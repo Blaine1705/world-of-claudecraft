@@ -112,7 +112,7 @@ export type {
 // discriminator. Changing the authoritative town layout requires a new epoch:
 // the strict discriminator makes both rolling-deploy directions fail closed
 // before either binary loads a character into a differently shaped world.
-export const ONLINE_WORLD_LAYOUT_VERSION = 3 as const;
+export const ONLINE_WORLD_LAYOUT_VERSION = 4 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -124,6 +124,12 @@ export const ONLINE_WORLD_INCOMPATIBLE_MESSAGE =
 // server. Keep the version exact so rolling deploys can negotiate fail-closed.
 export const STABLE_TIMER_WIRE_VERSION = 3 as const;
 export type StableTimerWireVersion = typeof STABLE_TIMER_WIRE_VERSION;
+
+// Warlock pet-bar signature command capability. It is negotiated independently
+// from the world-layout epoch so rolling deploys fail closed for this optional
+// behavior without disconnecting otherwise compatible clients.
+export const PET_SPECIAL_WIRE_VERSION = 1 as const;
+export type PetSpecialWireVersion = typeof PET_SPECIAL_WIRE_VERSION;
 
 // Absolute cooldown schedule in server simulation seconds. A number is the
 // expiry for 1x recovery. The tuple adds a temporary recovery-rate segment;
@@ -492,6 +498,10 @@ export const COMMAND_NAMES = [
   // Guild billboard: set (or clear, with '') the officer-editable message
   // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
   'guild_set_motd',
+  // Template-authored active on a controlled pet (Abyssal Chain, Felbolt)
+  // plus its pet-bar autocast toggle.
+  'pet_special',
+  'pet_auto_special',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -632,6 +642,8 @@ export const COMMAND_FACETS = {
   pet_taunt: 'IWorldPet',
   pet_auto_taunt: 'IWorldPet',
   pet_auto_water_jet: 'IWorldPet',
+  pet_special: 'IWorldPet',
+  pet_auto_special: 'IWorldPet',
   pet_feed: 'IWorldPet',
   pet_heal: 'IWorldPet',
   pet_mode: 'IWorldPet',

@@ -5,7 +5,7 @@ import {
   RADIANT_RESONANCE_KIND,
 } from './paladin_radiant_resonance';
 
-function matches(aura: Aura, abilityId?: string): boolean {
+function matches(aura: { empowerAbilities?: readonly string[] }, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
   return abilityId !== undefined && aura.empowerAbilities.includes(abilityId);
 }
@@ -31,7 +31,12 @@ export function consumeAuraKind(
   const idx = e.auras.findIndex((aura) => aura.kind === kind && matches(aura, abilityId));
   if (idx < 0) return null;
   if (EMPOWER_CAST_KINDS.has(kind)) e.castConsumedEmpower = true;
-  const [aura] = e.auras.splice(idx, 1);
+  const aura = e.auras[idx];
+  if ((aura.charges ?? 1) > 1) {
+    aura.charges = (aura.charges ?? 1) - 1;
+    return aura;
+  }
+  e.auras.splice(idx, 1);
   ctx.emit({
     type: 'aura',
     targetId: e.id,
@@ -65,6 +70,19 @@ export function hasNextExecuteFree(e: Entity, abilityId: string): boolean {
   );
 }
 
+export function nextCastCheapMultiplierFromAuras(
+  auras: readonly {
+    kind: string;
+    value?: number;
+    empowerAbilities?: readonly string[];
+  }[],
+  abilityId?: string,
+): number | null {
+  return (
+    auras.find((aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId))?.value ?? null
+  );
+}
+
 export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number | null {
   if (
     abilityId === 'dawns_embrace' &&
@@ -73,11 +91,7 @@ export function nextCastCheapMultiplier(e: Entity, abilityId?: string): number |
   ) {
     return RADIANT_RESONANCE_DAWN_COST_MULTIPLIER;
   }
-  const generic = e.auras.find(
-    (aura) => aura.kind === 'next_cast_cheap' && matches(aura, abilityId),
-  )?.value;
-  if (generic !== undefined) return generic;
-  return null;
+  return nextCastCheapMultiplierFromAuras(e.auras, abilityId);
 }
 
 export const BATTLE_TRANCE_ABILITIES: ReadonlySet<string> = new Set([

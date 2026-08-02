@@ -321,6 +321,22 @@ export const cs_CZ: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Condemnation",
+      "fateThreadsLabel": "Fate Threads",
+      "doomMeterUnlock": "Move Affliction resource bar",
+      "doomMeterLock": "Lock Affliction resource bar",
+      "doomEmptyStatus": "{value} of {max} Condemnation.",
+      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Soul Fragments",
+      "ruinMeter": "Ruin",
+      "ruinStatus": "{value} of {max} Ruin"
+    },
     "spectate": {
       "banner": "Sleduješ {name}"
     },
@@ -1773,17 +1789,31 @@ export const cs_CZ: EnTranslations = {
       "absorb": "Absorbuje {value} poškození",
       "healAbsorb": "Absorbuje {value} příchozího léčení",
       "thorns": "Způsobuje útočníkům {value} {school} poškození",
+      "stasis": "Immune and unable to act",
       "slow": "Snižuje rychlost pohybu o {pct} %",
       "speed": "Zvyšuje rychlost pohybu o {pct} %",
       "attackSpeedSlow": "Zpomaluje rychlost útoku o {pct} %",
       "attackSpeedFast": "Zvyšuje rychlost útoku o {pct} %",
       "haste": "Zvyšuje rychlost útoku a sesílání o {pct} %",
       "imbueRange": "Zbraň naplněna: {min} až {max} bonusového poškození při Verdiktu",
+      "petDamage": "Increases pet damage by {pct}%",
+      "petHaste": "Increases pet action speed by {pct}%",
+      "spellDamage": "Increases spell damage by {pct}%",
+      "spellHaste": "Increases spell casting speed by {pct}%",
+      "sated": "Cannot benefit from another group haste effect",
+      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
+      "castShield": "Casting cannot be interrupted or delayed by damage",
       "dmgDone": "Zvyšuje způsobené poškození o {pct} %",
       "dmgDoneReduce": "Snižuje způsobené poškození o {pct} %",
       "heatingUp": "Tvůj příští po sobě jdoucí kritický zásah stavebního ohnivého kouzla udělí Žhavou sérii; nekritický stavební útok Rozehřívání odstraní",
       "elementalConvergencePrimed": "Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci",
       "hunterFerocity": "{stacks} Zuřivosti smečky: tvůj společník způsobuje o {pct}% větší poškození",
+      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
+      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
+      "leadenHexLock": "Leaden Hex cannot root this target again yet",
+      "forbiddenReflectionReady": "Your next eligible shared Warlock cooldown can be cast again",
+      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
+      "internalCooldown": "This effect cannot trigger again until the timer expires",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",
@@ -1797,6 +1827,13 @@ export const cs_CZ: EnTranslations = {
       "revengeFree": "Tvá příští Odveta nestojí žádný vztek",
       "victoryRush": "Vítězný nápor je připraven",
       "maxHpPct": "Zvyšuje maximální zdraví o {pct} %",
+      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
+      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
+      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
+      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
+      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
+      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
+      "physicalReduction": "Reduces Physical damage taken by {pct}%",
       "temporalHourglass": "Nezranitelný/á a neschopný/á jednat; obnovuje zdraví a urychluje obnovu cooldownu. Klikni pravým tlačítkem pro zrušení.",
       "tongues": "Zvyšuje dobu sesílání o {pct} %",
       "combustionCrit": "Tvoje ohnivá kouzla vždy kriticky zasáhnou",
@@ -1818,6 +1855,10 @@ export const cs_CZ: EnTranslations = {
       "moontide": "Měsíční příliv: stupeň {stacks} z {max}. Sesílání Šípu divočiny, Pádu nebes a Měsíčního semene ho plní v Podobě měsíčního křídla; při {max} se Měsíční semeno mění v Měsíční vzedmutí a Pád nebes ve Sluneční brázdu a obojí ho čerpá",
       "oldBlood": "Stará krev: stupeň {stacks} z {max}. Zasažené vlčí a medvědí údery sdílejí tuto zásobu; při {max} se promění Krvavý skus nebo Drcení kostí",
       "verdance": "Zeleň: stupeň {stacks} z {max}. Dokončená sesílání Divokého květu a Druhého květu ji plní; při {max} se Rychlé zhojení mění v Překvět",
+      "freeExecute": "Your next eligible execute ability costs nothing",
+      "resourceSap": "Restores {value} of your current resource every {interval} sec",
+      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
+      "healEcho": "Falling below {threshold}% health restores {value} health",
       "increase": {
         "ap": "Zvyšuje sílu útoku o {value}",
         "sp": "Zvyšuje sílu kouzel o {value}",
@@ -1856,6 +1897,8 @@ export const cs_CZ: EnTranslations = {
       "mortalWound": "Snižuje přijaté léčení o {pct} %",
       "vulnerability": "Zvyšuje obdržené poškození o {pct} %",
       "physVuln": "Zvyšuje obdržené fyzické poškození o {pct} %",
+      "bleedVuln": "Increases bleed damage taken by {pct}%",
+      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
       "spellVuln": "Zvyšuje obdržené magické poškození o {pct} %",
       "critVuln": "Zvyšuje šanci na obdržený kritický zásah o {pct} %",
       "costTax": "Zvyšuje cenu schopností o {pct} %",
@@ -1874,8 +1917,39 @@ export const cs_CZ: EnTranslations = {
       "formCat": "Vlčí podoba: poškození na blízko a energie",
       "formTravel": "Cestovní podoba: rychlost pohybu zvýšena o {pct} %",
       "formFireball": "Žárová podoba: rychlost pohybu zvýšena o {pct} %; útoky a kouzla jsou zakázány",
+      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
+      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
+      "resourceCount": "{value} of {max}",
+      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
+      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
+      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
+      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
+      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
+      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
+      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
+      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
+      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
+      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
+      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
+      "necromancyHarvestMark": "Death can create 1 Soul Fragment and leaves a Death Echo for Corpse Explosion",
+      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
+      "necromancyDeathEcho": "Corpse Explosion can consume this echo within {radius} yd of its aim",
+      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
+      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
+      "energyRegen": "Increases Energy regeneration by {pct}%",
       "defensiveStance": "Obranný postoj: nižší obdržené poškození, větší hrozba",
       "righteousFury": "Hořící přísaha: výrazně zvýšená hrozba ze svatého poškození",
+      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
+      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
+      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
+      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
+      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
+      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
+      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
+      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
+      "duskfireClaim": "Death grants {value} Ruin",
+      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
+      "perfectMoment": "Aether Darts does not consume Arcane Charges",
       "scale": "Velikost zvýšena o {pct} %",
       "jump": "Výška skoku zvýšena o {pct} %",
       "school": {
@@ -3514,6 +3588,7 @@ export const cs_CZ: EnTranslations = {
       "none": "Žádná třída nesplňuje všechny filtry. Vyčisti jeden a uvidíš víc."
     },
     "abilityHook": {
+      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
       "heroic_strike": "Zařadí těžší švih, který utratí vztek při příštím zásahu.",
       "revenge": "Sekne nepřátele před tebou a po úhybu nebo odražení může být zdarma.",
       "hamstring": "Zmrzačí pohyb nepřítele, aby nemohl uniknout.",
@@ -6694,6 +6769,10 @@ export const cs_CZ: EnTranslations = {
     "pet": {
       "attack": "Útok",
       "waterJet": "Vodní paprsek",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "Provokace",
       "healDemon": "Léčit démona",
       "healPet": "Nakrm mazlíčka",
@@ -6704,6 +6783,10 @@ export const cs_CZ: EnTranslations = {
       "petAttackDesc": "Přikaž mazlíčkovi zaútočit na tvůj aktuální nepřátelský cíl.",
       "waterJetTitle": "Vodní paprsek",
       "waterJetDesc": "Přikaž svému vodnímu elementálovi, aby po dobu 3 sekund soustředil zpomalující proud. Čas obnovy 8 sekund. Kliknutím pravým tlačítkem aktivuješ automatické seslání, kdykoli je schopnost mimo čas obnovy.",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "Provokace mazlíčka",
       "petTauntDesc": "Přikaž mazlíčkovi zapojit se a zavrčet, jakmile bude v dosahu. Doba obnovy 10 sekund.",
       "healDemonDesc": "Utrať manu a směruj léčení do svého démona po dobu 5 sekund.",
@@ -6855,6 +6938,7 @@ export const cs_CZ: EnTranslations = {
     "tooltip": {
       "rank": "Stupeň {rank}",
       "cost": "{cost} {resource}",
+      "ruinCost": "{cost} Ruin",
       "range": "Dosah {range} yardů",
       "rangeWithMin": "Dosah {min}-{max} yardů",
       "instant": "Okamžité",
@@ -7068,6 +7152,7 @@ export const cs_CZ: EnTranslations = {
       "clickDestroy": "Kliknutím zničíš",
       "useFishing": "Použití: Rybař v blízkých vodách.",
       "useHealingPotion": "Použití: Okamžitě obnoví {amount} zdraví. Použitelné v boji. Doba obnovy 2 min.",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "Použití: Okamžitě obnoví {amount} many. Použitelné v boji. Doba obnovy 2 min.",
       "clickUseInstant": "Kliknutím okamžitě použiješ v boji",
       "clickUse": "Kliknutím použiješ",
@@ -7983,9 +8068,29 @@ export const cs_CZ: EnTranslations = {
         "name": "Černá hniloba",
         "description": "Zkazí cíl a způsobí {damage} stínového poškození během 18 s."
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+      },
+      "maledict_gaze": {
+        "name": "Maledict Gaze",
+        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+      },
+      "needle_of_fate": {
+        "name": "Needle of Fate",
+        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+      },
+      "sentence": {
+        "name": "Sentence",
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation."
+      },
       "life_tap": {
         "name": "Tvrdý obchod",
         "description": "Převede {damage} zdraví na {damage} many."
+      },
+      "cursed_accomplice": {
+        "name": "Cursed Accomplice",
+        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
       },
       "curse_of_agony": {
         "name": "Kletba trýzně",
@@ -7994,6 +8099,46 @@ export const cs_CZ: EnTranslations = {
       "drain_life": {
         "name": "Vysát",
         "description": "Vysává život cíle a převádí ti {damage} zdraví každou sekundu po dobu 5 s."
+      },
+      "litany_of_guilt": {
+        "name": "Litany of Guilt",
+        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+      },
+      "cinderhide": {
+        "name": "Cinderhide",
+        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+      },
+      "umbral_anchor": {
+        "name": "Umbral Anchor",
+        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+      },
+      "hex_of_violence": {
+        "name": "Hex of Violence",
+        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 22 Shadow damage."
+      },
+      "cruel_pact": {
+        "name": "Cruel Pact",
+        "description": "Sacrifices 12% of your maximum health to restore 15% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+      },
+      "vicarious_suffering": {
+        "name": "Vicarious Suffering",
+        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+      },
+      "possess_evil_eye": {
+        "name": "Possess the Evil Eye",
+        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage."
+      },
+      "hour_of_judgment": {
+        "name": "Hour of Judgment",
+        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+      },
+      "coven": {
+        "name": "Coven",
+        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
       },
       "fear": {
         "name": "Děs",
@@ -8006,6 +8151,10 @@ export const cs_CZ: EnTranslations = {
       "shadowburn": {
         "name": "Soumračný oheň",
         "description": "Okamžitě zasáhne cíl sežehujícím stínem za {damage} stínového poškození."
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "Šíp divočiny",
@@ -8197,6 +8346,62 @@ export const cs_CZ: EnTranslations = {
         "name": "Volání přílivu",
         "description": "Vyléčí přátelský cíl za {damage}. Léčení roste se silou kouzel. Přidá celé léčení před přeléčením do Léčivého proudu, až do 30% maximálního zdraví cíle."
       },
+      "soul_harvest": {
+        "name": "Essence Reap",
+        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+      },
+      "raise_graveguard": {
+        "name": "Raise Graveguard",
+        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Raise Skeletal Warrior",
+        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+      },
+      "raise_bone_mage": {
+        "name": "Raise Bone Mage",
+        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+      },
+      "bone_armor": {
+        "name": "Bone Armor",
+        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+      },
+      "corpse_explosion": {
+        "name": "Corpse Explosion",
+        "description": "Spends 2 Soul Fragments to rupture death energy at the chosen location, dealing {damage} Shadow damage to nearby enemies."
+      },
+      "funeral_harvest": {
+        "name": "Funeral Harvest",
+        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+      },
+      "unholy_command": {
+        "name": "Unholy Command",
+        "description": "Commands all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+      },
+      "reaping_command": {
+        "name": "Reaping Command",
+        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrifice Undead",
+        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+      },
+      "raise_gravewing": {
+        "name": "Raise Gravewing",
+        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+      },
+      "army_of_the_dead": {
+        "name": "Army of the Dead",
+        "description": "Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes."
+      },
       "metamorphosis": {
         "name": "Děsivý zjev",
         "description": "Na 20 s se proměníš v děsivého démona, zvýšíš svoje poškození kouzly o 20 % a rychlost sesílání o 20 %. Tvůj démon způsobuje o 50 % více poškození a sesílá o 20 % rychleji. (klíčová schopnost Démonologie)"
@@ -8323,7 +8528,7 @@ export const cs_CZ: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Vyvolat Žárového kolosa",
-        "description": "Spoutá Žárového kolosa do tvé vůle, mohutného juggernauta s drtivým bojem na blízko a nejhlubším zdravím i zbrojí ze všech démonů. Jeho syrovou sílu omezuje dlouhý cooldown. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona."
+        "description": "Přivolá Žárového kolosa do cílové oblasti a při dopadu způsobí 58-72 bodů ohnivého poškození. Bojuje 30 s, aniž by nahradil tvého démona, každé 2 s spaluje okolní nepřátele a každou sekundu vytváří 1 bod Zkázy."
       },
       "summon_doomguard": {
         "name": "Vyvolat Zrozence přízraků",
@@ -8477,9 +8682,17 @@ export const cs_CZ: EnTranslations = {
         "name": "Rozvětvený blesk",
         "description": "Sešle blesk na cílovou oblast a způsobí blízkým nepřátelům {damage} bodů poškození. (šamanský talent)"
       },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+      },
       "chaos_bolt": {
         "name": "Zkázný šíp",
         "description": "Vrhne střelu chaotického ohně, která způsobí {damage} bodů ohnivého poškození. (černokněžnický talent)"
+      },
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cloak_of_shadows": {
         "name": "Stínoplášť",
@@ -8668,6 +8881,10 @@ export const cs_CZ: EnTranslations = {
       "smoke_screen": {
         "name": "Kouřová clona",
         "description": "Zmizíte v oblaku kouře a na 8 s zvýšíte svou šanci na úhyb o 30 %."
+      },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
       },
       "spellsteal": {
         "name": "Krádež kouzla",
@@ -10209,6 +10426,9 @@ export const cs_CZ: EnTranslations = {
       "conjured_bread4": {
         "name": "Vyčarovaný hodovní bochník"
       },
+      "soul_stone": {
+        "name": "Soul Stone"
+      },
       "bristleback_maul": {
         "name": "Gallowglassské kladivo"
       },
@@ -11641,6 +11861,18 @@ export const cs_CZ: EnTranslations = {
       },
       "water_elemental": {
         "name": "Vodní elementál"
+      },
+      "graveguard": {
+        "name": "Graveguard"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Skeletal Warrior"
+      },
+      "necromancy_bone_mage": {
+        "name": "Bone Mage"
+      },
+      "necromancy_gravewing": {
+        "name": "Gravewing"
       }
     },
     "npcs": {

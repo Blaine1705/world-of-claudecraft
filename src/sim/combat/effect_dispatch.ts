@@ -33,9 +33,11 @@ import {
   isDivineAscensionActive,
   syncDivineAscensionAura,
 } from '../paladin_devotion';
+import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
+import { summonSoulwell } from '../soulwell';
 import {
   abilityScalingPower,
   absorbBonus,
@@ -60,6 +62,19 @@ import {
   swingMissChance,
 } from '../types';
 import {
+  applyCoven,
+  applyCruelPact,
+  applyCursedAccomplice,
+  applyEvilEyePossession,
+  applyHexOfViolence,
+  applyHourOfJudgment,
+  applyLitanyOfGuilt,
+  applyVicariousSuffering,
+  moveEvilEye,
+  resolveNeedleOfFate,
+  resolveSentence,
+} from './affliction';
+import {
   abilityQualifiesForAreaEcho,
   consumeAreaEchoCharge,
   echoAreaDamage,
@@ -82,6 +97,13 @@ import {
   placeTemporalEcho,
   selectCascadeTargets,
 } from './chronomancy';
+import {
+  advanceBurningPactTick,
+  applyDuskfireClaim,
+  applyRuinousBrand,
+  destructionAfterCast,
+  summonPyreColossus,
+} from './destruction';
 import { extendOwnedDot } from './dot_mutation';
 import {
   druidApexPayoffMult,
@@ -134,6 +156,17 @@ import {
 } from './hunter_shared';
 import { spawnFrostjawTrap, spawnHunterTrap } from './hunter_trap';
 import { resurrectDeadGroupMembers } from './mass_resurrection';
+import {
+  addSoulFragments,
+  applyOrDetonateOssuaryMark,
+  commandUndead,
+  consumeDeathEcho,
+  pierceLichSoulLance,
+  raiseArmyOfDead,
+  reapWithUndead,
+  sacrificeUndead,
+  summonUndead,
+} from './necromancy';
 import { placeBeaconOfLight } from './paladin_beacon';
 import { PROTECTION_CONSECRATION_DAMAGE_REDUCTION } from './paladin_consecration';
 import { pullPaladinTargets, pulsePaladinThreat } from './paladin_control';
@@ -200,6 +233,8 @@ import {
 import { noteSpellHit, spellDamageMultFromAuras } from './spell_combat';
 import { consumeSureCritCharge, hasSureCritAura } from './sure_crit';
 import { applyTemporalHourglass } from './temporal_hourglass';
+import { applyBlacktideReturnSpeed } from './warlock_talents';
+import { placeOrRecallUmbralAnchor } from './warlock_utility';
 
 export { SWEEP_MULT } from './area_echo';
 
@@ -289,7 +324,12 @@ function removeRootAuras(ctx: SimContext, entity: Entity): void {
     const aura = entity.auras[index];
     if (aura.kind !== 'root' || isUnbreakableControlAura(aura)) continue;
     entity.auras.splice(index, 1);
-    ctx.emit({ type: 'aura', targetId: entity.id, name: aura.name, gained: false });
+    ctx.emit({
+      type: 'aura',
+      targetId: entity.id,
+      name: aura.name,
+      gained: false,
+    });
   }
 }
 
@@ -388,6 +428,9 @@ export function runEffects(
   // Dynamic DoT riders snapshot a fraction of the preceding resolved direct
   // hit, including its scaling and critical multiplier.
   let lastDirectDamage = 0;
+  // Destruction's Brand copies health actually removed after the target-side
+  // damage pipeline, not the pre-mitigation direct-hit roll above.
+  let lastResolvedDirectDamage = 0;
   // Frost mage (combat/frost_mage.ts): resolved ONCE per cast, so a multi-hit
   // cast shares one frozen resolution and spends at most one Fingers of Frost
   // stack / Winter's Chill charge. Inert (and free) for everyone who is not a
@@ -408,7 +451,12 @@ export function runEffects(
     if (sf >= 0) {
       const lost = p.auras[sf];
       p.auras.splice(sf, 1);
-      ctx.emit({ type: 'aura', targetId: p.id, name: lost.name, gained: false });
+      ctx.emit({
+        type: 'aura',
+        targetId: p.id,
+        name: lost.name,
+        gained: false,
+      });
       recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
     }
   }
@@ -479,11 +527,28 @@ export function runEffects(
   // alongside spendAbilityCost/armAbilityCooldown, not here: a ranged ability's
   // runEffects can run ticks after the cast committed (once its projectile
   // lands), which used to leave the gating aura alive for a same-tick second
-  // cast attempt (issue #2632).
+  // cast attempt (issue #2632). Sentence is the exception: resolveSentence owns
+  // consuming its Doom pool after the cast is committed.
 
   let targetBuffIndex = 0;
   for (const eff of res.effects) {
     switch (eff.type) {
+      case 'destructionConflagrate': {
+        if (target) advanceBurningPactTick(ctx, p, target);
+        break;
+      }
+      case 'ruinousBrand': {
+        if (target) applyRuinousBrand(ctx, p, target, eff.duration, eff.charges);
+        break;
+      }
+      case 'duskfireClaim': {
+        if (target) applyDuskfireClaim(ctx, p, target, eff.duration);
+        break;
+      }
+      case 'summonPyreColossus': {
+        summonPyreColossus(ctx, p, eff.duration);
+        break;
+      }
       case 'temporalHourglass': {
         applyTemporalHourglass(ctx, p, p.castAim ?? p.pos, eff, ability.name);
         break;
@@ -503,7 +568,12 @@ export function runEffects(
             const charge = p.auras[chargeIndex];
             weaponMult *= 1 + charge.value * (charge.stacks ?? 1);
             p.auras.splice(chargeIndex, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: charge.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: charge.name,
+              gained: false,
+            });
           }
         }
         if (
@@ -706,6 +776,7 @@ export function runEffects(
           attackAnimationStarted,
           false,
           ability.id,
+          false,
         );
         // Read before the hunter/shaman follow-up hooks below, which can deal their
         // own damage: this must stay the damage THIS ability landed.
@@ -764,6 +835,10 @@ export function runEffects(
             }
           }
         }
+        lastResolvedDirectDamage = resolvedDamage;
+        if (ability.id === 'soul_lance') {
+          pierceLichSoulLance(ctx, p, target, lastResolvedDirectDamage);
+        }
         if (areaEcho) {
           areaEchoDealt = true;
           echoAreaDamage(ctx, p, target, resolvedDamage, ability.school, ability.name, threatOpts);
@@ -787,7 +862,12 @@ export function runEffects(
           if (echoIdx >= 0) {
             const echoAura = p.auras[echoIdx];
             p.auras.splice(echoIdx, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: echoAura.name,
+              gained: false,
+            });
             if (!target.dead) {
               // The echo is a REAL second projectile (owner playtest: the
               // instant copy looked superimposed): it visibly leaves the
@@ -1137,7 +1217,12 @@ export function runEffects(
           if (echoIdx >= 0) {
             const echoAura = p.auras[echoIdx];
             p.auras.splice(echoIdx, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: echoAura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: echoAura.name,
+              gained: false,
+            });
             if (!healTarget.dead && healed > 0) {
               const echoHeal = Math.max(1, Math.round(healed * echoAura.value));
               ctx.applyHeal(p, healTarget, echoHeal, ability.name, ability.id, false, false);
@@ -1289,7 +1374,12 @@ export function runEffects(
           const a = p.auras[i];
           if (a.kind === 'imbue' && a.id !== ability.id) {
             p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: a.name,
+              gained: false,
+            });
           }
         }
         ctx.applyAura(p, {
@@ -1470,7 +1560,12 @@ export function runEffects(
           const aura = p.auras[i];
           if (isDebuffAura(aura.kind, aura.value) && !isUnbreakableControlAura(aura)) {
             p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: aura.name,
+              gained: false,
+            });
           }
         }
         break;
@@ -1729,7 +1824,12 @@ export function runEffects(
           dot.value * ticksLeft * druidApexPayoffMult(ctx, p, ability.id),
         );
         target.auras.splice(dotIndex, 1);
-        ctx.emit({ type: 'aura', targetId: target.id, name: dot.name, gained: false });
+        ctx.emit({
+          type: 'aura',
+          targetId: target.id,
+          name: dot.name,
+          gained: false,
+        });
         ctx.emit({
           type: 'spellfx',
           sourceId: p.id,
@@ -1931,6 +2031,7 @@ export function runEffects(
         // the caster. The fx follows the same center (a world-anchored burst for
         // an aimed blast, the entity-anchored nova otherwise).
         const aoeCenter = p.castAim ?? p.pos;
+        if (ability.id === 'corpse_explosion' && !consumeDeathEcho(ctx, p, aoeCenter)) break;
         if (ability.id === 'bastion_sweep') {
           // The cast-start event was emitted before the authored wind-up. The
           // deferred impact phase owns only authoritative damage and hit flashes.
@@ -1958,7 +2059,7 @@ export function runEffects(
             ability: ability.id,
             sourceId: p.id,
           });
-        } else {
+        } else if (!p.castAim) {
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
@@ -2010,6 +2111,23 @@ export function runEffects(
         let sunVerdictHit: { target: Entity; mark: Aura } | null = null;
         for (const m of aoeTargets) {
           const sunVerdictMark = ability.id === DAWNFALL_ID ? sunVerdictMarkForHit(m, p.id) : null;
+          const boss = m.kind === 'mob' && MOBS[m.templateId]?.boss === true;
+          if (eff.pullToCenter && !boss) {
+            const pulled = ctx.resolveMove(
+              m.pos.x,
+              m.pos.z,
+              aoeCenter.x,
+              aoeCenter.z,
+              PLAYER_BODY_RADIUS,
+              m,
+            );
+            m.prevPos = { ...m.pos };
+            m.pos = ctx.groundPos(pulled.x, pulled.z);
+            m.vx = 0;
+            m.vz = 0;
+            m.vy = 0;
+            ctx.rebucket(m);
+          }
           let dmg = ctx.rng.range(eff.min, eff.max) + aoeSpBonus;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
           if (aoeCrit)
@@ -2066,7 +2184,7 @@ export function runEffects(
           // Paired stun rider (Faultline): each enemy actually struck is also
           // stunned, mirroring the single-target 'stun' case (shared PvP DR,
           // no rng drawn; diminishedCrowdControlDuration is deterministic).
-          if (eff.stunSec !== undefined && !m.dead) {
+          if (eff.stunSec !== undefined && !m.dead && !boss) {
             const duration = ctx.diminishedCrowdControlDuration(
               p,
               m,
@@ -2315,7 +2433,10 @@ export function runEffects(
           radius: eff.radius,
           min: Math.round(eff.min * thundercallMult),
           max: Math.round(eff.max * thundercallMult),
-          remaining: eff.duration,
+          // A delayed zone replaces its on-cast pulse with a pulse on the exact
+          // duration edge. Keep it alive for that boundary tick so it does not
+          // silently lose one authored wave.
+          remaining: eff.duration + (eff.delayed ? DT : 0),
           interval: eff.interval,
           tickTimer: eff.interval,
           school: ability.school,
@@ -2351,7 +2472,20 @@ export function runEffects(
         // Visual riders (owner playtest): a delayed FIRE zone is a falling
         // meteor (the ball drops over the fall delay); a friendly zone is an
         // inscribed rune circle for its whole life. Cosmetic only.
-        if (eff.delayed && ability.school === 'fire') {
+        const isRainOfFire = ability.id === 'rain_of_fire';
+        if (isRainOfFire) {
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            school: ability.school,
+            fx: 'felMeteorRain',
+            radius: eff.radius,
+            duration: eff.duration,
+            sourceId: p.id,
+            ability: ability.id,
+          });
+        } else if (eff.delayed && ability.school === 'fire') {
           ctx.emit({
             type: 'spellfxAt',
             x: zoneCenter.x,
@@ -2360,6 +2494,7 @@ export function runEffects(
             fx: 'meteorFall',
             radius: eff.radius,
             duration: eff.interval,
+            sourceId: p.id,
             ability: ability.id,
           });
         }
@@ -2371,6 +2506,7 @@ export function runEffects(
             school: ability.school,
             fx: 'runeCircle',
             radius: eff.radius,
+            sourceId: p.id,
             duration: eff.duration,
             ability: ability.id,
           });
@@ -2388,13 +2524,14 @@ export function runEffects(
             ability: ability.id,
           });
         }
-        if (p.castAim) {
+        if (p.castAim && !isRainOfFire) {
           ctx.emit({
             type: 'spellfxAt',
             x: zoneCenter.x,
             z: zoneCenter.z,
             school: ability.school,
             fx: 'nova',
+            sourceId: p.id,
             radius: eff.radius,
             ability: ability.id,
           });
@@ -2625,7 +2762,12 @@ export function runEffects(
         )) {
           const a = p.auras[i];
           p.auras.splice(i, 1);
-          ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+          ctx.emit({
+            type: 'aura',
+            targetId: p.id,
+            name: a.name,
+            gained: false,
+          });
         }
         const kind = eff.apPct !== undefined ? 'buff_ap_pct' : 'buff_ap';
         const value = eff.apPct ?? eff.amount ?? 0;
@@ -2745,7 +2887,12 @@ export function runEffects(
           const gone = p.auras[i];
           p.auras.splice(i, 1);
           removed++;
-          ctx.emit({ type: 'aura', targetId: p.id, name: gone.name, gained: false });
+          ctx.emit({
+            type: 'aura',
+            targetId: p.id,
+            name: gone.name,
+            gained: false,
+          });
         }
         // The stealth kind doubles as a MOVEMENT factor in moveSpeedMult
         // (rogue stealth walks slower); an invisible mage keeps full speed,
@@ -2944,7 +3091,12 @@ export function runEffects(
         }
         const consumed = target.auras[auraIdx];
         target.auras.splice(auraIdx, 1);
-        ctx.emit({ type: 'aura', targetId: target.id, name: consumed.name, gained: false });
+        ctx.emit({
+          type: 'aura',
+          targetId: target.id,
+          name: consumed.name,
+          gained: false,
+        });
         if (eff.deal) {
           let dmg =
             ctx.rng.range(eff.deal.min, eff.deal.max) +
@@ -3009,7 +3161,12 @@ export function runEffects(
             const source = ctx.entities.get(aura.sourceId);
             if (source && MOBS[source.templateId]?.boss) continue;
             p.auras.splice(i, 1);
-            ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: aura.name,
+              gained: false,
+            });
           }
         }
         break;
@@ -3058,13 +3215,19 @@ export function runEffects(
           isFormKind ||
           eff.kind === 'defensive_stance' ||
           eff.kind === 'stealth' ||
-          ability.id === 'ghost_wolf';
+          ability.id === 'ghost_wolf' ||
+          eff.healthDrainPctMax !== undefined;
         if (isToggle) {
           const existing = p.auras.findIndex((a) => a.id === ability.id);
           if (existing >= 0) {
             p.auras.splice(existing, 1);
             if (eff.kind === 'stealth') p.stealthed = false; // toggled back out of stealth
-            ctx.emit({ type: 'aura', targetId: p.id, name: ability.name, gained: false });
+            ctx.emit({
+              type: 'aura',
+              targetId: p.id,
+              name: ability.name,
+              gained: false,
+            });
             if (ability.id === 'ghost_wolf') onGhostWolfExited(ctx, p);
             recalcPlayerStats(
               p,
@@ -3086,7 +3249,12 @@ export function runEffects(
             const a = p.auras[i];
             if (isFormAuraKind(a.kind) && a.kind !== eff.kind) {
               p.auras.splice(i, 1);
-              ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+              ctx.emit({
+                type: 'aura',
+                targetId: p.id,
+                name: a.name,
+                gained: false,
+              });
             }
           }
         }
@@ -3100,7 +3268,12 @@ export function runEffects(
         )) {
           const a = p.auras[i];
           p.auras.splice(i, 1);
-          ctx.emit({ type: 'aura', targetId: p.id, name: a.name, gained: false });
+          ctx.emit({
+            type: 'aura',
+            targetId: p.id,
+            name: a.name,
+            gained: false,
+          });
         }
         if (eff.kind === 'overpower_charge') {
           const existing = p.auras.find((aura) => aura.kind === 'overpower_charge');
@@ -3129,8 +3302,13 @@ export function runEffects(
           duration: lifetime,
           permanent: eff.permanent,
           value: eff.value,
-          value2: eff.value2,
-          value3: eff.value3,
+          // value2/value3 are shared secondary slots: the generic selfBuff
+          // passthrough and the Warlock drain/disable knobs both ride them, so
+          // the explicit value wins and the Warlock knob is the fallback.
+          value2: eff.value2 ?? eff.healthDrainPctMax,
+          value3: eff.value3 ?? eff.disableBelowHpPct,
+          tickInterval: eff.healthDrainPctMax !== undefined ? 1 : undefined,
+          tickTimer: eff.healthDrainPctMax !== undefined ? 1 : undefined,
           stacks: eff.kind === 'overpower_charge' ? 1 : undefined,
           sourceId: p.id,
           school: ability.school,
@@ -3139,6 +3317,16 @@ export function runEffects(
           charges: eff.charges,
           icdMax: eff.internalCooldown,
         });
+        if (eff.kind === 'form_lich') {
+          ctx.emit({
+            type: 'spellfx',
+            sourceId: p.id,
+            targetId: p.id,
+            school: ability.school,
+            fx: 'lichTransform',
+            ability: ability.id,
+          });
+        }
         if (eff.kind === 'stealth' && dropsCombatOnStealth(ability)) {
           dropSelfFromHostileFocus(ctx, p);
         }
@@ -3320,12 +3508,147 @@ export function runEffects(
         });
         break;
       }
+      case 'selfDamagePctCurrent': {
+        const dmg = Math.max(1, Math.round(p.hp * eff.pct));
+        p.hp = Math.max(1, p.hp - dmg);
+        ctx.emit({
+          type: 'damage',
+          sourceId: p.id,
+          targetId: p.id,
+          amount: dmg,
+          crit: false,
+          school: 'shadow',
+          ability: ability.name,
+          kind: 'hit',
+        });
+        break;
+      }
       case 'selfHealPctMax': {
         const pct = p.auras.some((a) => a.id === 'furious_mending')
           ? Math.max(eff.pct, 0.2)
           : eff.pct;
         ctx.applyHeal(p, p, Math.round(p.maxHp * pct), ability.name);
         if (ability.id === 'wildheart') runHunterWildheart(ctx, p);
+        break;
+      }
+      case 'selfAbsorbPctMax': {
+        ctx.applyAura(p, {
+          id: ability.id,
+          name: ability.name,
+          kind: 'absorb',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: Math.round(p.maxHp * eff.pct),
+          sourceId: p.id,
+          school: ability.school,
+        });
+        break;
+      }
+      case 'gainSoulFragments': {
+        addSoulFragments(ctx, p, eff.amount);
+        break;
+      }
+      case 'summonUndead': {
+        summonUndead(ctx, p, eff.templateId, eff.temporary, eff.duration);
+        break;
+      }
+      case 'commandUndead': {
+        commandUndead(ctx, p, eff.duration, eff.dmgPct, eff.hastePct);
+        break;
+      }
+      case 'sacrificeUndead': {
+        sacrificeUndead(ctx, p, eff.healPctMax, ability.name);
+        break;
+      }
+      case 'reapingCommand': {
+        if (target) reapWithUndead(ctx, p, target, ability.name);
+        break;
+      }
+      case 'armyOfDead': {
+        raiseArmyOfDead(ctx, p, eff.duration);
+        break;
+      }
+      case 'empowerUndeadArmy': {
+        commandUndead(ctx, p, eff.duration, eff.dmgPct, eff.hastePct, 'lich_form_army');
+        break;
+      }
+      case 'necromancyOssuaryMark': {
+        if (target) {
+          applyOrDetonateOssuaryMark(
+            ctx,
+            p,
+            target,
+            eff.duration,
+            eff.storedDamagePct,
+            eff.soulLanceBonusPct,
+            eff.deathRadius,
+          );
+        }
+        break;
+      }
+      case 'afflictionEvilEye': {
+        if (target) moveEvilEye(ctx, p, target);
+        break;
+      }
+      case 'afflictionNeedle': {
+        if (target) resolveNeedleOfFate(ctx, p, target);
+        break;
+      }
+      case 'afflictionSentence': {
+        if (target) {
+          resolveSentence(ctx, p, target, ability.name, eff.damageMult ?? 1, eff.flat ?? 0);
+        }
+        break;
+      }
+      case 'afflictionAccomplice': {
+        if (target) applyCursedAccomplice(ctx, p, target);
+        break;
+      }
+      case 'afflictionViolence': {
+        if (target) {
+          applyHexOfViolence(
+            ctx,
+            p,
+            target,
+            eff.duration,
+            eff.charges,
+            eff.doomPerProc,
+            eff.damage,
+          );
+        }
+        break;
+      }
+      case 'afflictionCruelPact': {
+        const manaPctMax = eff.manaPctMax * (1 + (mods.abilities[ability.id]?.buffPct ?? 0));
+        applyCruelPact(ctx, p, eff.healthPct, manaPctMax, eff.doom);
+        break;
+      }
+      case 'afflictionVicarious': {
+        if (target) applyVicariousSuffering(ctx, p, target, eff.duration, eff.maxDoom);
+        break;
+      }
+      case 'warlockUmbralAnchor': {
+        if (placeOrRecallUmbralAnchor(ctx, p, eff.duration, eff.maxRange)) {
+          applyBlacktideReturnSpeed(ctx, p);
+        }
+        break;
+      }
+      case 'afflictionCoven': {
+        if (target) applyCoven(ctx, p, target, eff.duration, eff.radius, eff.maxSecondary);
+        break;
+      }
+      case 'afflictionPossession': {
+        applyEvilEyePossession(ctx, p, eff.duration, eff.doom);
+        break;
+      }
+      case 'afflictionJudgment': {
+        if (target) applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
+        break;
+      }
+      case 'afflictionLitany': {
+        if (target) {
+          applyLitanyOfGuilt(ctx, p, target, eff.duration, eff.radius, eff.maxTargets, eff.damage);
+        }
         break;
       }
       case 'selfHotPctMax': {
@@ -3413,7 +3736,12 @@ export function runEffects(
             : (comboStacks ?? Math.min(eff.maxStacks, (existing.stacks ?? 1) + 1));
           existing.value = eff.armor;
           existing.remaining = existing.duration;
-          ctx.emit({ type: 'aura', targetId: target.id, name: ability.name, gained: true });
+          ctx.emit({
+            type: 'aura',
+            targetId: target.id,
+            name: ability.name,
+            gained: true,
+          });
         } else {
           ctx.applyAura(target, {
             id: ability.id,
@@ -3480,6 +3808,12 @@ export function runEffects(
       }
       case 'summonDemon': {
         ctx.summonPet(p, eff.mobId);
+        break;
+      }
+      case 'summonSoulwell': {
+        if (!summonSoulwell(ctx, p, eff.duration)) {
+          ctx.error(p.id, 'Line of sight.');
+        }
         break;
       }
     }
@@ -3571,6 +3905,7 @@ export function runEffects(
   if (ability.spendsCombo && spentCombo > 0) {
     rogueEngineOnFinisher(ctx, p, ability.id, spentCombo);
   }
+  destructionAfterCast(ctx, p, meta, res, target, lastResolvedDirectDamage);
 
   if (ability.spendsCombo && spentCombo > 0) {
     p.comboPoints = 0;

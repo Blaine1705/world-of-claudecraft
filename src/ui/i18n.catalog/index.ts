@@ -1454,6 +1454,10 @@ export const en = {
       ...mergeEntities.en.mobs,
       ...mergeExtra.en.mobs,
       water_elemental: { name: 'Water Elemental' },
+      graveguard: { name: 'Graveguard' },
+      necromancy_skeletal_warrior: { name: 'Skeletal Warrior' },
+      necromancy_bone_mage: { name: 'Bone Mage' },
+      necromancy_gravewing: { name: 'Gravewing' },
     },
     npcs: { ...worldNames.en.entities.npcs, ...mergeExtra.en.npcs },
     quests: {

@@ -8,6 +8,7 @@ import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
@@ -555,6 +556,30 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
     setLanguage('en');
   });
 
+  it('resolves every player-visible Warlock resource, ability, and row aura name', () => {
+    setLanguage('zh_CN');
+    for (const name of [
+      'Condemnation',
+      'Soul Fragments',
+      'Umbral Anchor',
+      'Fate Threads',
+      'Possess the Evil Eye',
+      'Hour of Judgment',
+      'Coven',
+      'Sacrilegious March',
+      'Sanguine Covenant',
+      'Leaden Hex',
+      'Shadow Credit',
+      'Hexstorm',
+      'Forbidden Reflection',
+    ]) {
+      expect(localizeSimAuraName(name), `no Warlock aura matcher row for '${name}'`).not.toBeNull();
+    }
+    expect(localizeSimAuraName('Shadow Credit')).not.toBe('Shadow Credit');
+    expect(auraDisplayNameForHud('Fate Threads', '命运之针')).toBe('命运丝线');
+    setLanguage('en');
+  });
+
   it('every delve mob aura-emitting proc name resolves through the aura matcher', () => {
     // These five template fields all push a named, player-visible aura (a channel
     // line, a player debuff, or a target-frame buff). A name with no matcher row
@@ -601,6 +626,7 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
       'You have no living pet.',
       'You have no living demon.',
       'Pets are not allowed inside the delves.',
+      'Your Umbral Anchor is out of range.',
     ]) {
       expect(localizeSimText(emitted), `no sim matcher row for '${emitted}'`).not.toBe(emitted);
     }

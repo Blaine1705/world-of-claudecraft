@@ -49,7 +49,23 @@ describe('nine classes', () => {
           .filter((abilityId) => (ABILITIES[abilityId]?.learnLevel ?? Infinity) <= MAX_LEVEL)
           .every((abilityId) => reachable.has(abilityId)),
       ).toBe(true);
-      expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      if (cls === 'warlock') {
+        // The overhauled Warlock completes its shared kit at level 10; its
+        // 10-20 progression now belongs to each specialization instead.
+        for (const spec of ['affliction', 'demonology', 'destruction'] as const) {
+          const at10 = abilitiesKnownAt(cls, 10, computeTalentModifiers(cls, { spec, rows: {} }, 10));
+          const atMax = abilitiesKnownAt(
+            cls,
+            MAX_LEVEL,
+            computeTalentModifiers(cls, { spec, rows: {} }, MAX_LEVEL),
+          );
+          expect(at10.length, `${spec} should keep learning after level 10`).toBeLessThan(
+            atMax.length,
+          );
+        }
+      } else {
+        expect(abilitiesKnownAt(cls, 10).length).toBeLessThan(kit.length);
+      }
       // every class's core kit keeps scaling: something reaches rank 3+ by 20
       expect(kit.some((k) => k.rank >= 3)).toBe(true);
       // resource type sane

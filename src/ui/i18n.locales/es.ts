@@ -92,6 +92,95 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.title': 'Auras del objetivo',
   'hudChrome.targetAuras.unlock': 'Mover la ventana de auras del objetivo',
   'hudChrome.targetAuras.visibleRows': 'Filas de auras preferidas: {count}',
+  'hudChrome.warlock.doomLabel': 'Condena',
+  'hudChrome.warlock.fateThreadsLabel': 'Hilos del destino',
+  'hudChrome.warlock.doomEmptyStatus': '{value} de {max} de Condena.',
+  'hudChrome.warlock.doomStatus': '{value} de {max} de Condena; quedan {remaining}.',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Fragmentos de alma',
+  'guide.abilityHook.evil_eye':
+    'Señala al enemigo cuyas acciones y sufrimiento alimentarán tu Condena.',
+  'entities.abilities.evil_eye.name': 'Mal de ojo',
+  'entities.abilities.evil_eye.description':
+    'Marca a un enemigo como foco de tus maldiciones. Mover el Mal de ojo conserva la Condena, pero no renueva su duración de 20 s.',
+  'entities.abilities.maledict_gaze.name': 'Mirada maléfica',
+  'entities.abilities.maledict_gaze.description':
+    'Tu ojo maléfico ataca cada 2,5 s al objetivo principal de Mal de ojo e inflige daño de las Sombras. Poseer el Mal de ojo duplica su velocidad de ataque.',
+  'entities.abilities.needle_of_fate.name': 'Aguja del destino',
+  'entities.abilities.needle_of_fate.description':
+    'Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera 5 de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo.',
+  'entities.abilities.sentence.name': 'Sentencia',
+  'entities.abilities.sentence.description':
+    'Consume toda la Condena para sentenciar al enemigo. El daño y los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena.',
+  'entities.abilities.cursed_accomplice.name': 'Cómplice maldito',
+  'entities.abilities.cursed_accomplice.description':
+    'Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s.',
+  'entities.abilities.litany_of_guilt.name': 'Liturgia de culpa',
+  'entities.abilities.litany_of_guilt.description':
+    'Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo.',
+  'entities.abilities.umbral_anchor.name': 'Ancla umbría',
+  'entities.abilities.umbral_anchor.description':
+    'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s.',
+  'entities.abilities.hex_of_violence.name': 'Maleficio de violencia',
+  'entities.abilities.hex_of_violence.description':
+    'Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 22 de daño de las Sombras.',
+  'entities.abilities.cruel_pact.name': 'Pacto cruel',
+  'entities.abilities.cruel_pact.description':
+    'Sacrifica un 12% de tu salud máxima para generar 20 de Condena. No se puede usar con un 15% de salud o menos.',
+  'entities.abilities.vicarious_suffering.name': 'Sufrimiento vicario',
+  'entities.abilities.vicarious_suffering.description':
+    'Enlaza el sufrimiento durante 8 s y genera hasta 15 de Condena con golpes hostiles. Sobre ti reduce un 20% el daño recibido. Sobre un aliado redirige hasta un 20% hacia ti sin bajarte del 15% de salud.',
+  'entities.abilities.possess_evil_eye.name': 'Poseer el Mal de ojo',
+  'entities.abilities.possess_evil_eye.description':
+    'El maldictor posee tu Mal de ojo principal durante 15 s y genera 35 de Condena. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento, y Sentencia inflige un 25% más de daño y libera un eco retardado del 60% del daño.',
+  'entities.abilities.hour_of_judgment.name': 'Hora del juicio',
+  'entities.abilities.hour_of_judgment.description':
+    'Desata el juicio sobre tu Mal de ojo principal durante 15 s: obtienes 40 de Condena y 3 Hilos del destino, activas Posesión, duplicas la Condena generada mediante el Mal de ojo principal y aumentas un 20% el daño de Sentencia. La primera Sentencia devuelve 50 de Condena.',
+  'entities.abilities.coven.name': 'Aquelarre',
+  'entities.abilities.coven.description':
+    'Crea Males de ojo secundarios sobre hasta 4 enemigos cercanos durante 15 s. Alimentan la reserva compartida de Condena al 50% y reciben un eco del 35% del daño de Sentencia.',
+  'entities.mobs.necromancy_gravewing.name': 'Alatumba',
+  'entities.abilities.soul_harvest.name': 'Cosecha de esencia',
+  'entities.abilities.soul_harvest.description':
+    'Desgarra el alma del enemigo, inflige {damage} de daño de Sombras y crea 1 fragmento de alma, hasta un máximo de 5.',
+  'entities.abilities.raise_graveguard.name': 'Alzar guardián de tumbas',
+  'entities.abilities.raise_graveguard.description':
+    'Alza un compañero defensivo permanente. El guardián de tumbas provoca automáticamente, intercepta un 20% de tu daño mediante Dominio sepulcral y Mandato: siega hace que provoque y reciba un 30% menos de daño durante 4 s.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Alzar guerrero esquelético',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Gasta 1 fragmento de alma para añadir un guerrero esquelético persistente a tu Dominio de 2 huecos. Solo puede servirte uno. Golpea en barrido por un 45% de daño cada 6 s, y Mandato: siega ralentiza a su objetivo un 40% durante 4 s.',
+  'entities.abilities.raise_bone_mage.name': 'Alzar mago óseo',
+  'entities.abilities.raise_bone_mage.description':
+    'Gasta 2 fragmentos de alma para añadir un mago óseo a distancia persistente a tu Dominio de 2 huecos. Solo puede servirte uno. Sus ataques exponen al objetivo a un 5% más de daño mágico durante 6 s, y Mandato: siega eleva esa debilidad al 8%.',
+  'entities.abilities.bone_armor.name': 'Armadura de huesos',
+  'entities.abilities.bone_armor.description':
+    'Te envuelve en huesos y absorbe una cantidad de daño equivalente al 20% de tu salud máxima.',
+  'entities.abilities.corpse_explosion.name': 'Explosión de cadáver',
+  'entities.abilities.corpse_explosion.description':
+    'Gasta 2 fragmentos de alma para hacer estallar energía de muerte en la ubicación elegida e infligir {damage} de daño de Sombras a los enemigos cercanos.',
+  'entities.abilities.funeral_harvest.name': 'Cosecha fúnebre',
+  'entities.abilities.funeral_harvest.description':
+    'Cuando muere un enemigo dañado recientemente por ti o por tus no muertos, obtienes 1 fragmento de alma. Solo puede ocurrir una vez cada 3 s.',
+  'entities.abilities.unholy_command.name': 'Mandato profano',
+  'entities.abilities.unholy_command.description':
+    'Ordena a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s.',
+  'entities.abilities.reaping_command.name': 'Mandato: siega',
+  'entities.abilities.reaping_command.description':
+    'Gasta 2 fragmentos de alma para ordenar a todos tus sirvientes no muertos que golpeen al unísono. Los guardianes provocan y se protegen, los guerreros inmovilizan, los magos óseos exponen las defensas mágicas y el alatumba desgarra a todos los enemigos golpeados.',
+  'entities.abilities.sacrifice_undead.name': 'Sacrificar no muerto',
+  'entities.abilities.sacrifice_undead.description':
+    'Destruye uno de tus sirvientes del Dominio para restaurar un 25% de tu salud máxima.',
+  'entities.abilities.raise_gravewing.name': 'Alzar alatumba',
+  'entities.abilities.raise_gravewing.description':
+    'Gasta 2 fragmentos de alma para añadir un alatumba persistente a tu Dominio de 2 huecos. Solo puede servirte uno. Golpea en barrido por un 65% de daño cada 5 s, y Mandato: siega hace que cada enemigo golpeado reciba un 8% más de daño durante 5 s.',
+  'entities.abilities.army_of_the_dead.name': 'Ejército de los muertos',
+  'entities.abilities.army_of_the_dead.description':
+    'Abre un portal sepulcral durante 20 s y alza temporalmente cada arquetipo de Dominio que aún no te sirva. Tus sirvientes elegidos permanecen cuando se cierra el portal.',
+  'entities.abilities.cinderhide.name': 'Piel de escoria',
+  'entities.abilities.cinderhide.description':
+    'Endurece tu piel como escoria enfriada durante 10 s y reduce todo el daño recibido un 25%.',
+  'entities.mobs.graveguard.name': 'Guardián de tumbas',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Guerrero esquelético',
+  'entities.mobs.necromancy_bone_mage.name': 'Mago óseo',
   'hudChrome.bags.itemAriaMasterwork': '{item}, cantidad {count}, obra maestra',
   'hudChrome.archetypePair.tailoring+inscription': 'Tejedormago',
   'hudChrome.enchantName.enchant_weapon_runed_focus': 'Encantar arma - Sello Rúnico',
@@ -621,6 +710,102 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.archetypePair.weaponcrafting+armorcrafting': 'Herrero',
   'hudChrome.auraEffect.dmgDone': 'Aumenta el daño infligido un {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': 'Reduce el daño infligido un {pct}%',
+  'hudChrome.auraEffect.stasis': 'Inmune e incapaz de actuar',
+  'hudChrome.auraEffect.petDamage': 'Aumenta el daño de la mascota un {pct}%',
+  'hudChrome.auraEffect.petHaste': 'Aumenta la velocidad de acción de la mascota un {pct}%',
+  'hudChrome.auraEffect.spellDamage': 'Aumenta el daño con hechizos un {pct}%',
+  'hudChrome.auraEffect.spellHaste': 'Aumenta la velocidad de lanzamiento un {pct}%',
+  'hudChrome.auraEffect.sated': 'Impide beneficiarse de otro efecto de celeridad de grupo',
+  'hudChrome.auraEffect.cauterizeFatigue': 'Cauterizar no puede evitar otro golpe letal',
+  'hudChrome.auraEffect.castShield': 'El daño no puede interrumpir ni retrasar tus lanzamientos',
+  'hudChrome.auraEffect.cooldownCap':
+    'Has usado {used} de {cap} s de reducción de reutilización en esta ventana',
+  'hudChrome.auraEffect.funeralHarvestLock':
+    'Cosecha funeraria aún no puede crear otro fragmento de alma',
+  'hudChrome.auraEffect.leadenHexLock':
+    'Maleficio plomizo aún no puede volver a inmovilizar a este objetivo',
+  'hudChrome.auraEffect.forbiddenReflectionReady':
+    'Puedes volver a usar tu próxima facultad compartida de brujo con reutilización',
+  'hudChrome.auraEffect.forbiddenReflectionLock':
+    'Reflejo prohibido aún no puede volver a prepararse',
+  'hudChrome.auraEffect.internalCooldown':
+    'Este efecto no puede volver a activarse hasta que termine el temporizador',
+  'hudChrome.auraEffect.enrage':
+    'Aumenta el daño un {damagePct}%, la velocidad de ataque un {hastePct}% y el movimiento un {movePct}%',
+  'hudChrome.auraEffect.suddenDeath':
+    'Tu próximo Ejecutar no cuesta ira e ignora el requisito de salud',
+  'hudChrome.auraEffect.aoeEcho':
+    'Quedan {charges} ecos: las facultades de un objetivo infligen un {pct}% de daño a hasta {targets} enemigos cercanos',
+  'hudChrome.auraEffect.sureCrit':
+    'Tus próximas {charges} facultades dañinas tienen golpe crítico garantizado',
+  'hudChrome.auraEffect.temporalEcho':
+    'El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área',
+  'hudChrome.auraEffect.arcaneCharge':
+    '{stacks} cargas Arcanas: Oleada de éter inflige un {damagePct}% más, se lanza un {castPct}% más rápido y cuesta {costMult} veces más maná',
+  'hudChrome.auraEffect.physicalReduction': 'Reduce el daño Físico recibido un {pct}%',
+  'hudChrome.auraEffect.freeExecute': 'Tu próxima facultad de ejecución válida no cuesta recursos',
+  'hudChrome.auraEffect.resourceSap': 'Restaura {value} de tu recurso actual cada {interval} s',
+  'hudChrome.auraEffect.nextAttackCrit': 'Tu próximo ataque tiene golpe crítico garantizado',
+  'hudChrome.auraEffect.healEcho': 'Al bajar del {threshold}% de salud, restaura {value} de salud',
+  'hudChrome.auraEffect.bleedVuln': 'Aumenta el daño de sangrado recibido un {pct}%',
+  'hudChrome.auraEffect.sourceVuln':
+    'Recibe un {pct}% más de daño del taumaturgo que aplicó este efecto',
+  'hudChrome.auraEffect.formMoonkin':
+    'Forma de ala lunar: daño con hechizos aumentado un {pct}% y armadura aumentada un {armorPct}%',
+  'hudChrome.auraEffect.formShadow':
+    'Forma de velo umbrío: daño de las Sombras aumentado un {pct}%',
+  'hudChrome.auraEffect.formLich':
+    'Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño',
+  'hudChrome.auraEffect.afflictionEye':
+    'Mirada maléfica ataca cada {interval} s; los efectos en este Ojo generan un {pct}% de Condena',
+  'hudChrome.auraEffect.afflictionEyeSecondary':
+    'Los efectos en este Ojo generan un {doomPct}% de Condena; Sentencia hace eco aquí por un {echoPct}% de daño',
+  'hudChrome.auraEffect.afflictionAccomplice':
+    'El daño válido genera {value} de Condena, como máximo una vez cada {interval} s',
+  'hudChrome.auraEffect.afflictionViolence':
+    'Quedan {charges} represalias; un ataque enemigo genera {doom} de Condena y devuelve {damage} de daño de las Sombras',
+  'hudChrome.auraEffect.afflictionVicarious':
+    'Redirige o reduce un {pct}% del daño recibido y puede generar hasta {max} de Condena',
+  'hudChrome.auraEffect.afflictionPossession':
+    'Potencia Aguja del destino, Drenar vida, Mirada maléfica y Sentencia',
+  'hudChrome.auraEffect.afflictionJudgment':
+    'El Ojo principal genera un {eyePct}% más de Condena; Sentencia inflige un {sentencePct}% más y la primera devuelve {refund} de Condena',
+  'hudChrome.auraEffect.afflictionLitany':
+    'Obtener Condena inflige {damage} de daño de las Sombras a hasta {targets} enemigos en {radius} m, una vez por segundo',
+  'hudChrome.auraEffect.afflictionFateThreads':
+    '{stacks} Hilos del destino: Sentencia inflige un {sentencePct}% más, o Drenar vida genera {doom} de Condena extra por pulso',
+  'hudChrome.auraEffect.afflictionConsumeThreads':
+    'Drenar vida consume {stacks} Hilos del destino para generar {doom} de Condena extra por pulso',
+  'hudChrome.auraEffect.necromancyHarvestMark':
+    'La muerte puede crear 1 fragmento de alma y deja un Eco de muerte para Explosión de cadáver',
+  'hudChrome.auraEffect.necromancyOssuaryMark':
+    'Almacena un {storedPct}% de tu daño y el de tus no-muertos, más un {lancePct}% del daño de Lanza de alma; vuelve a lanzar para detonar. Al morir, explota en {radius} m y crea 1 fragmento de alma',
+  'hudChrome.auraEffect.necromancyDeathEcho':
+    'Explosión de cadáver puede consumir este eco a {radius} m del punto de mira',
+  'hudChrome.auraEffect.warlockAnchor':
+    'Vuelve a lanzar a menos de {range} m para regresar aquí y consumir el ancla',
+  'hudChrome.auraEffect.formMetamorph':
+    'Forma demoníaca: tamaño aumentado un {pct}%; las demás ventajas aparecen como beneficios separados',
+  'hudChrome.auraEffect.energyRegen': 'Aumenta la regeneración de energía un {pct}%',
+  'hudChrome.auraEffect.overpowerCharge':
+    '{stacks} cargas: tu próximo Golpe mutilador inflige un {pct}% más de daño',
+  'hudChrome.auraEffect.sweepingStrikes':
+    'Los golpes de un objetivo también infligen un {pct}% de daño a {targets} enemigo cercano',
+  'hudChrome.auraEffect.fingersOfFrost':
+    '{charges} cargas: Lanza de hielo trata al objetivo como congelado e inflige un {pct}% de daño de congelación',
+  'hudChrome.auraEffect.brainFreeze': 'Tu próxima Ráfaga es instantánea e ignora su reutilización',
+  'hudChrome.auraEffect.wintersChill':
+    '{charges} cargas: los hechizos válidos tratan a este objetivo como congelado',
+  'hudChrome.auraEffect.icicles':
+    '{value} de {max} Carámbanos; con {max}, puedes lanzar Pica glacial',
+  'hudChrome.auraEffect.desolation':
+    '{charges} cargas: tu próxima Descarga de caos se lanza un {castPct}% más rápido o tu próxima Lluvia de fuego cae al instante',
+  'hudChrome.auraEffect.ruinousBrand':
+    'Quedan {charges} copias: los hechizos directos copian aquí un {otherPct}% de daño, o un {selfPct}% si este es su objetivo',
+  'hudChrome.auraEffect.duskfireClaim': 'Al morir, otorga {value} de Ruina',
+  'hudChrome.auraEffect.pyreGuardian':
+    'Genera {ruin} de Ruina cada {ruinInterval} s e inflige {damage} de daño de Fuego en {radius} m cada {damageInterval} s',
+  'hudChrome.auraEffect.perfectMoment': 'Dardos de éter no consume cargas Arcanas',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     'Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental',
   'hudChrome.auraEffect.formFireball':
@@ -4284,7 +4469,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Invoca a un Warfiend bajo el mando del brujo. El Warfiend es un demonio cuerpo a cuerpo resistente que se adentra en la batalla y aguanta por sí mismo. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',
   'entities.abilities.summon_infernal.name': 'Invocar Pyre Colossus',
   'entities.abilities.summon_infernal.description':
-    'Somete a un Pyre Colossus a tu voluntad: un coloso descomunal con un cuerpo a cuerpo demoledor y la mayor salud y armadura de todos los demonios. Un largo tiempo de reutilización refrena su poder bruto. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',
+    'Hace caer un Coloso de la Pira sobre el área objetivo, infligiendo 58-72 de daño de Fuego al impactar. Lucha durante 30 s sin reemplazar a tu demonio, quema a los enemigos cercanos cada 2 s y genera 1 de Ruina por segundo.',
   'entities.abilities.summon_doomguard.name': 'Invocar Wraithborn',
   'entities.abilities.summon_doomguard.description':
     'Somete a un Wraithborn a tu voluntad: un demonio de élite que descarga un fuerte daño de las Sombras desde lejos. Un largo tiempo de reutilización refrena su poder devastador. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',

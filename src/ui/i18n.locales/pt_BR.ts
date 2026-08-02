@@ -4369,7 +4369,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Invoca um Warfiend sob o comando do bruxo. O Warfiend é um demônio resistente de corpo a corpo que avança para a batalha e se mantém firme. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez.',
   'entities.abilities.summon_infernal.name': 'Invocar Pyre Colossus',
   'entities.abilities.summon_infernal.description':
-    'Vincula um Pyre Colossus à sua vontade, um colosso imponente com um corpo a corpo esmagador e a maior vida e armadura entre todos os demônios. Uma longa recarga limita seu poder bruto. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez.',
+    'Faz um Pyre Colossus cair na área-alvo, causando 58-72 de dano de Fogo no impacto. Ele luta por 30 s sem substituir seu demônio, queima inimigos próximos a cada 2 s e gera 1 de Ruína por segundo.',
   'entities.abilities.summon_doomguard.name': 'Invocar Wraithborn',
   'entities.abilities.summon_doomguard.description':
     'Vincula um Wraithborn à sua vontade, um demônio de elite que faz chover pesado dano Sombrio à distância. Uma longa recarga limita seu poder devastador. Invocar um novo demônio dispensa o atual. Você só pode ter um demônio por vez.',

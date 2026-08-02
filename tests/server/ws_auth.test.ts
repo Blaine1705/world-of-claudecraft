@@ -211,13 +211,13 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it('2c. rejects an auth-world-2 client on the auth-world-3 server before all admission work', async () => {
+  it('2c. rejects an auth-world-3 client on the auth-world-4 server before all admission work', async () => {
     const fixture = setup();
     const { ws, deps, req } = fixture;
 
     await createWsAuth(deps).authenticateWebSocket(
       asWs(ws),
-      JSON.stringify({ t: 'auth-world-2', token: 'tok', character: 7 }),
+      JSON.stringify({ t: 'auth-world-3', token: 'tok', character: 7 }),
       req,
     );
 
@@ -228,7 +228,7 @@ describe('createWsAuth: authenticateWebSocket reject paths', () => {
     expectNoAdmissionWork(fixture);
   });
 
-  it.each(['auth-world', 'auth-world-4', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
+  it.each(['auth-world', 'auth-world-3', 'auth-world-next', 'auth-world-01', 'auth-world-1.0'])(
     '2d. rejects the non-current world auth discriminator %s before all admission work',
     async (authType) => {
       const fixture = setup();
@@ -478,6 +478,38 @@ describe('createWsAuth: timer-wire capability negotiation', () => {
     );
     expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
     expect(joinedMeta(resume.game)).toMatchObject({ timerWireVersion: 3 });
+  });
+});
+
+describe('createWsAuth: Warlock pet-special capability negotiation', () => {
+  it('accepts only the exact optional v1 capability and otherwise fails closed', async () => {
+    const capable = setup();
+    await createWsAuth(capable.deps).authenticateWebSocket(
+      asWs(capable.ws),
+      authRaw({ petSpecialWire: 1 }),
+      capable.req,
+    );
+    expect(joinedMeta(capable.game)).toMatchObject({ petSpecialWireVersion: 1 });
+
+    for (const advertised of [undefined, 2, '1', true]) {
+      const legacy = setup();
+      await createWsAuth(legacy.deps).authenticateWebSocket(
+        asWs(legacy.ws),
+        authRaw(advertised === undefined ? {} : { petSpecialWire: advertised }),
+        legacy.req,
+      );
+      expect(joinedMeta(legacy.game)).toMatchObject({ petSpecialWireVersion: 0 });
+    }
+
+    const resume = setup();
+    resume.game.hasSessionForCharacter.mockReturnValue(true);
+    await createWsAuth(resume.deps).authenticateWebSocket(
+      asWs(resume.ws),
+      authRaw({ petSpecialWire: 1 }),
+      resume.req,
+    );
+    expect(resume.deps.acquireCharacterLease).not.toHaveBeenCalled();
+    expect(joinedMeta(resume.game)).toMatchObject({ petSpecialWireVersion: 1 });
   });
 });
 

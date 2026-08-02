@@ -637,6 +637,7 @@ export const guideStrings = {
   // One spoiler-safe, number-free line per signature ability (what it is for, when you
   // press it). Keyed by the sim ability id.
   abilityHook: {
+    evil_eye: 'Names the enemy whose actions and suffering will feed your Condemnation.',
     heroic_strike: 'Queues a heavier swing that spends rage on your next hit.',
     revenge: 'Sweeps enemies in front of you, with a chance to become free after a dodge or parry.',
     hamstring: "Cripples an enemy's movement to keep it from escaping.",
@@ -726,7 +727,7 @@ export const guideStrings = {
     conjure_water: 'Conjures drinks that restore mana, so you can refill between pulls.',
     conjure_food: 'Conjures food that restores health when you sit down to eat.',
     shadow_bolt: 'A bolt of shadow you cast at a target, your go-to nuke.',
-    summon_imp: 'Calls up an Emberkin that flings firebolts at enemies from range.',
+    summon_imp: 'Calls up an Emberkin that casts Felbolt at enemies from range.',
     demon_skin: 'A lasting self-buff that toughens your skin and adds armor.',
     immolate: 'Sets a target alight for an opening hit and a burn that lingers.',
     corruption: 'Rots a target with shadow that ticks while you do other things.',
@@ -742,8 +743,9 @@ export const guideStrings = {
 
   // Warlock demon roster flavor, keyed by pet id.
   petHook: {
-    emberkin: 'A ranged firebolt demon that chips at enemies from a safe distance.',
-    gloomshade: 'A sturdy demon that taunts and soaks hits so you can cast in peace.',
+    emberkin: 'A ranged demon whose signature Felbolt chips at enemies from a safe distance.',
+    gloomshade:
+      'A sturdy tank demon that taunts and uses Abyssal Chain to pull fleeing normal enemies back into reach; bosses resist the pull.',
     duskborn: 'A fast melee demon that hits hard but folds under pressure.',
     spellhound: 'A shadow skirmisher that hounds enemy casters.',
     warfiend: 'A durable melee bruiser, the all-rounder once you can summon it.',

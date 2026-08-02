@@ -40,6 +40,7 @@ import {
   seatGroundedAt,
 } from './colliders';
 import { resolveActionReplacement } from './combat/action_replacement';
+import { clearAfflictionState } from './combat/affliction';
 import { auraAffectsStats, removeCancelableAura } from './combat/aura_cancel';
 import { auraReplacementConflicts } from './combat/aura_stacking';
 import {
@@ -121,6 +122,7 @@ import {
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import { resolveVespersAbility } from './combat/priest/vespers';
+import { clearOssuaryMarks, despawnTemporaryNecromancyUndead } from './combat/necromancy';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
 import { rewindHealAmount } from './combat/rewind';
 import { duskLingerOnStealthBreak } from './combat/rogue_talents';
@@ -438,7 +440,12 @@ import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
 import { persistedResource } from './serialize_resource';
-import { createSimContext, type SimContext, type SimContextHost } from './sim_context';
+import {
+  createSimContext,
+  type DamageResolution,
+  type SimContext,
+  type SimContextHost,
+} from './sim_context';
 import * as chatMod from './social/chat';
 import * as tradeMod from './social/trade';
 import {
@@ -1044,6 +1051,8 @@ export interface ResolvedAbility {
   ignoreStealthRequirement?: boolean; // Cheap Trick: the resolved ability drops requiresStealth
   charges?: number; // authored stored uses; undefined means one use
   bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
+  /** Destruction-only cast-time reservation; consumed once even if a projectile resists/fizzles. */
+  ruinousBrandCopy?: { targetId: number; value: number };
   /** 1-based authoritative charge stage for hold-to-charge spells. */
   empowerLevel?: number;
   hunterApex?: boolean;
@@ -1640,6 +1649,7 @@ export interface PetState {
   mode?: PetMode;
   autoTaunt?: boolean;
   autoWaterJet?: boolean;
+  autoSkill?: boolean;
 }
 
 // PendingMobRespawn is exported so SimContext can type the live `pendingMobRespawns`
@@ -1678,6 +1688,8 @@ function freshCounters(): RewardCounters {
 // isShamanShock/ignoresDamagePushback) live in combat/casting_lifecycle.ts (C4a).
 
 export class Sim {
+  // Offline/local Sim always has the implementation bundled with its HUD.
+  readonly petSpecialCommandsSupported = true;
   // `world` stays optional (a custom map for play-test, else undefined for the
   // built-in world); everything else is defaulted to a concrete value below.
   cfg: Required<Omit<SimConfig, 'noPlayer' | 'world' | 'perfLap' | 'respawnSeconds'>> &
@@ -2978,7 +2990,9 @@ export class Sim {
         this.worldContent.playerStart,
       );
     }
-    if (savedState?.pet) this.restorePet(player, savedState.pet);
+    if (savedState?.pet && petCommands.canRestorePetState(meta, savedState.pet)) {
+      this.restorePet(player, savedState.pet);
+    }
     // One-time Ravenpost welcome (doubles as the service announcement for
     // characters saved before mail existed). Flipped before the send so a
     // re-entrant save can never double-book the letter.
@@ -3263,6 +3277,9 @@ export class Sim {
     this.duelInvites.delete(pid);
     // mobs forget the leaving player; persistent hunter pets are serialized
     // with the character and removed from the live world instead of released
+    despawnTemporaryNecromancyUndead(this.ctx, pid);
+    clearOssuaryMarks(this.ctx, pid);
+    clearAfflictionState(this.ctx, pid);
     const pet = this.petOf(pid, true);
     if (pet) this.despawnPersistentPet(pet);
     for (const m of this.entities.values()) {
@@ -3303,6 +3320,10 @@ export class Sim {
   preparePlayerLeave(pid: number): void {
     const meta = this.players.get(pid);
     if (!meta) return;
+    if (!meta.leaving) {
+      const leavingEntity = this.entities.get(pid);
+      if (leavingEntity?.castingAbility === 'rain_of_fire') cancelCastImpl(this.ctx, leavingEntity);
+    }
     meta.leaving = true;
     cleanupPriestState(this.ctx, pid);
     const leaving = this.entities.get(pid);
@@ -4178,6 +4199,12 @@ export class Sim {
   }
 
   emit(ev: SimEvent): void {
+    if (ev.type === 'damage' && ev.sourceOwnerId === undefined) {
+      const sourceOwnerId = this.entities.get(ev.sourceId)?.ownerId;
+      if (sourceOwnerId !== null && sourceOwnerId !== undefined) {
+        ev.sourceOwnerId = sourceOwnerId;
+      }
+    }
     this.events.push(ev);
   }
 
@@ -6438,6 +6465,10 @@ export class Sim {
     petCommands.petWaterJet(this.ctx, pid);
   }
 
+  petSpecial(pid?: number): void {
+    petCommands.petSpecial(this.ctx, pid);
+  }
+
   feedPet(itemId: string, pid?: number): void {
     petCommands.feedPet(this.ctx, itemId, pid);
   }
@@ -6460,6 +6491,10 @@ export class Sim {
 
   setPetAutoWaterJet(enabled: boolean, pid?: number): void {
     petCommands.setPetAutoWaterJet(this.ctx, enabled, pid);
+  }
+
+  setPetAutoSpecial(enabled: boolean, pid?: number): void {
+    petCommands.setPetAutoSpecial(this.ctx, enabled, pid);
   }
 
   // despawnPet (summoned-demon hard despawn: player-target + threat scrub) moved to
@@ -6537,6 +6572,8 @@ export class Sim {
     alreadyFinal = false,
     abilityId: string | null = null,
     aoe = false,
+    resolution?: DamageResolution,
+    resolvedHpLoss = false,
   ): number {
     return dealDamageImpl(
       this.ctx,
@@ -6554,6 +6591,8 @@ export class Sim {
       alreadyFinal,
       abilityId,
       aoe,
+      resolution,
+      resolvedHpLoss,
     );
   }
 

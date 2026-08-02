@@ -164,6 +164,39 @@ describe('talent tooltip accuracy (all 9 classes x 3 specs)', () => {
       setLanguage('en');
     }
   });
+
+  it('renders every shared Warlock row safely and completely outside English', async () => {
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    try {
+      const choices = CHOICE_ROWS.warlock.rows.flatMap((row) => [...row.options]);
+      const rendered = new Map(
+        choices.map((choice) => [
+          choice.id,
+          tTalent({ kind: 'talentChoice', choice, field: 'description' }),
+        ]),
+      );
+
+      expect(rendered.size).toBe(18);
+      expect(rendered.get('wlk_r5_bane')).toContain('15');
+      expect(rendered.get('wlk_r5_improved_corruption')).toContain('40');
+      expect(rendered.get('wlk_r11_fel_concentration')).toContain('30');
+      expect(rendered.get('wlk_r14_ruin')).toContain('50');
+      expect(rendered.get('wlk_r14_ruin')).toContain('Trato');
+      expect(rendered.get('wlk_r14_ruin')).toContain('Pacto');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('25');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Maleficio de violencia');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Mandato profano');
+      expect(rendered.get('wlk_r17_death_coil')).toContain('Marca ruinosa');
+      expect(rendered.get('wlk_r20_chaos_bolt')).toContain('habilidades de clase de brujo');
+      expect(rendered.get('wlk_r20_chaos_bolt')).toContain('talentos finales');
+      expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('esa misma habilidad');
+      expect(rendered.get('wlk_r20_grimoire_of_haste')).toContain('una vez cada 60 s');
+      expect(rendered.get('wlk_r20_curse_mastery')).toContain('90');
+    } finally {
+      setLanguage('en');
+    }
+  });
 });
 
 // Talent descriptions are generated from effect data outside English. English remains
@@ -281,6 +314,13 @@ const PCT_FIELDS = new Set([
   // finisher echo fraction ("40%").
   'duskEconomyPct',
   'secondShadowPct',
+  'warlockBlacktideSpeedPct',
+  'warlockLeadenHex',
+  'warlockShadowCredit',
+  'warlockAshenFocus',
+  'warlockSoulwellWardPct',
+  'warlockFiendhideMagicDrPct',
+  'upperThresholdPct',
 ]);
 
 function expectedTokens(effect: unknown): string[] {
@@ -297,8 +337,10 @@ function expectedTokens(effect: unknown): string[] {
       duration?: number;
     };
     if (
-      shapedAura.kind === 'aura' &&
-      (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')
+      (shapedAura.kind === 'aura' &&
+        (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')) ||
+      (shapedAura.type === 'selfBuff' &&
+        (shapedAura.kind === 'buff_speed' || shapedAura.kind === 'buff_haste'))
     ) {
       toks.push(`${+(((shapedAura.value ?? 1) - 1) * 100).toFixed(1)}%`);
       if (shapedAura.duration) toks.push(`${+shapedAura.duration.toFixed(1)}`);
@@ -408,8 +450,10 @@ function legitNumbers(effect: unknown): Set<number> {
       duration?: number;
     };
     if (
-      shapedAura.kind === 'aura' &&
-      (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')
+      (shapedAura.kind === 'aura' &&
+        (shapedAura.auraKind === 'buff_speed' || shapedAura.auraKind === 'buff_haste')) ||
+      (shapedAura.type === 'selfBuff' &&
+        (shapedAura.kind === 'buff_speed' || shapedAura.kind === 'buff_haste'))
     ) {
       add((shapedAura.value ?? 1) - 1, true);
       if (shapedAura.duration) add(shapedAura.duration, false);

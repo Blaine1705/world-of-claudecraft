@@ -4425,7 +4425,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Beschwört einen Warfiend unter dem Befehl des Hexenmeisters. Der Warfiend ist ein widerstandsfähiger Nahkampfdämon, der sich in die Schlacht wirft und sich behauptet. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
   'entities.abilities.summon_infernal.name': 'Pyre Colossus beschwören',
   'entities.abilities.summon_infernal.description':
-    'Bindet einen Pyre Colossus an Euren Willen, einen wuchtigen Koloss mit zermalmendem Nahkampf und den höchsten Lebens- und Rüstungswerten aller Dämonen. Eine lange Abklingzeit zügelt seine rohe Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
+    'Ruft einen Pyre Colossus im Zielbereich herab, der beim Aufprall 58-72 Feuerschaden verursacht. Er kämpft 30 Sek. lang, ohne Euren Dämon zu ersetzen, verbrennt alle 2 Sek. Gegner in der Nähe und erzeugt jede Sekunde 1 Ruin.',
   'entities.abilities.summon_doomguard.name': 'Wraithborn beschwören',
   'entities.abilities.summon_doomguard.description':
     'Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',

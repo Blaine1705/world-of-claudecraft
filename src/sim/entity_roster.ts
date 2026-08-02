@@ -24,6 +24,7 @@ import { tickHunterTrap } from './combat/hunter_trap';
 import { cleanupPaladinAegis } from './combat/paladin_aegis';
 import { stripSunGodVerdicts } from './combat/paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './combat/paladin_support';
+import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
@@ -210,7 +211,11 @@ export function runDespawnDecay(ctx: SimContext): void {
       e.overheadEmoteUntil = 0;
     }
   }
-  for (const id of despawnIds) dropEntityFromRoster(ctx, id);
+  for (const id of despawnIds) {
+    const entity = ctx.entities.get(id);
+    if (entity && isTemporaryNecromancyUndead(entity)) ctx.despawnPet(entity);
+    else dropEntityFromRoster(ctx, id);
+  }
 }
 
 // Fire delayed events whose time has come (subject to their guard), keep the rest.

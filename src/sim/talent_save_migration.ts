@@ -13,14 +13,33 @@ import { MAX_LEVEL, type PlayerClass } from './types';
 const TALENTS_V2_CONTENT_REVISION = 1;
 
 /**
- * Latest production character-JSON revision. 1: the v0.26 Talents V2 rollout.
- * 2: the first v0.29 class redesigns (hunter, shaman, priest, and rogue);
- * 3: the v0.29 Druid redesign;
- * changed option ids get a free row repick, and the repair scrubs retired row
- * grants (for rogues: Contingency, Wraith Strike, Shadecloak) off saved bars.
- * Untouched classes pass through unchanged and only advance the marker.
+ * Latest production character-JSON revision.
+ *  1: the v0.26 Talents V2 rollout.
+ *  2: the first v0.29 class redesigns (hunter, shaman, priest, rogue) on the
+ *     class-wave line, AND the Warlock overhaul on its own line. The two lines
+ *     assigned DIFFERENT meanings to 2, so a stored 2 is ambiguous across the
+ *     merged fleet and cannot be trusted to mean either one.
+ *  3: the v0.29 Druid redesign (class-wave line only).
+ *  4: this composed wave. Because 2 and 3 are ambiguous, EVERY class redesigned
+ *     anywhere in the wave re-qualifies for its free repick here.
  */
-export const CURRENT_CHARACTER_CONTENT_REVISION = 3;
+export const CURRENT_CHARACTER_CONTENT_REVISION = 4;
+
+/**
+ * The classes redesigned AT the current revision. Per-revision, NOT cumulative:
+ * when your rework joins a revision someone else opened, ADD YOUR CLASS here
+ * rather than assuming the marker bump covers you. Omitting a class is what
+ * stranded retired ability ids on live Paladin bars once already.
+ */
+const REDESIGNED_AT_CURRENT_REVISION: ReadonlySet<PlayerClass> = new Set([
+  'hunter',
+  'shaman',
+  'priest',
+  'rogue',
+  'paladin',
+  'druid',
+  'warlock',
+]);
 
 function migrationLevel(value: number): number {
   if (!Number.isFinite(value)) return 1;
@@ -47,8 +66,9 @@ function canSeedOnMainBar(cls: PlayerClass, abilityId: string): boolean {
 
 /**
  * Keep valid positions, drop obsolete/duplicate/passive entries, then fill empty
- * slots with deterministic baseline/spec actives. Computing seed candidates with
- * an empty row map prevents unselected row grants from leaking onto the bar.
+ * slots with deterministic baseline, specialization, and selected-row actives.
+ * The repaired allocation is already authoritative, so its grants cannot leak
+ * unselected row abilities onto the bar.
  */
 function migrateLoadoutBar(
   cls: PlayerClass,
@@ -73,8 +93,7 @@ function migrateLoadoutBar(
     return abilityId;
   });
 
-  const specOnly = computeTalentModifiers(cls, { spec: allocation.spec, rows: {} }, level);
-  const seedIds = abilitiesKnownAt(cls, level, specOnly)
+  const seedIds = abilitiesKnownAt(cls, level, fullMods)
     .map((entry) => entry.def.id)
     .filter((abilityId) => canSeedOnMainBar(cls, abilityId));
   for (const abilityId of seedIds) {
@@ -120,21 +139,27 @@ export function migrateCharacterTalentsV2(cls: PlayerClass, state: CharacterStat
     : 0;
   if (revision >= CURRENT_CHARACTER_CONTENT_REVISION) return state;
 
+  // The free repick / row wipe is GATED: refilling slots would disturb a bar an
+  // untouched player deliberately left gapped, and a redesigned class needs its
+  // picks re-chosen because row ids were reused with changed meaning.
   const freeRepick =
-    revision < TALENTS_V2_CONTENT_REVISION ||
-    (cls === 'hunter' && revision < 2) ||
-    (cls === 'druid' && revision < 3);
-  if (!freeRepick) {
-    return { ...state, contentRevision: CURRENT_CHARACTER_CONTENT_REVISION };
-  }
+    revision < TALENTS_V2_CONTENT_REVISION || REDESIGNED_AT_CURRENT_REVISION.has(cls);
 
+  // UNIVERSAL SCRUB: migrateLoadouts runs for EVERY class, always. A slot naming
+  // an ability the character cannot use is dead whoever owns it, and nothing
+  // downstream catches it (talent_loadouts.repairBar only checks that a slot is
+  // a string, so a retired id survives every load). Only the repick/re-seed
+  // above is gated.
   const level = migrationLevel(state.level);
   const repairedTalents = repairAllocation(cls, state.talents, level);
-  const talents = {
-    spec: repairedTalents.spec,
-    rows: {},
-  };
-  const migratedLoadouts = migrateLoadouts(cls, level, state.loadouts, state.activeLoadout, true);
+  const talents = freeRepick ? { spec: repairedTalents.spec, rows: {} } : repairedTalents;
+  const migratedLoadouts = migrateLoadouts(
+    cls,
+    level,
+    state.loadouts,
+    state.activeLoadout,
+    freeRepick,
+  );
   return {
     ...state,
     contentRevision: CURRENT_CHARACTER_CONTENT_REVISION,

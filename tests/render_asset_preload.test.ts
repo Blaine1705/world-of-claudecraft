@@ -66,6 +66,15 @@ describe('character preload set covers placement at every graphics tier (v0.16.0
       }
     }
   });
+
+  it('always preloads the active Gloomshade tank model', () => {
+    const gloomshadeUrl = 'models/creatures/gloomshade_abyssal_guardian.glb';
+    expect(low).toContain(gloomshadeUrl);
+    expect(high).toContain(gloomshadeUrl);
+    for (const importTierStandardMaterials of [false, true]) {
+      expect(characterPreloadUrls(importTierStandardMaterials)).toContain(gloomshadeUrl);
+    }
+  });
 });
 
 describe('extracted world assets release their duplicate parsed glTF sources', () => {

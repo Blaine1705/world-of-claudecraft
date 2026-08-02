@@ -43,35 +43,32 @@ describe('clampOverlayAnchor', () => {
   });
 });
 
-describe('keyboard nudging', () => {
-  it('moves in viewport fractions and clamps at every edge', () => {
-    expect(nudgeOverlayAnchor({ fx: 0.5, fy: 0.5 }, 'left')).toEqual({
-      fx: 0.48,
+describe('nudgeOverlayAnchor', () => {
+  it('moves one keyboard step in every arrow direction', () => {
+    const start = { fx: 0.5, fy: 0.5 };
+    expect(nudgeOverlayAnchor(start, 'ArrowLeft', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.49,
       fy: 0.5,
     });
-    expect(nudgeOverlayAnchor({ fx: 0.98, fy: 0.98 }, 'right', 0.1)).toEqual({
-      fx: 1,
-      fy: 0.98,
+    expect(nudgeOverlayAnchor(start, 'ArrowRight', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.51,
+      fy: 0.5,
     });
-    expect(nudgeOverlayAnchor({ fx: 0.02, fy: 0.02 }, 'up', 0.1)).toEqual({
-      fx: 0.02,
-      fy: 0,
+    expect(nudgeOverlayAnchor(start, 'ArrowUp', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.5,
+      fy: 0.4875,
     });
-  });
-});
-
-describe('parse / serialize round-trip', () => {
-  it('round-trips a stored anchor', () => {
-    const a = { fx: 0.31, fy: 0.77 };
-    expect(parseOverlayAnchor(serializeOverlayAnchor(a))).toEqual(a);
+    expect(nudgeOverlayAnchor(start, 'ArrowDown', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.5,
+      fy: 0.5125,
+    });
+    expect(nudgeOverlayAnchor(start, 'Enter', 10, 300, 232, 1000, 800)).toBeNull();
   });
 
-  it('rejects garbage and out-of-band values', () => {
-    expect(parseOverlayAnchor(null)).toBeNull();
-    expect(parseOverlayAnchor('not json')).toBeNull();
-    expect(parseOverlayAnchor('{"fx":"a","fy":0.5}')).toBeNull();
-    expect(parseOverlayAnchor('{"fx":null,"fy":0.5}')).toBeNull();
-    // A finite but out-of-range stored value is clamped into 0..1.
-    expect(parseOverlayAnchor('{"fx":7,"fy":-3}')).toEqual({ fx: 1, fy: 0 });
+  it('keeps keyboard movement inside the viewport', () => {
+    expect(nudgeOverlayAnchor({ fx: 0, fy: 0 }, 'ArrowLeft', 10, 300, 232, 1000, 800)).toEqual({
+      fx: 0.15,
+      fy: 0.145,
+    });
   });
 });

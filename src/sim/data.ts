@@ -132,6 +132,7 @@ import {
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { MAGE_PET_MOBS } from './content/mage_pets';
 import { MAILBOXES } from './content/mailboxes';
+import { NECROMANCY_MOBS } from './content/necromancy';
 import {
   NIGHTBLOOM_CAMPS,
   NIGHTBLOOM_ITEMS,
@@ -358,6 +359,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE3_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
+  ...NECROMANCY_MOBS,
   ...MAGE_PET_MOBS,
   ...TEMPLE_MOBS,
   ...TEMPLE_DUNGEON_MOBS,

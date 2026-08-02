@@ -22,6 +22,7 @@ import { combustionRestokesCinderfall, PERSONAL_BARRIER_IDS } from './fire_mage'
 import { priestOnCastCompleted } from './priest/talents';
 import { rogueEngineOnCast } from './rogue_engines';
 import { onShamanCastCompleted } from './shaman_talents';
+import { applyLeadenHex } from './warlock_talents';
 
 function state(player: Entity): NonNullable<Entity['procState']> {
   if (!player.procState) player.procState = { counters: {}, icds: {} };
@@ -199,6 +200,7 @@ export function onCastCompleted(
   // from Duskveil openers and the Red Ribbon rhythm. Same funnel, no rng.
   rogueEngineOnCast(ctx, player, abilityId, target);
   druidEngineOnCast(ctx, player, abilityId, target);
+  applyLeadenHex(ctx, player, abilityId, target);
   if (wasEmpowered) return;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;

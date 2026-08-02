@@ -45,6 +45,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_DURATION,
 } from './paladin_templars_verdict_clip';
 import { PaladinTemplarsVerdictFx } from './paladin_templars_verdict_fx';
+import { createMetamorphWingPose, metamorphWingPoseInto } from './metamorph_wing_motion_core';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
@@ -261,7 +262,10 @@ function clickMat(): THREE.Material {
 // rasterizes nothing while the shadow pass still renders the proxy
 let shadowOnlySingleton: THREE.Material | null = null;
 function shadowOnlyMat(): THREE.Material {
-  shadowOnlySingleton ??= new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false });
+  shadowOnlySingleton ??= new THREE.MeshBasicMaterial({
+    colorWrite: false,
+    depthWrite: false,
+  });
   return shadowOnlySingleton;
 }
 
@@ -462,6 +466,16 @@ export class CharacterVisual {
   private ferocityStage = 0;
   private presentationScale = 1;
   private ascended = false;
+  private metamorphLeftWing: THREE.Object3D | null = null;
+  private metamorphRightWing: THREE.Object3D | null = null;
+  private metamorphLeftWingRest = new THREE.Euler();
+  private metamorphRightWingRest = new THREE.Euler();
+  private metamorphLeftHand: THREE.Object3D | null = null;
+  private metamorphRightHand: THREE.Object3D | null = null;
+  private metamorphWingPose = createMetamorphWingPose();
+  private metamorphElapsed = 0;
+  private metamorphPulse = 0;
+  private metamorphWasVisible = false;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -504,6 +518,26 @@ export class CharacterVisual {
       skinTexture(key, skinIndex),
       skinEmissiveTexture(key, skinIndex),
     );
+    if (key === 'form_metamorph') {
+      this.metamorphLeftWing = this.model.getObjectByName('metamorph_wing_left_hinge') ?? null;
+      this.metamorphRightWing = this.model.getObjectByName('metamorph_wing_right_hinge') ?? null;
+      if (this.metamorphLeftWing) {
+        this.metamorphLeftWingRest.copy(this.metamorphLeftWing.rotation);
+      }
+      if (this.metamorphRightWing) {
+        this.metamorphRightWingRest.copy(this.metamorphRightWing.rotation);
+      }
+      this.metamorphLeftHand =
+        this.model.getObjectByName('handslotl') ??
+        this.model.getObjectByName('handslot.l') ??
+        this.model.getObjectByName('L_Hand') ??
+        null;
+      this.metamorphRightHand =
+        this.model.getObjectByName('handslotr') ??
+        this.model.getObjectByName('handslot.r') ??
+        this.model.getObjectByName('R_Hand') ??
+        null;
+    }
     // Class halo (the priest's Light): a glowing ring behind the head bone.
     // Added AFTER applyMaterials (its additive material must not be re-mapped)
     // and BEFORE the originalMaterials snapshot, so ghost/stealth material
@@ -521,6 +555,7 @@ export class CharacterVisual {
       if (mesh.isMesh) this.originalMaterials.set(mesh, mesh.material);
     });
     this.modelWrap.rotation.y = prep.def.yaw ?? 0;
+    this.modelWrap.name = 'character_model_wrap';
     this.modelWrap.scale.setScalar(prep.normScale);
     this.modelWrap.position.y = prep.yOffset;
     this.modelWrap.add(this.model);
@@ -556,10 +591,12 @@ export class CharacterVisual {
         ),
       );
       this.farMaterials = this.farMesh.material;
+      this.farMesh.name = 'character_far_mesh';
       this.farMesh.visible = false;
       this.poseWrap.add(this.farMesh);
       if (GFX.tier !== 'low') {
         this.shadowProxy = new THREE.Mesh(prep.idleGeo, shadowOnlyMat());
+        this.shadowProxy.name = 'character_shadow_proxy';
         this.shadowProxy.castShadow = true;
         this.shadowProxy.visible = false;
         this.poseWrap.add(this.shadowProxy);
@@ -615,8 +652,9 @@ export class CharacterVisual {
 
   /** `animate=false` skips mixer integration (distance throttling); state
    *  edges still latch so the pose catches up when the entity nears. */
-  update(dt: number, s: AnimState, animate: boolean): void {
+  update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    this.updateMetamorphWings(dt, s, reducedMotion);
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
@@ -640,9 +678,9 @@ export class CharacterVisual {
       if (this.currentOneShotIsEmote && this.shouldInterruptEmote(s)) {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
-        this.fadeTo(this.baseAction(), FADE, false);
+        this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
       } else if (baseChanged && !this.currentIsOneShot) {
-        this.fadeTo(this.baseAction(), FADE, false);
+        this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
       }
       // foot-speed matching on locomotion cycles
       if (!this.currentIsOneShot && this.current) {
@@ -764,6 +802,41 @@ export class CharacterVisual {
       this.bastionSweepFx?.update(bastionTime, animationDt);
       this.templarsVerdictFx?.update(verdictTime, animationDt);
     }
+  }
+
+  private updateMetamorphWings(dt: number, s: AnimState, reducedMotion: boolean): void {
+    if (!this.metamorphLeftWing || !this.metamorphRightWing) return;
+    const visible = this.root.visible && !this.far;
+    if (visible && !this.metamorphWasVisible) this.metamorphElapsed = 0;
+    this.metamorphWasVisible = visible;
+    this.metamorphPulse = Math.max(0, this.metamorphPulse - dt);
+    if (!visible) return;
+
+    this.metamorphElapsed += dt;
+    const attacking = this.currentIsOneShot || this.metamorphPulse > 0;
+    const pose = metamorphWingPoseInto(
+      this.metamorphElapsed,
+      s.moving,
+      s.running,
+      s.airborne,
+      s.casting,
+      attacking,
+      this.metamorphWingPose,
+      reducedMotion,
+    );
+    const fold = (1 - pose.unfold) * 0.82;
+    const sweep = pose.sweepBack - pose.open;
+
+    this.metamorphLeftWing.rotation.set(
+      this.metamorphLeftWingRest.x + pose.breath + pose.open * 0.12,
+      this.metamorphLeftWingRest.y + fold + sweep,
+      this.metamorphLeftWingRest.z + (1 - pose.unfold) * 0.2 - pose.breath,
+    );
+    this.metamorphRightWing.rotation.set(
+      this.metamorphRightWingRest.x + pose.breath + pose.open * 0.12,
+      this.metamorphRightWingRest.y - fold - sweep,
+      this.metamorphRightWingRest.z - (1 - pose.unfold) * 0.2 + pose.breath,
+    );
   }
 
   /**
@@ -1185,6 +1258,21 @@ export class CharacterVisual {
     if (this.shadowProxy && this.shadowProxy.visible !== on) this.shadowProxy.visible = on;
   }
 
+  setActive(on: boolean): void {
+    const changed = this.root.visible !== on;
+    this.root.visible = on;
+    if (!this.metamorphLeftWing || !this.metamorphRightWing) return;
+    if (!on) {
+      this.metamorphWasVisible = false;
+      this.metamorphPulse = 0;
+      return;
+    }
+    if (changed || !this.metamorphWasVisible) {
+      this.metamorphElapsed = 0;
+      this.metamorphWasVisible = true;
+    }
+  }
+
   setFar(far: boolean): void {
     if (far === this.far) return;
     this.far = far;
@@ -1273,10 +1361,22 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  setMetamorph(on: boolean): void {
-    if (on === this.metamorph) return;
-    this.metamorph = on;
-    this.applyVisualMaterials();
+  pulseMetamorphosis(strength = 1): void {
+    this.metamorphPulse = Math.max(this.metamorphPulse, 0.24 + strength * 0.12);
+  }
+
+  metamorphHandWorldPositions(left: THREE.Vector3, right: THREE.Vector3): boolean {
+    if (!this.root.visible || this.far || !this.metamorphLeftHand || !this.metamorphRightHand) {
+      return false;
+    }
+    const owner = this.root.parent;
+    if (owner && (!owner.visible || !owner.matrixWorldAutoUpdate)) return false;
+    owner?.updateWorldMatrix(true, false);
+    this.metamorphLeftHand.updateWorldMatrix(true, false);
+    this.metamorphRightHand.updateWorldMatrix(true, false);
+    this.metamorphLeftHand.getWorldPosition(left);
+    this.metamorphRightHand.getWorldPosition(right);
+    return true;
   }
 
   setAscended(on: boolean): void {
@@ -1935,6 +2035,13 @@ export class CharacterVisual {
     this.fadeTo(this.baseAction(), FADE, false);
   }
 
+  private baseTransitionFade(next: BaseState): number {
+    // A winged form without an authored Jump clip must leave its locomotion
+    // stride almost immediately. The normal crossfade preserves too much of a
+    // forward-leaning Run pose after takeoff and reads as a frozen leap.
+    return this.key === 'form_metamorph' && next === 'jump' ? 0.04 : FADE;
+  }
+
   private effectMaterial<T extends THREE.Material | THREE.Material[]>(material: T): T {
     if (Array.isArray(material)) return material.map((m) => this.effectSingleMaterial(m)) as T;
     return this.effectSingleMaterial(material) as T;
@@ -1944,7 +2051,6 @@ export class CharacterVisual {
     // Death treatments (soul rend, ghost run) win over the shapeshift tints.
     if (this.soulRend) return this.soulRendMaterial(material);
     if (this.ghosted) return this.ghostMaterial(material);
-    if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);

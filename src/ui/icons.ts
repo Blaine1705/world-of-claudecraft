@@ -34,13 +34,55 @@ const TAU = Math.PI * 2;
 // ---------------------------------------------------------------------------
 
 const PALETTES = {
-  steel: { base: '#aebdc8', light: '#eef4f8', dark: '#4e5a66', glow: '#cfe4ff', accent: '#2b333c' },
-  gold: { base: '#e8b33a', light: '#ffe9a8', dark: '#8a5f12', glow: '#ffd97a', accent: '#5c3e08' },
-  blood: { base: '#c0392b', light: '#ff8a70', dark: '#5e120c', glow: '#ff5533', accent: '#2e0805' },
-  bone: { base: '#e8e0cc', light: '#fffaf0', dark: '#8f8468', glow: '#fff8d8', accent: '#4a4334' },
-  ember: { base: '#ff7a1a', light: '#ffd9a0', dark: '#8a2a08', glow: '#ffb45e', accent: '#401004' },
-  ice: { base: '#9fd8ff', light: '#eafaff', dark: '#2a6ea8', glow: '#c8f0ff', accent: '#123c5e' },
-  venom: { base: '#7ad94a', light: '#d8ffb0', dark: '#2a6e18', glow: '#a8ff70', accent: '#0d330a' },
+  steel: {
+    base: '#aebdc8',
+    light: '#eef4f8',
+    dark: '#4e5a66',
+    glow: '#cfe4ff',
+    accent: '#2b333c',
+  },
+  gold: {
+    base: '#e8b33a',
+    light: '#ffe9a8',
+    dark: '#8a5f12',
+    glow: '#ffd97a',
+    accent: '#5c3e08',
+  },
+  blood: {
+    base: '#c0392b',
+    light: '#ff8a70',
+    dark: '#5e120c',
+    glow: '#ff5533',
+    accent: '#2e0805',
+  },
+  bone: {
+    base: '#e8e0cc',
+    light: '#fffaf0',
+    dark: '#8f8468',
+    glow: '#fff8d8',
+    accent: '#4a4334',
+  },
+  ember: {
+    base: '#ff7a1a',
+    light: '#ffd9a0',
+    dark: '#8a2a08',
+    glow: '#ffb45e',
+    accent: '#401004',
+  },
+  ice: {
+    base: '#9fd8ff',
+    light: '#eafaff',
+    dark: '#2a6ea8',
+    glow: '#c8f0ff',
+    accent: '#123c5e',
+  },
+  venom: {
+    base: '#7ad94a',
+    light: '#d8ffb0',
+    dark: '#2a6e18',
+    glow: '#a8ff70',
+    accent: '#0d330a',
+  },
   arcanePink: {
     base: '#c66ee8',
     light: '#f0c8ff',
@@ -69,7 +111,13 @@ const PALETTES = {
     glow: '#9fe070',
     accent: '#0d2e0a',
   },
-  sky: { base: '#6fb6ff', light: '#d4ecff', dark: '#1f5a9e', glow: '#a0d4ff', accent: '#0c2c50' },
+  sky: {
+    base: '#6fb6ff',
+    light: '#d4ecff',
+    dark: '#1f5a9e',
+    glow: '#a0d4ff',
+    accent: '#0c2c50',
+  },
   earthBrown: {
     base: '#a8703c',
     light: '#e0b070',
@@ -91,8 +139,20 @@ const PALETTES = {
     glow: '#d8aa6a',
     accent: '#33200c',
   },
-  cloth: { base: '#b0a4d8', light: '#e0d8f4', dark: '#5a4e84', glow: '#d0c4f0', accent: '#2a2444' },
-  pink: { base: '#f0a8c0', light: '#ffe0ec', dark: '#a05878', glow: '#ffd0e0', accent: '#4e2030' },
+  cloth: {
+    base: '#b0a4d8',
+    light: '#e0d8f4',
+    dark: '#5a4e84',
+    glow: '#d0c4f0',
+    accent: '#2a2444',
+  },
+  pink: {
+    base: '#f0a8c0',
+    light: '#ffe0ec',
+    dark: '#a05878',
+    glow: '#ffd0e0',
+    accent: '#4e2030',
+  },
 } satisfies Record<string, IconPalette>;
 type PaletteName = keyof typeof PALETTES;
 
@@ -2446,7 +2506,12 @@ function r(
   prims: (PrimitiveName | Placement)[],
   fx?: FxName[],
 ): IconRecipe {
-  return { bg, pal, prims: prims.map((p) => (typeof p === 'string' ? { p } : p)), fx };
+  return {
+    bg,
+    pal,
+    prims: prims.map((p) => (typeof p === 'string' ? { p } : p)),
+    fx,
+  };
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
@@ -2489,6 +2554,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
   pet_water_jet: r('frost', 'ice', ['bolt', 'snowflake'], ['drips']),
+  emberkin_felbolt: r('fire', 'venom', ['bolt', 'flame'], ['glow']),
+  gloomshade_abyssal_chain: r('shadow', 'shadowPurple', ['tendrils', 'sigil_rune'], ['arcs']),
   pet_feed: r('food', 'ember', ['meat']), // roasted meat: hunters feed, not magic-heal
   pet_mend: r('shadow', 'shadowPurple', ['heart'], ['drips']),
   pet_passive: r('nature', 'earthBrown', ['paw']),
@@ -2784,9 +2851,111 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   demon_skin: r('shadow', 'venom', [{ p: 'chestplate', pal: 'venom' }]),
   immolate: r('fire', 'ember', ['flame'], ['crack', 'glow']),
   corruption: r('shadow', 'shadowPurple', ['skull'], ['drips']),
+  evil_eye: r('shadow', 'venom', [{ p: 'eye', s: 1.08 }], ['glow']),
+  maledict_gaze: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', x: -8, s: 0.88 },
+      { p: 'bolt', x: 10, s: 0.72, pal: 'shadowPurple' },
+    ],
+    ['arcs', 'glow'],
+  ),
+  needle_of_fate: r(
+    'shadow',
+    'silverWhite',
+    [
+      { p: 'bolt', s: 0.92 },
+      { p: 'eye', ...TR, s: 0.5, pal: 'venom' },
+    ],
+    ['motion'],
+  ),
+  sentence: r(
+    'shadow',
+    'shadowPurple',
+    [
+      { p: 'skull', s: 0.92 },
+      { p: 'sunburst', ...BR, s: 0.58, pal: 'venom' },
+    ],
+    ['arcs', 'glow'],
+  ),
+  cursed_accomplice: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', ...TL, s: 0.72 },
+      { p: 'hand', ...BR, s: 0.72, pal: 'shadowPurple' },
+    ],
+    ['glow'],
+  ),
+  hex_of_violence: r(
+    'blood',
+    'shadowPurple',
+    [
+      { p: 'skull', s: 0.88 },
+      { p: 'fist', ...BR, s: 0.58, pal: 'blood' },
+    ],
+    ['arcs'],
+  ),
+  cruel_pact: r(
+    'blood',
+    'blood',
+    [
+      { p: 'heart', s: 0.9 },
+      { p: 'claw_slash', ...TR, s: 0.62, pal: 'shadowPurple' },
+    ],
+    ['drips'],
+  ),
+  vicarious_suffering: r(
+    'shadow',
+    'blood',
+    [
+      { p: 'heart', ...TL, s: 0.7 },
+      { p: 'tendrils', ...BR, s: 0.72, pal: 'shadowPurple' },
+    ],
+    ['arcs'],
+  ),
+  coven: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', x: -11, y: -8, s: 0.58 },
+      { p: 'eye', x: 10, y: -7, s: 0.54, pal: 'shadowPurple' },
+      { p: 'eye', x: 0, y: 10, s: 0.64 },
+    ],
+    ['glow', 'arcs'],
+  ),
   life_tap: r('blood', 'shadowPurple', ['heart', { p: 'droplet', ...BR, pal: 'shadowPurple' }]),
   curse_of_agony: r('shadow', 'shadowPurple', ['skull'], ['arcs']),
   drain_life: r('shadow', 'blood', [{ p: 'droplet', pal: 'blood' }], ['motion', 'drips']),
+  umbral_anchor: r(
+    'shadow',
+    'shadowPurple',
+    [
+      { p: 'sunburst', s: 0.9, pal: 'venom' },
+      { p: 'tendrils', ...BR, s: 0.62, pal: 'shadowPurple' },
+    ],
+    ['glow', 'arcs'],
+  ),
+  possess_evil_eye: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', s: 1.05 },
+      { p: 'tendrils', ...BR },
+    ],
+    ['glow', 'arcs'],
+  ),
+  hour_of_judgment: r(
+    'shadow',
+    'venom',
+    [
+      { p: 'eye', s: 0.82 },
+      { p: 'sunburst', s: 1.08, pal: 'shadowPurple' },
+      { p: 'skull', ...BR, s: 0.48, pal: 'blood' },
+    ],
+    ['glow', 'arcs'],
+  ),
   // druid
   wrath: r('nature', 'leafGreen', ['bolt', { p: 'leaf', ...BR }], ['glow']),
   moonseed: r('arcane', 'leafGreen', ['moon', { p: 'leaf', ...BR }], ['sparkle']),
@@ -2948,7 +3117,23 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   summon_felguard: r('shadow', 'steel', ['axe', { p: 'helm', ...TL }], ['glow']),
   summon_infernal: r('fire', 'ember', ['meteor'], ['glow']),
   summon_doomguard: r('shadow', 'shadowPurple', ['wing', { p: 'skull', ...BR }], ['glow']),
-  metamorphosis: r('shadow', 'ember', ['wing', { p: 'chestplate', ...BR }], ['glow']),
+  soul_fragments: r('shadow', 'venom', ['skull'], ['sparkle', 'glow']),
+  soul_harvest: r('shadow', 'venom', ['skull', { p: 'bolt', ...BR }], ['glow']),
+  soul_lance: r('shadow', 'venom', ['bolt', { p: 'skull', ...TR }], ['motion', 'glow']),
+  raise_graveguard: r('shadow', 'bone', ['skull', { p: 'shield', ...BR }], ['glow']),
+  raise_skeletal_warrior: r('shadow', 'bone', ['skull', { p: 'sword', ...BR }], ['arcs', 'glow']),
+  raise_bone_mage: r('shadow', 'venom', ['skull', { p: 'sigil_rune', ...BR }], ['glow']),
+  raise_gravewing: r('shadow', 'bone', ['wing', { p: 'skull', ...BR }], ['motion', 'glow']),
+  bone_armor: r('steel', 'bone', ['chestplate', { p: 'shield', ...BR }], ['glow']),
+  corpse_explosion: r('shadow', 'venom', ['skull'], ['drips', 'glow']),
+  litany_of_guilt: r('shadow', 'shadowPurple', ['scroll', { p: 'skull', ...BR }], ['arcs', 'glow']),
+  funeral_harvest: r('shadow', 'bone', ['hourglass', { p: 'skull', ...TR }], ['sparkle', 'glow']),
+  ossuary_mark: r('shadow', 'bone', ['sigil_rune', { p: 'skull', ...TR }], ['arcs', 'glow']),
+  unholy_command: r('shadow', 'bone', ['roar', { p: 'skull', ...BR }], ['arcs']),
+  reaping_command: r('shadow', 'venom', ['fist', { p: 'skull', ...TR }], ['arcs', 'motion']),
+  sacrifice_undead: r('blood', 'bone', ['heart', { p: 'skull', ...BR }], ['drips']),
+  army_of_the_dead: r('shadow', 'bone', ['wing', { p: 'skull', ...BR }], ['arcs', 'glow']),
+  metamorphosis: r('shadow', 'venom', ['skull', { p: 'helm', ...TR }], ['glow']),
   // druid
   bear_charge: r('earth', 'earthBrown', ['paw', { p: 'boot', ...BR }], ['motion']),
   maul: r('earth', 'earthBrown', ['paw', { p: 'claw_slash', ...TR }], ['glow']),
@@ -3108,6 +3293,30 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   curse_of_exhaustion: r('shadow', 'shadowPurple', ['boot', { p: 'skull', ...TR }], ['motion']),
   death_coil: r('shadow', 'blood', ['skull', { p: 'heart', ...BR }], ['drips']),
   chaos_bolt: r('fire', 'shadowPurple', ['bolt', { p: 'flame', ...BR }], ['crack']),
+  ruinous_brand: r(
+    'fire',
+    'shadowPurple',
+    ['sigil_rune', { p: 'flame', ...BR }],
+    ['crack', 'glow'],
+  ),
+  cinderhide: r('fire', 'ember', ['shield', { p: 'flame', ...BR }], ['crack', 'glow']),
+  destruction_ruin: r('fire', 'ember', ['gem', { p: 'flame', ...BR }], ['crack', 'glow']),
+  desolation: r('fire', 'ember', ['sunburst', { p: 'bolt', ...BR }], ['crack']),
+  duskfire_claim: r('shadow', 'ember', ['skull', { p: 'flame', ...BR }], ['glow']),
+  pyre_guardian: r('fire', 'ember', ['meteor', { p: 'fist', ...BR }], ['glow']),
+  sacrilegious_march: r(
+    'blood',
+    'shadowPurple',
+    ['boot', { p: 'droplet', ...BR }],
+    ['motion', 'drips'],
+  ),
+  dark_pact: r('shadow', 'blood', ['shield', { p: 'droplet', ...BR }], ['glow', 'drips']),
+  abyssal_rift: r(
+    'shadow',
+    'arcanePink',
+    ['sigil_rune', { p: 'tendrils', ...BIG }],
+    ['arcs', 'glow'],
+  ),
   // druid
   typhoon: r('nature', 'sky', ['sunburst'], ['glow']),
   innervate: r('nature', 'leafGreen', ['leaf', { p: 'gem', ...BR }], ['sparkle']),
@@ -3365,6 +3574,14 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_sunwake: r('nature', 'gold', ['sunburst', { p: 'tendrils', ...BR }], ['glow']),
   aura_old_blood: r('blood', 'blood', ['fang', { p: 'droplet', ...BR }], ['drips']),
   aura_verdance: r('nature', 'leafGreen', ['leaf', { p: 'heart', ...BR }], ['sparkle']),
+  // Warlock specialization resources and offensive windows use aura_<kind>
+  // identities because they are not all applied by a matching AbilityDef.
+  aura_soul_fragments: r('shadow', 'venom', ['skull'], ['sparkle', 'glow']),
+  aura_affliction_doom: r('shadow', 'shadowPurple', ['scroll', { p: 'skull', ...BR }], ['glow']),
+  aura_destruction_ruin: r('fire', 'ember', ['gem', { p: 'flame', ...BR }], ['crack', 'glow']),
+  aura_desolation: r('fire', 'ember', ['sunburst', { p: 'bolt', ...BR }], ['crack']),
+  aura_duskfire_claim: r('shadow', 'ember', ['skull', { p: 'flame', ...BR }], ['glow']),
+  aura_pyre_guardian: r('fire', 'ember', ['meteor', { p: 'fist', ...BR }], ['glow']),
   // Inert rolling-window markers (kind 'internal_cd': Heating Up, the temporal
   // accumulator, the Water Jet counter). A single ember-on-gold "charging" look;
   // without it every marker warned to the console and fell back, once per frame.
@@ -3590,7 +3807,10 @@ function qualityFx(quality: string | undefined): FxName[] | undefined {
   return undefined;
 }
 
-function trinketPrimitive(name: string): { p: PrimitiveName; pal: PaletteName } {
+function trinketPrimitive(name: string): {
+  p: PrimitiveName;
+  pal: PaletteName;
+} {
   if (has(name, ['skull', 'head'])) return { p: 'skull', pal: 'bone' };
   if (has(name, ['bone'])) return { p: 'bone', pal: 'bone' };
   if (has(name, ['pelt', 'hide', 'fur', 'scrap', 'bandana', 'cloth']))
@@ -3870,6 +4090,26 @@ function weaponIconUrl(id: string): string | null {
 // fall through to the procedural ABILITY_RECIPES below. ABILITY_IMAGE_IDS and abilityImageUrl
 // are exported for the gate in tests/skill_icons.test.ts.
 const SKILL_ICON_DIR = '/ui/skills';
+const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
+  'wlk_r5_bane',
+  'wlk_r5_improved_corruption',
+  'wlk_r5_improved_immolate',
+  'wlk_r8_voidfeast',
+  'wlk_r8_howl_of_terror',
+  'wlk_r8_curse_of_exhaustion',
+  'wlk_r11_improved_life_tap',
+  'wlk_r11_fel_concentration',
+  'wlk_r11_demon_armor',
+  'wlk_r14_amplify_curse',
+  'wlk_r14_ruin',
+  'wlk_r14_shadow_mastery',
+  'wlk_r17_death_coil',
+  'wlk_r17_improved_fear',
+  'wlk_r17_demonic_resilience',
+  'wlk_r20_chaos_bolt',
+  'wlk_r20_grimoire_of_haste',
+  'wlk_r20_curse_mastery',
+]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
   // paladin (original project art for the overhaul and talent abilities, plus
   // the existing CraftPix premium "RPG Paladin skill icons" base set)
@@ -3990,6 +4230,53 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'summon_doomguard',
   'life_tap',
   'searing_pain',
+  // OpenAI-generated Warlock spell art. These complete the current ability catalog while
+  // preserving the existing CraftPix-backed ids above.
+  'rain_of_fire',
+  'evil_eye',
+  'maledict_gaze',
+  'needle_of_fate',
+  'sentence',
+  'cursed_accomplice',
+  'hex_of_violence',
+  'cruel_pact',
+  'vicarious_suffering',
+  'possess_evil_eye',
+  'hour_of_judgment',
+  'coven',
+  'soul_lance',
+  'litany_of_guilt',
+  'umbral_anchor',
+  'soulwell',
+  'ruinous_brand',
+  'soul_harvest',
+  'raise_graveguard',
+  'raise_skeletal_warrior',
+  'raise_bone_mage',
+  'raise_gravewing',
+  'bone_armor',
+  'corpse_explosion',
+  'funeral_harvest',
+  'ossuary_mark',
+  'unholy_command',
+  'reaping_command',
+  'sacrifice_undead',
+  'army_of_the_dead',
+  'metamorphosis',
+  'siphon_life',
+  'conflagrate',
+  'spell_lock',
+  'voidfeast',
+  'sacrilegious_march',
+  'dark_pact',
+  'abyssal_rift',
+  'howl_of_terror',
+  'curse_of_exhaustion',
+  'death_coil',
+  'chaos_bolt',
+  'cinderhide',
+  // Choice-row talents use their own images instead of borrowing spell art.
+  ...WARLOCK_TALENT_IMAGE_IDS,
   // rogue (CraftPix premium "RPG Thief skill icons" pack). garrote/sap/expose_armor/blind
   // have no fitting art (no garrote-wire, blackjack, armor-shred, or eye-powder) — procedural.
   'sinister_strike',
@@ -4240,7 +4527,13 @@ export function abilityImageUrl(id: string): string | null {
           id === 'elemental_convergence' ||
           id === 'overflowing_power'
         ? 'mage'
-        : null);
+        : WARLOCK_TALENT_IMAGE_IDS.has(id) ||
+            id === 'summon_succubus' ||
+            id === 'summon_felhunter' ||
+            id === 'summon_felguard' ||
+            id === 'summon_doomguard'
+          ? 'warlock'
+          : null);
   return cls ? `${SKILL_ICON_DIR}/${cls}/${id}.webp` : null;
 }
 
@@ -4791,6 +5084,9 @@ export function abilityIconRecipe(id: string): IconRecipe {
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
   return id in ABILITY_RECIPES;
+}
+export function hasExplicitAuraIcon(id: string): boolean {
+  return id in AURA_RECIPES;
 }
 
 const DEFAULT_ICON_SIZE = 96; // crisp at 46px buttons on 2x displays

@@ -46,7 +46,10 @@ function slot(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     empowered: false,
     ascensionSpender: false,
     ascensionCostLabel: '',
+    fateConsumeReady: false,
+    fateSentenceReady: false,
     ariaLabel: kind,
+    ariaDescription: '',
     keybindLabel: '',
   };
 }

@@ -88,6 +88,8 @@ import {
   type CommandName,
   type DungeonFinderBoard,
   isOverheadEmoteId,
+  PET_SPECIAL_WIRE_VERSION,
+  type PetSpecialWireVersion,
   STABLE_TIMER_WIRE_VERSION,
   type StableTimerWireVersion,
   type VcSharedCupInfo,
@@ -739,6 +741,7 @@ export interface ClientSession {
   // Recipient-negotiated timer representation. Legacy remains the default for
   // old and unknown clients throughout a rolling deploy.
   timerWireVersion: 1 | StableTimerWireVersion;
+  petSpecialWireVersion: 0 | PetSpecialWireVersion;
   timerWireCache: StableSelfTimerWireCache;
   // arena readout is reconciled at UI cadence instead of snapshot cadence
   lastArenaWireTick: number;
@@ -1123,6 +1126,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cast = e.castingAbility;
     out.castRem = round2(e.castRemaining);
     out.castTot = round2(e.castTotal);
+    if (e.castTargetId !== null) out.castTgt = e.castTargetId;
     if (e.channeling) out.chan = 1;
   }
   // Mount summon/dismount transition, so every client can time the summon FX / call
@@ -1172,6 +1176,8 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.pt = round2(e.petTauntTimer);
     if (e.petAutoTaunt) out.pa = 1;
     if (e.petAutoWaterJet) out.pw = 1;
+    if ((e.petSkillTimer ?? 0) > 0) out.ps = round2(e.petSkillTimer ?? 0);
+    if (e.petAutoSkill) out.px = 1;
   }
   if (e.rangedPower) out.rp = e.rangedPower;
   // Remote Paladins need the compact active-charge count so every client can
@@ -2821,6 +2827,7 @@ export class GameServer {
         sourceUrl?: string | null;
         leaseNonce?: string;
         timerWireVersion?: 1 | StableTimerWireVersion;
+        petSpecialWireVersion?: 0 | PetSpecialWireVersion;
         // Server-recomputed bank bonus slots (ws_auth.ts, fresh-join arm) stamped into
         // the character state via addPlayer. Absent on a resume and for callers that
         // pass no meta (tests, the bot-detector overlay), which keep the saved value.
@@ -2867,6 +2874,15 @@ export class GameServer {
       characterId,
       bankBonus: meta.bankBonus,
     });
+    const player = this.sim.entities.get(pid);
+    if (player) {
+      player.petSpecialCommandsSupported = meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (meta.petSpecialWireVersion !== PET_SPECIAL_WIRE_VERSION) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === pid) entity.petAutoSkill = false;
+      }
+    }
     if (isGm) {
       // GM characters: invulnerable, and always at the level cap (the row is
       // created without state, so the first join levels them up)
@@ -2949,6 +2965,8 @@ export class GameServer {
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
+      petSpecialWireVersion:
+        meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0,
       timerWireCache: new StableSelfTimerWireCache(),
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
@@ -3126,6 +3144,18 @@ export class GameServer {
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
+    session.petSpecialWireVersion =
+      meta.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION ? PET_SPECIAL_WIRE_VERSION : 0;
+    const player = this.sim.entities.get(session.pid);
+    if (player) {
+      player.petSpecialCommandsSupported =
+        session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION;
+    }
+    if (session.petSpecialWireVersion === 0) {
+      for (const entity of this.sim.entities.values()) {
+        if (entity.ownerId === session.pid) entity.petAutoSkill = false;
+      }
+    }
     session.timerWireCache = new StableSelfTimerWireCache();
     session.sentEnts = new Map();
     session.selfHeavyDirty = true;
@@ -4891,6 +4921,17 @@ export class GameServer {
       case 'pet_auto_water_jet':
         if (typeof msg.enabled === 'boolean') sim.setPetAutoWaterJet(msg.enabled, pid);
         break;
+      case 'pet_special':
+        if (session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION) sim.petSpecial(pid);
+        break;
+      case 'pet_auto_special':
+        if (
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION &&
+          typeof msg.enabled === 'boolean'
+        ) {
+          sim.setPetAutoSpecial(msg.enabled, pid);
+        }
+        break;
       case 'pet_feed':
         if (typeof msg.item === 'string') sim.feedPet(msg.item, pid);
         break;
@@ -5860,9 +5901,13 @@ export class GameServer {
         const consecrationsJson =
           consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
         const timerWireJson = stableTimerWire ? `,"tw":${STABLE_TIMER_WIRE_VERSION}` : '';
+        const petSpecialWireJson =
+          session.petSpecialWireVersion === PET_SPECIAL_WIRE_VERSION
+            ? `,"psw":${PET_SPECIAL_WIRE_VERSION}`
+            : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${frostRingsJson}${temporalHourglassesJson}${consecrationsJson}${keepJson}}`,
         );
       },
       (err, resolved) =>
@@ -6835,7 +6880,12 @@ export class GameServer {
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty)) continue;
+          const sourceOwnerId =
+            ev.type === 'damage'
+              ? (ev.sourceOwnerId ?? this.sim.entities.get(ev.sourceId)?.ownerId ?? null)
+              : null;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, sourceOwnerId))
+            continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (

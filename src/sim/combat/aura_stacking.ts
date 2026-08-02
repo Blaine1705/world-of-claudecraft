@@ -42,6 +42,7 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'rallying_cry_hp',
   'rune_of_power',
   'sanguine_aura',
+  'soulwell',
   'trueshot_aura_ap', // Sureflight Aura (hunter aoeAllyAttackPower)
   'temporal_hourglass',
   'aura_mastery',

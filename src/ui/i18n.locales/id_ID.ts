@@ -3143,7 +3143,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Memanggil Emberkin di bawah perintah Penyihir Iblis. Emberkin melontarkan Ashbolt ke arah musuhmu dari kejauhan. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',
   'entities.abilities.summon_imp.name': 'Panggil Emberkin',
   'entities.abilities.summon_infernal.description':
-    'Mengikat Raksasa Pyre pada kehendakmu, monster kekar dengan serangan jarak dekat yang meremukkan serta nyawa dan zirah terdalam di antara semua iblis. Waktu jeda yang panjang membatasi kekuatan mentahnya. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',
+    'Menjatuhkan Raksasa Pyre di area sasaran dan memberikan 58-72 kerusakan Api saat mendarat. Ia bertarung selama 30 dtk tanpa menggantikan iblismu, membakar musuh di sekitar setiap 2 dtk, dan menghasilkan 1 Ruin setiap detik.',
   'entities.abilities.summon_infernal.name': 'Panggil Raksasa Pyre',
   'entities.abilities.summon_succubus.description':
     'Memanggil Duskborn di bawah perintah Penyihir Iblis. Duskborn adalah iblis rapuh yang menyerang dengan cepat dan memukul keras dalam jarak dekat. Memanggil iblis baru akan membubarkan iblismu saat ini. Kau hanya boleh memiliki satu iblis pada satu waktu.',

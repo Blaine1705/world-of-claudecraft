@@ -20,6 +20,7 @@
 // fiestaStandardize / updateFiestaActive / fiestaRestoreChar / clearFiestaAugments
 // are consumed here via SimContext callbacks (points-at Sim until A3 flips them).
 
+import { emitRainOfFireStop } from '../combat/warlock_meteor_events';
 import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
@@ -990,6 +991,7 @@ export function readyArenaFighter(
   delete e.queuedOnSwingCostMultiplier;
   e.queuedCastAbility = null;
   e.queuedCastAim = null;
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;

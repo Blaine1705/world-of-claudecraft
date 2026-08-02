@@ -1552,11 +1552,11 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "id": "affliction",
         "name": "Hexcraft",
         "role": "dps",
-        "signature": "siphon_life"
+        "signature": "evil_eye"
       },
       {
         "id": "demonology",
-        "name": "Pactbound",
+        "name": "Necromancy",
         "role": "dps",
         "signature": "metamorphosis"
       },
@@ -1589,8 +1589,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Blackrot"
       },
       {
-        "id": "life_tap",
-        "name": "Hard Bargain"
+        "id": "evil_eye",
+        "name": "Evil Eye"
       }
     ],
     "abilities": [
@@ -1615,8 +1615,28 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Blackrot"
       },
       {
+        "id": "evil_eye",
+        "name": "Evil Eye"
+      },
+      {
+        "id": "maledict_gaze",
+        "name": "Maledict Gaze"
+      },
+      {
+        "id": "needle_of_fate",
+        "name": "Needle of Fate"
+      },
+      {
+        "id": "sentence",
+        "name": "Sentence"
+      },
+      {
         "id": "life_tap",
         "name": "Hard Bargain"
+      },
+      {
+        "id": "cursed_accomplice",
+        "name": "Cursed Accomplice"
       },
       {
         "id": "summon_voidwalker",
@@ -1631,36 +1651,64 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Consume"
       },
       {
+        "id": "searing_pain",
+        "name": "Sear"
+      },
+      {
+        "id": "soul_lance",
+        "name": "Soul Lance"
+      },
+      {
+        "id": "litany_of_guilt",
+        "name": "Litany of Guilt"
+      },
+      {
+        "id": "umbral_anchor",
+        "name": "Umbral Anchor"
+      },
+      {
+        "id": "soulwell",
+        "name": "Soulwell"
+      },
+      {
+        "id": "chaos_bolt",
+        "name": "Ruinbolt"
+      },
+      {
+        "id": "hex_of_violence",
+        "name": "Hex of Violence"
+      },
+      {
+        "id": "ossuary_mark",
+        "name": "Ossuary Mark"
+      },
+      {
         "id": "fear",
         "name": "Harrow"
       },
       {
-        "id": "searing_pain",
-        "name": "Sear"
+        "id": "cruel_pact",
+        "name": "Cruel Pact"
       },
       {
         "id": "shadowburn",
         "name": "Duskfire"
       },
       {
-        "id": "summon_succubus",
-        "name": "Summon Duskborn"
+        "id": "ruinous_brand",
+        "name": "Ruinous Brand"
       },
       {
-        "id": "summon_felhunter",
-        "name": "Summon Spellhound"
+        "id": "cinderhide",
+        "name": "Cinderhide"
       },
       {
-        "id": "summon_felguard",
-        "name": "Summon Warfiend"
+        "id": "vicarious_suffering",
+        "name": "Vicarious Suffering"
       },
       {
         "id": "summon_infernal",
         "name": "Summon Pyre Colossus"
-      },
-      {
-        "id": "summon_doomguard",
-        "name": "Summon Wraithborn"
       },
       {
         "id": "rain_of_fire",
@@ -1668,7 +1716,67 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "spell_lock",
-        "name": "Gag Order"
+        "name": "Abyssal Gag"
+      },
+      {
+        "id": "possess_evil_eye",
+        "name": "Possess the Evil Eye"
+      },
+      {
+        "id": "hour_of_judgment",
+        "name": "Hour of Judgment"
+      },
+      {
+        "id": "coven",
+        "name": "Coven"
+      },
+      {
+        "id": "soul_harvest",
+        "name": "Essence Reap"
+      },
+      {
+        "id": "raise_graveguard",
+        "name": "Raise Graveguard"
+      },
+      {
+        "id": "raise_skeletal_warrior",
+        "name": "Raise Skeletal Warrior"
+      },
+      {
+        "id": "raise_bone_mage",
+        "name": "Raise Bone Mage"
+      },
+      {
+        "id": "bone_armor",
+        "name": "Bone Armor"
+      },
+      {
+        "id": "corpse_explosion",
+        "name": "Corpse Explosion"
+      },
+      {
+        "id": "funeral_harvest",
+        "name": "Funeral Harvest"
+      },
+      {
+        "id": "unholy_command",
+        "name": "Unholy Command"
+      },
+      {
+        "id": "reaping_command",
+        "name": "Reaping Command"
+      },
+      {
+        "id": "sacrifice_undead",
+        "name": "Sacrifice Undead"
+      },
+      {
+        "id": "raise_gravewing",
+        "name": "Raise Gravewing"
+      },
+      {
+        "id": "army_of_the_dead",
+        "name": "Army of the Dead"
       }
     ],
     "model": "player_warlock",
@@ -2274,51 +2382,20 @@ export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
   {
     "id": "emberkin",
     "name": "Emberkin",
-    "model": "mob_demon",
-    "tint": "#ff7a2a",
-    "still": "/guide-stills/mob_demon__ff7a2a.webp"
+    "model": "mob_emberkin",
+    "still": "/guide-stills/mob_emberkin.webp"
   },
   {
     "id": "gloomshade",
     "name": "Gloomshade",
-    "model": "mob_demon",
-    "tint": "#3a3a6e",
-    "still": "/guide-stills/mob_demon__3a3a6e.webp"
-  },
-  {
-    "id": "duskborn",
-    "name": "Duskborn",
-    "model": "mob_demon",
-    "tint": "#c6469b",
-    "still": "/guide-stills/mob_demon__c6469b.webp"
-  },
-  {
-    "id": "spellhound",
-    "name": "Spellhound",
-    "model": "mob_demonalt",
-    "tint": "#4a7d4a",
-    "still": "/guide-stills/mob_demonalt__4a7d4a.webp"
-  },
-  {
-    "id": "warfiend",
-    "name": "Warfiend",
-    "model": "mob_demonalt",
-    "tint": "#6e5a2a",
-    "still": "/guide-stills/mob_demonalt__6e5a2a.webp"
+    "model": "mob_gloomshade",
+    "still": "/guide-stills/mob_gloomshade.webp"
   },
   {
     "id": "pyre_colossus",
     "name": "Pyre Colossus",
-    "model": "mob_demonalt",
-    "tint": "#d24a2a",
-    "still": "/guide-stills/mob_demonalt__d24a2a.webp"
-  },
-  {
-    "id": "wraithborn",
-    "name": "Wraithborn",
-    "model": "mob_demonalt",
-    "tint": "#7a3a8e",
-    "still": "/guide-stills/mob_demonalt__7a3a8e.webp"
+    "model": "mob_pyre_colossus",
+    "still": "/guide-stills/mob_pyre_colossus.webp"
   }
 ];
 
@@ -10103,17 +10180,23 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 2.3
   },
-  "mob_demon": {
-    "url": "models/creatures/demonalt.glb",
-    "idle": "Idle",
-    "height": 1.8,
-    "tintStrength": 0.5
-  },
-  "mob_demonalt": {
-    "url": "models/creatures/demonalt.glb",
+  "mob_emberkin": {
+    "url": "models/creatures/emberkin.glb",
     "idle": "Idle",
     "height": 2.1,
-    "tintStrength": 0.35
+    "yaw": -1.5707963267948966
+  },
+  "mob_gloomshade": {
+    "url": "models/creatures/gloomshade_abyssal_guardian.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "yaw": -1.5707963267948966
+  },
+  "mob_pyre_colossus": {
+    "url": "models/creatures/pyre_colossus.glb",
+    "idle": "Idle",
+    "height": 2.5,
+    "yaw": -1.5707963267948966
   },
   "mob_wolf": {
     "url": "models/creatures/wolf_basic.glb",
@@ -10321,5 +10404,11 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ]
+  },
+  "mob_demonalt": {
+    "url": "models/creatures/demonalt.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "tintStrength": 0.35
   }
 };

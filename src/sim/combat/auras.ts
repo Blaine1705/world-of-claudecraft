@@ -43,6 +43,7 @@ import { isPersistentEngineAura } from '../persistent_aura';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
+import { tickAfflictionAura, tickMaledictGaze } from './affliction';
 import { isStunned } from './cc';
 import { tickPaladinOathChainPull } from './paladin_control';
 import { druidEngineOnBleedTick } from './druid_engines';
@@ -51,10 +52,13 @@ import { preservesGloomtithe, vespersOnDotTick } from './priest/vespers';
 import { tickMendingCurrent } from './shaman_spiritmend';
 import { tickShamanTalentAura } from './shaman_talents';
 import { stoneboundThreatMultiplier } from './shaman_warspirit';
+import { regenerateRuinOutOfCombat, tickPyreGuardian } from './destruction';
 import { applyGreaterInvisibilityAftereffect } from './greater_invisibility';
+import { detonateOssuaryMark, OSSUARY_MARK_ABILITY_ID } from './necromancy';
 import { onHotExpired, tickProcState } from './talent_procs';
 import { temporalHourglassCooldownDelta, tickTemporalHourglassHealing } from './temporal_hourglass';
 import { tickThornsCooldown } from './thorns_charge';
+import { tickSacrilegiousMarch, tickWarlockTalentState } from './warlock_talents';
 
 const SECOND_WIND_THRESHOLD = 0.35;
 
@@ -87,6 +91,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 
 export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  regenerateRuinOutOfCombat(ctx, p, meta);
   // Lifesap restores whichever resource bar is currently live, including across
   // form changes. Hard control stills the sap rather than banking free resource.
   if (!isStunned(p)) {
@@ -237,6 +242,10 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   let statsDirty = false;
   // Talent-proc internal cooldowns age at the same cadence as auras.
   tickProcState(e, DT);
+  if (e.kind === 'player') {
+    const meta = ctx.players.get(e.id);
+    if (meta) tickWarlockTalentState(ctx, e, meta);
+  }
   // Walk a SNAPSHOT of e.auras, not the live array. A DoT tick's own
   // ctx.dealDamage call can splice an aura out of this SAME array mid-walk
   // (damage.ts's own backward sweeps remove a breaksOnDamage control aura, or a
@@ -263,6 +272,7 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       a.remaining -= DT;
     }
     tickShamanTalentAura(a);
+    tickAfflictionAura(ctx, e, a, DT);
     // charge-limited thorns (Lightning Shield): age its internal cooldown so the
     // next melee hit can reflect once it elapses. No-op for ungated thorns.
     if (a.kind === 'thorns') tickThornsCooldown(a);
@@ -270,8 +280,14 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       a.tickTimer = (a.tickTimer ?? a.tickInterval) - DT;
       if (a.tickTimer <= CAST_COMPLETE_EPS) {
         a.tickTimer += a.tickInterval;
-        if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
+        if (a.kind === 'pyre_guardian') {
+          tickPyreGuardian(ctx, e, a);
+        } else if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
           tickTemporalHourglassHealing(ctx, e, a);
+        } else if (a.id === 'sacrilegious_march' && a.kind === 'buff_speed') {
+          tickSacrilegiousMarch(ctx, e, a);
+        } else if (a.kind === 'affliction_eye') {
+          tickMaledictGaze(ctx, e, a);
         } else if (a.kind === 'dot') {
           const dotSource = ctx.entities.get(a.sourceId) ?? null;
           let tickDamage = a.value;
@@ -362,6 +378,11 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
       }
     }
     if (!a.permanent && a.remaining <= CAST_COMPLETE_EPS) {
+      if (a.id === OSSUARY_MARK_ABILITY_ID && a.kind === 'necromancy_ossuary_mark') {
+        detonateOssuaryMark(ctx, e, a);
+        if (e.dead) return;
+        continue;
+      }
       // `i` indexes the snapshot, which no longer matches e.auras once a mid-tick
       // removal has shifted it, so splice the aura's actual live position. The
       // guard covers the one remaining self-removal window (an aura whose OWN

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
+import { WARLOCK_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -119,92 +120,146 @@ describe('druid wave 2 choice rows', () => {
 });
 
 describe('warlock wave 2 choice rows', () => {
-  it('only Hexstorm still empowers Gloom Bolt, behind its internal cooldown', () => {
-    // Balance pass: Pact Deepened and Ashen Focus are flat ability talents
-    // (the instant-relay soup is gone); Hexstorm survives with an icd.
-    const { sim, p } = rig('warlock', 20, {
-      5: 'wlk_r5_improved_immolate',
-      14: 'wlk_r14_ruin',
-      20: 'wlk_r20_curse_mastery',
-    });
-    for (let i = 0; i < 3; i++) completeCast(sim, 'immolate');
-    expect(p.auras.some((a) => a.id === 'wlk_improved_immolate')).toBe(false);
-    const immolate = sim.resolvedAbility('immolate');
-    expect(immolate?.effects[0]).toMatchObject({ type: 'directDamage' });
-    for (let i = 0; i < 3; i++) completeCast(sim, 'curse_of_agony');
-    expect(p.auras.some((a) => a.id === 'wlk_curse_mastery')).toBe(true);
-    // Inside the 10 sec icd three more curses do NOT re-arm it.
-    p.auras.length = 0;
-    for (let i = 0; i < 3; i++) completeCast(sim, 'curse_of_agony');
-    expect(p.auras.some((a) => a.id === 'wlk_curse_mastery')).toBe(false);
-  });
-
-  it('Hellglass Ward shields the warlock on the 3rd damaging cast, never the mob', () => {
-    const { sim, p } = rig('warlock', 20, { 20: 'wlk_r20_grimoire_of_haste' });
-    const mob = addTargetMob(sim);
-    // Hold the mob still so nothing consumes the ward while the casts settle.
-    mob.auras.push({
-      id: 'test_hold',
-      name: 'Test Hold',
-      kind: 'stun',
-      remaining: 600,
-      duration: 600,
-      value: 0,
-      sourceId: p.id,
-      school: 'shadow',
-    });
-    for (let i = 0; i < 3; i++) castAndSettle(sim, 'shadow_bolt');
-    expect(mob.dead).toBe(false);
-    expect(p.auras.some((a) => a.id === 'wlk_grimoire_of_carnage' && a.kind === 'absorb')).toBe(
-      true,
+  it('names Grand Malediction targets and describes class talents without internal shared jargon', () => {
+    const dreadChorus = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 8)
+      ?.options.find((option) => option.id === 'wlk_r8_howl_of_terror');
+    expect(dreadChorus?.description).toBe(
+      'Grants Dread Chorus: frighten enemies within 8 yards for up to 3 sec. Damage may break the effect. 40 sec cooldown.',
     );
-    expect(mob.auras.some((a) => a.id === 'wlk_grimoire_of_carnage')).toBe(false);
+    const shadowCredit = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 14)
+      ?.options.find((option) => option.id === 'wlk_r14_shadow_mastery');
+    expect(shadowCredit?.description).toBe(
+      'Each time you spend at least 40% of your specialization resource, you gain 1 free generator. Spending at least 80% at once grants 2. Separate triggers can accumulate up to 2 charges.',
+    );
+
+    const grandMalediction = WARLOCK_CHOICE_ROWS.rows
+      .find((row) => row.level === 17)
+      ?.options.find((option) => option.id === 'wlk_r17_death_coil');
+    expect(grandMalediction?.description).toBe(
+      "Reduces your specialization's setup cooldown by 25%: Hex of Violence (Affliction; punishes the enemy's damaging actions), Unholy Command (Necromancy; briefly empowers all your undead), or Ruinous Brand (Destruction; echoes your direct spells).",
+    );
+
+    const capstones = WARLOCK_CHOICE_ROWS.rows.find((row) => row.level === 20)?.options ?? [];
+    const unbrokenRitual = capstones.find((option) => option.id === 'wlk_r20_chaos_bolt');
+    const forbiddenReflection = capstones.find(
+      (option) => option.id === 'wlk_r20_grimoire_of_haste',
+    );
+    expect(unbrokenRitual?.description).toBe(
+      'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class abilities by 0.5 sec. Does not affect specialization abilities or capstone talents.',
+    );
+    expect(forbiddenReflection?.description).toBe(
+      'The first Warlock class ability with a cooldown that you use, except Soulwell, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+    );
+    expect(`${unbrokenRitual?.description} ${forbiddenReflection?.description}`).not.toMatch(
+      /\bshared\b/i,
+    );
   });
 
-  it('Deepened Hex and defensive pact hooks change live combat outcomes', () => {
-    const hit = (withDot: boolean) => {
-      // Seed hunted (post-merge camp order) so the level-20 bolt LANDS in both
-      // arms (a resist zeroes the delta and voids the ratio). Spares: 3, 4.
-      const { sim } = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' }, null, 2);
-      const mob = addTargetMob(sim);
-      if (withDot) {
-        mob.auras.push({
-          id: 'corruption',
-          name: 'Corruption',
-          kind: 'dot',
-          remaining: 10,
-          duration: 10,
-          value: 1,
-          tickInterval: 99,
-          tickTimer: 99,
-          sourceId: sim.player.id,
-          school: 'shadow',
-        });
-      }
-      const before = mob.hp;
-      sim.player.resource = sim.player.maxResource;
-      sim.castAbility('shadow_bolt');
-      for (let i = 0; i < 20 * 4; i++) sim.tick();
-      expect(mob.dead).toBe(false);
-      return before - mob.hp;
-    };
-    expect(hit(true)).toBeGreaterThan(hit(false) * 1.15);
+  it('Grand Malediction reduces an already-known setup cooldown for every specialization', () => {
+    for (const [spec, ability, cooldown] of [
+      ['affliction', 'hex_of_violence', 11.25],
+      ['demonology', 'unholy_command', 33.75],
+      ['destruction', 'ruinous_brand', 15],
+    ] as const) {
+      const { sim } = rig('warlock', 20, { 17: 'wlk_r17_death_coil' }, spec);
+      expect(sim.resolvedAbility(ability)?.cooldown, spec).toBe(cooldown);
+    }
+  });
 
-    // Phase-2 defensive pass: Fiendward is a demonic safety net now: the big
-    // hit arms a 10 sec echo that pays 15% max health only if the wearer then
-    // falls below 35%.
-    const guarded = rig('warlock', 20, {
-      11: 'wlk_r11_demon_armor',
-      17: 'wlk_r17_demonic_resilience',
+  it('Ashen Focus keeps generators stationary and the final active is Abyssal Rift', () => {
+    for (const [spec, generator] of [
+      ['affliction', 'needle_of_fate'],
+      ['demonology', 'soul_harvest'],
+      ['destruction', 'shadow_bolt'],
+    ] as const) {
+      const { sim } = rig('warlock', 20, { 17: 'wlk_r17_improved_fear' }, spec);
+      expect(sim.resolvedAbility(generator)?.castWhileMoving, spec).not.toBe(true);
+    }
+
+    const { sim } = rig('warlock', 20, { 20: 'wlk_r20_curse_mastery' });
+    expect(sim.resolvedAbility('abyssal_rift')).toMatchObject({
+      cooldown: 90,
+      effects: [
+        expect.objectContaining({
+          type: 'aoeDamage',
+          radius: 8,
+          pullToCenter: true,
+          stunSec: 2,
+        }),
+      ],
     });
-    guarded.p.hp = Math.round(guarded.p.maxHp * 0.8);
-    dealDamage(guarded.sim, guarded.p, Math.ceil(guarded.p.maxHp * 0.2)); // arms at ~60%
-    const echo = guarded.p.auras.find((a) => a.id === 'wlk_demon_armor');
-    expect(echo?.kind).toBe('heal_echo');
-    expect(echo?.value).toBe(Math.round(guarded.p.maxHp * 0.15));
-    const beforeDrop = guarded.p.hp;
-    dealDamage(guarded.sim, guarded.p, Math.ceil(guarded.p.maxHp * 0.3)); // below 35%
-    expect(guarded.p.hp).toBeGreaterThan(beforeDrop - Math.ceil(guarded.p.maxHp * 0.3));
-    expect(guarded.p.auras.some((a) => a.id === 'wlk_demon_armor')).toBe(false);
+  });
+
+  it('Hexstorm empowers each primary generator behind its internal cooldown', () => {
+    for (const [spec, generator] of [
+      ['affliction', 'needle_of_fate'],
+      ['demonology', 'soul_harvest'],
+      ['destruction', 'shadow_bolt'],
+    ] as const) {
+      const { sim, p } = rig(
+        'warlock',
+        20,
+        {
+          17: 'wlk_r17_demonic_resilience',
+        },
+        spec,
+      );
+      for (let i = 0; i < 3; i++) completeCast(sim, generator);
+      expect(
+        p.auras.some((a) => a.id === 'wlk_curse_mastery'),
+        spec,
+      ).toBe(true);
+      // Inside the 10 sec icd three more generators do not re-arm it.
+      p.auras.length = 0;
+      for (let i = 0; i < 3; i++) completeCast(sim, generator);
+      expect(
+        p.auras.some((a) => a.id === 'wlk_curse_mastery'),
+        spec,
+      ).toBe(false);
+    }
+  });
+
+  it('Forbidden Reflection arms after a shared cooldown instead of creating a ward', () => {
+    const { sim, p } = rig('warlock', 20, {
+      11: 'wlk_r11_fel_concentration',
+      20: 'wlk_r20_grimoire_of_haste',
+    });
+    castAndSettle(sim, 'dark_pact', 1);
+    expect(p.auras.some((a) => a.id === 'wlk_forbidden_reflection')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'wlk_grimoire_of_carnage')).toBe(false);
+  });
+
+  it('generator economy, Blood Credit, and Sanguine Covenant change live outcomes', () => {
+    const economical = rig('warlock', 20, { 14: 'wlk_r14_amplify_curse' }, 'destruction');
+    expect(economical.sim.resolvedAbility('shadow_bolt')?.cost).toBe(42);
+
+    const credited = rig('warlock', 20, { 14: 'wlk_r14_ruin' });
+    credited.p.resource = 0;
+    const hpBeforeTap = credited.p.hp;
+    credited.sim.castAbility('life_tap');
+    expect(credited.p.resource).toBe(128);
+    expect(credited.p.hp).toBe(hpBeforeTap - 85);
+
+    const afflictionCredit = rig('warlock', 20, { 14: 'wlk_r14_ruin' }, 'affliction');
+    afflictionCredit.p.resource = 0;
+    const hpBeforeCruelPact = afflictionCredit.p.hp;
+    afflictionCredit.sim.castAbility('cruel_pact');
+    expect(afflictionCredit.p.resource).toBe(
+      Math.round(afflictionCredit.p.maxResource * 0.15 * 1.5),
+    );
+    expect(afflictionCredit.p.hp).toBe(
+      hpBeforeCruelPact - Math.round(afflictionCredit.p.maxHp * 0.12),
+    );
+
+    const guarded = rig('warlock', 20, { 11: 'wlk_r11_fel_concentration' });
+    const beforePact = guarded.p.hp;
+    guarded.sim.castAbility('dark_pact');
+    expect(guarded.p.hp).toBe(beforePact - Math.round(beforePact * 0.1));
+    expect(guarded.p.auras.find((a) => a.id === 'dark_pact')).toMatchObject({
+      kind: 'absorb',
+      value: Math.round(guarded.p.maxHp * 0.3),
+    });
   });
 });

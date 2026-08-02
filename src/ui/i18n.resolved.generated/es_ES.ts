@@ -321,6 +321,22 @@ export const es_ES: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "Condena",
+      "fateThreadsLabel": "Hilos del destino",
+      "doomMeterUnlock": "Move Affliction resource bar",
+      "doomMeterLock": "Lock Affliction resource bar",
+      "doomEmptyStatus": "{value} de {max} de Condena.",
+      "doomStatus": "{value} de {max} de Condena; quedan {remaining}.",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "Fragmentos de alma",
+      "ruinMeter": "Ruin",
+      "ruinStatus": "{value} of {max} Ruin"
+    },
     "spectate": {
       "banner": "Observando a {name}"
     },
@@ -1773,17 +1789,31 @@ export const es_ES: EnTranslations = {
       "absorb": "Bloquea {value} de daño",
       "healAbsorb": "Bloquea {value} de sanación recibida",
       "thorns": "Provoca {value} de daño de {school} a los atacantes",
+      "stasis": "Inmune e incapaz de actuar",
       "slow": "Disminuye la velocidad de movimiento un {pct}%",
       "speed": "Incrementa la velocidad de movimiento un {pct}%",
       "attackSpeedSlow": "Disminuye la velocidad de ataque un {pct}%",
       "attackSpeedFast": "Incrementa la velocidad de ataque un {pct}%",
       "haste": "Incrementa la velocidad de ataque y lanzamiento un {pct}%",
       "imbueRange": "Arma imbuida: {min} a {max} de daño extra con Verdict",
+      "petDamage": "Aumenta el daño de la mascota un {pct}%",
+      "petHaste": "Aumenta la velocidad de acción de la mascota un {pct}%",
+      "spellDamage": "Aumenta el daño con hechizos un {pct}%",
+      "spellHaste": "Aumenta la velocidad de lanzamiento un {pct}%",
+      "sated": "Impide beneficiarse de otro efecto de celeridad de grupo",
+      "cauterizeFatigue": "Cauterizar no puede evitar otro golpe letal",
+      "castShield": "El daño no puede interrumpir ni retrasar tus lanzamientos",
       "dmgDone": "Aumenta el daño infligido un {pct}%",
       "dmgDoneReduce": "Reduce el daño infligido un {pct}%",
       "heatingUp": "Tu siguiente golpe crítico consecutivo de Fuego activa Buena Racha; un golpe no crítico elimina Calentando Motores",
       "elementalConvergencePrimed": "Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental",
       "hunterFerocity": "{stacks} de Ferocidad de Manada: tu mascota inflige un {pct}% más de daño",
+      "cooldownCap": "Has usado {used} de {cap} s de reducción de reutilización en esta ventana",
+      "funeralHarvestLock": "Cosecha funeraria aún no puede crear otro fragmento de alma",
+      "leadenHexLock": "Maleficio plomizo aún no puede volver a inmovilizar a este objetivo",
+      "forbiddenReflectionReady": "Puedes volver a usar tu próxima facultad compartida de brujo con reutilización",
+      "forbiddenReflectionLock": "Reflejo prohibido aún no puede volver a prepararse",
+      "internalCooldown": "Este efecto no puede volver a activarse hasta que termine el temporizador",
       "battleStance": "Actitud de Combate: un 10% más de generación de ira",
       "berserkerStance": "Actitud Rabiosa: los críticos aciertan un 3% más a menudo y golpean un 3% más fuerte",
       "crit": "Incrementa la probabilidad de golpe crítico un {pct}%",
@@ -1797,6 +1827,13 @@ export const es_ES: EnTranslations = {
       "revengeFree": "Tu siguiente Venganza no cuesta ira",
       "victoryRush": "Ímpetu de Victoria está listo",
       "maxHpPct": "Incrementa la salud máxima un {pct}%",
+      "enrage": "Aumenta el daño un {damagePct}%, la velocidad de ataque un {hastePct}% y el movimiento un {movePct}%",
+      "suddenDeath": "Tu próximo Ejecutar no cuesta ira e ignora el requisito de salud",
+      "aoeEcho": "Quedan {charges} ecos: las facultades de un objetivo infligen un {pct}% de daño a hasta {targets} enemigos cercanos",
+      "sureCrit": "Tus próximas {charges} facultades dañinas tienen golpe crítico garantizado",
+      "temporalEcho": "El daño Arcano del taumaturgo te sana un {singlePct}% del daño a un objetivo o un {areaPct}% del daño de área",
+      "arcaneCharge": "{stacks} cargas Arcanas: Oleada de éter inflige un {damagePct}% más, se lanza un {castPct}% más rápido y cuesta {costMult} veces más maná",
+      "physicalReduction": "Reduce el daño Físico recibido un {pct}%",
       "temporalHourglass": "Inmune e incapaz de actuar; recupera salud y acelera los tiempos de reutilización. Haz clic derecho para cancelar.",
       "tongues": "Incrementa el tiempo de lanzamiento un {pct}%",
       "combustionCrit": "Tus hechizos de Fuego siempre golpean de crítico",
@@ -1818,6 +1855,10 @@ export const es_ES: EnTranslations = {
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
       "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
       "verdance": "Verdor: fase {stacks} de {max}. Los lanzamientos completados de Floración Silvestre y Segundo Florecer lo llenan; con {max}, Alivio presto se convierte en Sobrefloración",
+      "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
+      "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
+      "nextAttackCrit": "Tu próximo ataque tiene golpe crítico garantizado",
+      "healEcho": "Al bajar del {threshold}% de salud, restaura {value} de salud",
       "increase": {
         "ap": "Incrementa el poder de ataque en {value}",
         "sp": "Aumenta el poder con hechizos en {value}",
@@ -1856,6 +1897,8 @@ export const es_ES: EnTranslations = {
       "mortalWound": "Disminuye la sanación recibida un {pct}%",
       "vulnerability": "Incrementa el daño recibido un {pct}%",
       "physVuln": "Incrementa el daño físico recibido un {pct}%",
+      "bleedVuln": "Aumenta el daño de sangrado recibido un {pct}%",
+      "sourceVuln": "Recibe un {pct}% más de daño del taumaturgo que aplicó este efecto",
       "spellVuln": "Incrementa el daño mágico recibido un {pct}%",
       "critVuln": "Incrementa la probabilidad de recibir golpes críticos un {pct}%",
       "costTax": "Incrementa los costes de habilidades un {pct}%",
@@ -1874,8 +1917,39 @@ export const es_ES: EnTranslations = {
       "formCat": "Forma felina, daño cuerpo a cuerpo y energía",
       "formTravel": "Forma Fleet: velocidad de desplazamiento aumentada un {pct}%",
       "formFireball": "Forma de Brasa: velocidad de movimiento aumentada un {pct}%; ataques y hechizos desactivados",
+      "formMoonkin": "Forma de ala lunar: daño con hechizos aumentado un {pct}% y armadura aumentada un {armorPct}%",
+      "formShadow": "Forma de velo umbrío: daño de las Sombras aumentado un {pct}%",
+      "resourceCount": "{value} of {max}",
+      "formLich": "Lanza de alma también golpea hasta a {targets} enemigos cercanos por un {pct}% de daño",
+      "afflictionEye": "Mirada maléfica ataca cada {interval} s; los efectos en este Ojo generan un {pct}% de Condena",
+      "afflictionEyeSecondary": "Los efectos en este Ojo generan un {doomPct}% de Condena; Sentencia hace eco aquí por un {echoPct}% de daño",
+      "afflictionAccomplice": "El daño válido genera {value} de Condena, como máximo una vez cada {interval} s",
+      "afflictionViolence": "Quedan {charges} represalias; un ataque enemigo genera {doom} de Condena y devuelve {damage} de daño de las Sombras",
+      "afflictionVicarious": "Redirige o reduce un {pct}% del daño recibido y puede generar hasta {max} de Condena",
+      "afflictionPossession": "Potencia Aguja del destino, Drenar vida, Mirada maléfica y Sentencia",
+      "afflictionJudgment": "El Ojo principal genera un {eyePct}% más de Condena; Sentencia inflige un {sentencePct}% más y la primera devuelve {refund} de Condena",
+      "afflictionLitany": "Obtener Condena inflige {damage} de daño de las Sombras a hasta {targets} enemigos en {radius} m, una vez por segundo",
+      "afflictionFateThreads": "{stacks} Hilos del destino: Sentencia inflige un {sentencePct}% más, o Drenar vida genera {doom} de Condena extra por pulso",
+      "afflictionConsumeThreads": "Drenar vida consume {stacks} Hilos del destino para generar {doom} de Condena extra por pulso",
+      "necromancyHarvestMark": "La muerte puede crear 1 fragmento de alma y deja un Eco de muerte para Explosión de cadáver",
+      "necromancyOssuaryMark": "Almacena un {storedPct}% de tu daño y el de tus no-muertos, más un {lancePct}% del daño de Lanza de alma; vuelve a lanzar para detonar. Al morir, explota en {radius} m y crea 1 fragmento de alma",
+      "necromancyDeathEcho": "Explosión de cadáver puede consumir este eco a {radius} m del punto de mira",
+      "warlockAnchor": "Vuelve a lanzar a menos de {range} m para regresar aquí y consumir el ancla",
+      "formMetamorph": "Forma demoníaca: tamaño aumentado un {pct}%; las demás ventajas aparecen como beneficios separados",
+      "energyRegen": "Aumenta la regeneración de energía un {pct}%",
       "defensiveStance": "Guarded Stance: menos daño recibido, más amenaza",
       "righteousFury": "Burning Oath: amenaza por daño Sagrado enormemente aumentada",
+      "overpowerCharge": "{stacks} cargas: tu próximo Golpe mutilador inflige un {pct}% más de daño",
+      "sweepingStrikes": "Los golpes de un objetivo también infligen un {pct}% de daño a {targets} enemigo cercano",
+      "fingersOfFrost": "{charges} cargas: Lanza de hielo trata al objetivo como congelado e inflige un {pct}% de daño de congelación",
+      "brainFreeze": "Tu próxima Ráfaga es instantánea e ignora su reutilización",
+      "wintersChill": "{charges} cargas: los hechizos válidos tratan a este objetivo como congelado",
+      "icicles": "{value} de {max} Carámbanos; con {max}, puedes lanzar Pica glacial",
+      "desolation": "{charges} cargas: tu próxima Descarga de caos se lanza un {castPct}% más rápido o tu próxima Lluvia de fuego cae al instante",
+      "ruinousBrand": "Quedan {charges} copias: los hechizos directos copian aquí un {otherPct}% de daño, o un {selfPct}% si este es su objetivo",
+      "duskfireClaim": "Al morir, otorga {value} de Ruina",
+      "pyreGuardian": "Genera {ruin} de Ruina cada {ruinInterval} s e inflige {damage} de daño de Fuego en {radius} m cada {damageInterval} s",
+      "perfectMoment": "Dardos de éter no consume cargas Arcanas",
       "scale": "Talla aumentado un {pct}%",
       "jump": "Salto aumentada un {pct}%",
       "school": {
@@ -3514,6 +3588,7 @@ export const es_ES: EnTranslations = {
       "none": "Ninguna clase coincide con todos los filtros. Quita uno para ver más."
     },
     "abilityHook": {
+      "evil_eye": "Señala al enemigo cuyas acciones y sufrimiento alimentarán tu Condena.",
       "heroic_strike": "Prepara un golpe más fuerte que gasta ira en tu próximo ataque.",
       "revenge": "Golpea a los enemigos frente a ti y puede volverse gratis después de esquivar o parar.",
       "hamstring": "Entorpece el movimiento de un enemigo para impedir que escape.",
@@ -6694,6 +6769,10 @@ export const es_ES: EnTranslations = {
     "pet": {
       "attack": "Atacar",
       "waterJet": "Chorro de Agua",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "Provocar",
       "healDemon": "Sanar demonio",
       "healPet": "Sanar mascota",
@@ -6704,6 +6783,10 @@ export const es_ES: EnTranslations = {
       "petAttackDesc": "Ordena a tu mascota atacar a tu objetivo hostil actual.",
       "waterJetTitle": "Chorro de Agua",
       "waterJetDesc": "Ordena a tu Elemental de Agua que canalice un chorro ralentizador durante 3 segundos. Tiempo de reutilización: 8 segundos. Haz clic derecho para lanzarlo automáticamente cada vez que esté disponible.",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "Provocación de mascota",
       "petTauntDesc": "Ordena a tu mascota entrar en combate y usar Gruñido al estar en alcance. Reutilización de 10 segundos.",
       "healDemonDesc": "Gasta maná para canalizar sanación hacia tu demonio durante 5 segundos.",
@@ -6855,6 +6938,7 @@ export const es_ES: EnTranslations = {
     "tooltip": {
       "rank": "Rango {rank}",
       "cost": "{cost} de {resource}",
+      "ruinCost": "{cost} Ruin",
       "range": "{range} m de alcance",
       "rangeWithMin": "{min}-{max} m de alcance",
       "instant": "Instantáneo",
@@ -7068,6 +7152,7 @@ export const es_ES: EnTranslations = {
       "clickDestroy": "Haz clic para destruir",
       "useFishing": "Uso: pesca en aguas cercanas.",
       "useHealingPotion": "Uso: restaura al instante {amount} de salud. Se puede usar en combate. Reutilización de 1 min.",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "Uso: restaura al instante {amount} de maná. Se puede usar en combate. Reutilización de 1 min.",
       "clickUseInstant": "Haz clic para usar al instante en combate",
       "clickUse": "Haz clic para usar",
@@ -7983,9 +8068,29 @@ export const es_ES: EnTranslations = {
         "name": "Putrefacción Negra",
         "description": "Corrompe al objetivo y causa {damage} de daño de las Sombras durante 18 s."
       },
+      "evil_eye": {
+        "name": "Mal de ojo",
+        "description": "Marca a un enemigo como foco de tus maldiciones. Mover el Mal de ojo conserva la Condena, pero no renueva su duración de 20 s."
+      },
+      "maledict_gaze": {
+        "name": "Mirada maléfica",
+        "description": "Tu ojo maléfico ataca cada 2,5 s al objetivo principal de Mal de ojo e inflige daño de las Sombras. Poseer el Mal de ojo duplica su velocidad de ataque."
+      },
+      "needle_of_fate": {
+        "name": "Aguja del destino",
+        "description": "Perfora al enemigo e inflige {damage} de daño de las Sombras. Genera 5 de Condena si porta tu Mal de ojo; si no existe ninguno, primero marca al objetivo."
+      },
+      "sentence": {
+        "name": "Sentencia",
+        "description": "Consume toda la Condena para sentenciar al enemigo. El daño y los efectos adicionales aumentan con 20, 50, 80 y 100 de Condena."
+      },
       "life_tap": {
         "name": "Trato Amargo",
         "description": "Convierte {damage} de salud en {damage} de maná."
+      },
+      "cursed_accomplice": {
+        "name": "Cómplice maldito",
+        "description": "Si no seleccionas a un jugador aliado, enlaza tu ojo maléfico y hace que su Mirada genere 2 de Condena. Al enlazar a un aliado, su daño al objetivo de Mal de ojo genera 3. Solo puede activarse una vez cada 2 s."
       },
       "curse_of_agony": {
         "name": "Sortilegio de Angustia",
@@ -7994,6 +8099,46 @@ export const es_ES: EnTranslations = {
       "drain_life": {
         "name": "Consumir",
         "description": "Drena la vida del objetivo y te transfiere {damage} de salud cada segundo durante 5 s."
+      },
+      "litany_of_guilt": {
+        "name": "Liturgia de culpa",
+        "description": "Maldice tu Mal de ojo principal durante 8 s. Obtener Condena libera una onda que daña a un máximo de 4 enemigos más en 8 m, como máximo una vez por segundo."
+      },
+      "cinderhide": {
+        "name": "Piel de escoria",
+        "description": "Endurece tu piel como escoria enfriada durante 10 s y reduce todo el daño recibido un 25%."
+      },
+      "umbral_anchor": {
+        "name": "Ancla umbría",
+        "description": "Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s."
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+      },
+      "hex_of_violence": {
+        "name": "Maleficio de violencia",
+        "description": "Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 22 de daño de las Sombras."
+      },
+      "cruel_pact": {
+        "name": "Pacto cruel",
+        "description": "Sacrifica un 12% de tu salud máxima para generar 20 de Condena. No se puede usar con un 15% de salud o menos."
+      },
+      "vicarious_suffering": {
+        "name": "Sufrimiento vicario",
+        "description": "Enlaza el sufrimiento durante 8 s y genera hasta 15 de Condena con golpes hostiles. Sobre ti reduce un 20% el daño recibido. Sobre un aliado redirige hasta un 20% hacia ti sin bajarte del 15% de salud."
+      },
+      "possess_evil_eye": {
+        "name": "Poseer el Mal de ojo",
+        "description": "El maldictor posee tu Mal de ojo principal durante 15 s y genera 35 de Condena. Aguja del destino se lanza en 1 s y genera 2 de Condena adicionales, Consumir se puede canalizar en movimiento, y Sentencia inflige un 25% más de daño y libera un eco retardado del 60% del daño."
+      },
+      "hour_of_judgment": {
+        "name": "Hora del juicio",
+        "description": "Desata el juicio sobre tu Mal de ojo principal durante 15 s: obtienes 40 de Condena y 3 Hilos del destino, activas Posesión, duplicas la Condena generada mediante el Mal de ojo principal y aumentas un 20% el daño de Sentencia. La primera Sentencia devuelve 50 de Condena."
+      },
+      "coven": {
+        "name": "Aquelarre",
+        "description": "Crea Males de ojo secundarios sobre hasta 4 enemigos cercanos durante 15 s. Alimentan la reserva compartida de Condena al 50% y reciben un eco del 35% del daño de Sentencia."
       },
       "fear": {
         "name": "Espanto",
@@ -8006,6 +8151,10 @@ export const es_ES: EnTranslations = {
       "shadowburn": {
         "name": "Fuego Crepuscular",
         "description": "Explota al instante contra el objetivo con sombra abrasadora por {damage} de daño de las Sombras."
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "Descarga Silvestre",
@@ -8197,6 +8346,62 @@ export const es_ES: EnTranslations = {
         "name": "Llamada de la Marea",
         "description": "Sana a un objetivo amistoso por {damage}. La sanación aumenta con el poder con hechizos. Añade la sanación completa calculada antes del exceso a la Corriente Sanadora, hasta un 30% de la salud máxima del objetivo."
       },
+      "soul_harvest": {
+        "name": "Cosecha de esencia",
+        "description": "Desgarra el alma del enemigo, inflige {damage} de daño de Sombras y crea 1 fragmento de alma, hasta un máximo de 5."
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+      },
+      "raise_graveguard": {
+        "name": "Alzar guardián de tumbas",
+        "description": "Alza un compañero defensivo permanente. El guardián de tumbas provoca automáticamente, intercepta un 20% de tu daño mediante Dominio sepulcral y Mandato: siega hace que provoque y reciba un 30% menos de daño durante 4 s."
+      },
+      "raise_skeletal_warrior": {
+        "name": "Alzar guerrero esquelético",
+        "description": "Gasta 1 fragmento de alma para añadir un guerrero esquelético persistente a tu Dominio de 2 huecos. Solo puede servirte uno. Golpea en barrido por un 45% de daño cada 6 s, y Mandato: siega ralentiza a su objetivo un 40% durante 4 s."
+      },
+      "raise_bone_mage": {
+        "name": "Alzar mago óseo",
+        "description": "Gasta 2 fragmentos de alma para añadir un mago óseo a distancia persistente a tu Dominio de 2 huecos. Solo puede servirte uno. Sus ataques exponen al objetivo a un 5% más de daño mágico durante 6 s, y Mandato: siega eleva esa debilidad al 8%."
+      },
+      "bone_armor": {
+        "name": "Armadura de huesos",
+        "description": "Te envuelve en huesos y absorbe una cantidad de daño equivalente al 20% de tu salud máxima."
+      },
+      "corpse_explosion": {
+        "name": "Explosión de cadáver",
+        "description": "Gasta 2 fragmentos de alma para hacer estallar energía de muerte en la ubicación elegida e infligir {damage} de daño de Sombras a los enemigos cercanos."
+      },
+      "funeral_harvest": {
+        "name": "Cosecha fúnebre",
+        "description": "Cuando muere un enemigo dañado recientemente por ti o por tus no muertos, obtienes 1 fragmento de alma. Solo puede ocurrir una vez cada 3 s."
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+      },
+      "unholy_command": {
+        "name": "Mandato profano",
+        "description": "Ordena a todos tus no muertos que inflijan un 25% más de daño y actúen un 20% más rápido durante 12 s."
+      },
+      "reaping_command": {
+        "name": "Mandato: siega",
+        "description": "Gasta 2 fragmentos de alma para ordenar a todos tus sirvientes no muertos que golpeen al unísono. Los guardianes provocan y se protegen, los guerreros inmovilizan, los magos óseos exponen las defensas mágicas y el alatumba desgarra a todos los enemigos golpeados."
+      },
+      "sacrifice_undead": {
+        "name": "Sacrificar no muerto",
+        "description": "Destruye uno de tus sirvientes del Dominio para restaurar un 25% de tu salud máxima."
+      },
+      "raise_gravewing": {
+        "name": "Alzar alatumba",
+        "description": "Gasta 2 fragmentos de alma para añadir un alatumba persistente a tu Dominio de 2 huecos. Solo puede servirte uno. Golpea en barrido por un 65% de daño cada 5 s, y Mandato: siega hace que cada enemigo golpeado reciba un 8% más de daño durante 5 s."
+      },
+      "army_of_the_dead": {
+        "name": "Ejército de los muertos",
+        "description": "Abre un portal sepulcral durante 20 s y alza temporalmente cada arquetipo de Dominio que aún no te sirva. Tus sirvientes elegidos permanecen cuando se cierra el portal."
+      },
       "metamorphosis": {
         "name": "Metamorfosis",
         "description": "Asumes poder demoníaco, lo que aumenta la armadura y el poder de ataque durante 20 s. (talento de brujo)"
@@ -8323,7 +8528,7 @@ export const es_ES: EnTranslations = {
       },
       "summon_infernal": {
         "name": "Invocar Pyre Colossus",
-        "description": "Somete a un Pyre Colossus a tu voluntad: un coloso descomunal con un cuerpo a cuerpo demoledor y la mayor salud y armadura de todos los demonios. Un largo tiempo de reutilización refrena su poder bruto. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez."
+        "description": "Hace caer un Coloso de la Pira sobre el área objetivo, infligiendo 58-72 de daño de Fuego al impactar. Lucha durante 30 s sin reemplazar a tu demonio, quema a los enemigos cercanos cada 2 s y genera 1 de Ruina por segundo."
       },
       "summon_doomguard": {
         "name": "Invocar Wraithborn",
@@ -8477,9 +8682,17 @@ export const es_ES: EnTranslations = {
         "name": "Relámpago Bifurcado",
         "description": "Lanza un relámpago en el área objetivo que inflige {damage} de daño a los enemigos cercanos. (talento de Chamán)"
       },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+      },
       "chaos_bolt": {
         "name": "Descarga de Ruina",
         "description": "Lanza una descarga de fuego caótico que inflige {damage} de daño de Fuego. (talento de Brujo)"
+      },
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cloak_of_shadows": {
         "name": "Capa Sombría",
@@ -8668,6 +8881,10 @@ export const es_ES: EnTranslations = {
       "smoke_screen": {
         "name": "Cortina de Humo",
         "description": "Desapareces en una nube de humo, lo que aumenta tu probabilidad de esquivar un 30% durante 8 s."
+      },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
       },
       "spellsteal": {
         "name": "Robar Hechizo",
@@ -10209,6 +10426,9 @@ export const es_ES: EnTranslations = {
       "conjured_bread4": {
         "name": "Hogaza de Festín Invocada"
       },
+      "soul_stone": {
+        "name": "Soul Stone"
+      },
       "bristleback_maul": {
         "name": "Martillo Gallowglass"
       },
@@ -11641,6 +11861,18 @@ export const es_ES: EnTranslations = {
       },
       "water_elemental": {
         "name": "Elemental acuático"
+      },
+      "graveguard": {
+        "name": "Guardián de tumbas"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "Guerrero esquelético"
+      },
+      "necromancy_bone_mage": {
+        "name": "Mago óseo"
+      },
+      "necromancy_gravewing": {
+        "name": "Alatumba"
       }
     },
     "npcs": {

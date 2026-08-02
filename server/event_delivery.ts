@@ -21,9 +21,15 @@ export function shouldDeliverCombatEventToViewer(
   ev: SimEvent,
   viewerPid: number,
   viewerParty: CombatEventParty | null,
+  sourceOwnerId: number | null = ev.type === 'damage' ? (ev.sourceOwnerId ?? null) : null,
 ): boolean {
-  if (ev.type === 'damage')
-    return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty);
+  if (ev.type === 'damage') {
+    if (isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty)) return true;
+    return (
+      sourceOwnerId !== null &&
+      (sourceOwnerId === viewerPid || viewerParty?.members.includes(sourceOwnerId) === true)
+    );
+  }
   if (ev.type === 'heal2')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty);
   return true;

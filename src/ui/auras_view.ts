@@ -101,7 +101,8 @@ export interface AuraInput {
   value: number;
   // Optional effect-descriptor inputs (DoT/HoT tick interval, secondary values, magic
   // school). Present on the offline Sim aura; the online ClientWorld mirror may omit
-  // them, in which case auraEffectDescriptor falls back to its defaults.
+  // them, in which case auraEffectDescriptor falls back to its defaults. A newer
+  // server's unknown AuraKind safely omits the effect line until this client knows it.
   value2?: number;
   value3?: number;
   tickInterval?: number;

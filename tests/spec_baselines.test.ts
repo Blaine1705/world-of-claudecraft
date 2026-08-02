@@ -110,18 +110,16 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   },
   'warlock/affliction': {
     stats: { int: 6 },
-    global: { spellDmgPct: 0.06 },
     abilities: {
-      corruption: { dmgPct: 0.16, costPct: -0.15, castPct: -0.7 },
-      curse_of_agony: { dmgPct: 0.09, costPct: -0.15 },
+      needle_of_fate: { dmgPct: 0.08, costPct: -0.08 },
+      drain_life: { costPct: -0.08 },
     },
   },
   'warlock/demonology': {
     stats: { sta: 8, armorPct: 0.06, int: 6 },
     abilities: {
-      shadow_bolt: { costPct: -0.08 },
-      immolate: { costPct: -0.08 },
-      demon_skin: { dmgPct: 0.3 },
+      soul_harvest: { costPct: -0.08, dmgPct: 0.08 },
+      bone_armor: { costPct: -0.08 },
     },
   },
   'warlock/destruction': {

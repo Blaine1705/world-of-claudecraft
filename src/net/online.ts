@@ -41,6 +41,7 @@ import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
+import { isPrimaryOwnedPetEntity } from '../sim/pet/pet_selection';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
@@ -115,6 +116,7 @@ import {
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
+  PET_SPECIAL_WIRE_VERSION,
   type PlayerProfessionsView,
   type PresenceStatus,
   type RaidLockout,
@@ -247,6 +249,7 @@ export function buildWebSocketAuthMessage(
   character: number;
   clientSeed: string;
   timerWire: typeof STABLE_TIMER_WIRE_VERSION;
+  petSpecialWire: typeof PET_SPECIAL_WIRE_VERSION;
 } {
   return {
     t: ONLINE_WORLD_AUTH_TYPE,
@@ -254,6 +257,7 @@ export function buildWebSocketAuthMessage(
     character: characterId,
     clientSeed,
     timerWire: STABLE_TIMER_WIRE_VERSION,
+    petSpecialWire: PET_SPECIAL_WIRE_VERSION,
   };
 }
 
@@ -1315,8 +1319,10 @@ function blankEntity(id: number): Entity {
     ownerId: null,
     petMode: 'defensive',
     petTauntTimer: 0,
+    petSkillTimer: 0,
     petAutoTaunt: false,
     petAutoWaterJet: false,
+    petAutoSkill: false,
     petManualTauntPending: false,
     spawnPos: { x: 0, y: 0, z: 0 },
     leashAnchor: null,
@@ -1641,6 +1647,9 @@ export class ClientWorld implements IWorld {
   // server-measured achieved sim tick rate (Hz), mirrored from the snap head;
   // null until the server's meter warms up (perf overlay hides the row)
   serverTickHz: number | null = null;
+  // False until a negotiated server snapshot advertises support. This keeps a
+  // new client from showing inert buttons while connected to an older server.
+  petSpecialCommandsSupported = false;
   // Stable timer-wire decode state. These stay separate from the public
   // remaining-time mirrors so an omitted v2 field can be re-derived from the
   // server simulation clock without accumulating client-frame drift.
@@ -1835,6 +1844,9 @@ export class ClientWorld implements IWorld {
   // 'error' frame, handled in onMessage, which sets sessionEnded).
   private socketClosed(): void {
     this.connected = false;
+    // A reconnect may land on an older binary. Drop optional behavior before
+    // any new transport can accept input; the next capable snapshot re-arms it.
+    this.petSpecialCommandsSupported = false;
     this.failPendingCommandOutcomes();
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
@@ -2413,6 +2425,7 @@ export class ClientWorld implements IWorld {
 
   private applySnapshot(snap: LooseJson): void {
     const now = performance.now();
+    this.petSpecialCommandsSupported = snap.psw === PET_SPECIAL_WIRE_VERSION;
     if (typeof this.spectating === 'string' && typeof snap.self?.id === 'number') {
       this.playerId = snap.self.id;
     }
@@ -2706,6 +2719,7 @@ export class ClientWorld implements IWorld {
       e.castingAbility = w.cast ?? null;
       e.castRemaining = w.castRem ?? 0;
       e.castTotal = w.castTot ?? 0;
+      e.castTargetId = w.castTgt ?? null;
       e.channeling = !!w.chan;
       // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
       // the summon FX / call pose and (for the local player) the self-extrapolator's
@@ -2743,8 +2757,10 @@ export class ClientWorld implements IWorld {
       e.ownerId = w.own ?? null;
       e.petMode = w.pm ?? 'defensive';
       e.petTauntTimer = w.pt ?? 0;
+      e.petSkillTimer = w.ps ?? 0;
       e.petAutoTaunt = !!w.pa;
       e.petAutoWaterJet = !!w.pw;
+      e.petAutoSkill = !!w.px;
       e.petManualTauntPending = false;
       // same semantics as `new Map(w.thr ?? [])` (absent thr = empty table), but
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
@@ -3988,9 +4004,13 @@ export class ClientWorld implements IWorld {
   petWaterJet(): void {
     this.cmd({ cmd: 'pet_water_jet' });
   }
+  petSpecial(): void {
+    if (!this.petSpecialCommandsSupported) return;
+    this.cmd({ cmd: 'pet_special' });
+  }
   setPetAutoTaunt(enabled: boolean): void {
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
         e.petAutoTaunt = enabled;
         break;
       }
@@ -4000,12 +4020,22 @@ export class ClientWorld implements IWorld {
 
   setPetAutoWaterJet(enabled: boolean): void {
     for (const e of this.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId === this.playerId) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
         e.petAutoWaterJet = enabled;
         break;
       }
     }
     this.cmd({ cmd: 'pet_auto_water_jet', enabled });
+  }
+  setPetAutoSpecial(enabled: boolean): void {
+    if (!this.petSpecialCommandsSupported) return;
+    for (const e of this.entities.values()) {
+      if (isPrimaryOwnedPetEntity(e, this.playerId)) {
+        e.petAutoSkill = enabled;
+        break;
+      }
+    }
+    this.cmd({ cmd: 'pet_auto_special', enabled });
   }
   feedPet(itemId: string): void {
     this.cmd({ cmd: 'pet_feed', item: itemId });

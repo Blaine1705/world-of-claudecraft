@@ -35,6 +35,8 @@ const ABILITY_GAIN = 0.34;
 export const REF_DISTANCE = 5; // world units at which a sound is at full volume
 export const MAX_DISTANCE = 46; // hard cutoff: beyond this, sources are silent/skipped
 const POINT_AMBIENCE_GAIN = 0.18;
+const COOLDOWN_ENTRY_TTL = 60;
+const COOLDOWN_PRUNE_INTERVAL = 30;
 // amb_forge's custom recording still reads quiet in-game even with the
 // catalog's keyTrimDb ceiling (scripts/sfx/sfx_gain_map.json) applied at its
 // full sanctioned +5dB, the maximum true-peak headroom under the shared
@@ -97,6 +99,7 @@ export interface PlayOpts {
   gain?: number; // 0..1 multiplier (default 1)
   rate?: number; // playback-rate multiplier (default 1); ±6% jitter added
   cooldown?: number; // min seconds between plays of this key (default 0.03)
+  cooldownKey?: string; // optional namespace when one asset serves unrelated cues
   jitter?: boolean; // randomize rate/gain slightly (default true)
   // Percussive amplitude envelope. `release` truncates the clip to a crisp
   // transient that fully decays within `attack + release` seconds, used by fast
@@ -157,6 +160,7 @@ class Sfx {
   private vol = 0.8;
   private active = 0;
   private lastPlay = new Map<string, number>();
+  private lastPlayPruneAt = 0;
   private loops = new Map<string, LoopSlot>();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
@@ -505,17 +509,19 @@ class Sfx {
       }
       return false;
     }
-    if (this.active >= MAX_VOICES) return false;
     const now = ctx.currentTime;
+    this.pruneLastPlay(now);
+    if (this.active >= MAX_VOICES) return false;
     const cd = opts?.cooldown ?? 0.03;
+    const cooldownKey = opts?.cooldownKey ?? key;
     // -Infinity, not -1: a fresh key (never played) must never be blocked, at
     // any cooldown length. A -1 sentinel worked by accident while every
     // cooldown here stayed under 1s (now - -1 was always >= cooldown); a
     // longer cooldown (e.g. audio.error()'s 1.5s) can make now - -1 itself
     // read as "still on cooldown" moments after AudioContext starts, wrongly
     // swallowing the very first play of that key.
-    if (now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return false;
-    this.lastPlay.set(key, now);
+    if (now - (this.lastPlay.get(cooldownKey) ?? Number.NEGATIVE_INFINITY) < cd) return false;
+    this.lastPlay.set(cooldownKey, now);
     this.commitVariant(key, variantIndex);
 
     const jitter = opts?.jitter !== false;
@@ -599,8 +605,9 @@ class Sfx {
       }
       return;
     }
-    if (this.active >= MAX_VOICES) return;
     const now = ctx.currentTime;
+    this.pruneLastPlay(now);
+    if (this.active >= MAX_VOICES) return;
     const cd = opts?.cooldown ?? 0;
     // -Infinity sentinel: see the matching comment on playAt's cooldown check.
     if (cd > 0 && now - (this.lastPlay.get(key) ?? Number.NEGATIVE_INFINITY) < cd) return;
@@ -845,6 +852,60 @@ class Sfx {
             ? 'move_splash'
             : 'move_swim';
     this.playAt(key, x, y, z, { gain: kind === 'swim' ? 0.5 : 0.7, cooldown: 0.08 });
+  }
+
+  necromancy(
+    kind: 'lichTransform' | 'lichHeartbeat' | 'soulConsume',
+    x: number,
+    y: number,
+    z: number,
+    _self: boolean,
+    sourceId?: number,
+  ): void {
+    const sourceKey =
+      sourceId === undefined ? `${Math.round(x * 4)}:${Math.round(z * 4)}` : `${sourceId}`;
+    if (kind === 'lichTransform') {
+      this.playAt('impact_shadow', x, y, z, {
+        gain: 0.95,
+        rate: 0.68,
+        cooldown: 0.5,
+        cooldownKey: `necromancy:transform:${sourceKey}`,
+        jitter: false,
+        attack: 0.02,
+        release: 0.65,
+      });
+      return;
+    }
+    if (kind === 'lichHeartbeat') {
+      this.playAt('impact_bone', x, y, z, {
+        gain: 0.2,
+        rate: 0.55,
+        cooldown: 2.8,
+        cooldownKey: `necromancy:heartbeat:${sourceKey}`,
+        jitter: false,
+        attack: 0.025,
+        release: 0.22,
+      });
+      return;
+    }
+    this.playAt('proj_shadow', x, y, z, {
+      gain: 0.62,
+      rate: 0.74,
+      cooldown: 0.12,
+      cooldownKey: `necromancy:soul:${sourceKey}`,
+      jitter: false,
+      attack: 0.015,
+      release: 0.48,
+    });
+  }
+
+  private pruneLastPlay(now: number): void {
+    if (now < this.lastPlayPruneAt) return;
+    const cutoff = now - COOLDOWN_ENTRY_TTL;
+    for (const [key, playedAt] of this.lastPlay) {
+      if (playedAt < cutoff) this.lastPlay.delete(key);
+    }
+    this.lastPlayPruneAt = now + COOLDOWN_PRUNE_INTERVAL;
   }
 
   private ambient(key: string, target: number): void {

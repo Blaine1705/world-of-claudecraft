@@ -190,6 +190,62 @@ describe('talent production save migrations', () => {
     });
   });
 
+  it('migrates revision-1 Warlock loadout bars to the overhauled specialization kit', () => {
+    const state = cloneFixture();
+    state.contentRevision = 1;
+    state.talents = { spec: 'destruction', rows: { 5: 'wlk_r5_bane' } };
+    state.loadouts = [
+      {
+        name: 'Old Destruction',
+        alloc: { spec: 'destruction', rows: { 5: 'wlk_r5_bane' } },
+        bar: ['shadow_bolt', 'corruption', 'curse_of_agony', 'searing_pain', 'summon_doomguard'],
+      },
+    ];
+    state.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2('warlock', state);
+    const bar = migrated.loadouts?.[0].bar ?? [];
+
+    expect(migrated.contentRevision).toBe(CURRENT_CHARACTER_CONTENT_REVISION);
+    expect(migrated.talents).toEqual(state.talents);
+    expect(bar).toEqual(
+      expect.arrayContaining([
+        'shadow_bolt',
+        'umbral_anchor',
+        'conflagrate',
+        'chaos_bolt',
+        'shadowburn',
+        'ruinous_brand',
+        'rain_of_fire',
+        'summon_infernal',
+      ]),
+    );
+    expect(bar).not.toEqual(
+      expect.arrayContaining(['corruption', 'curse_of_agony', 'searing_pain', 'summon_doomguard']),
+    );
+  });
+
+  it('seeds the active granted by a selected Warlock row into a migrated loadout bar', () => {
+    const state = cloneFixture();
+    state.contentRevision = 1;
+    state.level = 8;
+    state.talents = { spec: 'affliction', rows: { 8: 'wlk_r8_voidfeast' } };
+    state.loadouts = [
+      {
+        name: 'Old Control',
+        alloc: { spec: 'affliction', rows: { 8: 'wlk_r8_voidfeast' } },
+        bar: ['voidfeast'],
+      },
+    ];
+    state.activeLoadout = 0;
+
+    const migrated = migrateCharacterTalentsV2('warlock', state);
+    const bar = migrated.loadouts?.[0].bar ?? [];
+
+    expect(bar).toContain('spell_lock');
+    expect(bar).not.toContain('voidfeast');
+  });
+
   it('loads, saves, and reloads the migrated Warrior without duplicate learning or neutral-state loss', () => {
     const sim = new Sim({ seed: 17, playerClass: 'warrior', noPlayer: true });
     const pid = sim.addPlayer('warrior', 'Migration Fixture', { state: cloneFixture() });

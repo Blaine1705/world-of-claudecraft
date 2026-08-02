@@ -34,6 +34,7 @@ describe('choice row unlock ability guards', () => {
             }
             if (
               ability.learnLevel > row.level &&
+              option.effect.grant?.ability !== mod.ability &&
               !FUTURE_ABILITY_EXCEPTIONS.has(`${option.id}:${mod.ability}`)
             ) {
               failures.push(

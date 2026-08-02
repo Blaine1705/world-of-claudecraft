@@ -1,8 +1,10 @@
+import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
 import { PALADIN_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
 import { computeTalentModifiers, emptyAllocation } from '../src/sim/content/talents';
@@ -250,6 +252,60 @@ describe('class ability webp icons', () => {
       }
     }
     expect(missing).toEqual([]);
+  });
+
+  it('backs every Warlock spell and choice talent with distinct painted art', () => {
+    const spellIds = Object.values(ABILITIES)
+      .filter(({ class: owner }) => owner === 'warlock')
+      .map(({ id }) => id);
+    const talentOptions = CHOICE_ROWS.warlock.rows.flatMap(({ options }) => options);
+    const talentIconIds = talentOptions.map(({ icon }) => icon);
+    const resolvedTalentIconIds = talentIconIds.filter((id): id is string => Boolean(id));
+
+    expect(spellIds.filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
+    expect(talentIconIds).toEqual(talentOptions.map(({ id }) => id));
+    expect(new Set(talentIconIds).size).toBe(talentOptions.length);
+    expect(resolvedTalentIconIds).toHaveLength(talentOptions.length);
+    expect(resolvedTalentIconIds.filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
+    expect([...spellIds, ...resolvedTalentIconIds].map((id) => abilityImageUrl(id))).not.toContain(
+      null,
+    );
+  });
+
+  it('pins generated Warlock provenance, dimensions, decoding, and unique bytes', async () => {
+    const warlockDir = path.join(skillsDir, 'warlock');
+    const mapping = JSON.parse(readFileSync(path.join(warlockDir, 'mapping.json'), 'utf8')) as {
+      iconSize: number;
+      abilities: Array<{ abilityId: string }>;
+      generatedBatches: Array<{ abilityIds?: string[]; talentIds?: string[] }>;
+    };
+    const generatedIds = mapping.generatedBatches.flatMap(
+      ({ abilityIds, talentIds }) => abilityIds ?? talentIds ?? [],
+    );
+    const mappedIds = [...mapping.abilities.map(({ abilityId }) => abilityId), ...generatedIds];
+    const committedIds = readdirSync(warlockDir)
+      .filter((name) => name.endsWith('.webp'))
+      .map((name) => path.basename(name, '.webp'));
+
+    expect(new Set(mappedIds).size).toBe(mappedIds.length);
+    expect(new Set(mappedIds)).toEqual(new Set(committedIds));
+
+    const hashes = new Set<string>();
+    for (const id of generatedIds) {
+      const file = path.join(warlockDir, `${id}.webp`);
+      const bytes = readFileSync(file);
+      const metadata = await sharp(bytes).metadata();
+      expect(metadata).toMatchObject({
+        format: 'webp',
+        width: mapping.iconSize,
+        height: mapping.iconSize,
+      });
+      hashes.add(createHash('sha256').update(bytes).digest('hex'));
+    }
+    expect(hashes.size).toBe(generatedIds.length);
+    expect(readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8')).toContain(
+      'Generated Warlock spell and talent icons',
+    );
   });
 
   it('A) every image-backed ability id resolves to a committed, valid .webp', () => {

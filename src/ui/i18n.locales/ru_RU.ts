@@ -154,6 +154,96 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Преклони колено, {playerName}, и прочти слова вслух. Вот так. Чувствуешь? Теперь Свет в твоих руках не только исцеляет живых, но и возвращает тех, кто пересек черту. Пользуйся этим даром мудро. Вернуть душу в безнадежный бой значит проявить жестокость, а не милосердие. Восстань, Искупитель.',
   'entities.quests.q_rite_of_redemption.objectives.0.label': 'Упокоено утопших мертвецов',
   'hudChrome.targetAuras.all': 'Все',
+  'hudChrome.warlock.doomLabel': 'Осуждение',
+  'hudChrome.warlock.fateThreadsLabel': 'Нити судьбы',
+  'hudChrome.warlock.doomMeterUnlock': 'Переместить шкалу ресурсов Колдовства',
+  'hudChrome.warlock.doomMeterLock': 'Закрепить шкалу ресурсов Колдовства',
+  'hudChrome.warlock.doomEmptyStatus': 'Осуждение: {value} из {max}.',
+  'hudChrome.warlock.doomStatus': 'Осуждение: {value} из {max}; осталось {remaining}.',
+  'hudChrome.procOverlay.soulFragmentsMeter': 'Осколки душ',
+  'guide.abilityHook.evil_eye':
+    'Отмечает врага, чьи действия и страдания будут накапливать ваше Осуждение.',
+  'entities.abilities.evil_eye.description':
+    'Отмечает одного врага как средоточие ваших проклятий. Перенос дурного глаза сохраняет Осуждение, но не обновляет его время действия в 20 сек.',
+  'entities.abilities.maledict_gaze.name': 'Проклятый взор',
+  'entities.abilities.maledict_gaze.description':
+    'Ваше проклятое око раз в 2,5 сек. атакует выбранную основную цель дурного глаза и наносит урон от Тьмы. Одержимость дурным глазом удваивает скорость атак.',
+  'entities.abilities.needle_of_fate.name': 'Игла судьбы',
+  'entities.abilities.needle_of_fate.description':
+    'Пронзает врага и наносит {damage} ед. урона от Тьмы. Если на цели есть ваш дурной глаз, создаёт 5 ед. Осуждения; если его нет, сначала отмечает цель.',
+  'entities.abilities.sentence.name': 'Приговор',
+  'entities.abilities.sentence.description':
+    'Расходует всё Осуждение и выносит врагу приговор. Урон и дополнительные эффекты усиливаются при 20, 50, 80 и 100 ед. Осуждения.',
+  'entities.abilities.cursed_accomplice.name': 'Проклятый сообщник',
+  'entities.abilities.cursed_accomplice.description':
+    'Если союзник не выбран, связывает вас с проклятым оком, и его взор создаёт 2 ед. Осуждения. При связи с союзником его урон по цели дурного глаза создаёт 3 ед. Эффект срабатывает не чаще раза в 2 сек.',
+  'entities.abilities.litany_of_guilt.name': 'Литания вины',
+  'entities.abilities.litany_of_guilt.description':
+    'Проклинает основную цель дурного глаза на 8 сек. Получение Осуждения выпускает волну, которая наносит урон максимум 4 другим противникам в радиусе 8 м. Эффект срабатывает не чаще раза в секунду.',
+  'entities.abilities.umbral_anchor.name': 'Сумрачный якорь',
+  'entities.abilities.umbral_anchor.description':
+    'Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек.',
+  'entities.abilities.hex_of_violence.name': 'Проклятие насилия',
+  'entities.abilities.hex_of_violence.description':
+    'Проклинает врага на 8 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 22 ед. урона от Тьмы.',
+  'entities.abilities.cruel_pact.name': 'Жестокий договор',
+  'entities.abilities.cruel_pact.description':
+    'Жертвует 12% максимального здоровья и создаёт 20 ед. Осуждения. Нельзя применить при 15% здоровья или меньше.',
+  'entities.abilities.vicarious_suffering.name': 'Перенесённое страдание',
+  'entities.abilities.vicarious_suffering.description':
+    'Связывает страдания на 8 сек. и создаёт до 15 ед. Осуждения от вражеских ударов. На себе снижает получаемый урон на 20%. На союзнике перенаправляет вам до 20% урона, но не опускает ваше здоровье ниже 15%.',
+  'entities.abilities.possess_evil_eye.name': 'Одержимость дурным глазом',
+  'entities.abilities.possess_evil_eye.description':
+    'Проклинатель овладевает вашим основным дурным глазом на 15 сек. и создаёт 35 ед. Осуждения. «Игла судьбы» применяется за 1 сек. и создаёт ещё 2 ед. Осуждения, «Поглощение» поддерживается в движении, а «Приговор» наносит на 25% больше урона и с задержкой повторяет 60% урона.',
+  'entities.abilities.hour_of_judgment.name': 'Час суда',
+  'entities.abilities.hour_of_judgment.description':
+    'Обрушивает суд на ваш основной дурной глаз на 15 сек., создаёт 40 ед. Осуждения и 3 Нити судьбы, активирует Одержимость, удваивает Осуждение от основного дурного глаза и повышает урон «Приговора» на 20%. Первый «Приговор» возвращает 50 ед. Осуждения.',
+  'entities.abilities.coven.name': 'Ковен',
+  'entities.abilities.coven.description':
+    'Создаёт вторичные дурные глаза на срок 15 сек. не более чем на 4 ближайших врагах. Они пополняют общий запас Осуждения с эффективностью 50% и получают 35% урона «Приговора».',
+  'entities.mobs.necromancy_gravewing.name': 'Могильное крыло',
+  'entities.abilities.soul_harvest.name': 'Жатва сущности',
+  'entities.abilities.soul_harvest.description':
+    'Терзает душу противника, нанося {damage} ед. урона от темной магии, и создает 1 осколок души, максимум 5.',
+  'entities.abilities.raise_graveguard.name': 'Поднять могильного стража',
+  'entities.abilities.raise_graveguard.description':
+    'Поднимает постоянного защитного спутника. Могильный страж автоматически провоцирует врагов и принимает 20% вашего урона благодаря Власти могил. Команда жатвы заставляет его провоцировать и на 4 сек. снижает получаемый им урон на 30%.',
+  'entities.abilities.raise_skeletal_warrior.name': 'Поднять воина-скелета',
+  'entities.abilities.raise_skeletal_warrior.description':
+    'Расходует 1 осколок души и добавляет постоянного воина-скелета в вашу Власть с 2 ячейками. Служить может только один. Раз в 6 сек. он рассекает ближайших врагов с 45% урона, а Команда жатвы замедляет его цель на 40% на 4 сек.',
+  'entities.abilities.raise_bone_mage.name': 'Поднять костяного мага',
+  'entities.abilities.raise_bone_mage.description':
+    'Расходует 2 осколка души и добавляет постоянного костяного мага дальнего боя в вашу Власть с 2 ячейками. Служить может только один. Его атаки на 6 сек. повышают получаемый целью магический урон на 5%, а Команда жатвы усиливает слабость до 8%.',
+  'entities.abilities.bone_armor.name': 'Костяной доспех',
+  'entities.abilities.bone_armor.description':
+    'Окутывает вас костями, поглощая урон в размере 20% от максимального запаса здоровья.',
+  'entities.abilities.corpse_explosion.name': 'Взрыв останков',
+  'entities.abilities.corpse_explosion.description':
+    'Расходует 2 осколка души и высвобождает энергию смерти в выбранной точке, нанося ближайшим противникам {damage} ед. урона от темной магии.',
+  'entities.abilities.funeral_harvest.name': 'Погребальная жатва',
+  'entities.abilities.funeral_harvest.description':
+    'Когда погибает противник, которому недавно нанесли урон вы или ваши мертвецы, вы получаете 1 осколок души. Эффект срабатывает не чаще раза в 3 сек.',
+  'entities.abilities.unholy_command.name': 'Нечестивый приказ',
+  'entities.abilities.unholy_command.description':
+    'Приказывает всем вашим мертвецам наносить на 25% больше урона и действовать на 20% быстрее в течение 12 сек.',
+  'entities.abilities.reaping_command.name': 'Приказ жатвы',
+  'entities.abilities.reaping_command.description':
+    'Расходует 2 осколка души и приказывает всем мёртвым слугам атаковать одновременно. Могильные стражи провоцируют и защищаются, воины приковывают цель, костяные маги раскрывают магическую защиту, а могильные крылья терзают всех поражённых врагов.',
+  'entities.abilities.sacrifice_undead.name': 'Жертва мертвеца',
+  'entities.abilities.sacrifice_undead.description':
+    'Уничтожает одного слугу Доминиона и восстанавливает 25% от максимального запаса здоровья.',
+  'entities.abilities.army_of_the_dead.name': 'Армия мертвых',
+  'entities.abilities.raise_gravewing.name': 'Поднять могильное крыло',
+  'entities.abilities.raise_gravewing.description':
+    'Расходует 2 осколка души и добавляет постоянное могильное крыло в вашу Власть с 2 ячейками. Служить может только одно. Раз в 5 сек. оно рассекает ближайших врагов с 65% урона, а Команда жатвы на 5 сек. повышает на 8% урон по всем поражённым врагам.',
+  'entities.abilities.cinderhide.name': 'Шлаковая кожа',
+  'entities.abilities.cinderhide.description':
+    'На 10 сек. делает кожу твёрдой, как остывший шлак, и снижает весь получаемый урон на 25%.',
+  'entities.abilities.army_of_the_dead.description':
+    'Открывает могильный портал на 20 сек. и временно поднимает все архетипы Власти, которые ещё вам не служат. Выбранные слуги остаются после закрытия портала.',
+  'entities.mobs.graveguard.name': 'Могильный страж',
+  'entities.mobs.necromancy_skeletal_warrior.name': 'Воин-скелет',
+  'entities.mobs.necromancy_bone_mage.name': 'Костяной маг',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -3245,7 +3335,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Призывает Боевого беса под командование чернокнижника. Боевой бес, выносливый демон ближнего боя, который врывается в гущу битвы и стойко держится. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
   'entities.abilities.summon_infernal.name': 'Призыв Погребального колосса',
   'entities.abilities.summon_infernal.description':
-    'Подчиняет вашей воле Погребального колосса, громадного исполина с сокрушительным ближним боем и самым большим запасом здоровья и брони среди всех демонов. Долгое время восстановления сдерживает его необузданную мощь. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
+    'Обрушивает Погребального колосса на указанную область и наносит 58-72 ед. урона от огня при падении. Он сражается 30 сек., не заменяя вашего демона, обжигает ближайших врагов раз в 2 сек. и создаёт 1 ед. Разрушения в секунду.',
   'entities.abilities.summon_doomguard.name': 'Призыв Духорождённого',
   'entities.abilities.summon_doomguard.description':
     'Подчиняет вашей воле Духорождённого, элитного демона, который издалека обрушивает тяжёлый урон от Тьмы. Долгое время восстановления сдерживает его разрушительную мощь. Призыв нового демона отпускает текущего. Одновременно у вас может быть только один демон.',
@@ -7556,6 +7646,64 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.haste': 'Повышает скорость атаки и произнесения заклинаний на {pct}%',
   'hudChrome.auraEffect.dmgDone': 'Повышает наносимый урон на {pct}%',
   'hudChrome.auraEffect.dmgDoneReduce': 'Снижает наносимый урон на {pct}%',
+  'hudChrome.auraEffect.stasis': 'Даёт неуязвимость, но не позволяет действовать',
+  'hudChrome.auraEffect.petDamage': 'Повышает урон питомца на {pct}%',
+  'hudChrome.auraEffect.petHaste': 'Повышает скорость действий питомца на {pct}%',
+  'hudChrome.auraEffect.spellDamage': 'Повышает урон заклинаний на {pct}%',
+  'hudChrome.auraEffect.spellHaste': 'Повышает скорость произнесения заклинаний на {pct}%',
+  'hudChrome.auraEffect.sated': 'Не позволяет получить другой групповой эффект ускорения',
+  'hudChrome.auraEffect.cauterizeFatigue': 'Прижигание не может снова предотвратить смертельный удар',
+  'hudChrome.auraEffect.castShield': 'Урон не прерывает и не задерживает произнесение заклинаний',
+  'hudChrome.auraEffect.cooldownCap': 'В этом окне использовано {used} из {cap} сек. сокращения восстановления',
+  'hudChrome.auraEffect.funeralHarvestLock': 'Погребальная жатва пока не может создать ещё один осколок души',
+  'hudChrome.auraEffect.leadenHexLock': 'Свинцовый сглаз пока не может снова обездвижить эту цель',
+  'hudChrome.auraEffect.forbiddenReflectionReady': 'Следующее подходящее общее умение чернокнижника можно применить повторно',
+  'hudChrome.auraEffect.forbiddenReflectionLock': 'Запретное отражение пока нельзя подготовить снова',
+  'hudChrome.auraEffect.internalCooldown': 'Эффект не сработает снова до окончания таймера',
+  'hudChrome.auraEffect.enrage': 'Наносимый урон повышен на {damagePct}%, скорость атак — на {hastePct}%, скорость передвижения — на {movePct}%',
+  'hudChrome.auraEffect.suddenDeath': 'Следующая Казнь не требует ярости и игнорирует требование к здоровью',
+  'hudChrome.auraEffect.aoeEcho': 'Осталось отражений: {charges}. Одиночные умения наносят {pct}% урона ещё до {targets} ближайшим врагам',
+  'hudChrome.auraEffect.sureCrit': 'Следующие атакующие умения ({charges}) гарантированно наносят критический удар',
+  'hudChrome.auraEffect.temporalEcho': 'Тайный урон заклинателя исцеляет вас на {singlePct}% одиночного или {areaPct}% массового урона',
+  'hudChrome.auraEffect.arcaneCharge': 'Заряды тайной магии: {stacks}. Урон Эфирного всплеска выше на {damagePct}%, применение быстрее на {castPct}%, расход маны — в {costMult} раз',
+  'hudChrome.auraEffect.physicalReduction': 'Снижает получаемый физический урон на {pct}%',
+  'hudChrome.auraEffect.freeExecute': 'Следующее подходящее добивающее умение не требует ресурсов',
+  'hudChrome.auraEffect.resourceSap': 'Восстанавливает {value} текущего ресурса раз в {interval} сек.',
+  'hudChrome.auraEffect.nextAttackCrit': 'Следующая атака гарантированно станет критической',
+  'hudChrome.auraEffect.healEcho': 'При падении здоровья ниже {threshold}% восстанавливает {value} здоровья',
+  'hudChrome.auraEffect.bleedVuln': 'Повышает получаемый урон от кровотечений на {pct}%',
+  'hudChrome.auraEffect.sourceVuln': 'Повышает на {pct}% урон от наложившего эффект заклинателя',
+  'hudChrome.auraEffect.formMoonkin':
+    'Облик лунного крыла: урон заклинаний повышен на {pct}%, а броня на {armorPct}%',
+  'hudChrome.auraEffect.formShadow': 'Сумрачный облик: урон от темной магии повышен на {pct}%',
+  'hudChrome.auraEffect.formLich': 'Копьё души поражает до {targets} ближайших врагов, нанося {pct}% урона',
+  'hudChrome.auraEffect.afflictionEye': 'Проклятый взгляд атакует раз в {interval} сек.; эффекты на этом оке создают {pct}% Осуждения',
+  'hudChrome.auraEffect.afflictionEyeSecondary': 'Эффекты на этом оке создают {doomPct}% Осуждения; Приговор отражается сюда с {echoPct}% урона',
+  'hudChrome.auraEffect.afflictionAccomplice': 'Подходящий урон создаёт {value} Осуждения не чаще раза в {interval} сек.',
+  'hudChrome.auraEffect.afflictionViolence': 'Осталось возмездий: {charges}. Атака врага создаёт {doom} Осуждения и наносит ему {damage} ед. урона от темной магии',
+  'hudChrome.auraEffect.afflictionVicarious': 'Перенаправляет или снижает {pct}% входящего урона и может создать до {max} Осуждения',
+  'hudChrome.auraEffect.afflictionPossession': 'Усиливает Иглу судьбы, Похищение жизни, Проклятый взгляд и Приговор',
+  'hudChrome.auraEffect.afflictionJudgment': 'Главное око создаёт на {eyePct}% больше Осуждения; Приговор наносит на {sentencePct}% больше урона, а первый возвращает {refund} Осуждения',
+  'hudChrome.auraEffect.afflictionLitany': 'Получение Осуждения наносит {damage} ед. урона от темной магии до {targets} врагам в радиусе {radius} м, не чаще раза в секунду',
+  'hudChrome.auraEffect.afflictionFateThreads': 'Нити судьбы: {stacks}. Приговор наносит на {sentencePct}% больше урона, либо каждый тик Похищения жизни создаёт ещё {doom} Осуждения',
+  'hudChrome.auraEffect.afflictionConsumeThreads': 'Похищение жизни поглощает {stacks} Нити судьбы и создаёт ещё {doom} Осуждения за тик',
+  'hudChrome.auraEffect.necromancyHarvestMark': 'Смерть может создать 1 осколок души и оставить Эхо смерти для Взрыва трупа',
+  'hudChrome.auraEffect.necromancyOssuaryMark': 'Накапливает {storedPct}% урона от вас и нежити и ещё {lancePct}% урона Копья души. Повторное применение взрывает метку. Смерть вызывает взрыв в радиусе {radius} м и создаёт 1 осколок души',
+  'hudChrome.auraEffect.necromancyDeathEcho': 'Взрыв трупа может поглотить это эхо в радиусе {radius} м от точки прицеливания',
+  'hudChrome.auraEffect.warlockAnchor': 'Повторное применение в пределах {range} м возвращает сюда и поглощает якорь',
+  'hudChrome.auraEffect.formMetamorph': 'Облик демона: размер тела увеличен на {pct}%; прочие бонусы показаны отдельными эффектами',
+  'hudChrome.auraEffect.energyRegen': 'Повышает восстановление энергии на {pct}%',
+  'hudChrome.auraEffect.overpowerCharge': 'Заряды: {stacks}. Следующий Калечащий удар наносит на {pct}% больше урона',
+  'hudChrome.auraEffect.sweepingStrikes': 'Одиночные удары наносят {pct}% урона ещё {targets} ближайшему врагу',
+  'hudChrome.auraEffect.fingersOfFrost': 'Заряды: {charges}. Ледяное копьё считает цель замороженной и наносит {pct}% урона по замороженной цели',
+  'hudChrome.auraEffect.brainFreeze': 'Следующий Шквал применяется мгновенно и игнорирует время восстановления',
+  'hudChrome.auraEffect.wintersChill': 'Заряды: {charges}. Подходящие заклинания считают эту цель замороженной',
+  'hudChrome.auraEffect.icicles': 'Ледяные осколки: {value}/{max}. При {max} можно применить Ледяной шип',
+  'hudChrome.auraEffect.desolation': 'Заряды: {charges}. Следующая Стрела хаоса применяется на {castPct}% быстрее, либо Огненный дождь падает мгновенно',
+  'hudChrome.auraEffect.ruinousBrand': 'Осталось копий: {charges}. Прямые заклинания копируют сюда {otherPct}% урона или {selfPct}%, если это их основная цель',
+  'hudChrome.auraEffect.duskfireClaim': 'Смерть цели даёт {value} Разрушения',
+  'hudChrome.auraEffect.pyreGuardian': 'Создаёт {ruin} Разрушения раз в {ruinInterval} сек. и наносит {damage} ед. урона от огня в радиусе {radius} м раз в {damageInterval} сек.',
+  'hudChrome.auraEffect.perfectMoment': 'Эфирные стрелы не поглощают заряды тайной магии',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     'Следующее заклинание другой стихийной школы активирует Стихийное слияние',
   'hudChrome.auraEffect.hunterFerocity':

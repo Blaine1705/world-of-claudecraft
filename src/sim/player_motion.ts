@@ -18,6 +18,7 @@
 // by the extraction.
 
 import { isInstancedRegion, MANTLE_REACH, slopeGlueHeight } from './colliders';
+import { afflictionCanCastWhileMoving } from './combat/affliction';
 import { isRooted, isStunned } from './combat/cc';
 import { iceFloesAuraForAbility } from './combat/empower_next';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
@@ -242,6 +243,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
         (casting.def.castWhileMoving ||
           casting.castWhileMoving ||
           iceFloesAuraForAbility(p, p.castingAbility) !== undefined ||
+          afflictionCanCastWhileMoving(p, p.castingAbility) ||
           p.auras.some((a) => a.kind === 'processional_grace'));
       if (!mobile) deps.cancelCast(p);
     }

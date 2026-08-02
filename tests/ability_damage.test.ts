@@ -46,6 +46,10 @@ const SPIRITMEND_MODS = computeTalentModifiers('shaman', {
   ...emptyAllocation(),
   spec: 'restoration',
 } as never);
+const DESTRUCTION_MODS = computeTalentModifiers('warlock', {
+  ...emptyAllocation(),
+  spec: 'destruction',
+} as never);
 const PROT_MODS = computeTalentModifiers('warrior', {
   ...emptyAllocation(),
   spec: 'prot',
@@ -203,9 +207,11 @@ describe('abilityDamageBonus (tooltip scaling mirrors combat)', () => {
     );
   });
 
-  it('a channelled AoE (Rain of Fire) uses the per-tick CHANNEL coefficient, not the cast one', () => {
-    const rof = known('warlock', 'rain_of_fire');
-    const eff = required(rof.effects.find((e) => e.type === 'aoeDamage'));
-    expect(abilityDamageBonus(rof, eff, SC)).toBe(channelTickBonus(SC.spellPower, rof.def));
+  it('the reworked Rain of Fire ground pulse uses the AoE-penalised direct coefficient', () => {
+    const rof = known('warlock', 'rain_of_fire', DESTRUCTION_MODS);
+    const eff = required(rof.effects.find((e) => e.type === 'groundAoE'));
+    expect(abilityDamageBonus(rof, eff, SC)).toBe(
+      directHitBonus(SC.spellPower, rof.def, rof.castTime, true),
+    );
   });
 });

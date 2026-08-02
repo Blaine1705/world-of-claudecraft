@@ -3379,7 +3379,7 @@ function c4aCastingLifecycle(): Scenario {
       const ePriest = sim.entities.get(priest) as AnyEntity;
       const eWarlock = sim.entities.get(warlock) as AnyEntity;
       // Level 12: fireball rank 3 (3.0s), lesser_heal rank 3 (2.0s, holy),
-      // drain_life rank 1 (5s channel / 5 ticks = 1s per tick). drain_life needs >=10.
+      // drain_life rank 1 (3s channel / 3 ticks = 1s per tick). drain_life needs >=9.
       for (const pid of [mage, priest, warlock]) sim.setPlayerLevel(12, pid);
       teleport(sim, eMage, -3, -45);
       teleport(sim, ePriest, 0, -45);

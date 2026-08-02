@@ -4,6 +4,7 @@
 // locks that spell school for a few seconds.
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, abilitiesKnownAt } from '../src/sim/content/classes';
+import { computeTalentModifiers } from '../src/sim/content/talents';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -48,6 +49,18 @@ describe('baseline class interrupts', () => {
     // Retired, so the bare class no longer trains the old one.
     expect(abilitiesKnownAt('paladin', 20).some((a) => a.def.id === 'rebuke')).toBe(false);
   });
+
+  it.each(['affliction', 'demonology', 'destruction'])(
+    'keeps the Warlock interrupt in the %s specialization',
+    (spec) => {
+      const mods = computeTalentModifiers('warlock', { spec, rows: {} }, 20);
+      const known = abilitiesKnownAt('warlock', 20, mods).find(
+        (ability) => ability.def.id === 'spell_lock',
+      );
+
+      expect(known, `${spec} should know spell_lock`).toBeTruthy();
+    },
+  );
 
   it('an interrupt cancels a hostile cast and locks that spell school', () => {
     const sim = new Sim({ seed: 4, playerClass: 'warrior', autoEquip: true });

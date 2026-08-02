@@ -67,25 +67,24 @@ export function serializeOverlayAnchor(a: OverlayAnchor): string {
   return JSON.stringify({ fx: a.fx, fy: a.fy });
 }
 
+/** Move an anchor by a keyboard arrow step and keep the whole overlay on screen. */
 export function nudgeOverlayAnchor(
   anchor: OverlayAnchor,
-  direction: 'left' | 'right' | 'up' | 'down',
-  step = 0.02,
-): OverlayAnchor {
-  const amount = Number.isFinite(step) ? Math.max(0, step) : 0.02;
-  return {
-    fx: Math.min(
-      1,
-      Math.max(
-        0,
-        anchor.fx + (direction === 'left' ? -amount : direction === 'right' ? amount : 0),
-      ),
-    ),
-    fy: Math.min(
-      1,
-      Math.max(0, anchor.fy + (direction === 'up' ? -amount : direction === 'down' ? amount : 0)),
-    ),
-  };
+  key: string,
+  stepPx: number,
+  w: number,
+  h: number,
+  vw: number,
+  vh: number,
+): OverlayAnchor | null {
+  let dx = 0;
+  let dy = 0;
+  if (key === 'ArrowLeft') dx = -stepPx;
+  else if (key === 'ArrowRight') dx = stepPx;
+  else if (key === 'ArrowUp') dy = -stepPx;
+  else if (key === 'ArrowDown') dy = stepPx;
+  else return null;
+  return clampOverlayAnchor(anchor.fx + dx / vw, anchor.fy + dy / vh, w, h, vw, vh);
 }
 
 /**
@@ -153,6 +152,7 @@ export function attachOverlayDrag(
     grabDy = ev.clientY - (r.top + r.height / 2);
     el.setPointerCapture(ev.pointerId);
     el.classList.add('dragging');
+    if (el.tabIndex >= 0) el.focus({ preventScroll: true });
     ev.preventDefault();
     ev.stopPropagation();
   });
@@ -173,18 +173,17 @@ export function attachOverlayDrag(
   el.addEventListener('pointerup', drop);
   el.addEventListener('pointercancel', drop);
   el.addEventListener('keydown', (ev) => {
-    const direction =
-      ev.key === 'ArrowLeft'
-        ? 'left'
-        : ev.key === 'ArrowRight'
-          ? 'right'
-          : ev.key === 'ArrowUp'
-            ? 'up'
-            : ev.key === 'ArrowDown'
-              ? 'down'
-              : null;
-    if (!direction) return;
-    anchor = nudgeOverlayAnchor(anchor, direction, ev.shiftKey ? 0.1 : 0.02);
+    const moved = nudgeOverlayAnchor(
+      anchor,
+      ev.key,
+      ev.shiftKey ? 1 : 10,
+      el.offsetWidth || 0,
+      el.offsetHeight || 0,
+      window.innerWidth,
+      window.innerHeight,
+    );
+    if (!moved) return;
+    anchor = moved;
     apply(anchor);
     localStorage.setItem(storageKey, serializeOverlayAnchor(anchor));
     ev.preventDefault();

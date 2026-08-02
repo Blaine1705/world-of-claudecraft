@@ -1843,7 +1843,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 840,
-      "state": "bd927be1",
+      "state": "058cc594",
       "events": "c3d75419",
       "rng": {
         "draws": 0,
@@ -2166,6 +2166,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 838,
+          "petAutoSkill": true,
           "petMode": "defensive",
           "pos": {
             "x": 34,
@@ -2194,8 +2195,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 840,
-      "state": "f76de153",
-      "events": "a8da9ac5",
+      "state": "d8054596",
+      "events": "20827f03",
       "rng": {
         "draws": 148,
         "digest": "26221b06"
@@ -2205,7 +2206,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 840,
-      "state": "bd15088b",
+      "state": "c08ec6fe",
       "events": "6beb7b44",
       "rng": {
         "draws": 295,
@@ -2216,7 +2217,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 840,
-      "state": "bd15088b",
+      "state": "c08ec6fe",
       "events": "741638a5",
       "rng": {
         "draws": 295,
@@ -2563,6 +2564,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 838,
+          "petAutoSkill": true,
           "petMode": "defensive",
           "pos": {
             "x": 34,
@@ -2591,7 +2593,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 842,
-      "state": "16b08cec",
+      "state": "33cd3c67",
       "events": "a6232866",
       "rng": {
         "draws": 295,
@@ -2938,6 +2940,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 838,
+          "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "defensive",
           "pos": {

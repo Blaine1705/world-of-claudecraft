@@ -321,6 +321,22 @@ export const zh_CN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "谴罪",
+      "fateThreadsLabel": "命运丝线",
+      "doomMeterUnlock": "移动痛苦资源条",
+      "doomMeterLock": "锁定痛苦资源条",
+      "doomEmptyStatus": "{value}/{max} 谴罪。",
+      "doomStatus": "{value}/{max} 谴罪；剩余 {remaining}。",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "灵魂碎片",
+      "ruinMeter": "Ruin",
+      "ruinStatus": "{value} of {max} Ruin"
+    },
     "spectate": {
       "banner": "正在观察 {name}"
     },
@@ -1773,17 +1789,31 @@ export const zh_CN: EnTranslations = {
       "absorb": "吸收 {value} 点伤害",
       "healAbsorb": "吸收 {value} 点受到的治疗",
       "thorns": "对攻击者造成 {value} 点{school}伤害",
+      "stasis": "免疫所有效果且无法行动",
       "slow": "移动速度降低 {pct}%",
       "speed": "移动速度提高 {pct}%",
       "attackSpeedSlow": "攻击速度减慢 {pct}%",
       "attackSpeedFast": "攻击速度提高 {pct}%",
       "haste": "攻击速度和施法速度提高 {pct}%",
       "imbueRange": "武器已附魔：裁决时附加 {min} 到 {max} 点额外伤害",
+      "petDamage": "宠物造成的伤害提高 {pct}%",
+      "petHaste": "宠物的行动速度提高 {pct}%",
+      "spellDamage": "法术伤害提高 {pct}%",
+      "spellHaste": "施法速度提高 {pct}%",
+      "sated": "无法再获得团队急速效果",
+      "cauterizeFatigue": "灸灼无法再次阻止致命伤害",
+      "castShield": "施法不会因受到伤害而中断或延迟",
       "dmgDone": "造成的伤害提高 {pct}%",
       "dmgDoneReduce": "造成的伤害降低 {pct}%",
       "heatingUp": "你的下一个火焰生成技能若连续造成暴击，会获得炽热连击；未造成暴击则移除热力迸发",
       "elementalConvergencePrimed": "你的下一个不同元素学派法术将触发元素汇聚",
       "hunterFerocity": "{stacks} 层兽群凶性：你的宠物造成的伤害提高 {pct}%",
+      "cooldownCap": "此时间窗已使用 {used}/{cap} 秒冷却缩减",
+      "funeralHarvestLock": "葬礼收割暂时无法再次生成灵魂碎片",
+      "leadenHexLock": "铅沉妖术暂时无法再次定身此目标",
+      "forbiddenReflectionReady": "下一个符合条件的术士通用冷却技能可再次施放",
+      "forbiddenReflectionLock": "禁忌映像暂时无法再次准备",
+      "internalCooldown": "计时结束前此效果无法再次触发",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
       "crit": "暴击几率提高 {pct}%",
@@ -1797,6 +1827,13 @@ export const zh_CN: EnTranslations = {
       "revengeFree": "你的下一次复仇不消耗怒气",
       "victoryRush": "乘胜追击已就绪",
       "maxHpPct": "最大生命值提高 {pct}%",
+      "enrage": "造成的伤害提高 {damagePct}%，攻击速度提高 {hastePct}%，移动速度提高 {movePct}%",
+      "suddenDeath": "下一次斩杀不消耗怒气并无视生命值要求",
+      "aoeEcho": "剩余 {charges} 次回响：单体技能对附近最多 {targets} 个敌人造成 {pct}% 伤害",
+      "sureCrit": "接下来 {charges} 个伤害技能必定暴击",
+      "temporalEcho": "施法者的奥术伤害会治疗你，单体伤害转化 {singlePct}%，范围伤害转化 {areaPct}%",
+      "arcaneCharge": "{stacks} 层奥术充能：以太涌动伤害提高 {damagePct}%，施法加快 {castPct}%，法力消耗变为 {costMult} 倍",
+      "physicalReduction": "受到的物理伤害降低 {pct}%",
       "temporalHourglass": "免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。",
       "tongues": "施法时间延长 {pct}%",
       "combustionCrit": "你的火焰法术必定造成致命一击",
@@ -1818,6 +1855,10 @@ export const zh_CN: EnTranslations = {
       "moontide": "月潮：第{stacks}/{max}层。月翼形态下，野性弹、天陨与月种的施法各累积1层。达到{max}层时：月种变为月涌，天陨变为日醒，使用任意一个都会消耗全部3层",
       "oldBlood": "古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：狼形态下血噬变为血收，巨熊形态下碎骨击变为碎髓",
       "verdance": "繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放",
+      "freeExecute": "下一个符合条件的斩杀技能不消耗资源",
+      "resourceSap": "每 {interval} 秒恢复 {value} 点当前资源",
+      "nextAttackCrit": "下一次攻击必定暴击",
+      "healEcho": "生命值低于 {threshold}% 时恢复 {value} 点生命值",
       "increase": {
         "ap": "攻击强度提高 {value}",
         "sp": "法术强度提高 {value}",
@@ -1856,6 +1897,8 @@ export const zh_CN: EnTranslations = {
       "mortalWound": "受到的治疗降低 {pct}%",
       "vulnerability": "受到的伤害提高 {pct}%",
       "physVuln": "受到的物理伤害提高 {pct}%",
+      "bleedVuln": "受到的流血伤害提高 {pct}%",
+      "sourceVuln": "受到施加此效果的施法者造成的伤害提高 {pct}%",
       "spellVuln": "受到的魔法伤害提高 {pct}%",
       "critVuln": "受到致命一击的几率提高 {pct}%",
       "costTax": "技能消耗提高 {pct}%",
@@ -1874,8 +1917,39 @@ export const zh_CN: EnTranslations = {
       "formCat": "猫形态：近战伤害与能量",
       "formTravel": "迅捷形态：移动速度提高 {pct}%",
       "formFireball": "火球形态：移动速度提高 {pct}%；无法攻击或施法",
+      "formMoonkin": "月翼形态：法术伤害提高 {pct}%，护甲提高 {armorPct}%",
+      "formShadow": "幽幕形态：暗影伤害提高 {pct}%",
+      "resourceCount": "{value} of {max}",
+      "formLich": "灵魂长枪还会对附近最多 {targets} 个敌人造成 {pct}% 伤害",
+      "afflictionEye": "恶咒凝视每 {interval} 秒攻击一次；此邪眼上的效果产生 {pct}% 的定罪值",
+      "afflictionEyeSecondary": "此邪眼上的效果产生 {doomPct}% 的定罪值；宣判在此回响并造成 {echoPct}% 伤害",
+      "afflictionAccomplice": "符合条件的伤害产生 {value} 点定罪值，每 {interval} 秒最多一次",
+      "afflictionViolence": "剩余 {charges} 次报复；敌人攻击会产生 {doom} 点定罪值并反击 {damage} 点暗影伤害",
+      "afflictionVicarious": "转移或降低 {pct}% 的受到伤害，并可产生最多 {max} 点定罪值",
+      "afflictionPossession": "强化命运之针、吸取生命、恶咒凝视和宣判",
+      "afflictionJudgment": "主邪眼产生的定罪值提高 {eyePct}%；宣判伤害提高 {sentencePct}%，第一次返还 {refund} 点定罪值",
+      "afflictionLitany": "获得定罪值时，对 {radius} 码内最多 {targets} 个敌人造成 {damage} 点暗影伤害，每秒最多一次",
+      "afflictionFateThreads": "{stacks} 层命运丝线：宣判伤害提高 {sentencePct}%，或使吸取生命每跳额外产生 {doom} 点定罪值",
+      "afflictionConsumeThreads": "吸取生命正在消耗 {stacks} 层命运丝线，每跳额外产生 {doom} 点定罪值",
+      "necromancyHarvestMark": "目标死亡时可生成 1 个灵魂碎片，并留下可供尸体爆炸使用的死亡回响",
+      "necromancyOssuaryMark": "储存你和亡灵造成伤害的 {storedPct}%，并额外储存灵魂长枪伤害的 {lancePct}%；再次施放引爆。目标死亡时在 {radius} 码内爆炸并生成 1 个灵魂碎片",
+      "necromancyDeathEcho": "尸体爆炸可消耗瞄准点 {radius} 码内的此回响",
+      "warlockAnchor": "在 {range} 码内再次施放可返回此处并消耗锚点",
+      "formMetamorph": "恶魔形态：体型增大 {pct}%；其他加成由独立增益提供",
+      "energyRegen": "能量恢复速度提高 {pct}%",
       "defensiveStance": "戒备姿态：受到的伤害降低，威胁值提高",
       "righteousFury": "炽燃誓约：神圣伤害产生的威胁值大幅提高",
+      "overpowerCharge": "{stacks} 层充能：下一次致残打击伤害提高 {pct}%",
+      "sweepingStrikes": "单体攻击还会对附近 {targets} 个敌人造成 {pct}% 伤害",
+      "fingersOfFrost": "剩余 {charges} 层：冰枪术视目标为冻结状态，并造成 {pct}% 的冻结伤害",
+      "brainFreeze": "下一次冰风暴瞬发且无视冷却时间",
+      "wintersChill": "剩余 {charges} 层：符合条件的法术视此目标为冻结状态",
+      "icicles": "{value}/{max} 根冰刺；达到 {max} 根时可施放冰川尖刺",
+      "desolation": "剩余 {charges} 层：下一次混乱箭施法加快 {castPct}%，或下一次火焰之雨立即落下",
+      "ruinousBrand": "剩余 {charges} 次复制：直接法术在此复制 {otherPct}% 伤害；若此目标也是主目标则复制 {selfPct}%",
+      "duskfireClaim": "目标死亡时获得 {value} 点毁灭",
+      "pyreGuardian": "每 {ruinInterval} 秒产生 {ruin} 点毁灭，并每 {damageInterval} 秒对 {radius} 码内敌人造成 {damage} 点火焰伤害",
+      "perfectMoment": "以太飞弹不会消耗奥术充能",
       "scale": "体型增大 {pct}%",
       "jump": "跳跃高度提高 {pct}%",
       "school": {
@@ -3514,6 +3588,7 @@ export const zh_CN: EnTranslations = {
       "none": "没有职业符合所有筛选条件。清除一项以查看更多。"
     },
     "abilityHook": {
+      "evil_eye": "标记一个敌人，使其行动与承受的苦难为你积累谴罪。",
       "heroic_strike": "预备一次更重的挥击，在下次攻击时消耗怒气。",
       "revenge": "横扫你前方的敌人，并可能在躲闪或招架后不消耗资源。",
       "hamstring": "妨碍敌人的移动，使其无法逃脱。",
@@ -6694,6 +6769,10 @@ export const zh_CN: EnTranslations = {
     "pet": {
       "attack": "攻击",
       "waterJet": "水流喷射",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "嘲讽",
       "healDemon": "治疗恶魔",
       "healPet": "治疗宠物",
@@ -6704,6 +6783,10 @@ export const zh_CN: EnTranslations = {
       "petAttackDesc": "命令你的宠物攻击当前敌对目标。",
       "waterJetTitle": "水流喷射",
       "waterJetDesc": "命令你的水元素引导减速水流，持续 3 秒。冷却时间 8 秒。右键点击可在冷却结束后自动施放。",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "宠物嘲讽",
       "petTauntDesc": "命令你的宠物接战，并在进入范围时使用低吼。10 秒冷却。",
       "healDemonDesc": "消耗法力，在 5 秒内向你的恶魔引导治疗。",
@@ -6855,6 +6938,7 @@ export const zh_CN: EnTranslations = {
     "tooltip": {
       "rank": "等级 {rank}",
       "cost": "{cost} 点{resource}",
+      "ruinCost": "{cost} Ruin",
       "range": "{range} 码范围",
       "rangeWithMin": "{min}-{max} 码范围",
       "instant": "瞬发",
@@ -7068,6 +7152,7 @@ export const zh_CN: EnTranslations = {
       "clickDestroy": "点击摧毁",
       "useFishing": "使用：在附近水域钓鱼。",
       "useHealingPotion": "使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。",
       "clickUseInstant": "点击在战斗中立即使用",
       "clickUse": "点击使用",
@@ -7983,9 +8068,29 @@ export const zh_CN: EnTranslations = {
         "name": "黑腐术",
         "description": "腐蚀目标，在 18 秒内造成 {damage} 点暗影伤害。"
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "将一名敌人标记为诅咒焦点。移动邪眼会保留谴罪，但不会刷新其20秒的持续时间。"
+      },
+      "maledict_gaze": {
+        "name": "咒眼凝视",
+        "description": "你的咒眼每2.5秒攻击所选的主要邪眼目标，造成暗影伤害。附身邪眼会使其攻击速度加倍。"
+      },
+      "needle_of_fate": {
+        "name": "命运之针",
+        "description": "刺穿敌人，造成{damage}点暗影伤害。若目标带有你的邪眼，则生成5点谴罪；若不存在邪眼，则先标记目标。"
+      },
+      "sentence": {
+        "name": "裁决",
+        "description": "消耗全部谴罪裁决敌人。伤害与附加效果会在20、50、80和100点谴罪时提升。"
+      },
       "life_tap": {
         "name": "苛酷交易",
         "description": "将 {damage} 点生命值转化为 {damage} 点法力值。"
+      },
+      "cursed_accomplice": {
+        "name": "受咒同谋",
+        "description": "未选择友方玩家时连接你的咒眼，使其凝视生成2点谴罪；连接友方玩家时，该玩家对邪眼目标造成伤害会生成3点。每2秒最多触发一次。"
       },
       "curse_of_agony": {
         "name": "苦楚妖术",
@@ -7994,6 +8099,46 @@ export const zh_CN: EnTranslations = {
       "drain_life": {
         "name": "吞噬",
         "description": "吸取目标的生命，持续 5 秒，每秒向你转移 {damage} 点生命值。"
+      },
+      "litany_of_guilt": {
+        "name": "罪责祷文",
+        "description": "诅咒你的主要邪眼8秒。每次获得谴罪时会释放冲击波，对8码内最多4名其他敌人造成伤害，每秒最多触发一次。"
+      },
+      "cinderhide": {
+        "name": "熔渣皮肤",
+        "description": "使皮肤硬化为冷却的熔渣，持续10秒，受到的所有伤害降低25%。"
+      },
+      "umbral_anchor": {
+        "name": "暗影锚",
+        "description": "首次施放：在脚下锚定暗影，持续5分钟。在40码内再次施放可返回锚点，消耗锚点并触发45秒冷却。"
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+      },
+      "hex_of_violence": {
+        "name": "暴行咒",
+        "description": "诅咒敌人8秒。其接下来的3次伤害行为各生成7点谴罪，并反噬22点暗影伤害。"
+      },
+      "cruel_pact": {
+        "name": "残酷契约",
+        "description": "牺牲最大生命值的12%以生成20点谴罪。生命值不高于15%时无法使用。"
+      },
+      "vicarious_suffering": {
+        "name": "苦痛转承",
+        "description": "连接苦痛8秒，受到敌对攻击时最多生成15点谴罪。对自己使用时受到的伤害降低20%；对盟友使用时最多将20%的伤害转移给你，但不会使你的生命值降至15%以下。"
+      },
+      "possess_evil_eye": {
+        "name": "附身邪眼",
+        "description": "咒术者附身你的主要邪眼15秒，并生成35点谴罪。命运之针施法时间变为1秒并额外生成2点谴罪；吞噬可在移动中引导；裁决造成的伤害提高25%，并在延迟后追加60%的伤害。"
+      },
+      "hour_of_judgment": {
+        "name": "审判时刻",
+        "description": "对你的主要邪眼降下持续15秒的审判，获得40点谴罪和3层命运丝线，激活附身，使通过主要邪眼生成的谴罪翻倍，并使裁决伤害提高20%。第一次裁决返还50点谴罪。"
+      },
+      "coven": {
+        "name": "巫契",
+        "description": "在最多4名附近敌人身上制造持续15秒的次级邪眼。它们以50%的效率补充共享谴罪池，并承受裁决35%的回响伤害。"
       },
       "fear": {
         "name": "惊惧",
@@ -8006,6 +8151,10 @@ export const zh_CN: EnTranslations = {
       "shadowburn": {
         "name": "暮火",
         "description": "立即以灼热暗影轰击目标，造成 {damage} 点暗影伤害。"
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "野性弹",
@@ -8197,6 +8346,62 @@ export const zh_CN: EnTranslations = {
         "name": "潮汐召唤",
         "description": "为一个友方目标恢复{damage}点生命值。治疗量随法术强度提高。将过量治疗前的完整治疗量加入愈合水流，最多为目标最大生命值的30%。"
       },
+      "soul_harvest": {
+        "name": "精华收割",
+        "description": "撕扯敌人的灵魂，造成 {damage} 点暗影伤害，并生成 1 枚灵魂碎片，最多 5 枚。"
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+      },
+      "raise_graveguard": {
+        "name": "唤醒墓卫",
+        "description": "唤醒一名永久的防御型伙伴。墓卫会自动嘲讽，通过墓域为你拦截20%的伤害；收割号令会使其嘲讽并在4秒内受到的伤害降低30%。"
+      },
+      "raise_skeletal_warrior": {
+        "name": "唤醒骷髅战士",
+        "description": "消耗1枚灵魂碎片，将一名永久骷髅战士加入你的2槽统御。只能有一名为你效命。它每6秒对附近敌人造成45%的顺劈伤害，收割号令会使目标减速40%，持续4秒。"
+      },
+      "raise_bone_mage": {
+        "name": "唤醒骸骨法师",
+        "description": "消耗2枚灵魂碎片，将一名永久远程骸骨法师加入你的2槽统御。只能有一名为你效命。它的攻击使目标受到的魔法伤害提高5%，持续6秒；收割号令将此弱点提高至8%。"
+      },
+      "bone_armor": {
+        "name": "骸骨护甲",
+        "description": "以骸骨环绕自身，吸收相当于最大生命值 20% 的伤害。"
+      },
+      "corpse_explosion": {
+        "name": "尸骸爆裂",
+        "description": "消耗 2 枚灵魂碎片，在目标地点引爆死亡能量，对附近敌人造成 {damage} 点暗影伤害。"
+      },
+      "funeral_harvest": {
+        "name": "葬魂收割",
+        "description": "当一个近期被你或你的亡灵伤害过的敌人死亡时，你获得1枚灵魂碎片。每3秒最多触发一次。"
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+      },
+      "unholy_command": {
+        "name": "邪秽号令",
+        "description": "号令所有亡灵，使其伤害提高 25%、行动速度提高 20%，持续 12 秒。"
+      },
+      "reaping_command": {
+        "name": "收割号令",
+        "description": "消耗2枚灵魂碎片，命令所有亡灵仆从同时攻击。墓卫嘲讽并防御，骷髅战士牵制目标，骸骨法师暴露魔法防御，墓翼撕裂所有被击中的敌人。"
+      },
+      "sacrifice_undead": {
+        "name": "献祭亡灵",
+        "description": "摧毁一名统御仆从，恢复最大生命值的 25%。"
+      },
+      "raise_gravewing": {
+        "name": "唤醒墓翼",
+        "description": "消耗2枚灵魂碎片，将一只永久墓翼加入你的2槽统御。只能有一只为你效命。它每5秒对附近敌人造成65%的顺劈伤害，收割号令使所有被击中的敌人在5秒内受到的伤害提高8%。"
+      },
+      "army_of_the_dead": {
+        "name": "亡者军团",
+        "description": "开启一座持续20秒的墓穴传送门，暂时唤醒尚未为你效命的所有统御原型。传送门关闭后，你选择的仆从仍会留下。"
+      },
       "metamorphosis": {
         "name": "恶魔变形",
         "description": "化为恶魔之力，使护甲和攻击强度提高 20 秒。（术士天赋）"
@@ -8323,7 +8528,7 @@ export const zh_CN: EnTranslations = {
       },
       "summon_infernal": {
         "name": "召唤焚炎巨像",
-        "description": "将一只焚炎巨像束缚于你的意志之下，这是一头庞大的破坏巨兽，拥有毁灭性的近战能力，以及所有恶魔中最深厚的生命与护甲。漫长的冷却时间限制了它的原始威力。召唤新的恶魔会驱散你当前的恶魔。你同时只能拥有一只恶魔。"
+        "description": "使一只焚炎巨像降临目标区域，落地时造成58-72点火焰伤害。它会战斗30秒而不取代你的恶魔，每2秒灼烧附近敌人，并且每秒生成1点毁灭。"
       },
       "summon_doomguard": {
         "name": "召唤亡魂裔",
@@ -8477,9 +8682,17 @@ export const zh_CN: EnTranslations = {
         "name": "天穹分枝",
         "description": "攻击目标，并跳向10码内最多2名敌人，对每个目标造成{damage}点自然伤害。命中时整次施法获得1层雷霆，而不是每个目标各获得1层。伤害随法术强度提高。原始掌控可使其瞬发，原始升华会使其施法时间缩短一半。（唤雷者）"
       },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+      },
       "chaos_bolt": {
         "name": "毁灭箭",
         "description": "投掷一枚混沌火焰弹，造成{damage}点火焰伤害。（术士天赋）"
+      },
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cloak_of_shadows": {
         "name": "暗影斗篷",
@@ -8668,6 +8881,10 @@ export const zh_CN: EnTranslations = {
       "smoke_screen": {
         "name": "烟幕",
         "description": "遁入烟雾之中，使你的躲闪几率提高30%，持续8秒。"
+      },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
       },
       "spellsteal": {
         "name": "夺法",
@@ -10209,6 +10426,9 @@ export const zh_CN: EnTranslations = {
       "conjured_bread4": {
         "name": "魔法盛宴面包"
       },
+      "soul_stone": {
+        "name": "Soul Stone"
+      },
       "bristleback_maul": {
         "name": "加洛格拉斯之锤"
       },
@@ -11641,6 +11861,18 @@ export const zh_CN: EnTranslations = {
       },
       "water_elemental": {
         "name": "水元素"
+      },
+      "graveguard": {
+        "name": "墓卫"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "骷髅战士"
+      },
+      "necromancy_bone_mage": {
+        "name": "骸骨法师"
+      },
+      "necromancy_gravewing": {
+        "name": "墓翼"
       }
     },
     "npcs": {

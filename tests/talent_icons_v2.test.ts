@@ -15,6 +15,14 @@ describe('Talents V2 icon routing', () => {
     return option;
   };
 
+  const warlockOption = (id: string) => {
+    const option = ROW_TREES.warlock
+      .flatMap((row) => row.options)
+      .find((candidate) => candidate.id === id);
+    if (!option) throw new Error(`Missing Warlock row option: ${id}`);
+    return option;
+  };
+
   const spec = (cls: 'warrior' | 'mage' | 'rogue', specId?: string): SpecDef => {
     const talents = talentsFor(cls);
     const found = specId
@@ -51,6 +59,17 @@ describe('Talents V2 icon routing', () => {
       kind: 'ability',
       id: 'combat_mastery',
     });
+  });
+
+  it('routes every Warlock choice through its unique authored talent icon', () => {
+    for (const row of ROW_TREES.warlock) {
+      for (const option of row.options) {
+        expect(talentRowOptionIconRef(warlockOption(option.id))).toEqual({
+          kind: 'ability',
+          id: option.id,
+        });
+      }
+    }
   });
 
   it('uses the authored Mage spec panel art for all three mage specs', () => {

@@ -4407,7 +4407,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Evoca un Warfiend al comando dello stregone. Il Warfiend è un robusto demone da mischia che si getta nella battaglia e sa difendersi. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.',
   'entities.abilities.summon_infernal.name': 'Evoca Pyre Colossus',
   'entities.abilities.summon_infernal.description':
-    "Vincola un Pyre Colossus al tuo volere: un colosso possente con una mischia devastante e la salute e l'armatura più elevate di qualsiasi demone. Un lungo tempo di recupero ne limita la potenza bruta. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.",
+    "Fa precipitare un Pyre Colossus nell'area bersaglio, infliggendo 58-72 danni da Fuoco all'impatto. Combatte per 30 s senza sostituire il tuo demone, brucia i nemici vicini ogni 2 s e genera 1 Rovina ogni secondo.",
   'entities.abilities.summon_doomguard.name': 'Evoca Wraithborn',
   'entities.abilities.summon_doomguard.description':
     "Vincola un Wraithborn al tuo volere: un demone d'élite che scaglia da lontano ingenti danni d'Ombra. Un lungo tempo di recupero ne limita la potenza devastante. Evocare un nuovo demone congeda quello attuale. Puoi avere un solo demone alla volta.",

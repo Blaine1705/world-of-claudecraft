@@ -24,6 +24,7 @@ import {
   t,
 } from './i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
+import { localizeTalentTitle } from './talent_i18n';
 
 const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
@@ -94,6 +95,8 @@ const baseEnTable = {
   'error.nothingToConsume': 'Nothing to consume.',
   'error.nothingToDevour': 'Nothing to devour.',
   'error.recentKillRequired': 'You need a recent kill.',
+  'error.burningPactRequired': 'Conflagrate requires Burning Pact on the target.',
+  'error.notEnoughRuin': 'Not enough Ruin!',
   'error.merchantUnavailable': 'That merchant is not available.',
   'error.notForSale': 'That item is not for sale.',
   'error.noMerchant': 'There is no merchant nearby.',
@@ -277,6 +280,7 @@ const baseEnTable = {
   'log.deletedBuild': 'Deleted build “{name}”.',
   'log.dismissPet': 'You dismiss {name}.',
   'log.summonDemon': 'You summon {name}.',
+  'log.pyreCrashes': '{name} crashes into the battle.',
   'log.tamedPet': '{name} is now your loyal companion.',
   'log.entityDies': '{name} dies.',
   'log.prestiged': 'You have prestiged! Prestige Rank {rank}.',
@@ -477,6 +481,10 @@ const baseEnTable = {
   'aura.improvedImmolate': 'Improved Immolate',
   'aura.demonArmor': 'Demon Armor',
   'aura.desolation': 'Desolation',
+  'aura.destructionRuin': 'Ruin',
+  'aura.ruinousBrand': 'Ruinous Brand',
+  'aura.duskfireClaim': 'Duskfire Claim',
+  'aura.pyreGuardian': 'Pyre Guardian',
   'aura.umbralMastery': 'Umbral Mastery',
   'aura.improvedFear': 'Improved Fear',
   'aura.unyieldingPact': 'Unyielding Pact',
@@ -7695,15 +7703,44 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Improved Immolate': 'aura.improvedImmolate',
   'Demon Armor': 'aura.demonArmor',
   Desolation: 'aura.desolation',
+  Ruin: 'aura.destructionRuin',
+  'Ruinous Brand': 'aura.ruinousBrand',
+  'Duskfire Claim': 'aura.duskfireClaim',
+  'Pyre Guardian': 'aura.pyreGuardian',
   'Umbral Mastery': 'aura.umbralMastery',
   'Improved Fear': 'aura.improvedFear',
   'Unyielding Pact': 'aura.unyieldingPact',
   'Grimoire of Carnage': 'aura.grimoireOfCarnage',
   'Curse Mastery': 'aura.curseMastery',
 };
+
+const WARLOCK_ABILITY_AURA_IDS: Readonly<Record<string, string>> = {
+  'Umbral Anchor': 'umbral_anchor',
+  'Possess the Evil Eye': 'possess_evil_eye',
+  'Hour of Judgment': 'hour_of_judgment',
+  Coven: 'coven',
+  'Sacrilegious March': 'sacrilegious_march',
+  'Sanguine Covenant': 'dark_pact',
+};
+
+const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
+  'Blacktide',
+  'Leaden Hex',
+  'Shadow Credit',
+  'Hexstorm',
+  'Forbidden Reflection',
+]);
+
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];
-  return key ? tSim(key) : null;
+  if (key) return tSim(key);
+  if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
+  if (name === 'Fate Threads') return t('hudChrome.warlock.fateThreadsLabel');
+  if (name === 'Soul Fragments') return t('hudChrome.procOverlay.soulFragmentsMeter');
+  const abilityId = WARLOCK_ABILITY_AURA_IDS[name];
+  if (abilityId) return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
+  if (WARLOCK_TALENT_AURA_NAMES.has(name)) return localizeTalentTitle(name);
+  return null;
 }
 
 // A boss/mob "mechanic" name spliced into "{mob} unleashes {mechanic}!". Reuses the shared
@@ -8784,6 +8821,11 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  {
+    re: /^Your Umbral Anchor is out of range\.$/,
+    build: () =>
+      `${tEntity({ kind: 'ability', id: 'umbral_anchor', field: 'name' })}: ${t('hud.errors.outOfRange')}`,
+  },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
@@ -8895,6 +8937,10 @@ const RULES: Rule[] = [
   { re: /^Deleted build "(.+)"\.$/, build: (m) => tSim('log.deletedBuild', { name: m[1] }) },
   { re: /^You dismiss (.+)\.$/, build: (m) => tSim('log.dismissPet', { name: locMob(m[1]) }) },
   { re: /^You summon (.+)\.$/, build: (m) => tSim('log.summonDemon', { name: locMob(m[1]) }) },
+  {
+    re: /^(.+) crashes into the battle\.$/,
+    build: (m) => tSim('log.pyreCrashes', { name: locMob(m[1]) }),
+  },
   {
     re: /^(.+) fades back into the void\.$/,
     build: (m) => tSim('log.petFadesVoid', { name: locMob(m[1]) }),

@@ -117,6 +117,38 @@ describe('ActionBarController form persistence', () => {
     expect(controller.actions.slice(22)).toEqual(Array.from({ length: 11 }, () => null));
   });
 
+  it('repairs a pre-overhaul Warlock bar with the active specialization kit', () => {
+    const storage = new MemoryStorage();
+    storage.setItem(
+      'woc_hotbar_warlock_ActionbarTester',
+      JSON.stringify(bar('corruption', 'curse_of_agony', 'searing_pain', 'summon_doomguard')),
+    );
+    const known = [
+      'shadow_bolt',
+      'life_tap',
+      'demon_skin',
+      'umbral_anchor',
+      'conflagrate',
+      'chaos_bolt',
+      'shadowburn',
+      'ruinous_brand',
+      'rain_of_fire',
+      'summon_infernal',
+    ];
+    const { controller } = makeHarness('warlock', known, bar(), storage);
+
+    controller.init();
+    controller.syncKnownAbilities();
+
+    const abilityIds = controller.actions.flatMap((action) =>
+      action?.type === 'ability' ? [action.id] : [],
+    );
+    expect(abilityIds).toEqual(expect.arrayContaining(known));
+    expect(abilityIds).not.toEqual(
+      expect.arrayContaining(['corruption', 'curse_of_agony', 'searing_pain', 'summon_doomguard']),
+    );
+  });
+
   it('persists the last third-row slot independently across Druid forms and reloads', () => {
     const storage = new MemoryStorage();
     const first = makeHarness('druid', ['wrath', 'bear_form', 'claw'], bar(), storage);

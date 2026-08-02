@@ -321,6 +321,22 @@ export const ja_JP: EnTranslations = {
     }
   },
   "hudChrome": {
+    "warlock": {
+      "doomLabel": "断罪",
+      "fateThreadsLabel": "運命の糸",
+      "doomMeterUnlock": "苦痛リソースバーを移動",
+      "doomMeterLock": "苦痛リソースバーを固定",
+      "doomEmptyStatus": "断罪 {value}/{max}。",
+      "doomStatus": "断罪 {value}/{max}、残り {remaining}。",
+      "fateThreadsStatus": "{value} of {max} Fate Threads.",
+      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
+      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+    },
+    "procOverlay": {
+      "soulFragmentsMeter": "魂の欠片",
+      "ruinMeter": "Ruin",
+      "ruinStatus": "{value} of {max} Ruin"
+    },
     "spectate": {
       "banner": "{name}を観戦中"
     },
@@ -1773,17 +1789,31 @@ export const ja_JP: EnTranslations = {
       "absorb": "{value}のダメージを吸収する",
       "healAbsorb": "受ける回復を{value}吸収する",
       "thorns": "攻撃者に{value}の{school}ダメージを与える",
+      "stasis": "無敵になるが行動できない",
       "slow": "移動速度を{pct}%低下させる",
       "speed": "移動速度を{pct}%上昇させる",
       "attackSpeedSlow": "攻撃速度を{pct}%低下させる",
       "attackSpeedFast": "攻撃速度を{pct}%上昇させる",
       "haste": "攻撃速度と詠唱速度を{pct}%上昇させる",
       "imbueRange": "武器付与: ヴァーディクトで{min}から{max}の追加ダメージ",
+      "petDamage": "ペットのダメージが{pct}%増加する",
+      "petHaste": "ペットの行動速度が{pct}%上昇する",
+      "spellDamage": "呪文ダメージが{pct}%増加する",
+      "spellHaste": "呪文の詠唱速度が{pct}%上昇する",
+      "sated": "別のグループ加速効果を受けられない",
+      "cauterizeFatigue": "コーテライズは次の致死ダメージを防げない",
+      "castShield": "ダメージで詠唱が中断または遅延しない",
       "dmgDone": "与えるダメージを{pct}%上昇させる",
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
       "heatingUp": "次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます",
       "elementalConvergencePrimed": "次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します",
       "hunterFerocity": "群れの獰猛さ{stacks}スタック：ペットの与えるダメージが{pct}%上昇",
+      "cooldownCap": "この時間枠でクールダウン短縮を{used}/{cap}秒使用済み",
+      "funeralHarvestLock": "フューネラル・ハーベストはまだ次の魂の欠片を生成できない",
+      "leadenHexLock": "レドン・ヘックスはまだこの対象を再び移動不能にできない",
+      "forbiddenReflectionReady": "次の対象となるウォーロック共通クールダウンを再使用できる",
+      "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
+      "internalCooldown": "タイマー終了までこの効果は再発動しない",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
       "crit": "クリティカル率を{pct}%上昇させる",
@@ -1797,6 +1827,13 @@ export const ja_JP: EnTranslations = {
       "revengeFree": "次の意趣返しの怒りコストが0になる",
       "victoryRush": "勝利の追撃が使用可能",
       "maxHpPct": "最大体力を{pct}%上昇させる",
+      "enrage": "与えるダメージが{damagePct}%、攻撃速度が{hastePct}%、移動速度が{movePct}%上昇する",
+      "suddenDeath": "次のエグゼキュートは怒気を消費せず、体力条件を無視する",
+      "aoeEcho": "残り{charges}回：単体アビリティが近くの最大{targets}体にも{pct}%のダメージを与える",
+      "sureCrit": "次のダメージアビリティ{charges}回が必ずクリティカルになる",
+      "temporalEcho": "術者の秘術ダメージのうち、単体なら{singlePct}%、範囲なら{areaPct}%があなたへの回復になる",
+      "arcaneCharge": "秘術チャージ{stacks}：エーテル・サージのダメージが{damagePct}%増加、詠唱が{castPct}%短縮、マナ消費が{costMult}倍になる",
+      "physicalReduction": "受ける物理ダメージが{pct}%減少する",
       "temporalHourglass": "ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。",
       "tongues": "詠唱時間を{pct}%増加させる",
       "combustionCrit": "火炎呪文が必ずクリティカルになる",
@@ -1818,6 +1855,10 @@ export const ja_JP: EnTranslations = {
       "moontide": "月潮：{stacks}/{max}段階。月翼形態での野生の稲妻・天墜・月の種の詠唱ごとに1段階進む。{max}段階で月の種はムーンサージに、天墜は陽醒に変化し、どちらを使っても3段階すべてを消費する",
       "oldBlood": "古き血：{stacks}/{max}段階。裂き爪・皮剥ぎ・血の亀裂・血噛み・薙ぎ払う爪・骨砕きの命中ごとに1段階蓄える。{max}段階で、ウルフフォームでは血噛みが血の収穫に、ブルーインフォームでは骨砕きが骨髄砕きに変化する",
       "verdance": "翠成：{stacks}/{max}段階。新しく植えた野生の芽吹きまたは二度目の開花ごとに1段階進む。{max}段階でスウィフトメンドが満開に変化する",
+      "freeExecute": "次の対象となる処刑アビリティはコストを消費しない",
+      "resourceSap": "{interval}秒ごとに現在のリソースを{value}回復する",
+      "nextAttackCrit": "次の攻撃が必ずクリティカルになる",
+      "healEcho": "体力が{threshold}%未満になると体力を{value}回復する",
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
         "sp": "呪文の威力を{value}上昇させる",
@@ -1856,6 +1897,8 @@ export const ja_JP: EnTranslations = {
       "mortalWound": "受ける回復量を{pct}%低下させる",
       "vulnerability": "受けるダメージを{pct}%増加させる",
       "physVuln": "受ける物理ダメージを{pct}%増加させる",
+      "bleedVuln": "受ける出血ダメージが{pct}%増加する",
+      "sourceVuln": "この効果を付与した術者から受けるダメージが{pct}%増加する",
       "spellVuln": "受ける魔法ダメージを{pct}%増加させる",
       "critVuln": "クリティカルを受ける確率を{pct}%増加させる",
       "costTax": "アビリティのコストを{pct}%増加させる",
@@ -1874,8 +1917,39 @@ export const ja_JP: EnTranslations = {
       "formCat": "キャットフォーム: 近接ダメージとエネルギー",
       "formTravel": "フリートフォーム: 移動速度が{pct}%上昇",
       "formFireball": "火球形態：移動速度が{pct}%上昇、攻撃と呪文は使用不可",
+      "formMoonkin": "ムーンウィング形態：呪文ダメージが{pct}%、アーマーが{armorPct}%増加する",
+      "formShadow": "グロームヴェイル形態：影ダメージが{pct}%増加する",
+      "resourceCount": "{value} of {max}",
+      "formLich": "ソウル・ランスが近くの最大{targets}体にも{pct}%のダメージを与える",
+      "afflictionEye": "マレディクト・ゲイズが{interval}秒ごとに攻撃し、この邪眼での効果は断罪を{pct}%生成する",
+      "afflictionEyeSecondary": "この邪眼での効果は断罪を{doomPct}%生成し、センテンスがここへ{echoPct}%のダメージで反響する",
+      "afflictionAccomplice": "対象となるダメージが断罪を{value}生成する。{interval}秒に1回まで",
+      "afflictionViolence": "報復は残り{charges}回。敵の攻撃で断罪を{doom}生成し、{damage}の影ダメージを返す",
+      "afflictionVicarious": "受けるダメージの{pct}%を転送または軽減し、断罪を最大{max}生成する",
+      "afflictionPossession": "ニードル・オブ・フェイト、ドレイン・ライフ、マレディクト・ゲイズ、センテンスを強化する",
+      "afflictionJudgment": "主邪眼の断罪生成が{eyePct}%増加し、センテンスのダメージが{sentencePct}%増加、最初の1回は断罪を{refund}返還する",
+      "afflictionLitany": "断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで",
+      "afflictionFateThreads": "運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する",
+      "afflictionConsumeThreads": "ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する",
+      "necromancyHarvestMark": "死亡時に魂の欠片を1個生成し、コープス・エクスプロージョン用のデス・エコーを残すことがある",
+      "necromancyOssuaryMark": "あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する",
+      "necromancyDeathEcho": "コープス・エクスプロージョンは照準地点から{radius}ヤード以内のこの残響を消費できる",
+      "warlockAnchor": "{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する",
+      "formMetamorph": "悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される",
+      "energyRegen": "エネルギー回復速度が{pct}%上昇する",
       "defensiveStance": "ガーデッドスタンス: 受けるダメージが減少し、脅威度が上昇",
       "righteousFury": "バーニングオース: 神聖ダメージによる脅威度が大幅に上昇",
+      "overpowerCharge": "チャージ{stacks}：次のメイミング・ストライクのダメージが{pct}%増加する",
+      "sweepingStrikes": "単体攻撃が近くの敵{targets}体にも{pct}%のダメージを与える",
+      "fingersOfFrost": "残り{charges}チャージ：アイス・ランスは対象を凍結扱いにし、凍結時ダメージ{pct}%を与える",
+      "brainFreeze": "次のフラーリィが即時発動し、クールダウンを無視する",
+      "wintersChill": "残り{charges}チャージ：対象となる呪文はこの敵を凍結扱いにする",
+      "icicles": "アイシクル{value}/{max}。{max}でグレイシャル・スパイクを使用できる",
+      "desolation": "残り{charges}チャージ：次のカオス・ボルトの詠唱が{castPct}%短縮、または次のレイン・オブ・ファイアが即着弾する",
+      "ruinousBrand": "残り{charges}回：直接呪文がここへ{otherPct}%のダメージを複製し、ここが主対象なら{selfPct}%を複製する",
+      "duskfireClaim": "対象の死亡時にルインを{value}得る",
+      "pyreGuardian": "{ruinInterval}秒ごとにルインを{ruin}生成し、{damageInterval}秒ごとに{radius}ヤード内へ{damage}の火ダメージを与える",
+      "perfectMoment": "エーテル・ダーツが秘術チャージを消費しない",
       "scale": "サイズが{pct}%増加",
       "jump": "ジャンプの高さが{pct}%増加",
       "school": {
@@ -3514,6 +3588,7 @@ export const ja_JP: EnTranslations = {
       "none": "すべての条件に合うクラスはありません。一つ解除するともっと表示されます。"
     },
     "abilityHook": {
+      "evil_eye": "敵を一体指定し、その行動と苦痛から断罪を蓄積します。",
       "heroic_strike": "次の一撃にレイジを乗せ、より重い攻撃を予約します。",
       "revenge": "前方の敵を薙ぎ払い、回避または受け流しの後に消費なしで使えることがある。",
       "hamstring": "敵の移動を妨げ、逃走を阻止する。",
@@ -6694,6 +6769,10 @@ export const ja_JP: EnTranslations = {
     "pet": {
       "attack": "攻撃",
       "waterJet": "ウォータージェット",
+      "felbolt": "Felbolt",
+      "abyssalChain": "Abyssal Chain",
+      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
+      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
       "taunt": "挑発",
       "healDemon": "悪魔を治癒",
       "healPet": "ペットを治癒",
@@ -6704,6 +6783,10 @@ export const ja_JP: EnTranslations = {
       "petAttackDesc": "現在の敵対対象を攻撃するようペットに命令します。",
       "waterJetTitle": "ウォータージェット",
       "waterJetDesc": "ウォーターエレメンタルに、3秒間敵を減速させる水流を放つよう命令します。クールダウン8秒。右クリックすると、使用可能になるたびに自動で発動します。",
+      "felboltTitle": "Felbolt",
+      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "abyssalChainTitle": "Abyssal Chain",
+      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
       "petTauntTitle": "ペット挑発",
       "petTauntDesc": "ペットに交戦を命じ、射程内でグロウルを使わせます。クールダウン10秒。",
       "healDemonDesc": "マナを消費し、5秒かけて悪魔へ治癒をチャネルします。",
@@ -6855,6 +6938,7 @@ export const ja_JP: EnTranslations = {
     "tooltip": {
       "rank": "ランク{rank}",
       "cost": "{resource} {cost}",
+      "ruinCost": "{cost} Ruin",
       "range": "射程{range}ヤード",
       "rangeWithMin": "射程{min}-{max}ヤード",
       "instant": "即時",
@@ -7068,6 +7152,7 @@ export const ja_JP: EnTranslations = {
       "clickDestroy": "クリックして破棄",
       "useFishing": "使用: 近くの水辺で釣りをします。",
       "useHealingPotion": "使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。",
+      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
       "useManaPotion": "使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。",
       "clickUseInstant": "クリックして戦闘中に即使用",
       "clickUse": "クリックして使用",
@@ -7983,9 +8068,29 @@ export const ja_JP: EnTranslations = {
         "name": "黒腐れ",
         "description": "対象を堕落させ、18秒間で {damage} の暗黒ダメージを与えます。"
       },
+      "evil_eye": {
+        "name": "Evil Eye",
+        "description": "敵一体を呪いの焦点として指定します。邪眼を移しても断罪は維持されますが、20秒の有効時間は更新されません。"
+      },
+      "maledict_gaze": {
+        "name": "呪眼の凝視",
+        "description": "呪眼が選択中の主要な邪眼対象を2.5秒ごとに攻撃し、影ダメージを与えます。邪眼憑依中は攻撃速度が2倍になります。"
+      },
+      "needle_of_fate": {
+        "name": "運命の針",
+        "description": "敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。"
+      },
+      "sentence": {
+        "name": "宣告",
+        "description": "断罪をすべて消費して敵に宣告を下します。ダメージと追加効果は断罪20、50、80、100で強化されます。"
+      },
       "life_tap": {
         "name": "過酷な取引",
         "description": "体力{damage}をマナ{damage}に変換します。"
+      },
+      "cursed_accomplice": {
+        "name": "呪われた共犯者",
+        "description": "味方プレイヤーを選択していない場合は呪眼と結び、その凝視で断罪を2生成します。味方と結ぶと、その味方が邪眼対象へ与えるダメージで3生成します。発動は2秒に1回までです。"
       },
       "curse_of_agony": {
         "name": "苦悶の呪い",
@@ -7994,6 +8099,46 @@ export const ja_JP: EnTranslations = {
       "drain_life": {
         "name": "喰らう",
         "description": "対象の生命力を吸収し、5秒間、毎秒{damage}の体力を自分に移します。"
+      },
+      "litany_of_guilt": {
+        "name": "罪責の連祷",
+        "description": "主要な邪眼を8秒間呪います。断罪を獲得するたびに波動を放ち、8ヤード以内にいる他の敵最大4体にダメージを与えます。発動は1秒に1回までです。"
+      },
+      "cinderhide": {
+        "name": "燼皮",
+        "description": "皮膚を冷えた鉱滓のように10秒間硬化させ、受けるすべてのダメージを25%減少させる。"
+      },
+      "umbral_anchor": {
+        "name": "影の錨",
+        "description": "初回使用時、足元に5分間残る影の錨を設置します。40ヤード以内で再使用すると錨へ戻り、錨を消費して45秒の再使用時間が始まります。"
+      },
+      "soulwell": {
+        "name": "Soulwell",
+        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+      },
+      "hex_of_violence": {
+        "name": "暴虐の呪い",
+        "description": "敵を8秒間呪います。次の3回の攻撃行動ごとに断罪を7生成し、22の影ダメージで反撃します。"
+      },
+      "cruel_pact": {
+        "name": "残酷な契約",
+        "description": "最大体力の12%を捧げて断罪を20生成します。体力が15%以下では使用できません。"
+      },
+      "vicarious_suffering": {
+        "name": "苦痛の肩代わり",
+        "description": "8秒間苦痛を結び、敵の攻撃から最大15の断罪を生成します。自分に使うと受けるダメージが20%減少します。味方に使うと、そのダメージの最大20%を自分へ移しますが、体力が15%未満になることはありません。"
+      },
+      "possess_evil_eye": {
+        "name": "邪眼憑依",
+        "description": "呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えて遅れて60%の追加ダメージを放ちます。"
+      },
+      "hour_of_judgment": {
+        "name": "審判の刻",
+        "description": "主要な邪眼へ15秒間の審判を下し、断罪を40と運命の糸を3獲得して憑依を発動し、主要な邪眼を通じて生成する断罪を2倍にして、宣告のダメージを20%増加させます。最初の宣告は断罪を50返還します。"
+      },
+      "coven": {
+        "name": "魔女盟約",
+        "description": "周囲の敵最大4体に15秒間持続する副次的な邪眼を作ります。断罪の共有量へ50%の効率で加算し、宣告の35%分の反響ダメージを受けます。"
       },
       "fear": {
         "name": "責め苦",
@@ -8006,6 +8151,10 @@ export const ja_JP: EnTranslations = {
       "shadowburn": {
         "name": "黄昏の火",
         "description": "対象に灼ける影を即座に叩き込み、{damage} の暗黒ダメージを与えます。"
+      },
+      "ruinous_brand": {
+        "name": "Ruinous Brand",
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
       },
       "wrath": {
         "name": "野生の稲妻",
@@ -8197,6 +8346,62 @@ export const ja_JP: EnTranslations = {
         "name": "潮呼び",
         "description": "味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。"
       },
+      "soul_harvest": {
+        "name": "霊魂刈り",
+        "description": "敵の魂を切り裂いて{damage}のシャドウダメージを与え、魂の欠片を1個生成する。最大5個。"
+      },
+      "soul_lance": {
+        "name": "Soul Lance",
+        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+      },
+      "raise_graveguard": {
+        "name": "墓守の召喚",
+        "description": "永続する防御型の相棒を呼び起こす。墓守は自動で挑発し、墓所の支配であなたへのダメージの20%を肩代わりする。リーピング・コマンドでは挑発し、4秒間受けるダメージが30%減少する。"
+      },
+      "raise_skeletal_warrior": {
+        "name": "骸骨戦士の召喚",
+        "description": "魂の欠片を1個消費し、永続する骸骨戦士を2枠のドミニオンに加える。同時に従えるのは1体まで。6秒ごとに周囲へ45%の薙ぎ払いダメージを与え、リーピング・コマンドでは対象を4秒間40%減速させる。"
+      },
+      "raise_bone_mage": {
+        "name": "骨魔導士の召喚",
+        "description": "魂の欠片を2個消費し、永続する遠隔型の骨魔導士を2枠のドミニオンに加える。同時に従えるのは1体まで。攻撃は6秒間受ける魔法ダメージを5%増加させ、リーピング・コマンドでは8%に強化する。"
+      },
+      "bone_armor": {
+        "name": "骨の鎧",
+        "description": "骨で身を包み、最大体力の20%に相当するダメージを吸収する。"
+      },
+      "corpse_explosion": {
+        "name": "骸の爆裂",
+        "description": "魂の欠片を2個消費し、指定地点で死の力を炸裂させ、周囲の敵に{damage}のシャドウダメージを与える。"
+      },
+      "funeral_harvest": {
+        "name": "葬送の収穫",
+        "description": "自分または自分のアンデッドが最近ダメージを与えた敵が死亡すると、魂の欠片を1個獲得します。発動は3秒に1回までです。"
+      },
+      "ossuary_mark": {
+        "name": "Ossuary Mark",
+        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+      },
+      "unholy_command": {
+        "name": "不浄の号令",
+        "description": "すべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。"
+      },
+      "reaping_command": {
+        "name": "刈り取りの号令",
+        "description": "魂の欠片を2個消費し、すべてのアンデッドの従者に一斉攻撃させる。墓守は挑発して身を固め、骸骨戦士は足止めし、骨魔導士は魔法防御を暴き、墓翼は命中した全敵を引き裂く。"
+      },
+      "sacrifice_undead": {
+        "name": "亡者の生贄",
+        "description": "ドミニオンの従者を1体破壊し、最大体力の25%を回復する。"
+      },
+      "raise_gravewing": {
+        "name": "墓翼の召喚",
+        "description": "魂の欠片を2個消費し、永続する墓翼を2枠のドミニオンに加える。同時に従えるのは1体まで。5秒ごとに周囲へ65%の薙ぎ払いダメージを与え、リーピング・コマンドでは命中した全敵の受けるダメージを5秒間8%増加させる。"
+      },
+      "army_of_the_dead": {
+        "name": "亡者の軍勢",
+        "description": "墓所の門を20秒間開き、まだ従えていない全ドミニオン系統を一時的に呼び起こす。選んだ従者は門が閉じた後も残る。"
+      },
       "metamorphosis": {
         "name": "悪魔変身",
         "description": "悪魔の力をまとい、20 秒間防御力と攻撃力を高めます。（ウォーロックのタレント）"
@@ -8323,7 +8528,7 @@ export const ja_JP: EnTranslations = {
       },
       "summon_infernal": {
         "name": "パイアコロッサスの召喚",
-        "description": "パイアコロッサスを意のままに束縛します。圧倒的な近接攻撃と、あらゆる悪魔の中で最も深い生命力と防御力を備えた巨大な破壊兵器です。長い再使用時間がその純然たる力を制限します。新たな悪魔を召喚すると現在の悪魔は解放されます。悪魔は一度に1体しか従えられません。"
+        "description": "対象地点にパイアコロッサスを呼び下ろし、着地時に58-72の火炎ダメージを与えます。現在の悪魔と入れ替わらず30秒間戦い、2秒ごとに周囲の敵を焼き、1秒ごとに破滅を1生成します。"
       },
       "summon_doomguard": {
         "name": "レイスボーンの召喚",
@@ -8477,9 +8682,17 @@ export const ja_JP: EnTranslations = {
         "name": "天枝の雷",
         "description": "対象を攻撃し、10ヤード以内の敵最大2体へ跳び移り、それぞれに{damage}の自然ダメージを与える。命中すると、対象ごとではなく詠唱全体で雷霆を1つ得る。ダメージはスペルパワーで増加する。原始の熟達で即時発動になり、原始の高揚で詠唱時間が半分になる。（雷呼び）"
       },
+      "abyssal_rift": {
+        "name": "Abyssal Rift",
+        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+      },
       "chaos_bolt": {
         "name": "破滅の矢",
         "description": "混沌の炎を放ち、{damage}の火属性ダメージを与える。（ウォーロックのタレント）"
+      },
+      "dark_pact": {
+        "name": "Sanguine Covenant",
+        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
       },
       "cloak_of_shadows": {
         "name": "影まとい",
@@ -8668,6 +8881,10 @@ export const ja_JP: EnTranslations = {
       "smoke_screen": {
         "name": "スモークスクリーン",
         "description": "煙幕に紛れ、8秒間、回避率を30%上昇させる。"
+      },
+      "sacrilegious_march": {
+        "name": "Sacrilegious March",
+        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
       },
       "spellsteal": {
         "name": "魔法奪取",
@@ -10209,6 +10426,9 @@ export const ja_JP: EnTranslations = {
       "conjured_bread4": {
         "name": "魔法の祝宴パン"
       },
+      "soul_stone": {
+        "name": "Soul Stone"
+      },
       "bristleback_maul": {
         "name": "ギャロウグラスの大槌"
       },
@@ -11641,6 +11861,18 @@ export const ja_JP: EnTranslations = {
       },
       "water_elemental": {
         "name": "ウォーターエレメンタル"
+      },
+      "graveguard": {
+        "name": "墓守"
+      },
+      "necromancy_skeletal_warrior": {
+        "name": "骸骨戦士"
+      },
+      "necromancy_bone_mage": {
+        "name": "骨魔導士"
+      },
+      "necromancy_gravewing": {
+        "name": "墓翼"
       }
     },
     "npcs": {

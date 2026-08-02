@@ -23,6 +23,7 @@
 import { cleanupPaladinAegis } from '../combat/paladin_aegis';
 import { stripSunGodVerdicts } from '../combat/paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from '../combat/paladin_support';
+import { emitRainOfFireStop } from '../combat/warlock_meteor_events';
 import {
   AUGMENTS_BY_ID,
   type AugmentDef,
@@ -306,6 +307,7 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   // ALL auras (including The Keeper's Toll), unlike the overworld/delve death paths.
   e.auras = [];
   e.ccDr.clear();
+  emitRainOfFireStop(ctx, e);
   e.castingAbility = null;
   e.castRemaining = 0;
   e.castTargetId = null;

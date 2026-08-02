@@ -75,6 +75,7 @@ Each module owns the FUNCTIONS for one system; the backing STATE stays on `Sim` 
 | `combat/paladin_solar_reprisal.ts` | Protection block/Vowkeeper proc rolls and the shared Sunward Disc, Hammer of Grace, or Mending Light override |
 | `combat/paladin_dawns_wrath.ts` | Retribution auto-attack/Final Edict proc and the stored extra Hammer of Wrath cast |
 | `combat/paladin_sunward_disc.ts` | Sunward Disc local ricochet selection, arrival-time damage, and per-impact Devotion |
+| `combat/warlock_talents.ts` | shared Warlock class-talent state: Leaden Hex, Shadow Credit, Ashen Focus, Unbroken Ritual, Forbidden Reflection, and Sacrilegious March |
 | `projectile_travel.ts` | in-flight homing projectiles: `pendingProjectiles` + the prologue `advancePendingProjectiles` phase |
 | `progression/xp.ts` | `prestige`, rested-XP, `isResting` |
 | `progression/talents.ts` | `applyTalents`/`spendTalent`/`setSpec`/`respec`/loadouts/`recomputeTalents` |

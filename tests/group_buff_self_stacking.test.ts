@@ -5,7 +5,10 @@
 // guard test at the bottom makes forgetting BOTH a loud CI failure for any
 // future group buff.
 import { describe, expect, it } from 'vitest';
-import { SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS } from '../src/sim/combat/aura_stacking';
+import {
+  auraReplacementConflicts,
+  SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS,
+} from '../src/sim/combat/aura_stacking';
 import { runHunterPackRally } from '../src/sim/combat/hunter_shared';
 import { ABILITIES } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
@@ -78,6 +81,21 @@ describe('Emboldening Roar never stacks its crit buff with itself', () => {
 });
 
 describe('every group buff is exhaustion-gated or source-independent', () => {
+  it('replaces a Soulwell ward from another Warlock instead of stacking it', () => {
+    const ward = {
+      id: 'soulwell',
+      name: 'Soulwell',
+      kind: 'absorb',
+      remaining: 30,
+      duration: 30,
+      value: 100,
+      sourceId: 1,
+      school: 'shadow',
+    } as const;
+
+    expect(auraReplacementConflicts([ward], { ...ward, sourceId: 2 })).toEqual([0]);
+  });
+
   it('no aoeAlly buff can silently self-stack across casters', () => {
     const offenders: string[] = [];
     for (const ability of Object.values(ABILITIES)) {

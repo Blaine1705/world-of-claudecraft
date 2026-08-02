@@ -86,7 +86,10 @@ function slotState(over: Partial<ActionBarSlotState> = {}): ActionBarSlotState {
     empowered: false,
     ascensionSpender: false,
     ascensionCostLabel: '',
+    fateConsumeReady: false,
+    fateSentenceReady: false,
     ariaLabel: 'A',
+    ariaDescription: '',
     keybindLabel: 'K',
     ...over,
   };
@@ -117,6 +120,7 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
           empowered: true,
           ascensionSpender: true,
           ascensionCostLabel: '-1',
+          fateConsumeReady: true,
           ariaLabel: 'aria1',
           keybindLabel: '1',
         }),
@@ -140,7 +144,11 @@ describe('ActionBarPainter: routes every write through the elided writers', () =
       { m: 'toggleClass', args: [el.btn, 'empowered', true] },
       { m: 'toggleClass', args: [el.btn, 'ascension-spender', true] },
       { m: 'setAttr', args: [el.btn, 'data-ascension-cost', '-1'] },
+      { m: 'toggleClass', args: [el.btn, 'fate-consume-ready', true] },
+      { m: 'toggleClass', args: [el.btn, 'fate-sentence-ready', false] },
       { m: 'setAttr', args: [el.btn, 'aria-label', 'aria1'] },
+      { m: 'setAttr', args: [el.btn, 'aria-description', ''] },
+      { m: 'setAttr', args: [el.btn, 'aria-disabled', 'true'] },
       { m: 'setText', args: [el.keybindEl, '1'] },
     ]);
   });
@@ -234,6 +242,7 @@ function fakeDeps(): ActionBarDeps {
 function idleWorld(): ActionBarWorldInput {
   return {
     player: {
+      id: 1,
       autoAttack: false,
       dead: false,
       resource: 100,
@@ -247,6 +256,7 @@ function idleWorld(): ActionBarWorldInput {
     target: null,
     inventory: [],
     stealthed: false,
+    entities: [],
   };
 }
 

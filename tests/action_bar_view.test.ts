@@ -94,11 +94,17 @@ interface WorldOpts {
   targetDead?: boolean;
   targetMaxHp?: number;
   targetAuras?: ActionBarAuraInput[];
+  entities?: Iterable<{
+    ownerId?: number | null;
+    templateId: string;
+    dead?: boolean;
+  }>;
   inventory?: { itemId: string; count: number }[];
   abilityCharges?: {
     [id: string]: { charges: number; recharge?: number; rechargeLength?: number } | undefined;
   };
   stealthed?: boolean;
+  fateThreads?: number;
   auras?: ActionBarAuraInput[];
   paladinDevotion?: {
     value: number;
@@ -137,6 +143,8 @@ function world(opts: WorldOpts = {}): ActionBarWorldInput {
           },
     inventory: opts.inventory ?? [],
     stealthed: opts.stealthed ?? false,
+    fateThreads: opts.fateThreads ?? 0,
+    entities: opts.entities ?? [],
   };
 }
 
@@ -422,6 +430,60 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     });
   });
 
+  it('dims Ruin spenders below their secondary-resource cost and glows under Desolation', () => {
+    const spender = ability('chaos_bolt', { cost: 65, ruinCost: 3 });
+    const view = createActionBarView(descriptor(slot(1, { ability: spender })), fakeDeps());
+    expect(
+      view.tick(
+        world({
+          resource: 100,
+          auras: [{ kind: 'destruction_ruin', stacks: 2 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
+    const ready = view.tick(
+      world({
+        resource: 100,
+        auras: [
+          { kind: 'destruction_ruin', stacks: 3 },
+          { kind: 'desolation', stacks: 1 },
+        ],
+      }),
+    ).slots[0];
+    expect(ready.usable).toBe(true);
+    expect(ready.procGlow).toBe(true);
+    expect(ready.ariaDescription).toBe('guide.glossary.procTerm');
+  });
+
+  it('gives Consume and Sentence distinct readiness cues at three Fate Threads', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('drain_life') }),
+        slot(2, { ability: ability('sentence') }),
+        slot(3, { ability: ability('needle_of_fate') }),
+      ),
+      fakeDeps(),
+    );
+
+    const unthreaded = view.tick(world({ fateThreads: 2 }));
+    expect(unthreaded.slots[0].fateConsumeReady).toBe(false);
+    expect(unthreaded.slots[1].fateSentenceReady).toBe(false);
+
+    const ready = view.tick(world({ fateThreads: 3 }));
+    expect(ready.slots[0]).toMatchObject({
+      fateConsumeReady: true,
+      fateSentenceReady: false,
+    });
+    expect(ready.slots[1]).toMatchObject({
+      fateConsumeReady: false,
+      fateSentenceReady: true,
+    });
+    expect(ready.slots[2]).toMatchObject({
+      fateConsumeReady: false,
+      fateSentenceReady: false,
+    });
+  });
+
   it('cooldown sweep is clamped, the countdown shows above one second', () => {
     const view = createActionBarView(
       descriptor(slot(1, { ability: ability('frostbolt', { cooldown: 6 }) })),
@@ -467,6 +529,106 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const near = view.tick(world({ resource: 60, targetPos: { x: 1, y: 1, z: 1 } })).slots[0];
     expect(near.usable).toBe(true);
     expect(near.outOfRange).toBe(false);
+  });
+
+  it('dims a Soul Fragment spender until the required stacks are banked', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('raise_bone_mage', {
+            cost: 20,
+            soulFragmentCost: 2,
+          }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    expect(
+      view.tick(
+        world({
+          resource: 100,
+          auras: [{ kind: 'soul_fragments', stacks: 1 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
+    expect(
+      view.tick(
+        world({
+          resource: 100,
+          auras: [{ kind: 'soul_fragments', stacks: 2 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(true);
+  });
+
+  it('dims primary-Eye abilities until the selected target has the owned primary Eye', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('hour_of_judgment', { requiresTarget: true, range: 30 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+    const targetPos = { x: 5, y: 0, z: 0 };
+
+    expect(view.tick(world({ playerId: 7, targetPos })).slots[0].usable).toBe(false);
+    expect(
+      view.tick(
+        world({
+          playerId: 7,
+          targetPos,
+          targetAuras: [{ kind: 'affliction_eye_secondary', sourceId: 7 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(false);
+    expect(
+      view.tick(
+        world({
+          playerId: 7,
+          targetPos,
+          targetAuras: [{ kind: 'affliction_eye', sourceId: 7 }],
+        }),
+      ).slots[0].usable,
+    ).toBe(true);
+  });
+
+  it('dims duplicate and over-cap Dominion summons without hiding valid composition choices', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('raise_skeletal_warrior', { soulFragmentCost: 1 }),
+        }),
+        slot(2, { ability: ability('raise_bone_mage', { soulFragmentCost: 2 }) }),
+        slot(3, { ability: ability('raise_gravewing', { soulFragmentCost: 1 }) }),
+      ),
+      fakeDeps(),
+    );
+    const base = {
+      playerId: 7,
+      auras: [{ kind: 'soul_fragments' as const, stacks: 5 }],
+    };
+    const oneServant = view.tick(
+      world({
+        ...base,
+        entities: new Map([
+          [1, { ownerId: 7, templateId: 'necromancy_skeletal_warrior' }],
+        ]).values(),
+      }),
+    );
+    expect(oneServant.slots.map((slotState) => slotState.usable)).toEqual([false, true, true]);
+
+    const fullDominion = view.tick(
+      world({
+        ...base,
+        entities: new Map([
+          [1, { ownerId: 7, templateId: 'necromancy_skeletal_warrior' }],
+          [2, { ownerId: 7, templateId: 'necromancy_bone_mage' }],
+        ]).values(),
+      }),
+    );
+    expect(fullDominion.slots.map((slotState) => slotState.usable)).toEqual([false, false, false]);
   });
 
   it('a requiresStealth ability is usable only while the player is stealthed (issue #1890)', () => {
@@ -597,6 +759,43 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     expect(state.slots[1].empowered).toBe(false);
   });
 
+  it('shows the scoped Forbidden Reflection copy as ready over the original cooldown', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('fear', { cooldown: 40, cost: 20 }) }),
+        slot(2, { ability: ability('life_tap', { cooldown: 40 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        cooldowns: new Map([
+          ['fear', 30],
+          ['life_tap', 30],
+        ]),
+        auras: [
+          {
+            kind: 'internal_cd',
+            empowerAbilities: ['fear'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0]).toMatchObject({
+      cooldownRemaining: 0,
+      cooldownPercent: 0,
+      cdText: '',
+      procGlow: true,
+      empowered: true,
+    });
+    expect(state.slots[1]).toMatchObject({
+      cooldownRemaining: 30,
+      procGlow: false,
+      empowered: false,
+    });
+  });
+
   it('glows ONLY the free-proc-scoped abilities, not every button', () => {
     // A Hot Streak / Aether Rush style next_cast_free names its spenders; only
     // those slots may show the gold proc glow (freeCostAuraActive is scoped).
@@ -635,6 +834,21 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
       }),
     );
     expect(building.slots[0].procGlow).toBe(false);
+  });
+
+  it('highlights only the three abilities empowered by Possess the Evil Eye', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, { ability: ability('needle_of_fate', { cost: 30 }) }),
+        slot(2, { ability: ability('drain_life', { cost: 35 }) }),
+        slot(3, { ability: ability('sentence', { cost: 40 }) }),
+        slot(4, { ability: ability('evil_eye', { cost: 25 }) }),
+      ),
+      fakeDeps(),
+    );
+    const state = view.tick(world({ auras: [{ kind: 'affliction_possession' }] }));
+
+    expect(state.slots.map((entry) => entry.empowered)).toEqual([true, true, true, false]);
   });
 
   it('lets unscoped next-cast auras empower every eligible ability slot', () => {
@@ -770,6 +984,50 @@ describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)',
       world({ playerId: 7, targetPos: { x: 4, y: 0, z: 0 }, targetAuras: [] }),
     ).slots;
     expect(cleared.map((entry) => entry.procGlow)).toEqual([false, false, false]);
+  });
+
+  it('keeps a Shadow Credit spell usable when mana covers its discounted cost', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('shadow_bolt', { cost: 40 }) })),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        resource: 25,
+        auras: [
+          {
+            kind: 'next_cast_cheap',
+            value: 0.5,
+            empowerAbilities: ['shadow_bolt'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0].usable).toBe(true);
+    expect(state.slots[0].empowered).toBe(true);
+  });
+
+  it('does not discount abilities outside Shadow Credit scope', () => {
+    const view = createActionBarView(
+      descriptor(slot(1, { ability: ability('needle_of_fate', { cost: 40 }) })),
+      fakeDeps(),
+    );
+    const state = view.tick(
+      world({
+        resource: 25,
+        auras: [
+          {
+            kind: 'next_cast_cheap',
+            value: 0.5,
+            empowerAbilities: ['shadow_bolt'],
+          },
+        ],
+      }),
+    );
+
+    expect(state.slots[0].usable).toBe(false);
+    expect(state.slots[0].empowered).toBe(false);
   });
 
   it('a Battle Trance proc glows and frees exactly the scoped abilities at zero rage', () => {

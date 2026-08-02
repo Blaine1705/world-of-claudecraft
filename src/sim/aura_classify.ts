@@ -34,10 +34,17 @@ export const DEBUFF_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
   'tongues',
   'cost_tax',
   'heal_absorb',
+  'ruinous_brand',
+  'duskfire_claim',
   'critvuln',
   'sated', // shared Bloodlust / Temporal Acceleration exhaustion lockout
   'cauterize_fatigue', // Cauterize's 5 min "already saved you" lockout
   'sun_verdict',
+  'affliction_eye',
+  'affliction_eye_secondary',
+  'affliction_fate_threads',
+  'affliction_violence',
+  'necromancy_harvest_mark',
 ]);
 
 // A negative-value stat aura (e.g. a mob's Withering Wail sapping attack power, or

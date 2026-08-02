@@ -180,6 +180,17 @@ export interface GlobalModEffect {
   // Foul Play: 1 when the caster's own dot ticks never break the caster's own
   // incapacitates (combat/damage.ts CC break).
   foulPlayGuard?: number;
+  // Warlock class-tree hooks. Numeric flags keep the accumulated modifier
+  // shape deterministic and let the combat modules no-op for every other
+  // class/build.
+  warlockBlacktideSpeedPct?: number;
+  warlockLeadenHex?: number;
+  warlockShadowCredit?: number;
+  warlockAshenFocus?: number;
+  warlockUnbrokenRitual?: number;
+  warlockForbiddenReflection?: number;
+  warlockSoulwellWardPct?: number;
+  warlockFiendhideMagicDrPct?: number;
 }
 
 export type ProcTrigger =
@@ -298,6 +309,10 @@ export interface TalentEffect {
   // rather than the generic modifier/proc engine. `values` keeps authored
   // tooltip numbers mechanically auditable; the sim ignores this metadata.
   intrinsic?: { mechanic: string; metrics: Record<string, number> };
+  // Authored values for bespoke module-backed mechanics. Runtime logic reads
+  // the named global hook; tooltip accuracy tests read these numbers so the
+  // hand-written description cannot drift from the implementation.
+  tuning?: Readonly<Record<string, number>>;
 }
 
 export interface SpecDef {
@@ -633,6 +648,14 @@ function zeroGlobal(): Required<GlobalModEffect> {
     secondShadowPct: 0,
     duskEconomyPct: 0,
     foulPlayGuard: 0,
+    warlockBlacktideSpeedPct: 0,
+    warlockLeadenHex: 0,
+    warlockShadowCredit: 0,
+    warlockAshenFocus: 0,
+    warlockUnbrokenRitual: 0,
+    warlockForbiddenReflection: 0,
+    warlockSoulwellWardPct: 0,
+    warlockFiendhideMagicDrPct: 0,
   };
 }
 
@@ -755,6 +778,14 @@ export function accumulateTalentEffect(
     target.secondShadowPct += (source.secondShadowPct ?? 0) * multiplier;
     target.duskEconomyPct += (source.duskEconomyPct ?? 0) * multiplier;
     target.foulPlayGuard += (source.foulPlayGuard ?? 0) * multiplier;
+    target.warlockBlacktideSpeedPct += (source.warlockBlacktideSpeedPct ?? 0) * multiplier;
+    target.warlockLeadenHex += (source.warlockLeadenHex ?? 0) * multiplier;
+    target.warlockShadowCredit += (source.warlockShadowCredit ?? 0) * multiplier;
+    target.warlockAshenFocus += (source.warlockAshenFocus ?? 0) * multiplier;
+    target.warlockUnbrokenRitual += (source.warlockUnbrokenRitual ?? 0) * multiplier;
+    target.warlockForbiddenReflection += (source.warlockForbiddenReflection ?? 0) * multiplier;
+    target.warlockSoulwellWardPct += (source.warlockSoulwellWardPct ?? 0) * multiplier;
+    target.warlockFiendhideMagicDrPct += (source.warlockFiendhideMagicDrPct ?? 0) * multiplier;
   }
   for (const ability of effect.ability ?? []) {
     const target = modifiers.abilities[ability.ability] ?? zeroAbilityMod();

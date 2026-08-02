@@ -2407,6 +2407,7 @@ function itemTranslationsEn(names: readonly string[]) {
     ...itemTranslations(names),
     conjured_water4: { name: 'Conjured Springwater' },
     conjured_bread4: { name: 'Conjured Feastloaf' },
+    soul_stone: { name: 'Soul Stone' },
   };
 }
 

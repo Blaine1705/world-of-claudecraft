@@ -406,7 +406,12 @@ export function equipItem(
   // The all-slots deed reads equipment, so re-check this player's triggers.
   ctx.markDeedsDirty(meta.entityId);
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
-  ctx.emit({ type: 'log', text: `Equipped ${def.name}.`, color: '#8f8', pid: meta.entityId });
+  ctx.emit({
+    type: 'log',
+    text: `Equipped ${def.name}.`,
+    color: '#8f8',
+    pid: meta.entityId,
+  });
 }
 
 // A committed spec is the only state transition that can make an already worn
@@ -540,7 +545,13 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // first sound doesn't land until ~6s in and using the item reads silent.
     // amount:0 + sfxTick:true is sound-only (see consumeHealCue), same
     // convention as the regen tick's own sfx-only ticks.
-    ctx.emit({ type: 'heal', targetId: p.id, amount: 0, source: def.kind, sfxTick: true });
+    ctx.emit({
+      type: 'heal',
+      targetId: p.id,
+      amount: 0,
+      source: def.kind,
+      sfxTick: true,
+    });
     ctx.emit({
       type: 'log',
       text: def.kind === 'food' ? 'You sit down to eat.' : 'You sit down to drink.',
@@ -555,7 +566,7 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     }
     const restoresMana =
       (def.potionMana ?? 0) > 0 && p.resourceType === 'mana' && p.resource < p.maxResource;
-    const restoresHp = (def.potionHp ?? 0) > 0 && p.hp < p.maxHp;
+    const restoresHp = ((def.potionHp ?? 0) > 0 || (def.potionHpPctMax ?? 0) > 0) && p.hp < p.maxHp;
     if (!restoresHp && !restoresMana) {
       ctx.error(
         meta.entityId,
@@ -591,7 +602,8 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     p.potionCdRemaining = POTION_COOLDOWN; // materialized remaining for the action-bar swipe
     let potionHeal = 0;
     if (restoresHp) {
-      potionHeal = Math.min(Math.round(def.potionHp! * ctx.healingTakenMult(p)), p.maxHp - p.hp);
+      const baseHeal = (def.potionHp ?? 0) + p.maxHp * (def.potionHpPctMax ?? 0);
+      potionHeal = Math.min(Math.round(baseHeal * ctx.healingTakenMult(p)), p.maxHp - p.hp);
       p.hp += potionHeal;
     }
     if (restoresMana) {
@@ -601,8 +613,18 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     // the dedicated quaff sound (hud.ts), distinct from a real heal's
     // heal_impact. amount:0 keeps a mana-only potion from spawning a bogus
     // "+0" floating heal number (the FCT/log arms both gate on amount > 0).
-    ctx.emit({ type: 'heal', targetId: p.id, amount: potionHeal, source: 'potion' });
-    ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
+    ctx.emit({
+      type: 'heal',
+      targetId: p.id,
+      amount: potionHeal,
+      source: 'potion',
+    });
+    ctx.emit({
+      type: 'log',
+      text: `You quaff ${def.name}.`,
+      color: '#c9f',
+      pid: meta.entityId,
+    });
   } else if (def.kind === 'elixir') {
     // Battle elixir: grant a temporary stat-buff aura. Usable in combat (classic),
     // no shared potion cooldown; re-quaffing refreshes the buff via applyAura.
@@ -627,7 +649,12 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
       sourceId: p.id,
       school: 'nature',
     });
-    ctx.emit({ type: 'log', text: `You quaff ${def.name}.`, color: '#c9f', pid: meta.entityId });
+    ctx.emit({
+      type: 'log',
+      text: `You quaff ${def.name}.`,
+      color: '#c9f',
+      pid: meta.entityId,
+    });
   } else if (def.kind === 'weapon' || def.kind === 'armor' || def.kind === 'held_offhand') {
     equipItem(ctx, itemId, meta.entityId);
   } else if (def.kind === 'bag') {

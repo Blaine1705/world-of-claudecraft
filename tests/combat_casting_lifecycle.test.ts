@@ -151,6 +151,22 @@ describe('casting_lifecycle: timed cast start -> progress -> finish', () => {
 });
 
 describe('casting_lifecycle: channel start -> tick -> finish', () => {
+  it('starts Consume damage on the first channel update instead of waiting one second', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    const mob = spawnTarget(sim, p);
+    const mobHp0 = mob.hp;
+
+    castAbility(sim.ctx, 'drain_life', p.id);
+    updateCasting(sim.ctx, p, meta);
+
+    expect(p.channelTicksLeft).toBe(2);
+    expect(sim.ctx.pendingProjectiles).toHaveLength(1);
+    for (let tick = 0; tick < 20 && mob.hp === mobHp0; tick++) {
+      advancePendingProjectiles(sim.ctx);
+    }
+    expect(mob.hp).toBeLessThan(mobHp0);
+  });
+
   it('starts a channel (channeling, resource spent at START), ticks drain, then finishes', () => {
     const { sim, p, meta } = makeSim('warlock', 12);
     const mob = spawnTarget(sim, p);
@@ -243,6 +259,26 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
       .drainEvents()
       .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
     expect(stops.some((e: any) => e.success === false)).toBe(true);
+  });
+
+  it('keeps Litany of Woe on the existing projectile channel path', () => {
+    const { sim, p } = makeSim('priest', 20);
+    const mob = spawnTarget(sim, p, 20, 6);
+    sim.drainEvents();
+    castAbility(sim.ctx, 'mind_flay', p.id);
+
+    let events: any[] = [];
+    for (let tick = 0; tick < 25; tick++) events.push(...sim.tick());
+
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'spellfx' &&
+          event.fx === 'projectile' &&
+          event.sourceId === p.id &&
+          event.targetId === mob.id,
+      ),
+    ).toBe(true);
   });
 });
 

@@ -62,6 +62,7 @@ import {
 import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
 import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
 import type { SimContext } from './sim_context';
+import { interactSoulwell } from './soulwell';
 import {
   cloneItemInstancePayload,
   dist2d,
@@ -491,7 +492,10 @@ export function harvestCorpse(
       isSignableMaterialRarity(rarity) &&
       !canHarvestMonsterMaterial(bestAny, monsterMaterialTierFor(y.component))
     ) {
-      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(itemId, qty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
       if (!toolDeniedEmitted) {
         toolDeniedEmitted = true;
@@ -508,13 +512,24 @@ export function harvestCorpse(
       ? HARVEST_COMPONENT_SPECIMENS[y.component]
       : undefined;
     if (specimenId !== undefined) {
-      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(itemId, qty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
-      signedGrants.push({ itemId: specimenId, specimen: true, plainQty: 0, rarity });
+      signedGrants.push({
+        itemId: specimenId,
+        specimen: true,
+        plainQty: 0,
+        rarity,
+      });
     } else if (isSignableMaterialRarity(rarity)) {
       signedGrants.push({ itemId, specimen: false, plainQty: qty, rarity });
     } else {
-      ctx.addItem(itemId, qty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(itemId, qty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
     }
   }
@@ -594,7 +609,10 @@ export function harvestCorpse(
         kind: 'signed',
       });
     } else {
-      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId, { silent: true, callerLogs: true });
+      ctx.addItem(grant.itemId, grant.plainQty, meta.entityId, {
+        silent: true,
+        callerLogs: true,
+      });
       // Recorded 'plain', not 'signed': the ledger reports what LANDED, and
       // this arm landed an unsigned top-up. The gatherDowngrade toast below
       // still tells the player the mark was the thing that got away.
@@ -606,7 +624,12 @@ export function harvestCorpse(
       });
       if (!downgradeEmitted) {
         downgradeEmitted = true;
-        ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'mark' });
+        ctx.emit({
+          type: 'gatherDowngrade',
+          pid: meta.entityId,
+          surface: 'corpse',
+          lost: 'mark',
+        });
       }
     }
   }
@@ -636,7 +659,12 @@ export function harvestCorpse(
       // A truncated specimen contributes NO ledger entry: nothing landed, so
       // no line claims it did. The 'find' toast is the whole feedback.
       downgradeEmitted = true;
-      ctx.emit({ type: 'gatherDowngrade', pid: meta.entityId, surface: 'corpse', lost: 'find' });
+      ctx.emit({
+        type: 'gatherDowngrade',
+        pid: meta.entityId,
+        surface: 'corpse',
+        lost: 'find',
+      });
     }
   }
   // #2457: one result event for the whole command, after every grant has
@@ -729,6 +757,7 @@ export function pickUpObject(
   }
   const objectItemId = obj.objectItemId;
   if (!objectItemId) return false;
+  if (interactSoulwell(ctx, obj, meta.entityId)) return true;
   const beforeCastingAbility = p.castingAbility;
   const beforeChanneling = p.channeling;
   if (tryStartNythraxisWardChannel(ctx, obj, p)) {

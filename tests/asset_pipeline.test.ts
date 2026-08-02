@@ -9,29 +9,328 @@
 // The pipeline modules are plain Node .mjs tools with no type declarations, so
 // each import is a namespace import behind @ts-expect-error (the same convention
 // as tests/backdrop_filter_survival.test.ts importing scripts/*.mjs).
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+// biome-ignore assist/source/organizeImports: glb initializes sharp before @gltf-transform/functions on Windows.
+import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { transformMesh } from '@gltf-transform/functions';
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
+// @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
+import * as cost from '../scripts/asset_pipeline/lib/cost.mjs';
 // @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
 import * as families from '../scripts/asset_pipeline/lib/families.mjs';
 // @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
 import * as glb from '../scripts/asset_pipeline/lib/glb.mjs';
+import { transformMesh } from '@gltf-transform/functions';
 // @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
 import * as integrate from '../scripts/asset_pipeline/lib/integrate.mjs';
 // @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
 import * as jobs from '../scripts/asset_pipeline/lib/job.mjs';
 // @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
+import * as library from '../scripts/asset_pipeline/lib/library.mjs';
+// @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
+import * as preview from '../scripts/asset_pipeline/lib/preview.mjs';
+// @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
 import * as prompts from '../scripts/asset_pipeline/lib/prompts.mjs';
 // @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
+import * as qa from '../scripts/asset_pipeline/lib/qa.mjs';
+// @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
+import * as tripo from '../scripts/asset_pipeline/lib/tripo.mjs';
+// @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
 import * as validate from '../scripts/asset_pipeline/lib/validate.mjs';
+// @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
+import * as wizard from '../scripts/asset_pipeline/lib/wizard.mjs';
+// @ts-expect-error untyped zero-dep pipeline tool (scripts/*.mjs convention)
+import * as wizardStatus from '../scripts/asset_pipeline/wizard_status.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SWORD_GLB = join(ROOT, 'public/models/weapons/sword_a.glb');
 const FOX_GLB = join(ROOT, 'public/models/creatures/fox.glb');
 const BARREL_GLB = join(ROOT, 'public/models/props/barrel.glb');
 const TMP = join(ROOT, 'tmp/asset_pipeline/test');
+
+describe('Tripo task detail requests', () => {
+  it('rejects a hung response within its caller-supplied timeout', async () => {
+    const previousKey = process.env.TRIPO_API_KEY;
+    process.env.TRIPO_API_KEY = 'test-key';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((_url, init: RequestInit | undefined) => {
+        if (!init?.signal) return new Promise(() => undefined);
+        return new Promise((_resolve, reject) => {
+          init.signal?.addEventListener('abort', () => reject(init.signal?.reason), { once: true });
+        });
+      }),
+    );
+    try {
+      const outcome = await Promise.race([
+        tripo.getTask('task_hung', { timeoutMs: 10, maxRetries: 1 }).then(
+          () => 'resolved',
+          (error: Error) => `rejected: ${error.message}`,
+        ),
+        new Promise<string>((resolve) => setTimeout(() => resolve('still pending'), 75)),
+      ]);
+      expect(outcome).toMatch(/^rejected:/);
+    } finally {
+      vi.unstubAllGlobals();
+      if (previousKey === undefined) delete process.env.TRIPO_API_KEY;
+      else process.env.TRIPO_API_KEY = previousKey;
+    }
+  });
+
+  it('does not wait through rate-limit backoff when the caller disables retries', async () => {
+    const previousKey = process.env.TRIPO_API_KEY;
+    process.env.TRIPO_API_KEY = 'test-key';
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        Promise.resolve(
+          new Response(JSON.stringify({ code: 1001, message: 'rate limited' }), {
+            status: 429,
+            headers: { 'Retry-After': '30' },
+          }),
+        ),
+      ),
+    );
+    try {
+      const outcome = await Promise.race([
+        tripo.getTask('task_limited', { timeoutMs: 100, maxRetries: 1 }).then(
+          () => 'resolved',
+          (error: Error) => `rejected: ${error.message}`,
+        ),
+        new Promise<string>((resolve) => setTimeout(() => resolve('still pending'), 75)),
+      ]);
+      expect(outcome).toMatch(/^rejected:/);
+    } finally {
+      vi.unstubAllGlobals();
+      if (previousKey === undefined) delete process.env.TRIPO_API_KEY;
+      else process.env.TRIPO_API_KEY = previousKey;
+    }
+  });
+
+  it('retries a timed-out idempotent task-detail request', async () => {
+    const previousKey = process.env.TRIPO_API_KEY;
+    process.env.TRIPO_API_KEY = 'test-key';
+    vi.useFakeTimers();
+    let calls = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((_url, init: RequestInit | undefined) => {
+        calls += 1;
+        if (calls === 2) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ code: 0, data: { status: 'success' } }), {
+              status: 200,
+            }),
+          );
+        }
+        return new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(init.signal?.reason), {
+            once: true,
+          });
+        });
+      }),
+    );
+    try {
+      const outcomePromise = tripo
+        .getTask('task_transient_timeout', {
+          timeoutMs: 10,
+          maxRetries: 2,
+        })
+        .then(
+          (task: { status: string }) => task.status,
+          (error: Error) => `rejected: ${error.message}`,
+        );
+      await vi.advanceTimersByTimeAsync(1_010);
+      expect(await outcomePromise).toBe('success');
+      expect(calls).toBe(2);
+    } finally {
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+      if (previousKey === undefined) delete process.env.TRIPO_API_KEY;
+      else process.env.TRIPO_API_KEY = previousKey;
+    }
+  });
+
+  it('bounds QA cost lookup to one five-second task-detail attempt', async () => {
+    const previousKey = process.env.TRIPO_API_KEY;
+    process.env.TRIPO_API_KEY = 'test-key';
+    vi.useFakeTimers();
+    const fetchMock = vi.fn((_url, init: RequestInit | undefined) => {
+      return new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener('abort', () => reject(init.signal?.reason), { once: true });
+      });
+    });
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      const resultPromise = cost.jobCost({ tasks: { generate: 'task_unpriced' } });
+      await vi.advanceTimersByTimeAsync(cost.COST_TASK_TIMEOUT_MS);
+      const result = await resultPromise;
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(result.unpriced).toBe(1);
+      expect(result.items[0]).toMatchObject({
+        taskId: 'task_unpriced',
+        credits: null,
+        status: 'unknown',
+      });
+    } finally {
+      vi.useRealTimers();
+      vi.unstubAllGlobals();
+      if (previousKey === undefined) delete process.env.TRIPO_API_KEY;
+      else process.env.TRIPO_API_KEY = previousKey;
+    }
+  });
+
+  it('warns when QA cannot retrieve real task pricing', () => {
+    expect(qa.qaVerdict([{ status: 'pass' }], { unpriced: 1 })).toBe('WARN');
+  });
+});
+
+describe('asset library paths', () => {
+  it('parses skin atlas paths on Windows and POSIX', () => {
+    expect(library.skinAtlasPathParts('textures\\skins\\mage\\base.png')).toEqual({
+      model: 'mage',
+      file: 'base.png',
+    });
+    expect(library.skinAtlasPathParts('textures/skins/mage/alt_void.png')).toEqual({
+      model: 'mage',
+      file: 'alt_void.png',
+    });
+  });
+
+  it('turns an absolute Windows module path into an importable file URL', () => {
+    expect(preview.moduleImportUrl('C:\\repo\\scripts\\browser_path.mjs')).toBe(
+      'file:///C:/repo/scripts/browser_path.mjs',
+    );
+  });
+
+  it('routes held hero previews to the primary cache path on Windows and POSIX', () => {
+    expect(
+      library.heldPreviewCacheDestination(
+        'C:\\tmp\\held_hero.png',
+        'weapon.held.png',
+        'weapon.held_right.png',
+      ),
+    ).toBe('weapon.held.png');
+    expect(
+      library.heldPreviewCacheDestination(
+        '/tmp/held_right.png',
+        'weapon.held.png',
+        'weapon.held_right.png',
+      ),
+    ).toBe('weapon.held_right.png');
+  });
+
+  it('turns the static library page live without requesting a missing favicon', () => {
+    const html = library.liveLibraryHtml(
+      '<html><head></head><body><script>window.__LIVE__ = false;</script></body></html>',
+    );
+    expect(html).toContain('window.__LIVE__ = true;');
+    expect(html).toContain('<link rel="icon" href="data:,">');
+    expect(html).toContain('<script type="module" src="/wizard_ui.js"></script>');
+  });
+
+  it('allows guarded repo assets after normalizing Windows separators', () => {
+    expect(library.repoAssetRequestPath('tmp\\asset_pipeline\\job\\raw.glb')).toBe(
+      'tmp/asset_pipeline/job/raw.glb',
+    );
+    expect(library.repoAssetRequestPath('public\\models\\creatures\\fox.glb')).toBe(
+      'public/models/creatures/fox.glb',
+    );
+    expect(library.repoAssetRequestPath('..\\.env')).toBeNull();
+  });
+
+  it('exposes a generated raw GLB for review before the job is finished', () => {
+    const dir = join(TMP, 'generated_review');
+    rmSync(dir, { recursive: true, force: true });
+    mkdirSync(dir, { recursive: true });
+    const raw = join(dir, 'raw.glb');
+    const finished = join(dir, 'maledict_eye.glb');
+    writeFileSync(raw, 'raw');
+
+    expect(library.generatedJobDisplayGlb(dir, 'maledict_eye')).toBe(raw);
+    writeFileSync(finished, 'finished');
+    expect(library.generatedJobDisplayGlb(dir, 'maledict_eye')).toBe(finished);
+    rmSync(dir, { recursive: true, force: true });
+  });
+});
+
+describe('asset wizard settled status', () => {
+  it('routes an idle failed generation to an error instead of model review', () => {
+    const status = {
+      running: false,
+      steps: { concept: { status: 'failed', error: 'TRIPO_API_KEY is not set' } },
+    };
+
+    expect(wizardStatus.wizardFailureMessage(status)).toContain('TRIPO_API_KEY is not set');
+    expect(wizardStatus.wizardFailureMessage({ ...status, running: true })).toBeNull();
+    expect(
+      wizardStatus.wizardFailureMessage({
+        running: false,
+        steps: { concept: { status: 'done' }, generate: { status: 'done' } },
+      }),
+    ).toBeNull();
+  });
+
+  it('reconstructs a resumable review state without regenerating the model', () => {
+    const state = wizardStatus.wizardResumeState({
+      jobId: 'prop_maledict_eye',
+      exists: true,
+      kind: 'prop',
+      name: 'maledict_eye',
+      wizard: {
+        prompt: 'floating abyssal eye',
+        options: { height: '0.65', rotateY: '0', model: 'lowpoly' },
+      },
+    });
+
+    expect(state).toMatchObject({
+      mode: 'resume',
+      lane: 'prop',
+      name: 'maledict_eye',
+      jobId: 'prop_maledict_eye',
+      prompt: 'floating abyssal eye',
+      options: { height: '0.65', rotateY: '0', model: 'lowpoly' },
+      phase: 'model',
+    });
+  });
+
+  it('keeps required prop options when applying a reviewed job', () => {
+    expect(
+      wizard.applyCommandArgs({
+        lane: 'prop',
+        jobId: 'prop_maledict_eye',
+        name: 'maledict_eye',
+        options: { height: '0.65', rotateY: '0', faceLimit: '2000' },
+      }),
+    ).toEqual([
+      'prop',
+      '--job',
+      'prop_maledict_eye',
+      '--apply',
+      '--name',
+      'maledict_eye',
+      '--face-limit',
+      '2000',
+      '--height',
+      '0.65',
+      '--rotate-y',
+      '0',
+    ]);
+  });
+
+  it('surfaces a failed child process even when no ledger step was written', () => {
+    expect(
+      wizardStatus.wizardProcessFailure({
+        phase: 'apply',
+        exitCode: 1,
+      }),
+    ).toEqual({
+      step: 'apply',
+      error: 'The pipeline process exited with code 1.',
+    });
+    expect(wizardStatus.wizardProcessFailure({ phase: 'apply', exitCode: 0 })).toBeNull();
+  });
+});
 
 // ---------------------------------------------------------------------------
 // 1. Weapon families
@@ -103,6 +402,17 @@ const FIXTURE = [
 ].join('\n');
 
 describe('anchored registry edits', () => {
+  it('formats generated asset credits with the redistribution policy column', () => {
+    expect(
+      integrate.formatCreditsRow({
+        assets: 'Generated creature model + animations (emberkin)',
+        source: 'Project-generated via scripts/asset_pipeline',
+      }),
+    ).toBe(
+      '| Generated creature model + animations (emberkin) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline | Project asset | With the project only |\n',
+    );
+  });
+
   it('findBlockEnd matches the closing bracket and skips nested blocks', () => {
     const src = '{ a: { b: [1, 2] } }';
     expect(integrate.findBlockEnd(src, 0)).toBe(src.length - 1);
@@ -608,10 +918,10 @@ describe('validators calibrated against shipped assets', () => {
 });
 
 // ---------------------------------------------------------------------------
-// 6. normalizeWeapon round-trip (the load-bearing correctness check)
+// 6. Static normalization round-trips (the load-bearing correctness checks)
 // ---------------------------------------------------------------------------
 
-describe('normalizeWeapon round-trip', () => {
+describe('static normalization round-trips', () => {
   afterAll(() => {
     rmSync(TMP, { recursive: true, force: true });
   });
@@ -650,6 +960,24 @@ describe('normalizeWeapon round-trip', () => {
       const centerZ = (min[2] + max[2]) / 2;
       expect(Math.abs(centerX), `centerX ${centerX}`).toBeLessThan(0.01);
       expect(Math.abs(centerZ), `centerZ ${centerZ}`).toBeLessThan(0.01);
+    },
+    60000,
+  );
+
+  it.skipIf(!existsSync(BARREL_GLB))(
+    'downsizes prop textures to the requested game budget',
+    async () => {
+      mkdirSync(TMP, { recursive: true });
+      const outPath = join(TMP, 'normalized_prop.glb');
+
+      await glb.normalizeProp(BARREL_GLB, outPath, { height: 0.9, maxTex: 512 });
+      const report = await glb.inspectGlb(outPath);
+
+      expect(report.textures.length).toBeGreaterThan(0);
+      for (const texture of report.textures) {
+        expect(texture.width, texture.name).toBeLessThanOrEqual(512);
+        expect(texture.height, texture.name).toBeLessThanOrEqual(512);
+      }
     },
     60000,
   );

@@ -5313,7 +5313,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Vyvolá Žhavorozeného pod velením černokněžníka. Žhavorozený vrhá na nepřátele z dálky popelavé šípy. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona.',
   'entities.abilities.summon_imp.name': 'Vyvolat Žhavorozeného',
   'entities.abilities.summon_infernal.description':
-    'Spoutá Žárového kolosa do tvé vůle, mohutného juggernauta s drtivým bojem na blízko a nejhlubším zdravím i zbrojí ze všech démonů. Jeho syrovou sílu omezuje dlouhý cooldown. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona.',
+    'Přivolá Žárového kolosa do cílové oblasti a při dopadu způsobí 58-72 bodů ohnivého poškození. Bojuje 30 s, aniž by nahradil tvého démona, každé 2 s spaluje okolní nepřátele a každou sekundu vytváří 1 bod Zkázy.',
   'entities.abilities.summon_infernal.name': 'Vyvolat Žárového kolosa',
   'entities.abilities.summon_succubus.description':
     'Vyvolá Zrozence soumraku pod velením černokněžníka. Zrozenec soumraku je křehký démon, který rychle útočí a tvrdě zasahuje na blízko. Vyvolání nového démona propustí toho současného. Můžeš mít vždy jen jednoho démona.',

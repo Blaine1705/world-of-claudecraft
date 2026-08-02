@@ -3109,7 +3109,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Karabüyücünün komutası altında bir Emberkin çağırır. Emberkin, düşmanlarına uzaktan Kül Okları fırlatır. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',
   'entities.abilities.summon_imp.name': 'Emberkin Çağırma',
   'entities.abilities.summon_infernal.description':
-    "Bir Pyre Colossus'u iradene bağlar: ezici yakın dövüşe ve herhangi bir iblisin en derin canına ve zırhına sahip hantal bir devasa güç. Uzun bir bekleme süresi ham gücünü dizginler. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.",
+    "Hedef alana bir Pyre Colossus indirerek çarpma anında 58-72 Ateş hasarı verir. İblisinin yerini almadan 30 sn. savaşır, yakındaki düşmanları 2 sn.'de bir yakar ve her saniye 1 Ruin üretir.",
   'entities.abilities.summon_infernal.name': 'Pyre Colossus Çağırma',
   'entities.abilities.summon_succubus.description':
     'Karabüyücünün komutası altında bir Duskborn çağırır. Duskborn, yakın dövüşte hızla vuran ve sert darbeler indiren kırılgan bir iblistir. Yeni bir iblis çağırmak mevcut olanı gönderir. Bir seferde yalnızca bir iblisin olabilir.',

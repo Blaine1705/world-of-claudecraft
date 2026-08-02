@@ -193,8 +193,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 834,
-      "state": "f5ab005d",
-      "events": "0239e514",
+      "state": "1ec22456",
+      "events": "6527aeaa",
       "rng": {
         "draws": 682,
         "digest": "91ea2bd6"
@@ -204,7 +204,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 834,
-      "state": "859f80ae",
+      "state": "42b06509",
       "events": "5d3372df",
       "rng": {
         "draws": 888,
@@ -215,8 +215,8 @@
       "tick": 160,
       "time": 8,
       "nextId": 834,
-      "state": "28fbb6b2",
-      "events": "4733734f",
+      "state": "7192c853",
+      "events": "242ec2c1",
       "rng": {
         "draws": 1140,
         "digest": "033c778f"
@@ -226,7 +226,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 834,
-      "state": "2f111fd2",
+      "state": "a0f8290d",
       "events": "4f3d2e33",
       "rng": {
         "draws": 1406,
@@ -237,8 +237,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 834,
-      "state": "22bf432f",
-      "events": "b8801a10",
+      "state": "3b6aaad2",
+      "events": "3d0abc0e",
       "rng": {
         "draws": 1672,
         "digest": "d81d57ba"
@@ -248,7 +248,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 834,
-      "state": "a0b0b6fa",
+      "state": "7eb40809",
       "events": "c2141616",
       "rng": {
         "draws": 1844,
@@ -259,7 +259,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 834,
-      "state": "5ca1b154",
+      "state": "9c5813e5",
       "events": "741638a5",
       "rng": {
         "draws": 1844,
@@ -424,6 +424,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 827,
+          "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 10,
@@ -518,8 +519,8 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 834,
-      "state": "d1a01197",
-      "events": "37ec2c62",
+      "state": "baae88f6",
+      "events": "e8801df0",
       "rng": {
         "draws": 1889,
         "digest": "a2f00d54"
@@ -684,6 +685,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 827,
+          "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 9.8,

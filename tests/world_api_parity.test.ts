@@ -174,9 +174,12 @@ export const IWORLD_MEMBERS = [
   { name: 'revivePet', kind: 'method' },
   { name: 'petAttack', kind: 'method' },
   { name: 'petWaterJet', kind: 'method' },
+  { name: 'petSpecialCommandsSupported', kind: 'data' },
+  { name: 'petSpecial', kind: 'method' },
   { name: 'petTaunt', kind: 'method' },
   { name: 'setPetAutoTaunt', kind: 'method' },
   { name: 'setPetAutoWaterJet', kind: 'method' },
+  { name: 'setPetAutoSpecial', kind: 'method' },
   { name: 'feedPet', kind: 'method' },
   { name: 'healPet', kind: 'method' },
   { name: 'setPetMode', kind: 'method' },
@@ -499,12 +502,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // activeMasterLootRolls, leaving 274; the rift floor timer HUD adds
     // riftEventMsRemaining and the instance-payload pipes add marketListInstance,
     // leaving 276; reactive aura timing adds reactiveAbilityWindowRemaining and
-    // third-person camera collision removes riftCollisionToken, leaving 276. The
-    // class wave's Paladin Consecration ground-state and priest marker
-    // projections leave 278.
-    expect(IWORLD_MEMBERS.length).toBe(278);
+    // third-person camera collision removes riftCollisionToken, leaving 276.
+    // Composed from that 276/71/205 base: the class wave's Paladin Consecration
+    // ground-state and priest marker projections add two DATA members (71 -> 73),
+    // and the controlled Warlock pet's signature-skill command plus autocast
+    // toggle add two METHOD members (205 -> 207), so IWORLD is 276 + 2 + 2 = 280.
+    expect(IWORLD_MEMBERS.length).toBe(280);
     expect(DATA_MEMBERS.length).toBe(73);
-    expect(METHOD_MEMBERS.length).toBe(205);
+    expect(METHOD_MEMBERS.length).toBe(207);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -700,6 +705,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
+      'petSpecialCommandsSupported',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -745,6 +752,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setDungeonDifficulty',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
@@ -850,6 +858,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'moveInput',
       'partyInfo',
+      'petSpecialCommandsSupported',
       'player',
       'playerId',
       'prestigeRank',
@@ -1009,6 +1018,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'partyLeave',
       'partyPromote',
       'petAttack',
+      'petSpecial',
       'petTaunt',
       'petWaterJet',
       'pickUpObject',
@@ -1043,6 +1053,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setDungeonDifficulty',
       'setMarker',
       'setPartyLootMaster',
+      'setPetAutoSpecial',
       'setPetAutoTaunt',
       'setPetAutoWaterJet',
       'setPetMode',
@@ -1295,10 +1306,13 @@ const FACET_PET = [
   'renamePet',
   'revivePet',
   'petAttack',
+  'petSpecialCommandsSupported',
+  'petSpecial',
   'petWaterJet',
   'petTaunt',
   'setPetAutoTaunt',
   'setPetAutoWaterJet',
+  'setPetAutoSpecial',
   'feedPet',
   'healPet',
   'setPetMode',
@@ -1623,8 +1637,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(276);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(276);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(278);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(278);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

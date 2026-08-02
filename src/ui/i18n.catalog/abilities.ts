@@ -29,6 +29,7 @@ const abilityStringsEn = {
     tooltip: {
       rank: 'Rank {rank}',
       cost: '{cost} {resource}',
+      ruinCost: '{cost} Ruin',
       range: '{range} yd range',
       rangeWithMin: '{min}-{max} yd range',
       instant: 'Instant',
@@ -618,7 +619,7 @@ const classAbilityNamesEn = {
       [
         'rain_of_fire',
         'Rain of Fire',
-        'Calls a rain of fire onto the target area for 4 sec, burning enemies for {damage} Fire damage each second.',
+        'Spends 3 Ruin to rain fire over the target area for {damage} Fire damage each second for 4 sec, increasing to 6 sec at rank 2. Desolation calls down the first wave immediately.',
       ],
       [
         'volley',
@@ -1471,7 +1472,32 @@ const classAbilityNamesEn = {
         'Blackrot',
         'Corrupts the target, causing {damage} Shadow damage over 18 sec.',
       ],
+      [
+        'evil_eye',
+        'Evil Eye',
+        'Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry.',
+      ],
+      [
+        'maledict_gaze',
+        'Maledict Gaze',
+        'Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed.',
+      ],
+      [
+        'needle_of_fate',
+        'Needle of Fate',
+        'Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target.',
+      ],
+      [
+        'sentence',
+        'Sentence',
+        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation.',
+      ],
       ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
+      [
+        'cursed_accomplice',
+        'Cursed Accomplice',
+        'Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec.',
+      ],
       [
         'curse_of_agony',
         'Hex of Anguish',
@@ -1480,7 +1506,57 @@ const classAbilityNamesEn = {
       [
         'drain_life',
         'Consume',
-        "Drains the target's life, transferring {damage} health to you each second for 5 sec.",
+        "Consumes the target's vitality, dealing {damage} Shadow damage each second and transferring 70% of it as health. Affliction transfers all of it instead. When channeled on your primary Evil Eye, it consumes all Fate Threads at the start, and each Thread generates 1 extra Condemnation per tick.",
+      ],
+      [
+        'litany_of_guilt',
+        'Litany of Guilt',
+        'Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies.',
+      ],
+      [
+        'cinderhide',
+        'Cinderhide',
+        'Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%.',
+      ],
+      [
+        'umbral_anchor',
+        'Umbral Anchor',
+        'First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown.',
+      ],
+      [
+        'soulwell',
+        'Soulwell',
+        'Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown.',
+      ],
+      [
+        'hex_of_violence',
+        'Hex of Violence',
+        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 22 Shadow damage.',
+      ],
+      [
+        'cruel_pact',
+        'Cruel Pact',
+        'Sacrifices 12% of your maximum health to restore 15% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+      ],
+      [
+        'vicarious_suffering',
+        'Vicarious Suffering',
+        'Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health.',
+      ],
+      [
+        'possess_evil_eye',
+        'Possess the Evil Eye',
+        'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage.',
+      ],
+      [
+        'hour_of_judgment',
+        'Hour of Judgment',
+        'Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation.',
+      ],
+      [
+        'coven',
+        'Coven',
+        'Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage.',
       ],
       [
         'fear',
@@ -1495,7 +1571,12 @@ const classAbilityNamesEn = {
       [
         'shadowburn',
         'Duskfire',
-        'Instantly blasts the target with searing shadow for {damage} Shadow damage.',
+        'Spends 1 Ruin to execute an enemy below 20% health for {damage} Shadow damage. Refunds its Ruin if the claimed target dies within 5 sec.',
+      ],
+      [
+        'ruinous_brand',
+        'Ruinous Brand',
+        'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target.',
       ],
       [
         'wrath',
@@ -1725,9 +1806,79 @@ const classAbilityNamesEn = {
         "Heal a friendly target for {damage}. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health.",
       ],
       [
+        'soul_harvest',
+        'Essence Reap',
+        'Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5.',
+      ],
+      [
+        'soul_lance',
+        'Soul Lance',
+        'Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark.',
+      ],
+      [
+        'raise_graveguard',
+        'Raise Graveguard',
+        'Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec.',
+      ],
+      [
+        'raise_skeletal_warrior',
+        'Raise Skeletal Warrior',
+        'Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec.',
+      ],
+      [
+        'raise_bone_mage',
+        'Raise Bone Mage',
+        'Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%.',
+      ],
+      [
+        'bone_armor',
+        'Bone Armor',
+        'Wraps you in bone, absorbing damage equal to 20% of your maximum health.',
+      ],
+      [
+        'corpse_explosion',
+        'Corpse Explosion',
+        'Spends 2 Soul Fragments to rupture death energy at the chosen location, dealing {damage} Shadow damage to nearby enemies.',
+      ],
+      [
+        'funeral_harvest',
+        'Funeral Harvest',
+        'When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec.',
+      ],
+      [
+        'ossuary_mark',
+        'Ossuary Mark',
+        'Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment.',
+      ],
+      [
+        'unholy_command',
+        'Unholy Command',
+        'Commands all of your undead to deal 25% more damage and act 20% faster for 12 sec.',
+      ],
+      [
+        'reaping_command',
+        'Reaping Command',
+        'Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit.',
+      ],
+      [
+        'sacrifice_undead',
+        'Sacrifice Undead',
+        'Destroys one Dominion servant to restore 25% of your maximum health.',
+      ],
+      [
+        'raise_gravewing',
+        'Raise Gravewing',
+        'Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec.',
+      ],
+      [
+        'army_of_the_dead',
+        'Army of the Dead',
+        'Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes.',
+      ],
+      [
         'metamorphosis',
-        'Dread Aspect',
-        'Transform into a monstrous demon for 20 sec, increasing your spell damage by 20% and casting speed by 20%. Your demon gains 50% damage and 20% casting speed. (Demonology signature)',
+        'Lich Form',
+        'Become a Lich for 20 sec, creating 3 Soul Fragments and increasing your spell damage and casting speed by 20%. Your undead deal 50% more damage and act 20% faster, and Soul Lance pierces through its target to strike up to 2 nearby enemies for 50% of its damage. (Necromancy signature)',
       ],
       [
         'holy_shock',
@@ -1812,7 +1963,7 @@ const classAbilityNamesEn = {
       [
         'conflagrate',
         'Conflagrate',
-        'Consumes your Burning Pact on the enemy to ignite them for {damage} Fire damage. (Destruction signature)',
+        'Advances one future tick of your Burning Pact, then ignites the target for {damage} Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)',
       ],
       [
         'moonkin_form',
@@ -1857,12 +2008,12 @@ const classAbilityNamesEn = {
       [
         'summon_imp',
         'Summon Emberkin',
-        'Summons an Emberkin under the command of the Warlock. The Emberkin hurls Ashbolts at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+        'Summons an Emberkin under the command of the Warlock. The Emberkin casts Felbolt at your enemies from afar. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
       [
         'summon_voidwalker',
         'Summon Gloomshade',
-        'Summons a Gloomshade under the command of the Warlock. The Gloomshade is a sturdy demon that taunts your enemies and soaks up punishment. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+        'Summons a Gloomshade under the command of the Warlock. This sturdy demon taunts enemies and uses Abyssal Chain to drag distant normal enemies back into reach. Bosses cannot be pulled. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
       [
         'summon_succubus',
@@ -1882,7 +2033,7 @@ const classAbilityNamesEn = {
       [
         'summon_infernal',
         'Summon Pyre Colossus',
-        'Binds a Pyre Colossus to your will — a hulking juggernaut with crushing melee and the deepest health and armor of any demon. A long cooldown gates its raw power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+        'Calls a Pyre Colossus down at the target area, dealing 58-72 Fire damage on impact. It fights for 30 sec without replacing your demon, burns nearby enemies every 2 sec, and generates 1 Ruin every 1 sec.',
       ],
       [
         'summon_doomguard',
@@ -2067,9 +2218,19 @@ const classAbilityNamesEn = {
         'Strike up to 3 enemies within 10 yards for {damage} Nature damage each. Thundercall: a hit grants 1 Thunder. Damage increases with Spell Power.',
       ],
       [
+        'abyssal_rift',
+        'Abyssal Rift',
+        'Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun.',
+      ],
+      [
         'chaos_bolt',
         'Ruinbolt',
-        'Hurls a bolt of chaotic fire for {damage} Fire damage. (Warlock talent)',
+        'Spends 3 Ruin to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%.',
+      ],
+      [
+        'dark_pact',
+        'Sanguine Covenant',
+        'Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec.',
       ],
       [
         'cloak_of_shadows',
@@ -2296,6 +2457,11 @@ const classAbilityNamesEn = {
         'Vanish into a cloud of smoke, increasing your chance to dodge by 30% for 8 sec.',
       ],
       [
+        'sacrilegious_march',
+        'Sacrilegious March',
+        'Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health.',
+      ],
+      [
         'spellsteal',
         'Spellsteal',
         'Steals a beneficial magic effect from an enemy, transferring it to yourself.',
@@ -2312,8 +2478,8 @@ const classAbilityNamesEn = {
       ],
       [
         'spell_lock',
-        'Gag Order',
-        'Silences the target mid-cast and prevents casting from that school for 5 sec.',
+        'Abyssal Gag',
+        'Interrupts enemy spellcasting and prevents casting from that school for 4 sec.',
       ],
       [
         'thieves_chorus',
