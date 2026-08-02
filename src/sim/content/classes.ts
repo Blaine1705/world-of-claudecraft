@@ -4503,7 +4503,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraStacks: 20,
     effects: [{ type: 'afflictionSentence' }],
     description:
-      'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation.',
+      'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
   },
   cursed_accomplice: {
     id: 'cursed_accomplice',
@@ -4603,7 +4603,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     projectile: false,
     effects: [{ type: 'afflictionPossession', duration: 15, doom: 35 }],
     description:
-      'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage.',
+      'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
   },
   hour_of_judgment: {
     id: 'hour_of_judgment',
@@ -5010,7 +5010,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    excludeSpecs: ['destruction'],
+    excludeSpecs: ['affliction', 'demonology', 'destruction'],
     effects: [{ type: 'directDamage', min: 30, max: 38 }],
     description: 'Sears the enemy with agonizing fire for $d Fire damage. Quick to cast.',
   },
@@ -5276,14 +5276,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 11,
     cost: 30,
     castTime: 0,
-    cooldown: 0,
+    cooldown: 8,
     range: 30,
     school: 'shadow',
     requiresTarget: false,
     targetMode: 'position',
     effects: [{ type: 'aoeDamage', min: 48, max: 60, radius: 8, canCrit: true }],
     description:
-      'Consumes a nearby Death Echo to rupture its lingering soul at the chosen location, dealing $d Shadow damage to nearby enemies.',
+      'Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal $d Shadow damage at the chosen location.',
   },
   funeral_harvest: {
     id: 'funeral_harvest',
@@ -5334,6 +5334,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['demonology'],
     learnLevel: 13,
     cost: 40,
+    soulFragmentCost: 3,
     castTime: 0,
     cooldown: 45,
     range: 0,
@@ -5341,7 +5342,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'commandUndead', duration: 12, dmgPct: 0.25, hastePct: 0.2 }],
     description:
-      'Commands all of your undead to deal 25% more damage and act 20% faster for 12 sec.',
+      'Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec.',
   },
   reaping_command: {
     id: 'reaping_command',
@@ -5413,7 +5414,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'armyOfDead', duration: 20 }],
     description:
-      'Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes.',
+      'Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec in addition to your chosen Dominion servants.',
   },
 
   // ====================== DRUID ======================

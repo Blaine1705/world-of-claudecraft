@@ -1793,7 +1793,7 @@ export const zh_TW: EnTranslations = {
       "cooldownCap": "此時間窗已使用 {used}/{cap} 秒冷卻縮減",
       "funeralHarvestLock": "葬禮收割暫時無法再次產生靈魂碎片",
       "leadenHexLock": "鉛沉妖術暫時無法再次定身此目標",
-      "forbiddenReflectionReady": "下一個符合條件的術士共用冷卻技能可再次施放",
+      "forbiddenReflectionReady": "下一個符合條件的術士冷卻技能可再次施放",
       "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
       "internalCooldown": "計時結束前此效果無法再次觸發",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
@@ -1902,9 +1902,9 @@ export const zh_TW: EnTranslations = {
       "afflictionLitany": "獲得定罪值時，對 {radius} 碼內最多 {targets} 個敵人造成 {damage} 點暗影傷害，每秒最多一次",
       "afflictionFateThreads": "{stacks} 層命運絲線：宣判傷害提高 {sentencePct}%，或使汲取生命每次額外產生 {doom} 點定罪值",
       "afflictionConsumeThreads": "汲取生命正在消耗 {stacks} 層命運絲線，每次額外產生 {doom} 點定罪值",
-      "necromancyHarvestMark": "目標死亡時可產生 1 個靈魂碎片，並留下可供屍體爆炸使用的死亡迴響",
+      "necromancyHarvestMark": "目標死亡時可產生 1 個靈魂碎片",
       "necromancyOssuaryMark": "儲存你和不死僕從造成傷害的 {storedPct}%，並額外儲存靈魂長槍傷害的 {lancePct}%；再次施放引爆。目標死亡時在 {radius} 碼內爆炸並產生 1 個靈魂碎片",
-      "necromancyDeathEcho": "屍體爆炸可消耗瞄準點 {radius} 碼內的此迴響",
+      "necromancyDeathEcho": "舊版本遺留的死亡迴響；目前沒有技能會消耗它",
       "warlockAnchor": "在 {range} 碼內再次施放可返回此處並消耗錨點",
       "formMetamorph": "惡魔形態：體型增大 {pct}%；其他加成由獨立增益提供",
       "energyRegen": "能量恢復速度提高 {pct}%",
@@ -7824,7 +7824,7 @@ export const zh_TW: EnTranslations = {
       },
       "sentence": {
         "name": "裁決",
-        "description": "消耗全部譴罪裁決敵人。傷害與附加效果會在20、50、80和100點譴罪時提升。"
+        "description": "消耗全部譴罪與命運絲線裁決敵人。每條絲線使傷害提高6%，附加效果會在20、50、80和100點譴罪時提升。16級後傷害成長趨於平緩。"
       },
       "life_tap": {
         "name": "苛刻交易",
@@ -7872,7 +7872,7 @@ export const zh_TW: EnTranslations = {
       },
       "possess_evil_eye": {
         "name": "附身邪眼",
-        "description": "咒術者附身你的主要邪眼15秒，並產生35點譴罪。命運之針施法時間變為1秒並額外產生2點譴罪；吞噬可在移動中引導；裁決造成的傷害提高25%，並在延遲後追加60%的傷害。"
+        "description": "咒術者附身你的主要邪眼15秒，並產生35點譴罪。命運之針施法時間變為1秒並額外產生2點譴罪；吞噬可在移動中引導；裁決造成的傷害提高25%。延遲迴響造成60%的傷害，並在17至20級間逐步降至30%。"
       },
       "hour_of_judgment": {
         "name": "審判時刻",
@@ -8068,7 +8068,7 @@ export const zh_TW: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "屍骸爆裂",
-        "description": "消耗 2 枚靈魂碎片，在目標地點引爆死亡能量，對附近敵人造成 {damage} 點暗影傷害。"
+        "description": "優先犧牲骸骨法師，其次是骷髏戰士，只有在別無選擇時才犧牲墓翼。同類僕從中先選擇剩餘持續時間最短者，再選擇最虛弱者，對目標地點的敵人造成 {damage} 點暗影傷害。"
       },
       "funeral_harvest": {
         "name": "葬魂收割",
@@ -8080,7 +8080,7 @@ export const zh_TW: EnTranslations = {
       },
       "unholy_command": {
         "name": "邪穢號令",
-        "description": "號令所有亡靈，使其傷害提高 25%、行動速度提高 20%，持續 12 秒。"
+        "description": "消耗 3 枚靈魂碎片號令所有亡靈，使其傷害提高 25%、行動速度提高 20%，持續 12 秒。"
       },
       "reaping_command": {
         "name": "收割號令",
@@ -8096,7 +8096,7 @@ export const zh_TW: EnTranslations = {
       },
       "army_of_the_dead": {
         "name": "亡者軍團",
-        "description": "開啟一座持續20秒的墓穴傳送門，暫時喚醒尚未為你效命的所有統御原型。傳送門關閉後，你選擇的僕從仍會留下。"
+        "description": "開啟墓穴傳送門，在你選擇的統御僕從之外額外召喚一名骷髏戰士、骸骨法師和墓翼，持續 20 秒。"
       },
       "metamorphosis": {
         "name": "惡魔變形",

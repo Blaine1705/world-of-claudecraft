@@ -28,7 +28,6 @@ export const SENTENCE_THREAT_MULT = 0.35;
 const POSSESSED_NEEDLE_CAST_TIME = 1;
 const POSSESSED_NEEDLE_DOOM_BONUS = 2;
 const POSSESSED_SENTENCE_ECHO_DELAY = 0.75;
-const POSSESSED_SENTENCE_ECHO_MULT = 0.6;
 const POSSESSED_SENTENCE_DAMAGE_MULT = 1.25;
 export const JUDGMENT_SENTENCE_DAMAGE_MULT = 1.2;
 const POSSESSED_SENTENCE_ECHO_ID = 'possess_evil_eye_sentence_echo';
@@ -674,6 +673,18 @@ export function sentenceBaseDamage(doom: number): number {
   return Math.round(750 + ((doom - 80) / 20) * 350);
 }
 
+function endgameCompressionProgress(level: number): number {
+  return Math.max(0, Math.min(4, Math.floor(level) - 16)) / 4;
+}
+
+export function sentenceEndgameDamageMultiplier(level: number): number {
+  return Math.round((1 - endgameCompressionProgress(level) * 0.2) * 1000) / 1000;
+}
+
+export function possessedSentenceEchoMultiplier(level: number): number {
+  return Math.round((0.6 - endgameCompressionProgress(level) * 0.3) * 1000) / 1000;
+}
+
 export function resolveSentence(
   ctx: SimContext,
   warlock: Entity,
@@ -694,13 +705,14 @@ export function resolveSentence(
   const levelScale = Math.max(0.25, Math.min(1, warlock.level / 20));
   const threadDamageMult = 1 + threadCount * FATE_THREAD_SENTENCE_DAMAGE_PER_STACK;
   const sharedDamage = Math.round(
-    sentenceBaseDamage(doom) *
+    (sentenceBaseDamage(doom) *
       levelScale *
       damageMult *
       threadDamageMult *
       (possessed ? POSSESSED_SENTENCE_DAMAGE_MULT : 1) *
       (judgment ? JUDGMENT_SENTENCE_DAMAGE_MULT : 1) +
-      flat,
+      flat) *
+      sentenceEndgameDamageMultiplier(warlock.level),
   );
   if (judgment && (judgment.charges ?? 0) > 0) {
     judgment.charges = Math.max(0, (judgment.charges ?? 0) - 1);
@@ -751,7 +763,7 @@ export function resolveSentence(
       kind: 'dot',
       remaining: POSSESSED_SENTENCE_ECHO_DELAY,
       duration: POSSESSED_SENTENCE_ECHO_DELAY,
-      value: Math.max(1, Math.round(dealt * POSSESSED_SENTENCE_ECHO_MULT)),
+      value: Math.max(1, Math.round(dealt * possessedSentenceEchoMultiplier(warlock.level))),
       tickInterval: POSSESSED_SENTENCE_ECHO_DELAY,
       tickTimer: POSSESSED_SENTENCE_ECHO_DELAY,
       sourceId: warlock.id,

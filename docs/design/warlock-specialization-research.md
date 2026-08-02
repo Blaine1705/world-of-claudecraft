@@ -251,8 +251,8 @@ magic should alter the battlefield.
   Reaping Command.
 - Warrior, Bone Mage, and Gravewing are persistent, unique Dominion choices with two
   available slots. Their ability tooltips state their passive and Reaping benefits.
-- Army of the Dead temporarily fills only the missing Dominion archetypes through a
-  shared level-20 grave portal; the chosen servants remain when it closes.
+- Army of the Dead always raises a temporary Warrior, Bone Mage, and Gravewing through
+  one grave portal; the chosen Dominion servants remain when it closes.
 - Death and conversion: Funeral Harvest and Sacrifice Undead.
 - Defense and signature window: Bone Armor and Lich Form.
 
@@ -269,33 +269,36 @@ creates different timing outcomes.
 | Bounded army choice | Complete | Two persistent Dominion slots chosen from Warrior, Mage, and Gravewing |
 | Direct command | Complete | Reaping Command and Unholy Command |
 | Owner-cast damage loop | Complete | Essence Reap, Soul Lance, and Ossuary Mark |
-| Death payoff | Complete | Eligible marked deaths leave a capped, 15-second Death Echo |
-| Corpse geography | Complete | Corpse Explosion consumes a nearby Death Echo at the selected location |
+| Death payoff | Complete | Funeral Harvest and Ossuary Mark deaths create Soul Fragments |
+| Corpse geography | Complete | Corpse Explosion converts a chosen Dominion servant into damage at the selected location |
 | Meaningful army composition | Complete | Reaping Command grants role-specific taunt, defense, slow, vulnerability, and cleave riders |
-| Minion conversion | Partial | Sacrifice Undead only converts a body into health |
+| Minion conversion | Complete | Sacrifice Undead converts a servant into health, while Corpse Explosion converts one into aimed area damage |
 | Transformation | Complete | Lich Form makes Soul Lance pierce up to two nearby enemies for 50% of landed damage |
 | Necromancer-specific control | Intentionally light | Generic Harrow and Abyssal Gag cover class control |
 
 #### Necromancy findings and follow-through
 
-##### Priority 0 (implemented): a spatial death resource
+##### Priority 0 (implemented): servant conversion at a selected point
 
-The largest fantasy and gameplay mismatch is Corpse Explosion. It has the name and
-visual promise of using a corpse, but mechanically spends two portable Soul Fragments
-at an arbitrary location.
+The first Corpse Explosion prototype used short-lived Death Echoes left by enemy deaths.
+Playtesting exposed two problems: the level-11 spell arrived before its level-12 echo
+generators, and boss usability depended on maintaining an extra spatial resource.
 
-The recommended direction is a capped **Death Echo** ground state rather than persistent
-physical corpse entities:
+The implemented direction converts the army itself while preserving ground targeting:
 
-- Eligible enemy deaths leave a short-lived echo at the death position.
-- Only a small number can exist per Necromancer.
-- Corpse Explosion consumes an echo at or near the selected location.
-- Soul Fragments remain the reliable economy for summons and commands.
-- Boss encounters can generate echoes through Essence Reap or marked damage so the
-  spec never depends on adds.
+- The player selects any valid point within range.
+- Corpse Explosion chooses Bone Mage first, Skeletal Warrior second, and Gravewing only
+  as a last resort.
+- Duplicates of one archetype are ordered by remaining duration, health percentage, and
+  entity ID so temporary servants and deterministic ties remain predictable.
+- Graveguard remains excluded from both damage conversion and Dominion composition.
+- The resulting open slot can be filled by any unique missing archetype. The player is
+  not forced to resummon the sacrificed archetype.
+- Soul Fragments remain the economy for summons and Reaping Command.
 
-This adds positioning and death-chain gameplay without an unlimited entity or network
-cost. It also gives Corpse Explosion an honest name.
+This keeps the positioning decision, makes army composition a consumable choice, and
+works consistently on bosses without adding corpse entities or another persistent world
+resource.
 
 ##### Priority 0 (implemented): composition-dependent command outcomes
 
@@ -317,7 +320,7 @@ Those numbers create power, but the player performs the same actions.
 
 During Lich Form, one or two existing verbs should change in a clearly visible way.
 Examples include a piercing Soul Lance, an Essence Reap which tears through several
-targets, or a Reaping Command which leaves a death echo. The form should not replace
+targets, or a stronger servant conversion. The form should not replace
 the full action bar, but it should be recognizable from play as well as from the model.
 
 ##### Priority 1 (implemented): remove resummon maintenance
@@ -325,7 +328,7 @@ the full action bar, but it should be recognizable from play as well as from the
 Warrior, Bone Mage, and Gravewing now persist without upkeep timers. Dominion has two
 slots and permits only one of each archetype, so the player chooses a composition
 instead of cycling every summon button. Army of the Dead preserves that composition
-and temporarily fills only what is missing.
+and always adds one complete temporary wave.
 
 ##### Priority 2: broaden sacrifice through talents
 
@@ -336,10 +339,10 @@ and death layers are sound, not a reason to add more baseline buttons.
 
 #### Necromancy recommendation
 
-The Death Echo seam, composition-dependent Reaping Command, transformative Lich Form,
-and persistent two-slot Dominion are now implemented. The remaining baseline question
-is play feel: test deliberate composition changes and Sacrifice Undead before deciding
-whether broader sacrifice conversions belong in the specialization talent tree.
+Ground-targeted servant conversion, composition-dependent Reaping Command,
+transformative Lich Form, and persistent two-slot Dominion are now implemented. The
+remaining baseline question is play feel: test deliberate composition changes before
+deciding whether broader sacrifice conversions belong in the specialization talent tree.
 
 ### Affliction
 

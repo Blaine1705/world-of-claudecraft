@@ -818,19 +818,28 @@ export function setPetMode(ctx: SimContext, mode: PetMode, pid?: number): void {
   }
   if (petCommandBlockedByControl(ctx, r.e)) return;
   r.meta.lastActiveTick = ctx.tickCount; // commanding the pet is a deliberate action
-  const pet = petOf(ctx, r.e.id, true);
-  if (!pet) {
+  const pets = combatCommandPetsOf(ctx, r.e.id);
+  const deadPrimary = petOf(ctx, r.e.id, true);
+  if (deadPrimary && !pets.some((pet) => pet.id === deadPrimary.id)) pets.push(deadPrimary);
+  if (pets.length === 0) {
     ctx.error(r.e.id, noPetError(r.e));
     return;
   }
-  pet.petMode = mode;
-  if (mode === 'passive') {
-    pet.aggroTargetId = null;
-    pet.inCombat = false;
-    pet.autoAttack = false;
-    pet.petManualTauntPending = false;
+  for (const pet of pets) {
+    pet.petMode = mode;
+    if (mode === 'passive') {
+      pet.aggroTargetId = null;
+      pet.inCombat = false;
+      pet.autoAttack = false;
+      pet.petManualTauntPending = false;
+    }
   }
-  ctx.emit({ type: 'log', text: `${pet.name} is now ${mode}.`, color: '#ffd100', pid: r.e.id });
+  ctx.emit({
+    type: 'log',
+    text: `${deadPrimary?.name ?? pets[0].name} is now ${mode}.`,
+    color: '#ffd100',
+    pid: r.e.id,
+  });
 }
 
 export function setPetAutoTaunt(ctx: SimContext, enabled: boolean, pid?: number): void {

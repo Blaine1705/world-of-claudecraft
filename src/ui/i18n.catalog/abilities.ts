@@ -1172,7 +1172,7 @@ const classAbilityNamesEn = {
       [
         'sentence',
         'Sentence',
-        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation.',
+        'Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16.',
       ],
       ['life_tap', 'Hard Bargain', 'Converts {damage} health into {damage} mana.'],
       [
@@ -1228,7 +1228,7 @@ const classAbilityNamesEn = {
       [
         'possess_evil_eye',
         'Possess the Evil Eye',
-        'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage.',
+        'The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20.',
       ],
       [
         'hour_of_judgment',
@@ -1438,7 +1438,7 @@ const classAbilityNamesEn = {
       [
         'corpse_explosion',
         'Corpse Explosion',
-        'Spends 2 Soul Fragments to rupture death energy at the chosen location, dealing {damage} Shadow damage to nearby enemies.',
+        'Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location.',
       ],
       [
         'funeral_harvest',
@@ -1453,7 +1453,7 @@ const classAbilityNamesEn = {
       [
         'unholy_command',
         'Unholy Command',
-        'Commands all of your undead to deal 25% more damage and act 20% faster for 12 sec.',
+        'Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec.',
       ],
       [
         'reaping_command',
@@ -1473,7 +1473,7 @@ const classAbilityNamesEn = {
       [
         'army_of_the_dead',
         'Army of the Dead',
-        'Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes.',
+        'Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec in addition to your chosen Dominion servants.',
       ],
       [
         'metamorphosis',

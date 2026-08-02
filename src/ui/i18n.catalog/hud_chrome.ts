@@ -1905,7 +1905,7 @@ export const hudChromeStrings = {
     cooldownCap: '{used} of {cap} sec of cooldown reduction used in this window',
     funeralHarvestLock: 'Funeral Harvest cannot create another Soul Fragment yet',
     leadenHexLock: 'Leaden Hex cannot root this target again yet',
-    forbiddenReflectionReady: 'Your next eligible shared Warlock cooldown can be cast again',
+    forbiddenReflectionReady: 'Your next eligible Warlock cooldown can be cast again',
     forbiddenReflectionLock: 'Forbidden Reflection cannot be prepared again yet',
     internalCooldown: 'This effect cannot trigger again until the timer expires',
     battleStance: 'Battle Stance: 10% more rage generation',
@@ -2034,11 +2034,10 @@ export const hudChromeStrings = {
       '{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick',
     afflictionConsumeThreads:
       'Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick',
-    necromancyHarvestMark:
-      'Death can create 1 Soul Fragment and leaves a Death Echo for Corpse Explosion',
+    necromancyHarvestMark: 'Death can create 1 Soul Fragment',
     necromancyOssuaryMark:
       'Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment',
-    necromancyDeathEcho: 'Corpse Explosion can consume this echo within {radius} yd of its aim',
+    necromancyDeathEcho: 'Legacy Death Echo; no current ability consumes it',
     warlockAnchor: 'Recast within {range} yd to return here and consume the anchor',
     formMetamorph: 'Demon form: body size increased by {pct}%; other bonuses ride separate buffs',
     energyRegen: 'Increases Energy regeneration by {pct}%',

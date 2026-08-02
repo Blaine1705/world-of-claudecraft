@@ -182,7 +182,7 @@ describe('warlock class talent tree', () => {
     expect(player.castTotal).toBeCloseTo(base * 0.8);
   });
 
-  it('reduces only shared class cooldowns while casting', () => {
+  it('reduces class and specialization cooldowns while casting', () => {
     const { sim, player } = rig({ 20: 'wlk_r20_chaos_bolt' }, 'affliction');
     addTarget(sim);
     player.cooldowns.set('umbral_anchor', 10);
@@ -190,10 +190,10 @@ describe('warlock class talent tree', () => {
     sim.castAbility('needle_of_fate');
     tick(sim, 20);
     expect(player.cooldowns.get('umbral_anchor')).toBeCloseTo(8.5);
-    expect(player.cooldowns.get('hex_of_violence')).toBeCloseTo(9);
+    expect(player.cooldowns.get('hex_of_violence')).toBeCloseTo(8.5);
   });
 
-  it('keeps specialization signatures out of the shared-capstone classifier', () => {
+  it('includes specialization signatures in Unbroken Ritual', () => {
     expect(ABILITIES.conflagrate.specs).toEqual(['destruction']);
     expect(ABILITIES.metamorphosis.specs).toEqual(['demonology']);
 
@@ -205,13 +205,20 @@ describe('warlock class talent tree', () => {
     tick(sim, 20);
 
     expect(player.cooldowns.get('umbral_anchor')).toBeCloseTo(8.5);
-    expect(player.cooldowns.get('conflagrate')).toBeCloseTo(9);
+    expect(player.cooldowns.get('conflagrate')).toBeCloseTo(8.5);
   });
 
-  it('does not arm Forbidden Reflection from a specialization signature', () => {
+  it('lets Forbidden Reflection repeat a specialization signature', () => {
     const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, 'demonology');
     sim.castAbility('metamorphosis');
-    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
+    expect(canUseForbiddenReflection(player, 'metamorphosis')).toBe(true);
+    tick(sim, 30);
+    const remaining = player.cooldowns.get('metamorphosis') ?? 0;
+
+    sim.castAbility('metamorphosis');
+
+    expect(player.cooldowns.get('metamorphosis')).toBeCloseTo(remaining);
+    expect(canUseForbiddenReflection(player, 'metamorphosis')).toBe(false);
   });
 
   it('lets Forbidden Reflection repeat one shared cooldown without restarting it', () => {
@@ -237,6 +244,19 @@ describe('warlock class talent tree', () => {
     tick(sim, 80);
 
     expect(player.cooldowns.has('soulwell')).toBe(true);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
+    expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock')).toBe(false);
+  });
+
+  it('does not let Forbidden Reflection duplicate Army of the Dead', () => {
+    const { sim, player } = rig({ 20: 'wlk_r20_grimoire_of_haste' }, 'demonology');
+    player.resource = player.maxResource;
+
+    sim.castAbility('army_of_the_dead');
+    tick(sim, 40);
+
+    expect(player.cooldowns.has('army_of_the_dead')).toBe(true);
+    expect(canUseForbiddenReflection(player, 'army_of_the_dead')).toBe(false);
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection')).toBe(false);
     expect(player.auras.some((aura) => aura.id === 'wlk_forbidden_reflection_lock')).toBe(false);
   });

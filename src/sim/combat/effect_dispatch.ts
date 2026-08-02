@@ -119,10 +119,10 @@ import {
   addSoulFragments,
   applyOrDetonateOssuaryMark,
   commandUndead,
-  consumeDeathEcho,
   pierceLichSoulLance,
   raiseArmyOfDead,
   reapWithUndead,
+  sacrificeDominionForCorpseExplosion,
   sacrificeUndead,
   summonUndead,
 } from './necromancy';
@@ -1487,7 +1487,9 @@ export function runEffects(
         // the caster. The fx follows the same center (a world-anchored burst for
         // an aimed blast, the entity-anchored nova otherwise).
         const aoeCenter = p.castAim ?? p.pos;
-        if (ability.id === 'corpse_explosion' && !consumeDeathEcho(ctx, p, aoeCenter)) break;
+        if (ability.id === 'corpse_explosion' && !sacrificeDominionForCorpseExplosion(ctx, p)) {
+          break;
+        }
         // Pyre Colossus owns a falling-meteor cue that carries the same
         // ability id into its authored landing sequence. Emitting the generic
         // nova here as well would show two impacts for one instant cast.

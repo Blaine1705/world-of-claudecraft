@@ -1793,7 +1793,7 @@ export const en: EnTranslations = {
       "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
       "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
       "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible shared Warlock cooldown can be cast again",
+      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
       "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
       "internalCooldown": "This effect cannot trigger again until the timer expires",
       "battleStance": "Battle Stance: 10% more rage generation",
@@ -1902,9 +1902,9 @@ export const en: EnTranslations = {
       "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
       "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
       "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment and leaves a Death Echo for Corpse Explosion",
+      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
       "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Corpse Explosion can consume this echo within {radius} yd of its aim",
+      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
       "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
       "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
       "energyRegen": "Increases Energy regeneration by {pct}%",
@@ -7824,7 +7824,7 @@ export const en: EnTranslations = {
       },
       "sentence": {
         "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation."
+        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
       },
       "life_tap": {
         "name": "Hard Bargain",
@@ -7872,7 +7872,7 @@ export const en: EnTranslations = {
       },
       "possess_evil_eye": {
         "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage."
+        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
       },
       "hour_of_judgment": {
         "name": "Hour of Judgment",
@@ -8068,7 +8068,7 @@ export const en: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "Corpse Explosion",
-        "description": "Spends 2 Soul Fragments to rupture death energy at the chosen location, dealing {damage} Shadow damage to nearby enemies."
+        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
       },
       "funeral_harvest": {
         "name": "Funeral Harvest",
@@ -8080,7 +8080,7 @@ export const en: EnTranslations = {
       },
       "unholy_command": {
         "name": "Unholy Command",
-        "description": "Commands all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
       },
       "reaping_command": {
         "name": "Reaping Command",
@@ -8096,7 +8096,7 @@ export const en: EnTranslations = {
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal for 20 sec, temporarily raising every Dominion archetype not already serving you. Your chosen servants remain after the portal closes."
+        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec in addition to your chosen Dominion servants."
       },
       "metamorphosis": {
         "name": "Lich Form",

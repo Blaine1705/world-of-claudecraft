@@ -275,10 +275,10 @@ describe('warlock wave 2 choice rows', () => {
       (option) => option.id === 'wlk_r20_grimoire_of_haste',
     );
     expect(unbrokenRitual?.description).toBe(
-      'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class abilities by 0.5 sec. Does not affect specialization abilities or capstone talents.',
+      'Each second spent casting or channeling reduces the remaining cooldown of your Warlock class and specialization abilities by 0.5 sec. Does not affect capstone talents.',
     );
     expect(forbiddenReflection?.description).toBe(
-      'The first Warlock class ability with a cooldown that you use, except Soulwell, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
+      'The first Warlock class or specialization ability with a cooldown that you use, except Soulwell and Army of the Dead, creates a forbidden reflection. You may use that same ability once more within 10 sec for its normal cost without starting another cooldown. This effect can occur once every 60 sec.',
     );
     expect(`${unbrokenRitual?.description} ${forbiddenReflection?.description}`).not.toMatch(
       /\bshared\b/i,

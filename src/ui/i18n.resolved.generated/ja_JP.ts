@@ -1793,7 +1793,7 @@ export const ja_JP: EnTranslations = {
       "cooldownCap": "この時間枠でクールダウン短縮を{used}/{cap}秒使用済み",
       "funeralHarvestLock": "フューネラル・ハーベストはまだ次の魂の欠片を生成できない",
       "leadenHexLock": "レドン・ヘックスはまだこの対象を再び移動不能にできない",
-      "forbiddenReflectionReady": "次の対象となるウォーロック共通クールダウンを再使用できる",
+      "forbiddenReflectionReady": "次の対象となるウォーロックのクールダウンを再使用できる",
       "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
       "internalCooldown": "タイマー終了までこの効果は再発動しない",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
@@ -1902,9 +1902,9 @@ export const ja_JP: EnTranslations = {
       "afflictionLitany": "断罪獲得時、{radius}ヤード内の最大{targets}体に{damage}の影ダメージを与える。1秒に1回まで",
       "afflictionFateThreads": "運命の糸{stacks}：センテンスのダメージが{sentencePct}%増加、またはドレイン・ライフの各ティックが断罪を{doom}追加生成する",
       "afflictionConsumeThreads": "ドレイン・ライフが運命の糸{stacks}を消費し、各ティックで断罪を{doom}追加生成する",
-      "necromancyHarvestMark": "死亡時に魂の欠片を1個生成し、コープス・エクスプロージョン用のデス・エコーを残すことがある",
+      "necromancyHarvestMark": "死亡時に魂の欠片を1個生成することがある",
       "necromancyOssuaryMark": "あなたとアンデッドのダメージの{storedPct}%、ソウル・ランスはさらに{lancePct}%を蓄積する。再使用で爆発。死亡時は{radius}ヤード内で爆発し魂の欠片を1個生成する",
-      "necromancyDeathEcho": "コープス・エクスプロージョンは照準地点から{radius}ヤード以内のこの残響を消費できる",
+      "necromancyDeathEcho": "旧仕様のデス・エコー。現在これを消費するアビリティはない",
       "warlockAnchor": "{range}ヤード以内で再使用するとここへ戻り、アンカーを消費する",
       "formMetamorph": "悪魔形態：体格が{pct}%大きくなる。ほかのボーナスは別のバフで表示される",
       "energyRegen": "エネルギー回復速度が{pct}%上昇する",
@@ -7824,7 +7824,7 @@ export const ja_JP: EnTranslations = {
       },
       "sentence": {
         "name": "宣告",
-        "description": "断罪をすべて消費して敵に宣告を下します。ダメージと追加効果は断罪20、50、80、100で強化されます。"
+        "description": "断罪と運命の糸をすべて消費して敵に宣告を下します。糸1本につきダメージが6%増加し、追加効果は断罪20、50、80、100で強化されます。レベル16以降はダメージの伸びが緩やかになります。"
       },
       "life_tap": {
         "name": "過酷な取引",
@@ -7872,7 +7872,7 @@ export const ja_JP: EnTranslations = {
       },
       "possess_evil_eye": {
         "name": "邪眼憑依",
-        "description": "呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えて遅れて60%の追加ダメージを放ちます。"
+        "description": "呪術師が主要な邪眼へ15秒間憑依し、断罪を35生成します。運命の針は詠唱1秒になり断罪をさらに2生成し、吸命は移動中も維持でき、宣告は25%多くダメージを与えます。遅延反響は60%のダメージを与え、レベル17から20にかけて30%まで低下します。"
       },
       "hour_of_judgment": {
         "name": "審判の刻",
@@ -8068,7 +8068,7 @@ export const ja_JP: EnTranslations = {
       },
       "corpse_explosion": {
         "name": "骸の爆裂",
-        "description": "魂の欠片を2個消費し、指定地点で死の力を炸裂させ、周囲の敵に{damage}のシャドウダメージを与える。"
+        "description": "まずボーン・メイジ、次にスケルタル・ウォリアーを生贄にし、グレイヴウィングは最後の手段としてのみ選ぶ。同系統が複数いる場合は残り時間が最も短いもの、次に最も弱いものを選び、指定地点の敵に{damage}のシャドウダメージを与える。"
       },
       "funeral_harvest": {
         "name": "葬送の収穫",
@@ -8080,7 +8080,7 @@ export const ja_JP: EnTranslations = {
       },
       "unholy_command": {
         "name": "不浄の号令",
-        "description": "すべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。"
+        "description": "魂の欠片を3個消費してすべてのアンデッドに号令を下し、12秒間、与えるダメージを25%、行動速度を20%上昇させる。"
       },
       "reaping_command": {
         "name": "刈り取りの号令",
@@ -8096,7 +8096,7 @@ export const ja_JP: EnTranslations = {
       },
       "army_of_the_dead": {
         "name": "亡者の軍勢",
-        "description": "墓所の門を20秒間開き、まだ従えていない全ドミニオン系統を一時的に呼び起こす。選んだ従者は門が閉じた後も残る。"
+        "description": "墓所の門を開き、選んだドミニオンの従者に加えて、スケルタル・ウォリアー、ボーン・メイジ、グレイヴウィングを20秒間召喚する。"
       },
       "metamorphosis": {
         "name": "悪魔変身",
