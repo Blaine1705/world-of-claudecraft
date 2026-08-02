@@ -370,6 +370,7 @@ import { QuestProgressBanner } from './hud/quest/quest_progress_banner';
 import { QuestTrackerController } from './hud/quest/quest_tracker_controller';
 import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
+import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt';
 import { buildHeroicVendorView } from './hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from './hud/vendor/heroic_vendor_window';
 import { TrainLearnTracker } from './hud/vendor/train_learn_core';
@@ -377,7 +378,6 @@ import { buildTrainView, isRecipeKnownForViewer } from './hud/vendor/train_view'
 import { renderTrainWindow } from './hud/vendor/train_window';
 import { buildUnbindView } from './hud/vendor/unbind_view';
 import { renderUnbindWindow } from './hud/vendor/unbind_window';
-import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt';
 import {
   buildVendorView,
   sellJunkButtonState,

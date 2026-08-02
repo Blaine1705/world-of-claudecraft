@@ -81,7 +81,9 @@ export function sanitizeBuyCount(count: number | undefined): number | null {
 export function vendorCountForced(def: ItemDef): boolean {
   const honor = def.priceHonor;
   const honorPriced = honor !== undefined && Number.isFinite(honor) && Math.floor(honor) > 0;
-  return def.kind === 'mount' || def.teachesRiding === true || def.soulbound === true || honorPriced;
+  return (
+    def.kind === 'mount' || def.teachesRiding === true || def.soulbound === true || honorPriced
+  );
 }
 
 /** Atomic totals for a count-N purchase, all three products verified to stay
@@ -123,11 +125,7 @@ export function buyPurchaseTotals(
  * shows the fit maximum and lets an unaffordable amount refuse whole with
  * the money toast.
  */
-export function maxBuyCount(
-  inventory: readonly InvSlot[],
-  capacity: number,
-  def: ItemDef,
-): number {
+export function maxBuyCount(inventory: readonly InvSlot[], capacity: number, def: ItemDef): number {
   const unitFit = countFit(inventory, capacity, def.id, Number.MAX_SAFE_INTEGER);
   return Math.floor(unitFit / vendorStackSize(def));
 }

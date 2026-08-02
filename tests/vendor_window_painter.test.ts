@@ -85,7 +85,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -100,7 +106,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
     const buyback: VendorBuybackRow[] = [
       { itemId: 'sword', item: item('sword'), count: 1, price: 100, index: 0 },
     ];
-    const view: VendorView = { goods: [], buyback, honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods: [],
+      buyback,
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -127,7 +139,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirement: { professionId: 'mining', proficiency: 40 },
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -166,7 +184,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirement: { professionId: 'not_a_profession' as never, proficiency: 40 },
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -198,7 +222,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirement: { professionId: 'mining', proficiency: 40 },
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(
       el,
@@ -234,7 +264,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(
       el,
@@ -264,7 +300,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -288,7 +330,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -300,7 +348,13 @@ describe('renderVendorWindow: goods/buyback grid wrapping', () => {
   });
 
   it('appends no empty .vendor-goods-grid when both sections are empty', () => {
-    const view: VendorView = { goods: [], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods: [],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -322,7 +376,13 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         requirementUnmet: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -342,7 +402,13 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkQuantity: 1,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -362,7 +428,13 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkQuantity: 20,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     let bulkCalled: [string, VendorBuyOptions | undefined] | undefined;
     renderVendorWindow(
@@ -396,7 +468,13 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkAffordable: false,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -417,7 +495,13 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkAffordable: true,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view, deps());
 
@@ -439,7 +523,13 @@ describe('renderVendorWindow: bulk purchase (#2374)', () => {
         bulkQuantity: 20,
       },
     ];
-    const view: VendorView = { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 1 };
+    const view: VendorView = {
+      goods,
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
     const el = document.createElement('div');
     const calls: (VendorBuyOptions | undefined)[] = [];
     renderVendorWindow(el, 'Vendor', view, deps({ onBuy: (_itemId, opts) => calls.push(opts) }));
@@ -828,12 +918,7 @@ describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () =
     const el = document.createElement('div');
     renderVendorWindow(el, 'Vendor', view([goodsRow('bread')], 5), deps());
     const btns = [...el.querySelectorAll<HTMLButtonElement>('.vendor-qty-btn')];
-    expect(btns.map((b) => b.dataset.focusKey)).toEqual([
-      'qty:1',
-      'qty:5',
-      'qty:10',
-      'qty:custom',
-    ]);
+    expect(btns.map((b) => b.dataset.focusKey)).toEqual(['qty:1', 'qty:5', 'qty:10', 'qty:custom']);
     expect(btns.map((b) => b.getAttribute('aria-pressed'))).toEqual([
       'false',
       'true',
@@ -934,7 +1019,7 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
     };
   }
   function mountStack(): HTMLElement {
-    document.querySelectorAll('#prompt-stack').forEach((n) => n.remove());
+    for (const n of document.querySelectorAll('#prompt-stack')) n.remove();
     const stack = document.createElement('div');
     stack.id = 'prompt-stack';
     document.body.appendChild(stack);
@@ -949,24 +1034,31 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
     renderVendorWindow(
       el,
       'Vendor',
-      { goods: [customRow('bread')], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 'custom' },
+      {
+        goods: [customRow('bread')],
+        buyback: [],
+        honorBalance: 0,
+        hasHonorGoods: false,
+        multiple: 'custom',
+      },
       deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 64 }),
     );
     el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
       new MouseEvent('click', { bubbles: true }),
     );
     expect(calls).toEqual([]);
-    const prompt = stack.querySelector('.buy-quantity-prompt');
+    const prompt = stack.querySelector('.buy-quantity-prompt') as HTMLElement | null;
     expect(prompt).not.toBeNull();
+    if (!prompt) return;
     // The computed max is shown in the title and caps the input (Q19).
-    expect(prompt?.querySelector('.prompt-text')?.textContent).toContain('64');
-    const input = prompt?.querySelector<HTMLInputElement>('.prompt-number');
+    expect(prompt.querySelector('.prompt-text')?.textContent).toContain('64');
+    const input = prompt.querySelector<HTMLInputElement>('.prompt-number');
     expect(input?.max).toBe('64');
     // The window behind the modal is inert while it is open (the shared recipe).
     expect(el.inert).toBe(true);
     // Confirm submits the typed count through the same onBuy seam and clears inert.
-    input!.value = '12';
-    (prompt?.querySelectorAll('button')[0] as HTMLButtonElement).click();
+    if (input) input.value = '12';
+    (prompt.querySelectorAll('button')[0] as HTMLButtonElement).click();
     expect(calls).toEqual([['bread', { count: 12 }]]);
     expect(el.inert).toBe(false);
     expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
@@ -981,7 +1073,13 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
     renderVendorWindow(
       el,
       'Vendor',
-      { goods: [customRow('bread')], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 'custom' },
+      {
+        goods: [customRow('bread')],
+        buyback: [],
+        honorBalance: 0,
+        hasHonorGoods: false,
+        multiple: 'custom',
+      },
       deps({ buyCustomMax: () => 0 }),
     );
     el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
@@ -1001,7 +1099,13 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
     renderVendorWindow(
       el,
       'Vendor',
-      { goods: [customRow('bread')], buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 'custom' },
+      {
+        goods: [customRow('bread')],
+        buyback: [],
+        honorBalance: 0,
+        hasHonorGoods: false,
+        multiple: 'custom',
+      },
       deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 10 }),
     );
     el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
