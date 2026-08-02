@@ -192,6 +192,11 @@ tier presets (`GATE_WORKER_TIER`, `GATE_MAX_WORKERS`) are in
 [`docs/qa-gate.md`](docs/qa-gate.md) and
 [`docs/local-gate-perf/tier-workers.md`](docs/local-gate-perf/tier-workers.md).
 
+Thinner Vitest helpers (also not merge bars): `npm run test:related -- <source.ts>`
+and `npm run test:changed` (optional git base after `--`). Prefer those or
+`gate:fast` while iterating; warm re-runs benefit from Vitest
+`experimental.fsModuleCache` (see `docs/local-gate-perf/`).
+
 You can also run a single suite (`npx vitest run tests/sim.test.ts`) and
 `npm run ci:changed` for formatting; `npm test` runs everything, and the suite map
 is in `tests/CLAUDE.md`. The full `npm run gate` covers generated-artifact

@@ -35,6 +35,16 @@ Classification for baselines also lives in `classifyMachineTier`
 | `GATE_MAX_WORKERS=<n>` | **Expert absolute override** (bypasses heuristic and tier cap). Use when you deliberately share a machine (lower n) or you know freemem is solid (raise n). Invalid values fall back to the heuristic. |
 | `GATE_FAST_BASE=<ref>` | Only for `gate:fast`: force branch-wide `vitest --changed <ref>` (slow if package.json differs). Default day-loop uses `vitest related` on changed sources instead. |
 
+## Related / changed helpers (Phase 4)
+
+| Script | What it runs | Notes |
+|---|---|---|
+| `npm run test:related -- <file.ts>` | `vitest related --run --passWithNoTests` | Pass source paths after `--`. Aligns with `gate:fast` related selection. |
+| `npm run test:changed` | `vitest run --passWithNoTests --changed` | Uncommitted changes. Optional base: `npm run test:changed -- origin/release/v0.34.0`. Dirtiness of `package.json` / vite config expands almost to the full suite; prefer `test:related` or `gate:fast` then. |
+| `npx vitest --clearCache` | Clears results + `experimental.fsModuleCache` | Use if a warm run misbehaves. Default cache dir: `node_modules/.experimental-vitest-cache`. |
+
+None of these replace `npm run gate`.
+
 ### Examples (all OS shells)
 
 ```bash

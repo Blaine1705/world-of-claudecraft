@@ -9,7 +9,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 | 1 | Baseline harness and machine-tier protocol | complete | 2026-08-02 | 2026-08-02 | M1 high-tier baseline 336.3s full gate |
 | 2 | Gate orchestration dedupe | complete | 2026-08-02 | 2026-08-02 | generate-once + pretest skip + build:bundle |
 | 3 | Tiered local gate + tier worker presets | complete | 2026-08-02 | 2026-08-02 | gate:fast ~25s day-loop; full gate still merge bar |
-| 4 | Vitest warm path | not-started | | | |
+| 4 | Vitest warm path | complete | 2026-08-02 | 2026-08-02 | fsModuleCache keep; test:related/changed; no @vitest/ui |
 | 5 | happy-dom for DOM tests | not-started | | | |
 | 6 | Pool, projects, isolation experiments | not-started | | | |
 | 7 | pnpm + shared store for worktrees | not-started | | | |
@@ -43,10 +43,11 @@ Status: not-started / in-progress / blocked / complete / dropped
 - [x] Pins/tests for new scripts as needed
 
 ### Phase 4 - Vitest warm path
-- [ ] fsModuleCache (or measured drop if harmful) decision recorded
-- [ ] `test:related` / changed helper scripts
-- [ ] Warm re-run numbers in baselines
-- [ ] Optional @vitest/ui only if it does not bloat default install path badly
+- [x] fsModuleCache (or measured drop if harmful) decision recorded
+- [x] `test:related` / changed helper scripts
+- [x] Warm re-run numbers in baselines
+- [x] Optional @vitest/ui only if it does not bloat default install path badly
+  (dropped: not installed; DX-only, re-open later if needed)
 
 ### Phase 5 - happy-dom
 - [ ] happy-dom dependency added if experiment kept

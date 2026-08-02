@@ -58,6 +58,22 @@ Optional `GATE_WORKER_TIER=low|medium|high` caps workers after that clamp; see
 branch-wide `vitest --changed <ref>` with `GATE_FAST_BASE=<ref>` when you deliberately
 want that broader (and slower) selection.
 
+For a narrower loop without malware/biome/types, use the thin wrappers (same Vitest CLI;
+not a merge bar):
+
+```bash
+npm run test:related -- path/to/changed.ts   # vitest related --run --passWithNoTests
+npm run test:changed                         # vitest run --changed (uncommitted)
+npm run test:changed -- origin/release/v0.34.0
+```
+
+`test:changed` expands almost to the full suite when `package.json` or `vite.config.ts`
+is dirty (same reason `gate:fast` skips those paths for related expansion). Prefer
+`test:related` with explicit sources, or `gate:fast`, for day-to-day work. Vitest
+`experimental.fsModuleCache` is on in `vite.config.ts` so warm re-runs reuse module
+transforms under `node_modules/.experimental-vitest-cache` (clear with
+`npx vitest --clearCache` if a warm run looks wrong).
+
 ### Full local gate
 
 `npm run gate` is the **merge and "done" contract**. It mirrors CI: generated i18n

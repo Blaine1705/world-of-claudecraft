@@ -9,6 +9,9 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 1 | baseline capture + gate_profile harness | n/a | full gate 336.3s, vitest 277.5s, workers 8 | M1 darwin/arm64 16c/128GiB Node 26.5 npm 11.17 SHA 2a79ba8a0d | keep | Required foundation; see baselines.md and detail below |
 | 2026-08-02 | 2 | gate i18n/wiki generate-once + pretest skip + build:bundle | triple i18n / double wiki; full gate 336.3s | single gen path; ~5s artifact save; composite gate 291.5s | M1 darwin/arm64 16c/128GiB | keep | Option C+B; see detail below |
 | 2026-08-02 | 3 | gate:fast + GATE_WORKER_TIER presets | day-loop ~= full gate 291.5s or ad-hoc | gate:fast 25.4s; full gate still merge bar | M1 darwin/arm64 16c/128GiB | keep | related not --changed default; see detail |
+| 2026-08-02 | 4 | experimental.fsModuleCache in vite.config test | full cold ~245-277s (prior); multi-file no-cache transform ~3-5s | full cold 252.8s green / warm 241.3s; multi-file transform 1.4s cold / 0.45s warm | M1 darwin/arm64 16c/128GiB vitest 4.1.10 | keep | Default path under node_modules; see detail |
+| 2026-08-02 | 4 | npm scripts test:related + test:changed | ad-hoc npx vitest related/changed only | package scripts + docs; gate:fast still owns day-loop orchestration | M1 | keep | Align with Phase 3; do not duplicate gate:fast |
+| 2026-08-02 | 4 | optional @vitest/ui dependency | n/a | not added | M1 | drop | Opt-in DX only; would bloat default install; re-open later if needed |
 
 ## Detail template (copy below for long notes)
 
@@ -117,3 +120,45 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
   - Phase 4: vitest warm path / fsModuleCache / related helper polish
   - Owner OPEN: gate:fast never replaces pre-push or merge bar without state.md sign-off
   - Optional: time full `npm run gate` once after Phase 3 lands on a quiet machine
+
+---
+
+### 2026-08-02 - Phase 4 - Vitest warm path (fsModuleCache + related scripts)
+
+- Hypothesis: Vitest 4.1 `experimental.fsModuleCache` speeds warm re-runs and
+  related loops without flaking the full suite; thin `test:related` /
+  `test:changed` scripts make the CLI convenient without replacing `gate:fast`.
+- Change:
+  - `vite.config.ts` `test.experimental.fsModuleCache: true` (default store
+    `node_modules/.experimental-vitest-cache`)
+  - package.json: `test:related`, `test:changed`
+  - `.gitignore` explicit cache path entries (also covered by `node_modules/`)
+  - Docs: `docs/qa-gate.md`, CONTRIBUTING, `tier-workers.md`, packet baselines
+  - Did **not** add `@vitest/ui` (drop)
+- Commands:
+  - Multi-file rep set (5 files, 100 tests) with and without cache
+  - `WOC_SKIP_PRETEST=1 npx vitest run --maxWorkers=8` cold after `--clearCache`, then warm
+  - `npm run test:related -- --maxWorkers=8 scripts/lib/gate_fast_plan.mjs` cold/warm
+  - `npm run gate:fast` smoke after config change
+  - Rejected concurrent `--clearCache` mid-suite (ENOENT storm; operator error, not a product flake)
+- Before metrics (M1, multi-file no-cache CLI false):
+  - cold Duration 1.56s (transform 3.14s); warm Duration 1.99s (transform 4.83s, no help)
+- After metrics (M1, cache on):
+  - multi-file cold Duration 1.02s (transform 1.39s); warm ~0.74s (transform ~0.45s)
+  - full suite cold after clear: **252.8s** Duration, 1945 files / 24693 tests PASS
+  - full suite warm: **241.3s** Duration (~11s / ~4% wall; transform 62s -> 46s)
+  - related `gate_fast_plan.mjs`: Duration cold 362ms -> warm 177ms; wall real ~14s both
+    (import-graph discovery dominates small related walls)
+  - related `src/sim/rng.ts`: expands to ~899 files (~236-258s); not a day-loop default
+  - `gate:fast` after change: **8.5s** PASS (workers 8; docs-only dirty set skipped vitest related)
+  - cache dir size ~3.8 MiB
+- Pass/fail: full suite green with cache; no wrong pass/fail attributed to cache when
+  used alone. Concurrent clearCache during a suite is unsafe (document only).
+- Decision:
+  - **keep** `experimental.fsModuleCache`
+  - **keep** `test:related` / `test:changed` scripts + docs
+  - **drop** `@vitest/ui` for this phase
+- Follow-ups:
+  - Phase 5 happy-dom
+  - Do not treat warm/related/`gate:fast` as merge bar
+  - Optional: document "never clearCache while another vitest is running"

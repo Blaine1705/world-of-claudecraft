@@ -420,5 +420,13 @@ export default defineConfig({
     // headroom for the current world size; deliberately long walkers keep their
     // own explicit budgets.
     testTimeout: 20000,
+    // Phase 4 local-gate-perf: persist Vite module transform cache across runs
+    // (Vitest 4.1 experimental.fsModuleCache). Default path is under
+    // node_modules/.experimental-vitest-cache (gitignored via node_modules/).
+    // Clear with `npx vitest --clearCache` if a warm run misbehaves. Full gate
+    // remains the merge bar; this speeds warm re-runs and related/day-loop paths.
+    experimental: {
+      fsModuleCache: true,
+    },
   },
 });

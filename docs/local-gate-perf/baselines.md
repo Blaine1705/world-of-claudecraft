@@ -132,7 +132,7 @@ suites can overlap; sum of file times exceeds suite wall).
 | 1 (baseline) | M1 | 336.3 | 277.5 | 0 | keep (foundation) |
 | 2 | M1 | 291.5 (composite) | 245.4 | -44.8 (see notes) | keep |
 | 3 | M1 | n/a (day-loop focus) | n/a | gate:fast 25.4s vs full ~291s | keep |
-| 4 warm related | | | | | |
+| 4 warm path | M1 | n/a (vitest focus) | cold 252.8 / warm 241.3 | ~11s warm full-suite; multi-file transform 3.1s -> 0.45s | keep |
 | 5 | | | | | |
 | 6 | | | | | |
 | 7 | | | | | |
@@ -220,3 +220,52 @@ Raw JSON: `tmp/gate-profile-phase2.json` (vitest path; typecheck failed pre-fix)
 
 `GATE_MAX_WORKERS` remains expert absolute override. Free-mem clamp never removed.
 Cross-OS notes: `docs/local-gate-perf/tier-workers.md`.
+
+## Phase 4 - Vitest warm path (after)
+
+**Decision:** Keep `experimental.fsModuleCache` in `vite.config.ts` test config and
+thin npm scripts `test:related` / `test:changed`. Drop optional `@vitest/ui` for now.
+Full `npm run gate` remains merge bar; `gate:fast` remains day-loop only.
+
+### Full suite cold vs warm (M1, 2026-08-02, maxWorkers=8, WOC_SKIP_PRETEST=1)
+
+| Run | Duration s | Transform s | Result |
+|---|---:|---:|---|
+| Cold after `vitest --clearCache` | 252.8 | 62.3 | 1945 files / 24693 tests PASS |
+| Warm second run | 241.3 | 46.2 | same PASS (~11s / ~4% wall) |
+
+Prior Phase 2 vitest composite was 245.4s; cold-with-cache here is within machine-load
+noise of that band. Warm win is real but modest for the full parallel suite (matches
+Vitest guidance: fs cache helps most on small re-runs with large module graphs).
+
+### Multi-file representative set (5 files, 100 tests)
+
+| Mode | Duration s | Transform s |
+|---|---:|---:|
+| No cache cold | 1.56 | 3.14 |
+| No cache warm | 1.99 | 4.83 |
+| Cache cold (after clear) | 1.02 | 1.39 |
+| Cache warm | 0.74 | 0.45 |
+
+### Related loop
+
+| Command | Duration (vitest) | Wall real s | Notes |
+|---|---:|---:|---|
+| `test:related -- scripts/lib/gate_fast_plan.mjs` cold | 0.36 | ~14 | graph discovery dominates wall |
+| same warm | 0.18 | ~14 | transform/setup halved |
+| `test:related -- src/sim/rng.ts` | ~223-244 | ~236-259 | expands to ~899 files; not day-loop default |
+
+### Scripts / cache path
+
+| Item | Value |
+|---|---|
+| Config | `test.experimental.fsModuleCache: true` |
+| Cache dir | `node_modules/.experimental-vitest-cache` (~3.8 MiB after full suite) |
+| Clear | `npx vitest --clearCache` |
+| `test:related` | `vitest related --run --passWithNoTests` |
+| `test:changed` | `vitest run --passWithNoTests --changed` |
+| `gate:fast` after change | 8.5s PASS (no code dirtiness; related step skipped) |
+
+**Caveat:** do not run `--clearCache` while another vitest process is using the same
+cache (observed ENOENT storm under concurrent clear). Not a suite correctness flake
+when used single-flight.
