@@ -29,9 +29,9 @@ Each instance:
   plane's response, so day-night grades, realm light levels and fog land on
   the sprite exactly as they land on the terrain under it (verified in the
   Nightbloom's dimmed violet grade);
-- sways with the same travelling gust the real canopies ride, amplitude
-  scaled by the real instance's scale, so a tree's motion is continuous
-  across the handoff.
+- sways with the same travelling gust, phase and amplitude the real
+  canopies ride (the sway direction is world-fixed where the real mesh sways
+  in its rotated model frame: sub-pixel at every sprite distance).
 
 The atlas layout is pure math (`src/render/foliage_impostor_core.ts`,
 registered in `RENDER_PURE_CORES`): a deterministic shelf packer that throws
@@ -73,7 +73,9 @@ bucket cap can matter, and the sprite carries its density to the fog wall
 (the old build-time vanish at `treeFillFar` was a visible density pop).
 
 Rocks and bushes take the same treatment at their own swaps (`rockFar` and
-`dressFar` times the budget scale, per instance now rather than per bucket).
+`dressFar` times the budget scale, clamped to the foliage cull; enforced per
+instance, with the bucket rows culled radius-aware against the same swap so
+a slab crossing its cap no longer drops its still-near members).
 Ferns and mushrooms are sub-pixel long before their cull and keep the plain
 window. The lean arm (no `GFX.standardMaterials`, or `GFX.leanFoliage`)
 ships NO impostors, exactly as before, and keeps the old fog-blend law

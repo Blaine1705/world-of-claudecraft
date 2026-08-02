@@ -139,12 +139,13 @@ export interface BucketWindowInput {
   minDist?: number;
   maxDist?: number;
   /**
-   * Bounds that additionally track the runtime tree-detail swap: the impostor
-   * starts there (minAtDetail), the real model ends there (maxAtDetail). It is
-   * the one edge that cannot be known at build time, because it follows the
-   * zone's fog. A bucket can carry BOTH a numeric cap and the detail cap (the
-   * near-fill half of a species culls at treeFillFar OR at the swap, whichever
-   * comes first), so these compose rather than replace.
+   * Bounds that additionally track the runtime handoff: the sprite starts
+   * there (minAtDetail), the real model ends there (maxAtDetail). It is the
+   * one edge that cannot be known at build time, because it follows the
+   * governor and the zone's fog. A bucket can carry BOTH a numeric cap and
+   * the detail cap, and the per-instance shader windows
+   * (foliage_collapse.ts) resolve whatever the coarse slab tests let
+   * through, so these compose rather than replace.
    */
   minAtDetail?: boolean;
   maxAtDetail?: boolean;

@@ -11,11 +11,12 @@
 //
 // THE HANDOFF IS JITTERED PER INSTANCE. Every real-geometry role ends at its
 // window max minus a hashed share of the fade span (IMPOSTOR_SWAP_FADE), and
-// the sprite mesh (foliage_impostor.ts) begins each instance at the SAME
-// hashed distance: the shared GLSL lives in foliage_impostor_core.ts so the
-// two vertex shaders agree exactly. The swap line is therefore never a front
-// that sweeps the forest; each tree trades representations alone, at a fixed
-// distance, in a single frame.
+// the sprite mesh (foliage_impostor.ts) begins each instance at the same
+// hashed distance: the shared GLSL lives in foliage_impostor_core.ts so both
+// vertex shaders compile the identical expression (see its header for the
+// precision caveat). The swap line is therefore never a front that sweeps
+// the forest; each tree trades representations alone, at a fixed distance,
+// in a single frame.
 //
 // The windows arrive per frame via updateCollapseUniforms (the shared-uniform
 // pattern of gfx.ts sharedUniforms.uTime): every material references the same

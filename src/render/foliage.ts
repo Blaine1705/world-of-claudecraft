@@ -441,9 +441,9 @@ export interface FoliageView {
    * Per-frame: grass fade + ring rebuild, fog culling of far tree buckets.
    * `fogNear`/`fogFar` are the LIVE fog (residency-clamped): they drive the
    * cull. `atmosFogNear`/`atmosFogFar` are the atmospheric fog (authored
-   * preset x day-night scale, pre-clamp): they drive the real-model/impostor
-   * swap, so a streaming fog wall never drags impostor cones toward the
-   * camera (see treeDetailDistance's input contract in foliage_lod.ts).
+   * preset x day-night scale, pre-clamp): they drive the real-model/sprite
+   * handoff, so a streaming fog wall never drags the boundary toward the
+   * camera (input contracts in foliage_lod.ts and foliage_impostor_core.ts).
    */
   update(
     px: number,
@@ -1181,6 +1181,7 @@ function placeSpecies(
               tintHex,
               c,
               spec.spriteTint === 'trunk' ? BARK_TINT_SOFTEN : leafSoften(d.biome),
+              spec.spriteTint === 'trunk' ? 0.5 : 1,
             ),
           );
         }
@@ -1218,7 +1219,11 @@ function placeSpecies(
         // and (for species whose canopy covers the trunk) the early bark cull.
         // The swap itself is symbolic: it follows fog, so only update() knows it.
         const numericCaps: number[] = [];
-        if (group.maxDist !== undefined) numericCaps.push(group.maxDist);
+        // On the sprite arm the near-fill cap is retired: instances collapse at
+        // the shared tree swap anyway (always inside the cap), and the
+        // center-measured bucket cull used to drop a slab's still-near trees
+        // with no sprite behind them.
+        if (group.maxDist !== undefined && !impostorsActive()) numericCaps.push(group.maxDist);
         if (cullBark) numericCaps.push(barkFar);
         const maxDist = numericCaps.length > 0 ? Math.min(...numericCaps) : undefined;
         register(im, group.lod, undefined, maxDist, { max: true });
@@ -1461,6 +1466,7 @@ function buildTrees(
       minDist?: number,
       maxDist?: number,
       atDetail?: { min?: boolean; max?: boolean },
+      spriteCategory?: ImpostorCategory,
     ): void => {
       registry.push({
         mesh,
@@ -1472,6 +1478,7 @@ function buildTrees(
         minAtDetail: atDetail?.min,
         maxAtDetail: atDetail?.max,
         lod,
+        spriteCategory,
         ...bucketMeshCost(mesh),
       });
     };
@@ -1569,7 +1576,15 @@ function buildTrees(
         // no rock shadows cast: sub-pixel at typical camera range, real draw cost
         rockMesh.receiveShadow = true;
         parent.add(rockMesh);
-        register(rockMesh, 'rock', undefined, lodDists().rockFar);
+        if (impostorsActive()) {
+          // Radius-aware cull against the rock swap (spriteCategory routes it
+          // in update()): the old center-measured cap dropped a slab's still
+          // near rocks in one step, and with sprites visible beyond the drop
+          // the missing annulus finally read as a hole.
+          register(rockMesh, 'rock', undefined, undefined, { max: true }, 'rock');
+        } else {
+          register(rockMesh, 'rock', undefined, lodDists().rockFar);
+        }
       }
     }
   }
@@ -1961,12 +1976,18 @@ function buildDressing(
         });
         im.receiveShadow = true; // dressing casts nothing: too small to matter
         parent.add(im);
+        const spriteBacked = spriteRow !== null && dressSprites !== null;
         registry.push({
           mesh: im,
           x: bx,
           z: bz,
           radius: bRadius,
-          maxDist: lodDists().dressFar,
+          // Sprite-backed kinds cull radius-aware against the dress swap
+          // (spriteCategory routes it in update()); ferns and mushrooms have
+          // no sprite side and keep the numeric cap.
+          maxDist: spriteBacked ? undefined : lodDists().dressFar,
+          maxAtDetail: spriteBacked ? true : undefined,
+          spriteCategory: spriteBacked ? 'dress' : undefined,
           lod: 'dressing',
           ...bucketMeshCost(im),
         });
@@ -3164,20 +3185,30 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
   const session = webgl ? createImpostorSession() : null;
   buildTrees(group, seed, bucketMeshes, treeHideables, session);
   buildDressing(group, seed, bucketMeshes, session);
+  // The sprite swap law engages only once sprite meshes really exist: if the
+  // bake throws (a grown kit overflowing the atlas, a lost context) the far
+  // field falls back to the lean law instead of collapsing real trees with
+  // nothing behind them. World entry survives either way.
+  let spritesLive = false;
   if (session && webgl) {
-    // One atlas bake, then one quad InstancedMesh per (bucket, category):
-    // the whole far field costs a handful of draws and 2 triangles per plant.
-    for (const reg of session.finalize(webgl, group)) {
-      bucketMeshes.push({
-        mesh: reg.mesh,
-        x: reg.x,
-        z: reg.z,
-        radius: reg.radius,
-        minAtDetail: true,
-        lod: 'impostor',
-        spriteCategory: reg.category,
-        ...bucketMeshCost(reg.mesh),
-      });
+    try {
+      // One atlas bake, then one quad InstancedMesh per (bucket, category):
+      // the whole far field costs a handful of draws and 2 triangles per plant.
+      for (const reg of session.finalize(webgl, group)) {
+        bucketMeshes.push({
+          mesh: reg.mesh,
+          x: reg.x,
+          z: reg.z,
+          radius: reg.radius,
+          minAtDetail: true,
+          lod: 'impostor',
+          spriteCategory: reg.category,
+          ...bucketMeshCost(reg.mesh),
+        });
+      }
+      spritesLive = true;
+    } catch (err) {
+      console.error('foliage: impostor bake failed, far field keeps the lean law', err);
     }
   }
   for (const b of bucketMeshes) {
@@ -3235,16 +3266,14 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
         dt,
         reducedMotion,
       );
-      // Buckets fully behind the fog wall are pure overdraw. The windows
-      // themselves, including the real-model -> impostor swap (which follows the
-      // zone's fog rather than a build-time constant, so a cone is never caught
-      // standing in clear air), are decided in foliage_lod.ts and unit-tested
-      // there. The cull tracks the LIVE fog; the swap tracks the ATMOSPHERE
-      // (see the update() doc above).
+      // Buckets fully behind the fog wall are pure overdraw. The handoff laws
+      // are decided in foliage_impostor_core.ts (sprite arm) and
+      // foliage_lod.ts (lean arm) and unit-tested there. The cull tracks the
+      // LIVE fog; the handoff tracks the ATMOSPHERE (see the update() doc).
       const distanceScale = foliageDistanceScale(modelQuality, GFX.leanFoliage);
       const fogLimit = foliageFogLimit(fogFar, modelQuality);
       const dists = lodDists();
-      const spritesOn = impostorsActive();
+      const spritesOn = spritesLive;
       // Sprite arm: the handoff follows the budget (sprites are legible in
       // clear air); lean arm: the old fog-blend law, trees end in the murk.
       const detailFar = spritesOn
@@ -3262,8 +3291,10 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
             distanceScale,
             fogLimit,
           );
-      const rockSwap = Math.min(dists.rockFar * distanceScale, fogFar);
-      const dressSwap = Math.min(dists.dressFar * distanceScale, fogFar);
+      // Real geometry never outlives the foliage cull (the model-quality trim
+      // exists to shed triangles); only the SPRITES run past it to the wall.
+      const rockSwap = Math.min(dists.rockFar * distanceScale, fogLimit);
+      const dressSwap = Math.min(dists.dressFar * distanceScale, fogLimit);
       // The vertex shaders enforce these same boundaries per INSTANCE, so a
       // surviving slab no longer drags its whole tree population along with it
       // (foliage_collapse.ts), and each sprite starts where its real twin

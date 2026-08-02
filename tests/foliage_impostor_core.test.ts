@@ -136,7 +136,10 @@ describe('sprite swap law', () => {
         const swap = spriteSwapDistance(base, scaleAt(q), near, far, fogLimit);
         expect(swap, `near ${near} far ${far} q ${q}`).toBeLessThan(fogLimit);
         expect(fogLimit - swap).toBeGreaterThan(0);
-        expect(fogLimit - swap).toBeLessThanOrEqual(Math.max(IMPOSTOR_MIN_BAND, fogLimit) + 1e-9);
+        // the band never grows past what the floor law leaves available
+        expect(fogLimit - swap).toBeLessThanOrEqual(
+          Math.max(IMPOSTOR_MIN_BAND, fogLimit - spriteSwapFloor(near, far)) + 1e-9,
+        );
       }
     }
   });
@@ -156,8 +159,10 @@ describe('sprite swap law', () => {
 
   it('never exceeds the budgeted radius, so near-fill needs no law of its own', () => {
     // placeSpecies folds the near-fill trees into the shared tree sprites.
-    // That is sound because the swap can never pass the near-fill numeric cap:
-    // swap <= base * scale < treeFillFar * scale at every quality and fog.
+    // That is sound because the swap can never pass the near-fill authored
+    // cap: swap <= base * scale, and the tables author the detail base under
+    // the near-fill cap (both scale by the same governor lever).
+    expect(LOD_HIGH.treeDetailFar).toBeLessThan(LOD_HIGH.treeFillFar);
     for (const q of [0, 0.35, 0.72, 1]) {
       for (const [near, far] of [
         [55, 700],
@@ -167,7 +172,6 @@ describe('sprite swap law', () => {
       ] as const) {
         const swap = spriteSwapDistance(base, scaleAt(q), near, far, foliageFogLimit(far, q));
         expect(swap).toBeLessThanOrEqual(base * scaleAt(q) + 1e-9);
-        expect(base * scaleAt(q)).toBeLessThan(LOD_HIGH.treeFillFar * scaleAt(q));
       }
     }
   });

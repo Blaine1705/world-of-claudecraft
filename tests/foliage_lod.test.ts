@@ -253,10 +253,10 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
           realTrees(d, { detailFar, radius }),
           impostors(d, { detailFar, radius }),
         ].filter(bucketVisible).length;
-        // A bucket overlapping the swap draws both meshes and the per-instance
-        // windows (instanceCullWindows, enforced in the vertex shader) split
-        // its trees exactly; everywhere else exactly one mesh draws. 0 is a
-        // hole in the forest; 2 outside the straddle is a double-drawn tree.
+        // A bucket overlapping the swap draws both meshes and the
+        // per-instance shader windows (foliage_collapse.ts) split its trees
+        // exactly; everywhere else exactly one mesh draws. 0 is a hole in
+        // the forest; 2 outside the straddle is a double-drawn tree.
         const straddles = d - radius < detailFar && d + radius >= detailFar;
         expect(drawn, `radius ${radius}, distance ${d}`).toBe(straddles ? 2 : 1);
       }

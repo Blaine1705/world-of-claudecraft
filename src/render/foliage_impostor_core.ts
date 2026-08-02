@@ -122,7 +122,9 @@ export const IMPOSTOR_MIN_BAND = 48;
  * Per-instance handoff jitter span in world units. Each tree swaps at its own
  * hashed distance inside [swap - fade, swap), so the boundary is never a
  * front that sweeps the forest; an individual swap is a one-frame change
- * between two representations sized and tinted to match.
+ * between two representations sized and tinted to match. Note the jitter
+ * undercuts every documented swap floor by up to this span: the effective
+ * clear-air floor is SPRITE_SWAP_MIN minus the fade.
  */
 export const IMPOSTOR_SWAP_FADE = 24;
 
@@ -168,9 +170,12 @@ export function spriteSwapDistance(
 /**
  * Per-instance handoff jitter, 0..1 from the instance's world origin. The
  * real-model collapse (foliage_collapse.ts) and the sprite material
- * (foliage_impostor.ts) each evaluate this in their own vertex shader; both
- * are float32 GLSL, so the two sides agree exactly and every tree swaps at
- * one distance in both meshes.
+ * (foliage_impostor.ts) each evaluate this expression in their own vertex
+ * shader. One compiler compiling one expression over identical inputs agrees
+ * with itself in practice; the GLSL spec does allow per-program contraction
+ * differences, and where a driver diverges the failure degrades to a single
+ * tree trading representations up to the fade span early or late, never a
+ * systematic seam.
  */
 export const IMPOSTOR_JITTER_GLSL =
   'fract(sin(dot(collapseOrigin, vec2(127.1, 311.7))) * 43758.5453)';

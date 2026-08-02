@@ -180,7 +180,7 @@ function archetypeBounds(parts: BakePart[]): { minY: number; height: number; rad
 function bakeAtlas(
   webgl: THREE.WebGLRenderer,
   archetypes: Archetype[],
-): { texture: THREE.Texture; rects: ImpostorCellRect[]; size: number } {
+): { target: THREE.WebGLRenderTarget; rects: ImpostorCellRect[]; size: number } {
   const placement = packImpostorAtlas(
     archetypes.map((a) => a.spec),
     GFX.constrainedMemory ? 2048 : IMPOSTOR_ATLAS_MAX,
@@ -208,89 +208,104 @@ function bakeAtlas(
   const prevClearAlpha = webgl.getClearAlpha();
   const prevAutoClear = webgl.autoClear;
 
-  // Cell addressing goes through the TARGET's viewport/scissor: with a render
-  // target bound, three ignores the renderer-level setViewport (that state
-  // belongs to the canvas) and reads renderTarget.viewport each render call.
-  bakeTarget.scissorTest = true;
-  webgl.setClearColor(0x000000, 0);
-  webgl.autoClear = false;
-
-  archetypes.forEach((arch, ai) => {
-    while (holder.children.length > 0) holder.remove(holder.children[0]);
-    for (const part of arch.parts) {
-      holder.add(new THREE.Mesh(part.geometry, bakeMaterialFor(part.material, part.isLeaf)));
-    }
-    const minY = arch.minY;
-    const height = arch.height;
-    const radius = arch.width / 2;
-    camera.left = -radius;
-    camera.right = radius;
-    camera.top = minY + height;
-    camera.bottom = minY;
-    camera.near = 0.1;
-    camera.far = radius * 4 + 1;
-    camera.position.set(0, 0, radius * 2 + 0.5);
-    camera.lookAt(0, 0, 0);
-    camera.updateProjectionMatrix();
-
-    const rect = placement.origin[ai];
-    const cellPx = Math.round((rect.u1 - rect.u0) * size);
-    const y0 = Math.round(rect.v0 * size);
-    for (let view = 0; view < arch.spec.views; view++) {
-      // Bake convention: view k shows the model spun by +k/views turns, i.e.
-      // the picture of the model seen from bearing -k. The draw shader's rel
-      // angle below must invert the same way; calibrated by the parity test.
-      holder.rotation.y = (view / arch.spec.views) * Math.PI * 2;
-      holder.updateMatrixWorld(true);
-      const x0 = Math.round(rect.u0 * size) + view * cellPx;
-      bakeTarget.viewport.set(x0, y0, cellPx, cellPx);
-      bakeTarget.scissor.set(x0, y0, cellPx, cellPx);
-      webgl.setRenderTarget(bakeTarget);
-      webgl.clear(true, true, false);
-      webgl.render(scene, camera);
-    }
-  });
-
-  // Resolve the multisampled bake into a plain mip-mapped texture and drop
-  // the bake target (its depth buffer alone is size^2 * 4 bytes).
+  // The mip-mapped resolve the sprites sample; created up front so the
+  // finally arm can dispose it on a mid-bake throw.
   const finalTarget = new THREE.WebGLRenderTarget(size, size, {
     depthBuffer: false,
     generateMipmaps: true,
     minFilter: THREE.LinearMipmapLinearFilter,
     magFilter: THREE.LinearFilter,
   });
-  const blitScene = new THREE.Scene();
-  // transparent + NoBlending: a straight RGBA copy. A default opaque material
-  // compiles with the OPAQUE define and force-writes alpha 1 over the whole
-  // atlas, which turns every sprite into a full rectangle downstream (the
-  // alpha test has nothing left to cut).
-  const blitMat = new THREE.MeshBasicMaterial({
-    map: bakeTarget.texture,
-    toneMapped: false,
-    transparent: true,
-    blending: THREE.NoBlending,
-    depthTest: false,
-    depthWrite: false,
-  });
-  const blitQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blitMat);
-  blitScene.add(blitQuad);
-  const blitCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  webgl.setRenderTarget(finalTarget);
-  webgl.clear(true, false, false);
-  webgl.render(blitScene, blitCam);
-
-  webgl.setRenderTarget(prevTarget);
-  webgl.setClearColor(prevClearColor, prevClearAlpha);
-  webgl.autoClear = prevAutoClear;
-
-  blitQuad.geometry.dispose();
-  blitMat.dispose();
-  bakeTarget.dispose();
-  for (const mat of bakeMaterialCache.values()) mat.dispose();
-  bakeMaterialCache.clear();
-
   finalTarget.texture.anisotropy = Math.min(4, webgl.capabilities.getMaxAnisotropy());
-  return { texture: finalTarget.texture, rects: placement.origin, size };
+
+  let done = false;
+  try {
+    // Cell addressing goes through the TARGET's viewport/scissor: with a
+    // render target bound, three ignores the renderer-level setViewport (that
+    // state belongs to the canvas) and reads renderTarget.viewport each
+    // render call. The clear alpha is 0 (the alpha test carves sprites from
+    // it) but the clear RGB is a foliage green: the MSAA resolve and the mip
+    // chain average edge texels toward the clear color, and a black surround
+    // rims every sprite dark where green disappears into the canopy.
+    bakeTarget.scissorTest = true;
+    webgl.setClearColor(0x33502c, 0);
+    webgl.autoClear = false;
+
+    archetypes.forEach((arch, ai) => {
+      while (holder.children.length > 0) holder.remove(holder.children[0]);
+      for (const part of arch.parts) {
+        holder.add(new THREE.Mesh(part.geometry, bakeMaterialFor(part.material, part.isLeaf)));
+      }
+      const minY = arch.minY;
+      const height = arch.height;
+      const radius = arch.width / 2;
+      camera.left = -radius;
+      camera.right = radius;
+      camera.top = minY + height;
+      camera.bottom = minY;
+      camera.near = 0.1;
+      camera.far = radius * 4 + 1;
+      camera.position.set(0, 0, radius * 2 + 0.5);
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+
+      const rect = placement.origin[ai];
+      const cellPx = Math.round((rect.u1 - rect.u0) * size);
+      const y0 = Math.round(rect.v0 * size);
+      for (let view = 0; view < arch.spec.views; view++) {
+        // Bake convention: view k shows the model spun by +k/views turns,
+        // i.e. the picture of the model seen from bearing -k. The draw
+        // shader's rel angle inverts the same way (impRel below); a sign
+        // slip here mirrors every sprite's view ring, verified against live
+        // captures.
+        holder.rotation.y = (view / arch.spec.views) * Math.PI * 2;
+        holder.updateMatrixWorld(true);
+        const x0 = Math.round(rect.u0 * size) + view * cellPx;
+        bakeTarget.viewport.set(x0, y0, cellPx, cellPx);
+        bakeTarget.scissor.set(x0, y0, cellPx, cellPx);
+        webgl.setRenderTarget(bakeTarget);
+        webgl.clear(true, true, false);
+        webgl.render(scene, camera);
+      }
+    });
+
+    // Resolve the multisampled bake into the plain mip-mapped texture and
+    // drop the bake target (its depth buffer alone is size^2 * 4 bytes).
+    const blitScene = new THREE.Scene();
+    // transparent + NoBlending: a straight RGBA copy. A default opaque
+    // material compiles with the OPAQUE define and force-writes alpha 1 over
+    // the whole atlas, which turns every sprite into a full rectangle
+    // downstream (the alpha test has nothing left to cut).
+    const blitMat = new THREE.MeshBasicMaterial({
+      map: bakeTarget.texture,
+      toneMapped: false,
+      transparent: true,
+      blending: THREE.NoBlending,
+      depthTest: false,
+      depthWrite: false,
+    });
+    const blitQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), blitMat);
+    blitScene.add(blitQuad);
+    const blitCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    webgl.setRenderTarget(finalTarget);
+    webgl.clear(true, false, false);
+    webgl.render(blitScene, blitCam);
+    blitQuad.geometry.dispose();
+    blitMat.dispose();
+    done = true;
+  } finally {
+    // Restore the live renderer whatever happened: a mid-bake throw must not
+    // leave the frame loop with a foreign clear color or autoClear off.
+    webgl.setRenderTarget(prevTarget);
+    webgl.setClearColor(prevClearColor, prevClearAlpha);
+    webgl.autoClear = prevAutoClear;
+    bakeTarget.dispose();
+    for (const mat of bakeMaterialCache.values()) mat.dispose();
+    bakeMaterialCache.clear();
+    if (!done) finalTarget.dispose();
+  }
+
+  return { target: finalTarget, rects: placement.origin, size };
 }
 
 // ---------------------------------------------------------------------------
@@ -326,13 +341,14 @@ const IMPOSTOR_WIND_GLSL = `
 
 const materialCache = new Map<ImpostorCategory, THREE.MeshLambertMaterial>();
 
-// The one live atlas. A same-session world rebuild bakes a fresh one; the
-// previous texture must be released or each rebuild leaks its GPU pages.
-let liveAtlas: THREE.Texture | null = null;
+// The one live atlas target. A same-session world rebuild bakes a fresh one;
+// the previous target must be released (texture AND framebuffer, which only
+// WebGLRenderTarget.dispose frees) or each rebuild leaks GPU pages.
+let liveAtlas: THREE.WebGLRenderTarget | null = null;
 
-function adoptAtlas(atlas: THREE.Texture): void {
-  if (liveAtlas && liveAtlas !== atlas) liveAtlas.dispose();
-  liveAtlas = atlas;
+function adoptAtlas(target: THREE.WebGLRenderTarget): void {
+  if (liveAtlas && liveAtlas !== target) liveAtlas.dispose();
+  liveAtlas = target;
 }
 
 function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THREE.Material {
@@ -350,8 +366,12 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
     fog: true,
   });
   mat.name = `foliage:impostor-${category}`;
-  // wind only sways what waves in the real kit: trees and bushes, not rocks
-  const windStrength = category === 'rock' || !GFX.windSway ? 0 : category === 'tree' ? 0.35 : 0.18;
+  // Amplitude parity with addWind in foliage.ts: TREE_WIND_STRENGTH 0.08
+  // times the kit's windMul (1.0 leaves, 1.2 bushes). The sway direction is
+  // world-fixed here where the real mesh sways in its rotated model frame:
+  // an accepted approximation, sub-pixel at every sprite distance. Rocks do
+  // not wave in the real kit and take none.
+  const windStrength = category === 'rock' || !GFX.windSway ? 0 : category === 'tree' ? 0.08 : 0.096;
   mat.onBeforeCompile = (shader) => {
     shader.uniforms.uTime = sharedUniforms.uTime;
     shader.uniforms.uImpSwap = swap;
@@ -507,8 +527,9 @@ export function createImpostorSession(): ImpostorSession | null {
 
     finalize(webgl, parent) {
       if (archetypes.length === 0) return [];
-      const { texture, rects } = bakeAtlas(webgl, archetypes);
-      adoptAtlas(texture);
+      const { target, rects } = bakeAtlas(webgl, archetypes);
+      adoptAtlas(target);
+      const texture = target.texture;
       const registrations: ImpostorRegistration[] = [];
       for (const acc of buckets) {
         if (acc.items.length === 0) continue;
