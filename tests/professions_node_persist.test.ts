@@ -135,9 +135,31 @@ describe('the write ceiling, the load clamp, and the record bound stay coupled',
     // eleven starter zones took the live node count 54 to 120 (integer
     // record measured 2784, so the two-decimal worst case sits near 3150
     // and the new ceiling keeps the same order of headroom the old one had).
+    // It moved 4096 to 8192 at the phase 20 density pass, when the +36
+    // bottom-three additions took the count 120 to 156: the integer record
+    // measured 3,648, still under the old pin, but the two-decimal
+    // real-record form crossed it at 4,116 (and the wire twin's thirty-day
+    // form in tests/professions_wire_budget.test.ts crossed outright at
+    // 4,740), so BOTH files took the natural doubling step together. Sizing
+    // note, corrected at the phase 20 review round: the +132 full-D5
+    // follow-on measures 7,684 bytes in THIS two-decimal persist form (so it
+    // fits the 8192 persist pin), but its wire twin adds four bytes per
+    // entry and lands near 8,850, so the WIRE arm takes a third move at that
+    // content (docs/design/professions-tuning-packet-review.md, the phase 20
+    // build record's premise correction on Q11's recorded number).
     const all = serializeNodeReadiness(meta.nodeHarvestReadyAt, 0);
     expect(all && Object.keys(all).length).toBe(GATHER_NODES.length);
-    expect(JSON.stringify(all).length).toBeLessThanOrEqual(4096);
+    expect(JSON.stringify(all).length).toBeLessThanOrEqual(8192);
+    // The two-decimal REAL-record form, the shape live saves actually carry
+    // and the number the raise was decided on: one twentieth of a second
+    // after the harvests every remaining serializes as 239.95. This is what
+    // makes the 8192 pin load-bearing in both directions here: reverting it
+    // to 4096 reds on the 4,116-byte measurement below.
+    const twoDecimal = serializeNodeReadiness(meta.nodeHarvestReadyAt, 0.05);
+    expect(twoDecimal && Object.keys(twoDecimal).length).toBe(GATHER_NODES.length);
+    const twoDecimalBytes = JSON.stringify(twoDecimal).length;
+    expect(twoDecimalBytes).toBeGreaterThan(4096);
+    expect(twoDecimalBytes).toBeLessThanOrEqual(8192);
     // The load side must survive the same scale: no cap, break, or dedupe may
     // shrink a full record on the way back in.
     expect(Object.keys(applyNodeReadiness(all, 0)).length).toBe(GATHER_NODES.length);

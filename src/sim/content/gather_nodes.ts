@@ -39,6 +39,13 @@
 // clearings, which is the density half of the goal and is real. The idle half is
 // only delivered in zone 1. Recorded here so the next reader does not believe
 // waiting was solved.
+//
+// Scope note for the header above: "every zone" meant the tuned strip when it
+// was written. The v0.32.0 expansion shipped eleven zones at a deliberate
+// two-per-type hub-outskirt starter kit, and the phase 20 density pass
+// (docs/design/professions-tuning-packet-review.md, the build record) brought
+// three of them (willowfen, galecrest, farshore_isle) to the strip's own six
+// per type; the remaining eight keep the starter kit until their zone-4 pass.
 
 import type { GatherNodeDef, GatherNodeType } from '../types';
 
@@ -905,6 +912,125 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 20,
     tier: 1,
   },
+  // Phase 20 density pass (the +36 bottom-three set, docs/design/
+  // professions-tuning-packet-review.md Q9 to Q16): four more of each type
+  // spread to the zone's far quarters, all tier 1, the rollout ledger row
+  // staying 'starter'. Every spot passed the full placement-rule sweep
+  // (dry land with sea freeboard, slope and reach, colliders, stand spot,
+  // hub flood, spacing, cluster bands, road band, dangers, mailbox floor)
+  // before landing.
+  {
+    id: 'ore_willowfen_3',
+    zoneId: 'willowfen',
+    type: 'ore',
+    // Lilymoors west fen-pool bank, a fishing shore nearby.
+    pos: { x: -470, z: 330 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'ore_willowfen_4',
+    zoneId: 'willowfen',
+    type: 'ore',
+    // Bogshine east margin. Nudged off (-252,268) at authoring (Q15): 1.48yd
+    // of world-sea freeboard sat inside the guard's half-yard near band; the
+    // moved spot clears at 1.76.
+    pos: { x: -251, z: 268 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'ore_willowfen_5',
+    zoneId: 'willowfen',
+    type: 'ore',
+    // Drowsy Flats southwest margin.
+    pos: { x: -384, z: 512 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'ore_willowfen_6',
+    zoneId: 'willowfen',
+    type: 'ore',
+    // North fen by the Tanglemouth road.
+    pos: { x: -358, z: 604 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_willowfen_3',
+    zoneId: 'willowfen',
+    type: 'wood',
+    // Lilymoors north willow stand.
+    pos: { x: -458, z: 264 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_willowfen_4',
+    zoneId: 'willowfen',
+    type: 'wood',
+    // East moor by the Windway track.
+    pos: { x: -232, z: 420 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_willowfen_5',
+    zoneId: 'willowfen',
+    type: 'wood',
+    // Drowsy Flats east rise. Nudged off (-254,500) at authoring (Q15):
+    // 1.01yd of world-sea freeboard; the moved spot clears at 1.73.
+    pos: { x: -251, z: 504 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_willowfen_6',
+    zoneId: 'willowfen',
+    type: 'wood',
+    // North fen west stand. Nudged off (-418,580) at authoring (Q15): 1.08yd
+    // of world-sea freeboard; the moved spot clears at 1.69.
+    pos: { x: -417, z: 580 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_willowfen_3',
+    zoneId: 'willowfen',
+    type: 'herb',
+    // Bogshine south pool shore.
+    pos: { x: -296, z: 332 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_willowfen_4',
+    zoneId: 'willowfen',
+    type: 'herb',
+    // Willowweep pool margin, a fishing shore.
+    pos: { x: -452, z: 438 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_willowfen_5',
+    zoneId: 'willowfen',
+    type: 'herb',
+    // North fen east meadow.
+    pos: { x: -322, z: 588 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_willowfen_6',
+    zoneId: 'willowfen',
+    type: 'herb',
+    // South fen off the Amberfen Steps road.
+    pos: { x: -330, z: 240 },
+    level: 20,
+    tier: 1,
+  },
 
   // The Nightbloom, around Moonrest: hub-outskirt veins, stands, and patches so every
   // profession can gather without backtracking to an older zone.
@@ -1062,6 +1188,118 @@ export const GATHER_NODES: GatherNodeDef[] = [
     level: 20,
     tier: 1,
   },
+  // Phase 20 density pass (the +36 bottom-three set; see the willowfen block
+  // note above for the sweep every spot passed).
+  {
+    id: 'ore_galecrest_3',
+    zoneId: 'galecrest',
+    type: 'ore',
+    // Old Beacon road foot.
+    pos: { x: 474, z: 298 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'ore_galecrest_4',
+    zoneId: 'galecrest',
+    type: 'ore',
+    // Coast road south of Wickharbor.
+    pos: { x: 420, z: 470 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'ore_galecrest_5',
+    zoneId: 'galecrest',
+    type: 'ore',
+    // Wreckfields approach.
+    pos: { x: 330, z: 600 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'ore_galecrest_6',
+    zoneId: 'galecrest',
+    type: 'ore',
+    // Howling Downs west.
+    pos: { x: 232, z: 300 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_galecrest_3',
+    zoneId: 'galecrest',
+    type: 'wood',
+    // Windway road south side.
+    pos: { x: 250, z: 432 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_galecrest_4',
+    zoneId: 'galecrest',
+    type: 'wood',
+    // Mid downs on the tarn road.
+    pos: { x: 350, z: 480 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_galecrest_5',
+    zoneId: 'galecrest',
+    type: 'wood',
+    // Wreckfields west treeline rise, clear of the Warden and deckhand camps.
+    pos: { x: 250, z: 648 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'wood_galecrest_6',
+    zoneId: 'galecrest',
+    type: 'wood',
+    // Stable meadows east, outside the (500,500) 60yd mob-scan probe disc.
+    pos: { x: 452, z: 600 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_galecrest_3',
+    zoneId: 'galecrest',
+    type: 'herb',
+    // Mirror Tarn northeast shore, bundling with the fishing site. Moved from
+    // the authored (330,562), whose cell the hub flood cannot enter.
+    pos: { x: 326, z: 566 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_galecrest_4',
+    zoneId: 'galecrest',
+    type: 'herb',
+    // West downs meadow.
+    pos: { x: 240, z: 352 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_galecrest_5',
+    zoneId: 'galecrest',
+    type: 'herb',
+    // South Lawnmere bank approach, on the dry side of the z 680 to 700 mere
+    // rect.
+    pos: { x: 420, z: 650 },
+    level: 20,
+    tier: 1,
+  },
+  {
+    id: 'herb_galecrest_6',
+    zoneId: 'galecrest',
+    type: 'herb',
+    // Beacon meadow at the eastern ridge foot, 16yd of rim margin.
+    pos: { x: 484, z: 330 },
+    level: 20,
+    tier: 1,
+  },
 
   // The Palmreach, around Drifthaven: hub-outskirt veins, stands, and patches so every
   // profession can gather without backtracking to an older zone.
@@ -1120,7 +1358,10 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_evergarden_1',
     zoneId: 'evergarden',
     type: 'ore',
-    pos: { x: 358, z: 784 },
+    // Moved off (358,784) at the phase 20 pass (Q13): 0.42yd from the road
+    // center line stood the vein body in the roadway by the R11 standard; the
+    // new spot clears the 5yd band at 6.3yd and keeps the hub flood.
+    pos: { x: 354, z: 780 },
     level: 20,
     tier: 1,
   },
@@ -1217,6 +1458,121 @@ export const GATHER_NODES: GatherNodeDef[] = [
     zoneId: 'farshore_isle',
     type: 'herb',
     pos: { x: 291, z: 122 },
+    level: 5,
+    tier: 1,
+  },
+  // Phase 20 density pass (the +36 bottom-three set; see the willowfen block
+  // note above for the sweep every spot passed).
+  {
+    id: 'ore_farshore_isle_3',
+    zoneId: 'farshore_isle',
+    type: 'ore',
+    // Causeway-approach meadow north of the Landing.
+    pos: { x: 232, z: 30 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'ore_farshore_isle_4',
+    zoneId: 'farshore_isle',
+    type: 'ore',
+    // South headland toward the cliffs.
+    pos: { x: 352, z: -48 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'ore_farshore_isle_5',
+    zoneId: 'farshore_isle',
+    type: 'ore',
+    // Sundered Cliffs meadow.
+    pos: { x: 430, z: -90 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'ore_farshore_isle_6',
+    zoneId: 'farshore_isle',
+    type: 'ore',
+    // Riftfields east reach. Nudged off (454,93) at authoring (Q15): 1.02yd
+    // of world-sea freeboard; the moved spot clears at 1.50.
+    pos: { x: 450, z: 93 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'wood_farshore_isle_3',
+    zoneId: 'farshore_isle',
+    type: 'wood',
+    // South strand west.
+    pos: { x: 279, z: -44 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'wood_farshore_isle_4',
+    zoneId: 'farshore_isle',
+    type: 'wood',
+    // South headland stand.
+    pos: { x: 330, z: -70 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'wood_farshore_isle_5',
+    zoneId: 'farshore_isle',
+    type: 'wood',
+    // North coast east of Gull Mere, bundling with the fishing site. Nudged
+    // off (388,123) at authoring (Q15): 1.04yd of world-sea freeboard; the
+    // moved spot clears at 1.50.
+    pos: { x: 386, z: 120 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'wood_farshore_isle_6',
+    zoneId: 'farshore_isle',
+    type: 'wood',
+    // Ferrywalk causeway approach.
+    pos: { x: 210, z: -24 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'herb_farshore_isle_3',
+    zoneId: 'farshore_isle',
+    type: 'herb',
+    // West meadow off the shore road.
+    pos: { x: 245, z: 55 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'herb_farshore_isle_4',
+    zoneId: 'farshore_isle',
+    type: 'herb',
+    // North shore east of Gull Mere, outside its blend footprint, bundling
+    // with the fishing site. Nudged off (358,140) at authoring (Q15): 1.16yd
+    // of world-sea freeboard; the moved spot clears at 1.52.
+    pos: { x: 358, z: 138 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'herb_farshore_isle_5',
+    zoneId: 'farshore_isle',
+    type: 'herb',
+    // South strand patch.
+    pos: { x: 295, z: -55 },
+    level: 5,
+    tier: 1,
+  },
+  {
+    id: 'herb_farshore_isle_6',
+    zoneId: 'farshore_isle',
+    type: 'herb',
+    // Riftfields patch.
+    pos: { x: 430, z: 8 },
     level: 5,
     tier: 1,
   },

@@ -222,15 +222,29 @@ describe('ncd bytes per player per tick under the delta rules (stable arm)', () 
     expect(m).not.toBeNull();
     const payload = m?.[1] ?? '';
     expect(Object.keys(JSON.parse(payload))).toHaveLength(GATHER_NODES.length);
-    // The wire twin of tests/professions_node_persist.test.ts's 4096-byte
-    // persistence ceiling: the same 120-entry record, absolute-deadline form
-    // at day-scale deadline widths. Growth history there: 2048 -> 4096 when
-    // live nodes went 54 -> 120. Width note (the fix-round review): the
-    // encoder's round2 collapses the accumulated float clock, so 10 chars per
-    // deadline is the true maximum at this magnitude; the next integer digit
-    // arrives past roughly 116 days of continuous realm uptime and costs
-    // about 120 bytes against the remaining headroom.
-    expect(payload.length).toBeLessThanOrEqual(4096);
+    // The wire twin of tests/professions_node_persist.test.ts's persistence
+    // ceiling: the same every-node record, absolute-deadline form at
+    // day-scale deadline widths. Growth history there: 2048 -> 4096 when
+    // live nodes went 54 -> 120; 4096 -> 8192 at the phase 20 density pass,
+    // when the +36 bottom-three additions took the count to 156 and this
+    // arm's thirty-day form measured 4,740 bytes (the wire binds FIRST: it
+    // crossed the old pin at roughly +17 nodes while the persist integer
+    // form was still under). Both files moved together per the v0.32.0
+    // precedent. Sizing note, corrected at the phase 20 review round: the
+    // recorded 7,684-byte full-D5 measurement is the PERSIST two-decimal
+    // form; this wire form adds four bytes per entry (proven at 156 nodes:
+    // 4,740 = 4,116 + 624) and lands near 8,850 at the +132 follow-on, so
+    // THIS arm takes a third ceiling move at that content
+    // (docs/design/professions-tuning-packet-review.md, the phase 20 build
+    // record's premise correction). Width note (the fix-round review): the
+    // encoder's round2 collapses the accumulated float clock, so 10 chars
+    // per deadline is the true maximum at this magnitude; the next integer
+    // digit arrives past roughly 116 days of continuous realm uptime and
+    // costs about 156 bytes against the remaining headroom.
+    // Two-sided on purpose: the lower bracket proves the raise was needed
+    // (this form crossed the old pin), so reverting 8192 to 4096 reds twice.
+    expect(payload.length).toBeGreaterThan(4096);
+    expect(payload.length).toBeLessThanOrEqual(8192);
   });
 });
 
@@ -289,7 +303,10 @@ describe('ncd on the legacy per-tick arm', () => {
     expect(m).not.toBeNull();
     const payload = m?.[1] ?? '';
     expect(Object.keys(JSON.parse(payload))).toHaveLength(GATHER_NODES.length);
-    expect(payload.length).toBeLessThanOrEqual(4096);
+    // 8192 since the phase 20 density pass, with the stable arm above (the
+    // legacy remaining-seconds form is narrower than the thirty-day
+    // absolute-deadline form, so the same ceiling bounds both).
+    expect(payload.length).toBeLessThanOrEqual(8192);
     // This payload repeats per player per tick at 20 Hz for a pre-stable
     // client while anything cools: that per-tick repetition is exactly why
     // the stable arm exists, and the load rig measures both arms live.

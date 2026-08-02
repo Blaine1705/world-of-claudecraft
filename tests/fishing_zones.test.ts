@@ -50,7 +50,7 @@ import {
   type ItemDef,
   type SimEvent,
 } from '../src/sim/types';
-import { terrainHeight, waterLevelAt } from '../src/sim/world';
+import { terrainHeight, waterLevel, waterLevelAt } from '../src/sim/world';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 // DERIVED from the authored tables' own keys, never a hand list: the
@@ -1051,6 +1051,34 @@ describe('the LIVE map cross-boundary cast site (no content override)', () => {
   });
 });
 
+// Memoized per-lake casting spots for the R55 arms below: fishableSpotOn is a
+// real-cast ring sweep with its own throwaway sim, so probe each declared
+// lake exactly once however many arms read the result.
+const LAKE_SPOT_CACHE = new Map<string, { x: number; z: number; facing: number } | null>();
+function spotForLake(zoneId: string, lake: { x: number; z: number; radius: number }) {
+  // Zone-scoped key: two zones declaring a lake at identical coordinates
+  // must not share a cached probe (the review round's cache-collision nit).
+  const k = `${zoneId}:${lake.x},${lake.z}`;
+  if (!LAKE_SPOT_CACHE.has(k)) {
+    try {
+      LAKE_SPOT_CACHE.set(k, fishableSpotOn(lake));
+    } catch {
+      LAKE_SPOT_CACHE.set(k, null);
+    }
+  }
+  return LAKE_SPOT_CACHE.get(k) ?? null;
+}
+
+// The two DECORATIVE lakes (the phase 20 fishing-geometry pass, Q14 in
+// docs/design/professions-tuning-packet-review.md): declared discs that hold
+// no swim-depth water, so no cast can accept on them. Both dried under a
+// terrain lift that post-dates their authoring: the farshore Hilltop Spring
+// under the Crown dome's +14 (the pre-R55 state, kept as scenery once Gull
+// Mere landed) and the Mirrormere under the western-highlands lift. Ruled
+// intentional; a lake that goes dry JOINS this list by a human edit, and one
+// that gains water must LEAVE it (the census arm reds).
+const DECORATIVE_LAKES = ['farshore_isle:388,26', 'veiled_hollow:-120,1105'];
+
 describe('every rod-tier row stands on real water and a real schedule row', () => {
   it('the shipped rod-tier ladder is fully distinguished by the gain schedule', () => {
     // The wield ladder's completeness arm has this shape for land tools; the
@@ -1080,25 +1108,258 @@ describe('every rod-tier row stands on real water and a real schedule row', () =
     expect(fishingTeachingCeilingFor(top)).toBe(200);
   });
 
-  it('every zone with declared lakes has water a REAL cast accepts', () => {
+  it('every declared lake accepts a REAL cast, or is a pinned decorative exemption', () => {
     // The R55 defect class: a zone carrying a live rod-tier row over water no
     // startFishing accepts (farshore shipped that way; the Crown dome dried
-    // the Hilltop Spring). Zones with no declared lakes are served by the
-    // programmatic border waters and are skipped here with that reason.
+    // the Hilltop Spring). Upgraded from some-lake-per-zone to per-lake at
+    // the phase 20 pass (Q14): the some() form let a dead lake hide behind a
+    // zone's one live one, which is exactly how the two decorative discs
+    // shipped unnoticed. Zones with no declared lakes would be served by the
+    // programmatic border waters and skipped; every shipped zone declares
+    // lakes today, and the count pin keeps this sweep from emptying quietly.
+    const dead: string[] = [];
+    let checked = 0;
     for (const zone of ZONES) {
       if (!FISHING_ZONE_ROD_TIERS[zone.id] || zone.lakes.length === 0) continue;
-      const spot = zone.lakes.map((lake) => {
-        try {
-          return fishableSpotOn(lake);
-        } catch {
-          return null;
+      checked += 1;
+      for (const lake of zone.lakes) {
+        if (spotForLake(zone.id, lake) === null) dead.push(`${zone.id}:${lake.x},${lake.z}`);
+      }
+    }
+    expect(checked).toBe(14);
+    expect(dead.sort()).toEqual(DECORATIVE_LAKES);
+  });
+
+  it('the decorative-lake exemptions genuinely hold no swim-depth water', () => {
+    // The exemption's own non-rot arm: a decorative disc that gains real
+    // water reds HERE and must leave the list, so the pin can never mask a
+    // lake that became fishable and then broke.
+    for (const entry of DECORATIVE_LAKES) {
+      const [zoneId, coords] = entry.split(':');
+      const [lx, lz] = coords.split(',').map(Number);
+      const zone = ZONES.find((z) => z.id === zoneId);
+      const lake = zone?.lakes.find((l) => l.x === lx && l.z === lz);
+      expect(lake, `${entry} names a declared lake`).toBeDefined();
+      if (!lake) continue;
+      let wet = 0;
+      for (let dx = -lake.radius; dx <= lake.radius; dx += 0.5) {
+        for (let dz = -lake.radius; dz <= lake.radius; dz += 0.5) {
+          if (dx * dx + dz * dz > lake.radius * lake.radius) continue;
+          const x = lake.x + dx;
+          const z = lake.z + dz;
+          if (terrainHeight(x, z, WORLD_SEED) < waterLevelAt(x, z) - PLAYER_SWIM_DEPTH) wet++;
         }
-      });
+      }
+      expect(wet, `${entry} holds swim-depth water and must leave the decorative list`).toBe(0);
+    }
+  });
+
+  it('every zone hub is a bounded walk from its nearest fishable shore', () => {
+    // Q14's travel-distance claim, measured rather than asserted: the
+    // straight-line hub distance to the nearest accepted casting spot, per
+    // rod-row zone. Wickharbor is the shipped worst by a wide margin (the
+    // Mirror Tarn shore, measured 230yd; the next zone sits at 137yd), the
+    // ruling accepted it with the south Lawnmere bank as the second site
+    // (the border-water arm below), and the bracket pins that acceptance:
+    // a ceiling under 240 that the shipped worst genuinely bites.
+    let worst = 0;
+    let worstZone = '';
+    let measured = 0;
+    for (const zone of ZONES) {
+      if (!FISHING_ZONE_ROD_TIERS[zone.id] || zone.lakes.length === 0) continue;
+      let best = Number.POSITIVE_INFINITY;
+      for (const lake of zone.lakes) {
+        const spot = spotForLake(zone.id, lake);
+        if (!spot) continue;
+        best = Math.min(best, Math.hypot(spot.x - zone.hub.x, spot.z - zone.hub.z));
+      }
+      expect(best, `${zone.id} has no fishable lake at all`).toBeLessThan(Number.POSITIVE_INFINITY);
+      measured += 1;
+      if (best > worst) {
+        worst = best;
+        worstZone = zone.id;
+      }
+    }
+    expect(measured).toBe(14);
+    expect(worstZone).toBe('galecrest');
+    expect(worst).toBeLessThanOrEqual(240);
+    expect(worst).toBeGreaterThan(200); // the ceiling bites, per the prose above
+  });
+
+  // Walkable-dry for the hub-shore floods below: above the WORLD sea plane
+  // (the ocean and every below-plane basin is a swim, whatever waterLevelAt
+  // says: outside a declared body it answers -Infinity, which would call the
+  // open sea dry) AND not swim-depth inside a declared body. The review
+  // round proved the naive declared-water-only form vacuous: 64 percent of
+  // the farshore rect sits below the sea plane yet counted as dry foot.
+  const dryFoot = (x: number, z: number): boolean => {
+    const ground = terrainHeight(x, z, WORLD_SEED);
+    if (ground <= waterLevel()) return false;
+    const wl = waterLevelAt(x, z);
+    return !Number.isFinite(wl) || ground > wl - PLAYER_SWIM_DEPTH;
+  };
+
+  const floodFromHub = (
+    zone: {
+      hub: { x: number; z: number };
+      xMin?: number;
+      xMax?: number;
+      zMin: number;
+      zMax: number;
+    },
+    step: number,
+  ): Set<string> => {
+    const key = (x: number, z: number) => `${Math.round(x / step)},${Math.round(z / step)}`;
+    const x0 = zone.xMin ?? 0;
+    const x1 = zone.xMax ?? 0;
+    const seen = new Set<string>([key(zone.hub.x, zone.hub.z)]);
+    const queue: [number, number][] = [[zone.hub.x, zone.hub.z]];
+    for (let head = 0; head < queue.length; head++) {
+      const [cx, cz] = queue[head];
+      for (const [dx, dz] of [
+        [step, 0],
+        [-step, 0],
+        [0, step],
+        [0, -step],
+      ]) {
+        const x = cx + dx;
+        const z = cz + dz;
+        if (x < x0 || x > x1 || z < zone.zMin || z > zone.zMax) continue;
+        const k = key(x, z);
+        if (seen.has(k) || !dryFoot(x, z)) continue;
+        seen.add(k);
+        queue.push([x, z]);
+      }
+    }
+    return seen;
+  };
+
+  it('the bottom-map zones reach their nearest fishable shore on dry foot from the hub', () => {
+    // The phase 20 bundling premise (nodes placed by fishing shores are only
+    // worth the trip if the shore is walkable from town): a coarse dry-cell
+    // flood from each hub (the tests/galecrest.test.ts landmass idiom, with
+    // the sea-plane-aware dryFoot above) must reach the nearest accepted
+    // casting spot.
+    const step = 4;
+    const key = (x: number, z: number) => `${Math.round(x / step)},${Math.round(z / step)}`;
+    for (const zoneId of ['willowfen', 'galecrest', 'farshore_isle']) {
+      const zone = ZONES.find((z) => z.id === zoneId);
+      expect(zone).toBeDefined();
+      if (!zone) continue;
+      let spot: { x: number; z: number } | null = null;
+      let best = Number.POSITIVE_INFINITY;
+      for (const lake of zone.lakes) {
+        const s = spotForLake(zone.id, lake);
+        if (!s) continue;
+        const d = Math.hypot(s.x - zone.hub.x, s.z - zone.hub.z);
+        if (d < best) {
+          best = d;
+          spot = s;
+        }
+      }
+      expect(spot, `${zoneId} has no accepted casting spot`).not.toBeNull();
+      if (!spot) continue;
+      expect(zone.xMin, `${zoneId} rect`).toBeDefined();
+      expect(zone.xMax, `${zoneId} rect`).toBeDefined();
+      const seen = floodFromHub(zone, step);
+      // The caster stands at the water's edge, so the spot's own cell can
+      // round into the wet side of the shore at this grid: reaching any
+      // cell one step around it is reaching the shore.
+      let shoreReached = false;
+      for (let dx = -step; dx <= step && !shoreReached; dx += step) {
+        for (let dz = -step; dz <= step && !shoreReached; dz += step) {
+          if (seen.has(key(spot.x + dx, spot.z + dz))) shoreReached = true;
+        }
+      }
       expect(
-        spot.some((s) => s !== null),
-        `${zone.id} carries a rod-tier row but none of its ${zone.lakes.length} lakes accepts a cast`,
+        shoreReached,
+        `${zoneId} hub flood never reaches the casting spot (${spot.x.toFixed(1)},${spot.z.toFixed(1)})`,
       ).toBe(true);
     }
+  });
+
+  it('the hub-shore flood can fail: open sea is not dry foot and stays unreached', () => {
+    // The counter-arm the review round demanded after the first predicate
+    // proved vacuous. Two halves: the ocean floor south of the farshore
+    // strand is genuinely below the world sea plane (the property), and the
+    // farshore hub flood never reaches it nor any cell around it (the
+    // verdict), so a casting spot on the far side of open water CANNOT
+    // satisfy the arm above.
+    const step = 4;
+    const key = (x: number, z: number) => `${Math.round(x / step)},${Math.round(z / step)}`;
+    const zone = ZONES.find((z) => z.id === 'farshore_isle');
+    expect(zone).toBeDefined();
+    if (!zone) return;
+    const OFF_STRAND_SEA_FLOOR = { x: 296, z: -172 };
+    expect(terrainHeight(OFF_STRAND_SEA_FLOOR.x, OFF_STRAND_SEA_FLOOR.z, WORLD_SEED)).toBeLessThan(
+      waterLevel(),
+    );
+    expect(dryFoot(OFF_STRAND_SEA_FLOOR.x, OFF_STRAND_SEA_FLOOR.z)).toBe(false);
+    const seen = floodFromHub(zone, step);
+    expect(seen.size).toBeGreaterThan(1000); // the flood really travelled
+    let reached = false;
+    for (let dx = -step; dx <= step && !reached; dx += step) {
+      for (let dz = -step; dz <= step && !reached; dz += step) {
+        if (seen.has(key(OFF_STRAND_SEA_FLOOR.x + dx, OFF_STRAND_SEA_FLOOR.z + dz))) reached = true;
+      }
+    }
+    expect(reached, 'the sea floor must stay outside the dry-foot flood').toBe(false);
+  });
+
+  it('border waters are fishable declared water: the Lawnmere south bank accepts a REAL cast', () => {
+    // The Lawnmere carves swim-depth water into the galecrest side of the
+    // z 700 border (ROW_MERES in src/sim/world.ts): the second Wickharbor
+    // site the Q14 ruling names. Probed with the same real-cast accept as
+    // the lake sweeps, pinned to the galecrest side (zoneAt is exclusive at
+    // zMax, so z under 700 resolves galecrest) and to the ruling's rough
+    // 330yd distance.
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('silverstream_fishing_rod', 1);
+    // Distance is measured from the literal Wickharbor hub; pin the live hub
+    // to that literal so a relocation cannot leave this arm measuring from
+    // an abandoned point while staying green.
+    expect(ZONES.find((z) => z.id === 'galecrest')?.hub).toMatchObject({ x: 420, z: 360 });
+    let accepted: { x: number; z: number } | null = null;
+    for (let x = 440; x <= 538 && !accepted; x += 2) {
+      for (let z = 682; z <= 698 && !accepted; z += 2) {
+        teleportTo(sim, x, z);
+        sim.player.facing = 0; // toward +z, into the border water at z 700
+        startFishing(sim.ctx, sim.player, meta);
+        if (sim.player.castingAbility === FISHING_CAST_ID) {
+          sim.player.castingAbility = null;
+          sim.player.castRemaining = 0;
+          sim.player.fishBiteAtTick = 0;
+          sim.player.fishReelDeadlineTick = 0;
+          accepted = { x, z };
+        }
+      }
+    }
+    expect(accepted, 'no accepted cast on the galecrest Lawnmere bank').not.toBeNull();
+    if (!accepted) return;
+    expect(zoneAt(accepted.x, accepted.z).id).toBe('galecrest');
+    const d = Math.hypot(accepted.x - 420, accepted.z - 360);
+    expect(d).toBeGreaterThan(300);
+    expect(d).toBeLessThan(360);
+  });
+
+  it('the open sea is unfishable: a seaward coastal cast denies with the no-water error', () => {
+    // The render draws one world-spanning sea, but the ocean is not a
+    // declared water body, so waterLevelAt answers -Infinity there and the
+    // 24yd probe walk finds no fishable sample. The farshore south strand
+    // faces open ocean with no declared body in reach; the same rod that
+    // accepts on Gull Mere denies here.
+    const sim = makeSim();
+    const meta = sim.meta(sim.playerId) as PlayerMeta;
+    sim.addItem('silverstream_fishing_rod', 1);
+    teleportTo(sim, 295, -70);
+    sim.player.facing = Math.PI; // toward -z, off the strand and out to sea
+    const evStart = sim.events.length;
+    startFishing(sim.ctx, sim.player, meta);
+    expect(sim.player.castingAbility).toBeNull();
+    expect(sim.events.slice(evStart)).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'You need to face fishable water.' }),
+    );
   });
 
   it('Gull Mere is deeply fishable with a walkable dry shore, at the shipped seed', () => {

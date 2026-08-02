@@ -20,9 +20,13 @@ describe('gather node rendering', () => {
       (child): child is THREE.InstancedMesh => child instanceof THREE.InstancedMesh,
     );
 
-    expect(GATHER_NODES).toHaveLength(120);
-    expect(expectedBatches.size).toBe(57);
-    expect(meshes).toHaveLength(57);
+    // 120 nodes in 57 batches through v0.33.0; the phase 20 density pass
+    // (the +36 bottom-three set) took the content to 156 nodes and 68
+    // batches (11 new zone:type:band combos across willowfen, galecrest,
+    // and farshore_isle).
+    expect(GATHER_NODES).toHaveLength(156);
+    expect(expectedBatches.size).toBe(68);
+    expect(meshes).toHaveLength(68);
     expect(meshes.reduce((sum, mesh) => sum + mesh.count, 0)).toBe(GATHER_NODES.length);
     expect(new Set(meshes.map((mesh) => mesh.geometry)).size).toBe(3);
     expect(new Set(meshes.map((mesh) => mesh.material)).size).toBe(3);

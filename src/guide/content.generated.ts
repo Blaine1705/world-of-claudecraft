@@ -7882,7 +7882,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Iron Ore"
       },
       {
@@ -7896,7 +7896,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Osmium Ore"
       },
       {
@@ -7924,7 +7924,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Osmium Ore"
       },
       {
@@ -8092,7 +8092,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Ashwood Log"
       },
       {
@@ -8106,7 +8106,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Highpine Log"
       },
       {
@@ -8134,7 +8134,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Highpine Log"
       },
       {
@@ -8302,7 +8302,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Farshore",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Goldleaf Herb"
       },
       {
@@ -8316,7 +8316,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Galecrest",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Sunpetal Herb"
       },
       {
@@ -8344,7 +8344,7 @@ export const GUIDE_PROF_GATHERING: GuideProfGathering[] = [
         "zone": "The Willowfen",
         "tier": 1,
         "toolTier": 1,
-        "count": 2,
+        "count": 6,
         "material": "Sunpetal Herb"
       },
       {

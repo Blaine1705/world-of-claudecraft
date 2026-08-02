@@ -44,11 +44,17 @@ const CAMP_AREA_PAD = 4;
 const POINT_AREA_RADIUS = 6;
 /**
  * How close two gather nodes have to be to read as ONE place on the map, used by
- * gatherNodeClusters below. Every zone carries six nodes of every type
- * (content/gather_nodes.ts), so a circle per node put six translucent fills and
- * six numbered badges on one zone map. The fills composite per circle rather
- * than merging, so overlapping ones darken toward opaque, and each carries its
- * own opaque badge as wide as the blob it labels. Grouping first fixes that.
+ * gatherNodeClusters below. The tuned strip and the phase 20 bottom-map zones
+ * carry six nodes of every type, the other expansion zones their two-per-type
+ * starter kits (content/gather_nodes.ts), so a circle per node put up to six
+ * translucent fills and six numbered badges on one zone map. The fills
+ * composite per circle rather than merging, so overlapping ones darken toward
+ * opaque, and each carries its own opaque badge as wide as the blob it labels.
+ * Grouping first fixes that. The worked measurements below predate the phase
+ * 20 additions; that pass verified the whole partition unchanged for every
+ * pre-existing group (its 36 additions all land as singletons at link 30, the
+ * nearest added-to-existing same-type pair measuring 39.40 yards), so the
+ * edges they pin still stand.
  *
  * How completely depends on the type, and only ore was a true pile: Eastbrook's
  * six veins are held inside one 20-yard ring by tests/gather_nodes.test.ts and

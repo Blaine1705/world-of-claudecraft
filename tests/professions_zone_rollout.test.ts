@@ -138,13 +138,35 @@ describe('the R37 professions zone-rollout guard', () => {
         `${zoneId} ships nodes by its row but has none`,
       ).toBeGreaterThan(0);
     }
-    // The starter shape EXACTLY, per type: two hub-outskirt nodes of each
-    // profession (the release's authored kit). A starter zone silently
-    // losing its herbs while keeping ore must red here, not sweep as fine.
+    // The starter shape EXACTLY, per type and per zone. The uniform
+    // two-per-type kit was the v0.32.0 release's authored shape; the phase
+    // 20 density pass (docs/design/professions-tuning-packet-review.md, the
+    // +36 bottom-three set, Q9 and Q12) grew willowfen, galecrest, and
+    // farshore_isle to six per type while their ledger rows deliberately
+    // stayed 'starter' (density is not rollout: a 'complete' flip also
+    // demands a crafting station, catch tables in every band, and the rest
+    // of the checklist below, which remains the zone-4 pass's decision). So
+    // the pin is a per-zone expected count rather than one number: a zone
+    // silently losing its herbs while keeping ore must still red here, and
+    // a density change that skips this ledger must too.
+    const STARTER_NODES_PER_TYPE: Readonly<Record<string, number>> = {
+      veiled_hollow: 2,
+      drakelands: 2,
+      frostveil: 2,
+      amberfall: 2,
+      willowfen: 6,
+      nightbloom: 2,
+      wraithwood: 2,
+      palmreach: 2,
+      evergarden: 2,
+      galecrest: 6,
+      farshore_isle: 6,
+    };
+    expect(new Set(Object.keys(STARTER_NODES_PER_TYPE))).toEqual(STARTER_ZONES);
     for (const zoneId of STARTER_ZONES) {
       for (const type of GATHER_NODE_TYPES) {
         const ofType = GATHER_NODES.filter((n) => n.zoneId === zoneId && n.type === type);
-        expect(ofType.length, `${zoneId} ${type} starter pair`).toBe(2);
+        expect(ofType.length, `${zoneId} ${type} starter kit`).toBe(STARTER_NODES_PER_TYPE[zoneId]);
       }
     }
   });

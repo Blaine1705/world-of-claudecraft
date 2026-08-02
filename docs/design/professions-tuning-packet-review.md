@@ -4136,6 +4136,120 @@ grant-site assertions now belong in tests/deeds_sites_pin.test.ts (the
 release renamed deeds_sites.test.ts; catalog pins stay in the
 untouched tests/deeds_content.test.ts).
 
+## Phase 20 build record (2026-08-02)
+
+Built as settled: the +36 bottom-three candidate set verbatim (Q9/Q10),
+all tier 1, in src/sim/content/gather_nodes.ts; both blob pins raised
+4096 to 8192 with the decision recorded in both files' history comments
+per the v0.32.0 precedent (Q11); the rollout ledger rows stay 'starter'
+with the starter-pair pin re-minted to a per-zone expected-count map
+(Q12); ore_evergarden_1 relocated (358,784) to (354,780), road 0.42 to
+6.3yd, and the remaining eight in-band expansion nodes pinned as
+recorded exemptions in a new placement-suite arm (Q13); the fishing
+geometry arms landed (Q14); the sea-plane guard arm landed and the six
+near-waterline candidates were nudged upslope (Q15); the galecrest 248s
+circuit stands accepted (Q16). Every candidate passed the full
+placement-rule sweep, per-zone hub floods over the after-state colliders
+reach all 18 nodes per zone with zero cross-zone regressions, cluster
+partitions are band-stable at 27/30/32 with every existing grouping
+unchanged (groups: ore 30 to 42, wood 32 to 44, herb 35 to 47), and the
+world-wide suites (spacing, dangers, anchor, mob-spawn-in-body,
+quest_targets, garden_parterre, minimap, snapshots, parity goldens)
+sweep the 156-node content green with no golden re-minted.
+
+Q15 nudges (integer grid, smallest displacement reaching 1.5yd of
+world-sea freeboard, half a yard clear of the 1yd guard to mirror the
+half-yard near band that defined the six; the criterion value is a
+session default): ore_willowfen_4 (-252,268) to (-251,268) fb 1.48 to
+1.76; wood_willowfen_5 (-254,500) to (-251,504) 1.01 to 1.73;
+wood_willowfen_6 (-418,580) to (-417,580) 1.08 to 1.69;
+ore_farshore_isle_6 (454,93) to (450,93) 1.02 to 1.50;
+wood_farshore_isle_5 (388,123) to (386,120) 1.04 to 1.50;
+herb_farshore_isle_4 (358,140) to (358,138) 1.16 to 1.52.
+
+Sea-plane arm discovery: the census behind the new arm found SEVEN
+shipped expansion starter nodes below the 1yd guard, five of them under
+the rendered sea outright (herb_galecrest_1 at -3.60 and ore_galecrest_2
+at -3.40 stand on the Wickharbor cove floor; herb_farshore_isle_2
+-1.37, wood_farshore_isle_1 -0.97, ore_frostveil_2 -0.49; plus
+ore_willowfen_1 +0.65 and wood_evergarden_2 +0.50 above the plane but
+under the guard). The arm lands with those seven pinned as recorded
+exemptions in the Q13 road-band pattern (a new violator reds; a fixed
+one must leave the list), because relocating seven shipped starter
+nodes is zone-4-pass content work, not a side effect of a guard
+landing. SESSION DEFAULT, veto-able: exemption rather than relocation.
+The suite's old WATER_MARGIN claim that no shipped node separated the
+declared-water screen from the global sea plane was corrected in place.
+
+Q14 landed as: the R55 per-zone some() arm upgraded to a per-lake sweep
+with a pinned two-entry decorative-lake exemption (the farshore Hilltop
+Spring and the veiled_hollow Mirrormere, the only two dead lakes
+world-wide, each proven to hold zero swim-depth water by its own
+census arm); a travel-distance census (nearest accepted cast spot from
+every hub: galecrest worst at a measured 230yd to the Mirror Tarn
+shore, next zone 137, ceiling pinned at 240 and proven to bite);
+hub-flood shore reachability for the three bottom zones; a real-cast
+border-water arm on the galecrest side of the Lawnmere (accepted at
+(446,682), 323yd from Wickharbor, the ruling's rough 330); and an
+open-sea deny arm (the no-water error on a seaward strand cast).
+
+Measured before and after (the 2yd lattice, canStand plus isDryLand
+cells over each zone's authored rect, greedy hub tour at RUN_SPEED 7
+with 2.5s casts against the 240s respawn; the same recipe as the
+before-state census in the phase text): willowfen density 0.32 to 0.96,
+coverage 9.5 to 38.6 percent, median/p90 132/248 to 48/96yd, circuit
+55s at 77 percent idle to 229s at 5. galecrest 0.32 to 0.96, 11.0 to
+37.2, 134/254 to 50/98, 53s at 78 to 248s (the Q16-accepted 8 seconds
+past respawn at zero idle). farshore_isle 0.46 to 1.39, 15.5 to 45.0,
+114/208 to 44/98, 53s at 78 to 199s at 17. (Post-nudge farshore
+coverage is 45.0 against the phase text's pre-nudge 45.3; the two
+tarn-side nudge displacements cost three tenths of a point.) The
+placement suite now carries the bottom-zone twins of the tuned design
+floors: count floor six per type all tier 1 with an exact non-vacuity
+twin, coverage floor 35 with the leanest-under-40 counter-arm, and the
+270/hr ceiling-parity arm (Q10's ceiling-texture ruling).
+
+Bytes, measured on the landed content: persist integer 2,784 to 3,648;
+persist two-decimal 3,144 to 4,116; wire thirty-day 3,624 to 4,740;
+both pins now 8192. tests/professions_blob_growth.test.ts holds at a
+re-measured settled ceiling of 9,451 against the 9,728 pin with the
+headroom note rewritten (277 bytes left: the NEXT node growth re-mints
+it, and the arm's lower bound now tracks the measured value at 9,216 so
+the note cannot rot silently).
+
+Premise correction on Q11's recorded sizing number, found by the review
+round's database reviewer and verified against this build's own
+measurements: the scoping investigation's "the +132 full-D5 follow-on
+measuring 7,684 B wire" mislabels the form. The wire thirty-day form
+runs exactly four bytes per entry over the persist two-decimal form
+(4,740 = 4,116 + 624 at 156 nodes), so 7,684 B is the PERSIST
+measurement of the 288-node content; its wire twin lands near 8,850 B,
+OVER the 8192 pin. The full-D5 follow-on therefore takes a third
+ceiling move on the wire arm, and 8192 covers this phase plus persist
+headroom only. Both test files' history comments carry the corrected
+sizing; the settled Q11 text above stands as the historical record of
+what was ruled.
+
+Render batches 57 to 68, nodes 120 to 156 at 138/12/6 by tier;
+tier-ramp groupsChecked stays 6 (all additions one tier). The guide
+regenerated (per-type counts 2 to 6 for the three zones); q_prof_intro
+untouched (every eastbrook ore vein still inside the 20yd pin).
+
+Q26 is built but BLOCKED ON CREST ART: the six chronicle deeds
+(gatherer plus first-cast for the three zones), their ZONE_FISH rows
+listing the Vale-fallback draws, the deeds_content fish-guard re-mint
+to the resolver's own-table-or-fallback read with a live tick-driven
+witness arm, every count pin (232 deeds, 2,795 Renown, chronicle 35,
+the SHA re-baseline), and the CREDITS and provenance rows including the
+six crests' full generation spec are COMPLETE and were verified green
+as a patch on this tree; they are held in
+.claude-scratch/phase20_deeds_await_art.patch (with an APPLY_README
+beside it) because the fully-painted-catalog pins landed by the icon
+pass on 2026-08-02 make an artless deed red the gate, and this build
+session has no image generation access. The deeds land the moment the
+six rasters are generated per the provenance spec; nothing else in the
+phase depends on them.
+
 ---
 
 ## Post-packet scoping (2026-08-01): proposed phases 19 to 21

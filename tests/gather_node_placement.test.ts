@@ -52,6 +52,7 @@ import {
   terrainHeight,
   terrainSteepness,
   terrainSteepnessAt,
+  waterLevel,
   waterLevelAt,
 } from '../src/sim/world';
 import { WORLD_BOSSES } from '../src/sim/world_boss';
@@ -75,12 +76,17 @@ it('the shipped world seed is pinned to its literal', () => {
 // not the same: that screen reads terrainHeight against the global waterLevel()
 // everywhere, while this reads groundHeight against waterLevelAt and only inside
 // a declared water body, so a dry sunken feature (the Mirefen impact crater is
-// one) stays legal exactly as isInWaterBody documents. No shipped node is
-// currently separated by that difference. Measured headroom on the shipped
-// content after this change: the tightest passing node clears by 0.57yd
-// (ore_mirefen_t2, a genuine bank inside a lake's blend ring), and the tightest
-// FAILING one missed by 0.54yd (the old wood_thornpeak_1, ankle deep in the
-// Glimmermere), so the line sits in a real gap rather than splitting a cluster.
+// one) stays legal exactly as isInWaterBody documents. The two predicates WERE
+// separated by the v0.32.0 expansion's coastal starter kits: seven shipped
+// expansion nodes sit below the global line (down to 3.6yd under it on the
+// Wickharbor cove floor) while passing this declared-water screen, which is
+// why the world-plane check is now its own arm below (the sea-plane arm and
+// its exemption pin) rather than a claim in this comment. Measured headroom on
+// the shipped content when this margin landed: the tightest passing node
+// cleared by 0.57yd (ore_mirefen_t2, a genuine bank inside a lake's blend
+// ring), and the tightest FAILING one missed by 0.54yd (the old
+// wood_thornpeak_1, ankle deep in the Glimmermere), so the line sits in a real
+// gap rather than splitting a cluster.
 const WATER_MARGIN = 1;
 
 // A node's "harvest reach" is exactly the gate harvestNode enforces: flat 2D
@@ -386,6 +392,86 @@ describe('gather node placement: every node sits on ground a player can work', (
     expect(isDryLand(IN_GLIMMERMERE_SHALLOWS.x, IN_GLIMMERMERE_SHALLOWS.z)).toBe(false);
   });
 
+  // The render seats ONE world-spanning water surface at waterLevel()
+  // (src/render/water.ts: a plane per zone plus the shared apron on the high
+  // tier, a single 3000yd plane on the low tier), so ground below that height
+  // shows water EVERYWHERE, while the dry-land arm above screens only
+  // DECLARED water bodies and the swim rules engage only inside them. A node
+  // outside every declared body can therefore pass every sim rule and still
+  // render under the sea (the phase 20 authoring pass found candidates doing
+  // exactly that, and the census below found seven SHIPPED ones). The
+  // freeboard is WATER_MARGIN, the same yard generateDecorations demands of
+  // every other procedurally seated world prop.
+  const seaFreeboardAt = (x: number, z: number): number =>
+    groundHeight(x, z, WORLD_SEED) - waterLevel();
+
+  // The seven shipped violators, pinned with the road-band exemption's logic:
+  // the set records a decision (these ship submerged or near-submerged today;
+  // relocating seven expansion starter nodes is zone-4-pass content work, not
+  // a side effect of a guard landing), and a NEW violation must be a human
+  // adding to this list rather than a silent drift. Measured freeboards at
+  // the pin: herb_galecrest_1 -3.60 and ore_galecrest_2 -3.40 (the Wickharbor
+  // cove floor), herb_farshore_isle_2 -1.37, wood_farshore_isle_1 -0.97,
+  // ore_frostveil_2 -0.49, ore_willowfen_1 +0.65, wood_evergarden_2 +0.50.
+  const SEA_PLANE_EXEMPT = [
+    'herb_farshore_isle_2',
+    'herb_galecrest_1',
+    'ore_frostveil_2',
+    'ore_galecrest_2',
+    'ore_willowfen_1',
+    'wood_evergarden_2',
+    'wood_farshore_isle_1',
+  ];
+
+  it('sea plane: every node clears the WORLD water surface by the prop freeboard', () => {
+    for (const node of GATHER_NODES) {
+      if (SEA_PLANE_EXEMPT.includes(node.id)) continue;
+      const freeboard = seaFreeboardAt(node.pos.x, node.pos.z);
+      expect(
+        freeboard,
+        `${node.id} at (${node.pos.x},${node.pos.z}) clears the sea plane by ${freeboard.toFixed(2)}yd, needs ${WATER_MARGIN}`,
+      ).toBeGreaterThanOrEqual(WATER_MARGIN);
+    }
+  });
+
+  it('the sea-plane exemption set holds exactly the seven shipped violators', () => {
+    // Both directions at once: a new sub-margin node reds (it is not in the
+    // list), and a relocated exemption reds too (the list would then name a
+    // node that no longer violates, and the exemption must be retired with
+    // the fix rather than mask the next violator).
+    const below = GATHER_NODES.filter((n) => seaFreeboardAt(n.pos.x, n.pos.z) < WATER_MARGIN)
+      .map((n) => n.id)
+      .sort();
+    expect(below).toEqual(SEA_PLANE_EXEMPT);
+    // Severity floor, per exemption (the review round: membership alone lets
+    // an exempt node sink further without a red). The deepest recorded
+    // violator sits at -3.60; a node dropping past -4.0 means the terrain
+    // under an exemption materially changed and the record must be re-read.
+    for (const id of SEA_PLANE_EXEMPT) {
+      const node = GATHER_NODES.find((n) => n.id === id);
+      expect(node, `${id} names a live node`).toBeDefined();
+      if (!node) continue;
+      expect(
+        seaFreeboardAt(node.pos.x, node.pos.z),
+        `${id} sank past every recorded freeboard`,
+      ).toBeGreaterThan(-4);
+    }
+  });
+
+  it('the sea-plane arm rejects the Wickharbor cove floor, so it can fail', () => {
+    // herb_galecrest_1's shipped spot: the harbor cove carves the ground to
+    // 3.6yd BELOW the world sea plane, outside every declared water body, so
+    // the dry-land arm passes, the swim rules never engage, a player walks
+    // the cove floor, and the herb patch renders under the rendered harbor
+    // water. Assert the property first (the hole is real: suite-green by
+    // every other arm), then that this arm is the one that says no.
+    const ON_WICKHARBOR_COVE_FLOOR = { x: 448, z: 400 };
+    expect(isInWaterBody(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).toBe(false);
+    expect(isDryLand(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).toBe(true);
+    expect(nearestStandSpot(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).not.toBeNull();
+    expect(seaFreeboardAt(ON_WICKHARBOR_COVE_FLOOR.x, ON_WICKHARBOR_COVE_FLOOR.z)).toBeLessThan(0);
+  });
+
   it('walkable slope: no node, and no ground in its harvest reach, is a cliff', () => {
     // Both halves matter and neither subsumes the other. The old wood_thornpeak_1
     // measured a perfectly walkable 0.94 AT the node while the wall inside its
@@ -643,7 +729,10 @@ describe('gather node placement: every node sits on ground a player can work', (
   // different and thinner design authored before these floors existed;
   // integrating them into the tier ladder and these floors is phase 13 work
   // (docs/design/professions-tuning-packet-review.md), so sweeping them here
-  // would fail content this packet has not tuned yet. The PHYSICAL arms above
+  // would fail content this packet has not tuned yet. Exception since the
+  // phase 20 density pass: the three bottom-map zones (willowfen, galecrest,
+  // farshore_isle) grew to the strip's own density and carry their own floor
+  // arms below the tuned ones. The PHYSICAL arms above
   // (dry land, slope, colliders, stand spots, hub reachability) stay
   // world-wide: unworkable ground is a defect no matter which release
   // authored it.
@@ -1067,6 +1156,50 @@ describe('gather node placement: every node sits on ground a player can work', (
     ]);
   });
 
+  it('the expansion-zone road band holds exactly the eight recorded exemptions', () => {
+    // The phase 20 pass swept the expansion zones with the same 5yd screen
+    // (docs/design/professions-tuning-packet-review.md, Q13). The ninth
+    // member, ore_evergarden_1 at 0.42yd, stood IN the roadway by the R11
+    // standard and moved to legal ground in that pass; the eight that remain
+    // sit shallower in the band (1.17 to 3.54yd, verge placements rather
+    // than roadway ones) and are pinned here exactly as the tuned zones'
+    // four are above: relocating them is a content decision for the zone-4
+    // pass, and a NEW in-band node must be a human adding to this list, not
+    // a drift the suite cannot see.
+    const inBand = GATHER_NODES.filter(
+      (n) =>
+        !(TUNED_ZONE_IDS as readonly string[]).includes(n.zoneId) &&
+        roadDistance(n.pos.x, n.pos.z) < 5,
+    )
+      .map((n) => n.id)
+      .sort();
+    const EXPANSION_ROAD_EXEMPT = [
+      'herb_amberfall_2',
+      'herb_palmreach_1',
+      'herb_palmreach_2',
+      'herb_veiled_hollow_2',
+      'herb_wraithwood_2',
+      'ore_galecrest_1',
+      'wood_amberfall_2',
+      'wood_wraithwood_1',
+    ];
+    expect(inBand).toEqual(EXPANSION_ROAD_EXEMPT);
+    // Severity floor, per exemption (the review round): each of the eight is
+    // a VERGE placement, not a roadway one. The R11 standard that moved
+    // wood_mirefen_t2 (0.3yd) and ore_evergarden_1 (0.42yd) is a body
+    // standing in the road surface, so an exempt node drifting under a full
+    // yard from the center line reds here even while it stays on the list.
+    for (const id of EXPANSION_ROAD_EXEMPT) {
+      const node = GATHER_NODES.find((n) => n.id === id);
+      expect(node, `${id} names a live node`).toBeDefined();
+      if (!node) continue;
+      expect(
+        roadDistance(node.pos.x, node.pos.z),
+        `${id} drifted from the verge into the roadway`,
+      ).toBeGreaterThanOrEqual(1);
+    }
+  });
+
   it('the added higher-tier node of each type is the one further from its hub', () => {
     // The rule the tier-ramp block in gather_nodes.ts states: of a type's two
     // additions in a later zone, the higher tier goes to the further one, so the
@@ -1121,6 +1254,102 @@ describe('gather node placement: every node sits on ground a player can work', (
     // rather than three.
     for (const type of GATHER_NODE_TYPES) {
       expect(NODE_HARVEST_TABLE[type].respawnSeconds).toBe(NODE_HARVEST_TABLE.ore.respawnSeconds);
+    }
+  });
+
+  // The phase 20 density floors (docs/design/professions-tuning-packet-review.md,
+  // the +36 bottom-three set, Q9/Q10): the three bottom-map zones now hold the
+  // same design contract as the tuned strip, at the density the pass authored.
+  // Their rollout ledger rows deliberately stay 'starter'
+  // (tests/professions_zone_rollout.test.ts owns that pin and the per-zone
+  // count re-mint); these arms own the SPREAD, the same split as the tuned
+  // zones' count-versus-coverage pair above.
+  const BOTTOM_ZONE_IDS = ['willowfen', 'galecrest', 'farshore_isle'] as const;
+  const BOTTOM_ZONES = ZONES.filter((zn) => (BOTTOM_ZONE_IDS as readonly string[]).includes(zn.id));
+  it('the bottom-zone scope names real zones', () => {
+    expect(BOTTOM_ZONES.map((zn) => zn.id)).toEqual([...BOTTOM_ZONE_IDS]);
+  });
+
+  it('count floor: every bottom-map zone carries six of each type, all of them tier 1', () => {
+    for (const zone of BOTTOM_ZONES) {
+      for (const type of GATHER_NODE_TYPES) {
+        const ofType = GATHER_NODES.filter((n) => n.zoneId === zone.id && n.type === type);
+        expect(
+          ofType.length,
+          `${zone.id} offers only ${ofType.length} ${type} node(s)`,
+        ).toBeGreaterThanOrEqual(6);
+        // Tier 1 across the WHOLE kit, not just one entry node: re-tiering is
+        // the zone-4 pass's decision (R37), and the material_grades
+        // below-material-rung arm reds on any above-tier-1 addition here.
+        for (const node of ofType) {
+          expect(node.tier, `${node.id} outruns the bottom-zone tier-1 density pass`).toBe(1);
+        }
+      }
+    }
+  });
+
+  it('the bottom-zone count floor is exercised by real content, not passing by slack', () => {
+    // Exact, like the tuned twin above: every bottom-map zone carries exactly
+    // six of each type, so the floor moved with the content and bites on the
+    // first drained node.
+    let leanestTotal = Number.POSITIVE_INFINITY;
+    for (const zone of BOTTOM_ZONES) {
+      for (const type of GATHER_NODE_TYPES) {
+        leanestTotal = Math.min(
+          leanestTotal,
+          GATHER_NODES.filter((n) => n.zoneId === zone.id && n.type === type).length,
+        );
+      }
+    }
+    expect(leanestTotal).toBe(6);
+  });
+
+  it('spatial coverage: a bottom-map gathering circuit reaches most of each zone', () => {
+    // The same lattice, predicates, and floor as the tuned arm above (2yd
+    // lattice over the zone's own authored rect, canStand and isDryLand
+    // cells, 40yd reach): measured at authoring, willowfen 38.6, galecrest
+    // 37.2, farshore_isle 45.0 percent, against 9.5 to 15.5 before the pass.
+    const COVERAGE_RADIUS = 40;
+    const COVERAGE_FLOOR_PCT = 35;
+    let leanest = Number.POSITIVE_INFINITY;
+    for (const zone of BOTTOM_ZONES) {
+      const cells: { x: number; z: number }[] = [];
+      const rectX0 = zone.xMin ?? STRIP_MIN_X;
+      const rectX1 = zone.xMax ?? STRIP_MAX_X;
+      for (let x = rectX0; x <= rectX1; x += 2) {
+        for (let z = zone.zMin; z <= zone.zMax; z += 2) {
+          if (canStand(x, z) && isDryLand(x, z)) cells.push({ x, z });
+        }
+      }
+      const nodes = GATHER_NODES.filter((n) => n.zoneId === zone.id).map((n) => n.pos);
+      let hit = 0;
+      for (const c of cells) {
+        if (nodes.some((p) => Math.hypot(p.x - c.x, p.z - c.z) <= COVERAGE_RADIUS)) hit++;
+      }
+      const nodePct = (hit / cells.length) * 100;
+      expect(
+        nodePct,
+        `${zone.id} keeps only ${nodePct.toFixed(1)} percent of its walkable ground within ${COVERAGE_RADIUS}yd of a gather node`,
+      ).toBeGreaterThanOrEqual(COVERAGE_FLOOR_PCT);
+      leanest = Math.min(leanest, nodePct);
+    }
+    // Not passing by slack: the leanest bottom-map zone (galecrest, whose
+    // rect carries the most un-walkable coast) sits within 5 points of the
+    // floor, the same bracket the tuned arm holds.
+    expect(leanest, `leanest bottom-zone coverage ${leanest.toFixed(1)} percent`).toBeLessThan(
+      COVERAGE_FLOOR_PCT + 5,
+    );
+  });
+
+  it('every bottom-map zone lands on the strip harvest ceiling exactly', () => {
+    // Q10's ceiling-texture ruling: the strip's 270 per hour extends to the
+    // level-20 zones (and farshore's level-5 kit rides the same number), so
+    // density parity is ceiling parity, both levers held by the same pair of
+    // pins as the tuned arm above.
+    const perHour = (nodes: number) => (nodes * 3600) / NODE_HARVEST_TABLE.ore.respawnSeconds;
+    for (const zone of BOTTOM_ZONES) {
+      const ceiling = perHour(GATHER_NODES.filter((n) => n.zoneId === zone.id).length);
+      expect(ceiling, `${zone.id} harvest ceiling`).toBe(270);
     }
   });
 
@@ -1195,4 +1424,8 @@ describe('gather node placement: every node sits on ground a player can work', (
 // as a decision rather than an oversight. The fifth former member,
 // wood_mirefen_t2 at 0.3yd (standing in the road surface), WAS a real defect
 // and R11 moved it to legal ground; the exemption pin above is what made that
-// relocation a deliberate edit instead of a drift.
+// relocation a deliberate edit instead of a drift. The phase 20 pass repeated
+// that exact treatment for the expansion zones: the one roadway-standing
+// member (ore_evergarden_1 at 0.42yd) moved, and the eight verge placements
+// that remain are pinned by the expansion-zone exemption arm, so both scopes
+// now carry the record-not-rule shape.
