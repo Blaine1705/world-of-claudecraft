@@ -7,6 +7,12 @@ import { pool } from './db';
 import { discordFlexForAccount, discordFlexForAccounts, setDiscordPresenceCache } from './discord';
 import { drainActivity, type QueuedActivity, requeueActivity } from './discord_activity';
 import {
+  DISCORD_BOT_BREAKER_STATES,
+  type DiscordBotBreakerState,
+  type DiscordBotCountersSnapshot,
+  setDiscordBotCounters,
+} from './discord_bot_counters';
+import {
   accountForDiscord,
   type DiscordMemberMetaRecord,
   type DiscordOutboxLinkRow,
@@ -123,6 +129,11 @@ async function handleDiscordInternal(
       ? body.voice.slice(0, 50).map((m: unknown) => sanitizeVoiceMember(m))
       : [];
     setDiscordPresenceCache({ onlineCount, memberTotal, voiceChannelName, voice });
+    // The bot's own rate-limit/breaker counters ride the same push. Absent (an
+    // older bot) leaves the counters cache alone; present, it never affects the
+    // presence fields above or the response.
+    const botCounters = sanitizeBotCounters(body.counters);
+    if (botCounters) setDiscordBotCounters(botCounters, Date.now());
     return ok(res, { received: true });
   }
 
@@ -550,6 +561,62 @@ export const outboxHandler: RouteHandler = async (ctx) => {
   }
 };
 
+/**
+ * Cap for every bot counter field. Cumulative-since-bot-start values are the ones
+ * that can actually grow, and a billion requests is far past anything a real bot
+ * process reaches before it restarts, so the cap only ever binds on a nonsense
+ * push. Clamping (rather than rejecting) keeps one bad field from discarding the
+ * rest of an otherwise good push.
+ */
+const BOT_COUNTER_MAX = 1_000_000_000;
+
+/**
+ * Validate the OPTIONAL bot `counters` block on a presence push into the fixed
+ * cache shape: every numeric field clamped, the scope record rebuilt from exactly
+ * the four known scopes, the breaker state taken from its allowlist. The result is
+ * always a FRESH object, never a spread of the request body, so an unknown field
+ * cannot ride into the cache and (via the exporter) become a Prometheus series.
+ *
+ * Returns null when the body carries no counters object at all, which is what an
+ * older bot sends: the arm then leaves the counters cache untouched and it ages
+ * out on its own rather than reading as a bot reporting all zeroes.
+ */
+function sanitizeBotCounters(value: unknown): DiscordBotCountersSnapshot | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const o = value as Record<string, unknown>;
+  const scopes =
+    o.rateLimitedByScope && typeof o.rateLimitedByScope === 'object'
+      ? (o.rateLimitedByScope as Record<string, unknown>)
+      : {};
+  const count = (v: unknown): number => clampInt(v, 0, BOT_COUNTER_MAX);
+  return {
+    requests: count(o.requests),
+    rateLimited: count(o.rateLimited),
+    rateLimitedByScope: {
+      user: count(scopes.user),
+      global: count(scopes.global),
+      shared: count(scopes.shared),
+      unknown: count(scopes.unknown),
+    },
+    globalPauses: count(o.globalPauses),
+    banPauses: count(o.banPauses),
+    breakerState: botBreakerState(o.breakerState),
+    breakerOpens: count(o.breakerOpens),
+    queueDepth: count(o.queueDepth),
+    trackedBuckets: count(o.trackedBuckets),
+    trackedRoutes: count(o.trackedRoutes),
+    activeQueues: count(o.activeQueues),
+    forbiddenEntries: count(o.forbiddenEntries),
+    forbiddenBlocks: count(o.forbiddenBlocks),
+    breakerBlocks: count(o.breakerBlocks),
+  };
+}
+
+/** The pushed breaker state if it is one of the three known ones, else 'closed'. */
+function botBreakerState(value: unknown): DiscordBotBreakerState {
+  return DISCORD_BOT_BREAKER_STATES.find((state) => state === value) ?? 'closed';
+}
+
 function sanitizeVoiceMember(m: unknown): {
   id: string;
   name: string;
@@ -696,6 +763,11 @@ export const routes: RouteDef[] = [
         ? body.voice.slice(0, 50).map((m: unknown) => sanitizeVoiceMember(m))
         : [];
       setDiscordPresenceCache({ onlineCount, memberTotal, voiceChannelName, voice });
+      // The bot's own rate-limit/breaker counters ride the same push. Absent (an
+      // older bot) leaves the counters cache alone; present, it never affects the
+      // presence fields above or the response.
+      const botCounters = sanitizeBotCounters(body.counters);
+      if (botCounters) setDiscordBotCounters(botCounters, Date.now());
       return ok(ctx.res, { received: true });
     },
   },

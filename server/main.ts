@@ -202,6 +202,7 @@ import { setAttackSignalSink } from './http/attack_signals';
 import { registerBusinessMetrics } from './http/business_metrics';
 import { handleClientError } from './http/client_error';
 import { type Config, DEFAULT_DISPATCH, type DispatchMode, loadConfig } from './http/config';
+import { registerDiscordBotMetrics } from './http/discord_bot_metrics';
 import {
   type ApiDelegate,
   type ApiDispatcher,
@@ -3047,6 +3048,11 @@ export async function startServer(): Promise<http.Server> {
   // must never touch liveGame() (a health probe constructing a GameServer is the bug
   // tests/server/game_boot_order.test.ts pins against).
   registerLivenessSource(gameStateSource);
+
+  // The Discord bot's own rate-limit and breaker health, pushed in on the presence
+  // request and cached process-locally. No collector and no query: the gauges read
+  // that cache at scrape time and the counters ride the push itself.
+  registerDiscordBotMetrics(httpMetrics.registry);
 
   // Business gauges use isolated, staggered, timeout-protected engagement and
   // funnel snapshots every 15 minutes. Scrapes publish only cached data and never
