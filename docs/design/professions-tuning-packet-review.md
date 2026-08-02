@@ -4235,6 +4235,21 @@ tier-ramp groupsChecked stays 6 (all additions one tier). The guide
 regenerated (per-type counts 2 to 6 for the three zones); q_prof_intro
 untouched (every eastbrook ore vein still inside the 20yd pin).
 
+Screenshots: before/after pairs at fixed vantages facing a phase 20
+solid prop in each zone, committed under
+docs/screenshots/phase20-gather-density/ (willowfen Drowsy Flats
+facing ore_willowfen_5, galecrest mid downs facing wood_galecrest_4,
+farshore Riftfields facing ore_farshore_isle_6; the before side shot
+on the pre-phase content via the source swap, state token
+ore_willowfen_3 absent). The change-aware runner's pinned targets
+(world-map, gather-quest-map-areas, gather-node) were captured both
+sides and dropped as non-evidence: the map windows show the capture
+zone (Eastbrook) and gather nodes are minimap markers, not world-map
+markers, so those pairs are byte-similar by construction; the
+gather-node target resolves a Mirefen vein this phase never touched.
+Mobile pairs deliberately omitted: the change is world props with no
+HUD or layout delta (session judgment, veto-able).
+
 Q26 is built but BLOCKED ON CREST ART: the six chronicle deeds
 (gatherer plus first-cast for the three zones), their ZONE_FISH rows
 listing the Vale-fallback draws, the deeds_content fish-guard re-mint
