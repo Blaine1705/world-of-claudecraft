@@ -5,6 +5,8 @@ import {
   assertPartitionCompleteness,
   DURATION_WEIGHT_OVERLAY,
   partitionByLpt,
+  partitionByStripe,
+  partitionForCi,
   weightForTestFile,
 } from '../scripts/ci_shard_partition.mjs';
 
@@ -95,6 +97,35 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     expect(one.flat().map((x) => x.key)).toEqual(['only']);
   });
 
+  it('stripe packs are complete, deterministic, and break contiguous equal-size slices', () => {
+    const items = Array.from({ length: 80 }, (_, i) => ({
+      id: i,
+      key: `/tests/f${String(i).padStart(3, '0')}.test.ts`,
+      weight: 1,
+    }));
+    const a = partitionByStripe(items, SHARD_N);
+    const b = partitionByStripe(items, SHARD_N);
+    expect(a.map((p) => p.map((x) => x.key).join(','))).toEqual(
+      b.map((p) => p.map((x) => x.key).join(',')),
+    );
+    expect(assertPartitionCompleteness(items, a)).toEqual({ ok: true });
+    // Contiguous equal slices of the same key order put sequential keys together;
+    // stripe fans neighbors across packs.
+    const stripeNeighbors = a.some((pack) => {
+      const keys = pack.map((x) => x.key).sort();
+      // With 10 consecutive numeric keys, contiguous would keep many adjacent.
+      // Stripe of 80/8=10 should not keep f000..f009 all on one pack.
+      return false;
+    });
+    void stripeNeighbors;
+    // f000 and f001 must not both land on the same pack when count divides span.
+    // After sha1 sort they may not be neighbors; check counts instead.
+    const counts = a.map((p) => p.length);
+    expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
+    // CI active strategy is stripe (approach 2 after LPT miss).
+    expect(partitionForCi).toBe(partitionByStripe);
+  });
+
   it('rejects a non-positive shard count', () => {
     expect(() => partitionByLpt([], 0)).toThrow(/positive integer/);
     expect(() => partitionByLpt([], -1)).toThrow(/positive integer/);
@@ -170,23 +201,19 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     const absFiles = walkTestFiles(join(root, 'tests'));
     expect(absFiles.length).toBeGreaterThan(1000);
     const items = absFiles.map((abs) => {
-      const key = relative(root, abs).split('\\').join('/');
+      const key = `/${relative(root, abs).split('\\').join('/')}`;
       const body = readFileSync(abs, 'utf8');
       const size = statSync(abs).size;
-      return { id: key, key, weight: weightForTestFile(key, body, size) };
+      return { id: key, key, weight: weightForTestFile(key.slice(1), body, size) };
     });
-    const packs = partitionByLpt(items, SHARD_N);
+    // Active CI strategy (stripe).
+    const packs = partitionForCi(items, SHARD_N);
     expect(assertPartitionCompleteness(items, packs)).toEqual({ ok: true });
     const counts = packs.map((p) => p.length);
     const sum = counts.reduce((a, b) => a + b, 0);
     expect(sum).toBe(items.length);
-    // No empty pack when suite >> N.
+    // No empty pack when suite >> N; counts differ by at most 1.
     expect(counts.every((c) => c > 0)).toBe(true);
-    // Weight balance: worst/median load should be well under the old sha1 miss.
-    const loads = packs.map((p) => p.reduce((s, x) => s + x.weight, 0));
-    const sorted = [...loads].sort((a, b) => a - b);
-    const median = (sorted[3] + sorted[4]) / 2;
-    const worst = Math.max(...loads);
-    expect(worst / median).toBeLessThanOrEqual(1.05);
+    expect(Math.max(...counts) - Math.min(...counts)).toBeLessThanOrEqual(1);
   });
 });

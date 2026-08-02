@@ -378,9 +378,9 @@ export default defineConfig({
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
     // D11 path-matrix: replace vitest's default sha1-contiguous --shard packs
-    // with LPT packs weighted for import cost so heavy three/render/electron
-    // suites do not cluster on one matrix cell. Local unsharded runs ignore this
-    // (shard() is only called when --shard is set). gate.mjs stays unsharded.
+    // with sha1-order stripe packs (approach 2; LPT import-proxy missed). Local
+    // unsharded runs ignore this (shard() only when --shard is set). gate.mjs
+    // stays unsharded.
     sequence: {
       sequencer: BalancedSequencer,
     },

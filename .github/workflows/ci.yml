@@ -261,13 +261,14 @@ jobs:
   # The PR tier is two parallel jobs: pr-gate runs the test suite while pr-checks
   # runs the serialized checks, so the PR critical path is max(tests, checks)
   # instead of their sum. pr-gate additionally fans the suite across an 8-shard
-  # matrix (vitest --shard=i/8). File packs are LPT-balanced by
-  # scripts/ci_balanced_sequencer.mjs (import-cost weights), not vitest's default
-  # sha1-contiguous slices, so heavy import graphs do not cluster on one shard
-  # (D11 path-matrix). Wall time is still the slowest shard. Locally
-  # `npm run gate` (scripts/gate.mjs) runs the SAME combined step list serially
-  # with ONE full unsharded vitest run by design (bounded workers); keep that
-  # script's step list in sync when adding or removing a step in either job.
+  # matrix (vitest --shard=i/8). File packs come from
+  # scripts/ci_balanced_sequencer.mjs: sha1-order stripe (round-robin), not
+  # vitest's default contiguous equal-size slices, so unlucky import clusters
+  # cannot sit in one slice (D11 path-matrix approach 2). Wall time is still
+  # the slowest shard. Locally `npm run gate` (scripts/gate.mjs) runs the SAME
+  # combined step list serially with ONE full unsharded vitest run by design
+  # (bounded workers); keep that script's step list in sync when adding or
+  # removing a step in either job.
   pr-gate:
     name: PR gate (English-only legal)
     # Compose release-to-main exclusion with the code path filter (D10). Do not

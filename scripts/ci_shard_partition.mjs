@@ -1,26 +1,65 @@
 /**
- * Deterministic LPT (longest-processing-time-first) partition of weighted
- * items into N packs. Used by the CI balanced vitest sequencer so heavy
- * import-bound suites do not cluster on one --shard slice (D11 path-matrix).
+ * Deterministic shard packs for the CI balanced vitest sequencer (D11
+ * path-matrix). Pure module: no vitest, no fs.
  *
- * Pure module: no vitest, no fs. Callers supply weights.
+ * Approach history:
+ * 1. LPT on import-proxy weights: regressed D11 (run 30748073443, ratio 1.59,
+ *    s4 import-bound). Proxy did not match real import residual.
+ * 2. Stripe (round-robin) after sha1 order: breaks vitest's default contiguous
+ *    sha1 slices so unlucky import clusters cannot sit in one equal-size slice.
+ *
+ * Callers supply keys; weights remain available for LPT helpers and tests.
  */
+
+import { createHash } from 'node:crypto';
 
 /**
  * @typedef {{ id: unknown, weight: number, key: string }} WeightedItem
  */
 
 /**
- * Partition items into `count` packs by LPT.
- * - Sort by weight desc, then key asc (stable).
- * - Assign each item to the pack with the smallest current load; ties break
- *   toward the lower pack index.
- * - Every item appears in exactly one pack; empty packs only when
- *   items.length < count (then trailing packs are empty).
+ * Partition items into `count` packs by striping a sha1-sorted order.
+ * Vitest default is contiguous slices of the same order; striping assigns
+ * every Nth file to the same shard so neighbors in hash space fan out.
+ *
+ * Every item appears in exactly one pack. Empty packs only when
+ * items.length < count.
  *
  * @param {WeightedItem[]} items
  * @param {number} count  shard count (N), must be >= 1
  * @returns {WeightedItem[][]} packs[0] is shard 1, packs[count-1] is shard N
+ */
+export function partitionByStripe(items, count) {
+  if (!Number.isInteger(count) || count < 1) {
+    throw new Error(`partitionByStripe: count must be a positive integer, got ${count}`);
+  }
+  /** @type {WeightedItem[][]} */
+  const packs = Array.from({ length: count }, () => []);
+  if (items.length === 0) return packs;
+
+  const ordered = [...items].sort((a, b) => {
+    const ha = createHash('sha1').update(a.key).digest('hex');
+    const hb = createHash('sha1').update(b.key).digest('hex');
+    if (ha < hb) return -1;
+    if (ha > hb) return 1;
+    return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
+  });
+
+  for (let i = 0; i < ordered.length; i++) {
+    packs[i % count].push(ordered[i]);
+  }
+  return packs;
+}
+
+/**
+ * Partition items into `count` packs by LPT (kept for unit tests / overlays).
+ * - Sort by weight desc, then key asc (stable).
+ * - Assign each item to the pack with the smallest current load; ties break
+ *   toward the lower pack index.
+ *
+ * @param {WeightedItem[]} items
+ * @param {number} count
+ * @returns {WeightedItem[][]}
  */
 export function partitionByLpt(items, count) {
   if (!Number.isInteger(count) || count < 1) {
@@ -46,6 +85,9 @@ export function partitionByLpt(items, count) {
   }
   return packs;
 }
+
+/** Active pack strategy for the CI sequencer (approach 2). */
+export const partitionForCi = partitionByStripe;
 
 /**
  * Known long-Duration files from Phase 3 CI evidence (run 30712431702 and

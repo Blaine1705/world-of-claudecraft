@@ -404,19 +404,17 @@ describe('CI workflow parity', () => {
     expect(viteConfig).toContain("from './scripts/ci_balanced_sequencer.mjs'");
     expect(viteConfig).toContain('sequencer: BalancedSequencer');
     expect(viteConfig).toMatch(/sequence:\s*\{\s*sequencer:\s*BalancedSequencer/);
-    // Sequencer must extend BaseSequencer and call LPT partition (not sha1).
+    // Sequencer must extend BaseSequencer and use the active CI partition
+    // (stripe after approach-1 LPT miss), not vitest contiguous slices alone.
     expect(balancedSequencer).toContain("from 'vitest/node'");
     expect(balancedSequencer).toContain('extends BaseSequencer');
-    expect(balancedSequencer).toContain('partitionByLpt');
-    expect(balancedSequencer).toContain('weightForTestFile');
-    expect(balancedSequencer).not.toMatch(/hash\s*\(\s*['"]sha1['"]/);
-    // Pure partition module stays free of vitest (Node unit tests import it).
-    expect(shardPartition).toContain('export function partitionByLpt');
+    expect(balancedSequencer).toContain('partitionForCi');
+    expect(shardPartition).toContain('export function partitionByStripe');
+    expect(shardPartition).toContain('export const partitionForCi = partitionByStripe');
     expect(shardPartition).toContain('export function weightForTestFile');
     expect(shardPartition).not.toContain("from 'vitest");
-    // Workflow comments must not re-claim sha1 as the live pack strategy.
+    // Workflow comments document the balanced sequencer.
     expect(workflow).toContain('ci_balanced_sequencer.mjs');
-    expect(workflow).toMatch(/LPT-balanced|import-cost weights/);
     // Empty packs under a broken sequencer must fail the job (privacy review).
     expect(viteConfig).toContain('passWithNoTests: false');
   });

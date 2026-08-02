@@ -9,7 +9,7 @@
 import { readFileSync, statSync } from 'node:fs';
 import { relative } from 'node:path';
 import { BaseSequencer } from 'vitest/node';
-import { partitionByLpt, weightForTestFile } from './ci_shard_partition.mjs';
+import { partitionForCi, weightForTestFile } from './ci_shard_partition.mjs';
 
 export class BalancedSequencer extends BaseSequencer {
   /**
@@ -26,23 +26,27 @@ export class BalancedSequencer extends BaseSequencer {
 
     const items = files.map((spec) => {
       const abs = spec.moduleId;
-      const key = relative(root, abs).split('\\').join('/');
+      // Match vitest's root-relative path form used for default sha1 sharding
+      // (leading slash after root slice) so stripe order is comparable.
+      const rel = relative(root, abs).split('\\').join('/');
+      const key = rel.startsWith('/') ? rel : `/${rel}`;
       let body = '';
       let size = 0;
       try {
         size = statSync(abs).size;
         body = readFileSync(abs, 'utf8');
       } catch {
-        // Unreadable path: still assign with minimal weight so completeness holds.
+        // Unreadable path: still assign so completeness holds.
       }
       return {
         id: spec,
         key,
-        weight: weightForTestFile(key, body, size),
+        weight: weightForTestFile(rel.replace(/^\//, ''), body, size),
       };
     });
 
-    const packs = partitionByLpt(items, count);
+    // Approach 2: stripe after sha1 order (not LPT). See ci_shard_partition.mjs.
+    const packs = partitionForCi(items, count);
     // vitest shard index is 1-based.
     return packs[index - 1].map((item) => item.id);
   }
