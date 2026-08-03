@@ -2,7 +2,7 @@ import { audio } from '../game/audio';
 import { corpseLootAvailability, localPartyMemberIds } from '../game/corpse_loot_availability';
 import type { GamepadKind } from '../game/gamepad_map';
 import { InstanceMusicController } from '../game/instance_music';
-import { type Keybinds, keyCapLabel } from '../game/keybinds';
+import { type Keybinds, keyCapLabel, keyLabel } from '../game/keybinds';
 import { music } from '../game/music';
 import type { GameSettings, Settings } from '../game/settings';
 import { sfx } from '../game/sfx';
@@ -271,6 +271,13 @@ import {
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
 import { isSelfOnlyAbility } from './hud/action_bar/ability_self_only';
+import {
+  type ActionBarBindState,
+  actionBarBindEnter,
+  actionBarBindResolveCapture,
+  actionBarBindSelectSlot,
+  actionBarBindStatus,
+} from './hud/action_bar/action_bar_bind_core';
 import {
   handleShiftClearContextMenu,
   handleShiftClearKeydown,
@@ -610,7 +617,7 @@ let lpAdvancedLast = -1;
 // perf_overlay_settings.ts alongside the panel that consumes it.
 export interface OptionsHooks {
   logout(): void;
-  captureKey(cb: (code: string | null) => void): void;
+  captureKey(cb: ((code: string | null) => void) | null): void;
   settings: Settings;
   onSettingChange(key: keyof GameSettings, value: GameSettings[keyof GameSettings]): void;
   // Switch the active locale at runtime (loads the locale chunk, relocalizes the page,
@@ -1066,6 +1073,14 @@ export class Hud {
   private actionBarView!: ActionBarView;
   private actionBarPainter!: ActionBarPainter;
   private actionBarWorldInput: ActionBarWorldInput | null = null;
+  // On-bar key-binding mode (issue #1238): null while inactive. Entered from the
+  // Key Bindings menu's single "Edit action bar keys" entry (replacing the wall
+  // of per-slot rebind rows), it lets a slot click on the live action bar select
+  // itself for rebinding instead of casting; the next physical keypress captures
+  // through the same Input.captureNextKey seam every other rebind flow uses, so
+  // it never fires the ability. Exited via the banner's Done button.
+  private actionBarBind: ActionBarBindState | null = null;
+  private actionBarBindBannerEl: HTMLElement | null = null;
   private playerCastBarInput: CastBarPaintInput | null = null;
   private targetCastBarInput: CastBarPaintInput | null = null;
   // The mobile action ring: a SECOND createActionBarView instance over a 6-slot
@@ -4470,6 +4485,7 @@ export class Hud {
       return item ? itemDisplayName(item) : null;
     },
     refreshKeybindLabels: () => this.refreshKeybindLabels(),
+    beginActionBarKeybindMode: () => this.beginActionBarKeybindMode(),
     buildDropdown: (options, current, onChange, placeholder, a11y) =>
       this.buildDropdown(options, current, onChange, placeholder, a11y),
     setDropdownValue: (root, value) => this.setDropdownValue(root, value),
@@ -5920,6 +5936,7 @@ export class Hud {
     let heldSlot: number | null = null;
     btn.addEventListener('pointerdown', (event) => {
       if (event.pointerType === 'mouse' && event.button !== 0) return;
+      if (this.actionBarBind) return; // bind mode owns clicks/holds on the bar
       const slot = resolveSlot();
       if (!this.empoweredAbilityIdForSlot(slot)) return;
       if (this.empowerCharge) return;
@@ -6311,6 +6328,13 @@ export class Hud {
         // (tooltip already shown) instead of casting — release dismisses it.
         if (this.peekGuard.consume()) {
           this.hideTooltip();
+          btn.blur();
+          return;
+        }
+        // On-bar key-binding mode: a slot click selects it for rebinding
+        // instead of casting (issue #1238).
+        if (this.actionBarBind) {
+          this.selectActionBarBindSlot(slot);
           btn.blur();
           return;
         }
@@ -7114,6 +7138,146 @@ export class Hud {
       if (keyEl) keyEl.textContent = keyCapLabel(key);
       btn.setAttribute('aria-label', key ? `${label} (${key})` : label);
     }
+  }
+
+  // -------------------------------------------------------------------------
+  // On-bar action-bar key-binding mode (issue #1238)
+  // -------------------------------------------------------------------------
+
+  // Entered from the Key Bindings menu's single "Edit action bar keys" entry.
+  // Closes the options window first (the mode plays out on the live bar, not
+  // inside a menu) and builds the banner. A no-op while already active.
+  private beginActionBarKeybindMode(): void {
+    if (this.actionBarBind) return;
+    this.optionsWindow.close();
+    this.actionBarBind = actionBarBindEnter();
+    this.buildActionBarBindBanner();
+    this.syncActionBarBindSlotClasses();
+  }
+
+  private endActionBarKeybindMode(): void {
+    if (!this.actionBarBind) return;
+    this.cancelPendingActionBarBindCapture();
+    this.actionBarBind = null;
+    this.actionBarBindBannerEl?.remove();
+    this.actionBarBindBannerEl = null;
+    this.syncActionBarBindSlotClasses();
+  }
+
+  // A slot is selected (a capture is armed via Input.captureNextKey) and the
+  // player clicks Done or Reset with the MOUSE instead of pressing a key: the
+  // armed callback is left dangling (captureNextKey is one-shot, cleared only
+  // by an actual keydown). Clear it so the player's very next real keypress
+  // after leaving/resetting the mode is not silently swallowed by that stale
+  // callback instead of driving normal gameplay.
+  private cancelPendingActionBarBindCapture(): void {
+    if (this.actionBarBind?.selectedSlot == null) return;
+    this.optionsHooks?.captureKey(null);
+  }
+
+  // A slot was clicked while the mode is active: select it, then arm the same
+  // Input.captureNextKey seam the individual Key Bindings rows use so the very
+  // next physical keypress (including a modifier chord) binds it and never
+  // reaches ability dispatch.
+  private selectActionBarBindSlot(slot: number): void {
+    if (!this.actionBarBind) return;
+    audio.click();
+    this.actionBarBind = actionBarBindSelectSlot(slot);
+    this.syncActionBarBindSlotClasses();
+    this.refreshActionBarBindBannerStatus();
+    this.optionsHooks?.captureKey((code) => {
+      // A stale capture: the mode exited, or a later slot click already
+      // re-armed capture for a different slot. Drop it.
+      if (!this.actionBarBind || this.actionBarBind.selectedSlot !== slot) return;
+      let boundLabel: string | null = null;
+      if (code !== null && this.keybinds.bind(`slot${slot}`, 0, code)) {
+        // Read back what actually got stored (matches the keycap the
+        // ActionBarPainter shows), not the raw captured chord.
+        boundLabel = keyLabel(this.keybinds.codeAt(`slot${slot}`, 0));
+        this.refreshKeybindLabels();
+      }
+      this.actionBarBind = actionBarBindResolveCapture(boundLabel);
+      this.syncActionBarBindSlotClasses();
+      this.refreshActionBarBindBannerStatus();
+    });
+  }
+
+  private confirmActionBarBindReset(): void {
+    // Capture is handled before the dialog's own key handling in Input.onKeyDown,
+    // so an armed slot capture left in place while the confirm is up would bind
+    // the slot to whatever key the player presses (Escape only cancels the
+    // capture, it does not dismiss the dialog). Cancel it up front, not only in
+    // the OK callback below.
+    this.cancelPendingActionBarBindCapture();
+    this.confirmDialog(
+      t('hudChrome.actionBar.resetConfirmTitle'),
+      t('hudChrome.actionBar.resetConfirmBody'),
+      t('hudChrome.actionBar.reset'),
+      t('hudChrome.actionBar.cancel'),
+      () => {
+        this.keybinds.resetSlots();
+        this.refreshKeybindLabels();
+        this.actionBarBind = actionBarBindEnter();
+        this.syncActionBarBindSlotClasses();
+        this.refreshActionBarBindBannerStatus();
+      },
+    );
+  }
+
+  private syncActionBarBindSlotClasses(): void {
+    const selected = this.actionBarBind?.selectedSlot ?? null;
+    this.abilityButtons.forEach(({ btn }, i) => {
+      btn.classList.toggle('bind-selected', i === selected);
+    });
+    document.body.classList.toggle('actionbar-bind-active', this.actionBarBind !== null);
+  }
+
+  private buildActionBarBindBanner(): void {
+    this.actionBarBindBannerEl?.remove();
+    const el = document.createElement('div');
+    el.id = 'actionbar-bind-banner';
+    el.setAttribute('role', 'status');
+    const hint = document.createElement('div');
+    hint.className = 'actionbar-bind-hint';
+    hint.textContent = t('hudChrome.actionBar.bannerHint');
+    const status = document.createElement('div');
+    status.className = 'actionbar-bind-status';
+    const actions = document.createElement('div');
+    actions.className = 'actionbar-bind-actions';
+    const resetBtn = document.createElement('button');
+    resetBtn.type = 'button';
+    resetBtn.className = 'btn';
+    resetBtn.textContent = t('hudChrome.actionBar.reset');
+    resetBtn.addEventListener('click', () => {
+      audio.click();
+      this.confirmActionBarBindReset();
+    });
+    const doneBtn = document.createElement('button');
+    doneBtn.type = 'button';
+    doneBtn.className = 'btn';
+    doneBtn.textContent = t('hudChrome.actionBar.done');
+    doneBtn.addEventListener('click', () => {
+      audio.click();
+      this.endActionBarKeybindMode();
+    });
+    actions.append(resetBtn, doneBtn);
+    el.append(hint, status, actions);
+    $('#actionbar-stack')?.appendChild(el);
+    this.actionBarBindBannerEl = el;
+    this.refreshActionBarBindBannerStatus();
+  }
+
+  private refreshActionBarBindBannerStatus(): void {
+    if (!this.actionBarBindBannerEl || !this.actionBarBind) return;
+    const el = this.actionBarBindBannerEl.querySelector<HTMLElement>('.actionbar-bind-status');
+    if (!el) return;
+    const status = actionBarBindStatus(this.actionBarBind);
+    el.textContent =
+      status === 'capturing'
+        ? t('hudChrome.actionBar.bannerCapturing')
+        : status === 'bound'
+          ? t('hudChrome.actionBar.boundToKey', { key: this.actionBarBind.lastBoundKeyLabel ?? '' })
+          : '';
   }
 
   private buildXpTicks(): void {

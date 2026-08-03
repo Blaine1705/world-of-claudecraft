@@ -959,6 +959,18 @@ export const ja_JP: EnTranslations = {
       "petAggressive": "ペット：攻撃的",
       "mount": "騎乗 / 降車"
     },
+    "actionBar": {
+      "editKeys": "アクションバーのキーを編集",
+      "editKeysHint": "アクションバーのスロットをクリックし、キーを押して割り当てます。",
+      "bannerHint": "スロットをクリックし、キーを押して割り当てます。終わったら「完了」をクリックしてください。",
+      "bannerCapturing": "キーを押してこのスロットに割り当てます…",
+      "boundToKey": "{key} に割り当てました。",
+      "reset": "リセット",
+      "done": "Done",
+      "cancel": "キャンセル",
+      "resetConfirmTitle": "アクションバーのキーをリセットしますか？",
+      "resetConfirmBody": "1本目のバーはデフォルトのキーに戻り、2本目と3本目のバーは未設定になります。この操作は取り消せません。"
+    },
     "mounts": {
       "title": "マウント",
       "close": "閉じる",
@@ -7096,8 +7108,8 @@ export const ja_JP: EnTranslations = {
       "hint": "このウィンドウが開いている間、バッグ内のアイテムをクリックすると売却できます。",
       "buyAria": "{item}を{price}で購入",
       "buyAriaWithRequirement": "{item}を{price}で購入。{requirement}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "{count}個購入",
+      "buyStackAria": "{item}を{count}個、{price}で購入",
       "qtyRowAria": "購入数量",
       "qtyMultiple": "{count}x",
       "qtyMultipleAria": "一度に{count}個ずつ購入",

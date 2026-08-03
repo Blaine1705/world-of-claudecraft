@@ -26,7 +26,7 @@ vi.mock('../server/db', () => ({
 import { saveCharacterState } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import { ClientWorld } from '../src/net/online';
+import type { ClientWorld } from '../src/net/online';
 import { mechHeldWeaponOverride, visualKeyFor } from '../src/render/characters/manifest';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
@@ -40,6 +40,14 @@ import { absorbTotal } from '../src/ui/absorb_bar';
 import { auraEffectDescriptor } from '../src/ui/aura_effect';
 import { isAuraDebuff } from '../src/ui/auras_view';
 import { buildCraftingView } from '../src/ui/crafting_view';
+import {
+  bareClient,
+  broadcast,
+  type FakeClient,
+  fakeWs,
+  joinServer,
+  lastSnap,
+} from './helpers/bare_client';
 
 // Wire round-trip fixtures only read the player entity they build, never ambient
 // world content, so strip camps/npcs/ground objects to keep each direct Sim cheap
@@ -71,98 +79,13 @@ const DELTA_KEYS = [
   'corpse',
 ];
 
-interface FakeClient {
-  sent: any[];
-  ws: any;
-}
-
 type SnapshotApplier = { applySnapshot(snapshot: unknown): void };
-
-function fakeWs(): FakeClient {
-  const sent: any[] = [];
-  return { sent, ws: { readyState: 1, send: (payload: string) => sent.push(JSON.parse(payload)) } };
-}
-
-function lastSnap(sent: any[]): any {
-  for (let i = sent.length - 1; i >= 0; i--) {
-    if (sent[i].t === 'snap') return sent[i];
-  }
-  return null;
-}
-
-function joinServer(
-  server: GameServer,
-  fc: FakeClient,
-  characterId: number,
-  name: string,
-  cls: PlayerClass = 'warrior',
-  meta: Parameters<GameServer['join']>[7] = {},
-): ClientSession {
-  const session = server.join(fc.ws, characterId, characterId, name, cls, null, false, meta);
-  if ('error' in session) throw new Error(session.error);
-  session.blockListLoaded = true;
-  return session;
-}
 
 function eventTexts(sent: any[]): string[] {
   return sent
     .flatMap((msg) => (msg.t === 'events' ? msg.list : []))
     .filter((ev) => ev.type === 'log' || ev.type === 'error')
     .map((ev) => ev.text);
-}
-
-function broadcast(server: GameServer): void {
-  (server as any).broadcastSnapshots();
-}
-
-// A ClientWorld without the WebSocket plumbing, to drive applySnapshot directly.
-function bareClient(pid: number, playerClass: PlayerClass = 'warrior'): ClientWorld {
-  const c: any = Object.create(ClientWorld.prototype);
-  c.cfg = { seed: 20061, playerClass };
-  c.entities = new Map();
-  c.playerId = pid;
-  c.ownPlayerId = pid;
-  c.ownPlayerClass = playerClass;
-  c.spectating = null;
-  c.cupInfo = null;
-  c.lastVcupRemainder = null;
-  c.lastVcupShared = null;
-  c.sportRole = null;
-  c.moveInput = {};
-  c.inventory = [];
-  c.vendorBuyback = [];
-  c.equipment = {};
-  c.accountCosmetics = { completedQuestIds: [], mechChromaIds: [] };
-  c.copper = 0;
-  c.honor = 0;
-  c.lifetimeHonor = 0;
-  c.xp = 0;
-  c.known = [];
-  c.questLog = new Map();
-  c.questsDone = new Set();
-  c.pendingQuestCommands = new Map();
-  c.partyInfo = null;
-  c.selectedDungeonDifficulty = 'normal';
-  c.tradeInfo = null;
-  c.duelInfo = null;
-  c.lastSnapAt = 0;
-  c.snapInterval = 50;
-  c.serverTickHz = null;
-  c.missingSince = new Map();
-  c.pendingFacingDelta = 0;
-  c.connected = true;
-  c.eventQueue = [];
-  c.mouselookFacing = null;
-  c.lastInputSentAt = 0;
-  c.lastInputSig = '';
-  c.inputSeq = 0;
-  c.pendingInputSeqSentAt = new Map();
-  c.ackedInputSeq = 0;
-  c.inputEchoSamples = [];
-  c.spectateFacingPending = false;
-  c.pendingSpectateFacing = null;
-  c.nodeCooldowns = new Map();
-  return c;
 }
 
 function feedEventFrame(client: ClientWorld, frame: unknown): void {
@@ -187,7 +110,7 @@ describe('self stat wire round-trip', () => {
     expect(snap.self.blk).toBeGreaterThan(0);
     expect(snap.self.bval).toBe(6);
 
-    const client = bareClient(session.pid, 'warrior');
+    const client = bareClient(session.pid, { playerClass: 'warrior' });
     const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
     internals.applySnapshot(snap);
     expect(client.player.offhandItemId).toBe('eastbrook_buckler');
@@ -810,7 +733,7 @@ describe('delta snapshots', () => {
     expect(snap.self.opUntil).toBe(1);
     expect(snap.self.opRem).toBe(4.25);
 
-    const client = bareClient(session.pid, 'hunter');
+    const client = bareClient(session.pid, { playerClass: 'hunter' });
     const now = vi.spyOn(performance, 'now').mockReturnValue(10_000);
     (client as unknown as SnapshotApplier).applySnapshot(snap);
     expect(client.reactiveAbilityWindowRemaining('mongoose_bite')).toBe(4.25);
@@ -977,7 +900,7 @@ describe('delta snapshots', () => {
     );
     expect(snap.self.stats.armor).toBe(baseArmor + 150);
 
-    const client = bareClient(paladinSession.pid, 'paladin');
+    const client = bareClient(paladinSession.pid, { playerClass: 'paladin' });
     (client as unknown as SnapshotApplier).applySnapshot(snap);
     expect(client.player.auras).toContainEqual(
       expect.objectContaining({ id: 'holy_shield', kind: 'buff_armor', value: 150 }),
@@ -1167,7 +1090,7 @@ describe('delta snapshots', () => {
     mageServer.sim.setPlayerLevel(5, mage.pid);
 
     broadcast(mageServer);
-    const client = bareClient(mage.pid, 'mage');
+    const client = bareClient(mage.pid, { playerClass: 'mage' });
     (client as any).applySnapshot(lastSnap(mageFc.sent));
     mageFc.sent.length = 0;
     broadcast(mageServer);
@@ -5696,7 +5619,7 @@ describe('negotiated stable timer wire v2', () => {
 
     broadcast(server);
     const first = lastSnap(viewerWs.sent);
-    const client = bareClient(viewer.pid, 'mage');
+    const client = bareClient(viewer.pid, { playerClass: 'mage' });
     (client as any).applySnapshot(first);
     expect(client.entities.get(subject.pid)?.auras[0].remaining).toBe(20);
 

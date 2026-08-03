@@ -959,6 +959,18 @@ export const ko_KR: EnTranslations = {
       "petAggressive": "펫: 공격적",
       "mount": "탑승 / 하차"
     },
+    "actionBar": {
+      "editKeys": "액션 바 키 편집",
+      "editKeysHint": "액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.",
+      "bannerHint": "슬롯을 클릭한 다음 키를 눌러 지정하세요. 완료되면 \"완료\"를 클릭하세요.",
+      "bannerCapturing": "키를 눌러 이 슬롯에 지정하세요...",
+      "boundToKey": "{key}(으)로 지정되었습니다.",
+      "reset": "초기화",
+      "done": "Done",
+      "cancel": "취소",
+      "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
+      "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
+    },
     "mounts": {
       "title": "탈것",
       "close": "닫기",
@@ -7096,8 +7108,8 @@ export const ko_KR: EnTranslations = {
       "hint": "이 창이 열려 있을 때 가방의 아이템을 클릭하면 판매합니다.",
       "buyAria": "{price}에 {item} 구매",
       "buyAriaWithRequirement": "{price}에 {item} 구매. {requirement}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "{count}개 구매",
+      "buyStackAria": "{price}에 {item} {count}개 구매",
       "qtyRowAria": "구매 수량",
       "qtyMultiple": "{count}x",
       "qtyMultipleAria": "한 번에 {count}개씩 구매",

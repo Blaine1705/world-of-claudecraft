@@ -2277,6 +2277,86 @@ export const TARGETS = [
     },
   },
   {
+    // The Key Bindings panel with the per-slot action-bar rows replaced by a
+    // single "Edit action bar keys" entry (issue #1238).
+    key: 'actionbar-keybind-menu-entry',
+    label: 'Key Bindings menu: single "Edit action bar keys" entry',
+    when: ['ui/hud/action_bar/action_bar_bind_core', 'ui/options_window.ts', 'game/keybinds.ts'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Key Bindings is the first row on the main options menu.
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[0]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .kb-actionbar-edit');
+      return open ? { clip: '#options-menu' } : {};
+    },
+  },
+  {
+    // Choosing the entry above closes the menu and opens the on-bar mode: a
+    // banner over the live action bar, a slot selected and highlighted, and
+    // the "press a key" status line (issue #1238).
+    key: 'actionbar-keybind-mode-banner',
+    label: 'On-bar key-binding mode: banner + a selected slot',
+    when: ['ui/hud/action_bar/action_bar_bind_core', 'ui/hud.ts', 'styles/hud.css'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[0]?.click();
+      });
+      await pollForSize(page, '#options-menu .kb-actionbar-edit');
+      await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
+      const open = await pollForSize(page, '#actionbar-bind-banner');
+      if (open) {
+        await page.evaluate(() => {
+          document.querySelectorAll('#actionbar .action-btn')[3]?.click();
+        });
+        await wait(400);
+      }
+      return open ? { clip: '#bottom-bar' } : {};
+    },
+  },
+  {
+    // Reset (behind a confirm) restores bar 1's defaults and unbinds every
+    // other bar; Keybinds.resetSlots() backs it (issue #1238).
+    key: 'actionbar-keybind-reset-confirm',
+    label: 'On-bar key-binding mode: Reset confirm dialog',
+    when: ['ui/hud/action_bar/action_bar_bind_core', 'ui/hud.ts', 'game/keybinds.ts'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[0]?.click();
+      });
+      await pollForSize(page, '#options-menu .kb-actionbar-edit');
+      await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
+      await pollForSize(page, '#actionbar-bind-banner');
+      await page.evaluate(() => {
+        const buttons = Array.from(document.querySelectorAll('#actionbar-bind-banner button'));
+        buttons[0]?.click(); // Reset (Done is the second button)
+      });
+      const open = await pollForSize(page, '#confirm-dialog');
+      return open ? { clip: '#confirm-dialog' } : {};
+    },
+  },
+  {
     key: 'guild-roster',
     label: 'Social window: Guild tab roster grouped by online status',
     // Match the SOURCE files (the `.ts` suffix keeps `ui/social_view` from also
@@ -4922,6 +5002,42 @@ export const TARGETS = [
       if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
       await wait(500);
       return { clip: '#bags' };
+    },
+  },
+  {
+    key: 'vale-cup-skill-deed-copy',
+    label: 'Book of Deeds: Vale Cup skill deeds spell out rated 3v3+ and the save floor (#2767)',
+    when: ['sim/content/deeds.ts', 'ui/deeds_window', 'ui/deeds_view', 'ui/deed_i18n'],
+    // Open the Book of Deeds on the pvp category and search the exact clause every
+    // silently-gated Vale Cup skill deed now shares, so the frame shows Hat Trick
+    // Hero, Safe Hands, and Nothing Gets Past Me together with their spelled-out
+    // rated/3v3+/save-floor conditions, not the whole (much longer) pvp category.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // openDeeds occasionally does not stick on the very first call (seen on both
+      // a loaded shared sandbox and a clean CI runner): retry the open a few times
+      // rather than a single fire-and-poll, mirroring the p14-bag-glyphs target's
+      // check-before-toggle defensiveness above.
+      let opened = false;
+      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+        await page.evaluate(() => {
+          const el = document.querySelector('#deeds-window');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.openDeeds?.('pvp');
+        });
+        opened = await pollForSize(page, '#deeds-window', 10, 500);
+      }
+      if (!opened) {
+        throw new Error('deeds window did not open');
+      }
+      await page.evaluate(() => {
+        const input = document.querySelector('#deeds-window .deed-search');
+        if (!(input instanceof HTMLInputElement)) return;
+        input.value = '3v3 bracket or larger';
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+      await wait(400);
+      return { clip: '#deeds-window' };
     },
   },
 ];

@@ -959,6 +959,18 @@ export const zh_CN: EnTranslations = {
       "petAggressive": "宠物：攻击性",
       "mount": "骑乘 / 下骑"
     },
+    "actionBar": {
+      "editKeys": "编辑动作条按键",
+      "editKeysHint": "点击动作条上的一个槽位，然后按下按键进行绑定。",
+      "bannerHint": "点击一个槽位，然后按下按键进行绑定。完成后点击“完成”。",
+      "bannerCapturing": "按下按键以绑定该槽位……",
+      "boundToKey": "已绑定至 {key}。",
+      "reset": "重置",
+      "done": "Done",
+      "cancel": "取消",
+      "resetConfirmTitle": "重置动作条按键？",
+      "resetConfirmBody": "第一条动作条将恢复为默认按键，第二条和第三条动作条将变为未绑定状态。此操作无法撤销。"
+    },
     "mounts": {
       "title": "坐骑",
       "close": "关闭",
@@ -7096,8 +7108,8 @@ export const zh_CN: EnTranslations = {
       "hint": "此窗口打开时，点击背包中的物品即可出售。",
       "buyAria": "以 {price} 购买 {item}",
       "buyAriaWithRequirement": "以 {price} 购买 {item}。{requirement}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "购买 {count} 个",
+      "buyStackAria": "以 {price} 购买 {count} 个 {item}",
       "qtyRowAria": "购买数量",
       "qtyMultiple": "{count}x",
       "qtyMultipleAria": "每次购买 {count} 份",

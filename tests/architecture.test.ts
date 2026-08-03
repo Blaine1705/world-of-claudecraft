@@ -252,6 +252,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/action_bar/action_bar_view.ts',
   'src/ui/hud/action_bar/action_bar_layout_core.ts',
   'src/ui/hud/action_bar/action_bar_visibility_core.ts',
+  'src/ui/hud/action_bar/action_bar_bind_core.ts',
   'src/ui/hud/action_bar/mobile_action_page_view.ts',
   'src/ui/hud/action_bar/consumable_bar_view.ts',
   'src/ui/mobile_hud_layout.ts',

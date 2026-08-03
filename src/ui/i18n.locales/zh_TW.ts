@@ -8712,6 +8712,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
+  // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
+  'hudChrome.actionBar.editKeys': '編輯動作列按鍵',
+  'hudChrome.actionBar.editKeysHint': '點擊動作列上的一個欄位，然後按下按鍵進行綁定。',
+  'hudChrome.actionBar.bannerHint': '點擊一個欄位，然後按下按鍵進行綁定。完成後點擊「完成」。',
+  'hudChrome.actionBar.bannerCapturing': '按下按鍵以綁定該欄位……',
+  'hudChrome.actionBar.boundToKey': '已綁定至 {key}。',
+  'hudChrome.actionBar.reset': '重設',
+  'hudChrome.actionBar.cancel': '取消',
+  'hudChrome.actionBar.resetConfirmTitle': '重設動作列按鍵？',
+  'hudChrome.actionBar.resetConfirmBody':
+    '第一列動作列將恢復為預設按鍵，第二列與第三列將變為未綁定狀態。此操作無法復原。',
   'hudChrome.mobile.mounts': '坐騎',
   'hudChrome.mounts.title': '坐騎',
   'hudChrome.mounts.close': '關閉',
@@ -10349,4 +10360,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.heatingUp': '熱身',
   'hudChrome.auraOverlay.procs.arcaneCharge': '秘法充能',
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔湧',
+  'itemUi.vendor.buyStack': '購買 {count} 個',
+  'itemUi.vendor.buyStackAria': '以 {price} 購買 {count} 個 {item}',
 };

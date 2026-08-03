@@ -959,6 +959,18 @@ export const ru_RU: EnTranslations = {
       "petAggressive": "Питомец: агрессия",
       "mount": "Сесть / Спешиться"
     },
+    "actionBar": {
+      "editKeys": "Настроить клавиши панели действий",
+      "editKeysHint": "Щёлкните ячейку на панели действий, затем нажмите клавишу, чтобы назначить её.",
+      "bannerHint": "Щёлкните ячейку, затем нажмите клавишу, чтобы назначить её. По завершении нажмите «Готово».",
+      "bannerCapturing": "Нажмите клавишу, чтобы назначить её этой ячейке...",
+      "boundToKey": "Назначено на {key}.",
+      "reset": "Сбросить",
+      "done": "Done",
+      "cancel": "Отмена",
+      "resetConfirmTitle": "Сбросить клавиши панели действий?",
+      "resetConfirmBody": "Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить."
+    },
     "mounts": {
       "title": "Транспорт",
       "close": "Закрыть",
@@ -7096,8 +7108,8 @@ export const ru_RU: EnTranslations = {
       "hint": "Нажмите на предмет в сумках, чтобы продать его, пока это окно открыто.",
       "buyAria": "Купить {item} за {price}",
       "buyAriaWithRequirement": "Купить {item} за {price}. {requirement}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Купить {count}",
+      "buyStackAria": "Купить {count} {item} за {price}",
       "qtyRowAria": "Количество покупки",
       "qtyMultiple": "{count}x",
       "qtyMultipleAria": "Покупать по {count} за раз",
