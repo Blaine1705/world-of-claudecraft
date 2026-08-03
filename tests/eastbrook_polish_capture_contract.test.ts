@@ -370,7 +370,7 @@ describe('Eastbrook polish capture contract', () => {
       // band with the ambient-life wiring removed). Not one Eastbrook
       // pipeline input or geometry value changed, and no capture was
       // retaken (the per-asset seal suites stay green untouched).
-      fingerprint: 'f535b11430818597e9d76ac393f73b19d7052f6e68199ed6de5b8106c81ac7e6',
+      fingerprint: '45c7c5d8fea0d2e4111fa81128c04af5314f542a37b5939900198834a406ab51',
       components: {
         captureContract: {
           id: 'polish-v2',
