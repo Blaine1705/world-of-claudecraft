@@ -983,8 +983,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_priest",
     "tint": "#f0e9d6",
-    "tintStrength": 0.5,
-    "still": "/guide-stills/player_priest__f0e9d6__s50.webp"
+    "tintStrength": 0.15,
+    "still": "/guide-stills/player_priest__f0e9d6__s15.webp"
   },
   {
     "id": "shaman",
@@ -1088,8 +1088,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_shaman",
     "tint": "#6f8fc9",
-    "tintStrength": 0.4,
-    "still": "/guide-stills/player_shaman__6f8fc9.webp"
+    "tintStrength": 0.15,
+    "still": "/guide-stills/player_shaman__6f8fc9__s15.webp"
   },
   {
     "id": "mage",
@@ -1467,8 +1467,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_warlock",
     "tint": "#8d5fd3",
-    "tintStrength": 0.45,
-    "still": "/guide-stills/player_warlock__8d5fd3__s45.webp"
+    "tintStrength": 0.15,
+    "still": "/guide-stills/player_warlock__8d5fd3__s15.webp"
   },
   {
     "id": "druid",
@@ -9888,7 +9888,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ],
-    "tintStrength": 0.5
+    "tintStrength": 0.15
   },
   "player_shaman": {
     "url": "models/chars/players/barbarian.glb",
@@ -9907,7 +9907,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.4
+    "tintStrength": 0.15
   },
   "player_mage": {
     "url": "models/chars/players/mage.glb",
@@ -9939,7 +9939,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "gripRef": "Spellbook_open"
       }
     ],
-    "tintStrength": 0.45
+    "tintStrength": 0.15
   },
   "player_druid": {
     "url": "models/chars/players/druid.glb",
