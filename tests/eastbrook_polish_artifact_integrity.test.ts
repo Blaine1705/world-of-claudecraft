@@ -615,9 +615,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'c56bf2b86ba41eb27c6f43cd88a09a3ad96fc801de9682bdf8b1edb72a4c83ef';
+  '7e15cc4c6b8c5b5bbf066129aa59f21f3f93a5125816918ea5814aa2cf31e59d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '80151ab5cdd28fa4cf68f6f0952aa1241594c3c11906b899864a1563c4de226a';
+  'fd1b2a46947d588aa6c0e62a04885a8039ed3fb1c2d1e281342f80168b16d590';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,12 +1474,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // The graphics overhaul changed the fingerprinted runtimeRender inputs, so
-    // the composite polish provenance moved and this seal follows the composite.
-    // Every measured value (frame timings, draw stats, triangle and scenario
+    // The lockfile leaf is pnpm-lock.yaml after the local-gate-perf migration (0.33.1 previously used package-lock.json), a hashed input to every
+    // GLB source fingerprint, so the town/mailbox/noticeboard leaves moved, the
+    // composite polish provenance followed (also folding in the v0.33 render
+    // recovery's renderer leaf, which re-pinned the capture contract without
+    // re-sweeping this evidence), and this seal follows the composite. Every
+    // measured value (frame timings, draw stats, triangle and scenario
     // numbers) is byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '58e21405a2b55000b3e0d7979235ba2e43f50c06f16f1373d421120c1e912369',
+      '71d3f6fc676687032023477349393654690706dbfe0bd25106dca32a13d1de3c',
     );
   });
 

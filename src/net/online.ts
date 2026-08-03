@@ -172,6 +172,7 @@ interface ClientWireAura {
   emp?: Aura['empowerAbilities'];
   src?: number;
   ub?: 1;
+  bt?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -1323,6 +1324,7 @@ function blankEntity(id: number): Entity {
     chaseStall: 0,
     evadeEpoch: 0,
     combatExitHoldUntil: 0,
+    chainPullInbound: false,
     fleeTimer: 0,
     fleeReturnTimer: 0,
     hasFled: false,
@@ -2823,6 +2825,7 @@ export class ClientWorld implements IWorld {
             // (auras_view ownFirst). An old server omits it; 0 matches no player id.
             rec.sourceId = a.src ?? 0;
             rec.unbreakableControl = a.ub === 1 ? true : undefined;
+            rec.breakThreshold = a.bt === 1 ? 1 : undefined;
           }
         } else {
           e.auras = wireAuras.map((a) => ({
@@ -2841,6 +2844,7 @@ export class ClientWorld implements IWorld {
             charges: a.charges,
             empowerAbilities: a.emp,
             unbreakableControl: a.ub === 1 ? true : undefined,
+            breakThreshold: a.bt === 1 ? 1 : undefined,
           }));
         }
       }

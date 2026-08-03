@@ -6214,6 +6214,7 @@ export const pt_BR: EnTranslations = {
         "add": "Adicionar canal de chat",
         "addTitle": "Adicionar canal",
         "close": "Fechar aba {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Mensagem para {channel}",
         "names": {
           "say": "Dizer",
