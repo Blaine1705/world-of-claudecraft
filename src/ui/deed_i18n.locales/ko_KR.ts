@@ -752,4 +752,32 @@ export const table: DeedLocaleTable = {
     name: '무리는 기억한다',
     desc: '장막의 골짜기를 떠도는 희귀 우두머리 둘, 늙은 매로우셸과 무리의 첫째 아우렐혼을 처치하십시오.',
   },
+  chr_peaks_gatherer: {
+    name: '고지대의 수확',
+    desc: 'Thornpeak Heights에서 광맥, 나무 군락, 약초 더미를 하나씩 채집하세요.',
+  },
+  chr_willowfen_gatherer: {
+    name: '펜랜드 바운티',
+    desc: '버드나무늪에서 광맥, 나무 스탠드, 허브 밭을 수확하세요.',
+  },
+  chr_willowfen_first_cast: {
+    name: '릴리무어의 잔물결',
+    desc: '버드나무늪 물에서 물고기를 잡아보세요.',
+  },
+  chr_galecrest_gatherer: {
+    name: '곶에서의 수확',
+    desc: 'Galecrest에서 광맥, 나무 스탠드, 허브 패치를 수확하세요.',
+  },
+  chr_galecrest_first_cast: {
+    name: '거울 속의 선 Tarn',
+    desc: 'Galecrest의 물에서 물고기를 잡으세요.',
+  },
+  chr_farshore_gatherer: {
+    name: '섬 조항',
+    desc: '파쇼어(Farshore)에서 광맥, 나무 스탠드, 허브 패치를 수확하세요.',
+  },
+  chr_farshore_first_cast: {
+    name: '갈매기가 아는 것',
+    desc: 'Farshore의 물에서 물고기를 잡으세요.',
+  },
 };

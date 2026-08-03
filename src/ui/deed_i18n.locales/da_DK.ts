@@ -768,4 +768,32 @@ export const table: DeedLocaleTable = {
     name: 'Flokken Husker',
     desc: 'Dræb Gamle Marvskal og Aurelhorn, Første af Flokken, de to omstrejfende sjældne bosser i Den Tilslørede Hule.',
   },
+  chr_peaks_gatherer: {
+    name: 'Højdernes høst',
+    desc: 'Høst en malmåre, et træstativ og et urteplaster i Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Kærlandets udbytte',
+    desc: 'Høst en malmåre, en træstativ og en urteplet i pilefladen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ripples i Lilymoors',
+    desc: 'Fang en fisk fra vandet i Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Høst på næsset',
+    desc: 'Høst en malmåre, et træstativ og en urteplet i Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'En linje i spejlet Tarn',
+    desc: 'Fang en fisk fra vandet i Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Ø-bestemmelser',
+    desc: 'Høst en malmåre, et træstativ og en urteplet på Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Hvad mågerne ved',
+    desc: 'Fang en fisk fra vandet i Farshore.',
+  },
 };

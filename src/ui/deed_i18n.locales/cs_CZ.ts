@@ -804,4 +804,32 @@ export const table: DeedLocaleTable = {
     name: 'Stádo nezapomíná',
     desc: 'Zab Starou Morkoskořápku a Aurelhorna, Prvního ze stáda, dva putující vzácné bosse Zahalené kotliny.',
   },
+  chr_peaks_gatherer: {
+    name: 'Sklizeň výšin',
+    desc: 'Sklizeň rudné žíly, dřevěného stojanu a bylinkového záhonu v Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Kořist mokřin',
+    desc: 'Sklizeň rudné žíly, dřevěného porostu a bylinkového záhonu ve Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Vlnky v Lilymoors',
+    desc: 'Chyťte rybu z vod Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Sklizeň na ostrohu',
+    desc: 'Sklizeň rudné žíly, dřevěného porostu a bylinkové záhony v Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Čára v Mirror Tarn',
+    desc: 'Chyťte rybu z vod Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Ostrovní ustanovení',
+    desc: 'Sklizeň rudné žíly, dřevěného porostu a bylinkového záhonu na Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Co Rackové vědí',
+    desc: 'Chyťte rybu z vod Farshore.',
+  },
 };

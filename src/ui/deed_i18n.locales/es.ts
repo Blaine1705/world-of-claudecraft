@@ -841,6 +841,34 @@ export const table: DeedLocaleTable = {
     name: 'La manada recuerda',
     desc: 'Mata al Viejo Marrowshell y a Aurelhorn, Primero de la Manada, los dos jefes raros errantes de la Hondonada.',
   },
+  chr_peaks_gatherer: {
+    name: 'Cosecha de las Cumbres',
+    desc: 'Cosecha una veta de mineral, un grupo de madera y un macizo de hierbas en las Cumbres de Thornpeak.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Recompensa de Fenland',
+    desc: 'Coseche una veta de mineral, un puesto de madera y un huerto de hierbas en Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ondas en Lilymoors',
+    desc: 'Pesca un pez en las aguas de Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Cosecha en el promontorio',
+    desc: 'Coseche una veta de mineral, un puesto de madera y un parche de hierbas en Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Una línea en el espejo Tarn',
+    desc: 'Pesca un pez en las aguas de Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Disposiciones de la isla',
+    desc: 'Coseche una veta de mineral, un puesto de madera y un huerto de hierbas en Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Lo que saben las gaviotas',
+    desc: 'Pesca un pez en las aguas de Farshore.',
+  },
 };
 
 // es_ES rides this base table plus the delve-vocabulary override layer

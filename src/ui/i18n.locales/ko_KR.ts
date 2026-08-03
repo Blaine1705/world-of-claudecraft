@@ -10855,4 +10855,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
   'itemUi.vendor.buyStack': '{count}개 구매',
   'itemUi.vendor.buyStackAria': '{price}에 {item} {count}개 구매',
+  'guide.profPages.colWield': '사용 장소',
+  'guide.profPages.wieldNone': '어느',
+  'hudChrome.actionBar.done': '완료',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
+  'itemUi.vendor.buyCountAria': '{price}에 {item} 중 {count} 구매',
+  'itemUi.vendor.buyCountAriaWithRequirement':
+    '{price}에 {item} 중 {count}을(를) 구매하세요. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '구입하다',
+  'itemUi.vendor.qtyMultiple': '{count}x',
 };

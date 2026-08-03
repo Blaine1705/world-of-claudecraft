@@ -792,4 +792,32 @@ export const table: DeedLocaleTable = {
     name: 'Sürü Unutmaz',
     desc: "Örtülü Vadi'nin iki gezgin ender patronunu öldür: Yaşlı Marrowshell ve Sürünün İlki Aurelhorn.",
   },
+  chr_peaks_gatherer: {
+    name: 'Tepelerin Hasadı',
+    desc: "Thornpeak Heights'ta bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
+  },
+  chr_willowfen_gatherer: {
+    name: 'Fenland Ödülü',
+    desc: "Willowfen'de bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
+  },
+  chr_willowfen_first_cast: {
+    name: "Lilymoors'taki dalgalanmalar",
+    desc: "Willowfen'in sularından bir balık yakalayın.",
+  },
+  chr_galecrest_gatherer: {
+    name: 'Burunda Hasat',
+    desc: "Galecrest'te bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
+  },
+  chr_galecrest_first_cast: {
+    name: "Ayna Tarn'daki Bir Çizgi",
+    desc: "Galecrest'in sularından bir balık yakalayın.",
+  },
+  chr_farshore_gatherer: {
+    name: 'Ada Hükümleri',
+    desc: "Farshore'da bir cevher damarı, bir ahşap stand ve bir bitki tarlası hasat edin.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Martıların Bildiği',
+    desc: "Farshore'un sularından bir balık yakalayın.",
+  },
 };

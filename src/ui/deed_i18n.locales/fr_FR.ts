@@ -871,6 +871,34 @@ export const table: DeedLocaleTable = {
     name: 'Le troupeau se souvient',
     desc: 'Tuer le Vieux Marrowshell et Aurelhorn, Premier du Troupeau, les deux boss rares errants du Vallon.',
   },
+  chr_peaks_gatherer: {
+    name: 'Récolte des Hauts Sommets',
+    desc: "Récoltez un filon de minerai, un peuplement d'arbres et une touffe d'herbes dans les Hauts Sommets de Thornpeak.",
+  },
+  chr_willowfen_gatherer: {
+    name: 'Prime du Fenland',
+    desc: "Récoltez une veine de minerai, un peuplement de bois et un champ d'herbes dans Willowfen.",
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ondulations dans les Lilymoors',
+    desc: 'Attrapez un poisson dans les eaux de Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Récolte sur le promontoire',
+    desc: "Récoltez une veine de minerai, un peuplement de bois et un champ d'herbes dans le Galecrest.",
+  },
+  chr_galecrest_first_cast: {
+    name: 'Une ligne dans le miroir Tarn',
+    desc: 'Attrapez un poisson dans les eaux du Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Dispositions insulaires',
+    desc: "Récoltez une veine de minerai, un peuplement de bois et un champ d'herbes sur Farshore.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Ce que savent les mouettes',
+    desc: 'Attrapez un poisson dans les eaux de Farshore.',
+  },
 };
 
 // fr_CA rides this base table plus the delve-vocabulary override layer

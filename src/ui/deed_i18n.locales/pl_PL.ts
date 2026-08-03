@@ -826,4 +826,32 @@ export const table: DeedLocaleTable = {
     name: 'Stado pamięta',
     desc: 'Zabij Starego Szpikoskorupa i Aurelhorna, Pierwszego ze Stada, dwóch wędrownych rzadkich bossów Zasłoniętej Kotliny.',
   },
+  chr_peaks_gatherer: {
+    name: 'Żniwa na Wzgórzach',
+    desc: 'Zbierz żyłę rudy, stojak na drewno i grządkę ziół w Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Nagroda Fenlanda',
+    desc: 'Zbierz żyłę rudy, drzewostan i grządkę ziół w Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Fale w Lilymoors',
+    desc: 'Złów rybę z wód Wierzby.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Żniwa na cyplu',
+    desc: 'Zbierz żyłę rudy, stojak na drewno i grządkę ziół w Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Linia w Lustrzanym Tarnie',
+    desc: 'Złów rybę z wód Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Przepisy wyspy',
+    desc: 'Zdobądź żyłę rudy, drzewostan i pole ziół na Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Co wiedzą mewy',
+    desc: 'Złów rybę z wód Farshore.',
+  },
 };

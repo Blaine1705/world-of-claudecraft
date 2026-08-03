@@ -868,4 +868,32 @@ export const table: DeedLocaleTable = {
     name: 'Il Branco Ricorda',
     desc: 'Uccidi il Vecchio Marrowshell e Aurelhorn, Primo del Branco, i due boss rari erranti della Valletta.',
   },
+  chr_peaks_gatherer: {
+    name: 'Raccolto delle alture',
+    desc: 'Raccogli una vena mineraria, un supporto in legno e un appezzamento di erbe a Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Taglia della Fenland',
+    desc: 'Raccogli una vena mineraria, un supporto di legno e un appezzamento di erbe a Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Increspature nelle Lilymoors',
+    desc: 'Cattura un pesce dalle acque del Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Raccolto sul promontorio',
+    desc: 'Raccogli una vena mineraria, un supporto di legno e un appezzamento di erbe nel Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Una linea nel Tarn dello specchio',
+    desc: 'Cattura un pesce dalle acque del Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: "Disposizioni sull'isola",
+    desc: 'Raccogli una vena mineraria, un supporto di legno e un appezzamento di erbe sulla Riva Lunga.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Quello che sanno i gabbiani',
+    desc: 'Cattura un pesce dalle acque della Riva Lunga.',
+  },
 };

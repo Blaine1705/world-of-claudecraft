@@ -838,4 +838,32 @@ export const table: DeedLocaleTable = {
     name: 'A Manada Lembra',
     desc: 'Mate o Velho Marrowshell e Aurelhorn, Primeiro da Manada, os dois chefes raros errantes do Vale.',
   },
+  chr_peaks_gatherer: {
+    name: 'Colheita das Alturas',
+    desc: 'Colha um veio de minério, um suporte de madeira e um canteiro de ervas em Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Recompensa Fenland',
+    desc: 'Colha um veio de minério, um suporte de madeira e um canteiro de ervas em Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ondulações em Lilymoors',
+    desc: 'Pegue um peixe nas águas de Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Colheita no promontório',
+    desc: 'Colha um veio de minério, um suporte de madeira e um canteiro de ervas em Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Uma linha no espelho Tarn',
+    desc: 'Pegue um peixe nas águas do Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Disposições da Ilha',
+    desc: 'Colha um veio de minério, um suporte de madeira e um canteiro de ervas na Costa Extrema.',
+  },
+  chr_farshore_first_cast: {
+    name: 'O que as gaivotas sabem',
+    desc: 'Pegue um peixe nas águas do Farshore.',
+  },
 };

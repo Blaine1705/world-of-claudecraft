@@ -841,4 +841,32 @@ export const table: DeedLocaleTable = {
     name: 'De Kudde Vergeet Niet',
     desc: 'Dood de Oude Mergschelp en Aurelhorn, Eerste van de Kudde, de twee rondzwervende zeldzame bazen van de Sluierholte.',
   },
+  chr_peaks_gatherer: {
+    name: 'Oogst van de hoogten',
+    desc: 'Oogst een ertsader, een houten standaard en een kruidenveld in Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Buit van het veenland',
+    desc: 'Oogst een ertsader, een houten standaard en een kruidenveldje in de Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Rimpelingen in de Lilymoors',
+    desc: 'Vang een vis uit de wateren van de Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Oogst op de landtong',
+    desc: 'Oogst een ertsader, een houten standaard en een kruidenveld in de Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Een lijn in de spiegel Tarn',
+    desc: 'Vang een vis uit de wateren van de Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Eilandvoorzieningen',
+    desc: 'Oogst een ertsader, een houten standaard en een kruidenveld op de Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Wat de meeuwen weten',
+    desc: 'Vang een vis uit de wateren van de Farshore.',
+  },
 };

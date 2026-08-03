@@ -10372,4 +10372,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔湧',
   'itemUi.vendor.buyStack': '購買 {count} 個',
   'itemUi.vendor.buyStackAria': '以 {price} 購買 {count} 個 {item}',
+  'guide.profPages.colWield': '使用於',
+  'guide.profPages.wieldNone': '任何',
+  'hudChrome.actionBar.done': '完畢',
+  'hudChrome.gathering.respawnClock': '{minutes}：{seconds}',
+  'itemUi.vendor.buyCountAria': '為 {price} 購買 {item} 的 {count}',
+  'itemUi.vendor.buyCountAriaWithRequirement': '為 {price} 購買 {item} 的 {count}。 {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '買',
+  'itemUi.vendor.qtyMultiple': '{count}x',
 };

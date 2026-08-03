@@ -10862,4 +10862,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
   'itemUi.vendor.buyStack': '{count}個購入',
   'itemUi.vendor.buyStackAria': '{item}を{count}個、{price}で購入',
+  'guide.profPages.colWield': 'で使用します',
+  'guide.profPages.wieldNone': 'どれでも',
+  'hudChrome.actionBar.done': '終わり',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
+  'itemUi.vendor.buyCountAria': '{price} で {item} の {count} を購入',
+  'itemUi.vendor.buyCountAriaWithRequirement':
+    '{price} で {item} の {count} を購入します。 {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '買う',
+  'itemUi.vendor.qtyMultiple': '{count}x',
 };

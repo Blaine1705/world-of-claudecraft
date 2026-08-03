@@ -835,4 +835,32 @@ export const table: DeedLocaleTable = {
     name: 'Kawanan Itu Ingat',
     desc: 'Bantai Marrowshell Tua dan Aurelhorn, yang Pertama dari Kawanan, dua bos langka pengembara di Ceruk Terselubung.',
   },
+  chr_peaks_gatherer: {
+    name: 'Panen dari Ketinggian',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Hadiah Fenland',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Riak di Lilymoors',
+    desc: 'Tangkap ikan dari perairan Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Panen di Tanjung',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Garis di Cermin Tarn',
+    desc: 'Tangkap ikan dari perairan Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Ketentuan Pulau',
+    desc: 'Panen urat bijih, tegakan kayu, dan petak herba di Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Apa yang Diketahui Burung Camar',
+    desc: 'Tangkap ikan dari perairan Farshore.',
+  },
 };

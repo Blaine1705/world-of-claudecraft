@@ -11041,4 +11041,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
   'itemUi.vendor.buyStack': 'Купить {count}',
   'itemUi.vendor.buyStackAria': 'Купить {count} {item} за {price}',
+  "guide.profPages.colWield": "Используйте в",
+  "guide.profPages.wieldNone": "Любой",
+  "hudChrome.actionBar.done": "Сделанный",
+  "hudChrome.gathering.respawnClock": "{minutes}:{seconds}",
+  "itemUi.vendor.buyCountAria": "Купите {count} из {item} за {price}",
+  "itemUi.vendor.buyCountAriaWithRequirement": "Купите {count} из {item} за {price}. {requirement}",
+  "itemUi.vendor.buyQuantityConfirm": "Купить",
+  "itemUi.vendor.qtyMultiple": "{count}x",
 };
+

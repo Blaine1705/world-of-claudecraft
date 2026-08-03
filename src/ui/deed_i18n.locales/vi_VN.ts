@@ -838,4 +838,32 @@ export const table: DeedLocaleTable = {
     name: 'Bầy Đàn Ghi Nhớ',
     desc: 'Hạ Marrowshell Già và Aurelhorn, Kẻ Đầu Đàn, hai trùm hiếm lang thang của Thung Lũng Sương Phủ.',
   },
+  chr_peaks_gatherer: {
+    name: 'Thu hoạch vùng cao',
+    desc: 'Thu hoạch quặng, giá gỗ và mảnh thảo mộc ở Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Tiền thưởng Fenland',
+    desc: 'Thu hoạch quặng, giá gỗ và mảnh thảo mộc ở Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Gợn sóng ở Lilymoors',
+    desc: 'Bắt một con cá từ vùng nước Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Thu hoạch trên mũi đất',
+    desc: 'Thu hoạch quặng, giá gỗ và mảnh thảo mộc ở Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Một đường kẻ trong gương Tarn',
+    desc: 'Bắt một con cá từ vùng biển Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Quy định về đảo',
+    desc: 'Thu hoạch quặng, giá gỗ và thảm thảo mộc ở Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Những gì mòng biển biết',
+    desc: 'Bắt một con cá từ vùng biển Farshore.',
+  },
 };

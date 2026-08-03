@@ -524,4 +524,32 @@ export const table: DeedLocaleTable = {
     name: '鹿群不忘',
     desc: '斬殺老髓殼與鹿群之首金輝角，帷幕幽谷的兩個遊蕩稀有首領。',
   },
+  chr_peaks_gatherer: {
+    name: '高地採收',
+    desc: '在 Thornpeak Heights 採收一處礦脈、一片林木和一叢草藥。',
+  },
+  chr_willowfen_gatherer: {
+    name: '芬蘭賞金',
+    desc: '在威洛芬收穫一條礦脈、一個木樁和一片藥草。',
+  },
+  chr_willowfen_first_cast: {
+    name: '百合沼澤的漣漪',
+    desc: '從柳沼水域捕獲一條魚。',
+  },
+  chr_galecrest_gatherer: {
+    name: '岬角的收穫',
+    desc: '在 Galecrest 中收穫一條礦脈、一個木樁和一片藥草。',
+  },
+  chr_galecrest_first_cast: {
+    name: '鏡中線塔恩',
+    desc: '從 Galecrest 水域捕獲一條魚。',
+  },
+  chr_farshore_gatherer: {
+    name: '島嶼規定',
+    desc: '在遠岸收穫一條礦脈、木樁和一片藥草。',
+  },
+  chr_farshore_first_cast: {
+    name: '海鷗知道什麼',
+    desc: '從遠岸水域捕獲一條魚。',
+  },
 };

@@ -833,4 +833,32 @@ export const table: DeedLocaleTable = {
     name: 'Die Herde vergisst nicht',
     desc: 'Erlege die Alte Markschale und Aurelhorn, den Ersten der Herde, die beiden wandernden seltenen Bosse der Schleiersenke.',
   },
+  chr_peaks_gatherer: {
+    name: 'Ernte der Höhen',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Kräuterbeet in den Thornpeak-Höhen.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Fenland-Kopfgeld',
+    desc: 'Ernten Sie eine Erzader, einen Holzbestand und ein Kräuterbeet im Weidenmoor.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Wellen in den Lilymoors',
+    desc: 'Fangen Sie einen Fisch aus den Gewässern des Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Ernte auf der Landzunge',
+    desc: 'Ernten Sie eine Erzader, einen Holzbestand und ein Kräuterbeet im Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Eine Linie im Mirror Tarn',
+    desc: 'Fangen Sie einen Fisch aus den Gewässern des Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Inselversorgung',
+    desc: 'Ernten Sie eine Erzader, einen Waldbestand und ein Kräuterbeet an der Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Was die Möwen wissen',
+    desc: 'Fangen Sie einen Fisch aus den Gewässern der Farshore.',
+  },
 };

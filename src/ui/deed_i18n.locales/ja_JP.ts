@@ -701,4 +701,32 @@ export const table: DeedLocaleTable = {
     name: '群れは忘れない',
     desc: 'ヴェールの幽谷を彷徨う2体の稀少ボス、老いたるマロウシェルと群れの長アウレルホーンを討ち倒す。',
   },
+  chr_peaks_gatherer: {
+    name: '高地の収穫',
+    desc: 'Thornpeak Heightsで鉱脈、木立、薬草の茂みをそれぞれ採集する。',
+  },
+  chr_willowfen_gatherer: {
+    name: 'フェンランドの報奨金',
+    desc: 'ウィローフェンで鉱脈、木の台、ハーブ畑を採取します。',
+  },
+  chr_willowfen_first_cast: {
+    name: 'リリームーアの波紋',
+    desc: 'ウィローフェンの水域で魚を釣りましょう。',
+  },
+  chr_galecrest_gatherer: {
+    name: '岬の収穫',
+    desc: 'Galecrest で鉱脈、木の台、ハーブ畑を採取します。',
+  },
+  chr_galecrest_first_cast: {
+    name: '鏡の中のライン',
+    desc: 'Galecrest の水域で魚を釣りましょう。',
+  },
+  chr_farshore_gatherer: {
+    name: '島の規定',
+    desc: 'ファーショアで鉱脈、木の台、ハーブ畑を採取します。',
+  },
+  chr_farshore_first_cast: {
+    name: 'カモメが知っていること',
+    desc: 'ファーショアの海で魚を釣りましょう。',
+  },
 };

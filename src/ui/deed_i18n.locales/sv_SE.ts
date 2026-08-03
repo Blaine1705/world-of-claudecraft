@@ -769,4 +769,32 @@ export const table: DeedLocaleTable = {
     name: 'Hjorden minns',
     desc: 'Dräp Gamla Märgskal och Aurelhorn, Först i hjorden, Slöjhålans två vandrande sällsynta bossar.',
   },
+  chr_peaks_gatherer: {
+    name: 'Höjdernas skörd',
+    desc: 'Skörda en malmåder, ett vedställ och en örtlapp i Thornpeak Heights.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Kärrmarkens byte',
+    desc: 'Skörda en malmåder, ett vedställ och en örtlapp i Willowfen.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Ripples i Lilymoors',
+    desc: 'Fånga en fisk från Willowfens vatten.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Skörd på udden',
+    desc: 'Skörda en malmåder, ett vedställ och en örtlapp i Galecrest.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'En linje i spegeln Tarn',
+    desc: 'Fånga en fisk från vattnet i Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Ö bestämmelser',
+    desc: 'Skörda en malmåder, ett vedställ och en örtlapp på Farshore.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Vad måsarna vet',
+    desc: 'Fånga en fisk från Farshores vatten.',
+  },
 };
