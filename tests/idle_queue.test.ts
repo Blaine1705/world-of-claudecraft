@@ -100,20 +100,21 @@ describe('runIdleQueue', () => {
     expect(seen).toEqual([]);
   });
 
-  it('runs a quarter batch when a timeout forces progress with no idle budget', async () => {
+  it('runs the full batch when a timeout forces progress with no idle budget', async () => {
     const pending: Array<(deadline: { didTimeout: boolean; timeRemaining: () => number }) => void> =
       [];
     const seen: number[] = [];
     const done = runIdleQueue([1, 2, 3, 4, 5, 6, 7, 8], (item) => seen.push(item), {
-      batchSize: 8,
+      batchSize: 3,
       timeoutMs: 50,
       scheduler: (callback) => pending.push(callback),
     });
-    // ceil(8 / 4) = 2 items per forced slot: bounded per-frame cost, but the
-    // queue can no longer degrade to one item per timeout under sustained
-    // load (the whole-zone streaming stall this arm used to cause).
+    // The full 3-item batch per forced slot: callers size batchSize to a
+    // few-ms budget, and the queue must not degrade to one item per timeout
+    // under sustained load (the whole-zone streaming stall this used to
+    // cause when the frame loop granted no real idle budget for minutes).
     pending.shift()?.({ didTimeout: true, timeRemaining: () => 0 });
-    expect(seen).toEqual([1, 2]);
+    expect(seen).toEqual([1, 2, 3]);
     while (pending.length > 0) pending.shift()?.({ didTimeout: true, timeRemaining: () => 0 });
     await done;
     expect(seen).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
