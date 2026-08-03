@@ -3374,6 +3374,10 @@ export class ClientWorld implements IWorld {
             attunedPairs: [...identity.attunedPairs],
             switchCount: identity.switchCount,
             amendsProgress: identity.amendsProgress,
+            // Jack of All Trades (#1296) does not ride CraftingIdentityView
+            // yet: there is no live quest path to become Jack online (or
+            // offline) in this change, so this is always false here.
+            isJackOfAllTrades: false,
           }
         : undefined,
       cadenceBlocked,
