@@ -224,6 +224,7 @@ import {
 } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
+import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
@@ -324,6 +325,7 @@ import {
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
+import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
@@ -1787,7 +1789,17 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
-    onMountToggle: () => world.toggleMounted(),
+    onMountToggle: () => {
+      // Dismount is the shared toggleMounted() path (unchanged); summoning an
+      // owned mount from a single tap goes through its reins item directly,
+      // since toggleMounted() itself never summons (src/ui/mount_quick_summon.ts).
+      // bagOwnedMounts (bags only, never bank) matches what useItem can
+      // actually summon: world.ownedMounts() includes bank-only reins that
+      // useItem would refuse (#2739 followup).
+      const action = mobileMountAction(world.player.mountKey, bagOwnedMounts(world.inventory));
+      if (action.kind === 'summon') world.useItem(action.itemId);
+      else world.toggleMounted();
+    },
     onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
