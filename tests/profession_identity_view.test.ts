@@ -123,9 +123,10 @@ describe('buildProfessionIdentityView', () => {
       'enchanting',
     ]);
     // The MODEL's own skills stay in CRAFT_RING order: the professions
-    // window's wheel renders its geometry from model order, so the card's
-    // presentation sort must be a copy, never an in-place mutation (the
-    // regression the final gate caught: professions_view and the ring nodes
+    // window's craft ROW LIST maps identity.skills positionally into
+    // model.crafts, so the card's presentation sort must be a copy, never an
+    // in-place mutation (the regression the final gate caught: the
+    // professions_view crafts pin and the window's craft-icon row order
     // reddened when the sort mutated the shared array).
     expect(view.skills[0].craftId).toBe('engineering');
     expect(view.skills[9].craftId).toBe('armorcrafting');

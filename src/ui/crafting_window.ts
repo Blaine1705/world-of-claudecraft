@@ -100,10 +100,12 @@ export function renderCraftingWindow(
   // offset AND its focus across: a single craft repaints this window three
   // times (optimistic, craftResult, the slow-band skill signature), and
   // without the carry each one yanks a scrolled reader back to row one and
-  // drops keyboard focus to body.
+  // drops keyboard focus to body. On mobile the CARD is the one scroller
+  // (hud.mobile.css lifts the list cap), so its offset carries too.
   const oldSkillList = el.querySelector('.profession-skill-list');
   const skillListScrollTop = oldSkillList?.scrollTop ?? 0;
   const skillListHadFocus = oldSkillList !== null && document.activeElement === oldSkillList;
+  const cardScrollTop = el.querySelector('.profession-identity-card')?.scrollTop ?? 0;
   el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
 
   if (identity) renderProfessionIdentityCard(el, identity);
@@ -387,4 +389,6 @@ export function renderCraftingWindow(
     newSkillList.scrollTop = skillListScrollTop;
     if (skillListHadFocus) newSkillList.focus();
   }
+  const newCard = el.querySelector<HTMLElement>('.profession-identity-card');
+  if (newCard) newCard.scrollTop = cardScrollTop;
 }

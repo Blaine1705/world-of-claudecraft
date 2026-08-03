@@ -1204,14 +1204,11 @@ export const TARGETS = [
             // the professions target's cap-legal attuned Smith, so the card
             // renders the per-row role/cap chips (major, hobby, dormant
             // knowledge, near-tier) instead of the unattuned collapse.
-            // Drop the persisted tab first: localStorage survives page.close()
-            // within the one shared browser, so an earlier variant's tab click
-            // (bag-freshness selects alchemy) would otherwise decide which tab
-            // these framings open on, making a solo re-shoot differ from a
-            // full-run one.
-            try {
-              localStorage.removeItem('woc_crafting_tab');
-            } catch {}
+            // Tab determinism lives in the variants' explicit selectTab, not
+            // here: the woc_crafting_tab memory is read at HUD boot, before
+            // this staging runs, and localStorage survives page.close() in
+            // the one shared browser, so an earlier variant's click would
+            // otherwise decide what these framings open on.
             const game = window.__game;
             if (game?.world) {
               Object.defineProperty(game.world, 'craftingIdentity', {

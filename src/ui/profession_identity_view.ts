@@ -63,8 +63,10 @@ export function uniformSkillChips(
  * still hold knowledge; the sort is stable, so ring order survives within
  * each group and the unattuned card (every row one role) is untouched.
  * A sorted COPY, deliberately not the model order: ProfessionIdentityModel
- * .skills stays in CRAFT_RING order because the professions window's wheel
- * renders its geometry from that order (professions_view.ts consumes it). */
+ * .skills stays in CRAFT_RING order because the professions window's craft
+ * ROW LIST maps it positionally (professions_view.ts, identity.skills into
+ * model.crafts, "Ten rows, CRAFT_RING order"); the wheel itself lays out
+ * from CRAFT_RING directly and never reads the model. */
 export function orderSkillsForCard(skills: readonly ProfessionSkillRow[]): ProfessionSkillRow[] {
   const rolePriority = (row: ProfessionSkillRow): number =>
     row.role === 'major' ? 0 : row.role === 'hobby' ? 1 : row.dormantKnowledge ? 2 : 3;

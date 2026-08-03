@@ -5491,8 +5491,10 @@
   /* Every card paragraph sits on the 12px narrative floor: without this the
      return-cost line and the unattuned / syncing narratives (bare <p> with no
      class rule) inherited the 16px document default, out-typing the card's
-     own 13px heading. */
-  .profession-identity-card p {
+     own 13px heading. :where() keeps this at zero class specificity so the
+     card's CLASSED paragraph rules (tutorial below) stay authoritative for
+     their own elements. */
+  :where(.profession-identity-card) p {
     font-size: 12px;
   }
   .profession-identity-heading {

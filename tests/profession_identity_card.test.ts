@@ -181,8 +181,12 @@ describe('profession identity card painter contract', () => {
     expect(parent.querySelector('.profession-identity-returncost')).toBeNull();
     // The first-tier tutorial renders its REAL localized sentence (cooking 10
     // is tier 0 everywhere, so the hint shows): the source pin alone was
-    // satisfiable by the model property access identity.tutorial.
-    expect(parent.querySelector('.profession-identity-tutorial')?.textContent).toContain('25');
+    // satisfiable by the model property access identity.tutorial. The exact
+    // sentence, same rationale as the return-cost pin (a substring '25'
+    // could match the wrong number).
+    expect(parent.querySelector('.profession-identity-tutorial')?.textContent).toBe(
+      'First tier: reach skill 25 in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.',
+    );
   });
 
   it('collapses the uniform role/cap chips to one caption on the unattuned card (phase 22)', () => {
@@ -459,8 +463,11 @@ describe('profession identity card painter contract', () => {
     // cold contract it happens to satisfy is pinned here instead: no layout
     // read, no frame driver, ever.
     const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    // The full FORCED_REFLOW_READS vocabulary from hud_perf_budget (not a
+    // subset: getUiScale pays a getComputedStyle one hop away and is exactly
+    // what a card painter might reach for).
     expect(code).not.toMatch(
-      /\.scrollTop|\.scrollLeft|\.offsetWidth|\.offsetHeight|\.offsetTop|\.offsetLeft|\.clientWidth|\.clientHeight|getBoundingClientRect|getComputedStyle|scrollIntoView/,
+      /\.scrollTop|\.scrollLeft|\.scrollWidth|\.scrollHeight|\.offsetWidth|\.offsetHeight|\.offsetTop|\.offsetLeft|\.offsetParent|\.clientWidth|\.clientHeight|\.innerText|getBoundingClientRect|getClientRects|getComputedStyle|getUiScale|scrollIntoView/,
     );
     expect(code).not.toMatch(/requestAnimationFrame|requestIdleCallback|setInterval/);
   });
@@ -553,8 +560,9 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     expect(components).toMatch(/\.profession-skill-uniform \{[^}]*font-size: 12px;/);
     // Every card paragraph, including the class-less unattuned and syncing
     // narratives and the return-cost line, which otherwise inherited the
-    // 16px document default (the QA round's floor completion).
-    expect(components).toMatch(/\.profession-identity-card p \{[^}]*font-size: 12px;/);
+    // 16px document default (the QA round's floor completion). :where() so
+    // the classed tutorial rule above keeps outranking it for its own p.
+    expect(components).toMatch(/:where\(\.profession-identity-card\) p \{[^}]*font-size: 12px;/);
   });
 
   it('the focusable capped list carries the shared focus-visible ring', () => {
@@ -826,16 +834,23 @@ describe('crafting window pins', () => {
     try {
       renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
       const first = el.querySelector<HTMLElement>('.profession-skill-list');
+      const firstCard = el.querySelector<HTMLElement>('.profession-identity-card');
       expect(first).not.toBeNull();
-      if (!first) return;
+      if (!first || !firstCard) return;
       first.scrollTop = 123;
+      // The CARD is the mobile scroller (hud.mobile.css lifts the list cap
+      // there), so its offset must carry too.
+      firstCard.scrollTop = 45;
       first.focus();
       expect(document.activeElement).toBe(first);
       renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
       const second = el.querySelector<HTMLElement>('.profession-skill-list');
+      const secondCard = el.querySelector<HTMLElement>('.profession-identity-card');
       expect(second).not.toBeNull();
       expect(second).not.toBe(first);
+      expect(secondCard).not.toBe(firstCard);
       expect(second?.scrollTop).toBe(123);
+      expect(secondCard?.scrollTop).toBe(45);
       expect(document.activeElement).toBe(second);
     } finally {
       el.remove();
