@@ -1046,6 +1046,7 @@ export const nl_NL: EnTranslations = {
       },
       "awayNote": "Als beide kanten dezelfde banier voeren, speelt de uitploeg in het omgekeerde kleurenpalet.",
       "rolesHeading": "Sportrol",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Allrounder",
@@ -1087,6 +1088,7 @@ export const nl_NL: EnTranslations = {
       "guildBoardWl": "{wins} W, {losses} V",
       "practice": "Oefenen tegen bots",
       "practiceNote": "Start meteen een besloten botwedstrijd op je eigen oefenveld.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Nu aan het oefenen ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Dalbeker-wachtrij: {bracket}, plaats {position} van {count}",
@@ -1129,6 +1131,8 @@ export const nl_NL: EnTranslations = {
         "rule5": "Iedereen kan aan komen lopen en je aanmoedigen vanaf de tribunes.",
         "kitHeading": "Jouw uitrusting",
         "kitNote": "Deze zetten vervangen je klassevaardigheden voor de duur van de wedstrijd.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "De opstelling",
         "you": "Jij",
         "bot": "Bot",

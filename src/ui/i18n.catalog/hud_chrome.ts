@@ -866,6 +866,10 @@ export const hudChromeStrings = {
     },
     awayNote: 'If both sides fly the same banner, the away side plays the inverted palette.',
     rolesHeading: 'Sport role',
+    // Shown under the role picker in the 1v1/2v2 brackets, where the sim seats
+    // every fighter as All-Rounder regardless of the pick (issue 2767).
+    rolesSmallBracketNote:
+      'In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.',
     role: {
       allrounder: {
         name: 'All-Rounder',
@@ -908,6 +912,9 @@ export const hudChromeStrings = {
     guildBoardWl: '{wins} W, {losses} L',
     practice: 'Practice vs. Bots',
     practiceNote: 'Starts a private bot match on your own practice pitch right away.',
+    // Practice bouts are deliberately unrated; shown beside the practice button.
+    practiceUnratedNote:
+      'Practice bouts are unrated: standings and Book of Deeds progress do not count.',
     // Region indicator: players currently off in a private practice instance.
     practicingNow: 'Practicing now ({count}):',
     // mm:ss; {seconds} is pre-padded to two digits.
@@ -959,6 +966,16 @@ export const hudChromeStrings = {
       rule5: 'Anyone can walk up and cheer you on from the stands.',
       kitHeading: 'Your kit',
       kitNote: 'These moves replace your class abilities for the match.',
+      // Extra rules-panel row for a bot-backfilled queued bout (issue 2767).
+      // Says "deeds for goals, saves, and clean sheets" rather than all deed
+      // progress: the debut deeds deliberately still credit a backfilled bout.
+      unratedNote:
+        'Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.',
+      // The same row for a private practice bout, which credits NO Cup deed at
+      // all (the debut deeds gate on the queued-bout predicate), so this copy
+      // is the blanket statement the backfill copy cannot make.
+      practiceUnratedNote:
+        'This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.',
       rosterHeading: 'The team sheet',
       // Row tags on the team sheet.
       you: 'You',

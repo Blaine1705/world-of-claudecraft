@@ -451,9 +451,11 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // it from the browse list. A listing I have already applied to stays
     // visible even while locked out, so its row (and withdraw control) keep
     // existing: otherwise a pending application could never be withdrawn
-    // once the lockout landed. My own listing no longer reaches this check
-    // (the already-in-group hide above owns it, and the leader's row lives
-    // in the `myListing` panel); the `!mine` term stays as belt and braces.
+    // once the lockout landed. My OWN listing no longer reaches this filter
+    // (the issue-2031 alreadyInGroup skip above hides it from browse
+    // entirely); a locked-out leader keeps managing theirs through the
+    // separate `myListing` panel, which no lockout ever filters. The `!mine`
+    // guard stays as belt and braces should the skip above ever narrow.
     if (!applied && !mine && lockoutMinutesFor(activity, input.lockouts) > 0) continue;
     const blocked = blockReasonFor(activity, level, specRole);
     const roleFit =

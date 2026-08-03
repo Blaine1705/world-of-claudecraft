@@ -432,7 +432,10 @@ describe('dungeon finder view core', () => {
     // expectation; the release landed the filter without updating this test,
     // reddening its own tip. The lockout stays in the input so the #2030
     // path is still exercised: it must neither resurrect the row nor lose
-    // the myListing panel.
+    // the myListing panel. The release later landed its own reconciliation
+    // of the same red (33729a9716); this merge unions the two, keeping the
+    // positive-control and unlocked arms and adopting the release's full
+    // myListing object assertion.
     const heroicListing = {
       id: 8,
       activityId: 'hollow_crypt_heroic',
@@ -470,7 +473,14 @@ describe('dungeon finder view core', () => {
       ),
     );
     expect(locked.board.listings.map((l) => l.id)).toEqual([9]);
-    expect(locked.board.myListing?.id).toBe(8);
+    // The lockout must not filter the leader's own management panel (the
+    // release's full-object assertion, adopted at the merge).
+    expect(locked.board.myListing).toEqual({
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    });
     // Same shape without the lockout: the hide comes from the
     // already-in-group rule, not the lockout path.
     const unlocked = live(
@@ -485,7 +495,12 @@ describe('dungeon finder view core', () => {
       ),
     );
     expect(unlocked.board.listings.map((l) => l.id)).toEqual([9]);
-    expect(unlocked.board.myListing?.id).toBe(8);
+    expect(unlocked.board.myListing).toEqual({
+      id: 8,
+      activityId: 'hollow_crypt_heroic',
+      tags: [],
+      applicants: [],
+    });
   });
 
   it('does not hide a listing over a lockout on a DIFFERENT dungeon or a lockout-free difficulty (#2030 followup)', () => {

@@ -1046,6 +1046,7 @@ export const vi_VN: EnTranslations = {
       },
       "awayNote": "Nếu hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.",
       "rolesHeading": "Vai trò thi đấu",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Toàn Năng",
@@ -1087,6 +1088,7 @@ export const vi_VN: EnTranslations = {
       "guildBoardWl": "{wins} T, {losses} B",
       "practice": "Tập Luyện Với Máy",
       "practiceNote": "Bắt đầu ngay một trận riêng với máy trên sân tập của riêng bạn.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Đang tập luyện ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Hàng chờ Cúp Thung Lũng: {bracket}, vị trí {position} trên {count}",
@@ -1129,6 +1131,8 @@ export const vi_VN: EnTranslations = {
         "rule5": "Ai cũng có thể tới cổ vũ bạn từ trên khán đài.",
         "kitHeading": "Bộ kỹ năng của bạn",
         "kitNote": "Các chiêu này thay thế kỹ năng lớp nhân vật của bạn trong trận đấu.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "Danh sách ra sân",
         "you": "Bạn",
         "bot": "Máy",

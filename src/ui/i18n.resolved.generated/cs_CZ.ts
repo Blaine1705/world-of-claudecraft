@@ -1046,6 +1046,7 @@ export const cs_CZ: EnTranslations = {
       },
       "awayNote": "Pokud obě strany hrají pod stejnou zástavou, hostující strana nastoupí v obrácených barvách.",
       "rolesHeading": "Sportovní role",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Univerzál",
@@ -1087,6 +1088,7 @@ export const cs_CZ: EnTranslations = {
       "guildBoardWl": "{wins} V, {losses} P",
       "practice": "Trénink proti botům",
       "practiceNote": "Okamžitě spustí soukromý zápas s boty na tvém vlastním tréninkovém hřišti.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Právě trénují ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Fronta Poháru údolí: {bracket}, pozice {position} z {count}",
@@ -1129,6 +1131,8 @@ export const cs_CZ: EnTranslations = {
         "rule5": "Kdokoli může přijít a fandit ti z tribun.",
         "kitHeading": "Tvá výbava",
         "kitNote": "Tyto dovednosti po dobu zápasu nahrazují tvé třídní schopnosti.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "Soupiska",
         "you": "Ty",
         "bot": "Bot",

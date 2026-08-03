@@ -8573,6 +8573,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.nation.copperdig': '구리 광산',
   'hudChrome.vcup.awayNote': '양 팀이 같은 깃발을 선택하면 원정 팀이 반전 배색으로 경기합니다.',
   'hudChrome.vcup.rolesHeading': '포지션',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    '1대1과 2대2 등급에서는 모든 선수가 올라운더로 출전합니다. 3대3 이상 등급이 필요한 업적은 여기서 달성할 수 없습니다.',
   'hudChrome.vcup.role.allrounder.name': '올라운더',
   'hudChrome.vcup.role.allrounder.desc': '조금씩 다 합니다: 킥, 롱킥, 그리고 정당한 어깨싸움.',
   'hudChrome.vcup.role.striker.name': '스트라이커',
@@ -8605,6 +8607,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.boardWins': '{count}승',
   'hudChrome.vcup.practice': '봇 연습 경기',
   'hudChrome.vcup.practiceNote': '소우필드에서 봇과의 정식 경기를 즉시 시작합니다.',
+  'hudChrome.vcup.practiceUnratedNote':
+    '연습 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.indicatorQueued': '베일 컵 대기열: {bracket}, {count}명 중 {position}번째',
   'hudChrome.vcup.indicatorLive': '베일 컵',
@@ -8646,6 +8650,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.rule5': '누구나 다가와 관중석에서 응원할 수 있습니다.',
   'hudChrome.vcup.briefing.kitHeading': '내 기술',
   'hudChrome.vcup.briefing.kitNote': '경기 동안 이 동작들이 직업 능력을 대신합니다.',
+  'hudChrome.vcup.briefing.unratedNote':
+    '봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적은 변하지 않으며 골, 세이브, 클린 시트 업적도 반영되지 않습니다.',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    '이 경기는 연습 경기이므로 등급전이 아닙니다. 전적은 변하지 않으며 업적의 서 진행도도 반영되지 않습니다.',
   'hudChrome.vcup.briefing.rosterHeading': '출전 명단',
   'hudChrome.vcup.briefing.you': '나',
   'hudChrome.vcup.briefing.bot': '봇',

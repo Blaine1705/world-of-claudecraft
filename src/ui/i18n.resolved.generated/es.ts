@@ -1046,6 +1046,7 @@ export const es: EnTranslations = {
       },
       "awayNote": "Si ambos bandos lucen el mismo estandarte, el visitante juega con la paleta invertida.",
       "rolesHeading": "Rol deportivo",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Polivalente",
@@ -1087,6 +1088,7 @@ export const es: EnTranslations = {
       "guildBoardWl": "{wins} V, {losses} D",
       "practice": "Práctica contra bots",
       "practiceNote": "Inicia de inmediato un partido privado contra bots en tu propio campo de práctica.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Practicando ahora ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Cola de la Copa del Valle: {bracket}, posición {position} de {count}",
@@ -1129,6 +1131,8 @@ export const es: EnTranslations = {
         "rule5": "Cualquiera puede acercarse y animarte desde las gradas.",
         "kitHeading": "Tu equipación",
         "kitNote": "Estos movimientos sustituyen a tus habilidades de clase durante el partido.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "La alineación",
         "you": "Tú",
         "bot": "Bot",

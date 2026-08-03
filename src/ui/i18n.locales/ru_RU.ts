@@ -8725,6 +8725,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.awayNote':
     'Если обе стороны подняли одно знамя, гости играют в инвертированных цветах.',
   'hudChrome.vcup.rolesHeading': 'Игровая роль',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    'В категориях 1 на 1 и 2 на 2 каждый игрок выходит как Универсал. Деяния, требующие категории 3 на 3 или больше, здесь получить нельзя.',
   'hudChrome.vcup.role.allrounder.name': 'Универсал',
   'hudChrome.vcup.role.allrounder.desc':
     'Всего понемногу: удар, дальний удар и честный толчок плечом.',
@@ -8759,6 +8761,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.boardWins': 'побед: {count}',
   'hudChrome.vcup.practice': 'Тренировка с ботами',
   'hudChrome.vcup.practiceNote': 'Немедленно начинает полный матч с ботами на Свином поле.',
+  'hudChrome.vcup.practiceUnratedNote':
+    'Тренировочные матчи не рейтинговые: счёт и прогресс Книги деяний не засчитываются.',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.indicatorQueued': 'Очередь Кубка Долины: {bracket}, место {position} из {count}',
   'hudChrome.vcup.indicatorLive': 'Кубок Долины',
@@ -8800,6 +8804,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.rule5': 'Любой может подойти и поболеть за вас с трибун.',
   'hudChrome.vcup.briefing.kitHeading': 'Ваш набор',
   'hudChrome.vcup.briefing.kitNote': 'На время матча эти приёмы заменяют способности класса.',
+  'hudChrome.vcup.briefing.unratedNote':
+    'На поле есть боты, поэтому этот матч не рейтинговый: результаты не меняются, а деяния за голы, сейвы и сухие матчи не засчитываются.',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    'Это тренировочный матч, поэтому он не рейтинговый: результаты не меняются, а прогресс Книги деяний не засчитывается.',
   'hudChrome.vcup.briefing.rosterHeading': 'Список состава',
   'hudChrome.vcup.briefing.you': 'Вы',
   'hudChrome.vcup.briefing.bot': 'Бот',
