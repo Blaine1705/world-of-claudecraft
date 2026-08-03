@@ -805,6 +805,66 @@ export const TARGETS = [
     },
   },
   {
+    key: 'continent-map',
+    label: 'World map: continent overview (land-masked zone highlight)',
+    when: ['ui/continent_', 'map_pinch_zoom_core'],
+    // Desktop shows the hover highlight (mouse only); mobile shows the resting
+    // overview, which is what a touch player sees before tapping a zone.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page, shot) {
+      await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          p.pos.x = 65; // Boar Meadow, Eastbrook Vale (the current-zone highlight)
+          p.pos.z = 0;
+        }
+      });
+      await wait(400);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      // Reach the overview the way a player now does: one zoom-out click at the
+      // zone map's full extent leaves the zone level entirely. The level toggle is
+      // the fallback, so this recipe also brings the overview up on a base build
+      // that predates the zoom-out escape (the before half of a comparison).
+      await page.evaluate(() => document.querySelector('#map-zoom-out')?.click());
+      await wait(600);
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (hud && hud.mapLevel !== 'continent') hud.toggleMapLevel?.();
+      });
+      await wait(500);
+      if (!shot?.mobile) {
+        // Hover a zone the player is NOT standing in, through the real pointer
+        // path (the painter reads Hud's hovered zone id, nothing synthetic).
+        await page.evaluate(() => {
+          const hud = window.__game?.hud;
+          const canvas = document.querySelector('#map-canvas');
+          if (!hud || !canvas) return;
+          const box = canvas.getBoundingClientRect();
+          const region =
+            hud.continentRegions?.find((r) => r.zoneId === 'nightbloom') ??
+            hud.continentRegions?.[0];
+          if (!region) return;
+          canvas.dispatchEvent(
+            new PointerEvent('pointermove', {
+              pointerType: 'mouse',
+              bubbles: true,
+              clientX: box.left + ((region.rect.mx + region.rect.w / 2) * box.width) / canvas.width,
+              clientY:
+                box.top + ((region.rect.my + region.rect.h / 2) * box.height) / canvas.height,
+            }),
+          );
+        });
+        await wait(400);
+      }
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#map-window' } : {};
+    },
+  },
+  {
     key: 'crafting',
     label: 'Crafting window',
     when: ['ui/crafting_view', 'ui/crafting_window', 'sim/content/recipes', 'sim/professions'],
