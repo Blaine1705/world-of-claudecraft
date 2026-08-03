@@ -6214,6 +6214,7 @@ export const en_XA: EnTranslations = {
         "add": "[Áðð çĥáţ çĥáññéļ]",
         "addTitle": "[Áðð çĥáññéļ]",
         "close": "[Çļóšé {channel} ţáƀ]",
+        "moveHint": "[Ŕéóŕðéŕ {channel} ţáƀ: ðŕáĝ íţ, óŕ úšé Áļţ+Ļéƒţ áñð Áļţ+Ŕíĝĥţ]",
         "sendingTo": "[Ɱéššáĝé {channel}]",
         "names": {
           "say": "[Šáý]",

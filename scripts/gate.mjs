@@ -1,16 +1,16 @@
 // The full local pre-merge gate: the CI checks from .github/workflows/ci.yml run
-// locally. Order: the PR tier's combined step list (CI splits it across the
-// parallel pr-gate and pr-checks jobs and fans the test step across a 4-shard
-// matrix; this script runs the same list serially with ONE full unsharded
-// vitest run by design), with the parallel lint job's changed-files biome pulled forward
-// as an early fast-fail; on a release/** branch the steps run release-tier
-// (I18N_RELEASE_TIER=1), mirroring the release-gate job. This script exists
-// because ad-hoc shell chains get the gate
-// wrong in two known ways: piping `npm test` through `tail` masks vitest's exit
-// code (a red run can print "PASS"), and an unbounded full run saturates every
-// core and flakes the heavy sim suites when other work shares the machine
-// (failing files that then pass in isolation). Steps run sequentially with
-// inherited stdio and stop at the first failure.
+// locally. CI splits each tier into a parallel pair (PR: pr-gate + pr-checks;
+// release: release-gate + release-checks) and fans each test job across an
+// 8-shard matrix; this script runs the SAME combined step list serially with
+// ONE full unsharded vitest run by design (no shard flag). The parallel lint
+// job's changed-files biome is pulled forward as an early fast-fail; on a
+// release/** branch the steps run release-tier (I18N_RELEASE_TIER=1), mirroring
+// the release-gate test job's job-level flag. This script exists because
+// ad-hoc shell chains get the gate wrong in two known ways: piping `npm test`
+// through `tail` masks vitest's exit code (a red run can print "PASS"), and an
+// unbounded full run saturates every core and flakes the heavy sim suites when
+// other work shares the machine (failing files that then pass in isolation).
+// Steps run sequentially with inherited stdio and stop at the first failure.
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
