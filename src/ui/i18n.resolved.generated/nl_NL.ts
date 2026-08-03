@@ -959,6 +959,18 @@ export const nl_NL: EnTranslations = {
       "petAggressive": "Huisdier: Agressief",
       "mount": "Opstijgen / Afstijgen"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Rijdieren",
       "close": "Sluiten",
@@ -6214,6 +6226,7 @@ export const nl_NL: EnTranslations = {
         "add": "Chatkanaal toevoegen",
         "addTitle": "Kanaal toevoegen",
         "close": "Tabblad {channel} sluiten",
+        "moveHint": "Tabblad {channel} herschikken: sleep het, of gebruik Alt+Links en Alt+Rechts",
         "sendingTo": "Bericht {channel}",
         "names": {
           "say": "Zeggen",
@@ -6442,8 +6455,8 @@ export const nl_NL: EnTranslations = {
       "joinParty": "Groep betreden",
       "guildInvite": "{name} nodigt je uit om lid te worden van {guild}.",
       "joinGuild": "Gilde betreden",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Een openstaande uitnodiging voor je gilde is geannuleerd omdat de gilde is hernoemd.",
+      "guildRenamed": "Je gilde is door het moderatieteam hernoemd tot {name}.",
       "tradeRequest": "{name} wil met je handelen.",
       "openTrade": "Handel openen",
       "duelRequest": "{name} heeft je uitgedaagd tot een duel!",
@@ -7039,8 +7052,8 @@ export const nl_NL: EnTranslations = {
       "close": "Handelaar sluiten",
       "hint": "Klik op een voorwerp in je tassen om het te verkopen terwijl dit venster open is.",
       "buyAria": "Koop {item} voor {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Koop {count}",
+      "buyStackAria": "Koop {count} {item} voor {price}",
       "buybackTitle": "Terugkopen",
       "buybackEmpty": "Geen voorwerpen",
       "buybackAria": "Koop {item} terug voor {price}",

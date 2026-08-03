@@ -359,9 +359,12 @@ export function aetherDartsProcGlowActive(
 ): boolean {
   if (abilityId !== 'arcane_missiles') return false;
   for (const aura of auras) {
+    if (aura.kind !== 'arcane_charge') continue;
+    const charges = aura.stacks ?? aura.value;
     if (
-      aura.kind === 'arcane_charge' &&
-      Math.max(0, Math.round(aura.stacks ?? aura.value ?? 0)) >= AETHER_SURGE_MAX_CHARGES
+      typeof charges === 'number' &&
+      Number.isInteger(charges) &&
+      charges >= AETHER_SURGE_MAX_CHARGES
     ) {
       return true;
     }

@@ -959,6 +959,18 @@ export const pl_PL: EnTranslations = {
       "petAggressive": "Zwierzę: Agresywne",
       "mount": "Dosiądź / Zsiądź"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Wierzchowce",
       "close": "Zamknij",
@@ -6214,6 +6226,7 @@ export const pl_PL: EnTranslations = {
         "add": "Dodaj kanał czatu",
         "addTitle": "Dodaj kanał",
         "close": "Zamknij kartę {channel}",
+        "moveHint": "Zmień kolejność karty {channel}: przeciągnij ją lub użyj Alt+Lewo i Alt+Prawo",
         "sendingTo": "Wiadomość do {channel}",
         "names": {
           "say": "Mów",
@@ -6442,8 +6455,8 @@ export const pl_PL: EnTranslations = {
       "joinParty": "Dołącz do drużyny",
       "guildInvite": "{name} zaprasza cię do gildii {guild}.",
       "joinGuild": "Dołącz do gildii",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Oczekujące zaproszenie do gildii zostało anulowane, ponieważ gildia zmieniła nazwę.",
+      "guildRenamed": "Twoja gildia została przemianowana na {name} przez zespół moderacji.",
       "tradeRequest": "{name} chce z tobą handlować.",
       "openTrade": "Otwórz handel",
       "duelRequest": "{name} wyzwał cię na pojedynek!",
@@ -7039,8 +7052,8 @@ export const pl_PL: EnTranslations = {
       "close": "Zamknij kupca",
       "hint": "Kliknij przedmiot w swoich torbach, aby go sprzedać, gdy to okno jest otwarte.",
       "buyAria": "Kup {item} za {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Kup {count}",
+      "buyStackAria": "Kup {count} {item} za {price}",
       "buybackTitle": "Odkup",
       "buybackEmpty": "Brak przedmiotów",
       "buybackAria": "Odkup {item} za {price}",

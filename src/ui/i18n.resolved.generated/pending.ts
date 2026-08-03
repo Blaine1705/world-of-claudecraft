@@ -10,127 +10,212 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "es_ES": [
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "fr_FR": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "fr_CA": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "en_CA": [],
   "it_IT": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "de_DE": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "zh_CN": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "zh_TW": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "ko_KR": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "ja_JP": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "pt_BR": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "ru_RU": [
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.done"
   ],
   "cs_CZ": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "nl_NL": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "pl_PL": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "id_ID": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "tr_TR": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "sv_SE": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "vi_VN": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ],
   "da_DK": [
     "abilityUi.actionBar.procSlotAria",
-    "hud.prompts.guildInviteCancelled",
-    "hud.prompts.guildRenamed",
-    "itemUi.vendor.buyStack",
-    "itemUi.vendor.buyStackAria"
+    "hudChrome.actionBar.bannerCapturing",
+    "hudChrome.actionBar.bannerHint",
+    "hudChrome.actionBar.boundToKey",
+    "hudChrome.actionBar.cancel",
+    "hudChrome.actionBar.done",
+    "hudChrome.actionBar.editKeys",
+    "hudChrome.actionBar.editKeysHint",
+    "hudChrome.actionBar.reset",
+    "hudChrome.actionBar.resetConfirmBody",
+    "hudChrome.actionBar.resetConfirmTitle"
   ]
 };

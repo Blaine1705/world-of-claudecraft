@@ -959,6 +959,18 @@ export const vi_VN: EnTranslations = {
       "petAggressive": "Thú Cưng: Hung Hăng",
       "mount": "Cưỡi Thú / Xuống Thú"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Thú Cưỡi",
       "close": "Đóng",
@@ -6214,6 +6226,7 @@ export const vi_VN: EnTranslations = {
         "add": "Thêm kênh trò chuyện",
         "addTitle": "Thêm kênh",
         "close": "Đóng thẻ {channel}",
+        "moveHint": "Sắp xếp lại tab {channel}: kéo nó, hoặc dùng Alt+Trái và Alt+Phải",
         "sendingTo": "Nhắn {channel}",
         "names": {
           "say": "Nói",
@@ -6442,8 +6455,8 @@ export const vi_VN: EnTranslations = {
       "joinParty": "Gia Nhập Tổ Đội",
       "guildInvite": "{name} mời bạn gia nhập {guild}.",
       "joinGuild": "Gia Nhập Bang Hội",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Lời mời gia nhập bang hội đang chờ xử lý đã bị hủy vì bang hội đã đổi tên.",
+      "guildRenamed": "Bang hội của bạn đã được đội kiểm duyệt đổi tên thành {name}.",
       "tradeRequest": "{name} muốn giao dịch với bạn.",
       "openTrade": "Mở Giao Dịch",
       "duelRequest": "{name} đã thách đấu tay đôi với bạn!",
@@ -7039,8 +7052,8 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng cửa hàng",
       "hint": "Nhấp vào một vật phẩm trong túi để bán khi cửa sổ này đang mở.",
       "buyAria": "Mua {item} với giá {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Mua {count}",
+      "buyStackAria": "Mua {count} {item} với giá {price}",
       "buybackTitle": "Mua Lại",
       "buybackEmpty": "Không có vật phẩm",
       "buybackAria": "Mua lại {item} với giá {price}",

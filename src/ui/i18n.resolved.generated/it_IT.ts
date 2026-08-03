@@ -959,6 +959,18 @@ export const it_IT: EnTranslations = {
       "petAggressive": "Famiglio: aggressivo",
       "mount": "Monta / Smonta"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Cavalcature",
       "close": "Chiudi",
@@ -6214,6 +6226,7 @@ export const it_IT: EnTranslations = {
         "add": "Aggiungi canale di chat",
         "addTitle": "Aggiungi canale",
         "close": "Chiudi la scheda {channel}",
+        "moveHint": "Riordina la scheda {channel}: trascinala, oppure usa Alt+Sinistra e Alt+Destra",
         "sendingTo": "Messaggio in {channel}",
         "names": {
           "say": "Dire",
@@ -6442,8 +6455,8 @@ export const it_IT: EnTranslations = {
       "joinParty": "Unisciti al gruppo",
       "guildInvite": "{name} ti invita a unirti a {guild}.",
       "joinGuild": "Unisciti alla gilda",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Un invito di gilda in sospeso è stato annullato perché la gilda è stata rinominata.",
+      "guildRenamed": "La tua gilda è stata rinominata in {name} dal team di moderazione.",
       "tradeRequest": "{name} vuole commerciare con te.",
       "openTrade": "Apri scambio",
       "duelRequest": "{name} ti ha sfidato a duello!",
@@ -7039,8 +7052,8 @@ export const it_IT: EnTranslations = {
       "close": "Chiudi venditore",
       "hint": "Clicca su un oggetto nelle borse per venderlo mentre questa finestra è aperta.",
       "buyAria": "Compra {item} per {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Compra {count}",
+      "buyStackAria": "Compra {count} {item} per {price}",
       "buybackTitle": "Riacquisto",
       "buybackEmpty": "Nessun oggetto",
       "buybackAria": "Riacquista {item} per {price}",

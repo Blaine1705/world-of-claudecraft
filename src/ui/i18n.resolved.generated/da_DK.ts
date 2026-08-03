@@ -959,6 +959,18 @@ export const da_DK: EnTranslations = {
       "petAggressive": "Kæledyr: Aggressiv",
       "mount": "Stig op / Stig af"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Ridedyr",
       "close": "Luk",
@@ -6214,6 +6226,7 @@ export const da_DK: EnTranslations = {
         "add": "Tilføj chatkanal",
         "addTitle": "Tilføj kanal",
         "close": "Luk {channel}-fanen",
+        "moveHint": "Omorganiser fanen {channel}: træk den, eller brug Alt+venstre og Alt+højre",
         "sendingTo": "Besked til {channel}",
         "names": {
           "say": "Sig",
@@ -6442,8 +6455,8 @@ export const da_DK: EnTranslations = {
       "joinParty": "Tilslut gruppe",
       "guildInvite": "{name} inviterer dig til at slutte dig til {guild}.",
       "joinGuild": "Tilslut laug",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "En afventende laugsinvitation blev annulleret, fordi lauget blev omdøbt.",
+      "guildRenamed": "Dit laug er blevet omdøbt til {name} af moderationsteamet.",
       "tradeRequest": "{name} vil handle med dig.",
       "openTrade": "Åbn handel",
       "duelRequest": "{name} har udfordret dig til en duel!",
@@ -7039,8 +7052,8 @@ export const da_DK: EnTranslations = {
       "close": "Luk købmand",
       "hint": "Klik på en genstand i dine tasker for at sælge den, mens dette vindue er åbent.",
       "buyAria": "Køb {item} for {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Køb {count}",
+      "buyStackAria": "Køb {count} {item} for {price}",
       "buybackTitle": "Tilbagekøb",
       "buybackEmpty": "Ingen genstande",
       "buybackAria": "Køb {item} tilbage for {price}",

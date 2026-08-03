@@ -959,6 +959,18 @@ export const de_DE: EnTranslations = {
       "petAggressive": "Begleiter: Aggressiv",
       "mount": "Aufsitzen / Absitzen"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Reittiere",
       "close": "Schließen",
@@ -6214,6 +6226,7 @@ export const de_DE: EnTranslations = {
         "add": "Chatkanal hinzufügen",
         "addTitle": "Kanal hinzufügen",
         "close": "Reiter {channel} schließen",
+        "moveHint": "Reiter {channel} neu anordnen: ziehen Sie ihn, oder verwenden Sie Alt+Links und Alt+Rechts",
         "sendingTo": "Nachricht an {channel}",
         "names": {
           "say": "Sagen",
@@ -6442,8 +6455,8 @@ export const de_DE: EnTranslations = {
       "joinParty": "Gruppe beitreten",
       "guildInvite": "{name} lädt Euch ein, {guild} beizutreten.",
       "joinGuild": "Gilde beitreten",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Eine ausstehende Gildeneinladung wurde storniert, da die Gilde umbenannt wurde.",
+      "guildRenamed": "Eure Gilde wurde vom Moderationsteam in {name} umbenannt.",
       "tradeRequest": "{name} möchte mit Euch handeln.",
       "openTrade": "Handel öffnen",
       "duelRequest": "{name} hat Euch zu einem Duell herausgefordert!",
@@ -7039,8 +7052,8 @@ export const de_DE: EnTranslations = {
       "close": "Händler schließen",
       "hint": "Klickt auf einen Gegenstand in Euren Taschen, um ihn zu verkaufen, solange dieses Fenster geöffnet ist.",
       "buyAria": "{item} für {price} kaufen",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "{count} kaufen",
+      "buyStackAria": "{count} {item} für {price} kaufen",
       "buybackTitle": "Rückkauf",
       "buybackEmpty": "Keine Gegenstände",
       "buybackAria": "{item} für {price} zurückkaufen",

@@ -959,6 +959,18 @@ export const pt_BR: EnTranslations = {
       "petAggressive": "Mascote: agressivo",
       "mount": "Montar / Desmontar"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Montarias",
       "close": "Fechar",
@@ -6214,6 +6226,7 @@ export const pt_BR: EnTranslations = {
         "add": "Adicionar canal de chat",
         "addTitle": "Adicionar canal",
         "close": "Fechar aba {channel}",
+        "moveHint": "Reordenar a aba {channel}: arraste-a, ou use Alt+Esquerda e Alt+Direita",
         "sendingTo": "Mensagem para {channel}",
         "names": {
           "say": "Dizer",
@@ -6442,8 +6455,8 @@ export const pt_BR: EnTranslations = {
       "joinParty": "Entrar no grupo",
       "guildInvite": "{name} convida você para entrar em {guild}.",
       "joinGuild": "Entrar na guilda",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Um convite de guilda pendente foi cancelado porque a guilda foi renomeada.",
+      "guildRenamed": "Sua guilda foi renomeada para {name} pela equipe de moderação.",
       "tradeRequest": "{name} quer negociar com você.",
       "openTrade": "Abrir troca",
       "duelRequest": "{name} desafiou você para um duelo!",
@@ -7039,8 +7052,8 @@ export const pt_BR: EnTranslations = {
       "close": "Fechar vendedor",
       "hint": "Clique em um item nas suas bolsas para vendê-lo enquanto esta janela estiver aberta.",
       "buyAria": "Comprar {item} por {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Comprar {count}",
+      "buyStackAria": "Comprar {count} {item} por {price}",
       "buybackTitle": "Recompra",
       "buybackEmpty": "Sem itens",
       "buybackAria": "Recomprar {item} por {price}",

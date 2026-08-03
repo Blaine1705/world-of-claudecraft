@@ -959,6 +959,18 @@ export const id_ID: EnTranslations = {
       "petAggressive": "Peliharaan: Agresif",
       "mount": "Naiki / Turun"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Tunggangan",
       "close": "Tutup",
@@ -6214,6 +6226,7 @@ export const id_ID: EnTranslations = {
         "add": "Tambah saluran obrolan",
         "addTitle": "Tambah saluran",
         "close": "Tutup tab {channel}",
+        "moveHint": "Atur ulang tab {channel}: seret, atau gunakan Alt+Kiri dan Alt+Kanan",
         "sendingTo": "Pesan {channel}",
         "names": {
           "say": "Berkata",
@@ -6442,8 +6455,8 @@ export const id_ID: EnTranslations = {
       "joinParty": "Gabung Party",
       "guildInvite": "{name} mengundang Anda untuk bergabung dengan {guild}.",
       "joinGuild": "Gabung Guild",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Undangan guild yang tertunda dibatalkan karena guild tersebut diganti nama.",
+      "guildRenamed": "Guild Anda telah diganti nama menjadi {name} oleh tim moderasi.",
       "tradeRequest": "{name} ingin berdagang dengan Anda.",
       "openTrade": "Buka Perdagangan",
       "duelRequest": "{name} menantang Anda untuk berduel!",
@@ -7039,8 +7052,8 @@ export const id_ID: EnTranslations = {
       "close": "Tutup pedagang",
       "hint": "Klik barang di tasmu untuk menjualnya selama jendela ini terbuka.",
       "buyAria": "Beli {item} seharga {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Beli {count}",
+      "buyStackAria": "Beli {count} {item} seharga {price}",
       "buybackTitle": "Beli Kembali",
       "buybackEmpty": "Tidak ada barang",
       "buybackAria": "Beli kembali {item} seharga {price}",

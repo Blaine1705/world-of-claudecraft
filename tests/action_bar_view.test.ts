@@ -453,6 +453,41 @@ describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)',
       'abilityUi.actionBar.slotAria(slot=2,ability=ability:arcane_missiles)',
     );
 
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: 4 }] })).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4 }] })).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: 5 }] })).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(
+        world({
+          auras: [
+            { kind: 'fingers_of_frost', stacks: 2 },
+            { kind: 'arcane_charge', stacks: 4 },
+          ],
+        }),
+      ).slots[0].procGlow,
+    ).toBe(true);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 3 }] })).slots[0]
+        .procGlow,
+    ).toBe(false);
+    expect(
+      view.tick(world({ auras: [{ kind: 'fingers_of_frost', value: 4, stacks: 4 }] })).slots[0]
+        .procGlow,
+    ).toBe(false);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: Number.POSITIVE_INFINITY }] }))
+        .slots[0].procGlow,
+    ).toBe(false);
+    expect(
+      view.tick(world({ auras: [{ kind: 'arcane_charge', stacks: 3.9 }] })).slots[0].procGlow,
+    ).toBe(false);
+
     const atFour = view.tick(
       world({ auras: [{ kind: 'arcane_charge', value: 4, stacks: 4 }] }),
     ).slots;

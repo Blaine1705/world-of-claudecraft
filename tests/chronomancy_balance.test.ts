@@ -10,7 +10,7 @@
 //   - conservative offensive rotation: 70-80s to OOM,
 //   - conservative + occasional Temporal Mend/Barrier: ~55-65s,
 //   - emergency (hold 4 charges): 15-25s,
-//   - Piro and Cryo sustained DPS each at least 22% above conservative Chronomancy.
+//   - conservative Chronomancy at 50-65% of Piro and Cryo DPS over the same window.
 import { describe, expect, it } from 'vitest';
 import { aetherSurgeStacks } from '../src/sim/combat/chronomancy';
 import { hasFreeCostFor } from '../src/sim/combat/empower_next';
@@ -198,6 +198,15 @@ describe('Chronomancy Phase 3 balance targets', () => {
   const piroScorch = runRotation('fire', nukeSpam('scorch'), 200, false);
   const piro: RunResult = piroWeave.dps >= piroScorch.dps ? piroWeave : piroScorch;
   const cryo = runRotation('frost', nukeSpam('frostbolt'), 200, false);
+  // Equal 40s windows keep every spec below its measured OOM point. The PRD
+  // comparison uses Chronomancy's actual healer rotation (Echo plus reactive
+  // Mend/Barrier), while consOff remains the damage-only longevity diagnostic.
+  const consSustained = runRotation('arcane', conservativeReactive(), 40, true);
+  const piroWeaveSustained = runRotation('fire', fireRotation, 40, false);
+  const piroScorchSustained = runRotation('fire', nukeSpam('scorch'), 40, false);
+  const piroSustained =
+    piroWeaveSustained.dps >= piroScorchSustained.dps ? piroWeaveSustained : piroScorchSustained;
+  const cryoSustained = runRotation('frost', nukeSpam('frostbolt'), 40, false);
 
   it('reports the measured numbers (owner harness)', () => {
     const fmt = (label: string, r: RunResult) =>
@@ -240,13 +249,13 @@ describe('Chronomancy Phase 3 balance targets', () => {
   });
 
   it('Piro and Cryo sustain clearly more DPS than conservative Chronomancy', () => {
-    // The cast-speed ramp lets the conservative surge-spam rotation (which banks
-    // charges) fire a bit faster, lifting Chronomancy's sustained DPS ~5% and
-    // narrowing the healer-vs-DPS gap from ~35% to ~29% (owner-approved 2026-07-12,
-    // to be re-tuned after playtest). The floor still enforces a clear >=22% gap so
-    // Chronomancy never rivals a pure-DPS spec.
-    expect(piro.dps).toBeGreaterThanOrEqual(consOff.dps * 1.22);
-    expect(cryo.dps).toBeGreaterThanOrEqual(consOff.dps * 1.22);
+    expect(consSustained.seconds).toBe(40);
+    expect(piroSustained.seconds).toBe(40);
+    expect(cryoSustained.seconds).toBe(40);
+    for (const pureDps of [piroSustained, cryoSustained]) {
+      expect(consSustained.dps).toBeGreaterThanOrEqual(pureDps.dps * 0.5);
+      expect(consSustained.dps).toBeLessThanOrEqual(pureDps.dps * 0.65);
+    }
   });
 
   it('the offensive rotation heals through Echo (maintenance HPS, below Temporal Mend)', () => {
@@ -373,6 +382,9 @@ describe('Chronomancy level-20 direct-heal parity', () => {
     // Mend pays some efficiency for its faster two-second cast, but should not
     // fall catastrophically behind the cap-ranked peer heals.
     expect(chrono.healPerMana).toBeGreaterThanOrEqual(peerEfficiencyMean * 0.65);
+    for (const peer of peers) {
+      expect(chrono.healPerMana, peer.label).toBeLessThan(peer.healPerMana);
+    }
   });
 });
 

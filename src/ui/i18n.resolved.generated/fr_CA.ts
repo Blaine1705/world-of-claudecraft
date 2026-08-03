@@ -959,6 +959,18 @@ export const fr_CA: EnTranslations = {
       "petAggressive": "Familier : agressif",
       "mount": "Monter / Descendre"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Montures",
       "close": "Fermer",
@@ -6214,6 +6226,7 @@ export const fr_CA: EnTranslations = {
         "add": "Ajouter un canal de discussion",
         "addTitle": "Ajouter un canal",
         "close": "Fermer l'onglet {channel}",
+        "moveHint": "Réorganiser l'onglet {channel} : faites-le glisser, ou utilisez Alt+Gauche et Alt+Droite",
         "sendingTo": "Message vers {channel}",
         "names": {
           "say": "Dire",
@@ -6442,8 +6455,8 @@ export const fr_CA: EnTranslations = {
       "joinParty": "Rejoindre le groupe",
       "guildInvite": "{name} vous invite à rejoindre {guild}.",
       "joinGuild": "Rejoindre la guilde",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.",
+      "guildRenamed": "Votre guilde a été renommée en {name} par l'équipe de modération.",
       "tradeRequest": "{name} veut échanger avec vous.",
       "openTrade": "Ouvrir l'échange",
       "duelRequest": "{name} vous a provoqué en duel !",
@@ -7039,8 +7052,8 @@ export const fr_CA: EnTranslations = {
       "close": "Fermer le vendeur",
       "hint": "Cliquez sur un objet dans vos sacs pour le vendre tant que cette fenêtre est ouverte.",
       "buyAria": "Acheter {item} pour {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Acheter {count}",
+      "buyStackAria": "Acheter {count} {item} pour {price}",
       "buybackTitle": "Rachat",
       "buybackEmpty": "Aucun objet",
       "buybackAria": "Racheter {item} pour {price}",

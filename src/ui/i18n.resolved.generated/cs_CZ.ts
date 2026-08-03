@@ -959,6 +959,18 @@ export const cs_CZ: EnTranslations = {
       "petAggressive": "Mazlíček: Agresivní",
       "mount": "Nasednout / Sesednout"
     },
+    "actionBar": {
+      "editKeys": "Edit action bar keys",
+      "editKeysHint": "Click a slot on the action bar, then press a key to bind it.",
+      "bannerHint": "Click a slot, then press a key to bind it. Click Done when finished.",
+      "bannerCapturing": "Press a key to bind this slot...",
+      "boundToKey": "Bound to {key}.",
+      "reset": "Reset",
+      "done": "Done",
+      "cancel": "Cancel",
+      "resetConfirmTitle": "Reset action bar keys?",
+      "resetConfirmBody": "The first bar returns to its default keys. The second and third bars become unbound. This cannot be undone."
+    },
     "mounts": {
       "title": "Jízdní zvířata",
       "close": "Zavřít",
@@ -6214,6 +6226,7 @@ export const cs_CZ: EnTranslations = {
         "add": "Přidat chatový kanál",
         "addTitle": "Přidat kanál",
         "close": "Zavřít kartu {channel}",
+        "moveHint": "Přeuspořádat kartu {channel}: přetáhněte ji, nebo použijte Alt+vlevo a Alt+vpravo",
         "sendingTo": "Zpráva do {channel}",
         "names": {
           "say": "Říct",
@@ -6442,8 +6455,8 @@ export const cs_CZ: EnTranslations = {
       "joinParty": "Vstoupit do skupiny",
       "guildInvite": "{name} tě zve do cechu {guild}.",
       "joinGuild": "Vstoupit do cechu",
-      "guildInviteCancelled": "A pending guild invitation was cancelled because the guild was renamed.",
-      "guildRenamed": "Your guild has been renamed to {name} by the moderation team.",
+      "guildInviteCancelled": "Čekající pozvánka do cechu byla zrušena, protože byl cech přejmenován.",
+      "guildRenamed": "Tvůj cech byl moderátorským týmem přejmenován na {name}.",
       "tradeRequest": "{name} s tebou chce obchodovat.",
       "openTrade": "Otevřít obchod",
       "duelRequest": "{name} tě vyzval(a) k duelu!",
@@ -7039,8 +7052,8 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít obchodníka",
       "hint": "Když je toto okno otevřené, klikni na předmět v batozích a prodáš ho.",
       "buyAria": "Koupit {item} za {price}",
-      "buyStack": "Buy {count}",
-      "buyStackAria": "Buy {count} {item} for {price}",
+      "buyStack": "Koupit {count}",
+      "buyStackAria": "Koupit {count} {item} za {price}",
       "buybackTitle": "Zpětný odkup",
       "buybackEmpty": "Žádné předměty",
       "buybackAria": "Odkoupit zpět {item} za {price}",

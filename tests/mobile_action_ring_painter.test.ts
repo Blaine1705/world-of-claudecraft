@@ -219,8 +219,8 @@ describe('mobile action ring: proc state remains perceptible', () => {
   });
 
   it('stops the touch proc pulse under reduced motion', () => {
-    expect(HUD_CSS).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?body\.mobile-touch #mobile-action-ring button\.proc,[\s\S]*?animation:\s*none/,
+    expect(MOBILE_HUD_CSS).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?body\.mobile-touch #mobile-action-ring button\.proc\s*\{[^}]*animation:\s*none/,
     );
   });
 });
