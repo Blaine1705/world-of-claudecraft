@@ -609,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '4d3ec4b5413f6db4b30939ce883d093875f3a29a0ff6dcb32140cbaa783217bf';
+  '27da6a7983e32a8e8a1bbb861ec053a3cf7b699935a8dce890b8421c44d5d6f1';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'aeb5c59e34489efd23274c661cc7942c9f55af2d0b1daa2c90fe36094cacc4e9';
+  '0c2b836bdce23cf6132850c7009d2fbea8ef79e5e38ca8ee275a32edf4717ae0';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9d38235f6a16ce60925c0faa28567775cbdb640f1749686c866ffeb9e5a10cb9';
+  '84b1e375592b0d5a0591b8f1e0e081b73fe5aa2ab57d3df0f8bfe7ef7aa31e9c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,13 +1474,14 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // Removing the stray eastbrook_fence_market_outer segment moved the
-    // rebuilt-town placement inventory in the after-* files, so this seal
-    // follows that content change. Every measured value (frame timings, draw
-    // stats, triangle and scenario numbers) is byte-identical, and no
+    // After merging release/v0.34.0 into this branch, both the fence-removal
+    // content change (rebuilt-town placement inventory in the after-* files)
+    // and the upstream version-sync-driven provenance move now stack, so this
+    // seal follows the merged composite. Every measured value (frame timings,
+    // draw stats, triangle and scenario numbers) is byte-identical, and no
     // capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '98fd978113f598e679dcb643e6b7c40b23bcb2fa20381e34e74828b8fbdc4cc1',
+      'bdd2bc50235677ff8caf16591e6458dc0fc346b2bc5ca7f63b2d53ca6b3e8002',
     );
   });
 

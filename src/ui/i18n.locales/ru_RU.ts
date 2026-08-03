@@ -1907,6 +1907,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.joinParty': 'Вступить в группу',
   'hud.prompts.guildInvite': '{name} приглашает вас в {guild}.',
   'hud.prompts.joinGuild': 'Вступить в гильдию',
+  'hud.prompts.guildInviteCancelled':
+    'Ожидающее приглашение в гильдию отменено, потому что гильдия была переименована.',
+  'hud.prompts.guildRenamed': 'Команда модерации переименовала вашу гильдию в {name}.',
   'hud.prompts.tradeRequest': '{name} хочет торговать с вами.',
   'hud.prompts.openTrade': 'Открыть обмен',
   'hud.prompts.duelRequest': '{name} вызвал вас на дуэль!',
@@ -5186,6 +5189,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
+  'hud.core.chatChannels.moveHint':
+    'Изменить порядок вкладки {channel}: перетащите или используйте Alt+влево и Alt+вправо',
   'hud.core.chatChannels.names.general': 'Общий',
   'hud.core.chatChannels.names.guild': 'Гильдия',
   'hud.core.chatChannels.names.lfg': 'Поиск группы',

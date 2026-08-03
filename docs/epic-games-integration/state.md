@@ -144,7 +144,7 @@ Tests:
   `tests/electron_desktop_config.test.ts`, `tests/electron_builder_config.test.ts`,
   `tests/epic_link.test.ts`, `tests/epic_link_markup.test.ts`,
   `tests/epic_achievement_map.test.ts`, `tests/epic_bpt_upload.test.ts`,
-  dual fan-out pins in `tests/deed_records.test.ts` and `tests/deeds_reconcile.test.ts`
+  dual fan-out pins in `tests/deed_records_table.test.ts` and `tests/deeds_reconcile.test.ts`
 
 ## Closed design choices (reference)
 

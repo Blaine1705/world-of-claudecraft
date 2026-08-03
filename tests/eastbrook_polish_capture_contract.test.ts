@@ -360,18 +360,16 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned. Five independent causes now stack: the 0.33.0
-      // version sync moved every GLB source-fingerprint leaf (#2729), the
-      // graphics overhaul and the ability-VFX integration each changed the
-      // renderer-integration and view-priority leaves, this branch edits
-      // src/render/renderer.ts for the compile gates, and removing the stray
-      // eastbrook_fence_market_outer segment touched src/sim/eastbrook_layout.ts
-      // (the authoritativeLayout input) and moved the live townTriangles/
-      // placementInventory baked into the polish-v2 capture contract snapshot.
-      // So the composite mints fresh and matches no parent's literal. No
-      // pipeline input or geometry value changed, and no capture was retaken
-      // (the five per-asset seal suites stay green untouched).
-      fingerprint: '28e00d16cf299f8f50c6046e101f9a1a15ded65d03d93c685e1af9d59a0e716a',
+      // Deliberately re-pinned after merging release/v0.34.0 into this branch.
+      // Both the fence-removal change (src/sim/eastbrook_layout.ts moved the
+      // authoritativeLayout/townTriangles/placementInventory inputs) and the
+      // upstream release-branch changes (package-lock.json version sync moving
+      // every GLB source-fingerprint leaf, plus the renderer-integration and
+      // view-priority leaves) now stack, so the composite mints fresh and
+      // matches neither parent's literal. No pipeline input or geometry value
+      // changed beyond what each parent already recorded, and no capture was
+      // retaken.
+      fingerprint: '8c0c62bebe8a2ec888e4701c47108dd217b1496fcde706666742aa8f857600e4',
       components: {
         captureContract: {
           id: 'polish-v2',
