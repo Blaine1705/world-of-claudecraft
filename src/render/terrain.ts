@@ -22,7 +22,7 @@ import {
   hasBiomeHazeField,
 } from './biome_haze_field';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
-import { GFX, SUN_DIR } from './gfx';
+import { GFX, SUN_DIR, sharedUniforms } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // The terrain relief ladder (GFX.terrainRelief, one source for the tier
@@ -45,7 +45,11 @@ const richTerrainSplat = (): boolean =>
 import { getGrassGroundBake } from './grass_ground_bake';
 import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
-import { GRASS_BAKE_PATCH_YARDS, GRASS_PAINT_GAIN } from './meadow_tuning';
+import {
+  GRASS_BAKE_PATCH_YARDS,
+  GRASS_PAINT_GAIN,
+  MEADOW_CARPET_FADE_START,
+} from './meadow_tuning';
 import {
   beginChunkGeometry,
   type ChunkGeometryArrays,
@@ -553,6 +557,24 @@ const float WOC_GRASS_HEIGHT_SHADE = 0.10;
 const float WOC_GRASS_RECESS_SAT = 0.12;
 `;
 
+// The paint-free ring: inside the dense blade carpet the soil shows the
+// plain photo grass, and the painted meadow ramps in across the carpet's
+// own outer fade (MEADOW_CARPET_FADE_START of the tier radius), so the real
+// blades and the painted ones never share the same ground and the two fades
+// cannot drift apart. uCarpetRing is (player xz, tier carpet radius) via
+// sharedUniforms; radius 0 (a tier with no carpet, or ?meadowband=off style
+// dev flags publishing nothing) keeps the paint everywhere, exactly the
+// shipped look. uPlainLift is a CPU-computed CONSTANT (bake mean over the
+// photo layer's mean, clamped to a sane range, identity when either mean is
+// unavailable): tone continuity with zero per-pixel sampler arithmetic, so
+// no code path can leave the safe range the way a live mip-division did.
+const GRASS_PAINT_RING_GLSL = `
+          if ( uCarpetRing.z > 0.0 ) {
+            float wocPaintT = smoothstep(uCarpetRing.z * ${MEADOW_CARPET_FADE_START.toFixed(2)},
+              uCarpetRing.z, distance(vWPos.xz, uCarpetRing.xy));
+            grassAlb = mix(texture2D(uGrass, tuv).rgb * uPlainLift, grassAlb, wocPaintT);
+          }`;
+
 // The meadow-continuum grass layer: when the ground bake exists, the grass
 // albedo is the BAKED blade artwork (grass_ground_bake.ts) sampled ONCE at
 // true world scale, replacing the photo octave stack. No rescaled octaves:
@@ -580,7 +602,7 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         if ( wocHasGrass ) {
           grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale} + grassJitter).rgb;
           float bakeHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);
+          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);${GRASS_PAINT_RING_GLSL}
         }`
     : `vec2 combT = tuv;
         vec2 grassJitter = vec2(0.0);
@@ -588,9 +610,47 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         vec2 combPerp = vec2(0.0, 1.0);
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
-          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale}).rgb;
+          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale}).rgb;${GRASS_PAINT_RING_GLSL}
         }`;
   return comb;
+}
+
+/**
+ * The paint ring's constant tone lift: bake mean over the photo grass
+ * layer's mean, both linear, clamped to a sane range. Identity when the
+ * photo canvas cannot be read (a non-canvas image, a 2d-context failure):
+ * the ring then shows the photo layer at its own tone, which at worst is a
+ * slight step under the dense carpet, never a runaway.
+ */
+function plainGrassLift(
+  photo: THREE.Texture,
+  bakeMean: readonly [number, number, number],
+): THREE.Vector3 {
+  const lift = new THREE.Vector3(1, 1, 1);
+  const img = photo.image as HTMLCanvasElement | undefined;
+  const ctx = img?.getContext?.('2d');
+  if (!ctx || !img?.width || !img?.height) return lift;
+  const data = ctx.getImageData(0, 0, img.width, img.height).data;
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    r += data[i];
+    g += data[i + 1];
+    b += data[i + 2];
+  }
+  const inv = 4 / data.length;
+  // canvas bytes are sRGB; the shader samples the photo through an sRGB
+  // decode, so lift in linear space (gamma 2.2 approximation of the mean)
+  const lin = (sum: number) => ((sum * inv) / 255) ** 2.2;
+  const clamp = (v: number) => Math.min(2.5, Math.max(0.4, v));
+  const pr = lin(r);
+  const pg = lin(g);
+  const pb = lin(b);
+  if (pr > 1e-4) lift.x = clamp(bakeMean[0] / pr);
+  if (pg > 1e-4) lift.y = clamp(bakeMean[1] / pg);
+  if (pb > 1e-4) lift.z = clamp(bakeMean[2] / pb);
+  return lift;
 }
 
 function buildSplatMaterial(
@@ -633,7 +693,16 @@ function buildSplatMaterial(
       uMacro: { value: macro },
       uGroundAO: { value: t.groundAO },
     });
-    if (grassBake) sh.uniforms.uGrassBake = { value: grassBake.texture };
+    if (grassBake) {
+      sh.uniforms.uGrassBake = { value: grassBake.texture };
+      // The paint-free ring (GRASS_PAINT_RING_GLSL): the live ring by shared
+      // reference, and the constant tone lift computed ONCE here. Identity
+      // (1,1,1) whenever the photo layer's mean cannot be read: the worst
+      // case is then a slight tone step under the dense carpet, never a
+      // blown-out ground.
+      sh.uniforms.uCarpetRing = sharedUniforms.uCarpetRing;
+      sh.uniforms.uPlainLift = { value: plainGrassLift(t.grassC, grassBake.mean) };
+    }
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -671,7 +740,7 @@ function buildSplatMaterial(
         varying vec3 vWPos;
         varying vec3 vWNorm;
         uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro, uGroundAO;
-        ${grassBake ? 'uniform sampler2D uGrassBake;' : ''}
+        ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uCarpetRing;\n        uniform vec3 uPlainLift;' : ''}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
       )

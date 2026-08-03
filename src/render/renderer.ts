@@ -4187,6 +4187,8 @@ export class Renderer {
     const p = this.sim.player;
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
+    // the paint-free carpet ring the terrain splat reads (see terrain.ts)
+    sharedUniforms.uCarpetRing.value.set(p.pos.x, p.pos.z, GFX.bladeCarpetRadius);
     this.tmpV.set(p.pos.x, p.pos.y, p.pos.z);
     this.updateCamera(this.tmpV, dt);
     this.updateAmbience(p.pos.x, this.camera.position.y, dt);
@@ -8244,6 +8246,12 @@ export class Renderer {
     }
     this.time += dt;
     sharedUniforms.uTime.value = this.time;
+    // the paint-free carpet ring the terrain splat reads (see terrain.ts)
+    sharedUniforms.uCarpetRing.value.set(
+      this.sim.player.pos.x,
+      this.sim.player.pos.z,
+      GFX.bladeCarpetRadius,
+    );
     for (const [id, remaining] of this.waterJetVisualChannels) {
       const next = remaining - dt;
       if (next <= 0) this.waterJetVisualChannels.delete(id);
