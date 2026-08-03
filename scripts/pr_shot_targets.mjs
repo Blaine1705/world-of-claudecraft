@@ -6522,6 +6522,165 @@ export const TARGETS = [
       return { clip: '#desktop-update-toast' };
     },
   },
+  {
+    key: 'auto-acquire-target',
+    label: 'Target frame after auto-acquiring the nearest attacking mob (issue #2787)',
+    when: ['casting_lifecycle', 'auto_acquire_target'],
+    variants: [{ key: 'desktop', charClass: 'mage', charName: 'Cassia' }],
+    async capture(page) {
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world unavailable' };
+        p.resource = p.maxResource;
+        p.targetId = null;
+        p.gcdRemaining = 0;
+        p.castingAbility = null;
+        if (p.cooldowns?.clear) p.cooldowns.clear();
+        const mob = [...sim.entities.values()].find(
+          (e) => e.kind === 'mob' && e.hostile && !e.dead,
+        );
+        if (!mob) return { ok: false, reason: 'no hostile mob fixture available' };
+        // A quiet open lane away from the Eastbrook Vale town clutter.
+        p.pos.x = 0;
+        p.pos.z = -1000;
+        if (sim.groundPos) p.pos.y = sim.groundPos(0, -1000).y;
+        p.facing = 0;
+        mob.pos.x = p.pos.x;
+        mob.pos.y = p.pos.y;
+        mob.pos.z = p.pos.z + 8;
+        mob.maxHp = Math.max(mob.maxHp, 5000);
+        mob.hp = mob.maxHp;
+        mob.aiState = 'chase';
+        mob.aggroTargetId = p.id;
+        mob.inCombat = true;
+        // A real threat-table entry, not just aggroTargetId, so the live tick
+        // loop's mob-AI retarget pass does not reset the staged "attacking"
+        // state back to null before the click below fires.
+        mob.threat = new Map([[p.id, 100]]);
+        mob.spawnPos = { ...mob.pos };
+        mob.leashAnchor = { ...mob.pos };
+        sim.rebucket?.(mob);
+        sim.rebucket?.(p);
+        game.hud.hotbarActions[0] = { type: 'ability', id: 'fireball' };
+        game.hud.saveSlotMap?.();
+        return { ok: true, mobId: mob.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(2000); // let the long-distance teleport's zone stream settle
+
+      // Exercise the same click handler a player uses on the primary action bar,
+      // like the target-auras target above: no offensive ability was pressed with
+      // a target already selected, so a successful cast here IS the auto-acquire
+      // proof, not just a state injection.
+      const clicked = await page.evaluate(() => {
+        const button = document.querySelector('.action-btn[data-hotbar-slot="1"]');
+        if (!button) return false;
+        button.click();
+        return true;
+      });
+      if (!clicked) throw new Error('primary action slot 1 is unavailable');
+      await wait(1200);
+
+      const proof = await page.evaluate(
+        (mobId) => window.__game?.sim?.player?.targetId === mobId,
+        staged.mobId,
+      );
+      if (!proof) throw new Error('auto-acquire did not select the attacking mob');
+      return {};
+    },
+  },
+  {
+    key: 'pick-priority-live-over-corpse',
+    label: 'Click-pick prefers a live mob over an overlapping corpse (issue #2787)',
+    when: ['pick_resolution'],
+    variants: [{ key: 'desktop', charClass: 'warrior', charName: 'Thorgar' }],
+    async capture(page) {
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world unavailable' };
+        const mobs = [...sim.entities.values()].filter((e) => e.kind === 'mob' && e.hostile);
+        if (mobs.length < 2) return { ok: false, reason: 'need two mob fixtures' };
+        const [corpse, live] = mobs;
+        const yaw = game.input.camYaw;
+        const dx = Math.sin(yaw);
+        const dz = Math.cos(yaw);
+        const dist = 5;
+        // The corpse sits nearer the camera; the live mob is placed a touch
+        // FARTHER along the very same bearing, so their capsules overlap on
+        // screen with the corpse's body visually in front, the exact bug
+        // shape issue #2787 describes.
+        corpse.pos.x = p.pos.x + dx * dist;
+        corpse.pos.y = p.pos.y;
+        corpse.pos.z = p.pos.z + dz * dist;
+        corpse.dead = true;
+        corpse.hp = 0;
+        corpse.lootable = true;
+        corpse.tappedById = p.id;
+        corpse.harvestClaimedBy = p.id;
+        corpse.loot = { copper: 12, items: [] };
+        corpse.aiState = 'dead';
+
+        live.pos.x = p.pos.x + dx * (dist + 0.4);
+        live.pos.y = p.pos.y;
+        live.pos.z = p.pos.z + dz * (dist + 0.4);
+        live.dead = false;
+        live.maxHp = Math.max(live.maxHp, 5000);
+        live.hp = live.maxHp;
+        live.hostile = true;
+        live.aiState = 'chase';
+        live.aggroTargetId = p.id;
+        live.inCombat = true;
+        live.threat = new Map([[p.id, 100]]);
+        live.spawnPos = { ...live.pos };
+        live.leashAnchor = { ...live.pos };
+
+        p.targetId = null;
+        p.facing = Math.atan2(dx, dz);
+        sim.rebucket?.(corpse);
+        sim.rebucket?.(live);
+        sim.rebucket?.(p);
+        return { ok: true, corpseId: corpse.id, liveId: live.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      await wait(800);
+
+      // Find a screen point where the direct raycast currently sees the
+      // corpse, proving the two capsules genuinely overlap at that pixel (the
+      // same technique the player-tooltip target above uses to locate a click
+      // point from a world position).
+      const point = await page.evaluate(({ corpseId }) => {
+        const game = window.__game;
+        const corpse = game?.sim?.entities.get(corpseId);
+        if (!game || !corpse) return null;
+        const anchor = game.renderer.worldToScreen(corpse.pos.x, corpse.pos.y + 0.6, corpse.pos.z);
+        if (anchor.behind) return null;
+        for (let dy = -100; dy <= 100; dy += 8) {
+          for (let dx = -80; dx <= 80; dx += 8) {
+            const x = anchor.x + dx;
+            const y = anchor.y + dy;
+            if (game.renderer.pickDirect(x, y) === corpseId) return { x, y };
+          }
+        }
+        return null;
+      }, staged);
+      if (!point) throw new Error('no screen point resolves the corpse via pickDirect');
+
+      await page.mouse.move(point.x, point.y);
+      await page.mouse.click(point.x, point.y, { button: 'left' });
+      await wait(1000);
+
+      const proof = await page.evaluate(
+        ({ liveId }) => window.__game?.sim?.player?.targetId === liveId,
+        staged,
+      );
+      if (!proof) throw new Error('click did not resolve to the live mob over the corpse');
+      return {};
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
