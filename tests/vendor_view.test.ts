@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
+import { buyPurchaseTotals } from '../src/sim/vendor_buy_stack';
 import { buildVendorView, sellJunkButtonState } from '../src/ui/hud/vendor/vendor_view';
 
 // Minimal ItemDef fixtures: buildVendorView only reads id / buyValue / sellValue.
@@ -296,17 +297,32 @@ describe('buildVendorView count multiples (phase 21)', () => {
     expect(view.goods[0].countBuy).toEqual({ count: 5, copper: 125, affordable: true });
   });
 
-  it('affordability tracks the SELECTED multiple, not the 1x baseline', () => {
+  it('the count total carries its own affordability while the row keeps the honest 1x baseline', () => {
     const items = table(item('potion', { buyValue: 40, kind: 'potion' }));
     const poor = { copper: 100, honor: 0, gatheringProficiency: RICH.gatheringProficiency };
     // 1x affordable (40 <= 100)...
     const at1 = buildVendorView(['potion'], [], items, poor);
     expect(at1.goods[0].affordable).toBe(true);
     // ...but the 10x total is not (400 > 100): the row must disable on the
-    // count total while the baseline field stays the honest 1x read.
+    // count total (countBuy.affordable, the painter's disable read at a
+    // fixed multiple) while the baseline field stays the honest 1x read.
     const at10 = buildVendorView(['potion'], [], items, poor, 10);
     expect(at10.goods[0].affordable).toBe(true);
     expect(at10.goods[0].countBuy).toEqual({ count: 10, copper: 400, affordable: false });
+  });
+
+  it('the previewed count total equals what the buy path itself would charge (preview/charge lockstep)', () => {
+    // The view's copper preview and the sim's charged total are computed in
+    // two files; this cross-check makes silent drift between them impossible
+    // for the same inputs. Food row: unit 5c, row unit 5, count 10.
+    const items = table(item('bread', { buyValue: 5, kind: 'food' }));
+    const view = buildVendorView(['bread'], [], items, RICH, 10);
+    const totals = buyPurchaseTotals(items.bread, 5, 0, 10);
+    expect(totals).not.toBeNull();
+    expect(view.goods[0].countBuy?.count).toBe(10);
+    expect(view.goods[0].countBuy?.copper).toBe(totals?.copper);
+    // The shared arithmetic is real on both sides (not two zeros agreeing).
+    expect(totals?.copper).toBe(250);
   });
 
   it('force-1 rows never grow count fields at any multiple (Q23)', () => {

@@ -614,6 +614,87 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     }
   });
 
+  it('a dead buyer with a hostile count hears the dead refusal, not the sanitize toast (refusal order)', () => {
+    // The fix round placed sanitize BELOW the dead/range gates on purpose;
+    // this pin keeps a refactor from hoisting it back above them, which
+    // would swap which refusal a dead buyer hears.
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    meta.copper = 1_000;
+    sim.entities.get(pid)!.dead = true;
+    sim.drainEvents();
+    items.buyItem(ctxOf(sim), wilkes.id, 'baked_bread', pid, { count: 0 });
+    const errors = errorTexts(sim.drainEvents());
+    expect(errors).toContain("You can't do that while dead.");
+    expect(errors).not.toContain('That item is not for sale.');
+    expect(sim.countItem('baked_bread', pid)).toBe(0);
+    expect(meta.copper).toBe(1_000);
+  });
+
+  it('an out-of-range buyer with a hostile count hears the range refusal, not the sanitize toast', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    meta.copper = 1_000;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = wilkes.pos.x + 100;
+    sim.drainEvents();
+    items.buyItem(ctxOf(sim), wilkes.id, 'baked_bread', pid, { count: 0 });
+    const errors = errorTexts(sim.drainEvents());
+    expect(errors).toContain('Too far away.');
+    expect(errors).not.toContain('That item is not for sale.');
+    expect(sim.countItem('baked_bread', pid)).toBe(0);
+    expect(meta.copper).toBe(1_000);
+  });
+
+  it('a hostile count on a mount row denies before the riding delegations run (Q20 on every row)', () => {
+    // Sanitize sits ABOVE the riding/mount delegations: a hostile count must
+    // deny on EVERY row, including the two that force-1 a VALID count. The
+    // riding twin lives in tests/mounts_training.test.ts beside its rig.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'MountHostileBuyer');
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(pid)!;
+    meta.ridingTrained = true;
+    meta.copper = 100_000_000;
+    const marla = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
+    )!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = marla.pos.x;
+    player.pos.z = marla.pos.z;
+    sim.drainEvents();
+    items.buyItem(ctxOf(sim), marla.id, 'reins_valorsteed', pid, { count: 0 });
+    expect(errorTexts(sim.drainEvents())).toContain('That item is not for sale.');
+    expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
+    expect(meta.copper).toBe(100_000_000);
+  });
+
+  it('a count purchase emits exactly ONE vendor event carrying no count (Q25)', () => {
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    meta.copper = 1_000;
+    sim.drainEvents();
+    items.buyItem(ctxOf(sim), wilkes.id, 'baked_bread', pid, { count: 5 });
+    const vendorEvents = sim.drainEvents().filter((e) => e.type === 'vendor');
+    // The exact event shape: one emit per command, no quantity field. A count
+    // field appearing here, or an emit moved inside a per-purchase loop,
+    // must fail this pin (the settled Q25: FCT/log stay quantity-blind).
+    expect(vendorEvents).toEqual([{ type: 'vendor', action: 'buy', itemId: 'baked_bread', pid }]);
+  });
+
+  it('bulk still wins when a crafted frame pairs it with a HOSTILE count (no deny, the bulk buy runs)', () => {
+    // The bulk-wins rule discards the count BEFORE sanitize, so the crafted
+    // probe shape {bulk, count: 0} is a plain bulk purchase, not a deny.
+    const sim = makeWorld();
+    const { pid, wilkes, meta } = vendorPlayer(sim);
+    meta.copper = 250;
+    sim.drainEvents();
+    items.buyItem(ctxOf(sim), wilkes.id, 'minor_healing_potion', pid, { bulk: true, count: 0 });
+    expect(errorTexts(sim.drainEvents())).toEqual([]);
+    expect(sim.countItem('minor_healing_potion', pid)).toBe(6);
+    expect(meta.copper).toBe(250 - 6 * 40);
+  });
+
   it('buyItem denies a safe-integer magnitude attack with the money toast, minting nothing', () => {
     const sim = makeWorld();
     const { pid, wilkes, meta } = vendorPlayer(sim);

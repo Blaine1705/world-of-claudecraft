@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import type { ItemDef } from '../src/sim/types';
 import type { VendorBuyOptions } from '../src/sim/vendor_buy_stack';
+import { dismissBuyQuantityPrompts } from '../src/ui/hud/vendor/buy_quantity_prompt_window';
 import type { HeroicShopRow, HeroicShopView } from '../src/ui/hud/vendor/heroic_vendor_view';
 import { renderHeroicVendorWindow } from '../src/ui/hud/vendor/heroic_vendor_window';
 import type {
@@ -22,6 +23,17 @@ import type {
 import { renderVendorWindow, type VendorWindowDeps } from '../src/ui/hud/vendor/vendor_window';
 
 const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+
+// Select a prompt button by its rendered accessible name, never by position:
+// a reorder of confirm/cancel must fail loudly here, not silently swap which
+// button a test clicks.
+function promptButton(prompt: Element, label: 'Buy' | 'Cancel'): HTMLButtonElement {
+  const match = [...prompt.querySelectorAll<HTMLButtonElement>('button')].find(
+    (b) => b.textContent === label,
+  );
+  expect(match, `prompt button labelled ${label}`).toBeDefined();
+  return match as HTMLButtonElement;
+}
 
 function item(id: string): ItemDef {
   return {
@@ -691,6 +703,37 @@ describe('renderVendorWindow: focus across the rebuild (the R22 advisory widenin
     }
   });
 
+  it('a focused qty control keeps focus when its own activation rebuilds the window (acceptance f)', () => {
+    // Every control-row activation forces a full rebuild through onQtyChange,
+    // so the qty buttons are the one surface where the player's OWN click
+    // repaints the node under their finger; the restore must land back on the
+    // same key with the pressed state flipped.
+    const before: VendorView = {
+      goods: [goodsRow('bread')],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      multiple: 1,
+    };
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(el, 'Vendor', before, deps());
+      const five = el.querySelector<HTMLButtonElement>('[data-focus-key="qty:5"]')!;
+      five.focus();
+      expect(five.getAttribute('aria-pressed')).toBe('false');
+      // The activation's rebuild, as the Hud performs it: same container,
+      // the view rebuilt for the newly selected multiple.
+      renderVendorWindow(el, 'Vendor', { ...before, multiple: 5 }, deps());
+      const rebuilt = el.querySelector<HTMLButtonElement>('[data-focus-key="qty:5"]')!;
+      expect(rebuilt).not.toBe(five); // genuinely a fresh element
+      expect(document.activeElement).toBe(rebuilt);
+      expect(rebuilt.getAttribute('aria-pressed')).toBe('true');
+    } finally {
+      el.remove();
+    }
+  });
+
   it('a row that comes back DISABLED yields to its enabled grid neighbor (the last-stack buy)', () => {
     // The primary degradation the focus_restore family documents: buying the
     // last affordable stack drains copper, so the SAME row returns from the
@@ -896,6 +939,40 @@ describe('vendor window family: hud.ts focus-management wiring (WCAG 2.4.3)', ()
     expect(closeVendorBody).toContain('// Guard');
     expect(closeVendorBody).toContain('if (this.openVendorNpcId === null) return;');
   });
+
+  it('every vendor lifecycle path runs the custom-prompt force-close backstop (phase 21)', () => {
+    // The prompt marks #vendor-window inert while open, and only these three
+    // paths can tear the window down around it: closeVendor (the ordinary
+    // close), openVendor re-entry (a second merchant over a live prompt,
+    // whose stale onBuy closure would aim at the previous npc), and
+    // openHeroicVendor (the marks shop takes the shared container WITHOUT
+    // closeVendor, which then early-returns on its null guard). Dropping any
+    // one strands the window inert under an orphaned aria-modal (the
+    // dismissBankPrompts precedent in bank_window.test.ts).
+    expect(openVendorBody).toContain("dismissBuyQuantityPrompts($('#vendor-window'));");
+    expect(openHeroicVendorBody).toContain("dismissBuyQuantityPrompts($('#vendor-window'));");
+    expect(closeVendorBody).toContain("dismissBuyQuantityPrompts($('#vendor-window'));");
+  });
+
+  it('the control-row selection resets to 1x on every vendor open (recorded judgment, phase 21)', () => {
+    // The build record pins this as deliberate least-surprise: a 10x selection
+    // must not silently carry into the next merchant, where a reflexive
+    // counter click would spend tenfold.
+    expect(openVendorBody).toContain('this.vendorQtyMultiple = 1;');
+  });
+
+  it('renderVendor caps the custom prompt from the sim leaf, with unknown ids capped at 0', () => {
+    // The one cheap pin on the buyCustomMax wiring: the cap must come from
+    // maxBuyCount over the LIVE inventory (never a cached view), and a stale
+    // bundle's unknown id caps at 0 so the prompt floor-of-1 lets the server
+    // answer honestly.
+    const renderVendorStart = anchor('private renderVendor(): void {');
+    expect(openHeroicVendorStart).toBeGreaterThan(renderVendorStart);
+    const renderVendorBody = hud.slice(renderVendorStart, openHeroicVendorStart);
+    expect(renderVendorBody).toContain(
+      'return def ? maxBuyCount(this.sim.inventory, this.sim.bagCapacity, def) : 0;',
+    );
+  });
 });
 
 describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () => {
@@ -979,7 +1056,7 @@ describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () =
     expect(rows[0].getAttribute('aria-label')).toContain('1s 25c');
   });
 
-  it('a count row click sends the count; ctrl/cmd still wins with bulk; 1x rows stay plain', () => {
+  it('a count row click sends the count and ctrl/cmd still wins with bulk', () => {
     const el = document.createElement('div');
     const calls: [string, VendorBuyOptions | undefined][] = [];
     renderVendorWindow(
@@ -1058,7 +1135,7 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
     expect(el.inert).toBe(true);
     // Confirm submits the typed count through the same onBuy seam and clears inert.
     if (input) input.value = '12';
-    (prompt.querySelectorAll('button')[0] as HTMLButtonElement).click();
+    promptButton(prompt, 'Buy').click();
     expect(calls).toEqual([['bread', { count: 12 }]]);
     expect(el.inert).toBe(false);
     expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
@@ -1114,9 +1191,223 @@ describe('renderVendorWindow: the custom-amount prompt (phase 21, Q19)', () => {
     const prompt = stack.querySelector('.buy-quantity-prompt')!;
     const input = prompt.querySelector<HTMLInputElement>('.prompt-number')!;
     input.value = '999';
-    (prompt.querySelectorAll('button')[0] as HTMLButtonElement).click();
+    promptButton(prompt, 'Buy').click();
     expect(calls).toEqual([['bread', { count: 10 }]]);
     el.remove();
     stack.remove();
+  });
+
+  it('every degenerate typed value floors to a legal request: empty, non-numeric, negative, fractional', () => {
+    // The one place a human types the number. Each arm of
+    // Math.max(1, Math.min(cap, Math.floor(Number(v) || 0))) gets its own
+    // case; the server re-sanitizes anyway, but the prompt must never emit a
+    // count the sim would deny for shape.
+    const cases: Array<[string, number]> = [
+      ['', 1],
+      ['abc', 1],
+      ['-5', 1],
+      ['3.9', 3],
+    ];
+    for (const [typed, expected] of cases) {
+      const stack = mountStack();
+      const el = document.createElement('div');
+      document.body.appendChild(el);
+      const calls: unknown[] = [];
+      renderVendorWindow(
+        el,
+        'Vendor',
+        {
+          goods: [customRow('bread')],
+          buyback: [],
+          honorBalance: 0,
+          hasHonorGoods: false,
+          multiple: 'custom',
+        },
+        deps({ onBuy: (id, opts) => calls.push([id, opts]), buyCustomMax: () => 10 }),
+      );
+      el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+        new MouseEvent('click', { bubbles: true }),
+      );
+      const prompt = stack.querySelector('.buy-quantity-prompt')!;
+      prompt.querySelector<HTMLInputElement>('.prompt-number')!.value = typed;
+      promptButton(prompt, 'Buy').click();
+      expect(calls, `typed ${JSON.stringify(typed)}`).toEqual([['bread', { count: expected }]]);
+      el.remove();
+      stack.remove();
+    }
+  });
+
+  it('a force-1 row at the custom multiple plain-buys instead of opening the prompt', () => {
+    // The view withholds customBuy from force-1 rows, so the painter must
+    // treat them as ordinary 1x rows even while 'custom' is selected: the
+    // composition of the two pinned halves.
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const calls: unknown[] = [];
+    renderVendorWindow(
+      el,
+      'Vendor',
+      {
+        goods: [{ ...customRow('marks_blade'), customBuy: undefined }],
+        buyback: [],
+        honorBalance: 0,
+        hasHonorGoods: false,
+        multiple: 'custom',
+      },
+      deps({ onBuy: (id, opts) => calls.push([id, opts]) }),
+    );
+    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+      new MouseEvent('click', { bubbles: true }),
+    );
+    expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
+    expect(calls).toEqual([['marks_blade', undefined]]);
+    el.remove();
+    stack.remove();
+  });
+});
+
+describe('buy_quantity_prompt_window: force-close backstop and focus landing net (phase 21 QA)', () => {
+  function customRow(itemId: string): VendorGoodsRow {
+    return {
+      itemId,
+      item: item(itemId),
+      price: { copper: 25, honor: 0 },
+      quantity: 1,
+      affordable: true,
+      requirementUnmet: false,
+      customBuy: true,
+    };
+  }
+  function customView(goods: VendorGoodsRow[]): VendorView {
+    return { goods, buyback: [], honorBalance: 0, hasHonorGoods: false, multiple: 'custom' };
+  }
+  function mountStack(): HTMLElement {
+    for (const n of document.querySelectorAll('#prompt-stack')) n.remove();
+    const stack = document.createElement('div');
+    stack.id = 'prompt-stack';
+    document.body.appendChild(stack);
+    return stack;
+  }
+  function openPrompt(
+    el: HTMLElement,
+    stack: HTMLElement,
+    onBuy?: VendorWindowDeps['onBuy'],
+  ): HTMLElement {
+    renderVendorWindow(
+      el,
+      'Vendor',
+      customView([customRow('bread')]),
+      deps(onBuy ? { onBuy, buyCustomMax: () => 10 } : { buyCustomMax: () => 10 }),
+    );
+    el.querySelector<HTMLButtonElement>('.vendor-item')!.dispatchEvent(
+      new MouseEvent('click', { bubbles: true }),
+    );
+    const prompt = stack.querySelector<HTMLElement>('.buy-quantity-prompt');
+    expect(prompt, 'prompt must open').not.toBeNull();
+    return prompt as HTMLElement;
+  }
+
+  it('dismissBuyQuantityPrompts removes every open prompt and clears the window inert (the backstop the hud paths call)', () => {
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    openPrompt(el, stack);
+    expect(el.inert).toBe(true);
+    dismissBuyQuantityPrompts(el);
+    expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
+    expect(el.inert).toBe(false);
+    // Idempotent on an already-clean window (the closeVendor path re-runs it).
+    dismissBuyQuantityPrompts(el);
+    expect(el.inert).toBe(false);
+    el.remove();
+    stack.remove();
+  });
+
+  it('submit lands focus on the rebuilt row by key when the opener was never focused (the pointer path)', () => {
+    // macOS Safari/Firefox and iOS do not focus a <button> on click, so the
+    // captured opener is <body> with no focus key. Without the item-row rung
+    // the ladder fell straight to Close, where a reflexive Enter shuts the
+    // whole vendor (the hazard the window's own ladder documents).
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      (document.activeElement as HTMLElement | null)?.blur?.();
+      const onBuy: VendorWindowDeps['onBuy'] = () => {
+        // The buy-driven repaint: fresh nodes, the captured opener detaches.
+        renderVendorWindow(el, 'Vendor', customView([customRow('bread')]), deps());
+      };
+      const prompt = openPrompt(el, stack, onBuy);
+      prompt.querySelector<HTMLInputElement>('.prompt-number')!.value = '3';
+      promptButton(prompt, 'Buy').click();
+      expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
+      expect(el.inert).toBe(false);
+      const landed = document.activeElement as HTMLElement;
+      expect(landed.dataset.focusKey).toBe('buy:bread');
+    } finally {
+      el.remove();
+      stack.remove();
+    }
+  });
+
+  it('Escape after a mid-prompt rebuild re-lands focus by the opener key on the fresh DOM (the keyboard path)', () => {
+    // A renderVendor while the prompt is open (an inventory delta, a party
+    // loot) detaches the captured opener, so the recipe's opener.focus()
+    // silently no-ops; the net must re-find the SAME key on the new DOM.
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderVendorWindow(
+        el,
+        'Vendor',
+        customView([customRow('bread')]),
+        deps({ buyCustomMax: () => 10 }),
+      );
+      const row = el.querySelector<HTMLButtonElement>('[data-focus-key="buy:bread"]')!;
+      row.focus();
+      row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      const prompt = stack.querySelector<HTMLElement>('.buy-quantity-prompt')!;
+      // The mid-prompt rebuild: the captured opener row is now detached.
+      renderVendorWindow(el, 'Vendor', customView([customRow('bread')]), deps());
+      expect(row.isConnected).toBe(false);
+      prompt.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
+      expect(el.inert).toBe(false);
+      const landed = document.activeElement as HTMLElement;
+      expect(landed.dataset.focusKey).toBe('buy:bread');
+      expect(landed).not.toBe(row);
+    } finally {
+      el.remove();
+      stack.remove();
+    }
+  });
+
+  it('cancel with the row vanished falls down the ladder to sell-junk, never Close-first', () => {
+    const stack = mountStack();
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      (document.activeElement as HTMLElement | null)?.blur?.();
+      const prompt = openPrompt(el, stack);
+      // The row vanishes from the rebuilt window (sold out mid-prompt); the
+      // sell-junk rung must be ENABLED to take focus (restoreFirstEnabled
+      // skips disabled rungs).
+      renderVendorWindow(
+        el,
+        'Vendor',
+        customView([]),
+        deps({ sellJunk: { enabled: true, proceeds: 5 } }),
+      );
+      promptButton(prompt, 'Cancel').click();
+      expect(stack.querySelector('.buy-quantity-prompt')).toBeNull();
+      expect(el.inert).toBe(false);
+      const landed = document.activeElement as HTMLElement;
+      expect(landed.dataset.focusKey).toBe('sell-junk');
+    } finally {
+      el.remove();
+      stack.remove();
+    }
   });
 });

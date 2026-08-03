@@ -3317,11 +3317,11 @@ export const TARGETS = [
     when: [
       'ui/hud/vendor/vendor_view',
       'ui/hud/vendor/vendor_window',
-      'ui/hud/vendor/buy_quantity_prompt',
+      'ui/hud/vendor/buy_quantity_prompt_window',
       'sim/vendor_buy_stack',
     ],
     // Trader Wilkes stocks the staple food/potion counter, the count verb's
-    // home case: bread rows show the x5 chip beside a whole-count total while
+    // home case: bread rows show the 5x chip beside a whole-count total while
     // the Buy Stack tile keeps its own bulk read next to them. The frame is
     // shot with the 5x multiple SELECTED through a real click on the control,
     // so the pressed state, the re-priced rows, and the count-tracking

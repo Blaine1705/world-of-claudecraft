@@ -58,7 +58,7 @@ describe('ClientWorld.buyItem count/bulk wire form (sender)', () => {
     expect('count' in sent[2]).toBe(false);
   });
 
-  it('a hostile count never becomes a purchase in either world (facet parity)', () => {
+  it('the sender forwards finite hostile counts for the authoritative deny and drops non-finite ones', () => {
     const { client, sent } = rig();
     // Finite hostiles ride the wire as-is so the authoritative sanitize
     // denies them with the same toast the offline Sim gives...

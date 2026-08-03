@@ -130,4 +130,17 @@ describe('mobile window layout CSS', () => {
       /@media \(pointer: coarse\) \{\s*\.vendor-qty-btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
     );
   });
+
+  it('floors the shared prompt-family action buttons at 40px under a coarse pointer (phase 21 QA)', () => {
+    // The bags/bank/vendor quantity prompts share one recipe; the vendor
+    // custom-amount prompt made those buttons a mobile purchase surface, so
+    // the tap floor lives on the shared .prompt .btn rule in hud.css.
+    const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8').replace(
+      /\r\n/g,
+      '\n',
+    );
+    expect(hudCss).toMatch(
+      /@media \(pointer: coarse\) \{\s*\.prompt \.btn \{[^}]*min-width: 40px;[^}]*min-height: 40px;/,
+    );
+  });
 });

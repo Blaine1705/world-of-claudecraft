@@ -5226,8 +5226,19 @@
     background: #ffffff20;
     color: var(--gold);
   }
-  /* The count chip on a multiplied row: the same muted stack-count read as
-     the bags, sitting just before the whole-count price. */
+  /* forced-colors drops the gold border/fill/text tints above to the same
+     system values as an unpressed chip, so the armed multiple would read by
+     colour alone (the crafting-commission-chip pip precedent): pin the
+     pressed chip to the system highlight pair instead. */
+  @media (forced-colors: active) {
+    .vendor-qty-btn[aria-pressed="true"] {
+      background: Highlight;
+      color: HighlightText;
+      forced-color-adjust: none;
+    }
+  }
+  /* The count chip on a multiplied row: the control row's own {count}x
+     grammar in a muted read, sitting just before the whole-count price. */
   .vendor-item .vi-qty {
     margin-right: 4px;
     opacity: 0.85;

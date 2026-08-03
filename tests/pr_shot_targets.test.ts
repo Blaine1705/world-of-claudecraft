@@ -204,7 +204,7 @@ describe('diffChangedPaths', () => {
       resolveTargets(['src/sim/vendor_buy_stack.ts']).map((t: { key: string }) => t.key),
     ).toEqual(['vendor-buy-count']);
     expect(
-      resolveTargets(['src/ui/hud/vendor/buy_quantity_prompt.ts']).map(
+      resolveTargets(['src/ui/hud/vendor/buy_quantity_prompt_window.ts']).map(
         (t: { key: string }) => t.key,
       ),
     ).toEqual(['vendor-buy-count']);

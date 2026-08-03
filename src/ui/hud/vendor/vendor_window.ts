@@ -16,7 +16,7 @@ import { gatheringProfessionNameKey } from '../../gathering_profession_name';
 import { formatMoney as formatLocalizedMoney, formatNumber, t } from '../../i18n';
 import type { PainterHostPresentation } from '../../painter_host';
 import { svgIcon } from '../../ui_icons';
-import { showBuyQuantityPrompt } from './buy_quantity_prompt';
+import { showBuyQuantityPrompt } from './buy_quantity_prompt_window';
 import {
   VENDOR_MULTIPLES,
   type VendorGoodsRow,
@@ -235,10 +235,12 @@ export function renderVendorWindow(
             })
           : t('itemUi.vendor.buyAria', { item: `${itemName}${stack}`, price }),
     );
-    // The count chip reuses the bags stack-count key (x{count}); the price
-    // cell shows the whole-count total the click will charge.
+    // The count chip reuses the control row's own multiple key ({count}x), so
+    // it reads in the row's grammar (5x = five purchases) and can never sit
+    // beside the name's units-per-purchase "x5" wearing the same face; the
+    // price cell shows the whole-count total the click will charge.
     const qtyChip = countBuy
-      ? `<span class="vi-qty">${esc(t('itemUi.bags.stackCount', { count: countText as string }))}</span>`
+      ? `<span class="vi-qty">${esc(t('itemUi.vendor.qtyMultiple', { count: countText as string }))}</span>`
       : '';
     const priceHtml = countBuy ? deps.moneyHtml(countBuy.copper) : goodsPriceHtml(goods, deps);
     row.innerHTML = `${deps.itemIcon(item)}<span class="vi-name">${esc(itemName)}${esc(stack)}${requirement ? `<span class="vi-sub">${esc(requirement)}</span>` : ''}</span><span class="vi-price">${qtyChip}${priceHtml}</span>`;

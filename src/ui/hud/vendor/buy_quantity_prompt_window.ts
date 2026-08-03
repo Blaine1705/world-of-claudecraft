@@ -79,17 +79,24 @@ export function showBuyQuantityPrompt(
   // renderVendor while the prompt is open (an inventory delta, a party
   // loot) detaches the captured row, and focusing a detached node does
   // nothing. When the recipe's return already landed inside the window,
-  // this is a no-op; otherwise it re-lands by the opener's focus KEY on
-  // the rebuilt DOM, then the always-present close (the bank prompt's
-  // land-on-[data-close] precedent, keyed instead of hardcoded).
+  // this is a no-op; otherwise it re-lands by key on the rebuilt DOM. The
+  // ladder mirrors renderVendorWindow's own (row, then sell-junk, then
+  // close): the opener key leads, but browsers that do not focus buttons on
+  // click (macOS Safari/Firefox, iOS) hand us a <body> opener with no key,
+  // so the prompt's OWN row key (`buy:` plus the item id) is the rung that
+  // keeps a keyboard user beside the row they were buying instead of on
+  // Close, where a reflexive Enter would shut the whole vendor.
   const openerKey = opener?.dataset.focusKey;
   const landFocus = () => {
     const active = document.activeElement;
     if (active instanceof HTMLElement && active.isConnected && vendorRoot.contains(active)) return;
     const keyed = [...vendorRoot.querySelectorAll<HTMLElement>('[data-focus-key]')];
+    const byKey = (key: string) => keyed.find((b) => b.dataset.focusKey === key);
     restoreFirstEnabled([
-      openerKey ? keyed.find((b) => b.dataset.focusKey === openerKey) : undefined,
-      keyed.find((b) => b.dataset.focusKey === 'close'),
+      openerKey ? byKey(openerKey) : undefined,
+      byKey(`buy:${item.id}`),
+      byKey('sell-junk'),
+      byKey('close'),
     ]);
   };
   const submit = () => {

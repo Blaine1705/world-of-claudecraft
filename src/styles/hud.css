@@ -6072,6 +6072,19 @@
   .prompt .prompt-number:focus {
     outline: 1px solid var(--gold-dim);
   }
+  /* Touch floor for the shared prompt family's action buttons (bags discard/
+     sell, bank withdraw/deposit, vendor buy-quantity). The base .btn renders
+     around 30px tall, under the 40px coarse-pointer tap target the rest of
+     the vendor family floors; the vendor prompt made this a mobile PURCHASE
+     surface, so the floor lives on the shared recipe and lifts all three
+     windows at once. */
+  @media (pointer: coarse) {
+    .prompt .btn {
+      min-width: 40px;
+      min-height: 40px;
+      box-sizing: border-box;
+    }
+  }
 
   /* ---------- trade window ---------- */
   #trade-window {

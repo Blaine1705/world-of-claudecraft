@@ -18,6 +18,13 @@
 //   BEFORE any balance compare (buyPurchaseTotals); and the Q23 force-1 rows
 //   (vendorCountForced) never multiply.
 //
+// Latent asymmetry, named so it stays deliberate: vendorCountForced treats
+// soulbound as force-1 but bulkEligible (items.ts buyItem) does not exclude
+// soulbound, so a soulbound copper-priced stackable would bulk-multiply while
+// the count path forces it to 1. No such item exists today (the only
+// soulbound row with a buyValue is a mount, force-1 on both paths); a future
+// soulbound consumable must pick ONE rule here.
+//
 // DOM-free and deterministic so tests/vendor_buy_stack.test.ts drives it directly.
 
 import { countFit, stackSizeOf } from './bags';

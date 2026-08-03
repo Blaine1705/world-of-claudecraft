@@ -761,6 +761,22 @@ export function buyItem(
     ctx.error(meta.entityId, 'Too far away.');
     return;
   }
+  // Sanitize sits BELOW the dead/range gates (a dead or out-of-range buyer
+  // hears the same refusal a legit frame gets) but ABOVE the riding and mount
+  // delegations: a hostile count must deny on EVERY row (Q20), and the riding
+  // delegate below returns without ever reaching the count branch, so a
+  // deny placed after it would silently launder a hostile count into a
+  // charge no legitimate client sent. A VALID count on those rows is still
+  // simply force-1 (the riding delegate ignores it; vendorCountForced pins
+  // mounts), never a second deny. Bulk wins on a crafted frame carrying both
+  // fields (the shipped verb's precedence, decided here once so all three
+  // hosts agree); the client never sends both.
+  const bulk = opts?.bulk === true;
+  const count = sanitizeBuyCount(bulk ? undefined : opts?.count);
+  if (count === null) {
+    ctx.error(meta.entityId, 'That item is not for sale.');
+    return;
+  }
   // Riding Training (the stablemaster's service entry): buying it delegates to
   // learnRiding, which owns every gate (already trained, level 20, the 80g fee,
   // trainer identity, range) and never puts an item in the bags.
@@ -812,23 +828,9 @@ export function buyItem(
   // row-unit purchases resolved atomically, refuse-whole on any shortfall
   // (Q20). The Q23 force-1 rows never multiply, and the totals are
   // overflow-guarded BEFORE the balance compares below so those compares can
-  // never run on a non-safe integer.
-  //
-  // Sanitize sits AFTER the shared vendor gates, so a dead or out-of-range
-  // buyer hears the same refusal a legit frame gets, and the riding/mount
-  // delegations above stay pure force-1 (a count on them is simply ignored,
-  // never a second deny). A present count must already be a legal integer
-  // request or the whole command is denied (Q20's toast-deny; never sell's
-  // silent swallow, and never coercion, which would charge for a quantity no
-  // legitimate client sent). Bulk wins on a crafted frame carrying both
-  // fields (the shipped verb's precedence, decided here once so all three
-  // hosts agree); the client never sends both.
-  const bulk = opts?.bulk === true;
-  const count = sanitizeBuyCount(bulk ? undefined : opts?.count);
-  if (count === null) {
-    ctx.error(meta.entityId, 'That item is not for sale.');
-    return;
-  }
+  // never run on a non-safe integer. The count itself was sanitized above the
+  // riding/mount delegations (a hostile count denies on every row; a valid
+  // one is force-1 there), so `count` here is always a safe integer >= 1.
   const bulkEligible = bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
   let qty: number;
   let copperCost: number;

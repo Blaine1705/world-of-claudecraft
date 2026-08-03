@@ -890,6 +890,9 @@ describe('economy telemetry counters at their emission sites', () => {
       JSON.stringify({ t: 'cmd', cmd: 'buy', npc: npcId, item: 'copper_mining_pick', count: 3 }),
     );
     const paidTriple = 500 - (meta.copper as number);
+    // Same guard as the sibling arm above: a zero catalog price would make
+    // the count multiplication below pass vacuously.
+    expect(paidTriple).toBeGreaterThan(0);
     expect(paidTriple).toBe(3 * (ITEMS.copper_mining_pick.buyValue as number));
     expect(rec.spent).toEqual([['vendor', paidTriple]]);
 

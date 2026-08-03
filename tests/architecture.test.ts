@@ -1327,7 +1327,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/quest/quest_dialog_controller.ts',
   'src/ui/hud/quest/quest_tracker_controller.ts',
   'src/ui/hud/quest/questlog_window.ts',
-  'src/ui/hud/vendor/buy_quantity_prompt.ts',
+  'src/ui/hud/vendor/buy_quantity_prompt_window.ts',
   'src/ui/hud/vendor/heroic_vendor_window.ts',
   'src/ui/hud/vendor/train_window.ts',
   'src/ui/hud/vendor/unbind_window.ts',
