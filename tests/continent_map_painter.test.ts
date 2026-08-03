@@ -44,6 +44,9 @@ const classColor = (cls: string): string => `color:${cls}`;
 
 interface PaintTrace {
   fillRects: string[]; // fillStyle at each fillRect (ocean flood + fallback wash)
+  // Every gradient minted on the map canvas (the letterbox depth grades), with
+  // the endpoints and stops each was built from.
+  gradients: Array<{ from: number[]; stops: Array<[number, string]> }>;
   strokeRects: string[]; // strokeStyle at each strokeRect (nothing draws one now)
   arcFills: string[]; // fillStyle at each arc fill (the you-are-here dot)
   labels: Array<{ text: string; color: string }>; // fillText + the fillStyle it used
@@ -51,12 +54,19 @@ interface PaintTrace {
 }
 
 function newTrace(): PaintTrace {
-  return { fillRects: [], strokeRects: [], arcFills: [], labels: [], styleReads: [] };
+  return {
+    fillRects: [],
+    strokeRects: [],
+    arcFills: [],
+    labels: [],
+    gradients: [],
+    styleReads: [],
+  };
 }
 
 function fakeContinentContext(trace: PaintTrace): CanvasRenderingContext2D {
   const ctx = {
-    fillStyle: '',
+    fillStyle: '' as string | object,
     strokeStyle: '',
     lineWidth: 1,
     font: '',
@@ -65,7 +75,18 @@ function fakeContinentContext(trace: PaintTrace): CanvasRenderingContext2D {
     imageSmoothingEnabled: false,
     drawImage(): void {},
     fillRect(): void {
-      trace.fillRects.push(String(ctx.fillStyle));
+      trace.fillRects.push(typeof ctx.fillStyle === 'string' ? ctx.fillStyle : 'gradient');
+    },
+    createLinearGradient(x0: number, y0: number, x1: number, y1: number): unknown {
+      const grad = {
+        from: [x0, y0, x1, y1] as number[],
+        stops: [] as Array<[number, string]>,
+        addColorStop(offset: number, color: string): void {
+          grad.stops.push([offset, color]);
+        },
+      };
+      trace.gradients.push(grad);
+      return grad;
     },
     strokeRect(): void {
       trace.strokeRects.push(String(ctx.strokeStyle));
@@ -424,9 +445,35 @@ describe('continent_map_painter: land-masked zone wash', () => {
     expect(scratch.width).toBe(560);
     expect(scratch.height).toBe(560);
 
-    // The map canvas itself: the ocean flood only. No rectangle wash reaches it,
-    // which is the regression this pins (the fallback would fillRect the zone box).
-    expect(trace.fillRects).toEqual(['paint:--color-map-continent-ocean']);
+    // The map canvas itself: the ocean flood, then the two letterbox depth grades
+    // that darken the open water toward the window edge (the plate is a tall
+    // portrait crop, so only the left/right bands exist). NO rectangle wash
+    // reaches it, which is the regression this pins (the fallback would fillRect
+    // the zone box, and a flat token fill would show as a named color here).
+    expect(trace.fillRects).toEqual(['paint:--color-map-continent-ocean', 'gradient', 'gradient']);
+
+    // Those two grades are the open water beside the plate: each runs from the
+    // window edge (fully darkened) to the plate edge (clear, so it lands on the
+    // ocean token unchanged and leaves no seam where the painted sea begins).
+    // A grade running the other way would vignette the plate instead of the sea.
+    expect(trace.gradients).toHaveLength(2);
+    const [westward, eastward] = trace.gradients;
+    const plateLeft = westward.from[2];
+    const plateRight = eastward.from[0];
+    expect(westward.from).toEqual([0, 0, plateLeft, 0]);
+    expect(plateLeft).toBeGreaterThan(0);
+    expect(westward.stops).toEqual([
+      [0, 'paint:--color-map-continent-backdrop-dim'],
+      [1, 'transparent'],
+    ]);
+    expect(eastward.from).toEqual([plateRight, 0, 560, 0]);
+    expect(plateRight).toBeLessThan(560);
+    expect(eastward.stops).toEqual([
+      [0, 'transparent'],
+      [1, 'paint:--color-map-continent-backdrop-dim'],
+    ]);
+    // The plate is centered in the square canvas, so the two bands are equal.
+    expect(560 - plateRight).toBeCloseTo(plateLeft, 6);
     // It receives the plate, then the finished wash as a single blit.
     expect(blits).toEqual(['plate', 'surface#1']);
 

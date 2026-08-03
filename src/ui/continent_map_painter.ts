@@ -59,6 +59,11 @@ const MASK_STOP_CLEAR = 'transparent';
 // Cached finished washes. Above the two one frame can ask for (the current zone
 // and the hovered one), so moving the cursor between zones cannot evict either.
 const WASH_CACHE_LIMIT = 3;
+// Drop shadow that seats the plate on the backdrop. SHADOW_NONE is the canvas
+// "no shadow" sentinel, not a themeable color: every 2D context spells a disabled
+// shadow as fully transparent black.
+const PLATE_SHADOW_BLUR = 18;
+const SHADOW_NONE = 'transparent';
 // "You are here" marker: a filled dot inside a steady ring (no animation).
 const HERE_DOT_RADIUS = 3.5;
 const HERE_RING_RADIUS = 6.5;
@@ -82,6 +87,8 @@ const CONTINENT_COLOR_TOKENS = {
   regionHoverFill: '--color-map-region-hover-fill',
   regionCurrentFill: '--color-map-region-current-fill',
   regionCurrentLabel: '--color-map-region-current-label',
+  backdropDim: '--color-map-continent-backdrop-dim',
+  plateShadow: '--color-map-continent-plate-shadow',
 } as const;
 
 type ContinentColors = Record<keyof typeof CONTINENT_COLOR_TOKENS, string>;
@@ -149,6 +156,50 @@ export class ContinentMapPainter {
     return this.mask;
   }
 
+  /**
+   * The letterbox beside the plate: OPEN WATER, deepening toward the window edge.
+   *
+   * The flat token fill alone met the plate's painted sea at a visible seam, and
+   * carrying the plate's own edge pixels outward (the first attempt) dragged
+   * coastline into the margin, which reads as land outside the world. So the
+   * margin stays pure sea: the ocean token, darkened by a gradient that is clear
+   * where it meets the plate and full at the window edge, which is what open
+   * water away from any coast actually does.
+   */
+  private paintLetterbox(
+    ctx: CanvasRenderingContext2D,
+    image: ContinentRect,
+    S: number,
+    dim: string,
+  ): void {
+    const right = image.mx + image.w;
+    const bottom = image.my + image.h;
+    if (image.mx > 0) {
+      const left = ctx.createLinearGradient(0, 0, image.mx, 0);
+      left.addColorStop(0, dim);
+      left.addColorStop(1, MASK_STOP_CLEAR);
+      ctx.fillStyle = left;
+      ctx.fillRect(0, 0, image.mx, S);
+      const far = ctx.createLinearGradient(right, 0, S, 0);
+      far.addColorStop(0, MASK_STOP_CLEAR);
+      far.addColorStop(1, dim);
+      ctx.fillStyle = far;
+      ctx.fillRect(right, 0, S - right, S);
+    }
+    if (image.my > 0) {
+      const top = ctx.createLinearGradient(0, 0, 0, image.my);
+      top.addColorStop(0, dim);
+      top.addColorStop(1, MASK_STOP_CLEAR);
+      ctx.fillStyle = top;
+      ctx.fillRect(0, 0, S, image.my);
+      const low = ctx.createLinearGradient(0, bottom, 0, S);
+      low.addColorStop(0, MASK_STOP_CLEAR);
+      low.addColorStop(1, dim);
+      ctx.fillStyle = low;
+      ctx.fillRect(0, bottom, S, S - bottom);
+    }
+  }
+
   /** Take the cached wash for this key, refreshing its recency, or null. */
   private cachedWash(key: string): HTMLCanvasElement | null {
     const hit = this.washes.get(key);
@@ -208,13 +259,21 @@ export class ContinentMapPainter {
     S: number,
     colors: ContinentColors,
   ): void {
-    // Open ocean under everything, then the continent art (if decoded) fitted to
-    // the model's dest rect. Regions, labels and the player marker draw on top.
+    // Open ocean under everything (the only backdrop available with no plate),
+    // then the plate's own sea carried out into the letterbox, then the plate
+    // itself. Regions, labels and the player marker draw on top.
     ctx.fillStyle = colors.ocean;
     ctx.fillRect(0, 0, S, S);
     if (this.artState === 'ready' && this.art) {
+      this.paintLetterbox(ctx, model.image, S, colors.backdropDim);
       ctx.imageSmoothingEnabled = true;
+      // A soft drop shadow seats the plate on that surround, so the boundary
+      // reads as depth rather than as two flat fills meeting.
+      ctx.shadowColor = colors.plateShadow;
+      ctx.shadowBlur = PLATE_SHADOW_BLUR;
       ctx.drawImage(this.art, model.image.mx, model.image.my, model.image.w, model.image.h);
+      ctx.shadowColor = SHADOW_NONE;
+      ctx.shadowBlur = 0;
     }
 
     // Zone highlights, and deliberately no borders: the zone the player stands in
