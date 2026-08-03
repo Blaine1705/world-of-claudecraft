@@ -1093,8 +1093,14 @@ describe('the $WOC token firewall over src/sim', () => {
   // No trailing \b on purpose: the leak shapes are COMPOUND identifiers
   // (sellerWallet, walletForAccount, quoteUsdCents), which a closed word
   // boundary would miss entirely.
+  // `treasury` carries a REQUIRED money suffix, unlike the rest. A bare match was
+  // too broad to survive contact with the game's own vocabulary: v0.34.0 added a
+  // keep room whose id is literally 'treasury' (src/sim/dungeon_layout.ts), which
+  // is a place on a map, not a fee destination. Every shape this firewall exists
+  // to catch is compound anyway (treasuryWallet, treasuryBps), and the bare word
+  // was the one token here that could flag ordinary content.
   const FIREWALL_RE =
-    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury|custodyclaim)/i;
+    /(?:wallet|pubkey|solana|usdcents|pricecents|amountbase|settlementquote|bondcents|treasury[_-]?(?:wallet|pubkey|address|bps|cents|leg|share)|custodyclaim)/i;
 
   it('keeps wallet, token, and settlement identifiers out of every sim file', () => {
     const offenders: string[] = [];
@@ -1114,6 +1120,11 @@ describe('the $WOC token firewall over src/sim', () => {
     expect(FIREWALL_RE.test('const w = walletForAccount(id);')).toBe(true);
     expect(FIREWALL_RE.test('const k = row.sellerWallet;')).toBe(true);
     expect(FIREWALL_RE.test('const escrowed = extractTradableCopy(inv, ref, def);')).toBe(false);
+    // The narrowed treasury arm, both directions: a fee destination or a split
+    // still bites, a room on a dungeon map does not.
+    expect(FIREWALL_RE.test('const dest = cfg.treasuryWallet;')).toBe(true);
+    expect(FIREWALL_RE.test('const bps = TREASURY_BPS;')).toBe(true);
+    expect(FIREWALL_RE.test("{ id: 'treasury', x0: 32, x1: 42 }")).toBe(false);
   });
 });
 
