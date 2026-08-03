@@ -1106,6 +1106,114 @@ export const TARGETS = [
     },
   },
   {
+    key: 'quest-marker-repeat',
+    label: 'Repeatable work-order marker (the blue "!")',
+    when: ['sim/quests/quest_marker_kind'],
+    // The four marker surfaces derive from the one classifier, so the pairs
+    // stage the classifier's INPUTS (questsDone history, the cadence window)
+    // rather than styling anything: the nameplate + minimap read live sim
+    // state, and the map variant opens the window over the same state. The
+    // work order and its sibling attune quest are seeded done so the giver
+    // offers ONLY the repeatable again (a live attune offer would win the
+    // fold with the first-offer gold and hide the blue under test).
+    variants: [
+      { key: 'repeat-desktop', stage: 'repeat' },
+      { key: 'cooldown-desktop', stage: 'cooldown' },
+      { key: 'repeat-map-desktop', stage: 'repeat', map: true },
+      { key: 'repeat-mobile', stage: 'repeat', mobile: true },
+    ],
+    async capture(page, variant) {
+      // Dismiss the overlays that can outlive entry, the leaderboard target's
+      // pre-shot sweep. No Escape: that OPENS the game menu over the frame.
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await wait(300);
+      const staged = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        const QUEST = 'q_prof_workorder_forge';
+        const ATTUNE = 'q_prof_attune_smith';
+        let giver = null;
+        for (const e of sim.entities?.values?.() ?? []) {
+          if (e?.kind === 'npc' && e.templateId === 'forgemistress_darva') giver = e;
+        }
+        if (!giver?.pos) return { ok: false, reason: 'forgemistress_darva not in the roster' };
+        // Face the giver: the camera looks along camYaw past the player, so
+        // standing 4yd behind the NPC on that axis puts her plate mid-frame
+        // (the player-tooltip target's placement, inverted for a fixed NPC).
+        // A tighter camera than the 12yd default so the 24px marker glyph
+        // reads at PR-thumbnail size.
+        player.pos.x = giver.pos.x - Math.sin(game.input.camYaw) * 4;
+        player.pos.z = giver.pos.z - Math.cos(game.input.camYaw) * 4;
+        game.input.camDist = 7;
+        sim.questsDone.add(ATTUNE);
+        sim.questsDone.add(QUEST);
+        if (shot.stage === 'cooldown') {
+          const meta = sim.players?.get?.(player.id);
+          if (!meta?.questCadence) return { ok: false, reason: 'quest cadence store unavailable' };
+          meta.questCadence.set(QUEST, (sim.tickCount ?? 0) + 36000);
+        }
+        return { ok: true };
+      }, variant);
+      if (!staged.ok) throw new Error(`quest-marker staging failed: ${staged.reason}`);
+      // The nameplate repaints on its own cadence; poll for the classified
+      // marker instead of trusting a fixed wait. SHOT_BASELINE=1 is the
+      // before/after protocol's BEFORE pass (base sources under the branch
+      // harness), where the base tree legitimately shows gold or nothing, so
+      // only the settle wait applies there.
+      const expected = variant.stage === 'cooldown' ? 'cooldown' : 'repeat';
+      if (process.env.SHOT_BASELINE === '1') {
+        await wait(1200);
+      } else {
+        let classified = false;
+        for (let attempt = 0; attempt < 16 && !classified; attempt++) {
+          await wait(250);
+          classified = await page.evaluate((cls) => {
+            const markers = Array.from(document.querySelectorAll('.np-marker'));
+            return markers.some(
+              (m) =>
+                m.className === `np-marker ${cls}` &&
+                m.textContent === '!' &&
+                getComputedStyle(m).display !== 'none',
+            );
+          }, expected);
+        }
+        if (!classified) throw new Error(`no nameplate classified np-marker ${expected}`);
+      }
+      // The Ravenpost mail toast lands a few seconds into every offline
+      // session and can straddle the capture; hide the banner slot for the
+      // shot (state, not styling: the marker under test is elsewhere).
+      await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.display = 'none';
+      });
+      if (variant.map) {
+        await page.evaluate(() => {
+          const el = document.querySelector('#map-window');
+          // Force hidden first so pollForSize cannot pass on a window already
+          // up from an earlier target (the market recipe's precedent).
+          if (el) el.style.display = 'none';
+        });
+        await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+        const open = await pollForSize(page, '#map-window');
+        if (!open) throw new Error('map window did not open');
+        // Zoom toward the player (the map opens centered on them) so the
+        // giver's glyph color is legible in the clipped window.
+        for (let i = 0; i < 3; i++) {
+          await page.evaluate(() => document.querySelector('#map-zoom-in')?.click());
+          await wait(250);
+        }
+        return { clip: '#map-window' };
+      }
+      return {};
+    },
+  },
+  {
     key: 'crafting',
     label: 'Crafting window',
     when: [
