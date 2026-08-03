@@ -42,6 +42,13 @@ function mainSource(): string {
     .replace(/(^|[^:])\/\/.*$/gm, '$1');
 }
 
+/** The extracted sweep cycle, comment-stripped the same way. */
+function sweepCycleSource(): string {
+  return readFileSync(new URL('../bot/sweep_cycle.ts', import.meta.url), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
 /**
  * Every scheduler task main.ts registers, the config field it must read, and the
  * sweep it must actually run.
@@ -73,9 +80,10 @@ const TASKS: readonly { name: string; field: string; idle?: string; run: string 
   // and the push; the case below pins which two it is handed.
   { name: 'special-roles-and-meta', field: 'roleSyncIntervalMs', run: 'refreshThenPushMeta' },
   // The liveness stamp (D15). It belongs on the scheduler rather than on a timer
-  // of its own precisely because that is what makes it evidence: the file's mtime
-  // advances only while the scheduler is still driving runs, so the container
-  // healthcheck reading it can tell a wedged bot from a busy one. Registered here
+  // of its own because that is what makes it evidence: the file's mtime advances
+  // only while the process, event loop, and scheduler machinery are alive (a
+  // single sibling task wedged on a never-settling run keeps stamping; the IO
+  // deadlines are the defense there, see the main.ts comment). Registered here
   // like every other loop, so it is covered by the exact-count assertion too.
   { name: 'heartbeat-file', field: 'heartbeatIntervalMs', run: 'writeHeartbeatFile' },
 ];
@@ -141,20 +149,20 @@ describe('bot/main.ts loop wiring', () => {
     }
   });
 
-  it('hands the sweep decision its clock, its slice size and its pass interval', () => {
-    // Phase 6 QA: nothing else can guard this call. The sweep-cycle rig mirrors
-    // main.ts rather than importing it (main() runs at module scope), so a
-    // dropped argument is invisible to every behavioral suite: without the
-    // third argument passDue never fires and the periodic pass silently becomes
-    // kick-only; without the second, DISCORD_SWEEP_SLICE_SIZE is inert and the
-    // slice falls back to the module default.
+  it('keeps ONE slice-decision site, inside the extracted cycle', () => {
+    // The nextSlice call and its three arguments live in bot/sweep_cycle.ts
+    // now, where the composed D18 suite drives them (the Phase 6 QA source pin
+    // on the inline call retired with the extraction; the knob wiring is pinned
+    // on the factory binding above). What remains for a source pin is the slice
+    // protocol's one-consumer assumption: main.ts must not keep, or regrow, a
+    // second decision site beside the binding.
     const source = mainSource();
-    expect(source).toContain(
-      'linkedSweep.nextSlice(Date.now(), cfg.sweepSliceSize, cfg.roleSyncIntervalMs)',
+    expect(source).not.toContain('.nextSlice(');
+    const cycle = sweepCycleSource();
+    expect(cycle).toContain(
+      'deps.linkedSweep.nextSlice(deps.now(), deps.sliceSize, deps.passIntervalMs)',
     );
-    // Exactly one decision site: a second nextSlice call would be a second
-    // consumer of the cursor, and the slice protocol assumes one.
-    expect((source.match(/linkedSweep\.nextSlice\(/g) ?? []).length).toBe(1);
+    expect((cycle.match(/\.nextSlice\(/g) ?? []).length).toBe(1);
   });
 
   it('kicks every task the events are supposed to kick, exactly as often', () => {
@@ -237,14 +245,16 @@ describe('bot/main.ts loop wiring', () => {
     // The resync bounds how long the members-meta diff cache may keep believing
     // the server still holds what the bot last pushed. Deleting it re-opens the
     // permanent divergence that dueForFullResync's header enumerates.
-    const source = mainSource();
-    expect(source).toMatch(/outcome === 'written'[\s\S]{0,80}?pushMemberMeta\(/);
+    // The rename-then-push ordering lives in the extracted cycle now; the pin
+    // moves with it (deps.pushMemberMeta is main's diff-guarded push, per the
+    // binding test above).
+    expect(sweepCycleSource()).toMatch(/outcome === 'written'[\s\S]{0,80}?deps\.pushMemberMeta\(/);
     // The WHOLE assignment, not just the two tokens near each other. An earlier
     // version pinned `dueForFullResync(...) ... lastPushedMeta.clear()`, which
     // matched with the predicate negated and with the restamp deleted; dropping
     // the restamp turns every later sweep into a full re-push, which is precisely
     // the load D5 removed.
-    expect(source).toMatch(
+    expect(mainSource()).toMatch(
       /lastFullMetaResyncMs = fullResyncIfDue\(lastFullMetaResyncMs, Date\.now\(\), lastPushedMeta\)/,
     );
   });
@@ -329,33 +339,54 @@ describe('bot/main.ts loop wiring', () => {
     expect(source).not.toContain('DEFAULT_HEARTBEAT_FILE');
   });
 
-  it('pins the sweep slice decisions no behavioral suite can reach', () => {
-    // Phase 6 QA: the D18 rig MIRRORS this loop rather than importing it, so
-    // these three lines had no guard at all: deleting the null-answer restore
-    // silently skips a whole slice on every failed flex-batch call, deleting
-    // the asked-set filter lets a buggy or compromised server answer aim role
-    // and nickname writes at arbitrary guild members, and deleting the
-    // metaStale drop suppresses a freshly linked member's join date and staff
-    // flair until the hourly resync. Sliced to the function body first, per the
-    // clause-anchor rule: a whole-file search is satisfied by a comment.
+  it('binds the sweep cycle to the production seams, config-complete', () => {
+    // The loop bodies themselves live in bot/sweep_cycle.ts, where the D18
+    // composed suite drives them directly (the Phase 6 QA text pins on the old
+    // inline bodies retired with the extraction). What only this file can say
+    // is the BINDING: which live maps, which config knobs, and which shell
+    // calls main.ts hands the factory. A binding that inlined a literal, swapped
+    // a knob, or dropped the guild id from a Discord write would type-check and
+    // pass every behavioral suite, because the rig binds its own fakes.
+    // Sliced to the factory call, per the clause-anchor rule.
     const source = mainSource();
-    const start = source.indexOf('const runSweepSlice');
-    const end = source.indexOf('const gateway = new Gateway', start);
+    const start = source.indexOf('createSweepCycle({');
+    const end = source.indexOf('});', start);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     const body = source.slice(start, end);
-    // `== null` and not `=== null`: flexBatch resolves undefined for a success
-    // envelope with no data field, and that answer observed nothing either.
-    expect(body).toContain('if (result == null)');
-    expect(body).toContain('linkedSweep.restoreSlice(slice);');
+    // The three D13 knobs, each from its own cfg field, plus the opt-out, plus
+    // the production clock (forwarding form, so it reads the global per call).
+    expect(body).toContain('sliceSize: cfg.sweepSliceSize');
+    expect(body).toContain('passIntervalMs: cfg.roleSyncIntervalMs');
+    expect(body).toContain('syncNicknames: cfg.syncNicknames');
+    expect(body).toContain('now: () => Date.now()');
+    // The guild id rides HERE, bound into each Discord write, so the cycle
+    // never sees config; a dropped or transposed argument aims writes at the
+    // wrong guild path and 404s silently through the drain helpers.
     expect(body).toContain(
-      'if (!asked.has(member.discord_user_id) || !memberRoles.has(member.discord_user_id))',
+      'addMemberRole: (userId, roleId) => discord.addMemberRole(cfg.guildId, userId, roleId)',
     );
-    expect(body).toContain('for (const id of outcome.metaStale) lastPushedMeta.delete(id);');
-    // The roster gate on flex-batch additions, the in-flight departure race.
-    expect(body).toMatch(
-      /applyFlexBatchResult\(slice\.ids, result, \(id\) =>\s*memberRoles\.has\(id\)/,
+    expect(body).toContain(
+      'removeMemberRole: (userId, roleId) => discord.removeMemberRole(cfg.guildId, userId, roleId)',
     );
+    expect(body).toContain(
+      'setNickname: (userId, nick) => discord.setNickname(cfg.guildId, userId, nick)',
+    );
+    // The live guild-state references and the two server seams, by name.
+    for (const seam of [
+      'linkedSweep,',
+      'tierRoleIds,',
+      'memberRoles,',
+      'nickCaches,',
+      'lastPushedMeta,',
+    ]) {
+      expect(body).toContain(seam);
+    }
+    expect(body).toContain('flexBatch: (ids) => server.flexBatch(ids)');
+    expect(body).toContain('pushMemberMeta: (userId) => pushMemberMeta(userId)');
+    // And the registration runs the factory's slice, on the role-sync task
+    // (the task table above pins the cadence fields).
+    expect(source).toContain('const { runSweepSlice } = createSweepCycle({');
   });
 
   it('routes every Discord and game-server call through the shells: no bare fetch', () => {

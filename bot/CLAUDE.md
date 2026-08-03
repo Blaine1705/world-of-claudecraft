@@ -79,6 +79,11 @@ includes `DOM` for the game client. Nothing in `bot/` may depend on a browser gl
   from outside (the outbox link-change feed, the flex-batch echo, the members-meta linkage
   signal) and each signal is applied for exactly as much as it can prove. Tested in
   `tests/discord_bot_linked_sweep.test.ts` and `tests/discord_bot_sweep_cycle.test.ts`.
+- `sweep_cycle.ts`: the role-sync sweep cycle behind injected deps: one flex-batch slice
+  per run, and what each answered member gets (the tier-role diff, the level nickname, the
+  diff-guarded meta follow-up). Extracted from `main.ts` so the composed D18 suite
+  (`tests/discord_bot_sweep_cycle.test.ts`) drives the PRODUCTION unit rather than a
+  hand-kept mirror; `main.ts` binds the deps and registers the task, and decides nothing.
 - `liveness.ts`: the container healthcheck's evidence. A pure freshness rule
   (`isHeartbeatFresh`, fresh means strictly under the stale window, and a FUTURE mtime is
   fresh so a clock step never kills a working bot) plus the thin writer the
@@ -194,11 +199,15 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   posts are non-essential, so the governor would refuse them, and a 200 is the outbox's only
   acknowledgement, so draining into refusals loses the items); each post is caught per item;
   a winners day is marked back on the server ONLY after its post landed, so a failed post
-  retries (at-least-once, duplicates accepted); and the poll runs on its own much longer
+  retries (at-least-once, duplicates accepted); a bounded process-local announced-days memo
+  (`OutboxPollState`) keeps a day whose MARK keeps failing from being re-announced every
+  poll (the re-serve skips straight to the mark retry; a restart costs the one documented
+  duplicate); and the poll runs on its own much longer
   deadline (`cfg.outboxTimeoutMs`, 70 s), which must stay ABOVE the server's read deadline.
   didWork is split by stream class: the three DRAINED streams count by carriage, the
-  re-served winners read counts by successful announce, so an unpostable winners day (unset
-  channel, durable 403) cannot pin the loop at the active cadence forever.
+  re-served winners read counts by successful MARK (the event that stops the re-serve), so
+  a winners day that cannot finish (unset channel, durable 403, a failing mark endpoint)
+  cannot pin the loop at the active cadence forever.
   Two honest limits of the consolidation, both deliberate: with a stream's channel id UNSET,
   drained relay/activity items are dropped after a once-per-channel notice (the pre-outbox
   pollers checked the channel BEFORE draining and left items queued; the drain is now
@@ -209,11 +218,14 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
 - Liveness stamp (`heartbeat-file`): re-writes `cfg.heartbeatFile` every
   `cfg.heartbeatIntervalMs` (`DISCORD_HEARTBEAT_INTERVAL_MS`, 30 s), and the compose
   healthcheck compares that file's mtime against now. It is on the scheduler rather than
-  on a timer of its own precisely so that it PROVES something: the mtime advances only
-  while the scheduler is still driving runs, which is what separates a wedged bot from a
-  busy one (a Discord bot has no port to probe, and a process that reconnected to nothing
-  looks perfectly healthy from outside). An unwritable path is logged and the run still
-  settles, so a bad mount degrades the healthcheck and never the bot.
+  on a timer of its own so that it PROVES something, and exactly this much: the mtime
+  advances only while the process, its event loop, and the scheduler machinery are alive
+  (a Discord bot has no port to probe, and a process that reconnected to nothing looks
+  perfectly healthy from outside). It does NOT prove the sibling tasks are healthy: tasks
+  chain independently, so one loop wedged on a never-settling run (L10) keeps the stamp
+  fresh; the IO deadlines on both shells are the defense there. An unwritable path is
+  logged and the run still settles, so a bad mount degrades the healthcheck and never the
+  bot.
 - Daily engagement grant: first message or voice-join per member per day, deduped
   bot-side AND server-side (grant dedupe key), so it is exactly-once.
 - The adaptive active-to-idle backoff has two consumers: the outbox poll (D1: 3 s active
@@ -299,7 +311,9 @@ pins and the value the bot falls back to cannot drift apart. The three knobs tha
 cadences take their defaults from the module that spends them, for the same reason:
 `DISCORD_SWEEP_SLICE_SIZE` (100, `DEFAULT_SWEEP_SLICE_SIZE` in `linked_sweep.ts`, how many
 members one slice may write to), `DISCORD_OUTBOX_TIMEOUT_MS` (70000,
-`DEFAULT_OUTBOX_TIMEOUT_MS` in `server_client.ts`, one poll's abort deadline), and
+`DEFAULT_OUTBOX_TIMEOUT_MS` in `server_client.ts`, one poll's abort deadline; the
+default is also an enforced FLOOR, since a deadline under the server's own 65 s
+drain deadline silently loses outbox items, so the knob can only raise it), and
 `DISCORD_HEARTBEAT_FILE` (`/tmp/discord-bot-heartbeat`, `DEFAULT_HEARTBEAT_FILE` in
 `liveness.ts`, the path the compose healthcheck stats; empty or whitespace falls back, and
 the value is trimmed). Each of these

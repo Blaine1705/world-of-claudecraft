@@ -82,6 +82,7 @@ function res(
     headers?: Record<string, string>;
     json?: unknown;
     jsonParsed?: boolean;
+    nonJsonBody?: boolean;
   } = {},
 ): GovernorResponse {
   return {
@@ -89,6 +90,7 @@ function res(
     headers: opts.headers ?? {},
     json: opts.json,
     jsonParsed: opts.jsonParsed ?? true,
+    nonJsonBody: opts.nonJsonBody,
   };
 }
 
@@ -640,7 +642,7 @@ describe('rate governor Cloudflare ban arm', () => {
     // are what say it did not fall through to a short retry.
     const { governor, clock, slept, logs } = governorFixture();
     const { send, sentAt } = queuedSend(clock, [
-      res({ status: 429, headers: { 'retry-after': '1' }, jsonParsed: false }),
+      res({ status: 429, headers: { 'retry-after': '1' }, jsonParsed: false, nonJsonBody: true }),
       res({}),
     ]);
 
@@ -669,7 +671,7 @@ describe('rate governor Cloudflare ban arm', () => {
     // above and fail this one.
     const { governor, clock, slept } = governorFixture();
     const banned = queuedSend(clock, [
-      res({ status: 429, headers: { 'retry-after': '1' }, jsonParsed: false }),
+      res({ status: 429, headers: { 'retry-after': '1' }, jsonParsed: false, nonJsonBody: true }),
     ]);
 
     const first = governor.run({ method: 'GET', path: '/guilds/1/roles' }, banned.send);
@@ -686,6 +688,30 @@ describe('rate governor Cloudflare ban arm', () => {
     await second;
     expect(later.sentAt).toEqual([777_000]);
     expect(slept).toEqual([777_000]);
+  });
+
+  it('retries a 429 whose body read failed or was empty as a NORMAL 429, never a ban', async () => {
+    // The shell signals a ban only for a body that was READ, non-empty, and not
+    // JSON. A jsonParsed:false 429 WITHOUT that signal is a transient read
+    // failure (the call deadline aborting mid-body, a reset after headers) on a
+    // genuine Discord 429, so it must wait out the Retry-After header and retry
+    // instead of silencing the whole process for banPauseMs.
+    const { governor, clock, slept, logs } = governorFixture();
+    const { send, sentAt } = queuedSend(clock, [
+      res({ status: 429, headers: { 'retry-after': '2' }, jsonParsed: false }),
+      res({}),
+    ]);
+
+    const pending = governor.run({ method: 'GET', path: '/guilds/1/roles' }, send);
+    await clock.runAll();
+
+    expect((await pending).status).toBe(200);
+    // Retried after the header's 2 seconds, not swallowed by a 123000 ms ban.
+    expect(sentAt).toEqual([0, 2000]);
+    expect(slept).toEqual([2000]);
+    expect(governor.snapshot().banPauses).toBe(0);
+    expect(logs.filter((l) => l.level === 'error').length).toBe(0);
+    expect(logs.filter((l) => l.message === '[bot] discord rate limited').length).toBe(1);
   });
 });
 

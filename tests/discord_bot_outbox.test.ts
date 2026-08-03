@@ -11,6 +11,8 @@
 import { describe, expect, it } from 'vitest';
 import type { ActivityItem, DailyRewardWinnersDay, RelayItem } from '../bot/logic';
 import {
+  ANNOUNCED_DAYS_MAX,
+  freshOutboxPollState,
   OutboxChannelUnsetError,
   type OutboxIo,
   outboxIoFor,
@@ -317,24 +319,86 @@ describe('outbox winners announce-then-mark', () => {
     expect(rec.errors).toEqual([{ where: 'winners', message: 'winners 2026-07-30 refused' }]);
   });
 
-  it('reports a failed mark without retrying it in-run', async () => {
+  it('reports a failed mark without retrying it in-run, and counts no progress', async () => {
     // ServerClient answers null for a failed call rather than throwing, so the
     // RETURN VALUE is the only signal there is; `undefined` counts too, since a
     // success envelope carrying no data comes back verbatim. Neither may be read
     // as a mark that landed, and neither may be retried here: the retry is the
     // same request that just failed, and the day is re-served next poll anyway.
+    // No progress either: the mark is the event that stops the re-serve, so a
+    // day whose mark keeps failing must decay the cadence, not hold it.
     for (const result of [null, undefined]) {
       const rec = recorder({
         envelope: envelope({ winners: { days: [winnersDay('2026-07-31')] } }),
         markResult: () => result,
       });
 
-      expect(await runOutboxPoll(rec.io)).toBe(true);
+      expect(await runOutboxPoll(rec.io)).toBe(false);
       expect(rec.calls).toEqual(['drain', 'links:0', 'winners:2026-07-31', 'mark:2026-07-31']);
       expect(rec.errors).toEqual([
         { where: 'winners-mark', message: 'day 2026-07-31 was posted but not marked' },
       ]);
     }
+  });
+
+  it('never re-announces a day it already posted: the memo skips straight to the mark retry', async () => {
+    // The item that can never succeed: a mark endpoint that keeps failing. The
+    // server re-serves the day on every poll, and without the announced-days
+    // memo each re-serve would duplicate the winners post in the channel (about
+    // twenty a minute at the active cadence). With a shared state the re-served
+    // day goes straight to the mark retry.
+    const state = freshOutboxPollState();
+    const days = { winners: { days: [winnersDay('2026-07-31')] } };
+    const first = recorder({ envelope: envelope(days), markResult: () => null });
+    expect(await runOutboxPoll(first.io, state)).toBe(false);
+    expect(first.calls).toEqual(['drain', 'links:0', 'winners:2026-07-31', 'mark:2026-07-31']);
+
+    const second = recorder({ envelope: envelope(days), markResult: () => null });
+    expect(await runOutboxPoll(second.io, state)).toBe(false);
+    // No winners post this time; only the mark was retried.
+    expect(second.calls).toEqual(['drain', 'links:0', 'mark:2026-07-31']);
+
+    // The retry that finally lands is progress, and it clears the memo entry,
+    // so a future day with the same key (a fresh server row after an ops
+    // reset) would be announced again rather than silently swallowed.
+    const third = recorder({ envelope: envelope(days) });
+    expect(await runOutboxPoll(third.io, state)).toBe(true);
+    expect(third.calls).toEqual(['drain', 'links:0', 'mark:2026-07-31']);
+    expect(state.announcedDays.size).toBe(0);
+  });
+
+  it('re-announces after a restart: the memo is process-local by design', async () => {
+    // A fresh state per process is the documented at-least-once cost: the one
+    // duplicate follows a restart, never a steady-state poll.
+    const days = { winners: { days: [winnersDay('2026-07-31')] } };
+    const first = recorder({ envelope: envelope(days), markResult: () => null });
+    await runOutboxPoll(first.io, freshOutboxPollState());
+    const second = recorder({ envelope: envelope(days), markResult: () => null });
+    await runOutboxPoll(second.io, freshOutboxPollState());
+
+    expect(first.winners.map((d) => d.day)).toEqual(['2026-07-31']);
+    expect(second.winners.map((d) => d.day)).toEqual(['2026-07-31']);
+  });
+
+  it('bounds the announced-days memo AT its cap, evicting the oldest entry', async () => {
+    // The bound is reached, not merely respected: one more day than the cap,
+    // every mark failing, must leave exactly ANNOUNCED_DAYS_MAX entries with
+    // the OLDEST evicted, so the memo can never grow for the life of a process
+    // whose marks are broken. The evicted day's observable consequence is a
+    // re-announce on its next re-serve; the survivors skip theirs.
+    const state = freshOutboxPollState();
+    const dayKeys = Array.from({ length: ANNOUNCED_DAYS_MAX + 1 }, (_, i) => {
+      return `2026-06-${String(i + 1).padStart(2, '0')}`;
+    });
+    const rec = recorder({
+      envelope: envelope({ winners: { days: dayKeys.map((d) => winnersDay(d)) } }),
+      markResult: () => null,
+    });
+    await runOutboxPoll(rec.io, state);
+
+    expect(state.announcedDays.size).toBe(ANNOUNCED_DAYS_MAX);
+    expect([...state.announcedDays]).toEqual(dayKeys.slice(1));
+    expect(state.announcedDays.has(dayKeys[0])).toBe(false);
   });
 
   it('survives a mark that REJECTS, so the link changes still land', async () => {
@@ -467,18 +531,20 @@ describe('outbox poll didWork signal', () => {
     expect(refused.marks).toEqual([]);
   });
 
-  it('counts an announced winners day as work even when its mark failed', async () => {
-    // Progress is the ANNOUNCE: a posted day is real work (and the re-serve
-    // after a failed mark needs the fast cadence to land the mark promptly).
-    // A drained stream beside it must also still count when the winners day is
-    // the one that failed, so the two signals stay independent.
+  it('counts winners progress by the MARK, never by the announce alone', async () => {
+    // Progress is the mark, the event that stops the re-serve. An announced day
+    // whose mark failed is re-served next poll, so counting the announce would
+    // hold the fast cadence for as long as the mark endpoint stays broken (the
+    // same unpostable-item shape the Phase 6 QA gate found on the post side).
     const rec = recorder({
       envelope: envelope({ winners: { days: [winnersDay('2026-07-31')] } }),
       markResult: () => null,
     });
-    expect(await runOutboxPoll(rec.io)).toBe(true);
+    expect(await runOutboxPoll(rec.io)).toBe(false);
     expect(rec.winners.map((d) => d.day)).toEqual(['2026-07-31']);
 
+    // A drained stream beside a failed winners day must still count: the two
+    // signals stay independent.
     const mixed = recorder({
       envelope: envelope({
         relay: { items: [relayItem('c9')] },

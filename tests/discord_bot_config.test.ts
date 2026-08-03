@@ -3,7 +3,7 @@
 // they are testable in plain Node; the env arms mutate `process.env` and restore
 // it key by key so nothing leaks into another test file.
 import { readFileSync } from 'node:fs';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   HEARTBEAT_INTERVAL_MS,
   OUTBOX_IDLE_MS,
@@ -509,7 +509,11 @@ describe('loadConfig cadence knobs (D13)', () => {
       field: 'outboxTimeoutMs',
       constant: 'DEFAULT_OUTBOX_TIMEOUT_MS',
       fallback: 70000,
-      override: '65500',
+      // Above the default on purpose: the default is also the FLOOR for this
+      // knob (a deadline below the server's own drain deadline silently loses
+      // outbox items), so a below-70000 override would fall back and fail the
+      // distinct-value case. The floor itself has its own arms below.
+      override: '84000',
     },
     // The two Phase 6 sweep knobs. The slice interval is a cadence like the
     // three above; the slice SIZE is a threshold, so its default lives beside
@@ -615,6 +619,32 @@ describe('loadConfig cadence knobs (D13)', () => {
       expect(cfg[knob.field]).toBe(Number(knob.override));
       expect(cfg[knob.field]).not.toBe(knob.fallback);
     }
+  });
+
+  it('floors the outbox deadline at its default instead of honoring a shorter one', () => {
+    // The one knob with a floor as well as a fallback. The default sits above
+    // the server's 65 s drain deadline BECAUSE a 200 is the outbox's only
+    // acknowledgement: a poll aborted client-side that the server later answers
+    // 200 to consumes items nobody received. An operator shortening the
+    // deadline mid-incident is exactly who this guards, so a positive
+    // below-floor value falls back loudly rather than silently losing items.
+    setRequired();
+    const warnings: unknown[][] = [];
+    const spy = vi.spyOn(console, 'warn').mockImplementation((...args: unknown[]) => {
+      warnings.push(args);
+    });
+
+    process.env.DISCORD_OUTBOX_TIMEOUT_MS = '30000';
+    expect(loadConfig().outboxTimeoutMs).toBe(70000);
+    expect(warnings.length).toBe(1);
+    expect(String(warnings[0][0])).toContain('DISCORD_OUTBOX_TIMEOUT_MS');
+
+    // AT the floor is honored without a warning: the guard is strictly-below.
+    warnings.length = 0;
+    process.env.DISCORD_OUTBOX_TIMEOUT_MS = '70000';
+    expect(loadConfig().outboxTimeoutMs).toBe(70000);
+    expect(warnings.length).toBe(0);
+    spy.mockRestore();
   });
 
   it('falls back to the default for empty, non-numeric, zero and negative alike', () => {

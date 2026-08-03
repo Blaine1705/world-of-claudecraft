@@ -46,6 +46,7 @@ export interface PresenceCounters {
   forbiddenEntries: number;
   forbiddenBlocks: number;
   breakerBlocks: number;
+  queueFullBlocks: number;
 }
 
 /**
@@ -119,6 +120,7 @@ export function collectPresenceCounters(read: () => GovernorCounters): PresenceC
       forbiddenEntries: normalizeCount(source.forbiddenEntries),
       forbiddenBlocks: normalizeCount(source.forbiddenBlocks),
       breakerBlocks: normalizeCount(source.breakerBlocks),
+      queueFullBlocks: normalizeCount(source.queueFullBlocks),
     };
   } catch {
     return null;

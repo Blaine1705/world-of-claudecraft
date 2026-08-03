@@ -45,9 +45,15 @@ export const DISCORD_CALL_TIMEOUT_MS = 15_000;
 
 /**
  * Why the bot edited a member, written into Discord's audit log (D14). Plain
- * ASCII and well inside Discord's 1 to 512 character bound.
+ * ASCII and well inside Discord's 1 to 512 character bound. Two constants, one
+ * per member-edit kind, so an operator reading the guild audit log sees which
+ * sync wrote the entry: the nickname PATCH carries the level-on-name reason,
+ * the role add/remove pair the status-tier one.
  */
 export const AUDIT_LOG_REASON = 'World of ClaudeCraft level sync';
+
+/** The role add/remove pair's audit-log reason (same D14 bounds). */
+export const ROLE_AUDIT_LOG_REASON = 'World of ClaudeCraft status tier sync';
 
 /**
  * Discord rejects a reason header that is empty or over 512 characters, and any
@@ -250,10 +256,15 @@ export class DiscordApi {
               errorText: text,
             };
           } catch {
+            // nonJsonBody only when text is non-empty: an empty string here
+            // means the read failed (the .catch above) or the body was blank,
+            // and the governor must retry that as a normal 429 rather than
+            // score it as a Cloudflare ban.
             return {
               status: 429,
               headers: collected,
               jsonParsed: false,
+              nonJsonBody: text !== '',
               ok: false,
               data: null,
               errorText: text,
@@ -390,6 +401,7 @@ export class DiscordApi {
   async addMemberRole(guildId: string, userId: string, roleId: string): Promise<void> {
     await this.request('PUT', `/guilds/${guildId}/members/${userId}/roles/${roleId}`, undefined, {
       subjectKey: rolesSubject(guildId, userId),
+      reason: ROLE_AUDIT_LOG_REASON,
     });
   }
 
@@ -400,6 +412,7 @@ export class DiscordApi {
       undefined,
       {
         subjectKey: rolesSubject(guildId, userId),
+        reason: ROLE_AUDIT_LOG_REASON,
       },
     );
   }

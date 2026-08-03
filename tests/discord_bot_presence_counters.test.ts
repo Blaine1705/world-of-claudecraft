@@ -34,6 +34,7 @@ const WIRE_KEYS = [
   'forbiddenEntries',
   'forbiddenBlocks',
   'breakerBlocks',
+  'queueFullBlocks',
 ];
 
 /** The four scopes, and no fifth. */
@@ -42,7 +43,7 @@ const SCOPE_KEYS = ['user', 'global', 'shared', 'unknown'];
 /**
  * A governor snapshot with a DISTINCT value in every numeric field. Distinct on
  * purpose: an all-zero or all-one fixture is satisfied by a collector that maps
- * requests to rateLimited, which is the realistic way a fourteen-field literal
+ * requests to rateLimited, which is the realistic way a fifteen-field literal
  * goes wrong.
  */
 function distinctSnapshot(): GovernorCounters {
@@ -61,6 +62,7 @@ function distinctSnapshot(): GovernorCounters {
     forbiddenEntries: 110,
     forbiddenBlocks: 111,
     breakerBlocks: 112,
+    queueFullBlocks: 113,
   };
 }
 
@@ -98,6 +100,7 @@ describe('collectPresenceCounters shape', () => {
       forbiddenEntries: 110,
       forbiddenBlocks: 111,
       breakerBlocks: 112,
+      queueFullBlocks: 113,
     });
   });
 
@@ -168,8 +171,9 @@ describe('collectPresenceCounters normalization', () => {
     { name: 'a boolean', field: 'trackedRoutes', value: true },
     { name: 'an object', field: 'activeQueues', value: {} },
     { name: 'a fraction below one', field: 'forbiddenEntries', value: 0.9 },
-    { name: 'NaN on the second-to-last field', field: 'forbiddenBlocks', value: Number.NaN },
-    { name: 'a negative on the last field', field: 'breakerBlocks', value: -1 },
+    { name: 'NaN on the third-to-last field', field: 'forbiddenBlocks', value: Number.NaN },
+    { name: 'a negative on the second-to-last field', field: 'breakerBlocks', value: -1 },
+    { name: 'a string on the last field', field: 'queueFullBlocks', value: '9' },
   ];
 
   for (const arm of ARMS) {
@@ -318,6 +322,7 @@ describe('withPresenceCounters', () => {
       forbiddenEntries: 110,
       forbiddenBlocks: 111,
       breakerBlocks: 112,
+      queueFullBlocks: 113,
     });
   });
 

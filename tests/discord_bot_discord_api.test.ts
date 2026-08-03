@@ -11,6 +11,7 @@ import {
   DISCORD_CALL_TIMEOUT_MS,
   DiscordApi,
   governorFromConfig,
+  ROLE_AUDIT_LOG_REASON,
   sanitizeAuditReason,
 } from '../bot/discord_api';
 import {
@@ -442,6 +443,29 @@ describe('DiscordApi 429 handling through the governor', () => {
     expect(banned[0].fields.pauseMs).toBe(DEFAULT_BAN_PAUSE_MS);
   });
 
+  it('retries a 429 whose body read failed as a normal 429, never as a ban', async () => {
+    // The realistic non-JSON-429 trigger is not Cloudflare: it is the call
+    // deadline aborting mid-body-read, or a reset after headers, on a genuine
+    // Discord 429 (which always carries a JSON body). The shell reports that as
+    // jsonParsed:false WITHOUT the nonJsonBody ban signal, so the governor
+    // waits the floor and retries instead of pausing the whole process for
+    // banPauseMs and counting an invalid request.
+    const { governor, slept, logs } = testGovernor();
+    const { calls, impl } = recordingFetch([
+      fakeResponse({ status: 429, textThrows: true }),
+      fakeResponse({ body: [] }),
+    ]);
+
+    expect(await new DiscordApi('tok', impl, governor).guildRoles('g1')).toEqual([]);
+
+    // One retry after the MISSING_RETRY_AFTER floor (no readable body, no
+    // Retry-After header), and no ban: no error log, no ban pause counted.
+    expect(calls.length).toBe(2);
+    expect(slept).toEqual([1000]);
+    expect(logs.filter((l) => l.level === 'error').length).toBe(0);
+    expect(governor.snapshot().banPauses).toBe(0);
+  });
+
   it('bounds the retries: a route that answers 429 forever gives up and throws', async () => {
     const { governor, slept } = testGovernor();
     const { calls, impl } = recordingFetch([
@@ -482,6 +506,33 @@ describe('DiscordApi governor wiring', () => {
     expect(AUDIT_LOG_REASON.length).toBeLessThanOrEqual(512);
     // Plain ASCII: a non-ASCII byte does not survive the header round trip.
     expect(/^[\x20-\x7E]+$/.test(AUDIT_LOG_REASON)).toBe(true);
+  });
+
+  it('sends its OWN X-Audit-Log-Reason on both role member edits (D14)', async () => {
+    // Role grants and revokes are member edits too, and the guild audit log is
+    // the operator surface D14 exists for; the pair carries the status-tier
+    // reason, distinct from the nickname's level one, so an entry names which
+    // sync wrote it.
+    const { governor } = testGovernor();
+    const { calls, impl } = recordingFetch([
+      fakeResponse({ status: 204 }),
+      fakeResponse({ status: 204 }),
+    ]);
+    const api = new DiscordApi('tok', impl, governor);
+
+    await api.addMemberRole('g1', 'u1', 'r1');
+    await api.removeMemberRole('g1', 'u1', 'r1');
+
+    for (const call of calls) {
+      const headers = call.init.headers as Record<string, string>;
+      expect(headers['X-Audit-Log-Reason']).toBe(ROLE_AUDIT_LOG_REASON);
+    }
+    // Same Discord bounds as the nickname reason, and distinct from it so the
+    // audit log can actually tell the two syncs apart.
+    expect(ROLE_AUDIT_LOG_REASON.length).toBeGreaterThanOrEqual(1);
+    expect(ROLE_AUDIT_LOG_REASON.length).toBeLessThanOrEqual(512);
+    expect(/^[\x20-\x7E]+$/.test(ROLE_AUDIT_LOG_REASON)).toBe(true);
+    expect(ROLE_AUDIT_LOG_REASON).not.toBe(AUDIT_LOG_REASON);
   });
 
   it('does NOT send an audit reason on calls that are not member PATCHes', async () => {
@@ -682,6 +733,7 @@ describe('governorFromConfig', () => {
       status: 429,
       headers: {},
       jsonParsed: false,
+      nonJsonBody: true,
     }));
     await clock.runAll();
     await banned;
@@ -746,6 +798,7 @@ describe('governorFromConfig', () => {
       status: 429,
       headers: {},
       jsonParsed: false,
+      nonJsonBody: true,
     }));
 
     expect(errors.length).toBe(1);

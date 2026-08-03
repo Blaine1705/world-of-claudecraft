@@ -99,6 +99,26 @@ function positiveNumberFromEnv(raw: string | undefined, fallback: number): numbe
   return value;
 }
 
+/**
+ * The outbox deadline parse: positiveNumberFromEnv plus a FLOOR at the default.
+ * DEFAULT_OUTBOX_TIMEOUT_MS is chosen to sit ABOVE the server's own 65 s read
+ * deadline, and a 200 is the outbox's only acknowledgement: a client deadline
+ * below the server's aborts polls the server later answers 200 to, and every
+ * item in that drain is consumed with nobody receiving it, silently. So this
+ * knob can only RAISE the deadline; a positive value below the floor logs once
+ * and falls back rather than shipping silent queue loss.
+ */
+function outboxTimeoutFromEnv(raw: string | undefined, floor: number): number {
+  const value = positiveNumberFromEnv(raw, floor);
+  if (value < floor) {
+    console.warn(
+      `[bot] DISCORD_OUTBOX_TIMEOUT_MS ${value} is below the server's drain deadline and would lose outbox items; using the ${floor} ms floor`,
+    );
+    return floor;
+  }
+  return value;
+}
+
 export function loadConfig(): BotConfig {
   return {
     token: required('DISCORD_BOT_TOKEN'),
@@ -146,8 +166,10 @@ export function loadConfig(): BotConfig {
     // The one cadence knob whose default does NOT live in bot/cadence.ts: it is
     // a request deadline, not a loop interval, and it is chosen against the
     // server's own read deadline. Importing the client's constant is what keeps
-    // the fallback here and the drainOutbox default from drifting apart.
-    outboxTimeoutMs: positiveNumberFromEnv(
+    // the fallback here and the drainOutbox default from drifting apart. The
+    // default is also the FLOOR (see outboxTimeoutFromEnv): the knob can only
+    // raise the deadline.
+    outboxTimeoutMs: outboxTimeoutFromEnv(
       process.env.DISCORD_OUTBOX_TIMEOUT_MS,
       DEFAULT_OUTBOX_TIMEOUT_MS,
     ),

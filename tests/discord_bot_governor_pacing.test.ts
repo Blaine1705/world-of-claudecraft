@@ -782,6 +782,10 @@ describe('RateGovernor queue depth cap', () => {
       ),
     );
     expect((blocked as Error).message).not.toContain(INTERACTION_TOKEN);
+    // The refusal is the one block class with its own counter (the other two
+    // are pinned in the counters suite); an operator reading the presence push
+    // must be able to see a saturated queue shedding load.
+    expect(governor.snapshot().queueFullBlocks).toBe(1);
 
     await clock.runAll();
     await Promise.all(queued);
@@ -795,7 +799,7 @@ describe('RateGovernor queue depth cap', () => {
 describe('RateGovernor pacing and memory across a pause (L11, L12)', () => {
   /** A 429 whose body is not JSON at all: the Cloudflare-ban shape. */
   function banned(): GovernorResponse {
-    return { status: 429, headers: {}, json: null, jsonParsed: false };
+    return { status: 429, headers: {}, json: null, jsonParsed: false, nonJsonBody: true };
   }
 
   it('re-reserves a rate slot after a pause, so pre-pause holders do not fire together (L11)', async () => {

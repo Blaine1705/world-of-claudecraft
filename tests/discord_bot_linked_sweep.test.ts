@@ -235,6 +235,31 @@ describe('link-change feed', () => {
     expect(sweep.hasNoLinkRow(A)).toBe(true);
   });
 
+  it('skips a malformed item and still applies the well-formed ones beside it', () => {
+    // Item-level tolerance matching the consumer's stream-level listOf: the
+    // apply runs AFTER the outbox drain consumed all four streams, so a throw
+    // on one malformed element would reject the whole poll and lose every
+    // relay and activity post in the same envelope. One bad item costs itself.
+    const sweep = seeded([]);
+    const malformed = [
+      null,
+      42,
+      'u9',
+      { kinds: ['link'] },
+      { kinds: ['link'], discordUserId: 7 },
+      { kinds: ['link'], discordUserId: '' },
+      { kinds: 'link', discordUserId: A },
+    ] as unknown as Parameters<typeof sweep.applyLinkChangeItems>[0];
+
+    const summary = sweep.applyLinkChangeItems([...malformed, item(B, ['link'])], anyMember);
+
+    // The non-array kinds item carries a usable id: it proves nothing terminal,
+    // but linkage evidence still applies (the same reading a flex item gets).
+    expect(summary.added).toEqual([A, B]);
+    expect(summary.removed).toEqual([]);
+    expect(sweep.has(B)).toBe(true);
+  });
+
   it('applies successive items in order, so the last one decides', () => {
     const sweep = seeded([]);
     sweep.applyLinkChangeItems([item(A, ['link'])], anyMember);

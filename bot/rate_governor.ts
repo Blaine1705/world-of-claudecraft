@@ -60,6 +60,16 @@ export interface GovernorResponse {
   /** Parsed body when `jsonParsed`; otherwise meaningless. */
   json?: unknown;
   jsonParsed: boolean;
+  /**
+   * True only when a 429 body was actually READ, was non-empty, and still
+   * failed to parse as JSON: the Cloudflare ban-page signal. The shell computes
+   * this where the body is read because `jsonParsed: false` alone cannot carry
+   * it: a body read that failed or came back empty (the call deadline aborting
+   * mid-read, a reset after headers) also parses as nothing, and a genuine
+   * Discord 429 always carries a JSON body, so a transient read hiccup must be
+   * retried as a normal 429, never scored as a ban.
+   */
+  nonJsonBody?: boolean;
 }
 
 export interface GovernorRequest {
@@ -118,6 +128,8 @@ export interface GovernorCounters {
   forbiddenBlocks: number;
   /** Requests refused outright because the breaker was open. */
   breakerBlocks: number;
+  /** Requests refused outright because their bucket queue was full. */
+  queueFullBlocks: number;
 }
 
 // Safe defaults for the four env knobs (D13). They live here, beside the logic
@@ -213,6 +225,15 @@ export class GovernorBlockedError extends Error {
  * True for a path segment that varies per call. Snowflakes are all digits;
  * interaction and webhook tokens are long opaque strings. `@me` and `@original`
  * are literals despite sitting where an id would.
+ *
+ * BOUNDARY HAZARD: the length test also fires on a LITERAL segment of 16 or
+ * more characters, and Discord has real ones ('scheduled-events' is exactly
+ * 16, 'auto-moderation' one short). Every literal segment the bot calls today
+ * is under 16 characters, so no live route is affected, but a new call site
+ * with a long literal would be silently templated as ':id', merging its
+ * provisional key, FIFO queue, and bucket fallback with unrelated routes until
+ * the X-RateLimit-Bucket remap corrects it. When adding such a route, extend
+ * the `@`-style literal carve-out here in the same change.
  */
 function isVariableSegment(segment: string): boolean {
   if (segment.startsWith('@')) return false;
@@ -418,6 +439,7 @@ export class RateGovernor {
     forbiddenEntries: 0,
     forbiddenBlocks: 0,
     breakerBlocks: 0,
+    queueFullBlocks: 0,
   };
 
   constructor(options: RateGovernorOptions) {
@@ -500,6 +522,7 @@ export class RateGovernor {
     const queue = this.queueFor(template);
     if (queue.waiting >= MAX_QUEUE_DEPTH) {
       if (probe.isProbe) this.probeInFlight = false;
+      this.counters.queueFullBlocks++;
       throw new GovernorBlockedError(
         'queue-full',
         `[bot] governor refused ${template}: bucket queue is full`,
@@ -697,10 +720,14 @@ export class RateGovernor {
     this.counters.rateLimited++;
     this.counters.rateLimitedByScope[scope]++;
 
-    // A 429 body that is not JSON is Cloudflare, not Discord: the edge has
-    // started refusing us outright. Treat it as a ban and stop process-wide for
-    // far longer than any retry_after would suggest.
-    if (!response.jsonParsed) {
+    // A 429 body that is PRESENT and not JSON is Cloudflare, not Discord: the
+    // edge has started refusing us outright. Treat it as a ban and stop
+    // process-wide for far longer than any retry_after would suggest. Keyed on
+    // the shell's explicit nonJsonBody signal, not on !jsonParsed: a body read
+    // that failed or came back empty (an abort mid-read, a reset after headers)
+    // is a transient IO hiccup on a genuine Discord 429, and falls through to
+    // the normal retry path below with the Retry-After header or the floor.
+    if (response.nonJsonBody === true) {
       this.pausedUntil = Math.max(this.pausedUntil, now + this.banPauseMs);
       this.counters.banPauses++;
       this.recordInvalid();

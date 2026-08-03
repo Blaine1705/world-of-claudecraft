@@ -210,6 +210,7 @@ const PRESENCE_COUNTERS: PresenceCounters = {
   forbiddenEntries: 110,
   forbiddenBlocks: 111,
   breakerBlocks: 112,
+  queueFullBlocks: 113,
 };
 
 /**
@@ -219,7 +220,7 @@ const PRESENCE_COUNTERS: PresenceCounters = {
  * and key order is half of what this pins.
  */
 const PRESENCE_BODY_WITH_COUNTERS =
-  '{"onlineCount":3,"memberTotal":9,"voiceChannelName":null,"voice":[],"counters":{"requests":101,"rateLimited":102,"rateLimitedByScope":{"user":201,"global":202,"shared":203,"unknown":204},"globalPauses":103,"banPauses":104,"breakerState":"half-open","breakerOpens":105,"queueDepth":106,"trackedBuckets":107,"trackedRoutes":108,"activeQueues":109,"forbiddenEntries":110,"forbiddenBlocks":111,"breakerBlocks":112}}';
+  '{"onlineCount":3,"memberTotal":9,"voiceChannelName":null,"voice":[],"counters":{"requests":101,"rateLimited":102,"rateLimitedByScope":{"user":201,"global":202,"shared":203,"unknown":204},"globalPauses":103,"banPauses":104,"breakerState":"half-open","breakerOpens":105,"queueDepth":106,"trackedBuckets":107,"trackedRoutes":108,"activeQueues":109,"forbiddenEntries":110,"forbiddenBlocks":111,"breakerBlocks":112,"queueFullBlocks":113}}';
 
 const ROUTE_ROWS: {
   name: string;

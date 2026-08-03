@@ -9,10 +9,11 @@
 // and queued every Discord write it produced at once, and no assertion about any
 // single piece of it was wrong.
 //
-// So this rig wires the REAL LinkedSweep, the REAL LoopScheduler and the REAL
-// write paths against fake IO, at the D18 envelope (5000 guild members, 1000
-// online, 300 linked), and asserts the four properties that decide whether the
-// bot is healthy in production:
+// So this rig wires the REAL sweep cycle (bot/sweep_cycle.ts, the unit
+// bot/main.ts registers), over the REAL LinkedSweep, the REAL LoopScheduler and
+// the REAL write paths, against fake IO, at the D18 envelope (5000 guild
+// members, 1000 online, 300 linked), and asserts the four properties that
+// decide whether the bot is healthy in production:
 //   D6  the sweep asks about LINKED members, never the online set or the roster;
 //   the SPREAD, that one tick's writes are bounded by one slice and the slices
 //       sit a slice interval apart on the clock;
@@ -23,21 +24,16 @@
 // not move under fake timers, so a rig built on them passes for an
 // implementation that quietly reads the real one (tests/helpers/synthetic_clock.ts).
 import { describe, expect, it } from 'vitest';
-import { LinkedSweep, unappliedIdsFrom } from '../bot/linked_sweep';
-import {
-  buildLevelNick,
-  computeRoleSync,
-  type FlexData,
-  type MemberMetaRecord,
-} from '../bot/logic';
+import { DEFAULT_SWEEP_SLICE_SIZE, LinkedSweep, unappliedIdsFrom } from '../bot/linked_sweep';
+import { buildLevelNick, type MemberMetaRecord } from '../bot/logic';
 import {
   type NicknameCaches,
   pushChangedMemberMeta,
   pushOneMemberMeta,
-  writeMemberNickname,
 } from '../bot/member_writes';
 import { GovernorBlockedError, MAX_QUEUE_DEPTH } from '../bot/rate_governor';
 import { LoopScheduler, type ScheduledTask, type SchedulerTimers } from '../bot/scheduler';
+import { createSweepCycle } from '../bot/sweep_cycle';
 import { type SyntheticClock, syntheticClock } from './helpers/synthetic_clock';
 
 // The D18 envelope. Named rather than inline because several assertions are
@@ -134,12 +130,14 @@ interface Rig {
 }
 
 /**
- * The bot's sweep wiring, rebuilt over fake IO.
+ * The bot's sweep wiring over fake IO, around the PRODUCTION cycle.
  *
- * It mirrors bot/main.ts deliberately and cannot import it: main.ts calls
- * main() at module scope, so importing it boots the whole bot (real env, real
- * Discord REST, a real WebSocket). tests/discord_bot_main_wiring.test.ts pins
- * that the production file still has this shape; this drives the shape.
+ * The loop bodies come from bot/sweep_cycle.ts, the unit bot/main.ts registers
+ * (main.ts itself calls main() at module scope, so importing IT would boot the
+ * whole bot: real env, real Discord REST, a real WebSocket). This rig only
+ * rebuilds what main.ts BINDS: the fake shells, the guild-state maps, and the
+ * scheduler registration; tests/discord_bot_main_wiring.test.ts pins that
+ * main.ts still binds the same seams.
  */
 function buildRig(): Rig {
   const clock = syntheticClock(1_000_000);
@@ -247,46 +245,30 @@ function buildRig(): Rig {
     role: null,
   });
 
-  // The same body bot/main.ts runs, minus the config plumbing: the flex payload
-  // arrives as an argument rather than being fetched per member.
-  const syncRolesFor = async (
-    userId: string,
-    flex: FlexData & { linked: boolean },
-  ): Promise<void> => {
-    if (!flex.linked) return;
-    const { toAdd, toRemove } = computeRoleSync({
-      tier: flex.statusTier,
-      memberRoleIds: memberRoles.get(userId) ?? [],
-      tierRoleIds,
-    });
-    for (const roleId of toAdd) {
-      try {
-        await discord.addMemberRole(userId, roleId);
-        memberRoles.set(userId, [...(memberRoles.get(userId) ?? []), roleId]);
-      } catch {
-        /* retried next pass, exactly as main.ts does */
-      }
-    }
-    for (const roleId of toRemove) {
-      try {
-        await discord.removeMemberRole(userId, roleId);
-        memberRoles.set(
-          userId,
-          (memberRoles.get(userId) ?? []).filter((r) => r !== roleId),
-        );
-      } catch {
-        /* retried next pass */
-      }
-    }
-    if (!flex.character) return;
-    const base = flex.username ?? caches.memberNames.get(userId) ?? 'Member';
-    const nick = buildLevelNick(base, flex.character.level, flex.character.class);
-    const outcome = await writeMemberNickname(userId, nick, caches, {
-      setNickname: (id, value) => discord.setNickname(id, value),
-    });
-    if (outcome === 'written')
-      await pushOneMemberMeta(memberMetaRecord(userId), lastPushedMeta, metaIo);
-  };
+  // The PRODUCTION cycle, the same unit bot/main.ts registers, bound to this
+  // rig's fake IO the way main.ts binds it to the real shells. The rig used to
+  // carry a hand-kept mirror of the two loop bodies; the extraction into
+  // bot/sweep_cycle.ts is what lets the composed D5/D6/spread claims below pin
+  // the code production actually runs.
+  const cycle = createSweepCycle({
+    linkedSweep: sweep,
+    now: () => clock.now(),
+    sliceSize: SLICE_SIZE,
+    passIntervalMs: PASS_MS,
+    syncNicknames: true,
+    tierRoleIds,
+    memberRoles,
+    nickCaches: caches,
+    lastPushedMeta,
+    discord,
+    flexBatch: (ids) => server.flexBatch([...ids]),
+    pushMemberMeta: async (id) => {
+      await pushOneMemberMeta(memberMetaRecord(id), lastPushedMeta, metaIo);
+    },
+    onError: () => {
+      /* refusals are counted by the governed gate above */
+    },
+  });
 
   // The roster members-meta push, wired the way main.ts wires it: the response
   // reports which of the ids it accepted had no link row, and that answer is
@@ -310,29 +292,7 @@ function buildRig(): Rig {
     });
   };
 
-  const runSweepSlice = async (): Promise<boolean> => {
-    const slice = sweep.nextSlice(clock.now(), SLICE_SIZE, PASS_MS);
-    if (slice === null) return false;
-    const result = await server.flexBatch(slice.ids);
-    if (result == null) {
-      sweep.restoreSlice(slice);
-      return false;
-    }
-    const outcome = sweep.applyFlexBatchResult(slice.ids, result, (id) => memberRoles.has(id));
-    for (const id of outcome.metaStale) lastPushedMeta.delete(id);
-    const asked = new Set(slice.ids);
-    for (const member of result.members) {
-      if (!asked.has(member.discord_user_id) || !memberRoles.has(member.discord_user_id)) {
-        continue;
-      }
-      try {
-        await syncRolesFor(member.discord_user_id, member);
-      } catch {
-        /* per member, so one refusal costs that member's turn and not the slice */
-      }
-    }
-    return true;
-  };
+  const runSweepSlice = cycle.runSweepSlice;
 
   // Whether a run is between its first await and its last. The test driver needs
   // this rather than the clock's pending-sleeper count: `kick()` clears the
@@ -508,12 +468,17 @@ describe('the sweep at the D18 envelope', () => {
       expect(tickTotal).toBe(SLICE_SIZE * 3);
       perQueue.push(...kinds.values());
     }
-    // The bound that decides whether work is DROPPED: a burst past the
-    // governor's per-queue depth is refused, which reads in production as flair
-    // that silently stopped updating. Reached, not merely respected: every
-    // queue really did take a full slice's worth, so the bound is not vacuous.
+    // The per-queue peak really is one full slice: reached, not merely
+    // respected, so the spread claim above is not vacuous.
     expect(Math.max(...perQueue)).toBe(SLICE_SIZE);
-    for (const count of perQueue) expect(count).toBeLessThan(MAX_QUEUE_DEPTH);
+    // The relationship that decides whether work is DROPPED: a burst past the
+    // governor's per-queue depth is refused, which reads in production as flair
+    // that silently stopped updating. Asserted on the PRODUCTION constants, not
+    // on this file's local SLICE_SIZE: 100 < 256 by construction here, so a
+    // local comparison could never go red, while a production slice-size raise
+    // past the queue depth is exactly the regression this line exists to catch.
+    expect(DEFAULT_SWEEP_SLICE_SIZE).toBeLessThan(MAX_QUEUE_DEPTH);
+    expect(SLICE_SIZE).toBe(DEFAULT_SWEEP_SLICE_SIZE);
 
     // And the ticks sit exactly one slice interval apart. Jitter is pinned at
     // the band's midpoint (random 0.5), which jitteredDelayMs returns as the

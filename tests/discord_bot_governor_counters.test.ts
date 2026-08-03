@@ -3,7 +3,7 @@
 // Every monotonic counter is asserted as a DELTA around ONE driven event, never
 // as a running total: against a total, a counter that moved twice reads exactly
 // like a counter that moved once, and a counter that never moved reads like a
-// counter whose event did not happen. The delta map covers all seven monotonic
+// counter whose event did not happen. The delta map covers all eight monotonic
 // counters plus all four scope buckets at once, so a test named for `banPauses`
 // also proves that same event did not quietly bump `globalPauses` as well. The
 // live gauges (queueDepth, trackedBuckets, forbiddenEntries, breakerState) are
@@ -22,6 +22,7 @@ import {
   type GovernorRequest,
   type GovernorResponse,
   MAX_ATTEMPTS,
+  MAX_QUEUE_DEPTH,
   RateGovernor,
   type RateGovernorOptions,
 } from '../bot/rate_governor';
@@ -69,6 +70,7 @@ function reply(opts: Partial<GovernorResponse> = {}): GovernorResponse {
     headers: opts.headers ?? {},
     json: opts.json,
     jsonParsed: opts.jsonParsed ?? true,
+    nonJsonBody: opts.nonJsonBody,
   };
 }
 
@@ -113,7 +115,8 @@ type MonotonicCounter =
   | 'banPauses'
   | 'breakerOpens'
   | 'forbiddenBlocks'
-  | 'breakerBlocks';
+  | 'breakerBlocks'
+  | 'queueFullBlocks';
 
 const MONOTONIC: MonotonicCounter[] = [
   'requests',
@@ -123,6 +126,7 @@ const MONOTONIC: MonotonicCounter[] = [
   'breakerOpens',
   'forbiddenBlocks',
   'breakerBlocks',
+  'queueFullBlocks',
 ];
 
 const SCOPES = ['user', 'global', 'shared', 'unknown'] as const;
@@ -136,6 +140,7 @@ const NO_MOVEMENT: Record<string, number> = {
   breakerOpens: 0,
   forbiddenBlocks: 0,
   breakerBlocks: 0,
+  queueFullBlocks: 0,
   'scope.user': 0,
   'scope.global': 0,
   'scope.shared': 0,
@@ -187,6 +192,7 @@ describe('RateGovernor snapshot shape', () => {
       forbiddenEntries: 0,
       forbiddenBlocks: 0,
       breakerBlocks: 0,
+      queueFullBlocks: 0,
     });
   });
 
@@ -406,7 +412,7 @@ describe('RateGovernor counters move exactly once per event', () => {
       clock,
       governor.run(ROLES, async () => {
         sent++;
-        return reply({ status: 429, jsonParsed: false });
+        return reply({ status: 429, jsonParsed: false, nonJsonBody: true });
       }),
     );
 
@@ -481,6 +487,37 @@ describe('RateGovernor counters move exactly once per event', () => {
     expect(movement(blocked, after)).toEqual({ ...NO_MOVEMENT, requests: 1 });
     // An essential success is not a probe, so it must not close the breaker.
     expect(after.breakerState).toBe('open');
+  });
+
+  it('counts a queue-full refusal once and never reaches the send callback', async () => {
+    // The refusal and its counter both land synchronously inside run(), before
+    // any await, so the snapshots on either side of the call isolate exactly
+    // this one event: no queued request has dispatched yet (requests stays 0).
+    const { governor, clock } = makeGovernor();
+    const gate = deferred<GovernorResponse>();
+    const queued: Promise<GovernorResponse>[] = [];
+    for (let i = 0; i < MAX_QUEUE_DEPTH; i++) {
+      queued.push(governor.run(ROLES, () => gate.promise));
+    }
+    const before = governor.snapshot();
+
+    let sent = 0;
+    const refused = governor.run(ROLES, async () => {
+      sent++;
+      return reply();
+    });
+    const after = governor.snapshot();
+
+    const blocked = await refused.catch((error: unknown) => error);
+    expect(blocked).toBeInstanceOf(GovernorBlockedError);
+    expect((blocked as GovernorBlockedError).reason).toBe('queue-full');
+    expect(sent).toBe(0);
+    expect(movement(before, after)).toEqual({ ...NO_MOVEMENT, queueFullBlocks: 1 });
+
+    // Release the gate and drain, so the case leaves no pending virtual work.
+    gate.resolve(reply());
+    await clock.runAll();
+    await Promise.all(queued);
   });
 
   it('counts a cache-refused subject once and never reaches the send callback', async () => {

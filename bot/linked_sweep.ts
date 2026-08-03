@@ -327,9 +327,15 @@ export class LinkedSweep {
     const dirtied: string[] = [];
     const metaStale: string[] = [];
     for (const item of items) {
+      // Item-level tolerance, matching the outbox consumer's stream-level
+      // listOf: this list is network input whatever the types say, and the
+      // apply runs AFTER the drain consumed all four streams, so a throw on
+      // one malformed element would reject the poll and lose every relay and
+      // activity post in the same envelope. One bad item costs itself only.
+      if (item === null || typeof item !== 'object') continue;
       const id = item.discordUserId;
-      if (!id) continue;
-      const terminal = terminalLinkKind(item.kinds ?? []);
+      if (typeof id !== 'string' || id === '') continue;
+      const terminal = terminalLinkKind(Array.isArray(item.kinds) ? item.kinds : []);
       if (terminal === 'unlink') {
         // The row is gone, so anything the bot believes it pushed for this id is
         // attached to nothing. Recorded only for roster members, which is what

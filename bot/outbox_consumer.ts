@@ -147,6 +147,37 @@ function callFailed(result: unknown): boolean {
 }
 
 /**
+ * Cross-poll memory for the winners stream: the days this process has already
+ * announced. The server re-serves an unannounced day on every poll until a mark
+ * lands, so without this a day whose MARK persistently fails would be
+ * re-announced to the channel every cycle; with it, the re-served day skips the
+ * post and only retries the mark. Process-local on purpose (a restart loses it
+ * and one duplicate announce follows, which the at-least-once contract already
+ * accepts), and bounded: the server answers at most a couple of days per
+ * envelope, so past the cap the oldest entry is evicted.
+ */
+export interface OutboxPollState {
+  announcedDays: Set<string>;
+}
+
+export function freshOutboxPollState(): OutboxPollState {
+  return { announcedDays: new Set() };
+}
+
+/** Announced-days memo bound; far above the server's own days-per-envelope cap. */
+export const ANNOUNCED_DAYS_MAX = 16;
+
+function rememberAnnounced(state: OutboxPollState, day: string): void {
+  state.announcedDays.delete(day);
+  state.announcedDays.add(day);
+  while (state.announcedDays.size > ANNOUNCED_DAYS_MAX) {
+    const oldest = state.announcedDays.keys().next();
+    if (oldest.done) break;
+    state.announcedDays.delete(oldest.value);
+  }
+}
+
+/**
  * One poll: drain, fan the four streams out, and report whether there was work.
  *
  * The return value is the scheduler's didWork signal, so it decides the cadence:
@@ -157,14 +188,24 @@ function callFailed(result: unknown): boolean {
  *   CARRIAGE, not post outcome: the drain consumed them, so fifty relay items
  *   with every post refused still means a backlog existed, and backing off
  *   then would be exactly backwards.
- * - The winners stream counts by PROGRESS (a day successfully announced). It is
- *   a re-served READ, not a drained queue: the server answers the same
- *   unannounced day on every poll until a mark lands, so counting it by
- *   carriage would let a day that can never be posted (an unset channel, a
- *   durable 403) hold the fast cadence forever, for every stream at once now
- *   that this is the one loop. Found by the Phase 6 QA gate.
+ * - The winners stream counts by PROGRESS, and progress is the MARK, because
+ *   the mark is the event that stops the re-serve. It is a re-served READ, not
+ *   a drained queue: the server answers the same unannounced day on every poll
+ *   until a mark lands, so counting it by carriage, or by the announce alone,
+ *   would let a day that can never finish (an unset channel, a durable 403, a
+ *   mark endpoint that keeps failing) hold the fast cadence forever, for every
+ *   stream at once now that this is the one loop. Found by the Phase 6 QA gate;
+ *   the announce-only half found in review after it.
+ *
+ * `state` carries the announced-days memo across polls; the default fresh state
+ * keeps single-shot callers (and the existing tests' single polls) unchanged.
+ * The production registration in bot/main.ts holds ONE state for the task's
+ * lifetime, which is what makes the memo actually suppress re-announces.
  */
-export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
+export async function runOutboxPoll(
+  io: OutboxIo,
+  state: OutboxPollState = freshOutboxPollState(),
+): Promise<boolean> {
   // THE BREAKER GATE, and it is the reason this returns before the drain rather
   // than after it. Relay posts, activity cards and winner announcements are all
   // non-essential createMessage calls, which the governor REFUSES while the
@@ -235,25 +276,27 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
   // unannounced server-side until the mark lands, which is what makes the stream
   // at-least-once: a failed post leaves it to be re-served next poll. Marking
   // first would make it at-most-once, and the day nobody saw would be gone.
+  // A day this process ALREADY announced (in the memo because its mark failed)
+  // skips the post and goes straight to the mark retry, so a broken mark
+  // endpoint costs one duplicate-free retry per poll, never a duplicate post.
   let winnersProgress = false;
   for (const day of winnerDays) {
-    let announced = false;
-    try {
-      await io.postWinnersDay(day);
-      announced = true;
-      // Progress is the ANNOUNCE, whatever the mark below does: a posted day is
-      // real work even if it will be re-served, while a day that cannot post at
-      // all must not hold the cadence (see the didWork split above).
-      winnersProgress = true;
-    } catch (error) {
-      report(error, 'winners');
+    let announced = state.announcedDays.has(day.day);
+    if (!announced) {
+      try {
+        await io.postWinnersDay(day);
+        announced = true;
+        rememberAnnounced(state, day.day);
+      } catch (error) {
+        report(error, 'winners');
+      }
     }
     if (!announced) continue;
     // A failed MARK is not retried in this run: the request that would retry it
     // is the same request that just failed, and the day is re-served next poll
-    // anyway. The cost is a duplicate announcement, which the at-least-once
-    // contract already accepts; the cost of retrying here is a tight loop
-    // against a server that has already refused.
+    // anyway (where the memo above suppresses the re-announce). The cost of
+    // retrying here instead would be a tight loop against a server that has
+    // already refused.
     //
     // Caught as well as result-checked, even though the client this is wired to
     // answers nullish rather than rejecting. An escaping throw would skip the
@@ -262,6 +305,13 @@ export async function runOutboxPoll(io: OutboxIo): Promise<boolean> {
     try {
       if (callFailed(await io.markWinnersDay(day.day))) {
         report(new Error(`day ${day.day} was posted but not marked`), 'winners-mark');
+      } else {
+        // Progress is the MARK, the event that stops the re-serve: a marked day
+        // will not come back, so its memo entry is dropped too. An announced
+        // day whose mark failed is deliberately NOT progress, or an unmarkable
+        // day would hold the fast cadence forever (the didWork split above).
+        winnersProgress = true;
+        state.announcedDays.delete(day.day);
       }
     } catch (error) {
       report(error, 'winners-mark');

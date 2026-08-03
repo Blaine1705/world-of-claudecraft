@@ -19,15 +19,12 @@ import { departedFromSeed, LinkedSweep, unappliedIdsFrom } from './linked_sweep'
 import { writeHeartbeatFile } from './liveness';
 import {
   allTierRoleNames,
-  buildLevelNick,
   buildLinkContent,
   buildWhoamiContent,
   claimDailyActive,
   clearDepartedFlair,
   clearedMemberMeta,
-  computeRoleSync,
   type DailyActiveState,
-  type FlexData,
   GUILD_LARGE_THRESHOLD,
   indexSpecialRoleIds,
   isSlashCommand,
@@ -52,12 +49,12 @@ import {
   pushOneMemberMeta,
   pushRejected,
   refreshThenPushMeta,
-  writeMemberNickname,
 } from './member_writes';
-import { outboxIoFor, runOutboxPoll } from './outbox_consumer';
+import { freshOutboxPollState, outboxIoFor, runOutboxPoll } from './outbox_consumer';
 import { withPresenceCounters } from './presence_counters';
 import { LoopScheduler } from './scheduler';
 import { ServerClient, type VoiceMemberPush } from './server_client';
+import { createSweepCycle } from './sweep_cycle';
 
 async function main(): Promise<void> {
   // Load .env (and optional .env.local) into process.env, matching server/db.ts.
@@ -282,139 +279,32 @@ async function main(): Promise<void> {
   };
 
   // ── role sync (one paced slice of the linked-member set at a time) ───────────
-  // The flex payload arrives as an ARGUMENT now rather than being fetched here.
-  // It used to be one GET per member per sweep, which at a thousand concurrent
-  // players was a thousand uncached server reads every five minutes; the sweep
-  // below asks about a whole slice in one flex-batch request instead. What this
-  // function does with the payload is unchanged.
-  const syncRolesFor = async (
-    userId: string,
-    flex: FlexData & { linked: boolean },
-  ): Promise<void> => {
-    if (!flex.linked) return;
-    const { toAdd, toRemove } =
-      tierRoleIds.size > 0
-        ? computeRoleSync({
-            tier: flex.statusTier,
-            memberRoleIds: memberRoles.get(userId) ?? [],
-            tierRoleIds,
-          })
-        : { toAdd: [] as string[], toRemove: [] as string[] };
-    // Only update the cached role set when the Discord API call actually
-    // succeeds, so a failed add/remove is retried on the next sync (not masked
-    // by a cache that wrongly claims success).
-    for (const roleId of toAdd) {
-      try {
-        await discord.addMemberRole(cfg.guildId, userId, roleId);
-        memberRoles.set(userId, [...(memberRoles.get(userId) ?? []), roleId]);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    for (const roleId of toRemove) {
-      try {
-        await discord.removeMemberRole(cfg.guildId, userId, roleId);
-        memberRoles.set(
-          userId,
-          (memberRoles.get(userId) ?? []).filter((r) => r !== roleId),
-        );
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    // Attach the in-game level + class icon to the member's Discord nickname.
-    // The base name fallback can be the member's already-suffixed live nick
-    // (flex.username is null for older links), so buildLevelNick strips any
-    // existing suffix first to stay idempotent across re-syncs.
-    if (cfg.syncNicknames && flex.character) {
-      const base = flex.username ?? memberNames.get(userId) ?? 'Member';
-      const nick = buildLevelNick(base, flex.character.level, flex.character.class);
-      // D5: only PATCH when the computed nick actually differs from the nick we
-      // last observed. This is the incident's biggest single source of load: the
-      // write was unconditional, so every linked online member was PATCHed every
-      // sweep forever, and each PATCH made Discord emit a GUILD_MEMBER_UPDATE that
-      // the handler below turned into a members-meta POST back into the game.
-      const outcome = await writeMemberNickname(userId, nick, nickCaches, {
-        setNickname: (id, value) => discord.setNickname(cfg.guildId, id, value),
-        onError: (e) => console.error('[bot] setNickname failed', e),
-      });
-      // A successful rename has to reach the game NOW, not on the next sweep.
-      // The name in a members-meta record is player-visible: the server stores it
-      // and emits it as the in-world Discord nameplate. Before the echo was
-      // suppressed, Discord's own GUILD_MEMBER_UPDATE was what carried it, within
-      // seconds; suppressing that without replacing it would leave the nameplate
-      // showing the old level for up to a whole role-sync interval.
-      // It cannot re-open the echo loop: this push is diff-guarded, so it happens
-      // exactly once, and the echo that follows finds the record already pushed.
-      if (outcome === 'written') await pushMemberMeta(userId);
-    }
-  };
-
-  /**
-   * ONE slice of the sweep, which is what the role-sync task now runs.
-   *
-   * The sweep this replaces did the whole population in a single run: it walked
-   * every online member, spent one server read each, and queued whatever Discord
-   * writes came out of them all at once. That is the shape that turned a slow
-   * minute into a storm, because the burst lands on the rate governor's queues
-   * faster than they drain and every later run piles onto the same queues.
-   * Handing back one bounded slice per run turns the same work into a spread:
-   * the module decides WHICH members, the scheduler decides WHEN, and neither
-   * needs to know about the other.
-   *
-   * Returns whether it did work, which is the scheduler's didWork signal: a
-   * slice snaps the cadence back to the slice interval so the rest of the pass
-   * follows promptly, and an empty run decays it toward the full sweep interval
-   * so an idle bot is not paying for a wake every three seconds.
-   */
-  const runSweepSlice = async (): Promise<boolean> => {
-    const slice = linkedSweep.nextSlice(Date.now(), cfg.sweepSliceSize, cfg.roleSyncIntervalMs);
-    if (slice === null) return false;
-    const result = await server.flexBatch(slice.ids);
-    if (result == null) {
-      // server_client answers null for a failed call rather than throwing, so
-      // this is the only failure signal there is (`== null` because a success
-      // envelope with no data field resolves to undefined, which observed
-      // nothing either). Nothing was observed, so no belief may move: the
-      // slice goes back to be re-served, and the run counts as empty so the
-      // cadence backs off instead of retrying every three seconds against a
-      // server that is already refusing.
-      linkedSweep.restoreSlice(slice);
-      return false;
-    }
-    // The roster gate keeps a stale answer from re-adding a member a departure
-    // or the seed prune removed while this request was in flight.
-    const outcome = linkedSweep.applyFlexBatchResult(slice.ids, result, (id) =>
-      memberRoles.has(id),
-    );
-    // A member whose link row is new has meta the bot believes it already
-    // pushed, attached to a row that no longer exists. Dropping the cached
-    // record BEFORE syncing them is what lets the nickname write's own push
-    // through; leaving it would suppress their join date and staff flair until
-    // the hourly resync.
-    for (const id of outcome.metaStale) lastPushedMeta.delete(id);
-    const asked = new Set(slice.ids);
-    for (const member of result.members) {
-      // Only ids this slice actually asked about AND still in the guild: the
-      // sweep's writes are driven by the answer, an answer carrying an id
-      // nobody asked for must not be able to aim a role write at an arbitrary
-      // guild member, and a member who departed while the slice was in flight
-      // must not get one last doomed 404 pass (their re-add is already gated
-      // on the same roster).
-      if (!asked.has(member.discord_user_id) || !memberRoles.has(member.discord_user_id)) {
-        continue;
-      }
-      try {
-        await syncRolesFor(member.discord_user_id, member);
-      } catch (e) {
-        // Per member, so one refusal (a governor-blocked write, an open breaker)
-        // costs that member's turn and not the rest of the slice. Their caches
-        // are left untouched by the write paths, so the next pass retries them.
-        console.error('[bot] sweep sync failed for', member.discord_user_id, e);
-      }
-    }
-    return true;
-  };
+  // The cycle itself lives in bot/sweep_cycle.ts so the composed-behavior suite
+  // drives the production unit; this is only the binding. Everything passed is
+  // either a boot-time config value or a LIVE reference the gateway handlers
+  // keep writing (tierRoleIds, memberRoles, nickCaches, lastPushedMeta), and
+  // the three Discord writes carry the guild id here so the cycle never needs
+  // the config. pushMemberMeta is a thunk because its const is declared below;
+  // the cycle only calls it at run time, long after boot finishes wiring.
+  const { runSweepSlice } = createSweepCycle({
+    linkedSweep,
+    now: () => Date.now(),
+    sliceSize: cfg.sweepSliceSize,
+    passIntervalMs: cfg.roleSyncIntervalMs,
+    syncNicknames: cfg.syncNicknames,
+    tierRoleIds,
+    memberRoles,
+    nickCaches,
+    lastPushedMeta,
+    discord: {
+      addMemberRole: (userId, roleId) => discord.addMemberRole(cfg.guildId, userId, roleId),
+      removeMemberRole: (userId, roleId) => discord.removeMemberRole(cfg.guildId, userId, roleId),
+      setNickname: (userId, nick) => discord.setNickname(cfg.guildId, userId, nick),
+    },
+    flexBatch: (ids) => server.flexBatch(ids),
+    pushMemberMeta: (userId) => pushMemberMeta(userId),
+    onError: (message, error) => console.error(message, error),
+  });
 
   // ── gateway dispatch ─────────────────────────────────────────────────────────
   const gateway = new Gateway(cfg.token, await discord.gatewayUrl(), {
@@ -859,11 +749,15 @@ async function main(): Promise<void> {
     run: () => refreshTierRoles(),
   });
   // The liveness stamp (D15). It is a scheduler task rather than a timer of its
-  // own precisely so that it proves something: the file's mtime only advances
-  // while the scheduler is still driving runs, so a container healthcheck reading
-  // it can tell a wedged bot from a busy one. A failed write is logged and the
-  // run still settles, so an unwritable path degrades the healthcheck rather than
-  // taking the bot down with it.
+  // own so that it proves something, and precisely this much: the file's mtime
+  // advances only while the process, its event loop, and the scheduler's
+  // timer-arming machinery are alive. It does NOT prove the sibling tasks are
+  // healthy: each task chains independently, so one loop wedged on a run that
+  // never settles (ledger L10) leaves this stamp advancing and the healthcheck
+  // green; the structural defense there is the IO deadlines both shells carry,
+  // not this file. A failed write is logged and the run still settles, so an
+  // unwritable path degrades the healthcheck rather than taking the bot down
+  // with it.
   scheduler.add({
     name: 'heartbeat-file',
     cadence: { activeMs: cfg.heartbeatIntervalMs },
@@ -873,10 +767,13 @@ async function main(): Promise<void> {
   // each ran at, so a busy bot delivers exactly as promptly as before; every
   // empty drain then decays the delay toward `idleMs`, and the first item to
   // arrive snaps it straight back, so the quiet-hours saving costs no latency.
+  // ONE state for the task's lifetime: the announced-days memo only suppresses
+  // duplicate winner announcements if it survives from poll to poll.
+  const outboxState = freshOutboxPollState();
   scheduler.add({
     name: 'outbox',
     cadence: { activeMs: cfg.outboxPollMs, idleMs: cfg.outboxIdleMs },
-    run: () => runOutboxPoll(outboxIo),
+    run: () => runOutboxPoll(outboxIo, outboxState),
   });
   const memberMetaTask = scheduler.add({
     name: 'special-roles-and-meta',
