@@ -12,6 +12,7 @@ import {
   DUNGEON_X_THRESHOLD,
   instanceOrigin,
   MOBS,
+  QUESTS,
   ZONES,
   zoneAt,
   zoneContaining,
@@ -267,7 +268,7 @@ describe('resolveRespawnSeconds: full precedence', () => {
     expect(isSelfScheduled(MOBS.thornpeak_ogre)).toBe(false);
   });
 
-  it('keeps Warlord Drogmar on his declared hour, not the trash delay', () => {
+  it('keeps Warlord Drogmar on the quest-target cadence, not the trash delay', () => {
     // He is boss + elite with boss-tier loot and NO rare flag, the exact shape
     // that silently inherited a trash timer. The explicit multiplier is what
     // fixes that, so both halves are pinned: the flags that do not schedule him,
@@ -275,15 +276,36 @@ describe('resolveRespawnSeconds: full precedence', () => {
     const drogmar = MOBS.warlord_drogmar;
     expect(drogmar.boss).toBe(true);
     expect(drogmar.rare).toBeUndefined();
-    expect(drogmar.respawnMult).toBe(144);
+    expect(drogmar.respawnMult).toBe(7.2);
     expect(isSelfScheduled(drogmar)).toBe(true);
-    // 144 * 25 = one hour, and it holds wherever he stands.
-    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined)).toBe(3600);
-    expect(resolveRespawnSeconds(drogmar, vale, undefined)).toBe(3600);
+    // 7.2 * 25 = three minutes, and it holds wherever he stands.
+    expect(resolveRespawnSeconds(drogmar, thornpeak, undefined)).toBe(180);
+    expect(resolveRespawnSeconds(drogmar, vale, undefined)).toBe(180);
     // Decisive against a regression to the trash delay.
     expect(resolveRespawnSeconds(drogmar, thornpeak, undefined)).not.toBe(TRASH_RESPAWN_SECONDS);
-    // He matches Marrowlord Varkas, the neighbour his value was calibrated to.
+    // He matches Old Cragmaw, the shipped cadence for a quest kill target, and
+    // deliberately NOT Marrowlord Varkas's boss hour: a required quest step
+    // must not make a party wait or queue. This is the assertion that fails if
+    // someone "corrects" him onto a boss cadence without reading q_drogmar.
+    expect(resolveRespawnSeconds(MOBS.old_cragmaw, thornpeak, undefined)).toBe(180);
     expect(resolveRespawnSeconds(MOBS.marrowlord_varkas, thornpeak, undefined)).toBe(3600);
+  });
+
+  it('holds Drogmar to a quest-friendly cadence because a quest requires him', () => {
+    // The premise the cadence rests on, pinned so it cannot rot silently: if
+    // q_drogmar ever stops requiring the kill, the three minutes is free to be
+    // revisited, and whoever revisits it should see this test say so.
+    const objectives = QUESTS.q_drogmar?.objectives ?? [];
+    expect(objectives).toContainEqual(
+      expect.objectContaining({ type: 'kill', targetMobId: 'warlord_drogmar' }),
+    );
+    // Coin held to Varkas parity instead, which is what keeps the corridor
+    // honest now that cadence cannot.
+    const coin = MOBS.warlord_drogmar.loot.find((e) => e.copper)?.copper;
+    expect(coin).toBe(650);
+    expect(MOBS.marrowlord_varkas.loot.find((e) => e.copper)?.copper).toBe(650);
+    // The three unique drops survive, so the kill still pays like a boss.
+    expect(MOBS.warlord_drogmar.loot.filter((e) => e.itemId)).toHaveLength(3);
   });
 
   it('uses the SPAWN position, not the death position', () => {
