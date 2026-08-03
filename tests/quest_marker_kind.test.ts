@@ -13,6 +13,7 @@ import {
   npcQuestMarkerKind,
   type QuestMarkerKind,
   questMarkerKind,
+  questMarkerRank,
   strongerQuestMarker,
 } from '../src/sim/quests/quest_marker_kind';
 import type { QuestDef, QuestProgress } from '../src/sim/types';
@@ -127,6 +128,31 @@ describe('the fold order', () => {
   it('keeps the left value on ties, so a left fold is order-stable', () => {
     for (const k of KINDS) expect(strongerQuestMarker(k, k)).toBe(k);
   });
+
+  it('ready is the maximum, through the fold itself: two surfaces short-circuit on it', () => {
+    // The nameplate and minimap loops break as soon as the fold reaches
+    // 'ready'. That is only sound while nothing outranks it, and this pin
+    // asks the production fold directly (not the mirrored RANK table above),
+    // so ranking a hypothetical new kind above 'ready' reddens here even if
+    // the mirror is updated in lockstep.
+    for (const k of KINDS) {
+      expect(strongerQuestMarker('ready', k)).toBe('ready');
+      expect(strongerQuestMarker(k, 'ready')).toBe('ready');
+    }
+  });
+
+  it('exposes the fold rank the list-producing consumers sort by', () => {
+    // questGiverNpcMarkers orders its tooltip list by questMarkerRank; this
+    // pins that the exported rank IS the fold's order, so the two can never
+    // be maintained apart.
+    for (const a of KINDS) {
+      for (const b of KINDS) {
+        const stronger = strongerQuestMarker(a, b);
+        const byRank = questMarkerRank(b) > questMarkerRank(a) ? b : a;
+        expect(stronger, `${a} vs ${b}`).toBe(byRank);
+      }
+    }
+  });
 });
 
 describe('npcQuestMarkerKind: the per-template fold', () => {
@@ -170,6 +196,26 @@ describe('the real work-order lifecycle through computeQuestState', () => {
     expect(workOrder).toBeDefined();
     expect(workOrder.repeatable).toBe(true);
     expect(workOrder.repeatCadenceTicks).toBe(WORK_ORDER_CADENCE_TICKS);
+    // The content assigns the field FROM the constant, so the line above is
+    // structural only; the literal pins the 30-minute window itself.
+    expect(WORK_ORDER_CADENCE_TICKS).toBe(36000);
+  });
+
+  it('a cadence-blocked quest shows cooldown even while another gate also blocks it (deliberate)', () => {
+    // q_prof_hobby_switch is repeatable, cadenced, AND an identity-transition
+    // quest: with another transition active, computeQuestState blocks it at
+    // the identity gate before ever reaching the cadence check, while the
+    // armed window still lists it in the blocked set. The marker still says
+    // cooldown, DELIBERATELY: the window claim is true, and the set drops
+    // the id the moment the window lapses, so the dim mark cannot outlive
+    // the cadence it reports (the leaf header records the reasoning).
+    const hobby = QUESTS.q_prof_hobby_switch;
+    expect(hobby.repeatable).toBe(true);
+    expect(hobby.repeatCadenceTicks).toBe(WORK_ORDER_CADENCE_TICKS);
+    expect(hobby.completionEffect?.type).toBe('switchHobby');
+    const done = new Set([hobby.id]);
+    const blocked = new Set([hobby.id]);
+    expect(questMarkerKind(hobby, 'unavailable', done, 'giver', blocked)).toBe('cooldown');
   });
 
   const doneWithPrereqs = (extra: string[] = []): Set<string> => {

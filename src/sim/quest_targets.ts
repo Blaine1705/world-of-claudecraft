@@ -12,7 +12,11 @@
 import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import { nodeMaterialFor } from './professions/gathering';
 import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
-import { npcQuestMarkerKind, type QuestMarkerKind } from './quests/quest_marker_kind';
+import {
+  npcQuestMarkerKind,
+  type QuestMarkerKind,
+  questMarkerRank,
+} from './quests/quest_marker_kind';
 import {
   type GatherNodeType,
   type QuestObjective,
@@ -390,17 +394,17 @@ export function questObjectiveAreas(
   return out;
 }
 
-/** One quest carried by a quest-giver/turn-in glyph. `kind` is one of the
- *  four map-drawn states ('ready' | 'available' | 'repeat' | 'cooldown');
- *  the gray in-progress state stays a nameplate-only statement. */
+/** The kinds the map actually draws: 'none' has nothing to draw and the gray
+ *  in-progress state stays a nameplate-only statement (both filtered below),
+ *  so the type says so and the painter's kind switch is exhaustive over what
+ *  can really arrive (the minimap's NpcMarkerVariant precedent). */
+export type MapQuestMarkerKind = Exclude<QuestMarkerKind, 'none' | 'active'>;
+
+/** One quest carried by a quest-giver/turn-in glyph, for its hover tooltip. */
 export interface QuestGiverNpcQuestRef {
   questId: string;
-  kind: QuestMarkerKind;
+  kind: MapQuestMarkerKind;
 }
-
-/** The states the map draws, in the order the tooltip lists their quests
- *  (the shared fold order: the glyph shows the FIRST kind present). */
-const MAP_MARKER_KIND_ORDER = ['ready', 'available', 'repeat', 'cooldown'] as const;
 
 /** One quest-giver/turn-in glyph location: `kind` is the strongest state
  *  present under the shared fold order ('?' turn-in ready beats every '!'
@@ -409,7 +413,7 @@ const MAP_MARKER_KIND_ORDER = ['ready', 'available', 'repeat', 'cooldown'] as co
  *  localized text. */
 export interface QuestGiverNpcMarker {
   pos: { x: number; z: number };
-  kind: QuestMarkerKind;
+  kind: MapQuestMarkerKind;
   quests: QuestGiverNpcQuestRef[];
 }
 
@@ -453,9 +457,13 @@ export function questGiverNpcMarkers(
     }
     if (refs.length === 0) continue;
     // Strongest kind first: the '?' state wins the glyph and its quests lead
-    // the tooltip, then gold, blue, and dimmed, stable within each kind. A
-    // fresh array per marker; the shared content tables are never aliased.
-    const quests = MAP_MARKER_KIND_ORDER.flatMap((kind) => refs.filter((r) => r.kind === kind));
+    // the tooltip, then gold, blue, and dimmed. Ordered by the ONE fold table
+    // the leaf exports (questMarkerRank), never a second local order, so the
+    // map glyph can never disagree with the nameplate and minimap folds;
+    // Array.prototype.sort is stable, preserving questIds order within a
+    // kind. A fresh array per marker; the shared content tables are never
+    // aliased.
+    const quests = [...refs].sort((a, b) => questMarkerRank(b.kind) - questMarkerRank(a.kind));
     out.push({
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       pos: { x: npc.pos.x, z: npc.pos.z },

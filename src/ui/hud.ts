@@ -521,6 +521,7 @@ import {
 import { buildProfessionTutorialModel } from './profession_tutorial_view';
 import { renderProfessionTutorial } from './profession_tutorial_window';
 import { ProfessionsWindow } from './professions_window';
+import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
@@ -9701,25 +9702,18 @@ export class Hud {
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest
-  // behind the glyph shows its title, tagged by its marker kind (the
-  // ready-to-turn-in tag on '?' quests, the repeatable tag on blue '!'
-  // quests, the available-again-soon tag on a work order inside its cooldown
-  // window), plus its level requirement when the quest declares one, all
-  // through questUi keys.
+  // behind the glyph shows its title, tagged by its marker kind through the
+  // pure questMarkerTooltipTag table (ready, repeatable, available-again-soon;
+  // the plain offer stays untagged), plus its level requirement when the
+  // quest declares one, all through questUi keys.
   private questGiverTooltipHtml(marker: MapNpcMarker): string {
     let html = '';
     for (const ref of marker.quests) {
       const quest = QUESTS[ref.questId];
       if (!quest) continue;
-      const tag =
-        ref.kind === 'ready'
-          ? ` <span class="quest-complete">(${esc(t('questUi.log.readyStatus'))})</span>`
-          : ref.kind === 'repeat'
-            ? ` <span class="quest-repeat">(${esc(t('questUi.log.repeatableStatus'))})</span>`
-            : ref.kind === 'cooldown'
-              ? ` <span class="quest-cooldown">(${esc(t('questUi.log.cooldownStatus'))})</span>`
-              : '';
-      html += `<div class="tt-title">${esc(questTitle(ref.questId))}${tag}</div>`;
+      const tag = questMarkerTooltipTag(ref.kind);
+      const tagHtml = tag ? ` <span class="${tag.cls}">(${esc(t(tag.key))})</span>` : '';
+      html += `<div class="tt-title">${esc(questTitle(ref.questId))}${tagHtml}</div>`;
       if (quest.minLevel) {
         html += `<div class="tt-quest-req">${esc(
           t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }),

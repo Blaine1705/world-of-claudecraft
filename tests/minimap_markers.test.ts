@@ -285,6 +285,36 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     }
   });
 
+  it("folds across an NPC's quests: a ready turn-in beats a completed repeatable", () => {
+    // Acceptance (c) at THIS surface: the fold accumulator (and its break on
+    // ready) runs over more than one quest. The work order's giver also
+    // gives the attune quest; its ready '?' must win the glyph over the
+    // repeat-blue offer.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const attune = Object.values(QUESTS).find(
+      (q) => q.giverNpcId === workOrder.giverNpcId && !q.repeatable,
+    );
+    if (!attune) throw new Error('expected a plain quest at the work-order giver');
+    const world = makeWorld('sim') as unknown as {
+      entities: Map<number, { templateId: string; questIds: string[] }>;
+      questState: (q: string) => string;
+      questsDone: Set<string>;
+    };
+    const npc = world.entities.get(6);
+    if (!npc) throw new Error('expected the seeded giver npc');
+    npc.templateId = workOrder.giverNpcId;
+    npc.questIds = [workOrder.id, attune.id];
+    world.questsDone = new Set([workOrder.id]);
+    world.questState = (q) =>
+      q === workOrder.id ? 'available' : q === attune.id ? 'ready' : 'unavailable';
+    const npcs = buildMarkers(world as unknown as IWorld).filter(
+      (m) => m.kind === 'npc',
+    ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+    expect(npcs[0].glyph).toBe('?');
+    expect(npcs[0].marker).toBe('ready');
+  });
+
   it('classifies party members: an on-map disc (alive -> pip) and an off-map arrow (dead)', () => {
     const markers = buildMarkers(makeWorld('sim'));
     const disc = markers.find((m) => m.kind === 'party-disc') as Extract<

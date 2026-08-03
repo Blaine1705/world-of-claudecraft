@@ -17,11 +17,11 @@
 
 import { DUNGEON_LIST, isDelvePos, STRIP_MAX_X, STRIP_MIN_X, type ZoneDef } from '../sim/data';
 import {
+  type MapQuestMarkerKind,
   type QuestObjectiveRef,
   questGiverNpcMarkers,
   questObjectiveAreas,
 } from '../sim/quest_targets';
-import type { QuestMarkerKind } from '../sim/quests/quest_marker_kind';
 import type { BuildingDef, ZonePropsDef } from '../sim/types';
 import type { Decoration } from '../sim/world';
 import type { FriendInfo, IWorld } from '../world_api';
@@ -97,10 +97,12 @@ export interface MapPortalMarker {
 /** One quest carried by a map quest-giver glyph, for its hover tooltip:
  *  'ready' (the '?' state), 'available' (first-offer gold '!'), 'repeat'
  *  (completed-repeatable blue '!'), or 'cooldown' (a work order inside its
- *  cadence window, the dimmed '!'). */
+ *  cadence window, the dimmed '!'). The type is the four-member
+ *  MapQuestMarkerKind, so the painter's kind switch is exhaustive over what
+ *  can really arrive. */
 export interface MapNpcQuestRef {
   questId: string;
-  kind: QuestMarkerKind;
+  kind: MapQuestMarkerKind;
 }
 
 /** A quest-giver glyph: `kind` is the strongest state present under the
@@ -111,7 +113,7 @@ export interface MapNpcQuestRef {
 export interface MapNpcMarker {
   mx: number;
   my: number;
-  kind: QuestMarkerKind;
+  kind: MapQuestMarkerKind;
   quests: MapNpcQuestRef[];
 }
 

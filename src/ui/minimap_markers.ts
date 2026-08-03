@@ -207,27 +207,29 @@ export function createMinimapMarkers(): MinimapMarkers {
               cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
             };
           }
-          let folded: QuestMarkerKind = 'none';
+          let folded: NpcMarkerVariant = 'none';
           for (const q of e.questIds) {
             const quest = QUESTS[q];
             if (!quest) continue;
-            folded = strongerQuestMarker(
-              folded,
-              npcQuestMarkerKind(
-                quest,
-                e.templateId,
-                world.questState(q),
-                questMarkerCtx.questsDone,
-                questMarkerCtx.cadenceBlocked,
-              ),
+            const kind = npcQuestMarkerKind(
+              quest,
+              e.templateId,
+              world.questState(q),
+              questMarkerCtx.questsDone,
+              questMarkerCtx.cadenceBlocked,
             );
+            // The gray in-progress state is nameplate-only. Filtered PER
+            // QUEST before the fold (the map's questGiverNpcMarkers does the
+            // same), never folded then collapsed: 'active' outranks
+            // 'cooldown', so folding it in would swallow a cooldown mark
+            // this surface DOES draw whenever the same NPC also holds an
+            // in-progress turn-in (all four profession masters do).
+            if (kind === 'active') continue;
+            folded = strongerQuestMarker(folded, kind) as NpcMarkerVariant;
             if (folded === 'ready') break; // nothing outranks the '?'
           }
-          // The gray in-progress state is nameplate-only: the minimap keeps
-          // its neutral dot there, exactly as before this marker existed.
-          const marker: NpcMarkerVariant = folded === 'active' ? 'none' : folded;
-          const glyph: NpcGlyph = marker === 'ready' ? '?' : marker === 'none' ? '•' : '!';
-          markers.push({ kind: 'npc', mx, my, glyph, marker });
+          const glyph: NpcGlyph = folded === 'ready' ? '?' : folded === 'none' ? '•' : '!';
+          markers.push({ kind: 'npc', mx, my, glyph, marker: folded });
         } else if (
           e.kind === 'object' &&
           (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')

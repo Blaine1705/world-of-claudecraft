@@ -40,6 +40,7 @@ const MINIMAP_COLOR_TOKENS = [
   '--color-minimap-ally-friend',
   '--color-minimap-ally-guild',
   '--color-minimap-npc-quest',
+  '--color-minimap-npc-quest-repeat',
   '--color-minimap-portal',
   '--color-minimap-object-loot',
   '--color-minimap-mob-aggro',

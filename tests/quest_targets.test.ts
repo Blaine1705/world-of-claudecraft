@@ -591,6 +591,28 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
     expect(questGiverNpcMarkers(() => 'unavailable', NO_HISTORY)).toEqual([]);
   });
 
+  it('draws nothing for in-progress quests: the active state is filtered, not thrown on', () => {
+    // The map never marked in-progress quests (only the nameplate shows the
+    // gray '?'), and the filter is load-bearing twice over: an NPC whose only
+    // quest is active must produce NO marker at all, never a marker whose
+    // quests array came out empty (the quests[0] deref would throw).
+    expect(questGiverNpcMarkers(() => 'active', NO_HISTORY)).toEqual([]);
+  });
+
+  it('returns fresh positions, never aliasing the shared NPCS content', () => {
+    const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+    if (!quest) throw new Error('expected a quest with a giverNpcId');
+    const giver = NPCS[quest.giverNpcId as string];
+    const marker = questGiverNpcMarkers(
+      (q) => (q === quest.id ? 'available' : 'unavailable'),
+      NO_HISTORY,
+    ).find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
+    if (!marker) throw new Error('expected the giver marker');
+    // Equal by value, never the same object: a consumer mutating marker.pos
+    // must not write through into the content table the sim places from.
+    expect(marker.pos).not.toBe(giver.pos);
+  });
+
   it("resolves a real giver's static position for an available quest ('!' glyph)", () => {
     const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
     if (!quest) throw new Error('expected a quest with a giverNpcId');

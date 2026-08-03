@@ -31,7 +31,13 @@ import { isQuestTurnInNpc, type QuestDef, type QuestState } from '../types';
  *   dimmed where the NPC previously showed nothing (the settled Q31 rule,
  *   closing the deferral recorded when the cooldown-visibility issue
  *   closed). Giver-side only: it marks where the order will be offered
- *   again once WORK_ORDER_CADENCE_TICKS lapses.
+ *   again once WORK_ORDER_CADENCE_TICKS lapses. The trigger is the live
+ *   cadence set alone, DELIBERATELY: a quest can sit inside its window and
+ *   simultaneously behind another availability gate (q_prof_hobby_switch is
+ *   cadenced AND identity-transition gated), and the marker still shows,
+ *   because the window claim it makes stays true and the set drops the id
+ *   the moment the window lapses, so the dim mark can never outlive the
+ *   cadence it reports (pinned in tests/quest_marker_kind.test.ts).
  * - 'none': draw nothing for this quest.
  */
 export type QuestMarkerKind = 'none' | 'available' | 'repeat' | 'ready' | 'active' | 'cooldown';
@@ -58,6 +64,14 @@ const MARKER_PRIORITY: Record<QuestMarkerKind, number> = {
  *  `a`, so folding left over a quest list is order-stable). */
 export function strongerQuestMarker(a: QuestMarkerKind, b: QuestMarkerKind): QuestMarkerKind {
   return MARKER_PRIORITY[b] > MARKER_PRIORITY[a] ? b : a;
+}
+
+/** The fold rank of a kind, exported so list-producing consumers (the map's
+ *  tooltip ordering in quest_targets.ts) sort by THE SAME table the fold
+ *  uses instead of keeping a second hand-maintained order. Higher is
+ *  stronger. */
+export function questMarkerRank(kind: QuestMarkerKind): number {
+  return MARKER_PRIORITY[kind];
 }
 
 /**

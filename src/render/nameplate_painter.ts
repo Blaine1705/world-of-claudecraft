@@ -107,6 +107,18 @@ export class NameplatePainter {
   // proportional to the player count. `anchorCount` is the live prefix length.
   private readonly anchorScratch: NameplateAnchor[] = [];
   private anchorCount = 0;
+  // Quest-marker inputs (the shared quest_marker_kind rule), resolved lazily
+  // on the first quest-bearing plate and REFRESHED once per full pass:
+  // craftingIdentity is a per-access allocation on the offline Sim, and an
+  // urgent town-NPC plate reaches the content branch at frame rate on
+  // throttled passes too, so a per-frame resolve tripled that cost for a
+  // marker whose inputs move on turn-in cadence. A throttled pass reusing
+  // the last full pass's snapshot lags a marker flip by at most one
+  // nameplate interval; the next full pass repaints it.
+  private questMarkerCtx: {
+    questsDone: ReadonlySet<string>;
+    cadenceBlocked: ReadonlySet<string> | undefined;
+  } | null = null;
 
   constructor(deps: NameplatePainterDeps) {
     this.views = deps.views;
@@ -132,14 +144,9 @@ export class NameplatePainter {
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
     this.anchorCount = 0;
-    // Quest-marker inputs (the shared quest_marker_kind rule), resolved
-    // lazily ONCE per pass on the first quest-bearing plate: craftingIdentity
-    // is a per-access allocation on the offline Sim, so a frame with no NPC
-    // plate in view never pays for it.
-    let questMarkerCtx: {
-      questsDone: ReadonlySet<string>;
-      cadenceBlocked: ReadonlySet<string> | undefined;
-    } | null = null;
+    // Drop the quest-marker snapshot at every full pass so it re-resolves
+    // lazily below; throttled passes reuse it (see the field's rationale).
+    if (fullPass) this.questMarkerCtx = null;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -302,11 +309,14 @@ export class NameplatePainter {
             : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
         // Role-aware via the shared quest_marker_kind rule: '!' only at the
         // quest's giver (gold first-offer, blue repeat, dimmed cooldown),
-        // '?' only at its turn-in NPC (gray while in progress), matching the
-        // gossip dialog, minimap, and map because all four fold the same way.
-        if (!questMarkerCtx) {
+        // '?' only at its turn-in NPC. The nameplate is the ONE surface that
+        // renders the gray in-progress state, so 'active' joins its fold at
+        // its shared rank (beating cooldown: an in-progress turn-in here is
+        // the more actionable signal); the minimap, map, and gossip list
+        // filter 'active' per quest instead, since they never drew it.
+        if (!this.questMarkerCtx && e.questIds.length > 0) {
           const blocked = world.craftingIdentity?.cadenceBlockedQuests;
-          questMarkerCtx = {
+          this.questMarkerCtx = {
             questsDone: world.questsDone,
             cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
           };
@@ -314,15 +324,15 @@ export class NameplatePainter {
         let folded: QuestMarkerKind = 'none';
         for (const qid of e.questIds) {
           const quest = QUESTS[qid];
-          if (!quest) continue;
+          if (!quest || !this.questMarkerCtx) continue;
           folded = strongerQuestMarker(
             folded,
             npcQuestMarkerKind(
               quest,
               e.templateId,
               world.questState(qid),
-              questMarkerCtx.questsDone,
-              questMarkerCtx.cadenceBlocked,
+              this.questMarkerCtx.questsDone,
+              this.questMarkerCtx.cadenceBlocked,
             ),
           );
           if (folded === 'ready') break; // nothing outranks the '?'

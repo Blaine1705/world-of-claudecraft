@@ -44,6 +44,7 @@ const MAP_COLOR_TOKENS = [
   '--color-map-portal-dot',
   '--color-map-portal-label',
   '--color-map-npc-quest',
+  '--color-map-npc-quest-repeat',
   '--color-map-player',
   '--color-map-ally-friend',
   '--color-map-ally-guild',

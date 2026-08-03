@@ -107,15 +107,22 @@ function view(): EntityView {
 }
 
 /** A painter looking at the work order's giver NPC, with the quest-marker
- *  world knobs (state, history, the cadence mirror) under test control. */
-function harness(knobs: { state: QuestState; done?: boolean; cadenceBlocked?: boolean }) {
+ *  world knobs (state, history, the cadence mirror, extra quests for the
+ *  cross-quest fold arms) under test control. */
+function harness(knobs: {
+  state: QuestState;
+  done?: boolean;
+  cadenceBlocked?: boolean;
+  questIds?: string[];
+  questStates?: Record<string, QuestState>;
+}) {
   const me = entity({ id: 1, name: 'Me', pos: { x: 0, y: 0, z: 3 } as Entity['pos'] });
   const npc = entity({
     id: 2,
     kind: 'npc',
     name: 'Master',
     templateId: WORK_ORDER.giverNpcId,
-    questIds: [WORK_ORDER.id],
+    questIds: knobs.questIds ?? [WORK_ORDER.id],
   });
   const views = new Map<number, EntityView>();
   const v = view();
@@ -131,7 +138,7 @@ function harness(knobs: { state: QuestState; done?: boolean; cadenceBlocked?: bo
       [npc.id, npc],
     ]),
     markerFor: () => null,
-    questState: () => knobs.state,
+    questState: (q: string) => knobs.questStates?.[q] ?? knobs.state,
     questsDone: new Set<string>(knobs.done ? [WORK_ORDER.id] : []),
     craftingIdentity: {
       version: 1,
@@ -194,6 +201,42 @@ describe('nameplate quest marker variants', () => {
     expect(bare.v.markerEl.className).toBe('np-marker');
   });
 
+  it("folds across an NPC's quests: a ready turn-in beats a completed repeatable", () => {
+    // Acceptance (c) at THIS surface: the per-surface fold (accumulator plus
+    // the break on ready) runs over more than one quest, not just the
+    // classifier unit. The work order's giver also gives the attune quest,
+    // and its ready '?' must win the plate over the repeat-blue offer.
+    const attuneId = 'q_prof_attune_smith';
+    const { painter, v } = harness({
+      state: 'unavailable',
+      done: true,
+      questIds: [WORK_ORDER.id, attuneId],
+      questStates: { [WORK_ORDER.id]: 'available', [attuneId]: 'ready' },
+    });
+    painter.update(true);
+    expect(v.markerEl.textContent).toBe('?');
+    expect(v.markerEl.className).toBe('np-marker ready');
+  });
+
+  it('renders the gray in-progress state over a cooldown mark: the documented divergence', () => {
+    // The nameplate is the ONE surface that renders 'active', and at its
+    // shared rank the gray '?' beats the dimmed '!' (an in-progress turn-in
+    // here is the more actionable signal). The minimap and map filter
+    // 'active' per quest instead and show the cooldown mark for the same
+    // state; tests/quest_marker_surface_agreement.test.ts pins their side.
+    const attuneId = 'q_prof_attune_smith';
+    const { painter, v } = harness({
+      state: 'unavailable',
+      done: true,
+      cadenceBlocked: true,
+      questIds: [WORK_ORDER.id, attuneId],
+      questStates: { [attuneId]: 'active' },
+    });
+    painter.update(true);
+    expect(v.markerEl.textContent).toBe('?');
+    expect(v.markerEl.className).toBe('np-marker active');
+  });
+
   it('repaints on a LIVE gold-to-blue transition: the marker class is in the plate signature', () => {
     // The first completion of a work order happens while its giver's plate
     // is on screen; if markerClass ever leaves the static signature the
@@ -203,6 +246,22 @@ describe('nameplate quest marker variants', () => {
     painter.update(true);
     expect(v.markerEl.className).toBe('np-marker avail');
     (world as unknown as { questsDone: Set<string> }).questsDone.add(WORK_ORDER.id);
+    painter.update(true);
+    expect(v.markerEl.textContent).toBe('!');
+    expect(v.markerEl.className).toBe('np-marker repeat');
+
+    // The reverse transitions ride the same signature (and the per-full-pass
+    // context refresh): a fresh turn-in arms the window (blue to dimmed),
+    // and expiry returns the blue offer.
+    (world as unknown as { questState: () => string }).questState = () => 'unavailable';
+    (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
+      [WORK_ORDER.id];
+    painter.update(true);
+    expect(v.markerEl.textContent).toBe('!');
+    expect(v.markerEl.className).toBe('np-marker cooldown');
+    (world as unknown as { questState: () => string }).questState = () => 'available';
+    (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
+      [];
     painter.update(true);
     expect(v.markerEl.textContent).toBe('!');
     expect(v.markerEl.className).toBe('np-marker repeat');
