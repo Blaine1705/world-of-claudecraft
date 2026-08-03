@@ -6061,6 +6061,17 @@ prose truth pass; any model, QA folds into the build session per
 the phase header), then the packet merge decision (locale fill
 stays maintainer-deferred).
 
+## Phase 24 entry sync (2026-08-03, zero drift)
+
+The per-phase sync preamble, run at the phase 24 build entry. git
+fetch at entry measured ZERO drift: origin/release/v0.34.0 still
+sits at 5f22a51a00, the same tip the phase 23 entry sync above
+already merged, and it is an ancestor of the branch tip 4115f12bf8
+(the phase 23 QA record commit). There is no merge commit, nothing
+for the release-merge-audit skill to run over, and the phase 23 QA
+gate (all 10 steps green at 909108deb8 content on the quiescent
+tree) stands as the entry state.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
