@@ -2,13 +2,8 @@ import { DELVES, ITEMS, NPCS, QUESTS, questRewardItem } from '../../../sim/data'
 import { CHRONICLER_TEMPLATE_IDS } from '../../../sim/deeds';
 import { craftsForPairTarget } from '../../../sim/professions/archetype';
 import { professionQuestSelectionTargets } from '../../../sim/quests/profession_quest_effects';
-import {
-  dist2d,
-  type Entity,
-  type ItemDef,
-  isQuestTurnInNpc,
-  questObjectiveRequired,
-} from '../../../sim/types';
+import { npcQuestMarkerKind, type QuestMarkerKind } from '../../../sim/quests/quest_marker_kind';
+import { dist2d, type Entity, type ItemDef, questObjectiveRequired } from '../../../sim/types';
 import type { IWorld } from '../../../world_api';
 import { archetypeTitleText, craftNameText } from '../../char_window';
 import { decorativeArtImg } from '../../decorative_art';
@@ -276,13 +271,29 @@ export class QuestDialogController {
   private renderGossip(npc: Entity, closeIfEmpty = false): void {
     const world = this.deps.world();
     const definition = NPCS[npc.templateId];
-    const interesting = npc.questIds.filter((questId) => {
-      const state = world.questState(questId);
-      return (
-        (state === 'available' && QUESTS[questId].giverNpcId === npc.templateId) ||
-        (state === 'ready' && isQuestTurnInNpc(QUESTS[questId], npc.templateId))
+    // The shared quest_marker_kind rule decides each row and its glyph: the
+    // gold '?'/'!' rows as before, plus the blue '!' for a repeatable already
+    // completed at least once. The 'active' and 'cooldown' kinds stay out of
+    // the list (in-progress quests have their own discuss rows below, and a
+    // work order inside its window is not offerable), matching the pre-phase
+    // dialog exactly for every non-repeat state.
+    const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+    const cadenceBlocked = blocked && blocked.length > 0 ? new Set(blocked) : undefined;
+    const interesting: { questId: string; kind: QuestMarkerKind }[] = [];
+    for (const questId of npc.questIds) {
+      const quest = QUESTS[questId];
+      if (!quest) continue;
+      const kind = npcQuestMarkerKind(
+        quest,
+        npc.templateId,
+        world.questState(questId),
+        world.questsDone,
+        cadenceBlocked,
       );
-    });
+      if (kind === 'ready' || kind === 'available' || kind === 'repeat') {
+        interesting.push({ questId, kind });
+      }
+    }
     const discussionQuests = [...world.questLog.values()]
       .filter((progress) => progress.state === 'active' && npc.questIds.includes(progress.questId))
       .filter((progress) =>
@@ -347,15 +358,20 @@ export class QuestDialogController {
         }),
       )}</div>`;
     }
-    for (const questId of interesting) {
-      const state = world.questState(questId);
+    for (const { questId, kind } of interesting) {
       const icon =
-        state === 'ready' ? '<span class="gold">?</span> ' : '<span class="gold">!</span> ';
+        kind === 'ready'
+          ? '<span class="gold">?</span> '
+          : kind === 'repeat'
+            ? '<span class="quest-repeat">!</span> '
+            : '<span class="gold">!</span> ';
       const title = this.deps.text.questTitle(questId);
       const aria =
-        state === 'ready'
+        kind === 'ready'
           ? t('questUi.dialog.readyQuestAria', { name: title })
-          : t('questUi.dialog.availableQuestAria', { name: title });
+          : kind === 'repeat'
+            ? t('questUi.dialog.repeatableQuestAria', { name: title })
+            : t('questUi.dialog.availableQuestAria', { name: title });
       html += `<button type="button" class="qd-list-item" data-quest="${esc(questId)}" aria-label="${esc(aria)}">${icon}${esc(title)}</button>`;
     }
     for (const questId of discussionQuests) {

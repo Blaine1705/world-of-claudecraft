@@ -65,7 +65,13 @@ describe('questMarkerKind: the giver role', () => {
     // giver shows nothing, exactly today's behavior.
     expect(questMarkerKind(quest({ repeatable: true }), 'unavailable', done, 'giver')).toBe('none');
     expect(
-      questMarkerKind(quest({ repeatable: true }), 'unavailable', done, 'giver', new Set(['other'])),
+      questMarkerKind(
+        quest({ repeatable: true }),
+        'unavailable',
+        done,
+        'giver',
+        new Set(['other']),
+      ),
     ).toBe('none');
   });
 
@@ -176,9 +182,7 @@ describe('the real work-order lifecycle through computeQuestState', () => {
   it('never completed: available, and the marker stays gold everywhere', () => {
     const state = computeQuestState(WORK_ORDER_ID, emptyLog, doneWithPrereqs(), 60);
     expect(state).toBe('available');
-    expect(
-      questMarkerKind(workOrder, state, doneWithPrereqs(), 'giver'),
-    ).toBe('available');
+    expect(questMarkerKind(workOrder, state, doneWithPrereqs(), 'giver')).toBe('available');
   });
 
   it('completed and inside the window: cooldown on the giver, from either cadence-set shape', () => {
@@ -207,10 +211,7 @@ describe('the real work-order lifecycle through computeQuestState', () => {
     const repeatables = Object.values(QUESTS).filter((q) => q.repeatable);
     expect(repeatables).toHaveLength(11);
     for (const q of repeatables) {
-      expect(
-        questMarkerKind(q, 'available', new Set([q.id]), 'giver'),
-        q.id,
-      ).toBe('repeat');
+      expect(questMarkerKind(q, 'available', new Set([q.id]), 'giver'), q.id).toBe('repeat');
     }
   });
 });

@@ -12,9 +12,9 @@
 import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import { nodeMaterialFor } from './professions/gathering';
 import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
+import { npcQuestMarkerKind, type QuestMarkerKind } from './quests/quest_marker_kind';
 import {
   type GatherNodeType,
-  isQuestTurnInNpc,
   type QuestObjective,
   type QuestProgress,
   type QuestState,
@@ -390,45 +390,77 @@ export function questObjectiveAreas(
   return out;
 }
 
-/** One quest-giver/turn-in glyph location: '?' (turn-in ready) beats '!'
- *  (available) the same way the live map glyph does. Carries the quest
- *  identities behind it so the hover tooltip can resolve their localized text. */
+/** One quest carried by a quest-giver/turn-in glyph. `kind` is one of the
+ *  four map-drawn states ('ready' | 'available' | 'repeat' | 'cooldown');
+ *  the gray in-progress state stays a nameplate-only statement. */
+export interface QuestGiverNpcQuestRef {
+  questId: string;
+  kind: QuestMarkerKind;
+}
+
+/** The states the map draws, in the order the tooltip lists their quests
+ *  (the shared fold order: the glyph shows the FIRST kind present). */
+const MAP_MARKER_KIND_ORDER = ['ready', 'available', 'repeat', 'cooldown'] as const;
+
+/** One quest-giver/turn-in glyph location: `kind` is the strongest state
+ *  present under the shared fold order ('?' turn-in ready beats every '!'
+ *  variant, exactly as the live map glyph always resolved). Carries the
+ *  quest identities behind it so the hover tooltip can resolve their
+ *  localized text. */
 export interface QuestGiverNpcMarker {
   pos: { x: number; z: number };
-  ready: boolean;
-  quests: { questId: string; ready: boolean }[];
+  kind: QuestMarkerKind;
+  quests: QuestGiverNpcQuestRef[];
 }
 
 /**
- * Every static NPC currently offering an available quest or holding a ready
- * turn-in, resolved from the NPCS content table rather than world.entities so
- * (like questObjectiveAreas above) it is never interest-radius limited: a
+ * Every static NPC currently offering an available quest (first-offer gold or
+ * repeatable blue), holding a ready turn-in, or holding a work order inside
+ * its cooldown window (the dimmed marker where the NPC previously showed
+ * nothing), resolved from the NPCS content table rather than world.entities
+ * so (like questObjectiveAreas above) it is never interest-radius limited: a
  * quest giver far across an online zone still surfaces its glyph. Dynamic
  * NPCs (spawned on demand by their owning system, e.g. mid-encounter or
  * per-graveyard) are skipped: they carry no fixed placement to resolve here.
+ *
+ * Classification is the shared quest_marker_kind rule; `questsDone` and the
+ * optional cadence-blocked set are the same inputs both worlds hand it
+ * (IWorld questsDone, and craftingIdentity.cadenceBlockedQuests at the
+ * caller's seam). The 'active' kind is deliberately filtered: the map never
+ * marked in-progress quests and still does not.
  */
 export function questGiverNpcMarkers(
   questState: (questId: string) => QuestState,
+  questsDone: ReadonlySet<string>,
+  cadenceBlocked?: ReadonlySet<string>,
 ): QuestGiverNpcMarker[] {
   const out: QuestGiverNpcMarker[] = [];
   for (const npc of Object.values(NPCS)) {
     if (npc.dynamic) continue;
-    const avail = npc.questIds.filter(
-      (q) => QUESTS[q].giverNpcId === npc.id && questState(q) === 'available',
-    );
-    const readyQuests = npc.questIds.filter(
-      (q) => isQuestTurnInNpc(QUESTS[q], npc.id) && questState(q) === 'ready',
-    );
-    if (avail.length === 0 && readyQuests.length === 0) continue;
+    const refs: QuestGiverNpcQuestRef[] = [];
+    for (const questId of npc.questIds) {
+      const quest = QUESTS[questId];
+      if (!quest) continue;
+      const kind = npcQuestMarkerKind(
+        quest,
+        npc.id,
+        questState(questId),
+        questsDone,
+        cadenceBlocked,
+      );
+      if (kind === 'none' || kind === 'active') continue;
+      refs.push({ questId, kind });
+    }
+    if (refs.length === 0) continue;
+    // Strongest kind first: the '?' state wins the glyph and its quests lead
+    // the tooltip, then gold, blue, and dimmed, stable within each kind. A
+    // fresh array per marker; the shared content tables are never aliased.
+    const quests = MAP_MARKER_KIND_ORDER.flatMap((kind) => refs.filter((r) => r.kind === kind));
     out.push({
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       pos: { x: npc.pos.x, z: npc.pos.z },
-      ready: readyQuests.length > 0,
-      // turn-ins first: the '?' state wins the glyph, so its quests lead the tooltip
-      quests: [
-        ...readyQuests.map((questId) => ({ questId, ready: true })),
-        ...avail.map((questId) => ({ questId, ready: false })),
-      ],
+      kind: quests[0].kind,
+      quests,
     });
   }
   return out;

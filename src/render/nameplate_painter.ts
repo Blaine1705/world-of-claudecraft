@@ -19,7 +19,12 @@
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
-import { type Entity, GATHER_CAST_ID, isQuestTurnInNpc } from '../sim/types';
+import {
+  npcQuestMarkerKind,
+  type QuestMarkerKind,
+  strongerQuestMarker,
+} from '../sim/quests/quest_marker_kind';
+import { type Entity, GATHER_CAST_ID } from '../sim/types';
 import { deedTitleText } from '../ui/deed_i18n';
 import {
   devTierBadgeDataUrl,
@@ -127,6 +132,14 @@ export class NameplatePainter {
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
     this.anchorCount = 0;
+    // Quest-marker inputs (the shared quest_marker_kind rule), resolved
+    // lazily ONCE per pass on the first quest-bearing plate: craftingIdentity
+    // is a per-access allocation on the offline Sim, so a frame with no NPC
+    // plate in view never pays for it.
+    let questMarkerCtx: {
+      questsDone: ReadonlySet<string>;
+      cadenceBlocked: ReadonlySet<string> | undefined;
+    } | null = null;
     for (const [id, v] of this.views) {
       const e = world.entities.get(id);
       if (!e) continue;
@@ -287,35 +300,47 @@ export class NameplatePainter {
           e.kind === 'npc'
             ? npcDisplayName(e.templateId)
             : tEntity({ kind: 'mob', id: e.templateId, field: 'name' });
-        let marker = '';
-        let cls = '';
-        // role-aware: '!' only at the quest's giver, '?' only at its turn-in
-        // NPC (gray while in progress), matching the gossip dialog
+        // Role-aware via the shared quest_marker_kind rule: '!' only at the
+        // quest's giver (gold first-offer, blue repeat, dimmed cooldown),
+        // '?' only at its turn-in NPC (gray while in progress), matching the
+        // gossip dialog, minimap, and map because all four fold the same way.
+        if (!questMarkerCtx) {
+          const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+          questMarkerCtx = {
+            questsDone: world.questsDone,
+            cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
+          };
+        }
+        let folded: QuestMarkerKind = 'none';
         for (const qid of e.questIds) {
           const quest = QUESTS[qid];
           if (!quest) continue;
-          const st = world.questState(qid);
-          if (st === 'ready' && isQuestTurnInNpc(quest, e.templateId)) {
-            marker = '?';
-            cls = 'ready';
-            break;
-          }
-          if (st === 'available' && quest.giverNpcId === e.templateId) {
-            marker = '!';
-            cls = 'avail';
-          } else if (st === 'active' && isQuestTurnInNpc(quest, e.templateId) && !marker) {
-            marker = '?';
-            cls = 'active';
-          }
+          folded = strongerQuestMarker(
+            folded,
+            npcQuestMarkerKind(
+              quest,
+              e.templateId,
+              world.questState(qid),
+              questMarkerCtx.questsDone,
+              questMarkerCtx.cadenceBlocked,
+            ),
+          );
+          if (folded === 'ready') break; // nothing outranks the '?'
         }
+        const marker =
+          folded === 'none' ? '' : folded === 'ready' || folded === 'active' ? '?' : '!';
         const markerClass =
-          cls === 'ready'
+          folded === 'ready'
             ? 'np-marker ready'
-            : cls === 'avail'
+            : folded === 'available'
               ? 'np-marker avail'
-              : cls === 'active'
-                ? 'np-marker active'
-                : 'np-marker';
+              : folded === 'repeat'
+                ? 'np-marker repeat'
+                : folded === 'active'
+                  ? 'np-marker active'
+                  : folded === 'cooldown'
+                    ? 'np-marker cooldown'
+                    : 'np-marker';
         this.setNameplateStatic(v, npcName, FRIENDLY, 'none', marker, markerClass, '1');
         this.setNameplateLevel(v, '', '');
         this.setFriendlyPetState(v, false);

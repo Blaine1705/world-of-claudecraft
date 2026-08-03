@@ -105,6 +105,15 @@ function makeOverworldWorld(
       ],
     },
   };
+  // The quest-marker inputs both worlds expose (the phase 23 classifier):
+  // questsDone always, and the crafting identity whose cadenceBlockedQuests
+  // mirror drives the cooldown variant. The sim shape carries the fuller
+  // identity a live Sim builds; the client shape carries only what the cprof
+  // mirror guarantees, so the core must not read past it.
+  const craftingIdentity =
+    shape === 'sim'
+      ? { version: 1, synced: true, attunedPairs: [], cadenceBlockedQuests: [] }
+      : { version: 1, synced: false, cadenceBlockedQuests: [] };
   return {
     player,
     entities,
@@ -114,6 +123,8 @@ function makeOverworldWorld(
     playerId: 1,
     questState: (q: string) => (q === GIVER_QUEST.id ? 'available' : 'unavailable'),
     questLog,
+    questsDone: new Set<string>(),
+    craftingIdentity,
   } as unknown as IWorld;
 }
 
@@ -420,11 +431,11 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), LABELS_ZOOM));
     expect(model.player).not.toBeNull();
     expect(model.player?.angle).toBe(-0.5);
-    // the npc has an available quest from its own giver -> one '!' (not ready) glyph
+    // the npc has an available quest from its own giver -> one gold '!' glyph
     expect(model.npcs).toHaveLength(1);
-    expect(model.npcs[0].ready).toBe(false);
+    expect(model.npcs[0].kind).toBe('available');
     // the glyph carries its quest identity for the hover tooltip
-    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, ready: false }]);
+    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, kind: 'available' }]);
   });
 
   it('hit-tests the nearest glyph within the hover radius (and misses outside it)', () => {
@@ -445,8 +456,8 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     world.entities.delete(2); // the seeded giver npc; only the player remains
     const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
     expect(model.npcs).toHaveLength(1);
-    expect(model.npcs[0].ready).toBe(false);
-    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, ready: false }]);
+    expect(model.npcs[0].kind).toBe('available');
+    expect(model.npcs[0].quests).toEqual([{ questId: GIVER_QUEST.id, kind: 'available' }]);
   });
 
   it("marks the glyph ready when a turn-in is ready (the '?' branch, not '!')", () => {
@@ -463,7 +474,40 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     world.questState = (q) => (q === READY_QUEST.id ? 'ready' : 'unavailable');
     const model = buildOverworldMapModel(input(world as unknown as IWorld, LABELS_ZOOM));
     expect(model.npcs).toHaveLength(1);
-    expect(model.npcs[0].ready).toBe(true);
+    expect(model.npcs[0].kind).toBe('ready');
+  });
+
+  it('classifies the repeat and cooldown variants identically for both world shapes', () => {
+    // Acceptance (a)'s both-worlds arm at the map surface: a real cadenced
+    // work order (giver in this test's zone), driven through a Sim-shaped
+    // and a ClientWorld-mirror-shaped stub. After one completion the offer
+    // is the blue repeat glyph; inside the window it is the dimmed cooldown
+    // glyph; and a non-repeatable quest stays pixel-identical gold
+    // (acceptance (b)'s negative, the GIVER_QUEST arm above).
+    const workOrder = QUESTS['q_prof_workorder_forge'];
+    expect(workOrder.repeatable).toBe(true);
+    for (const shape of ['sim', 'client'] as const) {
+      const world = makeOverworldWorld(shape) as unknown as {
+        questsDone: Set<string>;
+        craftingIdentity: { cadenceBlockedQuests: string[] };
+        questState: (q: string) => string;
+      };
+      world.questsDone = new Set([workOrder.id]);
+      world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
+      const offered = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+      const offeredGlyph = offered.npcs.find((n) =>
+        n.quests.some((q) => q.questId === workOrder.id),
+      );
+      expect(offeredGlyph?.kind, `${shape}: offered again`).toBe('repeat');
+
+      world.questState = () => 'unavailable';
+      world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+      const blocked = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+      const blockedGlyph = blocked.npcs.find((n) =>
+        n.quests.some((q) => q.questId === workOrder.id),
+      );
+      expect(blockedGlyph?.kind, `${shape}: inside the window`).toBe('cooldown');
+    }
   });
 
   it('projects only current-zone POIs and portals by the zone-local transform', () => {

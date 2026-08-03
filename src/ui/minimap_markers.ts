@@ -34,7 +34,11 @@ import type { GatheringProfessionId } from '../sim/content/professions';
 import { GATHER_NODES, isDelvePos, isYumiMazePos, QUESTS, zoneAt } from '../sim/data';
 import { NODE_HARVEST_TABLE } from '../sim/professions/gathering';
 import { canGatherTier } from '../sim/professions/tools';
-import { isQuestTurnInNpc } from '../sim/types';
+import {
+  npcQuestMarkerKind,
+  type QuestMarkerKind,
+  strongerQuestMarker,
+} from '../sim/quests/quest_marker_kind';
 import type { IWorld } from '../world_api';
 import { viewerUsableToolTier } from './gathering_view';
 
@@ -55,14 +59,24 @@ export type MinimapMode = 'delve' | 'yumiMaze' | 'overworld';
 /** The NPC quest glyph: turn-in ready ('?') wins over available ('!'), else neutral. */
 export type NpcGlyph = '?' | '!' | '•';
 
+/** The '!' glyph's kinds, in glyph terms: gold first-offer, blue repeat, or
+ *  the dimmed cooldown (a work order inside its cadence window). 'none' is
+ *  the neutral dot; 'ready' is the gold '?'. The gray in-progress state is
+ *  nameplate-only, so the minimap folds it to the neutral dot. */
+export type NpcMarkerVariant = Exclude<QuestMarkerKind, 'active'>;
+
 /** One overworld minimap marker, in canvas-pixel space. A DISCRIMINATED union (not a
  *  flat struct): each variant carries exactly the fields its draw branch needs. */
 export type MinimapMarker =
   // An online friend/guild ally who is NOT in the party (party members are the
   // party-disc/arrow variants). Strangers get no marker.
   | { kind: 'ally'; mx: number; my: number; ally: 'friend' | 'guild' }
-  // A quest-giver NPC glyph.
-  | { kind: 'npc'; mx: number; my: number; glyph: NpcGlyph }
+  // A quest-giver NPC glyph. `marker` is the folded quest-marker state behind
+  // the glyph: the painter resolves gold for 'ready'/'available' (and the
+  // neutral 'none' dot), the repeat token for 'repeat', and the repeat token
+  // dimmed for 'cooldown'. Actionable info on every graphics tier (fairness
+  // invariant: never preset-gated), like every other marker here.
+  | { kind: 'npc'; mx: number; my: number; glyph: NpcGlyph; marker: NpcMarkerVariant }
   // A dungeon entrance/exit portal.
   | { kind: 'portal'; mx: number; my: number }
   // A lootable world object.
@@ -130,7 +144,8 @@ export function minimapMode(world: IWorld): MinimapMode {
 
 /**
  * Build an overworld minimap marker model with a reused container. Reads only IWorld
- * members (player / entities / partyInfo / socialInfo / questState), so the offline Sim
+ * members (player / entities / partyInfo / socialInfo / questState / questsDone /
+ * craftingIdentity), so the offline Sim
  * and the online ClientWorld mirror produce identical output. Every
  * position is projected to canvas pixels here; the painter only resolves colors +
  * strokes.
@@ -162,6 +177,15 @@ export function createMinimapMarkers(): MinimapMarkers {
       const guildNames = social?.guild ? new Set(social.guild.members.map((m) => m.name)) : null;
       const partyPids = world.partyInfo ? new Set(world.partyInfo.members.map((m) => m.pid)) : null;
 
+      // Quest-marker inputs (the shared quest_marker_kind rule), resolved
+      // lazily ONCE per build on the first in-rim NPC: craftingIdentity is a
+      // per-access allocation on the offline Sim, so the common no-nearby-NPC
+      // frame skips it entirely (the bestToolTiers memo shape below).
+      let questMarkerCtx: {
+        questsDone: ReadonlySet<string>;
+        cadenceBlocked: ReadonlySet<string> | undefined;
+      } | null = null;
+
       for (const e of world.entities.values()) {
         if (e.id === p.id) continue;
         const dx = -(e.pos.x - p.pos.x) * pxPerYard; // +X is map-left
@@ -176,13 +200,34 @@ export function createMinimapMarkers(): MinimapMarkers {
             markers.push({ kind: 'ally', mx, my, ally: isFriend ? 'friend' : 'guild' });
           }
         } else if (e.kind === 'npc') {
-          const hasAvail = e.questIds.some(
-            (q) => QUESTS[q].giverNpcId === e.templateId && world.questState(q) === 'available',
-          );
-          const hasReady = e.questIds.some(
-            (q) => isQuestTurnInNpc(QUESTS[q], e.templateId) && world.questState(q) === 'ready',
-          );
-          markers.push({ kind: 'npc', mx, my, glyph: hasReady ? '?' : hasAvail ? '!' : '•' });
+          if (!questMarkerCtx) {
+            const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+            questMarkerCtx = {
+              questsDone: world.questsDone,
+              cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
+            };
+          }
+          let folded: QuestMarkerKind = 'none';
+          for (const q of e.questIds) {
+            const quest = QUESTS[q];
+            if (!quest) continue;
+            folded = strongerQuestMarker(
+              folded,
+              npcQuestMarkerKind(
+                quest,
+                e.templateId,
+                world.questState(q),
+                questMarkerCtx.questsDone,
+                questMarkerCtx.cadenceBlocked,
+              ),
+            );
+            if (folded === 'ready') break; // nothing outranks the '?'
+          }
+          // The gray in-progress state is nameplate-only: the minimap keeps
+          // its neutral dot there, exactly as before this marker existed.
+          const marker: NpcMarkerVariant = folded === 'active' ? 'none' : folded;
+          const glyph: NpcGlyph = marker === 'ready' ? '?' : marker === 'none' ? '•' : '!';
+          markers.push({ kind: 'npc', mx, my, glyph, marker });
         } else if (
           e.kind === 'object' &&
           (e.templateId === 'dungeon_door' || e.templateId === 'dungeon_exit')

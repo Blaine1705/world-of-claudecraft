@@ -9701,18 +9701,25 @@ export class Hud {
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest
-  // behind the '!'/'?' shows its title (with the ready-to-turn-in tag on '?'
-  // quests) plus its level requirement when the quest declares one, all through
-  // existing questUi keys (no new i18n surface).
+  // behind the glyph shows its title, tagged by its marker kind (the
+  // ready-to-turn-in tag on '?' quests, the repeatable tag on blue '!'
+  // quests, the available-again-soon tag on a work order inside its cooldown
+  // window), plus its level requirement when the quest declares one, all
+  // through questUi keys.
   private questGiverTooltipHtml(marker: MapNpcMarker): string {
     let html = '';
     for (const ref of marker.quests) {
       const quest = QUESTS[ref.questId];
       if (!quest) continue;
-      const readyTag = ref.ready
-        ? ` <span class="quest-complete">(${esc(t('questUi.log.readyStatus'))})</span>`
-        : '';
-      html += `<div class="tt-title">${esc(questTitle(ref.questId))}${readyTag}</div>`;
+      const tag =
+        ref.kind === 'ready'
+          ? ` <span class="quest-complete">(${esc(t('questUi.log.readyStatus'))})</span>`
+          : ref.kind === 'repeat'
+            ? ` <span class="quest-repeat">(${esc(t('questUi.log.repeatableStatus'))})</span>`
+            : ref.kind === 'cooldown'
+              ? ` <span class="quest-cooldown">(${esc(t('questUi.log.cooldownStatus'))})</span>`
+              : '';
+      html += `<div class="tt-title">${esc(questTitle(ref.questId))}${tag}</div>`;
       if (quest.minLevel) {
         html += `<div class="tt-quest-req">${esc(
           t('questUi.detail.requiresLevel', { level: this.questNumber(quest.minLevel) }),

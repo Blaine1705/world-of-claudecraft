@@ -290,6 +290,21 @@
   .np-marker.active {
     color: #b9b9b9;
   }
+  /* repeatable turn-in (completed at least once): the rare-item blue "!",
+     matching the map/minimap repeat tokens */
+  .np-marker.repeat {
+    color: #0070dd;
+    text-shadow:
+      0 0 6px #0070dd88,
+      1px 1px 2px #000;
+  }
+  /* a work order inside its cadence window: the blue mark dimmed at the same
+     0.55 the canvas surfaces blit with, where the plate showed nothing */
+  .np-marker.cooldown {
+    color: #0070dd;
+    opacity: 0.55;
+    text-shadow: 1px 1px 2px #000;
+  }
   .np-marker.loot {
     color: var(--gold);
     font-size: 14px;
@@ -2635,6 +2650,17 @@
   .qd-obj.done,
   .quest-complete {
     color: var(--color-text-success);
+  }
+  /* Repeatable-quest glyphs and tags (the phase 23 blue "!"): the rare-item
+     blue, matching the map/minimap repeat tokens; the cooldown tag dims it
+     at the same 0.55 the canvas surfaces use. Plain color classes so the
+     marker reads on every graphics tier (fairness invariant). */
+  .quest-repeat {
+    color: #0070dd;
+  }
+  .quest-cooldown {
+    color: #0070dd;
+    opacity: 0.55;
   }
 
   /* ---------- deed tracker ---------- */

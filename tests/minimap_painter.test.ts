@@ -153,8 +153,10 @@ interface FakeSprite {
 }
 
 interface GlyphTrace {
-  /** Every 3-argument `drawImage` (the glyph blits; the terrain blit takes 9). */
-  blits: Array<{ sprite: FakeSprite; dx: number; dy: number }>;
+  /** Every 3-argument `drawImage` (the glyph blits; the terrain blit takes 9),
+   *  with the context's globalAlpha AT BLIT TIME (the cooldown dim rides the
+   *  blit, never the sprite raster). */
+  blits: Array<{ sprite: FakeSprite; dx: number; dy: number; alpha: number }>;
   /** Every canvas created through `document.createElement('canvas')`. */
   sprites: FakeSprite[];
   /** Any text drawn straight onto the MINIMAP context (must stay zero). */
@@ -233,11 +235,17 @@ function newTrace(): GlyphTrace {
 
 function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
   let font = '';
+  let alpha = 1;
   const ctx = {
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 1,
-    globalAlpha: 1,
+    get globalAlpha(): number {
+      return alpha;
+    },
+    set globalAlpha(value: number) {
+      alpha = value;
+    },
     imageSmoothingEnabled: true,
     get font(): string {
       return font;
@@ -255,7 +263,7 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
     drawImage(image: unknown, ...rest: number[]): void {
       // The 3-argument form is a glyph sprite; the terrain sub-rect blit passes 9.
       if (rest.length === 2) {
-        trace.blits.push({ sprite: image as FakeSprite, dx: rest[0], dy: rest[1] });
+        trace.blits.push({ sprite: image as FakeSprite, dx: rest[0], dy: rest[1], alpha });
       }
     },
     clearRect(): void {},
@@ -297,11 +305,23 @@ function fakeMinimapContext(trace: GlyphTrace): CanvasRenderingContext2D {
 // The player sits at an overworld position with no gather node or station in the rim.
 const PLAYER_POS = { x: 0, z: 100 };
 
-/** `npcs` are world positions; `state` drives which glyph each quest-giver resolves to. */
+// A real cadenced work order drives the repeat/cooldown marker variants.
+function requireWorkOrderQuest() {
+  const quest = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+  if (!quest) throw new Error('expected a cadenced work order');
+  return quest;
+}
+const WORK_ORDER_QUEST = requireWorkOrderQuest();
+
+/** `npcs` are world positions; `state` drives which glyph and marker variant
+ *  each quest-giver resolves to (repeat/cooldown ride the real work order
+ *  with the questsDone/cadence inputs the classifier reads). */
 function glyphWorld(
   npcs: Array<{ x: number; z: number; quest: boolean }>,
-  state: 'available' | 'ready',
+  state: 'available' | 'ready' | 'repeat' | 'cooldown',
 ): IWorld {
+  const variant = state === 'repeat' || state === 'cooldown';
+  const quest = variant ? WORK_ORDER_QUEST : READY_QUEST;
   const entities = new Map<number, unknown>();
   const player = { id: 1, kind: 'player', name: 'Me', pos: { ...PLAYER_POS }, facing: 0 };
   entities.set(1, player);
@@ -313,8 +333,8 @@ function glyphWorld(
       dead: false,
       lootable: false,
       aggroTargetId: null,
-      templateId: npc.quest ? READY_QUEST.giverNpcId : '',
-      questIds: npc.quest ? [READY_QUEST.id] : [],
+      templateId: npc.quest ? quest.giverNpcId : '',
+      questIds: npc.quest ? [quest.id] : [],
       pos: { x: npc.x, z: npc.z },
     });
   });
@@ -329,7 +349,20 @@ function glyphWorld(
     inventory: [],
     stationPlacements: [],
     nodeHarvestableByMe: () => false,
-    questState: (q: string) => (q === READY_QUEST.id ? state : 'unavailable'),
+    questState: (q: string) =>
+      q === quest.id
+        ? state === 'repeat'
+          ? 'available'
+          : state === 'cooldown'
+            ? 'unavailable'
+            : state
+        : 'unavailable',
+    questsDone: variant ? new Set([quest.id]) : new Set<string>(),
+    craftingIdentity: {
+      version: 1,
+      synced: true,
+      cadenceBlockedQuests: state === 'cooldown' ? [quest.id] : [],
+    },
   } as unknown as IWorld;
 }
 
@@ -477,6 +510,65 @@ describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-mark
     expect(sprite.ink).toEqual([
       { glyph: '?', x: 2, y: 12, font: 'bold 11px Georgia', fillStyle: 'quest-a' },
     ]);
+  });
+
+  it('rasterizes the repeat variant in the repeat token, same box, full alpha', () => {
+    // The phase 23 blue "!": a completed repeatable resolves the
+    // npc-quest-repeat token (never the gold), rasterizes into the SAME
+    // 16x16 box at the same origin/baseline (the sprite geometry that clips
+    // silently when it shrinks, acceptance (d)), and blits undimmed.
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const ctx = fakeMinimapContext(trace);
+    paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'repeat'));
+
+    expect(trace.blits).toHaveLength(1);
+    expect(trace.blits[0].alpha).toBe(1);
+    const sprite = trace.blits[0].sprite;
+    expect(sprite.width).toBe(16);
+    expect(sprite.height).toBe(16);
+    expect(sprite.ink).toEqual([
+      {
+        glyph: '!',
+        x: 2,
+        y: 12,
+        font: 'bold 11px Georgia',
+        fillStyle: 'paint:--color-minimap-npc-quest-repeat',
+      },
+    ]);
+  });
+
+  it('blits the cooldown variant from the repeat sprite, dimmed, and restores alpha', () => {
+    // A work order inside its cadence window: the SAME repeat-token sprite
+    // (no third raster), blitted at the cooldown dim, with the context's
+    // globalAlpha restored so no later marker inherits the dim.
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const ctx = fakeMinimapContext(trace);
+    paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'cooldown'));
+
+    expect(trace.blits).toHaveLength(1);
+    expect(trace.blits[0].alpha).toBe(0.55);
+    expect(ctx.globalAlpha).toBe(1);
+    const sprite = trace.blits[0].sprite;
+    expect(sprite.ink[0].glyph).toBe('!');
+    expect(sprite.ink[0].fillStyle).toBe('paint:--color-minimap-npc-quest-repeat');
+  });
+
+  it('keeps every non-repeat glyph on the gold token at full alpha (the negative arm)', () => {
+    // Acceptance (b): a plain available quest and a ready turn-in stay
+    // pixel-identical to the pre-phase painter: gold token, no dim.
+    for (const state of ['available', 'ready'] as const) {
+      const trace = newTrace();
+      installGlyphGlobals(trace);
+      const ctx = fakeMinimapContext(trace);
+      paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], state));
+      expect(trace.blits, state).toHaveLength(1);
+      expect(trace.blits[0].alpha, state).toBe(1);
+      expect(trace.blits[0].sprite.ink[0].fillStyle, state).toBe('quest-a');
+      expect(trace.blits[0].sprite.ink[0].glyph, state).toBe(state === 'ready' ? '?' : '!');
+      vi.unstubAllGlobals();
+    }
   });
 
   it('gives each glyph its own sprite', () => {

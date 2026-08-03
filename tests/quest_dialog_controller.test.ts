@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DELVES, NPCS, STATIONS } from '../src/sim/data';
+import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
 import { craftNameText } from '../src/ui/char_window';
@@ -67,6 +67,8 @@ function harness(
       ...identityExtra,
     },
     questState: vi.fn(() => questState),
+    // The quest-marker inputs the gossip list reads (the phase 23 classifier).
+    questsDone: new Set<string>(),
     targetEntity,
     interact,
     acceptLinkedQuest,
@@ -197,6 +199,52 @@ describe('QuestDialogController', () => {
     expect(test.release).toHaveBeenCalledWith(true);
     expect(test.onOpenChange).toHaveBeenLastCalledWith(false);
     expect(test.controller.isOpen).toBe(false);
+  });
+
+  it('renders a completed repeatable as the blue row with the repeatable aria', () => {
+    // The phase 23 gossip arm over the real cadenced work order. Before the
+    // first completion the row keeps the first-offer gold glyph and the
+    // available aria (acceptance (b)'s negative); once questsDone carries the
+    // id, the glyph class flips to quest-repeat and the aria names the
+    // repeatable state (acceptance (e)).
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const giver = npc(30, workOrder.giverNpcId);
+    (giver as unknown as { questIds: string[] }).questIds = [workOrder.id];
+
+    const fresh = harness(giver, 'available');
+    fresh.controller.open(30);
+    const freshRow = fresh.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!freshRow) throw new Error('expected the gossip quest row');
+    expect(freshRow.innerHTML).toContain('<span class="gold">!</span>');
+    expect(freshRow.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.availableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+
+    const giver2 = npc(31, workOrder.giverNpcId);
+    (giver2 as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const done = harness(giver2, 'available');
+    (done.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    done.controller.open(31);
+    const doneRow = done.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!doneRow) throw new Error('expected the gossip quest row');
+    expect(doneRow.innerHTML).toContain('<span class="quest-repeat">!</span>');
+    expect(doneRow.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+
+    // Inside the cadence window the dialog lists NO row for the order (it is
+    // not offerable), exactly the pre-phase dialog: the dimmed marker is an
+    // overhead/map statement, never a dead gossip button.
+    const giver3 = npc(32, workOrder.giverNpcId);
+    (giver3 as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const blocked = harness(giver3, 'unavailable');
+    (blocked.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    (
+      blocked.world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }
+    ).cadenceBlockedQuests = [workOrder.id];
+    blocked.controller.open(32);
+    expect(blocked.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
   });
 
   it('routes bankers and chroniclers through authoritative interaction without gossip', () => {

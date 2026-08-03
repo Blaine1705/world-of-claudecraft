@@ -149,6 +149,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "es_ES": [
@@ -291,6 +294,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "fr_FR": [
@@ -433,6 +439,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "fr_CA": [
@@ -575,6 +584,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "en_CA": [],
@@ -718,6 +730,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "de_DE": [
@@ -860,6 +875,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "zh_CN": [
@@ -1042,6 +1060,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "ru_RU": [
@@ -1195,6 +1216,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "nl_NL": [
@@ -1338,6 +1362,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "pl_PL": [
@@ -1481,6 +1508,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "id_ID": [
@@ -1624,6 +1654,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "tr_TR": [
@@ -1767,6 +1800,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "sv_SE": [
@@ -1910,6 +1946,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "vi_VN": [
@@ -2053,6 +2092,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ],
   "da_DK": [
@@ -2196,6 +2238,9 @@ export const pending: Record<string, readonly string[]> = {
     "itemUi.vendor.qtyMultiple",
     "itemUi.vendor.qtyMultipleAria",
     "itemUi.vendor.qtyRowAria",
+    "questUi.dialog.repeatableQuestAria",
+    "questUi.log.cooldownStatus",
+    "questUi.log.repeatableStatus",
     "questUi.tracker.unknownQuest"
   ]
 };

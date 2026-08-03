@@ -585,19 +585,24 @@ describe('questObjectiveAreas', () => {
 });
 
 describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from static content)', () => {
-  it('is empty when no quest is available or ready', () => {
-    expect(questGiverNpcMarkers(() => 'unavailable')).toEqual([]);
+  const NO_HISTORY = new Set<string>();
+
+  it('is empty when no quest is available, ready, or inside a cooldown window', () => {
+    expect(questGiverNpcMarkers(() => 'unavailable', NO_HISTORY)).toEqual([]);
   });
 
   it("resolves a real giver's static position for an available quest ('!' glyph)", () => {
     const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
     if (!quest) throw new Error('expected a quest with a giverNpcId');
     const giver = NPCS[quest.giverNpcId as string];
-    const markers = questGiverNpcMarkers((q) => (q === quest.id ? 'available' : 'unavailable'));
+    const markers = questGiverNpcMarkers(
+      (q) => (q === quest.id ? 'available' : 'unavailable'),
+      NO_HISTORY,
+    );
     const marker = markers.find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
     expect(marker, "expected a marker at the giver's static content position").toBeTruthy();
-    expect(marker?.ready).toBe(false);
-    expect(marker?.quests).toContainEqual({ questId: quest.id, ready: false });
+    expect(marker?.kind).toBe('available');
+    expect(marker?.quests).toContainEqual({ questId: quest.id, kind: 'available' });
   });
 
   it("marks ready ('?') ahead of available ('!') for a giver that is also its own turn-in npc", () => {
@@ -606,9 +611,87 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
     );
     if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
     const giver = NPCS[quest.giverNpcId as string];
-    const markers = questGiverNpcMarkers((q) => (q === quest.id ? 'ready' : 'unavailable'));
+    const markers = questGiverNpcMarkers(
+      (q) => (q === quest.id ? 'ready' : 'unavailable'),
+      NO_HISTORY,
+    );
     const marker = markers.find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
-    expect(marker?.ready).toBe(true);
+    expect(marker?.kind).toBe('ready');
+  });
+
+  it('classifies a completed repeatable as the blue repeat variant, and only then', () => {
+    // A real repeatable work order: available again with the id in
+    // questsDone is the settled Q30 rule for the blue "!", while the same
+    // offer WITHOUT history keeps the first-offer gold (the negative arm).
+    const quest = Object.values(QUESTS).find((q) => q.repeatable && q.giverNpcId);
+    if (!quest) throw new Error('expected a repeatable quest with a giver');
+    const giver = NPCS[quest.giverNpcId as string];
+    const state = (q: string) =>
+      q === quest.id ? ('available' as const) : ('unavailable' as const);
+    const fresh = questGiverNpcMarkers(state, NO_HISTORY).find(
+      (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
+    );
+    expect(fresh?.kind).toBe('available');
+    const done = questGiverNpcMarkers(state, new Set([quest.id])).find(
+      (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
+    );
+    expect(done?.kind).toBe('repeat');
+    expect(done?.quests).toContainEqual({ questId: quest.id, kind: 'repeat' });
+  });
+
+  it('surfaces a cadence-blocked work order as the dimmed cooldown marker, from the set only', () => {
+    // Today the giver shows nothing inside the 30-minute window; with the
+    // blocked set the marker resolves cooldown, and WITHOUT the set the same
+    // unavailable state stays markerless (an older server payload degrades
+    // to the pre-phase map rather than guessing).
+    const quest = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!quest) throw new Error('expected a cadenced work order');
+    const giver = NPCS[quest.giverNpcId as string];
+    const state = () => 'unavailable' as const;
+    const blocked = questGiverNpcMarkers(state, new Set([quest.id]), new Set([quest.id])).find(
+      (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
+    );
+    expect(blocked?.kind).toBe('cooldown');
+    expect(blocked?.quests).toContainEqual({ questId: quest.id, kind: 'cooldown' });
+    expect(
+      questGiverNpcMarkers(state, new Set([quest.id])).find(
+        (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
+      ),
+    ).toBeUndefined();
+  });
+
+  it("lists a marker's quests strongest kind first, across the whole fold order", () => {
+    // The profession masters hold the full real mix on one NPC: a plain
+    // attunement quest, a repeatable amends return, and a cadenced work
+    // order (forgemistress_darva's three, giver and turn-in alike). Two
+    // arms pin every adjacent pair of the ready > available > repeat >
+    // cooldown listing order, so a reorder of any two neighbors reddens.
+    const ATTUNE = 'q_prof_attune_smith';
+    const AMENDS = 'q_prof_amends_smith';
+    const WORK_ORDER = 'q_prof_workorder_forge';
+    const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
+    const at = (m: { pos: { x: number; z: number } }) =>
+      m.pos.x === giver.pos.x && m.pos.z === giver.pos.z;
+
+    // Arm A: ready + available + repeat (the amends fresh, the work order
+    // completed and offered again).
+    const armA = questGiverNpcMarkers(
+      (q) =>
+        q === ATTUNE ? 'ready' : q === AMENDS || q === WORK_ORDER ? 'available' : 'unavailable',
+      new Set([WORK_ORDER]),
+    ).find(at);
+    expect(armA?.kind).toBe('ready');
+    expect(armA?.quests.map((q) => q.kind)).toEqual(['ready', 'available', 'repeat']);
+
+    // Arm B: ready + repeat + cooldown (the amends completed and offered
+    // again, the work order inside its window).
+    const armB = questGiverNpcMarkers(
+      (q) => (q === ATTUNE ? 'ready' : q === AMENDS ? 'available' : 'unavailable'),
+      new Set([AMENDS, WORK_ORDER]),
+      new Set([WORK_ORDER]),
+    ).find(at);
+    expect(armB?.kind).toBe('ready');
+    expect(armB?.quests.map((q) => q.kind)).toEqual(['ready', 'repeat', 'cooldown']);
   });
 
   it('skips a dynamic NPC (spawned on demand by its owning system) even when it lists a matching turn-in quest', () => {
@@ -618,7 +701,10 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
     if (!dynamicNpc) throw new Error('expected a dynamic NPC carrying a turn-in quest');
     const questId = dynamicNpc.questIds.find((q) => isQuestTurnInNpc(QUESTS[q], dynamicNpc.id));
     if (!questId) throw new Error('expected a turn-in questId on the dynamic NPC');
-    const markers = questGiverNpcMarkers((q) => (q === questId ? 'ready' : 'unavailable'));
+    const markers = questGiverNpcMarkers(
+      (q) => (q === questId ? 'ready' : 'unavailable'),
+      NO_HISTORY,
+    );
     expect(markers.some((m) => m.pos.x === dynamicNpc.pos.x && m.pos.z === dynamicNpc.pos.z)).toBe(
       false,
     );

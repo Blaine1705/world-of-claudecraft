@@ -112,6 +112,12 @@ const NPC_GLYPH_OFFSET_Y = 3;
 const NPC_GLYPH_SPRITE_SIZE = 16;
 const NPC_GLYPH_SPRITE_ORIGIN_X = 2;
 const NPC_GLYPH_SPRITE_BASELINE_Y = 12;
+// The cooldown variant's dim: the repeat-blue '!' blitted at this globalAlpha
+// (a work order inside its cadence window, marked where the NPC previously
+// showed nothing). Applied at drawImage time so the sprite cache stays at one
+// raster per (glyph, color); matches .np-marker.cooldown's opacity so the
+// nameplate and minimap dim identically.
+const NPC_GLYPH_COOLDOWN_ALPHA = 0.55;
 
 // Corpse marker (ghost run): a compact procedural skull, drawn from canvas
 // primitives (cranium + jaw in the corpse color, eye sockets and a nasal notch
@@ -162,6 +168,7 @@ const MINIMAP_COLOR_TOKENS = {
   allyFriend: '--color-minimap-ally-friend',
   allyGuild: '--color-minimap-ally-guild',
   npcQuest: '--color-minimap-npc-quest',
+  npcQuestRepeat: '--color-minimap-npc-quest-repeat',
   portal: '--color-minimap-portal',
   objectLoot: '--color-minimap-object-loot',
   mobAggro: '--color-minimap-mob-aggro',
@@ -213,8 +220,9 @@ export class MinimapPainter {
   // NPC glyph sprites (see the NPC_GLYPH_* header), keyed color -> glyph. Nested rather
   // than one map on a `${glyph}|${color}` composite so the per-marker lookup in the draw
   // loop allocates NO key string. Bounded without eviction by construction: NpcGlyph is a
-  // closed three-member union and resolveColors freezes one color set for the session, so
-  // the live map holds at most three sprites of 16x16 each.
+  // closed three-member union and resolveColors freezes TWO glyph colors for the session
+  // (the gold npcQuest and the repeat blue), so the live map holds at most six sprites of
+  // 16x16 each (the cooldown variant dims the repeat sprite at blit time, no extra raster).
   private readonly glyphSprites = new Map<string, Map<NpcGlyph, HTMLCanvasElement>>();
 
   constructor(
@@ -418,7 +426,7 @@ export class MinimapPainter {
           ctx.fill();
           ctx.stroke();
           break;
-        case 'npc':
+        case 'npc': {
           // Blit the cached glyph sprite so its internal fillText origin lands on the
           // inline site's (mx - 2, my + 3) anchor.
           //
@@ -438,12 +446,20 @@ export class MinimapPainter {
           // The tradeoff, deliberately taken: the glyph now snaps to whole pixels where
           // fillText advanced it in quarter-pixel steps. At the minimap's 1.7 px/yard base
           // scale that is a sub-pixel marker shift on a surface that redraws at 10Hz.
+          //
+          // Color by the folded marker state: gold for ready/available and the
+          // neutral dot, the repeat token for a completed repeatable, and the
+          // repeat token dimmed for a work order inside its cadence window.
+          const repeatColored = m.marker === 'repeat' || m.marker === 'cooldown';
+          if (m.marker === 'cooldown') ctx.globalAlpha = NPC_GLYPH_COOLDOWN_ALPHA;
           ctx.drawImage(
-            this.npcGlyphSprite(m.glyph, colors.npcQuest),
+            this.npcGlyphSprite(m.glyph, repeatColored ? colors.npcQuestRepeat : colors.npcQuest),
             Math.round(m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X),
             Math.round(m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y),
           );
+          if (m.marker === 'cooldown') ctx.globalAlpha = 1;
           break;
+        }
         case 'portal':
           ctx.fillStyle = colors.portal;
           ctx.beginPath();

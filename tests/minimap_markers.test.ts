@@ -116,6 +116,15 @@ function makeWorld(shape: 'sim' | 'client'): IWorld {
     // itself whatever the map looks like.
     inventory: [],
     nodeHarvestableByMe: () => true,
+    // The quest-marker inputs both worlds expose (the phase 23 classifier):
+    // questsDone always, and the crafting identity whose cadenceBlockedQuests
+    // mirror drives the cooldown variant. The sim shape carries a fuller
+    // identity; the client shape only what the cprof mirror guarantees.
+    questsDone: new Set<string>(),
+    craftingIdentity:
+      shape === 'sim'
+        ? { version: 1, synced: true, attunedPairs: [], cadenceBlockedQuests: [] }
+        : { version: 1, synced: false, cadenceBlockedQuests: [] },
   } as unknown as IWorld;
 }
 
@@ -207,6 +216,8 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     >[];
     // The giver has an available (not ready) quest -> '!'; the quiet npc -> '•'.
     expect(npcs.map((n) => n.glyph)).toEqual(['!', '•']);
+    // The marker variant behind each glyph: gold first-offer, neutral none.
+    expect(npcs.map((n) => n.marker)).toEqual(['available', 'none']);
   });
 
   it("renders the '?' glyph when an npc has a ready turn-in (distinct from '!')", () => {
@@ -223,6 +234,55 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       (m) => m.kind === 'npc',
     ) as Extract<MinimapMarker, { kind: 'npc' }>[];
     expect(npcs[0].glyph).toBe('?');
+    expect(npcs[0].marker).toBe('ready');
+  });
+
+  it('stamps the repeat and cooldown variants identically for both world shapes', () => {
+    // The phase 23 blue "!" at the minimap surface, from a real cadenced work
+    // order re-pointed onto the seeded npc: after one completion the offer
+    // stamps 'repeat'; inside the window (the cadenceBlockedQuests mirror)
+    // it stamps 'cooldown' where the npc previously showed the neutral dot.
+    // Driven through BOTH stub shapes so the Sim and the ClientWorld mirror
+    // provably stamp the same variant (acceptance (a)'s both-worlds arm).
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    for (const shape of ['sim', 'client'] as const) {
+      const world = makeWorld(shape) as unknown as {
+        entities: Map<number, { templateId: string; questIds: string[] }>;
+        questState: (q: string) => string;
+        questsDone: Set<string>;
+        craftingIdentity: { cadenceBlockedQuests: string[] };
+      };
+      const npc = world.entities.get(6);
+      if (!npc) throw new Error('expected the seeded giver npc');
+      npc.templateId = workOrder.giverNpcId;
+      npc.questIds = [workOrder.id];
+      world.questsDone = new Set([workOrder.id]);
+      world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
+      const offered = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(offered[0].glyph, `${shape}: offered again`).toBe('!');
+      expect(offered[0].marker, `${shape}: offered again`).toBe('repeat');
+
+      world.questState = () => 'unavailable';
+      world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+      const blocked = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(blocked[0].glyph, `${shape}: inside the window`).toBe('!');
+      expect(blocked[0].marker, `${shape}: inside the window`).toBe('cooldown');
+
+      // The negative arm: the same unavailable state WITHOUT the mirror set
+      // keeps the pre-phase neutral dot (an older server payload degrades to
+      // today's behavior rather than guessing).
+      world.craftingIdentity.cadenceBlockedQuests = [];
+      const bare = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(bare[0].glyph, `${shape}: no mirror`).toBe('•');
+      expect(bare[0].marker, `${shape}: no mirror`).toBe('none');
+    }
   });
 
   it('classifies party members: an on-map disc (alive -> pip) and an off-map arrow (dead)', () => {

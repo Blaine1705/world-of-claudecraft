@@ -107,8 +107,10 @@ interface PaintTrace {
   styleReads: string[];
   /** Every canvas minted through document.createElement('canvas'). */
   sprites: LabelSprite[];
-  /** Every 3-argument drawImage: the label blits (the terrain blit passes 9). */
-  blits: Array<{ sprite: LabelSprite; dx: number; dy: number }>;
+  /** Every 3-argument drawImage: the label blits (the terrain blit passes 9),
+   *  with the context's globalAlpha AT BLIT TIME (the cooldown glyph dims at
+   *  the blit, never in the sprite raster). */
+  blits: Array<{ sprite: LabelSprite; dx: number; dy: number; alpha: number }>;
   /** Every canvas text entry point used on the MAP context, which must stay empty. */
   textApi: string[];
   /** Every stroke() on the map context with the stroke state it used. The width
@@ -147,12 +149,19 @@ function makeLabelSprite(trace: PaintTrace): LabelSprite {
 function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
   let commands: string[] = [];
   let font = '';
+  let alpha = 1;
   const ctx = {
     fillStyle: '',
     strokeStyle: '',
     lineWidth: 1,
     textAlign: 'start',
     imageSmoothingEnabled: false,
+    get globalAlpha(): number {
+      return alpha;
+    },
+    set globalAlpha(value: number) {
+      alpha = value;
+    },
     get font(): string {
       return font;
     },
@@ -163,7 +172,7 @@ function fakeMapContext(trace: PaintTrace): CanvasRenderingContext2D {
     drawImage(image: unknown, ...rest: number[]): void {
       // The 3-argument form is a label sprite; the terrain sub-rect blit passes 9.
       if (rest.length === 2) {
-        trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1] });
+        trace.blits.push({ sprite: image as LabelSprite, dx: rest[0], dy: rest[1], alpha });
       }
     },
     // the painter floods the ocean before the zone bg blit; the fake context
@@ -447,6 +456,9 @@ function labelWorld(): IWorld {
         { questId: kill.id, counts: kill.objectives.map(() => 0), state: 'active' as const },
       ],
     ]),
+    // The quest-marker inputs both worlds expose (the phase 23 classifier).
+    questsDone: new Set<string>(),
+    craftingIdentity: { version: 1, synced: true, cadenceBlockedQuests: [] },
   } as unknown as IWorld;
 }
 
@@ -804,6 +816,74 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       { op: 'stroke', color: 'paint:--color-map-outline', text: '?' },
       { op: 'fill', color: 'paint:--color-map-npc-quest', text: '?' },
     ]);
+  });
+
+  it('draws the repeat and cooldown variants in the repeat token, dimming only the cooldown blit', () => {
+    // The phase 23 blue "!" at the map surface, over the real cadenced work
+    // order. The repeat arm fills the repeat token at full alpha; the
+    // cooldown arm reuses the same style but blits at the dim, restoring the
+    // context's alpha so no later layer inherits it; and the plain available
+    // glyph (labelWorld above) stays on the gold token, pinned as the
+    // negative arm so acceptance (b) has a decisive assertion here.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const variantWorld = (state: 'repeat' | 'cooldown'): IWorld => {
+      const world = labelWorld() as unknown as {
+        entities: Map<number, { templateId: string; questIds: string[] }>;
+        questState: (q: string) => string;
+        questsDone: Set<string>;
+        craftingIdentity: { cadenceBlockedQuests: string[] };
+      };
+      const npc = world.entities.get(2);
+      if (!npc) throw new Error('expected the fixture npc');
+      npc.templateId = workOrder.giverNpcId;
+      npc.questIds = [workOrder.id];
+      world.questsDone = new Set([workOrder.id]);
+      world.questState = (q) =>
+        state === 'repeat' && q === workOrder.id ? 'available' : 'unavailable';
+      world.craftingIdentity.cadenceBlockedQuests = state === 'cooldown' ? [workOrder.id] : [];
+      return world as unknown as IWorld;
+    };
+    // Is the work order's giver even inside this fixture zone? The glyphs
+    // resolve from static content, so require it up front rather than
+    // passing vacuously on an empty marker list.
+    for (const state of ['repeat', 'cooldown'] as const) {
+      const trace = newTrace();
+      installMapStyleGlobals(trace);
+      setActiveWorldContent(BUILTIN_WORLD);
+      const ctx = fakeMapContext(trace);
+      new MapWindowPainter(classColor).paintOverworld(
+        ctx,
+        variantWorld(state),
+        labelPaintOptions(),
+      );
+      const glyphBlits = trace.blits.filter((b) => spriteText(b.sprite) === '!');
+      expect(glyphBlits.length, state).toBeGreaterThan(0);
+      expect(glyphBlits[0].sprite.ink.map(inkStyle), state).toEqual([
+        { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
+        { op: 'fill', color: 'paint:--color-map-npc-quest-repeat', text: '!' },
+      ]);
+      expect(glyphBlits[0].alpha, state).toBe(state === 'cooldown' ? 0.55 : 1);
+      expect(ctx.globalAlpha, state).toBe(1);
+    }
+
+    // The negative arm: the ordinary available glyph keeps the gold token at
+    // full alpha, byte-identical styling to the pre-phase painter.
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      labelWorld(),
+      labelPaintOptions(),
+    );
+    const gold = trace.blits.filter((b) => spriteText(b.sprite) === '!');
+    expect(gold.length).toBeGreaterThan(0);
+    expect(gold[0].sprite.ink.map(inkStyle)).toEqual([
+      { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
+      { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
+    ]);
+    expect(gold[0].alpha).toBe(1);
   });
 
   it('opens each redraw on the cache, so the budget is enforced in the shipped path', () => {
