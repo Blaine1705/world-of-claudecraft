@@ -78,9 +78,24 @@ const NIGHT_LIGHT_FLOOR = 0.36;
 // The ambient (hemisphere + IBL) floor sits above the key-light floor: the sky
 // bounce is what holds terrain shape and body silhouettes together, and pinning
 // it to the moon's own dimness is what made deep night read as flat black rather
-// than as a lit night. A conservative lift on ONE number, kept here in the grade
-// math so no consumer has to scatter a night multiplier of its own.
-const NIGHT_AMBIENT_FLOOR = 0.5;
+// than as a lit night. ONE number, kept here in the grade math so no consumer
+// has to scatter a night multiplier of its own.
+//
+// Walked up across three passes (0.50, 0.62, then here) against playtest
+// feedback that night was too dark to move around in. This is a 2.2x lift on the
+// ambient half with the moonlit key light left untouched, which is what keeps
+// the result reading as night: the CONTRAST between the two halves is the night
+// cue, not the absolute level, and only the key light casts the long moon
+// shadows that sell it.
+//
+// The last step was measured rather than eyeballed, by mean frame luminance over
+// a fixed screenshot tour (see the numbers in the feature's PR notes). Going
+// 0.62 to 0.78 moved a town square only about 8 percent, because a lit town is
+// dominated by its own lamps and sky, but moved a forest interior 23 to 33
+// percent. That shape is the whole argument for putting the knob here: raising
+// the ambient floor buys the most exactly where the frame was darkest, and
+// nearly nothing where it was already readable.
+const NIGHT_AMBIENT_FLOOR = 0.78;
 const NIGHT_SKY: [number, number, number] = [0.045, 0.06, 0.15];
 const NIGHT_FOG: [number, number, number] = [0.14, 0.18, 0.31];
 const NIGHT_FAR_SCALE = 0.82;

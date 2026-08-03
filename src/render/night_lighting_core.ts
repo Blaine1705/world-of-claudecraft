@@ -71,6 +71,17 @@ export function mobGlowAmount(nightLight: number): number {
   return ramp(nightLight, MOB_ON, MOB_FULL) * MOB_GLOW_CEILING;
 }
 
+/**
+ * Bioluminescence: the glow flora and the fireflies. Shares the mob glow's
+ * later window rather than the lamps' dusk window, because a lamp is something
+ * a person lights at sundown while a glowing mushroom is only VISIBLE once the
+ * light around it has actually gone. Reaches a full 1 (the mob cue is
+ * deliberately capped below that; this one is the thing you are looking at).
+ */
+export function wildGlowAmount(nightLight: number): number {
+  return ramp(nightLight, MOB_ON, MOB_FULL);
+}
+
 /** Yards at which a character's ground glow has faded out completely. */
 export const MOB_GLOW_RANGE = 44;
 /** Yards at which it starts easing out, so a disc never pops in at the edge. */

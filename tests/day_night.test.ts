@@ -258,7 +258,12 @@ describe('the night ambient floor (readable silhouettes at deep night)', () => {
     // that keeps terrain shape and bodies legible. Pinning both to one floor is
     // what made night read as a black cutout.
     expect(g.ambientScale).toBeGreaterThan(g.lightScale);
-    expect(g.ambientScale).toBeCloseTo(0.5, 12);
+    expect(g.ambientScale).toBeCloseTo(0.78, 12);
+    // The CONTRAST between the two halves is the night cue, not the absolute
+    // level: the ambient may be walked up for readability, but if it ever
+    // reaches the key light the moon stops casting and the frame reads as an
+    // overcast afternoon. Keep a real gap.
+    expect(g.ambientScale - g.lightScale).toBeGreaterThan(0.15);
   });
 
   it('never brightens past the authored day, at any point of the cycle', () => {

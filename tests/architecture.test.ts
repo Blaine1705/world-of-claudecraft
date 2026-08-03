@@ -337,6 +337,7 @@ const RENDER_PURE_CORES = [
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/night_accents_core.ts',
   'src/render/night_lighting_core.ts',
   'src/render/streetlamp_placement_core.ts',
   'src/render/opaque_draw_order_core.ts',

@@ -159,6 +159,7 @@ import {
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
+import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
@@ -253,6 +254,7 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
+import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
   lampGlowAmount,
@@ -261,6 +263,7 @@ import {
   mobGlowStrength,
   nightLightAmount,
   nightRimBoost,
+  wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
 import {
@@ -1547,6 +1550,8 @@ export class Renderer {
   private amberFeatures: AmberFeaturesView | null = null;
   private nightFeatures: NightFeaturesView | null = null;
   private streetlamps: StreetlampsView | null = null;
+  private emberPools: EmberPoolsView | null = null;
+  private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   private hauntFeatures: HauntFeaturesView | null = null;
   private jungleFeatures: JungleFeaturesView | null = null;
@@ -2308,7 +2313,16 @@ export class Renderer {
     this.mobNightGlow = buildMobNightGlow();
     setRenderCategory(this.mobNightGlow.group, 'ui3d');
     this.scene.add(this.mobNightGlow.group);
-    bd('streetlamps');
+    // Ember pools at every authored campfire and mob camp: static, so they
+    // bucket per zone and ride the same distance cull as the lamps.
+    this.emberPools = buildEmberPools(this.sim.cfg.seed);
+    this.attachZoneFeature(this.emberPools);
+    // The streamed wilderness layer (glow flora + fireflies) follows the camera
+    // and rebuilds on a cell crossing, so it is NOT a zone feature.
+    this.nightAccents = buildNightAccents(this.sim.cfg.seed);
+    setRenderCategory(this.nightAccents.group, 'props');
+    this.scene.add(this.nightAccents.group);
+    bd('night-accents');
     // One residency table at the end of the build (dev console): where the
     // decoded bytes sit at exactly the point the iPhone 17 Pro is killed.
     // Scene first so shared buffers/images attribute to the live world, then
@@ -9550,7 +9564,9 @@ export class Renderer {
     // flicker pass are what actually write light.intensity, and they read the
     // baseIntensity this sets. Running it afterward would put a lamp's own level
     // back on top of a light the governor had just budgeted out.
-    this.streetlamps?.update(lampGlowAmount(this.dnGlobalNight), this.time);
+    const lampGlow = lampGlowAmount(this.dnGlobalNight);
+    this.streetlamps?.update(lampGlow, this.time);
+    this.emberPools?.update(lampGlow, this.time);
     this.budgetFireLights(p.pos.x, p.pos.z, true);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'lights', worldStart);
 
@@ -9686,6 +9702,10 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
+    // The wilderness night layer rides beside the ambient motes: same
+    // player-centred streaming contract, but gated on real dark and anchored to
+    // world cells for the flora (see night_accents.ts).
+    this.nightAccents?.update(wildGlowAmount(this.dnGlobalNight), this.time, dt, p.pos.x, p.pos.z);
     this.bladeGrass.update(p.pos.x, p.pos.z);
     // fogFar here is subsystemCullFar(): the residency-clamped detail
     // horizon, so band blades never stand past unbuilt ground
