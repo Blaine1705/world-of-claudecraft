@@ -9,6 +9,7 @@ import { GFX, SUN_DIR } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
 import {
+  bakeSwellGate,
   buildWaterSurfaceIndex,
   shoreDepthAt,
   shoreSlopeAt,
@@ -160,8 +161,11 @@ export function hasWaterShaderAssets(): boolean {
 /**
  * Directional swell height (yards of half-amplitude), the amplitude BOTH
  * shader stages scale their wave field by. Purely cosmetic: the sim's
- * waterline and the swim surface stay flat, the amplitude fades to zero at the
- * shoreline (a heaving sheet must never rise over a beach), and the vertex
+ * waterline and the swim surface stay flat, the amplitude is gated to zero
+ * over every cell that touches the shore (a heaving sheet must never rise over
+ * a beach, and the gate is a baked neighbourhood minimum precisely because the
+ * naive per-vertex version is only correct AT the vertices; see the aSwellGate
+ * attribute and water_core.ts bakeSwellGate), and the vertex
  * DISPLACEMENT additionally fades with camera range (the apron's ~29 yard
  * vertex spacing would alias the chop wavelengths into shimmer at the horizon;
  * the fragment stage has no such limit and fades on its own, wider schedule).
@@ -175,6 +179,18 @@ const WATER_SWELL_AMP = 0.22;
  * sheets, so this feather never reaches a normal, a whitecap, or a glint.
  */
 const WATER_CHOP_EDGE_FEATHER_YARDS = 14;
+/**
+ * Depth margin the horizon apron subtracts before its displacement gate opens
+ * (see bakeSwellGate). Its cells are ~29 x 38 yards, so an offshore sandbar can
+ * sit entirely BETWEEN four wet vertices, invisible to a grid minimum; one yard
+ * of margin covers every such bar in the world. It costs nothing visible: the
+ * shallowest fully-heaving apron vertex moves from 1.3 to about 3.4 yards of
+ * depth, and inside the world rect the apron is under a near-opaque zone plane
+ * there anyway. The zone planes take 0 at their 2 yard spacing, where the grid
+ * already sees everything.
+ */
+const WATER_APRON_SWELL_GATE_MARGIN_YARDS = 1;
+const WATER_PLANE_SWELL_GATE_MARGIN_YARDS = 0;
 /** Sun-through-swell scattering tint: the turquoise a lit wave face glows. */
 const SCATTER_COLOR = new THREE.Color(0.09, 0.38, 0.33);
 
@@ -293,6 +309,12 @@ const WATER_VERT = /* glsl */ `
   attribute float aShoreDepth;
   attribute float aShoreSlope;
   attribute float aSwellW;
+  // Baked conservative displacement gate (water_core.ts bakeSwellGate): the
+  // vertex's own depth ramp is only correct AT the vertex, and the GPU
+  // interpolates lift across the whole cell between them. A geometry that omits
+  // it reads 0 and stays flat, the same still-water default an interior pool
+  // already gets from omitting aSwellW.
+  attribute float aSwellGate;
   uniform float uTime;
   uniform float uSwellAmp;
   uniform sampler2D uWaveState;
@@ -317,7 +339,10 @@ const WATER_VERT = /* glsl */ `
     // matching SHADING is not computed here at all: the fragment stage
     // evaluates the same field per pixel on both sheets, so the feather (a
     // property of what a grid can carry) never reaches a normal.
-    float depthFade = clamp(aShoreDepth * 0.8, 0.0, 1.0);
+    // The baked neighbourhood gate, NOT this vertex's own depth: every corner
+    // of a cell touching dry ground reads 0, so the displaced sheet is exactly
+    // flat over that cell and cannot tear up through a beach between vertices.
+    float depthFade = aSwellGate;
     float rangeFade = 1.0 - smoothstep(120.0, 300.0, distance(cameraPosition.xz, pos.xz));
     // aSwellW packs both displacement gates: 0 = still water (interior pools,
     // whose geometry omits the attribute so GL supplies 0), 1 = groundswell
@@ -347,7 +372,12 @@ const WATER_VERT = /* glsl */ `
       // operand evaluation order is unspecified in GLSL.
       vec4 wave;
       float waveW = uWaveEnabled * waveSampleAt(pos.xz, wave);
-      pos.y += wave.r * waveW;
+      // Gated too: the height field clamps to +/- 0.65 yards, and this was the
+      // one displacement term that took no depth gate at all, so a wake or a
+      // splash next to a beach lifted the sheet over the sand at ANY vertex,
+      // dry ones included. Only the geometry is gated: the wake's SHADING
+      // (waveSlope, contactSheen) is a fragment effect and still runs ashore.
+      pos.y += wave.r * waveW * depthFade;
     }
     vShoreDepth = aShoreDepth;
     vShoreSlope = aShoreSlope;
@@ -801,6 +831,24 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // shade from the identical wave field and their shared rect edge carries
     // no step in normals, whitecaps, or glints.
     geo.setAttribute('aSwellW', new THREE.BufferAttribute(new Float32Array(pos.count).fill(1), 1));
+    // The LIVE segment count, never APRON_SEGMENTS: the vista tiers build a
+    // denser apron, and a gate computed over the wrong grid dimensions reads
+    // the wrong neighbours (the same class of bug commit 032ee377d fixed in
+    // cullApron).
+    const apronColumns = apronSegments + 1;
+    const apronGate = bakeSwellGate(
+      deep,
+      apronColumns,
+      apronColumns,
+      WATER_APRON_SWELL_GATE_MARGIN_YARDS,
+    );
+    geo.setAttribute('aSwellGate', new THREE.BufferAttribute(apronGate, 1));
+    const refitApronGate = (): void => {
+      apronGate.set(
+        bakeSwellGate(deep, apronColumns, apronColumns, WATER_APRON_SWELL_GATE_MARGIN_YARDS),
+      );
+      (geo.attributes.aSwellGate as THREE.BufferAttribute).needsUpdate = true;
+    };
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
     // Dry-tile culling: the apron spans the whole world rect too, and its
@@ -826,6 +874,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       fillApron();
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+      refitApronGate();
       cullApron();
       apron.position.y = waterLevel() - 0.02;
     });
@@ -934,6 +983,24 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(shoreDepth, 1));
     geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(shoreSlope, 1));
     geo.setAttribute('aSwellW', new THREE.BufferAttribute(swellW, 1));
+    const planeGate = bakeSwellGate(
+      shoreDepth,
+      columns,
+      SEGMENTS_PER_ZONE + 1,
+      WATER_PLANE_SWELL_GATE_MARGIN_YARDS,
+    );
+    geo.setAttribute('aSwellGate', new THREE.BufferAttribute(planeGate, 1));
+    const refitPlaneGate = (): void => {
+      planeGate.set(
+        bakeSwellGate(
+          shoreDepth,
+          columns,
+          SEGMENTS_PER_ZONE + 1,
+          WATER_PLANE_SWELL_GATE_MARGIN_YARDS,
+        ),
+      );
+      (geo.attributes.aSwellGate as THREE.BufferAttribute).needsUpdate = true;
+    };
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
     // Dry-tile culling: most of a zone rect is land, and every quad buried
@@ -959,6 +1026,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       fill();
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+      refitPlaneGate();
       cullZone();
       mesh.position.y = waterLevel();
     });
