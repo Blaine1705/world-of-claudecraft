@@ -1169,16 +1169,21 @@ describe('/api/discord status cache busts ride the real write paths (Phase 9)', 
   });
 
   it('setDiscordMemberMetaBulk skips junk changed_account_ids elements without throwing', async () => {
-    // The Number.isFinite guard's own arm: a router (or future statement
-    // variant) that lets a null or string into the aggregate must not throw
-    // and must still bust the finite ids beside it.
+    // The Number.isFinite guard's own arm, decisively: junk FIRST so an
+    // early-exit mutant (break/return on the first bad id) still has real
+    // work remaining behind it, and account 0 warmed because Number(null) is
+    // 0, so a deleted guard busts key 0 and reds the readsFor(0) pin (a bust
+    // of an uncached junk key is a no-op delete, invisible otherwise).
     const { pool } = makePool(() => ({
-      rows: [{ changed: '3', skipped: '0', unapplied: [], changed_account_ids: [42, null, 'x'] }],
+      rows: [{ changed: '3', skipped: '0', unapplied: [], changed_account_ids: [null, 'x', 42] }],
       rowCount: 1,
     }));
+    await warm(0);
     await warm(42);
     await setDiscordMemberMetaBulk(pool, [metaRecord({ discordUserId: 'u42' })]);
+    await warm(0);
     await warm(42);
+    expect(readsFor(0)).toBe(1);
     expect(readsFor(42)).toBe(2);
   });
 

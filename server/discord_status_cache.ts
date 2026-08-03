@@ -27,7 +27,9 @@
 // Failure contract, inherited from cached_read and stated because it CHANGES
 // this endpoint's brownout behavior: a warm entry stale-serves (200 with a
 // value of unbounded age) while refreshes keep failing, where the pre-cache
-// endpoint answered 500; a cold entry still rejects. Stale-serving does not
+// endpoint answered 500; a cold entry still rejects, and a rejected mint
+// releases its cap slot at settle so value-less entries can never evict warm,
+// stale-servable snapshots during a brownout with account churn. Stale-serving does not
 // shed load (every past-TTL read still attempts the refresh flight), and its
 // only signal today is cached_read's one console.warn per failure streak; a
 // stale-serve counter would need the shared cached_read seam and is recorded
@@ -171,7 +173,18 @@ export class KeyedCachedRead<T> {
       },
     );
     this.entries.set(key, entry);
-    return entry.read();
+    const flight = entry.read();
+    flight.catch(() => {
+      // A rejected read means nothing was ever installed (a warm entry
+      // stale-serves instead of rejecting), so this entry is value-less: drop
+      // it so it cannot hold a cap slot and evict a warm snapshot during a
+      // brownout with account churn. Deleting at settle loses no single-flight
+      // sharing (the insert above is synchronous, so concurrent readers joined
+      // this flight), and the next reader re-mints, which is cached_read's own
+      // retry shape. Identity-guarded: a bust may already have replaced us.
+      if (this.entries.get(key) === entry) this.entries.delete(key);
+    });
+    return flight;
   }
 
   /** Drop one key's entry; its next read refreshes (see the header on why drop). */

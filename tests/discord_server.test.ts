@@ -587,8 +587,15 @@ describe('GET /api/discord status cache (Phase 9)', () => {
     accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
     const core = await readDiscordStatusCore(1);
     const snapshot = structuredClone(core);
+    const before = dbMock.query.mock.calls.length;
     await handleDiscordStatus(makeReq(), makeRes(), 1);
     await handleDiscordStatus(makeReq(), makeRes(), 1);
+    // Both handler calls were HITS on this very entry (zero new queries, and
+    // the reader still hands back the same object by reference), so the
+    // comparison below really covers the composes the contract is about; a
+    // handler that stopped reading this entry would make it vacuous.
+    expect(dbMock.query.mock.calls.length).toBe(before);
+    expect(await readDiscordStatusCore(1)).toBe(core);
     expect(core).toEqual(snapshot);
   });
 

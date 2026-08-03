@@ -844,8 +844,12 @@ export async function setDiscordMemberMetaBulk(
       console.warn('setDiscordMemberMetaBulk: changed_account_ids missing; status busts skipped');
   } else {
     for (const accountId of changedAccountIds) {
+      // Positive integers only: account ids are positive serials, and the
+      // looser isFinite let a null element coerce to 0 (Number(null) is 0)
+      // and bust a key no real account holds. Real aggregate rows are INT
+      // PKs, so this rejects only junk.
       const id = Number(accountId);
-      if (Number.isFinite(id)) bustDiscordStatus(id);
+      if (Number.isInteger(id) && id > 0) bustDiscordStatus(id);
     }
   }
   return {
