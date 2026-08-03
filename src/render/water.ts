@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE } from '../sim/data';
+import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE, ZONES } from '../sim/data';
 import type { ZoneDef } from '../sim/types';
 import { waterLevel } from '../sim/world';
 import { loadTexture } from './assets/loader';
@@ -86,7 +86,7 @@ const WATER_DEEP_ALPHA = 1;
 const WATER_DEPTH_COLOR_AUTHORITY = 0.55;
 /** View distance over which the sea grades to open-ocean colour. */
 const WATER_DEEP_NEAR_YARDS = 25;
-const WATER_DEEP_FAR_YARDS = 240;
+const WATER_DEEP_FAR_YARDS = 500;
 // Carries what the seabed no longer does, so the far sea still reads as ocean.
 const WATER_DEEP_DISTANCE_STRENGTH = 0.92;
 /** GLSL needs a decimal point on every float literal. */
@@ -289,15 +289,17 @@ const SWELL_GLSL = /* glsl */ `
   const float SWELL_W1 = 0.900590;
   const float SWELL_W2 = 1.225221;
   const float SWELL_W3 = 1.696460;
-  // The GROUNDSWELL: two long rollers (about 150 and 110 yard wavelengths)
-  // that BOTH water grids sample cleanly (zone planes at ~2 yards, apron at
-  // ~27), so the displacement agrees at the plane/apron boundary and needs no
-  // camera range fade: the open sea visibly heaves all the way out. Speeds
-  // are 44 / 57 whole cycles per wrap period: seamless at the clock wrap.
+  // The GROUNDSWELL: two long rollers (about 150 and 180 yard wavelengths)
+  // that BOTH water grids sample cleanly. The apron cells are ~29 x 38 yards
+  // (same segment count over width AND span, so NOT square): the second
+  // wavelength must clear ~4.5 z-samples per cycle or it goes faceted and
+  // amplitude-starved out there, which is why it is the longer of the two.
+  // No camera range fade: the open sea visibly heaves all the way out.
+  // Speeds are 44 / 38 whole cycles per wrap period: seamless at the wrap.
   const vec2 GSWELL_K1 = vec2(0.0364, 0.0209);
-  const vec2 GSWELL_K2 = vec2(-0.0194, 0.0537);
+  const vec2 GSWELL_K2 = vec2(-0.0119, 0.0328);
   const float GSWELL_W1 = 0.460767;
-  const float GSWELL_W2 = 0.596903;
+  const float GSWELL_W2 = 0.397935;
 `;
 
 const WATER_VERT = /* glsl */ `
@@ -350,7 +352,7 @@ const WATER_VERT = /* glsl */ `
     // the rollers arrive in sets instead of a metronome.
     float g1 = dot(pos.xz, GSWELL_K1) + uTime * GSWELL_W1;
     float g2 = dot(pos.xz, GSWELL_K2) + uTime * GSWELL_W2;
-    float gsAmp = uSwellAmp * 1.5 * depthFade * gswW * (0.5 + 0.8 * group);
+    float gsAmp = uSwellAmp * 2.0 * depthFade * gswW * (0.5 + 0.8 * group);
     float gsCrest = sin(g1) * 0.62 + sin(g2) * 0.38;
     pos.y += gsCrest * gsAmp;
     vec2 swellSlope =
@@ -418,7 +420,7 @@ const WATER_FRAG = /* glsl */ `
     // shader to #version 300 es on WebGL2; the reserved name failed the
     // compile silently under parallel shader compilation.)
     float seaLane = texture2D(uNorm3, vWPos.xz * 0.0042 + uTime * vec2(0.001667, -0.001667)).x;
-    float farW = smoothstep(24.0, 140.0, camDist);
+    float farW = smoothstep(40.0, 260.0, camDist);
     // rippled up close -> glassy at distance: detail fades out, swell stays.
     // The geometric swell's analytic slope (vSwell.xz) tilts the whole normal
     // so the lit shading agrees with the silhouette the vertex stage displaced.
@@ -681,7 +683,12 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const deep = new Float32Array(pos.count);
     const apronSlope = new Float32Array(pos.count);
-    const half = WORLD_SIZE / 2;
+    // The FULL world rect, side columns included: WORLD_MAX_X, never
+    // WORLD_SIZE / 2 (that is one column's half-width, 180, and clamping the
+    // terrain sample there treated the whole east and west columns as open
+    // ocean: their real 0.8 to 2.2 yard shelves met a constant 6 yard apron
+    // at a ruler-straight 23 to 30 percent luma step along the outer coasts).
+    const half = WORLD_MAX_X;
     const edgeDepthCache = new Map<string, number>();
     const fillApron = (): void => {
       edgeDepthCache.clear();
@@ -768,7 +775,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     };
     cullApron();
     const apron = new THREE.Mesh(geo, material);
-    apron.position.y = waterLevel() - 0.06;
+    apron.position.y = waterLevel() - 0.02;
     apron.renderOrder = WATER_APRON_RENDER_ORDER;
     meshes.push(apron);
     group.add(apron);
@@ -778,7 +785,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
       cullApron();
-      apron.position.y = waterLevel() - 0.06;
+      apron.position.y = waterLevel() - 0.02;
     });
   }
   // Coarse wetness scan: samples the zone rect on a 3-vertex stride (about 6
@@ -830,16 +837,37 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // Swell weight, packed (see WATER_VERT): 2 = groundswell + chop inside
     // the plane, feathering the chop share back to 1 (groundswell only, the
     // apron's constant) at the rect edge, so the two displaced sheets agree
-    // exactly where they meet. Static per-vertex geometry: bakes once.
-    const swellW = new Float32Array(pos.count);
-    for (let i = 0; i < pos.count; i++) {
-      const edge = Math.min(
-        pos.getX(i) - x0,
-        x1 - pos.getX(i),
-        pos.getZ(i) - zone.zMin,
-        zone.zMax - pos.getZ(i),
+    // exactly where they meet. The feather fires ONLY where the neighbour
+    // across the edge really is the apron: an edge abutted by another zone
+    // plane carries identical chop on both sides, and feathering there cut a
+    // visible calm stripe down every internal border water (the column
+    // straits, the row meres). Abutment is per COORDINATE, not per edge:
+    // the zone grid has coverage gaps, so one edge can be plane on part of
+    // its run and apron on the rest. Static per-vertex geometry: bakes once.
+    const otherZoneCovers = (px: number, pz: number): boolean =>
+      ZONES.some(
+        (zz) =>
+          zz.id !== zone.id &&
+          px >= (zz.xMin ?? -WORLD_SIZE / 2) &&
+          px <= (zz.xMax ?? WORLD_SIZE / 2) &&
+          pz >= zz.zMin &&
+          pz <= zz.zMax,
       );
-      swellW[i] = 1 + Math.min(1, Math.max(0, edge / WATER_CHOP_EDGE_FEATHER_YARDS));
+    const swellW = new Float32Array(pos.count);
+    const probe = 0.5;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      let edge = Number.POSITIVE_INFINITY;
+      if (!otherZoneCovers(x0 - probe, z)) edge = Math.min(edge, x - x0);
+      if (!otherZoneCovers(x1 + probe, z)) edge = Math.min(edge, x1 - x);
+      if (!otherZoneCovers(x, zone.zMin - probe)) edge = Math.min(edge, z - zone.zMin);
+      if (!otherZoneCovers(x, zone.zMax + probe)) edge = Math.min(edge, zone.zMax - z);
+      swellW[i] =
+        1 +
+        (edge === Number.POSITIVE_INFINITY
+          ? 1
+          : Math.min(1, Math.max(0, edge / WATER_CHOP_EDGE_FEATHER_YARDS)));
     }
     const columns = SEGMENTS_PER_ZONE + 1;
     const fillRow = (row: number): void => {

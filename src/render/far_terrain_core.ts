@@ -582,6 +582,17 @@ export function farVertexHeight(x: number, z: number, spacing: number, seed: num
     const t = outside / 90;
     const fall = t * t * (3 - 2 * t);
     y = y * (1 - fall) + BEYOND_RIM_SEABED * fall;
+    // OPEN COASTS stay open: where the world-edge terrain itself is under
+    // the waterline, the unauthored noise outside it must never blend in as
+    // land standing offshore (measured live: a 38 yard noise plateau held a
+    // dark slab 3.5 yards above the sea on the west horizon). Rim mountains
+    // keep their far side: their edge sample is high, so no cap applies.
+    const edgeY = terrainHeight(
+      Math.min(WORLD_MAX_X, Math.max(WORLD_MIN_X, x)),
+      Math.min(WORLD_MAX_Z, Math.max(WORLD_MIN_Z, z)),
+      seed,
+    );
+    if (edgeY < WATER_LEVEL) y = Math.min(y, WATER_LEVEL - 1.5);
   }
   // High ground gets a build-time crag: the coarse grid renders peaks as
   // smooth cones, and with the fog gone that smoothness reads from across
