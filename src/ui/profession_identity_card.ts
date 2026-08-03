@@ -37,7 +37,10 @@ export function renderProfessionIdentityCard(
   card.setAttribute('aria-label', title);
 
   if (identity.state === 'syncing') {
-    card.innerHTML = `<h3>${esc(title)}</h3><p>${esc(t('hudChrome.crafting.identity.syncing'))}</p>`;
+    // Same .profession-identity-main wrapper the full card uses: the card is
+    // a flex ROW (components.css), so bare children would sit side by side
+    // and the waiting line would render beside its heading, not under it.
+    card.innerHTML = `<div class="profession-identity-main"><h3>${esc(title)}</h3><p>${esc(t('hudChrome.crafting.identity.syncing'))}</p></div>`;
     parent.appendChild(card);
     return;
   }

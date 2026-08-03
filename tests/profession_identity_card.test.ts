@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { CRAFT_RING } from '../src/sim/content/professions';
 import { renderCraftingWindow } from '../src/ui/crafting_window';
 import { QUALITY_COLOR } from '../src/ui/icons';
 import { renderProfessionIdentityCard } from '../src/ui/profession_identity_card';
@@ -47,10 +48,14 @@ describe('profession identity card painter contract', () => {
     expect(card?.textContent).toContain('Smith');
     expect(card?.textContent).toContain('Armorcrafting');
     // The attuned card surfaces the make-amends return cost
-    // (requiredAmendsProgress(1) = 8, the switch-cost-at-rest figure).
+    // (requiredAmendsProgress(1) = 8, the switch-cost-at-rest figure), pinned
+    // as the exact sentence: a substring '8' also matches 18 or 80, and this
+    // fixture's amendsRequired is ALSO 8, so only the full sentence proves
+    // the right field fed the template.
     const returnCost = card?.querySelector('.profession-identity-returncost');
-    expect(returnCost?.textContent).toContain('make-amends');
-    expect(returnCost?.textContent).toContain('8');
+    expect(returnCost?.textContent).toBe(
+      'If you leave this pair, returning to it later costs 8 make-amends tasks.',
+    );
     // Phase 22: the rows are the professions row family (head line with the
     // right-aligned value, pill chips below); the 9px uppercase column header
     // died with the rework, and the attuned card mixes roles so the uniform
@@ -106,12 +111,27 @@ describe('profession identity card painter contract', () => {
     expect(dormantRow?.querySelector('.prof-role-badge')?.textContent).toBe('Dormant knowledge');
     expect(dormantRow?.querySelector('.prof-ceiling')?.textContent).toBe('Common cap');
     // The full skillAria sentence stays on EVERY row (the chips are visual;
-    // the aria carries the whole fact set), pinned exactly once so a dropped
-    // t() argument cannot slip through substring checks.
-    expect(rows.every((r) => (r.getAttribute('aria-label') ?? '') !== '')).toBe(true);
+    // the aria carries the whole fact set): the exact sentence pinned once so
+    // a dropped t() argument cannot slip through substring checks, plus a
+    // structural every-row quantifier so no row can carry a truncated aria.
+    expect(
+      rows.every((r) =>
+        /^.+, skill \d+, tier \d+, .+, .+$/.test(r.getAttribute('aria-label') ?? ''),
+      ),
+    ).toBe(true);
     expect(armorRow?.getAttribute('aria-label')).toBe(
       'Armorcrafting, skill 49, tier 1, Major, No empowerment cap',
     );
+    // Role-priority order (the phase 22 QA round): the capped list leads with
+    // the majors, then the hobby, then dormant knowledge, so the two rows the
+    // attuned card exists to headline are never below the 264px fold. Stable
+    // within groups (ring order), so weaponcrafting (ring 8) precedes
+    // armorcrafting (ring 9).
+    expect(rows.slice(0, 3).map((r) => r.querySelector('.prof-craft-name')?.textContent)).toEqual([
+      'Weaponcrafting',
+      'Armorcrafting',
+      'Leatherworking',
+    ]);
     // The capped (scrollable) attuned list is keyboard-reachable and named:
     // a scroll region with no focusable child is pointer-only without these.
     const list = card?.querySelector<HTMLElement>('.profession-skill-list');
@@ -124,6 +144,11 @@ describe('profession identity card painter contract', () => {
       buildProfessionIdentityView({ ...identity, synced: false }),
     );
     expect(parent.textContent).toContain('Waiting for your crafting identity');
+    // The syncing branch keeps the .profession-identity-main wrapper: the
+    // card is a flex ROW, so bare children would render the waiting line
+    // BESIDE its heading instead of under it.
+    expect(parent.querySelector('.profession-identity-main h3')).not.toBeNull();
+    expect(parent.querySelector('.profession-identity-main p')).not.toBeNull();
     // The syncing card has no skill rows, so no uniform caption either.
     expect(parent.querySelectorAll('.profession-skill-row')).toHaveLength(0);
     expect(parent.querySelectorAll('.profession-skill-uniform')).toHaveLength(0);
@@ -154,6 +179,10 @@ describe('profession identity card painter contract', () => {
     expect(parent.querySelectorAll('.profession-skill-row')).toHaveLength(10);
     expect(parent.querySelector('.profession-archetype-crest')).toBeNull();
     expect(parent.querySelector('.profession-identity-returncost')).toBeNull();
+    // The first-tier tutorial renders its REAL localized sentence (cooking 10
+    // is tier 0 everywhere, so the hint shows): the source pin alone was
+    // satisfiable by the model property access identity.tutorial.
+    expect(parent.querySelector('.profession-identity-tutorial')?.textContent).toContain('25');
   });
 
   it('collapses the uniform role/cap chips to one caption on the unattuned card (phase 22)', () => {
@@ -412,15 +441,28 @@ describe('profession identity card painter contract', () => {
   it('renders localized visible identity, cap, tutorial, and nudge text', () => {
     expect(painter).toContain("t('hudChrome.crafting.identity.title')");
     expect(painter).toContain('identity.ceiling');
-    expect(painter).toContain('identity.tutorial');
+    // Full t()-call literal: the bare substring 'identity.tutorial' was a
+    // dead pin, satisfied by the model property access identity.tutorial.
+    expect(painter).toContain("t('hudChrome.crafting.identity.tutorial'");
     expect(painter).toContain('identity.nearTier');
     expect(painter).toContain('identity.dormantKnowledge');
   });
 
   it('provides a labelled region and skill-list accessible text', () => {
     expect(painter).toContain("setAttribute('role', 'region')");
-    expect(painter).toContain('aria-label');
     expect(painter).toContain('role="list"');
+  });
+
+  it('makes no forced-reflow read and owns no repeating driver (cold contract)', () => {
+    // profession_identity_card.ts escapes tests/hud_perf_budget.test.ts's
+    // sweep by NAME (_card.ts does not match the painter file regex), so the
+    // cold contract it happens to satisfy is pinned here instead: no layout
+    // read, no frame driver, ever.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(code).not.toMatch(
+      /\.scrollTop|\.scrollLeft|\.offsetWidth|\.offsetHeight|\.offsetTop|\.offsetLeft|\.clientWidth|\.clientHeight|getBoundingClientRect|getComputedStyle|scrollIntoView/,
+    );
+    expect(code).not.toMatch(/requestAnimationFrame|requestIdleCallback|setInterval/);
   });
 
   it('is integrated into the crafting window above recipe sections', () => {
@@ -496,7 +538,11 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     expect(components).not.toContain('.profession-skill-row');
     expect(mobileCss).not.toContain('.profession-skill-header');
     expect(mobileCss).not.toContain('.profession-skill-row');
-    expect(mobileCss).not.toMatch(/\.profession-skill-list \{[^}]*grid-template-columns/);
+    // BOTH sheets ban a grid track list on the skill list (the [^{]* arm
+    // also catches a grouped selector), so the retired subgrid cannot come
+    // back on either arm.
+    expect(mobileCss).not.toMatch(/\.profession-skill-list[^{]*\{[^}]*grid-template-columns/);
+    expect(components).not.toMatch(/\.profession-skill-list[^{]*\{[^}]*grid-template-columns/);
   });
 
   it('the card narrative text sits on the 12px floor (summary, tutorial, nudges, caption)', () => {
@@ -505,6 +551,15 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
       /\.profession-identity-tutorial,\s*\.profession-identity-nudges \{[^}]*font-size: 12px;/,
     );
     expect(components).toMatch(/\.profession-skill-uniform \{[^}]*font-size: 12px;/);
+    // Every card paragraph, including the class-less unattuned and syncing
+    // narratives and the return-cost line, which otherwise inherited the
+    // 16px document default (the QA round's floor completion).
+    expect(components).toMatch(/\.profession-identity-card p \{[^}]*font-size: 12px;/);
+  });
+
+  it('the focusable capped list carries the shared focus-visible ring', () => {
+    const base = readFileSync(path.resolve(process.cwd(), 'src/styles/base.css'), 'utf8');
+    expect(base).toMatch(/\.profession-skill-list:focus-visible[^{]*\{[^}]*outline: 2px solid/s);
   });
 
   it('no card-scope rule in either sheet sets a font-size below 12px (the floor as a floor)', () => {
@@ -514,17 +569,16 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     // card-scope override cannot quietly re-shrink the rows (the family's
     // own .prof-* rules carry their exemptions in the pin above).
     for (const [sheet, minBlocks] of [
-      [components, 8],
+      [components, 14],
       [mobileCss, 2],
     ] as const) {
       const blocks = [...sheet.matchAll(/^\s+([^@{}][^{]*?)\{([^}]*)\}/gms)].filter(
         ([, sel]) => sel.includes('.profession-identity') || sel.includes('.profession-skill-'),
       );
       // Aliveness: the sweep must have FOUND the card-scope blocks each
-      // sheet is known to carry (desktop 15, mobile 2 today), not merely
-      // seen the selector text somewhere: a dedent or layout change that
-      // breaks the block regex must fail loudly here, never silently sweep
-      // nothing.
+      // sheet is known to carry (desktop 16, mobile 2 today; the floors sit
+      // just under those counts so losing more than a couple of blocks to a
+      // partial regex break fails loudly), never silently sweep nothing.
       expect(blocks.length, 'card-scope blocks found by the sweep').toBeGreaterThanOrEqual(
         minBlocks,
       );
@@ -551,14 +605,26 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     // list opts back out (its one-line rows fit whole; a cap would only add
     // a needless scrollbar). 264px is the LITERAL the phase measured (recipe
     // pane 180px at 1366x768): a retune re-measures and updates this pin.
-    expect(components).toMatch(
-      /\.profession-identity-card \.profession-skill-list \{[^}]*max-height: 264px;[^}]*overflow-y: auto;/,
-    );
+    // Two separate pins on the capped block so a behavior-identical
+    // declaration reorder stays green (the mobile-lift idiom below).
+    const cappedList = /\n {2}\.profession-identity-card \.profession-skill-list \{[^}]*/;
+    expect(components).toMatch(new RegExp(`${cappedList.source}max-height: 264px;`));
+    expect(components).toMatch(new RegExp(`${cappedList.source}overflow-y: auto;`));
     expect(components).toMatch(
       /\.profession-identity-card \.profession-skill-list\.uniform-collapsed \{\s*max-height: none;/,
     );
+    // 264px was measured against the shipped TEN-craft ring (the uncapped
+    // collapsed list renders about 289px at ten): ring growth re-measures
+    // the cap, the collapse-fits rationale, AND the recipe-pane floor, so a
+    // new craft reddens here at the cap rather than only at the content pins.
+    expect(CRAFT_RING).toHaveLength(10);
+    // The mobile card cap is the exact viewport formula, pinned like the
+    // desktop literal: a retune re-measures and updates this pin.
     expect(mobileCss).toMatch(
-      /body\.mobile-touch \.profession-identity-card \{[^}]*max-height:[^}]*overflow-y: auto;/,
+      /body\.mobile-touch \.profession-identity-card \{[^}]*max-height: calc\(var\(--app-vh\) \* 0\.34 \/ var\(--ui-scale, 1\)\);/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.profession-identity-card \{[^}]*overflow-y: auto;/,
     );
     // On mobile the CARD is the one scroller, so the desktop list cap lifts:
     // a capped (overflow-y: auto) list is a flex child with a zero automatic
@@ -736,6 +802,64 @@ describe('crafting window pins', () => {
     expect(craftingWindow).toContain("minimal: 'hudChrome.crafting.difficultyMinimal'");
   });
 
+  const attunedIdentity = () =>
+    buildProfessionIdentityView({
+      version: 1 as const,
+      synced: true,
+      craftSkills: { armorcrafting: 49, weaponcrafting: 25, cooking: 30 },
+      activeArchetype: 'armorcrafting',
+      pairedMajor: 'weaponcrafting',
+      hobbyCraft: 'leatherworking',
+      attunedPairs: ['weaponcrafting+armorcrafting'],
+      switchCount: 1,
+      amendsProgress: 0,
+      amendsRequired: 8,
+      knownRecipes: [],
+    });
+
+  it('carries the capped skill list scroll offset and focus across a rebuild', () => {
+    // The identity list is the window's third scroll region and rebuilds
+    // with the rest; without the carry every repaint (a craft lands three)
+    // yanks a scrolled reader to row one and drops keyboard focus to body.
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    try {
+      renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+      const first = el.querySelector<HTMLElement>('.profession-skill-list');
+      expect(first).not.toBeNull();
+      if (!first) return;
+      first.scrollTop = 123;
+      first.focus();
+      expect(document.activeElement).toBe(first);
+      renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+      const second = el.querySelector<HTMLElement>('.profession-skill-list');
+      expect(second).not.toBeNull();
+      expect(second).not.toBe(first);
+      expect(second?.scrollTop).toBe(123);
+      expect(document.activeElement).toBe(second);
+    } finally {
+      el.remove();
+    }
+  });
+
+  it('keeps the identity card a SIBLING of the scrolling body (the pinned-region contract)', () => {
+    // The whole 264px-cap rationale assumes the card is pinned ABOVE
+    // .crafting-body, never inside it: a future height refactor that moves
+    // the card into the scroll pane would keep every other assertion green
+    // while silently voiding the cap's purpose.
+    const el = document.createElement('div');
+    renderCraftingWindow(el, { recipes: [] }, deps(), attunedIdentity());
+    const card = el.querySelector('.profession-identity-card');
+    const body = el.querySelector('.crafting-body');
+    expect(card).not.toBeNull();
+    expect(body).not.toBeNull();
+    expect(card?.parentElement).toBe(el);
+    expect(body?.contains(card as Node)).toBe(false);
+    expect(
+      card && body ? card.compareDocumentPosition(body) & Node.DOCUMENT_POSITION_FOLLOWING : 0,
+    ).toBeTruthy();
+  });
+
   it('an IN-RANGE station row keeps the badge, drops the dashed style and the note', () => {
     const parent = document.createElement('div');
     renderCraftingWindow(
@@ -835,6 +959,20 @@ describe('crafting window station-range repaint liveness (source pins)', () => {
       /const inRangeStations = inRangeStationTypes\(\s*this\.sim\.stationPlacements,\s*this\.sim\.player\.pos,\s*this\.sim\.activeMobileStationCraft,\s*\);/,
     );
     expect(hud).toContain('this.lastCraftingStationSig = stationTypesSignature(inRangeStations);');
+  });
+
+  it('a language switch rebuilds an OPEN crafting window (the relocalize arm)', () => {
+    // Every crafting repaint memo is text-independent (station set, reagent
+    // sig, the profession surface sig), so without an explicit arm in
+    // refreshLocalizedDynamicUi an open window keeps the previous locale
+    // indefinitely; its sibling professions window already has one.
+    const relocalize = hud.slice(
+      hud.indexOf('private refreshLocalizedDynamicUi'),
+      hud.indexOf('\n  }', hud.indexOf('private refreshLocalizedDynamicUi')),
+    );
+    expect(relocalize).toContain(
+      "if ($('#crafting-window').style.display === 'flex') this.renderCrafting();",
+    );
   });
 });
 

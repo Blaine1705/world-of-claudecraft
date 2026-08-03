@@ -38,8 +38,12 @@ export interface ProfessionUniformChips {
  * where all ten rows repeat Unattuned / Rare cap), the card states the pair
  * once as a caption over the list and the rows render craft plus skill only.
  * Mixed roles OR mixed ceilings disable the collapse; the attuned card always
- * mixes (two majors beside hobby and dormant rows), so in practice this fires
- * on the unattuned state. Row aria text is unaffected: every row keeps the
+ * mixes, and that is a guarantee, not a tendency: CRAFT_RING holds ten
+ * distinct crafts (three or more is enough) so a two-major pair can never
+ * cover every row, and every archetype writer validates its ids through
+ * isCraftId against the frozen ring (src/sim/professions/archetype.ts, the
+ * frozen-ring invariant), so an off-ring all-dormant identity is not a
+ * producible state. Row aria text is unaffected: every row keeps the
  * complete skillAria sentence either way. */
 export function uniformSkillChips(
   skills: readonly ProfessionSkillRow[],
@@ -158,6 +162,16 @@ export function buildProfessionIdentityView(
       dormantKnowledge: role === 'dormant' && skill > 0,
     };
   });
+  // Role-priority order for the capped list (the phase 22 QA round): the
+  // 264px cap shows about five of ten rows, and in raw ring order the two
+  // Material-pair majors sit at indices 8 and 9, below the fold, so an
+  // attuned Smith's card opened on everything EXCEPT the two crafts it
+  // exists to headline. Majors lead, then the hobby, then dormant rows that
+  // still hold knowledge; the sort is stable, so ring order survives within
+  // each group and the unattuned card (every row one role) is untouched.
+  const rolePriority = (row: ProfessionSkillRow): number =>
+    row.role === 'major' ? 0 : row.role === 'hobby' ? 1 : row.dormantKnowledge ? 2 : 3;
+  skills.sort((a, b) => rolePriority(a) - rolePriority(b));
   const nudges: ProfessionNudge[] = [];
   for (const row of skills) {
     if (row.skill > 0 && row.pointsToNextTier <= 5) {

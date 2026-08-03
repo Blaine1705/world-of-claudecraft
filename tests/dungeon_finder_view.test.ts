@@ -444,18 +444,32 @@ describe('dungeon finder view core', () => {
       members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
     };
     const myListing = { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] };
+    // The positive control: an unrelated leader's unlocked listing must
+    // SURVIVE both arms, so an empty result can only mean the own row was
+    // hidden, never that the loop produced nothing (a content-id rename
+    // would otherwise green this test forever).
+    const otherListing = {
+      id: 9,
+      activityId: 'hollow_crypt_normal',
+      leaderName: 'Other',
+      tags: [],
+      size: 1,
+      capacity: 5,
+      needed: { tank: 0, healer: 1, dps: 3 },
+      members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
+    };
     const locked = live(
       buildDungeonFinderView(
         input({
           tab: 'board',
           playerLevel: 20,
-          board: [heroicListing],
+          board: [heroicListing, otherListing],
           info: makeInfo('sim', { myListing }),
           lockouts: [{ id: 'hollow_crypt:heroic', msRemaining: 3_600_000 }],
         }),
       ),
     );
-    expect(locked.board.listings.map((l) => l.id)).toEqual([]);
+    expect(locked.board.listings.map((l) => l.id)).toEqual([9]);
     expect(locked.board.myListing?.id).toBe(8);
     // Same shape without the lockout: the hide comes from the
     // already-in-group rule, not the lockout path.
@@ -464,13 +478,13 @@ describe('dungeon finder view core', () => {
         input({
           tab: 'board',
           playerLevel: 20,
-          board: [heroicListing],
+          board: [heroicListing, otherListing],
           info: makeInfo('sim', { myListing }),
           lockouts: [],
         }),
       ),
     );
-    expect(unlocked.board.listings.map((l) => l.id)).toEqual([]);
+    expect(unlocked.board.listings.map((l) => l.id)).toEqual([9]);
     expect(unlocked.board.myListing?.id).toBe(8);
   });
 

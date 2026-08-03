@@ -143,6 +143,26 @@ describe('classifyDiff', () => {
     expect(target?.capture.toString()).toContain('knownRecipes: []');
   });
 
+  it('maps the identity card and view modules to the crafting target (phase 22)', () => {
+    // A rename or when-list trim would silently stop capturing the identity
+    // card framings; pin the routing per module the phase added.
+    const cardPlan = classifyDiff(['src/ui/profession_identity_card.ts']);
+    expect(cardPlan.isVisual).toBe(true);
+    expect(cardPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
+    const viewPlan = classifyDiff(['src/ui/profession_identity_view.ts']);
+    expect(viewPlan.specific.map((t: { key: string }) => t.key)).toContain('crafting');
+    const crafting = cardPlan.specific.find(
+      (candidate: { key: string }) => candidate.key === 'crafting',
+    );
+    expect((crafting?.variants ?? []).map((v: { key: string } | null) => v?.key)).toEqual(
+      expect.arrayContaining([
+        'desktop-identity-attuned',
+        'mobile-identity-attuned',
+        'desktop-identity-compact',
+      ]),
+    );
+  });
+
   it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
     const plan = classifyDiff(['src/sim/content/deeds.ts']);
     expect(plan.isVisual).toBe(true);

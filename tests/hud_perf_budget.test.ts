@@ -739,7 +739,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   { file: 'char_window.ts', reflowAllow: {}, driverAllow: {} },
   {
     file: 'crafting_window.ts',
-    reflowAllow: { '.scrollTop': 2, '.scrollLeft': 2 },
+    // Two scroll regions carried across the rebuild, capture + write-back
+    // each: .crafting-body (vertical) and the identity card's capped
+    // .profession-skill-list (vertical, the phase 22 QA carry), plus the
+    // .crafting-tabs horizontal pair (the bags_window/bank_window shape).
+    reflowAllow: { '.scrollTop': 4, '.scrollLeft': 2 },
     driverAllow: {},
   },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s

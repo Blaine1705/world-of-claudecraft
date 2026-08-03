@@ -5488,6 +5488,13 @@
   .profession-archetype-crest {
     filter: drop-shadow(var(--art-shadow-lg));
   }
+  /* Every card paragraph sits on the 12px narrative floor: without this the
+     return-cost line and the unattuned / syncing narratives (bare <p> with no
+     class rule) inherited the 16px document default, out-typing the card's
+     own 13px heading. */
+  .profession-identity-card p {
+    font-size: 12px;
+  }
   .profession-identity-heading {
     display: flex;
     align-items: center;
@@ -5545,7 +5552,10 @@
   }
   /* The uniform-chips caption (the option 3 collapse): when every row shares
      one role and one cap the card states the pair once here and the rows
-     render craft plus skill only. */
+     render craft plus skill only. Its .profession-skill-uniform-label child
+     is deliberately unstyled: plain caption text inheriting this rule's 12px
+     and muted color (the class is a structural and test hook, not an orphan
+     of the phase 14 kind). */
   .profession-skill-uniform {
     display: flex;
     align-items: center;

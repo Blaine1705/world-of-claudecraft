@@ -5585,6 +5585,12 @@ export class Hud {
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
+    // The crafting window's repaint memos (station set, reagent sig, the
+    // profession surface sig) are all text-independent, so a language switch
+    // alone never moves them and an open window kept the previous locale
+    // indefinitely (the same class as the town-focus arm above); one forced
+    // rebuild re-runs every t(), identity card included.
+    if ($('#crafting-window').style.display === 'flex') this.renderCrafting();
     // The deed tracker's texts re-localize on its next elided paint; run one
     // now so the strip never shows a stale language for up to a slow tick.
     this.updateDeedTracker();

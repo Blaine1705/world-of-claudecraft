@@ -1152,11 +1152,18 @@ export const TARGETS = [
       // frames the unattuned collapse. The compact variant re-runs the
       // attuned framing at 1366x768 (DESIGN.md's supported compact target)
       // so the recipe pane's remaining height is the shot.
-      { key: 'desktop-identity-attuned', identity: true },
-      { key: 'mobile-identity-attuned', identity: true, mobile: true },
+      // selectTab pins the tab deterministically: the woc_crafting_tab memory
+      // is read at HUD boot, BEFORE the staging evaluate can clear it, so
+      // without the explicit click these framings inherited whatever tab an
+      // earlier variant left in the shared browser's localStorage (alchemy,
+      // via the bag-freshness pair), and a solo re-shoot differed from a
+      // full-run one.
+      { key: 'desktop-identity-attuned', identity: true, selectTab: 'alchemy' },
+      { key: 'mobile-identity-attuned', identity: true, mobile: true, selectTab: 'alchemy' },
       {
         key: 'desktop-identity-compact',
         identity: true,
+        selectTab: 'alchemy',
         async beforeLoad(page) {
           await page.setViewport({ width: 1366, height: 768 });
         },
@@ -1197,6 +1204,14 @@ export const TARGETS = [
             // the professions target's cap-legal attuned Smith, so the card
             // renders the per-row role/cap chips (major, hobby, dormant
             // knowledge, near-tier) instead of the unattuned collapse.
+            // Drop the persisted tab first: localStorage survives page.close()
+            // within the one shared browser, so an earlier variant's tab click
+            // (bag-freshness selects alchemy) would otherwise decide which tab
+            // these framings open on, making a solo re-shoot differ from a
+            // full-run one.
+            try {
+              localStorage.removeItem('woc_crafting_tab');
+            } catch {}
             const game = window.__game;
             if (game?.world) {
               Object.defineProperty(game.world, 'craftingIdentity', {
