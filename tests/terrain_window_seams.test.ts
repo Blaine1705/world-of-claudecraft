@@ -9,7 +9,11 @@
 //     (the north channel's west end wall)
 //   applyFrostTerraces: z = 1460 across southern Frostveil, z = 1856 and
 //     z = 1924 and x = +-92 (the crossing corridor rect), x = +-178
-//   applyStripFlankCoast: z = 940 and z = 1925 on the Hollow moat flanks
+//   applyStripFlankCoast: z = 940 and z = 1925 on the Hollow moat flanks, plus
+//     its OUTER x = +-180 edge, where dEdge is 0 and the carve stands at FULL
+//     depth right up to the line the applier then returns unchanged past
+//   greenSeamT: z = 170, the south edge of the marsh/peaks green seam (its
+//     north edge already fades across 870..910; the south one snapped)
 //   onCauseway: x = 140 clipping the sandbar lift mid slope
 // Each test measures the rise of the RIDDEN surface (water clamps a seabed
 // step) across a 0.04yd gap straight over the line: a true discontinuity
@@ -78,6 +82,16 @@ describe('terrain applier windows end without a blocking step', () => {
       ...sweep('z', 1925, 130, 180),
       ...sweep('z', 1925, -180, -130),
     ];
+    expect(bad, bad.slice(0, 8).join('\n')).toEqual([]);
+  });
+
+  it('applyStripFlankCoast: the outer x = +-180 edge', () => {
+    const bad = [...sweep('x', 180, 940, 1925), ...sweep('x', -180, 940, 1925)];
+    expect(bad, bad.slice(0, 8).join('\n')).toEqual([]);
+  });
+
+  it('greenSeamT: the z = 170 south edge of the green seam', () => {
+    const bad = sweep('z', 170, -540, 540);
     expect(bad, bad.slice(0, 8).join('\n')).toEqual([]);
   });
 

@@ -1870,6 +1870,15 @@ function applyWorldEdgeSea(x: number, z: number, h: number): number {
 // gated to low ground (a lowGate) so it only widens the near-shore into the
 // moat, never cuts a marginal sliver out of interior land or the Tablecrag;
 // the isthmus crossings at z1890 are left as land bridges.
+//
+// The OUTER edge carries a skirt past x=+-180 for the same reason the border
+// ridge carries one past 3 sigma: dEdge is 0 at the boundary, so the carve
+// stood at FULL depth (up to 5yd) on the line the applier returned unchanged
+// past, walling the strip off from the column shore it is supposed to slope
+// into. The skirt factor is exactly 1 for ax <= 180, so every height inside
+// the strip stays bit-identical; only the fade outward is new, and lowGate
+// keeps it on ground already low enough to be shore.
+const STRIP_FLANK_OUTER_SKIRT = 14; // yards; 5yd over 14 is the 0.55 bank slope
 function applyStripFlankCoast(x: number, z: number, h: number): number {
   // The z window fades INSIDE the old hard 940..1925 edges (which left step
   // walls where the carve was still several yards deep at the line): the
@@ -1881,9 +1890,10 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
   // tests/terrain_window_seams.test.ts pins the lines.
   if (z < 940 || z > 1925) return h;
   const ax = Math.abs(x);
-  if (ax > 180 || ax < 124) return h;
+  if (ax > 180 + STRIP_FLANK_OUTER_SKIRT || ax < 124) return h;
   const zWin = smoothstep(940, 956, z) * (1 - smoothstep(1909, 1925, z));
   const xWin = smoothstep(124, 132, ax);
+  const outerSkirt = 1 - smoothstep(180, 180 + STRIP_FLANK_OUTER_SKIRT, ax);
   const dEdge = 180 - ax;
   const nearPass = 1 - smoothstep(20, 48, Math.abs(z - 1890));
   const wob =
@@ -1891,7 +1901,8 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
     (fbm2(z * 0.05, Math.sign(x) * 31, 9323, 2) - 0.5) * 12;
   const band = 28 + wob;
   const lowGate = 1 - smoothstep(6, 22, h);
-  const seaT = (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate * zWin * xWin;
+  const seaT =
+    (1 - smoothstep(band - 22, band, dEdge)) * (1 - nearPass) * lowGate * zWin * xWin * outerSkirt;
   if (seaT <= 0) return h;
   const floor = Math.min(h, WATER_LEVEL - 5);
   return h + (floor - h) * seaT;
@@ -1901,10 +1912,20 @@ function applyStripFlankCoast(x: number, z: number, h: number): number {
 // strip as dry rolling land (the sketch's land borders). The coast
 // appliers stand down inside the seam band so no shoreline forms there,
 // and the border ridge still rises over it (seaGate reads this too).
+// Its north edge already releases across 870..910; the south one cut hard at
+// 170 with the seam at full strength, so the coast appliers it silences came
+// back on all at once and stepped the shore along the whole line. Fade it in
+// BELOW 170 (bit-identical from 170 north, where the marsh row it serves
+// begins) rather than inside, which would re-carve the seam's own dry border.
+const GREEN_SEAM_SOUTH_SKIRT = 16;
 function greenSeamT(x: number, z: number): number {
-  if (z < 170 || z > 910) return 0;
+  if (z < 170 - GREEN_SEAM_SOUTH_SKIRT || z > 910) return 0;
   const d = Math.abs(Math.abs(x) - STRIP_MAX_X);
-  return (1 - smoothstep(50, 90, d)) * (1 - smoothstep(870, 910, z));
+  return (
+    (1 - smoothstep(50, 90, d)) *
+    (1 - smoothstep(870, 910, z)) *
+    smoothstep(170 - GREEN_SEAM_SOUTH_SKIRT, 170, z)
+  );
 }
 
 // Same coast recipe; holds the sealed wall's footing at the south fringe.
