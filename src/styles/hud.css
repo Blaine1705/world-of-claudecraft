@@ -3570,16 +3570,17 @@
     color: #fff;
     border-color: #c9a86a;
   }
-  /* day/night dial: a small satellite disc on the top-right rim of the minimap
-     (mirrors the #raid-lockout button placement), showing the 12h world cycle.
-     Purely informational, so it ignores pointer input. */
+  /* day/night dial: a satellite disc on the top-right rim of the minimap
+     (mirrors the #raid-lockout button placement), showing the world day/night
+     cycle. Sized to read at a glance; purely informational, so it ignores
+     pointer input. */
   #minimap-daynight {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: 2px;
+    right: 2px;
     z-index: 3;
-    width: 30px;
-    height: 30px;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     border: 2px solid var(--border);
     background: #14141d;

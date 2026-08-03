@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   currentDayNightPhase,
@@ -8,21 +9,67 @@ import {
   aboveHorizon,
   cyclePhase,
   DAY_NIGHT_CYCLE_MS,
+  DAY_ONLY,
   dayNightGrade,
+  duskWarmAmount,
   effectiveDayness,
   fullDayGrade,
   globalDayness,
+  LUNAR_CYCLE_MS,
+  lunarPhase,
   moonDirection,
+  moonTerminator,
+  NEUTRAL_DAY_GRADE,
+  nightSkyDesat,
   nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
   skyTintForDayness,
   sunDirection,
+  warmDuskGrade,
 } from '../src/render/day_night_core';
 import type { BiomeId } from '../src/sim/types';
 
 // The day_night_core: the pure clock-to-grade math of the world day/night cycle.
 // The renderer supplies the wall-clock ms (Date.now) and applies the grade to the
 // sun/hemi/IBL/fog/sky; here we drive any moment of the cycle deterministically.
+
+describe('the live cycle contract', () => {
+  it('runs a one-hour cycle, epoch-anchored so it is identical for every player', () => {
+    // Literal pin: an hour, not a derived expression, so a period change is a
+    // deliberate act here too. Epoch anchoring (cyclePhase of an absolute ms)
+    // is what makes the phase global; there is no per-client or per-zone term.
+    expect(DAY_NIGHT_CYCLE_MS).toBe(3_600_000);
+  });
+
+  it('ships with the cycle LIVE (DAY_ONLY off): the sun and moon move', () => {
+    expect(DAY_ONLY).toBe(false);
+  });
+
+  it('lands noon exactly on the authored day look (the identity grade)', () => {
+    // The lighting rig and per-biome HDRI gains are tuned against the identity
+    // grade, so the cycle must only ever dip DOWN from it, never re-dim day.
+    expect(dayNightGrade(1)).toEqual(NEUTRAL_DAY_GRADE);
+  });
+});
+
+describe('water follows the cycle (source pins)', () => {
+  // The water surface shader is unlit (baked palette + fog), so the day/night
+  // grade and the moving key light have to be wired in by hand; these pins
+  // fail if that wiring is dropped in a refactor.
+  it('water.ts shares the live sun + day/night uniforms and applies the grade', () => {
+    const source = readFileSync(new URL('../src/render/water.ts', import.meta.url), 'utf8');
+    expect(source).toContain('uSunDir: WATER_SUN_UNIFORM');
+    expect(source).toContain('uDayNight: WATER_DAYNIGHT_UNIFORM');
+    expect(source).toContain('uniform vec3 uDayNight;');
+    expect(source).toContain('col *= uDayNight;');
+  });
+
+  it('the renderer drives both from its key-light update every frame', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(source).toContain('setWaterSunDirection(this.lightDir);');
+    expect(source).toContain('setWaterDayNight(this.dnGrade.fog);');
+  });
+});
 
 describe('cyclePhase', () => {
   it('maps epoch 0 to phase 0 and the half-cycle to 0.5', () => {
@@ -112,13 +159,13 @@ describe('effectiveDayness', () => {
 });
 
 describe('dayNightGrade', () => {
-  it('is the brightest grade at e = 1, but a calm capped daylight (not blown-out white)', () => {
+  it('is the brightest grade at e = 1: the neutral authored day, untouched', () => {
     const g = dayNightGrade(1);
-    expect(g.lightScale).toBeCloseTo(0.65, 12); // peak day held well under full
-    // the day sky/fog are bright but capped under white so the HDRI does not bloom out
-    expect(Math.min(...g.sky)).toBeGreaterThan(0.5);
-    expect(Math.max(...g.sky)).toBeLessThan(1);
-    expect(Math.max(...g.fog)).toBeLessThan(1);
+    // peak day is the identity: the rig and HDRI gains already grade the day,
+    // so the cycle must not re-dim it (that was the pre-overhaul tuning)
+    expect(g.lightScale).toBeCloseTo(1, 12);
+    expect(g.sky).toEqual([1, 1, 1]);
+    expect(g.fog).toEqual([1, 1, 1]);
     expect(g.farScale).toBeCloseTo(1, 12);
     expect(g.nightAmt).toBeCloseTo(0, 12);
   });
@@ -159,6 +206,114 @@ describe('dayNightGrade', () => {
 describe('fullDayGrade', () => {
   it('equals the e = 1 grade (the safe pre-first-frame default)', () => {
     expect(fullDayGrade()).toEqual(dayNightGrade(1));
+  });
+});
+
+describe('per-realm night palettes (region style survives the dark)', () => {
+  it('holds the raised moonlit floor for the neutral night', () => {
+    expect(dayNightGrade(0).lightScale).toBeCloseTo(0.36, 12);
+  });
+
+  it('keeps realms without a palette on the global deep-blue night', () => {
+    expect(dayNightGrade(0, 'vale')).toEqual(dayNightGrade(0));
+    expect(dayNightGrade(0.4, 'marsh')).toEqual(dayNightGrade(0.4));
+  });
+
+  it('gives the Nightbloom a violet night, darker than neutral', () => {
+    const g = dayNightGrade(0, 'night');
+    // violet: red beats green, blue leads both
+    expect(g.sky[0]).toBeGreaterThan(g.sky[1]);
+    expect(g.sky[2]).toBeGreaterThan(g.sky[0]);
+    expect(g.fog[2]).toBeGreaterThan(g.fog[1]);
+    // and its floor dips under the global moonlit floor
+    expect(g.lightScale).toBeLessThan(dayNightGrade(0).lightScale);
+  });
+
+  it('keeps the Drakelands night warm: embers, not moonlight', () => {
+    const g = dayNightGrade(0, 'ember');
+    expect(g.sky[0]).toBeGreaterThan(g.sky[1]);
+    expect(g.sky[1]).toBeGreaterThan(g.sky[2]);
+    expect(g.fog[0]).toBeGreaterThan(g.fog[2]);
+    // the lava glow keeps its floor a touch above the global night
+    expect(g.lightScale).toBeGreaterThan(dayNightGrade(0).lightScale);
+  });
+
+  it('always lands day on the identity grade regardless of realm', () => {
+    for (const b of ['night', 'ember', 'frost', 'haunt', 'dusk', 'amber'] as BiomeId[]) {
+      expect(dayNightGrade(1, b)).toEqual(NEUTRAL_DAY_GRADE);
+    }
+  });
+});
+
+describe('warmDuskGrade (the whole frame goes orange at the horizon)', () => {
+  it('returns the grade untouched when the sun is high or deep under', () => {
+    const g = dayNightGrade(0.8);
+    expect(warmDuskGrade(g, 0)).toEqual(g);
+  });
+
+  it('warms sky and fog toward orange at full dusk, light level untouched', () => {
+    const g = dayNightGrade(0.5);
+    const w = warmDuskGrade(g, 1);
+    // red rises, blue falls: the sunset push
+    expect(w.sky[0]).toBeGreaterThan(g.sky[0]);
+    expect(w.sky[2]).toBeLessThan(g.sky[2]);
+    expect(w.fog[0]).toBeGreaterThan(g.fog[0]);
+    expect(w.fog[2]).toBeLessThan(g.fog[2]);
+    // hue only: intensity and sightlines stay the cycle's own curve
+    expect(w.lightScale).toBe(g.lightScale);
+    expect(w.farScale).toBe(g.farScale);
+  });
+});
+
+describe('lunarPhase / moonTerminator (the moon runs real phases)', () => {
+  it('anchors the lunar cycle to the epoch across eight world days', () => {
+    expect(LUNAR_CYCLE_MS).toBe(8 * DAY_NIGHT_CYCLE_MS);
+    expect(lunarPhase(0)).toBe(0);
+    expect(lunarPhase(LUNAR_CYCLE_MS / 2)).toBeCloseTo(0.5, 12);
+    expect(lunarPhase(LUNAR_CYCLE_MS * 2.25)).toBeCloseTo(0.25, 12);
+  });
+
+  it('traces the classic phases: new, quarters, full', () => {
+    const newMoon = moonTerminator(0);
+    expect(newMoon.litFrac).toBeCloseTo(0, 12);
+    expect(newMoon.rx).toBeCloseTo(1, 12);
+    const firstQuarter = moonTerminator(0.25);
+    expect(firstQuarter.litFrac).toBeCloseTo(0.5, 12);
+    expect(firstQuarter.rx).toBeCloseTo(0, 6);
+    expect(firstQuarter.shadowSide).toBe(-1); // waxing: lit from the right
+    const full = moonTerminator(0.5);
+    expect(full.litFrac).toBeCloseTo(1, 12);
+    const lastQuarter = moonTerminator(0.75);
+    expect(lastQuarter.litFrac).toBeCloseTo(0.5, 12);
+    expect(lastQuarter.shadowSide).toBe(1); // waning: lit from the left
+  });
+
+  it('bulges the terminator toward the lit side for crescents, the shadow side for gibbous', () => {
+    const waxingCrescent = moonTerminator(0.1);
+    expect(waxingCrescent.shadowSide).toBe(-1);
+    expect(waxingCrescent.bulgeSide).toBe(1);
+    const waxingGibbous = moonTerminator(0.4);
+    expect(waxingGibbous.shadowSide).toBe(-1);
+    expect(waxingGibbous.bulgeSide).toBe(-1);
+    const waningCrescent = moonTerminator(0.9);
+    expect(waningCrescent.shadowSide).toBe(1);
+    expect(waningCrescent.bulgeSide).toBe(-1);
+  });
+});
+
+describe('duskWarmAmount / nightSkyDesat (the cycle sky grading)', () => {
+  it('the dusk glow peaks at the horizon crossing and vanishes high or deep under', () => {
+    expect(duskWarmAmount(0.66)).toBeCloseTo(0, 6); // noon sun: no sunset glow
+    expect(duskWarmAmount(0)).toBeCloseTo(1, 2); // crossing: full glow
+    expect(duskWarmAmount(-0.5)).toBeCloseTo(0, 6); // deep night: none
+  });
+
+  it('the night desaturation rises from zero and stays capped under one', () => {
+    expect(nightSkyDesat(0)).toBe(0);
+    expect(nightSkyDesat(1)).toBeCloseTo(0.75, 6);
+    const mid = nightSkyDesat(0.5);
+    expect(mid).toBeGreaterThan(0);
+    expect(mid).toBeLessThan(0.75);
   });
 });
 
