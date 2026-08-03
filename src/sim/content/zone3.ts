@@ -331,6 +331,15 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     family: 'ogre',
     elite: true,
     boss: true,
+    // An HOUR, matching Marrowlord Varkas, whose expected value per kill is
+    // within 2% of his. He is boss: true with boss-tier loot (2000 guaranteed
+    // copper plus three gear drops) but declared no cadence, and boss/elite do
+    // not feed the respawn policy: only respawnMult or rare: true do. So he
+    // silently inherited the open-world TRASH timer and was 24% of the whole
+    // Glimmermere corridor's gold by himself, a bigger single lever on that
+    // route's economy than the trash respawn rate ever was. Declaring the
+    // cadence here is what makes him a boss rather than a very rich ogre.
+    respawnMult: 144,
     hpBase: 200,
     hpPerLevel: 30,
     dmgBase: 12,
