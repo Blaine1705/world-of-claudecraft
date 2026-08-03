@@ -45,8 +45,10 @@ export interface BladeGrassView {
   update(px: number, pz: number): void;
 }
 
-// same tiny deterministic PRNG the motes pool uses (module-local there)
-function mulberry32(seed: number): () => number {
+// same tiny deterministic PRNG the motes pool uses (module-local there);
+// exported for the mid-band and the ground bake, which reuse the exact
+// cluster look
+export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -62,7 +64,10 @@ function mulberry32(seed: number): () => number {
 // reads as grown grass arcing over rather than a symmetric fan of straight
 // spikes. Vertex colors carry a base->tip brighten so blades read rooted
 // without a texture; instanceColor multiplies in the per-spot ground tint.
-function clusterGeometry(rng: () => number): THREE.BufferGeometry {
+// Exported (geometry unchanged): the mid-band (blade_grass_band.ts) and the
+// ground bake (grass_ground_bake.ts) must use these EXACT clusters so the
+// carpet, the band, and the painted ground are one look by construction.
+export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   const positions: number[] = [];
   const colors: number[] = [];
   const indices: number[] = [];

@@ -36,8 +36,10 @@ const terrainReliefLevel = (): number => (renderLayerDisabled('trelief') ? 0 : G
 const richTerrainSplat = (): boolean =>
   terrainReliefLevel() >= 1 && !renderLayerDisabled('talbedo');
 
+import { getGrassGroundBake } from './grass_ground_bake';
 import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
+import { GRASS_BAKE_PATCH_YARDS, GRASS_PAINT_GAIN } from './meadow_tuning';
 import {
   beginChunkGeometry,
   type ChunkGeometryArrays,
@@ -545,6 +547,46 @@ const float WOC_GRASS_HEIGHT_SHADE = 0.10;
 const float WOC_GRASS_RECESS_SAT = 0.12;
 `;
 
+// The meadow-continuum grass layer: when the ground bake exists, the grass
+// albedo is the BAKED blade artwork (grass_ground_bake.ts) sampled ONCE at
+// true world scale, replacing the photo octave stack. No rescaled octaves:
+// a rescaled stroke is a scaled-up grass element, which the meadow rules
+// ban; anti-tiling comes from the jitter phase drift and the hue wander
+// only. The comb-frame locals stay declared at both tiers because the
+// detail-normal chunk and the tussock shade still sample through them.
+function grassBakeAlbedoGlsl(rich: boolean): string {
+  const uvScale = (1 / GRASS_BAKE_PATCH_YARDS).toFixed(6);
+  const comb = rich
+    ? `vec2 grassJitter = vec2(0.0);
+        if ( wocHasGrass ) {
+          grassJitter = (vec2(
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.07).r,
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5) * WOC_GRASS_SCALE_JITTER;
+        }
+        vec2 combDir = vec2(1.0, 0.0);
+        if ( wocHasGrass || wocHasSand ) {
+          float combA = (texture2D(uMacro, vWPos.xz * WOC_COMB_FREQ + 0.19).r - 0.5) * WOC_COMB_SWING;
+          combDir = vec2(cos(combA), sin(combA));
+        }
+        vec2 combPerp = vec2(-combDir.y, combDir.x);
+        vec2 combT = vec2(dot(tuv, combDir) * WOC_COMB_COMPRESS, dot(tuv, combPerp));
+        vec3 grassAlb = vec3(0.0);
+        if ( wocHasGrass ) {
+          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale} + grassJitter).rgb;
+          float bakeHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
+          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);
+        }`
+    : `vec2 combT = tuv;
+        vec2 grassJitter = vec2(0.0);
+        vec2 combDir = vec2(1.0, 0.0);
+        vec2 combPerp = vec2(0.0, 1.0);
+        vec3 grassAlb = vec3(0.0);
+        if ( wocHasGrass ) {
+          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale}).rgb;
+        }`;
+  return comb;
+}
+
 function buildSplatMaterial(
   normalTex: THREE.DataTexture,
   brush: BrushUniforms,
@@ -555,6 +597,10 @@ function buildSplatMaterial(
   groundSplatMaps();
   const macro = macroNoiseTexture();
   const t = TERRAIN_TEX;
+  // The meadow-continuum ground paint: present whenever the renderer baked
+  // the blade-cluster texture before terrain build. ?grassbake=off is the
+  // dev A/B switch back to the photo grass layer.
+  const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 1.0,
@@ -578,6 +624,7 @@ function buildSplatMaterial(
       uMacro: { value: macro },
       uGroundAO: { value: t.groundAO },
     });
+    if (grassBake) sh.uniforms.uGrassBake = { value: grassBake.texture };
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -615,6 +662,7 @@ function buildSplatMaterial(
         varying vec3 vWPos;
         varying vec3 vWNorm;
         uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro, uGroundAO;
+        ${grassBake ? 'uniform sampler2D uGrassBake;' : ''}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
       )
@@ -819,8 +867,12 @@ function buildSplatMaterial(
           // bench measured the meadow tier gap with relief already off, so
           // the no-relief tiers keep the plain two-octave anti-tiling mix.
           // ?talbedo=off is the dev perf-attribution kill switch.
-          richTerrainSplat()
-            ? `vec2 grassJitter = vec2(0.0);
+          // With the ground bake active, both tiers take the baked-blade
+          // grass layer instead (one true-scale tap; see grassBakeAlbedoGlsl).
+          grassBake
+            ? grassBakeAlbedoGlsl(richTerrainSplat())
+            : richTerrainSplat()
+              ? `vec2 grassJitter = vec2(0.0);
         if ( wocHasGrass ) {
           // Per-octave scale jitter: a slow (~36yd) two-channel drift field
         // nudges each octave's sample position a different amount and sign,
@@ -871,7 +923,7 @@ function buildSplatMaterial(
           float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
           grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
         }`
-            : `// No-relief tiers: the plain two-octave anti-tiling mix (the
+              : `// No-relief tiers: the plain two-octave anti-tiling mix (the
         // 90-degree-rotated coarse octave still kills the shared repeat).
         // The comb-frame locals stay declared at IDENTITY for the detail
         // normal chunk (which samples the grass normal through them on every
@@ -1059,13 +1111,29 @@ function buildSplatMaterial(
         vec3 sandAlb = vec3(0.0);
         if ( wocHasSand )
           sandAlb = texture2D(uSand, tuv).rgb;
-        vec3 alb = grassAlb * vSplatR.x
+        ${
+          grassBake
+            ? `// Per-layer tint (meadow continuum): the baked grass layer is
+        // tint-NEUTRAL artwork, so it takes the FULL vertex tint (on grass,
+        // vColor IS groundGrassColorAt: the palette + patch noise the blades
+        // tint from) scaled by the constructed paint gain, uniform at every
+        // distance. The photo layers keep the gentle 0.35 modulation they
+        // were authored against; vtint35 is reused by the snow and impact
+        // mixes so those keep today's response.
+        vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
+        vec3 vtint35 = mix(vec3(1.0), vtint, 0.35);
+        vec3 alb = grassAlb * vtint * ${(GRASS_PAINT_GAIN / 2).toFixed(4)} * vSplatR.x
+                 + (dirtAlb * vSplatR.y
+                 + rockAlb * vSplatR.z
+                 + sandAlb * vSplatR.w) * vtint35;`
+            : `vec3 alb = grassAlb * vSplatR.x
                  + dirtAlb * vSplatR.y
                  + rockAlb * vSplatR.z
-                 + sandAlb * vSplatR.w;
+                 + sandAlb * vSplatR.w;`
+        }
         // snow cover on the peaks/rim, by baked per-vertex weight
         if ( wocHasSnow )
-          alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb, vExtra.y);
+          alb = mix(alb, texture2D(uSnow, tuv * 0.7).rgb${grassBake ? ' * vtint35' : ''}, vExtra.y);
         // Wet shoreline: within ~1.6u above the waterline (WATER_LEVEL is
         // inlined from src/sim/world.ts at material build), sand and dirt
         // darken and tighten as if soaked, so every shore carries a wet
@@ -1088,18 +1156,24 @@ function buildSplatMaterial(
         // Meteor impact terrain is authored by the same crater profile as the
         // heightfield. Apply it in albedo space so the PBR textures do not wash
         // the crater floor back toward marsh sand.
-        vec3 impactAlb = mix(vec3(0.20, 0.08, 0.035), vec3(0.055, 0.040, 0.032), vExtra.w);
+        vec3 impactAlb = mix(vec3(0.20, 0.08, 0.035), vec3(0.055, 0.040, 0.032), vExtra.w)${grassBake ? ' * vtint35' : ''};
         alb = mix(alb, impactAlb, clamp(vExtra.z * 0.86 + vExtra.w * 0.18, 0.0, 0.96));
         // very-low-frequency hue drift (~100u wavelength) keeps distant
         // hills from flattening into one uniform lawn green (macro2 itself is
         // sampled up by the rock wall blend, which shares it)
         alb = mix(alb, alb * vec3(1.07, 1.03, 0.86), (macro2 - 0.5) * 0.75 * vSplat.x);
-        // real albedo carries the hue now; vertex color only modulates gently
+        ${
+          grassBake
+            ? `// vertex tint already folded in per layer above (grass full,
+        // photo layers at 0.35): only the macro swing and relief shade left.
+        diffuseColor.rgb *= alb * macro * groundShade;`
+            : `// real albedo carries the hue now; vertex color only modulates gently
         // so the biome painting (roads, hub discs, snowline) still reads.
         // (vColor was authored as a full sRGB ground color, so re-centre it
         // around 1.0 before using it as a multiplier.)
         vec3 vtint = clamp(vColor.rgb * 2.0, 0.0, 2.0);
-        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;`,
+        diffuseColor.rgb *= alb * mix(vec3(1.0), vtint, 0.35) * macro * groundShade;`
+        }`,
       )
       .replace(
         '#include <color_fragment>',

@@ -26,7 +26,10 @@ import {
   farTileVisible,
   planFarTiles,
 } from './far_terrain_core';
+import { getGrassGroundBake } from './grass_ground_bake';
 import { idleSlot } from './idle_queue';
+import { GRASS_BAKE_PATCH_YARDS, GRASS_PAINT_GAIN } from './meadow_tuning';
+import { renderLayerDisabled } from './render_dev_flags';
 
 // One Uint16 index buffer per (tileSize, spacing): every tile of one
 // spacing has identical topology, so a dozen tiles share one buffer.
@@ -111,23 +114,51 @@ export function buildFarTerrain(
   // The near-field discard (see FAR_DISCARD_MARGIN). uTime-style shared
   // uniforms are overkill here: one vec3 (camera xz + cutoff) per frame.
   const farCut = { value: new THREE.Vector3(0, 0, 0) };
+  // Meadow-continuum ground paint: the far tiles multiply the SAME baked
+  // blade texture the near splat terrain paints with, at the same true
+  // world scale and the same constructed gain, gated by the per-vertex
+  // grass weight (aGrassW). No distance term anywhere: the mip chain does
+  // the averaging, so the tiles' meadow converges on the identical colour
+  // the near ground shows, and the handoff at the detail horizon is
+  // invisible by construction. ?grassbake=off keeps the legacy flat tint.
+  const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uFarCut = farCut;
+    if (grassBake) shader.uniforms.uGrassBake = { value: grassBake.texture };
     shader.vertexShader = shader.vertexShader
-      .replace('#include <common>', '#include <common>\nvarying vec2 vFarXZ;')
+      .replace(
+        '#include <common>',
+        `#include <common>\nvarying vec2 vFarXZ;${
+          grassBake ? '\nattribute float aGrassW;\nvarying float vGrassW;' : ''
+        }`,
+      )
       .replace(
         '#include <begin_vertex>',
-        '#include <begin_vertex>\nvFarXZ = (modelMatrix * vec4(position, 1.0)).xz;',
+        `#include <begin_vertex>\nvFarXZ = (modelMatrix * vec4(position, 1.0)).xz;${
+          grassBake ? '\nvGrassW = aGrassW;' : ''
+        }`,
       );
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;',
+        `#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;${
+          grassBake ? '\nvarying float vGrassW;\nuniform sampler2D uGrassBake;' : ''
+        }`,
       )
       .replace(
         'void main() {',
         'void main() {\n\tif (distance(vFarXZ, uFarCut.xy) < uFarCut.z) discard;',
       );
+    if (grassBake) {
+      shader.fragmentShader = shader.fragmentShader.replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        diffuseColor.rgb *= mix(vec3(1.0),
+          texture2D(uGrassBake, vFarXZ * ${(1 / GRASS_BAKE_PATCH_YARDS).toFixed(6)}).rgb
+            * ${GRASS_PAINT_GAIN.toFixed(4)},
+          vGrassW);`,
+      );
+    }
   };
 
   const sharedIndex = sharedIndexFor(tiles[0].size, plan.spacing);
@@ -168,6 +199,7 @@ export function buildFarTerrain(
       geo.setAttribute('position', new THREE.BufferAttribute(data.positions, 3));
       geo.setAttribute('normal', new THREE.BufferAttribute(data.normals, 3));
       geo.setAttribute('color', new THREE.BufferAttribute(data.colors, 3));
+      geo.setAttribute('aGrassW', new THREE.BufferAttribute(data.grassW, 1));
       geo.setIndex(sharedIndex);
       attachTile(tile, data.minY, data.maxY, geo);
     }

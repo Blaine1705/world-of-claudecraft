@@ -54,6 +54,7 @@ import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_qu
 import { attachBankerChestToNpcView } from './banker_chest';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
+import { type BladeGrassBandView, buildBladeGrassBand } from './blade_grass_band';
 import { createCameraBoom, stepCameraBoom } from './camera_boom_core';
 import {
   cancelCameraDirective,
@@ -209,6 +210,7 @@ import {
   urlForcedTier,
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
+import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
@@ -1517,6 +1519,7 @@ export class Renderer {
   private fish: FishView;
   private motes: MotesView;
   private bladeGrass: BladeGrassView;
+  private bladeGrassBand: BladeGrassBandView;
   private cliffScree: CliffScreeView;
   private birds: BirdsView;
   private impactSite: ImpactSiteView;
@@ -1866,6 +1869,18 @@ export class Renderer {
     // where the far mesh and the water apron run nearly coplanar along
     // distant coasts.
     this.farVista = farVistaPlan(GFX.tier, GFX.constrainedMemory);
+    // Meadow continuum: bake the blade-cluster ground texture BEFORE any
+    // terrain material builds (near splat and far tiles both read the
+    // singleton at material-build time). A few milliseconds, once per
+    // session; tiers with neither splat terrain nor the vista never
+    // consume it, so skip the bake and its texture memory there.
+    if (GFX.terrainSplat || this.farVista.enabled) {
+      try {
+        setGrassGroundBake(bakeGrassGroundTexture(this.webgl, this.sim.cfg.seed));
+      } catch {
+        setGrassGroundBake(null); // headless/stub GL: keep the legacy ground
+      }
+    }
     this.camera = new THREE.PerspectiveCamera(
       CAMERA_BASE_FOV,
       this.viewport.width / this.viewport.height,
@@ -2177,6 +2192,14 @@ export class Renderer {
       this.sim.player.pos.z,
     );
     this.scene.add(this.bladeGrass.group);
+    // the meadow-continuum blade band: the same clusters carried out to the
+    // band radius over the painted ground (blade_grass_band.ts)
+    this.bladeGrassBand = buildBladeGrassBand(
+      this.sim.cfg.seed,
+      this.sim.player.pos.x,
+      this.sim.player.pos.z,
+    );
+    this.scene.add(this.bladeGrassBand.group);
     // boulders on the steep-slope band; cliffs stop being bare wedges
     this.cliffScree = buildCliffScree(this.sim.cfg.seed);
     this.scene.add(this.cliffScree.group);
@@ -9592,6 +9615,9 @@ export class Renderer {
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
     this.bladeGrass.update(p.pos.x, p.pos.z);
+    // fogFar here is subsystemCullFar(): the residency-clamped detail
+    // horizon, so band blades never stand past unbuilt ground
+    this.bladeGrassBand.update(p.pos.x, p.pos.z, fogFar, this.fogState === 'outdoor');
     this.cliffScree.update(p.pos.x, p.pos.z);
     this.realmFlora?.update(this.time);
     this.emberFeatures?.update(this.time);

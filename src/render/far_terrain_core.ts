@@ -381,6 +381,13 @@ const FAR_FOREST_DENSITY: Partial<Record<BiomeId, number>> = {
 /**
  * One far vertex's ground color, written into `out` as a linear-srgb triple.
  * `slope` is height units per world unit, from the caller's sampled grid.
+ *
+ * Returns the vertex's GRASS PAINT weight for the meadow-continuum ground
+ * texture: 1 where the colour above is meadow, feathering to 0 through the
+ * same mixes that remove the meadow from the colour (shore, rock, snow,
+ * scorch, rim). The near terrain's splat grass weight is the same idea
+ * (sampleVertex's lerpSplat calls); keeping the two recipes side by side is
+ * what keeps the painted grass gate from drifting between the tiers.
  */
 export function farGroundColor(
   x: number,
@@ -389,9 +396,10 @@ export function farGroundColor(
   slope: number,
   seed: number,
   out: Triple,
-): void {
+): number {
   const pal = farPaletteAt(x, z);
   const biome = zoneBiomeAt(x, z);
+  let grassW = 1;
 
   // base grass with the same patchy fbm variation the near tint uses
   const v = fbm2(x * 0.045, z * 0.045, seed + 53, 3);
@@ -408,11 +416,18 @@ export function farGroundColor(
     const scorch = clamp01((z - 2260) / 100) * (1 - valley);
     if (scorch > 0) lerp3(out, TONE.emberScorch, scorch * 0.55);
     if (valley > 0) lerp3(out, TONE.emberForest, valley * 0.8);
+    // the volcanic belt sheds its meadow (near tier: the sand/scorch splat)
+    grassW *= 1 - clamp01((z - 1925) / 145) * 0.75;
+    grassW *= 1 - scorch * 0.5;
+    grassW = grassW + (1 - grassW) * valley * 0.6;
   }
 
   // marsh mud: pull the ground toward dark wet earth where the marsh blends in
   const marshW = biomeWeightAt('marsh', x, z);
-  if (marshW > 0) lerp3(out, TONE.dirtDark, marshW * 0.45);
+  if (marshW > 0) {
+    lerp3(out, TONE.dirtDark, marshW * 0.45);
+    grassW *= 1 - marshW * 0.45;
+  }
 
   // far forest mass: clumped canopy paint over gentle, dry, low ground
   const shoreH = h - (WATER_LEVEL + 1.6);
@@ -436,12 +451,14 @@ export function farGroundColor(
   if (shore > 0) {
     const wetStone = biome === 'peaks' || biome === 'volcano' || biome === 'cave';
     lerp3(out, wetStone ? TONE.wetRock : biome === 'marsh' ? TONE.dirtDark : pal.sand, shore);
+    grassW *= 1 - shore;
   }
 
   // steep faces shed their cover; the rock itself carries ridge-scale
   // variation (gully shadows, warm strata) so far mountains read as stone
   const slopeRock = clamp01((slope - rockStart) * 2);
   if (slopeRock > 0) {
+    grassW *= 1 - slopeRock;
     lerp3(out, TONE.rock, slopeRock);
     const strata = fbm2(x * 0.06 + h * 0.05, z * 0.06, seed + 631, 3);
     if (strata < 0.45) {
@@ -455,12 +472,21 @@ export function farGroundColor(
   // volcanic cones never take snow (terrain.ts holds the same rule): their
   // high ground darkens toward bare basalt instead.
   if (biome === 'ember') {
-    if (h > 20) lerp3(out, TONE.emberBasalt, clamp01((h - 20) / 8) * 0.8);
+    if (h > 20) {
+      lerp3(out, TONE.emberBasalt, clamp01((h - 20) / 8) * 0.8);
+      grassW *= 1 - clamp01((h - 20) / 8) * 0.8;
+    }
   } else {
-    if (h > 22) lerp3(out, TONE.rock, clamp01((h - 22) / 10) * 0.6);
+    if (h > 22) {
+      lerp3(out, TONE.rock, clamp01((h - 22) / 10) * 0.6);
+      grassW *= 1 - clamp01((h - 22) / 10) * 0.8;
+    }
     const snowPatch = fbm2(x * 0.05, z * 0.05, seed + 61, 2);
     const snow = clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
-    if (snow > 0) lerp3(out, TONE.snowCap, snow);
+    if (snow > 0) {
+      lerp3(out, TONE.snowCap, snow);
+      grassW *= 1 - snow;
+    }
   }
 
   // the Frostveil's blanket: snow down to the shore wherever frost blends in
@@ -468,6 +494,7 @@ export function farGroundColor(
   if (frostW > 0) {
     const blanket = clamp01((h - (WATER_LEVEL + 1.2)) / 3) * frostW;
     lerp3(out, TONE.snowCap, blanket * 0.8);
+    grassW *= 1 - blanket;
   }
 
   // Aerial tint on the high rim: with the fog gone, the old near-solid
@@ -484,7 +511,9 @@ export function farGroundColor(
   if (rim > 0) {
     const alt = clamp01((h - 12) / 30);
     lerp3(out, TONE.hazyPeak, rim * (0.18 + alt * 0.3));
+    grassW *= 1 - rim * 0.85;
   }
+  return grassW;
 }
 
 // ---------------------------------------------------------------------------
@@ -502,6 +531,8 @@ export interface FarTileData {
   positions: Float32Array;
   normals: Float32Array;
   colors: Float32Array;
+  /** Meadow-continuum grass paint weight per vertex (see farGroundColor). */
+  grassW: Float32Array;
   minY: number;
   maxY: number;
 }
@@ -574,6 +605,7 @@ export function createFarTileBuilder(tile: FarTile, spacing: number, seed: numbe
   const positions = new Float32Array(side * side * 3);
   const normals = new Float32Array(side * side * 3);
   const colors = new Float32Array(side * side * 3);
+  const grassW = new Float32Array(side * side);
   let minY = Infinity;
   let maxY = -Infinity;
   let heightRow = 0;
@@ -615,7 +647,7 @@ export function createFarTileBuilder(tile: FarTile, spacing: number, seed: numbe
       normals[vi] = -(hx / (2 * spacing)) * invLen;
       normals[vi + 1] = invLen;
       normals[vi + 2] = -(hz / (2 * spacing)) * invLen;
-      farGroundColor(x, z, h, slope, seed, color);
+      grassW[iz * side + ix] = farGroundColor(x, z, h, slope, seed, color);
       colors[vi] = color[0];
       colors[vi + 1] = color[1];
       colors[vi + 2] = color[2];
@@ -640,7 +672,7 @@ export function createFarTileBuilder(tile: FarTile, spacing: number, seed: numbe
       if (heightRow < padded || vertexRow < side) {
         throw new Error('far tile builder not complete');
       }
-      return { positions, normals, colors, minY, maxY };
+      return { positions, normals, colors, grassW, minY, maxY };
     },
   };
 }
