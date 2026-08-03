@@ -1046,6 +1046,7 @@ export const fr_CA: EnTranslations = {
       },
       "awayNote": "Si les deux camps arborent la même bannière, l'équipe visiteuse joue avec la palette inversée.",
       "rolesHeading": "Rôle sportif",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Polyvalent",
@@ -1087,6 +1088,7 @@ export const fr_CA: EnTranslations = {
       "guildBoardWl": "{wins} V, {losses} D",
       "practice": "Entraînement contre des bots",
       "practiceNote": "Lance aussitôt un match privé contre des bots sur votre propre terrain d'entraînement.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "À l'entraînement ({count}) :",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "File de la Coupe du Val : {bracket}, position {position} sur {count}",
@@ -1129,6 +1131,8 @@ export const fr_CA: EnTranslations = {
         "rule5": "Chacun peut s'approcher et vous encourager depuis les tribunes.",
         "kitHeading": "Votre panoplie",
         "kitNote": "Ces techniques remplacent vos capacités de classe le temps du match.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "La feuille de match",
         "you": "Vous",
         "bot": "Bot",

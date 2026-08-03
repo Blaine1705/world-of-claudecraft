@@ -1046,6 +1046,7 @@ export const it_IT: EnTranslations = {
       },
       "awayNote": "Se entrambe le squadre battono lo stesso vessillo, quella in trasferta gioca con i colori invertiti.",
       "rolesHeading": "Ruolo sportivo",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Tuttocampista",
@@ -1087,6 +1088,7 @@ export const it_IT: EnTranslations = {
       "guildBoardWl": "{wins} V, {losses} S",
       "practice": "Allenamento contro i bot",
       "practiceNote": "Avvia subito una partita privata contro i bot sul tuo campo di allenamento.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "In allenamento ora ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Coda della Coppa della Valle: {bracket}, posizione {position} di {count}",
@@ -1129,6 +1131,8 @@ export const it_IT: EnTranslations = {
         "rule5": "Chiunque può avvicinarsi e fare il tifo dagli spalti.",
         "kitHeading": "Il tuo kit",
         "kitNote": "Queste mosse sostituiscono le tue abilità di classe per la partita.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "La distinta",
         "you": "Tu",
         "bot": "Bot",

@@ -6219,9 +6219,11 @@ export class GameServer {
         // liveHidden: this viewer is off in a private practice instance, so the
         // Sowfield live strip carried in the shared fragment must be suppressed for
         // them. Derived from the two values we already hold (the raw shared live is
-        // non-null but this viewer's effective live is null), so VcMatchInfo need
-        // not carry a practice flag; the client reapplies it on recompose and never
-        // surfaces liveHidden on CupInfo. The raw strip still rides vcupb to every
+        // non-null but this viewer's effective live is null), so this per-viewer
+        // suppression needs no flag of its own on the match sub-object
+        // (VcMatchInfo.practice describes the MATCH for the briefing copy, not
+        // this viewer's live-strip visibility); the client reapplies liveHidden
+        // on recompose and never surfaces it on CupInfo. The raw strip still rides vcupb to every
         // viewer (it is public match state, no PII), so a practicer receives the
         // bytes but this per-viewer flag keeps their client from ever rendering it.
         const liveHidden = shared.live !== null && full.live === null;

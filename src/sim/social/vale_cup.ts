@@ -31,6 +31,7 @@ import {
   resolveSportKit,
   SPORT_ROLES,
   VALE_CUP_BALL_TEMPLATE_ID,
+  VC_ALLROUNDER_ONLY_MAX_BRACKET,
   vcNation,
 } from '../content/vale_cup';
 import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
@@ -227,7 +228,14 @@ export interface VcMatch {
   rosterA: VcCombatant[]; // snapshot at start so leavers keep a team sheet
   rosterB: VcCombatant[];
   roles: Record<number, SportRole>;
-  rated: boolean; // false whenever bots are seated: no standing changes
+  // False whenever bots are seated (practice and bot-backfill): no standing
+  // changes and no Vale Cup skill-deed credit (goal/save/clean-sheet sites in
+  // deeds.ts gate on it). The debut/first-match deeds do NOT read this flag:
+  // they gate on cupQueuedBout (practice === null), so a bot-backfilled queued
+  // bout still credits them while a practice bout credits nothing at all.
+  // Deliberate, and surfaced to the player: matchInfoFor ships this flag so the
+  // briefing overlay can say the bout is unrated (issue 2767).
+  rated: boolean;
   ready: Set<number>; // fighters who readied up in the briefing (bots pre-added)
   briefingTimer: number; // s of briefing left before auto-ready ('briefing' only)
   benched: Set<number>; // deserters/vanished fighters; team plays short
@@ -342,7 +350,7 @@ function vcupPlayPhase(match: VcMatch): boolean {
 
 function normalizeRole(role: SportRole | string | undefined, bracket: VcBracket): SportRole {
   // 1v1 and 2v2 default to the all-rounder kit (PRD); unknown roles coerce too.
-  if (bracket <= 2) return 'allrounder';
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return 'allrounder';
   return SPORT_ROLES.includes(role as SportRole) ? (role as SportRole) : 'allrounder';
 }
 
@@ -357,7 +365,7 @@ function ensureSideKeeper(
   roles: Record<number, SportRole>,
   bracket: VcBracket,
 ): void {
-  if (bracket < 3 || pids.length === 0) return;
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET || pids.length === 0) return;
   if (pids.some((pid) => roles[pid] === 'keeper')) return;
   roles[pids[pids.length - 1]] = 'keeper';
 }
@@ -2172,6 +2180,8 @@ function matchInfoFor(ctx: SimContext, match: VcMatch, viewerPid: number): VcMat
   return {
     id: match.id,
     phase: match.phase,
+    rated: match.rated,
+    practice: match.practice !== null,
     countdown: match.phase === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
     timeLeft,
     golden: match.golden,
