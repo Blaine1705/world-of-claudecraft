@@ -48,7 +48,11 @@ import {
   impostorPrewarmMeshes,
   impostorsActive,
 } from './foliage_impostor';
-import { IMPOSTOR_SWAP_FADE, spriteSwapDistance } from './foliage_impostor_core';
+import {
+  CANOPY_EMISSIVE_FLOOR,
+  IMPOSTOR_SWAP_FADE,
+  spriteSwapDistance,
+} from './foliage_impostor_core';
 import {
   type BucketWindowInput,
   bucketVisible,
@@ -784,7 +788,7 @@ function foliageMaterial(
     // the sky term through the up-bent leaf normals (LEAF_UP_NORMAL_BLEND),
     // which falls off with light instead of glowing on its own.
     mat.emissiveMap = std.map;
-    mat.emissive.setRGB(0.155, 0.175, 0.135);
+    mat.emissive.setRGB(...CANOPY_EMISSIVE_FLOOR);
   }
   applyInstanceCollapse(mat, role);
   // Trunks take the bark family, the shared boulder fields a stronger stone;

@@ -44,11 +44,17 @@ function sharedIndexFor(tileSize: number, spacing: number): THREE.BufferAttribut
   return index;
 }
 
-// An idle-paced build slice: about the same per-slice budget the near
-// terrain's streamed chunk builds use (IDLE_GEOMETRY_SLICE_MS scale). A
-// 960u tile row is ~100 terrainHeight samples, roughly half a millisecond.
-const FAR_BUILD_ROWS_PER_SLICE = 12;
+// An idle-paced build slice. A 960u tile row is ~100 terrainHeight samples,
+// roughly half a millisecond, so 40 rows stays around 3ms per slice. The
+// budget matters less than the SLOT COUNT: this build takes an idle slot per
+// slice for its whole run and competes with near-terrain zone prepares for
+// the same idle time, so fewer, chunkier, more deferential slices (see the
+// timeout deferrals below) keep the vista from starving the detail horizon.
+const FAR_BUILD_ROWS_PER_SLICE = 40;
 const FAR_BUILD_TIMEOUT_MS = 200;
+/** Timed-out slots deferred before forcing progress: the far vista is the
+ *  politest consumer of idle time, the near detail always outranks it. */
+const FAR_BUILD_TIMEOUT_DEFERRALS = 2;
 
 // Fragments closer than (detailFar - margin) are discarded: inside the
 // detail envelope the real terrain owns every pixel, and on steep ridges
@@ -61,6 +67,29 @@ const FAR_DISCARD_MARGIN = 60;
 interface BuiltFarTile {
   tile: FarTile;
   mesh: THREE.Mesh;
+}
+
+/**
+ * Albedo-shaped ambient floor for deep night, shared by every far tile
+ * (one uniform object, the farCut pattern). The vista is the first layer
+ * this renderer draws with large arbitrarily oriented rock faces at scale;
+ * under the night rig (light scale 0.36, ~88 percent of what remains in one
+ * hard directional) a face angled off the moon crushes to black while the
+ * horizontal near meadow stays readable. Emissive lands after all light
+ * attenuation, so this floor survives the night scale exactly like the real
+ * canopies' emissive floor does. Zero by day: the day frame is byte-identical.
+ */
+const FAR_NIGHT_FLOOR: [number, number, number] = [0.026, 0.03, 0.044];
+const farNightFloor = { value: new THREE.Color(0, 0, 0) };
+
+/** Per-frame, from the renderer's day/night update: scales the moonlit
+ *  ambient floor with how deep into night the cycle sits (0 by day). */
+export function setFarTerrainNightFloor(nightAmt: number): void {
+  farNightFloor.value.setRGB(
+    FAR_NIGHT_FLOOR[0] * nightAmt,
+    FAR_NIGHT_FLOOR[1] * nightAmt,
+    FAR_NIGHT_FLOOR[2] * nightAmt,
+  );
 }
 
 export interface FarTerrainView {
@@ -124,6 +153,7 @@ export function buildFarTerrain(
   const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uFarCut = farCut;
+    shader.uniforms.uFarNightFloor = farNightFloor;
     if (grassBake) shader.uniforms.uGrassBake = { value: grassBake.texture };
     shader.vertexShader = shader.vertexShader
       .replace(
@@ -141,13 +171,19 @@ export function buildFarTerrain(
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        `#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;${
+        `#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;\nuniform vec3 uFarNightFloor;${
           grassBake ? '\nvarying float vGrassW;\nuniform sampler2D uGrassBake;' : ''
         }`,
       )
       .replace(
         'void main() {',
         'void main() {\n\tif (distance(vFarXZ, uFarCut.xy) < uFarCut.z) discard;',
+      )
+      .replace(
+        // The deep-night ambient floor (see FAR_NIGHT_FLOOR): albedo-shaped,
+        // added where emissive lands so it survives the night light scale.
+        '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += uFarNightFloor * diffuseColor.rgb;',
       );
     if (grassBake) {
       shader.fragmentShader = shader.fragmentShader.replace(
@@ -190,7 +226,9 @@ export function buildFarTerrain(
       const tile = tiles[idx];
       const builder = createFarTileBuilder(tile, plan.spacing, seed);
       for (;;) {
-        await idleSlot(FAR_BUILD_TIMEOUT_MS);
+        await idleSlot(FAR_BUILD_TIMEOUT_MS, {
+          maxTimeoutDeferrals: FAR_BUILD_TIMEOUT_DEFERRALS,
+        });
         if (cancelled) return;
         if (builder.step(FAR_BUILD_ROWS_PER_SLICE)) break;
       }

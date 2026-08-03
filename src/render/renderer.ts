@@ -172,7 +172,7 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
-import { buildFarTerrain, type FarTerrainView } from './far_terrain';
+import { buildFarTerrain, type FarTerrainView, setFarTerrainNightFloor } from './far_terrain';
 import {
   detailCullFar,
   type FarVistaPlan,
@@ -8011,6 +8011,8 @@ export class Renderer {
       // the world (its baked palette would otherwise stay day-bright at night)
       setWaterSunDirection(this.lightDir);
       setWaterDayNight(this.dnGrade.fog);
+      // the far vista's deep-night ambient floor rides the same grade
+      setFarTerrainNightFloor(this.dnGrade.nightAmt);
     }
     this.sun.target.position.set(pp.x, pp.y, pp.z);
   }

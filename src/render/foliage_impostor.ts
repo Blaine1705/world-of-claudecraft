@@ -31,6 +31,7 @@ import { terrainHeight } from '../sim/world';
 import { FAR_MESH_DROP, FAR_WORLD_MARGIN, farVertexHeight, farVistaPlan } from './far_terrain_core';
 import { collapseWindowUniforms } from './foliage_collapse';
 import {
+  CANOPY_EMISSIVE_FLOOR,
   IMPOSTOR_ATLAS_MAX,
   IMPOSTOR_JITTER_GLSL,
   type ImpostorArchetypeSpec,
@@ -132,10 +133,12 @@ export function impostorsActive(): boolean {
 // Neutral, yaw-agnostic studio rig: a hemisphere gives the bake its top-down
 // volume (canopy crowns brighter than skirts) without stamping a sun
 // direction into a sprite that must read correctly from every bearing at
-// every hour. Absolute level is close to 1 so the live Lambert lighting
-// supplies the actual brightness.
-const BAKE_SKY = 1.15;
-const BAKE_GROUND = 0.62;
+// every hour. The PI factor cancels Lambert's 1/PI: the bake material writes
+// albedo x irradiance / PI, and the atlas is then bound as a MAP and lit
+// again by the live shading, so without the cancellation the sprite pays the
+// 1/PI twice and lands about 3x darker than the real tree it replaces.
+const BAKE_SKY = 1.15 * Math.PI;
+const BAKE_GROUND = 0.62 * Math.PI;
 
 const bakeMaterialCache = new Map<THREE.Material, THREE.Material>();
 
@@ -377,7 +380,10 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
           : u.uTreeMax;
   // Standard, matching the real foliage materials: the sprites must take
   // the same realm IBL irradiance their 3D twins take, or their shaded
-  // sides read darker than the trees they replace.
+  // sides read darker than the trees they replace. vertexColors on so the
+  // per-instance tint written by setColorAt in finalize actually applies
+  // (without it three.js never compiles the instancing-color path and the
+  // tint is a silent no-op: every archetype repeats one identical sprite).
   const mat = new THREE.MeshStandardMaterial({
     map: atlas,
     alphaTest: 0.35,
@@ -385,8 +391,17 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
     fog: true,
     roughness: 0.95,
     metalness: 0,
+    vertexColors: true,
   });
   mat.name = `foliage:impostor-${category}`;
+  // The canopy ambient floor the real trees carry (foliage.ts), shaped by
+  // the same atlas texel in the fragment patch below. Without it a sprite is
+  // the only tree in the scene with no floor and crushes to a pure black
+  // silhouette at night. Foliage categories only: rocks and buildings do not
+  // carry the floor in their real form either.
+  if (category === 'tree' || category === 'dress') {
+    mat.emissive.setRGB(...CANOPY_EMISSIVE_FLOOR);
+  }
   // Amplitude parity with addWind in foliage.ts: TREE_WIND_STRENGTH 0.08
   // times the kit's windMul (1.0 leaves, 1.2 bushes). The sway direction is
   // world-fixed here where the real mesh sways in its rotated model frame:
@@ -477,15 +492,25 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         `#include <common>
         varying vec2 vImpUvA;
         varying vec2 vImpUvB;
-        varying float vImpBlend;`,
+        varying float vImpBlend;
+        vec4 impTexel;`,
       )
       .replace(
         '#include <map_fragment>',
         `{
           vec4 impA = texture2D( map, vImpUvA );
           vec4 impB = texture2D( map, vImpUvB );
-          diffuseColor *= mix( impA, impB, vImpBlend );
+          impTexel = mix( impA, impB, vImpBlend );
+          diffuseColor *= impTexel;
         }`,
+      )
+      .replace(
+        // Shape the canopy ambient floor by the blended atlas texel, the
+        // impostor equivalent of the real canopy's emissiveMap = leaf map
+        // (the stock chunk would sample flat uv, not the per-view cells).
+        // Categories with no floor have emissive = black, so this is free.
+        '#include <emissivemap_fragment>',
+        'totalEmissiveRadiance *= impTexel.rgb;',
       );
   };
   mat.customProgramCacheKey = () => `foliage-impostor-${CATEGORY_VIEWS[category]}`;
