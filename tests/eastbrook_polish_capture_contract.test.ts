@@ -360,12 +360,11 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned after stacking the release-branch
-      // renderer/view-priority provenance move with PR #2720's fence-removal
-      // layout evidence. The authoritativeLayout/townTriangles/
-      // placementInventory inputs and the upstream provenance leaves now mint
-      // one merged composite that matches neither parent's literal. No capture
-      // was retaken.
+      // Deliberately re-pinned after stacking the base renderer provenance move
+      // with PR #2720's fence-removal layout evidence. The authoritativeLayout/
+      // townTriangles/placementInventory inputs and the upstream provenance
+      // leaves now mint one merged composite that matches neither parent's
+      // literal. No capture was retaken.
       fingerprint: 'f75f88100e6856328646d6d259a6ac630db931b8dae4fe210e5efd94d99ec568',
       components: {
         captureContract: {

@@ -614,9 +614,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned after stacking PR #2720's Eastbrook fence-removal layout evidence
-// onto the accepted historical metadata. The accepted file still points at the
-// same captured view and historical polish provenance, but its town-contract
+// Re-pinned after stacking the base renderer provenance move with PR #2720's
+// Eastbrook fence-removal layout evidence. The accepted file still points at
+// the same captured view and historical polish provenance, but its town-contract
 // inventory bytes follow the merged layout inputs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   'def3cd8b40c856c6ee3bcd8dda2be0092f2b019658b447632b296a83934cba4e';
@@ -1478,11 +1478,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // After stacking the release-branch renderer/view-priority provenance move
-    // with PR #2720's fence-removal content change (rebuilt-town placement
-    // inventory in the after-* files), this seal follows the merged composite.
-    // Every measured value (frame timings, draw stats, triangle and scenario
-    // numbers) is byte-identical, and no capture was retaken.
+    // After stacking the base renderer provenance move with PR #2720's
+    // fence-removal content change (rebuilt-town placement inventory in the
+    // after-* files), this seal follows the merged composite. Every measured
+    // value (frame timings, draw stats, triangle and scenario numbers) is
+    // byte-identical, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
       '65d63c9d51f9543436bfd0d1f28729fac3346559c9ab03d2092ab789927eaa61',
     );
