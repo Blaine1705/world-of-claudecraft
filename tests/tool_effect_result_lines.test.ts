@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // The toolEffectResult HUD arm (the acquisition craft's one result surface),
 // driven through the REAL hud event switch: two success shapes, the deny

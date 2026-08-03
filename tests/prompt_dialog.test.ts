@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // Direct behavioral pins for the shared modal prompt recipe
 // (src/ui/prompt_dialog.ts), the rule-of-three extraction behind the bags,
 // bank, and vendor quantity/confirm prompts. The three windows pin their

@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The hover tooltip's countdown clock (the phase 14 QA): the paint used to
 // be pointer-gated, so a stationary hover froze the m:ss line and a node

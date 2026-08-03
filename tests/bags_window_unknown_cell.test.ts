@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 // The unknown (def-less) bag cell's click machinery, driven behaviorally
 // against the REAL BagsWindow (the bags_window_use_routing.test.ts fixture
 // idiom). The source pins in bags_window.test.ts anchor the onDrop ordering

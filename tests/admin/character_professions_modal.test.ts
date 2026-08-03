@@ -1,4 +1,8 @@
 // @vitest-environment jsdom
+// jsdom exception: under happy-dom the environment ships a LIVE window.fetch,
+// so the restore-slot flow's request really dials localhost:3000 (ECONNREFUSED)
+// instead of hitting this suite's stub; the jsdom arm has no ambient fetch to
+// escape the stub (the docs/local-gate-perf/baselines.md exception-list class).
 import './_setup';
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

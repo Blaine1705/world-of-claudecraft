@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The bags focus-restore ladder (the phase 13 QA hand-off): the window
 // rebuilds whole on the same onInventoryChanged hook the vendor does and

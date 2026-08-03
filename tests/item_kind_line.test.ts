@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 //
 // The fine-grade kind-line split (the UX pass): a fine-grade material's
 // tooltip kind line reads "Fine Material" while its def KIND stays 'junk'
