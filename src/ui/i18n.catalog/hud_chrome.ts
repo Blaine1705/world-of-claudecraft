@@ -3048,12 +3048,19 @@ export const hudChromeStrings = {
       ceilingRare: 'Rare cap',
       ceilingCommon: 'Common cap',
       skillAria: '{craft}, skill {skill}, tier {tier}, {role}, {ceiling}',
-      // Visual column headers over the skill rows (aria-hidden: each row
-      // already reads as the full skillAria sentence).
+      // RETIRED in place (phase 22): the visual column-header row died with
+      // the row-family rework (rows self-label through their pill chips).
+      // The four keys stay because their fills already exist in the
+      // maintainer-owned overlays, which contributors never edit; drop the
+      // keys and the overlay rows together in a maintainer pass.
       colCraft: 'Craft',
       colSkill: 'Skill',
       colRole: 'Role',
       colCap: 'Cap',
+      // The uniform-chips caption over the skill rows (the option 3
+      // collapse): shown when every craft shares one role and one cap, so
+      // ten rows do not repeat the same two chips.
+      allCrafts: 'All crafts',
       tutorial:
         'First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.',
       nearTier: '{craft} is {points} skill from its next tier.',

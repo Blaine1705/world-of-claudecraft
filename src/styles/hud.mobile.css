@@ -2786,18 +2786,18 @@
     min-height: 40px;
     white-space: nowrap;
   }
-  /* The LIST owns the tracks (rows subgrid into it, see components.css), so the
-     tighter mobile template lands on the list; the cap column wraps below. */
-  body.mobile-touch .profession-skill-list {
-    grid-template-columns: minmax(82px, 1fr) 34px minmax(68px, auto);
-  }
-  body.mobile-touch .profession-skill-row > :last-child {
-    grid-column: 1 / -1;
-  }
-  /* The cap value wraps to its own line per row on mobile (no cap column
-     exists), so the Cap column header would float over nothing: hide it. */
-  body.mobile-touch .profession-skill-header > :last-child {
-    display: none;
+  /* Phase 22 retired the mobile-only track override, the full-width Cap wrap,
+     and the Cap-header hide with the grid table itself: the rows are the
+     professions row family now (name + value line, labeled pill chips), so
+     nothing wraps unlabeled and there is no column header to hide. The card
+     keeps only its height cap above, and stays the ONE scroller: the desktop
+     list cap must lift here, because a capped (overflow-y: auto) list is a
+     flex child with a zero automatic minimum, and inside the height-capped
+     column card it shrinks to nothing, hiding every row. */
+  body.mobile-touch .profession-identity-card .profession-skill-list {
+    flex: none;
+    max-height: none;
+    overflow-y: visible;
   }
   body.mobile-touch .qd-profession-choice select {
     min-height: 40px;

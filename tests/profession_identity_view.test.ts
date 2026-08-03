@@ -3,6 +3,8 @@ import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import {
   buildAttunementPreview,
   buildProfessionIdentityView,
+  type ProfessionSkillRow,
+  uniformSkillChips,
 } from '../src/ui/profession_identity_view';
 
 const baseIdentity = {
@@ -98,6 +100,43 @@ describe('buildProfessionIdentityView', () => {
     });
     const row = view.skills.find((r) => r.craftId === 'cooking');
     expect(row).toMatchObject({ skill: 74, tier: 2, pointsToNextTier: 1 });
+  });
+
+  it('collapses uniform role/cap chips on the unattuned card and never on the attuned one', () => {
+    // Unattuned: every row is role unattuned / ceiling rare by construction,
+    // so the card-level caption replaces ten repeated chip pairs.
+    const unattuned = buildProfessionIdentityView({
+      ...baseIdentity,
+      activeArchetype: null,
+      pairedMajor: null,
+      hobbyCraft: null,
+      attunedPairs: [],
+    });
+    expect(unattuned.uniform).toEqual({ role: 'unattuned', ceiling: 'rare' });
+    // Attuned always mixes (two majors beside hobby/dormant rows): no collapse.
+    expect(buildProfessionIdentityView(baseIdentity).uniform).toBeNull();
+  });
+
+  it('uniformSkillChips requires BOTH dimensions uniform (per-dimension negatives)', () => {
+    const row = (role: ProfessionSkillRow['role'], ceiling: ProfessionSkillRow['ceiling']) => ({
+      craftId: 'cooking',
+      skill: 0,
+      tier: 0,
+      pointsToNextTier: 25,
+      role,
+      ceiling,
+      dormantKnowledge: false,
+    });
+    expect(uniformSkillChips([row('unattuned', 'rare'), row('unattuned', 'rare')])).toEqual({
+      role: 'unattuned',
+      ceiling: 'rare',
+    });
+    // Same role, mixed ceiling: no collapse.
+    expect(uniformSkillChips([row('dormant', 'common'), row('dormant', 'rare')])).toBeNull();
+    // Mixed role, same ceiling: no collapse.
+    expect(uniformSkillChips([row('hobby', 'rare'), row('unattuned', 'rare')])).toBeNull();
+    // No rows: nothing to state once.
+    expect(uniformSkillChips([])).toBeNull();
   });
 
   it('keeps the tutorial hint until the first tier-1 crossing, then never shows it again', () => {

@@ -6520,6 +6520,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.empty'
   | 'hudChrome.crafting.gatheredBy'
   | 'hudChrome.crafting.hobbyPreview'
+  | 'hudChrome.crafting.identity.allCrafts'
   | 'hudChrome.crafting.identity.ceilingCommon'
   | 'hudChrome.crafting.identity.ceilingRare'
   | 'hudChrome.crafting.identity.ceilingUnlimited'

@@ -51,15 +51,40 @@ describe('profession identity card painter contract', () => {
     const returnCost = card?.querySelector('.profession-identity-returncost');
     expect(returnCost?.textContent).toContain('make-amends');
     expect(returnCost?.textContent).toContain('8');
-    // One visual column-header row over the skill list, hidden from the
-    // accessibility tree (each row reads as the full skillAria sentence).
-    const header = card?.querySelectorAll<HTMLElement>('.profession-skill-header');
-    expect(header).toHaveLength(1);
-    expect(header?.[0].getAttribute('aria-hidden')).toBe('true');
-    const headerLabels = [...(header?.[0].querySelectorAll('span') ?? [])].map(
-      (s) => s.textContent,
+    // Phase 22: the rows are the professions row family (head line with the
+    // right-aligned value, pill chips below); the 9px uppercase column header
+    // died with the rework, and the attuned card mixes roles so the uniform
+    // caption must NOT appear.
+    expect(card?.querySelectorAll('.profession-skill-header')).toHaveLength(0);
+    expect(card?.querySelectorAll('.profession-skill-uniform')).toHaveLength(0);
+    // The attuned list keeps the height cap (no uniform-collapsed opt-out).
+    expect(
+      card?.querySelector('.profession-skill-list')?.classList.contains('uniform-collapsed'),
+    ).toBe(false);
+    const rows = [...(card?.querySelectorAll<HTMLElement>('.profession-skill-row') ?? [])];
+    expect(rows.every((r) => r.classList.contains('prof-craft-row'))).toBe(true);
+    expect(card?.querySelectorAll('.profession-skill-row .prof-craft-name')).toHaveLength(10);
+    expect(card?.querySelectorAll('.profession-skill-row .prof-skill-value')).toHaveLength(10);
+    // Every attuned row carries BOTH pill chips, and the role classes land on
+    // the row for the family's dormant name mute.
+    expect(card?.querySelectorAll('.profession-skill-row .prof-role-badge')).toHaveLength(10);
+    expect(card?.querySelectorAll('.profession-skill-row .prof-ceiling')).toHaveLength(10);
+    const armorRow = rows.find((r) =>
+      r.querySelector('.prof-craft-name')?.textContent?.includes('Armorcrafting'),
     );
-    expect(headerLabels).toEqual(['Craft', 'Skill', 'Role', 'Cap']);
+    expect(armorRow?.classList.contains('role-major')).toBe(true);
+    expect(armorRow?.querySelector('.prof-role-badge')?.textContent).toBe('Major');
+    expect(armorRow?.querySelector('.prof-ceiling')?.textContent).toBe('No empowerment cap');
+    expect(armorRow?.querySelector('.prof-skill-value')?.textContent).toBe('49');
+    const hobbyRow = rows.find((r) =>
+      r.querySelector('.prof-craft-name')?.textContent?.includes('Leatherworking'),
+    );
+    expect(hobbyRow?.querySelector('.prof-role-badge')?.textContent).toBe('Hobby');
+    expect(hobbyRow?.querySelector('.prof-ceiling')?.textContent).toBe('Rare cap');
+    // The full skillAria sentence stays on every row (the chips are visual;
+    // the aria carries the whole fact set).
+    expect(armorRow?.getAttribute('aria-label')).toContain('Major');
+    expect(armorRow?.getAttribute('aria-label')).toContain('No empowerment cap');
 
     parent.replaceChildren();
     renderProfessionIdentityCard(
@@ -67,8 +92,9 @@ describe('profession identity card painter contract', () => {
       buildProfessionIdentityView({ ...identity, synced: false }),
     );
     expect(parent.textContent).toContain('Waiting for your crafting identity');
-    // The syncing card has no skill rows, so no floating header row either.
-    expect(parent.querySelectorAll('.profession-skill-header')).toHaveLength(0);
+    // The syncing card has no skill rows, so no uniform caption either.
+    expect(parent.querySelectorAll('.profession-skill-row')).toHaveLength(0);
+    expect(parent.querySelectorAll('.profession-skill-uniform')).toHaveLength(0);
     // No return-cost line while syncing or unattuned (only shown once attuned).
     expect(parent.querySelectorAll('.profession-identity-returncost')).toHaveLength(0);
     expect(parent.querySelector('.profession-archetype-crest')).toBeNull();
@@ -96,6 +122,52 @@ describe('profession identity card painter contract', () => {
     expect(parent.querySelectorAll('.profession-skill-row')).toHaveLength(10);
     expect(parent.querySelector('.profession-archetype-crest')).toBeNull();
     expect(parent.querySelector('.profession-identity-returncost')).toBeNull();
+  });
+
+  it('collapses the uniform role/cap chips to one caption on the unattuned card (phase 22)', () => {
+    const parent = document.createElement('div');
+    renderProfessionIdentityCard(
+      parent,
+      buildProfessionIdentityView({
+        version: 1 as const,
+        synced: true,
+        craftSkills: { cooking: 10 },
+        activeArchetype: null,
+        pairedMajor: null,
+        hobbyCraft: null,
+        attunedPairs: [],
+        switchCount: 0,
+        amendsProgress: 0,
+        amendsRequired: 5,
+        knownRecipes: [],
+      }),
+    );
+
+    // One caption stating the shared pair in the same pill family the rows
+    // would have carried, positioned as the list's first item.
+    const captions = parent.querySelectorAll<HTMLElement>('.profession-skill-uniform');
+    expect(captions).toHaveLength(1);
+    expect(captions[0].querySelector('.profession-skill-uniform-label')?.textContent).toBe(
+      'All crafts',
+    );
+    expect(captions[0].querySelector('.prof-role-badge')?.textContent).toBe('Unattuned');
+    expect(captions[0].querySelector('.prof-ceiling')?.textContent).toBe('Rare cap');
+    expect(captions[0].parentElement?.classList.contains('profession-skill-list')).toBe(true);
+    expect(captions[0].parentElement?.firstElementChild).toBe(captions[0]);
+    // The collapsed list opts out of the height cap (one-line rows fit whole).
+    expect(captions[0].parentElement?.classList.contains('uniform-collapsed')).toBe(true);
+
+    // The rows drop their chips entirely (craft plus skill only) but keep the
+    // name/value anatomy and the complete skillAria sentence, so no reader
+    // loses the role/cap facts to the visual collapse.
+    const rows = [...parent.querySelectorAll<HTMLElement>('.profession-skill-row')];
+    expect(rows).toHaveLength(10);
+    expect(parent.querySelectorAll('.profession-skill-row .prof-role-badge')).toHaveLength(0);
+    expect(parent.querySelectorAll('.profession-skill-row .prof-ceiling')).toHaveLength(0);
+    expect(parent.querySelectorAll('.profession-skill-row .prof-craft-name')).toHaveLength(10);
+    expect(parent.querySelectorAll('.profession-skill-row .prof-skill-value')).toHaveLength(10);
+    expect(rows[0].getAttribute('aria-label')).toContain('Unattuned');
+    expect(rows[0].getAttribute('aria-label')).toContain('Rare cap');
   });
 
   it('renders combo guidance outside the faded disabled craft button', () => {
@@ -314,6 +386,10 @@ describe('profession identity card painter contract', () => {
     );
   });
 
+  it('renders the uniform caption through the allCrafts catalog key', () => {
+    expect(painter).toContain("t('hudChrome.crafting.identity.allCrafts')");
+  });
+
   // The card is a cold *_card consumer (not a *_painter.ts), so it escapes the
   // per-painter no-magic sweep in hud_perf_budget; this source scan carries the
   // same contract: colors and sizes live in the stylesheet, never in TS.
@@ -323,6 +399,75 @@ describe('profession identity card painter contract', () => {
     const rgb = code.match(/\brgba?\s*\(/g) ?? [];
     expect(hex, `hex colors: ${hex.join(', ')}`).toEqual([]);
     expect(rgb, `rgb colors: ${rgb.join(', ')}`).toEqual([]);
+  });
+});
+
+describe('identity card type floor and numeral pins (phase 22, source pins)', () => {
+  // The stylesheet is the authority the painter defers to (the no-magic
+  // contract above), so the DESIGN.md floors pin against the CSS source the
+  // way tests/mobile_window_layout.test.ts pins the vendor 40px floor.
+  const components = readFileSync(
+    path.resolve(process.cwd(), 'src/styles/components.css'),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+  const mobileCss = readFileSync(
+    path.resolve(process.cwd(), 'src/styles/hud.mobile.css'),
+    'utf8',
+  ).replace(/\r\n/g, '\n');
+
+  it('the row family the card reuses carries the 13px name line and the tabular-nums value', () => {
+    // .prof-craft-head is the name line (13px, at or above the DESIGN.md
+    // 12px authored-body floor); .prof-skill-value is the right-aligned
+    // numeral (tabular-nums per the every-player-read-number rule).
+    expect(components).toMatch(/\.prof-craft-head \{[^}]*font-size: 13px;/);
+    expect(components).toMatch(
+      /\.prof-skill-value \{[^}]*font-variant-numeric: tabular-nums;[^}]*color/,
+    );
+    expect(components).toMatch(/\.prof-skill-value \{[^}]*margin-left: auto;/);
+  });
+
+  it('the 10px rows and the 9px uppercase header are gone from the card scope', () => {
+    // The defect this phase fixes: the app's only sub-11px data rows and its
+    // only sub-10px column header. The selectors must not come back.
+    expect(components).not.toContain('.profession-skill-header');
+    expect(components).not.toMatch(/\.profession-skill-row \{/);
+    expect(mobileCss).not.toContain('.profession-skill-header');
+    expect(mobileCss).not.toContain('.profession-skill-row > :last-child');
+    expect(mobileCss).not.toMatch(/\.profession-skill-list \{[^}]*grid-template-columns/);
+  });
+
+  it('the card narrative text sits on the 12px floor (summary, tutorial, nudges, caption)', () => {
+    expect(components).toMatch(/\.profession-identity-summary \{[^}]*font-size: 12px;/);
+    expect(components).toMatch(
+      /\.profession-identity-tutorial,\s*\.profession-identity-nudges \{[^}]*font-size: 12px;/,
+    );
+    expect(components).toMatch(/\.profession-skill-uniform \{[^}]*font-size: 12px;/);
+  });
+
+  it('caps the skill list instead of starving the recipe pane', () => {
+    // The pinned-region contract: the card is pinned above the scrolling
+    // .crafting-body, so the LIST scrolls internally past its cap (the
+    // mobile card cap is the precedent, kept below). Unconditional, not a
+    // compact-height media query: the attuned two-line rows pass 500px and
+    // squeeze the pane to its 120px minimum even at 1600x900. The collapsed
+    // list opts back out (its one-line rows fit whole; a cap would only add
+    // a needless scrollbar).
+    expect(components).toMatch(
+      /\.profession-identity-card \.profession-skill-list \{[^}]*max-height: [0-9]+px;[^}]*overflow-y: auto;/,
+    );
+    expect(components).toMatch(
+      /\.profession-identity-card \.profession-skill-list\.uniform-collapsed \{\s*max-height: none;/,
+    );
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.profession-identity-card \{[^}]*max-height:[^}]*overflow-y: auto;/,
+    );
+    // On mobile the CARD is the one scroller, so the desktop list cap lifts:
+    // a capped (overflow-y: auto) list is a flex child with a zero automatic
+    // minimum, and inside the height-capped column card it shrinks to
+    // nothing, hiding every row (caught rendered, phase 22).
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.profession-identity-card \.profession-skill-list \{[^}]*flex: none;[^}]*max-height: none;[^}]*overflow-y: visible;/,
+    );
   });
 });
 

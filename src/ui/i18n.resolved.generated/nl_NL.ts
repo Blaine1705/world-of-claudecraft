@@ -2617,6 +2617,7 @@ export const nl_NL: EnTranslations = {
         "colSkill": "Vaardigheid",
         "colRole": "Rol",
         "colCap": "Begrenzing",
+        "allCrafts": "All crafts",
         "tutorial": "Eerste rang: bereik vaardigheid {skill} in een ambacht. Geslaagde recepten verhogen dat ambacht zonder kennis elders te wissen.",
         "nearTier": "{craft} mist {points} vaardigheid voor zijn volgende rang.",
         "dormantKnowledge": "{craft}-kennis wordt behouden maar is slapend tot zijn paar of liefhebberij actief is."

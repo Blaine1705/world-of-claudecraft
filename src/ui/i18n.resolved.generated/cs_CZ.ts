@@ -2617,6 +2617,7 @@ export const cs_CZ: EnTranslations = {
         "colSkill": "Dovednost",
         "colRole": "Role",
         "colCap": "Omezení",
+        "allCrafts": "All crafts",
         "tutorial": "První úroveň: dosáhni dovednosti {skill} v řemesle. Úspěšné recepty toto řemeslo posunou bez ztráty znalostí jinde.",
         "nearTier": "{craft} je {points} dovednostních bodů od příští úrovně.",
         "dormantKnowledge": "Znalosti {craft} jsou zachovány, ale dočasně neaktivní, dokud nebude aktivní jejich pár nebo koníček."

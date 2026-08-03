@@ -2617,6 +2617,7 @@ export const pt_BR: EnTranslations = {
         "colSkill": "Habilidade",
         "colRole": "Papel",
         "colCap": "Limite",
+        "allCrafts": "All crafts",
         "tutorial": "Primeiro nível: alcance a habilidade {skill} em um ofício. Receitas bem-sucedidas avançam naquele ofício sem apagar o conhecimento em outros.",
         "nearTier": "{craft} está a {points} de habilidade do próximo nível.",
         "dormantKnowledge": "O conhecimento de {craft} é retido, mas permanece inativo até que seu par ou passatempo esteja ativo."

@@ -28,6 +28,29 @@ export type ProfessionNudge =
   | { type: 'nearTier'; craftId: string; points: number }
   | { type: 'dormantKnowledge'; craftId: string };
 
+export interface ProfessionUniformChips {
+  role: ProfessionRole;
+  ceiling: EmpowermentCeiling;
+}
+
+/** The uniform-column collapse decision (phase 22, Q28 option 3): when EVERY
+ * skill row shares one role and one empowerment ceiling (the unattuned card,
+ * where all ten rows repeat Unattuned / Rare cap), the card states the pair
+ * once as a caption over the list and the rows render craft plus skill only.
+ * Mixed roles OR mixed ceilings disable the collapse; the attuned card always
+ * mixes (two majors beside hobby and dormant rows), so in practice this fires
+ * on the unattuned state. Row aria text is unaffected: every row keeps the
+ * complete skillAria sentence either way. */
+export function uniformSkillChips(
+  skills: readonly ProfessionSkillRow[],
+): ProfessionUniformChips | null {
+  const first = skills[0];
+  if (!first) return null;
+  return skills.every((row) => row.role === first.role && row.ceiling === first.ceiling)
+    ? { role: first.role, ceiling: first.ceiling }
+    : null;
+}
+
 export interface ProfessionIdentityModel {
   state: ProfessionIdentityState;
   summary: {
@@ -45,6 +68,9 @@ export interface ProfessionIdentityModel {
     returnCost: number;
   };
   skills: ProfessionSkillRow[];
+  // Non-null when every row shares one role and one ceiling: the card states
+  // the pair once (a caption over the list) and the rows drop their chips.
+  uniform: ProfessionUniformChips | null;
   tutorial: { targetSkill: number } | null;
   nudges: ProfessionNudge[];
 }
@@ -152,6 +178,7 @@ export function buildProfessionIdentityView(
       returnCost: requiredAmendsProgress(identity.switchCount),
     },
     skills,
+    uniform: uniformSkillChips(skills),
     tutorial: skills.some((row) => row.tier >= 1) ? null : { targetSkill: TIER_SKILL_STEP },
     nudges,
   };

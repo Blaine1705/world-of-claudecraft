@@ -60,6 +60,14 @@ export function renderProfessionIdentityCard(
     ? `<p class="profession-identity-returncost">${esc(t('hudChrome.crafting.attunementReturnCost', { cost: formatNumber(summary.returnCost, { maximumFractionDigits: 0 }) }))}</p>`
     : '';
 
+  // The skill rows reuse the professions window's row family (phase 22, the
+  // Q28 ruling): a .prof-craft-head name line with the right-aligned
+  // tabular-nums value, and the role/cap pills on their own chips line, so
+  // long localized names and wide chips never fight for one baseline. When
+  // the view collapsed the uniform chips (identity.uniform, the unattuned
+  // card), the rows drop the chips line and the caption above the list
+  // states the shared pair once. Every row keeps the complete skillAria
+  // sentence either way, so no reader loses the role/cap facts.
   const skillRows = identity.skills
     .map((row) => {
       const label = craftNameText(row.craftId);
@@ -70,16 +78,21 @@ export function renderProfessionIdentityCard(
         role: roleText(row.role),
         ceiling: ceilingText(row.ceiling),
       });
-      return `<li class="profession-skill-row role-${row.role}" aria-label="${esc(detail)}"><span>${esc(label)}</span><span>${esc(formatNumber(row.skill, { maximumFractionDigits: 0 }))}</span><span>${esc(roleText(row.role))}</span><span>${esc(ceilingText(row.ceiling))}</span></li>`;
+      const chips = identity.uniform
+        ? ''
+        : `<div class="prof-craft-chips"><span class="prof-role-badge">${esc(roleText(row.role))}</span><span class="prof-ceiling">${esc(ceilingText(row.ceiling))}</span></div>`;
+      return `<li class="profession-skill-row prof-craft-row role-${row.role}" aria-label="${esc(detail)}"><div class="prof-craft-main"><div class="prof-craft-head"><span class="prof-craft-name">${esc(label)}</span><span class="prof-skill-value">${esc(formatNumber(row.skill, { maximumFractionDigits: 0 }))}</span></div>${chips}</div></li>`;
     })
     .join('');
 
-  // Visual column headers only: aria-hidden because every skill row already
-  // carries the complete skillAria sentence, so exposing the headers too would
-  // double-read the table for screen readers.
-  const skillHeader = skillRows
-    ? `<li class="profession-skill-header" aria-hidden="true"><span>${esc(t('hudChrome.crafting.identity.colCraft'))}</span><span>${esc(t('hudChrome.crafting.identity.colSkill'))}</span><span>${esc(t('hudChrome.crafting.identity.colRole'))}</span><span>${esc(t('hudChrome.crafting.identity.colCap'))}</span></li>`
-    : '';
+  // The uniform-chips caption (the option 3 collapse): one line stating the
+  // role and cap every row shares, in the same pill family the rows would
+  // have carried. A list item rather than a sibling so the card keeps its
+  // two-column flex shape untouched.
+  const uniformCaption =
+    identity.uniform && skillRows
+      ? `<li class="profession-skill-uniform"><span class="profession-skill-uniform-label">${esc(t('hudChrome.crafting.identity.allCrafts'))}</span><span class="prof-role-badge">${esc(roleText(identity.uniform.role))}</span><span class="prof-ceiling">${esc(ceilingText(identity.uniform.ceiling))}</span></li>`
+      : '';
 
   const tutorial = identity.tutorial
     ? `<p class="profession-identity-tutorial">${esc(t('hudChrome.crafting.identity.tutorial', { skill: formatNumber(identity.tutorial.targetSkill, { maximumFractionDigits: 0 }) }))}</p>`
@@ -96,6 +109,9 @@ export function renderProfessionIdentityCard(
   // tutorial, nudges) beside the skill table, so the card reads as a compact
   // hero instead of a tall stack (the wrapper is layout-only; every child
   // keeps its class and semantics).
-  card.innerHTML = `<div class="profession-identity-main">${headingHtml}${summaryHtml}${returnCostHtml}${tutorial}${nudges ? `<ul class="profession-identity-nudges" role="list">${nudges}</ul>` : ''}</div><ul class="profession-skill-list" role="list">${skillHeader}${skillRows}</ul>`;
+  // uniform-collapsed lifts the list's height cap: the collapse already
+  // makes the rows one-liners, so the whole list fits without scrolling,
+  // while the attuned two-line rows scroll past the cap (components.css).
+  card.innerHTML = `<div class="profession-identity-main">${headingHtml}${summaryHtml}${returnCostHtml}${tutorial}${nudges ? `<ul class="profession-identity-nudges" role="list">${nudges}</ul>` : ''}</div><ul class="profession-skill-list${identity.uniform ? ' uniform-collapsed' : ''}" role="list">${uniformCaption}${skillRows}</ul>`;
   parent.appendChild(card);
 }

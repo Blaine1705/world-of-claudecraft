@@ -2617,6 +2617,7 @@ export const sv_SE: EnTranslations = {
         "colSkill": "Färdighet",
         "colRole": "Roll",
         "colCap": "Gräns",
+        "allCrafts": "All crafts",
         "tutorial": "Första nivån: nå färdighet {skill} i ett hantverk. Lyckade recept höjer det hantverket utan att radera kunskap på andra håll.",
         "nearTier": "{craft} är {points} färdighetspoäng från nästa nivå.",
         "dormantKnowledge": "{craft}-kunskap bibehålls men är vilande tills dess par eller hobby är aktivt."

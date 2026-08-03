@@ -2617,6 +2617,7 @@ export const id_ID: EnTranslations = {
         "colSkill": "Keahlian",
         "colRole": "Peran",
         "colCap": "Batas",
+        "allCrafts": "All crafts",
         "tutorial": "Tingkat pertama: capai keahlian {skill} dalam sebuah kerajinan. Resep yang berhasil meningkatkan kerajinan itu tanpa menghapus pengetahuan di tempat lain.",
         "nearTier": "{craft} berjarak {points} keahlian dari tingkat berikutnya.",
         "dormantKnowledge": "Pengetahuan {craft} tersimpan namun tidak aktif hingga pasangan atau hobinya aktif."

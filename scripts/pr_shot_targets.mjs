@@ -1108,7 +1108,14 @@ export const TARGETS = [
   {
     key: 'crafting',
     label: 'Crafting window',
-    when: ['ui/crafting_view', 'ui/crafting_window', 'sim/content/recipes', 'sim/professions'],
+    when: [
+      'ui/crafting_view',
+      'ui/crafting_window',
+      'sim/content/recipes',
+      'sim/professions',
+      'ui/profession_identity_card',
+      'ui/profession_identity_view',
+    ],
     // Desktop and mobile variants: the legibility rows (skill line,
     // difficulty label, station badge, combo reason) are actionable info and
     // must read on both form factors. The window shows one craft per tab, so
@@ -1138,6 +1145,22 @@ export const TARGETS = [
       // reagent still reads 0/2; after it, the row is live.
       { key: 'desktop-bag-freshness', bagFreshness: true, selectTab: 'alchemy' },
       { key: 'mobile-bag-freshness', bagFreshness: true, mobile: true, selectTab: 'alchemy' },
+      // Phase 22 (crafting identity table legibility): the identity card at
+      // the top of the window, framed rather than scrolled past. The attuned
+      // stub (the professions target's cap-legal Smith) is what lights the
+      // per-row role/cap chips; the plain desktop variant above already
+      // frames the unattuned collapse. The compact variant re-runs the
+      // attuned framing at 1366x768 (DESIGN.md's supported compact target)
+      // so the recipe pane's remaining height is the shot.
+      { key: 'desktop-identity-attuned', identity: true },
+      { key: 'mobile-identity-attuned', identity: true, mobile: true },
+      {
+        key: 'desktop-identity-compact',
+        identity: true,
+        async beforeLoad(page) {
+          await page.setViewport({ width: 1366, height: 768 });
+        },
+      },
     ],
     // Grant a spread of reagents across a few professions so several recipes read
     // craftable, force-hide then toggle so the open is deterministic, and clip to
@@ -1169,6 +1192,42 @@ export const TARGETS = [
             const meta = sim?.players?.get(sim.primaryId);
             if (meta) meta.craftSkills = { ...meta.craftSkills, armorcrafting: 80 };
           }
+          if (staging.identity) {
+            // The identity-card framings (phase 22): stub the IWorld read with
+            // the professions target's cap-legal attuned Smith, so the card
+            // renders the per-row role/cap chips (major, hobby, dormant
+            // knowledge, near-tier) instead of the unattuned collapse.
+            const game = window.__game;
+            if (game?.world) {
+              Object.defineProperty(game.world, 'craftingIdentity', {
+                value: {
+                  version: 1,
+                  synced: true,
+                  craftSkills: {
+                    weaponcrafting: 125,
+                    armorcrafting: 87,
+                    tailoring: 23,
+                    leatherworking: 0,
+                    cooking: 26,
+                    alchemy: 4,
+                    engineering: 51,
+                    enchanting: 0,
+                    jewelcrafting: 0,
+                    inscription: 61,
+                  },
+                  activeArchetype: 'weaponcrafting',
+                  pairedMajor: 'armorcrafting',
+                  hobbyCraft: 'cooking',
+                  attunedPairs: ['weaponcrafting+armorcrafting'],
+                  switchCount: 1,
+                  amendsProgress: 2,
+                  amendsRequired: 8,
+                  knownRecipes: [],
+                },
+                configurable: true,
+              });
+            }
+          }
           const el = document.querySelector('#crafting-window');
           if (el) el.style.display = 'none';
           window.__game?.hud?.toggleCrafting?.();
@@ -1176,6 +1235,7 @@ export const TARGETS = [
         {
           fourStates: Boolean(variant?.fourStates),
           discount: Boolean(variant?.discount),
+          identity: Boolean(variant?.identity),
         },
       );
       // A first-open crafting window with several icon-bearing recipe rows takes
@@ -1220,15 +1280,29 @@ export const TARGETS = [
         });
         await wait(900);
       }
+      if (open && variant?.identity && variant?.mobile) {
+        // The stacked mobile card caps its height and scrolls internally
+        // (hud.mobile.css), which leaves the skill rows below the fold; the
+        // rows ARE the mobile subject (the unlabeled wrapped Cap defect and
+        // its fix), so bring the list to the top of the card's own scroll.
+        await page.evaluate(() => {
+          document
+            .querySelector('#crafting-window .profession-skill-list')
+            ?.scrollIntoView({ block: 'start' });
+        });
+        await wait(300);
+      }
       if (
         open &&
+        !variant?.identity &&
         (variant?.mobile || variant?.fourStates || variant?.discount || variant?.bagFreshness)
       ) {
         // The identity card fills the top of the window (all of it on the short
         // landscape viewport); scroll the first recipe section into view so the
         // legibility rows, and for four-states the whole difficulty ladder
         // (weaponcrafting green/yellow/orange plus the armorcrafting gray 75
-        // row), are the shot.
+        // row), are the shot. The identity variants are the exception: the
+        // card itself is their subject, so they keep the top framing.
         await page.evaluate(() => {
           document
             .querySelector('#crafting-window .vendor-section-title')

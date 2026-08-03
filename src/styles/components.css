@@ -5492,7 +5492,9 @@
     grid-template-columns: max-content 1fr;
     gap: 3px 8px;
     margin: 0 0 8px;
-    font-size: 11px;
+    /* 12px, never lower: DESIGN.md's authored-body floor (phase 22 raised
+       the whole card to it; only the bordered pill chips sit below). */
+    font-size: 12px;
   }
   .profession-identity-summary dt {
     color: var(--color-text-muted);
@@ -5506,39 +5508,56 @@
     padding: 0;
     list-style: none;
   }
-  /* The list owns the column tracks and each row subgrids into them: auto-sized
-     role/cap columns would otherwise resize per row (each li its own grid), so
-     "Hobby" and "Major" rows drifted out of column with "Dormant knowledge". */
+  /* The skill rows reuse the professions window's row family (phase 22, the
+     Q28 ruling: .prof-craft-row head + chips anatomy, 13px names, the 11px
+     right-aligned tabular-nums value, bordered pill chips), so the card no
+     longer carries the app's only sub-11px data rows or its 9px uppercase
+     header. Card-scope overrides keep the compact inset rhythm without
+     forking the family; dormant rows dim through the family's own
+     .role-dormant name mute. */
   .profession-skill-list {
-    display: grid;
-    grid-template-columns: minmax(90px, 1fr) 38px minmax(72px, auto) minmax(88px, auto);
-    column-gap: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
-  .profession-skill-row {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
+  .profession-identity-card .prof-craft-row {
     padding: 3px 0;
-    font-size: 10px;
+    border-radius: 0;
+    background: none;
   }
-  .profession-skill-header {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
-    padding: 2px 0 3px;
+  /* The uniform-chips caption (the option 3 collapse): when every row shares
+     one role and one cap the card states the pair once here and the rows
+     render craft plus skill only. */
+  .profession-skill-uniform {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 0 5px;
+    margin-bottom: 3px;
     border-bottom: 1px solid var(--color-border-default);
+    font-size: 12px;
     color: var(--color-text-muted);
-    font-size: 9px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
   }
-  .profession-skill-row.role-dormant {
-    opacity: 0.72;
+  /* The family rows are taller than the retired 10px grid, and the card is
+     pinned above the scrolling .crafting-body: without a cap the attuned
+     card (two-line rows with chips) runs past 500px and squeezes the recipe
+     pane to its 120px minimum even at 1600x900, and DESIGN.md names
+     1366x768 a supported target. Cap the LIST and let it scroll internally
+     (the mobile arm's card cap is the precedent). The collapsed list opts
+     back out: its one-line rows are what the collapse buys, the whole list
+     fits, and capping it would just add a needless scrollbar. */
+  .profession-identity-card .profession-skill-list {
+    max-height: 264px;
+    overflow-y: auto;
+  }
+  .profession-identity-card .profession-skill-list.uniform-collapsed {
+    max-height: none;
   }
   .profession-identity-tutorial,
   .profession-identity-nudges {
     color: var(--color-text-muted);
-    font-size: 10px;
+    font-size: 12px;
     line-height: 1.35;
   }
   /* One recipe card (the showcase inset-card idiom): the whole first row stays

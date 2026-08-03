@@ -2617,6 +2617,7 @@ export const tr_TR: EnTranslations = {
         "colSkill": "Beceri",
         "colRole": "Rol",
         "colCap": "Sınır",
+        "allCrafts": "All crafts",
         "tutorial": "İlk kademe: bir zanaatta {skill} becerisine ulaş. Başarılı tarifler, başka yerlerdeki bilgiyi silmeden o zanaatı yükseltir.",
         "nearTier": "{craft}, bir sonraki kademeye {points} beceri uzaklıkta.",
         "dormantKnowledge": "{craft} bilgisi korunuyor ancak çifti veya hobisi etkin olana kadar eylemsiz kalacak."

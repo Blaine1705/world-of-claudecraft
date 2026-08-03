@@ -2617,6 +2617,7 @@ export const en: EnTranslations = {
         "colSkill": "Skill",
         "colRole": "Role",
         "colCap": "Cap",
+        "allCrafts": "All crafts",
         "tutorial": "First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.",
         "nearTier": "{craft} is {points} skill from its next tier.",
         "dormantKnowledge": "{craft} knowledge is retained but dormant until its pair or hobby is active."

@@ -2617,6 +2617,7 @@ export const it_IT: EnTranslations = {
         "colSkill": "Competenza",
         "colRole": "Ruolo",
         "colCap": "Limite",
+        "allCrafts": "All crafts",
         "tutorial": "Primo livello: raggiungi {skill} competenza in un mestiere. Le ricette riuscite aumentano quel mestiere senza cancellare le conoscenze altrove.",
         "nearTier": "{craft} dista {points} punti competenza dal prossimo livello.",
         "dormantKnowledge": "La conoscenza di {craft} viene mantenuta ma è dormiente finché la sua coppia o il passatempo non è attivo."
