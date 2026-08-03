@@ -2617,7 +2617,8 @@ export const zh_CN: EnTranslations = {
         "colSkill": "技能",
         "colRole": "定位",
         "colCap": "上限",
-        "allCrafts": "All crafts",
+        "allCrafts": "所有专业",
+        "skillListAria": "专业技能",
         "tutorial": "第一个阶级：将一门技艺提升到技能 {skill}。成功完成配方会提升对应技艺，且不会抹去其他知识。",
         "nearTier": "{craft}距离下一阶级还差 {points} 点技能。",
         "dormantKnowledge": "{craft}知识已保留，但在其组合或爱好未启用时处于休眠状态。"

@@ -5456,10 +5456,26 @@
     flex: 1 1 0;
     min-width: 0;
   }
+  /* One block on purpose (a second same-specificity block for the cap
+     invited a cascade surprise): the flex column slot, plus the height cap.
+     The family rows are taller than the retired 10px grid, and the card is
+     pinned above the scrolling .crafting-body: without the cap the attuned
+     card (two-line rows with chips) runs past 500px and squeezes the recipe
+     pane to its 120px minimum even at 1600x900, and DESIGN.md names
+     1366x768 a supported target. So the LIST scrolls internally past 264px
+     (the mobile arm's card cap is the precedent; hud.mobile.css lifts this
+     cap because there the CARD is the one scroller). The collapsed list
+     opts back out below: its one-line rows are what the collapse buys, the
+     whole list fits, and capping it would just add a needless scrollbar. */
   .profession-identity-card .profession-skill-list {
     flex: 1 1 0;
     min-width: 0;
     align-self: start;
+    max-height: 264px;
+    overflow-y: auto;
+  }
+  .profession-identity-card .profession-skill-list.uniform-collapsed {
+    max-height: none;
   }
   .profession-identity-card h3 {
     margin: 0 0 8px;
@@ -5492,8 +5508,10 @@
     grid-template-columns: max-content 1fr;
     gap: 3px 8px;
     margin: 0 0 8px;
-    /* 12px, never lower: DESIGN.md's authored-body floor (phase 22 raised
-       the whole card to it; only the bordered pill chips sit below). */
+    /* 12px, never lower: DESIGN.md's authored-body floor. Phase 22 raised
+       the card's narrative text to it; the two settled exemptions below it
+       are the family's bordered 10px pill chips and its 11px tabular-nums
+       skill value (the Q28 family spec). */
     font-size: 12px;
   }
   .profession-identity-summary dt {
@@ -5538,21 +5556,6 @@
     border-bottom: 1px solid var(--color-border-default);
     font-size: 12px;
     color: var(--color-text-muted);
-  }
-  /* The family rows are taller than the retired 10px grid, and the card is
-     pinned above the scrolling .crafting-body: without a cap the attuned
-     card (two-line rows with chips) runs past 500px and squeezes the recipe
-     pane to its 120px minimum even at 1600x900, and DESIGN.md names
-     1366x768 a supported target. Cap the LIST and let it scroll internally
-     (the mobile arm's card cap is the precedent). The collapsed list opts
-     back out: its one-line rows are what the collapse buys, the whole list
-     fits, and capping it would just add a needless scrollbar. */
-  .profession-identity-card .profession-skill-list {
-    max-height: 264px;
-    overflow-y: auto;
-  }
-  .profession-identity-card .profession-skill-list.uniform-collapsed {
-    max-height: none;
   }
   .profession-identity-tutorial,
   .profession-identity-nudges {

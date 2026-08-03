@@ -2617,7 +2617,8 @@ export const ko_KR: EnTranslations = {
         "colSkill": "기술",
         "colRole": "역할",
         "colCap": "상한",
-        "allCrafts": "All crafts",
+        "allCrafts": "모든 제작 분야",
+        "skillListAria": "제작 기술",
         "tutorial": "첫 티어: 한 기술을 숙련도 {skill}까지 올리세요. 제작에 성공하면 다른 지식을 지우지 않고 해당 기술이 성장합니다.",
         "nearTier": "{craft}는 다음 티어까지 숙련도 {points}이 필요합니다.",
         "dormantKnowledge": "{craft} 지식은 유지되지만 해당 조합이나 취미가 활성화될 때까지 비활성 상태입니다."

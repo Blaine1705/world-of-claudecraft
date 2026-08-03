@@ -3059,8 +3059,13 @@ export const hudChromeStrings = {
       colCap: 'Cap',
       // The uniform-chips caption over the skill rows (the option 3
       // collapse): shown when every craft shares one role and one cap, so
-      // ten rows do not repeat the same two chips.
+      // ten rows do not repeat the same two chips. M16: wordy, so the five
+      // non-Latin fills land in the same change.
       allCrafts: 'All crafts',
+      // aria-label for the capped, internally scrolling skill list (the
+      // attuned card): the scroll region needs a name once it is focusable
+      // for keyboard scrolling. M16 fills as above.
+      skillListAria: 'Craft skills',
       tutorial:
         'First tier: reach skill {skill} in a craft. Successful recipes raise that craft without erasing knowledge elsewhere.',
       nearTier: '{craft} is {points} skill from its next tier.',

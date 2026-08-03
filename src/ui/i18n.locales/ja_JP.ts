@@ -7475,6 +7475,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.identity.colSkill': '技能',
   'hudChrome.crafting.identity.colRole': '役割',
   'hudChrome.crafting.identity.colCap': '上限',
+  'hudChrome.crafting.identity.allCrafts': 'すべての職種',
+  'hudChrome.crafting.identity.skillListAria': '職種の技能',
   'hudChrome.crafting.identity.tutorial':
     '最初のティア：いずれかの技を技能 {skill} まで上げます。レシピの成功は他の知識を消さず、その技を成長させます。',
   'hudChrome.crafting.identity.nearTier': '{craft}は次のティアまであと技能 {points} です。',

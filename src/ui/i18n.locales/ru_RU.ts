@@ -7591,6 +7591,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.identity.colSkill': 'Навык',
   'hudChrome.crafting.identity.colRole': 'Роль',
   'hudChrome.crafting.identity.colCap': 'Потолок',
+  'hudChrome.crafting.identity.allCrafts': 'Все ремёсла',
+  'hudChrome.crafting.identity.skillListAria': 'Навыки ремёсел',
   'hudChrome.crafting.identity.tutorial':
     'Первый ранг: достигните навыка {skill} в одном ремесле. Успешные рецепты развивают это ремесло, не стирая остальные знания.',
   'hudChrome.crafting.identity.nearTier':

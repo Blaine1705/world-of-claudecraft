@@ -2618,6 +2618,7 @@ export const da_DK: EnTranslations = {
         "colRole": "Rolle",
         "colCap": "Begrænsning",
         "allCrafts": "All crafts",
+        "skillListAria": "Craft skills",
         "tutorial": "Første niveau: nå færdighed {skill} i et håndværk. Vellykkede opskrifter øger det håndværk uden at slette viden andre steder.",
         "nearTier": "{craft} er {points} færdigheder fra sit næste niveau.",
         "dormantKnowledge": "{craft}-viden bevares men er inaktiv, indtil dens par eller hobby er aktiv."

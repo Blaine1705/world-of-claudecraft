@@ -2618,6 +2618,7 @@ export const fr_CA: EnTranslations = {
         "colRole": "Rôle",
         "colCap": "Plafond",
         "allCrafts": "All crafts",
+        "skillListAria": "Craft skills",
         "tutorial": "Premier palier : atteignez {skill} points de compétence dans un métier. Les recettes réussies font progresser ce métier sans effacer les connaissances des autres.",
         "nearTier": "{craft} est à {points} points de compétence de son prochain palier.",
         "dormantKnowledge": "La connaissance de {craft} est conservée mais dormante jusqu'à ce que sa paire ou son passe-temps soit actif."

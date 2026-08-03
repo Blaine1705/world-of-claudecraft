@@ -2618,6 +2618,7 @@ export const vi_VN: EnTranslations = {
         "colRole": "Vai Trò",
         "colCap": "Giới Hạn",
         "allCrafts": "All crafts",
+        "skillListAria": "Craft skills",
         "tutorial": "Bậc đầu tiên: đạt kỹ năng {skill} trong một kỹ nghệ. Các công thức thành công nâng kỹ nghệ đó mà không xóa kiến thức ở nơi khác.",
         "nearTier": "{craft} còn {points} kỹ năng nữa là đến bậc tiếp theo.",
         "dormantKnowledge": "Kiến thức {craft} được giữ lại nhưng không hoạt động cho đến khi đôi hoặc sở thích của nó được kích hoạt."

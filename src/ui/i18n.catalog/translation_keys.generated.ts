@@ -6539,6 +6539,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.identity.roleMajor'
   | 'hudChrome.crafting.identity.roleUnattuned'
   | 'hudChrome.crafting.identity.skillAria'
+  | 'hudChrome.crafting.identity.skillListAria'
   | 'hudChrome.crafting.identity.syncing'
   | 'hudChrome.crafting.identity.title'
   | 'hudChrome.crafting.identity.titleLabel'

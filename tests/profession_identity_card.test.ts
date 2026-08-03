@@ -63,12 +63,27 @@ describe('profession identity card painter contract', () => {
     ).toBe(false);
     const rows = [...(card?.querySelectorAll<HTMLElement>('.profession-skill-row') ?? [])];
     expect(rows.every((r) => r.classList.contains('prof-craft-row'))).toBe(true);
-    expect(card?.querySelectorAll('.profession-skill-row .prof-craft-name')).toHaveLength(10);
-    expect(card?.querySelectorAll('.profession-skill-row .prof-skill-value')).toHaveLength(10);
-    // Every attuned row carries BOTH pill chips, and the role classes land on
-    // the row for the family's dormant name mute.
-    expect(card?.querySelectorAll('.profession-skill-row .prof-role-badge')).toHaveLength(10);
-    expect(card?.querySelectorAll('.profession-skill-row .prof-ceiling')).toHaveLength(10);
+    // The family NESTING, not just class presence: the 13px rule lives on
+    // .prof-craft-head and the chips line is what keeps wide chips off the
+    // name baseline (the text-squish fix), so a flattened row that still
+    // carries every class must fail here (the professions window's own
+    // anatomy pin idiom).
+    for (const row of rows) {
+      const main = row.firstElementChild as HTMLElement;
+      expect(main?.className, 'row first child').toBe('prof-craft-main');
+      const head = main?.firstElementChild as HTMLElement;
+      expect(head?.className, 'main first child').toBe('prof-craft-head');
+      expect([...(head?.children ?? [])].map((c) => c.className)).toEqual([
+        'prof-craft-name',
+        'prof-skill-value',
+      ]);
+      const chips = head?.nextElementSibling as HTMLElement;
+      expect(chips?.className, 'chips line').toBe('prof-craft-chips');
+      expect([...(chips?.children ?? [])].map((c) => c.className)).toEqual([
+        'prof-role-badge',
+        'prof-ceiling',
+      ]);
+    }
     const armorRow = rows.find((r) =>
       r.querySelector('.prof-craft-name')?.textContent?.includes('Armorcrafting'),
     );
@@ -81,10 +96,27 @@ describe('profession identity card painter contract', () => {
     );
     expect(hobbyRow?.querySelector('.prof-role-badge')?.textContent).toBe('Hobby');
     expect(hobbyRow?.querySelector('.prof-ceiling')?.textContent).toBe('Rare cap');
-    // The full skillAria sentence stays on every row (the chips are visual;
-    // the aria carries the whole fact set).
-    expect(armorRow?.getAttribute('aria-label')).toContain('Major');
-    expect(armorRow?.getAttribute('aria-label')).toContain('No empowerment cap');
+    // The DORMANT arms render too (cooking, skill 30, no pair active for
+    // it): role class for the family name mute, both pill texts. Without
+    // this a swapped ternary arm in roleText/ceilingText ships green.
+    const dormantRow = rows.find((r) =>
+      r.querySelector('.prof-craft-name')?.textContent?.includes('Cooking'),
+    );
+    expect(dormantRow?.classList.contains('role-dormant')).toBe(true);
+    expect(dormantRow?.querySelector('.prof-role-badge')?.textContent).toBe('Dormant knowledge');
+    expect(dormantRow?.querySelector('.prof-ceiling')?.textContent).toBe('Common cap');
+    // The full skillAria sentence stays on EVERY row (the chips are visual;
+    // the aria carries the whole fact set), pinned exactly once so a dropped
+    // t() argument cannot slip through substring checks.
+    expect(rows.every((r) => (r.getAttribute('aria-label') ?? '') !== '')).toBe(true);
+    expect(armorRow?.getAttribute('aria-label')).toBe(
+      'Armorcrafting, skill 49, tier 1, Major, No empowerment cap',
+    );
+    // The capped (scrollable) attuned list is keyboard-reachable and named:
+    // a scroll region with no focusable child is pointer-only without these.
+    const list = card?.querySelector<HTMLElement>('.profession-skill-list');
+    expect(list?.getAttribute('tabindex')).toBe('0');
+    expect(list?.getAttribute('aria-label')).toBe('Craft skills');
 
     parent.replaceChildren();
     renderProfessionIdentityCard(
@@ -144,9 +176,13 @@ describe('profession identity card painter contract', () => {
     );
 
     // One caption stating the shared pair in the same pill family the rows
-    // would have carried, positioned as the list's first item.
+    // would have carried, positioned as the list's first item. aria-hidden
+    // like the retired header (every row's aria already carries the pair),
+    // and role-classed so the family badge recolors reach its pill.
     const captions = parent.querySelectorAll<HTMLElement>('.profession-skill-uniform');
     expect(captions).toHaveLength(1);
+    expect(captions[0].getAttribute('aria-hidden')).toBe('true');
+    expect(captions[0].classList.contains('role-unattuned')).toBe(true);
     expect(captions[0].querySelector('.profession-skill-uniform-label')?.textContent).toBe(
       'All crafts',
     );
@@ -154,8 +190,11 @@ describe('profession identity card painter contract', () => {
     expect(captions[0].querySelector('.prof-ceiling')?.textContent).toBe('Rare cap');
     expect(captions[0].parentElement?.classList.contains('profession-skill-list')).toBe(true);
     expect(captions[0].parentElement?.firstElementChild).toBe(captions[0]);
-    // The collapsed list opts out of the height cap (one-line rows fit whole).
+    // The collapsed list opts out of the height cap (one-line rows fit whole)
+    // and never scrolls, so it stays OUT of the tab order and unnamed.
     expect(captions[0].parentElement?.classList.contains('uniform-collapsed')).toBe(true);
+    expect(captions[0].parentElement?.getAttribute('tabindex')).toBeNull();
+    expect(captions[0].parentElement?.getAttribute('aria-label')).toBeNull();
 
     // The rows drop their chips entirely (craft plus skill only) but keep the
     // name/value anatomy and the complete skillAria sentence, so no reader
@@ -166,7 +205,12 @@ describe('profession identity card painter contract', () => {
     expect(parent.querySelectorAll('.profession-skill-row .prof-ceiling')).toHaveLength(0);
     expect(parent.querySelectorAll('.profession-skill-row .prof-craft-name')).toHaveLength(10);
     expect(parent.querySelectorAll('.profession-skill-row .prof-skill-value')).toHaveLength(10);
-    expect(rows[0].getAttribute('aria-label')).toContain('Unattuned');
+    // EVERY collapsed row keeps its complete skillAria sentence, not just
+    // the first (the collapse is visual only).
+    expect(rows.every((r) => (r.getAttribute('aria-label') ?? '') !== '')).toBe(true);
+    expect(rows.every((r) => (r.getAttribute('aria-label') ?? '').includes('Unattuned'))).toBe(
+      true,
+    );
     expect(rows[0].getAttribute('aria-label')).toContain('Rare cap');
   });
 
@@ -387,7 +431,11 @@ describe('profession identity card painter contract', () => {
   });
 
   it('renders the uniform caption through the allCrafts catalog key', () => {
-    expect(painter).toContain("t('hudChrome.crafting.identity.allCrafts')");
+    // Comment-stripped like the no-magic scan below, so a leftover comment
+    // naming the key cannot satisfy the pin.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(code).toContain("t('hudChrome.crafting.identity.allCrafts')");
+    expect(code).toContain("t('hudChrome.crafting.identity.skillListAria')");
   });
 
   // The card is a cold *_card consumer (not a *_painter.ts), so it escapes the
@@ -418,21 +466,34 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
   it('the row family the card reuses carries the 13px name line and the tabular-nums value', () => {
     // .prof-craft-head is the name line (13px, at or above the DESIGN.md
     // 12px authored-body floor); .prof-skill-value is the right-aligned
-    // numeral (tabular-nums per the every-player-read-number rule).
-    expect(components).toMatch(/\.prof-craft-head \{[^}]*font-size: 13px;/);
+    // numeral (tabular-nums per the every-player-read-number rule) whose
+    // settled family size is 11px, the one non-pill exemption to the floor:
+    // pinned exactly so it cannot drift lower with the tests green. The
+    // leading newline-and-indent anchors the selector at rule position, so
+    // rescoping the family (a #professions-window prefix would strip the
+    // card's styling) fails the pin too.
+    expect(components).toMatch(/\n {2}\.prof-craft-head \{[^}]*font-size: 13px;/);
+    expect(components).toMatch(/\n {2}\.prof-skill-value \{[^}]*font-size: 11px;/);
     expect(components).toMatch(
-      /\.prof-skill-value \{[^}]*font-variant-numeric: tabular-nums;[^}]*color/,
+      /\n {2}\.prof-skill-value \{[^}]*font-variant-numeric: tabular-nums;[^}]*color/,
     );
-    expect(components).toMatch(/\.prof-skill-value \{[^}]*margin-left: auto;/);
+    expect(components).toMatch(/\n {2}\.prof-skill-value \{[^}]*margin-left: auto;/);
+    // The pills stay BORDERED at their family 10px: the border is the
+    // condition of the sub-12px chip exemption in acceptance (a).
+    expect(components).toMatch(
+      /\n {2}\.prof-role-badge,\s*\.prof-ceiling \{[^}]*font-size: 10px;[^}]*border: 1px solid/,
+    );
   });
 
   it('the 10px rows and the 9px uppercase header are gone from the card scope', () => {
     // The defect this phase fixes: the app's only sub-11px data rows and its
-    // only sub-10px column header. The selectors must not come back.
+    // only sub-10px column header. The selectors must not come back in ANY
+    // spelling (bare, compound, grouped), so the pin is a whole-sheet
+    // substring ban, valid because neither sheet mentions them at all now.
     expect(components).not.toContain('.profession-skill-header');
-    expect(components).not.toMatch(/\.profession-skill-row \{/);
+    expect(components).not.toContain('.profession-skill-row');
     expect(mobileCss).not.toContain('.profession-skill-header');
-    expect(mobileCss).not.toContain('.profession-skill-row > :last-child');
+    expect(mobileCss).not.toContain('.profession-skill-row');
     expect(mobileCss).not.toMatch(/\.profession-skill-list \{[^}]*grid-template-columns/);
   });
 
@@ -444,6 +505,30 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     expect(components).toMatch(/\.profession-skill-uniform \{[^}]*font-size: 12px;/);
   });
 
+  it('no card-scope rule in either sheet sets a font-size below 12px (the floor as a floor)', () => {
+    // The three named pins above are an allowlist; this sweep is the FLOOR:
+    // any rule scoped to the card or its skill list, in the desktop sheet or
+    // the mobile arm, that sets font-size below 12px fails here, so a future
+    // card-scope override cannot quietly re-shrink the rows (the family's
+    // own .prof-* rules carry their exemptions in the pin above).
+    for (const sheet of [components, mobileCss]) {
+      const blocks = [...sheet.matchAll(/^\s+([^@{}][^{]*?)\{([^}]*)\}/gms)].filter(
+        ([, sel]) => sel.includes('.profession-identity') || sel.includes('.profession-skill-'),
+      );
+      for (const [, sel, body] of blocks) {
+        for (const m of body.matchAll(/font-size:\s*([0-9.]+)px/g)) {
+          expect(
+            Number(m[1]),
+            `${sel.trim()} sets font-size ${m[1]}px (below the 12px floor)`,
+          ).toBeGreaterThanOrEqual(12);
+        }
+      }
+    }
+    // The sweep itself must be alive: the card scope has rules in both sheets.
+    expect(components).toContain('.profession-identity-card {');
+    expect(mobileCss).toContain('body.mobile-touch .profession-identity-card {');
+  });
+
   it('caps the skill list instead of starving the recipe pane', () => {
     // The pinned-region contract: the card is pinned above the scrolling
     // .crafting-body, so the LIST scrolls internally past its cap (the
@@ -451,9 +536,10 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     // compact-height media query: the attuned two-line rows pass 500px and
     // squeeze the pane to its 120px minimum even at 1600x900. The collapsed
     // list opts back out (its one-line rows fit whole; a cap would only add
-    // a needless scrollbar).
+    // a needless scrollbar). 264px is the LITERAL the phase measured (recipe
+    // pane 180px at 1366x768): a retune re-measures and updates this pin.
     expect(components).toMatch(
-      /\.profession-identity-card \.profession-skill-list \{[^}]*max-height: [0-9]+px;[^}]*overflow-y: auto;/,
+      /\.profession-identity-card \.profession-skill-list \{[^}]*max-height: 264px;[^}]*overflow-y: auto;/,
     );
     expect(components).toMatch(
       /\.profession-identity-card \.profession-skill-list\.uniform-collapsed \{\s*max-height: none;/,
@@ -464,10 +550,20 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     // On mobile the CARD is the one scroller, so the desktop list cap lifts:
     // a capped (overflow-y: auto) list is a flex child with a zero automatic
     // minimum, and inside the height-capped column card it shrinks to
-    // nothing, hiding every row (caught rendered, phase 22).
-    expect(mobileCss).toMatch(
-      /body\.mobile-touch \.profession-identity-card \.profession-skill-list \{[^}]*flex: none;[^}]*max-height: none;[^}]*overflow-y: visible;/,
-    );
+    // nothing, hiding every row (caught rendered, phase 22). Three separate
+    // pins so a behavior-identical declaration reorder stays green.
+    const mobileLift =
+      /body\.mobile-touch \.profession-identity-card \.profession-skill-list \{[^}]*/;
+    expect(mobileCss).toMatch(new RegExp(`${mobileLift.source}flex: none;`));
+    expect(mobileCss).toMatch(new RegExp(`${mobileLift.source}max-height: none;`));
+    expect(mobileCss).toMatch(new RegExp(`${mobileLift.source}overflow-y: visible;`));
+  });
+
+  it('dormant rows keep a visible mute through the family name rule', () => {
+    // The rework deleted the old whole-row opacity dim; the replacement is
+    // the family's muted name color. Pin the rule so a family cleanup pass
+    // cannot silently drop the only dormant differentiation left.
+    expect(components).toMatch(/\.role-dormant \.prof-craft-name \{[^}]*color:/);
   });
 });
 

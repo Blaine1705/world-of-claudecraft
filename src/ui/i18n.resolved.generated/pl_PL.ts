@@ -2618,6 +2618,7 @@ export const pl_PL: EnTranslations = {
         "colRole": "Rola",
         "colCap": "Pułap",
         "allCrafts": "All crafts",
+        "skillListAria": "Craft skills",
         "tutorial": "Pierwszy poziom: osiągnij umiejętność {skill} w danym rzemiośle. Udane przepisy zwiększają to rzemiosło, nie wymazując wiedzy z innych.",
         "nearTier": "Do następnego poziomu rzemiosła {craft} brakuje {points} umiejętności.",
         "dormantKnowledge": "Wiedza rzemiosła {craft} jest zachowana, lecz uśpiona, dopóki jego para lub hobby nie będzie aktywne."

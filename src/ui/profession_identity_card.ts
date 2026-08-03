@@ -88,10 +88,14 @@ export function renderProfessionIdentityCard(
   // The uniform-chips caption (the option 3 collapse): one line stating the
   // role and cap every row shares, in the same pill family the rows would
   // have carried. A list item rather than a sibling so the card keeps its
-  // two-column flex shape untouched.
+  // two-column flex shape untouched. aria-hidden like the retired column
+  // header was, and for the same reason: every row's skillAria already
+  // carries the role and cap, so exposing the caption too would read the
+  // same pair an eleventh time. The role-* class lets the family's badge
+  // recolors reach the caption pill, exactly as they reach a row's.
   const uniformCaption =
     identity.uniform && skillRows
-      ? `<li class="profession-skill-uniform"><span class="profession-skill-uniform-label">${esc(t('hudChrome.crafting.identity.allCrafts'))}</span><span class="prof-role-badge">${esc(roleText(identity.uniform.role))}</span><span class="prof-ceiling">${esc(ceilingText(identity.uniform.ceiling))}</span></li>`
+      ? `<li class="profession-skill-uniform role-${identity.uniform.role}" aria-hidden="true"><span class="profession-skill-uniform-label">${esc(t('hudChrome.crafting.identity.allCrafts'))}</span><span class="prof-role-badge">${esc(roleText(identity.uniform.role))}</span><span class="prof-ceiling">${esc(ceilingText(identity.uniform.ceiling))}</span></li>`
       : '';
 
   const tutorial = identity.tutorial
@@ -112,6 +116,14 @@ export function renderProfessionIdentityCard(
   // uniform-collapsed lifts the list's height cap: the collapse already
   // makes the rows one-liners, so the whole list fits without scrolling,
   // while the attuned two-line rows scroll past the cap (components.css).
-  card.innerHTML = `<div class="profession-identity-main">${headingHtml}${summaryHtml}${returnCostHtml}${tutorial}${nudges ? `<ul class="profession-identity-nudges" role="list">${nudges}</ul>` : ''}</div><ul class="profession-skill-list${identity.uniform ? ' uniform-collapsed' : ''}" role="list">${uniformCaption}${skillRows}</ul>`;
+  // The capped (non-collapsed) list is a scroll region with no focusable
+  // child, so it takes tabindex 0 and a name: without them a keyboard-only
+  // player cannot reach the rows past the fold (axe
+  // scrollable-region-focusable). The collapsed list never scrolls and
+  // stays out of the tab order.
+  const cappedListAttrs = identity.uniform
+    ? ''
+    : ` tabindex="0" aria-label="${esc(t('hudChrome.crafting.identity.skillListAria'))}"`;
+  card.innerHTML = `<div class="profession-identity-main">${headingHtml}${summaryHtml}${returnCostHtml}${tutorial}${nudges ? `<ul class="profession-identity-nudges" role="list">${nudges}</ul>` : ''}</div><ul class="profession-skill-list${identity.uniform ? ' uniform-collapsed' : ''}" role="list"${cappedListAttrs}>${uniformCaption}${skillRows}</ul>`;
   parent.appendChild(card);
 }

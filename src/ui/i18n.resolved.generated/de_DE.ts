@@ -2618,6 +2618,7 @@ export const de_DE: EnTranslations = {
         "colRole": "Rolle",
         "colCap": "Grenze",
         "allCrafts": "All crafts",
+        "skillListAria": "Craft skills",
         "tutorial": "Erste Stufe: Erreiche Fertigkeit {skill} in einem Beruf. Erfolgreiche Rezepte verbessern diesen Beruf, ohne Kenntnisse anderswo zu löschen.",
         "nearTier": "{craft} ist {points} Fertigkeitspunkte von der nächsten Stufe entfernt.",
         "dormantKnowledge": "Kenntnisse in {craft} bleiben erhalten, sind aber inaktiv, bis sein Paar oder Hobby aktiv ist."

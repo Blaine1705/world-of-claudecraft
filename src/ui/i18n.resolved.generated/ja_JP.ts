@@ -2617,7 +2617,8 @@ export const ja_JP: EnTranslations = {
         "colSkill": "技能",
         "colRole": "役割",
         "colCap": "上限",
-        "allCrafts": "All crafts",
+        "allCrafts": "すべての職種",
+        "skillListAria": "職種の技能",
         "tutorial": "最初のティア：いずれかの技を技能 {skill} まで上げます。レシピの成功は他の知識を消さず、その技を成長させます。",
         "nearTier": "{craft}は次のティアまであと技能 {points} です。",
         "dormantKnowledge": "{craft}の知識は保持されていますが、その組み合わせか趣味が有効になるまで休眠します。"
