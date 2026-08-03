@@ -71,6 +71,7 @@ import {
 } from './camera_feel_core';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
+import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
 import { type CharacterWeaponAura, characterWeaponAuraInto } from './character_effects';
 import {
   addCharacterEffectAura,
@@ -125,20 +126,23 @@ import {
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
-import { currentDayNightPhase, dayNightPhaseOverride } from './day_night_clock';
+import { currentDayNightPhase, currentLunarPhase, dayNightPhaseOverride } from './day_night_clock';
 import {
   aboveHorizon,
   DAY_ONLY,
   type DayNightGrade,
   dayNightGrade,
+  duskWarmAmount,
   effectiveDayness,
   fullDayGrade,
   globalDayness,
   moonDirection,
   NEUTRAL_DAY_GRADE,
+  nightSkyDesat,
   nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
   sunDirection,
+  warmDuskGrade,
 } from './day_night_core';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
@@ -358,7 +362,7 @@ import {
 import { ViewCreateRetryGate } from './view_create_retry';
 import { type WarriorCastVisualPlan, warriorCastVisualPlan } from './warrior_cast_fx_core';
 import { RecklessSkullPainter } from './warrior_cast_fx_painter';
-import { buildWater, type WaterView } from './water';
+import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
 import { buildWaterFlora } from './water_flora';
 import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
@@ -579,8 +583,9 @@ const MOON_HEMI_SKY_COLOR = 0x8b9cd0; // cool sky bounce at deepest night
 const MOON_HEMI_GROUND_COLOR = 0x2b3350; // dark cool ground bounce at deepest night
 const NIGHT_SUN_COOL = 0.55; // how far the sun hue shifts to moonlight at full night
 const NIGHT_HEMI_COOL = 0.5; // how far the sky-bounce hue shifts at full night
-// golden tone the sun light warms toward, strongest as the sun nears the horizon
-const WARM_SUN_COLOR = 0xff8a3a;
+// golden tone the sun light warms toward, strongest as the sun nears the
+// horizon: a deep sunset orange, so dawn and dusk read hot like the real thing
+const WARM_SUN_COLOR = 0xff7a28;
 // A shared warm daylight bias applied after each biome picks its authored hue.
 // Keeping this below 0.2 preserves Frostveil, Wraithwood, and Galecrest as cool
 // realms while stopping their HDRI/hemisphere fill from cooling the whole frame.
@@ -1488,6 +1493,7 @@ export class Renderer {
   private skyView!: SkyView;
   private sunSprites: THREE.Sprite[] = [];
   private moonSprites: THREE.Sprite[] = [];
+  private celestialSprites: CelestialSprites | null = null;
   private sunDir = new THREE.Vector3();
   // the moving moon direction plus how far above the horizon each body sits
   // (0 down, 1 up); recomputed each frame in updateAmbience from the world clock
@@ -1969,75 +1975,18 @@ export class Renderer {
     this.cullCharacters = !sun.castShadow;
     this.sunDir.copy(SUN_DIR);
 
-    // visible sun disc + bloom halo
-    // The sun and moon are billboard sprites: always camera-facing, so they read
-    // as perfect circles wherever they sit on screen (a dome-shader disc would
-    // project to an ellipse off-axis). Each is a crisp filled disc plus a soft
-    // glow; the renderer aims them along the sun/moon direction each frame and
-    // fades them by how far the body is above the horizon.
-    const discTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
-      const cv = document.createElement('canvas');
-      cv.width = cv.height = 128;
-      const ctx = cv.getContext('2d');
-      if (!ctx) throw new Error('2D canvas context unavailable');
-      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 60);
-      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 1)`);
-      grad.addColorStop(0.82, `rgba(${r}, ${g}, ${b}, 1)`); // solid plateau = crisp disc
-      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`); // feathered rim to anti-alias the edge
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 128, 128);
-      return new THREE.CanvasTexture(cv);
-    };
-    const glowTex = (r: number, g: number, b: number): THREE.CanvasTexture => {
-      const cv = document.createElement('canvas');
-      cv.width = cv.height = 128;
-      const ctx = cv.getContext('2d');
-      if (!ctx) throw new Error('2D canvas context unavailable');
-      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-      grad.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
-      grad.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 128, 128);
-      return new THREE.CanvasTexture(cv);
-    };
-    const makeCelestialSprite = (
-      tex: THREE.CanvasTexture,
-      scale: number,
-      opacity: number,
-      blending: THREE.Blending = THREE.AdditiveBlending,
-      renderOrder = -9,
-    ): THREE.Sprite => {
-      const sp = new THREE.Sprite(
-        new THREE.SpriteMaterial({
-          map: tex,
-          transparent: true,
-          fog: false,
-          depthWrite: false,
-          depthTest: false,
-          blending,
-          opacity,
-        }),
-      );
+    // visible sun disc + bloom halo. The sprite construction (cratered moon
+    // face, HDR sun core that crosses the bloom threshold, corona + glare
+    // streak) lives in celestial_sprites.ts; the renderer owns scene entry and
+    // the per-frame aim/fade (updateCelestialSprites).
+    const celestial = buildCelestialSprites(LOW_GFX);
+    this.celestialSprites = celestial;
+    this.sunSprites = celestial.sunSprites;
+    this.moonSprites = celestial.moonSprites;
+    for (const sp of [...this.sunSprites, ...this.moonSprites]) {
       setRenderCategory(sp, 'sky');
-      sp.scale.set(scale, scale, 1);
-      sp.renderOrder = renderOrder;
-      sp.frustumCulled = false; // rides the camera at a fixed offset; never cull it
-      sp.userData.baseOpacity = opacity;
       this.scene.add(sp);
-      return sp;
-    };
-    // sun: a warm disc under a soft warm glow
-    this.sunSprites = [
-      makeCelestialSprite(glowTex(255, 214, 150), 150, LOW_GFX ? 0.6 : 0.3),
-      makeCelestialSprite(discTex(255, 224, 168), 42, 0.9),
-    ];
-    // moon: a bright cratered face (normal-blended so the maria read as dark)
-    // under a soft cool additive glow kept modest so it does not wash the face
-    // moon: a plain bright disc (as bright as the stars) under a soft cool glow
-    this.moonSprites = [
-      makeCelestialSprite(glowTex(150, 170, 220), 128, 0.22),
-      makeCelestialSprite(discTex(247, 250, 255), 52, 1),
-    ];
+    }
 
     // god-ray shafts: elongated additive gradient sprites hanging sunward of
     // the camera; opacity follows how directly the camera faces the sun
@@ -4214,6 +4163,11 @@ export class Renderer {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       if (!this.lowGfx) {
         this.skyView.setDayNight(this.dnGrade.sky);
+        this.skyView.setCycle(
+          this.sunDir,
+          duskWarmAmount(this.sunDir.y),
+          nightSkyDesat(this.dnGrade.nightAmt),
+        );
         this.skyView.setFog((this.scene.fog as THREE.Fog).color);
         this.skyView.setStars(this.starAmt, this.time);
         this.updateEnvBiome(dt);
@@ -7445,12 +7399,9 @@ export class Renderer {
       // dev override still drives the real grade even while DAY_ONLY ships.
       const phase = currentDayNightPhase();
       const gday = globalDayness(phase);
-      this.dnGrade =
-        DAY_ONLY && phaseOverride === null
-          ? NEUTRAL_DAY_GRADE
-          : dayNightGrade(effectiveDayness(gday, biome));
       const amp = REALM_DAYNIGHT_AMPLITUDE[biome];
       if (DAY_ONLY && phaseOverride === null) {
+        this.dnGrade = NEUTRAL_DAY_GRADE;
         this.sunDir.copy(SUN_DIR);
         this.moonDir.set(0, -1, 0);
         this.sunUp = aboveHorizon(SUN_DIR.y) * amp;
@@ -7464,6 +7415,13 @@ export class Renderer {
         this.sunUp = aboveHorizon(sd[1]) * amp;
         this.moonUp = aboveHorizon(md[1]) * Math.max(amp, 0.6);
         this.starAmt = nightStarAmount(gday);
+        // the whole grade warms as the sun crosses the horizon, so the fog,
+        // sky dome, and water all take the sunrise/sunset orange rather than
+        // just the key light
+        this.dnGrade = warmDuskGrade(
+          dayNightGrade(effectiveDayness(gday, biome), biome),
+          duskWarmAmount(sd[1]),
+        );
       }
     }
     if (isDelvePos(px) && !inPractice) {
@@ -7790,10 +7748,12 @@ export class Renderer {
       let hi = (sunElev - 0.08) / 0.5;
       hi = hi < 0 ? 0 : hi > 1 ? 1 : hi;
       const lowness = 1 - hi * hi * (3 - 2 * hi);
-      // 0.42 base: with the key pinned at 31° the warm never ramps through
-      // the old near-horizon band, so the standing gold has to come from the
-      // base term. This is the golden-hour read at the permanent day angle
-      const warmAmt = aboveHorizon(sunElev) * (0.52 + lowness * 0.4);
+      // The base term is the standing day gold (the look tuned at the fixed
+      // 31 degree anchor, which the live noon sun closely matches); the
+      // lowness ramp runs the warm all the way to 1 at the horizon so sunrise
+      // and sunset go genuinely orange, and aboveHorizon gates the whole warm
+      // off below it so the moonlight never picks up a sunset tint.
+      const warmAmt = aboveHorizon(sunElev) * (0.52 + lowness * 0.48);
       this.dnColorScratch.setHex(light.sun);
       this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
       this.dnColorScratch.lerp(
@@ -7877,6 +7837,11 @@ export class Renderer {
         pp.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,
         pp.z + this.lightDir.z * SUN_TRAVEL_DISTANCE,
       );
+      // the unlit water shader follows the same key light and grade: glints
+      // track the sun by day and the moon by night, and the surface dims with
+      // the world (its baked palette would otherwise stay day-bright at night)
+      setWaterSunDirection(this.lightDir);
+      setWaterDayNight(this.dnGrade.fog);
     }
     this.sun.target.position.set(pp.x, pp.y, pp.z);
   }
@@ -7888,6 +7853,11 @@ export class Renderer {
     // riding sun and moon sprites can clip against its high rim as oversized
     // wedges. Reserve screen-space celestial overlays for the overworld.
     const outdoor = this.fogState === 'outdoor';
+    // keep the moon's shape on the lunar clock (no-op between phase buckets)
+    // and run the sun's disc to sunset orange on the same horizon curve the
+    // sky glow uses
+    this.celestialSprites?.setMoonPhase(currentLunarPhase());
+    this.celestialSprites?.setSunWarmth(duskWarmAmount(this.sunDir.y));
     for (const sp of this.sunSprites) {
       sp.position.copy(this.camera.position).addScaledVector(this.sunDir, 760);
       sp.visible = outdoor && this.sunUp > 0.02;
@@ -9534,6 +9504,11 @@ export class Renderer {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       if (!this.lowGfx) {
         this.skyView.setDayNight(this.dnGrade.sky);
+        this.skyView.setCycle(
+          this.sunDir,
+          duskWarmAmount(this.sunDir.y),
+          nightSkyDesat(this.dnGrade.nightAmt),
+        );
         this.skyView.setFog((this.scene.fog as THREE.Fog).color);
         this.skyView.setStars(this.starAmt, this.time);
         this.updateEnvBiome(dt);

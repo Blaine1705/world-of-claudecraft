@@ -145,6 +145,27 @@ export const SHALLOW_COLOR = new THREE.Color(0x2d8077);
 const SKY_TINT = new THREE.Color(0x7fb2e0); // matches the sky horizon band
 const SUN_COLOR = new THREE.Color(0xfff0d4);
 
+// Live day/night inputs, shared BY REFERENCE across every water surface
+// material (the overworld field plus the Wildheart pools), the same idiom as
+// sharedUniforms.uTime: the renderer writes them once per frame and every
+// surface follows. uSunDir starts at the fixed anchor and tracks the moving
+// sun/moon key light once the cycle drives it; uDayNight is the day/night
+// color multiplier ((1,1,1) = authored day), needed because this shader is
+// unlit (baked palette + fog) and would otherwise stay day-bright at night.
+const WATER_SUN_UNIFORM = { value: SUN_DIR.clone() };
+const WATER_DAYNIGHT_UNIFORM = { value: new THREE.Vector3(1, 1, 1) };
+
+/** Point the water glints along the live key-light direction (sun by day,
+ *  moon by night); the renderer calls this from its key-light update. */
+export function setWaterSunDirection(dir: THREE.Vector3): void {
+  WATER_SUN_UNIFORM.value.copy(dir);
+}
+
+/** Apply the day/night color multiplier to every water surface. */
+export function setWaterDayNight(mul: readonly [number, number, number]): void {
+  WATER_DAYNIGHT_UNIFORM.value.set(mul[0], mul[1], mul[2]);
+}
+
 export interface WaterView {
   group: THREE.Group;
   meshes: THREE.Mesh[];
@@ -259,6 +280,7 @@ const WATER_FRAG = /* glsl */ `
   uniform sampler2D uNorm2;
   uniform sampler2D uNorm3;
   uniform vec3 uSunDir;
+  uniform vec3 uDayNight;
   uniform vec3 uSunColor;
   uniform vec3 uSkyColor;
   uniform vec3 uDeep;
@@ -354,6 +376,10 @@ const WATER_FRAG = /* glsl */ `
     // collapses the mix to 1.0: the overworld shader is byte-identical.
     float edgeWobble = 0.18 * sin(vWPos.x * 1.7 + vWPos.z * 2.3) + 0.12 * sin(vWPos.z * 4.1 - vWPos.x * 3.3);
     alpha *= mix(1.0, smoothstep(0.12, 0.85, vShoreDepth + edgeWobble * uShoreEdgeFade), uShoreEdgeFade);
+    // World day/night grade: this shader is unlit (baked palette), so the same
+    // multiplier the fog takes dims the whole surface, glints and foam
+    // included, toward the moonlit night. (1,1,1) by day = byte-identical.
+    col *= uDayNight;
     gl_FragColor = vec4(col, alpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -408,7 +434,8 @@ export function createWaterSurfaceMaterial(
       uNorm1: { value: WATER_TEX.n1 },
       uNorm2: { value: WATER_TEX.n2 },
       uNorm3: { value: WATER_TEX.broad },
-      uSunDir: { value: SUN_DIR.clone() }, // the one shared sun (gfx.ts)
+      uSunDir: WATER_SUN_UNIFORM, // live key-light direction (shared by reference)
+      uDayNight: WATER_DAYNIGHT_UNIFORM, // day/night multiplier (shared by reference)
       uSunColor: { value: SUN_COLOR },
       uSkyColor: { value: SKY_TINT },
       uDeep: { value: DEEP_COLOR },

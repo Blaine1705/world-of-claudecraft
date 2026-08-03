@@ -197,7 +197,7 @@ import {
   playerPortraitDataUrl,
 } from './render/characters/portrait';
 import { installWebGLContextRelease } from './render/context_release';
-import { setDayNightPhaseOverride } from './render/day_night_clock';
+import { setDayNightPhaseOverride, setLunarPhaseOverride } from './render/day_night_clock';
 import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
 import { Renderer } from './render/renderer';
 import {
@@ -1504,9 +1504,18 @@ async function startGame(
   });
   // Dev-only chat command to scrub the world day/night cycle for testing:
   //   /daynight night|dawn|day|dusk|<0..1>|auto   (also /dev daynight, /dev time)
+  //   /daynight moon new|crescent|half|full|<0..1>|auto   (the lunar phase)
   // Render-only: it just overrides the shared clock phase (day_night_clock), so
   // the sky lighting and the minimap dial both jump to the chosen time of day.
   // Returns true when it handled the input (so it is not also sent to chat).
+  const MOON_PRESETS: Record<string, number> = {
+    new: 0,
+    crescent: 0.125,
+    half: 0.25,
+    quarter: 0.25,
+    gibbous: 0.375,
+    full: 0.5,
+  };
   const DAY_NIGHT_PRESETS: Record<string, number> = {
     midnight: 0,
     night: 0,
@@ -1531,6 +1540,28 @@ async function startGame(
     const arg = m[1].trim().toLowerCase();
     if (!arg) {
       hud.log('[dev] usage: /daynight night|dawn|day|dusk|<0..1>|auto', '#ffcf6a');
+      hud.log('[dev]        /daynight moon new|crescent|half|full|<0..1>|auto', '#ffcf6a');
+      return true;
+    }
+    const moonArg = arg.match(/^moon\s*(.*)$/);
+    if (moonArg) {
+      const moonWord = moonArg[1].trim();
+      if (!moonWord || ['auto', 'off', 'real', 'resume', 'clear'].includes(moonWord)) {
+        setLunarPhaseOverride(null);
+        hud.log('[dev] moon resumed (real lunar clock)', '#8fd0ff');
+        return true;
+      }
+      let moonPhase: number | null = moonWord in MOON_PRESETS ? MOON_PRESETS[moonWord] : null;
+      if (moonPhase === null) {
+        const n = Number.parseFloat(moonWord);
+        if (Number.isFinite(n)) moonPhase = ((n % 1) + 1) % 1;
+      }
+      if (moonPhase === null) {
+        hud.log(`[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`, '#ffcf6a');
+        return true;
+      }
+      setLunarPhaseOverride(moonPhase);
+      hud.log(`[dev] moon set to ${moonWord} (lunar phase ${moonPhase.toFixed(2)})`, '#8fd0ff');
       return true;
     }
     if (['auto', 'off', 'real', 'resume', 'clear'].includes(arg)) {
