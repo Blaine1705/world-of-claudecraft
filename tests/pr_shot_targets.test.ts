@@ -143,6 +143,18 @@ describe('classifyDiff', () => {
     expect(target?.capture.toString()).toContain('knownRecipes: []');
   });
 
+  it('maps the Vale Cup unrated-gates UI change to its two targets (#2767)', () => {
+    const plan = classifyDiff(['src/ui/vale_cup_window.ts', 'src/ui/vale_cup_briefing.ts']);
+    expect(plan.isVisual).toBe(true);
+    const keys = plan.specific.map((t: { key: string }) => t.key);
+    expect(keys).toContain('vale-cup-unrated-notes');
+    expect(keys).toContain('vale-cup-briefing-unrated');
+    for (const key of ['vale-cup-unrated-notes', 'vale-cup-briefing-unrated']) {
+      const target = plan.specific.find((candidate: { key: string }) => candidate.key === key);
+      expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+    }
+  });
+
   it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
     const plan = classifyDiff(['src/sim/content/deeds.ts']);
     expect(plan.isVisual).toBe(true);

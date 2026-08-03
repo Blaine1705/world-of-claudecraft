@@ -4379,6 +4379,48 @@ export const TARGETS = [
       return { clip: '#deeds-window' };
     },
   },
+  {
+    key: 'vale-cup-unrated-notes',
+    label: 'Vale Cup window: 1v1/2v2 all-rounder note and practice unrated note (#2767)',
+    when: ['ui/vale_cup_window'],
+    // The window opens on the 1v1 bracket by default, so the small-bracket
+    // role note shows; offline enables the practice button, so the practice
+    // unrated note shows beneath it in the same frame.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      let opened = false;
+      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+        await page.evaluate(() => {
+          const el = document.querySelector('#valecup-window');
+          if (el) el.style.display = 'none';
+          window.__game?.hud?.toggleValeCup?.();
+        });
+        opened = await pollForSize(page, '#valecup-window', 10, 500);
+      }
+      if (!opened) throw new Error('vale cup window did not open');
+      await wait(400);
+      return { clip: '#valecup-window' };
+    },
+  },
+  {
+    key: 'vale-cup-briefing-unrated',
+    label: 'Vale Cup briefing: unrated-bout note (practice / bot-backfill) (#2767)',
+    when: ['ui/vale_cup_briefing'],
+    // A private practice bout is the offline-reachable unrated bout: starting
+    // one brings up the pre-match briefing overlay, whose rules panel now ends
+    // with the unrated note (no standings, no Book of Deeds progress).
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        window.__game?.sim?.vcupPracticeStart?.(1);
+      });
+      if (!(await pollForSize(page, '#vcup-briefing', 20, 500))) {
+        throw new Error('briefing overlay did not appear');
+      }
+      await wait(400);
+      return { clip: '#vcup-briefing .vcupb-card' };
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and
