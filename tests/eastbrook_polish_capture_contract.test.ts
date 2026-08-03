@@ -366,11 +366,11 @@ describe('Eastbrook polish capture contract', () => {
       // compile-gate renderer edits), and the far-field work adds two more:
       // renderer.ts hands its WebGLRenderer to buildFoliage for the impostor
       // atlas bake, then grows the fog-free vista split (far terrain layer,
-      // detail horizon, fog parking), each moving the renderer-integration
-      // leaf. No Eastbrook pipeline input or geometry value changed, and no
-      // capture was retaken (the five per-asset seal suites stay green
-      // untouched).
-      fingerprint: 'f2b7ad84435dbcd3ea415df0b6b9bb38fba75cd0ccf3e7d98d58269b716a537a',
+      // detail horizon, fog parking) and the ambient-life wiring, each
+      // moving the renderer-integration leaf. No Eastbrook pipeline input or
+      // geometry value changed, and no capture was retaken (the five
+      // per-asset seal suites stay green untouched).
+      fingerprint: '1a2ec8ce5ff614b1c0e0e2c87cd0a38ec71dea205889128a99b2e0eb5dd4b098',
       components: {
         captureContract: {
           id: 'polish-v2',
