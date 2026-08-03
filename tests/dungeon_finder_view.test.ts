@@ -424,7 +424,15 @@ describe('dungeon finder view core', () => {
     expect(view.board.listings[0].canApply).toBe(false);
   });
 
-  it('keeps a leader listing visible in Open listings when its OWN dungeon goes locked (#2030 followup)', () => {
+  it('hides the leader OWN listing from Open listings, lockout or not; the myListing panel keeps it (issue 2031, superseding the #2030 followup)', () => {
+    // History: the #2030 followup pinned the leader's own row VISIBLE in Open
+    // listings under a lockout, so the leader would not lose their row. Issue
+    // 2031 then hid every already-in-group listing from the browse list (the
+    // row's home is the myListing panel), which deliberately supersedes that
+    // expectation; the release landed the filter without updating this test,
+    // reddening its own tip. The lockout stays in the input so the #2030
+    // path is still exercised: it must neither resurrect the row nor lose
+    // the myListing panel.
     const heroicListing = {
       id: 8,
       activityId: 'hollow_crypt_heroic',
@@ -435,21 +443,35 @@ describe('dungeon finder view core', () => {
       needed: { tank: 0, healer: 1, dps: 3 },
       members: [{ cls: 'warrior' as const, level: 20, role: 'tank' as const }],
     };
-    const view = live(
+    const myListing = { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] };
+    const locked = live(
       buildDungeonFinderView(
         input({
           tab: 'board',
           playerLevel: 20,
           board: [heroicListing],
-          info: makeInfo('sim', {
-            myListing: { id: 8, activityId: 'hollow_crypt_heroic', tags: [], applicants: [] },
-          }),
+          info: makeInfo('sim', { myListing }),
           lockouts: [{ id: 'hollow_crypt:heroic', msRemaining: 3_600_000 }],
         }),
       ),
     );
-    expect(view.board.listings.map((l) => l.id)).toEqual([8]);
-    expect(view.board.listings[0].mine).toBe(true);
+    expect(locked.board.listings.map((l) => l.id)).toEqual([]);
+    expect(locked.board.myListing?.id).toBe(8);
+    // Same shape without the lockout: the hide comes from the
+    // already-in-group rule, not the lockout path.
+    const unlocked = live(
+      buildDungeonFinderView(
+        input({
+          tab: 'board',
+          playerLevel: 20,
+          board: [heroicListing],
+          info: makeInfo('sim', { myListing }),
+          lockouts: [],
+        }),
+      ),
+    );
+    expect(unlocked.board.listings.map((l) => l.id)).toEqual([]);
+    expect(unlocked.board.myListing?.id).toBe(8);
   });
 
   it('does not hide a listing over a lockout on a DIFFERENT dungeon or a lockout-free difficulty (#2030 followup)', () => {

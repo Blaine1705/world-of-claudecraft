@@ -448,14 +448,12 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // Issue #2030: a listing for a dungeon/raid I am currently locked out of
     // is not something I can usefully apply to, and showing it invites a
     // player to join a group only to discover the lockout at the door. Hide
-    // it from the browse list. The board payload is viewer-independent, so
-    // my own listing DOES pass through this loop (it also renders in the
-    // separate `myListing` panel): exempt it the same as `applied`, or a
-    // leader who takes the lockout mid-run loses their own row from Open
-    // Listings. A listing I have already applied to stays visible even
-    // while locked out, so its row (and withdraw control) keep existing:
-    // otherwise a pending application could never be withdrawn once the
-    // lockout landed.
+    // it from the browse list. A listing I have already applied to stays
+    // visible even while locked out, so its row (and withdraw control) keep
+    // existing: otherwise a pending application could never be withdrawn
+    // once the lockout landed. My own listing no longer reaches this check
+    // (the already-in-group hide above owns it, and the leader's row lives
+    // in the `myListing` panel); the `!mine` term stays as belt and braces.
     if (!applied && !mine && lockoutMinutesFor(activity, input.lockouts) > 0) continue;
     const blocked = blockReasonFor(activity, level, specRole);
     const roleFit =
