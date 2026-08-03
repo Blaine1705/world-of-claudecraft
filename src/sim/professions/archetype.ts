@@ -64,7 +64,7 @@ export interface ArchetypeState {
   // pairedMajor/hobbyCraft stay null (see attuneJackOfAllTrades), and
   // normalizeArchetypeState forces this false whenever activeArchetype is
   // set, so the two identities can never both be live on the same save.
-  isJackOfAllTrades: boolean;
+  isJackOfAllTrades?: boolean;
 }
 
 /** A fresh character: no archetype chosen yet, never switched. */
@@ -154,6 +154,22 @@ export function normalizeArchetypeState(
     state.amendsProgress = saved.amendsProgress;
   }
   return state;
+}
+
+export type PersistedArchetypeState = Omit<ArchetypeState, 'isJackOfAllTrades'> & {
+  isJackOfAllTrades?: true;
+};
+
+export function serializeArchetypeState(state: ArchetypeState): PersistedArchetypeState {
+  return {
+    activeArchetype: state.activeArchetype,
+    pairedMajor: state.pairedMajor,
+    hobbyCraft: state.hobbyCraft,
+    attunedPairs: [...state.attunedPairs],
+    switchCount: state.switchCount,
+    amendsProgress: state.amendsProgress,
+    ...(state.isJackOfAllTrades ? { isJackOfAllTrades: true } : {}),
+  };
 }
 
 function isCraftId(id: string): boolean {
