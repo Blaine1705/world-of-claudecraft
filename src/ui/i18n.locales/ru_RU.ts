@@ -8820,7 +8820,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.sellSearchPlaceholder': 'Введите текст для фильтра сумок',
   'hudChrome.wocMarket.sellChoose': 'Предмет для продажи',
   'hudChrome.wocMarket.sellNoMatches': 'Нет предметов по этому запросу',
-  'hudChrome.wocMarket.sellBuyNowAboveStart': 'Цена немедленной покупки должна быть выше начальной ставки.',
+  'hudChrome.wocMarket.sellBuyNowAboveStart':
+    'Цена немедленной покупки должна быть выше начальной ставки.',
   'hudChrome.wocMarket.sellFormatBuyNow': 'Только выкуп',
   'hudChrome.wocMarket.sellFormatAuctionBuyNow': 'Аукцион с выкупом',
   'hudChrome.wocMarket.sellStart': 'Стартовая ставка (USD)',

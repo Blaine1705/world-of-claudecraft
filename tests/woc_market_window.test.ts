@@ -53,9 +53,12 @@ describe('woc_market_window: cold-window contract', () => {
     );
   });
 
-  it('performs no forced-reflow layout read', () => {
+  it('performs no forced-reflow layout read beyond the granted scroll pair', () => {
     // The layout-thrash killers the perf gate scans painters for; a cold
-    // window holds this contract whatever its poll cadence.
+    // window holds this contract whatever its poll cadence. `.scrollTop` is
+    // absent from this list because it is GRANTED to this file, at a count, in
+    // hud_perf_budget's COLD_PAINTER_ALLOWANCES; the case below is what holds it
+    // to the granted shape, so removing that case is what would weaken this.
     for (const token of [
       'getBoundingClientRect',
       'getClientRects',
@@ -66,17 +69,42 @@ describe('woc_market_window: cold-window contract', () => {
       'offsetParent',
       'clientWidth',
       'clientHeight',
-      'scrollTop',
       'scrollLeft',
       'scrollWidth',
       'scrollHeight',
-      'scrollIntoView',
     ]) {
       expect(painter.includes(token), `forced-reflow read: ${token}`).toBe(false);
     }
     // getComputedStyle is called BARE in this tree, never as a member, so the
     // scan matches the bare call form only.
     expect(painter).not.toMatch(/(?<![.\w])getComputedStyle\s*\(/);
+  });
+
+  it('preserves scroll with ONE read site and ONE write site, both inside the rebuild', () => {
+    // The granted allowance is 2 occurrences for TWO containers, which only holds
+    // because both go through the SCROLL_KEEPERS table. Counting here rather than
+    // trusting the grant: a second hand-rolled read would still satisfy the perf
+    // gate's count only by someone raising it, and would silently satisfy nothing
+    // at all if this case merely asserted the tokens were present.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(code.match(/\.scrollTop\b/g) ?? []).toHaveLength(2);
+    // Order is the whole contract: read before innerHTML throws the container
+    // away, write back after wire() has rebuilt it. Reversed, the read returns 0
+    // and the restore is a no-op that looks like it works.
+    const inner = between('private renderInner(', 'private usd(');
+    const read = inner.indexOf('?.scrollTop ?? 0');
+    const wipe = inner.indexOf('root.innerHTML =');
+    const write = inner.indexOf('el.scrollTop = top');
+    expect(read).toBeGreaterThanOrEqual(0);
+    expect(wipe).toBeGreaterThan(read);
+    expect(write).toBeGreaterThan(inner.indexOf('this.wire(root, model)'));
+    // Keyed, so a tab switch or a different listing still starts at the top
+    // rather than inheriting an offset into content that no longer exists.
+    expect(inner).toContain('if (keys[name] !== this.renderedScrollKey[name]) continue;');
+    expect(painter).toContain("return { body: this.tab, detail: `${this.tab}:${listing ?? ''}` };");
+    // Both containers, named. A table of one would pass every count above.
+    expect(painter).toContain("['body', '.wm-body'],");
+    expect(painter).toContain("['detail', '.wm-detail'],");
   });
 
   it('keeps the wocMarketViewSig repaint guard the hud_update_drive registry names', () => {
@@ -347,7 +375,7 @@ describe('woc_market_window: the item inspector on hover', () => {
     expect(cell).toContain('this.tooltipTargets.set(key, { itemId, instance });');
   });
 
-  it('tags every one of the four item surfaces with a namespaced, stable key', () => {
+  it('tags every one of the five item surfaces with a namespaced, stable key', () => {
     // Namespaced so the same item on two tabs cannot collide, and carrying the
     // row's own id so the hover target survives a poll rebuild.
     for (const key of [
@@ -355,6 +383,10 @@ describe('woc_market_window: the item inspector on hover', () => {
       '`detail:${d.row.id}`',
       // The sell tab keys off the CHOSEN row now, not a row in a rendered list.
       '`sell:${selected.index}`',
+      // ...and off each OPTION in the open picker, which is a fifth surface
+      // registered directly rather than through itemCellHtml, because an option
+      // is an icon plus a name in its own layout, not a shared cell.
+      '`opt:${r.index}`',
       '`activity:${l.id}`',
     ]) {
       expect(painter, `missing tooltip key ${key}`).toContain(key);
@@ -430,6 +462,16 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
     const sell = between('private sellHtml(', 'private activityHtml(');
     expect(sell).toContain('aria-activedescendant="${listId}-o${active}"');
     expect(sell).toContain('active >= 0 ?');
+    // Two writers now point at these ids (the markup and paintSellActive), so the
+    // id itself is ONE definition. Two literals would drift apart silently and the
+    // only symptom would be a screen reader announcing nothing.
+    expect(painter).toContain("const SELL_LISTBOX_ID = 'wm-sell-listbox';");
+    expect(sell).toContain('const listId = SELL_LISTBOX_ID;');
+    expect(painter).toContain('`${SELL_LISTBOX_ID}-o${this.sellActive}`');
+    // The label's `for` resolves to a real id while the input exists, and drops to
+    // a plain caption once the chosen cell replaces it.
+    expect(sell).toContain('id="${listId}-input"');
+    expect(sell).toContain('for="${listId}-input"');
   });
 
   it('renders options as NON-focusable divs, never buttons', () => {
@@ -559,20 +601,61 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
     expect(down).toContain('commitSellPick');
   });
 
-  it('repaints on hover only when the active option actually changes', () => {
-    // mousemove fires continuously; repainting per event would rebuild the whole
-    // subtree dozens of times per second.
+  it('moves the hover highlight IN PLACE, and never by rebuilding', () => {
+    // Not a saving: a correctness requirement. A rebuild replaces the very option
+    // the pointer is resting on, and a removed node fires no mouseleave and gets
+    // no fresh mouseenter while the pointer sits still, so the item stats card was
+    // hidden and never came back. Repainting the highlight leaves the hovered
+    // option, and its tooltip binding, alive.
     // Anchored on the next method SIGNATURE, not on a doc comment: the comment
     // above onFocusOut was rewritten and silently broke this slice.
     const move = between(
       'private onComboMouseMove(e: MouseEvent): void {',
-      'private onFocusOut(e: FocusEvent): void {',
+      'private onFocusIn(e: FocusEvent): void {',
     );
+    expect(move).toContain('this.paintSellActive(this.deps.root())');
+    expect(move).not.toContain('this.render()');
+    // And still only on a real change: mousemove fires continuously.
     expect(move).toContain('next === this.sellActive');
   });
 
+  it('moves the keyboard highlight the same way, so there is one mechanism', () => {
+    // Two mechanisms would drift: the arrow keys would rebuild (losing the card
+    // the pointer had opened) while the pointer did not.
+    const keys = between(
+      'private onKeyDown(e: KeyboardEvent): void {',
+      'private onComboMouseDown(',
+    );
+    const move = keys.slice(keys.indexOf("case 'move':"), keys.indexOf("case 'select':"));
+    expect(move).toContain('this.paintSellActive(this.deps.root())');
+    expect(move).not.toContain('this.render()');
+    // 'open' is the exception and must stay a rebuild: a hidden listbox has no
+    // options to repaint, so painting in place there would highlight nothing.
+    const open = keys.slice(keys.indexOf("case 'open':"), keys.indexOf("case 'move':"));
+    expect(open).toContain('this.render()');
+  });
+
+  it('paints the class, aria-selected and aria-activedescendant together', () => {
+    // The three are one state. Moving the class without the ARIA pair leaves a
+    // screen reader announcing an option the sighted highlight has left.
+    const paint = between(
+      'private paintSellActive(root: HTMLElement): void {',
+      'private onFocusOut(',
+    );
+    expect(paint).toContain("option.classList.toggle('wm-combo-active', on)");
+    expect(paint).toContain("option.setAttribute('aria-selected', on ? 'true' : 'false')");
+    expect(paint).toContain("input?.setAttribute('aria-activedescendant',");
+    // Cleared, not left stale, when nothing is highlighted.
+    expect(paint).toContain("input?.removeAttribute('aria-activedescendant')");
+    // The active option is scrolled into view: the list opens at FULL length, so
+    // arrowing down leaves the visible 240px within a few keystrokes. This is a
+    // scroll command, not one of the forced-reflow READS the cold contract counts,
+    // and it is what the sibling social_window combobox uses for the same case.
+    expect(paint).toContain("option.scrollIntoView({ block: 'nearest' })");
+  });
+
   it('closes on focusout only when focus leaves the whole combobox', () => {
-    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches()');
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private scrollKeys(');
     expect(out).toContain('combo.contains(next)');
   });
 
@@ -584,7 +667,7 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
     // as closed and Enter/Escape fell through to dropdownKeyNav's collapsed
     // branch: the widget looked like it had broken state, not a focus problem.
     expect(painter).toContain('private rendering = false');
-    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches()');
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private scrollKeys(');
     expect(out).toContain('if (this.rendering');
     // The flag must cover the focus RESTORE too, which is itself a focus move.
     const render = between('render(): void {', 'private renderInner(');
@@ -596,8 +679,68 @@ describe('woc_market_window: the sell tab is an ARIA combobox', () => {
   it('does NOT rely on isConnected to tell a rebuild from a real blur', () => {
     // The first attempt did, and it silently failed: the node is still attached at
     // the moment focusout fires, so the guard passed every time.
-    const out = between('private onFocusOut(e: FocusEvent): void {', 'private sellMatches()');
+    const out = between('private onFocusOut(e: FocusEvent): void {', 'private scrollKeys(');
     expect(out).not.toContain('isConnected');
+  });
+
+  it('opens the whole list on FOCUS, before a single keystroke', () => {
+    // A player who does not know what is listable should not have to guess a
+    // search term to find out. An empty query matches every row, so opening on
+    // focus shows the full scrollable inventory and typing only narrows it.
+    const focusIn = between('private onFocusIn(e: FocusEvent): void {', 'private paintSellActive(');
+    expect(focusIn).toContain("data-field') !== 'sell-search'");
+    expect(focusIn).toContain('this.sellOpen = true');
+    expect(focusIn).toContain('this.render()');
+    // focusin, not focus: only the former bubbles to the one delegated listener.
+    const render = between('render(): void {', 'const model = this.buildModel()');
+    expect(render).toContain("root.addEventListener('focusin',");
+    expect(render).not.toContain("root.addEventListener('focus',");
+    // And the query itself is NOT reset here: reopening on a re-focus must not
+    // silently discard what the seller already typed.
+    expect(focusIn).not.toContain('this.sellSearch');
+  });
+
+  it('ignores the focusin its OWN rebuild causes, or Escape could never close', () => {
+    // The exact mirror of the onFocusOut trap, and it bites in the opposite
+    // direction: renderInner's focus restore puts focus back on this input, so
+    // without the guard Escape would close the list and the rebuild it triggers
+    // would reopen it on the way out. Unclosable, and it would read as a stuck
+    // dropdown rather than a focus problem.
+    const focusIn = between('private onFocusIn(e: FocusEvent): void {', 'private paintSellActive(');
+    expect(focusIn).toContain('if (this.rendering || this.sellOpen) return;');
+  });
+
+  it('shows the item stats card from an option ICON, not only once chosen', () => {
+    // Comparing candidates is the point: a seller picks between two epics by
+    // reading their stats, which previously meant selecting one, reading it,
+    // clearing, and selecting the other.
+    const sell = between('private sellHtml(', 'private activityHtml(');
+    expect(sell).toContain('this.tooltipTargets.set(`opt:${r.index}`');
+    expect(sell).toContain('instance: r.instance');
+    expect(sell).toContain('data-tt-key="opt:${r.index}"');
+    // The key rides on the icon and NOT on the name: a card chasing the pointer
+    // across every row of a 70-item list is noise, so the icon is the deliberate
+    // target. Pinned by position, since both live in the same option div.
+    const icon = sell.indexOf('wm-combo-icon');
+    const name = sell.indexOf('wm-combo-name');
+    expect(sell.slice(icon, name)).toContain('data-tt-key');
+    expect(sell.slice(name)).not.toContain('data-tt-key');
+  });
+
+  it('does not rebuild under an open picker, which would eat the hovered card', () => {
+    // The remaining way the card could vanish mid-hover: the slow-band poll firing
+    // on a countdown bucket change while the pointer rests on an option.
+    const refresh = between('refreshIfChanged(): void {', 'relocalize(): void {');
+    const skip = "if (this.tab === 'sell' && this.sellOpen) return;";
+    // Scoped to the TAB as well as the flag, and that is not belt-and-braces: the
+    // flag is cleared by a focusout, and any path that skipped one would otherwise
+    // freeze the browse countdowns for the rest of the session. Bounding the skip
+    // to the tab the picker lives on makes the worst case a stale sell tab.
+    expect(refresh).toContain(skip);
+    // Before the signature is read, so lastSig is left unmoved and the very next
+    // poll after the picker closes still sees the change. Skipping AFTER the read
+    // would latch the new digest and drop the update entirely.
+    expect(refresh.indexOf(skip)).toBeLessThan(refresh.indexOf('const sig ='));
   });
 
   it('tells the seller when a search matches nothing', () => {
@@ -681,6 +824,31 @@ describe('woc_market_window: the picker prompt counts correctly', () => {
     }
     // And the singular really is singular.
     expect(decl).toContain("one: 'Choose from {count} item'");
+  });
+});
+
+describe('woc_market_window: the two ways to take a listing are separate actions', () => {
+  const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+
+  it('gives Buy now its own full-width row, clear of Place Bid', () => {
+    // They are independent decisions, not a submit pair: flush against each other
+    // they read as one control group and invite a misclick that spends money.
+    const rule = css.slice(
+      css.indexOf('#woc-market-window .wm-detail button[data-action="buy-now"]'),
+      css.indexOf('button[data-action="cancel-listing"]'),
+    );
+    expect(rule, 'no buy-now rule in components.css').not.toEqual('');
+    expect(rule).toContain('width: 100%');
+    expect(rule).toContain('display: block');
+    expect(rule).toMatch(/margin-top:\s*\d+px/);
+  });
+
+  it('keeps buy-now AFTER the window-wide button rule, so the width is not erased', () => {
+    // The same specificity trap the tab rules hit: an attribute selector is
+    // (1,1,1) and so is `button:not(.x-btn)`, so source order is what decides.
+    expect(css.indexOf('#woc-market-window button:not(.x-btn) {')).toBeLessThan(
+      css.indexOf('#woc-market-window .wm-detail button[data-action="buy-now"]'),
+    );
   });
 });
 

@@ -16095,6 +16095,15 @@
     min-height: 0;
     font-variant-numeric: tabular-nums;
   }
+  /* Buy now is a SECOND, independent way to take the same listing, not the bid
+     form's submit button: it sat flush against Place Bid, which read as one pair
+     of buttons and invited a misclick on a surface that spends money. Its own row
+     at full width, with air above it, separates the two decisions. */
+  #woc-market-window .wm-detail button[data-action="buy-now"] {
+    display: block;
+    width: 100%;
+    margin-top: 14px;
+  }
   /* Cancel is destructive and belongs to the LISTING, not to the bid form it
      followed; it was butted straight against that content with no separation.
      A rule plus generous space makes it read as its own action. */

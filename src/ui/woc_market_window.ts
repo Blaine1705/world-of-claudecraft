@@ -78,6 +78,37 @@ export interface WocMarketWindowDeps {
   restoreFocus(target: HTMLElement | null): void;
 }
 
+/**
+ * The scroll containers a rebuild replaces, each with the state key that decides
+ * whether a saved position still refers to the same content.
+ *
+ * This is the scroll pair the perf gate's cold allowance table documents as the
+ * shape repeated across these windows (bags, bank, deeds and the rest): read the
+ * position before the rebuild, write it back after, so the list does not jump
+ * under the player. It is load-bearing here rather than cosmetic, because the
+ * slow-band poll rebuilds on every countdown bucket change, which is once a
+ * minute at rest and once a SECOND inside the anti-snipe window: without it the
+ * browse list yanked itself back to the top while the player was reading it.
+ *
+ * Keyed, so a genuine change of view still starts at the top. The body resets
+ * when the tab changes; the detail pane also resets when a different listing is
+ * selected, since its old offset means nothing in another listing's content.
+ */
+const SCROLL_KEEPERS: ReadonlyArray<readonly [keyof WocMarketScrollKeys, string]> = [
+  ['body', '.wm-body'],
+  ['detail', '.wm-detail'],
+];
+
+interface WocMarketScrollKeys {
+  body: string;
+  detail: string;
+}
+
+/** The sell picker's listbox id. One definition: the markup builds the option ids
+ *  from it and paintSellActive points aria-activedescendant at them, so two
+ *  literals would let the two drift apart silently. */
+const SELL_LISTBOX_ID = 'wm-sell-listbox';
+
 // usdCents is NULLABLE on purpose: it is only a display label sourced from the
 // cached activity row, and a missing row must render no amount rather than a
 // fabricated $0.00 next to a real charge. The quote's token legs are the
@@ -135,6 +166,10 @@ export class WocMarketWindow {
   /** True for the duration of render(). Any focus movement inside that window is
    *  the rebuild tearing down its own nodes, never the user leaving the control. */
   private rendering = false;
+  /** What the scroll positions carried across the last rebuild referred to, so a
+   *  restore is skipped once it would point into different content. See
+   *  SCROLL_KEEPERS and scrollKeys(). */
+  private renderedScrollKey: WocMarketScrollKeys = { body: '', detail: '' };
   private sellDurationHours: number | null = null;
   private sellOfferNext = false;
   private acceptTerms = false;
@@ -248,6 +283,16 @@ export class WocMarketWindow {
   /** Hud.update() slow-band entry: rebuild only when the data digest moves. */
   refreshIfChanged(): void {
     if (!this.isOpen) return;
+    // Never rebuild under an open picker. The rebuild would destroy the option
+    // the pointer is resting on, and a removed node fires no mouseleave, so the
+    // stats card would vanish and not come back until the pointer moved again.
+    // Nothing behind the picker is time-critical, and lastSig is deliberately
+    // left unmoved, so the very next poll after it closes picks the change up.
+    // Scoped to the tab the picker lives on as well as the flag: the flag is
+    // cleared by a focusout that a stray path could skip, and an unscoped skip
+    // would then freeze the browse countdowns for the rest of the session, which
+    // is a worse failure than the flicker it prevents.
+    if (this.tab === 'sell' && this.sellOpen) return;
     const sig = wocMarketViewSig(this.buildModel());
     if (sig === this.lastSig) return;
     this.render();
@@ -302,8 +347,12 @@ export class WocMarketWindow {
       root.addEventListener('mousedown', (e) => this.onComboMouseDown(e as MouseEvent));
       root.addEventListener('mousemove', (e) => this.onComboMouseMove(e as MouseEvent));
       root.addEventListener('keydown', (e) => this.onKeyDown(e as KeyboardEvent));
-      // Closing on focusout keeps the listbox from outliving the control. Guarded
-      // on relatedTarget so moving focus WITHIN the combobox does not close it.
+      // focusin/focusout, NOT focus/blur: only the former pair bubbles, and this
+      // is one delegated listener over a subtree the rebuild replaces wholesale.
+      // Opening on focus is the default the picker wants (see onFocusIn); closing
+      // on focusout keeps the listbox from outliving the control, guarded on
+      // relatedTarget so moving focus WITHIN the combobox does not close it.
+      root.addEventListener('focusin', (e) => this.onFocusIn(e as FocusEvent));
       root.addEventListener('focusout', (e) => this.onFocusOut(e as FocusEvent));
     }
     const model = this.buildModel();
@@ -322,6 +371,16 @@ export class WocMarketWindow {
   private renderInner(root: HTMLElement, model: WocMarketViewModel): void {
     const focusKey = captureFocusKey(root);
     const draft = captureFormDraft(root);
+    // Read every scroll position BEFORE the markup that owns it is thrown away,
+    // and only for the containers whose content this rebuild still describes.
+    const keys = this.scrollKeys(model);
+    const keptScroll: [string, number][] = [];
+    for (const [name, selector] of SCROLL_KEEPERS) {
+      if (keys[name] !== this.renderedScrollKey[name]) continue;
+      const top = root.querySelector<HTMLElement>(selector)?.scrollTop ?? 0;
+      if (top > 0) keptScroll.push([selector, top]);
+    }
+    this.renderedScrollKey = keys;
     // The shared tooltip box is anchored to an element this rebuild is about to
     // destroy. Without this it would hang there pointing at nothing, because a
     // removed node fires no mouseleave.
@@ -329,6 +388,11 @@ export class WocMarketWindow {
     root.innerHTML = this.html(model);
     this.wire(root, model);
     this.attachItemTooltips(root);
+    // After wire(), so the write lands on the container the fresh markup built.
+    for (const [selector, top] of keptScroll) {
+      const el = root.querySelector<HTMLElement>(selector);
+      if (el) el.scrollTop = top;
+    }
     restoreFormDraft(root, draft);
     if (focusKey) {
       // captureFocusKey returns the ATTRIBUTE VALUE, so it must be wrapped in
@@ -677,9 +741,9 @@ export class WocMarketWindow {
       return `<div class="wm-status">${esc(t('hudChrome.wocMarket.sellEmpty'))}</div>`;
     }
     // A searchable dropdown, not a grid of buttons: a full bag is 70+ tradable
-    // items and the flat list pushed the form off the screen. Native <select>
-    // rather than a custom combobox, so keyboard and mobile behaviour come for
-    // free; the search box narrows the option set.
+    // items and the flat list pushed the form off the screen. An empty query
+    // matches everything, so focus alone (onFocusIn) shows the whole list and
+    // typing only narrows it.
     const query = this.sellSearch.trim().toLowerCase();
     const matches = model.sell.rows.filter(
       (r) => query === '' || this.itemName(r.itemId).toLowerCase().includes(query),
@@ -691,7 +755,7 @@ export class WocMarketWindow {
     // sibling documents: DOM focus stays on the input and aria-activedescendant
     // moves, so focusable options would also be dragged into the window's
     // focus-trap cycle.
-    const listId = 'wm-sell-listbox';
+    const listId = SELL_LISTBOX_ID;
     const open = this.sellOpen && selected === null;
     const active =
       open && this.sellActive >= 0 && this.sellActive < matches.length ? this.sellActive : -1;
@@ -701,16 +765,26 @@ export class WocMarketWindow {
             t('hudChrome.wocMarket.sellNoMatches'),
           )}</div>`
         : matches
-            .map(
-              (r, i) =>
+            .map((r, i) => {
+              // The icon carries the same hover stats card as the selected cell,
+              // so a seller can compare candidates without picking one first. The
+              // NAME deliberately does not: a card following the pointer across
+              // every row while scanning a 70-item list is noise, and the icon is
+              // the deliberate target. attachItemTooltips resolves the key.
+              this.tooltipTargets.set(`opt:${r.index}`, {
+                itemId: r.itemId,
+                instance: r.instance,
+              });
+              return (
                 `<div class="wm-combo-item${i === active ? ' wm-combo-active' : ''}" ` +
                 `id="${listId}-o${i}" role="option" aria-selected="${i === active ? 'true' : 'false'}" ` +
                 `data-sell-index="${r.index}" data-opt="${i}">` +
-                `<img class="wm-combo-icon" src="${iconDataUrl('item', r.itemId, 28)}" alt="" />` +
+                `<img class="wm-combo-icon" data-tt-key="opt:${r.index}" src="${iconDataUrl('item', r.itemId, 28)}" alt="" />` +
                 `<span class="wm-combo-name" style="color: ${
                   QUALITY_COLOR[r.quality] ?? 'var(--color-quality-default)'
-                }">${esc(this.itemName(r.itemId))}</span></div>`,
-            )
+                }">${esc(this.itemName(r.itemId))}</span></div>`
+              );
+            })
             .join('');
     const control = selected
       ? // Selected: the item renders INSIDE the control as a real cell, so the
@@ -727,17 +801,22 @@ export class WocMarketWindow {
           t('hudChrome.wocMarket.sellClear', { item: this.itemName(selected.itemId) }),
         )}" title="${esc(t('hudChrome.wocMarket.sellClearTitle'))}">${svgIcon('close')}</button>` +
         `</div>`
-      : `<input type="text" class="wm-combo-input" role="combobox" ` +
+      : `<input type="text" class="wm-combo-input" id="${listId}-input" role="combobox" ` +
         `aria-autocomplete="list" aria-controls="${listId}" aria-expanded="${open}" ` +
         (active >= 0 ? `aria-activedescendant="${listId}-o${active}" ` : '') +
         `autocomplete="off" spellcheck="false" ` +
         `data-field="sell-search" data-focus-key="wm-sell-search" ` +
         `placeholder="${esc(t('hudChrome.wocMarket.sellSearchPlaceholder'))}" ` +
         `value="${esc(this.sellSearch)}" />`;
+    // `for` only while the input exists: once an item is chosen the control is the
+    // chosen cell plus its clear button, and a label pointing at a removed id is
+    // worse than a plain caption.
     const picker =
-      `<label class="wm-sell-pick" for="wm-sell-combo-input">${esc(
-        t('hudChrome.wocMarket.sellChoose'),
-      )}</label>` +
+      (selected
+        ? `<span class="wm-sell-pick">${esc(t('hudChrome.wocMarket.sellChoose'))}</span>`
+        : `<label class="wm-sell-pick" for="${listId}-input">${esc(
+            t('hudChrome.wocMarket.sellChoose'),
+          )}</label>`) +
       `<div class="wm-combo" data-combo>${control}` +
       `<div class="wm-combo-list" id="${listId}" role="listbox" aria-label="${esc(
         // tPlural, not a flat key: "Choose from 1 items" is what a {count}
@@ -1010,7 +1089,9 @@ export class WocMarketWindow {
       case 'move':
         e.preventDefault();
         this.sellActive = action.index;
-        this.render();
+        // In place, not a rebuild: see paintSellActive. Arrowing does not change
+        // which options exist, only which one is highlighted.
+        this.paintSellActive(this.deps.root());
         return;
       case 'select': {
         e.preventDefault();
@@ -1053,7 +1134,62 @@ export class WocMarketWindow {
     // Repaint only on a real change: the pointer fires mousemove continuously.
     if (!Number.isInteger(next) || next === this.sellActive) return;
     this.sellActive = next;
+    // In place, and here it is a CORRECTNESS requirement rather than a saving: a
+    // rebuild would destroy the very option being hovered and take its stats card
+    // with it. See paintSellActive.
+    this.paintSellActive(this.deps.root());
+  }
+
+  /**
+   * Open the full list the moment the control takes focus, before any typing.
+   *
+   * With an empty query every eligible row matches, so this is the whole scrollable
+   * inventory rather than a teaser: the picker behaves like a dropdown you open,
+   * not a search box you have to guess at. A player who does not know what is
+   * listable should not have to type to find out.
+   *
+   * The `rendering` guard is the same one onFocusOut needs and load-bearing for the
+   * same reason: renderInner's focus restore is itself a focus movement into this
+   * input, so without it Escape would close the list and the rebuild it triggers
+   * would immediately reopen it.
+   */
+  private onFocusIn(e: FocusEvent): void {
+    if (this.rendering || this.sellOpen) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.getAttribute('data-field') !== 'sell-search') return;
+    this.sellOpen = true;
+    this.sellActive = -1;
     this.render();
+  }
+
+  /**
+   * Move the highlight IN PLACE, without a rebuild.
+   *
+   * The sibling this copies is social_window's highlightSuggest, and the reason is
+   * not only cost. A rebuild replaces the option the pointer is resting on, and a
+   * removed node fires no mouseleave, so the hover stats card would be hidden and
+   * then never re-shown: mouseenter does not fire again on the replacement while
+   * the pointer sits still. Repainting the highlight instead leaves the hovered
+   * option, and its tooltip binding, alive.
+   *
+   * scrollIntoView is a scroll COMMAND, not one of the forced-reflow reads the
+   * cold contract counts, and it is what the sibling combobox uses for exactly
+   * this case. It is needed here: the list opens at full length, so arrowing down
+   * leaves the visible 240px almost immediately.
+   */
+  private paintSellActive(root: HTMLElement): void {
+    const input = root.querySelector<HTMLElement>('[data-field="sell-search"]');
+    for (const option of root.querySelectorAll<HTMLElement>('[data-opt]')) {
+      const on = Number(option.dataset.opt) === this.sellActive;
+      option.classList.toggle('wm-combo-active', on);
+      option.setAttribute('aria-selected', on ? 'true' : 'false');
+      if (on) option.scrollIntoView({ block: 'nearest' });
+    }
+    // aria-activedescendant is what a screen reader follows while DOM focus stays
+    // on the input, so it has to move with the class or the two disagree.
+    if (this.sellActive >= 0) {
+      input?.setAttribute('aria-activedescendant', `${SELL_LISTBOX_ID}-o${this.sellActive}`);
+    } else input?.removeAttribute('aria-activedescendant');
   }
 
   /**
@@ -1079,6 +1215,14 @@ export class WocMarketWindow {
     this.sellOpen = false;
     this.sellActive = -1;
     this.render();
+  }
+
+  /** What each preserved scroll offset currently refers to. The detail key folds
+   *  in the selected listing as well as the tab, because an offset taken in one
+   *  listing's pane means nothing in another's. */
+  private scrollKeys(model: WocMarketViewModel): WocMarketScrollKeys {
+    const listing = model.kind === 'ready' ? model.browse.detail?.row.id : undefined;
+    return { body: this.tab, detail: `${this.tab}:${listing ?? ''}` };
   }
 
   /** The rows the current query matches. One definition, used by the markup and

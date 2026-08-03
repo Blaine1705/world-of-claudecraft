@@ -26,7 +26,11 @@ const GAME_URL = process.env.GAME_URL ?? 'http://localhost:5173';
 const SERVER_URL = process.env.SERVER_URL ?? 'http://localhost:8787';
 const WS_BASE = SERVER_URL.replace(/^http/, 'ws');
 const OUT = process.env.SHOTS_DIR ?? 'docs/screenshots/woc-market';
+// TWO listings, because a listing is an auction XOR a buy-now now that the
+// combined format is no longer creatable: one of each is what makes the detail
+// pane's bid form and its Buy now button both reachable in a capture.
 const EPIC_ITEM = 'deathlord_warplate';
+const BUY_NOW_ITEM = 'wyrmshadow_harness';
 fs.mkdirSync(OUT, { recursive: true });
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -108,33 +112,49 @@ async function seedSellerListing() {
     });
     ws.on('error', reject);
   });
-  // The epic arrives by dev cheat (ALLOW_DEV_COMMANDS server), then the REAL
-  // listing flow escrows it out of the live bags. The inventory index is not
+  // The epics arrive by dev cheat (ALLOW_DEV_COMMANDS server), then the REAL
+  // listing flow escrows them out of the live bags. The inventory index is not
   // knowable from out here, so walk indexes until the server accepts one.
-  ws.send(JSON.stringify({ t: 'cmd', cmd: 'chat', text: `/dev give ${EPIC_ITEM}` }));
-  await sleep(1500);
-  let listed = false;
-  for (let index = 0; index < 40 && !listed; index++) {
-    const out = await api(
-      '/api/woc-market/listings',
-      {
-        characterId,
-        itemIndex: index,
-        itemId: EPIC_ITEM,
-        format: 'auction_buy_now',
-        startCents: 2500,
-        reserveCents: 10000,
-        buyNowCents: 25000,
-        durationHours: 24,
-        offerNext: true,
-      },
-      token,
-    );
-    if (out.status === 200) listed = true;
+  for (const item of [EPIC_ITEM, BUY_NOW_ITEM]) {
+    ws.send(JSON.stringify({ t: 'cmd', cmd: 'chat', text: `/dev give ${item}` }));
+    await sleep(800);
+  }
+  await sleep(1200);
+  // An AUCTION carries a reserve and no buy-now price, and a BUY-NOW carries the
+  // price and no reserve: the rules refuse any other pairing, so these are the
+  // only two shapes a new listing can take.
+  const shapes = [
+    { itemId: EPIC_ITEM, format: 'auction', reserveCents: 10000, buyNowCents: null },
+    { itemId: BUY_NOW_ITEM, format: 'buy_now', reserveCents: null, buyNowCents: 25000 },
+  ];
+  const listed = [];
+  for (const shape of shapes) {
+    for (let index = 0; index < 40; index++) {
+      const out = await api(
+        '/api/woc-market/listings',
+        {
+          characterId,
+          itemIndex: index,
+          startCents: 2500,
+          durationHours: 24,
+          offerNext: true,
+          ...shape,
+        },
+        token,
+      );
+      if (out.status === 200) {
+        listed.push(shape.format);
+        break;
+      }
+    }
   }
   ws.close();
-  if (!listed) throw new Error('seller listing never landed; is WOC_MARKET_ENABLED=1 set?');
-  console.log(`seller ${username} listed ${EPIC_ITEM}`);
+  if (listed.length < shapes.length) {
+    throw new Error(
+      `seller listed only [${listed.join(', ')}]; is WOC_MARKET_ENABLED=1 set on the server?`,
+    );
+  }
+  console.log(`seller ${username} listed ${listed.join(' + ')}`);
 }
 
 // The exemplar flow from scripts/social_landscape_online_shot.mjs, verbatim
@@ -358,12 +378,22 @@ async function main() {
     if (tab instanceof HTMLElement) tab.click();
   });
   await sleep(600);
+  // The picker is a combobox now, not a grid of .wm-sell-item buttons. Focus
+  // ALONE opens the full list (the delegated focusin arm), and an option commits
+  // on MOUSEDOWN rather than click, because the options are non-focusable divs
+  // and a click would blur the input first.
   await page.evaluate(() => {
-    const item = document.querySelector('#woc-market-window .wm-sell-item');
-    if (item instanceof HTMLElement) item.click();
+    document.querySelector('#woc-market-window .wm-combo-input')?.focus();
   });
-  await sleep(600);
+  await sleep(700);
   await shoot(page, 'after-desktop-sell.png');
+  await page.evaluate(() => {
+    document
+      .querySelector('#woc-market-window .wm-combo-item')
+      ?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+  });
+  await sleep(700);
+  await shoot(page, 'after-desktop-sell-selected.png');
   await page.close();
 
   // Mobile landscape (in-game mobile is landscape-only on the web client).
