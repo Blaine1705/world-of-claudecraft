@@ -45,7 +45,12 @@ const richTerrainSplat = (): boolean =>
 import { getGrassGroundBake } from './grass_ground_bake';
 import { idleSlot } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
-import { GRASS_BAKE_PATCH_YARDS, GRASS_PAINT_GAIN } from './meadow_tuning';
+import {
+  GRASS_BAKE_PATCH_YARDS,
+  GRASS_PAINT_GAIN,
+  GRASS_PAINT_NEAR_END,
+  GRASS_PAINT_NEAR_START,
+} from './meadow_tuning';
 import {
   beginChunkGeometry,
   type ChunkGeometryArrays,
@@ -553,6 +558,39 @@ const float WOC_GRASS_HEIGHT_SHADE = 0.10;
 const float WOC_GRASS_RECESS_SAT = 0.12;
 `;
 
+// Underfoot, the baked blade artwork stops being grass and becomes a drawing
+// of grass: the strokes are a top-down render of a whole cluster field, so at
+// a couple of yards they read as wallpaper printed on the soil, on exactly
+// the ground the real blade carpet already stands on. Within
+// GRASS_PAINT_NEAR_START the near ground therefore shows the PLAIN splat
+// grass layer (the pre-meadow default), and the paint reaches full strength
+// only by GRASS_PAINT_NEAR_END. Camera distance, so the ramp never marks the
+// world; near terrain only, because the far tiles are never seen this close
+// and their distance-free paint gate is what keeps the vista identical to the
+// near ground.
+//
+// Level continuity is constructed, not eyeballed: the plain layer is divided
+// by its own top mip (average exactly 1 in whatever space the sampler
+// decodes) and lifted to the bake's measured mean, then takes the SAME vertex
+// tint and paint gain the bake takes. The meadow's average colour is
+// unchanged at every point of the ramp, so the band blades' ground-sunk bases
+// still match the pixel under them and no brightness ring travels with the
+// player.
+//
+// Two taps, not the legacy octave stack: at full plain strength the camera is
+// inside about six yards, barely one repeat of the 4.5-yard tuv period, so the
+// rotated anti-tiling octave has nothing to hide and the layer that WOULD show
+// a repeat (the mid field) is already back on the paint.
+const GRASS_NEAR_PLAIN_GLSL = `
+          float wocPaintT = smoothstep(${GRASS_PAINT_NEAR_START.toFixed(1)}, ${GRASS_PAINT_NEAR_END.toFixed(1)}, wocCamDist);
+          if ( wocPaintT < 0.999 ) {
+            // the top-mip tap is the photo layer's own average, so the divide
+            // leaves a mean of exactly 1 before the bake mean lifts it
+            vec3 wocPlainAlb = texture2D(uGrass, tuv).rgb * uGrassBakeMean
+              / max(texture2D(uGrass, tuv, 20.0).rgb, vec3(1e-4));
+            grassAlb = mix(wocPlainAlb, grassAlb, wocPaintT);
+          }`;
+
 // The meadow-continuum grass layer: when the ground bake exists, the grass
 // albedo is the BAKED blade artwork (grass_ground_bake.ts) sampled ONCE at
 // true world scale, replacing the photo octave stack. No rescaled octaves:
@@ -578,7 +616,7 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         vec2 combT = vec2(dot(tuv, combDir) * WOC_COMB_COMPRESS, dot(tuv, combPerp));
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
-          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale} + grassJitter).rgb;
+          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale} + grassJitter).rgb;${GRASS_NEAR_PLAIN_GLSL}
           float bakeHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
           grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, bakeHueT);
         }`
@@ -588,7 +626,7 @@ function grassBakeAlbedoGlsl(rich: boolean): string {
         vec2 combPerp = vec2(0.0, 1.0);
         vec3 grassAlb = vec3(0.0);
         if ( wocHasGrass ) {
-          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale}).rgb;
+          grassAlb = texture2D(uGrassBake, vWPos.xz * ${uvScale}).rgb;${GRASS_NEAR_PLAIN_GLSL}
         }`;
   return comb;
 }
@@ -633,7 +671,16 @@ function buildSplatMaterial(
       uMacro: { value: macro },
       uGroundAO: { value: t.groundAO },
     });
-    if (grassBake) sh.uniforms.uGrassBake = { value: grassBake.texture };
+    if (grassBake) {
+      sh.uniforms.uGrassBake = { value: grassBake.texture };
+      // The bake's own measured mip-average, the level the near plain layer
+      // is lifted to so the paint fade cannot move the meadow's tone (see
+      // GRASS_NEAR_PLAIN_GLSL). Same number the band blades sink their bases
+      // toward, straight from the bake, never hand-matched.
+      sh.uniforms.uGrassBakeMean = {
+        value: new THREE.Vector3(grassBake.mean[0], grassBake.mean[1], grassBake.mean[2]),
+      };
+    }
     sh.vertexShader = sh.vertexShader
       .replace(
         '#include <common>',
@@ -671,7 +718,7 @@ function buildSplatMaterial(
         varying vec3 vWPos;
         varying vec3 vWNorm;
         uniform sampler2D uGrass, uGrassN, uDirt, uDirtN, uRock, uRockN, uSand, uSandN, uMud, uSnow, uMacro, uGroundAO;
-        ${grassBake ? 'uniform sampler2D uGrassBake;' : ''}
+        ${grassBake ? 'uniform sampler2D uGrassBake;\n        uniform vec3 uGrassBakeMean;' : ''}
         ${GROUND_RELIEF_GLSL}
         ${BRUSH_RING_GLSL}`,
       )
