@@ -35,8 +35,7 @@ const GODRAYS = process.env.GODRAYS ?? 'on';
 // LEAN=0 for the grass shots: leanFoliage is exactly what thins the painted
 // meadow, so a grass-paint capture taken under it proves nothing.
 const LEAN = process.env.LEAN !== '0';
-const QUERY =
-  GFX === 'ultra' ? '?gfx=ultra' : `?gfx=${GFX}${LEAN ? '&gfxo=leanFoliage:1' : ''}`;
+const QUERY = GFX === 'ultra' ? '?gfx=ultra' : `?gfx=${GFX}${LEAN ? '&gfxo=leanFoliage:1' : ''}`;
 const URL = BASE + QUERY;
 
 // Every shot: name, world spot, camera, and which time-of-day batch owns it.
@@ -60,17 +59,73 @@ const SHOTS = [
   },
   // Shore water tearing: low grazing camera along four beaches that showed
   // foam shards sitting on dry sand.
-  { name: 'water-tear-a', time: 'day', x: -100, z: 345, facing: Math.PI, camPitch: 0.02, camDist: 7 },
-  { name: 'water-tear-b', time: 'day', x: -272, z: 367, facing: -Math.PI / 2, camPitch: 0.02, camDist: 7 },
-  { name: 'water-tear-c', time: 'day', x: -158, z: 1250, facing: Math.PI, camPitch: 0.02, camDist: 7 },
-  { name: 'water-tear-d', time: 'day', x: 245, z: 720, facing: Math.PI / 2, camPitch: 0.02, camDist: 7 },
+  {
+    name: 'water-tear-a',
+    time: 'day',
+    x: -100,
+    z: 345,
+    facing: Math.PI,
+    camPitch: 0.02,
+    camDist: 7,
+  },
+  {
+    name: 'water-tear-b',
+    time: 'day',
+    x: -272,
+    z: 367,
+    facing: -Math.PI / 2,
+    camPitch: 0.02,
+    camDist: 7,
+  },
+  {
+    name: 'water-tear-c',
+    time: 'day',
+    x: -158,
+    z: 1250,
+    facing: Math.PI,
+    camPitch: 0.02,
+    camDist: 7,
+  },
+  {
+    name: 'water-tear-d',
+    time: 'day',
+    x: 245,
+    z: 720,
+    facing: Math.PI / 2,
+    camPitch: 0.02,
+    camDist: 7,
+  },
   // The open channel: does a straight heave-vs-flat water line still show?
   { name: 'gap-line', time: 'day', x: 180, z: 1963, facing: Math.PI, camPitch: 0.08, camDist: 8 },
   // Waterline softness: top-down over a sandy beach, water thinning over sand.
-  { name: 'waterline-soft', time: 'day', x: -100, z: 349, facing: Math.PI, camPitch: 1.15, camDist: 14 },
+  {
+    name: 'waterline-soft',
+    time: 'day',
+    x: -100,
+    z: 349,
+    facing: Math.PI,
+    camPitch: 1.15,
+    camDist: 14,
+  },
   // Near-grass ring: plain turf underfoot, painted meadow beyond, no white ground.
-  { name: 'grass-ring-vale-chase', time: 'day', x: 22, z: 44, facing: 0.6, camPitch: 0.14, camDist: 8 },
-  { name: 'grass-ring-vale-top', time: 'day', x: 22, z: 44, facing: 0.6, camPitch: 1.25, camDist: 16 },
+  {
+    name: 'grass-ring-vale-chase',
+    time: 'day',
+    x: 22,
+    z: 44,
+    facing: 0.6,
+    camPitch: 0.14,
+    camDist: 8,
+  },
+  {
+    name: 'grass-ring-vale-top',
+    time: 'day',
+    x: 22,
+    z: 44,
+    facing: 0.6,
+    camPitch: 1.25,
+    camDist: 16,
+  },
   { name: 'grass-ring-town', time: 'day', x: 13, z: 15, facing: 1.9, camPitch: 0.18, camDist: 9 },
 
   // --- night ------------------------------------------------------------
@@ -84,9 +139,25 @@ const SHOTS = [
   // z=-186 and beyond is already open sea (the client starts nagging you to swim
   // back), so these sit up on the sand at z=-172. Facing PI/2 is WEST here, which
   // is where the setting sun actually is: facing south just shoots empty sky.
-  { name: 'dusk-sprites', time: '0.28', x: -40, z: -172, facing: Math.PI / 2, camPitch: 0.06, camDist: 10 },
+  {
+    name: 'dusk-sprites',
+    time: '0.28',
+    x: -40,
+    z: -172,
+    facing: Math.PI / 2,
+    camPitch: 0.06,
+    camDist: 10,
+  },
   // Sunset over water: deep amber, no clipped white sky bands.
-  { name: 'sunset-crossing', time: '0.65', x: -40, z: -155, facing: Math.PI / 2, camPitch: 0.1, camDist: 10 },
+  {
+    name: 'sunset-crossing',
+    time: '0.65',
+    x: -40,
+    z: -155,
+    facing: Math.PI / 2,
+    camPitch: 0.1,
+    camDist: 10,
+  },
 ];
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -199,9 +270,12 @@ if (PROBE) {
     const w = g.sim?.world ?? g.sim;
     const out = { keys: Object.keys(g), towns: null, zones: null, biome: null };
     try {
-      out.towns = (w.zones ?? w.getZones?.() ?? [])
-        .slice(0, 12)
-        .map((z) => ({ id: z.id, name: z.name, x: z.hub?.x ?? z.center?.x, z: z.hub?.z ?? z.center?.z }));
+      out.towns = (w.zones ?? w.getZones?.() ?? []).slice(0, 12).map((z) => ({
+        id: z.id,
+        name: z.name,
+        x: z.hub?.x ?? z.center?.x,
+        z: z.hub?.z ?? z.center?.z,
+      }));
     } catch (e) {
       out.towns = String(e);
     }
@@ -420,7 +494,9 @@ if (batch.length === 0) {
   process.exit(2);
 }
 
-await page.evaluate(() => { window.__shotGame = window.__game; });
+await page.evaluate(() => {
+  window.__shotGame = window.__game;
+});
 await setTimeOfDay(TIME);
 
 if (GODRAYS === 'off') {
