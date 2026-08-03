@@ -439,12 +439,15 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     if (!activity) continue;
     const applied = info.myApplication?.listingId === listing.id;
     const mine = info.myListing?.id === listing.id;
+    const locked = lockoutMinutesFor(activity, input.lockouts) > 0;
     // Hide a listing for the group I am ALREADY part of, whether I lead it
     // (mine) or I am one of the leader's party members browsing the same
-    // board (matched by leader name: the board carries no member pids).
+    // board (matched by leader name: the board carries no member pids). A
+    // leader's own locked listing stays visible so the Open listings tab still
+    // has the row they need to inspect/manage after the run locks them.
     const alreadyInGroup =
       mine || (input.partyLeaderName !== null && listing.leaderName === input.partyLeaderName);
-    if (alreadyInGroup) continue;
+    if (alreadyInGroup && !(mine && locked)) continue;
     // Issue #2030: a listing for a dungeon/raid I am currently locked out of
     // is not something I can usefully apply to, and showing it invites a
     // player to join a group only to discover the lockout at the door. Hide
@@ -456,7 +459,7 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // while locked out, so its row (and withdraw control) keep existing:
     // otherwise a pending application could never be withdrawn once the
     // lockout landed.
-    if (!applied && !mine && lockoutMinutesFor(activity, input.lockouts) > 0) continue;
+    if (!applied && !mine && locked) continue;
     const blocked = blockReasonFor(activity, level, specRole);
     const roleFit =
       activity.composition === null || info.roles.some((r) => (listing.needed?.[r] ?? 0) > 0);
