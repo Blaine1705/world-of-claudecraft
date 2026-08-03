@@ -336,6 +336,7 @@ import {
 } from './mount_race';
 import {
   forceDismount as forceDismountImpl,
+  mountOwned,
   ownedMounts as ownedMountsImpl,
   toggleMount as toggleMountImpl,
   updateMountTransition,
@@ -8953,8 +8954,21 @@ export class Sim {
   extractTradableCopy(pid: number | undefined, ref: ExtractRef): ExtractOutcome {
     const r = this.resolve(pid);
     if (!r) return { ok: false, reason: 'not_found' };
-    const out = extractTradableCopy(r.meta.inventory, ref, ITEMS[ref.itemId]);
-    if (out.ok) this.ctx.onInventoryChangedForQuests(r.meta);
+    const def = ITEMS[ref.itemId];
+    const out = extractTradableCopy(r.meta.inventory, ref, def);
+    if (out.ok) {
+      this.ctx.onInventoryChangedForQuests(r.meta);
+      // Escrow is the FIRST way a mount can leave a player's possession: reins
+      // are soulbound and noDiscard, so before the Exchange traded them nothing
+      // could remove one from the bags or the bank. Ownership is derived from
+      // holding the item (mountOwned), but a live ride is never re-validated
+      // once it has started, so a seller who lists the mount under themselves
+      // would keep its speed for the rest of the session while the buyer owned
+      // it. Dismount them here, at the one point where ownership actually ends.
+      if (def?.kind === 'mount' && r.e.mountKey === def.mount && !mountOwned(r.meta, def.mount)) {
+        forceDismountImpl(this.ctx, r.e);
+      }
+    }
     return out;
   }
 

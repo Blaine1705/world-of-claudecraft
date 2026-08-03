@@ -242,4 +242,64 @@ describe('Sim.extractTradableCopy (facade delegate)', () => {
       reason: 'not_found',
     });
   });
+
+  // Escrow is the first way a mount can leave a player at all: reins are
+  // soulbound AND noDiscard, so nothing could remove one before the Exchange
+  // traded them. A live ride is never re-validated once started, so without this
+  // the seller keeps the mount's speed for the rest of the session.
+  const mountFixture = (): { itemId: string; key: string } => {
+    const itemId = Object.keys(ITEMS).find((id) => ITEMS[id].kind === 'mount');
+    if (!itemId) throw new Error('no mount item in ITEMS');
+    const mount = (ITEMS[itemId] as { mount?: string }).mount;
+    if (!mount) throw new Error('mount item carries no mount key');
+    return { itemId, key: mount };
+  };
+
+  it('dismounts a seller who escrows the mount they are RIDING', () => {
+    const { itemId, key } = mountFixture();
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    const meta = sim.players.get(pid)!;
+    const entity = sim.entities.get(pid)!;
+    sim.addItem(itemId, 1, pid);
+    entity.mountKey = key;
+    const index = meta.inventory.findIndex((s) => s.itemId === itemId);
+    const out = sim.extractTradableCopy(pid, { index, itemId });
+    expect(out.ok).toBe(true);
+    expect(entity.mountKey).toBe('');
+  });
+
+  it('leaves the rider mounted when a BANK copy still confers ownership', () => {
+    // mountOwned reads the bags AND the bank, so a seller listing one of two
+    // copies still owns the mount and must keep riding it. Dismounting on any
+    // mount extraction would punish exactly the player who did nothing wrong.
+    const { itemId, key } = mountFixture();
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    const meta = sim.players.get(pid)!;
+    const entity = sim.entities.get(pid)!;
+    sim.addItem(itemId, 1, pid);
+    meta.bank.inventory.push({ itemId, count: 1 });
+    entity.mountKey = key;
+    const index = meta.inventory.findIndex((s) => s.itemId === itemId);
+    expect(sim.extractTradableCopy(pid, { index, itemId }).ok).toBe(true);
+    expect(entity.mountKey).toBe(key);
+  });
+
+  it('does not touch the ride when the escrowed item is a DIFFERENT mount', () => {
+    const { itemId, key } = mountFixture();
+    const other = Object.keys(ITEMS).find(
+      (id) => ITEMS[id].kind === 'mount' && (ITEMS[id] as { mount?: string }).mount !== key,
+    );
+    if (!other) throw new Error('need a second mount item');
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Rider');
+    const meta = sim.players.get(pid)!;
+    const entity = sim.entities.get(pid)!;
+    sim.addItem(other, 1, pid);
+    entity.mountKey = key;
+    const index = meta.inventory.findIndex((s) => s.itemId === other);
+    expect(sim.extractTradableCopy(pid, { index, itemId: other }).ok).toBe(true);
+    expect(entity.mountKey).toBe(key);
+  });
 });
