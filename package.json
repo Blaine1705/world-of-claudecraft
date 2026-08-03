@@ -1,6 +1,6 @@
 {
   "name": "world-of-claudecraft",
-  "version": "0.33.0",
+  "version": "0.33.1",
   "private": true,
   "license": "MIT",
   "author": {
@@ -42,7 +42,7 @@
     "check:fix": "biome check --write .",
     "ci:changed": "biome ci --changed --no-errors-on-unmatched",
     "check:admin": "svelte-check --tsconfig ./tsconfig.admin.json",
-    "check:ts": "tsc --noEmit",
+    "check:ts": "tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc/buildinfo.json",
     "check:types": "npm run check:ts && npm run check:admin",
     "pretest": "npm run i18n:build && npm run i18n:admin && npm run i18n:scan && npm run wiki:content",
     "test": "vitest run",

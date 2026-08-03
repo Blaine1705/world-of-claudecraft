@@ -2065,6 +2065,22 @@
     border-color: #6f5a2a;
     background: linear-gradient(#2a2436, #161220);
   }
+  /* Drag-to-reorder affordance, matching the bags' grab/drop-target language
+     (components.css `.bag-item[draggable="true"]` / `.bag-item.drop-target`)
+     so the gesture reads as intentional rather than a blind drop. */
+  /* Matches the specificity of the `#chatlog-tabs .chat-tab` cursor rule below
+     so the grab cursor actually wins instead of losing to it on ID weight. */
+  #chatlog-tabs .chat-tab[draggable="true"] {
+    cursor: var(--cursor-grab);
+  }
+  .chat-tab.chat-tab-dragging {
+    opacity: 0.45;
+  }
+  .chat-tab.drop-target {
+    outline: 2px dashed rgba(255, 218, 160, 0.85);
+    outline-offset: -2px;
+    box-shadow: 0 0 10px rgba(202, 164, 114, 0.45);
+  }
   /* "add channel" (+) tab: square, icon-only, slightly de-emphasised. Sticks to
      the right edge so it stays inline and reachable even when the tabs scroll. */
   .chat-tab-add {

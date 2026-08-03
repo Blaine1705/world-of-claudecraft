@@ -434,6 +434,7 @@ export type { MailSave } from './mail/post_office';
 export type { MarketSave } from './market';
 
 import { updateSwimFatigue } from './fatigue';
+import type { CombatExitMemory } from './instance_exit_memory';
 import { chainPullInstanceOnBossAggro } from './instances/boss_chain_pull';
 import {
   applyDungeonMobTuning,
@@ -985,6 +986,12 @@ export interface InstanceSlot {
   // when they actually entered this run: a door-camper or a member parked in
   // town takes the lockout without turning roster membership into mailed income.
   enteredBy: Set<number>;
+  // Recently-exited-mid-combat memory (issue #2653): a player who left this claim
+  // while a mob was actively fighting them has their dropped threat snapshotted
+  // here for a short window. Re-entering before it lapses resumes the fight
+  // instead of granting a free, unengaged reset (instances/dungeons.ts). Session
+  // state, cleared with the claim, same as clearedBy/enteredBy above.
+  combatExitMemory: CombatExitMemory;
 }
 
 export interface ResolvedAbility {
@@ -2060,6 +2067,7 @@ export class Sim {
             resetAvailableAt: 0,
             clearedBy: new Set(),
             enteredBy: new Set(),
+            combatExitMemory: new Map(),
           });
         }
         continue;
@@ -2090,6 +2098,7 @@ export class Sim {
           resetAvailableAt: 0,
           clearedBy: new Set(),
           enteredBy: new Set(),
+          combatExitMemory: new Map(),
         });
       }
     }
@@ -2208,6 +2217,7 @@ export class Sim {
         progressed: false,
         seqResetAt: -Infinity,
         bossDeathZones: [],
+        combatExitMemory: new Map(),
       });
     }
 
@@ -3723,6 +3733,14 @@ export class Sim {
       }
     }
     deedsMod.markDeedsDirty(this.ctx, pid); // soc_guild_joined reads the stamped name
+  }
+
+  /** Rename an existing guild identity without applying leave/join semantics. */
+  renamePlayerGuild(pid: number, oldName: string, newName: string): void {
+    const e = this.entities.get(pid);
+    if (!e || e.guild !== oldName) return;
+    valeCupMod.vcupRenameGuild(this.ctx, pid, oldName, newName);
+    e.guild = newName;
   }
 
   /** Cosmetic skin-select event: rolls a rarity rank (once) and emits the
@@ -7743,8 +7761,32 @@ export class Sim {
     return items.useItem(this.ctx, itemId, pid);
   }
 
-  buyItem(npcId: number, itemId: string, pid?: number): void {
-    items.buyItem(this.ctx, npcId, itemId, pid);
+  // Two overloads, same trick as buyBackItem below: the IWorld shape UI/production
+  // code calls (npcId, itemId, bulk?) versus the legacy test/server shape that
+  // already threads a pid positionally in the third slot (npcId, itemId, pid?).
+  // Disambiguated by typeof so every existing `sim.buyItem(npc, item, pid)` call
+  // site keeps working unchanged.
+  buyItem(npcId: number, itemId: string, bulk?: boolean): void;
+  buyItem(npcId: number, itemId: string, pid?: number, bulk?: boolean): void;
+  buyItem(
+    npcId: number,
+    itemId: string,
+    bulkOrPid?: boolean | number,
+    pidOrBulk?: number | boolean,
+  ): void {
+    const pid =
+      typeof bulkOrPid === 'number'
+        ? bulkOrPid
+        : typeof pidOrBulk === 'number'
+          ? pidOrBulk
+          : undefined;
+    const bulk =
+      typeof bulkOrPid === 'boolean'
+        ? bulkOrPid
+        : typeof pidOrBulk === 'boolean'
+          ? pidOrBulk
+          : undefined;
+    items.buyItem(this.ctx, npcId, itemId, pid, bulk);
   }
 
   sellItem(itemId: string, count = 1, pid?: number): void {

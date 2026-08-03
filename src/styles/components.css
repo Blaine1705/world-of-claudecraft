@@ -5170,6 +5170,15 @@
   .vendor-item:disabled:hover {
     background: transparent;
   }
+  /* Bulk ("Buy Stack") tile (#2374): a plain sibling tile beside the ordinary
+     single-unit buy tile (never a nested <button> inside it), so a gold top
+     accent is the only cue distinguishing the two at a glance. */
+  .vendor-item-bulk {
+    border-top: 2px solid var(--gold);
+  }
+  .vendor-item-bulk .vi-name {
+    color: var(--gold);
+  }
   .vendor-sell-junk {
     display: flex;
     align-items: center;

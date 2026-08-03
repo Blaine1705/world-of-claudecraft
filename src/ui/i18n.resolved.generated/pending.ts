@@ -9,25 +9,130 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "es_ES": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "fr_FR": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "fr_CA": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "de_DE": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "zh_CN": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "zh_TW": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "ko_KR": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "ja_JP": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "pt_BR": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "ru_RU": [
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "cs_CZ": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "nl_NL": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "pl_PL": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "id_ID": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "tr_TR": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "sv_SE": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "vi_VN": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ],
+  "da_DK": [
+    "hud.core.chatChannels.moveHint",
+    "hud.prompts.guildInviteCancelled",
+    "hud.prompts.guildRenamed",
+    "itemUi.vendor.buyStack",
+    "itemUi.vendor.buyStackAria"
+  ]
 };

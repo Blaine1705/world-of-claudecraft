@@ -1599,6 +1599,16 @@ export class GameServer {
     return this.sessionsByCharacterId.has(characterId);
   }
 
+  // Cheap admin readout: character ids with a live socket only. Linkdead
+  // sessions stay resident for resume semantics but are not shown as online.
+  liveCharacterIds(): Set<number> {
+    const ids = new Set<number>();
+    for (const session of this.sessionsByCharacterId.values()) {
+      if (!session.linkdead && session.ws.readyState === 1) ids.add(session.characterId);
+    }
+    return ids;
+  }
+
   // -------------------------------------------------------------------------
   // Social presence/transport: bridges the persistent SocialService to the
   // live client map + sim. Keyed by character id (stable across sessions),
@@ -1933,6 +1943,17 @@ export class GameServer {
       },
       pushSnapshot: (id) => {
         void this.sendSocialSnapshot(id);
+      },
+      onGuildRenamed: (id, guildId, oldName, newName) => {
+        const s = this.sessionByCharacterId(id);
+        if (!s) return;
+        // Vale Cup banner/credit identity moves before the live entity stamp;
+        // this is a rename, never a leave/rejoin or a deed transition.
+        this.sim.renamePlayerGuild(s.pid, oldName, newName);
+        this.send(s, {
+          t: 'events',
+          list: [{ type: 'guildRenamed', guildId, newName }],
+        });
       },
       onBlocksChanged: (id, ids) => {
         const s = this.sessionByCharacterId(id);
@@ -3112,8 +3133,14 @@ export class GameServer {
     // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
     // join. Without this, a mid-session save that already landed durably would
     // be clobbered by the stale join-time snapshot once lastSent resets below
-    // forces a resend.
-    session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    // forces a resend. Only refresh when the caller actually supplies a layout:
+    // ws_auth.ts always does on the real reconnect path, but an in-process/test
+    // caller that omits it (meta = {}) must keep the session's saved value
+    // rather than being reset to null, matching the sibling bankBonus
+    // "absent means keep" pattern above.
+    if (meta.hotbarLayout !== undefined) {
+      session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
@@ -4454,7 +4481,7 @@ export class GameServer {
         break;
       case 'buy':
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(msg.npc, msg.item, pid);
+          sim.buyItem(msg.npc, msg.item, pid, msg.bulk === true);
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
@@ -5448,6 +5475,13 @@ export class GameServer {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.item === 'string') {
           const count = typeof msg.count === 'number' ? msg.count : 1;
           sim.addItem(msg.item, Math.max(1, Math.min(20, count | 0)), pid);
+        }
+        break;
+      }
+      case 'dev_profiler_invulnerable': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') {
+          const entity = sim.entities.get(pid);
+          if (entity) entity.profilerInvulnerable = true;
         }
         break;
       }

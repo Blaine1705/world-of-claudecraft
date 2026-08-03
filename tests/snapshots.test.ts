@@ -2184,6 +2184,39 @@ describe('client-side delta merge', () => {
     expect(aura?.empowerAbilities).toEqual(['smite']);
   });
 
+  it('round-trips the Lingering Dread marker and clears it in place when the wire omits it', () => {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: true });
+    const e = sim.entities.get(sim.playerId)!;
+    const fearAura: Aura = {
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'incapacitate',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: e.id,
+      school: 'shadow',
+      breakThreshold: 25,
+    };
+    e.auras.push(fearAura);
+    const wired = wireEntity(e) as { auras: { id: string; bt?: 1 }[] };
+    expect(wired.auras.find((a) => a.id === 'fear_incap')?.bt).toBe(1);
+
+    const client = bareClient(e.id + 1000);
+    const apply = (): void => {
+      const snap = JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] }));
+      (client as any).applySnapshot(snap);
+    };
+    apply();
+    const mirrored = client.entities.get(e.id)!.auras.find((a) => a.id === 'fear_incap')!;
+    expect(mirrored.breakThreshold).toBe(1);
+
+    fearAura.breakThreshold = undefined;
+    apply();
+    expect(client.entities.get(e.id)!.auras.find((a) => a.id === 'fear_incap')).toBe(mirrored);
+    expect(mirrored.breakThreshold).toBeUndefined();
+  });
+
   it('snaps the interpolation anchor on a teleport but tweens normal moves', () => {
     const client = bareClient(1);
     const ent = (x: number, z: number) => ({
@@ -2427,6 +2460,73 @@ describe('guild nameplate wire', () => {
     // a later full record without `gd` means "no guild" → reset to ''
     (client as any).applySnapshot({ t: 'snap', ents: [base] });
     expect(client.entities.get(7)?.guild).toBe('');
+  });
+
+  it('patches only the matching social guild from a structured rename event', () => {
+    const client = bareClient(99);
+    client.socialInfo = {
+      friends: [],
+      blocks: [],
+      ignores: [],
+      guild: {
+        id: 7,
+        name: 'Silver Hand',
+        rank: 'member',
+        motd: '',
+        motdSetBy: '',
+        members: [],
+        events: [],
+      },
+    };
+    (client as any).socialDirty = false;
+    const internals = client as unknown as { onMessage(raw: string): void };
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'events',
+        list: [{ type: 'guildRenamed', guildId: 7, newName: 'Dawn Guard' }],
+      }),
+    );
+
+    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.consumeSocialChanged()).toBe(true);
+
+    internals.onMessage(
+      JSON.stringify({
+        t: 'events',
+        list: [{ type: 'guildRenamed', guildId: 8, newName: 'Wrong Guild' }],
+      }),
+    );
+    expect(client.socialInfo.guild?.name).toBe('Dawn Guard');
+    expect(client.consumeSocialChanged()).toBe(false);
+  });
+
+  it('stamps the live server entity and emits one event without a social snapshot', () => {
+    const server = new GameServer();
+    const socialSnapshot = vi.spyOn(server as any, 'sendSocialSnapshot');
+    const socket = fakeWs();
+    const session = joinServer(server, socket, 71, 'Brae');
+    server.sim.setPlayerGuild(session.pid, 'Silver Hand');
+    socialSnapshot.mockClear();
+    socket.sent.length = 0;
+
+    server.social.guildRenamed(7, 'Silver Hand', 'Dawn Guard', [session.characterId]);
+
+    expect(server.sim.entities.get(session.pid)?.guild).toBe('Dawn Guard');
+    expect(socket.sent).toContainEqual({
+      t: 'events',
+      list: [{ type: 'guildRenamed', guildId: 7, newName: 'Dawn Guard' }],
+    });
+    expect(socialSnapshot).not.toHaveBeenCalled();
+  });
+
+  it('reports only socket-connected character ids to cheap admin reads', () => {
+    const server = new GameServer();
+    const connected = joinServer(server, fakeWs(), 81, 'Connected');
+    const linkdead = joinServer(server, fakeWs(), 82, 'Linkdead');
+    linkdead.linkdead = true;
+
+    expect(server.liveCharacterIds()).toEqual(new Set([connected.characterId]));
   });
 });
 
