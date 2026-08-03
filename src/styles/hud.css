@@ -6353,9 +6353,16 @@
      Same rim-satellite family as the envelope; claims the top-RIGHT corner
      (raid-lockout owns bottom-left, the envelope bottom-right; guarded by
      tests/minimap_rim_badges.test.ts). */
+  /* Top-LEFT of the disc, the one corner the rim had left. It shipped at
+     top/right, which the day/night dial already held at top: 6px; right: 6px,
+     and the dial is later in the DOM at the same z-index, so it painted over
+     the coin: an actionable control buried under a decorative one. Only ever
+     visible together when proceeds are actually waiting, which is why it went
+     unnoticed. tests/minimap_rim_layout.test.ts keeps the four corners
+     one-to-one. */
   #market-indicator {
     position: absolute;
-    right: 4px;
+    left: 4px;
     top: 4px;
     z-index: 3;
     display: inline-flex;
