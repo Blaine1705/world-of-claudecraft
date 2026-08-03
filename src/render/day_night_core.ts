@@ -270,13 +270,19 @@ export function nightStarAmount(dayness: number): number {
 
 // Dawn/dusk grade warmth: the sky/fog multipliers pull toward these as the sun
 // crosses the horizon, so the whole frame (sky dome, scene fog, water) takes
-// the sunrise and sunset orange rather than just the key light. Red pushes
-// past 1 so the warmth genuinely shows against the neutral day grade. The
-// first cut here read as a mild tea stain next to a real sunset, so both ends
-// are pushed harder: more red gain, and blue pulled down near half so the
-// horizon crossing goes properly amber instead of merely off-white.
-const DUSK_SKY_TINT: [number, number, number] = [1.34, 0.8, 0.48];
-const DUSK_FOG_TINT: [number, number, number] = [1.42, 0.84, 0.52];
+// the sunrise and sunset orange rather than just the key light.
+//
+// The drama here is SATURATION, never added light, and that distinction is
+// load-bearing: distant sprite impostors and the sun-path water glints already
+// sit near the top of the range at dusk, so a tint that lifts red is what turns
+// them into detail-less white peach. So red stays at (sky) or under (fog) the
+// pre-overhaul gain and the depth comes from pulling green and blue down, which
+// is also the physically right direction: at the horizon the sun is dimmer AND
+// redder, not brighter. Net effect against the values these replace: red 0 to
+// -2 percent, Rec.709 luminance 13 to 15 percent LOWER, red-to-blue ratio up
+// from about 1.8 to about 2.8. Pinned in tests/day_night.test.ts.
+const DUSK_SKY_TINT: [number, number, number] = [1.14, 0.72, 0.4];
+const DUSK_FOG_TINT: [number, number, number] = [1.18, 0.74, 0.42];
 
 /** Warm a grade toward the dawn/dusk orange by duskAmt (duskWarmAmount). Hue
  *  only: lightScale and farScale stay the cycle's own curve. Returns a new
