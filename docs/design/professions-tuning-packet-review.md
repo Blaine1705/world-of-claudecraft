@@ -5490,6 +5490,79 @@ closed in the pin-gap round); first-match cascade blindness of
 source pins and the sweep's comment-absorbing selector capture are
 accepted as known repo-wide pin limitations.
 
+## Phase 22 QA entry sync (2026-08-03, merge 10400aef60)
+
+The per-phase sync preamble, run at the phase 22 QA entry. One merge
+brought twelve release commits: the v0.34.0 version-ref sync with its
+i18n fill (the bulk in the admin overlays), the Vale Cup deed gate
+wording and its match-driven deed test, the zone1 east/west direction
+fixes with a new direction-convention test, the shapeshift compile
+gate, premade-group hiding, the on-bar key-binding mode, the shared
+bareClient test helper, the mobile mount summon, the rogue Vanish and
+stun-facing fixes, the browser longtask fields, the delve final-chest
+guarantee, and the food/drink re-entrancy guard. Four source
+conflicts were hand-resolved: the wagon-quest text keeps the branch
+colon over the release comma (both sides carried the same southwest
+fix; the release's new direction test pins only the compass phrases,
+so both spellings pass it); guide gettingStarted keeps the branch
+superset (the identical southeast fix plus the Deeprock warning
+sentence); the gather test unions both sides' imports; and the two
+vale_cup describe blocks are kept sequentially. The resolved i18n
+bundles were regenerated, never hand-merged. One compile-level
+divergence was resolved deliberately: the release's bareClient helper
+assigned stationPlacements, which this branch converted to a getter
+over the active content bundle, so the redundant assignment was
+dropped with a comment.
+
+The release-merge-audit ran with four independent read-only auditors
+(sim overlap with a sibling-search helper, server plus the db-mock
+trap, UI overlap with overlay and tooling slices, phase 22 surfaces
+plus phase 23/24 premises), ALL CLEAN on the merge itself:
+both-direction content-line proofs show no side's hunks dropped in
+any co-modified file; all five release sim fixes land on their sole
+live paths with no professions sibling needing mirroring; POST
+/api/perf-report's new sanitizer lives in the shared handler both
+status arms delegate to; no new route, WS command, or db import
+arrived (command pins hold at 176/188/12); the phase 22 production
+surfaces carry ZERO merge drift (blob-identical both legs); and every
+phase 23 and 24 premise survives, with one new convention to honor:
+the release pinned the compass convention in
+tests/zone1_quest_directions.test.ts, so any phase 24 compass claim
+must follow it.
+
+Audit findings applied on the branch: six branch-authored DOM tests
+flipped to the happy-dom pragma with the admin professions modal
+recorded as an in-file jsdom exception (happy-dom ships a live fetch
+that escapes the suite's stub), and the release-authored
+stunned_facing_lock db mock padded to the canonical shape
+(89d79e1865); the release's vi_VN moveHint fill wrapped to the biome
+line width, the first error the merged changed-file set surfaced
+(bc2f55a58f). One release-inherited red was proven and reconciled:
+the release's already-in-group hide (issue 2031, PR 2724)
+deliberately hides the leader's own listing from Open listings but
+never updated the older #2030-followup test pinning that row visible
+under a lockout, so the release tip fails its own dungeon finder
+suite (reproduced identically on a pristine release/v0.34.0
+worktree). Fixed on-branch on the newer feature's semantic, both
+lockout arms pinned with the myListing panel as the row's home
+(309296ab0f); the maintainer should mirror the reconciliation on the
+release branch.
+
+Banked for maintainer passes, not branch work: the release's Vale Cup
+deed rewording (#2802) left all 18 deed_i18n.locales overlays on the
+pre-reword text, gate-invisible because the rows are filled rather
+than pending (add to the deferred locale-fill worklist beside the
+col* cleanup); the branch's Deeprock warning sentence in
+guide.professions.startBody is likewise missing from the five
+non-Latin fills that translate the rest of the value (same
+gate-invisible class, same worklist); tests/CLAUDE.md still documents
+jsdom as the DOM default (stale on both sides of the merge, adopted
+before the merge base; a release-side doc fix).
+
+npm run gate PASS on the merged tree: all 10 steps green, 2020 test
+files / 26354 tests passed (73 skipped) plus the 11-file browser
+suite at 96 tests, vitest workers 8.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
