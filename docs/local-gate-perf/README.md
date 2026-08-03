@@ -8,8 +8,10 @@ CI already improved (N=8 shards, path filters, parallel checks, incremental
 tsc). This packet is about **on-machine** speed: agents, multi-worktree
 workflows, and developers who do not own the highest-end hardware.
 
-This directory is scaffolding, not a shipping product feature. The final phase
-offers to tear it down (or keep a short permanent note under `docs/`) before merge.
+This directory is **living contributor guidance** after Phase 12 (teardown Option A):
+baselines, experiment-log, platform-matrix, tier-workers, task-cache, HANDOFF.
+Phase starter prompts may be trimmed in a follow-up; permanent merge-bar contract
+still lives in `docs/qa-gate.md` and CONTRIBUTING.
 
 ## Index
 
@@ -23,7 +25,9 @@ offers to tear it down (or keep a short permanent note under `docs/`) before mer
 | `experiment-log.md` | Try / measure / keep or drop log (MISS is expected and fine) |
 | `tier-workers.md` | Machine-tier worker presets + `gate:fast` vs full gate (Windows/macOS/Linux) |
 | `task-cache.md` | Turborepo pure-step cache for full gate (Phase 8) |
-| `phase-01-...` through `phase-12-...` | Self-contained starter prompts |
+| `platform-matrix.md` | Which-command table + OS validation matrix (Phase 11) |
+| `HANDOFF.md` | PR-oriented summary, how to measure, remaining OPEN (Phase 12) |
+| `phase-01-...` through `phase-12-...` | Self-contained starter prompts (Option A: may trim later) |
 
 ## Worktree (canonical)
 

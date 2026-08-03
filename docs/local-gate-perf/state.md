@@ -2,8 +2,8 @@
 
 Resume point for the next session. Keep current after every phase.
 
-**Current phase:** Phase 11 complete.  
-**Next action:** run Phase 12 starter prompt (`phase-12-final-qa-and-close.md`).  
+**Current phase:** Phase 12 complete / ready for PR.  
+**Next action:** owner opens PR when ready (do not open unless asked). Optional follow-up: trim phase starter prompts under Option A.  
 **Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
 **Branch:** `feature/local-gate-perf`  
 **Base:** always `origin/release/v0.34.0`
@@ -134,7 +134,13 @@ Fill as phases ship:
   (contributor "which command"; OS matrix macOS verified / Linux CI smoke /
   Windows smoke). Pointers in `docs/qa-gate.md`, CONTRIBUTING, tier-workers.
   Machine inventory: M1 + CI-L1 (GHA ubuntu-latest 4c/16GB low) + empty W1.
-- (Phase 12) teardown:
+- (Phase 12) teardown: **Option A** keep `docs/local-gate-perf/` as living
+  contributor guidance (baselines, experiment-log, platform-matrix, tier-workers,
+  task-cache, HANDOFF). Phase starter prompts may be trimmed later; do not delete
+  without a further owner decision. Blocker fix in close: root `Dockerfile`
+  moved from `npm ci` + `package-lock.json` to `pnpm install --frozen-lockfile`
+  (pinned in `tests/deploy_node_version.test.ts`). Full gate verified green on
+  M1 (505.3s workers 8 under load). PR summary: `docs/local-gate-perf/HANDOFF.md`.
 
 ## OPEN items
 
@@ -146,3 +152,6 @@ Fill as phases ship:
 5. Low/medium tier **local** machine baselines still empty (only M1 high-tier
    filled; CI-L1 is a Linux proxy from GHA specs, not a timed unsharded gate).
 6. Windows host (W1) still untested for full gate / gate:fast wall (smoke only).
+7. ~~Dockerfile still on package-lock / npm ci after pnpm migration.~~ **Closed Phase 12.**
+8. Optional: trim `phase-0N-*.md` starters; refresh non-English
+   `docs/i18n/CONTRIBUTING.*` install wording (English surfaces are pnpm-correct).

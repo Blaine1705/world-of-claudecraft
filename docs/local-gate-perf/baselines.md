@@ -144,6 +144,34 @@ suites can overlap; sum of file times exceeds suite wall).
 | 9 suite cost | M1 | n/a (file-level) | see Phase 9 table | top heavies 7-50x faster per file | keep |
 | 10 runners | M1 | n/a (no default swap) | turbo 126s red; vitest ~241-401s | not default; 811/1960 files red under turbo-test | drop |
 | 11 platform matrix | M1 + CI-L1 proxy | n/a (docs + gate:fast) | n/a | macOS verified; Linux smoke via CI; Windows smoke (scripts only) | keep |
+| 12 final QA | M1 | **505.3** (load) | 418.7 | correctness green under multi-session load; not quiet best-case; Dockerfile pnpm keep | keep |
+
+## Phase 12 - final QA close (after)
+
+**Decision:** Packet complete. Teardown **Option A**: keep `docs/local-gate-perf/`
+as living guidance; phase starters may trim later. Full merge bar remains
+`pnpm run gate`. Experimental runners stay not default (Phase 10 lock).
+
+### Verification walls (M1, 2026-08-03, SHA 12a1dd7c68 + Phase 12 WIP)
+
+| Path | Wall s | Workers | Result | Notes |
+|---|---:|---:|---|---|
+| `pnpm run gate` | 505.3 | 8 | PASS all 10 steps | freemem ~10.5 GiB; other worktrees running vitest; vitest 418.7s (1946 pass / 8 skip files, 24702 tests); browser 4.2s; turbo pure steps mixed cache |
+| `pnpm run gate:fast` | 7.98 | 8 | PASS 4 steps | clean tree (related selection thin) |
+| Pin suite (gate helpers + ci + deploy_node_version) | 0.4 | default | PASS | includes Dockerfile pnpm pin |
+
+Quiet-host reference still Phase 1/2 (~336s / ~291s composite). Phase 12 proves
+green under realistic multi-session freemem pressure, not a wall win claim.
+
+### Dockerfile install (blocker fix)
+
+| Before | After |
+|---|---|
+| `COPY package.json package-lock.json` + `npm ci` | `pnpm@10.34.5` + `pnpm-lock.yaml` + `.npmrc` + `pnpm install --frozen-lockfile` |
+
+Pin: `tests/deploy_node_version.test.ts` "installs build deps with pnpm frozen-lockfile".
+
+See `HANDOFF.md` for PR summary and remaining OPEN.
 
 ## Target bands (aspirational, not hard CI fail)
 

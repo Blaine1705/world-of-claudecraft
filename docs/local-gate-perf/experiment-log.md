@@ -38,6 +38,8 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 | 2026-08-02 | 10 | Deno as runner | n/a | not installed on host | M1 | drop | expected skip |
 | 2026-08-02 | 11 | platform + tier matrix docs | gaps undocumented | platform-matrix.md; macOS verified; Linux/Windows smoke | M1 + CI-L1 proxy | keep | no large script rewrite; biome format fix only |
 | 2026-08-02 | 11 | gate:fast revalidation | Phase 3 ~25s | default 28.6s (8w); low tier 22.7s (2w) | M1 darwin/arm64 | keep | day-loop still well under agent band |
+| 2026-08-03 | 12 | final QA full gate + gate:fast | packet complete | gate PASS 505.3s (8w load); gate:fast ~8s clean; pins green | M1 darwin/arm64 Node 26.5 pnpm 10.34.5 | keep | Option A keep packet dir; Dockerfile pnpm fix |
+| 2026-08-03 | 12 | Dockerfile npm ci -> pnpm frozen | package-lock COPY (broken post-P7) | pnpm@10.34.5 + pnpm-lock + .npmrc | Dockerfile / deploy pin | keep | QA blocker; pin in deploy_node_version |
 
 ## Detail template (copy below for long notes)
 
@@ -503,4 +505,36 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
   - Volunteer Windows host for W1 full gate / gate:fast walls
   - Optional local Linux unsharded full-gate wall (distinct from CI shards)
 
+
+
+### 2026-08-03 - Phase 12 - final QA and packet close
+
+- Hypothesis: The evolved local gate path is green end-to-end, docs match
+  reality, and the packet can close with an explicit teardown choice.
+- Change:
+  - Full QA: merge origin/release/v0.34.0 (already current), pin suite, gate:fast,
+    full `pnpm run gate`
+  - Blocker fix from qa-checklist: Dockerfile npm ci / package-lock -> pnpm
+    frozen install + packageManager pin; release_checklist wording; scripts/CLAUDE.md
+    gate:fast related (not --changed default)
+  - Pin: `tests/deploy_node_version.test.ts` Dockerfile pnpm contract
+  - Packet close: progress/state/baselines/experiment-log; HANDOFF.md; teardown
+    Option A keep docs/local-gate-perf living guidance
+- Commands:
+  - `pnpm exec vitest run tests/ci_workflow.test.ts tests/gate_workers.test.ts
+    tests/gate_profile.test.ts tests/gate_artifact_skip.test.ts
+    tests/gate_fast_plan.test.ts tests/gate_task_cache.test.ts`
+  - `pnpm exec vitest run tests/deploy_node_version.test.ts`
+  - `pnpm run gate:fast`
+  - `pnpm run gate`
+- Before metrics: Phase 11 complete; Dockerfile still broken for lockfile
+- After metrics (M1, freemem ~10.5 GiB under multi-session load):
+  - Full gate PASS **505.3s** real, workers 8; vitest 418.7s (1946 files /
+    24702 tests pass); browser 4.2s
+  - gate:fast PASS **~8s** on clean tree
+  - Pin suites PASS including Dockerfile
+- Pass/fail: all green; no em/en dash or emoji in packet close
+- Decision: **keep** Option A; ready for PR
+- Follow-ups: OPEN items in state.md / HANDOFF (Windows walls, low/medium
+  baselines, optional starter trim, i18n locale CONTRIBUTING wording)
 

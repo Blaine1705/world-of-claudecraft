@@ -17,7 +17,7 @@ Status: not-started / in-progress / blocked / complete / dropped
 | 9 | Suite cost reduction | complete | 2026-08-02 | 2026-08-02 | EMPTY/STABLE subsystem worlds keep; corpse empty drop |
 | 10 | Experimental runners spike | complete | 2026-08-02 | 2026-08-02 | not default: turbo-test wall win, pass rate fail; Bun pure only |
 | 11 | Cross-platform and tier matrix | complete | 2026-08-02 | 2026-08-02 | platform-matrix.md; macOS verified; Linux/Windows smoke |
-| 12 | Final QA and packet close | not-started | | | |
+| 12 | Final QA and packet close | complete | 2026-08-02 | 2026-08-03 | full gate green; Dockerfile pnpm; Option A keep packet |
 
 ## Per-phase deliverables
 
@@ -94,7 +94,10 @@ Status: not-started / in-progress / blocked / complete / dropped
   (platform-matrix.md; macOS verified gate:fast; Linux CI-L1 proxy; Windows smoke)
 
 ### Phase 12 - Final QA and close
-- [ ] `npm run gate` (or evolved) green on worktree
-- [ ] Docs synced (qa-gate.md, CONTRIBUTING as needed)
-- [ ] experiment-log complete
-- [ ] Teardown offer recorded; packet kept or slimmed
+- [x] `pnpm run gate` green on worktree (M1: 505.3s workers 8 under multi-session load; 1946 files / 24702 tests)
+- [x] `pnpm run gate:fast` green (~8s clean tree)
+- [x] Docs synced (qa-gate.md, CONTRIBUTING, platform-matrix already; Dockerfile + release checklist + scripts/CLAUDE.md fixed)
+- [x] experiment-log complete (Phase 12 row + detail)
+- [x] Teardown offer recorded: **Option A** keep `docs/local-gate-perf` living guidance; starters may trim later
+- [x] HANDOFF.md PR-oriented summary
+- [x] Pin tests green including Dockerfile pnpm pin
