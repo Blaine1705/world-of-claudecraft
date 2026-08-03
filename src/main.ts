@@ -3657,7 +3657,13 @@ async function startGame(
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
-        if (stepFacing !== null) offlineSim.player.facing = stepFacing;
+        // A stun locks facing (issue #2426): stepPlayerMotion already blocks
+        // turnLeft/turnRight while stunned, but mouselook/controller facing is
+        // applied out of band, here, before tick(), and must honor the same gate
+        // or a stunned player can still turn to face away from a positional attack.
+        if (stepFacing !== null && !isStunned(offlineSim.player)) {
+          offlineSim.player.facing = stepFacing;
+        }
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
         const simStart = perf.startTime();
