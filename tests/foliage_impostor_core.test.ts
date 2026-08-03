@@ -32,13 +32,15 @@ function spec(over: Partial<ImpostorArchetypeSpec> = {}): ImpostorArchetypeSpec 
 }
 
 // The shipped kit's shape at the default tier: 15 tree variants at 128px x 12
-// views, 8 rock colorway variants and 2 bush kinds at 64px. The packer must
-// keep this inside the 4096 hardware floor with room to grow.
+// views, 8 rock colorway variants and 2 bush kinds at 64px, and about a
+// dozen building and skyline-decor archetypes at 96px x 6 views. The packer
+// must keep this inside the 4096 hardware floor with room to grow.
 function shippedSet(): ImpostorArchetypeSpec[] {
   const specs: ImpostorArchetypeSpec[] = [];
   for (let i = 0; i < 15; i++) specs.push(spec({ id: `tree:${i}` }));
   for (let i = 0; i < 8; i++) specs.push(spec({ id: `rock:${i}`, views: 6, cellPx: 64 }));
   for (let i = 0; i < 2; i++) specs.push(spec({ id: `dress:${i}`, views: 8, cellPx: 64 }));
+  for (let i = 0; i < 14; i++) specs.push(spec({ id: `building:${i}`, views: 6, cellPx: 96 }));
   return specs;
 }
 

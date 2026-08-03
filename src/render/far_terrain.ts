@@ -98,7 +98,15 @@ export function buildFarTerrain(
   }
 
   const tiles = planFarTiles(WORLD_MIN_X, WORLD_MAX_X, WORLD_MIN_Z, WORLD_MAX_Z);
-  const material = new THREE.MeshLambertMaterial({ vertexColors: true });
+  // Standard, not Lambert: the detail terrain lights with the realm's IBL
+  // irradiance (scene.environment), and without the same term the far
+  // tiles' shaded faces crush toward black where the near terrain stays
+  // readable. Rough, metalness 0: the diffuse IBL response only.
+  const material = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 1,
+    metalness: 0,
+  });
   material.name = 'farTerrain';
   // The near-field discard (see FAR_DISCARD_MARGIN). uTime-style shared
   // uniforms are overkill here: one vec3 (camera xz + cutoff) per frame.

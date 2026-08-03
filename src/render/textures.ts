@@ -1444,3 +1444,50 @@ export function sparkleTexture(): THREE.CanvasTexture {
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
 }
+
+/** Soft smoke column for the ambient-life layer: a rising plume of blurred
+ *  puffs, alpha fading out toward the top and the sides, tiling vertically
+ *  so the shader can scroll it upward forever. */
+export function smokeColumnTexture(): THREE.CanvasTexture {
+  return makeCanvas(128, (ctx, size) => {
+    ctx.clearRect(0, 0, size, size);
+    for (let i = 0; i < 90; i++) {
+      const t = i / 90;
+      const y = size - t * size;
+      const drift = Math.sin(t * 6.3 + rnd() * 0.7) * size * 0.08 * t;
+      const x = size / 2 + drift + (rnd() - 0.5) * size * 0.16 * (0.4 + t);
+      const r = size * (0.05 + t * 0.1 + rnd() * 0.03);
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      const a = 0.1 * (1 - t * 0.65);
+      g.addColorStop(0, `rgba(232, 232, 228, ${a})`);
+      g.addColorStop(1, 'rgba(232, 232, 228, 0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+}
+
+/** Two-frame bird sprite sheet (wings up on the left half, wings down on
+ *  the right): simple dark gull silhouettes that read at a handful of
+ *  pixels, which is all the ambient flocks ever occupy. */
+export function birdSpriteTexture(): THREE.CanvasTexture {
+  return makeCanvas(128, (ctx, size) => {
+    ctx.clearRect(0, 0, size, size);
+    const drawBird = (cx: number, wingLift: number): void => {
+      ctx.strokeStyle = 'rgba(34, 30, 30, 0.96)';
+      ctx.lineWidth = size * 0.055;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      const cy = size * 0.5;
+      const span = size * 0.3;
+      ctx.moveTo(cx - span, cy - wingLift * 0.6);
+      ctx.quadraticCurveTo(cx - span * 0.45, cy - wingLift, cx, cy);
+      ctx.quadraticCurveTo(cx + span * 0.45, cy - wingLift, cx + span, cy - wingLift * 0.6);
+      ctx.stroke();
+    };
+    drawBird(size * 0.25, size * 0.16);
+    drawBird(size * 0.75, -size * 0.1);
+  });
+}

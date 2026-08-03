@@ -39,13 +39,13 @@ import {
 } from './foliage_impostor_core';
 import { GFX, sharedUniforms } from './gfx';
 
-export type ImpostorCategory = 'tree' | 'rock' | 'dress';
+export type ImpostorCategory = 'tree' | 'rock' | 'dress' | 'building';
 
-const CATEGORY_VIEWS: Record<ImpostorCategory, number> = { tree: 12, rock: 6, dress: 8 };
+const CATEGORY_VIEWS: Record<ImpostorCategory, number> = { tree: 12, rock: 6, dress: 8, building: 6 };
 
 function categoryCellPx(category: ImpostorCategory): number {
   const scale = GFX.constrainedMemory ? 0.5 : 1;
-  const base = category === 'tree' ? 128 : 64;
+  const base = category === 'tree' ? 128 : category === 'building' ? 96 : 64;
   return Math.max(32, Math.round(base * scale));
 }
 
@@ -343,7 +343,7 @@ const IMPOSTOR_WIND_GLSL = `
   float windAmt = (sin(uTime * 1.7 + windPhase) + 0.5 * sin(uTime * 3.1 + windPhase * 1.3))
     * windGust * uImpWind * aImpostorWind * smoothstep(0.0, 0.15, position.y);`;
 
-const materialCache = new Map<ImpostorCategory, THREE.MeshLambertMaterial>();
+const materialCache = new Map<ImpostorCategory, THREE.MeshStandardMaterial>();
 
 // The one live atlas target. A same-session world rebuild bakes a fresh one;
 // the previous target must be released (texture AND framebuffer, which only
@@ -362,12 +362,24 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
     return cached;
   }
   const u = collapseWindowUniforms();
-  const swap = category === 'rock' ? u.uRockMax : category === 'dress' ? u.uDressMax : u.uTreeMax;
-  const mat = new THREE.MeshLambertMaterial({
+  const swap =
+    category === 'rock'
+      ? u.uRockMax
+      : category === 'dress'
+        ? u.uDressMax
+        : category === 'building'
+          ? u.uBuildingMax
+          : u.uTreeMax;
+  // Standard, matching the real foliage materials: the sprites must take
+  // the same realm IBL irradiance their 3D twins take, or their shaded
+  // sides read darker than the trees they replace.
+  const mat = new THREE.MeshStandardMaterial({
     map: atlas,
     alphaTest: 0.35,
     side: THREE.DoubleSide,
     fog: true,
+    roughness: 0.95,
+    metalness: 0,
   });
   mat.name = `foliage:impostor-${category}`;
   // Amplitude parity with addWind in foliage.ts: TREE_WIND_STRENGTH 0.08

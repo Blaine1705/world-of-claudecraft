@@ -73,6 +73,7 @@ const ZERO: UniformValue = { value: 0 };
 const uTreeMax: UniformValue = { value: FAR_SEED };
 const uRockMax: UniformValue = { value: FAR_SEED };
 const uDressMax: UniformValue = { value: FAR_SEED };
+const uBuildingMax: UniformValue = { value: FAR_SEED };
 const uFogCull: UniformValue = { value: FAR_SEED };
 const uFade: UniformValue = { value: 0 };
 const uSpriteFar: UniformValue = { value: FAR_SEED };
@@ -81,6 +82,9 @@ export interface CollapseWindowValues {
   treeMax: number;
   rockMax: number;
   dressMax: number;
+  /** real buildings and skyline decor end at the detail horizon; their
+   *  sprites begin a little inside it (foliage_impostor.ts binds this) */
+  buildingMax: number;
   fogCull: number;
   fade: number;
   /** where every sprite dies: the live fog wall (foliage_impostor.ts binds it) */
@@ -92,6 +96,7 @@ export function updateCollapseUniforms(w: CollapseWindowValues): void {
   uTreeMax.value = w.treeMax;
   uRockMax.value = w.rockMax;
   uDressMax.value = w.dressMax;
+  uBuildingMax.value = w.buildingMax;
   uFogCull.value = w.fogCull;
   uFade.value = w.fade;
   uSpriteFar.value = w.spriteFar;
@@ -106,11 +111,12 @@ export function collapseWindowUniforms(): {
   uTreeMax: UniformValue;
   uRockMax: UniformValue;
   uDressMax: UniformValue;
+  uBuildingMax: UniformValue;
   uFogCull: UniformValue;
   uFade: UniformValue;
   uSpriteFar: UniformValue;
 } {
-  return { uTreeMax, uRockMax, uDressMax, uFogCull, uFade, uSpriteFar };
+  return { uTreeMax, uRockMax, uDressMax, uBuildingMax, uFogCull, uFade, uSpriteFar };
 }
 
 const COLLAPSE_PARS = `

@@ -135,6 +135,32 @@ old marsh wall at 165u) now draws the whole strip at about 1070 calls and
 tier. The far layer itself costs about 12 tile draws plus 3 sprite draws
 and 11.5k sprite triangles for the entire world.
 
+## The aesthetic pass (third stage)
+
+With the whole world visible, three more facades finish the picture, all on
+the vista arm and all measured at perf parity or better:
+
+- Mountains: the far tiles light as MeshStandardMaterial now (the Lambert
+  layer missed the realm IBL irradiance the near terrain gets, crushing
+  shaded faces to black), high ground takes build-time crag relief and
+  crevice/warm strata inside `farVertexHeight`/`farGroundColor`, the
+  fog-era near-solid rim wash became a light altitude-gated aerial tint,
+  and the margin band beyond the world rim settles to open seabed (raw
+  procedural noise out there read as random cone hills once the fog
+  stopped hiding it).
+- Buildings: village houses, inns, bell towers and skyline decor (windmills,
+  moored ships) bake into the atlas as a fourth sprite category
+  (`collectBuildingImpostors` in props.ts computes placements with the SAME
+  pools and scale rules the real placement loop uses), so civilization
+  shows past the detail horizon at one extra draw call.
+- Ambient life (`ambient_life.ts` + pure core): deterministic bird flocks
+  and campfire smoke columns, two GPU-animated draws built from static
+  world content plus the seed. Cosmetic by contract: no sim reads, so
+  nothing can leak an enemy position (online snapshots carry no distant
+  entities at all, and the fairness invariant forbids tier-gated actionable
+  information; distant REAL mobs are therefore impossible by design, and
+  this layer is how the horizon reads alive instead).
+
 ## Known tradeoffs
 
 - One sprite covers bark and canopy, so the whole picture takes the dominant

@@ -99,6 +99,7 @@ describe('foliage collapse: shader injection', () => {
       treeMax: 300,
       rockMax: 345.6,
       dressMax: 192,
+      buildingMax: 660,
       fogCull: 546,
       fade: IMPOSTOR_SWAP_FADE,
       spriteFar: 700,
@@ -120,6 +121,7 @@ describe('foliage collapse: shader injection', () => {
       treeMax: 368,
       rockMax: 259.2,
       dressMax: 144,
+      buildingMax: 300,
       fogCull: 418.15,
       fade: 0,
       spriteFar: 340,
@@ -138,6 +140,7 @@ describe('foliage collapse: shader injection', () => {
       treeMax: 111,
       rockMax: 222,
       dressMax: 33,
+      buildingMax: 555,
       fogCull: 444,
       fade: 5,
       spriteFar: 666,
@@ -145,6 +148,7 @@ describe('foliage collapse: shader injection', () => {
     expect(u.uTreeMax.value).toBe(111);
     expect(u.uRockMax.value).toBe(222);
     expect(u.uDressMax.value).toBe(33);
+    expect(u.uBuildingMax.value).toBe(555);
     expect(u.uFogCull.value).toBe(444);
     expect(u.uFade.value).toBe(5);
     expect(u.uSpriteFar.value).toBe(666);

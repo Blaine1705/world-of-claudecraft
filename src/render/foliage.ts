@@ -58,6 +58,7 @@ import {
   lodDistsFor,
   treeDetailDistance,
 } from './foliage_lod';
+import { collectBuildingImpostors } from './props';
 import {
   patchConstantUpNormalVertexShader,
   patchGrassFragmentShader,
@@ -3178,6 +3179,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
     treeMax: 0,
     rockMax: 0,
     dressMax: 0,
+    buildingMax: 0,
     fogCull: 0,
     fade: 0,
     spriteFar: 0,
@@ -3192,6 +3194,48 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
   let spritesLive = false;
   if (session && webgl) {
     try {
+      // Village buildings and skyline decor join the same atlas: the far
+      // field shows civilization, not just forest. Placement math comes
+      // from props.ts (collectBuildingImpostors) so a sprite is always the
+      // asset the near view really renders.
+      const buildings = collectBuildingImpostors(seed);
+      const buildingRows = new Map<string, number>();
+      for (const src of buildings.sources) {
+        buildingRows.set(src.asset, session.registerArchetype('building', src.asset, src.parts));
+      }
+      if (buildings.instances.length > 0) {
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minZ = Infinity;
+        let maxZ = -Infinity;
+        for (const inst of buildings.instances) {
+          minX = Math.min(minX, inst.x);
+          maxX = Math.max(maxX, inst.x);
+          minZ = Math.min(minZ, inst.z);
+          maxZ = Math.max(maxZ, inst.z);
+        }
+        const acc = session.bucket(
+          'building',
+          (minX + maxX) / 2,
+          (minZ + maxZ) / 2,
+          Math.hypot(maxX - minX, maxZ - minZ) / 2 + 20,
+        );
+        const white = new THREE.Color(1, 1, 1);
+        for (const inst of buildings.instances) {
+          const row = buildingRows.get(inst.asset);
+          if (row === undefined) continue;
+          acc.add(
+            row,
+            inst.x,
+            inst.y,
+            inst.z,
+            inst.rot,
+            inst.widthScale,
+            inst.heightScale / Math.max(inst.widthScale, 1e-6),
+            white,
+          );
+        }
+      }
       // One atlas bake, then one quad InstancedMesh per (bucket, category):
       // the whole far field costs a handful of draws and 2 triangles per plant.
       for (const reg of session.finalize(webgl, group, seed)) {
@@ -3295,6 +3339,10 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
       // exists to shed triangles); only the SPRITES run past it to the wall.
       const rockSwap = Math.min(dists.rockFar * distanceScale, fogLimit);
       const dressSwap = Math.min(dists.dressFar * distanceScale, fogLimit);
+      // Real buildings die with the detail horizon (props band culls), so
+      // their sprites step in a little inside it: the overlap band hides
+      // behind the real building it pictures.
+      const buildingSwap = Math.max(0, fogFar - 40);
       // The vertex shaders enforce these same boundaries per INSTANCE, so a
       // surviving slab no longer drags its whole tree population along with it
       // (foliage_collapse.ts), and each sprite starts where its real twin
@@ -3302,6 +3350,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
       collapseWindows.treeMax = detailFar;
       collapseWindows.rockMax = spritesOn ? rockSwap : fogLimit;
       collapseWindows.dressMax = spritesOn ? dressSwap : fogLimit;
+      collapseWindows.buildingMax = spritesOn ? buildingSwap : fogLimit;
       collapseWindows.fogCull = fogLimit;
       collapseWindows.fade = spritesOn ? IMPOSTOR_SWAP_FADE : 0;
       // Sprites run to the view horizon: with outdoor fog gone the renderer
@@ -3339,7 +3388,9 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
             ? rockSwap
             : b.spriteCategory === 'dress'
               ? dressSwap
-              : detailFar;
+              : b.spriteCategory === 'building'
+                ? buildingSwap
+                : detailFar;
         bucketWindow.revealScale = revealScale;
         bucketWindow.fogLimit = fogLimit;
         bucketWindow.spriteRow = b.lod === 'impostor';

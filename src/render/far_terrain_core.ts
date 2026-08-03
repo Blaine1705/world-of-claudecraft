@@ -24,6 +24,7 @@ import {
   STRIP_ZONES,
   WORLD_MAX_X,
   WORLD_MAX_Z,
+  WORLD_MIN_X,
   WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
@@ -261,6 +262,11 @@ const TONE = {
   emberScorch: srgbHexToLinear(TERRAIN_TONES.emberScorch),
   emberBasalt: srgbHexToLinear(TERRAIN_TONES.emberBasalt),
   snowCap: srgbHexToLinear(TERRAIN_TONES.snowCap),
+  // Mountain-face variants around TERRAIN_TONES.rock: a shadowed crevice
+  // tone and a warm sunned face, blended by ridge-scale noise so distant
+  // rock reads as strata and gullies instead of one flat gray.
+  rockCrevice: srgbHexToLinear(0x565650),
+  rockWarm: srgbHexToLinear(0x8f887c),
 };
 
 const lerp3 = (out: Triple, to: Triple, t: number): void => {
@@ -418,9 +424,18 @@ export function farGroundColor(
     lerp3(out, wetStone ? TONE.wetRock : biome === 'marsh' ? TONE.dirtDark : pal.sand, shore);
   }
 
-  // steep faces shed their cover
+  // steep faces shed their cover; the rock itself carries ridge-scale
+  // variation (gully shadows, warm strata) so far mountains read as stone
   const slopeRock = clamp01((slope - rockStart) * 2);
-  if (slopeRock > 0) lerp3(out, TONE.rock, slopeRock);
+  if (slopeRock > 0) {
+    lerp3(out, TONE.rock, slopeRock);
+    const strata = fbm2(x * 0.06 + h * 0.05, z * 0.06, seed + 631, 3);
+    if (strata < 0.45) {
+      lerp3(out, TONE.rockCrevice, slopeRock * clamp01((0.45 - strata) * 3.2) * 0.8);
+    } else if (strata > 0.55) {
+      lerp3(out, TONE.rockWarm, slopeRock * clamp01((strata - 0.55) * 3.2) * 0.7);
+    }
+  }
 
   // high ground: rock, then a noise-broken snow ramp. The Drakelands'
   // volcanic cones never take snow (terrain.ts holds the same rule): their
@@ -441,14 +456,21 @@ export function farGroundColor(
     lerp3(out, TONE.snowCap, blanket * 0.8);
   }
 
-  // world-rim haze: the encircling peaks fade toward atmosphere
+  // Aerial tint on the high rim: with the fog gone, the old near-solid
+  // hazyPeak wash read as flat pale cones. The rim now keeps its real rock
+  // and snow and takes only a light cool shift that strengthens with
+  // ALTITUDE (tall silhouettes recede, valleys stay grounded), so distance
+  // reads through color without erasing the mountain.
   const edge = Math.max(
     Math.abs(x) - (WORLD_MAX_X - 70),
     WORLD_MIN_Z + 70 - z,
     z - (WORLD_MAX_Z - 70),
   );
   const rim = clamp01(edge / 64);
-  if (rim > 0) lerp3(out, TONE.hazyPeak, rim * 0.95);
+  if (rim > 0) {
+    const alt = clamp01((h - 12) / 30);
+    lerp3(out, TONE.hazyPeak, rim * (0.18 + alt * 0.3));
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -489,13 +511,51 @@ export interface FarTileBuilder {
  * (foliage_impostor.ts) bilinears over the same function so sprites stay
  * planted on the exact surface the tiles build.
  */
+/** How far outside the zone-rect world a point sits (0 inside). */
+function outsideWorldBy(x: number, z: number): number {
+  return Math.max(
+    0,
+    x - WORLD_MAX_X,
+    WORLD_MIN_X - x,
+    z - WORLD_MAX_Z,
+    WORLD_MIN_Z - z,
+  );
+}
+
+/** Seabed the beyond-rim band settles to (under WATER_LEVEL, gentle). */
+const BEYOND_RIM_SEABED = WATER_LEVEL - 6;
+
 export function farVertexHeight(x: number, z: number, spacing: number, seed: number): number {
+  // Beyond the world rect the heightfield is unauthored procedural noise:
+  // under the old fog it was never seen, but fog-free it reads as random
+  // cone hills standing offshore. The margin band exists to seat the rim
+  // mountains' far side and the sea apron, so past the rim it settles to
+  // open seabed over a short falloff and the horizon meets clean water.
+  const outside = outsideWorldBy(x, z);
+  if (outside >= 90) return BEYOND_RIM_SEABED;
   const h = spacing / 2;
   let y = terrainHeight(x, z, seed);
   y = Math.max(y, terrainHeight(x + h, z, seed));
   y = Math.max(y, terrainHeight(x - h, z, seed));
   y = Math.max(y, terrainHeight(x, z + h, seed));
   y = Math.max(y, terrainHeight(x, z - h, seed));
+  if (outside > 0) {
+    const t = outside / 90;
+    const fall = t * t * (3 - 2 * t);
+    y = y * (1 - fall) + BEYOND_RIM_SEABED * fall;
+  }
+  // High ground gets a build-time crag: the coarse grid renders peaks as
+  // smooth cones, and with the fog gone that smoothness reads from across
+  // the world. A couple of ridge-scale fbm octaves break the profile into
+  // rock. Zero at valley height, so meadows and coasts keep the exact
+  // heightfield, and included HERE so the sprite shortfall
+  // (foliage_impostor.ts) and the tiles keep agreeing on one surface.
+  const crag = Math.min(1, Math.max(0, (y - 16) / 14));
+  if (crag > 0) {
+    const ridge = fbm2(x * 0.045, z * 0.045, seed + 977, 3) - 0.5;
+    const fine = fbm2(x * 0.13, z * 0.13, seed + 991, 2) - 0.5;
+    y += crag * (ridge * 7 + fine * 2.5);
+  }
   return y;
 }
 

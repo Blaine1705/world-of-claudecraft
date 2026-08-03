@@ -171,6 +171,7 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
+import { type AmbientLifeView, buildAmbientLife } from './ambient_life';
 import { buildFarTerrain, type FarTerrainView } from './far_terrain';
 import {
   detailCullFar,
@@ -1616,6 +1617,7 @@ export class Renderer {
   // mesh and the foliage sprites fill everything beyond it.
   private farVista: FarVistaPlan;
   private farTerrainView!: FarTerrainView;
+  private ambientLife: AmbientLifeView | null = null;
   private detailFogFar: number;
   /** Fired whenever a zone becomes resident (any prepare path). Wired by
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
@@ -2146,6 +2148,13 @@ export class Renderer {
     });
     setRenderCategory(this.farTerrainView.group, 'terrain');
     this.scene.add(this.farTerrainView.group);
+    // Cosmetic distant life (bird flocks, campfire smoke): vista tiers only,
+    // static world content plus seed, two draws, GPU-animated.
+    if (this.farVista.enabled) {
+      this.ambientLife = buildAmbientLife(this.sim.cfg.seed);
+      setRenderCategory(this.ambientLife.group, 'vfx');
+      this.scene.add(this.ambientLife.group);
+    }
     bd('terrain');
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
@@ -4166,6 +4175,7 @@ export class Renderer {
       this.viewFar(),
       this.fogState === 'outdoor',
     );
+    this.ambientLife?.update(this.fogState === 'outdoor');
     this.updateZoneFeatureVisibility(fogFar);
     this.propsView.update(
       this.camera.position.x,
@@ -9381,6 +9391,7 @@ export class Renderer {
       this.viewFar(),
       this.fogState === 'outdoor',
     );
+    this.ambientLife?.update(this.fogState === 'outdoor');
     this.updateZoneFeatureVisibility(fogFar);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart);
     this.propsView.update(
@@ -9907,6 +9918,13 @@ export class Renderer {
     });
     setRenderCategory(this.farTerrainView.group, 'terrain');
     this.scene.add(this.farTerrainView.group);
+    if (this.ambientLife) {
+      this.scene.remove(this.ambientLife.group);
+      this.ambientLife.dispose();
+      this.ambientLife = buildAmbientLife(this.sim.cfg.seed);
+      setRenderCategory(this.ambientLife.group, 'vfx');
+      this.scene.add(this.ambientLife.group);
+    }
     // A full editor rebuild replaces the zone cache along with the geometry.
     // Re-run the same preparation path for every resident zone so the renderer
     // cannot mistake an empty replacement view for an already-ready region.
