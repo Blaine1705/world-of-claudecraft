@@ -18,7 +18,7 @@ vi.mock('pg', () => ({
 }));
 
 import { hashPassword } from '../server/auth';
-import { consumePasswordResetRequest } from '../server/db';
+import { consumePasswordResetRequest, updatePasswordHash } from '../server/db';
 import {
   handleDiscordCallback,
   handleDiscordLoginLink,
@@ -28,10 +28,14 @@ import {
   handleDiscordUnlink,
   handleNativeDiscordExchange,
   handleSwagClaim,
+  projectDiscordStatusLink,
   setDiscordPresenceCache,
 } from '../server/discord';
 import { drainLinkChanges } from '../server/discord_link_changes';
-import { resetDiscordStatusCacheForTests } from '../server/discord_status_cache';
+import {
+  readDiscordStatusCore,
+  resetDiscordStatusCacheForTests,
+} from '../server/discord_status_cache';
 import { resetNativeDiscordHandoffsForTest } from '../server/native_discord_handoff';
 import { resetAuthFailures, resetDiscordRateLimits } from '../server/ratelimit';
 
@@ -347,6 +351,10 @@ describe('GET /api/discord status cache (Phase 9)', () => {
     accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
     await handleDiscordStatus(makeReq(), makeRes(), 1);
     const before = dbMock.query.mock.calls.length;
+    // Change what a refetch WOULD return, so the points assertion below is
+    // load-bearing: 10 proves the core came from the cache, 99 would mean the
+    // presence freshness was bought with a core refetch.
+    rewardRows = [{ points: '99', lifetime_points: '99' }];
     setDiscordPresenceCache({
       onlineCount: 7,
       memberTotal: 44,
@@ -457,6 +465,131 @@ describe('GET /api/discord status cache (Phase 9)', () => {
     // No bust on the write-nothing arm: the read is still a zero-query hit.
     expect(dbMock.query.mock.calls.length).toBe(before);
     expect(parse(res).data.passwordSet).toBe(false);
+  });
+
+  it('a standalone password change busts the status core on its own (site 7 unmasked)', async () => {
+    // The unlink-flow arm above fires updatePasswordHash's bust AND
+    // unlinkDiscord's bust, so deleting the site-7 bust alone survived it (the
+    // Phase 9 QA mutation pass proved this). This arm drives the REAL
+    // updatePasswordHash with no second bust in the flow: the account.ts
+    // password change and the admin reset ride exactly this chokepoint.
+    accountByIdRows = [{ id: 9, username: 'maxp', password_set: false }];
+    const first = makeRes();
+    await handleDiscordStatus(makeReq(), first, 9);
+    expect(parse(first).data.passwordSet).toBe(false);
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      if (s.includes('UPDATE accounts SET password_hash'))
+        return Promise.resolve({ rows: [], rowCount: 1 });
+      return Promise.resolve(defaultRouter(sql));
+    });
+    await updatePasswordHash(9, 'newhash');
+    accountByIdRows = [{ id: 9, username: 'maxp', password_set: true }];
+    const after = makeRes();
+    await handleDiscordStatus(makeReq(), after, 9);
+    expect(parse(after).data.passwordSet).toBe(true);
+  });
+
+  it('a password write that matches no account row leaves the cached entry alone', async () => {
+    // The rowCount gate's negative arm: an UPDATE that matched nothing wrote
+    // nothing, so it must not evict a healthy snapshot (busts ride real writes).
+    accountByIdRows = [{ id: 9, username: 'maxp', password_set: false }];
+    await handleDiscordStatus(makeReq(), makeRes(), 9);
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      if (s.includes('UPDATE accounts SET password_hash'))
+        return Promise.resolve({ rows: [], rowCount: 0 });
+      return Promise.resolve(defaultRouter(sql));
+    });
+    await updatePasswordHash(9, 'newhash');
+    const before = dbMock.query.mock.calls.length;
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 9);
+    expect(dbMock.query.mock.calls.length).toBe(before);
+    expect(parse(res).data.passwordSet).toBe(false);
+  });
+
+  it('a reset whose COMMIT fails never busts (the bust rides the committed write)', async () => {
+    // Bust-before-COMMIT would evict here and the next read would re-fetch;
+    // the placement is the contract (an early bust lets a concurrent refresh
+    // park pre-commit data until the TTL). The COMMIT rejection surfaces raw.
+    accountByIdRows = [{ id: 7, username: 'maxp', password_set: false }];
+    await handleDiscordStatus(makeReq(), makeRes(), 7);
+    dbMock.query.mockImplementation((sql: string) => {
+      const s = String(sql).replace(/\s+/g, ' ').trim();
+      if (s.includes('UPDATE password_reset_requests'))
+        return Promise.resolve({ rows: [{ account_id: 7 }], rowCount: 1 });
+      if (s === 'COMMIT') return Promise.reject(new Error('commit refused'));
+      return Promise.resolve(defaultRouter(sql));
+    });
+    await expect(consumePasswordResetRequest('tokenhash', 'newhash')).rejects.toThrow(
+      'commit refused',
+    );
+    dbMock.query.mockImplementation((sql: string) => Promise.resolve(defaultRouter(sql)));
+    const before = dbMock.query.mock.calls.length;
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 7);
+    expect(dbMock.query.mock.calls.length).toBe(before);
+    expect(parse(res).data.passwordSet).toBe(false);
+  });
+
+  it('serves the avatar CDN URL from the two projected fields (discordUserId, avatar)', async () => {
+    // Every other fixture uses discord_avatar: null, which discordAvatarUrl
+    // maps to null, so the projection's discordUserId/avatar wiring was
+    // otherwise unpinned (avatar: null or a swapped column would survive).
+    linkRow = [{ ...LINKED_ROW, discord_avatar: '8342729096ea3675442027381ff50dfe' }];
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    const res = makeRes();
+    await handleDiscordStatus(makeReq(), res, 1);
+    expect(parse(res).data.avatar).toBe(
+      'https://cdn.discordapp.com/avatars/80351110224678912/8342729096ea3675442027381ff50dfe.png?size=64',
+    );
+  });
+
+  it('caches EXACTLY the four projected link fields, never discord_email', async () => {
+    // The safety of setDiscordLinkEmail's missing bust rests on this key set:
+    // a field added to the projection makes its writers silent staleness
+    // writers until their busts are wired, so widening it must red this pin.
+    expect(
+      Object.keys(
+        projectDiscordStatusLink({
+          account_id: 1,
+          discord_user_id: '80351110224678912',
+          discord_username: 'maxp',
+          discord_avatar: null,
+          guild_member: true,
+          linked_at: 'now',
+          discord_email: 'max@example.com',
+        } as any),
+      ).sort(),
+    ).toEqual(['avatar', 'discordUserId', 'guildMember', 'username']);
+    // And through the real reader: the installed core carries no email even
+    // when the link row does.
+    linkRow = [{ ...LINKED_ROW, discord_email: 'max@example.com' }];
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    const core = await readDiscordStatusCore(1);
+    expect(Object.keys(core.link ?? {}).sort()).toEqual([
+      'avatar',
+      'discordUserId',
+      'guildMember',
+      'username',
+    ]);
+    expect(JSON.stringify(core)).not.toContain('max@example.com');
+  });
+
+  it('composing the payload never mutates the shared cached core', async () => {
+    // readDiscordStatusCore hands every reader the SAME object by reference
+    // (link and claimedSwagIds included); a consumer that mutated it would
+    // corrupt every later response for the account until the next bust.
+    linkRow = [LINKED_ROW];
+    rewardRows = [{ points: '5', lifetime_points: '15' }];
+    swagClaimRows = [{ swag_id: 'title_discordian' }];
+    accountByIdRows = [{ id: 1, username: 'maxp', password_set: true }];
+    const core = await readDiscordStatusCore(1);
+    const snapshot = structuredClone(core);
+    await handleDiscordStatus(makeReq(), makeRes(), 1);
+    await handleDiscordStatus(makeReq(), makeRes(), 1);
+    expect(core).toEqual(snapshot);
   });
 
   it('never serves account A its neighbor account B payload (per-account keying)', async () => {

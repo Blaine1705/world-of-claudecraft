@@ -239,7 +239,14 @@ function activeCache(): KeyedCachedRead<DiscordStatusCore> | null {
   return active;
 }
 
-/** The cached status core for one account (miss and TTL expiry refresh). */
+/**
+ * The cached status core for one account (miss and TTL expiry refresh). The
+ * returned core is the SHARED cached object (link and claimedSwagIds included),
+ * handed by reference to every reader of the entry: treat it as immutable, and
+ * compose responses from it without writing to it. A consumer that mutated it
+ * would corrupt every later response for that account until the next bust or
+ * TTL expiry. Pinned by the non-mutation arm in tests/discord_server.test.ts.
+ */
 export async function readDiscordStatusCore(accountId: number): Promise<DiscordStatusCore> {
   const cache = activeCache();
   if (cache === null) throw new Error('discord status cache has no configured reader');
@@ -256,6 +263,13 @@ export function bustDiscordStatus(accountId: number): void {
   active?.bust(accountId);
 }
 
+/**
+ * Drop every entry. Part of the module surface the phase spec mandates (read,
+ * bust-by-key, bust-all) and held as the whole-cache operational lever (a
+ * moderation sweep or an ops flush); no production site wires it yet, the same
+ * wire-up-later footing as stats(). Tests use resetDiscordStatusCacheForTests
+ * for isolation, not this.
+ */
 export function bustAllDiscordStatus(): void {
   active?.bustAll();
 }

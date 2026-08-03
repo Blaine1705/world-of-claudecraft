@@ -37,6 +37,7 @@ import {
   consumeDiscordPendingLogin,
   createDiscordOAuthState,
   createDiscordPendingLogin,
+  type DiscordLinkRow,
   discordFlexRowsForDiscordIds,
   discordForAccount,
   grantRewardPoints,
@@ -73,6 +74,7 @@ import {
 import {
   configureDiscordStatusCache,
   type DiscordStatusCore,
+  type DiscordStatusLink,
   readDiscordStatusCore,
 } from './discord_status_cache';
 import { deleteUnusedFederatedProvision } from './federated_auth_db';
@@ -840,6 +842,22 @@ export async function handleDiscordStatus(
 }
 
 /**
+ * The link-row projection the status cache stores: EXACTLY the four fields the
+ * payload serves, and never discord_email (the safety of setDiscordLinkEmail's
+ * missing bust rests on that absence, so the key set is pinned by an exact
+ * Object.keys test in tests/discord_server.test.ts; widening this projection
+ * means wiring the new field's writers' busts in the same change).
+ */
+export function projectDiscordStatusLink(row: DiscordLinkRow): DiscordStatusLink {
+  return {
+    discordUserId: row.discord_user_id,
+    username: row.discord_username,
+    avatar: row.discord_avatar,
+    guildMember: row.guild_member,
+  };
+}
+
+/**
  * The database-backed part of the status payload, refreshed on a cache miss.
  * Every field a write can change funnels through here, and every such write
  * site busts the account's entry (see the bust wiring in discord_db.ts/db.ts),
@@ -853,16 +871,7 @@ async function fetchDiscordStatusCore(accountId: number): Promise<DiscordStatusC
     accountById(accountId),
   ]);
   return {
-    // Projected to the fields the payload serves (DiscordStatusLink): the full
-    // row's discord_email must never sit in the cache (see the module header).
-    link: link
-      ? {
-          discordUserId: link.discord_user_id,
-          username: link.discord_username,
-          avatar: link.discord_avatar,
-          guildMember: link.guild_member,
-        }
-      : null,
+    link: link ? projectDiscordStatusLink(link) : null,
     points: reward.points,
     lifetimePoints: reward.lifetimePoints,
     claimedSwagIds,

@@ -1065,6 +1065,33 @@ describe('/api/discord status cache busts ride the real write paths (Phase 9)', 
     expect(readsFor(42)).toBe(1);
   });
 
+  it('a COMMIT failure never busts (the bust rides the committed write, not the attempt)', async () => {
+    // Bust-before-COMMIT is the mock-invisible reorder this arm exists for: an
+    // early bust lets a concurrent refresh read pre-commit data and park it
+    // until the TTL. A refused COMMIT must surface raw and evict nothing.
+    const grant = makePool((s) => {
+      if (s === 'COMMIT') throw new Error('commit refused');
+      if (s.includes('INSERT INTO reward_points'))
+        return { rows: [{ points: '10', lifetime_points: '10' }], rowCount: 1 };
+      return NONE;
+    });
+    await warm(42);
+    await expect(grantRewardPoints(grant.pool, 42, 10, 'test')).rejects.toThrow('commit refused');
+    await warm(42);
+    expect(readsFor(42)).toBe(1);
+
+    const swag = makePool((s) => {
+      if (s === 'COMMIT') throw new Error('commit refused');
+      if (s.includes('INSERT INTO swag_claims')) return { rows: [{ id: 9 }], rowCount: 1 };
+      if (s.includes('UPDATE reward_points SET points = points -'))
+        return { rows: [{ points: '1' }], rowCount: 1 };
+      return NONE;
+    });
+    await expect(claimSwag(swag.pool, 42, 'hat', 100)).rejects.toThrow('commit refused');
+    await warm(42);
+    expect(readsFor(42)).toBe(1);
+  });
+
   it('linkDiscordToAccount busts on a landed upsert, never on the owned-by-other refusal', async () => {
     const info = {
       discordUserId: '80351110224678912',
@@ -1139,6 +1166,20 @@ describe('/api/discord status cache busts ride the real write paths (Phase 9)', 
     // The changed account refreshes; the skipped one keeps its snapshot.
     expect(readsFor(42)).toBe(2);
     expect(readsFor(43)).toBe(1);
+  });
+
+  it('setDiscordMemberMetaBulk skips junk changed_account_ids elements without throwing', async () => {
+    // The Number.isFinite guard's own arm: a router (or future statement
+    // variant) that lets a null or string into the aggregate must not throw
+    // and must still bust the finite ids beside it.
+    const { pool } = makePool(() => ({
+      rows: [{ changed: '3', skipped: '0', unapplied: [], changed_account_ids: [42, null, 'x'] }],
+      rowCount: 1,
+    }));
+    await warm(42);
+    await setDiscordMemberMetaBulk(pool, [metaRecord({ discordUserId: 'u42' })]);
+    await warm(42);
+    expect(readsFor(42)).toBe(2);
   });
 
   it('setDiscordMemberMetaBulk tolerates a row without changed_account_ids and busts nothing', async () => {

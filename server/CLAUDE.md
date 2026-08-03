@@ -137,7 +137,8 @@ Three seams keep it flat; use them, never re-invent them.
   memo), `daily_rewards_board_cache.ts` (day-scoped), the leaderboard/guild/arena/deeds
   flights in `main.ts`; pinned by `tests/server/board_read_single_flight.test.ts`.
   Rules: a new endpoint whose response is identical for every caller (a board, a count,
-  an aggregate) reads through one of these two shapes, never a per-request `pool.query`;
+  an aggregate) reads through one of the first two shapes, never a per-request
+  `pool.query` (the keyed third shape is for an account-scoped hot read);
   anything a moderation action can change MUST be bust-wired in the same change (TTL
   alone delays enforcement); a deliberately non-busted read (a moderation-invariant
   COUNT) records why in a comment.

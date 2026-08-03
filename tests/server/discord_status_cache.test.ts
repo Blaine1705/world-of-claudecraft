@@ -12,7 +12,7 @@
 // the unconfigured-reader guard, which is observable only before some module
 // has installed the production reader.
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   bustAllDiscordStatus,
   bustDiscordStatus,
@@ -145,6 +145,45 @@ describe('KeyedCachedRead mechanism', () => {
     // And the value INSTALLED for later readers is the post-bust one, even
     // though the stale flight settled after it.
     await expect(cache.read(1)).resolves.toBe('post-bust');
+  });
+
+  it('stale-serves a warm entry while its refresh fails, and a cold key still rejects', async () => {
+    // The brownout contract the module header states (it CHANGES this
+    // endpoint's failure behavior, so it gets its own decisive arm): a warm
+    // entry answers with a value of unbounded age while refreshes fail, which
+    // requires the failing entry to STAY INSTALLED in the map (a read() that
+    // dropped a failing key would destroy stale-serve and this arm reds it).
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      let t = 0;
+      let healthy = true;
+      const cache = new KeyedCachedRead<string>(
+        async (key) => {
+          if (!healthy) throw new Error(`refresh down for k${key}`);
+          return `k${key}-fresh`;
+        },
+        { ttlMs: 1000, maxEntries: 10, now: () => t },
+      );
+      expect(await cache.read(1)).toBe('k1-fresh');
+      healthy = false;
+      t = 5000;
+      expect(await cache.read(1)).toBe('k1-fresh');
+      t = 10_000;
+      expect(await cache.read(1)).toBe('k1-fresh');
+      expect(cache.size()).toBe(1);
+      // cached_read's visibility contract: the failure streak warns (once).
+      expect(warnSpy).toHaveBeenCalled();
+      // A cold key has nothing to stale-serve: the failure surfaces raw, and
+      // the entry keeps its slot so the healed refresh serves the same key.
+      await expect(cache.read(2)).rejects.toThrow('refresh down for k2');
+      expect(cache.size()).toBe(2);
+      healthy = true;
+      await expect(cache.read(2)).resolves.toBe('k2-fresh');
+      // The stale entry heals on its next read too, not only new keys.
+      await expect(cache.read(1)).resolves.toBe('k1-fresh');
+    } finally {
+      warnSpy.mockRestore();
+    }
   });
 
   it('holds the bound AT the cap and evicts the least-recently-read key', async () => {
@@ -344,7 +383,10 @@ describe('process singleton wiring', () => {
       await readDiscordStatusCore(2);
       await readDiscordStatusCore(3); // evicts account 1
       expect(discordStatusCacheSize()).toBe(2);
-      await readDiscordStatusCore(1);
+      // The re-minted entry refreshes under ITS OWN key and hands back its own
+      // value (the last shape of eviction aliasing: a re-mint serving another
+      // key's core would return 2 or 3 here).
+      expect((await readDiscordStatusCore(1)).points).toBe(1);
       expect(reads.get(1)).toBe(2);
     } finally {
       delete process.env.DISCORD_STATUS_CACHE_MAX_ENTRIES;
@@ -380,6 +422,19 @@ describe('both /api/discord arms share the one payload assembly', () => {
     // tests/server/discord.test.ts.
     expect(src).toContain(
       "if (!discordRateLimited(req, accountId).allowed) return json(res, 429, { error: 'rate limited' }); return handleDiscordStatus(req, res, accountId);",
+    );
+    // Byte-exact (normalized) pin of the WHOLE frozen GET arm. The regex above
+    // tolerates up to 400 inserted characters before the delegate line, so a
+    // divergent early return slipped in after the brace would keep it green
+    // while bypassing the cache. This arm is frozen legacy surface (D9), so
+    // the full-block literal is the honest pin: ANY insertion reds it.
+    expect(src).toContain(
+      "if (req.method === 'GET' && url === '/api/discord') { " +
+        'const accountId = await bearerActiveAccount(req, res); ' +
+        'if (accountId === null) return; ' +
+        'if (!discordRateLimited(req, accountId).allowed) ' +
+        "return json(res, 429, { error: 'rate limited' }); " +
+        'return handleDiscordStatus(req, res, accountId); }',
     );
   });
 
