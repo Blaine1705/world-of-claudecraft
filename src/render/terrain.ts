@@ -677,19 +677,29 @@ function buildSplatMaterial(
     normalMap: normalTex,
     normalScale: new THREE.Vector2(1.15, 1.15),
   });
+  // FAIL-SAFE for the splat photo set: a texture whose image has not
+  // resolved yet binds as three's default WHITE, and a white uGrass paints
+  // the whole ground flat pale (seen live, intermittent: the bake's
+  // synchronous constructor readback can reorder against the deferred
+  // preload lane). A neutral mid-grey placeholder is wrong quietly for a
+  // frame; white is wrong loudly forever, because the bind is by value.
+  const neutral = new THREE.DataTexture(new Uint8Array([96, 96, 96, 255]), 1, 1);
+  neutral.needsUpdate = true;
+  const resolved = (tex: THREE.Texture | undefined): THREE.Texture =>
+    (tex?.image as { width?: number } | undefined)?.width ? (tex as THREE.Texture) : neutral;
   mat.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, brush);
     Object.assign(sh.uniforms, {
-      uGrass: { value: t.grassC },
-      uGrassN: { value: t.grassN },
-      uDirt: { value: t.dirtC },
-      uDirtN: { value: t.dirtN },
-      uRock: { value: t.rockC },
-      uRockN: { value: t.rockN },
-      uSand: { value: t.sandC },
-      uSandN: { value: t.sandN },
-      uMud: { value: t.mudC },
-      uSnow: { value: t.snowC },
+      uGrass: { value: resolved(t.grassC) },
+      uGrassN: { value: resolved(t.grassN) },
+      uDirt: { value: resolved(t.dirtC) },
+      uDirtN: { value: resolved(t.dirtN) },
+      uRock: { value: resolved(t.rockC) },
+      uRockN: { value: resolved(t.rockN) },
+      uSand: { value: resolved(t.sandC) },
+      uSandN: { value: resolved(t.sandN) },
+      uMud: { value: resolved(t.mudC) },
+      uSnow: { value: resolved(t.snowC) },
       uMacro: { value: macro },
       uGroundAO: { value: t.groundAO },
     });
