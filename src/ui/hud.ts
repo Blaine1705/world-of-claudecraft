@@ -190,6 +190,7 @@ import {
   type CraftTierUp,
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
+import { parseCraftingTab, serializeCraftingTab } from './crafting_tab_pref';
 import { buildCraftingView, craftingReagentSig, craftLearnHints } from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
@@ -933,6 +934,8 @@ const DEFAULT_EMOTE_WHEEL: OverheadEmoteId[] = [
 // chat event filter): keeping a second, name-keyed local list live online is
 // exactly how you get "I unignored them and still cannot see them".
 const LOCAL_IGNORES_KEY = 'woc_ignored_chat_names';
+// The persisted last-selected crafting tab (issue #2347). See selectedCraftTab.
+const CRAFTING_TAB_KEY = 'woc_crafting_tab';
 // The persisted top-left keys for the movable unit frames live in
 // frame_pos_reset.ts (imported above) so the one-time reset clears the same
 // keys the MovableFrames read.
@@ -1438,9 +1441,16 @@ export class Hud {
   private readonly craftCommissionOptIn = new Set<string>();
   // The crafting window's selected craft tab. Held here (the commission-set
   // precedent) so staleness repaints keep the player's tab; null means "no
-  // pick yet" and the painter falls back to the first tab. Cleared on close
-  // so reopening always starts at the front of the book.
-  private selectedCraftTab: string | null = null;
+  // pick yet" and the painter falls back to the first tab. Persisted across
+  // sessions (issue #2347: reopening always fell back to the first tab), so
+  // it survives window close instead of resetting like the commission set.
+  private selectedCraftTab: string | null = (() => {
+    try {
+      return parseCraftingTab(localStorage.getItem(CRAFTING_TAB_KEY));
+    } catch {
+      return null;
+    }
+  })();
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
   private readonly riftTracker: RiftFloorTrackerController;
@@ -13192,6 +13202,7 @@ export class Hud {
         selectedCraft: () => this.selectedCraftTab,
         onSelectCraft: (professionId) => {
           this.selectedCraftTab = professionId;
+          this.persistCraftingTab();
           this.renderCrafting();
           // A fresh tab starts at the top of its recipe list, not wherever
           // the previous craft's scroll happened to rest.
@@ -13215,9 +13226,17 @@ export class Hud {
     this.hideTooltip();
     // Commission opt-ins are per-session-of-the-window: closing it drops any
     // armed-but-uncrafted checkboxes, so reopening always starts clean (the
-    // off-by-default rule). The selected tab resets with them.
+    // off-by-default rule). The selected tab is persisted separately
+    // (issue #2347) and deliberately survives the close.
     this.craftCommissionOptIn.clear();
-    this.selectedCraftTab = null;
+  }
+
+  private persistCraftingTab(): void {
+    try {
+      localStorage.setItem(CRAFTING_TAB_KEY, serializeCraftingTab(this.selectedCraftTab));
+    } catch {
+      /* storage unavailable (private mode); tab pick still works in-session */
+    }
   }
   // -------------------------------------------------------------------------
   // The World Market — the Merchant's auction house
