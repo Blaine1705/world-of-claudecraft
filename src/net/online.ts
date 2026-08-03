@@ -1490,6 +1490,11 @@ export class ClientWorld implements IWorld {
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
   riftFloor: RiftFloorView | null = null;
+  // The online client never registers a rift collision region of its own (collision
+  // resolution is server-authoritative); 0 keeps findPlayerPath/resolvePlayerDestination
+  // and the swept-landing crest re-resolve (see world_api/dungeons.ts) inert here, same
+  // as outside a rift.
+  readonly riftCollisionToken = 0;
   // The riftState event's expiresAtMs mirrored verbatim: an epoch-ms deadline the
   // server computed via ctx.lockoutNowMs() (real Date.now() on the live server, the
   // same clock raidLockouts() already relies on). Null while riftFloor is null or
