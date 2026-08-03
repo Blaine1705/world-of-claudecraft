@@ -538,3 +538,5 @@ Columns: date, phase, experiment, before, after, platform, keep/drop, notes.
 - Follow-ups: OPEN items in state.md / HANDOFF (Windows walls, low/medium
   baselines, optional starter trim, i18n locale CONTRIBUTING wording)
 
+| 2026-08-03 | 12 | trim planning scaffolding | phase starters + plan/brief/progress | living docs only (8 files) | docs | keep | Option A follow-up; no code change |
+

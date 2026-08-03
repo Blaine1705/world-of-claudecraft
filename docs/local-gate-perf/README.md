@@ -1,73 +1,46 @@
-# Local gate and developer machine performance (planning packet)
+# Local gate and developer machine performance
 
-Cross-session packet to make `npm run gate` and everyday contributor loops
-fast, reliable, and fair across **Windows, macOS, and Linux**, on **low,
-medium, and high** tier machines, without weakening the merge contract.
+Living contributor guidance for **on-machine** gate speed: agents, multi-worktree
+workflows, and low/medium/high tier hosts, without weakening the merge contract.
 
-CI already improved (N=8 shards, path filters, parallel checks, incremental
-tsc). This packet is about **on-machine** speed: agents, multi-worktree
-workflows, and developers who do not own the highest-end hardware.
-
-This directory is **living contributor guidance** after Phase 12 (teardown Option A):
-baselines, experiment-log, platform-matrix, tier-workers, task-cache, HANDOFF.
-Phase starter prompts may be trimmed in a follow-up; permanent merge-bar contract
-still lives in `docs/qa-gate.md` and CONTRIBUTING.
+The merge and "done" contract is still documented in [`docs/qa-gate.md`](../qa-gate.md)
+and [`CONTRIBUTING.md`](../../CONTRIBUTING.md). This folder holds measured baselines,
+keep/drop history, and how-to tables that those surfaces point at.
 
 ## Index
 
 | File | Role |
 |---|---|
-| `research-brief.md` | Research synthesis (Vitest, pnpm, happy-dom, turbo, turbo-test, Bun/Deno, CI vs local) |
-| `implementation-plan.md` | Phase map, workflow, definition of done |
-| `state.md` | Locked decisions, invariants, validation matrix, worktree rules, ledger |
-| `progress.md` | Status table + per-phase checklists |
-| `baselines.md` | Machine-tier baseline numbers (filled by Phase 1, updated each phase) |
-| `experiment-log.md` | Try / measure / keep or drop log (MISS is expected and fine) |
-| `tier-workers.md` | Machine-tier worker presets + `gate:fast` vs full gate (Windows/macOS/Linux) |
-| `task-cache.md` | Turborepo pure-step cache for full gate (Phase 8) |
-| `platform-matrix.md` | Which-command table + OS validation matrix (Phase 11) |
-| `HANDOFF.md` | PR-oriented summary, how to measure, remaining OPEN (Phase 12) |
-| `phase-01-...` through `phase-12-...` | Self-contained starter prompts (Option A: may trim later) |
+| [`HANDOFF.md`](HANDOFF.md) | Short summary of what shipped, how to measure, remaining OPEN |
+| [`platform-matrix.md`](platform-matrix.md) | Which command by role/tier; OS validation matrix |
+| [`tier-workers.md`](tier-workers.md) | `GATE_WORKER_TIER` / `GATE_MAX_WORKERS` and free-mem clamp |
+| [`task-cache.md`](task-cache.md) | Turborepo pure-step cache for full gate |
+| [`baselines.md`](baselines.md) | Machine inventory and wall numbers |
+| [`experiment-log.md`](experiment-log.md) | Append-only try / measure / keep or drop log |
+| [`state.md`](state.md) | Locked decisions, invariants, ledger, OPEN items |
 
-## Worktree (canonical)
+## Day-loop vs merge bar
 
-All implementation for this packet happens in:
-
-```
-/Users/fernando/Documents/wocc-gate-perf-research
+```bash
+pnpm run gate:fast   # iterate only; not merge
+pnpm run gate        # full merge / "done" contract
 ```
 
-Branch family: `feature/local-gate-perf` (and phase sub-branches if needed).
-Integration base: **`origin/release/v0.34.0`** (always fetch and merge before work).
+Details and OS notes: [`platform-matrix.md`](platform-matrix.md).
 
-Do not implement this packet in the primary clone if that tree is busy with other
-sessions. Phase prompts restate this rule.
+## Measure a change
 
-## How to start a phase
+```bash
+node scripts/gate_profile.mjs --facts
+node scripts/gate_profile.mjs --vitest-slow --top 20 --json-out tmp/gate-profile.json
+```
 
-1. Open the worktree above.
-2. Read `state.md` and the relevant section of `research-brief.md`.
-3. Copy the fenced starter prompt from the next not-started phase file into a
-   fresh agent session (model-neutral; use the best available model for the work).
-4. The session must fetch latest `origin/release/v0.34.0` first, then implement,
-   measure against baselines, update `progress.md` / `state.md` / `baselines.md` /
-   `experiment-log.md`, and commit only this packet's files plus its code.
+Record walls in `baselines.md` and keep/drop rows in `experiment-log.md`.
 
-## Experiment doctrine
+## Locked product outcomes (do not re-litigate casually)
 
-Trying many levers is encouraged. Rules:
-
-1. **Baseline first** (Phase 1 numbers, then per-phase before/after).
-2. **No silent regressions**: full gate green, or an explicit documented abort
-   that reverts the experiment.
-3. A MISS (no win, flake, platform break) is success of the process: log it in
-   `experiment-log.md` and move on.
-4. Prefer reversible, measurable steps over one big bang.
-
-## Related prior work (already on release)
-
-- CI speed packet (PR #2737): N=8 shards, path filters, release-checks split
-- Local gate: memory-aware workers (`GATE_MAX_WORKERS`, `computeGateWorkers`)
-- Phase 3: `npm run gate:fast` day-loop path + `GATE_WORKER_TIER` caps (see `tier-workers.md`)
-- Incremental `check:ts` buildinfo cache
-- Dependency-sync preflight and malware `.worktrees` skip
+1. Full `pnpm run gate` remains the merge bar; `gate:fast` is day-loop only.
+2. pnpm is the package manager (`pnpm-lock.yaml` only; CI and Dockerfile frozen install).
+3. Free-mem worker clamp stays; tier presets cap after the clamp.
+4. turbo-test / Bun / Deno stay **not default** (optional `test:turbo` / `test:bun` only).
+5. Full detail: [`state.md`](state.md) and [`HANDOFF.md`](HANDOFF.md).

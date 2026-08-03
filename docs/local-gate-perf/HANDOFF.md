@@ -1,11 +1,10 @@
-# Handoff: local gate performance packet
+# Handoff: local gate performance
 
 **Branch:** `feature/local-gate-perf`  
 **Base:** `origin/release/v0.34.0`  
-**Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
-**Status:** Phase 12 complete; ready for PR (owner opens when ready).
+**Status:** complete / ready for PR.
 
-## What changed (keep list)
+## What shipped (keep list)
 
 | Area | Change | Default? |
 |---|---|---|
@@ -24,51 +23,38 @@ Dropped (measured MISSes): vitest threads pool, isolate:false, projects split, @
 ## How to measure
 
 ```bash
-# Machine facts + full timed gate + top slow files
 node scripts/gate_profile.mjs --facts
 node scripts/gate_profile.mjs --vitest-slow --top 20 --json-out tmp/gate-profile.json
 
-# Day-loop vs merge bar
 pnpm run gate:fast
 pnpm run gate
 ```
 
-Numbers and keep/drop rows: `baselines.md`, `experiment-log.md`.  
-Which command by tier/OS: `platform-matrix.md`.  
-Worker presets: `tier-workers.md`.  
-Turbo inventory: `task-cache.md`.
+Numbers: `baselines.md`, `experiment-log.md`.  
+Which command: `platform-matrix.md`. Workers: `tier-workers.md`. Turbo: `task-cache.md`.
 
-## Contributor permanent surfaces (outside this folder)
+## Permanent surfaces (outside this folder)
 
-- `docs/qa-gate.md` (layers: gate:fast vs full gate; turbo note)
-- `CONTRIBUTING.md` (pnpm install, multi-worktree store, gate:fast)
-- `README.md` (pnpm install path)
+- `docs/qa-gate.md`, `CONTRIBUTING.md`, root `README.md`
 - `scripts/gate.mjs`, `scripts/gate_fast.mjs`, `turbo.json`, `package.json`
-- CI: `.github/workflows/ci.yml` pnpm frozen-lockfile + 8-way shards
-- Game image: root `Dockerfile` pnpm install (pinned in `tests/deploy_node_version.test.ts`)
+- CI: `.github/workflows/ci.yml` (pnpm frozen-lockfile, 8-way shards)
+- Game image: root `Dockerfile` (pnpm; pinned in `tests/deploy_node_version.test.ts`)
 
-## Teardown choice (owner)
+## Docs kept here
 
-**Option A (selected for PR):** keep `docs/local-gate-perf/` as living contributor guidance
-(baselines, experiment-log, platform-matrix, tier-workers, task-cache, HANDOFF).
-Phase starter prompts (`phase-01` ... `phase-12`) may be trimmed in a follow-up;
-do not delete without a later owner decision.
-
-Option B (not chosen): collapse into a short note in `docs/qa-gate.md` / CONTRIBUTING
-and delete phase starters.
+Living guidance only: README, HANDOFF, platform-matrix, tier-workers, task-cache,
+baselines, experiment-log, state. Planning packet scaffolding (phase starters,
+implementation-plan, research-brief, progress) was removed after Phase 12.
 
 ## Phase 12 verification (M1, 2026-08-03)
 
 | Check | Result |
 |---|---|
-| `pnpm run gate` | PASS, wall **505.3 s**, workers **8** (multi-session load; vitest 418.7 s; 1946 files / 24702 tests) |
-| `pnpm run gate:fast` | PASS, wall **~8 s** on clean tree (related expanded nothing heavy) |
-| Pin suite | PASS: ci_workflow, gate_workers, gate_profile, gate_artifact_skip, gate_fast_plan, gate_task_cache, deploy_node_version |
-| Em/en dash + emoji scan | clean on packet docs / gate scripts |
-| Phase 10 lock | `test` still `vitest run`; turbo-test/Bun not default |
+| `pnpm run gate` | PASS, wall **505.3 s**, workers **8** (multi-session load; vitest 418.7 s) |
+| `pnpm run gate:fast` | PASS, wall **~8 s** on clean tree |
+| Pin suite | PASS (gate helpers, ci_workflow, deploy_node_version) |
 
 Quiet-host full gate historically ~5-6 min on M1 (Phase 1 336 s / Phase 2 composite 291 s).
-Phase 12 wall is correctness green under load, not a best-case claim.
 
 ## Remaining OPEN
 
@@ -76,14 +62,4 @@ Phase 12 wall is correctness green under load, not a best-case claim.
 2. Windows host (W1) full gate / gate:fast wall untested (smoke only).
 3. Whether local multi-shard full gate is worth supporting on high-tier only.
 4. Owner sign-off if `gate:fast` is ever allowed as pre-push (default: no).
-5. Optional later: trim `phase-0N-*.md` starters under Option A; refresh non-English
-   `docs/i18n/CONTRIBUTING.*` install wording (English CONTRIBUTING is pnpm-correct).
-
-## PR summary (copy-ready)
-
-Local gate performance: generate-once orchestration, `gate:fast` day-loop, worker tier
-caps, Vitest fsModuleCache, happy-dom for most DOM tests, full pnpm migration with
-shared store (CI + Dockerfile), turbo cache for pure artifact steps, and subsystem
-test-world fixtures for the heaviest suites. Full `pnpm run gate` remains the merge
-bar; experimental turbo-test/Bun stay opt-in only. Docs under `docs/local-gate-perf/`
-plus updates to `docs/qa-gate.md` and CONTRIBUTING.
+5. Optional: refresh non-English `docs/i18n/CONTRIBUTING.*` install wording.

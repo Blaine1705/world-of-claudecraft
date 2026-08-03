@@ -1,39 +1,35 @@
 # State: local gate performance
 
-Resume point for the next session. Keep current after every phase.
+Locked decisions and ledger for the local gate performance work. Planning
+scaffolding (phase starters, implementation-plan, research-brief, progress) was
+removed after Phase 12; living docs are listed in `README.md`.
 
-**Current phase:** Phase 12 complete / ready for PR.  
-**Next action:** owner opens PR when ready (do not open unless asked). Optional follow-up: trim phase starter prompts under Option A.  
-**Worktree:** `/Users/fernando/Documents/wocc-gate-perf-research`  
+**Status:** complete / ready for PR.  
 **Branch:** `feature/local-gate-perf`  
-**Base:** always `origin/release/v0.34.0`
+**Base:** `origin/release/v0.34.0`
 
 ---
 
 ## Locked decisions (do not re-litigate without owner)
 
-1. **Integration base is `release/v0.34.0`**, not `main`. Every phase fetches and
-   merges `origin/release/v0.34.0` before coding.
-2. **All packet work happens in the dedicated worktree**
-   `/Users/fernando/Documents/wocc-gate-perf-research` so other sessions stay safe.
-3. **Full gate remains the merge contract.** Faster paths are additive
+1. **Full gate remains the merge contract.** Faster paths are additive
    (`gate:fast`, related tests, cached steps). They never replace pre-merge full gate
    without an explicit owner decision recorded here.
-4. **Experiment freely; measure always.** A MISS is logged and dropped, not hidden.
-5. **Worker memory clamp stays.** Do not remove `computeGateWorkers` free-mem clamp
+2. **Experiment freely; measure always.** A MISS is logged and dropped, not hidden.
+3. **Worker memory clamp stays.** Do not remove `computeGateWorkers` free-mem clamp
    to chase wall time. Add tier presets and docs instead.
-6. **Prefer Vitest/Vite/Node plugs first.** turbo-test / Bun / Deno are spikes only
+4. **Prefer Vitest/Vite/Node plugs first.** turbo-test / Bun / Deno are spikes only
    unless a phase proves pass rate and wall win on this suite.
    **Phase 10 locked:** experimental runners stay **not default**. Do not switch
    `package.json` `test`, `scripts/gate.mjs`, or CI to turbo-test/Bun/Deno without
    a new owner line here. Optional scripts `test:turbo` / `test:bun` are re-spike
    hooks only (on-demand npx / local bun; no permanent turbo-test lockfile pin).
-7. **pnpm is the package manager** (full migration, Phase 7): `packageManager` +
+5. **pnpm is the package manager** (full migration, Phase 7): `packageManager` +
    `pnpm-lock.yaml` only, CI frozen install, multi-worktree shared store. Do not
    reintroduce `package-lock.json` or dual lockfiles without an explicit owner
    decision recorded here.
-8. **No em dashes, en dashes, or emojis** in docs, commits, or code comments.
-9. **No Claude-Session trailers** in commits.
+6. **No em dashes, en dashes, or emojis** in docs, commits, or code comments.
+7. **No Claude-Session trailers** in commits.
 
 ## Non-negotiable invariants
 
@@ -58,11 +54,11 @@ Resume point for the next session. Keep current after every phase.
 | turbo/wireit | Cache hit/miss demo; gate green cold and warm |
 | Suite splits | Targeted + full test; CI shard completeness pins if renames |
 
-Always before calling a phase complete:
+When changing gate/test/install orchestration:
 
-- Update `progress.md`, `state.md`, `baselines.md`, `experiment-log.md`
+- Update `baselines.md` / `experiment-log.md` when claiming a wall win
 - `npx @biomejs/biome check --write` only on files you touched
-- Prefer `npm run gate` after phases that touch gate/test/build orchestration
+- Prefer `pnpm run gate` before calling the change done
 
 ## Review-dispatch (when implementing, not for docs-only)
 
@@ -99,7 +95,7 @@ Always before calling a phase complete:
 | `.github/workflows/ci.yml` | CI shards and checks |
 | `docs/qa-gate.md` | QA contract docs |
 | `CONTRIBUTING.md` | pnpm lockfile + multi-worktree install policy |
-| `docs/local-gate-perf/*` | This packet |
+| `docs/local-gate-perf/*` | Living gate-perf docs (see README index) |
 
 ## Ledger (created by this packet)
 
@@ -153,5 +149,5 @@ Fill as phases ship:
    filled; CI-L1 is a Linux proxy from GHA specs, not a timed unsharded gate).
 6. Windows host (W1) still untested for full gate / gate:fast wall (smoke only).
 7. ~~Dockerfile still on package-lock / npm ci after pnpm migration.~~ **Closed Phase 12.**
-8. Optional: trim `phase-0N-*.md` starters; refresh non-English
-   `docs/i18n/CONTRIBUTING.*` install wording (English surfaces are pnpm-correct).
+8. Optional: refresh non-English `docs/i18n/CONTRIBUTING.*` install wording
+   (English surfaces are pnpm-correct).
