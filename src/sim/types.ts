@@ -2632,9 +2632,11 @@ export interface ZoneDef {
   // to the Pale Causeway's head so the Wyrmgate opens where the road arrives.
   southPassX?: number;
   // Per-zone override of the open-world trash respawn delay (seconds), which
-  // otherwise comes from this zone's level band (src/sim/respawn_policy.ts
-  // trashRespawnSecondsForZone). An explicit SimConfig.respawnSeconds still
-  // wins over it, and a MobTemplate.respawnSeconds still wins over both.
+  // otherwise is the single world delay TRASH_RESPAWN_SECONDS
+  // (src/sim/respawn_policy.ts trashRespawnSecondsForZone; the level-band tiers
+  // that used to decide it are retired, see that file's header). An explicit
+  // SimConfig.respawnSeconds still wins over it, and a MobTemplate.respawnSeconds
+  // still wins over both.
   trashRespawnSeconds?: number;
 }
 
