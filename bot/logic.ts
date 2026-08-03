@@ -739,18 +739,6 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
   return payload;
 }
 
-/**
- * The drained items mapped to postable payloads, in order, with unknown-kind
- * nulls DROPPED: the callable seam bot/main.ts posts through, extracted so
- * the never-post-an-empty-embed rule (the vale_cup failure) is testable
- * without the poll loop. Unit-tested in tests/discord_bot.test.ts.
- */
-export function buildActivityMessages(items: readonly ActivityItem[]): Record<string, unknown>[] {
-  return items
-    .map((item) => buildActivityMessage(item))
-    .filter((payload): payload is Record<string, unknown> => payload !== null);
-}
-
 // ── Daily rewards winners feed ────────────────────────────────────────────────
 export interface DailyRewardWinner {
   day: string;

@@ -3,7 +3,6 @@ import {
   type ActivityItem,
   allTierRoleNames,
   buildActivityMessage,
-  buildActivityMessages,
   buildDailyRewardWinnersMessage,
   buildLevelNick,
   buildLinkContent,
@@ -775,10 +774,11 @@ describe('significant-activity cards', () => {
     }
   });
 
-  it('buildActivityMessages drops unknown kinds and keeps the rest in order', () => {
-    // The seam bot/main.ts posts through: a drained batch with a kind this
-    // build does not know must shed exactly that item, never post an empty
-    // embed, and never reorder the survivors.
+  it('buildActivityMessage answers null for an unknown kind, never an empty embed', () => {
+    // The never-post-an-empty-embed rule (the vale_cup failure): a kind this
+    // build does not know maps to null, and the outbox io seam drops the null
+    // instead of posting (tests/discord_bot_outbox.test.ts pins the drop).
+    // Known kinds keep building full payloads.
     const known = (kind: ActivityItem['kind']): ActivityItem => ({
       kind,
       realm: 'Claudemoon',
@@ -786,15 +786,11 @@ describe('significant-activity cards', () => {
       level: 20,
       participants: [linked('Aldric', '111')],
     });
-    const payloads = buildActivityMessages([
-      known('levelup'),
-      { ...known('rareloot'), kind: 'parade' as never },
-      known('masterwork'),
-    ]);
-    expect(payloads).toHaveLength(2);
-    const titles = payloads.map((p) => (p.embeds as Array<{ title: string }>)[0].title);
-    expect(titles[0]).toContain('level 20');
-    expect(titles[1]).toBe('A masterwork piece');
+    expect(buildActivityMessage({ ...known('rareloot'), kind: 'parade' as never })).toBeNull();
+    const levelup = buildActivityMessage(known('levelup'));
+    expect((levelup?.embeds as Array<{ title: string }>)[0].title).toContain('level 20');
+    const masterwork = buildActivityMessage(known('masterwork'));
+    expect((masterwork?.embeds as Array<{ title: string }>)[0].title).toBe('A masterwork piece');
   });
 });
 

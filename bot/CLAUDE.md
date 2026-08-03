@@ -118,8 +118,11 @@ includes `DOM` for the game client. Nothing in `bot/` may depend on a browser gl
 
 ### Activity-kind parity (server to bot)
 The activity wire crosses two processes as unchecked JSON, so a kind the server
-enqueues but `buildActivityMessage` has no case for renders an EMPTY embed that
-Discord rejects (the shipped vale_cup failure). A new `ActivityKind` in
+enqueues but `buildActivityMessage` has no case for maps to `null` and is
+DROPPED SILENTLY at the outbox io seam (`outbox_consumer.ts` skips the null
+payload; before that guard the unmatched kind rendered an empty embed Discord
+rejects, the shipped vale_cup failure, and a silent drop is deliberately the
+quieter failure: no log line marks it). A new `ActivityKind` in
 `server/discord_activity.ts` therefore needs BOTH, in the same change: a `case`
 in `buildActivityMessage` (`logic.ts`) and a row in `SERVER_KINDS` in
 `tests/discord_bot.test.ts`. That list is pinned to the server union in both
@@ -222,6 +225,10 @@ not stay phase-locked, and repeated event kicks coalesce into exactly one follow
   them: it will NOT drain while the rate governor's breaker is open or half-open (those
   posts are non-essential, so the governor would refuse them, and a 200 is the outbox's only
   acknowledgement, so draining into refusals loses the items); each post is caught per item;
+  an activity item whose kind this build has no `buildActivityMessage` case for drains to a
+  null payload and is dropped silently before the channel gate (at-most-once by design, and
+  the Activity-kind parity rule above keeps the kind set aligned so the drop only ever
+  covers a mid-deploy skew);
   a winners day is marked back on the server ONLY after its post landed, so a failed post
   retries (at-least-once, duplicates accepted); a bounded process-local announced-days memo
   (`OutboxPollState`) keeps a day whose MARK keeps failing from being re-announced every
