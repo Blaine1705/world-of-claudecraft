@@ -21,7 +21,7 @@
 | Phase 8: Observability | built | 2026-08-02 | 2026-08-02 |
 | Phase 8 QA | complete | 2026-08-02 | 2026-08-02 |
 | Phase 9: /api/discord caching | built | 2026-08-02 | 2026-08-02 |
-| Phase 9 QA (packet close) | not started | | |
+| Phase 9 QA (packet close) | complete | 2026-08-02 | 2026-08-02 |
 
 ## Deliverable checklists
 
@@ -1616,3 +1616,83 @@ with no P0/P1. Every finding was applied or resolved with a reason:
   WHERE admits only never-authenticated accounts, so no entry can exist);
   .env.example fills stay maintainer-owed (harness-blocked); the eviction
   thrash shape needs 2000+ authenticated accounts against the 15/min guard.
+
+### Phase 9 QA, the packet close (2026-08-02, verdict PASS)
+
+Release sync at session start: origin/release/v0.34.0 refetched, still at
+8209e69ad, zero new commits past the build session's merge; no re-merge or
+re-measure owed. Tree clean at 2759f371a.
+
+Audit: a six-finder adversarial workflow (correctness, test-coverage-auditor,
+dead-code, privacy-security-review, database-performance-reviewer,
+qa-checklist) with one skeptic per deduped finding, every skeptic required to
+quote the code (D19). The two custom-agentType reviewers died without
+structured output (the known delivery trap) and were re-dispatched via the
+Agent tool with JSON-final-message framing; both then delivered. Verdicts:
+security PASS (one nit), db-performance PASS (one nice-to-have), qa-checklist
+READY with an independent bust-site re-derivation from the SQL that matched
+the recorded eight-site enumeration exactly. Skeptic outcomes: 12 confirmed,
+0 refuted, 0 settled-restated.
+
+Findings, all applied or resolved with a reason across three commits
+(e73fa1b2f tests, 63b2f9f30 behavior, eea25019a contract honesty):
+- BLOCKING (also found independently as the mutation pass's one survivor):
+  the updatePasswordHash bust (site 7) had no independent test; its only
+  exercising flow (unlink) fires unlinkDiscord's bust too, which masked a
+  deleted site-7 bust. Dedicated positive and negative arms now drive the
+  real function; the mutant is re-proven killed in both DB modes.
+- Behavior changes, both review-driven: a rejected MINT flight now releases
+  its cap slot at settle (failed mints cannot accumulate as dead weight; the
+  module header states the honest limit, at the cap a failing mint's
+  transient slot still displaces the coldest entry, R11 keeps the bound hard,
+  both halves pinned by dedicated arms); and the bulk bust guard tightened to
+  Number.isInteger(id) && id > 0, because Number(null) is 0, which isFinite
+  accepted, so a null aggregate element could bust key 0 (behavior identical
+  for real INT PK rows).
+- Decisiveness closures: COMMIT-failure arms for grantRewardPoints, claimSwag
+  and consumePasswordResetRequest (bust-before-COMMIT was mock-invisible);
+  stale-serve/cold-reject brownout arms with once-per-streak warn pins and
+  the latch reset proven on a second brownout; the avatar CDN URL pinned over
+  the projected fields (every prior fixture had a null avatar); the
+  DiscordStatusLink exact-key pin via the new exported
+  projectDiscordStatusLink (the setDiscordLinkEmail no-bust ruling now has a
+  test); a junk-first bulk-bust arm with a warm key 0 killing guard-deletion
+  and early-exit mutants alike; the R10 arm's points assertion made
+  load-bearing; the non-mutation arm pinning its own premise (zero new
+  queries plus same-reference reads); the frozen legacy arm pinned by the
+  full-block normalized literal (the regex pins tolerated a 400-char
+  insertion); the post-eviction re-read value pin.
+- Resolved with reasons: bustAllDiscordStatus stays as phase-mandated surface
+  with a wire-up-later note (the stats() footing); the DB-gated executed
+  proof of the bulk statement stays DB-gated per repo convention (CI floor is
+  the structural pins; the dual-mode mutation pass proved those pins kill the
+  semantic mutants, and the executed arm ran 16/16 against a throwaway PG16
+  in this session); server/CLAUDE.md two-vs-three shapes wording fixed;
+  phase-04-qa.md's final step renumbered to STEP 6 per R5 (the one rulings
+  -audit gap, docs-only).
+
+Mutation ledger (isolated worktree, own npm ci, every run BOTH with and
+without TEST_DATABASE_URL against throwaway zonky PG16; verdicts required
+rc!=0 plus named failing tests plus the Test Files line):
+- Spec pass at 2759f371a: 16 planted, 15 killed, 1 survivor (S7, the real
+  gap above; every other bust-site deletion, the constant key, TTL infinite,
+  always-refresh, no-op and entry-keeping bust, no-eviction, frozen presence,
+  and the forked legacy arm all died on their named arms).
+- Fix-round pass at e73fa1b2f: 8/8 killed (S7 re-proof, bust-before-COMMIT
+  both sites, failed-entry-dropped, projection widened, avatar nulled, the
+  legacy-slip insertion only the new literal catches, payload-mutates-core).
+- Round-2 pass at 63b2f9f30: 8/8 killed (slot-release revert, guard deleted,
+  guard early-exit, plus final-head re-runs of the five cache-class mutants).
+- Fresh-eyes rounds: round 1 PASS (three findings, applied), round 2 found
+  the header overclaim BLOCKING via its own probe runs (round 3 rewords the
+  contract and adds the at-cap displacement arm).
+
+Validation at close: the three cache suites 153/153; tsc clean; ci:changed
+rc 0; the whole-packet matrix vitest batch (governor, sweep-cycle, diffs,
+member-writes, outbox, main-wiring, internal, http spine, gateway, deploy,
+liveness, metrics, counters, presence-counters suites) 23 files, 908/908.
+Whole-packet scans at origin/release/v0.34.0...HEAD: zero src/ paths, zero
+added DDL, zero em/en dashes or emojis on added lines, wire/snapshot suites
+and known_deviations untouched. Rulings audit R1-R22: PASS (21 landed as
+written, R5 fixed above). Full gate result recorded in the final session
+report.

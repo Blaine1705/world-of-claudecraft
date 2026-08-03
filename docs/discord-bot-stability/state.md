@@ -1,7 +1,8 @@
 # State: Discord Bot Stability (cross-phase cheat sheet)
 
-Current phase: Phases 1 to 8 built and QA'd, Phase 9 built (2026-08-02). Next:
-Phase 9 QA, the packet-close session.
+Current phase: PACKET COMPLETE. All nine phases built and QA'd; the packet
+close ran 2026-08-02 (whole-feature matrix, rulings audit, full gate). The
+branch awaits its PR; O4 and O5 remain with the user.
 The packet's sync target is `origin/release/v0.34.0` (the maintainer's retarget call,
 relayed in the Phase 6 handoff). Phase 6 QA's sync merged the admin guild backoffice
 (PR #2590, 7 commits) as `50883ce3d`; the three Phase 5 feed sites in `server/db.ts`
@@ -945,8 +946,10 @@ because dropping the one word is otherwise silent),
     PROJECTION of the link row (discord_email can never sit in the cache, and
     `setDiscordLinkEmail` is structurally bust-free, recorded at that site);
     the `changed_account_ids` parse warns on missing-with-changed>0 and
-    guards `Number.isFinite`; the bulk over-bust on role/joined-only changes
-    recorded as deliberate; brownout contract and honest cost floor written
+    guards each id (the QA session tightened the guard to
+    `Number.isInteger(id) && id > 0`, because `Number(null)` is 0, which
+    `isFinite` accepted, letting a null element bust key 0); the bulk
+    over-bust on role/joined-only changes recorded as deliberate; brownout contract and honest cost floor written
     in the module header and DEPLOY.md (a warm entry stale-serves 200 where
     the endpoint used to 500; a hit removes the four payload queries, the
     auth-guard reads remain); `KeyedCachedRead.stats()` +
@@ -966,6 +969,43 @@ because dropping the one word is otherwise silent),
     wire-up-later like the boardCache counters; the eviction-thrash shape
     (2000+ authenticated accounts churning the cap to strip a victim's
     entry) is bounded by the 15/min guard and account cost, accepted.
+  - Phase 9 QA session (2026-08-02, verdict PASS; the packet close; full
+    narrative in progress.md). What a later reader must know:
+    - `KeyedCachedRead.read`: a rejected MINT flight now releases its cap
+      slot at settle (identity-guarded delete), so failed mints never
+      ACCUMULATE as dead weight. The header states the honest scope: the
+      bound stays hard on the way in (R11), so AT the cap a failing mint's
+      transient slot still displaces the coldest entry; both halves carry
+      dedicated arms, and the settle-cleanup catch marks the returned
+      promise handled (noted in the comment). Do not re-broaden the header
+      claim: the absolute no-displacement guarantee was probe-refuted in
+      review and rejected with reasons.
+    - The bulk bust guard is `Number.isInteger(id) && id > 0`, never
+      isFinite: `Number(null)` is 0 and account ids are positive serials.
+      The junk arm is junk-FIRST with a warm key 0 so guard deletion and
+      early-exit mutants both red.
+    - `projectDiscordStatusLink` is exported from server/discord.ts with an
+      exact-key pin; widening the projection reds the pin, which is what
+      backs the setDiscordLinkEmail no-bust ruling now.
+    - `bustAllDiscordStatus` is phase-mandated surface held wire-up-later
+      (the stats() footing), documented at the export; tests use
+      resetDiscordStatusCacheForTests for isolation, never bustAll.
+    - readDiscordStatusCore hands back the SHARED cached object; the
+      immutability contract is documented at the accessor and pinned by a
+      non-mutation arm that also pins its own premise (zero new queries plus
+      same-reference reads).
+    - The frozen legacy GET arm carries a full-block normalized-literal pin
+      beside the regex pins: the regexes tolerate a 400-character insertion
+      after the brace, the literal does not (mutation-proven).
+    - Bust placement is pinned by COMMIT-failure arms at all three
+      transactional sites: a refused COMMIT surfaces raw and busts nothing.
+    - The one spec-pass mutation survivor was the site-7 (updatePasswordHash)
+      bust deletion, masked because its only exercising flow also fired
+      unlinkDiscord's bust: a bust arm exercised only in a flow with a
+      SECOND bust is not independent coverage. Dedicated arms close it and
+      the mutant is re-proven killed in both DB modes.
+    - Mutation ledger: 16/15/1 spec (the survivor above), 8/8 fix-round,
+      8/8 round-2, every run twice (with and without TEST_DATABASE_URL).
 
 ## Phase 9 bust-site enumeration (the /api/discord staleness contract)
 
