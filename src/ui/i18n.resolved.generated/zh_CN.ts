@@ -1046,7 +1046,7 @@ export const zh_CN: EnTranslations = {
       },
       "awayNote": "若双方举同一面旗帜，客队将使用反转配色。",
       "rolesHeading": "运动位置",
-      "rolesSmallBracketNote": "在1对1和2对2赛级中，所有选手都以全能型出场。守门员玩法及其功绩需要3对3或更大的赛级。",
+      "rolesSmallBracketNote": "在1对1和2对2赛级中，所有选手都以全能型出场。要求3对3或更大赛级的功绩在此无法达成。",
       "role": {
         "allrounder": {
           "name": "全能型",
@@ -1131,7 +1131,7 @@ export const zh_CN: EnTranslations = {
         "rule5": "任何人都可以走上前，在看台上为你助威。",
         "kitHeading": "你的技能",
         "kitNote": "比赛期间，这些动作将取代你的职业技能。",
-        "unratedNote": "场上有机器人，因此本场为非评级赛：战绩与功绩之书进度均不计算。",
+        "unratedNote": "场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。",
         "rosterHeading": "出场名单",
         "you": "你",
         "bot": "电脑",

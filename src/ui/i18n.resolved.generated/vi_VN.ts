@@ -1046,7 +1046,7 @@ export const vi_VN: EnTranslations = {
       },
       "awayNote": "Nếu hai bên cùng giương một lá cờ, đội khách sẽ khoác bảng màu đảo ngược.",
       "rolesHeading": "Vai trò thi đấu",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Toàn Năng",
@@ -1131,7 +1131,7 @@ export const vi_VN: EnTranslations = {
         "rule5": "Ai cũng có thể tới cổ vũ bạn từ trên khán đài.",
         "kitHeading": "Bộ kỹ năng của bạn",
         "kitNote": "Các chiêu này thay thế kỹ năng lớp nhân vật của bạn trong trận đấu.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "Danh sách ra sân",
         "you": "Bạn",
         "bot": "Máy",

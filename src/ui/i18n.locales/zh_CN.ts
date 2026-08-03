@@ -8146,7 +8146,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.awayNote': '若双方举同一面旗帜，客队将使用反转配色。',
   'hudChrome.vcup.rolesHeading': '运动位置',
   'hudChrome.vcup.rolesSmallBracketNote':
-    '在1对1和2对2赛级中，所有选手都以全能型出场。守门员玩法及其功绩需要3对3或更大的赛级。',
+    '在1对1和2对2赛级中，所有选手都以全能型出场。要求3对3或更大赛级的功绩在此无法达成。',
   'hudChrome.vcup.role.allrounder.name': '全能型',
   'hudChrome.vcup.role.allrounder.desc': '样样都会：踢球、长传，还有一记正当的肩撞。',
   'hudChrome.vcup.role.striker.name': '前锋',
@@ -8220,7 +8220,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.kitHeading': '你的技能',
   'hudChrome.vcup.briefing.kitNote': '比赛期间，这些动作将取代你的职业技能。',
   'hudChrome.vcup.briefing.unratedNote':
-    '场上有机器人，因此本场为非评级赛：战绩与功绩之书进度均不计算。',
+    '场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。',
   'hudChrome.vcup.briefing.rosterHeading': '出场名单',
   'hudChrome.vcup.briefing.you': '你',
   'hudChrome.vcup.briefing.bot': '电脑',

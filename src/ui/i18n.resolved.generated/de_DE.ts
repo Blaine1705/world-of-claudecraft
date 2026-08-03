@@ -1046,7 +1046,7 @@ export const de_DE: EnTranslations = {
       },
       "awayNote": "Fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.",
       "rolesHeading": "Sportrolle",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Allrounder",
@@ -1131,7 +1131,7 @@ export const de_DE: EnTranslations = {
         "rule5": "Jeder kann vorbeikommen und dich von den Rängen aus anfeuern.",
         "kitHeading": "Deine Ausrüstung",
         "kitNote": "Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "Die Aufstellung",
         "you": "Du",
         "bot": "Bot",

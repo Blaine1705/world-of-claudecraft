@@ -869,7 +869,7 @@ export const hudChromeStrings = {
     // Shown under the role picker in the 1v1/2v2 brackets, where the sim seats
     // every fighter as All-Rounder regardless of the pick (issue 2767).
     rolesSmallBracketNote:
-      'In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.',
+      'In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.',
     role: {
       allrounder: {
         name: 'All-Rounder',
@@ -967,8 +967,10 @@ export const hudChromeStrings = {
       kitHeading: 'Your kit',
       kitNote: 'These moves replace your class abilities for the match.',
       // Extra rules-panel row for practice / bot-backfilled bouts (issue 2767).
+      // Says "deeds for goals, saves, and clean sheets" rather than all deed
+      // progress: the debut deeds deliberately still credit a backfilled bout.
       unratedNote:
-        'Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.',
+        'Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.',
       rosterHeading: 'The team sheet',
       // Row tags on the team sheet.
       you: 'You',

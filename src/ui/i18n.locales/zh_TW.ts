@@ -8146,7 +8146,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.awayNote': '若雙方舉同一面旗幟，客隊將使用反轉配色。',
   'hudChrome.vcup.rolesHeading': '運動位置',
   'hudChrome.vcup.rolesSmallBracketNote':
-    '在1對1和2對2賽級中，所有選手都以全能型出賽。守門員玩法及其功績需要3對3或更大的賽級。',
+    '在1對1和2對2賽級中，所有選手都以全能型出賽。要求3對3或更大賽級的功績在此無法達成。',
   'hudChrome.vcup.role.allrounder.name': '全能型',
   'hudChrome.vcup.role.allrounder.desc': '樣樣都會：踢球、長傳，還有一記正當的肩撞。',
   'hudChrome.vcup.role.striker.name': '前鋒',
@@ -8220,7 +8220,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.kitHeading': '你的技能',
   'hudChrome.vcup.briefing.kitNote': '比賽期間，這些動作將取代你的職業技能。',
   'hudChrome.vcup.briefing.unratedNote':
-    '場上有機器人，因此本場為非積分賽：戰績與功績之書進度均不計算。',
+    '場上有機器人，因此本場為非積分賽：戰績不會變動，進球、撲救與零封的功績均不計算。',
   'hudChrome.vcup.briefing.rosterHeading': '出場名單',
   'hudChrome.vcup.briefing.you': '你',
   'hudChrome.vcup.briefing.bot': '電腦',

@@ -1046,7 +1046,7 @@ export const pt_BR: EnTranslations = {
       },
       "awayNote": "Se os dois lados hasteiam o mesmo estandarte, o time visitante joga com a paleta invertida.",
       "rolesHeading": "Função esportiva",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Polivalente",
@@ -1131,7 +1131,7 @@ export const pt_BR: EnTranslations = {
         "rule5": "Qualquer um pode chegar e torcer por você das arquibancadas.",
         "kitHeading": "Seu kit",
         "kitNote": "Estes movimentos substituem as habilidades da sua classe durante a partida.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "A escalação",
         "you": "Você",
         "bot": "Bot",

@@ -8541,7 +8541,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.awayNote': '両チームが同じ旗を選んだ場合、アウェー側は反転配色でプレイする。',
   'hudChrome.vcup.rolesHeading': 'ポジション',
   'hudChrome.vcup.rolesSmallBracketNote':
-    '1対1と2対2の階級では全員がオールラウンダーとして出場する。キーパーのプレイとその功績には3対3以上の階級が必要だ。',
+    '1対1と2対2の階級では全員がオールラウンダーとして出場する。3対3以上の階級を求める功績はここでは達成できない。',
   'hudChrome.vcup.role.allrounder.name': 'オールラウンダー',
   'hudChrome.vcup.role.allrounder.desc': '何でもこなす:キック、ロングキック、正々堂々の肩当たり。',
   'hudChrome.vcup.role.striker.name': 'ストライカー',
@@ -8617,7 +8617,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.kitHeading': 'あなたの技',
   'hudChrome.vcup.briefing.kitNote': '試合中はこれらの技がクラスのアビリティと入れ替わる。',
   'hudChrome.vcup.briefing.unratedNote':
-    'ボットがピッチにいるため、この試合はレート対象外。戦績も功績の書の進行も数えられない。',
+    'ボットがピッチにいるため、この試合はレート対象外。戦績は動かず、ゴール・セーブ・クリーンシートの功績も数えられない。',
   'hudChrome.vcup.briefing.rosterHeading': 'メンバー表',
   'hudChrome.vcup.briefing.you': 'あなた',
   'hudChrome.vcup.briefing.bot': 'ボット',

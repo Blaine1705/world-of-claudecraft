@@ -1046,7 +1046,7 @@ export const id_ID: EnTranslations = {
       },
       "awayNote": "Jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.",
       "rolesHeading": "Peran olahraga",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Serba Bisa",
@@ -1131,7 +1131,7 @@ export const id_ID: EnTranslations = {
         "rule5": "Siapa pun bisa datang dan menyemangatimu dari tribun.",
         "kitHeading": "Perangkatmu",
         "kitNote": "Gerakan-gerakan ini menggantikan kemampuan kelasmu selama pertandingan.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "Susunan pemain",
         "you": "Kamu",
         "bot": "Bot",

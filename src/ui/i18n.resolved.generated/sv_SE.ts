@@ -1046,7 +1046,7 @@ export const sv_SE: EnTranslations = {
       },
       "awayNote": "Om båda sidor för samma banér spelar bortalaget i inverterade färger.",
       "rolesHeading": "Sportroll",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Allroundspelare",
@@ -1131,7 +1131,7 @@ export const sv_SE: EnTranslations = {
         "rule5": "Vem som helst kan gå fram och heja på dig från läktarna.",
         "kitHeading": "Din uppsättning",
         "kitNote": "De här dragen ersätter dina klassförmågor under matchen.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "Laguppställningen",
         "you": "Du",
         "bot": "Bot",

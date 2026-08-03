@@ -1046,7 +1046,7 @@ export const da_DK: EnTranslations = {
       },
       "awayNote": "Fører begge sider det samme banner, spiller udeholdet i den omvendte palet.",
       "rolesHeading": "Sportsrolle",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Allrounder",
@@ -1131,7 +1131,7 @@ export const da_DK: EnTranslations = {
         "rule5": "Enhver kan gå hen og heppe på dig fra tribunerne.",
         "kitHeading": "Dit sæt",
         "kitNote": "Disse træk erstatter dine klasseevner under kampen.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "Holdkortet",
         "you": "Dig",
         "bot": "Bot",

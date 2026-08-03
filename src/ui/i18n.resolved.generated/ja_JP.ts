@@ -1046,7 +1046,7 @@ export const ja_JP: EnTranslations = {
       },
       "awayNote": "両チームが同じ旗を選んだ場合、アウェー側は反転配色でプレイする。",
       "rolesHeading": "ポジション",
-      "rolesSmallBracketNote": "1対1と2対2の階級では全員がオールラウンダーとして出場する。キーパーのプレイとその功績には3対3以上の階級が必要だ。",
+      "rolesSmallBracketNote": "1対1と2対2の階級では全員がオールラウンダーとして出場する。3対3以上の階級を求める功績はここでは達成できない。",
       "role": {
         "allrounder": {
           "name": "オールラウンダー",
@@ -1131,7 +1131,7 @@ export const ja_JP: EnTranslations = {
         "rule5": "誰でも近づいて、スタンドから声援を送れる。",
         "kitHeading": "あなたの技",
         "kitNote": "試合中はこれらの技がクラスのアビリティと入れ替わる。",
-        "unratedNote": "ボットがピッチにいるため、この試合はレート対象外。戦績も功績の書の進行も数えられない。",
+        "unratedNote": "ボットがピッチにいるため、この試合はレート対象外。戦績は動かず、ゴール・セーブ・クリーンシートの功績も数えられない。",
         "rosterHeading": "メンバー表",
         "you": "あなた",
         "bot": "ボット",

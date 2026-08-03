@@ -1046,7 +1046,7 @@ export const en: EnTranslations = {
       },
       "awayNote": "If both sides fly the same banner, the away side plays the inverted palette.",
       "rolesHeading": "Sport role",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "All-Rounder",
@@ -1131,7 +1131,7 @@ export const en: EnTranslations = {
         "rule5": "Anyone can walk up and cheer you on from the stands.",
         "kitHeading": "Your kit",
         "kitNote": "These moves replace your class abilities for the match.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "The team sheet",
         "you": "You",
         "bot": "Bot",

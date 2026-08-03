@@ -1046,7 +1046,7 @@ export const tr_TR: EnTranslations = {
       },
       "awayNote": "İki taraf da aynı sancağı taşıyorsa deplasman tarafı ters renk paletiyle oynar.",
       "rolesHeading": "Spor rolü",
-      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Çok Yönlü",
@@ -1131,7 +1131,7 @@ export const tr_TR: EnTranslations = {
         "rule5": "İsteyen herkes gelip tribünlerden seni destekleyebilir.",
         "kitHeading": "Donanımın",
         "kitNote": "Bu hareketler maç boyunca sınıf yeteneklerinin yerine geçer.",
-        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
         "rosterHeading": "Kadro listesi",
         "you": "Sen",
         "bot": "Bot",
