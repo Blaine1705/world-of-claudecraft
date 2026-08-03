@@ -197,8 +197,9 @@ export type DiscordOutboxLinkRow = Pick<
  * Called by the consolidated outbox drain (GET /internal/discord/outbox,
  * server/internal.ts), which resolves every drained relay issuer, activity
  * participant and link-change account to its Discord identity in one pass. The
- * per-item discordForAccount the relay and activity GETs run costs one round trip
- * per ITEM, and a full drain carries thousands; collapsing that N+1 into a single
+ * per-item discordForAccount the relay GET still runs costs one round trip per
+ * ITEM (the activity GET batches its own read via discordForAccounts above),
+ * and a full drain carries thousands; collapsing that N+1 into a single
  * statement is invariant D1.
  *
  * discord_email is NOT selected, and that is the one deliberate difference from

@@ -299,6 +299,11 @@ describe('reclaimDeactivatedName', () => {
     // the link row, so the release enqueues ONE flex item for the HOLDER's account
     // (Phase 5 QA feed sweep). The holder SELECT must carry account_id for it.
     expect(calls[1][0]).toMatch(/c\.account_id/);
+    // The rich return's level/state come from the MOCK ROW, so the toEqual above
+    // is blind to the column list; these pins hold the hand-unioned SELECT (the
+    // caller feeds reclaimed.level/state straight into a real save write).
+    expect(calls[1][0]).toMatch(/c\.level/);
+    expect(calls[1][0]).toMatch(/c\.state/);
     expect(drainLinkChanges()).toEqual([{ accountId: 7, kinds: ['flex'] }]);
   });
 
@@ -333,6 +338,8 @@ describe('reclaimDeactivatedName', () => {
 
     await expect(reclaimDeactivatedName('Nobody')).resolves.toBeNull();
     expect(client.query.mock.calls.map((c) => c[0])).not.toContain('COMMIT');
+    // A refusal is not a transition: nothing may reach the change feed.
+    expect(drainLinkChanges()).toEqual([]);
   });
 
   it("leaves a banned account's name reserved even when the account is deactivated", async () => {
@@ -357,6 +364,8 @@ describe('reclaimDeactivatedName', () => {
     expect(client.query.mock.calls.map((c) => c[0]).some((s) => /UPDATE characters/i.test(s))).toBe(
       false,
     );
+    // The moderation-hold refusal must not reach the change feed either.
+    expect(drainLinkChanges()).toEqual([]);
   });
 });
 

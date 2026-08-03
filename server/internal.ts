@@ -449,9 +449,9 @@ export const OUTBOX_LINK_CHANGE_PAGE = 1000;
  *  3. Collect the account ids every drained item mentions. An EMPTY set issues no
  *     identity query at all.
  *  4. Otherwise resolve the whole union with ONE discordLinksForAccounts call.
- *     The per-item discordForAccount that the relay and activity GETs run once
- *     per item (or once per participant) never appears here: that N+1 is what
- *     invariant D1 forbids on this path.
+ *     The per-item discordForAccount the relay GET still runs once per item
+ *     never appears here (the activity GET already batches its own read via
+ *     discordForAccounts): that N+1 is what invariant D1 forbids on this path.
  *
  * RETRY CONTRACT (Phase 6's retry logic is written against this):
  *  - `winners` is an IDEMPOTENT READ. It stays unannounced until the bot calls
