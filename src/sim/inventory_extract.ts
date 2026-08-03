@@ -18,6 +18,7 @@
 // player moved or consumed the copy between seeing it and asking) refuses
 // instead of extracting a different copy of the same item.
 
+import { exchangeHardLock } from './exchange_eligibility';
 import { itemInstancePayloadsEqual } from './item_instance_merge';
 import type { InvSlot, ItemDef, ItemInstancePayload } from './types';
 import { cloneItemInstancePayload } from './types';
@@ -65,10 +66,12 @@ export function extractTradableCopy(
       return { ok: false, reason: 'stale_copy' };
     }
   }
-  if (def.soulbound) return { ok: false, reason: 'soulbound' };
-  if (def.kind === 'quest') return { ok: false, reason: 'quest_item' };
-  if (def.noMarketList) return { ok: false, reason: 'no_market_list' };
-  if (slot.instance?.boundTo !== undefined) return { ok: false, reason: 'bound_copy' };
+  // The shared lock predicate, not a fourth copy of these four checks: a mount
+  // is soulbound by content design and a chroma plate is noMarketList, and both
+  // trade on the Exchange, so a local copy here would refuse at the bags what
+  // the server's policy had already cleared (see exchange_eligibility.ts).
+  const lock = exchangeHardLock(def, slot.instance);
+  if (lock) return { ok: false, reason: lock };
   // Exactly one unit leaves the bags. A surviving stack keeps the original
   // payload object and the extracted unit gets its own clone (the aliasing
   // rule at cloneItemInstancePayload in types.ts); the final unit of a

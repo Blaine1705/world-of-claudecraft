@@ -355,8 +355,7 @@ describe('listingEligibility', () => {
 
   it('refuses an item on the policy exclusion list', () => {
     const excluding: WocEligibilityPolicy = {
-      allowEquipment: true,
-      equipmentQualityFloor: 'epic',
+      ...WOC_MARKET_RESTRICTED_POLICY,
       excludedItemIds: new Set(['syn_plate']),
     };
     expect(listingEligibility(equipDef(), undefined, excluding)).toEqual({
@@ -395,6 +394,104 @@ describe('listingEligibility', () => {
       ok: false,
       reason: 'below_quality_floor',
     });
+  });
+
+  // --- the two collectible categories ---------------------------------------
+  // Mounts and chroma plates trade at EVERY rarity, and each carries the very
+  // flag that keeps it out of the gold economy: a mount is soulbound (holding
+  // the reins IS owning the mount) and a plate is noMarketList. Both tolerances
+  // are scoped to this policy; the item defs are untouched.
+
+  const mountDef = (over: Record<string, unknown> = {}): ItemDef =>
+    ({
+      id: 'reins_syn',
+      name: 'Reins of the Synthetic Steed',
+      kind: 'mount',
+      mount: 'valorsteed',
+      quality: 'common',
+      soulbound: true,
+      sellValue: 10,
+      ...over,
+    }) as unknown as ItemDef;
+
+  const chromaDef = (over: Record<string, unknown> = {}): ItemDef =>
+    ({
+      id: 'syn_chroma_armor_plate',
+      name: 'Synthetic Chroma Plate',
+      kind: 'consumable',
+      quality: 'uncommon',
+      noMarketList: true,
+      use: { type: 'mechChroma', chromaId: 'syn_chroma' },
+      sellValue: 10,
+      ...over,
+    }) as unknown as ItemDef;
+
+  it.each(['common', 'uncommon', 'rare', 'epic', 'legendary'])(
+    'accepts a soulbound mount at %s, with no floor applied',
+    (quality) => {
+      expect(listingEligibility(mountDef({ quality }), undefined, policy)).toEqual({ ok: true });
+    },
+  );
+
+  it.each(['common', 'uncommon', 'rare', 'epic'])(
+    'accepts a noMarketList chroma plate at %s, with no floor applied',
+    (quality) => {
+      expect(listingEligibility(chromaDef({ quality }), undefined, policy)).toEqual({ ok: true });
+    },
+  );
+
+  it('still refuses BOTH categories when the realm turns them off', () => {
+    const off: WocEligibilityPolicy = {
+      ...WOC_MARKET_RESTRICTED_POLICY,
+      allowMounts: false,
+      allowMechChromas: false,
+    };
+    expect(listingEligibility(mountDef(), undefined, off)).toEqual({
+      ok: false,
+      reason: 'not_eligible_category',
+    });
+    expect(listingEligibility(chromaDef(), undefined, off)).toEqual({
+      ok: false,
+      reason: 'not_eligible_category',
+    });
+  });
+
+  it('keeps the absolute locks absolute for both categories', () => {
+    // The tolerances are scoped to ONE flag each, not a blanket pass. A bound
+    // copy and the exclusion list still refuse, and a mount does not inherit the
+    // chroma's noMarketList tolerance or the other way round.
+    const bound: ItemInstancePayload = { boundTo: 7 };
+    expect(listingEligibility(mountDef(), bound, policy)).toEqual({
+      ok: false,
+      reason: 'bound_copy',
+    });
+    expect(listingEligibility(chromaDef(), bound, policy)).toEqual({
+      ok: false,
+      reason: 'bound_copy',
+    });
+    expect(listingEligibility(mountDef({ noMarketList: true }), undefined, policy)).toEqual({
+      ok: false,
+      reason: 'no_market_list',
+    });
+    expect(listingEligibility(chromaDef({ soulbound: true }), undefined, policy)).toEqual({
+      ok: false,
+      reason: 'soulbound',
+    });
+    const excluded: WocEligibilityPolicy = {
+      ...WOC_MARKET_RESTRICTED_POLICY,
+      excludedItemIds: new Set(['reins_syn']),
+    };
+    expect(listingEligibility(mountDef(), undefined, excluded)).toEqual({
+      ok: false,
+      reason: 'excluded_item',
+    });
+  });
+
+  it('turns both categories ON in the shipped policy', () => {
+    // The point of the change, pinned against the real exported policy rather
+    // than a fixture: flipping either default off silently delists a collection.
+    expect(WOC_MARKET_RESTRICTED_POLICY.allowMounts).toBe(true);
+    expect(WOC_MARKET_RESTRICTED_POLICY.allowMechChromas).toBe(true);
   });
 });
 

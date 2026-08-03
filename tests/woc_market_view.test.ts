@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
+import { exchangeHardLock, exchangeItemCategory } from '../src/sim/exchange_eligibility';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
   buildWocMarketView,
@@ -50,11 +51,23 @@ const soulboundId = findId(
   (d) => d.slot !== undefined && d.soulbound === true,
 );
 const questKindId = findId('quest-kind item', (d) => d.kind === 'quest');
-const noMarketListId = findId('noMarketList item', (d) => d.noMarketList === true);
-const noSlotId = findId(
-  'def with no equip slot',
-  (d) => d.slot === undefined && !d.soulbound && !d.noMarketList && d.kind !== 'quest',
+// noMarketList AND not a chroma plate: every plate carries that flag and the
+// Exchange now tolerates it for that category, so an unscoped pick could resolve
+// to a plate and this arm would assert the opposite of the rule.
+const noMarketListId = findId(
+  'noMarketList non-chroma item',
+  (d) => d.noMarketList === true && exchangeItemCategory(d) !== 'mech_chroma',
 );
+// Category 'other' explicitly, not merely "no slot": a mount also has no slot
+// and is deliberately tradable now, so the old spelling of this fixture would
+// have drifted into testing nothing.
+const noSlotId = findId(
+  'def in no tradable category',
+  (d) => exchangeItemCategory(d) === 'other' && exchangeHardLock(d, undefined) === null,
+);
+// The two collectible categories, resolved from shipped content.
+const mountItemId = findId('a mount item', (d) => exchangeItemCategory(d) === 'mount');
+const chromaPlateId = findId('a chroma plate', (d) => exchangeItemCategory(d) === 'mech_chroma');
 const rareEquipId = findId(
   'rare equipment',
   (d) =>
@@ -78,6 +91,8 @@ const makeStatus = (over: Partial<WocMarketStatus> = {}): WocMarketStatus => ({
   durationsHours: [12, 24, 48, 72, 168],
   minPriceCents: 25,
   maxPriceCents: 5_000_000,
+  allowMounts: true,
+  allowMechChromas: true,
   qualityFloor: 'epic',
   settlementWindowSeconds: 600,
   ...over,
@@ -240,13 +255,15 @@ describe('paused derivation', () => {
   });
 });
 
+const BOTH_ON = { mounts: true, mechChromas: true } as const;
+
 describe('sellableRows: the sell-tab pre-filter over real ITEMS', () => {
   it('passes eligible epic equipment and preserves its inventory index', () => {
     const inventory: InvSlot[] = [
       { itemId: noSlotId, count: 1 },
       { itemId: epicEquipId, count: 1 },
     ];
-    expect(sellableRows(inventory, 'epic')).toEqual([
+    expect(sellableRows(inventory, 'epic', BOTH_ON)).toEqual([
       { index: 1, itemId: epicEquipId, quality: 'epic', instance: undefined },
     ]);
   });
@@ -258,19 +275,54 @@ describe('sellableRows: the sell-tab pre-filter over real ITEMS', () => {
     ['a quest-kind def', questKindId],
     ['rare equipment under the epic floor', rareEquipId],
   ])('refuses %s', (_label, itemId) => {
-    expect(sellableRows([{ itemId, count: 1 }], 'epic')).toEqual([]);
+    expect(sellableRows([{ itemId, count: 1 }], 'epic', BOTH_ON)).toEqual([]);
   });
 
   it('refuses a character-bound copy of otherwise eligible equipment', () => {
     const inventory: InvSlot[] = [{ itemId: epicEquipId, count: 1, instance: { boundTo: 3 } }];
-    expect(sellableRows(inventory, 'epic')).toEqual([]);
+    expect(sellableRows(inventory, 'epic', BOTH_ON)).toEqual([]);
   });
 
   it('lets a rolled epic quality lift a rare def over an epic floor', () => {
     const instance = { rolled: { quality: 'epic' } };
-    expect(sellableRows([{ itemId: rareEquipId, count: 1, instance }], 'epic')).toEqual([
+    expect(sellableRows([{ itemId: rareEquipId, count: 1, instance }], 'epic', BOTH_ON)).toEqual([
       { index: 0, itemId: rareEquipId, quality: 'epic', instance },
     ]);
+  });
+
+  it('offers a mount and a chroma plate from real content, under an epic floor', () => {
+    // Under the SAME epic floor that refuses rare equipment above: the floor is
+    // the equipment floor and must not reach either collectible category. Both
+    // fixtures are below epic in shipped content, so a floor bug shows up here.
+    const inventory: InvSlot[] = [
+      { itemId: mountItemId, count: 1 },
+      { itemId: chromaPlateId, count: 1 },
+    ];
+    expect(sellableRows(inventory, 'epic', BOTH_ON).map((r) => r.itemId)).toEqual([
+      mountItemId,
+      chromaPlateId,
+    ]);
+  });
+
+  it('withholds each category when the realm has it off, independently', () => {
+    // Independently, because one shared switch would make an operator disabling
+    // mounts also delist every suit skin.
+    const inventory: InvSlot[] = [
+      { itemId: mountItemId, count: 1 },
+      { itemId: chromaPlateId, count: 1 },
+    ];
+    expect(
+      sellableRows(inventory, 'epic', { mounts: false, mechChromas: true }).map((r) => r.itemId),
+    ).toEqual([chromaPlateId]);
+    expect(
+      sellableRows(inventory, 'epic', { mounts: true, mechChromas: false }).map((r) => r.itemId),
+    ).toEqual([mountItemId]);
+    expect(sellableRows(inventory, 'epic', { mounts: false, mechChromas: false })).toEqual([]);
+  });
+
+  it('still refuses a BOUND copy of a mount, switch on or not', () => {
+    const inventory: InvSlot[] = [{ itemId: mountItemId, count: 1, instance: { boundTo: 3 } }];
+    expect(sellableRows(inventory, 'epic', BOTH_ON)).toEqual([]);
   });
 });
 

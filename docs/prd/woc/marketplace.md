@@ -172,14 +172,39 @@ Eligibility is a per-server policy, not a hardcoded rule set
 (`woc_market_rules.ts`). The existing server ships the restricted policy:
 
 - Eligible: non-soulbound equipment of epic quality or higher.
-- Defined but empty on this server today: non-soulbound mounts, retired
-  cosmetics, and serialized collectibles (the game has no mounts, item-backed
-  cosmetics, or serials yet; the categories exist so a future web3 server can
-  enable them without rewriting settlement).
-- Excluded always: soulbound and `boundTo` copies, `noMarketList` items, quest
-  items, anything currently sold for Claudium (the store catalog is consulted
-  through the service when reachable), Gold, and Claudium themselves (not
-  items, structurally unlistable).
+- Eligible: **rideable mounts at every rarity** (the reins and ignition items,
+  `kind: 'mount'`). Deliberately unfloored: a mount's rarity is a look and a
+  speed tier rather than item power, so the equipment floor would hide every
+  common, uncommon and rare mount while reporting it ineligible. Mounts are
+  soulbound by content design, because holding the reins IS owning the mount
+  (`src/sim/mounts.ts` `mountOwned`); that flag keeps them out of the gold
+  economy's trade window and vendors and still does. The tolerance is scoped to
+  this rail and the item defs are untouched.
+- Eligible: **mech chroma plates at every rarity** (the suit skins,
+  `use.type === 'mechChroma'`), for the same reasons. Each plate carries
+  `noMarketList`, which keeps it off the in-game gold market; tolerated here at
+  the same scope. A plate is consumed on use and grants a permanent ACCOUNT
+  cosmetic, so only an unused plate is ever listable: once applied there is no
+  item left, which needs no rule of its own.
+- Still defined and dark: serialized collectibles (no assets behind them yet).
+- Excluded always, for every category: `boundTo` copies, quest items, anything
+  currently sold for Claudium (the store catalog is consulted through the
+  service when reachable), Gold, and Claudium themselves (not items,
+  structurally unlistable). `soulbound` and `noMarketList` remain absolute for
+  every category except the one that tolerates each, above.
+
+Each category is an independent switch (`allowEquipment`, `allowMounts`,
+`allowMechChromas`), so a realm can delist one collection without touching the
+others, and the switches ride the `/status` payload so the Sell picker offers
+exactly what the realm will accept.
+
+The taxonomy and the lock predicate are ONE definition
+(`src/sim/exchange_eligibility.ts`) consulted by all three enforcement points:
+the server's `listingEligibility` (authoritative), the sim's
+`extractTradableCopy` (defence in depth at the bags), and the client's
+`sellableRows` (the picker's pre-filter). They each carried a copy of the same
+four checks before, which is how a category the server accepted could still be
+refused at escrow, or never be offered in the picker at all.
 
 ### Integrity
 

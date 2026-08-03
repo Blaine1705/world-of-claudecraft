@@ -131,6 +131,11 @@ describe('status()', () => {
       minPriceCents: 0,
       maxPriceCents: 0,
       qualityFloor: 'epic',
+      // Both category switches fail CLOSED here, like every other field: an
+      // unreachable server must not leave the Sell picker offering mounts or
+      // suit skins it cannot confirm the realm trades.
+      allowMounts: false,
+      allowMechChromas: false,
       settlementWindowSeconds: 0,
     });
   });

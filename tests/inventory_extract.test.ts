@@ -99,6 +99,46 @@ describe('extractTradableCopy (pure leaf)', () => {
       expect(inventory).toHaveLength(1);
     });
 
+    it('EXTRACTS a soulbound mount: escrow must not re-refuse what policy cleared', () => {
+      // The gate that would otherwise have made every mount unlistable no matter
+      // what the server's policy said. Every reins item is soulbound by content
+      // design (holding the reins IS owning the mount), so a local soulbound
+      // refusal here beat the policy silently, at escrow, after the listing had
+      // already been accepted.
+      const inventory = inv({ itemId: 'reins', count: 1 });
+      const out = extractTradableCopy(
+        inventory,
+        { index: 0, itemId: 'reins' },
+        def({ kind: 'mount', soulbound: true, slot: undefined }),
+      );
+      expect(out).toEqual({ ok: true, extracted: { itemId: 'reins', count: 1 } });
+      expect(inventory).toHaveLength(0);
+    });
+
+    it('EXTRACTS a noMarketList chroma plate, and still refuses a bound one', () => {
+      const inventory = inv({ itemId: 'plate', count: 1 });
+      // `def` is typed against the weapon arm of the ItemDef union, so a
+      // consumable's shape needs the same unknown hop the helper itself uses.
+      const plateDef = {
+        kind: 'consumable',
+        name: 'Test Plate',
+        sellValue: 100,
+        noMarketList: true,
+        use: { type: 'mechChroma', chromaId: 'onyx_gold' },
+      } as unknown as ItemDef;
+      expect(extractTradableCopy(inventory, { index: 0, itemId: 'plate' }, plateDef)).toEqual({
+        ok: true,
+        extracted: { itemId: 'plate', count: 1 },
+      });
+      // The tolerance is one flag, not a blanket pass: a bound copy still stays.
+      const bound = inv({ itemId: 'plate', count: 1, instance: { boundTo: 4 } });
+      expect(extractTradableCopy(bound, { index: 0, itemId: 'plate' }, plateDef)).toEqual({
+        ok: false,
+        reason: 'bound_copy',
+      });
+      expect(bound).toHaveLength(1);
+    });
+
     it('refuses a quest item', () => {
       const inventory = inv({ itemId: 'blade', count: 1 });
       const out = extractTradableCopy(

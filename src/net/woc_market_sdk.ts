@@ -38,6 +38,11 @@ export interface WocMarketStatus {
   minPriceCents: number;
   maxPriceCents: number;
   qualityFloor: string;
+  /** Whether the realm trades the two collectible categories (mounts at any
+   *  rarity, mech chroma plates at any rarity). The Sell picker mirrors these
+   *  so it never offers what the server would refuse. */
+  allowMounts: boolean;
+  allowMechChromas: boolean;
   settlementWindowSeconds: number;
 }
 
@@ -213,6 +218,10 @@ export class WocMarketClient {
         minPriceCents: 0,
         maxPriceCents: 0,
         qualityFloor: 'epic',
+        // Fail CLOSED, like every other field in this stub: an unreachable
+        // server must not have the picker offering categories it may refuse.
+        allowMounts: false,
+        allowMechChromas: false,
         settlementWindowSeconds: 0,
       };
     }

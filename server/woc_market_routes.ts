@@ -344,6 +344,10 @@ async function statusHandler(ctx: Ctx): Promise<void> {
     // The eligibility floor, so the client's sell-tab pre-filter follows this
     // server's policy instead of hardcoding one (the server re-validates).
     qualityFloor: policy.equipmentQualityFloor,
+    // The two collectible category switches, so the client's Sell picker offers
+    // exactly what this realm's policy will accept.
+    allowMounts: policy.allowMounts,
+    allowMechChromas: policy.allowMechChromas,
     settlementWindowSeconds: WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
   });
 }

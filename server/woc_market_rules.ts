@@ -6,6 +6,11 @@
 // deeds_board.ts split. Every USD value is INTEGER CENTS; token amounts never
 // appear here (the economy service owns all token math).
 
+import {
+  exchangeCategoryUsesQualityFloor,
+  exchangeHardLock,
+  exchangeItemCategory,
+} from '../src/sim/exchange_eligibility';
 import type { ItemDef, ItemInstancePayload } from '../src/sim/types';
 
 // ---------------------------------------------------------------------------
@@ -192,6 +197,21 @@ export interface WocEligibilityPolicy {
   allowEquipment: boolean;
   equipmentQualityFloor: 'epic' | 'rare' | 'uncommon';
   /**
+   * Rideable mounts (the reins/ignition items, `kind: 'mount'`), at EVERY
+   * rarity. Deliberately not floored: a mount's rarity is a look and a speed
+   * tier, not item power, and the whole collection trades or none of it does.
+   * Applying the equipment floor here would hide every common, uncommon and
+   * rare mount while reporting it ineligible.
+   */
+  allowMounts: boolean;
+  /**
+   * Mech chroma plates (the suit skins, `use.type === 'mechChroma'`), at every
+   * rarity, for the same reason. A plate is consumed on use and grants a
+   * permanent ACCOUNT cosmetic, so only an unused plate is ever tradable: once
+   * applied there is no item left to list, which needs no rule of its own.
+   */
+  allowMechChromas: boolean;
+  /**
    * Item ids barred regardless of category: anything currently sold for
    * Claudium (merged from the store catalog when the service is reachable)
    * plus operator additions.
@@ -200,12 +220,15 @@ export interface WocEligibilityPolicy {
 }
 
 /** The existing server's policy: non-soulbound equipment of epic quality or
- *  higher. Mounts, retired cosmetics, and serialized collectibles are defined
- *  categories with no tradable assets behind them yet (PRD "Eligibility
- *  policy"), so they have no arm here until such assets exist. */
+ *  higher, plus the two collectible categories the PRD defined and left dark
+ *  ("no tradable assets behind them yet"). v0.34.0 shipped the assets: eight
+ *  rideable mounts and fifteen mech chroma plates, so both arms are on. The
+ *  remaining dark category is serialized collectibles, which still have none. */
 export const WOC_MARKET_RESTRICTED_POLICY: WocEligibilityPolicy = {
   allowEquipment: true,
   equipmentQualityFloor: 'epic',
+  allowMounts: true,
+  allowMechChromas: true,
   excludedItemIds: new Set(),
 };
 
@@ -232,19 +255,30 @@ export function listingEligibility(
   policy: WocEligibilityPolicy,
 ): { ok: true } | { ok: false; reason: WocEligibilityRefusal } {
   if (!def) return { ok: false, reason: 'unknown_item' };
-  if (def.soulbound) return { ok: false, reason: 'soulbound' };
-  if (def.kind === 'quest') return { ok: false, reason: 'quest_item' };
-  if (def.noMarketList) return { ok: false, reason: 'no_market_list' };
-  if (instance?.boundTo !== undefined) return { ok: false, reason: 'bound_copy' };
+  // The shared lock predicate (src/sim/exchange_eligibility.ts), which the sim's
+  // escrow extraction and the client's Sell picker also consult, so all three
+  // agree on which locks a category tolerates.
+  const lock = exchangeHardLock(def, instance);
+  if (lock) return { ok: false, reason: lock };
   if (policy.excludedItemIds.has(def.id)) return { ok: false, reason: 'excluded_item' };
-  const isEquipment = def.slot !== undefined;
-  if (!isEquipment || !policy.allowEquipment) {
-    return { ok: false, reason: 'not_eligible_category' };
-  }
-  const quality = instance?.rolled?.quality ?? def.quality ?? 'common';
-  const floor = QUALITY_RANK[policy.equipmentQualityFloor];
-  if ((QUALITY_RANK[quality] ?? 0) < floor) {
-    return { ok: false, reason: 'below_quality_floor' };
+  const category = exchangeItemCategory(def);
+  const categoryAllowed =
+    category === 'equipment'
+      ? policy.allowEquipment
+      : category === 'mount'
+        ? policy.allowMounts
+        : category === 'mech_chroma'
+          ? policy.allowMechChromas
+          : false;
+  if (!categoryAllowed) return { ok: false, reason: 'not_eligible_category' };
+  // The floor is the EQUIPMENT floor and reaches only equipment; the collectible
+  // categories trade at every tier (see the policy fields).
+  if (exchangeCategoryUsesQualityFloor(category)) {
+    const quality = instance?.rolled?.quality ?? def.quality ?? 'common';
+    const floor = QUALITY_RANK[policy.equipmentQualityFloor];
+    if ((QUALITY_RANK[quality] ?? 0) < floor) {
+      return { ok: false, reason: 'below_quality_floor' };
+    }
   }
   return { ok: true };
 }

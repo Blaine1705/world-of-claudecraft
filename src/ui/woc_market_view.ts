@@ -10,6 +10,11 @@
 // the item def) purely as a courtesy: the server re-validates every listing.
 
 import { ITEMS } from '../sim/data';
+import {
+  exchangeCategoryUsesQualityFloor,
+  exchangeHardLock,
+  exchangeItemCategory,
+} from '../sim/exchange_eligibility';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
 
 // Structural twins of the src/net/woc_market_sdk.ts payload shapes. The
@@ -41,6 +46,8 @@ export interface WocMarketStatus {
   minPriceCents: number;
   maxPriceCents: number;
   qualityFloor: string;
+  allowMounts: boolean;
+  allowMechChromas: boolean;
   settlementWindowSeconds: number;
 }
 
@@ -235,23 +242,33 @@ const QUALITY_RANK: Record<string, number> = {
 };
 
 /**
- * The sell-tab pre-filter: equipment (a def with an equip slot) at or above
- * the server's floor, free of every hard transfer lock. Mirrors, never
- * replaces, the server-side listingEligibility + extraction checks.
+ * The sell-tab pre-filter: every category the server's policy trades, free of
+ * every hard transfer lock, with the equipment floor applied to equipment only.
+ * Mirrors, never replaces, the server-side listingEligibility + extraction
+ * checks, and shares their lock predicate and taxonomy so it cannot drift into
+ * hiding something the server would have accepted.
+ *
+ * The category switches ride the status payload rather than being assumed here:
+ * a realm with mounts turned off must not offer them in the picker and then
+ * refuse the listing.
  */
 export function sellableRows(
   inventory: readonly InvSlot[],
   qualityFloor: string,
+  categories: { mounts: boolean; mechChromas: boolean },
 ): WocSellRowModel[] {
   const floor = QUALITY_RANK[qualityFloor] ?? QUALITY_RANK.epic;
   const rows: WocSellRowModel[] = [];
   inventory.forEach((slot, index) => {
     const def = ITEMS[slot.itemId];
-    if (!def || def.slot === undefined) return;
-    if (def.soulbound || def.noMarketList || def.kind === 'quest') return;
-    if (slot.instance?.boundTo !== undefined) return;
+    if (!def) return;
+    if (exchangeHardLock(def, slot.instance) !== null) return;
+    const category = exchangeItemCategory(def);
+    if (category === 'other') return;
+    if (category === 'mount' && !categories.mounts) return;
+    if (category === 'mech_chroma' && !categories.mechChromas) return;
     const quality = slot.instance?.rolled?.quality ?? def.quality ?? 'common';
-    if ((QUALITY_RANK[quality] ?? 0) < floor) return;
+    if (exchangeCategoryUsesQualityFloor(category) && (QUALITY_RANK[quality] ?? 0) < floor) return;
     rows.push({ index, itemId: slot.itemId, quality, instance: slot.instance });
   });
   return rows;
@@ -359,7 +376,10 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
       detail,
     },
     sell: {
-      rows: sellableRows(input.inventory, status.qualityFloor),
+      rows: sellableRows(input.inventory, status.qualityFloor, {
+        mounts: status.allowMounts,
+        mechChromas: status.allowMechChromas,
+      }),
       maxActiveListings: status.maxActiveListings,
     },
     activity,
