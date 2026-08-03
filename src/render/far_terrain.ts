@@ -17,6 +17,12 @@
 import * as THREE from 'three';
 import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data';
 import {
+  BIOME_HAZE_DECLARATIONS,
+  biomeHazeFragmentGlsl,
+  biomeHazeUniforms,
+  hasBiomeHazeField,
+} from './biome_haze_field';
+import {
   createFarTileBuilder,
   type FarTile,
   type FarVistaPlan,
@@ -151,6 +157,9 @@ export function buildFarTerrain(
   // the near ground shows, and the handoff at the detail horizon is
   // invisible by construction. ?grassbake=off keeps the legacy flat tint.
   const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
+  // Distant-zone atmosphere: whether the biome haze field exists is decided
+  // once, before the material compiles, so a tier without one is byte-identical.
+  const zoneHaze = hasBiomeHazeField();
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uFarCut = farCut;
     shader.uniforms.uFarNightFloor = farNightFloor;
@@ -194,6 +203,21 @@ export function buildFarTerrain(
             * ${GRASS_PAINT_GAIN.toFixed(4)},
           vGrassW);`,
       );
+    }
+    // Per-zone aerial perspective (biome_haze_field.ts). Self-contained and
+    // additive on purpose: its own uniforms, its own two replaces, and it
+    // lands immediately before <fog_fragment> so the horizon haze band still
+    // owns the rim. The near splat terrain splices the identical snippet on
+    // the identical uniforms, which is what keeps the detail-horizon handoff
+    // seamless.
+    if (zoneHaze) {
+      Object.assign(shader.uniforms, biomeHazeUniforms());
+      shader.fragmentShader = shader.fragmentShader
+        .replace('#include <common>', `#include <common>${BIOME_HAZE_DECLARATIONS}`)
+        .replace(
+          '#include <fog_fragment>',
+          `${biomeHazeFragmentGlsl('vFarXZ')}\n\t#include <fog_fragment>`,
+        );
     }
   };
 
