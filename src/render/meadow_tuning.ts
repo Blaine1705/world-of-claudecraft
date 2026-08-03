@@ -17,8 +17,8 @@
 // ---------------------------------------------------------------------------
 
 /** Outer radius of the solid-blade band, in yards. Charlie's acceptance
- *  window is roughly 90 to 150; the band fades by scale collapse over its
- *  outer 20 percent (MEADOW_BAND_FADE_START). */
+ *  window is roughly 90 to 150; the band fades by scale collapse from
+ *  MEADOW_BAND_FADE_START of this radius outward. */
 export const MEADOW_BAND_RADIUS = 120;
 
 /** Yards between band cluster cells. ONE constant density across the whole
@@ -27,8 +27,19 @@ export const MEADOW_BAND_RADIUS = 120;
 export const MEADOW_BAND_CELL = 1.25;
 
 /** Fraction of the band radius where the outer scale-collapse fade begins.
- *  0.8 leaves the outer 20 percent as the only fade, mirroring the carpet. */
-export const MEADOW_BAND_FADE_START = 0.8;
+ *  Started at 0.8 (outer 20 percent only); lowered to 0.5 after the first
+ *  playtest: a short fade window puts the whole grow-to-full-size ramp in
+ *  one narrow ring, which reads as grass LOADING IN around the player as
+ *  the ring travels. A long ramp spreads the growth over half the band so
+ *  the field just gets gradually denser toward you. */
+export const MEADOW_BAND_FADE_START = 0.5;
+
+/** Same idea for the near carpet (blade_grass.ts reads this): fraction of
+ *  GFX.bladeCarpetRadius where the carpet's scale-collapse fade begins.
+ *  The carpet's own 0.8 was the strongest "loading in" read since its ring
+ *  sits right at the player's feet; 0.5 makes the fine blades emerge over
+ *  the outer half of the carpet instead of materializing at its rim. */
+export const MEADOW_CARPET_FADE_START = 0.5;
 
 /** Cluster re-placements per frame while the player moves (the toroidal
  *  scan's budget). A teleport backfills the full pool within about a

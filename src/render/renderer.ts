@@ -342,7 +342,7 @@ import {
   type TemporalHourglassMode,
   type TemporalHourglassVisual,
 } from './temporal_hourglass_visual';
-import { buildTerrain, type TerrainView } from './terrain';
+import { buildTerrain, hasTerrainSplatAssets, type TerrainView } from './terrain';
 import { uploadDataTextureInChunks } from './texture_upload';
 import { sparkleTexture } from './textures';
 import { targetIntensityFromValues } from './travel_speed_fx';
@@ -1872,9 +1872,12 @@ export class Renderer {
     // Meadow continuum: bake the blade-cluster ground texture BEFORE any
     // terrain material builds (near splat and far tiles both read the
     // singleton at material-build time). A few milliseconds, once per
-    // session; tiers with neither splat terrain nor the vista never
-    // consume it, so skip the bake and its texture memory there.
-    if (GFX.terrainSplat || this.farVista.enabled) {
+    // session. Gated on the same predicate that picks the near splat
+    // material: when the near terrain runs the Lambert arm (low tier, the
+    // Advanced Terrain Detail=Low dial, or a failed splat-asset preload),
+    // the far tiles must stay legacy too, or the horizon would be painted
+    // meadow while the ground underfoot is not.
+    if (GFX.terrainSplat && hasTerrainSplatAssets()) {
       try {
         setGrassGroundBake(bakeGrassGroundTexture(this.webgl, this.sim.cfg.seed));
       } catch {

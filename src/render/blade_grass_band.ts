@@ -4,9 +4,9 @@
 // blades near the camera" half of the meadow rule: the painted terrain
 // carries the grass look at every distance, and this layer only adds
 // parallax and silhouette where blades still resolve. Nothing here scales
-// an element up and nothing varies with distance except the mandated outer
-// scale-collapse fade (the outer 20 percent of the band) and the residency
-// clamp handed in by the renderer.
+// an element up and nothing varies with distance except the outer
+// scale-collapse fade (from MEADOW_BAND_FADE_START of the radius outward)
+// and the residency clamp handed in by the renderer.
 //
 // The band's grid covers the full disc, INCLUDING the ground under the near
 // carpet. Cutting an inner hole at the carpet edge would make every band
