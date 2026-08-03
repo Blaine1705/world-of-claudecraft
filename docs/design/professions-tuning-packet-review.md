@@ -5885,6 +5885,17 @@ test files / 27303 tests passed (89 skipped) plus the 11-file browser
 suite at 96 tests, vitest workers 8. NEXT = phase 23 QA (ultracode,
 new session), then phase 24.
 
+## Phase 23 QA entry sync (2026-08-03, zero drift)
+
+The per-phase sync preamble, run at the phase 23 QA entry. git fetch
+at entry measured ZERO drift: origin/release/v0.34.0 still sits at
+5f22a51a00, the same tip the phase 23 entry sync above already
+merged, and it is an ancestor of the branch tip 051dac3b4d (the
+build record commit). There is no merge commit, nothing for the
+release-merge-audit skill to run over, and the build record's final
+gate (all 10 steps green at 3f1e058325 content on the quiescent
+tree) stands as the entry state.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
