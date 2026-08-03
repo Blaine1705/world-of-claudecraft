@@ -296,7 +296,10 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // the same contract for the map editor's realtime terrain/water edits.
 // day_night_core is the clock-to-grade math of the world day/night cycle
 // (Date.now stays in the renderer that calls it), so a Vitest can drive any
-// moment of the cycle.
+// moment of the cycle. night_lighting_core is the pair of ramps every
+// after-dark readability layer fades on, and streetlamp_placement_core lays
+// out the town lamp posts from the road polylines through caller-supplied
+// probes, so both stay drivable without a renderer.
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
@@ -335,6 +338,9 @@ const RENDER_PURE_CORES = [
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/net_interp_core.ts',
+  'src/render/night_accents_core.ts',
+  'src/render/night_lighting_core.ts',
+  'src/render/streetlamp_placement_core.ts',
   'src/render/opaque_draw_order_core.ts',
   'src/render/perceptual_lod_core.ts',
   'src/render/prop_cell_core.ts',

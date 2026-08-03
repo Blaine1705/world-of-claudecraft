@@ -161,6 +161,7 @@ import {
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
+import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
 import {
@@ -244,6 +245,7 @@ import {
 } from './mage_barrier_visual';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
+import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
@@ -254,7 +256,15 @@ import {
   nameplateScreenTransform,
 } from './nameplate_projection';
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
+import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
+import {
+  lampGlowAmount,
+  mobGlowAmount,
+  nightLightAmount,
+  nightRimBoost,
+  wildGlowAmount,
+} from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
 import {
   type OpaqueSortPolicyInput,
@@ -341,6 +351,7 @@ import { freezeStaticMatrices, freezeStaticSubtreeMatrices } from './static_matr
 import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
+import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -1543,6 +1554,10 @@ export class Renderer {
   private fenFeatures: FenFeaturesView | null = null;
   private amberFeatures: AmberFeaturesView | null = null;
   private nightFeatures: NightFeaturesView | null = null;
+  private streetlamps: StreetlampsView | null = null;
+  private emberPools: EmberPoolsView | null = null;
+  private nightAccents: NightAccentsView | null = null;
+  private mobNightGlow: MobNightGlowView | null = null;
   private hauntFeatures: HauntFeaturesView | null = null;
   private jungleFeatures: JungleFeaturesView | null = null;
   private gardenFeatures: GardenFeaturesView | null = null;
@@ -1553,6 +1568,12 @@ export class Renderer {
   // and the IBL intensity. Defaults to full day for the frames before the first
   // updateAmbience runs.
   private dnGrade: DayNightGrade = fullDayGrade();
+  // How far into night the shared WORLD clock is (1 - globalDayness), before any
+  // realm amplitude compresses it, and 0 on a tier that never applies the grade.
+  // The night-visibility layers (streetlamps, the mob ground glow, the character
+  // rim lift) all key off this one number so they light up together in every
+  // realm; see night_lighting_core.ts for why it is the global amount.
+  private dnGlobalNight = 0;
   private fixedLowDayBiome: BiomeId | null = null;
   private dnColorScratch = new THREE.Color();
   private dnMoonScratch = new THREE.Color();
@@ -2290,6 +2311,30 @@ export class Renderer {
     this.flames.push(...stationProps.flames);
     this.fireLights.push(...stationProps.fireLights);
     bd('stations');
+
+    // Town streetlamps: world-spanning dressing, so it is built here with the
+    // rest of it rather than lazily per biome (every zone has a hub, so a
+    // per-biome gate would build the whole set within a couple of zones anyway).
+    // Each town is its own cull group, so only the town the player is standing
+    // in submits draws; its point lights join the shared fire-light budget.
+    this.streetlamps = buildStreetlamps(this.sim.cfg.seed);
+    this.attachZoneFeature(this.streetlamps);
+    // Warm ground pools under nearby characters after dark. Camera-band sized
+    // and rewritten every frame from the entity loop, so it is NOT a zone
+    // feature: it is a pooled overlay the sync loop fills.
+    this.mobNightGlow = buildMobNightGlow();
+    setRenderCategory(this.mobNightGlow.group, 'ui3d');
+    this.scene.add(this.mobNightGlow.group);
+    // Ember pools at every authored campfire and mob camp: static, so they
+    // bucket per zone and ride the same distance cull as the lamps.
+    this.emberPools = buildEmberPools(this.sim.cfg.seed);
+    this.attachZoneFeature(this.emberPools);
+    // The streamed wilderness layer (glow flora + fireflies) follows the camera
+    // and rebuilds on a cell crossing, so it is NOT a zone feature.
+    this.nightAccents = buildNightAccents(this.sim.cfg.seed);
+    setRenderCategory(this.nightAccents.group, 'props');
+    this.scene.add(this.nightAccents.group);
+    bd('night-accents');
     // One residency table at the end of the build (dev console): where the
     // decoded bytes sit at exactly the point the iPhone 17 Pro is killed.
     // Scene first so shared buffers/images attribute to the live world, then
@@ -7494,6 +7539,7 @@ export class Renderer {
     if (this.lowGfx && DAY_ONLY && phaseOverride === null) {
       if (this.fixedLowDayBiome !== biome) {
         this.dnGrade = NEUTRAL_DAY_GRADE;
+        this.dnGlobalNight = 0;
         this.sunDir.copy(SUN_DIR);
         this.moonDir.set(0, -1, 0);
         this.sunUp = aboveHorizon(SUN_DIR.y) * REALM_DAYNIGHT_AMPLITUDE[biome];
@@ -7510,6 +7556,7 @@ export class Renderer {
       const amp = REALM_DAYNIGHT_AMPLITUDE[biome];
       if (DAY_ONLY && phaseOverride === null) {
         this.dnGrade = NEUTRAL_DAY_GRADE;
+        this.dnGlobalNight = 0;
         this.sunDir.copy(SUN_DIR);
         this.moonDir.set(0, -1, 0);
         this.sunUp = aboveHorizon(SUN_DIR.y) * amp;
@@ -7530,6 +7577,11 @@ export class Renderer {
           dayNightGrade(effectiveDayness(gday, biome), biome),
           duskWarmAmount(sd[1]),
         );
+        // The night-visibility layers read the world clock, not the realm's
+        // compressed grade, so lamps light at the same instant everywhere. The
+        // Lambert tier never applies the grade at all (see the outdoor branch
+        // below), so it reports full day and its lamps stay dark.
+        this.dnGlobalNight = nightLightAmount(1 - gday, !this.lowGfx);
       }
     }
     // The distant-zone haze rides the settled grade and the live camera: a
@@ -7791,7 +7843,7 @@ export class Renderer {
               ? LASTKEEP_HEMI_INTENSITY
               : underground
                 ? DUNGEON_HEMI_INTENSITY
-                : hemiOutdoorIntensity() * this.dnGrade.lightScale;
+                : hemiOutdoorIntensity() * this.dnGrade.ambientScale;
         this.scene.environmentIntensity = mazeNight
           ? YUMI_MAZE_ENV_INTENSITY
           : wildheartSun
@@ -7800,7 +7852,7 @@ export class Renderer {
               ? LASTKEEP_ENV_INTENSITY
               : underground
                 ? DUNGEON_ENV_INTENSITY
-                : this.envOutdoorIntensity * this.dnGrade.lightScale;
+                : this.envOutdoorIntensity * this.dnGrade.ambientScale;
         sharedUniforms.uRimBoost.value = mazeNight
           ? YUMI_MAZE_RIM_BOOST
           : wildheartSun
@@ -7930,8 +7982,17 @@ export class Renderer {
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
       this.sun.intensity +=
         (SUN_INTENSITY * g.lightScale * (light.sunScale ?? 1) - this.sun.intensity) * k;
+      // The ambient half rides its own higher night floor, so terrain shape and
+      // body silhouettes survive deep night while the moon key light stays dim.
       this.hemi.intensity +=
-        (hemiOutdoorIntensity() * g.lightScale * (light.hemiScale ?? 1) - this.hemi.intensity) * k;
+        (hemiOutdoorIntensity() * g.ambientScale * (light.hemiScale ?? 1) - this.hemi.intensity) *
+        k;
+      // The character rim (the cheapest silhouette separator the renderer owns:
+      // one shared uniform, no extra draw, every rig at once) lifts after dark
+      // for the same reason the ambient floor does. Outdoors this is the only
+      // writer; the fogState transition above sets it to 1 on the way out of an
+      // interior and this immediately re-grades it.
+      sharedUniforms.uRimBoost.value = nightRimBoost(this.dnGlobalNight);
     }
   }
 
@@ -7952,7 +8013,8 @@ export class Renderer {
         ? (Renderer.BIOME_LIGHT[dominant as BiomeId].envScale ?? 1)
         : 1;
     const target = this.envRTs.has(dominant) ? dominant : this.envTransition.current;
-    const settledIntensity = this.envOutdoorIntensity * this.dnGrade.lightScale * envScale;
+    // The IBL is ambient, so it follows the grade's ambient floor, not the sun's.
+    const settledIntensity = this.envOutdoorIntensity * this.dnGrade.ambientScale * envScale;
     // Interior presets write the scene intensity directly. Re-seed from that
     // live value on the first outdoor frame so returning outside never jumps
     // back to a stale transition scalar.
@@ -9305,6 +9367,27 @@ export class Renderer {
     }
     this.lastVisibleRigCount = visibleRigCount;
 
+    // Night mob glow: a warm pool of light on the ground under every nearby body
+    // once it is properly dark, so a mob out in an unlit field still reads as a
+    // body. Driven here rather than from the entity loop above because all it
+    // needs is the final visibility that loop just settled plus the drawn
+    // position; the walk itself lives in the module that owns the pool.
+    //
+    // Outdoors only: the world clock does not govern a dungeon, a delve, the
+    // Last Keep, or the seabed, each of which runs its own authored rig. Without
+    // this, walking underground at world-midnight lit a pool under every mob and
+    // the same dungeon went dark again at world-noon, which is incoherent to a
+    // player who never saw the sky. `fogState` carries last frame's answer (it
+    // settles in updateAmbience, below the entity loop); one frame of discs on
+    // the way through a door is not worth reordering the frame for.
+    this.mobNightGlow?.emit(
+      this.views,
+      sim.entities,
+      p.pos.x,
+      p.pos.z,
+      this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0,
+    );
+
     // Hidden views skip their whole matrix subtree: three recomposes even
     // invisible hierarchies, and a distance-culled or off-screen rig is 30-60
     // nodes of dead per-frame compose+multiply. Re-showing flips the gate back
@@ -9492,6 +9575,13 @@ export class Renderer {
       if (!priorState) this.flamePerceptualStates.set(f, state);
       if (state.emitsEmber) this.vfx.campfireEmber(state.worldPosition, dt);
     }
+    // Streetlamps light before the budget runs, not after: the budget and its
+    // flicker pass are what actually write light.intensity, and they read the
+    // baseIntensity this sets. Running it afterward would put a lamp's own level
+    // back on top of a light the governor had just budgeted out.
+    const lampGlow = lampGlowAmount(this.dnGlobalNight);
+    this.streetlamps?.update(lampGlow, this.time);
+    this.emberPools?.update(lampGlow, this.time);
     this.budgetFireLights(p.pos.x, p.pos.z, true);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'lights', worldStart);
 
@@ -9627,6 +9717,18 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'foliage', worldStart);
     this.fish.update(p.pos.x, p.pos.z, dt);
     this.motes.update(p.pos.x, p.pos.z, dt);
+    // The wilderness night layer rides beside the ambient motes: same
+    // player-centred streaming contract, but gated on real dark and anchored to
+    // world cells for the flora (see night_accents.ts).
+    // Same outdoor gate as the mob glow: mushrooms and fireflies belong to the
+    // sky's clock, so an instanced interior never grows them.
+    this.nightAccents?.update(
+      this.fogState === 'outdoor' ? wildGlowAmount(this.dnGlobalNight) : 0,
+      this.time,
+      dt,
+      p.pos.x,
+      p.pos.z,
+    );
     this.bladeGrass.update(p.pos.x, p.pos.z);
     // fogFar here is subsystemCullFar(): the residency-clamped detail
     // horizon, so band blades never stand past unbuilt ground

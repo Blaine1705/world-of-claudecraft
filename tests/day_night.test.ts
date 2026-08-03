@@ -72,6 +72,39 @@ describe('water follows the cycle (source pins)', () => {
   });
 });
 
+describe('the night visibility layers stay outdoors (source pins)', () => {
+  // The world clock governs the sky, not a dungeon, a delve, the Last Keep, or
+  // the seabed: each of those runs its own authored light rig all cycle long. A
+  // night layer that ignored that would light a pool under every mob underground
+  // at world-midnight and take it away again at world-noon, which is incoherent
+  // to a player who has not seen the sky in an hour. The gate is one ternary per
+  // call site in renderer.ts, so these pins are what keep it from being dropped
+  // in a refactor; there is no pure core to assert it on.
+  const renderer = () =>
+    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+
+  it('gates the mob ground glow on the outdoor fog state', () => {
+    expect(renderer()).toContain(
+      "this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0",
+    );
+  });
+
+  it('gates the wilderness accents on the outdoor fog state', () => {
+    expect(renderer()).toContain(
+      "this.fogState === 'outdoor' ? wildGlowAmount(this.dnGlobalNight) : 0",
+    );
+  });
+
+  it('drives the streetlamps and the ember pools from the same lamp amount', () => {
+    // One amount for both, so a lamp and the campfire beside it never disagree
+    // about whether it is dusk.
+    const source = renderer();
+    expect(source).toContain('const lampGlow = lampGlowAmount(this.dnGlobalNight);');
+    expect(source).toContain('this.streetlamps?.update(lampGlow, this.time);');
+    expect(source).toContain('this.emberPools?.update(lampGlow, this.time);');
+  });
+});
+
 describe('cyclePhase', () => {
   it('maps epoch 0 to phase 0 and the half-cycle to 0.5', () => {
     expect(cyclePhase(0)).toBe(0);
@@ -243,6 +276,59 @@ describe('per-realm night palettes (region style survives the dark)', () => {
     for (const b of ['night', 'ember', 'frost', 'haunt', 'dusk', 'amber'] as BiomeId[]) {
       expect(dayNightGrade(1, b)).toEqual(NEUTRAL_DAY_GRADE);
     }
+  });
+});
+
+describe('the night ambient floor (readable silhouettes at deep night)', () => {
+  it('is the identity at noon, exactly like every other day target', () => {
+    expect(dayNightGrade(1).ambientScale).toBeCloseTo(1, 12);
+    expect(NEUTRAL_DAY_GRADE.ambientScale).toBe(1);
+  });
+
+  it('holds a HIGHER floor than the key light at deepest night', () => {
+    const g = dayNightGrade(0);
+    // The two halves of the rig answer different questions after dark: the sun
+    // scale is the moon (genuinely dim), the ambient scale is the sky bounce
+    // that keeps terrain shape and bodies legible. Pinning both to one floor is
+    // what made night read as a black cutout.
+    expect(g.ambientScale).toBeGreaterThan(g.lightScale);
+    expect(g.ambientScale).toBeCloseTo(0.78, 12);
+    // The CONTRAST between the two halves is the night cue, not the absolute
+    // level: the ambient may be walked up for readability, but if it ever
+    // reaches the key light the moon stops casting and the frame reads as an
+    // overcast afternoon. Keep a real gap.
+    expect(g.ambientScale - g.lightScale).toBeGreaterThan(0.15);
+  });
+
+  it('never brightens past the authored day, at any point of the cycle', () => {
+    for (let i = 0; i <= 20; i++) {
+      const g = dayNightGrade(i / 20);
+      expect(g.ambientScale).toBeLessThanOrEqual(1);
+      expect(g.ambientScale).toBeGreaterThanOrEqual(g.lightScale - 1e-12);
+    }
+  });
+
+  it('brightens monotonically from night to day', () => {
+    let prev = -1;
+    for (let i = 0; i <= 20; i++) {
+      const g = dayNightGrade(i / 20);
+      expect(g.ambientScale).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = g.ambientScale;
+    }
+  });
+
+  it('takes the realm floor scale, capped so a warm realm cannot outshine noon', () => {
+    // the Nightbloom scales its floor DOWN (0.85), so its ambient dips with it
+    expect(dayNightGrade(0, 'night').ambientScale).toBeLessThan(dayNightGrade(0).ambientScale);
+    // the Drakelands scale UP (1.1): warmer than neutral, still under the day
+    const ember = dayNightGrade(0, 'ember');
+    expect(ember.ambientScale).toBeGreaterThan(dayNightGrade(0).ambientScale);
+    expect(ember.ambientScale).toBeLessThanOrEqual(1);
+  });
+
+  it('survives the dusk warm untouched (warmDuskGrade is hue only)', () => {
+    const g = dayNightGrade(0.5);
+    expect(warmDuskGrade(g, 1).ambientScale).toBe(g.ambientScale);
   });
 });
 
