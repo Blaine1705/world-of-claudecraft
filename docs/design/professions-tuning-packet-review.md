@@ -4560,6 +4560,137 @@ Q19 convergence question stay the maintainer's (reconciliation item
 Q23 one-model re-rule, and the new non-stackable force-1 question stay
 open maintainer items.
 
+## Phase 21 QA record (2026-08-02)
+
+Ultracode QA session over the build above, entry at the QA sync
+(merge 82d9e93091, audited, gate green; see the sync block below).
+Verdict: PASS. Commits this session: 68f89d89b3 (sync record),
+777cf6a17c (the QA fix round), f351ee26e6 (after-pair re-shoot),
+571e985f90 (the fix round's own review round), and this record. Gate:
+`npm run gate` PASS, all 11 steps green (8 vitest workers), run at
+571e985f90 on a clean tree; this record is a docs-only commit on top.
+
+Method. Acceptance (a) to (h) re-verified from scratch against the
+real code, not the build record: the exact-key-set sender pin and the
+three-shape state-equality test for (a), the atomic-math and
+refuse-whole arms for (b), the per-dimension hostile loop plus the
+leaf's bracketed overflow boundary for (c), the dispatch degrade read
+directly for (d), command_schema plus world_api_parity plus the S3
+guard run green with zero edits for (e) and (g), the by-eye check on
+all four screenshot pairs with arithmetic spot-checks for (f). Six
+fresh domain reviewers ran via the Agent tool (architecture,
+cross-platform-sync, privacy-security-review, test-coverage-auditor,
+frontend-seam-reviewer, qa-checklist), each told the build's own fix
+round (f4202adeed, 5164d8aaba) was unreviewed code; a seventh fresh
+reviewer then audited the QA session's own fix round (0 blocking, 3
+should-fix, 11 nits, ALL applied in 571e985f90). A 21-mutant ledger
+over the build's guards plus 8 fix-validation mutants over the QA
+round's new pins ran in the isolated worktree ~/wt/p21-qa-mut (own
+npm ci): 29 of 29 KILLED, every run recording its vitest summary and
+named failing test (ledgers at ~/wt/p21_mutation_ledger.json and
+~/wt/p21_fix_mutation_ledger.json).
+
+What QA changed (777cf6a17c and 571e985f90). The one behavior fix:
+the count sanitize moved ABOVE the teachesRiding delegation (still
+below the dead/range gates), because a crafted hostile count on the
+riding-service row previously bypassed sanitize entirely and completed
+the full 800,000c purchase silently, found independently by three
+reviewers and contradicting the settled Q20 deny ruling; hostile
+counts now deny on EVERY row, and a valid count stays force-1
+everywhere (riding by delegation, mounts by predicate). The refusal
+order is pinned per-arm: dead and range beat sanitize, sanitize beats
+the riding delegation and the mount gates (an untrained-buyer arm
+records that hostile-count frames now hear the sanitize deny before
+the riding hint; legit frames keep today's order exactly). UI
+hardening from the reviewer round: the prompt landing-net ladder
+gained the item-row and sell-junk rungs so browsers that never focus
+buttons on click (macOS Safari and Firefox, iOS) land beside the row
+instead of on Close, with the rung order pinned against an enabled
+sell-junk; the pressed qty chip gained a forced-colors arm
+(Highlight/HighlightText, source-pinned in the ctx-menu shape); the
+count chip switched from the bags x{count} key to the control row's
+own {count}x grammar so two adjacent chips can no longer wear the
+same face with different meanings, pinned exact on a row carrying
+both (after pair re-shot in f351ee26e6); the shared prompt family's
+action buttons gained the 40px coarse-pointer floor (an inherited gap
+phase 21 turned into a purchase surface; the floor lives on the
+shared .prompt rule and lifts bags, bank, and the generic
+invite/trade prompts too); and the prompt module was renamed
+buy_quantity_prompt_window.ts so the painter gate's filename sweep
+holds it to the cold-window contracts. New coverage: a direct
+behavioral suite for the shared prompt_dialog recipe including the
+Enter and Space bubble stops; source pins for all three
+dismissBuyQuantityPrompts call sites, the 1x-per-open reset, and the
+buyCustomMax wiring; decisive landing-net tests across the pointer,
+keyboard, and vanished-row teardown paths; a qty-control
+focus-across-rebuild arm; per-arm typed-input floors on the prompt;
+the Q25 exact-event-shape pin (one vendor event, no count field); a
+preview/charge lockstep cross-check between the view total and
+buyPurchaseTotals; the bulk-plus-hostile-count probe shape; two test
+titles narrowed to their honest claims; the metrics arm's
+paid-greater-than-zero guard; and .claude-scratch/ added to
+.gitignore.
+
+Judgments recorded (veto-able). The sender's non-finite drop and the
+dispatch's non-number degrade both STAY: the line is that type-garbage
+is ignored uniformly (exactly as malformed npc or item fields are)
+while value-hostile is denied authoritatively; the recorded
+toast-versus-silence divergence for NaN/Infinity is feedback-only, on
+values no shipped surface can produce, and is now uniform across
+every row since the riding fix. The build's chip-key default (reuse
+the bags stackCount key) was VETOED on the screenshot evidence of two
+adjacent identical chips with different meanings; the swap to
+qtyMultiple does NOT settle the Q23 double-x5 wording item, which
+stays the maintainer's. The openVendor capture-before-backstop order
+is harmless (canFocus rejects detached nodes; capturing after the
+dismiss would yield null with identical user-visible behavior). The
+single-line dispatch source pins and the not-toContain exclusion arms
+are accepted brittleness: both fail LOUD on a re-wrap or a future
+count-bearing field, never silent. A fresh security pass over the QA
+fix round was judged unnecessary: the fix strictly strengthens the
+deny posture and three reviewers analyzed its exact semantics. The
+mobile custom-amount prompt at the new 40px floor has no dedicated
+capture; accepted as a named residual (the prompt is a centered
+300px-min stack, and Q24 already records it pointer/keyboard-only).
+
+Corrections to the build record (superseded statements, per the
+packet's append-only convention). Its sentence "a count on them is
+simply ignored, never a second deny" was inaccurate as written even
+pre-fix (a hostile count on a MOUNT row did deny; only riding
+silently purchased) and is superseded by the fix: every row denies
+hostile counts, valid counts are force-1 on both. Its judgment "the
+count chip reuses the bags stackCount key" is superseded by the veto
+above. Its citation of src/ui/hud/vendor/buy_quantity_prompt.ts now
+reads as src/ui/hud/vendor/buy_quantity_prompt_window.ts after the QA
+rename. Its note that the teardown backstops and landing net were
+untested is correct and now closed.
+
+Verified clean beyond the build record: the free-vendor decisive
+overflow arm's guard-versus-no-guard toast distinction re-derived and
+confirmed; vendorCountForced's honor read mirror-tested against
+items.ts's own price read including the floored-to-zero and NaN arms;
+countFit is O(inventory) so no count-magnitude DoS; the RL env and
+admin carry zero vendor surface; parity goldens unchanged across the
+build (independent evidence for acceptance (a)); i18n M16's wordy
+predicate re-derived (exactly six of ten leaves wordy, exactly those
+six filled in all five non-Latin locales); the sync-record fogFar
+analysis independently re-verified by the fix-round reviewer.
+
+Open maintainer items after QA (unchanged unless noted): the Q21
+redundancy (5x control beside a Buy Stack tile), the Q23 one-model
+re-rule and double-x5 wording (the chip grammar swap removes the
+identical-face collision but not the model question), the Q19
+bulk-cap convergence, the non-stackable force-1 question, the
+all-force-1 counter still rendering the control row. New, recorded
+here: on an ALLOW_DEV_COMMANDS realm the view shows a copper total
+the freeVendor arm then charges 0 for (dev-only display, pre-existing
+at 1x); the prompt family does not re-localize on a runtime language
+switch (pre-existing, family-wide); the soulbound bulk/count
+asymmetry is latent-only and now named in the vendor_buy_stack
+header; a radiogroup-with-aria-checked shape would be marginally more
+precise than the toggle-button group, noted as preference beside the
+live crafting-chip precedent.
+
 ## Phase 21 QA sync (2026-08-02, merge 82d9e93091)
 
 The per-phase sync preamble, run at the phase 21 QA entry. The release
