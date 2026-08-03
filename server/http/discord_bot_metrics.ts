@@ -62,6 +62,9 @@ export const WOC_DISCORD_BOT_FORBIDDEN_BLOCKS_TOTAL = 'woc_discord_bot_forbidden
 /** Total requests the bot refused while its breaker was open. */
 export const WOC_DISCORD_BOT_BREAKER_BLOCKS_TOTAL = 'woc_discord_bot_breaker_blocks_total';
 
+/** Total requests the bot refused because a bucket queue was at its cap. */
+export const WOC_DISCORD_BOT_QUEUE_FULL_BLOCKS_TOTAL = 'woc_discord_bot_queue_full_blocks_total';
+
 /** Requests currently queued behind the bot's rate-limit scheduler. */
 export const WOC_DISCORD_BOT_QUEUE_DEPTH = 'woc_discord_bot_queue_depth';
 
@@ -96,6 +99,7 @@ const CUMULATIVE_FIELDS = [
   'breakerOpens',
   'forbiddenBlocks',
   'breakerBlocks',
+  'queueFullBlocks',
 ] as const;
 
 type CumulativeField = (typeof CUMULATIVE_FIELDS)[number];
@@ -153,6 +157,11 @@ export function registerDiscordBotMetrics(registry: Registry, now: () => number 
     help: 'Total requests the bot refused while its circuit breaker was open.',
     registers: [registry],
   });
+  const queueFullBlocks = new Counter({
+    name: WOC_DISCORD_BOT_QUEUE_FULL_BLOCKS_TOTAL,
+    help: 'Total requests the bot refused because a bucket queue was at its cap.',
+    registers: [registry],
+  });
   const cumulative: Record<CumulativeField, Counter<string>> = {
     requests,
     globalPauses,
@@ -160,6 +169,7 @@ export function registerDiscordBotMetrics(registry: Registry, now: () => number 
     breakerOpens,
     forbiddenBlocks,
     breakerBlocks,
+    queueFullBlocks,
   };
 
   const rateLimited = new Counter({
@@ -182,6 +192,7 @@ export function registerDiscordBotMetrics(registry: Registry, now: () => number 
     breakerOpens: 0,
     forbiddenBlocks: 0,
     breakerBlocks: 0,
+    queueFullBlocks: 0,
   };
   const lastSeenByScope: Record<DiscordBotRateLimitScope, number> = {
     user: 0,

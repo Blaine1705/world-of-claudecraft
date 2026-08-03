@@ -35,6 +35,7 @@ function pushed(): DiscordBotCountersSnapshot {
     forbiddenEntries: 8,
     forbiddenBlocks: 21,
     breakerBlocks: 13,
+    queueFullBlocks: 17,
   };
 }
 
@@ -63,6 +64,7 @@ describe('discordBotCounters staleness', () => {
       forbiddenEntries: 0,
       forbiddenBlocks: 0,
       breakerBlocks: 0,
+      queueFullBlocks: 0,
       updatedAt: 0,
     };
     expect(discordBotCounters(T0)).toEqual(empty);
@@ -79,7 +81,7 @@ describe('discordBotCounters staleness', () => {
 
     const pastBoundary = discordBotCounters(T0 + DISCORD_BOT_COUNTERS_STALE_MS + 1);
     expect(pastBoundary).toEqual({
-      // The eight cumulative fields survive: they count since bot start, and
+      // The nine cumulative fields survive: they count since bot start, and
       // zeroing them here would render as traffic the bot never served.
       requests: 1000,
       rateLimited: 30,
@@ -89,6 +91,7 @@ describe('discordBotCounters staleness', () => {
       breakerOpens: 5,
       forbiddenBlocks: 21,
       breakerBlocks: 13,
+      queueFullBlocks: 17,
       // The five live gauges and the breaker state read as "nothing reporting".
       breakerState: null,
       queueDepth: 0,

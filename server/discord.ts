@@ -870,17 +870,23 @@ async function fetchDiscordStatusCore(accountId: number): Promise<DiscordStatusC
     listSwagClaims(pool, accountId),
     accountById(accountId),
   ]);
-  return {
-    link: link ? projectDiscordStatusLink(link) : null,
+  // Frozen at mint, nested parts included: the cache hands EVERY reader of an
+  // entry this one object by reference, so a consumer mutation would corrupt
+  // that account's later responses until the next bust or TTL expiry. The
+  // treat-as-immutable contract (readDiscordStatusCore's JSDoc) is made
+  // structural here: modules run in strict mode, so a mutation attempt throws
+  // loudly at the offending call site instead of silently poisoning the cache.
+  return Object.freeze({
+    link: link ? Object.freeze(projectDiscordStatusLink(link)) : null,
     points: reward.points,
     lifetimePoints: reward.lifetimePoints,
-    claimedSwagIds,
+    claimedSwagIds: Object.freeze(claimedSwagIds) as string[],
     // Whether the account has a real (owner-chosen) password. The client reads this
     // to decide whether unlinking must first set one (a Discord-only account with no
     // usable password would otherwise be stranded). Defaults true if the account row
     // is somehow missing, so we never wrongly demand a password.
     passwordSet: acct?.password_set ?? true,
-  };
+  });
 }
 // Installed at module load; the cache itself builds lazily on the first status
 // read, so no clock or env value binds before a test can inject its own.

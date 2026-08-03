@@ -37,11 +37,11 @@ export type DiscordBotRateLimitScope = (typeof DISCORD_BOT_RATE_LIMIT_SCOPES)[nu
 /**
  * One sanitized counters push. Cumulative-since-bot-start: requests, rateLimited,
  * the four scope buckets, globalPauses, banPauses, breakerOpens, forbiddenBlocks,
- * breakerBlocks. Live gauges: queueDepth, trackedBuckets, trackedRoutes,
- * activeQueues, forbiddenEntries. A bot restart makes the cumulative values go
- * DOWN (a fresh process starts at 0); consumers must expect that. A null
- * breakerState is a push whose state field was unrecognized: the sanitizer
- * refuses to invent a claim, and the exporter renders no state at all.
+ * breakerBlocks, queueFullBlocks. Live gauges: queueDepth, trackedBuckets,
+ * trackedRoutes, activeQueues, forbiddenEntries. A bot restart makes the
+ * cumulative values go DOWN (a fresh process starts at 0); consumers must expect
+ * that. A null breakerState is a push whose state field was unrecognized: the
+ * sanitizer refuses to invent a claim, and the exporter renders no state at all.
  */
 export interface DiscordBotCountersSnapshot {
   requests: number;
@@ -58,6 +58,7 @@ export interface DiscordBotCountersSnapshot {
   forbiddenEntries: number;
   forbiddenBlocks: number;
   breakerBlocks: number;
+  queueFullBlocks: number;
 }
 
 /** What a read returns: the stored snapshot plus its age, staleness applied. */
@@ -109,6 +110,7 @@ function emptyRead(): DiscordBotCountersRead {
     forbiddenEntries: 0,
     forbiddenBlocks: 0,
     breakerBlocks: 0,
+    queueFullBlocks: 0,
     updatedAt: 0,
   };
 }
@@ -152,6 +154,7 @@ export function discordBotCounters(nowMs: number): DiscordBotCountersRead {
       forbiddenEntries: 0,
       forbiddenBlocks: counters.forbiddenBlocks,
       breakerBlocks: counters.breakerBlocks,
+      queueFullBlocks: counters.queueFullBlocks,
       updatedAt: 0,
     };
   }

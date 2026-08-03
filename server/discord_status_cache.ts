@@ -271,7 +271,10 @@ function activeCache(): KeyedCachedRead<DiscordStatusCore> | null {
  * handed by reference to every reader of the entry: treat it as immutable, and
  * compose responses from it without writing to it. A consumer that mutated it
  * would corrupt every later response for that account until the next bust or
- * TTL expiry. Pinned by the non-mutation arm in tests/discord_server.test.ts.
+ * TTL expiry; the production reader makes that structural by deep-freezing the
+ * core at mint (fetchDiscordStatusCore in server/discord.ts), so a mutation
+ * throws at the offending call site under strict mode. Pinned by the
+ * non-mutation arm in tests/discord_server.test.ts.
  */
 export async function readDiscordStatusCore(accountId: number): Promise<DiscordStatusCore> {
   const cache = activeCache();

@@ -730,6 +730,34 @@ export interface DiscordMemberMetaResult {
   unapplied: string[];
 }
 
+/** True for a Postgres deadlock abort (SQLSTATE 40P01). */
+function isDeadlockAbort(err: unknown): boolean {
+  return (err as { code?: unknown } | null)?.code === '40P01';
+}
+
+/**
+ * One statement, retried exactly once on a deadlock abort. The bulk upsert's
+ * sorted input makes overlapping pushes AGREE on order best-effort, but
+ * Postgres row locks follow the plan, never a subquery ORDER BY, so a deadlock
+ * stays reachable; the victim's statement committed nothing, so re-running it
+ * is clean (the change/skip classification re-reads live rows). One retry and
+ * never a loop: a second abort means sustained contention, and the caller's
+ * next sweep re-sends anyway.
+ */
+async function queryRetryingDeadlockOnce(
+  pool: Pool,
+  text: string,
+  params: unknown[],
+): Promise<{ rows: Record<string, unknown>[] }> {
+  try {
+    return await pool.query(text, params);
+  } catch (err) {
+    if (!isDeadlockAbort(err)) throw err;
+    console.warn('setDiscordMemberMetaBulk: deadlock abort (40P01), retrying once');
+    return await pool.query(text, params);
+  }
+}
+
 /**
  * Upsert bot-pushed guild metadata (server join date, in-server nickname, top
  * special-role key) for MANY Discord users in ONE statement, and report what it
@@ -748,9 +776,13 @@ export interface DiscordMemberMetaResult {
  *     counted as written, which is what lets a caller keep re-sending them until
  *     they link.
  *
- * The data-modifying CTE is load-bearing: `matched` and `updated` both read the
- * SAME pre-statement snapshot, so `matched` classifies against the values as they
- * were BEFORE the UPDATE rather than after it.
+ * The data-modifying CTE is load-bearing: `matched` (the linked subset of the
+ * input) and `updated` read the SAME statement snapshot, so `skipped` is
+ * derived as matched minus changed without evaluating the row comparison a
+ * second time; the comparison lives ONLY in the UPDATE's WHERE, the one place
+ * that stops a write. (`matched` used to carry its own copy as a `will_change`
+ * column; at the 1000-record cap that joined discord_links twice and computed
+ * the comparison twice per row for numbers the two counts already imply.)
  *
  * Duplicate ids are the caller's to remove; this de-duplicates defensively,
  * keeping the LAST occurrence, which is the state the old sequential loop left
@@ -762,13 +794,18 @@ export async function setDiscordMemberMetaBulk(
 ): Promise<DiscordMemberMetaResult> {
   const byId = new Map<string, DiscordMemberMetaRecord>();
   for (const record of records) byId.set(record.discordUserId, record);
-  // Sorted by id, which is a deadlock guard rather than tidiness. A multi-row
-  // UPDATE takes its row locks in the order the plan feeds it, so two overlapping
-  // pushes presenting the same ids in DIFFERENT orders can deadlock, and Postgres
-  // aborts one of them. The old loop could not: it held exactly one row lock per
-  // autocommitted statement. Overlap is reachable (departed-flair clears run
-  // alongside the sweep, and several realm processes write this realm-agnostic
-  // table), so every caller is made to offer the same lock order.
+  // Sorted by id as a BEST-EFFORT deadlock reducer, not a guarantee. A
+  // multi-row UPDATE takes its row locks in the order the plan feeds it, so two
+  // overlapping pushes presenting the same ids in DIFFERENT orders can
+  // deadlock, and Postgres aborts one of them. The old loop could not: it held
+  // exactly one row lock per autocommitted statement. Overlap is reachable
+  // (departed-flair clears run alongside the sweep, and several realm processes
+  // write this realm-agnostic table), so every caller offers the same input
+  // order; but the ORDER BY in the UPDATE's FROM subquery is a hint the planner
+  // may reorder, never a locking directive, so the residual deadlock is handled
+  // below: one retry on SQLSTATE 40P01 (the aborted statement committed
+  // nothing, so the retry is clean), and a second abort propagates as the 500
+  // the caller already turns into a next-sweep re-send.
   const deduped = [...byId.values()].sort((a, b) =>
     a.discordUserId < b.discordUserId ? -1 : a.discordUserId > b.discordUserId ? 1 : 0,
   );
@@ -784,18 +821,14 @@ export async function setDiscordMemberMetaBulk(
   // discord_role is assigned unconditionally, so a null CLEARS the stored role.
   // Both rules are carried identically into the change comparison, so "would this
   // write alter the row" is asked about the value that would actually be stored.
-  const res = await pool.query(
+  const res = await queryRetryingDeadlockOnce(
+    pool,
     `WITH input AS (
        SELECT * FROM unnest($1::text[], $2::text[], $3::timestamptz[], $4::text[])
          AS t(discord_user_id, nickname, joined_at, role_key)
      ),
      matched AS (
-       SELECT i.discord_user_id,
-              (dl.discord_username, dl.discord_joined_at, dl.discord_role)
-                IS DISTINCT FROM
-              (COALESCE(i.nickname, dl.discord_username),
-               COALESCE(i.joined_at, dl.discord_joined_at),
-               i.role_key) AS will_change
+       SELECT i.discord_user_id
          FROM input i
          JOIN discord_links dl ON dl.discord_user_id = i.discord_user_id
      ),
@@ -814,7 +847,8 @@ export async function setDiscordMemberMetaBulk(
       RETURNING dl.account_id
      )
      SELECT (SELECT count(*) FROM updated) AS changed,
-            (SELECT count(*) FROM matched WHERE NOT will_change) AS skipped,
+            (SELECT count(*) FROM matched)
+              - (SELECT count(*) FROM updated) AS skipped,
             (SELECT COALESCE(array_agg(i.discord_user_id), ARRAY[]::text[])
                FROM input i
               WHERE NOT EXISTS (
@@ -887,7 +921,16 @@ export interface DiscordFlexBatchRow {
  *
  * Only narrow scalar columns are selected, never the character `state` JSONB blob
  * (a 1000-member batch would drag megabytes of character state across the wire
- * for one integer). `account_id` rides along as the row's identity even though
+ * for one integer). That claim is about the WIRE: server-side, the level
+ * projection and the lifetimeXp ORDER BY still read `state` and therefore
+ * detoast it once per candidate character row before the LATERAL's LIMIT 1
+ * discards all but one, roughly 3000 detoasts per capped request at the D18
+ * envelope. Measured against TOASTed production-shaped blobs (~32 KiB each) in
+ * tests/discord_db_integration.test.ts: 38 ms raw at the 1000-id cap (54k
+ * shared-hit buffers), far inside the 15 s session statement timeout, which is
+ * why this rides the default with no runWithStatementTimeout allowance; the
+ * integration suite bounds it and logs the current figure on every DB-gated
+ * run. `account_id` rides along as the row's identity even though
  * the flex payload itself does not render it: it is what lets a caller join a
  * row back to an account without a second lookup, and it is one int per row.
  * Everything else selected IS a payload field. The level is projected
@@ -931,15 +974,21 @@ export async function discordFlexRowsForDiscordIds(
        LEFT JOIN LATERAL (
          SELECT c.name, c.class,
                 CASE WHEN jsonb_typeof(c.state->'level') = 'number'
-                      AND (c.state->>'level')::numeric BETWEEN -2147483648 AND 2147483647
-                     THEN (c.state->>'level')::numeric::int ELSE c.level END AS level
+                     THEN CASE WHEN (c.state->>'level')::numeric
+                                    BETWEEN -2147483648 AND 2147483647
+                               THEN (c.state->>'level')::numeric::int ELSE c.level END
+                     ELSE c.level END AS level
            FROM characters c
           WHERE c.account_id = dl.account_id AND c.realm = $2
           ORDER BY c.level DESC, ((c.state->>'lifetimeXp')::bigint) DESC NULLS LAST, c.id ASC
           LIMIT 1
        ) ch ON TRUE
       WHERE dl.discord_user_id = ANY($1::text[])`,
-    [[...discordUserIds], realm],
+    // De-duplicated like the sibling discordLinksForAccounts, not left to the
+    // caller: today's one caller sanitizes into a Set already, but a second
+    // caller would silently inherit that unstated requirement, and repeats in a
+    // ScalarArrayOpExpr waste probes for nothing.
+    [[...new Set(discordUserIds)], realm],
   );
   return res.rows.map((row) => ({
     discord_user_id: String(row.discord_user_id),

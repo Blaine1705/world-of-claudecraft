@@ -597,6 +597,12 @@ describe('GET /api/discord status cache (Phase 9)', () => {
     expect(dbMock.query.mock.calls.length).toBe(before);
     expect(await readDiscordStatusCore(1)).toBe(core);
     expect(core).toEqual(snapshot);
+    // And the contract is STRUCTURAL, not just observed: the production reader
+    // deep-freezes the core at mint, so a future consumer mutation throws at
+    // its own call site (strict mode) instead of silently poisoning the entry.
+    expect(Object.isFrozen(core)).toBe(true);
+    expect(Object.isFrozen(core.claimedSwagIds)).toBe(true);
+    expect(core.link !== null && Object.isFrozen(core.link)).toBe(true);
   });
 
   it('never serves account A its neighbor account B payload (per-account keying)', async () => {

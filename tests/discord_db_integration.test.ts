@@ -484,15 +484,46 @@ describeDb('discord set-based statements (real Postgres)', () => {
         `INSERT INTO discord_links (account_id, discord_user_id)
          SELECT g, 'du' || g FROM generate_series(1, 5000) g`,
       );
+      // The 1000 REQUESTED accounts carry production-shaped state: an
+      // incompressible ~32 KiB filler that forces TOAST storage, because the
+      // LATERAL's level projection and lifetimeXp ORDER BY read c.state and
+      // therefore detoast it for EVERY candidate row before LIMIT 1 discards
+      // all but one. A two-key state that stays inline (the fixture's earlier
+      // shape) proves the plan SHAPE while silently measuring none of that
+      // detoast cost, which at the cap is the statement's real weight (~3000
+      // TOAST fetches per request). Incompressible on purpose: pglz collapses
+      // a repeat() filler back under the inline threshold.
       await pool.query(
         `INSERT INTO characters (account_id, name, class, level, state, realm)
          SELECT g, 'C' || g || '_' || s, 'warrior', (g % 20) + 1,
-                jsonb_build_object('level', (g % 20) + 1, 'lifetimeXp', g * 10), $1
+                jsonb_build_object(
+                  'level', (g % 20) + 1,
+                  'lifetimeXp', g * 10,
+                  'pad', CASE WHEN g <= 1000
+                              THEN (SELECT string_agg(md5(g::text || s::text || i::text), '')
+                                      FROM generate_series(1, 1000) i)
+                              ELSE NULL END
+                ), $1
            FROM generate_series(1, 5000) g, generate_series(1, 3) s`,
         [REALM],
       );
       await pool.query('ANALYZE discord_links, characters, reward_points');
       const ids = Array.from({ length: 1000 }, (_, i) => `du${i + 1}`);
+
+      // The raw statement at the cap, timed WITHOUT EXPLAIN instrumentation
+      // (whose per-node timers make Execution Time incomparable): the whole
+      // batch, detoast included, must land far inside DB_STATEMENT_TIMEOUT_MS
+      // (15 s), because the statement rides the session default with no
+      // runWithStatementTimeout allowance and holds one of the ten pool
+      // clients for its whole duration. The bound is generous (a slow laptop
+      // passes with a wide margin; measured 38 ms here, 54k shared-hit buffers)
+      // so it reds only on a structural regression, e.g. the LATERAL starting
+      // to detoast the whole table's state rather than the requested accounts'.
+      const rawStart = Date.now();
+      const rawRows = await discordFlexRowsForDiscordIds(pool, ids, REALM);
+      const rawMs = Date.now() - rawStart;
+      expect(rawRows).toHaveLength(1000);
+      expect(rawMs).toBeLessThan(10_000);
 
       // Capture the statement the MODULE actually issues, then explain exactly
       // that. Re-typing the SQL here would pin a copy that can drift away from
@@ -511,7 +542,17 @@ describeDb('discord set-based statements (real Postgres)', () => {
         ids,
         REALM,
       ]);
-      const nodes = planNodes(explain.rows[0]['QUERY PLAN'][0].Plan);
+      const planRoot = explain.rows[0]['QUERY PLAN'][0];
+      // Recorded, not only bounded: the measured figures are the evidence the
+      // detoast-cost review asked for, and re-running this file after a change
+      // to the statement or the fixture is how the next number gets recorded.
+      console.log(
+        `[flex-batch @${ids.length} ids, TOASTed state] raw ${rawMs} ms; ` +
+          `EXPLAIN execution ${planRoot['Execution Time']} ms, ` +
+          `shared hit ${planRoot.Plan['Shared Hit Blocks']}, ` +
+          `read ${planRoot.Plan['Shared Read Blocks']}`,
+      );
+      const nodes = planNodes(planRoot.Plan);
 
       // The LATERAL's LIMIT 1 forbids pull-up, so the shape must be a nested loop
       // whose inner side reaches characters THROUGH THE INDEX. The assertion is

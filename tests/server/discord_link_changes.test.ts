@@ -375,6 +375,17 @@ describe('discord link change feed: requeue after a failed hand-off', () => {
     requeueLinkChanges(page);
 
     expect(linkChangeDepth()).toBe(LINK_CHANGE_MAX_QUEUE);
+    // And WHICH items survived, not depth alone: a requeue that trimmed the
+    // WRONG end would also read depth == cap. The ten fresh enqueues landed in
+    // the slots the drain freed (depth was cap - 10), so the requeue's own trim
+    // is the only drop: exactly the requeued 1..10, the oldest present. The
+    // queue is 11..cap plus the ten newest, in FIFO order.
+    const survivors = drainLinkChanges();
+    expect(survivors.length).toBe(LINK_CHANGE_MAX_QUEUE);
+    expect(survivors[0]).toEqual(change(11));
+    expect(survivors[survivors.length - 1]).toEqual(change(LINK_CHANGE_MAX_QUEUE + 10));
+    const survivorIds = new Set(survivors.map((item) => item.accountId));
+    for (let n = 1; n <= 10; n++) expect(survivorIds.has(n)).toBe(false);
   });
 });
 

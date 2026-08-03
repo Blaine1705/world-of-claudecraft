@@ -25,6 +25,7 @@ import {
   WOC_DISCORD_BOT_GLOBAL_PAUSES_TOTAL,
   WOC_DISCORD_BOT_PUSH_AGE_SECONDS,
   WOC_DISCORD_BOT_QUEUE_DEPTH,
+  WOC_DISCORD_BOT_QUEUE_FULL_BLOCKS_TOTAL,
   WOC_DISCORD_BOT_RATE_LIMITED_TOTAL,
   WOC_DISCORD_BOT_REQUESTS_TOTAL,
   WOC_DISCORD_BOT_TRACKED_BUCKETS,
@@ -51,6 +52,7 @@ function push(overrides: Partial<DiscordBotCountersSnapshot> = {}): DiscordBotCo
     forbiddenEntries: 8,
     forbiddenBlocks: 21,
     breakerBlocks: 13,
+    queueFullBlocks: 17,
     ...overrides,
   };
 }
@@ -83,6 +85,7 @@ describe('registerDiscordBotMetrics', () => {
     expect(WOC_DISCORD_BOT_BREAKER_OPENS_TOTAL).toBe('woc_discord_bot_breaker_opens_total');
     expect(WOC_DISCORD_BOT_FORBIDDEN_BLOCKS_TOTAL).toBe('woc_discord_bot_forbidden_blocks_total');
     expect(WOC_DISCORD_BOT_BREAKER_BLOCKS_TOTAL).toBe('woc_discord_bot_breaker_blocks_total');
+    expect(WOC_DISCORD_BOT_QUEUE_FULL_BLOCKS_TOTAL).toBe('woc_discord_bot_queue_full_blocks_total');
     expect(WOC_DISCORD_BOT_QUEUE_DEPTH).toBe('woc_discord_bot_queue_depth');
     expect(WOC_DISCORD_BOT_TRACKED_BUCKETS).toBe('woc_discord_bot_tracked_buckets');
     expect(WOC_DISCORD_BOT_TRACKED_ROUTES).toBe('woc_discord_bot_tracked_routes');
@@ -105,6 +108,7 @@ describe('registerDiscordBotMetrics', () => {
       WOC_DISCORD_BOT_BREAKER_OPENS_TOTAL,
       WOC_DISCORD_BOT_FORBIDDEN_BLOCKS_TOTAL,
       WOC_DISCORD_BOT_BREAKER_BLOCKS_TOTAL,
+      WOC_DISCORD_BOT_QUEUE_FULL_BLOCKS_TOTAL,
       WOC_DISCORD_BOT_QUEUE_DEPTH,
       WOC_DISCORD_BOT_TRACKED_BUCKETS,
       WOC_DISCORD_BOT_TRACKED_ROUTES,
@@ -139,6 +143,7 @@ describe('registerDiscordBotMetrics', () => {
     expect(sample(text, WOC_DISCORD_BOT_BREAKER_OPENS_TOTAL)).toBe('5');
     expect(sample(text, WOC_DISCORD_BOT_FORBIDDEN_BLOCKS_TOTAL)).toBe('21');
     expect(sample(text, WOC_DISCORD_BOT_BREAKER_BLOCKS_TOTAL)).toBe('13');
+    expect(sample(text, WOC_DISCORD_BOT_QUEUE_FULL_BLOCKS_TOTAL)).toBe('17');
     expect(sample(text, WOC_DISCORD_BOT_RATE_LIMITED_TOTAL, 'scope="user"')).toBe('11');
     expect(sample(text, WOC_DISCORD_BOT_RATE_LIMITED_TOTAL, 'scope="global"')).toBe('7');
     expect(sample(text, WOC_DISCORD_BOT_RATE_LIMITED_TOTAL, 'scope="shared"')).toBe('9');
@@ -210,6 +215,7 @@ describe('registerDiscordBotMetrics', () => {
         breakerOpens: 0,
         forbiddenBlocks: 0,
         breakerBlocks: 0,
+        queueFullBlocks: 0,
       }),
       clock.now(),
     );
@@ -225,6 +231,7 @@ describe('registerDiscordBotMetrics', () => {
     expect(sample(text, WOC_DISCORD_BOT_BREAKER_OPENS_TOTAL)).toBe('5');
     expect(sample(text, WOC_DISCORD_BOT_FORBIDDEN_BLOCKS_TOTAL)).toBe('21');
     expect(sample(text, WOC_DISCORD_BOT_BREAKER_BLOCKS_TOTAL)).toBe('13');
+    expect(sample(text, WOC_DISCORD_BOT_QUEUE_FULL_BLOCKS_TOTAL)).toBe('17');
 
     // A SECOND restart behaves like the first: the guard is per-push
     // bookkeeping, not a one-shot latch. 40 up to 55 is an ordinary +15 delta,

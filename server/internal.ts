@@ -611,6 +611,7 @@ function sanitizeBotCounters(value: unknown): DiscordBotCountersSnapshot | null 
     forbiddenEntries: count(o.forbiddenEntries),
     forbiddenBlocks: count(o.forbiddenBlocks),
     breakerBlocks: count(o.breakerBlocks),
+    queueFullBlocks: count(o.queueFullBlocks),
   };
 }
 

@@ -513,6 +513,41 @@ describe('setDiscordMemberMetaBulk', () => {
     expect((many.calls[0].params[0] as string[])[999]).toBe('u999');
   });
 
+  it('retries EXACTLY once on a deadlock abort, and only for 40P01', async () => {
+    // The sorted input is best-effort: row locks follow the plan, never the
+    // subquery ORDER BY, so overlapping pushes can still deadlock. The victim
+    // committed nothing, so one clean retry absorbs it; a second deadlock, and
+    // any other error, must propagate (the next sweep re-sends anyway).
+    let attempts = 0;
+    const deadlockOnce = makePool(() => {
+      attempts++;
+      if (attempts === 1) throw Object.assign(new Error('deadlock detected'), { code: '40P01' });
+      return counted('3', '0', []);
+    });
+    const result = await setDiscordMemberMetaBulk(deadlockOnce.pool, [metaRecord()]);
+    expect(result).toEqual({ changed: 3, skipped: 0, unapplied: [] });
+    expect(deadlockOnce.calls).toHaveLength(2);
+    // The retry re-runs the IDENTICAL statement and bindings: nothing about the
+    // input changed, only the lock race outcome.
+    expect(deadlockOnce.calls[1]).toEqual(deadlockOnce.calls[0]);
+
+    const deadlockAlways = makePool(() => {
+      throw Object.assign(new Error('deadlock detected'), { code: '40P01' });
+    });
+    await expect(
+      setDiscordMemberMetaBulk(deadlockAlways.pool, [metaRecord()]),
+    ).rejects.toMatchObject({ code: '40P01' });
+    expect(deadlockAlways.calls).toHaveLength(2);
+
+    const otherError = makePool(() => {
+      throw Object.assign(new Error('duplicate key'), { code: '23505' });
+    });
+    await expect(setDiscordMemberMetaBulk(otherError.pool, [metaRecord()])).rejects.toMatchObject({
+      code: '23505',
+    });
+    expect(otherError.calls).toHaveLength(1);
+  });
+
   it('issues NO statement at all for an empty record list', async () => {
     const { pool, calls } = makePool(() => counted('0', '0', []));
     expect(await setDiscordMemberMetaBulk(pool, [])).toEqual({
@@ -551,28 +586,30 @@ describe('setDiscordMemberMetaBulk', () => {
     // ...and IS DISTINCT FROM (not <>) is what makes a NULL-to-NULL column count
     // as unchanged rather than as a difference that rewrites the row forever.
     //
-    // ANCHORED to each clause, never a bare toContain('IS DISTINCT FROM'). The
-    // statement carries the row comparison TWICE and the two decide different
-    // numbers: the `matched` CTE's copy decides `skipped`, the UPDATE's WHERE
-    // decides `changed` and is the only thing that stops the write. An unanchored
-    // fragment scan is satisfied by EITHER copy, so deleting the UPDATE's
-    // predicate (every row rewrites, the phase's headline win gone) or inverting
-    // it to IS NOT DISTINCT FROM (only unchanged rows write) both leave this file
-    // green. Verified by mutation in Phase 4 QA: both mutants survive the whole
-    // DB-free suite, which is the arm CI actually runs, because the integration
-    // file that WOULD catch them skips without TEST_DATABASE_URL.
-    expect(sql).toContain(
-      '(dl.discord_username, dl.discord_joined_at, dl.discord_role) IS DISTINCT FROM (COALESCE(i.nickname, dl.discord_username), COALESCE(i.joined_at, dl.discord_joined_at), i.role_key) AS will_change',
-    );
+    // ANCHORED to the full UPDATE WHERE clause, never a bare
+    // toContain('IS DISTINCT FROM'): a fragment scan cannot tell the predicate
+    // that stops the write from a copy elsewhere in the statement. Deleting the
+    // predicate (every row rewrites, the phase's headline win gone) or
+    // inverting it to IS NOT DISTINCT FROM (only unchanged rows write) must
+    // both go red here. Verified by mutation in Phase 4 QA against the earlier
+    // two-copy statement; the comparison now lives ONLY in the UPDATE's WHERE
+    // (`skipped` is derived as matched minus changed), so the occurrence count
+    // below pins that a second copy does not creep back in.
     expect(sql).toContain(
       'WHERE dl.discord_user_id = i.discord_user_id AND (dl.discord_username, dl.discord_joined_at, dl.discord_role) IS DISTINCT FROM (COALESCE(i.nickname, dl.discord_username), COALESCE(i.joined_at, dl.discord_joined_at), i.role_key) RETURNING dl.account_id',
     );
     expect(sql).not.toContain('<>');
     expect(sql).not.toContain('IS NOT DISTINCT FROM');
-    // EXACTLY two copies. The whole argument for anchoring above is that the count
-    // matters, so a third copy added later must not slip past assertions that only
-    // ask whether each of the two known clauses is present.
-    expect(sql.split('IS DISTINCT FROM')).toHaveLength(3);
+    // EXACTLY one copy: the UPDATE's WHERE. skipped and unapplied are derived
+    // from `matched` (the bare linked-subset join) and `updated` counts, so a
+    // second comparison would be duplicate expression work per row at the cap.
+    expect(sql.split('IS DISTINCT FROM')).toHaveLength(2);
+    expect(sql).toContain(
+      'matched AS ( SELECT i.discord_user_id FROM input i JOIN discord_links dl ON dl.discord_user_id = i.discord_user_id )',
+    );
+    expect(sql).toContain(
+      '(SELECT count(*) FROM matched) - (SELECT count(*) FROM updated) AS skipped',
+    );
     // Phase 9: the /api/discord status bust reads the changed rows' account ids
     // off the SAME statement (RETURNING dl.account_id above feeds this
     // aggregate), so the write and the bust population cannot drift apart.
@@ -759,6 +796,15 @@ describe('discordFlexRowsForDiscordIds', () => {
     expect(calls).toHaveLength(0);
   });
 
+  it('de-duplicates the bound id array, like its sibling discordLinksForAccounts', async () => {
+    // Today's one caller sanitizes into a Set already; binding the dedup here
+    // too keeps a future second caller from inheriting that unstated
+    // requirement (repeats in an ANY() waste probes and skew nothing else).
+    const { pool, calls } = makePool(() => ({ rows: [], rowCount: 0 }));
+    await discordFlexRowsForDiscordIds(pool, ['u1', 'u2', 'u1', 'u2', 'u3'], 'eastbrook');
+    expect(calls[0].params[0]).toEqual(['u1', 'u2', 'u3']);
+  });
+
   it('resolves the whole batch through one ANY() pass with the reward join', async () => {
     const { pool, calls } = makePool(() => ({ rows: [], rowCount: 0 }));
     await discordFlexRowsForDiscordIds(pool, ['u1'], 'eastbrook');
@@ -782,8 +828,11 @@ describe('discordFlexRowsForDiscordIds', () => {
     // path tolerates it in TypeScript, so the batch must not be more brittle.
     // All three parts are pinned because each one alone is insufficient:
     // jsonb_typeof still admits a float, and numeric::int still overflows.
+    // NESTED CASEs, not one WHEN with AND: Postgres does not promise an order
+    // of AND operand evaluation, so the bounds arm's ::numeric cast must sit in
+    // a branch the typeof arm guards, which only CASE nesting guarantees.
     expect(sql).toContain(
-      "CASE WHEN jsonb_typeof(c.state->'level') = 'number' AND (c.state->>'level')::numeric BETWEEN -2147483648 AND 2147483647 THEN (c.state->>'level')::numeric::int ELSE c.level END AS level",
+      "CASE WHEN jsonb_typeof(c.state->'level') = 'number' THEN CASE WHEN (c.state->>'level')::numeric BETWEEN -2147483648 AND 2147483647 THEN (c.state->>'level')::numeric::int ELSE c.level END ELSE c.level END AS level",
     );
   });
 

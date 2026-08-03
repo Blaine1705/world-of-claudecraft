@@ -498,9 +498,10 @@ const BOT_COUNTERS = {
   forbiddenEntries: 8,
   forbiddenBlocks: 21,
   breakerBlocks: 13,
+  queueFullBlocks: 17,
 };
 
-/** The 14 stored fields, in the order the wire contract declares them. */
+/** The 15 stored fields, in the order the wire contract declares them. */
 const BOT_COUNTER_FIELDS = [
   'requests',
   'rateLimited',
@@ -516,6 +517,7 @@ const BOT_COUNTER_FIELDS = [
   'forbiddenEntries',
   'forbiddenBlocks',
   'breakerBlocks',
+  'queueFullBlocks',
 ];
 
 /** The snapshot the arm stored on call `index`, or a loud failure if it stored none. */
@@ -567,6 +569,7 @@ describe('discord/presence bot counters', () => {
       forbiddenEntries: 8,
       forbiddenBlocks: 21,
       breakerBlocks: 13,
+      queueFullBlocks: 17,
     });
     // Stamped with the REAL push time, so the cache can age it out. A bounded
     // window rather than a typeof: a handler stamping 0 (or any fixed literal)
@@ -593,8 +596,8 @@ describe('discord/presence bot counters', () => {
           breakerOpens: 12.9,
           queueDepth: [4],
           trackedBuckets: { n: 1 },
-          // trackedRoutes, activeQueues, forbiddenEntries, forbiddenBlocks and
-          // breakerBlocks are absent entirely.
+          // trackedRoutes, activeQueues, forbiddenEntries, forbiddenBlocks,
+          // breakerBlocks and queueFullBlocks are absent entirely.
         },
       },
     });
@@ -614,13 +617,14 @@ describe('discord/presence bot counters', () => {
       forbiddenEntries: 0,
       forbiddenBlocks: 0,
       breakerBlocks: 0,
+      queueFullBlocks: 0,
     });
   });
 
   it('caps EVERY numeric slot independently, not just the two the mixed case hits', async () => {
     process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
 
-    // 2e9 in all sixteen numeric slots at once. Per-field, because the clamp is
+    // 2e9 in all seventeen numeric slots at once. Per-field, because the clamp is
     // one `count` closure today but nothing stops a later edit from unrolling a
     // single field ("trackedRoutes: Math.trunc(Number(v) || 0)") and quietly
     // shipping it uncapped while the two-field case above stayed green.
@@ -642,6 +646,7 @@ describe('discord/presence bot counters', () => {
           forbiddenEntries: 2e9,
           forbiddenBlocks: 2e9,
           breakerBlocks: 2e9,
+          queueFullBlocks: 2e9,
         },
       },
     });
@@ -662,6 +667,7 @@ describe('discord/presence bot counters', () => {
       forbiddenEntries: cap,
       forbiddenBlocks: cap,
       breakerBlocks: cap,
+      queueFullBlocks: cap,
     });
   });
 
@@ -875,6 +881,7 @@ describe('discord/presence bot counters', () => {
       forbiddenEntries: 8,
       forbiddenBlocks: 21,
       breakerBlocks: 13,
+      queueFullBlocks: 17,
     };
     expect(storedCounters(0)).toEqual(expected);
     expect(storedCounters(1)).toEqual(storedCounters(0));
@@ -1845,9 +1852,12 @@ describe('discord/outbox', () => {
     expect(failed.status).toBe(500);
     expect(failed.body).toEqual({ success: false, data: null, error: 'internal.error' });
     // Relay and activity are mocked here, so what is provable of them is that the
-    // handler handed the exact drained items back, by value.
-    expect(vi.mocked(requeueRelay)).toHaveBeenCalledWith(relayItems);
-    expect(vi.mocked(requeueActivity)).toHaveBeenCalledWith(activityItems);
+    // handler handed the exact drained items back, by value. FRESH expectation
+    // literals, never the arrays handed to the drain mocks: those are the same
+    // live objects the handler holds, so an in-place mutation before the requeue
+    // would move both sides of the comparison together.
+    expect(vi.mocked(requeueRelay)).toHaveBeenCalledWith([relayItem(1, 'a')]);
+    expect(vi.mocked(requeueActivity)).toHaveBeenCalledWith([activityItem(2, 'Bea')]);
 
     // The link-change feed is the REAL module, so its half is proved end to end:
     // the retry (drains empty, read restored) carries the item the failed poll
