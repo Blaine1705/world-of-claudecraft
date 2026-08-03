@@ -247,6 +247,38 @@ describe('QuestDialogController', () => {
     expect(blocked.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
   });
 
+  it('surfaces a lapsed work order in an OPEN dialog through refreshIfChanged', () => {
+    // A cadence lapse is a pure tick-threshold crossing: the state re-opens
+    // with NO quest event to repaint through, while the dimmed map marker's
+    // "Available again soon" tag walks the player to this very NPC. The
+    // slowHud refreshIfChanged watch must rebuild the row set in place,
+    // and an unchanged signature must never rebuild the focus-trapped DOM.
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const giver = npc(33, workOrder.giverNpcId);
+    (giver as unknown as { questIds: string[] }).questIds = [workOrder.id];
+    const test = harness(giver, 'unavailable');
+    (test.world as unknown as { questsDone: Set<string> }).questsDone.add(workOrder.id);
+    test.controller.open(33);
+    expect(test.element.querySelector(`[data-quest="${workOrder.id}"]`)).toBeNull();
+
+    // Unchanged signature: the same DOM nodes survive (identity, not HTML
+    // equality, since a rebuild would produce identical markup).
+    const anchorNode = test.element.querySelector('[data-close]');
+    test.controller.refreshIfChanged();
+    expect(test.element.querySelector('[data-close]')).toBe(anchorNode);
+
+    // The window lapses: the quest state re-opens and the watch repaints.
+    (test.world.questState as ReturnType<typeof vi.fn>).mockReturnValue('available');
+    test.controller.refreshIfChanged();
+    const row = test.element.querySelector(`[data-quest="${workOrder.id}"]`);
+    if (!row) throw new Error('expected the lapsed work order row without close/reopen');
+    expect(row.innerHTML).toContain('<span class="quest-repeat">!</span>');
+    expect(row.getAttribute('aria-label')).toBe(
+      t('questUi.dialog.repeatableQuestAria', { name: `quest:${workOrder.id}` }),
+    );
+  });
+
   it('routes bankers and chroniclers through authoritative interaction without gossip', () => {
     const bankerId = Object.values(NPCS).find((definition) => definition.banker)?.id;
     if (!bankerId) throw new Error('banker fixture not found');

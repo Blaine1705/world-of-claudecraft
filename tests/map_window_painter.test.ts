@@ -23,7 +23,10 @@ import {
 } from '../src/sim/data';
 import { emptyZoneProps, isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
-import { MapWindowPainter } from '../src/ui/map_window_painter';
+import {
+  MapWindowPainter,
+  MAP_COLOR_TOKENS as PAINTER_TOKEN_TABLE,
+} from '../src/ui/map_window_painter';
 import { buildOverworldMapModel } from '../src/ui/map_window_view';
 import { TEXT_SPRITE_LIMIT } from '../src/ui/text_sprite_cache';
 import type { IWorld } from '../src/world_api';
@@ -287,6 +290,20 @@ describe('map_window_painter: no magic values', () => {
     for (const tok of MAP_COLOR_TOKENS) {
       expect(code, `painter never reads ${tok}`).toContain(tok);
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
+    }
+    // The hand list above cannot see a table entry it was never told about,
+    // so a token missing from tokens.css would resolve '' and draw default
+    // ink. Pin EVERY live table entry (the exported source of truth) against
+    // the sheet, and the hand list against the table, so neither can drift
+    // (the minimap suite's rationale).
+    for (const tok of Object.values(PAINTER_TOKEN_TABLE)) {
+      expect(tokens, `tokens.css missing live table entry ${tok}`).toContain(`${tok}:`);
+    }
+    for (const tok of MAP_COLOR_TOKENS) {
+      expect(
+        Object.values(PAINTER_TOKEN_TABLE),
+        `hand list names a token the painter no longer reads: ${tok}`,
+      ).toContain(tok);
     }
   });
 
@@ -859,7 +876,9 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
         labelPaintOptions(),
       );
       const glyphBlits = trace.blits.filter((b) => spriteText(b.sprite) === '!');
-      expect(glyphBlits.length, state).toBeGreaterThan(0);
+      // Exactly one: the fixture stages a single giver, and a second glyph
+      // drawn first would silently change which sprite is asserted below.
+      expect(glyphBlits, state).toHaveLength(1);
       expect(glyphBlits[0].sprite.ink.map(inkStyle), state).toEqual([
         { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
         { op: 'fill', color: 'paint:--color-map-npc-quest-repeat', text: '!' },
@@ -879,7 +898,8 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       labelPaintOptions(),
     );
     const gold = trace.blits.filter((b) => spriteText(b.sprite) === '!');
-    expect(gold.length).toBeGreaterThan(0);
+    // Exactly one, for the same reason as the variant arms above.
+    expect(gold).toHaveLength(1);
     expect(gold[0].sprite.ink.map(inkStyle)).toEqual([
       { op: 'stroke', color: 'paint:--color-map-outline', text: '!' },
       { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },

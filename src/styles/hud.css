@@ -2652,15 +2652,22 @@
     color: var(--color-text-success);
   }
   /* Repeatable-quest glyphs and tags (the phase 23 blue "!"): the rare-item
-     blue, matching the map/minimap repeat tokens; the cooldown tag dims it
-     at the same 0.55 the canvas surfaces use. Plain color classes so the
+     blue, matching the map/minimap repeat tokens. Plain color classes so the
      marker reads on every graphics tier (fairness invariant). */
   .quest-repeat {
     color: #0070dd;
   }
-  .quest-cooldown {
-    color: #0070dd;
-    opacity: 0.55;
+  /* The map tooltip's TAG texts are 13.5px prose over the panel gradient,
+     where #0070dd reads 4.07:1 (under the 4.5:1 AA floor for text) and a
+     0.55 dim about 2:1, so the TEXT channel lifts to the same 211-degree hue
+     at a lighter stop, full opacity; the glyph channels (the gossip '!', the
+     nameplate marks, both canvas painters) keep the #0070dd anchor and carry
+     the dim. One grouped rule so the accessible blue is stated once
+     (.quest-cooldown is tooltip-tag-only; .quest-repeat doubles as the
+     gossip glyph, so only its tooltip use lifts). */
+  .quest-cooldown,
+  #tooltip .quest-repeat {
+    color: #3d9bff;
   }
 
   /* ---------- deed tracker ---------- */

@@ -716,6 +716,40 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
     expect(armB?.quests.map((q) => q.kind)).toEqual(['ready', 'repeat', 'cooldown']);
   });
 
+  it('sorts the listing even when the strongest kind arrives LAST in content order', () => {
+    // Both arms above happen to classify in already-sorted content order, so
+    // deleting the sort (or the glyph reading quests[0]) would leave them
+    // green. Here the work order, LAST in the giver's questIds, is the ready
+    // turn-in while the attune quest is merely available: the sort must lift
+    // it to the front and the glyph must take its kind.
+    const ATTUNE = 'q_prof_attune_smith';
+    const WORK_ORDER = 'q_prof_workorder_forge';
+    const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
+    const marker = questGiverNpcMarkers(
+      (q) => (q === ATTUNE ? 'available' : q === WORK_ORDER ? 'ready' : 'unavailable'),
+      NO_HISTORY,
+    ).find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
+    expect(marker?.kind).toBe('ready');
+    expect(marker?.quests.map((q) => q.questId)).toEqual([WORK_ORDER, ATTUNE]);
+    expect(marker?.quests.map((q) => q.kind)).toEqual(['ready', 'available']);
+  });
+
+  it('keeps questIds order WITHIN a kind: the stable half of the sort contract', () => {
+    // The amends return and the work order both classify 'repeat'; the
+    // giver's content order lists amends first, and the stable sort must
+    // keep it there for the tooltip rows.
+    const AMENDS = 'q_prof_amends_smith';
+    const WORK_ORDER = 'q_prof_workorder_forge';
+    const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
+    const marker = questGiverNpcMarkers(
+      (q) => (q === AMENDS || q === WORK_ORDER ? 'available' : 'unavailable'),
+      new Set([AMENDS, WORK_ORDER]),
+    ).find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
+    expect(marker?.kind).toBe('repeat');
+    expect(marker?.quests.map((q) => q.questId)).toEqual([AMENDS, WORK_ORDER]);
+    expect(marker?.quests.map((q) => q.kind)).toEqual(['repeat', 'repeat']);
+  });
+
   it('skips a dynamic NPC (spawned on demand by its owning system) even when it lists a matching turn-in quest', () => {
     const dynamicNpc = Object.values(NPCS).find(
       (n) => n.dynamic && n.questIds.some((q) => QUESTS[q] && isQuestTurnInNpc(QUESTS[q], n.id)),

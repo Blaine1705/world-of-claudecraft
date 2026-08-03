@@ -97,8 +97,10 @@ const QUEST_BADGE_LINE_WIDTH = 1.5;
 const QUEST_BADGE_TEXT_LIFT = 4; // px above the arc center to optically center digits
 
 // The `--color-map-*` design tokens the painter resolves once per redraw. These
-// mirror the colors the inline overworld-map render used verbatim.
-const MAP_COLOR_TOKENS = {
+// mirror the colors the inline overworld-map render used verbatim. Exported so the
+// suite pins EVERY entry against tokens.css (the minimap table's rationale; a missing
+// declaration resolves '' and the mark draws in default ink).
+export const MAP_COLOR_TOKENS = {
   ocean: '--color-map-ocean',
   label: '--color-map-label',
   outline: '--color-map-outline',
@@ -392,9 +394,12 @@ export class MapWindowPainter {
     for (const npc of model.npcs) {
       const glyph = npc.kind === 'ready' ? NPC_GLYPH_READY : NPC_GLYPH_AVAILABLE;
       const repeatColored = npc.kind === 'repeat' || npc.kind === 'cooldown';
+      // Restore the PRIOR alpha, not a literal 1: nothing else dims this
+      // context today, but a literal would hardcode that caller state.
+      const priorAlpha = ctx.globalAlpha;
       if (npc.kind === 'cooldown') ctx.globalAlpha = NPC_GLYPH_COOLDOWN_ALPHA;
       this.labels.draw(ctx, glyph, npc.mx, npc.my, repeatColored ? npcGlyphRepeat : npcGlyph);
-      if (npc.kind === 'cooldown') ctx.globalAlpha = 1;
+      if (npc.kind === 'cooldown') ctx.globalAlpha = priorAlpha;
     }
 
     // Local player facing arrow.

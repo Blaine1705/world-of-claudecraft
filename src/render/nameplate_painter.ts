@@ -108,13 +108,21 @@ export class NameplatePainter {
   private readonly anchorScratch: NameplateAnchor[] = [];
   private anchorCount = 0;
   // Quest-marker inputs (the shared quest_marker_kind rule), resolved lazily
-  // on the first quest-bearing plate and REFRESHED once per full pass:
-  // craftingIdentity is a per-access allocation on the offline Sim, and an
-  // urgent town-NPC plate reaches the content branch at frame rate on
+  // on the first quest-bearing plate of a pass and dropped at every full
+  // pass: craftingIdentity is a per-access allocation on the offline Sim,
+  // and an urgent town-NPC plate reaches the content branch at frame rate on
   // throttled passes too, so a per-frame resolve tripled that cost for a
-  // marker whose inputs move on turn-in cadence. A throttled pass reusing
-  // the last full pass's snapshot lags a marker flip by at most one
-  // nameplate interval; the next full pass repaints it.
+  // marker whose inputs move on turn-in cadence. questsDone is held by
+  // REFERENCE: live on the offline Sim (one Set mutated in place), frozen on
+  // the online ClientWorld (replaced wholesale per qdone snapshot). The
+  // identity re-check at the resolve site heals that replacement immediately
+  // (and re-reads the cadence mirror with it, since a turn-in ships qdone
+  // and cprof in the same snapshot), so the one remaining stale window is a
+  // cprof-only change (a cadence lapse) on a throttled pass, bounded by one
+  // nameplate interval: the tier-scaled 1/24s to 1/15s plate staleness floor
+  // that already throttles every field identically (recorded ruling: inside
+  // the sanctioned envelope, not a fairness gate). A throttled pass reuses
+  // the snapshot when one exists and resolves it fresh otherwise.
   private questMarkerCtx: {
     questsDone: ReadonlySet<string>;
     cadenceBlocked: ReadonlySet<string> | undefined;
@@ -314,12 +322,21 @@ export class NameplatePainter {
         // its shared rank (beating cooldown: an in-progress turn-in here is
         // the more actionable signal); the minimap, map, and gossip list
         // filter 'active' per quest instead, since they never drew it.
-        if (!this.questMarkerCtx && e.questIds.length > 0) {
-          const blocked = world.craftingIdentity?.cadenceBlockedQuests;
-          this.questMarkerCtx = {
-            questsDone: world.questsDone,
-            cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
-          };
+        if (e.questIds.length > 0) {
+          // A changed questsDone identity means the online mirror replaced
+          // the history Set: drop the snapshot and re-resolve now, instead
+          // of folding a fresh questState against stale history for the
+          // rest of the pass (see the field's rationale).
+          if (this.questMarkerCtx && this.questMarkerCtx.questsDone !== world.questsDone) {
+            this.questMarkerCtx = null;
+          }
+          if (!this.questMarkerCtx) {
+            const blocked = world.craftingIdentity?.cadenceBlockedQuests;
+            this.questMarkerCtx = {
+              questsDone: world.questsDone,
+              cadenceBlocked: blocked && blocked.length > 0 ? new Set(blocked) : undefined,
+            };
+          }
         }
         let folded: QuestMarkerKind = 'none';
         for (const qid of e.questIds) {

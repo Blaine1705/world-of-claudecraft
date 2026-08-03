@@ -483,7 +483,10 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     // and a ClientWorld-mirror-shaped stub. After one completion the offer
     // is the blue repeat glyph; inside the window it is the dimmed cooldown
     // glyph; and a non-repeatable quest stays pixel-identical gold
-    // (acceptance (b)'s negative, the GIVER_QUEST arm above).
+    // (acceptance (b)'s negative, the GIVER_QUEST arm above). This pins the
+    // CLASSIFIER over each world's data shape; true world-to-world parity
+    // of the inputs rests on the online cadence/attunement suites pinning
+    // the qdone and cprof mirrors.
     const workOrder = QUESTS['q_prof_workorder_forge'];
     expect(workOrder.repeatable).toBe(true);
     for (const shape of ['sim', 'client'] as const) {

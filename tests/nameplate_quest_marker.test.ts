@@ -111,7 +111,9 @@ function view(): EntityView {
  *  cross-quest fold arms) under test control. */
 function harness(knobs: {
   state: QuestState;
-  done?: boolean;
+  /** true = the work order's id; an array = explicit questsDone ids (so a
+   *  NON-repeatable id can sit in the history for the negative arm). */
+  done?: boolean | string[];
   cadenceBlocked?: boolean;
   questIds?: string[];
   questStates?: Record<string, QuestState>;
@@ -139,7 +141,9 @@ function harness(knobs: {
     ]),
     markerFor: () => null,
     questState: (q: string) => knobs.questStates?.[q] ?? knobs.state,
-    questsDone: new Set<string>(knobs.done ? [WORK_ORDER.id] : []),
+    questsDone: new Set<string>(
+      Array.isArray(knobs.done) ? knobs.done : knobs.done ? [WORK_ORDER.id] : [],
+    ),
     craftingIdentity: {
       version: 1,
       synced: true,
@@ -166,6 +170,16 @@ describe('nameplate quest marker variants', () => {
     painter.update(true);
     expect(v.markerEl.textContent).toBe('!');
     expect(v.markerEl.className).toBe('np-marker avail');
+
+    // The other half of "repeatable or not": a NON-repeatable quest whose id
+    // IS in questsDone must stay gold at this surface too. The classifier
+    // owns the rule; this arm reddens a plate that branched on
+    // questsDone.has(id) directly instead of asking it.
+    const attuneId = 'q_prof_attune_smith';
+    const plain = harness({ state: 'available', done: [attuneId], questIds: [attuneId] });
+    plain.painter.update(true);
+    expect(plain.v.markerEl.textContent).toBe('!');
+    expect(plain.v.markerEl.className).toBe('np-marker avail');
   });
 
   it("keeps the gold '?' for a ready turn-in and the gray '?' for an active one", () => {
@@ -243,6 +257,42 @@ describe('nameplate quest marker variants', () => {
     painter.update(true);
     expect(v.markerEl.textContent).toBe('?');
     expect(v.markerEl.className).toBe('np-marker active');
+  });
+
+  it('heals a REPLACED questsDone set immediately, even on a throttled pass', () => {
+    // Online, ClientWorld REPLACES the whole Set per qdone snapshot rather
+    // than mutating it in place (the offline shape). The snapshot's identity
+    // re-check must drop the cached context, so a completion flips the plate
+    // on the very next pass, full or throttled: the harness NPC sits inside
+    // NAMEPLATE_URGENT_RANGE, so update(false) reaches the content branch.
+    const { painter, v, world } = harness({ state: 'available' });
+    painter.update(true);
+    expect(v.markerEl.className).toBe('np-marker avail');
+    (world as unknown as { questsDone: Set<string> }).questsDone = new Set([WORK_ORDER.id]);
+    painter.update(false);
+    expect(v.markerEl.textContent).toBe('!');
+    expect(v.markerEl.className).toBe('np-marker repeat');
+  });
+
+  it('reuses the snapshot for a cprof-only change until the next full pass: the bounded lag', () => {
+    // A fresh turn-in flips the quest state live, but the cadence mirror
+    // rides the cached snapshot (questsDone identity unchanged), so a
+    // throttled pass blanks the plate for one interval instead of dimming:
+    // the one-interval bound the field comment documents. Deleting the
+    // cache (resolving fresh every pass) would dim here and redden this
+    // arm; the next full pass re-resolves and dims.
+    const { painter, v, world } = harness({ state: 'available', done: true });
+    painter.update(true);
+    expect(v.markerEl.className).toBe('np-marker repeat');
+    (world as unknown as { questState: () => string }).questState = () => 'unavailable';
+    (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
+      [WORK_ORDER.id];
+    painter.update(false);
+    expect(v.markerEl.textContent).toBe('');
+    expect(v.markerEl.className).toBe('np-marker');
+    painter.update(true);
+    expect(v.markerEl.textContent).toBe('!');
+    expect(v.markerEl.className).toBe('np-marker cooldown');
   });
 
   it('repaints on a LIVE gold-to-blue transition: the marker class is in the plate signature', () => {

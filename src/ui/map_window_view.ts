@@ -98,8 +98,9 @@ export interface MapPortalMarker {
  *  'ready' (the '?' state), 'available' (first-offer gold '!'), 'repeat'
  *  (completed-repeatable blue '!'), or 'cooldown' (a work order inside its
  *  cadence window, the dimmed '!'). The type is the four-member
- *  MapQuestMarkerKind, so the painter's kind switch is exhaustive over what
- *  can really arrive. */
+ *  MapQuestMarkerKind, so consumers see only drawable kinds; the tooltip
+ *  tag table switches exhaustively over them (the painter resolves glyph
+ *  and color by comparison). */
 export interface MapNpcQuestRef {
   questId: string;
   kind: MapQuestMarkerKind;

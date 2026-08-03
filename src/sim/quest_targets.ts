@@ -396,8 +396,10 @@ export function questObjectiveAreas(
 
 /** The kinds the map actually draws: 'none' has nothing to draw and the gray
  *  in-progress state stays a nameplate-only statement (both filtered below),
- *  so the type says so and the painter's kind switch is exhaustive over what
- *  can really arrive (the minimap's NpcMarkerVariant precedent). */
+ *  so the type says so and every consumer sees only the four drawable kinds;
+ *  the tooltip tag table (quest_marker_tags.ts) switches exhaustively over
+ *  them, while the painter resolves glyph and color by comparison (the
+ *  minimap's NpcMarkerVariant precedent). */
 export type MapQuestMarkerKind = Exclude<QuestMarkerKind, 'none' | 'active'>;
 
 /** One quest carried by a quest-giver/turn-in glyph, for its hover tooltip. */
@@ -461,14 +463,14 @@ export function questGiverNpcMarkers(
     // the leaf exports (questMarkerRank), never a second local order, so the
     // map glyph can never disagree with the nameplate and minimap folds;
     // Array.prototype.sort is stable, preserving questIds order within a
-    // kind. A fresh array per marker; the shared content tables are never
-    // aliased.
-    const quests = [...refs].sort((a, b) => questMarkerRank(b.kind) - questMarkerRank(a.kind));
+    // kind. refs is built fresh above and aliases nothing shared, so it
+    // sorts in place.
+    refs.sort((a, b) => questMarkerRank(b.kind) - questMarkerRank(a.kind));
     out.push({
       // fresh {x,z}: never alias the shared NPCS content the sim places from
       pos: { x: npc.pos.x, z: npc.pos.z },
-      kind: quests[0].kind,
-      quests,
+      kind: refs[0].kind,
+      quests: refs,
     });
   }
   return out;

@@ -242,8 +242,10 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     // order re-pointed onto the seeded npc: after one completion the offer
     // stamps 'repeat'; inside the window (the cadenceBlockedQuests mirror)
     // it stamps 'cooldown' where the npc previously showed the neutral dot.
-    // Driven through BOTH stub shapes so the Sim and the ClientWorld mirror
-    // provably stamp the same variant (acceptance (a)'s both-worlds arm).
+    // Driven through BOTH stub shapes (acceptance (a)'s both-worlds arm).
+    // This pins the CLASSIFIER over each world's data shape; true
+    // world-to-world parity of the inputs themselves rests on the online
+    // cadence/attunement suites pinning the qdone and cprof mirrors.
     const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
     if (!workOrder) throw new Error('expected a cadenced work order');
     for (const shape of ['sim', 'client'] as const) {

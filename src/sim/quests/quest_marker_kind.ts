@@ -102,7 +102,13 @@ export function questMarkerKind(
   if (state === 'available') {
     return quest.repeatable && questsDone.has(quest.id) ? 'repeat' : 'available';
   }
-  if (state === 'unavailable' && cadenceBlocked?.has(quest.id)) return 'cooldown';
+  // The repeatable guard is defense in depth: only armCadence writes the
+  // cadence store and only under repeatCadenceTicks (a repeatable-only
+  // field), so a non-repeatable id cannot reach the set today; if one ever
+  // does, it must not dress as a work-order cooldown.
+  if (state === 'unavailable' && quest.repeatable && cadenceBlocked?.has(quest.id)) {
+    return 'cooldown';
+  }
   return 'none';
 }
 

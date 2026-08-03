@@ -163,8 +163,11 @@ function drawCorpseSkull(
 
 // The `--color-minimap-*` design tokens the painter resolves once and caches (they are
 // static; see resolveColors). These mirror the colors the inline overworld minimap used
-// verbatim.
-const MINIMAP_COLOR_TOKENS = {
+// verbatim. Exported so the suite pins EVERY entry against tokens.css: a token missing
+// there freezes as '' for the whole session once resolveColors caches (the glyph then
+// draws default black on every redraw), and a hand-copied test list cannot see a new
+// entry it was never told about.
+export const MINIMAP_COLOR_TOKENS = {
   allyFriend: '--color-minimap-ally-friend',
   allyGuild: '--color-minimap-ally-guild',
   npcQuest: '--color-minimap-npc-quest',
@@ -451,13 +454,16 @@ export class MinimapPainter {
           // neutral dot, the repeat token for a completed repeatable, and the
           // repeat token dimmed for a work order inside its cadence window.
           const repeatColored = m.marker === 'repeat' || m.marker === 'cooldown';
+          // Restore the PRIOR alpha, not a literal 1: nothing else dims this
+          // context today, but a literal would hardcode that caller state.
+          const priorAlpha = ctx.globalAlpha;
           if (m.marker === 'cooldown') ctx.globalAlpha = NPC_GLYPH_COOLDOWN_ALPHA;
           ctx.drawImage(
             this.npcGlyphSprite(m.glyph, repeatColored ? colors.npcQuestRepeat : colors.npcQuest),
             Math.round(m.mx - NPC_GLYPH_OFFSET_X - NPC_GLYPH_SPRITE_ORIGIN_X),
             Math.round(m.my + NPC_GLYPH_OFFSET_Y - NPC_GLYPH_SPRITE_BASELINE_Y),
           );
-          if (m.marker === 'cooldown') ctx.globalAlpha = 1;
+          if (m.marker === 'cooldown') ctx.globalAlpha = priorAlpha;
           break;
         }
         case 'portal':

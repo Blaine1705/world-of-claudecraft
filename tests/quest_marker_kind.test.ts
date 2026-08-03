@@ -74,6 +74,11 @@ describe('questMarkerKind: the giver role', () => {
         new Set(['other']),
       ),
     ).toBe('none');
+    // Defense in depth: a NON-repeatable id in the blocked set (impossible
+    // today, only armCadence writes the store and only under the
+    // repeatable-only repeatCadenceTicks) must not dress as a work-order
+    // cooldown.
+    expect(questMarkerKind(quest(), 'unavailable', done, 'giver', blocked)).toBe('none');
   });
 
   it('shows nothing at the giver for ready, active, and done states', () => {

@@ -12,7 +12,10 @@ import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GATHER_NODES, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
 import { isQuestTurnInNpc } from '../src/sim/types';
-import { MinimapPainter } from '../src/ui/minimap_painter';
+import {
+  MinimapPainter,
+  MINIMAP_COLOR_TOKENS as PAINTER_TOKEN_TABLE,
+} from '../src/ui/minimap_painter';
 import type { IWorld } from '../src/world_api';
 
 const painter = readFileSync(new URL('../src/ui/minimap_painter.ts', import.meta.url), 'utf8');
@@ -87,6 +90,20 @@ describe('minimap_painter: no magic values (canvas sub-rule)', () => {
     for (const tok of MINIMAP_COLOR_TOKENS) {
       expect(code, `painter never reads ${tok}`).toContain(tok);
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
+    }
+    // The hand list above cannot see a table entry it was never told about,
+    // and resolveColors freezes the WHOLE color set on first resolve, so one
+    // token absent from tokens.css draws default ink for the session. Pin
+    // EVERY live table entry (the exported source of truth) against the
+    // sheet, and the hand list against the table, so neither can drift.
+    for (const tok of Object.values(PAINTER_TOKEN_TABLE)) {
+      expect(tokens, `tokens.css missing live table entry ${tok}`).toContain(`${tok}:`);
+    }
+    for (const tok of MINIMAP_COLOR_TOKENS) {
+      expect(
+        Object.values(PAINTER_TOKEN_TABLE),
+        `hand list names a token the painter no longer reads: ${tok}`,
+      ).toContain(tok);
     }
   });
 });
@@ -554,6 +571,66 @@ describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-mark
     const sprite = trace.blits[0].sprite;
     expect(sprite.ink[0].glyph).toBe('!');
     expect(sprite.ink[0].fillStyle).toBe('paint:--color-minimap-npc-quest-repeat');
+  });
+
+  it('shares ONE blue raster between a repeat and a cooldown marker in the same frame', () => {
+    // The budget claim (at most six 16x16 sprites: two colors by three
+    // glyphs) holds only if the cooldown variant never mints its own dimmed
+    // raster, and a fillStyle comparison alone cannot see a second canvas
+    // with identical ink. Two givers, one offered again and one inside its
+    // window, must blit the IDENTICAL sprite object, dimmed only at blit.
+    const amends = Object.values(QUESTS).find((q) => q.repeatable && !q.repeatCadenceTicks);
+    if (!amends) throw new Error('expected an uncadenced repeatable quest');
+    const entities = new Map<number, unknown>();
+    const player = { id: 1, kind: 'player', name: 'Me', pos: { ...PLAYER_POS }, facing: 0 };
+    entities.set(1, player);
+    const npc = (id: number, questId: string, giver: string, x: number, z: number) => ({
+      id,
+      kind: 'npc',
+      name: `Npc${id}`,
+      dead: false,
+      lootable: false,
+      aggroTargetId: null,
+      templateId: giver,
+      questIds: [questId],
+      pos: { x, z },
+    });
+    entities.set(2, npc(2, amends.id, amends.giverNpcId as string, 4, 98.5));
+    entities.set(3, npc(3, WORK_ORDER_QUEST.id, WORK_ORDER_QUEST.giverNpcId as string, -3, 101));
+    const world = {
+      player,
+      entities,
+      partyInfo: null,
+      socialInfo: null,
+      delveRun: null,
+      cfg: { seed: 42, playerClass: 'warrior' },
+      playerId: 1,
+      inventory: [],
+      stationPlacements: [],
+      nodeHarvestableByMe: () => false,
+      questState: (q: string) => (q === amends.id ? 'available' : 'unavailable'),
+      questsDone: new Set([amends.id, WORK_ORDER_QUEST.id]),
+      craftingIdentity: {
+        version: 1,
+        synced: true,
+        cadenceBlockedQuests: [WORK_ORDER_QUEST.id],
+      },
+    } as unknown as IWorld;
+
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const ctx = fakeMinimapContext(trace);
+    paint(newPainter(), ctx, world);
+
+    expect(trace.blits).toHaveLength(2);
+    const repeatBlit = trace.blits.find((b) => b.alpha === 1);
+    const coolBlit = trace.blits.find((b) => b.alpha === 0.55);
+    expect(repeatBlit).toBeTruthy();
+    expect(coolBlit).toBeTruthy();
+    // Object identity, not ink equality: one raster serves both markers.
+    expect(coolBlit?.sprite).toBe(repeatBlit?.sprite);
+    expect(trace.sprites).toHaveLength(1);
+    expect(trace.sprites[0].ink[0].fillStyle).toBe('paint:--color-minimap-npc-quest-repeat');
   });
 
   it('keeps every non-repeat glyph on the gold token at full alpha (the negative arm)', () => {
