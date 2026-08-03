@@ -5360,6 +5360,245 @@ the vendor SimEvent unchanged). Q27 stands informational.
 
 ---
 
+## Post-QA scoping (2026-08-02): proposed phases 22 to 24
+
+Drafted after the phase 21 QA close from a four-thread research batch
+(player feedback and maintainer questions), every claim verified
+against the tree at c478eadf51 by independent investigators. The
+decision list (Q28 to Q32, after the drafts) is UNSETTLED: the
+worklist goes live when the maintainer rules, per the packet
+convention. One related finding is deliberately NOT a phase: the
+masterwork worn-offhand payload loss is already fixed in code (PR
+2701, contained in this branch and release/v0.34.0); what remains is
+a production deploy check and a per-player restore from the nightly
+dumps, both host-side operator work with no repo change.
+
+### Phase 22: crafting identity table legibility
+
+Build: Fable xhigh. QA: ultracode, new session. Small phase; may pair
+with 24 in one session pair.
+
+What the audit found (measured, not estimated). The crafting window's
+identity card renders its per-craft table (.profession-skill-row /
+.profession-skill-header in src/styles/components.css, painted by
+src/ui/profession_identity_card.ts) at 10px data rows with a 9px
+uppercase muted header: the only sub-11px data rows and the only
+sub-10px column header in the entire app (a full row-size census of
+every -row/-cell/-item selector confirms the next-smallest data row
+anywhere is 11px and every other window table is 12 to 13px).
+DESIGN.md's typography section is explicit: authored body text never
+goes below 12px, compress spacing before shrinking type, and every
+player-read number takes font-variant-numeric: tabular-nums; the
+Skill column has neither the size nor the numerals and is left-aligned
+in a fixed track. Contrast is NOT the problem: composited over the
+real panel stack against dark-ground, bright-sky, and snow backdrops
+the header measures 5.4 to 5.7:1 and the rows 14.9 to 15.8:1, all AA.
+The forcing function is layout: the card splits its ~706px inner width
+into two flex columns, leaving the four-column subgrid ~345px, which
+is also a live localization hazard (the French cap string and the
+German role/cap strings are estimated to overflow the declared tracks;
+confirm rendered before treating as a shipped bug). In the unattuned
+state the view (src/ui/profession_identity_view.ts) makes all ten
+rows repeat the same Role and Cap values, so half the width carries
+zero differentiating information. The mobile arm has its own defect:
+the Cap value wraps to a full-width line while its column header is
+display:none, so "Rare cap" hangs unlabeled under the craft name.
+Exemplars in-repo: the professions window's own row family
+(.prof-craft-row with .prof-skill-value: 13px names, 11px
+right-aligned tabular-nums values, bordered 10px pills) renders the
+SAME data legibly; the leaderboard family (.lb-row/.lb-head) is the
+one true header-plus-rows table idiom (12px rows, 11px title-font
+gold header, zebra striping).
+
+Scope, per the Q28/Q29 rulings. The default proposal (option 1 plus
+option 3): rebuild the table as the .prof-craft-row family, 13px craft
+names, the skill value right-aligned with tabular-nums, role and cap
+as pill chips, AND collapse the uniform columns: when every row shares
+one Role and one Cap, state it once as a card-level line (new
+catalog key(s), M16 fills if wordy) and render craft plus skill only.
+The alternative small diff (option 2) restyles in place on the
+leaderboard idiom (12px rows, 11px header in the title font, gold,
+zebra) plus a wrapping Cap cell, CSS-only. Either way the mobile
+unlabeled-Cap defect is fixed in the same change, and the pinned
+region's height cost on compact viewports (DESIGN.md names 1366x768
+a supported target) is checked before/after. This is a legibility
+bug fix, not a restyle fragment, per the Q29 framing; it does not
+preempt DESIGN.md's phase rollout.
+
+Acceptance. (a) No text in the identity card renders below 12px
+except bordered pill chips, and the header is no longer uppercase
+9px; (b) the skill value is right-aligned with tabular-nums; (c) the
+de_DE and fr_FR strings render without overflow or clipping at the
+default and compact desktop widths (rendered check, both locales);
+(d) the mobile card carries no unlabeled wrapped value; (e) every new
+player-visible string is a t() key with M16 fills if wordy; (f) the
+recipe pane keeps a workable height at 1366x768 (before/after
+screenshot pair, desktop and mobile, committed under
+docs/screenshots); (g) npm run gate PASS.
+
+Tests. Update tests/profession_identity_card.test.ts to the new
+structure (its DOM assertions pin the current selectors); pin the
+12px floor and tabular-nums the way tests/mobile_window_layout.test.ts
+pins the vendor 40px floor (source pins over the stylesheet); a
+per-locale render arm for (c) if cheap, else a recorded manual check;
+keep the view-core arms in tests/profession_identity_view.test.ts
+green (the collapse adds a view field, Node-tested).
+
+Reviewers. frontend-seam-reviewer (pure-core vs painter split, the
+styles contract, mobile); test-coverage-auditor (pin decisiveness);
+qa-checklist always. Not needed: architecture-reviewer (no sim
+change), migration-safety, database-performance-reviewer.
+
+### Phase 23: repeatable work-order marker (the blue "!")
+
+Build: Fable xhigh. QA: ultracode, new session.
+
+What the audit found (all verified). Player feedback from a 1-15
+playthrough: first-zone profession work orders read as ordinary
+quests; the classic precedent marks repeatable turn-ins with a blue
+exclamation mark. Feasibility is clean: QuestDef.repeatable exists
+(src/sim/types.ts), turn-in adds every completion to questsDone
+unconditionally (guarding only the lifetime counter), availability
+ignores that history for repeatables, and questsDone is persisted
+forever in the character save, is already an IWorldQuests member on
+BOTH worlds, and already reaches the online client (the qdone
+snapshot key). So "completed at least once AND repeatable" is
+answerable on every host today with zero sim-mechanic, wire, schema,
+or parity-pin changes; the work is purely presentational. Eleven
+repeatable quests exist (the four zone-1 work orders the playthrough
+hit, tannery, apothecary, the four make-amends returns, and the hobby
+switch). Today NO surface distinguishes them: the four indicator
+surfaces (nameplate marker div in src/render/nameplate_painter.ts,
+minimap NpcGlyph in src/ui/minimap_markers.ts plus its sprite cache
+painter, the world-map markers from questGiverNpcMarkers in
+src/sim/quest_targets.ts through map_window_view/painter, and the
+gossip list in src/ui/hud/quest/quest_dialog_controller.ts) each
+re-derive available/ready from questState with four independent
+copies of the same giver/turn-in predicate, and only the nameplate
+knows the gray in-progress state. No issue tracks this request.
+
+Scope, per the Q30/Q31 rulings. (1) New pure sim leaf
+src/sim/quests/quest_marker_kind.ts exporting QuestMarkerKind
+('none' | 'available' | 'repeat' | 'ready' | 'active'; plus
+'cooldown' if Q31 rules the dimmed marker in) and
+questMarkerKind(quest, state, questsDone, role), the ONE
+classification rule all four surfaces consume (the rule-of-three is
+already satisfied four times over); sim-pure, no rng, no clock. The
+default derivation (Q30): repeat shows only AFTER first completion,
+quest.repeatable && questsDone.has(id), a recorded deliberate
+divergence from the classic type-based blue because the first offer
+genuinely pays quest XP and gold is honest there. (2) Consumers: the
+nameplate branch swaps to the helper and gains an np-marker repeat
+CSS rule; minimap_markers stamps the variant and the painter gains a
+repeat colour token beside its existing three-state gather family;
+questGiverNpcMarkers widens to take questsDone (one call site) and
+the map view/painter/tooltip thread it; the gossip list picks a
+repeat class and aria. (3) Colour: the existing rare-item blue
+#0070dd (src/ui/icons.ts rare), the classic-fidelity anchor; two new
+tokens because map and minimap deliberately use separate token
+blocks. (4) i18n: a repeatable aria key beside the existing
+available/ready quest arias, and optionally a map-tooltip tag;
+short leaves, M16 fills if any turns out wordy. (5) If Q31 rules the
+cadence-dimmed marker IN: a 'cooldown' variant driven by the
+cprof.cadenceBlockedQuests mirror (already at the client seam; the
+offline Sim re-derives from questCadence), rendering a dimmed marker
+where today the NPC shows nothing inside the 30-minute window
+(WORK_ORDER_CADENCE_TICKS); this closes the deliberate deferral
+recorded when the cooldown-visibility issue was closed, and roughly
+doubles the surface area of the phase.
+
+Acceptance. (a) A work order never completed shows today's gold
+markers everywhere; after one completion it shows the blue variant on
+all four surfaces, identically offline and online (both-worlds arm);
+(b) non-repeatable quests are pixel-identical to today on every
+surface; (c) ready turn-ins keep priority over the repeat variant;
+(d) the minimap sprite renders unclipped (the glyph sprite box is
+sized from the font ascent and clips silently); (e) every new string
+is a t() key, arias name the repeatable state; (f) desktop and mobile
+screenshot pairs committed; (g) tests: a unit file for the classifier,
+the minimap/map/dialog/nameplate suites extended per surface with the
+repeat arm plus a negative (non-repeatable unchanged) arm each, and
+world_api_parity/command_schema run with ZERO edits to prove the
+no-facet-change claim; (h) npm run gate PASS.
+
+Reviewers. architecture-reviewer (new sim leaf purity, no rng/clock);
+cross-platform-sync (both worlds derive identical markers from the
+shared members; the qdone/cprof mirrors); frontend-seam-reviewer
+(four painter surfaces, tokens, fairness: a marker is actionable
+info, so it must not be tier-gated); test-coverage-auditor;
+qa-checklist always. Not needed: migration-safety,
+database-performance-reviewer (zero persistence change).
+
+### Phase 24: guide prose truth pass (two stale sentences)
+
+Build: any model. QA: folds into the build session's own review (docs
+and catalog only; no sim, server, or UI logic).
+
+What the audit found. Two guide sentences are behind the game, and
+neither is a packet regression. (1) guide.profPages.gatherDeeds.fishing
+still says a first fish from each of the THREE heartland zones'
+waters fills its own page; phase 20's Q26 deeds make it six first-cast
+zones (incomplete rather than false: the heartland claim itself is
+still true). The three land gatherDeeds keys never mention the
+per-zone gatherer chronicles at all (also six now). (2)
+guide.economy.buyingBody still describes the tabbed vendor from the
+reverted interface overhaul: no tabs exist, the rolled-quality sell
+confirm it describes was deleted with the revert, and
+guide.economy.junkBody's "Sell tab" phrasing is wrong the same way;
+this predates the packet and is equally stale on release/v0.34.0. The
+same rewrite should absorb the one genuine phase 21 gap: neither the
+release-owned Buy Stack verb nor the count control row has any guide
+prose. Everything mechanical (node tables, deeds, crests) is
+generated and already committed; no wiki:content regen is needed for
+any of this.
+
+Scope, per the Q32 ruling. Either (a) on this branch: rewrite
+buyingBody to the flat-panel truth (browse and click to buy, the
+quantity strip, click a bag item to sell, the Buyback list), rescope
+junkBody's phrasing, correct the fishing-deeds sentence to cover all
+six first-cast zones, and extend the three land deeds keys with one
+clause on the zone chronicles; or (b) defer the whole set to the
+release docs pass the maintainer already holds. The i18n mechanics
+decide the shape either way: these leaves are filled in the locale
+overlays, so an in-place reword silently stales every fill (they
+re-enter the release worklist), while a new-key-beside shape needs
+its five non-Latin M16 fills in the same change because every one of
+these values is wordy. The recommendation on record: in-place rewrite,
+accepting the re-fill cost at the release fill the maintainer already
+owns, because fragmenting the one buying paragraph into two keys is
+worse for translators than re-filling one.
+
+Acceptance. (a) No guide sentence contradicts the live vendor window
+or undercounts the first-cast deeds; (b) English-only edits pass the
+PR-tier gate (or, for any NEW wordy key, M16 fills land in the same
+change); (c) the guide build and tests/guide.test.ts stay green with
+zero generated-content drift; (d) npm run gate PASS.
+
+Reviewers. qa-checklist; the i18n scrutiny rides the gate (S3 does
+not apply: no sim emit changes). Not needed: all domain reviewers.
+
+### Scoping decision list (Q28 to Q32, UNSETTLED)
+
+Q28. Phase 22 vehicle: the full row-family rework plus the
+uniform-column collapse (option 1 + 3, the recommended end state), or
+the CSS-only leaderboard restyle plus a wrapping Cap cell (option
+2 + 3, smallest diff)? Both fix the mobile unlabeled-Cap defect.
+Q29. Phase 22 governance: confirm the legibility work ships as a bug
+fix ahead of DESIGN.md's typography/window rollout phases (the
+standard's own floor is the thing being violated).
+Q30. Phase 23 derivation: blue only AFTER first completion (the
+recommended rule, matching the request) or classic type-based blue on
+every offer of a repeatable? Both are one-line predicates over
+existing data; the choice is free and reversible.
+Q31. Phase 23 adjacency: is the cadence-cooldown dimmed marker IN
+(closing the deferred cooldown-visibility gap with data already at
+the seam, roughly doubling the phase) or OUT (a later phase)?
+Q32. Phase 24 landing: on this branch now, or deferred whole to the
+release docs pass? And confirm the in-place-reword shape (accepting
+the overlay re-fill at release) over new-keys-beside.
+
+---
+
 ## Deferred and accepted, with reasons (pass-2 additions)
 
 - Thornpeak t1 faucet: accepted, telemetry-watched (R31).
