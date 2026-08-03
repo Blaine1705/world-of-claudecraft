@@ -5597,6 +5597,24 @@ Q32. Phase 24 landing: on this branch now, or deferred whole to the
 release docs pass? And confirm the in-place-reword shape (accepting
 the overlay re-fill at release) over new-keys-beside.
 
+Settled with the maintainer, 2026-08-02, same sitting. Q28: phase 22
+takes the full row-family rework plus the uniform-column collapse
+(option 1 plus 3). Q29: it ships now as a legibility bug fix; the
+DESIGN.md rollout phases are not preempted. Q30: the marker turns
+blue only AFTER the first completion (quest.repeatable and
+questsDone.has(id)), the recorded divergence from type-based classic
+blue standing. Q31: the cadence-cooldown dimmed marker is IN phase
+23; the phase absorbs the deferred cooldown-visibility gap in the
+same stroke. Q32: phase 24 lands ON THIS BRANCH after 22 and 23,
+with in-place rewording (the stale overlay fills re-enter the
+release fill worklist the maintainer already owns). The worklist for
+phases 22 to 24 is LIVE. The masterwork offhand item stays
+operator-side with NO tracking issue by the maintainer's choice; the
+fix's presence here was re-verified at settlement time (the PR 2701
+commit is an ancestor of this branch and of release/v0.34.0, and its
+per-slot round-trip pins pass on this tree), so the remaining
+exposure is purely whether production has been redeployed since.
+
 ---
 
 ## Deferred and accepted, with reasons (pass-2 additions)
