@@ -17,6 +17,7 @@ import {
   WATER_SEABED_CLAMP_YARDS,
 } from './water_core';
 import { WaterSimulation, type WaterWaveUniforms } from './water_simulation';
+import { WATER_TIME_PERIOD, WATER_WAVE_GLSL } from './water_wave_core';
 
 // Water for the whole zone strip.
 //
@@ -36,6 +37,14 @@ import { WaterSimulation, type WaterWaveUniforms } from './water_simulation';
 //
 // Low tier keeps the legacy scrolling Phong plane, upgraded with the real
 // swell normal map for textured speculars.
+//
+// DISPLACEMENT AND SHADING ARE SPLIT ON PURPOSE (water_wave_core.ts holds the
+// one field both stages evaluate). Displacement is bound by what a grid can
+// sample, so the short chop displaces on the zone planes only and feathers out
+// at their rect edge; shading is not bound by anything, so it is computed per
+// pixel from world position on every sheet. Tying the two together is what put
+// a hard straight line through the sun-glint field along that rect edge and
+// left the open sea (mostly apron) with no travelling waves at all.
 
 const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing, enough for the foam band
 // terrainHeight is deliberately rich and sampling all 32k water vertices in
@@ -92,14 +101,12 @@ const WATER_DEEP_DISTANCE_STRENGTH = 0.92;
 /** GLSL needs a decimal point on every float literal. */
 const glsl = (n: number): string => (Number.isInteger(n) ? `${n}.0` : String(n));
 /**
- * The water clock wraps at this period so shader phases never grow unbounded
- * (fp32 sin() goes visibly steppy on long sessions, and mobile mediump dies
- * within minutes). Every water frequency below is snapped to a whole number
- * of cycles per period and every texture scroll to a whole number of tiles
- * per period, so the wrap is seamless by construction.
+ * The one shared, wrapped water clock every water material binds as uTime.
+ * It wraps at WATER_TIME_PERIOD so shader phases never grow unbounded; every
+ * wave frequency (water_wave_core.ts) is a whole number of cycles per that
+ * period and every texture scroll below a whole number of tiles per it, so the
+ * wrap is seamless by construction.
  */
-const WATER_TIME_PERIOD = 600;
-/** The one shared, wrapped water clock every water material binds as uTime. */
 const WATER_TIME: THREE.IUniform<number> = { value: 0 };
 /**
  * Seabed slope the horizon apron falls back to once it is far enough out that
@@ -151,17 +158,21 @@ export function hasWaterShaderAssets(): boolean {
 }
 
 /**
- * Directional swell height (yards of half-amplitude). Purely cosmetic vertex
- * displacement: the sim's waterline and the swim surface stay flat, and the
- * amplitude fades to zero at the shoreline (a heaving sheet must never rise
- * over a beach) and with camera range (the apron's ~15 yard vertex spacing
- * would alias these wavelengths into shimmer at the horizon).
+ * Directional swell height (yards of half-amplitude), the amplitude BOTH
+ * shader stages scale their wave field by. Purely cosmetic: the sim's
+ * waterline and the swim surface stay flat, the amplitude fades to zero at the
+ * shoreline (a heaving sheet must never rise over a beach), and the vertex
+ * DISPLACEMENT additionally fades with camera range (the apron's ~29 yard
+ * vertex spacing would alias the chop wavelengths into shimmer at the horizon;
+ * the fragment stage has no such limit and fades on its own, wider schedule).
  */
 const WATER_SWELL_AMP = 0.22;
 /**
- * Feather over which the zone planes fade their chop displacement to zero
+ * Feather over which the zone planes fade their chop DISPLACEMENT to zero
  * approaching their rect edge, where the chop-free apron takes over. Wider
  * than the chop wavelengths' half-heights so the handoff has no visible knee.
+ * Displacement only: the shading field is per-pixel and identical on both
+ * sheets, so this feather never reaches a normal, a whitecap, or a glint.
  */
 const WATER_CHOP_EDGE_FEATHER_YARDS = 14;
 /** Sun-through-swell scattering tint: the turquoise a lit wave face glows. */
@@ -278,30 +289,6 @@ const WAVE_SAMPLE_GLSL = /* glsl */ `
   }
 `;
 
-// The three swell wave vectors (radians per yard) and their angular speeds.
-// Wavelengths 21 / 20 / 12 yards: long enough that the zone planes' ~2 yard
-// vertex spacing samples them cleanly, short enough to read as running water.
-const SWELL_GLSL = /* glsl */ `
-  const vec2 SWELL_K1 = vec2(0.24, 0.18);
-  const vec2 SWELL_K2 = vec2(-0.16, 0.27);
-  const vec2 SWELL_K3 = vec2(0.44, -0.31);
-  // 86 / 117 / 162 cycles per wrap period: seamless at the clock wrap.
-  const float SWELL_W1 = 0.900590;
-  const float SWELL_W2 = 1.225221;
-  const float SWELL_W3 = 1.696460;
-  // The GROUNDSWELL: two long rollers (about 150 and 180 yard wavelengths)
-  // that BOTH water grids sample cleanly. The apron cells are ~29 x 38 yards
-  // (same segment count over width AND span, so NOT square): the second
-  // wavelength must clear ~4.5 z-samples per cycle or it goes faceted and
-  // amplitude-starved out there, which is why it is the longer of the two.
-  // No camera range fade: the open sea visibly heaves all the way out.
-  // Speeds are 44 / 38 whole cycles per wrap period: seamless at the wrap.
-  const vec2 GSWELL_K1 = vec2(0.0364, 0.0209);
-  const vec2 GSWELL_K2 = vec2(-0.0119, 0.0328);
-  const float GSWELL_W1 = 0.460767;
-  const float GSWELL_W2 = 0.397935;
-`;
-
 const WATER_VERT = /* glsl */ `
   attribute float aShoreDepth;
   attribute float aShoreSlope;
@@ -315,20 +302,21 @@ const WATER_VERT = /* glsl */ `
   varying vec3 vWPos;
   varying float vShoreDepth;
   varying float vShoreSlope;
-  // xz: analytic surface slope of the swell; y: normalized crest height (0..1)
-  varying vec3 vSwell;
+  // Open water, WITHOUT the rect-edge chop feather: 1 on the zone planes and
+  // the apron alike, 0 on a still interior pool. The fragment stage keys its
+  // whole wave field on this, so it must carry no per-sheet difference at all.
+  varying float vOpenSea;
   #include <fog_pars_vertex>
-  ${SWELL_GLSL}
+  ${WATER_WAVE_GLSL}
   ${WAVE_SAMPLE_GLSL}
   void main() {
     vec3 pos = position;
-    // Directional CHOP: three short travelling waves displace the surface, and
-    // the fragment stage gets the matching slope (the cos derivatives) for
-    // free. Gated by aSwellW: zone planes only, feathered out at their rect
-    // edge (the apron cannot sample these wavelengths, see the apron builder).
-    float p1 = dot(pos.xz, SWELL_K1) + uTime * SWELL_W1;
-    float p2 = dot(pos.xz, SWELL_K2) + uTime * SWELL_W2;
-    float p3 = dot(pos.xz, SWELL_K3) + uTime * SWELL_W3;
+    // Directional CHOP: three short travelling waves DISPLACE the surface.
+    // Gated by aSwellW: zone planes only, feathered out at their rect edge
+    // (the apron cannot sample these wavelengths, see the apron builder). The
+    // matching SHADING is not computed here at all: the fragment stage
+    // evaluates the same field per pixel on both sheets, so the feather (a
+    // property of what a grid can carry) never reaches a normal.
     float depthFade = clamp(aShoreDepth * 0.8, 0.0, 1.0);
     float rangeFade = 1.0 - smoothstep(120.0, 300.0, distance(cameraPosition.xz, pos.xz));
     // aSwellW packs both displacement gates: 0 = still water (interior pools,
@@ -337,31 +325,22 @@ const WATER_VERT = /* glsl */ `
     // feathering back to 1 approaching the rect edge the apron shares).
     float chopW = clamp(aSwellW - 1.0, 0.0, 1.0);
     float gswW = clamp(aSwellW, 0.0, 1.0);
-    // Wave GROUPS: a very slow two-sine envelope swells some stretches of sea
-    // and calms others, so open water stops being one uniform corduroy sheet.
-    float group = 0.55 + 0.45
-      * sin(dot(pos.xz, vec2(0.021, 0.013)) + uTime * 0.146608)
-      * sin(dot(pos.xz, vec2(-0.011, 0.024)) + uTime * 0.115192);
-    float amp = uSwellAmp * depthFade * rangeFade * chopW * (0.55 + 0.9 * group);
-    float crest = sin(p1) * 0.5 + sin(p2) * 0.32 + sin(p3) * 0.18;
-    pos.y += crest * amp;
+    float group = waveGroup(pos.xz, uTime);
+    float chopCrest;
+    vec2 chopSlope;
+    chopField(pos.xz, uTime, chopCrest, chopSlope);
+    pos.y += chopCrest * uSwellAmp * depthFade * rangeFade * chopW * (0.55 + 0.9 * group);
     // The GROUNDSWELL: long rollers both grids sample cleanly, so they carry
     // no aSwellW gate and no range fade: this is what keeps the open sea
-    // visibly alive at distance. Depth-faded like the chop (a heaving sheet
+    // visibly heaving at distance. Depth-faded like the chop (a heaving sheet
     // must never rise over a beach), and the group envelope rides along so
     // the rollers arrive in sets instead of a metronome.
-    float g1 = dot(pos.xz, GSWELL_K1) + uTime * GSWELL_W1;
-    float g2 = dot(pos.xz, GSWELL_K2) + uTime * GSWELL_W2;
-    float gsAmp = uSwellAmp * 2.0 * depthFade * gswW * (0.5 + 0.8 * group);
-    float gsCrest = sin(g1) * 0.62 + sin(g2) * 0.38;
-    pos.y += gsCrest * gsAmp;
-    vec2 swellSlope =
-      (cos(p1) * 0.5 * SWELL_K1 + cos(p2) * 0.32 * SWELL_K2 + cos(p3) * 0.18 * SWELL_K3) * amp
-      + (cos(g1) * 0.62 * GSWELL_K1 + cos(g2) * 0.38 * GSWELL_K2) * gsAmp;
-    float crestMix = crest * (0.35 + 0.65 * group) * min(1.0, chopW + 0.35)
-      + gsCrest * 0.45 * group * gswW;
-    vSwell = vec3(swellSlope.x, crestMix * 0.5 + 0.5, swellSlope.y);
-    pos.y += (sin(uTime * 1.099557 + pos.x * 0.35) + sin(uTime * 0.701622 + pos.z * 0.28))
+    float gsCrest;
+    vec2 gsSlope;
+    groundswellField(pos.xz, uTime, gsCrest, gsSlope);
+    pos.y += gsCrest * uSwellAmp * 2.0 * depthFade * gswW * (0.5 + 0.8 * group);
+    vOpenSea = gswW;
+    pos.y += (sin(uTime * WOBBLE_W1 + pos.x * 0.35) + sin(uTime * WOBBLE_W2 + pos.z * 0.28))
       * 0.05 * depthFade * chopW;
     if (uWaveEnabled > 0.001) {
       // waveSampleAt WRITES wave, so it has to complete before wave is read:
@@ -397,12 +376,14 @@ const WATER_FRAG = /* glsl */ `
   uniform float uWaveSize;
   uniform float uShoreEdgeFade;
   uniform vec3 uScatter;
+  uniform float uSwellAmp;
   varying vec3 vWPos;
   varying float vShoreDepth;
   varying float vShoreSlope;
-  varying vec3 vSwell;
+  varying float vOpenSea;
   #include <common>
   #include <fog_pars_fragment>
+  ${WATER_WAVE_GLSL}
   ${WAVE_SAMPLE_GLSL}
   void main() {
     float camDist = length(cameraPosition - vWPos);
@@ -421,10 +402,58 @@ const WATER_FRAG = /* glsl */ `
     // compile silently under parallel shader compilation.)
     float seaLane = texture2D(uNorm3, vWPos.xz * 0.0042 + uTime * vec2(0.001667, -0.001667)).x;
     float farW = smoothstep(40.0, 260.0, camDist);
+    // THE WAVE FIELD, PER PIXEL, from world position: the same functions the
+    // vertex stage displaces with, evaluated identically on BOTH sheets.
+    //
+    // Carrying the slope as a vertex varying instead is what cut a hard
+    // straight line through the sun-glint field along the zone planes' rect
+    // edge. The planes can displace the chop and the apron's ~29 x 38 yard
+    // cells cannot, so the slope feeding glints, whitecaps and scatter stepped
+    // exactly at that rectangle, and at a low sun the mismatch is glaring.
+    // Nothing here reads a grid or a sheet, so the two cannot disagree. It is
+    // also what puts travelling waves on the OPEN sea, which is mostly apron
+    // and previously carried nothing but scrolling normal maps.
+    float waveDepthFade = clamp(vShoreDepth * 0.8, 0.0, 1.0);
+    float group = waveGroup(vWPos.xz, uTime);
+    float openW = vOpenSea * waveDepthFade;
+    float chopW = openW * (1.0 - smoothstep(CHOP_FADE.x, CHOP_FADE.y, camDist));
+    float midW = openW * (1.0 - smoothstep(MSWELL_FADE.x, MSWELL_FADE.y, camDist));
+    float gsW = openW * (1.0 - smoothstep(GSWELL_FADE.x, GSWELL_FADE.y, camDist));
+    vec2 swellSlope = vec2(0.0);
+    float crestSum = 0.0;
+    // Each family is skipped once it has faded out. camDist varies smoothly
+    // across the screen, so these branches are coherent: whole tiles of the
+    // distant sea take the same path and pay for none of the trig.
+    if (chopW > 0.002) {
+      float crest;
+      vec2 slope;
+      chopField(vWPos.xz, uTime, crest, slope);
+      swellSlope += slope * (uSwellAmp * chopW * (0.55 + 0.9 * group));
+      crestSum += crest * chopW * (0.35 + 0.65 * group);
+    }
+    if (midW > 0.002) {
+      float crest;
+      vec2 slope;
+      midField(vWPos.xz, uTime, crest, slope);
+      swellSlope += slope * (uSwellAmp * MSWELL_AMP_SCALE * midW * (0.45 + 0.75 * group));
+      crestSum += crest * midW * (0.32 + 0.58 * group);
+    }
+    if (gsW > 0.002) {
+      float crest;
+      vec2 slope;
+      groundswellField(vWPos.xz, uTime, crest, slope);
+      swellSlope += slope * (uSwellAmp * 2.0 * gsW * (0.5 + 0.8 * group));
+      crestSum += crest * gsW * 0.45 * group;
+    }
+    // Normalized crest height, 0.5 = still water. Drives the whitecaps and the
+    // sun-through-swell scatter, and is per-pixel for the same reason the
+    // slope is: it keyed off the same feathered vertex weight, so it stepped
+    // along the same rectangle and left a tonal boundary on the open water.
+    float crestN = crestSum * CREST_NORM * 0.5 + 0.5;
     // rippled up close -> glassy at distance: detail fades out, swell stays.
-    // The geometric swell's analytic slope (vSwell.xz) tilts the whole normal
-    // so the lit shading agrees with the silhouette the vertex stage displaced.
-    vec2 nm = mix(n1.xy * 0.85 + n2.xy * 0.6, n3.xy * 1.5, farW * 0.78) + vSwell.xz * 5.5;
+    // The swell's analytic slope tilts the whole normal so the lit shading
+    // agrees with the silhouette the vertex stage displaced.
+    vec2 nm = mix(n1.xy * 0.85 + n2.xy * 0.6, n3.xy * 1.5, farW * 0.78) + swellSlope * 5.5;
     // interactive wakes ride on top of the static maps, near the camera only
     vec2 waveSlope = vec2(0.0);
     float waveEnergy = 0.0;
@@ -490,18 +519,29 @@ const WATER_FRAG = /* glsl */ `
     col += uSunColor * pow(sunAlign, 6.0) * 0.05;                    // faint warm sheen sunward
     // Sun-through-swell scattering: looking INTO the sun across running water,
     // light enters the back of a crest and scatters out of its face as a
-    // turquoise glow. Gated on the crest height (vSwell.y) and a grazing view,
-    // so calm water seen from above is untouched; the interactive wake energy
-    // feeds it too, so a churned wake glows the same way.
+    // turquoise glow. Gated on the crest height and a grazing view, so calm
+    // water seen from above is untouched; the interactive wake energy feeds it
+    // too, so a churned wake glows the same way.
     float intoSun = pow(max(dot(-V, uSunDir), 0.0), 3.0);
     float grazing = 1.0 - max(dot(N, V), 0.0);
-    float churn = clamp(vSwell.y + waveEnergy * 2.0, 0.0, 1.3);
+    float churn = clamp(crestN + waveEnergy * 2.0, 0.0, 1.3);
     col += uScatter * (intoSun * grazing * (0.25 + 0.75 * churn));
-    // Whitecap mottling where grouped crests peak, broken up by the detail
-    // map and faded with range (the analytic mask has no mip chain).
-    float capMask = smoothstep(0.68, 0.96, vSwell.y * (0.5 + 0.5 * seaLane));
+    // Whitecap mottling where grouped crests peak. The thresholds roll out
+    // with range instead of the mask being faded away: near, individual crests
+    // break and only the tallest go white, while far the only crests still
+    // resolvable are the long rollers under the group envelope, so the
+    // thresholds have to meet the field where it is or the horizon goes flat.
+    float capMask = smoothstep(
+      mix(0.68, 0.53, farW),
+      mix(0.96, 0.74, farW),
+      crestN * (0.5 + 0.5 * seaLane)
+    );
+    // The detail map breaks the caps up close; at range it mips toward a flat
+    // 0.5 and would erase them, so hand over to the lane field, which is low
+    // frequency enough to keep both its structure and its mips all the way out.
     float capTex = smoothstep(0.52, 0.82, n2.x * 0.5 + 0.5);
-    col = mix(col, vec3(0.99), capMask * capTex * (1.0 - farW) * 0.45);
+    float capBreak = mix(capTex, smoothstep(0.30, 0.78, seaLane), farW);
+    col = mix(col, vec3(0.99), capMask * capBreak * 0.45);
     // Shoreline foam keyed on HORIZONTAL distance to the waterline, recovered
     // as depth / seabed slope, NOT on depth. Measured shelves range from 3.2
     // yards of depth in 4 yards of run to 0.2 yards of depth sustained over 40,
@@ -514,12 +554,12 @@ const WATER_FRAG = /* glsl */ `
     // stripes, faded with range because it is an analytic function with no mip
     // chain and aliases hard at grazing angles.
     float foamWave = 0.55
-      + 0.25 * sin(uTime * 1.696460 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0)
-      + 0.20 * sin(uTime * 0.900590 - vWPos.x * 0.41 + vWPos.z * 0.63 + n1.y * 4.0);
+      + 0.25 * sin(uTime * SWELL_W3 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0)
+      + 0.20 * sin(uTime * SWELL_W1 - vWPos.x * 0.41 + vWPos.z * 0.63 + n1.y * 4.0);
     // A lapping wave travels SHOREWARD through the band (phase runs along the
     // recovered shore distance), so the surf advances and retreats instead of
     // pulsing in place. Reuses the already-sampled normal maps for its break.
-    float lap = 0.6 + 0.4 * sin(uTime * 1.350885 - shoreDist * 1.9 + n1.y * 3.0);
+    float lap = 0.6 + 0.4 * sin(uTime * FOAM_LAP_W - shoreDist * 1.9 + n1.y * 3.0);
     float foam = foamBand * foamWave * lap * exp(-camDist * ${glsl(WATER_FOAM_DISTANCE_FADE)});
     // disturbed water reads brighter and skyward, the way a real wake does
     float contactSheen = smoothstep(0.025, 0.13, waveEnergy) * exp(-camDist * 0.022);
@@ -755,9 +795,11 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(apronSlope, 1));
     // aSwellW 1 everywhere: the apron takes the long groundswell (its grid
     // samples those wavelengths cleanly) but NEVER the short chop: its ~27
-    // yard vertex spacing cannot sample chop wavelengths (pure aliasing), and
-    // a chop-displaced apron disagreeing with the zone planes at their shared
-    // rect edge is exactly the straight seam line this attribute closes.
+    // yard vertex spacing cannot sample chop wavelengths (pure aliasing).
+    // It is a DISPLACEMENT gate only. The fragment stage reads the clamped
+    // weight, which is 1 here and 1 on every zone plane, so the two sheets
+    // shade from the identical wave field and their shared rect edge carries
+    // no step in normals, whitecaps, or glints.
     geo.setAttribute('aSwellW', new THREE.BufferAttribute(new Float32Array(pos.count).fill(1), 1));
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
@@ -834,11 +876,11 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
     const shoreSlope = new Float32Array(pos.count);
-    // Swell weight, packed (see WATER_VERT): 2 = groundswell + chop inside
-    // the plane, feathering the chop share back to 1 (groundswell only, the
-    // apron's constant) at the rect edge, so the two displaced sheets agree
-    // exactly where they meet. The feather fires ONLY where the neighbour
-    // across the edge really is the apron: an edge abutted by another zone
+    // Swell DISPLACEMENT weight, packed (see WATER_VERT): 2 = groundswell +
+    // chop inside the plane, feathering the chop share back to 1 (groundswell
+    // only, the apron's constant) at the rect edge, so the two displaced
+    // sheets agree exactly where they meet. The feather fires ONLY where the
+    // neighbour across the edge really is the apron: an edge abutted by another zone
     // plane carries identical chop on both sides, and feathering there cut a
     // visible calm stripe down every internal border water (the column
     // straits, the row meres). Abutment is per COORDINATE, not per edge:

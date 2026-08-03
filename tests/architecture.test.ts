@@ -347,6 +347,7 @@ const RENDER_PURE_CORES = [
   'src/render/vfx_pool_core.ts',
   'src/render/view_candidate_pool_core.ts',
   'src/render/water_core.ts',
+  'src/render/water_wave_core.ts',
   'src/render/water_flora_core.ts',
   'src/render/water_flora_shader_core.ts',
   'src/render/day_night_core.ts',
