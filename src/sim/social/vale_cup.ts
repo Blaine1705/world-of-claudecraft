@@ -31,6 +31,7 @@ import {
   resolveSportKit,
   SPORT_ROLES,
   VALE_CUP_BALL_TEMPLATE_ID,
+  VC_ALLROUNDER_ONLY_MAX_BRACKET,
   vcNation,
 } from '../content/vale_cup';
 import { abilitiesKnownAt, DUNGEON_X_THRESHOLD, MOBS } from '../data';
@@ -347,7 +348,7 @@ function vcupPlayPhase(match: VcMatch): boolean {
 
 function normalizeRole(role: SportRole | string | undefined, bracket: VcBracket): SportRole {
   // 1v1 and 2v2 default to the all-rounder kit (PRD); unknown roles coerce too.
-  if (bracket <= 2) return 'allrounder';
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return 'allrounder';
   return SPORT_ROLES.includes(role as SportRole) ? (role as SportRole) : 'allrounder';
 }
 
@@ -362,7 +363,7 @@ function ensureSideKeeper(
   roles: Record<number, SportRole>,
   bracket: VcBracket,
 ): void {
-  if (bracket < 3 || pids.length === 0) return;
+  if (bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET || pids.length === 0) return;
   if (pids.some((pid) => roles[pid] === 'keeper')) return;
   roles[pids[pids.length - 1]] = 'keeper';
 }

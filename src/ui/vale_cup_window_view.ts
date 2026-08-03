@@ -16,7 +16,11 @@
 // DOM-free and i18n-free: rows carry raw ids (nation/role/bracket) the painter
 // localizes; the render-skip sig is text-independent (ids + numbers only).
 
-import { SPORT_ROLES, VC_NATION_IDS } from '../sim/content/vale_cup';
+import {
+  SPORT_ROLES,
+  VC_ALLROUNDER_ONLY_MAX_BRACKET,
+  VC_NATION_IDS,
+} from '../sim/content/vale_cup';
 import type { SportRole, VcBracket, VcNationId } from '../sim/types';
 import type { CupInfo, PartyInfo } from '../world_api';
 
@@ -159,13 +163,15 @@ export function buildVcupView(input: VcupViewInput): VcupView {
   // Every role stays pickable in every bracket and changeable while waiting in
   // the queue, but the sim seats 1v1/2v2 fighters as All-Rounder regardless of
   // the pick (normalizeRole in src/sim/social/vale_cup.ts), so those brackets
-  // get an explicit note instead of a silently ignored keeper pick.
+  // get an explicit note instead of a silently ignored keeper pick. The
+  // threshold is the SAME constant normalizeRole reads, so note and rule
+  // cannot drift.
   const roles: VcupRoleRow[] = SPORT_ROLES.map((id) => ({
     id,
     selected: id === role,
     disabled: inMatch,
   }));
-  const smallBracketRoles = bracket <= 2;
+  const smallBracketRoles = bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET;
 
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === playerId;

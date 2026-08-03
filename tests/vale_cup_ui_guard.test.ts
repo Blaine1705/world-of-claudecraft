@@ -86,6 +86,25 @@ describe('vale_cup_window: WCAG chrome (focusable controls + focus-return)', () 
   });
 });
 
+describe('vale_cup gate notes: the unrated / small-bracket copy is actually rendered (issue 2767)', () => {
+  // The view cores pin the FLAGS (tests/vale_cup_window_view.test.ts,
+  // tests/vale_cup_briefing_view.test.ts); these source pins hold the painters
+  // to rendering them, so deleting a note line cannot survive the suite.
+  it('window: renders the small-bracket role note behind its view gate', () => {
+    expect(windowSrc).toContain("t('hudChrome.vcup.rolesSmallBracketNote')");
+    expect(windowSrc).toContain('view.smallBracketRoles');
+  });
+
+  it('window: renders the practice unrated note beside the practice button', () => {
+    expect(windowSrc).toContain("t('hudChrome.vcup.practiceUnratedNote')");
+  });
+
+  it('briefing: renders the unrated rules row gated on the rated flag', () => {
+    expect(briefingSrc).toContain("t('hudChrome.vcup.briefing.unratedNote')");
+    expect(briefingSrc).toContain('view.rated');
+  });
+});
+
 describe('vale_cup painters: no magic values', () => {
   it.each(ALL_PAINTERS)('%s carries no literal hex or rgb color in TS', (_name, code) => {
     const hex = code.match(/#[0-9a-fA-F]{3,8}\b/g) ?? [];

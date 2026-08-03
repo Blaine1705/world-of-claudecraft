@@ -143,14 +143,23 @@ describe('classifyDiff', () => {
     expect(target?.capture.toString()).toContain('knownRecipes: []');
   });
 
-  it('maps the Vale Cup unrated-gates UI change to its two targets (#2767)', () => {
-    const plan = classifyDiff(['src/ui/vale_cup_window.ts', 'src/ui/vale_cup_briefing.ts']);
-    expect(plan.isVisual).toBe(true);
-    const keys = plan.specific.map((t: { key: string }) => t.key);
-    expect(keys).toContain('vale-cup-unrated-notes');
-    expect(keys).toContain('vale-cup-briefing-unrated');
+  it('maps the Vale Cup unrated-gates UI change to its two targets, per path (#2767)', () => {
+    // One classifyDiff per path, so each target's `when` routing is proven on
+    // its own rather than through the OR of the union.
+    const windowKeys = classifyDiff(['src/ui/vale_cup_window.ts']).specific.map(
+      (t: { key: string }) => t.key,
+    );
+    expect(windowKeys).toContain('vale-cup-unrated-notes');
+    expect(windowKeys).not.toContain('vale-cup-briefing-unrated');
+    const briefingPlan = classifyDiff(['src/ui/vale_cup_briefing.ts']);
+    const briefingKeys = briefingPlan.specific.map((t: { key: string }) => t.key);
+    expect(briefingKeys).toContain('vale-cup-briefing-unrated');
+    expect(briefingKeys).not.toContain('vale-cup-unrated-notes');
     for (const key of ['vale-cup-unrated-notes', 'vale-cup-briefing-unrated']) {
-      const target = plan.specific.find((candidate: { key: string }) => candidate.key === key);
+      const target = classifyDiff([
+        'src/ui/vale_cup_window.ts',
+        'src/ui/vale_cup_briefing.ts',
+      ]).specific.find((candidate: { key: string }) => candidate.key === key);
       expect(target?.variants).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
     }
   });
