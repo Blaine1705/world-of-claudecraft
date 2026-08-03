@@ -609,15 +609,15 @@ function readJsonFile<T>(filePath: string): T {
 }
 
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
-  '27da6a7983e32a8e8a1bbb861ec053a3cf7b699935a8dce890b8421c44d5d6f1';
+  'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '0c2b836bdce23cf6132850c7009d2fbea8ef79e5e38ca8ee275a32edf4717ae0';
+  '20bccfe7b2395b40b59815d514ee8424a1ca7500485c4f6ea246c5112c67f266';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '84b1e375592b0d5a0591b8f1e0e081b73fe5aa2ab57d3df0f8bfe7ef7aa31e9c';
+  'fd1b2a46947d588aa6c0e62a04885a8039ed3fb1c2d1e281342f80168b16d590';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1474,14 +1474,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // After merging release/v0.34.0 into this branch, both the fence-removal
-    // content change (rebuilt-town placement inventory in the after-* files)
-    // and the upstream version-sync-driven provenance move now stack, so this
-    // seal follows the merged composite. Every measured value (frame timings,
-    // draw stats, triangle and scenario numbers) is byte-identical, and no
-    // capture was retaken.
+    // Re-pinned again after merging the current release/v0.34.0 tip into this
+    // branch: neither parent's literal matched the merged tree, so this was
+    // recomputed against the actual merged performance evidence files (byte
+    // identical to both parents' inputs; no capture retaken).
     expect(fingerprint.digest('hex')).toBe(
-      'bdd2bc50235677ff8caf16591e6458dc0fc346b2bc5ca7f63b2d53ca6b3e8002',
+      '84ac863929dd9323394454c79e9fa8bb8c6d09c642bd0e7013cbe30944903af7',
     );
   });
 
