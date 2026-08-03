@@ -384,10 +384,22 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
           : u.uTreeMax;
   // Standard, matching the real foliage materials: the sprites must take
   // the same realm IBL irradiance their 3D twins take, or their shaded
-  // sides read darker than the trees they replace. vertexColors on so the
-  // per-instance tint written by setColorAt in finalize actually applies
-  // (without it three.js never compiles the instancing-color path and the
-  // tint is a silent no-op: every archetype repeats one identical sprite).
+  // sides read darker than the trees they replace.
+  //
+  // vertexColors STAYS OFF, and the per-instance tint still applies. three
+  // derives USE_INSTANCING_COLOR from the mesh owning an instanceColor (see
+  // instancingColor in WebGLPrograms), never from this flag, and its fragment
+  // side defines USE_COLOR from that same instancing path, so setColorAt
+  // reaches diffuseColor either way. Turning the flag ON is what broke: it
+  // defines USE_COLOR in the VERTEX prefix too, and there `color_vertex` runs
+  // `vColor *= color` against a `color` attribute the impostor quad does not
+  // have. An unbound attribute reads (0, 0, 0), which zeroed vColor and with
+  // it every sprite's whole diffuse term. What was left to draw was the
+  // canopy emissive floor plus a specular lobe, neither of which is
+  // multiplied by diffuseColor: a flat cutout, one colour, unable to react to
+  // the sun at any hour, warm and washed out under a low sun because the
+  // specular alone carried the light's colour. Pinned by
+  // tests/foliage_impostor_core.test.ts.
   const mat = new THREE.MeshStandardMaterial({
     map: atlas,
     alphaTest: 0.35,
@@ -395,7 +407,6 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
     fog: true,
     roughness: 0.95,
     metalness: 0,
-    vertexColors: true,
   });
   mat.name = `foliage:impostor-${category}`;
   // The canopy ambient floor the real trees carry (foliage.ts), shaped by
@@ -542,6 +553,23 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
           impTexel = mix( impA, impB, vImpBlend );
           diffuseColor *= impTexel;
         }`,
+      )
+      .replace(
+        // Drop the specular lobe. It is the one term here that never
+        // multiplies the atlas texel, so on a flat card carrying a single
+        // smooth synthetic normal it lands as a uniform sheet of the light's
+        // own colour and no sprite texture survives it. A real canopy spreads
+        // the same energy over thousands of leaf orientations, so it never
+        // forms a card-sized highlight. Measured against a real twin: under a
+        // high sun with the camera facing it the lobe was 38 percent of the
+        // sprite's pixel and left the sprite 2.2x brighter than the tree it
+        // replaces; dropping it brings that to 1.6x. At a low sun it is under
+        // 5 percent, so dawn and dusk barely move, and the sprite layer (the
+        // most pixels in the far field) saves a PMREM sample per fragment.
+        '#include <lights_fragment_end>',
+        `#include <lights_fragment_end>
+        reflectedLight.directSpecular = vec3( 0.0 );
+        reflectedLight.indirectSpecular = vec3( 0.0 );`,
       )
       .replace(
         // Shape the canopy ambient floor by the blended atlas texel, the
