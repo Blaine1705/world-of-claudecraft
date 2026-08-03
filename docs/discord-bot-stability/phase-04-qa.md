@@ -165,7 +165,7 @@ Then FILL IN the Phase 5 starter prompt in docs/discord-bot-stability/phase-05-o
 from this session's outcome, the way Phase 3 QA filled in Phase 4 and the Phase 4 build filled in
 this file. Commit with explicit paths and a body.
 
-STEP 5 - FINAL RESPONSE: verdict (PASS / PASS-WITH-FOLLOWUPS / FAIL), counts of findings found
+STEP 6 - FINAL RESPONSE: verdict (PASS / PASS-WITH-FOLLOWUPS / FAIL), counts of findings found
 and fixed by severity, the mutation kill tally (killed / survived / skipped, and what a survivor
 means), deferrals with their reason, and a one-line handoff for Phase 5.
 

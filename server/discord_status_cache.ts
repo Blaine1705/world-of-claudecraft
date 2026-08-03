@@ -28,8 +28,14 @@
 // this endpoint's brownout behavior: a warm entry stale-serves (200 with a
 // value of unbounded age) while refreshes keep failing, where the pre-cache
 // endpoint answered 500; a cold entry still rejects, and a rejected mint
-// releases its cap slot at settle so value-less entries can never evict warm,
-// stale-servable snapshots during a brownout with account churn. Stale-serving does not
+// releases its cap slot at settle, so failed mints never ACCUMULATE as dead
+// weight. The bound stays hard on the way in (R11), so AT the cap a failing
+// mint's transient slot still displaces the coldest entry while its flight is
+// open: a brownout with churn at the cap costs up to one warm snapshot per
+// concurrently failing mint, never a growing residue. The absolute
+// no-displacement guarantee would need either a soft bound or per-key flights
+// outside the map (losing cold single-flight); both were considered and
+// rejected. Stale-serving does not
 // shed load (every past-TTL read still attempts the refresh flight), and its
 // only signal today is cached_read's one console.warn per failure streak; a
 // stale-serve counter would need the shared cached_read seam and is recorded
@@ -177,11 +183,16 @@ export class KeyedCachedRead<T> {
     flight.catch(() => {
       // A rejected read means nothing was ever installed (a warm entry
       // stale-serves instead of rejecting), so this entry is value-less: drop
-      // it so it cannot hold a cap slot and evict a warm snapshot during a
-      // brownout with account churn. Deleting at settle loses no single-flight
-      // sharing (the insert above is synchronous, so concurrent readers joined
-      // this flight), and the next reader re-mints, which is cached_read's own
-      // retry shape. Identity-guarded: a bust may already have replaced us.
+      // it at settle so failed mints never accumulate as dead weight (the
+      // header states the honest scope: the insert above already ran the
+      // at-cap eviction, so this prevents retention, not the transient
+      // displacement). Deleting at settle loses no single-flight sharing (the
+      // insert is synchronous, so concurrent readers joined this flight), and
+      // the next reader re-mints, cached_read's own retry shape.
+      // Identity-guarded: a bust may already have replaced us. Side effect of
+      // any settle-cleanup handler: the returned promise counts as handled,
+      // so a caller that forgets to await no longer trips unhandledRejection;
+      // awaiting callers still see the rejection.
       if (this.entries.get(key) === entry) this.entries.delete(key);
     });
     return flight;

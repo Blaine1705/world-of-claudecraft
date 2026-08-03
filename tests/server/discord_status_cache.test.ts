@@ -194,11 +194,13 @@ describe('KeyedCachedRead mechanism', () => {
     }
   });
 
-  it('failed mints never evict a warm snapshot at the cap (brownout churn)', async () => {
-    // The slot-release rule's own scenario: with the map AT the cap, a churn
-    // of accounts whose refreshes all fail must not push out the warm entry
-    // that could still stale-serve. Keeping failed mints in the map would
-    // evict key 1 at the third failure and this arm would red on the refetch.
+  it('failed mints never accumulate as dead weight (brownout churn below the cap)', async () => {
+    // The slot-release rule's no-accumulation half: sequential failing mints
+    // below the cap each release at settle, so the map never fills with
+    // value-less entries and the warm snapshot is never displaced. Keeping
+    // failed mints in the map would fill the second slot at the first failure
+    // and evict key 1 at the second (size 2 at the cap when key 3 mints), so
+    // this arm reds on the refetch without the release.
     // (No warn spy: a cold rejection never warns, only a stale-serve does.)
     const reads = new Map<number, number>();
     let healthy = true;
@@ -219,6 +221,36 @@ describe('KeyedCachedRead mechanism', () => {
     // The warm snapshot survived the churn: still served from cache.
     expect(await cache.read(1)).toBe('k1');
     expect(reads.get(1)).toBe(1);
+  });
+
+  it('AT the cap a failing mint transiently displaces exactly the coldest entry', async () => {
+    // The honest other half, stated in the module header: the bound is hard
+    // on the way in (R11), so a mint that later fails has already run the
+    // insert-side eviction. One warm entry (the coldest) is displaced per
+    // failing mint at the cap; the failed mint itself does not stay, and the
+    // other warm entry is untouched.
+    const reads = new Map<number, number>();
+    let healthy = true;
+    const cache = new KeyedCachedRead<string>(
+      async (key) => {
+        reads.set(key, (reads.get(key) ?? 0) + 1);
+        if (!healthy) throw new Error(`down for k${key}`);
+        return `k${key}`;
+      },
+      { ttlMs: 60_000, maxEntries: 2, now: () => 0 },
+    );
+    expect(await cache.read(1)).toBe('k1');
+    expect(await cache.read(2)).toBe('k2');
+    healthy = false;
+    await expect(cache.read(3)).rejects.toThrow('down for k3');
+    // Key 1 (coldest) was displaced by the failing mint's transient slot; the
+    // slot itself was released at settle, so only key 2 remains.
+    expect(cache.size()).toBe(1);
+    healthy = true;
+    expect(await cache.read(2)).toBe('k2');
+    expect(reads.get(2)).toBe(1);
+    expect(await cache.read(1)).toBe('k1');
+    expect(reads.get(1)).toBe(2);
   });
 
   it('holds the bound AT the cap and evicts the least-recently-read key', async () => {
