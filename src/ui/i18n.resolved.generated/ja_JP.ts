@@ -1046,6 +1046,7 @@ export const ja_JP: EnTranslations = {
       },
       "awayNote": "両チームが同じ旗を選んだ場合、アウェー側は反転配色でプレイする。",
       "rolesHeading": "ポジション",
+      "rolesSmallBracketNote": "1対1と2対2の階級では全員がオールラウンダーとして出場する。キーパーのプレイとその功績には3対3以上の階級が必要だ。",
       "role": {
         "allrounder": {
           "name": "オールラウンダー",
@@ -1087,6 +1088,7 @@ export const ja_JP: EnTranslations = {
       "guildBoardWl": "{wins} 勝 {losses} 敗",
       "practice": "ボット練習試合",
       "practiceNote": "ソウフィールドでボットとのフル試合をすぐに始める。",
+      "practiceUnratedNote": "練習試合はレート対象外。戦績も功績の書の進行も数えられない。",
       "practicingNow": "練習中（{count}）：",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "ヴェイルカップ待機中:{bracket}、{count} 人中 {position} 番目",
@@ -1129,6 +1131,7 @@ export const ja_JP: EnTranslations = {
         "rule5": "誰でも近づいて、スタンドから声援を送れる。",
         "kitHeading": "あなたの技",
         "kitNote": "試合中はこれらの技がクラスのアビリティと入れ替わる。",
+        "unratedNote": "ボットがピッチにいるため、この試合はレート対象外。戦績も功績の書の進行も数えられない。",
         "rosterHeading": "メンバー表",
         "you": "あなた",
         "bot": "ボット",

@@ -1046,6 +1046,7 @@ export const zh_CN: EnTranslations = {
       },
       "awayNote": "若双方举同一面旗帜，客队将使用反转配色。",
       "rolesHeading": "运动位置",
+      "rolesSmallBracketNote": "在1对1和2对2赛级中，所有选手都以全能型出场。守门员玩法及其功绩需要3对3或更大的赛级。",
       "role": {
         "allrounder": {
           "name": "全能型",
@@ -1087,6 +1088,7 @@ export const zh_CN: EnTranslations = {
       "guildBoardWl": "{wins} 胜，{losses} 负",
       "practice": "与机器人练习赛",
       "practiceNote": "立即在母猪场开始一场完整的机器人比赛。",
+      "practiceUnratedNote": "练习赛不计入评级：战绩与功绩之书进度均不计算。",
       "practicingNow": "正在练习（{count}）：",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人",
@@ -1129,6 +1131,7 @@ export const zh_CN: EnTranslations = {
         "rule5": "任何人都可以走上前，在看台上为你助威。",
         "kitHeading": "你的技能",
         "kitNote": "比赛期间，这些动作将取代你的职业技能。",
+        "unratedNote": "场上有机器人，因此本场为非评级赛：战绩与功绩之书进度均不计算。",
         "rosterHeading": "出场名单",
         "you": "你",
         "bot": "电脑",

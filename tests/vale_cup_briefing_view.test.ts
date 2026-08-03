@@ -35,6 +35,7 @@ function makeMatch(
   return {
     id: 9,
     phase: 'briefing',
+    rated: true,
     countdown: 0,
     timeLeft: 360,
     golden: false,
@@ -302,6 +303,18 @@ describe('vale_cup_briefing_view', () => {
       }),
     );
     expect(role.sig).not.toBe(base.sig);
+  });
+
+  it('carries the rated flag and rebuilds the skeleton when it differs (issue 2767)', () => {
+    const rated = buildVcupBriefingView(makeCupInfo('sim', { match: makeMatch() }));
+    expect(rated.rated).toBe(true);
+    const unrated = buildVcupBriefingView(
+      makeCupInfo('sim', { match: makeMatch({ rated: false }) }),
+    );
+    expect(unrated.rated).toBe(false);
+    // Structural: an unrated bout adds the note row to the rules panel, so the
+    // skeleton sig must move with the flag.
+    expect(unrated.sig).not.toBe(rated.sig);
   });
 
   it('renders identically from Sim-shaped and mirror-shaped stubs', () => {

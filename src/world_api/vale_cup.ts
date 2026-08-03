@@ -35,6 +35,10 @@ export interface VcBetInfo {
 export interface VcMatchInfo {
   id: number;
   phase: VcPhase;
+  // False whenever bots are seated (practice and bot-backfilled bouts): an
+  // unrated bout moves no standings and grants no Vale Cup skill deeds, and the
+  // UI (briefing overlay) tells the player so up front (issue 2767).
+  rated: boolean;
   // whole seconds: countdown until kickoff, or remaining match/golden time
   countdown: number;
   timeLeft: number;

@@ -8145,6 +8145,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.nation.copperdig': '铜矿坑',
   'hudChrome.vcup.awayNote': '若双方举同一面旗帜，客队将使用反转配色。',
   'hudChrome.vcup.rolesHeading': '运动位置',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    '在1对1和2对2赛级中，所有选手都以全能型出场。守门员玩法及其功绩需要3对3或更大的赛级。',
   'hudChrome.vcup.role.allrounder.name': '全能型',
   'hudChrome.vcup.role.allrounder.desc': '样样都会：踢球、长传，还有一记正当的肩撞。',
   'hudChrome.vcup.role.striker.name': '前锋',
@@ -8176,6 +8178,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.boardWins': '{count} 胜',
   'hudChrome.vcup.practice': '与机器人练习赛',
   'hudChrome.vcup.practiceNote': '立即在母猪场开始一场完整的机器人比赛。',
+  'hudChrome.vcup.practiceUnratedNote': '练习赛不计入评级：战绩与功绩之书进度均不计算。',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.indicatorQueued': '溪谷杯队列：{bracket}，第 {position} 位，共 {count} 人',
   'hudChrome.vcup.indicatorLive': '溪谷杯',
@@ -8216,6 +8219,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.rule5': '任何人都可以走上前，在看台上为你助威。',
   'hudChrome.vcup.briefing.kitHeading': '你的技能',
   'hudChrome.vcup.briefing.kitNote': '比赛期间，这些动作将取代你的职业技能。',
+  'hudChrome.vcup.briefing.unratedNote':
+    '场上有机器人，因此本场为非评级赛：战绩与功绩之书进度均不计算。',
   'hudChrome.vcup.briefing.rosterHeading': '出场名单',
   'hudChrome.vcup.briefing.you': '你',
   'hudChrome.vcup.briefing.bot': '电脑',

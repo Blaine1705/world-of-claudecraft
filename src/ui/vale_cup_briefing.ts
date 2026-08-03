@@ -198,7 +198,7 @@ export class ValeCupBriefing {
       `<div class="vcupb-card">` +
       this.headerHtml(view) +
       `<div class="vcupb-panels">` +
-      this.rulesHtml() +
+      this.rulesHtml(view) +
       this.kitHtml(view) +
       this.rosterHtml(view) +
       `</div>` +
@@ -230,16 +230,22 @@ export class ValeCupBriefing {
     );
   }
 
-  private rulesHtml(): string {
+  private rulesHtml(view: VcupBriefingView): string {
     const rows = RULE_KEYS.map(
       (key, i) =>
         `<li class="vcupb-rule"><span class="vcupb-rule-mark r${i + 1}" aria-hidden="true"></span>` +
         `<span class="vcupb-rule-text">${esc(t(key))}</span></li>`,
     ).join('');
+    // Unrated bouts (practice / bot-backfill) say so up front: standings and
+    // Book of Deeds progress do not count (issue 2767). Structural (in the sig).
+    const unrated = view.rated
+      ? ''
+      : `<li class="vcupb-rule vcupb-unrated"><span class="vcupb-rule-mark unrated" aria-hidden="true"></span>` +
+        `<span class="vcupb-rule-text">${esc(t('hudChrome.vcup.briefing.unratedNote'))}</span></li>`;
     return (
       `<section class="vcupb-panel vcupb-rules">` +
       `<h3 class="vcupb-panel-title">${esc(t('hudChrome.vcup.briefing.rulesHeading'))}</h3>` +
-      `<ul class="vcupb-rule-list">${rows}</ul></section>`
+      `<ul class="vcupb-rule-list">${rows}${unrated}</ul></section>`
     );
   }
 

@@ -81,6 +81,10 @@ export type VcupView =
       nation: VcNationId | null;
       roles: VcupRoleRow[];
       role: SportRole;
+      /** True for the 1v1/2v2 brackets, where the sim seats every fighter as
+       *  All-Rounder regardless of the pick (normalizeRole): the painter shows
+       *  the note so the keeper deeds' 3v3+ gate is explicit (issue 2767). */
+      smallBracketRoles: boolean;
       standing: { wins: number; losses: number; draws: number };
       action: VcupAction;
       live: VcupLivePanel | null;
@@ -152,13 +156,16 @@ export function buildVcupView(input: VcupViewInput): VcupView {
     disabled: picksLocked,
   }));
 
-  // Every role is allowed in every bracket (a 1v1 keeper is a legitimate,
-  // if brave, choice); the role stays changeable while waiting in the queue.
+  // Every role stays pickable in every bracket and changeable while waiting in
+  // the queue, but the sim seats 1v1/2v2 fighters as All-Rounder regardless of
+  // the pick (normalizeRole in src/sim/social/vale_cup.ts), so those brackets
+  // get an explicit note instead of a silently ignored keeper pick.
   const roles: VcupRoleRow[] = SPORT_ROLES.map((id) => ({
     id,
     selected: id === role,
     disabled: inMatch,
   }));
+  const smallBracketRoles = bracket <= 2;
 
   const partySize = party?.members.length ?? 1;
   const isLeader = !party || party.leader === playerId;
@@ -248,6 +255,7 @@ export function buildVcupView(input: VcupViewInput): VcupView {
     nation,
     roles,
     role,
+    smallBracketRoles,
     standing: info.standing,
     action,
     live,

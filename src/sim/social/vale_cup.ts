@@ -227,7 +227,12 @@ export interface VcMatch {
   rosterA: VcCombatant[]; // snapshot at start so leavers keep a team sheet
   rosterB: VcCombatant[];
   roles: Record<number, SportRole>;
-  rated: boolean; // false whenever bots are seated: no standing changes
+  // False whenever bots are seated (practice and bot-backfill): no standing
+  // changes and no Vale Cup skill-deed credit (goal/save/clean-sheet sites in
+  // deeds.ts gate on it; only the debut/first-match deeds stay permissive).
+  // Deliberate, and surfaced to the player: matchInfoFor ships this flag so the
+  // briefing overlay can say the bout is unrated (issue 2767).
+  rated: boolean;
   ready: Set<number>; // fighters who readied up in the briefing (bots pre-added)
   briefingTimer: number; // s of briefing left before auto-ready ('briefing' only)
   benched: Set<number>; // deserters/vanished fighters; team plays short
@@ -2172,6 +2177,7 @@ function matchInfoFor(ctx: SimContext, match: VcMatch, viewerPid: number): VcMat
   return {
     id: match.id,
     phase: match.phase,
+    rated: match.rated,
     countdown: match.phase === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
     timeLeft,
     golden: match.golden,

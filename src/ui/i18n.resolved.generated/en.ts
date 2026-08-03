@@ -1046,6 +1046,7 @@ export const en: EnTranslations = {
       },
       "awayNote": "If both sides fly the same banner, the away side plays the inverted palette.",
       "rolesHeading": "Sport role",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
       "role": {
         "allrounder": {
           "name": "All-Rounder",
@@ -1087,6 +1088,7 @@ export const en: EnTranslations = {
       "guildBoardWl": "{wins} W, {losses} L",
       "practice": "Practice vs. Bots",
       "practiceNote": "Starts a private bot match on your own practice pitch right away.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Practicing now ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Vale Cup queue: {bracket}, position {position} of {count}",
@@ -1129,6 +1131,7 @@ export const en: EnTranslations = {
         "rule5": "Anyone can walk up and cheer you on from the stands.",
         "kitHeading": "Your kit",
         "kitNote": "These moves replace your class abilities for the match.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
         "rosterHeading": "The team sheet",
         "you": "You",
         "bot": "Bot",

@@ -1046,6 +1046,7 @@ export const tr_TR: EnTranslations = {
       },
       "awayNote": "İki taraf da aynı sancağı taşıyorsa deplasman tarafı ters renk paletiyle oynar.",
       "rolesHeading": "Spor rolü",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
       "role": {
         "allrounder": {
           "name": "Çok Yönlü",
@@ -1087,6 +1088,7 @@ export const tr_TR: EnTranslations = {
       "guildBoardWl": "{wins} G, {losses} M",
       "practice": "Botlara Karşı Antrenman",
       "practiceNote": "Kendi antrenman sahanda hemen özel bir bot maçı başlatır.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Şu an antrenmanda ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Vadi Kupası sırası: {bracket}, sıra {position} / {count}",
@@ -1129,6 +1131,7 @@ export const tr_TR: EnTranslations = {
         "rule5": "İsteyen herkes gelip tribünlerden seni destekleyebilir.",
         "kitHeading": "Donanımın",
         "kitNote": "Bu hareketler maç boyunca sınıf yeteneklerinin yerine geçer.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
         "rosterHeading": "Kadro listesi",
         "you": "Sen",
         "bot": "Bot",

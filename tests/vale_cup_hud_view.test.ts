@@ -35,6 +35,7 @@ function makeMatch(
   return {
     id: 5,
     phase: 'active',
+    rated: true,
     countdown: 0,
     timeLeft: 359,
     golden: false,

@@ -9494,6 +9494,14 @@
     border-radius: 2px;
     background: #b8e8a0;
   }
+  /* unrated-bout notice (practice / bot-backfill): a warning-tinted extra row */
+  .vcupb-rule-mark.unrated {
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    background: #e8b8a0;
+  }
+  .vcupb-rule.vcupb-unrated {
+    color: #e8c9a8;
+  }
   .vcupb-rule-text {
     min-width: 0;
   }

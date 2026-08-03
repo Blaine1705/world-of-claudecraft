@@ -1046,6 +1046,7 @@ export const id_ID: EnTranslations = {
       },
       "awayNote": "Jika kedua tim mengibarkan panji yang sama, tim tandang memakai palet warna terbalik.",
       "rolesHeading": "Peran olahraga",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
       "role": {
         "allrounder": {
           "name": "Serba Bisa",
@@ -1087,6 +1088,7 @@ export const id_ID: EnTranslations = {
       "guildBoardWl": "{wins} M, {losses} K",
       "practice": "Latihan vs. Bot",
       "practiceNote": "Langsung memulai pertandingan bot pribadi di lapangan latihanmu sendiri.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Sedang berlatih ({count}):",
       "clock": "{minutes}.{seconds}",
       "indicatorQueued": "Antrean Piala Lembah: {bracket}, posisi {position} dari {count}",
@@ -1129,6 +1131,7 @@ export const id_ID: EnTranslations = {
         "rule5": "Siapa pun bisa datang dan menyemangatimu dari tribun.",
         "kitHeading": "Perangkatmu",
         "kitNote": "Gerakan-gerakan ini menggantikan kemampuan kelasmu selama pertandingan.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
         "rosterHeading": "Susunan pemain",
         "you": "Kamu",
         "bot": "Bot",

@@ -1046,6 +1046,7 @@ export const pl_PL: EnTranslations = {
       },
       "awayNote": "Jeśli obie strony niosą ten sam sztandar, goście grają w odwróconych barwach.",
       "rolesHeading": "Rola sportowa",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
       "role": {
         "allrounder": {
           "name": "Wszechstronny",
@@ -1087,6 +1088,7 @@ export const pl_PL: EnTranslations = {
       "guildBoardWl": "{wins} Z, {losses} P",
       "practice": "Trening z botami",
       "practiceNote": "Od razu rozpoczyna prywatny mecz z botami na twoim własnym boisku treningowym.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Trenują teraz ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Kolejka Pucharu Doliny: {bracket}, miejsce {position} z {count}",
@@ -1129,6 +1131,7 @@ export const pl_PL: EnTranslations = {
         "rule5": "Każdy może podejść i kibicować ci z trybun.",
         "kitHeading": "Twój zestaw",
         "kitNote": "Te zagrania zastępują twoje umiejętności klasowe na czas meczu.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
         "rosterHeading": "Skład drużyn",
         "you": "Ty",
         "bot": "Bot",

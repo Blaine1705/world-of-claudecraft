@@ -866,6 +866,10 @@ export const hudChromeStrings = {
     },
     awayNote: 'If both sides fly the same banner, the away side plays the inverted palette.',
     rolesHeading: 'Sport role',
+    // Shown under the role picker in the 1v1/2v2 brackets, where the sim seats
+    // every fighter as All-Rounder regardless of the pick (issue 2767).
+    rolesSmallBracketNote:
+      'In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.',
     role: {
       allrounder: {
         name: 'All-Rounder',
@@ -908,6 +912,9 @@ export const hudChromeStrings = {
     guildBoardWl: '{wins} W, {losses} L',
     practice: 'Practice vs. Bots',
     practiceNote: 'Starts a private bot match on your own practice pitch right away.',
+    // Practice bouts are deliberately unrated; shown beside the practice button.
+    practiceUnratedNote:
+      'Practice bouts are unrated: standings and Book of Deeds progress do not count.',
     // Region indicator: players currently off in a private practice instance.
     practicingNow: 'Practicing now ({count}):',
     // mm:ss; {seconds} is pre-padded to two digits.
@@ -959,6 +966,9 @@ export const hudChromeStrings = {
       rule5: 'Anyone can walk up and cheer you on from the stands.',
       kitHeading: 'Your kit',
       kitNote: 'These moves replace your class abilities for the match.',
+      // Extra rules-panel row for practice / bot-backfilled bouts (issue 2767).
+      unratedNote:
+        'Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.',
       rosterHeading: 'The team sheet',
       // Row tags on the team sheet.
       you: 'You',

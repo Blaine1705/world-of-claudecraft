@@ -8540,6 +8540,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.nation.copperdig': '銅鉱山',
   'hudChrome.vcup.awayNote': '両チームが同じ旗を選んだ場合、アウェー側は反転配色でプレイする。',
   'hudChrome.vcup.rolesHeading': 'ポジション',
+  'hudChrome.vcup.rolesSmallBracketNote':
+    '1対1と2対2の階級では全員がオールラウンダーとして出場する。キーパーのプレイとその功績には3対3以上の階級が必要だ。',
   'hudChrome.vcup.role.allrounder.name': 'オールラウンダー',
   'hudChrome.vcup.role.allrounder.desc': '何でもこなす:キック、ロングキック、正々堂々の肩当たり。',
   'hudChrome.vcup.role.striker.name': 'ストライカー',
@@ -8571,6 +8573,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.boardWins': '{count} 勝',
   'hudChrome.vcup.practice': 'ボット練習試合',
   'hudChrome.vcup.practiceNote': 'ソウフィールドでボットとのフル試合をすぐに始める。',
+  'hudChrome.vcup.practiceUnratedNote':
+    '練習試合はレート対象外。戦績も功績の書の進行も数えられない。',
   'hudChrome.vcup.clock': '{minutes}:{seconds}',
   'hudChrome.vcup.indicatorQueued': 'ヴェイルカップ待機中:{bracket}、{count} 人中 {position} 番目',
   'hudChrome.vcup.indicatorLive': 'ヴェイルカップ',
@@ -8612,6 +8616,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.rule5': '誰でも近づいて、スタンドから声援を送れる。',
   'hudChrome.vcup.briefing.kitHeading': 'あなたの技',
   'hudChrome.vcup.briefing.kitNote': '試合中はこれらの技がクラスのアビリティと入れ替わる。',
+  'hudChrome.vcup.briefing.unratedNote':
+    'ボットがピッチにいるため、この試合はレート対象外。戦績も功績の書の進行も数えられない。',
   'hudChrome.vcup.briefing.rosterHeading': 'メンバー表',
   'hudChrome.vcup.briefing.you': 'あなた',
   'hudChrome.vcup.briefing.bot': 'ボット',

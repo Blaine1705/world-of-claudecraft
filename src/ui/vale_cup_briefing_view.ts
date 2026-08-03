@@ -33,6 +33,10 @@ export interface VcupBriefingPlayer {
 export interface VcupBriefingView {
   /** True only while cupInfo.match.phase === 'briefing'. */
   visible: boolean;
+  /** False for practice and bot-backfilled bouts: the rules panel then shows
+   *  the unrated note (no standings, no Book of Deeds progress). Structural
+   *  (fixed at match creation), so it lives in the sig. */
+  rated: boolean;
   nationA: VcNationId;
   nationB: VcNationId;
   awayPalette: boolean;
@@ -60,6 +64,7 @@ export interface VcupBriefingView {
 
 const INACTIVE: VcupBriefingView = {
   visible: false,
+  rated: true,
   nationA: 'vale',
   nationB: 'vale',
   awayPalette: false,
@@ -100,13 +105,15 @@ export function buildVcupBriefingView(info: CupInfo | null): VcupBriefingView {
   const kit = SPORT_KITS[myRole ?? 'allrounder'].map((abilityId) => ({ abilityId }));
   const format = Math.max(teamA.length, teamB.length);
 
-  // Structural, language-independent identity: nations, my side/role, and the
-  // per-fighter pid/name/role/me/bot. The moving parts (briefingLeft, every
-  // `ready` flag, iAmReady) are intentionally excluded so they ride elided
-  // writes instead of forcing a skeleton rebuild.
+  // Structural, language-independent identity: rated (fixed at match creation;
+  // drives the unrated-note row), nations, my side/role, and the per-fighter
+  // pid/name/role/me/bot. The moving parts (briefingLeft, every `ready` flag,
+  // iAmReady) are intentionally excluded so they ride elided writes instead of
+  // forcing a skeleton rebuild.
   const skel = (players: typeof m.teamA): unknown[] =>
     players.map((p) => [p.pid, p.name, p.role, p.me ? 1 : 0, p.bot ? 1 : 0]);
   const sig = JSON.stringify([
+    m.rated ? 1 : 0,
     m.nationA,
     m.nationB,
     m.awayPalette ? 1 : 0,
@@ -119,6 +126,7 @@ export function buildVcupBriefingView(info: CupInfo | null): VcupBriefingView {
 
   return {
     visible: true,
+    rated: m.rated,
     nationA: m.nationA,
     nationB: m.nationB,
     awayPalette: m.awayPalette,

@@ -245,6 +245,9 @@ export class ValeCupWindow {
       `<div class="vcup-note">${esc(t('hudChrome.vcup.awayNote'))}</div>` +
       `<div class="vcup-sub">${esc(t('hudChrome.vcup.rolesHeading'))}</div>` +
       this.rolesHtml(view.roles) +
+      (view.smallBracketRoles
+        ? `<div class="vcup-note">${esc(t('hudChrome.vcup.rolesSmallBracketNote'))}</div>`
+        : '') +
       this.guildEntryHtml(view.guildEntry, view.guildStanding) +
       this.actionHtml(view.action) +
       this.practiceHtml(view.practice) +
@@ -361,9 +364,12 @@ export class ValeCupWindow {
 
   private practiceHtml(show: boolean): string {
     if (!show) return '';
+    // Practice bouts are deliberately unrated (no standings, no Book of Deeds
+    // progress); say so where the button is offered (issue 2767).
     return (
       `<button type="button" class="btn vcup-practice" data-act="practice">${esc(t('hudChrome.vcup.practice'))}</button>` +
-      `<div class="vcup-note">${esc(t('hudChrome.vcup.practiceNote'))}</div>`
+      `<div class="vcup-note">${esc(t('hudChrome.vcup.practiceNote'))}</div>` +
+      `<div class="vcup-note">${esc(t('hudChrome.vcup.practiceUnratedNote'))}</div>`
     );
   }
 

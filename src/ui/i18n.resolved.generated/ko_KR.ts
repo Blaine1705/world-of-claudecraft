@@ -1046,6 +1046,7 @@ export const ko_KR: EnTranslations = {
       },
       "awayNote": "양 팀이 같은 깃발을 선택하면 원정 팀이 반전 배색으로 경기합니다.",
       "rolesHeading": "포지션",
+      "rolesSmallBracketNote": "1대1과 2대2 등급에서는 모든 선수가 올라운더로 출전합니다. 키퍼 플레이와 관련 업적에는 3대3 이상 등급이 필요합니다.",
       "role": {
         "allrounder": {
           "name": "올라운더",
@@ -1087,6 +1088,7 @@ export const ko_KR: EnTranslations = {
       "guildBoardWl": "{wins}승 {losses}패",
       "practice": "봇 연습 경기",
       "practiceNote": "소우필드에서 봇과의 정식 경기를 즉시 시작합니다.",
+      "practiceUnratedNote": "연습 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.",
       "practicingNow": "연습 중 ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "베일 컵 대기열: {bracket}, {count}명 중 {position}번째",
@@ -1129,6 +1131,7 @@ export const ko_KR: EnTranslations = {
         "rule5": "누구나 다가와 관중석에서 응원할 수 있습니다.",
         "kitHeading": "내 기술",
         "kitNote": "경기 동안 이 동작들이 직업 능력을 대신합니다.",
+        "unratedNote": "봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적과 업적의 서 진행도가 반영되지 않습니다.",
         "rosterHeading": "출전 명단",
         "you": "나",
         "bot": "봇",

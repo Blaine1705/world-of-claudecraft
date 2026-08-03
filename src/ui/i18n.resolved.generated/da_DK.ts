@@ -1046,6 +1046,7 @@ export const da_DK: EnTranslations = {
       },
       "awayNote": "Fører begge sider det samme banner, spiller udeholdet i den omvendte palet.",
       "rolesHeading": "Sportsrolle",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Keeper play and its deeds need the 3v3 bracket or larger.",
       "role": {
         "allrounder": {
           "name": "Allrounder",
@@ -1087,6 +1088,7 @@ export const da_DK: EnTranslations = {
       "guildBoardWl": "{wins} S, {losses} N",
       "practice": "Træning mod bots",
       "practiceNote": "Starter straks en privat botkamp på din egen træningsbane.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Træner lige nu ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Dalpokal-kø: {bracket}, plads {position} af {count}",
@@ -1129,6 +1131,7 @@ export const da_DK: EnTranslations = {
         "rule5": "Enhver kan gå hen og heppe på dig fra tribunerne.",
         "kitHeading": "Dit sæt",
         "kitNote": "Disse træk erstatter dine klasseevner under kampen.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings and Book of Deeds progress do not count.",
         "rosterHeading": "Holdkortet",
         "you": "Dig",
         "bot": "Bot",
