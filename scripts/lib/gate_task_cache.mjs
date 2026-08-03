@@ -105,7 +105,10 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
     outputs: ['dist-server/**'],
   },
   'build:bot': {
-    inputs: ['bot/**', 'src/**', 'scripts/build_bot.mjs', 'package.json'],
+    // tsconfig.json is an input because esbuild auto-discovers it when bundling
+    // bot/main.ts (no explicit tsconfig option in build_bot.mjs), so a root
+    // compiler-settings edit must bust the cached dist-bot artifact.
+    inputs: ['bot/**', 'src/**', 'scripts/build_bot.mjs', 'tsconfig.json', 'package.json'],
     outputs: ['dist-bot/**'],
   },
   'build:bundle': {

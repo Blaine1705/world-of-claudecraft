@@ -87,7 +87,7 @@
       "outputs": ["dist-server/**"]
     },
     "build:bot": {
-      "inputs": ["bot/**", "src/**", "scripts/build_bot.mjs", "package.json"],
+      "inputs": ["bot/**", "src/**", "scripts/build_bot.mjs", "tsconfig.json", "package.json"],
       "outputs": ["dist-bot/**"]
     },
     "build:bundle": {

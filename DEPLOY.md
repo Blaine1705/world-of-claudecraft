@@ -387,7 +387,9 @@ For off-box safety, sync the directory to S3 occasionally:
   `woc_discord_bot_rate_limited_total` (labeled `scope` over `user`, `global`,
   `shared`, `unknown`), `woc_discord_bot_global_pauses_total`,
   `woc_discord_bot_ban_pauses_total`, `woc_discord_bot_breaker_opens_total`,
-  `woc_discord_bot_forbidden_blocks_total`, `woc_discord_bot_breaker_blocks_total`.
+  `woc_discord_bot_forbidden_blocks_total`, `woc_discord_bot_breaker_blocks_total`,
+  `woc_discord_bot_queue_full_blocks_total` (requests refused because a bucket
+  queue was at its cap: a saturated backlog shedding load during an incident).
   Live gauges: `woc_discord_bot_queue_depth`, `woc_discord_bot_tracked_buckets`,
   `woc_discord_bot_tracked_routes`, `woc_discord_bot_active_queues`,
   `woc_discord_bot_forbidden_entries`, and `woc_discord_bot_breaker_state`
@@ -687,7 +689,7 @@ bot's share of game-server request volume):
 | `DISCORD_SWEEP_SLICE_SIZE` | `100` | How many linked members one slice asks about, and may write to. Lower it together with the slice interval to cut the peak Discord write rate a single tick can queue. |
 | `DISCORD_OUTBOX_POLL_MS` | `3000` | The active poll cadence while the outbox keeps returning work. Raise it to cut the bot's share of game-server requests, at the cost of relay and activity latency. |
 | `DISCORD_OUTBOX_IDLE_MS` | `15000` | Where that cadence decays to once the drains come back empty. The first queued item snaps the loop straight back to the active cadence, so raising this costs no latency on a quiet realm. |
-| `DISCORD_OUTBOX_TIMEOUT_MS` | `70000` | The abort deadline for ONE outbox poll. It must stay ABOVE the game server's 65 second read deadline on the outbox long poll: set lower, every poll aborts client-side before the server can answer, and items the server already drained are lost. Treat 70000 as a floor, never something to tune down during an incident. |
+| `DISCORD_OUTBOX_TIMEOUT_MS` | `70000` | The abort deadline for ONE outbox poll. It must stay ABOVE the game server's 65 second read deadline on the outbox long poll: set lower, every poll aborts client-side before the server can answer, and items the server already drained are lost. 70000 is an ENFORCED floor: the bot logs a warning and uses 70000 for any lower value, so the knob can only raise the deadline. |
 
 **Heartbeat** (liveness, read by the container healthcheck):
 
