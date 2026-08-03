@@ -166,9 +166,10 @@ describe('classifyDiff', () => {
   it('maps the quest-marker classifier to the repeat-marker target (phase 23)', () => {
     // A rename or when-list trim would silently stop capturing the marker
     // pairs (the phase 22 pin's lesson). Only the classifier leaf routes
-    // here: the four SURFACE files route to their own targets (the
-    // nameplate painter to the generic HUD, minimap/map to world-map), so a
-    // colour-only marker change captures no marker pair by design.
+    // here: the surface files route to their own specific targets (the
+    // nameplate painter to holder-tier, minimap/map to world-map, the
+    // gossip controller to attunement-legibility), so a colour-only marker
+    // change captures no marker pair by design.
     const plan = classifyDiff(['src/sim/quests/quest_marker_kind.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toContain('quest-marker-repeat');

@@ -120,9 +120,10 @@ export class NameplatePainter {
   // and cprof in the same snapshot), so the one remaining stale window is a
   // cprof-only change (a cadence lapse) on a throttled pass, bounded by one
   // nameplate interval: the tier-scaled 1/24s to 1/15s plate staleness floor
-  // that already throttles every field identically (recorded ruling: inside
-  // the sanctioned envelope, not a fairness gate). A throttled pass reuses
-  // the snapshot when one exists and resolves it fresh otherwise.
+  // that already throttles every field identically (ruling recorded in the
+  // phase 23 QA record, docs/design/professions-tuning-packet-review.md:
+  // inside the sanctioned envelope, not a fairness gate). A throttled pass
+  // reuses the snapshot when one exists and resolves it fresh otherwise.
   private questMarkerCtx: {
     questsDone: ReadonlySet<string>;
     cadenceBlocked: ReadonlySet<string> | undefined;

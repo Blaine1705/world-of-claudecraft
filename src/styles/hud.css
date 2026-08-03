@@ -2659,15 +2659,15 @@
   }
   /* The map tooltip's TAG texts are 13.5px prose over the panel gradient,
      where #0070dd reads 4.07:1 (under the 4.5:1 AA floor for text) and a
-     0.55 dim about 2:1, so the TEXT channel lifts to the same 211-degree hue
-     at a lighter stop, full opacity; the glyph channels (the gossip '!', the
-     nameplate marks, both canvas painters) keep the #0070dd anchor and carry
-     the dim. One grouped rule so the accessible blue is stated once
-     (.quest-cooldown is tooltip-tag-only; .quest-repeat doubles as the
-     gossip glyph, so only its tooltip use lifts). */
-  .quest-cooldown,
+     0.55 dim about 2:1, so the TEXT channel lifts to the theme-repaired
+     tag token at full opacity; the glyph channels (the gossip '!', the
+     nameplate marks, both canvas painters) keep the #0070dd anchor and
+     carry the dim. One grouped rule so the accessible blue is stated once,
+     both arms #tooltip-scoped so a future gossip or tracker reuse of the
+     tag classes inherits the glyph channel, never the text lift. */
+  #tooltip .quest-cooldown,
   #tooltip .quest-repeat {
-    color: #3d9bff;
+    color: var(--color-quest-tag-text, #3d9bff);
   }
 
   /* ---------- deed tracker ---------- */

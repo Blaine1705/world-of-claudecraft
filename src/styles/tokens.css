@@ -28,6 +28,11 @@
        shipped gradient from it (overwritten wholesale by the theme system). */
     --panel-base: #15151f;
     --panel-bg: linear-gradient(170deg, #15151ff2 0%, #0b0b12f2 60%, #08080df2 100%);
+    /* quest-marker tooltip TAG text: the rare-adjacent blue lifted to the
+       4.5:1 text tier over the default panel stops (the glyph channels keep
+       the #0070dd anchor). The theme system re-emits this per preset via
+       ensureReadable, so the light Parchment panel darkens it to AA. */
+    --color-quest-tag-text: #3d9bff;
     /* Typography, Cinzel (heraldic display/headings), Alegreya Sans (UI + body),
        Alegreya (serif flavour prose). Legacy token names alias the canonical set
        so every existing usage resolves to the new system. */

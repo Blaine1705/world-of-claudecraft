@@ -12,6 +12,13 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { QUALITY_COLOR } from '../src/ui/icons';
+import {
+  MIN_TEXT_CONTRAST,
+  PRESET_ORDER,
+  resolveTheme,
+  THEME_PRESETS,
+  themeCssVars,
+} from '../src/ui/theme';
 
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
@@ -42,10 +49,12 @@ const baseCss = stripComments(
 const RARE_BLUE = QUALITY_COLOR.rare;
 const COOLDOWN_ALPHA = '0.55';
 // The TEXT channel's accessible blue (the same 211-degree hue lifted for
-// prose) and the panel-bg gradient stops the tooltip composites over; the
-// stops are pinned against tokens.css below so these literals cannot drift.
+// prose): the tokens.css DEFAULT behind --color-quest-tag-text, which the
+// theme system re-emits per preset (the theme arm below holds every preset
+// to the same floor). The panel-bg gradient stops are pinned against the
+// real declaration below so these literals cannot drift.
 const TAG_TEXT_BLUE = '#3d9bff';
-const PANEL_STOPS = ['#15151f', '#0b0b12'] as const;
+const PANEL_STOPS = ['#15151f', '#0b0b12', '#08080d'] as const;
 
 // WCAG 2.2 relative-luminance contrast, so the accessible-blue pin is a
 // working floor rather than a frozen hex: the hue may move as long as the
@@ -89,29 +98,39 @@ describe('quest marker style agreement across surfaces', () => {
     );
   });
 
-  it('keeps the gossip glyph on the anchor blue and lifts BOTH tooltip tags to the text blue', () => {
+  it('keeps the gossip glyph on the anchor blue and lifts BOTH tooltip tags to the tag token', () => {
     // Glyph channel: the gossip row's '!' span stays on the anchor.
     expect(hudCss).toMatch(new RegExp(`\\.quest-repeat\\s*\\{[^}]*color:\\s*${RARE_BLUE}`, 's'));
-    // Text channel: one grouped rule states the accessible blue exactly once
-    // for the cooldown tag and the tooltip-scoped repeat tag. The #tooltip
-    // scope is a deliberate cascade override of the glyph rule above; both
-    // sides are pinned here so the suite states the full cascade story.
+    // Text channel: one grouped rule routes BOTH tooltip tag spans through
+    // the theme-repaired token (with the tokens.css default as fallback).
+    // Both arms are #tooltip-scoped deliberately: a future reuse of a tag
+    // class outside the tooltip must make its own channel decision instead
+    // of silently inheriting the text lift. The #tooltip .quest-repeat arm
+    // is a cascade override of the glyph rule above; both sides are pinned
+    // so the suite states the full cascade story.
     expect(hudCss).toMatch(
       new RegExp(
-        `\\.quest-cooldown,\\s*#tooltip \\.quest-repeat\\s*\\{[^}]*color:\\s*${TAG_TEXT_BLUE}`,
+        '#tooltip \\.quest-cooldown,\\s*#tooltip \\.quest-repeat\\s*\\{[^}]*' +
+          'color:\\s*var\\(--color-quest-tag-text, #3d9bff\\)',
         's',
       ),
     );
+    // The tokens.css default IS the pinned accessible blue.
+    expect(tokensCss).toMatch(new RegExp(`--color-quest-tag-text:\\s*${TAG_TEXT_BLUE};`));
     // The old 0.55 dim on the cooldown TAG must not come back: dimmed prose
     // read about 2:1 over the panel. The dim belongs to the glyph channel.
     expect(hudCss).not.toMatch(/\.quest-cooldown[^}]*opacity/s);
   });
 
   it('keeps the tag text at WCAG AA and the glyphs above the component floor', () => {
-    // The panel stops are literals here; pin them against the real
-    // --panel-bg declaration so they cannot silently drift apart (the
-    // gradient states them with the f2 alpha suffix).
-    for (const stop of PANEL_STOPS) expect(tokensCss).toContain(`${stop}f2`);
+    // The stops are pinned against the real --panel-bg declaration (all
+    // three, in order, with the f2 alpha suffix) so the literals here
+    // cannot silently drift from the sheet.
+    expect(tokensCss).toMatch(
+      new RegExp(
+        `--panel-bg:[^;]*${PANEL_STOPS[0]}f2[^;]*${PANEL_STOPS[1]}f2[^;]*${PANEL_STOPS[2]}f2`,
+      ),
+    );
     for (const stop of PANEL_STOPS) {
       // 13.5px tooltip prose needs 4.5:1 (WCAG 2.2 AA, normal text).
       expect(contrast(TAG_TEXT_BLUE, stop)).toBeGreaterThanOrEqual(4.5);
@@ -120,19 +139,52 @@ describe('quest marker style agreement across surfaces', () => {
     }
   });
 
+  it('holds EVERY theme preset to the text tier for the tag token', () => {
+    // --color-quest-tag-text is re-emitted per preset through ensureReadable
+    // (the --color-gold precedent): the raw default reads about 2.2:1 on the
+    // light Parchment panel, so the repair is what makes the AA claim true
+    // beyond the default palette. Held against BOTH the preset panel and the
+    // emitted gradient edge.
+    for (const preset of PRESET_ORDER) {
+      const vars = themeCssVars(resolveTheme({ preset, custom: {} }));
+      const tag = vars['--color-quest-tag-text'];
+      expect(tag, preset).toMatch(/^#[0-9a-f]{6}$/i);
+      expect(contrast(tag, THEME_PRESETS[preset].panel), preset).toBeGreaterThanOrEqual(
+        MIN_TEXT_CONTRAST,
+      );
+      expect(contrast(tag, vars['--panel-edge']), preset).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+    }
+  });
+
   it('carries the repeat-vs-gold distinction through forced-colors on the nameplate', () => {
     // The forced palette strips color, so the DOM nameplate (the one surface
     // with neither canvas pixels nor a text tag) needs a redundant non-color
     // cue: underline for repeat, dotted for cooldown (the #tf-name.hostile
-    // precedent). Pinned inside the forced-colors block specifically.
-    const forcedStart = baseCss.indexOf('@media (forced-colors: active)');
-    const forcedEnd = baseCss.indexOf('@media print');
-    expect(forcedStart).toBeGreaterThan(-1);
-    const forcedBlock = baseCss.slice(forcedStart, forcedEnd === -1 ? undefined : forcedEnd);
+    // precedent). The block is extracted by BALANCED BRACES, not by slicing
+    // to the next media query: a rule parked between the block's closing
+    // brace and the print reset would satisfy a slice-based pin while
+    // applying in normal mode.
+    const marker = '@media (forced-colors: active)';
+    const start = baseCss.indexOf(marker);
+    expect(start).toBeGreaterThan(-1);
+    const open = baseCss.indexOf('{', start);
+    let depth = 1;
+    let end = open + 1;
+    while (end < baseCss.length && depth > 0) {
+      if (baseCss[end] === '{') depth++;
+      else if (baseCss[end] === '}') depth--;
+      end++;
+    }
+    const forcedBlock = baseCss.slice(start, end);
     expect(forcedBlock).toMatch(/\.np-marker\.repeat\s*\{[^}]*text-decoration:\s*underline;/s);
     expect(forcedBlock).toMatch(
       /\.np-marker\.cooldown\s*\{[^}]*text-decoration:\s*underline dotted;/s,
     );
+    // The cues exist ONLY there: normal mode carries no np-marker
+    // text-decoration in either sheet.
+    const outsideBlock = baseCss.slice(0, start) + baseCss.slice(end);
+    expect(outsideBlock).not.toMatch(/\.np-marker[^}]*text-decoration/s);
+    expect(hudCss).not.toMatch(/\.np-marker[^}]*text-decoration/s);
   });
 
   it('dims both canvas painters at the CSS alpha', () => {

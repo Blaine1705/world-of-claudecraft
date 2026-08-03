@@ -22,7 +22,11 @@ const painter = readFileSync(new URL('../src/ui/minimap_painter.ts', import.meta
 // Drop comments so prose can't create a false positive (mirrors architecture.test).
 const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
-const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+// Comment-stripped like `code`: a commented-out token declaration must not
+// satisfy the design-token pins below.
+const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 // Slice from a REQUIRED marker. A bare `code.slice(code.indexOf(m))` degrades to
 // `code.slice(-1)` (a single '}') when the marker is gone, which would turn every
@@ -571,6 +575,20 @@ describe('minimap_painter: NPC glyphs draw from the sprite cache, never per-mark
     const sprite = trace.blits[0].sprite;
     expect(sprite.ink[0].glyph).toBe('!');
     expect(sprite.ink[0].fillStyle).toBe('paint:--color-minimap-npc-quest-repeat');
+  });
+
+  it('restores the CALLER alpha around the cooldown blit, not a literal 1', () => {
+    // The restore-prior contract is only observable under a non-1 caller
+    // alpha: a reverted literal-1 restore stays green on every 1-alpha
+    // fixture and reddens here.
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const ctx = fakeMinimapContext(trace);
+    ctx.globalAlpha = 0.9;
+    paint(newPainter(), ctx, glyphWorld([{ x: 4, z: 98.5, quest: true }], 'cooldown'));
+    expect(trace.blits).toHaveLength(1);
+    expect(trace.blits[0].alpha).toBe(0.55);
+    expect(ctx.globalAlpha).toBe(0.9);
   });
 
   it('shares ONE blue raster between a repeat and a cooldown marker in the same frame', () => {

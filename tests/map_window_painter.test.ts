@@ -38,7 +38,11 @@ const hudSource = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'ut
 // Comments stripped for the same reason as `code` above: a wiring pin that a
 // commented-out call satisfies is not a pin (see the repo's raw-source rule).
 const hud = hudSource.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
-const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+// Comment-stripped like `code`: a commented-out token declaration must not
+// satisfy the design-token pins below.
+const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8')
+  .replace(/\/\*[\s\S]*?\*\//g, '')
+  .replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 const MAP_COLOR_TOKENS = [
   '--color-map-ocean',
@@ -905,6 +909,42 @@ describe('map_window_painter: labels blit from the sprite cache', () => {
       { op: 'fill', color: 'paint:--color-map-npc-quest', text: '!' },
     ]);
     expect(gold[0].alpha).toBe(1);
+  });
+
+  it('restores the CALLER alpha around the cooldown blit, not a literal 1', () => {
+    // The restore-prior contract is only observable under a non-1 caller
+    // alpha: a reverted literal-1 restore stays green on every 1-alpha
+    // fixture and reddens here. The world staging mirrors the variant arms
+    // above (a cadenced work order inside its window).
+    const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
+    if (!workOrder) throw new Error('expected a cadenced work order');
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = labelWorld() as unknown as {
+      entities: Map<number, { templateId: string; questIds: string[] }>;
+      questState: (q: string) => string;
+      questsDone: Set<string>;
+      craftingIdentity: { cadenceBlockedQuests: string[] };
+    };
+    const fixtureNpc = world.entities.get(2);
+    if (!fixtureNpc) throw new Error('expected the fixture npc');
+    fixtureNpc.templateId = workOrder.giverNpcId;
+    fixtureNpc.questIds = [workOrder.id];
+    world.questsDone = new Set([workOrder.id]);
+    world.questState = () => 'unavailable';
+    world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+    const ctx = fakeMapContext(trace);
+    ctx.globalAlpha = 0.9;
+    new MapWindowPainter(classColor).paintOverworld(
+      ctx,
+      world as unknown as IWorld,
+      labelPaintOptions(),
+    );
+    const glyphBlits = trace.blits.filter((b) => spriteText(b.sprite) === '!');
+    expect(glyphBlits).toHaveLength(1);
+    expect(glyphBlits[0].alpha).toBe(0.55);
+    expect(ctx.globalAlpha).toBe(0.9);
   });
 
   it('opens each redraw on the cache, so the budget is enforced in the shipped path', () => {
