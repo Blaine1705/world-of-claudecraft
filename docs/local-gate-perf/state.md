@@ -149,5 +149,4 @@ Fill as phases ship:
    filled; CI-L1 is a Linux proxy from GHA specs, not a timed unsharded gate).
 6. Windows host (W1) still untested for full gate / gate:fast wall (smoke only).
 7. ~~Dockerfile still on package-lock / npm ci after pnpm migration.~~ **Closed Phase 12.**
-8. Optional: refresh non-English `docs/i18n/CONTRIBUTING.*` install wording
-   (English surfaces are pnpm-correct).
+8. ~~Optional: refresh non-English `docs/i18n/CONTRIBUTING.*` install wording.~~ **Closed:** all 20 locales updated to pnpm.

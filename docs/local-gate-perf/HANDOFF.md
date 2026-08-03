@@ -62,4 +62,4 @@ Quiet-host full gate historically ~5-6 min on M1 (Phase 1 336 s / Phase 2 compos
 2. Windows host (W1) full gate / gate:fast wall untested (smoke only).
 3. Whether local multi-shard full gate is worth supporting on high-tier only.
 4. Owner sign-off if `gate:fast` is ever allowed as pre-push (default: no).
-5. Optional: refresh non-English `docs/i18n/CONTRIBUTING.*` install wording.
+5. ~~Optional: refresh non-English `docs/i18n/CONTRIBUTING.*` install wording.~~ **Closed:** all 20 locales updated to pnpm.
