@@ -263,9 +263,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'hud/quest/quest_dialog_controller.ts',
-    memos: ['lastIntroHintVisible'],
+    memos: ['lastGossipRowSig', 'lastIntroHintVisible'],
     answer: 'this.questDialog.relocalize',
-    why: 'the profession intro hint visibility latch',
+    why: 'the profession intro hint visibility latch, and the offerable-row signature (quest ids and marker kinds, text-independent by design; the phase 23 cadence-lapse watch)',
   },
   {
     file: 'hud/rift/rift_floor_tracker_controller.ts',
