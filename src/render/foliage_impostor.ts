@@ -8,9 +8,11 @@
 // picks the two atlas views bracketing its camera bearing (offset by its own
 // placement yaw, so a forest never shows one repeated silhouette) and blends
 // them, so orbiting the camera never snaps. Lighting is the live Lambert
-// pipeline over the quad's up normal, the exact response the ground plane
-// has, so day-night grades, biome light and fog all land on the sprite the
-// way they land on the terrain under it.
+// pipeline over a shading normal that leans off vertical toward the camera
+// and fans across the card (IMPOSTOR_NORMAL_GLSL in foliage_impostor_core.ts),
+// so a sprite keeps the terrain's response to day-night grades, biome light
+// and fog while still lighting one side and shading the other the way the
+// real tree it replaces does.
 //
 // The handoff against the real meshes is per instance and jittered: the real
 // side collapses each tree at swap - fade * jitter (foliage_collapse.ts) and
@@ -34,6 +36,7 @@ import {
   CANOPY_EMISSIVE_FLOOR,
   IMPOSTOR_ATLAS_MAX,
   IMPOSTOR_JITTER_GLSL,
+  IMPOSTOR_NORMAL_GLSL,
   type ImpostorArchetypeSpec,
   type ImpostorCellRect,
   packImpostorAtlas,
@@ -324,9 +327,10 @@ function bakeAtlas(
 // Draw material
 // ---------------------------------------------------------------------------
 
-// One unit quad shared by every impostor mesh: x centered, base at y 0, up
-// normals so the live Lambert lighting gives the sprite the ground plane's
-// response (see the module header).
+// One unit quad shared by every impostor mesh: x centered, base at y 0. The
+// stored normals are placeholders the vertex stage overwrites per instance
+// (IMPOSTOR_NORMAL_GLSL), since the shading normal depends on where the
+// camera stands, not on the quad.
 let quadGeo: THREE.BufferGeometry | null = null;
 function impostorQuadGeo(): THREE.BufferGeometry {
   if (quadGeo) return quadGeo;
@@ -436,22 +440,50 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         varying float vImpBlend;`,
       )
       .replace(
-        '#include <begin_vertex>',
+        // The billboard basis is built HERE, a chunk earlier than the offsets
+        // that consume it: three resolves the shading normal before
+        // <begin_vertex> runs, so a normal written down there would never
+        // reach the fragment stage. Culled instances now pay the basis before
+        // <begin_vertex> drops them, a few ALU on a 2-triangle quad against
+        // the fragment work the cull is actually there to save.
+        '#include <beginnormal_vertex>',
         `vec3 impOrigin = vec3(instanceMatrix[3][0], instanceMatrix[3][1], instanceMatrix[3][2]);
         vec2 collapseOrigin = impOrigin.xz;
         float impDist = distance(collapseOrigin, cameraPosition.xz);
-        float impJitter = ${IMPOSTOR_JITTER_GLSL};
+        float impSx = length(instanceMatrix[0].xyz);
+        float impSy = length(instanceMatrix[1].xyz);
+        float impSz = max(length(instanceMatrix[2].xyz), 1e-6);
+        float impYaw = atan(-instanceMatrix[0].z, instanceMatrix[0].x);
+        // The yaw's cosine and sine come straight off the normalized first
+        // column, which a Y rotation stores as (cos, 0, -sin) times the x
+        // scale. Exact, one divide cheaper than a cos and a sin, and immune
+        // to the half turn SwiftShader returns from atan(-0.0, positive):
+        // that lands an axis-aligned instance's normal facing backwards.
+        float impC = instanceMatrix[0].x / impSx;
+        float impS = -instanceMatrix[0].z / impSx;
+        vec2 impToCam = cameraPosition.xz - collapseOrigin;
+        vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
+        vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
+        ${IMPOSTOR_NORMAL_GLSL}
+        // The offsets below un-rotate and DIVIDE by the instance scale so the
+        // stock instancing chunk lands them where the billboard math put
+        // them. A normal takes the mirror of that: the stock chunk divides
+        // each component by its column length squared before applying
+        // mat3(instanceMatrix), which nets out to dividing a normal by the
+        // scale where a position is multiplied by it. So un-rotate the same
+        // way and MULTIPLY, and impNormal survives into world space intact.
+        vec3 objectNormal = vec3(impC * impNormal.x - impS * impNormal.z, impNormal.y,
+          impS * impNormal.x + impC * impNormal.z) * vec3(impSx, impSy, impSz);`,
+      )
+      .replace(
+        '#include <begin_vertex>',
+        `float impJitter = ${IMPOSTOR_JITTER_GLSL};
         float impBegin = uImpSwap - uImpFade * impJitter;
         float impKeep = step(impBegin, impDist) * (1.0 - step(uImpSpriteFar, impDist));
         if (impKeep == 0.0) {
           gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
           return;
         }
-        float impSx = length(instanceMatrix[0].xyz);
-        float impSy = length(instanceMatrix[1].xyz);
-        float impSz = max(length(instanceMatrix[2].xyz), 1e-6);
-        float impYaw = atan(-instanceMatrix[0].z, instanceMatrix[0].x);
-        vec2 impToCam = cameraPosition.xz - collapseOrigin;
         // bearing of the camera as seen from the instance, same wrap as the bake
         float impViewAng = atan(impToCam.x, impToCam.y);
         float impRel = fract((impYaw - impViewAng) / 6.2831853 + 1.0);
@@ -464,8 +496,6 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         float impCellH = aImpostorCell.w;
         vImpUvA = vec2(aImpostorCell.x + (impV0 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
         vImpUvB = vec2(aImpostorCell.x + (impV1 + uv.x) * impCellW, aImpostorCell.y + uv.y * impCellH);
-        vec3 impFwd = vec3(impToCam.x, 0.0, impToCam.y) / max(impDist, 1e-4);
-        vec3 impRight = normalize(cross(vec3(0.0, 1.0, 0.0), impFwd));
         vec3 impOff = impRight * (position.x * impSx) + vec3(0.0, 1.0, 0.0) * (position.y * impSy);
         // Past the detail envelope the ground under a sprite is the coarse
         // far-tile mesh, which can sit below the true heightfield, so far
@@ -481,8 +511,6 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         // undo the instance rotation and scale so the stock instancing chunk
         // (project_vertex applies instanceMatrix) lands the quad exactly on
         // the billboarded world offsets computed above
-        float impC = cos(impYaw);
-        float impS = sin(impYaw);
         vec3 transformed = vec3(impC * impOff.x - impS * impOff.z, impOff.y, impS * impOff.x + impC * impOff.z)
           / vec3(impSx, impSy, impSz);`,
       );
@@ -494,6 +522,17 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
         varying vec2 vImpUvB;
         varying float vImpBlend;
         vec4 impTexel;`,
+      )
+      .replace(
+        '#include <normal_fragment_begin>',
+        `#include <normal_fragment_begin>
+        #ifdef DOUBLE_SIDED
+          // The vertex stage authors this normal in camera terms, so it is
+          // already correct for whichever face the rasterizer keeps; the
+          // double-sided chunk's flip would aim it away from the camera and
+          // invert the lit and shaded sides. faceDirection squared undoes it.
+          normal *= faceDirection;
+        #endif`,
       )
       .replace(
         '#include <map_fragment>',

@@ -183,6 +183,84 @@ export const IMPOSTOR_JITTER_GLSL =
 /** GL_MAX_TEXTURE_SIZE floor is 4096 everywhere WebGL2 runs; stay inside it. */
 export const IMPOSTOR_ATLAS_MAX = 4096;
 
+// ---------------------------------------------------------------------------
+// Sprite shading normal
+// ---------------------------------------------------------------------------
+
+/**
+ * How far the sprite's shading normal leans off vertical, 0 (the old
+ * straight-up quad normal) to 1 (a pure camera-facing cylinder).
+ *
+ * A quad carrying up normals takes the GROUND PLANE's light response, which
+ * reads as a canopy only while the sun is high. This world's sun never passes
+ * 41 degrees (CELESTIAL_ARC_HEIGHT in day_night_core.ts) and sits under 3
+ * degrees around dawn and dusk, where dot(up, sunDir) is about 0.05: every
+ * sprite loses its directional term in the same frame and flattens into one
+ * ambient-lit cutout while the real trees beside it still show a warm lit
+ * side and a dark back. Leaning the normal toward the camera restores the
+ * directional term at a low sun; keeping most of the vertical component is
+ * what preserves the midday response the sprite-to-tree parity was tuned
+ * against. At this value the bearing-averaged noon term holds about 83
+ * percent of the up-normal response while the dawn lit edge gains roughly a
+ * factor of 11, which is the trade this constant exists to make.
+ */
+export const IMPOSTOR_NORMAL_TILT = 0.4;
+
+/**
+ * Half-width of the horizontal normal fan across the card, in radians. The
+ * leaning normal alone would light a whole sprite uniformly from its own
+ * bearing; fanning it from one edge to the other makes the card shade like a
+ * standing cylinder instead, so a single sprite carries a lit side and a
+ * shaded side the way its real twin's canopy does. A canopy is a soft mass,
+ * not a mirror-finish tube, so the fan stops short of the full 90 degrees a
+ * true cylinder silhouette would take.
+ */
+export const IMPOSTOR_NORMAL_FAN = 1.05;
+
+/**
+ * Shared GLSL for the sprite shading normal. Declares `impNormal` in WORLD
+ * space from the billboard basis the vertex stage has already built
+ * (`impFwd`, the horizontal direction from the instance toward the camera,
+ * and `impRight`, across the card) plus the vertex's own place across the
+ * card (`position.x`, -0.5 at the left edge to 0.5 at the right). The caller
+ * un-rotates it into the instance frame; see foliage_impostor.ts.
+ */
+export const IMPOSTOR_NORMAL_GLSL = `
+        float impFan = position.x * ${(2 * IMPOSTOR_NORMAL_FAN).toFixed(5)};
+        vec3 impNormal = normalize(mix(vec3(0.0, 1.0, 0.0),
+          impFwd * cos(impFan) + impRight * sin(impFan), ${IMPOSTOR_NORMAL_TILT.toFixed(3)}));`;
+
+/**
+ * The world-space shading normal IMPOSTOR_NORMAL_GLSL builds, in plain TS so
+ * the light response can be pinned in Node. `faceX` is the vertex's
+ * position.x (-0.5 to 0.5) and (`fwdX`, `fwdZ`) the horizontal direction from
+ * the instance toward the camera. Mirrors the GLSL step for step: the two
+ * only stay honest because the core test evaluates this one against the
+ * numbers the shader constants above interpolate.
+ */
+export function impostorSpriteNormal(
+  faceX: number,
+  fwdX: number,
+  fwdZ: number,
+  tilt: number = IMPOSTOR_NORMAL_TILT,
+  fan: number = IMPOSTOR_NORMAL_FAN,
+): [number, number, number] {
+  const len = Math.hypot(fwdX, fwdZ) || 1;
+  const fx = fwdX / len;
+  const fz = fwdZ / len;
+  // impRight = cross(up, impFwd)
+  const rx = fz;
+  const rz = -fx;
+  const ang = faceX * 2 * fan;
+  const c = Math.cos(ang);
+  const s = Math.sin(ang);
+  const nx = (fx * c + rx * s) * tilt;
+  const ny = 1 - tilt;
+  const nz = (fz * c + rz * s) * tilt;
+  const n = Math.hypot(nx, ny, nz) || 1;
+  return [nx / n, ny / n, nz / n];
+}
+
 /**
  * The texture-shaped canopy ambient floor, shared by the real canopy
  * materials (foliage.ts, where its rationale lives: a dense canopy
