@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MIN_X, ZONES, zoneAt } from '../src/sim/data';
-import { zoneBiomeAt } from '../src/sim/world';
-import { type MapRegion, mapCanvasHeight, paintTerrainRows } from '../src/ui/map_terrain';
+import { inHollowOpenSea, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../src/sim/world';
+import {
+  type MapRegion,
+  mapCanvasHeight,
+  mapZoneRegion,
+  paintTerrainRows,
+} from '../src/ui/map_terrain';
 
 const SEED = 20061;
 
@@ -70,5 +75,91 @@ describe('map terrain painter', () => {
     }
     // and just past the far edge, where both clamp to the last zone
     expect(zoneBiomeAt(0, maxZ + 50)).toBe(zoneAt(0, maxZ + 50).biome);
+  });
+});
+
+// The open-sea limit: the swim-fatigue boundary is a rect test, so before this
+// the safe/lethal colour step painted a hard straight edge through open water
+// and the map read as a lighter box pasted over the sea. The water now deepens
+// toward the limit and the limit itself is drawn. Sampled in WORLD coordinates
+// off a plate at the shipped resolution, because the claims are about yards
+// (how far ahead the deepening reaches, how wide the line is), not pixels.
+describe('map terrain painter: the open-sea limit', () => {
+  const zone = ZONES.find((z) => z.id === 'wraithwood');
+  if (!zone) throw new Error('wraithwood zone missing');
+  const region = mapZoneRegion(zone);
+  const W = 480; // MAP_BG_RES, the resolution the plates actually bake at
+  const H = mapCanvasHeight(W, region);
+  const data = renderFull(W, region, SEED);
+
+  const luma = (x: number, z: number): number => {
+    const ix = Math.min(
+      W - 1,
+      Math.max(0, Math.round(((region.maxX - x) / (region.maxX - region.minX)) * W)),
+    );
+    const iy = Math.min(
+      H - 1,
+      Math.max(0, Math.round(((region.maxZ - z) / (region.maxZ - region.minZ)) * H)),
+    );
+    const k = (iy * W + ix) * 4;
+    return 0.2126 * data[k] + 0.7152 * data[k + 1] + 0.0722 * data[k + 2];
+  };
+  const isWater = (x: number, z: number) => terrainHeight(x, z, SEED) < WATER_LEVEL;
+
+  /** World x where safe water turns lethal at this z, with open water either
+   *  side of it (so the reading is about the limit, never a shoreline). The
+   *  Wraithwood is a COLUMN zone, so its own x band is searched, not the strip. */
+  function crossingAt(z: number): number | null {
+    for (let x = region.minX + 40; x < region.maxX - 40; x += 0.5) {
+      if (inHollowOpenSea(x, z) || !isWater(x, z)) continue;
+      if (!inHollowOpenSea(x + 0.5, z)) continue; // lethal on the +x side
+      // Open water either side, safe for 30 yd inward and lethal for 12 yd
+      // outward, so the reading is an unambiguous crossing rather than a
+      // shoreline or a narrow channel between two lethal bands.
+      let clear = true;
+      for (let d = -30; d <= 12; d += 1.5) if (!isWater(x + d, z)) clear = false;
+      for (let d = -30; d < 0; d += 1.5) if (inHollowOpenSea(x + d, z)) clear = false;
+      for (let d = 1; d <= 12; d += 1.5) if (!inHollowOpenSea(x + d, z)) clear = false;
+      if (clear) return x; // else keep looking: that one was not a clean limit
+    }
+    return null;
+  }
+
+  const crossings = [1300, 1340, 1400, 1500, 1600, 1700, 1800]
+    .map((z) => ({ z, x: crossingAt(z) }))
+    .filter((c): c is { z: number; x: number } => c.x !== null);
+
+  it('finds real limit crossings in open water to test against', () => {
+    expect(crossings.length).toBeGreaterThan(2);
+  });
+
+  it('deepens the safe water as the limit closes', () => {
+    // Flat without the approach easing: the old painter held one safe tone right
+    // up to the step.
+    const deepened = crossings.filter(({ x, z }) => luma(x - 2, z) < luma(x - 28, z));
+    expect(deepened.length).toBe(crossings.length);
+  });
+
+  it('still draws the limit itself, brighter than the water either side', () => {
+    // The pin that keeps the change honest. The easing above deliberately removes
+    // the colour contrast that used to mark this boundary, so if the drawn line
+    // stops rendering, an actionable edge silently disappears with nothing else
+    // failing.
+    const marked = crossings.filter(({ x, z }) => {
+      // Brightest sample in the last two yards of safe water: the line is under
+      // a yard wide, so which PIXEL carries it depends on grid alignment.
+      let line = 0;
+      for (let d = -2; d <= 0; d += 0.25) line = Math.max(line, luma(x + d, z));
+      return line > luma(x - 6, z) && line > luma(x + 6, z);
+    });
+    expect(marked.length).toBe(crossings.length);
+  });
+
+  it('leaves the lethal side as the deep body it was', () => {
+    // Only the safe approach is shaped, so the two sides never flatten into one
+    // tone: past the limit stays darker than safe water well inside it.
+    for (const { x, z } of crossings) {
+      expect(luma(x + 8, z), `z=${z}`).toBeLessThan(luma(x - 28, z));
+    }
   });
 });

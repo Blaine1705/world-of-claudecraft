@@ -33,6 +33,7 @@ import {
   WATER_LEVEL,
   zoneBiomeAt,
 } from '../sim/world';
+import { onOpenSeaEdge, openSeaNearness } from './map_open_sea_edge_core';
 
 export interface MapRegion {
   minX: number;
@@ -74,6 +75,19 @@ export function hashPaintedRows(region: MapRegion, seed: number, W: number, rows
   }
   return (h >>> 0).toString(16).padStart(8, '0');
 }
+
+// The open-sea limit (the swim-fatigue boundary). APPROACH is how far the safe
+// water eases toward the deep tone as it nears the line. That easing is what
+// removes the pasted-box look, and it is ALSO what makes the drawn line
+// load-bearing: by the boundary both sides are nearly the same dark, so the
+// limit has to carry the read on its own. It is therefore drawn PALE (a depth
+// rule, the language a chart already uses) rather than inked dark like the
+// coastline, which would vanish into the deep water it sits in.
+const OPEN_SEA_APPROACH = 0.72;
+const OPEN_SEA_EDGE_MIX = 0.5;
+const OPEN_SEA_EDGE_R = 150;
+const OPEN_SEA_EDGE_G = 196;
+const OPEN_SEA_EDGE_B = 214;
 
 // How thick the tree cover stipples per biome (chance per ~1.3yd hash cell).
 const FOREST_STIPPLE: Partial<Record<ReturnType<typeof zoneBiomeAt>, number>> = {
@@ -276,14 +290,32 @@ export function paintTerrainRows(
         // depth-graded with a smoothstep ease so neither is a flat slab.
         const t = Math.min(1, (WATER_LEVEL - h) / 8);
         const depth = t * t * (3 - 2 * t);
+        const deepR = 22 + (14 - 22) * depth;
+        const deepG = 48 + (36 - 48) * depth;
+        const deepB = 88 + (76 - 88) * depth;
+        let onEdge = false;
         if (inHollowOpenSea(x, z)) {
-          r = 22 + (14 - 22) * depth;
-          g = 48 + (36 - 48) * depth;
-          b = 88 + (76 - 88) * depth;
+          r = deepR;
+          g = deepG;
+          b = deepB;
         } else {
           r = 100 + (46 - 100) * depth;
           g = 164 + (98 - 164) * depth;
           b = 200 + (150 - 200) * depth;
+          // The predicate's boundary is a straight rect edge, so a bare colour
+          // step there reads as a lighter box pasted over the sea. Ease the safe
+          // water into the deep tone as it approaches instead (the water is
+          // getting deeper, which is what a map should say), and ink the limit
+          // itself below so nothing an actionable read depends on is softened:
+          // the boundary goes from implied by a colour change to drawn.
+          const near = openSeaNearness(x, z, inHollowOpenSea);
+          if (near > 0) {
+            const ease = near * near * (3 - 2 * near) * OPEN_SEA_APPROACH;
+            r += (deepR - r) * ease;
+            g += (deepG - g) * ease;
+            b += (deepB - b) * ease;
+            onEdge = onOpenSeaEdge(x, z, Math.min(spanX / W, spanZ / H), inHollowOpenSea);
+          }
         }
         const chop = (hash2(Math.round(x * 0.6), Math.round(z * 0.6), seed + 811) - 0.5) * 3.5;
         r += chop;
@@ -313,6 +345,13 @@ export function paintTerrainRows(
           r *= 0.45;
           g *= 0.45;
           b *= 0.5;
+        } else if (onEdge) {
+          // The swim-fatigue limit, drawn: past this line open-sea fatigue
+          // kills, so it is STATED rather than left to a colour step that the
+          // approach easing above has deliberately softened.
+          r += (OPEN_SEA_EDGE_R - r) * OPEN_SEA_EDGE_MIX;
+          g += (OPEN_SEA_EDGE_G - g) * OPEN_SEA_EDGE_MIX;
+          b += (OPEN_SEA_EDGE_B - b) * OPEN_SEA_EDGE_MIX;
         }
         const k = (iy * W + ix) * 4;
         data[k] = r;

@@ -91,6 +91,24 @@ Commits on `feature/frontend-modernization-v016`: `8aba739d` (aura debuff-priori
 `ae619faf` (party full-rate + the `nonSelfRepaintDue` swap-bypass), `82721b18` (minimap token
 cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
 
+### The world map's open-sea limit (2026-08-03)
+
+Not a graphics-preset shed, but the same principle applied to a MAP read, recorded here because
+the change deliberately softened a colour contrast that carried actionable information.
+
+The zone map colours water by the sim's own swim-fatigue predicate (`inHollowOpenSea`): safe
+water light, the lethal open sea dark. That predicate is a rectangle test, so the two colours
+met at a hard straight step through open water and the map read as a lighter box pasted over
+the sea. The fix eases the safe water toward the deep tone as it approaches, WHICH REMOVES THAT
+CONTRAST, and therefore also draws the limit itself as a pale rule
+(`src/ui/map_open_sea_edge_core.ts`, consumed by `map_terrain.ts`).
+
+The trade is deliberate and is what keeps it fair: the boundary moves from IMPLIED by a colour
+change to STATED by a drawn line, at the same pixel, with no delay and no tier-dependence (the
+plates are baked identically for every preset). `tests/map_terrain.test.ts` pins both halves,
+and the line pin is the load-bearing one: if the rule ever stops rendering, the easing would
+leave an actionable edge invisible, and nothing else in the suite would notice.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
