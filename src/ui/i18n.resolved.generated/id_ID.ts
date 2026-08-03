@@ -6214,6 +6214,7 @@ export const id_ID: EnTranslations = {
         "add": "Tambah saluran obrolan",
         "addTitle": "Tambah saluran",
         "close": "Tutup tab {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Pesan {channel}",
         "names": {
           "say": "Berkata",
@@ -7038,6 +7039,8 @@ export const id_ID: EnTranslations = {
       "close": "Tutup pedagang",
       "hint": "Klik barang di tasmu untuk menjualnya selama jendela ini terbuka.",
       "buyAria": "Beli {item} seharga {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Beli Kembali",
       "buybackEmpty": "Tidak ada barang",
       "buybackAria": "Beli kembali {item} seharga {price}",

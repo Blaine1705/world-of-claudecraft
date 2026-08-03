@@ -6214,6 +6214,7 @@ export const tr_TR: EnTranslations = {
         "add": "Sohbet kanalı ekle",
         "addTitle": "Kanal ekle",
         "close": "{channel} sekmesini kapat",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "{channel} kanalına mesaj",
         "names": {
           "say": "Söyle",
@@ -7038,6 +7039,8 @@ export const tr_TR: EnTranslations = {
       "close": "Tüccarı kapat",
       "hint": "Bu pencere açıkken satmak için çantalarınızdaki bir eşyaya tıklayın.",
       "buyAria": "{item} eşyasını {price} karşılığında satın al",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Geri Alım",
       "buybackEmpty": "Eşya yok",
       "buybackAria": "{item} eşyasını {price} karşılığında geri al",

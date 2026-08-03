@@ -6214,6 +6214,7 @@ export const en_XA: EnTranslations = {
         "add": "[Áðð çĥáţ çĥáññéļ]",
         "addTitle": "[Áðð çĥáññéļ]",
         "close": "[Çļóšé {channel} ţáƀ]",
+        "moveHint": "[Ŕéóŕðéŕ {channel} ţáƀ: ðŕáĝ íţ, óŕ úšé Áļţ+Ļéƒţ áñð Áļţ+Ŕíĝĥţ]",
         "sendingTo": "[Ɱéššáĝé {channel}]",
         "names": {
           "say": "[Šáý]",
@@ -7038,6 +7039,8 @@ export const en_XA: EnTranslations = {
       "close": "[Çļóšé ʋéñðóŕ]",
       "hint": "[Çļíçķ áñ íţéɱ íñ ýóúŕ ƀáĝš ţó šéļļ íţ ŵĥíļé ţĥíš ŵíñðóŵ íš óþéñ.]",
       "buyAria": "[Ɓúý {item} ƒóŕ {price}]",
+      "buyStack": "[Ɓúý {count}]",
+      "buyStackAria": "[Ɓúý {count} {item} ƒóŕ {price}]",
       "buybackTitle": "[Ɓúýƀáçķ]",
       "buybackEmpty": "[Ñó íţéɱš]",
       "buybackAria": "[Ɓúý ƀáçķ {item} ƒóŕ {price}]",

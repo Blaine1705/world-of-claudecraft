@@ -6214,6 +6214,7 @@ export const zh_TW: EnTranslations = {
         "add": "新增聊天頻道",
         "addTitle": "新增頻道",
         "close": "關閉{channel}分頁",
+        "moveHint": "重新排列{channel}分頁：拖曳，或使用 Alt+左與 Alt+右",
         "sendingTo": "傳訊至{channel}",
         "names": {
           "say": "說話",
@@ -7038,6 +7039,8 @@ export const zh_TW: EnTranslations = {
       "close": "關閉商人",
       "hint": "此視窗開啟時，點擊背包中的物品即可出售。",
       "buyAria": "以 {price} 購買 {item}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "買回",
       "buybackEmpty": "沒有物品",
       "buybackAria": "以 {price} 買回 {item}",

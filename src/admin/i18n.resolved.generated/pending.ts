@@ -11,6 +11,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -19,6 +22,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -66,9 +70,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "es_ES": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -77,6 +85,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -124,9 +133,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "fr_FR": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -135,6 +148,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -182,9 +196,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "fr_CA": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -193,6 +211,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -240,10 +259,14 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "en_CA": [],
   "it_IT": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -252,6 +275,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -299,9 +323,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "de_DE": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -310,6 +338,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -357,9 +386,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "zh_CN": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -368,6 +401,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -415,9 +449,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "zh_TW": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -426,6 +464,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -473,9 +512,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "ko_KR": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -484,6 +527,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -531,9 +575,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "ja_JP": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -542,6 +590,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -589,9 +638,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "pt_BR": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -600,6 +653,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -647,9 +701,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "ru_RU": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -658,6 +716,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -705,9 +764,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "cs_CZ": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -716,6 +779,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -763,9 +827,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "nl_NL": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -774,6 +842,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -821,9 +890,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "pl_PL": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -832,6 +905,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -879,9 +953,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "id_ID": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -890,6 +968,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -937,9 +1016,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "tr_TR": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -948,6 +1031,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -995,9 +1079,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "sv_SE": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -1006,6 +1094,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -1053,9 +1142,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "vi_VN": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -1064,6 +1157,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -1111,9 +1205,13 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ],
   "da_DK": [
+    "auth.twoFactorHint",
+    "auth.twoFactorLabel",
+    "auth.twoFactorPlaceholder",
     "characters.colGuild",
     "characters.colGuildRank",
     "error.guildMemberLimit",
@@ -1122,6 +1220,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.guildNameUnchanged",
     "error.guildNotFound",
     "error.guildReasonInvalid",
+    "error.invalidTwoFactorCode",
     "guilds.backToList",
     "guilds.colCreated",
     "guilds.colId",
@@ -1169,6 +1268,7 @@ export const pending: Record<string, readonly string[]> = {
     "guilds.searchLabel",
     "guilds.searchPlaceholder",
     "moderationHistory.actionGuildRename",
-    "nav.guilds"
+    "nav.guilds",
+    "theme.darkModeLabel"
   ]
 };

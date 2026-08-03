@@ -6214,6 +6214,7 @@ export const cs_CZ: EnTranslations = {
         "add": "Přidat chatový kanál",
         "addTitle": "Přidat kanál",
         "close": "Zavřít kartu {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Zpráva do {channel}",
         "names": {
           "say": "Říct",
@@ -7038,6 +7039,8 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít obchodníka",
       "hint": "Když je toto okno otevřené, klikni na předmět v batozích a prodáš ho.",
       "buyAria": "Koupit {item} za {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Zpětný odkup",
       "buybackEmpty": "Žádné předměty",
       "buybackAria": "Odkoupit zpět {item} za {price}",

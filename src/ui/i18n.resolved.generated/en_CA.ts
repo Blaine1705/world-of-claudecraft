@@ -6214,6 +6214,7 @@ export const en_CA: EnTranslations = {
         "add": "Add chat channel",
         "addTitle": "Add channel",
         "close": "Close {channel} tab",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Message {channel}",
         "names": {
           "say": "Say",
@@ -7038,6 +7039,8 @@ export const en_CA: EnTranslations = {
       "close": "Close vendor",
       "hint": "Click an item in your bags to sell it while this window is open.",
       "buyAria": "Buy {item} for {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Buyback",
       "buybackEmpty": "No items",
       "buybackAria": "Buy back {item} for {price}",

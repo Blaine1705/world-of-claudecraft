@@ -6214,6 +6214,7 @@ export const nl_NL: EnTranslations = {
         "add": "Chatkanaal toevoegen",
         "addTitle": "Kanaal toevoegen",
         "close": "Tabblad {channel} sluiten",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Bericht {channel}",
         "names": {
           "say": "Zeggen",
@@ -7038,6 +7039,8 @@ export const nl_NL: EnTranslations = {
       "close": "Handelaar sluiten",
       "hint": "Klik op een voorwerp in je tassen om het te verkopen terwijl dit venster open is.",
       "buyAria": "Koop {item} voor {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Terugkopen",
       "buybackEmpty": "Geen voorwerpen",
       "buybackAria": "Koop {item} terug voor {price}",

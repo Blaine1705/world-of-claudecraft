@@ -6214,6 +6214,7 @@ export const sv_SE: EnTranslations = {
         "add": "Lägg till chattkanal",
         "addTitle": "Lägg till kanal",
         "close": "Stäng fliken {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Meddela {channel}",
         "names": {
           "say": "Säg",
@@ -7038,6 +7039,8 @@ export const sv_SE: EnTranslations = {
       "close": "Stäng köpman",
       "hint": "Klicka på ett föremål i dina väskor för att sälja det medan detta fönster är öppet.",
       "buyAria": "Köp {item} för {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Återköp",
       "buybackEmpty": "Inga föremål",
       "buybackAria": "Köp tillbaka {item} för {price}",

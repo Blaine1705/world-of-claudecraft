@@ -6214,6 +6214,7 @@ export const vi_VN: EnTranslations = {
         "add": "Thêm kênh trò chuyện",
         "addTitle": "Thêm kênh",
         "close": "Đóng thẻ {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Nhắn {channel}",
         "names": {
           "say": "Nói",
@@ -7038,6 +7039,8 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng cửa hàng",
       "hint": "Nhấp vào một vật phẩm trong túi để bán khi cửa sổ này đang mở.",
       "buyAria": "Mua {item} với giá {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Mua Lại",
       "buybackEmpty": "Không có vật phẩm",
       "buybackAria": "Mua lại {item} với giá {price}",

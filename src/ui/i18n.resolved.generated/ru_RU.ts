@@ -6214,6 +6214,7 @@ export const ru_RU: EnTranslations = {
         "add": "Добавить канал чата",
         "addTitle": "Добавить канал",
         "close": "Закрыть вкладку {channel}",
+        "moveHint": "Изменить порядок вкладки {channel}: перетащите или используйте Alt+влево и Alt+вправо",
         "sendingTo": "Сообщение в {channel}",
         "names": {
           "say": "Сказать",
@@ -7038,6 +7039,8 @@ export const ru_RU: EnTranslations = {
       "close": "Закрыть торговца",
       "hint": "Нажмите на предмет в сумках, чтобы продать его, пока это окно открыто.",
       "buyAria": "Купить {item} за {price}",
+      "buyStack": "Buy {count}",
+      "buyStackAria": "Buy {count} {item} for {price}",
       "buybackTitle": "Выкуп",
       "buybackEmpty": "Нет предметов",
       "buybackAria": "Выкупить {item} за {price}",

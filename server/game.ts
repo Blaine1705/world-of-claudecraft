@@ -3116,8 +3116,14 @@ export class GameServer {
     // Re-validate the freshly-read layout (untrusted at rest), same as a fresh
     // join. Without this, a mid-session save that already landed durably would
     // be clobbered by the stale join-time snapshot once lastSent resets below
-    // forces a resend.
-    session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    // forces a resend. Only refresh when the caller actually supplies a layout:
+    // ws_auth.ts always does on the real reconnect path, but an in-process/test
+    // caller that omits it (meta = {}) must keep the session's saved value
+    // rather than being reset to null, matching the sibling bankBonus
+    // "absent means keep" pattern above.
+    if (meta.hotbarLayout !== undefined) {
+      session.initialHotbarLayout = sanitizeActionBarLayout(meta.hotbarLayout);
+    }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
     session.lastSent = {};
@@ -4458,7 +4464,7 @@ export class GameServer {
         break;
       case 'buy':
         if (typeof msg.npc === 'number' && typeof msg.item === 'string')
-          sim.buyItem(msg.npc, msg.item, pid);
+          sim.buyItem(msg.npc, msg.item, pid, msg.bulk === true);
         break;
       case 'sell':
         if (typeof msg.item === 'string') {
@@ -5452,6 +5458,13 @@ export class GameServer {
         if (process.env.ALLOW_DEV_COMMANDS === '1' && typeof msg.item === 'string') {
           const count = typeof msg.count === 'number' ? msg.count : 1;
           sim.addItem(msg.item, Math.max(1, Math.min(20, count | 0)), pid);
+        }
+        break;
+      }
+      case 'dev_profiler_invulnerable': {
+        if (process.env.ALLOW_DEV_COMMANDS === '1') {
+          const entity = sim.entities.get(pid);
+          if (entity) entity.profilerInvulnerable = true;
         }
         break;
       }
