@@ -6,6 +6,14 @@ function lootableCorpse(e: PickEntity): boolean {
   return e.kind === 'mob' && e.dead && e.lootable;
 }
 
+// A live, selectable creature: a mob or player still standing. Excludes
+// 'object' (never targetable) and anything dead. Issue #2787: this is the
+// pick priority a click resolves to before it is allowed to fall into the
+// dead-corpse loot branch below.
+function isLiveTargetable(e: PickEntity): boolean {
+  return e.kind !== 'object' && !e.dead;
+}
+
 export function resolveDirectPickEntityId(
   hitEntityIds: readonly number[],
   entities: Pick<Map<number, PickEntity>, 'get'>,
@@ -23,6 +31,18 @@ export function resolveDirectPickEntityId(
     ordered.push(e);
   }
   if (ordered.length === 0) return null;
+
+  // Issue #2787: in a cluster with some mobs already dead, the raycast often
+  // hits a corpse's capsule first (whichever body is visually in front) even
+  // when a live mob or player is ALSO in the hit set, just farther along the
+  // ray. Opening the loot popup for that corpse instead of selecting the
+  // still-fighting mob is the "hard to target the last living mob" bug: the
+  // nearest live hit wins over a leading corpse before the loot/cycle logic
+  // below ever runs.
+  if (lootableCorpse(ordered[0])) {
+    const live = ordered.find(isLiveTargetable);
+    if (live) return live.id;
+  }
 
   const corpses = ordered.filter(lootableCorpse);
   if (lootableCorpse(ordered[0]) && corpses.length > 1 && currentTargetId !== null) {
