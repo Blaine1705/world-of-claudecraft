@@ -1132,6 +1132,7 @@ export const ko_KR: EnTranslations = {
         "kitHeading": "내 기술",
         "kitNote": "경기 동안 이 동작들이 직업 능력을 대신합니다.",
         "unratedNote": "봇이 경기장에 있어 이 경기는 등급전이 아닙니다. 전적은 변하지 않으며 골, 세이브, 클린 시트 업적도 반영되지 않습니다.",
+        "practiceUnratedNote": "이 경기는 연습 경기이므로 등급전이 아닙니다. 전적은 변하지 않으며 업적의 서 진행도도 반영되지 않습니다.",
         "rosterHeading": "출전 명단",
         "you": "나",
         "bot": "봇",

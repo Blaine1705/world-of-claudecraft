@@ -1132,6 +1132,7 @@ export const ja_JP: EnTranslations = {
         "kitHeading": "あなたの技",
         "kitNote": "試合中はこれらの技がクラスのアビリティと入れ替わる。",
         "unratedNote": "ボットがピッチにいるため、この試合はレート対象外。戦績は動かず、ゴール・セーブ・クリーンシートの功績も数えられない。",
+        "practiceUnratedNote": "これは練習試合のためレート対象外。戦績は動かず、功績の書の進行も数えられない。",
         "rosterHeading": "メンバー表",
         "you": "あなた",
         "bot": "ボット",

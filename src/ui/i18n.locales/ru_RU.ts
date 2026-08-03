@@ -8755,6 +8755,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.kitNote': 'На время матча эти приёмы заменяют способности класса.',
   'hudChrome.vcup.briefing.unratedNote':
     'На поле есть боты, поэтому этот матч не рейтинговый: результаты не меняются, а деяния за голы, сейвы и сухие матчи не засчитываются.',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    'Это тренировочный матч, поэтому он не рейтинговый: результаты не меняются, а прогресс Книги деяний не засчитывается.',
   'hudChrome.vcup.briefing.rosterHeading': 'Список состава',
   'hudChrome.vcup.briefing.you': 'Вы',
   'hudChrome.vcup.briefing.bot': 'Бот',

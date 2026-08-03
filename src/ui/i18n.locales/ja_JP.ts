@@ -8618,6 +8618,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.kitNote': '試合中はこれらの技がクラスのアビリティと入れ替わる。',
   'hudChrome.vcup.briefing.unratedNote':
     'ボットがピッチにいるため、この試合はレート対象外。戦績は動かず、ゴール・セーブ・クリーンシートの功績も数えられない。',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    'これは練習試合のためレート対象外。戦績は動かず、功績の書の進行も数えられない。',
   'hudChrome.vcup.briefing.rosterHeading': 'メンバー表',
   'hudChrome.vcup.briefing.you': 'あなた',
   'hudChrome.vcup.briefing.bot': 'ボット',

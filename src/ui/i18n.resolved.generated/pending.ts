@@ -20,6 +20,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -35,6 +36,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -50,6 +52,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -65,6 +68,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -81,6 +85,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -96,6 +101,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -123,6 +129,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -141,6 +148,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -156,6 +164,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -171,6 +180,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -186,6 +196,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -201,6 +212,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -216,6 +228,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -231,6 +244,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"
@@ -246,6 +260,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.actionBar.reset",
     "hudChrome.actionBar.resetConfirmBody",
     "hudChrome.actionBar.resetConfirmTitle",
+    "hudChrome.vcup.briefing.practiceUnratedNote",
     "hudChrome.vcup.briefing.unratedNote",
     "hudChrome.vcup.practiceUnratedNote",
     "hudChrome.vcup.rolesSmallBracketNote"

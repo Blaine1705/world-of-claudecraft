@@ -7881,6 +7881,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.vcup.briefing.bot'
   | 'hudChrome.vcup.briefing.kitHeading'
   | 'hudChrome.vcup.briefing.kitNote'
+  | 'hudChrome.vcup.briefing.practiceUnratedNote'
   | 'hudChrome.vcup.briefing.ready'
   | 'hudChrome.vcup.briefing.readyAria'
   | 'hudChrome.vcup.briefing.readyCount'

@@ -1132,6 +1132,7 @@ export const de_DE: EnTranslations = {
         "kitHeading": "Deine Ausrüstung",
         "kitNote": "Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.",
         "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "Die Aufstellung",
         "you": "Du",
         "bot": "Bot",

@@ -28,6 +28,7 @@
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
+import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
@@ -1659,7 +1660,7 @@ export function onCupGoalForDeeds(
   if (!meta) return;
   grantDeed(ctx, meta, 'pvp_vcup_first_goal');
   if (match.golden) grantDeed(ctx, meta, 'pvp_vcup_golden_goal');
-  if (match.bracket >= 3) {
+  if (match.bracket > VC_ALLROUNDER_ONLY_MAX_BRACKET) {
     let goals = ctx.deedRuntime.cupGoals.get(match.id);
     if (!goals) {
       goals = new Map();
@@ -1671,13 +1672,16 @@ export function onCupGoalForDeeds(
   }
 }
 
-/** A keeper save (shot at or above the save speed floor), rated only. */
+/** A keeper save (shot at or above the save speed floor), rated only. The
+ *  description also promises the 3v3 bracket or larger; today that holds
+ *  emergently (normalizeRole seats no small-bracket keeper), so the explicit
+ *  gate enforces the published rule rather than inferring it. */
 export function onCupSaveForDeeds(
   ctx: SimContext,
   match: CupMatchForDeeds,
   keeperPid: number,
 ): void {
-  if (!match.rated) return;
+  if (!match.rated || match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
   const meta = ctx.players.get(keeperPid);
   if (meta) grantDeed(ctx, meta, 'pvp_vcup_first_save');
 }
@@ -1695,6 +1699,9 @@ export function onCupStandingForDeeds(
   // The Cup win meters moved in the caller's standing loop: full pass.
   markDeedsDirty(ctx, pid);
   if (winner !== team) return;
+  // Clean sheet promises the 3v3 bracket or larger, like the save deed above:
+  // enforce the published rule directly instead of leaning on normalizeRole.
+  if (match.bracket <= VC_ALLROUNDER_ONLY_MAX_BRACKET) return;
   if (match.roles[pid] !== 'keeper' || match.benched.has(pid)) return;
   const opposingScore = team === 'A' ? match.scoreB : match.scoreA;
   if (opposingScore !== 0) return;

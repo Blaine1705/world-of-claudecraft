@@ -59,6 +59,7 @@ function makeMatch(
     id: 7,
     phase: 'active',
     rated: true,
+    practice: false,
     countdown: 0,
     timeLeft: 245,
     golden: false,

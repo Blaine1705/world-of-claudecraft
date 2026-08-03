@@ -9494,9 +9494,11 @@
     border-radius: 2px;
     background: #b8e8a0;
   }
-  /* unrated-bout notice (practice / bot-backfill): a warning-tinted extra row */
+  /* unrated-bout notice (practice / bot-backfill): a warning-tinted extra row.
+     Inverted triangle: r4 already owns the upright one, and the section rule
+     is a distinct glyph per row. */
   .vcupb-rule-mark.unrated {
-    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
     background: #e8b8a0;
   }
   .vcupb-rule.vcupb-unrated {

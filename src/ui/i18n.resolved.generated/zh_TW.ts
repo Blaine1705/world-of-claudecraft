@@ -1132,6 +1132,7 @@ export const zh_TW: EnTranslations = {
         "kitHeading": "你的技能",
         "kitNote": "比賽期間，這些動作將取代你的職業技能。",
         "unratedNote": "場上有機器人，因此本場為非積分賽：戰績不會變動，進球、撲救與零封的功績均不計算。",
+        "practiceUnratedNote": "這是練習賽，因此不計入積分：戰績不會變動，功績之書進度也不計算。",
         "rosterHeading": "出場名單",
         "you": "你",
         "bot": "電腦",

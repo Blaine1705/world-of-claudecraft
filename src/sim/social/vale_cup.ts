@@ -230,7 +230,9 @@ export interface VcMatch {
   roles: Record<number, SportRole>;
   // False whenever bots are seated (practice and bot-backfill): no standing
   // changes and no Vale Cup skill-deed credit (goal/save/clean-sheet sites in
-  // deeds.ts gate on it; only the debut/first-match deeds stay permissive).
+  // deeds.ts gate on it). The debut/first-match deeds do NOT read this flag:
+  // they gate on cupQueuedBout (practice === null), so a bot-backfilled queued
+  // bout still credits them while a practice bout credits nothing at all.
   // Deliberate, and surfaced to the player: matchInfoFor ships this flag so the
   // briefing overlay can say the bout is unrated (issue 2767).
   rated: boolean;
@@ -2179,6 +2181,7 @@ function matchInfoFor(ctx: SimContext, match: VcMatch, viewerPid: number): VcMat
     id: match.id,
     phase: match.phase,
     rated: match.rated,
+    practice: match.practice !== null,
     countdown: match.phase === 'countdown' ? Math.max(0, Math.ceil(match.timer)) : 0,
     timeLeft,
     golden: match.golden,

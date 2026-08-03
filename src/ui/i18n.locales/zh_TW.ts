@@ -8221,6 +8221,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.vcup.briefing.kitNote': '比賽期間，這些動作將取代你的職業技能。',
   'hudChrome.vcup.briefing.unratedNote':
     '場上有機器人，因此本場為非積分賽：戰績不會變動，進球、撲救與零封的功績均不計算。',
+  'hudChrome.vcup.briefing.practiceUnratedNote':
+    '這是練習賽，因此不計入積分：戰績不會變動，功績之書進度也不計算。',
   'hudChrome.vcup.briefing.rosterHeading': '出場名單',
   'hudChrome.vcup.briefing.you': '你',
   'hudChrome.vcup.briefing.bot': '電腦',

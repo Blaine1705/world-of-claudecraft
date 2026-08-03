@@ -1132,6 +1132,7 @@ export const nl_NL: EnTranslations = {
         "kitHeading": "Jouw uitrusting",
         "kitNote": "Deze zetten vervangen je klassevaardigheden voor de duur van de wedstrijd.",
         "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "De opstelling",
         "you": "Jij",
         "bot": "Bot",

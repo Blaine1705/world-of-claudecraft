@@ -1132,6 +1132,7 @@ export const zh_CN: EnTranslations = {
         "kitHeading": "你的技能",
         "kitNote": "比赛期间，这些动作将取代你的职业技能。",
         "unratedNote": "场上有机器人，因此本场为非评级赛：战绩不会变动，进球、扑救与零封的功绩均不计算。",
+        "practiceUnratedNote": "这是练习赛，因此不计入评级：战绩不会变动，功绩之书进度也不计算。",
         "rosterHeading": "出场名单",
         "you": "你",
         "bot": "电脑",

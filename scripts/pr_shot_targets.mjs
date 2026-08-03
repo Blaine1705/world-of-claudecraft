@@ -4398,6 +4398,11 @@ export const TARGETS = [
         opened = await pollForSize(page, '#valecup-window', 10, 500);
       }
       if (!opened) throw new Error('vale cup window did not open');
+      // The two notes sit below the fold on the mobile-landscape viewport:
+      // scroll the last one into view (a no-op on desktop, where all fit).
+      await page.evaluate(() => {
+        document.getElementById('vcup-practice-unrated-note')?.scrollIntoView({ block: 'nearest' });
+      });
       await wait(400);
       return { clip: '#valecup-window' };
     },
@@ -4411,11 +4416,26 @@ export const TARGETS = [
     // with the unrated note (no standings, no Book of Deeds progress).
     variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
     async capture(page) {
-      await page.evaluate(() => {
-        window.__game?.sim?.vcupPracticeStart?.(1);
-      });
-      if (!(await pollForSize(page, '#vcup-briefing', 20, 500))) {
-        throw new Error('briefing overlay did not appear');
+      // Retried: startValeCupPractice no-ops with a chat error once seated, so a
+      // repeat call after a swallowed first attempt (CI flake) is safe.
+      let up = false;
+      for (let attempt = 0; attempt < 3 && !up; attempt++) {
+        await page.evaluate(() => {
+          window.__game?.sim?.vcupPracticeStart?.(1);
+        });
+        up = await pollForSize(page, '#vcup-briefing', 10, 500);
+      }
+      if (!up) {
+        const state = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          const match = sim?.cupInfoFor?.(sim.primaryId)?.match;
+          return JSON.stringify({
+            game: Boolean(window.__game),
+            phase: match ? match.phase : null,
+            dead: Boolean(sim?.player?.dead),
+          });
+        });
+        throw new Error(`briefing overlay did not appear (${state})`);
       }
       await wait(400);
       return { clip: '#vcup-briefing .vcupb-card' };

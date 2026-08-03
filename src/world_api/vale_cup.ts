@@ -39,6 +39,11 @@ export interface VcMatchInfo {
   // unrated bout moves no standings and grants no Vale Cup skill deeds, and the
   // UI (briefing overlay) tells the player so up front (issue 2767).
   rated: boolean;
+  // True only for a private practice bout. The briefing overlay branches its
+  // unrated copy on this: practice credits NO Cup deed at all (the debut deeds
+  // gate on the queued-bout predicate), while a bot-backfilled queued bout
+  // still credits the debut deeds.
+  practice: boolean;
   // whole seconds: countdown until kickoff, or remaining match/golden time
   countdown: number;
   timeLeft: number;

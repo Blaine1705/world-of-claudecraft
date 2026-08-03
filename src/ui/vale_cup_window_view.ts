@@ -249,6 +249,9 @@ export function buildVcupView(input: VcupViewInput): VcupView {
     info.practicing,
     party && [party.leader, partySize],
     practice,
+    // Redundant with `bracket` today (a pure function of it), pinned here so a
+    // future re-derivation from a non-sig input cannot leave a stale note.
+    smallBracketRoles,
   ]);
 
   return {

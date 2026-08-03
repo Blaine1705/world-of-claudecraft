@@ -966,11 +966,16 @@ export const hudChromeStrings = {
       rule5: 'Anyone can walk up and cheer you on from the stands.',
       kitHeading: 'Your kit',
       kitNote: 'These moves replace your class abilities for the match.',
-      // Extra rules-panel row for practice / bot-backfilled bouts (issue 2767).
+      // Extra rules-panel row for a bot-backfilled queued bout (issue 2767).
       // Says "deeds for goals, saves, and clean sheets" rather than all deed
       // progress: the debut deeds deliberately still credit a backfilled bout.
       unratedNote:
         'Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.',
+      // The same row for a private practice bout, which credits NO Cup deed at
+      // all (the debut deeds gate on the queued-bout predicate), so this copy
+      // is the blanket statement the backfill copy cannot make.
+      practiceUnratedNote:
+        'This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.',
       rosterHeading: 'The team sheet',
       // Row tags on the team sheet.
       you: 'You',

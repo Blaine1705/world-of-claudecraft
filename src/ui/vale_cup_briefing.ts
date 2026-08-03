@@ -236,12 +236,20 @@ export class ValeCupBriefing {
         `<li class="vcupb-rule"><span class="vcupb-rule-mark r${i + 1}" aria-hidden="true"></span>` +
         `<span class="vcupb-rule-text">${esc(t(key))}</span></li>`,
     ).join('');
-    // Unrated bouts (practice / bot-backfill) say so up front: standings and
-    // Book of Deeds progress do not count (issue 2767). Structural (in the sig).
+    // Unrated bouts say so up front (issue 2767), with the copy branched on
+    // the bout kind: practice credits NO Cup deed at all, while a
+    // bot-backfilled queued bout still credits the debut deeds, so its copy
+    // names only the skill deeds. Both flags are structural (in the sig).
     const unrated = view.rated
       ? ''
       : `<li class="vcupb-rule vcupb-unrated"><span class="vcupb-rule-mark unrated" aria-hidden="true"></span>` +
-        `<span class="vcupb-rule-text">${esc(t('hudChrome.vcup.briefing.unratedNote'))}</span></li>`;
+        `<span class="vcupb-rule-text">${esc(
+          t(
+            view.practice
+              ? 'hudChrome.vcup.briefing.practiceUnratedNote'
+              : 'hudChrome.vcup.briefing.unratedNote',
+          ),
+        )}</span></li>`;
     return (
       `<section class="vcupb-panel vcupb-rules">` +
       `<h3 class="vcupb-panel-title">${esc(t('hudChrome.vcup.briefing.rulesHeading'))}</h3>` +
