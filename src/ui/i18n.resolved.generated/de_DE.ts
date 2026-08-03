@@ -1046,6 +1046,7 @@ export const de_DE: EnTranslations = {
       },
       "awayNote": "Fliegen beide Seiten dasselbe Banner, spielt die Auswärtsseite in den umgekehrten Farben.",
       "rolesHeading": "Sportrolle",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Allrounder",
@@ -1087,6 +1088,7 @@ export const de_DE: EnTranslations = {
       "guildBoardWl": "{wins} S, {losses} N",
       "practice": "Training gegen Bots",
       "practiceNote": "Startet sofort ein privates Bot-Spiel auf deinem eigenen Trainingsplatz.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Gerade im Training ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Talpokal-Warteschlange: {bracket}, Position {position} von {count}",
@@ -1129,6 +1131,8 @@ export const de_DE: EnTranslations = {
         "rule5": "Jeder kann vorbeikommen und dich von den Rängen aus anfeuern.",
         "kitHeading": "Deine Ausrüstung",
         "kitNote": "Diese Manöver ersetzen für das Spiel deine Klassenfähigkeiten.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "Die Aufstellung",
         "you": "Du",
         "bot": "Bot",

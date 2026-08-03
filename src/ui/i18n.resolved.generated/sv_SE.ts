@@ -1046,6 +1046,7 @@ export const sv_SE: EnTranslations = {
       },
       "awayNote": "Om båda sidor för samma banér spelar bortalaget i inverterade färger.",
       "rolesHeading": "Sportroll",
+      "rolesSmallBracketNote": "In the 1v1 and 2v2 brackets every fighter plays the All-Rounder kit. Deeds that call for the 3v3 bracket or larger cannot be earned here.",
       "role": {
         "allrounder": {
           "name": "Allroundspelare",
@@ -1087,6 +1088,7 @@ export const sv_SE: EnTranslations = {
       "guildBoardWl": "{wins} V, {losses} F",
       "practice": "Träning mot bottar",
       "practiceNote": "Startar genast en privat botmatch på din egen träningsplan.",
+      "practiceUnratedNote": "Practice bouts are unrated: standings and Book of Deeds progress do not count.",
       "practicingNow": "Tränar just nu ({count}):",
       "clock": "{minutes}:{seconds}",
       "indicatorQueued": "Dalcupskö: {bracket}, plats {position} av {count}",
@@ -1129,6 +1131,8 @@ export const sv_SE: EnTranslations = {
         "rule5": "Vem som helst kan gå fram och heja på dig från läktarna.",
         "kitHeading": "Din uppsättning",
         "kitNote": "De här dragen ersätter dina klassförmågor under matchen.",
+        "unratedNote": "Bots are on the pitch, so this bout is unrated: standings do not move, and deeds for goals, saves, and clean sheets do not count.",
+        "practiceUnratedNote": "This is a practice bout, so it is unrated: standings do not move, and Book of Deeds progress does not count.",
         "rosterHeading": "Laguppställningen",
         "you": "Du",
         "bot": "Bot",
