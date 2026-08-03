@@ -31,8 +31,10 @@
 // releases its cap slot at settle, so failed mints never ACCUMULATE as dead
 // weight. The bound stays hard on the way in (R11), so AT the cap a failing
 // mint's transient slot still displaces the coldest entry while its flight is
-// open: a brownout with churn at the cap costs up to one warm snapshot per
-// concurrently failing mint, never a growing residue. The absolute
+// open: a brownout with churn costs up to one warm snapshot per failing mint
+// that arrives at the cap (in-flight transient slots count toward it, so
+// overlapping failing mints can displace below the value cap), never a
+// growing residue. The absolute
 // no-displacement guarantee would need either a soft bound or per-key flights
 // outside the map (losing cold single-flight); both were considered and
 // rejected. Stale-serving does not

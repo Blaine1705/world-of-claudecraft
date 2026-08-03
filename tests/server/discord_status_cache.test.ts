@@ -253,6 +253,34 @@ describe('KeyedCachedRead mechanism', () => {
     expect(reads.get(1)).toBe(2);
   });
 
+  it('overlapping failing mints can displace the warm entry below the value cap', async () => {
+    // The concurrent brownout shape, pinned so the header's honest cost
+    // statement has a test behind it: each in-flight mint occupies its slot
+    // from the synchronous insert until its own settle, so failing mints that
+    // OVERLAP evict each other and the warm entry even though the map never
+    // holds more than one VALUE. The sequential sibling arm's warm-survival
+    // promise holds only below the cap; this is the boundary of it.
+    const reads = new Map<number, number>();
+    let healthy = true;
+    const cache = new KeyedCachedRead<string>(
+      async (key) => {
+        reads.set(key, (reads.get(key) ?? 0) + 1);
+        if (!healthy) throw new Error(`down for k${key}`);
+        return `k${key}`;
+      },
+      { ttlMs: 60_000, maxEntries: 2, now: () => 0 },
+    );
+    expect(await cache.read(1)).toBe('k1');
+    healthy = false;
+    await Promise.all([2, 3, 4, 5].map((key) => cache.read(key).catch(() => 'rejected')));
+    // The overlapping inserts evicted keys 1 to 3 on the way in; the two
+    // still-in-flight mints released at settle, leaving nothing.
+    expect(cache.size()).toBe(0);
+    healthy = true;
+    expect(await cache.read(1)).toBe('k1');
+    expect(reads.get(1)).toBe(2);
+  });
+
   it('holds the bound AT the cap and evicts the least-recently-read key', async () => {
     let refreshes = 0;
     const cache = new KeyedCachedRead<number>(
