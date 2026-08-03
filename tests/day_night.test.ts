@@ -71,6 +71,39 @@ describe('water follows the cycle (source pins)', () => {
   });
 });
 
+describe('the night visibility layers stay outdoors (source pins)', () => {
+  // The world clock governs the sky, not a dungeon, a delve, the Last Keep, or
+  // the seabed: each of those runs its own authored light rig all cycle long. A
+  // night layer that ignored that would light a pool under every mob underground
+  // at world-midnight and take it away again at world-noon, which is incoherent
+  // to a player who has not seen the sky in an hour. The gate is one ternary per
+  // call site in renderer.ts, so these pins are what keep it from being dropped
+  // in a refactor; there is no pure core to assert it on.
+  const renderer = () =>
+    readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+
+  it('gates the mob ground glow on the outdoor fog state', () => {
+    expect(renderer()).toContain(
+      "this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0",
+    );
+  });
+
+  it('gates the wilderness accents on the outdoor fog state', () => {
+    expect(renderer()).toContain(
+      "this.fogState === 'outdoor' ? wildGlowAmount(this.dnGlobalNight) : 0",
+    );
+  });
+
+  it('drives the streetlamps and the ember pools from the same lamp amount', () => {
+    // One amount for both, so a lamp and the campfire beside it never disagree
+    // about whether it is dusk.
+    const source = renderer();
+    expect(source).toContain('const lampGlow = lampGlowAmount(this.dnGlobalNight);');
+    expect(source).toContain('this.streetlamps?.update(lampGlow, this.time);');
+    expect(source).toContain('this.emberPools?.update(lampGlow, this.time);');
+  });
+});
+
 describe('cyclePhase', () => {
   it('maps epoch 0 to phase 0 and the half-cycle to 0.5', () => {
     expect(cyclePhase(0)).toBe(0);

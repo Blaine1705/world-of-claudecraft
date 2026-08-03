@@ -16,7 +16,7 @@
 // fades in over the dusk ramp with its emissive rather than existing as new
 // daylight geometry, which would be a world-content change nobody asked for.
 import * as THREE from 'three';
-import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
+import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import { hash2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
@@ -224,7 +224,10 @@ export function buildNightAccents(seed = 0): NightAccentsView {
   return {
     group,
     update(glow: number, time: number, dt: number, camX: number, camZ: number): void {
-      const lit = glow > 0.001 && camX <= DUNGEON_X_THRESHOLD;
+      // The CALLER owns the outdoor decision (renderer.ts gates on fogState,
+      // which knows about every instanced interior and about being underwater);
+      // this layer only asks whether it is lit.
+      const lit = glow > 0.001;
       group.visible = lit;
       if (!lit) {
         fliesSeeded = false;

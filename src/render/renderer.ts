@@ -9346,9 +9346,16 @@ export class Renderer {
     // visibility that loop just settled, plus the drawn position. Cosmetic,
     // identical on every graphics tier, and allocation-free (the pool owns its
     // matrices; characters past the cap simply go without a disc).
+    // Outdoors only: the world clock does not govern a dungeon, a delve, the
+    // Last Keep, or the seabed, each of which runs its own authored rig. Without
+    // this, walking underground at world-midnight lit a pool under every mob and
+    // the same dungeon went dark again at world-noon, which is incoherent to a
+    // player who never saw the sky. `fogState` carries last frame's answer (it
+    // settles in updateAmbience, below the entity loop); one frame of discs on
+    // the way through a door is not worth reordering the frame for.
     const nightGlow = this.mobNightGlow;
     if (nightGlow) {
-      const glowAmount = mobGlowAmount(this.dnGlobalNight);
+      const glowAmount = this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0;
       if (nightGlow.begin(glowAmount)) {
         const glowRangeSq = MOB_GLOW_RANGE * MOB_GLOW_RANGE;
         for (const [id, v] of this.views) {
@@ -9705,7 +9712,15 @@ export class Renderer {
     // The wilderness night layer rides beside the ambient motes: same
     // player-centred streaming contract, but gated on real dark and anchored to
     // world cells for the flora (see night_accents.ts).
-    this.nightAccents?.update(wildGlowAmount(this.dnGlobalNight), this.time, dt, p.pos.x, p.pos.z);
+    // Same outdoor gate as the mob glow: mushrooms and fireflies belong to the
+    // sky's clock, so an instanced interior never grows them.
+    this.nightAccents?.update(
+      this.fogState === 'outdoor' ? wildGlowAmount(this.dnGlobalNight) : 0,
+      this.time,
+      dt,
+      p.pos.x,
+      p.pos.z,
+    );
     this.bladeGrass.update(p.pos.x, p.pos.z);
     // fogFar here is subsystemCullFar(): the residency-clamped detail
     // horizon, so band blades never stand past unbuilt ground
