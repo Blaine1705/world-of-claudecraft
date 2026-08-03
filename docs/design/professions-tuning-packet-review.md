@@ -5417,6 +5417,79 @@ in the catalog because their fills already exist in the maintainer
 owned overlays, which contributors never edit; drop the keys and the
 overlay rows together in a maintainer pass if desired.
 
+## Phase 22 build record (2026-08-02)
+
+Built in ~/wt/prof-packet off the two-merge entry sync above, per the
+phase text and the Q28/Q29 rulings (full row-family rework plus the
+uniform-column collapse, shipped as a legibility bug fix). Commits,
+in order: the entry-sync doc block; the rework (the identity card's
+skill rows rebuilt on the professions window's prof-craft-row family
+with the head line's right-aligned tabular-nums value and the
+role/cap pill chips, the 9px uppercase header retired, the collapse
+decided by the Node-tested view-core helper uniformSkillChips and
+rendered as a card-level caption in the same pill family, the list
+capped at 264px with internal scroll and the collapsed list opted
+out, the mobile arm's track override, unlabeled Cap wrap, and header
+hide all deleted with the card kept as the one mobile scroller, the
+narrative text raised to the 12px floor, the allCrafts catalog key,
+the crafting shot target's when-list and three identity framings,
+and the before/after pairs under
+docs/screenshots/profession-identity-legibility); the review fix
+round (the M16 fills for allCrafts and skillListAria in the five
+non-Latin overlays, the capped list made keyboard-reachable with
+tabindex and a named aria-label, the caption aria-hidden with the
+role class for family recolors, the CSS block merge and honest
+comment, and the audit's pin hardenings); and the pin-gap round
+(sweep aliveness minimums, the px-unit floor requirement, the
+order-insensitive pill pins).
+
+Acceptance, checked in-session: (a) the card scope carries no
+sub-12px text except the settled family exemptions (bordered 10px
+pills, the 11px tabular-nums value), enforced by a card-scope floor
+sweep over both sheets plus exact family pins; (b) the value is
+right-aligned with tabular-nums (family rule, pinned); (c) rendered
+de_DE and fr_FR checks pass at 1600x900 and 1366x768, attuned and
+unattuned, zero horizontal overflow on card, rows, caption, or chips
+(the caption rendered its English value in those locales; its de/fr
+fills stay on the release worklist and the caption is flex-wrap by
+construction); (d) the mobile card carries no unlabeled wrapped
+value: caps render as self-labeling pills, shot before and after;
+(e) allCrafts and skillListAria are t() keys with real non-Latin
+fills per M16, the completeness gate green; (f) the recipe pane
+keeps 180px at 1366x768 attuned (was starved to the 120px minimum
+by the uncapped rework mid-build; the 264px cap is the measured
+fix), screenshot pairs committed desktop, mobile, and compact; (g)
+npm run gate PASS is the build's exit condition, with the run and
+its result recorded in the phase 22 session memory alongside this
+block.
+
+Judgments recorded (veto-able): the 11px skill value stands as part
+of the settled Q28 family spec, the one non-pill exemption to
+acceptance (a)'s floor, pinned exactly; the four retired col* header
+keys stay in the catalog because their fills live in maintainer-owned
+overlays (release-fill note in the entry-sync block); the uniform
+caption is aria-hidden like the header it replaces (every row keeps
+the complete skillAria sentence, pinned as an exact sentence plus an
+every-row quantifier); the card-scope container override (padding,
+radius, background) is an intended instance divergence, the family
+anatomy inside it is the reuse; the collapsed list stays out of the
+tab order (it never scrolls); .profession-skill-row survives as the
+structural and test hook with no CSS on purpose; and the mobile
+unattuned framing ships unphotographed (the desktop unattuned shot
+plus the identical collapse markup cover it).
+
+Build-session review rounds: three fresh reviewers over the build
+diff (general coverage, frontend seam, test auditor with its own
+14-mutation probe) returned one blocking finding each on the same
+root (the wordy allCrafts key red on the always-on M16 gate) plus
+the pin and a11y hardenings above; every finding was applied or
+judged, one refuted with the harness open (each shot variant gets a
+fresh page, so a compact-viewport leak cannot occur). The fix round
+itself was re-reviewed clean (one aliveness should-fix plus nits,
+closed in the pin-gap round); first-match cascade blindness of
+source pins and the sweep's comment-absorbing selector capture are
+accepted as known repo-wide pin limitations.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
