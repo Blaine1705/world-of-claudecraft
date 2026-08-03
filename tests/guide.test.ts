@@ -1660,6 +1660,33 @@ describe('Guide professions gathering accuracy', () => {
     // at its fixed baseline (40 * 0.4 / 100 = 16 percent).
     expect(c.specimenChancePct).toBe(16);
   });
+
+  it('ties the gatherDeeds prose counts to the deed catalog (phase 24)', () => {
+    // The two per-zone deed families the gatherDeeds prose counts. A new zone
+    // that authors either deed (the zone-4 pass) moves the count here and must
+    // reword the prose in the same change, or these arms go red.
+    const firstCast = Object.values(DEEDS).filter(
+      (d) => d.trigger.kind === 'visit' && d.trigger.markId.startsWith('fish:'),
+    );
+    const chronicles = Object.values(DEEDS).filter(
+      (d) =>
+        d.trigger.kind === 'visits' &&
+        d.trigger.markIds.length > 0 &&
+        d.trigger.markIds.every((m) => m.startsWith('gather:')),
+    );
+    const words: Record<number, string> = { 5: 'five', 6: 'six', 7: 'seven', 8: 'eight' };
+    const castWord = words[firstCast.length];
+    expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
+    expect(guideStrings.profPages.gatherDeeds.fishing).toContain(
+      `each of ${castWord} zones' waters`,
+    );
+    const chronWord = words[chronicles.length];
+    expect(chronWord, `unmapped gatherer-chronicle count ${chronicles.length}`).toBeDefined();
+    const chronSentence = `${(chronWord as string)[0].toUpperCase()}${(chronWord as string).slice(1)} zones keep a gatherer's chronicle page apiece`;
+    for (const trade of ['mining', 'logging', 'herbalism'] as const) {
+      expect(guideStrings.profPages.gatherDeeds[trade]).toContain(chronSentence);
+    }
+  });
 });
 
 describe('Guide professions enchanting and economy accuracy', () => {

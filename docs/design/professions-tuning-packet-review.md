@@ -6282,8 +6282,11 @@ six first-cast zones, and extend the three land deeds keys with one
 clause on the zone chronicles; or (b) defer the whole set to the
 release docs pass the maintainer already holds. The i18n mechanics
 decide the shape either way: these leaves are filled in the locale
-overlays, so an in-place reword silently stales every fill (they
-re-enter the release worklist), while a new-key-beside shape needs
+overlays, so an in-place reword silently stales every fill (measured
+at the phase 24 build: nothing re-surfaces them automatically, the
+scan's staleness detection is dormant and the worklist emits pending
+rows only, so the build record hand-carries the re-fill list), while
+a new-key-beside shape needs
 its five non-Latin M16 fills in the same change because every one of
 these values is wordy. The recommendation on record: in-place rewrite,
 accepting the re-fill cost at the release fill the maintainer already
