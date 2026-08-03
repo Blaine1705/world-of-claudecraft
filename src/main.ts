@@ -1557,7 +1557,10 @@ async function startGame(
         if (Number.isFinite(n)) moonPhase = ((n % 1) + 1) % 1;
       }
       if (moonPhase === null) {
-        hud.log(`[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`, '#ffcf6a');
+        hud.log(
+          `[dev] unknown moon "${moonWord}" - try new|crescent|half|full|<0..1>|auto`,
+          '#ffcf6a',
+        );
         return true;
       }
       setLunarPhaseOverride(moonPhase);
