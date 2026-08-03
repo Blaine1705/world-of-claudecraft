@@ -5776,6 +5776,115 @@ npm run gate PASS on the fixed tree: all 10 steps green, 2048 test
 files / 27254 tests passed (89 skipped) plus the 11-file browser
 suite at 96 tests, vitest workers 8.
 
+## Phase 23 build record (2026-08-03)
+
+Built in a fresh Fable xhigh session per the phase header, off the
+entry sync above. Seven commits from the sync record to the build
+tip 3f1e058325: the classifier leaf (12d4511262), the four-surface
+wiring with i18n (4d62bb7b6a), the domain-review fix round
+(82fac570ca), the screenshot pairs and their change-aware shot target
+(985828bc4d), the qa-gate and re-review closure (d73961abe8), and the
+mutation-audit closure (3f1e058325).
+
+What shipped, against the settled scope. (1) The pure sim leaf
+src/sim/quests/quest_marker_kind.ts: QuestMarkerKind over the
+resolved QuestState, questsDone, the NPC role, and the optional
+cadence-blocked set, plus the per-template fold (npcQuestMarkerKind),
+the generic strongerQuestMarker (typed so a narrowed fold stays
+narrowed with no assertion), and the exported fold rank the map's
+tooltip ordering sorts by, so the fold order exists exactly once. Q30
+as settled: blue only after quest.repeatable AND questsDone.has(id);
+the first offer keeps its honest gold. Q31 as settled: 'cooldown'
+from the cadence-blocked set alone, giver-side only, degrading to
+today's no-marker when an older payload omits the mirror. (2) All
+four surfaces consume the leaf and their four private giver/turn-in
+predicate copies are deleted: the nameplate (np-marker repeat and
+cooldown classes; the classifier snapshot resolves once per full pass
+and only for quest-bearing plates), the minimap (the npc variant
+field plus the npcQuestRepeat token; the cooldown variant dims the
+repeat raster at blit time, so the sprite cache stays at two colors
+by three glyphs), the world map (questGiverNpcMarkers widened to take
+questsDone and the blocked set; MapQuestMarkerKind narrows the model
+so the painter switch is exhaustive; the tooltip tags ride the pure
+bare-named quest_marker_tags core), and the gossip list (the
+quest-repeat row class plus the repeatable aria). (3) Colour: the
+rare-item blue derived from QUALITY_COLOR.rare, carried by two new
+tokens (--color-map-npc-quest-repeat, --color-minimap-npc-quest-
+repeat) and the hud.css marker rules, with
+tests/quest_marker_styles.test.ts pinning the blue (halo included)
+and the 0.55 dim in agreement everywhere they are stated, CSS and
+painter reads comment-stripped alike. (4) i18n: three keys
+(questUi.dialog.repeatableQuestAria, questUi.log.repeatableStatus,
+questUi.log.cooldownStatus), English in the catalog plus all five
+non-Latin M16 fills in the same change.
+
+Review round: the four doc-named reviewers dispatched fresh via the
+Agent tool, then a fresh fix-round re-reviewer with a consumer-sweep
+helper and a 22-mutant battery, and the qa-checklist gate with its
+adversarial pass. Zero blocking findings on committed code at any
+point. Applied beyond the scope items: the map's second fold-order
+table replaced by the one exported rank; the minimap now filters the
+in-progress kind per quest exactly as the map does, closing the
+round's best catch (an active turn-in swallowed the cooldown mark on
+every profession master; the two pure cores are pinned agreeing over
+one state in tests/quest_marker_surface_agreement.test.ts, and after
+the re-review showed a cast could silently reintroduce the swallow,
+the generic fold now makes removing the filter a compile error); the
+tooltip tag table extracted to the registered bare-named pure core
+and tested to the exact English of the new keys plus a comment-
+stripped wiring pin holding hud.ts to it; the text-sprite worst case
+re-derived at 371 for the third glyph raster with the stale frozen
+sum dropped from its header; both painter token allowlists extended;
+and the mutation survivors closed (CSS pins comment-stripped, both
+cross-quest fold arms driven with the ready quest first AND last so a
+last-value-wins fold reddens, the literal RANK mirror marked as the
+deliberate non-derived ordering pin).
+
+Judged, no change, with grounds (do not re-raise): the gossip dialog
+stays silent about a cooldown order (the dimmed mark is an
+overhead/map statement; a dead gossip row for an unofferable quest is
+not the dialog's shape); the cooldown mark shows even while another
+gate also blocks the quest (the window claim stays true and the set
+drops the id at lapse; documented in the leaf and pinned over
+q_prof_hobby_switch); the nameplate alone renders 'active', and at
+its shared rank the gray '?' beats the dimmed '!' (the more
+actionable signal; pinned with rationale); colour is the only channel
+on the three world surfaces while the gossip aria and tooltip tags
+carry text (recorded as a decision after the forced-colors and
+tritanopia note; the classic-fidelity anchor is the blue itself).
+
+Elevated follow-ups (packet doc, not issues): the offline Sim pays a
+fresh craftingIdentityFor allocation per nameplate full pass and per
+10Hz minimap build for one field of that view (measured 3.83us per
+access at a 79-recipe list, scaling with the recipe catalog); a
+narrow IWorld read of the blocked set would make it free on all four
+surfaces and is exactly the facet change this phase deliberately
+avoided, so it belongs to a later phase beside its parity-pin update.
+Phase 24 input: the guide never names the new visual vocabulary (the
+blue "!" for a finished repeatable, the dimmed mark inside the
+window); the buyingBody/gatherDeeds rewrite is its natural home. The
+map tooltip's cooldown tag stays deliberately vague ("Available again
+soon"): the mirror carries ids, not remaining ticks, and a countdown
+would need the wire change this phase is scoped away from. The
+architecture bare-named registry cannot catch a synchronized
+three-list delete (pre-existing; the positive purity direction works
+and caught the battery's impurity mutant).
+
+Acceptance: (a) both-worlds arms at the minimap and map cores plus
+the classifier's real-lifecycle arms; (b) negative arms on every
+surface suite; (c) pinned at the classifier and across two real
+quests in both fold orders on the nameplate and minimap; (d) the
+16x16 box, origin, baseline, font, and repeat token pinned in one
+raster assertion, the cooldown dim blit-time only with alpha
+restored; (e) exact-English aria and tag pins; (f) four pairs under
+docs/screenshots/quest-marker-repeat, verified honest by crop (gold
+before / blue after; nothing before / dimmed after); (g)
+world_api_parity and command_schema pass unedited; (h) npm run gate
+PASS on the quiescent tree at 3f1e058325: all 10 steps green, 2053
+test files / 27303 tests passed (89 skipped) plus the 11-file browser
+suite at 96 tests, vitest workers 8. NEXT = phase 23 QA (ultracode,
+new session), then phase 24.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
