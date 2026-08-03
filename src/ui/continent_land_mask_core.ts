@@ -20,8 +20,9 @@
 // deterministic so tests/continent_land_mask_core.test.ts drives it directly.
 
 /** How much bluer than red a pixel must be to count as open water. Deep and
- *  shallow sea both clear it by a wide margin; painted terrain (green canopy,
- *  brown rock, grey-white snow) never does. */
+ *  shallow sea both clear it by a wide margin, and green canopy or brown rock is
+ *  nowhere near it; the frostveil snowfields sit right ON the threshold, which is
+ *  why the green margin below is the one actually holding them. */
 export const OCEAN_BLUE_OVER_RED = 25;
 /** The same test against green, which separates sea from the plate's teal-tinted
  *  shallows without swallowing the snowfields (near-neutral, blue barely ahead). */
