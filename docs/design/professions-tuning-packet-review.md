@@ -6237,6 +6237,22 @@ stopped first.
 NEXT: the packet merge decision. The locale fill stays maintainer-
 deferred, and MUST take the hand-carried re-fill list above with it.
 
+## Merge-decision entry sync (2026-08-03, zero drift)
+
+The sync preamble, run at the merge-decision session entry. git fetch
+at entry measured ZERO drift: origin/release/v0.34.0 still sits at
+5f22a51a00, the same tip the phase 23 entry sync already merged, and
+it is an ancestor of the branch tip 20452f9a1a (the phase 24 build
+record commit; the branch is 482 commits ahead and none behind).
+There is no merge commit and nothing for the release-merge-audit
+skill to run over. Rather than inheriting the phase 24 gate, the gate
+was re-run at this exact tip in a quiet load window: npm run gate
+PASS, all 10 steps green, 2053 test files / 27316 tests passed (89
+skipped) plus the 11-file browser suite at 96 tests, vitest workers
+8, exit code 0 read from the run's own captured line, on the
+quiescent committed tree. The merge-decision record follows at the
+end of this session's work.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
