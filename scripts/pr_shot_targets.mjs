@@ -823,9 +823,16 @@ export const TARGETS = [
       await page.evaluate(() => window.__game?.hud?.toggleMap?.());
       await wait(600);
       // Reach the overview the way a player now does: one zoom-out click at the
-      // zone map's full extent leaves the zone level entirely.
+      // zone map's full extent leaves the zone level entirely. The level toggle is
+      // the fallback, so this recipe also brings the overview up on a base build
+      // that predates the zoom-out escape (the before half of a comparison).
       await page.evaluate(() => document.querySelector('#map-zoom-out')?.click());
       await wait(600);
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (hud && hud.mapLevel !== 'continent') hud.toggleMapLevel?.();
+      });
+      await wait(500);
       if (!shot?.mobile) {
         // Hover a zone the player is NOT standing in, through the real pointer
         // path (the painter reads Hud's hovered zone id, nothing synthetic).

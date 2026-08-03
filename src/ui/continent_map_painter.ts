@@ -56,6 +56,9 @@ const WASH_FEATHER_MIN_PX = 6;
 // it carries never reaches a pixel.
 const MASK_STOP_OPAQUE = 'white';
 const MASK_STOP_CLEAR = 'transparent';
+// Cached finished washes. Above the two one frame can ask for (the current zone
+// and the hovered one), so moving the cursor between zones cannot evict either.
+const WASH_CACHE_LIMIT = 3;
 // "You are here" marker: a filled dot inside a steady ring (no animation).
 const HERE_DOT_RADIUS = 3.5;
 const HERE_RING_RADIUS = 6.5;
@@ -107,11 +110,14 @@ export class ContinentMapPainter {
   // never a rebuild per redraw).
   private mask: HTMLCanvasElement | null = null;
   private maskBuilt = false;
-  // Scratch surface the wash is composited on before it is blitted over the art.
-  // Kept at the map canvas size and reused; resizing clears it, which is exactly
-  // what a fresh composite wants anyway.
-  private scratch: HTMLCanvasElement | null = null;
-  private scratchCtx: CanvasRenderingContext2D | null = null;
+  // Finished washes, cached per zone + token + geometry and blitted on later
+  // redraws (the offscreen-background-cache technique in src/ui/CLAUDE.md): the
+  // composite is several full-surface passes, and the overview redraws on the
+  // mediumHud band while it is open, so recompositing an unchanged wash four
+  // times a second is the cost this avoids. Least-recently-used eviction past
+  // WASH_CACHE_LIMIT, which is above the two a single frame can ask for (the
+  // current zone and the hovered one) so neither evicts the other.
+  private readonly washes = new Map<string, HTMLCanvasElement>();
 
   /** classColor resolves a party member's class to its display color (issue
    *  2652), the same resolver Hud threads into MinimapPainter / DelveMapPainter
@@ -143,20 +149,23 @@ export class ContinentMapPainter {
     return this.mask;
   }
 
-  /** The reusable composite surface, sized to the square map canvas. */
-  private ensureScratch(
-    S: number,
-  ): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } | null {
-    if (!this.scratch) {
-      this.scratch = document.createElement('canvas');
-      this.scratchCtx = null;
+  /** Take the cached wash for this key, refreshing its recency, or null. */
+  private cachedWash(key: string): HTMLCanvasElement | null {
+    const hit = this.washes.get(key);
+    if (!hit) return null;
+    this.washes.delete(key); // re-insert so the live pair stays the most recent
+    this.washes.set(key, hit);
+    return hit;
+  }
+
+  /** Store a freshly composited wash, evicting the least recently used past the cap. */
+  private storeWash(key: string, canvas: HTMLCanvasElement): void {
+    this.washes.set(key, canvas);
+    while (this.washes.size > WASH_CACHE_LIMIT) {
+      const oldest = this.washes.keys().next();
+      if (oldest.done) break;
+      this.washes.delete(oldest.value);
     }
-    if (this.scratch.width !== S || this.scratch.height !== S) {
-      this.scratch.width = S;
-      this.scratch.height = S;
-    }
-    if (!this.scratchCtx) this.scratchCtx = this.scratch.getContext('2d');
-    return this.scratchCtx ? { canvas: this.scratch, ctx: this.scratchCtx } : null;
   }
 
   private resolveColors(): ContinentColors {
@@ -214,8 +223,8 @@ export class ContinentMapPainter {
     // alone rather than stacking the two.
     const hovered = model.regions.find((r) => r.isHovered);
     const current = model.regions.find((r) => r.isCurrent && !r.isHovered);
-    if (current) this.wash(ctx, model.image, current.rect, S, colors.regionCurrentFill);
-    if (hovered) this.wash(ctx, model.image, hovered.rect, S, colors.regionHoverFill);
+    if (current) this.wash(ctx, model.image, current, S, colors.regionCurrentFill);
+    if (hovered) this.wash(ctx, model.image, hovered, S, colors.regionHoverFill);
 
     // Zone name labels: outlined for legibility over the art, hovered one lifted
     // to the top with the larger font. Loop-invariant text state is set per label
@@ -290,9 +299,10 @@ export class ContinentMapPainter {
 
   /**
    * Wash one zone in `fill`, masked to the painted land and faded out toward the
-   * zone's own bounds. Composited on the scratch surface (the mask and the fade
-   * have to intersect before anything lands on the map), then blitted over the
-   * art in one draw.
+   * zone's own bounds, then blit it over the art in a single draw. The composite
+   * (mask in, tint through it, two feather ramps) happens once per zone + token +
+   * geometry and is cached; a redraw with the same hover state blits and nothing
+   * more, which is what keeps the mediumHud cadence cheap.
    *
    * Falls back to a flat rectangle fill when there is no mask (no plate, no 2D
    * context, or a cross-origin plate that tainted the mask canvas), so the
@@ -301,21 +311,35 @@ export class ContinentMapPainter {
   private wash(
     ctx: CanvasRenderingContext2D,
     image: ContinentRect,
-    rect: ContinentRect,
+    region: ContinentZoneRegion,
     S: number,
     fill: string,
   ): void {
     const mask = this.ensureMask();
-    const scratch = mask ? this.ensureScratch(S) : null;
-    if (!mask || !scratch) {
+    const rect = region.rect;
+    if (!mask) {
       ctx.fillStyle = fill;
       ctx.fillRect(rect.mx, rect.my, rect.w, rect.h);
       return;
     }
-    const sctx = scratch.ctx;
-    sctx.clearRect(0, 0, S, S);
+    // Geometry is in the key as well as the zone: the same zone lands on a
+    // different rect when the canvas or the plate's fitted box changes.
+    const key = `${region.zoneId}|${fill}|${S}|${image.mx},${image.my},${image.w},${image.h}`;
+    const cached = this.cachedWash(key);
+    if (cached) {
+      ctx.drawImage(cached, 0, 0);
+      return;
+    }
+    const surface = document.createElement('canvas');
+    surface.width = S;
+    surface.height = S;
+    const sctx = surface.getContext('2d');
+    if (!sctx) {
+      ctx.fillStyle = fill;
+      ctx.fillRect(rect.mx, rect.my, rect.w, rect.h);
+      return;
+    }
     // The land mask, positioned exactly like the plate it was built from.
-    sctx.globalCompositeOperation = 'source-over';
     sctx.imageSmoothingEnabled = true;
     sctx.drawImage(mask, image.mx, image.my, image.w, image.h);
     // Tint it: source-in keeps the mask's alpha and takes the token's color and
@@ -332,8 +356,8 @@ export class ContinentMapPainter {
     sctx.fillRect(0, 0, S, S);
     sctx.fillStyle = this.featherRamp(sctx, rect.my, rect.h, feather, true);
     sctx.fillRect(0, 0, S, S);
-    sctx.globalCompositeOperation = 'source-over';
-    ctx.drawImage(scratch.canvas, 0, 0);
+    this.storeWash(key, surface);
+    ctx.drawImage(surface, 0, 0);
   }
 
   /** One axis of the feathered-rectangle mask: clear at the zone's edge, opaque a

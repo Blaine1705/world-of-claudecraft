@@ -433,7 +433,6 @@ describe('continent_map_painter: land-masked zone wash', () => {
     // The composite: mask in, tint through it, then the two feather ramps that
     // confine it to this zone and soften the border it shares with the next.
     expect(scratch.ops).toEqual([
-      { kind: 'clearRect' },
       { kind: 'drawImage', detail: 'surface#0' },
       { kind: 'fillRect', detail: 'source-in|paint:--color-map-region-hover-fill' },
       { kind: 'fillRect', detail: 'destination-in|gradient' },
@@ -459,14 +458,49 @@ describe('continent_map_painter: land-masked zone wash', () => {
       expect(ramp.stops[2][0]).toBe(1 - ramp.stops[1][0]);
     }
 
-    // A second redraw reuses both surfaces: the mask is built once per session and
-    // the scratch is not re-minted per frame.
+    // A second redraw with the same hover state COMPOSITES NOTHING: the mask is
+    // built once per session and the finished wash is cached and re-blitted, which
+    // is what keeps the mediumHud cadence cheap.
+    const opsAfterFirst = scratch.ops.length;
     painterUnderTest.paintContinent(ctx, continentWorld(), {
       canvasSize: 560,
       hoveredZoneId: 'eastbrook_vale',
     });
     expect(surfaces).toHaveLength(2);
+    expect(scratch.ops).toHaveLength(opsAfterFirst);
     expect(mask.ops.filter((o) => o.kind === 'putImageData')).toHaveLength(1);
+    expect(blits).toEqual(['plate', 'surface#1', 'plate', 'surface#1']);
+
+    // Hovering a DIFFERENT zone composites two more washes: that zone's hover, and
+    // the quiet one on the zone the player is standing in (which the hover-on-self
+    // frames above folded into a single wash). Both are then cached, so coming
+    // back to the first hover composites nothing.
+    painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'frostveil',
+    });
+    expect(surfaces).toHaveLength(4);
+    painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'eastbrook_vale',
+    });
+    expect(surfaces).toHaveLength(4);
+
+    // The cache is CAPPED, so a sweep across the map cannot grow it without
+    // bound: after enough distinct hovers the oldest wash is evicted and has to
+    // be composited again.
+    const before = surfaces.length;
+    for (const zoneId of ['wraithwood', 'amberfall', 'drakelands', 'palmreach']) {
+      painterUnderTest.paintContinent(ctx, continentWorld(), {
+        canvasSize: 560,
+        hoveredZoneId: zoneId,
+      });
+    }
+    painterUnderTest.paintContinent(ctx, continentWorld(), {
+      canvasSize: 560,
+      hoveredZoneId: 'eastbrook_vale',
+    });
+    expect(surfaces.length).toBeGreaterThan(before + 4);
   });
 });
 
