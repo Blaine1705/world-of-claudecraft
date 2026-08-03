@@ -326,12 +326,6 @@ export function paintTerrainRows(
         b = 48;
 
       if (h < WATER_LEVEL) {
-        // -- water: split by the SIM's death-zone predicate (inHollowOpenSea,
-        // the exact test swim-fatigue uses). The lethal open sea reads as a
-        // dark deep-ocean body (matching the out-of-bounds fill, so plate
-        // edges leave no seam); the safe water near shore, in lakes, and in the
-        // moats/channels reads a light blue easing only to a mid blue. Each is
-        // depth-graded with a smoothstep ease so neither is a flat slab.
         // -- water: ONE ocean ramp from shallow to deep, walked by two things:
         // the terrain's own depth, and how near the point is to the sim's
         // swim-fatigue limit (inHollowOpenSea), past which the ramp simply
