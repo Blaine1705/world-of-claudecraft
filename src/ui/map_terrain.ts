@@ -100,14 +100,21 @@ export function hashPaintedRows(region: MapRegion, seed: number, W: number, rows
   return (h >>> 0).toString(16).padStart(8, '0');
 }
 
-// The open-sea limit (the swim-fatigue boundary). APPROACH is how far the safe
-// water eases toward the deep tone as it nears the line. That easing is what
-// removes the pasted-box look, and it is ALSO what makes the drawn line
-// load-bearing: by the boundary both sides are nearly the same dark, so the
-// limit has to carry the read on its own. It is therefore drawn PALE (a depth
-// rule, the language a chart already uses) rather than inked dark like the
-// coastline, which would vanish into the deep water it sits in.
-const OPEN_SEA_APPROACH = 0.72;
+// The sea's single shallow-to-deep ramp. One body of water instead of the two
+// palettes that used to meet at the swim-fatigue predicate's straight rect
+// edge; the limit is drawn instead (below), which is what lets the colours be
+// continuous. The deep end matches --color-map-ocean, the flat fill the painter
+// puts beyond a plate, so a plate edge still leaves no seam.
+const SEA_SHALLOW_R = 100;
+const SEA_SHALLOW_G = 164;
+const SEA_SHALLOW_B = 200;
+const SEA_DEEP_R = 26;
+const SEA_DEEP_G = 58;
+const SEA_DEEP_B = 100;
+// Where the lethal open sea starts on that ramp: deep enough to read as open
+// ocean at a glance, close enough that the two sides are one sea. Safe water
+// approaching the limit climbs to meet it.
+const OPEN_SEA_RAMP_FLOOR = 0.62;
 const OPEN_SEA_EDGE_MIX = 0.5;
 const OPEN_SEA_EDGE_R = 150;
 const OPEN_SEA_EDGE_G = 196;
@@ -312,35 +319,31 @@ export function paintTerrainRows(
         // edges leave no seam); the safe water near shore, in lakes, and in the
         // moats/channels reads a light blue easing only to a mid blue. Each is
         // depth-graded with a smoothstep ease so neither is a flat slab.
+        // -- water: ONE ocean ramp from shallow to deep, walked by two things:
+        // the terrain's own depth, and how near the point is to the sim's
+        // swim-fatigue limit (inHollowOpenSea), past which the ramp simply
+        // starts deep. The two used to be separate palettes a stark distance
+        // apart, meeting at that predicate's straight rect edge, which is what
+        // made the map read as a lighter box pasted on a flat navy sea. Colour
+        // no longer has to carry the boundary, because the limit is DRAWN
+        // below, so the sea can be one continuous body: nearer the limit means
+        // deeper water, which is what a chart says there anyway.
         const t = Math.min(1, (WATER_LEVEL - h) / 8);
         const depth = t * t * (3 - 2 * t);
-        const deepR = 22 + (14 - 22) * depth;
-        const deepG = 48 + (36 - 48) * depth;
-        const deepB = 88 + (76 - 88) * depth;
         let onEdge = false;
+        let ramp: number;
         if (inHollowOpenSea(x, z)) {
-          r = deepR;
-          g = deepG;
-          b = deepB;
+          ramp = OPEN_SEA_RAMP_FLOOR + (1 - OPEN_SEA_RAMP_FLOOR) * depth;
         } else {
-          r = 100 + (46 - 100) * depth;
-          g = 164 + (98 - 164) * depth;
-          b = 200 + (150 - 200) * depth;
-          // The predicate's boundary is a straight rect edge, so a bare colour
-          // step there reads as a lighter box pasted over the sea. Ease the safe
-          // water into the deep tone as it approaches instead (the water is
-          // getting deeper, which is what a map should say), and ink the limit
-          // itself below so nothing an actionable read depends on is softened:
-          // the boundary goes from implied by a colour change to drawn.
           const near = openSeaNearness(x, z, inHollowOpenSea);
-          if (near > 0) {
-            const ease = near * near * (3 - 2 * near) * OPEN_SEA_APPROACH;
-            r += (deepR - r) * ease;
-            g += (deepG - g) * ease;
-            b += (deepB - b) * ease;
+          const approach = near > 0 ? near * near * (3 - 2 * near) : 0;
+          ramp = Math.max(depth * (1 - OPEN_SEA_RAMP_FLOOR), approach * OPEN_SEA_RAMP_FLOOR);
+          if (near > 0)
             onEdge = onOpenSeaEdge(x, z, Math.min(spanX / W, spanZ / H), inHollowOpenSea);
-          }
         }
+        r = SEA_SHALLOW_R + (SEA_DEEP_R - SEA_SHALLOW_R) * ramp;
+        g = SEA_SHALLOW_G + (SEA_DEEP_G - SEA_SHALLOW_G) * ramp;
+        b = SEA_SHALLOW_B + (SEA_DEEP_B - SEA_SHALLOW_B) * ramp;
         const chop = (hash2(Math.round(x * 0.6), Math.round(z * 0.6), seed + 811) - 0.5) * 3.5;
         r += chop;
         g += chop;

@@ -2,14 +2,18 @@
 // patch of safe water is to the lethal open sea, and whether it sits right on
 // the line.
 //
-// WHY IT EXISTS. The zone map colours water by the sim's own swim-fatigue
-// predicate (inHollowOpenSea): safe water light, the lethal open sea dark. The
-// predicate is a rectangle test (a fixed inset from the strip and row bounds),
-// so the two colours met at a hard straight step in the middle of open water,
-// which reads as a lighter box pasted over the sea rather than as anything the
-// world contains. The fix is not to hide the limit, which is information a
-// player acts on, but to STATE it: the safe water deepens as it approaches, and
-// the limit itself is drawn as a line.
+// WHY IT EXISTS. The zone map used to colour water with two palettes a stark
+// distance apart, split by the sim's swim-fatigue predicate (inHollowOpenSea):
+// safe water light, the lethal open sea near-navy. That predicate is a rectangle
+// test (a fixed inset from the strip and row bounds), so the two met at a hard
+// straight step in the middle of open water and the map read as a lighter box
+// pasted on a flat sea rather than as anything the world contains.
+//
+// The sea is now ONE shallow-to-deep ramp, and this module is what makes that
+// possible without losing the limit: the boundary is no longer implied by a
+// colour difference, it is STATED, by water that deepens as it approaches and by
+// the limit itself drawn as a line. Colour got to become continuous precisely
+// because the information stopped depending on it.
 //
 // WHY THE PREDICATE IS SAMPLED RATHER THAN RE-DERIVED. The distance to that
 // boundary is not something the predicate reports, and re-deriving it in the

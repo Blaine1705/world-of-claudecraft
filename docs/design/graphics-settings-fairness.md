@@ -96,12 +96,13 @@ cache), `119b47fa` (FCT drop-kind uniformity test), `4915b6b7` (docs).
 Not a graphics-preset shed, but the same principle applied to a MAP read, recorded here because
 the change deliberately softened a colour contrast that carried actionable information.
 
-The zone map colours water by the sim's own swim-fatigue predicate (`inHollowOpenSea`): safe
-water light, the lethal open sea dark. That predicate is a rectangle test, so the two colours
-met at a hard straight step through open water and the map read as a lighter box pasted over
-the sea. The fix eases the safe water toward the deep tone as it approaches, WHICH REMOVES THAT
-CONTRAST, and therefore also draws the limit itself as a pale rule
-(`src/ui/map_open_sea_edge_core.ts`, consumed by `map_terrain.ts`).
+The zone map used to colour water with two palettes a stark distance apart, split by the sim's
+swim-fatigue predicate (`inHollowOpenSea`): safe water light, the lethal open sea near-navy.
+That predicate is a rectangle test, so the two met at a hard straight step through open water
+and the map read as a lighter box pasted on a flat sea. The sea is now one shallow-to-deep ramp
+that the limit's nearness walks, WHICH REMOVES THE COLOUR CONTRAST ENTIRELY, and the limit is
+therefore drawn as a pale rule instead (`src/ui/map_open_sea_edge_core.ts`, consumed by
+`map_terrain.ts`).
 
 The trade is deliberate and is what keeps it fair: the boundary moves from IMPLIED by a colour
 change to STATED by a drawn line, at the same pixel, with no delay and no tier-dependence (the
