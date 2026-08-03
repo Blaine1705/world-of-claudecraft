@@ -360,17 +360,15 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned, two independent causes merged here: the
-      // local-gate-perf migration moved the lockfile leaf to pnpm-lock.yaml
-      // (a hashed input to every GLB source fingerprint, so the town,
-      // mailbox and noticeboard leaves all minted fresh), and the far-field
-      // work moved the renderer-integration leaf (renderer.ts hands its
-      // WebGLRenderer to buildFoliage for the impostor atlas bake, grows
-      // the fog-free vista split, and eases fog to the horizonHazePlan
-      // band with the ambient-life wiring removed). Not one Eastbrook
-      // pipeline input or geometry value changed, and no capture was
-      // retaken (the per-asset seal suites stay green untouched).
-      fingerprint: '45c7c5d8fea0d2e4111fa81128c04af5314f542a37b5939900198834a406ab51',
+      // Deliberately re-pinned at the release/v0.34.0 merge: both parents had
+      // legitimately re-pinned this composite (the env-combined branch for the
+      // pnpm lockfile leaf plus the far-field renderer-integration work, the
+      // release branch for the #2571 shapeshift async-compile gate in
+      // renderer.ts), so the merged renderer-integration leaf hashes fresh and
+      // the composite takes a third value. Not one Eastbrook pipeline input or
+      // geometry value changed, and no capture was retaken (the per-asset seal
+      // suites stay green untouched).
+      fingerprint: '460a84b6f6f4911c643b028b225b16e8f5c4abe97f53c07c621b18cd498ac902',
       components: {
         captureContract: {
           id: 'polish-v2',
