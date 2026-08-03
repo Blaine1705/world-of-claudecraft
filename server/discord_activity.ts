@@ -63,7 +63,9 @@ const DEDUPE_TTL_MS = 30_000;
 // opt-out db read inside the window it was supposed to own. 4096 keys is
 // about 8x that rate before eviction starts, and the memory (a short
 // string and a number per entry) is negligible.
-const MAX_RECENT_KEYS = 4096;
+// Exported for the same reason as ACTIVITY_MAX_QUEUE above: the sweep test
+// sizes its fixture from the REAL trigger, not a mirror that drifts.
+export const MAX_RECENT_KEYS = 4096;
 // After a rejected gated read the claimant re-opens the key only this far
 // into the future: a single blip costs one card (a retry lands 2s later),
 // while a sustained outage still costs at most one read per backoff window

@@ -17,6 +17,7 @@ import {
   activityQueueDepth,
   drainActivity,
   enqueueActivity,
+  MAX_RECENT_KEYS,
   type QueuedActivity,
   requeueActivity,
 } from '../../server/discord_activity';
@@ -179,7 +180,6 @@ describe('server activity queue: dedupe map sweep', () => {
   // so every suppress-probe runs before the one admit-probe. It leaves 4096 keys in the
   // module-global map, which is why it is the last dedupe block in the file.
   it('prunes only expired keys and leaves fresh ones (and the map) intact', () => {
-    const MAX_RECENT_KEYS = 4096; // mirrors the module-private sweep trigger
     const OLD = 1_000_000;
     const FRESH = OLD + DEDUPE_TTL_MS; // ages the OLD stamp to exactly the TTL at sweep time
     const expiredKey = 'sweep-expired';
