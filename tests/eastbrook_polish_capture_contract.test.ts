@@ -363,14 +363,15 @@ describe('Eastbrook polish capture contract', () => {
       // Deliberately re-pinned. Four independent causes stacked here before
       // (the 0.33.0 version sync moving every GLB source-fingerprint leaf,
       // #2729; the graphics overhaul; the ability-VFX integration; the
-      // compile-gate renderer edits), and the far-field work adds two more:
+      // compile-gate renderer edits), and the far-field work adds more:
       // renderer.ts hands its WebGLRenderer to buildFoliage for the impostor
       // atlas bake, then grows the fog-free vista split (far terrain layer,
-      // detail horizon, fog parking) and the ambient-life wiring, each
-      // moving the renderer-integration leaf. No Eastbrook pipeline input or
-      // geometry value changed, and no capture was retaken (the five
-      // per-asset seal suites stay green untouched).
-      fingerprint: '1a2ec8ce5ff614b1c0e0e2c87cd0a38ec71dea205889128a99b2e0eb5dd4b098',
+      // detail horizon, fog parking), and finally the horizon-haze pass
+      // (fog eased to the horizonHazePlan band on vista tiers, ambient-life
+      // wiring removed), each moving the renderer-integration leaf. No
+      // Eastbrook pipeline input or geometry value changed, and no capture
+      // was retaken (the five per-asset seal suites stay green untouched).
+      fingerprint: 'b4ec392b56c2681e2e2cedf0b447d1a8c8fd29216c3a7685cc9504a7eee02f76',
       components: {
         captureContract: {
           id: 'polish-v2',
