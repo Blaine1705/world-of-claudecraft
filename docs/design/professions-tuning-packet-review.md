@@ -5896,6 +5896,171 @@ release-merge-audit skill to run over, and the build record's final
 gate (all 10 steps green at 3f1e058325 content on the quiescent
 tree) stands as the entry state.
 
+## Phase 23 QA record (2026-08-03)
+
+The QA round, run in a fresh ultracode session per the phase header,
+off the zero-drift entry sync above. Acceptance (a) through (h)
+re-verified independently against the tree, not the build record's
+word: the classifier, all four surface files, both stylesheets'
+marker rules, and the three i18n keys with all five non-Latin fills
+by direct read; (g) by running world_api_parity and command_schema
+green with zero edits; (f) by re-judging the four committed
+screenshot pairs by eye (gold before, blue after on the nameplate,
+map, and mobile pairs; nothing before, dimmed after on the cooldown
+pair; no drift, no re-shoot); and the rendered arms by a 28-probe
+browser pass against the live client (the dev server verified
+serving THIS worktree by listener cwd and module fetch):
+before/after completion on all four surfaces including canvas pixel
+scans of the minimap and map, the exact gossip aria, the map
+tooltip's "(Repeatable)" and "(Available again soon)" tags on
+hover, the cooldown nameplate at 0.55, a de_DE arm (German quest
+title, English fallback for the three pending keys, no raw-key
+leak), and a mobile-landscape arm. All 28 probes passed before the
+fix round and again after it.
+
+Review round: the four doc-named reviewers plus an adversarial
+what-is-missing pass with enumeration and fifth-surface helpers,
+all dispatched fresh with phase-unique names. Zero blocking
+findings anywhere; the adversarial claim audit re-verified seven
+build-record claims against the tree (the eleven-repeatable count,
+the zero-facet-change claim, the single fold table, the
+older-payload degradation, and the lapse re-emit among them) and
+swept every candidate fifth surface clean. Applied, with the fix
+round itself re-reviewed and the second round delta-verified
+CONFIRMED: the map tooltip's tag texts move off the glyph anchor
+(4.07:1 over the panel, under the 4.5:1 text floor; the old 0.55
+dim read about 2:1) onto a theme-repaired token
+(--color-quest-tag-text, re-emitted per preset through
+ensureReadable, the --color-gold precedent) after the first fix's
+raw lifted hex was itself caught regressing the light Parchment
+preset to 2.19:1; a per-preset AA arm now holds every preset over
+both the panel and its gradient edge, and both grouped arms are
+#tooltip-scoped so a reuse outside the tooltip can never silently
+inherit the text lift. The nameplate marks gain forced-colors
+underline cues (solid for repeat, dotted for cooldown, the
+#tf-name.hostile precedent), pinned by balanced-brace extraction
+of the media block plus an only-there negative. The nameplate
+snapshot heals a REPLACED questsDone Set by identity re-check (the
+online mirror replaces it per qdone snapshot; the offline Sim
+aliases one live Set), with throttled-pass arms pinning both the
+heal and the bounded cprof-only lag. An open gossip dialog now
+refreshes when a cadence window lapses (a pure tick-threshold
+crossing with no quest event, while the new dimmed marker's own
+tooltip walks the player to exactly that NPC): the offerable-row
+signature joins the intro-hint watch in refreshIfChanged, with a
+DOM-identity arm proving an unchanged signature never rebuilds the
+focus-trapped dialog. The map listing sort gains a decisive
+not-already-sorted arm (both prior arms classified in content
+order, so deleting the sort stayed green) plus a within-kind
+stability arm, and sorts its fresh refs array in place. The
+classifier refuses a non-repeatable id in the cadence set (defense
+in depth; only armCadence writes the store, under the
+repeatable-only repeatCadenceTicks). The quest-marker-repeat shot
+target gains its routing pin. The nameplate suite gains the
+non-repeatable-in-questsDone negative its title claimed. Both
+painter token tables are exported and pinned complete against a
+comment-stripped tokens.css (ten previously unpinned entries; a
+missing declaration freezes as '' for the session). Both painters
+restore the PRIOR alpha around the cooldown blit, with a non-1
+caller-alpha arm each making the contract load-bearing. The
+minimap gains a sprite-identity arm (one blue raster serves repeat
+and cooldown in the same frame, object identity rather than ink
+equality). The gossip drops its dead cadence-set read (a cooldown
+row is filtered with or without it). The map painter suite's glyph
+assertions tighten to exact counts, and the two both-worlds loop
+comments now say what the arms actually prove (the classifier over
+each world's data shape; input parity rests on the online
+cadence/attunement suites). Finally, the full gate itself caught
+the last two findings, exactly the arbiter lesson restated: the
+new lastGossipRowSig memo re-opened the language-fanout
+classification, and the reshaped refreshIfChanged guard no longer
+matched the update-drive row's pinned proof; both registry rows
+were updated with the language question answered on the new field
+(quest ids and marker kinds, text-independent by design; the
+dialog stays in the relocalize fan-out), and the re-gate ran green
+in a quiet load window after a first attempt launched into a
+concurrent load storm was stood down rather than trusted.
+
+Judged, no change, with grounds. The ruling the nameplate snapshot
+comment cites: the quest-marker inputs riding the tier-scaled
+nameplate full-pass interval (1/24s full tiers, 1/15s low) is
+INSIDE the sanctioned envelope and is not a fairness gate: the
+interval is the pre-existing plate staleness floor that throttles
+every plate field identically, the classifier reads no governor
+state, and no preset sheds the marker itself. Also judged: the
+online login frame can show repeat where cooldown belongs until
+the first cprof snapshot lands (inherited from the cadence phase;
+one frame); an in-flight turn-in shows the gray '?' online for one
+round trip (pre-existing, identical to the old inline code);
+Sim.talkToNpc keeps its own giver/turn-in predicate (an action
+rule deciding what a talk press does, not a drawn marker, so the
+four-surfaces claim stays accurate as written; elevated below
+instead); the optional chains on craftingIdentity stay (required
+by IWorld, but the chains cost nothing and tolerate world doubles
+that omit the member); the map painter's per-redraw style objects
+stay (the sibling gold style predates the phase and map redraws
+are cold); the exact eleven-repeatable canary stays (a deliberate
+prompt on new repeatable content); one shared token for the DOM
+blues stays declined (the contrast fix deliberately splits the
+text channel from the glyph channel; the agreement suite pins
+every stated site); a removed quest id riding questCadence and the
+cprof wire is inert (no phantom marker possible; the window lapses
+in thirty minutes); the fold masking the cooldown mark behind an
+available or repeat sibling at the four profession masters is the
+strongest-wins design and narrow in steady state (the amends
+return is only offerable when a return is owed); and the editor's
+3D viewport writes np-marker classes no editor stylesheet styles
+(pre-existing for every marker class, unreachable with a fresh
+Sim's empty history). Depth limits recorded: the surface-agreement
+suite pins one cross-surface state, the tooltip tag assembly is
+source-pinned rather than DOM-rendered, token VALUES beyond the
+pinned blues are declaration-checked only, and the per-preset arm
+covers the four presets, not custom panel overrides (safe by
+construction: the repair runs on the RESOLVED panel).
+
+Elevated follow-ups (packet doc, not issues, per the convention):
+Sim.talkToNpc (src/sim/sim.ts) restates the ready-over-available
+giver/turn-in shape the leaf now owns; a later phase should fold
+the interact action onto the leaf's role predicates or pin the two
+consistent. The '?' family stays color-only under forced-colors
+(gold ready vs gray active collapse to one CanvasText; the '!'
+family now carries underline cues, and the pair deserves the same
+deliberate treatment). Tooltip text is theme-blind beyond the tag:
+#tooltip .tt-title is white on cream (about 1.1:1) on Parchment
+(pre-existing and tooltip-wide; the tag token's ensureReadable
+shape is the template for the general fix). The user-settable HUD
+opacity knob fades the whole tooltip below any measured floor
+(pre-existing and global). Phase 24 input, extending the recorded
+guide-vocabulary follow-up: the in-game questUi.log.emptyHint copy
+("Seek out townsfolk marked with !") and the quest log window's
+status vocabulary are the in-game analogues of the guide gap, and
+the phase 23 keys are log-namespaced while only the map tooltip
+consumes them. Doc clarifications from the enumeration audit: the
+scope's "apothecary" work order is q_prof_workorder_apothecary at
+Alchemist Verane in zone 3 (the amends apothecary at Cook Marlow
+is counted inside the make-amends four), and the cooldown variant
+is structurally reachable only for the seven cadenced repeatables
+(the four amends returns never arm the store).
+
+Mutation battery, run on the committed tree with reviewers stood
+down and each mutant reverted clean: 14 of 14 KILLED (the fold
+rank order, the minimap active-filter, the np-marker CSS block
+commented out, the 16x16 raster box, the Q30 history condition,
+the cooldown repeatable-guard, the nameplate identity re-check,
+the snapshot reuse, the map sort deletion, the gossip row-sig
+watch, the theme repair bypass, the grouped tag rule, the
+forced-colors underline, and the literal-1 alpha restore).
+
+Verdict: PASS. Gate green at the QA content tip 909108deb8: all 10
+steps, 2053 test files / 27315 tests passed (89 skipped) plus the
+11-file browser suite at 96 tests, vitest workers 8. Acceptance
+(a) through (h) all hold on the re-verified tree; every finding
+applied or judged with the fix round itself re-reviewed and the
+second round delta-verified. NEXT = phase 24 build (the guide
+prose truth pass; any model, QA folds into the build session per
+the phase header), then the packet merge decision (locale fill
+stays maintainer-deferred).
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
