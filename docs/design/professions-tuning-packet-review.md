@@ -5563,6 +5563,127 @@ npm run gate PASS on the merged tree: all 10 steps green, 2020 test
 files / 26354 tests passed (73 skipped) plus the 11-file browser
 suite at 96 tests, vitest workers 8.
 
+## Phase 22 QA record (2026-08-03)
+
+The QA round, run in a fresh ultracode session per the phase header,
+off the entry sync above. Acceptance (a) through (g) re-verified
+independently against the tree, not the build record's word: the
+card and view source, both stylesheets' family rules, the i18n keys
+with all five non-Latin fills, the view-core negatives, and the four
+committed screenshot pairs by direct read; the rendered arms by a
+ten-scenario browser probe against the live client (de_DE and fr_FR
+at 1600x900 and 1366x768, attuned and unattuned, plus two mobile
+arms), all clean: zero horizontal overflow anywhere, computed fonts
+exactly the spec (13px names, 11px tabular-nums value at zero right
+gap, 10px bordered pills, 12px narrative), the 264px cap scrolling
+internally over 508px of rows with the recipe pane at 188px and
+180px, the collapse fitting uncapped at 289px with the caption once
+and chip-free rows, the capped list focusable and named, and the
+mobile zero-height-row regression absent. Seven mutation checks
+killed the load-bearing pins (the floor sweep on both the value and
+the px-only arm, the 264px literal, the collapsed opt-out, the 11px
+value, the anatomy loop, the selector ban, the mobile lift); the
+sweep aliveness minimums were skipped with a recorded justification
+(a structural guard whose mobile exact-2 threshold fired live during
+the build round).
+
+Review round: the three doc-named reviewers plus an adversarial
+what-is-missing pass with three deep-dive helpers, all dispatched
+fresh. No blocking findings anywhere. Applied, with the fix round
+re-reviewed: the capped skill list now carries its scroll offset AND
+keyboard focus across every window rebuild (a single craft repaints
+the window three times; the crafting window's reflow allowance moves
+to four scrollTop tokens, the bags/bank shape) with a two-render
+regression arm; the skill rows sort major, hobby, dormant knowledge,
+rest (stable within groups), because raw ring order put the two
+Material-pair majors below the 264px fold, the one fact an attuned
+card exists to headline (pinned in the view core and the DOM); every
+card paragraph joins the 12px floor (the return-cost, unattuned, and
+syncing narratives inherited the 16px document default); the syncing
+branch gains the main wrapper (its heading and text rendered side by
+side under the card's flex row); the focusable list joins the shared
+focus-visible ring; a language switch now rebuilds an open crafting
+window (the relocalize arm plus its fanout-registry row: every
+crafting repaint memo is text-independent, so an open window kept
+the previous locale indefinitely, an asymmetry against the
+professions window's existing arm); the identity shot framings drop
+the persisted crafting tab before opening (localStorage survives
+page.close() in the one shot browser, so an earlier variant's tab
+click decided what the identity shots opened on); the dungeon finder
+reconciliation gains its positive control listing; the shot-routing
+classifyDiff pins land; the tutorial key pin is a full t() literal
+with a rendered-DOM assertion; the return-cost pin is the exact
+sentence; the 264 pin splits reorder-safe; the mobile card cap pins
+its exact viewport formula; the grid ban covers both sheets; the
+sweep aliveness floor rises to 14; CRAFT_RING.length pins beside the
+cap literal so ring growth reddens at the cap; and the card gains a
+zero-reflow zero-driver cold-contract pin (its _card.ts name escapes
+the hud_perf_budget sweep) plus a structural sibling pin holding the
+card OUTSIDE the scrolling recipe pane. The four after screenshots
+were re-shot at the fixed tree.
+
+The fix round was itself reviewed fresh, and the review loop closed
+in two turns. The reviewer and the full gate independently caught
+the same self-inflicted regression: the first sort implementation
+mutated the model's skills array in place, and the professions
+window's craft row list maps that array positionally, so its rows
+reordered (the wheel itself lays out from CRAFT_RING and never reads
+the model). The sort moved to a copy-returning pure helper
+(orderSkillsForCard) with both contracts pinned: the card order and
+the model's untouched ring order. The reviewer's remaining findings
+all landed in a second round it then delta-verified CONFIRMED: the
+mobile scroller (the card itself, where hud.mobile.css lifts the
+list cap) carries its offset across the rebuild too (allowance six,
+exact); the sort rationale comments name the row list, not the
+wheel; the cold-contract pin mirrors the full sixteen-token reflow
+vocabulary including getUiScale; the inert localStorage clear in the
+shot staging is dropped (the explicit selectTab is the determinism
+mechanism, and boot reads the key first); the card paragraph floor
+moved to :where() so the classed tutorial rule stays authoritative;
+and the tutorial pin is the exact sentence. A process lesson for the
+record: the first fix-round commit went in before its gate, and the
+targeted-suite selection missed the two consumer suites the full
+gate then reddened; the gate, not the targeted runs, is the arbiter.
+
+Judged, no change, with grounds: the collapsed arm stays uncapped
+(the real-font collapsed list renders 289px, so a 264px cap would
+add today the needless scrollbar the settled rationale declines; the
+ring pin covers the growth story instead); the mobile non-collapsed
+list keeps its state-decided tabindex (a focusable named group that
+does not scroll is a harmless extra tab stop, and tabindex cannot be
+media-gated from CSS); the dead mine terms in the dungeon finder
+view stay (release-owned belt and braces); the unattuned recipe pane
+at 155px on 1366x768 stands (above the 120px floor, fewer recipes in
+that state, and the build record claimed only the attuned figure);
+CRAFT_RING stays a mutable export and the client mirror stays
+unvalidated (frozen-ring invariant; the card degrades visibly before
+either could matter); and the three-site row anatomy stays
+hand-written (the sites differ on icon, format, and tail).
+
+Elevated follow-ups (packet doc, not issues, per the convention):
+at uiScale 1.4 on 1366x768 the crafting window clips 123px of
+content past its clamp with no scroll affordance (measured rendered;
+a pre-existing cliff at the extreme that the taller card moved from
+about uiScale 1.24 to 1.08; the fix is window-level height-yield, a
+candidate later phase); the happy-dom suites make real outbound
+localhost:3000 requests through the character portrait module's
+module-scope asset warmup (the pragma migration's class, two more
+instances added by this round's flips; a shared DOM-setup fetch stub
+is the wholesale fix, release-owned); and the professions window's
+own role and cap pill namespace (hudChrome.professions.*) diverges
+from the card's correct crafting.identity.* wording in 18 of 22
+locales, including cap-as-headwear mistranslations (pt_BR, vi_VN,
+pl_PL, tr_TR), newly conspicuous now the two surfaces share one
+pill design: align the professions namespace onto the identity
+wording at the maintainer locale fill.
+
+Verdict: PASS. Gate green at the QA tip: all 10 steps, 2020 test
+files / 26361 tests passed (73 skipped) plus the 11-file browser
+suite at 96 tests; acceptance (a) through (g) all hold on the
+re-verified tree; every finding applied or judged with the fix round
+itself re-reviewed. NEXT = phase 23 build (the repeatable work-order
+blue marker; Fable xhigh, new session).
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
