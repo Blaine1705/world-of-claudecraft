@@ -327,6 +327,7 @@ export const IWORLD_MEMBERS = [
   { name: 'rechargeToolEffect', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
+  { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
   { name: 'riftEventMsRemaining', kind: 'method' }, // ms until the rift event stops admitting parties
   { name: 'dungeonDifficulty', kind: 'method' }, // read-returning
@@ -510,9 +511,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // and reactive aura timing's reactiveAbilityWindowRemaining (all
     // methods) for 281; the v0.34.0 sync removes the renderer-only
     // riftCollisionToken (data) with third-person camera collision,
-    // leaving 280.
-    expect(IWORLD_MEMBERS.length).toBe(280);
-    expect(DATA_MEMBERS.length).toBe(72);
+    // leaving 280; a later v0.34.0 sync re-adds riftCollisionToken (data)
+    // so client-side swept-landing and click-to-move pathing can treat
+    // rift walls as solid, leaving 281.
+    expect(IWORLD_MEMBERS.length).toBe(281);
+    expect(DATA_MEMBERS.length).toBe(73);
     expect(METHOD_MEMBERS.length).toBe(208);
   });
   it('has no duplicate member names', () => {
@@ -741,6 +744,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'revivePet',
       'ridingTrained',
       'riftBossDeathZones',
+      'riftCollisionToken',
       'riftEventMsRemaining',
       'riftFloor',
       'salvageItem',
@@ -869,6 +873,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'renown',
       'restedXp',
+      'riftCollisionToken',
       'riftFloor',
       'socialInfo',
       'stationPlacements',
@@ -1440,6 +1445,7 @@ const FACET_DUNGEONS = [
   'leaveDungeon',
   'raidLockouts',
   'riftFloor',
+  'riftCollisionToken',
   'riftBossDeathZones',
   'riftEventMsRemaining',
   'dungeonDifficulty',
@@ -1638,8 +1644,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(280);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(280);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(281);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(281);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

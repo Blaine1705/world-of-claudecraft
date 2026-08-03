@@ -4994,6 +4994,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': '添加聊天频道',
   'hud.core.chatChannels.addTitle': '添加频道',
   'hud.core.chatChannels.close': '关闭{channel}标签',
+  'hud.core.chatChannels.moveHint': '重新排列{channel}标签：拖动，或使用 Alt+左和 Alt+右',
   'hud.core.chatChannels.names.general': '综合',
   'hud.core.chatChannels.names.guild': '公会',
   'hud.core.chatChannels.names.lfg': '组队',

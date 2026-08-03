@@ -153,7 +153,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "es_ES": [
     "alert.itemIdRequired",
@@ -298,7 +299,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "fr_FR": [
     "alert.itemIdRequired",
@@ -443,7 +445,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "fr_CA": [
     "alert.itemIdRequired",
@@ -588,7 +591,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "en_CA": [],
   "it_IT": [
@@ -734,7 +738,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "de_DE": [
     "alert.itemIdRequired",
@@ -879,7 +884,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "zh_CN": [
     "alert.itemIdRequired",
@@ -1024,7 +1030,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "zh_TW": [
     "alert.itemIdRequired",
@@ -1169,7 +1176,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "ko_KR": [
     "alert.itemIdRequired",
@@ -1314,7 +1322,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "ja_JP": [
     "alert.itemIdRequired",
@@ -1459,7 +1468,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "pt_BR": [
     "alert.itemIdRequired",
@@ -1604,7 +1614,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "ru_RU": [
     "alert.itemIdRequired",
@@ -1749,7 +1760,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "cs_CZ": [
     "alert.itemIdRequired",
@@ -1894,7 +1906,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "nl_NL": [
     "alert.itemIdRequired",
@@ -2039,7 +2052,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "pl_PL": [
     "alert.itemIdRequired",
@@ -2184,7 +2198,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "id_ID": [
     "alert.itemIdRequired",
@@ -2329,7 +2344,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "tr_TR": [
     "alert.itemIdRequired",
@@ -2474,7 +2490,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "sv_SE": [
     "alert.itemIdRequired",
@@ -2619,7 +2636,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "vi_VN": [
     "alert.itemIdRequired",
@@ -2764,7 +2782,8 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ],
   "da_DK": [
     "alert.itemIdRequired",
@@ -2909,6 +2928,7 @@ export const pending: Record<string, readonly string[]> = {
     "profInspect.slotPair",
     "profInspect.slotsEmpty",
     "profInspect.slotsHeader",
-    "profInspect.title"
+    "profInspect.title",
+    "theme.darkModeLabel"
   ]
 };

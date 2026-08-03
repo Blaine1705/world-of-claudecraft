@@ -2475,6 +2475,60 @@ export const TARGETS = [
     },
   },
   {
+    key: 'chat-tab-reorder-before',
+    label: 'Chat tab strip: World then Guild opened, before reordering (#1365)',
+    when: ['ui/hud/chat/chat_channels', 'ui/hud/chat/chat_window_controller'],
+    // Opens two channel tabs (World, then Guild) through the real "+" add-channel
+    // picker, in that order, so the "before" strip reads World, Guild left to
+    // right. chat-tab-reorder-after (next target, same shared page/session) then
+    // reorders them and shoots the strip again.
+    async capture(page) {
+      await pollForSize(page, '#chatlog-wrap', 60, 500);
+      for (const action of ['world', 'guild']) {
+        await page.evaluate(() => {
+          document
+            .querySelector('.chat-tab-add')
+            ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        });
+        await wait(200);
+        await page.evaluate((act) => {
+          document
+            .querySelector(`.ctx-item[data-act="${act}"]`)
+            ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        }, action);
+        await wait(200);
+      }
+      await page.evaluate(() => {
+        document
+          .querySelector('#chatlog-tabs button[data-tab="all"]')
+          ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
+    key: 'chat-tab-reorder-after',
+    label: 'Chat tab strip: World moved past Guild via Alt+ArrowRight (#1365)',
+    when: ['ui/hud/chat/chat_channels', 'ui/hud/chat/chat_window_controller'],
+    // Runs right after chat-tab-reorder-before on the same shared page, so the
+    // World/Guild tabs opened there are still present. Drives the real
+    // Alt+ArrowRight keyboard reorder path bound on the World tab button (the
+    // same reorderChatTabs/persist path a drag uses), so the strip flips to
+    // Guild, World.
+    async capture(page) {
+      await page.evaluate(() => {
+        document
+          .querySelector('#chatlog-tabs button[data-tab="world"]')
+          ?.dispatchEvent(
+            new KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true, bubbles: true }),
+          );
+      });
+      await wait(200);
+      return { clip: '#chatlog-wrap' };
+    },
+  },
+  {
     key: 'chat-flair-class-color',
     label: 'Chat: class-colored name + verified-streamer badge',
     when: ['ui/hud/chat/chat_line'],

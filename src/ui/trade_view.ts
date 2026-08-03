@@ -14,7 +14,8 @@
 // tradeOfferCeiling gives the trade window the same total.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
-import type { InvSlot, ItemDef } from '../sim/types';
+import { ITEMS } from '../sim/data';
+import type { InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import { itemDisplayName } from './entity_i18n';
 import { formatNumber, t } from './i18n';
 import { knownItemDef } from './known_item';
@@ -53,4 +54,24 @@ export function buildTradeItemRow(
         })}`
       : name;
   return { item, label };
+}
+
+/** Resolves the bag-style tooltip target (item def + optional per-instance
+ *  payload) for the slot at `index` in a trade offer's item list. Both offer
+ *  sides render from the same `InvSlot[]` (`TradeOffer.items` in
+ *  `src/world_api/trade.ts`), so a trade slot's tooltip is exactly the item's
+ *  bag tooltip, instance detail included. Returns null for an out-of-range
+ *  index or an unrecognized item id (#2693). */
+export function tradeRowTooltipTarget(
+  items: InvSlot[],
+  index: number,
+): { item: ItemDef; instance?: ItemInstancePayload } | null {
+  const s = items[index];
+  if (!s) return null;
+  // knownItemDef, not a bare ITEMS index: this branches between a known-item
+  // arm and an unknown-item arm, so a prototype-key id must take the
+  // unknown arm here too (R34 family, src/ui/known_item.ts).
+  const item = knownItemDef(ITEMS, s.itemId);
+  if (!item) return null;
+  return { item, instance: s.instance };
 }

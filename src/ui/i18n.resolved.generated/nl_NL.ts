@@ -6260,6 +6260,7 @@ export const nl_NL: EnTranslations = {
         "add": "Chatkanaal toevoegen",
         "addTitle": "Kanaal toevoegen",
         "close": "Tabblad {channel} sluiten",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Bericht {channel}",
         "names": {
           "say": "Zeggen",

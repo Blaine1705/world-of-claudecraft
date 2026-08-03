@@ -6260,6 +6260,7 @@ export const fr_FR: EnTranslations = {
         "add": "Ajouter un canal de discussion",
         "addTitle": "Ajouter un canal",
         "close": "Fermer l'onglet {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Message vers {channel}",
         "names": {
           "say": "Dire",

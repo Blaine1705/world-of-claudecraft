@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
-import { buildTradeItemRow, tradeOfferCeiling } from '../src/ui/trade_view';
+import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from '../src/ui/trade_view';
 
 describe('tradeOfferCeiling (trade offer stepper cap)', () => {
   it('sums an item split across multiple bag slots instead of capping at one slot', () => {
@@ -141,5 +141,64 @@ describe('trade window painter wiring (source pins, hud.ts updateTradeWindow)', 
     const fin = body.indexOf('} finally {');
     expect(fin).toBeGreaterThan(render);
     expect(commit).toBeGreaterThan(fin);
+  });
+});
+
+// Issue #2693: hovering an item in the trade window showed no stats tooltip
+// because updateTradeWindow (hud.ts) never wired the trade slots to the
+// shared attachTooltip/itemTooltip infrastructure bag slots use.
+// tradeRowTooltipTarget is the pure lookup hud.ts's wiring resolves through:
+// same InvSlot shape as a bag row (both offer sides carry it, per
+// src/world_api/trade.ts's TradeOffer), so it must expose the exact item def
+// plus per-instance payload (enchant/masterwork/signature) the bag tooltip
+// itself reads.
+describe('tradeRowTooltipTarget (trade slot tooltip wiring, #2693)', () => {
+  it('resolves the item def for a plain trade slot', () => {
+    const items: InvSlot[] = [{ itemId: 'worn_sword', count: 1 }];
+    const target = tradeRowTooltipTarget(items, 0);
+    expect(target?.item).toBe(ITEMS.worn_sword);
+    expect(target?.instance).toBeUndefined();
+  });
+
+  it('carries the per-instance payload (enchant/masterwork/signature) through, matching the bag tooltip', () => {
+    const items: InvSlot[] = [
+      {
+        itemId: 'worn_sword',
+        count: 1,
+        instance: { signer: 'Anna', rolled: { masterwork: true, stats: { str: 2 } } },
+      },
+    ];
+    const target = tradeRowTooltipTarget(items, 0);
+    expect(target?.instance).toEqual({
+      signer: 'Anna',
+      rolled: { masterwork: true, stats: { str: 2 } },
+    });
+  });
+
+  it('resolves each offer row positionally, so the second slot does not pick up the first slot instance', () => {
+    const items: InvSlot[] = [
+      { itemId: 'worn_sword', count: 1 },
+      { itemId: 'gnarled_staff', count: 1, instance: { signer: 'Bob' } },
+    ];
+    expect(tradeRowTooltipTarget(items, 0)?.item).toBe(ITEMS.worn_sword);
+    expect(tradeRowTooltipTarget(items, 0)?.instance).toBeUndefined();
+    expect(tradeRowTooltipTarget(items, 1)?.item).toBe(ITEMS.gnarled_staff);
+    expect(tradeRowTooltipTarget(items, 1)?.instance).toEqual({ signer: 'Bob' });
+  });
+
+  it('returns null out of range (the trade-empty placeholder row) and for an unrecognized item id', () => {
+    const items: InvSlot[] = [{ itemId: 'worn_sword', count: 1 }];
+    expect(tradeRowTooltipTarget(items, 1)).toBeNull();
+    expect(tradeRowTooltipTarget([{ itemId: 'not_a_real_item', count: 1 }], 0)).toBeNull();
+  });
+
+  it('returns null for a PROTOTYPE-KEY id (R34 family), never a tooltip target', () => {
+    // ITEMS is a prototype-bearing Record: a bare ITEMS[id] truthiness test
+    // resolves 'constructor' to a FUNCTION and the tooltip sink would
+    // dereference it as an ItemDef. The merge resolution routes this lookup
+    // through knownItemDef so these stay on the null arm.
+    for (const key of ['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty']) {
+      expect(tradeRowTooltipTarget([{ itemId: key, count: 1 }], 0), key).toBeNull();
+    }
   });
 });

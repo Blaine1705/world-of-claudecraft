@@ -5219,6 +5219,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': 'Добавить канал чата',
   'hud.core.chatChannels.addTitle': 'Добавить канал',
   'hud.core.chatChannels.close': 'Закрыть вкладку {channel}',
+  'hud.core.chatChannels.moveHint':
+    'Изменить порядок вкладки {channel}: перетащите или используйте Alt+влево и Alt+вправо',
   'hud.core.chatChannels.names.general': 'Общий',
   'hud.core.chatChannels.names.guild': 'Гильдия',
   'hud.core.chatChannels.names.lfg': 'Поиск группы',

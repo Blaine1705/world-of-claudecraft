@@ -4996,6 +4996,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatChannels.add': '新增聊天頻道',
   'hud.core.chatChannels.addTitle': '新增頻道',
   'hud.core.chatChannels.close': '關閉{channel}分頁',
+  'hud.core.chatChannels.moveHint': '重新排列{channel}分頁：拖曳，或使用 Alt+左與 Alt+右',
   'hud.core.chatChannels.names.general': '綜合',
   'hud.core.chatChannels.names.guild': '公會',
   'hud.core.chatChannels.names.lfg': '尋求組隊',

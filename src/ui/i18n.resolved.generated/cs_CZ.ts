@@ -6260,6 +6260,7 @@ export const cs_CZ: EnTranslations = {
         "add": "Přidat chatový kanál",
         "addTitle": "Přidat kanál",
         "close": "Zavřít kartu {channel}",
+        "moveHint": "Reorder {channel} tab: drag it, or use Alt+Left and Alt+Right",
         "sendingTo": "Zpráva do {channel}",
         "names": {
           "say": "Říct",
