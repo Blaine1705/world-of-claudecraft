@@ -1925,7 +1925,7 @@ export const guideStrings = {
     // Offloading junk.
     junkTitle: 'Clearing out junk',
     junkBody:
-      "Drops you have no use for still sell to any merchant with wares of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
+      "Drops you have no use for still sell to any merchant with a shop of their own, so empty your bags whenever you pass through town rather than letting them fill up. The merchant's window even keeps a one-click Sell Junk button that sells every Poor-quality oddment at once. Truly worthless odds and ends can also be discarded outright to make room.",
 
     // Direct player-to-player trading.
     tradeTitle: 'Trading with other players',

@@ -6287,7 +6287,8 @@ at the phase 24 build: nothing re-surfaces them automatically, the
 scan's staleness detection is dormant and the worklist emits pending
 rows only, so the build record hand-carries the re-fill list), while
 a new-key-beside shape needs its five non-Latin M16 fills in the
-same change because every one of these values is wordy. The recommendation on record: in-place rewrite,
+same change because every one of these values is wordy. The
+recommendation on record: in-place rewrite,
 accepting the re-fill cost at the release fill the maintainer already
 owns, because fragmenting the one buying paragraph into two keys is
 worse for translators than re-filling one.
