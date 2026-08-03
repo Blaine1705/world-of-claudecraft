@@ -582,11 +582,14 @@ const SKY_FRAG = /* glsl */ `
       vec2 sunAz = normalize(uSunDirLive.xz);
       vec2 dirAz = normalize(dir.xz + vec2(1e-5, 0.0));
       float align = max(dot(dirAz, sunAz), 0.0);
-      float band = (1.0 - smoothstep(0.04, 0.45, dir.y)) * smoothstep(-0.24, -0.02, dir.y);
+      // The glow climbs to dir.y 0.60 rather than 0.45: a sunset that stops a
+      // few degrees off the horizon reads as a stripe, and the camera looks
+      // DOWN, so the band has to reach well up the dome to fill the frame.
+      float band = (1.0 - smoothstep(0.04, 0.60, dir.y)) * smoothstep(-0.24, -0.02, dir.y);
       float warm = uDuskWarm * band * (0.2 + 0.8 * align * align);
-      vec3 duskCol = vec3(1.0, 0.42, 0.16);
-      c = mix(c, duskCol * (0.3 + 0.9 * cycleLum), warm * 0.8);
-      c += duskCol * warm * align * align * 0.6;
+      vec3 duskCol = vec3(1.0, 0.38, 0.12);
+      c = mix(c, duskCol * (0.3 + 0.9 * cycleLum), warm * 0.92);
+      c += duskCol * warm * align * align * 0.78;
     }
     // The sun and moon discs are billboard sprites (see renderer.ts) so they stay
     // perfect circles on screen; the dome only carries the sky and the stars.

@@ -25,6 +25,7 @@ import {
   REALM_DAYNIGHT_AMPLITUDE,
   skyTintForDayness,
   sunDirection,
+  sunsetWarmGate,
   warmDuskGrade,
 } from '../src/render/day_night_core';
 import type { BiomeId } from '../src/sim/types';
@@ -263,6 +264,20 @@ describe('warmDuskGrade (the whole frame goes orange at the horizon)', () => {
     expect(w.lightScale).toBe(g.lightScale);
     expect(w.farScale).toBe(g.farScale);
   });
+
+  it('pushes far enough past neutral to read as amber, not as a tea stain', () => {
+    // The tint is deliberately exaggerated: the first cut (red 1.14, blue 0.62)
+    // was too timid to survive the tone map, so pin the shape of the push
+    // rather than the exact constants. Red must gain, blue must lose roughly
+    // half, and fog must stay warmer than sky (fog reads lighter for
+    // readability, so it carries more of the orange).
+    const g = dayNightGrade(1); // identity grade: the tint shows undiluted
+    const w = warmDuskGrade(g, 1);
+    expect(w.sky[0]).toBeGreaterThan(1.25);
+    expect(w.sky[2]).toBeLessThan(0.55);
+    expect(w.fog[0]).toBeGreaterThan(w.sky[0]);
+    expect(w.fog[0] / w.fog[2]).toBeGreaterThan(2.5);
+  });
 });
 
 describe('lunarPhase / moonTerminator (the moon runs real phases)', () => {
@@ -306,6 +321,35 @@ describe('duskWarmAmount / nightSkyDesat (the cycle sky grading)', () => {
     expect(duskWarmAmount(0.66)).toBeCloseTo(0, 6); // noon sun: no sunset glow
     expect(duskWarmAmount(0)).toBeCloseTo(1, 2); // crossing: full glow
     expect(duskWarmAmount(-0.5)).toBeCloseTo(0, 6); // deep night: none
+  });
+
+  it('holds a wide golden band so the sunset lasts, without leaking either end', () => {
+    // The band was widened deliberately: the original window (open at y 0.3,
+    // shut at y -0.24) gave about ten minutes of golden hour per cycle, which
+    // a player crossing a zone missed entirely. These pins are the two ends
+    // that must NOT move: the peak sun elevation is ~0.659, so a high sun stays
+    // exactly zero, and deep night stays exactly zero so no warmth reaches the
+    // moonlit grade. Between them the glow is strong well before the crossing
+    // and lingers as afterglow well after it.
+    expect(duskWarmAmount(0.5)).toBe(0); // still full afternoon: nothing yet
+    expect(duskWarmAmount(0.22)).toBeGreaterThan(0.5); // golden hour has opened
+    expect(duskWarmAmount(0.06)).toBeGreaterThan(0.9);
+    expect(duskWarmAmount(-0.15)).toBeGreaterThan(0.5); // afterglow lingers
+    expect(duskWarmAmount(-0.32)).toBe(0); // sun well under: back to moonlight
+  });
+
+  it('keeps the key light warm across the horizon but off before the moon takes it', () => {
+    // The whole point of a gate separate from aboveHorizon: the sun sitting ON
+    // the horizon is the most orange moment of the day, and aboveHorizon had
+    // already faded to ~0.35 there, washing the key light pale.
+    expect(sunsetWarmGate(0)).toBeGreaterThan(0.9);
+    expect(aboveHorizon(0)).toBeLessThan(0.4); // the curve this replaces
+    expect(sunsetWarmGate(0.2)).toBe(1); // full warmth above the horizon
+    // ...and fully off by y -0.14, ahead of the key light's handover to the
+    // moon at y -0.15 (updateKeyLight), so moonlight is never sunset-tinted.
+    expect(sunsetWarmGate(-0.14)).toBe(0);
+    expect(sunsetWarmGate(-0.5)).toBe(0);
+    expect(sunsetWarmGate(-0.1)).toBeLessThan(0.2); // already nearly gone
   });
 
   it('the night desaturation rises from zero and stays capped under one', () => {

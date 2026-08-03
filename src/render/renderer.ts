@@ -143,6 +143,7 @@ import {
   nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
   sunDirection,
+  sunsetWarmGate,
   warmDuskGrade,
 } from './day_night_core';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
@@ -597,12 +598,17 @@ const NIGHT_HEMI_COOL = 0.5; // how far the sky-bounce hue shifts at full night
 // horizon: a deep sunset orange, so dawn and dusk read hot like the real thing
 const WARM_SUN_COLOR = 0xff7a28;
 // A shared warm daylight bias applied after each biome picks its authored hue.
-// Keeping this below 0.2 preserves Frostveil, Wraithwood, and Galecrest as cool
-// realms while stopping their HDRI/hemisphere fill from cooling the whole frame.
+// The sky bounce is the frame's ambient fill, so this is the knob that decides
+// whether ordinary daylight reads golden or clinical, and the first cut at 0.18
+// left it clinical. These weights blend TOWARD a cream, never past it, so the
+// cool realms stay cool by construction: at 0.3 a Frostveil noon still resolves
+// blue-dominant (its bounce lands near rgb 193,196,207), it just stops washing
+// the whole frame grey-blue. Both terms are scaled by (1 - nightAmt) at the
+// call site, so none of this warmth reaches the moonlit night.
 const WARM_HEMI_SKY_COLOR = 0xffdfbd;
 const WARM_HEMI_GROUND_COLOR = 0x725038;
-const DAY_HEMI_SKY_WARMTH = 0.18;
-const DAY_HEMI_GROUND_WARMTH = 0.13;
+const DAY_HEMI_SKY_WARMTH = 0.3;
+const DAY_HEMI_GROUND_WARMTH = 0.22;
 // the moving sun/moon key light rides at the same distance the fixed anchor did
 const SUN_TRAVEL_DISTANCE = SUN_ANCHOR.length();
 // character rim glow scales up underground so silhouettes split from the murk
@@ -7862,17 +7868,25 @@ export class Renderer {
       const light = Renderer.BIOME_LIGHT[biome];
       // the sun light warms toward gold, gently by day and strongly as it nears
       // the horizon (a golden hour), then cools toward moonlight deep at night.
-      // The warm blend is gated by aboveHorizon so it never tints the moonlight.
+      // sunsetWarmGate holds the warm through the horizon crossing and drops it
+      // before the key light hands over to the moon, so moonlight stays cool.
       const sunElev = this.sunDir.y;
-      let hi = (sunElev - 0.08) / 0.5;
+      let hi = (sunElev - 0.12) / 0.46;
       hi = hi < 0 ? 0 : hi > 1 ? 1 : hi;
       const lowness = 1 - hi * hi * (3 - 2 * hi);
       // The base term is the standing day gold (the look tuned at the fixed
       // 31 degree anchor, which the live noon sun closely matches); the
       // lowness ramp runs the warm all the way to 1 at the horizon so sunrise
-      // and sunset go genuinely orange, and aboveHorizon gates the whole warm
-      // off below it so the moonlight never picks up a sunset tint.
-      const warmAmt = aboveHorizon(sunElev) * (0.52 + lowness * 0.48);
+      // and sunset go genuinely orange, and the gate takes the whole warm off
+      // below it so the moonlight never picks up a sunset tint.
+      // The base sits at 0.58 rather than the first cut's 0.52: standing
+      // daylight read clinical, and this is a couple hundred kelvin of golden
+      // bias (a vale noon key lands near rgb 255,182,144 instead of
+      // 255,189,152), not an orange midday. The lowness ramp reaches full at
+      // y 0.12 rather than 0.08 so the key light is already at its sunset
+      // orange while the gate still passes it at full strength, which is what
+      // makes the golden hour read as a band rather than an instant.
+      const warmAmt = sunsetWarmGate(sunElev) * (0.58 + lowness * 0.42);
       this.dnColorScratch.setHex(light.sun);
       this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
       this.dnColorScratch.lerp(

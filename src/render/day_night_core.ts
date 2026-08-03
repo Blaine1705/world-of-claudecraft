@@ -271,9 +271,12 @@ export function nightStarAmount(dayness: number): number {
 // Dawn/dusk grade warmth: the sky/fog multipliers pull toward these as the sun
 // crosses the horizon, so the whole frame (sky dome, scene fog, water) takes
 // the sunrise and sunset orange rather than just the key light. Red pushes
-// past 1 so the warmth genuinely shows against the neutral day grade.
-const DUSK_SKY_TINT: [number, number, number] = [1.14, 0.86, 0.62];
-const DUSK_FOG_TINT: [number, number, number] = [1.2, 0.9, 0.68];
+// past 1 so the warmth genuinely shows against the neutral day grade. The
+// first cut here read as a mild tea stain next to a real sunset, so both ends
+// are pushed harder: more red gain, and blue pulled down near half so the
+// horizon crossing goes properly amber instead of merely off-white.
+const DUSK_SKY_TINT: [number, number, number] = [1.34, 0.8, 0.48];
+const DUSK_FOG_TINT: [number, number, number] = [1.42, 0.84, 0.52];
 
 /** Warm a grade toward the dawn/dusk orange by duskAmt (duskWarmAmount). Hue
  *  only: lightScale and farScale stay the cycle's own curve. Returns a new
@@ -292,13 +295,33 @@ export function warmDuskGrade(g: DayNightGrade, duskAmt: number): DayNightGrade 
 
 /** How strongly the dawn/dusk sky glow shows, 0..1, from the sun's elevation
  *  (its unit-direction y). Peaks while the sun crosses the horizon: fades in
- *  as it drops below ~17 degrees of arc (y 0.3), is full through the crossing,
+ *  as it drops below ~26 degrees of arc (y 0.44), is full through the crossing,
  *  and is gone once the sun sinks well under (deep night has no sunset). The
- *  sky dome pours its warm horizon lobe in scaled by this. */
+ *  sky dome pours its warm horizon lobe in scaled by this.
+ *
+ *  The window is deliberately WIDE. The first cut only opened at y 0.3 and shut
+ *  at y -0.24, which gave a roughly ten-minute golden band per cycle: over
+ *  before a player crossing a zone noticed it. Starting the ramp higher and
+ *  letting the afterglow linger a little deeper stretches that to about
+ *  thirteen minutes, a real golden hour, without leaking into deep night: the
+ *  peak sun elevation is ~0.66, so noon still lands exactly on zero. */
 export function duskWarmAmount(sunElev: number): number {
-  const above = smoothstep((0.3 - sunElev) / 0.28); // fades in as the sun lowers
-  const below = smoothstep((sunElev + 0.24) / 0.2); // fades out as it sinks under
+  const above = smoothstep((0.44 - sunElev) / 0.4); // fades in as the sun lowers
+  const below = smoothstep((sunElev + 0.3) / 0.26); // fades out as it sinks under
   return above * below;
+}
+
+/** How much of the key light's golden-hour warmth survives at a sun elevation,
+ *  0 (none) to 1 (all of it). This is the sunset's own horizon gate, and it is
+ *  deliberately NOT aboveHorizon: that curve is already down to 0.35 by the
+ *  time the sun sits ON the horizon, which washed the key light to a pale pink
+ *  (rgb 234,199,189) at exactly the moment the sky was most orange, and was the
+ *  single biggest reason sunset read flat. This holds full warmth through the
+ *  crossing and instead reaches zero at y -0.14, still comfortably before
+ *  updateKeyLight has finished handing the key over to the moon (y -0.15), so
+ *  moonlight never picks up a sunset tint. */
+export function sunsetWarmGate(sunElev: number): number {
+  return smoothstep((sunElev + 0.14) / 0.16); // y <= -0.14 -> 0, y >= 0.02 -> 1
 }
 
 /** How far the sky dome desaturates toward night, 0 (day, untouched) to a
@@ -344,6 +367,6 @@ export function moonTerminator(p: number): MoonTerminator {
   // crescents (a > 0): the shadow spills past centre, bulging toward the lit
   // side; gibbous (a < 0): the lit face spills over, terminator bulging back
   // into the shadow side.
-  const bulgeSide: -1 | 1 = a > 0 ? ((-shadowSide) as -1 | 1) : shadowSide;
+  const bulgeSide: -1 | 1 = a > 0 ? (-shadowSide as -1 | 1) : shadowSide;
   return { litFrac: (1 - a) / 2, shadowSide, rx: Math.abs(a), bulgeSide };
 }
