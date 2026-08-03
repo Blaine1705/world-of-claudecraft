@@ -1968,10 +1968,16 @@ describe('discord/outbox', () => {
     const links = [linkRow(1)];
 
     stubDrains([], fixture());
-    vi.mocked(discordForAccount).mockImplementation(async (_pool, accountId) =>
-      accountId === 1 ? linkRow(1) : null,
-    );
+    // The standalone GET batches its links read (discordForAccounts, the N+1
+    // fix), so the old arm stubs the BATCH; the singular lookup must stay
+    // uncalled on this path.
+    vi.mocked(discordForAccounts).mockImplementation(async (_pool, accountIds) => {
+      const map = new Map();
+      if ((accountIds as number[]).includes(1)) map.set(1, linkRow(1));
+      return map;
+    });
     const old = await runRoute('GET', '/internal/discord/activity', { headers: DISCORD_HEADERS });
+    expect(discordForAccount).not.toHaveBeenCalled();
 
     stubDrains([], fixture());
     vi.mocked(dailyRewardService.discordWinnerAnnouncements).mockResolvedValue(NO_WINNERS);
