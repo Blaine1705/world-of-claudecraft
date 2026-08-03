@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 // Masterwork zone broadcast (Professions 2.0): a masterwork proc in
 // the overworld emits one pid-scoped `masterworkZone` copy per player in the

@@ -22,8 +22,8 @@ import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resourc
 const REPO_ROOT = path.join(__dirname, '..');
 const ASSET_PATH = path.join(REPO_ROOT, 'public/models/props/mailbox_pillar.glb');
 const ASSET_BYTES = 32_884;
-const ASSET_SHA256 = '5555e666378f0fe00fea41cffca3bda750a784ac30e769c42529c7bcfd1a8e4c';
-const SOURCE_FINGERPRINT = 'd9fb94ca9cd0e866b709a629181c53fe0298424a4442b5a6127bb35eeca08ca3';
+const ASSET_SHA256 = '599f931cebcee4652e2fff788947cc34bedacad7a5bf8a168f04e44f1bfcdc95';
+const SOURCE_FINGERPRINT = '2d63ac194e8e21ac618c5cb6405e2e4aef2c19a0f63a8a29d92489275e53cba6';
 const ORIGINAL_STANDARD_MATERIALS = GFX.standardMaterials;
 
 function sourceModel(material: THREE.MeshStandardMaterial): THREE.Group {
@@ -63,7 +63,7 @@ describe('Eastbrook Ravenpost mailbox pipeline', () => {
       'scripts/assets/eastbrook_mailbox/source_fingerprint.mjs',
       'scripts/assets/specs/eastbrook_mailbox.json',
       'scripts/assets/build_assets.mjs',
-      'package-lock.json',
+      'pnpm-lock.yaml',
     ]);
     expect(eastbrookMailboxSourceFingerprint(REPO_ROOT)).toBe(SOURCE_FINGERPRINT);
     expect(eastbrookMailboxSourceFingerprint(REPO_ROOT)).toBe(
