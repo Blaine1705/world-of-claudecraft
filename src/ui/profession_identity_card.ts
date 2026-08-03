@@ -2,7 +2,7 @@ import { archetypeTitleText, craftNameText } from './char_window';
 import { esc } from './esc';
 import { formatNumber, t } from './i18n';
 import { archetypeImageUrl } from './profession_art';
-import type { ProfessionIdentityModel } from './profession_identity_view';
+import { orderSkillsForCard, type ProfessionIdentityModel } from './profession_identity_view';
 
 function ceilingText(ceiling: 'unlimited' | 'rare' | 'common'): string {
   return t(
@@ -71,7 +71,9 @@ export function renderProfessionIdentityCard(
   // card), the rows drop the chips line and the caption above the list
   // states the shared pair once. Every row keeps the complete skillAria
   // sentence either way, so no reader loses the role/cap facts.
-  const skillRows = identity.skills
+  // Card presentation order (majors first; see orderSkillsForCard): the
+  // model's own skills stay ring-ordered for the professions wheel.
+  const skillRows = orderSkillsForCard(identity.skills)
     .map((row) => {
       const label = craftNameText(row.craftId);
       const detail = t('hudChrome.crafting.identity.skillAria', {

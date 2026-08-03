@@ -55,6 +55,22 @@ export function uniformSkillChips(
     : null;
 }
 
+/** Presentation order for the identity CARD's capped list (the phase 22 QA
+ * round): the 264px cap shows about five of ten rows, and in raw ring order
+ * the two Material-pair majors sit at ring indices 8 and 9, below the fold,
+ * so an attuned Smith's card opened on everything EXCEPT the two crafts it
+ * exists to headline. Majors lead, then the hobby, then dormant rows that
+ * still hold knowledge; the sort is stable, so ring order survives within
+ * each group and the unattuned card (every row one role) is untouched.
+ * A sorted COPY, deliberately not the model order: ProfessionIdentityModel
+ * .skills stays in CRAFT_RING order because the professions window's wheel
+ * renders its geometry from that order (professions_view.ts consumes it). */
+export function orderSkillsForCard(skills: readonly ProfessionSkillRow[]): ProfessionSkillRow[] {
+  const rolePriority = (row: ProfessionSkillRow): number =>
+    row.role === 'major' ? 0 : row.role === 'hobby' ? 1 : row.dormantKnowledge ? 2 : 3;
+  return [...skills].sort((a, b) => rolePriority(a) - rolePriority(b));
+}
+
 export interface ProfessionIdentityModel {
   state: ProfessionIdentityState;
   summary: {
@@ -162,16 +178,6 @@ export function buildProfessionIdentityView(
       dormantKnowledge: role === 'dormant' && skill > 0,
     };
   });
-  // Role-priority order for the capped list (the phase 22 QA round): the
-  // 264px cap shows about five of ten rows, and in raw ring order the two
-  // Material-pair majors sit at indices 8 and 9, below the fold, so an
-  // attuned Smith's card opened on everything EXCEPT the two crafts it
-  // exists to headline. Majors lead, then the hobby, then dormant rows that
-  // still hold knowledge; the sort is stable, so ring order survives within
-  // each group and the unattuned card (every row one role) is untouched.
-  const rolePriority = (row: ProfessionSkillRow): number =>
-    row.role === 'major' ? 0 : row.role === 'hobby' ? 1 : row.dormantKnowledge ? 2 : 3;
-  skills.sort((a, b) => rolePriority(a) - rolePriority(b));
   const nudges: ProfessionNudge[] = [];
   for (const row of skills) {
     if (row.skill > 0 && row.pointsToNextTier <= 5) {

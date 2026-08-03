@@ -3,6 +3,7 @@ import { TIER_SKILL_STEP } from '../src/sim/professions/wheel';
 import {
   buildAttunementPreview,
   buildProfessionIdentityView,
+  orderSkillsForCard,
   type ProfessionSkillRow,
   uniformSkillChips,
 } from '../src/ui/profession_identity_view';
@@ -102,14 +103,14 @@ describe('buildProfessionIdentityView', () => {
     expect(row).toMatchObject({ skill: 74, tier: 2, pointsToNextTier: 1 });
   });
 
-  it('orders rows major, hobby, dormant knowledge, then rest, ring-stable within groups', () => {
+  it('orderSkillsForCard sorts major, hobby, dormant knowledge, rest, ring-stable in groups', () => {
     // The 264px cap shows about five of ten rows; in raw ring order the two
     // Material-pair majors sat at ring indices 8 and 9, below the fold. The
     // sort is stable, so ring order decides within each group: weaponcrafting
     // (ring 8) precedes armorcrafting (ring 9) among the majors, and cooking
     // (ring 2) precedes jewelcrafting (ring 7) among dormant knowledge.
     const view = buildProfessionIdentityView(baseIdentity);
-    expect(view.skills.map((row) => row.craftId)).toEqual([
+    expect(orderSkillsForCard(view.skills).map((row) => row.craftId)).toEqual([
       'weaponcrafting',
       'armorcrafting',
       'leatherworking',
@@ -121,6 +122,13 @@ describe('buildProfessionIdentityView', () => {
       'inscription',
       'enchanting',
     ]);
+    // The MODEL's own skills stay in CRAFT_RING order: the professions
+    // window's wheel renders its geometry from model order, so the card's
+    // presentation sort must be a copy, never an in-place mutation (the
+    // regression the final gate caught: professions_view and the ring nodes
+    // reddened when the sort mutated the shared array).
+    expect(view.skills[0].craftId).toBe('engineering');
+    expect(view.skills[9].craftId).toBe('armorcrafting');
     // The unattuned card is one role group, so the stable sort leaves it in
     // pure ring order (the collapse caption depends on nothing here).
     const unattuned = buildProfessionIdentityView({
@@ -130,8 +138,8 @@ describe('buildProfessionIdentityView', () => {
       hobbyCraft: null,
       attunedPairs: [],
     });
-    expect(unattuned.skills[0].craftId).toBe('engineering');
-    expect(unattuned.skills[9].craftId).toBe('armorcrafting');
+    expect(orderSkillsForCard(unattuned.skills)[0].craftId).toBe('engineering');
+    expect(orderSkillsForCard(unattuned.skills)[9].craftId).toBe('armorcrafting');
   });
 
   it('collapses uniform role/cap chips on the unattuned card and never on the attuned one', () => {
