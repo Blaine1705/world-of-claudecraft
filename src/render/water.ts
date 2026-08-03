@@ -158,6 +158,12 @@ export function hasWaterShaderAssets(): boolean {
  * would alias these wavelengths into shimmer at the horizon).
  */
 const WATER_SWELL_AMP = 0.22;
+/**
+ * Feather over which the zone planes fade their chop displacement to zero
+ * approaching their rect edge, where the chop-free apron takes over. Wider
+ * than the chop wavelengths' half-heights so the handoff has no visible knee.
+ */
+const WATER_CHOP_EDGE_FEATHER_YARDS = 14;
 /** Sun-through-swell scattering tint: the turquoise a lit wave face glows. */
 const SCATTER_COLOR = new THREE.Color(0.09, 0.38, 0.33);
 
@@ -283,11 +289,21 @@ const SWELL_GLSL = /* glsl */ `
   const float SWELL_W1 = 0.900590;
   const float SWELL_W2 = 1.225221;
   const float SWELL_W3 = 1.696460;
+  // The GROUNDSWELL: two long rollers (about 150 and 110 yard wavelengths)
+  // that BOTH water grids sample cleanly (zone planes at ~2 yards, apron at
+  // ~27), so the displacement agrees at the plane/apron boundary and needs no
+  // camera range fade: the open sea visibly heaves all the way out. Speeds
+  // are 44 / 57 whole cycles per wrap period: seamless at the clock wrap.
+  const vec2 GSWELL_K1 = vec2(0.0364, 0.0209);
+  const vec2 GSWELL_K2 = vec2(-0.0194, 0.0537);
+  const float GSWELL_W1 = 0.460767;
+  const float GSWELL_W2 = 0.596903;
 `;
 
 const WATER_VERT = /* glsl */ `
   attribute float aShoreDepth;
   attribute float aShoreSlope;
+  attribute float aSwellW;
   uniform float uTime;
   uniform float uSwellAmp;
   uniform sampler2D uWaveState;
@@ -304,25 +320,47 @@ const WATER_VERT = /* glsl */ `
   ${WAVE_SAMPLE_GLSL}
   void main() {
     vec3 pos = position;
-    // Directional swell: three travelling waves displace the surface, and the
-    // fragment stage gets the matching slope (the cos derivatives) for free.
+    // Directional CHOP: three short travelling waves displace the surface, and
+    // the fragment stage gets the matching slope (the cos derivatives) for
+    // free. Gated by aSwellW: zone planes only, feathered out at their rect
+    // edge (the apron cannot sample these wavelengths, see the apron builder).
     float p1 = dot(pos.xz, SWELL_K1) + uTime * SWELL_W1;
     float p2 = dot(pos.xz, SWELL_K2) + uTime * SWELL_W2;
     float p3 = dot(pos.xz, SWELL_K3) + uTime * SWELL_W3;
     float depthFade = clamp(aShoreDepth * 0.8, 0.0, 1.0);
-    float rangeFade = 1.0 - smoothstep(90.0, 220.0, distance(cameraPosition.xz, pos.xz));
+    float rangeFade = 1.0 - smoothstep(120.0, 300.0, distance(cameraPosition.xz, pos.xz));
+    // aSwellW packs both displacement gates: 0 = still water (interior pools,
+    // whose geometry omits the attribute so GL supplies 0), 1 = groundswell
+    // only (the apron), 2 = groundswell plus chop (zone plane interiors,
+    // feathering back to 1 approaching the rect edge the apron shares).
+    float chopW = clamp(aSwellW - 1.0, 0.0, 1.0);
+    float gswW = clamp(aSwellW, 0.0, 1.0);
     // Wave GROUPS: a very slow two-sine envelope swells some stretches of sea
     // and calms others, so open water stops being one uniform corduroy sheet.
     float group = 0.55 + 0.45
       * sin(dot(pos.xz, vec2(0.021, 0.013)) + uTime * 0.146608)
       * sin(dot(pos.xz, vec2(-0.011, 0.024)) + uTime * 0.115192);
-    float amp = uSwellAmp * depthFade * rangeFade * (0.55 + 0.9 * group);
+    float amp = uSwellAmp * depthFade * rangeFade * chopW * (0.55 + 0.9 * group);
     float crest = sin(p1) * 0.5 + sin(p2) * 0.32 + sin(p3) * 0.18;
     pos.y += crest * amp;
+    // The GROUNDSWELL: long rollers both grids sample cleanly, so they carry
+    // no aSwellW gate and no range fade: this is what keeps the open sea
+    // visibly alive at distance. Depth-faded like the chop (a heaving sheet
+    // must never rise over a beach), and the group envelope rides along so
+    // the rollers arrive in sets instead of a metronome.
+    float g1 = dot(pos.xz, GSWELL_K1) + uTime * GSWELL_W1;
+    float g2 = dot(pos.xz, GSWELL_K2) + uTime * GSWELL_W2;
+    float gsAmp = uSwellAmp * 1.5 * depthFade * gswW * (0.5 + 0.8 * group);
+    float gsCrest = sin(g1) * 0.62 + sin(g2) * 0.38;
+    pos.y += gsCrest * gsAmp;
     vec2 swellSlope =
-      (cos(p1) * 0.5 * SWELL_K1 + cos(p2) * 0.32 * SWELL_K2 + cos(p3) * 0.18 * SWELL_K3) * amp;
-    vSwell = vec3(swellSlope.x, (crest * (0.35 + 0.65 * group)) * 0.5 + 0.5, swellSlope.y);
-    pos.y += (sin(uTime * 1.099557 + pos.x * 0.35) + sin(uTime * 0.701622 + pos.z * 0.28)) * 0.05;
+      (cos(p1) * 0.5 * SWELL_K1 + cos(p2) * 0.32 * SWELL_K2 + cos(p3) * 0.18 * SWELL_K3) * amp
+      + (cos(g1) * 0.62 * GSWELL_K1 + cos(g2) * 0.38 * GSWELL_K2) * gsAmp;
+    float crestMix = crest * (0.35 + 0.65 * group) * min(1.0, chopW + 0.35)
+      + gsCrest * 0.45 * group * gswW;
+    vSwell = vec3(swellSlope.x, crestMix * 0.5 + 0.5, swellSlope.y);
+    pos.y += (sin(uTime * 1.099557 + pos.x * 0.35) + sin(uTime * 0.701622 + pos.z * 0.28))
+      * 0.05 * depthFade * chopW;
     if (uWaveEnabled > 0.001) {
       // waveSampleAt WRITES wave, so it has to complete before wave is read:
       // operand evaluation order is unspecified in GLSL.
@@ -537,7 +575,9 @@ export function zeroWaveUniforms(): WaterWaveUniforms {
  * The one overworld water surface material (dual-scroll + swell normal maps,
  * fresnel sky tint, HDR sun glints, shore foam, fog). Exported so interior
  * builders (the Wildheart Basin) draw the exact same surface; geometry fed to
- * it must carry aShoreDepth/aShoreSlope attributes. Callers gate on
+ * it must carry aShoreDepth/aShoreSlope attributes (aSwellW is optional: a
+ * geometry that omits it reads 0 and stays displacement-still, which is what
+ * interior pools want). Callers gate on
  * GFX.standardMaterials && hasWaterShaderAssets() exactly like buildWater.
  *
  * `shoreEdgeFade` fades the surface to nothing where the baked depth reaches
@@ -706,6 +746,12 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     fillApron();
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(deep, 1));
     geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(apronSlope, 1));
+    // aSwellW 1 everywhere: the apron takes the long groundswell (its grid
+    // samples those wavelengths cleanly) but NEVER the short chop: its ~27
+    // yard vertex spacing cannot sample chop wavelengths (pure aliasing), and
+    // a chop-displaced apron disagreeing with the zone planes at their shared
+    // rect edge is exactly the straight seam line this attribute closes.
+    geo.setAttribute('aSwellW', new THREE.BufferAttribute(new Float32Array(pos.count).fill(1), 1));
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
     // Dry-tile culling: the apron spans the whole world rect too, and its
@@ -713,7 +759,11 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // the full-rect ones baked above (conservative, still correct).
     const fullIndex = geo.getIndex();
     const cullApron = (): void => {
-      const culled = buildWaterSurfaceIndex(deep, APRON_SEGMENTS + 1, APRON_SEGMENTS + 1);
+      // The LIVE segment count, never the APRON_SEGMENTS constant: the vista
+      // tiers build a denser apron (288), and a cull index computed over the
+      // wrong grid dimensions keeps and drops the wrong triangles (seen live
+      // as hard dark wedges and stray slivers along the coast).
+      const culled = buildWaterSurfaceIndex(deep, apronSegments + 1, apronSegments + 1);
       geo.setIndex(culled ? new THREE.BufferAttribute(culled, 1) : fullIndex);
     };
     cullApron();
@@ -749,6 +799,20 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
     const shoreSlope = new Float32Array(pos.count);
+    // Swell weight, packed (see WATER_VERT): 2 = groundswell + chop inside
+    // the plane, feathering the chop share back to 1 (groundswell only, the
+    // apron's constant) at the rect edge, so the two displaced sheets agree
+    // exactly where they meet. Static per-vertex geometry: bakes once.
+    const swellW = new Float32Array(pos.count);
+    for (let i = 0; i < pos.count; i++) {
+      const edge = Math.min(
+        pos.getX(i) - x0,
+        x1 - pos.getX(i),
+        pos.getZ(i) - zone.zMin,
+        zone.zMax - pos.getZ(i),
+      );
+      swellW[i] = 1 + Math.min(1, Math.max(0, edge / WATER_CHOP_EDGE_FEATHER_YARDS));
+    }
     const columns = SEGMENTS_PER_ZONE + 1;
     const fillRow = (row: number): void => {
       const start = row * columns;
@@ -771,6 +835,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     }
     geo.setAttribute('aShoreDepth', new THREE.BufferAttribute(shoreDepth, 1));
     geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(shoreSlope, 1));
+    geo.setAttribute('aSwellW', new THREE.BufferAttribute(swellW, 1));
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
     // Dry-tile culling: most of a zone rect is land, and every quad buried
@@ -831,9 +896,10 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       cameraY = Number.POSITIVE_INFINITY,
     ): number {
       WATER_TIME.value = _time % WATER_TIME_PERIOD;
-      // Small slack over the waterline so the swell never strands the camera
-      // between a displaced front face and a hidden ceiling.
-      const under = cameraY < waterLevel() + 0.75;
+      // Slack over the waterline so the swell never strands the camera
+      // between a displaced front face and a hidden ceiling: must exceed the
+      // worst-case combined chop + groundswell + wobble displacement.
+      const under = cameraY < waterLevel() + 1.1;
       for (const pair of underPairs) {
         pair.under.position.y = pair.front.position.y;
         pair.under.visible = under && pair.front.visible;
