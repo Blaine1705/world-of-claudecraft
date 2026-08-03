@@ -32,8 +32,18 @@ export const WOC_MARKET_ANTI_SNIPE_WINDOW_SECONDS = 120;
 export const WOC_MARKET_ANTI_SNIPE_EXTENSION_SECONDS = 120;
 /** Total extension budget past the seller's chosen end (30 minutes). */
 export const WOC_MARKET_ANTI_SNIPE_CAP_SECONDS = 1800;
-/** Seller-selectable auction durations. */
-export const WOC_MARKET_DURATION_HOURS = [12, 24, 48, 72, 168] as const;
+/**
+ * Seller-selectable auction durations, capped at 48 HOURS.
+ *
+ * The cap is the point, not the list: a listing holds the seller's item in
+ * escrow for its whole life, so a longer auction is a longer period where the
+ * item is neither usable nor sellable elsewhere, and where a price quoted in USD
+ * rides a token whose rate moves. Two days is the longest that stays reasonable
+ * on both counts. The retired 72-hour and one-week options are refused at
+ * creation only: listings already running keep their own end time, exactly like
+ * the retired combined format, so no data migration is implied.
+ */
+export const WOC_MARKET_DURATION_HOURS = [12, 24, 48] as const;
 /** Active listings per account (the World Market's 12-listing precedent). */
 export const WOC_MARKET_MAX_ACTIVE_LISTINGS = 12;
 /** Price floor and ceiling for every USD field. */

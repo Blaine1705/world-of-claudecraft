@@ -13,6 +13,7 @@ import {
   validSettlementTransition,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
+  WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_MAX_PRICE_CENTS,
   WOC_MARKET_MIN_PRICE_CENTS,
@@ -48,6 +49,19 @@ describe('tunables: literal pins', () => {
     expect(WOC_MARKET_MIN_PRICE_CENTS).toBe(25);
     expect(WOC_MARKET_MAX_PRICE_CENTS).toBe(5_000_000);
     expect(WOC_MARKET_STRANDED_RECLAIM_SECONDS).toBe(300);
+  });
+
+  it('caps the seller-selectable duration at 48 hours', () => {
+    // The MAX is the decision, so it is asserted as a bound and not only as a
+    // list: a future addition above 48 has to red this line rather than slip in
+    // as one more allowlist entry.
+    expect([...WOC_MARKET_DURATION_HOURS]).toEqual([12, 24, 48]);
+    expect(Math.max(...WOC_MARKET_DURATION_HOURS)).toBe(48);
+    // Ascending, because the client picks its default by index (durationsHours[1]);
+    // an unsorted list would silently change which option is preselected.
+    expect([...WOC_MARKET_DURATION_HOURS]).toEqual(
+      [...WOC_MARKET_DURATION_HOURS].sort((a, b) => a - b),
+    );
   });
 
   it('keeps the buy-now lock STRICTLY longer than one quote lifetime', () => {
@@ -194,6 +208,22 @@ describe('validListingParams', () => {
       ok: false,
       reason: 'bad_duration',
     });
+  });
+
+  it.each([72, 168])(
+    'refuses %i hours: the two options the 48-hour cap retired',
+    (durationHours) => {
+      // These were valid before the cap, so they are the one behaviour change here
+      // and worth naming rather than leaving to the allowlist equality above.
+      expect(validListingParams(params({ durationHours }))).toEqual({
+        ok: false,
+        reason: 'bad_duration',
+      });
+    },
+  );
+
+  it.each([...WOC_MARKET_DURATION_HOURS])('still accepts %i hours', (durationHours) => {
+    expect(validListingParams(params({ durationHours }))).toEqual({ ok: true });
   });
 
   it('refuses a buy-now format with no buy-now price', () => {

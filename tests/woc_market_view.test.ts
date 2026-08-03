@@ -88,7 +88,7 @@ const makeStatus = (over: Partial<WocMarketStatus> = {}): WocMarketStatus => ({
   price: { available: true, healthy: true, reason: null, tokensPerUsd: 100, asOfMs: 900_000 },
   totpThresholdCents: 10_000,
   maxActiveListings: 12,
-  durationsHours: [12, 24, 48, 72, 168],
+  durationsHours: [12, 24, 48],
   minPriceCents: 25,
   maxPriceCents: 5_000_000,
   allowMounts: true,
