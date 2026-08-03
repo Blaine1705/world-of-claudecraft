@@ -458,6 +458,9 @@ export class QuestDialogController {
         attunedPairs: [...identity.attunedPairs],
         switchCount: identity.switchCount,
         amendsProgress: identity.amendsProgress,
+        // Jack of All Trades (#1296) does not ride CraftingIdentityView yet:
+        // there is no live quest path to become Jack, so this is always false.
+        isJackOfAllTrades: false,
       });
       const options = professionTargets
         .map((target) => {
