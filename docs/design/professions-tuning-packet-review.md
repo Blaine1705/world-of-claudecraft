@@ -617,6 +617,17 @@ Executed after the ruling:
   release; the four new Vale Cup gate-note keys add 60 Latin pending
   rows to the release-owned backlog (counts above already include
   them).
-- This condensation commit, then the full gate at the push tip, the
-  push to origin, and the PR; results recorded in the session memory
+- The full gate ran green at the condensation tip 8f9591c3fc (all 10
+  steps, 2,054 test files), and the base moved AGAIN before the push:
+  origin/release/v0.34.0 advanced to 48fbcf80b8 (7 commits, the
+  zone-map open-sea edge PR 2817). Merged as 0821cc0d3c with one
+  conflict (the map_terrain test's import block, resolved as the union
+  with the branch's derived WORLD_SEED kept over the release's 20061
+  literal). The audit over that merge: all four both-sides files are
+  verified unions (the open-sea pure-core registration beside the
+  branch's rows, the ocean token beside the marker tokens, the
+  fairness-doc append), and the delta carries no route, wire, db, or
+  sim surface, so no premise moved.
+- Then the full gate at the push tip, the push to origin, and the PR;
+  results recorded in the session memory
   (professions-tuning-packet-merge-decision).
