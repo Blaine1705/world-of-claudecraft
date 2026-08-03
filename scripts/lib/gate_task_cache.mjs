@@ -24,6 +24,7 @@ export const GATE_CACHEABLE_TASKS = Object.freeze([
   'check:types',
   'build:env',
   'build:server',
+  'build:bot',
   'build:bundle',
 ]);
 
@@ -78,10 +79,12 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'src/**',
       'server/**',
       'headless/**',
+      'bot/**',
       'tests/**',
       'private/**',
       'tsconfig.json',
       'tsconfig.admin.json',
+      'tsconfig.bot.json',
       'package.json',
     ],
     outputs: ['node_modules/.cache/tsc/**'],
@@ -100,6 +103,10 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'package.json',
     ],
     outputs: ['dist-server/**'],
+  },
+  'build:bot': {
+    inputs: ['bot/**', 'src/**', 'scripts/build_bot.mjs', 'package.json'],
+    outputs: ['dist-bot/**'],
   },
   'build:bundle': {
     inputs: [
