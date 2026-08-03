@@ -11,11 +11,17 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { QUALITY_COLOR } from '../src/ui/icons';
 
-const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
-const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
-
 const stripComments = (source: string): string =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+// The CSS goes through the SAME comment strip as the painters: a pin a
+// commented-out rule satisfies is not a pin (the mutation round proved the
+// raw read green with the live .np-marker.repeat block commented out).
+const tokensCss = stripComments(
+  readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8'),
+);
+const hudCss = stripComments(
+  readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8'),
+);
 const minimapPainter = stripComments(
   readFileSync(new URL('../src/ui/minimap_painter.ts', import.meta.url), 'utf8'),
 );
@@ -45,6 +51,8 @@ describe('quest marker style agreement across surfaces', () => {
     expect(hudCss).toMatch(
       new RegExp(`\\.np-marker\\.repeat\\s*\\{[^}]*color:\\s*${RARE_BLUE}`, 's'),
     );
+    // The glow halo is the ninth statement of the blue (RARE_BLUE + alpha).
+    expect(hudCss).toMatch(new RegExp(`\\.np-marker\\.repeat\\s*\\{[^}]*${RARE_BLUE}88`, 's'));
     expect(hudCss).toMatch(
       new RegExp(`\\.np-marker\\.cooldown\\s*\\{[^}]*color:\\s*${RARE_BLUE}`, 's'),
     );

@@ -78,16 +78,19 @@ interface TextInk {
  *  arithmetic against those sources, so raising a cap fails there first):
  *
  *    150  ally names   (server/social.ts FRIEND_LIMIT 50 + GUILD_MEMBER_LIMIT 100)
- *     96  badge digits (nothing caps the active quest log, but a badge number is
+ *      N  badge digits (nothing caps the active quest log, but a badge number is
  *                       an index into it and it is keyed by quest id, so the
- *                       count of quests in the content tables is the ceiling)
+ *                       count of quests in the content tables is the ceiling;
+ *                       the test derives N from the live QUESTS table, and the
+ *                       realm-grid content growth is what carries the total)
  *     11  POI labels   (the widest zone)
  *      3  portal names (the zone with the most dungeon doors)
  *      1  zone title
  *      3  quest-giver glyphs (gold '?', gold '!', repeat-blue '!'; the
  *         cooldown variant reuses the blue raster and dims at blit time)
  *   ----
- *    264, rounded up for headroom.
+ *    371 as derived today (tests/text_sprite_cache.test.ts recomputes it
+ *    from the live caps and floors the total, so a shrunken term reddens).
  *
  *  The budget is a ceiling, not a working set: ordinary play resides at a couple
  *  of dozen sprites, and nothing releases them before then (there is deliberately

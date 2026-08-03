@@ -206,16 +206,24 @@ describe('nameplate quest marker variants', () => {
     // the break on ready) runs over more than one quest, not just the
     // classifier unit. The work order's giver also gives the attune quest,
     // and its ready '?' must win the plate over the repeat-blue offer.
+    // BOTH orders: with the ready quest first, a fold degenerated to
+    // last-value-wins answers 'repeat' (the mutation round proved the
+    // ready-last order alone leaves exactly that mutant green).
     const attuneId = 'q_prof_attune_smith';
-    const { painter, v } = harness({
-      state: 'unavailable',
-      done: true,
-      questIds: [WORK_ORDER.id, attuneId],
-      questStates: { [WORK_ORDER.id]: 'available', [attuneId]: 'ready' },
-    });
-    painter.update(true);
-    expect(v.markerEl.textContent).toBe('?');
-    expect(v.markerEl.className).toBe('np-marker ready');
+    for (const questIds of [
+      [attuneId, WORK_ORDER.id],
+      [WORK_ORDER.id, attuneId],
+    ]) {
+      const { painter, v } = harness({
+        state: 'unavailable',
+        done: true,
+        questIds,
+        questStates: { [WORK_ORDER.id]: 'available', [attuneId]: 'ready' },
+      });
+      painter.update(true);
+      expect(v.markerEl.textContent, questIds.join(',')).toBe('?');
+      expect(v.markerEl.className, questIds.join(',')).toBe('np-marker ready');
+    }
   });
 
   it('renders the gray in-progress state over a cooldown mark: the documented divergence', () => {

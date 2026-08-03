@@ -105,7 +105,11 @@ describe('questMarkerKind: the turn-in role', () => {
 describe('the fold order', () => {
   // Record<QuestMarkerKind, number> forces this table to name every variant:
   // adding a kind without ranking it here is a compile error, so the sweep
-  // below cannot silently skip one (the union-sweep trap).
+  // below cannot silently skip one (the union-sweep trap). DELIBERATELY a
+  // hand-written literal mirror, never derived from questMarkerRank: this
+  // table is the load-bearing ordering pin (the mutation round proved a
+  // priority swap survives every derived comparison), so "DRYing" it onto
+  // the production table would evaporate all ordering protection.
   const RANK: Record<QuestMarkerKind, number> = {
     ready: 5,
     available: 4,
@@ -142,9 +146,10 @@ describe('the fold order', () => {
   });
 
   it('exposes the fold rank the list-producing consumers sort by', () => {
-    // questGiverNpcMarkers orders its tooltip list by questMarkerRank; this
-    // pins that the exported rank IS the fold's order, so the two can never
-    // be maintained apart.
+    // Pins rank/fold AGREEMENT only (both read the production table, so this
+    // cannot catch a reordering; the literal RANK mirror above does that).
+    // What it does catch is the two exports drifting apart, the exact
+    // divergence the map's sort-by-rank refactor made possible.
     for (const a of KINDS) {
       for (const b of KINDS) {
         const stronger = strongerQuestMarker(a, b);

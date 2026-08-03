@@ -4,6 +4,7 @@
 // the mapping plus the resolved English here is what makes the tooltip tags
 // a tested behavior rather than an inlined string soup.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { t } from '../src/ui/i18n';
 import { questMarkerTooltipTag } from '../src/ui/quest_marker_tags';
@@ -39,5 +40,17 @@ describe('questMarkerTooltipTag', () => {
     expect(t('questUi.dialog.repeatableQuestAria', { name: 'Forge Orders' })).toBe(
       'Repeatable quest: Forge Orders',
     );
+  });
+
+  it('is what the map tooltip actually renders through (the wiring pin)', () => {
+    // The mapping above is worthless if hud.ts quietly reverts to inlined
+    // strings: pin the LIVE call and the class emission, comments stripped so
+    // a commented-out call cannot satisfy either arm (the raw-source rule).
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(hud).toContain('questMarkerTooltipTag(ref.kind)');
+    expect(hud).toContain('<span class="${tag.cls}">');
+    expect(hud).toContain('esc(t(tag.key))');
   });
 });

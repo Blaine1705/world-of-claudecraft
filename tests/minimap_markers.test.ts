@@ -304,15 +304,23 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     const npc = world.entities.get(6);
     if (!npc) throw new Error('expected the seeded giver npc');
     npc.templateId = workOrder.giverNpcId;
-    npc.questIds = [workOrder.id, attune.id];
     world.questsDone = new Set([workOrder.id]);
     world.questState = (q) =>
       q === workOrder.id ? 'available' : q === attune.id ? 'ready' : 'unavailable';
-    const npcs = buildMarkers(world as unknown as IWorld).filter(
-      (m) => m.kind === 'npc',
-    ) as Extract<MinimapMarker, { kind: 'npc' }>[];
-    expect(npcs[0].glyph).toBe('?');
-    expect(npcs[0].marker).toBe('ready');
+    // BOTH orders: with the ready quest first, a fold degenerated to
+    // last-value-wins answers 'repeat' (the mutation round proved the
+    // ready-last order alone leaves exactly that mutant green).
+    for (const questIds of [
+      [attune.id, workOrder.id],
+      [workOrder.id, attune.id],
+    ]) {
+      npc.questIds = questIds;
+      const npcs = buildMarkers(world as unknown as IWorld).filter(
+        (m) => m.kind === 'npc',
+      ) as Extract<MinimapMarker, { kind: 'npc' }>[];
+      expect(npcs[0].glyph, questIds.join(',')).toBe('?');
+      expect(npcs[0].marker, questIds.join(',')).toBe('ready');
+    }
   });
 
   it('classifies party members: an on-map disc (alive -> pip) and an off-map arrow (dead)', () => {
