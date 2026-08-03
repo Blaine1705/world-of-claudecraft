@@ -146,6 +146,54 @@ export function shoreDepthAt(x: number, z: number, seed: number): number {
 }
 
 /**
+ * Dry-tile culling for the water sheets. A zone plane (and the horizon apron)
+ * spans its whole rect, but most of that rect is LAND: every quad whose
+ * corners all sit this far above the waterline has its surface buried under
+ * terrain and can never contribute a visible fragment, yet its vertices are
+ * shaded every frame. The margin is one ~2 yard vertex spacing of slack so a
+ * quad that straddles the waterline contour (or heaves with the swell) is
+ * always kept; only genuinely-inland tiles drop.
+ */
+export const WATER_TILE_KEEP_ABOVE = -0.75;
+
+/**
+ * Index buffer over a (columns x rows) vertex lattice keeping only quads with
+ * at least one corner deeper than WATER_TILE_KEEP_ABOVE. Triangle order and
+ * winding match THREE.PlaneGeometry exactly (a,b,d / b,c,d), so a culled
+ * geometry renders identically to the full sheet minus the buried tiles.
+ * Returns null when nothing was dropped (keep the geometry's own index).
+ */
+export function buildWaterSurfaceIndex(
+  depth: ArrayLike<number>,
+  columns: number,
+  rows: number,
+): Uint16Array | Uint32Array | null {
+  const quads: number[] = [];
+  let dropped = 0;
+  for (let r = 0; r < rows - 1; r++) {
+    for (let c = 0; c < columns - 1; c++) {
+      const a = r * columns + c;
+      const b = (r + 1) * columns + c;
+      const cc = (r + 1) * columns + c + 1;
+      const d = r * columns + c + 1;
+      if (
+        depth[a] > WATER_TILE_KEEP_ABOVE ||
+        depth[b] > WATER_TILE_KEEP_ABOVE ||
+        depth[cc] > WATER_TILE_KEEP_ABOVE ||
+        depth[d] > WATER_TILE_KEEP_ABOVE
+      ) {
+        quads.push(a, b, d, b, cc, d);
+      } else {
+        dropped++;
+      }
+    }
+  }
+  if (dropped === 0) return null;
+  const vertexCount = columns * rows;
+  return vertexCount > 65535 ? new Uint32Array(quads) : new Uint16Array(quads);
+}
+
+/**
  * Deepest the terrain generator ever puts the seabed below the water line.
  * Measured across a 30 sample coastline survey: every sample tops out at
  * exactly this, and depth 15 is reached by none of them. The colour ramp

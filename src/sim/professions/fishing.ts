@@ -103,7 +103,7 @@ function hasFishableWaterAhead(ctx: SimContext, p: Entity): boolean {
   return FISHING_SAMPLE_DISTANCES.some((d) => {
     const x = p.pos.x + sin * d;
     const z = p.pos.z + cos * d;
-    return groundHeight(x, z, ctx.cfg.seed) < waterLevelAt(x, z) - SWIM_DEPTH;
+    return groundHeight(x, z, ctx.cfg.seed) < waterLevelAt(x, z, ctx.cfg.seed) - SWIM_DEPTH;
   });
 }
 

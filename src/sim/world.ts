@@ -102,12 +102,57 @@ export function isInWaterBody(x: number, z: number): boolean {
   return false;
 }
 
+// True where the world's OWN terrain generation (base fields, coasts, lake
+// basins, the world-edge sea shave; custom-map sculpt stamps excluded, #1518)
+// carved the finished ground below the active waterline. This is exactly where
+// the renderer's zone water planes and horizon apron read as open water, so
+// the sim recognizes the same seas, straits, and coves the player can SEE
+// (the old declared-footprint-only rule left every undeclared sea sim-dry:
+// players sank to the seabed, walked under the surface, and wedged on bed
+// slopes no shore rule would release). Instanced interiors sit on their own
+// floors far off-world and never read as sea.
+export function isOpenSeaAt(x: number, z: number, seed: number): boolean {
+  if (x > DUNGEON_X_THRESHOLD) return false;
+  // Per-cell memo: this runs inside the movement gates several times per
+  // entity per tick and the sea test costs a full terrain sample. Sea-ness is
+  // stable per 1-yard cell (the same quantization the movement gates already
+  // accept from the steepness memo), so cache the bit per cell, keyed by the
+  // active content + seed (tests and custom maps swap both). Callers compare
+  // exact ground against the returned surface, so only the yard nearest the
+  // waterline contour ever sees the quantization, where the water is ankle
+  // deep and every consumer no-ops anyway.
+  const content = getActiveWorldContent();
+  if (seed !== seaCellSeed || content !== seaCellContent) {
+    seaCellSeed = seed;
+    seaCellContent = content;
+    seaCellCache.clear();
+  }
+  const cx = Math.floor(x);
+  const cz = Math.floor(z);
+  const key = (cx + 8192) * 65536 + (cz + 8192);
+  let sea = seaCellCache.get(key);
+  if (sea === undefined) {
+    if (seaCellCache.size > 400000) seaCellCache.clear(); // bound the memo
+    sea = terrainHeightSansEdits(cx + 0.5, cz + 0.5, seed) < waterLevel();
+    seaCellCache.set(key, sea);
+  }
+  return sea;
+}
+let seaCellSeed = Number.NaN;
+let seaCellContent: unknown = null;
+const seaCellCache = new Map<number, boolean>();
+
 // The water surface height AT this location: waterLevel() inside a declared
-// lake's footprint, else -Infinity (there is no water surface here, so nothing
-// reads as flooded and no swim-depth floor applies). Callers that need "is there
-// water here at all" should prefer this over a flat global constant.
-export function waterLevelAt(x: number, z: number): number {
-  return isInWaterBody(x, z) ? waterLevel() : -Infinity;
+// lake's footprint OR anywhere the generator itself carved open sea, else
+// -Infinity (there is no water surface here, so nothing reads as flooded and
+// no swim-depth floor applies). The cheap footprint scan answers first so
+// declared water never pays for a terrain sample; an authored sunken stamp
+// outside every footprint stays dry (#1518, isOpenSeaAt ignores the edit
+// layer). Callers that need "is there water here at all" should prefer this
+// over a flat global constant.
+export function waterLevelAt(x: number, z: number, seed: number): number {
+  if (isInWaterBody(x, z)) return waterLevel();
+  return isOpenSeaAt(x, z, seed) ? waterLevel() : -Infinity;
 }
 
 // Every declared lake across the active content's zones, in render/authoring
@@ -3397,7 +3442,24 @@ export function groundHeight(x: number, z: number, seed: number): number {
 }
 
 export function terrainHeight(x: number, z: number, seed: number): number {
-  let h = terrainHeightUnpadded(x, z, seed);
+  return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed));
+}
+
+// The finished overworld height as the GENERATOR alone authors it: the full
+// unpadded chain and every authored pad, with only the custom-map sculpt-edit
+// layer skipped. This is the ground truth for "did the world's own shaping
+// carve below the waterline here" (isOpenSeaAt), so an author's sunken stamp
+// (#1518) can never read as sea. For the built-in world (no terrainEdits) it
+// equals terrainHeight exactly.
+export function terrainHeightSansEdits(x: number, z: number, seed: number): number {
+  return applyTerrainPads(x, z, seed, terrainHeightUnpadded(x, z, seed, true));
+}
+
+// The authored pad chain over the unpadded height (castle pad, spring bank,
+// pool walkway bed, garden/gale pads): one shared body so terrainHeight and
+// terrainHeightSansEdits can never drift.
+function applyTerrainPads(x: number, z: number, seed: number, h0: number): number {
+  let h = h0;
   // The Last Keep's courtyard pad, over the FINISHED height (the world-edge
   // sea shave runs late in the unpadded chain and was clipping the castle's
   // seaward corner; the castle plateau must win everywhere inside its walls).
@@ -3561,7 +3623,7 @@ function borderSeaGate(x: number, z: number): number {
   return smoothstep(0.005, 0.06, land);
 }
 
-function terrainHeightUnpadded(x: number, z: number, seed: number): number {
+function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = false): number {
   const region = terrainRegionAt(x, z);
   let h = baseHeight(x, z, seed, region);
 
@@ -3972,7 +4034,9 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   // height (the editor's height stamps; a no-op for the built-in world, which has
   // no terrainEdits). Kept in terrainHeight so the render mesh (which samples
   // terrainHeight) and the sim's groundHeight both see the edited ground.
-  return applyEditLayer(x, z, h);
+  // skipEdits serves terrainHeightSansEdits (the open-sea predicate) alone:
+  // every gameplay and render height keeps the edited ground.
+  return skipEdits ? h : applyEditLayer(x, z, h);
 }
 
 // Steepest local rise/run of the walkable heightfield at (x, z), independent of

@@ -34,7 +34,7 @@ export function bobberAnchorInto(
   for (const d of FISHING_SAMPLE_DISTANCES) {
     const sx = x + sin * d;
     const sz = z + cos * d;
-    const water = waterLevelAt(sx, sz);
+    const water = waterLevelAt(sx, sz, seed);
     if (groundHeight(sx, sz, seed) < water - PLAYER_SWIM_DEPTH) {
       out.x = sx;
       out.y = water;

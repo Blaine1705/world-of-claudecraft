@@ -5,10 +5,11 @@ import { waterLevel } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { farVistaPlan } from './far_terrain_core';
-import { GFX, SUN_DIR, sharedUniforms } from './gfx';
+import { GFX, SUN_DIR } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
 import { waterNormalish, waterNormalMaps } from './textures';
 import {
+  buildWaterSurfaceIndex,
   shoreDepthAt,
   shoreSlopeAt,
   WATER_FIELD_EDGE_FEATHER_UV,
@@ -91,6 +92,16 @@ const WATER_DEEP_DISTANCE_STRENGTH = 0.92;
 /** GLSL needs a decimal point on every float literal. */
 const glsl = (n: number): string => (Number.isInteger(n) ? `${n}.0` : String(n));
 /**
+ * The water clock wraps at this period so shader phases never grow unbounded
+ * (fp32 sin() goes visibly steppy on long sessions, and mobile mediump dies
+ * within minutes). Every water frequency below is snapped to a whole number
+ * of cycles per period and every texture scroll to a whole number of tiles
+ * per period, so the wrap is seamless by construction.
+ */
+const WATER_TIME_PERIOD = 600;
+/** The one shared, wrapped water clock every water material binds as uTime. */
+const WATER_TIME: THREE.IUniform<number> = { value: 0 };
+/**
  * Seabed slope the horizon apron falls back to once it is far enough out that
  * terrain sampling is no longer trustworthy. Foam is depth/slope, so a small
  * slope against a deep reading puts it far past the surf band: open water,
@@ -139,6 +150,17 @@ export function hasWaterShaderAssets(): boolean {
   return Boolean(WATER_TEX.n1 && WATER_TEX.n2 && WATER_TEX.broad);
 }
 
+/**
+ * Directional swell height (yards of half-amplitude). Purely cosmetic vertex
+ * displacement: the sim's waterline and the swim surface stay flat, and the
+ * amplitude fades to zero at the shoreline (a heaving sheet must never rise
+ * over a beach) and with camera range (the apron's ~15 yard vertex spacing
+ * would alias these wavelengths into shimmer at the horizon).
+ */
+const WATER_SWELL_AMP = 0.22;
+/** Sun-through-swell scattering tint: the turquoise a lit wave face glows. */
+const SCATTER_COLOR = new THREE.Color(0.09, 0.38, 0.33);
+
 const DEEP_COLOR = new THREE.Color(0x0d3a52);
 /** Canonical shallow-water tint, exported for surfaces that must match the
  *  sea palette without the full shader (the Wildheart waterfall ribbons). */
@@ -152,11 +174,18 @@ export interface WaterView {
   ensureZone(zone: ZoneDef, opts?: { pace?: 'fast' | 'idle' }): Promise<THREE.Mesh[]>;
   isZoneLoaded(zoneId: string): boolean;
   /**
-   * Advances the legacy texture scroll (low tier; high tier uses uTime) and
-   * the interactive height field. Returns the simulation passes drawn this
-   * frame, which the renderer folds into its draw-call accounting.
+   * Advances the wrapped water clock, the legacy texture scroll (low tier),
+   * the interactive height field, and the from-below ceiling visibility
+   * (cameraY against the waterline). Returns the simulation passes drawn
+   * this frame, which the renderer folds into its draw-call accounting.
    */
-  update(time: number, cameraX: number, cameraZ: number, visibleRange: number): number;
+  update(
+    time: number,
+    cameraX: number,
+    cameraZ: number,
+    visibleRange: number,
+    cameraY?: number,
+  ): number;
   /** Adds a local entry, landing, fish, or bobber disturbance. */
   addSplash(x: number, z: number, radius: number, strength?: number): void;
   /** Presses a facing-aligned body footprint into the surface. */
@@ -222,10 +251,24 @@ const WAVE_SAMPLE_GLSL = /* glsl */ `
   }
 `;
 
+// The three swell wave vectors (radians per yard) and their angular speeds.
+// Wavelengths 21 / 20 / 12 yards: long enough that the zone planes' ~2 yard
+// vertex spacing samples them cleanly, short enough to read as running water.
+const SWELL_GLSL = /* glsl */ `
+  const vec2 SWELL_K1 = vec2(0.24, 0.18);
+  const vec2 SWELL_K2 = vec2(-0.16, 0.27);
+  const vec2 SWELL_K3 = vec2(0.44, -0.31);
+  // 86 / 117 / 162 cycles per wrap period: seamless at the clock wrap.
+  const float SWELL_W1 = 0.900590;
+  const float SWELL_W2 = 1.225221;
+  const float SWELL_W3 = 1.696460;
+`;
+
 const WATER_VERT = /* glsl */ `
   attribute float aShoreDepth;
   attribute float aShoreSlope;
   uniform float uTime;
+  uniform float uSwellAmp;
   uniform sampler2D uWaveState;
   uniform float uWaveEnabled;
   uniform vec2 uWaveOrigin;
@@ -233,11 +276,32 @@ const WATER_VERT = /* glsl */ `
   varying vec3 vWPos;
   varying float vShoreDepth;
   varying float vShoreSlope;
+  // xz: analytic surface slope of the swell; y: normalized crest height (0..1)
+  varying vec3 vSwell;
   #include <fog_pars_vertex>
+  ${SWELL_GLSL}
   ${WAVE_SAMPLE_GLSL}
   void main() {
     vec3 pos = position;
-    pos.y += (sin(uTime * 1.1 + pos.x * 0.35) + sin(uTime * 0.7 + pos.z * 0.28)) * 0.05;
+    // Directional swell: three travelling waves displace the surface, and the
+    // fragment stage gets the matching slope (the cos derivatives) for free.
+    float p1 = dot(pos.xz, SWELL_K1) + uTime * SWELL_W1;
+    float p2 = dot(pos.xz, SWELL_K2) + uTime * SWELL_W2;
+    float p3 = dot(pos.xz, SWELL_K3) + uTime * SWELL_W3;
+    float depthFade = clamp(aShoreDepth * 0.8, 0.0, 1.0);
+    float rangeFade = 1.0 - smoothstep(90.0, 220.0, distance(cameraPosition.xz, pos.xz));
+    // Wave GROUPS: a very slow two-sine envelope swells some stretches of sea
+    // and calms others, so open water stops being one uniform corduroy sheet.
+    float group = 0.55 + 0.45
+      * sin(dot(pos.xz, vec2(0.021, 0.013)) + uTime * 0.146608)
+      * sin(dot(pos.xz, vec2(-0.011, 0.024)) + uTime * 0.115192);
+    float amp = uSwellAmp * depthFade * rangeFade * (0.55 + 0.9 * group);
+    float crest = sin(p1) * 0.5 + sin(p2) * 0.32 + sin(p3) * 0.18;
+    pos.y += crest * amp;
+    vec2 swellSlope =
+      (cos(p1) * 0.5 * SWELL_K1 + cos(p2) * 0.32 * SWELL_K2 + cos(p3) * 0.18 * SWELL_K3) * amp;
+    vSwell = vec3(swellSlope.x, (crest * (0.35 + 0.65 * group)) * 0.5 + 0.5, swellSlope.y);
+    pos.y += (sin(uTime * 1.099557 + pos.x * 0.35) + sin(uTime * 0.701622 + pos.z * 0.28)) * 0.05;
     if (uWaveEnabled > 0.001) {
       // waveSampleAt WRITES wave, so it has to complete before wave is read:
       // operand evaluation order is unspecified in GLSL.
@@ -270,23 +334,35 @@ const WATER_FRAG = /* glsl */ `
   uniform vec2 uWaveOrigin;
   uniform float uWaveSize;
   uniform float uShoreEdgeFade;
+  uniform vec3 uScatter;
   varying vec3 vWPos;
   varying float vShoreDepth;
   varying float vShoreSlope;
+  varying vec3 vSwell;
   #include <common>
   #include <fog_pars_fragment>
   ${WAVE_SAMPLE_GLSL}
   void main() {
     float camDist = length(cameraPosition - vWPos);
     // dual-scroll detail ripples (real three.js water normal maps)
-    vec3 n1 = texture2D(uNorm1, vWPos.xz * 0.055 + uTime * vec2(0.013, 0.019)).xyz * 2.0 - 1.0;
-    vec3 n2 = texture2D(uNorm2, vWPos.xz * 0.115 - uTime * vec2(0.021, 0.011)).xyz * 2.0 - 1.0;
+    vec3 n1 = texture2D(uNorm1, vWPos.xz * 0.055 + uTime * vec2(0.013333, 0.018333)).xyz * 2.0 - 1.0;
+    vec3 n2 = texture2D(uNorm2, vWPos.xz * 0.115 - uTime * vec2(0.021667, 0.011667)).xyz * 2.0 - 1.0;
     // broad slow ocean swell that survives at range, where the detail maps
     // average out to a mirror, keeps big water surfaces alive from above
-    vec3 n3 = texture2D(uNorm3, vWPos.xz * 0.016 + uTime * vec2(0.005, -0.004)).xyz * 2.0 - 1.0;
+    vec3 n3 = texture2D(uNorm3, vWPos.xz * 0.016 + uTime * vec2(0.005000, -0.003333)).xyz * 2.0 - 1.0;
+    // Sea-state lanes: the broad map again at 1/4 the scale, drifting one
+    // tile per clock period. Its slow field re-tints and brightens whole
+    // stretches of water (wind lanes, glassy calms), the large-scale
+    // variation a single-palette ocean is missing. (Named seaLane because
+    // "patch" is a RESERVED WORD in GLSL ES 3.00, and three.js promotes this
+    // shader to #version 300 es on WebGL2; the reserved name failed the
+    // compile silently under parallel shader compilation.)
+    float seaLane = texture2D(uNorm3, vWPos.xz * 0.0042 + uTime * vec2(0.001667, -0.001667)).x;
     float farW = smoothstep(24.0, 140.0, camDist);
-    // rippled up close -> glassy at distance: detail fades out, swell stays
-    vec2 nm = mix(n1.xy * 0.85 + n2.xy * 0.6, n3.xy * 1.5, farW * 0.78);
+    // rippled up close -> glassy at distance: detail fades out, swell stays.
+    // The geometric swell's analytic slope (vSwell.xz) tilts the whole normal
+    // so the lit shading agrees with the silhouette the vertex stage displaced.
+    vec2 nm = mix(n1.xy * 0.85 + n2.xy * 0.6, n3.xy * 1.5, farW * 0.78) + vSwell.xz * 5.5;
     // interactive wakes ride on top of the static maps, near the camera only
     vec2 waveSlope = vec2(0.0);
     float waveEnergy = 0.0;
@@ -298,6 +374,24 @@ const WATER_FRAG = /* glsl */ `
     }
     vec3 N = normalize(vec3(nm + waveSlope * 9.5, 3.1).xzy);
     vec3 V = normalize(cameraPosition - vWPos);
+  #ifdef WATER_UNDERSIDE
+    // Seen from BELOW: the surface is a rippling ceiling lit from above.
+    // (A dedicated BackSide mesh, never gl_FrontFacing: three.js renders a
+    // transparent DoubleSide object as two passes with forced face culling,
+    // which makes gl_FrontFacing unreliable.) Inside Snell's window (the
+    // ~97 degree cone overhead, IOR 1.333) the ceiling opens to sky light;
+    // outside it closes into the deep, the total-internal-reflection look.
+    // Around the sun's column light wells down and refracted glints dance.
+    float upDot = abs(dot(N, V));
+    float tir = pow(1.0 - upDot, 2.0);
+    float snellW = smoothstep(0.655, 0.70, upDot);
+    float sunWell = pow(max(dot(uSunDir, N), 0.0), 4.0);
+    vec3 ceiling = mix(uDeep * 0.5, mix(uShallow * 0.75, uSkyColor * 0.9, 0.45), snellW);
+    ceiling += uShallow * sunWell * 0.25;
+    ceiling += uSunColor * pow(max(dot(reflect(-uSunDir, N), -V), 0.0), 60.0) * 0.6;
+    vec3 col = mix(ceiling, uDeep * 0.35, tir * (1.0 - snellW) * 0.8);
+    float alpha = clamp(0.88 + tir * 0.12, 0.0, 1.0);
+  #else
     float fresnel = 0.05 + 0.95 * pow(1.0 - max(dot(N, V), 0.0), 4.0);
     // The seabed is hard clamped at ${WATER_SEABED_CLAMP_YARDS} yards. A linear ramp spends the
     // whole palette in the shallows, and an exponential is still climbing when
@@ -308,6 +402,10 @@ const WATER_FRAG = /* glsl */ `
     // two land on the same colour and rect boundaries stay invisible.
     float depth = smoothstep(0.0, ${glsl(WATER_SEABED_CLAMP_YARDS)}, vShoreDepth);
     vec3 col = mix(uShallow, uDeep, depth * ${glsl(WATER_DEPTH_COLOR_AUTHORITY)});
+    // Red dies first (Beer-Lambert): the per-channel absorption signature
+    // that makes shallow-to-mid water read as water instead of paint. Both
+    // sheets saturate by the seabed clamp, so the apron seam stays closed.
+    col *= mix(vec3(1.0), vec3(0.78, 0.99, 1.04), 1.0 - exp(-vShoreDepth * 0.55));
     // A 6 yard seabed cannot supply open-ocean depth, so grade toward deep with
     // VIEW DISTANCE the way real water does. This is what makes the far sea read
     // as ocean rather than as an endless shallow, and it hides the apron seam.
@@ -315,14 +413,33 @@ const WATER_FRAG = /* glsl */ `
     // dappled shimmer that fades with distance so it never reads as speckle
     float shimmer = max(n1.x * 0.7 + n2.y * 0.55, 0.0) * exp(-camDist * 0.022);
     col *= 0.92 + 0.4 * shimmer;
+    // wind lanes: hue and brightness drift with the lane field
+    col = mix(col, col * vec3(0.86, 1.04, 1.07), (seaLane - 0.5) * 0.9);
+    col *= 0.93 + seaLane * 0.14;
     // reflection tracks the live fog/horizon color so each biome's water
     // belongs to its sky instead of a constant pasted-on tint
     vec3 skyRef = mix(uSkyColor, fogColor, 0.5);
     col = mix(col, skyRef, min(fresnel * 0.65, 0.42));
     float sunAlign = max(dot(reflect(-uSunDir, N), V), 0.0);
-    col += uSunColor * pow(sunAlign, 130.0) * 2.6;                   // sparkle glints (>1 -> bloom)
+    // sparkle glints (>1 -> bloom), jittered by the detail maps so they
+    // twinkle in patches instead of lighting one uniform stripe
+    col += uSunColor * pow(sunAlign, 130.0) * (1.4 + 2.4 * clamp(n1.x * 3.0 + 0.5, 0.0, 1.0));
     col += uSunColor * pow(sunAlign, 28.0) * 0.30;                   // wider lobe: survives steep cameras
     col += uSunColor * pow(sunAlign, 6.0) * 0.05;                    // faint warm sheen sunward
+    // Sun-through-swell scattering: looking INTO the sun across running water,
+    // light enters the back of a crest and scatters out of its face as a
+    // turquoise glow. Gated on the crest height (vSwell.y) and a grazing view,
+    // so calm water seen from above is untouched; the interactive wake energy
+    // feeds it too, so a churned wake glows the same way.
+    float intoSun = pow(max(dot(-V, uSunDir), 0.0), 3.0);
+    float grazing = 1.0 - max(dot(N, V), 0.0);
+    float churn = clamp(vSwell.y + waveEnergy * 2.0, 0.0, 1.3);
+    col += uScatter * (intoSun * grazing * (0.25 + 0.75 * churn));
+    // Whitecap mottling where grouped crests peak, broken up by the detail
+    // map and faded with range (the analytic mask has no mip chain).
+    float capMask = smoothstep(0.68, 0.96, vSwell.y * (0.5 + 0.5 * seaLane));
+    float capTex = smoothstep(0.52, 0.82, n2.x * 0.5 + 0.5);
+    col = mix(col, vec3(0.99), capMask * capTex * (1.0 - farW) * 0.45);
     // Shoreline foam keyed on HORIZONTAL distance to the waterline, recovered
     // as depth / seabed slope, NOT on depth. Measured shelves range from 3.2
     // yards of depth in 4 yards of run to 0.2 yards of depth sustained over 40,
@@ -335,9 +452,13 @@ const WATER_FRAG = /* glsl */ `
     // stripes, faded with range because it is an analytic function with no mip
     // chain and aliases hard at grazing angles.
     float foamWave = 0.55
-      + 0.25 * sin(uTime * 1.7 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0)
-      + 0.20 * sin(uTime * 0.9 - vWPos.x * 0.41 + vWPos.z * 0.63 + n1.y * 4.0);
-    float foam = foamBand * foamWave * exp(-camDist * ${glsl(WATER_FOAM_DISTANCE_FADE)});
+      + 0.25 * sin(uTime * 1.696460 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0)
+      + 0.20 * sin(uTime * 0.900590 - vWPos.x * 0.41 + vWPos.z * 0.63 + n1.y * 4.0);
+    // A lapping wave travels SHOREWARD through the band (phase runs along the
+    // recovered shore distance), so the surf advances and retreats instead of
+    // pulsing in place. Reuses the already-sampled normal maps for its break.
+    float lap = 0.6 + 0.4 * sin(uTime * 1.350885 - shoreDist * 1.9 + n1.y * 3.0);
+    float foam = foamBand * foamWave * lap * exp(-camDist * ${glsl(WATER_FOAM_DISTANCE_FADE)});
     // disturbed water reads brighter and skyward, the way a real wake does
     float contactSheen = smoothstep(0.025, 0.13, waveEnergy) * exp(-camDist * 0.022);
     col = mix(col, mix(uShallow, uSkyColor, 0.52), contactSheen * 0.24);
@@ -355,6 +476,7 @@ const WATER_FRAG = /* glsl */ `
     // collapses the mix to 1.0: the overworld shader is byte-identical.
     float edgeWobble = 0.18 * sin(vWPos.x * 1.7 + vWPos.z * 2.3) + 0.12 * sin(vWPos.z * 4.1 - vWPos.x * 3.3);
     alpha *= mix(1.0, smoothstep(0.12, 0.85, vShoreDepth + edgeWobble * uShoreEdgeFade), uShoreEdgeFade);
+  #endif
     gl_FragColor = vec4(col, alpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
@@ -401,9 +523,10 @@ export function zeroWaveUniforms(): WaterWaveUniforms {
  */
 export function createWaterSurfaceMaterial(
   wave: WaterWaveUniforms,
-  opts?: { shoreEdgeFade?: boolean },
+  opts?: { shoreEdgeFade?: boolean; underside?: boolean },
 ): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
+    defines: opts?.underside ? { WATER_UNDERSIDE: '' } : {},
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
       uNorm1: { value: WATER_TEX.n1 },
@@ -414,17 +537,23 @@ export function createWaterSurfaceMaterial(
       uSkyColor: { value: SKY_TINT },
       uDeep: { value: DEEP_COLOR },
       uShallow: { value: SHALLOW_COLOR },
-      uTime: sharedUniforms.uTime,
+      uTime: WATER_TIME,
       uWaveState: wave.uWaveState,
       uWaveEnabled: wave.uWaveEnabled,
       uWaveOrigin: wave.uWaveOrigin,
       uWaveSize: wave.uWaveSize,
       uShoreEdgeFade: { value: opts?.shoreEdgeFade ? 1 : 0 },
+      uSwellAmp: { value: WATER_SWELL_AMP },
+      uScatter: { value: SCATTER_COLOR },
     },
     vertexShader: WATER_VERT,
     fragmentShader: WATER_FRAG,
     transparent: true,
     depthWrite: false,
+    // The from-below ceiling is a separate BackSide mesh (see addUnderside in
+    // buildShaderWater), never DoubleSide: three.js splits a transparent
+    // DoubleSide object into two passes, which breaks gl_FrontFacing.
+    side: opts?.underside ? THREE.BackSide : THREE.FrontSide,
     fog: true,
   });
 }
@@ -438,10 +567,24 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // ONE material for every zone plane and the apron, so the field's uniform
   // objects (shared by reference, like uTime) drive the whole surface.
   const material = createWaterSurfaceMaterial(wave);
+  const undersideMaterial = createWaterSurfaceMaterial(wave, { underside: true });
 
   const meshes: THREE.Mesh[] = [];
   const group = new THREE.Group();
   group.name = 'water';
+  // The from-below ceiling: a BackSide twin per sheet SHARING its geometry
+  // (attributes, culled index and all), visible only while the camera is
+  // under the waterline, so above water it costs nothing at all.
+  const underPairs: { front: THREE.Mesh; under: THREE.Mesh }[] = [];
+  const addUnderside = (front: THREE.Mesh): void => {
+    const under = new THREE.Mesh(front.geometry, undersideMaterial);
+    under.renderOrder = front.renderOrder;
+    under.position.copy(front.position);
+    under.visible = false;
+    group.add(under);
+    meshes.push(under);
+    underPairs.push({ front, under });
+  };
   const loadedZones = new Set<string>();
   const pendingZones = new Map<string, Promise<THREE.Mesh[]>>();
   // Per-mesh in-place refit closures: re-seat y and recompute the shore-depth
@@ -537,15 +680,26 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(apronSlope, 1));
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
+    // Dry-tile culling: the apron spans the whole world rect too, and its
+    // interior is mostly LAND under the zone planes. Bounding volumes stay
+    // the full-rect ones baked above (conservative, still correct).
+    const fullIndex = geo.getIndex();
+    const cullApron = (): void => {
+      const culled = buildWaterSurfaceIndex(deep, APRON_SEGMENTS + 1, APRON_SEGMENTS + 1);
+      geo.setIndex(culled ? new THREE.BufferAttribute(culled, 1) : fullIndex);
+    };
+    cullApron();
     const apron = new THREE.Mesh(geo, material);
     apron.position.y = waterLevel() - 0.06;
     apron.renderOrder = WATER_APRON_RENDER_ORDER;
     meshes.push(apron);
     group.add(apron);
+    addUnderside(apron);
     refits.push(() => {
       fillApron();
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+      cullApron();
       apron.position.y = waterLevel() - 0.06;
     });
   }
@@ -591,6 +745,15 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     geo.setAttribute('aShoreSlope', new THREE.BufferAttribute(shoreSlope, 1));
     geo.computeBoundingBox();
     geo.computeBoundingSphere();
+    // Dry-tile culling: most of a zone rect is land, and every quad buried
+    // under it still cost full vertex shading. Keeping only waterline-adjacent
+    // tiles is the single biggest water frame-cost win in this module.
+    const fullIndex = geo.getIndex();
+    const cullZone = (): void => {
+      const culled = buildWaterSurfaceIndex(shoreDepth, columns, SEGMENTS_PER_ZONE + 1);
+      geo.setIndex(culled ? new THREE.BufferAttribute(culled, 1) : fullIndex);
+    };
+    cullZone();
     const mesh = new THREE.Mesh(geo, material);
     mesh.position.y = waterLevel();
     mesh.renderOrder = WATER_SURFACE_RENDER_ORDER;
@@ -600,10 +763,12 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     mesh.visible = !idlePace;
     meshes.push(mesh);
     group.add(mesh);
+    addUnderside(mesh);
     refits.push(() => {
       fill();
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
+      cullZone();
       mesh.position.y = waterLevel();
     });
     return mesh;
@@ -630,7 +795,21 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       return task;
     },
     isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
-    update(_time: number, cameraX: number, cameraZ: number): number {
+    update(
+      _time: number,
+      cameraX: number,
+      cameraZ: number,
+      _visibleRange?: number,
+      cameraY = Number.POSITIVE_INFINITY,
+    ): number {
+      WATER_TIME.value = _time % WATER_TIME_PERIOD;
+      // Small slack over the waterline so the swell never strands the camera
+      // between a displaced front face and a hidden ceiling.
+      const under = cameraY < waterLevel() + 0.75;
+      for (const pair of underPairs) {
+        pair.under.position.y = pair.front.position.y;
+        pair.under.visible = under && pair.front.visible;
+      }
       return simulation?.update(_time, cameraX, cameraZ) ?? 0;
     },
     addSplash(x: number, z: number, radius: number, strength = 1): void {
