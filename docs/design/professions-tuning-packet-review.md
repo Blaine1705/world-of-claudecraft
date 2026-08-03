@@ -5360,6 +5360,63 @@ the vendor SimEvent unchanged). Q27 stands informational.
 
 ---
 
+## Phase 22 entry sync (2026-08-02, merges 36b4296875 and 05f4fc838d)
+
+The per-phase sync preamble, run at the phase 22 build entry. The
+release moved twice in one sitting, so the entry took two merges. The
+first (36b4296875) brought twelve commits: trade slot tooltips (PR
+2712), the crafting tab memory (PR 2713), the Dungeon Finder lockout
+hide (PR 2714), the rift collision token re-add threaded through swept
+landings (PR 2711), the v0.33.1 release merge (provenance re-mint,
+version surface sync, frame pacing recovery with the dev profiler
+invulnerability handshake), the Wildheart chain pull basin reach (PR
+2745), the bloom shader shape fix (PR 2743), chat tab drag-reorder (PR
+2768), and the admin theme toggle (PR 2769). Six source conflicts were
+hand-resolved: the trade window unions the packet's buildTradeItemRow
+render (try/finally repaint commit) with the release's
+tradeRowTooltipTarget wiring grafted inside the try; the release's
+bare ITEMS index in tradeRowTooltipTarget was upgraded to knownItemDef
+(the R34 family rule) with a prototype-key pin added in
+tests/trade_view.test.ts; command schema pins re-derived from the
+merge base as 176 send / 188 dispatch / 12 dispatch-only; IWorld
+parity re-pinned at 281 members (73 data / 208 methods) with
+riftCollisionToken back as data on BOTH worlds; the i18n pending
+bundles were regenerated, never hand-merged. The second merge
+(05f4fc838d) brought the local-gate-perf packet (28 commits, PR 2788)
+conflict-free: pnpm 10.34.5 replaces npm as the install path (shared
+store, pnpm-lock.yaml, package-lock.json deleted), turbo task cache,
+gate:fast (explicitly NOT the merge bar), happy-dom for most DOM
+vitest files (six professions-family test files got the one-line
+pragma flip), and subsystem-world test rigs.
+
+The release-merge-audit ran over both merges with four independent
+read-only auditors (UI overlap, server plus the db-mock trap, sim
+overlap, phase 22 target surfaces), all CLEAN: diff-of-diffs proves
+no side's hunks were dropped in any co-modified file; the dev
+profiler invulnerability landed on BOTH status arms (legacy
+server/main.ts and migrated server/leaderboard.ts); zero new
+vi.mock('../server/db') sites arrived; the crafting tab memory (PR
+2713) landed wholly on hud.ts surfaces the packet never migrated, so
+no mirroring was needed; and the phase 22 production surfaces
+(profession_identity_card.ts, profession_identity_view.ts, the
+.profession-skill-* CSS arms) carry ZERO merge drift. Two premise
+notes for this phase: new DOM tests take the happy-dom pragma (the
+tests/CLAUDE.md jsdom instruction predates the migration), and the
+crafting window now opens on the persisted tab (woc_crafting_tab),
+which touches screenshot repro only. Targeted suites green post-merge
+(trade_view, command_schema, world_api_parity, rift_wall_swept
+collision, wildheart_boss_chain_pull), npx tsc --noEmit clean, and
+npm run gate PASS on the merged tree: all 10 steps green (the gate is
+ten steps after the local-gate-perf reshape folded typecheck and the
+env/server builds into one turbo step), 2015 test files / 26289 tests
+plus the 11-file browser suite. One small maintainer note banked for
+the release fill pass: phase 22 retires the identity card's visual
+column header row, but its four catalog keys
+(hudChrome.crafting.identity.colCraft/colSkill/colRole/colCap) stay
+in the catalog because their fills already exist in the maintainer
+owned overlays, which contributors never edit; drop the keys and the
+overlay rows together in a maintainer pass if desired.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
