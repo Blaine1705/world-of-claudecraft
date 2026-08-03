@@ -3289,10 +3289,19 @@ function c3AuraRunner(): Scenario {
       // every 40 ticks (the 2s classic tick): the food heal runs ctx.healingTakenMult +
       // the 'heal' emit, the drink restores mana, and the short buff_ap expires inside
       // updateAuras -> statsDirty -> recalcPlayerStats (+ applyNonPlayerStatAura).
+      // The hp deficit is a FRACTION of the beefed maxHp (50000, see `beef` above), not
+      // an absolute amount: recalcPlayerStats preserves the hp/maxHp FRACTION across a
+      // maxHp change (entity.ts `hpFrac`), so once the buff_ap expiry below shrinks
+      // maxHp back down to the real (unbeefed) paladin value, an absolute deficit like
+      // "600 short of 50000" collapses to a tiny few points of the real pool, small
+      // enough that a single stacked natural-regen tick (#1608: eating no longer blocks
+      // it) closes the whole gap before the food tick's own check runs, and the food
+      // heal this phase exists to cover never fires. A fractional deficit survives the
+      // rescale untouched, so the food heal still has real work left to do afterward.
       p.inCombat = false;
       p.combatTimer = 99;
       p.fiveSecondRule = 99;
-      p.hp = Math.max(1, p.maxHp - 600);
+      p.hp = Math.max(1, Math.round(p.maxHp * 0.4));
       p.resource = Math.max(0, p.maxResource - 300);
       p.eating = {
         itemId: 'parity_food',

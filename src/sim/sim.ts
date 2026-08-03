@@ -3051,9 +3051,10 @@ export class Sim {
       e.hp = Math.max(1, Math.round(e.maxHp * CASCADE_SCENARIO.allyHpFraction));
       // Freeze out-of-combat regen so ONLY the Chronomancer's Echo/initial healing
       // moves these bars (the owner wants to isolate the conversion, not watch the
-      // allies self-heal). A zero-value "food" trips the `!p.eating` regen guard in
-      // updateRegen and heals nothing; an idle, unsitting bot never trips standUp,
-      // and the non-damaging dummy never clears it. Dev scenario only.
+      // allies self-heal). A zero-hpPer2s "food" trips the natural-regen freeze
+      // in updateRegen (auras.ts: `p.eating?.hpPer2s !== 0`) and heals nothing
+      // itself; an idle, unsitting bot never trips standUp, and the
+      // non-damaging dummy never clears it. Dev scenario only.
       e.eating = {
         itemId: 'dev_cascade_freeze',
         kind: 'food',
