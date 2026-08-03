@@ -788,9 +788,11 @@ describe('significant-activity cards', () => {
     });
     expect(buildActivityMessage({ ...known('rareloot'), kind: 'parade' as never })).toBeNull();
     const levelup = buildActivityMessage(known('levelup'));
-    expect((levelup?.embeds as Array<{ title: string }>)[0].title).toContain('level 20');
+    if (!levelup) throw new Error('the levelup payload must build');
+    expect((levelup.embeds as Array<{ title: string }>)[0].title).toContain('level 20');
     const masterwork = buildActivityMessage(known('masterwork'));
-    expect((masterwork?.embeds as Array<{ title: string }>)[0].title).toBe('A masterwork piece');
+    if (!masterwork) throw new Error('the masterwork payload must build');
+    expect((masterwork.embeds as Array<{ title: string }>)[0].title).toBe('A masterwork piece');
   });
 });
 
