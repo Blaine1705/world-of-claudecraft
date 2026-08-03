@@ -1,6 +1,5 @@
-// Pure, host-agnostic shaping for the world map's OPEN-SEA limit: how near a
-// patch of safe water is to the lethal open sea, and whether it sits right on
-// the line.
+// Pure, host-agnostic shaping for the world map's sea: how near a patch of safe
+// water is to the open sea the sim's swim fatigue governs.
 //
 // WHY IT EXISTS. The zone map used to colour water with two palettes a stark
 // distance apart, split by the sim's swim-fatigue predicate (inHollowOpenSea):
@@ -9,11 +8,12 @@
 // straight step in the middle of open water and the map read as a lighter box
 // pasted on a flat sea rather than as anything the world contains.
 //
-// The sea is now ONE shallow-to-deep ramp, and this module is what makes that
-// possible without losing the limit: the boundary is no longer implied by a
-// colour difference, it is STATED, by water that deepens as it approaches and by
-// the limit itself drawn as a line. Colour got to become continuous precisely
-// because the information stopped depending on it.
+// The sea is now ONE shallow-to-deep ramp, and this module is what walks it:
+// water deepens as the open sea nears, the way a chart says it. The map marks
+// no boundary at all, because the sim states it far better than a drawn rule
+// could (src/sim/fatigue.ts: an on-screen toast on crossing, repeated every 4s,
+// and 8 seconds of grace before the first damage pulse, reaching a swimmer who
+// is looking at the world and not at the map).
 //
 // WHY THE PREDICATE IS SAMPLED RATHER THAN RE-DERIVED. The distance to that
 // boundary is not something the predicate reports, and re-deriving it in the
@@ -44,10 +44,6 @@ export const NEARNESS_STEPS = 8;
  *  resolution to under half a yard, which is finer than a plate pixel, so the
  *  ramp reads as continuous instead of as stripes. */
 export const NEARNESS_REFINE = 3;
-
-/** How far, in yards, the edge test looks for a flip. Kept at the raster step so
- *  the drawn line is one pixel wide at any plate resolution. */
-export const EDGE_STEP_MIN_YD = 0.5;
 
 /** Half a diagonal step: the ring's 45 degree points sit at r/sqrt(2) on each axis. */
 const DIAG = Math.SQRT1_2;
@@ -111,19 +107,4 @@ export function openSeaNearness(x: number, z: number, isOpenSea: OpenSeaPredicat
     else lo = mid;
   }
   return (NEARNESS_MAX_YD - hi) / NEARNESS_MAX_YD;
-}
-
-/**
- * True when the point is safe water with lethal water immediately beside it:
- * the limit itself, which the painter inks. `step` is the raster's world-units
- * per pixel, floored so a very coarse plate cannot skip the line entirely.
- */
-export function onOpenSeaEdge(
-  x: number,
-  z: number,
-  step: number,
-  isOpenSea: OpenSeaPredicate,
-): boolean {
-  const d = Math.max(EDGE_STEP_MIN_YD, step);
-  return isOpenSea(x + d, z) || isOpenSea(x - d, z) || isOpenSea(x, z + d) || isOpenSea(x, z - d);
 }

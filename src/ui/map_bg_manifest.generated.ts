@@ -25,62 +25,62 @@ export const BAKED_MAP_BG = {
   "veiled_hollow": {
     "w": 720,
     "h": 720,
-    "rowHash": "a3819b33"
+    "rowHash": "bec03249"
   },
   "drakelands": {
-    "w": 800,
+    "w": 640,
     "h": 800,
-    "rowHash": "a3327759"
+    "rowHash": "0296af91"
   },
   "frostveil": {
     "w": 693,
     "h": 693,
-    "rowHash": "ef9c68cd"
+    "rowHash": "d6a920e4"
   },
   "amberfall": {
-    "w": 747,
-    "h": 747,
-    "rowHash": "d8e417de"
+    "w": 613,
+    "h": 746,
+    "rowHash": "4c562364"
   },
   "willowfen": {
-    "w": 693,
-    "h": 693,
-    "rowHash": "5254c288"
+    "w": 587,
+    "h": 694,
+    "rowHash": "23f05e87"
   },
   "nightbloom": {
-    "w": 747,
-    "h": 747,
-    "rowHash": "1ce82569"
+    "w": 613,
+    "h": 746,
+    "rowHash": "d55bed1b"
   },
   "wraithwood": {
-    "w": 747,
-    "h": 747,
-    "rowHash": "57558a1d"
+    "w": 613,
+    "h": 746,
+    "rowHash": "5d264620"
   },
   "palmreach": {
-    "w": 747,
-    "h": 747,
-    "rowHash": "f829b2da"
+    "w": 613,
+    "h": 746,
+    "rowHash": "a6a197db"
   },
   "evergarden": {
-    "w": 747,
-    "h": 747,
-    "rowHash": "d8de383d"
+    "w": 613,
+    "h": 746,
+    "rowHash": "b4cacefd"
   },
   "galecrest": {
-    "w": 693,
-    "h": 693,
-    "rowHash": "95679f7d"
+    "w": 587,
+    "h": 694,
+    "rowHash": "e9bc5aaa"
   },
   "farshore_isle": {
     "w": 480,
     "h": 480,
-    "rowHash": "f61d149d"
+    "rowHash": "16922e27"
   },
   "world_strip": {
     "w": 140,
     "h": 337,
-    "rowHash": "e4577309"
+    "rowHash": "eb5ef26f"
   }
 },
 } as const;

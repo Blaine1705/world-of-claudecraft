@@ -149,24 +149,24 @@ describe('map terrain painter: the open-sea limit', () => {
     expect(deepened.length).toBe(crossings.length);
   });
 
-  it('still draws the limit itself, brighter than the water either side', () => {
-    // The pin that keeps the change honest. The easing above deliberately removes
-    // the colour contrast that used to mark this boundary, so if the drawn line
-    // stops rendering, an actionable edge silently disappears with nothing else
-    // failing.
-    const marked = crossings.filter(({ x, z }) => {
-      // Brightest sample in the last two yards of safe water: the line is under
-      // a yard wide, so which PIXEL carries it depends on grid alignment.
-      let line = 0;
-      for (let d = -2; d <= 0; d += 0.25) line = Math.max(line, luma(x + d, z));
-      return line > luma(x - 6, z) && line > luma(x + 6, z);
-    });
-    expect(marked.length).toBe(crossings.length);
+  it('does NOT mark the limit, because the sim states it far better', () => {
+    // Deliberate, and the reason it is safe: crossing raises an on-screen error
+    // toast repeated every 4s plus 8 seconds of grace before the first damage
+    // pulse (src/sim/fatigue.ts), which is real time to turn around and reaches
+    // a swimmer who is looking at the world rather than at the map. A rule drawn
+    // across open water restates that less well and costs a straight line
+    // through the sea, so the map draws no boundary of its own: no pixel near
+    // the limit is brighter than the safe water well inside it.
+    for (const { x, z } of crossings) {
+      let brightest = 0;
+      for (let d = -3; d <= 0; d += 0.25) brightest = Math.max(brightest, luma(x + d, z));
+      expect(brightest, `z=${z}`).toBeLessThanOrEqual(luma(x - 28, z));
+    }
   });
 
-  it('leaves the lethal side as the deep body it was', () => {
-    // Only the safe approach is shaped, so the two sides never flatten into one
-    // tone: past the limit stays darker than safe water well inside it.
+  it('keeps the lethal side deeper on the ramp than water well inside the limit', () => {
+    // One sea, walked to different depths: continuous colour, but open ocean
+    // still reads as open ocean rather than flattening into the shallows.
     for (const { x, z } of crossings) {
       expect(luma(x + 8, z), `z=${z}`).toBeLessThan(luma(x - 28, z));
     }

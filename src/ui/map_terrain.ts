@@ -21,6 +21,10 @@ import {
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
   ZONES,
 } from '../sim/data';
 import { fbm2, hash2 } from '../sim/rng';
@@ -33,7 +37,7 @@ import {
   WATER_LEVEL,
   zoneBiomeAt,
 } from '../sim/world';
-import { onOpenSeaEdge, openSeaNearness } from './map_open_sea_edge_core';
+import { openSeaNearness } from './map_open_sea_edge_core';
 
 export interface MapRegion {
   minX: number;
@@ -75,11 +79,17 @@ export function mapZoneRegion(zone: ZoneDef): MapRegion {
   const side = Math.max(maxX - minX, zone.zMax - zone.zMin);
   const cx = (minX + maxX) / 2;
   const cz = (zone.zMin + zone.zMax) / 2;
+  // CLAMPED to the world. terrainHeight answers for any coordinate, including
+  // past the world's edge, so an unclamped square paints unreachable generator
+  // terrain as though it were a coastline the player could sail to (the
+  // Wraithwood's square reaches 100 yd past WORLD_MAX_X). Beyond the edge the
+  // painter's flat ocean fill is the honest answer, and it is seamless now that
+  // the fill matches the sea ramp's deep end.
   return {
-    minX: cx - side / 2,
-    maxX: cx + side / 2,
-    minZ: cz - side / 2,
-    maxZ: cz + side / 2,
+    minX: Math.max(WORLD_MIN_X, cx - side / 2),
+    maxX: Math.min(WORLD_MAX_X, cx + side / 2),
+    minZ: Math.max(WORLD_MIN_Z, cz - side / 2),
+    maxZ: Math.min(WORLD_MAX_Z, cz + side / 2),
   };
 }
 
@@ -102,9 +112,8 @@ export function hashPaintedRows(region: MapRegion, seed: number, W: number, rows
 
 // The sea's single shallow-to-deep ramp. One body of water instead of the two
 // palettes that used to meet at the swim-fatigue predicate's straight rect
-// edge; the limit is drawn instead (below), which is what lets the colours be
-// continuous. The deep end matches --color-map-ocean, the flat fill the painter
-// puts beyond a plate, so a plate edge still leaves no seam.
+// edge. The deep end matches --color-map-ocean, the flat fill the painter puts
+// beyond a plate, so a plate edge leaves no seam.
 const SEA_SHALLOW_R = 100;
 const SEA_SHALLOW_G = 164;
 const SEA_SHALLOW_B = 200;
@@ -114,11 +123,15 @@ const SEA_DEEP_B = 100;
 // Where the lethal open sea starts on that ramp: deep enough to read as open
 // ocean at a glance, close enough that the two sides are one sea. Safe water
 // approaching the limit climbs to meet it.
+//
+// The limit is NOT drawn on the map, and deliberately so. The sim already
+// states it where it matters (src/sim/fatigue.ts): crossing raises an on-screen
+// error toast repeated every 4s, a log line, and 8 seconds of grace before the
+// first damage pulse, which is real time to turn around. A rule drawn across
+// open water would restate that less well (the swimmer is looking at the world,
+// not the map) at the cost of a straight line through the sea, so the map keeps
+// only what a map is good at: water that deepens as the world does.
 const OPEN_SEA_RAMP_FLOOR = 0.62;
-const OPEN_SEA_EDGE_MIX = 0.5;
-const OPEN_SEA_EDGE_R = 150;
-const OPEN_SEA_EDGE_G = 196;
-const OPEN_SEA_EDGE_B = 214;
 
 // How thick the tree cover stipples per biome (chance per ~1.3yd hash cell).
 const FOREST_STIPPLE: Partial<Record<ReturnType<typeof zoneBiomeAt>, number>> = {
@@ -324,13 +337,13 @@ export function paintTerrainRows(
         // swim-fatigue limit (inHollowOpenSea), past which the ramp simply
         // starts deep. The two used to be separate palettes a stark distance
         // apart, meeting at that predicate's straight rect edge, which is what
-        // made the map read as a lighter box pasted on a flat navy sea. Colour
-        // no longer has to carry the boundary, because the limit is DRAWN
-        // below, so the sea can be one continuous body: nearer the limit means
-        // deeper water, which is what a chart says there anyway.
+        // made the map read as a lighter box pasted on a flat navy sea. The map
+        // no longer marks that boundary at all (see OPEN_SEA_RAMP_FLOOR: the sim
+        // states it far better, in the world, at the moment of crossing), so the
+        // sea is one continuous body: nearer the open sea means deeper water,
+        // which is what a chart says there anyway.
         const t = Math.min(1, (WATER_LEVEL - h) / 8);
         const depth = t * t * (3 - 2 * t);
-        let onEdge = false;
         let ramp: number;
         if (inHollowOpenSea(x, z)) {
           ramp = OPEN_SEA_RAMP_FLOOR + (1 - OPEN_SEA_RAMP_FLOOR) * depth;
@@ -338,8 +351,6 @@ export function paintTerrainRows(
           const near = openSeaNearness(x, z, inHollowOpenSea);
           const approach = near > 0 ? near * near * (3 - 2 * near) : 0;
           ramp = Math.max(depth * (1 - OPEN_SEA_RAMP_FLOOR), approach * OPEN_SEA_RAMP_FLOOR);
-          if (near > 0)
-            onEdge = onOpenSeaEdge(x, z, Math.min(spanX / W, spanZ / H), inHollowOpenSea);
         }
         r = SEA_SHALLOW_R + (SEA_DEEP_R - SEA_SHALLOW_R) * ramp;
         g = SEA_SHALLOW_G + (SEA_DEEP_G - SEA_SHALLOW_G) * ramp;
@@ -372,13 +383,6 @@ export function paintTerrainRows(
           r *= 0.45;
           g *= 0.45;
           b *= 0.5;
-        } else if (onEdge) {
-          // The swim-fatigue limit, drawn: past this line open-sea fatigue
-          // kills, so it is STATED rather than left to a colour step that the
-          // approach easing above has deliberately softened.
-          r += (OPEN_SEA_EDGE_R - r) * OPEN_SEA_EDGE_MIX;
-          g += (OPEN_SEA_EDGE_G - g) * OPEN_SEA_EDGE_MIX;
-          b += (OPEN_SEA_EDGE_B - b) * OPEN_SEA_EDGE_MIX;
         }
         const k = (iy * W + ix) * 4;
         data[k] = r;

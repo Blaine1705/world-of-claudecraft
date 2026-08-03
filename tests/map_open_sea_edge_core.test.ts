@@ -4,16 +4,15 @@
 // states one geometric claim: a straight limit (the shape the sim's rect test
 // actually produces, and the case that broke the first implementation), a
 // corner, and water with no limit anywhere near it. The painter's use of these
-// numbers is pinned separately in tests/map_terrain.test.ts.
+// numbers, including that it draws no boundary of its own, is pinned separately
+// in tests/map_terrain.test.ts.
 
 import { describe, expect, it } from 'vitest';
 import {
-  EDGE_STEP_MIN_YD,
   NEARNESS_MAX_YD,
   NEARNESS_REFINE,
   NEARNESS_STEPS,
   type OpenSeaPredicate,
-  onOpenSeaEdge,
   openSeaNearness,
 } from '../src/ui/map_open_sea_edge_core';
 
@@ -89,27 +88,5 @@ describe('open-sea nearness', () => {
     const once = openSeaNearness(94, 17, limit);
     const twice = openSeaNearness(94, 17, limit);
     expect(twice).toBe(once);
-  });
-});
-
-describe('open-sea edge', () => {
-  it('is true only immediately inside the limit', () => {
-    const limit = straightLimit(100);
-    expect(onOpenSeaEdge(99.9, 0, 1, limit)).toBe(true);
-    expect(onOpenSeaEdge(80, 0, 1, limit)).toBe(false);
-  });
-
-  it('widens its reach to the raster step, so a coarse plate cannot skip the line', () => {
-    const limit = straightLimit(100);
-    // 4 yd short of the limit: invisible to a fine step, found by a coarse one,
-    // which is what keeps the line one pixel wide at any plate resolution.
-    expect(onOpenSeaEdge(96, 0, 1, limit)).toBe(false);
-    expect(onOpenSeaEdge(96, 0, 5, limit)).toBe(true);
-  });
-
-  it('floors the step so a degenerate raster still tests a real distance', () => {
-    const limit = straightLimit(100);
-    expect(EDGE_STEP_MIN_YD).toBeGreaterThan(0);
-    expect(onOpenSeaEdge(100 - EDGE_STEP_MIN_YD / 2, 0, 0, limit)).toBe(true);
   });
 });
