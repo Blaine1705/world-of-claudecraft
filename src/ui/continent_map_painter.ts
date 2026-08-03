@@ -15,13 +15,25 @@
 // --color-map-* tokens via getComputedStyle ONCE per redraw (cached for the
 // frame, never per-region); every other literal (font, radius, line width) is a
 // named constant.
+//
+// ZONE WASH, NOT ZONE RECTANGLES. A zone's world bounds are a rectangle, but
+// drawing that rectangle turned the plate into a grid of boxes and made the hover
+// highlight a box over the sea. Instead the hovered (and the current) zone is
+// washed through the LAND MASK built from the plate itself
+// (continent_land_mask.ts), faded out near its own bounds, so the highlight
+// follows the coastline, skips the lakes and rivers, and softens the one edge
+// that is genuinely straight: the border it shares with the next zone. No plate,
+// no mask: the wash degrades to the flat rectangle fill, which is still the only
+// affordance available without art.
 
 import type { IWorld } from '../world_api';
 import { loadContinentArt } from './continent_art';
+import { buildLandMaskCanvas } from './continent_land_mask';
 import {
   buildContinentMapModel,
   CONTINENT_FALLBACK_ASPECT,
   type ContinentMapModel,
+  type ContinentRect,
   type ContinentZoneRegion,
 } from './continent_map_view';
 import { zoneDisplayName } from './entity_i18n';
@@ -33,10 +45,17 @@ const TITLE_BASELINE_Y = 20; // px from the canvas top
 const LABEL_FONT = 'bold 12px Georgia';
 const LABEL_HOVER_FONT = 'bold 13px Georgia';
 const LABEL_LINE_WIDTH = 3; // text outline width
-// Zone region rectangles.
-const REGION_LINE_WIDTH = 1.5;
-const REGION_HOVER_LINE_WIDTH = 2.5;
-const REGION_CURRENT_LINE_WIDTH = 2.5;
+// Zone wash: how far it fades in from the zone's own bounds, as a fraction of the
+// zone's shorter side, with a floor so a thin band still fades. The fade is what
+// keeps the border two zones share from reading as the drawn straight line it
+// geometrically is.
+const WASH_FEATHER_FRACTION = 0.14;
+const WASH_FEATHER_MIN_PX = 6;
+// Alpha-ramp endpoints for that fade. These are MASK stops, not themeable colors:
+// the ramp composites destination-in, so only its alpha is ever read and the RGB
+// it carries never reaches a pixel.
+const MASK_STOP_OPAQUE = 'white';
+const MASK_STOP_CLEAR = 'transparent';
 // "You are here" marker: a filled dot inside a steady ring (no animation).
 const HERE_DOT_RADIUS = 3.5;
 const HERE_RING_RADIUS = 6.5;
@@ -57,10 +76,9 @@ const CONTINENT_COLOR_TOKENS = {
   outline: '--color-map-outline',
   player: '--color-map-player',
   partyDead: '--color-map-party-dead',
-  regionStroke: '--color-map-region-stroke',
   regionHoverFill: '--color-map-region-hover-fill',
-  regionHoverStroke: '--color-map-region-hover-stroke',
-  regionCurrentStroke: '--color-map-region-current-stroke',
+  regionCurrentFill: '--color-map-region-current-fill',
+  regionCurrentLabel: '--color-map-region-current-label',
 } as const;
 
 type ContinentColors = Record<keyof typeof CONTINENT_COLOR_TOKENS, string>;
@@ -84,6 +102,16 @@ export interface ContinentPaintResult {
 export class ContinentMapPainter {
   private art: HTMLImageElement | null = null;
   private artState: 'idle' | 'loading' | 'ready' | 'missing' = 'idle';
+  // The land mask built from the plate, and whether that build has been attempted
+  // (it is one-shot: a null mask after an attempt means the flat fallback wash,
+  // never a rebuild per redraw).
+  private mask: HTMLCanvasElement | null = null;
+  private maskBuilt = false;
+  // Scratch surface the wash is composited on before it is blitted over the art.
+  // Kept at the map canvas size and reused; resizing clears it, which is exactly
+  // what a fresh composite wants anyway.
+  private scratch: HTMLCanvasElement | null = null;
+  private scratchCtx: CanvasRenderingContext2D | null = null;
 
   /** classColor resolves a party member's class to its display color (issue
    *  2652), the same resolver Hud threads into MinimapPainter / DelveMapPainter
@@ -102,6 +130,33 @@ export class ContinentMapPainter {
         this.artState = 'missing';
       },
     );
+  }
+
+  /** Build the land mask once the plate has decoded. One attempt per session: the
+   *  plate is static, and a mask that could not be built (no context, a tainted
+   *  canvas) will not build on the next redraw either. */
+  private ensureMask(): HTMLCanvasElement | null {
+    if (this.maskBuilt) return this.mask;
+    if (this.artState !== 'ready' || !this.art) return null;
+    this.maskBuilt = true;
+    this.mask = buildLandMaskCanvas(this.art, this.art.naturalWidth, this.art.naturalHeight);
+    return this.mask;
+  }
+
+  /** The reusable composite surface, sized to the square map canvas. */
+  private ensureScratch(
+    S: number,
+  ): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D } | null {
+    if (!this.scratch) {
+      this.scratch = document.createElement('canvas');
+      this.scratchCtx = null;
+    }
+    if (this.scratch.width !== S || this.scratch.height !== S) {
+      this.scratch.width = S;
+      this.scratch.height = S;
+    }
+    if (!this.scratchCtx) this.scratchCtx = this.scratch.getContext('2d');
+    return this.scratchCtx ? { canvas: this.scratch, ctx: this.scratchCtx } : null;
   }
 
   private resolveColors(): ContinentColors {
@@ -153,26 +208,14 @@ export class ContinentMapPainter {
       ctx.drawImage(this.art, model.image.mx, model.image.my, model.image.w, model.image.h);
     }
 
-    // Zone regions: a light border on every zone, a translucent fill + brighter
-    // border on the hovered zone, and a distinct border on the current zone.
-    for (const region of model.regions) {
-      const { rect } = region;
-      if (region.isHovered) {
-        ctx.fillStyle = colors.regionHoverFill;
-        ctx.fillRect(rect.mx, rect.my, rect.w, rect.h);
-      }
-      ctx.lineWidth = region.isHovered
-        ? REGION_HOVER_LINE_WIDTH
-        : region.isCurrent
-          ? REGION_CURRENT_LINE_WIDTH
-          : REGION_LINE_WIDTH;
-      ctx.strokeStyle = region.isHovered
-        ? colors.regionHoverStroke
-        : region.isCurrent
-          ? colors.regionCurrentStroke
-          : colors.regionStroke;
-      ctx.strokeRect(rect.mx, rect.my, rect.w, rect.h);
-    }
+    // Zone highlights, and deliberately no borders: the zone the player stands in
+    // carries a permanent quiet wash and the hovered one a brighter wash on top,
+    // both masked to the painted land. Hovering your own zone draws the hover
+    // alone rather than stacking the two.
+    const hovered = model.regions.find((r) => r.isHovered);
+    const current = model.regions.find((r) => r.isCurrent && !r.isHovered);
+    if (current) this.wash(ctx, model.image, current.rect, S, colors.regionCurrentFill);
+    if (hovered) this.wash(ctx, model.image, hovered.rect, S, colors.regionHoverFill);
 
     // Zone name labels: outlined for legibility over the art, hovered one lifted
     // to the top with the larger font. Loop-invariant text state is set per label
@@ -185,7 +228,6 @@ export class ContinentMapPainter {
       ctx.font = LABEL_FONT;
       this.label(ctx, region, colors);
     }
-    const hovered = model.regions.find((r) => r.isHovered);
     if (hovered) {
       ctx.font = LABEL_HOVER_FONT;
       this.label(ctx, hovered, colors);
@@ -239,8 +281,80 @@ export class ContinentMapPainter {
   ): void {
     const text = zoneDisplayName(region.zoneId);
     ctx.strokeStyle = colors.outline;
-    ctx.fillStyle = colors.label;
+    // The zone the player stands in is the one the borders used to call out; its
+    // label carries that job now, so the "where am I" read survives their removal.
+    ctx.fillStyle = region.isCurrent ? colors.regionCurrentLabel : colors.label;
     ctx.strokeText(text, region.labelX, region.labelY);
     ctx.fillText(text, region.labelX, region.labelY);
+  }
+
+  /**
+   * Wash one zone in `fill`, masked to the painted land and faded out toward the
+   * zone's own bounds. Composited on the scratch surface (the mask and the fade
+   * have to intersect before anything lands on the map), then blitted over the
+   * art in one draw.
+   *
+   * Falls back to a flat rectangle fill when there is no mask (no plate, no 2D
+   * context, or a cross-origin plate that tainted the mask canvas), so the
+   * highlight is never simply absent.
+   */
+  private wash(
+    ctx: CanvasRenderingContext2D,
+    image: ContinentRect,
+    rect: ContinentRect,
+    S: number,
+    fill: string,
+  ): void {
+    const mask = this.ensureMask();
+    const scratch = mask ? this.ensureScratch(S) : null;
+    if (!mask || !scratch) {
+      ctx.fillStyle = fill;
+      ctx.fillRect(rect.mx, rect.my, rect.w, rect.h);
+      return;
+    }
+    const sctx = scratch.ctx;
+    sctx.clearRect(0, 0, S, S);
+    // The land mask, positioned exactly like the plate it was built from.
+    sctx.globalCompositeOperation = 'source-over';
+    sctx.imageSmoothingEnabled = true;
+    sctx.drawImage(mask, image.mx, image.my, image.w, image.h);
+    // Tint it: source-in keeps the mask's alpha and takes the token's color and
+    // its own alpha, so the token alone decides how strong the wash reads.
+    sctx.globalCompositeOperation = 'source-in';
+    sctx.fillStyle = fill;
+    sctx.fillRect(0, 0, S, S);
+    // Confine it to this zone, fading over the feather band on all four sides.
+    // Two destination-in ramps multiply into a soft-edged rectangle; outside the
+    // ramps the end stop is transparent, which clears the rest of the surface.
+    sctx.globalCompositeOperation = 'destination-in';
+    const feather = Math.max(WASH_FEATHER_MIN_PX, Math.min(rect.w, rect.h) * WASH_FEATHER_FRACTION);
+    sctx.fillStyle = this.featherRamp(sctx, rect.mx, rect.w, feather, false);
+    sctx.fillRect(0, 0, S, S);
+    sctx.fillStyle = this.featherRamp(sctx, rect.my, rect.h, feather, true);
+    sctx.fillRect(0, 0, S, S);
+    sctx.globalCompositeOperation = 'source-over';
+    ctx.drawImage(scratch.canvas, 0, 0);
+  }
+
+  /** One axis of the feathered-rectangle mask: clear at the zone's edge, opaque a
+   *  feather inside it. A band narrower than two feathers collapses to a single
+   *  opaque midpoint rather than inverting. */
+  private featherRamp(
+    ctx: CanvasRenderingContext2D,
+    start: number,
+    size: number,
+    feather: number,
+    vertical: boolean,
+  ): CanvasGradient {
+    const end = start + size;
+    const grad = vertical
+      ? ctx.createLinearGradient(0, start, 0, end)
+      : ctx.createLinearGradient(start, 0, end, 0);
+    const ramp = size > 0 ? Math.min(0.5, feather / size) : 0.5;
+    grad.addColorStop(0, MASK_STOP_CLEAR);
+    grad.addColorStop(ramp, MASK_STOP_OPAQUE);
+    grad.addColorStop(1 - ramp, MASK_STOP_OPAQUE);
+    grad.addColorStop(1, MASK_STOP_CLEAR);
+    return grad;
   }
 }
