@@ -365,7 +365,7 @@ describe('Eastbrook polish capture contract', () => {
       // this seal was recomputed against the actual merged provenance
       // inputs. No pipeline input or geometry value changed and no capture
       // was retaken.
-      fingerprint: '67293d6e20ea8ef2ca288ad2dc10999a7482d793945e692861df073222f5e49c',
+      fingerprint: 'f75f88100e6856328646d6d259a6ac630db931b8dae4fe210e5efd94d99ec568',
       components: {
         captureContract: {
           id: 'polish-v2',

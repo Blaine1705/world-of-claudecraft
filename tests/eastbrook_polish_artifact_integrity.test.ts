@@ -614,10 +614,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
+// Re-pinned: src/render/renderer.ts is the rendererIntegration leaf of the polish
+// composite provenance, so gating the shapeshift-form visual swap on async compile
+// (#2571) in that file moves the metadata file's bytes (its polishProvenance block)
+// and the composite fingerprint it carries, the same way the compile-storm
+// gear/mount/base-visual gate fix re-pinned these before it.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '20bccfe7b2395b40b59815d514ee8424a1ca7500485c4f6ea246c5112c67f266';
+  'def3cd8b40c856c6ee3bcd8dda2be0092f2b019658b447632b296a83934cba4e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'fd1b2a46947d588aa6c0e62a04885a8039ed3fb1c2d1e281342f80168b16d590';
+  '2d4e6e0ee7168a0bf25a13ba1a2754f39e8c8f168e6f369ceb6588fe2bb9b2bb';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1476,10 +1481,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // performance evidence files, which carry the composite polish provenance.
     // Re-pinned again after merging the current release/v0.34.0 tip into this
     // branch: neither parent's literal matched the merged tree, so this was
-    // recomputed against the actual merged performance evidence files (byte
-    // identical to both parents' inputs; no capture retaken).
+    // recomputed against the actual merged performance evidence files.
     expect(fingerprint.digest('hex')).toBe(
-      '84ac863929dd9323394454c79e9fa8bb8c6d09c642bd0e7013cbe30944903af7',
+      '65d63c9d51f9543436bfd0d1f28729fac3346559c9ab03d2092ab789927eaa61',
     );
   });
 
