@@ -545,7 +545,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
-import { tradeOfferCeiling } from './trade_view';
+import { tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -15336,6 +15336,10 @@ export class Hud {
     if (sig === this.lastTradeSig) return;
     this.lastTradeSig = sig;
 
+    // Both offer sides render from the same InvSlot shape (TradeOffer.items in
+    // src/world_api/trade.ts), so the trade-slot tooltip reuses the exact bag
+    // tooltip (item + per-instance enchant/masterwork/signature detail) rather
+    // than any bespoke trade-only summary.
     const itemRow = (s: InvSlot, mine: boolean) => {
       const item = ITEMS[s.itemId];
       const label = `${item ? itemDisplayName(item) : s.itemId}${s.count > 1 ? ` x${formatNumber(s.count, { maximumFractionDigits: 0 })}` : ''}`;
@@ -15387,6 +15391,26 @@ export class Hud {
         }
       });
     });
+    // Wire the same stat tooltip bag/vendor/bank slots use onto both offer
+    // sides, keyed positionally (the rendered rows are the offer's own items
+    // in order, with no other `.trade-item` siblings to misalign against).
+    const attachTradeTooltips = (rows: NodeListOf<Element>, slots: InvSlot[]) => {
+      rows.forEach((row, i) => {
+        const target = tradeRowTooltipTarget(slots, i);
+        if (!target) return;
+        this.attachTooltip(row as HTMLElement, () =>
+          this.itemTooltip(target.item, true, target.instance),
+        );
+      });
+    };
+    attachTradeTooltips(
+      el.querySelectorAll('.trade-col:first-child .trade-item'),
+      info.myOffer.items,
+    );
+    attachTradeTooltips(
+      el.querySelectorAll('.trade-col:last-child .trade-item'),
+      info.theirOffer.items,
+    );
     const goldInput = el.querySelector('#trade-g') as HTMLInputElement;
     const silverInput = el.querySelector('#trade-s') as HTMLInputElement;
     const copperInput = el.querySelector('#trade-c') as HTMLInputElement;
