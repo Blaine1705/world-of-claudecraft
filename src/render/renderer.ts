@@ -52,6 +52,7 @@ import { formatResidencyBudget, residencyBudget } from './assets/residency_budge
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
+import { ensureBiomeHazeField, setBiomeHazeCamera, setBiomeHazeGrade } from './biome_haze_field';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { type BladeGrassBandView, buildBladeGrassBand } from './blade_grass_band';
@@ -2096,6 +2097,13 @@ export class Renderer {
       }
       bdLast = now;
     };
+    // The biome haze field, built BEFORE any surface that samples it (both
+    // terrain layers gate their shader patch on its existence at compile
+    // time). Sourced from this renderer's own outdoor fog presets, so the
+    // atmosphere a zone shows from across the world is literally the one the
+    // player meets on entry. Vista tiers only: the fogged arm already carries
+    // per-biome aerial perspective in scene fog itself.
+    if (this.farVista.enabled && !this.lowGfx) ensureBiomeHazeField(Renderer.BIOME_FOG);
     this.terrainView = buildTerrain(this.sim.cfg.seed, {
       x: this.sim.player.pos.x,
       z: this.sim.player.pos.z,
@@ -7518,6 +7526,14 @@ export class Renderer {
         );
       }
     }
+    // The distant-zone haze rides the settled grade and the live camera: a
+    // neighbouring realm's air darkens and cools through the cycle exactly
+    // like the air the player stands in, because both take the identical
+    // dnGrade.fog multiply. Unconditional and once per frame (the world
+    // surfaces that sample the field are drawn from both sync paths); a no-op
+    // when no field was built.
+    setBiomeHazeGrade(this.dnGrade.fog);
+    setBiomeHazeCamera(this.camera.position.x, this.camera.position.z);
     if (isDelvePos(px) && !inPractice) {
       this.ensureDelveInteriorsNear(px, pz);
     } else if (inside && isYumiMazePos(px)) {

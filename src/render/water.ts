@@ -4,6 +4,12 @@ import type { ZoneDef } from '../sim/types';
 import { waterLevel } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  BIOME_HAZE_DECLARATIONS,
+  biomeHazeFragmentGlsl,
+  biomeHazeUniforms,
+  hasBiomeHazeField,
+} from './biome_haze_field';
 import { farVistaPlan } from './far_terrain_core';
 import { GFX, SUN_DIR } from './gfx';
 import { idleSlot, runIdleQueue } from './idle_queue';
@@ -381,6 +387,9 @@ const WATER_VERT = /* glsl */ `
 `;
 
 const WATER_FRAG = /* glsl */ `
+#ifdef WOC_ZONE_HAZE
+${BIOME_HAZE_DECLARATIONS}
+#endif
   uniform sampler2D uNorm1;
   uniform sampler2D uNorm2;
   uniform sampler2D uNorm3;
@@ -547,6 +556,14 @@ const WATER_FRAG = /* glsl */ `
     gl_FragColor = vec4(col, alpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
+#ifdef WOC_ZONE_HAZE
+    // Per-zone aerial perspective (biome_haze_field.ts): the identical snippet
+    // on the identical uniforms both terrain layers splice, so a far bay or
+    // lake takes the air of the zone it lies in and stops being the one
+    // surface in the vista with no realm character. Compiled out entirely
+    // when no field exists, so the fogged tiers are byte-identical.
+${biomeHazeFragmentGlsl('vWPos.xz')}
+#endif
     #include <fog_fragment>
   }
 `;
@@ -594,10 +611,19 @@ export function createWaterSurfaceMaterial(
   wave: WaterWaveUniforms,
   opts?: { shoreEdgeFade?: boolean; underside?: boolean },
 ): THREE.ShaderMaterial {
+  // Distant-zone atmosphere: present only when the renderer built the field
+  // (vista tiers). The define compiles the block away otherwise, and the
+  // uniforms are the shared objects, never clones, so the water follows the
+  // same camera and day/night grade the terrain layers do.
+  const zoneHaze = hasBiomeHazeField();
   return new THREE.ShaderMaterial({
-    defines: opts?.underside ? { WATER_UNDERSIDE: '' } : {},
+    defines: {
+      ...(opts?.underside ? { WATER_UNDERSIDE: '' } : {}),
+      ...(zoneHaze ? { WOC_ZONE_HAZE: '' } : {}),
+    },
     uniforms: {
       ...THREE.UniformsUtils.clone(THREE.UniformsLib.fog),
+      ...(zoneHaze ? biomeHazeUniforms() : {}),
       uNorm1: { value: WATER_TEX.n1 },
       uNorm2: { value: WATER_TEX.n2 },
       uNorm3: { value: WATER_TEX.broad },

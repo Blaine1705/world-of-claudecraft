@@ -15,6 +15,12 @@ import type { BiomeId, ZoneDef } from '../sim/types';
 import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import {
+  BIOME_HAZE_DECLARATIONS,
+  biomeHazeFragmentGlsl,
+  biomeHazeUniforms,
+  hasBiomeHazeField,
+} from './biome_haze_field';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, SUN_DIR } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
@@ -601,6 +607,9 @@ function buildSplatMaterial(
   // the blade-cluster texture before terrain build. ?grassbake=off is the
   // dev A/B switch back to the photo grass layer.
   const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
+  // Distant-zone atmosphere: resolved once, before compile, so a tier without
+  // the field (low, `?zonehaze=off`) keeps the exact shader it always had.
+  const zoneHaze = hasBiomeHazeField();
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 1.0,
@@ -1311,6 +1320,21 @@ function buildSplatMaterial(
           normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 1.1));
         }`,
       );
+    // Per-zone aerial perspective (biome_haze_field.ts): the SAME snippet on
+    // the SAME uniforms the far vista tiles splice, so the 300 to 700 yard
+    // band the detail terrain owns hands off to the far mesh with no ring at
+    // the seam. Distant ground reads as the air of the zone it belongs to,
+    // which is the whole point: a neighbouring realm looks like itself from
+    // across a bay instead of waiting for the border to swap the world.
+    if (zoneHaze) {
+      Object.assign(sh.uniforms, biomeHazeUniforms());
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', `#include <common>${BIOME_HAZE_DECLARATIONS}`)
+        .replace(
+          '#include <fog_fragment>',
+          `${biomeHazeFragmentGlsl('vWPos.xz')}\n\t#include <fog_fragment>`,
+        );
+    }
   };
   return mat;
 }
