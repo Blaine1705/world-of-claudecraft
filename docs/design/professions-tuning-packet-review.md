@@ -6286,9 +6286,8 @@ overlays, so an in-place reword silently stales every fill (measured
 at the phase 24 build: nothing re-surfaces them automatically, the
 scan's staleness detection is dormant and the worklist emits pending
 rows only, so the build record hand-carries the re-fill list), while
-a new-key-beside shape needs
-its five non-Latin M16 fills in the same change because every one of
-these values is wordy. The recommendation on record: in-place rewrite,
+a new-key-beside shape needs its five non-Latin M16 fills in the
+same change because every one of these values is wordy. The recommendation on record: in-place rewrite,
 accepting the re-fill cost at the release fill the maintainer already
 owns, because fragmenting the one buying paragraph into two keys is
 worse for translators than re-filling one.
@@ -6332,7 +6331,11 @@ blue standing. Q31: the cadence-cooldown dimmed marker is IN phase
 23; the phase absorbs the deferred cooldown-visibility gap in the
 same stroke. Q32: phase 24 lands ON THIS BRANCH after 22 and 23,
 with in-place rewording (the stale overlay fills re-enter the
-release fill worklist the maintainer already owns). The worklist for
+release fill worklist the maintainer already owns). (That
+parenthetical premise was measured false at the phase 24 build:
+the worklist emits pending rows only, so the phase 24 build
+record hand-carries the re-fill list; the corrected mechanics
+are in the phase 24 scope above.) The worklist for
 phases 22 to 24 is LIVE. The masterwork offhand item stays
 operator-side with NO tracking issue by the maintainer's choice; the
 fix's presence here was re-verified at settlement time (the PR 2701
