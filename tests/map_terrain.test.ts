@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { WORLD_MAX_X, WORLD_MIN_X, ZONES, zoneAt } from '../src/sim/data';
 import { inHollowOpenSea, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../src/sim/world';
+import { openSeaNearness } from '../src/ui/map_open_sea_edge_core';
 import {
   type MapRegion,
   mapCanvasHeight,
@@ -120,6 +121,14 @@ describe('map terrain painter: the open-sea limit', () => {
       for (let d = -30; d <= 12; d += 1.5) if (!isWater(x + d, z)) clear = false;
       for (let d = -30; d < 0; d += 1.5) if (inHollowOpenSea(x + d, z)) clear = false;
       for (let d = 1; d <= 12; d += 1.5) if (!inHollowOpenSea(x + d, z)) clear = false;
+      // Comparable depth at the two sample points, so the reading is about the
+      // approach easing and not the depth grade running under it, and the far
+      // point demonstrably clear of ANY limit (near the zone's eastern margin a
+      // patch of water can have lethal sea on both sides, which eases both
+      // samples and makes the comparison meaningless).
+      if (Math.abs(terrainHeight(x - 2, z, SEED) - terrainHeight(x - 28, z, SEED)) > 0.6)
+        clear = false;
+      if (openSeaNearness(x - 28, z, inHollowOpenSea) > 0) clear = false;
       if (clear) return x; // else keep looking: that one was not a clean limit
     }
     return null;

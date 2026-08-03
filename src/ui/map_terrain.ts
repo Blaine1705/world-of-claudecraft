@@ -42,20 +42,44 @@ export interface MapRegion {
   maxZ: number;
 }
 
+/** Plate detail, in pixels per world yard. The value the 480px plates carried
+ *  over a zone's 360yd width before they were squared, kept so squaring the
+ *  plate widened the world it covers WITHOUT thinning the detail inside it. */
+export const MAP_PLATE_PX_PER_YD = 480 / 360;
+
+/** The pixel width a region's plate bakes at: the ONE definition the bake, the
+ *  manifest and the freshness guard share, now that a plate's width follows its
+ *  region rather than a single constant for every zone. */
+export function mapPlateWidth(region: MapRegion): number {
+  return Math.round((region.maxX - region.minX) * MAP_PLATE_PX_PER_YD);
+}
+
 // Pixel height of a W-wide terrain canvas covering `region` (square-pixel).
 export function mapCanvasHeight(W: number, region: MapRegion): number {
   return Math.round((W * (region.maxZ - region.minZ)) / (region.maxX - region.minX));
 }
 
-/** The full-zone band a world-map plate covers. ONE definition shared by the
- *  HUD painter, the build-time plate bake (scripts/build_map_backgrounds.mjs),
- *  and the freshness guard, so they can never drift apart. */
+/** The band a world-map plate covers. ONE definition shared by the HUD painter,
+ *  the build-time plate bake (scripts/build_map_backgrounds.mjs), and the
+ *  freshness guard, so they can never drift apart.
+ *
+ *  It covers the SQUARE the map window frames, not the zone's own rectangle. The
+ *  window frames a square of the zone's longer side (map_window_view), so for
+ *  every zone taller than it is wide the plate used to stop short of the view and
+ *  the painter filled the rest with flat ocean: a hard-edged lighter box pasted
+ *  on a flat sea, showing open water where the neighbouring zone's land actually
+ *  continues. Squaring the plate paints that margin with the real world instead. */
 export function mapZoneRegion(zone: ZoneDef): MapRegion {
+  const minX = zone.xMin ?? STRIP_MIN_X;
+  const maxX = zone.xMax ?? STRIP_MAX_X;
+  const side = Math.max(maxX - minX, zone.zMax - zone.zMin);
+  const cx = (minX + maxX) / 2;
+  const cz = (zone.zMin + zone.zMax) / 2;
   return {
-    minX: zone.xMin ?? STRIP_MIN_X,
-    maxX: zone.xMax ?? STRIP_MAX_X,
-    minZ: zone.zMin,
-    maxZ: zone.zMax,
+    minX: cx - side / 2,
+    maxX: cx + side / 2,
+    minZ: cz - side / 2,
+    maxZ: cz + side / 2,
   };
 }
 
