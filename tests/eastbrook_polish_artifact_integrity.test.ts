@@ -1482,7 +1482,8 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // fence-removal content change (rebuilt-town placement inventory in the
     // after-* files), this seal follows the merged composite. Every measured
     // value (frame timings, draw stats, triangle and scenario numbers) is
-    // byte-identical, and no capture was retaken.
+    // byte-identical against the current release/v0.34.0 tip, neither parent's
+    // literal matched the merged tree, and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
       '65d63c9d51f9543436bfd0d1f28729fac3346559c9ab03d2092ab789927eaa61',
     );
