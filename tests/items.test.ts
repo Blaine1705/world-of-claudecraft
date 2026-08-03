@@ -646,10 +646,13 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     expect(meta.copper).toBe(1_000);
   });
 
-  it('a hostile count on a mount row denies before the riding delegations run (Q20 on every row)', () => {
-    // Sanitize sits ABOVE the riding/mount delegations: a hostile count must
-    // deny on EVERY row, including the two that force-1 a VALID count. The
-    // riding twin lives in tests/mounts_training.test.ts beside its rig.
+  it('a hostile count on a mount row denies with zero state change (Q20 on every row)', () => {
+    // Sanitize sits ABOVE the riding delegation and the mount gates: a
+    // hostile count must deny on EVERY row, including the two that force-1 a
+    // VALID count. The riding twin lives in tests/mounts_training.test.ts
+    // beside its rig. This arm passes every mount gate, so it pins that
+    // mount rows sanitize AT ALL; the ordering arm is the untrained one
+    // below.
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'MountHostileBuyer');
     sim.setPlayerLevel(20);
@@ -666,6 +669,31 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     items.buyItem(ctxOf(sim), marla.id, 'reins_valorsteed', pid, { count: 0 });
     expect(errorTexts(sim.drainEvents())).toContain('That item is not for sale.');
     expect(sim.countItem('reins_valorsteed', pid)).toBe(0);
+    expect(meta.copper).toBe(100_000_000);
+  });
+
+  it('an UNTRAINED buyer with a hostile count on a mount row hears the sanitize deny first (ordering)', () => {
+    // The refusal-order consequence of the hoist, recorded as a pin: sanitize
+    // now beats the mount gates, so a crafted hostile-count frame from an
+    // untrained buyer hears the not-for-sale deny rather than the riding
+    // hint. Legit frames (count absent or 1) pass sanitize and keep today's
+    // gate order untouched.
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'UntrainedMountHostile');
+    sim.setPlayerLevel(20);
+    const meta = sim.meta(pid)!;
+    meta.copper = 100_000_000;
+    const marla = [...sim.entities.values()].find(
+      (e) => e.kind === 'npc' && e.templateId === 'stablemaster_marla',
+    )!;
+    const player = sim.entities.get(pid)!;
+    player.pos.x = marla.pos.x;
+    player.pos.z = marla.pos.z;
+    sim.drainEvents();
+    items.buyItem(ctxOf(sim), marla.id, 'reins_valorsteed', pid, { count: 0 });
+    const errors = errorTexts(sim.drainEvents());
+    expect(errors).toContain('That item is not for sale.');
+    expect(errors).not.toContain('You must learn to ride first. Find a riding trainer.');
     expect(meta.copper).toBe(100_000_000);
   });
 

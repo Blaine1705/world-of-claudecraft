@@ -134,7 +134,9 @@ const itemStringsEn = {
       buyStack: 'Buy {count}',
       buyStackAria: 'Buy {count} {item} for {price}',
       // The 1x/5x/10x/custom purchase control row (phase 21). qtyMultiple is
-      // the visible chip label; the arias name the action for screen readers.
+      // the visible label on both the control chips AND the per-row count
+      // chip beside a multiplied total (one grammar for both surfaces); the
+      // arias name the action for screen readers.
       qtyRowAria: 'Purchase quantity',
       qtyMultiple: '{count}x',
       qtyMultipleAria: 'Buy {count} at a time',

@@ -5228,8 +5228,10 @@
   }
   /* forced-colors drops the gold border/fill/text tints above to the same
      system values as an unpressed chip, so the armed multiple would read by
-     colour alone (the crafting-commission-chip pip precedent): pin the
-     pressed chip to the system highlight pair instead. */
+     colour alone. Pin the pressed chip to the system highlight pair (the
+     .ui-icon-art forced-color-adjust precedent in base.css; the
+     crafting-commission chip solves the same problem with a redundant
+     non-colour pip instead). */
   @media (forced-colors: active) {
     .vendor-qty-btn[aria-pressed="true"] {
       background: Highlight;

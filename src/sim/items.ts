@@ -762,15 +762,17 @@ export function buyItem(
     return;
   }
   // Sanitize sits BELOW the dead/range gates (a dead or out-of-range buyer
-  // hears the same refusal a legit frame gets) but ABOVE the riding and mount
-  // delegations: a hostile count must deny on EVERY row (Q20), and the riding
-  // delegate below returns without ever reaching the count branch, so a
-  // deny placed after it would silently launder a hostile count into a
-  // charge no legitimate client sent. A VALID count on those rows is still
-  // simply force-1 (the riding delegate ignores it; vendorCountForced pins
-  // mounts), never a second deny. Bulk wins on a crafted frame carrying both
-  // fields (the shipped verb's precedence, decided here once so all three
-  // hosts agree); the client never sends both.
+  // hears the same refusal a legit frame gets) but ABOVE the riding
+  // DELEGATION and the mount GATES: a hostile count must deny on EVERY row
+  // (Q20). The distinction matters: the teachesRiding branch below delegates
+  // and RETURNS without ever reaching the count branch, so a deny placed
+  // after it would silently launder a hostile count into a charge no
+  // legitimate client sent; the mount block is only a gate ladder that falls
+  // through to the count math. A VALID count on both is still simply force-1
+  // (the riding delegate ignores it; vendorCountForced pins mounts), never a
+  // second deny. Bulk wins on a crafted frame carrying both fields (the
+  // shipped verb's precedence, decided here once so all three hosts agree);
+  // the client never sends both.
   const bulk = opts?.bulk === true;
   const count = sanitizeBuyCount(bulk ? undefined : opts?.count);
   if (count === null) {
@@ -828,9 +830,10 @@ export function buyItem(
   // row-unit purchases resolved atomically, refuse-whole on any shortfall
   // (Q20). The Q23 force-1 rows never multiply, and the totals are
   // overflow-guarded BEFORE the balance compares below so those compares can
-  // never run on a non-safe integer. The count itself was sanitized above the
-  // riding/mount delegations (a hostile count denies on every row; a valid
-  // one is force-1 there), so `count` here is always a safe integer >= 1.
+  // never run on a non-safe integer. The count itself was sanitized above
+  // the riding delegation and the mount gates (a hostile count denies on
+  // every row; a valid one is force-1 there), so `count` here is always a
+  // safe integer >= 1.
   const bulkEligible = bulk && hasCopperPrice && !hasHonorPrice && def.kind !== 'mount';
   let qty: number;
   let copperCost: number;

@@ -1028,6 +1028,24 @@ describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () =
     expect(el.querySelector('.vendor-qty-row')).toBeNull();
   });
 
+  it('the pressed chip keeps a non-author cue under forced-colors (never colour-only)', () => {
+    // forced-colors drops the gold border/fill/text tints to the same system
+    // values as an unpressed chip; the armed multiple must survive on the
+    // system highlight pair (the ctx-menu danger-line pin shape).
+    const components = readFileSync(
+      join(__dirname, '../src/styles/components.css'),
+      'utf8',
+    ).replace(/\r\n/g, '\n');
+    const forced = components.match(
+      /@media \(forced-colors: active\) \{\s*\.vendor-qty-btn\[aria-pressed="true"\]\s*\{[^}]*\}/,
+    );
+    expect(forced, 'the pressed qty chip needs a forced-colors arm').not.toBeNull();
+    const arm = forced?.[0] ?? '';
+    expect(arm).toMatch(/background:\s*Highlight/);
+    expect(arm).toMatch(/color:\s*HighlightText/);
+    expect(arm).toMatch(/forced-color-adjust:\s*none/);
+  });
+
   it('a count row shows the count chip and whole-count total, and disables on the count total', () => {
     const el = document.createElement('div');
     renderVendorWindow(
@@ -1035,7 +1053,10 @@ describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () =
       'Vendor',
       view(
         [
-          goodsRow('bread', { countBuy: { count: 5, copper: 125, affordable: true } }),
+          goodsRow('bread', {
+            quantity: 5,
+            countBuy: { count: 5, copper: 125, affordable: true },
+          }),
           goodsRow('water', { countBuy: { count: 5, copper: 250, affordable: false } }),
         ],
         5,
@@ -1043,7 +1064,11 @@ describe('renderVendorWindow: the 1x/5x/10x/custom control row (phase 21)', () =
       deps(),
     );
     const rows = [...el.querySelectorAll<HTMLButtonElement>('.vendor-item')];
-    expect(rows[0].querySelector('.vi-qty')?.textContent).toContain('5');
+    // The chip wears the control row's {count}x grammar, EXACTLY: the bags
+    // x{count} face would collide with the food row's own "x5" name suffix
+    // (both render on this row, and they mean different quantities).
+    expect(rows[0].querySelector('.vi-qty')?.textContent).toBe('5x');
+    expect(rows[0].querySelector('.vi-name')?.textContent).toContain('x5');
     expect(rows[0].querySelector('.vi-price')?.textContent).toContain('125');
     expect(rows[0].disabled).toBe(false);
     // The second row is 1x-affordable (the baseline field says true) but the
@@ -1336,7 +1361,14 @@ describe('buy_quantity_prompt_window: force-close backstop and focus landing net
       (document.activeElement as HTMLElement | null)?.blur?.();
       const onBuy: VendorWindowDeps['onBuy'] = () => {
         // The buy-driven repaint: fresh nodes, the captured opener detaches.
-        renderVendorWindow(el, 'Vendor', customView([customRow('bread')]), deps());
+        // Sell-junk comes back ENABLED so this also pins the RUNG ORDER: the
+        // item row must win over an enabled sell-junk, not just over Close.
+        renderVendorWindow(
+          el,
+          'Vendor',
+          customView([customRow('bread')]),
+          deps({ sellJunk: { enabled: true, proceeds: 5 } }),
+        );
       };
       const prompt = openPrompt(el, stack, onBuy);
       prompt.querySelector<HTMLInputElement>('.prompt-number')!.value = '3';

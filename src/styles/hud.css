@@ -6072,12 +6072,13 @@
   .prompt .prompt-number:focus {
     outline: 1px solid var(--gold-dim);
   }
-  /* Touch floor for the shared prompt family's action buttons (bags discard/
-     sell, bank withdraw/deposit, vendor buy-quantity). The base .btn renders
-     around 30px tall, under the 40px coarse-pointer tap target the rest of
-     the vendor family floors; the vendor prompt made this a mobile PURCHASE
-     surface, so the floor lives on the shared recipe and lifts all three
-     windows at once. */
+  /* Touch floor for the .prompt family's action buttons: the three quantity
+     prompts (bags discard/sell, bank withdraw/deposit, vendor buy-quantity)
+     plus the generic invite/trade/duel/ready-check prompts that share the
+     class. The base .btn renders around 30px tall, under the 40px
+     coarse-pointer tap target the rest of the vendor family floors; the
+     vendor prompt made this a mobile PURCHASE surface, so the floor lives on
+     the shared rule and lifts every prompt at once. */
   @media (pointer: coarse) {
     .prompt .btn {
       min-width: 40px;

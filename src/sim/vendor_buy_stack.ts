@@ -1,7 +1,10 @@
-// Pure, host-agnostic vendor purchase quantity math: the one leaf BOTH the
-// sim's authoritative buy path (items.ts buyItem) and the vendor window's UI
-// preview (ui/hud/vendor/vendor_view.ts, the custom-amount prompt) share, so
-// no vendor affordance can promise a quantity the server would not grant.
+// Pure, host-agnostic vendor purchase quantity math: the one leaf owning the
+// row-unit model for the sim's authoritative buy path (items.ts buyItem) and
+// the vendor window's UI preview (ui/hud/vendor/vendor_view.ts consumes the
+// force-1 predicate and the prompt cap; it recomputes the display total from
+// the same row-unit price, held in lockstep by a cross-check in
+// tests/vendor_view.test.ts), so no vendor affordance can promise a quantity
+// the server would not grant.
 //
 // Two purchase axes live here, deliberately together (one seam, phase 21):
 // - The bulk ("buy stack") verb, #2374: classic vendors sell most goods one

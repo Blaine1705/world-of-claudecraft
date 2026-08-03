@@ -97,6 +97,8 @@ Thumbs.db
 !.claude/commands/
 !.claude/hooks/
 !.claude/settings.json
+# Per-session QA/build scratch (gate logs, probe scripts); never committed.
+.claude-scratch/
 .cursor/
 
 # local SDK/tooling dump (extracted command-line tools, not project source)

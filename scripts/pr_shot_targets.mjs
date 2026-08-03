@@ -3392,7 +3392,7 @@ export const TARGETS = [
           };
         });
         if (!after.pressed) throw new Error('the 5x control did not take the pressed state');
-        if (after.chipCount === 0) throw new Error('no goods row carries the x5 count chip');
+        if (after.chipCount === 0) throw new Error('no goods row carries the 5x count chip');
         if (!after.ariaNamesCount) throw new Error('a count row aria-label does not name the qty');
       }
       return { clip: '#vendor-window' };

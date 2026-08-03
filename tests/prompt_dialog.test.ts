@@ -134,9 +134,18 @@ describe('installPromptDialog: the shared modal recipe', () => {
         bubbles: true,
         cancelable: true,
       });
+      let reachedWindow = false;
+      const windowSpy = () => {
+        reachedWindow = true;
+      };
+      window.addEventListener('keydown', windowSpy);
       r.confirm.dispatchEvent(attached);
-      // Native activation must survive (Enter on the confirm button).
+      window.removeEventListener('keydown', windowSpy);
+      // Native activation must survive (Enter on the confirm button)...
       expect(attached.defaultPrevented).toBe(false);
+      // ...but the bubble must still stop: without it the same press reaches
+      // the global chat/jump bind and steals the WCAG 2.4.3 focus return.
+      expect(reachedWindow).toBe(false);
       // A submit handler at the target phase can remove the prompt DURING the
       // dispatch; the listener still runs (the event path is fixed at
       // dispatch) and must THEN cancel the default, or the browser runs the
@@ -149,6 +158,29 @@ describe('installPromptDialog: the shared modal recipe', () => {
       });
       r.prompt.dispatchEvent(detached);
       expect(detached.defaultPrevented).toBe(true);
+    } finally {
+      r.cleanup();
+    }
+  });
+
+  it('Space stops its bubble too (prompt buttons are not tag-exempt at the input layer)', () => {
+    const r = rig();
+    try {
+      const space = new KeyboardEvent('keydown', {
+        key: ' ',
+        code: 'Space',
+        bubbles: true,
+        cancelable: true,
+      });
+      let reachedWindow = false;
+      const windowSpy = () => {
+        reachedWindow = true;
+      };
+      window.addEventListener('keydown', windowSpy);
+      r.cancel.dispatchEvent(space);
+      window.removeEventListener('keydown', windowSpy);
+      expect(space.defaultPrevented).toBe(false);
+      expect(reachedWindow).toBe(false);
     } finally {
       r.cleanup();
     }
