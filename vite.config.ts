@@ -374,9 +374,15 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
+    // D11 path-matrix follow-on tried LPT and stripe sequencers under
+    // scripts/ci_balanced_sequencer.mjs; both missed the balance bar and stayed
+    // unwired. Default vitest sha1-contiguous --shard is live. passWithNoTests
+    // false so an empty pack cannot green a future re-wired sequencer.
+    passWithNoTests: false,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
-    // jsdom environment); see the file for why this is needed on Node 22+.
+    // DOM environment). Needed on Node 22+ for jsdom and happy-dom files;
+    // no-op when `window` is absent (default node env). See the file.
     setupFiles: ['./tests/jsdom_local_storage_setup.ts'],
     // Two kinds of exclusion, kept together:
     // - agent-runtime directories may contain local worktree copies, and their tracked
@@ -415,5 +421,13 @@ export default defineConfig({
     // headroom for the current world size; deliberately long walkers keep their
     // own explicit budgets.
     testTimeout: 20000,
+    // Phase 4 local-gate-perf: persist Vite module transform cache across runs
+    // (Vitest 4.1 experimental.fsModuleCache). Default path is under
+    // node_modules/.experimental-vitest-cache (gitignored via node_modules/).
+    // Clear with `npx vitest --clearCache` if a warm run misbehaves. Full gate
+    // remains the merge bar; this speeds warm re-runs and related/day-loop paths.
+    experimental: {
+      fsModuleCache: true,
+    },
   },
 });
