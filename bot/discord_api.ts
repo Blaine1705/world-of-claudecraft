@@ -8,8 +8,9 @@
 // permanent-failure cache. What used to live here was a single retry that
 // clamped Discord's retry_after to 10 seconds and answered a Cloudflare ban page
 // with a 1 second retry, which is the escalation path the 2026-07-29 incident
-// rode all the way down. The governor replaces it; see
-// docs/discord-bot-stability/phase-02-rate-limit-governor.md.
+// rode all the way down. The governor replaces it; ./rate_governor.ts's own
+// header carries the full pacing contract (the incident diagnosis is
+// docs/discord-bot-stability/incident-2026-07-29.md).
 
 import {
   DEFAULT_BAN_PAUSE_MS,
@@ -95,9 +96,8 @@ export interface GovernorConfig {
 export function governorFromConfig(
   config: GovernorConfig,
   // Trailing seams with production defaults, the one convention the three shells
-  // share (bot/CLAUDE.md, "One injection convention in the three shells"; the
-  // packet records it as R15 in docs/discord-bot-stability/state.md). Without
-  // them the mapping below is unobservable:
+  // share (bot/CLAUDE.md, "One injection convention in the three shells").
+  // Without them the mapping below is unobservable:
   // the production clock is the real one, so pinning that `banPauseMs` reached
   // the governor would mean a test that actually waits out a ban pause.
   clock: GovernorClock = systemGovernorClock(),

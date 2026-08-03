@@ -9,9 +9,9 @@
 //
 // The matching commented .env.example fills (#DISCORD_STATUS_CACHE_TTL_MS=15000,
 // #DISCORD_STATUS_CACHE_MAX_ENTRIES=2000) are OWED to the maintainer: every
-// .env* path is blocked at the harness level for sessions in this environment
-// (recorded with the Phase 3/6/7 debt in docs/discord-bot-stability/state.md),
-// so this file deliberately carries no .env.example pin until that lands.
+// .env* path is blocked at the harness level for agent sessions in this
+// environment, so this file deliberately carries no .env.example pin until
+// that lands.
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
