@@ -331,6 +331,34 @@ describe('shared GLSL and constants', () => {
     expect(src.slice(normalHook, offsetHook)).toContain('vec3 objectNormal');
   });
 
+  it('never sets vertexColors while the sprite quad carries no colour attribute', () => {
+    // The regression that made every sprite a flat cutout. three defines
+    // USE_COLOR in the VERTEX prefix from material.vertexColors alone, and
+    // `color_vertex` then runs `vColor *= color` against a `color` attribute
+    // the impostor quad does not have. An unbound attribute reads (0, 0, 0),
+    // so vColor was zero and `color_fragment` multiplied every sprite's whole
+    // DIFFUSE term away. All that still drew was the canopy emissive floor
+    // and a specular lobe, neither of which is multiplied by diffuseColor:
+    // one flat colour, no response to the sun at any hour, and warm and
+    // washed out at dawn and dusk because the specular alone carried the
+    // light's colour. The per-instance tint never needed the flag: three
+    // derives USE_INSTANCING_COLOR from the mesh's instanceColor, and its
+    // FRAGMENT prefix defines USE_COLOR from that same instancing path.
+    const src = readFileSync(new URL('../src/render/foliage_impostor.ts', import.meta.url), 'utf8');
+    const geoStart = src.indexOf('function impostorQuadGeo');
+    const geoEnd = src.indexOf('\n}', geoStart);
+    expect(geoStart).toBeGreaterThan(0);
+    const quadGeoBody = src.slice(geoStart, geoEnd);
+    const quadHasColor = /setAttribute\(\s*'color'/.test(quadGeoBody);
+    expect(quadHasColor, 'quad gained a colour attribute: revisit the flag below').toBe(false);
+    // With no such attribute the flag must stay off. Setting it back on is
+    // the exact shape of the bug, so fail on the assignment itself.
+    expect(src).not.toMatch(/vertexColors:\s*true/);
+    // three still needs the tint to arrive, which it does through setColorAt.
+    expect(src).toContain('mesh.setColorAt(i,');
+    expect(src).toContain('instanceColor.needsUpdate = true');
+  });
+
   it('the pinned three build still has the chunk order the normal patch needs', () => {
     // onBeforeCompile patching fails SILENTLY when a hook string moves: the
     // replace becomes a no-op, objectNormal keeps three's stock value, and
