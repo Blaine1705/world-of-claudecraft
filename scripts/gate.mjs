@@ -1,19 +1,20 @@
 // The full local pre-merge gate: the CI checks from .github/workflows/ci.yml run
-// locally. Order: the PR tier's combined step list (CI splits it across the
-// parallel pr-gate and pr-checks jobs and fans the test step across a 4-shard
-// matrix; this script runs the same list serially with ONE full unsharded
-// vitest run by design), with the parallel lint job's changed-files biome pulled forward
-// as an early fast-fail; on a release/** branch the steps run release-tier
-// (I18N_RELEASE_TIER=1), mirroring the release-gate job. This script exists
-// because ad-hoc shell chains get the gate
-// wrong in two known ways: piping `npm test` through `tail` masks vitest's exit
-// code (a red run can print "PASS"), and an unbounded full run saturates every
-// core and flakes the heavy sim suites when other work shares the machine
-// (failing files that then pass in isolation). Steps run sequentially with
-// inherited stdio and stop at the first failure.
+// locally. CI splits each tier into a parallel pair (PR: pr-gate + pr-checks;
+// release: release-gate + release-checks) and fans each test job across an
+// 8-shard matrix; this script runs the SAME combined step list serially with
+// ONE full unsharded vitest run by design (no shard flag). The parallel lint
+// job's changed-files biome is pulled forward as an early fast-fail; on a
+// release/** branch the steps run release-tier (I18N_RELEASE_TIER=1), mirroring
+// the release-gate test job's job-level flag. This script exists because
+// ad-hoc shell chains get the gate wrong in two known ways: piping `npm test`
+// through `tail` masks vitest's exit code (a red run can print "PASS"), and an
+// unbounded full run saturates every core and flakes the heavy sim suites when
+// other work shares the machine (failing files that then pass in isolation).
+// Steps run sequentially with inherited stdio and stop at the first failure.
 // Keep the step list in sync with .github/workflows/ci.yml (and vice versa).
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
+import { computeGateWorkers } from './lib/gate_workers.mjs';
 import {
   formatInstallSyncFailure,
   parseInstallProblems,
@@ -21,7 +22,18 @@ import {
 } from './lib/npm_install_sync.mjs';
 import { FFMPEG_PATH, FFPROBE_PATH } from './sfx/ffmpeg_paths.mjs';
 
-const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
+// Halving the core count only protects a gate run from ITSELF; it does nothing when a
+// second `npm run gate` (or any other heavy vitest run) is happening in a sibling
+// worktree on the same machine, which this repo's own parallel-worktree workflow makes
+// routine. computeGateWorkers additionally clamps to available memory, since a vitest
+// fork worker that starts swapping presents as a flaky failure, not a slow one. Override
+// with GATE_MAX_WORKERS=<n> when you know better than the heuristic (e.g. deliberately
+// running several gates at once and want each one to take a smaller share).
+const workers = computeGateWorkers({
+  cpuCount: os.availableParallelism(),
+  freeMemBytes: os.freemem(),
+  envOverride: process.env.GATE_MAX_WORKERS,
+});
 // npm/npx resolve to .cmd files on Windows, which spawnSync only finds via a shell.
 const shell = process.platform === 'win32';
 
@@ -124,6 +136,4 @@ for (const [name, cmd, args, hint] of steps) {
   }
 }
 
-console.log(
-  `\n[gate] PASS: all ${steps.length} steps green (vitest workers capped at ${workers}, half the cores)`,
-);
+console.log(`\n[gate] PASS: all ${steps.length} steps green (vitest workers: ${workers})`);
