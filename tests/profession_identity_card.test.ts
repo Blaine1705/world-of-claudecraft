@@ -479,10 +479,12 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     );
     expect(components).toMatch(/\n {2}\.prof-skill-value \{[^}]*margin-left: auto;/);
     // The pills stay BORDERED at their family 10px: the border is the
-    // condition of the sub-12px chip exemption in acceptance (a).
-    expect(components).toMatch(
-      /\n {2}\.prof-role-badge,\s*\.prof-ceiling \{[^}]*font-size: 10px;[^}]*border: 1px solid/,
-    );
+    // condition of the sub-12px chip exemption in acceptance (a). Two
+    // separate pins on the same block so a harmless declaration reorder
+    // stays green (the mobile-lift idiom below).
+    const pillBlock = /\n {2}\.prof-role-badge,\s*\.prof-ceiling \{[^}]*/;
+    expect(components).toMatch(new RegExp(`${pillBlock.source}font-size: 10px;`));
+    expect(components).toMatch(new RegExp(`${pillBlock.source}border: 1px solid`));
   });
 
   it('the 10px rows and the 9px uppercase header are gone from the card scope', () => {
@@ -511,22 +513,33 @@ describe('identity card type floor and numeral pins (phase 22, source pins)', ()
     // the mobile arm, that sets font-size below 12px fails here, so a future
     // card-scope override cannot quietly re-shrink the rows (the family's
     // own .prof-* rules carry their exemptions in the pin above).
-    for (const sheet of [components, mobileCss]) {
+    for (const [sheet, minBlocks] of [
+      [components, 8],
+      [mobileCss, 2],
+    ] as const) {
       const blocks = [...sheet.matchAll(/^\s+([^@{}][^{]*?)\{([^}]*)\}/gms)].filter(
         ([, sel]) => sel.includes('.profession-identity') || sel.includes('.profession-skill-'),
       );
+      // Aliveness: the sweep must have FOUND the card-scope blocks each
+      // sheet is known to carry (desktop 15, mobile 2 today), not merely
+      // seen the selector text somewhere: a dedent or layout change that
+      // breaks the block regex must fail loudly here, never silently sweep
+      // nothing.
+      expect(blocks.length, 'card-scope blocks found by the sweep').toBeGreaterThanOrEqual(
+        minBlocks,
+      );
       for (const [, sel, body] of blocks) {
-        for (const m of body.matchAll(/font-size:\s*([0-9.]+)px/g)) {
+        for (const m of body.matchAll(/font-size:\s*([^;]+);/g)) {
+          // Every card-scope font-size must be authored px (the DESIGN.md
+          // scale): a rem/em/var() size would evade a px-only floor.
+          expect(m[1].trim(), `${sel.trim()} font-size unit`).toMatch(/^[0-9.]+px$/);
           expect(
-            Number(m[1]),
-            `${sel.trim()} sets font-size ${m[1]}px (below the 12px floor)`,
+            Number.parseFloat(m[1]),
+            `${sel.trim()} sets font-size ${m[1]} (below the 12px floor)`,
           ).toBeGreaterThanOrEqual(12);
         }
       }
     }
-    // The sweep itself must be alive: the card scope has rules in both sheets.
-    expect(components).toContain('.profession-identity-card {');
-    expect(mobileCss).toContain('body.mobile-touch .profession-identity-card {');
   });
 
   it('caps the skill list instead of starving the recipe pane', () => {
