@@ -37,6 +37,10 @@ export interface GuideClassInfo {
   abilities: GuideAbilityRef[];
   model: string;
   tint?: string;
+  /** Manifest tint strength (0..1) for this figure's model, when tinted. Feeds the still's
+   *  filename identity (still_key.mjs) alongside model/tint; the live viewer reads its own
+   *  copy off GuideModelSpec.tintStrength, so this is not consumed for rendering. */
+  tintStrength?: number;
   /** Pre-rendered transparent still (public/guide-stills/), the default poster. */
   still?: string;
 }
@@ -63,13 +67,13 @@ export interface GuideDungeon {
   name?: string;
 }
 
-export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; still?: string; }
+export interface GuideWarlockPet { id: string; name: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
 // Druid shapeshift forms. Unnamed on purpose: the gallery labels them with guide.models.form*
 // keys so the names localize like the rest of the picker chrome.
-export interface GuideDruidForm { id: string; model: string; tint?: string; still?: string; }
+export interface GuideDruidForm { id: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 
-export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; still?: string; }
+export interface GuideCreature { name: string; min: number; max: number; rare: boolean; templateId: string; model: string; tint?: string; tintStrength?: number; still?: string; }
 export interface GuideFamily { family: string; creatures: GuideCreature[]; }
 
 export interface GuideDelveKeeper { name: string; title: string; }
@@ -979,7 +983,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_priest",
     "tint": "#f0e9d6",
-    "still": "/guide-stills/player_priest__f0e9d6.webp"
+    "tintStrength": 0.5,
+    "still": "/guide-stills/player_priest__f0e9d6__s50.webp"
   },
   {
     "id": "shaman",
@@ -1083,6 +1088,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_shaman",
     "tint": "#6f8fc9",
+    "tintStrength": 0.4,
     "still": "/guide-stills/player_shaman__6f8fc9.webp"
   },
   {
@@ -1461,7 +1467,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_warlock",
     "tint": "#8d5fd3",
-    "still": "/guide-stills/player_warlock__8d5fd3.webp"
+    "tintStrength": 0.45,
+    "still": "/guide-stills/player_warlock__8d5fd3__s45.webp"
   },
   {
     "id": "druid",
@@ -2060,49 +2067,56 @@ export const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = [
     "name": "Emberkin",
     "model": "mob_demon",
     "tint": "#ff7a2a",
-    "still": "/guide-stills/mob_demon__ff7a2a.webp"
+    "tintStrength": 0.5,
+    "still": "/guide-stills/mob_demon__ff7a2a__s50.webp"
   },
   {
     "id": "gloomshade",
     "name": "Gloomshade",
     "model": "mob_demon",
     "tint": "#3a3a6e",
-    "still": "/guide-stills/mob_demon__3a3a6e.webp"
+    "tintStrength": 0.5,
+    "still": "/guide-stills/mob_demon__3a3a6e__s50.webp"
   },
   {
     "id": "duskborn",
     "name": "Duskborn",
     "model": "mob_demon",
     "tint": "#c6469b",
-    "still": "/guide-stills/mob_demon__c6469b.webp"
+    "tintStrength": 0.5,
+    "still": "/guide-stills/mob_demon__c6469b__s50.webp"
   },
   {
     "id": "spellhound",
     "name": "Spellhound",
     "model": "mob_demonalt",
     "tint": "#4a7d4a",
-    "still": "/guide-stills/mob_demonalt__4a7d4a.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__4a7d4a__s35.webp"
   },
   {
     "id": "warfiend",
     "name": "Warfiend",
     "model": "mob_demonalt",
     "tint": "#6e5a2a",
-    "still": "/guide-stills/mob_demonalt__6e5a2a.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__6e5a2a__s35.webp"
   },
   {
     "id": "pyre_colossus",
     "name": "Pyre Colossus",
     "model": "mob_demonalt",
     "tint": "#d24a2a",
-    "still": "/guide-stills/mob_demonalt__d24a2a.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__d24a2a__s35.webp"
   },
   {
     "id": "wraithborn",
     "name": "Wraithborn",
     "model": "mob_demonalt",
     "tint": "#7a3a8e",
-    "still": "/guide-stills/mob_demonalt__7a3a8e.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/mob_demonalt__7a3a8e__s35.webp"
   }
 ];
 
@@ -2111,13 +2125,15 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
     "id": "form_bear",
     "model": "form_bear",
     "tint": "#5a4030",
-    "still": "/guide-stills/form_bear__5a4030.webp"
+    "tintStrength": 0.55,
+    "still": "/guide-stills/form_bear__5a4030__s55.webp"
   },
   {
     "id": "form_cat",
     "model": "form_cat",
     "tint": "#d08b45",
-    "still": "/guide-stills/form_cat__d08b45.webp"
+    "tintStrength": 0.35,
+    "still": "/guide-stills/form_cat__d08b45__s35.webp"
   },
   {
     "id": "form_travel",
@@ -2138,7 +2154,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "forest_wolf",
         "model": "mob_wolf",
         "tint": "#7f8c8d",
-        "still": "/guide-stills/mob_wolf__7f8c8d.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__7f8c8d__s35.webp"
       },
       {
         "name": "Wild Boar",
@@ -2148,6 +2165,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wild_boar",
         "model": "mob_boar",
         "tint": "#935116",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_boar__935116.webp"
       },
       {
@@ -2167,7 +2185,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "void_stalker",
         "model": "mob_wolf",
         "tint": "#2f2a44",
-        "still": "/guide-stills/mob_wolf__2f2a44.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__2f2a44__s35.webp"
       },
       {
         "name": "Mire Prowler",
@@ -2177,7 +2196,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mire_prowler",
         "model": "mob_wolf",
         "tint": "#4d5656",
-        "still": "/guide-stills/mob_wolf__4d5656.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__4d5656__s35.webp"
       },
       {
         "name": "Bog Bloat",
@@ -2187,7 +2207,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "bog_bloat",
         "model": "mob_murloc",
         "tint": "#6b8e23",
-        "still": "/guide-stills/mob_murloc__6b8e23.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__6b8e23__s45.webp"
       },
       {
         "name": "Ridge Stalker",
@@ -2197,7 +2218,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ridge_stalker",
         "model": "mob_wolf",
         "tint": "#8c8270",
-        "still": "/guide-stills/mob_wolf__8c8270.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__8c8270__s35.webp"
       },
       {
         "name": "Veiled Doe",
@@ -2225,7 +2247,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "snowdrift_wolf",
         "model": "mob_wolf",
         "tint": "#eef4f8",
-        "still": "/guide-stills/mob_wolf__eef4f8.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__eef4f8__s35.webp"
       },
       {
         "name": "Gilded Stag",
@@ -2235,7 +2258,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gilded_stag",
         "model": "mob_stag",
         "tint": "#d8a848",
-        "still": "/guide-stills/mob_stag__d8a848.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_stag__d8a848__s35.webp"
       },
       {
         "name": "Gloam Fox",
@@ -2245,7 +2269,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gloam_fox",
         "model": "mob_fox",
         "tint": "#d87838",
-        "still": "/guide-stills/mob_fox__d87838.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_fox__d87838__s35.webp"
       },
       {
         "name": "Terrace Howler",
@@ -2255,7 +2280,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "terrace_howler",
         "model": "mob_wolf",
         "tint": "#9db4c8",
-        "still": "/guide-stills/mob_wolf__9db4c8.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__9db4c8__s35.webp"
       },
       {
         "name": "Moonfleece Grazer",
@@ -2265,7 +2291,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "moonfleece_grazer",
         "model": "mob_alpaca",
         "tint": "#e6e9f4",
-        "still": "/guide-stills/mob_alpaca__e6e9f4.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_alpaca__e6e9f4__s30.webp"
       },
       {
         "name": "Moor Ram",
@@ -2275,7 +2302,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "moor_ram",
         "model": "mob_alpaca",
         "tint": "#d8d0c0",
-        "still": "/guide-stills/mob_alpaca__d8d0c0.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_alpaca__d8d0c0__s30.webp"
       },
       {
         "name": "Thicket Boar",
@@ -2285,6 +2313,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "thicket_boar",
         "model": "mob_boar",
         "tint": "#6a4e38",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_boar__6a4e38.webp"
       },
       {
@@ -2295,7 +2324,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "tide_scuttler",
         "model": "mob_crab",
         "tint": "#e86848",
-        "still": "/guide-stills/mob_crab__e86848.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_crab__e86848__s35.webp"
       },
       {
         "name": "Topiary Stag",
@@ -2305,7 +2335,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "topiary_stag",
         "model": "mob_stag",
         "tint": "#3f7e3c",
-        "still": "/guide-stills/mob_stag__3f7e3c.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_stag__3f7e3c__s35.webp"
       },
       {
         "name": "Topiary Wolf",
@@ -2315,7 +2346,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "topiary_wolf",
         "model": "mob_wolf",
         "tint": "#4a8a4e",
-        "still": "/guide-stills/mob_wolf__4a8a4e.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_wolf__4a8a4e__s35.webp"
       }
     ]
   },
@@ -2330,7 +2362,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "webwood_spider",
         "model": "mob_spider",
         "tint": "#4a235a",
-        "still": "/guide-stills/mob_spider__4a235a.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__4a235a__s35.webp"
       },
       {
         "name": "Mirefen Widow",
@@ -2340,7 +2373,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mire_widow",
         "model": "mob_spider",
         "tint": "#283747",
-        "still": "/guide-stills/mob_spider__283747.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__283747__s35.webp"
       },
       {
         "name": "Canopy Weaver",
@@ -2350,7 +2384,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "canopy_weaver",
         "model": "mob_spider",
         "tint": "#4e8a3c",
-        "still": "/guide-stills/mob_spider__4e8a3c.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__4e8a3c__s35.webp"
       },
       {
         "name": "Widowsilk Spinner",
@@ -2360,7 +2395,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "widowsilk_spinner",
         "model": "mob_spider",
         "tint": "#3a3440",
-        "still": "/guide-stills/mob_spider__3a3440.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_spider__3a3440__s35.webp"
       }
     ]
   },
@@ -2375,7 +2411,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mudfin_murloc",
         "model": "mob_murloc",
         "tint": "#52be80",
-        "still": "/guide-stills/mob_murloc__52be80.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__52be80__s45.webp"
       },
       {
         "name": "Deepfen Snapper",
@@ -2385,7 +2422,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "deepfen_murloc",
         "model": "mob_murloc",
         "tint": "#45b39d",
-        "still": "/guide-stills/mob_murloc__45b39d.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__45b39d__s45.webp"
       },
       {
         "name": "Glimmermere Wader",
@@ -2395,7 +2433,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "glimmermere_wader",
         "model": "mob_murloc",
         "tint": "#8fb6c4",
-        "still": "/guide-stills/mob_murloc__8fb6c4.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__8fb6c4__s45.webp"
       },
       {
         "name": "Bogtoad",
@@ -2405,7 +2444,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "bogtoad",
         "model": "mob_murloc",
         "tint": "#7aa848",
-        "still": "/guide-stills/mob_murloc__7aa848.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__7aa848__s45.webp"
       },
       {
         "name": "Mere Lurker",
@@ -2415,7 +2455,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mere_lurker",
         "model": "mob_murloc",
         "tint": "#a8b048",
-        "still": "/guide-stills/mob_murloc__a8b048.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_murloc__a8b048__s45.webp"
       }
     ]
   },
@@ -2430,7 +2471,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "breach_wretch",
         "model": "mob_kobold",
         "tint": "#5a4a78",
-        "still": "/guide-stills/mob_kobold__5a4a78.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a4a78__s20.webp"
       },
       {
         "name": "Deeprock Digger",
@@ -2440,7 +2482,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "tunnel_rat",
         "model": "mob_kobold",
         "tint": "#9c640c",
-        "still": "/guide-stills/mob_kobold__9c640c.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__9c640c__s20.webp"
       },
       {
         "name": "Deeprock Tunneler",
@@ -2450,7 +2493,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "deeprock_kobold",
         "model": "mob_kobold",
         "tint": "#9c7a3c",
-        "still": "/guide-stills/mob_kobold__9c7a3c.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__9c7a3c__s20.webp"
       },
       {
         "name": "Gleamfolk Pixie",
@@ -2460,7 +2504,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "mushroom_pixie",
         "model": "mob_mushroom_pixie",
         "tint": "#d8c4f0",
-        "still": "/guide-stills/mob_mushroom_pixie__d8c4f0.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_mushroom_pixie__d8c4f0__s20.webp"
       },
       {
         "name": "Sporeling Gatherer",
@@ -2470,7 +2515,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "sporeling_gatherer",
         "model": "mob_glub",
         "tint": "#d8b98a",
-        "still": "/guide-stills/mob_glub__d8b98a.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_glub__d8b98a__s45.webp"
       },
       {
         "name": "Corrupted Sporeling",
@@ -2480,7 +2526,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "corrupted_sporeling",
         "model": "mob_glub",
         "tint": "#5e4a72",
-        "still": "/guide-stills/mob_glub__5e4a72.webp"
+        "tintStrength": 0.45,
+        "still": "/guide-stills/mob_glub__5e4a72__s45.webp"
       },
       {
         "name": "Fen Sprite",
@@ -2490,7 +2537,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "fen_sprite",
         "model": "mob_kobold",
         "tint": "#cfe0ea",
-        "still": "/guide-stills/mob_kobold__cfe0ea.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__cfe0ea__s20.webp"
       },
       {
         "name": "Harvest Sprite",
@@ -2500,7 +2548,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "harvest_sprite",
         "model": "mob_kobold",
         "tint": "#e8c878",
-        "still": "/guide-stills/mob_kobold__e8c878.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__e8c878__s20.webp"
       },
       {
         "name": "Willow Sprite",
@@ -2510,7 +2559,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "willow_sprite",
         "model": "mob_kobold",
         "tint": "#c8e0b8",
-        "still": "/guide-stills/mob_kobold__c8e0b8.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__c8e0b8__s20.webp"
       },
       {
         "name": "Downs Bandit",
@@ -2520,7 +2570,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "downs_bandit",
         "model": "mob_kobold",
         "tint": "#5a8a46",
-        "still": "/guide-stills/mob_kobold__5a8a46.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a8a46__s20.webp"
       },
       {
         "name": "Hedge Gnome",
@@ -2530,7 +2581,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "hedge_gnome",
         "model": "mob_kobold",
         "tint": "#5a8a46",
-        "still": "/guide-stills/mob_kobold__5a8a46.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a8a46__s20.webp"
       },
       {
         "name": "Wreckfield Thief",
@@ -2540,7 +2592,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wreck_thief",
         "model": "mob_kobold",
         "tint": "#5a8a46",
-        "still": "/guide-stills/mob_kobold__5a8a46.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_kobold__5a8a46__s20.webp"
       }
     ]
   },
@@ -2555,7 +2608,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "vale_bandit",
         "model": "mob_bandit",
         "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
         "name": "Gravecaller Cultist",
@@ -2565,7 +2619,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravecaller_cultist",
         "model": "mob_dark_caster",
         "tint": "#6c3483",
-        "still": "/guide-stills/mob_dark_caster__6c3483.webp"
+        "tintStrength": 0.5,
+        "still": "/guide-stills/mob_dark_caster__6c3483__s50.webp"
       },
       {
         "name": "Gravecaller Mender",
@@ -2575,7 +2630,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravecaller_mender",
         "model": "mob_bandit",
         "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
         "name": "Gravecaller Summoner",
@@ -2585,7 +2641,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravecaller_summoner",
         "model": "mob_dark_caster",
         "tint": "#884ea0",
-        "still": "/guide-stills/mob_dark_caster__884ea0.webp"
+        "tintStrength": 0.5,
+        "still": "/guide-stills/mob_dark_caster__884ea0__s50.webp"
       },
       {
         "name": "Wyrmcult Zealot",
@@ -2595,7 +2652,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wyrmcult_zealot",
         "model": "mob_bandit",
         "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_bandit__6b3a32__s30.webp"
       },
       {
         "name": "Wyrmcult Necromancer",
@@ -2605,7 +2663,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wyrmcult_necromancer",
         "model": "mob_dark_caster",
         "tint": "#533566",
-        "still": "/guide-stills/mob_dark_caster__533566.webp"
+        "tintStrength": 0.5,
+        "still": "/guide-stills/mob_dark_caster__533566__s50.webp"
       },
       {
         "name": "Dawnhold Knight",
@@ -2629,7 +2688,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "fen_troll",
         "model": "mob_troll",
         "tint": "#229954",
-        "still": "/guide-stills/mob_troll__229954.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_troll__229954__s12.webp"
       },
       {
         "name": "Grubjaw the Glutton",
@@ -2639,7 +2699,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "grubjaw",
         "model": "mob_troll",
         "tint": "#145a32",
-        "still": "/guide-stills/mob_troll__145a32.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_troll__145a32__s12.webp"
       },
       {
         "name": "Dune Troll",
@@ -2649,7 +2710,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "dune_troll",
         "model": "mob_troll",
         "tint": "#b07040",
-        "still": "/guide-stills/mob_troll__b07040.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_troll__b07040__s12.webp"
       }
     ]
   },
@@ -2664,7 +2726,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "thornpeak_ogre",
         "model": "mob_ogre",
         "tint": "#9e7b53",
-        "still": "/guide-stills/mob_ogre__9e7b53.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_ogre__9e7b53__s20.webp"
       },
       {
         "name": "Gravenbark Shambler",
@@ -2674,7 +2737,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gravenbark_shambler",
         "model": "mob_treant",
         "tint": "#4e4a3a",
-        "still": "/guide-stills/mob_treant__4e4a3a.webp"
+        "tintStrength": 0.72,
+        "still": "/guide-stills/mob_treant__4e4a3a__s72.webp"
       }
     ]
   },
@@ -2689,7 +2753,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "restless_bones",
         "model": "skel_minion",
         "tint": "#d5dbdb",
-        "still": "/guide-stills/skel_minion__d5dbdb.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__d5dbdb__s25.webp"
       },
       {
         "name": "Drowned Dead",
@@ -2699,7 +2764,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "drowned_dead",
         "model": "skel_minion",
         "tint": "#7fb3d5",
-        "still": "/guide-stills/skel_minion__7fb3d5.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__7fb3d5__s25.webp"
       },
       {
         "name": "Drowned Votary",
@@ -2709,7 +2775,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "drowned_votary",
         "model": "skel_minion",
         "tint": "#6c8f8a",
-        "still": "/guide-stills/skel_minion__6c8f8a.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__6c8f8a__s25.webp"
       },
       {
         "name": "Ashbone Raider",
@@ -2719,7 +2786,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ashbone_raider",
         "model": "skel_minion",
         "tint": "#e8dcc8",
-        "still": "/guide-stills/skel_minion__e8dcc8.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__e8dcc8__s25.webp"
       },
       {
         "name": "Ashbone Warcaller",
@@ -2729,7 +2797,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ashbone_warcaller",
         "model": "skel_minion",
         "tint": "#d8c8a8",
-        "still": "/guide-stills/skel_minion__d8c8a8.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__d8c8a8__s25.webp"
       },
       {
         "name": "Boneclad Revenant",
@@ -2739,7 +2808,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "boneclad_revenant",
         "model": "skel_warrior",
         "tint": "#cacfd2",
-        "still": "/guide-stills/skel_warrior__cacfd2.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_warrior__cacfd2__s25.webp"
       },
       {
         "name": "Barrow Wight",
@@ -2749,7 +2819,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "barrow_wight",
         "model": "skel_minion",
         "tint": "#9fb0c4",
-        "still": "/guide-stills/skel_minion__9fb0c4.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__9fb0c4__s25.webp"
       },
       {
         "name": "Drowned Deckhand",
@@ -2759,7 +2830,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "drowned_deckhand",
         "model": "skel_minion",
         "tint": "#86988e",
-        "still": "/guide-stills/skel_minion__86988e.webp"
+        "tintStrength": 0.25,
+        "still": "/guide-stills/skel_minion__86988e__s25.webp"
       }
     ]
   },
@@ -2792,7 +2864,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "ice_wisp",
         "model": "mob_ghost",
         "tint": "#bfe4ff",
-        "still": "/guide-stills/mob_ghost__bfe4ff.webp"
+        "tintStrength": 0.55,
+        "still": "/guide-stills/mob_ghost__bfe4ff__s55.webp"
       },
       {
         "name": "Stormcrag Elemental",
@@ -2802,6 +2875,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "stormcrag_elemental",
         "model": "mob_elemental",
         "tint": "#5dade2",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__5dade2.webp"
       },
       {
@@ -2812,6 +2886,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "rime_elemental",
         "model": "mob_elemental",
         "tint": "#9fd0f0",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__9fd0f0.webp"
       },
       {
@@ -2822,6 +2897,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "shardlord_kazzix",
         "model": "mob_elemental",
         "tint": "#aed6f1",
+        "tintStrength": 0.4,
         "still": "/guide-stills/mob_elemental__aed6f1.webp"
       },
       {
@@ -2832,7 +2908,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "lily_wisp",
         "model": "mob_ghost",
         "tint": "#d0f2c8",
-        "still": "/guide-stills/mob_ghost__d0f2c8.webp"
+        "tintStrength": 0.55,
+        "still": "/guide-stills/mob_ghost__d0f2c8__s55.webp"
       },
       {
         "name": "Nightkin Stargazer",
@@ -2842,7 +2919,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "nightkin_stargazer",
         "model": "mob_nightkin",
         "tint": "#8fa8e0",
-        "still": "/guide-stills/mob_nightkin__8fa8e0.webp"
+        "tintStrength": 0.3,
+        "still": "/guide-stills/mob_nightkin__8fa8e0__s30.webp"
       },
       {
         "name": "Wood Wraith",
@@ -2852,7 +2930,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "wood_wraith",
         "model": "mob_ghost",
         "tint": "#9ab4a0",
-        "still": "/guide-stills/mob_ghost__9ab4a0.webp"
+        "tintStrength": 0.55,
+        "still": "/guide-stills/mob_ghost__9ab4a0__s55.webp"
       }
     ]
   },
@@ -2867,7 +2946,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "sethrael_palecoil",
         "model": "mob_dragonkin",
         "tint": "#bcd2e6",
-        "still": "/guide-stills/mob_dragonkin__bcd2e6.webp"
+        "tintStrength": 0.2,
+        "still": "/guide-stills/mob_dragonkin__bcd2e6__s20.webp"
       }
     ]
   },
@@ -2882,7 +2962,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "riftspawn",
         "model": "mob_demonalt",
         "tint": "#7a3fb0",
-        "still": "/guide-stills/mob_demonalt__7a3fb0.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_demonalt__7a3fb0__s35.webp"
       }
     ]
   },
@@ -2897,7 +2978,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "templateId": "gloam_strider",
         "model": "mob_raptor",
         "tint": "#4c4a72",
-        "still": "/guide-stills/mob_raptor__4c4a72.webp"
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_raptor__4c4a72__s35.webp"
       }
     ]
   }
