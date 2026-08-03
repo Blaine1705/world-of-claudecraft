@@ -9806,7 +9806,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ],
-    "tintStrength": 0.5
+    "tintStrength": 0.12
   },
   "player_shaman": {
     "url": "models/chars/players/barbarian.glb",
@@ -9825,7 +9825,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.4
+    "tintStrength": 0.12
   },
   "player_mage": {
     "url": "models/chars/players/mage.glb",
@@ -9857,7 +9857,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "gripRef": "Spellbook_open"
       }
     ],
-    "tintStrength": 0.45
+    "tintStrength": 0.12
   },
   "player_druid": {
     "url": "models/chars/players/druid.glb",

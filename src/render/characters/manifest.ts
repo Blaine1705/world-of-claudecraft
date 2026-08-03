@@ -706,8 +706,12 @@ export const VISUALS: Record<string, VisualDef> = {
     show: [],
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
+    // Subtle differentiation from the plain mage on the same model: 0.5 washed
+    // the mage.glb atlas under a near-solid cream (issue #2678), which read as
+    // a corrupted default. A faint wash reads without hiding the base texture,
+    // same precedent as mob_troll below.
     tint: 0xf0e9d6,
-    tintStrength: 0.5,
+    tintStrength: 0.12,
   },
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,
@@ -723,8 +727,12 @@ export const VISUALS: Record<string, VisualDef> = {
     ],
     weaponSlots: [0],
     offhandSlot: 1,
+    // Subtle differentiation from the barbarian on the same model: 0.4 washed
+    // the barbarian.glb atlas under a near-solid blue (issue #2678), which
+    // read as a corrupted default. A faint wash reads without hiding the base
+    // texture, same precedent as mob_troll below.
     tint: 0x6f8fc9,
-    tintStrength: 0.4,
+    tintStrength: 0.12,
   },
   player_mage: {
     url: `${PLAYERS}/mage.glb`,
@@ -748,8 +756,12 @@ export const VISUALS: Record<string, VisualDef> = {
       { url: `${WEAPONS}/spellbook_open.glb`, bone: 'handslot.l', gripRef: 'Spellbook_open' },
     ],
     weaponSlots: [0], // mainhand (wand) swaps; spellbook offhand stays
+    // Subtle differentiation from the mage/priest on the same model: 0.45
+    // washed the mage.glb atlas under a near-solid purple (issue #2678),
+    // which read as a corrupted default. A faint wash reads without hiding
+    // the base texture, same precedent as mob_troll below.
     tint: 0x8d5fd3,
-    tintStrength: 0.45,
+    tintStrength: 0.12,
   },
   player_druid: {
     url: `${PLAYERS}/druid.glb`,
