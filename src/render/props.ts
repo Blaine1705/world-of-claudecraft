@@ -2697,7 +2697,6 @@ export const propStaticMergeInternalsForTest = { mergeStaticMeshes };
 
 export const propMaterialInternalsForTest = { convertMaterial };
 
-
 // ---------------------------------------------------------------------------
 // Far-field building impostors
 // ---------------------------------------------------------------------------

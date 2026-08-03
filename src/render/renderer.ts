@@ -46,6 +46,7 @@ import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
+import { type AmbientLifeView, buildAmbientLife } from './ambient_life';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
@@ -171,7 +172,6 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
-import { type AmbientLifeView, buildAmbientLife } from './ambient_life';
 import { buildFarTerrain, type FarTerrainView } from './far_terrain';
 import {
   detailCullFar,

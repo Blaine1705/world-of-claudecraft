@@ -41,7 +41,12 @@ import { GFX, sharedUniforms } from './gfx';
 
 export type ImpostorCategory = 'tree' | 'rock' | 'dress' | 'building';
 
-const CATEGORY_VIEWS: Record<ImpostorCategory, number> = { tree: 12, rock: 6, dress: 8, building: 6 };
+const CATEGORY_VIEWS: Record<ImpostorCategory, number> = {
+  tree: 12,
+  rock: 6,
+  dress: 8,
+  building: 6,
+};
 
 function categoryCellPx(category: ImpostorCategory): number {
   const scale = GFX.constrainedMemory ? 0.5 : 1;

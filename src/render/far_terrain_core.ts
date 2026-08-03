@@ -513,13 +513,7 @@ export interface FarTileBuilder {
  */
 /** How far outside the zone-rect world a point sits (0 inside). */
 function outsideWorldBy(x: number, z: number): number {
-  return Math.max(
-    0,
-    x - WORLD_MAX_X,
-    WORLD_MIN_X - x,
-    z - WORLD_MAX_Z,
-    WORLD_MIN_Z - z,
-  );
+  return Math.max(0, x - WORLD_MAX_X, WORLD_MIN_X - x, z - WORLD_MAX_Z, WORLD_MIN_Z - z);
 }
 
 /** Seabed the beyond-rim band settles to (under WATER_LEVEL, gentle). */

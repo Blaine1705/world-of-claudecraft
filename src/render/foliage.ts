@@ -58,7 +58,6 @@ import {
   lodDistsFor,
   treeDetailDistance,
 } from './foliage_lod';
-import { collectBuildingImpostors } from './props';
 import {
   patchConstantUpNormalVertexShader,
   patchGrassFragmentShader,
@@ -85,6 +84,7 @@ import {
   projectedPixelSize,
   reorderInstanceDataByStableRank,
 } from './perceptual_lod_core';
+import { collectBuildingImpostors } from './props';
 import { attachShadowPassOnlyGate } from './shadow_pass_gate_core';
 import { freezeStaticMatrices } from './static_matrix';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
