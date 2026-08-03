@@ -50,22 +50,22 @@ export const BAKED_MAP_BG = {
   "nightbloom": {
     "w": 480,
     "h": 747,
-    "rowHash": "b328f747"
+    "rowHash": "bc77ce08"
   },
   "wraithwood": {
     "w": 480,
     "h": 747,
-    "rowHash": "bb7e41a8"
+    "rowHash": "91a4aa98"
   },
   "palmreach": {
     "w": 480,
     "h": 747,
-    "rowHash": "1a091822"
+    "rowHash": "82ec540e"
   },
   "evergarden": {
     "w": 480,
     "h": 747,
-    "rowHash": "50e6f60f"
+    "rowHash": "652b90a2"
   },
   "galecrest": {
     "w": 480,
@@ -75,7 +75,7 @@ export const BAKED_MAP_BG = {
   "farshore_isle": {
     "w": 480,
     "h": 480,
-    "rowHash": "c5d89b51"
+    "rowHash": "7dd7d4d6"
   },
   "world_strip": {
     "w": 140,
