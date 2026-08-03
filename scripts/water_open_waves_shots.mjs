@@ -190,6 +190,35 @@ for (const [phaseName, phase] of [
     pitch: 0.02,
     phase,
   });
+  // Straight down on a waterline: where the surface meets the sand, which is
+  // where the shore film and any residual shore tearing both show. Two flat
+  // shelves (the film has the most room to read on those), then the spot where
+  // the apron beneath interpolates DEEPEST under a shoreline, which is the
+  // adversarial case for fading the plane's alpha out over the sand.
+  await shoot(`${phaseName}_5_waterline_galecrest`, {
+    x: 462,
+    y: 11,
+    z: 480,
+    yaw: 0,
+    pitch: 1.45,
+    phase,
+  });
+  await shoot(`${phaseName}_6_waterline_drakelands`, {
+    x: 270,
+    y: 11,
+    z: 1862,
+    yaw: 0,
+    pitch: 1.45,
+    phase,
+  });
+  await shoot(`${phaseName}_7_waterline_apron_worst`, {
+    x: -286,
+    y: 11,
+    z: 182,
+    yaw: 0,
+    pitch: 1.45,
+    phase,
+  });
 }
 
 console.log(sawError ? 'ERRORS SEEN (see log above)' : 'no page/shader errors');

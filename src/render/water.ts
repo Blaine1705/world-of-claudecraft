@@ -90,6 +90,22 @@ const WATER_OPACITY_EXTINCTION_PER_YARD = 0.9;
 const WATER_SHALLOW_ALPHA = 0.84;
 const WATER_DEEP_ALPHA = 1;
 /**
+ * Depth over which the surface thins to nothing as it runs out onto the sand.
+ * Without it the sheet holds WATER_SHALLOW_ALPHA right up to its geometric
+ * intersection with the terrain and then simply stops, which reads as a cut
+ * line rather than as water. Deliberately far shallower than the seabed clamp,
+ * so the "both sheets saturate by the clamp" rule the file header rests on is
+ * untouched: this only ever acts in the last half yard.
+ */
+const WATER_SHORE_FILM_YARDS = 0.55;
+/**
+ * The surf outlives the water carrying it: a wash line is the last thing to
+ * dry off a beach, and the foam band lives in exactly the depth range the film
+ * acts on, so fading them together would erase the surf instead of softening
+ * the waterline. Foam therefore rides its own shorter fade.
+ */
+const WATER_SHORE_FILM_FOAM_FRACTION = 0.4;
+/**
  * How much of the palette the SEABED is allowed to drive. Bathymetry is not
  * smooth: the measured shelf off Eastbrook runs flat at ~1.5 yards for 40
  * yards, then breaks and drops to the 6 yard clamp within 30. Letting depth
@@ -606,9 +622,18 @@ ${BIOME_HAZE_DECLARATIONS}
     col = mix(col, vec3(1.05), clamp(foam, 0.0, 0.9));
     float surfaceAccent = clamp(foam + contactSheen * 0.12, 0.0, 0.92);
     float opacityDepth = 1.0 - exp(-vShoreDepth * ${glsl(WATER_OPACITY_EXTINCTION_PER_YARD)});
+    // The last half yard of shallows THINS to nothing over the sand instead of
+    // ending at the geometric intersection with it. Foam holds on longer (see
+    // WATER_SHORE_FILM_FOAM_FRACTION): the wash line is the last thing to dry.
+    float shoreFilm = smoothstep(0.0, ${glsl(WATER_SHORE_FILM_YARDS)}, vShoreDepth);
+    float foamFilm = smoothstep(
+      0.0,
+      ${glsl(WATER_SHORE_FILM_YARDS * WATER_SHORE_FILM_FOAM_FRACTION)},
+      vShoreDepth
+    );
     float alpha = max(
-      mix(${glsl(WATER_SHALLOW_ALPHA)}, ${glsl(WATER_DEEP_ALPHA)}, opacityDepth),
-      surfaceAccent * 0.95
+      mix(${glsl(WATER_SHALLOW_ALPHA)}, ${glsl(WATER_DEEP_ALPHA)}, opacityDepth) * shoreFilm,
+      surfaceAccent * 0.95 * foamFilm
     );
     // Contour waterline (uShoreEdgeFade, interior strips/pools only): the
     // surface dissolves where the baked depth reaches zero, so the visible
