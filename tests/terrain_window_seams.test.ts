@@ -29,8 +29,8 @@ const MAX_STEP = 0.35; // yards of ridden rise across the gap
 function rideStep(ax: 'x' | 'z', at: number, along: number): number {
   const pa: [number, number] = ax === 'x' ? [at - GAP / 2, along] : [along, at - GAP / 2];
   const pb: [number, number] = ax === 'x' ? [at + GAP / 2, along] : [along, at + GAP / 2];
-  const ra = Math.max(groundHeight(pa[0], pa[1], SEED), waterLevelAt(pa[0], pa[1]));
-  const rb = Math.max(groundHeight(pb[0], pb[1], SEED), waterLevelAt(pb[0], pb[1]));
+  const ra = Math.max(groundHeight(pa[0], pa[1], SEED), waterLevelAt(pa[0], pa[1], SEED));
+  const rb = Math.max(groundHeight(pb[0], pb[1], SEED), waterLevelAt(pb[0], pb[1], SEED));
   return Math.abs(rb - ra);
 }
 

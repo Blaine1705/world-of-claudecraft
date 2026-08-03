@@ -2127,7 +2127,7 @@ export class Renderer {
     bd('foliage');
     this.fish = buildFish(this.sim.cfg.seed, (x, z, radius, strength) => {
       this.waterView.addSplash(x, z, radius, strength);
-      const level = waterLevelAt(x, z);
+      const level = waterLevelAt(x, z, this.sim.cfg.seed);
       if (Number.isFinite(level)) {
         this.vfx.waterSplash(x, level, z, radius, strength);
       }
@@ -2448,7 +2448,7 @@ export class Renderer {
     // fishingBite event flips the owner's into the bite state (handleEvent).
     this.fishingBobbers = new FishingBobberVisual(this.scene, (x, z, radius, strength) => {
       this.waterView.addSplash(x, z, radius, strength);
-      const level = waterLevelAt(x, z);
+      const level = waterLevelAt(x, z, this.sim.cfg.seed);
       if (Number.isFinite(level)) {
         this.vfx.waterSplash(x, level, z, radius, strength);
       }
@@ -4137,6 +4137,7 @@ export class Renderer {
       this.camera.position.x,
       this.camera.position.z,
       fogFar,
+      this.camera.position.y,
     );
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     this.updateZoneFeatureVisibility(fogFar);
@@ -7585,7 +7586,13 @@ export class Renderer {
                   ? 'lastkeep'
                   : inside
                     ? 'dungeon'
-                    : camY < waterLevelAt(px, pz) - 0.05
+                    : camY <
+                        waterLevelAt(
+                          this.camera.position.x,
+                          this.camera.position.z,
+                          this.sim.cfg.seed,
+                        ) -
+                          0.05
                       ? 'underwater'
                       : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
@@ -8684,7 +8691,7 @@ export class Renderer {
       // Derive both the swim pose and surface contact from the same displayed
       // coordinates. Network interpolation can lead or trail authoritative
       // snapshots, so mixing the two timelines produces a visible pose pop.
-      const wl = waterLevelAt(ax, az);
+      const wl = waterLevelAt(ax, az, this.sim.cfg.seed);
       const feetDepth = wl - ay;
       const floorSampleDepth = v.wasSwimming ? SWIM_EXIT_FEET_DEPTH : SWIM_ENTER_FEET_DEPTH;
       const floorDepth =
@@ -9380,6 +9387,7 @@ export class Renderer {
       this.camera.position.x,
       this.camera.position.z,
       (this.scene.fog as THREE.Fog).far,
+      this.camera.position.y,
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'water', worldStart);
     this.vfx.update(dt);
@@ -10178,7 +10186,7 @@ export class Renderer {
               : null;
       // Only at the water's edge / in it, sampled at the player, so a loose
       // threshold made the loop bleed across the low marsh from far off.
-      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz) + 0.4;
+      const nearWater = !inDungeon && groundHeight(px, pz, seed) < waterLevelAt(px, pz, seed) + 0.4;
       // Sowfield crowd bed: murmurs near the ground, swells while a match is
       // live (cupInfo is the IWorld mirror, so this works online too).
       const crowd = crowdAmbienceAt(px, pz, inDungeon, !!this.sim.cupInfo?.live);
