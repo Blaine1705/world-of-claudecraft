@@ -827,6 +827,66 @@ describe('woc_market_window: the picker prompt counts correctly', () => {
   });
 });
 
+describe('woc_market_window: a fixed-price listing can satisfy the guards buyNow runs', () => {
+  it('renders the terms and two-factor fields when there is no bid form to carry them', () => {
+    // The defect this pins was UNREACHABLE in local testing and total in effect.
+    // buyNow() sends totpCode and acceptTerms, and the server's buyNow gate chain
+    // runs guardTotp and guardTerms exactly as placeBid does. But both inputs used
+    // to live ONLY inside bidFormHtml, which returns '' for a buy_now listing. So a
+    // fixed-price listing at or above the two-factor threshold refused with
+    // totp_required while offering no field to type a code into, and a buyer who
+    // had never accepted the terms got terms_required with no checkbox: unbuyable,
+    // permanently, with no way out from the UI. Every listing in the local database
+    // was the legacy combined format, whose bid form DOES render, which is exactly
+    // why nothing caught it.
+    const detail = between('private detailPaneHtml(', 'private bidFormHtml(');
+    expect(detail).toContain('this.confirmFieldsHtml(model)');
+    // Only when the bid form is absent: a combined listing would otherwise render
+    // the same data-field twice and totpValue() would read whichever came first.
+    expect(detail).toContain("bidForm === ''");
+    // The COMPOSITION, not the declarations. Asserting the order with indexOf over
+    // the whole method was vacuous both ways: `buyNowFields` appears first in its
+    // own `const`, so deleting it from the returned concatenation entirely, and
+    // moving it after the button, both still passed. The pane is assembled here, so
+    // this is the sequence that decides what a player sees.
+    const parts = detail
+      .slice(detail.indexOf('      estimate +'), detail.indexOf('      cancel +'))
+      .split('+')
+      .map((piece) => piece.trim())
+      .filter(Boolean);
+    expect(parts).toEqual(['estimate', 'bidForm', 'buyNowFields', 'buyNow']);
+  });
+
+  it('defines those two fields exactly once, so both paths send the same names', () => {
+    // One definition is the whole point: two copies drift, and the server reads one
+    // pair of names.
+    const fields = between('private confirmFieldsHtml(', 'private sellHtml(');
+    expect(fields).toContain('data-field="accept-terms"');
+    expect(fields).toContain('data-field="totp"');
+    expect(fields).toContain("t('hudChrome.wocMarket.totpNote'");
+    expect(fields).toContain("t('hudChrome.wocMarket.termsLabel')");
+    // The bid form consumes the same helper rather than keeping its own copy.
+    const bid = between('private bidFormHtml(', 'private confirmFieldsHtml(');
+    expect(bid).toContain('this.confirmFieldsHtml(model)');
+    expect(bid).not.toContain('data-field="totp"');
+    expect(bid).not.toContain('data-field="accept-terms"');
+    // Exactly one RENDER site for each, so no path can emit a duplicate. The
+    // negative lookarounds exclude the query-selector form, `[data-field="totp"]`,
+    // which totpValue() legitimately uses to read the field back.
+    expect(painter.match(/(?<!\[)data-field="totp"(?!\])/g) ?? []).toHaveLength(1);
+    expect(painter.match(/(?<!\[)data-field="accept-terms"(?!\])/g) ?? []).toHaveLength(1);
+  });
+
+  it('reads both values by the same name it renders them under', () => {
+    // A rename on one side only would silently send null forever, which the server
+    // reports as totp_required: the same dead end, from the opposite direction.
+    expect(painter).toContain('this.field<HTMLInputElement>(\'[data-field="totp"]\')');
+    const buy = between('private async buyNow(', 'private async cancelListing(');
+    expect(buy).toContain('totpCode: this.totpValue()');
+    expect(buy).toContain('acceptTerms: this.acceptTermsChecked()');
+  });
+});
+
 describe('woc_market_window: the two ways to take a listing are separate actions', () => {
   const css = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
 

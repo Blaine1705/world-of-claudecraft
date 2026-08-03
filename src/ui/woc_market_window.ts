@@ -675,6 +675,11 @@ export class WocMarketWindow {
           `aria-label="${esc(t('hudChrome.wocMarket.cancelAria', { item: name }))}" data-focus-key="wm-cancel">` +
           `${esc(t('hudChrome.wocMarket.cancelButton'))}</button>`
         : '';
+    // A fixed-price listing has no bid form, so nothing else would carry the two
+    // fields buyNow's own server-side guards demand. Rendered only when the bid
+    // form is absent: a legacy combined listing would otherwise emit the same
+    // data-field twice and totpValue() would read whichever came first.
+    const buyNowFields = buyNow !== '' && bidForm === '' ? this.confirmFieldsHtml(model) : '';
     return (
       `<div class="wm-detail"><h3>${esc(t('hudChrome.wocMarket.detailTitle'))}</h3>` +
       `<div class="wm-detail-item">${this.itemCellHtml(d.row.itemId, d.row.quality, `detail:${d.row.id}`, d.row.instance)}</div>` +
@@ -687,6 +692,7 @@ export class WocMarketWindow {
       }</p>` +
       estimate +
       bidForm +
+      buyNowFields +
       buyNow +
       cancel +
       `<h4>${esc(t('hudChrome.wocMarket.detailSales'))}</h4>${sales}</div>`
@@ -701,11 +707,6 @@ export class WocMarketWindow {
     const d = model.browse.detail;
     if (!d || d.row.mine || d.row.format === 'buy_now' || d.row.remainingMs <= 0) return '';
     const disabled = model.paused || !model.walletLinked || this.busy ? 'disabled' : '';
-    const termsRow = model.activity?.termsAccepted
-      ? ''
-      : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" ${this.acceptTerms ? 'checked' : ''} /> ${esc(
-          t('hudChrome.wocMarket.termsLabel'),
-        )}</label>`;
     return (
       `<div class="wm-bid-form">` +
       `<p class="wm-min-next">${esc(t('hudChrome.wocMarket.detailMinNext', { usd: this.usd(d.row.minNextBidCents) }))}</p>` +
@@ -713,12 +714,7 @@ export class WocMarketWindow {
       `<input type="number" inputmode="decimal" min="0" step="0.25" data-field="bid-usd" data-focus-key="wm-bid-usd" placeholder="${esc(
         t('hudChrome.wocMarket.bidPlaceholder'),
       )}" /></label>` +
-      `<label class="wm-totp">${esc(t('hudChrome.wocMarket.totpLabel'))}` +
-      `<input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" data-field="totp" data-focus-key="wm-totp" placeholder="${esc(
-        t('hudChrome.wocMarket.totpPlaceholder'),
-      )}" /></label>` +
-      `<p class="wm-note">${esc(t('hudChrome.wocMarket.totpNote', { usd: this.usd(model.totpThresholdCents) }))}</p>` +
-      termsRow +
+      this.confirmFieldsHtml(model) +
       `<p class="wm-note">${esc(
         // The bond figure is SERVER-computed and shipped on the listing view:
         // the client computes no money (the PRD rule).
@@ -733,6 +729,40 @@ export class WocMarketWindow {
       `<button type="button" class="wm-primary" data-action="place-bid" data-listing="${listingId}" ${disabled} ` +
       `aria-label="${esc(t('hudChrome.wocMarket.bidAria', { item: itemName }))}" data-focus-key="wm-bid-submit">` +
       `${esc(t('hudChrome.wocMarket.bidButton'))}</button></div>`
+    );
+  }
+
+  /**
+   * The two fields the SERVER demands before it will take money: the terms
+   * acceptance and the two-factor code.
+   *
+   * One definition, rendered by whichever action is on screen, because the
+   * server's guards do not care which one it was. Both `placeBid` and `buyNow`
+   * run guardTerms and guardTotp, but these inputs used to live only inside the
+   * bid form, which is suppressed for a fixed-price listing: a buy-now at or
+   * above the threshold refused with totp_required and showed nowhere to type a
+   * code, and a buyer who had not yet accepted the terms got terms_required with
+   * no checkbox. Both were dead ends with no way out of the UI, and neither could
+   * appear on a legacy combined listing, which is the only kind the local
+   * database held.
+   *
+   * The threshold in the note is the SERVER's own number off the status payload,
+   * never a hardcoded $100, so an operator who moves
+   * WOC_MARKET_TOTP_THRESHOLD_CENTS does not leave the copy lying.
+   */
+  private confirmFieldsHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
+    const termsRow = model.activity?.termsAccepted
+      ? ''
+      : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" ${this.acceptTerms ? 'checked' : ''} /> ${esc(
+          t('hudChrome.wocMarket.termsLabel'),
+        )}</label>`;
+    return (
+      `<label class="wm-totp">${esc(t('hudChrome.wocMarket.totpLabel'))}` +
+      `<input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" data-field="totp" data-focus-key="wm-totp" placeholder="${esc(
+        t('hudChrome.wocMarket.totpPlaceholder'),
+      )}" /></label>` +
+      `<p class="wm-note">${esc(t('hudChrome.wocMarket.totpNote', { usd: this.usd(model.totpThresholdCents) }))}</p>` +
+      termsRow
     );
   }
 
