@@ -26,8 +26,19 @@ export const DAY_NIGHT_CYCLE_MS = 60 * 60 * 1000;
  *  color multipliers for the sky dome and fog, a fog-distance pull-in, and the
  *  raw night amount (0 = full day, 1 = deepest night) for hue-cool blends. */
 export interface DayNightGrade {
-  /** multiplies sun + hemisphere + environment intensity (1 = authored day). */
+  /** multiplies the sun key light's intensity (1 = authored day). */
   lightScale: number;
+  /**
+   * multiplies the AMBIENT half of the rig (hemisphere light + image-based
+   * lighting) instead of `lightScale`. It sits on a higher night floor, because
+   * the two halves answer different questions after dark: the key light is the
+   * moon, which genuinely is that dim, while the ambient term is the sky bounce
+   * that keeps terrain shape and silhouettes readable. Dropping both to the same
+   * floor is what makes a night scene read as a black cutout rather than as
+   * night, and lifting the key light instead would just flatten the moonlight
+   * into a second sun. Always >= lightScale, always <= 1.
+   */
+  ambientScale: number;
   /** multiplies the sky dome color (1,1,1 = day; dark blue at night). */
   sky: [number, number, number];
   /** multiplies the biome fog color (kept lighter than the sky for readability). */
@@ -50,6 +61,7 @@ export const DAY_ONLY = false;
  *  targets below are neutral), so the cycle's noon IS the authored day look. */
 export const NEUTRAL_DAY_GRADE: DayNightGrade = {
   lightScale: 1,
+  ambientScale: 1,
   sky: [1, 1, 1],
   fog: [1, 1, 1],
   farScale: 1,
@@ -63,6 +75,12 @@ export const NEUTRAL_DAY_GRADE: DayNightGrade = {
 // 0.18 first cut across several playtests that all read too dark; 0.36 keeps
 // night clearly night while the world stays comfortably playable.
 const NIGHT_LIGHT_FLOOR = 0.36;
+// The ambient (hemisphere + IBL) floor sits above the key-light floor: the sky
+// bounce is what holds terrain shape and body silhouettes together, and pinning
+// it to the moon's own dimness is what made deep night read as flat black rather
+// than as a lit night. A conservative lift on ONE number, kept here in the grade
+// math so no consumer has to scatter a night multiplier of its own.
+const NIGHT_AMBIENT_FLOOR = 0.5;
 const NIGHT_SKY: [number, number, number] = [0.045, 0.06, 0.15];
 const NIGHT_FOG: [number, number, number] = [0.14, 0.18, 0.31];
 const NIGHT_FAR_SCALE = 0.82;
@@ -195,9 +213,15 @@ export function dayNightGrade(e: number, biome?: BiomeId): DayNightGrade {
   const palette = biome === undefined ? undefined : REALM_NIGHT_PALETTE[biome];
   const nightSky = palette?.sky ?? NIGHT_SKY;
   const nightFog = palette?.fog ?? NIGHT_FOG;
-  const nightFloor = NIGHT_LIGHT_FLOOR * (palette?.floorScale ?? 1);
+  const floorScale = palette?.floorScale ?? 1;
+  const nightFloor = NIGHT_LIGHT_FLOOR * floorScale;
+  // A realm's floorScale shapes its ambient the same way it shapes its key
+  // light, but the ambient floor is capped at the authored day so a realm that
+  // scales UP (the Drakelands' ember glow) can never brighten past noon.
+  const nightAmbientFloor = Math.min(DAY_LIGHT_CAP, NIGHT_AMBIENT_FLOOR * floorScale);
   return {
     lightScale: lerp(nightFloor, DAY_LIGHT_CAP, c),
+    ambientScale: lerp(nightAmbientFloor, DAY_LIGHT_CAP, c),
     sky: lerp3(nightSky, DAY_SKY, c),
     fog: lerp3(nightFog, DAY_FOG, c),
     farScale: lerp(NIGHT_FAR_SCALE, 1, c),
@@ -344,6 +368,6 @@ export function moonTerminator(p: number): MoonTerminator {
   // crescents (a > 0): the shadow spills past centre, bulging toward the lit
   // side; gibbous (a < 0): the lit face spills over, terminator bulging back
   // into the shadow side.
-  const bulgeSide: -1 | 1 = a > 0 ? ((-shadowSide) as -1 | 1) : shadowSide;
+  const bulgeSide: -1 | 1 = a > 0 ? (-shadowSide as -1 | 1) : shadowSide;
   return { litFrac: (1 - a) / 2, shadowSide, rx: Math.abs(a), bulgeSide };
 }

@@ -245,6 +245,54 @@ describe('per-realm night palettes (region style survives the dark)', () => {
   });
 });
 
+describe('the night ambient floor (readable silhouettes at deep night)', () => {
+  it('is the identity at noon, exactly like every other day target', () => {
+    expect(dayNightGrade(1).ambientScale).toBeCloseTo(1, 12);
+    expect(NEUTRAL_DAY_GRADE.ambientScale).toBe(1);
+  });
+
+  it('holds a HIGHER floor than the key light at deepest night', () => {
+    const g = dayNightGrade(0);
+    // The two halves of the rig answer different questions after dark: the sun
+    // scale is the moon (genuinely dim), the ambient scale is the sky bounce
+    // that keeps terrain shape and bodies legible. Pinning both to one floor is
+    // what made night read as a black cutout.
+    expect(g.ambientScale).toBeGreaterThan(g.lightScale);
+    expect(g.ambientScale).toBeCloseTo(0.5, 12);
+  });
+
+  it('never brightens past the authored day, at any point of the cycle', () => {
+    for (let i = 0; i <= 20; i++) {
+      const g = dayNightGrade(i / 20);
+      expect(g.ambientScale).toBeLessThanOrEqual(1);
+      expect(g.ambientScale).toBeGreaterThanOrEqual(g.lightScale - 1e-12);
+    }
+  });
+
+  it('brightens monotonically from night to day', () => {
+    let prev = -1;
+    for (let i = 0; i <= 20; i++) {
+      const g = dayNightGrade(i / 20);
+      expect(g.ambientScale).toBeGreaterThanOrEqual(prev - 1e-9);
+      prev = g.ambientScale;
+    }
+  });
+
+  it('takes the realm floor scale, capped so a warm realm cannot outshine noon', () => {
+    // the Nightbloom scales its floor DOWN (0.85), so its ambient dips with it
+    expect(dayNightGrade(0, 'night').ambientScale).toBeLessThan(dayNightGrade(0).ambientScale);
+    // the Drakelands scale UP (1.1): warmer than neutral, still under the day
+    const ember = dayNightGrade(0, 'ember');
+    expect(ember.ambientScale).toBeGreaterThan(dayNightGrade(0).ambientScale);
+    expect(ember.ambientScale).toBeLessThanOrEqual(1);
+  });
+
+  it('survives the dusk warm untouched (warmDuskGrade is hue only)', () => {
+    const g = dayNightGrade(0.5);
+    expect(warmDuskGrade(g, 1).ambientScale).toBe(g.ambientScale);
+  });
+});
+
 describe('warmDuskGrade (the whole frame goes orange at the horizon)', () => {
   it('returns the grade untouched when the sun is high or deep under', () => {
     const g = dayNightGrade(0.8);
