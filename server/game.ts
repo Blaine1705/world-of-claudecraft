@@ -171,6 +171,12 @@ import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
+import {
+  initialJumpLatchState,
+  type JumpLatchState,
+  noteJumpInput,
+  resolveJumpInput,
+} from './jump_latch';
 import { keepaliveSweepDelayed } from './keepalive_sweep';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
@@ -733,6 +739,13 @@ export interface ClientSession {
   lastInputSeq: number;
   // sim time of the last movement input frame, used to clear stale held input
   lastInputAt: number;
+  // Raw jump flag plus latch deadline (see jump_latch.ts): protects a
+  // momentary jump press from being last-write-wins overwritten by its own
+  // release frame when jittery delivery bunches the two together before the
+  // next tick. GameServer's per-tick loop (applyJumpLatches) is the only
+  // writer of meta.moveInput.jump derived from this; dispatchMessage only
+  // records the raw flag here.
+  jumpLatch: JumpLatchState;
   // serialized form of each delta self field as last sent to this client;
   // a field is omitted from a snapshot while its serialization is unchanged
   lastSent: Record<string, string>;
@@ -1677,6 +1690,7 @@ export class GameServer {
       this.sim.setGm(moderator.pid);
       const meta = this.sim.meta(moderator.pid);
       if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+      moderator.jumpLatch = initialJumpLatchState();
       moderator.spectating = {
         characterId: target.characterId,
         name: target.name,
@@ -1740,6 +1754,7 @@ export class GameServer {
     this.sim.playerGrid.update(entity);
     const meta = this.sim.meta(session.pid);
     if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    session.jumpLatch = initialJumpLatchState();
   }
 
   private jailSpawnFor(session: ClientSession): { x: number; z: number } {
@@ -1798,6 +1813,7 @@ export class GameServer {
     }
     const meta = this.sim.meta(target.pid);
     if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    target.jumpLatch = initialJumpLatchState();
     target.lastSent = {};
     target.sentEnts.clear();
     return true;
@@ -1821,6 +1837,7 @@ export class GameServer {
     }
     const meta = this.sim.meta(session.pid);
     if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    session.jumpLatch = initialJumpLatchState();
     session.lastSent = {};
     session.sentEnts.clear();
   }
@@ -2075,6 +2092,7 @@ export class GameServer {
           let ticksRun = 0;
           while (acc >= DT) {
             this.clearStaleInputs();
+            this.applyJumpLatches();
             lap('stale');
             this.riftUpgrader.drain(this.sim.ctx);
             this.riftAssets.drain(this.sim.ctx);
@@ -2570,6 +2588,23 @@ export class GameServer {
       )
         continue;
       Object.assign(meta.moveInput, emptyMoveInput());
+      session.jumpLatch = initialJumpLatchState();
+    }
+  }
+
+  // The only writer of PlayerMeta.moveInput.jump derived from the jump latch
+  // (see jump_latch.ts and ClientSession.jumpLatch): called once per session
+  // immediately before every Sim.tick(), so it always recomputes from the
+  // untouched raw flag instead of accumulating a forced value that would
+  // otherwise never revert once the latch window elapses with no further
+  // input frame. Order matters: this runs AFTER clearStaleInputs, so a
+  // session that just went stale (and had its latch reset there) resolves to
+  // grounded here too, in the same tick.
+  private applyJumpLatches(): void {
+    for (const session of this.clients.values()) {
+      const meta = this.sim.meta(session.pid);
+      if (!meta) continue;
+      meta.moveInput.jump = resolveJumpInput(session.jumpLatch, this.sim.time);
     }
   }
 
@@ -2947,6 +2982,7 @@ export class GameServer {
       rememberedChat: { channel: 'say' },
       lastInputSeq: 0,
       lastInputAt: this.sim.time,
+      jumpLatch: initialJumpLatchState(),
       lastSent: {},
       timerWireVersion:
         meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1,
@@ -3127,6 +3163,7 @@ export class GameServer {
     }
     session.lastInputSeq = 0;
     session.lastInputAt = this.sim.time;
+    session.jumpLatch = initialJumpLatchState();
     session.lastSent = {};
     session.timerWireVersion =
       meta.timerWireVersion === STABLE_TIMER_WIRE_VERSION ? STABLE_TIMER_WIRE_VERSION : 1;
@@ -3175,6 +3212,7 @@ export class GameServer {
     // still be attacked, healed, or die while linkdead, like any player).
     const meta = this.sim.meta(session.pid);
     if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    session.jumpLatch = initialJumpLatchState();
     // Safety flush so a process crash during the grace window loses nothing.
     void this.saveCharacter(session, { withMarket: true }).catch((err) =>
       console.error(`linkdead save failed for ${session.name}:`, err),
@@ -4189,6 +4227,11 @@ export class GameServer {
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
       const frame = parseMoveInputFrame(msg);
+      // Record the raw jump flag for the per-tick latch resolver
+      // (applyJumpLatches, jump_latch.ts); meta.moveInput.jump itself is
+      // written ONLY there, never here, so a forced-true value is never
+      // mistaken for genuine held-key state once no further frame arrives.
+      noteJumpInput(session.jumpLatch, frame.moveInput.jump, sim.time);
       Object.assign(meta.moveInput, frame.moveInput);
       session.lastInputAt = sim.time;
       if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
