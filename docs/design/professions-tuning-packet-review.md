@@ -6072,6 +6072,171 @@ for the release-merge-audit skill to run over, and the phase 23 QA
 gate (all 10 steps green at 909108deb8 content on the quiescent
 tree) stands as the entry state.
 
+## Phase 24 build record (2026-08-03), QA folded per the phase header
+
+Built in one session off the zero-drift entry sync above, per the
+phase header (docs and catalog only, no sim, server, or UI logic, so
+the QA round folds into the build session). Commits: a297298cfe (the
+prose truth pass), 9c6387bd14 (the review fix round), 547eb5ef7e (the
+round 2 verifier's two nits, taken verbatim). One count correction to
+the scope as written: the pass reworded SEVEN English values in
+place, not six: guide.economy.buyingBody, guide.economy.junkBody,
+guide.profPages.econ.workOrdersNote, and all four
+guide.profPages.gatherDeeds keys (the three land trades plus
+fishing). In-place reword per the settled Q32 ruling; no key was
+added or renamed (translation_keys.generated.ts is untouched), and
+the i18n.locales overlays were never edited.
+
+Verified against the live code BEFORE writing prose: a five-agent
+verify fan-out (vendor window truth, first-cast enumeration,
+chronicle enumeration, marker-vocabulary home, i18n pipeline
+mechanics), plus first-hand reads of vendor_window.ts, vendor_view.ts
+and the deeds catalog. Rendered confirms, not just source reads: a
+14-assertion DOM probe against the live offline client (flat panel
+with zero tab semantics, the exact 1x/5x/10x/Custom strip, the
+Buy {count} bulk tile, Sell Junk with quoted proceeds, and a full
+sell-into-Buyback-and-reclaim round trip), and a rendered guide-page
+probe (19 checks across /wiki/economy, /wiki/professions/fishing,
+/wiki/professions/mining, /wiki/professions/economy) re-run after
+every fix round. Enumerations pinned: six first-cast pages
+(chr_vale_first_cast, chr_marsh_first_cast, chr_peaks_glimmer_cast,
+chr_willowfen_first_cast, chr_galecrest_first_cast,
+chr_farshore_first_cast) and six gatherer chronicles (the vale, marsh
+and peaks chronicles plus the three Q26 zones), matching the doc's
+provenance claims exactly.
+
+What shipped. buyingBody now describes the live flat-panel vendor:
+browse and click to buy, the quantity strip (with the force-1 wares
+named), the whole-stack offer described by what the tile renders (its
+visible label is Buy {count}; the internal Buy Stack name appears
+nowhere on screen), sell-from-bags with the sellability qualifier,
+and the Buyback list with the position claim dropped. junkBody scopes
+junk selling to "any merchant with a shop of their own" (the code
+predicate is vendorInRange over vendorItems: the market NPCs, the
+Heroic Marks quartermaster and the delve counter stock nothing and
+take no sells, while FURY stocks wares and does). The fishing deeds
+sentence counts six first-cast zones and names the Willowfen,
+Galecrest and Farshore; the three land keys carry one sentence on the
+six per-zone gatherer chronicles. workOrdersNote carries the marker
+vocabulary in the glyph-to-meaning direction the per-NPC strongest-
+wins fold can honestly promise: "a bright blue ! is repeatable work
+you have handled before, and the same mark dimmed is repeatable work
+still inside its clock, offered again once the window laps", which is
+true of the four uncadenced make-amends returns (permanent blue,
+never dim) and of the cadenced hobby switch (dims, is not a work
+order). A new guide.test.ts arm ("ties the gatherDeeds prose counts
+to the deed catalog") pins both prose counts to the DEEDS content, so
+a seventh first-cast page or gatherer chronicle rewords the prose in
+the same change; both prose-side mutants were killed on the committed
+tree (a first sed-based mutant "survived" only because BSD sed
+silently no-ops the GNU 0,/pat/ address: prove the mutation applied
+before trusting a survivor).
+
+Folded QA round. Reviewers, all fresh with phase-unique names:
+qa-checklist (rev-p24-qa: READY, zero blocking), an adversarial
+what-is-missing pass (rev-p24-missing, with i18n-mechanics and
+cross-catalog sweep helpers), and a fix-round delta reviewer
+(rev-p24-fixround) who confirmed all ten applied findings, audited
+the test arm decisive on six mutated inputs, then delta-verified
+round 2 CONFIRMED and had its two remaining nits taken verbatim in
+round 3. Every finding was applied or judged with the file open;
+the load-bearing one follows.
+
+The worklist premise, measured false, and the hand-carried re-fill
+list. The Q32 settlement accepted in-place rewording on the premise
+that staled fills "re-enter the release fill worklist". Measured at
+this build: they do not and cannot. i18n_scan.mjs recomputes srcHash
+from the current English every run (its own comment calls the
+translated/stale distinction DORMANT), i18n_fill_worklist.mjs emits
+state === 'pending' rows only, and the release-tier gate asserts
+pending == 0, so a translated-but-reworded row is invisible to all
+three. The scope sentence above and the Q32 settlement record now
+carry the correction. THE RELEASE FILL MUST THEREFORE TAKE THIS LIST
+FROM HERE, because no tool will generate it:
+- Stale in EVERY non-English locale (the 18 base overlays own the
+  fills; es_ES and fr_CA inherit by dialect fall-through):
+  guide.economy.buyingBody, guide.economy.junkBody,
+  guide.profPages.econ.workOrdersNote,
+  guide.profPages.gatherDeeds.mining, .logging, .herbalism.
+- Stale in the five non-Latin overlays only (zh_CN, zh_TW, ja_JP,
+  ko_KR, ru_RU): guide.profPages.gatherDeeds.fishing. Its 15 Latin
+  rows were English passthrough, are already pending, and are the
+  ONLY rows of this phase the worklist will list.
+That is 125 stale rows. Until the fill, buyingBody and junkBody are
+factually wrong in every non-English locale (they still describe the
+reverted three-tab shop and the deleted rolled-quality sell confirm),
+so the fill is a correctness item, not polish.
+
+Judged, no change, with grounds (do not re-raise):
+- No marker legend on the quests page: that section names no glyph
+  color or shape anywhere (verified), so blue/dim vocabulary there
+  would break its register; the work-orders note is where the two
+  new states matter. A future deliberate legend is recorded below.
+- Buyback reclaims one unit per click at one unit's price while a
+  row can show a stack count: pre-existing display semantics; the
+  prose is quantity-neutral and its per-unit price claim is exact.
+- The whole-stack tile hides when your coin covers fewer than two
+  units: the "as many as your coin covers" clause carries the
+  dependence; below guide altitude.
+- The map tooltip tells repeat from cooldown by tag words at one
+  AA-lifted color rather than by brightness: the guide sentence
+  scopes itself to the head marks and maps, and should not later be
+  "corrected" toward the tooltip.
+- buyingBody's "Speak to a merchant" stays unscoped: the economy
+  page is the coin-economy context, and the marks counters are
+  introduced elsewhere as what they are.
+
+Elevated follow-ups from the round's breadth sweeps (recorded here
+per the packet convention, deliberately NOT fixed in this phase and
+NOT filed):
+- The three-zones set: guide.home sub, worldPage.intro,
+  worldPage.mapSub and progression.journeyBody still say three zones
+  while ZONES carries 14 and the home/progression pages render 8
+  zone cards; their neighboring code comments rot the same way. The
+  FAQ cap answers ("reached across three zones") stay defensible as
+  the 1-20 leveling spine. Candidates for the maintainer's release
+  docs pass; outside this phase's settled scope.
+- deedsPage.chroniclesBody "Each zone keeps its own Chronicle"
+  overclaims: six zones have chronicle sets, plus two loose
+  chronicle deeds, out of 14.
+- profPages.fish.tablesNote's "Each zone's waters hold their own
+  pair of food fish" and its three-band zone mapping describe the
+  three authored tables; eleven zones serve the Vale fallback until
+  the zone-4 pass (the toolsNote sibling already carries the
+  caveat).
+- The Farshore world-page card renders the Vale's blurb, greeting
+  and place notes verbatim (farshore_isle declares biome 'vale' and
+  no farshore-specific keys exist); pre-existing, outside the
+  packet.
+- The mediawiki first-boot seed still says three zones (launch-era
+  snapshot, globally stale by design).
+- Eight further zones carry full ore/wood/herb node sets but no
+  gatherer chronicle: a content gap for the zone-4 pass, and the
+  reason the prose counts pages rather than zones.
+- A deliberate marker legend (gold, gray, blue, dimmed) on the
+  quests page, if ever wanted, is a register change to make on
+  purpose.
+- The new count pin covers the count words, not the fishing
+  sentence's zone enumeration; a seventh zone forces the count word
+  anyway.
+
+Acceptance. (a) No guide sentence contradicts the live vendor window
+or undercounts the first-cast deeds: verified rendered on all four
+touched pages and re-verified after every round. (b) English-only
+edits, PR-tier i18n gate green; no new key, so M16 is vacuous (all
+five non-Latin locales carry real fills for every touched key).
+(c) tests/guide.test.ts green including the new arm; wiki:content
+regenerated byte-identically (zero drift proven, not assumed);
+i18n_resolved_equivalence proves the committed slices match a fresh
+regen. (d) npm run gate PASS: all 10 steps green on the
+quiescent tree at 547eb5ef7e, 2053 test files / 27316 tests passed
+(89 skipped) plus the 11-file browser suite at 96 tests, vitest
+workers 8, run in a quiet load window with the probe dev server
+stopped first.
+
+NEXT: the packet merge decision. The locale fill stays maintainer-
+deferred, and MUST take the hand-carried re-fill list above with it.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
