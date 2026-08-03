@@ -265,18 +265,27 @@ describe('warmDuskGrade (the whole frame goes orange at the horizon)', () => {
     expect(w.farScale).toBe(g.farScale);
   });
 
-  it('pushes far enough past neutral to read as amber, not as a tea stain', () => {
-    // The tint is deliberately exaggerated: the first cut (red 1.14, blue 0.62)
-    // was too timid to survive the tone map, so pin the shape of the push
-    // rather than the exact constants. Red must gain, blue must lose roughly
-    // half, and fog must stay warmer than sky (fog reads lighter for
-    // readability, so it carries more of the orange).
+  it('buys its amber with saturation, never with extra light', () => {
+    // The guard that matters at dusk. Distant sprite impostors and the sun-path
+    // water glints already sit near the top of the range there, so a tint that
+    // lifts RED is what blows them out to detail-less white peach. The drama has
+    // to come from pulling green and blue down instead. Pinned as a hard ceiling
+    // on the red gain plus a floor on saturation, so a future "make it hotter"
+    // tuning pass cannot quietly buy warmth with radiance again.
     const g = dayNightGrade(1); // identity grade: the tint shows undiluted
     const w = warmDuskGrade(g, 1);
-    expect(w.sky[0]).toBeGreaterThan(1.25);
-    expect(w.sky[2]).toBeLessThan(0.55);
-    expect(w.fog[0]).toBeGreaterThan(w.sky[0]);
+    const lum = (c: [number, number, number]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+    // red may not exceed the gain this grade replaced (sky 1.14, fog 1.20)
+    expect(w.sky[0]).toBeLessThanOrEqual(1.14);
+    expect(w.fog[0]).toBeLessThanOrEqual(1.2);
+    // and the tint as a whole must REMOVE energy, not add it
+    expect(lum(w.sky)).toBeLessThan(1);
+    expect(lum(w.fog)).toBeLessThan(1);
+    // while still reading as a genuine amber, not the old tea stain (was ~1.8)
+    expect(w.sky[0] / w.sky[2]).toBeGreaterThan(2.5);
     expect(w.fog[0] / w.fog[2]).toBeGreaterThan(2.5);
+    // fog stays lighter than sky for readability, the pre-existing contract
+    expect(w.fog[0]).toBeGreaterThan(w.sky[0]);
   });
 });
 
