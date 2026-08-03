@@ -781,7 +781,34 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       apron.position.y = waterLevel() - 0.06;
     });
   }
-  const buildZone = async (zone: ZoneDef, idlePace: boolean): Promise<THREE.Mesh> => {
+  // Coarse wetness scan: samples the zone rect on a 3-vertex stride (about 6
+  // yards) and reports whether ANY sample is submerged. A fully dry zone then
+  // skips the whole 181-row fill, the single biggest term in a background
+  // zone prepare. The stride is safely below the smallest authored water body
+  // (the border meres); a body would have to be under two strides across in
+  // BOTH axes to slip through.
+  const WETNESS_SCAN_STRIDE = 3;
+  const zoneHasWater = async (
+    zone: ZoneDef,
+    x0: number,
+    x1: number,
+    idlePace: boolean,
+  ): Promise<boolean> => {
+    const step = ((x1 - x0) / SEGMENTS_PER_ZONE) * WETNESS_SCAN_STRIDE;
+    const zStep = ((zone.zMax - zone.zMin) / SEGMENTS_PER_ZONE) * WETNESS_SCAN_STRIDE;
+    let sincePause = 0;
+    for (let z = zone.zMin; z <= zone.zMax; z += zStep) {
+      for (let x = x0; x <= x1; x += step) {
+        if (shoreDepthAt(x, z, seed) > 0) return true;
+      }
+      if (idlePace && ++sincePause >= WATER_ROWS_PER_IDLE_SLICE) {
+        sincePause = 0;
+        await idleSlot(WATER_IDLE_TIMEOUT_MS);
+      }
+    }
+    return false;
+  };
+  const buildZone = async (zone: ZoneDef, idlePace: boolean): Promise<THREE.Mesh | null> => {
     const depth = zone.zMax - zone.zMin;
     // each plane covers its zone's own rect: the side columns live at
     // x beyond the strip, and a strip-centered plane would leave their
@@ -789,6 +816,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // featureless apron with no foam or shallow grading
     const x0 = zone.xMin ?? -WORLD_SIZE / 2;
     const x1 = zone.xMax ?? WORLD_SIZE / 2;
+    if (!(await zoneHasWater(zone, x0, x1, idlePace))) return null;
     const geo = new THREE.PlaneGeometry(
       x1 - x0,
       depth,
@@ -881,7 +909,7 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
         .then(async () => {
           const mesh = await buildZone(zone, idlePace);
           loadedZones.add(zone.id);
-          return [mesh];
+          return mesh ? [mesh] : [];
         })
         .finally(() => pendingZones.delete(zone.id));
       pendingZones.set(zone.id, task);

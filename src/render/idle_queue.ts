@@ -137,7 +137,12 @@ export function runIdleQueue<T>(
         return;
       }
       const batchSize = Math.max(1, Math.floor(options.batchSize));
-      const maxItems = budget.didTimeout ? 1 : batchSize;
+      // A timed-out slot still makes real progress: a quarter batch, never a
+      // single item. Under sustained load (a busy frame loop grants no true
+      // idle budget for minutes) the one-item arm degraded a 181-row water
+      // fill to one row per 200ms timeout, which is what held whole-zone
+      // streaming to ~36s per zone behind the residency-clamped horizon.
+      const maxItems = budget.didTimeout ? Math.max(1, Math.ceil(batchSize / 4)) : batchSize;
       const end = Math.min(index + maxItems, items.length);
       for (; index < end; index++) {
         if (!budget.didTimeout && budget.timeRemaining() <= 0) break;

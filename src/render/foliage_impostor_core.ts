@@ -182,3 +182,14 @@ export const IMPOSTOR_JITTER_GLSL =
 
 /** GL_MAX_TEXTURE_SIZE floor is 4096 everywhere WebGL2 runs; stay inside it. */
 export const IMPOSTOR_ATLAS_MAX = 4096;
+
+/**
+ * The texture-shaped canopy ambient floor, shared by the real canopy
+ * materials (foliage.ts, where its rationale lives: a dense canopy
+ * shadow-maps itself into darkness) and the sprite impostors. Emissive is
+ * added after all light attenuation, so it is the one term that survives the
+ * deep-night light scale: an impostor without it reads as a pure black
+ * silhouette at night while its real twin stays readable. One constant so
+ * the two sides of the swap line can never drift apart.
+ */
+export const CANOPY_EMISSIVE_FLOOR: readonly [number, number, number] = [0.155, 0.175, 0.135];
