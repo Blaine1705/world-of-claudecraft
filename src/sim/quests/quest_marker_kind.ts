@@ -61,8 +61,11 @@ const MARKER_PRIORITY: Record<QuestMarkerKind, number> = {
 };
 
 /** The stronger of two marker kinds under the shared fold order (ties keep
- *  `a`, so folding left over a quest list is order-stable). */
-export function strongerQuestMarker(a: QuestMarkerKind, b: QuestMarkerKind): QuestMarkerKind {
+ *  `a`, so folding left over a quest list is order-stable). Generic over the
+ *  argument union because the result is ALWAYS one of the two arguments: a
+ *  fold over a narrowed subset (the minimap's no-active variant) stays inside
+ *  that subset by type, with no assertion for an edit to quietly defeat. */
+export function strongerQuestMarker<K extends QuestMarkerKind>(a: K, b: K): K {
   return MARKER_PRIORITY[b] > MARKER_PRIORITY[a] ? b : a;
 }
 

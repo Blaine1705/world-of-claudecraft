@@ -233,13 +233,22 @@ describe('the real work-order lifecycle through computeQuestState', () => {
 
   it('completed and inside the window: cooldown on the giver, from either cadence-set shape', () => {
     const done = doneWithPrereqs([WORK_ORDER_ID]);
-    // Offline shape: the Sim re-derives the blocked set from questCadence.
-    // Online shape: the server's sorted cprof.cadenceBlockedQuests mirror.
-    // Both reach computeQuestState/questMarkerKind as a ReadonlySet, so one
-    // assertion per shape proves the classification cannot diverge.
-    const offlineShape = new Set([WORK_ORDER_ID]);
-    const onlineShape = new Set([WORK_ORDER_ID].sort());
-    for (const withinCadence of [offlineShape, onlineShape]) {
+    // Offline, the Sim re-derives the blocked set from questCadence in ARMING
+    // order; online, the server's cprof mirror arrives SORTED. Membership is
+    // all the classifier may read, so the two constructions are driven with
+    // genuinely different insertion orders (a second blocked order ahead of
+    // and behind the subject) and must classify identically. This arm cannot
+    // prove more than membership-only reads, and does not claim to; the real
+    // both-worlds proofs live in the minimap and map surface suites.
+    const otherOrder = Object.values(QUESTS).find(
+      (q) => q.repeatable && q.repeatCadenceTicks && q.id !== WORK_ORDER_ID,
+    );
+    if (!otherOrder) throw new Error('expected a second cadenced work order');
+    const sortedIds = [WORK_ORDER_ID, otherOrder.id].sort();
+    const armingOrder = new Set([sortedIds[1], sortedIds[0]]); // reversed by construction
+    const sortedMirror = new Set(sortedIds);
+    expect([...armingOrder]).not.toEqual([...sortedMirror]); // the shapes really differ
+    for (const withinCadence of [armingOrder, sortedMirror]) {
       const state = computeQuestState(WORK_ORDER_ID, emptyLog, done, 60, undefined, withinCadence);
       expect(state).toBe('unavailable');
       expect(questMarkerKind(workOrder, state, done, 'giver', withinCadence)).toBe('cooldown');

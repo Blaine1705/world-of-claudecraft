@@ -9,6 +9,7 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { QUALITY_COLOR } from '../src/ui/icons';
 
 const tokensCss = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
 const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
@@ -23,10 +24,18 @@ const mapPainter = stripComments(
 );
 
 // The one blue and the one dim, stated here as the cross-surface contract.
-const RARE_BLUE = '#0070dd';
+// The blue is DERIVED from its stated design anchor (the rare item quality
+// color), so a rare-quality retune reddens every marker pin instead of
+// silently detaching the markers from the classic anchor; the literal beside
+// it pins the anchor itself against a drive-by edit.
+const RARE_BLUE = QUALITY_COLOR.rare;
 const COOLDOWN_ALPHA = '0.55';
 
 describe('quest marker style agreement across surfaces', () => {
+  it('anchors on the real rare-item blue', () => {
+    expect(RARE_BLUE).toBe('#0070dd');
+  });
+
   it('declares both repeat tokens at the rare-item blue', () => {
     expect(tokensCss).toMatch(new RegExp(`--color-map-npc-quest-repeat:\\s*${RARE_BLUE};`));
     expect(tokensCss).toMatch(new RegExp(`--color-minimap-npc-quest-repeat:\\s*${RARE_BLUE};`));

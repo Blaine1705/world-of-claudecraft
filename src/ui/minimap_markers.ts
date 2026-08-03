@@ -225,7 +225,9 @@ export function createMinimapMarkers(): MinimapMarkers {
             // this surface DOES draw whenever the same NPC also holds an
             // in-progress turn-in (all four profession masters do).
             if (kind === 'active') continue;
-            folded = strongerQuestMarker(folded, kind) as NpcMarkerVariant;
+            // No cast: the generic fold keeps the narrowed union, so removing
+            // the guard above is a compile error, not a comment violation.
+            folded = strongerQuestMarker<NpcMarkerVariant>(folded, kind);
             if (folded === 'ready') break; // nothing outranks the '?'
           }
           const glyph: NpcGlyph = folded === 'ready' ? '?' : folded === 'none' ? '•' : '!';
