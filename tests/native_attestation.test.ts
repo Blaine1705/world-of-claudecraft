@@ -38,6 +38,15 @@ const seekerArtifactEnv = {
   SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS: 'solana-release-cert',
 };
 
+const enforcedAndroidAuthEnv = {
+  NODE_ENV: 'production',
+  NATIVE_ATTESTATION_REQUIRED: '1',
+  GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME: 'com.worldofclaudecraft',
+  GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS: 'google-play-signing-cert',
+  SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME: 'com.worldofclaudecraft',
+  SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS: 'solana-release-cert',
+};
+
 function validSeekerArtifactPayload(nonce: string): SeekerArtifactPayload {
   return {
     requestDetails: {
@@ -102,6 +111,115 @@ describe('native attestation', () => {
       }),
     ).resolves.toBe(false);
   });
+
+  it.each(['login', 'register'] as const)(
+    'accepts an allowlisted Solana Store artifact for enforced native %s',
+    async (action) => {
+      const request = req({ origin: 'capacitor://localhost' });
+      const challenge = createNativeAttestationChallenge(request, action);
+      const payload = validSeekerArtifactPayload(challenge.nonce);
+
+      await expect(
+        verifyNativeAttestation(
+          request,
+          {
+            platform: 'android',
+            challengeId: challenge.challengeId,
+            token: 'integrity-token',
+          },
+          {
+            decodeIntegrityToken: async () => payload,
+            env: enforcedAndroidAuthEnv,
+          },
+        ),
+      ).resolves.toBe(true);
+    },
+  );
+
+  it('continues to accept a Google Play recognised artifact for enforced native login', async () => {
+    const request = req({ origin: 'capacitor://localhost' });
+    const challenge = createNativeAttestationChallenge(request, 'login');
+    const payload = validSeekerArtifactPayload(challenge.nonce);
+    payload.appIntegrity.appRecognitionVerdict = 'PLAY_RECOGNIZED';
+    payload.appIntegrity.certificateSha256Digest = ['google-play-signing-cert'];
+
+    await expect(
+      verifyNativeAttestation(
+        request,
+        {
+          platform: 'android',
+          challengeId: challenge.challengeId,
+          token: 'integrity-token',
+        },
+        {
+          decodeIntegrityToken: async () => payload,
+          env: enforcedAndroidAuthEnv,
+        },
+      ),
+    ).resolves.toBe(true);
+  });
+
+  const invalidNativeLoginArtifactCases: Array<{
+    name: string;
+    mutate(payload: SeekerArtifactPayload, env: NodeJS.ProcessEnv): void;
+  }> = [
+    {
+      name: 'missing Solana certificate allowlist',
+      mutate: (_payload, env) => {
+        delete env.SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS;
+      },
+    },
+    {
+      name: 'Google Play certificate on an unrecognised build',
+      mutate: (payload) => {
+        payload.appIntegrity.certificateSha256Digest = ['google-play-signing-cert'];
+      },
+    },
+    {
+      name: 'unknown certificate',
+      mutate: (payload) => {
+        payload.appIntegrity.certificateSha256Digest = ['attacker-cert'];
+      },
+    },
+    {
+      name: 'Solana package configuration mismatch',
+      mutate: (_payload, env) => {
+        env.SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME = 'com.example.attacker';
+      },
+    },
+    {
+      name: 'missing required device verdict',
+      mutate: (payload) => {
+        delete payload.deviceIntegrity.deviceRecognitionVerdict;
+      },
+    },
+  ];
+
+  it.each(invalidNativeLoginArtifactCases)(
+    'rejects an unrecognised native login artifact with $name',
+    async ({ mutate }) => {
+      const request = req({ origin: 'capacitor://localhost' });
+      const challenge = createNativeAttestationChallenge(request, 'login');
+      const payload = validSeekerArtifactPayload(challenge.nonce);
+      const env = { ...enforcedAndroidAuthEnv };
+      mutate(payload, env);
+
+      await expect(
+        verifyNativeAttestation(
+          request,
+          {
+            platform: 'android',
+            challengeId: challenge.challengeId,
+            token: 'integrity-token',
+          },
+          {
+            decodeIntegrityToken: async () => payload,
+            env,
+          },
+        ),
+      ).resolves.toBe(false);
+    },
+  );
 
   it('returns only the consumed server nonce for the expected action', async () => {
     process.env.NATIVE_ATTESTATION_REQUIRED = '0';

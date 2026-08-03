@@ -43,6 +43,8 @@ export interface SeekerSolanaAttestationDeps {
   env?: NodeJS.ProcessEnv;
 }
 
+export type NativeAttestationDeps = SeekerSolanaAttestationDeps;
+
 const challenges = new Map<string, NativeChallenge>();
 let googleTokenCache: GoogleTokenCache | null = null;
 
@@ -137,9 +139,12 @@ function pruneChallenges(): void {
 export async function verifyNativeAttestation(
   req: IncomingMessage,
   proof: unknown,
+  deps: NativeAttestationDeps = {
+    decodeIntegrityToken: decodeAndroidIntegrityToken,
+  },
 ): Promise<boolean> {
   if (!isNativeAppRequest(req)) return false;
-  if (!nativeAttestationRequired()) return true;
+  if (!nativeAttestationRequired(deps.env ?? process.env)) return true;
   if (!proof || typeof proof !== 'object') return false;
   const src = proof as NativeAttestationProof;
   if (
@@ -150,7 +155,7 @@ export async function verifyNativeAttestation(
     return false;
   const challenge = consumeChallenge(src.challengeId, req);
   if (!challenge) return false;
-  if (src.platform === 'android') return verifyAndroidIntegrity(src.token, challenge);
+  if (src.platform === 'android') return verifyAndroidIntegrity(src.token, challenge, false, deps);
   if (src.platform === 'ios') return verifyAppleDeviceCheck(src.token, src.challengeId);
   return false;
 }
@@ -330,9 +335,13 @@ async function verifyAndroidIntegrity(
   token: string,
   challenge: NativeChallenge,
   allowExpectedNonPlayBuild = false,
+  deps: NativeAttestationDeps = {
+    decodeIntegrityToken: decodeAndroidIntegrityToken,
+  },
 ): Promise<boolean> {
-  const packageName = process.env.GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME || DEFAULT_PACKAGE_NAME;
-  const payload = await decodeAndroidIntegrityToken(packageName, token);
+  const env = deps.env ?? process.env;
+  const packageName = env.GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME || DEFAULT_PACKAGE_NAME;
+  const payload = await deps.decodeIntegrityToken(packageName, token);
   if (!payload) return false;
   const requestDetails = payload.requestDetails;
   const appIntegrity = payload.appIntegrity;
@@ -343,13 +352,26 @@ async function verifyAndroidIntegrity(
   if (normalizedVerdictNonce !== normalizedExpectedNonce) return false;
   if (requestDetails?.requestPackageName !== packageName) return false;
   if (appIntegrity?.packageName !== packageName) return false;
-  const certs = String(process.env.GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS ?? '')
+  const certs = String(env.GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS ?? '')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean);
-  if (!androidAppIntegrityAllowed(appIntegrity, certs, allowExpectedNonPlayBuild)) return false;
+  const defaultArtifactAllowed = androidAppIntegrityAllowed(
+    appIntegrity,
+    certs,
+    allowExpectedNonPlayBuild,
+  );
+  const solanaConfig = seekerSolanaArtifactConfig(env);
+  const solanaDeviceVerdict =
+    solanaConfig !== null &&
+    appIntegrity?.appRecognitionVerdict === 'UNRECOGNIZED_VERSION' &&
+    solanaConfig.packageName === packageName &&
+    androidAppIntegrityAllowed(appIntegrity, solanaConfig.certificateDigests, true)
+      ? solanaConfig.deviceVerdict
+      : null;
+  if (!defaultArtifactAllowed && solanaDeviceVerdict === null) return false;
   const requiredDevice =
-    process.env.GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT || 'MEETS_DEVICE_INTEGRITY';
+    solanaDeviceVerdict ?? env.GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT ?? 'MEETS_DEVICE_INTEGRITY';
   const deviceVerdicts = Array.isArray(deviceIntegrity?.deviceRecognitionVerdict)
     ? deviceIntegrity.deviceRecognitionVerdict.filter((s): s is string => typeof s === 'string')
     : [];

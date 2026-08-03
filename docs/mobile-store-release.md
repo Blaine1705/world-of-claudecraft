@@ -188,9 +188,17 @@ SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS=<SOLANA_STORE_RELEASE_CERT_BASE64URL_SHA256
 SEEKER_SOLANA_INTEGRITY_DEVICE_VERDICT=MEETS_DEVICE_INTEGRITY
 ```
 
+Native Android authentication accepts two separate artifact policies. Google
+Play builds must return `PLAY_RECOGNIZED` and match the Google Play certificate
+allowlist. Direct-distributed Solana Store builds may return
+`UNRECOGNIZED_VERSION`, but are accepted only when their package and signing
+certificate exactly match the separate `SEEKER_SOLANA_INTEGRITY_*` allowlist.
+Both paths still require the server-issued nonce and configured device verdict.
+
 Missing service-account credentials, package configuration, or certificate
-allowlist intentionally fails Seeker claim and native spin closed with
-`seeker.solana_artifact_required`.
+allowlist intentionally fails Solana Store native authentication, Seeker claim,
+and native spin closed. Seeker claim and spin report
+`seeker.solana_artifact_required` for the artifact-verification failure.
 
 Play Integrity verifies the signed artifact and device signals; it does not
 prove that the APK was downloaded from the Solana dApp Store. A correctly
