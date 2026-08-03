@@ -137,8 +137,9 @@ and 11.5k sprite triangles for the entire world.
 
 ## The aesthetic pass (third stage)
 
-With the whole world visible, three more facades finish the picture, all on
-the vista arm and all measured at perf parity or better:
+With the whole world visible, two more facades plus a closing atmosphere
+pass finish the picture, all on the vista arm and all measured at perf
+parity or better:
 
 - Mountains: the far tiles light as MeshStandardMaterial now (the Lambert
   layer missed the realm IBL irradiance the near terrain gets, crushing
@@ -153,13 +154,22 @@ the vista arm and all measured at perf parity or better:
   (`collectBuildingImpostors` in props.ts computes placements with the SAME
   pools and scale rules the real placement loop uses), so civilization
   shows past the detail horizon at one extra draw call.
-- Ambient life (`ambient_life.ts` + pure core): deterministic bird flocks
-  and campfire smoke columns, two GPU-animated draws built from static
-  world content plus the seed. Cosmetic by contract: no sim reads, so
-  nothing can leak an enemy position (online snapshots carry no distant
-  entities at all, and the fairness invariant forbids tier-gated actionable
-  information; distant REAL mobs are therefore impossible by design, and
-  this layer is how the horizon reads alive instead).
+- Horizon haze (`horizonHazePlan` in `far_terrain_core.ts`): with the fog
+  gone the sea met the sky as a razor line. The vista arm now eases the
+  scene fog to a band anchored on the vista envelope (near at 0.62x, far
+  at 1.6x), so gameplay range and the detail horizon stay crystal clear,
+  the last stretch of far tiles picks up a light aerial wash, and open
+  water dissolves into the sky instead of cutting against it. The fog
+  color keeps feeding the sky-dome horizon band, so the haze tint always
+  matches the sky it melts into.
+
+One facade was built here and then removed by design decision: an ambient
+life layer (deterministic bird flocks and campfire smoke columns, two
+GPU-animated draws). The vista reads better without the extra motion, so
+it was cut after playtesting. The fairness rationale that shaped it still
+governs this whole feature: online snapshots carry no distant entities and
+the fairness invariant forbids tier-gated actionable information, so any
+distant "life" can only ever be cosmetic, never real mobs or characters.
 
 ## Known tradeoffs
 

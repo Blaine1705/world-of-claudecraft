@@ -46,7 +46,6 @@ import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
-import { type AmbientLifeView, buildAmbientLife } from './ambient_life';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
@@ -178,6 +177,7 @@ import {
   type FarVistaPlan,
   FOGLESS_DETAIL_FAR,
   farVistaPlan,
+  horizonHazePlan,
 } from './far_terrain_core';
 import { buildFarshoreFeatures } from './farshore_features';
 import { buildFenFeatures, type FenFeaturesView } from './fen_features';
@@ -1617,7 +1617,6 @@ export class Renderer {
   // mesh and the foliage sprites fill everything beyond it.
   private farVista: FarVistaPlan;
   private farTerrainView!: FarTerrainView;
-  private ambientLife: AmbientLifeView | null = null;
   private detailFogFar: number;
   /** Fired whenever a zone becomes resident (any prepare path). Wired by
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
@@ -2148,13 +2147,6 @@ export class Renderer {
     });
     setRenderCategory(this.farTerrainView.group, 'terrain');
     this.scene.add(this.farTerrainView.group);
-    // Cosmetic distant life (bird flocks, campfire smoke): vista tiers only,
-    // static world content plus seed, two draws, GPU-animated.
-    if (this.farVista.enabled) {
-      this.ambientLife = buildAmbientLife(this.sim.cfg.seed);
-      setRenderCategory(this.ambientLife.group, 'vfx');
-      this.scene.add(this.ambientLife.group);
-    }
     bd('terrain');
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
@@ -4175,7 +4167,6 @@ export class Renderer {
       this.viewFar(),
       this.fogState === 'outdoor',
     );
-    this.ambientLife?.update(this.fogState === 'outdoor');
     this.updateZoneFeatureVisibility(fogFar);
     this.propsView.update(
       this.camera.position.x,
@@ -7705,12 +7696,13 @@ export class Renderer {
       );
       if (vista) {
         this.detailFogFar = easedFogFar(this.detailFogFar, requestedFar, residencyFar, dt);
-        // Fog itself eases out to the parking band beyond the camera far
-        // plane (a smooth lift when stepping out of a fogged interior),
-        // where its contribution is zero at every visible depth.
-        const parkFar = this.farVista.envelopeFar * 2;
-        fog.far = dampedValue(fog.far, parkFar, dt, ZONE_ENVIRONMENT_RESPONSE);
-        fog.near = dampedValue(fog.near, parkFar - 400, dt, ZONE_ENVIRONMENT_RESPONSE);
+        // Fog itself eases out to the horizon haze band: zero effect across
+        // every gameplay distance, a gentle realm-tinted aerial blend where
+        // the open sea meets the sky, so the horizon melts instead of
+        // cutting a razor line (and interiors still hand off smoothly).
+        const haze = horizonHazePlan(this.farVista.envelopeFar);
+        fog.far = dampedValue(fog.far, haze.far, dt, ZONE_ENVIRONMENT_RESPONSE);
+        fog.near = dampedValue(fog.near, haze.near, dt, ZONE_ENVIRONMENT_RESPONSE);
       } else {
         fog.far = easedFogFar(fog.far, requestedFar, residencyFar, dt);
         fog.near = easedFogNear(fog.near, preset.near, fog.far, dt);
@@ -9391,7 +9383,6 @@ export class Renderer {
       this.viewFar(),
       this.fogState === 'outdoor',
     );
-    this.ambientLife?.update(this.fogState === 'outdoor');
     this.updateZoneFeatureVisibility(fogFar);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'terrain', worldStart);
     this.propsView.update(
@@ -9918,13 +9909,6 @@ export class Renderer {
     });
     setRenderCategory(this.farTerrainView.group, 'terrain');
     this.scene.add(this.farTerrainView.group);
-    if (this.ambientLife) {
-      this.scene.remove(this.ambientLife.group);
-      this.ambientLife.dispose();
-      this.ambientLife = buildAmbientLife(this.sim.cfg.seed);
-      setRenderCategory(this.ambientLife.group, 'vfx');
-      this.scene.add(this.ambientLife.group);
-    }
     // A full editor rebuild replaces the zone cache along with the geometry.
     // Re-run the same preparation path for every resident zone so the renderer
     // cannot mistake an empty replacement view for an already-ready region.

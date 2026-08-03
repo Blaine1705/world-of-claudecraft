@@ -17,6 +17,7 @@ import {
   farTileVisible,
   farVertexHeight,
   farVistaPlan,
+  horizonHazePlan,
   planFarTiles,
   srgbHexToLinear,
 } from '../src/render/far_terrain_core';
@@ -78,6 +79,22 @@ describe('detailCullFar: the classic envelope still bounds the detail subsystems
     // subsystem's workload beyond that, and must stay inside the classic cap.
     expect(FOGLESS_DETAIL_FAR).toBe(700);
     expect(FOGLESS_DETAIL_FAR).toBeLessThanOrEqual(MAX_OUTDOOR);
+  });
+
+  it('the horizon haze never touches gameplay range and saturates past the world', () => {
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
+      const plan = farVistaPlan(tier, false);
+      const haze = horizonHazePlan(plan.envelopeFar);
+      // the band starts in the OUTER half of the vista, comfortably past
+      // everything the detail subsystems draw (700u): gameplay range and the
+      // handoff line stay crystal clear on every vista tier
+      expect(haze.near).toBeGreaterThan(FOGLESS_DETAIL_FAR * 1.9);
+      expect(haze.near).toBeGreaterThanOrEqual(plan.envelopeFar * 0.5);
+      // full atmosphere only past the whole-world envelope: the sea horizon
+      // melts, the world itself stays readable
+      expect(haze.far).toBeGreaterThan(plan.envelopeFar);
+      expect(haze.near).toBeLessThan(plan.envelopeFar);
+    }
   });
 });
 

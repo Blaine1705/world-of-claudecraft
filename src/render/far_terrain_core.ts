@@ -78,6 +78,20 @@ export const CLASSIC_CAMERA_FAR = 950;
 export const FOGLESS_DETAIL_FAR = 700;
 
 /**
+ * The horizon haze band: where scene fog parks on the vista arm. A raw
+ * fog-free horizon puts a razor edge between the open sea and the sky; real
+ * atmosphere never does that. The band starts far past every gameplay
+ * distance (nothing a player interacts with is ever hazed) and saturates
+ * beyond the world, so distant water, the rim silhouettes and the sky
+ * dome's fog-colored horizon band all converge on one realm-tinted
+ * atmosphere right where sea meets sky. Fractions of the tier envelope so
+ * medium's shorter world melts proportionally.
+ */
+export function horizonHazePlan(envelopeFar: number): { near: number; far: number } {
+  return { near: envelopeFar * 0.62, far: envelopeFar * 1.6 };
+}
+
+/**
  * Per-tier vista plan. Low and constrained-memory devices keep the classic
  * renderer byte-for-byte (fog wall at the biome preset, camera far 950, no
  * far mesh); medium opens a shorter vista; high and above see the whole
