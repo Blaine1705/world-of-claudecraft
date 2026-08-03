@@ -5684,6 +5684,98 @@ re-verified tree; every finding applied or judged with the fix round
 itself re-reviewed. NEXT = phase 23 build (the repeatable work-order
 blue marker; Fable xhigh, new session).
 
+## Phase 23 entry sync (2026-08-03, merge 3bf8df598f)
+
+The per-phase sync preamble, run at the phase 23 build entry. One
+merge brought 139 release commits, all of them the Discord bot
+stability packet landing (PR 2794): the pure rate-limit governor and
+loop scheduler, the consolidated outbox drain replacing the bot's
+three pollers, the keyed /api/discord status cache busted on every
+write path, the bounded linked-member change feed, the bot governor
+counters as prometheus series, and the deploy healthcheck, limits,
+and runbook. The gate gains build:bot inside the existing
+typecheck-plus-builds turbo step, so the step list stays at ten.
+
+Eight source conflicts were hand-resolved, every one by union:
+reclaimDeactivatedName selects the branch's c.level/c.state (the rich
+rekey return) plus the release's c.account_id (the post-COMMIT flex
+enqueue) with the test's holder row carrying all three; discord_db
+keeps BOTH batched link reads (the branch's discordForAccounts behind
+the legacy activity GET, the release's discordLinksForAccounts behind
+the outbox drain); the character-lease and discord_db test files keep
+both sides' appended blocks; DEPLOY.md keeps the release's
+/internal/* edge-404 paragraph plus the branch's series-cardinality
+and multi-realm notes beside the new bot-series bullet; and
+bot/main.ts plus server_client.ts take the release's outbox
+architecture whole, since the branch's poller edits sat entirely
+inside the replaced regions. One compile-level divergence was
+resolved deliberately: the branch made buildActivityMessage nullable
+(drop an unknown kind mid-deploy), the release's outboxIoFor consumed
+it unguarded, so postActivity now drops a null payload rather than
+posting an empty embed.
+
+The release-merge-audit ran with three read-only auditors (bot slice,
+server slice with the db-mock trap, routes/gate/CI plus the premise
+re-check), ALL CLEAN on the merge itself with both-direction
+content-line proofs (no side's hunks dropped anywhere; server/game.ts
+qdone and cprof producers byte-identical, shifted +31 by the change
+feed plumbing above them; both new release routes carry surface rows
+and are registry-only by design; every db-mock export list is a
+correct union, and game.ts's ./db import list is byte-identical
+across all four trees). Two merged-tree-only reds surfaced exactly as
+the audit class predicts, neither parent able to see either: the
+release-authored sweep test still filled 600 keys against the old
+inline 512 trigger the branch had raised to MAX_RECENT_KEYS = 4096
+with an oldest-first overflow backstop, and the release's outbox
+parity test stubbed the singular discordForAccount for a standalone
+activity GET the branch had batched. Findings applied on the branch
+in five commits: f25cda34f4 (the null-drop pinned at the io seam with
+a channel-unset negative, the consumer-less buildActivityMessages
+wrapper deleted with its contract repointed at the singular, two
+stale bot/CLAUDE.md passages reworded to the real silent-drop
+behavior), 16ec59c25e (both reds reconciled onto branch semantics),
+813de4bcd6 (MAX_RECENT_KEYS exported so the fixture tracks the real
+trigger, the ACTIVITY_MAX_QUEUE precedent; both outbox no-N+1
+negatives widened to pin the sibling batch uncalled), 2d3f1dcee0
+(c.level/c.state pins on the hand-unioned SELECT, two comments still
+claiming a per-item activity read reworded, the outbox payload worst
+case moved to the wider deed item shape and re-measured at 290,671
+bytes with the suite's db mock gaining the batched read, feed-empty
+negatives on both reclaim refusal arms, the swallowed loadAccountFlair
+mock gap closed, the server CLAUDE.md discord row extended with the
+new modules), and 4f0e47e12b (a changed-files biome error on the
+rewritten arm).
+
+Every phase 23 premise was re-verified on the merged tree and holds;
+the merge delta contains zero files under src/, so the four indicator
+surfaces, the quest-state model, and the cadence seam are
+blob-identical to the QA-verified entry tip. One phase 24 premise was
+STALE and is corrected in this commit: the fishing-deeds undercount
+is the packet's own phase 17 narrowing staled by its own phase 20
+deeds, not a pre-existing gap (the release still carries the generic
+sentence), which also means the Q32 defer-to-release option was never
+viable for that item. A correction to the running record: earlier
+sync notes quoted command pins as 176/188/12; after the pnpm/turbo
+migration those literals no longer exist, and the live pins are the
+internal-ladder 21/21 (completeness and ownership), the 209-row
+surface inventory, oauth 5/2, the 7-route ops family, and authed18b
+19.
+
+Elevated follow-up (packet doc, not an issue, per the convention):
+consolidate the two near-duplicate batched discord_links readers
+(discordForAccounts, 3 columns as a Map for the legacy activity GET,
+and discordLinksForAccounts, 4 columns as an array for the outbox
+drain) once the legacy per-stream GETs retire with the pre-outbox
+bot; both auditors flagged the duplication independently. Banked for
+maintainer passes: .env.example documents only 4 of the 16 DISCORD_*
+knobs docker-compose forwards to the bot (pre-existing on the
+release; DEPLOY.md covers all sixteen, so it is a pointer gap, not a
+knowledge gap).
+
+npm run gate PASS on the fixed tree: all 10 steps green, 2048 test
+files / 27254 tests passed (89 skipped) plus the 11-file browser
+suite at 96 tests, vitest workers 8.
+
 ## Post-QA scoping (2026-08-02): proposed phases 22 to 24
 
 Drafted after the phase 21 QA close from a four-thread research batch
@@ -5858,13 +5950,23 @@ database-performance-reviewer (zero persistence change).
 Build: any model. QA: folds into the build session's own review (docs
 and catalog only; no sim, server, or UI logic).
 
-What the audit found. Two guide sentences are behind the game, and
-neither is a packet regression. (1) guide.profPages.gatherDeeds.fishing
-still says a first fish from each of the THREE heartland zones'
-waters fills its own page; phase 20's Q26 deeds make it six first-cast
-zones (incomplete rather than false: the heartland claim itself is
-still true). The three land gatherDeeds keys never mention the
-per-zone gatherer chronicles at all (also six now). (2)
+What the audit found. Two guide sentences are behind the game. The
+vendor pair predates the packet; the fishing undercount is the
+packet's own (a provenance correction from the phase 23 entry sync
+audit: the original claim here said neither was a packet regression).
+(1) guide.profPages.gatherDeeds.fishing says a first fish from each
+of the THREE heartland zones' waters fills its own page; that
+narrowing is the packet's own phase 17 wording (the release still
+carries the generic "each zone's waters" sentence, which stayed true),
+and phase 20's Q26 deeds staled it at six first-cast zones (incomplete
+rather than false: the heartland claim itself is still true). A
+consequence recorded at the same audit: the Q32 defer-to-release
+option was never viable for this item, because no release docs pass
+would find a sentence that only exists on this branch; Q32's settled
+land-on-this-branch answer already covers it. The three land
+gatherDeeds keys never mention the per-zone gatherer chronicles at
+all (also six now; two of the six unmentioned chronicles predate the
+packet, the other four are its own R21 and Q26 additions). (2)
 guide.economy.buyingBody still describes the tabbed vendor from the
 reverted interface overhaul: no tabs exist, the rolled-quality sell
 confirm it describes was deleted with the revert, and
