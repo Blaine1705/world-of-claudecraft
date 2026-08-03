@@ -2663,8 +2663,10 @@
      tag token at full opacity; the glyph channels (the gossip '!', the
      nameplate marks, both canvas painters) keep the #0070dd anchor and
      carry the dim. One grouped rule so the accessible blue is stated once,
-     both arms #tooltip-scoped so a future gossip or tracker reuse of the
-     tag classes inherits the glyph channel, never the text lift. */
+     both arms #tooltip-scoped so a future reuse outside the tooltip never
+     silently inherits the text lift: .quest-repeat falls back to its glyph
+     rule above, and .quest-cooldown (tooltip-tag-only, no base rule) would
+     surface unstyled as a prompt to decide its channel. */
   #tooltip .quest-cooldown,
   #tooltip .quest-repeat {
     color: var(--color-quest-tag-text, #3d9bff);
