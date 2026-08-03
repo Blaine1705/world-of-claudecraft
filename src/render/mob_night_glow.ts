@@ -3,29 +3,30 @@
 // a patch of shadow. Deliberately NOT an outline or a highlight: it is the light
 // the world is missing at night, put back under the thing you need to see.
 //
-// One pooled InstancedMesh for the whole scene (one additive draw), filled from
-// the renderer's existing entity loop through begin/add/end. The per-frame path
-// allocates nothing: matrices, colors, and the scratch transform are owned once
-// here, and `add` past the pool cap simply drops the extra disc, which is the
-// crowd-safe failure mode (the discs are cosmetic; nameplates, health bars, and
-// the rigs themselves are untouched).
+// One pooled InstancedMesh for the whole scene (one additive draw). The
+// renderer hands `emit` its live entity views once a frame and this module owns
+// the walk, so the coordinator keeps a single call rather than another loop. The
+// per-frame path allocates nothing: matrices, colors, and the scratch transform
+// are owned once here, and a body past the pool cap simply goes without a disc,
+// which is the crowd-safe failure mode (the discs are cosmetic; nameplates,
+// health bars, and the rigs themselves are untouched).
 //
 // This is a NIGHT VISIBILITY layer, so it runs identically on every graphics
 // tier: no tier scaling, no tier gate. It is driven purely by the frame's night
 // amount (night_lighting_core.ts), which is already 0 on the one tier whose
 // world never darkens.
 import * as THREE from 'three';
-import { MOB_GLOW_POOL } from './night_lighting_core';
+import { MOB_GLOW_POOL, MOB_GLOW_RANGE, mobGlowStrength } from './night_lighting_core';
 import { radialGlowTexture } from './textures';
 
-/** World yards of the unit disc; `add` scales this by the body's radius. */
+/** World yards of the unit disc; each instance scales it to its body. */
 const DISC_RADIUS = 1.0;
 /**
  * Default disc radius in world yards for a scale-1 body: wide enough to light
  * the ground a body stands on, tight enough that a pack of mobs does not merge
- * into one lit blob. Callers multiply by the entity's own scale.
+ * into one lit blob, scaled per body by the entity's own scale.
  */
-export const MOB_GLOW_DISC_RADIUS = 1.45;
+const MOB_GLOW_DISC_RADIUS = 1.45;
 const DISC_SEGMENTS = 14;
 /** Above the ground sample, matching the selection ring's drape lift. */
 const LIFT = 0.09;
@@ -35,26 +36,44 @@ const GLOW_COLOR = 0xffc894;
 /** Opacity at full strength. Low on purpose: a hint of warmth, not a spotlight. */
 const MAX_OPACITY = 0.32;
 
+/**
+ * The read-only slice of one entity view this layer reads. The renderer's own
+ * view map satisfies it structurally, so nothing has to be adapted at the call
+ * site (the vale_cup_team_ring.ts contract).
+ *
+ * `group.position.y` is the body's DRAWN feet height, and that is deliberately
+ * what the disc sits on rather than a fresh terrain sample: it keeps a pool
+ * flush with a body standing on a dock, a bridge, or a step the smoother is
+ * still easing, and it costs nothing. The tradeoff is that a jumping body
+ * carries its pool for the arc, which reads as carried light, not as a fault.
+ */
+export interface GlowBodyView {
+  group: { visible: boolean; position: { x: number; y: number; z: number } };
+}
+
+/** The read-only slice of the sim entity behind a view. */
+export interface GlowBodyEntity {
+  kind: string;
+  scale: number;
+}
+
 export interface MobNightGlowView {
   group: THREE.Group;
   /**
-   * Open the frame. `strength` is the frame's glow amount (0 hides the whole
-   * layer and makes `add` a no-op). Returns true when the caller should bother
-   * emitting discs at all.
+   * Redraw every nearby body's disc for this frame. `amount` is the frame's
+   * glow strength (0 hides the whole layer and skips the walk entirely).
+   *
+   * The walk lives here rather than in the renderer's entity loop because it
+   * needs nothing the coordinator owns privately: the final visibility and the
+   * drawn position, both already settled by the time this runs.
    */
-  begin(strength: number): boolean;
-  /**
-   * Emit one character's disc. `feetY` is the body's DRAWN feet height (the
-   * entity view's own y), not a fresh terrain sample: that is what keeps a pool
-   * flush with a body standing on a dock, a bridge, or a step the smoother is
-   * still easing, and it costs nothing. The tradeoff is that a jumping body
-   * carries its pool for the arc, which reads as carried light rather than as a
-   * fault. `radius` scales the disc to the body; `strength` is that character's
-   * own distance-faded amount from mobGlowStrength.
-   */
-  add(x: number, feetY: number, z: number, radius: number, strength: number): void;
-  /** Close the frame: commit the instance count and the upload. */
-  end(): void;
+  emit(
+    views: Iterable<[number, GlowBodyView]>,
+    entities: { get(id: number): GlowBodyEntity | undefined },
+    px: number,
+    pz: number,
+    amount: number,
+  ): void;
 }
 
 export function buildMobNightGlow(): MobNightGlowView {
@@ -92,30 +111,44 @@ export function buildMobNightGlow(): MobNightGlowView {
   const tint = new THREE.Color();
   const base = new THREE.Color(GLOW_COLOR);
   let count = 0;
-  let open = false;
+
+  /** Write one body's disc into the next pool slot. */
+  const add = (x: number, feetY: number, z: number, radius: number, strength: number): void => {
+    if (count >= MOB_GLOW_POOL || strength <= 0.001) return;
+    position.set(x, feetY + LIFT, z);
+    scale.set(radius, 1, radius);
+    mesh.setMatrixAt(count, matrix.compose(position, quaternion, scale));
+    // Per-instance strength rides the instance color rather than the shared
+    // opacity, so one draw can hold discs at different distances.
+    tint.copy(base).multiplyScalar(strength);
+    mesh.setColorAt(count, tint);
+    count++;
+  };
 
   return {
     group,
-    begin(strength: number): boolean {
+    emit(views, entities, px, pz, amount): void {
       count = 0;
-      open = strength > 0.001;
-      group.visible = open;
-      return open;
-    },
-    add(x: number, feetY: number, z: number, radius: number, strength: number): void {
-      if (!open || count >= MOB_GLOW_POOL || strength <= 0.001) return;
-      position.set(x, feetY + LIFT, z);
-      scale.set(radius, 1, radius);
-      mesh.setMatrixAt(count, matrix.compose(position, quaternion, scale));
-      // Per-instance strength rides the instance color rather than the shared
-      // opacity, so one draw can hold discs at different distances.
-      tint.copy(base).multiplyScalar(strength);
-      mesh.setColorAt(count, tint);
-      count++;
-    },
-    end(): void {
+      const lit = amount > 0.001;
+      group.visible = lit;
+      if (lit) {
+        const rangeSq = MOB_GLOW_RANGE * MOB_GLOW_RANGE;
+        for (const [id, view] of views) {
+          if (!view.group.visible) continue;
+          const entity = entities.get(id);
+          if (!entity || entity.kind === 'object') continue;
+          const x = view.group.position.x;
+          const z = view.group.position.z;
+          const dx = x - px;
+          const dz = z - pz;
+          const distSq = dx * dx + dz * dz;
+          if (distSq >= rangeSq) continue;
+          const radius = MOB_GLOW_DISC_RADIUS * Math.max(0.5, entity.scale);
+          add(x, view.group.position.y, z, radius, mobGlowStrength(distSq, amount));
+        }
+      }
       mesh.count = count;
-      if (!open) return;
+      if (!lit) return;
       mesh.instanceMatrix.needsUpdate = true;
       if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
     },

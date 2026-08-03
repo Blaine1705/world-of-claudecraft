@@ -243,7 +243,7 @@ import {
 } from './mage_barrier_visual';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildMailboxPillar } from './mailbox';
-import { buildMobNightGlow, MOB_GLOW_DISC_RADIUS, type MobNightGlowView } from './mob_night_glow';
+import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
 import { mountBobY, mountVisualSpec } from './mount_visuals';
@@ -258,9 +258,7 @@ import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
   lampGlowAmount,
-  MOB_GLOW_RANGE,
   mobGlowAmount,
-  mobGlowStrength,
   nightLightAmount,
   nightRimBoost,
   wildGlowAmount,
@@ -9339,13 +9337,12 @@ export class Renderer {
     }
     this.lastVisibleRigCount = visibleRigCount;
 
-    // Night mob glow: a warm pool of light on the ground under every nearby
-    // body once it is properly dark, so a mob out in an unlit field still reads
-    // as a body. Its own short pass over the live views rather than another
-    // concern threaded through the loop above: all it needs is the final
-    // visibility that loop just settled, plus the drawn position. Cosmetic,
-    // identical on every graphics tier, and allocation-free (the pool owns its
-    // matrices; characters past the cap simply go without a disc).
+    // Night mob glow: a warm pool of light on the ground under every nearby body
+    // once it is properly dark, so a mob out in an unlit field still reads as a
+    // body. Driven here rather than from the entity loop above because all it
+    // needs is the final visibility that loop just settled plus the drawn
+    // position; the walk itself lives in the module that owns the pool.
+    //
     // Outdoors only: the world clock does not govern a dungeon, a delve, the
     // Last Keep, or the seabed, each of which runs its own authored rig. Without
     // this, walking underground at world-midnight lit a pool under every mob and
@@ -9353,32 +9350,13 @@ export class Renderer {
     // player who never saw the sky. `fogState` carries last frame's answer (it
     // settles in updateAmbience, below the entity loop); one frame of discs on
     // the way through a door is not worth reordering the frame for.
-    const nightGlow = this.mobNightGlow;
-    if (nightGlow) {
-      const glowAmount = this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0;
-      if (nightGlow.begin(glowAmount)) {
-        const glowRangeSq = MOB_GLOW_RANGE * MOB_GLOW_RANGE;
-        for (const [id, v] of this.views) {
-          if (!v.group.visible) continue;
-          const e = sim.entities.get(id);
-          if (!e || e.kind === 'object') continue;
-          const gx = v.group.position.x;
-          const gz = v.group.position.z;
-          const gdx = gx - p.pos.x;
-          const gdz = gz - p.pos.z;
-          const gd2 = gdx * gdx + gdz * gdz;
-          if (gd2 >= glowRangeSq) continue;
-          nightGlow.add(
-            gx,
-            v.group.position.y,
-            gz,
-            MOB_GLOW_DISC_RADIUS * Math.max(0.5, e.scale),
-            mobGlowStrength(gd2, glowAmount),
-          );
-        }
-      }
-      nightGlow.end();
-    }
+    this.mobNightGlow?.emit(
+      this.views,
+      sim.entities,
+      p.pos.x,
+      p.pos.z,
+      this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0,
+    );
 
     // Hidden views skip their whole matrix subtree: three recomposes even
     // invisible hierarchies, and a distance-culled or off-screen rig is 30-60
