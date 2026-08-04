@@ -1082,7 +1082,13 @@ export function buildCrookedReedInn(buckets) {
   // Side deck returns.
   for (let index = 0; index < 5; index += 1) {
     const z = -bodyD * 0.4 + index * 1.1;
-    addBox(buckets, 'timber', [1.3, 0.1, 0.95], [-bodyW * 0.55 - 0.1, deckY + 0.04, z], P.timberLight);
+    addBox(
+      buckets,
+      'timber',
+      [1.3, 0.1, 0.95],
+      [-bodyW * 0.55 - 0.1, deckY + 0.04, z],
+      P.timberLight,
+    );
     addBox(buckets, 'timber', [1.15, 0.1, 0.95], [bodyW * 0.55 + 0.05, deckY + 0.04, z], P.timber);
   }
 
@@ -1129,7 +1135,13 @@ export function buildCrookedReedInn(buckets) {
   addBox(buckets, 'timber', [1.25, 0.1, 0.12], [-2.8, deckY + 2.25, bodyD * 0.46], P.timber);
 
   // ---- 3. Exterior-only timber shell ----
-  addBox(buckets, 'timber', [bodyW * 0.88, wallH * 0.95, bodyD * 0.86], [0, wallCy, 0], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 0.88, wallH * 0.95, bodyD * 0.86],
+    [0, wallCy, 0],
+    P.timberDeep,
+  );
   addVerticalPlankFace(buckets, 'front', bodyW * 0.92, wallH, [0, wallCy, bodyD * 0.44], {
     plankCount: 11,
   });
@@ -1150,13 +1162,43 @@ export function buildCrookedReedInn(buckets) {
     }
   }
   for (const z of [-bodyD * 0.44, bodyD * 0.44]) {
-    addBox(buckets, 'timber', [bodyW * 0.94, 0.15, 0.15], [0, wallBottom + wallH * 0.38, z], P.timberDark);
+    addBox(
+      buckets,
+      'timber',
+      [bodyW * 0.94, 0.15, 0.15],
+      [0, wallBottom + wallH * 0.38, z],
+      P.timberDark,
+    );
     addBox(buckets, 'timber', [bodyW * 0.94, 0.14, 0.16], [0, wallTop - 0.1, z], P.timber);
   }
   // Wall plate the roof seats on (kills floating roof).
-  addBox(buckets, 'timber', [bodyW * 1.02, 0.16, bodyD * 1.02], [0, wallTop - 0.02, 0], P.timberDark);
-  addBeamXY(buckets, 'timber', [-bodyW * 0.4, wallBottom + 0.35], [-bodyW * 0.1, wallTop - 0.45], -bodyD * 0.46, 0.11, 0.12, P.timber);
-  addBeamXY(buckets, 'timber', [bodyW * 0.4, wallBottom + 0.35], [bodyW * 0.1, wallTop - 0.45], -bodyD * 0.46, 0.11, 0.12, P.timber);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 1.02, 0.16, bodyD * 1.02],
+    [0, wallTop - 0.02, 0],
+    P.timberDark,
+  );
+  addBeamXY(
+    buckets,
+    'timber',
+    [-bodyW * 0.4, wallBottom + 0.35],
+    [-bodyW * 0.1, wallTop - 0.45],
+    -bodyD * 0.46,
+    0.11,
+    0.12,
+    P.timber,
+  );
+  addBeamXY(
+    buckets,
+    'timber',
+    [bodyW * 0.4, wallBottom + 0.35],
+    [bodyW * 0.1, wallTop - 0.45],
+    -bodyD * 0.46,
+    0.11,
+    0.12,
+    P.timber,
+  );
 
   // ---- 4. Continuous seated bent roof ----
   addBentConceptRoof(buckets, 8.9, 6.85, wallTop + 0.02, peakY, {
@@ -1207,7 +1249,14 @@ export function buildCrookedReedInn(buckets) {
       dx === 0 ? P.timber : P.timberDeep,
     );
   }
-  addOctahedron(buckets, 'metal', 0.07, [-2.45, deckY + 1.05, bodyD * 0.51], P.brass, [0.7, 1, 0.45]);
+  addOctahedron(
+    buckets,
+    'metal',
+    0.07,
+    [-2.45, deckY + 1.05, bodyD * 0.51],
+    P.brass,
+    [0.7, 1, 0.45],
+  );
   for (const x of [-0.7, 1.15, 2.75]) {
     addWindow(buckets, x, deckY + 1.92, bodyD * 0.48, 1.0);
     addFrontSill(buckets, x, deckY + 1.34, bodyD * 0.51, 0.92);
@@ -1232,7 +1281,13 @@ export function buildCrookedReedInn(buckets) {
   }
 
   // ---- 9. Right crane + hanging reed basket (kept clear of the door bay) ----
-  addBox(buckets, 'timber', [0.18, 3.7, 0.18], [4.35, deckY + 1.85, porchFront - 0.35], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [0.18, 3.7, 0.18],
+    [4.35, deckY + 1.85, porchFront - 0.35],
+    P.timberDark,
+  );
   addBox(buckets, 'timber', [0.16, 0.7, 0.16], [4.35, deckY + 3.55, porchFront - 0.35], P.timber);
   addBox(
     buckets,
@@ -1242,7 +1297,16 @@ export function buildCrookedReedInn(buckets) {
     P.timberLight,
     [0, 0, -0.08],
   );
-  addCylinder(buckets, 'cloth', 0.028, 0.028, 1.15, 5, [3.15, deckY + 3.05, porchFront - 0.35], P.rope);
+  addCylinder(
+    buckets,
+    'cloth',
+    0.028,
+    0.028,
+    1.15,
+    5,
+    [3.15, deckY + 3.05, porchFront - 0.35],
+    P.rope,
+  );
   addReedBundleSign(buckets, 3.15, deckY + 1.55, porchFront - 0.2, 1.05);
   // Rear-left crane with hanging barrel (concept rear, not on the approach).
   addBox(buckets, 'timber', [0.15, 2.7, 0.15], [-4.2, deckY + 1.45, -bodyD * 0.4], P.timberDark);
@@ -1288,18 +1352,19 @@ export function buildCrookedReedInn(buckets) {
 
   // ---- 11. Lanterns: left arm (concept) + sparse porch accents ----
   // Extended left arm so the warm lantern hangs clear of the door bay.
-  addBox(buckets, 'timber', [0.9, 0.1, 0.1], [-4.15, deckY + 2.85, porchFront - 0.55], P.timberDark, [
-    0,
-    0,
-    0.2,
-  ]);
+  addBox(
+    buckets,
+    'timber',
+    [0.9, 0.1, 0.1],
+    [-4.15, deckY + 2.85, porchFront - 0.55],
+    P.timberDark,
+    [0, 0, 0.2],
+  );
   addLantern(buckets, [-4.45, deckY + 2.35, porchFront - 0.55], 0.98);
   addLantern(buckets, [2.35, deckY + 2.5, porchFront - 0.48], 0.7);
   addLantern(buckets, [4.15, deckY + 2.25, porchZ + 0.25], 0.65);
   addLantern(buckets, [-4.05, deckY + 2.3, -bodyD * 0.12], 0.62, 'fenlight');
 }
-
-
 
 /**
  * Moonwort Apothecary: stilt shack, crooked teal roof with horns, porch steps,
@@ -1345,7 +1410,13 @@ export function buildMoonwortApothecary(buckets) {
   addSteps(buckets, 0, frontZ + 0.7, 1.7, 5, 1, 0.05);
 
   // R2-3 shell
-  addBox(buckets, 'timber', [bodyW * 0.88, wallH * 0.96, bodyD * 0.86], [0, wallCy, 0], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 0.88, wallH * 0.96, bodyD * 0.86],
+    [0, wallCy, 0],
+    P.timberDeep,
+  );
   addVerticalPlankFace(buckets, 'front', bodyW * 0.95, wallH, [0, wallCy, frontZ - 0.04], {
     plankCount: 10,
   });
@@ -1363,7 +1434,13 @@ export function buildMoonwortApothecary(buckets) {
       addBox(buckets, 'timber', [0.22, wallH + 0.15, 0.22], [x, wallCy, z], P.timberDark);
     }
   }
-  addBox(buckets, 'timber', [bodyW * 1.05, 0.14, bodyD * 1.05], [0, wallTop - 0.02, 0], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 1.05, 0.14, bodyD * 1.05],
+    [0, wallTop - 0.02, 0],
+    P.timberDark,
+  );
 
   // R4-6 crooked bent roof + horns
   addBentConceptRoof(buckets, bodyW * 1.25, bodyD * 1.2, wallTop + 0.02, peakY, {
@@ -1405,13 +1482,22 @@ export function buildMoonwortApothecary(buckets) {
   // R7-9 door + herb counter + windows
   addDoor(buckets, -0.85, wallBottom + 1.05, frontZ - 0.02, 1.05, 2.0, 'rounded');
   // Herb service counter (socket ~1.9, 1.2, 3)
-  addBox(buckets, 'timber', [1.6, 0.7, 0.55], [1.7, wallBottom + 0.85, frontZ + 0.15], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [1.6, 0.7, 0.55],
+    [1.7, wallBottom + 0.85, frontZ + 0.15],
+    P.timberDeep,
+  );
   addBox(buckets, 'cloth', [1.5, 0.06, 0.7], [1.7, wallBottom + 1.35, frontZ + 0.2], P.parchment);
-  addBox(buckets, 'cloth', [1.7, 0.08, 0.9], [1.7, wallBottom + 1.55, frontZ + 0.15], P.clothTeal, [
-    0.05,
-    0,
-    0,
-  ]);
+  addBox(
+    buckets,
+    'cloth',
+    [1.7, 0.08, 0.9],
+    [1.7, wallBottom + 1.55, frontZ + 0.15],
+    P.clothTeal,
+    [0.05, 0, 0],
+  );
   // Potion bottles (colored glass)
   for (const [dx, c] of [
     [-0.4, P.potionGlass],
@@ -1419,7 +1505,16 @@ export function buildMoonwortApothecary(buckets) {
     [0.2, P.wax],
     [0.5, P.potionGlass],
   ]) {
-    addCylinder(buckets, 'organic', 0.08, 0.1, 0.22, 6, [1.7 + dx, wallBottom + 1.5, frontZ + 0.25], c);
+    addCylinder(
+      buckets,
+      'organic',
+      0.08,
+      0.1,
+      0.22,
+      6,
+      [1.7 + dx, wallBottom + 1.5, frontZ + 0.25],
+      c,
+    );
   }
   addWindow(buckets, 0.15, wallBottom + 2.35, frontZ - 0.02, 0.7, 'rounded');
   addWindow(buckets, -halfW * 0.95, wallBottom + 1.9, 0.3, 0.7, 'rounded');
@@ -1436,12 +1531,27 @@ export function buildMoonwortApothecary(buckets) {
     addBox(buckets, 'organic', [0.15, 0.2, 0.1], [x, wallBottom + 1.65, z], P.herb);
   }
   // Distiller still left porch
-  addCylinder(buckets, 'metal', 0.18, 0.22, 0.45, 8, [-2.3, wallBottom + 0.7, frontZ + 0.4], P.brass);
-  addCylinder(buckets, 'metal', 0.06, 0.06, 0.5, 5, [-2.0, wallBottom + 1.1, frontZ + 0.4], P.brassLight, [
-    0,
-    0,
-    0.6,
-  ]);
+  addCylinder(
+    buckets,
+    'metal',
+    0.18,
+    0.22,
+    0.45,
+    8,
+    [-2.3, wallBottom + 0.7, frontZ + 0.4],
+    P.brass,
+  );
+  addCylinder(
+    buckets,
+    'metal',
+    0.06,
+    0.06,
+    0.5,
+    5,
+    [-2.0, wallBottom + 1.1, frontZ + 0.4],
+    P.brassLight,
+    [0, 0, 0.6],
+  );
   // Purple fungi
   for (const [x, z] of [
     [-1.8, frontZ + 0.5],
@@ -1514,7 +1624,13 @@ export function buildHeskTannery(buckets) {
       index % 2 === 0 ? P.timberLight : P.timber,
     );
   }
-  addBox(buckets, 'timber', [11.6, 0.14, 0.15], [0.15, deckY - 0.02, porchFront - 0.04], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [11.6, 0.14, 0.15],
+    [0.15, deckY - 0.02, porchFront - 0.04],
+    P.timberDark,
+  );
   for (const x of [-5.75, 5.9]) {
     addBox(buckets, 'timber', [0.15, 0.14, 6.55], [x, deckY - 0.02, 0.08], P.timberDark);
   }
@@ -1554,7 +1670,16 @@ export function buildHeskTannery(buckets) {
     const color = index % 3 === 0 ? P.timberDeep : index % 2 === 0 ? P.timberDark : P.timber;
     // Pole body: sunk slightly below deck so it reads as standing in water.
     // 5 segments keeps the undercroft dense without overspending tris.
-    addCylinder(buckets, 'timber', radius, radius * 1.08, height, 5, [x, height / 2 - 0.02, z], color);
+    addCylinder(
+      buckets,
+      'timber',
+      radius,
+      radius * 1.08,
+      height,
+      5,
+      [x, height / 2 - 0.02, z],
+      color,
+    );
     // Moss / waterline ring at the wet base.
     addCylinder(
       buckets,
@@ -1586,17 +1711,7 @@ export function buildHeskTannery(buckets) {
     [5.2, porchFront + 0.12, -0.22],
     [-4.5, rearZ - 0.35, 0.18],
   ]) {
-    addCylinder(
-      buckets,
-      'timber',
-      0.07,
-      0.09,
-      0.95,
-      5,
-      [x, 0.42, z],
-      P.timberDark,
-      [0, 0, lean],
-    );
+    addCylinder(buckets, 'timber', 0.07, 0.09, 0.95, 5, [x, 0.42, z], P.timberDark, [0, 0, lean]);
   }
 
   // ---- Round 1: workshop shell with basestone belt ----
@@ -1613,9 +1728,16 @@ export function buildHeskTannery(buckets) {
   addVerticalPlankFace(buckets, 'rear', bodyW * 0.94, wallH, [bodyCx, wallCy, rearZ + 0.08], {
     plankCount: 12,
   });
-  addVerticalPlankFace(buckets, 'left', bodyD * 0.9, wallH, [bodyCx - bodyW * 0.46, wallCy, bodyCz], {
-    plankCount: 8,
-  });
+  addVerticalPlankFace(
+    buckets,
+    'left',
+    bodyD * 0.9,
+    wallH,
+    [bodyCx - bodyW * 0.46, wallCy, bodyCz],
+    {
+      plankCount: 8,
+    },
+  );
   addVerticalPlankFace(
     buckets,
     'right',
@@ -1869,9 +1991,7 @@ export function buildHeskTannery(buckets) {
   for (const y of [deckY + 0.55, deckY + 1.05, deckY + 1.55]) {
     addBox(buckets, 'metal', [1.05, 0.07, 0.05], [0, y, frontZ + 0.05], P.iron);
   }
-  addOctahedron(buckets, 'metal', 0.07, [0.4, deckY + 1.0, frontZ + 0.07], P.brass, [
-    0.7, 1, 0.45,
-  ]);
+  addOctahedron(buckets, 'metal', 0.07, [0.4, deckY + 1.0, frontZ + 0.07], P.brass, [0.7, 1, 0.45]);
   for (const x of [-0.8, 0.8]) {
     addBox(buckets, 'timber', [0.12, 2.28, 0.12], [x, deckY + 1.2, frontZ - 0.06], P.timberDark);
   }
@@ -1913,7 +2033,16 @@ export function buildHeskTannery(buckets) {
   }
   addCylinder(buckets, 'metal', 0.16, 0.2, 0.3, 7, [benchX - 0.7, deckY + 0.82, benchZ], P.iron);
   addCylinder(buckets, 'metal', 0.14, 0.18, 0.28, 7, [benchX + 0.5, deckY + 0.8, benchZ], P.brass);
-  addCylinder(buckets, 'metal', 0.12, 0.15, 0.26, 7, [benchX + 0.1, deckY + 0.78, benchZ + 0.08], P.ironLight);
+  addCylinder(
+    buckets,
+    'metal',
+    0.12,
+    0.15,
+    0.26,
+    7,
+    [benchX + 0.1, deckY + 0.78, benchZ + 0.08],
+    P.ironLight,
+  );
   addCylinder(
     buckets,
     'cloth',
@@ -1925,17 +2054,11 @@ export function buildHeskTannery(buckets) {
     P.hide,
     [0, 0, Math.PI / 2],
   );
-  addCylinder(
-    buckets,
-    'cloth',
-    0.12,
-    0.12,
-    0.55,
-    7,
-    [benchX + 0.9, deckY + 0.85, benchZ],
-    P.hide,
-    [0, 0, Math.PI / 2],
-  );
+  addCylinder(buckets, 'cloth', 0.12, 0.12, 0.55, 7, [benchX + 0.9, deckY + 0.85, benchZ], P.hide, [
+    0,
+    0,
+    Math.PI / 2,
+  ]);
   addBarrel(buckets, [benchX - 1.5, deckY + 0.34, benchZ + 0.18], 0.76);
   addBarrel(buckets, [benchX + 1.5, deckY + 0.32, benchZ - 0.05], 0.66);
   addBarrel(buckets, [benchX - 1.85, deckY + 0.32, benchZ - 0.22], 0.58);
@@ -1969,7 +2092,13 @@ export function buildHeskTannery(buckets) {
     addBox(buckets, 'timber', [wingW * 0.96, 0.13, 0.13], [wingCx, wingEaveY + 0.04, z], P.timber);
   }
   for (const x of wingPostXs) {
-    addBox(buckets, 'timber', [0.12, 0.12, wingD * 0.88], [x, wingEaveY + 0.05, 0.05], P.timberLight);
+    addBox(
+      buckets,
+      'timber',
+      [0.12, 0.12, wingD * 0.88],
+      [x, wingEaveY + 0.05, 0.05],
+      P.timberLight,
+    );
   }
   // Attach lean-to to workshop right wall with ledger beam.
   addBox(
@@ -2033,14 +2162,9 @@ export function buildHeskTannery(buckets) {
   // ---- Round 2: forward-facing hide wall (concept front identity) ----
   // Plank wall mid-bay faces +Z so hides read from the street approach.
   const hideWallZ = 0.35;
-  addVerticalPlankFace(
-    buckets,
-    'front',
-    wingW * 0.88,
-    2.35,
-    [wingCx, deckY + 1.45, hideWallZ],
-    { plankCount: 9 },
-  );
+  addVerticalPlankFace(buckets, 'front', wingW * 0.88, 2.35, [wingCx, deckY + 1.45, hideWallZ], {
+    plankCount: 9,
+  });
   addBox(
     buckets,
     'timber',
@@ -2095,9 +2219,21 @@ export function buildHeskTannery(buckets) {
   addBox(buckets, 'metal', [1.2, 0.035, 0.26], [4.6, deckY + 0.16, 3.2], P.water);
 
   // ---- Round 3: lanterns on timber arms ----
-  addBox(buckets, 'timber', [0.55, 0.08, 0.08], [-1.15, deckY + 2.55, porchFront - 0.55], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [0.55, 0.08, 0.08],
+    [-1.15, deckY + 2.55, porchFront - 0.55],
+    P.timberDark,
+  );
   addLantern(buckets, [-1.45, deckY + 2.2, porchFront - 0.55], 0.72);
-  addBox(buckets, 'timber', [0.45, 0.08, 0.08], [-4.55, deckY + 2.45, porchFront - 0.55], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [0.45, 0.08, 0.08],
+    [-4.55, deckY + 2.45, porchFront - 0.55],
+    P.timberDark,
+  );
   addLantern(buckets, [-4.85, deckY + 2.15, porchFront - 0.55], 0.64);
   addLantern(buckets, [wingCx + wingW * 0.4, deckY + 2.45, wingFront - 0.25], 0.76);
   addLantern(buckets, [wingCx - wingW * 0.15, deckY + 2.4, wingFront - 0.2], 0.62);
@@ -2288,7 +2424,13 @@ export function buildScoutLodge(buckets) {
   addSteps(buckets, -0.5, frontZ + 0.75, 1.8, 4, 1, 0.05);
 
   // R3 main shell
-  addBox(buckets, 'timber', [bodyW * 0.88, wallH * 0.96, bodyD * 0.86], [0, wallCy, 0], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 0.88, wallH * 0.96, bodyD * 0.86],
+    [0, wallCy, 0],
+    P.timberDeep,
+  );
   addVerticalPlankFace(buckets, 'front', bodyW * 0.95, wallH, [0, wallCy, frontZ - 0.04], {
     plankCount: 11,
   });
@@ -2307,7 +2449,13 @@ export function buildScoutLodge(buckets) {
       addBox(buckets, 'metal', [0.28, 0.12, 0.28], [x, wallBottom + 0.5, z], P.iron);
     }
   }
-  addBox(buckets, 'timber', [bodyW * 1.05, 0.14, bodyD * 1.05], [0, wallTop - 0.02, 0], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 1.05, 0.14, bodyD * 1.05],
+    [0, wallTop - 0.02, 0],
+    P.timberDark,
+  );
 
   // R4-6 bent main roof + side wing
   addBentConceptRoof(buckets, bodyW * 1.22, bodyD * 1.18, wallTop + 0.02, peakY, {
@@ -2345,7 +2493,13 @@ export function buildScoutLodge(buckets) {
     [-0.45, 0.45],
     [0.45, 0.45],
   ]) {
-    addBox(buckets, 'timber', [0.16, 4.2, 0.16], [tx + dx, wallBottom + 2.1, tz + dz], P.timberDark);
+    addBox(
+      buckets,
+      'timber',
+      [0.16, 4.2, 0.16],
+      [tx + dx, wallBottom + 2.1, tz + dz],
+      P.timberDark,
+    );
   }
   addBox(buckets, 'timber', [1.15, 0.12, 1.15], [tx, wallBottom + 3.6, tz], P.timberLight);
   for (const [dx, dz] of [
@@ -2364,11 +2518,14 @@ export function buildScoutLodge(buckets) {
     courses: 4,
   });
   addCylinder(buckets, 'timber', 0.05, 0.05, 1.4, 5, [tx, wallBottom + 5.9, tz], P.timberDark);
-  addBox(buckets, 'cloth', [0.08, 0.7, 0.95], [tx + 0.35, wallBottom + 6.2, tz], P.clothTeal, [
-    0,
-    0.2,
-    0,
-  ]);
+  addBox(
+    buckets,
+    'cloth',
+    [0.08, 0.7, 0.95],
+    [tx + 0.35, wallBottom + 6.2, tz],
+    P.clothTeal,
+    [0, 0.2, 0],
+  );
 
   // R8-10 door, windows, map table lean-to
   addDoor(buckets, -0.3, wallBottom + 1.05, frontZ - 0.02, 1.1, 2.05, 'rounded');
@@ -2377,10 +2534,28 @@ export function buildScoutLodge(buckets) {
   addWindow(buckets, -halfW * 0.95, wallBottom + 1.9, 0.2, 0.7, 'rounded');
   // Map lean-to posts + table (socket 3.2, 1.2, 3.2)
   for (const x of [2.4, 3.7]) {
-    addBox(buckets, 'timber', [0.16, 2.2, 0.16], [x, wallBottom + 1.15, frontZ + 0.4], P.timberDark);
+    addBox(
+      buckets,
+      'timber',
+      [0.16, 2.2, 0.16],
+      [x, wallBottom + 1.15, frontZ + 0.4],
+      P.timberDark,
+    );
   }
-  addBox(buckets, 'timber', [1.6, 0.12, 1.1], [3.1, wallBottom + 0.95, frontZ + 0.35], P.timberLight);
-  addBox(buckets, 'parchment', [1.1, 0.04, 0.75], [3.15, wallBottom + 1.05, frontZ + 0.4], P.parchment);
+  addBox(
+    buckets,
+    'timber',
+    [1.6, 0.12, 1.1],
+    [3.1, wallBottom + 0.95, frontZ + 0.35],
+    P.timberLight,
+  );
+  addBox(
+    buckets,
+    'parchment',
+    [1.1, 0.04, 0.75],
+    [3.15, wallBottom + 1.05, frontZ + 0.4],
+    P.parchment,
+  );
   // Weapon racks (spears)
   for (let i = 0; i < 5; i += 1) {
     addCylinder(
@@ -2394,13 +2569,9 @@ export function buildScoutLodge(buckets) {
       P.timberDark,
       [0.15, 0, 0],
     );
-    addGeometry(
-      buckets,
-      'metal',
-      new THREE.ConeGeometry(0.05, 0.18, 4),
-      P.ironLight,
-      { position: [2.6 + i * 0.12, wallBottom + 2.15, frontZ + 0.1] },
-    );
+    addGeometry(buckets, 'metal', new THREE.ConeGeometry(0.05, 0.18, 4), P.ironLight, {
+      position: [2.6 + i * 0.12, wallBottom + 2.15, frontZ + 0.1],
+    });
   }
 
   // R11-15 lanterns, barrels, rails, seat

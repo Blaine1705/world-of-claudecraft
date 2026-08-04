@@ -416,23 +416,14 @@ export function addShingledRoof(buckets, width, depth, eaveY, peakY, options = {
         const z = cz + slope * halfDepth * (1 - midT);
         const courseDepth = Math.max(0.16, halfDepth / courses + 0.05);
         const color = course % 3 === 0 ? deep : course % 2 === 0 ? mid : light;
-        addBox(
-          buckets,
-          'roof',
-          [width * 1.02, 0.05, courseDepth],
-          [cx, y, z],
-          color,
-          [slope * pitch * 0.95, 0, 0],
-        );
+        addBox(buckets, 'roof', [width * 1.02, 0.05, courseDepth], [cx, y, z], color, [
+          slope * pitch * 0.95,
+          0,
+          0,
+        ]);
       }
     }
-    addBox(
-      buckets,
-      'roof',
-      [width * 1.04, 0.1, 0.22],
-      [cx, peakY + 0.05, cz],
-      deep,
-    );
+    addBox(buckets, 'roof', [width * 1.04, 0.1, 0.22], [cx, peakY + 0.05, cz], deep);
     addBox(
       buckets,
       'timber',
@@ -450,23 +441,14 @@ export function addShingledRoof(buckets, width, depth, eaveY, peakY, options = {
         const x = cx + slope * halfWidth * (1 - midT);
         const courseDepth = Math.max(0.16, halfWidth / courses + 0.05);
         const color = course % 3 === 0 ? deep : course % 2 === 0 ? mid : light;
-        addBox(
-          buckets,
-          'roof',
-          [courseDepth, 0.05, depth * 1.02],
-          [x, y, cz],
-          color,
-          [0, 0, -slope * pitch * 0.95],
-        );
+        addBox(buckets, 'roof', [courseDepth, 0.05, depth * 1.02], [x, y, cz], color, [
+          0,
+          0,
+          -slope * pitch * 0.95,
+        ]);
       }
     }
-    addBox(
-      buckets,
-      'roof',
-      [0.22, 0.1, depth * 1.04],
-      [cx, peakY + 0.05, cz],
-      deep,
-    );
+    addBox(buckets, 'roof', [0.22, 0.1, depth * 1.04], [cx, peakY + 0.05, cz], deep);
   }
 }
 
@@ -545,17 +527,7 @@ export function addBentConceptRoof(buckets, width, depth, eaveY, peakY, options 
     const x = cx + f * width;
     const ridgeY = peakY + ridgeLiftAt(f);
     const base = vertex;
-    positions.push(
-      x,
-      eaveY,
-      cz + halfD,
-      x,
-      ridgeY,
-      cz,
-      x,
-      eaveY,
-      cz - halfD,
-    );
+    positions.push(x, eaveY, cz + halfD, x, ridgeY, cz, x, eaveY, cz - halfD);
     if (end < 0) indices.push(base, base + 1, base + 2);
     else indices.push(base, base + 2, base + 1);
     vertex += 3;
@@ -579,14 +551,11 @@ export function addBentConceptRoof(buckets, width, depth, eaveY, peakY, options 
       const midZ = (zEave + cz) * 0.5;
       const len = Math.hypot(ridgeY - eaveY, zEave - cz);
       const pitch = Math.atan2(ridgeY - eaveY, Math.abs(zEave - cz));
-      addBox(
-        buckets,
-        'timber',
-        [0.08, 0.1, len],
-        [x, midY, midZ],
-        FENBRIDGE_PALETTE.timberDark,
-        [slope * pitch, 0, 0],
-      );
+      addBox(buckets, 'timber', [0.08, 0.1, len], [x, midY, midZ], FENBRIDGE_PALETTE.timberDark, [
+        slope * pitch,
+        0,
+        0,
+      ]);
     }
     // Horizontal battens across the gable face (reads as framed cladding).
     for (const t of [0.22, 0.45, 0.68]) {
@@ -626,14 +595,11 @@ export function addBentConceptRoof(buckets, width, depth, eaveY, peakY, options 
         const courseDepth = Math.max(0.14, halfD / courses + 0.04);
         const color = course % 3 === 0 ? deep : course % 2 === 0 ? mid : light;
         const pitch = Math.atan2(ridgeY - eaveY, halfD);
-        addBox(
-          buckets,
-          'roof',
-          [segW, 0.04, courseDepth],
-          [midX, y, z],
-          color,
-          [slope * pitch, 0, 0],
-        );
+        addBox(buckets, 'roof', [segW, 0.04, courseDepth], [midX, y, z], color, [
+          slope * pitch,
+          0,
+          0,
+        ]);
       }
     }
   }
@@ -668,14 +634,11 @@ export function addBentConceptRoof(buckets, width, depth, eaveY, peakY, options 
   for (const side of [-1, 1]) {
     const tipX = cx + side * (halfW + 0.12);
     const tipY = peakY + ridgeLiftAt(side * 0.5) + 0.12;
-    addBox(
-      buckets,
-      'timber',
-      [0.5, 0.09, 0.09],
-      [tipX, tipY, cz],
-      FENBRIDGE_PALETTE.timberLight,
-      [0, 0, side * 0.32],
-    );
+    addBox(buckets, 'timber', [0.5, 0.09, 0.09], [tipX, tipY, cz], FENBRIDGE_PALETTE.timberLight, [
+      0,
+      0,
+      side * 0.32,
+    ]);
     addOctahedron(
       buckets,
       'metal',
@@ -721,13 +684,7 @@ export function addRaisedPilingDeck(
   buckets,
   width,
   depth,
-  {
-    deckY = 0.72,
-    deckThickness = 0.16,
-    pilingRows = 3,
-    pilingsPerRow = 6,
-    center = [0, 0],
-  } = {},
+  { deckY = 0.72, deckThickness = 0.16, pilingRows = 3, pilingsPerRow = 6, center = [0, 0] } = {},
 ) {
   const [cx, cz] = center;
   addBox(
@@ -759,13 +716,7 @@ export function addRaisedPilingDeck(
         [x, height / 2, z],
         (col + row) % 2 === 0 ? FENBRIDGE_PALETTE.stoneDeep : FENBRIDGE_PALETTE.stone,
       );
-      addBox(
-        buckets,
-        'stone',
-        [0.36, 0.12, 0.36],
-        [x, 0.06, z],
-        FENBRIDGE_PALETTE.moss,
-      );
+      addBox(buckets, 'stone', [0.36, 0.12, 0.36], [x, 0.06, z], FENBRIDGE_PALETTE.moss);
     }
   }
 }
@@ -775,24 +726,9 @@ export function addRopeRail(buckets, x0, x1, y, z, posts = 5) {
   for (let index = 0; index < posts; index += 1) {
     const t = posts === 1 ? 0.5 : index / (posts - 1);
     const x = x0 + (x1 - x0) * t;
-    addBox(
-      buckets,
-      'timber',
-      [0.1, 0.85, 0.1],
-      [x, y + 0.42, z],
-      FENBRIDGE_PALETTE.timberDark,
-    );
+    addBox(buckets, 'timber', [0.1, 0.85, 0.1], [x, y + 0.42, z], FENBRIDGE_PALETTE.timberDark);
   }
-  addBeamXY(
-    buckets,
-    'cloth',
-    [x0, y + 0.72],
-    [x1, y + 0.7],
-    z,
-    0.05,
-    0.05,
-    FENBRIDGE_PALETTE.rope,
-  );
+  addBeamXY(buckets, 'cloth', [x0, y + 0.72], [x1, y + 0.7], z, 0.05, 0.05, FENBRIDGE_PALETTE.rope);
   addBeamXY(
     buckets,
     'cloth',

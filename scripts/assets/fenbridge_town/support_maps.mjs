@@ -120,7 +120,8 @@ async function sourceCellRgb(sourceBytes, row, column) {
 function copyCellIntoAtlas(atlas, cell, row, column) {
   for (let y = 0; y < CELL_SIZE; y += 1) {
     const sourceStart = y * CELL_SIZE * 3;
-    const targetStart = ((row * CELL_SIZE + y) * FENBRIDGE_SUPPORT_MAP_SIZE + column * CELL_SIZE) * 3;
+    const targetStart =
+      ((row * CELL_SIZE + y) * FENBRIDGE_SUPPORT_MAP_SIZE + column * CELL_SIZE) * 3;
     cell.copy(atlas, targetStart, sourceStart, sourceStart + CELL_SIZE * 3);
   }
 }
@@ -136,8 +137,7 @@ function blurHeightCell(heights, cellLeft, cellTop) {
           const sx = (x + dx + CELL_SIZE) % CELL_SIZE;
           const sy = (y + dy + CELL_SIZE) % CELL_SIZE;
           const w = dx === 0 && dy === 0 ? 4 : dx === 0 || dy === 0 ? 2 : 1;
-          sum +=
-            heights[(cellTop + sy) * FENBRIDGE_SUPPORT_MAP_SIZE + cellLeft + sx] * w;
+          sum += heights[(cellTop + sy) * FENBRIDGE_SUPPORT_MAP_SIZE + cellLeft + sx] * w;
           weight += w;
         }
       }
@@ -152,7 +152,9 @@ function blurHeightCell(heights, cellLeft, cellTop) {
   }
 }
 
-export async function buildFenbridgeSupportMaps(repoRoot = path.resolve(import.meta.dirname, '../../..')) {
+export async function buildFenbridgeSupportMaps(
+  repoRoot = path.resolve(import.meta.dirname, '../../..'),
+) {
   const sourcePath = path.join(repoRoot, FENBRIDGE_SUPPORT_MAP_SOURCE_PATH);
   const sourceBytes = readFileSync(sourcePath);
   const metadata = await sharp(sourceBytes).metadata();
@@ -220,7 +222,8 @@ export async function buildFenbridgeSupportMaps(repoRoot = path.resolve(import.m
     for (let x = 0; x < FENBRIDGE_SUPPORT_MAP_SIZE; x += 1) {
       const pixel = y * FENBRIDGE_SUPPORT_MAP_SIZE + x;
       const offset = pixel * 3;
-      const cell = Math.floor(y / CELL_SIZE) * FENBRIDGE_SUPPORT_MAP_GRID + Math.floor(x / CELL_SIZE);
+      const cell =
+        Math.floor(y / CELL_SIZE) * FENBRIDGE_SUPPORT_MAP_GRID + Math.floor(x / CELL_SIZE);
       const localX = x % CELL_SIZE;
       const localY = y % CELL_SIZE;
       const borderDistance = Math.min(
