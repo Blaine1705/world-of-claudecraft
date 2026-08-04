@@ -1096,6 +1096,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Bonus heroik, salah satu dari ini selalu jatuh:',
   'hudChrome.finder.lootMaybe': 'Paling banyak salah satu dari ini mungkin jatuh:',
   'hudChrome.finder.mech.deathless_rage': 'Murka Abadi (diputus di wardstone)',
+  'hudChrome.finder.mech.dread_curse':
+    'Kutukan Kengerian (khusus heroik, debuff bertumpuk untuk pergantian tank)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Tebasan Deathstalker (tebasan ke depan)',
   'hudChrome.finder.mech.enrage': 'Mengamuk saat darah menipis',
   'hudChrome.finder.mech.grave_cleaver': 'Penebas Kubur (tebasan ke depan)',

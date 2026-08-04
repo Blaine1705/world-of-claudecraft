@@ -1191,6 +1191,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Bônus heroico, um destes cai sempre:',
   'hudChrome.finder.lootMaybe': 'No máximo um destes pode cair:',
   'hudChrome.finder.mech.deathless_rage': 'Fúria Imortal (interrompida nas pedras de guarda)',
+  'hudChrome.finder.mech.dread_curse':
+    'Maldição do Pavor (somente heroico, penalidade cumulativa para troca de tanque)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Corte do Caçador da Morte (golpe em cone frontal)',
   'hudChrome.finder.mech.enrage': 'Entra em frenesi com pouca vida',
   'hudChrome.finder.mech.grave_cleaver': 'Ceifador de Tumbas (golpe em cone frontal)',

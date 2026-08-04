@@ -9151,6 +9151,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.raise_fallen': '망자 소생(주기적 증원)',
   'hudChrome.finder.mech.soul_rend': '영혼 가르기(표식 대상은 산개 후 치유 필요)',
   'hudChrome.finder.mech.deathless_rage': '불사의 격노(수호석에서 저지)',
+  'hudChrome.finder.mech.dread_curse': '공포의 저주(영웅 전용, 중첩되는 탱커 교대 약화 효과)',
   'hudChrome.finder.mech.wardstones': '수호석 정신집중(단계 전환)',
   'hudChrome.steam.link': 'Steam 연동',
   'hudChrome.steam.unlink': 'Steam 연동 해제',

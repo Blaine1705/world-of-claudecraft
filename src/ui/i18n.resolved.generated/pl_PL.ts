@@ -2961,7 +2961,8 @@ export const pl_PL: EnTranslations = {
         "raise_fallen": "Wskrzeszenie Poległych (okresowe fale wrogów)",
         "soul_rend": "Rozdarcie Duszy (oznaczeni gracze muszą się rozprószyć i być leczeni)",
         "deathless_rage": "Nieśmiertelna Furia (przerywana przy kamieniach wardowych)",
-        "wardstones": "Kanały kamieni wardowych (przejście fazy)"
+        "wardstones": "Kanały kamieni wardowych (przejście fazy)",
+        "dread_curse": "Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)"
       }
     },
     "deeds": {

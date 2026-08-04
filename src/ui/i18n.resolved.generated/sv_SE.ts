@@ -2961,7 +2961,8 @@ export const sv_SE: EnTranslations = {
         "raise_fallen": "Res de fallna (periodiska vågor av tillskott)",
         "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
-        "wardstones": "Väktarstenarnas kanaler (fasövergång)"
+        "wardstones": "Väktarstenarnas kanaler (fasövergång)",
+        "dread_curse": "Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)"
       }
     },
     "deeds": {

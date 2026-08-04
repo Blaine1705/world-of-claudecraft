@@ -1129,6 +1129,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroisk bonus, et af disse falder altid:',
   'hudChrome.finder.lootMaybe': 'Højst et af disse kan falde:',
   'hudChrome.finder.mech.deathless_rage': 'Udødelig Raseri (afbrydes ved vardstene)',
+  'hudChrome.finder.mech.dread_curse':
+    'Rædselsforbandelse (kun heroisk, stablende svækkelse til tankskifte)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Dødsstalkers Mejning (frontal mejning)',
   'hudChrome.finder.mech.enrage': 'Raserer ved lavt helbred',
   'hudChrome.finder.mech.grave_cleaver': 'Gravhugger (frontal mejning)',

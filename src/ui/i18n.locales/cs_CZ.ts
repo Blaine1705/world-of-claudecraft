@@ -1088,6 +1088,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Hrdinský bonus, vždy vypadne jedno z těchto:',
   'hudChrome.finder.lootMaybe': 'Může vypadnout nejvýše jeden z těchto předmětů:',
   'hudChrome.finder.mech.deathless_rage': 'Nesmrtelný hněv (přerušen u ochranných kamenů)',
+  'hudChrome.finder.mech.dread_curse':
+    'Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Sek smrtilovcovy zbraně (čelní sek)',
   'hudChrome.finder.mech.enrage': 'Zuří při nízkém zdraví',
   'hudChrome.finder.mech.grave_cleaver': 'Hrobní sekáč (čelní sek)',

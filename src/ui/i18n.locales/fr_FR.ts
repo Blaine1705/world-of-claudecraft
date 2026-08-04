@@ -1235,6 +1235,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': "Bonus héroïque, l'un de ces objets tombe toujours:",
   'hudChrome.finder.lootMaybe': "Au plus l'un de ces objets peut tomber:",
   'hudChrome.finder.mech.deathless_rage': 'Fureur immortelle (interrompue aux pierres de garde)',
+  'hudChrome.finder.mech.dread_curse':
+    'Malédiction d’effroi (héroïque seulement, affaiblissement cumulatif pour échange de tank)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Balayage du traqueur de mort (cleave frontal)',
   'hudChrome.finder.mech.enrage': 'Entre en rage à faible santé',
   'hudChrome.finder.mech.grave_cleaver': 'Faucheur de tombes (cleave frontal)',

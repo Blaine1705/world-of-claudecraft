@@ -2961,7 +2961,8 @@ export const zh_TW: EnTranslations = {
         "raise_fallen": "亡者復生（週期性召喚小怪）",
         "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
         "deathless_rage": "不死之怒（需在護符石處打斷）",
-        "wardstones": "護符石引導（階段轉換）"
+        "wardstones": "護符石引導（階段轉換）",
+        "dread_curse": "恐懼詛咒（僅英雄，疊加換坦減益）"
       }
     },
     "deeds": {

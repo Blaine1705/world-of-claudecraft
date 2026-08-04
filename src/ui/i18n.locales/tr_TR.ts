@@ -1084,6 +1084,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroik bonusu, bunlardan biri her zaman düşer:',
   'hudChrome.finder.lootMaybe': 'En fazla bunlardan biri düşebilir:',
   'hudChrome.finder.mech.deathless_rage': 'Ölümsüz Öfke (koruma taşlarında kesilir)',
+  'hudChrome.finder.mech.dread_curse':
+    'Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Ölüm Avcısının Biçişi (öne doğru yay saldırısı)',
   'hudChrome.finder.mech.enrage': 'Düşük canda çılgına döner',
   'hudChrome.finder.mech.grave_cleaver': 'Mezar Biçici (öne doğru yay saldırısı)',

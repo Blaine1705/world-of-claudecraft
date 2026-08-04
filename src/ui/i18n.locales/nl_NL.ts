@@ -1190,6 +1190,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroïsche bonus, een van deze valt altijd:',
   'hudChrome.finder.lootMaybe': 'Maximaal een van deze kan vallen:',
   'hudChrome.finder.mech.deathless_rage': 'Doodloze Razernij (onderbroken bij de wardstones)',
+  'hudChrome.finder.mech.dread_curse':
+    'Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Doodstalker-Maaislaan (frontale maaislaan)',
   'hudChrome.finder.mech.enrage': 'Razend bij weinig gezondheid',
   'hudChrome.finder.mech.grave_cleaver': 'Grafsplijter (frontale maaislaan)',

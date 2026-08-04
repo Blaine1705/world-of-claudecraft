@@ -1204,6 +1204,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Bonus eroico, uno di questi cade sempre:',
   'hudChrome.finder.lootMaybe': 'Al massimo uno di questi puo cadere:',
   'hudChrome.finder.mech.deathless_rage': 'Furia Immortale (interrotta alle pietre di guardia)',
+  'hudChrome.finder.mech.dread_curse':
+    'Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)',
   'hudChrome.finder.mech.deathstalker_cleave':
     'Fendente del Cacciatore di Morti (fendente frontale)',
   'hudChrome.finder.mech.enrage': 'Va in furia con poca salute',

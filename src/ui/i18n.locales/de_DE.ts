@@ -1191,6 +1191,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Hochstens eines davon kann fallen:',
   'hudChrome.finder.mech.deathless_rage':
     'Unsterbliche Raserei (an den Schutzsteinen unterbrochen)',
+  'hudChrome.finder.mech.dread_curse':
+    'Schreckensfluch (nur heroisch, stapelnder Schwachungseffekt fur Tankwechsel)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Todjaeger-Schwung (frontaler Schwung)',
   'hudChrome.finder.mech.enrage': 'Rasiert bei geringer Gesundheit',
   'hudChrome.finder.mech.grave_cleaver': 'Grabspalter (frontaler Schwung)',

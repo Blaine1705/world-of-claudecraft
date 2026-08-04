@@ -1130,6 +1130,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroisk bonus, ett av dessa faller alltid:',
   'hudChrome.finder.lootMaybe': 'Högst ett av dessa kan falla:',
   'hudChrome.finder.mech.deathless_rage': 'Dödsfri vrede (avbryts vid väktarstenarna)',
+  'hudChrome.finder.mech.dread_curse':
+    'Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Dödsstalkarens huggsving (frontalt huggsving)',
   'hudChrome.finder.mech.enrage': 'Rasar vid låga livspunkter',
   'hudChrome.finder.mech.grave_cleaver': 'Grav-klyvare (frontalt huggsving)',

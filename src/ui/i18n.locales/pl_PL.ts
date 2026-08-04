@@ -1201,6 +1201,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Co najwyżej jeden z tych może wypaść:',
   'hudChrome.finder.mech.deathless_rage':
     'Nieśmiertelna Furia (przerywana przy kamieniach wardowych)',
+  'hudChrome.finder.mech.dread_curse':
+    'Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Kosiące Cięcie Łowcy Śmierci (frontalne cięcie)',
   'hudChrome.finder.mech.enrage': 'Wpada w szał przy niskim zdrowiu',
   'hudChrome.finder.mech.grave_cleaver': 'Grobowe Cięcie (frontalne cięcie)',

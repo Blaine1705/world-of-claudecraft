@@ -992,6 +992,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Thưởng anh hùng, luôn rơi một trong số này:',
   'hudChrome.finder.lootMaybe': 'Tối đa một trong số này có thể rơi:',
   'hudChrome.finder.mech.deathless_rage': 'Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)',
+  'hudChrome.finder.mech.dread_curse':
+    'Lời Nguyền Kinh Hoàng (chỉ anh hùng, hiệu ứng bất lợi cộng dồn để đổi tank)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Chém Ngang Thần Chết (chém ngang phía trước)',
   'hudChrome.finder.mech.enrage': 'Nổi giận khi máu thấp',
   'hudChrome.finder.mech.grave_cleaver': 'Chém Mộ Phần (chém ngang phía trước)',

@@ -1084,6 +1084,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Puede caer como maximo uno de estos:',
   'hudChrome.finder.mech.deathless_rage':
     'Furia Inmortal (se interrumpe en las piedras de guardia)',
+  'hudChrome.finder.mech.dread_curse':
+    'Maldicion Pavorosa (solo heroico, perjuicio acumulativo para cambio de tanque)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Tajo del Acechador de la Muerte (tajo frontal)',
   'hudChrome.finder.mech.enrage': 'Entra en furia al tener poca salud',
   'hudChrome.finder.mech.grave_cleaver': 'Hacha Funebra (tajo frontal)',

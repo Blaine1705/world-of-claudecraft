@@ -2961,7 +2961,8 @@ export const en: EnTranslations = {
         "raise_fallen": "Raise Fallen (periodic waves of adds)",
         "soul_rend": "Soul Rend (marked players must spread and be healed)",
         "deathless_rage": "Deathless Rage (interrupted at the wardstones)",
-        "wardstones": "Wardstone channels (phase transition)"
+        "wardstones": "Wardstone channels (phase transition)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
