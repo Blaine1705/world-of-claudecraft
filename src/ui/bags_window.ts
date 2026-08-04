@@ -1443,7 +1443,8 @@ export class BagsWindow {
    *  stack is not a quest kind or the player does not hold the related quest. */
   private questMarkProgress(item: ItemDef) {
     if (item.kind !== 'quest' || !item.questId) return null;
-    const log = this.deps.world().questLog.get(item.questId);
+    // Optional chain: thin IWorld fakes in unit harnesses may omit questLog.
+    const log = this.deps.world().questLog?.get(item.questId);
     if (!log) return null;
     const quest = QUESTS[item.questId];
     return bagQuestMarkProgressFromLog(

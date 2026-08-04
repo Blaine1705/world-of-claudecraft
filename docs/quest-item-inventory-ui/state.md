@@ -1,9 +1,9 @@
 # Quest Item Inventory UI: cross-phase state
 
-Current phase: **Phase 5 complete; Phase 6 ready to start**
+Current phase: **Phase 6 complete; packet merge-ready (await PR / teardown ok)**
 Worktree: `/Users/fernando/Documents/wocc-quest-item-ui`
 Branch: `feature/quest-item-inventory-ui`
-Base: `release/v0.34.0` (merge latest at the start of every phase)
+Base: `release/v0.34.0` (merged latest before final QA)
 
 ## Locked design decisions
 
@@ -124,7 +124,9 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
 - [x] Mobile long-press / desktop hover both honest (tooltip Phase 2 model + host)
 - [x] Reduced motion never removes the rim or seal (no motion gate on Phase 1; Phase 5
   drops pulse only)
-- [ ] Screenshots planned or taken for the PR
+- [x] Screenshots planned or taken for the PR
+  (`docs/screenshots/quest-item-inventory-ui/before|after-bags-mixed-desktop.png`
+  and mobile twins)
 
 ## Ledger (fill as phases complete)
 
@@ -187,6 +189,18 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
 
 ## Resume point
 
-**Next action:** Phase 6 final QA + screenshots under
-`docs/screenshots/quest-item-inventory-ui/` + `npm run gate`. Open PR only if asked.
-Packet teardown only after explicit confirmation.
+**Phase 6 complete.** Packet is merge-ready pending user action:
+
+1. Confirm `npm run gate` green outcome in the Phase 6 handoff.
+2. Open PR only if the user asks (body draft in the handoff message).
+3. Packet teardown (`docs/quest-item-inventory-ui/` planning files) only after
+   explicit user confirmation. Do not tear down unprompted.
+
+Screenshots live under `docs/screenshots/quest-item-inventory-ui/` (before/after
+mixed bags, desktop + mobile). Ready seal and tooltip story are covered by
+automated tests; live capture shows rim/seal + Quest filter count badge.
+
+Residual non-blocking notes from reviewers:
+- Tracker highlight is pointer-hover only (touch keeps rim/seal/tooltip).
+- Ready is visual-only in bag aria (purpose string stays "quest item").
+- Optional glyph-priority arms for signed/bound under quest stacks.

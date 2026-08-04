@@ -86,6 +86,35 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     expect(cellsBranch).not.toContain('bag-section-header');
   });
 
+  it('wires bag hover to tracker highlight via pure id + thin controller', () => {
+    // Pure id + controller are unit-tested elsewhere; this pin keeps the
+    // bags painter from dropping the call site while those suites stay green.
+    expect(painter).toContain("from './bag_quest_tracker_highlight'");
+    expect(painter).toContain("from './bag_quest_tracker_highlight_view'");
+    expect(painter).toContain('BagQuestTrackerHighlight');
+    expect(painter).toContain('bagQuestTrackerHighlightId');
+    expect(painter).toContain('trackerHighlight.set');
+    expect(painter).toContain('trackerHighlight.clear');
+    expect(painter).toContain("addEventListener('mouseenter'");
+    expect(painter).toContain("addEventListener('mouseleave'");
+    expect(painter).toContain('clearTrackerHighlight');
+    // Clear on rebuild (render + refreshGrid) and close; hideTooltip path uses
+    // hideTooltipClearingTracker so drag/peek does not leave a sticky glow.
+    expect(painter).toContain('hideTooltipClearingTracker');
+    const clearCalls = painter.match(/this\.clearTrackerHighlight\(\)/g) ?? [];
+    // At least: close, render, refreshGrid, hideTooltipClearingTracker (+ mouseleave).
+    expect(clearCalls.length).toBeGreaterThanOrEqual(4);
+    // Hover CSS: always-on token, no --fx gate.
+    const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+    expect(hudCss).toContain('.qt-title.qt-bag-hover');
+    expect(hudCss).toContain('var(--color-quest-tracker-bag-hover)');
+    expect(tokens).toContain('--color-quest-tracker-bag-hover:');
+    const hoverStart = hudCss.indexOf('.qt-title.qt-bag-hover');
+    expect(hoverStart).toBeGreaterThan(-1);
+    const hoverBlock = hudCss.slice(hoverStart, hudCss.indexOf('}', hoverStart));
+    expect(hoverBlock).not.toContain('--fx-');
+  });
+
   it("asks for the backpack icon by the id the art is wired under ('backpack')", () => {
     // The bar's first socket is the implicit backpack, whose painted art is wired in
     // icons.ts under exactly this id (UI_ITEM_IMAGE_IDS, guarded by item_icons.test.ts).
@@ -211,8 +240,10 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // The peek check stays FIRST; the only thing that may sit between it and the
     // shift-link arm is the touch-drag click suppression (the synthetic click that
     // trails a completed drag), which is likewise a "swallow this click" gate.
+    // Peek dismiss uses hideTooltipClearingTracker so bag hover cannot leave a
+    // sticky tracker glow after a long-press inspect (Phase 5).
     expect(painter).toMatch(
-      /row\.addEventListener\('click', \(ev\) => \{[\s\S]{0,320}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.deps\.hideTooltip\(\);\s*return;\s*\}[\s\S]{0,400}?if \(ev\.shiftKey && bagShiftLinks/,
+      /row\.addEventListener\('click', \(ev\) => \{[\s\S]{0,320}?if \(this\.deps\.consumePeek\(\)\) \{\s*this\.hideTooltipClearingTracker\(\);\s*return;\s*\}[\s\S]{0,400}?if \(ev\.shiftKey && bagShiftLinks/,
     );
     // The drag's trailing click must never ALSO run the stack's action.
     expect(painter).toMatch(

@@ -18,10 +18,7 @@ import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import type { IWorld } from '../src/world_api';
 
-function fakeWorld(
-  inventory: InvSlot[],
-  questLog: Map<string, QuestProgress> = new Map(),
-): IWorld {
+function fakeWorld(inventory: InvSlot[], questLog: Map<string, QuestProgress> = new Map()): IWorld {
   return {
     inventory,
     bags: [null, null, null, null],

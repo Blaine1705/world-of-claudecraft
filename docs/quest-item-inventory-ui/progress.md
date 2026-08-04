@@ -8,7 +8,7 @@
 | Phase 3: Findability chrome | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 4: Cross-surface language | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 5: Interactive polish | Complete | 2026-08-03 | 2026-08-03 |
-| Phase 6: Final QA + screenshots + gate | Pending | | |
+| Phase 6: Final QA + screenshots + gate | Complete | 2026-08-04 | 2026-08-04 |
 
 ## Phase 1 deliverables
 - [x] `src/ui/bag_quest_mark_view.ts` pure core registered in architecture allowlists
@@ -54,11 +54,11 @@
 - [x] Reviews clean of BLOCKING
 
 ## Phase 6 deliverables
-- [ ] Full qa-checklist / woc-qa on branch diff
-- [ ] Desktop + mobile screenshots under `docs/screenshots/quest-item-inventory-ui/`
-- [ ] `npm run gate` green
-- [ ] Merge latest `origin/release/v0.34.0` before final gate
-- [ ] PR body ready (open only if user asks)
+- [x] Full qa-checklist / woc-qa on branch diff
+- [x] Desktop + mobile screenshots under `docs/screenshots/quest-item-inventory-ui/`
+- [x] `npm run gate` green
+- [x] Merge latest `origin/release/v0.34.0` before final gate
+- [x] PR body ready (open only if user asks)
 - [ ] Packet teardown only after explicit user confirmation
 
 ## Notes
@@ -103,3 +103,12 @@
   `--color-bag-quest-seal-ready`, `--color-quest-tracker-bag-hover`. No new player
   strings. Validation: tsc, mark + highlight + bags marker + architecture tests,
   `npm run ci:changed`.
+- 2026-08-04 Phase 6: Final QA + screenshots + gate. Merged latest
+  `origin/release/v0.34.0` (i18n pending conflict resolved via regen). Closed
+  Phase 5 ready-seal gap with DOM paint tests against a real `questLog` for
+  `q_boars`/`boar_hide`. Added bags_window source pin for tracker highlight
+  wiring + hover CSS fairness. Reviewers (frontend-seam, test-coverage, qa-checklist)
+  returned READY WITH NOTES (no BLOCKING code). Screenshots:
+  `docs/screenshots/quest-item-inventory-ui/before|after-bags-mixed-{desktop,mobile}.png`.
+  Full `npm run gate` PASS (all 10 steps; vitest workers=2 after quieter re-run).
+  Packet teardown deferred until user confirmation. PR not opened (await ask).
