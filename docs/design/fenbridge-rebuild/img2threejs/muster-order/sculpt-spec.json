@@ -48,7 +48,11 @@
       "pitch": 0,
       "roll": 0
     },
-    "positionHint": [0, 0, 3],
+    "positionHint": [
+      0,
+      0,
+      3
+    ],
     "note": "For likeness work, solve the reference camera (forge/stage1_intake/solve_camera_pose.py) so the review render aligns with the photo and the reference can be projected. Confirm by overlay review."
   },
   "suitability": "pass",
@@ -70,7 +74,11 @@
         "layered irregular pages",
         "central colored binding and wax seal"
       ],
-      "structureKind": ["stacked parchment leaves", "rigid backing board", "bound sealed document"],
+      "structureKind": [
+        "stacked parchment leaves",
+        "rigid backing board",
+        "bound sealed document"
+      ],
       "motionPotential": [
         "static quest pickup",
         "whole-object hover or rotation",
@@ -111,7 +119,11 @@
     },
     "specDepthDecision": {
       "requiredDepth": "moderate",
-      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -334,7 +346,9 @@
         "qualityCriteria": [
           "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model reads as a generic placeholder instead of the reference object",
           "major proportions are guessed without evidence"
@@ -347,7 +361,9 @@
         "qualityCriteria": [
           "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "large visible parts are merged into one mesh",
           "component hierarchy is too shallow for the observed complexity"
@@ -360,7 +376,9 @@
         "qualityCriteria": [
           "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "child part root floats away from the parent",
           "branch/limb/tube is centered in space instead of pivoting from its root",
@@ -376,7 +394,9 @@
           "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
           "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "surface looks like flat plastic",
           "local material variation is missing or not tied to image evidence"
@@ -392,7 +412,9 @@
           "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
           "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model has acceptable shape but reads as flat shaded or plastic",
           "colors are a generic average instead of reference-observed local color zones",
@@ -445,9 +467,17 @@
       "Reference-accurate teal binding band",
       "Offset red wax seal and three ink lines"
     ],
-    "niceToHave": ["subtle material age variation", "secondary micro-surface breakup"],
+    "niceToHave": [
+      "subtle material age variation",
+      "secondary micro-surface breakup"
+    ],
     "fpsTarget": 60,
-    "reviewViewpoints": ["front", "side", "rear", "hero"]
+    "reviewViewpoints": [
+      "front",
+      "side",
+      "rear",
+      "hero"
+    ]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -487,7 +517,13 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -528,31 +564,58 @@
       "id": "layered-document-packet",
       "name": "Thin board-backed layered parchment packet",
       "tier": "critical",
-      "passIds": ["blockout", "form-refinement"],
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": ["order-root", "parchment-stack", "page-edges"],
-      "evidenceRefs": ["hero", "front"]
+      "componentRefs": [
+        "order-root",
+        "parchment-stack",
+        "page-edges"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ]
     },
     {
       "id": "teal-binding-system",
       "name": "Reference-accurate teal binding band",
       "tier": "critical",
-      "passIds": ["structural-pass", "material-pass"],
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": ["binding-band"],
-      "evidenceRefs": ["hero", "side"]
+      "componentRefs": [
+        "binding-band"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ]
     },
     {
       "id": "wax-and-ink-marks",
       "name": "Offset red wax seal and three ink lines",
       "tier": "important",
-      "passIds": ["structural-pass", "material-pass"],
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
       "minimumScore": 0.72,
       "mustPass": false,
-      "componentRefs": ["wax-seal", "ink-lines"],
-      "evidenceRefs": ["hero", "rear"]
+      "componentRefs": [
+        "wax-seal",
+        "ink-lines"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rear"
+      ]
     }
   ],
   "sculptPipeline": {
@@ -660,9 +723,20 @@
       "thickness:width about 0.24:1 after gameplay normalization"
     ],
     "symmetry": "Board and binding are centered; wax seal and ink lines are offset.",
-    "dominantCurves": ["slightly curled page corners", "round wax seal"],
-    "negativeSpaces": ["thin separations between leaf edges", "small exposed backing border"],
-    "landmarks": ["parchment stack", "teal binding", "red wax seal", "three dark text lines"]
+    "dominantCurves": [
+      "slightly curled page corners",
+      "round wax seal"
+    ],
+    "negativeSpaces": [
+      "thin separations between leaf edges",
+      "small exposed backing border"
+    ],
+    "landmarks": [
+      "parchment stack",
+      "teal binding",
+      "red wax seal",
+      "three dark text lines"
+    ]
   },
   "viewEvidence": [
     {
@@ -692,7 +766,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["teal binding"],
+      "observations": [
+        "teal binding"
+      ],
       "confidence": 0.9
     },
     {
@@ -706,7 +782,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["red wax seal"],
+      "observations": [
+        "red wax seal"
+      ],
       "confidence": 0.9
     },
     {
@@ -720,7 +798,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["three dark text lines"],
+      "observations": [
+        "three dark text lines"
+      ],
       "confidence": 0.9
     }
   ],
@@ -735,7 +815,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Rigid board-backed packet footprint is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "order-binding",
-      "materialLayers": ["order-binding"],
+      "materialLayers": [
+        "order-binding"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -744,9 +826,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -769,14 +863,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["exposed-backboard-border", "thin-grounded-profile"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "exposed-backboard-border",
+        "thin-grounded-profile"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "root",
         "pivot": {
           "mode": "floor-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -813,7 +921,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Five layered parchment leaves is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "order-parchment",
-      "materialLayers": ["order-parchment"],
+      "materialLayers": [
+        "order-parchment"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -822,9 +932,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -847,14 +969,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["layered-page-edges", "irregular-page-corners"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "layered-page-edges",
+        "irregular-page-corners"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -891,7 +1027,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Centered teal cloth binding is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "order-binding",
-      "materialLayers": ["order-binding"],
+      "materialLayers": [
+        "order-binding"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -900,9 +1038,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -925,14 +1075,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["teal-cross-band", "binding-fold-line"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "teal-cross-band",
+        "binding-fold-line"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -969,7 +1133,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Offset raised red wax seal is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "order-wax-ink",
-      "materialLayers": ["order-wax-ink"],
+      "materialLayers": [
+        "order-wax-ink"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -978,9 +1144,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1003,14 +1181,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["round-red-seal", "faceted-seal-impression"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "round-red-seal",
+        "faceted-seal-impression"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1047,7 +1239,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Three short dark text lines is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "order-wax-ink",
-      "materialLayers": ["order-wax-ink"],
+      "materialLayers": [
+        "order-wax-ink"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1056,9 +1250,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1081,14 +1287,27 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["three-ink-lines"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "three-ink-lines"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1125,7 +1344,9 @@
       "topologyClass": "conforming-shell",
       "topologyRationale": "Alternating exposed parchment leaf edges is visibly thin, layered over the supporting assembly, and must read from both face and edge views.",
       "material": "order-parchment",
-      "materialLayers": ["order-parchment"],
+      "materialLayers": [
+        "order-parchment"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1134,9 +1355,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1159,14 +1392,27 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["alternating-leaf-tones"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "alternating-leaf-tones"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1204,11 +1450,17 @@
       "color": "#d3be8c",
       "albedo": {
         "dominant": "#d3be8c",
-        "secondary": ["#523b29", "#765236"],
+        "secondary": [
+          "#523b29",
+          "#765236"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#d3be8c", "#523b29"],
+        "palette": [
+          "#d3be8c",
+          "#523b29"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1216,7 +1468,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1264,7 +1519,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1276,7 +1533,10 @@
         {
           "id": "page-edge-darkening",
           "description": "Observed local response for aged parchment leaves.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.7
         }
       ],
@@ -1294,11 +1554,17 @@
       "color": "#276a6f",
       "albedo": {
         "dominant": "#276a6f",
-        "secondary": ["#34383a", "#d3be8c"],
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#276a6f", "#d3be8c"],
+        "palette": [
+          "#276a6f",
+          "#d3be8c"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1306,7 +1572,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1354,7 +1623,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1366,7 +1637,10 @@
         {
           "id": "binding-fold-and-board-border",
           "description": "Observed local response for teal cloth binding and dark backboard.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.56
         }
       ],
@@ -1384,11 +1658,17 @@
       "color": "#a42632",
       "albedo": {
         "dominant": "#a42632",
-        "secondary": ["#34383a", "#d3be8c"],
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#a42632", "#d3be8c"],
+        "palette": [
+          "#a42632",
+          "#d3be8c"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1396,7 +1676,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1444,7 +1727,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1456,7 +1741,10 @@
         {
           "id": "wax-gloss-and-ink-lines",
           "description": "Observed local response for red wax seal and dark ink.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.22
         }
       ],
@@ -1955,7 +2243,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2023,7 +2313,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2090,7 +2382,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2157,7 +2451,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2224,7 +2520,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2291,7 +2589,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2358,7 +2658,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2400,7 +2702,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [

@@ -48,7 +48,11 @@
       "pitch": 0,
       "roll": 0
     },
-    "positionHint": [0, 0, 3],
+    "positionHint": [
+      0,
+      0,
+      3
+    ],
     "note": "For likeness work, solve the reference camera (forge/stage1_intake/solve_camera_pose.py) so the review render aligns with the photo and the reference can be projected. Confirm by overlay review."
   },
   "suitability": "pass",
@@ -70,8 +74,16 @@
         "deep roofed lintel",
         "horn and lantern skyline accents"
       ],
-      "structureKind": ["assembled timber portal", "iron-braced jambs", "shingled overhead cap"],
-      "motionPotential": ["static open gateway", "lantern sway", "banner flutter"],
+      "structureKind": [
+        "assembled timber portal",
+        "iron-braced jambs",
+        "shingled overhead cap"
+      ],
+      "motionPotential": [
+        "static open gateway",
+        "lantern sway",
+        "banner flutter"
+      ],
       "materialFamilies": [
         "dark timber",
         "teal shingles and banners",
@@ -107,7 +119,11 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -330,7 +346,9 @@
         "qualityCriteria": [
           "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model reads as a generic placeholder instead of the reference object",
           "major proportions are guessed without evidence"
@@ -343,7 +361,9 @@
         "qualityCriteria": [
           "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "large visible parts are merged into one mesh",
           "component hierarchy is too shallow for the observed complexity"
@@ -356,7 +376,9 @@
         "qualityCriteria": [
           "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "child part root floats away from the parent",
           "branch/limb/tube is centered in space instead of pivoting from its root",
@@ -372,7 +394,9 @@
           "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
           "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "surface looks like flat plastic",
           "local material variation is missing or not tied to image evidence"
@@ -388,7 +412,9 @@
           "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
           "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model has acceptable shape but reads as flat shaded or plastic",
           "colors are a generic average instead of reference-observed local color zones",
@@ -441,9 +467,17 @@
       "Deep teal roofed lintel",
       "Horn and fenlight crown cues"
     ],
-    "niceToHave": ["subtle material age variation", "secondary micro-surface breakup"],
+    "niceToHave": [
+      "subtle material age variation",
+      "secondary micro-surface breakup"
+    ],
     "fpsTarget": 60,
-    "reviewViewpoints": ["front", "side", "rear", "hero"]
+    "reviewViewpoints": [
+      "front",
+      "side",
+      "rear",
+      "hero"
+    ]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -483,7 +517,13 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -524,31 +564,57 @@
       "id": "open-gate-portal",
       "name": "Unobstructed monumental gate opening",
       "tier": "critical",
-      "passIds": ["blockout", "form-refinement"],
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": ["portal-root", "twin-jambs"],
-      "evidenceRefs": ["hero", "front"]
+      "componentRefs": [
+        "portal-root",
+        "twin-jambs"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ]
     },
     {
       "id": "teal-roofed-lintel",
       "name": "Deep teal roofed lintel",
       "tier": "critical",
-      "passIds": ["structural-pass", "material-pass"],
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": ["roofed-lintel"],
-      "evidenceRefs": ["hero", "side"]
+      "componentRefs": [
+        "roofed-lintel"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ]
     },
     {
       "id": "horn-lantern-crown",
       "name": "Horn and fenlight crown cues",
       "tier": "important",
-      "passIds": ["structural-pass", "material-pass"],
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
       "minimumScore": 0.72,
       "mustPass": false,
-      "componentRefs": ["horn-crown", "lantern-banners"],
-      "evidenceRefs": ["hero", "rear"]
+      "componentRefs": [
+        "horn-crown",
+        "lantern-banners"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rear"
+      ]
     }
   ],
   "sculptPipeline": {
@@ -651,11 +717,25 @@
   },
   "silhouette": {
     "boundingShape": "Two broad jambs support a teal-roofed lintel around a tall unobstructed lane.",
-    "aspectRatios": ["width:height about 1.5:1", "depth:width about 0.14:1"],
+    "aspectRatios": [
+      "width:height about 1.5:1",
+      "depth:width about 0.14:1"
+    ],
     "symmetry": "Portal mass is bilateral; horns, lanterns and hanging banners add controlled asymmetry.",
-    "dominantCurves": ["upturned roof shoulders", "curved horn profiles"],
-    "negativeSpaces": ["large central travel lane", "small gaps around hanging lanterns"],
-    "landmarks": ["twin jambs", "teal roof", "open lane", "horns and lanterns"]
+    "dominantCurves": [
+      "upturned roof shoulders",
+      "curved horn profiles"
+    ],
+    "negativeSpaces": [
+      "large central travel lane",
+      "small gaps around hanging lanterns"
+    ],
+    "landmarks": [
+      "twin jambs",
+      "teal roof",
+      "open lane",
+      "horns and lanterns"
+    ]
   },
   "viewEvidence": [
     {
@@ -685,7 +765,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["teal roof"],
+      "observations": [
+        "teal roof"
+      ],
       "confidence": 0.9
     },
     {
@@ -699,7 +781,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["open lane"],
+      "observations": [
+        "open lane"
+      ],
       "confidence": 0.9
     },
     {
@@ -713,7 +797,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["horns and lanterns"],
+      "observations": [
+        "horns and lanterns"
+      ],
       "confidence": 0.9
     }
   ],
@@ -728,7 +814,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Open gateway lane and grounded footprint is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "gate-timber",
-      "materialLayers": ["gate-timber"],
+      "materialLayers": [
+        "gate-timber"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -737,9 +825,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -762,14 +862,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["clear-travel-lane", "broad-ground-contact"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "clear-travel-lane",
+        "broad-ground-contact"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "root",
         "pivot": {
           "mode": "floor-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -806,7 +920,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Paired monumental timber jambs is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "gate-timber",
-      "materialLayers": ["gate-timber"],
+      "materialLayers": [
+        "gate-timber"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -815,9 +931,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -840,14 +968,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["tapered-jamb-pair", "stepped-jamb-feet"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "tapered-jamb-pair",
+        "stepped-jamb-feet"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -884,7 +1026,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Deep teal-shingled overhead lintel is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "teal-roof-cloth",
-      "materialLayers": ["teal-roof-cloth"],
+      "materialLayers": [
+        "teal-roof-cloth"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -893,9 +1037,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -918,14 +1074,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["upturned-roof-ends", "deep-lintel-shadow"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "upturned-roof-ends",
+        "deep-lintel-shadow"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -962,7 +1132,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Curved horn pair above the lintel is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "gate-metal-light",
-      "materialLayers": ["gate-metal-light"],
+      "materialLayers": [
+        "gate-metal-light"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -971,9 +1143,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -996,14 +1180,27 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["paired-gate-horns"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "paired-gate-horns"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1030,12 +1227,22 @@
       "attachment": {
         "parentId": "portal-root",
         "parentSocket": "surface-contact",
-        "localStart": [0, 0, 0],
-        "localEnd": [0, 1, 0],
+        "localStart": [
+          0,
+          0,
+          0
+        ],
+        "localEnd": [
+          0,
+          1,
+          0
+        ],
         "contactType": "embedded-overlap",
         "overlap": 0.03,
         "gapTolerance": 0.01,
-        "evidenceRefs": ["hero"]
+        "evidenceRefs": [
+          "hero"
+        ]
       },
       "importance": 0.85,
       "confidence": 0.86
@@ -1050,7 +1257,9 @@
       "topologyClass": "conforming-shell",
       "topologyRationale": "Hanging lantern and banner accents is visibly thin, layered over the supporting assembly, and must read from both face and edge views.",
       "material": "teal-roof-cloth",
-      "materialLayers": ["teal-roof-cloth"],
+      "materialLayers": [
+        "teal-roof-cloth"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1059,9 +1268,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1084,14 +1305,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["teal-lantern-pair", "hanging-banner-tabs"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "teal-lantern-pair",
+        "hanging-banner-tabs"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1128,7 +1363,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Iron straps and jamb foot plates is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "gate-metal-light",
-      "materialLayers": ["gate-metal-light"],
+      "materialLayers": [
+        "gate-metal-light"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1137,9 +1374,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1162,14 +1411,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["jamb-strap-lines", "foot-plate-fasteners"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "jamb-strap-lines",
+        "foot-plate-fasteners"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1207,11 +1470,17 @@
       "color": "#34271e",
       "albedo": {
         "dominant": "#34271e",
-        "secondary": ["#523b29", "#765236"],
+        "secondary": [
+          "#523b29",
+          "#765236"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#34271e", "#523b29"],
+        "palette": [
+          "#34271e",
+          "#523b29"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1219,7 +1488,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1267,7 +1539,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1279,7 +1553,10 @@
         {
           "id": "worn-jamb-edges",
           "description": "Observed local response for dark reinforced gate timber.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.72
         }
       ],
@@ -1297,11 +1574,17 @@
       "color": "#176269",
       "albedo": {
         "dominant": "#176269",
-        "secondary": ["#34383a", "#d3be8c"],
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#176269", "#d3be8c"],
+        "palette": [
+          "#176269",
+          "#d3be8c"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1309,7 +1592,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1357,7 +1643,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1369,7 +1657,10 @@
         {
           "id": "roof-edge-and-banner-fade",
           "description": "Observed local response for teal shingles and hanging banners.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.58
         }
       ],
@@ -1387,11 +1678,17 @@
       "color": "#34383a",
       "albedo": {
         "dominant": "#34383a",
-        "secondary": ["#34383a", "#d3be8c"],
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#34383a", "#d3be8c"],
+        "palette": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1399,7 +1696,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1447,7 +1747,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1459,7 +1761,10 @@
         {
           "id": "brass-horn-and-teal-glow",
           "description": "Observed local response for iron straps brass horns and fenlight.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.22
         }
       ],
@@ -1949,7 +2254,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2017,7 +2324,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2084,7 +2393,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2151,7 +2462,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2218,7 +2531,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2285,7 +2600,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2352,7 +2669,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2394,7 +2713,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [

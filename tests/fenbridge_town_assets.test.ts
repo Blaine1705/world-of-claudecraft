@@ -769,7 +769,7 @@ describe('Fenbridge shipping asset family', () => {
       FENBRIDGE_LAYOUT.services.bank.teller.position,
     );
     expect(FENBRIDGE_LAYOUT.services.bank.teller.standingPoint).toEqual(
-      localToWorld(bankBuilding.position, bankBuilding.rotation, -2.2, 4.75),
+      localToWorld(bankBuilding.position, bankBuilding.rotation, -1.25, 4.75),
     );
     const bankContract = FENBRIDGE_TOWN_CONTRACTS.gilded_strongbox;
     expect(bankContract.sockets.find((socket) => socket.id === 'front-entry')?.position).toEqual([

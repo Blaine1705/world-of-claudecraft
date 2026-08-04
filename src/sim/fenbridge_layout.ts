@@ -436,100 +436,101 @@ function makeBuilding(
   };
 }
 
-// Site plan: wider civic ring in the wedges BETWEEN the four road corridors so
-// service aprons stay clear of pathfinding centerlines. Every lot faces the
-// cistern (rotation = facingToward(lot, CIVIC_CENTER)).
+// Canonical site plan (master-plan.md). Every lot faces the cistern so the
+// building front (+Z) and Eastbrook-style greeter facing open onto the square.
+// Rotations are facingToward(lot, CIVIC_CENTER), then literal-pinned by tests.
 const GATEHOUSE = makeBuilding(
   'fenbridge_warden_gatehouse',
   '/models/props/fenbridge_warden_gatehouse.glb',
   'house',
-  { x: 16.1, z: 283.8 },
+  { x: 9, z: 282 },
   7.8,
   10.5,
   7,
-  facingToward({ x: 16.1, z: 283.8 }, CIVIC_CENTER),
+  facingToward({ x: 9, z: 282 }, CIVIC_CENTER),
 );
 const INN_BASE = makeBuilding(
   'fenbridge_crooked_reed_inn',
   '/models/props/fenbridge_crooked_reed_inn.glb',
   'inn',
-  { x: -24.4, z: 300.4 },
+  { x: -7, z: 310 },
   9,
   8.8,
   8,
-  facingToward({ x: -24.4, z: 300.4 }, CIVIC_CENTER),
+  facingToward({ x: -7, z: 310 }, CIVIC_CENTER),
   -2.8,
 );
 const CHAPEL_BASE = makeBuilding(
   'fenbridge_lantern_chapel',
   '/models/props/fenbridge_lantern_chapel.glb',
   'chapel',
-  // Clear of preserved graveyard at (-18, 286) and inside the palisade ring.
-  { x: -21.4, z: 291.1 },
+  { x: -19.5, z: 294 },
   7,
   8.6,
   7,
-  facingToward({ x: -21.4, z: 291.1 }, CIVIC_CENTER),
+  facingToward({ x: -19.5, z: 294 }, CIVIC_CENTER),
 );
 const APOTHECARY = makeBuilding(
   'fenbridge_moonwort_apothecary',
   '/models/props/fenbridge_moonwort_apothecary.glb',
   'house',
-  { x: 22.3, z: 289.6 },
+  { x: 17.8, z: 291.5 },
   7,
   7.2,
   6,
-  facingToward({ x: 22.3, z: 289.6 }, CIVIC_CENTER),
+  facingToward({ x: 17.8, z: 291.5 }, CIVIC_CENTER),
 );
 const BANK_BASE = makeBuilding(
   'fenbridge_gilded_strongbox',
   '/models/props/fenbridge_gilded_strongbox.glb',
   'house',
-  { x: 21.1, z: 309.1 },
+  { x: 19.2, z: 309.5 },
   7.5,
   7.4,
   6.5,
-  facingToward({ x: 21.1, z: 309.1 }, CIVIC_CENTER),
+  facingToward({ x: 19.2, z: 309.5 }, CIVIC_CENTER),
+  // Matches the GLB front-entry socket local x = 1.75.
   1.75,
 );
 const TANNERY_BASE = makeBuilding(
   'fenbridge_hesk_tannery',
   '/models/props/fenbridge_hesk_tannery.glb',
   'house',
-  // Craft bay framed so the preserved station (-13, 314) sits on the open apron.
-  { x: -11.4, z: 320.6 },
+  // Open craft bay faces the square; preserved station sits on the apron.
+  { x: -16, z: 318 },
   12,
   7.2,
   7,
-  facingToward({ x: -11.4, z: 320.6 }, CIVIC_CENTER),
+  facingToward({ x: -16, z: 318 }, CIVIC_CENTER),
 );
 const SCOUT_LODGE = makeBuilding(
   'fenbridge_scout_lodge',
   '/models/props/fenbridge_scout_lodge.glb',
   'house',
-  // West of the north road so the connector stays clear of wood_mirefen_1.
-  { x: -2.1, z: 326.9 },
+  // East of the north road so wood_mirefen_1 at (10, 330) stays clear.
+  { x: 3, z: 325 },
   8,
   7.6,
   6.5,
-  facingToward({ x: -2.1, z: 326.9 }, CIVIC_CENTER),
+  facingToward({ x: 3, z: 325 }, CIVIC_CENTER),
 );
 
-// Stall on the SW square approach (clear of roads, inn mass, and cistern).
-const PROVISION_STALL_POSITION = { x: -5, z: 297 } as const;
+// Market stall on the inn side of the square. +Z faces the civic center
+// (customer approach); vendor stands on the -Z service side looking +Z.
+const PROVISION_STALL_POSITION = { x: -3.5, z: 306.5 } as const;
 const PROVISION_STALL_ROTATION = facingToward(PROVISION_STALL_POSITION, CIVIC_CENTER);
 const PROVISION_STALL_WIDTH = 3.2;
 const PROVISION_STALL_DEPTH = 1.6;
-// South-gate apron, facing the causeway so orders read before the square.
-const MUSTER_BOARD_POSITION = { x: -4.5, z: 276.5 } as const;
-const MUSTER_BOARD_ROTATION = facingToward(MUSTER_BOARD_POSITION, { x: 0, z: 266 });
-// Stand beside the stall (not buried in the OBB) so pathfinding can reach
-// the vendor from the square. Faces the counter from the left vendor bay.
+// Inner south-gate apron, board facing the square (readable on approach).
+const MUSTER_BOARD_POSITION = { x: -6, z: 278 } as const;
+const MUSTER_BOARD_ROTATION = facingToward(MUSTER_BOARD_POSITION, CIVIC_CENTER);
+// Stand to the vendor's left of the counter, clear of the stall OBB so
+// pathfinding can reach them (Eastbrook-style service apron, not inside mesh).
 const PROVISION_STALL_VENDOR_POINT = localToWorld(
   PROVISION_STALL_POSITION,
   PROVISION_STALL_ROTATION,
-  -(PROVISION_STALL_WIDTH / 2 + 0.85),
-  0,
+  -(PROVISION_STALL_WIDTH / 2 + 0.9),
+  0.15,
 );
 
 const INN = {
@@ -545,11 +546,11 @@ const INN = {
   },
 };
 
-// Archive apron: left of the chapel front, clear of the shell and graveyard.
+// Archive apron: left of the door on the clear front (not pressed into the wall).
 const CHAPEL_ARCHIVE_STANDING_POINT = localToWorld(
   CHAPEL_BASE.position,
   CHAPEL_BASE.rotation,
-  -2.6,
+  -2.4,
   CHAPEL_BASE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
 );
 const CHAPEL = {
@@ -558,23 +559,21 @@ const CHAPEL = {
     ...CHAPEL_BASE.sockets,
     archive: {
       id: 'fenbridge_lantern_chapel_archive',
-      localPosition: { x: -CHAPEL_BASE.nativeDimensions.width / 2, z: 0 },
+      localPosition: { x: -2.4, z: CHAPEL_BASE.nativeDimensions.depth / 2 },
       position: localToWorld(
         CHAPEL_BASE.position,
         CHAPEL_BASE.rotation,
-        -CHAPEL_BASE.nativeDimensions.width / 2,
-        0,
+        -2.4,
+        CHAPEL_BASE.nativeDimensions.depth / 2,
       ),
       standingPoint: CHAPEL_ARCHIVE_STANDING_POINT,
     },
   },
 };
 
+// Teller counter on the bank face; Petra stands on the apron in front of it
+// (Eastbrook bursar style: front apron + building rotation into the square).
 const BANK_TELLER_LOCAL_X = -1.25;
-// Petra stands one body-width to the teller counter's left. That keeps the
-// solid banker chest clear of the separate public entrance while still
-// reading as the same exterior counter service.
-const BANK_TELLER_STANDING_LOCAL_X = -2.2;
 const BANK_TELLER_POSITION = localToWorld(
   BANK_BASE.position,
   BANK_BASE.rotation,
@@ -584,13 +583,21 @@ const BANK_TELLER_POSITION = localToWorld(
 const BANK_TELLER_STANDING_POINT = localToWorld(
   BANK_BASE.position,
   BANK_BASE.rotation,
-  BANK_TELLER_STANDING_LOCAL_X,
+  BANK_TELLER_LOCAL_X,
   BANK_BASE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
 );
 const BANK = {
   ...BANK_BASE,
+  // Pathfinding apron: teller bay is clear; the door-bay stand collides with
+  // the west-road sample at 1.5 yd. Socket local x stays 1.75 for GLB parity.
+  frontStandingPoint: BANK_TELLER_STANDING_POINT,
   sockets: {
     ...BANK_BASE.sockets,
+    entrance: {
+      ...BANK_BASE.sockets.entrance,
+      // Keep localPosition from makeBuilding (1.75); only the world stand moves.
+      standingPoint: BANK_TELLER_STANDING_POINT,
+    },
     teller: {
       id: 'fenbridge_gilded_strongbox_teller',
       localPosition: {
@@ -603,7 +610,7 @@ const BANK = {
   },
 };
 
-// Preserved profession station coordinates (master plan + content pins).
+// Preserved profession station + master pairing (1 to 3 yd).
 const TANNERY_STATION_POSITION = { x: -13, z: 314 } as const;
 const TANNER_POSITION = { x: -11, z: 315.5 } as const;
 const TANNERY = {
@@ -779,9 +786,8 @@ const ROADS = [
 
 /**
  * Ground-seated boardwalk modules (long axis = local X, joins at ±2).
- * Laid as continuous paths: south causeway spine, then NW (inn/tannery) and
- * SE (bank/apothecary) spurs that actually connect buildings instead of
- * floating as random planks.
+ * Continuous paths from the south gate into the square, then short spurs
+ * toward the inn/chapel (west) and bank/apothecary (east) aprons.
  */
 function boardwalkModulesAlong(
   points: readonly Point2[],
@@ -809,20 +815,20 @@ function boardwalkModulesAlong(
 }
 
 const BOARDWALK_PATHS: readonly (readonly Point2[])[] = [
-  // South gate apron up the causeway into the square (6 modules).
+  // South gate -> square (6 modules along the causeway).
   [
     { x: 0, z: 274 },
     { x: 0, z: 298 },
   ],
-  // West spur toward the inn / chapel approach (3 modules).
+  // West spur to the inn / chapel approach (3 modules).
   [
-    { x: -2, z: 301 },
-    { x: -14, z: 301 },
+    { x: -2, z: 302 },
+    { x: -14, z: 308 },
   ],
-  // East spur toward the bank / apothecary approach (3 modules).
+  // East spur to the bank / apothecary approach (3 modules).
   [
-    { x: 2, z: 301 },
-    { x: 14, z: 301 },
+    { x: 2, z: 302 },
+    { x: 14, z: 300 },
   ],
 ];
 
@@ -861,19 +867,20 @@ function makeNpc(id: string, position: Point2, facing: number, anchorId: string)
   return { id, position, facing, anchorId, bodyRadius: 0.6 };
 }
 
-// Gatehouse guard apron: offset left of the door, clear of the building mass.
+// Eastbrook pattern: greeters on the front apron face with the building
+// (into the square). Gate guard faces arrivals; tanner faces the station.
 const WARDEN_POSITION = localToWorld(
   GATEHOUSE.position,
   GATEHOUSE.rotation,
-  -2.6,
-  GATEHOUSE.nativeDimensions.depth / 2 + FRONT_CLEARANCE + 0.1,
+  -2.4,
+  GATEHOUSE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
 );
-// Scout map lean-to: slightly right of the door on the clear front apron.
+// Map lean-to: right front of the scout lodge (north lot, not the tannery).
 const SCOUT_MAP_POSITION = localToWorld(
   SCOUT_LODGE.position,
   SCOUT_LODGE.rotation,
-  1.8,
-  SCOUT_LODGE.nativeDimensions.depth / 2 + FRONT_CLEARANCE + 0.2,
+  2.2,
+  SCOUT_LODGE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
 );
 const NPCS = [
   makeNpc(
@@ -882,31 +889,29 @@ const NPCS = [
     facingToward(WARDEN_POSITION, { x: 0, z: 266 }),
     GATEHOUSE.id,
   ),
-  // Entrance greeters face the square (building +Z faces civic center).
   makeNpc('brother_aldric_fen', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
+  // Eastbrook merchant: stand on the customer face, face with the stall.
   makeNpc(
     'provisioner_hale',
     PROVISION_STALL_VENDOR_POINT,
-    // Face the counter / customer side of the stall.
-    facingToward(PROVISION_STALL_VENDOR_POINT, PROVISION_STALL_POSITION),
+    PROVISION_STALL_ROTATION,
     'fenbridge_provision_stall',
   ),
   makeNpc('herbalist_yara', APOTHECARY.frontStandingPoint, APOTHECARY.rotation, APOTHECARY.id),
   makeNpc('scout_maren', SCOUT_MAP_POSITION, SCOUT_LODGE.rotation, SCOUT_LODGE.id),
+  // Eastbrook bursar: bank front apron, face into the square.
   makeNpc(
     'bursar_petra_vell',
     BANK.sockets.teller.standingPoint,
-    // Face the teller counter (toward the bank face), not the rear wall.
-    facingToward(BANK.sockets.teller.standingPoint, BANK.sockets.teller.position),
+    BANK.rotation,
     BANK.sockets.teller.id,
   ),
   makeNpc(
     'chronicler_osric_fenn',
     CHAPEL_ARCHIVE_STANDING_POINT,
-    facingToward(CHAPEL_ARCHIVE_STANDING_POINT, CHAPEL.position),
+    CHAPEL.rotation,
     'fenbridge_lantern_chapel_archive',
   ),
-  // Preserved tannery station pairing: 2.5 yd from station on the open apron.
   makeNpc(
     'tanner_hesk',
     TANNER_POSITION,

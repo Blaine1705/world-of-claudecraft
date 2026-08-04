@@ -48,7 +48,11 @@
       "pitch": 0,
       "roll": 0
     },
-    "positionHint": [0, 0, 3],
+    "positionHint": [
+      0,
+      0,
+      3
+    ],
     "note": "For likeness work, solve the reference camera (forge/stage1_intake/solve_camera_pose.py) so the review render aligns with the photo and the reference can be projected. Confirm by overlay review."
   },
   "suitability": "pass",
@@ -65,14 +69,26 @@
     "objectClass": {
       "primaryType": "modular marsh timber boardwalk span",
       "primaryDomain": "object",
-      "formLanguage": ["long parallel plank deck", "low irregular rail posts", "rope-bound edges"],
-      "structureKind": ["repeated plank deck", "cross-bearer support", "low rope guard"],
+      "formLanguage": [
+        "long parallel plank deck",
+        "low irregular rail posts",
+        "rope-bound edges"
+      ],
+      "structureKind": [
+        "repeated plank deck",
+        "cross-bearer support",
+        "low rope guard"
+      ],
       "motionPotential": [
         "static walkable module",
         "repeatable path segment",
         "rope secondary motion"
       ],
-      "materialFamilies": ["raw weathered boards", "dark rope and iron", "moss and damp staining"],
+      "materialFamilies": [
+        "raw weathered boards",
+        "dark rope and iron",
+        "moss and damp staining"
+      ],
       "notes": "Classified from the four labeled turnaround quadrants; no character anatomy applies."
     },
     "complexity": {
@@ -101,7 +117,11 @@
     },
     "specDepthDecision": {
       "requiredDepth": "moderate",
-      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -324,7 +344,9 @@
         "qualityCriteria": [
           "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model reads as a generic placeholder instead of the reference object",
           "major proportions are guessed without evidence"
@@ -337,7 +359,9 @@
         "qualityCriteria": [
           "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "large visible parts are merged into one mesh",
           "component hierarchy is too shallow for the observed complexity"
@@ -350,7 +374,9 @@
         "qualityCriteria": [
           "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "child part root floats away from the parent",
           "branch/limb/tube is centered in space instead of pivoting from its root",
@@ -366,7 +392,9 @@
           "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
           "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "surface looks like flat plastic",
           "local material variation is missing or not tied to image evidence"
@@ -382,7 +410,9 @@
           "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
           "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model has acceptable shape but reads as flat shaded or plastic",
           "colors are a generic average instead of reference-observed local color zones",
@@ -435,9 +465,17 @@
       "Sparse posts with low sagging ropes",
       "Damp timber and moss edge cues"
     ],
-    "niceToHave": ["subtle material age variation", "secondary micro-surface breakup"],
+    "niceToHave": [
+      "subtle material age variation",
+      "secondary micro-surface breakup"
+    ],
     "fpsTarget": 60,
-    "reviewViewpoints": ["front", "side", "rear", "hero"]
+    "reviewViewpoints": [
+      "front",
+      "side",
+      "rear",
+      "hero"
+    ]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -477,7 +515,13 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "allowedActions": [
+      "continue",
+      "refine-spec",
+      "refine-code",
+      "request-input",
+      "stop"
+    ],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -518,31 +562,58 @@
       "id": "parallel-plank-span",
       "name": "Long low parallel plank span",
       "tier": "critical",
-      "passIds": ["blockout", "form-refinement"],
+      "passIds": [
+        "blockout",
+        "form-refinement"
+      ],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": ["walk-root", "plank-deck"],
-      "evidenceRefs": ["hero", "front"]
+      "componentRefs": [
+        "walk-root",
+        "plank-deck"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ]
     },
     {
       "id": "low-rope-edges",
       "name": "Sparse posts with low sagging ropes",
       "tier": "critical",
-      "passIds": ["structural-pass", "material-pass"],
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": ["edge-posts", "rope-guards"],
-      "evidenceRefs": ["hero", "side"]
+      "componentRefs": [
+        "edge-posts",
+        "rope-guards"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ]
     },
     {
       "id": "marsh-weathering",
       "name": "Damp timber and moss edge cues",
       "tier": "important",
-      "passIds": ["structural-pass", "material-pass"],
+      "passIds": [
+        "structural-pass",
+        "material-pass"
+      ],
       "minimumScore": 0.72,
       "mustPass": false,
-      "componentRefs": ["cross-bearers", "moss-clumps"],
-      "evidenceRefs": ["hero", "rear"]
+      "componentRefs": [
+        "cross-bearers",
+        "moss-clumps"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "rear"
+      ]
     }
   ],
   "sculptPipeline": {
@@ -645,11 +716,25 @@
   },
   "silhouette": {
     "boundingShape": "A very low long plank deck with sparse short posts and rope edges.",
-    "aspectRatios": ["length:width about 2.85:1", "height:length about 0.04:1"],
+    "aspectRatios": [
+      "length:width about 2.85:1",
+      "height:length about 0.04:1"
+    ],
     "symmetry": "Deck span is regular; edge posts and moss are uneven.",
-    "dominantCurves": ["slight rope sags", "subtle uneven plank edge"],
-    "negativeSpaces": ["thin gaps between planks", "open sides below the low ropes"],
-    "landmarks": ["parallel planks", "low posts", "rope edges", "mossy corners"]
+    "dominantCurves": [
+      "slight rope sags",
+      "subtle uneven plank edge"
+    ],
+    "negativeSpaces": [
+      "thin gaps between planks",
+      "open sides below the low ropes"
+    ],
+    "landmarks": [
+      "parallel planks",
+      "low posts",
+      "rope edges",
+      "mossy corners"
+    ]
   },
   "viewEvidence": [
     {
@@ -663,7 +748,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["A very low long plank deck with sparse short posts and rope edges."],
+      "observations": [
+        "A very low long plank deck with sparse short posts and rope edges."
+      ],
       "confidence": 0.9
     },
     {
@@ -677,7 +764,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["low posts"],
+      "observations": [
+        "low posts"
+      ],
       "confidence": 0.9
     },
     {
@@ -691,7 +780,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["rope edges"],
+      "observations": [
+        "rope edges"
+      ],
       "confidence": 0.9
     },
     {
@@ -705,7 +796,9 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": ["mossy corners"],
+      "observations": [
+        "mossy corners"
+      ],
       "confidence": 0.9
     }
   ],
@@ -720,7 +813,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Grounded walkable span is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "boardwalk-timber",
-      "materialLayers": ["boardwalk-timber"],
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -729,9 +824,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -754,14 +861,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["low-profile-baseline", "walkable-clear-width"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "low-profile-baseline",
+        "walkable-clear-width"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "root",
         "pivot": {
           "mode": "floor-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -798,7 +919,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Parallel uneven deck boards is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "boardwalk-timber",
-      "materialLayers": ["boardwalk-timber"],
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -807,9 +930,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -832,14 +967,28 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["parallel-plank-rhythm", "uneven-plank-ends"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "parallel-plank-rhythm",
+        "uneven-plank-ends"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -876,7 +1025,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Transverse underside bearers is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "boardwalk-timber",
-      "materialLayers": ["boardwalk-timber"],
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -885,9 +1036,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -910,14 +1073,27 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["under-deck-crossbars"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "under-deck-crossbars"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -954,7 +1130,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Short irregular edge posts is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "boardwalk-timber",
-      "materialLayers": ["boardwalk-timber"],
+      "materialLayers": [
+        "boardwalk-timber"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -963,9 +1141,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -988,14 +1178,27 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["sparse-post-pairs"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "sparse-post-pairs"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1032,7 +1235,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Low sagging rope edge lines is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "rope-iron",
-      "materialLayers": ["rope-iron"],
+      "materialLayers": [
+        "rope-iron"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1041,9 +1246,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1066,14 +1283,27 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["left-and-right-rope-sags"],
-      "evidenceRefs": ["hero", "front"],
+      "localFeatures": [
+        "left-and-right-rope-sags"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "front"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1100,12 +1330,22 @@
       "attachment": {
         "parentId": "walk-root",
         "parentSocket": "surface-contact",
-        "localStart": [0, 0, 0],
-        "localEnd": [0, 1, 0],
+        "localStart": [
+          0,
+          0,
+          0
+        ],
+        "localEnd": [
+          0,
+          1,
+          0
+        ],
         "contactType": "embedded-overlap",
         "overlap": 0.03,
         "gapTolerance": 0.01,
-        "evidenceRefs": ["hero"]
+        "evidenceRefs": [
+          "hero"
+        ]
       },
       "importance": 0.85,
       "confidence": 0.86
@@ -1120,7 +1360,9 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Moss at damp deck corners is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "boardwalk-moss",
-      "materialLayers": ["boardwalk-moss"],
+      "materialLayers": [
+        "boardwalk-moss"
+      ],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1129,9 +1371,21 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [0, 0, 0],
-        "rotation": [0, 0, 0],
-        "scale": [1, 1, 1]
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1154,14 +1408,27 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": ["asymmetric-moss-corners"],
-      "evidenceRefs": ["hero", "side"],
+      "localFeatures": [
+        "asymmetric-moss-corners"
+      ],
+      "evidenceRefs": [
+        "hero",
+        "side"
+      ],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [0, 0, 0],
-          "axis": [0, 1, 0],
+          "localPosition": [
+            0,
+            0,
+            0
+          ],
+          "axis": [
+            0,
+            1,
+            0
+          ],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1199,11 +1466,17 @@
       "color": "#765236",
       "albedo": {
         "dominant": "#765236",
-        "secondary": ["#523b29", "#765236"],
+        "secondary": [
+          "#523b29",
+          "#765236"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#765236", "#523b29"],
+        "palette": [
+          "#765236",
+          "#523b29"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1211,7 +1484,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1259,7 +1535,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1271,7 +1549,10 @@
         {
           "id": "wet-end-grain-and-plank-variation",
           "description": "Observed local response for damp raw board timber.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.8
         }
       ],
@@ -1289,11 +1570,17 @@
       "color": "#34383a",
       "albedo": {
         "dominant": "#34383a",
-        "secondary": ["#34383a", "#d3be8c"],
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#34383a", "#d3be8c"],
+        "palette": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1301,7 +1588,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1349,7 +1639,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1361,7 +1653,10 @@
         {
           "id": "rope-fiber-and-pin-glints",
           "description": "Observed local response for dark rope and iron pins.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.22
         }
       ],
@@ -1379,11 +1674,17 @@
       "color": "#43563b",
       "albedo": {
         "dominant": "#43563b",
-        "secondary": ["#34383a", "#d3be8c"],
+        "secondary": [
+          "#34383a",
+          "#d3be8c"
+        ],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": ["#43563b", "#d3be8c"],
+        "palette": [
+          "#43563b",
+          "#d3be8c"
+        ],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1391,7 +1692,10 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [1, 1],
+        "repeat": [
+          1,
+          1
+        ],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1439,7 +1743,9 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": ["short direction-following marks"],
+        "scratches": [
+          "short direction-following marks"
+        ],
         "chips": []
       },
       "dirt": {
@@ -1451,7 +1757,10 @@
         {
           "id": "moss-edge-clumps",
           "description": "Observed local response for marsh moss accumulations.",
-          "evidenceRefs": ["hero", "front"],
+          "evidenceRefs": [
+            "hero",
+            "front"
+          ],
           "roughness": 0.86
         }
       ],
@@ -1950,7 +2259,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2018,7 +2329,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2085,7 +2398,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2152,7 +2467,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2219,7 +2536,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2286,7 +2605,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2353,7 +2674,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2395,7 +2718,9 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
+      "mismatches": [
+        "No blocking mismatch remains in the accepted stylized target"
+      ],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [

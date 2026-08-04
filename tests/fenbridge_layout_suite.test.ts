@@ -108,13 +108,13 @@ describe('Fenbridge canonical pure layout', () => {
     );
     // Explicit lot anchors (readable site-plan pin).
     expect(FENBRIDGE_LAYOUT.buildings.map((b) => [b.id, b.position.x, b.position.z])).toEqual([
-      ['fenbridge_warden_gatehouse', 16.1, 283.8],
-      ['fenbridge_crooked_reed_inn', -24.4, 300.4],
-      ['fenbridge_lantern_chapel', -21.4, 291.1],
-      ['fenbridge_moonwort_apothecary', 22.3, 289.6],
-      ['fenbridge_gilded_strongbox', 21.1, 309.1],
-      ['fenbridge_hesk_tannery', -11.4, 320.6],
-      ['fenbridge_scout_lodge', -2.1, 326.9],
+      ['fenbridge_warden_gatehouse', 9, 282],
+      ['fenbridge_crooked_reed_inn', -7, 310],
+      ['fenbridge_lantern_chapel', -19.5, 294],
+      ['fenbridge_moonwort_apothecary', 17.8, 291.5],
+      ['fenbridge_gilded_strongbox', 19.2, 309.5],
+      ['fenbridge_hesk_tannery', -16, 318],
+      ['fenbridge_scout_lodge', 3, 325],
     ]);
 
     for (let left = 0; left < FENBRIDGE_LAYOUT.buildings.length; left++) {
@@ -162,12 +162,12 @@ describe('Fenbridge canonical pure layout', () => {
     expect(FENBRIDGE_LAYOUT.civic.provisionStall).toMatchObject({
       id: 'fenbridge_provision_stall',
       assetId: '/models/props/fenbridge_provision_stall.glb',
-      position: { x: -5, z: 297 },
+      position: { x: -3.5, z: 306.5 },
     });
     expect(FENBRIDGE_LAYOUT.civic.musterBoard).toMatchObject({
       id: 'fenbridge_muster_board',
       assetId: '/models/props/fenbridge_muster_board.glb',
-      position: { x: -4.5, z: 276.5 },
+      position: { x: -6, z: 278 },
     });
     expect(FENBRIDGE_LAYOUT.repeated.boardwalks).toHaveLength(12);
     // Continuous paths: south spine + west/east spurs (not scattered planks).
@@ -669,8 +669,8 @@ describe('Fenbridge content projection and preservation', () => {
       {
         id: 'fenbridge_muster_board',
         assetId: '/models/props/fenbridge_muster_board.glb',
-        x: -4.5,
-        z: 276.5,
+        x: -6,
+        z: 278,
         rotation: FENBRIDGE_LAYOUT.civic.musterBoard.rotation,
         width: 2.4,
         depth: 0.6,

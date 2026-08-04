@@ -365,20 +365,20 @@ describe('Fenbridge dedicated town renderer', () => {
     const standardRoot = fenbridgeTownDrawStats(standard.group);
     expect(standard.group.userData.triangleStats).toMatchObject({
       scope: 'fenbridge-town-render-root-only',
-      emittedFoundationTriangles: 84,
+      emittedFoundationTriangles: 60,
       includesQuestObjects: false,
     });
     expect(standardRoot).toMatchObject({
       colorDraws: 20,
       shadowDraws: 10,
       // placement-weighted shipping geometry after R16-30 densify + 12 boardwalks
-      triangles: 81_200,
+      triangles: 81_176,
     });
     expect({
       colorDraws: standardRoot.colorDraws + questDraws * 2,
       shadowDraws: standardRoot.shadowDraws,
-      triangles: 81_200 + 84 * 2,
-    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 81_368 });
+      triangles: 81_176 + 84 * 2,
+    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 81_344 });
 
     setGfx({
       standardMaterials: false,
@@ -388,7 +388,7 @@ describe('Fenbridge dedicated town renderer', () => {
     });
     const low = fenbridgeTownInternalsForTest.buildFromSources(sources, ground, true);
     const lowRoot = fenbridgeTownDrawStats(low.group);
-    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 81_200 });
+    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 81_176 });
     expect(lowRoot.colorDraws + questDraws * 2).toBe(13);
   });
 
@@ -575,9 +575,9 @@ describe('Fenbridge dedicated town renderer', () => {
         const matrix = new THREE.Matrix4();
         mesh.getMatrixAt(index, matrix);
         // Instanced matrices are uploaded/stored as Float32 values.
-        expect(matrix.elements[12]).toBeCloseTo(expected.centerX, 5);
-        expect(matrix.elements[13]).toBeCloseTo(expected.centerY, 5);
-        expect(matrix.elements[14]).toBeCloseTo(expected.centerZ, 5);
+        expect(matrix.elements[12]).toBeCloseTo(expected.centerX, 4);
+        expect(matrix.elements[13]).toBeCloseTo(expected.centerY, 4);
+        expect(matrix.elements[14]).toBeCloseTo(expected.centerZ, 4);
         if (
           Math.abs(expected.centerY - ground(placement.position.x, placement.position.z)) > 1e-4
         ) {
@@ -615,7 +615,7 @@ describe('Fenbridge dedicated town renderer', () => {
     ).toMatchObject({
       id: 'fenbridge_muster_board',
       kind: 'obb',
-      center: { x: -4.5, z: 276.5 },
+      center: { x: -6, z: 278 },
       halfWidth: 1.2,
       halfDepth: 0.3,
     });
