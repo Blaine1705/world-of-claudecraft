@@ -177,6 +177,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
+import { refusedWhileDead } from './dead_gate';
 import * as deedsMod from './deeds';
 import {
   createDeedRuntime,
@@ -430,6 +431,7 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
+import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
@@ -2879,6 +2881,10 @@ export class Sim {
         // tick op dereferences QUESTS[qp.questId].objectives and TypeErrors inside
         // the server tick (quest_credit.ts + interactNpcForQuests). questsDone is
         // membership-only (never dereferenced), so it is preserved as history below.
+        // Untrusted JSONB: normalize on load. Absent on any save written before
+        // the per-object interact ledger existed, which grants that player their
+        // remaining interacts rather than dead-ending a part-way-done quest.
+        const creditedObjects = sanitizeCreditedObjects(q.creditedObjects);
         if (q.state !== 'done' && QUESTS[q.questId])
           meta.questLog.set(q.questId, {
             questId: q.questId,
@@ -2886,6 +2892,7 @@ export class Sim {
             state: q.state,
             ...(q.selection === undefined ? {} : { selection: q.selection }),
             ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+            ...(creditedObjects === undefined ? {} : { creditedObjects }),
           });
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
@@ -3652,6 +3659,8 @@ export class Sim {
         state: q.state,
         ...(q.selection === undefined ? {} : { selection: q.selection }),
         ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+        // Absent until the first interact credit (parity-stable saves).
+        ...(q.creditedObjects === undefined ? {} : { creditedObjects: [...q.creditedObjects] }),
       })),
       questsDone: [...meta.questsDone],
       arenaRating: meta.arenaRating,
@@ -8167,6 +8176,14 @@ export class Sim {
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
   craftItem(recipeId: string, commission?: boolean, pid?: number): void {
+    // Dead gate for the profession-action family (this wrapper plus
+    // trainRecipe/unbindItem/salvageItem/disenchantItem/applyEnchant below):
+    // refuse BEFORE the resolver, so no result event is emitted and the
+    // shared error line is the single surface (see dead_gate.ts). It sits on
+    // the wrapper, not in the impl, because these wrappers emit the impl's
+    // result unconditionally; mobile-station placement and the rift forge
+    // emit no wrapper-side event, so their gates live in their own modules.
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = craftItemImpl(this.ctx, recipeId, commission === true, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
@@ -8218,6 +8235,8 @@ export class Sim {
   // silent no-op (the crafting window's station row already communicates
   // range, and the server re-validates the gate on every craft).
   placeMobileStation(craftId: string, pid?: number): void {
+    // Dead-gated inside placeMobileStationForPlayer itself, so the `/dev
+    // mobilestation` cheat's direct call shares the gate.
     placeMobileStationForPlayer(this.ctx, craftId, pid);
   }
 
@@ -8231,6 +8250,7 @@ export class Sim {
   // the event plus the lastTrainResult probe (the craftItem single-surface
   // doctrine: no ctx.error toast, or the deny would print twice).
   trainRecipe(recipeId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const r = this.ctx.resolve(pid);
     if (!r) return;
     const result = resolveTrain(this.stationPlacements, r.meta, r.e.pos, recipeId);
@@ -8259,6 +8279,7 @@ export class Sim {
   // twice); the payload change itself converges through the self inventory
   // mirror in both hosts.
   unbindItem(itemId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = unbindItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     this.emit({
@@ -8307,6 +8328,7 @@ export class Sim {
   // command arrives on, same shape as craftItem above. Stashes the outcome
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
   salvageItem(itemId: string, pid?: number): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = salvageItemImpl(this.ctx, itemId, pid);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
@@ -8358,6 +8380,7 @@ export class Sim {
   ): void {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
@@ -8395,6 +8418,7 @@ export class Sim {
     confirmReplace?: boolean,
     pid?: number,
   ): void {
+    if (refusedWhileDead(this.ctx, pid)) return;
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;

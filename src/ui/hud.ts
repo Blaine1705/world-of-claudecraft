@@ -432,7 +432,11 @@ import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
-import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom } from './map_pinch_zoom_core';
+import {
+  MAP_TAP_MOVE_TOLERANCE_PX,
+  nextMapZoom,
+  zoomOutExitsZoneLevel,
+} from './map_pinch_zoom_core';
 import {
   type MapRegion,
   mapCanvasHeight,
@@ -9626,6 +9630,17 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
+    // One more zoom-out at the zone map's full extent leaves the zone and opens
+    // the continent overview (the level toggle's other half), instead of clamping
+    // at the minimum and doing nothing. A delve has no overview to go to.
+    if (
+      this.mapLevel === 'zone' &&
+      zoomOutExitsZoneLevel(this.mapZoom, factor) &&
+      mapWindowMode(this.sim) !== 'delve'
+    ) {
+      this.setMapLevel('continent');
+      return;
+    }
     const prev = this.mapZoom;
     this.mapZoom = nextMapZoom(this.mapZoom, factor);
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
@@ -13508,6 +13523,13 @@ export class Hud {
   // flight closes when the trainResult event resolves it, or by TTL if the
   // answer is lost to a disconnect.
   private trainRecipeClicked(recipeId: string): void {
+    // While dead, send without opening a flight: the sim's dead gate
+    // (src/sim/dead_gate.ts) refuses with the shared error line and emits NO
+    // trainResult, so an opened flight would only sit disabled until its TTL.
+    if (this.sim.player.dead) {
+      this.sim.trainRecipe(recipeId);
+      return;
+    }
     if (!this.trainLearns.begin(recipeId, performance.now())) return;
     this.sim.trainRecipe(recipeId);
     this.renderTrain();

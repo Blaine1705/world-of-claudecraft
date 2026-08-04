@@ -227,6 +227,7 @@ const UI_PURE_CORES = [
   'src/ui/quality_glow.ts',
   'src/ui/map_pinch_zoom_core.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/continent_land_mask_core.ts',
   'src/ui/continent_map_view.ts',
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
@@ -1268,7 +1269,9 @@ const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 // is imported BY a painter and paints nothing itself; a window painter owns and
 // updates the nodes of its own window. What the gate enforces is that one of them
 // is chosen on purpose.
-const UI_PAINTER_HELPERS = ['src/ui/text_sprite_cache.ts'].map((rel) => join(repoRoot, rel));
+const UI_PAINTER_HELPERS = ['src/ui/continent_land_mask.ts', 'src/ui/text_sprite_cache.ts'].map(
+  (rel) => join(repoRoot, rel),
+);
 
 // Modules that REACH A HOST: they own browser state (the windows, the HUD
 // controllers, the drag / resize / focus plumbing, the storage-backed settings) or
