@@ -10818,6 +10818,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Kolye Büyüsü - Çeviklik',
   'hudChrome.enchantName.enchant_neck_intellect': 'Kolye Büyüsü - Zeka',
   'hudChrome.enchantName.enchant_neck_spirit': 'Kolye Büyüsü - Ruh',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'İkincil El Büyüsü - Dayanıklılık',
   'hudChrome.enchantName.enchant_ring_agility': 'Yüzük Büyüsü - Çeviklik',
   'hudChrome.enchantName.enchant_ring_intellect': 'Yüzük Büyüsü - Zeka',
   'hudChrome.enchantName.enchant_ring_spirit': 'Yüzük Büyüsü - Ruh',

@@ -6828,6 +6828,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Zaklinanie naszyjnika - Zwinność',
   'hudChrome.enchantName.enchant_neck_intellect': 'Zaklinanie naszyjnika - Intelekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Zaklinanie naszyjnika - Duch',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Zaklinanie ręki dodatkowej - Wytrzymałość',
   'hudChrome.enchantName.enchant_ring_agility': 'Zaklinanie pierścienia - Zwinność',
   'hudChrome.enchantName.enchant_ring_intellect': 'Zaklinanie pierścienia - Intelekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Zaklinanie pierścienia - Duch',

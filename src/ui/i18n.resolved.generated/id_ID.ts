@@ -2551,6 +2551,7 @@ export const id_ID: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Mantrai Senjata - Kekuatan",
       "enchant_weapon_intellect": "Mantrai Senjata - Daya Mantra",
+      "enchant_offhand_stamina": "Mantrai Tangan Sekunder - Stamina",
       "enchant_helmet_fortitude": "Mantrai Helm - Keteguhan",
       "enchant_neck_spirit": "Mantrai Kalung - Roh",
       "enchant_shoulder_agility": "Mantrai Bahu - Kegesitan",

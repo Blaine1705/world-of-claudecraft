@@ -8780,6 +8780,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Mantrai Kalung - Kegesitan',
   'hudChrome.enchantName.enchant_neck_intellect': 'Mantrai Kalung - Kecerdasan',
   'hudChrome.enchantName.enchant_neck_spirit': 'Mantrai Kalung - Roh',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Mantrai Tangan Sekunder - Stamina',
   'hudChrome.enchantName.enchant_ring_agility': 'Mantrai Cincin - Kegesitan',
   'hudChrome.enchantName.enchant_ring_intellect': 'Mantrai Cincin - Kecerdasan',
   'hudChrome.enchantName.enchant_ring_spirit': 'Mantrai Cincin - Roh',

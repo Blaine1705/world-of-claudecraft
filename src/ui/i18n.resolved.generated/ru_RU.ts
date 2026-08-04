@@ -2551,6 +2551,7 @@ export const ru_RU: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Зачарование оружия - Мощь",
       "enchant_weapon_intellect": "Зачарование оружия - Сила заклинаний",
+      "enchant_offhand_stamina": "Зачарование левой руки - Выносливость",
       "enchant_helmet_fortitude": "Зачарование шлема - Стойкость",
       "enchant_neck_spirit": "Зачарование ожерелья - Дух",
       "enchant_shoulder_agility": "Зачарование наплечников - Ловкость",

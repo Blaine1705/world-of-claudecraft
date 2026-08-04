@@ -2551,6 +2551,7 @@ export const en_CA: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Enchant Weapon - Might",
       "enchant_weapon_intellect": "Enchant Weapon - Spellpower",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Enchant Helmet - Fortitude",
       "enchant_neck_spirit": "Enchant Necklace - Spirit",
       "enchant_shoulder_agility": "Enchant Shoulders - Agility",

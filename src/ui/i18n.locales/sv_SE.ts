@@ -10768,6 +10768,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Förtrollning Halsband - Rörlighet',
   'hudChrome.enchantName.enchant_neck_intellect': 'Förtrollning Halsband - Intelligens',
   'hudChrome.enchantName.enchant_neck_spirit': 'Förtrollning Halsband - Ande',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Förtrollning Bi-hand - Uthållighet',
   'hudChrome.enchantName.enchant_ring_agility': 'Förtrollning Ring - Rörlighet',
   'hudChrome.enchantName.enchant_ring_intellect': 'Förtrollning Ring - Intelligens',
   'hudChrome.enchantName.enchant_ring_spirit': 'Förtrollning Ring - Ande',

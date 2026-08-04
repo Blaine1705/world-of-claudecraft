@@ -11058,6 +11058,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Encantar collar - Agilidad',
   'hudChrome.enchantName.enchant_neck_intellect': 'Encantar collar - Intelecto',
   'hudChrome.enchantName.enchant_neck_spirit': 'Encantar collar - Espíritu',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Encantar mano secundaria - Aguante',
   'hudChrome.enchantName.enchant_ring_agility': 'Encantar anillo - Agilidad',
   'hudChrome.enchantName.enchant_ring_intellect': 'Encantar anillo - Intelecto',
   'hudChrome.enchantName.enchant_ring_spirit': 'Encantar anillo - Espíritu',

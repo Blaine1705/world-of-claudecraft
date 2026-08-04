@@ -10725,6 +10725,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Okouzlení náhrdelníku - Obratnost',
   'hudChrome.enchantName.enchant_neck_intellect': 'Okouzlení náhrdelníku - Intelekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Okouzlení náhrdelníku - Duch',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Okouzlení vedlejší ruky - Výdrž',
   'hudChrome.enchantName.enchant_ring_agility': 'Okouzlení prstenu - Obratnost',
   'hudChrome.enchantName.enchant_ring_intellect': 'Okouzlení prstenu - Intelekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Okouzlení prstenu - Duch',

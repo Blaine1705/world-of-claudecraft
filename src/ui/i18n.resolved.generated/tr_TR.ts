@@ -2551,6 +2551,7 @@ export const tr_TR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Silah Büyüsü - Güç",
       "enchant_weapon_intellect": "Silah Büyüsü - Büyü Gücü",
+      "enchant_offhand_stamina": "İkincil El Büyüsü - Dayanıklılık",
       "enchant_helmet_fortitude": "Miğfer Büyüsü - Metanet",
       "enchant_neck_spirit": "Kolye Büyüsü - Ruh",
       "enchant_shoulder_agility": "Omuzluk Büyüsü - Çeviklik",

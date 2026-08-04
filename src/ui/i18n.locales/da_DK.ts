@@ -6643,6 +6643,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Fortryl halskæde - Smidighed',
   'hudChrome.enchantName.enchant_neck_intellect': 'Fortryl halskæde - Intellekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Fortryl halskæde - Ånd',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Fortryl sekundær hånd - Udholdenhed',
   'hudChrome.enchantName.enchant_ring_agility': 'Fortryl ring - Smidighed',
   'hudChrome.enchantName.enchant_ring_intellect': 'Fortryl ring - Intellekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Fortryl ring - Ånd',

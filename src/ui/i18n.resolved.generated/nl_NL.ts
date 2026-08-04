@@ -2551,6 +2551,7 @@ export const nl_NL: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Wapen betoveren - Kracht",
       "enchant_weapon_intellect": "Wapen betoveren - Spreukkracht",
+      "enchant_offhand_stamina": "Bijhand betoveren - Uithoudingsvermogen",
       "enchant_helmet_fortitude": "Helm betoveren - Fortitude",
       "enchant_neck_spirit": "Ketting betoveren - Geest",
       "enchant_shoulder_agility": "Schouders betoveren - Behendigheid",

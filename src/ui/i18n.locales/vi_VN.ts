@@ -2388,6 +2388,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Pháp Khắc Vòng Cổ - Nhanh Nhẹn',
   'hudChrome.enchantName.enchant_neck_intellect': 'Pháp Khắc Vòng Cổ - Trí Tuệ',
   'hudChrome.enchantName.enchant_neck_spirit': 'Pháp Khắc Vòng Cổ - Tinh Thần',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Pháp Khắc Tay Phụ - Thể Lực',
   'hudChrome.enchantName.enchant_ring_agility': 'Pháp Khắc Nhẫn - Nhanh Nhẹn',
   'hudChrome.enchantName.enchant_ring_intellect': 'Pháp Khắc Nhẫn - Trí Tuệ',
   'hudChrome.enchantName.enchant_ring_spirit': 'Pháp Khắc Nhẫn - Tinh Thần',

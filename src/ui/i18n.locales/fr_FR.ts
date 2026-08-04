@@ -6671,6 +6671,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Enchantement Collier - Agilité',
   'hudChrome.enchantName.enchant_neck_intellect': 'Enchantement Collier - Intellect',
   'hudChrome.enchantName.enchant_neck_spirit': 'Enchantement Collier - Esprit',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Enchantement Main gauche - Endurance',
   'hudChrome.enchantName.enchant_ring_agility': 'Enchantement Anneau - Agilité',
   'hudChrome.enchantName.enchant_ring_intellect': 'Enchantement Anneau - Intellect',
   'hudChrome.enchantName.enchant_ring_spirit': 'Enchantement Anneau - Esprit',

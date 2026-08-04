@@ -9683,6 +9683,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Amulett verzaubern - Beweglichkeit',
   'hudChrome.enchantName.enchant_neck_intellect': 'Amulett verzaubern - Intellekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Amulett verzaubern - Geist',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Nebenhand verzaubern - Ausdauer',
   'hudChrome.enchantName.enchant_ring_agility': 'Ring verzaubern - Beweglichkeit',
   'hudChrome.enchantName.enchant_ring_intellect': 'Ring verzaubern - Intellekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Ring verzaubern - Geist',

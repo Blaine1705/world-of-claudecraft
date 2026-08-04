@@ -2551,6 +2551,7 @@ export const pt_BR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Encantar Arma - Força",
       "enchant_weapon_intellect": "Encantar Arma - Poder Mágico",
+      "enchant_offhand_stamina": "Encantar Mão Secundária - Vigor",
       "enchant_helmet_fortitude": "Encantar Elmo - Fortitude",
       "enchant_neck_spirit": "Encantar Colar - Espírito",
       "enchant_shoulder_agility": "Encantar Ombros - Agilidade",

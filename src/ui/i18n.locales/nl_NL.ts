@@ -1856,6 +1856,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Ketting betoveren - Behendigheid',
   'hudChrome.enchantName.enchant_neck_intellect': 'Ketting betoveren - Intellect',
   'hudChrome.enchantName.enchant_neck_spirit': 'Ketting betoveren - Geest',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Bijhand betoveren - Uithoudingsvermogen',
   'hudChrome.enchantName.enchant_ring_agility': 'Ring betoveren - Behendigheid',
   'hudChrome.enchantName.enchant_ring_intellect': 'Ring betoveren - Intellect',
   'hudChrome.enchantName.enchant_ring_spirit': 'Ring betoveren - Geest',
