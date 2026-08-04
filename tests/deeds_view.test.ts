@@ -19,6 +19,7 @@ import {
   type DeedsViewInput,
   deedCrestId,
   deedDisplayCategory,
+  deedJumpCategory,
   deedProgress,
   deedRarityFraction,
   deedStatsDigest,
@@ -478,6 +479,24 @@ describe('buildDeedsView', () => {
     expect(view.summary.recent[0].earnedDay).toBe('2026-07-01');
   });
 
+  it('an earned id the catalog no longer knows cannot enter recent through the fetched order', () => {
+    // Both drift ids sit in the EARNED map, so the earned check alone cannot
+    // reject them: the catalog own-property check is the only thing between
+    // the wire-sourced order and deedCrestId throwing on a missing def (and
+    // 'constructor' is the prototype-key arm of the same guard).
+    const view = buildDeedsView(
+      makeInput({
+        deedsEarned: new Map([
+          ['removed_deed', '2026-07-01'],
+          ['constructor', '2026-07-01'],
+          ['cmb_counter', '2026-07-02'],
+        ]),
+        recentOrder: ['removed_deed', 'constructor', 'cmb_counter'],
+      }),
+    );
+    expect(view.summary.recent.map((r) => r.id)).toEqual(['cmb_counter']);
+  });
+
   it('echoes focusDeedId only when the deed rendered an entry this paint', () => {
     const earned = new Map([['cmb_counter', '2026-07-01']]);
     expect(
@@ -499,8 +518,27 @@ describe('buildDeedsView', () => {
         makeInput({ deedsEarned: earned, filter: 'unearned', focusDeedId: 'cmb_counter' }),
       ).focusDeedId,
     ).toBe(null);
+    // A search that hides the card clears it too (the reason openWithDeed
+    // resets the search before it paints).
+    expect(
+      buildDeedsView(
+        makeInput({ deedsEarned: earned, search: 'zzz-no-match', focusDeedId: 'cmb_counter' }),
+      ).focusDeedId,
+    ).toBe(null);
     // Absent input: null.
     expect(buildDeedsView(makeInput()).focusDeedId).toBe(null);
+  });
+
+  it('deedJumpCategory: display bucket for a landable deed, null when the jump must not move', () => {
+    const earnedHidden = new Map([['hid_x', '2026-07-01']]);
+    expect(deedJumpCategory(TEST_DEEDS, new Map(), 'cmb_counter')).toBe('combat');
+    // An EARNED hidden deed is revealed on the Feats shelf and jumpable.
+    expect(deedJumpCategory(TEST_DEEDS, earnedHidden, 'hid_x')).toBe('feat');
+    // Hidden and unearned: even the destination shelf would leak, so null.
+    expect(deedJumpCategory(TEST_DEEDS, new Map(), 'hid_x')).toBe(null);
+    // Drift and prototype ids: null, never a throw.
+    expect(deedJumpCategory(TEST_DEEDS, earnedHidden, 'removed_deed')).toBe(null);
+    expect(deedJumpCategory(TEST_DEEDS, earnedHidden, 'constructor')).toBe(null);
   });
 
   it('ranks nearest by progress fraction, excluding zero progress', () => {

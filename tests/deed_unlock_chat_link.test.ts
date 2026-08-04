@@ -33,6 +33,7 @@ interface DeedLinkHarness {
   isNythraxisEvent: ReturnType<typeof vi.fn>;
   chatLogEl: HTMLElement;
   chatTimestamps: boolean;
+  chatClock: string;
   chatWindow: { hideIfFiltered: ReturnType<typeof vi.fn> };
   chatAnnouncer: { push: ReturnType<typeof vi.fn> };
   combatAnnouncer: { push: ReturnType<typeof vi.fn> };
@@ -57,6 +58,7 @@ function makeHud(): DeedLinkHarness {
   hud.isNythraxisEvent = vi.fn(() => false);
   hud.chatLogEl = document.createElement('div');
   hud.chatTimestamps = false;
+  hud.chatClock = '24h';
   hud.chatWindow = { hideIfFiltered: vi.fn() };
   hud.chatAnnouncer = { push: vi.fn() };
   hud.combatAnnouncer = { push: vi.fn() };
@@ -103,6 +105,19 @@ describe('the unlock line (handleDeedUnlocks)', () => {
     expect(hud.deedsWindow.openWithDeed).toHaveBeenCalledWith(UNLOCK_ID);
     link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
     expect(hud.deedsWindow.openWithDeed).toHaveBeenCalledTimes(2);
+  });
+
+  it('announces the full spliced line through the chat live region, timestamp included', () => {
+    const hud = makeHud();
+    hud.chatTimestamps = true;
+    hud.handleDeedUnlocks([{ deedId: UNLOCK_ID }]);
+    const line = hud.chatLogEl.lastElementChild as HTMLElement;
+    // The timestamp option still decorates the node-body line.
+    expect(line.querySelector('.chat-ts')).not.toBeNull();
+    // The announcer receives the DIV's text (not the empty text argument the
+    // node path passes), so screen readers hear the whole line.
+    expect(hud.chatAnnouncer.push).toHaveBeenCalledWith(line.textContent ?? '', expect.any(Number));
+    expect((line.textContent ?? '').length).toBeGreaterThan(0);
   });
 
   it('feeds the drain order to the recent strip and keeps retro out of it', () => {

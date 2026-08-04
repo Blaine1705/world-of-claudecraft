@@ -21,7 +21,7 @@ import {
   type DeedEntryModel,
   type DeedsFilter,
   type DeedsViewModel,
-  deedDisplayCategory,
+  deedJumpCategory,
   deedRarityFraction,
   deedStatsDigest,
   deedsRefreshSig,
@@ -39,7 +39,6 @@ import {
   t,
 } from './i18n';
 import { iconDataUrl } from './icons';
-import { ownEntry } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 
@@ -234,9 +233,13 @@ export class DeedsWindow {
    *  must not reveal it), so that jump opens the Book wherever it last was,
    *  unfocused; an unknown id (content drift) does the same. */
   openWithDeed(deedId: string): void {
-    const def = ownEntry(DEEDS, deedId);
-    if (def && !(def.hidden === true && !this.deps.world().deedsEarned.has(deedId))) {
-      this.category = deedDisplayCategory(def.category);
+    // The eligibility + destination decision is the core's (deedJumpCategory
+    // shares the masking predicate with buildDeedsView, so the two cannot
+    // drift): null means an unknown or still-masked deed, and the Book opens
+    // wherever it was, unfocused.
+    const jump = deedJumpCategory(DEEDS, this.deps.world().deedsEarned, deedId);
+    if (jump !== null) {
+      this.category = jump;
       this.filter = 'all';
       this.search = '';
       this.focusDeedId = deedId;
@@ -267,14 +270,11 @@ export class DeedsWindow {
     }
   }
 
-  /** Slow-band refresh: repaint only when the compact signature moves. The
-   *  stat digest keeps open-window progress bars live while raw counters
-   *  climb between unlocks. Both builders are pure deeds_view exports so
-   *  every repaint dimension stays unit-pinned. */
-  refreshIfChanged(): void {
-    if (!this.opened) return;
+  /** The compact repaint signature over the current world + view state (the
+   *  deedsRefreshSig dimensions, every one unit-pinned). */
+  private currentSig(): string {
     const world = this.deps.world();
-    const sig = deedsRefreshSig({
+    return deedsRefreshSig({
       renown: world.renown,
       earnedCount: world.deedsEarned.size,
       activeTitle: world.activeTitle,
@@ -284,6 +284,18 @@ export class DeedsWindow {
       watchRev: this.watchRev,
       statsDigest: deedStatsDigest(world.deedStats),
     });
+  }
+
+  /** Slow-band refresh: repaint only when the compact signature moves. The
+   *  stat digest keeps open-window progress bars live while raw counters
+   *  climb between unlocks. Both builders are pure deeds_view exports so
+   *  every repaint dimension stays unit-pinned. render() latches the same
+   *  signature after every paint, so the first slow-band tick after an open
+   *  or a jump elides instead of tearing down the frame it just painted
+   *  (which would wipe the jump spotlight within 500ms). */
+  refreshIfChanged(): void {
+    if (!this.opened) return;
+    const sig = this.currentSig();
     if (sig === this.lastSig) return;
     this.lastSig = sig;
     this.render();
@@ -333,19 +345,30 @@ export class DeedsWindow {
       (fresh ?? (el.querySelector('[data-close]') as HTMLElement | null))?.focus();
     }
     if (model.focusDeedId !== null) this.spotlightCard(el, model.focusDeedId);
+    // One-shot regardless of the echo: an id the core could not echo (content
+    // drift between paints) must not stay latched and scroll at some
+    // arbitrary later render.
+    this.focusDeedId = null;
+    // Latch the painted state's signature so the next slow-band tick elides:
+    // without this, open() (lastSig = '') and every jump-driven render would
+    // be rebuilt within 500ms, wiping the spotlight and, under
+    // prefers-reduced-motion, the static ring that is the only landing cue.
+    this.lastSig = this.currentSig();
   }
 
-  /** One-shot spotlight after a paint that carried focusDeedId: scroll the
-   *  card into view and flash it (a pure CSS animation, so the cold window
-   *  gains no timer; reduced-motion swaps in a static ring). One-shot so the
-   *  slow-band refresh never re-scrolls a window the player has moved on
-   *  from. The selector escape is the refocusSelector rule (quote+backslash;
-   *  CSS.escape is absent in the jsdom test env). */
+  /** One-shot spotlight after a paint that carried focusDeedId: move the
+   *  reading position onto the card (the jump button promised a navigation,
+   *  so focus must follow, not just the viewport), scroll it into view, and
+   *  flash it (a pure CSS animation, so the cold window gains no timer;
+   *  reduced-motion swaps in a static ring). The selector escape is the
+   *  refocusSelector rule (quote+backslash; CSS.escape is absent in the
+   *  jsdom test env). */
   private spotlightCard(el: HTMLElement, deedId: string): void {
-    this.focusDeedId = null;
     const cssValue = deedId.replace(/["\\]/g, '\\$&');
     const card = el.querySelector<HTMLElement>(`.deed-card[data-deed="${cssValue}"]`);
     if (!card) return;
+    card.tabIndex = -1;
+    card.focus({ preventScroll: true });
     // Guarded: jsdom (the focus/behavior test env) ships no scrollIntoView.
     if (typeof card.scrollIntoView === 'function') card.scrollIntoView({ block: 'center' });
     card.classList.add('deed-card-flash');
@@ -665,6 +688,11 @@ export class DeedsWindow {
   private ensureWatchLoaded(): void {
     const key = this.watchKey();
     if (key === this.watchedKey) return;
+    // A character SWITCH (never the first key load: unlocks noted before the
+    // first paint must survive it) invalidates the per-character session feed
+    // too, the watch set's own rekey rule: a previous character's unlock
+    // order must not outrank the new character's real recency.
+    if (this.watchedKey !== '') this.sessionUnlocks = [];
     this.watchedKey = key;
     this.watchedSet = new Set();
     try {

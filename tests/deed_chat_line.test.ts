@@ -13,6 +13,10 @@ import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from '../src/ui/hud/ch
 
 const texts = (nodes: Node[]): string[] => nodes.map((n) => n.textContent ?? '');
 
+it('pins the splice sentinel literal (both sides of every splice test use the constant)', () => {
+  expect(DEED_NAME_TOKEN).toBe('__WOC_DEED_NAME__');
+});
+
 describe('deedChatLinkEl', () => {
   it('builds a focusable role=button span with the bracketed label', () => {
     const link = deedChatLinkEl(document, 'Veteran', () => {});

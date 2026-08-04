@@ -83,6 +83,24 @@ export const DEED_BESPOKE_CRESTS: ReadonlySet<string> = new Set([
  *  display category base `deed_cat_<category>`. The image branch in icons.ts outranks the
  *  bespoke recipe for the same id; the recipes stay as the forward-compat fallback tier
  *  (an artless bespoke deed still lands on deed_<id>, never the base crest). */
+/** Where a jump-to-deed (a chat deed-link or recent-strip activation) may
+ *  land: the deed's display category, or null when the jump must not move the
+ *  Book at all. Null for a catalog-unknown id (content drift) and for a
+ *  hidden deed not yet earned: revealing even the destination shelf would
+ *  leak the masked deed's existence (the masking contract in this header).
+ *  The painter consumes this instead of re-deriving the mask, so the two can
+ *  never drift. */
+export function deedJumpCategory(
+  deeds: Readonly<Record<string, DeedDef>>,
+  deedsEarned: ReadonlyMap<string, string>,
+  id: string,
+): DeedDisplayCategory | null {
+  if (!Object.hasOwn(deeds, id)) return null;
+  const def = deeds[id];
+  if (def.hidden === true && !deedsEarned.has(id)) return null;
+  return deedDisplayCategory(def.category);
+}
+
 export function deedCrestId(id: string, category: string): string {
   return DEED_IMAGE_IDS.has(id) || DEED_BESPOKE_CRESTS.has(id)
     ? `deed_${id}`
@@ -355,7 +373,9 @@ function buildSummary(
   const seen = new Set<string>();
   const recent: string[] = [];
   const pushRecent = (id: string): void => {
-    if (seen.has(id) || !input.deedsEarned.has(id) || !input.deeds[id]) return;
+    // Own-property check, not a bare index read: the fetched recentOrder is
+    // wire data whose ids could name prototype keys (the known_item doctrine).
+    if (seen.has(id) || !input.deedsEarned.has(id) || !Object.hasOwn(input.deeds, id)) return;
     seen.add(id);
     recent.push(id);
   };

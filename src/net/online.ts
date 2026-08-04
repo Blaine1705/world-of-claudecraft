@@ -37,7 +37,7 @@ import {
   resolveDelveShopOffers,
 } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
-import { freshDeedStats } from '../sim/deeds';
+import { DEEDS_RECENT_CAP, freshDeedStats } from '../sim/deeds';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
@@ -4594,7 +4594,9 @@ export class ClientWorld implements IWorld {
       if (!Array.isArray(data?.deeds)) return null;
       const ids: string[] = [];
       for (const id of data.deeds) if (typeof id === 'string') ids.push(id);
-      return ids;
+      // Clamp to the shared cap so all three enforcement points (Sim slice,
+      // server LIMIT, this read) stay identical even against an older server.
+      return ids.slice(0, DEEDS_RECENT_CAP);
     } catch {
       return null;
     }

@@ -117,8 +117,13 @@ describe('painter hygiene', () => {
 
   it('elides slow-band repaints through the pure refresh-signature builders', () => {
     // Both builders live in deeds_view.ts where every repaint dimension is
-    // unit-pinned; the painter must not grow a private signature again.
-    expect(painter).toContain('const sig = deedsRefreshSig({');
+    // unit-pinned; the painter must not grow a private signature again. The
+    // one currentSig() helper feeds BOTH the slow-band diff and the
+    // post-paint latch (render() stamping lastSig is what keeps the first
+    // slow-band tick after a jump from wiping the spotlight).
+    expect(painter).toContain('return deedsRefreshSig({');
+    expect(painter).toContain('const sig = this.currentSig();');
+    expect(painter).toContain('this.lastSig = this.currentSig();');
     expect(painter).toContain('statsDigest: deedStatsDigest(world.deedStats),');
     expect(painter).not.toMatch(/private statsDigest\(/);
   });
@@ -780,6 +785,32 @@ describe('chrome keys and CSS floors', () => {
     );
     expect(hudCss).toMatch(
       /@media \(pointer: coarse\) \{\s*#deed-tracker \.dt-header \{\s*min-height: 40px;/,
+    );
+    // The recent-strip jump buttons: the floor lives in hud.mobile.css and
+    // must be UNCONDITIONAL under body.mobile-touch (a landscape tablet never
+    // enters the short-phone media block).
+    expect(hudMobile).toMatch(
+      /body\.mobile-touch #deeds-window \.deeds-recent-item \{\s*min-width: 40px;\s*min-height: 40px;/,
+    );
+  });
+
+  it('the jump spotlight flashes once and degrades to a static ring under reduced motion', () => {
+    expect(components).toMatch(
+      /\.deed-card-flash \{\s*animation: deed-card-flash 1\.6s ease-out 1;/,
+    );
+    // The reduced-motion arm swaps the pulse for a persistent ring: the only
+    // landing cue those users get, so it must not silently vanish.
+    expect(components).toMatch(
+      /@media \(prefers-reduced-motion: reduce\) \{\s*\.deed-card-flash \{\s*animation: none;\s*box-shadow: inset 0 0 0 2px var\(--gold-dim\);/,
+    );
+  });
+
+  it('the chat deed link carries the shared focus ring and link affordance', () => {
+    expect(hudCss).toMatch(
+      /\.chat-deed-link \{\s*cursor: var\(--cursor-point\);\s*text-decoration: underline;/,
+    );
+    expect(hudCss).toMatch(
+      /\.chat-deed-link:focus-visible \{\s*outline: 2px solid var\(--color-border-focus\);/,
     );
   });
 

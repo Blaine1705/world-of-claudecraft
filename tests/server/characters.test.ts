@@ -468,6 +468,16 @@ describe('deeds-recent handler', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ deeds: [] });
   });
+
+  it('mounts the READ-tier gate pair, identical to the owner sheet', () => {
+    const recent = routeFor('GET', '/api/characters/:id/deeds-recent');
+    const sheet = routeFor('GET', '/api/characters/:id/sheet');
+    expect(recent.middleware).toHaveLength(2);
+    // Identity, not shape: the exact readGuard instance the sheet mounts, so
+    // a swap to the mutation-tier activeGuard (locking out read-only tokens)
+    // reds here.
+    expect(recent.middleware?.[0]).toBe(sheet.middleware?.[0]);
+  });
 });
 
 describe('owner sheet handler', () => {

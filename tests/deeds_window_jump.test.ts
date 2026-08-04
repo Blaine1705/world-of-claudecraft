@@ -8,8 +8,11 @@
 // feeds (noteUnlocks, the fetched order).
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { freshDeedStats } from '../src/sim/deeds';
+import { DEED_ORDER } from '../src/sim/content/deeds';
+import { DEEDS_RECENT_CAP, freshDeedStats } from '../src/sim/deeds';
+import { deedName } from '../src/ui/deed_i18n';
 import { DeedsWindow, type DeedsWindowDeps } from '../src/ui/deeds_window';
+import { t } from '../src/ui/i18n';
 
 // jsdom ships no 2D canvas, so the procedural crest compositor cannot run
 // here; the painter only ever uses the returned string as an <img src>.
@@ -22,13 +25,18 @@ interface WorldState {
   renown: number;
   activeTitle: string | null;
   recent: string[] | null;
+  name: string;
 }
 
 function baseState(): WorldState {
-  return { deedsEarned: new Map(), renown: 0, activeTitle: null, recent: null };
+  return { deedsEarned: new Map(), renown: 0, activeTitle: null, recent: null, name: 'Hero' };
 }
 
-function makeWindow(state: WorldState, open = true): { w: DeedsWindow; el: HTMLElement } {
+function makeWindow(
+  state: WorldState,
+  open = true,
+  worldOver: Record<string, unknown> = {},
+): { w: DeedsWindow; el: HTMLElement } {
   const el = document.createElement('div');
   el.id = 'deeds-window';
   document.body.appendChild(el);
@@ -47,7 +55,10 @@ function makeWindow(state: WorldState, open = true): { w: DeedsWindow; el: HTMLE
           state.activeTitle = id;
         },
         cfg: { playerClass: 'warrior' },
-        player: { name: 'Hero' },
+        get player() {
+          return { name: state.name };
+        },
+        ...worldOver,
       }) as never,
     closeOthers: () => {},
     hideTooltip: () => {},
@@ -93,6 +104,54 @@ describe('openWithDeed: the chat-link landing', () => {
     expect(flashed(el)).toBe(null);
   });
 
+  it('the spotlight survives the slow-band refresh right after the jump (signature latched)', () => {
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    const { w, el } = makeWindow(state);
+    w.open('combat');
+    w.openWithDeed('prog_first_steps');
+    expect(flashed(el)).toBe('prog_first_steps');
+    // The HUD's 500ms band fires within the 1.6s flash: same state, same
+    // latched signature, so the repaint elides and the animation lives on.
+    w.refreshIfChanged();
+    expect(flashed(el)).toBe('prog_first_steps');
+  });
+
+  it('moves the reading position onto the landed card (the jump is a navigation)', () => {
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    const { w, el } = makeWindow(state);
+    w.openWithDeed('prog_first_steps');
+    const card = el.querySelector('.deed-card[data-deed="prog_first_steps"]') as HTMLElement;
+    expect(card.tabIndex).toBe(-1);
+    expect(document.activeElement).toBe(card);
+  });
+
+  it('scrolls the landed card into view once, centered', () => {
+    const spy = vi.fn();
+    (Element.prototype as unknown as { scrollIntoView: unknown }).scrollIntoView = spy;
+    try {
+      const state = baseState();
+      state.deedsEarned.set('prog_first_steps', '2026-07-01');
+      const { w } = makeWindow(state, false);
+      w.openWithDeed('prog_first_steps');
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy).toHaveBeenCalledWith({ block: 'center' });
+    } finally {
+      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+    }
+  });
+
+  it('an EARNED hidden deed is jumpable: revealed on the Feats shelf, flashed', () => {
+    const state = baseState();
+    state.deedsEarned.set('hid_roll_hundred', '2026-07-01');
+    const { w, el } = makeWindow(state);
+    w.open('combat');
+    w.openWithDeed('hid_roll_hundred');
+    expect(el.querySelector('[data-cat="feat"]')?.classList.contains('active')).toBe(true);
+    expect(flashed(el)).toBe('hid_roll_hundred');
+  });
+
   it('opens the Book when it was closed, landing on the card', () => {
     const state = baseState();
     state.deedsEarned.set('prog_first_steps', '2026-07-01');
@@ -136,6 +195,14 @@ describe('openWithDeed: the chat-link landing', () => {
     expect(w.isOpen).toBe(true);
     expect(flashed(el)).toBe(null);
   });
+
+  it('a prototype-key id is a plain unknown, never a forged def', () => {
+    const { w, el } = makeWindow(baseState(), false);
+    w.openWithDeed('__proto__');
+    w.openWithDeed('constructor');
+    expect(w.isOpen).toBe(true);
+    expect(flashed(el)).toBe(null);
+  });
 });
 
 describe('the recent strip: jump buttons and recency sources', () => {
@@ -146,9 +213,77 @@ describe('the recent strip: jump buttons and recency sources', () => {
     const btn = el.querySelector<HTMLElement>('[data-recent="prog_first_steps"]');
     expect(btn).not.toBeNull();
     expect(btn?.tagName).toBe('BUTTON');
+    // The accessible name rides the button (runtime, not just a source pin),
+    // and the crest img stays alt="" so the deed is not announced twice.
+    expect(btn?.getAttribute('aria-label')).toBe(
+      t('hudChrome.deeds.recentJumpAria', { name: deedName('prog_first_steps') }),
+    );
+    expect(btn?.querySelector('img')?.getAttribute('alt')).toBe('');
     btn?.click();
     expect(el.querySelector('[data-cat="progression"]')?.classList.contains('active')).toBe(true);
     expect(flashed(el)).toBe('prog_first_steps');
+  });
+
+  it('bounds the session feed to DEEDS_RECENT_CAP, newest surviving', () => {
+    const { w } = makeWindow(baseState(), false);
+    const ids = DEED_ORDER.slice(0, DEEDS_RECENT_CAP + 4);
+    w.noteUnlocks(ids);
+    const session = (w as unknown as { sessionUnlocks: string[] }).sessionUnlocks;
+    expect(session).toHaveLength(DEEDS_RECENT_CAP);
+    expect(session).toEqual(ids.slice(-DEEDS_RECENT_CAP));
+  });
+
+  it('an unlock noted while the Book is closed leads the strip when it opens', () => {
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    state.deedsEarned.set('cmb_first_blood', '2026-07-01');
+    const { w, el } = makeWindow(state, false);
+    w.noteUnlocks(['prog_first_steps']);
+    w.open();
+    expect(stripIds(el)[0]).toBe('prog_first_steps');
+  });
+
+  it('a character switch clears the session feed (the watch-set rekey rule)', () => {
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    state.deedsEarned.set('cmb_first_blood', '2026-07-01');
+    const { w, el } = makeWindow(state);
+    w.noteUnlocks(['prog_first_steps']);
+    expect(stripIds(el)[0]).toBe('prog_first_steps');
+    state.name = 'Other';
+    w.render();
+    // Back to the same-day fallback order (catalog-later first): the old
+    // character's session signal died with the switch.
+    expect(stripIds(el)[0]).toBe('cmb_first_blood');
+  });
+
+  it('fetches the recent order once per open, and drops a response landing after close', async () => {
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    state.deedsEarned.set('cmb_first_blood', '2026-07-01');
+    let resolveRecent: ((v: readonly string[] | null) => void) | undefined;
+    let calls = 0;
+    const { w } = makeWindow(state, false, {
+      deedsRecent: () => {
+        calls++;
+        return new Promise((resolve) => {
+          resolveRecent = resolve;
+        });
+      },
+    });
+    w.open();
+    expect(calls).toBe(1);
+    w.render();
+    w.render();
+    // Once per OPEN, never per render: a render-driven refetch would loop.
+    expect(calls).toBe(1);
+    w.close();
+    resolveRecent?.(['prog_first_steps', 'cmb_first_blood']);
+    await settle();
+    // The late response was discarded, not stored into the closed window.
+    expect((w as unknown as { recentOrder: readonly string[] | null }).recentOrder).toBe(null);
+    w.open();
+    expect(calls).toBe(2);
   });
 
   it('noteUnlocks puts the session order first and repaints an open window', () => {

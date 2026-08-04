@@ -89,6 +89,11 @@ export interface IWorldDeeds {
   // GET /api/characters/:id/deeds-recent (the character_deeds observer table,
   // exact server timestamps) and resolves null on any fetch failure so the
   // Book's recent strip falls back to the day-granular order.
+  // Order means RECORD order, not play chronology, for back-credits: a
+  // join-time retro or legacy-milestone grant is recorded when it lands (the
+  // login), so it can head this list on both hosts equally. Accepted: the
+  // record has no per-deed retro marker to filter on, and the strip
+  // self-corrects as live unlocks accrue.
   deedsRecent(): Promise<readonly string[] | null>;
   // The Renown board (the account-level deeds leaderboard), paged server-side
   // like the other high-score boards; page is 0-based. GLOBAL-ONLY (see
