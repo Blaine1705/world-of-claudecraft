@@ -8566,6 +8566,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaInstanced': '{item}, 수량 {count}, 제작자 표식이 있는 사본',
   'hudChrome.bags.itemAriaMasterwork': '{item}, 수량 {count}, 걸작',
   'hudChrome.bags.itemAriaQuest': '{item}, 수량 {count}, 퀘스트 아이템',
+  'hudChrome.bags.filterQuestCountAria': '퀘스트, 아이템 {count}개',
+  'hudChrome.bags.noQuestItems': '가방에 퀘스트 아이템이 없습니다.',
   'hudChrome.crafting.gatheredBy': '채집자: {name}',
   'hudChrome.crafting.masterworkSeal': '걸작',
   'hudChrome.crafting.stationRequired': '그것을 제작하려면 {station}에 있어야 합니다.',

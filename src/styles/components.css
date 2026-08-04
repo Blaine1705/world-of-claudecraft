@@ -6307,6 +6307,42 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
   }
+  /* Quest filter chip stack-count badge (bagQuestItemCount). Quest gold so
+     the purpose class is glanceable on the chip row; aria-hidden (the chip
+     aria-label carries the count). Always-on, no --fx gate. */
+  .bag-chip .bag-chip-count {
+    display: inline-block;
+    margin-left: 5px;
+    min-width: 1.1em;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #15110a;
+    background: var(--color-quest);
+  }
+  .bag-chip.active .bag-chip-count {
+    background: color-mix(in srgb, var(--color-quest) 85%, #15110a);
+    color: #15110a;
+  }
+  /* Soft Quest section header in a derived bag list only (not All+recent
+     manual cells). Thin parchment caption using quest gold; not a drop
+     target. Spans the full grid row via grid-column. */
+  .bag-grid .bag-section-header {
+    grid-column: 1 / -1;
+    margin: 4px 0 2px;
+    padding: 2px 4px 1px;
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-quest);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-quest) 35%, transparent);
+    pointer-events: none;
+    user-select: none;
+  }
   body.mobile-touch .bag-chip {
     min-height: 40px;
     padding: 9px 13px;

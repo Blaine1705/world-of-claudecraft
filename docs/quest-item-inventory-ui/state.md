@@ -1,6 +1,6 @@
 # Quest Item Inventory UI: cross-phase state
 
-Current phase: **Phase 2 complete; Phase 3 ready to start**
+Current phase: **Phase 3 complete; Phase 4 ready to start**
 Worktree: `/Users/fernando/Documents/wocc-quest-item-ui`
 Branch: `feature/quest-item-inventory-ui`
 Base: `release/v0.34.0` (merge latest at the start of every phase)
@@ -86,6 +86,21 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   orphaned. Host localizes related title via tEntity quest channel and progress via
   questUi.detail.objectiveProgress; rules/orphaned via itemUi.tooltip keys.
 
+## Progress resolution notes (for Phase 3)
+
+- **Quest filter count metric (locked):** total stack count of quest pieces, sum of
+  `slot.count` for every stack with `kind === 'quest'` (`bagQuestItemCount` in
+  `bag_filter.ts`). Prefer stack count over unique-stack count so "Boar Hide x5" reads 5.
+  Badge paints only when N > 0; aria uses `hudChrome.bags.filterQuestCountAria`.
+- **Empty Quest copy:** `bagNoMatchKind` returns `'quest'` when category is quest; painter
+  maps to `hudChrome.bags.noQuestItems` (warm purpose-class line). Other filters keep
+  `hudChrome.bags.noMatch`.
+- **Soft section model:** `bagQuestSectionHeadersAllowed` is `!bagOrderIsManual`.
+  `buildBagListRows` emits a single Quest header then quest stacks then rest only when
+  headers are allowed AND the visible list mixes quest and non-quest. Manual All+recent
+  paints `model.cells` only (no header nodes; drop indices stay 1:1 with capacity).
+  Section label reuses `hudChrome.bags.filterQuest`.
+
 ## Beauty checklist (every visual phase)
 
 - [x] Looks premium next to quality borders and masterwork seals (Phase 1 rim/seal)
@@ -112,9 +127,13 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   - `itemUi.tooltip.questRelated` (EN + M16)
   - `itemUi.tooltip.questRules` (EN + M16)
   - `itemUi.tooltip.questOrphaned` (EN + M16)
+  - `hudChrome.bags.filterQuestCountAria` (EN + M16)
+  - `hudChrome.bags.noQuestItems` (EN + M16)
 - Architecture allowlist entries:
   - `src/ui/bag_quest_mark_view.ts` in `UI_PURE_CORES`
   - `src/ui/quest_item_tooltip_view.ts` in `UI_PURE_CORES`
+  - Phase 3 extended existing pure cores `bag_filter.ts` and `bags_view.ts` (already
+    registered); no new `*_view.ts` file required.
 - Known gotchas discovered:
   - `.bag-item.q-common` uses `border-color: ... !important`; quest rim rule must follow
     it (or also use `!important`) so purpose gold wins on common quest stacks.
@@ -124,9 +143,10 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
     tooltips share one number format; do not invent a parallel progress key.
   - Kind line uses `itemUi.kind.quest` alone (showQuality false); the legacy
     `itemUi.tooltip.questItem` desc line is no longer composed for quest kinds.
+  - `fillGrid` must not use `continue` (R34 unknown-cell pin); section vs stack branches
+    use if/else. Soft section headers use `grid-column: 1 / -1` on `.bag-grid`.
 
 ## Resume point
 
-**Next action:** Phase 3 findability chrome. Merge latest `origin/release/v0.34.0` first.
-Filter count badge, empty Quest filter copy, soft Quest section only where
-`bagOrderIsManual` allows (state.md lock 7). Drop targets must not break in All+recent.
+**Next action:** Phase 4 cross-surface quest gold. Merge latest `origin/release/v0.34.0`
+first. Shared item name color helper for chat item links and loot names.

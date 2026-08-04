@@ -47,6 +47,44 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     expect(painter).not.toContain('applyBagFilter(');
   });
 
+  it('wires Phase 3 findability chrome from pure cores (count, empty copy, list rows)', () => {
+    // Count badge, empty Quest copy, and soft section rows come from pure
+    // helpers; the painter only maps results to DOM. Do not re-derive kind
+    // counts or section rules inline.
+    expect(painter).toContain('bagQuestItemCount(');
+    expect(painter).toContain('bagNoMatchKind(');
+    expect(painter).toContain('buildBagListRows(');
+    expect(painter).toContain('hudChrome.bags.noQuestItems');
+    expect(painter).toContain('hudChrome.bags.filterQuestCountAria');
+    expect(painter).toContain('bag-chip-count');
+    expect(painter).toContain('bag-section-header');
+    // Badge only when N > 0 (state.md metric lock): presence of bag-chip-count
+    // alone still passes if zero is painted; pin the gate next to the badge.
+    expect(painter).toMatch(/questCount\s*>\s*0/);
+    // Warm empty copy association: inverting the ternary keeps bare toContain
+    // green; pin both arms as literals so quest maps to noQuestItems only.
+    expect(painter).toMatch(
+      /bagNoMatchKind\([^)]*\)\s*===\s*'quest'\s*\?\s*'hudChrome\.bags\.noQuestItems'\s*:\s*'hudChrome\.bags\.noMatch'/,
+    );
+  });
+
+  it('never inserts section headers into the manual cells drop-target stream', () => {
+    // Locked decision 7: the model.cells loop must not call buildBagListRows
+    // or buildSectionHeader. Section headers live only on the derived list path
+    // after the cells early-return.
+    const fillStart = painter.indexOf('private fillGrid(');
+    const fillEnd = painter.indexOf('private buildStackCell(');
+    const fill = painter.slice(fillStart, fillEnd);
+    const cellsBranch = fill.slice(
+      fill.indexOf('if (model.cells.length > 0)'),
+      fill.indexOf('// Derived list:'),
+    );
+    expect(cellsBranch).toContain('buildStackCell');
+    expect(cellsBranch).not.toContain('buildBagListRows');
+    expect(cellsBranch).not.toContain('buildSectionHeader');
+    expect(cellsBranch).not.toContain('bag-section-header');
+  });
+
   it("asks for the backpack icon by the id the art is wired under ('backpack')", () => {
     // The bar's first socket is the implicit backpack, whose painted art is wired in
     // icons.ts under exactly this id (UI_ITEM_IMAGE_IDS, guarded by item_icons.test.ts).

@@ -5,7 +5,7 @@
 | Planning packet | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 1: Bag visual identity | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 2: Story tooltip | Complete | 2026-08-03 | 2026-08-03 |
-| Phase 3: Findability chrome | Pending | | |
+| Phase 3: Findability chrome | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 4: Cross-surface language | Pending | | |
 | Phase 5: Interactive polish | Pending | | |
 | Phase 6: Final QA + screenshots + gate | Pending | | |
@@ -31,12 +31,12 @@
 - [x] Reviews clean of BLOCKING
 
 ## Phase 3 deliverables
-- [ ] Quest filter count badge
-- [ ] Empty Quest filter copy
-- [ ] Soft Quest section only where `bagOrderIsManual` allows (state.md lock)
-- [ ] Pure helpers + tests; drop targets never break in All+recent
-- [ ] Merge latest `origin/release/v0.34.0` before coding
-- [ ] Reviews clean of BLOCKING
+- [x] Quest filter count badge
+- [x] Empty Quest filter copy
+- [x] Soft Quest section only where `bagOrderIsManual` allows (state.md lock)
+- [x] Pure helpers + tests; drop targets never break in All+recent
+- [x] Merge latest `origin/release/v0.34.0` before coding
+- [x] Reviews clean of BLOCKING
 
 ## Phase 4 deliverables
 - [ ] Shared item name color helper (quest override)
@@ -79,3 +79,9 @@
   no Common Quest Item double line, story block via host escape + tEntity. English keys
   `itemUi.tooltip.questRelated` / `questRules` / `questOrphaned` with M16 fills. Progress
   reuses `questUi.detail.objectiveProgress`. Merged latest release base first.
+- 2026-08-03 Phase 3: Findability chrome. Metric lock: Quest chip badge uses total stack
+  count of quest pieces (`bagQuestItemCount`, sum of counts). Empty Quest filter uses
+  warm `hudChrome.bags.noQuestItems`. Soft Quest section via `buildBagListRows` only when
+  `!bagOrderIsManual` and the list mixes quest + non-quest; manual All+recent keeps the
+  real cell stream (rim/seal only, no header nodes). i18n EN + M16 for count aria and
+  empty copy. Merged latest release base first.

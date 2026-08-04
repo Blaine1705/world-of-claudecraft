@@ -8183,6 +8183,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.itemAriaInstanced': '{item}，數量 {count}，帶工匠印記的物品',
   'hudChrome.bags.itemAriaMasterwork': '{item}，數量 {count}，傑作',
   'hudChrome.bags.itemAriaQuest': '{item}，數量 {count}，任務物品',
+  'hudChrome.bags.filterQuestCountAria': '任務，{count} 件物品',
+  'hudChrome.bags.noQuestItems': '背包中沒有任務物品。',
   'hudChrome.crafting.gatheredBy': '採集者：{name}',
   'hudChrome.crafting.masterworkSeal': '傑作',
   'hudChrome.crafting.stationRequired': '必須位於{station}才能製作該物品。',
