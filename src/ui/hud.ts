@@ -176,6 +176,7 @@ import {
   mobVoiceActionForDamage,
   mobVoiceCue,
   mobVoiceCueWithFallback,
+  novaAbilityCue,
   playerSwingCueForDamage,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
@@ -185,6 +186,7 @@ import {
 import { type CardinalId, compassView } from './compass';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
+import { cookingCatchHintKey } from './cooking_catch_hint_view';
 import { formatMinimapCoords } from './coords';
 import {
   buildCraftCelebrationPlan,
@@ -582,6 +584,7 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
+import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
@@ -5036,9 +5039,15 @@ export class Hud {
   // sizing onto one of these. Returns the measured author-space box size so the
   // caller can cache it (attachTooltip's mousemove clamp reuses it instead of
   // re-reading offsetWidth/Height, which would force a reflow per mousemove).
-  private paintTooltipAt(html: string, x: number, y: number): { w: number; h: number } {
+  // Accepts a legacy HTML string or a prebuilt Node / DocumentFragment so
+  // createElement painters can mount without forcing every caller onto strings.
+  private paintTooltipAt(content: string | Node, x: number, y: number): { w: number; h: number } {
     this.tooltipEl.classList.remove('mob-tooltip');
-    this.tooltipEl.innerHTML = html;
+    if (typeof content === 'string') {
+      this.tooltipEl.innerHTML = content;
+    } else {
+      this.tooltipEl.replaceChildren(content);
+    }
     this.tooltipEl.style.display = 'block';
     // offsetWidth/Height are author-space (zoom-immune) layout sizes, but x/y
     // arrive in visual (zoomed) space, so map x/y into author space (÷ scale)
@@ -5331,6 +5340,13 @@ export class Hud {
     // keys the table by item id): what the reagent is for and which gear
     // disenchants into it. Every other item id renders nothing here.
     html += materialHintLine(item.id);
+    // Raw cooking catches: pure key table + createElement line (no foodHp /
+    // restore-health line; no materialHintLine HTML growth). outerHTML bridges
+    // the node into the legacy string tooltip stack.
+    const cookingHintKey = cookingCatchHintKey(item.id);
+    if (cookingHintKey) {
+      html += createTooltipLine(t(cookingHintKey), 'tt-desc').outerHTML;
+    }
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
@@ -10114,6 +10130,14 @@ export class Hud {
         // on the same floor, so the player's own y is the right height anchor.
         if (ev.fx !== 'nova') return;
         const y = sim.player.pos.y;
+        // A per-ability nova recording (Flamestrike) is the whole read on the
+        // aimed path too, at the same 1.0 the entity-anchored spellfx path
+        // plays it; the generic burst keeps its school-flavored layer.
+        const novaKey = novaAbilityCue(ev.ability);
+        if (novaKey !== 'spell_nova') {
+          this.combat(novaKey, ev.x, y, ev.z, 1.0, { cooldown: 0.08 });
+          return;
+        }
         this.combat('spell_nova', ev.x, y, ev.z, 0.6, { cooldown: 0.08 });
         this.combat(`impact_${ev.school}`, ev.x, y, ev.z, 0.5, { rate: 0.8, cooldown: 0.08 });
         return;

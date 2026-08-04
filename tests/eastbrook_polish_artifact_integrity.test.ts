@@ -614,16 +614,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned after stacking this branch's renderer provenance move (the Bear Form
-// visual swap onto the purpose-built quadruped rig) onto a release/v0.34.0 that
-// already carries PR #2720's Eastbrook fence-removal layout evidence and the live
-// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs).
-// The accepted file still points at the same captured view; only its swept
-// provenance bytes follow the merged rendererIntegration and layout inputs.
+// Re-pinned after stacking this branch's renderer provenance move (the Blizzard
+// timed ground loop on the snowZone spellfx arm) onto a release/v0.34.0 that now
+// also carries the far-field work (sprite impostors, the fog-free vista, and the
+// horizon pass, PR #2793). Both sides move the same rendererIntegration leaf, so
+// the merged tree mints literals matching neither parent. The accepted file still
+// points at the same captured view; only its swept provenance bytes follow the
+// merged rendererIntegration input.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'cc85733f3d8b76363977b65eee4868018493e20f00aa85c1de1fcc98d1776f24';
+  'ead3c0a3861443d66c3a85915d1a1a8c7bd6c4e47f5efbad1df512af3ee98e8e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '38b87f7e206b1666253705a02283b70485b5fa6dd16096d1463d51ef7defe0f4';
+  '37d323e85add7bc96cc62dfe7860bedba2949a3ec0934f45ca61650e3f86a571';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1480,15 +1481,15 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // After stacking this branch's renderer provenance move (the Bear Form rig
-    // swap) onto a base carrying PR #2720's fence-removal content change and the
-    // live graphics rebuild, this seal follows the merged composite, recomputed
-    // last by remint_polish_provenance.mjs. Every measured value (frame timings,
-    // draw stats, triangle and scenario numbers) is byte-identical against the
+    // After stacking this branch's renderer provenance move (the Blizzard timed
+    // ground loop) onto a base that now carries the far-field work (PR #2793),
+    // this seal follows the merged composite, recomputed last by
+    // remint_polish_provenance.mjs. Every measured value (frame timings, draw
+    // stats, triangle and scenario numbers) is byte-identical against the
     // current release/v0.34.0 tip, no parent's literal matched the merged tree,
     // and no capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '7dff3a2a3aaa221a40e3abca1464b0510986ee85c7d7d1922d034b1b7a82f37a',
+      'ced64c4976abc483a3759f3ff31728e65418602d3f378060fe85825cf0d45b8b',
     );
   });
 

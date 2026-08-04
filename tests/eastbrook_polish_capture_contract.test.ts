@@ -370,13 +370,11 @@ describe('Eastbrook polish capture contract', () => {
       // literal. No GLB source fingerprint moved, no pipeline input or geometry
       // value changed, and no capture was retaken. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      // Deliberately re-pinned at the far-field merge: the release retook
-      // the polish captures (their metadata/performance JSONs and pins are
-      // adopted verbatim), but this branch's renderer.ts still moves the
-      // rendererIntegration leaf (impostor bake, fog-free vista, haze band,
-      // the #2793 review round), so the merged composite matches neither
-      // parent's literal. No capture was retaken here.
-      fingerprint: '56c3b80211a4ebe3465eed9f0b578cf15e821d8f1971e32a9495231926a88445',
+// Re-pinned after merging fenbridge open-gate layout with the far-field
+      // release leaf moves. Both sides moved rendererIntegration inputs, so
+      // the composite matches neither parent's literal. Re-minted with
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '37d323e85add7bc96cc62dfe7860bedba2949a3ec0934f45ca61650e3f86a571',
       components: {
         captureContract: {
           id: 'polish-v2',
