@@ -233,6 +233,7 @@ import {
   dungeonDisplayName,
   itemDisplayName,
   knownLetterId,
+  riftFloorLabel,
   tEntity,
   zoneDisplayName,
   zonePoiLabel,
@@ -432,6 +433,7 @@ import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
 import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom } from './map_pinch_zoom_core';
+import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
 import {
   type MapRegion,
   mapCanvasHeight,
@@ -9578,14 +9580,21 @@ export class Hud {
 
   // Dungeon Finder "Show on Map": open the world map on the entrance's zone
   // band, pan to the authored door position, and ring it. Never teleports; the
-  // highlight clears when the map closes or is reopened normally.
+  // highlight clears when the map closes or is reopened normally. The pan/zoom
+  // + forced per-zone level all come from showOnMapPanState (map_show_on_map_core.ts):
+  // see its header for why the level write is not optional (the continent
+  // overview branch of updateMapWindow never reads mapPing/mapZoom/mapCenter
+  // at all, so a map left open on that level swallowed the ping silently).
   showFinderOnMap(x: number, z: number): void {
     const el = $('#map-window');
     if (el.style.display !== 'block') this.toggleMap();
-    this.mapZoneOverride = zoneAt(x, z).id;
-    this.mapPing = { x, z };
-    this.mapZoom = Math.max(this.mapZoom, 2);
-    this.mapCenter = { x, z };
+    const next = showOnMapPanState(this.mapZoom, x, z, zoneAt(x, z).id);
+    this.mapZoneOverride = next.zoneOverride;
+    this.mapPing = next.ping;
+    this.mapZoom = next.zoom;
+    this.mapCenter = next.center;
+    this.mapLevel = next.level;
+    this.mapHoverZone = next.hoverZone;
     this.updateMapWindow();
   }
 
@@ -9671,10 +9680,15 @@ export class Hud {
         : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
     // Crossing a zone while the map is open starts that zone at its full frame;
     // a pan target from the previous zone must never leak into the new one.
+    // shouldResetMapPanOnZoneCross (map_show_on_map_core.ts) is what keeps a
+    // pending Show-on-Map ping's own zoom/pan from being clobbered by this
+    // same guard on the redraw right after the ping fires.
     if (this.mapZoneId !== zone.id) {
       this.mapZoneId = zone.id;
-      this.mapZoom = MAP_OPEN_ZOOM;
-      this.mapCenter = null;
+      if (shouldResetMapPanOnZoneCross(this.mapPing !== null, this.mapZoneOverride, zone.id)) {
+        this.mapZoom = MAP_OPEN_ZOOM;
+        this.mapCenter = null;
+      }
     }
     const zoneBg = {
       canvas: this.mapZoneBg(zone),
@@ -9692,7 +9706,14 @@ export class Hud {
     this.mapQuestAreas = result.questAreas;
     this.mapNpcMarkers = result.npcs;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
-    this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
+    // Inside a rift the aria-live summary must name the generated floor, not
+    // the overworld zone the far-off rift x would otherwise resolve to
+    // (mirrors the on-canvas title map_window_painter now draws).
+    const riftFloor = this.sim.riftFloor;
+    const zoneLabel = riftFloor
+      ? riftFloorLabel(riftFloor.name, riftFloor.tier)
+      : zoneDisplayName(zone.id);
+    this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneLabel }));
   }
 
   // Tooltip body for a hovered zone region on the continent overview: the zone's
