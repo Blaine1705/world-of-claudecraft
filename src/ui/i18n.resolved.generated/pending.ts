@@ -14,28 +14,36 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "es_ES": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_FR": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_CA": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "en_CA": [],
   "it_IT": [
@@ -43,14 +51,18 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "de_DE": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -61,7 +73,9 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -69,55 +83,71 @@ export const pending: Record<string, readonly string[]> = {
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "nl_NL": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "pl_PL": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "id_ID": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "tr_TR": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "sv_SE": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "vi_VN": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ],
   "da_DK": [
     "desktop.update.checkingBody",
     "desktop.update.checkingTitle",
     "desktop.update.dismiss",
     "desktop.update.downloadingBody",
-    "desktop.update.uptodateTitle"
+    "desktop.update.uptodateTitle",
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
   ]
 };
