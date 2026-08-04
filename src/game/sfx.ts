@@ -15,6 +15,11 @@ import type { BiomeId } from '../sim/types';
 import { isAbilityMomentRecorded } from './ability_sfx_coverage';
 import { resumeWhenAllowed } from './audio_unlock';
 import {
+  advanceMountEngine,
+  type MountEngineEntry,
+  mountEngineLoopActive,
+} from './mount_engine_state';
+import {
   SFX_CATALOG_HASH,
   SFX_CLIPS,
   SFX_RUNTIME_PACK_URL,
@@ -64,6 +69,12 @@ const FORGE_AMBIENCE_GAIN = 0.625;
 // 6) heading into town, and still 8 units narrower than the shared 46
 // default.
 export const FORGE_MAX_DISTANCE = 38;
+// Fallback windup duration for mountEngine's very first call on a cold cache
+// (the real decoded AudioBuffer.duration takes over once the clip loads);
+// close to the tank mount's actual ~0.9s windup take so the first play still
+// splices to the loop at roughly the right instant.
+const MOUNT_ENGINE_START_FALLBACK_SEC = 0.9;
+
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -160,6 +171,8 @@ class Sfx {
   private loops = new Map<string, LoopSlot>();
   // Pending auto-stop timers for timedGroundLoop, keyed the same as `loops`.
   private groundLoopTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  // Per-entity windup/loop/winddown state for an engine mount (see mountEngine).
+  private mountEngines = new Map<number, MountEngineEntry>();
   private footstepsOn = false; // off by default; driven by the footstepSfx setting
   private lx = 0;
   private lz = 0; // cached listener position
@@ -638,7 +651,12 @@ class Sfx {
   // one caster's channel) is reused and cross-faded rather than restarted.
 
   /** Ensure a loop `id` is playing `key` at `target` gain; (x,y,z) makes it
-   *  positional. Ramps gain smoothly; creating from scratch fades in from 0. */
+   *  positional. Ramps gain smoothly; creating from scratch fades in from 0,
+   *  UNLESS `immediate` is set, which snaps straight to full target gain on
+   *  creation instead (a hard splice from a preceding one-shot that was
+   *  authored to already end at the loop's own level, e.g. mountEngine's
+   *  windup-to-loop handoff: a fade-in there would read as an audible swell
+   *  right where the two takes are meant to read as one continuous sound). */
   // maxDistance defaults to makePanner's own default (the shared MAX_DISTANCE),
   // so every existing caller keeps its current audible range; only a caller
   // that needs its own falloff (pointAmbient's 'forge' branch) passes an
@@ -652,6 +670,7 @@ class Sfx {
     y?: number,
     z?: number,
     maxDistance?: number,
+    immediate = false,
   ): void {
     const ctx = this.ctx,
       master = this.master;
@@ -662,6 +681,7 @@ class Sfx {
       this.unloop(id, 0);
       slot = undefined;
     }
+    let justCreated = false;
     if (!slot) {
       const pending = this.pendingLoops.get(id);
       const pendingVariant = pending?.key === key ? this.pendingLoopVariants.get(id) : undefined;
@@ -719,6 +739,7 @@ class Sfx {
       this.pendingLoopVariants.delete(id);
       slot = { key, src, gain: g, panner, target: -1, x, y, z };
       this.loops.set(id, slot);
+      justCreated = true;
     } else if (positional && slot.panner) {
       if (slot.x !== x || slot.y !== y || slot.z !== z) {
         this.setPannerPos(slot.panner, x, y, z);
@@ -740,7 +761,8 @@ class Sfx {
     const mixedTarget = target * (this.entry(key)?.gain ?? 1);
     if (slot.target !== mixedTarget) {
       slot.target = mixedTarget;
-      slot.gain.gain.setTargetAtTime(mixedTarget, ctx.currentTime, 0.25);
+      if (justCreated && immediate) slot.gain.gain.setValueAtTime(mixedTarget, ctx.currentTime);
+      else slot.gain.gain.setTargetAtTime(mixedTarget, ctx.currentTime, 0.25);
     }
   }
 
@@ -855,6 +877,54 @@ class Sfx {
       cooldown: 0.05,
       release: 0.44,
     });
+  }
+
+  /** Windup/loop/winddown engine audio for a mount with a dedicated take set
+   *  (currently just the tank mount): call every frame a rider is mounted,
+   *  keyed per entity so multiple riders never share state. A mount with no
+   *  `_start` take falls through silently, so ordinary mounts keep using
+   *  mountRun's per-stride gait beat instead. See mount_engine_state.ts for
+   *  the transition rules (a quick tap plays the windup and winddown back to
+   *  back, no loop; sustained movement crossfades into the loop and back
+   *  out). Returns whether this call drives an engine mount at all, so the
+   *  caller (renderer.ts) knows whether to also skip the generic gait beat. */
+  mountEngine(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    moving: boolean,
+    entityId: number,
+  ): boolean {
+    const startKey = `mount_run_${mountKey}_start`;
+    const loopKey = `mount_run_${mountKey}`;
+    const stopKey = `mount_run_${mountKey}_stop`;
+    if (!(startKey in SFX_CLIPS)) return false;
+    const ctx = this.ctx;
+    if (!ctx) return true;
+    const now = ctx.currentTime;
+    const prior = this.mountEngines.get(entityId);
+    const startBuf = this.buffers.get(assetCacheKey(startKey, 0));
+    const startDuration = startBuf?.duration ?? MOUNT_ENGINE_START_FALLBACK_SEC;
+    const { next, action } = advanceMountEngine(prior, moving, now, startDuration);
+    this.mountEngines.set(entityId, next);
+    if (action === 'playStart') this.playAt(startKey, x, y, z, { gain: 0.85, cooldown: 0 });
+    else if (action === 'playStop') this.playAt(stopKey, x, y, z, { gain: 0.85, cooldown: 0 });
+    const loopActive = mountEngineLoopActive(next.state);
+    const loopId = `mountEngine:${entityId}`;
+    // immediate: true, the windup take is authored to already end at the
+    // loop's own level, so a fade-in here would read as a swell right where
+    // the two takes are meant to splice as one continuous sound.
+    if (loopActive) this.loop(loopId, loopKey, 0.85, x, y, z, undefined, true);
+    else if (prior && mountEngineLoopActive(prior.state)) this.unloop(loopId, 0.15);
+    return true;
+  }
+
+  /** Drop an entity's engine-mount state and silence its loop, e.g. on
+   *  dismount or when its view is removed (interest culled, disconnect). */
+  mountEngineReset(entityId: number): void {
+    if (!this.mountEngines.delete(entityId)) return;
+    this.unloop(`mountEngine:${entityId}`, 0.1);
   }
 
   /** Jump / land / water-entry / swim-stroke. */

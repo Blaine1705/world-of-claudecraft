@@ -120,6 +120,10 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'mount_run_terrorspark_groundshaker_start',
+    custom: true,
+  },
+  {
     key: 'mount_run_terrorspark_groundshaker',
     custom: true,
   },
@@ -127,6 +131,10 @@ export const SFX = [
     // The Drakemaw Raptor's sprint: the gobbler's two-legged gallop donor,
     // pitched down in sfx_speed_map.json so the heavier raptor reads deeper.
     key: 'mount_run_drakemaw_raptor',
+    custom: true,
+  },
+  {
+    key: 'mount_run_terrorspark_groundshaker_stop',
     custom: true,
   },
   {

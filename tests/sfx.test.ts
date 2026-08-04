@@ -23,6 +23,7 @@ interface FakeSource {
 
 const sources: FakeSource[] = [];
 let nowT = 0;
+let gainAutomationCalls: string[] = [];
 const WOOD_BUFFER = { duration: 0.37 };
 
 function lastSource(): FakeSource {
@@ -33,12 +34,19 @@ function lastSource(): FakeSource {
 
 function installAudioStub(): void {
   sources.length = 0;
+  gainAutomationCalls = [];
   nowT += 1000; // monotonic across tests so the singleton's cooldown map never blocks
   const param = () => ({
     value: 0,
-    setValueAtTime() {},
+    setValueAtTime(v: number) {
+      this.value = v;
+      gainAutomationCalls.push('setValueAtTime');
+    },
     linearRampToValueAtTime() {},
-    setTargetAtTime() {},
+    setTargetAtTime(v: number) {
+      this.value = v;
+      gainAutomationCalls.push('setTargetAtTime');
+    },
   });
   class FakeCtx {
     get currentTime() {
@@ -253,9 +261,21 @@ describe('mount running audio', () => {
     }
   });
 
+  // The tank mount (terrorspark_groundshaker) has a dedicated windup/loop/
+  // winddown take set (see mount_engine_state.ts), so it ships two extra
+  // clips beyond the base loop every other mount has.
+  const ENGINE_MOUNT_EXTRA_SUFFIXES: Partial<Record<string, string[]>> = {
+    terrorspark_groundshaker: ['_start', '_stop'],
+  };
+
   it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
-    const expected = MOUNT_KEYS.map((mountKey) => `mount_run_${mountKey}.mp3`).sort();
+    const expected = MOUNT_KEYS.flatMap((mountKey) => [
+      `mount_run_${mountKey}.mp3`,
+      ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
+        (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
+      ),
+    ]).sort();
     const actual = readdirSync(directory)
       .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
       .sort();
@@ -301,6 +321,115 @@ describe('mount running audio', () => {
     const before = sources.length;
     sfx.mountRun(0, 0, 0, 'unknown_mount', true);
     expect(sources.length).toBe(before);
+  });
+});
+
+describe('mount engine audio (windup/loop/winddown)', () => {
+  const KEY = 'terrorspark_groundshaker';
+  const START_KEY = `mount_run_${KEY}_start`;
+  const LOOP_KEY = `mount_run_${KEY}`;
+  const STOP_KEY = `mount_run_${KEY}_stop`;
+  const START_BUF = { duration: 0.9 };
+  const STOP_BUF = { duration: 0.7 };
+
+  // One-shot playback increments Sfx's MAX_VOICES concurrency counter on play
+  // and only decrements it via the real AudioBufferSourceNode's `ended`
+  // event, which this suite's FakeSource never fires (it only records
+  // `stopAt`); left alone, this suite's extra one-shots would push the
+  // shared `sfx` singleton's counter toward the 24-voice cap and starve
+  // later tests in this FILE. Reset it directly instead. Also resets the
+  // per-entity engine and loop maps: entity id 1 is reused test to test.
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set(START_KEY, START_BUF);
+    buffers.set(STOP_KEY, STOP_BUF);
+    (sfx as unknown as { mountEngines: Map<number, unknown> }).mountEngines.clear();
+    (sfx as unknown as { loops: Map<string, unknown> }).loops.clear();
+  });
+
+  afterEach(() => {
+    (sfx as unknown as { active: number }).active = 0;
+  });
+
+  it('falls through (returns false) for a mount with no engine take set', () => {
+    expect(sfx.mountEngine(0, 0, 0, 'valorsteed', true, 1)).toBe(false);
+  });
+
+  it('plays the windup one-shot on the moving edge and reports the mount as handled', () => {
+    const handled = sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    expect(handled).toBe(true);
+    expect(lastSource().buffer).toBe(START_BUF);
+    expect(lastSource().started).toBe(true);
+  });
+
+  it('starts the sustain loop once the windup duration elapses while still moving', () => {
+    const buffers = (sfx as unknown as { buffers: Map<string, unknown> }).buffers;
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    nowT += 0.9;
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    // The loop path (Sfx.loop) creates its own source with `loop = true`.
+    const loopSrc = sources.at(-1) as unknown as { loop?: boolean; buffer: unknown };
+    expect(loopSrc.loop).toBe(true);
+    expect(loopSrc.buffer).toBe(buffers.get(LOOP_KEY));
+  });
+
+  it('splices into the loop at full volume, no fade-in ramp at the windup/loop seam', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    nowT += 0.9;
+    gainAutomationCalls = []; // isolate just the loop-entry gain call
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    const loops = (sfx as unknown as { loops: Map<string, { gain: { gain: { value: number } } }> })
+      .loops;
+    const slot = loops.get('mountEngine:1');
+    expect(slot?.gain.gain.value).toBeGreaterThan(0); // snapped straight to target
+    expect(gainAutomationCalls).toEqual(['setValueAtTime']); // never setTargetAtTime (the ramp)
+  });
+
+  it('a quick tap plays the windup and winddown back to back with no loop ever engaging', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    const beforeLoop = sources.length;
+    // Released well before the 0.9s windup naturally ends.
+    nowT += 0.1;
+    sfx.mountEngine(0, 0, 0, KEY, false, 1);
+    expect(sources.length).toBe(beforeLoop); // no new source yet: windup still playing
+    // At the windup's natural end, moving is still false: chains to winddown.
+    nowT += 0.8;
+    sfx.mountEngine(0, 0, 0, KEY, false, 1);
+    expect(lastSource().buffer).toBe(STOP_BUF);
+    // Never entered the loop.
+    expect(sources.some((s) => (s as unknown as { loop?: boolean }).loop)).toBe(false);
+  });
+
+  it('stops the loop and plays the winddown one-shot on the stop edge', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    nowT += 0.9;
+    sfx.mountEngine(0, 0, 0, KEY, true, 1); // enters the loop
+    nowT += 1;
+    sfx.mountEngine(0, 0, 0, KEY, false, 1);
+    expect(lastSource().buffer).toBe(STOP_BUF);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.has('mountEngine:1')).toBe(false);
+  });
+
+  it('tracks each entity independently', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    const rider1Start = lastSource();
+    sfx.mountEngine(0, 0, 0, KEY, false, 2); // rider 2 was never moving: no-op
+    expect(sources.at(-1)).toBe(rider1Start);
+  });
+
+  it('mountEngineReset silences an in-progress loop and clears state', () => {
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    nowT += 0.9;
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    expect(loops.has('mountEngine:1')).toBe(true);
+    sfx.mountEngineReset(1);
+    expect(loops.has('mountEngine:1')).toBe(false);
+    // A fresh moving edge after reset starts clean from the windup again.
+    nowT += 1;
+    sfx.mountEngine(0, 0, 0, KEY, true, 1);
+    expect(lastSource().buffer).toBe(START_BUF);
   });
 });
 

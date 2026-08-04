@@ -8872,6 +8872,7 @@ export class Renderer {
     v.temporalHourglassVisual?.dispose();
     v.frostNovaRootVisual?.dispose();
     v.mageBarrierVisual?.dispose();
+    this.audioSink?.mountEngineReset(id);
     this.views.delete(id);
   }
 
@@ -9916,7 +9917,13 @@ export class Renderer {
             sink.movement('swim', ax, ay, az, isSelf);
           }
         } else if (logicallyMounted && moving && !airborne) {
-          if (loco.speed >= FOOT_RUN_SPEED) {
+          // An engine mount (windup/loop/winddown take set, e.g. the tank
+          // mount) drives its own state machine every frame instead of the
+          // per-stride gait beat below; mountEngine reports whether this
+          // mountKey actually has one, so ordinary mounts fall through.
+          if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id)) {
+            // handled entirely by mountEngine
+          } else if (loco.speed >= FOOT_RUN_SPEED) {
             v.stepAccum += loco.speed * dt;
             if (v.stepAccum >= MOUNT_STRIDE_RUN) {
               v.stepAccum = 0;
@@ -9925,6 +9932,11 @@ export class Renderer {
           } else {
             v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
+        } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
+          // Not moving (or airborne) while mounted: still poll an engine
+          // mount every frame so the winddown fires on the stop edge; a
+          // non-engine mount has nothing to do here (mountEngine no-ops).
+          sink.mountEngine(ax, ay, az, e.mountKey, false, e.id);
         } else if (moving && !airborne) {
           v.stepAccum += loco.speed * dt;
           const stride = loco.speed >= FOOT_RUN_SPEED ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK;
