@@ -196,6 +196,7 @@ const UI_PURE_CORES = [
   'src/ui/material_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
   'src/ui/bag_quest_mark_view.ts',
+  'src/ui/quest_item_tooltip_view.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',

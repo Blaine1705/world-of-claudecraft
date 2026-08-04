@@ -1,6 +1,6 @@
 # Quest Item Inventory UI: cross-phase state
 
-Current phase: **Phase 1 complete; Phase 2 ready to start**
+Current phase: **Phase 2 complete; Phase 3 ready to start**
 Worktree: `/Users/fernando/Documents/wocc-quest-item-ui`
 Branch: `feature/quest-item-inventory-ui`
 Base: `release/v0.34.0` (merge latest at the start of every phase)
@@ -68,7 +68,7 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
 
 ### Expected new modules
 - `src/ui/bag_quest_mark_view.ts` + `tests/bag_quest_mark_view.test.ts` (**done Phase 1**)
-- `src/ui/quest_item_tooltip_view.ts` + `tests/quest_item_tooltip_view.test.ts`
+- `src/ui/quest_item_tooltip_view.ts` + `tests/quest_item_tooltip_view.test.ts` (**done Phase 2**)
 - Optional Phase 4: `src/ui/item_name_color.ts` (or similar) + tests
 - Optional Phase 5: small bag-tracker highlight helper
 
@@ -81,12 +81,16 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   need a full Sim.
 - Bag mark class `.bag-quest` and seal `.bi-quest-seal` are stable; tooltip can reuse
   `--color-quest` / quest gold language.
+- Phase 2 model: `questItemTooltipModel` returns titleColorMode, showQuality false,
+  kindLineKey, relatedQuestId, progress (objectiveIndex/current/required), rulesKey,
+  orphaned. Host localizes related title via tEntity quest channel and progress via
+  questUi.detail.objectiveProgress; rules/orphaned via itemUi.tooltip keys.
 
 ## Beauty checklist (every visual phase)
 
 - [x] Looks premium next to quality borders and masterwork seals (Phase 1 rim/seal)
 - [x] Quest gold, not chrome gold wash over everything (`--color-quest` #ffd12d)
-- [ ] Mobile long-press / desktop hover both honest (tooltip Phase 2)
+- [x] Mobile long-press / desktop hover both honest (tooltip Phase 2 model + host)
 - [x] Reduced motion never removes the rim or seal (no motion gate on Phase 1)
 - [ ] Screenshots planned or taken for the PR
 
@@ -95,6 +99,8 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
 - New files:
   - `src/ui/bag_quest_mark_view.ts`
   - `tests/bag_quest_mark_view.test.ts`
+  - `src/ui/quest_item_tooltip_view.ts`
+  - `tests/quest_item_tooltip_view.test.ts`
   - `docs/quest-item-inventory-ui/*` (planning packet)
 - New tokens:
   - `--color-quest: #ffd12d`
@@ -103,16 +109,24 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   - `--color-bag-quest-seal`
 - New i18n keys:
   - `hudChrome.bags.itemAriaQuest` (EN + M16: zh_CN, zh_TW, ja_JP, ko_KR, ru_RU)
+  - `itemUi.tooltip.questRelated` (EN + M16)
+  - `itemUi.tooltip.questRules` (EN + M16)
+  - `itemUi.tooltip.questOrphaned` (EN + M16)
 - Architecture allowlist entries:
   - `src/ui/bag_quest_mark_view.ts` in `UI_PURE_CORES`
+  - `src/ui/quest_item_tooltip_view.ts` in `UI_PURE_CORES`
 - Known gotchas discovered:
   - `.bag-item.q-common` uses `border-color: ... !important`; quest rim rule must follow
     it (or also use `!important`) so purpose gold wins on common quest stacks.
   - Glyph priority composition lives in `bags_window` buildStackCell, not inside either
     pure core (keeps bag_quest_mark free of instance-glyph imports).
+  - Tooltip progress reuses `questUi.detail.objectiveProgress` so tracker and item
+    tooltips share one number format; do not invent a parallel progress key.
+  - Kind line uses `itemUi.kind.quest` alone (showQuality false); the legacy
+    `itemUi.tooltip.questItem` desc line is no longer composed for quest kinds.
 
 ## Resume point
 
-**Next action:** Phase 2 story tooltip. Merge latest `origin/release/v0.34.0` first.
-Reuse `--color-quest` for title/kind gold. Extract `quest_item_tooltip_view.ts` pure model;
-keep `Hud.itemTooltip` quest branch thin.
+**Next action:** Phase 3 findability chrome. Merge latest `origin/release/v0.34.0` first.
+Filter count badge, empty Quest filter copy, soft Quest section only where
+`bagOrderIsManual` allows (state.md lock 7). Drop targets must not break in All+recent.

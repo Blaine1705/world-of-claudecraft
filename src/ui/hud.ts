@@ -532,6 +532,12 @@ import {
 import { buildProfessionTutorialModel } from './profession_tutorial_view';
 import { renderProfessionTutorial } from './profession_tutorial_window';
 import { ProfessionsWindow } from './professions_window';
+import {
+  QUEST_ITEM_TOOLTIP_COLOR,
+  type QuestItemTooltipModel,
+  questItemTooltipModel,
+  questItemTooltipRelatedKey,
+} from './quest_item_tooltip_view';
 import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
@@ -5139,21 +5145,37 @@ export class Hud {
   // fungible stacks and def-only surfaces (the crafting window's result rows),
   // so those render exactly as before.
   private itemTooltip(item: ItemDef, compare = true, instance?: ItemInstancePayload): string {
-    const qColor = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
+    // Quest items are a purpose class, not a quality tier: title and kind use
+    // quest gold, and the kind line is "Quest Item" alone (never "Common Quest
+    // Item"). Story lines (related quest, progress, rules, orphaned) come from
+    // the pure model; escape and tEntity stay in this host.
+    const questModel = this.questItemTooltipFor(item);
+    const qColor =
+      questModel?.titleColorMode === 'quest'
+        ? QUEST_ITEM_TOOLTIP_COLOR
+        : (QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff');
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
     // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
     // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
     // "[HEROIC]" tag here (never in the name) so the drop reads "Epic Armor [HEROIC]".
-    let qualityKindHtml = esc(
-      t('itemUi.tooltip.qualityKind', {
-        quality: itemQualityLabel(item.quality),
-        kind: itemKindLabel(item.kind, item.id),
-      }),
-    );
-    if (item.heroicOf || item.heroic) {
-      qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+    // Quest kinds skip the quality half so the line is a single quest-gold
+    // "Quest Item" (no redundant Common + second Quest Item desc).
+    if (questModel && !questModel.showQuality) {
+      html += `<div class="tt-sub" style="color:${QUEST_ITEM_TOOLTIP_COLOR}">${esc(
+        t(questModel.kindLineKey),
+      )}</div>`;
+    } else {
+      let qualityKindHtml = esc(
+        t('itemUi.tooltip.qualityKind', {
+          quality: itemQualityLabel(item.quality),
+          kind: itemKindLabel(item.kind, item.id),
+        }),
+      );
+      if (item.heroicOf || item.heroic) {
+        qualityKindHtml += ` <span style="color:#e5cc80">${esc(t('hudChrome.itemHeroicTag'))}</span>`;
+      }
+      html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     }
-    html += `<div class="tt-sub">${qualityKindHtml}</div>`;
     // Weapon type (Sword/Dagger/Mace/...) as its own plain line under the
     // quality/kind line and above the slot/handedness line, classic-style, so a
     // player can tell a dagger from a sword at a glance (rogues need daggers). It
@@ -5300,8 +5322,9 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
-    if (item.kind === 'quest')
-      html += `<div class="tt-desc">${esc(t('itemUi.tooltip.questItem'))}</div>`;
+    // Quest story block (related quest, progress, rules, orphaned). Replaces the
+    // old plain "Quest Item" desc that doubled the kind line.
+    if (questModel) html += this.questItemTooltipStoryHtml(questModel);
     if (item.kind === 'bag' && item.bagSlots)
       html += `<div class="tt-stat">${esc(t('itemUi.tooltip.bagSlots', { slots: itemNumber(item.bagSlots) }))}</div>`;
     // Collectible mount reins: the mount's flavor + specialty numbers + its
@@ -5525,6 +5548,56 @@ export class Hud {
       current: this.questNumber(current),
       total: this.questNumber(total),
     });
+  }
+
+  /** Pure quest-item tooltip model for one def, or null for non-quest kinds. */
+  private questItemTooltipFor(item: ItemDef): QuestItemTooltipModel | null {
+    if (item.kind !== 'quest') return null;
+    const questId = item.questId;
+    const quest = questId ? QUESTS[questId] : undefined;
+    const log = questId ? this.sim.questLog.get(questId) : undefined;
+    return questItemTooltipModel({
+      kind: item.kind,
+      itemId: item.id,
+      questId,
+      questKnown: !!quest,
+      log: log
+        ? {
+            counts: log.counts,
+            state: log.state,
+            resolvedCounts: log.resolvedCounts,
+          }
+        : null,
+      objectives: quest?.objectives.map((objective) => ({
+        type: objective.type,
+        itemId: 'itemId' in objective ? objective.itemId : undefined,
+        count: objective.count,
+      })),
+    });
+  }
+
+  /** Story lines under the quest kind row: related quest, progress, rules, orphaned. */
+  private questItemTooltipStoryHtml(model: QuestItemTooltipModel): string {
+    let html = '';
+    if (model.relatedQuestId) {
+      html += `<div class="tt-sub" style="color:${QUEST_ITEM_TOOLTIP_COLOR}">${esc(
+        t(questItemTooltipRelatedKey(), { quest: questTitle(model.relatedQuestId) }),
+      )}</div>`;
+    }
+    if (model.progress && model.relatedQuestId) {
+      html += `<div class="tt-sub">${esc(
+        this.questProgressText(
+          questObjectiveLabel(model.relatedQuestId, model.progress.objectiveIndex),
+          model.progress.current,
+          model.progress.required,
+        ),
+      )}</div>`;
+    }
+    html += `<div class="tt-desc">${esc(t(model.rulesKey))}</div>`;
+    if (model.orphaned) {
+      html += `<div class="tt-desc">${esc(t(model.orphanedKey))}</div>`;
+    }
+    return html;
   }
 
   private questSuggestedPlayersHtml(count?: number): string {

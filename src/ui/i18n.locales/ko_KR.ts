@@ -2355,6 +2355,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useDrink':
     '사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.',
   'itemUi.tooltip.questItem': '퀘스트 아이템',
+  'itemUi.tooltip.questRelated': '퀘스트: {quest}',
+  'itemUi.tooltip.questRules': '판매, 은행에 보관, 거래할 수 없습니다.',
+  'itemUi.tooltip.questOrphaned': '진행 중인 퀘스트에 더 이상 필요하지 않습니다.',
   'itemUi.tooltip.classes': '직업: {classes}',
   'itemUi.tooltip.sellPrice': '판매 가격: {money}',
   'itemUi.tooltip.clickBuy': '클릭하여 구매',

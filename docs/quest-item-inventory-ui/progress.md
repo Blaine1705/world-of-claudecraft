@@ -4,7 +4,7 @@
 |---|---|---|---|
 | Planning packet | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 1: Bag visual identity | Complete | 2026-08-03 | 2026-08-03 |
-| Phase 2: Story tooltip | Pending | | |
+| Phase 2: Story tooltip | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 3: Findability chrome | Pending | | |
 | Phase 4: Cross-surface language | Pending | | |
 | Phase 5: Interactive polish | Pending | | |
@@ -22,13 +22,13 @@
 - [x] `progress.md` / `state.md` ledger updated
 
 ## Phase 2 deliverables
-- [ ] `src/ui/quest_item_tooltip_view.ts` pure model + decisive tests
-- [ ] `Hud.itemTooltip` thin composition for quest branch
-- [ ] Quest-gold title/kind; no redundant Common Quest Item double line
-- [ ] Related quest title, progress, rules footer, orphaned line
-- [ ] i18n keys + M16 as required
-- [ ] Merge latest `origin/release/v0.34.0` before coding
-- [ ] Reviews clean of BLOCKING
+- [x] `src/ui/quest_item_tooltip_view.ts` pure model + decisive tests
+- [x] `Hud.itemTooltip` thin composition for quest branch
+- [x] Quest-gold title/kind; no redundant Common Quest Item double line
+- [x] Related quest title, progress, rules footer, orphaned line
+- [x] i18n keys + M16 as required
+- [x] Merge latest `origin/release/v0.34.0` before coding
+- [x] Reviews clean of BLOCKING
 
 ## Phase 3 deliverables
 - [ ] Quest filter count badge
@@ -73,3 +73,9 @@
   bags_window class/seal/glyph priority/aria, English `hudChrome.bags.itemAriaQuest` with
   M16 fills (zh_CN, zh_TW, ja_JP, ko_KR, ru_RU). Validation: tsc, pure-core + bags marker
   + architecture + localization tests, `npm run ci:changed`.
+- 2026-08-03 Phase 2: Story tooltip. Pure core `questItemTooltipModel` (quest gold title
+  mode, showQuality false, related quest id, collect/gather progress from plain log +
+  objectives, rules + orphaned keys). Thin `Hud.itemTooltip` composition: title/kind gold,
+  no Common Quest Item double line, story block via host escape + tEntity. English keys
+  `itemUi.tooltip.questRelated` / `questRules` / `questOrphaned` with M16 fills. Progress
+  reuses `questUi.detail.objectiveProgress`. Merged latest release base first.
