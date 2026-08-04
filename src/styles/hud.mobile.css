@@ -223,11 +223,15 @@
   }
   /* Floating move joystick: a lower-left capture zone lets the thumb land
      anywhere; the joystick rests dimmed at home until touched, then springs to
-     the touch point with a gold "engaged" glow. */
+     the touch point with a gold "engaged" glow. Anchored with the same
+     env(safe-area-inset-left)/env(safe-area-inset-bottom) offsets as the
+     .mobile-joystick rule it hosts (every other touch control already does
+     this), so the capture zone itself does not sit under a notch or the home
+     indicator gesture strip; the zone's own width/height stay untouched. */
   body.mobile-touch #mobile-move-zone {
     position: absolute;
-    left: 0;
-    bottom: 0;
+    left: max(18px, env(safe-area-inset-left));
+    bottom: calc(26px + env(safe-area-inset-bottom));
     width: min(30vw, 132px);
     min-width: 112px;
     max-width: 132px;
@@ -5459,6 +5463,12 @@
     body.mobile-touch.hud-mobile-tablet #castbar,
     body.mobile-touch.hud-mobile-tablet #swingbar {
       left: calc(50% - 10px);
+    }
+    /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar {
+      left: calc(50% + 10px);
     }
   }
 
