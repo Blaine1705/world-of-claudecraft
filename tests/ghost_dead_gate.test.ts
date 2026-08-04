@@ -16,6 +16,7 @@
 import { describe, expect, it } from 'vitest';
 import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { DUNGEON_X_THRESHOLD, QUESTS, SPIRIT_HEALER_NPC_ID } from '../src/sim/data';
+import { placeMobileStationForPlayer } from '../src/sim/professions/mobile_station';
 import { createRiftGearInstance } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import { SPIRIT_HEALER_RANGE } from '../src/sim/spirit';
@@ -221,6 +222,7 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       expect(
         resultEvents(aliveEvents, 'craftResult').filter((ev: any) => ev.ok === true).length,
       ).toBe(1);
+      expect(deadErrors(aliveEvents)).toBe(0);
       expect(sim.countItem('tough_jerky')).toBe(1);
       makeDead(sim, mode);
       sim.drainEvents();
@@ -246,10 +248,13 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       it(`${label} is refused before the resolver (no ${type} event)`, () => {
         const sim = makeSim();
         // Alive control: the same call reaches the resolver and emits the
-        // family result event (as a denial; the args are junk on purpose).
+        // family result event (as a denial; the args are junk on purpose),
+        // with no while-dead error line.
         sim.drainEvents();
         act(sim);
-        expect(resultEvents(sim.drainEvents(), type).length).toBe(1);
+        const aliveEvents = sim.drainEvents();
+        expect(resultEvents(aliveEvents, type).length).toBe(1);
+        expect(deadErrors(aliveEvents)).toBe(0);
         makeDead(sim, mode);
         sim.drainEvents();
         act(sim);
@@ -266,11 +271,21 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       sim.placeMobileStation('cooking');
       const placed = meta.mobileStation;
       expect(placed).toBeTruthy();
+      const placedAtTick = placed.placedAtTick;
       makeDead(sim, mode);
       sim.drainEvents();
       sim.placeMobileStation('cooking');
       expect(deadErrors(sim.drainEvents())).toBe(1);
       expect(meta.mobileStation).toBe(placed); // no replacement placed
+      expect(meta.mobileStation.placedAtTick).toBe(placedAtTick);
+      // The gate lives INSIDE placeMobileStationForPlayer, so the direct
+      // call the `/dev mobilestation` cheat makes is refused identically
+      // (the wrapper is not the only entry point for this command).
+      sim.drainEvents();
+      expect(placeMobileStationForPlayer((sim as any).ctx, 'cooking', sim.playerId)).toBe(
+        undefined,
+      );
+      expect(deadErrors(sim.drainEvents())).toBe(1);
     });
 
     it('the rift forge trio is refused and spends no essence', () => {
@@ -298,6 +313,48 @@ for (const mode of ['unreleased', 'ghost'] as const) {
     });
   });
 }
+
+// The explicit-pid arm is the one the authoritative server always uses
+// (server/game.ts passes the sender's pid into every profession command), so
+// pin that the gate resolves the TARGET player, routes the refusal to that
+// player alone, and leaves everyone else able to act.
+describe('dead-gate: profession actions with an explicit pid (the server arm)', () => {
+  it('a dead second player is refused by pid and the alive primary still crafts', () => {
+    const sim = makeSim();
+    const pidB = sim.addPlayer('mage', 'Bea');
+    sim.addItem('spider_leg', 1);
+    sim.addItem('spider_leg', 1, pidB);
+    const b = (sim as any).entities.get(pidB) as AnyEntity;
+    b.hp = 0;
+    b.dead = true;
+    sim.drainEvents();
+    sim.craftItem('recipe_tough_jerky', false, pidB);
+    const events = sim.drainEvents();
+    expect(
+      events.filter((ev: any) => ev.type === 'error' && ev.text === DEAD_ERROR && ev.pid === pidB)
+        .length,
+    ).toBe(1);
+    expect(deadErrors(events)).toBe(1); // and no copy routed anywhere else
+    expect(events.filter((ev) => ev.type === 'craftResult').length).toBe(0);
+    expect(sim.countItem('tough_jerky', pidB)).toBe(0);
+    // The alive primary is unaffected by B's refusal and crafts normally.
+    sim.craftItem('recipe_tough_jerky');
+    const aliveEvents = sim.drainEvents();
+    expect(
+      aliveEvents.filter((ev: any) => ev.type === 'craftResult' && ev.ok === true).length,
+    ).toBe(1);
+    expect(sim.countItem('tough_jerky')).toBe(1);
+  });
+
+  it('an unresolvable pid does not trip the gate (the documented false arm)', () => {
+    const sim = makeSim();
+    sim.drainEvents();
+    sim.craftItem('recipe_tough_jerky', false, 999999);
+    // The gate declines to fire (no while-dead error); the impl's own
+    // resolve handles the unknown player exactly as it did before the gate.
+    expect(deadErrors(sim.drainEvents())).toBe(0);
+  });
+});
 
 describe('dead-gate: Spirit Healer exceptions for a ghost', () => {
   it('interact at the graveyard (angel in reach) emits no while-dead error', () => {

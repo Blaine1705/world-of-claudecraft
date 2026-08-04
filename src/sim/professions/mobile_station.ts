@@ -18,6 +18,7 @@
 // one command-shaped writer, storing onto the resolved player's meta slot.
 
 import { MOBILE_CRAFTING_STATION_DURATION_TICKS } from '../content/professions';
+import { refusedWhileDead } from '../dead_gate';
 import type { SimContext } from '../sim_context';
 import { type CraftSkillState, isSpecialized } from './wheel';
 
@@ -78,6 +79,12 @@ export function placeMobileStationForPlayer(
   craftId: string,
   pid?: number,
 ): MobileCraftingStation | undefined {
+  // Dead gate INSIDE the module (not on the Sim wrapper like the rest of the
+  // profession family): this command emits no result event, so the module
+  // placement costs nothing, and it keeps the `/dev mobilestation` cheat
+  // (dev_commands.ts), which calls this directly, behind the same gate; the
+  // cheat saves the walk, never a gate.
+  if (refusedWhileDead(ctx, pid)) return undefined;
   const r = ctx.resolve(pid);
   if (!r) return undefined;
   const station = placeMobileCraftingStation(
