@@ -2270,6 +2270,7 @@ export const nl_NL: EnTranslations = {
       "sortAria": "Bankvoorwerpen sorteren",
       "searchAria": "Bankvoorwerpen zoeken op naam",
       "depositAll": "Alle materialen storten",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Materialen gestort: {count}.",
       "depositAllFull": "Materialen gestort: {count}. De bank is nu vol.",
       "depositAllNone": "Bank vol: niets gestort.",

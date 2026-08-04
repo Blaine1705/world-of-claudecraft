@@ -2270,6 +2270,7 @@ export const tr_TR: EnTranslations = {
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",
       "depositAll": "Tüm malzemeleri yatır",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Yatırılan malzeme: {count}.",
       "depositAllFull": "Yatırılan malzeme: {count}. Banka artık dolu.",
       "depositAllNone": "Banka dolu: hiçbir şey yatırılmadı.",

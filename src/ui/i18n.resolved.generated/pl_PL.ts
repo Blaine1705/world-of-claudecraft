@@ -2270,6 +2270,7 @@ export const pl_PL: EnTranslations = {
       "sortAria": "Sortuj przedmioty w banku",
       "searchAria": "Szukaj przedmiotów w banku po nazwie",
       "depositAll": "Zdeponuj wszystkie materiały",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Zdeponowane materiały: {count}.",
       "depositAllFull": "Zdeponowane materiały: {count}. Bank jest teraz pełny.",
       "depositAllNone": "Bank pełny: niczego nie zdeponowano.",

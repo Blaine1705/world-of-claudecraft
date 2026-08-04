@@ -9060,6 +9060,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.sortAria': 'Сортировать предметы в банке',
   'hudChrome.bank.searchAria': 'Поиск предметов в банке по названию',
   'hudChrome.bank.depositAll': 'Положить все материалы',
+  'hudChrome.bank.depositAllTooltip':
+    'Отправляет в банк все материалы для крафта и хлам из ваших сумок за один раз. Инструменты для добычи, надетое снаряжение, квестовые предметы и расходники не затрагиваются.',
   'hudChrome.bank.depositAllDone': 'Материалов положено: {count}.',
   'hudChrome.bank.depositAllFull': 'Материалов положено: {count}. Банк заполнен.',
   'hudChrome.bank.depositAllNone': 'Банк заполнен: ничего не положено.',

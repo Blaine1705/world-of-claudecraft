@@ -2270,6 +2270,7 @@ export const fr_CA: EnTranslations = {
       "sortAria": "Trier les objets de la banque",
       "searchAria": "Rechercher un objet de la banque par son nom",
       "depositAll": "Déposer tous les matériaux",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Matériaux déposés : {count}.",
       "depositAllFull": "Matériaux déposés : {count}. La banque est maintenant pleine.",
       "depositAllNone": "Banque pleine : rien n'a été déposé.",

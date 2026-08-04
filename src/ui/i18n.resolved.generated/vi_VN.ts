@@ -2270,6 +2270,7 @@ export const vi_VN: EnTranslations = {
       "sortAria": "Sắp xếp vật phẩm ngân hàng",
       "searchAria": "Tìm vật phẩm ngân hàng theo tên",
       "depositAll": "Gửi tất cả nguyên liệu",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Nguyên liệu đã gửi: {count}.",
       "depositAllFull": "Nguyên liệu đã gửi: {count}. Ngân hàng hiện đã đầy.",
       "depositAllNone": "Ngân hàng đầy: không gửi được gì.",

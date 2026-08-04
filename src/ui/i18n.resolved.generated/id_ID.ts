@@ -2270,6 +2270,7 @@ export const id_ID: EnTranslations = {
       "sortAria": "Urutkan barang bank",
       "searchAria": "Cari barang bank menurut nama",
       "depositAll": "Setor semua bahan",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Bahan disetor: {count}.",
       "depositAllFull": "Bahan disetor: {count}. Bank kini penuh.",
       "depositAllNone": "Bank penuh: tidak ada yang disetor.",
