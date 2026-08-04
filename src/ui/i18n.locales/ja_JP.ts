@@ -10118,6 +10118,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.marketListBound': 'そのアイテムはバインドされているため出品できません。',
   'hudChrome.enchantName.enchant_weapon_might': '武器エンチャント - 剛力',
   'hudChrome.enchantName.enchant_weapon_intellect': '武器エンチャント - 呪文威力',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'オフハンドエンチャント - スタミナ',
   'hudChrome.enchantName.enchant_helmet_fortitude': '頭エンチャント - 堅牢',
   'hudChrome.enchantName.enchant_neck_spirit': '首エンチャント - 精神力',
   'hudChrome.enchantName.enchant_shoulder_agility': '肩エンチャント - 敏捷性',

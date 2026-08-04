@@ -2481,6 +2481,7 @@ export const en_XA: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "[Éñçĥáñţ Ŵéáþóñ - Ɱíĝĥţ]",
       "enchant_weapon_intellect": "[Éñçĥáñţ Ŵéáþóñ - Šþéļļþóŵéŕ]",
+      "enchant_offhand_stamina": "[Éñçĥáñţ Óƒƒĥáñð - Šţáɱíñá]",
       "enchant_helmet_fortitude": "[Éñçĥáñţ Ĥéļɱéţ - Ƒóŕţíţúðé]",
       "enchant_neck_spirit": "[Éñçĥáñţ Ñéçķļáçé - Šþíŕíţ]",
       "enchant_shoulder_agility": "[Éñçĥáñţ Šĥóúļðéŕš - Áĝíļíţý]",

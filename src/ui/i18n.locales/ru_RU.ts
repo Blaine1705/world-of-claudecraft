@@ -10287,6 +10287,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.marketListBound': 'Этот предмет привязан и не может быть выставлен на продажу.',
   'hudChrome.enchantName.enchant_weapon_might': 'Зачарование оружия - Мощь',
   'hudChrome.enchantName.enchant_weapon_intellect': 'Зачарование оружия - Сила заклинаний',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Зачарование левой руки - Выносливость',
   'hudChrome.enchantName.enchant_helmet_fortitude': 'Зачарование шлема - Стойкость',
   'hudChrome.enchantName.enchant_neck_spirit': 'Зачарование ожерелья - Дух',
   'hudChrome.enchantName.enchant_shoulder_agility': 'Зачарование наплечников - Ловкость',

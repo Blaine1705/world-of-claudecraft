@@ -2481,6 +2481,7 @@ export const zh_TW: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "附魔武器 - 威力",
       "enchant_weapon_intellect": "附魔武器 - 法術強度",
+      "enchant_offhand_stamina": "附魔副手 - 耐力",
       "enchant_helmet_fortitude": "附魔頭部 - 堅韌",
       "enchant_neck_spirit": "附魔頸部 - 精神",
       "enchant_shoulder_agility": "附魔肩部 - 敏捷",

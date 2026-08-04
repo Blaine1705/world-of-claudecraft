@@ -2481,6 +2481,7 @@ export const sv_SE: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Förtrollning Vapen - Kraft",
       "enchant_weapon_intellect": "Förtrollning Vapen - Besvärjelsestyrka",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Förtrollning Hjälm - Uthållighet",
       "enchant_neck_spirit": "Förtrollning Halsband - Ande",
       "enchant_shoulder_agility": "Förtrollning Axelplåtar - Rörlighet",

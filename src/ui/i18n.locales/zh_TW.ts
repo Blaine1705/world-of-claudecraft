@@ -9650,6 +9650,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.errors.marketListBound': '該物品已綁定，無法上架。',
   'hudChrome.enchantName.enchant_weapon_might': '附魔武器 - 威力',
   'hudChrome.enchantName.enchant_weapon_intellect': '附魔武器 - 法術強度',
+  'hudChrome.enchantName.enchant_offhand_stamina': '附魔副手 - 耐力',
   'hudChrome.enchantName.enchant_helmet_fortitude': '附魔頭部 - 堅韌',
   'hudChrome.enchantName.enchant_neck_spirit': '附魔頸部 - 精神',
   'hudChrome.enchantName.enchant_shoulder_agility': '附魔肩部 - 敏捷',
