@@ -391,7 +391,8 @@ export const es_ES: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Listo"
+      "done": "Listo",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Recompensas diarias",
