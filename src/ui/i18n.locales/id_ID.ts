@@ -2,6 +2,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Rekrut',
+  'hud.social.tenure.veteran': 'Veteran',
+  'hudChrome.keybinds.mouseHint':
+    'Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia.',
+  'hudChrome.social.billboard.loginLine': 'Papan Pengumuman Serikat: {text}',
   'hudChrome.actionBar.editKeys': 'Ubah tombol bilah aksi',
   'hudChrome.actionBar.editKeysHint':
     'Klik sebuah slot di bilah aksi, lalu tekan tombol untuk mengikatnya.',

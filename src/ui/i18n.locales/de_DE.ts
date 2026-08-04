@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Rekrut',
+  'hud.social.tenure.veteran': 'Veteran',
+  'hudChrome.keybinds.mouseHint':
+    'Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten.',
+  'hudChrome.social.billboard.loginLine': 'Gildenpinnwand: {text}',
   'hudChrome.actionBar.editKeys': 'Aktionsleisten-Tasten bearbeiten',
   'hudChrome.actionBar.editKeysHint':
     'Klicke einen Platz auf der Aktionsleiste an, dann drücke eine Taste, um ihn zu belegen.',

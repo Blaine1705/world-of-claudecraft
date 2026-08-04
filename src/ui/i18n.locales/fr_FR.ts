@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Recrue',
+  'hud.social.tenure.veteran': 'Vétéran',
+  'hudChrome.keybinds.mouseHint':
+    "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde.",
+  'hudChrome.social.billboard.loginLine': "Tableau d'affichage de la guilde: {text}",
   'hudChrome.actionBar.editKeys': "Modifier les touches de la barre d'action",
   'hudChrome.actionBar.editKeysHint':
     "Cliquez sur un emplacement de la barre d'action, puis appuyez sur une touche pour l'assigner.",

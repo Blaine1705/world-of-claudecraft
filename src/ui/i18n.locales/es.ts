@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Recluta',
+  'hud.social.tenure.veteran': 'Veterano',
+  'hudChrome.keybinds.mouseHint':
+    'Los botones del ratón también funcionan: pulsa el botón central (M3) o un botón lateral (M4, M5) mientras asignas la tecla. Los botones izquierdo y derecho quedan reservados para la cámara, el clic para moverse y el clic sobre objetos del mundo.',
+  'hudChrome.social.billboard.loginLine': 'Tablón de la hermandad: {text}',
   'hudChrome.actionBar.editKeys': 'Editar teclas de la barra de acción',
   'hudChrome.actionBar.editKeysHint':
     'Haz clic en una ranura de la barra de acción y luego presiona una tecla para asignarla.',

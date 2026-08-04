@@ -958,7 +958,7 @@ export const id_ID: EnTranslations = {
       "petDefensive": "Peliharaan: Defensif",
       "petAggressive": "Peliharaan: Agresif",
       "mount": "Naiki / Turun",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia."
     },
     "actionBar": {
       "editKeys": "Ubah tombol bilah aksi",
@@ -2353,7 +2353,7 @@ export const id_ID: EnTranslations = {
       "billboard": {
         "label": "Papan Pengumuman Serikat",
         "empty": "Belum ada apa pun di papan pengumuman.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Papan Pengumuman Serikat: {text}",
         "setBy": "Ditetapkan oleh {name}",
         "save": "Simpan",
         "placeholder": "Tulis pesan untuk serikat",
@@ -6811,7 +6811,7 @@ export const id_ID: EnTranslations = {
         "member": "Anggota"
       },
       "tenure": {
-        "recruit": "Recruit",
+        "recruit": "Rekrut",
         "veteran": "Veteran"
       },
       "guildHeadOne": "Anda adalah {rank}, {count} anggota",

@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pt_BR: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Recruta',
+  'hud.social.tenure.veteran': 'Veterano',
+  'hudChrome.keybinds.mouseHint':
+    'Os botões do mouse também funcionam: pressione o botão do meio (M3) ou um botão lateral (M4, M5) ao atribuir a tecla. Os botões esquerdo e direito continuam reservados para a câmera, o clique para mover e cliques em objetos no mundo.',
+  'hudChrome.social.billboard.loginLine': 'Mural da Guilda: {text}',
   'hudChrome.actionBar.editKeys': 'Editar teclas da barra de ação',
   'hudChrome.actionBar.editKeysHint':
     'Clique em um espaço da barra de ação e pressione uma tecla para atribuí-la.',

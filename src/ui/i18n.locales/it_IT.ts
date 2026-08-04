@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const it_IT: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Recluta',
+  'hud.social.tenure.veteran': 'Veterano',
+  'hudChrome.keybinds.mouseHint':
+    "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo.",
+  'hudChrome.social.billboard.loginLine': 'Bacheca della gilda: {text}',
   'hudChrome.actionBar.editKeys': 'Modifica i tasti della barra delle azioni',
   'hudChrome.actionBar.editKeysHint':
     'Fai clic su uno slot della barra delle azioni, poi premi un tasto per assegnarlo.',

@@ -958,7 +958,7 @@ export const sv_SE: EnTranslations = {
       "petDefensive": "Djur: Defensivt",
       "petAggressive": "Djur: Aggressivt",
       "mount": "Sitt upp / Stig av",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen."
     },
     "actionBar": {
       "editKeys": "Redigera handlingsfältets tangenter",
@@ -2353,7 +2353,7 @@ export const sv_SE: EnTranslations = {
       "billboard": {
         "label": "Gillets anslagstavla",
         "empty": "Inget på anslagstavlan än.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Gillets anslagstavla: {text}",
         "setBy": "Skriven av {name}",
         "save": "Spara",
         "placeholder": "Skriv ett meddelande till gillet",
@@ -6811,7 +6811,7 @@ export const sv_SE: EnTranslations = {
         "member": "Medlem"
       },
       "tenure": {
-        "recruit": "Recruit",
+        "recruit": "Rekryt",
         "veteran": "Veteran"
       },
       "guildHeadOne": "du är {rank}, {count} medlem",

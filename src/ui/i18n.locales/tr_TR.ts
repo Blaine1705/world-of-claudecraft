@@ -2,6 +2,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Acemi',
+  'hud.social.tenure.veteran': 'Kıdemli',
+  'hudChrome.keybinds.mouseHint':
+    'Fare düğmeleri de işe yarar: atama yaparken orta düğmeye (M3) veya bir yan düğmeye (M4, M5) bas. Sol ve sağ düğmeler kamera, tıklayarak hareket ve dünyadaki nesnelere tıklamak için ayrılmıştır.',
+  'hudChrome.social.billboard.loginLine': 'Lonca Panosu: {text}',
   'hudChrome.actionBar.editKeys': 'Eylem çubuğu tuşlarını düzenle',
   'hudChrome.actionBar.editKeysHint':
     'Eylem çubuğunda bir yuvaya tıkla, sonra atamak için bir tuşa bas.',

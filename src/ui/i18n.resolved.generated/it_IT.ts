@@ -958,7 +958,7 @@ export const it_IT: EnTranslations = {
       "petDefensive": "Famiglio: difensivo",
       "petAggressive": "Famiglio: aggressivo",
       "mount": "Monta / Smonta",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo."
     },
     "actionBar": {
       "editKeys": "Modifica i tasti della barra delle azioni",
@@ -2353,7 +2353,7 @@ export const it_IT: EnTranslations = {
       "billboard": {
         "label": "Bacheca della Gilda",
         "empty": "Non c'è ancora nulla sulla bacheca.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Bacheca della gilda: {text}",
         "setBy": "Impostato da {name}",
         "save": "Salva",
         "placeholder": "Scrivi un messaggio per la gilda",
@@ -6811,8 +6811,8 @@ export const it_IT: EnTranslations = {
         "member": "Membro"
       },
       "tenure": {
-        "recruit": "Recruit",
-        "veteran": "Veteran"
+        "recruit": "Recluta",
+        "veteran": "Veterano"
       },
       "guildHeadOne": "sei {rank}, {count} membro",
       "guildHeadMany": "sei {rank}, {count} membri"

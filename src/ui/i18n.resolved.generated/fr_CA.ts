@@ -958,7 +958,7 @@ export const fr_CA: EnTranslations = {
       "petDefensive": "Familier : défensif",
       "petAggressive": "Familier : agressif",
       "mount": "Monter / Descendre",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde."
     },
     "actionBar": {
       "editKeys": "Modifier les touches de la barre d'action",
@@ -2353,7 +2353,7 @@ export const fr_CA: EnTranslations = {
       "billboard": {
         "label": "Tableau d'affichage de la guilde",
         "empty": "Rien sur le tableau d'affichage pour le moment.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Tableau d'affichage de la guilde: {text}",
         "setBy": "Défini par {name}",
         "save": "Enregistrer",
         "placeholder": "Écrivez un message pour la guilde",
@@ -6811,8 +6811,8 @@ export const fr_CA: EnTranslations = {
         "member": "Membre"
       },
       "tenure": {
-        "recruit": "Recruit",
-        "veteran": "Veteran"
+        "recruit": "Recrue",
+        "veteran": "Vétéran"
       },
       "guildHeadOne": "vous êtes {rank}, {count} membre",
       "guildHeadMany": "vous êtes {rank}, {count} membres"

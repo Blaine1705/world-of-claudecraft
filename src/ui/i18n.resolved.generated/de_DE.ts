@@ -958,7 +958,7 @@ export const de_DE: EnTranslations = {
       "petDefensive": "Begleiter: Defensiv",
       "petAggressive": "Begleiter: Aggressiv",
       "mount": "Aufsitzen / Absitzen",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten."
     },
     "actionBar": {
       "editKeys": "Aktionsleisten-Tasten bearbeiten",
@@ -2353,7 +2353,7 @@ export const de_DE: EnTranslations = {
       "billboard": {
         "label": "Gildenpinnwand",
         "empty": "Noch nichts an der Pinnwand.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Gildenpinnwand: {text}",
         "setBy": "Festgelegt von {name}",
         "save": "Speichern",
         "placeholder": "Schreib eine Nachricht für die Gilde...",
@@ -6811,7 +6811,7 @@ export const de_DE: EnTranslations = {
         "member": "Mitglied"
       },
       "tenure": {
-        "recruit": "Recruit",
+        "recruit": "Rekrut",
         "veteran": "Veteran"
       },
       "guildHeadOne": "Ihr seid {rank}, {count} Mitglied",

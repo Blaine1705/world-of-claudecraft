@@ -958,7 +958,7 @@ export const nl_NL: EnTranslations = {
       "petDefensive": "Huisdier: Verdedigend",
       "petAggressive": "Huisdier: Agressief",
       "mount": "Opstijgen / Afstijgen",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld."
     },
     "actionBar": {
       "editKeys": "Actiebalktoetsen bewerken",
@@ -2353,7 +2353,7 @@ export const nl_NL: EnTranslations = {
       "billboard": {
         "label": "Gildeprikbord",
         "empty": "Nog niets op het prikbord.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Gildeprikbord: {text}",
         "setBy": "Geplaatst door {name}",
         "save": "Opslaan",
         "placeholder": "Schrijf een bericht voor de gilde",
@@ -6811,8 +6811,8 @@ export const nl_NL: EnTranslations = {
         "member": "Lid"
       },
       "tenure": {
-        "recruit": "Recruit",
-        "veteran": "Veteran"
+        "recruit": "Rekruut",
+        "veteran": "Veteraan"
       },
       "guildHeadOne": "je bent {rank}, {count} lid",
       "guildHeadMany": "je bent {rank}, {count} leden"

@@ -2,6 +2,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Rekryt',
+  'hud.social.tenure.veteran': 'Veteran',
+  'hudChrome.keybinds.mouseHint':
+    'Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen.',
+  'hudChrome.social.billboard.loginLine': 'Gillets anslagstavla: {text}',
   'hudChrome.actionBar.editKeys': 'Redigera handlingsfältets tangenter',
   'hudChrome.actionBar.editKeysHint':
     'Klicka på en plats i handlingsfältet och tryck sedan på en tangent för att binda den.',

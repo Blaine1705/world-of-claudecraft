@@ -2,6 +2,10 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Tân Binh',
+  'hud.social.tenure.veteran': 'Cựu Binh',
+  'hudChrome.keybinds.mouseHint': 'Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới.',
+  'hudChrome.social.billboard.loginLine': 'Bảng tin bang hội: {text}',
   'hudChrome.actionBar.editKeys': 'Sửa phím thanh hành động',
   'hudChrome.actionBar.editKeysHint': 'Nhấp vào một ô trên thanh hành động, rồi nhấn một phím để gán.',
   'hudChrome.actionBar.bannerHint': 'Nhấp vào một ô, rồi nhấn một phím để gán. Nhấp Xong khi hoàn tất.',

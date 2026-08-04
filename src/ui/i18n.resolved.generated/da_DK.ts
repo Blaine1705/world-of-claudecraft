@@ -958,7 +958,7 @@ export const da_DK: EnTranslations = {
       "petDefensive": "Kæledyr: Defensiv",
       "petAggressive": "Kæledyr: Aggressiv",
       "mount": "Stig op / Stig af",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Museknapper virker også: tryk på midterknappen (M3) eller en tommelfingerknap (M4, M5), mens du binder. Venstre og højre er fortsat forbeholdt kameraet, klik for at flytte og at klikke på ting i verden."
     },
     "actionBar": {
       "editKeys": "Rediger handlingslinjens taster",
@@ -2353,7 +2353,7 @@ export const da_DK: EnTranslations = {
       "billboard": {
         "label": "Laugsopslagstavle",
         "empty": "Der er intet på opslagstavlen endnu.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Laugsopslagstavle: {text}",
         "setBy": "Sat af {name}",
         "save": "Gem",
         "placeholder": "Skriv en besked til lauget",
@@ -6811,7 +6811,7 @@ export const da_DK: EnTranslations = {
         "member": "Medlem"
       },
       "tenure": {
-        "recruit": "Recruit",
+        "recruit": "Rekrut",
         "veteran": "Veteran"
       },
       "guildHeadOne": "du er {rank}, {count} medlem",

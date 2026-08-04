@@ -2,6 +2,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const cs_CZ: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Nováček',
+  'hud.social.tenure.veteran': 'Veterán',
+  'hudChrome.keybinds.mouseHint':
+    'Fungují i tlačítka myši: při přiřazování stiskni prostřední tlačítko (M3) nebo boční tlačítko (M4, M5). Levá a pravá tlačítka zůstávají vyhrazena pro kameru, kliknutí k pohybu a klikání na věci ve světě.',
+  'hudChrome.social.billboard.loginLine': 'Cechovní nástěnka: {text}',
   'hudChrome.actionBar.editKeys': 'Upravit klávesy akční lišty',
   'hudChrome.actionBar.editKeysHint':
     'Klikni na slot na akční liště a pak stiskni klávesu, kterou mu chceš přiřadit.',

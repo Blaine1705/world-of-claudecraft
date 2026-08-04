@@ -958,7 +958,7 @@ export const es: EnTranslations = {
       "petDefensive": "Mascota: defensiva",
       "petAggressive": "Mascota: agresiva",
       "mount": "Montar / Desmontar",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Los botones del ratón también funcionan: pulsa el botón central (M3) o un botón lateral (M4, M5) mientras asignas la tecla. Los botones izquierdo y derecho quedan reservados para la cámara, el clic para moverse y el clic sobre objetos del mundo."
     },
     "actionBar": {
       "editKeys": "Editar teclas de la barra de acción",
@@ -2353,7 +2353,7 @@ export const es: EnTranslations = {
       "billboard": {
         "label": "Tablón de la Hermandad",
         "empty": "Aún no hay nada publicado en el tablón.",
-        "loginLine": "Guild billboard: {text}",
+        "loginLine": "Tablón de la hermandad: {text}",
         "setBy": "Fijado por {name}",
         "save": "Guardar",
         "placeholder": "Escribe un mensaje para la hermandad",
@@ -6811,8 +6811,8 @@ export const es: EnTranslations = {
         "member": "Miembro"
       },
       "tenure": {
-        "recruit": "Recruit",
-        "veteran": "Veteran"
+        "recruit": "Recluta",
+        "veteran": "Veterano"
       },
       "guildHeadOne": "eres {rank}, {count} miembro",
       "guildHeadMany": "eres {rank}, {count} miembros"

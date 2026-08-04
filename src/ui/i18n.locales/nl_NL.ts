@@ -2,6 +2,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Rekruut',
+  'hud.social.tenure.veteran': 'Veteraan',
+  'hudChrome.keybinds.mouseHint':
+    'Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld.',
+  'hudChrome.social.billboard.loginLine': 'Gildeprikbord: {text}',
   'hudChrome.actionBar.editKeys': 'Actiebalktoetsen bewerken',
   'hudChrome.actionBar.editKeysHint':
     'Klik op een vak op de actiebalk en druk daarna op een toets om die toe te wijzen.',

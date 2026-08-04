@@ -2,6 +2,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'hud.social.tenure.recruit': 'Rekrut',
+  'hud.social.tenure.veteran': 'Weteran',
+  'hudChrome.keybinds.mouseHint':
+    'Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie.',
+  'hudChrome.social.billboard.loginLine': 'Tablica ogłoszeń gildii: {text}',
   'hudChrome.actionBar.editKeys': 'Edytuj klawisze paska akcji',
   'hudChrome.actionBar.editKeysHint':
     'Kliknij slot na pasku akcji, a następnie naciśnij klawisz, aby go przypisać.',
