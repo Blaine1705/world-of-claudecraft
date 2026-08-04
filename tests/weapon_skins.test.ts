@@ -306,6 +306,40 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(weaponSkinOrientPin(null)).toBeNull();
   });
 
+  it('the aim pin tracks SHOOTING, not merely "some one-shot is playing"', async () => {
+    const { rangedSkinAiming } = await import('../src/render/characters/skin_attack');
+    // The release: the attack one-shot is the moment the pin was written for.
+    expect(rangedSkinAiming('attack', false)).toBe(true);
+    // The DRAW: a cast-time shot (Long Draw, castTime 3.0) is a held base
+    // state, not a one-shot, so the old "is a one-shot playing" test missed
+    // the whole three seconds the bow should have been up.
+    expect(rangedSkinAiming(null, true)).toBe(true);
+    // Taking a hit plays a one-shot and is NOT shooting. This is the case
+    // that made a bow jerk upright through the flinch.
+    expect(rangedSkinAiming('other', false)).toBe(false);
+    // Emotes were already excluded and stay excluded.
+    expect(rangedSkinAiming('emote', false)).toBe(false);
+    // Idle, doing nothing at all.
+    expect(rangedSkinAiming(null, false)).toBe(false);
+    // A one-shot that is not the attack wins over a concurrent cast flag:
+    // whatever interrupted the draw is what the body is actually playing.
+    expect(rangedSkinAiming('other', true)).toBe(false);
+    // ...and the attack one-shot during a cast stays aimed (the release frame
+    // of a channelled shot, where both are briefly true).
+    expect(rangedSkinAiming('attack', true)).toBe(true);
+  });
+
+  it('visual.ts asks the shared predicate rather than re-deriving the trigger', () => {
+    const src = readFileSync(join(ROOT, 'src/render/characters/visual.ts'), 'utf8');
+    const fn = src.slice(
+      src.indexOf('private applySkinOrientation('),
+      src.indexOf('/** Re-scale VFX point sprites'),
+    );
+    expect(fn).toContain('rangedSkinAiming(');
+    // The old inline trigger must be gone, not merely supplemented.
+    expect(fn).not.toContain('this.currentIsOneShot && !this.currentOneShotIsEmote');
+  });
+
   it('the hunter ships the bow clip via animUrls and the GLB carries it', async () => {
     // Source scan, not an import: pulling the manifest into Node would kick
     // the module-import GLB preloads (assets.ts loading contract).
