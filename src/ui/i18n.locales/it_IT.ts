@@ -2477,6 +2477,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Amichevole',
   'hudChrome.mobTooltip.hostile': 'Ostile',
   'hudChrome.mobTooltip.levelFamily': '{family} di livello {level}',
+  'hudChrome.mobTooltip.elite': 'Élite',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Buff sul riquadro del giocatore',
   'hudChrome.options.playerFrameScale': 'Scala del riquadro del giocatore',
   'hudChrome.options.showDailyRewardsChest': 'Mostra forziere delle ricompense giornaliere',

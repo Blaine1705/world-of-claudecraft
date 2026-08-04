@@ -1941,7 +1941,9 @@ export const id_ID: EnTranslations = {
       "levelFamily": "{family} Level {level}",
       "familyDemon": "Iblis",
       "hostile": "Bermusuhan",
-      "friendly": "Ramah"
+      "friendly": "Ramah",
+      "elite": "Elite",
+      "boss": "Bos"
     },
     "targetFrame": {
       "unlock": "Pindahkan bingkai sasaran",

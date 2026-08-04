@@ -4721,6 +4721,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Přátelský',
   'hudChrome.mobTooltip.hostile': 'Nepřátelský',
   'hudChrome.mobTooltip.levelFamily': 'Úroveň {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elita',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.raidConvert.leaderOnly': 'Na skupinu může převést jen vůdce raidu.',
   'hudChrome.raidConvert.notRaid': 'Tvoje skupina není raid.',
   'hudChrome.raidConvert.toPartyDone': 'Tvůj raid byl převeden zpět na skupinu.',

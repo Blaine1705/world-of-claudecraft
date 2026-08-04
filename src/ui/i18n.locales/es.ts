@@ -2484,6 +2484,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.familyDemon': 'Demonio',
   'hudChrome.mobTooltip.hostile': 'Hostil',
   'hudChrome.mobTooltip.friendly': 'Amistoso',
+  'hudChrome.mobTooltip.elite': 'Élite',
+  'hudChrome.mobTooltip.boss': 'Jefe',
   'hud.core.mapCanvasLabel': 'Mapa',
   'hud.core.mapSummary': 'Mapa de {zone}.',
   'hudChrome.castBar.playerAria': 'Tu barra de lanzamiento',

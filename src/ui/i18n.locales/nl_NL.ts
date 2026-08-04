@@ -2606,6 +2606,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Vriendelijk',
   'hudChrome.mobTooltip.hostile': 'Vijandig',
   'hudChrome.mobTooltip.levelFamily': 'Niveau {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Baas',
   'hudChrome.options.aurasOnPlayerFrame': 'Buffs op het spelerframe',
   'hudChrome.options.playerFrameScale': 'Schaal spelerframe',
   'hudChrome.options.showDailyRewardsChest': 'Kist met dagelijkse beloningen tonen',

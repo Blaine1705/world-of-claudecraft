@@ -1941,7 +1941,9 @@ export const zh_TW: EnTranslations = {
       "levelFamily": "等級 {level} {family}",
       "familyDemon": "惡魔",
       "hostile": "敵對",
-      "friendly": "友方"
+      "friendly": "友方",
+      "elite": "精英",
+      "boss": "首領"
     },
     "targetFrame": {
       "unlock": "移動目標框",

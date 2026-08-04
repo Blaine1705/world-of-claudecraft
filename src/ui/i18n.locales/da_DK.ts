@@ -2368,6 +2368,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Venlig',
   'hudChrome.mobTooltip.hostile': 'Fjendtlig',
   'hudChrome.mobTooltip.levelFamily': 'Niveau {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elite',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Buffs på spillerrammen',
   'hudChrome.options.playerFrameScale': 'Spillerrammens skala',
   'hudChrome.options.showDailyRewardsChest': 'Vis kisten med daglige belønninger',

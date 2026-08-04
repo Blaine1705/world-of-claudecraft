@@ -1941,7 +1941,9 @@ export const ru_RU: EnTranslations = {
       "levelFamily": "Уровень {level} {family}",
       "familyDemon": "Демон",
       "hostile": "Враждебный",
-      "friendly": "Дружественный"
+      "friendly": "Дружественный",
+      "elite": "Элита",
+      "boss": "Босс"
     },
     "targetFrame": {
       "unlock": "Переместить рамку цели",

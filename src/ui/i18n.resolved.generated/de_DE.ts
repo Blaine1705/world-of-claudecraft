@@ -1941,7 +1941,9 @@ export const de_DE: EnTranslations = {
       "levelFamily": "Stufe {level} {family}",
       "familyDemon": "Dämon",
       "hostile": "Feindlich",
-      "friendly": "Freundlich"
+      "friendly": "Freundlich",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Zielfenster verschieben",

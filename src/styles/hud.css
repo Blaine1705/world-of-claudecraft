@@ -4169,6 +4169,15 @@
   #tooltip.mob-tooltip .tt-green {
     font-size: calc(14px * var(--tooltip-scale, 1));
   }
+  /* Elite/Boss rank badge (mob_tooltip_view.ts), between the level/family line
+     and any quest lines. Mirrors the target frame's gold, letter-spaced
+     #tf-elite-tag styling so the two rank cues read as the same chrome. */
+  #tooltip.mob-tooltip .tt-rank {
+    color: var(--gold);
+    font-family: var(--title-font);
+    letter-spacing: 1px;
+    font-size: calc(12px * var(--tooltip-scale, 1));
+  }
   /* The map quest-giver glyph tooltip: the quest's level-requirement line,
      dimmed under its gold title so the name stays the focus. */
   #tooltip .tt-quest-req {

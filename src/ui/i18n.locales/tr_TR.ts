@@ -2484,6 +2484,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Dost',
   'hudChrome.mobTooltip.hostile': 'Düşman',
   'hudChrome.mobTooltip.levelFamily': 'Seviye {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Seçkin',
+  'hudChrome.mobTooltip.boss': 'Patron',
   'hudChrome.options.aurasOnPlayerFrame': 'Oyuncu Çerçevesinde Güçlendirmeler',
   'hudChrome.options.playerFrameScale': 'Oyuncu Çerçevesi Ölçeği',
   'hudChrome.options.showDailyRewardsChest': 'Günlük Ödül Sandığını Göster',
