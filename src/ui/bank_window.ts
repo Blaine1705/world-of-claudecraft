@@ -77,7 +77,9 @@ function dismissBankPrompts(): void {
 
 // The bank's window-local filter preferences persist under their OWN key, distinct
 // from the bags' 'woc_bag_filter': the two windows share the state SHAPE (BagFilterState)
-// and the tolerant serialize/parse, but keep independent category/sort/search choices.
+// and the tolerant serialize/parse, but keep independent category/sort choices. The
+// SEARCH is per-visit only: close() clears it and construction never restores it, so
+// a reopened bank always starts unfiltered (a stale query silently hides slots).
 const BANK_FILTER_KEY = 'woc_bank_filter';
 
 // How long the transient deposit-all summary stays on screen before it clears. The
@@ -176,13 +178,15 @@ export class BankWindow {
   private openerFocus: HTMLElement | null = null;
   private openedAt = 0;
 
-  // Window-local filter state: category chips + sort + live search, persisted across
-  // sessions under BANK_FILTER_KEY. Pure logic lives in bank_filter.ts (reusing
-  // bag_filter.ts); this is the consumer. Tolerant parse: corrupt storage falls back
-  // to the default filter, never throwing.
+  // Window-local filter state: category chips + sort persist across sessions under
+  // BANK_FILTER_KEY; the live search is per-visit and starts empty even when a
+  // reload while the bank sat open left a query in storage (close() never ran, see
+  // BANK_FILTER_KEY). Pure logic lives in bank_filter.ts (reusing bag_filter.ts);
+  // this is the consumer. Tolerant parse: corrupt storage falls back to the default
+  // filter, never throwing.
   private filter: BagFilterState = (() => {
     try {
-      return parseBagFilter(localStorage.getItem(BANK_FILTER_KEY));
+      return { ...parseBagFilter(localStorage.getItem(BANK_FILTER_KEY)), search: '' };
     } catch {
       return { ...DEFAULT_BAG_FILTER };
     }
@@ -237,6 +241,14 @@ export class BankWindow {
     // flashes a stale line, and no late timer fires render() on the hidden window.
     this.clearDepositStatus();
     this.clearDepositAllPending();
+    // The search is a per-visit filter: left set, the next open would start
+    // pre-narrowed to a stale query (slots hidden with no cue why). Clear it and
+    // persist the scrub so storage never carries it across sessions either; the
+    // category/sort preferences stay.
+    if (this.filter.search !== '') {
+      this.filter.search = '';
+      this.persistFilter();
+    }
     const el = this.deps.root();
     el.style.display = 'none';
     el.inert = false;
