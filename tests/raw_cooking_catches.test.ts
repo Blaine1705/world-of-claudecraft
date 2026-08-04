@@ -1,6 +1,9 @@
 // Raw fishing catches as cooking reagents only: non-edible content shape,
 // useItem refuse (no heal, no consume), cooked meal control still eats, and
-// the pure id set export for sim + Phase 2 UI reuse.
+// the pure id set export for sim + Phase 2 UI reuse. Phase 2 also pins pet
+// feed: kind food + foodHp gates feedPet, so raw junk catches cannot be pet food.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isRawCookingCatch, RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
@@ -118,5 +121,19 @@ describe('raw catch refuse localization', () => {
   it('sim_i18n EXACT-matches the refuse literal', () => {
     // English identity: the EXACT key re-renders the same bytes for en.
     expect(localizeSimText(REFUSE)).toBe(REFUSE);
+  });
+});
+
+describe('pet feed: raw catches are not pet food', () => {
+  it('catches fail the feedPet kind+foodHp gate that live food must pass', () => {
+    // feedPet (src/sim/pet/pet_commands.ts) only accepts kind food with foodHp.
+    // Raw catches are junk reagents with no foodHp, so they can never be pet food.
+    for (const id of RAW_CATCH_IDS) {
+      const def = ITEMS[id];
+      expect(def.kind, id).not.toBe('food');
+      expect(def.foodHp, id).toBeUndefined();
+    }
+    const feedSrc = readFileSync(join(process.cwd(), 'src/sim/pet/pet_commands.ts'), 'utf8');
+    expect(feedSrc).toMatch(/kind !== ['"]food['"]\s*\|\|\s*!item\.foodHp/);
   });
 });
