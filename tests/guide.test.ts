@@ -1672,7 +1672,13 @@ describe('Guide professions gathering accuracy', () => {
         d.trigger.markIds.length > 0 &&
         d.trigger.markIds.every((m) => m.startsWith('gather:')),
     );
-    const words: Record<number, string> = { 5: 'five', 6: 'six', 7: 'seven', 8: 'eight' };
+    const words: Record<number, string> = {
+      5: 'five',
+      6: 'six',
+      7: 'seven',
+      8: 'eight',
+      12: 'twelve',
+    };
     const castWord = words[firstCast.length];
     expect(castWord, `unmapped first-cast count ${firstCast.length}`).toBeDefined();
     expect(guideStrings.profPages.gatherDeeds.fishing).toContain(
