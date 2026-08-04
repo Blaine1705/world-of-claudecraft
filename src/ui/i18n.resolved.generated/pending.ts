@@ -61,7 +61,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "es_ES": [
     "desktop.update.checkingBody",
@@ -115,7 +121,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "fr_FR": [
     "desktop.update.checkingBody",
@@ -169,7 +181,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "fr_CA": [
     "desktop.update.checkingBody",
@@ -223,7 +241,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "en_CA": [],
   "it_IT": [
@@ -278,7 +302,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "de_DE": [
     "desktop.update.checkingBody",
@@ -332,7 +362,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "zh_CN": [
     "hudChrome.deeds.recentJumpAria"
@@ -398,7 +434,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "ru_RU": [
     "hudChrome.deeds.recentJumpAria"
@@ -455,7 +497,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "nl_NL": [
     "desktop.update.checkingBody",
@@ -509,7 +557,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "pl_PL": [
     "desktop.update.checkingBody",
@@ -563,7 +617,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "id_ID": [
     "desktop.update.checkingBody",
@@ -617,7 +677,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "tr_TR": [
     "desktop.update.checkingBody",
@@ -671,7 +737,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "sv_SE": [
     "desktop.update.checkingBody",
@@ -725,7 +797,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "vi_VN": [
     "desktop.update.checkingBody",
@@ -779,7 +857,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ],
   "da_DK": [
     "desktop.update.checkingBody",
@@ -833,6 +917,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.tabsAria",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria",
-    "hudChrome.deeds.recentJumpAria"
+    "hudChrome.deeds.recentJumpAria",
+    "itemUi.market.buyChanged",
+    "itemUi.market.buyConfirmAccept",
+    "itemUi.market.buyConfirmBody",
+    "itemUi.market.buyConfirmBodyStack",
+    "itemUi.market.buyConfirmCancel",
+    "itemUi.market.buyConfirmTitle"
   ]
 };
