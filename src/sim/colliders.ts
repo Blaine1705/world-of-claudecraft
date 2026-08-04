@@ -13,9 +13,9 @@ import {
   isEastbrookGrandArmoury,
 } from './building_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
-import { STATIONS } from './content/professions';
 import {
   arenaOriginAt,
+  BUILTIN_WORLD,
   DUNGEON_FLOOR_Y,
   DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
@@ -31,8 +31,6 @@ import {
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
-  NPCS,
-  OVERWORLD_GRAVEYARDS,
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,
@@ -56,6 +54,7 @@ import {
 } from './dungeon_layout';
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
+import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -322,14 +321,17 @@ export function mineMoundFootprint(m: {
 
 // Positions no prop may stand on: authored NPCs, plus every overworld
 // graveyard anchor, where a Spirit Healer is spawned at runtime rather than
-// being an authored NPC record.
+// being an authored NPC record. Reads the ACTIVE content (byte-identical on
+// shipped hosts) so a custom map's furniture is vetoed against ITS npcs and
+// graveyards, never the builtin layout's.
 function townNpcPositions(): { x: number; z: number }[] {
+  const content = getActiveWorldContent();
   const out: { x: number; z: number }[] = [];
-  for (const npc of Object.values(NPCS)) {
+  for (const npc of Object.values(content.npcs)) {
     const pos = (npc as { pos?: { x: number; z: number } }).pos;
     if (pos) out.push({ x: pos.x, z: pos.z });
   }
-  for (const g of OVERWORLD_GRAVEYARDS) out.push({ x: g.x, z: g.z });
+  for (const g of content.services?.graveyards ?? []) out.push({ x: g.x, z: g.z });
   return out;
 }
 
@@ -569,14 +571,24 @@ function staticWorldColliders(seed: number): Collider[] {
       standable: true,
     });
   }
-  // Town wall segments: the drawn wing is a stone PARAPET with an open iron
-  // railing above it, not a solid curtain, so the slab is a standable top a
-  // jump vaults onto or clean over (the railing is see-through iron: the
-  // fence rule). The wing's two pillars ride each segment: the short capped
-  // one is a standable step above the parapet, and only the tall lantern
-  // pylon (gate-side on `mirrored` wings) blocks full-height. Mob pathing is
-  // untouched: grounded movers without a jump still treat the slab as a wall.
+  // Eastbrook's town wall is a stone parapet with an open iron railing and
+  // two modeled pillars. Fenbridge's palisade is instead a solid log curtain:
+  // its one authored OBB stays full-height and carries no synthetic pillars.
   for (const wall of PROPS.walls ?? []) {
+    const cameraTopY = topY(seed, wall.x, wall.z, wall.height);
+    if (wall.assetId === FENBRIDGE_LAYOUT.wall.assetId) {
+      out.push({
+        type: 'obb',
+        x: wall.x,
+        z: wall.z,
+        hw: wall.w / 2,
+        hd: wall.d / 2,
+        rot: wall.rot,
+        cameraTopY,
+      });
+      continue;
+    }
+
     const parapet = topY(seed, wall.x, wall.z, wall.height * TOWN_WALL_PARAPET_FRAC);
     out.push({
       type: 'obb',
@@ -585,7 +597,7 @@ function staticWorldColliders(seed: number): Collider[] {
       hw: wall.w / 2,
       hd: wall.d / 2,
       rot: wall.rot,
-      cameraTopY: topY(seed, wall.x, wall.z, wall.height),
+      cameraTopY,
       moveTopY: parapet,
       standable: true,
     });
@@ -614,6 +626,27 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
+  // Fenbridge's gate arch is a compound obstacle: the overhead beam never
+  // closes the route, while its two authored jamb OBBs remain solid. The
+  // stable wall ids gate this projection so custom worlds that remove the
+  // Fenbridge palisade do not inherit invisible builtin collision.
+  const wallIds = new Set((PROPS.walls ?? []).map((wall) => wall.id));
+  if (FENBRIDGE_LAYOUT.wall.segments.every((segment) => wallIds.has(segment.id))) {
+    for (const gate of FENBRIDGE_LAYOUT.wall.gates) {
+      for (const jamb of gate.arch.jambs) {
+        out.push({
+          type: 'obb',
+          x: jamb.center.x,
+          z: jamb.center.z,
+          hw: jamb.halfWidth,
+          hd: jamb.halfDepth,
+          rot: jamb.rotation,
+          cameraTopY: topY(seed, jamb.center.x, jamb.center.z, gate.arch.nativeDimensions.height),
+        });
+      }
+    }
+  }
+
   // Interactable town boards are authored through active WorldContent rather
   // than PROPS. The same service record drives their spawn and exact OBB, and
   // custom worlds that omit the service inherit no Eastbrook collision.
@@ -627,6 +660,22 @@ function staticWorldColliders(seed: number): Collider[] {
       rot: board.rotation,
       cameraTopY: topY(seed, board.x, board.z, board.height),
     });
+  }
+  // The dedicated Fenbridge renderer is built-in-only. Keep this specialized
+  // service collision under the same authority so a programmatic custom world
+  // cannot create an invisible solid board by supplying musterBoards data.
+  if (content === BUILTIN_WORLD) {
+    for (const board of content.services?.musterBoards ?? []) {
+      out.push({
+        type: 'obb',
+        x: board.x,
+        z: board.z,
+        hw: board.width / 2,
+        hd: board.depth / 2,
+        rot: board.rotation,
+        cameraTopY: topY(seed, board.x, board.z, board.height),
+      });
+    }
   }
 
   // hand-placed GLB decor: circle collider matched to the model footprint;
@@ -986,9 +1035,11 @@ function staticWorldColliders(seed: number): Collider[] {
 
   // Profession-station clusters and Artisan Row: the town's furniture. Both
   // layouts are sim-owned data the renderer reads back (`town_props.ts`), so
-  // an anvil you can see is an anvil you can climb on.
+  // an anvil you can see is an anvil you can climb on. The ACTIVE bundle's
+  // stations, matching the gate and visuals: a custom map without services
+  // gets no invisible builtin furniture, and its own stations do collide.
   for (const tp of townPropPlacements(
-    STATIONS.map((st) => ({ type: st.type, x: st.pos.x, z: st.pos.z })),
+    (content.services?.stations ?? []).map((st) => ({ type: st.type, x: st.pos.x, z: st.pos.z })),
     townNpcPositions(),
   )) {
     const top = topY(seed, tp.x, tp.z, tp.size.height);
@@ -1098,7 +1149,9 @@ function staticWorldColliders(seed: number): Collider[] {
     const res = resolveAgainst(out, x, z, r, ignoreFences);
     return Math.abs(res.x - x) > 1e-4 || Math.abs(res.z - z) > 1e-4;
   };
-  for (const npc of Object.values(NPCS)) {
+  // The ACTIVE content's roster, like the npc veto above: a custom map's own
+  // banker gets a chest and a builtin banker absent from that map gets none.
+  for (const npc of Object.values(content.npcs)) {
     const rec = npc as { pos?: { x: number; z: number }; facing?: number; banker?: true };
     if (!rec.banker || !rec.pos) continue;
     const seat = resolveAgainst(out, rec.pos.x, rec.pos.z, 0.6);

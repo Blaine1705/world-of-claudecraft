@@ -51,6 +51,10 @@ services:
       # advertises the value so the client realm list can show Full honestly. Empty
       # (unset) yields the built-in default of 5000; an explicit 0 disables the cap.
       MAX_PLAYERS_PER_REALM: ${MAX_PLAYERS_PER_REALM:-}
+      # Runtime: Postgres clients this process keeps in its pool (server/db.ts).
+      # Empty (unset) yields the built-in default of 10; accepted range is 1 to
+      # 97 and anything else falls back to the default with an error at boot.
+      DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
@@ -78,6 +82,11 @@ services:
       GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME: ${GOOGLE_PLAY_INTEGRITY_PACKAGE_NAME:-com.worldofclaudecraft}
       GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS: ${GOOGLE_PLAY_INTEGRITY_CERT_DIGESTS:-}
       GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT: ${GOOGLE_PLAY_INTEGRITY_DEVICE_VERDICT:-MEETS_DEVICE_INTEGRITY}
+      # Solana Store (Seeker) artifact allowlist: fail-closed while unset, so the
+      # Solana native-auth arm and Seeker claim/spin stay off until configured.
+      SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME: ${SEEKER_SOLANA_INTEGRITY_PACKAGE_NAME:-}
+      SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS: ${SEEKER_SOLANA_INTEGRITY_CERT_DIGESTS:-}
+      SEEKER_SOLANA_INTEGRITY_DEVICE_VERDICT: ${SEEKER_SOLANA_INTEGRITY_DEVICE_VERDICT:-MEETS_DEVICE_INTEGRITY}
       APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
       APPLE_BUNDLE_ID: ${APPLE_BUNDLE_ID:-com.worldofclaudecraft}
       APPLE_DEVICECHECK_KEY_ID: ${APPLE_DEVICECHECK_KEY_ID:-}

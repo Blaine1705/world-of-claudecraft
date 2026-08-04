@@ -229,6 +229,43 @@ export interface CharacterRow {
   updatedAt: string;
 }
 
+// R35 professions inspector (GET /admin/api/characters/:id/professions);
+// matches server/character_professions.ts CharacterProfessionsSheet exactly.
+export interface CharacterProfessionsSheet {
+  characterId: number;
+  name: string;
+  class: string;
+  level: number;
+  accountId: number;
+  username: string;
+  live: boolean;
+  updatedAt: string | null;
+  preMigration: boolean;
+  archetype: {
+    activeArchetype: string | null;
+    pairedMajor: string | null;
+    hobbyCraft: string | null;
+  };
+  gathering: { professionId: string; proficiency: number }[];
+  crafting: { craftId: string; skill: number; tier: number }[];
+  knownRecipes: number;
+  slots: {
+    professionId: string;
+    effectId: string;
+    durability: number;
+    maxDurability: number;
+    craftedBy: string | null;
+    confirmMode: string;
+  }[];
+  nodeTimers: {
+    nodeId: string;
+    zoneId: string | null;
+    nodeType: string | null;
+    remainingSeconds: number;
+  }[];
+  toolEffectIds: string[];
+}
+
 export interface Paginated<T> {
   rows: T[];
   total: number;
@@ -279,6 +316,30 @@ export interface GuildRenameHistoryRow {
 
 export interface GuildRenameHistoryData {
   rows: GuildRenameHistoryRow[];
+}
+
+/** One slot of a guild's live bank as GET /admin/api/guilds/:id/bank answers
+ *  it. `index` is the exact `slot` argument the purge takes and `itemId` is its
+ *  confirmation token; `dormant` means the anonymous-pipe policy refuses the
+ *  copy in both directions, so the guild can neither withdraw it nor disband
+ *  while it sits there, and it is the ONLY thing the purge will remove.
+ *  Deliberately carries no per-copy instance payload (see
+ *  server/admin_guild_bank_view.ts). */
+export interface GuildBankSlot {
+  index: number;
+  itemId: string;
+  count: number;
+  dormant: boolean;
+}
+
+export interface GuildBankStateData {
+  guildId: number;
+  treasury: number;
+  capacity: number;
+  purchasedSlots: number;
+  usedSlots: number;
+  dormantSlots: number;
+  slots: GuildBankSlot[];
 }
 
 export interface IpAssociationsData {

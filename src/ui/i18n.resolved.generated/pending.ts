@@ -9,213 +9,51 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
-  ],
-  "es_ES": [
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
-  ],
+  "es": [],
+  "es_ES": [],
   "fr_FR": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "fr_CA": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "en_CA": [],
   "it_IT": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "de_DE": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
-  "zh_CN": [
-    "hudChrome.actionBar.done"
-  ],
-  "zh_TW": [
-    "hudChrome.actionBar.done"
-  ],
-  "ko_KR": [
-    "hudChrome.actionBar.done"
-  ],
-  "ja_JP": [
-    "hudChrome.actionBar.done"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
-  "ru_RU": [
-    "hudChrome.actionBar.done"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "nl_NL": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "pl_PL": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "id_ID": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "tr_TR": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "sv_SE": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "vi_VN": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ],
   "da_DK": [
-    "abilityUi.actionBar.procSlotAria",
-    "hudChrome.actionBar.bannerCapturing",
-    "hudChrome.actionBar.bannerHint",
-    "hudChrome.actionBar.boundToKey",
-    "hudChrome.actionBar.cancel",
-    "hudChrome.actionBar.done",
-    "hudChrome.actionBar.editKeys",
-    "hudChrome.actionBar.editKeysHint",
-    "hudChrome.actionBar.reset",
-    "hudChrome.actionBar.resetConfirmBody",
-    "hudChrome.actionBar.resetConfirmTitle"
+    "abilityUi.actionBar.procSlotAria"
   ]
 };

@@ -3338,6 +3338,7 @@ const ALL_DELTA_KEYS = [
   'ench',
   'equip',
   'gprof',
+  'guildBank',
   'hbl',
   'honor',
   'inv',
@@ -3369,6 +3370,7 @@ const ALL_DELTA_KEYS = [
   'tal',
   'tfocus',
   'trade',
+  'tslot',
   'vcup',
   'vcupb',
   'weapon',
@@ -3411,6 +3413,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ench: 'lastEnchantResult',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
+  guildBank: 'guildBankInfo',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
@@ -3441,6 +3444,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   salv: 'lastSalvageResult',
   sport: 'sportRole',
   tfocus: 'townFocus',
+  tslot: 'toolEffectSlots',
 };
 
 // Year ~2223 in epoch ms. Beats selfWireJson's `until > Date.now()` lockout
@@ -3509,6 +3513,15 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // `guildBank`: guildBankInfoFor additionally needs an officer-plus membership
+  // stamp and a loaded guild book (the banker relocated above covers proximity);
+  // a non-empty treasury + slot makes the mirror distinguishable.
+  sim.setPlayerGuildMembership(lp, { guildId: 7, rank: 'officer' });
+  sim.loadGuildBank(7, {
+    treasury: 12345,
+    inventory: [{ itemId: 'wolf_fang', count: 4 }],
+    purchasedSlots: 30, // opened (24) + one expansion: a valid ladder position
+  });
 
   // Direct PlayerMeta fields.
   // The reins item both dirties `inv` further and flips `mntOwn` (the owned
@@ -3536,6 +3549,21 @@ function dirtyEveryDeltaField(): {
   meta.delveClears = { 'collapsed_reliquary:heroic': 1 };
   meta.companionUpgrades = { companion_tessa: 2 };
   meta.gatheringProficiency = { mining: 6, logging: 0, herbalism: 0, fishing: 0 };
+  // tslot: a REAL slotted effect, not the empty default. Without this the key
+  // rides the first snapshot as `[]`, which is not null, so it passes the
+  // "dirtied to a non-default value" loop below vacuously and nothing anywhere
+  // proves a slot reaches a client. Written straight onto meta (this fixture
+  // predates the acquisition craft's charm-consuming command and stays a
+  // direct write on purpose: the wire shape under test is the DELTA, not the
+  // mint) at the charges a common tier-1 pick mints.
+  meta.toolEffectSlots = {
+    mining: {
+      effectId: 'gatherers_cache',
+      durability: 12,
+      maxDurability: 20,
+      confirmMode: 'always',
+    },
+  };
   meta.craftSkills.armorcrafting = 31;
   meta.craftSkills.weaponcrafting = 29;
   meta.archetype = {
@@ -3545,6 +3573,7 @@ function dirtyEveryDeltaField(): {
     attunedPairs: ['weaponcrafting+armorcrafting'],
     switchCount: 2,
     amendsProgress: 4,
+    isJackOfAllTrades: false,
   };
   // An ACTIVE mobile crafting station (`mst`): set directly on the
   // meta slot (the placement command's specialization gate is pinned in
@@ -3709,6 +3738,7 @@ describe('full self-state snapshot delta fixture', () => {
       attunedPairs: ['weaponcrafting+armorcrafting'],
       switchCount: 0,
       amendsProgress: 0,
+      isJackOfAllTrades: false,
     };
     // Reagents for the warplate helm.
     meta.inventory = [
@@ -3881,6 +3911,15 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
+    // guild bank mirror: the officer-gated boundary clone survives the wire whole
+    expect(client.guildBankInfo).toEqual({
+      treasury: 12345,
+      slots: [{ itemId: 'wolf_fang', count: 4 }],
+      capacity: 30,
+      purchasedSlots: 30,
+      nextExpansionPrice: 50000, // rung-2 literal
+    });
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
     // only: the curate-phase master roll is master-looter-only, and roll 1 (a plain
@@ -3919,6 +3958,21 @@ describe('full self-state snapshot delta fixture', () => {
       herbalism: 0,
       fishing: 0,
     }); // gprof -> gatheringProficiency
+    // tslot -> toolEffectSlots: the projected row shape, so a decode onto the
+    // wrong field or a renamed wire key reddens here rather than silently
+    // leaving the HUD empty. craftedBy is deliberately not projected; what
+    // crosses instead is the R48 selfCrafted boolean (false here: the
+    // fixture's direct meta write recorded no crafter).
+    expect(client.toolEffectSlots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 20,
+        confirmMode: 'always',
+        selfCrafted: false,
+      },
+    ]);
     // ncd -> nodeHarvestableByMe: the cooling-down node reads not-ready, an
     // untouched node (never in the map) still reads ready.
     expect(client.nodeHarvestableByMe(GATHER_NODES[0].id)).toBe(false);
@@ -4148,9 +4202,9 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 62 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(62);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(62);
+  it('ALL_DELTA_KEYS contains exactly 64 unique keys in sorted order', () => {
+    expect(ALL_DELTA_KEYS).toHaveLength(64); // +1: guildBank (Guild Bank Phase 2)
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(64);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4171,9 +4225,51 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
-    // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62.
-    expect(scraped.size).toBe(62);
+    // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
+    // plus the packet's slotted-tool-effects key tslot for 63.
+    expect(scraped.size).toBe(64); // +1: guildBank (Guild Bank Phase 2)
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
+  });
+
+  it('mntOwn is encoded INSIDE the heavy self gate (its inputs sit behind it)', () => {
+    // The owned-mounts walk (full inventory AND bank scan with an ITEMS
+    // lookup per slot, per viewer per pass) rode outside the gate at the
+    // v0.32.0 merge; a straight revert to the ungated position stays green
+    // on every wire-observing sweep (an unchanged value elides either way),
+    // so the placement itself is pinned two ways: the source order here, and
+    // the call-elision spy below, which observes the WORK the gate exists to
+    // skip rather than the bytes it cannot change.
+    const raw = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+    const gateAt = raw.indexOf('if (heavyDue) {');
+    const mntOwnAt = raw.indexOf("maybe('mntOwn'");
+    const siblingAt = raw.indexOf("maybe('qdone'");
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(mntOwnAt).toBeGreaterThan(gateAt);
+    expect(mntOwnAt).toBeLessThan(siblingAt);
+  });
+
+  it('a non-heavy pass never runs the owned-mounts walk; a heavy-dirty one does', () => {
+    // The behavioral half of the placement pin above: the gate's whole point
+    // is skipping the walk, so spy on the CALL. A quiet pass (not dirty,
+    // same wireRev, off the staggered refresh slot) must not invoke
+    // ownedMountsFor; flipping selfHeavyDirty must.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 61, 'Rider');
+    broadcast(server); // the join's own heavy pass, so the gate state settles
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('missing meta');
+    session.selfHeavyDirty = false;
+    session.lastWireRev = meta.wireRev;
+    // Step off the staggered refresh slot so heavyDue is false for certain.
+    while ((server.sim.tickCount + session.pid) % 40 === 0) server.sim.tick();
+    const walk = vi.spyOn(server.sim, 'ownedMountsFor');
+    broadcast(server);
+    expect(walk).not.toHaveBeenCalled();
+    session.selfHeavyDirty = true;
+    broadcast(server);
+    expect(walk).toHaveBeenCalledWith(session.pid);
+    walk.mockRestore();
   });
 
   it('TERSE_TO_IWORLD pins the terse-key to IWorld-name renames in sorted membership', () => {
@@ -4555,6 +4651,79 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     const { wire, mirror } = roundTrip(scriptedStasis);
     expect(wireAura(wire, 'scripted_stasis').ub).toBe(1);
     expect(mirror.unbreakableControl).toBe(true);
+  });
+
+  it('round-trips the break-threshold armed marker so the dread band renders online', () => {
+    // The v0.34.0 merge audit: the release added the presence-only bt emit
+    // (server/game.ts WireAura) for the Lingering Dread victim band, but no
+    // client decode existed, so the band (ability_vfx/painter.ts, gated on
+    // breakThreshold !== undefined) could never render for online mirrors.
+    // Presence-only both ways: the value never crosses the wire.
+    const talentedFear: Aura = {
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: 0,
+      school: 'shadow',
+      breakThreshold: 120,
+    };
+    const { wire, mirror } = roundTrip(talentedFear);
+    expect(wireAura(wire, 'fear_incap').bt).toBe(1);
+    expect('breakThreshold' in wireAura(wire, 'fear_incap')).toBe(false); // presence-only: no value leak
+    expect(mirror.breakThreshold).not.toBeUndefined();
+
+    // And the negative arm: an untalented fear (no threshold) stays unmarked
+    // and mirrors to undefined, so the band gate stays closed.
+    const plainFear: Aura = { ...talentedFear, breakThreshold: undefined };
+    const plain = roundTrip(plainFear);
+    expect('bt' in wireAura(plain.wire, 'fear_incap')).toBe(false);
+    expect(plain.mirror.breakThreshold).toBeUndefined();
+  });
+
+  it('clears the armed marker through the in-place decode arm when bt drops', () => {
+    // The 20 Hz path: a persisting aura re-uses its mirrored record through
+    // the sameAuraShape fast path (aura identity unchanged between
+    // snapshots), which is the ONE arm where `= undefined` carries clearing
+    // semantics: a fear_incap slot re-armed by an untalented fear must lose
+    // the band, not wear a stale one. roundTrip cannot reach this arm (it
+    // builds a fresh client per call), so this drives two snapshots into
+    // one client by hand.
+    const sim = new Sim({
+      seed: 1,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: WIRE_TEST_WORLD,
+    });
+    const pid = sim.addPlayer('warrior', 'Dreaded');
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'fear_incap',
+      name: 'Fear',
+      kind: 'stasis',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: 0,
+      school: 'shadow',
+      breakThreshold: 120,
+    });
+    const client = bareClient(999);
+    (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
+    const armed = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    expect(armed.breakThreshold).not.toBeUndefined();
+
+    // Same aura identity, threshold gone: the in-place arm must CLEAR it.
+    e.auras[e.auras.length - 1].breakThreshold = undefined;
+    (client as any).applySnapshot(JSON.parse(JSON.stringify({ t: 'snap', ents: [wireEntity(e)] })));
+    const mirrored = client.entities.get(pid)!.auras.find((a) => a.id === 'fear_incap')!;
+    // The fast path updates the SAME record object; assert both the clear
+    // and the reuse, so this pin cannot silently slide onto the fresh-array
+    // arm if the shape check ever changes.
+    expect(mirrored).toBe(armed);
+    expect(mirrored.breakThreshold).toBeUndefined();
   });
 
   it('round-trips the imbue judgement range (value2/value3), value omitted when 0', () => {

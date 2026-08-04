@@ -30,6 +30,7 @@ import { recalcPlayerStats } from '../entity';
 import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../entity_roster';
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
+import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -67,6 +68,7 @@ import {
   igniteOnCrit,
   PERSONAL_BARRIER_IDS,
 } from './fire_mage';
+import { questGateBlocksDamage } from './quest_damage_gate';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -126,6 +128,9 @@ export function dealDamage(
   aoe = false,
 ): number {
   if (target.dead) return 0;
+  // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
+  // owner has the gating quest active/ready may harm it; other hits are a no-op.
+  if (questGateBlocksDamage(ctx.players, source, target)) return 0;
   if (
     source?.kind === 'mob' &&
     source.ownerId !== null &&
@@ -149,6 +154,7 @@ export function dealDamage(
         crit: false,
         school,
         ability,
+        abilityId,
         kind,
         ...(attackAnimationStarted ? { attackAnimationStarted: true as const } : {}),
       });
@@ -178,6 +184,7 @@ export function dealDamage(
         crit: false,
         school,
         ability,
+        abilityId,
         kind: 'evade',
       });
     }
@@ -553,10 +560,28 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
       });
+      // The duel-terminal early return skips the shared tail below, including
+      // the landed-hit session cancel: without this a duel-ending blow left
+      // the loser fishing at 1 hp. Runs AFTER the damage emit so the event
+      // order matches the tail (damage, then castStop). Unconditional on
+      // kind and amount BY DESIGN: this arm only ever sees a landed 'hit' or
+      // 'block' whose INCOMING amount was real (entering the clamp requires
+      // amount >= hp >= 1 on a living target); the clamped EMITTED amount
+      // can still be 0 when the loser already stood at exactly 1 hp, and
+      // that blow landed too, so it cancels like any other. The tail's
+      // self-hit exclusion is NOT
+      // implied, because a duelist's own damage (the Cauterize burn carries
+      // the caster's own id) can land the clamped blow, so it is restated
+      // here. Spell casts keep the classic no-cancel (the tail's pushback
+      // never applied to this terminal hit either).
+      if (sourcePlayer.id !== target.id && isNonSpellCast(target.castingAbility)) {
+        ctx.cancelCast(target);
+      }
       // Book of Deeds: the clamped terminal hit counts (zero rng; the early
       // return skips the shared deed site and the session RewardCounters).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
@@ -601,6 +626,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
@@ -632,6 +658,7 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         ...attackAnimation,
       });
@@ -666,13 +693,14 @@ export function dealDamage(
         crit,
         school,
         ability,
+        abilityId,
         kind,
         absorbed: totalAbsorbed || undefined,
         ...attackAnimation,
       });
       // Book of Deeds: the clamped terminal hit counts (zero rng).
       if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, ability);
       const loserTeam = ctx.arenaTeamOf(match, target.id);
       if (loserTeam && ctx.isArenaTeamWiped(match, loserTeam)) {
         ctx.endArenaMatch(match, loserTeam === 'A' ? 'B' : 'A', 'defeat');
@@ -751,6 +779,7 @@ export function dealDamage(
     crit,
     school,
     ability,
+    abilityId,
     kind,
     absorbed: totalAbsorbed || undefined,
     ...attackAnimation,
@@ -950,14 +979,26 @@ export function dealDamage(
       target.castingAbility &&
       source &&
       source.id !== target.id &&
-      amount > 0 &&
-      kind === 'hit'
+      (amount > 0 || totalAbsorbed > 0) &&
+      (kind === 'hit' || kind === 'block')
     ) {
       // A non-spell cast (fishing/gather) cancels outright instead of pushing
-      // back. The Demon Heal channel is deliberately NOT folded in: it takes
-      // the normal channel pushback below, as today.
+      // back, and the hit counts even when a shield soaked ALL of it or a
+      // block took the edge off: a blocked swing still lands at least a
+      // point of damage and still rolls its knockback rider, so it ends the
+      // session exactly like a clean hit (miss/dodge/parry never reach this
+      // arm at all). Spell pushback keeps the classic kind gate below: only
+      // an unblocked, unabsorbed hit pushes a cast back, exactly as before
+      // this arm widened. The Demon Heal channel is deliberately NOT folded
+      // in: it takes the normal channel pushback below, as today.
       if (isNonSpellCast(target.castingAbility)) ctx.cancelCast(target);
-      else if (!ignoresDamagePushback(ctx, target, target.castingAbility)) ctx.pushbackCast(target);
+      else if (
+        amount > 0 &&
+        kind === 'hit' &&
+        !ignoresDamagePushback(ctx, target, target.castingAbility)
+      ) {
+        ctx.pushbackCast(target);
+      }
     }
   }
 
@@ -981,7 +1022,7 @@ export function dealDamage(
       // the permanent death + graveyard flow.
       ctx.yumiPlayerDown(fmatch, target, null);
     } else {
-      handleDeath(ctx, target, source);
+      handleDeath(ctx, target, source, ability);
     }
   }
   return amount;
@@ -1071,7 +1112,12 @@ function reflectSpellWard(
   );
 }
 
-export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): void {
+export function handleDeath(
+  ctx: SimContext,
+  e: Entity,
+  killer: Entity | null,
+  killerAbility?: string | null,
+): void {
   resetProcState(e);
   e.dead = true;
   e.hp = 0;
@@ -1087,8 +1133,17 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
   // being 0/'' at every sampled frame outside a live cast; cancelCast owns the
   // ordinary cancel paths, but a lethal non-hit tick reaches death directly).
   e.gatherCastNodeId = '';
+  e.gatherCastToolRarity = '';
+  e.gatherCastEffectConfirmed = false;
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
+  e.fishCastZoneId = '';
+  // A dragonkin egg that DIES here (a shot, the chain ripple, the broodlord
+  // shout, the proximity ambush: every real break runs through dealDamage)
+  // is CRACKED: the brood pass hatches only flagged corpses, so an egg
+  // fiat-flagged dead outside the damage path (the test-suite despawnMobs
+  // idiom, admin sweeps) never detonates the clutch (mob/dragonkin_brood.ts).
+  if (e.kind === 'mob' && MOBS[e.templateId]?.broodEgg) e.broodCracked = true;
   ctx.emit({ type: 'death', entityId: e.id, killerId: killer?.id ?? -1 });
 
   // a dead mob keeps no raid marker — respawnMob reuses the same entity id,
@@ -1147,7 +1202,18 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     e.chargePath = [];
     if (e.leap !== undefined) e.leap = null;
     e.followTargetId = null;
-    ctx.emit({ type: 'playerDeath', pid: e.id });
+    // Classic-era death recap: the killer entity id (real kill credit already
+    // lives on the killer entity passed in here, the same source kill-credit /
+    // loot resolution reuses) plus the raw killing-ability name, if any. The
+    // client resolves and localizes both, and renders the ONE death log line
+    // (no separate sim-side notice: two lines on every death, and a doubled
+    // "You have died." for the no-killer case, was the earlier bug here).
+    ctx.emit({
+      type: 'playerDeath',
+      pid: e.id,
+      killerId: killer && killer.id !== e.id ? killer.id : undefined,
+      killerAbility: killerAbility ?? undefined,
+    });
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left
@@ -1160,7 +1226,7 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
     // Route it through handleDeath so the owned-mob branch below applies: warlock
     // demons unravel, a hunter's beast leaves a revivable corpse (Revive Pet).
     const pet = ctx.petOf(e.id);
-    if (pet) handleDeath(ctx, pet, killer);
+    if (pet) handleDeath(ctx, pet, killer, killerAbility);
     return;
   }
 
@@ -1374,6 +1440,8 @@ export function handleDeath(ctx: SimContext, e: Entity, killer: Entity | null): 
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
       }
+      // A destroyed Broodmother egg may hatch a widow that swarms the killer.
+      if (e.templateId === 'spider_egg' && killer) spawnWidowHatchlingOnEggDeath(ctx, e, killer);
       // World bosses use PERSONAL loot for every contributor (rolled below from the
       // hate-table snapshot), not the tapper/party shared-corpse roll. Rares pass
       // their own damage-contributor snapshot (rareContribs) so rollLoot's guaranteed
