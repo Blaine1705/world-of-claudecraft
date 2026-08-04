@@ -71,6 +71,16 @@ const MAP_COLOR_TOKENS = [
   '--color-map-graveyard',
   '--color-map-mudhut',
   '--color-map-campfire',
+  '--color-map-gather-ore-ready',
+  '--color-map-gather-ore-cooldown',
+  '--color-map-gather-ore-glow',
+  '--color-map-gather-wood-ready',
+  '--color-map-gather-wood-cooldown',
+  '--color-map-gather-wood-glow',
+  '--color-map-gather-herb-ready',
+  '--color-map-gather-herb-cooldown',
+  '--color-map-gather-herb-glow',
+  '--color-map-gather-locked',
 ];
 
 // The classColor resolver every MapWindowPainter call site now takes (issue 2652),
@@ -264,6 +274,9 @@ function mapWorld(): IWorld {
     cfg: { seed: 42, playerClass: 'warrior' },
     questState: () => 'unavailable',
     questLog: new Map(),
+    inventory: [],
+    gatheringProficiency: {},
+    nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
 
@@ -481,6 +494,9 @@ function labelWorld(): IWorld {
     // The quest-marker inputs both worlds expose (the phase 23 classifier).
     questsDone: new Set<string>(),
     craftingIdentity: { version: 1, synced: true, cadenceBlockedQuests: [] },
+    inventory: [],
+    gatheringProficiency: {},
+    nodeHarvestableByMe: () => true,
   } as unknown as IWorld;
 }
 
@@ -1167,6 +1183,105 @@ function partyWorld(): IWorld {
   };
   return world as unknown as IWorld;
 }
+
+describe('map_window_painter: zone-map gather nodes', () => {
+  it('fills gather silhouettes with the locked token for a toolless viewer', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+
+    const result = new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      mapWorld(),
+      {
+        zone: ZONES[0],
+        zoneBg: {
+          canvas: { width: 560, height: 560 } as HTMLCanvasElement,
+          region: {
+            minX: ZONES[0].xMin ?? STRIP_MIN_X,
+            maxX: ZONES[0].xMax ?? STRIP_MAX_X,
+            minZ: ZONES[0].zMin,
+            maxZ: ZONES[0].zMax,
+          },
+        },
+        canvasSize: 560,
+        zoom: 1,
+        center: null,
+      },
+    );
+
+    expect(result.gatherNodes.length).toBeGreaterThan(0);
+    // Empty inventory locks every node: fills use the locked token, never a
+    // ready profession color (the lock strike is a stroke, not a fill).
+    const lockedFills = trace.fills.filter(
+      (fill) => fill.style === 'paint:--color-map-gather-locked',
+    );
+    expect(lockedFills.length).toBe(result.gatherNodes.length);
+    // Ready profession colors must not paint when every node is locked.
+    for (const tok of [
+      '--color-map-gather-ore-ready',
+      '--color-map-gather-wood-ready',
+      '--color-map-gather-herb-ready',
+    ]) {
+      expect(
+        trace.fills.some((f) => f.style === `paint:${tok}`),
+        `locked viewer must not fill ${tok}`,
+      ).toBe(false);
+    }
+  });
+
+  it('uses type-ready tokens (and their glow) when the viewer can work the node', () => {
+    const trace = newTrace();
+    installMapStyleGlobals(trace);
+    setActiveWorldContent(BUILTIN_WORLD);
+    const world = mapWorld() as unknown as {
+      inventory: { itemId: string; count: number }[];
+      gatheringProficiency: Record<string, number>;
+    };
+    // Cover every gathering profession at tier 1 so ore/wood/herb all unlock.
+    world.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'handaxe', count: 1 },
+      { itemId: 'gathering_sickle', count: 1 },
+    ];
+    world.gatheringProficiency = { mining: 1, logging: 1, herbalism: 1 };
+
+    const result = new MapWindowPainter(classColor).paintOverworld(
+      fakeMapContext(trace),
+      world as unknown as IWorld,
+      {
+        zone: ZONES[0],
+        zoneBg: {
+          canvas: { width: 560, height: 560 } as HTMLCanvasElement,
+          region: {
+            minX: ZONES[0].xMin ?? STRIP_MIN_X,
+            maxX: ZONES[0].xMax ?? STRIP_MAX_X,
+            minZ: ZONES[0].zMin,
+            maxZ: ZONES[0].zMax,
+          },
+        },
+        canvasSize: 560,
+        zoom: 1,
+        center: null,
+      },
+    );
+
+    expect(result.gatherNodes.every((n) => !n.locked && n.ready)).toBe(true);
+    for (const tok of [
+      '--color-map-gather-ore-ready',
+      '--color-map-gather-wood-ready',
+      '--color-map-gather-herb-ready',
+      '--color-map-gather-ore-glow',
+      '--color-map-gather-wood-glow',
+      '--color-map-gather-herb-glow',
+    ]) {
+      expect(
+        trace.fills.some((f) => f.style === `paint:${tok}`),
+        `expected a fill with ${tok}`,
+      ).toBe(true);
+    }
+  });
+});
 
 describe('map_window_painter: party markers', () => {
   it('draws a class-colored dot for an alive member and the dead token for a fallen one', () => {

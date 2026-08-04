@@ -257,10 +257,12 @@ import {
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { gatherNodeTooltipHtml } from './gather_node_tooltip_controller';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
 import {
   buildGatheringProficiencyRows,
+  buildGatherNodeTooltip,
   gatherDeniedLineKey,
   gatherDowngradeLineKey,
   gatherRareTierFor,
@@ -458,7 +460,9 @@ import {
 } from './map_terrain';
 import { MapWindowPainter } from './map_window_painter';
 import {
+  gatherNodeMarkerAt,
   MAP_OPEN_ZOOM,
+  type MapGatherNodeMarker,
   type MapNpcMarker,
   type MapQuestAreaMarker,
   mapWindowMode,
@@ -1649,6 +1653,9 @@ export class Hud {
   // The quest-giver glyphs of the last overworld map paint, for the hover
   // tooltip's hit-test (quest names + level requirements). Empty in delve mode.
   private mapNpcMarkers: MapNpcMarker[] = [];
+  // Gather-node icons of the last overworld map paint (zone map only), for the
+  // hover/tap tooltip hit-test. Empty in delve mode and on the continent.
+  private mapGatherNodes: MapGatherNodeMarker[] = [];
   // World-map level: the per-zone detail map, or the WoW-style continent overview
   // reached by right-click / the level-toggle button. Reset to 'zone' on open.
   private mapLevel: 'zone' | 'continent' = 'zone';
@@ -2488,8 +2495,9 @@ export class Hud {
     // the mouse (hover); on touch there is no hover, so a TAP on a marker shows it
     // (a press that moves beyond the tolerance is a pan, not a tap). Priority: a
     // quest-giver glyph ('!'/'?', quest names + level requirements) sits ON TOP of
-    // the blobs, so it wins; otherwise a quest-objective area shows its objectives
-    // with live tracker progress. Both hit-tests run against the markers of the
+    // gather icons and quest blobs, so it wins; then a gather node (precise
+    // resource target); otherwise a quest-objective area shows its objectives
+    // with live tracker progress. Hit-tests run against the markers of the
     // last paint, scaled from CSS px to the canvas backing space the model projects
     // into.
     let mapAreaTipShown = false;
@@ -2503,14 +2511,24 @@ export class Hud {
     // report whether one was shown (the attachTooltip idiom: map into author
     // space, then clamp the tooltip box against the viewport).
     const showMapTipAt = (clientX: number, clientY: number): boolean => {
-      if (this.mapQuestAreas.length === 0 && this.mapNpcMarkers.length === 0) return false;
+      if (
+        this.mapQuestAreas.length === 0 &&
+        this.mapNpcMarkers.length === 0 &&
+        this.mapGatherNodes.length === 0
+      )
+        return false;
       const rect = mapCanvas.getBoundingClientRect();
       const cx = ((clientX - rect.left) * mapCanvas.width) / rect.width;
       const cy = ((clientY - rect.top) * mapCanvas.height) / rect.height;
       const glyph = npcMarkerAt(this.mapNpcMarkers, cx, cy);
-      const html = glyph
-        ? this.questGiverTooltipHtml(glyph)
-        : this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, cx, cy));
+      let html = glyph ? this.questGiverTooltipHtml(glyph) : '';
+      if (!html) {
+        const gather = gatherNodeMarkerAt(this.mapGatherNodes, cx, cy);
+        html = gather ? this.gatherNodeMapTooltipHtml(gather) : '';
+      }
+      if (!html) {
+        html = this.questAreaTooltipHtml(questAreaObjectivesAt(this.mapQuestAreas, cx, cy));
+      }
       if (!html) return false;
       // Same as desktop hover: paint the tip at the pointer (a tap on touch, the
       // cursor on mouse). paintTooltipAt clamps the box on-screen either way.
@@ -9805,6 +9823,7 @@ export class Hud {
       // title is drawn on-canvas, since the world map has no DOM zone label).
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
+      this.mapGatherNodes = [];
       this.continentRegions = [];
       this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const run = this.sim.delveRun;
@@ -9828,6 +9847,7 @@ export class Hud {
       // The continent overview: a painted world plate with clickable zone regions.
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
+      this.mapGatherNodes = [];
       this.mapView = null; // panning/zoom belong to the per-zone level only
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
@@ -9871,6 +9891,7 @@ export class Hud {
     this.mapView = result.view;
     this.mapQuestAreas = result.questAreas;
     this.mapNpcMarkers = result.npcs;
+    this.mapGatherNodes = result.gatherNodes;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
   }
@@ -9889,6 +9910,14 @@ export class Hud {
       )}</div>`;
     }
     return html;
+  }
+
+  // Tooltip body for a hovered gather node on the zone map: reuses the world
+  // hover's pure model + HTML (name, tool gate, ready/cooldown, fine preview)
+  // so the map and the 3D node tip never disagree.
+  private gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string {
+    const model = buildGatherNodeTooltip(this.sim, marker.nodeId);
+    return model ? gatherNodeTooltipHtml(model) : '';
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest
