@@ -391,7 +391,8 @@ export const sv_SE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Gester",
-      "done": "Klar"
+      "done": "Klar",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Dagliga belöningar",

@@ -5521,6 +5521,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': '南東',
   'hudChrome.compass.SW': '南西',
   'hudChrome.compass.W': '西',
+  'hudChrome.emoteEditor.close': 'エモートを閉じる',
   'hudChrome.emoteEditor.done': '完了',
   'hudChrome.emoteEditor.title': 'エモート',
   'hudChrome.emotes.bow': 'お辞儀',

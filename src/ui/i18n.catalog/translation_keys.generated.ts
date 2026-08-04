@@ -7113,6 +7113,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.dungeonDifficulty.resetUsage'
   | 'hudChrome.dungeonDifficulty.setHeroic'
   | 'hudChrome.dungeonDifficulty.setNormal'
+  | 'hudChrome.emoteEditor.close'
   | 'hudChrome.emoteEditor.done'
   | 'hudChrome.emoteEditor.title'
   | 'hudChrome.emoteWheel.edit'
