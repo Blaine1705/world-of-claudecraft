@@ -21,10 +21,10 @@ const BOUNDARY_EPSILON = 0.01;
 const BUILTIN_NOTICEBOARDS = BUILTIN_WORLD.services?.noticeboards ?? [];
 
 describe('Eastbrook town grass exclusion', () => {
-  it('snapshots every building, service apron, civic prop, market prop, fence, and wall chord', () => {
+  it('snapshots every built-in town footprint, service apron, civic prop, and wall chord', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
     expect(BUILTIN_NOTICEBOARDS).toHaveLength(1);
-    expect(exclusions).toHaveLength(52);
+    expect(exclusions).toHaveLength(112);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,
