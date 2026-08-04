@@ -27,6 +27,7 @@ import {
   moderationQueue,
   moderationReportsForAccount,
   muteAccountChat,
+  prunePlayerReportsBatch,
   reactivateAccountAudited,
   recordInGameAction,
   resetChatStrikesAudited,
@@ -1059,5 +1060,53 @@ describe('moderation bust hook wiring', () => {
     expect(statements(client)).toContain('COMMIT');
     expect(errorSpy).toHaveBeenCalled();
     errorSpy.mockRestore();
+  });
+});
+
+describe('prunePlayerReportsBatch (the retention-sweep primitive)', () => {
+  // Mirrors tests/unstuck_db.test.ts's pruneUnstuckReportsBatch suite: the
+  // sweep owns cadence, budget, and batching, this primitive owns exactly
+  // one bounded delete on the shared pool.
+  it('runs one sibling-shaped bounded delete that excludes open reports', async () => {
+    query.mockResolvedValueOnce(queryResult([], 3));
+
+    await expect(prunePlayerReportsBatch(180, 1000)).resolves.toBe(3);
+
+    expect(connect).not.toHaveBeenCalled();
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('DELETE FROM player_reports');
+    // An open report must never be eligible: moderationQueue and
+    // moderationReportsForAccount above only ever read status = 'open' rows,
+    // so the exclusion is what keeps a still-visible report from vanishing.
+    expect(sql).toContain("status != 'open'");
+    expect(sql).toContain("created_at < now() - ($1::int * INTERVAL '1 day')");
+    expect(sql).toContain('ORDER BY created_at ASC, id ASC');
+    expect(sql).toContain('LIMIT $2');
+    expect(params).toEqual([180, 1000]);
+  });
+
+  it('keeps forever on zero and negative retention (the destructive-delete safe side)', async () => {
+    await expect(prunePlayerReportsBatch(0, 1000)).resolves.toBe(0);
+    await expect(prunePlayerReportsBatch(-3, 1000)).resolves.toBe(0);
+    await expect(prunePlayerReportsBatch(Number.NaN, 1000)).resolves.toBe(0);
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('normalizes fractional retention days up to one full day, never to zero', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    await prunePlayerReportsBatch(0.5, 1000);
+    expect(query.mock.calls[0][1]).toEqual([1, 1000]);
+  });
+
+  it('floors the batch size at one row (no LIMIT 0 infinite no-op)', async () => {
+    query.mockResolvedValueOnce(queryResult([], 0));
+    await prunePlayerReportsBatch(180, 0);
+    expect(query.mock.calls[0][1]).toEqual([180, 1]);
+  });
+
+  it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
+    query.mockResolvedValueOnce(queryResult([], null as unknown as number));
+    await expect(prunePlayerReportsBatch(180, 1000)).resolves.toBe(0);
   });
 });
