@@ -126,30 +126,114 @@ mitigations that cost no custody:
    non-payment can carry its consequence without anything at risk up front. This
    is the cheapest teeth available and I would take it.
 
-## Open questions
+## Decisions (all four resolved)
 
-**1. Does the seller enter USD or $WOC?** The requirement says "a $WOC value", but
-every downstream rail is USD-denominated: the fee split, the min and max price
-rails, the 2FA threshold, and the sales history. Entering USD with a live $WOC
-preview keeps all of that intact and matches the auction UI. Entering $WOC means
-converting to USD cents at agreement and locking it, and every rail then operates
-on a derived number. Recommend USD with a $WOC preview, but this contradicts the
-literal request so it needs confirming.
+**1. The seller enters USD.** The window shows the equivalent $WOC at the time of
+the trade, and that figure is what the balance check uses.
 
-**2. May the $WOC side also offer items?** The stated rules exclude only gold. But a
-listing is "one seller's items for a price", so a two-way item swap with $WOC on one
-side is not a listing shape: it needs escrowing BOTH sides and is a materially
-bigger build than a directed listing. Recommend scoping v1 to items one way, $WOC
-the other, and treating two-way as a separate feature if it is wanted.
+Two consequences.
 
-**3. Does the seller see their net?** The fee means they receive 90%. In an auction
-the fee is a note; here the price is agreed face to face, so the net is the number
-that matters. Recommend showing both.
+The displayed $WOC is a **preview, not a commitment**. USD is what is agreed; the
+token amount is recomputed by a fresh quote at payment time, so the buyer may pay
+more or fewer tokens than the window showed. That is the same exposure an auction
+has and the existing `variableTokenWarning` copy already covers it, but here the
+number is shown next to a price the two players just negotiated, so it will read as
+a promise unless the copy says otherwise.
 
-**4. Does leaving range cancel it?** The sim trade dies when players separate. A
-directed listing outlives the trade window by design, since the buyer needs time to
-sign. Recommend that the listing survives, and that the trade window closing is not
-a cancellation.
+The balance check is **doing more work here than it was built for**. `guardBalance`
+says so itself:
+
+> Balance is a bid-time plausibility gate, never a guarantee (the bond is the
+> enforcement).
+
+With no bond there is no enforcement behind it, and it compares against a cached
+chain read. So it can pass and payment can still fail, from a moved price or a
+balance spent elsewhere. That is acceptable because the item returns, but the UI
+must not present it as a guarantee that the buyer can pay.
+
+**2. Items one way, $WOC the other, and $WOC only.** The buyer's side of the deal
+is $WOC and nothing else. This is what makes the directed-listing shape fit exactly:
+one seller's items, one price, one buyer. No two-way escrow, and the bigger build is
+avoided.
+
+**3. Show the net AND the fee.** Both, for transparency.
+
+**This number must come from the server.** The view core's contract is explicit:
+
+> The client computes NO price, token, or increment values: everything economic in
+> this model is a passthrough of server-provided numbers.
+
+And the fee schedule is not in the status payload today, so the client cannot derive
+the net even if it were allowed to. Two ways to supply it, and the second is better:
+
+- Ship the fee bps in `/status` and let the client do the USD arithmetic. Cheap, but
+  it breaches the rule above and risks drift, because `splitMarketProceeds` rounds
+  the burn up, then the treasury up, and gives the seller the remainder. A client
+  computing a flat percentage would disagree by a cent.
+- **Have the service return the split for an amount.** `/estimate` already takes
+  `usdCents`; returning the three USD legs alongside the token figure makes the
+  displayed net authoritative and drift-proof. Recommend this.
+
+**4. Range stops mattering once both parties confirm.** Before mutual confirm the
+window behaves normally and is proximity-gated. At mutual confirm the item escrows,
+the directed listing exists, and separation is irrelevant.
+
+This has an implementation consequence that decides the shape of the whole feature.
+The sim's confirm **performs the swap** the moment both sides have accepted:
+
+```ts
+if (session.a === r.meta.entityId) session.acceptedA = true;
+else session.acceptedB = true;
+if (!(session.acceptedA && session.acceptedB)) return;
+// ... straight into the atomic swap
+```
+
+So a $WOC deal can never route its confirm through `tradeConfirm()`. Two options:
+
+- Reuse the sim session for NEGOTIATION only (items, accepted flags) and intercept
+  the final confirm server-side. Saves the offer UI plumbing, but the sim session is
+  proximity-gated and dies when players separate, which fights decision 4, and it
+  means a session whose confirm must never be allowed to reach the sim.
+- **Do not use the sim trade session for $WOC mode at all.** The window in $WOC mode
+  is a server-negotiated directed offer: the seller picks items and a USD price, the
+  buyer accepts, the server escrows and creates the listing. The sim never
+  participates, so proximity, swap-on-confirm and the firewall are all non-issues by
+  construction.
+
+Recommend the second. It costs new offer/accept plumbing, and it buys a $WOC path
+with no entanglement in a machine that was built to do something else atomically.
+
+## Remaining open questions
+
+**1. Does a directed sale enter the public sales history?** This is the one with
+integrity consequences, not just preference. Every settled exchange sale is recorded
+as public provenance and feeds price statistics. Both answers cost something:
+
+- **Include it** and the price feed stays complete, but it becomes public that A
+  sold to B and for how much, which is odd for a deal the two arranged privately.
+- **Exclude it** and directed sales become an invisible settlement channel. That is
+  precisely what someone laundering real-money trades or wash-trading to move a
+  price would want, and it would be the only path on the rail with no public record.
+
+Recommend including it, possibly with the counterparty names suppressed while the
+item and price stay public. Privacy of the negotiation is not the same as privacy of
+the settlement.
+
+**2. Does 2FA apply?** `guardTotp` runs on `buyNow`, so a directed sale at or above
+the threshold ($100 by default) would demand a code automatically. That is the right
+default for a payment that size, but it will surprise two players who think they are
+doing a face-to-face trade. Confirm it is intended and make the copy explain it
+rather than just refusing.
+
+**3. Does a directed offer count against the 12-listing cap?**
+`WOC_MARKET_MAX_ACTIVE_LISTINGS` is 12. A directed offer holds an item in escrow
+exactly as a listing does, so it should count, otherwise it is a way around the cap.
+Confirm.
+
+**4. Do strikes apply to a directed non-payment?** Recommended above as the teeth
+that replace the bond, since the ladder is bond-independent. Not yet confirmed. If
+they do not apply, non-payment is entirely free and the denial-of-use above has no
+consequence at all.
 
 ## Sequencing
 
