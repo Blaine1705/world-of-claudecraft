@@ -151,8 +151,8 @@ describe('CustomMap build + projection', () => {
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
       assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -7,
-      z: 310,
+      x: -21.25,
+      z: 317,
     });
     expect(highwatchForge).toBeDefined();
     expect(templeCampfire).toBeDefined();

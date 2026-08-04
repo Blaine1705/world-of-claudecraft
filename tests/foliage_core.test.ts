@@ -25,7 +25,7 @@ describe('Eastbrook town grass exclusion', () => {
     const exclusions = eastbrookGrassExclusions(PROPS.buildings, true, BUILTIN_NOTICEBOARDS);
     expect(BUILTIN_NOTICEBOARDS).toHaveLength(1);
     // Includes Eastbrook footprints plus Fenbridge rebuild aprons (see fenbridge_layout).
-    expect(exclusions).toHaveLength(111);
+    expect(exclusions).toHaveLength(113);
     for (const building of [
       ...EASTBROOK_LAYOUT.preservedBuildings,
       ...EASTBROOK_LAYOUT.buildings,

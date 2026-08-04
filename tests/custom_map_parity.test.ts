@@ -77,8 +77,8 @@ describe('custom-map terrain seam', () => {
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
       assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -7,
-      z: 310,
+      x: -21.25,
+      z: 317,
     });
     if (!bank || !fenbridgeInn) return;
 

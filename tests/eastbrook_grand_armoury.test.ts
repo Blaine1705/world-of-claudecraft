@@ -353,11 +353,11 @@ describe('Eastbrook Grand Armoury gameplay preservation', () => {
     expect(fenbridgeInn).toMatchObject({
       id: 'fenbridge_crooked_reed_inn',
       assetId: '/models/props/fenbridge_crooked_reed_inn.glb',
-      x: -7,
-      z: 310,
+      x: -21.25,
+      z: 317,
       w: 9,
       d: 8,
-      rot: Math.PI * 0.75,
+      rot: FENBRIDGE_BUILDINGS_BY_ID.fenbridge_crooked_reed_inn.rotation,
     });
 
     const restPadding = buildingRestPadding(fenbridgeInn);

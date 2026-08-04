@@ -376,7 +376,7 @@ describe('Eastbrook polish capture contract', () => {
       // rendererIntegration leaf (impostor bake, fog-free vista, haze band,
       // the #2793 review round), so the merged composite matches neither
       // parent's literal. No capture was retaken here.
-      fingerprint: '491fabc2dd5413d298bcabcdad3e20361d590cd74eab5a750bdee27767980d18',
+      fingerprint: '56c3b80211a4ebe3465eed9f0b578cf15e821d8f1971e32a9495231926a88445',
       components: {
         captureContract: {
           id: 'polish-v2',
