@@ -18,8 +18,11 @@ import {
   HAZE_DENSITY_CLEAR_FAR,
   HAZE_DENSITY_THICK_FAR,
   HAZE_FIELD_CELL,
+  HAZE_RAIN_STRENGTH_FLOOR,
+  HAZE_SNOW_STRENGTH_FLOOR,
   HAZE_STRENGTH_MIN,
   hazeFieldLayout,
+  hazeLightLevel,
   hazeStrengthForFogFar,
   sampleBiomeHazeField,
 } from '../src/render/biome_haze_field_core';
@@ -175,13 +178,14 @@ describe('aerial distance ramp', () => {
   it('leaves every gameplay distance untouched', () => {
     expect(aerialHazeAmount(0, 1)).toBe(0);
     expect(aerialHazeAmount(HAZE_AERIAL_ONSET, 1)).toBe(0);
-    // Interest scope is about 120 yards; the onset sits well past it.
-    expect(HAZE_AERIAL_ONSET).toBeGreaterThan(120);
+    // Interest scope is about 120 yards; the onset covers all of it, and the
+    // Gaussian shoulder keeps the next 30 yards visually at zero too.
+    expect(HAZE_AERIAL_ONSET).toBeGreaterThanOrEqual(120);
   });
 
   it('has no onset ring: the first yards past the onset are near-zero', () => {
-    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 10, 1)).toBeLessThan(0.001);
-    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 30, 1)).toBeLessThan(0.01);
+    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 10, 1)).toBeLessThan(0.002);
+    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 30, 1)).toBeLessThan(0.015);
   });
 
   it('grows monotonically and saturates below the ceiling', () => {
@@ -195,19 +199,98 @@ describe('aerial distance ramp', () => {
     expect(aerialHazeAmount(1500, 1)).toBeCloseTo(HAZE_AERIAL_MAX, 3);
   });
 
-  it('stays a hint of air, never a paint-over, across the whole preset spread', () => {
+  it('stays under half even fully saturated, never a paint-over', () => {
     const clearest = hazeStrengthForFogFar(HAZE_DENSITY_CLEAR_FAR);
     const murkiest = hazeStrengthForFogFar(HAZE_DENSITY_THICK_FAR);
-    expect(aerialHazeAmount(4000, clearest)).toBeGreaterThan(0.2);
-    expect(aerialHazeAmount(4000, clearest)).toBeLessThan(0.25);
-    expect(aerialHazeAmount(4000, murkiest)).toBeGreaterThan(0.3);
-    expect(aerialHazeAmount(4000, murkiest)).toBeLessThan(0.35);
+    expect(aerialHazeAmount(4000, clearest)).toBeGreaterThan(0.27);
+    expect(aerialHazeAmount(4000, clearest)).toBeLessThan(0.32);
+    expect(aerialHazeAmount(4000, murkiest)).toBeGreaterThan(0.42);
+    expect(aerialHazeAmount(4000, murkiest)).toBeLessThan(0.5);
   });
 
-  it('reads clearly at the range a neighbouring zone actually sits', () => {
-    // A zone band is 360 to 560 yards deep, so a neighbour's middle is
-    // typically 400 to 900 yards out: the effect must be visible there.
-    expect(aerialHazeAmount(400, 0.83)).toBeGreaterThan(0.08);
-    expect(aerialHazeAmount(700, 0.83)).toBeGreaterThan(0.2);
+  it('reads clearly at the BORDER sightline, not only mid-vista', () => {
+    // Standing at a zone border looking in, the neighbour's land fills the
+    // 250 to 400 yard band. The first ship of this ramp put 2 to 8 percent
+    // there, which play-read as "nothing changed": these floors are the fix
+    // and must not regress.
+    expect(aerialHazeAmount(250, 0.8)).toBeGreaterThan(0.1);
+    expect(aerialHazeAmount(300, 0.8)).toBeGreaterThan(0.15);
+    expect(aerialHazeAmount(400, 0.83)).toBeGreaterThan(0.25);
+    expect(aerialHazeAmount(700, 0.83)).toBeGreaterThan(0.3);
+  });
+});
+
+describe('zone light level in the bake', () => {
+  it('computes full day as exactly 1 and the twilight rigs dimmer', () => {
+    expect(hazeLightLevel()).toBe(1);
+    expect(hazeLightLevel(1, 1, 1)).toBe(1);
+    // The Nightbloom rig (sun 0.6, hemi 0.95, env 0.7) lands near 0.7.
+    expect(hazeLightLevel(0.6, 0.95, 0.7)).toBeGreaterThan(0.65);
+    expect(hazeLightLevel(0.6, 0.95, 0.7)).toBeLessThan(0.75);
+    expect(hazeLightLevel(0.5)).toBeLessThan(hazeLightLevel(0.8));
+  });
+
+  it('darkens the baked haze colour, so a twilight realm reads dim from outside', () => {
+    const dayField = buildBiomeHazeFieldData(
+      presetTable({ night: { color: 0x8d7fc0, far: 460 } }),
+      () => 'night',
+    );
+    const duskField = buildBiomeHazeFieldData(
+      presetTable({ night: { color: 0x8d7fc0, far: 460, light: 0.7 } }),
+      () => 'night',
+    );
+    const day = sampleBiomeHazeField(dayField, 0, 0);
+    const dusk = sampleBiomeHazeField(duskField, 0, 0);
+    expect(dusk.r).toBeCloseTo(day.r * 0.7, 2);
+    expect(dusk.g).toBeCloseTo(day.g * 0.7, 2);
+    expect(dusk.b).toBeCloseTo(day.b * 0.7, 2);
+    expect(dusk.strength).toBeCloseTo(day.strength, 3);
+  });
+});
+
+describe('baked weather veil', () => {
+  it('whitens and thickens a snowing realm air', () => {
+    const clear = buildBiomeHazeFieldData(
+      presetTable({ frost: { color: 0xa9bed2, far: 325 } }),
+      () => 'frost',
+    );
+    const snowing = buildBiomeHazeFieldData(
+      presetTable({ frost: { color: 0xa9bed2, far: 325, precip: 'snow' } }),
+      () => 'frost',
+    );
+    const base = sampleBiomeHazeField(clear, 0, 0);
+    const veiled = sampleBiomeHazeField(snowing, 0, 0);
+    expect(veiled.r).toBeGreaterThan(base.r);
+    expect(veiled.g).toBeGreaterThan(base.g);
+    expect(veiled.b).toBeGreaterThan(base.b);
+    expect(veiled.strength).toBeGreaterThanOrEqual(HAZE_SNOW_STRENGTH_FLOOR - 1 / 255);
+  });
+
+  it('thickens a raining realm air without recolouring it', () => {
+    const clear = buildBiomeHazeFieldData(
+      presetTable({ marsh: { color: 0xc2cbb6, far: 400 } }),
+      () => 'marsh',
+    );
+    const raining = buildBiomeHazeFieldData(
+      presetTable({ marsh: { color: 0xc2cbb6, far: 400, precip: 'rain' } }),
+      () => 'marsh',
+    );
+    const base = sampleBiomeHazeField(clear, 0, 0);
+    const veiled = sampleBiomeHazeField(raining, 0, 0);
+    expect(veiled.r).toBeCloseTo(base.r, 3);
+    expect(veiled.g).toBeCloseTo(base.g, 3);
+    expect(veiled.b).toBeCloseTo(base.b, 3);
+    expect(veiled.strength).toBeGreaterThanOrEqual(HAZE_RAIN_STRENGTH_FLOOR - 1 / 255);
+    expect(veiled.strength).toBeGreaterThan(base.strength);
+  });
+
+  it('floors, never caps: air already thicker than the floor keeps its own value', () => {
+    const raining = buildBiomeHazeFieldData(
+      // far 150 is the murkiest end: strength 1, above the rain floor.
+      presetTable({ marsh: { color: 0xc2cbb6, far: 150, precip: 'rain' } }),
+      () => 'marsh',
+    );
+    const veiled = sampleBiomeHazeField(raining, 0, 0);
+    expect(veiled.strength).toBeGreaterThan(HAZE_RAIN_STRENGTH_FLOOR);
   });
 });

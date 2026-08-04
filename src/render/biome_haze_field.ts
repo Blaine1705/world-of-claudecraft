@@ -5,14 +5,15 @@
 // cross-fade, distance ramp) live in biome_haze_field_core.ts, which is
 // Node-tested; this file only owns the texture, the uniforms and the string.
 //
-// One field, one uniform block, three consumers. The near splat terrain, the
-// far vista tiles and (when a caller opts in) any other world surface all
-// splice the SAME snippet at the SAME point (immediately before
-// <fog_fragment>, so the haze lands where scene fog lands and the horizon
-// band still wins at the rim). Sharing the snippet is what makes the
-// near-to-far handoff seamless: at the detail horizon both surfaces evaluate
-// identical math on identical uniforms, so there is no ring where one layer
-// hands off to the other.
+// One field, one uniform block, four consumers. The near splat terrain, the
+// far vista tiles and the water planes all splice the SAME snippet at the
+// SAME point (immediately before <fog_fragment>, so the haze lands where
+// scene fog lands and the horizon band still wins at the rim), and the sky
+// dome samples the same field directionally for its horizon-band tint
+// (sky.ts), applied before ITS fog band under the same rim rule. Sharing the
+// snippet is what makes the near-to-far handoff seamless: at the detail
+// horizon both surfaces evaluate identical math on identical uniforms, so
+// there is no ring where one layer hands off to the other.
 //
 // Cost: one RGBA8 texture of about 15k texels (60 KB, one zoneBiomeAt tap per
 // texel, roughly 10 ms once per session and memoized across terrain rebuilds),

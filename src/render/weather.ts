@@ -1,14 +1,18 @@
 import * as THREE from 'three';
 import type { BiomeId } from '../sim/types';
 import { transitionAlpha, WEATHER_ENVIRONMENT_RESPONSE } from './environment_transition_core';
+import { type PrecipMode, precipSpawnXZ, remotePrecipPlan } from './weather_field_core';
 
 // Ambient precipitation. One pooled THREE.Points cloud rides inside a box that
 // follows the camera (the same "ride along" trick the sky dome uses), so a
-// small fixed pool blankets the whole visible world. The biome under the player
-// drives what falls: drifting snow in the peaks, light rain in the marsh, clear
-// skies in the vale. Render-only and presentation-only — it never touches sim
-// state, so it stays out of the determinism contract (like the other ambient
-// render effects).
+// small fixed pool blankets the whole visible world. Any weathered biome
+// inside the box drives what falls (weather_field_core.ts): over your own
+// head when you stand in the peaks' snow or the marsh's rain, and across the
+// border when you stand OUTSIDE one looking in, with every spawn masked to
+// the weathered zone's own cells so the neighbour's snowfall is visible from
+// the clear side of the line. Render-only and presentation-only: it never
+// touches sim state, so it stays out of the determinism contract (like the
+// other ambient render effects).
 //
 // Intensity cross-fades when the player crosses a zone band. Switching the
 // precipitation TYPE (snow <-> rain) fades the current one out, swaps the
@@ -19,7 +23,13 @@ const HX = 70;
 const HY = 46;
 const HZ = 70;
 
-type Precip = 'snow' | 'rain';
+// How often the box is re-scanned for weathered cells (remotePrecipPlan).
+// Zone borders move at walking speed under the camera; half a second is
+// indistinguishable from per-frame and keeps the 49-tap scan out of the
+// per-frame cost entirely.
+const PLAN_INTERVAL = 0.5;
+
+type Precip = PrecipMode;
 
 interface PrecipStyle {
   color: number;
@@ -128,6 +138,14 @@ export class Weather {
   private intensity = 0; // current eased opacity 0..1
   private enabled = true;
   private time = 0;
+  // Remote-weather state: the cached box plan, its refresh clock, and whether
+  // spawns are currently masked to the weathered zone's cells (plan found a
+  // neighbour's weather rather than the player's own).
+  private planMode: Precip | null = null;
+  private planLocal = true;
+  private planTimer = 0;
+  private wasLive = false;
+  private readonly spawnRng = mulberry32(0x5eed ^ 0x9e37);
 
   constructor(scene: THREE.Scene, lowGfx: boolean) {
     // a smaller pool on the low tier keeps the effect affordable there
@@ -203,21 +221,31 @@ export class Weather {
   }
 
   /**
-   * @param cam   current camera position (cloud re-centres on it)
-   * @param dt    seconds since last frame
-   * @param biome biome under the player, or null when precipitation should stop
-   *              (indoors / underwater / suppressed)
+   * @param cam     current camera position (cloud re-centres on it)
+   * @param dt      seconds since last frame
+   * @param biome   biome under the player, or null when precipitation should
+   *                stop (indoors / underwater / suppressed)
+   * @param biomeAt world biome sampler (sim zoneBiomeAt), which is what lets a
+   *                neighbouring zone's weather fall inside the box while the
+   *                player stands outside it
    */
-  update(cam: THREE.Vector3, dt: number, biome: BiomeId | null): void {
-    // peaks -> snow, marsh -> rain, everything else clears
-    const want: Precip | null =
-      !this.enabled || biome === null
-        ? null
-        : biome === 'peaks' || biome === 'frost'
-          ? 'snow'
-          : biome === 'marsh'
-            ? 'rain'
-            : null;
+  update(
+    cam: THREE.Vector3,
+    dt: number,
+    biome: BiomeId | null,
+    biomeAt: (x: number, z: number) => BiomeId,
+  ): void {
+    // Any weathered biome in the box drives the mode (own zone first); the
+    // player's own biome staying clear no longer clears the box. `biome`
+    // stays the suppression channel: null (indoors/underwater) always stops.
+    this.planTimer -= dt;
+    if (this.planTimer <= 0) {
+      this.planTimer = PLAN_INTERVAL;
+      const plan = remotePrecipPlan(cam.x, cam.z, HX, HZ, biomeAt);
+      this.planMode = plan.mode;
+      this.planLocal = plan.local;
+    }
+    const want: Precip | null = !this.enabled || biome === null ? null : this.planMode;
 
     // While the visible type still differs from what we want, drive opacity to
     // zero first; once faded out, swap the material and let it climb again.
@@ -240,6 +268,21 @@ export class Weather {
 
     const live = this.intensity > 0.01;
     this.points.visible = live;
+    // A masked activation reseeds the whole pool into the weathered zone's
+    // cells: resting positions are uniform over the box, and waiting for each
+    // particle's first wrap would open the effect with a burst of snow over
+    // the WRONG (clear) side of the border.
+    const masked = !this.planLocal;
+    if (live && !this.wasLive && masked) {
+      for (let i = 0; i < this.count; i++) {
+        const s = precipSpawnXZ(this.spawnRng, cam.x, cam.z, HX, HZ, this.mode, biomeAt);
+        if (s) {
+          this.positions[i * 3] = s.x;
+          this.positions[i * 3 + 2] = s.z;
+        }
+      }
+    }
+    this.wasLive = live;
     if (!live) return;
 
     this.time += dt;
@@ -253,16 +296,41 @@ export class Weather {
       pos[j] += Math.sin(this.time * 0.8 + this.phase[i]) * s.sway * dt;
 
       // wrap each axis into the camera-relative box so the field is endless
+      let wrapped = false;
       const rx = pos[j] - cam.x;
-      if (rx > HX) pos[j] -= HX * 2;
-      else if (rx < -HX) pos[j] += HX * 2;
+      if (rx > HX) {
+        pos[j] -= HX * 2;
+        wrapped = true;
+      } else if (rx < -HX) {
+        pos[j] += HX * 2;
+        wrapped = true;
+      }
       const rz = pos[j + 2] - cam.z;
-      if (rz > HZ) pos[j + 2] -= HZ * 2;
-      else if (rz < -HZ) pos[j + 2] += HZ * 2;
+      if (rz > HZ) {
+        pos[j + 2] -= HZ * 2;
+        wrapped = true;
+      } else if (rz < -HZ) {
+        pos[j + 2] += HZ * 2;
+        wrapped = true;
+      }
       const ry = pos[j + 1] - cam.y;
-      if (ry < -HY)
+      if (ry < -HY) {
         pos[j + 1] += HY * 2; // fell out the bottom -> back to the top
-      else if (ry > HY) pos[j + 1] -= HY * 2;
+        wrapped = true;
+      } else if (ry > HY) {
+        pos[j + 1] -= HY * 2;
+        wrapped = true;
+      }
+      // Remote weather: a wrap is a respawn, and a masked respawn must land
+      // over the weathered zone's own cells (a sampling miss keeps the
+      // wrapped position, one stray flake the next wrap re-tries).
+      if (wrapped && masked) {
+        const spawn = precipSpawnXZ(this.spawnRng, cam.x, cam.z, HX, HZ, this.mode, biomeAt);
+        if (spawn) {
+          pos[j] = spawn.x;
+          pos[j + 2] = spawn.z;
+        }
+      }
     }
     this.positionAttribute.needsUpdate = true;
   }

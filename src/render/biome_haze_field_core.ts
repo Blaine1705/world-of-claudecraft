@@ -59,15 +59,34 @@ export const HAZE_DENSITY_CLEAR_FAR = 700;
 /** Strength of the clearest realm's air, as a fraction of the murkiest. */
 export const HAZE_STRENGTH_MIN = 0.66;
 
-// The distance ramp. Onset well past every gameplay distance (nothing a
-// player fights, loots or reads is ever hazed), then a Gaussian-shouldered
-// rise so there is no onset ring, saturating a little past half a kilometre.
-// HAZE_AERIAL_MAX is the ceiling for the murkiest realm; the clear realms land
-// at HAZE_STRENGTH_MIN of it, so the far end of the ramp spans roughly 22 to
-// 34 percent. Never a paint-over: the distant ground keeps its own colour.
-export const HAZE_AERIAL_ONSET = 150;
-export const HAZE_AERIAL_REF = 350;
-export const HAZE_AERIAL_MAX = 0.34;
+// The distance ramp. Onset at the 120 yard interest radius (nothing a player
+// fights, loots or reads is ever hazed: the Gaussian shoulder keeps 150 yards
+// under 1 percent), then a rise tuned to the BORDER SIGHTLINE: standing in
+// one realm looking across into the next, the neighbour's land sits 250 to
+// 400 yards out, and the first ship of this ramp (onset 150 / ref 350) put
+// only 2 to 8 percent of the neighbour's air on it, which read as "nothing
+// changed". Now that band carries 14 to 35 percent, saturating around 40 for
+// the murkiest realms. HAZE_AERIAL_MAX is the ceiling for the murkiest realm;
+// the clear realms land at HAZE_STRENGTH_MIN of it. Still never a full
+// paint-over: the distant ground keeps its own colour under the air.
+export const HAZE_AERIAL_ONSET = 120;
+export const HAZE_AERIAL_REF = 200;
+export const HAZE_AERIAL_MAX = 0.46;
+
+// How far along the view ray the SKY dome samples the field for its
+// horizon-band tint (sky.ts): the mid-vista distance where a neighbouring
+// realm's land actually sits, well inside the field rect from any camera.
+export const HAZE_SKY_SAMPLE_DIST = 500;
+
+// Baked weather veil. A realm that always precipitates (see
+// weather_field_core.ts precipForBiome) reads as weathered from across the
+// world: snowfall whitens the air and both kinds thicken it, so the Frostveil
+// shows a snow-white veil and the marsh a heavy rain murk before you ever
+// cross in. Strength floors, not multipliers: a fog preset thicker than the
+// floor keeps its own value.
+export const HAZE_SNOW_WHITEN = 0.3;
+export const HAZE_SNOW_STRENGTH_FLOOR = 0.95;
+export const HAZE_RAIN_STRENGTH_FLOOR = 0.88;
 
 /** The subset of a biome's outdoor fog preset the field needs. The renderer
  *  owns the preset table and passes it in, so the haze can never drift from
@@ -77,6 +96,15 @@ export interface BiomeHazePreset {
   color: number;
   /** The preset's fog `far`, which is what "thick air" means here. */
   far: number;
+  /** Zone light level 0..1 (hazeLightLevel over the biome light rig's
+   *  intensity scales). Darkens the baked haze colour so a twilight realm
+   *  (the Nightbloom, the Wraithwood) reads DIM from outside, not just
+   *  tinted: its lighting is the atmosphere as much as its fog hue is.
+   *  Default 1 (full daylight realms are untouched). */
+  light?: number;
+  /** The realm's always-on precipitation, if any: bakes the weather veil
+   *  (snow whiten + strength floors above) into the zone's air. */
+  precip?: 'snow' | 'rain';
 }
 
 export interface HazeFieldLayout {
@@ -153,6 +181,17 @@ export function hazeStrengthForFogFar(fogFar: number): number {
 }
 
 /**
+ * A biome's light level for the haze bake, from the light rig's optional
+ * intensity scales (renderer BIOME_LIGHT sunScale/hemiScale/envScale, each
+ * default 1). Sun-weighted: the key light is most of what "a bright realm"
+ * means. Full-day realms come out at exactly 1, the Nightbloom's twilight rig
+ * lands near 0.7, so its lavender air is baked a third dimmer than day.
+ */
+export function hazeLightLevel(sunScale = 1, hemiScale = 1, envScale = 1): number {
+  return clamp01(0.6 * sunScale + 0.25 * hemiScale + 0.15 * envScale);
+}
+
+/**
  * How much of the sampled haze a fragment takes, from its distance to the
  * camera. The Node twin of the GLSL in biome_haze_field.ts: both are
  * `max * strength * (1 - exp(-t^2))` over `t = (dist - onset) / ref`, so a
@@ -194,12 +233,23 @@ export function buildBiomeHazeFieldData(
     if (!entry) {
       const preset = presets[biome];
       const hex = preset?.color ?? 0xffffff;
-      entry = [
-        srgbToLinear(((hex >> 16) & 0xff) / 255),
-        srgbToLinear(((hex >> 8) & 0xff) / 255),
-        srgbToLinear((hex & 0xff) / 255),
-        hazeStrengthForFogFar(preset?.far ?? HAZE_DENSITY_CLEAR_FAR),
-      ];
+      // Light level multiplies the LINEAR colour (a dim realm's air carries
+      // less light), then the snow whiten lifts it back toward white: snow
+      // veils are bright even under a cold sky.
+      const light = preset?.light ?? 1;
+      let lr = srgbToLinear(((hex >> 16) & 0xff) / 255) * light;
+      let lg = srgbToLinear(((hex >> 8) & 0xff) / 255) * light;
+      let lb = srgbToLinear((hex & 0xff) / 255) * light;
+      let strength = hazeStrengthForFogFar(preset?.far ?? HAZE_DENSITY_CLEAR_FAR);
+      if (preset?.precip === 'snow') {
+        lr += (1 - lr) * HAZE_SNOW_WHITEN;
+        lg += (1 - lg) * HAZE_SNOW_WHITEN;
+        lb += (1 - lb) * HAZE_SNOW_WHITEN;
+        strength = Math.max(strength, HAZE_SNOW_STRENGTH_FLOOR);
+      } else if (preset?.precip === 'rain') {
+        strength = Math.max(strength, HAZE_RAIN_STRENGTH_FLOOR);
+      }
+      entry = [lr, lg, lb, strength];
       resolved.set(biome, entry);
     }
     return entry;

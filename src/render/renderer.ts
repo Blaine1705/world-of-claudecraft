@@ -53,6 +53,7 @@ import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
 import { ensureBiomeHazeField, setBiomeHazeCamera, setBiomeHazeGrade } from './biome_haze_field';
+import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
 import { type BladeGrassView, buildBladeGrass } from './blade_grass';
 import { type BladeGrassBandView, buildBladeGrassBand } from './blade_grass_band';
@@ -161,6 +162,7 @@ import {
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
+import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
@@ -388,6 +390,7 @@ import { RecklessSkullPainter } from './warrior_cast_fx_painter';
 import { buildWater, setWaterDayNight, setWaterSunDirection, type WaterView } from './water';
 import { buildWaterFlora } from './water_flora';
 import { Weather } from './weather';
+import { precipForBiome } from './weather_field_core';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
@@ -1563,6 +1566,7 @@ export class Renderer {
   private nightFeatures: NightFeaturesView | null = null;
   private streetlamps: StreetlampsView | null = null;
   private emberPools: EmberPoolsView | null = null;
+  private campBraziers: CampBraziersView | null = null;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   private hauntFeatures: HauntFeaturesView | null = null;
@@ -1957,6 +1961,30 @@ export class Renderer {
     );
     this.detailFogFar = (this.scene.fog as THREE.Fog).far;
 
+    // The biome haze field, built BEFORE any surface that samples it (the
+    // terrain layers, the water and the sky dome all gate their shader patch
+    // on its existence at compile time, and buildSky below is the earliest
+    // consumer). Sourced from this renderer's own outdoor fog presets plus
+    // the light rig's intensity scales and the always-on precipitation table,
+    // so the atmosphere a zone shows from across the world (colour, light
+    // level, weather veil) is literally the one the player meets on entry.
+    // Vista tiers only: the fogged arm already carries per-biome aerial
+    // perspective in scene fog itself.
+    if (this.farVista.enabled && !this.lowGfx) {
+      const hazePresets = {} as Record<BiomeId, BiomeHazePreset>;
+      for (const biome of Object.keys(Renderer.BIOME_FOG) as BiomeId[]) {
+        const fog = Renderer.BIOME_FOG[biome];
+        const light = Renderer.BIOME_LIGHT[biome];
+        hazePresets[biome] = {
+          color: fog.color,
+          far: fog.far,
+          light: hazeLightLevel(light.sunScale, light.hemiScale, light.envScale),
+          precip: precipForBiome(biome) ?? undefined,
+        };
+      }
+      ensureBiomeHazeField(hazePresets);
+    }
+
     // sky dome, follows the camera so the world strip never outruns it.
     // High tier: shader gradient + sun glow with biome-aware horizon tints;
     // low keeps the legacy canvas-gradient dome.
@@ -2131,13 +2159,6 @@ export class Renderer {
       }
       bdLast = now;
     };
-    // The biome haze field, built BEFORE any surface that samples it (both
-    // terrain layers gate their shader patch on its existence at compile
-    // time). Sourced from this renderer's own outdoor fog presets, so the
-    // atmosphere a zone shows from across the world is literally the one the
-    // player meets on entry. Vista tiers only: the fogged arm already carries
-    // per-biome aerial perspective in scene fog itself.
-    if (this.farVista.enabled && !this.lowGfx) ensureBiomeHazeField(Renderer.BIOME_FOG);
     this.terrainView = buildTerrain(this.sim.cfg.seed, {
       x: this.sim.player.pos.x,
       z: this.sim.player.pos.z,
@@ -2332,10 +2353,19 @@ export class Renderer {
     this.mobNightGlow = buildMobNightGlow();
     setRenderCategory(this.mobNightGlow.group, 'ui3d');
     this.scene.add(this.mobNightGlow.group);
-    // Ember pools at every authored campfire and mob camp: static, so they
-    // bucket per zone and ride the same distance cull as the lamps.
+    // Ember pools at every authored campfire: static, so they bucket per zone
+    // and ride the same distance cull as the lamps.
     this.emberPools = buildEmberPools(this.sim.cfg.seed);
     this.attachZoneFeature(this.emberPools);
+    // Fire braziers at every mob camp without an authored campfire: a real
+    // burning fixture, so a camp's light has a source you can walk up to. The
+    // flames join the shared scenery-flame pass (freeze runs first, so their
+    // matrixAutoUpdate is re-armed here, the stationProps pattern) and the
+    // lights join the shared fire-light budget via attachZoneFeature.
+    this.campBraziers = buildCampBraziers(this.sim.cfg.seed);
+    this.attachZoneFeature(this.campBraziers);
+    for (const flame of this.campBraziers.flames) flame.matrixAutoUpdate = true;
+    this.flames.push(...this.campBraziers.flames);
     // The streamed wilderness layer (glow flora + fireflies) follows the camera
     // and rebuilds on a cell crossing, so it is NOT a zone feature.
     this.nightAccents = buildNightAccents(this.sim.cfg.seed);
@@ -9628,6 +9658,7 @@ export class Renderer {
     const lampGlow = lampGlowAmount(this.dnGlobalNight);
     this.streetlamps?.update(lampGlow, this.time);
     this.emberPools?.update(lampGlow, this.time);
+    this.campBraziers?.update(lampGlow, this.time);
     this.budgetFireLights(p.pos.x, p.pos.z, true);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'lights', worldStart);
 
@@ -9834,11 +9865,14 @@ export class Renderer {
         this.updateEnvBiome(dt);
       }
     }
-    // precipitation only falls outdoors; indoors/underwater pass null to clear
+    // precipitation only falls outdoors; indoors/underwater pass null to clear.
+    // The sampler lets a neighbouring zone's weather fall inside the box while
+    // the player stands outside it (weather_field_core.ts).
     this.weather.update(
       this.camera.position,
       dt,
       this.fogState === 'outdoor' ? zoneBiomeAt(p.pos.x, p.pos.z) : null,
+      zoneBiomeAt,
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'sky', worldStart);
     this.updateCelestialSprites();

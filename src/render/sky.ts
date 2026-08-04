@@ -3,6 +3,8 @@ import { COLUMN_ZONES, columnBlendAt, STRIP_ZONES } from '../sim/data';
 import type { BiomeId } from '../sim/types';
 import { SOWFIELD_CENTER } from '../sim/vale_cup_layout';
 import { loadHdr, loadTexture } from './assets/loader';
+import { BIOME_HAZE_DECLARATIONS, biomeHazeUniforms, hasBiomeHazeField } from './biome_haze_field';
+import { HAZE_AERIAL_MAX, HAZE_SKY_SAMPLE_DIST } from './biome_haze_field_core';
 import {
   createEnvironmentBlend,
   SKY_ENVIRONMENT_RESPONSE,
@@ -480,7 +482,15 @@ const SKY_VERT = /* glsl */ `
   }
 `;
 
-const SKY_FRAG = /* glsl */ `
+// The dome fragment is composed per session: when the renderer built the
+// biome haze field (vista tiers), the dome becomes one more consumer of the
+// SAME field and shared uniform block the terrain layers splice, adding a
+// directional horizon-band tint; without a field the string is byte-identical
+// to the legacy shader. Decided once, before the material compiles, exactly
+// like the geometry consumers gate on hasBiomeHazeField().
+const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
+  zoneHaze ? BIOME_HAZE_DECLARATIONS : ''
+}
   uniform sampler2D uSkyA;
   uniform sampler2D uSkyB;
   uniform float uMix;
@@ -632,7 +642,26 @@ const SKY_FRAG = /* glsl */ `
     // degrees, then fade to clear sky by ~21 degrees for the taller stuff
     // (a neighbor realm's coast trees seen across a strait).
     c = mix(uFog, c, smoothstep(0.1, 0.36, dir.y));
-    gl_FragColor = vec4(c, 1.0);
+${
+  zoneHaze
+    ? `    // Distant-zone air on the dome (biome_haze_field.ts): the sky just
+    // above the horizon takes the colour of the realm the view ray lands in
+    // (the field sampled ${HAZE_SKY_SAMPLE_DIST} yards out along the ray), so
+    // the Nightbloom's twilight lavender and the Frostveil's snow-white air
+    // read in the SKY from across a border, not only on the ground. Lands
+    // AFTER the fog band above (inside it the band's own ramp multiplied the
+    // tint to nothing), with a window that is ZERO at the true rim: on the
+    // vista tiers fog saturates only at the extreme rim, and geometry there
+    // lands at exactly the fog colour, so the dome must too.
+    {
+      vec2 wocSkyXZ = uHazeCam + normalize(dir.xz + vec2(1e-5, 0.0)) * ${HAZE_SKY_SAMPLE_DIST.toFixed(1)};
+      vec4 wocSkyHaze = texture2D(uHazeField, (wocSkyXZ - uHazeRect.xy) * uHazeRect.zw);
+      float wocSkyBand = smoothstep(0.02, 0.1, dir.y) * (1.0 - smoothstep(0.16, 0.38, dir.y));
+      c = mix(c, wocSkyHaze.rgb * uHazeGrade, ${HAZE_AERIAL_MAX.toFixed(6)} * wocSkyHaze.a * wocSkyBand);
+    }
+`
+    : ''
+}    gl_FragColor = vec4(c, 1.0);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
@@ -800,10 +829,15 @@ export function buildSky(
     uLiftA: { value: BIOME_HORIZON_LIFT[start.from] },
     uLiftB: { value: BIOME_HORIZON_LIFT[start.to] },
   };
+  // Distant-zone atmosphere on the horizon band: same compile-time gate and
+  // SHARED uniform objects as the terrain layers (the renderer builds the
+  // field before buildSky runs), so the dome's tint follows the same camera
+  // and day/night grade with zero per-frame writes of its own.
+  const zoneHaze = hasBiomeHazeField();
   const material = new THREE.ShaderMaterial({
-    uniforms,
+    uniforms: { ...uniforms, ...(zoneHaze ? biomeHazeUniforms() : {}) },
     vertexShader: SKY_VERT,
-    fragmentShader: SKY_FRAG,
+    fragmentShader: skyFrag(zoneHaze),
     side: THREE.BackSide,
     fog: false,
     depthWrite: false,
@@ -875,3 +909,8 @@ export function buildSky(
     currentBiomeBlend: () => current,
   };
 }
+
+// The composed dome fragment for the shader-string tests
+// (tests/sky_zone_haze.test.ts): both arms of the zone-haze gate without
+// standing up the HDRI asset graph.
+export const skyZoneHazeInternalsForTest = { skyFrag };
