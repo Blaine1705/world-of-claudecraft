@@ -352,9 +352,9 @@ describe('Fenbridge dedicated town renderer', () => {
     expect({ questTriangles, questDraws }).toEqual({ questTriangles: 204, questDraws: 1 });
     triangleCountByAsset[fenbridgeTownInternalsForTest.questAssetUrl] = questTriangles;
     expect(fenbridgeTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      assetTriangles: 80_772,
+      assetTriangles: 81_524,
       maximumFoundationTriangles: 84,
-      maximumRuntimeTriangles: 80_856,
+      maximumRuntimeTriangles: 81_608,
       hardCeiling: 88_000,
       withinHardCeiling: true,
     });
@@ -365,20 +365,20 @@ describe('Fenbridge dedicated town renderer', () => {
     const standardRoot = fenbridgeTownDrawStats(standard.group);
     expect(standard.group.userData.triangleStats).toMatchObject({
       scope: 'fenbridge-town-render-root-only',
-      emittedFoundationTriangles: 60,
+      emittedFoundationTriangles: 84,
       includesQuestObjects: false,
     });
     expect(standardRoot).toMatchObject({
       colorDraws: 20,
       shadowDraws: 10,
-      // placement-weighted shipping geometry after R16-30 exterior densify
-      triangles: 80_424,
+      // placement-weighted shipping geometry after R16-30 densify + 12 boardwalks
+      triangles: 81_200,
     });
     expect({
       colorDraws: standardRoot.colorDraws + questDraws * 2,
       shadowDraws: standardRoot.shadowDraws,
-      triangles: 80_424 + 84 * 2,
-    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 80_592 });
+      triangles: 81_200 + 84 * 2,
+    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 81_368 });
 
     setGfx({
       standardMaterials: false,
@@ -388,7 +388,7 @@ describe('Fenbridge dedicated town renderer', () => {
     });
     const low = fenbridgeTownInternalsForTest.buildFromSources(sources, ground, true);
     const lowRoot = fenbridgeTownDrawStats(low.group);
-    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 80_424 });
+    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 81_200 });
     expect(lowRoot.colorDraws + questDraws * 2).toBe(13);
   });
 
@@ -425,7 +425,7 @@ describe('Fenbridge dedicated town renderer', () => {
       buildingFadeTargetCount: 7,
       wallSegmentCount: 16,
       gateCount: 4,
-      boardwalkCount: 10,
+      boardwalkCount: 12,
     });
     expect(stats.colorDraws).toBeLessThanOrEqual(22);
     expect(stats.shadowDraws).toBeLessThanOrEqual(10);
@@ -615,7 +615,7 @@ describe('Fenbridge dedicated town renderer', () => {
     ).toMatchObject({
       id: 'fenbridge_muster_board',
       kind: 'obb',
-      center: { x: -6, z: 278 },
+      center: { x: -4.5, z: 276.5 },
       halfWidth: 1.2,
       halfDepth: 0.3,
     });

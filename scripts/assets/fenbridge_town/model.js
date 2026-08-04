@@ -317,7 +317,7 @@ export const FENBRIDGE_TOWN_CONTRACTS = Object.freeze({
     triangleCeiling: 500,
     byteTarget: 16 * 1024,
     byteCeiling: 100 * 1024,
-    placementCount: 10,
+    placementCount: 12,
     placementCeiling: 12,
     serviceCues: Object.freeze([
       'ground-seated-planks',

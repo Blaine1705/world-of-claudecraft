@@ -262,13 +262,13 @@ function validObserved(expectedFenbridge: boolean, view = overview): any {
           repeatedCounts: {
             fenbridge_palisade_wing: 16,
             fenbridge_gate_arch: 4,
-            fenbridge_boardwalk: 10,
+            fenbridge_boardwalk: 12,
             fenbridge_muster_order: 2,
           },
           observedRepeatedCounts: {
             fenbridge_palisade_wing: 16,
             fenbridge_gate_arch: 4,
-            fenbridge_boardwalk: 10,
+            fenbridge_boardwalk: 12,
             fenbridge_muster_order: 2,
           },
         },
@@ -605,7 +605,7 @@ describe('Fenbridge matched capture constants', () => {
     expect(FENBRIDGE_REPEATED_ASSET_REQUIREMENTS).toEqual({
       fenbridge_palisade_wing: { exact: 16 },
       fenbridge_gate_arch: { exact: 4 },
-      fenbridge_boardwalk: { exact: 10 },
+      fenbridge_boardwalk: { exact: 12 },
       fenbridge_muster_order: { exact: 2 },
     });
     expect(FENBRIDGE_TOWN_ASSET_URLS).toEqual([
@@ -753,7 +753,7 @@ describe('Fenbridge matched capture constants', () => {
       sceneRepeatedCounts: {
         fenbridge_palisade_wing: 16,
         fenbridge_gate_arch: 4,
-        fenbridge_boardwalk: 10,
+        fenbridge_boardwalk: 12,
         fenbridge_muster_order: 2,
       },
       scenePlacementIds: FENBRIDGE_REBUILD_REQUIRED_IDS,
@@ -765,13 +765,13 @@ describe('Fenbridge matched capture constants', () => {
       repeatedCounts: {
         fenbridge_palisade_wing: 16,
         fenbridge_gate_arch: 4,
-        fenbridge_boardwalk: 10,
+        fenbridge_boardwalk: 12,
         fenbridge_muster_order: 2,
       },
       observedRepeatedCounts: {
         fenbridge_palisade_wing: 16,
         fenbridge_gate_arch: 4,
-        fenbridge_boardwalk: 10,
+        fenbridge_boardwalk: 12,
         fenbridge_muster_order: 2,
       },
     });

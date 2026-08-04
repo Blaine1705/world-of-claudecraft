@@ -5,14 +5,26 @@
     "objectClass": {
       "primaryType": "modular marsh timber boardwalk span",
       "primaryDomain": "object",
-      "formLanguage": ["long parallel plank deck", "low irregular rail posts", "rope-bound edges"],
-      "structureKind": ["repeated plank deck", "cross-bearer support", "low rope guard"],
+      "formLanguage": [
+        "long parallel plank deck",
+        "low irregular rail posts",
+        "rope-bound edges"
+      ],
+      "structureKind": [
+        "repeated plank deck",
+        "cross-bearer support",
+        "low rope guard"
+      ],
       "motionPotential": [
         "static walkable module",
         "repeatable path segment",
         "rope secondary motion"
       ],
-      "materialFamilies": ["raw weathered boards", "dark rope and iron", "moss and damp staining"],
+      "materialFamilies": [
+        "raw weathered boards",
+        "dark rope and iron",
+        "moss and damp staining"
+      ],
       "notes": "Classified from the four labeled turnaround quadrants; no character anatomy applies."
     },
     "complexity": {
@@ -41,7 +53,11 @@
     },
     "specDepthDecision": {
       "requiredDepth": "moderate",
-      "minimumComponentLevels": ["macro", "meso", "micro"],
+      "minimumComponentLevels": [
+        "macro",
+        "meso",
+        "micro"
+      ],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -264,7 +280,9 @@
         "qualityCriteria": [
           "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model reads as a generic placeholder instead of the reference object",
           "major proportions are guessed without evidence"
@@ -277,7 +295,9 @@
         "qualityCriteria": [
           "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "large visible parts are merged into one mesh",
           "component hierarchy is too shallow for the observed complexity"
@@ -290,7 +310,9 @@
         "qualityCriteria": [
           "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "child part root floats away from the parent",
           "branch/limb/tube is centered in space instead of pivoting from its root",
@@ -306,7 +328,9 @@
           "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
           "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "surface looks like flat plastic",
           "local material variation is missing or not tied to image evidence"
@@ -322,7 +346,9 @@
           "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
           "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
         ],
-        "evidenceRefs": ["full-object"],
+        "evidenceRefs": [
+          "full-object"
+        ],
         "failureModes": [
           "model has acceptable shape but reads as flat shaded or plastic",
           "colors are a generic average instead of reference-observed local color zones",

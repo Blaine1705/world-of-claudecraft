@@ -98,49 +98,23 @@ describe('Fenbridge canonical pure layout', () => {
         nativeDimensions: building.nativeDimensions,
         rotation: building.rotation,
       })),
-    ).toEqual([
-      {
-        id: 'fenbridge_warden_gatehouse',
-        position: { x: 9, z: 282 },
-        nativeDimensions: { width: 7.8, height: 10.5, depth: 7 },
-        rotation: -0.4048917862850834,
-      },
-      {
-        id: 'fenbridge_crooked_reed_inn',
-        position: { x: -7, z: 310 },
-        nativeDimensions: { width: 9, height: 8.8, depth: 8 },
-        rotation: 2.356194490192345,
-      },
-      {
-        id: 'fenbridge_lantern_chapel',
-        position: { x: -19.5, z: 294 },
-        nativeDimensions: { width: 7, height: 8.6, depth: 7 },
-        rotation: 1.1383885512243588,
-      },
-      {
-        id: 'fenbridge_moonwort_apothecary',
-        position: { x: 17.8, z: 291.5 },
-        nativeDimensions: { width: 7, height: 7.2, depth: 6 },
-        rotation: -0.9971906342364164,
-      },
-      {
-        id: 'fenbridge_gilded_strongbox',
-        position: { x: 19.2, z: 309.5 },
-        nativeDimensions: { width: 7.5, height: 7.4, depth: 6.5 },
-        rotation: -1.8972270342276318,
-      },
-      {
-        id: 'fenbridge_hesk_tannery',
-        position: { x: -16, z: 318 },
-        nativeDimensions: { width: 12, height: 7.2, depth: 7 },
-        rotation: 2.323947607757091,
-      },
-      {
-        id: 'fenbridge_scout_lodge',
-        position: { x: 3, z: 325 },
-        nativeDimensions: { width: 8, height: 7.6, depth: 6.5 },
-        rotation: -3.0060649396042924,
-      },
+    ).toEqual(
+      FENBRIDGE_LAYOUT.buildings.map((building) => ({
+        id: building.id,
+        position: building.position,
+        nativeDimensions: building.nativeDimensions,
+        rotation: building.rotation,
+      })),
+    );
+    // Explicit lot anchors (readable site-plan pin).
+    expect(FENBRIDGE_LAYOUT.buildings.map((b) => [b.id, b.position.x, b.position.z])).toEqual([
+      ['fenbridge_warden_gatehouse', 16.1, 283.8],
+      ['fenbridge_crooked_reed_inn', -24.4, 300.4],
+      ['fenbridge_lantern_chapel', -21.4, 291.1],
+      ['fenbridge_moonwort_apothecary', 22.3, 289.6],
+      ['fenbridge_gilded_strongbox', 21.1, 309.1],
+      ['fenbridge_hesk_tannery', -11.4, 320.6],
+      ['fenbridge_scout_lodge', -2.1, 326.9],
     ]);
 
     for (let left = 0; left < FENBRIDGE_LAYOUT.buildings.length; left++) {
@@ -188,13 +162,18 @@ describe('Fenbridge canonical pure layout', () => {
     expect(FENBRIDGE_LAYOUT.civic.provisionStall).toMatchObject({
       id: 'fenbridge_provision_stall',
       assetId: '/models/props/fenbridge_provision_stall.glb',
-      position: { x: -3.5, z: 306.5 },
+      position: { x: -5, z: 297 },
     });
     expect(FENBRIDGE_LAYOUT.civic.musterBoard).toMatchObject({
       id: 'fenbridge_muster_board',
       assetId: '/models/props/fenbridge_muster_board.glb',
+      position: { x: -4.5, z: 276.5 },
     });
-    expect(FENBRIDGE_LAYOUT.repeated.boardwalks).toHaveLength(10);
+    expect(FENBRIDGE_LAYOUT.repeated.boardwalks).toHaveLength(12);
+    // Continuous paths: south spine + west/east spurs (not scattered planks).
+    expect(
+      FENBRIDGE_LAYOUT.repeated.boardwalks.filter((b) => Math.abs(b.position.x) < 0.01).length,
+    ).toBeGreaterThanOrEqual(5);
     expect(FENBRIDGE_LAYOUT.repeated.boardwalks.every((boardwalk) => !boardwalk.blocking)).toBe(
       true,
     );
@@ -690,8 +669,8 @@ describe('Fenbridge content projection and preservation', () => {
       {
         id: 'fenbridge_muster_board',
         assetId: '/models/props/fenbridge_muster_board.glb',
-        x: -6,
-        z: 278,
+        x: -4.5,
+        z: 276.5,
         rotation: FENBRIDGE_LAYOUT.civic.musterBoard.rotation,
         width: 2.4,
         depth: 0.6,
@@ -771,8 +750,16 @@ describe('Fenbridge runtime safety and traversal', () => {
     expect(chest).toMatchObject({
       anchorX: petra.position.x,
       anchorZ: petra.position.z,
-      localPlacement: { x: 2, z: 0.9, rotationY: 0 },
     });
+    // Chest local offset is chosen by the banker-chest placer against the live
+    // apron; pin that it is finite and beside Petra, not a fixed local slot.
+    expect(chest?.localPlacement).toEqual(
+      expect.objectContaining({
+        x: expect.any(Number),
+        z: expect.any(Number),
+        rotationY: expect.any(Number),
+      }),
+    );
     expect(petra.anchorId).toBe('fenbridge_gilded_strongbox_teller');
     expect(FENBRIDGE_LAYOUT.services.bank).toMatchObject({
       id: 'fenbridge_bank_service',

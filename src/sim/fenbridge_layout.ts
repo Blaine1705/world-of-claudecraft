@@ -436,89 +436,99 @@ function makeBuilding(
   };
 }
 
+// Site plan: wider civic ring in the wedges BETWEEN the four road corridors so
+// service aprons stay clear of pathfinding centerlines. Every lot faces the
+// cistern (rotation = facingToward(lot, CIVIC_CENTER)).
 const GATEHOUSE = makeBuilding(
   'fenbridge_warden_gatehouse',
   '/models/props/fenbridge_warden_gatehouse.glb',
   'house',
-  { x: 9, z: 282 },
+  { x: 16.1, z: 283.8 },
   7.8,
   10.5,
   7,
-  -0.4048917862850834,
+  facingToward({ x: 16.1, z: 283.8 }, CIVIC_CENTER),
 );
 const INN_BASE = makeBuilding(
   'fenbridge_crooked_reed_inn',
   '/models/props/fenbridge_crooked_reed_inn.glb',
   'inn',
-  { x: -7, z: 310 },
+  { x: -24.4, z: 300.4 },
   9,
   8.8,
   8,
-  2.356194490192345,
+  facingToward({ x: -24.4, z: 300.4 }, CIVIC_CENTER),
   -2.8,
 );
 const CHAPEL_BASE = makeBuilding(
   'fenbridge_lantern_chapel',
   '/models/props/fenbridge_lantern_chapel.glb',
   'chapel',
-  { x: -19.5, z: 294 },
+  // Clear of preserved graveyard at (-18, 286) and inside the palisade ring.
+  { x: -21.4, z: 291.1 },
   7,
   8.6,
   7,
-  1.1383885512243588,
+  facingToward({ x: -21.4, z: 291.1 }, CIVIC_CENTER),
 );
 const APOTHECARY = makeBuilding(
   'fenbridge_moonwort_apothecary',
   '/models/props/fenbridge_moonwort_apothecary.glb',
   'house',
-  { x: 17.8, z: 291.5 },
+  { x: 22.3, z: 289.6 },
   7,
   7.2,
   6,
-  -0.9971906342364164,
+  facingToward({ x: 22.3, z: 289.6 }, CIVIC_CENTER),
 );
 const BANK_BASE = makeBuilding(
   'fenbridge_gilded_strongbox',
   '/models/props/fenbridge_gilded_strongbox.glb',
   'house',
-  { x: 19.2, z: 309.5 },
+  { x: 21.1, z: 309.1 },
   7.5,
   7.4,
   6.5,
-  -1.8972270342276318,
+  facingToward({ x: 21.1, z: 309.1 }, CIVIC_CENTER),
   1.75,
 );
 const TANNERY_BASE = makeBuilding(
   'fenbridge_hesk_tannery',
   '/models/props/fenbridge_hesk_tannery.glb',
   'house',
-  { x: -16, z: 318 },
+  // Craft bay framed so the preserved station (-13, 314) sits on the open apron.
+  { x: -11.4, z: 320.6 },
   12,
   7.2,
   7,
-  2.323947607757091,
+  facingToward({ x: -11.4, z: 320.6 }, CIVIC_CENTER),
 );
 const SCOUT_LODGE = makeBuilding(
   'fenbridge_scout_lodge',
   '/models/props/fenbridge_scout_lodge.glb',
   'house',
-  { x: 3, z: 325 },
+  // West of the north road so the connector stays clear of wood_mirefen_1.
+  { x: -2.1, z: 326.9 },
   8,
   7.6,
   6.5,
-  -3.0060649396042924,
+  facingToward({ x: -2.1, z: 326.9 }, CIVIC_CENTER),
 );
 
-const PROVISION_STALL_POSITION = { x: -3.5, z: 306.5 } as const;
-const PROVISION_STALL_ROTATION = Math.PI * 0.75;
+// Stall on the SW square approach (clear of roads, inn mass, and cistern).
+const PROVISION_STALL_POSITION = { x: -5, z: 297 } as const;
+const PROVISION_STALL_ROTATION = facingToward(PROVISION_STALL_POSITION, CIVIC_CENTER);
 const PROVISION_STALL_WIDTH = 3.2;
 const PROVISION_STALL_DEPTH = 1.6;
-const MUSTER_BOARD_POSITION = { x: -6, z: 278 } as const;
-const MUSTER_BOARD_ROTATION = facingToward(MUSTER_BOARD_POSITION, CIVIC_CENTER);
+// South-gate apron, facing the causeway so orders read before the square.
+const MUSTER_BOARD_POSITION = { x: -4.5, z: 276.5 } as const;
+const MUSTER_BOARD_ROTATION = facingToward(MUSTER_BOARD_POSITION, { x: 0, z: 266 });
+// Stand beside the stall (not buried in the OBB) so pathfinding can reach
+// the vendor from the square. Faces the counter from the left vendor bay.
 const PROVISION_STALL_VENDOR_POINT = localToWorld(
   PROVISION_STALL_POSITION,
   PROVISION_STALL_ROTATION,
-  2.4,
+  -(PROVISION_STALL_WIDTH / 2 + 0.85),
   0,
 );
 
@@ -535,11 +545,12 @@ const INN = {
   },
 };
 
+// Archive apron: left of the chapel front, clear of the shell and graveyard.
 const CHAPEL_ARCHIVE_STANDING_POINT = localToWorld(
   CHAPEL_BASE.position,
   CHAPEL_BASE.rotation,
-  -4.8,
-  0,
+  -2.6,
+  CHAPEL_BASE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
 );
 const CHAPEL = {
   ...CHAPEL_BASE,
@@ -592,6 +603,9 @@ const BANK = {
   },
 };
 
+// Preserved profession station coordinates (master plan + content pins).
+const TANNERY_STATION_POSITION = { x: -13, z: 314 } as const;
+const TANNER_POSITION = { x: -11, z: 315.5 } as const;
 const TANNERY = {
   ...TANNERY_BASE,
   sockets: {
@@ -599,8 +613,8 @@ const TANNERY = {
     station: {
       id: 'fenbridge_hesk_tannery_station',
       localPosition: null,
-      position: { x: -13, z: 314 },
-      standingPoint: { x: -13, z: 314 },
+      position: TANNERY_STATION_POSITION,
+      standingPoint: TANNERY_STATION_POSITION,
     },
   },
 };
@@ -763,25 +777,65 @@ const ROADS = [
   },
 ] as const;
 
-const BOARDWALKS = [
-  { x: -11, z: 281, rotation: 0.25 },
-  { x: -6, z: 287, rotation: -0.2 },
-  { x: 5, z: 290, rotation: 0.12 },
-  { x: 12, z: 287, rotation: -0.35 },
-  { x: 25, z: 296, rotation: 1.35 },
-  { x: 25, z: 320, rotation: 1.75 },
-  { x: 14, z: 329, rotation: 2.5 },
-  { x: -6, z: 330, rotation: 3.05 },
-  { x: -24, z: 323, rotation: -2.25 },
-  { x: -27, z: 304, rotation: -1.45 },
-].map((placement, index) => ({
-  id: `fenbridge_boardwalk_${String(index).padStart(2, '0')}`,
-  assetId: '/models/props/fenbridge_boardwalk.glb',
-  position: { x: placement.x, z: placement.z },
-  rotation: placement.rotation,
-  nativeDimensions: { width: 4, height: 0.15, depth: 1.4 },
-  blocking: false,
-}));
+/**
+ * Ground-seated boardwalk modules (long axis = local X, joins at ±2).
+ * Laid as continuous paths: south causeway spine, then NW (inn/tannery) and
+ * SE (bank/apothecary) spurs that actually connect buildings instead of
+ * floating as random planks.
+ */
+function boardwalkModulesAlong(
+  points: readonly Point2[],
+  moduleLength = 4,
+): Array<{ x: number; z: number; rotation: number }> {
+  const modules: Array<{ x: number; z: number; rotation: number }> = [];
+  for (let index = 0; index < points.length - 1; index++) {
+    const start = points[index];
+    const end = points[index + 1];
+    const length = Math.hypot(end.x - start.x, end.z - start.z);
+    if (!(length > 0)) continue;
+    const count = Math.max(1, Math.round(length / moduleLength));
+    // Align local +X (module length) with the path direction.
+    const rotation = Math.atan2(-(end.z - start.z), end.x - start.x);
+    for (let step = 0; step < count; step++) {
+      const progress = (step + 0.5) / count;
+      modules.push({
+        x: start.x + (end.x - start.x) * progress,
+        z: start.z + (end.z - start.z) * progress,
+        rotation,
+      });
+    }
+  }
+  return modules;
+}
+
+const BOARDWALK_PATHS: readonly (readonly Point2[])[] = [
+  // South gate apron up the causeway into the square (6 modules).
+  [
+    { x: 0, z: 274 },
+    { x: 0, z: 298 },
+  ],
+  // West spur toward the inn / chapel approach (3 modules).
+  [
+    { x: -2, z: 301 },
+    { x: -14, z: 301 },
+  ],
+  // East spur toward the bank / apothecary approach (3 modules).
+  [
+    { x: 2, z: 301 },
+    { x: 14, z: 301 },
+  ],
+];
+
+const BOARDWALKS = BOARDWALK_PATHS.flatMap((path) => boardwalkModulesAlong(path)).map(
+  (placement, index) => ({
+    id: `fenbridge_boardwalk_${String(index).padStart(2, '0')}`,
+    assetId: '/models/props/fenbridge_boardwalk.glb',
+    position: { x: placement.x, z: placement.z },
+    rotation: placement.rotation,
+    nativeDimensions: { width: 4, height: 0.15, depth: 1.4 },
+    blocking: false,
+  }),
+);
 
 const MUSTER_ORDERS = [
   { id: 'fenbridge_muster_order_west', position: { x: -3.75, z: 274.8 } },
@@ -798,7 +852,7 @@ const STATIONS = [
     id: 'station_fenbridge_tannery',
     type: 'tannery',
     masterNpcId: 'tanner_hesk',
-    position: { x: -13, z: 314 },
+    position: TANNERY_STATION_POSITION,
     interactionRadius: 20,
   },
 ] as const;
@@ -807,27 +861,43 @@ function makeNpc(id: string, position: Point2, facing: number, anchorId: string)
   return { id, position, facing, anchorId, bodyRadius: 0.6 };
 }
 
-const WARDEN_POSITION = { x: 4.8, z: 278.5 } as const;
+// Gatehouse guard apron: offset left of the door, clear of the building mass.
+const WARDEN_POSITION = localToWorld(
+  GATEHOUSE.position,
+  GATEHOUSE.rotation,
+  -2.6,
+  GATEHOUSE.nativeDimensions.depth / 2 + FRONT_CLEARANCE + 0.1,
+);
+// Scout map lean-to: slightly right of the door on the clear front apron.
+const SCOUT_MAP_POSITION = localToWorld(
+  SCOUT_LODGE.position,
+  SCOUT_LODGE.rotation,
+  1.8,
+  SCOUT_LODGE.nativeDimensions.depth / 2 + FRONT_CLEARANCE + 0.2,
+);
 const NPCS = [
   makeNpc(
     'warden_fenwick',
     WARDEN_POSITION,
-    facingToward(WARDEN_POSITION, CIVIC_CENTER),
+    facingToward(WARDEN_POSITION, { x: 0, z: 266 }),
     GATEHOUSE.id,
   ),
+  // Entrance greeters face the square (building +Z faces civic center).
   makeNpc('brother_aldric_fen', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
   makeNpc(
     'provisioner_hale',
     PROVISION_STALL_VENDOR_POINT,
+    // Face the counter / customer side of the stall.
     facingToward(PROVISION_STALL_VENDOR_POINT, PROVISION_STALL_POSITION),
     'fenbridge_provision_stall',
   ),
   makeNpc('herbalist_yara', APOTHECARY.frontStandingPoint, APOTHECARY.rotation, APOTHECARY.id),
-  makeNpc('scout_maren', SCOUT_LODGE.frontStandingPoint, SCOUT_LODGE.rotation, SCOUT_LODGE.id),
+  makeNpc('scout_maren', SCOUT_MAP_POSITION, SCOUT_LODGE.rotation, SCOUT_LODGE.id),
   makeNpc(
     'bursar_petra_vell',
     BANK.sockets.teller.standingPoint,
-    BANK.rotation,
+    // Face the teller counter (toward the bank face), not the rear wall.
+    facingToward(BANK.sockets.teller.standingPoint, BANK.sockets.teller.position),
     BANK.sockets.teller.id,
   ),
   makeNpc(
@@ -836,7 +906,13 @@ const NPCS = [
     facingToward(CHAPEL_ARCHIVE_STANDING_POINT, CHAPEL.position),
     'fenbridge_lantern_chapel_archive',
   ),
-  makeNpc('tanner_hesk', { x: -11, z: 315.5 }, 2.3, TANNERY.id),
+  // Preserved tannery station pairing: 2.5 yd from station on the open apron.
+  makeNpc(
+    'tanner_hesk',
+    TANNER_POSITION,
+    facingToward(TANNER_POSITION, TANNERY_STATION_POSITION),
+    TANNERY.id,
+  ),
 ] as const;
 
 const PRESERVED_PROPS = {
@@ -916,7 +992,7 @@ export const FENBRIDGE_LAYOUT = deepFreeze({
         PROVISION_STALL_POSITION,
         PROVISION_STALL_ROTATION,
         0,
-        PROVISION_STALL_DEPTH / 2 + 1.2,
+        PROVISION_STALL_DEPTH / 2 + 0.9,
       ),
       vendorStandingPoint: PROVISION_STALL_VENDOR_POINT,
     },
