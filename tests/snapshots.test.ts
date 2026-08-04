@@ -3573,6 +3573,7 @@ function dirtyEveryDeltaField(): {
     attunedPairs: ['weaponcrafting+armorcrafting'],
     switchCount: 2,
     amendsProgress: 4,
+    isJackOfAllTrades: false,
   };
   // An ACTIVE mobile crafting station (`mst`): set directly on the
   // meta slot (the placement command's specialization gate is pinned in
@@ -3737,6 +3738,7 @@ describe('full self-state snapshot delta fixture', () => {
       attunedPairs: ['weaponcrafting+armorcrafting'],
       switchCount: 0,
       amendsProgress: 0,
+      isJackOfAllTrades: false,
     };
     // Reagents for the warplate helm.
     meta.inventory = [
