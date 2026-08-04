@@ -6095,10 +6095,16 @@ export const vi_VN: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Đang tải bản cập nhật {version}...",
-      "ready": "Bản cập nhật {version} đã sẵn sàng. Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "The game keeps itself up to date automatically.",
+      "uptodateTitle": "You are playing the latest version.",
+      "downloadingTitle": "Đang tải bản cập nhật {version}...",
+      "downloadingBody": "You can keep playing. The update installs when you quit.",
+      "readyTitle": "Bản cập nhật {version} đã sẵn sàng",
+      "readyBody": "Sẽ tự cài khi bạn thoát, hoặc khởi động lại ngay.",
       "restart": "Khởi động lại ngay",
-      "later": "Để sau"
+      "later": "Để sau",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

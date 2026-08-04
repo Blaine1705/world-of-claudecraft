@@ -123,6 +123,41 @@ async function stubGlobalLeaderboardFetch(page) {
   })()`);
 }
 
+// The desktop auto-update card only exists inside the Electron shell: an
+// Electron user agent turns the DESKTOP_APP gate on and a wocDesktop bridge
+// stub (installed before the document loads) captures the update callback at
+// window.__updateEventCb so the capture recipe can replay the shell's
+// whitelisted payloads. Absolute https fetches short-circuit to an empty JSON
+// body: with the Electron UA the client targets the baked production API
+// origin, and a screenshot host has no business calling the live site.
+// String-form for the same tsx keepNames reason as the leaderboard stub above.
+async function stubDesktopUpdateBridge(page) {
+  await page.setUserAgent(
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) WorldOfClaudeCraft/0.0.0 Chrome/128.0.0.0 Electron/34.0.0 Safari/537.36',
+  );
+  await page.evaluateOnNewDocument(`(() => {
+    window.wocDesktop = {
+      openBrowserLogin: () => Promise.resolve(),
+      takeLoginCode: () => Promise.resolve(null),
+      onLoginCode: () => () => {},
+      setShellStrings: () => Promise.resolve(null),
+      onUpdateEvent: (cb) => { window.__updateEventCb = cb; return () => {}; },
+      installUpdate: () => Promise.resolve(null),
+    };
+    const real = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const url = String(typeof input === 'string' ? input : (input && input.url) || '');
+      if (url.indexOf('https://') === 0) {
+        return Promise.resolve(new Response('{}', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }));
+      }
+      return real(input, init);
+    };
+  })()`);
+}
+
 export const TARGETS = [
   {
     key: 'target-auras',
@@ -5385,6 +5420,65 @@ export const TARGETS = [
       }
       await wait(400);
       return { clip: '#vcup-briefing .vcupb-card' };
+    },
+  },
+  {
+    key: 'desktop-update-card',
+    label: 'Desktop (Electron) auto-update card: checking / downloading / ready',
+    // `when` deliberately omits src/styles/shell.css and src/ui/ui_icons.ts even
+    // though both carry part of this card's look: each is a large shared surface
+    // whose mostly-unrelated edits would re-shoot these three variants on a big
+    // fraction of PRs. A pure styling pass on the card should list one of the
+    // four owning files (or this script) in its diff anyway.
+    when: [
+      'src/ui/desktop_update_toast.ts',
+      'src/ui/desktop_update_view.ts',
+      'electron/updater.cjs',
+      'electron/update_events.cjs',
+    ],
+    // The card is shell-level (pre-game and in-world alike), so `landing`
+    // shots on the marketing shell frame it against a stable background. Each
+    // variant replays the whitelisted event sequence the Electron shell would
+    // send for that state.
+    variants: [
+      {
+        key: 'checking',
+        landing: true,
+        beforeLoad: stubDesktopUpdateBridge,
+        events: [{ type: 'checking' }],
+      },
+      {
+        key: 'downloading',
+        landing: true,
+        beforeLoad: stubDesktopUpdateBridge,
+        events: [
+          { type: 'checking' },
+          { type: 'available', version: '0.34.1' },
+          { type: 'progress', percent: 40 },
+        ],
+      },
+      {
+        key: 'ready',
+        landing: true,
+        beforeLoad: stubDesktopUpdateBridge,
+        events: [
+          { type: 'checking' },
+          { type: 'available', version: '0.34.1' },
+          { type: 'downloaded', version: '0.34.1' },
+        ],
+      },
+    ],
+    async capture(page, variant) {
+      const armed = await page.evaluate((events) => {
+        if (typeof window.__updateEventCb !== 'function') return false;
+        for (const e of events) window.__updateEventCb(e);
+        return true;
+      }, variant.events);
+      if (!armed) throw new Error('desktop update bridge did not initialize');
+      if (!(await pollForSize(page, '#desktop-update-toast', 10, 300))) {
+        throw new Error('desktop update card did not render');
+      }
+      return { clip: '#desktop-update-toast' };
     },
   },
 ];

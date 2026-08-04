@@ -6095,10 +6095,16 @@ export const ja_JP: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "アップデート {version} をダウンロード中...",
-      "ready": "アップデート {version} の準備ができました。ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
+      "checkingTitle": "アップデートを確認中...",
+      "checkingBody": "ゲームは自動的に最新の状態に保たれます。",
+      "uptodateTitle": "お使いのバージョンは最新です。",
+      "downloadingTitle": "アップデート {version} をダウンロード中...",
+      "downloadingBody": "プレイは続けられます。アップデートはゲーム終了時にインストールされます。",
+      "readyTitle": "アップデート {version} の準備ができました",
+      "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
-      "later": "後で"
+      "later": "後で",
+      "dismiss": "閉じる"
     },
     "crash": {
       "title": "World of ClaudeCraft",

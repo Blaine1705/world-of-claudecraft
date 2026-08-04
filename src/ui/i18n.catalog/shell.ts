@@ -112,16 +112,22 @@ export const shellStrings = {
         crossSiteOrigin: 'Request blocked for security reasons.',
       },
     },
-    // Desktop (Electron) shell surfaces: the auto-update toast rendered by the
+    // Desktop (Electron) shell surfaces: the auto-update card rendered by the
     // renderer (src/ui/desktop_update_toast.ts) and the crash-dialog strings
     // the renderer pushes to the main process (src/game/desktop_shell_strings.ts,
     // mirrored by electron/shell_strings.cjs DEFAULT_SHELL_STRINGS in English).
     desktop: {
       update: {
-        downloading: 'Downloading update {version}...',
-        ready: 'Update {version} is ready. It installs when you quit, or restart now.',
+        checkingTitle: 'Checking for updates...',
+        checkingBody: 'The game keeps itself up to date automatically.',
+        uptodateTitle: 'You are playing the latest version.',
+        downloadingTitle: 'Downloading update {version}...',
+        downloadingBody: 'You can keep playing. The update installs when you quit.',
+        readyTitle: 'Update {version} is ready',
+        readyBody: 'It installs when you quit, or restart now.',
         restart: 'Restart now',
         later: 'Later',
+        dismiss: 'Dismiss',
       },
       crash: {
         title: 'World of ClaudeCraft',

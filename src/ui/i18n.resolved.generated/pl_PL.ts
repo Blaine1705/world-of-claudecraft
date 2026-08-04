@@ -6095,10 +6095,16 @@ export const pl_PL: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Pobieranie aktualizacji {version}...",
-      "ready": "Aktualizacja {version} jest gotowa. Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "The game keeps itself up to date automatically.",
+      "uptodateTitle": "You are playing the latest version.",
+      "downloadingTitle": "Pobieranie aktualizacji {version}...",
+      "downloadingBody": "You can keep playing. The update installs when you quit.",
+      "readyTitle": "Aktualizacja {version} jest gotowa",
+      "readyBody": "Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.",
       "restart": "Uruchom ponownie teraz",
-      "later": "Później"
+      "later": "Później",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

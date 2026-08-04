@@ -6095,10 +6095,16 @@ export const id_ID: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Mengunduh pembaruan {version}...",
-      "ready": "Pembaruan {version} siap. Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "The game keeps itself up to date automatically.",
+      "uptodateTitle": "You are playing the latest version.",
+      "downloadingTitle": "Mengunduh pembaruan {version}...",
+      "downloadingBody": "You can keep playing. The update installs when you quit.",
+      "readyTitle": "Pembaruan {version} siap",
+      "readyBody": "Akan terpasang saat kamu keluar, atau mulai ulang sekarang.",
       "restart": "Mulai Ulang Sekarang",
-      "later": "Nanti"
+      "later": "Nanti",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",

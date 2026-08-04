@@ -6095,10 +6095,16 @@ export const cs_CZ: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Stahuje se aktualizace {version}...",
-      "ready": "Aktualizace {version} je připravena. Nainstaluje se při ukončení, nebo restartuj hned.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "The game keeps itself up to date automatically.",
+      "uptodateTitle": "You are playing the latest version.",
+      "downloadingTitle": "Stahuje se aktualizace {version}...",
+      "downloadingBody": "You can keep playing. The update installs when you quit.",
+      "readyTitle": "Aktualizace {version} je připravena",
+      "readyBody": "Nainstaluje se při ukončení, nebo restartuj hned.",
       "restart": "Restartovat hned",
-      "later": "Později"
+      "later": "Později",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",
