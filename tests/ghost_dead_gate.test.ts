@@ -348,10 +348,12 @@ describe('dead-gate: profession actions with an explicit pid (the server arm)', 
 
   it('an unresolvable pid does not trip the gate (the documented false arm)', () => {
     const sim = makeSim();
+    // The PRIMARY is dead, so a gate that ignored the target pid and fell
+    // back to resolving the primary would fire here: zero while-dead errors
+    // proves both the false arm and that the gate keys on the TARGET pid.
+    makeDead(sim, 'ghost');
     sim.drainEvents();
     sim.craftItem('recipe_tough_jerky', false, 999999);
-    // The gate declines to fire (no while-dead error); the impl's own
-    // resolve handles the unknown player exactly as it did before the gate.
     expect(deadErrors(sim.drainEvents())).toBe(0);
   });
 });
