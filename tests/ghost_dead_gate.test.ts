@@ -14,7 +14,9 @@
 // alive/released-ghost saves load exactly as before.
 
 import { describe, expect, it } from 'vitest';
+import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { DUNGEON_X_THRESHOLD, QUESTS, SPIRIT_HEALER_NPC_ID } from '../src/sim/data';
+import { createRiftGearInstance } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
 import { SPIRIT_HEALER_RANGE } from '../src/sim/spirit';
 import { dist2d, type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
@@ -188,6 +190,111 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       expect(deadErrors(events)).toBe(1);
       expect(events.some((ev: any) => ev.type === 'questDone')).toBe(false);
       expect(sim.questLog.get(questId)?.state).toBe('ready');
+    });
+  });
+}
+
+// Part A2: the profession-action command family (craftItem / salvageItem /
+// disenchantItem / applyEnchant / trainRecipe / unbindItem /
+// placeMobileStation, plus the rift forge trio) refuses a dead player the
+// same way. These commands surface outcomes through their own result events
+// (craftResult and friends), emitted unconditionally by their Sim wrappers,
+// so the dead gate (src/sim/dead_gate.ts) must fire BEFORE the resolver:
+// the decisive assertion in each test is "zero result events plus exactly
+// one while-dead error line", because ANY resolver outcome, success or
+// denial, would have emitted the family's result event.
+for (const mode of ['unreleased', 'ghost'] as const) {
+  describe(`dead-gate: profession actions refused for a ${mode} dead player`, () => {
+    function resultEvents(events: SimEvent[], type: string): SimEvent[] {
+      return events.filter((ev) => ev.type === type);
+    }
+
+    it('craftItem is refused (the cooking-while-dead repro) and consumes nothing', () => {
+      const sim = makeSim();
+      sim.addItem('spider_leg', 2);
+      // Alive baseline first: the same recipe at the same spot succeeds
+      // (tough jerky is common-tier cooking, no station, grandfathered), so
+      // the dead denial below can only be the gate.
+      sim.drainEvents();
+      sim.craftItem('recipe_tough_jerky');
+      const aliveEvents = sim.drainEvents();
+      expect(
+        resultEvents(aliveEvents, 'craftResult').filter((ev: any) => ev.ok === true).length,
+      ).toBe(1);
+      expect(sim.countItem('tough_jerky')).toBe(1);
+      makeDead(sim, mode);
+      sim.drainEvents();
+      sim.craftItem('recipe_tough_jerky');
+      const events = sim.drainEvents();
+      expect(deadErrors(events)).toBe(1);
+      expect(resultEvents(events, 'craftResult').length).toBe(0);
+      expect(sim.countItem('tough_jerky')).toBe(1); // nothing new crafted
+      expect(sim.countItem('spider_leg')).toBe(1); // no reagent consumed
+    });
+
+    for (const [label, type, act] of [
+      ['salvageItem', 'salvageResult', (sim: AnySim) => sim.salvageItem('linen_scrap')],
+      ['disenchantItem', 'disenchantResult', (sim: AnySim) => sim.disenchantItem('linen_scrap')],
+      [
+        'applyEnchant',
+        'enchantResult',
+        (sim: AnySim) => sim.applyEnchant('linen_scrap', 'not_an_enchant'),
+      ],
+      ['trainRecipe', 'trainResult', (sim: AnySim) => sim.trainRecipe('recipe_tough_jerky')],
+      ['unbindItem', 'unbindResult', (sim: AnySim) => sim.unbindItem('linen_scrap')],
+    ] as const) {
+      it(`${label} is refused before the resolver (no ${type} event)`, () => {
+        const sim = makeSim();
+        // Alive control: the same call reaches the resolver and emits the
+        // family result event (as a denial; the args are junk on purpose).
+        sim.drainEvents();
+        act(sim);
+        expect(resultEvents(sim.drainEvents(), type).length).toBe(1);
+        makeDead(sim, mode);
+        sim.drainEvents();
+        act(sim);
+        const events = sim.drainEvents();
+        expect(deadErrors(events)).toBe(1);
+        expect(resultEvents(events, type).length).toBe(0);
+      });
+    }
+
+    it('placeMobileStation is refused and the previous station is untouched', () => {
+      const sim = makeSim();
+      const meta = (sim as any).players.get(sim.playerId);
+      meta.craftSkills.cooking = 75; // specialized: placement would succeed
+      sim.placeMobileStation('cooking');
+      const placed = meta.mobileStation;
+      expect(placed).toBeTruthy();
+      makeDead(sim, mode);
+      sim.drainEvents();
+      sim.placeMobileStation('cooking');
+      expect(deadErrors(sim.drainEvents())).toBe(1);
+      expect(meta.mobileStation).toBe(placed); // no replacement placed
+    });
+
+    it('the rift forge trio is refused and spends no essence', () => {
+      const sim = makeSim();
+      sim.setPlayerLevel(20);
+      const gear = createRiftGearInstance('rift-dead-gate', 'S', 'warrior', sim.player.id);
+      sim.addItemInstance(gear.itemId, gear.instance);
+      sim.addItem(RIFT_ESSENCE_ITEM_ID, 20);
+      sim.addItem(RIFT_GEM_IDS[0], 1);
+      // Alive baseline: the first upgrade lands and spends essence.
+      expect(sim.upgradeRiftItem(gear.itemId).ok).toBe(true);
+      const essenceAfterUpgrade = sim.countItem(RIFT_ESSENCE_ITEM_ID);
+      expect(essenceAfterUpgrade).toBeLessThan(20);
+      makeDead(sim, mode);
+      sim.drainEvents();
+      expect(sim.upgradeRiftItem(gear.itemId).reason).toBe('dead');
+      expect(sim.enchantRiftItem(gear.itemId, 'critRating').reason).toBe('dead');
+      expect(sim.socketRiftGem(gear.itemId, RIFT_GEM_IDS[0]).reason).toBe('dead');
+      const events = sim.drainEvents();
+      expect(deadErrors(events)).toBe(3);
+      expect(resultEvents(events, 'riftForgeResult').length).toBe(0);
+      expect(sim.countItem(RIFT_ESSENCE_ITEM_ID)).toBe(essenceAfterUpgrade);
+      const slot = sim.inventory.find((s: any) => s.itemId === gear.itemId);
+      expect(slot?.instance?.rift).toEqual(expect.objectContaining({ upgradeLevel: 1, gems: [] }));
     });
   });
 }
