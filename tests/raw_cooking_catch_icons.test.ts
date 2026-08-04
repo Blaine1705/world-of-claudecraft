@@ -8,19 +8,24 @@ import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
 import { itemIconRecipe } from '../src/ui/icons';
 
-const FISH_LIKE = new Set(['fish', 'droplet', 'fang']);
-
 describe('raw cooking catch icon recipes', () => {
-  it('every catch is kind junk and still maps to a fish-like primitive', () => {
+  it('every catch is kind junk and still maps to the fish fallback shape', () => {
+    // Hand-authored trout uses a custom droplet+fang fish silhouette; every
+    // other catch must hit the shared fish fallback (bg drink / pal sky /
+    // prim fish). A loose fish|droplet|fang set is too weak: trinket scale
+    // maps to droplet and would hide a dead fallback arm.
     expect(RAW_COOKING_CATCH_IDS.size).toBe(7);
     for (const id of RAW_COOKING_CATCH_IDS) {
       expect(ITEMS[id].kind, id).toBe('junk');
       const recipe = itemIconRecipe(id);
       const prims = recipe.prims.map((p) => p.p);
-      const fishLike = prims.some((p) => FISH_LIKE.has(p));
-      expect(fishLike, `${id} prims=${prims.join(',')}`).toBe(true);
-      // Not the unknown / empty fallback.
-      expect(prims.length, id).toBeGreaterThan(0);
+      expect(recipe.bg, id).toBe('drink');
+      expect(recipe.pal, id).toBe('sky');
+      if (id === 'raw_mirror_trout') {
+        expect(prims, id).toEqual(['droplet', 'fang']);
+      } else {
+        expect(prims, id).toContain('fish');
+      }
     }
   });
 
@@ -28,7 +33,7 @@ describe('raw cooking catch icon recipes', () => {
     // raw_river_perch has no hand-authored ITEM_RECIPES row; it must hit the
     // fish fallback, not trinketPrimitive.
     const recipe = itemIconRecipe('raw_river_perch');
-    expect(recipe.prims.some((p) => p.p === 'fish')).toBe(true);
+    expect(recipe.prims.map((p) => p.p)).toEqual(['fish']);
     expect(recipe.bg).toBe('drink');
     expect(recipe.pal).toBe('sky');
   });

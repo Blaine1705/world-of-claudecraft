@@ -95,10 +95,9 @@ describe('itemTooltip integration for raw catches', () => {
 describe('bank deposit-all copy after catches are materials', () => {
   it('depositAllTooltip still describes crafting reagents and junk', () => {
     // #2715: button gates on isMaterialItem; raw catches are honest materials.
-    // Copy already matches; no reword required when catches enter the set.
-    const copy = t('hudChrome.bank.depositAllTooltip');
-    expect(copy).toMatch(/crafting reagent/i);
-    expect(copy).toMatch(/junk/i);
-    expect(copy).toMatch(/consumable/i);
+    // Full sentence pin so a rewrite that keeps only loose tokens fails.
+    expect(t('hudChrome.bank.depositAllTooltip')).toBe(
+      'Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.',
+    );
   });
 });
