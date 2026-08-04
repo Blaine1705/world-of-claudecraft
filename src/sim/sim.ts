@@ -3887,6 +3887,16 @@ export class Sim {
     meta.skinCatalog = catalog;
     e.skin = idx;
     e.skinCatalog = catalog;
+    // The BODY decides which skin types apply (the mech shows the equipped
+    // mainhand, the hunter rig its fixed ranged attach), so a catalog change
+    // re-resolves. Without this the new body's skin stays dark, and the old
+    // body's stays resolved, until an unrelated gear change recomputes it.
+    e.weaponSkinId = resolveActiveWeaponSkin(
+      e.templateId,
+      e.mainhandItemId,
+      e.weaponSkinLoadout,
+      catalog,
+    );
     deedsMod.markDeedsDirty(this.ctx, meta.entityId); // col_true_colors reads the skin state
     return true;
   }

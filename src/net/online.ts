@@ -3972,6 +3972,15 @@ export class ClientWorld implements IWorld {
     if (p) {
       p.skin = idx;
       p.skinCatalog = catalog;
+      // Same re-resolve the offline Sim does (setPlayerSkin): the body decides
+      // which skin types apply, so the optimistic local view must swap the
+      // displayed skin with the body rather than wait for the next snapshot.
+      p.weaponSkinId = resolveActiveWeaponSkin(
+        p.templateId,
+        p.mainhandItemId,
+        p.weaponSkinLoadout,
+        catalog,
+      );
     }
     this.cmd({ cmd: 'change_skin', skin: idx, catalog });
   }
