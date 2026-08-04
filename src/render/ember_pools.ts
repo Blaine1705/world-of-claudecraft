@@ -1,21 +1,25 @@
-// A warm pool of embers on the ground at every authored campfire and mob camp
-// in the world, lit only after dark.
+// A warm pool of embers on the ground at every authored campfire in the world,
+// lit only after dark.
 //
 // Why this exists even though campfires already carry a real light: the forward
 // renderer keeps only GFX.maxPointLights alive at once (renderer.ts
 // budgetFireLights), so of the ~55 campfires in the world the nearest handful
 // shine and the rest are unlit props. By day nobody notices. At night it meant
 // a hostile camp you could see from a ridge had no light at all. A baked
-// additive pool costs one instanced draw per zone and is the same trick
+// additive pool costs one merged draw per zone and is the same trick
 // dungeon.ts already uses under its torches for exactly the same reason.
 //
-// Camps without a campfire get a wider, fainter pool: the read is "people live
-// here", not one fire. The dedupe that keeps the two from stacking is in
-// night_accents_core.ts (pure, tested).
+// The pool geometry drapes over the terrain (ground_glow_patch.ts) instead of
+// lying flat, so a fire on a slope keeps its glow instead of the hillside
+// slicing through it. Mob camps WITHOUT an authored campfire are not pooled
+// here any more: they get a real fire brazier (camp_braziers.ts), and the
+// which-camps split lives in night_accents_core.ts (pure, tested).
 import * as THREE from 'three';
-import { CAMPS, getActiveWorldContent, zoneAt } from '../sim/data';
+import { getActiveWorldContent, zoneAt } from '../sim/data';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
-import { emberSites } from './night_accents_core';
+import { buildDrapedGlowGeometry } from './ground_glow_patch';
+import { campfireEmberSites } from './night_accents_core';
+import { hasNightLightField, registerStaticNightLights } from './night_light_field';
 import { radialGlowTexture } from './textures';
 
 export interface EmberPoolsView {
@@ -28,9 +32,16 @@ export interface EmberPoolsView {
 
 const POOL_COLOR = 0xff8c3c;
 const POOL_OPACITY = 0.34;
-const POOL_LIFT = 0.1;
-/** Unit disc; each instance scales it to the site's own radius. */
-const POOL_SEGMENTS = 16;
+/** Night-light-field entries: the punctual cutoff and candela-style level,
+ *  calibrated to read as firelight on dark ground (see streetlamps.ts). */
+const FIELD_RADIUS = 26;
+const FIELD_INTENSITY = 40;
+/** Open-fire glow as deep linear ember. */
+const FIELD_COLOR = [1.0, 0.42, 0.12] as const;
+/** The authored campfires' flame height (props.ts hangs its light at 1.2). */
+const FIELD_HEIGHT = 1.2;
+/** An open fire wavers hard; this is what sells it as burning. */
+const FIELD_FLICKER = 0.22;
 
 export function buildEmberPools(seed = 0): EmberPoolsView {
   const group = new THREE.Group();
@@ -38,12 +49,12 @@ export function buildEmberPools(seed = 0): EmberPoolsView {
   const cullGroups: THREE.Group[] = [];
 
   const content = getActiveWorldContent();
-  const sites = emberSites(content.props.campfires, CAMPS);
+  const sites = campfireEmberSites(content.props.campfires);
   // Bucket by zone so a pool 900 yards away is not submitted every frame.
   const byZone = new Map<number, typeof sites>();
   for (const site of sites) {
     const groundY = terrainHeight(site.x, site.z, seed);
-    if (groundY < WATER_LEVEL) continue; // a drowned camp lights nothing
+    if (groundY < WATER_LEVEL) continue; // a drowned fire lights nothing
     const zone = zoneAt(site.x, site.z);
     const index = content.zones.indexOf(zone);
     const bucket = byZone.get(index);
@@ -54,8 +65,26 @@ export function buildEmberPools(seed = 0): EmberPoolsView {
     return { group, cullGroups, update: () => undefined };
   }
 
-  const geometry = new THREE.CircleGeometry(1, POOL_SEGMENTS);
-  geometry.rotateX(-Math.PI / 2);
+  // Authored campfires join the night light field where the terrain splices
+  // it; the draped pools below are the fallback where it does not.
+  registerStaticNightLights(
+    'ember-pools',
+    [...byZone.values()].flat().map((site) => ({
+      x: site.x,
+      y: terrainHeight(site.x, site.z, seed) + FIELD_HEIGHT,
+      z: site.z,
+      radius: FIELD_RADIUS,
+      r: FIELD_COLOR[0],
+      g: FIELD_COLOR[1],
+      b: FIELD_COLOR[2],
+      intensity: FIELD_INTENSITY,
+      flicker: FIELD_FLICKER,
+    })),
+  );
+  if (hasNightLightField()) {
+    return { group, cullGroups, update: () => undefined };
+  }
+
   const material = new THREE.MeshBasicMaterial({
     map: radialGlowTexture(),
     color: POOL_COLOR,
@@ -65,25 +94,16 @@ export function buildEmberPools(seed = 0): EmberPoolsView {
     blending: THREE.AdditiveBlending,
   });
 
-  const matrix = new THREE.Matrix4();
-  const position = new THREE.Vector3();
-  const quaternion = new THREE.Quaternion();
-  const scale = new THREE.Vector3(1, 1, 1);
-  const meshes: THREE.InstancedMesh[] = [];
-
+  const meshes: THREE.Mesh[] = [];
   for (const [zoneIndex, zoneSites] of byZone) {
     const zoneGroup = new THREE.Group();
     zoneGroup.name = `ember-pools-zone-${zoneIndex}`;
-    const mesh = new THREE.InstancedMesh(geometry, material, zoneSites.length);
-    for (let i = 0; i < zoneSites.length; i++) {
-      const site = zoneSites[i];
-      position.set(site.x, terrainHeight(site.x, site.z, seed) + POOL_LIFT, site.z);
-      scale.set(site.radius, 1, site.radius);
-      mesh.setMatrixAt(i, matrix.compose(position, quaternion, scale));
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.computeBoundingSphere();
-    mesh.renderOrder = 1; // over the ground it floats on
+    const mesh = new THREE.Mesh(
+      buildDrapedGlowGeometry(zoneSites, (x, z) => terrainHeight(x, z, seed)),
+      material,
+    );
+    mesh.geometry.computeBoundingSphere();
+    mesh.renderOrder = 1; // over the ground it drapes on
     mesh.visible = false; // nothing until the embers light
     meshes.push(mesh);
     zoneGroup.add(mesh);

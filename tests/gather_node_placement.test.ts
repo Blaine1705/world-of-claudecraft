@@ -410,8 +410,9 @@ describe('gather node placement: every node sits on ground a player can work', (
   // set records a decision (these ship near-submerged today; relocating
   // expansion starter nodes is zone-4-pass content work, not a side effect
   // of a guard landing), and a NEW violation must be a human adding to this
-  // list rather than a silent drift. Measured freeboards at the pin:
-  // ore_frostveil_2 -0.49, ore_willowfen_1 +0.65, wood_evergarden_2 +0.50.
+  // list rather than a silent drift. Measured freeboards at the pin (after the
+  // waterline rose 0.2 to -4.3): ore_frostveil_2 -0.69, ore_willowfen_1 +0.45,
+  // wood_evergarden_2 +0.30.
   // Four former members retired at the release/v0.34.0 merge: open-sea swim
   // made the world sea real water, which turned herb_galecrest_1 (-3.60),
   // ore_galecrest_2 (-3.40), herb_farshore_isle_2 (-1.37) and
@@ -435,11 +436,12 @@ describe('gather node placement: every node sits on ground a player can work', (
     // Both directions at once: a new sub-margin node reds (it is not in the
     // list), and a relocated exemption reds too (the list would then name a
     // node that no longer violates, and the exemption must be retired with
-    // the fix rather than mask the next violator). Edge note (the QA round):
-    // the tightest PASSING node is ore_palmreach_1 at 1.012yd of freeboard,
-    // 0.012 above the margin, so a Palmreach-coast terrain touch is the
-    // likeliest next arrival here; that failure means terrain moved under a
-    // node, not that this pin broke.
+    // the fix rather than mask the next violator). Edge note: when the
+    // waterline rose 0.2 to -4.3, the four tightest passers (the three
+    // Mirefen shore herbs and ore_palmreach_1) arrived here at once and all
+    // four moved a few yards up their own shores instead of joining the
+    // list; the next arrival after a terrain or waterline touch means
+    // terrain moved under a node, not that this pin broke.
     const below = GATHER_NODES.filter((n) => seaFreeboardAt(n.pos.x, n.pos.z) < WATER_MARGIN)
       .map((n) => n.id)
       .sort();

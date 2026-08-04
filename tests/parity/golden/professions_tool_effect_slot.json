@@ -307,7 +307,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 832,
-      "state": "8e03c429",
+      "state": "f9235d8d",
       "events": "576d3e00",
       "rng": {
         "draws": 2,
@@ -439,7 +439,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.134597,
           "fiveSecondRule": 101.55,
           "hp": 100,
           "id": 827,
@@ -455,7 +455,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.134597,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -487,7 +487,7 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 832,
-      "state": "115039f4",
+      "state": "7117ae1c",
       "events": "45bdbca8",
       "rng": {
         "draws": 2,
@@ -619,7 +619,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.134597,
           "fiveSecondRule": 101.65,
           "hp": 100,
           "id": 827,
@@ -635,7 +635,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.134597,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -667,7 +667,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 832,
-      "state": "926d0822",
+      "state": "09f6ca12",
       "events": "fbae1629",
       "rng": {
         "draws": 2,
@@ -799,7 +799,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.134597,
           "fiveSecondRule": 101.75,
           "hp": 100,
           "id": 827,
@@ -815,7 +815,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.134597,
             "z": 350
           },
           "potionCooldownUntil": -1,

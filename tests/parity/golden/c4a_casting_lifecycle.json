@@ -15,8 +15,8 @@
     "cancelCast fishing arm via dealDamage (FISHING_CAST_ID, not pushback)",
     "multi-class casters: mage/priest/warlock"
   ],
-  "draws": 1916,
-  "drawDigest": "f966da6c",
+  "draws": 1920,
+  "drawDigest": "1972c58f",
   "frames": [
     {
       "tick": 0,
@@ -1879,52 +1879,52 @@
       "state": "fdd889a7",
       "events": "20fd7d23",
       "rng": {
-        "draws": 1674,
-        "digest": "ed672428"
+        "draws": 1675,
+        "digest": "f635955c"
       }
     },
     {
       "tick": 205,
       "time": 10.25,
       "nextId": 835,
-      "state": "349be588",
-      "events": "3890649a",
+      "state": "e6fa1461",
+      "events": "8ee592ae",
       "rng": {
-        "draws": 1699,
-        "digest": "274d407d"
+        "draws": 1701,
+        "digest": "ce6291cc"
       }
     },
     {
       "tick": 210,
       "time": 10.5,
       "nextId": 835,
-      "state": "3286a543",
+      "state": "58d9a5dc",
       "events": "741638a5",
       "rng": {
-        "draws": 1735,
-        "digest": "9af88ecb"
+        "draws": 1738,
+        "digest": "90686fc8"
       }
     },
     {
       "tick": 215,
       "time": 10.75,
       "nextId": 835,
-      "state": "fa31a20b",
+      "state": "bb539fb5",
       "events": "fcefe0b6",
       "rng": {
-        "draws": 1773,
-        "digest": "c674c85c"
+        "draws": 1776,
+        "digest": "5b7ec886"
       }
     },
     {
       "tick": 217,
       "time": 10.85,
       "nextId": 835,
-      "state": "447fbb79",
+      "state": "87d372dd",
       "events": "2f2b7262",
       "rng": {
-        "draws": 1790,
-        "digest": "ff2ed751"
+        "draws": 1795,
+        "digest": "f2e4e55d"
       },
       "label": "warlock-channel-pushback",
       "players": [
@@ -1944,7 +1944,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 139,
-            "damageTaken": 65
+            "damageTaken": 76
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2162,11 +2162,11 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "castRemaining": 0.7,
+          "castRemaining": 1.2,
           "castTargetId": 834,
-          "castTotal": 2.5,
+          "castTotal": 3,
           "castingAbility": "fireball",
-          "combatTimer": 1.7,
+          "combatTimer": 0.75,
           "comboUntil": -1,
           "critChance": 0.056,
           "detonateTimer": "Infinity",
@@ -2174,7 +2174,7 @@
           "facing": 0.56413,
           "fallStartY": -0.371544,
           "fiveSecondRule": 1.85,
-          "hp": 19935,
+          "hp": 19924,
           "id": 831,
           "inCombat": true,
           "kind": "player",
@@ -2420,33 +2420,33 @@
       "tick": 220,
       "time": 11,
       "nextId": 835,
-      "state": "b94ff99f",
+      "state": "ba4c665e",
       "events": "262987cd",
       "rng": {
-        "draws": 1815,
-        "digest": "7a3219de"
+        "draws": 1820,
+        "digest": "ea8fed7d"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 835,
-      "state": "fe4ce466",
+      "state": "0a49fc4b",
       "events": "98f2b48c",
       "rng": {
-        "draws": 1856,
-        "digest": "940276e1"
+        "draws": 1858,
+        "digest": "54441855"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 835,
-      "state": "2205fc0c",
+      "state": "e11caf41",
       "events": "3782c67f",
       "rng": {
-        "draws": 1856,
-        "digest": "940276e1"
+        "draws": 1858,
+        "digest": "54441855"
       },
       "label": "warlock-fishing-cancel",
       "players": [
@@ -2466,7 +2466,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 141,
-            "damageTaken": 65
+            "damageTaken": 76
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -2687,9 +2687,9 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "castRemaining": 0.3,
+          "castRemaining": 0.8,
           "castTargetId": 834,
-          "castTotal": 2.5,
+          "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 0.1,
           "comboUntil": -1,
@@ -2699,7 +2699,7 @@
           "facing": 0.56413,
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.25,
-          "hp": 19935,
+          "hp": 19924,
           "id": 831,
           "inCombat": true,
           "kind": "player",
@@ -2942,22 +2942,22 @@
       "tick": 230,
       "time": 11.5,
       "nextId": 835,
-      "state": "a022c9e2",
+      "state": "682c8b81",
       "events": "741638a5",
       "rng": {
-        "draws": 1916,
-        "digest": "f966da6c"
+        "draws": 1920,
+        "digest": "1972c58f"
       }
     },
     {
       "tick": 230,
       "time": 11.5,
       "nextId": 835,
-      "state": "a022c9e2",
+      "state": "682c8b81",
       "events": "741638a5",
       "rng": {
-        "draws": 1916,
-        "digest": "f966da6c"
+        "draws": 1920,
+        "digest": "1972c58f"
       },
       "label": "final",
       "players": [
@@ -2977,7 +2977,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 141,
-            "damageTaken": 65
+            "damageTaken": 76
           },
           "craftSkills": {},
           "craftThrottle": {},
@@ -3198,9 +3198,9 @@
         {
           "aiState": "idle",
           "attackPower": 10,
-          "castRemaining": 0.05,
+          "castRemaining": 0.55,
           "castTargetId": 834,
-          "castTotal": 2.5,
+          "castTotal": 3,
           "castingAbility": "fireball",
           "combatTimer": 0.35,
           "comboUntil": -1,
@@ -3210,7 +3210,7 @@
           "facing": 0.56413,
           "fallStartY": -0.371544,
           "fiveSecondRule": 2.5,
-          "hp": 19935,
+          "hp": 19924,
           "id": 831,
           "inCombat": true,
           "kind": "player",

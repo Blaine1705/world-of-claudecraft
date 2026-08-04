@@ -456,6 +456,10 @@ ${BIOME_HAZE_DECLARATIONS}
     // shader to #version 300 es on WebGL2; the reserved name failed the
     // compile silently under parallel shader compilation.)
     float seaLane = texture2D(uNorm3, vWPos.xz * 0.0042 + uTime * vec2(0.001667, -0.001667)).x;
+    // A second, far broader lane sample (different scale, channel, and drift,
+    // so the two fields never sync): hue-drifts whole reaches of sea so the
+    // palette stops being one flat teal from shore to horizon.
+    float seaDrift = texture2D(uNorm3, vWPos.xz * 0.0011 + uTime * vec2(0.003333, -0.001667)).y;
     float farW = smoothstep(40.0, 260.0, camDist);
     // THE WAVE FIELD, PER PIXEL, from world position: the same functions the
     // vertex stage displaces with, evaluated identically on BOTH sheets.
@@ -562,6 +566,14 @@ ${BIOME_HAZE_DECLARATIONS}
     // wind lanes: hue and brightness drift with the lane field
     col = mix(col, col * vec3(0.86, 1.04, 1.07), (seaLane - 0.5) * 0.9);
     col *= 0.93 + seaLane * 0.14;
+    // The broad drift field re-tints whole reaches on top of the lanes, teal
+    // toward blue and back, and the running crest field tints too: a lifted
+    // face reads greener and brighter than the trough behind it. Together they
+    // key the palette to position AND to the moving waves, so no two stretches
+    // of sea hold one flat painted colour.
+    col = mix(col, col * vec3(1.08, 0.97, 0.92), (seaDrift - 0.5) * 0.55);
+    col *= 0.95 + seaDrift * 0.1;
+    col *= 1.0 + (crestN - 0.5) * vec3(-0.08, 0.10, 0.05);
     // reflection tracks the live fog/horizon color so each biome's water
     // belongs to its sky instead of a constant pasted-on tint
     vec3 skyRef = mix(uSkyColor, fogColor, 0.5);
@@ -603,7 +615,13 @@ ${BIOME_HAZE_DECLARATIONS}
     // so any depth threshold either floods a flat bay or vanishes on a steep
     // one. Distance to shore is the same signal on both.
     float shoreDist = vShoreDepth / vShoreSlope;
-    float foamBand = smoothstep(${glsl(WATER_FOAM_WIDTH_YARDS)}, 0.0, shoreDist + n1.x * 0.6);
+    // The surf BREATHES with the wave sets: the group envelope (the same field
+    // that gathers the swell into sets offshore) drives the band's reach, so a
+    // set runs the wash line up the beach and the lull between sets lets it
+    // drain back, instead of a fixed-width band that only flickers in place.
+    float surge = 0.55 + 0.65 * group;
+    float foamBand = smoothstep(${glsl(WATER_FOAM_WIDTH_YARDS)} * surge, 0.0,
+      shoreDist + n1.x * 0.7 + n2.y * 0.4);
     foamBand *= foamBand;
     // Two decorrelated sines so the band stops reading as one set of wallpaper
     // stripes, faded with range because it is an analytic function with no mip
@@ -611,10 +629,18 @@ ${BIOME_HAZE_DECLARATIONS}
     float foamWave = 0.55
       + 0.25 * sin(uTime * SWELL_W3 + vWPos.x * 1.2 + vWPos.z * 0.95 + n2.y * 6.0)
       + 0.20 * sin(uTime * SWELL_W1 - vWPos.x * 0.41 + vWPos.z * 0.63 + n1.y * 4.0);
-    // A lapping wave travels SHOREWARD through the band (phase runs along the
-    // recovered shore distance), so the surf advances and retreats instead of
-    // pulsing in place. Reuses the already-sampled normal maps for its break.
-    float lap = 0.6 + 0.4 * sin(uTime * FOAM_LAP_W - shoreDist * 1.9 + n1.y * 3.0);
+    // TWO lapping waves travel SHOREWARD through the band (phase runs along
+    // the recovered shore distance), so the surf advances and retreats instead
+    // of pulsing in place. Their speeds are incommensurate (129 vs 88 cycles
+    // per clock period), so the beat brings the wash in irregularly, a few
+    // strong waves then a near-still spell; the second runs at its own spatial
+    // frequency and carries an ALONGSHORE phase, so one stretch of beach
+    // surges while the next rests. Both reuse the already-sampled normal maps
+    // for their break, and the deeper combined trough lets the wash die out
+    // entirely between arrivals.
+    float lap = 0.52
+      + 0.30 * sin(uTime * FOAM_LAP_W - shoreDist * 1.9 + n1.y * 3.0)
+      + 0.26 * sin(uTime * FOAM_LAP_W2 - shoreDist * 1.1 + vWPos.x * 0.071 + vWPos.z * 0.053 + n2.x * 2.5);
     float foam = foamBand * foamWave * lap * exp(-camDist * ${glsl(WATER_FOAM_DISTANCE_FADE)});
     // disturbed water reads brighter and skyward, the way a real wake does
     float contactSheen = smoothstep(0.025, 0.13, waveEnergy) * exp(-camDist * 0.022);
@@ -625,11 +651,16 @@ ${BIOME_HAZE_DECLARATIONS}
     // The last half yard of shallows THINS to nothing over the sand instead of
     // ending at the geometric intersection with it. Foam holds on longer (see
     // WATER_SHORE_FILM_FOAM_FRACTION): the wash line is the last thing to dry.
-    float shoreFilm = smoothstep(0.0, ${glsl(WATER_SHORE_FILM_YARDS)}, vShoreDepth);
+    // Jittered by the scrolling detail map, multiplicatively so zero depth
+    // stays exactly zero: against a steep bank the film's whole depth range
+    // crosses inside one vertex cell, and an unjittered ramp there traces the
+    // mesh's own triangulated contour as a hard zigzag waterline.
+    float filmJitter = 1.0 + n2.x * 0.45;
+    float shoreFilm = smoothstep(0.0, ${glsl(WATER_SHORE_FILM_YARDS)}, vShoreDepth * filmJitter);
     float foamFilm = smoothstep(
       0.0,
       ${glsl(WATER_SHORE_FILM_YARDS * WATER_SHORE_FILM_FOAM_FRACTION)},
-      vShoreDepth
+      vShoreDepth * filmJitter
     );
     float alpha = max(
       mix(${glsl(WATER_SHALLOW_ALPHA)}, ${glsl(WATER_DEEP_ALPHA)}, opacityDepth) * shoreFilm,

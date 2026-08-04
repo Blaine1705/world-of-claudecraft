@@ -95,43 +95,84 @@ export const WATER_WAVE_GLSL = /* glsl */ `
   const float SWELL_W2 = 1.225221;
   const float SWELL_W3 = 1.696460;
 
-  // The MID waves: 58 and 44 yard wavelengths, the band between the chop and
-  // the groundswell. SHADING ONLY, never displacement, and that is exactly why
-  // they can exist at all: no grid ever has to sample them. They are what puts
-  // travelling waves on the open sea at ranges where the chop has already
-  // aliased away and the two long rollers alone read as a flat sheet.
-  // 62 / 72 whole cycles per wrap period.
+  // The MID waves: 58, 44, and 70 yard wavelengths, the band between the chop
+  // and the groundswell. SHADING ONLY, never displacement, and that is exactly
+  // why they can exist at all: no grid ever has to sample them. They are what
+  // puts travelling waves on the open sea at ranges where the chop has already
+  // aliased away and the two long rollers alone read as a flat sheet. Three
+  // members with well-spread directions, not two: two straight wave trains
+  // interfere on a fixed diamond lattice, which is exactly the "grid of
+  // swells" the open sea used to read as at range.
+  // 62 / 72 / 79 whole cycles per wrap period.
   const vec2 MSWELL_K1 = vec2(0.1015, 0.0369);
   const vec2 MSWELL_K2 = vec2(-0.0248, 0.1406);
+  const vec2 MSWELL_K3 = vec2(0.0735, -0.0515);
   const float MSWELL_W1 = 0.649262;
   const float MSWELL_W2 = 0.753982;
+  const float MSWELL_W3 = 0.827286;
 
-  // The GROUNDSWELL: two long rollers (about 150 and 180 yard wavelengths)
-  // that BOTH water grids sample cleanly. The apron cells are ~29 x 38 yards
-  // (same segment count over width AND span, so NOT square): the second
-  // wavelength must clear ~4.5 z-samples per cycle or it goes faceted and
-  // amplitude-starved out there, which is why it is the longer of the two.
-  // 44 / 38 whole cycles per wrap period.
+  // The GROUNDSWELL: three long rollers (about 150, 180, and 150 yard
+  // wavelengths) that BOTH water grids sample cleanly. The apron cells are
+  // ~29 x 38 yards (same segment count over width AND span, so NOT square):
+  // a roller must clear ~4.5 z-samples per cycle or it goes faceted and
+  // amplitude-starved out there; the second is the longest for that reason
+  // and the third points 55 degrees off north so its z-projection still
+  // clears the bar. Three members, not two, for the same anti-lattice
+  // reason as the mid waves.
+  // 44 / 38 / 50 whole cycles per wrap period.
   const vec2 GSWELL_K1 = vec2(0.0364, 0.0209);
   const vec2 GSWELL_K2 = vec2(-0.0119, 0.0328);
+  const vec2 GSWELL_K3 = vec2(0.0240, 0.0343);
   const float GSWELL_W1 = 0.460767;
   const float GSWELL_W2 = 0.397935;
+  const float GSWELL_W3 = 0.523599;
 
-  // Wave GROUPS: a very slow two-sine envelope swells some stretches of sea
-  // and calms others, so open water stops being one uniform corduroy sheet.
-  // Wavelengths 254 and 238 yards; 14 / 11 whole cycles per wrap period.
+  // Wave GROUPS: a very slow envelope swells some stretches of sea and calms
+  // others, so open water stops being one uniform corduroy sheet. A pure
+  // two-sine product peaks on a fixed checkerboard, which reads as a lattice
+  // of identical swell patches; blending the second axis between two
+  // different wave vectors slides the peaks around instead.
+  // Wavelengths 254, 238, and 207 yards; 14 / 11 / 17 whole cycles per period.
   const vec2 GROUP_K1 = vec2(0.021, 0.013);
   const vec2 GROUP_K2 = vec2(-0.011, 0.024);
+  const vec2 GROUP_K3 = vec2(0.0152, -0.0262);
   const float GROUP_W1 = 0.146608;
   const float GROUP_W2 = 0.115192;
+  const float GROUP_W3 = 0.178024;
+
+  // The MEANDER warp: a slow, very long domain warp the mid waves, the
+  // groundswell, and the group envelope all sample through. Straight-crested
+  // sinusoids interfere on a fixed lattice no matter how many members a
+  // family has; bending the sample position by two slower, far longer sines
+  // makes every crest line wander and slides the interference pattern
+  // around, so the open sea stops repeating. The chop stays UNWARPED on
+  // purpose: its short crests are already broken up by the group envelope
+  // and the detail maps, and it is the family the zone planes displace at
+  // ~2 yard spacing, so skipping it keeps the vertex stage's added cost to
+  // the families the apron carries anyway. Both stages share these
+  // functions, so displaced crests and shaded crests bend identically.
+  // Wavelengths 384 / 440 yards; 9 / 7 whole cycles per wrap period.
+  const vec2 WARP_K1 = vec2(0.0141, -0.0083);
+  const vec2 WARP_K2 = vec2(0.0067, 0.0126);
+  const float WARP_W1 = 0.094248;
+  const float WARP_W2 = 0.073304;
+  // Yards of positional offset. Bounded by the coarsest DISPLACING grid: the
+  // local wavenumber perturbation is at most WARP_AMP * (|WARP_K1| + 0.6 *
+  // |WARP_K2|), about 15 percent, so a warped 180 yard roller never shortens
+  // below what the apron's ~38 yard cells can sample (pinned in
+  // tests/water_wave_field.test.ts).
+  const float WARP_AMP = 6.0;
 
   // The axis-aligned surface WOBBLE the zone planes carry under the chop, and
-  // the shoreward LAP that runs through the foam band. Both vertex-side and
-  // fragment-side respectively, both on the same whole-cycle grid as the rest.
-  // 105 / 67 / 129 whole cycles per wrap period.
+  // the TWO shoreward LAPs that run through the foam band. The laps are
+  // deliberately incommensurate (129 vs 88 cycles per period): their beat is
+  // what makes the wash arrive in an irregular rhythm, a few strong waves and
+  // then a near-still spell, instead of a single sine's metronome.
+  // 105 / 67 / 129 / 88 whole cycles per wrap period.
   const float WOBBLE_W1 = 1.099557;
   const float WOBBLE_W2 = 0.701622;
   const float FOAM_LAP_W = 1.350885;
+  const float FOAM_LAP_W2 = 0.921534;
 
   // Per family range fades for the FRAGMENT field (near, far), in yards of
   // camera distance. A per-pixel analytic wave has no mip chain, so a family
@@ -175,11 +216,27 @@ export const WATER_WAVE_GLSL = /* glsl */ `
     slope += cos(phase) * a * k;
   }
 
-  // The slow envelope that gathers waves into SETS. Ranges 0.1 to 1.0.
+  // The meander warp itself: still a function of world position and time
+  // alone, so everything sampled through it stays sheet-agnostic. The slope
+  // addWave returns is taken with respect to the WARPED position; the warp's
+  // own Jacobian (at most ~12 percent, see WARP_AMP) is deliberately ignored,
+  // an error far below what the normal-tilt scale makes visible.
+  vec2 waveWarp(vec2 p, float t) {
+    float a = wavePhase(p, WARP_K1, WARP_W1, t);
+    float b = wavePhase(p, WARP_K2, WARP_W2, t);
+    return p + WARP_AMP * vec2(sin(a) + 0.6 * cos(b), sin(b) - 0.6 * cos(a));
+  }
+
+  // The slow envelope that gathers waves into SETS. Ranges 0.04 to 1.0: the
+  // deep floor is deliberate, a real lull goes near-glassy, and the contrast
+  // between a running set and the calm behind it is most of what reads as
+  // "random" from the shore.
   float waveGroup(vec2 p, float t) {
-    return 0.55 + 0.45
-      * sin(wavePhase(p, GROUP_K1, GROUP_W1, t))
-      * sin(wavePhase(p, GROUP_K2, GROUP_W2, t));
+    vec2 q = waveWarp(p, t);
+    return 0.52 + 0.48
+      * sin(wavePhase(q, GROUP_K1, GROUP_W1, t))
+      * (0.62 * sin(wavePhase(q, GROUP_K2, GROUP_W2, t))
+       + 0.38 * sin(wavePhase(q, GROUP_K3, GROUP_W3, t)));
   }
 
   void chopField(vec2 p, float t, out float crest, out vec2 slope) {
@@ -193,14 +250,18 @@ export const WATER_WAVE_GLSL = /* glsl */ `
   void midField(vec2 p, float t, out float crest, out vec2 slope) {
     crest = 0.0;
     slope = vec2(0.0);
-    addWave(p, t, MSWELL_K1, MSWELL_W1, 0.60, crest, slope);
-    addWave(p, t, MSWELL_K2, MSWELL_W2, 0.40, crest, slope);
+    vec2 q = waveWarp(p, t);
+    addWave(q, t, MSWELL_K1, MSWELL_W1, 0.45, crest, slope);
+    addWave(q, t, MSWELL_K2, MSWELL_W2, 0.33, crest, slope);
+    addWave(q, t, MSWELL_K3, MSWELL_W3, 0.22, crest, slope);
   }
 
   void groundswellField(vec2 p, float t, out float crest, out vec2 slope) {
     crest = 0.0;
     slope = vec2(0.0);
-    addWave(p, t, GSWELL_K1, GSWELL_W1, 0.62, crest, slope);
-    addWave(p, t, GSWELL_K2, GSWELL_W2, 0.38, crest, slope);
+    vec2 q = waveWarp(p, t);
+    addWave(q, t, GSWELL_K1, GSWELL_W1, 0.46, crest, slope);
+    addWave(q, t, GSWELL_K2, GSWELL_W2, 0.33, crest, slope);
+    addWave(q, t, GSWELL_K3, GSWELL_W3, 0.21, crest, slope);
   }
 `;

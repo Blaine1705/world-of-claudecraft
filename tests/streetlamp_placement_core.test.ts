@@ -9,231 +9,266 @@ import {
 import { resolvePosition } from '../src/sim/colliders';
 import { getActiveWorldContent } from '../src/sim/data';
 import { propPlacementRoll } from '../src/sim/prop_layout';
-import { terrainHeight } from '../src/sim/world';
+import { roadDistance, terrainHeight } from '../src/sim/world';
 
-// streetlamp_placement_core: where the town streetlamps stand. Pure, so the
-// layout is asserted directly here instead of eyeballed in a screenshot.
+// streetlamp_placement_core: where the streetlamps stand. Pure, so the layout
+// is asserted directly here instead of eyeballed in a screenshot.
 
-/** Flat ground, nothing in the way, a fixed roll: the layout under a microscope. */
-function openGround(overrides: Partial<StreetlampProbes> = {}): StreetlampProbes {
+/** Distance from a point to the raw chords of a road set (the test's own
+ *  "painted road" when no meander is being simulated). */
+function chordDistance(
+  roads: readonly (readonly { x: number; z: number }[])[],
+  x: number,
+  z: number,
+): number {
+  let best = Infinity;
+  for (const road of roads) {
+    for (let i = 0; i + 1 < road.length; i++) {
+      const a = road[i];
+      const b = road[i + 1];
+      const abx = b.x - a.x;
+      const abz = b.z - a.z;
+      const len2 = abx * abx + abz * abz;
+      const t = len2 > 0 ? Math.max(0, Math.min(1, ((x - a.x) * abx + (z - a.z) * abz) / len2)) : 0;
+      const dx = x - a.x - abx * t;
+      const dz = z - a.z - abz * t;
+      best = Math.min(best, Math.hypot(dx, dz));
+    }
+  }
+  return best;
+}
+
+/** Flat ground, nothing in the way, a fixed roll: the layout under a microscope.
+ *  roadClear reports the true chord distance, as if the paint had no meander. */
+function openGround(
+  roads: readonly (readonly { x: number; z: number }[])[],
+  overrides: Partial<StreetlampProbes> = {},
+): StreetlampProbes {
   return {
     groundAt: () => 0,
     blocked: () => false,
     roll: () => 0.5,
+    roadClear: (x, z) => chordDistance(roads, x, z),
     ...overrides,
   };
 }
 
 const HUB: LampTown = { x: 0, z: 0, radius: 20 };
-/** A straight 200 yd run due north out of the hub, as two authored waypoints. */
+/** A straight 400 yd run due north out of the hub, as two authored waypoints. */
 const STRAIGHT = [
   [
     { x: 0, z: 0 },
-    { x: 0, z: 200 },
+    { x: 0, z: 400 },
   ],
 ];
 
-describe('planStreetlamps: spacing and reach', () => {
-  it('spaces lamps evenly along the road', () => {
-    const plan = planStreetlamps(STRAIGHT, [HUB], openGround(), { spacing: 10, offset: 0 });
-    expect(plan.sites.length).toBeGreaterThan(3);
-    for (let i = 1; i < plan.sites.length; i++) {
-      expect(plan.sites[i].z - plan.sites[i - 1].z).toBeCloseTo(10, 9);
+describe('planStreetlamps: the whole network is lit', () => {
+  it('lines the road end to end, not just a walk out of the hub', () => {
+    const plan = planStreetlamps(STRAIGHT, [HUB], openGround(STRAIGHT));
+    const zs = plan.sites.map((s) => s.z);
+    // reach = 20 * 1.6 + 60 = 92: the old plan stopped there; this one keeps
+    // going to the far end (the last waymarker lands within one open step).
+    expect(Math.max(...zs)).toBeGreaterThan(400 - 64);
+    expect(Math.min(...zs)).toBeLessThan(30);
+  });
+
+  it('spaces lamps evenly along the open road', () => {
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT), { openSpacing: 25 });
+    const zs = plan.sites.map((s) => s.z).sort((a, b) => a - b);
+    expect(zs.length).toBeGreaterThan(10);
+    for (let i = 1; i < zs.length; i++) {
+      expect(zs[i] - zs[i - 1]).toBeCloseTo(25, 6);
     }
   });
 
-  it('stops at the town reach instead of lighting the whole road', () => {
-    // reach = radius * reachScale + reachPad
-    const plan = planStreetlamps(STRAIGHT, [HUB], openGround(), {
+  it('packs lamps closer inside a town reach than out on the open road', () => {
+    const plan = planStreetlamps(STRAIGHT, [HUB], openGround(STRAIGHT), {
       spacing: 10,
-      offset: 0,
-      reachScale: 1,
-      reachPad: 30,
+      openSpacing: 30,
     });
-    for (const site of plan.sites) expect(site.z).toBeLessThanOrEqual(50);
-    // and it really did use the whole reach, not just the first chord
-    expect(Math.max(...plan.sites.map((s) => s.z))).toBeGreaterThan(40);
+    const zs = plan.sites.map((s) => s.z).sort((a, b) => a - b);
+    const reach = HUB.radius * 1.6 + 60;
+    const townGaps: number[] = [];
+    const openGaps: number[] = [];
+    for (let i = 1; i < zs.length; i++) {
+      const gap = zs[i] - zs[i - 1];
+      if (zs[i] < reach) townGaps.push(gap);
+      else if (zs[i - 1] > reach) openGaps.push(gap);
+    }
+    expect(townGaps.length).toBeGreaterThan(2);
+    expect(openGaps.length).toBeGreaterThan(2);
+    for (const gap of townGaps) expect(gap).toBeCloseTo(10, 6);
+    for (const gap of openGaps) expect(gap).toBeCloseTo(30, 6);
   });
 
   it('keeps the step running across waypoints instead of restarting at each', () => {
     // The authored roads have uneven waypoint spacing; restarting the step at
-    // every corner (the older Icemantle lantern loop does) bunches lamps up
-    // wherever a road happens to be finely authored.
+    // every corner bunches lamps up wherever a road is finely authored.
     const kinked = [
       [
         { x: 0, z: 0 },
         { x: 0, z: 13 }, // deliberately not a multiple of the spacing
-        { x: 0, z: 60 },
+        { x: 0, z: 400 },
       ],
     ];
-    const plan = planStreetlamps(kinked, [HUB], openGround(), { spacing: 10, offset: 0 });
-    for (let i = 1; i < plan.sites.length; i++) {
-      expect(plan.sites[i].z - plan.sites[i - 1].z).toBeCloseTo(10, 9);
+    const plan = planStreetlamps(kinked, [], openGround(kinked), { openSpacing: 25 });
+    const zs = plan.sites.map((s) => s.z).sort((a, b) => a - b);
+    expect(zs.length).toBeGreaterThan(10);
+    for (let i = 1; i < zs.length; i++) {
+      expect(zs[i] - zs[i - 1]).toBeCloseTo(25, 6);
     }
   });
 
   it('stands the posts off the road, alternating sides down the run', () => {
-    const plan = planStreetlamps(STRAIGHT, [HUB], openGround(), { spacing: 10, offset: 3 });
-    const offsets = plan.sites.map((s) => s.x);
-    expect(new Set(offsets.map(Math.abs))).toEqual(new Set([3]));
-    // consecutive lamps sit on opposite sides
-    for (let i = 1; i < offsets.length; i++) {
-      expect(Math.sign(offsets[i])).toBe(-Math.sign(offsets[i - 1]));
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT));
+    const xs = plan.sites.map((s) => s.x);
+    expect(xs.some((x) => x > 0)).toBe(true);
+    expect(xs.some((x) => x < 0)).toBe(true);
+    for (const x of xs) expect(Math.abs(x)).toBeGreaterThan(2.9);
+  });
+});
+
+describe('planStreetlamps: the clearance band against the painted road', () => {
+  it('lands every post inside the band the roadClear probe reports', () => {
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT), {
+      clearMin: 3.0,
+      clearMax: 5.6,
+    });
+    expect(plan.sites.length).toBeGreaterThan(5);
+    for (const site of plan.sites) {
+      const clear = chordDistance(STRAIGHT, site.x, site.z);
+      expect(clear).toBeGreaterThanOrEqual(3.0);
+      expect(clear).toBeLessThanOrEqual(5.6);
     }
+  });
+
+  it('nudges a post OUT when the painted road has meandered under it', () => {
+    // The paint is the chord shifted 2.5 yd toward +x: a fixed chord offset on
+    // the +x side would stand IN the track. The probe reports the real paint.
+    const shifted = (x: number, z: number) => chordDistance(STRAIGHT, x - 2.5, z);
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT, { roadClear: shifted }), {
+      offset: 3.8,
+      clearMin: 3.0,
+      clearMax: 5.6,
+    });
+    expect(plan.sites.length).toBeGreaterThan(5);
+    for (const site of plan.sites) {
+      const clear = shifted(site.x, site.z);
+      expect(clear).toBeGreaterThanOrEqual(3.0);
+      expect(clear).toBeLessThanOrEqual(5.6);
+    }
+  });
+
+  it('abandons a spot the band cannot be reached from, rather than misplacing it', () => {
+    // A probe that always reports "on the road" is unescapable within maxNudges.
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT, { roadClear: () => 0 }));
+    expect(plan.sites).toHaveLength(0);
   });
 });
 
 describe('planStreetlamps: the rejection probes', () => {
   it('drops a site standing in water or over a void', () => {
-    const drowned = planStreetlamps(STRAIGHT, [HUB], openGround({ groundAt: () => -40 }), {
-      spacing: 10,
-      offset: 0,
-    });
-    expect(drowned.sites).toHaveLength(0);
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT, { groundAt: () => -8 }));
+    expect(plan.sites).toHaveLength(0);
   });
 
   it('drops a site something else already occupies', () => {
     const blockedNorth = planStreetlamps(
       STRAIGHT,
-      [HUB],
-      openGround({ blocked: (_x, z) => z > 25 }),
-      { spacing: 10, offset: 0 },
+      [],
+      openGround(STRAIGHT, { blocked: (_x, z) => z > 200 }),
     );
     expect(blockedNorth.sites.length).toBeGreaterThan(0);
-    for (const site of blockedNorth.sites) expect(site.z).toBeLessThanOrEqual(25);
+    for (const site of blockedNorth.sites) expect(site.z).toBeLessThanOrEqual(200);
   });
 
   it('carries the vetted ground height, so the builder never resamples', () => {
-    const plan = planStreetlamps(STRAIGHT, [HUB], openGround({ groundAt: () => 7.5 }), {
-      spacing: 10,
-      offset: 0,
-    });
-    for (const site of plan.sites) expect(site.y).toBe(7.5);
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT, { groundAt: () => 4.25 }));
+    expect(plan.sites.length).toBeGreaterThan(0);
+    for (const site of plan.sites) expect(site.y).toBe(4.25);
   });
 
-  it('collapses lamps where two roads converge on the same hub', () => {
-    // Roads meet at a town, so their runs overlap on the approach; without the
-    // separation guard the shared stretch gets two posts in the same spot.
-    const converging = [
+  it('collapses lamps where two roads cross', () => {
+    const crossing = [
       [
-        { x: 0, z: 0 },
-        { x: 0, z: 60 },
+        { x: -200, z: 100 },
+        { x: 200, z: 100 },
       ],
       [
-        { x: 0.4, z: 0 },
-        { x: 0.4, z: 60 },
+        { x: 0, z: -100 },
+        { x: 0, z: 300 },
       ],
     ];
-    const plan = planStreetlamps(converging, [HUB], openGround(), {
-      spacing: 10,
-      offset: 0,
-      minSeparation: 6,
-    });
+    const plan = planStreetlamps(crossing, [], openGround(crossing), { minSeparation: 8 });
+    expect(plan.sites.length).toBeGreaterThan(10);
     for (let i = 0; i < plan.sites.length; i++) {
       for (let j = i + 1; j < plan.sites.length; j++) {
         const dx = plan.sites[i].x - plan.sites[j].x;
         const dz = plan.sites[i].z - plan.sites[j].z;
-        expect(Math.hypot(dx, dz)).toBeGreaterThanOrEqual(6);
+        expect(Math.hypot(dx, dz)).toBeGreaterThanOrEqual(8);
       }
     }
   });
 });
 
-describe('planStreetlamps: towns own their lamps', () => {
-  it('tags every lamp with its town and reports contiguous ranges', () => {
-    const towns: LampTown[] = [
-      { x: 0, z: 0, radius: 20 },
-      { x: 0, z: 400, radius: 20 },
-    ];
-    const road = [
-      [
-        { x: 0, z: -60 },
-        { x: 0, z: 460 },
-      ],
-    ];
-    const plan = planStreetlamps(road, towns, openGround(), { spacing: 10, offset: 0 });
-    expect(plan.townRanges).toHaveLength(2);
-    for (let t = 0; t < towns.length; t++) {
-      const { start, end } = plan.townRanges[t];
-      expect(end).toBeGreaterThan(start);
-      for (let i = start; i < end; i++) expect(plan.sites[i].town).toBe(t);
-    }
-    // the two towns light their own approaches and nothing between them
-    expect(plan.townRanges[0].end).toBe(plan.townRanges[1].start);
-    const gap = plan.sites.filter((s) => s.z > 120 && s.z < 280);
-    expect(gap).toHaveLength(0);
-  });
-
-  it('gives a town with no road nearby an empty range rather than a hole', () => {
-    const towns: LampTown[] = [
-      { x: 0, z: 0, radius: 20 },
-      { x: 5000, z: 5000, radius: 20 },
-    ];
-    const plan = planStreetlamps(STRAIGHT, towns, openGround(), { spacing: 10, offset: 0 });
-    expect(plan.townRanges[1].end - plan.townRanges[1].start).toBe(0);
-  });
-});
-
 describe('planStreetlamps is deterministic and finite on the real world', () => {
-  const seed = 12345;
-  const content = getActiveWorldContent();
-  const towns = content.zones.map((zone) => ({
-    x: zone.hub.x,
-    z: zone.hub.z,
-    radius: zone.hub.radius,
-  }));
-  const probes: StreetlampProbes = {
-    groundAt: (x, z) => terrainHeight(x, z, seed),
+  const SEED = 0;
+  const realProbes = (): StreetlampProbes => ({
+    groundAt: (x, z) => terrainHeight(x, z, SEED),
     blocked: (x, z) => {
-      const resolved = resolvePosition(seed, x, z, 1.1);
+      const resolved = resolvePosition(SEED, x, z, 1.1);
       return Math.abs(resolved.x - x) > 0.05 || Math.abs(resolved.z - z) > 0.05;
     },
     roll: propPlacementRoll,
+    roadClear: roadDistance,
+  });
+  const realPlan = () => {
+    const content = getActiveWorldContent();
+    const towns = content.zones.map((zone) => ({
+      x: zone.hub.x,
+      z: zone.hub.z,
+      radius: zone.hub.radius,
+    }));
+    return planStreetlamps(content.roads, towns, realProbes());
   };
 
-  it('lights every town, and none of them extravagantly', () => {
-    const plan = planStreetlamps(content.roads, towns, probes);
-    expect(plan.townRanges).toHaveLength(content.zones.length);
-    for (let t = 0; t < towns.length; t++) {
-      const count = plan.townRanges[t].end - plan.townRanges[t].start;
-      // A town with no lamps at all means its roads stopped reaching the hub;
-      // a town with hundreds means the reach or the spacing has run away and
-      // the per-town instanced draw is no longer a per-town draw.
-      expect(count, content.zones[t].hub.name).toBeGreaterThan(0);
-      expect(count, content.zones[t].hub.name).toBeLessThan(80);
+  it('lights the whole network, sparsely (waymarkers, not a boulevard)', () => {
+    const plan = realPlan();
+    // ~13,500 yd of road at town spacing 26 / open spacing 64: a few hundred
+    // posts. A runaway count is a perf regression (fixtures instance per zone,
+    // but every third post carries a real light object); a collapsed count
+    // means part of the network went dark.
+    expect(plan.sites.length).toBeGreaterThan(200);
+    expect(plan.sites.length).toBeLessThan(450);
+  });
+
+  it('stands every post beside the painted road, never on it', () => {
+    const plan = realPlan();
+    for (const site of plan.sites) {
+      const clear = roadDistance(site.x, site.z);
+      expect(clear).toBeGreaterThanOrEqual(3.0);
+      expect(clear).toBeLessThanOrEqual(5.6);
     }
   });
 
-  it('produces the identical layout twice (no hidden global state)', () => {
-    const a = planStreetlamps(content.roads, towns, probes);
-    const b = planStreetlamps(content.roads, towns, probes);
-    expect(a.sites).toEqual(b.sites);
-    expect(a.townRanges).toEqual(b.townRanges);
+  it('never stands a lamp in the sea', () => {
+    const plan = realPlan();
+    for (const site of plan.sites) expect(site.y).toBeGreaterThanOrEqual(-3);
   });
 
-  it('never stands a lamp in the sea', () => {
-    const plan = planStreetlamps(content.roads, towns, probes);
-    for (const site of plan.sites) expect(site.y).toBeGreaterThanOrEqual(-3);
+  it('produces the identical layout twice (no hidden global state)', () => {
+    expect(realPlan()).toEqual(realPlan());
   });
 });
 
 describe('lampCarriesLight (which posts get a real point light)', () => {
   it('lights one post in three, so the shared budget still has room', () => {
-    // renderer.ts budgetFireLights keeps only GFX.maxPointLights alive at once,
-    // and campfires, braziers, and quest glows already compete for those slots.
     expect(LAMP_LIGHT_STRIDE).toBe(3);
-    expect([0, 1, 2, 3, 4, 5, 6].map(lampCarriesLight)).toEqual([
-      true,
-      false,
-      false,
-      true,
-      false,
-      false,
-      true,
-    ]);
+    const lit = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter(lampCarriesLight);
+    expect(lit).toEqual([0, 3, 6]);
   });
 
-  it('always lights the first post of a town, so a small town is never dark', () => {
+  it('always lights the first post of a zone, so a small zone is never dark', () => {
     expect(lampCarriesLight(0)).toBe(true);
   });
 });

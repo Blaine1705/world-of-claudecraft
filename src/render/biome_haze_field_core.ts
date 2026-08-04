@@ -74,6 +74,17 @@ export const HAZE_AERIAL_ONSET = 100;
 export const HAZE_AERIAL_REF = 150;
 export const HAZE_AERIAL_MAX = 0.5;
 
+// The FAR term: past the border band the air keeps thickening, so distance
+// genuinely fades out into the LOCAL zone's fog colour (the field sample, so
+// the fade is always the colour of the area it covers, never the camera
+// zone's). A second Gaussian shoulder starting where the near term has
+// saturated; the two sum to HAZE_FAR_CEIL for the murkiest realm at extreme
+// range, which still leaves the horizon band and the ground's own colour a
+// say: more fade with distance, deliberately not a white-out.
+export const HAZE_FAR_ONSET = 450;
+export const HAZE_FAR_REF = 500;
+export const HAZE_FAR_CEIL = 0.85;
+
 // How far along the view ray the SKY dome samples the field for its
 // horizon-band tint (sky.ts): the mid-vista distance where a neighbouring
 // realm's land actually sits, well inside the field rect from any camera.
@@ -194,13 +205,17 @@ export function hazeLightLevel(sunScale = 1, hemiScale = 1, envScale = 1): numbe
 
 /**
  * How much of the sampled haze a fragment takes, from its distance to the
- * camera. The Node twin of the GLSL in biome_haze_field.ts: both are
- * `max * strength * (1 - exp(-t^2))` over `t = (dist - onset) / ref`, so a
- * test can pin the curve the shader actually runs.
+ * camera. The Node twin of the GLSL in biome_haze_field.ts: both sum the
+ * border-band term `MAX * (1 - exp(-t1^2))` and the far term
+ * `(CEIL - MAX) * (1 - exp(-t2^2))`, scaled by the field strength, so a test
+ * can pin the exact curve the shader runs at both ranges.
  */
 export function aerialHazeAmount(distance: number, strength: number): number {
-  const t = Math.max(0, distance - HAZE_AERIAL_ONSET) / HAZE_AERIAL_REF;
-  return HAZE_AERIAL_MAX * strength * (1 - Math.exp(-t * t));
+  const t1 = Math.max(0, distance - HAZE_AERIAL_ONSET) / HAZE_AERIAL_REF;
+  const t2 = Math.max(0, distance - HAZE_FAR_ONSET) / HAZE_FAR_REF;
+  const near = HAZE_AERIAL_MAX * (1 - Math.exp(-t1 * t1));
+  const far = (HAZE_FAR_CEIL - HAZE_AERIAL_MAX) * (1 - Math.exp(-t2 * t2));
+  return strength * (near + far);
 }
 
 /**

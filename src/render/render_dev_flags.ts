@@ -13,6 +13,9 @@
 //   canopy      - the canopy clump-detail layer
 //   n8ao        - the N8AO ambient-occlusion pass
 //   tmicroshadow - the terrain micro sun-shadow taps (ultra+)
+//   zonehaze    - the per-zone aerial haze field (biome_haze_field)
+//   nightlights - the night light field (night_light_field); off falls back
+//                 to the draped ground-glow pools and the mob glow discs
 
 const disabled = ((): ReadonlySet<string> => {
   const set = new Set<string>();

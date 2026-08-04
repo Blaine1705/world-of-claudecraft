@@ -1373,7 +1373,7 @@ export class Hud {
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
   private dayNightCtx: CanvasRenderingContext2D | null = null;
-  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; ample for the hour cycle
+  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; ample for the 20-minute cycle
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display

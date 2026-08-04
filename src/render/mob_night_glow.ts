@@ -11,10 +11,20 @@
 // which is the crowd-safe failure mode (the discs are cosmetic; nameplates,
 // health bars, and the rigs themselves are untouched).
 //
-// This is a NIGHT VISIBILITY layer, so it runs identically on every graphics
-// tier: no tier scaling, no tier gate. It is driven purely by the frame's night
-// amount (night_lighting_core.ts), which is already 0 on the one tier whose
-// world never darkens.
+// This is a NIGHT VISIBILITY layer, and it is now the FALLBACK arm of that
+// job: wherever the night light field runs (night_light_field.ts, every tier
+// that compiles the standard splat material, which is exactly the set of
+// tiers that darken at night), nearby bodies light the ground through the
+// terrain shader as real light instead, and the renderer hands this layer a
+// zero amount. The disc pool serves the configurations without the field
+// (`?nightlights=off` today), driven purely by the frame's night amount
+// (night_lighting_core.ts), which is already 0 on the tiers whose world never
+// darkens. Every configuration that HAS night therefore has a body cue; which
+// mechanism paints it is cosmetic, per the graphics-fairness rule. Two field
+// limits worth knowing against the discs: the field lights terrain only (a
+// body on a dock or bridge deck casts nothing there), and it spends
+// NIGHT_LIGHT_DYNAMIC_SLOTS on the nearest bodies where the pool here holds
+// MOB_GLOW_POOL discs.
 import * as THREE from 'three';
 import { MOB_GLOW_POOL, MOB_GLOW_RANGE, mobGlowStrength } from './night_lighting_core';
 import { radialGlowTexture } from './textures';

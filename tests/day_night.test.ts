@@ -35,11 +35,12 @@ import type { BiomeId } from '../src/sim/types';
 // sun/hemi/IBL/fog/sky; here we drive any moment of the cycle deterministically.
 
 describe('the live cycle contract', () => {
-  it('runs a one-hour cycle, epoch-anchored so it is identical for every player', () => {
-    // Literal pin: an hour, not a derived expression, so a period change is a
-    // deliberate act here too. Epoch anchoring (cyclePhase of an absolute ms)
-    // is what makes the phase global; there is no per-client or per-zone term.
-    expect(DAY_NIGHT_CYCLE_MS).toBe(3_600_000);
+  it('runs a twenty-minute cycle, epoch-anchored so it is identical for every player', () => {
+    // Literal pin: twenty minutes, not a derived expression, so a period change
+    // is a deliberate act here too. Epoch anchoring (cyclePhase of an absolute
+    // ms) is what makes the phase global; there is no per-client or per-zone
+    // term.
+    expect(DAY_NIGHT_CYCLE_MS).toBe(1_200_000);
   });
 
   it('ships with the cycle LIVE (DAY_ONLY off): the sun and moon move', () => {
@@ -420,7 +421,7 @@ describe('duskWarmAmount / nightSkyDesat (the cycle sky grading)', () => {
 
   it('holds a wide golden band so the sunset lasts, without leaking either end', () => {
     // The band was widened deliberately: the original window (open at y 0.3,
-    // shut at y -0.24) gave about ten minutes of golden hour per cycle, which
+    // shut at y -0.24) gave a golden band about a sixth of the cycle, which
     // a player crossing a zone missed entirely. These pins are the two ends
     // that must NOT move: the peak sun elevation is ~0.659, so a high sun stays
     // exactly zero, and deep night stays exactly zero so no warmth reaches the

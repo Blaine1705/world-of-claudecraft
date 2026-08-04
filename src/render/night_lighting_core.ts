@@ -48,11 +48,13 @@ export function nightLightAmount(globalNightAmt: number, gradeApplied: boolean):
   return clamp01(globalNightAmt);
 }
 
-// Lamps catch a few minutes before the sun touches the horizon and are fully lit
-// a few minutes after (globalDayness is symmetric, so the same window snuffs them
-// at dawn). In the one-hour cycle this is roughly a five-minute dusk.
-const LAMP_ON = 0.3;
-const LAMP_FULL = 0.62;
+// Lamps catch EARLY: the lamplighter is out in the late afternoon, the lamps
+// are at full burn before the sun touches the horizon, and (globalDayness
+// being symmetric) they hold through dawn and only snuff once the morning is
+// properly bright. Noon and the early afternoon stay lamp-free, which the
+// mid-afternoon pin in tests/night_lighting_core.test.ts holds.
+const LAMP_ON = 0.08;
+const LAMP_FULL = 0.32;
 
 /** How brightly the streetlamps burn, 0 (out) to 1 (full), from the driver. */
 export function lampGlowAmount(nightLight: number): number {

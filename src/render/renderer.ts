@@ -72,6 +72,7 @@ import {
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
+import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
@@ -162,7 +163,6 @@ import {
 } from './dynamic_resolution_core';
 import { buildEastbrookTownView, type EastbrookTownView } from './eastbrook_town';
 import { buildEmberFeatures, type EmberFeaturesView } from './ember_features';
-import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { buildEmberPools, type EmberPoolsView } from './ember_pools';
 import { objectDisplayName } from './entity_labels';
 import { resolveEnvironmentPrefilterPlan } from './env_prefilter_core';
@@ -260,6 +260,12 @@ import {
 import { facingAlpha, remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
+import {
+  ensureNightLightField,
+  hasNightLightField,
+  updateNightLightField,
+} from './night_light_field';
+import { collectBodyNightLights, type NightLightSite } from './night_light_field_core';
 import {
   lampGlowAmount,
   mobGlowAmount,
@@ -1569,6 +1575,10 @@ export class Renderer {
   private campBraziers: CampBraziersView | null = null;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
+  // Pooled scratch for the night light field's dynamic entries (the body
+  // collector rewrites it each frame; entries past the count are stale).
+  private nightBodyLights: NightLightSite[] = [];
+  private nightBodyLightCount = 0;
   private hauntFeatures: HauntFeaturesView | null = null;
   private jungleFeatures: JungleFeaturesView | null = null;
   private gardenFeatures: GardenFeaturesView | null = null;
@@ -1766,6 +1776,10 @@ export class Renderer {
   private lowGfx: boolean;
   private post: PostPipeline | null = null;
   private godRays: THREE.Sprite[] = [];
+  // Eased per-biome god-ray strength (BIOME_GOD_RAYS via updateAmbience): the
+  // shafts are "sun through bright air" and read as detached glowing streaks
+  // over the twilight and gloom realms, so those fade them out entirely.
+  private godRayZoneScale = 1;
   private viewport = { width: 1, height: 1 };
   private viewportPollTimer = 0;
   private nameplateTimer = 0;
@@ -1984,6 +1998,12 @@ export class Renderer {
       }
       ensureBiomeHazeField(hazePresets);
     }
+    // The night light field must decide before any splat material compiles:
+    // the terrain gates its shader patch on hasNightLightField() at compile
+    // time (the biome-haze contract). Lamps, camp fires, and bodies register
+    // their entries later, at their own build steps; the registry is read per
+    // frame, not at compile.
+    ensureNightLightField();
 
     // sky dome, follows the camera so the world strip never outruns it.
     // High tier: shader gradient + sun glow with biome-aware horizon tints;
@@ -2948,7 +2968,12 @@ export class Renderer {
       return Promise.resolve();
     }
     const pending = this.pendingZonePrepares.get(zoneId);
-    if (pending) return pending;
+    if (pending) {
+      // A gating caller (teleport, login) joining a background prepare must
+      // not wait at idle pace behind the loading screen.
+      if (opts?.pace !== 'idle') this.terrainView.escalateZone(zoneId);
+      return pending;
+    }
     const zone = zoneAt(x, z);
     const idlePace = opts?.pace === 'idle';
     const task = (async () => {
@@ -7463,6 +7488,23 @@ export class Renderer {
     cave: { hemiSky: 0x4d564c, hemiGround: 0x0e120e, sun: 0x6e7a66, sunScale: 0.8, envScale: 0.8 },
   };
 
+  // God-ray shaft strength per biome (default 1). The shafts sell a bright
+  // sun hanging in clear or golden air; under the Nightbloom's starfield
+  // twilight or the Wraithwood's grey murk the same additive streaks read as
+  // artifacts (a playtested report over the Nightbloom's lake), and the
+  // overcast/rain realms keep only a hint. Eased in updateAmbience so a
+  // border crossing fades the shafts instead of popping them.
+  private static BIOME_GOD_RAYS: Partial<Record<BiomeId, number>> = {
+    night: 0,
+    haunt: 0,
+    cave: 0,
+    dusk: 0.35,
+    frost: 0.45,
+    ember: 0.55,
+    volcano: 0.3,
+    marsh: 0.3,
+  };
+
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
     return Renderer.BIOME_FOG[zoneBiomeAt(this.sim.player.pos.x, this.sim.player.pos.z)];
@@ -7575,6 +7617,11 @@ export class Renderer {
       this.valeCupSky.mesh.visible = false;
     }
     const biome = zoneBiomeAt(this.sim.player.pos.x, pz);
+    // Per-biome god-ray strength, eased over about half a second so a border
+    // crossing fades the shafts with the rest of the ambience.
+    const shaftTarget = Renderer.BIOME_GOD_RAYS[biome] ?? 1;
+    this.godRayZoneScale +=
+      (shaftTarget - this.godRayZoneScale) * (1 - Math.exp(-2 * Math.max(0, dt)));
     const phaseOverride = dayNightPhaseOverride();
     if (this.lowGfx && DAY_ONLY && phaseOverride === null) {
       if (this.fixedLowDayBiome !== biome) {
@@ -9456,13 +9503,22 @@ export class Renderer {
     // player who never saw the sky. `fogState` carries last frame's answer (it
     // settles in updateAmbience, below the entity loop); one frame of discs on
     // the way through a door is not worth reordering the frame for.
+    // Where the night light field runs, bodies light the ground through the
+    // terrain shader instead (real reactive light); the disc pool is the
+    // fallback tier's cue, so the field zeroes its amount rather than both
+    // layers warming the same ground twice.
+    const bodyGlow = this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0;
     this.mobNightGlow?.emit(
       this.views,
       sim.entities,
       p.pos.x,
       p.pos.z,
-      this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0,
+      hasNightLightField() ? 0 : bodyGlow,
     );
+    this.nightBodyLightCount =
+      hasNightLightField() && bodyGlow > 0.001
+        ? collectBodyNightLights(this.views, sim.entities, p.pos.x, p.pos.z, this.nightBodyLights)
+        : 0;
 
     // Hidden views skip their whole matrix subtree: three recomposes even
     // invisible hierarchies, and a distance-culled or off-screen rig is 30-60
@@ -9659,6 +9715,19 @@ export class Renderer {
     this.streetlamps?.update(lampGlow, this.time);
     this.emberPools?.update(lampGlow, this.time);
     this.campBraziers?.update(lampGlow, this.time);
+    // The night light field: every lamp and camp fire plus the nearby bodies
+    // collected above, packed into the terrain shader's uniform slots. Indoors
+    // the world clock does not govern the ground either, so the same fogState
+    // gate the discs use zeroes the whole field.
+    updateNightLightField(
+      p.pos.x,
+      p.pos.z,
+      this.fogState === 'outdoor' ? lampGlow : 0,
+      this.fogState === 'outdoor' ? mobGlowAmount(this.dnGlobalNight) : 0,
+      this.time,
+      this.nightBodyLights,
+      this.nightBodyLightCount,
+    );
     this.budgetFireLights(p.pos.x, p.pos.z, true);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'lights', worldStart);
 
@@ -9727,6 +9796,16 @@ export class Renderer {
         ? Math.min((this.scene.fog as THREE.Fog).near, fogFar * 0.55)
         : (this.scene.fog as THREE.Fog).near;
     this.queueVisibleZonePrepares(Math.max(fogFar, this.lastRequestedFogFar));
+    // The player standing in a zone whose background prepare is still running
+    // escalates that build to fast pacing: the ground under their feet must
+    // not keep crawling in at idle-slot speed (a border walk arrives before
+    // the neighbour's idle prepare finishes by design; this is its handoff).
+    {
+      const standingZoneId = this.zoneIdAt(p.pos.x, p.pos.z);
+      if (standingZoneId !== null && this.pendingZonePrepares.has(standingZoneId)) {
+        this.terrainView.escalateZone(standingZoneId);
+      }
+    }
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     this.farTerrainView.update(
       this.camera.position.x,
@@ -10114,7 +10193,9 @@ export class Renderer {
     // Wildheart is open-air, but the long screen-space shafts read as giant
     // triangles against its enclosed caldera rim. The basin keeps the sun,
     // sky, and outdoor grade while reserving these shafts for the overworld.
-    const outdoor = this.fogState === 'outdoor';
+    // Faded out entirely in the twilight/gloom realms (BIOME_GOD_RAYS): skip
+    // the draw as well as the math once the eased scale reaches zero.
+    const shafts = this.fogState === 'outdoor' && this.godRayZoneScale > 0.02;
     // azimuth-only alignment, the chase cam always pitches down while the
     // sun sits high, so a full 3D dot product would never light the shafts
     this.camera.getWorldDirection(this.tmpV);
@@ -10125,8 +10206,8 @@ export class Renderer {
     const side = this.tmpV.set(sunAzimuth.z, 0, -sunAzimuth.x); // sunAzimuth x up
     for (let i = 0; i < this.godRays.length; i++) {
       const sp = this.godRays[i];
-      sp.visible = outdoor;
-      if (!outdoor) continue;
+      sp.visible = shafts;
+      if (!shafts) continue;
       const sway = Math.sin(this.time * 0.13 + i * 2.1) * 10;
       // hang the shafts sunward of the camera but near eye height so they
       // cross a third-person frame instead of floating 150u overhead
@@ -10135,7 +10216,8 @@ export class Renderer {
         .addScaledVector(sunAzimuth, 48 + i * 26)
         .addScaledVector(side, (i - 1) * 30 + sway);
       sp.position.y = this.camera.position.y + 16 + i * 7;
-      sp.material.opacity = facing * facing * facing * (0.3 - i * 0.05) * this.sunUp;
+      sp.material.opacity =
+        facing * facing * facing * (0.3 - i * 0.05) * this.sunUp * this.godRayZoneScale;
     }
   }
 

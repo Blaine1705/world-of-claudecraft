@@ -129,9 +129,12 @@ describe('mobGlowStrength (per-character distance fade)', () => {
   });
 
   it('keeps a pool big enough for a crowded scene', () => {
-    // The renderer's entity views live inside an 80 yd create band, so a pool
-    // this size covers an ordinary throng; past it a body simply goes without a
-    // disc, which is the crowd-safe failure mode (cosmetic only).
+    // The disc layer is the FALLBACK body cue now (the night light field
+    // carries bodies on the tiers that splice it; see mob_night_glow.ts), but
+    // wherever the discs DO run they still cover an ordinary throng inside
+    // the 80 yd view create band; past the pool a body simply goes without a
+    // disc, which is the crowd-safe failure mode (cosmetic only). The field
+    // side's companion pin lives in tests/night_light_field_core.test.ts.
     expect(MOB_GLOW_POOL).toBeGreaterThanOrEqual(48);
   });
 });

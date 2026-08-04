@@ -27,6 +27,7 @@ import {
 } from '../sim/world';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { attachBiomeHaze } from './biome_haze_field';
 import { applyCanopyDetail } from './canopy_detail';
 import {
   applyInstanceCollapse,
@@ -779,6 +780,11 @@ function foliageMaterial(
   mat.name = src.name;
   const upBlend = pol.leaf ? LEAF_UP_NORMAL_BLEND : 0;
   if (pol.windMul > 0 || upBlend > 0) addWind(mat, TREE_WIND_STRENGTH * pol.windMul, upBlend);
+  // Distant-zone air (biome_haze_field.ts): canopies and trunks at range must
+  // haze with the ground under them (a full-green pine over lavender-hazed
+  // downs reads as "no fog at all"). Chained over the wind hook; reads the
+  // post-wind vertex, so swaying canopies sample their true world position.
+  attachBiomeHaze(mat);
   if (pol.leaf && std.map) {
     // Texture-shaped ambient floor: a dense canopy shadow-maps itself into
     // darkness (worst on small meadow pines, which read as black clumps), and

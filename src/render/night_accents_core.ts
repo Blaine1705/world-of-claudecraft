@@ -4,7 +4,9 @@
 //
 // Three layers, all pure here and all deterministic (hash-driven, never
 // Math.random), with the Three side in ember_pools.ts and night_accents.ts:
-//   - ember pools: a static warm pool at every authored campfire and mob camp.
+//   - ember pools: a static warm pool at every authored campfire; a mob camp
+//     without a campfire gets a fire brazier instead (camp_braziers.ts), and
+//     uncoveredCampSites below decides which camps those are.
 //   - glow flora: luminous mushroom clusters, streamed on a world-anchored cell
 //     grid around the camera.
 //   - fireflies: a drifting pool that only settles in its habitat (water edges
@@ -20,7 +22,7 @@
 // height, road distance, biome) arrives as a caller-supplied callback, so the
 // whole layout is drivable from a Vitest with no renderer and no sim.
 
-import type { BiomeId } from '../sim/types';
+import type { BiomeId, MobFamily } from '../sim/types';
 
 // ---------------------------------------------------------------------------
 // Ember pools
@@ -37,29 +39,56 @@ export interface EmberSite {
  *  gives it a flame and a budgeted point light; the pool is what survives when
  *  the budget's nearest-few rule leaves this one dark. */
 const CAMPFIRE_POOL_RADIUS = 4.2;
-/** A camp's pool. Wide and faint: the read is "people live here", not one fire. */
-const CAMP_POOL_RADIUS = 7.5;
-/** A camp with an authored campfire this close already has its light. */
+/** A camp with an authored campfire this close already has its fire. */
 const CAMP_DEDUPE_RANGE = 12;
 
+/** One ember pool per authored campfire (camps without one get a brazier). */
+export function campfireEmberSites(campfires: readonly (readonly [number, number])[]): EmberSite[] {
+  return campfires.map(([x, z]) => ({ x, z, radius: CAMPFIRE_POOL_RADIUS }));
+}
+
 /**
- * Every static ember pool in the world: one per authored campfire, plus one per
- * mob camp that does not already have a campfire inside it.
+ * The mob families that BUILD fires. A wolf pack or a spider nest with a tended
+ * brazier reads as a placement bug; a bandit camp without one reads as a
+ * different bug. Trolls and ogres are fire-builders in every classic bestiary,
+ * so they count; the skittering and elemental families do not.
+ */
+export const FIRE_BUILDING_FAMILIES: ReadonlySet<MobFamily> = new Set<MobFamily>([
+  'humanoid',
+  'troll',
+  'ogre',
+]);
+
+/**
+ * Only the camps whose mob would actually build and tend a fire. `familyOf`
+ * resolves a camp's mob id to its family (the sim's MOBS table at the call
+ * site); an unknown id builds nothing, which is the safe reading of bad data.
+ */
+export function fireBuildingCamps<T extends { mobId: string }>(
+  camps: readonly T[],
+  familyOf: (mobId: string) => MobFamily | undefined,
+): T[] {
+  return camps.filter((camp) => {
+    const family = familyOf(camp.mobId);
+    return family !== undefined && FIRE_BUILDING_FAMILIES.has(family);
+  });
+}
+
+/**
+ * Every mob camp that does NOT already have an authored campfire inside it:
+ * these are the camps that get a real fire of their own (camp_braziers.ts), so
+ * each fire-building camp owns exactly one fire.
  *
  * The dedupe matters because the two tables overlap by design (a camp usually
- * gets a campfire prop), and stacking a wide camp pool on a bright campfire pool
- * is how a hostile camp ends up glowing like a bonfire from across the valley.
+ * gets a campfire prop), and standing a brazier beside a bright campfire is how
+ * a hostile camp ends up glowing like a bonfire from across the valley.
  */
-export function emberSites(
+export function uncoveredCampSites(
   campfires: readonly (readonly [number, number])[],
   camps: readonly { center: { x: number; z: number } }[],
-): EmberSite[] {
-  const sites: EmberSite[] = campfires.map(([x, z]) => ({
-    x,
-    z,
-    radius: CAMPFIRE_POOL_RADIUS,
-  }));
+): { x: number; z: number }[] {
   const dedupeSq = CAMP_DEDUPE_RANGE * CAMP_DEDUPE_RANGE;
+  const sites: { x: number; z: number }[] = [];
   for (const camp of camps) {
     let covered = false;
     for (const [x, z] of campfires) {
@@ -70,8 +99,7 @@ export function emberSites(
         break;
       }
     }
-    if (covered) continue;
-    sites.push({ x: camp.center.x, z: camp.center.z, radius: CAMP_POOL_RADIUS });
+    if (!covered) sites.push({ x: camp.center.x, z: camp.center.z });
   }
   return sites;
 }

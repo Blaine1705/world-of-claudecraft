@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
 import { tightMemoryDeviceHint } from '../device_memory_hint';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
+import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
@@ -1596,6 +1597,10 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         side: opts.side ?? THREE.FrontSide,
       });
   if (opts.rim && GFX.standardMaterials) addRimGlow(mat);
+  // Every surfaceMat surface takes the distant-zone air (compile-time no-op
+  // on tiers without a field): props and buildings at range must haze with
+  // the ground under them or the effect reads as nothing.
+  attachBiomeHaze(mat);
   matCache.set(key, mat);
   return mat;
 }

@@ -351,7 +351,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_mirefen_1',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 29, z: 395 },
+    pos: { x: 26, z: 395 },
     level: 10,
     tier: 1,
   },
@@ -359,7 +359,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'herb_mirefen_2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: -66, z: 458 },
+    pos: { x: -68, z: 459 },
     level: 10,
     tier: 1,
   },
@@ -524,12 +524,13 @@ export const GATHER_NODES: GatherNodeDef[] = [
     tier: 2,
   },
   // Followed herb_mirefen_1 off the pool it shared: it sat inside the same
-  // footprint at 3.55 yards under. Still 12 yards from that patch.
+  // footprint at 3.55 yards under, and the raised waterline later walked both
+  // patches further up the same shore. Still about 20 yards from that patch.
   {
     id: 'herb_mirefen_t2',
     zoneId: 'mirefen_marsh',
     type: 'herb',
-    pos: { x: 34, z: 406 },
+    pos: { x: 23, z: 416 },
     level: 10,
     tier: 2,
   },
@@ -1320,7 +1321,7 @@ export const GATHER_NODES: GatherNodeDef[] = [
     id: 'ore_palmreach_1',
     zoneId: 'palmreach',
     type: 'ore',
-    pos: { x: -262, z: 794 },
+    pos: { x: -263, z: 795 },
     level: 20,
     tier: 1,
   },

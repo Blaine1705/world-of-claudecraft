@@ -17,10 +17,11 @@
 
 import type { BiomeId } from '../sim/types';
 
-/** Full day-to-night-to-day period. One real hour, so every play session sees
- *  the whole cycle; epoch-anchored below, so the phase is identical for every
- *  player on Earth at the same instant, decoupled from local clocks. */
-export const DAY_NIGHT_CYCLE_MS = 60 * 60 * 1000;
+/** Full day-to-night-to-day period. Twenty real minutes, so every play session
+ *  sees the whole cycle several times over; epoch-anchored below, so the phase
+ *  is identical for every player on Earth at the same instant, decoupled from
+ *  local clocks. */
+export const DAY_NIGHT_CYCLE_MS = 20 * 60 * 1000;
 
 /** The grade a frame reads: intensity scale for the lights + IBL, per-channel
  *  color multipliers for the sky dome and fog, a fog-distance pull-in, and the
@@ -345,11 +346,12 @@ export function warmDuskGrade(g: DayNightGrade, duskAmt: number): DayNightGrade 
  *  sky dome pours its warm horizon lobe in scaled by this.
  *
  *  The window is deliberately WIDE. The first cut only opened at y 0.3 and shut
- *  at y -0.24, which gave a roughly ten-minute golden band per cycle: over
+ *  at y -0.24, which gave a golden band about a sixth of the cycle: over
  *  before a player crossing a zone noticed it. Starting the ramp higher and
- *  letting the afterglow linger a little deeper stretches that to about
- *  thirteen minutes, a real golden hour, without leaking into deep night: the
- *  peak sun elevation is ~0.66, so noon still lands exactly on zero. */
+ *  letting the afterglow linger a little deeper stretches that past a fifth of
+ *  the cycle (about four and a half of the twenty minutes), a real golden hour,
+ *  without leaking into deep night: the peak sun elevation is ~0.66, so noon
+ *  still lands exactly on zero. */
 export function duskWarmAmount(sunElev: number): number {
   const above = smoothstep((0.44 - sunElev) / 0.4); // fades in as the sun lowers
   const below = smoothstep((sunElev + 0.3) / 0.26); // fades out as it sinks under
@@ -380,7 +382,8 @@ export function nightSkyDesat(nightAmt: number): number {
 
 /** The synodic month: eight world days per lunar cycle, epoch-anchored like
  *  the day itself, so the moon's shape drifts night to night the way the real
- *  moon's does and every player sees the identical phase. */
+ *  moon's does and every player sees the identical phase. Defined in world
+ *  days on purpose, so it scales with the day period automatically. */
 export const LUNAR_CYCLE_MS = 8 * DAY_NIGHT_CYCLE_MS;
 
 /** Lunar phase in [0, 1): 0 = new moon, 0.25 = first quarter, 0.5 = full,

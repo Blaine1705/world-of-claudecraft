@@ -28,6 +28,9 @@ import {
   HAZE_AERIAL_MAX,
   HAZE_AERIAL_ONSET,
   HAZE_AERIAL_REF,
+  HAZE_FAR_CEIL,
+  HAZE_FAR_ONSET,
+  HAZE_FAR_REF,
   type HazeFieldLayout,
 } from './biome_haze_field_core';
 import { renderLayerDisabled } from './render_dev_flags';
@@ -126,6 +129,61 @@ export function disposeBiomeHazeField(): void {
 
 const glsl = (v: number): string => v.toFixed(6);
 
+/**
+ * Make any built-in lit material (standard or Lambert, instanced or merged)
+ * a haze consumer: props, buildings, and foliage canopies at range must take
+ * the same air the ground under them does, or the effect cancels itself (a
+ * pine keeping full local green over lavender-hazed ground reads as "no fog
+ * at all", which is exactly how the first ship of this field played).
+ *
+ * Chainable and idempotent: it wraps any existing onBeforeCompile (wind,
+ * worn-stone detail, emissive reuse) and attaches once per material. The
+ * field check runs at COMPILE time, so it is safe to attach from module-scope
+ * material factories that run before the renderer builds the field; a tier
+ * that never builds one compiles byte-identically (the cache key carries the
+ * arm). The world position varying replicates project_vertex's instancing
+ * arm, reading `transformed` AFTER any wind displacement.
+ */
+export function attachBiomeHaze(mat: THREE.Material): void {
+  if (renderLayerDisabled('zonehaze')) return;
+  const flagged = mat.userData as { wocZoneHaze?: boolean };
+  if (flagged.wocZoneHaze) return;
+  flagged.wocZoneHaze = true;
+  const prev = mat.onBeforeCompile;
+  const prevSrc = typeof prev === 'function' ? prev.toString() : '';
+  const prevKey =
+    typeof mat.customProgramCacheKey === 'function' ? mat.customProgramCacheKey.bind(mat) : null;
+  mat.onBeforeCompile = (sh, renderer) => {
+    prev?.call(mat, sh, renderer);
+    if (!hasBiomeHazeField()) return;
+    Object.assign(sh.uniforms, biomeHazeUniforms());
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec2 wocHazeVXZ;')
+      .replace(
+        '#include <project_vertex>',
+        `#include <project_vertex>
+        {
+          vec4 wocHazeW = vec4(transformed, 1.0);
+          #ifdef USE_INSTANCING
+            wocHazeW = instanceMatrix * wocHazeW;
+          #endif
+          wocHazeVXZ = (modelMatrix * wocHazeW).xz;
+        }`,
+      );
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        '#include <common>',
+        `#include <common>\nvarying vec2 wocHazeVXZ;${BIOME_HAZE_DECLARATIONS}`,
+      )
+      .replace(
+        '#include <fog_fragment>',
+        `${biomeHazeFragmentGlsl('wocHazeVXZ')}\n\t#include <fog_fragment>`,
+      );
+  };
+  mat.customProgramCacheKey = () =>
+    `woc-zone-haze:${hasBiomeHazeField() ? 1 : 0}|${prevKey ? prevKey() : prevSrc}`;
+}
+
 /** Fragment-stage declarations. Splice into the fragment `<common>` patch. */
 export const BIOME_HAZE_DECLARATIONS = `
 uniform sampler2D uHazeField;
@@ -139,18 +197,21 @@ uniform vec2 uHazeCam;`;
  *
  * Reads the field at the FRAGMENT's position, not the camera's: that is what
  * makes a neighbouring realm look like itself from across a bay. The amount
- * is the Node-tested `aerialHazeAmount` curve, zero derivative at the onset
- * so the ramp never draws a ring, saturating gently so it stays a hint of
- * air rather than a paint-over.
+ * is the Node-tested `aerialHazeAmount` curve (two summed Gaussian-shoulder
+ * terms, both zero-derivative at their onsets so neither draws a ring): the
+ * border-band term that puts a realm's air on it from across the line, and
+ * the far term that fades distance out into the LOCAL area's fog colour.
  */
 export function biomeHazeFragmentGlsl(worldXZ: string): string {
   return `
   {
     vec2 wocHazeXZ = ${worldXZ};
     vec4 wocHaze = texture2D(uHazeField, (wocHazeXZ - uHazeRect.xy) * uHazeRect.zw);
-    float wocHazeT = max(0.0, distance(wocHazeXZ, uHazeCam) - ${glsl(HAZE_AERIAL_ONSET)})
-      / ${glsl(HAZE_AERIAL_REF)};
-    float wocHazeA = ${glsl(HAZE_AERIAL_MAX)} * wocHaze.a * (1.0 - exp(-wocHazeT * wocHazeT));
+    float wocHazeD = distance(wocHazeXZ, uHazeCam);
+    float wocHazeT = max(0.0, wocHazeD - ${glsl(HAZE_AERIAL_ONSET)}) / ${glsl(HAZE_AERIAL_REF)};
+    float wocHazeT2 = max(0.0, wocHazeD - ${glsl(HAZE_FAR_ONSET)}) / ${glsl(HAZE_FAR_REF)};
+    float wocHazeA = wocHaze.a * (${glsl(HAZE_AERIAL_MAX)} * (1.0 - exp(-wocHazeT * wocHazeT))
+      + ${glsl(HAZE_FAR_CEIL - HAZE_AERIAL_MAX)} * (1.0 - exp(-wocHazeT2 * wocHazeT2)));
     gl_FragColor.rgb = mix(gl_FragColor.rgb, wocHaze.rgb * uHazeGrade, wocHazeA);
   }`;
 }

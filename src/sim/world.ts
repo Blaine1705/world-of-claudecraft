@@ -67,7 +67,7 @@ import { wildheartFieldHeight } from './wildheart_field';
 const HILL_SCALE = 0.013;
 const DETAIL_SCALE = 0.05;
 
-export const WATER_LEVEL = -4.5;
+export const WATER_LEVEL = -4.3;
 
 // The ACTIVE water surface height: the custom map's level if one is loaded, else
 // the built-in constant. Cheap (identity-cached content lookup), safe in hot

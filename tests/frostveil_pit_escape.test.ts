@@ -164,13 +164,13 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
     // east shallow at (60, 1630.4) is the tarn's own organic shore wobble,
     // above the waterline before the fix and after it.)
     const bed: [number, number, number][] = [
-      [60, 1640, -7.6],
-      [69.6, 1640, -6.6074798367305],
-      [60, 1630.4, -4.421488179551974],
-      [58, 1634, -6.9929825395840535],
-      [48, 1652, -7.6],
-      [53.4, 1652, -7.597759267257777],
-      [42.6, 1652, -7.401574172538028],
+      [60, 1640, -7.4],
+      [69.6, 1640, -6.41885341413167],
+      [60, 1630.4, -4.236579941196264],
+      [58, 1634, -6.801476616934744],
+      [48, 1652, -7.4],
+      [53.4, 1652, -7.397785868179671],
+      [42.6, 1652, -7.204025313789661],
     ];
     for (const [x, z, h] of bed) {
       expect(terrainHeight(x, z, SEED), `pond bed at (${x}, ${z})`).toBeCloseTo(h, 10);
@@ -198,7 +198,7 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
   it('leaves the Rime Elemental camp ground untouched', () => {
     // the camp center's pre-fix height, pinned to the literal: the ramp is on
     // the far (west) flank and must never reshape the elementals' beach
-    expect(terrainHeight(66, 1622, SEED)).toBeCloseTo(-3.9529135048925803, 10);
+    expect(terrainHeight(66, 1622, SEED)).toBeCloseTo(-3.8278704295586854, 10);
   });
 
   it('never re-sharpens the ramp centerline past the climb gate', () => {

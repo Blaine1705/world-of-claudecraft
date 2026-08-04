@@ -14,6 +14,7 @@
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
+  attachBiomeHaze,
   BIOME_HAZE_DECLARATIONS,
   biomeHazeFieldLayout,
   biomeHazeFragmentGlsl,
@@ -80,19 +81,29 @@ describe('the spliced snippet', () => {
     }
   });
 
-  it('runs the identical ramp aerialHazeAmount pins', () => {
+  it('runs the identical two-term ramp aerialHazeAmount pins', () => {
     const glsl = biomeHazeFragmentGlsl('vFarXZ');
-    const onset = Number(/uHazeCam\) - ([0-9.]+)\)/.exec(glsl)?.[1]);
-    const ref = Number(/\/ ([0-9.]+);/.exec(glsl)?.[1]);
-    const max = Number(/float wocHazeA = ([0-9.]+) \*/.exec(glsl)?.[1]);
-    expect(Number.isFinite(onset)).toBe(true);
-    expect(Number.isFinite(ref)).toBe(true);
-    expect(Number.isFinite(max)).toBe(true);
-    expect(glsl).toContain('(1.0 - exp(-wocHazeT * wocHazeT))');
+    const near = /float wocHazeT = max\(0\.0, wocHazeD - ([0-9.]+)\) \/ ([0-9.]+);/.exec(glsl);
+    const far = /float wocHazeT2 = max\(0\.0, wocHazeD - ([0-9.]+)\) \/ ([0-9.]+);/.exec(glsl);
+    const amps =
+      /wocHaze\.a \* \(([0-9.]+) \* \(1\.0 - exp\(-wocHazeT \* wocHazeT\)\)\s*\+ ([0-9.]+) \* \(1\.0 - exp\(-wocHazeT2 \* wocHazeT2\)\)\)/.exec(
+        glsl,
+      );
+    const onset1 = Number(near?.[1]);
+    const ref1 = Number(near?.[2]);
+    const onset2 = Number(far?.[1]);
+    const ref2 = Number(far?.[2]);
+    const max1 = Number(amps?.[1]);
+    const span2 = Number(amps?.[2]);
+    for (const v of [onset1, ref1, onset2, ref2, max1, span2]) {
+      expect(Number.isFinite(v)).toBe(true);
+    }
     for (const distance of [0, 150, 260, 400, 700, 1200, 3000]) {
       for (const strength of [0.66, 0.83, 1]) {
-        const t = Math.max(0, distance - onset) / ref;
-        const shader = max * strength * (1 - Math.exp(-t * t));
+        const t1 = Math.max(0, distance - onset1) / ref1;
+        const t2 = Math.max(0, distance - onset2) / ref2;
+        const shader =
+          strength * (max1 * (1 - Math.exp(-t1 * t1)) + span2 * (1 - Math.exp(-t2 * t2)));
         expect(shader).toBeCloseTo(aerialHazeAmount(distance, strength), 6);
       }
     }
@@ -201,5 +212,83 @@ describe('shared-by-reference uniforms', () => {
     setBiomeHazeCamera(-40, -186);
     expect(consumer.uHazeGrade.value).toMatchObject({ x: 0.3, y: 0.35, z: 0.6 });
     expect(consumer.uHazeCam.value).toMatchObject({ x: -40, y: -186 });
+  });
+});
+
+describe('attachBiomeHaze (props, buildings, foliage canopies)', () => {
+  type FakeShader = {
+    uniforms: Record<string, unknown>;
+    vertexShader: string;
+    fragmentShader: string;
+  };
+  function fakeShader(): FakeShader {
+    return {
+      uniforms: {},
+      vertexShader: THREE.ShaderLib.physical.vertexShader,
+      fragmentShader: THREE.ShaderLib.physical.fragmentShader,
+    };
+  }
+  function compile(mat: THREE.Material, sh: FakeShader): void {
+    (mat.onBeforeCompile as unknown as (s: FakeShader, r: null) => void)(sh, null);
+  }
+
+  it('is a compile-time no-op without a field, so fogged tiers stay byte-identical', () => {
+    const mat = new THREE.MeshStandardMaterial();
+    attachBiomeHaze(mat);
+    const sh = fakeShader();
+    compile(mat, sh);
+    expect(sh.vertexShader).toBe(THREE.ShaderLib.physical.vertexShader);
+    expect(sh.fragmentShader).toBe(THREE.ShaderLib.physical.fragmentShader);
+    expect(Object.keys(sh.uniforms)).toEqual([]);
+  });
+
+  it('splices the shared snippet and uniforms once the field exists', () => {
+    ensureBiomeHazeField(presetTable());
+    const mat = new THREE.MeshStandardMaterial();
+    attachBiomeHaze(mat);
+    const sh = fakeShader();
+    compile(mat, sh);
+    expect(sh.vertexShader).toContain('wocHazeVXZ');
+    // The instancing arm: an InstancedMesh prop must resolve its own world
+    // position, not the shared model origin.
+    expect(sh.vertexShader).toContain('instanceMatrix * wocHazeW');
+    expect(sh.fragmentShader).toContain('uniform sampler2D uHazeField;');
+    // Same anchor as every other geometry consumer: immediately before fog.
+    expect(sh.fragmentShader.indexOf('wocHazeA')).toBeLessThan(
+      sh.fragmentShader.indexOf('#include <fog_fragment>'),
+    );
+    expect(sh.uniforms.uHazeField).toBe(biomeHazeUniforms().uHazeField);
+  });
+
+  it('chains an existing hook (wind, worn detail) instead of replacing it', () => {
+    ensureBiomeHazeField(presetTable());
+    const mat = new THREE.MeshStandardMaterial();
+    let prevRan = 0;
+    mat.onBeforeCompile = () => {
+      prevRan++;
+    };
+    attachBiomeHaze(mat);
+    compile(mat, fakeShader());
+    expect(prevRan).toBe(1);
+  });
+
+  it('attaches once per material, so a shared surfaceMat cannot double-tint', () => {
+    ensureBiomeHazeField(presetTable());
+    const mat = new THREE.MeshStandardMaterial();
+    attachBiomeHaze(mat);
+    attachBiomeHaze(mat);
+    const sh = fakeShader();
+    compile(mat, sh);
+    expect(sh.fragmentShader.split('vec2 wocHazeXZ').length - 1).toBe(1);
+  });
+
+  it('keys the program cache by arm so on and off tiers never share a program', () => {
+    const mat = new THREE.MeshStandardMaterial();
+    attachBiomeHaze(mat);
+    const keyFor = mat.customProgramCacheKey as unknown as () => string;
+    const off = keyFor.call(mat);
+    ensureBiomeHazeField(presetTable());
+    const on = keyFor.call(mat);
+    expect(off).not.toBe(on);
   });
 });

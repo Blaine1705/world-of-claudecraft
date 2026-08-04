@@ -1,17 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import {
-  emberSites,
+  campfireEmberSites,
+  FIRE_BUILDING_FAMILIES,
   FLORA_CAP_POOL,
   FLORA_CELL,
   FLORA_DENSITY,
   FLORA_TINT,
   type FloraProbes,
+  fireBuildingCamps,
   fireflyBlink,
   fireflyHabitat,
   floraCellChanged,
   floraCellOf,
   type GlowFloraCap,
   glowFloraCaps,
+  uncoveredCampSites,
 } from '../src/render/night_accents_core';
 import { CAMPS, getActiveWorldContent } from '../src/sim/data';
 import { hash2 } from '../src/sim/rng';
@@ -20,45 +23,70 @@ import type { BiomeId } from '../src/sim/types';
 // night_accents_core: the placement math for the map-wide night accents. Pure,
 // so the layout is asserted here rather than eyeballed in a screenshot.
 
-describe('emberSites (a warm pool at every fire and camp)', () => {
+describe('campfireEmberSites (a warm pool at every authored fire)', () => {
   it('gives every authored campfire its own tight pool', () => {
-    const sites = emberSites(
-      [
-        [10, 10],
-        [200, 200],
-      ],
-      [],
-    );
+    const sites = campfireEmberSites([
+      [10, 10],
+      [200, 200],
+    ]);
     expect(sites).toHaveLength(2);
     expect(sites[0]).toMatchObject({ x: 10, z: 10 });
     expect(sites[0].radius).toBeGreaterThan(0);
   });
+});
 
-  it('gives a camp with no fire a WIDER, and therefore fainter, pool', () => {
-    const fire = emberSites([[0, 0]], [])[0];
-    const camp = emberSites([], [{ center: { x: 0, z: 0 } }])[0];
-    expect(camp.radius).toBeGreaterThan(fire.radius);
+describe('fireBuildingCamps (only mobs that would build a fire get one)', () => {
+  const camps = [
+    { mobId: 'bandit', center: { x: 0, z: 0 } },
+    { mobId: 'wolf', center: { x: 10, z: 10 } },
+    { mobId: 'grump', center: { x: 20, z: 20 } },
+    { mobId: 'unknown', center: { x: 30, z: 30 } },
+  ];
+  const familyOf = (mobId: string) =>
+    ({ bandit: 'humanoid' as const, wolf: 'beast' as const, grump: 'ogre' as const })[mobId];
+
+  it('keeps the humanoid families and drops the beasts', () => {
+    const kept = fireBuildingCamps(camps, familyOf);
+    expect(kept.map((c) => c.mobId)).toEqual(['bandit', 'grump']);
   });
 
-  it('does not stack a camp pool on a campfire that already lights it', () => {
+  it('builds nothing for a mob id the table does not know', () => {
+    const kept = fireBuildingCamps([camps[3]], familyOf);
+    expect(kept).toHaveLength(0);
+  });
+
+  it('counts trolls and ogres as fire-builders, spiders and elementals not', () => {
+    expect(FIRE_BUILDING_FAMILIES.has('humanoid')).toBe(true);
+    expect(FIRE_BUILDING_FAMILIES.has('troll')).toBe(true);
+    expect(FIRE_BUILDING_FAMILIES.has('ogre')).toBe(true);
+    expect(FIRE_BUILDING_FAMILIES.has('beast')).toBe(false);
+    expect(FIRE_BUILDING_FAMILIES.has('spider')).toBe(false);
+    expect(FIRE_BUILDING_FAMILIES.has('elemental')).toBe(false);
+  });
+});
+
+describe('uncoveredCampSites (which camps get a fire brazier)', () => {
+  it('skips a camp a campfire already lights', () => {
     // The two tables overlap by design: most camps get a campfire prop, and a
-    // wide camp pool over a bright fire pool is how a camp ends up reading as a
-    // bonfire from across the valley.
-    const sites = emberSites([[100, 100]], [{ center: { x: 104, z: 97 } }]);
-    expect(sites).toHaveLength(1);
-    expect(sites[0]).toMatchObject({ x: 100, z: 100 });
+    // brazier beside a bright fire is how a camp ends up reading as a bonfire
+    // from across the valley.
+    const sites = uncoveredCampSites([[100, 100]], [{ center: { x: 104, z: 97 } }]);
+    expect(sites).toHaveLength(0);
   });
 
-  it('still lights a camp whose nearest fire is far away', () => {
-    const sites = emberSites([[100, 100]], [{ center: { x: 400, z: 400 } }]);
-    expect(sites).toHaveLength(2);
+  it('claims a camp whose nearest fire is far away', () => {
+    const sites = uncoveredCampSites([[100, 100]], [{ center: { x: 400, z: 400 } }]);
+    expect(sites).toEqual([{ x: 400, z: 400 }]);
   });
 
   it('covers the real world map without running away', () => {
     const content = getActiveWorldContent();
-    const sites = emberSites(content.props.campfires, CAMPS);
-    expect(sites.length).toBeGreaterThan(content.props.campfires.length);
-    // one instanced draw per zone: a runaway count here is a perf regression
+    const sites = uncoveredCampSites(content.props.campfires, CAMPS);
+    // some camps are unlit by an authored fire, and every one of those gets a
+    // brazier; a runaway count here is a perf regression (a fixture, a flame
+    // mesh, and a point light per site)
+    expect(sites.length).toBeGreaterThan(0);
+    expect(sites.length).toBeLessThan(CAMPS.length);
     expect(sites.length).toBeLessThan(400);
   });
 });

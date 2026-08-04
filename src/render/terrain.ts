@@ -23,6 +23,12 @@ import {
 } from './biome_haze_field';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
 import { GFX, SUN_DIR, sharedUniforms } from './gfx';
+import {
+  hasNightLightField,
+  NIGHT_LIGHT_DECLARATIONS,
+  nightLightFragmentGlsl,
+  nightLightUniforms,
+} from './night_light_field';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // The terrain relief ladder (GFX.terrainRelief, one source for the tier
@@ -761,6 +767,8 @@ function buildSplatMaterial(
   // Distant-zone atmosphere: resolved once, before compile, so a tier without
   // the field (low, `?zonehaze=off`) keeps the exact shader it always had.
   const zoneHaze = hasBiomeHazeField();
+  // Night lamplight on the ground, same compile-time contract (`?nightlights=off`).
+  const nightLights = hasNightLightField();
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
     roughness: 1.0,
@@ -1491,6 +1499,22 @@ function buildSplatMaterial(
           normal = normalize(normal + mat3(viewMatrix) * wallPerturb * (vSplat.z * wallW * 1.1));
         }`,
       );
+    // Night lamplight (night_light_field.ts): every lamp, camp fire, and
+    // nearby body contributes REAL irradiance inside the material's lighting
+    // resolve (reflectedLight.directDiffuse through the albedo BRDF), the
+    // same path a THREE.PointLight takes, so lamplight multiplies with the
+    // splat's own colour and normals and the tonemapper rolls it off softly.
+    // Downstream of the lighting resolve it is ordinary shaded surface, so
+    // the haze and fog blocks dim it with distance like everything else.
+    if (nightLights) {
+      Object.assign(sh.uniforms, nightLightUniforms());
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', `#include <common>${NIGHT_LIGHT_DECLARATIONS}`)
+        .replace(
+          '#include <lights_fragment_end>',
+          `${nightLightFragmentGlsl('vWPos.xyz')}\n\t#include <lights_fragment_end>`,
+        );
+    }
     // Per-zone aerial perspective (biome_haze_field.ts): the SAME snippet on
     // the SAME uniforms the far vista tiles splice, so the 300 to 700 yard
     // band the detail terrain owns hands off to the far mesh with no ring at
@@ -1584,6 +1608,17 @@ export interface TerrainView {
     opts?: EnsureZoneOptions,
   ): Promise<void>;
   isZoneLoaded(zoneId: string): boolean;
+  /**
+   * Escalate an in-flight idle-paced ensureZone to fast pacing: its yields
+   * switch from browser idle slots to plain macrotasks, so the remaining
+   * chunks stream at build speed instead of idle-slot speed. The use case is
+   * the player ARRIVING in (or a gating caller joining) a zone whose
+   * background prepare is still running: without this the ground under their
+   * feet keeps crawling in at idle pace for tens of seconds. Idempotent;
+   * unknown zone ids are a no-op; a zone never de-escalates (it is about to
+   * finish anyway).
+   */
+  escalateZone(zoneId: string): void;
   /**
    * The chunk lattice this view builds on, plus whether a given cell still owes
    * geometry. The outdoor fog clamp reads ground residency through this narrow
@@ -1866,6 +1901,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   const built = new Set<number>();
   const loadedZones = new Set<string>();
   const pendingZones = new Map<string, Promise<void>>();
+  // Zones whose in-flight idle build has been escalated to fast pacing (the
+  // player arrived, or a gating caller joined the shared task). Checked at
+  // every yield, so an escalation takes effect mid-build.
+  const escalatedZones = new Set<string>();
   // Set by cancelStreaming(): every in-flight ensureZone loop bails at its next
   // yield point without marking its zone loaded, so a discarded view (see
   // renderer rebuildTerrain) stops adding chunks instead of building on a
@@ -1945,9 +1984,19 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       return Promise.resolve();
     }
     const pending = pendingZones.get(zone.id);
-    if (pending) return pending;
+    if (pending) {
+      // A fast caller joining an idle build must not wait at idle pace: a
+      // teleport loading screen once sat behind an already-running background
+      // prepare for its full idle-slot duration.
+      if (opts?.pace !== 'idle') escalatedZones.add(zone.id);
+      return pending;
+    }
     const idlePace = opts?.pace === 'idle';
-    const yieldSlice = idlePace ? yieldIdle : yieldBuild;
+    // Re-checked at every yield rather than captured: escalateZone can flip
+    // an in-flight idle build to fast pacing mid-zone.
+    const yieldSlice = idlePace
+      ? (): Promise<void> => (escalatedZones.has(zone.id) ? yieldBuild() : yieldIdle())
+      : yieldBuild;
     // Gating builds race in batches of four. Idle geometry has its own
     // row/time-sliced builder, preserving one mesh per cell without a blocking
     // 60 yd build or the old four-mesh subdivision workaround.
@@ -2043,6 +2092,9 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
   return {
     group,
     ensureZone,
+    escalateZone: (zoneId: string) => {
+      escalatedZones.add(zoneId);
+    },
     isZoneLoaded: (zoneId: string) => loadedZones.has(zoneId),
     groundResidency: () => residency,
     cancelStreaming(): void {

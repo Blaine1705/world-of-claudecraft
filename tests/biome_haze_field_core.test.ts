@@ -15,8 +15,11 @@ import {
   buildBiomeHazeFieldData,
   HAZE_AERIAL_MAX,
   HAZE_AERIAL_ONSET,
+  HAZE_AERIAL_REF,
   HAZE_DENSITY_CLEAR_FAR,
   HAZE_DENSITY_THICK_FAR,
+  HAZE_FAR_CEIL,
+  HAZE_FAR_ONSET,
   HAZE_FIELD_CELL,
   HAZE_RAIN_STRENGTH_FLOOR,
   HAZE_SNOW_STRENGTH_FLOOR,
@@ -190,25 +193,33 @@ describe('aerial distance ramp', () => {
     expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 30, 1)).toBeLessThan(0.03);
   });
 
-  it('grows monotonically and saturates below the ceiling', () => {
+  it('grows monotonically toward the far ceiling', () => {
     let prev = 0;
-    for (let d = 150; d <= 2000; d += 25) {
+    for (let d = 150; d <= 4000; d += 25) {
       const a = aerialHazeAmount(d, 1);
       expect(a).toBeGreaterThanOrEqual(prev);
-      expect(a).toBeLessThanOrEqual(HAZE_AERIAL_MAX);
+      expect(a).toBeLessThanOrEqual(HAZE_FAR_CEIL);
       prev = a;
     }
-    expect(aerialHazeAmount(1500, 1)).toBeCloseTo(HAZE_AERIAL_MAX, 3);
+    expect(aerialHazeAmount(4000, 1)).toBeCloseTo(HAZE_FAR_CEIL, 3);
   });
 
-  it('caps at half even fully saturated: a little fog, never a paint-over', () => {
+  it('keeps the border band moderate and lets the far term start past it', () => {
+    // The far term must not thicken the 150 to 400 yard border band the near
+    // term was tuned for: it opens only after the near shoulder has saturated.
+    expect(HAZE_AERIAL_MAX).toBeLessThanOrEqual(0.5);
+    expect(HAZE_FAR_ONSET).toBeGreaterThanOrEqual(HAZE_AERIAL_ONSET + 2 * HAZE_AERIAL_REF);
+    expect(aerialHazeAmount(400, 1)).toBeLessThanOrEqual(HAZE_AERIAL_MAX);
+  });
+
+  it('fades distance most of the way out into the local air, never a white-out', () => {
     const clearest = hazeStrengthForFogFar(HAZE_DENSITY_CLEAR_FAR);
     const murkiest = hazeStrengthForFogFar(HAZE_DENSITY_THICK_FAR);
-    expect(HAZE_AERIAL_MAX).toBeLessThanOrEqual(0.5);
-    expect(aerialHazeAmount(4000, clearest)).toBeGreaterThan(0.3);
-    expect(aerialHazeAmount(4000, clearest)).toBeLessThan(0.36);
-    expect(aerialHazeAmount(4000, murkiest)).toBeGreaterThan(0.45);
-    expect(aerialHazeAmount(4000, murkiest)).toBeLessThanOrEqual(0.5);
+    expect(HAZE_FAR_CEIL).toBeLessThanOrEqual(0.9);
+    expect(aerialHazeAmount(4000, clearest)).toBeGreaterThan(0.5);
+    expect(aerialHazeAmount(4000, clearest)).toBeLessThan(0.6);
+    expect(aerialHazeAmount(4000, murkiest)).toBeGreaterThan(0.8);
+    expect(aerialHazeAmount(4000, murkiest)).toBeLessThanOrEqual(HAZE_FAR_CEIL);
   });
 
   it('reads as real fog tint at the BORDER sightline, not only mid-vista', () => {
