@@ -31,7 +31,12 @@ import {
 import { fbm2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
 import { terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
-import { FAR_CELL_PROBES, farCellOvershoot, farVertexClearance } from './far_surface_core';
+import {
+  FAR_CELL_PROBES,
+  farCellOvershoot,
+  farRenderedCellHeight,
+  farVertexClearance,
+} from './far_surface_core';
 import {
   makeShoreProbe,
   SHORE_BAND_HEIGHT,
@@ -189,6 +194,49 @@ export function farVistaPlan(
  *  never widens their workload. */
 export function detailCullFar(detailFar: number, maxOutdoorFar: number): number {
   return Math.min(detailFar, maxOutdoorFar);
+}
+
+/** The capability flags the far-field decision reads (a GFX subset). */
+export interface FarFieldCapabilities {
+  standardMaterials: boolean;
+  leanFoliage: boolean;
+  constrainedMemory: boolean;
+}
+
+export interface FarFieldPolicy {
+  /** bake the atlas and draw sprite impostors (the fogged stage-1 arm too) */
+  sprites: boolean;
+  /** the whole-world fog-free vista; never enabled without sprites */
+  vista: FarVistaPlan;
+}
+
+/**
+ * THE one far-field capability decision: every consumer (the impostor
+ * session, the renderer's vista arm, the water apron, the shortfall
+ * sampler) reads this, never farVistaPlan or the GFX flags directly, so
+ * the sprite and vista arms can never diverge per profile.
+ *
+ * Laws, in force together:
+ * - Sprites require the standard-material pipeline, the full foliage kit,
+ *   and an unconstrained memory ceiling: the lean arm (low tier, weak-iGPU
+ *   medium) and every phone-class memory profile keep the classic fogged
+ *   renderer byte-for-byte and never allocate the atlas.
+ * - The vista requires sprites: a fog-free horizon with no far foliage
+ *   would read as a bare-ground world, so any profile that sheds the atlas
+ *   keeps its fog wall too.
+ */
+export function farFieldPolicy(
+  tier: 'low' | 'medium' | 'high' | 'ultra' | 'insane',
+  caps: FarFieldCapabilities,
+): FarFieldPolicy {
+  const sprites = caps.standardMaterials && !caps.leanFoliage && !caps.constrainedMemory;
+  if (!sprites) {
+    return {
+      sprites: false,
+      vista: { enabled: false, spacing: 0, envelopeFar: 0, cameraFar: CLASSIC_CAMERA_FAR },
+    };
+  }
+  return { sprites: true, vista: farVistaPlan(tier, caps.constrainedMemory) };
 }
 
 export interface FarTile {
@@ -844,6 +892,62 @@ export function farVertexRenderY(x: number, z: number, spacing: number, seed: nu
     if (over > clearance) clearance = over;
   }
   return at(0, 0) - FAR_MESH_DROP - clearance;
+}
+
+/**
+ * How far the coarse far-tile surface sits BELOW a base height at (x, z).
+ * Sprites past the detail envelope ease down by this much so their bases stay
+ * planted on the vista instead of floating over it.
+ *
+ * Reconstructed the way the far mesh is actually TRIANGULATED (the anti-diagonal
+ * split farGridIndices emits) over farVertexRenderY corners, so this reports the
+ * exact surface the tile builder writes: bilinear and the real triangulation
+ * disagree on a saddle, and a saddle is exactly a ridge shoulder where sprites
+ * stand.
+ *
+ * A sampler is a SESSION object: its corner cache is keyed by grid corner
+ * only because seed, spacing and the grid origin are fixed at creation, so
+ * a world rebuild or tier change mints a new sampler and can never reuse
+ * the previous world's surface (the module-level-cache staleness class).
+ */
+export interface FarShortfallSampler {
+  shortfall(x: number, z: number, baseY: number): number;
+}
+
+export function createFarShortfallSampler(
+  seed: number,
+  spacing: number,
+  originX: number,
+  originZ: number,
+): FarShortfallSampler {
+  const corners = new Map<string, number>();
+  const corner = (x: number, z: number): number => {
+    const key = `${x}:${z}`;
+    const cached = corners.get(key);
+    if (cached !== undefined) return cached;
+    const y = farVertexRenderY(x, z, spacing, seed);
+    corners.set(key, y);
+    return y;
+  };
+  return {
+    shortfall(x, z, baseY) {
+      const x0 = originX + Math.floor((x - originX) / spacing) * spacing;
+      const z0 = originZ + Math.floor((z - originZ) / spacing) * spacing;
+      const tx = (x - x0) / spacing;
+      const tz = (z - z0) / spacing;
+      const farY = farRenderedCellHeight(
+        corner(x0, z0),
+        corner(x0 + spacing, z0),
+        corner(x0, z0 + spacing),
+        corner(x0 + spacing, z0 + spacing),
+        tx,
+        tz,
+      );
+      // farVertexRenderY already carries FAR_MESH_DROP and the clearance, so the
+      // surface here is the finished one: no second drop to subtract.
+      return Math.max(0, baseY - farY);
+    },
+  };
 }
 
 export function createFarTileBuilder(tile: FarTile, spacing: number, seed: number): FarTileBuilder {
