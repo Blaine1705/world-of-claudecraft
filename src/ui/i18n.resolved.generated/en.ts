@@ -8801,6 +8801,18 @@ export const en: EnTranslations = {
       "fen_muster_order": {
         "name": "Fenbridge Muster Order"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Mire Prowler Pelt"
       },
@@ -11074,6 +11086,21 @@ export const en: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spider Egg-Sac"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Grave-Silt Bulwark"
       },
@@ -12059,11 +12086,11 @@ export const en: EnTranslations = {
       },
       "q_bones": {
         "title": "The Restless Dead",
-        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Grant them peace, {playerName} - return 8 Restless Bones to the earth.",
+        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Put them down and bring me a skull from each you lay to rest, {playerName}, eight in all, so I may speak the rites over them and grant the peace they were denied.",
         "completion": "May they rest now, and may the Light forgive whatever woke them.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Restless Skulls recovered"
           }
         }
       },
@@ -12242,11 +12269,11 @@ export const en: EnTranslations = {
       },
       "q_deepfen_purge": {
         "title": "Back to the Shallows",
-        "text": "Aldric says those idols are cult-make - which means the mudfins are hauling the marsh's old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.",
+        "text": "Aldric says those idols are cult-make, which means the mudfins are hauling the marsh's old evil up one armful at a time, and it all funnels through their reed-huts on the shallows. I will not have it washing onto my causeway. Take this firebottle, get right up against each hut, and burn the lot. Five should break their dredging for good.",
         "completion": "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
         "objectives": {
           "0": {
-            "label": "Deepfen Snapper slain"
+            "label": "Mudfin huts burned"
           }
         }
       },
@@ -12265,11 +12292,11 @@ export const en: EnTranslations = {
       },
       "q_broodmother": {
         "title": "The Broodmother",
-        "text": "You have seen the webs - now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Burn through 8 more widows and put the old mother down before that clutch opens.",
+        "text": "You have seen the webs, now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Smash 8 of her eggs and put the old mother down before the rest can hatch. Mind the clutch, some eggs will not go quietly.",
         "completion": "Dead? Truly dead? Then the thicket is just trees again. The Light bless your blade, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Mirefen Widow slain"
+            "label": "Broodmother eggs destroyed"
           },
           "1": {
             "label": "The Broodmother slain"
@@ -12298,11 +12325,11 @@ export const en: EnTranslations = {
       },
       "q_no_rest": {
         "title": "No Rest in the Reeds",
-        "text": "The rite on those censers binds the drowned to rise wherever the marsh touches them - and the marsh touches everything. There will be no rest in these reeds until the dead outnumber the living. We cannot unmake the rite yet, but we can empty it of soldiers. Lay 14 more of the Drowned Dead to rest.",
-        "completion": "You give the dead more mercy than their masters ever did. Take this - you have more than earned it.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
+        "completion": "You give the dead more mercy than their masters ever did. Take this, you have more than earned it.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "The Drowned Warlord slain"
           }
         }
       },
@@ -12501,11 +12528,11 @@ export const en: EnTranslations = {
       },
       "q_ogre_bounty": {
         "title": "The Captain's Bounty",
-        "text": "Maren's totems tell me all I need to know: the clans are bought, and my wall is their first errand. I will not wait for them to muster. Fourteen more Thornpeak Ogres, {playerName} - and I will pay bounty on every one.",
+        "text": "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, {playerName}, and Highwatch will pay a captain's bounty.",
         "completion": "Bounty paid in full. The foothills are quieter - now we deal with the ones doing the buying.",
         "objectives": {
           "0": {
-            "label": "Thornpeak Ogre slain"
+            "label": "Brakka the Wallbreaker slain"
           }
         }
       },
@@ -12571,26 +12598,20 @@ export const en: EnTranslations = {
       },
       "q_cult_orders": {
         "title": "Orders from Below",
-        "text": "The zealots move with purpose now - watches set, supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. Kill eight more and bring me four sets of their written orders. I would know the hand that commands them.",
+        "text": "The zealots move with purpose now, watches set and supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. One of them is carrying written orders from below. Find the zealot who has them and bring the orders to me: I would know the hand that commands them.",
         "completion": "This script... I last saw its like in Morthen's grimoire, in Eastbrook. The same hand has guided every grave we have fought over, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
-          },
-          "1": {
-            "label": "Wyrmcult Orders"
+            "label": "Orders from Below"
           }
         }
       },
       "q_necromancers": {
         "title": "The Phylactery Ring",
-        "text": "The orders speak of a \"ring of phylacteries\" - soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Kill eight necromancers and bring me three phylacteries unbroken. I must know what souls they hold.",
+        "text": "The orders speak of a \"ring of phylacteries\", soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.",
         "completion": "Light forgive us. These hold the dead of the Vale and the fen - every corpse the Gravecallers ever raised, harvested. They were never building an army, {playerName}. They were gathering a tithe.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancer slain"
-          },
-          "1": {
             "label": "Ritual Phylactery"
           }
         }
@@ -12607,11 +12628,11 @@ export const en: EnTranslations = {
       },
       "q_revenant_vanguard": {
         "title": "Bones of the Vanguard",
-        "text": "The revenants are forming ranks, {playerName} - true ranks, shield-lines and columns, drilling with no drummer. They are being mustered for the Sanctum gate. Break fourteen more before that march begins, and Highwatch will owe you its best steel.",
+        "text": "The revenants are forming ranks, {playerName}, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.",
         "completion": "The fields lie still again. Take this - it was made for the defenders of the wall, and no one has earned it more.",
         "objectives": {
           "0": {
-            "label": "Boneclad Revenant slain"
+            "label": "Vanguard Bone recovered"
           }
         }
       },
@@ -12637,11 +12658,11 @@ export const en: EnTranslations = {
       },
       "q_voice_below": {
         "title": "The Voice Below",
-        "text": "Last night the whole cult camp knelt at once, {playerName} - every zealot, every necromancer, all facing the Sanctum. Korzul speaks to them in their sleep now; Vael heard the same voice in the fen, and Morthen before him. Cut the congregation down - ten zealots, six necromancers - before that voice has hands enough to pull the gate open itself.",
-        "completion": "The kneeling has stopped. We have not silenced the voice, {playerName} - only thinned its choir. It must be enough.",
+        "text": "Last night the whole cult camp knelt at once, {playerName}, every zealot and necromancer facing the Sanctum, and one throat led the chant. They call him Threnos, the First Voice, and Korzul speaks through his mouth. Vael heard the same voice in the fen, and Morthen before him. Silence Threnos and cut down the six necromancers who keep his choir, before that voice has hands enough to pull the gate open itself.",
+        "completion": "Threnos is silent, and the kneeling has stopped, {playerName}. We have not ended the voice below, only taken from it the mouth that carried it. It must be enough.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
+            "label": "Threnos the First Voice silenced"
           },
           "1": {
             "label": "Wyrmcult Necromancer slain"

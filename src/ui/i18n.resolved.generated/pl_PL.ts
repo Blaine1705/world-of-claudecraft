@@ -8801,6 +8801,18 @@ export const pl_PL: EnTranslations = {
       "fen_muster_order": {
         "name": "Rozkaz zbiórki z Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Futro bagiennego czyhacza"
       },
@@ -11074,6 +11086,21 @@ export const pl_PL: EnTranslations = {
       "spider_egg_sac": {
         "name": "Pajęczy Kokon Jaj"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Bastion Grobowego Mułu"
       },
@@ -12298,7 +12325,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Brak spoczynku w szuwarach",
-        "text": "Obrzęd na tych kadzielnicach sprawia, że utopieni powstają wszędzie tam, gdzie sięga ich bagno - a bagno sięga wszędzie. Nie będzie spoczynku w tych szuwarach, póki zmarli nie przewyższą liczebnie żywych. Nie potrafimy jeszcze cofnąć obrzędu, ale możemy pozbawić go żołnierzy. Ułóż do spoczynku 14 kolejnych Utopionych Zmarłych.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Okazujesz zmarłym więcej litości, niż kiedykolwiek ich panowie. Weź to - z nawiązką na to zasłużyłeś.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Zabity zelota Kultu Żmija"
-          },
-          "1": {
-            "label": "Rozkazy Kultu Żmija"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nekromanta Kultu Żmija pokonany"
-          },
-          "1": {
-            "label": "Rytualne filakterium"
           }
         }
       },

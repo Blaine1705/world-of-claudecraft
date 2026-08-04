@@ -293,7 +293,10 @@ describe('the Thornpeak corridor is one dense cluster ON PURPOSE', () => {
     );
     expect(merged).toHaveLength(1);
     // Pinned so a future camp addition to this corridor is a visible decision.
-    expect(merged[0].mobCount).toBe(63);
+    // 63 -> 64: the quest-dedupe pass placed Brakka the Wallbreaker (a single
+    // slow-respawn quest capstone elite) at the ogre foothills inside this
+    // corridor.
+    expect(merged[0].mobCount).toBe(64);
   });
 
   it('bounds that cluster by YIELD instead, since density here is the layout', () => {
@@ -404,12 +407,29 @@ describe('the density model covers the shipped world', () => {
       .filter((t) => t.xpMult === 0)
       .map((t) => t.id)
       .sort();
-    expect(noXp).toEqual(['dragonkin_egg', 'spider_egg_sac', 'vale_cup_ball', 'yumi_cat']);
-    // Only the egg is camp-spawned at all: the sac is placed by delve room logic
-    // and the ball and the cat are battleground objectives, so no camp cluster
-    // can ever hold them and the density model never sees them.
+    expect(noXp).toEqual([
+      'dragonkin_egg',
+      'spider_egg',
+      'spider_egg_sac',
+      'vale_cup_ball',
+      'yumi_cat',
+    ]);
+    // Two are camp-spawned: the sac is placed by delve room logic and the ball
+    // and the cat are battleground objectives, so no camp cluster can ever hold
+    // those three and the density model never sees them.
+    //
+    // spider_egg is the second, and it is deliberately NOT added to the
+    // dense-by-design exemption: the Broodmother clutch sits in ordinary Widow
+    // Thicket camps that the count caps still govern (the caps passed with it,
+    // which is the point of leaving it capped), whereas DENSE_BY_DESIGN_SHELL is
+    // granted only to the 240 yd Drakemaw brood belt the block below pins by
+    // composition. A no-XP template being camp-spawned does not earn the
+    // exemption; being an uncappable belt does.
     const campIds = [...new Set(CAMPS.map((c) => c.mobId))];
-    expect(campIds.filter((id) => noXp.includes(id)).sort()).toEqual([DENSE_BY_DESIGN_SHELL]);
+    expect(campIds.filter((id) => noXp.includes(id)).sort()).toEqual([
+      DENSE_BY_DESIGN_SHELL,
+      'spider_egg',
+    ]);
     // The hatching-shell mechanic is one template today, pinned so a second
     // clutch family lands as a decision here and cannot widen the belt exemption
     // by arriving quietly.

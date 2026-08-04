@@ -6517,7 +6517,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Tohle písmo... podobné jsem naposledy viděl v Morthenově grimoáru v Eastbrooku. Stejná ruka vedla každý hrob, o který jsme bojovali, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Fanatik kultu draka zabit',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Rozkazy kultu draka',
   'entities.quests.q_cult_orders.text':
     'Fanatici se teď pohybují cíleně, staví hlídky, počítají zásoby, jako vojáci před obléháním. Kultisté, kteří se organizují, jsou kultisté s rozkazy, {playerName}. Zabij dalších osm a přines mi čtyři sady jejich psaných rozkazů. Chci znát ruku, která jim velí.',
   'entities.quests.q_cult_orders.title': 'Rozkazy zdola',
@@ -6691,15 +6690,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Světlo nám odpusť. Tohle drží mrtvé údolí i močálu, každou mrtvolu, kterou kdy Hrobovolající vztyčili, sklizenou. Nikdy nebudovali armádu, {playerName}. Shromažďovali desátek.',
   'entities.quests.q_necromancers.objectives.0.label': 'Nekromant kultu draka zabit',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rituální fylakterie',
   'entities.quests.q_necromancers.text':
     'Rozkazy mluví o "kruhu fylakterií", nádobách duší, {playerName}, rozmístěných kolem svatyně, aby ji krmily. Nekromanti kultu je nosí jako svaté relikvie. Zabij osm nekromantů a přines mi tři neporušené fylakterie. Musím vědět, čí duše drží.',
   'entities.quests.q_necromancers.title': 'Kruh fylakterií',
   'entities.quests.q_no_rest.completion':
     'Dáváš mrtvým víc milosti, než jim kdy dali jejich páni. Vezmi si tohle, víc než sis to zasloužil.',
   'entities.quests.q_no_rest.objectives.0.label': 'Utopený mrtvý uložen ke klidu',
-  'entities.quests.q_no_rest.text':
-    'Rituál na těch kadidelnicích váže utopené, aby povstali všude, kam dosáhne močál, a močál dosáhne všude. V tomhle rákosí nebude klid, dokud mrtví nepřevýší živé. Rituál zatím zrušit neumíme, ale můžeme ho zbavit vojáků. Ulož k odpočinku dalších 14 utopených mrtvých.',
   'entities.quests.q_no_rest.title': 'Bez odpočinku v rákosí',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'Ty tři relikvie vyprávějí stejný příběh: Aldren bojoval, aby bránil svého krále, Malric prolomil hranici smrti a Voss se pokusil zastavit, co následovalo. Pečeť slábne a tenhle pečetní prsten je klíčem k Nythraxisově hrobce. Teď jsi naladěn ke vstupu do Krypty Nythraxis. Vrať se do opuštěné krypty, odemkni královské dveře a postav se Nythraxisovi dřív, než hněv starého krále přeteče za Thornpeak.',

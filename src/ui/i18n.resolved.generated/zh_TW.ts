@@ -8801,6 +8801,18 @@ export const zh_TW: EnTranslations = {
       "fen_muster_order": {
         "name": "芬橋集結令"
       },
+      "firebottle": {
+        "name": "火油瓶"
+      },
+      "murloc_hut": {
+        "name": "泥鰭茅屋"
+      },
+      "restless_skull": {
+        "name": "不寧顱骨"
+      },
+      "vanguard_bone": {
+        "name": "先鋒之骨"
+      },
       "mire_prowler_pelt": {
         "name": "泥沼潛伏者毛皮"
       },
@@ -11074,6 +11086,21 @@ export const zh_TW: EnTranslations = {
       "spider_egg_sac": {
         "name": "蜘蛛卵囊"
       },
+      "spider_egg": {
+        "name": "蛛母之卵"
+      },
+      "widow_hatchling": {
+        "name": "寡婦蛛幼體"
+      },
+      "drowned_warlord": {
+        "name": "溺亡督軍"
+      },
+      "brakka_wallbreaker": {
+        "name": "破牆者布拉卡"
+      },
+      "threnos_first_voice": {
+        "name": "初聲瑟雷諾斯"
+      },
       "grave_silt_bulwark": {
         "name": "墓淤壁壘"
       },
@@ -12298,7 +12325,7 @@ export const zh_TW: EnTranslations = {
       },
       "q_no_rest": {
         "title": "蘆葦中不得安息",
-        "text": "香爐上的儀式會讓溺亡者在濕地觸及之處復起。我們還無法破除它，只能先少給敵人14名士兵。",
+        "text": "香爐上的儀式會讓溺亡者復起，如今它已喚起一個強大到足以統領他們的存在。守望者稱他為溺亡督軍，只要他還占據沉沒的禮拜堂，死者便陣列不散。打倒他，{playerName}，其餘的自會潰散回泥沼。",
         "completion": "你給了死者比他們主人更多的憐憫。拿著，你早已應得。",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "擊敗龍教狂熱者"
-          },
-          "1": {
-            "label": "龍教命令"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "擊敗龍教死靈法師"
-          },
-          "1": {
-            "label": "儀式護命匣"
           }
         }
       },

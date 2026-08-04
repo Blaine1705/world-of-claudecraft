@@ -125,6 +125,11 @@ const baseEnTable = {
   'error.wrongEquipSlot': 'That does not go in that slot.',
   'error.faceWater': 'You need to face fishable water.',
   'error.potionNotReady': 'That potion is not ready yet.',
+  // Firebottle hut burns (src/sim/interactions/firebottle_hut.ts REASON_MESSAGE).
+  'error.firebottleNeeded': 'You need a firebottle to torch that.',
+  'error.firebottleNotReady': 'Your firebottle is not ready yet.',
+  'error.firebottleTooFar': 'Get right up against a hut to torch it.',
+  'error.hutStillBurning': 'This hut is still burning.',
   'error.fullHealth': 'You are already at full health.',
   'error.nothingRestore': 'Nothing to restore.',
   'error.nothingToConsume': 'Nothing to consume.',
@@ -228,6 +233,11 @@ const baseEnTable = {
   'groundPickup.graveVossEnough':
     "You have already taken what Royal Assassin Voss's grave will give.",
   'groundPickup.cryptRitualCircleEnough': 'The circle has nothing more to give you.',
+  // Murloc huts (q_deepfen_purge): the pickup deny arm is defensive (hut clicks
+  // route to the firebottle handler first), but the lines exist per the
+  // every-object-has-lines rule and localize like the rest.
+  'groundPickup.murlocHutDeny': 'You have no reason to torch that.',
+  'groundPickup.murlocHutEnough': 'These huts are already smouldering.',
   // The Veiled Hollow pickup surfaces (sealstone puzzle + the three memory
   // monuments): dems added these to GROUND_PICKUP_LINES; their EXACT matcher
   // entries land here so the client re-localizes the sim-emitted lines.
@@ -344,6 +354,9 @@ const baseEnTable = {
   // Per-member ready-check follow-up lines (social/ready_check.ts finalizeReadyCheck).
   'log.readyCheckNotReady': '{name} is not ready.',
   'log.readyCheckNoResponse': '{name} did not respond to the ready check.',
+  // Talking to a quest giver re-grants a lost required item (a deleted firebottle
+  // for q_deepfen_purge); placeholder-free, so it registers in the EXACT matcher.
+  'log.questItemRecovered': 'You recover a quest item you were missing.',
   'loot.rollWin': '{winner} wins {item} ({roll})',
   'loot.rollWinnerOffline': '{winner} was offline; {item} returned to the corpse.',
   'loot.rollNeed': 'Need Roll - {roll} for {item} by {name}',

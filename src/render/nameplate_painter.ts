@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
+import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   npcQuestMarkerKind,
   type QuestMarkerKind,
@@ -178,6 +179,12 @@ export class NameplatePainter {
     for (const [id, view] of this.views) {
       const entity = world.entities.get(id);
       if (!entity) continue;
+      // Quest-gated mobs (Broodmother eggs): no nameplate or hp bar for players not
+      // on the gating quest, so the clutch reads as inert scenery until you have it.
+      // The canvas pass draws only what it reaches, so skipping the entity is the
+      // whole hide (the removed DOM-era hideNameplate had to clear styles instead).
+      if (isQuestGatedEntityHidden(entity, world.questLog)) continue;
+      // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,
         entity,

@@ -3421,6 +3421,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': 'Глубинный щелкун',
   'entities.mobs.mire_widow.name': 'Мирефенская вдова',
   'entities.mobs.mirefen_broodmother.name': 'Матка выводка',
+  'entities.mobs.spider_egg.name': 'Яйцо Матки выводка',
+  'entities.mobs.widow_hatchling.name': 'Детеныш вдовы',
+  'entities.mobs.drowned_warlord.name': 'Утопший военачальник',
+  'entities.mobs.brakka_wallbreaker.name': 'Бракка Стенолом',
+  'entities.mobs.threnos_first_voice.name': 'Тренос Первый Голос',
+  'entities.items.firebottle.name': 'Зажигательная бутыль',
+  'entities.items.murloc_hut.name': 'Хижина илогривов',
+  'entities.items.restless_skull.name': 'Беспокойный череп',
+  'entities.items.vanguard_bone.name': 'Кость авангарда',
   'entities.mobs.drowned_dead.name': 'Утопший мертвец',
   'entities.mobs.fen_troll.name': 'Мирефенский тролль',
   'entities.mobs.grubjaw.name': 'Грубджо Обжора',
@@ -3794,7 +3803,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': 'Ржавое кадило',
   'entities.quests.q_no_rest.title': 'Нет покоя в камышах',
   'entities.quests.q_no_rest.text':
-    'Этот обряд поднимает утопших всюду, где топь их коснется. Мы еще не можем разрушить его, но можем лишить хозяев 14 солдат.',
+    'Этот обряд на курильницах поднимает утопших, а теперь он поднял того, кто способен их возглавить. Смотрители зовут его Утопшим военачальником, и, пока он держит Затонувшую часовню, мертвецы не покидают строя. Сразите его, {playerName}, и остальные разбегутся обратно в топь.',
   'entities.quests.q_no_rest.completion':
     'Вы дали мертвым больше милости, чем их господа. Возьмите это.',
   'entities.quests.q_no_rest.objectives.0.label': 'Утопший мертвец: упокоено',
@@ -3958,14 +3967,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Этот почерк я видел в гримуаре Мортена. Одна рука вела каждую могилу, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Фанатик Культа Вирма: убито',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Приказы Культа Вирма',
   'entities.quests.q_necromancers.title': 'Кольцо филактерий',
   'entities.quests.q_necromancers.text':
     'В приказах сказано о кольце филактерий, сосудах душ, {playerName}, вокруг святилища. Убейте 8 некромантов и принесите 3 целыми.',
   'entities.quests.q_necromancers.completion':
     'Свет, прости нас. В них мертвые долины и топи. Это была не армия, {playerName}. Это была десятина.',
   'entities.quests.q_necromancers.objectives.0.label': 'Некромант Культа Вирма: убито',
-  'entities.quests.q_necromancers.objectives.1.label': 'Ритуальная филактерия',
   'entities.quests.q_revenants.title': 'Поля ревенантов',
   'entities.quests.q_revenants.text':
     'К востоку от дороги старое поле боя. Культ поднял кости в ржавых латах. Верните 12 в землю, {playerName}.',

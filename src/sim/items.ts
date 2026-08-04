@@ -30,6 +30,7 @@ import {
   weaponHand,
 } from './equipment_rules';
 import { formatMoney } from './format_money';
+import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { canStackInstancePayloads, itemInstancePayloadsEqual } from './item_instance_merge';
 import { meetsLevelRequirement, requiredLevelFor } from './item_level_req';
@@ -593,6 +594,10 @@ export function useItem(ctx: SimContext, itemId: string, pid?: number): ItemUseR
     return;
   }
   if (p.dead) return;
+  if (def.use?.type === 'throw') {
+    throwFirebottleAtNearestHut(ctx, p, meta);
+    return;
+  }
   if (def.kind === 'food' || def.kind === 'drink') {
     if (p.inCombat) {
       ctx.error(meta.entityId, "You can't do that while in combat.");

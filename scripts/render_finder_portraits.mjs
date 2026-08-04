@@ -48,14 +48,22 @@ const bundled = await esbuild.build({
   // import.meta to an EMPTY OBJECT in an IIFE and the page TypeErrors at boot,
   // which surfaces only as a __ready timeout. Same fix as
   // scripts/wiki/render_model_stills.mjs, whose guard comment carries the detail.
+  // This is the union of both sides of the merge: the release added the five
+  // runtime/client-origin fields, and this branch's art-pipeline unblock added
+  // BASE_URL plus the discord/reown/turnstile/wallet fields the same graph reads.
   define: {
     'import.meta.env.DEV': 'true',
     'import.meta.env.PROD': 'false',
-    'import.meta.env.VITE_NATIVE_APP': "''",
-    'import.meta.env.VITE_API_ORIGIN': "''",
-    'import.meta.env.VITE_DESKTOP_APP': "''",
-    'import.meta.env.VITE_DESKTOP_API_ORIGIN': "''",
-    'import.meta.env.VITE_DESKTOP_RELATIVE_API': "''",
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.VITE_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',
+    'import.meta.env.VITE_DESKTOP_APP': '""',
+    'import.meta.env.VITE_DESKTOP_RELATIVE_API': '""',
+    'import.meta.env.VITE_DISCORD_DISABLED': '""',
+    'import.meta.env.VITE_NATIVE_APP': '""',
+    'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
+    'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
+    'import.meta.env.VITE_WALLET_DISABLED': '""',
   },
   write: false,
   logLevel: 'silent',

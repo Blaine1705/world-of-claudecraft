@@ -8801,6 +8801,18 @@ export const cs_CZ: EnTranslations = {
       "fen_muster_order": {
         "name": "Fenbridgeský svolávací rozkaz"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Kožešina slatinného plížence"
       },
@@ -11074,6 +11086,21 @@ export const cs_CZ: EnTranslations = {
       "spider_egg_sac": {
         "name": "Pavoučí váček vajec"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Hradba z hrobového bahna"
       },
@@ -12298,7 +12325,7 @@ export const cs_CZ: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Bez odpočinku v rákosí",
-        "text": "Rituál na těch kadidelnicích váže utopené, aby povstali všude, kam dosáhne močál, a močál dosáhne všude. V tomhle rákosí nebude klid, dokud mrtví nepřevýší živé. Rituál zatím zrušit neumíme, ale můžeme ho zbavit vojáků. Ulož k odpočinku dalších 14 utopených mrtvých.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Dáváš mrtvým víc milosti, než jim kdy dali jejich páni. Vezmi si tohle, víc než sis to zasloužil.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanatik kultu draka zabit"
-          },
-          "1": {
-            "label": "Rozkazy kultu draka"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nekromant kultu draka zabit"
-          },
-          "1": {
-            "label": "Rituální fylakterie"
           }
         }
       },

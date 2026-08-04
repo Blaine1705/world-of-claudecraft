@@ -8801,6 +8801,18 @@ export const nl_NL: EnTranslations = {
       "fen_muster_order": {
         "name": "Veenbrug-Mobilisatiebevel"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Slijksluiper-Vacht"
       },
@@ -11074,6 +11086,21 @@ export const nl_NL: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spinnen-Eierzak"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Grafslib-Bolwerk"
       },
@@ -12298,7 +12325,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Geen Rust in het Riet",
-        "text": "Het ritueel op die wierookvaten bindt de verdronkenen om op te staan waar het moeras hen ook raakt - en het moeras raakt alles. Er zal geen rust zijn in dit riet tot de doden de levenden overtreffen. We kunnen het ritueel nog niet ongedaan maken, maar we kunnen het van soldaten ontdoen. Leg nog 14 van de Verdronken Doden ter ruste.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Je geeft de doden meer genade dan hun meesters ooit deden. Neem dit aan - je hebt het meer dan verdiend.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wurmsekte-Dweper gedood"
-          },
-          "1": {
-            "label": "Wurmsekte-Bevelen"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wurmsekte-Necromancer gedood"
-          },
-          "1": {
-            "label": "Rituele Phylacterie"
           }
         }
       },

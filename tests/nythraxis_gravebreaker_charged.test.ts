@@ -155,7 +155,10 @@ describe('Nythraxis Gravebreaker as a charged auto-attack', () => {
     // No seed hunt: nothing below rides the tank's hit-table luck. The release
     // schedule is asserted against the ARM beat plus the swings this run
     // actually landed, so any seed satisfies it (verified over seeds 1 to 16
-    // and 42 on both v0.34.0 merge parents and on the merge).
+    // and 42 on both v0.34.0 merge parents and on the merge). This supersedes
+    // the hunted seed this branch carried: a seed-independent assertion needs no
+    // re-hunt when a content merge shifts the shared rng stream, which is
+    // exactly what kept re-breaking it.
     const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);

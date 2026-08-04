@@ -3975,7 +3975,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Denna skrift... jag såg senast något liknande i Morthens grimoar, i Östbäck. Samma hand har styrt varje grav vi har stridit om, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Lindormskultsivrare dräpt',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Lindormskultens order',
   'entities.quests.q_cult_orders.text':
     'Ivrarna rör sig med syfte nu - vakter utsatta, förråd räknade, som soldater inför en belägring. Kultister som organiserar sig är kultister som tar order, {playerName}. Döda åtta till och hämta mig fyra uppsättningar av deras skrivna order. Jag vill känna handen som befaller dem.',
   'entities.quests.q_cult_orders.title': 'Order nedifrån',
@@ -4150,15 +4149,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Ljuset förlåte oss. Dessa rymmer dalens och kärrets döda - varje lik Gravkallarna någonsin reste, skördat. De byggde aldrig en armé, {playerName}. De samlade in en tionde.',
   'entities.quests.q_necromancers.objectives.0.label': 'Lindormssektens nekromant dräpt',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rituellt fylakterium',
   'entities.quests.q_necromancers.text':
     'Orderna talar om en "ring av fylakterier" - själsbehållare, {playerName}, utplacerade runt helgedomen för att nära den. Sektens nekromanter bär dem som heliga reliker. Döda åtta nekromanter och hämta tre oskadda fylakterier åt mig. Jag måste veta vilka själar de rymmer.',
   'entities.quests.q_necromancers.title': 'Fylakteriernas ring',
   'entities.quests.q_no_rest.completion':
     'Du ger de döda mer nåd än deras mästare någonsin gjorde. Ta detta - du har mer än förtjänat det.',
   'entities.quests.q_no_rest.objectives.0.label': 'Dränkt död lagd till ro',
-  'entities.quests.q_no_rest.text':
-    'Riten på de där rökelsekaren binder de dränkta att resa sig var än kärret rör vid dem - och kärret rör vid allt. Det finns ingen ro i dessa vassar förrän de döda är fler än de levande. Vi kan inte upphäva riten ännu, men vi kan tömma den på soldater. Lägg ytterligare 14 av de dränkta döda till ro.',
   'entities.quests.q_no_rest.title': 'Ingen ro i vassen',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'De tre relikerna berättar samma historia: Aldren stred för att försvara sin kung, Malric bröt dödens gräns, och Voss försökte stoppa det som följde. Sigillet försvagas, och denna signetring är nyckeln till Nythraxis grav. Du är nu invigd att träda in i Nythraxis krypta. Återvänd till den övergivna kryptan, lås upp den kungliga dörren, och möt Nythraxis innan den gamle kungens vrede svämmar bortom Törntopp.',

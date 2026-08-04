@@ -3972,7 +3972,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Denne skrift... jeg så sidst dens lige i Morthens grimoire, i Østbæk. Den samme hånd har styret hver eneste grav, vi har kæmpet om, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Ormekult-Zelot dræbt',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Ormekult-Ordrer',
   'entities.quests.q_cult_orders.text':
     'Zeloterne bevæger sig med formål nu - vagter sat, forsyninger talt, som soldater før en belejring. Kultister, der organiserer sig, er kultister, der tager imod ordrer, {playerName}. Dræb otte til, og bring mig fire sæt af deres skrevne ordrer. Jeg vil kende den hånd, der befaler dem.',
   'entities.quests.q_cult_orders.title': 'Ordrer fra Det Dybe',
@@ -4148,15 +4147,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Lyset tilgive os. Disse rummer de døde fra Dalen og sumpen - hvert lig Gravkalderne nogensinde rejste, høstet. De byggede aldrig en hær, {playerName}. De indsamlede en tiende.',
   'entities.quests.q_necromancers.objectives.0.label': 'Ormekult-Nekromantiker dræbt',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rituelt Fylakterie',
   'entities.quests.q_necromancers.text':
     'Ordrerne taler om en "ring af fylakterier" - sjælebeholdere, {playerName}, sat omkring Helligdommen for at nære den. Kultens nekromantikere bærer dem som hellige relikvier. Dræb otte nekromantikere og bring mig tre fylakterier ubrudte. Jeg må vide, hvilke sjæle de rummer.',
   'entities.quests.q_necromancers.title': 'Fylakterieringen',
   'entities.quests.q_no_rest.completion':
     'Du giver de døde mere nåde, end deres mestre nogensinde gjorde. Tag dette - du har mere end fortjent det.',
   'entities.quests.q_no_rest.objectives.0.label': 'Druknede Døde stedt til hvile',
-  'entities.quests.q_no_rest.text':
-    'Riten på de røgelseskar binder de druknede til at rejse sig, hvor end sumpen rører dem - og sumpen rører alt. Der bliver ingen hvile i disse siv, før de døde er flere end de levende. Vi kan ikke ophæve riten endnu, men vi kan tømme den for soldater. Sted 14 flere af de Druknede Døde til hvile.',
   'entities.quests.q_no_rest.title': 'Ingen Hvile i Sivene',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     "De tre relikvier fortæller den samme historie: Aldren kæmpede for at forsvare sin konge, Malric brød dødens grænse, og Voss forsøgte at standse, hvad der fulgte. Seglet svækkes, og denne signetring er nøglen til Nythraxis' grav. Du er nu indviet til at træde ind i Nythraxis' Krypt. Vend tilbage til den forladte krypt, lås den kongelige dør op, og mød Nythraxis, før den gamle konges raseri vælder ud over Tornetop.",

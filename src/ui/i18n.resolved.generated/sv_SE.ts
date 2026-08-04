@@ -8801,6 +8801,18 @@ export const sv_SE: EnTranslations = {
       "fen_muster_order": {
         "name": "Kärrbros mönstringsorder"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Kärrstrykarpäls"
       },
@@ -11074,6 +11086,21 @@ export const sv_SE: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spindeläggsäck"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Gravslamsbålverk"
       },
@@ -12298,7 +12325,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Ingen ro i vassen",
-        "text": "Riten på de där rökelsekaren binder de dränkta att resa sig var än kärret rör vid dem - och kärret rör vid allt. Det finns ingen ro i dessa vassar förrän de döda är fler än de levande. Vi kan inte upphäva riten ännu, men vi kan tömma den på soldater. Lägg ytterligare 14 av de dränkta döda till ro.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Du ger de döda mer nåd än deras mästare någonsin gjorde. Ta detta - du har mer än förtjänat det.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lindormskultsivrare dräpt"
-          },
-          "1": {
-            "label": "Lindormskultens order"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const sv_SE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lindormssektens nekromant dräpt"
-          },
-          "1": {
-            "label": "Rituellt fylakterium"
           }
         }
       },

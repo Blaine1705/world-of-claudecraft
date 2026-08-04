@@ -8801,6 +8801,18 @@ export const da_DK: EnTranslations = {
       "fen_muster_order": {
         "name": "Kærbro Mønstringsordre"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Sumplusker-Pels"
       },
@@ -11074,6 +11086,21 @@ export const da_DK: EnTranslations = {
       "spider_egg_sac": {
         "name": "Edderkoppe-Ægsæk"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Gravdynd-Bolværk"
       },
@@ -12298,7 +12325,7 @@ export const da_DK: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Ingen Hvile i Sivene",
-        "text": "Riten på de røgelseskar binder de druknede til at rejse sig, hvor end sumpen rører dem - og sumpen rører alt. Der bliver ingen hvile i disse siv, før de døde er flere end de levende. Vi kan ikke ophæve riten endnu, men vi kan tømme den for soldater. Sted 14 flere af de Druknede Døde til hvile.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Du giver de døde mere nåde, end deres mestre nogensinde gjorde. Tag dette - du har mere end fortjent det.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ormekult-Zelot dræbt"
-          },
-          "1": {
-            "label": "Ormekult-Ordrer"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ormekult-Nekromantiker dræbt"
-          },
-          "1": {
-            "label": "Rituelt Fylakterie"
           }
         }
       },

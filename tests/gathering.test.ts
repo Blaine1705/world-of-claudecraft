@@ -264,17 +264,19 @@ describe('isHarvestableCorpse', () => {
     // 36 since the farm-economy pass: beast, spider and reptile trash pays in
     // harvestable components instead of coin, so 15 previously untagged
     // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
-    // 39 with the Drakelands dragonkin brood: the broodguard, the whelp and the
-    // broodlord are skinnable scaled hide like every other dragonkin corpse
-    // (the egg clutch is NOT: a 1 HP shell yields nothing at all).
-    expect(included).toHaveLength(39);
-    // ...and the untagged templates are counted rather than assumed: 185 of them
+    // 40: 36 before either side of this merge, then 39 with the Drakelands
+    // dragonkin brood (the broodguard, the whelp and the broodlord are skinnable
+    // scaled hide like every other dragonkin corpse; the egg clutch is NOT, a
+    // 1 HP shell yields nothing at all), then 40 with this branch's quest-dedupe
+    // pass, whose threnos_first_voice ships a mapped cloth tag.
+    expect(included).toHaveLength(40);
+    // ...and the untagged templates are counted rather than assumed: 189 of them
     // ship, all excluded before this change and all excluded after it, which is
     // the path fen_troll now joins instead of getting one of its own. (184 before
-    // the brood: its three tagged corpses are counted above, and the untagged
-    // dragonkin egg lands here.)
+    // this merge, plus the untagged dragonkin egg from the brood and the four
+    // untagged camp mobs the quest-dedupe pass added.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(185);
+    expect(untagged).toHaveLength(189);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

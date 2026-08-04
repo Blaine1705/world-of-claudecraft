@@ -614,21 +614,24 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
   POLISH_ROOT,
   'metadata/after-desktop-ultra.json',
 );
-// Re-pinned after stacking this branch's renderer provenance move (the brood
-// shout/flourish and attackByAbility wiring, then gating that cue on a mob
-// source) onto a release/v0.34.0 that already carries PR #2720's Eastbrook
-// fence-removal layout evidence, the Bear Form quadruped rig, the live graphics
-// rebuild, the far-field work (sprite impostors, the fog-free vista, and the
-// horizon pass, PR #2793), and the Blizzard timed ground loop on the snowZone
-// spellfx arm (PR #2861). Both sides move the same rendererIntegration leaf, so
-// the merged tree mints literals matching neither parent. The release retook the
-// polish captures and this branch adopts them verbatim: the accepted file still
-// points at the same captured view, and only its swept provenance bytes follow
-// the merged rendererIntegration and layout inputs.
+// Re-pinned for the merge of release/v0.34.0 into this branch. Every
+// rendererIntegration move on both sides now stacks on src/render/renderer.ts:
+// from the release, PR #2720's Eastbrook fence-removal layout evidence, the live
+// graphics rebuild (context recycle plus profile-aware Eastbrook runtime inputs,
+// PR #2799), the Bear Form quadruped rig (PR #2842), the far-field sprite
+// impostors, fog-free vista and horizon pass (PR #2793), the Blizzard timed
+// ground loop on the snowZone spellfx arm (PR #2861), and the brood
+// shout/flourish and attackByAbility wiring; from this branch, the
+// worldObjectBurning fire-burst cue. Both sides move the same leaf, so the merged
+// tree mints literals matching neither parent. The release retook the polish
+// captures and this branch adopts them verbatim: the accepted file still points
+// at the same captured view, and only its swept provenance bytes follow the
+// merged rendererIntegration and layout inputs.
+// Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'd38d3c57c0b2996c05b0c88b936e8482a289a3f53f84f4c2081abc616ce6b4d3';
+  '9c23de6ea957bf325f7ed50fc37ec3631d898c7c8701e3cdffb6400d20b8de43';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e2cdf273f5a5d64997d6b68647e20a0feaffb12e653671ab9108879ed1ff9de6';
+  '6b02ff15264e961e2a91ecfecc67f547382c77d76dcce9cedf6218405b94c71d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1485,18 +1488,19 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(acceptedFiles).toHaveLength(4);
     // Second-order seal, recomputed LAST in the re-mint recipe: it hashes the
     // performance evidence files, which carry the composite polish provenance.
-    // It therefore follows the first-order composite, so the base sync moves it
-    // for the same reason: this branch's renderer provenance move (the brood
-    // shout/flourish and attackByAbility wiring) stacked onto a base carrying
-    // PR #2720's fence-removal content change, the Bear Form quadruped rig, the
-    // live graphics rebuild, the far-field work (PR #2793), and the Blizzard
-    // timed ground loop (PR #2861), recomputed last by
-    // remint_polish_provenance.mjs. The release retook the polish captures, so
+    // It therefore follows the first-order composite, so this merge moves it for
+    // the same reason: every rendererIntegration move on both sides stacks in
+    // that composite (from the release, PR #2720's fence-removal layout
+    // evidence, the live graphics rebuild #2799, the Bear Form rig swap #2842,
+    // the far-field impostors, fog-free vista and horizon pass #2793, the
+    // Blizzard timed ground loop #2861, and the brood shout/flourish wiring;
+    // from this branch, the worldObjectBurning fire-burst cue), recomputed last
+    // by remint_polish_provenance.mjs. The release retook the polish captures, so
     // every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
     expect(fingerprint.digest('hex')).toBe(
-      '492cba07efa079237a2b5e178679e8854c7fc4dcae584dbb2b3a326366ef6046',
+      '985ebaa5c0e031e33ef4b781689a9b1e29dca0ae526f21b059e9bfe180bcc707',
     );
   });
 

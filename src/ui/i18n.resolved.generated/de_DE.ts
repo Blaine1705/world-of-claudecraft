@@ -8801,6 +8801,18 @@ export const de_DE: EnTranslations = {
       "fen_muster_order": {
         "name": "Musterungsbefehl von Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Balg eines Moorpirschers"
       },
@@ -11074,6 +11086,21 @@ export const de_DE: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spinnen-Eikokon"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Grabschlick-Bollwerk"
       },
@@ -12298,7 +12325,7 @@ export const de_DE: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Keine Ruhe im Schilf",
-        "text": "Dieser Ritus lässt Ertrunkene überall auferstehen, wo das Moor sie berührt. Wir können ihn noch nicht brechen; nimm ihren Herren 14 Soldaten.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Du schenkst den Toten mehr Gnade als ihre Meister. Nimm dies, du hast es verdient.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Eiferer getötet"
-          },
-          "1": {
-            "label": "Befehle des Wyrmkults"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmkult-Nekromant getötet"
-          },
-          "1": {
-            "label": "Rituelles Seelengefäß"
           }
         }
       },

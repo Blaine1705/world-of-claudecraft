@@ -177,7 +177,9 @@ export function bagItemAction(
   // no-target rung; it must never demote the click to the default use ladder.
   if (mode.bankOpen) return 'bankDepositBlockedNoTarget';
   if (mode.petFeed) return item.kind === 'food' ? 'petFeed' : 'petFeedBlocked';
-  if (item.kind === 'quest') return 'discardQuest';
+  // A usable quest item (e.g. the firebottle: use.type 'throw') is USED on click,
+  // not discarded; only inert quest items fall through to the discard prompt.
+  if (item.kind === 'quest') return item.use ? 'use' : 'discardQuest';
   if (item.kind === 'bag') return 'equipBag';
   // A collected reins item falls through to 'use' like any other usable item:
   // clicking it summons that mount (sim useItem -> summonMountItem). There is no

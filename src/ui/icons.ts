@@ -3053,6 +3053,16 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   ),
   sanctum_key_shard: r('arcane', 'sky', ['gem'], ['sparkle', 'glow']),
   blessed_wax: r('holy', 'holyGold', [{ p: 'droplet', pal: 'holyGold' }], ['sparkle']),
+  // A pitch-filled bottle with a lit rag: a bottle body under a rising flame.
+  firebottle: r(
+    'fire',
+    'ember',
+    [
+      { p: 'potion', pal: 'ember' },
+      { p: 'flame', s: 0.5, y: -9 },
+    ],
+    ['glow'],
+  ),
   ghostly_essence: r('shadow', 'silverWhite', [{ p: 'flame', pal: 'silverWhite' }], ['sparkle']),
   webwood_silk: r('shadow', 'silverWhite', ['web']),
   supply_crate: r('wood', 'earthBrown', ['crate']),
@@ -4481,10 +4491,11 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
 // enumerated rather than silent, and it shrinks as art lands.
 //
-// Empty after the accepted 2026-08-01 painted-art wave. Keep the mechanism: a future
-// development-only item may still use it temporarily. tests/item_icons.test.ts holds the line
-// from both sides: it rejects stale entries after art lands and unenumerated art debt. Do not
-// add to this list merely to silence that failure; commission the art.
+// Empty after the accepted 2026-08-01 painted-art wave, and empty again after the three
+// quest-collect items this branch's dedupe pass added were painted. Keep the mechanism: a
+// future development-only item may still use it temporarily. tests/item_icons.test.ts holds
+// the line from both sides: it rejects stale entries after art lands and unenumerated art
+// debt. Do not add to this list merely to silence that failure; commission the art.
 export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

@@ -8801,6 +8801,18 @@ export const tr_TR: EnTranslations = {
       "fen_muster_order": {
         "name": "Fenbridge Seferberlik Emri"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Bataklık Sinsisi Postu"
       },
@@ -11074,6 +11086,21 @@ export const tr_TR: EnTranslations = {
       "spider_egg_sac": {
         "name": "Örümcek Yumurta Kesesi"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Mezarbalçığı Siperi"
       },
@@ -12298,7 +12325,7 @@ export const tr_TR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Sazlıkta Huzur Yok",
-        "text": "O buhurdanlıklardaki ayin, boğulmuşları bataklığın değdiği her yerde dirilmeye bağlıyor; bataklık ise her şeye değiyor. Ölüler, dirilerden fazla olana dek bu sazlıklarda huzur olmayacak. Ayini henüz bozamayız, ama onu askerlerinden boşaltabiliriz. 14 Boğulmuş Ölüyü daha huzura kavuştur.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Ölülere, efendilerinin hiç göstermediği kadar merhamet gösteriyorsun. Şunu al; fazlasıyla hak ettin.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ejdertarikatı Bağnazı öldürüldü"
-          },
-          "1": {
-            "label": "Ejdertarikatı Emirleri"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ejder Tarikatı Nekromatiği öldürüldü"
-          },
-          "1": {
-            "label": "Ayinsel Filakter"
           }
         }
       },

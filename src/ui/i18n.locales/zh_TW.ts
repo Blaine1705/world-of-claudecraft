@@ -3262,6 +3262,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': '深沼鉗咬魚人',
   'entities.mobs.mire_widow.name': '泥沼寡婦蛛',
   'entities.mobs.mirefen_broodmother.name': '蛛母',
+  'entities.mobs.spider_egg.name': '蛛母之卵',
+  'entities.mobs.widow_hatchling.name': '寡婦蛛幼體',
+  'entities.mobs.drowned_warlord.name': '溺亡督軍',
+  'entities.mobs.brakka_wallbreaker.name': '破牆者布拉卡',
+  'entities.mobs.threnos_first_voice.name': '初聲瑟雷諾斯',
+  'entities.items.firebottle.name': '火油瓶',
+  'entities.items.murloc_hut.name': '泥鰭茅屋',
+  'entities.items.restless_skull.name': '不寧顱骨',
+  'entities.items.vanguard_bone.name': '先鋒之骨',
   'entities.mobs.drowned_dead.name': '溺亡死者',
   'entities.mobs.fen_troll.name': '泥沼巨魔',
   'entities.mobs.grubjaw.name': '貪食者格魯布顎',
@@ -3616,7 +3625,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '生鏽香爐',
   'entities.quests.q_no_rest.title': '蘆葦中不得安息',
   'entities.quests.q_no_rest.text':
-    '香爐上的儀式會讓溺亡者在濕地觸及之處復起。我們還無法破除它，只能先少給敵人14名士兵。',
+    '香爐上的儀式會讓溺亡者復起，如今它已喚起一個強大到足以統領他們的存在。守望者稱他為溺亡督軍，只要他還占據沉沒的禮拜堂，死者便陣列不散。打倒他，{playerName}，其餘的自會潰散回泥沼。',
   'entities.quests.q_no_rest.completion': '你給了死者比他們主人更多的憐憫。拿著，你早已應得。',
   'entities.quests.q_no_rest.objectives.0.label': '讓溺亡死者安息',
   'entities.quests.q_trolls.title': '泥沼墳丘',
@@ -3773,14 +3782,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '這筆跡...我在東溪莫森的魔典裡見過。每座墳後都是同一隻手，{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': '擊敗龍教狂熱者',
-  'entities.quests.q_cult_orders.objectives.1.label': '龍教命令',
   'entities.quests.q_necromancers.title': '護命匣之環',
   'entities.quests.q_necromancers.text':
     '命令提到一圈護命匣，{playerName}，靈魂容器圍著聖所供養它。殺8名死靈法師，帶回3個完整護命匣。',
   'entities.quests.q_necromancers.completion':
     '願聖光寬恕我們。裡面裝著谷地和濕地的死者，所有被收割的靈魂。他們從來不是在組建軍隊，{playerName}。他們是在收取貢稅。',
   'entities.quests.q_necromancers.objectives.0.label': '擊敗龍教死靈法師',
-  'entities.quests.q_necromancers.objectives.1.label': '儀式護命匣',
   'entities.quests.q_revenants.title': '亡魂戰場',
   'entities.quests.q_revenants.text':
     '聖所路東有片古戰場，上一支攻山軍的先鋒已埋兩百年。邪教叫醒了他們，穿著鏽甲。{playerName}，讓12個歸土。',

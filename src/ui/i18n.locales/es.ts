@@ -5152,11 +5152,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tal como temía: quemaban ceniza de tumba, y el rito está firmado por Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Incensario oxidado',
   'entities.quests.q_no_rest.title': 'Sin descanso entre los juncos',
-  'entities.quests.q_no_rest.text':
-    'Ese rito hace levantarse a los ahogados donde la ciénaga los toca. No podemos deshacerlo aún; deja 14 muertos menos a sus amos.',
   'entities.quests.q_no_rest.completion':
     'Das más misericordia a los muertos que sus señores. Toma esto, lo mereces.',
-  'entities.quests.q_no_rest.objectives.0.label': 'Muerto ahogado devuelto al descanso',
   'entities.quests.q_trolls.title': 'Túmulos de Mirefen',
   'entities.quests.q_trolls.text':
     'Los trolls de Mirefen abrieron túmulos más viejos que cualquier reino humano, {playerName}. Expúlsalos: 12 trolls muertos bastarán.',
@@ -5301,14 +5298,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Esta letra viene del grimorio de Morthen. La misma mano guio cada tumba, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Fanático del Culto del Wyrm abatido',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Órdenes del Culto del Wyrm',
   'entities.quests.q_necromancers.title': 'El anillo de filacterias',
   'entities.quests.q_necromancers.text':
     'Las órdenes hablan de un anillo de filacterias, vasos de alma, {playerName}, alrededor del Santuario. Mata 8 nigromantes y trae 3 intactas.',
   'entities.quests.q_necromancers.completion':
     'Que la Luz nos perdone. Guardan los muertos del Valle y la ciénaga; nunca formaban un ejército, {playerName}. Eran un diezmo.',
   'entities.quests.q_necromancers.objectives.0.label': 'Nigromante del Culto del Wyrm abatido',
-  'entities.quests.q_necromancers.objectives.1.label': 'Filacteria ritual',
   'entities.quests.q_revenants.title': 'Los campos de aparecidos',
   'entities.quests.q_revenants.text':
     'Al este del camino yace un viejo campo de batalla. El culto levantó sus huesos con armaduras oxidadas. Devuelve 12 al suelo, {playerName}.',

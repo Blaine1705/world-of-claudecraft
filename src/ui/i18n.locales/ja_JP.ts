@@ -3399,6 +3399,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': 'ディープフェンのスナッパー',
   'entities.mobs.mire_widow.name': 'マイアフェンのウィドウ',
   'entities.mobs.mirefen_broodmother.name': '群れの母',
+  'entities.mobs.spider_egg.name': '群れの母の卵',
+  'entities.mobs.widow_hatchling.name': 'ウィドウの幼体',
+  'entities.mobs.drowned_warlord.name': '溺れの武将',
+  'entities.mobs.brakka_wallbreaker.name': '壁砕きのブラッカ',
+  'entities.mobs.threnos_first_voice.name': '第一の声スレノス',
+  'entities.items.firebottle.name': '火炎瓶',
+  'entities.items.murloc_hut.name': '泥ひれの小屋',
+  'entities.items.restless_skull.name': '安らがぬ頭蓋骨',
+  'entities.items.vanguard_bone.name': '先兵の骨',
   'entities.mobs.drowned_dead.name': '溺れ死者',
   'entities.mobs.fen_troll.name': 'マイアフェン・トロル',
   'entities.mobs.grubjaw.name': '大食いグラブジョー',
@@ -3772,7 +3781,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '錆びた香炉',
   'entities.quests.q_no_rest.title': '葦の中に安息なし',
   'entities.quests.q_no_rest.text':
-    'その儀式は湿地が触れる場所で溺死者を起こします。まだ壊せませんが、兵を14体減らせます。',
+    'その香炉の儀式は溺れ死者を起こします。そして今、彼らを率いるほど強い者まで蘇らせました。番人たちは彼を「溺れの武将」と呼びます。彼が沈んだ礼拝堂を占める限り、死者は隊列を崩しません。{playerName}、彼を打ち倒してください。残りは泥沼へ散り散りに戻るはずです。',
   'entities.quests.q_no_rest.completion':
     'あなたは死者に、主たちより多くの慈悲を与えました。受け取ってください。',
   'entities.quests.q_no_rest.objectives.0.label': '溺れ死者を安息させる',
@@ -3933,14 +3942,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'この筆跡はモーセンの魔導書と同じです。すべての墓を導いた同じ手です、{playerName}。',
   'entities.quests.q_cult_orders.objectives.0.label': 'ワーム教団の狂信者を討伐',
-  'entities.quests.q_cult_orders.objectives.1.label': 'ワーム教団の命令書',
   'entities.quests.q_necromancers.title': '経箱の輪',
   'entities.quests.q_necromancers.text':
     '命令は経箱の輪を語っています。{playerName}、聖所を養う魂の器です。死霊術師を8人倒し、3つを壊さず持ってきてください。',
   'entities.quests.q_necromancers.completion':
     '光よ、赦したまえ。谷と湿地の死者が入っています。{playerName}、これは軍ではなく、貢ぎ物でした。',
   'entities.quests.q_necromancers.objectives.0.label': 'ワーム教団の死霊術師を討伐',
-  'entities.quests.q_necromancers.objectives.1.label': '儀式の経箱',
   'entities.quests.q_revenants.title': '亡霊の野',
   'entities.quests.q_revenants.text':
     '聖所道の東には古い戦場があります。教団は錆びた甲冑の骨を起こしました。{playerName}、12体を土へ戻してください。',

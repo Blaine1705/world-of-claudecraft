@@ -3380,6 +3380,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.deepfen_murloc.name': '딥펜 무는이',
   'entities.mobs.mire_widow.name': '마이어펜 과부거미',
   'entities.mobs.mirefen_broodmother.name': '거미어미',
+  'entities.mobs.spider_egg.name': '거미어미의 알',
+  'entities.mobs.widow_hatchling.name': '과부거미 새끼',
+  'entities.mobs.drowned_warlord.name': '익사한 전쟁군주',
+  'entities.mobs.brakka_wallbreaker.name': '성벽파괴자 브라카',
+  'entities.mobs.threnos_first_voice.name': '첫 번째 목소리 스레노스',
+  'entities.items.firebottle.name': '화염병',
+  'entities.items.murloc_hut.name': '진흙지느러미 오두막',
+  'entities.items.restless_skull.name': '불안한 두개골',
+  'entities.items.vanguard_bone.name': '선봉대의 뼈',
   'entities.mobs.drowned_dead.name': '익사한 망자',
   'entities.mobs.fen_troll.name': '마이어펜 트롤',
   'entities.mobs.grubjaw.name': '대식가 그럽죠',
@@ -3753,7 +3762,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_drowned_censers.objectives.0.label': '녹슨 향로',
   'entities.quests.q_no_rest.title': '갈대밭에 안식은 없다',
   'entities.quests.q_no_rest.text':
-    '그 의식은 습지가 닿는 곳마다 익사자를 일으킵니다. 아직 풀 수 없지만, 병사 14구를 주인에게서 빼앗을 수 있습니다.',
+    '그 향로의 의식은 익사자를 일으키고, 이제 그들을 이끌 만큼 강한 자까지 일으켰습니다. 파수꾼들은 그를 익사한 전쟁군주라 부릅니다. 그가 잠긴 예배당을 차지하고 있는 한 망자들은 대열을 지킵니다. {playerName}이여, 그를 쓰러뜨리십시오. 남은 것들은 진창으로 흩어져 돌아갈 것입니다.',
   'entities.quests.q_no_rest.completion':
     '당신은 죽은 자들에게 주인들보다 큰 자비를 베풀었습니다. 받으십시오.',
   'entities.quests.q_no_rest.objectives.0.label': '익사한 망자 안식시킴',
@@ -3917,14 +3926,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     '이 필체는 모르덴의 마법서에서 본 것입니다. 모든 무덤을 같은 손이 이끌었습니다, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': '고룡교단 광신도 처치',
-  'entities.quests.q_cult_orders.objectives.1.label': '고룡교단 명령서',
   'entities.quests.q_necromancers.title': '성물함의 고리',
   'entities.quests.q_necromancers.text':
     '명령서는 성소 둘레의 성물함 고리를 말합니다. 영혼 그릇입니다, {playerName}이여. 강령술사 8명을 죽이고 3개를 온전하게 가져오십시오.',
   'entities.quests.q_necromancers.completion':
     '빛이여 용서하소서. 계곡과 습지의 죽은 자들이 담겨 있습니다. {playerName}이여, 그들은 군대를 만든 것이 아니라 십일조를 거두고 있었습니다.',
   'entities.quests.q_necromancers.objectives.0.label': '고룡교단 강령술사 처치',
-  'entities.quests.q_necromancers.objectives.1.label': '의식 성물함',
   'entities.quests.q_revenants.title': '망령 들판',
   'entities.quests.q_revenants.text':
     '성소 길 동쪽에는 오래된 전장이 있습니다. 교단이 녹슨 갑옷의 뼈들을 일으켰습니다. {playerName}이여, 12구를 흙으로 돌려보내십시오.',

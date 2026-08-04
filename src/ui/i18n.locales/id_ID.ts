@@ -4104,7 +4104,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Aksara ini... terakhir kulihat yang serupa di grimoir Morthen, di Eastbrook. Tangan yang sama telah menuntun setiap makam yang kita perebutkan, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Fanatik Wyrmcult terbunuh',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Perintah Wyrmcult',
   'entities.quests.q_cult_orders.text':
     'Para fanatik kini bergerak dengan tujuan, jaga ditempatkan, perbekalan dihitung, bagai prajurit sebelum pengepungan. Pengikut yang terorganisir adalah pengikut yang menerima perintah, {playerName}. Bunuh delapan lagi dan bawakan padaku empat berkas perintah tertulis mereka. Aku ingin tahu tangan yang memimpin mereka.',
   'entities.quests.q_cult_orders.title': 'Perintah dari Kedalaman',
@@ -4280,15 +4279,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Semoga Cahaya mengampuni kita. Ini menampung para mati dari Lembah dan rawa - setiap mayat yang pernah dibangkitkan para Gravecaller, dipanen. Mereka tidak pernah membangun pasukan, {playerName}. Mereka sedang mengumpulkan upeti.',
   'entities.quests.q_necromancers.objectives.0.label': 'Wyrmcult Necromancer dibunuh',
-  'entities.quests.q_necromancers.objectives.1.label': 'Filakteri Ritual',
   'entities.quests.q_necromancers.text':
     'Perintah-perintah itu menyebut sebuah "cincin filakteri" - bejana jiwa, {playerName}, yang ditempatkan mengelilingi Sanktum untuk memberinya makan. Para necromancer sekte itu membawanya seperti relik suci. Bunuh delapan necromancer dan bawakan aku tiga filakteri yang utuh. Aku harus tahu jiwa siapa yang mereka tampung.',
   'entities.quests.q_necromancers.title': 'Cincin Filakteri',
   'entities.quests.q_no_rest.completion':
     'Kau memberi para mati lebih banyak belas kasih daripada yang pernah diberikan tuan-tuan mereka. Ambillah ini - kau lebih dari pantas mendapatkannya.',
   'entities.quests.q_no_rest.objectives.0.label': 'Drowned Dead diistirahatkan',
-  'entities.quests.q_no_rest.text':
-    'Ritus pada pedupaan itu mengikat para tenggelam untuk bangkit di mana pun rawa menyentuh mereka - dan rawa menyentuh segalanya. Tidak akan ada ketenangan di antara alang-alang ini sampai para mati melebihi jumlah yang hidup. Kita belum bisa membatalkan ritus itu, tapi kita bisa menguras prajuritnya. Istirahatkan 14 lagi dari Drowned Dead.',
   'entities.quests.q_no_rest.title': 'Tiada Ketenangan di Antara Alang-Alang',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'Ketiga relik itu menceritakan kisah yang sama: Aldren berjuang membela rajanya, Malric mendobrak batas kematian, dan Voss berusaha menghentikan apa yang menyusul. Segel itu melemah, dan cincin-meterai ini adalah kunci ke makam Nythraxis. Kau kini selaras untuk memasuki Kripta Nythraxis. Kembalilah ke kripta terbengkalai, buka pintu kerajaan, dan hadapi Nythraxis sebelum murka sang raja tua tumpah melampaui Thornpeak.',

@@ -4101,7 +4101,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'To pismo... ostatni raz widziałem takie w grymuarze Morthena, w Eastbrook. Ta sama ręka kierowała każdym grobem, o który walczyliśmy, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Zabity zelota Kultu Żmija',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Rozkazy Kultu Żmija',
   'entities.quests.q_cult_orders.text':
     'Zeloci poruszają się teraz celowo: wystawiają warty, liczą zapasy niczym żołnierze przed oblężeniem. Kultyści, którzy się organizują, to kultyści wykonujący rozkazy, {playerName}. Zabij jeszcze ośmiu i przynieś mi cztery komplety ich pisemnych rozkazów. Chciałbym poznać rękę, która nimi dowodzi.',
   'entities.quests.q_cult_orders.title': 'Rozkazy z głębi',
@@ -4276,15 +4275,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_necromancers.completion':
     'Niech Światło nam wybaczy. Te trzymają zmarłych z Doliny i z trzęsawiska - każdego trupa, jakiego Grobozwańcy kiedykolwiek podnieśli, zebranego jak żniwo. Oni nigdy nie budowali armii, {playerName}. Oni ściągali daninę.',
   'entities.quests.q_necromancers.objectives.0.label': 'Nekromanta Kultu Żmija pokonany',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rytualne filakterium',
   'entities.quests.q_necromancers.text':
     'Rozkazy mówią o "kręgu filakteriów" - naczyniach dusz, {playerName}, rozstawionych wokół Sanktuarium, by je karmić. Nekromanci kultu noszą je niczym święte relikwie. Zabij ośmiu nekromantów i przynieś mi trzy nienaruszone filakteria. Muszę wiedzieć, jakie dusze przechowują.',
   'entities.quests.q_necromancers.title': 'Krąg filakteriów',
   'entities.quests.q_no_rest.completion':
     'Okazujesz zmarłym więcej litości, niż kiedykolwiek ich panowie. Weź to - z nawiązką na to zasłużyłeś.',
   'entities.quests.q_no_rest.objectives.0.label': 'Utopiony Zmarły ułożony do spoczynku',
-  'entities.quests.q_no_rest.text':
-    'Obrzęd na tych kadzielnicach sprawia, że utopieni powstają wszędzie tam, gdzie sięga ich bagno - a bagno sięga wszędzie. Nie będzie spoczynku w tych szuwarach, póki zmarli nie przewyższą liczebnie żywych. Nie potrafimy jeszcze cofnąć obrzędu, ale możemy pozbawić go żołnierzy. Ułóż do spoczynku 14 kolejnych Utopionych Zmarłych.',
   'entities.quests.q_no_rest.title': 'Brak spoczynku w szuwarach',
   'entities.quests.q_nythraxis_bound_guardian.completion':
     'Trzy relikwie opowiadają tę samą historię: Aldren walczył w obronie swego króla, Malric przełamał granicę śmierci, a Voss próbował powstrzymać to, co nastąpiło. Pieczęć słabnie, a ten sygnet jest kluczem do grobowca Nythraxis. Jesteś teraz dostrojony, by wejść do Krypty Nythraxis. Wróć do opuszczonej krypty, otwórz królewskie wrota i stań przeciw Nythraxis, nim furia starego króla rozleje się poza Ciernisty Szczyt.',

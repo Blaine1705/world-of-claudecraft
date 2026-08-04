@@ -8801,6 +8801,18 @@ export const es: EnTranslations = {
       "fen_muster_order": {
         "name": "Orden de alistamiento de Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Piel de merodeador del pantano"
       },
@@ -11074,6 +11086,21 @@ export const es: EnTranslations = {
       "spider_egg_sac": {
         "name": "Saco de huevos de araña"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Baluarte de limo sepulcral"
       },
@@ -12298,11 +12325,11 @@ export const es: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Sin descanso entre los juncos",
-        "text": "Ese rito hace levantarse a los ahogados donde la ciénaga los toca. No podemos deshacerlo aún; deja 14 muertos menos a sus amos.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Das más misericordia a los muertos que sus señores. Toma esto, lo mereces.",
         "objectives": {
           "0": {
-            "label": "Muerto ahogado devuelto al descanso"
+            "label": "The Drowned Warlord slain"
           }
         }
       },
@@ -12576,9 +12603,6 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanático del Culto del Wyrm abatido"
-          },
-          "1": {
-            "label": "Órdenes del Culto del Wyrm"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const es: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nigromante del Culto del Wyrm abatido"
-          },
-          "1": {
-            "label": "Filacteria ritual"
           }
         }
       },

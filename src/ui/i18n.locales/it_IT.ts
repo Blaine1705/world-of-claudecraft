@@ -5271,8 +5271,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Come temevo: bruciavano cenere di tomba, e il rito è firmato Voss.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Incensiere arrugginito',
   'entities.quests.q_no_rest.title': 'Nessun riposo tra le canne',
-  'entities.quests.q_no_rest.text':
-    'Quel rito rialza gli annegati ovunque la palude li tocchi. Non possiamo disfarlo ancora; togli 14 soldati ai loro padroni.',
   'entities.quests.q_no_rest.completion':
     "Offri ai morti più misericordia dei loro padroni. Prendi questo, l'hai meritato.",
   'entities.quests.q_no_rest.objectives.0.label': 'Morto annegato restituito al riposo',
@@ -5420,14 +5418,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Questa scrittura viene dal grimorio di Morthen. La stessa mano ha guidato ogni tomba, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Zelota del Culto del Wyrm ucciso',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Ordini del Culto del Wyrm',
   'entities.quests.q_necromancers.title': 'Anello di filatteri',
   'entities.quests.q_necromancers.text':
     "Gli ordini parlano di un anello di filatteri, vasi d'anima attorno al Santuario, {playerName}. Uccidi 8 negromanti e portane 3 intatti.",
   'entities.quests.q_necromancers.completion':
     'Che la Luce ci perdoni. Contengono i morti della Valle e della palude; non stavano costruendo un esercito, {playerName}, raccoglievano una decima.',
   'entities.quests.q_necromancers.objectives.0.label': 'Negromante del Culto del Wyrm ucciso',
-  'entities.quests.q_necromancers.objectives.1.label': 'Filatterio rituale',
   'entities.quests.q_revenants.title': 'Campi dei revenant',
   'entities.quests.q_revenants.text':
     'A est della strada giace un vecchio campo di battaglia. Il culto ne ha rialzato le ossa in piastre arrugginite. Rimettine 12 a terra, {playerName}.',

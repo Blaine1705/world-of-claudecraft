@@ -509,6 +509,7 @@ import {
   onNodeGatheredForQuests,
   onRecipeCraftedForQuests,
 } from './quests/quest_credit';
+import { migrateRestoredQuestProgress } from './quests/quest_progress_migration';
 import { type NaturalRiftPortal, updateRiftPortals as updateRiftPortalsImpl } from './rift/portals';
 import {
   enchantRiftItem as enchantRiftItemImpl,
@@ -1117,6 +1118,9 @@ export interface PlayerMeta {
   isDevBot?: boolean;
   // Offline Fiesta practice opponent. Session-only and never serialized.
   isFiestaBot?: boolean;
+  // Firebottle throw cooldown (q_deepfen_purge): sim time the player's next hut
+  // torch is ready. Session-only, never serialized.
+  firebottleReadyAt?: number;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
@@ -2923,6 +2927,7 @@ export class Sim {
       // field and sanitizes to an empty bank). See bank.ts sanitizeBankState.
       meta.bank = sanitizeBankState(s.bank, meta.name, droppedInstanceJunk, player.id);
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
+      let questRevReset = false;
       for (const q of s.questLog) {
         // Prune unknown quest ids at load (normalize on load, never crash): a save
         // mid a since-deleted quest (e.g. the retirement of
@@ -2935,17 +2940,40 @@ export class Sim {
         // the per-object interact ledger existed, which grants that player their
         // remaining interacts rather than dead-ending a part-way-done quest.
         const creditedObjects = sanitizeCreditedObjects(q.creditedObjects);
-        if (q.state !== 'done' && QUESTS[q.questId])
-          meta.questLog.set(q.questId, {
+        if (q.state !== 'done' && QUESTS[q.questId]) {
+          // migrateRestoredQuestProgress resets an in-flight run whose QuestDef.rev
+          // moved under it (the objective rework migration); a reset drops the
+          // per-run scratch (burnedObjects, creditedObjects) with the counts. The
+          // burnedObjects filter drops pre-stable-key rows (a legacy {id, at}
+          // save) so they can never alias a live hut key.
+          const restored = {
             questId: q.questId,
             counts: [...q.counts],
             state: q.state,
             ...(q.selection === undefined ? {} : { selection: q.selection }),
             ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+            ...(q.burnedObjects === undefined
+              ? {}
+              : {
+                  burnedObjects: q.burnedObjects
+                    .filter((b) => typeof b.key === 'string')
+                    .map((b) => ({ key: b.key, at: b.at })),
+                }),
             ...(creditedObjects === undefined ? {} : { creditedObjects }),
-          });
+            ...(q.rev === undefined ? {} : { rev: q.rev }),
+          };
+          const migrated = migrateRestoredQuestProgress(QUESTS[q.questId], restored);
+          if (migrated !== restored) questRevReset = true;
+          meta.questLog.set(q.questId, migrated);
+        }
       }
       for (const q of s.questsDone) meta.questsDone.add(q);
+      // A rev reset zeroes COLLECT counts too, and those are derived state only
+      // onInventoryChangedForQuests re-credits: re-sync once (inventory is already
+      // restored above) so a migrated character holding the collect items is not
+      // stuck at 0 of N until an unrelated inventory change. Non-migrated quests
+      // are already in sync, so this emits nothing for them.
+      if (questRevReset) this.ctx.onInventoryChangedForQuests(meta);
       if (s.talents)
         // Revalidate the persisted build against the current rules + level budget
         // before it is baked into the flat mods below. A stored allocation replays
@@ -3709,8 +3737,12 @@ export class Sim {
         state: q.state,
         ...(q.selection === undefined ? {} : { selection: q.selection }),
         ...(q.resolvedCounts === undefined ? {} : { resolvedCounts: [...q.resolvedCounts] }),
+        ...(q.burnedObjects === undefined
+          ? {}
+          : { burnedObjects: q.burnedObjects.map((b) => ({ key: b.key, at: b.at })) }),
         // Absent until the first interact credit (parity-stable saves).
         ...(q.creditedObjects === undefined ? {} : { creditedObjects: [...q.creditedObjects] }),
+        ...(q.rev === undefined ? {} : { rev: q.rev }),
       })),
       questsDone: [...meta.questsDone],
       arenaRating: meta.arenaRating,
@@ -8694,6 +8726,10 @@ export class Sim {
 
   private interactNpcForQuests(npc: Entity, meta: PlayerMeta): boolean {
     let progressed = false;
+    // Talking to the giver of an active quest re-grants a lost required item
+    // (quests/quest_commands.ts regrantMissingQuestItems, the accept grant's
+    // in-progress twin, on the same recoverable-stores predicate).
+    questCommands.regrantMissingQuestItems(this.ctx, meta, npc.templateId);
     for (const qp of meta.questLog.values()) {
       if (qp.state !== 'active') continue;
       const quest = QUESTS[qp.questId];

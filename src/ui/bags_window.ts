@@ -20,6 +20,7 @@
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
+import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -822,6 +823,24 @@ export class BagsWindow {
               : ''
           : '';
       row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
+      // 5s throw pacing is visible in the bag. The bag is a cold window with no
+      // per-frame driver, so the sweep is a self-contained CSS animation seeded from
+      // the wired remaining seconds (world.player.firebottleCdRemaining), not a
+      // per-frame-repainted --cd-fill like the action bar. Appended after the
+      // innerHTML build so the quest seal markup above is not overwritten.
+      if (item.id === FIREBOTTLE_ITEM_ID && world.player.firebottleCdRemaining > 0) {
+        const remaining = world.player.firebottleCdRemaining;
+        const curtain = document.createElement('span');
+        curtain.className = 'bag-cd-curtain';
+        curtain.setAttribute('aria-hidden', 'true');
+        curtain.style.setProperty(
+          '--cd-start',
+          `${Math.min(100, (remaining / FIREBOTTLE_COOLDOWN_SECS) * 100)}%`,
+        );
+        curtain.style.setProperty('--cd-dur', `${remaining}s`);
+        row.appendChild(curtain);
+      }
       // Bag hover / keyboard focus lights the matching quest-tracker title
       // (information-add). Mouse and focus both drive the same highlight so Tab
       // navigation matches pointer hover; leave/focusout clear it. Touch peek

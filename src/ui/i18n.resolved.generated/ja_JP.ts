@@ -8801,6 +8801,18 @@ export const ja_JP: EnTranslations = {
       "fen_muster_order": {
         "name": "フェンブリッジ召集令"
       },
+      "firebottle": {
+        "name": "火炎瓶"
+      },
+      "murloc_hut": {
+        "name": "泥ひれの小屋"
+      },
+      "restless_skull": {
+        "name": "安らがぬ頭蓋骨"
+      },
+      "vanguard_bone": {
+        "name": "先兵の骨"
+      },
       "mire_prowler_pelt": {
         "name": "沼の徘徊者の毛皮"
       },
@@ -11074,6 +11086,21 @@ export const ja_JP: EnTranslations = {
       "spider_egg_sac": {
         "name": "蜘蛛の卵嚢"
       },
+      "spider_egg": {
+        "name": "群れの母の卵"
+      },
+      "widow_hatchling": {
+        "name": "ウィドウの幼体"
+      },
+      "drowned_warlord": {
+        "name": "溺れの武将"
+      },
+      "brakka_wallbreaker": {
+        "name": "壁砕きのブラッカ"
+      },
+      "threnos_first_voice": {
+        "name": "第一の声スレノス"
+      },
       "grave_silt_bulwark": {
         "name": "墓泥の防壁"
       },
@@ -12298,7 +12325,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_no_rest": {
         "title": "葦の中に安息なし",
-        "text": "その儀式は湿地が触れる場所で溺死者を起こします。まだ壊せませんが、兵を14体減らせます。",
+        "text": "その香炉の儀式は溺れ死者を起こします。そして今、彼らを率いるほど強い者まで蘇らせました。番人たちは彼を「溺れの武将」と呼びます。彼が沈んだ礼拝堂を占める限り、死者は隊列を崩しません。{playerName}、彼を打ち倒してください。残りは泥沼へ散り散りに戻るはずです。",
         "completion": "あなたは死者に、主たちより多くの慈悲を与えました。受け取ってください。",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ワーム教団の狂信者を討伐"
-          },
-          "1": {
-            "label": "ワーム教団の命令書"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ワーム教団の死霊術師を討伐"
-          },
-          "1": {
-            "label": "儀式の経箱"
           }
         }
       },

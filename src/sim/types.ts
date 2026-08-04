@@ -639,6 +639,9 @@ export type WeaponSkinLoadout = Partial<Record<WeaponSkinType, string>>;
 
 export type ItemUse =
   | { type: 'fishing' }
+  // Thrown at the nearest murloc hut to torch it (q_deepfen_purge); see
+  // src/sim/interactions/firebottle_hut.ts. Reusable, so it is never consumed.
+  | { type: 'throw' }
   | { type: 'mechChroma'; chromaId: string }
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
@@ -1236,6 +1239,10 @@ export interface MobTemplate {
   // Kill-XP multiplier (default 1). 0 marks a puzzle-object mob (e.g. the 1 HP
   // spider egg-sac) that must not pay full kill XP for a single hit.
   xpMult?: number;
+  // Quest-gated destructible: when set, the mob is only damageable by a player who
+  // has this quest active (state 'active' or 'ready'). Used for quest-exclusive
+  // objects like Broodmother eggs so non-questers cannot grief the clutch.
+  requiresQuestId?: string;
   // Rare/miniboss controls.
   canSwim?: boolean;
   // Every movement step (chase, flee, wander, leash return) uses Sim.moveToward's
@@ -3114,6 +3121,14 @@ export interface QuestDef {
   // Resolve the first objective's count from the character's return history at
   // acceptance time. The snapshotted value stays stable while the quest is active.
   resolvedObjectiveCounts?: 'archetypeAmends';
+  // Objective-list revision. Bump when a rework changes what an objective INDEX
+  // means (a new target, type, or count under the same quest id), so an
+  // in-flight save's index-keyed counts stop applying: on restore, a
+  // QuestProgress whose stamped rev differs is reset to a fresh run
+  // (quests/quest_progress_migration.ts). Without this, a carried count at or
+  // above the new requirement can never flip ready (the credit paths skip an
+  // at-cap objective before their ready check) and the quest strands.
+  rev?: number;
 }
 
 export function questTurnInNpcIds(quest: QuestDef): readonly string[] {
@@ -3134,10 +3149,25 @@ export interface QuestProgress {
   state: 'active' | 'ready' | 'done';
   selection?: string;
   resolvedCounts?: number[];
+  // World objects torched THIS quest run (burned murloc huts), each with the
+  // sim-time it was last burned. A hut is on cooldown until HUT_REBURN_COOLDOWN_SECS
+  // after that, then it can be torched (and credited) again. Only the latest burn
+  // per object is kept, keyed by the STABLE content key (object item id plus
+  // rounded spawn position, firebottle_hut.ts stableHutKey), never the runtime
+  // entity id, which is spawn-order-assigned and can alias across a reboot or a
+  // content change. Fresh (empty) on accept; persisted with the run
+  // (serialize/restore in sim.ts). See src/sim/interactions/firebottle_hut.ts.
+  burnedObjects?: { key: string; at: number }[];
   // Ledger of the distinct objects an `interact` objective has already been
   // credited off, so one object cannot satisfy a multi-count objective on its
   // own (see quests/interact_object_credit.ts). Absent until the first credit.
+  // The firebottle huts deliberately do NOT ride this ledger: their re-burn
+  // crediting is the timed burnedObjects cooldown above.
   creditedObjects?: string[];
+  // The QuestDef.rev this progress was accepted (or migrated) under; restore
+  // resets the run when the def's rev has moved (quest_progress_migration.ts),
+  // dropping the per-run scratch (burnedObjects, creditedObjects) with it.
+  rev?: number;
 }
 
 export function questObjectiveRequired(
@@ -3471,6 +3501,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // gcdRemaining) so the action bar can paint a cooldown swipe without a client
   // clock. Derived from potionCooldownUntil; excluded from the parity trace.
   potionCdRemaining: number;
+  // The firebottle throw cooldown (q_deepfen_purge) as REMAINING seconds,
+  // materialized per tick like potionCdRemaining so the bag can paint a cooldown
+  // swipe on the firebottle slot without a client clock. Set on throw
+  // (firebottle_hut.ts), decremented in combat/auras.ts; excluded from the parity
+  // trace. The authoritative use-gate stays on PlayerMeta.firebottleReadyAt.
+  firebottleCdRemaining: number;
   // warrior charge: forced run toward the target along a pathfound route
   chargeTargetId: number | null;
   chargeTimeLeft: number; // seconds; failsafe so a blocked charge can't run forever
@@ -3683,6 +3719,10 @@ export interface Entity extends ClientMirroredEntityFields {
   // `tid` (#2513).
   harvestClaimedBy: number | null;
   despawnTimer?: number;
+  // Summoned quest add (e.g. a Broodmother-egg hatchling): seconds it survives out
+  // of combat before despawning. updateMob starts the despawnTimer countdown when
+  // the add leashes home and cancels it while the add is back in combat.
+  leashDespawnSecs?: number;
   damageIdleDespawnTimer?: number;
   lootable: boolean;
   loot: CorpseLoot | null;
@@ -4272,6 +4312,14 @@ export type SimEvent = { pid?: number } & (
   // Interacting with a town noticeboard. Structured and personal: the client
   // owns localized feedback, and online routing sends it only to the reader.
   | { type: 'noticeboard'; noticeboardId: string; state: 'empty' }
+  | {
+      // A world object (a torched murloc hut, q_deepfen_purge) bursts into flames.
+      // The renderer plays a fire burst at (x, z). Visual-only.
+      type: 'worldObjectBurning';
+      objectId: number;
+      x: number;
+      z: number;
+    }
   | { type: 'mailArrived'; senderName: string; letterId?: string }
   | { type: 'mailResult'; code: MailResultCode; value?: number; name?: string }
   // Guild calendar outcome. Emitted only by the server's SocialService (the

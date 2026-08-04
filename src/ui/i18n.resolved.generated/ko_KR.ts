@@ -8801,6 +8801,18 @@ export const ko_KR: EnTranslations = {
       "fen_muster_order": {
         "name": "펜브리지 소집 명령서"
       },
+      "firebottle": {
+        "name": "화염병"
+      },
+      "murloc_hut": {
+        "name": "진흙지느러미 오두막"
+      },
+      "restless_skull": {
+        "name": "불안한 두개골"
+      },
+      "vanguard_bone": {
+        "name": "선봉대의 뼈"
+      },
       "mire_prowler_pelt": {
         "name": "수렁 배회자 가죽"
       },
@@ -11074,6 +11086,21 @@ export const ko_KR: EnTranslations = {
       "spider_egg_sac": {
         "name": "거미 알집"
       },
+      "spider_egg": {
+        "name": "거미어미의 알"
+      },
+      "widow_hatchling": {
+        "name": "과부거미 새끼"
+      },
+      "drowned_warlord": {
+        "name": "익사한 전쟁군주"
+      },
+      "brakka_wallbreaker": {
+        "name": "성벽파괴자 브라카"
+      },
+      "threnos_first_voice": {
+        "name": "첫 번째 목소리 스레노스"
+      },
       "grave_silt_bulwark": {
         "name": "무덤진흙 방벽"
       },
@@ -12298,7 +12325,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "갈대밭에 안식은 없다",
-        "text": "그 의식은 습지가 닿는 곳마다 익사자를 일으킵니다. 아직 풀 수 없지만, 병사 14구를 주인에게서 빼앗을 수 있습니다.",
+        "text": "그 향로의 의식은 익사자를 일으키고, 이제 그들을 이끌 만큼 강한 자까지 일으켰습니다. 파수꾼들은 그를 익사한 전쟁군주라 부릅니다. 그가 잠긴 예배당을 차지하고 있는 한 망자들은 대열을 지킵니다. {playerName}이여, 그를 쓰러뜨리십시오. 남은 것들은 진창으로 흩어져 돌아갈 것입니다.",
         "completion": "당신은 죽은 자들에게 주인들보다 큰 자비를 베풀었습니다. 받으십시오.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "고룡교단 광신도 처치"
-          },
-          "1": {
-            "label": "고룡교단 명령서"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "고룡교단 강령술사 처치"
-          },
-          "1": {
-            "label": "의식 성물함"
           }
         }
       },

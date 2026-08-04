@@ -53,6 +53,13 @@ const bundled = await esbuild.build({
   define: {
     'import.meta.env.DEV': 'true',
     'import.meta.env.PROD': 'false',
+    // src/client_origin.ts and src/runtime.ts (pulled in transitively via the guide
+    // viewer's asset chain) also read import.meta.env at module scope; esbuild replaces
+    // the whole import.meta object with {} for a non-ESM output format, so an undefined
+    // field access here throws in the browser page rather than failing this build step
+    // (the assert below only catches a literal `import.meta` surviving the bundle, not
+    // an unmatched member access on the now-empty stand-in object). esbuild matches the
+    // FULL member path, so every VITE_* member those modules read needs its own entry.
     'import.meta.env.BASE_URL': '"/"',
     'import.meta.env.VITE_API_ORIGIN': '""',
     'import.meta.env.VITE_DESKTOP_API_ORIGIN': '""',

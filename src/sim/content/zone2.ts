@@ -248,6 +248,46 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     color: 0x283747,
     componentTags: ['venomSac', 'hide'],
   },
+  spider_egg: {
+    id: 'spider_egg',
+    name: 'Broodmother Egg',
+    minLevel: 10,
+    maxLevel: 10,
+    family: 'spider',
+    // Only players on The Broodmother quest can damage the clutch (see dealDamage).
+    requiresQuestId: 'q_broodmother',
+    hpBase: 100,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    xpMult: 0,
+    loot: [],
+    scale: 0.9,
+    color: 0xb7a7c9,
+  },
+  widow_hatchling: {
+    id: 'widow_hatchling',
+    name: 'Widow Hatchling',
+    minLevel: 9,
+    maxLevel: 9,
+    family: 'spider',
+    hpBase: 14,
+    hpPerLevel: 4,
+    dmgBase: 5,
+    dmgPerLevel: 1.6,
+    attackSpeed: 1.6,
+    armorPerLevel: 8,
+    moveSpeed: 8.5,
+    aggroRadius: 0,
+    xpMult: 0.5,
+    loot: [{ copper: 8, chance: 0.5 }],
+    scale: 0.55,
+    color: 0x3a2740,
+  },
   mirefen_broodmother: {
     id: 'mirefen_broodmother',
     name: 'The Broodmother',
@@ -307,6 +347,35 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.0,
     color: 0x7fb3d5,
+  },
+  drowned_warlord: {
+    id: 'drowned_warlord',
+    // Named quest capstone: single spawn on the slow elite respawn cadence
+    // (the Old Cragmaw precedent), not the trash farm population.
+    respawnMult: 7.2,
+    name: 'The Drowned Warlord',
+    minLevel: 12,
+    maxLevel: 12,
+    family: 'undead',
+    elite: true,
+    hpBase: 60,
+    hpPerLevel: 22,
+    dmgBase: 9,
+    dmgPerLevel: 2.5,
+    attackSpeed: 2.2,
+    armorPerLevel: 16,
+    moveSpeed: 6.5,
+    aggroRadius: 12,
+    lifeleech: { healFrac: 0.5, chance: 0.4, name: 'Drowning Grasp' },
+    // Bog Rot: a fevered, clammy grip that wastes the living from within (Stamina drain).
+    plague: { chance: 0.35, sta: 14, duration: 12, name: 'Bog Rot' },
+    loot: [
+      { copper: 120, chance: 1 },
+      { itemId: 'bone_fragments', chance: 1 },
+      { itemId: 'cracked_fetish', chance: 0.6 },
+    ],
+    scale: 1.3,
+    color: 0x3a6ea5,
   },
   fen_troll: {
     id: 'fen_troll',
@@ -880,18 +949,20 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   },
   q_deepfen_purge: {
     id: 'q_deepfen_purge',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'Back to the Shallows',
     giverNpcId: 'warden_fenwick',
     turnInNpcId: 'warden_fenwick',
-    text: "Aldric says those idols are cult-make — which means the mudfins are hauling the marsh's old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.",
+    text: "Aldric says those idols are cult-make, which means the mudfins are hauling the marsh's old evil up one armful at a time, and it all funnels through their reed-huts on the shallows. I will not have it washing onto my causeway. Take this firebottle, get right up against each hut, and burn the lot. Five should break their dredging for good.",
     completionText:
       "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
     objectives: [
-      { type: 'kill', targetMobId: 'deepfen_murloc', count: 14, label: 'Deepfen Snapper slain' },
+      { type: 'interact', targetObjectItemId: 'murloc_hut', count: 5, label: 'Mudfin huts burned' },
     ],
     xpReward: 1100,
     copperReward: 450,
     itemRewards: {},
+    requiredItems: ['firebottle'],
     requiresQuest: 'q_idols',
   },
   q_widows: {
@@ -913,14 +984,15 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   },
   q_broodmother: {
     id: 'q_broodmother',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Broodmother',
     giverNpcId: 'herbalist_yara',
     turnInNpcId: 'herbalist_yara',
-    text: "You have seen the webs — now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Burn through 8 more widows and put the old mother down before that clutch opens.",
+    text: "You have seen the webs, now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Smash 8 of her eggs and put the old mother down before the rest can hatch. Mind the clutch, some eggs will not go quietly.",
     completionText:
       'Dead? Truly dead? Then the thicket is just trees again. The Light bless your blade, $N.',
     objectives: [
-      { type: 'kill', targetMobId: 'mire_widow', count: 8, label: 'Mirefen Widow slain' },
+      { type: 'kill', targetMobId: 'spider_egg', count: 8, label: 'Broodmother eggs destroyed' },
       {
         type: 'kill',
         targetMobId: 'mirefen_broodmother',
@@ -965,14 +1037,20 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
   },
   q_no_rest: {
     id: 'q_no_rest',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'No Rest in the Reeds',
     giverNpcId: 'brother_aldric_fen',
     turnInNpcId: 'brother_aldric_fen',
-    text: 'The rite on those censers binds the drowned to rise wherever the marsh touches them — and the marsh touches everything. There will be no rest in these reeds until the dead outnumber the living. We cannot unmake the rite yet, but we can empty it of soldiers. Lay 14 more of the Drowned Dead to rest.',
+    text: 'The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, $N, and the rest will scatter back into the mire.',
     completionText:
-      'You give the dead more mercy than their masters ever did. Take this — you have more than earned it.',
+      'You give the dead more mercy than their masters ever did. Take this, you have more than earned it.',
     objectives: [
-      { type: 'kill', targetMobId: 'drowned_dead', count: 14, label: 'Drowned Dead laid to rest' },
+      {
+        type: 'kill',
+        targetMobId: 'drowned_warlord',
+        count: 1,
+        label: 'The Drowned Warlord slain',
+      },
     ],
     xpReward: 1500,
     copperReward: 550,
@@ -1237,10 +1315,16 @@ export const ZONE2_CAMPS: CampDef[] = [
   { mobId: 'mire_widow', center: { x: 70, z: 300 }, radius: 20, count: 7 },
   { mobId: 'mire_widow', center: { x: 95, z: 340 }, radius: 16, count: 6 },
   { mobId: 'mirefen_broodmother', center: { x: 98, z: 348 }, radius: 3, count: 1 },
+  // The Broodmother's clutch: quest-gated eggs spread across Widow Thicket,
+  // interleaved with the widow packs (q_broodmother).
+  { mobId: 'spider_egg', center: { x: 70, z: 300 }, radius: 20, count: 7 },
+  { mobId: 'spider_egg', center: { x: 95, z: 340 }, radius: 16, count: 6 },
   // Drowned dead: the Drowned Chapel and the shallows beyond
   { mobId: 'drowned_dead', center: { x: 90, z: 420 }, radius: 20, count: 8 },
   { mobId: 'drowned_dead', center: { x: 115, z: 450 }, radius: 16, count: 6 },
   { mobId: 'sloomtooth_the_drowned', center: { x: 118, z: 455 }, radius: 5, count: 1 },
+  // Quest capstone: an elite Drowned Warlord risen at the Drowned Chapel (q_no_rest)
+  { mobId: 'drowned_warlord', center: { x: 98, z: 432 }, radius: 3, count: 1 },
   // Trolls: barrow-mounds in the southeast
   { mobId: 'fen_troll', center: { x: -80, z: 420 }, radius: 22, count: 7 },
   { mobId: 'fen_troll', center: { x: -105, z: 455 }, radius: 18, count: 6 },
@@ -1259,6 +1343,19 @@ export const ZONE2_CAMPS: CampDef[] = [
 ];
 
 export const ZONE2_OBJECTS: GroundObjectDef[] = [
+  {
+    // Murloc huts torched with a firebottle for "Back to the Shallows"
+    // (q_deepfen_purge); positions match the mud-hut props at the shallows.
+    itemId: 'murloc_hut',
+    name: 'Mudfin Hut',
+    positions: [
+      { x: -78, z: 269 },
+      { x: -83, z: 266 },
+      { x: -74, z: 275 },
+      { x: -117, z: 346 },
+      { x: -123, z: 354 },
+    ],
+  },
   {
     itemId: 'fen_muster_order',
     name: 'Fenbridge Muster Order',

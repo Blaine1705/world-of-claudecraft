@@ -8801,6 +8801,18 @@ export const fr_FR: EnTranslations = {
       "fen_muster_order": {
         "name": "Ordre de rassemblement de Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Peau de rôdeur du bourbier"
       },
@@ -11074,6 +11086,21 @@ export const fr_FR: EnTranslations = {
       "spider_egg_sac": {
         "name": "Sac d'œufs d'araignée"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Rempart de vase funéraire"
       },
@@ -12298,7 +12325,7 @@ export const fr_FR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Pas de repos dans les roseaux",
-        "text": "Ce rite relève les noyés partout où le marais les touche. Nous ne pouvons le défaire encore; retirez 14 soldats à leurs maîtres.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Vous donnez aux morts plus de pitié que leurs maîtres. Prenez ceci, vous l'avez mérité.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Zélote du Culte du Wyrm tué"
-          },
-          "1": {
-            "label": "Ordres du Culte du Wyrm"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const fr_FR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Nécromancien du Culte du Wyrm tué"
-          },
-          "1": {
-            "label": "Phylactère rituel"
           }
         }
       },

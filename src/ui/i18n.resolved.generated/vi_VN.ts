@@ -8801,6 +8801,18 @@ export const vi_VN: EnTranslations = {
       "fen_muster_order": {
         "name": "Lệnh Tập Hợp Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Da Lông Thú Rình Bùn"
       },
@@ -11074,6 +11086,21 @@ export const vi_VN: EnTranslations = {
       "spider_egg_sac": {
         "name": "Bọc Trứng Nhện"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Thành Lũy Bùn Mộ"
       },
@@ -12298,7 +12325,7 @@ export const vi_VN: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Không Yên Nghỉ Giữa Lau Sậy",
-        "text": "Nghi lễ trên những chiếc lư hương ấy buộc kẻ chết chìm trỗi dậy ở bất cứ nơi nào đầm lầy chạm đến chúng - và đầm lầy chạm đến mọi thứ. Sẽ không có yên nghỉ giữa những lau sậy này cho đến khi kẻ chết đông hơn người sống. Ta chưa thể hóa giải nghi lễ, nhưng ta có thể tước đi binh lính của nó. Hãy đưa thêm 14 Kẻ Chết Chìm về an nghỉ.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Ngươi ban cho người chết nhiều lòng thương xót hơn những kẻ chủ của chúng từng làm. Hãy nhận lấy thứ này - ngươi xứng đáng còn hơn thế.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Cuồng Tín Long Giáo"
-          },
-          "1": {
-            "label": "Mệnh Lệnh Long Giáo"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Đã hạ Pháp Sư Tử Linh Long Giáo"
-          },
-          "1": {
-            "label": "Hồn Hộp Nghi Lễ"
           }
         }
       },

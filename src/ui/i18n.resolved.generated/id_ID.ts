@@ -8801,6 +8801,18 @@ export const id_ID: EnTranslations = {
       "fen_muster_order": {
         "name": "Perintah Mobilisasi Fenbridge"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Kulit Bulu Pengendap Rawa"
       },
@@ -11074,6 +11086,21 @@ export const id_ID: EnTranslations = {
       "spider_egg_sac": {
         "name": "Kantung Telur Laba-laba"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Benteng Lanau Kubur"
       },
@@ -12298,7 +12325,7 @@ export const id_ID: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Tiada Ketenangan di Antara Alang-Alang",
-        "text": "Ritus pada pedupaan itu mengikat para tenggelam untuk bangkit di mana pun rawa menyentuh mereka - dan rawa menyentuh segalanya. Tidak akan ada ketenangan di antara alang-alang ini sampai para mati melebihi jumlah yang hidup. Kita belum bisa membatalkan ritus itu, tapi kita bisa menguras prajuritnya. Istirahatkan 14 lagi dari Drowned Dead.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
         "completion": "Kau memberi para mati lebih banyak belas kasih daripada yang pernah diberikan tuan-tuan mereka. Ambillah ini - kau lebih dari pantas mendapatkannya.",
         "objectives": {
           "0": {
@@ -12576,9 +12603,6 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fanatik Wyrmcult terbunuh"
-          },
-          "1": {
-            "label": "Perintah Wyrmcult"
           }
         }
       },
@@ -12589,9 +12613,6 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Wyrmcult Necromancer dibunuh"
-          },
-          "1": {
-            "label": "Filakteri Ritual"
           }
         }
       },

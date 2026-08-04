@@ -5293,8 +5293,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Wie befürchtet: Sie verbrannten Grabasche, und der Ritus ist mit Voss gezeichnet.',
   'entities.quests.q_drowned_censers.objectives.0.label': 'Rostiges Räuchergefäß',
   'entities.quests.q_no_rest.title': 'Keine Ruhe im Schilf',
-  'entities.quests.q_no_rest.text':
-    'Dieser Ritus lässt Ertrunkene überall auferstehen, wo das Moor sie berührt. Wir können ihn noch nicht brechen; nimm ihren Herren 14 Soldaten.',
   'entities.quests.q_no_rest.completion':
     'Du schenkst den Toten mehr Gnade als ihre Meister. Nimm dies, du hast es verdient.',
   'entities.quests.q_no_rest.objectives.0.label': 'Ertrunkener Toter zur Ruhe gelegt',
@@ -5442,14 +5440,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_cult_orders.completion':
     'Diese Schrift kenne ich aus Morthens Grimoire. Dieselbe Hand führte jedes Grab, {playerName}.',
   'entities.quests.q_cult_orders.objectives.0.label': 'Wyrmkult-Eiferer getötet',
-  'entities.quests.q_cult_orders.objectives.1.label': 'Befehle des Wyrmkults',
   'entities.quests.q_necromancers.title': 'Der Ring der Phylakterien',
   'entities.quests.q_necromancers.text':
     'Die Befehle nennen einen Ring von Phylakterien, {playerName}, Seelengefäße um das Heiligtum. Töte 8 Nekromanten und bring 3 unversehrt.',
   'entities.quests.q_necromancers.completion':
     'Licht, vergib uns. Darin sind die Toten aus Tal und Moor; sie bauten nie ein Heer, {playerName}. Sie sammelten einen Zehnt.',
   'entities.quests.q_necromancers.objectives.0.label': 'Wyrmkult-Nekromant getötet',
-  'entities.quests.q_necromancers.objectives.1.label': 'Rituelles Seelengefäß',
   'entities.quests.q_revenants.title': 'Die Wiedergängerfelder',
   'entities.quests.q_revenants.text':
     'Östlich der Straße liegt ein altes Schlachtfeld. Der Kult hob die Knochen in rostiger Rüstung. Leg 12 zurück in die Erde, {playerName}.',

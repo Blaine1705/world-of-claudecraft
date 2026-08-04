@@ -364,28 +364,19 @@ describe('Eastbrook polish capture contract', () => {
       // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
       // this composite: the pnpm-lock migration (a hashed input to every GLB source
       // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
-      // Bear Form quadruped rig and live graphics rebuild (context recycle plus
-      // profile-aware Eastbrook runtime inputs), and this branch's own brood
-      // shout/flourish and attackByAbility wiring (then gating that cue on a mob
-      // source so player castFx keeps reaching the warrior plan). Each moves the
-      // leaf's own sha256 and with it the composite, so the merged tree mints one
-      // fingerprint matching neither parent's literal. No GLB source fingerprint
-      // moved, not one pipeline input or geometry value changed, and no capture was
-      // retaken: Eastbrook itself is untouched by all of it. Re-minted with
+      // Bear Form quadruped rig (PR #2842), live graphics rebuild (context recycle
+      // plus profile-aware Eastbrook runtime inputs, PR #2799), far-field sprite
+      // impostors and fog-free vista (PR #2793), and brood shout/flourish wiring;
+      // and from this branch the worldObjectBurning fire-burst cue (torched murloc
+      // huts, q_deepfen_purge). The release also retook the polish captures and
+      // re-swept their metadata and performance JSONs, and those files are adopted
+      // verbatim here. Each move shifts the leaf's own sha256 and with it the
+      // composite, so the merged tree mints one fingerprint matching neither
+      // parent's literal. No GLB source fingerprint moved, not one pipeline input
+      // or geometry value changed, and no capture was retaken: Eastbrook itself is
+      // untouched by all of it. Re-minted with
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      // Re-pinned again at the fenbridge-rebuild merge. The release retook the
-      // polish captures, so their metadata and performance JSONs are adopted
-      // verbatim from the base, and it has now moved the rendererIntegration
-      // leaf repeatedly (the impostor bake, fog-free vista, and haze band of
-      // #2793, the Blizzard timed ground loop of #2861, the reactable rift boss
-      // mechanics of #2858, the batched canvas crowd nameplates of #2789, and
-      // the fenbridge rebuild of #2913). This branch's own edits to
-      // src/render/renderer.ts (the brood shout/flourish and attackByAbility
-      // wiring, then gating that cue on a mob source) stack on top. Both sides
-      // moved the same leaf, so the merged composite matches neither parent's
-      // literal. No GLB source fingerprint moved and no capture was retaken on
-      // this branch.
-      fingerprint: 'e2cdf273f5a5d64997d6b68647e20a0feaffb12e653671ab9108879ed1ff9de6',
+      fingerprint: '6b02ff15264e961e2a91ecfecc67f547382c77d76dcce9cedf6218405b94c71d',
       components: {
         captureContract: {
           id: 'polish-v2',

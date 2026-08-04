@@ -1970,6 +1970,11 @@ const ITEM_ENTITY_IDS = [
   'arcane_essence',
   'arcane_shard',
   'fen_muster_order',
+  // Quest-dedupe pass (zones 1 to 3): the firebottle quest tools and collects.
+  'firebottle',
+  'murloc_hut',
+  'restless_skull',
+  'vanguard_bone',
   'mire_prowler_pelt',
   'lost_caravan_goods',
   'waterlogged_idol',
@@ -2494,7 +2499,14 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
+  // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
+  // folds them into the per-locale arrays.
+  firebottle: 'Firebottle',
+  murloc_hut: 'Mudfin Hut',
+  // Dragonkin brood rebuild (PR #2811), same English-appended treatment.
   reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
+  restless_skull: 'Restless Skull',
+  vanguard_bone: 'Vanguard Bone',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {

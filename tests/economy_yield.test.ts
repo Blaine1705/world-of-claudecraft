@@ -66,7 +66,13 @@ function isTrash(template: MobTemplate): boolean {
     // sparkle every corpse in a clutch. Same principled gate
     // tests/progression.test.ts uses for its unconditional-loot rule.
     template.xpMult !== 0 &&
-    template.respawnMult === undefined
+    template.respawnMult === undefined &&
+    // A quest-gated destructible (requiresQuestId, the Broodmother eggs) is a
+    // puzzle object only questers can even damage, not farm population: it
+    // carries neither coin nor harvest components by design. Kept alongside the
+    // xpMult gate above: the two arrived from opposite sides of this merge and
+    // state different intents, so neither is folded into the other.
+    template.requiresQuestId === undefined
   );
 }
 

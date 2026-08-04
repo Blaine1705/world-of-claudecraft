@@ -1309,6 +1309,7 @@ function blankEntity(id: number): Entity {
     overpowerUntil: -1,
     potionCooldownUntil: -1,
     potionCdRemaining: 0,
+    firebottleCdRemaining: 0,
     savedMana: 0,
     chargeTargetId: null,
     chargeTimeLeft: 0,
@@ -3118,6 +3119,19 @@ export class ClientWorld implements IWorld {
       }
       e.gcdRemaining = s.gcd ?? 0;
       e.potionCdRemaining = s.pcd ?? 0;
+      {
+        // A firebottle throw starts its cooldown with NO inventory echo (the
+        // bottle is not consumed), so without this edge the bags grid never
+        // learns to paint the cooldown curtain online (offline useItem is
+        // synchronous and the click-path render sees it immediately). Flag
+        // inventory-changed ONLY on the 0 -> positive start edge: a per-frame
+        // diff would rebuild the bags at 20 Hz for the whole cooldown (the
+        // copper rule above), and the drain is a self-contained CSS animation
+        // that needs no further repaint.
+        const fcd = s.fcd ?? 0;
+        if (fcd > 0 && e.firebottleCdRemaining === 0) this.invChanged = true;
+        e.firebottleCdRemaining = fcd;
+      }
       e.comboPoints = s.combo ?? 0;
       // Routed through the pending-target echo guard: a stale in-flight
       // snapshot must not clobber an optimistic targetEntity write (the target
