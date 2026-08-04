@@ -20,6 +20,7 @@
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import type { TranslationKey } from './i18n';
+import { QUEST_ITEM_NAME_COLOR } from './item_name_color';
 
 /** One objective row the host projects from QuestDef.objectives. */
 export interface QuestItemObjectiveInput {
@@ -70,8 +71,9 @@ export interface QuestItemTooltipModel {
   orphanedKey: 'itemUi.tooltip.questOrphaned';
 }
 
-/** CSS color token for quest-gold title / kind lines. */
-export const QUEST_ITEM_TOOLTIP_COLOR = 'var(--color-quest)';
+/** CSS color token for quest-gold title / kind lines. Same source as chat links
+ *  and loot names (`itemNameColor` / `QUEST_ITEM_NAME_COLOR`). */
+export const QUEST_ITEM_TOOLTIP_COLOR = QUEST_ITEM_NAME_COLOR;
 
 const RULES_KEY = 'itemUi.tooltip.questRules' as const;
 const ORPHANED_KEY = 'itemUi.tooltip.questOrphaned' as const;

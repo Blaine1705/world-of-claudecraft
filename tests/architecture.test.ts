@@ -197,6 +197,7 @@ const UI_PURE_CORES = [
   'src/ui/bag_instance_glyph_view.ts',
   'src/ui/bag_quest_mark_view.ts',
   'src/ui/quest_item_tooltip_view.ts',
+  'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
@@ -392,6 +393,7 @@ const RENDER_PURE_CORES = [
 const BARE_NAMED = [
   'src/ui/banner_queue.ts',
   'src/ui/item_kind_label.ts',
+  'src/ui/item_name_color.ts',
   'src/render/foliage_lod.ts',
   'src/render/compile_gate.ts',
   'src/render/prewarm_pass.ts',
@@ -965,6 +967,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/item_kind_label.ts',
+  'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/known_item.ts',
   'src/ui/live_region_politeness.ts',

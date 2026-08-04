@@ -1,6 +1,6 @@
 # Quest Item Inventory UI: cross-phase state
 
-Current phase: **Phase 3 complete; Phase 4 ready to start**
+Current phase: **Phase 4 complete; Phase 5 ready to start**
 Worktree: `/Users/fernando/Documents/wocc-quest-item-ui`
 Branch: `feature/quest-item-inventory-ui`
 Base: `release/v0.34.0` (merge latest at the start of every phase)
@@ -69,7 +69,7 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
 ### Expected new modules
 - `src/ui/bag_quest_mark_view.ts` + `tests/bag_quest_mark_view.test.ts` (**done Phase 1**)
 - `src/ui/quest_item_tooltip_view.ts` + `tests/quest_item_tooltip_view.test.ts` (**done Phase 2**)
-- Optional Phase 4: `src/ui/item_name_color.ts` (or similar) + tests
+- `src/ui/item_name_color.ts` + `tests/item_name_color.test.ts` (**done Phase 4**)
 - Optional Phase 5: small bag-tracker highlight helper
 
 ## Progress resolution notes (for Phase 2)
@@ -116,6 +116,8 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   - `tests/bag_quest_mark_view.test.ts`
   - `src/ui/quest_item_tooltip_view.ts`
   - `tests/quest_item_tooltip_view.test.ts`
+  - `src/ui/item_name_color.ts`
+  - `tests/item_name_color.test.ts`
   - `docs/quest-item-inventory-ui/*` (planning packet)
 - New tokens:
   - `--color-quest: #ffd12d`
@@ -134,6 +136,8 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   - `src/ui/quest_item_tooltip_view.ts` in `UI_PURE_CORES`
   - Phase 3 extended existing pure cores `bag_filter.ts` and `bags_view.ts` (already
     registered); no new `*_view.ts` file required.
+  - `src/ui/item_name_color.ts` in `UI_PURE_CORES`, `BARE_NAMED`, and
+    `EXPECTED_BARE_NAMED` (bare name, not `*_view` / `*_core`).
 - Known gotchas discovered:
   - `.bag-item.q-common` uses `border-color: ... !important`; quest rim rule must follow
     it (or also use `!important`) so purpose gold wins on common quest stacks.
@@ -145,8 +149,14 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
     `itemUi.tooltip.questItem` desc line is no longer composed for quest kinds.
   - `fillGrid` must not use `continue` (R34 unknown-cell pin); section vs stack branches
     use if/else. Soft section headers use `grid-column: 1 / -1` on `.bag-grid`.
+  - Loot roll events carry quality on the wire but kind only via knownItemDef; pass
+    `{ kind: item?.kind, quality }` into `itemNameColor` so unknown ids stay on the
+    quality path and quest defs paint quest gold.
+  - Bare-named pure cores need three list entries: UI_PURE_CORES, BARE_NAMED, and
+    EXPECTED_BARE_NAMED (architecture cross-check).
 
 ## Resume point
 
-**Next action:** Phase 4 cross-surface quest gold. Merge latest `origin/release/v0.34.0`
-first. Shared item name color helper for chat item links and loot names.
+**Next action:** Phase 5 interactive polish. Merge latest `origin/release/v0.34.0`
+first. Bag hover highlight for matching tracker rows and ready-to-turn-in seal
+variant (`bag_quest_mark_view` extension), reduced-motion safe.

@@ -425,6 +425,7 @@ import {
   itemStatName,
 } from './item_instance_tooltip';
 import { itemKindLabel, itemQualityLabel } from './item_kind_label';
+import { itemNameColor } from './item_name_color';
 import { itemSetMemberCounts, itemSetTooltipModel } from './item_set_tooltip_view';
 import { itemSlotLabel as itemSlotName } from './item_slot_labels';
 import { knownItemDef, ownEntry } from './known_item';
@@ -5150,10 +5151,8 @@ export class Hud {
     // Item"). Story lines (related quest, progress, rules, orphaned) come from
     // the pure model; escape and tEntity stay in this host.
     const questModel = this.questItemTooltipFor(item);
-    const qColor =
-      questModel?.titleColorMode === 'quest'
-        ? QUEST_ITEM_TOOLTIP_COLOR
-        : (QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff');
+    // Shared helper: quest kind paints quest gold; all other kinds use quality.
+    const qColor = itemNameColor(item);
     let html = `<div class="tt-title" style="color:${qColor}">${esc(itemDisplayName(item))}</div>`;
     // Quality/kind line, e.g. "Epic Armor". Heroic items (dungeon upgraded variants
     // via heroicOf, bespoke heroic-tier raid gear via heroic) append a gold
@@ -12582,8 +12581,10 @@ export class Hud {
   }
 
   // Render a [[i:id]] chat segment as a quality-colored, inspectable item link.
-  // Hover/focus shows the same item tooltip the bags window uses; an unknown id
-  // (e.g. content drift between players) degrades to a plain [?].
+  // Quest kinds use quest gold (purpose class) via itemNameColor so chat matches
+  // bag / tooltip / loot name language. Hover/focus shows the same item tooltip
+  // the bags window uses; an unknown id (e.g. content drift between players)
+  // degrades to a plain [?].
   private appendChatItemLink(parent: HTMLElement, itemId: string): void {
     // knownItemDef, not bare truthiness: the token charset admits prototype
     // keys ([[i:constructor]] is peer-typed text), and the bare read sent
@@ -12595,7 +12596,7 @@ export class Hud {
     }
     const link = document.createElement('span');
     link.className = 'chat-item-link';
-    link.style.color = QUALITY_COLOR[item.quality ?? 'common'] ?? '#fff';
+    link.style.color = itemNameColor(item);
     link.textContent = `[${itemDisplayName(item)}]`;
     link.tabIndex = 0;
     this.attachTooltip(link, () => this.itemTooltip(item));

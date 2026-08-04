@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { QUEST_ITEM_NAME_COLOR } from '../src/ui/item_name_color';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipInput,
@@ -63,6 +64,8 @@ describe('quest_item_tooltip_view: purpose chrome', () => {
     expect(model!.showQuality).toBe(false);
     expect(model!.kindLineKey).toBe('itemUi.kind.quest');
     expect(QUEST_ITEM_TOOLTIP_COLOR).toBe('var(--color-quest)');
+    // Single source: tooltip gold aliases the shared name-color token.
+    expect(QUEST_ITEM_TOOLTIP_COLOR).toBe(QUEST_ITEM_NAME_COLOR);
   });
 
   it('always carries the rules footer key (active and orphaned)', () => {

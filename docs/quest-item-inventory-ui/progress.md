@@ -6,7 +6,7 @@
 | Phase 1: Bag visual identity | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 2: Story tooltip | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 3: Findability chrome | Complete | 2026-08-03 | 2026-08-03 |
-| Phase 4: Cross-surface language | Pending | | |
+| Phase 4: Cross-surface language | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 5: Interactive polish | Pending | | |
 | Phase 6: Final QA + screenshots + gate | Pending | | |
 
@@ -39,11 +39,11 @@
 - [x] Reviews clean of BLOCKING
 
 ## Phase 4 deliverables
-- [ ] Shared item name color helper (quest override)
-- [ ] Chat item links + loot name surfaces wired
-- [ ] Tests for helper
-- [ ] Merge latest `origin/release/v0.34.0` before coding
-- [ ] Reviews clean of BLOCKING
+- [x] Shared item name color helper (quest override)
+- [x] Chat item links + loot name surfaces wired
+- [x] Tests for helper
+- [x] Merge latest `origin/release/v0.34.0` before coding
+- [x] Reviews clean of BLOCKING
 
 ## Phase 5 deliverables
 - [ ] Bag hover highlights matching tracker row
@@ -85,3 +85,10 @@
   `!bagOrderIsManual` and the list mixes quest + non-quest; manual All+recent keeps the
   real cell stream (rim/seal only, no header nodes). i18n EN + M16 for count aria and
   empty copy. Merged latest release base first.
+- 2026-08-03 Phase 4: Cross-surface language. Pure helper `itemNameColor` in
+  `item_name_color.ts`: kind === 'quest' returns `var(--color-quest)`; otherwise
+  QUALITY_COLOR with hasOwn + `var(--color-quality-default)` fallback. Chat item links
+  and loot-roll names (need/greed, watch, master) use the helper; tooltip title color
+  also routes through it so surfaces cannot drift. QUEST_ITEM_TOOLTIP_COLOR aliases
+  QUEST_ITEM_NAME_COLOR. Registered in UI_PURE_CORES + BARE_NAMED + EXPECTED_BARE_NAMED.
+  Merged latest release base first (already up to date).
