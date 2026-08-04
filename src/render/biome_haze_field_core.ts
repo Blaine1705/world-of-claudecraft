@@ -59,19 +59,20 @@ export const HAZE_DENSITY_CLEAR_FAR = 700;
 /** Strength of the clearest realm's air, as a fraction of the murkiest. */
 export const HAZE_STRENGTH_MIN = 0.66;
 
-// The distance ramp. Onset at the 120 yard interest radius (nothing a player
-// fights, loots or reads is ever hazed: the Gaussian shoulder keeps 150 yards
-// under 1 percent), then a rise tuned to the BORDER SIGHTLINE: standing in
-// one realm looking across into the next, the neighbour's land sits 250 to
-// 400 yards out, and the first ship of this ramp (onset 150 / ref 350) put
-// only 2 to 8 percent of the neighbour's air on it, which read as "nothing
-// changed". Now that band carries 14 to 35 percent, saturating around 40 for
-// the murkiest realms. HAZE_AERIAL_MAX is the ceiling for the murkiest realm;
-// the clear realms land at HAZE_STRENGTH_MIN of it. Still never a full
-// paint-over: the distant ground keeps its own colour under the air.
-export const HAZE_AERIAL_ONSET = 120;
-export const HAZE_AERIAL_REF = 200;
-export const HAZE_AERIAL_MAX = 0.46;
+// The distance ramp, now a genuine LIGHT FOG in the zone's own colour rather
+// than a hint. Onset just under the 120 yard interest radius (the Gaussian
+// shoulder keeps the radius itself under 1 percent, so nothing a player
+// fights, loots or reads is ever hazed), then a fast rise tuned to the
+// BORDER SIGHTLINE: the neighbour's land fills the 150 to 400 yard band, and
+// two ships of this ramp (onset 150 / ref 350, then ref 200) still played as
+// "the air did not change". Now 200 yards carries about 15 percent, 300
+// about a third, saturating near 40 percent for a clear realm and
+// HAZE_AERIAL_MAX for the murkiest. A little fog, deliberately not a lot:
+// the ceiling stays at half, so the distant ground always keeps its own
+// colour under the air.
+export const HAZE_AERIAL_ONSET = 100;
+export const HAZE_AERIAL_REF = 150;
+export const HAZE_AERIAL_MAX = 0.5;
 
 // How far along the view ray the SKY dome samples the field for its
 // horizon-band tint (sky.ts): the mid-vista distance where a neighbouring

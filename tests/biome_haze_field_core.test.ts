@@ -178,14 +178,16 @@ describe('aerial distance ramp', () => {
   it('leaves every gameplay distance untouched', () => {
     expect(aerialHazeAmount(0, 1)).toBe(0);
     expect(aerialHazeAmount(HAZE_AERIAL_ONSET, 1)).toBe(0);
-    // Interest scope is about 120 yards; the onset covers all of it, and the
-    // Gaussian shoulder keeps the next 30 yards visually at zero too.
-    expect(HAZE_AERIAL_ONSET).toBeGreaterThanOrEqual(120);
+    // Interest scope is about 120 yards. The onset may sit just under it,
+    // but the Gaussian shoulder must keep the radius itself under 1 percent:
+    // nothing a player fights, loots or reads ever reads as fogged.
+    expect(HAZE_AERIAL_ONSET).toBeGreaterThanOrEqual(100);
+    expect(aerialHazeAmount(120, 1)).toBeLessThan(0.01);
   });
 
   it('has no onset ring: the first yards past the onset are near-zero', () => {
-    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 10, 1)).toBeLessThan(0.002);
-    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 30, 1)).toBeLessThan(0.015);
+    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 10, 1)).toBeLessThan(0.004);
+    expect(aerialHazeAmount(HAZE_AERIAL_ONSET + 30, 1)).toBeLessThan(0.03);
   });
 
   it('grows monotonically and saturates below the ceiling', () => {
@@ -199,24 +201,26 @@ describe('aerial distance ramp', () => {
     expect(aerialHazeAmount(1500, 1)).toBeCloseTo(HAZE_AERIAL_MAX, 3);
   });
 
-  it('stays under half even fully saturated, never a paint-over', () => {
+  it('caps at half even fully saturated: a little fog, never a paint-over', () => {
     const clearest = hazeStrengthForFogFar(HAZE_DENSITY_CLEAR_FAR);
     const murkiest = hazeStrengthForFogFar(HAZE_DENSITY_THICK_FAR);
-    expect(aerialHazeAmount(4000, clearest)).toBeGreaterThan(0.27);
-    expect(aerialHazeAmount(4000, clearest)).toBeLessThan(0.32);
-    expect(aerialHazeAmount(4000, murkiest)).toBeGreaterThan(0.42);
-    expect(aerialHazeAmount(4000, murkiest)).toBeLessThan(0.5);
+    expect(HAZE_AERIAL_MAX).toBeLessThanOrEqual(0.5);
+    expect(aerialHazeAmount(4000, clearest)).toBeGreaterThan(0.3);
+    expect(aerialHazeAmount(4000, clearest)).toBeLessThan(0.36);
+    expect(aerialHazeAmount(4000, murkiest)).toBeGreaterThan(0.45);
+    expect(aerialHazeAmount(4000, murkiest)).toBeLessThanOrEqual(0.5);
   });
 
-  it('reads clearly at the BORDER sightline, not only mid-vista', () => {
+  it('reads as real fog tint at the BORDER sightline, not only mid-vista', () => {
     // Standing at a zone border looking in, the neighbour's land fills the
-    // 250 to 400 yard band. The first ship of this ramp put 2 to 8 percent
-    // there, which play-read as "nothing changed": these floors are the fix
-    // and must not regress.
-    expect(aerialHazeAmount(250, 0.8)).toBeGreaterThan(0.1);
-    expect(aerialHazeAmount(300, 0.8)).toBeGreaterThan(0.15);
-    expect(aerialHazeAmount(400, 0.83)).toBeGreaterThan(0.25);
-    expect(aerialHazeAmount(700, 0.83)).toBeGreaterThan(0.3);
+    // 150 to 400 yard band. Two ships of this ramp under-shot there and both
+    // play-read as "the air did not change": these floors are the fix and
+    // must not regress.
+    expect(aerialHazeAmount(200, 0.8)).toBeGreaterThan(0.1);
+    expect(aerialHazeAmount(250, 0.8)).toBeGreaterThan(0.2);
+    expect(aerialHazeAmount(300, 0.8)).toBeGreaterThan(0.28);
+    expect(aerialHazeAmount(400, 0.83)).toBeGreaterThan(0.35);
+    expect(aerialHazeAmount(700, 0.83)).toBeGreaterThan(0.38);
   });
 });
 
