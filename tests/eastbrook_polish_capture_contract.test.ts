@@ -209,7 +209,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'feature-worktree',
       views: EASTBROOK_TOWN_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -233,7 +233,7 @@ describe('Eastbrook polish capture contract', () => {
       sourceComparison: 'polish-baseline-worktree',
       views: EASTBROOK_TOWN_POLISH_MATCHED_CAPTURE_VIEWS,
       placementInventory: EASTBROOK_TOWN_REBUILD_PLACEMENT_INVENTORY,
-      townTriangles: 29_644,
+      townTriangles: 29_436,
       attributionTargets: [
         {
           key: 'town-root',
@@ -255,7 +255,7 @@ describe('Eastbrook polish capture contract', () => {
       layoutId: 'eastbrook_civic_layout_v2',
       sourceComparison: 'polish-v2-worktree',
       placementInventory: EASTBROOK_TOWN_POLISH_V2_PLACEMENT_INVENTORY,
-      townTriangles: 29_110,
+      townTriangles: 28_902,
       attributionTargets: [
         {
           key: 'town-root',
@@ -360,12 +360,23 @@ describe('Eastbrook polish capture contract', () => {
       mode: 'composite-sha256',
       algorithm: 'sha256',
       baselineRevision: EASTBROOK_POLISH_BASELINE_REVISION,
-      // Deliberately re-pinned: the 0.33.1 version sync bumped package-lock.json,
-      // a hashed input to every GLB source fingerprint, so the town, mailbox and
-      // noticeboard leaves all moved and this composite mints fresh (atop the v0.33
-      // render recovery's renderer integration leaf). Not one pipeline input or
-      // geometry value changed, and no capture was retaken.
-      fingerprint: '84b1e375592b0d5a0591b8f1e0e081b73fe5aa2ab57d3df0f8bfe7ef7aa31e9c',
+      // Deliberately re-pinned, and this mint stacks every leaf move on both sides
+      // of the merge onto src/render/renderer.ts, the rendererIntegration leaf of
+      // this composite: the pnpm-lock migration (a hashed input to every GLB source
+      // fingerprint), PR #2720's fence-removal layout evidence, release/v0.34.0's
+      // Bear Form quadruped rig (PR #2842), live graphics rebuild (context recycle
+      // plus profile-aware Eastbrook runtime inputs, PR #2799), far-field sprite
+      // impostors and fog-free vista (PR #2793), and brood shout/flourish wiring;
+      // and from this branch the worldObjectBurning fire-burst cue (torched murloc
+      // huts, q_deepfen_purge). The release also retook the polish captures and
+      // re-swept their metadata and performance JSONs, and those files are adopted
+      // verbatim here. Each move shifts the leaf's own sha256 and with it the
+      // composite, so the merged tree mints one fingerprint matching neither
+      // parent's literal. No GLB source fingerprint moved, not one pipeline input
+      // or geometry value changed, and no capture was retaken: Eastbrook itself is
+      // untouched by all of it. Re-minted with
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '6b02ff15264e961e2a91ecfecc67f547382c77d76dcce9cedf6218405b94c71d',
       components: {
         captureContract: {
           id: 'polish-v2',
@@ -576,10 +587,10 @@ describe('Eastbrook polish capture contract', () => {
         shadowEnabled: true,
         ...(contractId ? { contractId } : {}),
       });
-    expect(() => assertPerf(29_644)).not.toThrow();
-    expect(() => assertPerf(29_644, 'rebuild-v1')).not.toThrow();
-    expect(() => assertPerf(29_644, 'polish-baseline')).not.toThrow();
-    expect(() => assertPerf(29_110, 'polish-v2')).not.toThrow();
+    expect(() => assertPerf(29_436)).not.toThrow();
+    expect(() => assertPerf(29_436, 'rebuild-v1')).not.toThrow();
+    expect(() => assertPerf(29_436, 'polish-baseline')).not.toThrow();
+    expect(() => assertPerf(28_902, 'polish-v2')).not.toThrow();
     expect(() => assertPerf(29_644, 'polish-v2')).toThrow('draw stats');
   });
 

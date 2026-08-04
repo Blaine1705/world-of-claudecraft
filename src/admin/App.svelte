@@ -22,6 +22,7 @@
   import Accounts from './pages/Accounts.svelte';
   import Characters from './pages/Characters.svelte';
   import OnlinePlayers from './pages/OnlinePlayers.svelte';
+  import Guilds from './pages/Guilds.svelte';
   import Usage from './pages/Usage.svelte';
   import TickPerf from './pages/TickPerf.svelte';
   import Moderation from './pages/Moderation.svelte';
@@ -61,7 +62,7 @@
     'bug-reports': BugReports,
     'unstuck-reports': UnstuckReports,
     staff: Staff,
-  } satisfies Record<AdminPage, Component>;
+  } satisfies Record<Exclude<AdminPage, 'guilds'>, Component>;
   // Permission route guard (presentation only; the server re-checks every
   // call): a route the operator cannot open renders their first visible page
   // instead. The URL is left alone so a later role change makes it work again.
@@ -74,7 +75,9 @@
     return fallback === null ? null : { page: fallback };
   });
   let Page = $derived(
-    guardedRoute === null || guardedRoute.page === 'ip' ? null : PAGE_COMPONENTS[guardedRoute.page],
+    guardedRoute === null || guardedRoute.page === 'ip' || guardedRoute.page === 'guilds'
+      ? null
+      : PAGE_COMPONENTS[guardedRoute.page],
   );
 
   setAdminNavigation({
@@ -112,6 +115,10 @@
       {#if guardedRoute.page === 'ip'}
         {#key guardedRoute.ip}
           <IpAssociations ip={guardedRoute.ip} />
+        {/key}
+      {:else if guardedRoute.page === 'guilds'}
+        {#key guardedRoute.guildId ?? 'directory'}
+          <Guilds guildId={guardedRoute.guildId} />
         {/key}
       {:else if Page}
         <Page />

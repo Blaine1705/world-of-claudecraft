@@ -46,8 +46,8 @@
         "skins": 0,
         "cameras": 0,
         "extensions": ["EXT_meshopt_compression", "KHR_mesh_quantization"],
-        "sha256": "5555e666378f0fe00fea41cffca3bda750a784ac30e769c42529c7bcfd1a8e4c",
-        "sourceFingerprint": "d9fb94ca9cd0e866b709a629181c53fe0298424a4442b5a6127bb35eeca08ca3"
+        "sha256": "599f931cebcee4652e2fff788947cc34bedacad7a5bf8a168f04e44f1bfcdc95",
+        "sourceFingerprint": "2d63ac194e8e21ac618c5cb6405e2e4aef2c19a0f63a8a29d92489275e53cba6"
       }
     },
     {
@@ -84,8 +84,8 @@
         "skins": 0,
         "cameras": 0,
         "extensions": ["EXT_meshopt_compression", "KHR_mesh_quantization"],
-        "sha256": "306974064e061b013e6d1bf6d382af07513dd6824de30d6aedf2797d4689d32f",
-        "sourceFingerprint": "8af63560e2b9cbac190549c44e9ebb7b24245161a971bb112210128ded55ea34"
+        "sha256": "765ac43c5be4942921aa48b9796a70681b030aa8f6882632a4ba5c6e6f6a97d6",
+        "sourceFingerprint": "0517cc8bd05d333786105323fcb13bed8b3c1f00820633be568bc6098133f00c"
       }
     }
   ],

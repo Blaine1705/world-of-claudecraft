@@ -122,7 +122,7 @@ repository did not move or alter it. The committed processor and exact semantic 
 The full-color source and the comparison image containing it are rights-reserved design evidence.
 The derived shipping WebP is a separate project asset licensed for redistribution with the
 project, as recorded by its own row in `CREDITS.md`. The atlas source fingerprint is
-`ed6ce2b56d9358cdfabfc267b76e729e039c5a4049ddb224a6f43f34d3c8700b`, separate from the
+`c31c1e41eb443f24565e805e045fdaca87fee087b2c0152d13af28ab749aab68`, separate from the
 town GLB source fingerprint. The asset test literal-pins both fingerprints and proves that all
 nine GLBs still contain zero embedded textures. Visual acceptance verifies cell isolation and
 pattern retention; it does not claim byte-level continuity between opposite cell edges. Runtime

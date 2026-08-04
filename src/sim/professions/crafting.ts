@@ -68,7 +68,7 @@
 // game/net imports, no Math.random/Date.now, host-agnostic so it runs
 // offline, on the server, and in the headless RL env unchanged.
 
-import { bagCapacity, fitsAll, removeStacked } from '../bags';
+import { bagCapacity, countStacked, fitsAll, removeStacked } from '../bags';
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
@@ -80,7 +80,18 @@ import { archetypeCeilingFor, craftSkillGainMultiplier } from './archetype';
 import { comboEligibility } from './combo_eligibility';
 import { isCommissionEligible } from './commission';
 import { isSignableMaterialRarity, type MaterialRarity } from './gathering';
-import { masterworkBonusStats, masterworkBumpedQuality, masterworkProcChance } from './masterwork';
+import {
+  type CraftVarianceOutcome,
+  JACK_VARIANCE_BETTER_PROC_BONUS,
+  rollCraftVariance,
+} from './jack_variance';
+import {
+  MASTERWORK_CHANCE_CAP,
+  masterworkBonusStats,
+  masterworkBumpedQuality,
+  masterworkProcChance,
+} from './masterwork';
+import { countAcrossGrades, materialGradeIds, planGradeRemoval } from './material_grades';
 import { materialTierBonusForReagents } from './material_tier';
 import { isStationActive } from './mobile_station';
 import { craftActionXp } from './profession_xp';
@@ -103,6 +114,20 @@ import {
 // recipe) is retired; the free-floor COST rule (common-tier crafting never
 // costs anything) lives on in recipes.ts/types.ts.
 const CRAFT_SKILL_GAIN = 1;
+
+// Jack of All Trades cross-craft synergy discount (issue #1296, the second
+// improviser perk): an ADDITIONAL flat percentage shaved off every reagent's
+// required quantity for a Jack-attuned crafter, composing with the #1145
+// self-signed reduction and #1134 specialization discount the same way those
+// two already compose (requiredReagentCountFor below): one combined floor,
+// never fully waiving a reagent (floored at 1). Represents a Jack's breadth
+// across every craft lowering material waste, unlike specialization's
+// per-craft depth. Magnitude is an open design question (the doc's own Open
+// Questions section: "the material-saving bonus" magnitude "is open"); kept
+// modest and below PERK_THRESHOLDS' specialization discount
+// (content/professions.ts materialDiscountPct, 0.2), since a Jack is
+// deliberately broad-and-shallow rather than ever truly specialized.
+const JACK_MATERIAL_DISCOUNT_PCT = 0.1;
 
 function isCraftedDisenchantTrackedOutput(def: ItemDef | undefined): boolean {
   return (
@@ -140,6 +165,16 @@ export interface CraftResult {
   // so no UI may consume it (the honored-vs-ignored pins are its consumer);
   // the player-visible commission fact is the payload's bindOnTrade arm.
   commission?: boolean;
+  // Jack of All Trades improviser variance (#1296): present only for a
+  // Jack-attuned crafter (jack_variance.ts rollCraftVariance draws an
+  // ADDITIONAL rng roll only then, so every non-Jack craft still draws
+  // exactly the one masterwork proc roll, unchanged). 'worse' forced this
+  // craft's masterwork bump off outright; 'better' improved (never
+  // guaranteed) this craft's masterwork odds; 'normal' changed nothing.
+  // Sim-internal, the same as `commission` above: NOT projected into
+  // CraftResultView or the craftResult SimEvent, since there is no live
+  // quest path to become Jack yet (see archetype.ts attuneJackOfAllTrades).
+  variance?: CraftVarianceOutcome;
   // Present only when !ok: a stable reason code, not player-facing prose (the
   // caller renders/localizes the denial).
   reason?:
@@ -229,17 +264,45 @@ export function holdsSelfSignedInstance(
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
- *  instance stamped with `meta`'s OWN name (a self-gathered signed material). */
+ *  instance stamped with `meta`'s OWN name (a self-gathered signed material).
+ *
+ *  Spans the reagent's grades (professions/material_grades.ts). The reason is
+ *  that the fine grade REPLACES the plain yield, so past the tier-1 tool a
+ *  player's self-gathered copper ore IS fine copper ore, and checking the
+ *  declared id alone would quietly stop the #1145 discount firing for exactly
+ *  the players who upgraded: using the better tool would cost them a perk.
+ *
+ *  Note the semantic this inherits and does not change: the discount is
+ *  keyed on HOLDING a self-signed copy, not on spending one, and
+ *  `planGradeRemoval` drains the base grade first. So a player holding both
+ *  grades earns the discount from the fine copy while the craft actually
+ *  spends plain ore. That hold-not-spend behavior predates the grades (the
+ *  check was always a `some`, and removeItem walks end-backward, so the
+ *  signed copy was never guaranteed to be the consumed one); the widening
+ *  extends it to a second id rather than introducing it. Pinned in
+ *  tests/material_grade_substitution.test.ts so the ruling is on record. */
 function hasSelfSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return holdsSelfSignedInstance(meta.inventory, meta.name, itemId);
+  return materialGradeIds(itemId).some((gradeId) =>
+    holdsSelfSignedInstance(meta.inventory, meta.name, gradeId),
+  );
 }
 
 /** Whether `meta` holds an inventory slot for `itemId` carrying a signed
  *  instance with ANY signer (the crafter's own name included). Feeds the
  *  masterwork proc's signed-reagent term (2026-07-17 ruling); the #1145
- *  quantity discount keeps using the self-only check above. */
+ *  quantity discount keeps using the self-only check above.
+ *
+ *  Spans the reagent's grades for the same reason its sibling does. 26 shipped
+ *  masterwork-capable recipes declare a material that has a fine grade
+ *  (ironedge_longsword, thoriumscale_cuirass, goldweave_robe and the rest), and
+ *  a fine grade carries a signer exactly like its base: resolveHarvest mints
+ *  the signed instance on the RESOLVED id (gathering.ts). So a player who
+ *  out-tooled the material, holding only signed fine copies, would pay the
+ *  reagent line with one and still lose MASTERWORK_SIGNED_CHANCE, which is the
+ *  same inversion the sibling exists to prevent. */
 function hasSignedInstance(meta: PlayerMeta, itemId: string): boolean {
-  return meta.inventory.some((s) => s.itemId === itemId && !!s.instance?.signer);
+  const gradeIds = materialGradeIds(itemId);
+  return meta.inventory.some((s) => gradeIds.includes(s.itemId) && !!s.instance?.signer);
 }
 
 /** The result of resolving one reagent's required quantity: the final count
@@ -272,6 +335,7 @@ export function requiredReagentCount(
     reagent,
     craftSkills,
     professionId,
+    !!meta?.archetype?.isJackOfAllTrades,
   );
 }
 
@@ -282,17 +346,26 @@ export function requiredReagentCount(
  * window's view core computes its displayed requirement and Craft gate with
  * the SAME function the sim's availability check and consumption use, the
  * single-surface doctrine the difficulty label already follows.
+ *
+ * `isJackOfAllTrades` (#1296) composes a THIRD multiplicative discount, the
+ * cross-craft synergy material-saving perk, on top of the #1145/#1134 pair
+ * in the SAME single floor (never triple-floored, so the three never
+ * compound more aggressively than one combined percentage would). Defaults
+ * false so every existing caller (crafting_view.ts's UI projection included)
+ * is byte-identical until it is threaded a real Jack identity.
  */
 export function requiredReagentCountFor(
   hasSelfSigned: boolean,
   reagent: ProfessionReagent,
   craftSkills: CraftSkillState,
   professionId: string,
+  isJackOfAllTrades = false,
 ): RequiredReagentResult {
   const afterSelfSigned = hasSelfSigned ? Math.max(1, reagent.count - 1) : reagent.count;
   const multiplier = materialCostMultiplier(craftSkills, professionId);
+  const jackMultiplier = isJackOfAllTrades ? 1 - JACK_MATERIAL_DISCOUNT_PCT : 1;
   return {
-    count: Math.max(1, Math.floor(afterSelfSigned * multiplier)),
+    count: Math.max(1, Math.floor(afterSelfSigned * multiplier * jackMultiplier)),
     selfSignedBonusApplied: afterSelfSigned < reagent.count,
   };
 }
@@ -310,7 +383,10 @@ export function hasRecipeMaterials(
   const craftSkills = meta ? meta.craftSkills : {};
   return recipe.reagents.every(
     (r) =>
-      ctx.countItem(r.itemId, pid) >=
+      // Counted across the reagent's grades, in the same order the
+      // consumption below spends them, so the gate can never promise units the
+      // removal would not find.
+      countAcrossGrades(r.itemId, (id) => ctx.countItem(id, pid)) >=
       requiredReagentCount(meta, r, craftSkills, recipe.professionId).count,
   );
 }
@@ -459,7 +535,15 @@ export function resolveCraftForRecipe(
     const scratch = meta.inventory.map((s) => ({ ...s }));
     for (const reagent of recipe.reagents) {
       const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
-      removeStacked(scratch, reagent.itemId, required.count);
+      // The SAME grade plan the real consumption applies below, computed from
+      // the scratch copy so a multi-reagent recipe sees earlier lines already
+      // taken. Modelling only the declared id would leave the gate reserving
+      // room against slots the craft never actually frees.
+      for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
+        countStacked(scratch, id),
+      )) {
+        removeStacked(scratch, take.itemId, take.count);
+      }
     }
     // The grant shapes, mirroring the grant arms below field for field so the
     // modeled payloads merge exactly like the minted ones.
@@ -522,17 +606,32 @@ export function resolveCraftForRecipe(
     const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId);
     if (required.selfSignedBonusApplied) selfSignedBonusApplied = true;
     if (meta && hasSignedInstance(meta, reagent.itemId)) signedReagentUsed = true;
-    ctx.removeItem(reagent.itemId, required.count, pid);
+    for (const take of planGradeRemoval(reagent.itemId, required.count, (id) =>
+      ctx.countItem(id, pid),
+    )) {
+      ctx.removeItem(take.itemId, take.count, pid);
+    }
   }
-  // Masterwork proc draw: the single output-side rng draw, at the
-  // exact position the retired quality roll occupied so the world's draw
-  // order and the one-draw-per-successful-craft contract are preserved. The
-  // draw is UNCONDITIONAL on the success path: it happens even when the
-  // effect is gated off below, so the draw count per successful craft is
-  // always exactly 1 regardless of archetype state or output type. Every
-  // denial path above draws nothing, unchanged.
+  // Jack of All Trades improviser variance roll (#1296): an ADDITIONAL
+  // output-side draw, ONLY for a Jack-attuned crafter, positioned
+  // immediately before the masterwork proc draw below. Every non-Jack
+  // crafter (isJackOfAllTrades false, still the only reachable value: there
+  // is no live quest path to become Jack yet) draws nothing extra here, so
+  // the one-draw-per-successful-craft contract the masterwork proc draw
+  // documents below is unchanged for every existing scenario and test.
+  const jackVariance: CraftVarianceOutcome | null = meta?.archetype.isJackOfAllTrades
+    ? rollCraftVariance(ctx.rng.next())
+    : null;
+  // Masterwork proc draw: the single output-side rng draw for every
+  // non-Jack crafter, at the exact position the retired quality roll
+  // occupied so the world's draw order and the one-draw-per-successful-craft
+  // contract are preserved. The draw is UNCONDITIONAL on the success path:
+  // it happens even when the effect is gated off below, so the draw count
+  // per successful craft is exactly 1 (2 for a Jack, counting the variance
+  // roll above) regardless of archetype state or output type. Every denial
+  // path above draws nothing, unchanged.
   const procRoll = ctx.rng.next();
-  const procChance = masterworkProcChance({
+  const baseProcChance = masterworkProcChance({
     tiersAboveRecipe:
       tierCapability(craftSkills, recipe.professionId) - tierForSkill(recipe.skillReq),
     signedReagent: signedReagentUsed,
@@ -542,13 +641,24 @@ export function resolveCraftForRecipe(
     // it draws nothing and cannot move the single procRoll draw above.
     materialTierBonus: materialTierBonusForReagents(recipe.reagents),
   });
+  // A 'better' variance roll improves (never guarantees) this craft's
+  // masterwork odds, still capped at MASTERWORK_CHANCE_CAP like every other
+  // term composing into the chance. 'worse'/'normal' leave the base chance
+  // untouched; 'worse' instead forces the masterwork gate off outright below.
+  const procChance =
+    jackVariance === 'better'
+      ? Math.min(MASTERWORK_CHANCE_CAP, baseProcChance + JACK_VARIANCE_BETTER_PROC_BONUS)
+      : baseProcChance;
   // Effect gate (gates the EFFECT, never the draw): the def must bake a
   // non-null bonus record, and the bumped quality tier must not exceed the
   // archetype ceiling (the invariant that a dormant or hobby craft's
-  // output never exceeds its ceiling tier). When
-  // gated off, the craft still succeeds as a plain deterministic craft.
+  // output never exceeds its ceiling tier). A 'worse' Jack variance roll
+  // forces this arm off outright, even when procRoll would otherwise have
+  // hit. When gated off, the craft still succeeds as a plain deterministic
+  // craft.
   const masterwork =
     !!meta &&
+    jackVariance !== 'worse' &&
     procRoll < procChance &&
     bonusStats !== null &&
     bumped !== null &&
@@ -688,6 +798,7 @@ export function resolveCraftForRecipe(
   };
   if (masterwork) result.masterwork = true;
   if (commissioned) result.commission = true;
+  if (jackVariance !== null) result.variance = jackVariance;
   return result;
 }
 

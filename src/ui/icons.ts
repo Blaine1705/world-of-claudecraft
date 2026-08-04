@@ -8,6 +8,7 @@
 // from the ability school / item kind + name keywords, so everything always
 // has a proper icon. Results are cached as data URLs.
 
+import { isRawCookingCatch } from '../sim/content/items';
 import { ABILITIES, ITEMS } from '../sim/data';
 import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { PROFESSION_IMAGE_IDS, professionImageUrl } from './profession_art';
@@ -3052,6 +3053,16 @@ const ITEM_RECIPES: Record<string, IconRecipe> = {
   ),
   sanctum_key_shard: r('arcane', 'sky', ['gem'], ['sparkle', 'glow']),
   blessed_wax: r('holy', 'holyGold', [{ p: 'droplet', pal: 'holyGold' }], ['sparkle']),
+  // A pitch-filled bottle with a lit rag: a bottle body under a rising flame.
+  firebottle: r(
+    'fire',
+    'ember',
+    [
+      { p: 'potion', pal: 'ember' },
+      { p: 'flame', s: 0.5, y: -9 },
+    ],
+    ['glow'],
+  ),
   ghostly_essence: r('shadow', 'silverWhite', [{ p: 'flame', pal: 'silverWhite' }], ['sparkle']),
   webwood_silk: r('shadow', 'silverWhite', ['web']),
   supply_crate: r('wood', 'earthBrown', ['crate']),
@@ -3445,8 +3456,18 @@ function trinketPrimitive(name: string): { p: PrimitiveName; pal: PaletteName } 
 }
 
 function itemFallback(id: string): IconRecipe | null {
-  const it = ITEMS[id];
-  if (!it) return null;
+  // Own-property gate plus shape check: ITEMS is a prototype-bearing Record,
+  // so a raw server id like '__proto__' resolves a truthy non-def whose
+  // missing `name` would throw right here, and 'constructor' resolves a
+  // FUNCTION whose `.name` is a real string, which a shape check alone would
+  // wave through to a garbage derived recipe. This is the unknown-id path
+  // every stale-client fallback surface funnels through; today the
+  // weapon-art arm (staticIconUrl, extracted from iconDataUrl in v0.32.0)
+  // happens to short-circuit prototype keys
+  // first, and this guard makes the fallback's throw-freedom a property of
+  // this function rather than of that coincidence surviving refactors.
+  const it = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
+  if (!it || typeof it.name !== 'string') return null;
   const name = it.name.toLowerCase();
   const fx = qualityFx(it.quality);
   if (it.kind === 'weapon') {
@@ -3527,6 +3548,15 @@ function itemFallback(id: string): IconRecipe | null {
   if (it.kind === 'bag') {
     const isCloth = has(name, ['linen', 'silk', 'woven', 'cloth', 'wool']);
     return r(isCloth ? 'cloth' : 'leather', isCloth ? 'cloth' : 'leather', ['sack'], fx);
+  }
+  // Raw fishing catches left kind food for cooking reagents; keep a fish-like
+  // procedural recipe so they never fall through to generic junk trinkets when
+  // static WebP is missing. Name tokens cover cooked fish siblings and rares.
+  if (
+    isRawCookingCatch(id) ||
+    has(name, ['trout', 'perch', 'pike', 'eel', 'carp', 'koi', 'fish'])
+  ) {
+    return r('drink', 'sky', ['fish'], fx);
   }
   const t = trinketPrimitive(name);
   return r(it.kind === 'quest' ? 'parchment' : 'junk', t.pal, [{ p: t.p, pal: t.pal }], fx);
@@ -3666,8 +3696,21 @@ const WEAPON_ICON_DIR = '/ui/weapons';
 const ITEM_ICON_IMAGES = ITEM_WEAPON_VARIANTS;
 
 /** Static URL of a weapon's rendered thumbnail, or null if it uses a recipe. */
-function weaponIconUrl(id: string): string | null {
-  const model = ITEM_ICON_IMAGES[id];
+export function weaponIconUrl(id: string): string | null {
+  // Own-property gate (the resolveRecipe item-arm rule): ITEM_ICON_IMAGES is
+  // a prototype-bearing object literal, so a raw server id like
+  // 'constructor' would otherwise stringify a prototype member into a
+  // garbage /ui/weapons/ URL instead of falling through to the fallback.
+  const directModel = Object.hasOwn(ITEM_ICON_IMAGES, id) ? ITEM_ICON_IMAGES[id] : undefined;
+  if (directModel) return `${WEAPON_ICON_DIR}/${directModel}.jpg`;
+
+  // Generated Heroic weapons intentionally reuse their base weapon's GLB-rendered
+  // portrait. Keep ITEM_WEAPON_VARIANTS base-oriented and mirror the held-model
+  // resolver without trusting prototype-chain or stale server ids at either lookup.
+  const item = Object.hasOwn(ITEMS, id) ? ITEMS[id] : undefined;
+  const baseId = item?.heroicOf;
+  const model =
+    baseId && Object.hasOwn(ITEM_ICON_IMAGES, baseId) ? ITEM_ICON_IMAGES[baseId] : undefined;
   return model ? `${WEAPON_ICON_DIR}/${model}.jpg` : null;
 }
 
@@ -3947,6 +3990,109 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'bear_charge',
   'hibernate',
   'pounce', // druid
+  // Project-generated painted additions (OpenAI built-in image generation). These 90
+  // complete every live ABILITIES record while the procedural recipes below remain intact
+  // as resilience fallbacks. Per-asset prompts, reference roles, ownership and accepted
+  // hashes live in the class mapping files and missing-painted-icons accepted-art manifest.
+  // druid
+  'berserk',
+  'feral_charge',
+  'frenzied_regeneration',
+  'hurricane',
+  'innervate',
+  'moonkin_form',
+  'primal_reflexes',
+  'skull_bash',
+  'swiftmend',
+  'tranquility',
+  'typhoon',
+  // hunter
+  'aspect_of_the_wild',
+  'bestial_wrath',
+  'counter_shot',
+  'deterrence',
+  'frost_trap',
+  'mend_pet',
+  'multi_shot',
+  'startle_shot',
+  'trueshot_aura',
+  'volley',
+  'wyvern_sting',
+  // mage
+  'arcane_power',
+  'cone_of_cold',
+  'deep_freeze',
+  'spellsteal',
+  // paladin
+  'aura_surge',
+  'avenging_wrath',
+  'cleansing_verdict',
+  'crusader_strike',
+  'divine_shield',
+  'hammer_of_wrath',
+  'holy_shield',
+  'holy_shock',
+  'holy_taunt',
+  'holy_wrath',
+  'rebuke',
+  'sacred_bulwark',
+  // priest
+  'desperate_prayer',
+  'holy_nova',
+  'inner_focus',
+  'mind_sear',
+  'power_infusion',
+  'prayer_of_healing',
+  'psychic_scream',
+  'shadowform',
+  'silence',
+  // rogue
+  'blade_flurry',
+  'cloak_of_shadows',
+  'cold_blood',
+  'ghostly_strike',
+  'hemorrhage',
+  'kick',
+  'preparation',
+  'shadowstep',
+  'smoke_screen',
+  // shaman
+  'bloodlust',
+  'chain_heal',
+  'chain_lightning',
+  'earthbind',
+  'earthquake',
+  'elemental_mastery',
+  'healing_stream',
+  // warlock
+  'chaos_bolt',
+  'conflagrate',
+  'curse_of_exhaustion',
+  'death_coil',
+  'howl_of_terror',
+  'metamorphosis',
+  'rain_of_fire',
+  'siphon_life',
+  'spell_lock',
+  'voidfeast',
+  // warrior + the Vale Cup family
+  'cleaving_blows',
+  'deep_wounds',
+  'diabolical_twinstrike',
+  'enrage_passive',
+  'measured_fury',
+  'seasoned_soldier',
+  'sport_boot',
+  'sport_dive',
+  'sport_feint',
+  'sport_hoof',
+  'sport_kick',
+  'sport_pass',
+  'sport_punt',
+  'sport_second_wind',
+  'sport_shoot',
+  'sport_shoulder',
+  'sudden_death',
 ]);
 
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
@@ -4293,6 +4439,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'tanning_agent',
   'thorium_ore',
   'venom_gland',
+  // tool-effect charms (the acquisition craft; original painted inventory art)
+  'artisans_eye',
+  'gatherers_cache',
   // junk
   'bandit_bandana',
   'briny_idol',
@@ -4342,129 +4491,12 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
 // enumerated rather than silent, and it shrinks as art lands.
 //
-// These are the zone and Rift items added by the procedural-dungeons work, which predates the
-// every-item-ships-painted-art rule (v0.30.0, #2301). tests/item_icons.test.ts holds the line
-// from BOTH sides: a stale entry (art committed but still listed) fails, and a NEW item with no
-// art that is NOT listed here still fails. Do not add to this list to silence that failure;
-// commission the art.
-export const ITEM_ART_PENDING = new Set<string>([
-  // amberfall.ts
-  'amberfall_sap_bucket',
-  'gilded_sap_clot',
-  'mantle_of_the_meredark',
-  'mere_ferry_lantern',
-  'orchard_sapbinder_grips',
-  // drakelands.ts
-  'ashbone_war_brand',
-  'cinderwalk_treads',
-  'emberwing_scale',
-  'mawscale_pauldrons',
-  'scorched_supply_crate',
-  'wyrmwatch_warning_banner',
-  // evergarden.ts
-  'evergarden_bloom_clipping',
-  'evergarden_statue_rubbing',
-  'fountain_court_mantle',
-  'hedgewick_shears',
-  'hedgewick_tool_cart',
-  'shearkeeper_gloves',
-  // farshore.ts
-  'breakscarred_steel',
-  'farshore_salt_moss',
-  'gullhaven_watchbell',
-  'mantle_of_the_unbroken_shore',
-  'saltforged_grips',
-  // frostveil.ts
-  'aurora_mote',
-  'frostmane_mantle',
-  'hearth_ember_cache',
-  'hearthlined_treads',
-  'sprung_trap',
-  'thick_winter_pelt',
-  // galecrest.ts
-  'galecrest_ram_wool',
-  'shear_storm_lantern',
-  'wickspun_treads',
-  'wreck_wardens_mantle',
-  'wreckfield_flotsam_crate',
-  // items.ts
-  'riding_training',
-  // nightbloom.ts
-  'barrow_grave_offering',
-  'barrowshade_mantle',
-  'gloamfield_nightbloom',
-  'moonfleece_mitts',
-  'moonfleece_tuft',
-  'vigil_star_chart',
-  // palmreach.ts
-  'canopy_silk_hank',
-  'pearlwake_cargo_crate',
-  'saltwalker_sandals',
-  'sunken_idol_mantle',
-  'sunken_offering_bowl',
-  // realm.ts
-  'duskwisp_essence',
-  'elder_bark',
-  'gleaming_antler',
-  'gleamstag_charm',
-  'guardian_core',
-  'hollow_sealstone',
-  'monument_court',
-  'monument_north',
-  'monument_overlook',
-  'nightweave_tunic',
-  'spore_heart',
-  'starfall_shard',
-  'veilcloth_robe',
-  'wardens_oathband',
-  'wardens_seal',
-  'wardplate_cuirass',
-  'wisp_mote',
-  // rift/items.ts
-  'abyssal_loop',
-  'abysswrought_band',
-  'bonelord_mantle',
-  'broodmother_carapace',
-  'emberforge_gauntlets',
-  'emberforged_bulwark',
-  'graskbreaker_girdle',
-  'heart_of_the_rift',
-  'pactbound_vestments',
-  'rift_essence',
-  'rift_gem_azure',
-  'rift_gem_crimson',
-  'rift_gem_verdant',
-  'riftbound_band_of_guile',
-  'riftbound_band_of_insight',
-  'riftbound_band_of_might',
-  'stormscale_treads',
-  'stormsunder_hood',
-  'voidscar_handwraps',
-  'voidweave_mantle',
-  // heroic_loot.ts (Wildheart Basin Tier-2 loot pass; armor art not commissioned yet)
-  'basin_stalkers_tunic',
-  'bloodmane_war_legguards',
-  'sunbone_oracles_crown',
-  'sunbone_ritual_hauberk',
-  'verdant_heart_vestment',
-  // wildheart.ts (Zulgar's guaranteed uncommon trio; armor art not commissioned yet)
-  'bloodmane_warleggings',
-  'sunbone_ritual_sarong',
-  'vineclaw_stalking_breeches',
-  // willowfen.ts
-  'bridgemere_toll_chest',
-  'eelskin_mudwaders',
-  'fenway_mooring_line',
-  'lilybed_mantle',
-  'plump_fen_eel',
-  'wisplight_globe',
-  // wraithwood.ts
-  'gallowmere_grave_candle',
-  'gravebound_silk_wraps',
-  'mantle_of_the_unhorsed',
-  'silkbound_remains',
-  'widowsilk_skein',
-]);
+// Empty after the accepted 2026-08-01 painted-art wave, and empty again after the three
+// quest-collect items this branch's dedupe pass added were painted. Keep the mechanism: a
+// future development-only item may still use it temporarily. tests/item_icons.test.ts holds
+// the line from both sides: it rejects stale entries after art lands and unenumerated art
+// debt. Do not add to this list merely to silence that failure; commission the art.
+export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
@@ -4480,6 +4512,22 @@ export function itemImageUrl(id: string): string | null {
 // a consumer.
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
+
+// Deeds whose crest art is COMMISSIONED BUT NOT YET COMMITTED, the ITEM_ART_PENDING model one
+// screen up. The Icons authoring rule in docs/design/deeds.md permits this by design ("an artless
+// deed falls back to its procedural category crest, so art can trail the deed"), so the point of
+// the list is not to change behavior (deedImageUrl already declines any id absent from
+// DEED_IMAGE_IDS) but to make the debt ENUMERATED rather than silent, and to give the art tests
+// one name to agree on instead of three copies of the same literal pair.
+// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
+// unenumerated debt. Do not add an id here merely to silence that failure; commission the art and
+// file it in docs/achievements/icon-brief.md.
+export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
+  // The Drakelands dragonkin brood rework (v0.35): both are 'chronicle', so both fall back to
+  // the deed_cat_chronicle crest until their commissioned art lands.
+  'chr_drakemaw_broodlord',
+  'chr_maw_matriarch',
+]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {
   if (!crestId.startsWith(DEED_CREST_PREFIX)) return null;
@@ -4502,7 +4550,13 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
   if (kind === 'ability') {
     recipe = ABILITY_RECIPES[id] ?? abilityFallback(id);
   } else if (kind === 'item') {
-    recipe = ITEM_RECIPES[id] ?? itemFallback(id);
+    // Own-property gate: a prototype key like '__proto__' would otherwise
+    // resolve Object.prototype as a truthy "recipe". Item ids are the kind
+    // the stale-client fallback surfaces funnel raw server strings into,
+    // hence the gate here first; the ability and aura arms also see
+    // server-sent ids and share the ungated-lookup shape (recorded, not
+    // fixed here: no realistic server mints a prototype-key ability id).
+    recipe = (Object.hasOwn(ITEM_RECIPES, id) ? ITEM_RECIPES[id] : null) ?? itemFallback(id);
   } else if (kind === 'crest') {
     recipe = CREST_RECIPES[id] ?? null;
   } else {
@@ -4523,6 +4577,16 @@ function resolveRecipe(kind: IconKind, id: string): IconRecipe {
 // to assert every ability has a deliberate, distinct icon recipe.
 export function abilityIconRecipe(id: string): IconRecipe {
   return resolveRecipe('ability', id);
+}
+// The item-side sibling, added so tests/item_icons.test.ts can pin the premise
+// every stale-client fallback rests on WITHOUT a canvas: any unresolvable item
+// id (including prototype-chain keys) lands on the shared fallback recipe
+// instead of throwing.
+export function itemIconRecipe(id: string): IconRecipe {
+  return resolveRecipe('item', id);
+}
+export function isUnknownIconRecipe(recipe: IconRecipe): boolean {
+  return recipe === UNKNOWN_RECIPE;
 }
 export function hasExplicitAbilityIcon(id: string): boolean {
   return id in ABILITY_RECIPES;
