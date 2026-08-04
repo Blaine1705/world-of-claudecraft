@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  STREETLAMP_STYLE_BY_ZONE,
-  resolveStreetlampStyle,
-} from '../src/render/streetlamp_style_core';
+import { resolveStreetlampStyle, STREETLAMP_STYLE_BY_ZONE } from '../src/sim/streetlamp_style';
 
 const EXPECTED_ZONE_STYLES = {
   eastbrook_vale: 'eastbrook_civic',

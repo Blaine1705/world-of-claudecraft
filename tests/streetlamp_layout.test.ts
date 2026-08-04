@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { NIGHT_LIGHT_STATIC_SLOTS } from '../src/render/night_light_field_core';
+import { streetlampPlacements } from '../src/sim/colliders';
+import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
 import {
   LAMP_LIGHT_AXIS_MIN,
   LAMP_LIGHT_STRIDE,
@@ -9,12 +11,10 @@ import {
   lampFixtureYaw,
   planStreetlamps,
   type StreetlampProbes,
-} from '../src/render/streetlamp_placement_core';
-import { resolvePosition } from '../src/sim/colliders';
-import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
+} from '../src/sim/streetlamp_layout';
 import { roadDistance, terrainHeight } from '../src/sim/world';
 
-// streetlamp_placement_core: where the streetlamps stand. Pure, so the layout
+// streetlamp_layout: where the streetlamps stand. Pure, so the layout
 // is asserted directly here instead of eyeballed in a screenshot.
 
 /** Distance from a point to the raw chords of a road set (the test's own
@@ -347,39 +347,26 @@ describe('planStreetlamps: the rejection probes', () => {
   });
 });
 
-describe('planStreetlamps is deterministic and finite on the real world', () => {
+describe('the real world lamp network is deterministic and finite', () => {
   const SEED = 0;
-  const realProbes = (): StreetlampProbes => ({
-    groundAt: (x, z) => terrainHeight(x, z, SEED),
-    blocked: (x, z) => {
-      const resolved = resolvePosition(SEED, x, z, 1.1);
-      return Math.abs(resolved.x - x) > 0.05 || Math.abs(resolved.z - z) > 0.05;
-    },
-    roadClear: roadDistance,
-  });
-  const realPlan = () => {
-    const content = getActiveWorldContent();
-    const towns = content.zones.map((zone) => ({
-      x: zone.hub.x,
-      z: zone.hub.z,
-      radius: zone.hub.radius,
-    }));
-    return planStreetlamps(content.roads, towns, realProbes());
-  };
+  // The SHIPPED list, not a re-plan. colliders.ts builds the world's lamps
+  // exactly once, while its grid is still lamp-free, and plants a post on each;
+  // re-planning here against a warm grid would hand the layout its own posts as
+  // obstacles and quietly thin the network under every assertion below.
+  const realSites = () => streetlampPlacements(SEED);
 
   it('lights the whole network, sparsely (waymarkers, not a boulevard)', () => {
-    const plan = realPlan();
+    const sites = realSites();
     // ~13,500 yd of road at town spacing 26 / open spacing 64: a few hundred
     // posts. A runaway count is a perf regression (fixtures instance per zone,
     // but every third post carries a real light object); a collapsed count
     // means part of the network went dark.
-    expect(plan.sites.length).toBeGreaterThan(200);
-    expect(plan.sites.length).toBeLessThan(450);
+    expect(sites.length).toBeGreaterThan(200);
+    expect(sites.length).toBeLessThan(450);
   });
 
   it('stands every post beside the painted road, never on it', () => {
-    const plan = realPlan();
-    for (const site of plan.sites) {
+    for (const site of realSites()) {
       const clear = roadDistance(site.x, site.z);
       expect(clear).toBeGreaterThanOrEqual(3.0);
       expect(clear).toBeLessThanOrEqual(5.6);
@@ -387,8 +374,7 @@ describe('planStreetlamps is deterministic and finite on the real world', () => 
   });
 
   it('never stands a lamp in the sea', () => {
-    const plan = realPlan();
-    for (const site of plan.sites) expect(site.y).toBeGreaterThanOrEqual(-3);
+    for (const site of realSites()) expect(site.y).toBeGreaterThanOrEqual(-3);
   });
 
   it('fits every lamp within a hundred yards into the night field, with room for the fires', () => {
@@ -397,7 +383,7 @@ describe('planStreetlamps is deterministic and finite on the real world', () => 
     // the lamp overhead lights a pool, which is what "the light only shows when
     // you are close" looked like. So the densest stretch of road has to leave
     // headroom for the camp braziers and fires that share the window.
-    const sites = realPlan().sites;
+    const sites = realSites();
     let crowded = 0;
     for (const anchor of sites) {
       let near = 0;
@@ -414,13 +400,13 @@ describe('planStreetlamps is deterministic and finite on the real world', () => 
     // Junctions, hairpins and roads running in parallel are where a pair of
     // posts used to end up almost touching. The floor holds across the whole
     // network, not just the crossing the unit case builds.
-    expect(closestPair(realPlan().sites)).toBeGreaterThanOrEqual(18);
+    expect(closestPair(realSites())).toBeGreaterThanOrEqual(18);
   });
 
   it('turns every lamp on the network toward the road it lights', () => {
     // The facing yaw is only useful if stepping along it actually approaches
     // the PAINTED track, on meandering real roads rather than a test chord.
-    for (const site of realPlan().sites) {
+    for (const site of realSites()) {
       const here = roadDistance(site.x, site.z);
       const ahead = stepTowardRoad(site, 1);
       expect(roadDistance(ahead.x, ahead.z)).toBeLessThan(here);
@@ -428,7 +414,24 @@ describe('planStreetlamps is deterministic and finite on the real world', () => 
   });
 
   it('produces the identical layout twice (no hidden global state)', () => {
-    expect(realPlan()).toEqual(realPlan());
+    const probes = (): StreetlampProbes => ({
+      groundAt: (x, z) => terrainHeight(x, z, SEED),
+      // Deliberately NOT resolvePosition: the shipped grid already carries the
+      // lamp posts, so the point of this case (the planner itself holds no
+      // state between runs) needs a probe that is the same on both passes.
+      blocked: () => false,
+      roadClear: roadDistance,
+    });
+    const content = getActiveWorldContent();
+    const towns = content.zones.map((zone) => ({
+      x: zone.hub.x,
+      z: zone.hub.z,
+      radius: zone.hub.radius,
+    }));
+    const plan = () => planStreetlamps(content.roads, towns, probes());
+    expect(plan()).toEqual(plan());
+    // and the memoized shipped list is one object, handed out unchanged
+    expect(realSites()).toBe(realSites());
   });
 });
 

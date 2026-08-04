@@ -32,28 +32,27 @@
 // end of a fixture overhangs the track and the post is left standing on the far
 // side of it, whichever edge the artist hung the light off.
 //
-// Placement is streetlamp_placement_core.ts (pure, tested): every road end to
-// end, clearance-banded against the sim's roadDistance so a post stands beside
-// the PAINTED track, never on it. Ground heights come from the sim's
-// terrainHeight, per the "terrain height = sim height" invariant.
+// A lamp post is SOLID, and the sim owns it. `src/sim/streetlamp_layout.ts`
+// lays the network out (every road end to end, clearance-banded against the
+// sim's roadDistance so a post stands beside the PAINTED track, never on it,
+// with ground heights from the sim's terrainHeight per the "terrain height =
+// sim height" invariant), `src/sim/colliders.ts` plants a collider on every
+// site, and this module instances the fixtures on the SAME list via
+// `streetlampPlacements`. So the lamp you walk into is the lamp you see, and
+// neither half can drift from the other.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { resolvePosition } from '../sim/colliders';
-import { getActiveWorldContent, STRIP_MAX_X, STRIP_MIN_X } from '../sim/data';
-import { roadDistance, terrainHeight } from '../sim/world';
+import { streetlampPlacements } from '../sim/colliders';
+import { getActiveWorldContent } from '../sim/data';
+import { lampFixtureYaw, type PlacedStreetlamp } from '../sim/streetlamp_layout';
+import type { StreetlampStyleId } from '../sim/streetlamp_style';
+import { terrainHeight } from '../sim/world';
 import { attachBiomeHaze } from './biome_haze_field';
 import { GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
 import { STREETLAMP_ASSET_DEFS, streetlampAsset } from './streetlamp_assets';
 import { type StreetlampEmissiveState, updateStreetlampEmissive } from './streetlamp_emissive';
-import {
-  type LampSite,
-  lampFixtureYaw,
-  planStreetlamps,
-  type StreetlampPlan,
-} from './streetlamp_placement_core';
-import { resolveStreetlampStyle, type StreetlampStyleId } from './streetlamp_style_core';
 import { radialGlowTexture } from './textures';
 
 export interface StreetlampsView {
@@ -100,9 +99,6 @@ const FIELD_INTENSITY = 205;
 /** A glassed lantern wavers gently, so the authored source and ground breathe
  *  together without introducing fixture-to-fixture brightness differences. */
 const FIELD_FLICKER = 0.1;
-/** How far a lamp may be nudged by a collider before we give up on the spot. */
-const CLEARANCE_EPSILON = 0.05;
-const LAMP_CLEARANCE = 1.1;
 
 /**
  * Post, collar, lantern housing, and finial, merged into one instanced draw,
@@ -171,48 +167,6 @@ function ironMaterial(): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial 
   return material;
 }
 
-function strictAreaAt(
-  x: number,
-  z: number,
-  zones: readonly {
-    id: string;
-    zMin: number;
-    zMax: number;
-    xMin?: number;
-    xMax?: number;
-  }[],
-): string | null {
-  for (const zone of zones) {
-    const xMin = zone.xMin ?? STRIP_MIN_X;
-    const xMax = zone.xMax ?? STRIP_MAX_X;
-    if (x >= xMin && x < xMax && z >= zone.zMin && z < zone.zMax) return zone.id;
-  }
-  return null;
-}
-
-function buildPlan(seed: number): StreetlampPlan {
-  const content = getActiveWorldContent();
-  const towns = content.zones.map((zone) => ({
-    x: zone.hub.x,
-    z: zone.hub.z,
-    radius: zone.hub.radius,
-  }));
-  return planStreetlamps(content.roads, towns, {
-    groundAt: (x, z) => terrainHeight(x, z, seed),
-    blocked: (x, z) => {
-      // A lamp inside a building, stall, well, or fence is worse than no lamp.
-      // resolvePosition pushes a body out of whatever it overlaps, so a spot
-      // that comes back moved was already occupied.
-      const resolved = resolvePosition(seed, x, z, LAMP_CLEARANCE);
-      return (
-        Math.abs(resolved.x - x) > CLEARANCE_EPSILON || Math.abs(resolved.z - z) > CLEARANCE_EPSILON
-      );
-    },
-    roadClear: roadDistance,
-    areaAt: (x, z) => strictAreaAt(x, z, content.zones),
-  });
-}
-
 export function buildStreetlamps(seed = 0): StreetlampsView {
   const group = new THREE.Group();
   group.name = 'streetlamps';
@@ -226,20 +180,16 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
   >();
   const authoredGlowStates = new Set<StreetlampEmissiveState>();
 
-  const plan = buildPlan(seed);
-  if (plan.sites.length === 0) {
+  // The sim's list, fixture identity and all: the same rows its collider pass
+  // planted posts on.
+  const placements = streetlampPlacements(seed);
+  if (placements.length === 0) {
     registerStaticNightLights('streetlamps', []);
     return { group, glowLights, cullGroups, update: () => undefined };
   }
 
   const content = getActiveWorldContent();
   const zoneIndexById = new Map(content.zones.map((zone, index) => [zone.id, index]));
-  const zoneBiomeById = new Map(content.zones.map((zone) => [zone.id, zone.biome]));
-  const styleFor = (site: LampSite): StreetlampStyleId =>
-    resolveStreetlampStyle(
-      site.areaId,
-      site.areaId ? (zoneBiomeById.get(site.areaId) ?? null) : null,
-    );
 
   /**
    * Where the light actually comes from, in world space. The authored
@@ -250,7 +200,7 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
     streetlampAsset(style)?.socket ?? STREETLAMP_ASSET_DEFS[style].lightOffset;
 
   const lightAnchor = (
-    site: LampSite,
+    site: PlacedStreetlamp,
     yaw: number,
     socket: readonly [number, number, number],
   ): { x: number; y: number; z: number } => {
@@ -265,19 +215,19 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
   };
 
   interface StyledSite {
-    site: LampSite;
+    site: PlacedStreetlamp;
     style: StreetlampStyleId;
     yaw: number;
   }
-  // Style and yaw are resolved ONCE per site, here, and every consumer below
-  // reads the same record. The field anchor and the instance transform must
-  // agree on the yaw or the light drifts off the lantern that casts it.
-  const styled: StyledSite[] = plan.sites.map((site) => {
-    const style = styleFor(site);
-    const axis = streetlampAsset(style)?.lightAxis;
+  // The style arrives from the sim (it sized the post's collider from it); the
+  // yaw is resolved ONCE per site here, and every consumer below reads the same
+  // record. The field anchor and the instance transform must agree on the yaw
+  // or the light drifts off the lantern that casts it.
+  const styled: StyledSite[] = placements.map((site) => {
+    const axis = streetlampAsset(site.style)?.lightAxis;
     return {
       site,
-      style,
+      style: site.style,
       // Turn the fixture's own lit end over the road: a hanging lantern reaches
       // out across the track, its post left standing out on the verge.
       yaw: lampFixtureYaw(site.roadYaw, axis?.[0] ?? 0, axis?.[1] ?? 0),

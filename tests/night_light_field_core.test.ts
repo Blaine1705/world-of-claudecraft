@@ -60,7 +60,7 @@ describe('the slot layout', () => {
     // camps add braziers on top, so a ten-slot window shut inside 60 yd and the
     // next lamp up the road stood over dark ground while the one overhead lit a
     // pool. The companion pin against the real network (how many lamps fall
-    // inside a hundred yards) lives in tests/streetlamp_placement_core.test.ts.
+    // inside a hundred yards) lives in tests/streetlamp_layout.test.ts.
     expect(NIGHT_LIGHT_STATIC_SLOTS).toBeGreaterThanOrEqual(24);
   });
 

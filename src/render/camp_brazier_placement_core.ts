@@ -1,7 +1,7 @@
 // camp_brazier_placement_core: where the camp fires stand and which kind each
 // one is. Pure (no Three, no DOM): the camps, the authored campfires, and the
 // world probes all arrive as arguments, so the whole layout is a deterministic
-// function a Vitest drives directly (the streetlamp_placement_core shape).
+// function a Vitest drives directly (the streetlamp_layout shape).
 //
 // Only fire-building camps qualify (night_accents_core.fireBuildingCamps), and
 // only the ones no authored campfire already lights (uncoveredCampSites). Half

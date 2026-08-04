@@ -1,7 +1,13 @@
-// streetlamp_placement_core: where the streetlamps stand. Pure (no Three,
-// no DOM), so the whole layout is a deterministic function of the road polylines,
-// the zone hubs, and the caller-supplied probes, and a Vitest can assert spacing,
+// streetlamp_layout: where the streetlamps stand. Pure (no Three, no DOM), so
+// the whole layout is a deterministic function of the road polylines, the zone
+// hubs, and the caller-supplied probes, and a Vitest can assert spacing,
 // clearance, and coverage without a renderer.
+//
+// It is a SIM layout, like dungeon_layout.ts and prop_layout.ts, because a lamp
+// post is solid: `colliders.ts` binds the probes below, plants a collider on
+// every site it returns, and hands the finished list to the renderer
+// (`streetlampPlacements`). One plan, so the post you see is the post you walk
+// into, and neither half can drift from the other.
 //
 // Lamps line EVERY road end to end: the whole network is lit, not just a short
 // walk out of each hub. Near a hub they stand at town spacing; on the open road
@@ -20,6 +26,12 @@
 // `lampFixtureYaw` turns a fixture by its OWN light axis so the lit end always
 // overhangs the track: a hanging lantern reaches its arm out over the road with
 // the post left standing on the outside, exactly as a real street lamp is hung.
+//
+// A road curve is authored content, not an rng draw: nothing here touches `Rng`,
+// so a given world and seed always lay the same posts in the same places and
+// every host agrees on where they are.
+import { resolveStreetlampStyle, type StreetlampStyleId } from './streetlamp_style';
+import type { BiomeId } from './types';
 
 /** A zone hub: the town centre and the radius its plateau is flattened to. */
 export interface LampTown {
@@ -287,6 +299,37 @@ export function planStreetlamps(
     }
   }
   return { sites };
+}
+
+/** A planned site with the fixture identity resolved onto it. */
+export interface PlacedStreetlamp extends LampSite {
+  style: StreetlampStyleId;
+}
+
+/** The zone facts a site needs to know which fixture stands on it. */
+export interface LampStyleZone {
+  id: string;
+  biome: BiomeId;
+}
+
+/**
+ * Resolve the fixture identity for every site, ONCE, so the collider that
+ * blocks a post and the mesh that draws it are sized from the same row of
+ * `STREETLAMP_COLLIDER_RADIUS`. Split out from the plan because style depends
+ * on authored zone data the pure layout above deliberately knows nothing about.
+ */
+export function styleStreetlampSites(
+  sites: readonly LampSite[],
+  zones: readonly LampStyleZone[],
+): PlacedStreetlamp[] {
+  const biomeById = new Map(zones.map((zone) => [zone.id, zone.biome]));
+  return sites.map((site) => ({
+    ...site,
+    style: resolveStreetlampStyle(
+      site.areaId,
+      site.areaId ? (biomeById.get(site.areaId) ?? null) : null,
+    ),
+  }));
 }
 
 /**

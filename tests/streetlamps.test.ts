@@ -12,7 +12,6 @@ import {
   streetlampPreloadInternalsForTest,
 } from '../src/render/streetlamp_assets';
 import { LAMP_GLASS_MATERIAL, LAMP_SOURCE_MATERIAL } from '../src/render/streetlamp_emissive';
-import { LAMP_LIGHT_AXIS_MIN } from '../src/render/streetlamp_placement_core';
 import {
   buildLampFixtureGeometry,
   buildLampGlassGeometry,
@@ -20,6 +19,7 @@ import {
   LAMP_SCALE,
 } from '../src/render/streetlamps';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { LAMP_LIGHT_AXIS_MIN } from '../src/sim/streetlamp_layout';
 import { roadDistance } from '../src/sim/world';
 
 afterEach(() => {

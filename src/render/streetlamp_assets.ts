@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { STREETLAMP_FIXTURE_HEIGHT, type StreetlampStyleId } from '../sim/streetlamp_style';
 import { loadGltf, releaseGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { attachBiomeHaze } from './biome_haze_field';
@@ -9,7 +10,6 @@ import {
   streetlampEmissiveRole,
 } from './streetlamp_emissive';
 import { attachStreetlampFlame } from './streetlamp_flame';
-import type { StreetlampStyleId } from './streetlamp_style_core';
 
 export interface StreetlampAssetDef {
   url: string;
@@ -57,7 +57,10 @@ function authoredName(material: THREE.Material): string {
   return name.startsWith(MATERIAL_PREFIX) ? name.slice(MATERIAL_PREFIX.length) : name;
 }
 
-const TARGET_HEIGHT = 5.5;
+// Read from the sim, not re-declared: colliders.ts derives a post's visual top
+// (the sight-blocking height) from the same number, and a fixture scaled to a
+// height its collider does not know about is a lamp you can cast through.
+const TARGET_HEIGHT = STREETLAMP_FIXTURE_HEIGHT;
 const MAX_FOOTPRINT = 2.0;
 /** The bottom slice of a fixture that counts as its footing, as a fraction of
  *  its height. Deep enough to catch a plinth or a splayed set of legs, shallow
