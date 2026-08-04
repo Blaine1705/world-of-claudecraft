@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "es_ES": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "fr_FR": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "fr_CA": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "de_DE": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "nl_NL": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "pl_PL": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "id_ID": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "tr_TR": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "sv_SE": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "vi_VN": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ],
+  "da_DK": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria"
+  ]
 };
