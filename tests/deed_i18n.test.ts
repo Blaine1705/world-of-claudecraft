@@ -44,10 +44,9 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 234 deeds x (name + desc) + the 30 shipped title rewards (both counts
-    // pinned by tests/deeds_content.test.ts). 232 to 234 with the Drakelands
-    // brood deeds; the title count is unchanged, since neither rewards one.
-    expect(manifest.length).toBe(234 * 2 + 30);
+    // 246 deeds x (name + desc) + the 30 shipped title rewards (both counts
+    // pinned by tests/deeds_content.test.ts).
+    expect(manifest.length).toBe(246 * 2 + 30);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(30);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',

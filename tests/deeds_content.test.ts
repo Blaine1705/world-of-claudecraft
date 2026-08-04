@@ -61,9 +61,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 234 deeds worth 2815 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(234);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2815);
+  it('ships exactly 246 deeds worth 2875 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(246);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2875);
   });
 
   it('ships the audited per-category counts', () => {
@@ -74,7 +74,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       combat: 10,
       dungeon: 29,
       delve: 13,
-      chronicle: 37,
+      chronicle: 49,
       collection: 28,
       pvp: 28,
       social: 18,
@@ -150,6 +150,20 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // shipped capstone the first reckoning never credited.
       'chr_drakemaw_broodlord',
       'chr_maw_matriarch',
+      // The remaining starter-tier zones pick up the same chronicle pair
+      // (Drakelands is covered by the brood rework pair above).
+      'chr_frostveil_gatherer',
+      'chr_frostveil_first_cast',
+      'chr_amberfall_gatherer',
+      'chr_amberfall_first_cast',
+      'chr_nightbloom_gatherer',
+      'chr_nightbloom_first_cast',
+      'chr_wraithwood_gatherer',
+      'chr_wraithwood_first_cast',
+      'chr_palmreach_gatherer',
+      'chr_palmreach_first_cast',
+      'chr_evergarden_gatherer',
+      'chr_evergarden_first_cast',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -397,7 +411,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // standing broodlord rares) and chr_maw_matriarch (quest-trigger credit for
   // the shipped Cindraleth capstone). Both parents appended only, so no
   // shipped trigger or renown changed on either side.
-  const FROZEN_CATALOG_SHA256 = '4421793493830ebbde6691ea8af7f18a99d6917281c94f0b069bb66c1c82e9b1';
+  // Re-baselined for the remaining bottom-map chronicle pairs: twelve more
+  // appended deeds, the gatherer and first-cast pair for frostveil,
+  // amberfall, nightbloom, wraithwood, palmreach, and evergarden
+  // (Drakelands is covered by the brood rework pair above). No shipped trigger
+  // or renown changed.
+  const FROZEN_CATALOG_SHA256 = '8d84c852e239128266b79b5870fc8fd15a577bb16d6b3f684426ffd93aaa13a9';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -586,12 +605,12 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the farshore
+    // literals: prog_first_steps opens the catalog and the evergarden
     // first-cast closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_maw_matriarch');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_evergarden_first_cast');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
@@ -788,13 +807,20 @@ describe('trigger references resolve against the real content tables', () => {
     // The witness for the fallback-aware guard above: the mark writer fires
     // for a Vale fish caught under a starter zone's own id (which is what
     // the resolver actually draws there), and the deed grants through the
-    // real visit path, for ALL THREE zones (the review round: one positive
-    // arm of a three-zone claim proves one zone). A fish the zone never
-    // draws must NOT fire it.
+    // real visit path, for every bottom-map zone (the six added when the
+    // pair extended past the original three prove the mechanism generalizes,
+    // not just that it works once). A fish the zone never draws must NOT
+    // fire it.
     const CASES = [
       ['willowfen', 'chr_willowfen_first_cast'],
       ['galecrest', 'chr_galecrest_first_cast'],
       ['farshore_isle', 'chr_farshore_first_cast'],
+      ['frostveil', 'chr_frostveil_first_cast'],
+      ['amberfall', 'chr_amberfall_first_cast'],
+      ['nightbloom', 'chr_nightbloom_first_cast'],
+      ['wraithwood', 'chr_wraithwood_first_cast'],
+      ['palmreach', 'chr_palmreach_first_cast'],
+      ['evergarden', 'chr_evergarden_first_cast'],
     ] as const;
     for (const [zoneId, deedId] of CASES) {
       const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });
@@ -824,6 +850,12 @@ describe('trigger references resolve against the real content tables', () => {
       ['willowfen', 'chr_willowfen_gatherer'],
       ['galecrest', 'chr_galecrest_gatherer'],
       ['farshore_isle', 'chr_farshore_gatherer'],
+      ['frostveil', 'chr_frostveil_gatherer'],
+      ['amberfall', 'chr_amberfall_gatherer'],
+      ['nightbloom', 'chr_nightbloom_gatherer'],
+      ['wraithwood', 'chr_wraithwood_gatherer'],
+      ['palmreach', 'chr_palmreach_gatherer'],
+      ['evergarden', 'chr_evergarden_gatherer'],
     ] as const;
     for (const [zoneId, deedId] of CASES) {
       const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });

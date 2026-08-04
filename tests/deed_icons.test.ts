@@ -367,16 +367,15 @@ describe('Book of Deeds webp icons', () => {
   });
 
   it('an artless deed card resolves to a procedural crest (no committed image)', () => {
-    // Any live deed awaiting art must land on its category base crest, which carries no
+    // Any live deeds awaiting art must land on their category base crest, which carries no
     // image URL and falls through to the procedural canvas path. The pending set is pinned
-    // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a third
-    // artless deed, a dropped webp, or a silent catalog append all red here.
+    // exhaustively in DEED_ART_PENDING, so unenumerated art debt reds here.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(234);
-    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending pair is painted').toBe(232);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(246);
+    expect(DEED_IMAGE_IDS.size, 'the committed art set is unchanged by this merge').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(crestId, `${id} must fall back to a category base crest`).toMatch(/^deed_cat_/);

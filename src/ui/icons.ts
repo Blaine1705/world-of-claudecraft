@@ -4527,6 +4527,20 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
   'chr_maw_matriarch',
+  // Remaining starter-zone chronicle gather/first-cast pairs. They intentionally ship
+  // art-trailing under docs/design/deeds.md rule 6 until the commissioned set lands.
+  'chr_frostveil_gatherer',
+  'chr_frostveil_first_cast',
+  'chr_amberfall_gatherer',
+  'chr_amberfall_first_cast',
+  'chr_nightbloom_gatherer',
+  'chr_nightbloom_first_cast',
+  'chr_wraithwood_gatherer',
+  'chr_wraithwood_first_cast',
+  'chr_palmreach_gatherer',
+  'chr_palmreach_first_cast',
+  'chr_evergarden_gatherer',
+  'chr_evergarden_first_cast',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

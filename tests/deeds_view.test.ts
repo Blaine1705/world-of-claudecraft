@@ -667,11 +667,10 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 234 deeds - 3 feats - 9 hidden = 222 visible to a fresh character (232 to
-    // 234 with the Drakelands brood deeds, neither of which is a feat or hidden).
-    expect(view.summary.visibleTotal).toBe(222);
+    // 246 deeds - 3 feats - 9 hidden = 234 visible to a fresh character.
+    expect(view.summary.visibleTotal).toBe(234);
     // The bucket sum adds the Feats shelf's own 3 rows back on top.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(225);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(237);
   });
 
   it('maps every live catalog category onto a display bucket', () => {
