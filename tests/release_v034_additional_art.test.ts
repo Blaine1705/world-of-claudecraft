@@ -395,8 +395,26 @@ describe('release v0.34 additional painted art', () => {
       expect(iconDataUrl('item', id)).toBe(`/ui/items/${id}.webp`);
     }
 
-    expect(sorted(DEED_ORDER.slice(-DEED_IDS.length))).toEqual([...DEED_IDS]);
-    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([]);
+    // This pack landed as one contiguous append block; it no longer sits at
+    // DEED_ORDER's tail once a later change appends more deeds after it (the
+    // zone chronicle extension did), so pin contiguity + membership instead
+    // of an absolute tail slice.
+    const deedIdIndices = DEED_IDS.map((id) => DEED_ORDER.indexOf(id));
+    expect(
+      deedIdIndices.every((i) => i >= 0),
+      'every DEED_IDS member is live',
+    ).toBe(true);
+    const lo = Math.min(...deedIdIndices);
+    const hi = Math.max(...deedIdIndices);
+    expect(hi - lo + 1, 'the pack is a contiguous append block').toBe(DEED_IDS.length);
+    expect(sorted(DEED_ORDER.slice(lo, hi + 1))).toEqual([...DEED_IDS]);
+    // The twelve zone chronicle deeds appended after this pack ship
+    // art-trailing (docs/design/deeds.md rule 6); this pack itself still
+    // ships fully painted.
+    expect(
+      DEED_IDS.every((id) => DEED_IMAGE_IDS.has(id)),
+      'this pack stays fully painted',
+    ).toBe(true);
     for (const id of DEED_IDS) {
       expect(DEEDS[id], `${id} live deed`).toBeDefined();
       expect(DEED_IMAGE_IDS.has(id), `${id} generated registry`).toBe(true);

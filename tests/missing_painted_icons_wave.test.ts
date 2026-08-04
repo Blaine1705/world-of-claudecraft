@@ -511,8 +511,26 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    expect(DEED_ORDER).toHaveLength(232);
-    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([]);
+    expect(DEED_ORDER).toHaveLength(244);
+    // The twelve zone chronicle deeds added for frostveil/amberfall/nightbloom/
+    // wraithwood/palmreach/evergarden ship art-trailing per docs/design/deeds.md
+    // rule 6 (flagged to the maintainer for the commissioned set): this wave's
+    // "zero artless" claim now excludes exactly that pinned set, listed in
+    // DEED_ORDER (append) order.
+    expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([
+      'chr_frostveil_gatherer',
+      'chr_frostveil_first_cast',
+      'chr_amberfall_gatherer',
+      'chr_amberfall_first_cast',
+      'chr_nightbloom_gatherer',
+      'chr_nightbloom_first_cast',
+      'chr_wraithwood_gatherer',
+      'chr_wraithwood_first_cast',
+      'chr_palmreach_gatherer',
+      'chr_palmreach_first_cast',
+      'chr_evergarden_gatherer',
+      'chr_evergarden_first_cast',
+    ]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(
       path.join(repoRoot, 'docs/achievements/missing-painted-icons-provenance.md'),

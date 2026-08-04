@@ -357,11 +357,27 @@ describe('Book of Deeds webp icons', () => {
 
   it('an artless deed card resolves to a procedural crest (no committed image)', () => {
     // Any live deeds awaiting art must land on their category base crest, which carries no
-    // image URL and falls through to the procedural canvas path. A fully commissioned live
-    // catalog makes this loop empty, so the synthetic id below keeps the branch pinned.
+    // image URL and falls through to the procedural canvas path. The twelve zone chronicle
+    // deeds added for frostveil/amberfall/nightbloom/wraithwood/palmreach/evergarden ship art-
+    // trailing per docs/design/deeds.md rule 6 (flagged to the maintainer for the commissioned
+    // set); until that lands they are the pinned artless set.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
-    expect(artless, 'all live deeds must now resolve to painted art').toEqual([]);
-    expect(DEED_IMAGE_IDS.size, 'the complete live deed catalog is painted').toBe(232);
+    // Listed in DEED_ORDER (append) order, not alphabetized: filter preserves it.
+    expect(artless, 'only the art-trailing zone chronicle deeds may be artless').toEqual([
+      'chr_frostveil_gatherer',
+      'chr_frostveil_first_cast',
+      'chr_amberfall_gatherer',
+      'chr_amberfall_first_cast',
+      'chr_nightbloom_gatherer',
+      'chr_nightbloom_first_cast',
+      'chr_wraithwood_gatherer',
+      'chr_wraithwood_first_cast',
+      'chr_palmreach_gatherer',
+      'chr_palmreach_first_cast',
+      'chr_evergarden_gatherer',
+      'chr_evergarden_first_cast',
+    ]);
+    expect(DEED_IMAGE_IDS.size, 'the committed art set is unchanged by this PR').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);
       expect(deedImageUrl(crestId), `${id} -> ${crestId} must have no committed image`).toBeNull();
