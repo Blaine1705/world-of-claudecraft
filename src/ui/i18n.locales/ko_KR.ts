@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.deeds.recentJumpAria': '{name}(으)로 이동',
   'hudChrome.targetAuras.all': '전체',
   'hudChrome.actionBar.done': '완료',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',

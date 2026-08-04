@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.deeds.recentJumpAria': '跳至 {name}',
   'hudChrome.targetAuras.all': '全部',
   'hudChrome.actionBar.done': '完成',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',

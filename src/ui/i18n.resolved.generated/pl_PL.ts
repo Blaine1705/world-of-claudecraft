@@ -997,7 +997,7 @@ export const pl_PL: EnTranslations = {
       "name_stormfeather_griffin": "Niebosiężny Burzopiór",
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
-      "name_drakemaw_raptor": "Drakemaw Raptor",
+      "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1006,7 +1006,7 @@ export const pl_PL: EnTranslations = {
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
-      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
+      "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -1177,15 +1177,15 @@ export const pl_PL: EnTranslations = {
       "browserEffectsReduced": "Ograniczone",
       "browserEffectsMinimal": "Minimalne",
       "browserEffectsNote": "Tryb Auto przygasza ciężkie efekty CSS (rozmycie, poświatę, ruch tła) w zależności od przeglądarki i urządzenia. Zmniejsz go ręcznie, jeśli interfejs działa ociężale.",
-      "graphicsApply": "Apply Graphics",
-      "graphicsApplying": "Applying graphics settings...",
-      "graphicsApplied": "Graphics settings applied.",
-      "graphicsSaved": "Graphics settings saved. The active renderer already matches them.",
-      "graphicsFailed": "Graphics could not be applied. Your previous settings are still active.",
-      "graphicsRetry": "Retry Graphics",
-      "graphicsFatal": "Graphics recovery failed. Reload the game to continue.",
-      "graphicsReload": "Reload Game",
-      "graphicsDraftChanged": "Graphics changes are ready to apply.",
+      "graphicsApply": "Zastosuj grafikę",
+      "graphicsApplying": "Stosowanie ustawień grafiki...",
+      "graphicsApplied": "Zastosowano ustawienia grafiki.",
+      "graphicsSaved": "Zapisano ustawienia grafiki. Aktywny renderer już im odpowiada.",
+      "graphicsFailed": "Nie udało się zastosować grafiki. Twoje poprzednie ustawienia są nadal aktywne.",
+      "graphicsRetry": "Ponów próbę grafiki",
+      "graphicsFatal": "Przywracanie grafiki nie powiodło się. Wczytaj grę ponownie, aby kontynuować.",
+      "graphicsReload": "Wczytaj grę ponownie",
+      "graphicsDraftChanged": "Zmiany grafiki są gotowe do zastosowania.",
       "interfaceMode": "Tryb interfejsu",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Komputer",
@@ -1216,7 +1216,7 @@ export const pl_PL: EnTranslations = {
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showThirdActionBar": "Pokaż trzeci pasek akcji",
-      "lockActionBars": "Lock Action Bars",
+      "lockActionBars": "Zablokuj paski akcji",
       "showTargetOfTarget": "Pokaż cel celu",
       "showAttackButton": "Pokaż Przycisk Ataku",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
@@ -1380,11 +1380,11 @@ export const pl_PL: EnTranslations = {
       "highContrast": "Wysoki kontrast",
       "highContrastAria": "Przełącz tło o wysokim kontraście: wyłącza ruchomy zwiastun, aby tekst ekranu startowego pozostał czytelny",
       "browserSupport": {
-        "title": "Heads up: unsupported browser",
-        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
-        "getDesktopApp": "Get the desktop app",
-        "continueInBrowser": "Continue in browser",
-        "dismissAria": "Dismiss the unsupported browser notice"
+        "title": "Uwaga: nieobsługiwana przeglądarka",
+        "body": "W tej przeglądarce możesz zauważyć obniżoną wydajność. Aby zapewnić sobie najlepsze wrażenia, pobierz aplikację na komputer dla systemu Windows, macOS lub Linux. Wolisz grać w przeglądarce? Chrome działa najlepiej, a Firefox i Safari również są obsługiwane.",
+        "getDesktopApp": "Pobierz aplikację na komputer",
+        "continueInBrowser": "Kontynuuj w przeglądarce",
+        "dismissAria": "Zamknij powiadomienie o nieobsługiwanej przeglądarce"
       }
     },
     "warfare": {
@@ -1754,7 +1754,7 @@ export const pl_PL: EnTranslations = {
       "itemAriaEnchanted": "{item}, ilość {count}, zaklęta kopia",
       "itemAriaBound": "{item}, ilość {count}, związana kopia",
       "itemAriaMasterwork": "{item}, ilość {count}, arcydzieło",
-      "itemAriaQuest": "{item}, quantity {count}, quest item",
+      "itemAriaQuest": "{item}, ilość {count}, przedmiot zadania",
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
       "filterWeapon": "Bronie",
@@ -1763,7 +1763,7 @@ export const pl_PL: EnTranslations = {
       "filterMaterial": "Surowce",
       "filterTool": "Narzędzia",
       "filterQuest": "Zadania",
-      "filterQuestCountAria": "Quest, {count} items",
+      "filterQuestCountAria": "Zadania, {count} przedmiotów",
       "filterMount": "Wierzchowce",
       "sortAria": "Sortuj przedmioty w torbie",
       "sortRecent": "Ostatnie",
@@ -1772,7 +1772,7 @@ export const pl_PL: EnTranslations = {
       "searchPlaceholder": "Szukaj przedmiotów",
       "searchAria": "Szukaj przedmiotów w torbie według nazwy",
       "noMatch": "Żaden przedmiot nie pasuje do filtrów.",
-      "noQuestItems": "No quest items in your bags.",
+      "noQuestItems": "Brak przedmiotów zadań w twoich torbach.",
       "capacity": "{used}/{total}",
       "capacityAria": "Zajęte miejsca w torbach: {used} z {total}",
       "backpack": "Plecak",
@@ -1991,7 +1991,7 @@ export const pl_PL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Gatunek wyborny. Zebrany z żyły o pełnym poziomie narzędziem wyższej rangi niż sam materiał; liczy się jako zwykła wersja wszędzie tam, gdzie jest ona wymagana.",
-      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
+      "cookingCatch": "Składnik kuchenny. Wymaga ugotowania przed zjedzeniem.",
       "arcaneDust": "Składnik do zaklinania. Pozyskiwany z rozbrajania pospolitego i niezwykłego ekwipunku.",
       "arcaneEssence": "Składnik do zaklinania. Pozyskiwany z rozbrajania rzadkiego ekwipunku.",
       "arcaneShard": "Składnik do zaklinania. Pozyskiwany z rozbrajania epickiego i legendarnego ekwipunku.",
@@ -2273,7 +2273,7 @@ export const pl_PL: EnTranslations = {
       "depositHint": "Kliknij, aby zdeponować",
       "depositPartialHint": "Kliknij z Shiftem, aby zdeponować część",
       "cannotDeposit": "Nie można zdeponować",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Nie można teraz zdeponować",
       "depositQuantityTitle": "Zdeponuj: {item}",
       "depositQuantityInput": "Liczba do zdeponowania",
       "depositQuantityConfirm": "Zdeponuj",
@@ -2284,7 +2284,7 @@ export const pl_PL: EnTranslations = {
       "sortAria": "Sortuj przedmioty w banku",
       "searchAria": "Szukaj przedmiotów w banku po nazwie",
       "depositAll": "Zdeponuj wszystkie materiały",
-      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
+      "depositAllTooltip": "Wysyła każdy reagent rzemieślniczy i przedmiot tandetny z twoich toreb do banku za jednym razem. Narzędzia do zbieractwa, założony ekwipunek, przedmioty zadań i przedmioty konsumpcyjne nigdy nie są ruszane.",
       "depositAllDone": "Zdeponowane materiały: {count}.",
       "depositAllFull": "Zdeponowane materiały: {count}. Bank jest teraz pełny.",
       "depositAllNone": "Bank pełny: niczego nie zdeponowano.",
@@ -2301,49 +2301,49 @@ export const pl_PL: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Zaproś przyjaciela: gdy osiągnie 10. poziom, oboje zdobywacie po 2 miejsca, maksymalnie za 5 przyjaciół.",
       "bonusSectionAria": "Premiowe miejsca w banku i jak zdobyć ich więcej",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
-      "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "tabsAria": "Zakładki banku",
+      "personalTab": "Osobiste",
+      "guildTab": "Gildia",
+      "guildCapacityAria": "Wykorzystane miejsca w banku gildii: {used} z {total}",
+      "guildEmpty": "Bank gildii jest pusty.",
+      "guildTreasury": "Skarbiec gildii",
+      "guildDepositGold": "Wpłać pieniądze",
+      "guildWithdrawGold": "Wypłać pieniądze",
+      "guildDepositGoldTitle": "Wpłać pieniądze do skarbca gildii",
+      "guildWithdrawGoldTitle": "Wypłać pieniądze ze skarbca gildii",
+      "guildGoldAvailable": "Dostępne: {amount}",
+      "guildBuyConfirm": "Kupić {count} dodatkowych miejsc w banku gildii za {price} ze skarbca gildii?",
+      "guildBuyNote": "Opłacone ze skarbca gildii",
+      "guildTreasuryShort": "Za mało w skarbcu",
+      "guildOpenBank": "Otwórz bank gildii",
+      "guildOpenConfirm": "Otworzyć bank gildii za {price}? Zostanie to opłacone z twoich własnych pieniędzy.",
+      "guildOpenAccept": "Otwórz",
+      "guildOpenNote": "Opłacone z twoich własnych pieniędzy, nie ze skarbca gildii",
+      "guildPurseShort": "Za mało pieniędzy",
+      "guildDormantNote": "Zablokowanych przedmiotów nie można wyjąć, a ich obecność uniemożliwia rozwiązanie gildii.",
+      "guildDormantHint": "Ten przedmiot jest zablokowany w banku gildii i nie można go wyjąć.",
+      "guildDormantAria": "{item}, ilość {count}, nie można wyjąć",
+      "guildUnknownItem": "Nieznany przedmiot",
+      "guildDepositHint": "Kliknij, aby zdeponować w banku gildii",
+      "guildCannotDeposit": "Nie można umieścić w banku gildii",
+      "guildGoldCannotMove": "Tej kwoty nie można teraz przenieść.",
+      "guildViewsAria": "Widoki banku gildii",
+      "guildContentsTab": "Zawartość",
+      "guildLogTab": "Dziennik",
+      "logAria": "Dziennik aktywności banku gildii",
+      "logNote": "{count} najnowszych działań w banku gildii.",
+      "logLoading": "Wczytywanie dziennika banku gildii...",
+      "logEmpty": "Nic jeszcze nie zostało przeniesione do ani z banku gildii.",
+      "logRefused": "Tylko oficerowie gildii mogą odczytać dziennik banku gildii.",
+      "logFormerMember": "Były członek gildii",
+      "logDepositItem": "{actor} zdeponował {count} {item}",
+      "logWithdrawItem": "{actor} wyjął {count} {item}",
+      "logDepositMoney": "{actor} zdeponował {amount}",
+      "logWithdrawMoney": "{actor} wypłacił {amount}",
+      "logBuySlots": "{actor} kupił rozszerzenie banku za {amount}",
+      "logOpenBank": "{actor} otworzył bank gildii za {amount}",
+      "logCharterFee": "{actor} zapłacił opłatę za założenie gildii w wysokości {amount}",
+      "logAdminPurge": "Administrator usunął {count} {item}"
     },
     "calendar": {
       "title": "Kalendarz wydarzeń",
@@ -2658,8 +2658,8 @@ export const pl_PL: EnTranslations = {
     "crafting": {
       "title": "Rzemiosło",
       "close": "Zamknij rzemiosło",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Rzemiosło",
+      "dialogOptionAria": "Otwórz okno rzemiosła dla {craft}",
       "craft": "Rzemiosło",
       "reagentsNeeded": "Wymaga:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2969,7 +2969,7 @@ export const pl_PL: EnTranslations = {
       "countLabel": "{earned}/{total} czynów",
       "completionAria": "Zdobyte czyny: {earned} z {total}",
       "recentLabel": "Ostatnie:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Przejdź do {name}",
       "nearestLabel": "Prawie u celu:",
       "filterGroupAria": "Filtruj czyny",
       "filterAll": "Wszystkie",
@@ -6166,16 +6166,16 @@ export const pl_PL: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Sprawdzanie aktualizacji...",
+      "checkingBody": "Nowe wersje pobierają się, gdy grasz.",
+      "uptodateTitle": "Masz najnowszą wersję",
       "downloadingTitle": "Pobieranie aktualizacji {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Możesz grać dalej. Instalacja nastąpi, gdy wyjdziesz z gry.",
       "readyTitle": "Aktualizacja {version} jest gotowa",
       "readyBody": "Zainstaluje się przy zamknięciu lub uruchom ponownie teraz.",
       "restart": "Uruchom ponownie teraz",
       "later": "Później",
-      "dismiss": "Dismiss"
+      "dismiss": "Zamknij"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6642,11 +6642,11 @@ export const pl_PL: EnTranslations = {
     },
     "system": {
       "playerDeath": "Zginąłeś.",
-      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
-      "deathRecapKiller": "You have died. Slain by {killer}.",
-      "deathRecapAbility": "You have died. Slain by {ability}.",
-      "deathRecapFalling": "You have died. You fell to your death.",
-      "deathRecapDrowned": "You have died. You drowned.",
+      "deathRecapKillerAbility": "Zginąłeś. Zabity przez {killer} za pomocą {ability}.",
+      "deathRecapKiller": "Zginąłeś. Zabity przez {killer}.",
+      "deathRecapAbility": "Zginąłeś. Zabity przez {ability}.",
+      "deathRecapFalling": "Zginąłeś. Spadłeś na śmierć.",
+      "deathRecapDrowned": "Zginąłeś. Utonąłeś.",
       "respawn": "Czujesz się wypoczęty i znów cały.",
       "ignoringChat": "Ignorujesz wiadomości od {name}.",
       "noLongerIgnoring": "Nie ignorujesz już {name}.",
@@ -7137,7 +7137,7 @@ export const pl_PL: EnTranslations = {
       "quest": "Przedmiot zadania",
       "junk": "Tandeta",
       "fineMaterial": "Wyborny materiał",
-      "material": "Material",
+      "material": "Materiał",
       "food": "Jedzenie",
       "drink": "Napój",
       "tool": "Narzędzie",
@@ -7170,9 +7170,9 @@ export const pl_PL: EnTranslations = {
       "useFood": "Użycie: Przywraca {amount} zdrowia w ciągu {seconds} s. Podczas jedzenia musisz pozostać w pozycji siedzącej.",
       "useDrink": "Użycie: Przywraca {amount} many w ciągu {seconds} s. Podczas picia musisz pozostać w pozycji siedzącej.",
       "questItem": "Przedmiot zadania",
-      "questRelated": "Quest: {quest}",
-      "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "Not needed for any active quest.",
+      "questRelated": "Zadanie: {quest}",
+      "questRules": "Nie można go sprzedać, zdeponować w banku ani wymienić.",
+      "questOrphaned": "Niepotrzebny w żadnym aktywnym zadaniu.",
       "classes": "Klasy: {classes}",
       "sellPrice": "Cena sprzedaży: {money}",
       "clickBuy": "Kliknij, aby kupić",
@@ -7308,12 +7308,12 @@ export const pl_PL: EnTranslations = {
       "reclaim": "Odbierz",
       "buyAria": "Kup {item} za {price}",
       "reclaimAria": "Odbierz {item}",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Potwierdź zakup",
+      "buyConfirmBody": "Kupić {item} za {price}?",
+      "buyConfirmBodyStack": "Kupić {item} x{count} za {price} ({each} za sztukę)?",
+      "buyConfirmAccept": "Kup",
+      "buyConfirmCancel": "Anuluj",
+      "buyChanged": "Ta oferta zmieniła się, zanim zdążyłeś potwierdzić. Sprawdź cenę i spróbuj ponownie.",
       "sellNote": "Wystaw towary ze swoich toreb. Kupiec pobiera {cut}% prowizji przy sprzedaży przedmiotu. Wykorzystujesz {used}/{max} slotów na oferty.",
       "sellPickEmpty": "Kliknij przedmiot w swoich torbach, aby wybrać, co sprzedać.",
       "quantity": "Ilość",
@@ -8802,16 +8802,16 @@ export const pl_PL: EnTranslations = {
         "name": "Rozkaz zbiórki z Fenbridge"
       },
       "firebottle": {
-        "name": "Firebottle"
+        "name": "Ognista Butelka"
       },
       "murloc_hut": {
-        "name": "Mudfin Hut"
+        "name": "Chata Mudfinów"
       },
       "restless_skull": {
-        "name": "Restless Skull"
+        "name": "Niespokojna Czaszka"
       },
       "vanguard_bone": {
-        "name": "Vanguard Bone"
+        "name": "Kość Awangardy"
       },
       "mire_prowler_pelt": {
         "name": "Futro bagiennego czyhacza"
@@ -10089,7 +10089,7 @@ export const pl_PL: EnTranslations = {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
       },
       "reins_drakemaw_raptor": {
-        "name": "Reins of the Drakemaw Raptor"
+        "name": "Wodze Raptora Smoczej Paszczy"
       },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
@@ -11087,19 +11087,19 @@ export const pl_PL: EnTranslations = {
         "name": "Pajęczy Kokon Jaj"
       },
       "spider_egg": {
-        "name": "Broodmother Egg"
+        "name": "Jajo Matki Pomiotu"
       },
       "widow_hatchling": {
-        "name": "Widow Hatchling"
+        "name": "Wylęg Wdowy"
       },
       "drowned_warlord": {
-        "name": "The Drowned Warlord"
+        "name": "Utopiony Wódz Wojenny"
       },
       "brakka_wallbreaker": {
-        "name": "Brakka the Wallbreaker"
+        "name": "Brakka Murołamca"
       },
       "threnos_first_voice": {
-        "name": "Threnos the First Voice"
+        "name": "Threnos, Pierwszy Głos"
       },
       "grave_silt_bulwark": {
         "name": "Bastion Grobowego Mułu"
@@ -11282,16 +11282,16 @@ export const pl_PL: EnTranslations = {
         "name": "Cindraleth, Matriarchini Paszczy"
       },
       "dragonkin_egg": {
-        "name": "Dragonkin Egg"
+        "name": "Smocze Jajo"
       },
       "dragonkin_whelp": {
-        "name": "Dragonkin Whelp"
+        "name": "Smoczątko"
       },
       "dragonkin_broodguard": {
-        "name": "Dragonkin Broodguard"
+        "name": "Smoczy Strażnik Wylęgu"
       },
       "drakemaw_broodlord": {
-        "name": "Drakemaw Broodlord"
+        "name": "Władca Wylęgu Smoczej Paszczy"
       },
       "gilded_stag": {
         "name": "Złocony Jeleń"
@@ -12325,7 +12325,7 @@ export const pl_PL: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Brak spoczynku w szuwarach",
-        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
+        "text": "Obrzęd rzucony na te kadzielnice zmusza utopionych do powstania z martwych, a teraz wskrzesił jednego na tyle potężnego, by nimi dowodzić. Strażnicy zwą go Utopionym Wodzem Wojennym, a póki włada Zatopioną Kaplicą, zmarli trzymają szyki. Złam go, {playerName}, a reszta rozproszy się z powrotem w trzęsawisko.",
         "completion": "Okazujesz zmarłym więcej litości, niż kiedykolwiek ich panowie. Weź to - z nawiązką na to zasłużyłeś.",
         "objectives": {
           "0": {

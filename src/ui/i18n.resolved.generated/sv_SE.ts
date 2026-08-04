@@ -997,7 +997,7 @@ export const sv_SE: EnTranslations = {
       "name_stormfeather_griffin": "Himmelsvidd Stormfjäder",
       "name_thunderstrut_gobbler": "Åskstoltsern, Den stora kalkonen",
       "name_terrorspark_groundshaker": "Skräckgnista, markskakaren",
-      "name_drakemaw_raptor": "Drakemaw Raptor",
+      "name_drakemaw_raptor": "Drakgapsraptor",
       "desc_valorsteed": "En uthållig, säkerfotad stridshäst som ger ökad reshastighet.",
       "desc_grag_bear": "En uthållig, säkerfotad björn som ger ökad reshastighet.",
       "desc_stalkglider_snail": "En robust, långsamt brinnande snigel som ger ökad reshastighet.",
@@ -1006,7 +1006,7 @@ export const sv_SE: EnTranslations = {
       "desc_stormfeather_griffin": "En kunglig stormgrip som smyger fram på runskodda klor, med vingarna hopfällda.",
       "desc_thunderstrut_gobbler": "En kolossal stormkläckt kalkon som stoltserar ner från Den vaknande toppen, med stjärten spretande som ett åskmoln.",
       "desc_terrorspark_groundshaker": "En kompakt bepansrad maskin med tunga larvband, en grovkalibrig kanon och en sadel byggd för orädda förare.",
-      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
+      "desc_drakemaw_raptor": "En sadeltämjd kullraptor från Drakgapets kaldera, ren sena och sprint, som fortfarande doftar svagt av aska."
     },
     "mountTraining": {
       "mountPrompt": "Tryck på {key} för att sitta upp på övnings-Tapperhetshästen.",
@@ -1177,15 +1177,15 @@ export const sv_SE: EnTranslations = {
       "browserEffectsReduced": "Reducerad",
       "browserEffectsMinimal": "Minimal",
       "browserEffectsNote": "Auto dämpar tunga CSS-effekter (oskärpa, glöd, bakgrundsrörelse) baserat på din webbläsare och enhet. Sänk den manuellt om gränssnittet känns trögt.",
-      "graphicsApply": "Apply Graphics",
-      "graphicsApplying": "Applying graphics settings...",
-      "graphicsApplied": "Graphics settings applied.",
-      "graphicsSaved": "Graphics settings saved. The active renderer already matches them.",
-      "graphicsFailed": "Graphics could not be applied. Your previous settings are still active.",
-      "graphicsRetry": "Retry Graphics",
-      "graphicsFatal": "Graphics recovery failed. Reload the game to continue.",
-      "graphicsReload": "Reload Game",
-      "graphicsDraftChanged": "Graphics changes are ready to apply.",
+      "graphicsApply": "Tillämpa grafik",
+      "graphicsApplying": "Tillämpar grafikinställningar...",
+      "graphicsApplied": "Grafikinställningarna har tillämpats.",
+      "graphicsSaved": "Grafikinställningarna har sparats. Den aktiva renderaren matchar dem redan.",
+      "graphicsFailed": "Grafiken kunde inte tillämpas. Dina tidigare inställningar är fortfarande aktiva.",
+      "graphicsRetry": "Försök igen med grafiken",
+      "graphicsFatal": "Grafikåterställningen misslyckades. Ladda om spelet för att fortsätta.",
+      "graphicsReload": "Ladda om spelet",
+      "graphicsDraftChanged": "Grafikändringarna är redo att tillämpas.",
       "interfaceMode": "Gränssnittsläge",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Skrivbord",
@@ -1216,7 +1216,7 @@ export const sv_SE: EnTranslations = {
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
-      "lockActionBars": "Lock Action Bars",
+      "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
@@ -1380,11 +1380,11 @@ export const sv_SE: EnTranslations = {
       "highContrast": "Hög kontrast",
       "highContrastAria": "Växla bakgrund med hög kontrast: inaktiverar den rörliga trailern så att texten på startskärmen förblir läsbar",
       "browserSupport": {
-        "title": "Heads up: unsupported browser",
-        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
-        "getDesktopApp": "Get the desktop app",
-        "continueInBrowser": "Continue in browser",
-        "dismissAria": "Dismiss the unsupported browser notice"
+        "title": "Observera: webbläsaren stöds inte",
+        "body": "Du kan uppleva sämre prestanda i den här webbläsaren. För bästa upplevelse, hämta skrivbordsappen för Windows, macOS eller Linux. Föredrar du att spela i en webbläsare? Chrome fungerar bäst, och Firefox och Safari stöds också.",
+        "getDesktopApp": "Hämta skrivbordsappen",
+        "continueInBrowser": "Fortsätt i webbläsaren",
+        "dismissAria": "Stäng meddelandet om webbläsare som inte stöds"
       }
     },
     "warfare": {
@@ -1754,7 +1754,7 @@ export const sv_SE: EnTranslations = {
       "itemAriaEnchanted": "{item}, antal {count}, förtrollad kopia",
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
-      "itemAriaQuest": "{item}, quantity {count}, quest item",
+      "itemAriaQuest": "{item}, antal {count}, uppdragsföremål",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
@@ -1763,7 +1763,7 @@ export const sv_SE: EnTranslations = {
       "filterMaterial": "Material",
       "filterTool": "Verktyg",
       "filterQuest": "Uppdrag",
-      "filterQuestCountAria": "Quest, {count} items",
+      "filterQuestCountAria": "Uppdrag, {count} föremål",
       "filterMount": "Riddjur",
       "sortAria": "Sortera väskföremål",
       "sortRecent": "Senaste",
@@ -1772,7 +1772,7 @@ export const sv_SE: EnTranslations = {
       "searchPlaceholder": "Sök föremål",
       "searchAria": "Sök väskföremål efter namn",
       "noMatch": "Inga föremål matchar dina filter.",
-      "noQuestItems": "No quest items in your bags.",
+      "noQuestItems": "Inga uppdragsföremål i dina väskor.",
       "capacity": "{used}/{total}",
       "capacityAria": "Använda väskplatser: {used} av {total}",
       "backpack": "Ryggsäck",
@@ -1991,7 +1991,7 @@ export const sv_SE: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Bruten ur en åder av full nivå med ett verktyg som rankar över materialet, och räknas som den vanliga versionen varhelst en sådan krävs.",
-      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
+      "cookingCatch": "Ingrediens för matlagning. Måste tillagas innan den kan ätas.",
       "arcaneDust": "Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.",
       "arcaneEssence": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.",
       "arcaneShard": "Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.",
@@ -2273,7 +2273,7 @@ export const sv_SE: EnTranslations = {
       "depositHint": "Klicka för att sätta in",
       "depositPartialHint": "Skift-klicka för att sätta in en del av antalet",
       "cannotDeposit": "Kan inte förvaras i banken",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Kan inte sättas in just nu",
       "depositQuantityTitle": "Sätt in {item}",
       "depositQuantityInput": "Antal att sätta in",
       "depositQuantityConfirm": "Sätt in",
@@ -2284,7 +2284,7 @@ export const sv_SE: EnTranslations = {
       "sortAria": "Sortera bankföremål",
       "searchAria": "Sök bankföremål efter namn",
       "depositAll": "Sätt in alla material",
-      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
+      "depositAllTooltip": "Skickar alla hantverksreagenser och skräpföremål från dina väskor till banken i en enda resa. Insamlingsverktyg, utrustad utrustning, uppdragsföremål och förbrukningsvaror rörs aldrig.",
       "depositAllDone": "Material insatta: {count}.",
       "depositAllFull": "Material insatta: {count}. Banken är nu full.",
       "depositAllNone": "Banken är full: inget sattes in.",
@@ -2301,49 +2301,49 @@ export const sv_SE: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Bjud in en vän: när vännen når nivå 10 tjänar ni 2 fack var, upp till 5 vänner.",
       "bonusSectionAria": "Bonusbankfack och hur du tjänar fler",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
-      "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "tabsAria": "Bankflikar",
+      "personalTab": "Personligt",
+      "guildTab": "Gille",
+      "guildCapacityAria": "Använda fack i gillesbanken: {used} av {total}",
+      "guildEmpty": "Gillesbanken är tom.",
+      "guildTreasury": "Gillets kassa",
+      "guildDepositGold": "Sätt in pengar",
+      "guildWithdrawGold": "Ta ut pengar",
+      "guildDepositGoldTitle": "Sätt in pengar i gillets kassa",
+      "guildWithdrawGoldTitle": "Ta ut pengar från gillets kassa",
+      "guildGoldAvailable": "Tillgängligt: {amount}",
+      "guildBuyConfirm": "Köp {count} extra fack i gillesbanken för {price} från gillets kassa?",
+      "guildBuyNote": "Betalas från gillets kassa",
+      "guildTreasuryShort": "Kassan räcker inte",
+      "guildOpenBank": "Öppna gillesbanken",
+      "guildOpenConfirm": "Öppna gillesbanken för {price}? Detta betalas med dina egna pengar.",
+      "guildOpenAccept": "Öppna",
+      "guildOpenNote": "Betalas med dina egna pengar, inte gillets kassa",
+      "guildPurseShort": "Otillräckligt med pengar",
+      "guildDormantNote": "Fastlåsta föremål kan inte tas ut och hindrar gillet från att upplösas.",
+      "guildDormantHint": "Det här föremålet är fastlåst i gillesbanken och kan inte tas ut.",
+      "guildDormantAria": "{item}, antal {count}, kan inte tas ut",
+      "guildUnknownItem": "Okänt föremål",
+      "guildDepositHint": "Klicka för att sätta in i gillesbanken",
+      "guildCannotDeposit": "Kan inte läggas i gillesbanken",
+      "guildGoldCannotMove": "Det beloppet kan inte flyttas just nu.",
+      "guildViewsAria": "Vyer för gillesbanken",
+      "guildContentsTab": "Innehåll",
+      "guildLogTab": "Logg",
+      "logAria": "Aktivitetslogg för gillesbanken",
+      "logNote": "De {count} senaste händelserna i gillesbanken.",
+      "logLoading": "Laddar gillesbankens logg...",
+      "logEmpty": "Inget har flyttats in i eller ut ur gillesbanken ännu.",
+      "logRefused": "Endast gillesofficerare kan läsa gillesbankens logg.",
+      "logFormerMember": "En tidigare gillesmedlem",
+      "logDepositItem": "{actor} satte in {count} {item}",
+      "logWithdrawItem": "{actor} tog ut {count} {item}",
+      "logDepositMoney": "{actor} satte in {amount}",
+      "logWithdrawMoney": "{actor} tog ut {amount}",
+      "logBuySlots": "{actor} köpte en bankutökning för {amount}",
+      "logOpenBank": "{actor} öppnade gillesbanken för {amount}",
+      "logCharterFee": "{actor} betalade gillets stadgeavgift på {amount}",
+      "logAdminPurge": "En administratör tog bort {count} {item}"
     },
     "calendar": {
       "title": "Evenemangskalender",
@@ -2658,8 +2658,8 @@ export const sv_SE: EnTranslations = {
     "crafting": {
       "title": "Hantverk",
       "close": "Nära hantverk",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Hantverk",
+      "dialogOptionAria": "Öppna hantverksfönstret för {craft}",
       "craft": "Hantverk",
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2969,7 +2969,7 @@ export const sv_SE: EnTranslations = {
       "countLabel": "{earned}/{total} bedrifter",
       "completionAria": "Fullbordade bedrifter: {earned} av {total}",
       "recentLabel": "Nyligen:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Hoppa till {name}",
       "nearestLabel": "Nästan framme:",
       "filterGroupAria": "Filtrera bedrifter",
       "filterAll": "Alla",
@@ -6166,16 +6166,16 @@ export const sv_SE: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Söker efter uppdateringar...",
+      "checkingBody": "Nya versioner laddas ner medan du spelar.",
+      "uptodateTitle": "Du har den senaste versionen",
       "downloadingTitle": "Laddar ner uppdatering {version}...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Du kan fortsätta spela. Den installeras när du avslutar.",
       "readyTitle": "Uppdatering {version} är klar",
       "readyBody": "Den installeras när du avslutar, eller starta om nu.",
       "restart": "Starta om nu",
       "later": "Senare",
-      "dismiss": "Dismiss"
+      "dismiss": "Stäng"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6642,11 +6642,11 @@ export const sv_SE: EnTranslations = {
     },
     "system": {
       "playerDeath": "Du har dött.",
-      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
-      "deathRecapKiller": "You have died. Slain by {killer}.",
-      "deathRecapAbility": "You have died. Slain by {ability}.",
-      "deathRecapFalling": "You have died. You fell to your death.",
-      "deathRecapDrowned": "You have died. You drowned.",
+      "deathRecapKillerAbility": "Du har dött. Dräpt av {killer}s {ability}.",
+      "deathRecapKiller": "Du har dött. Dräpt av {killer}.",
+      "deathRecapAbility": "Du har dött. Dräpt av {ability}.",
+      "deathRecapFalling": "Du har dött. Du föll till din död.",
+      "deathRecapDrowned": "Du har dött. Du drunknade.",
       "respawn": "Du känner dig utvilad och hel igen.",
       "ignoringChat": "Ignorerar chatt från {name}.",
       "noLongerIgnoring": "Ignorerar inte längre {name}.",
@@ -7170,9 +7170,9 @@ export const sv_SE: EnTranslations = {
       "useFood": "Använd: Återställer {amount} hälsa under {seconds} sek. Du måste förbli sittande medan du äter.",
       "useDrink": "Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.",
       "questItem": "Uppdragsföremål",
-      "questRelated": "Quest: {quest}",
-      "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "Not needed for any active quest.",
+      "questRelated": "Uppdrag: {quest}",
+      "questRules": "Kan inte säljas, bankas eller bytas bort.",
+      "questOrphaned": "Behövs inte för något aktivt uppdrag.",
       "classes": "Klasser: {classes}",
       "sellPrice": "Försäljningspris: {money}",
       "clickBuy": "Klicka för att köpa",
@@ -7308,12 +7308,12 @@ export const sv_SE: EnTranslations = {
       "reclaim": "Återkalla",
       "buyAria": "Köp {item} för {price}",
       "reclaimAria": "Återkalla {item}",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Bekräfta köp",
+      "buyConfirmBody": "Köp {item} för {price}?",
+      "buyConfirmBodyStack": "Köp {item} x{count} för {price} ({each} styck)?",
+      "buyConfirmAccept": "Köp",
+      "buyConfirmCancel": "Avbryt",
+      "buyChanged": "Den listningen ändrades innan du bekräftade. Kontrollera priset och försök igen.",
       "sellNote": "Lägg upp varor från dina väskor. Köpmannen tar {cut}% i provision när ett föremål säljs. Du använder {used}/{max} listningsplatser.",
       "sellPickEmpty": "Klicka på ett föremål i dina väskor för att välja vad du vill sälja.",
       "quantity": "Antal",
@@ -8802,16 +8802,16 @@ export const sv_SE: EnTranslations = {
         "name": "Kärrbros mönstringsorder"
       },
       "firebottle": {
-        "name": "Firebottle"
+        "name": "Eldflaska"
       },
       "murloc_hut": {
-        "name": "Mudfin Hut"
+        "name": "Dyfenehydda"
       },
       "restless_skull": {
-        "name": "Restless Skull"
+        "name": "Rastlös skalle"
       },
       "vanguard_bone": {
-        "name": "Vanguard Bone"
+        "name": "Förtruppsben"
       },
       "mire_prowler_pelt": {
         "name": "Kärrstrykarpäls"
@@ -10089,7 +10089,7 @@ export const sv_SE: EnTranslations = {
         "name": "Tändningsnyckel: Skräckgnista, markskakaren"
       },
       "reins_drakemaw_raptor": {
-        "name": "Reins of the Drakemaw Raptor"
+        "name": "Tyglar till Drakgapsraptorn"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
@@ -11087,19 +11087,19 @@ export const sv_SE: EnTranslations = {
         "name": "Spindeläggsäck"
       },
       "spider_egg": {
-        "name": "Broodmother Egg"
+        "name": "Yngelmoderns ägg"
       },
       "widow_hatchling": {
-        "name": "Widow Hatchling"
+        "name": "Änkeyngel"
       },
       "drowned_warlord": {
-        "name": "The Drowned Warlord"
+        "name": "Den drunknade krigsherren"
       },
       "brakka_wallbreaker": {
-        "name": "Brakka the Wallbreaker"
+        "name": "Brakka Murbrytaren"
       },
       "threnos_first_voice": {
-        "name": "Threnos the First Voice"
+        "name": "Threnos, den första rösten"
       },
       "grave_silt_bulwark": {
         "name": "Gravslamsbålverk"
@@ -11282,16 +11282,16 @@ export const sv_SE: EnTranslations = {
         "name": "Cindraleth, Gapets matriark"
       },
       "dragonkin_egg": {
-        "name": "Dragonkin Egg"
+        "name": "Drakättsägg"
       },
       "dragonkin_whelp": {
-        "name": "Dragonkin Whelp"
+        "name": "Drakättsunge"
       },
       "dragonkin_broodguard": {
-        "name": "Dragonkin Broodguard"
+        "name": "Drakättskullvakt"
       },
       "drakemaw_broodlord": {
-        "name": "Drakemaw Broodlord"
+        "name": "Drakgapets kullherre"
       },
       "gilded_stag": {
         "name": "Förgylld hjort"
@@ -12325,7 +12325,7 @@ export const sv_SE: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Ingen ro i vassen",
-        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
+        "text": "Riten på dessa rökelsekar binder de drunknade att resa sig, och nu har den väckt en stark nog att leda dem. Väktarna kallar honom Den drunknade krigsherren, och så länge han håller Det dränkta kapellet behåller de döda sina led. Krossa honom, {playerName}, så sprids resten tillbaka ut i kärret.",
         "completion": "Du ger de döda mer nåd än deras mästare någonsin gjorde. Ta detta - du har mer än förtjänat det.",
         "objectives": {
           "0": {

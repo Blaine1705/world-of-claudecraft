@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.deeds.recentJumpAria': 'Перейти к {name}',
   'hudChrome.targetAuras.all': 'Все',
   'hudChrome.actionBar.done': 'Готово',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',

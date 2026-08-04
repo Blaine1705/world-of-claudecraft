@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.deeds.recentJumpAria': '{name}へ移動',
   'hudChrome.targetAuras.all': 'すべて',
   'hudChrome.actionBar.done': '完了',
   'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',

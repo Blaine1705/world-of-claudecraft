@@ -997,7 +997,7 @@ export const nl_NL: EnTranslations = {
       "name_stormfeather_griffin": "Hemelreik Stormveder",
       "name_thunderstrut_gobbler": "Donderstap de Grote Kalkoen",
       "name_terrorspark_groundshaker": "Schrikvonk, de Grondschudder",
-      "name_drakemaw_raptor": "Drakemaw Raptor",
+      "name_drakemaw_raptor": "Drakenmuil-Raptor",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -1006,7 +1006,7 @@ export const nl_NL: EnTranslations = {
       "desc_stormfeather_griffin": "Een koninklijke stormgriffioen die met runenbeslagen klauwen over de grond sluipt, vleugels opgevouwen.",
       "desc_thunderstrut_gobbler": "Een kolossale, uit de storm geboren kalkoen die vanaf de Ontwakende Piek naar beneden stapt, staart gespreid als een onweerswolk.",
       "desc_terrorspark_groundshaker": "Een compacte gepantserde machine met zware rupsbanden, een grootkaliberkanon en een zadel gebouwd voor onverschrokken piloten.",
-      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
+      "desc_drakemaw_raptor": "Een zadelmakke broedraptor uit de Drakenmuil-Caldera, één en al pezen en vaart, nog altijd zwak naar as geurend."
     },
     "mountTraining": {
       "mountPrompt": "Druk op {key} om op de trainings-Moedros te stijgen.",
@@ -1177,15 +1177,15 @@ export const nl_NL: EnTranslations = {
       "browserEffectsReduced": "Beperkt",
       "browserEffectsMinimal": "Minimaal",
       "browserEffectsNote": "Automatisch tempert zware CSS-effecten (vervaging, gloed, achtergrondbeweging) op basis van je browser en apparaat. Verlaag het handmatig als de interface traag aanvoelt.",
-      "graphicsApply": "Apply Graphics",
-      "graphicsApplying": "Applying graphics settings...",
-      "graphicsApplied": "Graphics settings applied.",
-      "graphicsSaved": "Graphics settings saved. The active renderer already matches them.",
-      "graphicsFailed": "Graphics could not be applied. Your previous settings are still active.",
-      "graphicsRetry": "Retry Graphics",
-      "graphicsFatal": "Graphics recovery failed. Reload the game to continue.",
-      "graphicsReload": "Reload Game",
-      "graphicsDraftChanged": "Graphics changes are ready to apply.",
+      "graphicsApply": "Grafica toepassen",
+      "graphicsApplying": "Grafische instellingen worden toegepast...",
+      "graphicsApplied": "Grafische instellingen toegepast.",
+      "graphicsSaved": "Grafische instellingen opgeslagen. De actieve renderer komt al overeen.",
+      "graphicsFailed": "Grafica kon niet worden toegepast. Je vorige instellingen zijn nog actief.",
+      "graphicsRetry": "Grafica opnieuw proberen",
+      "graphicsFatal": "Herstel van de grafische instellingen is mislukt. Herlaad het spel om door te gaan.",
+      "graphicsReload": "Spel herladen",
+      "graphicsDraftChanged": "Grafische wijzigingen zijn klaar om toe te passen.",
       "interfaceMode": "Interfacemodus",
       "interfaceModeAuto": "Automatisch",
       "interfaceModeDesktop": "Desktop",
@@ -1216,7 +1216,7 @@ export const nl_NL: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showThirdActionBar": "Derde actiebalk tonen",
-      "lockActionBars": "Lock Action Bars",
+      "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
@@ -1380,11 +1380,11 @@ export const nl_NL: EnTranslations = {
       "highContrast": "Hoog contrast",
       "highContrastAria": "Hoog-contrastachtergrond aan/uit: schakelt de bewegende trailer uit zodat de tekst op het startscherm leesbaar blijft",
       "browserSupport": {
-        "title": "Heads up: unsupported browser",
-        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
-        "getDesktopApp": "Get the desktop app",
-        "continueInBrowser": "Continue in browser",
-        "dismissAria": "Dismiss the unsupported browser notice"
+        "title": "Let op: niet-ondersteunde browser",
+        "body": "Je kunt verminderde prestaties ondervinden in deze browser. Download voor de beste ervaring de desktop-app voor Windows, macOS of Linux. Speel je liever in een browser? Chrome presteert het best, en Firefox en Safari worden ook ondersteund.",
+        "getDesktopApp": "Download de desktop-app",
+        "continueInBrowser": "Doorgaan in de browser",
+        "dismissAria": "De melding over niet-ondersteunde browser sluiten"
       }
     },
     "warfare": {
@@ -1754,7 +1754,7 @@ export const nl_NL: EnTranslations = {
       "itemAriaEnchanted": "{item}, aantal {count}, betoverd exemplaar",
       "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
-      "itemAriaQuest": "{item}, quantity {count}, quest item",
+      "itemAriaQuest": "{item}, aantal {count}, questvoorwerp",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",
@@ -1763,7 +1763,7 @@ export const nl_NL: EnTranslations = {
       "filterMaterial": "Materialen",
       "filterTool": "Gereedschap",
       "filterQuest": "Quest",
-      "filterQuestCountAria": "Quest, {count} items",
+      "filterQuestCountAria": "Quest, {count} voorwerpen",
       "filterMount": "Rijdieren",
       "sortAria": "Tasitems sorteren",
       "sortRecent": "Recent",
@@ -1772,7 +1772,7 @@ export const nl_NL: EnTranslations = {
       "searchPlaceholder": "Items zoeken",
       "searchAria": "Tasitems zoeken op naam",
       "noMatch": "Geen items komen overeen met je filters.",
-      "noQuestItems": "No quest items in your bags.",
+      "noQuestItems": "Geen questvoorwerpen in je tassen.",
       "capacity": "{used}/{total}",
       "capacityAria": "Tasvakken gebruikt: {used} van {total}",
       "backpack": "Rugzak",
@@ -1991,7 +1991,7 @@ export const nl_NL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.",
-      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
+      "cookingCatch": "Kookingrediënt. Moet worden gekookt voordat het gegeten wordt.",
       "arcaneDust": "Betoveringsreagens. Verkregen door het onbetoveren van gewone en ongewone uitrusting.",
       "arcaneEssence": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame uitrusting.",
       "arcaneShard": "Betoveringsreagens. Verkregen door het onbetoveren van epische en legendarische uitrusting.",
@@ -2273,7 +2273,7 @@ export const nl_NL: EnTranslations = {
       "depositHint": "Klik om te storten",
       "depositPartialHint": "Shift-klik om een deel te storten",
       "cannotDeposit": "Kan niet in de bank",
-      "cannotDepositNow": "Cannot be deposited right now",
+      "cannotDepositNow": "Kan nu niet worden gestort",
       "depositQuantityTitle": "{item} storten",
       "depositQuantityInput": "Aantal om te storten",
       "depositQuantityConfirm": "Storten",
@@ -2284,7 +2284,7 @@ export const nl_NL: EnTranslations = {
       "sortAria": "Bankvoorwerpen sorteren",
       "searchAria": "Bankvoorwerpen zoeken op naam",
       "depositAll": "Alle materialen storten",
-      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
+      "depositAllTooltip": "Stuurt in één keer elk ambachtsreagens en rommelvoorwerp uit je tassen naar de bank. Verzamelgereedschap, gedragen uitrusting, questvoorwerpen en verbruiksartikelen worden nooit aangeraakt.",
       "depositAllDone": "Materialen gestort: {count}.",
       "depositAllFull": "Materialen gestort: {count}. De bank is nu vol.",
       "depositAllNone": "Bank vol: niets gestort.",
@@ -2301,49 +2301,49 @@ export const nl_NL: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Nodig een vriend uit: wanneer die niveau 10 bereikt, verdienen jullie allebei 2 vakken, tot 5 vrienden.",
       "bonusSectionAria": "Bonusbankvakken en hoe je er meer verdient",
-      "tabsAria": "Bank tabs",
-      "personalTab": "Personal",
-      "guildTab": "Guild",
-      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
-      "guildEmpty": "The guild bank is empty.",
-      "guildTreasury": "Guild treasury",
-      "guildDepositGold": "Deposit money",
-      "guildWithdrawGold": "Withdraw money",
-      "guildDepositGoldTitle": "Deposit money into the guild treasury",
-      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
-      "guildGoldAvailable": "Available: {amount}",
-      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
-      "guildBuyNote": "Paid from the guild treasury",
-      "guildTreasuryShort": "Treasury short",
-      "guildOpenBank": "Open the guild bank",
-      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
-      "guildOpenAccept": "Open",
-      "guildOpenNote": "Paid from your own money, not the guild treasury",
-      "guildPurseShort": "Not enough money",
-      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
-      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
-      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
-      "guildUnknownItem": "Unknown item",
-      "guildDepositHint": "Click to deposit into the guild bank",
-      "guildCannotDeposit": "Cannot go in the guild bank",
-      "guildGoldCannotMove": "That amount cannot be moved right now.",
-      "guildViewsAria": "Guild bank views",
-      "guildContentsTab": "Contents",
-      "guildLogTab": "Log",
-      "logAria": "Guild bank activity log",
-      "logNote": "The {count} most recent guild bank actions.",
-      "logLoading": "Loading the guild bank log...",
-      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
-      "logRefused": "Only guild officers can read the guild bank log.",
-      "logFormerMember": "A former guild member",
-      "logDepositItem": "{actor} deposited {count} {item}",
-      "logWithdrawItem": "{actor} withdrew {count} {item}",
-      "logDepositMoney": "{actor} deposited {amount}",
-      "logWithdrawMoney": "{actor} withdrew {amount}",
-      "logBuySlots": "{actor} bought a bank expansion for {amount}",
-      "logOpenBank": "{actor} opened the guild bank for {amount}",
-      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
-      "logAdminPurge": "An administrator removed {count} {item}"
+      "tabsAria": "Banktabbladen",
+      "personalTab": "Persoonlijk",
+      "guildTab": "Gilde",
+      "guildCapacityAria": "Gildebankvakken gebruikt: {used} van {total}",
+      "guildEmpty": "De gildebank is leeg.",
+      "guildTreasury": "Gildekas",
+      "guildDepositGold": "Geld storten",
+      "guildWithdrawGold": "Geld opnemen",
+      "guildDepositGoldTitle": "Geld storten in de gildekas",
+      "guildWithdrawGoldTitle": "Geld opnemen uit de gildekas",
+      "guildGoldAvailable": "Beschikbaar: {amount}",
+      "guildBuyConfirm": "{count} extra gildebankvakken kopen voor {price} uit de gildekas?",
+      "guildBuyNote": "Betaald uit de gildekas",
+      "guildTreasuryShort": "Kastekort",
+      "guildOpenBank": "De gildebank openen",
+      "guildOpenConfirm": "De gildebank openen voor {price}? Dit wordt betaald uit je eigen geld.",
+      "guildOpenAccept": "Openen",
+      "guildOpenNote": "Betaald uit je eigen geld, niet uit de gildekas",
+      "guildPurseShort": "Niet genoeg geld",
+      "guildDormantNote": "Vergrendelde voorwerpen kunnen niet worden opgenomen en verhinderen het ontbinden van de gilde.",
+      "guildDormantHint": "Dit voorwerp is vergrendeld in de gildebank en kan niet worden opgenomen.",
+      "guildDormantAria": "{item}, aantal {count}, kan niet worden opgenomen",
+      "guildUnknownItem": "Onbekend voorwerp",
+      "guildDepositHint": "Klik om in de gildebank te storten",
+      "guildCannotDeposit": "Kan niet in de gildebank",
+      "guildGoldCannotMove": "Dat bedrag kan nu niet worden verplaatst.",
+      "guildViewsAria": "Gildebankweergaven",
+      "guildContentsTab": "Inhoud",
+      "guildLogTab": "Logboek",
+      "logAria": "Activiteitenlogboek van de gildebank",
+      "logNote": "De {count} meest recente gildebankacties.",
+      "logLoading": "Het logboek van de gildebank wordt geladen...",
+      "logEmpty": "Er is nog niets in of uit de gildebank verplaatst.",
+      "logRefused": "Alleen gildeofficieren kunnen het logboek van de gildebank lezen.",
+      "logFormerMember": "Een oud-gildelid",
+      "logDepositItem": "{actor} stortte {count} {item}",
+      "logWithdrawItem": "{actor} nam {count} {item} op",
+      "logDepositMoney": "{actor} stortte {amount}",
+      "logWithdrawMoney": "{actor} nam {amount} op",
+      "logBuySlots": "{actor} kocht een bankuitbreiding voor {amount}",
+      "logOpenBank": "{actor} opende de gildebank voor {amount}",
+      "logCharterFee": "{actor} betaalde de gildeoprichtingskosten van {amount}",
+      "logAdminPurge": "Een beheerder verwijderde {count} {item}"
     },
     "calendar": {
       "title": "Evenementenkalender",
@@ -2658,8 +2658,8 @@ export const nl_NL: EnTranslations = {
     "crafting": {
       "title": "Knutselen",
       "close": "Sluit het maken",
-      "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window for {craft}",
+      "dialogOption": "Vervaardigen",
+      "dialogOptionAria": "Het vervaardigingsvenster openen voor {craft}",
       "craft": "Ambacht",
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2969,7 +2969,7 @@ export const nl_NL: EnTranslations = {
       "countLabel": "{earned}/{total} daden",
       "completionAria": "Daden behaald: {earned} van {total}",
       "recentLabel": "Recent:",
-      "recentJumpAria": "Jump to {name}",
+      "recentJumpAria": "Ga naar {name}",
       "nearestLabel": "Bijna zover:",
       "filterGroupAria": "Filter de daden",
       "filterAll": "Alle",
@@ -6166,16 +6166,16 @@ export const nl_NL: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "checkingTitle": "Checking for updates...",
-      "checkingBody": "New versions download while you play.",
-      "uptodateTitle": "You're up to date",
+      "checkingTitle": "Controleren op updates...",
+      "checkingBody": "Nieuwe versies worden gedownload terwijl je speelt.",
+      "uptodateTitle": "Je hebt de nieuwste versie",
       "downloadingTitle": "Update {version} wordt gedownload...",
-      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "downloadingBody": "Je kunt blijven spelen. Het installeert zodra je stopt.",
       "readyTitle": "Update {version} is klaar",
       "readyBody": "Deze wordt geïnstalleerd wanneer je afsluit, of herstart nu.",
       "restart": "Nu herstarten",
       "later": "Later",
-      "dismiss": "Dismiss"
+      "dismiss": "Sluiten"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6642,11 +6642,11 @@ export const nl_NL: EnTranslations = {
     },
     "system": {
       "playerDeath": "Je bent gestorven.",
-      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
-      "deathRecapKiller": "You have died. Slain by {killer}.",
-      "deathRecapAbility": "You have died. Slain by {ability}.",
-      "deathRecapFalling": "You have died. You fell to your death.",
-      "deathRecapDrowned": "You have died. You drowned.",
+      "deathRecapKillerAbility": "Je bent gestorven. Gedood door {killer}'s {ability}.",
+      "deathRecapKiller": "Je bent gestorven. Gedood door {killer}.",
+      "deathRecapAbility": "Je bent gestorven. Gedood door {ability}.",
+      "deathRecapFalling": "Je bent gestorven. Je bent te pletter gevallen.",
+      "deathRecapDrowned": "Je bent gestorven. Je bent verdronken.",
       "respawn": "Je voelt je uitgerust en weer heel.",
       "ignoringChat": "Chat van {name} wordt genegeerd.",
       "noLongerIgnoring": "{name} wordt niet langer genegeerd.",
@@ -7137,7 +7137,7 @@ export const nl_NL: EnTranslations = {
       "quest": "Opdrachtvoorwerp",
       "junk": "Rommel",
       "fineMaterial": "Fijn Materiaal",
-      "material": "Material",
+      "material": "Materiaal",
       "food": "Voedsel",
       "drink": "Drank",
       "tool": "Gereedschap",
@@ -7171,8 +7171,8 @@ export const nl_NL: EnTranslations = {
       "useDrink": "Gebruik: Herstelt {amount} mana over {seconds} sec. Je moet blijven zitten tijdens het drinken.",
       "questItem": "Questvoorwerp",
       "questRelated": "Quest: {quest}",
-      "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "Not needed for any active quest.",
+      "questRules": "Kan niet worden verkocht, in de bank gezet of geruild.",
+      "questOrphaned": "Niet nodig voor een actieve quest.",
       "classes": "Klassen: {classes}",
       "sellPrice": "Verkoopprijs: {money}",
       "clickBuy": "Klik om te kopen",
@@ -7308,12 +7308,12 @@ export const nl_NL: EnTranslations = {
       "reclaim": "Terugnemen",
       "buyAria": "{item} kopen voor {price}",
       "reclaimAria": "{item} terugnemen",
-      "buyConfirmTitle": "Confirm Purchase",
-      "buyConfirmBody": "Buy {item} for {price}?",
-      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
-      "buyConfirmAccept": "Buy",
-      "buyConfirmCancel": "Cancel",
-      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "buyConfirmTitle": "Bevestig aankoop",
+      "buyConfirmBody": "{item} kopen voor {price}?",
+      "buyConfirmBodyStack": "{item} x{count} kopen voor {price} ({each} per stuk)?",
+      "buyConfirmAccept": "Kopen",
+      "buyConfirmCancel": "Annuleren",
+      "buyChanged": "Die vermelding is veranderd voordat je bevestigde. Controleer de prijs en probeer het opnieuw.",
       "sellNote": "Bied goederen uit je tassen aan. De handelaar neemt een aandeel van {cut}% wanneer een voorwerp verkocht wordt. Je gebruikt {used}/{max} aanbiedingsplekken.",
       "sellPickEmpty": "Klik op een voorwerp in je tassen om te kiezen wat je verkoopt.",
       "quantity": "Aantal",
@@ -8802,16 +8802,16 @@ export const nl_NL: EnTranslations = {
         "name": "Veenbrug-Mobilisatiebevel"
       },
       "firebottle": {
-        "name": "Firebottle"
+        "name": "Vuurfles"
       },
       "murloc_hut": {
-        "name": "Mudfin Hut"
+        "name": "Mudfin-Hut"
       },
       "restless_skull": {
-        "name": "Restless Skull"
+        "name": "Rusteloze Schedel"
       },
       "vanguard_bone": {
-        "name": "Vanguard Bone"
+        "name": "Bot van de Voorhoede"
       },
       "mire_prowler_pelt": {
         "name": "Slijksluiper-Vacht"
@@ -10089,7 +10089,7 @@ export const nl_NL: EnTranslations = {
         "name": "Contactsleutel: Schrikvonk, de Grondschudder"
       },
       "reins_drakemaw_raptor": {
-        "name": "Reins of the Drakemaw Raptor"
+        "name": "Teugels van de Drakenmuil-Raptor"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"
@@ -11087,19 +11087,19 @@ export const nl_NL: EnTranslations = {
         "name": "Spinnen-Eierzak"
       },
       "spider_egg": {
-        "name": "Broodmother Egg"
+        "name": "Broedmoeder-Ei"
       },
       "widow_hatchling": {
-        "name": "Widow Hatchling"
+        "name": "Weduwenjong"
       },
       "drowned_warlord": {
-        "name": "The Drowned Warlord"
+        "name": "De Verdronken Krijgsheer"
       },
       "brakka_wallbreaker": {
-        "name": "Brakka the Wallbreaker"
+        "name": "Brakka de Muurbreker"
       },
       "threnos_first_voice": {
-        "name": "Threnos the First Voice"
+        "name": "Threnos de Eerste Stem"
       },
       "grave_silt_bulwark": {
         "name": "Grafslib-Bolwerk"
@@ -11282,16 +11282,16 @@ export const nl_NL: EnTranslations = {
         "name": "Cindraleth de Muilmatriarch"
       },
       "dragonkin_egg": {
-        "name": "Dragonkin Egg"
+        "name": "Drakenvolk-Ei"
       },
       "dragonkin_whelp": {
-        "name": "Dragonkin Whelp"
+        "name": "Drakenvolk-Welp"
       },
       "dragonkin_broodguard": {
-        "name": "Dragonkin Broodguard"
+        "name": "Drakenvolk-Broedwacht"
       },
       "drakemaw_broodlord": {
-        "name": "Drakemaw Broodlord"
+        "name": "Drakenmuil-Broedheer"
       },
       "gilded_stag": {
         "name": "Vergulde Hert"
@@ -12325,7 +12325,7 @@ export const nl_NL: EnTranslations = {
       },
       "q_no_rest": {
         "title": "Geen Rust in het Riet",
-        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
+        "text": "De rite op die wierookvaten dwingt de verdronkenen om op te staan, en nu heeft ze er een opgewekt die sterk genoeg is om hen te leiden. De wachters noemen hem de Verdronken Krijgsheer, en zolang hij de Verdronken Kapel in bezit houdt, blijven de doden in het gelid. Breek hem, {playerName}, en de rest stuift uiteen, terug het moeras in.",
         "completion": "Je geeft de doden meer genade dan hun meesters ooit deden. Neem dit aan - je hebt het meer dan verdiend.",
         "objectives": {
           "0": {
