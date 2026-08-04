@@ -391,7 +391,8 @@ export const nl_NL: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emotes",
-      "done": "Klaar"
+      "done": "Klaar",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Dagelijkse beloningen",

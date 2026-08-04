@@ -391,7 +391,8 @@ export const ru_RU: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Эмоции",
-      "done": "Готово"
+      "done": "Готово",
+      "close": "Закрыть эмоции"
     },
     "dailyRewards": {
       "title": "Ежедневные награды",

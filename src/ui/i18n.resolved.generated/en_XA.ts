@@ -391,7 +391,8 @@ export const en_XA: EnTranslations = {
     },
     "emoteEditor": {
       "title": "[Éɱóţéš]",
-      "done": "[Ðóñé]"
+      "done": "[Ðóñé]",
+      "close": "[Çļóšé éɱóţéš]"
     },
     "dailyRewards": {
       "title": "[Ðáíļý Ŕéŵáŕðš]",
