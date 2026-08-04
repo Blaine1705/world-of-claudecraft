@@ -264,19 +264,16 @@ describe('isHarvestableCorpse', () => {
     // 36 since the farm-economy pass: beast, spider and reptile trash pays in
     // harvestable components instead of coin, so 15 previously untagged
     // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
-    // 40: 36 before either side of this merge, then 39 with the Drakelands
-    // dragonkin brood (the broodguard, the whelp and the broodlord are skinnable
-    // scaled hide like every other dragonkin corpse; the egg clutch is NOT, a
-    // 1 HP shell yields nothing at all), then 40 with this branch's quest-dedupe
-    // pass, whose threnos_first_voice ships a mapped cloth tag.
-    expect(included).toHaveLength(40);
-    // ...and the untagged templates are counted rather than assumed: 189 of them
+    // The Drakelands brood, zones 1 to 3 quest-dedupe content, and the
+    // Drakelands/Willowfen/Evergarden harvest-gap fix together bring it to 43.
+    expect(included).toHaveLength(43);
+    // ...and the untagged templates are counted rather than assumed: 186 of them
     // ship, all excluded before this change and all excluded after it, which is
-    // the path fen_troll now joins instead of getting one of its own. (184 before
-    // this merge, plus the untagged dragonkin egg from the brood and the four
-    // untagged camp mobs the quest-dedupe pass added.)
+    // the path fen_troll now joins instead of getting one of its own. The merged
+    // corpus is counted here rather than hand-waved from either side's prior
+    // arithmetic.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(189);
+    expect(untagged).toHaveLength(186);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
@@ -483,15 +480,11 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // The sweep must actually have exercised the raising arm, or a formula
     // that changed nothing would pass both bounds above. A CORPUS CENSUS like
     // the mixed-template count in tests/mob_component_tags: v0.32.0 authored 30
-    // against the release bestiary, and this branch's extra corpses raise two
-    // more picks. The three tagged dragonkin brood corpses add NOTHING here:
-    // they carry hide+fang, both mapped, so every harvestable pick on them
-    // concentrates exactly as the pre-#2514 body did and none of them raises.
-    // (They briefly advertised claw and horn, which are unmapped, and did raise
-    // eight picks; the same commit that took those tags back out of the mixed
-    // census left this pin at 40 by oversight.)
-    // The two bounds inside the loop are the real assertions.
-    expect(raised).toBe(32);
+    // against the release bestiary, this branch's extra corpses raise two more
+    // picks, and the Drakelands/Willowfen/Evergarden harvest-gap fix's bogtoad
+    // (the one mixed template it adds) raises two more again. The two bounds
+    // inside the loop are the real assertions.
+    expect(raised).toBe(34);
   });
 
   it('is self-healing: giving claw an item returns every number to the pre-#2514 world', () => {

@@ -2809,6 +2809,7 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     });
     // The count is asserted so an empty or one-row sweep cannot pass quietly.
     expect(mixed.map(([id]) => id).sort()).toEqual([
+      'bogtoad',
       'deepfen_murloc',
       'glimmermere_wader',
       'mire_prowler',
@@ -2929,10 +2930,11 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     }
     // The sweep has to visit the disabled arm at all: an all-false pass would
     // agree trivially. Split by gate so a change that moved every refusal onto
-    // ONE of them could not pass the total: 12 pick-level rows on the ten mixed
-    // templates, and fen_troll's four subsets at the corpse level.
-    expect(disabledSeen).toBe(16);
-    expect(byPick).toBe(12);
+    // ONE of them could not pass the total: 13 pick-level rows on the eleven
+    // mixed templates (the Willowfen harvest-gap fix added bogtoad's single
+    // unmapped 'gills' box), and fen_troll's four subsets at the corpse level.
+    expect(disabledSeen).toBe(17);
+    expect(byPick).toBe(13);
     expect(byCorpse).toBe(4);
     // The two gates partition the refusals: no row is refused by both, so the
     // two messages can never be reported together. (Arithmetically implied by
@@ -3233,16 +3235,13 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // every tagged template (it grew with the templates #1584 added), stated so a
     // shrunk sweep reads as wrong rather than merely smaller.
     // Spent rose 86 to 152 with the farm-economy pass, which gave 15 coinless
-    // trash templates their mapped harvest tags; refused is untouched because
-    // that arm counts all-unmapped corpses, which neither pass added to.
-    // Then 152 to 164 for the Drakelands brood: whelp, broodguard and
-    // broodlord each carry hide+fang, so each contributes all 4 of its masks
-    // (2 mapped families means no selection can forfeit every yield) and none
-    // to refused, exactly +12/+0. Then 164 to 166 with this branch's zones 1-3
-    // quest-dedupe pass, whose tagged threnos_first_voice adds its two subsets.
-    expect(spent).toBe(166);
-    expect(refused).toBe(16);
-    expect(spent + refused).toBe(182);
+    // trash templates their mapped harvest tags. The Drakelands brood,
+    // zones 1 to 3 quest-dedupe content, and the Drakelands/Willowfen/
+    // Evergarden harvest-gap fix together add mapped harvest rows. bogtoad's
+    // all-unmapped ['gills'] subset is the one new refusal.
+    expect(spent).toBe(175);
+    expect(refused).toBe(17);
+    expect(spent + refused).toBe(192);
   });
 
   // The six mapped families and their item ids, spelled out. Deriving them from
@@ -3324,19 +3323,16 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // a CORPUS CENSUS, not a behaviour claim: the v0.32.0 base merge brings the
     // release's 35/92 together with this branch's extra mobs (the rift bestiary),
     // so the counts rise while the property above is what actually holds the line.
-    expect(unmappedOffered).toBe(37);
+    expect(unmappedOffered).toBe(39);
     // 113 to 217 for the same reason as the spend census above: more mapped
-    // families in the corpus, none of them unmapped, so only this half moves.
-    // 217 to 235 for the Drakelands brood, on the same footing: three hide+fang
-    // templates extract 2 + 1 + 1 + 2 families across their four masks, so +18
-    // here while unmappedOffered above stays put, since neither tag is unmapped.
-    // Then 235 to 237 with this branch's quest-dedupe pass: the tagged
-    // threnos_first_voice adds one cloth extraction on each of its two subsets.
-    expect(extracted).toBe(237);
+    // families in the corpus. The Drakelands brood, zones 1 to 3 quest-dedupe
+    // content, and the Drakelands/Willowfen/Evergarden harvest-gap fix combine
+    // to move this corpus census to 248.
+    expect(extracted).toBe(248);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
-    // The nine templates that mix mapped and unmapped families still claim,
+    // The eleven templates that mix mapped and unmapped families still claim,
     // still draw and still grant on their mapped picks. Derived from content so
     // a retag cannot quietly shrink the sweep.
     const mixed = Object.entries(MOBS).filter(([, m]) => {
@@ -3346,7 +3342,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
         tags.some((t) => !HARVEST_COMPONENT_ITEMS[t])
       );
     });
-    expect(mixed).toHaveLength(10);
+    expect(mixed).toHaveLength(11);
     for (const [id, m] of mixed) {
       const mapped = m.componentTags?.filter((t) => HARVEST_COMPONENT_ITEMS[t]);
       const r = harvestAt(id, mapped);
