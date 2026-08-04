@@ -45,6 +45,7 @@ import {
   setAdminDbForTests,
 } from '../../server/admin';
 import { resetAdminGuildListReadsForTests } from '../../server/admin_guilds_read';
+import { characterProfessionsSheet } from '../../server/character_professions';
 import { pool } from '../../server/db';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
@@ -137,6 +138,9 @@ function installAdminRuntime(overrides: Partial<Record<keyof AdminRuntime, unkno
     reloadBlockedIps: vi.fn(async () => {}),
     disconnectByIp: vi.fn(),
     applyAccountFlairLive: vi.fn(),
+    // The guild bank operator read defaults to "no loaded book" so a test that
+    // does not care about banks cannot accidentally assert against a fixture.
+    adminGuildBankState: vi.fn(() => null),
     social: {
       guildRenamed: vi.fn(),
     },
@@ -1039,6 +1043,16 @@ describe('guild administration', () => {
     });
     expect(history.status).toBe(403);
     expect(listAdminGuildHistory).not.toHaveBeenCalled();
+
+    // The guild bank read is a live-sim read rather than a db one, so its
+    // "never reached" proof is the runtime spy.
+    const rtDenied = installAdminRuntime();
+    const bank = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '4' },
+    });
+    expect(bank.status).toBe(403);
+    expect(rtDenied.adminGuildBankState).not.toHaveBeenCalled();
 
     authedAdminDb({
       adminRolesForAccount: async () => ({ username: 'op', roles: ['viewer'] }),
@@ -3350,5 +3364,972 @@ describe('account flair (AI mark + streamer links)', () => {
     expect(r.status).toBe(400);
     expect(r.body).toEqual({ success: false, data: null, error: 'boom' });
     expect(rt.applyAccountFlairLive).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The guild bank operator READ (GET /admin/api/guilds/:id/bank): the slot list
+// the escape hatch below is unusable without. Deliberately WIDER than the purge
+// (moderation.read, not the superadmin-only guildbank.purge), because reading
+// destroys nothing and "is this bank stuck?" is the question that decides
+// whether there is anything to escalate. The payload is guild-scoped property
+// only: what it must NOT carry is pinned here and in
+// tests/server/admin_guild_bank_view.test.ts.
+// ---------------------------------------------------------------------------
+
+describe('guild bank operator read', () => {
+  const STATE = {
+    treasury: 12_345,
+    capacity: 30,
+    purchasedSlots: 30,
+    usedSlots: 2,
+    dormantSlots: 1,
+    slots: [
+      { index: 0, itemId: 'wolf_fang', count: 3, dormant: false },
+      { index: 1, itemId: 'final_argument_greatblade', count: 1, dormant: true },
+    ],
+  };
+
+  it('answers the live book for the target guild', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState });
+
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+
+    expect(adminGuildBankState).toHaveBeenCalledWith(913);
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { guildId: 913, ...STATE },
+      error: null,
+    });
+  });
+
+  it('carries nothing account-scoped: the response is item ids, counts, and flags', async () => {
+    // The operator boundary. The snapshot this read projects keeps the real
+    // per-copy payload (the purge's ledger evidence), so a regression that
+    // forwarded it would leak another character's bind identity to every
+    // moderation.read operator.
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState: vi.fn(() => STATE) });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    const data = (r.body as { data: Record<string, unknown> }).data;
+    expect(Object.keys(data).sort()).toEqual([
+      'capacity',
+      'dormantSlots',
+      'guildId',
+      'purchasedSlots',
+      'slots',
+      'treasury',
+      'usedSlots',
+    ]);
+    for (const slot of data.slots as Record<string, unknown>[]) {
+      expect(Object.keys(slot).sort()).toEqual(['count', 'dormant', 'index', 'itemId']);
+    }
+    expect(r.raw).not.toContain('instance');
+    expect(r.raw).not.toContain('boundTo');
+  });
+
+  it('404s a guild with no loaded book, reusing the purge line an operator already knows', async () => {
+    authedAdminDb({});
+    installAdminRuntime({ adminGuildBankState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    expect(r.status).toBe(404);
+    // Byte-identical to the purge's no_book body, so the dashboard's existing
+    // error.guildBankNotLoaded row localizes both without a second string.
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that guild has no loaded bank',
+    });
+  });
+
+  it('is reachable by a moderator and a viewer, unlike the purge beside it', async () => {
+    // The deliberate widening, pinned: the roles that investigate a ticket can
+    // SEE a stuck bank. The same roles are denied the purge (pinned below).
+    for (const roles of [['moderator'], ['viewer'], ['admin']]) {
+      const adminGuildBankState = vi.fn(() => STATE);
+      authedAdminDb({ adminRolesForAccount: async () => ({ username: 'op', roles }) });
+      installAdminRuntime({ adminGuildBankState });
+      const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+      });
+      expect(r.status, roles[0]).toBe(200);
+      expect(adminGuildBankState, roles[0]).toHaveBeenCalledWith(913);
+    }
+  });
+
+  it('denies a role holding no moderation.read before the live sim is read', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    authedAdminDb({ adminRolesForAccount: async () => ({ username: 'op', roles: [] }) });
+    installAdminRuntime({ adminGuildBankState });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+    });
+    expect(r.status).toBe(403);
+    expect(adminGuildBankState).not.toHaveBeenCalled();
+  });
+
+  it('401s an unauthenticated caller before the sim is reached', async () => {
+    const adminGuildBankState = vi.fn(() => STATE);
+    installAdminRuntime({ adminGuildBankState });
+    const r = await runRoute('GET', '/admin/api/guilds/:id/bank', { params: { id: '913' } });
+    expect(r.status).toBe(401);
+    expect(adminGuildBankState).not.toHaveBeenCalled();
+  });
+
+  it('both dispatch arms run the SAME shared body (the dual-edit rule)', () => {
+    const source = readFileSync(join(process.cwd(), 'server/admin.ts'), 'utf8');
+    const calls = source.match(/guildBankStateOutcome\(/g) ?? [];
+    // one declaration + two call sites
+    expect(calls.length).toBe(3);
+    expect(source).toContain('const guildBankStateMatch =');
+    expect(source).toContain("path: '/admin/api/guilds/:id/bank',");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The guild bank dormant-slot escape hatch (POST /admin/api/guilds/:id/bank/
+// purge-slot). It destroys player property, so the authorization arm matters as
+// much as the happy path: it carries its OWN permission (guildbank.purge), not
+// moderation.act, and every refusal must reach the operator as its own body.
+// ---------------------------------------------------------------------------
+
+describe('guild bank dormant-slot purge', () => {
+  const OK_BODY = {
+    slot: 3,
+    itemId: 'wolf_fang',
+    reason: 'stuck rift-gear copy, guild disbanding',
+  };
+
+  it('purges the named slot, writes the audited row, and answers with what was removed', async () => {
+    const adminPurgeGuildBankSlot = vi.fn(async () => ({
+      ok: true as const,
+      removed: { itemId: 'wolf_fang', count: 2 },
+      carrierCharacterId: 11,
+    }));
+    const recordAdminGuildBankPurge = vi.fn(async () => {});
+    authedAdminDb({ recordAdminGuildBankPurge });
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+
+    // The acting OPERATOR's account id is threaded to the game, not the carrier's.
+    expect(adminPurgeGuildBankSlot).toHaveBeenCalledWith(913, 3, 'wolf_fang', ADMIN_ACCOUNT_ID);
+    // ...and the audited moderation row carries who, why, and what.
+    expect(recordAdminGuildBankPurge).toHaveBeenCalledWith({
+      guildId: 913,
+      reason: OK_BODY.reason,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      itemId: 'wolf_fang',
+      count: 2,
+      slotIndex: 3,
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({
+      success: true,
+      data: { guildId: 913, slotIndex: 3, itemId: 'wolf_fang', count: 2, audited: true },
+      error: null,
+    });
+  });
+
+  it('reports audited:false (never a 500) when only the audit insert fails', async () => {
+    // The item is already gone; a failed audit row cannot un-remove it, so the
+    // operator is told the purge landed AND that the log row did not.
+    authedAdminDb({
+      recordAdminGuildBankPurge: vi.fn(async () => {
+        throw new Error('audit db down');
+      }),
+    });
+    installAdminRuntime({
+      adminPurgeGuildBankSlot: vi.fn(async () => ({
+        ok: true as const,
+        removed: { itemId: 'wolf_fang', count: 1 },
+        carrierCharacterId: 11,
+      })),
+    });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+    errSpy.mockRestore();
+    expect(r.status).toBe(200);
+    expect((r.body as { data: { audited: boolean } }).data.audited).toBe(false);
+  });
+
+  it('denies every dashboard-grantable role BEFORE touching the live sim', async () => {
+    // guildbank.purge is superadmin-only: moderator reaches the guild rename,
+    // and even `admin` (otherwise everything) must NOT reach this.
+    for (const roles of [['moderator'], ['admin'], ['viewer']]) {
+      const adminPurgeGuildBankSlot = vi.fn();
+      const recordAdminGuildBankPurge = vi.fn();
+      authedAdminDb({
+        adminRolesForAccount: async () => ({ username: 'op', roles }),
+        recordAdminGuildBankPurge,
+      });
+      installAdminRuntime({ adminPurgeGuildBankSlot });
+
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body: OK_BODY,
+      });
+
+      expect(r.status, roles[0]).toBe(403);
+      expect(adminPurgeGuildBankSlot, roles[0]).not.toHaveBeenCalled();
+      expect(recordAdminGuildBankPurge, roles[0]).not.toHaveBeenCalled();
+    }
+  });
+
+  it('rejects a malformed slot, a missing itemId, and a missing reason, calling nothing', async () => {
+    const adminPurgeGuildBankSlot = vi.fn();
+    authedAdminDb({});
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+
+    const cases: Array<[Record<string, unknown>, string]> = [
+      [{ ...OK_BODY, slot: undefined }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: 'first' }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: -1 }, 'a slot index is required'],
+      [{ ...OK_BODY, slot: 1.5 }, 'a slot index is required'],
+      [{ ...OK_BODY, itemId: undefined }, 'the item id in that slot is required'],
+      [{ ...OK_BODY, itemId: '   ' }, 'the item id in that slot is required'],
+      [{ ...OK_BODY, reason: undefined }, 'a moderation reason is required (500 chars max)'],
+      [{ ...OK_BODY, reason: '  ' }, 'a moderation reason is required (500 chars max)'],
+      [{ ...OK_BODY, reason: 'x'.repeat(501) }, 'a moderation reason is required (500 chars max)'],
+    ];
+    for (const [body, error] of cases) {
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body,
+      });
+      expect(r.status, JSON.stringify(body)).toBe(400);
+      expect(r.body, JSON.stringify(body)).toEqual({ success: false, data: null, error });
+    }
+    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+
+  it('maps each refusal reason to its own status and operator body', async () => {
+    const cases = [
+      { reason: 'no_book', status: 404, error: 'that guild has no loaded bank' },
+      {
+        reason: 'no_carrier',
+        status: 409,
+        error: 'no member of that guild is online to persist the change',
+      },
+      { reason: 'not_dormant', status: 400, error: 'that slot is not a stuck item' },
+      {
+        reason: 'save_failed',
+        status: 503,
+        error: 'the change could not be saved and was rolled back',
+      },
+      {
+        // The guild-delete window: its OWN reason, and deliberately not the
+        // save_failed one. Nothing was attempted, so nothing was saved and
+        // nothing was rolled back, and 409 (a conflict with a delete already in
+        // flight) is not 503 (a transient the operator should retry into).
+        reason: 'delete_in_flight',
+        status: 409,
+        error: 'that guild is being deleted, so its bank is closed',
+      },
+    ] as const;
+    for (const c of cases) {
+      const recordAdminGuildBankPurge = vi.fn();
+      authedAdminDb({ recordAdminGuildBankPurge });
+      installAdminRuntime({
+        adminPurgeGuildBankSlot: vi.fn(async () => ({ ok: false as const, reason: c.reason })),
+      });
+      const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+        headers: { authorization: BEARER },
+        params: { id: '913' },
+        body: OK_BODY,
+      });
+      expect(r.status, c.reason).toBe(c.status);
+      expect(r.body, c.reason).toEqual({ success: false, data: null, error: c.error });
+      // A refused purge never logs a moderation row.
+      expect(recordAdminGuildBankPurge, c.reason).not.toHaveBeenCalled();
+    }
+  });
+
+  it('fails CLOSED on an unrecognized refusal reason instead of faking success', async () => {
+    // A reason added to the game later must never fall through the switch into
+    // the success return (which would read `removed` off a refusal).
+    authedAdminDb({});
+    installAdminRuntime({
+      adminPurgeGuildBankSlot: vi.fn(async () => ({ ok: false, reason: 'future_reason' })),
+    });
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+    expect(r.status).toBe(500);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'the guild bank change was refused',
+    });
+  });
+
+  it('401s an unauthenticated caller before the sim is reached', async () => {
+    const adminPurgeGuildBankSlot = vi.fn();
+    installAdminRuntime({ adminPurgeGuildBankSlot });
+    const r = await runRoute('POST', '/admin/api/guilds/:id/bank/purge-slot', {
+      params: { id: '913' },
+      body: OK_BODY,
+    });
+    expect(r.status).toBe(401);
+    expect(adminPurgeGuildBankSlot).not.toHaveBeenCalled();
+  });
+
+  it('both dispatch arms run the SAME shared body (the dual-edit rule)', () => {
+    // The legacy ladder arm and the RouteDef handler must not drift, so pin
+    // that neither carries its own logic: both call the one shared helper.
+    const source = readFileSync(join(process.cwd(), 'server/admin.ts'), 'utf8');
+    const calls = source.match(/purgeGuildBankSlotOutcome\(/g) ?? [];
+    // one declaration + two call sites
+    expect(calls.length).toBe(3);
+    expect(source).toContain('const guildBankPurgeMatch =');
+    expect(source).toContain("path: '/admin/api/guilds/:id/bank/purge-slot'");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. R35 GM professions tooling: the inspector read + the two audited restores.
+// ---------------------------------------------------------------------------
+
+describe('R35 professions inspector (GET /admin/api/characters/:id/professions)', () => {
+  const BLOB_ROW = {
+    id: 5,
+    name: 'Aldric',
+    class: 'warrior',
+    level: 12,
+    accountId: 9,
+    username: 'aldric-owner',
+    state: {
+      gatheringProficiency: { mining: 42.5 },
+      craftSkills: { alchemy: 30 },
+      knownRecipes: ['recipe_a', 'recipe_b'],
+      toolEffectSlots: {
+        mining: {
+          effectId: 'gatherers_cache',
+          durability: 3,
+          maxDurability: 16,
+          craftedBy: 'Mira',
+          confirmMode: 'always',
+        },
+      },
+      // One live node id (enriched from content) and one retired id (null
+      // enrichment; the load-side filter would drop it in game).
+      nodeHarvestCooldowns: { ore_eastbrook_1: 120, retired_node_xyz: 30 },
+      archetype: { activeArchetype: 'alchemy', pairedMajor: 'engineering', hobbyCraft: null },
+      masteryResetApplied: true,
+      proficiencyDisplayHealApplied: true,
+      recipesGrandfathered: true,
+    },
+    updatedAt: '2026-07-30T12:00:00.000Z',
+  };
+
+  it('shapes the stored blob for an OFFLINE character (live false, save clock kept)', async () => {
+    const characterProfessionsRow = vi.fn(async () => BLOB_ROW);
+    authedAdminDb({ characterProfessionsRow });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, true); // offline: fetch the blob
+    expect(sheet.name).toBe('Aldric');
+    expect(sheet.live).toBe(false);
+    expect(sheet.updatedAt).toBe('2026-07-30T12:00:00.000Z');
+    expect(sheet.preMigration).toBe(false); // the fixture carries all three one-shot flags
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 42.5 });
+    // Every gathering profession renders, absent ones as 0.
+    expect(sheet.gathering).toContainEqual({ professionId: 'fishing', proficiency: 0 });
+    expect(sheet.crafting).toContainEqual({ craftId: 'alchemy', skill: 30, tier: 1 });
+    expect(sheet.knownRecipes).toBe(2);
+    // The sheet runs the LOADER'S normalizeArchetypeState, so the stored
+    // null hobby renders as the default the next login resolves for the
+    // alchemy+engineering pair (enchanting; inscription has no content).
+    expect(sheet.archetype).toEqual({
+      activeArchetype: 'alchemy',
+      pairedMajor: 'engineering',
+      hobbyCraft: 'enchanting',
+    });
+    expect(sheet.slots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 16,
+        craftedBy: 'Mira',
+        confirmMode: 'always',
+      },
+    ]);
+    // Sorted longest-remaining first; the live node enriches, the retired one
+    // reads null zone/type.
+    expect(sheet.nodeTimers).toEqual([
+      {
+        nodeId: 'ore_eastbrook_1',
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        remainingSeconds: 120,
+      },
+      { nodeId: 'retired_node_xyz', zoneId: null, nodeType: null, remainingSeconds: 30 },
+    ]);
+    // The server-authored effect vocabulary the restore-slot select renders.
+    expect(sheet.toolEffectIds).toEqual(['gatherers_cache', 'artisans_eye', 'quickening_charm']);
+  });
+
+  it('overlays a LIVE serializeCharacter snapshot when the character is online here', async () => {
+    const characterProfessionsRow = vi.fn(async () => BLOB_ROW);
+    authedAdminDb({ characterProfessionsRow });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 43.5 } })),
+    });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.live).toBe(true);
+    expect(sheet.updatedAt).toBeNull(); // a live snapshot is "now"
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 43.5 });
+    // A live read discards the blob, so the query must not fetch it.
+    expect(characterProfessionsRow).toHaveBeenCalledWith(5, false);
+  });
+
+  it('falls back to the legacy pre-rename professions key (dual-key read)', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        ...BLOB_ROW,
+        state: { professions: { herbalism: 7 } },
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.gathering).toContainEqual({ professionId: 'herbalism', proficiency: 7 });
+  });
+
+  it('404s an unknown character with the standard envelope', async () => {
+    authedAdminDb({ characterProfessionsRow: vi.fn(async () => null) });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(404);
+    expect(r.body).toEqual({ success: false, data: null, error: 'character not found' });
+  });
+});
+
+describe('R35 GM restores (restore-item / restore-slot)', () => {
+  it('restore-item audits FIRST, then mints on the live session', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 2, reason: 'lost to issue 2514' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      action: 'restore_item',
+      detail: 'copper_mining_pick x2',
+      reason: 'lost to issue 2514',
+    });
+    expect(rt.adminRestoreItem).toHaveBeenCalledWith(5, 'copper_mining_pick', 2);
+    // A grant may never exist unaudited: the audit row precedes the mint.
+    const auditOrder = recordProfessionsRestore.mock.invocationCallOrder[0];
+    const mintOrder = (rt.adminRestoreItem as ReturnType<typeof vi.fn>).mock.invocationCallOrder[0];
+    expect(auditOrder).toBeLessThan(mintOrder);
+  });
+
+  it('restore-item refuses an offline character BEFORE any audit write', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => false),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'character is not online on this realm',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+    expect(rt.adminRestoreItem).not.toHaveBeenCalled();
+    expect(rt.adminCharacterOnline).toHaveBeenCalledWith(5);
+  });
+
+  it('restore-item refuses an unknown item and an out-of-range count pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const bad = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'not_a_real_item', count: 1, reason: 'lost' },
+    });
+    expect(bad.status).toBe(400);
+    expect(bad.body).toEqual({ success: false, data: null, error: 'unknown item id' });
+    const over = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 21, reason: 'lost' },
+    });
+    expect(over.status).toBe(400);
+    expect(over.body).toEqual({
+      success: false,
+      data: null,
+      error: 'count must be a whole number between 1 and 20',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+
+  it('restore-item surfaces a missing reason as the audited write refusal', async () => {
+    authedAdminDb({
+      recordProfessionsRestore: vi.fn(async () => {
+        throw new Error('moderation reason is required');
+      }),
+    });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1 },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'moderation reason is required',
+    });
+    expect(rt.adminRestoreItem).not.toHaveBeenCalled(); // no unaudited grant
+  });
+
+  it('restore-slot audits then re-mints, with the profession/effect detail', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(200);
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(recordProfessionsRestore).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: ADMIN_ACCOUNT_ID,
+      action: 'restore_slot',
+      detail: 'mining/gatherers_cache',
+      reason: 'row vanished',
+    });
+    expect(rt.adminRestoreToolEffectSlot).toHaveBeenCalledWith(5, 'mining', 'gatherers_cache');
+  });
+
+  it('restore-slot maps the sim refusals to their own error prose', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'no_tool'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'the character owns no tool for that profession',
+    });
+    expect(rt.adminRestoreToolEffectSlot).toHaveBeenCalled();
+  });
+
+  it('restore-slot refuses a craft (non-gathering) profession id pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'cooking', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'unknown gathering profession id',
+    });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('R35 GM restores: refusal prose arms', () => {
+  it('restore-slot maps already_slotted and invalid_request to their own prose', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    const rt = installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'already_slotted'),
+    });
+    const slotted = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(slotted.status).toBe(400);
+    expect(slotted.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that profession already has a slotted effect',
+    });
+    (rt.adminRestoreToolEffectSlot as ReturnType<typeof vi.fn>).mockReturnValue('invalid_request');
+    const badPair = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'row vanished' },
+    });
+    expect(badPair.status).toBe(400);
+    expect(badPair.body).toEqual({
+      success: false,
+      data: null,
+      error: 'that effect cannot be slotted on that profession',
+    });
+  });
+
+  it('both restores surface the post-audit leave race as their own prose', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true), // online at the pre-check...
+      adminRestoreItem: vi.fn(() => 'offline'), // ...gone by the mint
+      adminRestoreToolEffectSlot: vi.fn(() => 'offline'),
+    });
+    const raceProse = 'character went offline before the restore landed';
+    const item = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(item.status).toBe(400);
+    expect(item.body).toEqual({ success: false, data: null, error: raceProse });
+    const slot = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'gatherers_cache', reason: 'lost' },
+    });
+    expect(slot.status).toBe(400);
+    expect(slot.body).toEqual({ success: false, data: null, error: raceProse });
+    // The race is the ONE place an audit row may outlive a failed grant, so
+    // the row must exist for the history to stay honest.
+    expect(recordProfessionsRestore).toHaveBeenCalledTimes(2);
+  });
+
+  it('restore-slot refuses an unknown effect id pre-audit', async () => {
+    const recordProfessionsRestore = vi.fn(async () => ({ accountId: 9 }));
+    authedAdminDb({ recordProfessionsRestore });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreToolEffectSlot: vi.fn(() => 'ok'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-slot', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { professionId: 'mining', effectId: 'not_an_effect', reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown tool effect id' });
+    expect(recordProfessionsRestore).not.toHaveBeenCalled();
+  });
+});
+
+describe('R35 professions inspector: fix-round edge pins', () => {
+  it('survives a NULL characters.state row (created but never entered)', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Unborn',
+        class: 'warrior',
+        level: 1,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    expect(r.status).toBe(200);
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 0 });
+    expect(sheet.slots).toEqual([]);
+    expect(sheet.nodeTimers).toEqual([]);
+    expect(sheet.knownRecipes).toBe(0);
+    // Never-entered is emptyBlob, NOT pre-migration: first login takes the
+    // construction path the one-shot migrations never touch.
+    expect(sheet.preMigration).toBe(false);
+  });
+
+  it('marks a pre-migration blob and clamps a tampered node timer', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Veteran',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        // A pre-curve blob: no one-shot flags, an over-cap node timer, and a
+        // fishing slot the loader drops plus a legacy confirm-mode row.
+        state: {
+          gatheringProficiency: { mining: 50 },
+          // 99999 pins the clamp; the negative and NaN rows pin the
+          // loader's positive() filter (garbage never renders).
+          nodeHarvestCooldowns: {
+            ore_eastbrook_1: 99999,
+            ore_eastbrook_2: -5,
+            ore_eastbrook_3: Number.NaN,
+          },
+          toolEffectSlots: {
+            fishing: {
+              effectId: 'gatherers_cache',
+              durability: 3,
+              maxDurability: 16,
+              confirmMode: 'always',
+            },
+            mining: { effectId: 'gatherers_cache', durability: 3, maxDurability: 16 },
+          },
+        },
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({ adminCharacterState: vi.fn(() => null) });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    // The one-shot load migrations have not run: the operator is warned.
+    expect(sheet.preMigration).toBe(true);
+    // The load-side clamp: never display a wait the game would not honor
+    // (ore respawn is 240s).
+    expect(sheet.nodeTimers).toEqual([
+      {
+        nodeId: 'ore_eastbrook_1',
+        zoneId: 'eastbrook_vale',
+        nodeType: 'ore',
+        remainingSeconds: 240,
+      },
+    ]);
+    // The loader's slot rules: the refused fishing row DROPS; the legacy
+    // row without a confirmMode reads 'always'.
+    expect(sheet.slots).toEqual([
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        durability: 3,
+        maxDurability: 16,
+        craftedBy: null,
+        confirmMode: 'always',
+      },
+    ]);
+  });
+
+  it('a LIVE snapshot is never pre-migration even when its flags are absent', async () => {
+    authedAdminDb({
+      characterProfessionsRow: vi.fn(async () => ({
+        id: 5,
+        name: 'Live',
+        class: 'warrior',
+        level: 12,
+        accountId: 9,
+        username: 'alice',
+        state: null,
+        updatedAt: '2026-07-30T12:00:00.000Z',
+      })),
+    });
+    installAdminRuntime({
+      adminCharacterState: vi.fn(() => ({ gatheringProficiency: { mining: 1 } })),
+    });
+    const r = await runRoute('GET', '/admin/api/characters/:id/professions', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+    });
+    const sheet = (r.body as { data: Record<string, any> }).data;
+    expect(sheet.live).toBe(true);
+    expect(sheet.preMigration).toBe(false);
+  });
+});
+
+describe('characterProfessionsSheet: the per-field normalizer arms (pure)', () => {
+  const baseInput = (state: Record<string, unknown>) => ({
+    characterId: 5,
+    name: 'Aldric',
+    class: 'warrior',
+    level: 12,
+    accountId: 9,
+    username: 'alice',
+    state: state as never,
+    live: false,
+    updatedAt: null as string | null,
+    emptyBlob: false,
+  });
+  const ALL_FLAGS = {
+    masteryResetApplied: true,
+    proficiencyDisplayHealApplied: true,
+    recipesGrandfathered: true,
+  };
+
+  it('preMigration fires when ANY single one-shot flag is missing (per-dimension)', () => {
+    // The check ORs three independent flags; each case drops exactly one so
+    // a deleted conjunct in the source fails its own case.
+    for (const missing of [
+      'masteryResetApplied',
+      'proficiencyDisplayHealApplied',
+      'recipesGrandfathered',
+    ] as const) {
+      const flags: Record<string, boolean> = { ...ALL_FLAGS };
+      delete flags[missing];
+      const sheet = characterProfessionsSheet(baseInput(flags));
+      expect(sheet.preMigration, `missing ${missing} must warn`).toBe(true);
+    }
+    expect(characterProfessionsSheet(baseInput(ALL_FLAGS)).preMigration).toBe(false);
+  });
+
+  it('clamps out-of-range proficiencies and craft skills the way the login does', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        gatheringProficiency: { mining: 999, logging: -5 },
+        craftSkills: { alchemy: 99999 },
+      }),
+    );
+    // mining maxSkill is 100 (content); a tampered 999 renders as the value
+    // the next login resolves, and a negative floors at 0.
+    expect(sheet.gathering).toContainEqual({ professionId: 'mining', proficiency: 100 });
+    expect(sheet.gathering).toContainEqual({ professionId: 'logging', proficiency: 0 });
+    const alchemy = sheet.crafting.find((c) => c.craftId === 'alchemy');
+    expect(alchemy?.skill).toBeLessThanOrEqual(300);
+    expect(Number.isFinite(alchemy?.skill)).toBe(true);
+  });
+
+  it('drops a ZERO node timer (the > 0 boundary) and tie-breaks equal timers by node id', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        nodeHarvestCooldowns: { ore_eastbrook_1: 0, zz_retired: 30, aa_retired: 30 },
+      }),
+    );
+    // The literal 0 row is not "pending", it is the loader's drop boundary.
+    expect(sheet.nodeTimers.map((t) => t.nodeId)).toEqual(['aa_retired', 'zz_retired']);
+  });
+
+  it('counts knownRecipes through the loader Set (duplicates collapse)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({ ...ALL_FLAGS, knownRecipes: ['recipe_a', 'recipe_a', 'recipe_a'] }),
+    );
+    expect(sheet.knownRecipes).toBe(1);
+  });
+
+  it('renders a corrupt non-iterable knownRecipes as 0 instead of a 500', () => {
+    // The loader THROWS on this blob (such a character cannot log in), which
+    // is exactly why the sheet must not: the inspector is the tool an
+    // operator opens to diagnose it. Guarded on iterability, not isArray,
+    // so a string still counts its characters the way the loader Set does.
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 42 })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: {} })).knownRecipes,
+    ).toBe(0);
+    expect(
+      characterProfessionsSheet(baseInput({ ...ALL_FLAGS, knownRecipes: 'abc' })).knownRecipes,
+    ).toBe(3);
+  });
+
+  it('repairs an invalid archetype the way the login does (trio nulls together)', () => {
+    const sheet = characterProfessionsSheet(
+      baseInput({
+        ...ALL_FLAGS,
+        archetype: { activeArchetype: 'not_a_craft', pairedMajor: 'engineering', hobbyCraft: null },
+      }),
+    );
+    // normalizeArchetypeState refuses the invalid active craft, and without
+    // an active there is no pair and no hobby: the operator sees the reset
+    // the next login performs, not the raw stored trio.
+    expect(sheet.archetype).toEqual({ activeArchetype: null, pairedMajor: null, hobbyCraft: null });
+  });
+});
+
+describe('R35 restore-item: the defensive invalid_item arm', () => {
+  it('maps a runtime invalid_item to its own prose, never the offline race', async () => {
+    authedAdminDb({ recordProfessionsRestore: vi.fn(async () => ({ accountId: 9 })) });
+    installAdminRuntime({
+      adminCharacterOnline: vi.fn(() => true),
+      adminRestoreItem: vi.fn(() => 'invalid_item'),
+    });
+    const r = await runRoute('POST', '/admin/api/moderation/characters/:id/restore-item', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { itemId: 'copper_mining_pick', count: 1, reason: 'lost' },
+    });
+    expect(r.status).toBe(400);
+    expect(r.body).toEqual({ success: false, data: null, error: 'unknown item id' });
   });
 });

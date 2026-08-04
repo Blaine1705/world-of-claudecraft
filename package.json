@@ -44,7 +44,8 @@
     "ci:changed": "biome ci --changed --no-errors-on-unmatched",
     "check:admin": "svelte-check --tsconfig ./tsconfig.admin.json",
     "check:ts": "tsc --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc/buildinfo.json",
-    "check:types": "npm run check:ts && npm run check:admin",
+    "check:ts:bot": "tsc -p tsconfig.bot.json",
+    "check:types": "npm run check:ts && npm run check:admin && npm run check:ts:bot",
     "pretest": "node scripts/pretest.mjs",
     "test": "vitest run",
     "test:browser": "vitest run --config vitest.browser.config.ts",
@@ -80,6 +81,7 @@
     "env": "npm run build:env && node dist-env/env_server.cjs",
     "bench": "npm run build:env && node dist-env/env_server.cjs --bench",
     "perf:load": "node scripts/server_load_jitter.mjs",
+    "perf:professions": "node scripts/load_professions.mjs",
     "audit:quests": "node scripts/quest_audit_graph.mjs",
     "audit:zone1": "npm run audit:quests",
     "db:up": "docker compose up -d postgres",
@@ -182,7 +184,17 @@
       "build/icon.ico",
       "build/icon.icns",
       "package.json",
-      "!node_modules/**"
+      "!node_modules/**",
+      "!dist/models/**",
+      "!dist/textures/**",
+      "!dist/env/**",
+      "!dist/vfx/**",
+      "!dist/*.pdf",
+      "!dist/press.html",
+      "!dist/merch.html",
+      "!dist/links.html",
+      "!dist/CLAUDE.md",
+      "!dist/guide-stills/**"
     ],
     "directories": {
       "buildResources": "build",
@@ -247,7 +259,8 @@
       ]
     },
     "nsis": {
-      "include": "build/installer.nsh"
+      "include": "build/installer.nsh",
+      "buildUniversalInstaller": false
     },
     "linux": {
       "category": "Game",

@@ -3,6 +3,8 @@
 // drift. Pure and DOM-free: main.ts samples the surfaces and passes them in.
 
 export interface GameplayInputSurfaces {
+  /** The renderer is being recycled, so every client-frame owner is paused. */
+  graphicsRebuildPaused: boolean;
   /** A HUD window is up that owns the screen (Hud.isModalOpen). */
   modalOpen: boolean;
   /** A HUD prompt is awaiting an answer (Hud.promptModalOpen). */
@@ -26,6 +28,7 @@ export interface GameplayInputSurfaces {
 /** True when a blocking surface owns the keyboard, so gameplay keys must be ignored. */
 export function isGameplayInputBlocked(surfaces: GameplayInputSurfaces): boolean {
   return (
+    surfaces.graphicsRebuildPaused ||
     surfaces.modalOpen ||
     surfaces.promptModalOpen ||
     surfaces.cameraPromptOpen ||

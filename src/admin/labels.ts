@@ -36,10 +36,11 @@ export function guildRankLabel(rank: string | null): string {
 //
 // The keys are the union of server/moderation_db.ts MODERATION_ACTIONS (the closed set
 // written to account_moderation_actions.action), the ip_blocks history kinds
-// (block / unblock), and the guild audit kind (guild_rename, server/admin_db.ts
-// GUILD_RENAME_ACTION), the last two of which only the realm-wide page can surface.
-// tests/admin/moderation_action_labels.test.ts pins the table against MODERATION_ACTIONS
-// so the next new kind cannot silently regress to "Other action".
+// (block / unblock), and the guild audit kinds (server/admin_db.ts
+// GUILD_MODERATION_ACTIONS: guild_rename and guild_bank_purge), the last two
+// groups of which only the realm-wide page can surface.
+// tests/admin/moderation_action_labels.test.ts pins the table against BOTH closed
+// sets so the next new kind cannot silently regress to "Other action".
 export type ModerationBadgeVariant = 'default' | 'neutral' | 'warn' | 'bad' | 'success';
 
 export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
@@ -66,9 +67,16 @@ export const MODERATION_ACTION_LABEL_KEYS: Record<string, string> = {
   unblock: 'moderationHistory.actionIpUnblock',
   reactivate: 'moderationHistory.actionReactivate',
   chat_strikes_reset: 'moderationHistory.actionResetChatStrikes',
+  // R35 GM restores: audited but not punitive, so they stay on the neutral
+  // badge variant (the set_ai / note reasoning).
+  restore_item: 'moderationHistory.actionRestoreItem',
+  restore_slot: 'moderationHistory.actionRestoreSlot',
   // Realm-scoped rather than account-scoped: written by the guild backoffice into
-  // guild_moderation_actions, surfaced only by the realm-wide page.
+  // guild_moderation_actions, surfaced only by the realm-wide page. The closed
+  // set is server/admin_db.ts GUILD_MODERATION_ACTIONS, pinned in
+  // tests/admin/moderation_action_labels.test.ts alongside the account set.
   guild_rename: 'moderationHistory.actionGuildRename',
+  guild_bank_purge: 'moderationHistory.actionGuildBankPurge',
 };
 
 const BAD_ACTIONS = new Set(['ban', 'block', 'daily_rewards_ban', 'daily_rewards_ip_ban']);

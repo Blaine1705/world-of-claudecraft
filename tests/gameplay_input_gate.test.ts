@@ -10,6 +10,7 @@ import {
 // answer, and a per-flag test would stay green while any two of them disagreed.
 
 const NOTHING_OPEN: GameplayInputSurfaces = {
+  graphicsRebuildPaused: false,
   modalOpen: false,
   promptModalOpen: false,
   cameraPromptOpen: false,
@@ -26,6 +27,10 @@ describe('gameplay input gate', () => {
     expect(isGameplayInputBlocked({ ...NOTHING_OPEN, modalOpen: true })).toBe(true);
     expect(isGameplayInputBlocked({ ...NOTHING_OPEN, promptModalOpen: true })).toBe(true);
     expect(isGameplayInputBlocked({ ...NOTHING_OPEN, cameraPromptOpen: true })).toBe(true);
+  });
+
+  it('blocks while the renderer is being rebuilt', () => {
+    expect(isGameplayInputBlocked({ ...NOTHING_OPEN, graphicsRebuildPaused: true })).toBe(true);
   });
 
   it('blocks while the composer holds keyboard focus', () => {
@@ -63,6 +68,7 @@ describe('gameplay input gate', () => {
   it('blocks when every surface is up at once', () => {
     expect(
       isGameplayInputBlocked({
+        graphicsRebuildPaused: true,
         modalOpen: true,
         promptModalOpen: true,
         cameraPromptOpen: true,

@@ -439,6 +439,7 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     if (!activity) continue;
     const applied = info.myApplication?.listingId === listing.id;
     const mine = info.myListing?.id === listing.id;
+    const locked = lockoutMinutesFor(activity, input.lockouts) > 0;
     // Hide a listing for the group I am ALREADY part of, whether I lead it
     // (mine) or I am one of the leader's party members browsing the same
     // board (matched by leader name: the board carries no member pids).
@@ -448,15 +449,15 @@ export function buildDungeonFinderView(input: DungeonFinderViewInput): DungeonFi
     // Issue #2030: a listing for a dungeon/raid I am currently locked out of
     // is not something I can usefully apply to, and showing it invites a
     // player to join a group only to discover the lockout at the door. Hide
-    // it from the browse list. The board payload is viewer-independent, so
-    // my own listing DOES pass through this loop (it also renders in the
-    // separate `myListing` panel): exempt it the same as `applied`, or a
-    // leader who takes the lockout mid-run loses their own row from Open
-    // Listings. A listing I have already applied to stays visible even
-    // while locked out, so its row (and withdraw control) keep existing:
-    // otherwise a pending application could never be withdrawn once the
-    // lockout landed.
-    if (!applied && !mine && lockoutMinutesFor(activity, input.lockouts) > 0) continue;
+    // it from the browse list. A listing I have already applied to stays
+    // visible even while locked out, so its row (and withdraw control) keep
+    // existing: otherwise a pending application could never be withdrawn
+    // once the lockout landed. My OWN listing no longer reaches this filter
+    // (the issue-2031 alreadyInGroup skip above hides it from browse
+    // entirely); a locked-out leader keeps managing theirs through the
+    // separate `myListing` panel, which no lockout ever filters. The `!mine`
+    // guard stays as belt and braces should the skip above ever narrow.
+    if (!applied && !mine && locked) continue;
     const blocked = blockReasonFor(activity, level, specRole);
     const roleFit =
       activity.composition === null || info.roles.some((r) => (listing.needed?.[r] ?? 0) > 0);
