@@ -118,13 +118,15 @@ export const shellStrings = {
     // mirrored by electron/shell_strings.cjs DEFAULT_SHELL_STRINGS in English).
     desktop: {
       update: {
+        // Classic desktop-client voice (Discord / VS Code / Steam style): short
+        // titles, calm bodies, primary action first on the ready card.
         checkingTitle: 'Checking for updates...',
-        checkingBody: 'The game keeps itself up to date automatically.',
-        uptodateTitle: 'You are playing the latest version.',
+        checkingBody: 'New versions download while you play.',
+        uptodateTitle: "You're up to date",
         downloadingTitle: 'Downloading update {version}...',
-        downloadingBody: 'You can keep playing. The update installs when you quit.',
+        downloadingBody: 'You can keep playing. It installs when you quit.',
         readyTitle: 'Update {version} is ready',
-        readyBody: 'It installs when you quit, or restart now.',
+        readyBody: 'Restart to install now, or keep playing and it installs when you quit.',
         restart: 'Restart now',
         later: 'Later',
         dismiss: 'Dismiss',

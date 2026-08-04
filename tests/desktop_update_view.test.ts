@@ -95,6 +95,35 @@ describe('reduceUpdateToast', () => {
     expect(state.percent).toBe(100);
   });
 
+  it('keeps download progress across a re-emitted available (4h recheck)', () => {
+    let state = reduceUpdateToast(INITIAL_UPDATE_TOAST_STATE, {
+      type: 'available',
+      version: '0.19.0',
+    });
+    state = reduceUpdateToast(state, { type: 'progress', percent: 60 });
+    expect(state.percent).toBe(60);
+    // Same update re-announced mid-download must not zero the bar.
+    state = reduceUpdateToast(state, { type: 'available', version: '0.19.0' });
+    expect(state).toMatchObject({ mode: 'downloading', version: '0.19.0', percent: 60 });
+    // A newer version stamp on the same download path is allowed to update.
+    state = reduceUpdateToast(state, { type: 'available', version: '0.19.1' });
+    expect(state).toMatchObject({ mode: 'downloading', version: '0.19.1', percent: 60 });
+  });
+
+  it('never lets progress regress mid-download', () => {
+    let state = reduceUpdateToast(INITIAL_UPDATE_TOAST_STATE, {
+      type: 'available',
+      version: '0.19.0',
+    });
+    state = reduceUpdateToast(state, { type: 'progress', percent: 50 });
+    const afterLower = reduceUpdateToast(state, { type: 'progress', percent: 20 });
+    expect(afterLower.percent).toBe(50);
+    // Identity elision: a no-op lower sample returns the same state object.
+    expect(afterLower).toBe(state);
+    state = reduceUpdateToast(state, { type: 'progress', percent: 70 });
+    expect(state.percent).toBe(70);
+  });
+
   it('keeps ready sticky over later checking/available/progress chatter', () => {
     let state = reduceUpdateToast(INITIAL_UPDATE_TOAST_STATE, {
       type: 'downloaded',

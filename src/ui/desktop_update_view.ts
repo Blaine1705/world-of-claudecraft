@@ -57,12 +57,20 @@ export function reduceUpdateToast(
   }
   if (event.type === 'available') {
     if (state.dismissed) return state;
+    // A recheck can re-emit 'available' while a download is already running.
+    // Keep the live percent so the bar does not flash back to zero.
+    if (state.mode === 'downloading') {
+      return { ...state, version: event.version || state.version };
+    }
     return { ...state, mode: 'downloading', version: event.version || '', percent: 0 };
   }
   if (event.type === 'progress') {
     if (state.mode !== 'downloading' || !Number.isFinite(event.percent)) return state;
-    const percent = Math.max(0, Math.min(100, Math.round(event.percent as number)));
-    return { ...state, percent };
+    const next = Math.max(0, Math.min(100, Math.round(event.percent as number)));
+    // Monotonic: never let a lower sample or a re-ordered IPC tick pull the bar
+    // backward mid-download.
+    const percent = Math.max(state.percent, next);
+    return percent === state.percent ? state : { ...state, percent };
   }
   if (event.type === 'not-available') {
     return state.mode === 'checking' ? { ...state, mode: 'uptodate' } : state;
