@@ -2591,7 +2591,7 @@ export const da_DK: EnTranslations = {
       "title": "Håndværk",
       "close": "Tæt håndværk",
       "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window to {craft}",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Håndværk",
       "reagentsNeeded": "Kræver:",
       "reagentLine": "{name}: {have}/{required}",

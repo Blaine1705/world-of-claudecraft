@@ -3033,7 +3033,7 @@ export const hudChromeStrings = {
     // crafting window straight to the master's own craft tab. {craft} in the
     // aria is the localized craft name (craftName above).
     dialogOption: 'Crafting',
-    dialogOptionAria: 'Open the crafting window to {craft}',
+    dialogOptionAria: 'Open the crafting window for {craft}',
     craft: 'Craft',
     reagentsNeeded: 'Requires:',
     reagentLine: '{name} x{have}/{required}',

@@ -2591,7 +2591,7 @@ export const en_XA: EnTranslations = {
       "title": "[Çŕáƒţíñĝ]",
       "close": "[Çļóšé çŕáƒţíñĝ]",
       "dialogOption": "[Çŕáƒţíñĝ]",
-      "dialogOptionAria": "[Óþéñ ţĥé çŕáƒţíñĝ ŵíñðóŵ ţó {craft}]",
+      "dialogOptionAria": "[Óþéñ ţĥé çŕáƒţíñĝ ŵíñðóŵ ƒóŕ {craft}]",
       "craft": "[Çŕáƒţ]",
       "reagentsNeeded": "[Ŕéɋúíŕéš:]",
       "reagentLine": "[{name} ẋ{have}/{required}]",

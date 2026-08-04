@@ -2591,7 +2591,7 @@ export const tr_TR: EnTranslations = {
       "title": "işçiliği",
       "close": "İşçiliği kapat",
       "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window to {craft}",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Zanaat",
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",

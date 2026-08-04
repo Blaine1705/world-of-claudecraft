@@ -4174,20 +4174,46 @@ export const TARGETS = [
     // falls back to the plain toggle the row replaces (BEFORE source state:
     // the window opens on the stale cooking tab), so ONE recipe photographs
     // both halves of the pair.
+    //
+    // beforeLoad also marks the first-run camera-mode prompt as already shown
+    // (woc.cameraModePrompt.shown): page.screenshot clips paint overlapping
+    // page chrome into the #quest-dialog region, and a live camera prompt
+    // was covering Training/Crafting/Unbinding in the after-desktop dialog
+    // shot. Capture still clicks/removes residual overlays as belt-and-braces.
     variants: [
-      { key: 'dialog-desktop' },
-      { key: 'dialog-mobile', mobile: true },
+      {
+        key: 'dialog-desktop',
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument("localStorage.setItem('woc.cameraModePrompt.shown', '1')"),
+      },
+      {
+        key: 'dialog-mobile',
+        mobile: true,
+        beforeLoad: (page) =>
+          page.evaluateOnNewDocument("localStorage.setItem('woc.cameraModePrompt.shown', '1')"),
+      },
       {
         key: 'window-desktop',
         beforeLoad: (page) =>
-          page.evaluateOnNewDocument("localStorage.setItem('woc_crafting_tab', '\"cooking\"')"),
+          page.evaluateOnNewDocument(`
+            localStorage.setItem('woc.cameraModePrompt.shown', '1');
+            localStorage.setItem('woc_crafting_tab', '"cooking"');
+          `),
       },
     ],
     async capture(page, variant) {
       await page.evaluate(() => {
         document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.camera-prompt-backdrop')?.remove();
         document.querySelector('.tut-skip')?.click();
         document.querySelector('#gpu-notice')?.remove();
+        // Welcome-mail and other ambient banners paint into the dialog clip
+        // the same way the camera prompt does; clear the shared slot.
+        const banner = document.querySelector('#banner');
+        if (banner) {
+          banner.textContent = '';
+          banner.style.display = 'none';
+        }
       });
       await wait(300);
       // Stand beside Darva (the dialog auto-closes on distance) and open her
@@ -4219,16 +4245,34 @@ export const TARGETS = [
       if (!setup.ok) throw new Error(`gossip setup failed: ${setup.reason}`);
       const open = await pollForSize(page, '#quest-dialog');
       if (!open) throw new Error('quest dialog did not open');
+      // Re-clear overlays after the dialog opens: a delayed camera prompt or
+      // welcome-mail banner can still land on top of the clip region.
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-backdrop')?.remove();
+        const banner = document.querySelector('#banner');
+        if (banner) {
+          banner.textContent = '';
+          banner.style.display = 'none';
+        }
+      });
       if (variant?.key !== 'window-desktop') {
         // The mobile dialog scrolls internally and the service rows sit at
         // the bottom: bring the subject row (Crafting; the Unbind row on a
         // BEFORE source tree) into frame or the shot photographs the fold.
-        await page.evaluate(() => {
+        // Assert the row exists so a contaminated or empty dialog cannot
+        // ship as the PR's before/after evidence.
+        const hasSubject = await page.evaluate(() => {
           const row =
             document.querySelector('#quest-dialog [data-crafting]') ??
             document.querySelector('#quest-dialog [data-unbind]');
           row?.scrollIntoView({ block: 'center' });
+          return Boolean(row);
         });
+        if (!hasSubject) {
+          throw new Error(
+            'quest dialog missing Crafting/Unbinding subject row for gossip-crafting-shortcut',
+          );
+        }
         await wait(300);
         return { clip: '#quest-dialog' };
       }

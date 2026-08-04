@@ -2591,7 +2591,7 @@ export const pl_PL: EnTranslations = {
       "title": "Rzemiosło",
       "close": "Zamknij rzemiosło",
       "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window to {craft}",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Rzemiosło",
       "reagentsNeeded": "Wymaga:",
       "reagentLine": "{name}: {have}/{required}",

@@ -328,5 +328,13 @@ describe('diffChangedPaths', () => {
       'dialog-mobile',
       'window-desktop',
     ]);
+    // Every variant must seed the camera-mode prompt flag before the document
+    // loads: page.screenshot clips paint overlapping chrome into the dialog
+    // region, and a live prompt was covering the Crafting row in the after
+    // desktop dialog shot. beforeLoad is a function (evaluateOnNewDocument),
+    // so pin presence rather than its body string.
+    for (const variant of target?.variants ?? []) {
+      expect(typeof variant.beforeLoad, `${variant.key} beforeLoad`).toBe('function');
+    }
   });
 });

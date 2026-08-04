@@ -2591,7 +2591,7 @@ export const vi_VN: EnTranslations = {
       "title": "Chế tạo",
       "close": "Đóng chế tạo",
       "dialogOption": "Crafting",
-      "dialogOptionAria": "Open the crafting window to {craft}",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "thủ công",
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
