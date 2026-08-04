@@ -277,16 +277,19 @@ describe('bank_window: search / sort / deposit-all', () => {
   });
 
   it('persists category/sort under the bank-specific key; the search never enters storage', () => {
-    expect(painter).toContain("const BANK_FILTER_KEY = 'woc_bank_filter'");
+    // Comment-stripped view so a comment carrying a pinned literal cannot satisfy
+    // these (the known source-text-pin trap); behavior is driven in
+    // tests/bank_window_search_reset.test.ts, these anchors keep the source rule
+    // named next to the storage key.
+    const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
+    expect(code).toContain("const BANK_FILTER_KEY = 'woc_bank_filter'");
     // The per-visit search rule holds at BOTH ends of the round trip:
     // construction drops any stored query (legacy or reload-stranded)...
-    expect(painter).toContain(
+    expect(code).toContain(
       "{ ...parseBagFilter(localStorage.getItem(BANK_FILTER_KEY)), search: '' }",
     );
-    // ...and the serializer strips it from every write. Behavior is driven in
-    // tests/bank_window_search_reset.test.ts; these anchors keep the source rule
-    // named next to the storage key.
-    expect(painter).toContain("serializeBagFilter({ ...this.filter, search: '' })");
+    // ...and the serializer strips it from every write.
+    expect(code).toContain("serializeBagFilter({ ...this.filter, search: '' })");
   });
 
   it('runs the pure bank filter core, never a re-derived bag filter', () => {

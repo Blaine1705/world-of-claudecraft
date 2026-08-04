@@ -143,11 +143,36 @@ describe('bank window search reset on close', () => {
     const { root, w } = harness();
     w.open();
     typeSearch(root, 'copper');
-    // Even the keystroke persist strips the query at the serialize boundary...
+    // The keystroke persist strips the query at the serialize boundary...
     expect(storedFilter().search).toBe('');
-    w.close();
+    // ...so does the chip-click write, driven WHILE the query is live (a future
+    // second write path in the handler must not store it)...
+    chip(root, 'weapon').click();
+    expect(storedFilter().search).toBe('');
+    // ...and the sort-change write (the chip click rebuilt the window, so both
+    // the select and the search need re-driving on the fresh nodes)...
+    typeSearch(root, 'copper');
+    const sort = root.querySelector('.bag-sort') as HTMLSelectElement;
+    sort.value = 'name';
+    sort.dispatchEvent(new Event('change'));
+    expect(storedFilter().search).toBe('');
     // ...and the close-path rewrite leaves it scrubbed as well.
+    w.close();
     expect(storedFilter().search).toBe('');
+  });
+
+  it('a data-driven rebuild restores the live query into the fresh input (mid-visit repaint)', () => {
+    const { root, w } = harness();
+    w.open();
+    typeSearch(root, 'copper');
+    // A slow-band data repaint (a deposit echo) rebuilds the whole window while
+    // the player is mid-search; the fresh input must carry the live query, not
+    // blank the box over a still-narrowed grid. This pins the restore the reset
+    // cases above read as their evidence channel.
+    w.render();
+    expect(searchInput(root).value).toBe('copper');
+    expect(occupiedCells(root)).toBe(1);
+    w.close();
   });
 
   it('keeps the persisted category and sort across close/reopen (only search is transient)', () => {
@@ -200,6 +225,33 @@ describe('bank window search reset on close', () => {
     expect(storedFilter()).toEqual({ category: 'weapon', sort: 'name', search: '' });
   });
 
+  it('round-trips category/sort to a fresh instance while the search stays per-visit', () => {
+    // The real cross-session shape: instance A writes its preferences and closes;
+    // a second BankWindow (a new session over the same storage) restores the
+    // category live AND the sort live (proven by rendered order, not just the
+    // stored shape), with the search gone.
+    const a = harness();
+    a.w.open();
+    chip(a.root, 'weapon').click();
+    const sort = a.root.querySelector('.bag-sort') as HTMLSelectElement;
+    sort.value = 'name';
+    sort.dispatchEvent(new Event('change'));
+    typeSearch(a.root, 'pitted');
+    a.w.close();
+    const b = harness();
+    b.w.open();
+    expect(activeCategory(b.root)).toBe('weapon');
+    expect(searchInput(b.root).value).toBe('');
+    chip(b.root, 'all').click();
+    const labels = [...b.root.querySelectorAll<HTMLButtonElement>('button.bank-item')].map(
+      (c) => c.getAttribute('aria-label') ?? '',
+    );
+    expect(labels).toHaveLength(2);
+    expect(labels[0]).toContain('Copper Ore');
+    expect(labels[1]).toContain('Pitted Shortsword');
+    b.w.close();
+  });
+
   it('the walk-away grace close resets the search like any other close', () => {
     const { root, w, world } = harness();
     w.open();
@@ -219,7 +271,7 @@ describe('bank window search reset on close', () => {
     w.close();
   });
 
-  it('resets identically under the online ClientWorld shape (bonus breakdown present)', () => {
+  it('resets identically under a server-stamped bonus breakdown (the online mirror shape)', () => {
     // Online, bankInfo carries the server-stamped bonus sources and the window
     // renders the bonus footer in the same rebuild; the per-visit reset must
     // behave the same there as in the offline Sim shape above.
