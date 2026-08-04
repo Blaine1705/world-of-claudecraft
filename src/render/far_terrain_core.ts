@@ -584,12 +584,36 @@ export function farVertexHeight(x: number, z: number, spacing: number, seed: num
   // open seabed over a short falloff and the horizon meets clean water.
   const outside = outsideWorldBy(x, z);
   if (outside >= 90) return BEYOND_RIM_SEABED;
+  // A 3x3 half-spacing stencil: the crest (max) keeps distant silhouettes
+  // conservative, but the vertex DRAPES most of the local within-cell relief
+  // back down (the spread sink). The old plain 5-tap max carried every crest
+  // across its whole cell and sat the coarse sheet ABOVE the dense terrain
+  // wherever the heightfield varies inside one cell: with the
+  // natural-relief crags that was 40 to 55 percent of mountain-realm ground
+  // (up to 15yd proud), rendering as bare low-poly sheets hanging out of
+  // hillsides and over shore water. Measured after the sink (8yd tier,
+  // tmp harness): pokes drop to under 1 percent of samples with worst
+  // around 2yd, while ridge-crest undersit stays a few yards, hidden by the
+  // dense terrain drawn on top inside the detail envelope.
   const h = spacing / 2;
-  let y = terrainHeight(x, z, seed);
-  y = Math.max(y, terrainHeight(x + h, z, seed));
-  y = Math.max(y, terrainHeight(x - h, z, seed));
-  y = Math.max(y, terrainHeight(x, z + h, seed));
-  y = Math.max(y, terrainHeight(x, z - h, seed));
+  let maxT = -Infinity;
+  let minT = Infinity;
+  for (let i = -1; i <= 1; i++) {
+    for (let j = -1; j <= 1; j++) {
+      const t = terrainHeight(x + i * h, z + j * h, seed);
+      if (t > maxT) maxT = t;
+      if (t < minT) minT = t;
+    }
+  }
+  const spread = maxT - minT;
+  let y = maxT - spread * 0.7;
+  // A cell that touches open water must never carry its land side across
+  // the sea: hug the low side so the sheet stays under the water plane
+  // (the shore-cliff poke was the loudest report: bare tan sheets floating
+  // over the sea beside every tall coast).
+  if (minT < WATER_LEVEL + 0.4) {
+    y = Math.min(y, minT + spread * 0.2);
+  }
   if (outside > 0) {
     const t = outside / 90;
     const fall = t * t * (3 - 2 * t);
@@ -601,11 +625,14 @@ export function farVertexHeight(x: number, z: number, spacing: number, seed: num
   // rock. Zero at valley height, so meadows and coasts keep the exact
   // heightfield, and included HERE so the sprite shortfall
   // (foliage_impostor.ts) and the tiles keep agreeing on one surface.
+  // Damped to 0.4x alongside the drape: the real heightfield carries its
+  // own crags now, and the full-strength additive noise was a second way
+  // for the sheet to climb over the dense terrain.
   const crag = Math.min(1, Math.max(0, (y - 16) / 14));
   if (crag > 0) {
     const ridge = fbm2(x * 0.045, z * 0.045, seed + 977, 3) - 0.5;
     const fine = fbm2(x * 0.13, z * 0.13, seed + 991, 2) - 0.5;
-    y += crag * (ridge * 7 + fine * 2.5);
+    y += crag * (ridge * 7 + fine * 2.5) * 0.4;
   }
   return y;
 }
