@@ -249,7 +249,8 @@ export class Input {
   // mouselook do, instead of only ever orbiting the free camera.
   private gamepadLookActive = false;
   private touchLookVector = { x: 0, y: 0 };
-  // multiplier on the touch look (camera joystick) rate; setTouchLookSpeed
+  // multiplier on the touch look rate, both the camera joystick (updateTouchLook)
+  // and the default one-finger swipe-drag (applyTouchLookDelta); setTouchLookSpeed
   // drives it from the settings menu. Mouselook uses lookSensitivity instead.
   private touchLookSpeed = 1;
   // +1 normal, -1 when the player inverts the touch camera's vertical axis
@@ -635,7 +636,7 @@ export class Input {
   }
 
   applyTouchLookDelta(dx: number, dy: number): void {
-    const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT;
+    const dragSens = this.lookSensitivity * TOUCH_DRAG_SENS_MULT * this.touchLookSpeed;
     this.camYaw -= dx * dragSens;
     this.camPitch = Math.min(
       1.35,
