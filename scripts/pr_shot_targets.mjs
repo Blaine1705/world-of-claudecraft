@@ -5866,10 +5866,6 @@ export const TARGETS = [
         sim.equipItem('direfang_greatblade');
         sim.changeSkin(0, shot.catalog);
         sim.changeWeaponSkin(shot.skinId);
-        // Face the camera so the weapon and the hand holding it are both in
-        // frame; the renderer puts the camera behind the player along camYaw.
-        player.facing = game.input.camYaw + Math.PI;
-        game.input.camDist = 6;
         return {
           ok: sim.equipment?.mainhand === 'direfang_greatblade',
           reason: 'the greatblade did not equip',
@@ -5888,11 +5884,34 @@ export const TARGETS = [
           polling: 250,
         });
       }
-      await wait(4000);
+      // Levelling to 60 fires a cascade of deed banners plus the Ravenpost mail
+      // banner across mid-screen, exactly where the character stands. Let them
+      // run out, then hide the plate so a late one cannot land on the frame.
+      await wait(9000);
+      // Shoot the character sheet's paperdoll turntable, not the world.
+      // The in-world camera was tried first and is the wrong instrument here:
+      // the body drifts to face nearby mobs between variants, the world camera
+      // frames a 2.6yd character inside a whole town, and the held weapon came
+      // out a smudge at the default distance while a closer camera clipped it
+      // against the unit frame. The paperdoll is centered, lit, uncluttered,
+      // identical across variants, and it runs the same resolveActiveWeaponSkin
+      // call the world does (hud.ts mountCharPreview), so it is a real read of
+      // this change rather than a staged one.
+      await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      if (!(await pollForSize(page, '#char-model-preview'))) {
+        throw new Error('character sheet paperdoll did not open');
+      }
+      // The turntable needs a beat to mount the rig, stream the skin GLB and
+      // settle its pose before it is worth shooting.
+      await wait(3500);
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
-      return {};
+      return { clip: '#char-model-preview' };
     },
   },
 ];
