@@ -6,6 +6,7 @@
 // callbacks. Reuses the vendor window's CSS classes (.vendor-item, .vi-name,
 // .vi-price) so the shop reads as the same window family. It owns no state.
 
+import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
 import { formatNumber, t } from '../../i18n';
@@ -30,6 +31,7 @@ export function renderHeroicVendorWindow(
   // collapses the scrolled list; drop the tooltip and restore the scroll.
   deps.hideTooltip();
   const scrollTop = el.scrollTop;
+  markDialogRoot(el, { label: t('itemUi.vendor.goodsTitle', { name: vendorName }) });
   el.innerHTML = `<div class="panel-title"><span>${esc(t('itemUi.vendor.goodsTitle', { name: vendorName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('itemUi.vendor.close'))}">${svgIcon('close')}</button></div>`;
 
   const balance = document.createElement('div');
