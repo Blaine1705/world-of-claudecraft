@@ -349,12 +349,12 @@ describe('Fenbridge dedicated town renderer', () => {
       (sum, mesh) => sum + (Array.isArray(mesh.material) ? mesh.material.length : 1),
       0,
     );
-    expect({ questTriangles, questDraws }).toEqual({ questTriangles: 84, questDraws: 1 });
+    expect({ questTriangles, questDraws }).toEqual({ questTriangles: 204, questDraws: 1 });
     triangleCountByAsset[fenbridgeTownInternalsForTest.questAssetUrl] = questTriangles;
     expect(fenbridgeTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      assetTriangles: 69_176,
+      assetTriangles: 80_772,
       maximumFoundationTriangles: 84,
-      maximumRuntimeTriangles: 69_260,
+      maximumRuntimeTriangles: 80_856,
       hardCeiling: 88_000,
       withinHardCeiling: true,
     });
@@ -371,13 +371,14 @@ describe('Fenbridge dedicated town renderer', () => {
     expect(standardRoot).toMatchObject({
       colorDraws: 20,
       shadowDraws: 10,
-      triangles: 69_068,
+      // placement-weighted shipping geometry after R16-30 exterior densify
+      triangles: 80_424,
     });
     expect({
       colorDraws: standardRoot.colorDraws + questDraws * 2,
       shadowDraws: standardRoot.shadowDraws,
-      triangles: 69_068 + 84 * 2,
-    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 69_236 });
+      triangles: 80_424 + 84 * 2,
+    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 80_592 });
 
     setGfx({
       standardMaterials: false,
@@ -387,7 +388,7 @@ describe('Fenbridge dedicated town renderer', () => {
     });
     const low = fenbridgeTownInternalsForTest.buildFromSources(sources, ground, true);
     const lowRoot = fenbridgeTownDrawStats(low.group);
-    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 69_068 });
+    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 80_424 });
     expect(lowRoot.colorDraws + questDraws * 2).toBe(13);
   });
 

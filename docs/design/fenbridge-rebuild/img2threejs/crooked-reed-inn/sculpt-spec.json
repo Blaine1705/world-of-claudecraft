@@ -23,13 +23,7 @@
       "eave",
       "negative space"
     ],
-    "materialTerms": [
-      "albedo",
-      "roughness",
-      "normal response",
-      "ambient occlusion",
-      "emissive"
-    ],
+    "materialTerms": ["albedo", "roughness", "normal response", "ambient occlusion", "emissive"],
     "lightingTerms": [
       "key light",
       "fill light",
@@ -43,11 +37,7 @@
     "objectClass": {
       "primaryType": "raised exterior-only marsh inn and provision house",
       "primaryDomain": "object",
-      "formLanguage": [
-        "stylized low-poly",
-        "crooked timber construction",
-        "swamp vernacular"
-      ],
+      "formLanguage": ["stylized low-poly", "crooked timber construction", "swamp vernacular"],
       "structureKind": [
         "closed timber shell",
         "raised porch",
@@ -95,11 +85,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -215,16 +201,9 @@
         "id": "inn-silhouette",
         "name": "Raised broad inn and bent roof",
         "required": true,
-        "qualityCriteria": [
-          "Broad width, lifted floor, chimney and bent ridge remain legible."
-        ],
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ],
-        "failureModes": [
-          "reads as a generic cottage"
-        ]
+        "qualityCriteria": ["Broad width, lifted floor, chimney and bent ridge remain legible."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
       },
       {
         "id": "porch-system",
@@ -233,44 +212,24 @@
         "qualityCriteria": [
           "Posts, steps, undercroft and rope rail create real depth without blocking entry."
         ],
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ],
-        "failureModes": [
-          "porch collapses into facade trim"
-        ]
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["porch collapses into facade trim"]
       },
       {
         "id": "provision-service",
         "name": "Provision counter and rain awning",
         "required": true,
-        "qualityCriteria": [
-          "Counter remains attached and readable from the civic-facing side."
-        ],
-        "evidenceRefs": [
-          "side",
-          "hero"
-        ],
-        "failureModes": [
-          "service identity is absent"
-        ]
+        "qualityCriteria": ["Counter remains attached and readable from the civic-facing side."],
+        "evidenceRefs": ["side", "hero"],
+        "failureModes": ["service identity is absent"]
       },
       {
         "id": "material-separation",
         "name": "Swamp material and warm-light separation",
         "required": true,
-        "qualityCriteria": [
-          "Timber, stone, teal roof, rope and amber glazing remain distinct."
-        ],
-        "evidenceRefs": [
-          "front",
-          "rear",
-          "hero"
-        ],
-        "failureModes": [
-          "semantic colors flatten"
-        ]
+        "qualityCriteria": ["Timber, stone, teal roof, rope and amber glazing remain distinct."],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["semantic colors flatten"]
       }
     ],
     "visualDeltaChecks": [
@@ -284,11 +243,7 @@
       "Do not replace the bent roof with a straight generic gable.",
       "Keep all service clutter attached and exterior."
     ],
-    "mustNotDo": [
-      "No interior.",
-      "No readable sign.",
-      "No detached player-lane clutter."
-    ]
+    "mustNotDo": ["No interior.", "No readable sign.", "No detached player-lane clutter."]
   },
   "qualityTargets": {
     "targetFidelity": 0.7,
@@ -299,16 +254,8 @@
       "provision counter",
       "reed sign"
     ],
-    "niceToHave": [
-      "fixed barrel and crate arrangement",
-      "restrained rope sag"
-    ],
-    "reviewViewpoints": [
-      "front",
-      "left-side",
-      "rear",
-      "front-three-quarter"
-    ]
+    "niceToHave": ["fixed barrel and crate arrangement", "restrained rope sag"],
+    "reviewViewpoints": ["front", "left-side", "rear", "front-three-quarter"]
   },
   "coordinateFrame": {
     "front": "+Z",
@@ -330,11 +277,7 @@
       "porch depth:building depth about 0.2"
     ],
     "symmetry": "near-symmetric main shell with asymmetric chimney, sign and service counter",
-    "dominantCurves": [
-      "shallow concave ridge",
-      "upturned eave tips",
-      "sagging rope rails"
-    ],
+    "dominantCurves": ["shallow concave ridge", "upturned eave tips", "sagging rope rails"],
     "negativeSpaces": [
       "open porch undercroft",
       "gaps between porch posts",
@@ -360,13 +303,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "porch depth",
-        "offset entrance",
-        "dormer",
-        "chimney",
-        "reed sign"
-      ],
+      "observations": ["porch depth", "offset entrance", "dormer", "chimney", "reed sign"],
       "confidence": 0.96
     },
     {
@@ -380,12 +317,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "provision counter",
-        "rain awning",
-        "building depth",
-        "rear porch rail"
-      ],
+      "observations": ["provision counter", "rain awning", "building depth", "rear porch rail"],
       "confidence": 0.93
     },
     {
@@ -399,12 +331,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "rear wall bays",
-        "raised piling base",
-        "rear windows",
-        "roof depth"
-      ],
+      "observations": ["rear wall bays", "raised piling base", "rear windows", "roof depth"],
       "confidence": 0.94
     },
     {
@@ -418,12 +345,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "complete volume",
-        "attached clutter",
-        "roof curvature",
-        "porch approach"
-      ],
+      "observations": ["complete volume", "attached clutter", "roof curvature", "porch approach"],
       "confidence": 0.97
     }
   ],
@@ -447,26 +369,12 @@
         "confidence": 0.94
       },
       "transform": {
-        "position": [
-          0,
-          2.8,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 2.8, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "open-piling-undercroft",
@@ -483,11 +391,7 @@
           "confidence": 0.93
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(52, 39, 30, 1)",
         "secondaryAlbedo": "rgba(78, 86, 80, 1)",
@@ -514,27 +418,12 @@
         "confidence": 0.9
       },
       "transform": {
-        "position": [
-          0,
-          5.25,
-          -0.1
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 5.25, -0.1],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "bent-ridge-profile",
@@ -565,12 +454,7 @@
           "confidence": 0.96
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(23, 98, 105, 1)",
         "secondaryAlbedo": "rgba(46, 52, 49, 1)",
@@ -597,26 +481,12 @@
         "confidence": 0.95
       },
       "transform": {
-        "position": [
-          0,
-          1.4,
-          3.8
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 1.4, 3.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "rope-rail-and-net",
@@ -633,10 +503,7 @@
           "confidence": 1
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(82, 59, 41, 1)",
         "secondaryAlbedo": "rgba(141, 118, 80, 1)",
@@ -663,26 +530,12 @@
         "confidence": 0.9
       },
       "transform": {
-        "position": [
-          2.7,
-          1.8,
-          3.9
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [2.7, 1.8, 3.9],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "counter-rain-awning",
@@ -699,10 +552,7 @@
           "confidence": 0.86
         }
       ],
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["side", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(39, 106, 111, 1)",
         "secondaryAlbedo": "rgba(118, 82, 54, 1)",
@@ -729,26 +579,12 @@
         "confidence": 0.78
       },
       "transform": {
-        "position": [
-          -4.0,
-          3.2,
-          3.6
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-4.0, 3.2, 3.6],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "reed-bundle-sign",
@@ -758,10 +594,7 @@
           "confidence": 0.88
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(141, 118, 80, 1)",
         "secondaryAlbedo": "rgba(82, 59, 41, 1)",
@@ -788,27 +621,12 @@
         "confidence": 0.9
       },
       "transform": {
-        "position": [
-          0,
-          2.5,
-          3.62
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 2.5, 3.62],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-emissive",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "amber-pane-grid",
@@ -818,11 +636,7 @@
           "confidence": 0.97
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(255, 164, 58, 1)",
         "secondaryAlbedo": "rgba(255, 221, 119, 1)",
@@ -840,23 +654,11 @@
       "baseColor": "#FFFFFF",
       "albedo": {
         "dominant": "semantic COLOR_0",
-        "secondary": [
-          "dark timber",
-          "damp stone",
-          "teal shingles",
-          "rope",
-          "canvas"
-        ],
+        "secondary": ["dark timber", "damp stone", "teal shingles", "rope", "canvas"],
         "samplingNotes": "Reference values define semantic families; baked studio highlights are not copied."
       },
       "colorVariation": {
-        "palette": [
-          "#34271E",
-          "#4E5650",
-          "#176269",
-          "#8D7650",
-          "#276A6F"
-        ],
+        "palette": ["#34271E", "#4E5650", "#176269", "#8D7650", "#276A6F"],
         "pattern": "bounded semantic vertex-color regions",
         "amplitude": 0.1
       },
@@ -883,30 +685,21 @@
           "region": "wall boards, porch members and trim",
           "pattern": "axial low-frequency grain with darker lower damp band",
           "roughness": 0.86,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         },
         {
           "id": "teal-roof-edge-wear",
           "region": "eave course crests and ridge tips",
           "pattern": "restrained lighter exposed facets",
           "roughness": 0.72,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         },
         {
           "id": "stone-contact-damp",
           "region": "foundation and chimney joints",
           "pattern": "cavity-biased darkening",
           "roughness": 0.91,
-          "evidenceRefs": [
-            "front",
-            "rear"
-          ]
+          "evidenceRefs": ["front", "rear"]
         }
       ]
     },
@@ -918,16 +711,11 @@
       "baseColor": "#FFA43A",
       "albedo": {
         "dominant": "#FFA43A",
-        "secondary": [
-          "#FFDD77"
-        ],
+        "secondary": ["#FFDD77"],
         "samplingNotes": "Restrained amber panes, no punctual lights embedded."
       },
       "colorVariation": {
-        "palette": [
-          "#FFA43A",
-          "#FFDD77"
-        ],
+        "palette": ["#FFA43A", "#FFDD77"],
         "pattern": "pane-center value lift",
         "amplitude": 0.08
       },
@@ -955,11 +743,7 @@
           "emissiveColor": "#FFB14A",
           "emissiveIntensity": 1.2,
           "roughness": 0.28,
-          "evidenceRefs": [
-            "front",
-            "rear",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "rear", "hero"]
         }
       ]
     }
@@ -1017,10 +801,7 @@
         "ACES tone mapping",
         "contact shadow"
       ],
-      "mustAvoid": [
-        "ambient-only lighting",
-        "baked highlights treated as albedo"
-      ]
+      "mustAvoid": ["ambient-only lighting", "baked highlights treated as albedo"]
     },
     "screenshotReview": [
       "Compare fixed front and hero silhouettes.",
@@ -1068,13 +849,7 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
     "specRefineTriggers": [
       "wrong bent-roof silhouette",
       "missing porch depth",
@@ -1108,203 +883,109 @@
       "id": "crooked-inn-silhouette",
       "name": "Broad raised body, bent teal roof, chimney and dormer",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "form-refinement"
-      ],
+      "passIds": ["blockout", "form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "building-shell",
-        "roof-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["building-shell", "roof-system"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "deep-porch-approach",
       "name": "Deep porch, open undercroft, rope rail and local x=-2.8 entrance steps",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "interaction-pass"
-      ],
+      "passIds": ["structural-pass", "interaction-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "porch-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["porch-system"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "provision-service-read",
       "name": "Attached provision counter and teal rain awning",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "provision-counter"
-      ],
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["provision-counter"],
+      "evidenceRefs": ["side", "hero"]
     },
     {
       "id": "reed-sign-landmark",
       "name": "Unreadable bound-reed hanging sign",
       "tier": "critical",
-      "passIds": [
-        "form-refinement"
-      ],
+      "passIds": ["form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "reed-sign"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["reed-sign"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "swamp-material-read",
       "name": "Dark timber, damp stone, teal roof and amber window separation",
       "tier": "critical",
-      "passIds": [
-        "material-pass"
-      ],
+      "passIds": ["material-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "building-shell",
-        "roof-system",
-        "facade-lighting"
-      ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["building-shell", "roof-system", "facade-lighting"],
+      "evidenceRefs": ["front", "rear", "hero"]
     },
     {
       "id": "fixed-attached-clutter",
       "name": "Barrels, crates, net and rope remain attached and bounded",
       "tier": "important",
-      "passIds": [
-        "form-refinement",
-        "interaction-pass"
-      ],
+      "passIds": ["form-refinement", "interaction-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "porch-system",
-        "provision-counter"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["porch-system", "provision-counter"],
+      "evidenceRefs": ["front", "side", "hero"]
     },
     {
       "id": "shipping-budget",
       "name": "Exterior-only model stays within 5,200 triangles and 350 KiB",
       "tier": "important",
-      "passIds": [
-        "optimization-pass"
-      ],
+      "passIds": ["optimization-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "building-shell"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["building-shell"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     }
   ],
   "buildPasses": [
     {
       "id": "blockout",
       "goal": "Lock native bounds and macro silhouette.",
-      "componentRefs": [
-        "building-shell",
-        "roof-system"
-      ],
-      "acceptance": [
-        "Raised broad silhouette and bent roof match front and hero crops."
-      ]
+      "componentRefs": ["building-shell", "roof-system"],
+      "acceptance": ["Raised broad silhouette and bent roof match front and hero crops."]
     },
     {
       "id": "structural-pass",
       "goal": "Build porch and service hierarchy.",
-      "componentRefs": [
-        "porch-system",
-        "provision-counter",
-        "reed-sign"
-      ],
-      "acceptance": [
-        "All exterior systems are attached and the central approach remains clear."
-      ]
+      "componentRefs": ["porch-system", "provision-counter", "reed-sign"],
+      "acceptance": ["All exterior systems are attached and the central approach remains clear."]
     },
     {
       "id": "form-refinement",
       "goal": "Add observed roof, rope, dormer, sign and cargo geometry.",
-      "componentRefs": [
-        "roof-system",
-        "porch-system",
-        "reed-sign",
-        "facade-lighting"
-      ],
-      "acceptance": [
-        "Every inventoried component detail has implemented geometry."
-      ]
+      "componentRefs": ["roof-system", "porch-system", "reed-sign", "facade-lighting"],
+      "acceptance": ["Every inventoried component detail has implemented geometry."]
     },
     {
       "id": "material-pass",
       "goal": "Apply semantic colors and two-bucket material response.",
-      "componentRefs": [
-        "building-shell",
-        "roof-system",
-        "facade-lighting"
-      ],
-      "acceptance": [
-        "Low and Ultra retain timber, stone, roof and amber separation."
-      ]
+      "componentRefs": ["building-shell", "roof-system", "facade-lighting"],
+      "acceptance": ["Low and Ultra retain timber, stone, roof and amber separation."]
     },
     {
       "id": "interaction-pass",
       "goal": "Verify clear porch, service apron and runtime-owned collision intent.",
-      "componentRefs": [
-        "porch-system",
-        "provision-counter"
-      ],
-      "acceptance": [
-        "No attached clutter blocks the standing points or steps."
-      ]
+      "componentRefs": ["porch-system", "provision-counter"],
+      "acceptance": ["No attached clutter blocks the standing points or steps."]
     },
     {
       "id": "optimization-pass",
       "goal": "Merge and verify shipping budgets.",
-      "componentRefs": [
-        "building-shell"
-      ],
-      "acceptance": [
-        "At most two primitives, no interior, at most 5,200 triangles and 350 KiB."
-      ]
+      "componentRefs": ["building-shell"],
+      "acceptance": ["At most two primitives, no interior, at most 5,200 triangles and 350 KiB."]
     }
   ],
   "sculptPipeline": {
@@ -1334,21 +1015,9 @@
     "contract": "Static exterior hierarchy with stable service and entrance sockets; gameplay collision remains runtime-owned.",
     "defaultRigType": "static-town-asset",
     "rootMotionNode": "building-shell",
-    "requiredComponentFields": [
-      "semantic id",
-      "parent",
-      "native transform"
-    ],
-    "transformChannels": [
-      "root translate",
-      "root rotate",
-      "visibility",
-      "material state"
-    ],
-    "authoringRules": [
-      "No detachable clutter.",
-      "No shipping collision mesh."
-    ],
+    "requiredComponentFields": ["semantic id", "parent", "native transform"],
+    "transformChannels": ["root translate", "root rotate", "visibility", "material state"],
+    "authoringRules": ["No detachable clutter.", "No shipping collision mesh."],
     "destructionPolicy": {
       "defaultBreakable": false
     }
@@ -1380,10 +1049,7 @@
       "grimoire/intake/surface_topology.md",
       "grimoire/build/geometry_patterns.md"
     ],
-    "evidenceRefs": [
-      "core.topology-intent",
-      "core.pbr-hand-painted-vs-pbr-texture"
-    ]
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
   },
   "visualEvidence": [
     {
@@ -1772,9 +1438,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -1866,9 +1530,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -1959,9 +1621,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2052,9 +1712,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2145,9 +1803,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2189,9 +1845,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [

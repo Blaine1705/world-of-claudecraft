@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {
   addBarrel,
   addBox,
+  addCrate,
   addCylinder,
   addGeometry,
   addLantern,
@@ -80,6 +81,33 @@ export function buildProvisionStall(buckets) {
     addBox(buckets, 'metal', [0.08, 0.08, 0.08], [x, 1.05, 0.65], P.iron);
   }
   addCylinder(buckets, 'cloth', 0.04, 0.04, 2.6, 5, [0, 2.2, 0.55], P.rope, [0, 0, Math.PI / 2]);
+
+  // R16-30 exterior densify: denser goods, canopy tassels, post wraps, rain streaks.
+  for (const x of [-1.2, -0.4, 0.4, 1.2]) {
+    addBox(buckets, 'cloth', [0.06, 0.22, 0.06], [x, 2.2, 0.65], P.clothTeal);
+  }
+  for (const [x, z] of [
+    [-1.35, 0.55],
+    [1.35, 0.55],
+    [-1.35, -0.55],
+    [1.35, -0.55],
+  ]) {
+    addCylinder(buckets, 'cloth', 0.14, 0.14, 0.08, 5, [x, 1.15, z], P.rope);
+    addBox(buckets, 'metal', [0.12, 0.08, 0.12], [x, 2.3, z], P.ironLight);
+  }
+  addBox(buckets, 'organic', [0.3, 0.18, 0.22], [-1.1, 1.28, -0.2], P.hide);
+  addBox(buckets, 'organic', [0.25, 0.16, 0.2], [0.55, 1.28, 0.3], P.herb);
+  addCylinder(buckets, 'organic', 0.1, 0.1, 0.22, 6, [-0.15, 1.3, -0.25], P.parchment);
+  addCrate(buckets, [1.0, 0.05, 0.35], [0.35, 0.28, 0.3]);
+  addBarrel(buckets, [-1.15, 0.28, -0.35], 0.55);
+  // Canopy underside battens
+  for (const z of [-0.35, 0.15]) {
+    addBox(buckets, 'timber', [2.5, 0.05, 0.06], [0, 2.28, z], P.timberDark);
+  }
+  // Customer-side kickboard bolts
+  for (const x of [-1.0, 0, 1.0]) {
+    addBox(buckets, 'metal', [0.07, 0.07, 0.05], [x, 0.55, 0.68], P.iron);
+  }
 }
 
 /**
@@ -130,6 +158,13 @@ export function buildPalisadeWing(buckets) {
   addCylinder(buckets, 'cloth', 0.04, 0.04, 1.1, 5, [-1.6, 1.5, 0.2], P.rope, [0, 0, 0.7]);
   addCylinder(buckets, 'cloth', 0.04, 0.04, 1.1, 5, [-1.6, 1.5, 0.2], P.rope, [0, 0, -0.7]);
   addBox(buckets, 'cloth', [0.08, 0.55, 0.28], [1.7, 1.35, 0.22], P.clothTeal, [0, 0, -0.15]);
+
+  // R16-30 densify (budget-tight instanced wall): sparse hardware + moss only.
+  for (const x of [-2.0, 0, 2.0]) {
+    addBox(buckets, 'metal', [0.2, 0.1, 0.2], [x, 1.4, 0], P.iron);
+    addBox(buckets, 'stone', [0.3, 0.08, 0.26], [x, 0.06, 0.12], P.moss);
+  }
+  addBox(buckets, 'timber', [5.0, 0.08, 0.08], [0, 0.7, -0.1], P.timberDark);
 }
 
 /**
@@ -198,6 +233,21 @@ export function buildGateArch(buckets) {
   for (const sx of [-1, 1]) {
     addCylinder(buckets, 'cloth', 0.2, 0.2, 0.1, 5, [sx * 2.85, 1.2, 0], P.rope);
   }
+
+  // R16-30 densify: denser jamb hardware, ridge finials, lane-edge moss (lane stays open).
+  for (const sx of [-1, 1]) {
+    for (const y of [0.95, 2.15, 3.1]) {
+      addBox(buckets, 'metal', [0.55, 0.1, 0.5], [sx * 2.85, y, 0], P.ironLight);
+    }
+    addCylinder(buckets, 'cloth', 0.22, 0.22, 0.1, 5, [sx * 2.85, 2.4, 0], P.rope);
+    addBox(buckets, 'stone', [0.45, 0.12, 0.4], [sx * 2.85, 0.08, 0.35], P.moss);
+    addBox(buckets, 'stone', [0.45, 0.12, 0.4], [sx * 2.85, 0.08, -0.35], P.moss);
+  }
+  for (const x of [-2.0, 0, 2.0]) {
+    addBox(buckets, 'metal', [0.12, 0.1, 0.12], [x, 4.55, 0], P.brass);
+  }
+  addBox(buckets, 'timber', [6.5, 0.1, 0.12], [0, 3.35, 0.2], P.timberLight);
+  addBox(buckets, 'timber', [6.5, 0.1, 0.12], [0, 3.35, -0.2], P.timberLight);
 }
 
 /**
@@ -219,6 +269,16 @@ export function buildBoardwalk(buckets) {
     }
   }
   addBox(buckets, 'stone', [3.8, 0.04, 1.35], [0, -0.01, 0], P.moss);
+
+  // R16-30 densify (budget-tight module): seam boards + wet mud only.
+  for (const x of [-1.0, 0, 1.0]) {
+    addBox(buckets, 'timber', [0.04, 0.05, 1.1], [x, 0.09, 0], P.timberDeep);
+  }
+  for (const z of [-0.62, 0.62]) {
+    for (const x of [-1.2, 1.2]) {
+      addBox(buckets, 'stone', [0.3, 0.04, 0.12], [x, 0.0, z], P.mud);
+    }
+  }
 }
 
 /**
@@ -263,6 +323,23 @@ export function buildMusterBoard(buckets) {
   for (const x of [-0.95, 0.95]) {
     addCylinder(buckets, 'cloth', 0.14, 0.14, 0.1, 5, [x, 0.85, 0], P.rope);
   }
+
+  // R16-30 densify: more sealed notices, rain cap trim, post hardware.
+  for (const [x, y, w, h] of [
+    [-0.55, 1.25, 0.28, 0.35],
+    [0.35, 1.7, 0.3, 0.28],
+  ]) {
+    addBox(buckets, 'parchment', [w, h, 0.03], [x, y, 0.15], P.parchmentDark);
+    addCylinder(buckets, 'organic', 0.04, 0.04, 0.03, 5, [x, y + h * 0.3, 0.18], P.wax);
+  }
+  for (const x of [-0.95, 0.95]) {
+    for (const y of [0.9, 1.75]) {
+      addBox(buckets, 'metal', [0.26, 0.1, 0.26], [x, y, 0], P.ironLight);
+    }
+  }
+  addBox(buckets, 'timber', [2.2, 0.08, 0.1], [0, 2.35, 0.08], P.timber);
+  addBox(buckets, 'roof', [2.0, 0.05, 0.7], [0, 2.55, 0], P.roofDeep);
+  addLantern(buckets, [1.45, 1.35, 0.15], 0.7);
 }
 
 /**
@@ -276,4 +353,26 @@ export function buildMusterOrder(buckets) {
   addBox(buckets, 'cloth', [0.75, 0.05, 0.12], [0, 0.16, 0], P.clothTeal);
   addCylinder(buckets, 'organic', 0.07, 0.07, 0.05, 6, [0.15, 0.2, 0.05], P.wax);
   addBox(buckets, 'metal', [0.08, 0.02, 0.08], [-0.2, 0.18, 0.08], P.brass);
+
+  // R16-30 densify: layered papers, ribbon tails, seal facets, corner tacks.
+  addBox(
+    buckets,
+    'parchment',
+    [0.55, 0.02, 0.35],
+    [-0.05, 0.17, 0.04],
+    P.parchment,
+    [0, -0.1, 0.05],
+  );
+  addBox(buckets, 'cloth', [0.12, 0.03, 0.35], [0.28, 0.16, 0], P.clothTeal);
+  addBox(buckets, 'cloth', [0.1, 0.02, 0.2], [-0.3, 0.15, 0.1], P.rope, [0, 0.3, 0]);
+  addCylinder(buckets, 'organic', 0.05, 0.05, 0.04, 6, [-0.12, 0.2, -0.08], P.wax);
+  for (const [x, z] of [
+    [-0.35, 0.18],
+    [0.35, 0.18],
+    [-0.35, -0.18],
+    [0.35, -0.18],
+  ]) {
+    addBox(buckets, 'metal', [0.05, 0.02, 0.05], [x, 0.08, z], P.brassLight);
+  }
+  addBox(buckets, 'timber', [0.9, 0.03, 0.58], [0, 0.015, 0], P.timber);
 }

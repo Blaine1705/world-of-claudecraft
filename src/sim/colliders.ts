@@ -13,7 +13,6 @@ import {
   isEastbrookGrandArmoury,
 } from './building_layout';
 import { MOUNT_RACE_JUMP_FIXTURES, raceGateSegment } from './content/mounts';
-import { STATIONS } from './content/professions';
 import {
   arenaOriginAt,
   BUILTIN_WORLD,
@@ -32,8 +31,6 @@ import {
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
-  NPCS,
-  OVERWORLD_GRAVEYARDS,
   PORTALS,
   RIFT_REGION_HALF_X,
   RIFT_REGION_HALF_Z,

@@ -48,11 +48,7 @@
       "pitch": -12,
       "roll": 0
     },
-    "positionHint": [
-      8,
-      5.5,
-      11
-    ],
+    "positionHint": [8, 5.5, 11],
     "note": "Orthographic-like multi-view sheet; compare each admitted elevation independently and never project the baked pixels."
   },
   "suitability": "conditional",
@@ -69,12 +65,7 @@
     "objectClass": {
       "primaryType": "fortified marsh bank and ledger office",
       "primaryDomain": "object",
-      "formLanguage": [
-        "architectural",
-        "hard-surface",
-        "orderly",
-        "fortified"
-      ],
+      "formLanguage": ["architectural", "hard-surface", "orderly", "fortified"],
       "structureKind": [
         "layered exterior shell",
         "repeated facade modules",
@@ -122,11 +113,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -494,15 +481,8 @@
         "qualityCriteria": [
           "The bank stays broader than tall, with a stout base, restrained roof, and centered front gable."
         ],
-        "evidenceRefs": [
-          "front",
-          "rear",
-          "hero"
-        ],
-        "failureModes": [
-          "bank reads as a generic cottage",
-          "roof becomes too tall or crooked"
-        ]
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["bank reads as a generic cottage", "roof becomes too tall or crooked"]
       },
       {
         "id": "teller-door-service-front",
@@ -511,10 +491,7 @@
         "qualityCriteria": [
           "The two front service bays remain distinct, accessible, and backed without showing an interior."
         ],
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "hero"],
         "failureModes": [
           "teller grille becomes an ordinary window",
           "door straps or service ledge disappear"
@@ -527,10 +504,7 @@
         "qualityCriteria": [
           "Side vault wheel, heavy bars, straps, and bolts communicate security without an open vault."
         ],
-        "evidenceRefs": [
-          "side",
-          "hero"
-        ],
+        "evidenceRefs": ["side", "hero"],
         "failureModes": [
           "vault wheel is omitted or placed on the rear",
           "window glow escapes its bars"
@@ -543,15 +517,8 @@
         "qualityCriteria": [
           "All service props remain attached within the footprint and keep the approach clear."
         ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "hero"
-        ],
-        "failureModes": [
-          "loose clutter blocks the lane",
-          "shield gains a mark or chest floats"
-        ]
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["loose clutter blocks the lane", "shield gains a mark or chest floats"]
       },
       {
         "id": "ordered-material-separation",
@@ -560,12 +527,7 @@
         "qualityCriteria": [
           "Semantic vertex colors preserve the bank's orderly fortified palette under neutral relighting."
         ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "rear",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "side", "rear", "hero"],
         "failureModes": [
           "iron and brass collapse into one value",
           "baked studio light is treated as albedo"
@@ -601,12 +563,7 @@
       "subtle handled-metal polish"
     ],
     "fpsTarget": 60,
-    "reviewViewpoints": [
-      "front",
-      "side",
-      "rear",
-      "front-three-quarter"
-    ]
+    "reviewViewpoints": ["front", "side", "rear", "front-three-quarter"]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -646,13 +603,7 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -693,158 +644,81 @@
       "id": "bank-width-roof-profile",
       "name": "Low wide office with restrained teal gable and dormer",
       "tier": "critical",
-      "passIds": [
-        "blockout"
-      ],
+      "passIds": ["blockout"],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": [
-        "foundation",
-        "office-shell",
-        "roof-dormer"
-      ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["foundation", "office-shell", "roof-dormer"],
+      "evidenceRefs": ["front", "rear", "hero"]
     },
     {
       "id": "teller-grille-service",
       "name": "Readable brass teller grille and counter",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.78,
       "mustPass": true,
-      "componentRefs": [
-        "teller-bay"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["teller-bay"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "ironbound-door-read",
       "name": "Broad ironbound service door",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.75,
       "mustPass": true,
-      "componentRefs": [
-        "ironbound-door"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["ironbound-door"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "vault-wheel-security",
       "name": "Exterior side vault wheel and reinforced bars",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "material-pass"
-      ],
+      "passIds": ["structural-pass", "material-pass"],
       "minimumScore": 0.78,
       "mustPass": true,
-      "componentRefs": [
-        "vault-wheel",
-        "barred-window-system"
-      ],
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["vault-wheel", "barred-window-system"],
+      "evidenceRefs": ["side", "hero"]
     },
     {
       "id": "metal-value-hierarchy",
       "name": "Iron, brass, and amber focal hierarchy",
       "tier": "critical",
-      "passIds": [
-        "material-pass",
-        "surface-pass"
-      ],
+      "passIds": ["material-pass", "surface-pass"],
       "minimumScore": 0.72,
       "mustPass": true,
-      "componentRefs": [
-        "teller-bay",
-        "ironbound-door",
-        "vault-wheel",
-        "lantern-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["teller-bay", "ironbound-door", "vault-wheel", "lantern-system"],
+      "evidenceRefs": ["front", "side", "hero"]
     },
     {
       "id": "attached-service-props",
       "name": "Chest, barrel, gutter, rope posts, and blank shield",
       "tier": "important",
-      "passIds": [
-        "structural-pass"
-      ],
+      "passIds": ["structural-pass"],
       "minimumScore": 0.68,
       "mustPass": false,
-      "componentRefs": [
-        "service-props",
-        "blank-shield-sign",
-        "chimney-gutter"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["service-props", "blank-shield-sign", "chimney-gutter"],
+      "evidenceRefs": ["front", "side", "hero"]
     },
     {
       "id": "reinforcement-cadence",
       "name": "Strap, bolt, bar, block, and shingle cadence",
       "tier": "important",
-      "passIds": [
-        "surface-pass"
-      ],
+      "passIds": ["surface-pass"],
       "minimumScore": 0.68,
       "mustPass": false,
-      "componentRefs": [
-        "foundation",
-        "office-shell",
-        "roof-dormer",
-        "barred-window-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["foundation", "office-shell", "roof-dormer", "barred-window-system"],
+      "evidenceRefs": ["front", "rear", "hero"]
     },
     {
       "id": "clear-teller-apron",
       "name": "Floor seating and unobstructed teller apron",
       "tier": "important",
-      "passIds": [
-        "optimization-pass"
-      ],
+      "passIds": ["optimization-pass"],
       "minimumScore": 0.7,
       "mustPass": false,
-      "componentRefs": [
-        "root",
-        "teller-bay",
-        "service-props"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["root", "teller-bay", "service-props"],
+      "evidenceRefs": ["front", "hero"]
     }
   ],
   "sculptPipeline": {
@@ -883,18 +757,8 @@
       "localOverridesRequired": true,
       "minimumTextureResolution": 512,
       "preferredTextureResolution": 512,
-      "independentMapChannels": [
-        "albedo",
-        "roughness",
-        "height",
-        "normal",
-        "ambient-occlusion"
-      ],
-      "requiredSurfaceFrequencyBands": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
       "geometryReliefRequiredWhenSilhouetteAffected": true,
       "referencePbrExtraction": {
         "requiredWhenSourceImagePresent": false,
@@ -996,11 +860,7 @@
       "foundation about 16 percent of total height"
     ],
     "symmetry": "ordered front mass with asymmetrical teller/door bays, side vault wheel, chest, gutter, and sign",
-    "dominantCurves": [
-      "shallow gable slopes",
-      "arched door and windows",
-      "circular vault wheel"
-    ],
+    "dominantCurves": ["shallow gable slopes", "arched door and windows", "circular vault wheel"],
     "negativeSpaces": [
       "teller grille openings",
       "porch posts",
@@ -1119,36 +979,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1164,16 +1004,8 @@
         "sockets": [],
         "collider": {
           "type": "compound",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -1188,9 +1020,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1205,12 +1035,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural"
     },
@@ -1245,36 +1070,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          0,
-          0.575,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.575, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1290,16 +1095,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -1314,9 +1111,7 @@
         }
       },
       "material": "stone",
-      "materialLayers": [
-        "stone"
-      ],
+      "materialLayers": ["stone"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1340,12 +1135,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1386,36 +1176,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          0,
-          2.8,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 2.8, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1431,16 +1201,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -1455,9 +1217,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1481,12 +1241,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1527,36 +1282,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          0,
-          5.65,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 5.65, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1572,16 +1307,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -1596,9 +1323,7 @@
         }
       },
       "material": "roof",
-      "materialLayers": [
-        "roof"
-      ],
+      "materialLayers": ["roof"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1622,12 +1347,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1668,36 +1388,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          -1.05,
-          2.55,
-          2.93
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-1.05, 2.55, 2.93],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1713,16 +1413,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -1737,9 +1429,7 @@
         }
       },
       "material": "brass",
-      "materialLayers": [
-        "brass"
-      ],
+      "materialLayers": ["brass"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1771,10 +1461,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1815,36 +1502,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          1.75,
-          2.05,
-          2.95
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [1.75, 2.05, 2.95],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1860,16 +1527,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -1884,9 +1543,7 @@
         }
       },
       "material": "metal",
-      "materialLayers": [
-        "metal"
-      ],
+      "materialLayers": ["metal"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1910,10 +1567,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1954,36 +1608,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          0,
-          3,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 3, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1999,16 +1633,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -2023,9 +1649,7 @@
         }
       },
       "material": "warm",
-      "materialLayers": [
-        "warm"
-      ],
+      "materialLayers": ["warm"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2049,12 +1673,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2095,36 +1714,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          -3.43,
-          3.05,
-          -0.25
-        ],
-        "rotation": [
-          0,
-          1.5707963267948966,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-3.43, 3.05, -0.25],
+        "rotation": [0, 1.5707963267948966, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2140,16 +1739,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -2164,9 +1755,7 @@
         }
       },
       "material": "metal",
-      "materialLayers": [
-        "metal"
-      ],
+      "materialLayers": ["metal"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2190,10 +1779,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["side", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2228,24 +1814,12 @@
       "attachment": {
         "parentId": "office-shell",
         "parentSocket": "exterior-service-footing",
-        "localStart": [
-          -1.4,
-          0,
-          0
-        ],
-        "localEnd": [
-          1.4,
-          0,
-          0
-        ],
+        "localStart": [-1.4, 0, 0],
+        "localEnd": [1.4, 0, 0],
         "contactType": "overlap",
         "overlap": 0.06,
         "gapTolerance": 0.02,
-        "evidenceRefs": [
-          "side",
-          "rear",
-          "hero"
-        ]
+        "evidenceRefs": ["side", "rear", "hero"]
       },
       "dimensions": {
         "width": 2.8,
@@ -2255,36 +1829,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          -2.75,
-          1.15,
-          1.75
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-2.75, 1.15, 1.75],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2300,16 +1854,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -2324,9 +1870,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2366,11 +1910,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2411,36 +1951,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          3.65,
-          3.15,
-          2.75
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [3.65, 3.15, 2.75],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2456,16 +1976,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -2480,9 +1992,7 @@
         }
       },
       "material": "brass",
-      "materialLayers": [
-        "brass"
-      ],
+      "materialLayers": ["brass"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2506,10 +2016,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2550,36 +2057,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          -1.45,
-          5.9,
-          -1.35
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-1.45, 5.9, -1.35],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2595,16 +2082,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -2619,9 +2098,7 @@
         }
       },
       "material": "stone",
-      "materialLayers": [
-        "stone"
-      ],
+      "materialLayers": ["stone"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2645,10 +2122,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["side", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2689,36 +2163,16 @@
         "confidence": 0.89
       },
       "transform": {
-        "position": [
-          0.3,
-          3.35,
-          3.25
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0.3, 3.35, 3.25],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2734,16 +2188,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; Fenbridge layout owns shipping collision."
         },
@@ -2758,9 +2204,7 @@
         }
       },
       "material": "warm",
-      "materialLayers": [
-        "warm"
-      ],
+      "materialLayers": ["warm"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2784,10 +2228,7 @@
         "edgeWearPattern": "controlled edge polish on handled metal",
         "notes": "Generated studio light is not copied into albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2808,16 +2249,11 @@
       "color": "#4E5650",
       "albedo": {
         "dominant": "#4E5650",
-        "secondary": [
-          "#74776B"
-        ],
+        "secondary": ["#74776B"],
         "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#4E5650",
-          "#74776B"
-        ],
+        "palette": ["#4E5650", "#74776B"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.1,
         "heightCorrelation": 0.15
@@ -2825,10 +2261,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2902,10 +2335,7 @@
           "roughness": 0.96,
           "dirtAmount": 0.18,
           "cavityBias": true,
-          "evidenceRefs": [
-            "side",
-            "hero"
-          ]
+          "evidenceRefs": ["side", "hero"]
         }
       ],
       "shaderNotes": [
@@ -2923,16 +2353,11 @@
       "color": "#34271E",
       "albedo": {
         "dominant": "#34271E",
-        "secondary": [
-          "#765236"
-        ],
+        "secondary": ["#765236"],
         "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#34271E",
-          "#765236"
-        ],
+        "palette": ["#34271E", "#765236"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.1,
         "heightCorrelation": 0.15
@@ -2940,10 +2365,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3015,10 +2437,7 @@
           "region": "teller ledge and porch rail crowns",
           "color": "#765236",
           "roughness": 0.62,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3036,16 +2455,11 @@
       "color": "#176269",
       "albedo": {
         "dominant": "#176269",
-        "secondary": [
-          "#2D8585"
-        ],
+        "secondary": ["#2D8585"],
         "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#176269",
-          "#2D8585"
-        ],
+        "palette": ["#176269", "#2D8585"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.1,
         "heightCorrelation": 0.15
@@ -3053,10 +2467,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3128,10 +2539,7 @@
           "region": "lower shingle edges and dormer trim",
           "color": "#103A3C",
           "roughness": 0.82,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3149,16 +2557,11 @@
       "color": "#34383A",
       "albedo": {
         "dominant": "#34383A",
-        "secondary": [
-          "#62676A"
-        ],
+        "secondary": ["#62676A"],
         "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#34383A",
-          "#62676A"
-        ],
+        "palette": ["#34383A", "#62676A"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.1,
         "heightCorrelation": 0.15
@@ -3166,10 +2569,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3241,11 +2641,7 @@
           "region": "door pull, vault hub, and chest lock",
           "color": "#62676A",
           "roughness": 0.22,
-          "evidenceRefs": [
-            "front",
-            "side",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "side", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3263,16 +2659,11 @@
       "color": "#9B762D",
       "albedo": {
         "dominant": "#9B762D",
-        "secondary": [
-          "#D1A952"
-        ],
+        "secondary": ["#D1A952"],
         "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#9B762D",
-          "#D1A952"
-        ],
+        "palette": ["#9B762D", "#D1A952"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.1,
         "heightCorrelation": 0.15
@@ -3280,10 +2671,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3355,10 +2743,7 @@
           "region": "teller bar and shield bevel crowns",
           "color": "#D1A952",
           "roughness": 0.2,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3376,16 +2761,11 @@
       "color": "#FFA43A",
       "albedo": {
         "dominant": "#FFA43A",
-        "secondary": [
-          "#FFDD77"
-        ],
+        "secondary": ["#FFDD77"],
         "samplingNotes": "Observed from neutral turnaround areas; baked highlights and shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#FFA43A",
-          "#FFDD77"
-        ],
+        "palette": ["#FFA43A", "#FFDD77"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.1,
         "heightCorrelation": 0.15
@@ -3393,10 +2773,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3469,12 +2846,7 @@
           "emissive": "#FFDD77",
           "emissiveIntensity": 1.02,
           "roughness": 0.24,
-          "evidenceRefs": [
-            "front",
-            "side",
-            "rear",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "side", "rear", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3493,11 +2865,7 @@
       "geometry": "staggered low-profile course boxes",
       "instances": 30,
       "distribution": "five courses over both main slopes plus shallow front canopy",
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "evidenceRefs": ["front", "rear", "hero"]
     },
     {
       "id": "security-bar-and-fastener-system",
@@ -3507,23 +2875,14 @@
       "geometry": "bars, straps, square plates, bolt heads, and radial spoke units",
       "instances": 38,
       "distribution": "teller, windows, door, wall frames, chest, and vault wheel",
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     }
   ],
   "buildPasses": [
     {
       "id": "blockout",
       "goal": "Match macro silhouette and proportions.",
-      "componentRefs": [
-        "foundation",
-        "office-shell",
-        "roof-dormer"
-      ],
+      "componentRefs": ["foundation", "office-shell", "roof-dormer"],
       "acceptance": [
         "Silhouette reads correctly without materials.",
         "Quality contract has named all required macro feature groups before code generation.",
@@ -4253,9 +3612,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4353,9 +3710,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4452,9 +3807,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4551,9 +3904,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4650,9 +4001,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4749,9 +4098,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4848,9 +4195,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4892,9 +4237,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4924,11 +4267,7 @@
     "maxShippingPrimitives": 2,
     "maxShippingMaterials": 2,
     "embeddedTextures": 0,
-    "nativeDimensionsYards": [
-      7.5,
-      7.4,
-      6.5
-    ],
+    "nativeDimensionsYards": [7.5, 7.4, 6.5],
     "placementCount": 1,
     "fpsTarget": 60,
     "optimizationPolicy": "Group bars, straps, bolts, shingles, and stone cadence before simplifying teller, door, wheel, or attached service silhouettes."

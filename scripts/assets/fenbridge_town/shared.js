@@ -939,6 +939,215 @@ export function addLantern(buckets, position, scale = 1, glow = 'warm') {
   }
 }
 
+/**
+ * Exterior-only multi-round polish (R16-30 style densify). Adds weathering,
+ * iron hardware, moss, eave locks, and sparse corner clutter with NO interior
+ * volumes. Keep clearFront half-width free for service sockets and door bays.
+ */
+export function addExteriorPolishRounds(
+  buckets,
+  {
+    frontZ,
+    rearZ,
+    wallBottom,
+    wallTop,
+    bodyW,
+    bodyD,
+    baseH = 0.45,
+    clearFront = 0.85,
+    density = 1,
+    rainOnlyFront = false,
+    skipClutter = false,
+    fenlight = false,
+  },
+) {
+  const halfW = bodyW * 0.5;
+  const halfD = bodyD * 0.5;
+  const rear = rearZ ?? -frontZ;
+  const d = Math.max(0.55, Math.min(1.35, density));
+
+  // R16-18: denser eave fascia seats the roof to the shell on all four sides.
+  for (const z of [frontZ * 0.98, rear * 0.98]) {
+    addBox(
+      buckets,
+      'timber',
+      [bodyW * 1.12, 0.11, 0.1],
+      [0, wallTop + 0.015, z],
+      FENBRIDGE_PALETTE.timberDark,
+    );
+    addBox(
+      buckets,
+      'timber',
+      [bodyW * 1.05, 0.06, 0.07],
+      [0, wallTop - 0.08, z * 0.99],
+      FENBRIDGE_PALETTE.timberDeep,
+    );
+  }
+  for (const x of [-halfW * 1.0, halfW * 1.0]) {
+    addBox(
+      buckets,
+      'timber',
+      [0.1, 0.11, bodyD * 1.08],
+      [x, wallTop + 0.015, 0],
+      FENBRIDGE_PALETTE.timberDark,
+    );
+  }
+
+  // R19-21: rain-dark streaks under eaves (swamp weathering hierarchy).
+  const rainXs = [];
+  const span = halfW * 0.92;
+  const rainN = Math.max(3, Math.round(5 * d));
+  for (let i = 0; i < rainN; i += 1) {
+    const x = -span + (span * 2 * (i + 0.5)) / rainN;
+    if (Math.abs(x) < clearFront * 0.55) continue;
+    rainXs.push(x);
+  }
+  for (const [i, x] of rainXs.entries()) {
+    const h = 1.05 + (i % 3) * 0.35 * d;
+    const y = wallBottom + (wallTop - wallBottom) * (0.45 + (i % 4) * 0.08);
+    addBox(
+      buckets,
+      'timber',
+      [0.09, h, 0.055],
+      [x, y, frontZ - 0.02],
+      i % 2 === 0 ? FENBRIDGE_PALETTE.timberDeep : FENBRIDGE_PALETTE.timberDark,
+    );
+    if (!rainOnlyFront) {
+      addBox(
+        buckets,
+        'timber',
+        [0.09, h * 0.85, 0.055],
+        [x * 0.9, y - 0.1, rear + 0.02],
+        FENBRIDGE_PALETTE.timberDeep,
+      );
+    }
+  }
+  // Side elevation streaks (exterior only).
+  for (const side of [-1, 1]) {
+    for (const [j, z] of [-halfD * 0.55, halfD * 0.35].entries()) {
+      addBox(
+        buckets,
+        'timber',
+        [0.055, 1.15 + j * 0.25, 0.09],
+        [side * halfW * 0.97, wallBottom + (wallTop - wallBottom) * 0.55, z],
+        FENBRIDGE_PALETTE.timberDeep,
+      );
+    }
+  }
+
+  // R22-24: iron stud grids on corners + mid belts (hardware density).
+  const studYs = [];
+  const studRows = Math.max(2, Math.round(3 * d));
+  for (let r = 0; r < studRows; r += 1) {
+    studYs.push(wallBottom + ((wallTop - wallBottom) * (r + 1)) / (studRows + 1));
+  }
+  for (const x of [-halfW * 0.94, halfW * 0.94]) {
+    for (const z of [frontZ - 0.03, rear + 0.03]) {
+      for (const y of studYs) {
+        addBox(
+          buckets,
+          'metal',
+          [0.07, 0.07, 0.055],
+          [x * 1.03, y, z * 1.01],
+          FENBRIDGE_PALETTE.ironLight,
+        );
+      }
+    }
+  }
+  for (const x of [-halfW * 0.55, halfW * 0.55]) {
+    if (Math.abs(x) < clearFront * 0.4) continue;
+    for (const y of studYs) {
+      addBox(buckets, 'metal', [0.09, 0.09, 0.06], [x, y, frontZ + 0.02], FENBRIDGE_PALETTE.iron);
+    }
+  }
+
+  // R25-26: moss pads and wet footing stains (swamp base read).
+  const moss = [
+    [-halfW * 0.85, halfD * 0.9],
+    [halfW * 0.85, halfD * 0.88],
+    [-halfW * 0.8, -halfD * 0.85],
+    [halfW * 0.82, -halfD * 0.8],
+    [0, -halfD * 0.95],
+  ];
+  for (const [i, [x, z]] of moss.entries()) {
+    if (Math.abs(x) < clearFront * 0.5 && z > 0) continue;
+    addBox(
+      buckets,
+      'stone',
+      [0.42 + (i % 2) * 0.12, 0.08, 0.32],
+      [x, baseH * 0.55, z],
+      i % 3 === 0 ? FENBRIDGE_PALETTE.moss : FENBRIDGE_PALETTE.stoneDeep,
+    );
+  }
+
+  // R27-28: bargeboard / gable edge ribs (side silhouette).
+  for (const end of [-1, 1]) {
+    const z = end * (halfD + 0.06);
+    const rise = wallTop + (wallTop - wallBottom) * 0.08;
+    for (let row = 0; row < Math.max(3, Math.round(4 * d)); row += 1) {
+      const t = (row + 0.4) / Math.max(3, Math.round(4 * d));
+      const y = wallTop + 0.04 + (rise - wallTop + 0.55) * t;
+      const w = Math.max(0.35, bodyW * (1 - t) * 0.48);
+      addBox(
+        buckets,
+        'timber',
+        [w, 0.09, 0.07],
+        [0, y, z],
+        row % 2 ? FENBRIDGE_PALETTE.timber : FENBRIDGE_PALETTE.timberLight,
+      );
+    }
+  }
+
+  // R29: corner lantern arms (off the approach center).
+  const glow = fenlight ? 'fenlight' : 'warm';
+  addBox(
+    buckets,
+    'timber',
+    [0.55, 0.09, 0.09],
+    [-halfW * 0.92, wallBottom + (wallTop - wallBottom) * 0.72, frontZ * 0.55],
+    FENBRIDGE_PALETTE.timberDark,
+  );
+  addLantern(
+    buckets,
+    [-halfW * 1.05, wallBottom + (wallTop - wallBottom) * 0.62, frontZ * 0.55],
+    0.72,
+    glow,
+  );
+  addBox(
+    buckets,
+    'timber',
+    [0.55, 0.09, 0.09],
+    [halfW * 0.92, wallBottom + (wallTop - wallBottom) * 0.68, rear * 0.4],
+    FENBRIDGE_PALETTE.timberDark,
+  );
+  addLantern(
+    buckets,
+    [halfW * 1.05, wallBottom + (wallTop - wallBottom) * 0.58, rear * 0.4],
+    0.68,
+    glow,
+  );
+
+  // R30: sparse exterior clutter, never on clear front approach.
+  if (!skipClutter) {
+    addBarrel(buckets, [halfW * 0.95, baseH + 0.32, -halfD * 0.75], 0.62 * d);
+    addBarrel(buckets, [halfW * 1.05, baseH + 0.28, -halfD * 0.45], 0.48 * d);
+    addCrate(buckets, [-halfW * 0.95, baseH + 0.05, -halfD * 0.7], [0.42, 0.32, 0.38]);
+    // Rope wraps on rear stilts / corners.
+    for (const x of [-halfW * 0.9, halfW * 0.9]) {
+      addCylinder(
+        buckets,
+        'cloth',
+        0.12,
+        0.12,
+        0.09,
+        5,
+        [x, wallBottom + 0.55, rear * 0.85],
+        FENBRIDGE_PALETTE.rope,
+      );
+    }
+  }
+}
+
 function draftBounds(buckets) {
   const bounds = new THREE.Box3().makeEmpty();
   for (const geometries of Object.values(buckets)) {

@@ -36,7 +36,6 @@ import type { DelveModuleId } from '../sim/delve_layout';
 import { generateRiftFloor, riftLiftAt } from '../sim/rift/rift_gen';
 import type { BiomeId, ZoneDef } from '../sim/types';
 import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
-import { isAtSowfield } from '../sim/vale_cup_layout';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
@@ -120,8 +119,6 @@ import {
   animCadenceFrames,
   type CharacterLodBands,
   characterLodBandsInto,
-  crowdLodScaleSq,
-  midAnimCadence,
   showsStaticFarMesh,
 } from './crowd_lod';
 import { daisVisualLift } from './dais_lift';
@@ -1505,7 +1502,6 @@ export class Renderer {
   private sunUp = 1;
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
-  private sunAzimuth = new THREE.Vector3(SUN_DIR.x, 0, SUN_DIR.z).normalize();
   private waterView: WaterView;
   private lastWaterSimulationPasses = 0;
   private terrainView: TerrainView;

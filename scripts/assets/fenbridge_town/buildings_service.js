@@ -9,6 +9,7 @@ import {
   addBox,
   addCrate,
   addCylinder,
+  addExteriorPolishRounds,
   addGeometry,
   addLantern,
   addMasonryCourse,
@@ -21,11 +22,10 @@ import {
   addSteps,
   addTorus,
   addVerticalPlankFace,
-  buildUnapprovedPlaceholder,
   FENBRIDGE_PALETTE as P,
 } from './shared.js';
 
-function addFoundation(buckets, width, depth, height = 0.36, centerX = 0, centerZ = 0) {
+function _addFoundation(buckets, width, depth, height = 0.36, centerX = 0, centerZ = 0) {
   addBox(buckets, 'stone', [width, height, depth], [centerX, height / 2, centerZ], P.stoneDeep);
   addBox(
     buckets,
@@ -62,7 +62,7 @@ function addFoundation(buckets, width, depth, height = 0.36, centerX = 0, center
   }
 }
 
-function addTimberShell(buckets, options) {
+function _addTimberShell(buckets, options) {
   const { width, depth, wallHeight, peakY, centerX = 0, centerZ = 0, ridgeAxis = 'x' } = options;
   const wallBottom = 0.42;
   const wallBody = wallHeight - wallBottom;
@@ -269,7 +269,7 @@ function addExteriorWindow(
   }
 }
 
-function addBasestoneRhythm(buckets, { width, depth, centerX = 0, centerZ = 0 }) {
+function _addBasestoneRhythm(buckets, { width, depth, centerX = 0, centerZ = 0 }) {
   const rearZ = centerZ - depth * 0.455;
   for (const [index, fraction] of [-0.36, -0.12, 0.12, 0.36].entries()) {
     addBox(
@@ -293,7 +293,7 @@ function addBasestoneRhythm(buckets, { width, depth, centerX = 0, centerZ = 0 })
   }
 }
 
-function addSideAndRearFraming(buckets, { width, depth, wallHeight, centerX = 0, centerZ = 0 }) {
+function _addSideAndRearFraming(buckets, { width, depth, wallHeight, centerX = 0, centerZ = 0 }) {
   const rearZ = centerZ - depth * 0.442;
   const frameHeight = wallHeight - 0.68;
   const frameY = 0.52 + frameHeight / 2;
@@ -357,7 +357,7 @@ function addSideAndRearFraming(buckets, { width, depth, wallHeight, centerX = 0,
   }
 }
 
-function addRoofStructure(buckets, { width, depth, eaveY, peakY, centerX = 0, centerZ = 0 }) {
+function _addRoofStructure(buckets, { width, depth, eaveY, peakY, centerX = 0, centerZ = 0 }) {
   const halfDepth = depth / 2;
   for (const side of [-1, 1]) {
     const x = centerX + side * width * 0.49;
@@ -515,12 +515,12 @@ function addDormer(buckets, x, y, z, scale = 1) {
   }
 }
 
-function addChimney(buckets, x, z, baseY, height) {
+function _addChimney(buckets, x, z, baseY, height) {
   addBox(buckets, 'stone', [0.56, height, 0.56], [x, baseY + height / 2, z], P.stoneDeep);
   addBox(buckets, 'stone', [0.72, 0.22, 0.72], [x, baseY + height - 0.08, z], P.stoneLight);
 }
 
-function addCrookedApothecaryVent(buckets, x, z, baseY) {
+function _addCrookedApothecaryVent(buckets, x, z, baseY) {
   addBox(buckets, 'metal', [0.62, 1.12, 0.62], [x, baseY + 0.56, z], P.brass);
   addBox(
     buckets,
@@ -598,7 +598,7 @@ function addTiedBand(buckets, x, y, z, scale) {
   addBox(buckets, 'cloth', [0.36 * scale, 0.05, 0.08], [x, y, z], P.rope);
 }
 
-function addBentRoofTrim(buckets, options) {
+function _addBentRoofTrim(buckets, options) {
   const { width, eaveY, peakY, frontZ, backZ, centerX = 0, centerZ = 0 } = options;
   const profile = options.profile ?? [
     [-0.54, 0.62],
@@ -817,7 +817,7 @@ function addTanningVat(buckets, x, y, z, scale = 1) {
   }
 }
 
-function addStreamer(buckets, x, y, z, direction, scale = 1) {
+function _addStreamer(buckets, x, y, z, direction, scale = 1) {
   const shape = new THREE.Shape();
   shape.moveTo(0, 0.08 * scale);
   shape.lineTo(direction * 1.8 * scale, 0.02 * scale);
@@ -835,7 +835,7 @@ function addStreamer(buckets, x, y, z, direction, scale = 1) {
   addGeometry(buckets, 'cloth', geometry, P.clothTeal, { position: [x, y, z] });
 }
 
-function addApothecaryEntryHierarchy(buckets) {
+function _addApothecaryEntryHierarchy(buckets) {
   addPitchedRoof(buckets, 'roof', 2.3, 1.04, 3.12, 3.78, P.roofDeep, {
     ridgeAxis: 'z',
     center: [0, 0, 3.12],
@@ -886,7 +886,7 @@ function addApothecaryEntryHierarchy(buckets) {
   addCrate(buckets, [-0.92, 0.52, 3.24], [0.62, 0.52, 0.54]);
 }
 
-function addApothecaryCraftStation(buckets) {
+function _addApothecaryCraftStation(buckets) {
   const benchX = -2.24;
   const benchZ = 3.02;
   addBox(buckets, 'timber', [2.42, 0.18, 0.76], [benchX, 1.02, benchZ], P.timberLight);
@@ -936,7 +936,7 @@ function addApothecaryCraftStation(buckets) {
   addBox(buckets, 'metal', [1.5, 0.045, 0.42], [-2.16, 0.64, 3.56], P.water);
 }
 
-function addScoutLookoutMass(buckets) {
+function _addScoutLookoutMass(buckets) {
   const centerX = -2.85;
   const centerZ = -0.95;
   addBox(buckets, 'stone', [1.95, 0.5, 1.95], [centerX, 0.48, centerZ], P.stoneDeep);
@@ -1364,6 +1364,35 @@ export function buildCrookedReedInn(buckets) {
   addLantern(buckets, [2.35, deckY + 2.5, porchFront - 0.48], 0.7);
   addLantern(buckets, [4.15, deckY + 2.25, porchZ + 0.25], 0.65);
   addLantern(buckets, [-4.05, deckY + 2.3, -bodyD * 0.12], 0.62, 'fenlight');
+
+  // R16-30 exterior polish: keep door bay (front-entry x=-2.8) clear.
+  addExteriorPolishRounds(buckets, {
+    frontZ: bodyD * 0.5,
+    rearZ: -bodyD * 0.5,
+    wallBottom: deckY + 0.05,
+    wallTop: deckY + 3.55,
+    bodyW,
+    bodyD,
+    baseH: deckY,
+    clearFront: 1.4,
+    density: 0.95,
+    fenlight: true,
+  });
+  // Inn porch post nail heads + chimney iron cap bolts.
+  for (const x of [-3.6, -1.9, 1.2, 3.4]) {
+    for (const y of [deckY + 0.45, deckY + 1.85]) {
+      addBox(buckets, 'metal', [0.05, 0.05, 0.04], [x, y, bodyD * 0.5 + 0.35], P.ironLight);
+    }
+  }
+  for (const a of [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2]) {
+    addBox(
+      buckets,
+      'metal',
+      [0.08, 0.06, 0.08],
+      [Math.cos(a) * 0.35 + 3.2, deckY + 5.1, Math.sin(a) * 0.35 - 0.4],
+      P.iron,
+    );
+  }
 }
 
 /**
@@ -1571,6 +1600,40 @@ export function buildMoonwortApothecary(buckets) {
   for (const z of [frontZ * 0.98, -frontZ * 0.98]) {
     addBox(buckets, 'timber', [bodyW * 1.1, 0.12, 0.1], [0, wallTop + 0.02, z], P.timberDark);
   }
+
+  // R16-30 exterior polish: herb counter (1.9, front) stays serviceable.
+  addExteriorPolishRounds(buckets, {
+    frontZ,
+    rearZ: -bodyD * 0.5,
+    wallBottom,
+    wallTop,
+    bodyW,
+    bodyD,
+    baseH: deckY,
+    clearFront: 1.05,
+    density: 1.12,
+    fenlight: true,
+  });
+  for (const [x, y] of [
+    [2.15, wallBottom + 2.45],
+    [2.35, wallBottom + 2.2],
+    [2.0, wallBottom + 2.65],
+  ]) {
+    addBox(buckets, 'organic', [0.12, 0.35, 0.1], [x, y, frontZ - 0.05], P.herb);
+    addCylinder(buckets, 'cloth', 0.02, 0.02, 0.2, 4, [x, y + 0.25, frontZ - 0.05], P.rope);
+  }
+  for (const dx of [0, 0.18, 0.36]) {
+    addCylinder(
+      buckets,
+      'organic',
+      0.06,
+      0.06,
+      0.18,
+      5,
+      [2.1 + dx, wallBottom + 1.45, frontZ + 0.35],
+      dx === 0.18 ? P.potionGlass : P.herb,
+    );
+  }
 }
 
 /**
@@ -1604,7 +1667,7 @@ export function buildHeskTannery(buckets) {
   const wingRear = -wingD * 0.42;
   // Lean-to roof sits well below main eaves (concept lower wing).
   const wingEaveY = deckY + 2.95;
-  const wingPeakY = deckY + 3.55;
+  const _wingPeakY = deckY + 3.55;
 
   // ---- Round 1: wide stilt apron ----
   addRaisedPilingDeck(buckets, 11.85, 7.05, {
@@ -2378,6 +2441,36 @@ export function buildHeskTannery(buckets) {
       [0, 0, 0.15],
     );
   }
+
+  // R16-30 exterior polish: station apron (~2.75, 2.8) stays clear of new clutter.
+  addExteriorPolishRounds(buckets, {
+    frontZ,
+    rearZ,
+    wallBottom,
+    wallTop,
+    bodyW: bodyW + wingW * 0.35,
+    bodyD,
+    baseH: deckY,
+    clearFront: 1.2,
+    density: 0.9,
+    skipClutter: true,
+  });
+  // Extra hide frames silhouette density on the open bay (exterior only).
+  for (let i = 0; i < 3; i += 1) {
+    const x = wingCx - 0.8 + i * 0.7;
+    addBox(buckets, 'timber', [0.08, 1.55, 0.08], [x, deckY + 1.0, wingFront - 0.15], P.timberDark);
+    addBox(buckets, 'cloth', [0.55, 0.9, 0.04], [x, deckY + 1.15, wingFront - 0.12], P.hide);
+  }
+  // Drain run stones along craft bay front.
+  for (let i = 0; i < 6; i += 1) {
+    addBox(
+      buckets,
+      'stone',
+      [0.35, 0.08, 0.22],
+      [wingCx - 1.4 + i * 0.55, deckY + 0.05, wingFront + 0.35],
+      i % 2 ? P.moss : P.stoneDeep,
+    );
+  }
 }
 
 /**
@@ -2587,4 +2680,30 @@ export function buildScoutLodge(buckets) {
   for (const y of [wallBottom + wallH * 0.4, wallBottom + wallH * 0.7]) {
     addBox(buckets, 'timber', [bodyW * 0.95, 0.12, 0.12], [0, y, frontZ - 0.02], P.timberDark);
   }
+
+  // R16-30 exterior polish: map table lean-to (3.2, front) stays clear.
+  addExteriorPolishRounds(buckets, {
+    frontZ,
+    rearZ: -bodyD * 0.5,
+    wallBottom,
+    wallTop,
+    bodyW,
+    bodyD,
+    baseH: deckY,
+    clearFront: 1.1,
+    density: 1.08,
+  });
+  // Lookout tower rail studs + pennant mast wrap.
+  for (const y of [wallTop + 0.4, wallTop + 0.9, wallTop + 1.35]) {
+    addBox(buckets, 'metal', [0.5, 0.06, 0.5], [-2.0, y, -0.3], P.ironLight);
+  }
+  addCylinder(buckets, 'cloth', 0.05, 0.05, 0.9, 5, [-2.0, wallTop + 1.7, -0.3], P.rope);
+  addBox(
+    buckets,
+    'cloth',
+    [0.08, 0.55, 0.35],
+    [-1.7, wallTop + 1.55, -0.3],
+    P.clothTeal,
+    [0, 0, -0.2],
+  );
 }

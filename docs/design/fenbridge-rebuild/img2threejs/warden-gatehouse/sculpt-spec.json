@@ -48,11 +48,7 @@
       "pitch": -14,
       "roll": 0
     },
-    "positionHint": [
-      8,
-      7,
-      12
-    ],
+    "positionHint": [8, 7, 12],
     "note": "The sheet is orthographic-like and is not used for pixel projection. Match each admitted elevation independently during review."
   },
   "suitability": "conditional",
@@ -69,22 +65,9 @@
     "objectClass": {
       "primaryType": "fortified timber gatehouse and watchtower",
       "primaryDomain": "object",
-      "formLanguage": [
-        "architectural",
-        "hard-surface",
-        "asymmetric",
-        "silhouette-led"
-      ],
-      "structureKind": [
-        "layered exterior shell",
-        "branching hierarchy",
-        "repeated modules"
-      ],
-      "motionPotential": [
-        "static world building",
-        "future lantern sway",
-        "future banner flutter"
-      ],
+      "formLanguage": ["architectural", "hard-surface", "asymmetric", "silhouette-led"],
+      "structureKind": ["layered exterior shell", "branching hierarchy", "repeated modules"],
+      "motionPotential": ["static world building", "future lantern sway", "future banner flutter"],
       "materialFamilies": [
         "damp stone",
         "rain-dark timber",
@@ -123,11 +106,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -414,12 +393,7 @@
         "qualityCriteria": [
           "The stone base stays broad and low while the timber tower remains narrow and vertically dominant."
         ],
-        "evidenceRefs": [
-          "front",
-          "left",
-          "rear",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "left", "rear", "hero"],
         "failureModes": [
           "tower reads as a generic square house",
           "foundation consumes too much of the height"
@@ -432,14 +406,8 @@
         "qualityCriteria": [
           "Steep roof slopes, central finial, and paired horn arcs remain legible from front and hero views."
         ],
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ],
-        "failureModes": [
-          "roof loses the horned identity",
-          "horns float away from eave collars"
-        ]
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["roof loses the horned identity", "horns float away from eave collars"]
       },
       {
         "id": "service-asymmetry",
@@ -448,12 +416,7 @@
         "qualityCriteria": [
           "The accessible front stair is balanced by offset balcony, lantern jib, and blank teal banner without blocking the apron."
         ],
-        "evidenceRefs": [
-          "front",
-          "left",
-          "rear",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "left", "rear", "hero"],
         "failureModes": [
           "facade becomes symmetrical and generic",
           "service stair or balcony has no readable negative space"
@@ -466,11 +429,7 @@
         "qualityCriteria": [
           "Grouped plank seams, diagonal braces, metal plates, bolts, stone courses, and shingles read without one mesh per mark."
         ],
-        "evidenceRefs": [
-          "front",
-          "rear",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "rear", "hero"],
         "failureModes": [
           "surface becomes flat plastic",
           "uniform detail density exceeds the triangle budget"
@@ -483,12 +442,7 @@
         "qualityCriteria": [
           "Amber shapes stay behind dark mullions and cage bars, subordinate to the roof silhouette."
         ],
-        "evidenceRefs": [
-          "front",
-          "left",
-          "rear",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "left", "rear", "hero"],
         "failureModes": [
           "unframed glow washes out construction",
           "windows lose arched mullion identity"
@@ -524,12 +478,7 @@
       "fine rain streaks"
     ],
     "fpsTarget": 60,
-    "reviewViewpoints": [
-      "front",
-      "left",
-      "rear",
-      "front-three-quarter"
-    ]
+    "reviewViewpoints": ["front", "left", "rear", "front-three-quarter"]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -569,13 +518,7 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -616,155 +559,81 @@
       "id": "tower-plinth-ratio",
       "name": "Narrow tower over stout plinth",
       "tier": "critical",
-      "passIds": [
-        "blockout"
-      ],
+      "passIds": ["blockout"],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": [
-        "foundation",
-        "tower-shell"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["foundation", "tower-shell"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "horned-roof-profile",
       "name": "Steep teal roof with paired horn arcs",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "form-refinement"
-      ],
+      "passIds": ["blockout", "form-refinement"],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": [
-        "roof-silhouette",
-        "horned-ridge"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["roof-silhouette", "horned-ridge"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "entry-stair-apron",
       "name": "Accessible front door, hood, and stair",
       "tier": "critical",
-      "passIds": [
-        "structural-pass"
-      ],
+      "passIds": ["structural-pass"],
       "minimumScore": 0.75,
       "mustPass": true,
-      "componentRefs": [
-        "entry-porch"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["entry-porch"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "asymmetric-service-cues",
       "name": "Offset balcony, lantern, banner, and rear rope",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.75,
       "mustPass": true,
-      "componentRefs": [
-        "lookout-balcony",
-        "lantern-jib",
-        "banner-mast",
-        "rear-rope-brace"
-      ],
-      "evidenceRefs": [
-        "left",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["lookout-balcony", "lantern-jib", "banner-mast", "rear-rope-brace"],
+      "evidenceRefs": ["left", "rear", "hero"]
     },
     {
       "id": "amber-frame-hierarchy",
       "name": "Amber windows and lantern contained by dark frames",
       "tier": "critical",
-      "passIds": [
-        "material-pass",
-        "surface-pass"
-      ],
+      "passIds": ["material-pass", "surface-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "window-system",
-        "lantern-jib"
-      ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["window-system", "lantern-jib"],
+      "evidenceRefs": ["front", "rear", "hero"]
     },
     {
       "id": "construction-cadence",
       "name": "Timber brace, shingle, stone, and fastener cadence",
       "tier": "important",
-      "passIds": [
-        "structural-pass",
-        "surface-pass"
-      ],
+      "passIds": ["structural-pass", "surface-pass"],
       "minimumScore": 0.7,
       "mustPass": false,
-      "componentRefs": [
-        "foundation",
-        "tower-shell",
-        "roof-silhouette"
-      ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["foundation", "tower-shell", "roof-silhouette"],
+      "evidenceRefs": ["front", "rear", "hero"]
     },
     {
       "id": "weathering-restraint",
       "name": "Moss and rain-darkening stay at contact zones",
       "tier": "important",
-      "passIds": [
-        "material-pass",
-        "surface-pass"
-      ],
+      "passIds": ["material-pass", "surface-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "foundation",
-        "tower-shell"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["foundation", "tower-shell"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "floor-seat-and-clearance",
       "name": "Floor seating and service-apron clearance",
       "tier": "important",
-      "passIds": [
-        "optimization-pass"
-      ],
+      "passIds": ["optimization-pass"],
       "minimumScore": 0.7,
       "mustPass": false,
-      "componentRefs": [
-        "root",
-        "entry-porch"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["root", "entry-porch"],
+      "evidenceRefs": ["front", "hero"]
     }
   ],
   "sculptPipeline": {
@@ -803,18 +672,8 @@
       "localOverridesRequired": true,
       "minimumTextureResolution": 512,
       "preferredTextureResolution": 512,
-      "independentMapChannels": [
-        "albedo",
-        "roughness",
-        "height",
-        "normal",
-        "ambient-occlusion"
-      ],
-      "requiredSurfaceFrequencyBands": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
       "geometryReliefRequiredWhenSilhouetteAffected": true,
       "referencePbrExtraction": {
         "requiredWhenSourceImagePresent": false,
@@ -915,23 +774,14 @@
       "plinth under 15 percent of total height"
     ],
     "symmetry": "mostly bilateral tower mass with deliberately asymmetric balcony, lantern, banner, and rear rope",
-    "dominantCurves": [
-      "steep roof slopes",
-      "paired upturned eave horns",
-      "sagging rear rope"
-    ],
+    "dominantCurves": ["steep roof slopes", "paired upturned eave horns", "sagging rear rope"],
     "negativeSpaces": [
       "open lookout rail",
       "lantern cage",
       "service stair gaps",
       "space below banner"
     ],
-    "landmarks": [
-      "central roof finial",
-      "front arched window",
-      "hooded door",
-      "offset balcony"
-    ]
+    "landmarks": ["central roof finial", "front arched window", "hooded door", "offset balcony"]
   },
   "viewEvidence": [
     {
@@ -1039,36 +889,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1084,16 +914,8 @@
         "sockets": [],
         "collider": {
           "type": "compound",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -1108,9 +930,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1125,12 +945,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "left",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "left", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural"
     },
@@ -1165,36 +980,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0.725,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.725, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1210,16 +1005,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -1234,9 +1021,7 @@
         }
       },
       "material": "stone",
-      "materialLayers": [
-        "stone"
-      ],
+      "materialLayers": ["stone"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1260,12 +1045,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "left",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "left", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1306,36 +1086,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          4.2,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 4.2, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1351,16 +1111,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -1375,9 +1127,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1417,12 +1167,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "left",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "left", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1463,36 +1208,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          8.3,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 8.3, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1508,16 +1233,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -1532,9 +1249,7 @@
         }
       },
       "material": "roof",
-      "materialLayers": [
-        "roof"
-      ],
+      "materialLayers": ["roof"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1558,12 +1273,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "left",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "left", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1604,36 +1314,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0.25,
-          1.6,
-          2.25
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0.25, 1.6, 2.25],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1649,16 +1339,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -1673,9 +1355,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1699,10 +1379,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1743,36 +1420,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          1.75,
-          5.1,
-          -0.65
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [1.75, 5.1, -0.65],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1788,16 +1445,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -1812,9 +1461,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1838,11 +1485,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "left",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["left", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1877,23 +1520,12 @@
       "attachment": {
         "parentId": "roof-silhouette",
         "parentSocket": "upper-eave-collars",
-        "localStart": [
-          -2.1,
-          0,
-          0
-        ],
-        "localEnd": [
-          2.1,
-          0,
-          0
-        ],
+        "localStart": [-2.1, 0, 0],
+        "localEnd": [2.1, 0, 0],
         "contactType": "overlap",
         "overlap": 0.05,
         "gapTolerance": 0.01,
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ]
+        "evidenceRefs": ["front", "hero"]
       },
       "dimensions": {
         "width": 5.9,
@@ -1903,36 +1535,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          8.45,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 8.45, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1948,16 +1560,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -1972,9 +1576,7 @@
         }
       },
       "material": "metal",
-      "materialLayers": [
-        "metal"
-      ],
+      "materialLayers": ["metal"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1998,11 +1600,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2043,36 +1641,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          -2.25,
-          5,
-          1.1
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-2.25, 5, 1.1],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2088,16 +1666,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -2112,9 +1682,7 @@
         }
       },
       "material": "metal",
-      "materialLayers": [
-        "metal"
-      ],
+      "materialLayers": ["metal"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2138,12 +1706,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "left",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "left", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2184,36 +1747,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          2.5,
-          5.25,
-          0.8
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [2.5, 5.25, 0.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2229,16 +1772,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -2253,9 +1788,7 @@
         }
       },
       "material": "cloth",
-      "materialLayers": [
-        "cloth"
-      ],
+      "materialLayers": ["cloth"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2279,11 +1812,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2324,36 +1853,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          5.8,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 5.8, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2369,16 +1878,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -2393,9 +1894,7 @@
         }
       },
       "material": "warm",
-      "materialLayers": [
-        "warm"
-      ],
+      "materialLayers": ["warm"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2419,12 +1918,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "front",
-        "left",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "left", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2459,22 +1953,12 @@
       "attachment": {
         "parentId": "tower-shell",
         "parentSocket": "rear-rope-anchors",
-        "localStart": [
-          0.7,
-          -2.5,
-          -2
-        ],
-        "localEnd": [
-          1.2,
-          1.2,
-          -2
-        ],
+        "localStart": [0.7, -2.5, -2],
+        "localEnd": [1.2, 1.2, -2],
         "contactType": "overlap",
         "overlap": 0.05,
         "gapTolerance": 0.01,
-        "evidenceRefs": [
-          "rear"
-        ]
+        "evidenceRefs": ["rear"]
       },
       "dimensions": {
         "length": 3.8,
@@ -2483,36 +1967,16 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0.9,
-          3.2,
-          -2
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0.9, 3.2, -2],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2528,16 +1992,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; shipping collision is owned by the Fenbridge layout contract."
         },
@@ -2552,9 +2008,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2578,9 +2032,7 @@
         "edgeWearPattern": "restrained exposed-edge lightening",
         "notes": "Reference lighting is baked into the generated sheet, so vertex color remains the palette authority."
       },
-      "evidenceRefs": [
-        "rear"
-      ],
+      "evidenceRefs": ["rear"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2601,16 +2053,11 @@
       "color": "#4E5650",
       "albedo": {
         "dominant": "#4E5650",
-        "secondary": [
-          "#74776B"
-        ],
+        "secondary": ["#74776B"],
         "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
       },
       "colorVariation": {
-        "palette": [
-          "#4E5650",
-          "#74776B"
-        ],
+        "palette": ["#4E5650", "#74776B"],
         "pattern": "shared semantic atlas plus authored vertex-color zones",
         "amplitude": 0.12,
         "heightCorrelation": 0.18
@@ -2618,10 +2065,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2695,10 +2139,7 @@
           "roughness": 0.96,
           "dirtAmount": 0.22,
           "cavityBias": true,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -2716,16 +2157,11 @@
       "color": "#34271E",
       "albedo": {
         "dominant": "#34271E",
-        "secondary": [
-          "#765236"
-        ],
+        "secondary": ["#765236"],
         "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
       },
       "colorVariation": {
-        "palette": [
-          "#34271E",
-          "#765236"
-        ],
+        "palette": ["#34271E", "#765236"],
         "pattern": "shared semantic atlas plus authored vertex-color zones",
         "amplitude": 0.12,
         "heightCorrelation": 0.18
@@ -2733,10 +2169,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2810,10 +2243,7 @@
           "roughness": 0.74,
           "dirtAmount": 0.16,
           "streak": "gravity-down",
-          "evidenceRefs": [
-            "front",
-            "rear"
-          ]
+          "evidenceRefs": ["front", "rear"]
         }
       ],
       "shaderNotes": [
@@ -2831,16 +2261,11 @@
       "color": "#176269",
       "albedo": {
         "dominant": "#176269",
-        "secondary": [
-          "#2D8585"
-        ],
+        "secondary": ["#2D8585"],
         "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
       },
       "colorVariation": {
-        "palette": [
-          "#176269",
-          "#2D8585"
-        ],
+        "palette": ["#176269", "#2D8585"],
         "pattern": "shared semantic atlas plus authored vertex-color zones",
         "amplitude": 0.12,
         "heightCorrelation": 0.18
@@ -2848,10 +2273,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2923,9 +2345,7 @@
           "region": "exposed shingle lower edges",
           "color": "#2D8585",
           "roughness": 0.7,
-          "evidenceRefs": [
-            "hero"
-          ]
+          "evidenceRefs": ["hero"]
         }
       ],
       "shaderNotes": [
@@ -2943,16 +2363,11 @@
       "color": "#34383A",
       "albedo": {
         "dominant": "#34383A",
-        "secondary": [
-          "#9B762D"
-        ],
+        "secondary": ["#9B762D"],
         "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
       },
       "colorVariation": {
-        "palette": [
-          "#34383A",
-          "#9B762D"
-        ],
+        "palette": ["#34383A", "#9B762D"],
         "pattern": "shared semantic atlas plus authored vertex-color zones",
         "amplitude": 0.12,
         "heightCorrelation": 0.18
@@ -2960,10 +2375,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3035,10 +2447,7 @@
           "region": "raised bolt and collar crowns",
           "roughness": 0.24,
           "color": "#62676A",
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3056,16 +2465,11 @@
       "color": "#FFA43A",
       "albedo": {
         "dominant": "#FFA43A",
-        "secondary": [
-          "#FFDD77"
-        ],
+        "secondary": ["#FFDD77"],
         "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
       },
       "colorVariation": {
-        "palette": [
-          "#FFA43A",
-          "#FFDD77"
-        ],
+        "palette": ["#FFA43A", "#FFDD77"],
         "pattern": "shared semantic atlas plus authored vertex-color zones",
         "amplitude": 0.12,
         "heightCorrelation": 0.18
@@ -3073,10 +2477,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3149,10 +2550,7 @@
           "emissive": "#FFDD77",
           "emissiveIntensity": 1.1,
           "roughness": 0.24,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3170,16 +2568,11 @@
       "color": "#276A6F",
       "albedo": {
         "dominant": "#276A6F",
-        "secondary": [
-          "#176269"
-        ],
+        "secondary": ["#176269"],
         "samplingNotes": "Palette sampled by visual inspection from neutral turnaround zones; studio highlights are not treated as albedo."
       },
       "colorVariation": {
-        "palette": [
-          "#276A6F",
-          "#176269"
-        ],
+        "palette": ["#276A6F", "#176269"],
         "pattern": "shared semantic atlas plus authored vertex-color zones",
         "amplitude": 0.12,
         "heightCorrelation": 0.18
@@ -3187,10 +2580,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3262,10 +2652,7 @@
           "region": "uneven lower edge",
           "color": "#176269",
           "roughness": 0.93,
-          "evidenceRefs": [
-            "rear",
-            "hero"
-          ]
+          "evidenceRefs": ["rear", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3284,10 +2671,7 @@
       "geometry": "staggered low-profile boxes",
       "instances": 28,
       "distribution": "five descending courses across two slopes with wider edge pieces",
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "iron-plate-fasteners",
@@ -3297,23 +2681,14 @@
       "geometry": "square plates plus low-segment bolt heads",
       "instances": 22,
       "distribution": "beam intersections, door rails, post shoes, and horn collars",
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "evidenceRefs": ["front", "rear", "hero"]
     }
   ],
   "buildPasses": [
     {
       "id": "blockout",
       "goal": "Match macro silhouette and proportions.",
-      "componentRefs": [
-        "foundation",
-        "tower-shell",
-        "roof-silhouette",
-        "horned-ridge"
-      ],
+      "componentRefs": ["foundation", "tower-shell", "roof-silhouette", "horned-ridge"],
       "acceptance": [
         "Silhouette reads correctly without materials.",
         "Quality contract has named all required macro feature groups before code generation.",
@@ -4035,9 +3410,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4135,9 +3508,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4234,9 +3605,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4333,9 +3702,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4432,9 +3799,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4531,9 +3896,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4630,9 +3993,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4674,9 +4035,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4706,11 +4065,7 @@
     "maxShippingPrimitives": 2,
     "maxShippingMaterials": 2,
     "embeddedTextures": 0,
-    "nativeDimensionsYards": [
-      7.8,
-      10.5,
-      7
-    ],
+    "nativeDimensionsYards": [7.8, 10.5, 7],
     "placementCount": 1,
     "fpsTarget": 60,
     "optimizationPolicy": "Group shingle, fastener, stone, and plank cadence before removing any identity-critical silhouette or service cue."

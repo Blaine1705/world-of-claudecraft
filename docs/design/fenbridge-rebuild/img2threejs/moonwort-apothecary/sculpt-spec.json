@@ -23,13 +23,7 @@
       "surface relief",
       "negative space"
     ],
-    "materialTerms": [
-      "albedo",
-      "roughness",
-      "normal response",
-      "ambient occlusion",
-      "emissive"
-    ],
+    "materialTerms": ["albedo", "roughness", "normal response", "ambient occlusion", "emissive"],
     "lightingTerms": [
       "key light",
       "fill light",
@@ -95,11 +89,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -215,32 +205,17 @@
         "id": "apothecary-silhouette",
         "name": "Crooked roof and compact hut",
         "required": true,
-        "qualityCriteria": [
-          "Curled tips, front dormer and vent remain legible."
-        ],
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ],
-        "failureModes": [
-          "reads as a generic cottage"
-        ]
+        "qualityCriteria": ["Curled tips, front dormer and vent remain legible."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
       },
       {
         "id": "sales-display",
         "name": "Potion sales window",
         "required": true,
-        "qualityCriteria": [
-          "Awning, shelf and bottles stay attached and exterior."
-        ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "hero"
-        ],
-        "failureModes": [
-          "service cue is absent"
-        ]
+        "qualityCriteria": ["Awning, shelf and bottles stay attached and exterior."],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["service cue is absent"]
       },
       {
         "id": "herbal-craft",
@@ -249,28 +224,16 @@
         "qualityCriteria": [
           "Botanical, glass and copper systems remain readable without loose clutter."
         ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "rear"
-        ],
-        "failureModes": [
-          "craft cues flatten"
-        ]
+        "evidenceRefs": ["front", "side", "rear"],
+        "failureModes": ["craft cues flatten"]
       },
       {
         "id": "material-separation",
         "name": "Teal, timber, copper, botanical and violet separation",
         "required": true,
-        "qualityCriteria": [
-          "The two-bucket merge preserves semantic colors and restrained glow."
-        ],
-        "evidenceRefs": [
-          "hero"
-        ],
-        "failureModes": [
-          "display reads as uniform noise"
-        ]
+        "qualityCriteria": ["The two-bucket merge preserves semantic colors and restrained glow."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["display reads as uniform noise"]
       }
     ],
     "visualDeltaChecks": [
@@ -284,11 +247,7 @@
       "Do not use a straight generic gable.",
       "Keep sales and craft scenery outside a closed shell."
     ],
-    "mustNotDo": [
-      "No interior cutaway.",
-      "No readable labels.",
-      "No loose apron clutter."
-    ]
+    "mustNotDo": ["No interior cutaway.", "No readable labels.", "No loose apron clutter."]
   },
   "qualityTargets": {
     "targetFidelity": 0.7,
@@ -299,16 +258,8 @@
       "herbs and mushrooms",
       "copper still"
     ],
-    "niceToHave": [
-      "gutter elbows",
-      "fixed barrel arrangement"
-    ],
-    "reviewViewpoints": [
-      "front",
-      "left-side",
-      "rear",
-      "front-three-quarter"
-    ]
+    "niceToHave": ["gutter elbows", "fixed barrel arrangement"],
+    "reviewViewpoints": ["front", "left-side", "rear", "front-three-quarter"]
   },
   "coordinateFrame": {
     "front": "+Z",
@@ -362,13 +313,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "centered door",
-        "dormer",
-        "bottle shelf",
-        "mushroom planters",
-        "still"
-      ],
+      "observations": ["centered door", "dormer", "bottle shelf", "mushroom planters", "still"],
       "confidence": 0.97
     },
     {
@@ -382,12 +327,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "deep sales shelf",
-        "herb bundles",
-        "building depth",
-        "barrel platform"
-      ],
+      "observations": ["deep sales shelf", "herb bundles", "building depth", "barrel platform"],
       "confidence": 0.94
     },
     {
@@ -401,12 +341,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "rear wall bays",
-        "rear herb rail",
-        "foundation",
-        "roof depth"
-      ],
+      "observations": ["rear wall bays", "rear herb rail", "foundation", "roof depth"],
       "confidence": 0.93
     },
     {
@@ -420,12 +355,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "complete volume",
-        "curled roof",
-        "clear approach",
-        "material hierarchy"
-      ],
+      "observations": ["complete volume", "curled roof", "clear approach", "material hierarchy"],
       "confidence": 0.97
     }
   ],
@@ -449,26 +379,12 @@
         "confidence": 0.95
       },
       "transform": {
-        "position": [
-          0,
-          2.35,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 2.35, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "centered-door-and-steps",
@@ -485,11 +401,7 @@
           "confidence": 0.92
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(52, 39, 30, 1)",
         "secondaryAlbedo": "rgba(78, 86, 80, 1)",
@@ -516,27 +428,12 @@
         "confidence": 0.91
       },
       "transform": {
-        "position": [
-          0,
-          4.35,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 4.35, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "curled-eave-tips",
@@ -553,12 +450,7 @@
           "confidence": 0.97
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(23, 98, 105, 1)",
         "secondaryAlbedo": "rgba(29, 23, 19, 1)",
@@ -585,26 +477,12 @@
         "confidence": 0.91
       },
       "transform": {
-        "position": [
-          0,
-          1.7,
-          2.75
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 1.7, 2.75],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "potion-sales-shelf",
@@ -621,11 +499,7 @@
           "confidence": 0.94
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(118, 82, 54, 1)",
         "secondaryAlbedo": "rgba(165, 138, 95, 1)",
@@ -652,27 +526,12 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          1.7,
-          1.6,
-          3
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [1.7, 1.6, 3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "chunky-bottle-row",
@@ -689,11 +548,7 @@
           "confidence": 0.9
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(98, 105, 165, 1)",
         "secondaryAlbedo": "rgba(48, 228, 209, 1)",
@@ -720,27 +575,12 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          1.7,
-          2.8
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 1.7, 2.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "drying-herb-bundles",
@@ -757,12 +597,7 @@
           "confidence": 0.9
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(88, 123, 61, 1)",
         "secondaryAlbedo": "rgba(98, 105, 165, 1)",
@@ -789,26 +624,12 @@
         "confidence": 0.82
       },
       "transform": {
-        "position": [
-          -2.7,
-          1.5,
-          2.2
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-2.7, 1.5, 2.2],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "copper-alembic-stack",
@@ -825,12 +646,7 @@
           "confidence": 0.87
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(155, 118, 45, 1)",
         "secondaryAlbedo": "rgba(52, 56, 58, 1)",
@@ -859,14 +675,7 @@
         "samplingNotes": "Reference values define semantic families; no studio highlight is copied into albedo."
       },
       "colorVariation": {
-        "palette": [
-          "#34271E",
-          "#4E5650",
-          "#176269",
-          "#9B762D",
-          "#587B3D",
-          "#6269A5"
-        ],
+        "palette": ["#34271E", "#4E5650", "#176269", "#9B762D", "#587B3D", "#6269A5"],
         "pattern": "bounded semantic vertex-color regions",
         "amplitude": 0.11
       },
@@ -893,30 +702,21 @@
           "region": "wall boards, shelf and porch members",
           "pattern": "axial grain with darker damp lower band",
           "roughness": 0.87,
-          "evidenceRefs": [
-            "front",
-            "rear"
-          ]
+          "evidenceRefs": ["front", "rear"]
         },
         {
           "id": "bottle-gloss",
           "region": "faceted potion bottle bodies",
           "pattern": "low-roughness exposed facets without transmission",
           "roughness": 0.24,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         },
         {
           "id": "copper-wear",
           "region": "alembic bulb, neck and cap",
           "pattern": "warmer worn convex facets and darker joints",
           "roughness": 0.46,
-          "evidenceRefs": [
-            "front",
-            "side"
-          ]
+          "evidenceRefs": ["front", "side"]
         }
       ]
     },
@@ -928,19 +728,11 @@
       "baseColor": "#FFA43A",
       "albedo": {
         "dominant": "#FFA43A",
-        "secondary": [
-          "#6269A5",
-          "#90FFF0"
-        ],
+        "secondary": ["#6269A5", "#90FFF0"],
         "samplingNotes": "Warm windows dominate; violet/teal magic remains a small accent."
       },
       "colorVariation": {
-        "palette": [
-          "#FFA43A",
-          "#FFDD77",
-          "#6269A5",
-          "#90FFF0"
-        ],
+        "palette": ["#FFA43A", "#FFDD77", "#6269A5", "#90FFF0"],
         "pattern": "semantic pane and crystal regions",
         "amplitude": 0.1
       },
@@ -968,10 +760,7 @@
           "emissiveColor": "#756FC4",
           "emissiveIntensity": 0.72,
           "roughness": 0.22,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         },
         {
           "id": "amber-window-glow",
@@ -979,11 +768,7 @@
           "emissiveColor": "#FFB14A",
           "emissiveIntensity": 1.2,
           "roughness": 0.28,
-          "evidenceRefs": [
-            "front",
-            "rear",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "rear", "hero"]
         }
       ]
     }
@@ -1041,10 +826,7 @@
         "ACES tone mapping",
         "contact shadow"
       ],
-      "mustAvoid": [
-        "ambient-only lighting",
-        "violet accent overpowering service silhouette"
-      ]
+      "mustAvoid": ["ambient-only lighting", "violet accent overpowering service silhouette"]
     },
     "screenshotReview": [
       "Compare front and hero roof curl.",
@@ -1092,26 +874,14 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
     "specRefineTriggers": [
       "wrong roof curl",
       "missing service display",
       "unresolved apron obstruction"
     ],
-    "codeRefineTriggers": [
-      "implementation diverges from sound spec",
-      "budget exceeded"
-    ],
-    "stopCriteria": [
-      "all critical features reach 0.70",
-      "new input required"
-    ],
+    "codeRefineTriggers": ["implementation diverges from sound spec", "budget exceeded"],
+    "stopCriteria": ["all critical features reach 0.70", "new input required"],
     "screenshotPolicy": {
       "requiredForPasses": [
         "blockout",
@@ -1132,151 +902,79 @@
       "id": "moonwort-silhouette",
       "name": "Compact shell, curled teal roof, dormer and vent",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "form-refinement"
-      ],
+      "passIds": ["blockout", "form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "building-shell",
-        "roof-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["building-shell", "roof-system"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "centered-entry",
       "name": "Accessible x=0 doorway and clear steps",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "interaction-pass"
-      ],
+      "passIds": ["structural-pass", "interaction-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "building-shell",
-        "front-service"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["building-shell", "front-service"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "potion-sales-display",
       "name": "Exterior shelf, awning, bottles and violet crystal",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "front-service",
-        "bottle-display"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["front-service", "bottle-display"],
+      "evidenceRefs": ["front", "side", "hero"]
     },
     {
       "id": "botanical-craft-read",
       "name": "Drying herbs, mushrooms, still and drainage",
       "tier": "critical",
-      "passIds": [
-        "form-refinement"
-      ],
+      "passIds": ["form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "botanical-display",
-        "still-and-drainage"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["botanical-display", "still-and-drainage"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     },
     {
       "id": "apothecary-material-read",
       "name": "Teal, timber, copper, botanical, glass and restrained glow separation",
       "tier": "critical",
-      "passIds": [
-        "material-pass"
-      ],
+      "passIds": ["material-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "roof-system",
-        "bottle-display",
-        "botanical-display",
-        "still-and-drainage"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["roof-system", "bottle-display", "botanical-display", "still-and-drainage"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "fixed-display-counts",
       "name": "Representative bottle and herb counts remain deterministic",
       "tier": "important",
-      "passIds": [
-        "form-refinement",
-        "optimization-pass"
-      ],
+      "passIds": ["form-refinement", "optimization-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "bottle-display",
-        "botanical-display"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["bottle-display", "botanical-display"],
+      "evidenceRefs": ["front", "side", "hero"]
     },
     {
       "id": "shipping-budget",
       "name": "Exterior-only model stays within 4,300 triangles and 300 KiB",
       "tier": "important",
-      "passIds": [
-        "optimization-pass"
-      ],
+      "passIds": ["optimization-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "building-shell"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["building-shell"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     }
   ],
   "buildPasses": [
     {
       "id": "blockout",
       "goal": "Lock native bounds and curled silhouette.",
-      "componentRefs": [
-        "building-shell",
-        "roof-system"
-      ],
-      "acceptance": [
-        "Compact hut and curled roof match front and hero."
-      ]
+      "componentRefs": ["building-shell", "roof-system"],
+      "acceptance": ["Compact hut and curled roof match front and hero."]
     },
     {
       "id": "structural-pass",
@@ -1287,22 +985,13 @@
         "botanical-display",
         "still-and-drainage"
       ],
-      "acceptance": [
-        "Every system stays attached and x=0 approach remains clear."
-      ]
+      "acceptance": ["Every system stays attached and x=0 approach remains clear."]
     },
     {
       "id": "form-refinement",
       "goal": "Add observed bottle, herb, fungi, still and gutter forms.",
-      "componentRefs": [
-        "roof-system",
-        "bottle-display",
-        "botanical-display",
-        "still-and-drainage"
-      ],
-      "acceptance": [
-        "Every inventoried component detail has geometry."
-      ]
+      "componentRefs": ["roof-system", "bottle-display", "botanical-display", "still-and-drainage"],
+      "acceptance": ["Every inventoried component detail has geometry."]
     },
     {
       "id": "material-pass",
@@ -1314,30 +1003,19 @@
         "botanical-display",
         "still-and-drainage"
       ],
-      "acceptance": [
-        "Low and Ultra preserve service-material separation."
-      ]
+      "acceptance": ["Low and Ultra preserve service-material separation."]
     },
     {
       "id": "interaction-pass",
       "goal": "Verify doorway, porch and service apron clearance.",
-      "componentRefs": [
-        "building-shell",
-        "front-service"
-      ],
-      "acceptance": [
-        "No display geometry blocks the x=0 entrance standing point."
-      ]
+      "componentRefs": ["building-shell", "front-service"],
+      "acceptance": ["No display geometry blocks the x=0 entrance standing point."]
     },
     {
       "id": "optimization-pass",
       "goal": "Merge and verify shipping budgets.",
-      "componentRefs": [
-        "building-shell"
-      ],
-      "acceptance": [
-        "At most two primitives, no interior, at most 4,300 triangles and 300 KiB."
-      ]
+      "componentRefs": ["building-shell"],
+      "acceptance": ["At most two primitives, no interior, at most 4,300 triangles and 300 KiB."]
     }
   ],
   "sculptPipeline": {
@@ -1367,21 +1045,9 @@
     "contract": "Static exterior hierarchy with stable herbalist and entrance sockets; collision remains runtime-owned.",
     "defaultRigType": "static-town-asset",
     "rootMotionNode": "building-shell",
-    "requiredComponentFields": [
-      "semantic id",
-      "parent",
-      "native transform"
-    ],
-    "transformChannels": [
-      "root translate",
-      "root rotate",
-      "visibility",
-      "material state"
-    ],
-    "authoringRules": [
-      "No detachable display clutter.",
-      "No shipping collision mesh."
-    ],
+    "requiredComponentFields": ["semantic id", "parent", "native transform"],
+    "transformChannels": ["root translate", "root rotate", "visibility", "material state"],
+    "authoringRules": ["No detachable display clutter.", "No shipping collision mesh."],
     "destructionPolicy": {
       "defaultBreakable": false
     }
@@ -1413,10 +1079,7 @@
       "grimoire/intake/surface_topology.md",
       "grimoire/build/geometry_patterns.md"
     ],
-    "evidenceRefs": [
-      "core.topology-intent",
-      "core.pbr-hand-painted-vs-pbr-texture"
-    ]
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
   },
   "visualEvidence": [
     {
@@ -1805,9 +1468,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -1899,9 +1560,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -1992,9 +1651,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2085,9 +1742,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2178,9 +1833,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2222,9 +1875,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [

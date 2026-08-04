@@ -4,25 +4,23 @@ import {
   addArchedPanel,
   addBarrel,
   addBeamXY,
-  addBentConceptRoof,
   addBox,
   addCylinder,
+  addExteriorPolishRounds,
   addGeometry,
   addLantern,
   addMasonryCourse,
   addOctahedron,
   addPitchedRoof,
-  addRaisedPilingDeck,
   addRopeRail,
   addShingledRoof,
   addSteps,
   addTorus,
   addVerticalPlankFace,
-  buildUnapprovedPlaceholder,
   FENBRIDGE_PALETTE as P,
 } from './shared.js';
 
-function addMasonryFooting(buckets, width, depth, height = 0.48) {
+function _addMasonryFooting(buckets, width, depth, height = 0.48) {
   addBox(buckets, 'stone', [width, height, depth], [0, height / 2, 0], P.stoneDeep);
   addBox(
     buckets,
@@ -55,7 +53,7 @@ function addMasonryFooting(buckets, width, depth, height = 0.48) {
   });
 }
 
-function addFramedShell(buckets, width, depth, bottomY, topY, centerX = 0, centerZ = 0) {
+function _addFramedShell(buckets, width, depth, bottomY, topY, centerX = 0, centerZ = 0) {
   const height = topY - bottomY;
   const centerY = bottomY + height / 2;
   // Inset mass for closed silhouette; exterior planks own the readable timber.
@@ -234,7 +232,7 @@ function addDiagonalYZ(buckets, bucket, x, start, end, thickness, depth, color) 
   );
 }
 
-function addRoofHorn(buckets, side, z = 2.28) {
+function _addRoofHorn(buckets, side, z = 2.28) {
   const root = [side * 1.56, 8.1];
   const center = [side * 2.0, 8.52, z];
   const rotationZ = side > 0 ? (-Math.PI * 3) / 4 : Math.PI;
@@ -251,7 +249,7 @@ function addRoofHorn(buckets, side, z = 2.28) {
   addBeamXY(buckets, 'timber', [side * 0.92, 8.78], root, z - 0.02, 0.17, 0.2, P.timberLight);
 }
 
-function addBlankShield(buckets, position, scale = 1) {
+function _addBlankShield(buckets, position, scale = 1) {
   const outline = new THREE.Shape();
   outline.moveTo(-0.48, 0.42);
   outline.lineTo(0.48, 0.42);
@@ -281,7 +279,7 @@ function addBlankShield(buckets, position, scale = 1) {
   });
 }
 
-function addRectangularStoneCourse(
+function _addRectangularStoneCourse(
   buckets,
   {
     width,
@@ -334,7 +332,7 @@ function addRectangularStoneCourse(
   }
 }
 
-function addWallStudRhythm(
+function _addWallStudRhythm(
   buckets,
   { width, depth, bottomY, topY, frontXs = [], backXs = [], sideZs = [] },
 ) {
@@ -373,7 +371,7 @@ function addWallStudRhythm(
   }
 }
 
-function addPointedRoofTrim(
+function _addPointedRoofTrim(
   buckets,
   { width, depth, eaveY, peakY, courseFractions = [0.3, 0.58] },
 ) {
@@ -394,7 +392,7 @@ function addPointedRoofTrim(
   }
 }
 
-function addPointedRoofShingles(buckets, { width, depth, eaveY, peakY, rows, columns }) {
+function _addPointedRoofShingles(buckets, { width, depth, eaveY, peakY, rows, columns }) {
   const halfWidth = width / 2;
   const usableDepth = depth - 0.18;
   const slopeAngle = Math.atan2(peakY - eaveY, halfWidth);
@@ -420,7 +418,7 @@ function addPointedRoofShingles(buckets, { width, depth, eaveY, peakY, rows, col
   }
 }
 
-function addBroadRoofShingles(buckets, { width, depth, eaveY, peakY, rows, columns }) {
+function _addBroadRoofShingles(buckets, { width, depth, eaveY, peakY, rows, columns }) {
   const halfDepth = depth / 2;
   const usableWidth = width - 0.2;
   const slopeAngle = Math.atan2(peakY - eaveY, halfDepth);
@@ -446,7 +444,7 @@ function addBroadRoofShingles(buckets, { width, depth, eaveY, peakY, rows, colum
   }
 }
 
-function addBroadRoofTrim(buckets, { width, depth, eaveY, peakY }) {
+function _addBroadRoofTrim(buckets, { width, depth, eaveY, peakY }) {
   const halfWidth = width / 2;
   const halfDepth = depth / 2;
   for (const x of [-halfWidth, halfWidth]) {
@@ -463,7 +461,7 @@ function addBroadRoofTrim(buckets, { width, depth, eaveY, peakY }) {
   }
 }
 
-function addRadialRoofRib(buckets, angle, radius, centerY, eaveY) {
+function _addRadialRoofRib(buckets, angle, radius, centerY, eaveY) {
   const innerRadius = 0.11;
   const start = new THREE.Vector3(
     Math.cos(angle) * innerRadius,
@@ -512,7 +510,7 @@ function addSideWinch(buckets, x, y, z) {
   );
 }
 
-function addRainChain(buckets, x, topY, z, length = 1.38) {
+function _addRainChain(buckets, x, topY, z, length = 1.38) {
   const segments = 5;
   const step = length / segments;
   for (let index = 0; index < segments; index += 1) {
@@ -1042,7 +1040,7 @@ export function buildWardenGatehouse(buckets) {
   const porchEave = wallBottom + 2.42;
   const porchPeak = wallBottom + 3.28;
   const porchRise = porchPeak - porchEave;
-  const porchHalfW = 1.28;
+  const _porchHalfW = 1.28;
   addShingledRoof(buckets, 2.55, 1.7, porchEave, porchPeak, {
     ridgeAxis: 'z',
     center: [0, 0, porchZ - 0.08],
@@ -1358,6 +1356,25 @@ export function buildWardenGatehouse(buckets) {
       P.ironLight,
     );
   }
+
+  // R16-30 exterior polish: weathering, hardware, moss, corner lanterns (guard apron clear).
+  addExteriorPolishRounds(buckets, {
+    frontZ,
+    rearZ,
+    wallBottom,
+    wallTop,
+    bodyW,
+    bodyD,
+    baseH,
+    clearFront: 1.15,
+    density: 1.05,
+    fenlight: true,
+  });
+  // Signal-tower specific: extra balcony rail studs + horn mount ring.
+  for (const x of [-1.35, -0.45, 0.45, 1.35]) {
+    addBox(buckets, 'metal', [0.08, 0.08, 0.06], [x, wallTop - 0.55, frontZ + 0.04], P.brass);
+  }
+  addCylinder(buckets, 'metal', 0.08, 0.1, 0.12, 6, [0, peakY - 0.35, 0.15], P.brassLight);
 }
 
 /**
@@ -1534,7 +1551,7 @@ export function buildLanternChapel(buckets) {
   const rise = peakY - eaveY;
   const roofHalfW = roofW / 2;
   const roofHalfD = roofD / 2;
-  const pitch = Math.atan2(rise, roofHalfW);
+  const _pitch = Math.atan2(rise, roofHalfW);
   addShingledRoof(buckets, roofW, roofD, eaveY, peakY, {
     ridgeAxis: 'z',
     courses: 11,
@@ -2057,6 +2074,32 @@ export function buildLanternChapel(buckets) {
   ]) {
     addBox(buckets, 'timber', [0.06, h, 0.1], [halfW * 0.96, wallBottom + 2.6, z], P.timberDeep);
   }
+
+  // R16-30 exterior polish: archive niche stays clear (clearFront left of door).
+  addExteriorPolishRounds(buckets, {
+    frontZ,
+    rearZ,
+    wallBottom,
+    wallTop,
+    bodyW,
+    bodyD,
+    baseH,
+    clearFront: 1.0,
+    density: 1.1,
+    fenlight: true,
+  });
+  // Bell gable hardware + grave-lamp bases.
+  for (const x of [-1.55, 1.55]) {
+    addBox(buckets, 'metal', [0.12, 0.08, 0.12], [x, wallTop + 0.35, 0.1], P.brass);
+  }
+  for (const [x, z] of [
+    [-2.9, 2.85],
+    [2.9, 2.8],
+  ]) {
+    addCylinder(buckets, 'stone', 0.14, 0.16, 0.35, 6, [x, 0.35, z], P.stoneDeep);
+    addCylinder(buckets, 'metal', 0.04, 0.04, 1.1, 5, [x, 1.0, z], P.iron);
+    addLantern(buckets, [x, 1.55, z], 0.55, 'fenlight');
+  }
 }
 
 /**
@@ -2322,6 +2365,32 @@ export function buildGildedStrongbox(buckets) {
   // Extra barrel + crate exterior clutter off approach
   addBarrel(buckets, [2.7, baseH + 0.35, -2.0], 0.6);
   addBox(buckets, 'timber', [0.45, 0.35, 0.4], [-2.9, baseH + 0.3, -1.8], P.timberLight);
+
+  // R16-30 exterior polish: keep teller left and entry right clear.
+  addExteriorPolishRounds(buckets, {
+    frontZ,
+    rearZ: -bodyD * 0.5,
+    wallBottom,
+    wallTop,
+    bodyW,
+    bodyD,
+    baseH,
+    clearFront: 1.35,
+    density: 1.15,
+  });
+  // Vault iron straps + brass corner plates.
+  for (const y of [wallBottom + 0.8, wallBottom + 1.6, wallBottom + 2.4]) {
+    addBox(buckets, 'metal', [0.55, 0.08, 0.06], [1.55, y, frontZ + 0.03], P.ironLight);
+  }
+  for (const sx of [-1, 1]) {
+    addBox(
+      buckets,
+      'metal',
+      [0.18, 0.18, 0.06],
+      [sx * bodyW * 0.48, wallBottom + 0.45, frontZ + 0.02],
+      P.brass,
+    );
+  }
 }
 
 /**
@@ -2426,5 +2495,56 @@ export function buildMirelightCistern(buckets) {
     const z = Math.sin(a) * 1.2;
     addBox(buckets, 'metal', [0.12, 0.35, 0.12], [x, 1.7, z], P.ironLight);
     addBox(buckets, 'fenlight', [0.14, 0.22, 0.14], [x, 1.55, z], P.fenlight);
+  }
+
+  // R16-30 exterior densify: pavilion ribs, more moss ring, chain hangers, kettle details.
+  for (let i = 0; i < 8; i += 1) {
+    const a = (i / 8) * Math.PI * 2;
+    const x = Math.cos(a) * 1.05;
+    const z = Math.sin(a) * 1.05;
+    addBox(buckets, 'timber', [0.08, 0.95, 0.08], [x, 1.55, z], i % 2 ? P.timber : P.timberDark, [
+      0,
+      -a,
+      0.25,
+    ]);
+  }
+  for (let i = 0; i < 10; i += 1) {
+    const a = (i / 10) * Math.PI * 2 + 0.1;
+    addBox(
+      buckets,
+      'stone',
+      [0.28, 0.07, 0.22],
+      [Math.cos(a) * 1.62, 0.5, Math.sin(a) * 1.62],
+      i % 2 ? P.moss : P.stoneDeep,
+      [0, -a, 0],
+    );
+  }
+  // Chain links from pavilion to kettle
+  for (const a of [0.4, Math.PI + 0.4]) {
+    const x = Math.cos(a) * 0.55;
+    const z = Math.sin(a) * 0.55;
+    for (let s = 0; s < 4; s += 1) {
+      addBox(buckets, 'metal', [0.05, 0.1, 0.05], [x, 1.35 + s * 0.12, z], P.ironLight);
+    }
+  }
+  addCylinder(buckets, 'metal', 0.04, 0.04, 0.55, 5, [0, 1.25, 0], P.iron);
+  // Extra fenlights opposite the first pair
+  for (const a of [Math.PI * 0.75, Math.PI * 1.75]) {
+    const x = Math.cos(a) * 1.15;
+    const z = Math.sin(a) * 1.15;
+    addBox(buckets, 'metal', [0.1, 0.28, 0.1], [x, 1.65, z], P.iron);
+    addBox(buckets, 'fenlight', [0.12, 0.18, 0.12], [x, 1.5, z], P.fenlightPale);
+  }
+  // Wet splash ring at waterline
+  for (let i = 0; i < 8; i += 1) {
+    const a = (i / 8) * Math.PI * 2;
+    addBox(
+      buckets,
+      'organic',
+      [0.35, 0.04, 0.22],
+      [Math.cos(a) * 1.95, 0.04, Math.sin(a) * 1.95],
+      P.mud,
+      [0, -a, 0],
+    );
   }
 }

@@ -23,13 +23,7 @@
       "lean-to",
       "negative space"
     ],
-    "materialTerms": [
-      "albedo",
-      "roughness",
-      "normal response",
-      "ambient occlusion",
-      "emissive"
-    ],
+    "materialTerms": ["albedo", "roughness", "normal response", "ambient occlusion", "emissive"],
     "lightingTerms": [
       "key light",
       "fill light",
@@ -43,11 +37,7 @@
     "objectClass": {
       "primaryType": "exterior-only scout lodge and north-gate patrol post",
       "primaryDomain": "object",
-      "formLanguage": [
-        "stylized low-poly",
-        "sturdy timber barracks",
-        "swamp watchpost"
-      ],
+      "formLanguage": ["stylized low-poly", "sturdy timber barracks", "swamp watchpost"],
       "structureKind": [
         "closed lodge shell",
         "offset open lookout",
@@ -95,11 +85,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -215,62 +201,33 @@
         "id": "lodge-silhouette",
         "name": "Steep lodge and offset lookout",
         "required": true,
-        "qualityCriteria": [
-          "Open tower, canopy and mast rise distinctly above the gable."
-        ],
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ],
-        "failureModes": [
-          "reads as a generic cottage"
-        ]
+        "qualityCriteria": ["Open tower, canopy and mast rise distinctly above the gable."],
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["reads as a generic cottage"]
       },
       {
         "id": "map-service",
         "name": "Exterior blank map table",
         "required": true,
-        "qualityCriteria": [
-          "Sloped table remains readable and approachable without text."
-        ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "hero"
-        ],
-        "failureModes": [
-          "scout service cue is absent"
-        ]
+        "qualityCriteria": ["Sloped table remains readable and approachable without text."],
+        "evidenceRefs": ["front", "side", "hero"],
+        "failureModes": ["scout service cue is absent"]
       },
       {
         "id": "patrol-gear",
         "name": "Simple weapon rack and patrol gear",
         "required": true,
-        "qualityCriteria": [
-          "Abstract spear and bow silhouettes stay attached under the lean-to."
-        ],
-        "evidenceRefs": [
-          "front",
-          "rear",
-          "hero"
-        ],
-        "failureModes": [
-          "gear becomes detailed or loose clutter"
-        ]
+        "qualityCriteria": ["Abstract spear and bow silhouettes stay attached under the lean-to."],
+        "evidenceRefs": ["front", "rear", "hero"],
+        "failureModes": ["gear becomes detailed or loose clutter"]
       },
       {
         "id": "material-separation",
         "name": "Teal, timber, parchment, iron and amber separation",
         "required": true,
-        "qualityCriteria": [
-          "Two-bucket merge preserves service and lookout readability."
-        ],
-        "evidenceRefs": [
-          "hero"
-        ],
-        "failureModes": [
-          "lean-to becomes undifferentiated clutter"
-        ]
+        "qualityCriteria": ["Two-bucket merge preserves service and lookout readability."],
+        "evidenceRefs": ["hero"],
+        "failureModes": ["lean-to becomes undifferentiated clutter"]
       }
     ],
     "visualDeltaChecks": [
@@ -284,11 +241,7 @@
       "Do not replace the open lookout with a solid tower block.",
       "Keep the map and gear lean-to exterior and open."
     ],
-    "mustNotDo": [
-      "No interior.",
-      "No readable map text.",
-      "No detailed weapons or loose clutter."
-    ]
+    "mustNotDo": ["No interior.", "No readable map text.", "No detailed weapons or loose clutter."]
   },
   "qualityTargets": {
     "targetFidelity": 0.7,
@@ -299,16 +252,8 @@
       "map table",
       "simple weapon rack"
     ],
-    "niceToHave": [
-      "patrol packs",
-      "gutter and lantern brackets"
-    ],
-    "reviewViewpoints": [
-      "front",
-      "left-side",
-      "rear",
-      "front-three-quarter"
-    ]
+    "niceToHave": ["patrol packs", "gutter and lantern brackets"],
+    "reviewViewpoints": ["front", "left-side", "rear", "front-three-quarter"]
   },
   "coordinateFrame": {
     "front": "+Z",
@@ -362,13 +307,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "lookout",
-        "mast",
-        "x=0 door",
-        "map table",
-        "broad porch"
-      ],
+      "observations": ["lookout", "mast", "x=0 door", "map table", "broad porch"],
       "confidence": 0.98
     },
     {
@@ -382,12 +321,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "lookout depth",
-        "lean-to depth",
-        "map-table slope",
-        "lantern bracket"
-      ],
+      "observations": ["lookout depth", "lean-to depth", "map-table slope", "lantern bracket"],
       "confidence": 0.95
     },
     {
@@ -401,12 +335,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "rear wall bays",
-        "weapon rack",
-        "tower attachment",
-        "chimney"
-      ],
+      "observations": ["rear wall bays", "weapon rack", "tower attachment", "chimney"],
       "confidence": 0.94
     },
     {
@@ -450,26 +379,12 @@
         "confidence": 0.95
       },
       "transform": {
-        "position": [
-          0.4,
-          2.5,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0.4, 2.5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "centered-door-and-shutters",
@@ -486,11 +401,7 @@
           "confidence": 0.95
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(52, 39, 30, 1)",
         "secondaryAlbedo": "rgba(78, 86, 80, 1)",
@@ -517,27 +428,12 @@
         "confidence": 0.92
       },
       "transform": {
-        "position": [
-          0.4,
-          4.5,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0.4, 4.5, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "steep-front-gable",
@@ -554,12 +450,7 @@
           "confidence": 0.9
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(23, 98, 105, 1)",
         "secondaryAlbedo": "rgba(46, 52, 49, 1)",
@@ -586,26 +477,12 @@
         "confidence": 0.94
       },
       "transform": {
-        "position": [
-          0,
-          0.65,
-          3
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.65, 3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "centered-porch-steps",
@@ -622,10 +499,7 @@
           "confidence": 0.94
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(82, 59, 41, 1)",
         "secondaryAlbedo": "rgba(116, 119, 107, 1)",
@@ -652,26 +526,12 @@
         "confidence": 0.91
       },
       "transform": {
-        "position": [
-          -2.8,
-          3.9,
-          -0.8
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-2.8, 3.9, -0.8],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque"
-      ],
+      "materialLayers": ["fenbridge-opaque"],
       "localFeatures": [
         {
           "id": "open-lookout-perch",
@@ -702,12 +562,7 @@
           "confidence": 0.91
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(52, 39, 30, 1)",
         "secondaryAlbedo": "rgba(39, 106, 111, 1)",
@@ -734,27 +589,12 @@
         "confidence": 0.91
       },
       "transform": {
-        "position": [
-          3.1,
-          1.8,
-          2.3
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [3.1, 1.8, 2.3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "sloped-map-table",
@@ -771,11 +611,7 @@
           "confidence": 0.94
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(82, 59, 41, 1)",
         "secondaryAlbedo": "rgba(211, 190, 140, 1)",
@@ -802,27 +638,12 @@
         "confidence": 0.82
       },
       "transform": {
-        "position": [
-          3.1,
-          1.6,
-          1.9
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [3.1, 1.6, 1.9],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "material": "fenbridge-opaque",
-      "materialLayers": [
-        "fenbridge-opaque",
-        "fenbridge-emissive"
-      ],
+      "materialLayers": ["fenbridge-opaque", "fenbridge-emissive"],
       "localFeatures": [
         {
           "id": "simple-weapon-rack",
@@ -839,11 +660,7 @@
           "confidence": 0.78
         }
       ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "rear", "hero"],
       "colorMaterialRecipe": {
         "dominantAlbedo": "rgba(52, 56, 58, 1)",
         "secondaryAlbedo": "rgba(141, 118, 80, 1)",
@@ -861,24 +678,11 @@
       "baseColor": "#FFFFFF",
       "albedo": {
         "dominant": "semantic COLOR_0",
-        "secondary": [
-          "dark timber",
-          "damp stone",
-          "teal shingles and cloth",
-          "parchment",
-          "iron"
-        ],
+        "secondary": ["dark timber", "damp stone", "teal shingles and cloth", "parchment", "iron"],
         "samplingNotes": "Reference values define semantic families; map patches remain abstract and unreadable."
       },
       "colorVariation": {
-        "palette": [
-          "#34271E",
-          "#4E5650",
-          "#176269",
-          "#276A6F",
-          "#D3BE8C",
-          "#34383A"
-        ],
+        "palette": ["#34271E", "#4E5650", "#176269", "#276A6F", "#D3BE8C", "#34383A"],
         "pattern": "bounded semantic vertex-color regions",
         "amplitude": 0.1
       },
@@ -905,31 +709,21 @@
           "region": "sloped table parchment panels",
           "pattern": "warm shallow shapes with a few abstract non-linguistic route strokes",
           "roughness": 0.9,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         },
         {
           "id": "wet-timber-grain",
           "region": "lodge, porch, lookout and lean-to members",
           "pattern": "axial grain with damp lower band",
           "roughness": 0.87,
-          "evidenceRefs": [
-            "front",
-            "rear",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "rear", "hero"]
         },
         {
           "id": "streamer-cloth",
           "region": "two mast ribbons",
           "pattern": "flat teal semantic color with darker fold facets",
           "roughness": 0.89,
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ]
     },
@@ -941,16 +735,11 @@
       "baseColor": "#FFA43A",
       "albedo": {
         "dominant": "#FFA43A",
-        "secondary": [
-          "#FFDD77"
-        ],
+        "secondary": ["#FFDD77"],
         "samplingNotes": "Shuttered windows, door lattice and one lantern only."
       },
       "colorVariation": {
-        "palette": [
-          "#FFA43A",
-          "#FFDD77"
-        ],
+        "palette": ["#FFA43A", "#FFDD77"],
         "pattern": "pane-center value lift",
         "amplitude": 0.08
       },
@@ -978,11 +767,7 @@
           "emissiveColor": "#FFB14A",
           "emissiveIntensity": 1.2,
           "roughness": 0.28,
-          "evidenceRefs": [
-            "front",
-            "rear",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "rear", "hero"]
         }
       ]
     }
@@ -1040,10 +825,7 @@
         "ACES tone mapping",
         "contact shadow"
       ],
-      "mustAvoid": [
-        "ambient-only lighting",
-        "readable pseudo-text on the map"
-      ]
+      "mustAvoid": ["ambient-only lighting", "readable pseudo-text on the map"]
     },
     "screenshotReview": [
       "Compare open lookout and mast silhouette.",
@@ -1091,26 +873,10 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
-    "specRefineTriggers": [
-      "lookout reads solid",
-      "map service missing",
-      "x=0 approach obstructed"
-    ],
-    "codeRefineTriggers": [
-      "implementation diverges from sound spec",
-      "budget exceeded"
-    ],
-    "stopCriteria": [
-      "all critical features reach 0.70",
-      "new input required"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
+    "specRefineTriggers": ["lookout reads solid", "map service missing", "x=0 approach obstructed"],
+    "codeRefineTriggers": ["implementation diverges from sound spec", "budget exceeded"],
+    "stopCriteria": ["all critical features reach 0.70", "new input required"],
     "screenshotPolicy": {
       "requiredForPasses": [
         "blockout",
@@ -1131,180 +897,91 @@
       "id": "scout-lodge-silhouette",
       "name": "Steep lodge, open lookout, canopy, mast and streamers",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "form-refinement"
-      ],
+      "passIds": ["blockout", "form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "lodge-shell",
-        "roof-system",
-        "lookout-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["lodge-shell", "roof-system", "lookout-system"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "centered-lodge-entry",
       "name": "Accessible local x=0 door and clear porch steps",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "interaction-pass"
-      ],
+      "passIds": ["structural-pass", "interaction-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "lodge-shell",
-        "porch-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["lodge-shell", "porch-system"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "open-lookout-read",
       "name": "Open viewing level, balustrade and true tower depth",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "lookout-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["lookout-system"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     },
     {
       "id": "map-and-gear-service",
       "name": "Blank map table, simple weapon rack and open apron",
       "tier": "critical",
-      "passIds": [
-        "form-refinement",
-        "interaction-pass"
-      ],
+      "passIds": ["form-refinement", "interaction-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "map-lean-to",
-        "patrol-gear"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["map-lean-to", "patrol-gear"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     },
     {
       "id": "scout-material-read",
       "name": "Teal, timber, parchment, iron, cloth and amber separation",
       "tier": "critical",
-      "passIds": [
-        "material-pass"
-      ],
+      "passIds": ["material-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "roof-system",
-        "lookout-system",
-        "map-lean-to",
-        "patrol-gear"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["roof-system", "lookout-system", "map-lean-to", "patrol-gear"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "fixed-abstract-details",
       "name": "Two streamers, blank map and simple weapons remain deterministic",
       "tier": "important",
-      "passIds": [
-        "form-refinement",
-        "optimization-pass"
-      ],
+      "passIds": ["form-refinement", "optimization-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "lookout-system",
-        "map-lean-to",
-        "patrol-gear"
-      ],
-      "evidenceRefs": [
-        "front",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["lookout-system", "map-lean-to", "patrol-gear"],
+      "evidenceRefs": ["front", "rear", "hero"]
     },
     {
       "id": "shipping-budget",
       "name": "Exterior-only model stays within 4,000 triangles and 280 KiB",
       "tier": "important",
-      "passIds": [
-        "optimization-pass"
-      ],
+      "passIds": ["optimization-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "lodge-shell"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["lodge-shell"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     }
   ],
   "buildPasses": [
     {
       "id": "blockout",
       "goal": "Lock native bounds and multi-height silhouette.",
-      "componentRefs": [
-        "lodge-shell",
-        "roof-system",
-        "lookout-system"
-      ],
-      "acceptance": [
-        "Steep gable and open mast-topped lookout match front and hero."
-      ]
+      "componentRefs": ["lodge-shell", "roof-system", "lookout-system"],
+      "acceptance": ["Steep gable and open mast-topped lookout match front and hero."]
     },
     {
       "id": "structural-pass",
       "goal": "Build porch, open lookout and service lean-to hierarchy.",
-      "componentRefs": [
-        "porch-system",
-        "lookout-system",
-        "map-lean-to",
-        "patrol-gear"
-      ],
-      "acceptance": [
-        "Lookout and lean-to remain open; x=0 approach stays clear."
-      ]
+      "componentRefs": ["porch-system", "lookout-system", "map-lean-to", "patrol-gear"],
+      "acceptance": ["Lookout and lean-to remain open; x=0 approach stays clear."]
     },
     {
       "id": "form-refinement",
       "goal": "Add rail, mast, streamers, map table and simple gear.",
-      "componentRefs": [
-        "lookout-system",
-        "map-lean-to",
-        "patrol-gear"
-      ],
-      "acceptance": [
-        "Every inventoried component detail has geometry."
-      ]
+      "componentRefs": ["lookout-system", "map-lean-to", "patrol-gear"],
+      "acceptance": ["Every inventoried component detail has geometry."]
     },
     {
       "id": "material-pass",
@@ -1316,30 +993,19 @@
         "map-lean-to",
         "patrol-gear"
       ],
-      "acceptance": [
-        "Low and Ultra preserve map, cloth, gear and structure separation."
-      ]
+      "acceptance": ["Low and Ultra preserve map, cloth, gear and structure separation."]
     },
     {
       "id": "interaction-pass",
       "goal": "Verify doorway, porch and map-service apron clearance.",
-      "componentRefs": [
-        "porch-system",
-        "map-lean-to"
-      ],
-      "acceptance": [
-        "No attached gear blocks the x=0 entrance or map-table standing point."
-      ]
+      "componentRefs": ["porch-system", "map-lean-to"],
+      "acceptance": ["No attached gear blocks the x=0 entrance or map-table standing point."]
     },
     {
       "id": "optimization-pass",
       "goal": "Merge and verify shipping budgets.",
-      "componentRefs": [
-        "lodge-shell"
-      ],
-      "acceptance": [
-        "At most two primitives, no interior, at most 4,000 triangles and 280 KiB."
-      ]
+      "componentRefs": ["lodge-shell"],
+      "acceptance": ["At most two primitives, no interior, at most 4,000 triangles and 280 KiB."]
     }
   ],
   "sculptPipeline": {
@@ -1369,21 +1035,9 @@
     "contract": "Static exterior hierarchy with stable scout, map-table and entrance sockets; collision remains runtime-owned.",
     "defaultRigType": "static-town-asset",
     "rootMotionNode": "lodge-shell",
-    "requiredComponentFields": [
-      "semantic id",
-      "parent",
-      "native transform"
-    ],
-    "transformChannels": [
-      "root translate",
-      "root rotate",
-      "visibility",
-      "material state"
-    ],
-    "authoringRules": [
-      "No detachable gear.",
-      "No shipping collision mesh."
-    ],
+    "requiredComponentFields": ["semantic id", "parent", "native transform"],
+    "transformChannels": ["root translate", "root rotate", "visibility", "material state"],
+    "authoringRules": ["No detachable gear.", "No shipping collision mesh."],
     "destructionPolicy": {
       "defaultBreakable": false
     }
@@ -1415,10 +1069,7 @@
       "grimoire/intake/surface_topology.md",
       "grimoire/build/geometry_patterns.md"
     ],
-    "evidenceRefs": [
-      "core.topology-intent",
-      "core.pbr-hand-painted-vs-pbr-texture"
-    ]
+    "evidenceRefs": ["core.topology-intent", "core.pbr-hand-painted-vs-pbr-texture"]
   },
   "visualEvidence": [
     {
@@ -1807,9 +1458,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -1901,9 +1550,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -1994,9 +1641,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2087,9 +1732,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2180,9 +1823,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2224,9 +1865,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [

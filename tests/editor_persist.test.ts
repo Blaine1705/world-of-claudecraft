@@ -220,9 +220,9 @@ describe('serialize / parse round-trip', () => {
     map.placements.push({ assetId: 'props/well', x: 5, z: 6, rotY: 1, scale: 2, collide: true });
     const parsed = parseMap(serializeMap(map));
     expect(parsed).not.toBeNull();
-    expect(parsed!.terrainEdits).toEqual(map.terrainEdits);
-    expect(parsed!.placements).toEqual(map.placements);
-    expect(parsed!.content.zones.length).toBe(map.content.zones.length);
+    expect(parsed?.terrainEdits).toEqual(map.terrainEdits);
+    expect(parsed?.placements).toEqual(map.placements);
+    expect(parsed?.content.zones.length).toBe(map.content.zones.length);
   });
 
   it('rejects unsalvageable input (no usable zones)', () => {
@@ -248,12 +248,12 @@ describe('serialize / parse round-trip', () => {
     };
     const parsed = parseMap(dirty);
     expect(parsed).not.toBeNull();
-    expect(parsed!.content.camps).toEqual([]);
-    expect(parsed!.content.roads).toEqual([]);
-    expect(parsed!.terrainEdits).toHaveLength(1);
-    expect(parsed!.placements).toHaveLength(1);
-    expect(parsed!.placements[0].scale).toBe(1); // def-filled
-    expect(parsed!.meta.name).toBe('Untitled Map'); // def-filled
+    expect(parsed?.content.camps).toEqual([]);
+    expect(parsed?.content.roads).toEqual([]);
+    expect(parsed?.terrainEdits).toHaveLength(1);
+    expect(parsed?.placements).toHaveLength(1);
+    expect(parsed?.placements[0].scale).toBe(1); // def-filled
+    expect(parsed?.meta.name).toBe('Untitled Map'); // def-filled
   });
 });
 

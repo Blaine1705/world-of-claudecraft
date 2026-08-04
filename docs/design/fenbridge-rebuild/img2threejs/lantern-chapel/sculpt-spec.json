@@ -48,11 +48,7 @@
       "pitch": -12,
       "roll": 0
     },
-    "positionHint": [
-      8,
-      6,
-      11
-    ],
+    "positionHint": [8, 6, 11],
     "note": "Orthographic-like multi-view sheet; review each admitted elevation independently and do not project baked pixels."
   },
   "suitability": "conditional",
@@ -69,22 +65,13 @@
     "objectClass": {
       "primaryType": "exterior-only timber chapel and archive",
       "primaryDomain": "object",
-      "formLanguage": [
-        "architectural",
-        "hard-surface",
-        "pointed-arch",
-        "asymmetric roofline"
-      ],
+      "formLanguage": ["architectural", "hard-surface", "pointed-arch", "asymmetric roofline"],
       "structureKind": [
         "layered exterior shell",
         "repeated facade modules",
         "open bell subassembly"
       ],
-      "motionPotential": [
-        "static world building",
-        "future bell sway",
-        "future lantern sway"
-      ],
+      "motionPotential": ["static world building", "future bell sway", "future lantern sway"],
       "materialFamilies": [
         "damp stone",
         "rain-dark timber",
@@ -123,11 +110,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "complex",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -435,11 +418,7 @@
         "qualityCriteria": [
           "The long low nave remains subordinate to the tall front bell gable and pointed finial."
         ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "side", "hero"],
         "failureModes": [
           "chapel reads as a generic cottage",
           "bell opening collapses into a solid block"
@@ -452,14 +431,8 @@
         "qualityCriteria": [
           "The closed pointed portal, flanking lancets, and dry steps form a clear service approach on +Z."
         ],
-        "evidenceRefs": [
-          "front",
-          "hero"
-        ],
-        "failureModes": [
-          "door loses pointed identity",
-          "steps or lanterns obstruct the approach"
-        ]
+        "evidenceRefs": ["front", "hero"],
+        "failureModes": ["door loses pointed identity", "steps or lanterns obstruct the approach"]
       },
       {
         "id": "lancet-light-rhythm",
@@ -468,11 +441,7 @@
         "qualityCriteria": [
           "Dark mullions and cage bars contain every warm core across front and side bays."
         ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "side", "hero"],
         "failureModes": [
           "unframed emissive panels wash out the wall",
           "window cadence becomes uniform rectangles"
@@ -485,10 +454,7 @@
         "qualityCriteria": [
           "The side niche clearly carries blank ledgers and map rolls without implying an explorable interior."
         ],
-        "evidenceRefs": [
-          "side",
-          "hero"
-        ],
+        "evidenceRefs": ["side", "hero"],
         "failureModes": [
           "archive cue disappears",
           "readable pseudo-text or open interior is introduced"
@@ -501,12 +467,7 @@
         "qualityCriteria": [
           "Semantic vertex colors keep damp stone, dark timber, teal roof, metal, warm light, and parchment distinct under neutral relighting."
         ],
-        "evidenceRefs": [
-          "front",
-          "side",
-          "rear",
-          "hero"
-        ],
+        "evidenceRefs": ["front", "side", "rear", "hero"],
         "failureModes": [
           "materials collapse into one brown mass",
           "baked lighting is projected as albedo"
@@ -536,18 +497,9 @@
       "amber lancet rhythm",
       "protected exterior archive niche"
     ],
-    "niceToHave": [
-      "individual shingle drift",
-      "bell lip patina",
-      "fine rain streaks"
-    ],
+    "niceToHave": ["individual shingle drift", "bell lip patina", "fine rain streaks"],
     "fpsTarget": 60,
-    "reviewViewpoints": [
-      "front",
-      "side",
-      "rear",
-      "front-three-quarter"
-    ]
+    "reviewViewpoints": ["front", "side", "rear", "front-three-quarter"]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -587,13 +539,7 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -634,156 +580,81 @@
       "id": "chapel-bell-profile",
       "name": "Steep nave and open bell-gable silhouette",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "form-refinement"
-      ],
+      "passIds": ["blockout", "form-refinement"],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": [
-        "nave-shell",
-        "roof-silhouette",
-        "bell-gable"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["nave-shell", "roof-silhouette", "bell-gable"],
+      "evidenceRefs": ["front", "side", "hero"]
     },
     {
       "id": "pointed-portal-approach",
       "name": "Pointed portal and accessible front stair",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "structural-pass"
-      ],
+      "passIds": ["blockout", "structural-pass"],
       "minimumScore": 0.75,
       "mustPass": true,
-      "componentRefs": [
-        "front-portal"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["front-portal"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "lancet-window-rhythm",
       "name": "Contained amber lancet rhythm",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "material-pass"
-      ],
+      "passIds": ["structural-pass", "material-pass"],
       "minimumScore": 0.75,
       "mustPass": true,
-      "componentRefs": [
-        "lancet-window-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["lancet-window-system"],
+      "evidenceRefs": ["front", "side", "hero"]
     },
     {
       "id": "archive-niche-read",
       "name": "Exterior ledger and rolled-map display",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "form-refinement"
-      ],
+      "passIds": ["structural-pass", "form-refinement"],
       "minimumScore": 0.72,
       "mustPass": true,
-      "componentRefs": [
-        "archive-niche"
-      ],
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["archive-niche"],
+      "evidenceRefs": ["side", "hero"]
     },
     {
       "id": "bell-lantern-hierarchy",
       "name": "Bell, lantern, and diamond-window focal hierarchy",
       "tier": "critical",
-      "passIds": [
-        "material-pass",
-        "surface-pass"
-      ],
+      "passIds": ["material-pass", "surface-pass"],
       "minimumScore": 0.7,
       "mustPass": true,
-      "componentRefs": [
-        "bell-gable",
-        "lantern-finial-system",
-        "front-portal"
-      ],
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ]
+      "componentRefs": ["bell-gable", "lantern-finial-system", "front-portal"],
+      "evidenceRefs": ["front", "hero"]
     },
     {
       "id": "chapel-construction-cadence",
       "name": "Truss, shingle, stone, and chain cadence",
       "tier": "important",
-      "passIds": [
-        "structural-pass",
-        "surface-pass"
-      ],
+      "passIds": ["structural-pass", "surface-pass"],
       "minimumScore": 0.68,
       "mustPass": false,
-      "componentRefs": [
-        "foundation",
-        "nave-shell",
-        "roof-silhouette",
-        "rain-chain-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ]
+      "componentRefs": ["foundation", "nave-shell", "roof-silhouette", "rain-chain-system"],
+      "evidenceRefs": ["front", "side", "rear", "hero"]
     },
     {
       "id": "archive-no-writing",
       "name": "Abstract blank archive papers",
       "tier": "important",
-      "passIds": [
-        "material-pass"
-      ],
+      "passIds": ["material-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "archive-niche"
-      ],
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ]
+      "componentRefs": ["archive-niche"],
+      "evidenceRefs": ["side", "hero"]
     },
     {
       "id": "moss-weathering-restraint",
       "name": "Moss and wetness stay at footing and drainage contacts",
       "tier": "important",
-      "passIds": [
-        "surface-pass"
-      ],
+      "passIds": ["surface-pass"],
       "minimumScore": 0.65,
       "mustPass": false,
-      "componentRefs": [
-        "foundation",
-        "rain-chain-system"
-      ],
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear"
-      ]
+      "componentRefs": ["foundation", "rain-chain-system"],
+      "evidenceRefs": ["front", "side", "rear"]
     }
   ],
   "sculptPipeline": {
@@ -822,18 +693,8 @@
       "localOverridesRequired": true,
       "minimumTextureResolution": 512,
       "preferredTextureResolution": 512,
-      "independentMapChannels": [
-        "albedo",
-        "roughness",
-        "height",
-        "normal",
-        "ambient-occlusion"
-      ],
-      "requiredSurfaceFrequencyBands": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "independentMapChannels": ["albedo", "roughness", "height", "normal", "ambient-occlusion"],
+      "requiredSurfaceFrequencyBands": ["macro", "meso", "micro"],
       "geometryReliefRequiredWhenSilhouetteAffected": true,
       "referencePbrExtraction": {
         "requiredWhenSourceImagePresent": false,
@@ -1000,11 +861,7 @@
         "height": 1,
         "units": "normalized"
       },
-      "observations": [
-        "plain rear timber gable",
-        "circular rear light",
-        "rear footing and chain"
-      ],
+      "observations": ["plain rear timber gable", "circular rear light", "rear footing and chain"],
       "confidence": 0.9
     },
     {
@@ -1058,36 +915,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1103,16 +940,8 @@
         "sockets": [],
         "collider": {
           "type": "compound",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -1127,9 +956,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1144,12 +971,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural"
     },
@@ -1184,36 +1006,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          0.525,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0.525, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1229,16 +1031,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -1253,9 +1047,7 @@
         }
       },
       "material": "stone",
-      "materialLayers": [
-        "stone"
-      ],
+      "materialLayers": ["stone"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1279,12 +1071,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1325,36 +1112,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          2.9,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 2.9, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1370,16 +1137,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -1394,9 +1153,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1420,12 +1177,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1466,36 +1218,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          5.55,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 5.55, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1511,16 +1243,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -1535,9 +1259,7 @@
         }
       },
       "material": "roof",
-      "materialLayers": [
-        "roof"
-      ],
+      "materialLayers": ["roof"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1561,12 +1283,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1607,36 +1324,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          -0.4,
-          2.25,
-          3
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-0.4, 2.25, 3],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1652,16 +1349,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -1676,9 +1365,7 @@
         }
       },
       "material": "timber",
-      "materialLayers": [
-        "timber"
-      ],
+      "materialLayers": ["timber"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1710,10 +1397,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1754,36 +1438,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          -1.45,
-          7.15,
-          1.55
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-1.45, 7.15, 1.55],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1799,16 +1463,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -1823,9 +1479,7 @@
         }
       },
       "material": "metal",
-      "materialLayers": [
-        "metal"
-      ],
+      "materialLayers": ["metal"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1857,12 +1511,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -1903,36 +1552,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          3.1,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 3.1, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1948,16 +1577,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -1972,9 +1593,7 @@
         }
       },
       "material": "warm",
-      "materialLayers": [
-        "warm"
-      ],
+      "materialLayers": ["warm"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -1998,11 +1617,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2043,36 +1658,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          -2.75,
-          2.3,
-          0.55
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [-2.75, 2.3, 0.55],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2088,16 +1683,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -2112,9 +1699,7 @@
         }
       },
       "material": "parchment",
-      "materialLayers": [
-        "parchment"
-      ],
+      "materialLayers": ["parchment"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2138,10 +1723,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ],
+      "evidenceRefs": ["side", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2182,36 +1764,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          0,
-          3.6,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 3.6, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2227,16 +1789,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -2251,9 +1805,7 @@
         }
       },
       "material": "metal",
-      "materialLayers": [
-        "metal"
-      ],
+      "materialLayers": ["metal"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2285,12 +1837,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear",
-        "hero"
-      ],
+      "evidenceRefs": ["front", "side", "rear", "hero"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2325,23 +1872,12 @@
       "attachment": {
         "parentId": "roof-silhouette",
         "parentSocket": "eave-chain-anchors",
-        "localStart": [
-          2.7,
-          -0.1,
-          2.8
-        ],
-        "localEnd": [
-          2.7,
-          -2.15,
-          2.8
-        ],
+        "localStart": [2.7, -0.1, 2.8],
+        "localEnd": [2.7, -2.15, 2.8],
         "contactType": "overlap",
         "overlap": 0.05,
         "gapTolerance": 0.01,
-        "evidenceRefs": [
-          "front",
-          "rear"
-        ]
+        "evidenceRefs": ["front", "rear"]
       },
       "dimensions": {
         "length": 2.2,
@@ -2350,36 +1886,16 @@
         "confidence": 0.88
       },
       "transform": {
-        "position": [
-          2.75,
-          2.2,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [2.75, 2.2, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "actionProfile": {
         "animationRole": "static-part",
         "pivot": {
           "mode": "base",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -2395,16 +1911,8 @@
         "sockets": [],
         "collider": {
           "type": "none",
-          "offset": [
-            0,
-            0,
-            0
-          ],
-          "scale": [
-            1,
-            1,
-            1
-          ],
+          "offset": [0, 0, 0],
+          "scale": [1, 1, 1],
           "isTrigger": false,
           "notes": "Authoring proxy only; layout owns shipping collision."
         },
@@ -2419,9 +1927,7 @@
         }
       },
       "material": "metal",
-      "materialLayers": [
-        "metal"
-      ],
+      "materialLayers": ["metal"],
       "deformations": [],
       "joints": [],
       "seams": [],
@@ -2445,11 +1951,7 @@
         "edgeWearPattern": "restrained exposed trim wear",
         "notes": "Generated studio lighting is excluded from albedo."
       },
-      "evidenceRefs": [
-        "front",
-        "side",
-        "rear"
-      ],
+      "evidenceRefs": ["front", "side", "rear"],
       "details": [],
       "fidelityTier": "structural",
       "colorMaterialRecipe": {
@@ -2470,16 +1972,11 @@
       "color": "#4E5650",
       "albedo": {
         "dominant": "#4E5650",
-        "secondary": [
-          "#74776B"
-        ],
+        "secondary": ["#74776B"],
         "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#4E5650",
-          "#74776B"
-        ],
+        "palette": ["#4E5650", "#74776B"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.11,
         "heightCorrelation": 0.16
@@ -2487,10 +1984,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2564,11 +2058,7 @@
           "roughness": 0.97,
           "dirtAmount": 0.22,
           "cavityBias": true,
-          "evidenceRefs": [
-            "front",
-            "side",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "side", "hero"]
         }
       ],
       "shaderNotes": [
@@ -2586,16 +2076,11 @@
       "color": "#34271E",
       "albedo": {
         "dominant": "#34271E",
-        "secondary": [
-          "#765236"
-        ],
+        "secondary": ["#765236"],
         "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#34271E",
-          "#765236"
-        ],
+        "palette": ["#34271E", "#765236"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.11,
         "heightCorrelation": 0.16
@@ -2603,10 +2088,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2679,10 +2161,7 @@
           "color": "#1D1713",
           "roughness": 0.76,
           "streak": "gravity-down",
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -2700,16 +2179,11 @@
       "color": "#176269",
       "albedo": {
         "dominant": "#176269",
-        "secondary": [
-          "#2D8585"
-        ],
+        "secondary": ["#2D8585"],
         "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#176269",
-          "#2D8585"
-        ],
+        "palette": ["#176269", "#2D8585"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.11,
         "heightCorrelation": 0.16
@@ -2717,10 +2191,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2792,10 +2263,7 @@
           "region": "lower course edges and sagged ridge",
           "color": "#103A3C",
           "roughness": 0.84,
-          "evidenceRefs": [
-            "side",
-            "hero"
-          ]
+          "evidenceRefs": ["side", "hero"]
         }
       ],
       "shaderNotes": [
@@ -2813,16 +2281,11 @@
       "color": "#34383A",
       "albedo": {
         "dominant": "#34383A",
-        "secondary": [
-          "#9B762D"
-        ],
+        "secondary": ["#9B762D"],
         "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#34383A",
-          "#9B762D"
-        ],
+        "palette": ["#34383A", "#9B762D"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.11,
         "heightCorrelation": 0.16
@@ -2830,10 +2293,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -2906,10 +2366,7 @@
           "color": "#9B762D",
           "roughness": 0.38,
           "patinaColor": "#59613A",
-          "evidenceRefs": [
-            "front",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "hero"]
         }
       ],
       "shaderNotes": [
@@ -2927,16 +2384,11 @@
       "color": "#FFA43A",
       "albedo": {
         "dominant": "#FFA43A",
-        "secondary": [
-          "#FFDD77"
-        ],
+        "secondary": ["#FFDD77"],
         "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#FFA43A",
-          "#FFDD77"
-        ],
+        "palette": ["#FFA43A", "#FFDD77"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.11,
         "heightCorrelation": 0.16
@@ -2944,10 +2396,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3020,11 +2469,7 @@
           "emissive": "#FFDD77",
           "emissiveIntensity": 1.05,
           "roughness": 0.25,
-          "evidenceRefs": [
-            "front",
-            "side",
-            "hero"
-          ]
+          "evidenceRefs": ["front", "side", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3042,16 +2487,11 @@
       "color": "#D3BE8C",
       "albedo": {
         "dominant": "#D3BE8C",
-        "secondary": [
-          "#A58A5F"
-        ],
+        "secondary": ["#A58A5F"],
         "samplingNotes": "Observed from neutral turnaround zones; highlights and contact shadows are excluded."
       },
       "colorVariation": {
-        "palette": [
-          "#D3BE8C",
-          "#A58A5F"
-        ],
+        "palette": ["#D3BE8C", "#A58A5F"],
         "pattern": "semantic vertex colors multiplied by shared atlas grain",
         "amplitude": 0.11,
         "heightCorrelation": 0.16
@@ -3059,10 +2499,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Fixed physical detail scale inside a padded non-wrapping semantic cell."
       },
@@ -3135,10 +2572,7 @@
           "color": "#D3BE8C",
           "roughness": 0.9,
           "markingPolicy": "abstract folds only; no readable writing",
-          "evidenceRefs": [
-            "side",
-            "hero"
-          ]
+          "evidenceRefs": ["side", "hero"]
         }
       ],
       "shaderNotes": [
@@ -3157,10 +2591,7 @@
       "geometry": "staggered low-profile course boxes",
       "instances": 34,
       "distribution": "six long courses across both roof slopes with restrained sag offsets",
-      "evidenceRefs": [
-        "side",
-        "hero"
-      ]
+      "evidenceRefs": ["side", "hero"]
     },
     {
       "id": "lancet-and-lamp-modules",
@@ -3170,23 +2601,14 @@
       "geometry": "pointed amber panel, dark frame, mullion, and cage variants",
       "instances": 9,
       "distribution": "front flanks, three side bays, diamond gable, and exterior brackets",
-      "evidenceRefs": [
-        "front",
-        "side",
-        "hero"
-      ]
+      "evidenceRefs": ["front", "side", "hero"]
     }
   ],
   "buildPasses": [
     {
       "id": "blockout",
       "goal": "Match macro silhouette and proportions.",
-      "componentRefs": [
-        "foundation",
-        "nave-shell",
-        "roof-silhouette",
-        "bell-gable"
-      ],
+      "componentRefs": ["foundation", "nave-shell", "roof-silhouette", "bell-gable"],
       "acceptance": [
         "Silhouette reads correctly without materials.",
         "Quality contract has named all required macro feature groups before code generation.",
@@ -3901,9 +3323,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4001,9 +3421,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4100,9 +3518,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4199,9 +3615,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4298,9 +3712,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4397,9 +3809,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4496,9 +3906,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4540,9 +3948,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -4572,11 +3978,7 @@
     "maxShippingPrimitives": 2,
     "maxShippingMaterials": 2,
     "embeddedTextures": 0,
-    "nativeDimensionsYards": [
-      7,
-      8.6,
-      7
-    ],
+    "nativeDimensionsYards": [7, 8.6, 7],
     "placementCount": 1,
     "fpsTarget": 60,
     "optimizationPolicy": "Group shingles, lancets, finials, and chains before simplifying any bell, portal, archive, or stair silhouette."

@@ -143,7 +143,7 @@ describe('Fenbridge town preload ownership', () => {
           );
           expect(standard.roughness).toBe(1);
           expect(standard.metalness).toBe(1);
-          expect(standard.normalScale.toArray()).toEqual([0.55, 0.55]);
+          expect(standard.normalScale.toArray()).toEqual([0.82, 0.82]);
         }
       });
       expect(texturedMeshes).toBeGreaterThan(0);
