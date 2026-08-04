@@ -814,12 +814,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // hair, and robe together), so this lerp multiplies the entire body, not
     // just the cloth. Measured: 0xf0e9d6 is near white, so even at 0.5 the old
     // strength only shifted the body by roughly (0.983, 0.980, 0.956), a
-    // near-no-op (issue #2678); dropped to 0.15 anyway for consistency with
+    // near-no-op (issue #2678); dropped to 0.12 anyway for consistency with
     // shaman/warlock, where the saturated tints DID flatten the face and
     // hands at their old strengths. Kept low like the mob tints below that
     // hit the same one-material-per-rig trap (mob_troll, mob_kobold, mob_ogre).
     tint: 0xf0e9d6,
-    tintStrength: 0.15,
+    tintStrength: 0.12,
   },
   player_shaman: {
     url: `${PLAYERS}/barbarian.glb`,
@@ -840,7 +840,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // hands as hard as the cloth. 0.4 (the class default strength) desaturated
     // the whole model into a blue-grey wash on character create (issue #2678).
     tint: 0x6f8fc9,
-    tintStrength: 0.15,
+    tintStrength: 0.12,
   },
   player_mage: {
     url: `${PLAYERS}/mage.glb`,
@@ -869,7 +869,7 @@ export const VISUALS: Record<string, VisualDef> = {
     // this multiplies skin and hair along with the robe). 0.45 read as a
     // saturated full-body purple wash on character create (issue #2678).
     tint: 0x8d5fd3,
-    tintStrength: 0.15,
+    tintStrength: 0.12,
   },
   player_druid: {
     url: `${PLAYERS}/druid.glb`,
