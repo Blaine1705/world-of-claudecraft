@@ -1,10 +1,9 @@
 # Raw fish as cooking reagents: cross-phase state
 
-Current phase: **Phase 1 complete; ready for Phase 1 QA** (2026-08-04).
+Current phase: **Phase 2 complete; ready for Phase 2 QA** (2026-08-04).
 
-Base: `origin/release/v0.34.0` at `22ec14cfde`
-(fix(client): close the same-frame zone-warmup teleport race #2801).
-Re-pull at every phase start.
+Base: rebased onto latest `origin/release/v0.34.0` at Phase 2 start
+(includes #2842 bear form and pending-registry fix). Re-pull at every phase.
 
 Feature branch: `feature/raw-fish-cooking-reagents`  
 Worktree: `/Users/fernando/Documents/wocc-raw-fish-cooking`
@@ -141,13 +140,28 @@ None. Refuse literal locked as `That is raw. Cook it first.`
 - New files:
   - `tests/raw_cooking_catches.test.ts`
   - `docs/raw-fish-cooking-reagents/*` (planning packet)
-- New i18n keys: (none in catalog; sim_i18n only)
+  - `src/ui/cooking_catch_hint_view.ts` (pure purpose-key table)
+  - `src/ui/tooltip_line.ts` (createElement tt-desc / tt-sub factory)
+  - `tests/cooking_catch_hint_view.test.ts`
+  - `tests/raw_cooking_catch_icons.test.ts`
+- New i18n keys:
+  - `itemUi.kind.material` ("Material")
+  - `hudChrome.materialHint.cookingCatch` ("Cooking ingredient. Must be cooked before eating.")
+  - M16 non-Latin fills for both (zh_CN, zh_TW, ja_JP, ko_KR, ru_RU)
+  - Phase 1 sim_i18n: `error.rawCatchCookFirst`
 - New error literals: `That is raw. Cook it first.` (`error.rawCatchCookFirst`)
 - Material set delta: +7 (`raw_mirror_trout`, `raw_river_perch`,
   `raw_marsh_pike`, `raw_bog_eel`, `raw_frostgill_trout`,
   `raw_stonescale_carp`, `glimmerfin_koi`); honest set size 52
 - Pure export: `RAW_COOKING_CATCH_IDS` / `isRawCookingCatch` in
   `src/sim/content/items.ts` (Phase 2 UI reuse)
+- Phase 2 UI:
+  - Kind: Material for honest materials; Fine Material unchanged; grey Junk
+  - Cooking line via pure key + `createTooltipLine` (not `materialHintLine` HTML)
+  - `paintTooltipAt` accepts `string | Node`
+  - Bags: no clickConsume on catches; petFeedBlocked
+  - Icons: fish-like procedural fallback (`isRawCookingCatch` + name tokens)
+  - Bank depositAllTooltip: no copy change (already correct)
 - Screenshots: (pending Phase 3)
 - Also: one-line parse fix in `src/ui/i18n.resolved.generated/pending.ts`
   (stray PR URL on `guildDormantHint` pt_BR row)

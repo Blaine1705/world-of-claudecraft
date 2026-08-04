@@ -5,7 +5,7 @@
 | Planning packet | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 1: Sim truth | Complete | 2026-08-04 | 2026-08-04 |
 | Phase 1 QA | Pending | | |
-| Phase 2: UI/UX | Pending | | |
+| Phase 2: UI/UX | Complete | 2026-08-04 | 2026-08-04 |
 | Phase 2 QA | Pending | | |
 | Phase 3: Guide, economy, screenshots | Pending | | |
 | Phase 3 QA (gate + PR readiness) | Pending | | |
@@ -24,14 +24,14 @@
 
 ## Phase 2 deliverables
 
-- [ ] `itemKindLabel`: honest materials read Material
-- [ ] Raw-catch cooking-ingredient purpose line (pure key table + createElement
-      paint; generic tooltip line component if reusable)
-- [ ] No new feature-owned `innerHTML` / HTML-string builders for these surfaces
-- [ ] Bags: no consume affordance on raw catches
-- [ ] Icons: fish-like recipes for raw catch names/ids
-- [ ] i18n English keys (+ M16 if wordy)
-- [ ] Tests green; frontend-seam + coverage review clean
+- [x] `itemKindLabel`: honest materials read Material
+- [x] Raw-catch cooking-ingredient purpose line (pure key table + createElement
+      paint; generic tooltip line component)
+- [x] No new feature-owned `innerHTML` / HTML-string builders for these surfaces
+- [x] Bags: no consume affordance on raw catches
+- [x] Icons: fish-like recipes for raw catch names/ids
+- [x] i18n English keys (+ M16 non-Latin fills for wordy values)
+- [x] Tests green; frontend-seam + coverage review clean
 
 ## Phase 3 deliverables
 
@@ -84,3 +84,21 @@ Phase 1 implementation (2026-08-04):
 - Also fixed pre-existing parse corruption in
   `src/ui/i18n.resolved.generated/pending.ts` (stray PR URL in pt_BR list)
   that blocked vitest transforms of the UI tree.
+
+Phase 2 implementation (2026-08-04):
+
+- Rebased onto latest `origin/release/v0.34.0` (tip includes #2842 bear form
+  and pending-registry fix).
+- Kind line: `itemUi.kind.material` for junk + `MATERIAL_ITEM_IDS` (ores,
+  `game_meat`, all raw catches); fine grades still Fine Material.
+- Cooking purpose: pure `cooking_catch_hint_view` (shared key via
+  `isRawCookingCatch`) + `createTooltipLine` (createElement / textContent);
+  wired in `itemTooltip` via outerHTML bridge; `paintTooltipAt` accepts
+  `string | Node`.
+- `materialHintLine` HTML path not grown.
+- Bags: live `RAW_COOKING_CATCH_IDS` not `clickConsume` / `petFeedBlocked`.
+- Icons: fish primitive fallback for raw catches + name tokens.
+- M16 fills for `itemUi.kind.material` and
+  `hudChrome.materialHint.cookingCatch` (zh_CN/zh_TW/ja_JP/ko_KR/ru_RU).
+- Reviewers: frontend-seam BLOCKING fixed (`tooltip_line` in
+  `UI_PAINTER_HELPERS`); coverage CLEAN after bags pin to live catalog.
