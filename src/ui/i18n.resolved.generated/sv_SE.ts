@@ -1214,6 +1214,7 @@ export const sv_SE: EnTranslations = {
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Visa målets mål",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",

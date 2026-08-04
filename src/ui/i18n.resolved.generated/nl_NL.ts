@@ -1214,6 +1214,7 @@ export const nl_NL: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showThirdActionBar": "Derde actiebalk tonen",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",

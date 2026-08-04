@@ -1214,6 +1214,7 @@ export const vi_VN: EnTranslations = {
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
       "showThirdActionBar": "Hiển thị thanh hành động thứ ba",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",

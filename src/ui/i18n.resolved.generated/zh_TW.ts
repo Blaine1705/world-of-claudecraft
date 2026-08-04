@@ -1214,6 +1214,7 @@ export const zh_TW: EnTranslations = {
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
       "showThirdActionBar": "顯示第三動作列",
+      "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",

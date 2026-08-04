@@ -1214,6 +1214,7 @@ export const en: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showThirdActionBar": "Show Third Action Bar",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",

@@ -1124,6 +1124,11 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
+    // Interface panel toggle (off by default) that locks the action bar slots
+    // against drag-to-move, drag-to-replace, and clear so an accidental
+    // click-and-drag mid-fight can't disturb a slot. Abilities still fire from
+    // keybinds and clicks while locked.
+    lockActionBars: 'Lock Action Bars',
     // Interface panel toggle for the classic "target of target" mini-frame (off by
     // default): a small unit frame under the target frame showing who your target
     // is targeting.

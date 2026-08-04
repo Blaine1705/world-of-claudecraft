@@ -1214,6 +1214,7 @@ export const pl_PL: EnTranslations = {
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showThirdActionBar": "Pokaż trzeci pasek akcji",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Pokaż cel celu",
       "showAttackButton": "Pokaż Przycisk Ataku",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",

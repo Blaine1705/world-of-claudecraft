@@ -1214,6 +1214,7 @@ export const ru_RU: EnTranslations = {
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showThirdActionBar": "Показывать третью панель действий",
+      "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
