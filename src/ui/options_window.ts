@@ -886,7 +886,7 @@ export class OptionsWindow {
     resetDisabled = false,
   ): void {
     const el = this.deps.root();
-    const keys = optionsControlKeys(controls);
+    const keys = optionsControlKeys(controls) as (keyof GameSettings)[];
     const reset = document.createElement('button');
     reset.className = 'btn';
     reset.textContent = t('hud.options.resetToDefaults');
