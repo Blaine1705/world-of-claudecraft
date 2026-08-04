@@ -3146,7 +3146,8 @@ export const tr_TR: EnTranslations = {
         "raise_fallen": "Düşenleri Kaldır (periyodik yardımcı dalgaları)",
         "soul_rend": "Ruh Yırtılması (işaretlenen oyuncular yayılmalı ve iyileştirilmeli)",
         "deathless_rage": "Ölümsüz Öfke (koruma taşlarında kesilir)",
-        "wardstones": "Koruma taşı kanalları (faz geçişi)"
+        "wardstones": "Koruma taşı kanalları (faz geçişi)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

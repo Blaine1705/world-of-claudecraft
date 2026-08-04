@@ -3146,7 +3146,8 @@ export const it_IT: EnTranslations = {
         "raise_fallen": "Richiama i Caduti (ondate periodiche di rinforzi)",
         "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
-        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)"
+        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
