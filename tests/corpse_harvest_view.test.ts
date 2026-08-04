@@ -243,9 +243,12 @@ describe('corpseHarvestView: a selection that forfeits every yield (#2509)', () 
     }
     // The sweep has to actually VISIT both disabled arms. A content retag that
     // left no mixed template would otherwise pass it all-false with the mirror
-    // never exercised at all.
-    expect(disabledSeen).toBe(16);
-    expect(byPickGate).toBe(12);
+    // never exercised at all. The Drakelands/Willowfen/Evergarden harvest-gap
+    // fix adds bogtoad's single unmapped 'gills' pick-level refusal, raising
+    // byPickGate (and disabledSeen with it); dune_troll and hedge_knight are
+    // fully mapped and add none.
+    expect(disabledSeen).toBe(17);
+    expect(byPickGate).toBe(13);
     expect(byCorpseGate).toBe(4);
   });
 });

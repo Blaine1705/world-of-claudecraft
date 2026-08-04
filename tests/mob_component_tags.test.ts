@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MOBS } from '../src/sim/data';
+import { CAMPS, MOBS, ZONES, zoneContaining } from '../src/sim/data';
 import {
   BASE_TIER_WEIGHTS,
   HARVEST_TIERS,
@@ -52,9 +52,11 @@ describe('mob component-type tags', () => {
     expect(allUnmapped).toEqual(['fen_troll']);
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep.
-    // 36 since the farm-economy pass added mapped tags to 15 coinless trash
-    // templates; fen_troll is still the only all-unmapped one.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(36);
+    // 39 since the Drakelands/Willowfen/Evergarden harvest-gap fix tagged
+    // dune_troll, bogtoad, and hedge_knight on top of the prior 36 (Evergarden's
+    // topiary trio stays untagged: they are the hedge-construct exception in
+    // tests/economy_yield.test.ts); fen_troll is still the only all-unmapped one.
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(39);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {
@@ -107,13 +109,50 @@ describe('mob component-type tags', () => {
     }
     // ...over every PARTLY-mapped template, so an emptied sweep reads as wrong
     // rather than as a pass. A CORPUS CENSUS, not a behaviour claim: v0.32.0
-    // authored 9 against the release bestiary and this branch's rift/dungeon
-    // mobs bring a tenth. The per-template bound above is what holds the line.
-    expect(mixedSeen).toBe(10);
+    // authored 9 against the release bestiary, this branch's rift/dungeon mobs
+    // brought a tenth, and the Drakelands/Willowfen/Evergarden harvest-gap fix
+    // added bogtoad's ['gills', 'hide'] as an eleventh (dune_troll's
+    // ['hide', 'fang'] and hedge_knight's ['cloth'] are fully mapped, so they
+    // do not join this count). The per-template bound above is what holds
+    // the line.
+    expect(mixedSeen).toBe(11);
     // And the threshold really is where the comment says it is, stated as a
     // hypothetical shape rather than waiting for content to author one.
     expect(3 * expectedQty(1)).toBeGreaterThan(4 * expectedQty(0));
     expect(2 * expectedQty(1)).toBeLessThanOrEqual(3 * expectedQty(0));
+  });
+
+  it('gives every zone at least one corpse-harvestable camp mob (Drakelands/Willowfen/Evergarden harvest gap)', () => {
+    // Drakelands, Willowfen, and Evergarden shipped with zero tagged mobs, so
+    // nothing there was ever corpse-harvestable: e.g. Drakelands' dune_troll
+    // (family troll) carried no tags while Mirefen's fen_troll (same family)
+    // did. Derived from the real camp population, per zone, rather than a
+    // hand-picked mob list, so a future zone that ships the same gap fails
+    // here instead of going unnoticed.
+    const campZoneIds = new Set<string>();
+    const harvestableByZone = new Map<string, Set<string>>();
+    for (const camp of CAMPS) {
+      const template = MOBS[camp.mobId];
+      const zone = zoneContaining(camp.center.x, camp.center.z);
+      if (!zone) continue;
+      campZoneIds.add(zone.id);
+      if (!template || !isHarvestableCorpse(template.componentTags)) continue;
+      if (!harvestableByZone.has(zone.id)) harvestableByZone.set(zone.id, new Set());
+      harvestableByZone.get(zone.id)?.add(template.id);
+    }
+    // Every zone that actually spawns camps is checked, not just the three
+    // named above: a bare list would silently stop covering a zone whose
+    // camps moved. The floor is real (14 zones ship camp trash today), so an
+    // empty or trivially small sweep cannot pass this by accident.
+    expect(campZoneIds.size).toBeGreaterThanOrEqual(14);
+    expect(ZONES.length).toBeGreaterThanOrEqual(campZoneIds.size);
+    const gaps = [...campZoneIds].filter((id) => !(harvestableByZone.get(id)?.size ?? 0)).sort();
+    expect(gaps).toEqual([]);
+    // Decisive pin on the specific fix: the exact mob that now carries each of
+    // the three previously-gapped zones.
+    expect(harvestableByZone.get('drakelands')).toEqual(new Set(['dune_troll']));
+    expect(harvestableByZone.get('willowfen')).toEqual(new Set(['bogtoad']));
+    expect(harvestableByZone.get('evergarden')).toEqual(new Set(['hedge_knight']));
   });
 
   it('lists which mobs are tagged so the sample stays visible in test output', () => {

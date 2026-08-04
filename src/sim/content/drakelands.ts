@@ -212,6 +212,7 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     ],
     scale: 1.15,
     color: 0xb07040,
+    componentTags: ['hide', 'fang'],
   },
   // The brood-mother of every emberwing in the Drakemaw sky, gold as a coal
   // about to catch against her red-scaled children (q_dk_matriarch_of_the_maw).

@@ -264,12 +264,14 @@ describe('isHarvestableCorpse', () => {
     // 36 since the farm-economy pass: beast, spider and reptile trash pays in
     // harvestable components instead of coin, so 15 previously untagged
     // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
-    expect(included).toHaveLength(36);
-    // ...and the untagged templates are counted rather than assumed: 184 of them
+    // 39 with the Drakelands/Willowfen/Evergarden harvest-gap fix, which tagged
+    // dune_troll, bogtoad, and hedge_knight.
+    expect(included).toHaveLength(39);
+    // ...and the untagged templates are counted rather than assumed: 181 of them
     // ship, all excluded before this change and all excluded after it, which is
     // the path fen_troll now joins instead of getting one of its own.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(184);
+    expect(untagged).toHaveLength(181);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read
@@ -476,9 +478,11 @@ describe('yieldingFocusComponents and harvestConcentrationBonus (#2514)', () => 
     // The sweep must actually have exercised the raising arm, or a formula
     // that changed nothing would pass both bounds above. A CORPUS CENSUS like
     // the mixed-template count in tests/mob_component_tags: v0.32.0 authored 30
-    // against the release bestiary, and this branch's extra corpses raise two
-    // more picks. The two bounds inside the loop are the real assertions.
-    expect(raised).toBe(32);
+    // against the release bestiary, this branch's extra corpses raise two more
+    // picks, and the Drakelands/Willowfen/Evergarden harvest-gap fix's bogtoad
+    // (the one mixed template it adds) raises two more again. The two bounds
+    // inside the loop are the real assertions.
+    expect(raised).toBe(34);
   });
 
   it('is self-healing: giving claw an item returns every number to the pre-#2514 world', () => {
