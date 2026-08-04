@@ -71,8 +71,9 @@ export function isStationActive(station: MobileCraftingStation, nowTick: number)
  * same idiom craftItem uses), attempts the specialization-gated placement at
  * the player's current position, and on success stores the station in the
  * transient `PlayerMeta.mobileStation` slot (replacing any previous one).
- * Returns the placed station, or undefined when the caller is unresolvable
- * or not specialized in `craftId`. Draws no rng; denial has no side effect.
+ * Returns the placed station, or undefined when the caller is dead (the
+ * shared while-dead error line is the only surface), unresolvable, or not
+ * specialized in `craftId`. Draws no rng; denial has no side effect.
  */
 export function placeMobileStationForPlayer(
   ctx: SimContext,

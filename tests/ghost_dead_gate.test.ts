@@ -268,7 +268,12 @@ for (const mode of ['unreleased', 'ghost'] as const) {
       const sim = makeSim();
       const meta = (sim as any).players.get(sim.playerId);
       meta.craftSkills.cooking = 75; // specialized: placement would succeed
+      // Alive control: placement succeeds with no while-dead error, so the
+      // dead denial below can only be the gate.
+      sim.drainEvents();
       sim.placeMobileStation('cooking');
+      const aliveEvents = sim.drainEvents();
+      expect(deadErrors(aliveEvents)).toBe(0);
       const placed = meta.mobileStation;
       expect(placed).toBeTruthy();
       const placedAtTick = placed.placedAtTick;
