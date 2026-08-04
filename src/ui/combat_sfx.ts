@@ -88,15 +88,17 @@ const DOT_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 
 // A landed cc (stun/root/incapacitate) has no recording by default (see
 // ability_sfx_coverage.ts's RECORDED_IMPACT_ARCHETYPES, which deliberately
-// excludes 'cc'); these four now have one, keyed off the casting ability
+// excludes 'cc'); these now have one, keyed off the casting ability
 // id the fx:'ccImpact' event carries (effect_dispatch.ts gates the emit to
 // exactly this set, so no other stun/root/incapacitate fires the event at
-// all).
+// all). Low Blow (kidney_shot) reuses Gut Punch's (cheap_shot) recording,
+// same reuse mechanism as Eviscerate/Rupture.
 const CC_IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   hammer_of_justice: 'hammer_of_justice',
   entangling_roots: 'entangling_roots',
   blind: 'blind',
   cheap_shot: 'cheap_shot',
+  kidney_shot: 'cheap_shot',
   sap: 'sap',
 };
 

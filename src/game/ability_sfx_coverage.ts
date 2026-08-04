@@ -70,6 +70,7 @@ export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'entangling_roots',
   'blind',
   'cheap_shot',
+  'kidney_shot',
   'sap',
 ]);
 
