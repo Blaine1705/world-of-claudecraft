@@ -7145,7 +7145,7 @@ export const vi_VN: EnTranslations = {
       "questItem": "Vật Phẩm Nhiệm Vụ",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "No longer needed for an active quest.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Lớp nhân vật: {classes}",
       "sellPrice": "Giá bán: {money}",
       "clickBuy": "Nhấp để mua",

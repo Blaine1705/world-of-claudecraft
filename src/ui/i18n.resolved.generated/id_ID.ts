@@ -7145,7 +7145,7 @@ export const id_ID: EnTranslations = {
       "questItem": "Barang Misi",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "No longer needed for an active quest.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Kelas: {classes}",
       "sellPrice": "Harga jual: {money}",
       "clickBuy": "Klik untuk membeli",

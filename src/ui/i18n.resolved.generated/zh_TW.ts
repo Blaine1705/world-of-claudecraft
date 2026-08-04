@@ -7145,7 +7145,7 @@ export const zh_TW: EnTranslations = {
       "questItem": "任務物品",
       "questRelated": "任務：{quest}",
       "questRules": "無法出售、存入銀行或交易。",
-      "questOrphaned": "已不再被進行中的任務需要。",
+      "questOrphaned": "目前沒有進行中的任務需要此物品。",
       "classes": "職業：{classes}",
       "sellPrice": "出售價格：{money}",
       "clickBuy": "點擊購買",

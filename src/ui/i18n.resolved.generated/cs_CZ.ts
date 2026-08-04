@@ -7145,7 +7145,7 @@ export const cs_CZ: EnTranslations = {
       "questItem": "Úkolový předmět",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "No longer needed for an active quest.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Třídy: {classes}",
       "sellPrice": "Prodejní cena: {money}",
       "clickBuy": "Kliknutím koupíš",

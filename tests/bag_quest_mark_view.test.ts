@@ -58,7 +58,9 @@ describe('bag_quest_mark_view: questReady', () => {
     ).toBe('questReady');
   });
 
-  it('returns questReady when active and every matching objective is complete', () => {
+  it('stays quest when active even if matching collect objectives are complete', () => {
+    // Multi-objective quests can finish the item row while the log is still
+    // active (other kill/speak rows remain). Ready is turn-in only.
     expect(
       bagQuestMarkKind(
         { kind: 'quest' },
@@ -70,7 +72,7 @@ describe('bag_quest_mark_view: questReady', () => {
           ],
         },
       ),
-    ).toBe('questReady');
+    ).toBe('quest');
   });
 
   it('stays quest when active but a matching objective is incomplete', () => {
@@ -201,6 +203,7 @@ describe('bag_quest_mark_view: bagQuestMarkProgressFromLog', () => {
       { state: 'active', counts: [5] },
       objectives,
     );
-    expect(bagQuestMarkKind({ kind: 'quest' }, completeActive)).toBe('questReady');
+    // Full collect while still active is not turn-in ready.
+    expect(bagQuestMarkKind({ kind: 'quest' }, completeActive)).toBe('quest');
   });
 });

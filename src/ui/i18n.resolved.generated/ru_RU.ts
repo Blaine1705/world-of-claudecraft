@@ -7145,7 +7145,7 @@ export const ru_RU: EnTranslations = {
       "questItem": "Предмет задания",
       "questRelated": "Задание: {quest}",
       "questRules": "Нельзя продать, положить в банк или обменять.",
-      "questOrphaned": "Больше не нужен для активного задания.",
+      "questOrphaned": "Не нужен ни для одного активного задания.",
       "classes": "Классы: {classes}",
       "sellPrice": "Цена продажи: {money}",
       "clickBuy": "Нажмите, чтобы купить",

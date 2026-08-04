@@ -7145,7 +7145,7 @@ export const nl_NL: EnTranslations = {
       "questItem": "Questvoorwerp",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "No longer needed for an active quest.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Klassen: {classes}",
       "sellPrice": "Verkoopprijs: {money}",
       "clickBuy": "Klik om te kopen",

@@ -2374,7 +2374,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questItem': 'クエストアイテム',
   'itemUi.tooltip.questRelated': 'クエスト：{quest}',
   'itemUi.tooltip.questRules': '売却、銀行預け入れ、取引はできません。',
-  'itemUi.tooltip.questOrphaned': '進行中のクエストではもう必要ありません。',
+  'itemUi.tooltip.questOrphaned': '進行中のクエストでは必要ありません。',
   'itemUi.tooltip.classes': 'クラス: {classes}',
   'itemUi.tooltip.sellPrice': '売却価格: {money}',
   'itemUi.tooltip.clickBuy': 'クリックして購入',

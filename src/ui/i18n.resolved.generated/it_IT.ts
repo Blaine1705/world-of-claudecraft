@@ -7145,7 +7145,7 @@ export const it_IT: EnTranslations = {
       "questItem": "Oggetto missione",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "No longer needed for an active quest.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Classi: {classes}",
       "sellPrice": "Prezzo di vendita: {money}",
       "clickBuy": "Clicca per comprare",

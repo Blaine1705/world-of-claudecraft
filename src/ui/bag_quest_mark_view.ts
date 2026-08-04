@@ -6,13 +6,14 @@
 //
 // Mark kinds:
 //   'quest'           - active quest purpose (default rim + seal)
-//   'questReady'      - ready to turn in (log state ready, or matching
-//                       collect/gather objectives complete while held)
+//   'questReady'      - whole quest ready to turn in (log state === 'ready')
 //   'questOrphaned'   - reserved (not invented by this resolver yet)
 //
-// Ready is NEVER invented from kind alone: the second progress argument must
-// supply plain log/objective inputs (same shape the tooltip core uses) so tests
-// do not need a full Sim.
+// Ready is NEVER invented from kind alone or from partial collect progress:
+// only the quest log's ready state means turn-in is available. Matching
+// collect/gather rows still project for host diagnostics, but a multi-objective
+// quest that is still active must not brighten the seal as if it were turn-in
+// ready (tooltip progress covers per-item completion).
 //
 // The mark is information-ADD and pairs with an aria-hidden seal: the cell's
 // accessible name carries the quest fact, and the treatment renders identically
@@ -33,16 +34,17 @@ export interface BagQuestMarkObjectiveProgress {
 }
 
 /**
- * Plain progress inputs for the ready decision. Absent/null keeps Phase 1
- * on/off behavior ('quest' only). Host projects quest log + objectives into
- * this shape; the pure core never imports sim data tables.
+ * Plain progress inputs for the ready decision. Absent/null keeps default
+ * on/off behavior ('quest' only). Ready is decided solely from `state ===
+ * 'ready'`. Host may still project matching objectives for diagnostics; the
+ * pure core never imports sim data tables.
  */
 export interface BagQuestMarkProgressInput {
   /** Quest log state: active | ready | done | ... */
   state: string;
   /**
-   * Matching collect/gather objectives for THIS item. Empty when the held
-   * quest has no collect/gather row for the stack's itemId.
+   * Matching collect/gather objectives for THIS item (diagnostic / future
+   * use). Not used for the ready mark; only log state === 'ready' brightens.
    */
   matchingObjectives?: readonly BagQuestMarkObjectiveProgress[];
 }
@@ -107,15 +109,7 @@ function isCollectOrGatherWithItem(objective: BagQuestMarkObjectiveInput, itemId
 
 function isQuestReady(progress?: BagQuestMarkProgressInput | null): boolean {
   if (!progress) return false;
-  // Whole-quest ready: turn-in available.
-  if (progress.state === 'ready') return true;
-  // Held active quest whose matching collect/gather rows for this item are all
-  // complete. No matching rows means we cannot claim ready from progress alone.
-  if (progress.state !== 'active') return false;
-  const matching = progress.matchingObjectives;
-  if (!matching || matching.length === 0) return false;
-  for (const objective of matching) {
-    if (objective.current < objective.required) return false;
-  }
-  return true;
+  // Whole-quest ready only: turn-in available. Partial item-objective completion
+  // while state is still active must stay on the default quest mark.
+  return progress.state === 'ready';
 }

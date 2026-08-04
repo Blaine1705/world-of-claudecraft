@@ -5,7 +5,7 @@
 // title and kind line use quest gold and never a "Common Quest Item" double
 // line.
 //
-// Hierarchy (locked in docs/quest-item-inventory-ui/state.md):
+// Hierarchy:
 //   1. Title in quest gold
 //   2. Kind line: "Quest Item" in quest gold (showQuality false)
 //   3. Related quest title when questId resolves

@@ -2274,7 +2274,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questItem': '任務物品',
   'itemUi.tooltip.questRelated': '任務：{quest}',
   'itemUi.tooltip.questRules': '無法出售、存入銀行或交易。',
-  'itemUi.tooltip.questOrphaned': '已不再被進行中的任務需要。',
+  'itemUi.tooltip.questOrphaned': '目前沒有進行中的任務需要此物品。',
   'itemUi.tooltip.classes': '職業：{classes}',
   'itemUi.tooltip.sellPrice': '出售價格：{money}',
   'itemUi.tooltip.clickBuy': '點擊購買',

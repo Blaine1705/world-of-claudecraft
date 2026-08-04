@@ -2272,7 +2272,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questItem': '任务物品',
   'itemUi.tooltip.questRelated': '任务：{quest}',
   'itemUi.tooltip.questRules': '无法出售、存入银行或交易。',
-  'itemUi.tooltip.questOrphaned': '已不再被进行中的任务需要。',
+  'itemUi.tooltip.questOrphaned': '当前没有进行中的任务需要此物品。',
   'itemUi.tooltip.classes': '职业：{classes}',
   'itemUi.tooltip.sellPrice': '出售价格：{money}',
   'itemUi.tooltip.clickBuy': '点击购买',

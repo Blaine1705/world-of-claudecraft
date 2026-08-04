@@ -300,9 +300,9 @@ export class BagsWindow {
   // a window shown without a paint would always converge on the first probe.
   private lastMoneyCopper = -1;
 
-  // Bag-hover -> quest-tracker title highlight. One active row at a time; cleared
-  // on leave, programmatic tooltip hide, rebuild, and close so a stale class never
-  // sticks after the hovered cell is torn down.
+  // Bag hover/focus -> quest-tracker title highlight. One active row at a time;
+  // cleared on leave/focusout, programmatic tooltip hide, rebuild, and close so
+  // a stale class never sticks after the cell is torn down.
   private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
 
   constructor(private readonly deps: BagsWindowDeps) {}
@@ -822,11 +822,16 @@ export class BagsWindow {
               : ''
           : '';
       row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
-      // Bag hover lights the matching quest-tracker title (information-add).
+      // Bag hover / keyboard focus lights the matching quest-tracker title
+      // (information-add). Mouse and focus both drive the same highlight so Tab
+      // navigation matches pointer hover; leave/focusout clear it. Touch peek
+      // still relies on the tooltip path alone (no mouseenter on long-press).
       const trackerQuestId = bagQuestTrackerHighlightId(item);
       if (trackerQuestId) {
         row.addEventListener('mouseenter', () => this.trackerHighlight.set(trackerQuestId));
         row.addEventListener('mouseleave', () => this.clearTrackerHighlight());
+        row.addEventListener('focusin', () => this.trackerHighlight.set(trackerQuestId));
+        row.addEventListener('focusout', () => this.clearTrackerHighlight());
       }
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its

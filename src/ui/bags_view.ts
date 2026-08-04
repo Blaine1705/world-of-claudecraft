@@ -422,8 +422,7 @@ export function bagNoMatchKind(filter: BagFilterState): BagNoMatchKind {
 export type BagListRow = { kind: 'section'; section: 'quest' } | { kind: 'stack'; slot: InvSlot };
 
 /** Soft Quest section headers are allowed only when the grid is a derived list
- *  (not the All+recent manual cell stream). Locked decision 7 in
- *  docs/quest-item-inventory-ui/state.md: inserting a header node into the
+ *  (not the All+recent manual cell stream). Inserting a header node into the
  *  drop-target cell stream would shift bagIndex positions and break reorder.
  *  Category `quest` already implies bagOrderIsManual is false, so it is covered. */
 export function bagQuestSectionHeadersAllowed(filter: BagFilterState): boolean {

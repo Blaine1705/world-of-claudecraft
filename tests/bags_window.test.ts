@@ -86,7 +86,7 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     expect(cellsBranch).not.toContain('bag-section-header');
   });
 
-  it('wires bag hover to tracker highlight via pure id + thin controller', () => {
+  it('wires bag hover and keyboard focus to tracker highlight via pure id + thin controller', () => {
     // Pure id + controller are unit-tested elsewhere; this pin keeps the
     // bags painter from dropping the call site while those suites stay green.
     expect(painter).toContain("from './bag_quest_tracker_highlight'");
@@ -97,12 +97,16 @@ describe('bags_window: load-bearing behaviors preserved', () => {
     expect(painter).toContain('trackerHighlight.clear');
     expect(painter).toContain("addEventListener('mouseenter'");
     expect(painter).toContain("addEventListener('mouseleave'");
+    // Keyboard parity: bag tooltips show on focusin, so the tracker highlight
+    // must too (and clear on focusout).
+    expect(painter).toContain("addEventListener('focusin'");
+    expect(painter).toContain("addEventListener('focusout'");
     expect(painter).toContain('clearTrackerHighlight');
     // Clear on rebuild (render + refreshGrid) and close; hideTooltip path uses
     // hideTooltipClearingTracker so drag/peek does not leave a sticky glow.
     expect(painter).toContain('hideTooltipClearingTracker');
     const clearCalls = painter.match(/this\.clearTrackerHighlight\(\)/g) ?? [];
-    // At least: close, render, refreshGrid, hideTooltipClearingTracker (+ mouseleave).
+    // At least: close, render, refreshGrid, hideTooltipClearingTracker (+ leave/focusout).
     expect(clearCalls.length).toBeGreaterThanOrEqual(4);
     // Hover CSS: always-on token, no --fx gate.
     const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');

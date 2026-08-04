@@ -2399,7 +2399,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questItem': 'Предмет задания',
   'itemUi.tooltip.questRelated': 'Задание: {quest}',
   'itemUi.tooltip.questRules': 'Нельзя продать, положить в банк или обменять.',
-  'itemUi.tooltip.questOrphaned': 'Больше не нужен для активного задания.',
+  'itemUi.tooltip.questOrphaned': 'Не нужен ни для одного активного задания.',
   'itemUi.tooltip.classes': 'Классы: {classes}',
   'itemUi.tooltip.sellPrice': 'Цена продажи: {money}',
   'itemUi.tooltip.clickBuy': 'Нажмите, чтобы купить',

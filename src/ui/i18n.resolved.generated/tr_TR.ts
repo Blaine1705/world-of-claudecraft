@@ -7145,7 +7145,7 @@ export const tr_TR: EnTranslations = {
       "questItem": "Görev Eşyası",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",
-      "questOrphaned": "No longer needed for an active quest.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Sınıflar: {classes}",
       "sellPrice": "Satış fiyatı: {money}",
       "clickBuy": "Satın almak için tıkla",

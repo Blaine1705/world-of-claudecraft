@@ -348,16 +348,17 @@ describe('bags grid quest-purpose mark', () => {
     expect(seal?.classList.contains('bi-quest-seal-ready')).toBe(false);
   });
 
-  it('paints ready when active log has matching collect objectives complete', () => {
-    // q_boars objective count is 5; complete matching rows while still active
-    // must brighten the seal the same way state ready does.
+  it('does not paint ready when active log has matching collect complete', () => {
+    // q_boars objective count is 5; full collect while still active is not
+    // turn-in ready (other objectives may remain). Seal stays default quest.
     const questLog = new Map<string, QuestProgress>([
       ['q_boars', { questId: 'q_boars', counts: [5], state: 'active' }],
     ]);
     const root = windowFor([{ itemId: 'boar_hide', count: 5 }], questLog);
     const cell = root.querySelector('button.bag-item');
-    expect(cell?.classList.contains('bag-quest-ready')).toBe(true);
-    expect(cell?.querySelector('.bi-quest-seal-ready')).not.toBeNull();
+    expect(cell?.classList.contains('bag-quest')).toBe(true);
+    expect(cell?.classList.contains('bag-quest-ready')).toBe(false);
+    expect(cell?.querySelector('.bi-quest-seal-ready')).toBeNull();
   });
 });
 
