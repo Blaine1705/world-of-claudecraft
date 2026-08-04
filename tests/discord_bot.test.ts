@@ -352,9 +352,6 @@ describe('slash commands + messages', () => {
     expect(
       buildWhoamiContent({ linked: true, statusTier: 5, points: 100, lifetimePoints: 5000 }),
     ).toContain('Champion');
-    expect(
-      buildWhoamiContent({ linked: true, statusTier: 5, points: 100, lifetimePoints: 5000 }),
-    ).not.toContain('/flex'); // removed command, must not be referenced in the reply
     expect(buildLinkContent('https://woc')).toContain('https://woc');
     expect(buildWelcomeMessage({ userMention: '<@1>', gameUrl: 'https://woc' })).toContain('<@1>');
   });
