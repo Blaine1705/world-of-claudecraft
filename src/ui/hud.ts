@@ -14583,6 +14583,7 @@ export class Hud {
         cls,
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
+        this.sim.player.skinCatalog ?? 'class',
       ),
       framing: 'sheet',
     });

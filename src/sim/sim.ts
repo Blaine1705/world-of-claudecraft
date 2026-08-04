@@ -3996,7 +3996,7 @@ export class Sim {
     }
     e.weaponSkinLoadout = next;
     // For player entities templateId is the class id (createPlayer).
-    e.weaponSkinId = resolveActiveWeaponSkin(e.templateId, e.mainhandItemId, next);
+    e.weaponSkinId = resolveActiveWeaponSkin(e.templateId, e.mainhandItemId, next, e.skinCatalog);
     this.mirrorWeaponSkinLoadout(pid, e);
   }
 
@@ -4023,7 +4023,8 @@ export class Sim {
     if (skinId !== null) {
       const def = WEAPON_SKINS[skinId];
       if (!def) return false;
-      if (!weaponSkinTypeMatches(cls, e.mainhandItemId, def.weaponType)) return false;
+      if (!weaponSkinTypeMatches(cls, e.mainhandItemId, def.weaponType, e.skinCatalog))
+        return false;
       e.weaponSkinLoadout = withWeaponSkinApplied(e.weaponSkinLoadout, skinId) ?? {};
     } else {
       const t = weaponType;
@@ -4032,7 +4033,12 @@ export class Sim {
       delete next[t];
       e.weaponSkinLoadout = next;
     }
-    e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
+    e.weaponSkinId = resolveActiveWeaponSkin(
+      cls,
+      e.mainhandItemId,
+      e.weaponSkinLoadout,
+      e.skinCatalog,
+    );
     this.mirrorWeaponSkinLoadout(pid, e);
     return true;
   }

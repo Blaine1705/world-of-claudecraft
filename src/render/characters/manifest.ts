@@ -890,6 +890,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // baked in from knight.glb (scripts/bake_mech_anims.mjs) — these names now
     // resolve like any other class. Lazy-loaded; see preloadMechAssets().
     clips: kaykit(['1H_Melee_Attack_Chop']),
+    // Same bow-draw donor the hunter loads. The mech is the one body that shows
+    // a HUNTER's equipped weapon, so it is also the one body besides the hunter
+    // that can display a bow skin, and Bow_Draw_Shot targets the same KayKit
+    // Rig_Medium bones this model uses. Without it a displayed bow falls back to
+    // the melee chop (skin_attack.ts pickSkinAttackClips).
+    animUrls: [`${PLAYERS}/bow_anims.glb`],
     // Class-agnostic cosmetic body, but it still holds the wearer's equipped
     // mainhand: the shared handslot.r bone carries the grip (the mech reuses the
     // exact KayKit rig), so weaponSlots swaps attach[0] to the equipped weapon's
