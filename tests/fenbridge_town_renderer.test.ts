@@ -41,7 +41,6 @@ import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld } from '../src/sim/fenbridge_layout';
 import { terrainHeight } from '../src/sim/world';
 
-
 const ORIGINAL_GFX = {
   standardMaterials: GFX.standardMaterials,
   dynamicShadows: GFX.dynamicShadows,
