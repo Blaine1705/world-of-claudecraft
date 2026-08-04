@@ -378,7 +378,7 @@ describe('Eastbrook polish capture contract', () => {
       // still stands. Both sides moved the same leaf, so the merged composite
       // matches neither parent's literal. No GLB source fingerprint moved and
       // no capture was retaken here.
-      fingerprint: '2a685589b5037732da8354fba7b3b50a4f1ba4e7fac4676006bacb95bea53372',
+      fingerprint: '209810fca1ad2f8fe3e4574dc8b3684e4c27ee169b608bedbda12ef12860c053',
       components: {
         captureContract: {
           id: 'polish-v2',
