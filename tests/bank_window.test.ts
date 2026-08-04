@@ -276,10 +276,17 @@ describe('bank_window: search / sort / deposit-all', () => {
     expect(painter).toContain('bank-deposit-all');
   });
 
-  it('persists the filter under the bank-specific key via the tolerant parse/serialize', () => {
+  it('persists category/sort under the bank-specific key; the search never enters storage', () => {
     expect(painter).toContain("const BANK_FILTER_KEY = 'woc_bank_filter'");
-    expect(painter).toContain('parseBagFilter(localStorage.getItem(BANK_FILTER_KEY))');
-    expect(painter).toContain('serializeBagFilter(this.filter)');
+    // The per-visit search rule holds at BOTH ends of the round trip:
+    // construction drops any stored query (legacy or reload-stranded)...
+    expect(painter).toContain(
+      "{ ...parseBagFilter(localStorage.getItem(BANK_FILTER_KEY)), search: '' }",
+    );
+    // ...and the serializer strips it from every write. Behavior is driven in
+    // tests/bank_window_search_reset.test.ts; these anchors keep the source rule
+    // named next to the storage key.
+    expect(painter).toContain("serializeBagFilter({ ...this.filter, search: '' })");
   });
 
   it('runs the pure bank filter core, never a re-derived bag filter', () => {
