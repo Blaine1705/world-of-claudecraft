@@ -192,7 +192,12 @@ import {
   observeCraftSkillsForTierUps,
 } from './craft_celebration_view';
 import { parseCraftingTab, serializeCraftingTab } from './crafting_tab_pref';
-import { buildCraftingView, craftingReagentSig, craftLearnHints } from './crafting_view';
+import {
+  buildCraftingView,
+  craftingReagentSig,
+  craftLearnHints,
+  craftOwnsTab,
+} from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
 import { shouldRefreshDailyRewardsLauncher } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow } from './daily_rewards_window';
@@ -13751,10 +13756,17 @@ export class Hud {
 
   // `craftId` (the gossip dialog's Crafting shortcut on a station master)
   // pre-selects that craft's tab exactly like a tab click would: same field,
-  // same persistence, same fresh-tab scroll reset. resolveSelectedCraft still
-  // guards a craft the viewer has no tab for (falls back to the first tab).
+  // same persistence, same fresh-tab scroll reset. The assign-and-persist is
+  // gated on the craft actually owning a tab for this viewer (craftOwnsTab),
+  // so the shortcut never clobbers the saved tab preference (issue #2347)
+  // with a craft the window cannot show; resolveSelectedCraft still guards
+  // the render either way.
   openCrafting(craftId?: string): void {
-    if (craftId !== undefined && craftId !== this.selectedCraftTab) {
+    if (
+      craftId !== undefined &&
+      craftId !== this.selectedCraftTab &&
+      craftOwnsTab(this.sim.recipeList, this.sim.craftingIdentity.knownRecipes, craftId)
+    ) {
       this.selectedCraftTab = craftId;
       this.persistCraftingTab();
     }
@@ -13763,6 +13775,14 @@ export class Hud {
     if (craftId !== undefined) {
       const scroller = $('#crafting-window').querySelector('.crafting-body');
       if (scroller) scroller.scrollTop = 0;
+      // The gossip route reaches here after the dialog released its focus
+      // trap WITHOUT restoring (the successor-window premise), and
+      // #crafting-window installs no trap of its own: land keyboard focus on
+      // the selected tab (onSelectCraft's refocus target) so the handoff
+      // never strands focus on body. Promoting this window into the
+      // windowFocus system proper is the #2525 town-focus precedent, a
+      // separate ruling, not this change.
+      ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
     }
   }
 

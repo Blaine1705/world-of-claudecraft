@@ -98,12 +98,25 @@ describe('shared behavior across all screen sizes', () => {
 describe('gossip Crafting shortcut launcher (station masters)', () => {
   it('routes the quest dialog dep into openCrafting and pre-selects the tab like a tab click', () => {
     expect(hud).toContain('openCrafting: (craftId) => this.openCrafting(craftId),');
-    expect(hud).toContain('openCrafting(craftId?: string): void {');
-    // The pre-select is the tab-click contract (same field, same persistence,
-    // then the repaint), so the shortcut can never drift from onSelectCraft.
-    expect(hud).toMatch(
-      /openCrafting\(craftId\?: string\): void \{[\s\S]*?this\.selectedCraftTab = craftId;\s*this\.persistCraftingTab\(\);[\s\S]*?this\.renderCrafting\(\);/,
+    // Pin the method BODY (sliced to the method's own 2-space closing brace),
+    // so the same-tab guard, the craftOwnsTab persist gate, the persistence,
+    // the repaint, and the focus handoff must all live inside openCrafting
+    // itself, not merely somewhere in hud.ts. The behavioral halves are unit
+    // tested where they are pure: craftOwnsTab and resolveSelectedCraft in
+    // tests/crafting_window_tabs.test.ts.
+    const start = hud.indexOf('openCrafting(craftId?: string): void {');
+    expect(start).toBeGreaterThan(-1);
+    const body = hud.slice(start, hud.indexOf('\n  }', start));
+    expect(body).toContain('craftId !== this.selectedCraftTab');
+    expect(body).toContain(
+      'craftOwnsTab(this.sim.recipeList, this.sim.craftingIdentity.knownRecipes, craftId)',
     );
+    expect(body).toContain('this.selectedCraftTab = craftId;');
+    expect(body).toContain('this.persistCraftingTab();');
+    expect(body).toContain('this.renderCrafting();');
+    // The gossip route's focus handoff: the dialog released its trap without
+    // restoring, so openCrafting must land focus on the selected tab.
+    expect(body).toContain("querySelector('.crafting-tab.sel')");
   });
 });
 

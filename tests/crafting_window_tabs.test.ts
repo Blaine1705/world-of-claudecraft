@@ -20,6 +20,7 @@ import {
   type CraftingRecipeRow,
   type CraftingView,
   craftingTabs,
+  craftOwnsTab,
   resolveSelectedCraft,
 } from '../src/ui/crafting_view';
 import { renderCraftingWindow } from '../src/ui/crafting_window';
@@ -112,6 +113,28 @@ describe('resolveSelectedCraft (the selection fallback)', () => {
   it('resolves null for an empty book, whatever was requested', () => {
     expect(resolveSelectedCraft([], 'craft_a')).toBeNull();
     expect(resolveSelectedCraft([], null)).toBeNull();
+  });
+});
+
+describe('craftOwnsTab (the gossip shortcut persist gate)', () => {
+  // Real content rows: the arming sword has no acquisition list (grandfathered
+  // known to everyone), the gauntlets are trainer-taught (known only once the
+  // id is in the viewer's mirrored set). Both are weaponcrafting.
+  const sword = recipeRows([SWORD_RECIPE]);
+  const gauntlets = recipeRows([GAUNTLET_RECIPE]);
+
+  it('a grandfathered field recipe gives the craft a tab for every viewer', () => {
+    expect(craftOwnsTab(sword, [], 'weaponcrafting')).toBe(true);
+  });
+
+  it('an unlearned trainer-only recipe gives no tab, and learning it flips the gate', () => {
+    expect(craftOwnsTab(gauntlets, [], 'weaponcrafting')).toBe(false);
+    expect(craftOwnsTab(gauntlets, [GAUNTLET_RECIPE], 'weaponcrafting')).toBe(true);
+  });
+
+  it('a craft with no recipes in the book never owns a tab', () => {
+    expect(craftOwnsTab(sword, [], 'craft_without_recipes')).toBe(false);
+    expect(craftOwnsTab([], [], 'weaponcrafting')).toBe(false);
   });
 });
 

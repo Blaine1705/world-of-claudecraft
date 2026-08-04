@@ -413,7 +413,11 @@ export class QuestDialogController {
     // window straight to their own craft's tab (the viewer's stronger craft
     // when the station serves two), skipping the keybind-then-find-the-tab
     // hop. Same isStationMasterNpc gate as Train/Unbind, so the empty-menu
-    // check needs no new arm.
+    // check needs no new arm. The pick binds at render and is deliberately
+    // NOT in the staleness signature: online, a dialog opened before the
+    // first cprof mirror lands defaults to declaration order, which is
+    // cosmetic (the row label never changes, and resolveSelectedCraft plus
+    // the craftOwnsTab persist gate still guard the open).
     const masterCraft = hasTraining
       ? masterCraftTarget(
           npc.templateId,
