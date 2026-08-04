@@ -112,6 +112,7 @@ export const hudChromeStrings = {
   emoteEditor: {
     title: 'Emotes',
     done: 'Done',
+    close: 'Close emotes',
   },
   dailyRewards: {
     title: 'Daily Rewards',

@@ -391,7 +391,8 @@ export const vi_VN: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Biểu Cảm",
-      "done": "Xong"
+      "done": "Xong",
+      "close": "Đóng biểu cảm"
     },
     "dailyRewards": {
       "title": "Phần Thưởng Hằng Ngày",

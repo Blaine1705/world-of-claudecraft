@@ -6831,6 +6831,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Knopindeling resetten',
   'hudChrome.controller.title': 'Controller',
   'hudChrome.controller.vibration': 'Trilling',
+  'hudChrome.emoteEditor.close': 'Emotes sluiten',
   'hudChrome.emoteEditor.done': 'Klaar',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emoteWheel.edit': 'Bewerken',

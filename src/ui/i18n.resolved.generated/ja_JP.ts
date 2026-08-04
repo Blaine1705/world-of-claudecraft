@@ -391,7 +391,8 @@ export const ja_JP: EnTranslations = {
     },
     "emoteEditor": {
       "title": "エモート",
-      "done": "完了"
+      "done": "完了",
+      "close": "エモートを閉じる"
     },
     "dailyRewards": {
       "title": "デイリー報酬",

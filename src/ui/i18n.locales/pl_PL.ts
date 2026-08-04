@@ -6789,6 +6789,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     'Zbiera zaznaczone komponenty. Każde zwloki można zebrać raz, pierwszemu podejdzie. Nie zabiera łupów.',
   'hudChrome.corpseHarvest.title': 'Zbieranie',
+  'hudChrome.emoteEditor.close': 'Zamknij emotki',
   'hudChrome.emoteEditor.done': 'Gotowe',
   'hudChrome.emoteEditor.title': 'Emotki',
   'hudChrome.emoteWheel.edit': 'Edytuj',

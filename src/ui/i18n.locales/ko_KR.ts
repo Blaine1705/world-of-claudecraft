@@ -5389,6 +5389,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': '남동',
   'hudChrome.compass.SW': '남서',
   'hudChrome.compass.W': '서',
+  'hudChrome.emoteEditor.close': '감정 표현 닫기',
   'hudChrome.emoteEditor.done': '완료',
   'hudChrome.emoteEditor.title': '감정 표현',
   'hudChrome.emotes.bow': '절',

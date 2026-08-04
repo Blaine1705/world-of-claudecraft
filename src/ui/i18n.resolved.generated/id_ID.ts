@@ -391,7 +391,8 @@ export const id_ID: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emote",
-      "done": "Selesai"
+      "done": "Selesai",
+      "close": "Tutup emote"
     },
     "dailyRewards": {
       "title": "Hadiah Harian",

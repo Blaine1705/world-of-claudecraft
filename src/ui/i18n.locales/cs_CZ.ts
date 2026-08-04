@@ -4743,6 +4743,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.expandHint': 'Rozbalit tracker úkolů',
   'hudChrome.castBar.playerAria': 'Tvoje lišta sesílání',
   'hudChrome.castBar.targetAria': 'Lišta sesílání jednotky',
+  'hudChrome.emoteEditor.close': 'Zavřít emoty',
   'hudChrome.emoteEditor.done': 'Hotovo',
   'hudChrome.emoteEditor.title': 'Emoty',
   'hudChrome.emoteWheel.edit': 'Upravit',

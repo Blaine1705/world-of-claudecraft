@@ -6604,6 +6604,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     'Indsamler de markerede komponenter. Hvert kadaver kan kun hostes en gang, og det gælder for den første der kommer. Tager ikke byttet.',
   'hudChrome.corpseHarvest.title': 'Høst',
+  'hudChrome.emoteEditor.close': 'Luk følelsesudtryk',
   'hudChrome.emoteEditor.done': 'Færdig',
   'hudChrome.emoteEditor.title': 'Følelsesudtryk',
   'hudChrome.emoteWheel.edit': 'Rediger',

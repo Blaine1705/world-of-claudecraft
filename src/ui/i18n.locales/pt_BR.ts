@@ -6009,6 +6009,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.venomSac': 'Bolsa de veneno',
   'hudChrome.corpseHarvest.harvestButton': 'Coletar',
   'hudChrome.corpseHarvest.title': 'Coleta',
+  'hudChrome.emoteEditor.close': 'Fechar emotes',
   'hudChrome.emoteEditor.done': 'Concluído',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Reverência',

@@ -6629,6 +6629,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     "Récupère les composants cochés. Chaque cadavre ne peut être dépecé qu'une fois, premier arrivé. Ne prend pas le butin.",
   'hudChrome.corpseHarvest.title': 'Dépeçage',
+  'hudChrome.emoteEditor.close': 'Fermer les emotes',
   'hudChrome.emoteEditor.done': 'Terminé',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': "S'incliner",

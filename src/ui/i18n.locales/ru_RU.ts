@@ -5452,6 +5452,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': 'ЮВ',
   'hudChrome.compass.SW': 'ЮЗ',
   'hudChrome.compass.W': 'З',
+  'hudChrome.emoteEditor.close': 'Закрыть эмоции',
   'hudChrome.emoteEditor.done': 'Готово',
   'hudChrome.emoteEditor.title': 'Эмоции',
   'hudChrome.emotes.bow': 'Поклон',

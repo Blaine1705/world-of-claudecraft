@@ -6001,6 +6001,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': 'SE',
   'hudChrome.compass.SW': 'SO',
   'hudChrome.compass.W': 'O',
+  'hudChrome.emoteEditor.close': 'Cerrar emotes',
   'hudChrome.emoteEditor.done': 'Listo',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Reverencia',

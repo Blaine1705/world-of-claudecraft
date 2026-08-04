@@ -391,7 +391,8 @@ export const da_DK: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Følelsesudtryk",
-      "done": "Færdig"
+      "done": "Færdig",
+      "close": "Luk følelsesudtryk"
     },
     "dailyRewards": {
       "title": "Daglige belønninger",

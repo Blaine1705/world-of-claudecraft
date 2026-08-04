@@ -6052,6 +6052,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     'Raccoglie i componenti selezionati. Ogni carcassa puo essere raccolta una volta, chi prima arriva. Non prende il bottino.',
   'hudChrome.corpseHarvest.title': 'Raccolta',
+  'hudChrome.emoteEditor.close': 'Chiudi emote',
   'hudChrome.emoteEditor.done': 'Fine',
   'hudChrome.emoteEditor.title': 'Emote',
   'hudChrome.emotes.bow': 'Inchino',

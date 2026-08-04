@@ -7400,6 +7400,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Đặt Lại Bố Cục Nút',
   'hudChrome.controller.title': 'Tay Cầm',
   'hudChrome.controller.vibration': 'Rung',
+  'hudChrome.emoteEditor.close': 'Đóng biểu cảm',
   'hudChrome.emoteEditor.done': 'Xong',
   'hudChrome.emoteEditor.title': 'Biểu Cảm',
   'hudChrome.emoteWheel.edit': 'Chỉnh Sửa',

@@ -7439,6 +7439,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Atur Ulang Tata Letak Tombol',
   'hudChrome.controller.title': 'Kontroler',
   'hudChrome.controller.vibration': 'Getaran',
+  'hudChrome.emoteEditor.close': 'Tutup emote',
   'hudChrome.emoteEditor.done': 'Selesai',
   'hudChrome.emoteEditor.title': 'Emote',
   'hudChrome.emoteWheel.edit': 'Sunting',

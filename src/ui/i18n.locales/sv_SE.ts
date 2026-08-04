@@ -6636,6 +6636,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Återställ knapplayout',
   'hudChrome.controller.title': 'Handkontroll',
   'hudChrome.controller.vibration': 'Vibration',
+  'hudChrome.emoteEditor.close': 'Stäng gester',
   'hudChrome.emoteEditor.done': 'Klar',
   'hudChrome.emoteEditor.title': 'Gester',
   'hudChrome.emoteWheel.edit': 'Redigera',

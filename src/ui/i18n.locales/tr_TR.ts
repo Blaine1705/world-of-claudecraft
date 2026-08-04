@@ -7360,6 +7360,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Tuş Düzenini Sıfırla',
   'hudChrome.controller.title': 'Oyun Kolu',
   'hudChrome.controller.vibration': 'Titreşim',
+  'hudChrome.emoteEditor.close': 'İfadeleri kapat',
   'hudChrome.emoteEditor.done': 'Tamam',
   'hudChrome.emoteEditor.title': 'İfadeler',
   'hudChrome.emoteWheel.edit': 'Düzenle',

@@ -6075,6 +6075,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.venomSac': 'Giftsack',
   'hudChrome.corpseHarvest.harvestButton': 'Verwerten',
   'hudChrome.corpseHarvest.title': 'Verwerten',
+  'hudChrome.emoteEditor.close': 'Emotes schließen',
   'hudChrome.emoteEditor.done': 'Fertig',
   'hudChrome.emoteEditor.title': 'Emotes',
   'hudChrome.emotes.bow': 'Verbeugen',
