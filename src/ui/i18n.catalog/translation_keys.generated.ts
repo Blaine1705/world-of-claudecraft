@@ -6533,6 +6533,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.craft'
   | 'hudChrome.crafting.craftedToast'
   | 'hudChrome.crafting.craftedToastQty'
+  | 'hudChrome.crafting.dialogOption'
+  | 'hudChrome.crafting.dialogOptionAria'
   | 'hudChrome.crafting.difficultyFull'
   | 'hudChrome.crafting.difficultyMinimal'
   | 'hudChrome.crafting.difficultyNone'

@@ -10,22 +10,34 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "es_ES": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "fr_FR": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "fr_CA": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "de_DE": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "zh_CN": [
@@ -41,33 +53,51 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.deeds.recentJumpAria"
   ],
   "pt_BR": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "ru_RU": [
     "hudChrome.deeds.recentJumpAria"
   ],
   "cs_CZ": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "nl_NL": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "pl_PL": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "id_ID": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "tr_TR": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "sv_SE": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "vi_VN": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ],
   "da_DK": [
+    "hudChrome.crafting.dialogOption",
+    "hudChrome.crafting.dialogOptionAria",
     "hudChrome.deeds.recentJumpAria"
   ]
 };

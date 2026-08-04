@@ -2590,6 +2590,8 @@ export const pt_BR: EnTranslations = {
     "crafting": {
       "title": "Artesanato",
       "close": "Fechar elaboração",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Arte",
       "reagentsNeeded": "Requer:",
       "reagentLine": "{name}x{have}/{required}",
