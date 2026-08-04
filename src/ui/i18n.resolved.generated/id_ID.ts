@@ -1801,7 +1801,13 @@ export const id_ID: EnTranslations = {
       "saveButton": "Simpan Fokus",
       "notInTownHint": "Kamu harus berada di kota untuk mengatur fokusmu.",
       "increaseAria": "Tambah fokus pada {component}",
-      "decreaseAria": "Kurangi fokus pada {component}"
+      "decreaseAria": "Kurangi fokus pada {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Angkat jadi Pemimpin",

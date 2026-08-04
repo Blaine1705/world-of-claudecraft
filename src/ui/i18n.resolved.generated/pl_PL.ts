@@ -1801,7 +1801,13 @@ export const pl_PL: EnTranslations = {
       "saveButton": "Zapisz priorytety",
       "notInTownHint": "Musisz być w mieście, aby ustawić priorytety.",
       "increaseAria": "Zwiększ priorytet: {component}",
-      "decreaseAria": "Zmniejsz priorytet: {component}"
+      "decreaseAria": "Zmniejsz priorytet: {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Mianuj przywódcą",

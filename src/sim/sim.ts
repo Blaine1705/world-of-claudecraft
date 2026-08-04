@@ -378,6 +378,7 @@ import {
   isEnchantedInstance,
 } from './professions/enchanting';
 import * as fishing from './professions/fishing';
+import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
 import {
   completeGatherCast as completeGatherCastImpl,
@@ -8957,7 +8958,19 @@ export class Sim {
   // player standing in their current zone's town hub (professions/focus.ts
   // isInTownZone); rejected requests (out of town, malformed, over budget)
   // leave the previous allocation untouched and surface a toast.
-  setTownFocus(allocation: Record<string, number>, pid?: number): void {
+  //
+  // #1144: `tier` picks which of the three RESPEC_TIER_CONFIG rows prices the
+  // reallocation (computeRespecCost). The charge/reject happens HERE, between
+  // validating the request and delegating (committing `result.allocation`
+  // onto meta.townFocus): the pure validator runs first and never mutates
+  // state, so an invalid/over-budget/out-of-town request is rejected before
+  // any cost is even computed, and an unaffordable one is rejected before the
+  // allocation commits. Priced off `result.allocation` (the request AFTER the
+  // pure validator drops zero-point entries), not the raw `allocation`
+  // argument, so a caller cannot inflate the bill with junk the commit itself
+  // would discard. A no-op reallocation costs nothing at any tier and can
+  // never fail the affordability check.
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
@@ -8974,6 +8987,18 @@ export class Sim {
             : 'Invalid focus allocation.',
       );
       return;
+    }
+    const cost = professionsFocus.computeRespecCost(meta.townFocus, result.allocation, tier);
+    const canAfford =
+      meta.copper >= cost.coin &&
+      this.countItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, meta.entityId) >= cost.materials;
+    if (!canAfford) {
+      this.error(meta.entityId, 'You cannot afford that focus re-spec.');
+      return;
+    }
+    if (cost.coin > 0) meta.copper -= cost.coin;
+    if (cost.materials > 0) {
+      this.removeItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, cost.materials, meta.entityId);
     }
     meta.townFocus = result.allocation as Record<string, number>;
     deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation

@@ -1801,7 +1801,13 @@ export const en_CA: EnTranslations = {
       "saveButton": "Save Focus",
       "notInTownHint": "You must be in town to set your focus.",
       "increaseAria": "Increase focus on {component}",
-      "decreaseAria": "Decrease focus on {component}"
+      "decreaseAria": "Decrease focus on {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promote to Leader",

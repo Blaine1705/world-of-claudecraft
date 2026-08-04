@@ -1801,7 +1801,13 @@ export const ko_KR: EnTranslations = {
       "saveButton": "집중 저장",
       "notInTownHint": "집중을 설정하려면 마을에 있어야 합니다.",
       "increaseAria": "{component}에 대한 집중 증가",
-      "decreaseAria": "{component}에 대한 집중 감소"
+      "decreaseAria": "{component}에 대한 집중 감소",
+      "respecTierLabel": "재배분 속도",
+      "respecTierTimeOption": "무료 (시간이 걸림)",
+      "respecTierPartialOption": "빠름 (소량 비용)",
+      "respecTierInstantOption": "즉시 (전액 비용)",
+      "respecCostFree": "무료",
+      "respecCostLine": "{coin} 및 {materials} 소모"
     },
     "party": {
       "promoteLeader": "파티장으로 지정",

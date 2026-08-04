@@ -1801,7 +1801,13 @@ export const vi_VN: EnTranslations = {
       "saveButton": "Lưu Trọng Tâm",
       "notInTownHint": "Bạn phải ở trong thị trấn để đặt trọng tâm.",
       "increaseAria": "Tăng trọng tâm cho {component}",
-      "decreaseAria": "Giảm trọng tâm cho {component}"
+      "decreaseAria": "Giảm trọng tâm cho {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Thăng Làm Đội Trưởng",

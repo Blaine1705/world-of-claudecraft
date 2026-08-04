@@ -1801,7 +1801,13 @@ export const zh_TW: EnTranslations = {
       "saveButton": "儲存專注",
       "notInTownHint": "你必須在城鎮中才能設定專注。",
       "increaseAria": "增加對{component}的專注",
-      "decreaseAria": "減少對{component}的專注"
+      "decreaseAria": "減少對{component}的專注",
+      "respecTierLabel": "重新分配速度",
+      "respecTierTimeOption": "免費（花費時間）",
+      "respecTierPartialOption": "更快（少量花費）",
+      "respecTierInstantOption": "即時（全額花費）",
+      "respecCostFree": "免費",
+      "respecCostLine": "花費 {coin} 和 {materials}"
     },
     "party": {
       "promoteLeader": "提升為隊長",

@@ -70,7 +70,12 @@ import { isItemLevelEligible, itemLevel, itemScore } from '../sim/item_level';
 import { requiredLevelFor } from '../sim/item_level_req';
 import type { Ante, PickAction } from '../sim/lockpick';
 import { petCanForceTaunt } from '../sim/pet/pet_taunt_gate';
-import { FOCUS_POINT_BUDGET, isInTownZone } from '../sim/professions/focus';
+import {
+  computeRespecCost,
+  FOCUS_POINT_BUDGET,
+  isInTownZone,
+  type RespecPaymentTier,
+} from '../sim/professions/focus';
 import { inRangeStationTypes, stationTypesSignature } from '../sim/professions/stations';
 import { TIER_SKILL_STEP, tierForSkill } from '../sim/professions/wheel';
 import { type QuestObjectiveRef, questObjectivesForMob } from '../sim/quest_targets';
@@ -14563,6 +14568,11 @@ export class Hud {
 
   private townFocusDraft: Record<string, number> | null = null;
 
+  /** The #1144 re-spec payment tier the panel's Save will charge. Defaults to
+   *  'time', the free tier, so an untouched picker never surprises the player
+   *  with a charge; reset alongside townFocusDraft on every fresh open. */
+  private townFocusRespecTier: RespecPaymentTier = 'time';
+
   /** The signature of what the panel currently shows (#2500). `''` until the
    *  first paint arms it, which no real signature can spell (every one carries
    *  the in-town flag, the budget and a row per component). */
@@ -14593,6 +14603,7 @@ export class Hud {
     }
     this.closeOtherWindows('#town-focus-window');
     this.townFocusDraft = { ...this.sim.townFocus };
+    this.townFocusRespecTier = 'time';
     this.renderTownFocus();
     // AFTER the first paint, the train / unbind ordering: captureFocus records
     // the opener (the minimap button) and installs the trap over a root that is
@@ -14615,23 +14626,36 @@ export class Hud {
     // actually on screen rather than against the last thing the probe itself
     // painted.
     this.lastTownFocusSig = townFocusRenderSig(view);
-    renderTownFocusWindow($('#town-focus-window'), view, {
-      onStep: (component, delta) => {
-        this.townFocusDraft = stepTownFocus(
-          this.townFocusDraft ?? this.sim.townFocus,
-          component,
-          delta,
-          FOCUS_POINT_BUDGET,
-        );
-        this.renderTownFocus();
+    // #1144: the cost preview for the CHOSEN tier, priced off the committed
+    // allocation vs the draft (never the raw request), the same pair
+    // Sim.setTownFocus charges against server-side.
+    const cost = computeRespecCost(this.sim.townFocus, allocation, this.townFocusRespecTier);
+    renderTownFocusWindow(
+      $('#town-focus-window'),
+      view,
+      { tier: this.townFocusRespecTier, cost },
+      {
+        onStep: (component, delta) => {
+          this.townFocusDraft = stepTownFocus(
+            this.townFocusDraft ?? this.sim.townFocus,
+            component,
+            delta,
+            FOCUS_POINT_BUDGET,
+          );
+          this.renderTownFocus();
+        },
+        onTierChange: (tier) => {
+          this.townFocusRespecTier = tier;
+          this.renderTownFocus();
+        },
+        onSave: () => {
+          this.sim.setTownFocus(this.townFocusDraft ?? {}, this.townFocusRespecTier);
+          this.townFocusDraft = null;
+          this.closeTownFocus();
+        },
+        onClose: () => this.closeTownFocus(),
       },
-      onSave: () => {
-        this.sim.setTownFocus(this.townFocusDraft ?? {});
-        this.townFocusDraft = null;
-        this.closeTownFocus();
-      },
-      onClose: () => this.closeTownFocus(),
-    });
+    );
   }
 
   /** Slow-band staleness check for an OPEN panel (#2500). The panel used to

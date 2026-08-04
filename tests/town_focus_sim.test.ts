@@ -23,6 +23,7 @@ vi.mock('../server/db', () => ({
   })),
 }));
 
+import type { ClientSession } from '../server/game';
 import { GameServer } from '../server/game';
 import { MOBS, ZONES } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
@@ -72,22 +73,22 @@ function spawnHideWolf(internals: SimInternals, id: number, pos: { x: number; z:
 describe('setTownFocus: gated on standing in the town hub', () => {
   it('is accepted while in town', () => {
     const { sim, internals, a } = setup();
-    sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, a);
+    sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: POINTS_PER_TIER_BONUS });
   });
 
   it('is rejected far outside the town hub, leaving the prior allocation unchanged', () => {
     const { sim, internals, a } = setup();
-    sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, a);
+    sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
     const e = internals.entities.get(a)!;
     e.pos = { x: ZONE1.hub.x + ZONE1.hub.radius * 20, y: 0, z: ZONE1.hub.z };
-    sim.setTownFocus({ fang: POINTS_PER_TIER_BONUS }, a);
+    sim.setTownFocus({ fang: POINTS_PER_TIER_BONUS }, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: POINTS_PER_TIER_BONUS });
   });
 
   it('rejects an over-budget allocation', () => {
     const { sim, internals, a } = setup();
-    sim.setTownFocus({ hide: 999 }, a);
+    sim.setTownFocus({ hide: 999 }, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({});
   });
 });
@@ -107,9 +108,9 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
 
   it('refuses the issue frame in town, leaving the stored allocation untouched', () => {
     const { sim, internals, a } = setup();
-    sim.setTownFocus({ hide: 4 }, a);
+    sim.setTownFocus({ hide: 4 }, 'time', a);
     sim.drainEvents();
-    sim.setTownFocus({ not_a_real_tag: 5 }, a);
+    sim.setTownFocus({ not_a_real_tag: 5 }, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: 4 });
     expect(errorsOf(sim)).toEqual(['Invalid focus allocation.']);
   });
@@ -119,8 +120,8 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     // an all-empty version of this would be {} equalling {} at all three
     // checkpoints, which the unfixed load arm satisfies just as well.
     const { sim, internals, a } = setup();
-    sim.setTownFocus({ hide: 4 }, a);
-    sim.setTownFocus({ hide: 4, not_a_real_tag: 5 }, a);
+    sim.setTownFocus({ hide: 4 }, 'time', a);
+    sim.setTownFocus({ hide: 4, not_a_real_tag: 5 }, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: 4 });
     const state = sim.serializeCharacter(a);
     expect(state?.townFocus).toEqual({ hide: 4 });
@@ -171,7 +172,7 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     reloaded.tick();
     reloaded.drainEvents();
 
-    reloaded.setTownFocus({ ...reloaded.townFocusFor(b), hide: 4 }, b);
+    reloaded.setTownFocus({ ...reloaded.townFocusFor(b), hide: 4 }, 'time', b);
     expect(internals.players.get(b)?.townFocus).toEqual({ hide: 4 });
     expect(errorsOf(reloaded)).toEqual([]);
   });
@@ -185,7 +186,7 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     const stale = { hide: 2, eastbrook: 4, constructor: 1 };
     const draft = stepTownFocus(stale, 'hide', 1, FOCUS_POINT_BUDGET);
     expect(draft).toEqual({ hide: 3 });
-    sim.setTownFocus(draft, a);
+    sim.setTownFocus(draft, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: 3 });
     expect(errorsOf(sim)).toEqual([]);
     // A decrement to zero still removes the row, and still emits nothing junk.
@@ -218,7 +219,7 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     const e = (reloaded as unknown as SimInternals).entities.get(b)!;
     e.pos = { x: ZONE1.hub.x, y: 0, z: ZONE1.hub.z };
     e.prevPos = { ...e.pos };
-    reloaded.setTownFocus({ hide: 1 }, b);
+    reloaded.setTownFocus({ hide: 1 }, 'time', b);
     for (let i = 0; i < 5; i++) reloaded.tick();
     expect(earned()).toBe(true);
   });
@@ -230,7 +231,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
 
     function harvestTotal(focused: boolean) {
       const { sim, internals, a } = setup();
-      if (focused) sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, a);
+      if (focused) sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
       let total = 0;
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 10000 + i, ZONE1.hub);
@@ -258,7 +259,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
 
     function harvestTotal(points: number) {
       const { sim, internals, a } = setup();
-      if (points > 0) sim.setTownFocus({ hide: points }, a);
+      if (points > 0) sim.setTownFocus({ hide: points }, 'time', a);
       let total = 0;
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 30000 + i, ZONE1.hub);
@@ -285,7 +286,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
     // Explicit [] = spread on both arms: an omitted pick would narrow the
     // focused run to fang alone (the town-focus default) and
     // never harvest hide at all.
-    sim.setTownFocus({ fang: 10 }, a);
+    sim.setTownFocus({ fang: 10 }, 'time', a);
     const mob = spawnHideWolf(internals, 20000, ZONE1.hub);
     sim.harvestCorpse(mob.id, [], a);
     const withOtherFocused = sim.countItem('rough_hide', a);
@@ -312,7 +313,7 @@ describe('harvestCorpse omitted-components town-focus default', () => {
     components: string[] | undefined,
   ): { hide: number; fang: number } {
     const { sim, internals, a } = setup();
-    if (focus) sim.setTownFocus(focus, a);
+    if (focus) sim.setTownFocus(focus, 'time', a);
     const mob = spawnHideWolf(internals, 40000, ZONE1.hub);
     sim.harvestCorpse(mob.id, components, a);
     return { hide: sim.countItem('rough_hide', a), fang: sim.countItem('wolf_fang', a) };
@@ -380,7 +381,9 @@ describe('the server forwards a set_town_focus allocation key verbatim (#2511)',
       raw,
       0,
     );
-    expect(spy).toHaveBeenCalledWith({ hide: 4, not_a_real_tag: 5 }, session.pid);
+    // No `tier` field on the frame, so the dispatch falls back to 'time' (the
+    // free tier; see the tier-forwarding describe below).
+    expect(spy).toHaveBeenCalledWith({ hide: 4, not_a_real_tag: 5 }, 'time', session.pid);
 
     // "Verbatim" is true of the KEY channel only, which is the channel #2511 is
     // about. The dispatch does pre-filter VALUES on `typeof v === 'number'`, so
@@ -402,6 +405,128 @@ describe('the server forwards a set_town_focus allocation key verbatim (#2511)',
       stringValued,
       0,
     );
-    expect(spy).toHaveBeenCalledWith({ hide: 4 }, session.pid);
+    expect(spy).toHaveBeenCalledWith({ hide: 4 }, 'time', session.pid);
+  });
+});
+
+// #1144: the wire command carries the chosen payment tier through to
+// Sim.setTownFocus, and the server validates it against the real
+// RESPEC_TIER_CONFIG keys rather than trusting the client-supplied string.
+describe('the server forwards and validates the set_town_focus payment tier (#1144)', () => {
+  function joinedServer(): { server: GameServer; session: ClientSession } {
+    const server = new GameServer();
+    const session = server.join(
+      { readyState: 1, send: () => {} } as never,
+      98,
+      98,
+      'Beta',
+      'warrior',
+      null,
+    );
+    if ('error' in session) throw new Error(session.error);
+    session.blockListLoaded = true;
+    return { server, session };
+  }
+
+  function dispatch(server: GameServer, session: unknown, msg: Record<string, unknown>): void {
+    const raw = JSON.stringify({ t: 'cmd', cmd: 'set_town_focus', ...msg });
+    (server as unknown as { dispatchMessage: (...a: unknown[]) => void }).dispatchMessage(
+      session,
+      JSON.parse(raw),
+      raw,
+      0,
+    );
+  }
+
+  it('forwards a real tier verbatim', () => {
+    const { server, session } = joinedServer();
+    const spy = vi.spyOn(server.sim, 'setTownFocus').mockImplementation(() => {});
+    dispatch(server, session, { allocation: { hide: 4 }, tier: 'instant' });
+    expect(spy).toHaveBeenCalledWith({ hide: 4 }, 'instant', session.pid);
+  });
+
+  it('falls back to the free time tier for an unknown or malformed tier string', () => {
+    const { server, session } = joinedServer();
+    const spy = vi.spyOn(server.sim, 'setTownFocus').mockImplementation(() => {});
+    dispatch(server, session, { allocation: { hide: 4 }, tier: 'not_a_real_tier' });
+    expect(spy).toHaveBeenCalledWith({ hide: 4 }, 'time', session.pid);
+    spy.mockClear();
+    dispatch(server, session, { allocation: { hide: 4 }, tier: 7 });
+    expect(spy).toHaveBeenCalledWith({ hide: 4 }, 'time', session.pid);
+  });
+});
+
+// #1144: the re-spec cost model, wired end to end through the real Sim
+// (charge/reject before the allocation commits). tests/focus.test.ts owns
+// computeRespecCost's own math; this drives the command path that spends it.
+describe('setTownFocus charges the #1144 re-spec cost model', () => {
+  it('the free time tier never charges coin or the arcane_dust material', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    const startingCopper = meta.copper;
+    sim.setTownFocus({ hide: FOCUS_POINT_BUDGET }, 'time', a);
+    expect(meta.townFocus).toEqual({ hide: FOCUS_POINT_BUDGET });
+    expect(meta.copper).toBe(startingCopper);
+    expect(sim.countItem('arcane_dust', a)).toBe(0);
+  });
+
+  it('a paid tier deducts coin, priced off the points actually moved', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    meta.copper = 10_000;
+    // timeAndPartial also costs 1 material/point; stock enough that the
+    // affordability check isolates the COIN assertion below.
+    sim.addItem('arcane_dust', 50, a);
+    sim.setTownFocus({ hide: 3 }, 'timeAndPartial', a);
+    expect(meta.townFocus).toEqual({ hide: 3 });
+    // RESPEC_TIER_CONFIG.timeAndPartial: 5 coin/point, magnitude 3 (0 -> 3).
+    expect(meta.copper).toBe(10_000 - 3 * 5);
+    expect(sim.countItem('arcane_dust', a)).toBe(50 - 3 * 1);
+  });
+
+  it('a materials-costing tier consumes arcane_dust from the bag', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    meta.copper = 10_000;
+    sim.addItem('arcane_dust', 50, a);
+    sim.setTownFocus({ hide: 2 }, 'instant', a);
+    expect(meta.townFocus).toEqual({ hide: 2 });
+    // RESPEC_TIER_CONFIG.instant: 5 materials/point, magnitude 2.
+    expect(sim.countItem('arcane_dust', a)).toBe(50 - 2 * 5);
+  });
+
+  it('rejects an instant re-spec the player cannot afford, leaving the allocation and purse untouched', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    meta.copper = 0; // instant costs 25 coin/point; unaffordable with zero
+    sim.drainEvents(); // clear setup noise so the error assertion is decisive
+    sim.setTownFocus({ hide: 2 }, 'instant', a);
+    expect(meta.townFocus).toEqual({});
+    expect(meta.copper).toBe(0);
+    const errors = sim
+      .drainEvents()
+      .filter((e): e is Extract<typeof e, { type: 'error' }> => e.type === 'error')
+      .map((e) => e.text);
+    expect(errors).toEqual(['You cannot afford that focus re-spec.']);
+  });
+
+  it('rejects an instant re-spec missing the required arcane_dust, even with enough coin', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    meta.copper = 10_000; // affordable coin-wise
+    // No arcane_dust in the bag at all.
+    sim.setTownFocus({ hide: 1 }, 'instant', a);
+    expect(meta.townFocus).toEqual({});
+    expect(meta.copper).toBe(10_000); // never charged: the affordability check ran first
+  });
+
+  it('a no-op reallocation (identical to the current allocation) costs nothing at any tier', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    sim.setTownFocus({ hide: 3 }, 'time', a);
+    meta.copper = 0; // now unaffordable for a REAL paid re-spec
+    sim.setTownFocus({ hide: 3 }, 'instant', a);
+    expect(meta.townFocus).toEqual({ hide: 3 });
+    expect(meta.copper).toBe(0);
   });
 });
