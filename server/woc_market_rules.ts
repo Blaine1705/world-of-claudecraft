@@ -48,7 +48,32 @@ export const WOC_MARKET_DURATION_HOURS = [12, 24, 48] as const;
 export const WOC_MARKET_MAX_ACTIVE_LISTINGS = 12;
 /** Price floor and ceiling for every USD field. */
 export const WOC_MARKET_MIN_PRICE_CENTS = 25;
-export const WOC_MARKET_MAX_PRICE_CENTS = 5_000_000;
+/**
+ * The per-field USD ceiling, sized against the REAL $WOC market rather than
+ * chosen as a round number.
+ *
+ * Measured 2026-08-05 from the only pool with meaningful volume (WOC/SOL on
+ * pumpswap): total pool liquidity about $38,000, of which the $WOC side is about
+ * $18,900, and a fully diluted market cap of about $160,000. The previous ceiling
+ * of $50,000 was 31% of the entire token's market cap for ONE item sale, and
+ * larger than every pool that prices the token put together.
+ *
+ * $1,000 is the largest figure that stays defensible on three independent counts:
+ *
+ *  - about 0.6% of market cap, so a single sale can never be a material fraction
+ *    of the token's total value;
+ *  - about 5% of the $WOC-side pool reserve, so a buyer who has to market-buy to
+ *    pay moves the price noticeably but not catastrophically (most will already
+ *    hold the tokens, which is why this is the loosest of the three bounds);
+ *  - exactly where the bond ladder already stops scaling. bondCents is 5% capped
+ *    at $50, so $1,000 is the point the existing design already treated as the
+ *    top of the range.
+ *
+ * REVISIT THIS as liquidity grows: it is deliberately a measured number and it
+ * will go stale. The measurement above is recorded so the next person knows what
+ * it was sized against rather than guessing why it is 1000.
+ */
+export const WOC_MARKET_MAX_PRICE_CENTS = 100_000;
 /** The buy-now server lock: one pending buyer at a time. Longer than one quote
  *  lifetime on purpose, so an honest buyer whose first quote expires still has
  *  window left to request a fresh one. */

@@ -11,6 +11,7 @@ import {
   strikeSuspensionMs,
   validListingParams,
   validSettlementTransition,
+  WOC_MARKET_BOND_MAX_CENTS,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
   WOC_MARKET_DURATION_HOURS,
@@ -47,8 +48,19 @@ describe('tunables: literal pins', () => {
     expect(WOC_MARKET_BOND_PENDING_TTL_SECONDS).toBe(300);
     expect(WOC_MARKET_MAX_ACTIVE_LISTINGS).toBe(12);
     expect(WOC_MARKET_MIN_PRICE_CENTS).toBe(25);
-    expect(WOC_MARKET_MAX_PRICE_CENTS).toBe(5_000_000);
+    expect(WOC_MARKET_MAX_PRICE_CENTS).toBe(100_000);
     expect(WOC_MARKET_STRANDED_RECLAIM_SECONDS).toBe(300);
+  });
+
+  it('keeps the price ceiling where the bond ladder stops scaling', () => {
+    // A relationship, not a second copy of the literal. bondCents is 5% capped at
+    // $50, so the bond is proportional right up to $1,000 and flat above it.
+    // Raising the ceiling without raising the bond cap therefore makes the bond a
+    // shrinking fraction of the largest sales, which is the weak-deterrent shape
+    // the whole bond exists to avoid. This forces that to be a conscious edit.
+    expect(bondCents(WOC_MARKET_MAX_PRICE_CENTS)).toBe(WOC_MARKET_BOND_MAX_CENTS);
+    // And the ceiling leaves a usable band above the floor.
+    expect(WOC_MARKET_MAX_PRICE_CENTS).toBeGreaterThan(WOC_MARKET_MIN_PRICE_CENTS * 100);
   });
 
   it('caps the seller-selectable duration at 48 hours', () => {

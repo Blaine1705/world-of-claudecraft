@@ -48,7 +48,7 @@ const statusBody = {
   maxActiveListings: 12,
   durationsHours: [12, 24, 48],
   minPriceCents: 25,
-  maxPriceCents: 5_000_000,
+  maxPriceCents: 100_000,
   qualityFloor: 'epic',
   settlementWindowSeconds: 600,
 };
