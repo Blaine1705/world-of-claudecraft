@@ -1628,6 +1628,9 @@ export class CharacterVisual {
     disposeOwnedWeaponSkinMaterials(this.model, this.originalMaterials, [
       this.ghostMaterials,
       this.soulRendMaterials,
+      this.shadowformMaterials,
+      this.moonkinMaterials,
+      this.metamorphMaterials,
       this.auraGlowMaterials,
     ]);
   }
@@ -1636,11 +1639,17 @@ export class CharacterVisual {
     const materials = new Set<THREE.Material>([
       ...this.ghostMaterials.values(),
       ...this.soulRendMaterials.values(),
+      ...this.shadowformMaterials.values(),
+      ...this.moonkinMaterials.values(),
+      ...this.metamorphMaterials.values(),
       ...this.auraGlowMaterials.values(),
     ]);
     for (const material of materials) material.dispose();
     this.ghostMaterials.clear();
     this.soulRendMaterials.clear();
+    this.shadowformMaterials.clear();
+    this.moonkinMaterials.clear();
+    this.metamorphMaterials.clear();
     this.auraGlowMaterials.clear();
   }
 
