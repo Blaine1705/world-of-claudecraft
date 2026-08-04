@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'Все',
+  'hudChrome.actionBar.done': 'Готово',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': 'Потолок редкого',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': 'Нужно мастерство',
+  'guide.profPages.wieldNone': 'Любое',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': 'Обратитесь к {name} за заданием «{quest}».',
+  'itemUi.vendor.qtyMultiple': 'x{count}',
+  'itemUi.vendor.buyCountAria': 'Купить {count} {item} за {price}',
+  'itemUi.vendor.buyCountAriaWithRequirement': 'Купить {count} {item} за {price}. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': 'Купить',
   'entities.items.eastbrook_greatsword.name': 'Истврукский двуручный меч',
   'entities.items.highwatch_greatsword.name': 'Двуручный меч Хайвотча',
   'entities.items.highwatch_wallshield.name': 'Стенной щит Хайвотча',
@@ -712,6 +720,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'Скрыть офлайн участников гильдии',
   'hudChrome.social.billboard.label': 'Доска объявлений гильдии',
   'hudChrome.social.billboard.empty': 'На доске объявлений пока пусто.',
+  'hudChrome.social.billboard.loginLine': 'Доска объявлений гильдии: {text}',
   'hudChrome.social.billboard.setBy': 'Разместил(а): {name}',
   'hudChrome.social.billboard.save': 'Сохранить',
   'hudChrome.social.billboard.placeholder': 'Напишите сообщение для гильдии',
@@ -1315,6 +1324,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.',
   'wallet.mobileAppHelp':
     'Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.',
+  'wallet.seekerAppHelp':
+    'Продолжите с Seed Vault Wallet. Проверьте запросы на подключение и подтверждение в Seed Vault, затем вернитесь в игру.',
   'wallet.standaloneAppHelp':
     'Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.',
   'wallet.openAppTitle': 'Продолжить в {wallet}',
@@ -2150,6 +2161,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': 'Глава гильдии',
   'hud.social.ranks.officer': 'Офицер',
   'hud.social.ranks.member': 'Участник',
+  'hud.social.tenure.recruit': 'Новобранец',
+  'hud.social.tenure.veteran': 'Ветеран',
   'hud.social.guildHeadOne': 'вы {rank}, {count} участник',
   'hud.social.guildHeadMany': 'вы {rank}, {count} участников',
   'hud.trade.title': 'Обмен с {name}',
@@ -7552,6 +7565,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': 'Куплю',
   'hudChrome.discord.relay.help.label': 'Нужна помощь',
   'hudChrome.crafting.title': 'Крафт',
+  'hudChrome.crafting.dialogOption': 'Крафт',
+  'hudChrome.crafting.dialogOptionAria': 'Открыть окно крафта: {craft}',
   'hudChrome.crafting.close': 'Закрыть крафт',
   'hudChrome.crafting.craft': 'Создать',
   'hudChrome.crafting.reagentsNeeded': 'Требуется:',
@@ -8273,6 +8288,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
+  'apiError.seeker.native_only': 'Права Seeker доступны только в нативном приложении.',
+  'apiError.seeker.attestation_failed': 'Не удалось подтвердить устройство. Повторите попытку.',
+  'apiError.seeker.solana_artifact_required': 'Продолжите в версии приложения из Solana Store.',
+  'apiError.seeker.wallet_required': 'Сначала привяжите и подтвердите кошелек.',
+  'apiError.seeker.genesis_token_required': 'Требуется подтвержденный Seeker Genesis Token.',
+  'apiError.seeker.genesis_token_claimed': 'Этот Seeker Genesis Token уже был зарегистрирован.',
+  'apiError.seeker.entitlement_required': 'Требуются подтвержденные права Seeker.',
+  'apiError.seeker.current_ownership_required': 'Требуется текущее владение Seeker Genesis Token.',
   'apiError.steam.invalid_ticket':
     'Steam не смог подтвердить этот запрос на привязку. Повторите попытку из настольного приложения.',
   'apiError.steam.banned': 'Этот аккаунт Steam нельзя привязать.',
@@ -9288,6 +9311,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    'Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру.',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': 'Настроить клавиши панели действий',
   'hudChrome.actionBar.editKeysHint':
@@ -11041,13 +11067,4 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
   'itemUi.vendor.buyStack': 'Купить {count}',
   'itemUi.vendor.buyStackAria': 'Купить {count} {item} за {price}',
-  "guide.profPages.colWield": "Используйте в",
-  "guide.profPages.wieldNone": "Любой",
-  "hudChrome.actionBar.done": "Сделанный",
-  "hudChrome.gathering.respawnClock": "{minutes}:{seconds}",
-  "itemUi.vendor.buyCountAria": "Купите {count} из {item} за {price}",
-  "itemUi.vendor.buyCountAriaWithRequirement": "Купите {count} из {item} за {price}. {requirement}",
-  "itemUi.vendor.buyQuantityConfirm": "Купить",
-  "itemUi.vendor.qtyMultiple": "{count}x",
 };
-

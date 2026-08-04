@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '全部',
+  'hudChrome.actionBar.done': '完成',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '精良品質上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '傳奇',
   'hudChrome.discord.roleTag.shill': '擁護者',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟練度',
+  'guide.profPages.wieldNone': '不限',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '請找{name}接取《{quest}》。',
+  'itemUi.vendor.qtyMultiple': '{count} 個',
+  'itemUi.vendor.buyCountAria': '以 {price} 購買 {count} 個 {item}',
+  'itemUi.vendor.buyCountAriaWithRequirement': '以 {price} 購買 {count} 個 {item}。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '購買',
   'entities.items.eastbrook_greatsword.name': '東溪巨劍',
   'entities.items.highwatch_greatsword.name': '高望巨劍',
   'entities.items.highwatch_wallshield.name': '高望壁盾',
@@ -693,6 +701,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '隱藏離線公會成員',
   'hudChrome.social.billboard.label': '公會公告板',
   'hudChrome.social.billboard.empty': '公告板上還沒有內容。',
+  'hudChrome.social.billboard.loginLine': '公會公告板：{text}',
   'hudChrome.social.billboard.setBy': '由 {name} 設定',
   'hudChrome.social.billboard.save': '儲存',
   'hudChrome.social.billboard.placeholder': '給公會寫一則訊息',
@@ -1246,6 +1255,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '若要在此處看到錢包，請保持 Solflare Wallet 等瀏覽器錢包擴充功能處於啟用狀態。',
   'wallet.mobileAppHelp':
     '選擇 Phantom 或 Solflare。錢包應用程式會要求核准。請保持遊戲開啟，完成後返回遊戲。',
+  'wallet.seekerAppHelp':
+    '使用 Seed Vault Wallet 繼續。在 Seed Vault 中檢視連線與驗證要求，然後返回遊戲。',
   'wallet.standaloneAppHelp':
     '主畫面應用程式目前尚不支援連接錢包。若要使用 Phantom 或 Solflare，請在 Safari 或 Chrome 中開啟 World of ClaudeCraft。',
   'wallet.openAppTitle': '在 {wallet} 中繼續',
@@ -2033,6 +2044,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '會長',
   'hud.social.ranks.officer': '幹部',
   'hud.social.ranks.member': '成員',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '老兵',
   'hud.social.guildHeadOne': '你是{rank}，{count}名成員',
   'hud.social.guildHeadMany': '你是{rank}，{count}名成員',
   'hud.trade.title': '與 {name} 交易',
@@ -7125,6 +7138,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '想要購買',
   'hudChrome.discord.relay.help.label': '需要協助',
   'hudChrome.crafting.title': '製作',
+  'hudChrome.crafting.dialogOption': '製作',
+  'hudChrome.crafting.dialogOptionAria': '開啟{craft}製作視窗',
   'hudChrome.crafting.close': '關閉製作',
   'hudChrome.crafting.craft': '製作',
   'hudChrome.crafting.reagentsNeeded': '需要:',
@@ -7778,6 +7793,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.ota_updates.invalid_input': '輸入無效。',
   'apiError.steam.disabled': 'Steam 連結目前無法使用。',
   'apiError.wallet.handoff_invalid': '錢包授權已過期或無法驗證。請再試一次。',
+  'apiError.seeker.native_only': 'Seeker 權益僅可在原生應用程式中使用。',
+  'apiError.seeker.attestation_failed': '裝置驗證失敗。請再試一次。',
+  'apiError.seeker.solana_artifact_required': '請使用 Solana Store 版應用程式繼續。',
+  'apiError.seeker.wallet_required': '請先連結並驗證錢包。',
+  'apiError.seeker.genesis_token_required': '需要已驗證的 Seeker Genesis Token。',
+  'apiError.seeker.genesis_token_claimed': '該 Seeker Genesis Token 已被領取。',
+  'apiError.seeker.entitlement_required': '需要已驗證的 Seeker 權益。',
+  'apiError.seeker.current_ownership_required': '需要目前持有 Seeker Genesis Token。',
   'apiError.steam.invalid_ticket': 'Steam 無法驗證此連結請求。請在桌面應用程式中重試。',
   'apiError.steam.banned': '該 Steam 帳號無法連結。',
   'apiError.steam.already_linked': '你的帳號已連結一個 Steam 帳號。',
@@ -8722,6 +8745,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '編輯動作列按鍵',
   'hudChrome.actionBar.editKeysHint': '點擊動作列上的一個欄位，然後按下按鍵進行綁定。',
@@ -10372,12 +10398,4 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔湧',
   'itemUi.vendor.buyStack': '購買 {count} 個',
   'itemUi.vendor.buyStackAria': '以 {price} 購買 {count} 個 {item}',
-  'guide.profPages.colWield': '使用於',
-  'guide.profPages.wieldNone': '任何',
-  'hudChrome.actionBar.done': '完畢',
-  'hudChrome.gathering.respawnClock': '{minutes}：{seconds}',
-  'itemUi.vendor.buyCountAria': '為 {price} 購買 {item} 的 {count}',
-  'itemUi.vendor.buyCountAriaWithRequirement': '為 {price} 購買 {item} 的 {count}。 {requirement}',
-  'itemUi.vendor.buyQuantityConfirm': '買',
-  'itemUi.vendor.qtyMultiple': '{count}x',
 };

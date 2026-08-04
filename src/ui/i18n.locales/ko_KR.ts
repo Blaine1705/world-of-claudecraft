@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': '전체',
+  'hudChrome.actionBar.done': '완료',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': '희귀 상한',
   'hudChrome.crafting.pairOptionLabel': '{pair} ({craftA} + {craftB})',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': '전설',
   'hudChrome.discord.roleTag.shill': '홍보대사',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '사용 숙련도',
+  'guide.profPages.wieldNone': '제한 없음',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '{name}에게 "{quest}"을(를) 받으세요.',
+  'itemUi.vendor.qtyMultiple': '{count}개',
+  'itemUi.vendor.buyCountAria': '{price}에 {item} {count}개 구매',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{price}에 {item} {count}개 구매. {requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '구매',
   'entities.items.eastbrook_greatsword.name': '이스트브룩 대검',
   'entities.items.highwatch_greatsword.name': '하이워치 대검',
   'entities.items.highwatch_wallshield.name': '하이워치 벽방패',
@@ -712,6 +720,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '오프라인 길드원 숨기기',
   'hudChrome.social.billboard.label': '길드 게시판',
   'hudChrome.social.billboard.empty': '게시판에 아직 아무 내용도 없습니다.',
+  'hudChrome.social.billboard.loginLine': '길드 게시판: {text}',
   'hudChrome.social.billboard.setBy': '{name} 설정',
   'hudChrome.social.billboard.save': '저장',
   'hudChrome.social.billboard.placeholder': '길드에 전할 메시지를 작성하세요',
@@ -1297,6 +1306,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '여기에 지갑이 표시되려면 Solflare Wallet 같은 브라우저 지갑 확장 프로그램이 활성화되어 있어야 합니다.',
   'wallet.mobileAppHelp':
     'Phantom 또는 Solflare를 선택하세요. 지갑 앱에서 승인을 요청합니다. 게임을 열어 둔 채 완료 후 돌아오세요.',
+  'wallet.seekerAppHelp':
+    'Seed Vault Wallet로 계속하세요. Seed Vault에서 연결 및 인증 요청을 확인한 후 게임으로 돌아오세요.',
   'wallet.standaloneAppHelp':
     '홈 화면 앱에서는 아직 지갑 연결을 사용할 수 없습니다. Phantom 또는 Solflare를 사용하려면 Safari나 Chrome에서 World of ClaudeCraft를 여세요.',
   'wallet.openAppTitle': '{wallet}에서 계속',
@@ -2111,6 +2122,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '길드장',
   'hud.social.ranks.officer': '장교',
   'hud.social.ranks.member': '회원',
+  'hud.social.tenure.recruit': '신병',
+  'hud.social.tenure.veteran': '베테랑',
   'hud.social.guildHeadOne': '당신은 {rank}, {count}명 회원',
   'hud.social.guildHeadMany': '당신은 {rank}, {count}명 회원',
   'hud.trade.title': '{name}님과 거래',
@@ -7429,6 +7442,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '구매 희망',
   'hudChrome.discord.relay.help.label': '도움 요청',
   'hudChrome.crafting.title': '제작',
+  'hudChrome.crafting.dialogOption': '제작',
+  'hudChrome.crafting.dialogOptionAria': '{craft} 제작 창 열기',
   'hudChrome.crafting.close': '제작 닫기',
   'hudChrome.crafting.craft': '제작',
   'hudChrome.crafting.reagentsNeeded': '필요 재료:',
@@ -8127,6 +8142,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': '현재 Steam 연동을 사용할 수 없습니다.',
   'apiError.wallet.handoff_invalid':
     '지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.',
+  'apiError.seeker.native_only': 'Seeker 자격은 네이티브 앱에서만 사용할 수 있습니다.',
+  'apiError.seeker.attestation_failed': '기기 인증에 실패했습니다. 다시 시도해 주세요.',
+  'apiError.seeker.solana_artifact_required': 'Solana Store 앱을 사용하여 계속해 주세요.',
+  'apiError.seeker.wallet_required': '먼저 지갑을 연결하고 인증하세요.',
+  'apiError.seeker.genesis_token_required': '인증된 Seeker Genesis Token이 필요합니다.',
+  'apiError.seeker.genesis_token_claimed': '해당 Seeker Genesis Token은 이미 등록되었습니다.',
+  'apiError.seeker.entitlement_required': '인증된 Seeker 자격이 필요합니다.',
+  'apiError.seeker.current_ownership_required': '현재 Seeker Genesis Token을 보유해야 합니다.',
   'apiError.steam.invalid_ticket':
     'Steam이 이 연동 요청을 확인하지 못했습니다. 데스크톱 앱에서 다시 시도해 주세요.',
   'apiError.steam.banned': '해당 Steam 계정은 연동할 수 없습니다.',
@@ -9125,6 +9148,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '탑승 / 하차',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다.',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '액션 바 키 편집',
   'hudChrome.actionBar.editKeysHint': '액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.',
@@ -10855,13 +10881,4 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
   'itemUi.vendor.buyStack': '{count}개 구매',
   'itemUi.vendor.buyStackAria': '{price}에 {item} {count}개 구매',
-  'guide.profPages.colWield': '사용 장소',
-  'guide.profPages.wieldNone': '어느',
-  'hudChrome.actionBar.done': '완료',
-  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
-  'itemUi.vendor.buyCountAria': '{price}에 {item} 중 {count} 구매',
-  'itemUi.vendor.buyCountAriaWithRequirement':
-    '{price}에 {item} 중 {count}을(를) 구매하세요. {requirement}',
-  'itemUi.vendor.buyQuantityConfirm': '구입하다',
-  'itemUi.vendor.qtyMultiple': '{count}x',
 };

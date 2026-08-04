@@ -14,6 +14,8 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.all': 'すべて',
+  'hudChrome.actionBar.done': '完了',
+  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
   'hudChrome.crafting.identity.ceilingRare': 'レア上限',
   'hudChrome.crafting.pairOptionLabel': '{pair}（{craftA} + {craftB}）',
   'hudChrome.nameplate.mobEliteLevel': '{level}+',
@@ -22,8 +24,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'レジェンド',
   'hudChrome.discord.roleTag.shill': 'サポーター',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.colWield': '使用熟練度',
+  'guide.profPages.wieldNone': '制限なし',
   'guide.profPages.fish.pctFmt': '{pct}%',
   'questUi.dialog.profIntroHint': '{name}から「{quest}」を受けましょう。',
+  'itemUi.vendor.qtyMultiple': '{count}個',
+  'itemUi.vendor.buyCountAria': '{item}を{count}個、{price}で購入',
+  'itemUi.vendor.buyCountAriaWithRequirement': '{item}を{count}個、{price}で購入。{requirement}',
+  'itemUi.vendor.buyQuantityConfirm': '購入',
   'entities.items.eastbrook_greatsword.name': 'イーストブルックの大剣',
   'entities.items.highwatch_greatsword.name': 'ハイウォッチの大剣',
   'entities.items.highwatch_wallshield.name': 'ハイウォッチの壁盾',
@@ -714,6 +722,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'オフラインのギルドメンバーを非表示',
   'hudChrome.social.billboard.label': 'ギルド掲示板',
   'hudChrome.social.billboard.empty': '掲示板にはまだ何もありません。',
+  'hudChrome.social.billboard.loginLine': 'ギルド掲示板：{text}',
   'hudChrome.social.billboard.setBy': '{name}が設定',
   'hudChrome.social.billboard.save': '保存',
   'hudChrome.social.billboard.placeholder': 'ギルドへのメッセージを書く',
@@ -1300,6 +1309,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ここにウォレットを表示するには、Solflare Wallet などのブラウザ用ウォレット拡張機能を有効にしておいてください。',
   'wallet.mobileAppHelp':
     'Phantom または Solflare を選択してください。ウォレットアプリで承認を求められます。ゲームを開いたままにし、完了後に戻ってください。',
+  'wallet.seekerAppHelp':
+    'Seed Vault Walletで続行します。Seed Vaultで接続と認証のリクエストを確認し、完了したらゲームに戻ってください。',
   'wallet.standaloneAppHelp':
     'ホーム画面アプリでは、まだウォレットに接続できません。Phantom または Solflare を使用するには、Safari か Chrome で World of ClaudeCraft を開いてください。',
   'wallet.openAppTitle': '{wallet} で続行',
@@ -2127,6 +2138,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': 'ギルドマスター',
   'hud.social.ranks.officer': '士官',
   'hud.social.ranks.member': 'メンバー',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '古参',
   'hud.social.guildHeadOne': 'あなたは{rank}、{count}人のメンバー',
   'hud.social.guildHeadMany': 'あなたは{rank}、{count}人のメンバー',
   'hud.trade.title': '{name}と取引',
@@ -7435,6 +7448,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.wtb.label': '購入希望',
   'hudChrome.discord.relay.help.label': 'ヘルプが必要',
   'hudChrome.crafting.title': '製作',
+  'hudChrome.crafting.dialogOption': '製作',
+  'hudChrome.crafting.dialogOptionAria': '{craft}の製作ウィンドウを開く',
   'hudChrome.crafting.close': '製作を閉じる',
   'hudChrome.crafting.craft': '製作',
   'hudChrome.crafting.reagentsNeeded': '必要素材:',
@@ -8144,6 +8159,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Steam連携は現在利用できません。',
   'apiError.wallet.handoff_invalid':
     'ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。',
+  'apiError.seeker.native_only': 'Seeker資格はネイティブアプリでのみ利用できます。',
+  'apiError.seeker.attestation_failed': '端末の検証に失敗しました。もう一度お試しください。',
+  'apiError.seeker.solana_artifact_required': 'Solana Store版アプリを使用して続行してください。',
+  'apiError.seeker.wallet_required': '先にウォレットを連携して検証してください。',
+  'apiError.seeker.genesis_token_required': '検証済みのSeeker Genesis Tokenが必要です。',
+  'apiError.seeker.genesis_token_claimed': 'そのSeeker Genesis Tokenはすでに取得されています。',
+  'apiError.seeker.entitlement_required': '検証済みのSeeker資格が必要です。',
+  'apiError.seeker.current_ownership_required':
+    '現在Seeker Genesis Tokenを所有している必要があります。',
   'apiError.steam.invalid_ticket':
     'Steamがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。',
   'apiError.steam.banned': 'そのSteamアカウントは連携できません。',
@@ -9136,6 +9160,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乗 / 降車',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    'マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': 'アクションバーのキーを編集',
   'hudChrome.actionBar.editKeysHint':
@@ -10862,13 +10889,4 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
   'itemUi.vendor.buyStack': '{count}個購入',
   'itemUi.vendor.buyStackAria': '{item}を{count}個、{price}で購入',
-  'guide.profPages.colWield': 'で使用します',
-  'guide.profPages.wieldNone': 'どれでも',
-  'hudChrome.actionBar.done': '終わり',
-  'hudChrome.gathering.respawnClock': '{minutes}:{seconds}',
-  'itemUi.vendor.buyCountAria': '{price} で {item} の {count} を購入',
-  'itemUi.vendor.buyCountAriaWithRequirement':
-    '{price} で {item} の {count} を購入します。 {requirement}',
-  'itemUi.vendor.buyQuantityConfirm': '買う',
-  'itemUi.vendor.qtyMultiple': '{count}x',
 };

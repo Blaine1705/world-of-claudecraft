@@ -957,7 +957,8 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
-      "mount": "Сесть / Спешиться"
+      "mount": "Сесть / Спешиться",
+      "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
     "actionBar": {
       "editKeys": "Настроить клавиши панели действий",
@@ -966,7 +967,7 @@ export const ru_RU: EnTranslations = {
       "bannerCapturing": "Нажмите клавишу, чтобы назначить её этой ячейке...",
       "boundToKey": "Назначено на {key}.",
       "reset": "Сбросить",
-      "done": "Сделанный",
+      "done": "Готово",
       "cancel": "Отмена",
       "resetConfirmTitle": "Сбросить клавиши панели действий?",
       "resetConfirmBody": "Первая панель вернётся к клавишам по умолчанию, а вторая и третья панели останутся без назначенных клавиш. Это действие нельзя отменить."
@@ -2352,6 +2353,7 @@ export const ru_RU: EnTranslations = {
       "billboard": {
         "label": "Доска объявлений гильдии",
         "empty": "На доске объявлений пока пусто.",
+        "loginLine": "Доска объявлений гильдии: {text}",
         "setBy": "Разместил(а): {name}",
         "save": "Сохранить",
         "placeholder": "Напишите сообщение для гильдии",
@@ -2588,6 +2590,8 @@ export const ru_RU: EnTranslations = {
     "crafting": {
       "title": "Крафт",
       "close": "Закрыть крафт",
+      "dialogOption": "Крафт",
+      "dialogOptionAria": "Открыть окно крафта: {craft}",
       "craft": "Создать",
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
@@ -3079,6 +3083,16 @@ export const ru_RU: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Недопустимые данные."
+    },
+    "seeker": {
+      "native_only": "Права Seeker доступны только в нативном приложении.",
+      "attestation_failed": "Не удалось подтвердить устройство. Повторите попытку.",
+      "solana_artifact_required": "Продолжите в версии приложения из Solana Store.",
+      "wallet_required": "Сначала привяжите и подтвердите кошелек.",
+      "genesis_token_required": "Требуется подтвержденный Seeker Genesis Token.",
+      "genesis_token_claimed": "Этот Seeker Genesis Token уже был зарегистрирован.",
+      "entitlement_required": "Требуются подтвержденные права Seeker.",
+      "current_ownership_required": "Требуется текущее владение Seeker Genesis Token."
     }
   },
   "guide": {
@@ -4274,8 +4288,8 @@ export const ru_RU: EnTranslations = {
       "toolUnavailable": "Не продается",
       "priceNone": "Не продается",
       "toolTierReq": "Инструмент {tier} уровня",
-      "colWield": "Используйте в",
-      "wieldNone": "Любой",
+      "colWield": "Нужно мастерство",
+      "wieldNone": "Любое",
       "yieldsHeading": "Что дает сбор",
       "yieldsBody": "Каждый сбор катит качество для того, что он дает, и ваше мастерство, это вся история этого броска. Совсем новый собиратель всегда тянет обычный материал; каждое очко навыка стабильно переносит вес из обычного в высшие сорта и никогда назад, пока на пределе в 100 обычный сорт не исчезнет совсем: 60 процентов необычного, 30 процентов редкого, 8 процентов эпического и 2 процента легендарного, каждый раз.\n\nКачество означает и количество: обычный бросок дает 1 единицу, необычный и редкий дают 2, эпический 3, а легендарный 4. Любая редкая, эпическая или легендарная добыча приходит подписанным экземпляром с клеймом Gathered by you: на пределе это четыре сбора из десяти несут ваше имя, а правила происхождения на странице Crafting Economy объясняют, почему ремесленники платят сверху ровно за такие стопки.",
       "bandsHeading": "Разряды мастерства",
@@ -5158,6 +5172,7 @@ export const ru_RU: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Привилегии держателя активны. Подключайте приложение, когда нужно подписать или потратить.",
     "extensionHelp": "Чтобы кошелек появился здесь, держите активным браузерное расширение кошелька, например Solflare Wallet.",
     "mobileAppHelp": "Выберите Phantom или Solflare. Приложение кошелька запросит подтверждение. Не закрывайте игру и вернитесь в нее после завершения.",
+    "seekerAppHelp": "Продолжите с Seed Vault Wallet. Проверьте запросы на подключение и подтверждение в Seed Vault, затем вернитесь в игру.",
     "standaloneAppHelp": "Подключение кошелька пока недоступно в приложении с главного экрана. Для Phantom или Solflare откройте World of ClaudeCraft в Safari или Chrome.",
     "openAppTitle": "Продолжить в {wallet}",
     "openAppHelp": "Откройте {wallet}, чтобы проверить этот запрос. Не закрывайте вкладку с игрой, пока открыто приложение кошелька.",
@@ -6797,6 +6812,10 @@ export const ru_RU: EnTranslations = {
         "officer": "Офицер",
         "member": "Участник"
       },
+      "tenure": {
+        "recruit": "Новобранец",
+        "veteran": "Ветеран"
+      },
       "guildHeadOne": "вы {rank}, {count} участник",
       "guildHeadMany": "вы {rank}, {count} участников"
     },
@@ -7118,12 +7137,12 @@ export const ru_RU: EnTranslations = {
       "buyStack": "Купить {count}",
       "buyStackAria": "Купить {count} {item} за {price}",
       "qtyRowAria": "Количество покупки",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "x{count}",
       "qtyMultipleAria": "Покупать по {count} за раз",
       "qtyCustom": "Другое",
       "qtyCustomAria": "Указать своё количество",
-      "buyCountAria": "Купите {count} из {item} за {price}",
-      "buyCountAriaWithRequirement": "Купите {count} из {item} за {price}. {requirement}",
+      "buyCountAria": "Купить {count} {item} за {price}",
+      "buyCountAriaWithRequirement": "Купить {count} {item} за {price}. {requirement}",
       "buyQuantityTitle": "Сколько купить: {item}? Не более {max}.",
       "buyQuantityInput": "Количество для покупки",
       "buyQuantityConfirm": "Купить",

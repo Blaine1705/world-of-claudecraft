@@ -957,7 +957,8 @@ export const en_CA: EnTranslations = {
       "petTaunt": "Pet: Taunt",
       "petDefensive": "Pet: Defensive",
       "petAggressive": "Pet: Aggressive",
-      "mount": "Mount / Dismount"
+      "mount": "Mount / Dismount",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const en_CA: EnTranslations = {
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Set by {name}",
         "save": "Save",
         "placeholder": "Write a message for the guild",
@@ -2588,6 +2590,8 @@ export const en_CA: EnTranslations = {
     "crafting": {
       "title": "Crafting",
       "close": "Close crafting",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Craft",
       "reagentsNeeded": "Requires:",
       "reagentLine": "{name} x{have}/{required}",
@@ -3079,6 +3083,16 @@ export const en_CA: EnTranslations = {
     },
     "ota_updates": {
       "invalid_input": "Invalid input."
+    },
+    "seeker": {
+      "native_only": "Seeker entitlement is available only in the native app.",
+      "attestation_failed": "Device verification failed. Please try again.",
+      "solana_artifact_required": "Use the Solana Store app to continue.",
+      "wallet_required": "Link and verify a wallet first.",
+      "genesis_token_required": "A verified Seeker Genesis Token is required.",
+      "genesis_token_claimed": "That Seeker Genesis Token has already been claimed.",
+      "entitlement_required": "Verified Seeker entitlement is required.",
+      "current_ownership_required": "Current Seeker Genesis Token ownership is required."
     }
   },
   "guide": {
@@ -5158,6 +5172,7 @@ export const en_CA: EnTranslations = {
     "helpLinkedDisconnectedWithBalance": "Holder perks are active. Connect the app when you need to sign or spend.",
     "extensionHelp": "Choose an installed browser wallet, or open Reown AppKit for Phantom, Solflare, Backpack, and more.",
     "mobileAppHelp": "Choose Phantom or Solflare. Your wallet app will ask for approval. Keep this game open and return to it when finished.",
+    "seekerAppHelp": "Continue with Seed Vault Wallet. Review the connection and verification requests in Seed Vault, then return to the game.",
     "standaloneAppHelp": "Wallet connections are not available in the Home Screen app yet. Open World of ClaudeCraft in Safari or Chrome to use Phantom or Solflare.",
     "openAppTitle": "Continue in {wallet}",
     "openAppHelp": "Open {wallet} to review this request. Keep this game tab open while the wallet app is active.",
@@ -6796,6 +6811,10 @@ export const en_CA: EnTranslations = {
         "leader": "Guild Master",
         "officer": "Officer",
         "member": "Member"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "you are {rank}, {count} member",
       "guildHeadMany": "you are {rank}, {count} members"
