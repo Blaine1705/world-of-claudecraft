@@ -15,7 +15,7 @@
 // unmet. Locked rows are ALWAYS produced (the visible ladder: the player
 // must see what a master will eventually teach), never dropped.
 
-import { ALL_RECIPES } from '../../../sim/content/recipes';
+import { ALL_RECIPES, recipeById } from '../../../sim/content/recipes';
 import type { StationType } from '../../../sim/professions/stations';
 import {
   teachTierMet,
@@ -69,13 +69,42 @@ export interface TrainViewDeps {
   items: Record<string, ItemDef>;
   /** Recipe ids with a learn currently in flight (the HUD's
    *  TrainLearnTracker, issue #2342): a teachable row in this set renders
-   *  pending (disabled, statePending label). Absent means none. */
+   *  pending (disabled, statePending label). Their fees are also reserved
+   *  against the purse so sibling teachable rows flip unaffordable the
+   *  moment a Learn click leaves, never after a failed second click.
+   *  Absent means none. */
   pendingRecipes?: ReadonlySet<string>;
   /** Server-confirmed learns (trainResult ok) the mirrored knownRecipes set
    *  may not carry yet: unioned into the known set so the row flips to Known
    *  the moment the result lands, never a repaint behind the cprof mirror.
    *  Absent means none. */
   confirmedRecipes?: ReadonlySet<string>;
+}
+
+/**
+ * Purse available for pricing one train row after in-flight Learn fees are
+ * reserved. Pending flights already left the client; the authoritative charge
+ * lands on trainResult ok, so sibling rows must not advertise gold they cannot
+ * still spend. The row under pricing is excluded from the reserve when it is
+ * itself pending, so its gold fee chip stays honest under the disabled pending
+ * state (the painter's pending arm pins that look). Clamped at 0 so a stale or
+ * over-reserved pending set never goes negative. Pure and host-agnostic so the
+ * view tests pin it directly.
+ */
+export function availableTrainCopper(
+  copper: number,
+  pendingRecipes?: ReadonlySet<string>,
+  /** Recipe id of the row being priced; its own pending fee is not re-reserved. */
+  excludeRecipeId?: string,
+): number {
+  if (!pendingRecipes || pendingRecipes.size === 0) return copper;
+  let reserved = 0;
+  for (const id of pendingRecipes) {
+    if (excludeRecipeId !== undefined && id === excludeRecipeId) continue;
+    const recipe = recipeById(id);
+    if (recipe) reserved += trainingFeeFor(recipe);
+  }
+  return Math.max(0, copper - reserved);
 }
 
 /** True when a station master with `masterNpcId` exists (the gossip dialog's
@@ -133,12 +162,18 @@ export function buildTrainView(masterNpcId: string, deps: TrainViewDeps): TrainV
   // Confirmed-but-unmirrored learns read Known immediately: knownness wins
   // over any stale pending flag for the same id (resolve() cleared it anyway).
   if (deps.confirmedRecipes) for (const id of deps.confirmedRecipes) known.add(id);
+  // Reserve in-flight Learn fees before pricing each ladder row: online the
+  // purse mirror can lag the click by a frame or more, and even offline a
+  // second Learn before trainResult must not look gold-chip ready on a purse
+  // the first flight already committed. Each row prices against the purse
+  // after every OTHER pending fee is reserved (see availableTrainCopper).
   const rows: TrainRow[] = [];
   for (const recipe of ALL_RECIPES) {
     if (trainingStationTypeFor(recipe) !== station.type) continue;
     const state = rowState(recipe, known, deps.craftSkills);
     if (state === null) continue;
     const feeCopper = trainingFeeFor(recipe);
+    const spendable = availableTrainCopper(deps.copper, deps.pendingRecipes, recipe.id);
     rows.push({
       recipeId: recipe.id,
       professionId: recipe.professionId,
@@ -148,7 +183,7 @@ export function buildTrainView(masterNpcId: string, deps: TrainViewDeps): TrainV
       state,
       ...(state === 'teachable' && deps.pendingRecipes?.has(recipe.id) ? { pending: true } : {}),
       feeCopper,
-      affordable: deps.copper >= feeCopper,
+      affordable: spendable >= feeCopper,
       ...(state === 'locked'
         ? {
             requirement: {

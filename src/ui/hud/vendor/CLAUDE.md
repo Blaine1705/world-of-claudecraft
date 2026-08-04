@@ -17,6 +17,12 @@ thin window painter, exported only through `index.ts`.
   (readable under the disabled opacity); locked rows keep the muted plain
   price; known rows are price-free. Pinned by
   `tests/train_window_painter.test.ts` plus the train/unbind hud suites.
+- Train affordability must stay live against the purse: an open train (and
+  unbind) window re-prices on every inventory/purse delta via
+  `Hud.onInventoryChanged` (the vendor edge, #2373), and a pending Learn
+  reserves its fee in `availableTrainCopper` so sibling rows disable before
+  the authoritative copper mirror lands. Pinned by `tests/train_view.test.ts`
+  and `tests/train_window_hud.test.ts`.
 - Recipe knownness resolves through the shared `train_view.ts` viewer
   predicates (`isRecipeKnownForViewer`); never a second knownness rule.
 

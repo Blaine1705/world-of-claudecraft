@@ -14317,6 +14317,17 @@ export class Hud {
     // this hook (#2373), so a hidden window would be rebuilt on each one.
     if (bagsWindowShown($('#bags').style.display)) this.renderBags();
     if (this.openVendorNpcId !== null) this.renderVendor();
+    // A trainer fee is a money-only self delta online (no inv echo): the
+    // trainResult arm can repaint before the purse mirror moves, so sibling
+    // Learn rows stayed gold-chip ready until a failed click. Re-price the
+    // open ladder (and the unbind fee list) on every purse move, the same
+    // edge the vendor affordability path already uses (#2373).
+    if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block') {
+      this.renderTrain();
+    }
+    if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block') {
+      this.renderUnbind();
+    }
     this.renderCharIfOpen();
     // The crafting window rides this hook too (#2375): it is the online
     // host's instant edge for an authoritative delta, and offline it is what

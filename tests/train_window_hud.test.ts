@@ -151,6 +151,27 @@ describe('hud.ts train window wiring (source pins)', () => {
       'confirmedRecipes: this.trainLearns.confirmedIds(identity.knownRecipes)',
     );
   });
+
+  it('reprices an open train (and unbind) window on every inventory/purse delta', () => {
+    // Online a trainer fee is a money-only self delta: trainResult can repaint
+    // before ClientWorld mirrors the new copper, so sibling Learn rows stayed
+    // gold-chip ready until a failed click. onInventoryChanged is the same
+    // edge that keeps vendor affordability honest (#2373); pin both service
+    // windows so a future edit cannot drop the train arm alone.
+    const start = hudSource.indexOf('onInventoryChanged(): void {');
+    expect(start, 'onInventoryChanged method present').toBeGreaterThan(-1);
+    const end = hudSource.indexOf('\n  onCosmeticsChanged()', start);
+    expect(end, 'onInventoryChanged precedes onCosmeticsChanged').toBeGreaterThan(start);
+    const arm = hudSource.slice(start, end);
+    expect(arm).toContain('this.openTrainNpcId !== null');
+    expect(arm).toContain("$('#train-window').style.display === 'block'");
+    expect(arm).toContain('this.renderTrain();');
+    expect(arm).toContain('this.openUnbindNpcId !== null');
+    expect(arm).toContain("$('#unbind-window').style.display === 'block'");
+    expect(arm).toContain('this.renderUnbind();');
+    // Vendor stays on the same hook (regression guard for the family).
+    expect(arm).toContain('this.renderVendor();');
+  });
 });
 
 describe('#train-window container exists in both HTML entries', () => {

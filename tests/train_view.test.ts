@@ -10,6 +10,7 @@ import { STATIONS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
+  availableTrainCopper,
   buildTrainView,
   isRecipeKnownForViewer,
   isStationMasterNpc,
@@ -181,6 +182,58 @@ describe('buildTrainView', () => {
     // Grandfathered (known) rows are free.
     const known = poor.rows.find((row) => row.recipeId === 'recipe_eastbrook_arming_sword');
     expect(known?.feeCopper).toBe(0);
+  });
+
+  it('availableTrainCopper reserves every pending fee except the priced row', () => {
+    // Pure helper pin: one ironlink fee (2500) in flight against a 2500 purse
+    // leaves 0 for a sibling and the full 2500 when the pending row prices
+    // itself (so its gold chip stays under the disabled pending opacity).
+    const pending = new Set(['recipe_ironlink_hauberk']);
+    expect(availableTrainCopper(2500, pending, 'recipe_ironlink_legguards')).toBe(0);
+    expect(availableTrainCopper(2500, pending, 'recipe_ironlink_hauberk')).toBe(2500);
+    expect(availableTrainCopper(2500, undefined)).toBe(2500);
+    expect(availableTrainCopper(2500, new Set())).toBe(2500);
+  });
+
+  it('a pending Learn reserves its fee so sibling teachable rows reprice immediately', () => {
+    // Two ironlink-rung armor recipes cost 25 silver each. With exactly one
+    // fee on hand, learning the first must not leave the second gold-chip
+    // ready while the flight is open (the click-then-cannot-afford trap).
+    const pendingId = 'recipe_ironlink_hauberk';
+    const siblingId = 'recipe_ironlink_legguards';
+    const bothTeachable = {
+      craftSkills: { armorcrafting: 25 },
+      copper: 2500,
+      knownRecipes: [] as string[],
+    };
+    // Baseline without a flight: both teachable rows advertise affordable
+    // even though the purse covers only one fee (the pre-fix trap).
+    const open = buildTrainView('forgemistress_darva', deps(bothTeachable));
+    const openPending = open.rows.find((row) => row.recipeId === pendingId);
+    const openSibling = open.rows.find((row) => row.recipeId === siblingId);
+    expect(openPending?.state).toBe('teachable');
+    expect(openPending?.feeCopper).toBe(2500);
+    expect(openPending?.affordable).toBe(true);
+    expect(openSibling?.state).toBe('teachable');
+    expect(openSibling?.feeCopper).toBe(2500);
+    expect(openSibling?.affordable).toBe(true);
+
+    const inFlight = buildTrainView(
+      'forgemistress_darva',
+      deps({
+        ...bothTeachable,
+        pendingRecipes: new Set([pendingId]),
+      }),
+    );
+    const flightPending = inFlight.rows.find((row) => row.recipeId === pendingId);
+    const flightSibling = inFlight.rows.find((row) => row.recipeId === siblingId);
+    // The row in flight keeps its own affordability (gold chip under pending
+    // opacity) and carries the pending flag.
+    expect(flightPending?.pending).toBe(true);
+    expect(flightPending?.affordable).toBe(true);
+    // The sibling no longer advertises a fee the reserved purse cannot cover.
+    expect(flightSibling?.pending).toBeUndefined();
+    expect(flightSibling?.affordable).toBe(false);
   });
 
   it('the apothecary master lists the alchemy ladder with its combo teachable at tier 1', () => {
