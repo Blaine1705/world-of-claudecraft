@@ -4242,6 +4242,13 @@
     margin-top: 4px;
     font-size: 11.5px;
   }
+  /* Profession affinity on honest materials ("Used by Leatherworking, ...").
+     Soft craft-teal wash on the accent so multi-use reagents scan apart from
+     food/potion use lines without inventing a new rarity color. Always-on
+     (no --fx gate; fairness). */
+  #tooltip .tt-desc.tt-material-use {
+    color: color-mix(in srgb, var(--color-accent) 72%, #6ec8d4);
+  }
   #tooltip .tt-stat {
     color: #fff;
     font-size: 11.5px;
