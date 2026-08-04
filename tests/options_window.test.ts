@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { GRAPHICS_ADVANCED_TIER_KEYS } from '../src/ui/options_view';
 
 // Source-level guards for the options painter. The pure control descriptors +
 // the per-kind dispatch coercion are unit-tested in options_view.test.ts; here we
@@ -139,9 +140,13 @@ describe('options_window: interface tab split', () => {
   });
 
   it('filters the declarative controls to the active tab', () => {
+    // renderInterface builds the full (untagged) control list once, then
+    // filters it per tab for applyControls (the same full list also feeds the
+    // footer's Reset to Defaults, see the #2341 describe block below).
     expect(painter).toContain(
-      'interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab)',
+      'const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];',
     );
+    expect(painter).toContain('interfaceControlsForTab(controls, tab)');
   });
 
   it('places the bespoke rows into their approved tab', () => {
@@ -365,11 +370,12 @@ describe('options_window: title-bar back control', () => {
     expect(painter).toContain(
       "el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());",
     );
-    // the four footer Back buttons (settings shell, interface, bug report,
+    // the three footer Back buttons (the shared settingsViewFooter, which
+    // Graphics/Audio/Controller/Interface all now feed into; bug report;
     // keybinds) reuse the same path (no inline copies left)
     expect(
       painter.match(/back\.addEventListener\('click', \(\) => this\.goBack\(\)\);/g),
-    ).toHaveLength(4);
+    ).toHaveLength(3);
     // the click-then-flip-to-main sequence lives ONLY in goBack itself; a stray
     // inline copy in some handler would push this count past 1
     expect(painter.match(/audio\.click\(\);\s*this\.view = 'main';/g) ?? []).toHaveLength(1);
@@ -464,22 +470,25 @@ describe('options_window: settings shows the running version (#1541)', () => {
   });
 });
 
-// Reset to Defaults is scoped per sub-view (#2341): each of Graphics/Audio/Controller
-// must feed its OWN just-built controls list into the shared footer, and the footer
-// must reset/re-apply only the keys those controls carry, never a bare full reset.
+// Reset to Defaults is scoped per sub-view (#2341): each of
+// Graphics/Audio/Controller/Interface must feed its OWN just-built controls
+// list into the shared footer, and the footer must reset/re-apply only the
+// keys those controls carry, never a bare full reset.
 // settings.test.ts and options_view.test.ts already unit-test reset(keys) and
 // optionsControlKeys() in isolation; this pins the WIRING between them so a future
 // footer/call-site edit that quietly reverts to the old shared-state bug (e.g. a
 // call site passing the wrong controls list, or the footer falling back to a bare
 // settings.reset()) fails a test instead of shipping silently.
 describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () => {
-  it('settingsViewFooter derives keys from its controls param and resets/re-applies only those', () => {
-    const footer = painter.slice(
-      painter.indexOf('settingsViewFooter(controls: OptionsControl[]): void {'),
-    );
+  it('settingsViewFooter derives keys from its controls param (plus any always-include keys) and resets/re-applies only those', () => {
+    const footer = painter.slice(painter.indexOf('private settingsViewFooter('));
     const body = footer.slice(0, footer.indexOf('\n  }\n'));
-    expect(body).toContain('const keys = optionsControlKeys(controls)');
-    // the reset call is scoped, never the bare no-arg full reset
+    expect(body).toContain('optionsControlKeys(controls)');
+    // Graphics' Advanced-tier dials widen the key set via a second param that
+    // defaults to empty for every other sub-view (see the Graphics-specific
+    // test below), never a bare full reset.
+    expect(body).toContain('alwaysIncludeKeys: readonly string[] = []');
+    expect(body).toContain('...optionsControlKeys(controls), ...alwaysIncludeKeys');
     expect(body).toContain('hooks?.settings.reset(keys)');
     expect(body).not.toMatch(/settings\.reset\(\)/);
     // re-apply loop walks only the scoped keys, never settings.all()
@@ -491,6 +500,7 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     ['renderGraphics', 'buildGraphicsControls'],
     ['renderAudio', 'buildAudioControls'],
     ['renderController', 'buildControllerControls'],
+    ['renderInterface', 'buildInterfaceControls'],
   ])(
     '%s builds its own controls and passes that same list into settingsViewFooter',
     (method, builder) => {
@@ -499,7 +509,80 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
       const rest = painter.slice(start);
       const body = rest.slice(0, rest.indexOf('\n  }\n'));
       expect(body).toContain(builder);
-      expect(body).toContain('this.settingsViewFooter(controls)');
+      expect(body).toContain('this.settingsViewFooter(controls');
     },
   );
+
+  // Interface (~40 settings across its four tabs) used to build a panel-title
+  // + a bare Back button by hand and never called settingsViewFooter at all,
+  // so it had no Reset to Defaults button whatsoever.
+  it('renderInterface calls settingsViewFooter (it previously had no reset button at all)', () => {
+    const start = painter.indexOf('private renderInterface(): void {');
+    expect(start).toBeGreaterThan(-1);
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    // the full, untagged list (every tab), not just the current tab's filtered view
+    expect(body).toContain(
+      'const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];',
+    );
+    expect(body).toContain('this.settingsViewFooter(controls);');
+    // the old bespoke back-button block (no reset) is gone from this method
+    expect(body).not.toContain("back.textContent = t('hud.options.back')");
+  });
+
+  // Graphics' five Advanced-tier dials (terrainDetail/foliageDensity/
+  // surfaceDetail/effectsQuality/shadowQuality) are only pushed onto `controls`
+  // while graphicsPreset is CURRENTLY Advanced (5); Reset to Defaults must
+  // restore them even from a non-Advanced preset, where buildGraphicsControls
+  // never rendered them into `controls` in the first place.
+  it('renderGraphics widens the footer key set with the Advanced-tier dials unconditionally', () => {
+    const start = painter.indexOf('private renderGraphics(): void {');
+    expect(start).toBeGreaterThan(-1);
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    expect(body).toContain('this.settingsViewFooter(controls, GRAPHICS_ADVANCED_TIER_KEYS);');
+    // never gated behind the Advanced-preset check that governs what is rendered
+    expect(body).not.toMatch(
+      /if \(Math\.round\(s\.num\('graphicsPreset'\)\) === 5\)[\s\S]*settingsViewFooter/,
+    );
+  });
+
+  it('GRAPHICS_ADVANCED_TIER_KEYS names exactly the five dials buildGraphicsControls gates on Advanced', () => {
+    expect(GRAPHICS_ADVANCED_TIER_KEYS).toEqual([
+      'terrainDetail',
+      'foliageDensity',
+      'surfaceDetail',
+      'effectsQuality',
+      'shadowQuality',
+    ]);
+  });
+});
+
+// Key Bindings' Reset to Defaults used to reset only the rebindable key-code
+// map (Keybinds.reset()), silently leaving the seven GameSettings toggles the
+// same panel renders (mouse camera, click-to-move + its mouse button, attack
+// move, left-handed touch, profanity filter) untouched.
+describe('options_window: Key Bindings Reset to Defaults also resets its own toggles', () => {
+  it('names the same seven setting keys the panel renders via settingToggleKeybind/clickMoveMouseButtonRow', () => {
+    expect(painter).toContain(
+      "const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [\n  'mouseCamera',\n  'lockCursorOnRotate',\n  'clickToMove',\n  'clickToMoveButton',\n  'attackMove',\n  'leftHandedTouch',\n  'filterProfanity',\n];",
+    );
+  });
+
+  it("renderKeybinds' reset handler resets the keybind map AND the panel's own settings, then re-applies them", () => {
+    const start = painter.indexOf('private renderKeybinds(): void {');
+    expect(start).toBeGreaterThan(-1);
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    const reset = body.slice(body.indexOf("reset.addEventListener('click', () => {"));
+    const handler = reset.slice(0, reset.indexOf('});'));
+    expect(handler).toContain('this.deps.keybinds().reset();');
+    expect(handler).toContain('hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);');
+    expect(handler).toContain(
+      'for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));',
+    );
+    // still keeps the pre-existing keybind-map-only behavior (note + refresh)
+    expect(handler).toContain("this.keybindNote = t('hud.options.keybindReset');");
+    expect(handler).toContain('this.deps.refreshKeybindLabels();');
+  });
 });

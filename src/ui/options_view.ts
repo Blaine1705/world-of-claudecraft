@@ -387,6 +387,21 @@ export function buildGraphicsControls(s: OptionsSettingsSource, env: OptionsEnv)
   return out;
 }
 
+/** The five Advanced-preset-only quality dials (terrainDetail, foliageDensity,
+ *  surfaceDetail, effectsQuality, shadowQuality). buildGraphicsControls only ever
+ *  pushes these while graphicsPreset is CURRENTLY 5 (Advanced), so a control list
+ *  built on any other preset carries none of their keys. The painter's Graphics
+ *  Reset to Defaults widens its key set with this list so a dial changed while on
+ *  Advanced, then abandoned by switching presets, still resets instead of
+ *  silently surviving. */
+export const GRAPHICS_ADVANCED_TIER_KEYS: readonly string[] = [
+  'terrainDetail',
+  'foliageDensity',
+  'surfaceDetail',
+  'effectsQuality',
+  'shadowQuality',
+];
+
 // ---------------------------------------------------------------------------
 // Audio panel (cluster 4)
 // ---------------------------------------------------------------------------
