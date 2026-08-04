@@ -2649,6 +2649,7 @@ export const ko_KR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "무기 마법부여 - 위력",
       "enchant_weapon_intellect": "무기 마법부여 - 주문력",
+      "enchant_offhand_stamina": "보조장비 마법부여 - 체력",
       "enchant_helmet_fortitude": "투구 마법부여 - 강건함",
       "enchant_neck_spirit": "목걸이 마법부여 - 정신력",
       "enchant_shoulder_agility": "어깨 마법부여 - 민첩성",

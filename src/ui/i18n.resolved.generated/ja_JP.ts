@@ -2649,6 +2649,7 @@ export const ja_JP: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "武器エンチャント - 剛力",
       "enchant_weapon_intellect": "武器エンチャント - 呪文威力",
+      "enchant_offhand_stamina": "オフハンドエンチャント - スタミナ",
       "enchant_helmet_fortitude": "頭エンチャント - 堅牢",
       "enchant_neck_spirit": "首エンチャント - 精神力",
       "enchant_shoulder_agility": "肩エンチャント - 敏捷性",

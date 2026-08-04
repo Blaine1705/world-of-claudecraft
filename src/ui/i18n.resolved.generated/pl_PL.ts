@@ -2649,6 +2649,7 @@ export const pl_PL: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Zaklinanie broni - Moc",
       "enchant_weapon_intellect": "Zaklinanie broni - Moc zaklęć",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Zaklinanie hełmu - Krzepkość",
       "enchant_neck_spirit": "Zaklinanie naszyjnika - Duch",
       "enchant_shoulder_agility": "Zaklinanie naramienników - Zwinność",
