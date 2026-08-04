@@ -1,6 +1,6 @@
 # Quest Item Inventory UI: cross-phase state
 
-Current phase: **Phase 4 complete; Phase 5 ready to start**
+Current phase: **Phase 5 complete; Phase 6 ready to start**
 Worktree: `/Users/fernando/Documents/wocc-quest-item-ui`
 Branch: `feature/quest-item-inventory-ui`
 Base: `release/v0.34.0` (merge latest at the start of every phase)
@@ -67,10 +67,12 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
 - `tests/architecture.test.ts` pure-core registration
 
 ### Expected new modules
-- `src/ui/bag_quest_mark_view.ts` + `tests/bag_quest_mark_view.test.ts` (**done Phase 1**)
+- `src/ui/bag_quest_mark_view.ts` + `tests/bag_quest_mark_view.test.ts` (**done Phase 1**; ready
+  variant Phase 5)
 - `src/ui/quest_item_tooltip_view.ts` + `tests/quest_item_tooltip_view.test.ts` (**done Phase 2**)
 - `src/ui/item_name_color.ts` + `tests/item_name_color.test.ts` (**done Phase 4**)
-- Optional Phase 5: small bag-tracker highlight helper
+- `src/ui/bag_quest_tracker_highlight_view.ts` + thin `bag_quest_tracker_highlight.ts`
+  + `tests/bag_quest_tracker_highlight_view.test.ts` (**done Phase 5**)
 
 ## Progress resolution notes (for Phase 2)
 
@@ -101,12 +103,27 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   paints `model.cells` only (no header nodes; drop indices stay 1:1 with capacity).
   Section label reuses `hudChrome.bags.filterQuest`.
 
+## Progress resolution notes (for Phase 5)
+
+- **questReady decision:** `bagQuestMarkProgressFromLog` projects held log state + matching
+  collect/gather rows for this itemId. `bagQuestMarkKind(item, progress)` returns
+  `questReady` when `state === 'ready'`, or when `state === 'active'` and every matching
+  objective has `current >= required`. Kind alone never invents ready. Orphaned remains
+  reserved (not painted this phase).
+- **Tracker highlight:** pure `bagQuestTrackerHighlightId` + class `qt-bag-hover`; thin
+  `BagQuestTrackerHighlight` injects a query root. Clear paths: mouseleave, hideTooltip
+  during drag/peek, grid rebuild, bags close.
+- **Reduced motion:** optional `bag-quest-ready-pulse` only under
+  `prefers-reduced-motion: no-preference`; reduce arm sets `animation: none` while brighter
+  seal color and rim/wash stay.
+
 ## Beauty checklist (every visual phase)
 
 - [x] Looks premium next to quality borders and masterwork seals (Phase 1 rim/seal)
 - [x] Quest gold, not chrome gold wash over everything (`--color-quest` #ffd12d)
 - [x] Mobile long-press / desktop hover both honest (tooltip Phase 2 model + host)
-- [x] Reduced motion never removes the rim or seal (no motion gate on Phase 1)
+- [x] Reduced motion never removes the rim or seal (no motion gate on Phase 1; Phase 5
+  drops pulse only)
 - [ ] Screenshots planned or taken for the PR
 
 ## Ledger (fill as phases complete)
@@ -118,12 +135,17 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
   - `tests/quest_item_tooltip_view.test.ts`
   - `src/ui/item_name_color.ts`
   - `tests/item_name_color.test.ts`
+  - `src/ui/bag_quest_tracker_highlight_view.ts`
+  - `src/ui/bag_quest_tracker_highlight.ts`
+  - `tests/bag_quest_tracker_highlight_view.test.ts`
   - `docs/quest-item-inventory-ui/*` (planning packet)
 - New tokens:
   - `--color-quest: #ffd12d`
   - `--color-bag-quest-rim`
   - `--color-bag-quest-wash`
   - `--color-bag-quest-seal`
+  - `--color-bag-quest-seal-ready`
+  - `--color-quest-tracker-bag-hover`
 - New i18n keys:
   - `hudChrome.bags.itemAriaQuest` (EN + M16: zh_CN, zh_TW, ja_JP, ko_KR, ru_RU)
   - `itemUi.tooltip.questRelated` (EN + M16)
@@ -138,6 +160,9 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
     registered); no new `*_view.ts` file required.
   - `src/ui/item_name_color.ts` in `UI_PURE_CORES`, `BARE_NAMED`, and
     `EXPECTED_BARE_NAMED` (bare name, not `*_view` / `*_core`).
+  - `src/ui/bag_quest_tracker_highlight_view.ts` in `UI_PURE_CORES`
+  - `src/ui/bag_quest_tracker_highlight.ts` is host-injected residual (no browser globals;
+    not a pure core, not UI_DOM_MODULES).
 - Known gotchas discovered:
   - `.bag-item.q-common` uses `border-color: ... !important`; quest rim rule must follow
     it (or also use `!important`) so purpose gold wins on common quest stacks.
@@ -154,9 +179,14 @@ Base: `release/v0.34.0` (merge latest at the start of every phase)
     quality path and quest defs paint quest gold.
   - Bare-named pure cores need three list entries: UI_PURE_CORES, BARE_NAMED, and
     EXPECTED_BARE_NAMED (architecture cross-check).
+  - Tracker highlight selector `#quest-tracker .qt-title[...]` must run against a root
+    that contains the tracker (document in production); querying from the tracker node
+    itself cannot match its own id as an ancestor.
+  - Ready seal pulse is gated with `prefers-reduced-motion: no-preference` so the
+    brighter static seal remains under reduce without a second rule that hides shape.
 
 ## Resume point
 
-**Next action:** Phase 5 interactive polish. Merge latest `origin/release/v0.34.0`
-first. Bag hover highlight for matching tracker rows and ready-to-turn-in seal
-variant (`bag_quest_mark_view` extension), reduced-motion safe.
+**Next action:** Phase 6 final QA + screenshots under
+`docs/screenshots/quest-item-inventory-ui/` + `npm run gate`. Open PR only if asked.
+Packet teardown only after explicit confirmation.

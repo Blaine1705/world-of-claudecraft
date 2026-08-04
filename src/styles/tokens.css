@@ -143,10 +143,13 @@
        .bi-quest-seal, painted by bags_window.ts as a class, never an inline
        color). Purpose class, not a rarity tier: thin rim + soft wash + small
        seal from the --color-quest lineage. Shape is primary, tint is redundant
-       (fairness). Always-on, no --fx-* gate. */
+       (fairness). Always-on, no --fx-* gate. Ready seal brightens the same
+       lineage (never a second yellow). Tracker bag-hover uses the same gold. */
     --color-bag-quest-rim: var(--color-quest);
     --color-bag-quest-wash: color-mix(in srgb, var(--color-quest) 16%, transparent);
     --color-bag-quest-seal: var(--color-quest);
+    --color-bag-quest-seal-ready: color-mix(in srgb, var(--color-quest) 55%, #fff);
+    --color-quest-tracker-bag-hover: var(--color-quest);
 
     /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
        no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.

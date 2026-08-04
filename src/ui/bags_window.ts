@@ -19,7 +19,7 @@
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
-import { ITEMS } from '../sim/data';
+import { ITEMS, QUESTS } from '../sim/data';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -36,7 +36,9 @@ import {
 } from './bag_filter';
 import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
-import { bagQuestMarkKind } from './bag_quest_mark_view';
+import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
+import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
+import { bagQuestTrackerHighlightId } from './bag_quest_tracker_highlight_view';
 import {
   type BagDestroyAction,
   type BagMode,
@@ -287,6 +289,11 @@ export class BagsWindow {
   // a window shown without a paint would always converge on the first probe.
   private lastMoneyCopper = -1;
 
+  // Bag-hover -> quest-tracker title highlight. One active row at a time; cleared
+  // on leave, programmatic tooltip hide, rebuild, and close so a stale class never
+  // sticks after the hovered cell is torn down.
+  private readonly trackerHighlight = new BagQuestTrackerHighlight(document);
+
   constructor(private readonly deps: BagsWindowDeps) {}
 
   /**
@@ -367,6 +374,7 @@ export class BagsWindow {
     dismissBagPrompts();
     el.style.display = 'none';
     el.inert = false;
+    this.clearTrackerHighlight();
     this.deps.hideTooltip();
     this.deps.cancelPetFeed();
     this.deps.restoreFocus(this.openerFocus);
@@ -375,6 +383,8 @@ export class BagsWindow {
   }
 
   render(): void {
+    // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
+    this.clearTrackerHighlight();
     const el = this.deps.root();
     const world = this.deps.world();
     // The focused control's identity, carried across the rebuild (the vendor
@@ -737,9 +747,11 @@ export class BagsWindow {
       const row = document.createElement('button');
       row.type = 'button';
       // Quest-purpose mark (bag_quest_mark_view.ts): kind===quest gets the
-      // .bag-quest rim/wash class. Purpose class, not a quality tier.
-      const questMark = bagQuestMarkKind(item);
-      row.className = `bag-item q-${bagQualityKey(item)}${questMark ? ' bag-quest' : ''}`;
+      // .bag-quest rim/wash class; questReady adds .bag-quest-ready for the
+      // brighter seal. Purpose class, not a quality tier.
+      const questMark = bagQuestMarkKind(item, this.questMarkProgress(item));
+      const questReady = questMark === 'questReady';
+      row.className = `bag-item q-${bagQualityKey(item)}${questMark ? ' bag-quest' : ''}${questReady ? ' bag-quest-ready' : ''}`;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
@@ -782,12 +794,13 @@ export class BagsWindow {
       // Exactly one corner treatment ever renders: masterwork seal, quest seal,
       // or an instance glyph/tab. Composes with the bottom-right count badge,
       // always visible without hover on desktop and touch, identical on every
-      // graphics preset (no --fx gate).
+      // graphics preset (no --fx gate). Ready seals share the seal markup and
+      // brighten via .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const masterworkSeal = isMasterwork
         ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
         : '';
       const questSeal = showQuestSeal
-        ? `<span class="bi-quest-seal" aria-hidden="true">${svgIcon('questlog')}</span>`
+        ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
         : '';
       const instanceMark =
         !isMasterwork && !showQuestSeal
@@ -798,13 +811,19 @@ export class BagsWindow {
               : ''
           : '';
       row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // Bag hover lights the matching quest-tracker title (information-add).
+      const trackerQuestId = bagQuestTrackerHighlightId(item);
+      if (trackerQuestId) {
+        row.addEventListener('mouseenter', () => this.trackerHighlight.set(trackerQuestId));
+        row.addEventListener('mouseleave', () => this.clearTrackerHighlight());
+      }
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /
         // deposit / feed): the release dismisses the tooltip and fires nothing. A
         // plain tap / desktop click falls through.
         if (this.deps.consumePeek()) {
-          this.deps.hideTooltip();
+          this.hideTooltipClearingTracker();
           return;
         }
         // The synthetic click that trails a completed touch drag must not ALSO run
@@ -888,7 +907,8 @@ export class BagsWindow {
           e.dataTransfer.effectAllowed = 'copyMove';
         }
         this.deps.markEquipDropTargets(s.itemId);
-        this.deps.hideTooltip();
+        // Drag dismisses the tooltip without mouseleave; clear the tracker glow too.
+        this.hideTooltipClearingTracker();
       });
       row.addEventListener('dragend', () => {
         this.deps.dragState.end();
@@ -916,7 +936,7 @@ export class BagsWindow {
               },
         ghostHtml: () => this.deps.itemIcon(item),
         onStart: () => {
-          this.deps.hideTooltip();
+          this.hideTooltipClearingTracker();
           this.deps.markEquipDropTargets(s.itemId);
         },
         onMove: () => {
@@ -1367,9 +1387,43 @@ export class BagsWindow {
     });
   }
 
+  /** Plain progress inputs for bagQuestMarkKind (questReady). Null when the
+   *  stack is not a quest kind or the player does not hold the related quest. */
+  private questMarkProgress(item: ItemDef) {
+    if (item.kind !== 'quest' || !item.questId) return null;
+    const log = this.deps.world().questLog.get(item.questId);
+    if (!log) return null;
+    const quest = QUESTS[item.questId];
+    return bagQuestMarkProgressFromLog(
+      item.id,
+      {
+        counts: log.counts,
+        state: log.state,
+        resolvedCounts: log.resolvedCounts,
+      },
+      quest?.objectives.map((objective) => ({
+        type: objective.type,
+        itemId: 'itemId' in objective ? objective.itemId : undefined,
+        count: objective.count,
+      })),
+    );
+  }
+
+  private clearTrackerHighlight(): void {
+    this.trackerHighlight.clear();
+  }
+
+  /** Hide the shared tooltip and drop any bag-driven tracker highlight. */
+  private hideTooltipClearingTracker(): void {
+    this.clearTrackerHighlight();
+    this.deps.hideTooltip();
+  }
+
   // Refresh only the grid contents (used by live search) so the search input keeps
   // focus and caret position across keystrokes.
   private refreshGrid(): void {
+    // Grid rebuild tears down hovered cells without mouseleave.
+    this.clearTrackerHighlight();
     const grid = this.deps.root().querySelector('.bag-grid') as HTMLElement | null;
     if (!grid) return;
     const prevScrollTop = grid.scrollTop;

@@ -12,22 +12,29 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import type { InvSlot } from '../src/sim/types';
+import type { InvSlot, QuestProgress } from '../src/sim/types';
 import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
 import type { IWorld } from '../src/world_api';
 
-function fakeWorld(inventory: InvSlot[]): IWorld {
+function fakeWorld(
+  inventory: InvSlot[],
+  questLog: Map<string, QuestProgress> = new Map(),
+): IWorld {
   return {
     inventory,
     bags: [null, null, null, null],
     bagCapacity: 16,
     copper: 0,
+    questLog,
   } as unknown as IWorld;
 }
 
-function windowFor(inventory: InvSlot[]): HTMLElement {
+function windowFor(
+  inventory: InvSlot[],
+  questLog: Map<string, QuestProgress> = new Map(),
+): HTMLElement {
   const root = document.createElement('div');
   document.body.appendChild(root);
   const noop = (): void => {};
@@ -37,7 +44,7 @@ function windowFor(inventory: InvSlot[]): HTMLElement {
     itemTooltip: () => '',
     attachTooltip: noop,
     root: () => root,
-    world: () => fakeWorld(inventory),
+    world: () => fakeWorld(inventory, questLog),
     wocBalanceHtml: () => '',
     claudiumLauncherHtml: () => '',
     openClaudium: noop,
@@ -311,6 +318,48 @@ describe('bags grid quest-purpose mark', () => {
     expect(cell?.querySelector('.bi-count')?.textContent).toContain('5');
     expect(cell?.getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 5, quest item');
   });
+
+  // Ready seal must be DOM-painted from a real questLog, not only source-pinned
+  // as class strings in bags_window. boar_hide -> q_boars (collect x5).
+  it('paints bag-quest-ready and bi-quest-seal-ready when the related quest is ready', () => {
+    const questLog = new Map<string, QuestProgress>([
+      ['q_boars', { questId: 'q_boars', counts: [5], state: 'ready' }],
+    ]);
+    const root = windowFor([{ itemId: 'boar_hide', count: 5 }], questLog);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-quest')).toBe(true);
+    expect(cell?.classList.contains('bag-quest-ready')).toBe(true);
+    const seal = cell?.querySelector('.bi-quest-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.classList.contains('bi-quest-seal-ready')).toBe(true);
+    // Purpose aria stays "quest item"; ready is a visual brighten only.
+    expect(cell?.getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 5, quest item');
+  });
+
+  it('does not paint ready classes when the related quest is still active and incomplete', () => {
+    const questLog = new Map<string, QuestProgress>([
+      ['q_boars', { questId: 'q_boars', counts: [2], state: 'active' }],
+    ]);
+    const root = windowFor([{ itemId: 'boar_hide', count: 2 }], questLog);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-quest')).toBe(true);
+    expect(cell?.classList.contains('bag-quest-ready')).toBe(false);
+    const seal = cell?.querySelector('.bi-quest-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.classList.contains('bi-quest-seal-ready')).toBe(false);
+  });
+
+  it('paints ready when active log has matching collect objectives complete', () => {
+    // q_boars objective count is 5; complete matching rows while still active
+    // must brighten the seal the same way state ready does.
+    const questLog = new Map<string, QuestProgress>([
+      ['q_boars', { questId: 'q_boars', counts: [5], state: 'active' }],
+    ]);
+    const root = windowFor([{ itemId: 'boar_hide', count: 5 }], questLog);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-quest-ready')).toBe(true);
+    expect(cell?.querySelector('.bi-quest-seal-ready')).not.toBeNull();
+  });
 });
 
 describe('marker stylesheet contract (source pins)', () => {
@@ -406,6 +455,15 @@ describe('marker stylesheet contract (source pins)', () => {
     expect(questSealBlock).toContain('left: 1px');
     expect(questSealBlock).toContain('var(--color-bag-quest-seal)');
     expect(questSealBlock).not.toContain('--fx-');
+    // Ready seal brightens via the same quest lineage; pulse is optional only.
+    expect(tokens).toMatch(/--color-bag-quest-seal-ready:[\s\S]*?var\(--color-quest\)/);
+    expect(components).toContain('bi-quest-seal-ready');
+    expect(components).toContain('bag-quest-ready');
+    expect(components).toContain('bag-quest-ready-pulse');
+    // prefers-reduced-motion drops the pulse only, never the seal or rim.
+    expect(components).toMatch(
+      /prefers-reduced-motion:\s*reduce[\s\S]*?\.bi-quest-seal-ready[\s\S]*?animation:\s*none/,
+    );
     // Painter paints classes only; no raw quest hex in bags_window.
     const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
     expect(painter).not.toContain('#ffd12d');
@@ -413,5 +471,7 @@ describe('marker stylesheet contract (source pins)', () => {
     expect(painter).toContain('bag-quest');
     expect(painter).toContain('bi-quest-seal');
     expect(painter).toContain('bagQuestMarkKind');
+    expect(painter).toContain('bag-quest-ready');
+    expect(painter).toContain('bi-quest-seal-ready');
   });
 });

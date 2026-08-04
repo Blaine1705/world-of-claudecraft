@@ -6202,6 +6202,36 @@
     width: 100%;
     height: 100%;
   }
+  /* Ready-to-turn-in: brighter static seal (shape stays primary). Optional
+     soft pulse is decorative only and yields under prefers-reduced-motion;
+     the brighter seal and rim/wash never hide (fairness). */
+  .bag-item.bag-quest-ready .bi-quest-seal,
+  .bag-item .bi-quest-seal-ready {
+    color: var(--color-bag-quest-seal-ready);
+    filter: drop-shadow(0 1px 1px #000)
+      drop-shadow(0 0 3px color-mix(in srgb, var(--color-bag-quest-seal-ready) 70%, transparent));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bag-item.bag-quest-ready .bi-quest-seal-ready {
+      animation: bag-quest-ready-pulse 1.8s ease-in-out infinite;
+    }
+  }
+  @keyframes bag-quest-ready-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 1px 1px #000)
+        drop-shadow(0 0 2px color-mix(in srgb, var(--color-bag-quest-seal-ready) 55%, transparent));
+    }
+    50% {
+      filter: drop-shadow(0 1px 1px #000)
+        drop-shadow(0 0 5px color-mix(in srgb, var(--color-bag-quest-seal-ready) 85%, transparent));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bag-item.bag-quest-ready .bi-quest-seal-ready {
+      animation: none;
+    }
+  }
   .bag-item.empty {
     cursor: default;
     background: #0b0906;

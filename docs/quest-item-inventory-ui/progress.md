@@ -7,13 +7,13 @@
 | Phase 2: Story tooltip | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 3: Findability chrome | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 4: Cross-surface language | Complete | 2026-08-03 | 2026-08-03 |
-| Phase 5: Interactive polish | Pending | | |
+| Phase 5: Interactive polish | Complete | 2026-08-03 | 2026-08-03 |
 | Phase 6: Final QA + screenshots + gate | Pending | | |
 
 ## Phase 1 deliverables
 - [x] `src/ui/bag_quest_mark_view.ts` pure core registered in architecture allowlists
 - [x] Quest bag tokens (`--color-quest` if missing + bag rim/wash/seal tokens as needed)
-- [x] CSS: `.bag-item.bag-quest`, `.bi-quest-seal` (rim, wash, seal; always-on)
+- [x] CSS: `.bag-item.bag-quest`, `.bi-quest-seal` (rim, seal; always-on)
 - [x] `bags_window.ts` wiring: class, seal, glyph priority, aria
 - [x] English aria i18n key(s); M16 fills if wordy
 - [x] `tests/bag_quest_mark_view.test.ts` decisive
@@ -46,12 +46,12 @@
 - [x] Reviews clean of BLOCKING
 
 ## Phase 5 deliverables
-- [ ] Bag hover highlights matching tracker row
-- [ ] Ready-to-turn-in seal variant
-- [ ] Reduced-motion safe
-- [ ] Tests for mark kind extension
-- [ ] Merge latest `origin/release/v0.34.0` before coding
-- [ ] Reviews clean of BLOCKING
+- [x] Bag hover highlights matching tracker row
+- [x] Ready-to-turn-in seal variant
+- [x] Reduced-motion safe
+- [x] Tests for mark kind extension
+- [x] Merge latest `origin/release/v0.34.0` before coding
+- [x] Reviews clean of BLOCKING
 
 ## Phase 6 deliverables
 - [ ] Full qa-checklist / woc-qa on branch diff
@@ -92,3 +92,14 @@
   also routes through it so surfaces cannot drift. QUEST_ITEM_TOOLTIP_COLOR aliases
   QUEST_ITEM_NAME_COLOR. Registered in UI_PURE_CORES + BARE_NAMED + EXPECTED_BARE_NAMED.
   Merged latest release base first (already up to date).
+- 2026-08-03 Phase 5: Interactive polish. Merged latest `origin/release/v0.34.0` first.
+  `bagQuestMarkKind` + `bagQuestMarkProgressFromLog` return `questReady` from plain log
+  state ready or complete matching collect/gather rows (never invent ready from kind
+  alone). Bags paint `.bag-quest-ready` / `.bi-quest-seal-ready` with brighter seal
+  token; optional pulse drops under prefers-reduced-motion (seal/rim stay). Bag hover
+  uses pure `bagQuestTrackerHighlightId` + thin `BagQuestTrackerHighlight` to toggle
+  `.qt-bag-hover` on matching `#quest-tracker .qt-title[data-quest]`; clear on leave,
+  tooltip hide (drag/peek), rebuild, and close. Tokens:
+  `--color-bag-quest-seal-ready`, `--color-quest-tracker-bag-hover`. No new player
+  strings. Validation: tsc, mark + highlight + bags marker + architecture tests,
+  `npm run ci:changed`.

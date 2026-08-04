@@ -94,9 +94,7 @@ describe('item_name_color: consumer source pins', () => {
     expect(hudSrc).toContain("from './item_name_color'");
     expect(hudSrc).toContain('itemNameColor(item)');
     // Chat link must not re-inline QUALITY_COLOR for the name color.
-    expect(hudSrc).not.toMatch(
-      /link\.style\.color\s*=\s*QUALITY_COLOR\[item\.quality/,
-    );
+    expect(hudSrc).not.toMatch(/link\.style\.color\s*=\s*QUALITY_COLOR\[item\.quality/);
   });
 
   it('loot roll need/greed, watch, and master name colors use itemNameColor', () => {
