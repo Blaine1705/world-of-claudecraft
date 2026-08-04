@@ -5681,6 +5681,10 @@ export class Hud {
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
     this.mapPainter.relocalize();
+    // The delve minimap/world-map schematic bakes the localized compass-north
+    // glyph into its cached background canvas, keyed only on module id; a
+    // language switch alone never busts that cache, so force one rebuild.
+    this.delvePainter.relocalize();
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
