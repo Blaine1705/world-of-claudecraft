@@ -109,12 +109,12 @@ describe('Fenbridge canonical pure layout', () => {
     // Explicit lot anchors (readable site-plan pin).
     expect(FENBRIDGE_LAYOUT.buildings.map((b) => [b.id, b.position.x, b.position.z])).toEqual([
       ['fenbridge_warden_gatehouse', 9, 282],
-      ['fenbridge_crooked_reed_inn', -21.5, 316.5],
+      ['fenbridge_crooked_reed_inn', -21.25, 317],
       ['fenbridge_lantern_chapel', -19.5, 294],
       ['fenbridge_moonwort_apothecary', 17.8, 291.5],
       ['fenbridge_gilded_strongbox', 19.2, 309.5],
-      ['fenbridge_hesk_tannery', -8.5, 326],
-      ['fenbridge_scout_lodge', 3, 325],
+      ['fenbridge_hesk_tannery', -2, 320],
+      ['fenbridge_scout_lodge', -13.5, 325.5],
     ]);
 
     for (let left = 0; left < FENBRIDGE_LAYOUT.buildings.length; left++) {
@@ -162,7 +162,7 @@ describe('Fenbridge canonical pure layout', () => {
     expect(FENBRIDGE_LAYOUT.civic.provisionStall).toMatchObject({
       id: 'fenbridge_provision_stall',
       assetId: '/models/props/fenbridge_provision_stall.glb',
-      position: { x: -16, z: 313 },
+      position: { x: -14, z: 313 },
     });
     expect(FENBRIDGE_LAYOUT.civic.musterBoard).toMatchObject({
       id: 'fenbridge_muster_board',
@@ -445,7 +445,7 @@ describe('Fenbridge canonical pure layout', () => {
     expect(woodNode).toMatchObject({
       id: 'wood_mirefen_1',
       type: 'wood',
-      pos: { x: 10, z: 330 },
+      pos: { x: 20, z: 375 },
     });
     if (!north || !woodNode) return;
 
@@ -650,10 +650,10 @@ describe('Fenbridge content projection and preservation', () => {
       masterNpcId: 'tanner_hesk',
     });
     // Station + master sit on the craft-bay apron and move with the tannery lot.
-    expect(stationPos.x).toBeCloseTo(-8.000415973449709, 10);
-    expect(stationPos.z).toBeCloseTo(320.3210550451324, 10);
-    expect(heskPos.x).toBeCloseTo(-6.878900811806206, 10);
-    expect(heskPos.z).toBeCloseTo(319.8826445728536, 10);
+    expect(stationPos.x).toBeCloseTo(1.0670827486441765, 10);
+    expect(stationPos.z).toBeCloseTo(315.3263500973041, 10);
+    expect(heskPos.x).toBeCloseTo(3.053383957289929, 10);
+    expect(heskPos.z).toBeCloseTo(315.5600325924389, 10);
     const masterDistance = Math.hypot(stationPos.x - heskPos.x, stationPos.z - heskPos.z);
     expect(masterDistance).toBeGreaterThanOrEqual(1);
     expect(masterDistance).toBeLessThanOrEqual(3);

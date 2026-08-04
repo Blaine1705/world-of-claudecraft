@@ -453,12 +453,12 @@ const INN_BASE = makeBuilding(
   'fenbridge_crooked_reed_inn',
   '/models/props/fenbridge_crooked_reed_inn.glb',
   'inn',
-  // Back-west ring: clear of the east-marsh road, chapel apron, and tannery.
-  { x: -21.5, z: 316.5 },
+  // Back-west ring: clear of the east-marsh road and the west gate path.
+  { x: -21.25, z: 317 },
   9,
   8.8,
   8,
-  facingToward({ x: -21.5, z: 316.5 }, CIVIC_CENTER),
+  facingToward({ x: -21.25, z: 317 }, CIVIC_CENTER),
   -2.8,
 );
 const CHAPEL_BASE = makeBuilding(
@@ -497,27 +497,27 @@ const TANNERY_BASE = makeBuilding(
   'fenbridge_hesk_tannery',
   '/models/props/fenbridge_hesk_tannery.glb',
   'house',
-  // Far north ring (back of town); ~16 yd from the inn, clear of the scout lodge.
-  { x: -8.5, z: 326 },
+  // North ring, west of the north road so the gate stay open.
+  { x: -2, z: 320 },
   12,
   7.2,
   7,
-  facingToward({ x: -8.5, z: 326 }, CIVIC_CENTER),
+  facingToward({ x: -2, z: 320 }, CIVIC_CENTER),
 );
 const SCOUT_LODGE = makeBuilding(
   'fenbridge_scout_lodge',
   '/models/props/fenbridge_scout_lodge.glb',
   'house',
-  // East of the north road so wood_mirefen_1 at (10, 330) stays clear.
-  { x: 3, z: 325 },
+  // West of the north exit (smaller footprint than the tannery).
+  { x: -13.5, z: 325.5 },
   8,
   7.6,
   6.5,
-  facingToward({ x: 3, z: 325 }, CIVIC_CENTER),
+  facingToward({ x: -13.5, z: 325.5 }, CIVIC_CENTER),
 );
 
 // Market stall on the inn front apron (NW of the cistern, clear of chapel greeters).
-const PROVISION_STALL_POSITION = { x: -16, z: 313 } as const;
+const PROVISION_STALL_POSITION = { x: -14, z: 313 } as const;
 const PROVISION_STALL_ROTATION = facingToward(PROVISION_STALL_POSITION, CIVIC_CENTER);
 const PROVISION_STALL_WIDTH = 3.2;
 const PROVISION_STALL_DEPTH = 1.6;
@@ -615,14 +615,14 @@ const BANK = {
 const TANNERY_STATION_POSITION = localToWorld(
   TANNERY_BASE.position,
   TANNERY_BASE.rotation,
-  1.5,
-  TANNERY_BASE.nativeDimensions.depth / 2 + 2.0,
+  -2.5,
+  TANNERY_BASE.nativeDimensions.depth / 2 + 1.5,
 );
 const TANNER_POSITION = localToWorld(
   TANNERY_BASE.position,
   TANNERY_BASE.rotation,
-  0.6,
-  TANNERY_BASE.nativeDimensions.depth / 2 + 2.8,
+  -4.5,
+  TANNERY_BASE.nativeDimensions.depth / 2 + 1.5,
 );
 const TANNERY = {
   ...TANNERY_BASE,
@@ -784,8 +784,7 @@ const ROADS = [
       { x: 4, z: 313 },
       { x: 9, z: 318 },
       { x: 11, z: 324 },
-      // Thread between the scout lodge and preserved wood_mirefen_1 at
-      // (10, 330); the old x=11 centerline overlapped the node collider.
+      // Keep east of the north-ring lots; wood nodes sit outside the wall.
       { x: 7.5, z: 330 },
       gateCrossing('fenbridge_gate_north'),
       { x: 10, z: 400 },
@@ -919,12 +918,8 @@ const NPCS = [
     CHAPEL.rotation,
     'fenbridge_lantern_chapel_archive',
   ),
-  makeNpc(
-    'tanner_hesk',
-    TANNER_POSITION,
-    facingToward(TANNER_POSITION, TANNERY_STATION_POSITION),
-    TANNERY.id,
-  ),
+  // Face the square with the building (craft station stays on the apron).
+  makeNpc('tanner_hesk', TANNER_POSITION, TANNERY.rotation, TANNERY.id),
 ] as const;
 
 const PRESERVED_PROPS = {

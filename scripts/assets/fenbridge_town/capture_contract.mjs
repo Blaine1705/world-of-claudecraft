@@ -290,8 +290,8 @@ export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
     }),
     Object.freeze({
       id: 'provisioner_hale',
-      x: -14.547802904391286,
-      z: 315.04049591901224,
+      x: -12.424844495021249,
+      z: 314.94714794895896,
     }),
     Object.freeze({
       id: 'herbalist_yara',
@@ -300,8 +300,8 @@ export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
     }),
     Object.freeze({
       id: 'scout_maren',
-      x: 0.17838590781930275,
-      z: 320.59080575220287,
+      x: -12.942629598286846,
+      z: 320.2950179409249,
     }),
     Object.freeze({
       id: 'bursar_petra_vell',
@@ -315,8 +315,8 @@ export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
     }),
     Object.freeze({
       id: 'tanner_hesk',
-      x: -6.878900811806206,
-      z: 319.8826445728536,
+      x: 3.053383957289929,
+      z: 315.5600325924389,
     }),
   ]),
   mailbox: Object.freeze({
@@ -330,8 +330,8 @@ export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
     type: 'tannery',
     zoneId: FENBRIDGE_ZONE_ID,
     masterNpcId: 'tanner_hesk',
-    x: -8.000415973449709,
-    z: 320.3210550451324,
+    x: 1.0670827486441765,
+    z: 315.3263500973041,
   }),
   graveyard: Object.freeze({
     id: 'gy_fenbridge',
