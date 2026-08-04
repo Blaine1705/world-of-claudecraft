@@ -86,12 +86,27 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
     pet.hp = Math.min(pet.maxHp, pet.hp + Math.max(1, Math.round(pet.maxHp * 0.02)));
   }
 
-  pullNearbyMobs(ctx, pet);
+  // A mounted owner is travelling, so the pet only heels: it neither body-pulls the
+  // camps you ride past nor answers the mobs YOU pulled running through them. Riding
+  // across a zone used to drag the pet into every fight along the way, and no stance
+  // avoided it: defensive correctly answers anything attacking its owner, and even
+  // passive still body-pulled because that scan never consulted the stance.
+  //
+  // This needs no toggling and cannot strand you, because it self-restores: nothing
+  // dismounts you for taking damage, but casting or swinging does (casting_lifecycle,
+  // auto_attack), so the moment you choose to fight the pet is back to normal on the
+  // next tick. Mounting mid-fight is not a way in either, since the summon channel
+  // cancels on entering combat (mounts.ts).
+  const travelling = ownerIsMounted(owner);
+  if (!travelling) pullNearbyMobs(ctx, pet);
 
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
   if (target && (target.dead || !ctx.isHostileTo(pet, target) || !petCanSeeTarget(pet, target)))
     target = null;
   if (target && dist2d(owner.pos, pet.pos) > PET_LEASH) target = null;
+  // Drop a target the pet already had, so mounting up disengages it rather than
+  // leaving it locked on while you ride away.
+  if (travelling) target = null;
   if (!target && !owner.dead) target = petPickTarget(ctx, pet, owner);
   pet.aggroTargetId = target?.id ?? null;
   pet.inCombat = target !== null;
@@ -396,8 +411,22 @@ export function startWaterJet(
   pet.petTauntTimer = jet.cooldown;
 }
 
+/**
+ * Whether the owner is riding, and so travelling rather than fighting.
+ *
+ * `Entity.mountKey` is '' when dismounted (types.ts) and only players ever carry one,
+ * so this is false for every other owner.
+ */
+export function ownerIsMounted(owner: Entity): boolean {
+  return (owner.mountKey ?? '') !== '';
+}
+
 export function petPickTarget(ctx: SimContext, pet: Entity, owner: Entity): Entity | null {
   if (pet.petMode === 'passive') return null;
+  // While the owner rides, the pet heels in every stance (see updatePet). Guarding
+  // acquisition here as well as clearing the target there means a pet cannot pick a
+  // new one up mid-ride, in aggressive stance or by assisting.
+  if (ownerIsMounted(owner)) return null;
   // Anti-AFK: an aggressive pet only proactively pulls fresh targets while its
   // owner is actually playing. An idle owner's pet still defends (engagingUs /
   // ownerOffense below) but cannot farm the area alone (hunter/warlock).
