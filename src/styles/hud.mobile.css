@@ -3341,7 +3341,8 @@
   body.mobile-touch #tooltip.mob-tooltip .tt-red,
   body.mobile-touch #tooltip.mob-tooltip .tt-green,
   body.mobile-touch #tooltip.mob-tooltip .tt-quest-name,
-  body.mobile-touch #tooltip.mob-tooltip .tt-quest-obj {
+  body.mobile-touch #tooltip.mob-tooltip .tt-quest-obj,
+  body.mobile-touch #tooltip.mob-tooltip .tt-rank {
     font-size: calc(10px * var(--tooltip-scale, 1));
     line-height: 1.2;
   }

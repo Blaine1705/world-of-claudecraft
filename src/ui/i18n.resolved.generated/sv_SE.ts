@@ -1918,7 +1918,9 @@ export const sv_SE: EnTranslations = {
       "levelFamily": "Nivå {level} {family}",
       "familyDemon": "Demon",
       "hostile": "Fientlig",
-      "friendly": "Vänlig"
+      "friendly": "Vänlig",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Flytta målramen",

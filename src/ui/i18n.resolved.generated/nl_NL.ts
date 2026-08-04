@@ -1918,7 +1918,9 @@ export const nl_NL: EnTranslations = {
       "levelFamily": "Niveau {level} {family}",
       "familyDemon": "Demon",
       "hostile": "Vijandig",
-      "friendly": "Vriendelijk"
+      "friendly": "Vriendelijk",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Doelwitframe verplaatsen",

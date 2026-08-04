@@ -7329,6 +7329,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.meters.resize'
   | 'hudChrome.meters.seconds'
   | 'hudChrome.meters.separate'
+  | 'hudChrome.mobTooltip.boss'
+  | 'hudChrome.mobTooltip.elite'
   | 'hudChrome.mobTooltip.familyDemon'
   | 'hudChrome.mobTooltip.friendly'
   | 'hudChrome.mobTooltip.hostile'
