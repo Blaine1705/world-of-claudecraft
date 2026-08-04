@@ -150,6 +150,17 @@
     --color-bag-quest-seal: var(--color-quest);
     --color-bag-quest-seal-ready: color-mix(in srgb, var(--color-quest) 55%, #fff);
     --color-quest-tracker-bag-hover: var(--color-quest);
+    /* Bag-grid fine-grade material treatment (components.css .bag-item.bag-fine /
+       .bi-fine-seal, painted by bags_window.ts as a class, never an inline
+       color). Grade class, not a rarity tier and not quest purpose: cool refined
+       teal-silver rim + soft wash + crafting seal so fine ores/logs/herbs never
+       read as plain white reagents. Distinct from --color-quest gold and from
+       green/blue/purple quality borders. Shape is primary, tint is redundant
+       (fairness). Always-on, no --fx-* gate. */
+    --color-bag-fine: #6ec8d4;
+    --color-bag-fine-rim: var(--color-bag-fine);
+    --color-bag-fine-wash: color-mix(in srgb, var(--color-bag-fine) 18%, transparent);
+    --color-bag-fine-seal: var(--color-bag-fine);
 
     /* Empty paperdoll slot greys (char_window.ts uses these so the painter carries
        no raw hex): the muted "Empty" label and the dimmed placeholder-icon border.

@@ -1755,6 +1755,7 @@ export const en_CA: EnTranslations = {
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
       "itemAriaQuest": "{item}, quantity {count}, quest item",
+      "itemAriaFine": "{item}, quantity {count}, fine material",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",

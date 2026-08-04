@@ -1755,6 +1755,7 @@ export const zh_TW: EnTranslations = {
       "itemAriaBound": "{item}，數量 {count}，已綁定的副本",
       "itemAriaMasterwork": "{item}，數量 {count}，傑作",
       "itemAriaQuest": "{item}，數量 {count}，任務物品",
+      "itemAriaFine": "{item}, quantity {count}, fine material",
       "filterGroupAria": "依類別篩選背包",
       "filterAll": "全部",
       "filterWeapon": "武器",

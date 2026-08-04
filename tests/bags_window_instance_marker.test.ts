@@ -362,6 +362,69 @@ describe('bags grid quest-purpose mark', () => {
   });
 });
 
+describe('bags grid fine-grade mark', () => {
+  it('a fine stack gets bag-fine, the seal, and fine aria; base and junk do not', () => {
+    const root = windowFor([
+      { itemId: 'fine_copper_ore', count: 1 },
+      { itemId: 'copper_ore', count: 1 },
+      { itemId: 'mudfin_scale', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(3);
+    expect(cells[0].classList.contains('bag-fine')).toBe(true);
+    expect(cells[1].classList.contains('bag-fine')).toBe(false);
+    expect(cells[2].classList.contains('bag-fine')).toBe(false);
+    const seal = cells[0].querySelector('.bi-fine-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.getAttribute('aria-hidden')).toBe('true');
+    expect(cells[1].querySelector('.bi-fine-seal')).toBeNull();
+    expect(cells[2].querySelector('.bi-fine-seal')).toBeNull();
+    expect(cells[0].getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 1, fine material');
+    expect(cells[1].getAttribute('aria-label')).toBe('Copper Ore, quantity 1');
+  });
+
+  it('fine seal outranks instance glyphs; masterwork seal outranks fine seal', () => {
+    // Priority: masterwork > fine > signed. Rim still marks fine when
+    // masterwork wins the corner; grade aria always says fine material.
+    const root = windowFor([
+      {
+        itemId: 'fine_copper_ore',
+        count: 1,
+        instance: { signer: 'Anna' },
+      },
+      {
+        itemId: 'fine_copper_ore',
+        count: 1,
+        instance: { signer: 'Anna', rolled: { masterwork: true, stats: { sta: 1 } } },
+      },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    // Fine + signed: fine seal wins; no bi-glyph-signed.
+    expect(cells[0].classList.contains('bag-fine')).toBe(true);
+    expect(cells[0].querySelector('.bi-fine-seal')).not.toBeNull();
+    expect(cells[0].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[0].querySelector('.bi-masterwork-seal')).toBeNull();
+    expect(cells[0].getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 1, fine material');
+    // Fine + masterwork: masterwork seal wins; rim still marks fine.
+    expect(cells[1].classList.contains('bag-fine')).toBe(true);
+    expect(cells[1].querySelector('.bi-masterwork-seal')).not.toBeNull();
+    expect(cells[1].querySelector('.bi-fine-seal')).toBeNull();
+    expect(cells[1].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[1].getAttribute('aria-label')).toBe('Fine Copper Ore, quantity 1, fine material');
+    expect(cells[1].getAttribute('aria-label')).not.toContain('masterwork');
+  });
+
+  it('a counted fine stack keeps its count badge beside the seal', () => {
+    const root = windowFor([{ itemId: 'fine_iron_ore', count: 7 }]);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.classList.contains('bag-fine')).toBe(true);
+    expect(cell?.querySelector('.bi-fine-seal')).not.toBeNull();
+    expect(cell?.querySelector('.bi-count')?.textContent).toContain('7');
+    expect(cell?.getAttribute('aria-label')).toBe('Fine Iron Ore, quantity 7, fine material');
+  });
+});
+
 describe('marker stylesheet contract (source pins)', () => {
   // jsdom gives import.meta.url an http URL, which readFileSync(new URL(...))
   // rejects (the vendor_window_painter precedent): resolve from __dirname.
@@ -473,5 +536,40 @@ describe('marker stylesheet contract (source pins)', () => {
     expect(painter).toContain('bagQuestMarkKind');
     expect(painter).toContain('bag-quest-ready');
     expect(painter).toContain('bi-quest-seal-ready');
+  });
+
+  it('fine bag treatment is always-on, tokenized, and never an --fx gate', () => {
+    const tokens = readFileSync(join(__dirname, '../src/styles/tokens.css'), 'utf8');
+    expect(tokens).toContain('--color-bag-fine:');
+    expect(tokens).toMatch(/--color-bag-fine-rim:\s*var\(--color-bag-fine\)/);
+    expect(tokens).toMatch(/--color-bag-fine-seal:\s*var\(--color-bag-fine\)/);
+    expect(tokens).toContain('--color-bag-fine-wash:');
+    expect(tokens).toMatch(/--color-bag-fine-wash:[\s\S]*?var\(--color-bag-fine\)/);
+    const commonStart = components.indexOf('.bag-item.q-common');
+    const fineCellStart = components.indexOf('.bag-item.bag-fine {');
+    expect(fineCellStart).toBeGreaterThan(-1);
+    // Fine rim must follow the common/poor neutral reset so equal-specificity
+    // !important border-color wins for the refined grade color.
+    expect(commonStart).toBeGreaterThan(-1);
+    expect(fineCellStart).toBeGreaterThan(commonStart);
+    const fineCellBlock = components.slice(fineCellStart, components.indexOf('}', fineCellStart));
+    expect(fineCellBlock).toContain('border-color:');
+    expect(fineCellBlock).toContain('!important');
+    expect(fineCellBlock).toContain('box-shadow:');
+    expect(fineCellBlock).toContain('var(--color-bag-fine-rim)');
+    expect(fineCellBlock).toContain('var(--color-bag-fine-wash)');
+    expect(fineCellBlock).not.toContain('--fx-');
+    const sealStart = components.indexOf('.bag-item .bi-fine-seal {');
+    expect(sealStart).toBeGreaterThan(-1);
+    const sealBlock = components.slice(sealStart, components.indexOf('}', sealStart));
+    expect(sealBlock).toContain('var(--color-bag-fine-seal)');
+    expect(sealBlock).not.toContain('--fx-');
+    expect(components).not.toContain('.bag-item:hover .bi-fine-seal');
+    // The painter carries no inline color for the fine treatment.
+    const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
+    expect(painter).toContain('bagFineMark');
+    expect(painter).toContain('bag-fine');
+    expect(painter).toContain('bi-fine-seal');
+    expect(painter).not.toContain('bi-fine-seal" style=');
   });
 });

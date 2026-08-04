@@ -6310,6 +6310,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bags.filterWeapon'
   | 'hudChrome.bags.itemAriaBound'
   | 'hudChrome.bags.itemAriaEnchanted'
+  | 'hudChrome.bags.itemAriaFine'
   | 'hudChrome.bags.itemAriaInstanced'
   | 'hudChrome.bags.itemAriaMasterwork'
   | 'hudChrome.bags.itemAriaQuest'

@@ -9,25 +9,65 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "es_ES": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "fr_FR": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "fr_CA": [
+    "hudChrome.bags.itemAriaFine"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "de_DE": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "zh_CN": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "zh_TW": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "ko_KR": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "ja_JP": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "pt_BR": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "ru_RU": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "cs_CZ": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "nl_NL": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "pl_PL": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "id_ID": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "tr_TR": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "sv_SE": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "vi_VN": [
+    "hudChrome.bags.itemAriaFine"
+  ],
+  "da_DK": [
+    "hudChrome.bags.itemAriaFine"
+  ]
 };
