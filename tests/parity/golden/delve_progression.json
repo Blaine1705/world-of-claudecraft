@@ -301,7 +301,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 850,
-      "state": "cf1ace23",
+      "state": "8a620b26",
       "events": "dae51339",
       "rng": {
         "draws": 3,
@@ -419,8 +419,8 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104200,
-            "z": -1127
+            "x": -5,
+            "z": -52
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -451,7 +451,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 850,
-      "state": "f783f540",
+      "state": "b6fc1fcf",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -565,12 +565,12 @@
           "maxResource": 100,
           "moveSpeed": 7,
           "offhandItemId": "eastbrook_buckler",
-          "onGround": true,
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 104200,
-            "z": -1127
+            "x": -5,
+            "y": -0.04,
+            "z": -52
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

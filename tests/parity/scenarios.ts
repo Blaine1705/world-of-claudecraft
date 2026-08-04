@@ -2825,7 +2825,12 @@ function delveProgression(): Scenario {
         rec.tick(3); // walk into the tombstone -> advanceDelveModule to the finale
       }
       rec.snapshot('advanced-to-finale');
-      // Marks shop: an 'available'-gated piece + a companion rank bump.
+      // Marks shop: an 'available'-gated piece + a companion rank bump. Both
+      // are gated to Brother Halven's board at the delve door (12 yards),
+      // like enter_delve, so step back to the door before spending.
+      p.pos = { x: def.doorPos.x, y: p.pos.y, z: def.doorPos.z };
+      p.prevPos = { ...p.pos };
+      sim.rebucket(p);
       const meta = sim.players.get(sim.playerId) as any;
       meta.delveMarks = 100;
       meta.copper = 100000;
