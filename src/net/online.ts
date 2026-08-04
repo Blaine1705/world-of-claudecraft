@@ -4578,6 +4578,27 @@ export class ClientWorld implements IWorld {
       return null;
     }
   }
+  // Newest-first unlock ids for the SELF character from the server's
+  // character_deeds record (exact earn timestamps; the mirrored `deeds` map
+  // only carries the utcDay). Owner-scoped bearer read; null on any failure,
+  // the facet's documented no-data value (the recent strip then falls back to
+  // the day-granular order).
+  async deedsRecent(): Promise<readonly string[] | null> {
+    try {
+      const res = await fetch(
+        apiUrl(`/api/characters/${this.characterId}/deeds-recent`, this.base),
+        { headers: { Authorization: `Bearer ${this.token}` } },
+      );
+      if (!res.ok) return null;
+      const data = (await res.json()) as { deeds?: unknown };
+      if (!Array.isArray(data?.deeds)) return null;
+      const ids: string[] = [];
+      for (const id of data.deeds) if (typeof id === 'string') ids.push(id);
+      return ids;
+    } catch {
+      return null;
+    }
+  }
   // --- IWorldDungeons: dungeon enter/leave sends + the raid-lockout countdown read.
   // selfLockouts mirrors the snapshot `s.lockouts`; raidLockouts derives the live
   // countdown locally so it ticks without traffic. enter_crypt/leave_crypt are legacy

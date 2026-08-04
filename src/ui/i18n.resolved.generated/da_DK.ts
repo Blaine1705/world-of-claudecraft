@@ -2897,6 +2897,7 @@ export const da_DK: EnTranslations = {
       "countLabel": "{earned}/{total} bedrifter",
       "completionAria": "Bedrifter opnået: {earned} af {total}",
       "recentLabel": "Seneste:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Næsten i mål:",
       "filterGroupAria": "Filtrer bedrifter",
       "filterAll": "Alle",

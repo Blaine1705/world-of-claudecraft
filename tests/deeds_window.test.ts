@@ -260,6 +260,8 @@ describe('hud wiring', () => {
         bannerEl: HTMLElement;
         bannerTimer: number | undefined;
         log: ReturnType<typeof vi.fn>;
+        logNodes: ReturnType<typeof vi.fn>;
+        deedsWindow: { noteUnlocks: ReturnType<typeof vi.fn> };
         combatAnnouncer: { push: ReturnType<typeof vi.fn> };
         handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void;
         showBanner(text: string): void;
@@ -267,6 +269,8 @@ describe('hud wiring', () => {
       h.bannerEl = document.createElement('div');
       h.bannerTimer = undefined;
       h.log = vi.fn();
+      h.logNodes = vi.fn();
+      h.deedsWindow = { noteUnlocks: vi.fn() };
       h.combatAnnouncer = { push: vi.fn() };
 
       h.handleDeedUnlocks([{ deedId: 'prog_first_steps' }]);
@@ -340,6 +344,8 @@ describe('hud wiring', () => {
       bannerTimer: number | undefined;
       bannerSource: 'unstuck' | null;
       log: ReturnType<typeof vi.fn>;
+      logNodes: ReturnType<typeof vi.fn>;
+      deedsWindow: { noteUnlocks: ReturnType<typeof vi.fn> };
       combatAnnouncer: { push: ReturnType<typeof vi.fn> };
       handleDeedUnlocks(events: { deedId: string; retro?: boolean }[]): void;
       showBanner(
@@ -360,6 +366,8 @@ describe('hud wiring', () => {
     h.bannerTimer = undefined;
     h.bannerSource = null;
     h.log = vi.fn();
+    h.logNodes = vi.fn();
+    h.deedsWindow = { noteUnlocks: vi.fn() };
     h.combatAnnouncer = { push: vi.fn() };
     return h;
   }
@@ -473,9 +481,16 @@ describe('hud wiring', () => {
     expect(body.match(/combatAnnouncer\.push/g)?.length).toBe(2);
   });
 
-  it('marks the watch toggle state and names the recent-strip crests', () => {
+  it('marks the watch toggle state and names the recent-strip jump buttons', () => {
     expect(painter).toContain('aria-pressed="${entry.watched}"');
-    expect(painter).toMatch(/deed-crest-mini[^>]*alt="\$\{esc\(deedName\(r\.id\)\)\}"/);
+    // The strip crest is a jump button: the accessible name rides the button
+    // (aria-label + title from the deed name), and the crest img inside stays
+    // alt="" so the deed is not announced twice.
+    expect(painter).toMatch(/deeds-recent-item" data-recent="\$\{esc\(r\.id\)\}"/);
+    expect(painter).toMatch(
+      /aria-label="\$\{esc\(t\('hudChrome\.deeds\.recentJumpAria', \{ name: deedName\(r\.id\) \}\)\)\}"/,
+    );
+    expect(painter).toMatch(/deed-crest-mini[^>]*alt=""/);
   });
 
   it('shows the active title and earned border badges on the character sheet', () => {

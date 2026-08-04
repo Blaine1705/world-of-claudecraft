@@ -6702,6 +6702,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.deeds.progressAria'
   | 'hudChrome.deeds.progressText'
   | 'hudChrome.deeds.rarityLine'
+  | 'hudChrome.deeds.recentJumpAria'
   | 'hudChrome.deeds.recentLabel'
   | 'hudChrome.deeds.renownChip'
   | 'hudChrome.deeds.renownLabel'

@@ -2897,6 +2897,7 @@ export const it_IT: EnTranslations = {
       "countLabel": "{earned}/{total} imprese",
       "completionAria": "Imprese ottenute: {earned} su {total}",
       "recentLabel": "Recenti:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Ci sei quasi:",
       "filterGroupAria": "Filtra le imprese",
       "filterAll": "Tutte",

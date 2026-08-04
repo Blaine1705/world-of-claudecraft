@@ -3938,6 +3938,12 @@
     body.mobile-touch #deeds-window .deeds-nearest {
       padding-bottom: 2px;
     }
+    /* The recent-strip jump buttons keep the 40px touch floor; the strip
+       wraps, so the taller row never squeezes its neighbors. */
+    body.mobile-touch #deeds-window .deeds-recent-item {
+      min-width: 40px;
+      min-height: 40px;
+    }
   }
   /* Watchlist tracker on phones: compact rows, the list capped (it is
      glanceable decoration, the Book itself carries the full watch set) so the

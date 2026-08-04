@@ -437,6 +437,72 @@ describe('buildDeedsView', () => {
     expect(view.summary.recent[0].crestId).toBe('deed_cat_combat');
   });
 
+  it('lets the fetched recentOrder outrank the day sort, skipping drifted and unearned ids', () => {
+    const view = buildDeedsView(
+      makeInput({
+        deedsEarned: new Map([
+          ['prog_a', '2026-07-01'],
+          ['cmb_counter', '2026-07-03'],
+          ['cmb_title', '2026-07-03'],
+          ['dgn_clears', '2026-07-02'],
+        ]),
+        recentOrder: ['cmb_counter', 'removed_deed', 'exp_visits', 'cmb_title', 'prog_a'],
+      }),
+    );
+    // The fetched order wins over the day sort (which would put cmb_title
+    // first); the drifted id and the unearned id are skipped; the deed the
+    // fetch missed (dgn_clears) still follows from the day fallback.
+    expect(view.summary.recent.map((r) => r.id)).toEqual([
+      'cmb_counter',
+      'cmb_title',
+      'prog_a',
+      'dgn_clears',
+    ]);
+  });
+
+  it('puts session unlocks first, newest first, deduped against the fetched order', () => {
+    const view = buildDeedsView(
+      makeInput({
+        deedsEarned: new Map([
+          ['prog_a', '2026-07-01'],
+          ['cmb_counter', '2026-07-03'],
+          ['cmb_title', '2026-07-03'],
+        ]),
+        // Drain order (oldest first): prog_a is the newest session unlock.
+        sessionUnlocks: ['cmb_counter', 'prog_a'],
+        recentOrder: ['cmb_title', 'cmb_counter'],
+      }),
+    );
+    expect(view.summary.recent.map((r) => r.id)).toEqual(['prog_a', 'cmb_counter', 'cmb_title']);
+    // The display day still resolves from the earned map for a merged source.
+    expect(view.summary.recent[0].earnedDay).toBe('2026-07-01');
+  });
+
+  it('echoes focusDeedId only when the deed rendered an entry this paint', () => {
+    const earned = new Map([['cmb_counter', '2026-07-01']]);
+    expect(
+      buildDeedsView(makeInput({ deedsEarned: earned, focusDeedId: 'cmb_counter' })).focusDeedId,
+    ).toBe('cmb_counter');
+    // Another category selected: the card is not in the DOM, so null.
+    expect(
+      buildDeedsView(
+        makeInput({ deedsEarned: earned, category: 'progression', focusDeedId: 'cmb_counter' }),
+      ).focusDeedId,
+    ).toBe(null);
+    // Hidden and unearned: masked entirely, never echoed even on its shelf.
+    expect(buildDeedsView(makeInput({ category: 'feat', focusDeedId: 'hid_x' })).focusDeedId).toBe(
+      null,
+    );
+    // A filter that hides the card also clears the echo.
+    expect(
+      buildDeedsView(
+        makeInput({ deedsEarned: earned, filter: 'unearned', focusDeedId: 'cmb_counter' }),
+      ).focusDeedId,
+    ).toBe(null);
+    // Absent input: null.
+    expect(buildDeedsView(makeInput()).focusDeedId).toBe(null);
+  });
+
   it('ranks nearest by progress fraction, excluding zero progress', () => {
     const s = stats((x) => {
       x.counters.kills = 3; // cmb_counter 0.3

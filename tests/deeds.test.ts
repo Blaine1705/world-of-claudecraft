@@ -10,6 +10,7 @@ import { ITEMS, MOBS, QUESTS, ZONES } from '../src/sim/data';
 import {
   bumpDeedStat,
   checkDeedTrigger,
+  DEEDS_RECENT_CAP,
   evaluateDeedsFor,
   grantDeed,
   markItemDiscovered,
@@ -1820,6 +1821,24 @@ describe('deedsRarity (offline facet arm)', () => {
   it('always resolves null: a sandbox has no population to aggregate', async () => {
     const sim = makeSim();
     await expect(sim.deedsRarity()).resolves.toBeNull();
+  });
+});
+
+describe('deedsRecent (offline facet arm)', () => {
+  it('serves the live grant order newest first, capped at DEEDS_RECENT_CAP', async () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // No unlocks yet: an empty list, never null (the Sim always has its own
+    // grant-order record; null is the fetch-failure arm online).
+    await expect(sim.deedsRecent()).resolves.toEqual([]);
+    // Grant two more than the cap in a KNOWN order that is not catalog order,
+    // so the assertion can tell grant order from DEED_ORDER.
+    const granted = [...DEED_ORDER.slice(0, DEEDS_RECENT_CAP + 1), 'dgn_korzul_flawless'];
+    for (const id of granted) grantDeed(sim.ctx, meta, id);
+    const recent = await sim.deedsRecent();
+    expect(recent).toEqual(granted.slice(-DEEDS_RECENT_CAP).reverse());
+    expect(recent).toHaveLength(DEEDS_RECENT_CAP);
+    expect(recent?.[0]).toBe('dgn_korzul_flawless');
   });
 });
 

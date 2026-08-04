@@ -9,6 +9,7 @@
 
 import { audio } from '../game/audio';
 import { DEED_ORDER, DEEDS } from '../sim/content/deeds';
+import { DEEDS_RECENT_CAP } from '../sim/deeds';
 import type { DeedsRarity, IWorld } from '../world_api';
 import { deedDesc, deedName, deedTitleText } from './deed_i18n';
 import {
@@ -20,6 +21,7 @@ import {
   type DeedEntryModel,
   type DeedsFilter,
   type DeedsViewModel,
+  deedDisplayCategory,
   deedRarityFraction,
   deedStatsDigest,
   deedsRefreshSig,
@@ -37,6 +39,7 @@ import {
   t,
 } from './i18n';
 import { iconDataUrl } from './icons';
+import { ownEntry } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 
@@ -78,7 +81,7 @@ const FILTER_LABEL_KEYS: Record<DeedsFilter, TranslationKey> = {
  */
 export function refocusSelector(active: Element | null): string | null {
   if (active === null) return null;
-  for (const attr of ['data-cat', 'data-filter', 'data-watch', 'data-title']) {
+  for (const attr of ['data-cat', 'data-filter', 'data-watch', 'data-title', 'data-recent']) {
     const value = active.getAttribute(attr);
     if (value !== null) {
       const cssValue = value.replace(/["\\]/g, '\\$&');
@@ -127,6 +130,15 @@ export class DeedsWindow {
   // through the facet (null offline or on failure; the slot renders nothing).
   private rarity: DeedsRarity | null = null;
   private rarityFetchSeq = 0;
+  // The host's newest-first unlock order, fetched per open like rarity (null
+  // until it lands; the strip then falls back to the day-granular order).
+  private recentOrder: readonly string[] | null = null;
+  private recentFetchSeq = 0;
+  // This session's non-retro unlock ids in drain order (the HUD's noteUnlocks
+  // feed), bounded to DEEDS_RECENT_CAP: the freshest recency signal.
+  private sessionUnlocks: string[] = [];
+  // One-shot: the deed to spotlight (scroll + flash) after the next paint.
+  private focusDeedId: string | null = null;
 
   constructor(private readonly deps: DeedsWindowDeps) {}
 
@@ -153,6 +165,7 @@ export class DeedsWindow {
     this.opened = true;
     this.lastSig = '';
     this.fetchRarity();
+    this.fetchRecent();
     this.render();
     this.deps.root().style.display = 'flex';
     // Move keyboard focus into the freshly opened window (onto the close button),
@@ -179,6 +192,60 @@ export class DeedsWindow {
       .catch(() => {
         /* null-on-failure is the facet contract; a rejection renders nothing */
       });
+  }
+
+  /** One recent-order fetch per fresh open (the rarity pattern): the async
+   *  result repaints in place, the sequence guard drops a stale response
+   *  after a close/reopen race. Session unlocks outrank it in the merge, so a
+   *  character_deeds upsert still in flight cannot misplace a just-earned
+   *  deed. */
+  private fetchRecent(): void {
+    const seq = ++this.recentFetchSeq;
+    this.recentOrder = null;
+    void this.deps
+      .world()
+      .deedsRecent()
+      .then((order) => {
+        if (seq !== this.recentFetchSeq || !this.opened || order === null) return;
+        this.recentOrder = order;
+        this.render();
+      })
+      .catch(() => {
+        /* null-on-failure is the facet contract; the day fallback stands */
+      });
+  }
+
+  /** The HUD's deed-unlock drain feed: remember this session's non-retro
+   *  unlock order so the recent strip is exact the moment the Book opens
+   *  (the fetched order may predate an upsert still in flight). Bounded to
+   *  DEEDS_RECENT_CAP; an open window repaints immediately. */
+  noteUnlocks(deedIds: readonly string[]): void {
+    if (deedIds.length === 0) return;
+    for (const id of deedIds) this.sessionUnlocks.push(id);
+    const excess = this.sessionUnlocks.length - DEEDS_RECENT_CAP;
+    if (excess > 0) this.sessionUnlocks.splice(0, excess);
+    if (this.opened) this.render();
+  }
+
+  /** Open (or refocus) the Book on one deed's card: the chat deed-link and
+   *  recent-strip jump. Switches to the deed's display category and clears
+   *  the filter/search so the card is guaranteed visible, then spotlights it
+   *  after the paint. A hidden deed not yet earned stays masked (the Book
+   *  must not reveal it), so that jump opens the Book wherever it last was,
+   *  unfocused; an unknown id (content drift) does the same. */
+  openWithDeed(deedId: string): void {
+    const def = ownEntry(DEEDS, deedId);
+    if (def && !(def.hidden === true && !this.deps.world().deedsEarned.has(deedId))) {
+      this.category = deedDisplayCategory(def.category);
+      this.filter = 'all';
+      this.search = '';
+      this.focusDeedId = deedId;
+    }
+    if (!this.opened) {
+      this.open();
+      return;
+    }
+    this.render();
   }
 
   close(): void {
@@ -265,6 +332,23 @@ export class DeedsWindow {
       const fresh = refocusSel === null ? null : el.querySelector<HTMLElement>(refocusSel);
       (fresh ?? (el.querySelector('[data-close]') as HTMLElement | null))?.focus();
     }
+    if (model.focusDeedId !== null) this.spotlightCard(el, model.focusDeedId);
+  }
+
+  /** One-shot spotlight after a paint that carried focusDeedId: scroll the
+   *  card into view and flash it (a pure CSS animation, so the cold window
+   *  gains no timer; reduced-motion swaps in a static ring). One-shot so the
+   *  slow-band refresh never re-scrolls a window the player has moved on
+   *  from. The selector escape is the refocusSelector rule (quote+backslash;
+   *  CSS.escape is absent in the jsdom test env). */
+  private spotlightCard(el: HTMLElement, deedId: string): void {
+    this.focusDeedId = null;
+    const cssValue = deedId.replace(/["\\]/g, '\\$&');
+    const card = el.querySelector<HTMLElement>(`.deed-card[data-deed="${cssValue}"]`);
+    if (!card) return;
+    // Guarded: jsdom (the focus/behavior test env) ships no scrollIntoView.
+    if (typeof card.scrollIntoView === 'function') card.scrollIntoView({ block: 'center' });
+    card.classList.add('deed-card-flash');
   }
 
   private buildModel(): DeedsViewModel {
@@ -283,6 +367,9 @@ export class DeedsWindow {
       search: this.search.trim().toLocaleLowerCase(tag),
       watched: this.watchedSet,
       searchText: (id) => `${deedName(id)} ${deedDesc(id)}`.toLocaleLowerCase(tag),
+      recentOrder: this.recentOrder,
+      sessionUnlocks: this.sessionUnlocks,
+      focusDeedId: this.focusDeedId,
     });
   }
 
@@ -303,10 +390,12 @@ export class DeedsWindow {
       const crests = s.recent
         .map(
           (r) =>
-            // alt carries the deed name: the strip has no adjacent visible
-            // text, so an empty alt would hide the recent unlocks entirely
-            // from the accessibility tree.
-            `<img class="deed-crest deed-crest-mini" src="${iconDataUrl('crest', r.crestId, DEED_CREST_SIZE)}" alt="${esc(deedName(r.id))}" title="${esc(deedName(r.id))}">`,
+            // Each crest is a jump button to its deed's card. The button
+            // carries the accessible name (the strip has no adjacent visible
+            // text); the crest img inside stays alt="" so the deed is not
+            // announced twice.
+            `<button type="button" class="deeds-recent-item" data-recent="${esc(r.id)}" aria-label="${esc(t('hudChrome.deeds.recentJumpAria', { name: deedName(r.id) }))}" title="${esc(deedName(r.id))}">` +
+            `<img class="deed-crest deed-crest-mini" src="${iconDataUrl('crest', r.crestId, DEED_CREST_SIZE)}" alt=""></button>`,
         )
         .join('');
       html += `<div class="deeds-recent"><span class="deeds-strip-label">${esc(t('hudChrome.deeds.recentLabel'))}</span>${crests}</div>`;
@@ -496,6 +585,16 @@ export class DeedsWindow {
         this.filter = (DEED_FILTERS as readonly string[]).includes(filter) ? filter : 'all';
         audio.click();
         this.render();
+      });
+    }
+    // Recent-strip jump: land on that deed's card (category switch + scroll +
+    // flash), the openWithDeed path the chat deed-link also takes.
+    for (const btn of el.querySelectorAll<HTMLElement>('[data-recent]')) {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.recent;
+        if (!id) return;
+        audio.click();
+        this.openWithDeed(id);
       });
     }
     // Touch long-press peek: holding a card shows its tooltip (name + full
