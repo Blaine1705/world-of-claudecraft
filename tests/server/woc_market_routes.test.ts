@@ -117,7 +117,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(39);
+    expect(rows).toHaveLength(37);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -140,8 +140,6 @@ describe('the refusal-to-wire mapping', () => {
     // Authorization. The caller is known and the action is not theirs.
     ['wallet_required', 403, 'woc_market.wallet_required'],
     ['terms_required', 403, 'woc_market.terms_required'],
-    ['totp_required', 403, 'woc_market.totp_required'],
-    ['totp_invalid', 403, 'woc_market.totp_invalid'],
     ['account_suspended', 403, 'woc_market.suspended'],
     ['own_listing', 403, 'woc_market.own_listing'],
     // The anti-enumeration pair: a foreign id and an absent id are

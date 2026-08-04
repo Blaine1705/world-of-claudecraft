@@ -8661,9 +8661,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementDeadlineNote':
     '落札した場合、オークション終了後 {duration} 以内に支払う必要があります。',
   'hudChrome.wocMarket.termsLabel': '変動トークン決済の条件に同意します。',
-  'hudChrome.wocMarket.totpLabel': '二要素認証コード',
-  'hudChrome.wocMarket.totpPlaceholder': '6 桁のコード',
-  'hudChrome.wocMarket.totpNote': '{usd} 以上の入札には二要素認証が必要です。',
   'hudChrome.wocMarket.quoteTitle': '支払いの確認',
   'hudChrome.wocMarket.quoteTotal': '合計: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSeller': '出品者の受取额: {tokens} $WOC',

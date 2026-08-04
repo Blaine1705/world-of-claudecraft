@@ -857,33 +857,35 @@ describe('woc_market_window: a fixed-price listing can satisfy the guards buyNow
     expect(parts).toEqual(['estimate', 'bidForm', 'buyNowFields', 'buyNow']);
   });
 
-  it('defines those two fields exactly once, so both paths send the same names', () => {
+  it('defines the terms field exactly once, so both paths send the same name', () => {
     // One definition is the whole point: two copies drift, and the server reads one
-    // pair of names.
+    // name. This was two fields until 2FA came off the Exchange's paying side; the
+    // helper stays because both the bid form and the buy-now path still need the
+    // terms checkbox, which is the whole reason it was extracted.
     const fields = between('private confirmFieldsHtml(', 'private sellHtml(');
     expect(fields).toContain('data-field="accept-terms"');
-    expect(fields).toContain('data-field="totp"');
-    expect(fields).toContain("t('hudChrome.wocMarket.totpNote'");
     expect(fields).toContain("t('hudChrome.wocMarket.termsLabel')");
     // The bid form consumes the same helper rather than keeping its own copy.
     const bid = between('private bidFormHtml(', 'private confirmFieldsHtml(');
     expect(bid).toContain('this.confirmFieldsHtml(model)');
-    expect(bid).not.toContain('data-field="totp"');
     expect(bid).not.toContain('data-field="accept-terms"');
-    // Exactly one RENDER site for each, so no path can emit a duplicate. The
-    // negative lookarounds exclude the query-selector form, `[data-field="totp"]`,
-    // which totpValue() legitimately uses to read the field back.
-    expect(painter.match(/(?<!\[)data-field="totp"(?!\])/g) ?? []).toHaveLength(1);
+    // Exactly one RENDER site, so no path can emit a duplicate.
     expect(painter.match(/(?<!\[)data-field="accept-terms"(?!\])/g) ?? []).toHaveLength(1);
   });
 
-  it('reads both values by the same name it renders them under', () => {
-    // A rename on one side only would silently send null forever, which the server
-    // reports as totp_required: the same dead end, from the opposite direction.
-    expect(painter).toContain('this.field<HTMLInputElement>(\'[data-field="totp"]\')');
+  it('sends the terms flag from both paying paths', () => {
     const buy = between('private async buyNow(', 'private async cancelListing(');
-    expect(buy).toContain('totpCode: this.totpValue()');
     expect(buy).toContain('acceptTerms: this.acceptTermsChecked()');
+    const bid = between('private async placeBid(', 'private async buyNow(');
+    expect(bid).toContain('acceptTerms: this.acceptTermsChecked()');
+  });
+
+  it('carries no two-factor field: 2FA is off the Exchange paying side', () => {
+    // Removed deliberately, not lost. Both paying actions already require the
+    // buyer's own wallet signature, which a stolen session token does not carry, so
+    // the gate sat in front of an action that already had a stronger second factor.
+    // The account's LOGIN 2FA is untouched and lives in server/account.ts.
+    expect(painter.toLowerCase()).not.toContain('totp');
   });
 });
 

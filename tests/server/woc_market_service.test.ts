@@ -177,7 +177,6 @@ interface Harness {
   deps: WocMarketDeps;
   wallets: Map<number, string>;
   balances: Map<string, number>;
-  totpEnrolled: Set<number>;
   now: () => number;
   setNow: (ms: number) => void;
 }
@@ -222,7 +221,6 @@ function makeHarness(): Harness {
     ['wallet-c', 100_000_000],
   ]);
   // BUYER_B stays deliberately unenrolled (the enroll-first TOTP refusal arm).
-  const totpEnrolled = new Set<number>([SELLER, BUYER_A, BUYER_C, WALLET_TWIN]);
   const economy = createDevWocMarketEconomy(now);
   const deps: WocMarketDeps = {
     db,
@@ -230,13 +228,10 @@ function makeHarness(): Harness {
     custody,
     verifiedWallet: async (account) => wallets.get(account) ?? null,
     balanceTokens: async (pubkey) => balances.get(pubkey) ?? null,
-    totpEnabled: async (account) => totpEnrolled.has(account),
-    totpVerify: async (_account, code) => code === 'OTP-OK',
     config: {
       enabled: true,
       realm: REALM,
       policy: WOC_MARKET_RESTRICTED_POLICY,
-      totpThresholdCents: 10_000,
     },
     now,
   };
@@ -249,7 +244,6 @@ function makeHarness(): Harness {
     deps,
     wallets,
     balances,
-    totpEnrolled,
     now,
     setNow: (ms) => {
       clockMs = ms;
@@ -289,7 +283,6 @@ interface BidArgs {
   characterId: number;
   listingId: number;
   amountCents: number;
-  totpCode?: string | null;
   acceptTerms?: boolean;
 }
 
@@ -299,7 +292,6 @@ function placeBid(h: Harness, args: BidArgs) {
     characterId: args.characterId,
     listingId: args.listingId,
     amountCents: args.amountCents,
-    totpCode: args.totpCode ?? null,
     acceptTerms: args.acceptTerms ?? true,
   });
 }
@@ -696,42 +688,6 @@ describe('placeBid', () => {
     expect((await getListing(h, listing.id)).currentBidId).toBeNull();
   });
 
-  it('enforces TOTP at the threshold: missing code, unenrolled account, bad code, good code', async () => {
-    const h = makeHarness();
-    const listing = await listEpic(h);
-    const noCode = await placeBid(h, {
-      account: BUYER_A,
-      characterId: CHAR_A,
-      listingId: listing.id,
-      amountCents: 10_000,
-    });
-    expect(noCode).toEqual({ ok: false, reason: 'totp_required' });
-    const unenrolled = await placeBid(h, {
-      account: BUYER_B,
-      characterId: CHAR_B,
-      listingId: listing.id,
-      amountCents: 10_000,
-      totpCode: 'OTP-OK',
-    });
-    expect(unenrolled).toEqual({ ok: false, reason: 'totp_required' });
-    const badCode = await placeBid(h, {
-      account: BUYER_A,
-      characterId: CHAR_A,
-      listingId: listing.id,
-      amountCents: 10_000,
-      totpCode: 'OTP-BAD',
-    });
-    expect(badCode).toEqual({ ok: false, reason: 'totp_invalid' });
-    const good = await placeBid(h, {
-      account: BUYER_A,
-      characterId: CHAR_A,
-      listingId: listing.id,
-      amountCents: 10_000,
-      totpCode: 'OTP-OK',
-    });
-    expect(good.ok).toBe(true);
-  });
-
   it('refuses insufficient_balance when the wallet cannot cover bid plus bond', async () => {
     const h = makeHarness();
     const listing = await listEpic(h);
@@ -797,7 +753,6 @@ describe('placeBid', () => {
       characterId: CHAR_A,
       listingId: listing.id,
       amountCents: 5000,
-      totpCode: null,
       acceptTerms: true,
     });
     expect(res).toEqual({ ok: false, reason: 'market_paused' });
@@ -906,7 +861,6 @@ describe('placeBid', () => {
       characterId: CHAR_A,
       listingId: listing.id,
       amountCents: 5000,
-      totpCode: null,
       acceptTerms: true,
     });
     expect(res).toEqual({ ok: false, reason: 'disabled' });
@@ -931,7 +885,6 @@ describe('placeBid', () => {
       characterId: CHAR_A,
       listingId: listing.id,
       amountCents: 5000,
-      totpCode: null,
       acceptTerms: true,
     });
     expect(res).toEqual({ ok: false, reason: 'market_paused' });
@@ -1481,7 +1434,6 @@ describe('buy now', () => {
         account: BUYER_B,
         characterId: CHAR_B,
         listingId: listing.id,
-        totpCode: null,
         acceptTerms: true,
       }),
       'buyNow',
@@ -1507,7 +1459,6 @@ describe('buy now', () => {
       account: BUYER_C,
       characterId: CHAR_C,
       listingId: listing.id,
-      totpCode: null,
       acceptTerms: true,
     });
     expect(rival).toEqual({ ok: false, reason: 'buy_now_locked' });
@@ -1544,7 +1495,6 @@ describe('buy now', () => {
         account: BUYER_B,
         characterId: CHAR_B,
         listingId: listing.id,
-        totpCode: null,
         acceptTerms: true,
       }),
       'buyNow',
@@ -1580,7 +1530,6 @@ describe('buy now', () => {
         account: BUYER_C,
         characterId: CHAR_C,
         listingId: listing.id,
-        totpCode: null,
         acceptTerms: true,
       }),
       'buyNow',
@@ -1747,7 +1696,6 @@ describe('adminSuspendListing', () => {
         account: BUYER_B,
         characterId: CHAR_B,
         listingId: listing.id,
-        totpCode: null,
         acceptTerms: true,
       }),
       'buyNow',

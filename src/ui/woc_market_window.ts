@@ -678,7 +678,7 @@ export class WocMarketWindow {
     // A fixed-price listing has no bid form, so nothing else would carry the two
     // fields buyNow's own server-side guards demand. Rendered only when the bid
     // form is absent: a legacy combined listing would otherwise emit the same
-    // data-field twice and totpValue() would read whichever came first.
+    // data-field twice and the reader would take whichever came first.
     const buyNowFields = buyNow !== '' && bidForm === '' ? this.confirmFieldsHtml(model) : '';
     return (
       `<div class="wm-detail"><h3>${esc(t('hudChrome.wocMarket.detailTitle'))}</h3>` +
@@ -733,22 +733,18 @@ export class WocMarketWindow {
   }
 
   /**
-   * The two fields the SERVER demands before it will take money: the terms
-   * acceptance and the two-factor code.
+   * The field the SERVER demands before it will take money: the terms
+   * acceptance. It was two until 2FA came off the Exchange's paying side; the
+   * helper stays because the same reasoning applies to whatever the server gates
+   * on next, and because both the bid form and the buy-now path still need it.
    *
    * One definition, rendered by whichever action is on screen, because the
    * server's guards do not care which one it was. Both `placeBid` and `buyNow`
-   * run guardTerms and guardTotp, but these inputs used to live only inside the
-   * bid form, which is suppressed for a fixed-price listing: a buy-now at or
-   * above the threshold refused with totp_required and showed nowhere to type a
-   * code, and a buyer who had not yet accepted the terms got terms_required with
-   * no checkbox. Both were dead ends with no way out of the UI, and neither could
-   * appear on a legacy combined listing, which is the only kind the local
-   * database held.
-   *
-   * The threshold in the note is the SERVER's own number off the status payload,
-   * never a hardcoded $100, so an operator who moves
-   * WOC_MARKET_TOTP_THRESHOLD_CENTS does not leave the copy lying.
+   * runs guardTerms, but this input used to live only inside the bid form, which
+   * is suppressed for a fixed-price listing: a buyer who had not yet accepted the
+   * terms got terms_required with no checkbox to tick, a dead end with no way out
+   * of the UI, and one that could not appear on a legacy combined listing, which
+   * is the only kind the local database held.
    */
   private confirmFieldsHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
     const termsRow = model.activity?.termsAccepted
@@ -756,14 +752,7 @@ export class WocMarketWindow {
       : `<label class="wm-terms"><input type="checkbox" data-field="accept-terms" data-focus-key="wm-terms" ${this.acceptTerms ? 'checked' : ''} /> ${esc(
           t('hudChrome.wocMarket.termsLabel'),
         )}</label>`;
-    return (
-      `<label class="wm-totp">${esc(t('hudChrome.wocMarket.totpLabel'))}` +
-      `<input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="8" data-field="totp" data-focus-key="wm-totp" placeholder="${esc(
-        t('hudChrome.wocMarket.totpPlaceholder'),
-      )}" /></label>` +
-      `<p class="wm-note">${esc(t('hudChrome.wocMarket.totpNote', { usd: this.usd(model.totpThresholdCents) }))}</p>` +
-      termsRow
-    );
+    return termsRow;
   }
 
   private sellHtml(model: Extract<WocMarketViewModel, { kind: 'ready' }>): string {
@@ -1421,11 +1410,6 @@ export class WocMarketWindow {
     return this.acceptTerms;
   }
 
-  private totpValue(): string | null {
-    const value = this.field<HTMLInputElement>('[data-field="totp"]')?.value.trim() ?? '';
-    return value === '' ? null : value;
-  }
-
   private async placeBid(listingId: number): Promise<void> {
     const hooks = this.deps.hooks();
     if (!hooks || !Number.isFinite(listingId)) return;
@@ -1440,7 +1424,6 @@ export class WocMarketWindow {
         listingId,
         characterId: hooks.characterId(),
         amountCents,
-        totpCode: this.totpValue(),
         acceptTerms: this.acceptTermsChecked(),
       });
       if (!out.ok) {
@@ -1465,7 +1448,6 @@ export class WocMarketWindow {
       const out = await hooks.client.buyNow({
         listingId,
         characterId: hooks.characterId(),
-        totpCode: this.totpValue(),
         acceptTerms: this.acceptTermsChecked(),
       });
       if (!out.ok) {

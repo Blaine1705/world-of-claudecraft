@@ -64,7 +64,6 @@ import {
 // Feature config (the domain-getter pattern; read per call so tests can flip)
 // ---------------------------------------------------------------------------
 
-const DEFAULT_TOTP_THRESHOLD_CENTS = 10_000; // $100
 /** Deepest browse page a client may request (25 per page). */
 const MAX_BROWSE_PAGE = 400;
 
@@ -73,7 +72,6 @@ export function wocMarketConfig(): WocMarketConfig {
     .split(',')
     .map((s) => s.trim())
     .filter((s) => s !== '');
-  const threshold = Number(process.env.WOC_MARKET_TOTP_THRESHOLD_CENTS ?? '');
   return {
     enabled: process.env.WOC_MARKET_ENABLED === '1',
     realm: REALM,
@@ -81,10 +79,6 @@ export function wocMarketConfig(): WocMarketConfig {
       excluded.length === 0
         ? WOC_MARKET_RESTRICTED_POLICY
         : { ...WOC_MARKET_RESTRICTED_POLICY, excludedItemIds: new Set(excluded) },
-    totpThresholdCents:
-      Number.isFinite(threshold) && threshold > 0
-        ? Math.floor(threshold)
-        : DEFAULT_TOTP_THRESHOLD_CENTS,
   };
 }
 
@@ -127,8 +121,6 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   market_paused: { status: 503, code: 'woc_market.paused' },
   wallet_required: { status: 403, code: 'woc_market.wallet_required' },
   terms_required: { status: 403, code: 'woc_market.terms_required' },
-  totp_required: { status: 403, code: 'woc_market.totp_required' },
-  totp_invalid: { status: 403, code: 'woc_market.totp_invalid' },
   account_suspended: { status: 403, code: 'woc_market.suspended' },
   character_invalid: { status: 400, code: 'woc_market.character_invalid' },
   not_found: { status: 404, code: 'woc_market.not_found' },
@@ -336,7 +328,6 @@ async function statusHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, {
     enabled: status.enabled,
     price: status.price,
-    totpThresholdCents: status.totpThresholdCents,
     maxActiveListings: status.maxActiveListings,
     durationsHours: WOC_MARKET_DURATION_HOURS,
     minPriceCents: WOC_MARKET_MIN_PRICE_CENTS,
@@ -460,7 +451,6 @@ async function placeBidHandler(ctx: Ctx): Promise<void> {
     characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
     listingId: idParam(ctx),
     amountCents: intField(body.amountCents, 1, WOC_MARKET_MAX_PRICE_CENTS),
-    totpCode: optionalString(body.totpCode, 16),
     acceptTerms: body.acceptTerms === true,
   });
   if (!out.ok) throwRefusal(out.reason);
@@ -490,7 +480,6 @@ async function buyNowHandler(ctx: Ctx): Promise<void> {
     account: ctxAccountId(ctx),
     characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
     listingId: idParam(ctx),
-    totpCode: optionalString(body.totpCode, 16),
     acceptTerms: body.acceptTerms === true,
   });
   if (!out.ok) throwRefusal(out.reason);
@@ -638,7 +627,7 @@ const OWNED_ACCOUNT = { requireOwned: { kind: 'woc-market', ownerScope: 'account
 // Any authenticated player may read a listing or its sales history, and may
 // bid on / buy ANY listing: there is no per-object ownership by design, so
 // these carry the intentional publicRead marker instead of a loader (the
-// service owns every other guard: seller/wallet exclusion, terms, TOTP).
+// service owns every other guard: seller/wallet exclusion, terms).
 const NO_OWNER = { publicRead: true } as const;
 const ADMIN_META = { envelope: 'admin' } as const;
 const ADMIN_TARGET_META = {

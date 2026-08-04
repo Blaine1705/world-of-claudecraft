@@ -8780,9 +8780,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementDeadlineNote':
     'Если вы выиграете, оплата должна поступить в течение {duration} после закрытия аукциона.',
   'hudChrome.wocMarket.termsLabel': 'Я принимаю условия расчёта с плавающим количеством токенов.',
-  'hudChrome.wocMarket.totpLabel': 'Код двухфакторной аутентификации',
-  'hudChrome.wocMarket.totpPlaceholder': 'Шестизначный код',
-  'hudChrome.wocMarket.totpNote': 'Ставки от {usd} требуют двухфакторной аутентификации.',
   'hudChrome.wocMarket.quoteTitle': 'Подтверждение оплаты',
   'hudChrome.wocMarket.quoteTotal': 'Итого: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSeller': 'Продавец получает: {tokens} $WOC',

@@ -32,7 +32,6 @@ export interface WocMarketStatus {
   ok: boolean;
   enabled: boolean;
   price: WocPriceView;
-  totpThresholdCents: number;
   maxActiveListings: number;
   durationsHours: readonly number[];
   minPriceCents: number;
@@ -153,14 +152,12 @@ export interface PlaceBidRequest {
   listingId: number;
   characterId: number;
   amountCents: number;
-  totpCode: string | null;
   acceptTerms: boolean;
 }
 
 export interface BuyNowRequest {
   listingId: number;
   characterId: number;
-  totpCode: string | null;
   acceptTerms: boolean;
 }
 
@@ -212,7 +209,6 @@ export class WocMarketClient {
         ok: false,
         enabled: false,
         price: { available: false, healthy: false, reason: null, tokensPerUsd: null, asOfMs: null },
-        totpThresholdCents: 0,
         maxActiveListings: 0,
         durationsHours: [],
         minPriceCents: 0,
@@ -307,7 +303,6 @@ export class WocMarketClient {
       {
         characterId: req.characterId,
         amountCents: req.amountCents,
-        totpCode: req.totpCode,
         acceptTerms: req.acceptTerms,
       },
     );
@@ -340,7 +335,7 @@ export class WocMarketClient {
     const out = await this.request<{ settlement: WocSettlementView; quote: WocQuoteView }>(
       'POST',
       `/api/woc-market/listings/${req.listingId}/buy-now`,
-      { characterId: req.characterId, totpCode: req.totpCode, acceptTerms: req.acceptTerms },
+      { characterId: req.characterId, acceptTerms: req.acceptTerms },
     );
     return out.ok ? { ok: true, ...out.data } : out;
   }

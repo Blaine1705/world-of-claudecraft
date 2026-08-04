@@ -40,7 +40,6 @@ export interface WocMarketStatus {
   ok: boolean;
   enabled: boolean;
   price: WocPriceView;
-  totpThresholdCents: number;
   maxActiveListings: number;
   durationsHours: readonly number[];
   minPriceCents: number;
@@ -215,7 +214,6 @@ export type WocMarketViewModel =
       walletLinked: boolean;
       tokensPerUsd: number | null;
       priceAsOfMs: number | null;
-      totpThresholdCents: number;
       settlementWindowSeconds: number;
       durationsHours: readonly number[];
       minPriceCents: number;
@@ -360,7 +358,6 @@ export function buildWocMarketView(input: WocMarketViewInput): WocMarketViewMode
     walletLinked: input.walletLinked,
     tokensPerUsd: status.price.tokensPerUsd,
     priceAsOfMs: status.price.asOfMs,
-    totpThresholdCents: status.totpThresholdCents,
     settlementWindowSeconds: status.settlementWindowSeconds,
     durationsHours: status.durationsHours,
     minPriceCents: status.minPriceCents,

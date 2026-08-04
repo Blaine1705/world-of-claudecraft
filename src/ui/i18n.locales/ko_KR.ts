@@ -8630,9 +8630,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.settlementDeadlineNote':
     '낙찰되면 경매 종료 후 {duration} 안에 결제해야 합니다.',
   'hudChrome.wocMarket.termsLabel': '가변 토큰 정산 약관에 동의합니다.',
-  'hudChrome.wocMarket.totpLabel': '2단계 인증 코드',
-  'hudChrome.wocMarket.totpPlaceholder': '6자리 코드',
-  'hudChrome.wocMarket.totpNote': '{usd} 이상 입찰에는 2단계 인증이 필요합니다.',
   'hudChrome.wocMarket.quoteTitle': '결제 확인',
   'hudChrome.wocMarket.quoteTotal': '합계: {tokens} $WOC',
   'hudChrome.wocMarket.quoteSeller': '판매자 수령액: {tokens} $WOC',

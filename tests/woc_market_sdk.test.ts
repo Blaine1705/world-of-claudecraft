@@ -45,7 +45,6 @@ const client = (token: string | null = 'tok-1'): WocMarketClient =>
 const statusBody = {
   enabled: true,
   price: { available: true, healthy: true, reason: null, tokensPerUsd: 100, asOfMs: 900_000 },
-  totpThresholdCents: 2500,
   maxActiveListings: 12,
   durationsHours: [12, 24, 48],
   minPriceCents: 25,
@@ -125,7 +124,6 @@ describe('status()', () => {
       ok: false,
       enabled: false,
       price: { available: false, healthy: false, reason: null, tokensPerUsd: null, asOfMs: null },
-      totpThresholdCents: 0,
       maxActiveListings: 0,
       durationsHours: [],
       minPriceCents: 0,
@@ -196,7 +194,6 @@ describe('placeBid()', () => {
       listingId: 9,
       characterId: 4,
       amountCents: 12_345,
-      totpCode: '123456',
       acceptTerms: true,
     });
     expect(calls[0]?.url.endsWith('/api/woc-market/listings/9/bids')).toBe(true);
@@ -205,7 +202,6 @@ describe('placeBid()', () => {
     expect(JSON.parse(String(calls[0]?.init?.body))).toEqual({
       characterId: 4,
       amountCents: 12_345,
-      totpCode: '123456',
       acceptTerms: true,
     });
     expect(out).toEqual({ ok: true, bid: bidView, bond: quoteView });

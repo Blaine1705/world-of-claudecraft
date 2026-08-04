@@ -430,7 +430,6 @@ export interface WocMarketConfig {
   enabled: boolean;
   realm: string;
   policy: WocEligibilityPolicy;
-  totpThresholdCents: number;
 }
 
 export interface WocMarketDeps {
@@ -439,8 +438,6 @@ export interface WocMarketDeps {
   custody: WocMarketCustody;
   verifiedWallet(account: number): Promise<string | null>;
   balanceTokens(pubkey: string): Promise<number | null>;
-  totpEnabled(account: number): Promise<boolean>;
-  totpVerify(account: number, code: string): Promise<boolean>;
   config: WocMarketConfig;
   now?: () => number;
   /** Per-pass observability sink (main.ts logs it). `saturated` names every arm
@@ -457,8 +454,6 @@ export type WocMarketRefusal =
   | 'market_paused' // economy service down or oracle unhealthy
   | 'wallet_required'
   | 'terms_required'
-  | 'totp_required'
-  | 'totp_invalid'
   | 'account_suspended'
   | 'character_invalid'
   | 'not_found'
@@ -523,7 +518,6 @@ export class WocMarketService {
   async status(): Promise<{
     enabled: boolean;
     price: WocPriceInfo;
-    totpThresholdCents: number;
     maxActiveListings: number;
   }> {
     const price = this.cfg.enabled
@@ -532,7 +526,6 @@ export class WocMarketService {
     return {
       enabled: this.cfg.enabled,
       price,
-      totpThresholdCents: this.cfg.totpThresholdCents,
       maxActiveListings: WOC_MARKET_MAX_ACTIVE_LISTINGS,
     };
   }
@@ -610,20 +603,6 @@ export class WocMarketService {
     if (!acceptTerms) return refuse('terms_required');
     await this.deps.db.recordTermsAccepted(account, this.now());
     return null;
-  }
-
-  private async guardTotp(
-    account: number,
-    amountCents: number,
-    code: string | null,
-  ): Promise<Refused | null> {
-    if (amountCents < this.cfg.totpThresholdCents) return null;
-    const enabled = await this.deps.totpEnabled(account);
-    // Above the threshold, 2FA is REQUIRED: an unenrolled account is told to
-    // enroll (the PRD's "2FA for bids over a configurable threshold").
-    if (!enabled) return refuse('totp_required');
-    if (!code) return refuse('totp_required');
-    return (await this.deps.totpVerify(account, code)) ? null : refuse('totp_invalid');
   }
 
   /** Balance is a bid-time plausibility gate, never a guarantee (the bond is
@@ -738,13 +717,11 @@ export class WocMarketService {
     characterId: number;
     listingId: number;
     amountCents: number;
-    totpCode: string | null;
     acceptTerms: boolean;
   }): Promise<{ ok: true; bid: WocBidRow; bond: WocQuoteIntent } | Refused> {
     const gate =
       (await this.guardEnabledHealthy()) ??
       (await this.guardSuspended(args.account)) ??
-      (await this.guardTotp(args.account, args.amountCents, args.totpCode)) ??
       (await this.guardTerms(args.account, args.acceptTerms));
     if (gate) return gate;
     if (!Number.isInteger(args.amountCents) || args.amountCents <= 0) return refuse('bid_too_low');
@@ -846,7 +823,6 @@ export class WocMarketService {
     account: number;
     characterId: number;
     listingId: number;
-    totpCode: string | null;
     acceptTerms: boolean;
   }): Promise<{ ok: true; settlement: WocSettlementRow; quote: WocQuoteIntent } | Refused> {
     const nowMs = this.now();
@@ -859,7 +835,6 @@ export class WocMarketService {
     if (listingPeek.buyNowCents === null) return refuse('no_buy_now');
     const gate =
       (await this.guardSuspended(args.account)) ??
-      (await this.guardTotp(args.account, listingPeek.buyNowCents, args.totpCode)) ??
       (await this.guardTerms(args.account, args.acceptTerms));
     if (gate) return gate;
     const wallet = await this.deps.verifiedWallet(args.account);

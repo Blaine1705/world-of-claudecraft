@@ -116,12 +116,10 @@ import {
   handleDailyRewardInternalApi,
 } from './daily_rewards';
 import { pruneDailyRewardEventsBatch } from './daily_rewards_db';
-import type { AccountRow } from './db';
 import {
   type ArenaLeaderRow,
   accountAndScopeForToken,
   accountById,
-  accountTwoFactorEnabled,
   acquireCharacterLease,
   type BgLeaderRow,
   bankBonusFactsForAccount,
@@ -142,7 +140,6 @@ import {
   getCharacter,
   getCharacterById,
   getCharactersCount,
-  getTotpState,
   guildNameForCharacter,
   isAdminAccount,
   lifetimeXpRankForCharacter,
@@ -2762,18 +2759,6 @@ const wocMarketService = new WocMarketService({
   }),
   verifiedWallet: async (account) => (await walletForAccount(account))?.pubkey ?? null,
   balanceTokens: (pubkey) => cachedWocBalance(pubkey),
-  totpEnabled: (account) => accountTwoFactorEnabled(account),
-  totpVerify: async (account, code) => {
-    // verifyLoginTwoFactor wants the login-path AccountRow; the TOTP arm only
-    // reads id, totp_secret and totp_last_window, which getTotpState carries.
-    const state = await getTotpState(account);
-    if (!state?.secret) return false;
-    return verifyLoginTwoFactor(
-      { id: account, totp_secret: state.secret, totp_last_window: state.lastWindow } as AccountRow,
-      code,
-      '',
-    );
-  },
   config: wocMarketConfig(),
   onSweepPass: (stats, saturated) => {
     // One line per pass that did work, plus a loud arm-not-draining warning:
