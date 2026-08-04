@@ -106,11 +106,25 @@ describe('gossip Crafting shortcut launcher (station masters)', () => {
     // tests/crafting_window_tabs.test.ts.
     const start = hud.indexOf('openCrafting(craftId?: string): void {');
     expect(start).toBeGreaterThan(-1);
-    const body = hud.slice(start, hud.indexOf('\n  }', start));
+    // Guard the terminator too: an unmatched end would slice to EOF and let
+    // every arm pass vacuously (the slice(start, -1) trap). The length
+    // ceiling keeps the slice ONE method even if the brace style shifts.
+    const end = hud.indexOf('\n  }', start);
+    expect(end).toBeGreaterThan(start);
+    // Strip comment lines so a comment quoting a call can never keep an arm
+    // green after the real call is deleted.
+    const body = hud
+      .slice(start, end)
+      .split('\n')
+      .filter((line) => !line.trim().startsWith('//'))
+      .join('\n');
+    expect(body.length).toBeLessThan(2000);
     expect(body).toContain('craftId !== this.selectedCraftTab');
-    expect(body).toContain(
-      'craftOwnsTab(this.sim.recipeList, this.sim.craftingIdentity.knownRecipes, craftId)',
-    );
+    // The persist gate, matched per argument rather than as one long literal
+    // so a biome re-wrap of the call cannot false-red the pin.
+    expect(body).toContain('craftOwnsTab(');
+    expect(body).toContain('this.sim.recipeList');
+    expect(body).toContain('this.sim.craftingIdentity.knownRecipes');
     expect(body).toContain('this.selectedCraftTab = craftId;');
     expect(body).toContain('this.persistCraftingTab();');
     expect(body).toContain('this.renderCrafting();');

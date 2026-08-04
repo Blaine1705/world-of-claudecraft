@@ -4165,7 +4165,7 @@ export const TARGETS = [
   {
     key: 'gossip-crafting-shortcut',
     label: "Station master gossip Crafting shortcut (crafting window to the master's craft)",
-    when: ['ui/hud/quest/master_craft_core', 'ui/hud/quest/quest_dialog_controller'],
+    when: ['ui/hud/quest/master_craft_core.ts', 'ui/hud/quest/quest_dialog_controller.ts'],
     // The dialog variants shoot Forgemistress Darva's gossip menu (the
     // Crafting row between Training and Unbinding). The window variant seeds
     // a stale persisted tab (cooking; the boot-time woc_crafting_tab read, so
