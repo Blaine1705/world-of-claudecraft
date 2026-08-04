@@ -1018,6 +1018,27 @@ describe('Guide deeds cross-page surfaces', () => {
     }
   });
 
+  it('never leaks a boss personal name into the dungeons page card copy', () => {
+    // Regression pin: wildheartBody once named the Wildheart Basin boss outright
+    // ("...to face Zulgar"), breaking with every sibling body's withhold-the-name
+    // idiom (sanctumBody, raidBody, sagaPeaksBody). The full-name scan the deeds
+    // page uses would have missed it (the leak was the bare personal name, not the
+    // comma-joined title), so this checks the personal name segment on its own.
+    setLanguage('en');
+    const html = dungeonsPage.render({
+      params: [],
+      sub: 'dungeons',
+      titleKey: 'guide.nav.dungeons',
+    });
+    for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
+      const personalName = boss.name.split(',')[0];
+      expect(
+        html.includes(personalName),
+        `boss personal name "${personalName}" leaked into the dungeons page`,
+      ).toBe(false);
+    }
+  });
+
   it('documents the new default binds on the controls page', () => {
     setLanguage('en');
     const html = controlsPage.render({
