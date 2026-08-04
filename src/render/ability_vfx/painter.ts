@@ -19,6 +19,7 @@ import {
   planImpact,
 } from '../ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
+import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
 import { ABILITY_VFX_SPECS } from '../ability_vfx_specs';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { attackAbilityId } from '../characters/weapon_attack_style_core';
@@ -1199,6 +1200,24 @@ export class AbilityVfx {
       if (isPassiveAura(auraId)) continue;
       const full = ABILITY_VFX_FULL_SPECS[auraId];
       const wornDebuff = hostileWorn && full?.debuff !== undefined;
+      // Long-worn buffs are SILENT while held (the long-buff policy,
+      // ability_vfx_longbuff_core.ts): no orbit band, ground disc, shell, or
+      // sustained transformative rim (Wildfang Rally, the one power >= 1.1
+      // buff past the threshold, goes silent too; morph forms are exempt in
+      // the policy itself). Only the gain moment survives, as a one-shot
+      // swirl on the aura's first held sighting (the same held-semantic
+      // stamps the band swirl below rides, so it reads online, replays after
+      // a drop, and never replays on camera re-entry), and the aura stops
+      // consuming band and disc slots.
+      if (!wornDebuff && !holdsBuffVfxWhileWorn(auraId, full)) {
+        const buffish = full?.buff !== undefined || (full?.archetype ?? spec.a) === 'buff';
+        if (buffish && !auraWasHeld) {
+          this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
+          this.spawned = 1;
+          this.recordStat(auraId, false);
+        }
+        continue;
+      }
       // barrier specs wear the translucent fresnel shell while the aura lives
       if (full?.barrier && !wornDebuff) fx.holdShell(e.id, abilityVfxColor(spec));
       // Held buffs: the sustained whole-rig tint is RESERVED. Morph forms and
