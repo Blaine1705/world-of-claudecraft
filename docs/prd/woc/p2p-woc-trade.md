@@ -203,37 +203,55 @@ So a $WOC deal can never route its confirm through `tradeConfirm()`. Two options
 Recommend the second. It costs new offer/accept plumbing, and it buys a $WOC path
 with no entanglement in a machine that was built to do something else atomically.
 
+## Second round of decisions
+
+**Public sales history: YES, for every p2p $WOC trade.** No name suppression, so no
+special-casing at all: the sales row already carries `sellerName` and `buyerName` for
+auctions, and a directed sale flows into the same history unchanged. This is the
+cheapest of the three to build and it closes the hole flagged above, where directed
+trades would otherwise have been the only settlement path on the rail with no public
+record.
+
+**Strikes: YES, once both parties have accepted.** Mutual acceptance is the moment a
+commitment exists, and it is also the moment the item escrows, so the two line up.
+This falls out of reusing the settlement machinery rather than needing new work: a
+directed sale creates a settlement, and the existing expiry sweep already strikes a
+lapsed one. Before mutual acceptance there is no settlement and therefore no strike,
+which is the right shape.
+
+**2FA: removed on the paying side.** Scoped here to the directed p2p path; see the
+note below about whether it should also come off auctions.
+
+The reason it costs little is worth recording, because it is not obvious.
+`guardTotp` runs on `placeBid` and `buyNow` only, and both of those require the
+buyer's own wallet signature to move any money. A stolen session token does not carry
+the wallet key, so 2FA there is a step-up gate in front of an action that already
+demands a stronger second factor.
+
+**The gap it leaves untouched is on the other side.** `createListing` has NO 2FA at
+all, and that is where a session-token thief can actually steal: list the victim's
+valuables at the $0.25 minimum, have a confederate buy them, and the items leave
+custody legitimately with the victim's wallet never signing anything. Removing 2FA
+from the paying side does not create that hole and keeping it would not have closed
+it, but it is the thing to fix if 2FA is meant to protect anything here.
+
 ## Remaining open questions
 
-**1. Does a directed sale enter the public sales history?** This is the one with
-integrity consequences, not just preference. Every settled exchange sale is recorded
-as public provenance and feeds price statistics. Both answers cost something:
+**1. Does 2FA come off auctions too?** Removed for the directed path above. The same
+argument applies to `placeBid` and `buyNow` on an auction, since those also require a
+wallet signature, and gating one path but not the other is hard to explain to a player
+paying the same amount on the same rail. Not decided.
 
-- **Include it** and the price feed stays complete, but it becomes public that A
-  sold to B and for how much, which is odd for a deal the two arranged privately.
-- **Exclude it** and directed sales become an invisible settlement channel. That is
-  precisely what someone laundering real-money trades or wash-trading to move a
-  price would want, and it would be the only path on the rail with no public record.
-
-Recommend including it, possibly with the counterparty names suppressed while the
-item and price stay public. Privacy of the negotiation is not the same as privacy of
-the settlement.
-
-**2. Does 2FA apply?** `guardTotp` runs on `buyNow`, so a directed sale at or above
-the threshold ($100 by default) would demand a code automatically. That is the right
-default for a payment that size, but it will surprise two players who think they are
-doing a face-to-face trade. Confirm it is intended and make the copy explain it
-rather than just refusing.
+**2. Should `createListing` GAIN 2FA?** The theft vector described above is real and
+unguarded today, independent of this feature. It belongs to the exchange rather than
+to p2p trades, so it is noted here and tracked separately.
 
 **3. Does a directed offer count against the 12-listing cap?**
-`WOC_MARKET_MAX_ACTIVE_LISTINGS` is 12. A directed offer holds an item in escrow
-exactly as a listing does, so it should count, otherwise it is a way around the cap.
-Confirm.
-
-**4. Do strikes apply to a directed non-payment?** Recommended above as the teeth
-that replace the bond, since the ladder is bond-independent. Not yet confirmed. If
-they do not apply, non-payment is entirely free and the denial-of-use above has no
-consequence at all.
+`WOC_MARKET_MAX_ACTIVE_LISTINGS` is 12 active listings per account, realm-scoped,
+enforced in `createListing` via `countActiveBySeller`. A directed offer holds an item
+in custody escrow exactly as a listing does, so it should count, otherwise it is a way
+around both the escrow bound and the browse-flood bound the cap exists for. Still
+unconfirmed.
 
 ## Sequencing
 
