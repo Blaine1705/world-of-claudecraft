@@ -41,9 +41,9 @@ npm run ci:changed
 
 ### Exit criteria
 
-- [ ] Guide text accurate
-- [ ] Sell floors sane or explicitly accepted
-- [ ] Screenshots committed; paths listed in `progress.md`
+- [x] Guide text accurate
+- [x] Sell floors sane or explicitly accepted (unchanged; pinned)
+- [x] Screenshots committed; paths listed in `progress.md`
 - [ ] Ready for Phase 3 QA (`npm run gate` + checklist)
 
 ### Packet complete when

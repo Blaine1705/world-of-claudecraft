@@ -1,6 +1,6 @@
 # Raw fish as cooking reagents: state
 
-Current phase: **Phase 2 QA complete; ready for Phase 3** (2026-08-04).
+Current phase: **Phase 3 implement complete; ready for Phase 3 QA** (2026-08-04).
 
 Feature branch: `feature/raw-fish-cooking-reagents`  
 Worktree: `/Users/fernando/Documents/wocc-raw-fish-cooking`  
@@ -50,7 +50,20 @@ Base: `origin/release/v0.34.0` (re-pull at every phase).
 - Pure export: `RAW_COOKING_CATCH_IDS` / `isRawCookingCatch` in
   `src/sim/content/items.ts`
 - Material set: +7 catches (honest set size 52)
-- Screenshots: pending Phase 3 under `docs/screenshots/raw-fish-cooking-reagents/`
+- Guide English (Phase 3): fishing gear body/food, fishing tablesNote, cooking
+  materialsBody; no raw sit-and-eat claim remains in catalog English
+- sellValue (Phase 3): **accepted unchanged**
+  - Vale: perch 2c, trout 3c
+  - Marsh: pike/eel 6c
+  - Peak: frostgill/slatefin 10c
+  - Rare koi 75c
+  - Zone-tier monotonic; each raw floor below its primary cooked meal vendor
+    value; pin in `tests/raw_cooking_catches.test.ts`
+- Screenshots (Phase 3):
+  - `docs/screenshots/raw-fish-cooking-reagents/raw-mirror-trout-tooltip-desktop.png`
+  - `docs/screenshots/raw-fish-cooking-reagents/cooked-pan-seared-perch-tooltip-desktop.png`
+  - `docs/screenshots/raw-fish-cooking-reagents/bags-materials-chip-fish-desktop.png`
+  - Capture harness: `scripts/raw_fish_cooking_shots.mjs`
 
 ## Key paths
 
@@ -67,6 +80,7 @@ Base: `origin/release/v0.34.0` (re-pull at every phase).
 | `src/ui/bags_view.ts` | No clickConsume on catches |
 | `src/ui/icons.ts` | Fish procedural fallback |
 | `src/ui/sim_i18n.ts` | Refuse matcher |
+| `src/ui/i18n.catalog/guide.ts` | Fishing + cooking guide prose |
 
 ## Phase 2 QA notes (2026-08-04)
 
@@ -76,3 +90,11 @@ Base: `origin/release/v0.34.0` (re-pull at every phase).
   depositAllTooltip full-sentence pin.
 - Intentional nits/defer: outerHTML bridge into legacy string tooltip;
   `paintTooltipAt` Node arm unused by cooking wire (future migration).
+
+## Phase 3 implement notes (2026-08-04)
+
+- Guide catalog English only (locale overlays stay on prior wording until
+  release fill; known staleness blind spot, not a PR-tier failure).
+- `docs/design/professions.md` had no raw-fish-heal claim; no design doc edit.
+- `npm run wiki:content` regenerated with no guide-content.generated delta
+  (prose is runtime i18n, not baked content rows).

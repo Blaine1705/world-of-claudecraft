@@ -79,6 +79,43 @@ describe('raw catch content: non-edible cooking reagents', () => {
   });
 });
 
+// Phase 3 economy review: floors stay weak copper so market/cook demand wins
+// over vendor dump. Numbers accepted unchanged (2026-08-04); pin so a future
+// raise cannot silently gut the raw-fish market.
+describe('raw catch sellValue floors', () => {
+  const FLOORS = {
+    raw_river_perch: 2,
+    raw_mirror_trout: 3,
+    raw_marsh_pike: 6,
+    raw_bog_eel: 6,
+    raw_frostgill_trout: 10,
+    raw_stonescale_carp: 10,
+    glimmerfin_koi: 75,
+  } as const;
+
+  it('pins the accepted weak copper floors', () => {
+    for (const [id, copper] of Object.entries(FLOORS)) {
+      expect(ITEMS[id]?.sellValue, id).toBe(copper);
+    }
+  });
+
+  it('keeps zone-tier monotonicity (vale < marsh < peak < rare koi)', () => {
+    expect(ITEMS.raw_river_perch.sellValue).toBeLessThan(ITEMS.raw_marsh_pike.sellValue);
+    expect(ITEMS.raw_mirror_trout.sellValue).toBeLessThan(ITEMS.raw_marsh_pike.sellValue);
+    expect(ITEMS.raw_marsh_pike.sellValue).toBeLessThan(ITEMS.raw_frostgill_trout.sellValue);
+    expect(ITEMS.raw_bog_eel.sellValue).toBeLessThan(ITEMS.raw_stonescale_carp.sellValue);
+    expect(ITEMS.raw_frostgill_trout.sellValue).toBeLessThan(ITEMS.glimmerfin_koi.sellValue);
+  });
+
+  it('raw floors stay below their primary cooked meal vendor value', () => {
+    expect(ITEMS.raw_river_perch.sellValue).toBeLessThan(ITEMS.pan_seared_perch.sellValue);
+    expect(ITEMS.raw_marsh_pike.sellValue).toBeLessThan(ITEMS.herbed_marsh_pike.sellValue);
+    expect(ITEMS.raw_bog_eel.sellValue).toBeLessThan(ITEMS.ashwood_smoked_eel.sellValue);
+    expect(ITEMS.raw_frostgill_trout.sellValue).toBeLessThan(ITEMS.frostgill_chowder.sellValue);
+    expect(ITEMS.raw_stonescale_carp.sellValue).toBeLessThan(ITEMS.silvered_carp_supper.sellValue);
+  });
+});
+
 describe('useItem: raw catches refuse, cooked control still eats', () => {
   it('refuses every raw catch: error once, no eat, stack unchanged, no heal', () => {
     for (const id of RAW_CATCH_IDS) {
