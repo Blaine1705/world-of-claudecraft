@@ -307,7 +307,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 946,
-      "state": "d7ce75b8",
+      "state": "01424450",
       "events": "2c994565",
       "rng": {
         "draws": 2,
@@ -439,7 +439,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.315209,
           "fiveSecondRule": 101.55,
           "hp": 100,
           "id": 941,
@@ -455,7 +455,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.315209,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -487,7 +487,7 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 946,
-      "state": "18fa3ec1",
+      "state": "bde746b9",
       "events": "62c7a753",
       "rng": {
         "draws": 2,
@@ -619,7 +619,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.315209,
           "fiveSecondRule": 101.65,
           "hp": 100,
           "id": 941,
@@ -635,7 +635,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.315209,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -667,7 +667,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 946,
-      "state": "040e9847",
+      "state": "be8f6b0f",
       "events": "0d129907",
       "rng": {
         "draws": 2,
@@ -799,7 +799,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.315209,
           "fiveSecondRule": 101.75,
           "hp": 100,
           "id": 941,
@@ -815,7 +815,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.315209,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -847,7 +847,7 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 946,
-      "state": "f9a41c28",
+      "state": "9f8a8fe0",
       "events": "de70ae11",
       "rng": {
         "draws": 4,
@@ -988,7 +988,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.314273,
+          "fallStartY": -2.317142,
           "fiveSecondRule": 104.3,
           "hp": 100,
           "id": 941,
@@ -1004,7 +1004,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 40,
-            "y": -2.314273,
+            "y": -2.317142,
             "z": 340
           },
           "potionCooldownUntil": -1,
@@ -1036,7 +1036,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 946,
-      "state": "d87e97fd",
+      "state": "b35cd84d",
       "events": "1dbb5bab",
       "rng": {
         "draws": 6,
@@ -1185,7 +1185,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.911251,
+          "fallStartY": 2.385746,
           "fiveSecondRule": 106.85,
           "hp": 100,
           "id": 941,
@@ -1201,7 +1201,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 45,
-            "y": 2.911251,
+            "y": 2.385746,
             "z": 491
           },
           "potionCooldownUntil": -1,
@@ -1233,7 +1233,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 946,
-      "state": "ff798d62",
+      "state": "4c44f992",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1382,7 +1382,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 2.911251,
+          "fallStartY": 2.385746,
           "fiveSecondRule": 106.95,
           "hp": 100,
           "id": 941,
@@ -1398,7 +1398,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 45,
-            "y": 2.911251,
+            "y": 2.385746,
             "z": 491
           },
           "potionCooldownUntil": -1,
