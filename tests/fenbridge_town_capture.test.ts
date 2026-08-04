@@ -677,8 +677,8 @@ describe('Fenbridge matched capture constants', () => {
       ),
     ).toEqual({
       id: 'bursar_petra_vell',
-      x: 15.406295026612955,
-      z: 305.8930202974097,
+      x: 15.101663970557492,
+      z: 306.79285357068125,
     });
     expect(FENBRIDGE_GAMEPLAY_CONTRACT.quest).toEqual({
       id: 'q_fenbridge_muster',

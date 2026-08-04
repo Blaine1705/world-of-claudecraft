@@ -272,13 +272,17 @@ export const FENBRIDGE_REQUIRED_ASSET_REQUEST_URLS = Object.freeze([
 export const FENBRIDGE_REPEATED_ASSET_REQUIREMENTS = Object.freeze({
   fenbridge_palisade_wing: Object.freeze({ exact: 16 }),
   fenbridge_gate_arch: Object.freeze({ exact: 4 }),
-  fenbridge_boardwalk: Object.freeze({ exact: 10 }),
+  fenbridge_boardwalk: Object.freeze({ exact: 12 }),
   fenbridge_muster_order: Object.freeze({ exact: 2 }),
 });
 
 export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
   npcs: Object.freeze([
-    Object.freeze({ id: 'warden_fenwick', x: 4.8, z: 278.5 }),
+    Object.freeze({
+      id: 'warden_fenwick',
+      x: 4.824455435060822,
+      z: 285.6503188335003,
+    }),
     Object.freeze({
       id: 'brother_aldric_fen',
       x: -14.960203077497741,
@@ -286,8 +290,8 @@ export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
     }),
     Object.freeze({
       id: 'provisioner_hale',
-      x: -5.197056274847714,
-      z: 304.80294372515226,
+      x: -14.547802904391286,
+      z: 315.04049591901224,
     }),
     Object.freeze({
       id: 'herbalist_yara',
@@ -296,20 +300,24 @@ export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
     }),
     Object.freeze({
       id: 'scout_maren',
-      x: 2.3582122775167607,
-      z: 320.29355670178956,
+      x: 0.17838590781930275,
+      z: 320.59080575220287,
     }),
     Object.freeze({
       id: 'bursar_petra_vell',
-      x: 15.406295026612955,
-      z: 305.8930202974097,
+      x: 15.101663970557492,
+      z: 306.79285357068125,
     }),
     Object.freeze({
       id: 'chronicler_osric_fenn',
-      x: -21.511479251816386,
-      z: 298.3582050456022,
+      x: -15.965942703405933,
+      z: 298.27439341010984,
     }),
-    Object.freeze({ id: 'tanner_hesk', x: -11, z: 315.5 }),
+    Object.freeze({
+      id: 'tanner_hesk',
+      x: -6.878900811806206,
+      z: 319.8826445728536,
+    }),
   ]),
   mailbox: Object.freeze({
     id: 'mailbox_fenbridge',
@@ -322,8 +330,8 @@ export const FENBRIDGE_GAMEPLAY_CONTRACT = Object.freeze({
     type: 'tannery',
     zoneId: FENBRIDGE_ZONE_ID,
     masterNpcId: 'tanner_hesk',
-    x: -13,
-    z: 314,
+    x: -8.000415973449709,
+    z: 320.3210550451324,
   }),
   graveyard: Object.freeze({
     id: 'gy_fenbridge',

@@ -368,20 +368,20 @@ describe('Fenbridge dedicated town renderer', () => {
     const standardRoot = fenbridgeTownDrawStats(standard.group);
     expect(standard.group.userData.triangleStats).toMatchObject({
       scope: 'fenbridge-town-render-root-only',
-      emittedFoundationTriangles: 60,
+      emittedFoundationTriangles: 72,
       includesQuestObjects: false,
     });
     expect(standardRoot).toMatchObject({
       colorDraws: 20,
       shadowDraws: 10,
       // placement-weighted shipping geometry after R16-30 densify + 12 boardwalks
-      triangles: 81_176,
+      triangles: 81_188,
     });
     expect({
       colorDraws: standardRoot.colorDraws + questDraws * 2,
       shadowDraws: standardRoot.shadowDraws,
-      triangles: 81_176 + 84 * 2,
-    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 81_344 });
+      triangles: 81_188 + 84 * 2,
+    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 81_356 });
 
     setGfx({
       standardMaterials: false,
@@ -391,7 +391,7 @@ describe('Fenbridge dedicated town renderer', () => {
     });
     const low = fenbridgeTownInternalsForTest.buildFromSources(sources, ground, true);
     const lowRoot = fenbridgeTownDrawStats(low.group);
-    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 81_176 });
+    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 81_188 });
     expect(lowRoot.colorDraws + questDraws * 2).toBe(13);
   });
 

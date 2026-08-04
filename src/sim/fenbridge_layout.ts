@@ -453,11 +453,12 @@ const INN_BASE = makeBuilding(
   'fenbridge_crooked_reed_inn',
   '/models/props/fenbridge_crooked_reed_inn.glb',
   'inn',
-  { x: -7, z: 310 },
+  // Back-west ring: clear of the east-marsh road, chapel apron, and tannery.
+  { x: -21.5, z: 316.5 },
   9,
   8.8,
   8,
-  facingToward({ x: -7, z: 310 }, CIVIC_CENTER),
+  facingToward({ x: -21.5, z: 316.5 }, CIVIC_CENTER),
   -2.8,
 );
 const CHAPEL_BASE = makeBuilding(
@@ -496,12 +497,12 @@ const TANNERY_BASE = makeBuilding(
   'fenbridge_hesk_tannery',
   '/models/props/fenbridge_hesk_tannery.glb',
   'house',
-  // Open craft bay faces the square; preserved station sits on the apron.
-  { x: -16, z: 318 },
+  // Far north ring (back of town); ~16 yd from the inn, clear of the scout lodge.
+  { x: -8.5, z: 326 },
   12,
   7.2,
   7,
-  facingToward({ x: -16, z: 318 }, CIVIC_CENTER),
+  facingToward({ x: -8.5, z: 326 }, CIVIC_CENTER),
 );
 const SCOUT_LODGE = makeBuilding(
   'fenbridge_scout_lodge',
@@ -515,9 +516,8 @@ const SCOUT_LODGE = makeBuilding(
   facingToward({ x: 3, z: 325 }, CIVIC_CENTER),
 );
 
-// Market stall on the inn side of the square. +Z faces the civic center
-// (customer approach); vendor stands on the -Z service side looking +Z.
-const PROVISION_STALL_POSITION = { x: -3.5, z: 306.5 } as const;
+// Market stall on the inn front apron (NW of the cistern, clear of chapel greeters).
+const PROVISION_STALL_POSITION = { x: -16, z: 313 } as const;
 const PROVISION_STALL_ROTATION = facingToward(PROVISION_STALL_POSITION, CIVIC_CENTER);
 const PROVISION_STALL_WIDTH = 3.2;
 const PROVISION_STALL_DEPTH = 1.6;
@@ -610,9 +610,20 @@ const BANK = {
   },
 };
 
-// Preserved profession station + master pairing (1 to 3 yd).
-const TANNERY_STATION_POSITION = { x: -13, z: 314 } as const;
-const TANNER_POSITION = { x: -11, z: 315.5 } as const;
+// Profession station on the open craft bay apron (outside the OBB so body 0.8
+// pathfinding can stand on it). Master stands 1 to 3 yd from the station.
+const TANNERY_STATION_POSITION = localToWorld(
+  TANNERY_BASE.position,
+  TANNERY_BASE.rotation,
+  1.5,
+  TANNERY_BASE.nativeDimensions.depth / 2 + 2.0,
+);
+const TANNER_POSITION = localToWorld(
+  TANNERY_BASE.position,
+  TANNERY_BASE.rotation,
+  0.6,
+  TANNERY_BASE.nativeDimensions.depth / 2 + 2.8,
+);
 const TANNERY = {
   ...TANNERY_BASE,
   sockets: {
@@ -883,12 +894,8 @@ const SCOUT_MAP_POSITION = localToWorld(
   SCOUT_LODGE.nativeDimensions.depth / 2 + FRONT_CLEARANCE,
 );
 const NPCS = [
-  makeNpc(
-    'warden_fenwick',
-    WARDEN_POSITION,
-    facingToward(WARDEN_POSITION, { x: 0, z: 266 }),
-    GATEHOUSE.id,
-  ),
+  // Face the square like the other greeters (not the south causeway).
+  makeNpc('warden_fenwick', WARDEN_POSITION, GATEHOUSE.rotation, GATEHOUSE.id),
   makeNpc('brother_aldric_fen', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
   // Eastbrook merchant: stand on the customer face, face with the stall.
   makeNpc(

@@ -109,11 +109,11 @@ describe('Fenbridge canonical pure layout', () => {
     // Explicit lot anchors (readable site-plan pin).
     expect(FENBRIDGE_LAYOUT.buildings.map((b) => [b.id, b.position.x, b.position.z])).toEqual([
       ['fenbridge_warden_gatehouse', 9, 282],
-      ['fenbridge_crooked_reed_inn', -7, 310],
+      ['fenbridge_crooked_reed_inn', -21.5, 316.5],
       ['fenbridge_lantern_chapel', -19.5, 294],
       ['fenbridge_moonwort_apothecary', 17.8, 291.5],
       ['fenbridge_gilded_strongbox', 19.2, 309.5],
-      ['fenbridge_hesk_tannery', -16, 318],
+      ['fenbridge_hesk_tannery', -8.5, 326],
       ['fenbridge_scout_lodge', 3, 325],
     ]);
 
@@ -162,7 +162,7 @@ describe('Fenbridge canonical pure layout', () => {
     expect(FENBRIDGE_LAYOUT.civic.provisionStall).toMatchObject({
       id: 'fenbridge_provision_stall',
       assetId: '/models/props/fenbridge_provision_stall.glb',
-      position: { x: -3.5, z: 306.5 },
+      position: { x: -16, z: 313 },
     });
     expect(FENBRIDGE_LAYOUT.civic.musterBoard).toMatchObject({
       id: 'fenbridge_muster_board',
@@ -640,19 +640,23 @@ describe('Fenbridge content projection and preservation', () => {
       z: 286,
     });
     const station = STATIONS.find((candidate) => candidate.id === 'station_fenbridge_tannery');
+    const stationPos = FENBRIDGE_STATIONS_BY_ID.station_fenbridge_tannery.position;
+    const heskPos = ZONE2_NPCS.tanner_hesk.pos;
     expect(station).toEqual({
       id: 'station_fenbridge_tannery',
       type: 'tannery',
       zoneId: 'mirefen_marsh',
-      pos: { x: -13, z: 314 },
+      pos: { x: stationPos.x, z: stationPos.z },
       masterNpcId: 'tanner_hesk',
     });
-    expect(FENBRIDGE_STATIONS_BY_ID.station_fenbridge_tannery.position).toEqual({
-      x: -13,
-      z: 314,
-    });
-    expect(ZONE2_NPCS.tanner_hesk.pos).toEqual({ x: -11, z: 315.5 });
-    expect(Math.hypot(-13 - -11, 314 - 315.5)).toBe(2.5);
+    // Station + master sit on the craft-bay apron and move with the tannery lot.
+    expect(stationPos.x).toBeCloseTo(-8.000415973449709, 10);
+    expect(stationPos.z).toBeCloseTo(320.3210550451324, 10);
+    expect(heskPos.x).toBeCloseTo(-6.878900811806206, 10);
+    expect(heskPos.z).toBeCloseTo(319.8826445728536, 10);
+    const masterDistance = Math.hypot(stationPos.x - heskPos.x, stationPos.z - heskPos.z);
+    expect(masterDistance).toBeGreaterThanOrEqual(1);
+    expect(masterDistance).toBeLessThanOrEqual(3);
     expect(FENBRIDGE_LAYOUT.services.rest).toEqual({
       id: 'fenbridge_inn_rest',
       buildingId: 'fenbridge_crooked_reed_inn',
