@@ -2395,6 +2395,7 @@ const ITEM_ENTITY_IDS = [
   'gatherers_cache',
   'artisans_eye',
   'reins_terrorspark_groundshaker',
+  'reins_drakemaw_raptor',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2493,6 +2494,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
+  reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
 };
 
 function itemTranslations(names: readonly string[]): ItemEntityTranslations {
