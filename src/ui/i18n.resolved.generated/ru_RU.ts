@@ -6098,10 +6098,16 @@ export const ru_RU: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Загрузка обновления {version}...",
-      "ready": "Обновление {version} готово. Оно установится при выходе из игры, либо перезапустите сейчас.",
+      "checkingTitle": "Проверка обновлений...",
+      "checkingBody": "Игра обновляется автоматически.",
+      "uptodateTitle": "У вас последняя версия игры.",
+      "downloadingTitle": "Загрузка обновления {version}...",
+      "downloadingBody": "Можно продолжать играть. Обновление установится при выходе из игры.",
+      "readyTitle": "Обновление {version} готово",
+      "readyBody": "Оно установится при выходе из игры, либо перезапустите сейчас.",
       "restart": "Перезапустить сейчас",
-      "later": "Позже"
+      "later": "Позже",
+      "dismiss": "Закрыть"
     },
     "crash": {
       "title": "World of ClaudeCraft",
