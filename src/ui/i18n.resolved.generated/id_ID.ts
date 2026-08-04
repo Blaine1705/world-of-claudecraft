@@ -957,7 +957,8 @@ export const id_ID: EnTranslations = {
       "petTaunt": "Peliharaan: Ejek",
       "petDefensive": "Peliharaan: Defensif",
       "petAggressive": "Peliharaan: Agresif",
-      "mount": "Naiki / Turun"
+      "mount": "Naiki / Turun",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const id_ID: EnTranslations = {
       "billboard": {
         "label": "Papan Pengumuman Serikat",
         "empty": "Belum ada apa pun di papan pengumuman.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ditetapkan oleh {name}",
         "save": "Simpan",
         "placeholder": "Tulis pesan untuk serikat",
@@ -6808,6 +6810,10 @@ export const id_ID: EnTranslations = {
         "leader": "Pemimpin Serikat",
         "officer": "Perwira",
         "member": "Anggota"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "Anda adalah {rank}, {count} anggota",
       "guildHeadMany": "Anda adalah {rank}, {count} anggota"

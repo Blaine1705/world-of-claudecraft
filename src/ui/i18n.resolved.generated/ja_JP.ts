@@ -957,7 +957,8 @@ export const ja_JP: EnTranslations = {
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
       "petAggressive": "ペット：攻撃的",
-      "mount": "騎乗 / 降車"
+      "mount": "騎乗 / 降車",
+      "mouseHint": "マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。"
     },
     "actionBar": {
       "editKeys": "アクションバーのキーを編集",
@@ -2352,6 +2353,7 @@ export const ja_JP: EnTranslations = {
       "billboard": {
         "label": "ギルド掲示板",
         "empty": "掲示板にはまだ何もありません。",
+        "loginLine": "ギルド掲示板：{text}",
         "setBy": "{name}が設定",
         "save": "保存",
         "placeholder": "ギルドへのメッセージを書く",
@@ -6808,6 +6810,10 @@ export const ja_JP: EnTranslations = {
         "leader": "ギルドマスター",
         "officer": "士官",
         "member": "メンバー"
+      },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "古参"
       },
       "guildHeadOne": "あなたは{rank}、{count}人のメンバー",
       "guildHeadMany": "あなたは{rank}、{count}人のメンバー"

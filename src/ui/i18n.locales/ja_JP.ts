@@ -714,6 +714,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'オフラインのギルドメンバーを非表示',
   'hudChrome.social.billboard.label': 'ギルド掲示板',
   'hudChrome.social.billboard.empty': '掲示板にはまだ何もありません。',
+  'hudChrome.social.billboard.loginLine': 'ギルド掲示板：{text}',
   'hudChrome.social.billboard.setBy': '{name}が設定',
   'hudChrome.social.billboard.save': '保存',
   'hudChrome.social.billboard.placeholder': 'ギルドへのメッセージを書く',
@@ -2129,6 +2130,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': 'ギルドマスター',
   'hud.social.ranks.officer': '士官',
   'hud.social.ranks.member': 'メンバー',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '古参',
   'hud.social.guildHeadOne': 'あなたは{rank}、{count}人のメンバー',
   'hud.social.guildHeadMany': 'あなたは{rank}、{count}人のメンバー',
   'hud.trade.title': '{name}と取引',
@@ -9147,6 +9150,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乗 / 降車',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    'マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': 'アクションバーのキーを編集',
   'hudChrome.actionBar.editKeysHint':

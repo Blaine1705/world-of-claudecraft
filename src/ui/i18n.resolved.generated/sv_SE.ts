@@ -957,7 +957,8 @@ export const sv_SE: EnTranslations = {
       "petTaunt": "Djur: Provocera",
       "petDefensive": "Djur: Defensivt",
       "petAggressive": "Djur: Aggressivt",
-      "mount": "Sitt upp / Stig av"
+      "mount": "Sitt upp / Stig av",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const sv_SE: EnTranslations = {
       "billboard": {
         "label": "Gillets anslagstavla",
         "empty": "Inget på anslagstavlan än.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Skriven av {name}",
         "save": "Spara",
         "placeholder": "Skriv ett meddelande till gillet",
@@ -6808,6 +6810,10 @@ export const sv_SE: EnTranslations = {
         "leader": "Gillesmästare",
         "officer": "Officer",
         "member": "Medlem"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "du är {rank}, {count} medlem",
       "guildHeadMany": "du är {rank}, {count} medlemmar"

@@ -712,6 +712,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '오프라인 길드원 숨기기',
   'hudChrome.social.billboard.label': '길드 게시판',
   'hudChrome.social.billboard.empty': '게시판에 아직 아무 내용도 없습니다.',
+  'hudChrome.social.billboard.loginLine': '길드 게시판: {text}',
   'hudChrome.social.billboard.setBy': '{name} 설정',
   'hudChrome.social.billboard.save': '저장',
   'hudChrome.social.billboard.placeholder': '길드에 전할 메시지를 작성하세요',
@@ -2113,6 +2114,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '길드장',
   'hud.social.ranks.officer': '장교',
   'hud.social.ranks.member': '회원',
+  'hud.social.tenure.recruit': '신병',
+  'hud.social.tenure.veteran': '베테랑',
   'hud.social.guildHeadOne': '당신은 {rank}, {count}명 회원',
   'hud.social.guildHeadMany': '당신은 {rank}, {count}명 회원',
   'hud.trade.title': '{name}님과 거래',
@@ -9135,6 +9138,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '팁: 다른 플레이어에게 친선 결투를 신청하거나 잿빛 콜로세움 투기장에 참가해 빌드를 시험해보세요.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '탑승 / 하차',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다.',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '액션 바 키 편집',
   'hudChrome.actionBar.editKeysHint': '액션 바의 슬롯을 클릭한 다음 키를 눌러 지정하세요.',

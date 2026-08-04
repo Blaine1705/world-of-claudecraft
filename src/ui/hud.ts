@@ -264,6 +264,7 @@ import {
   grantQtyText,
   harvestLineKey,
 } from './grant_line_view';
+import { decideGuildMotdLine } from './guild_motd_login';
 import {
   healLandingFloatTextKey,
   healLandingLogKey,
@@ -432,7 +433,11 @@ import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
-import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom } from './map_pinch_zoom_core';
+import {
+  MAP_TAP_MOVE_TOLERANCE_PX,
+  nextMapZoom,
+  zoomOutExitsZoneLevel,
+} from './map_pinch_zoom_core';
 import {
   type MapRegion,
   mapCanvasHeight,
@@ -1701,6 +1706,9 @@ export class Hud {
   // Ravenpost envelope indicator (slow-band, value-diffed; see updateMailIndicator).
   private mailIndicatorEl: HTMLElement | null = null;
   private lastMailUnread = -1;
+  // Last guild billboard text echoed to the chat log (slow-band, value-diffed;
+  // see decideGuildMotdLine). Survives linkdead resume, so no re-show there.
+  private lastShownGuildMotd: string | null = null;
   // World Market collect indicator (slow-band, value-diffed; see updateMarketIndicator).
   private marketIndicatorEl: HTMLElement | null = null;
   private lastMarketCollectPending: boolean | null = null;
@@ -8551,6 +8559,7 @@ export class Hud {
     // Social repaints only on the slow divider, behind the painter's struct/content
     // diff-gate; a content tick swaps the body innerHTML without re-wiring rows.
     if (slowHud) this.socialWindow.refreshIfChanged();
+    if (slowHud) this.updateGuildBillboardEcho();
     if (slowHud && this.marketWindow.isOpen) {
       if (!this.nearbyMarketNpc()) this.marketWindow.close();
       else this.marketWindow.refreshIfChanged();
@@ -8593,6 +8602,36 @@ export class Hud {
       ev.stopPropagation();
       this.openMailbox();
     });
+  }
+
+  // Guild billboard echo into the chat log: latched on the MOTD VALUE (not on
+  // social-frame arrival), so it fires once at login and once per mid-session
+  // text change, and never on unrelated social snapshot re-pushes. The MOTD text
+  // is player-authored: spliced into the template untranslated, but run through
+  // the same profanity mask as every other player-authored body in this pane
+  // (guild chat masks, so the echo one line below it must too; the chat-bubble
+  // path is the whole-string precedent). The latch keys on the RAW text, so
+  // toggling the filter mid-session never re-triggers the line. Tagged to the
+  // guild channel so the Guild filter tab shows it and the color derives from
+  // the channel's single source of truth.
+  private updateGuildBillboardEcho(): void {
+    const motdLine = decideGuildMotdLine(this.lastShownGuildMotd, this.sim.socialInfo);
+    this.lastShownGuildMotd = motdLine.nextShown;
+    if (motdLine.emit !== null) {
+      // plainText: the billboard's home rendering (social_window.ts) is
+      // esc()'d plain text, so the echo must not linkify [[i:...]] tokens
+      // from guild-controlled text into trusted clickable item links; the
+      // line renders verbatim, exactly as the billboard panel shows it.
+      this.appendLog(
+        this.chatLogEl,
+        t('hudChrome.social.billboard.loginLine', { text: this.maskChat(motdLine.emit) }),
+        chatChannelColor('guild'),
+        true,
+        'guild',
+        undefined,
+        true,
+      );
+    }
   }
 
   // The envelope indicator by the minimap: visible while unread letters wait.
@@ -9592,6 +9631,17 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
+    // One more zoom-out at the zone map's full extent leaves the zone and opens
+    // the continent overview (the level toggle's other half), instead of clamping
+    // at the minimum and doing nothing. A delve has no overview to go to.
+    if (
+      this.mapLevel === 'zone' &&
+      zoomOutExitsZoneLevel(this.mapZoom, factor) &&
+      mapWindowMode(this.sim) !== 'delve'
+    ) {
+      this.setMapLevel('continent');
+      return;
+    }
     const prev = this.mapZoom;
     this.mapZoom = nextMapZoom(this.mapZoom, factor);
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
@@ -12280,7 +12330,7 @@ export class Hud {
    *  autoscroll), with the body landing as the given nodes instead of one
    *  text node. */
   private logNodes(nodes: readonly Node[], color: string): void {
-    this.appendLog(this.chatLogEl, '', color, true, 'system', undefined, nodes);
+    this.appendLog(this.chatLogEl, '', color, true, 'system', undefined, false, nodes);
   }
 
   private noteProcAuraGain(name: string): void {
@@ -12929,6 +12979,13 @@ export class Hud {
     timestamp = false,
     chan = 'system',
     decorativeIconUrl?: string,
+    // True forces the single-text-node path even on the chat pane: the line
+    // renders VERBATIM and [[i:...]]/[[q:...]] tokens are never turned into
+    // links. For player-authored surfaces whose home rendering is plain
+    // escaped text (the guild billboard echo: the social pane shows the MOTD
+    // via esc(), so guild-controlled text must not mint trusted clickable
+    // item links in chat either).
+    plainText = false,
     bodyNodes?: readonly Node[],
   ): void {
     const wasNearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 24;
@@ -12946,10 +13003,11 @@ export class Hud {
     // A caller-assembled node body (the deed-link splice) lands verbatim.
     // Loot lines carry name-free item tokens ([[i:id]]); render those as clickable
     // links via the shared chat item-link renderer. Plain system/combat lines keep
-    // the fast text-node path (the substring test never fires for tokenless lines).
+    // the fast text-node path (the substring test never fires for tokenless lines),
+    // and a plainText caller opts out entirely (see the parameter note above).
     if (bodyNodes) {
       for (const node of bodyNodes) div.append(node);
-    } else if (el === this.chatLogEl && text.includes('[[i:')) {
+    } else if (!plainText && el === this.chatLogEl && text.includes('[[i:')) {
       for (const seg of parseChatSegments(text)) {
         if (seg.kind === 'item') this.appendChatItemLink(div, seg.itemId);
         else if (seg.kind === 'quest')
@@ -13498,6 +13556,13 @@ export class Hud {
   // flight closes when the trainResult event resolves it, or by TTL if the
   // answer is lost to a disconnect.
   private trainRecipeClicked(recipeId: string): void {
+    // While dead, send without opening a flight: the sim's dead gate
+    // (src/sim/dead_gate.ts) refuses with the shared error line and emits NO
+    // trainResult, so an opened flight would only sit disabled until its TTL.
+    if (this.sim.player.dead) {
+      this.sim.trainRecipe(recipeId);
+      return;
+    }
     if (!this.trainLearns.begin(recipeId, performance.now())) return;
     this.sim.trainRecipe(recipeId);
     this.renderTrain();

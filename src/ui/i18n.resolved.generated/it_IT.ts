@@ -957,7 +957,8 @@ export const it_IT: EnTranslations = {
       "petTaunt": "Famiglio: provoca",
       "petDefensive": "Famiglio: difensivo",
       "petAggressive": "Famiglio: aggressivo",
-      "mount": "Monta / Smonta"
+      "mount": "Monta / Smonta",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const it_IT: EnTranslations = {
       "billboard": {
         "label": "Bacheca della Gilda",
         "empty": "Non c'è ancora nulla sulla bacheca.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Impostato da {name}",
         "save": "Salva",
         "placeholder": "Scrivi un messaggio per la gilda",
@@ -6808,6 +6810,10 @@ export const it_IT: EnTranslations = {
         "leader": "Capo gilda",
         "officer": "Ufficiale",
         "member": "Membro"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "sei {rank}, {count} membro",
       "guildHeadMany": "sei {rank}, {count} membri"

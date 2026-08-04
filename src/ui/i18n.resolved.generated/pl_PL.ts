@@ -957,7 +957,8 @@ export const pl_PL: EnTranslations = {
       "petTaunt": "Zwierzę: Prowokacja",
       "petDefensive": "Zwierzę: Obronne",
       "petAggressive": "Zwierzę: Agresywne",
-      "mount": "Dosiądź / Zsiądź"
+      "mount": "Dosiądź / Zsiądź",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const pl_PL: EnTranslations = {
       "billboard": {
         "label": "Tablica ogłoszeń gildii",
         "empty": "Na tablicy ogłoszeń nic jeszcze nie ma.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ustawione przez {name}",
         "save": "Zapisz",
         "placeholder": "Napisz wiadomość dla gildii",
@@ -6808,6 +6810,10 @@ export const pl_PL: EnTranslations = {
         "leader": "Mistrz gildii",
         "officer": "Oficer",
         "member": "Członek"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "jesteś {rank}, {count} członek",
       "guildHeadMany": "jesteś {rank}, {count} członków"

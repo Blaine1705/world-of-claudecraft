@@ -957,7 +957,8 @@ export const cs_CZ: EnTranslations = {
       "petTaunt": "Mazlíček: Provokace",
       "petDefensive": "Mazlíček: Obranný",
       "petAggressive": "Mazlíček: Agresivní",
-      "mount": "Nasednout / Sesednout"
+      "mount": "Nasednout / Sesednout",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const cs_CZ: EnTranslations = {
       "billboard": {
         "label": "Cechovní nástěnka",
         "empty": "Na nástěnce zatím nic není.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Nastaveno {name}",
         "save": "Uložit",
         "placeholder": "Napiš zprávu pro cech",
@@ -6808,6 +6810,10 @@ export const cs_CZ: EnTranslations = {
         "leader": "Mistr cechu",
         "officer": "Důstojník",
         "member": "Člen"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "jsi {rank}, {count} člen",
       "guildHeadMany": "jsi {rank}, {count} členů"

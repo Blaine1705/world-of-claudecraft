@@ -693,6 +693,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': '隱藏離線公會成員',
   'hudChrome.social.billboard.label': '公會公告板',
   'hudChrome.social.billboard.empty': '公告板上還沒有內容。',
+  'hudChrome.social.billboard.loginLine': '公會公告板：{text}',
   'hudChrome.social.billboard.setBy': '由 {name} 設定',
   'hudChrome.social.billboard.save': '儲存',
   'hudChrome.social.billboard.placeholder': '給公會寫一則訊息',
@@ -2035,6 +2036,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': '會長',
   'hud.social.ranks.officer': '幹部',
   'hud.social.ranks.member': '成員',
+  'hud.social.tenure.recruit': '新兵',
+  'hud.social.tenure.veteran': '老兵',
   'hud.social.guildHeadOne': '你是{rank}，{count}名成員',
   'hud.social.guildHeadMany': '你是{rank}，{count}名成員',
   'hud.trade.title': '與 {name} 交易',
@@ -8732,6 +8735,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp': '提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乘 / 下騎',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    '滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': '編輯動作列按鍵',
   'hudChrome.actionBar.editKeysHint': '點擊動作列上的一個欄位，然後按下按鍵進行綁定。',

@@ -957,7 +957,8 @@ export const tr_TR: EnTranslations = {
       "petTaunt": "Yoldaş: Kışkırt",
       "petDefensive": "Yoldaş: Savunmacı",
       "petAggressive": "Yoldaş: Saldırgan",
-      "mount": "Bin / İn"
+      "mount": "Bin / İn",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const tr_TR: EnTranslations = {
       "billboard": {
         "label": "Lonca Panosu",
         "empty": "Panoda henüz bir şey yok.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ayarlayan: {name}",
         "save": "Kaydet",
         "placeholder": "Lonca için bir mesaj yaz",
@@ -6808,6 +6810,10 @@ export const tr_TR: EnTranslations = {
         "leader": "Lonca Üstadı",
         "officer": "Subay",
         "member": "Üye"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "{rank} rütbesindesin, {count} üye",
       "guildHeadMany": "{rank} rütbesindesin, {count} üye"

@@ -957,7 +957,8 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
-      "mount": "Сесть / Спешиться"
+      "mount": "Сесть / Спешиться",
+      "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
     "actionBar": {
       "editKeys": "Настроить клавиши панели действий",
@@ -2352,6 +2353,7 @@ export const ru_RU: EnTranslations = {
       "billboard": {
         "label": "Доска объявлений гильдии",
         "empty": "На доске объявлений пока пусто.",
+        "loginLine": "Доска объявлений гильдии: {text}",
         "setBy": "Разместил(а): {name}",
         "save": "Сохранить",
         "placeholder": "Напишите сообщение для гильдии",
@@ -6808,6 +6810,10 @@ export const ru_RU: EnTranslations = {
         "leader": "Глава гильдии",
         "officer": "Офицер",
         "member": "Участник"
+      },
+      "tenure": {
+        "recruit": "Новобранец",
+        "veteran": "Ветеран"
       },
       "guildHeadOne": "вы {rank}, {count} участник",
       "guildHeadMany": "вы {rank}, {count} участников"

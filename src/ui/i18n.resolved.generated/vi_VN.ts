@@ -957,7 +957,8 @@ export const vi_VN: EnTranslations = {
       "petTaunt": "Thú Cưng: Khiêu Khích",
       "petDefensive": "Thú Cưng: Phòng Thủ",
       "petAggressive": "Thú Cưng: Hung Hăng",
-      "mount": "Cưỡi Thú / Xuống Thú"
+      "mount": "Cưỡi Thú / Xuống Thú",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const vi_VN: EnTranslations = {
       "billboard": {
         "label": "Bảng Tin Bang Hội",
         "empty": "Bảng tin chưa có gì được dán lên.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Đặt bởi {name}",
         "save": "Lưu",
         "placeholder": "Viết tin nhắn cho bang hội",
@@ -6808,6 +6810,10 @@ export const vi_VN: EnTranslations = {
         "leader": "Hội Chủ",
         "officer": "Sĩ Quan",
         "member": "Thành Viên"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "bạn là {rank}, {count} thành viên",
       "guildHeadMany": "bạn là {rank}, {count} thành viên"

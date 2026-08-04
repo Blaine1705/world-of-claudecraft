@@ -957,7 +957,8 @@ export const fr_CA: EnTranslations = {
       "petTaunt": "Familier : provoquer",
       "petDefensive": "Familier : défensif",
       "petAggressive": "Familier : agressif",
-      "mount": "Monter / Descendre"
+      "mount": "Monter / Descendre",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const fr_CA: EnTranslations = {
       "billboard": {
         "label": "Tableau d'affichage de la guilde",
         "empty": "Rien sur le tableau d'affichage pour le moment.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Défini par {name}",
         "save": "Enregistrer",
         "placeholder": "Écrivez un message pour la guilde",
@@ -6808,6 +6810,10 @@ export const fr_CA: EnTranslations = {
         "leader": "Maître de guilde",
         "officer": "Officier",
         "member": "Membre"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "vous êtes {rank}, {count} membre",
       "guildHeadMany": "vous êtes {rank}, {count} membres"

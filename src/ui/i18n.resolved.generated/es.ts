@@ -957,7 +957,8 @@ export const es: EnTranslations = {
       "petTaunt": "Mascota: provocar",
       "petDefensive": "Mascota: defensiva",
       "petAggressive": "Mascota: agresiva",
-      "mount": "Montar / Desmontar"
+      "mount": "Montar / Desmontar",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -2352,6 +2353,7 @@ export const es: EnTranslations = {
       "billboard": {
         "label": "Tablón de la Hermandad",
         "empty": "Aún no hay nada publicado en el tablón.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Fijado por {name}",
         "save": "Guardar",
         "placeholder": "Escribe un mensaje para la hermandad",
@@ -6808,6 +6810,10 @@ export const es: EnTranslations = {
         "leader": "Maestro de hermandad",
         "officer": "Oficial",
         "member": "Miembro"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "eres {rank}, {count} miembro",
       "guildHeadMany": "eres {rank}, {count} miembros"

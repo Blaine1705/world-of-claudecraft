@@ -712,6 +712,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.hideOfflineTitle': 'Скрыть офлайн участников гильдии',
   'hudChrome.social.billboard.label': 'Доска объявлений гильдии',
   'hudChrome.social.billboard.empty': 'На доске объявлений пока пусто.',
+  'hudChrome.social.billboard.loginLine': 'Доска объявлений гильдии: {text}',
   'hudChrome.social.billboard.setBy': 'Разместил(а): {name}',
   'hudChrome.social.billboard.save': 'Сохранить',
   'hudChrome.social.billboard.placeholder': 'Напишите сообщение для гильдии',
@@ -2152,6 +2153,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.social.ranks.leader': 'Глава гильдии',
   'hud.social.ranks.officer': 'Офицер',
   'hud.social.ranks.member': 'Участник',
+  'hud.social.tenure.recruit': 'Новобранец',
+  'hud.social.tenure.veteran': 'Ветеран',
   'hud.social.guildHeadOne': 'вы {rank}, {count} участник',
   'hud.social.guildHeadMany': 'вы {rank}, {count} участников',
   'hud.trade.title': 'Обмен с {name}',
@@ -9298,6 +9301,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
+  // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
+  'hudChrome.keybinds.mouseHint':
+    'Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру.',
   // On-bar action-bar key-binding mode (issue #1238). M16 wordy fills.
   'hudChrome.actionBar.editKeys': 'Настроить клавиши панели действий',
   'hudChrome.actionBar.editKeysHint':

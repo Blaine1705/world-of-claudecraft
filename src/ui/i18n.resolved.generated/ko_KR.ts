@@ -957,7 +957,8 @@ export const ko_KR: EnTranslations = {
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
-      "mount": "탑승 / 하차"
+      "mount": "탑승 / 하차",
+      "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
     },
     "actionBar": {
       "editKeys": "액션 바 키 편집",
@@ -2352,6 +2353,7 @@ export const ko_KR: EnTranslations = {
       "billboard": {
         "label": "길드 게시판",
         "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "loginLine": "길드 게시판: {text}",
         "setBy": "{name} 설정",
         "save": "저장",
         "placeholder": "길드에 전할 메시지를 작성하세요",
@@ -6808,6 +6810,10 @@ export const ko_KR: EnTranslations = {
         "leader": "길드장",
         "officer": "장교",
         "member": "회원"
+      },
+      "tenure": {
+        "recruit": "신병",
+        "veteran": "베테랑"
       },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",
       "guildHeadMany": "당신은 {rank}, {count}명 회원"

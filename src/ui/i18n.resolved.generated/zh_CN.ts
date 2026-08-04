@@ -957,7 +957,8 @@ export const zh_CN: EnTranslations = {
       "petTaunt": "宠物：嘲讽",
       "petDefensive": "宠物：防御",
       "petAggressive": "宠物：攻击性",
-      "mount": "骑乘 / 下骑"
+      "mount": "骑乘 / 下骑",
+      "mouseHint": "鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。"
     },
     "actionBar": {
       "editKeys": "编辑动作条按键",
@@ -2352,6 +2353,7 @@ export const zh_CN: EnTranslations = {
       "billboard": {
         "label": "公会公告板",
         "empty": "公告板上还没有内容。",
+        "loginLine": "公会公告板：{text}",
         "setBy": "由 {name} 设置",
         "save": "保存",
         "placeholder": "给公会写一条消息",
@@ -6808,6 +6810,10 @@ export const zh_CN: EnTranslations = {
         "leader": "会长",
         "officer": "官员",
         "member": "成员"
+      },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "老兵"
       },
       "guildHeadOne": "你是{rank}，{count}名成员",
       "guildHeadMany": "你是{rank}，{count}名成员"
