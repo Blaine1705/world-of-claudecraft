@@ -13,16 +13,27 @@
   import AccountLink from '../components/AccountLink.svelte';
   import Pager from '../components/Pager.svelte';
 
+  type AccountSort =
+    | 'id'
+    | 'username'
+    | 'character_count'
+    | 'max_level'
+    | 'playtime_seconds'
+    | 'created_at'
+    | 'last_login';
+
   const accountModal = getAccountModalController();
   let accounts = $state<Paginated<AccountRow> | null>(null);
   let failed = $state(false);
   let search = $state('');
   let page = $state(1);
+  let sort = $state<AccountSort>('id');
+  let dir = $state<'asc' | 'desc'>('desc');
   let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
   async function refresh(): Promise<void> {
     try {
-      const params = new URLSearchParams({ page: String(page), search });
+      const params = new URLSearchParams({ page: String(page), search, sort, dir });
       accounts = await apiGet<Paginated<AccountRow>>(`/admin/api/accounts?${params}`);
       failed = false;
     } catch (err) {
@@ -35,6 +46,23 @@
     page = 1;
     if (searchTimer) clearTimeout(searchTimer);
     searchTimer = setTimeout(() => void refresh(), SEARCH_DEBOUNCE_MS);
+  }
+
+  function changeSort(column: AccountSort): void {
+    dir = sort === column ? (dir === 'desc' ? 'asc' : 'desc') : column === 'username' ? 'asc' : 'desc';
+    sort = column;
+    page = 1;
+    void refresh();
+  }
+
+  function sortArrow(column: AccountSort): string {
+    if (sort !== column) return '';
+    return dir === 'asc' ? ' ▲' : ' ▼';
+  }
+
+  function ariaSort(column: AccountSort): 'ascending' | 'descending' | 'none' {
+    if (sort !== column) return 'none';
+    return dir === 'asc' ? 'ascending' : 'descending';
   }
 
   function openAccount(event: MouseEvent, id: number): void {
@@ -81,13 +109,41 @@
     <table>
       <thead>
         <tr>
-          <th class="num">{t('accounts.colId')}</th>
-          <th>{t('accounts.colUsername')}</th>
-          <th class="num">{t('accounts.colChars')}</th>
-          <th class="num">{t('accounts.colMaxLvl')}</th>
-          <th class="num">{t('accounts.colPlaytime')}</th>
-          <th>{t('accounts.colRegistered')}</th>
-          <th>{t('accounts.colLastLogin')}</th>
+          <th class="num sortable" aria-sort={ariaSort('id')}>
+            <button type="button" onclick={() => changeSort('id')}>
+              {t('accounts.colId')}<span aria-hidden="true">{sortArrow('id')}</span>
+            </button>
+          </th>
+          <th class="sortable" aria-sort={ariaSort('username')}>
+            <button type="button" onclick={() => changeSort('username')}>
+              {t('accounts.colUsername')}<span aria-hidden="true">{sortArrow('username')}</span>
+            </button>
+          </th>
+          <th class="num sortable" aria-sort={ariaSort('character_count')}>
+            <button type="button" onclick={() => changeSort('character_count')}>
+              {t('accounts.colChars')}<span aria-hidden="true">{sortArrow('character_count')}</span>
+            </button>
+          </th>
+          <th class="num sortable" aria-sort={ariaSort('max_level')}>
+            <button type="button" onclick={() => changeSort('max_level')}>
+              {t('accounts.colMaxLvl')}<span aria-hidden="true">{sortArrow('max_level')}</span>
+            </button>
+          </th>
+          <th class="num sortable" aria-sort={ariaSort('playtime_seconds')}>
+            <button type="button" onclick={() => changeSort('playtime_seconds')}>
+              {t('accounts.colPlaytime')}<span aria-hidden="true">{sortArrow('playtime_seconds')}</span>
+            </button>
+          </th>
+          <th class="sortable" aria-sort={ariaSort('created_at')}>
+            <button type="button" onclick={() => changeSort('created_at')}>
+              {t('accounts.colRegistered')}<span aria-hidden="true">{sortArrow('created_at')}</span>
+            </button>
+          </th>
+          <th class="sortable" aria-sort={ariaSort('last_login')}>
+            <button type="button" onclick={() => changeSort('last_login')}>
+              {t('accounts.colLastLogin')}<span aria-hidden="true">{sortArrow('last_login')}</span>
+            </button>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -125,3 +181,21 @@
     </table>
   {/if}
 </Panel>
+
+<style>
+  th.sortable button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+  }
+
+  th.sortable button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+</style>

@@ -1,4 +1,5 @@
 import { normalizeAccountFlair, type StreamerLinks } from '../src/sim/account_flair';
+import type { AdminAccountSort, AdminAccountSortDirection } from './admin_accounts_sort';
 import {
   type ClientPerfSummaryBuckets,
   cleanHours,
@@ -898,13 +899,34 @@ export async function associationsForIp(
   };
 }
 
+// Maps each allowlisted AdminAccountSort to the SQL it orders by. character_count,
+// max_level, and playtime_seconds address their own SELECT-list aliases (Postgres
+// resolves an ORDER BY item against the output column list), so no separate
+// aggregate expression needs repeating here.
+const ACCOUNT_SORT_COLUMNS: Record<AdminAccountSort, string> = {
+  id: 'a.id',
+  username: 'lower(a.username)',
+  character_count: 'character_count',
+  max_level: 'max_level',
+  playtime_seconds: 'playtime_seconds',
+  created_at: 'a.created_at',
+  last_login: 'a.last_login',
+};
+
 export async function listAccounts(
   search: string,
   page: number,
   limit: number,
+  sort: AdminAccountSort = 'id',
+  dir: AdminAccountSortDirection = sort === 'username' ? 'asc' : 'desc',
 ): Promise<Paginated<AdminAccountRow>> {
   const pattern = search ? `%${escapeLike(search)}%` : '%';
   const offset = (page - 1) * limit;
+  const direction = dir === 'asc' ? 'ASC' : 'DESC';
+  const column = ACCOUNT_SORT_COLUMNS[sort];
+  // a.id is always the unique tiebreaker; for the id sort itself that would
+  // just repeat "a.id DESC, a.id DESC", so it is the whole ORDER BY on its own.
+  const order = sort === 'id' ? `a.id ${direction}` : `${column} ${direction}, a.id ${direction}`;
   const [rows, total] = await Promise.all([
     pool.query(
       `SELECT a.id, a.username, a.created_at, a.last_login, a.is_admin,
@@ -919,7 +941,7 @@ export async function listAccounts(
        LEFT JOIN characters c ON c.account_id = a.id
        WHERE a.username ILIKE $1
        GROUP BY a.id
-       ORDER BY a.id DESC
+       ORDER BY ${order}
        LIMIT $2 OFFSET $3`,
       [pattern, limit, offset],
     ),

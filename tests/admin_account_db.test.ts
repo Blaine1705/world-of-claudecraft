@@ -237,6 +237,36 @@ describe('admin account detail query', () => {
     expect(mocks.runWithStatementTimeout).not.toHaveBeenCalled();
   });
 
+  it('defaults the accounts ORDER BY to id DESC, matching the old fixed order', async () => {
+    mocks.query.mockResolvedValueOnce({ rows: [] }).mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+    await listAccounts('', 1, 25);
+
+    expect(mocks.query.mock.calls[0][0]).toContain('ORDER BY a.id DESC');
+  });
+
+  it('orders by each allowlisted accounts sort column, with an id tiebreaker', async () => {
+    const cases: Array<[Parameters<typeof listAccounts>[3], 'asc' | 'desc', string]> = [
+      ['username', 'asc', 'ORDER BY lower(a.username) ASC, a.id ASC'],
+      ['character_count', 'desc', 'ORDER BY character_count DESC, a.id DESC'],
+      ['max_level', 'asc', 'ORDER BY max_level ASC, a.id ASC'],
+      ['playtime_seconds', 'desc', 'ORDER BY playtime_seconds DESC, a.id DESC'],
+      ['created_at', 'asc', 'ORDER BY a.created_at ASC, a.id ASC'],
+      ['last_login', 'desc', 'ORDER BY a.last_login DESC, a.id DESC'],
+    ];
+
+    for (const [sort, dir, expectedOrderBy] of cases) {
+      mocks.query.mockReset();
+      mocks.query
+        .mockResolvedValueOnce({ rows: [] })
+        .mockResolvedValueOnce({ rows: [{ total: 0 }] });
+
+      await listAccounts('', 1, 25, sort, dir);
+
+      expect(mocks.query.mock.calls[0][0], sort).toContain(expectedOrderBy);
+    }
+  });
+
   it('returns positive point events for one account, reward day, and realm', async () => {
     mocks.query.mockResolvedValueOnce({
       rows: [

@@ -1,5 +1,6 @@
 import type * as http from 'node:http';
 import { verifyLoginTwoFactor } from './account';
+import { parseAdminAccountSort } from './admin_accounts_sort';
 import {
   accountDetail,
   associationsForIp,
@@ -1390,7 +1391,8 @@ export async function handleAdminApi(
     if (path === '/admin/api/accounts') {
       const { page, limit } = parsePageParams(url.searchParams);
       const search = (url.searchParams.get('search') ?? '').slice(0, 64);
-      return ok(res, await listAccounts(search, page, limit));
+      const { sort, dir } = parseAdminAccountSort(url.searchParams);
+      return ok(res, await listAccounts(search, page, limit, sort, dir));
     }
     if (path === '/admin/api/guilds') {
       const { page, limit } = parsePageParams(url.searchParams);
@@ -2175,11 +2177,12 @@ async function perfTickCaptureHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, useAdminRuntime().startPerfCapture(durationMs));
 }
 
-/** GET /admin/api/accounts: paged account search (search clamped to 64 chars). */
+/** GET /admin/api/accounts: paged, sortable account search (search clamped to 64 chars). */
 async function accountsHandler(ctx: Ctx): Promise<void> {
   const { page, limit } = parsePageParams(ctx.url.searchParams);
   const search = (ctx.url.searchParams.get('search') ?? '').slice(0, 64);
-  ok(ctx.res, await adminDb().listAccounts(search, page, limit));
+  const { sort, dir } = parseAdminAccountSort(ctx.url.searchParams);
+  ok(ctx.res, await adminDb().listAccounts(search, page, limit, sort, dir));
 }
 
 /** GET /admin/api/guilds: current-realm guild search with bounded pagination. */
