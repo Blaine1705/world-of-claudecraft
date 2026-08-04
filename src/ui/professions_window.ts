@@ -39,6 +39,7 @@ import {
   type RingLayout,
 } from './professions_view';
 import { toolEffectNameKey } from './tool_effect_name';
+import { toolEffectStandaloneTooltip } from './tool_effect_tooltip';
 import { svgIcon } from './ui_icons';
 
 // Ring node distance from the container center, in percent of the box
@@ -81,10 +82,10 @@ export interface ProfessionsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   closeOthers(): void;
   hideTooltip(): void;
-  /** The shared Hud TouchPeekGuard (the deeds/bank contract); wired but never
-   *  consumed: the slot/recharge controls are plain labeled buttons with no
-   *  tooltip peek state, outside the card-action family the guard exists
-   *  for, and the window has no peeking cards. */
+  /** The shared Hud TouchPeekGuard (the deeds/bank contract). Slot buttons and
+   *  live effect rows now attach hover tooltips that describe what each charm
+   *  does; the guard still is not consumed for a long-press peek (the buttons
+   *  stay outside the card-action family). */
   consumePeek(): boolean;
   captureFocus(): HTMLElement | null;
   restoreFocus(target: HTMLElement | null): void;
@@ -596,8 +597,11 @@ export class ProfessionsWindow {
           effect.confirmMode === 'prompt'
             ? `<span class="prof-effect-mode">${esc(t('hudChrome.professions.toolEffectModePrompt'))}</span>`
             : '';
+        // data-effect-tip marks the live row for the shared attachTooltip
+        // wiring below: the hover card explains the bonus and charge ladder
+        // the compact line cannot fit.
         html +=
-          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}">` +
+          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}" data-effect-tip="${esc(effect.effectId)}">` +
           `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
           `<span class="prof-effect-charges">${esc(charges)}</span>${modeChip}${recharge}</div>`;
       }
@@ -665,21 +669,38 @@ export class ProfessionsWindow {
     // real answer then arrives late, a duplicate send is refused server-side
     // (no_gain or already_full), so the race costs nothing.
     for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
+      const effectId = button.getAttribute('data-slot-effect');
+      // Hover card: what the charm does and how slotting works, so a player
+      // never has to burn a charm to learn the bonus. Empty string means no
+      // attach (a retired id); attachTooltip is a no-op only if never called.
+      if (effectId !== null) {
+        const tip = toolEffectStandaloneTooltip(effectId);
+        if (tip !== '') this.deps.attachTooltip(button, () => tip);
+      }
       button.addEventListener('click', () => {
         if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-slot-profession');
-        const effectId = button.getAttribute('data-slot-effect');
-        if (professionId === null || effectId === null) return;
+        const slotEffectId = button.getAttribute('data-slot-effect');
+        if (professionId === null || slotEffectId === null) return;
         this.armSentGuard(button);
         // The R40 mode rides the mint: 'prompt' when the row's toggle is on,
         // OMITTED otherwise so the plain send stays byte-identical.
         if (this.slotModePrompt.has(professionId)) {
-          this.deps.world().slotToolEffect(professionId, effectId, 'prompt');
+          this.deps.world().slotToolEffect(professionId, slotEffectId, 'prompt');
         } else {
-          this.deps.world().slotToolEffect(professionId, effectId);
+          this.deps.world().slotToolEffect(professionId, slotEffectId);
         }
         audio.click();
       });
+    }
+    // Live effect rows: same hover card as the slot buttons, so a already-
+    // slotted charm still explains its bonus without forcing the player to
+    // open the bags and re-read the item.
+    for (const row of el.querySelectorAll<HTMLElement>('[data-effect-tip]')) {
+      const effectId = row.getAttribute('data-effect-tip');
+      if (effectId === null) continue;
+      const tip = toolEffectStandaloneTooltip(effectId);
+      if (tip !== '') this.deps.attachTooltip(row, () => tip);
     }
     // The R40 mode toggles: flip the painter-local choice and repaint (the
     // slottable set asks the resolver with the sent mode, so the button set
