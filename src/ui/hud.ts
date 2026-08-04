@@ -1559,6 +1559,11 @@ export class Hud {
   private openUnbindNpcId: number | null = null;
   private readonly unbindWindowFocus = this.windowFocus('#unbind-window');
   private unbindOpenerFocus: HTMLElement | null = null;
+  // The crafting window (#1127) was the one standalone-window holdout that
+  // never installed the shared Tab trap or returned focus to its opener: the
+  // same train/unbind shape, added here so it stops being the exception.
+  private readonly craftingWindowFocus = this.windowFocus('#crafting-window');
+  private craftingOpenerFocus: HTMLElement | null = null;
   // Craft tier-up snapshot (Professions 2.0): the last SYNCED
   // craftSkills observation handleEvents diffs for tier crossings. null until
   // the first synced observation, which initializes silently (no toasts for
@@ -14350,16 +14355,19 @@ export class Hud {
     }
     this.closeOtherWindows('#crafting-window');
     this.renderCrafting();
+    // AFTER the paint, the train / unbind ordering (see toggleTownFocus):
+    // captureFocus records the opener and installs the trap over a root that
+    // is by then populated and displayed. #crafting-window now installs its
+    // own trap (this change), so the craftId branch below only needs to move
+    // focus onto the selected tab within that trap, not chase it back from body.
+    this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
     if (craftId !== undefined) {
       const scroller = $('#crafting-window').querySelector('.crafting-body');
       if (scroller) scroller.scrollTop = 0;
       // The gossip route reaches here after the dialog released its focus
-      // trap WITHOUT restoring (the successor-window premise), and
-      // #crafting-window installs no trap of its own: land keyboard focus on
-      // the selected tab (onSelectCraft's refocus target) so the handoff
-      // never strands focus on body. Promoting this window into the
-      // windowFocus system proper is the #2525 town-focus precedent, a
-      // separate ruling, not this change.
+      // trap WITHOUT restoring (the successor-window premise): land keyboard
+      // focus on the selected tab (onSelectCraft's refocus target) so the
+      // handoff never strands focus on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
     }
   }
@@ -14442,6 +14450,8 @@ export class Hud {
   closeCrafting(): void {
     $('#crafting-window').style.display = 'none';
     this.hideTooltip();
+    this.craftingWindowFocus.restoreFocus(this.craftingOpenerFocus);
+    this.craftingOpenerFocus = null;
     // Commission opt-ins are per-session-of-the-window: closing it drops any
     // armed-but-uncrafted checkboxes, so reopening always starts clean (the
     // off-by-default rule). The selected tab is persisted separately
