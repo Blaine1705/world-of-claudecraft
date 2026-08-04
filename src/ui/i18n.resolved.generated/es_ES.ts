@@ -3226,6 +3226,9 @@ export const es_ES: EnTranslations = {
       "toZone": "Mapa de la zona",
       "toggleAria": "Alternar entre el mapa del mundo y el mapa de la zona",
       "levels": "Niveles {min} a {max}"
+    },
+    "arenaGate": {
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

@@ -36,6 +36,7 @@ import { solveLockActions } from '../../src/sim/lockpick';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
 import { Sim } from '../../src/sim/sim';
+import { ARENA_MIN_LEVEL } from '../../src/sim/social/arena';
 import { addThreat } from '../../src/sim/threat';
 import {
   type Aura,
@@ -831,6 +832,8 @@ function arena1v1(): Scenario {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, a);
+      sim.setPlayerLevel(ARENA_MIN_LEVEL, b);
       teleport(sim, sim.entities.get(a)!, 0, -40);
       teleport(sim, sim.entities.get(b)!, 6, -40);
       sim.arenaQueueJoin(a);
@@ -1049,6 +1052,7 @@ function arena2v2Wipe(): Scenario {
       const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
       const pids = classes.map((c, i) => sim.addPlayer(c, names[i]));
       pids.forEach((pid, i) => {
+        sim.setPlayerLevel(ARENA_MIN_LEVEL, pid);
         teleport(sim, sim.entities.get(pid)!, i * 3, -40);
       });
       rec.track(...pids);
