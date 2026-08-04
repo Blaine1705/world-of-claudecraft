@@ -35,11 +35,12 @@ import {
   fenbridgeFogVisible,
   newFenbridgeBuildingVisibilityPlan,
 } from '../src/render/fenbridge_town_visibility_core';
-import { GFX } from '../src/render/gfx';
+import { GFX, gfxInternalsForTest } from '../src/render/gfx';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
 import { FENBRIDGE_LAYOUT, localToWorld } from '../src/sim/fenbridge_layout';
 import { terrainHeight } from '../src/sim/world';
+
 
 const ORIGINAL_GFX = {
   standardMaterials: GFX.standardMaterials,
@@ -48,8 +49,10 @@ const ORIGINAL_GFX = {
   composer: GFX.composer,
 };
 
+// GFX is a frozen profile after the v0.34 settings rework; mutate via the
+// test override seam instead of Object.assign.
 function setGfx(overrides: Partial<typeof ORIGINAL_GFX>): void {
-  Object.assign(GFX as unknown as Record<string, unknown>, overrides);
+  gfxInternalsForTest.overrideSettings(overrides);
 }
 
 function sourceAsset(withEmissive = true): THREE.Group {
