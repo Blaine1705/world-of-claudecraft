@@ -48,11 +48,7 @@
       "pitch": 0,
       "roll": 0
     },
-    "positionHint": [
-      0,
-      0,
-      3
-    ],
+    "positionHint": [0, 0, 3],
     "note": "For likeness work, solve the reference camera (forge/stage1_intake/solve_camera_pose.py) so the review render aligns with the photo and the reference can be projected. Confirm by overlay review."
   },
   "suitability": "pass",
@@ -84,12 +80,7 @@
         "repeatable wall run",
         "optional cloth-tab flutter"
       ],
-      "materialFamilies": [
-        "raw timber",
-        "forged iron",
-        "hemp rope",
-        "teal marker cloth"
-      ],
+      "materialFamilies": ["raw timber", "forged iron", "hemp rope", "teal marker cloth"],
       "notes": "Classified from the four labeled turnaround quadrants; no character anatomy applies."
     },
     "complexity": {
@@ -118,11 +109,7 @@
     },
     "specDepthDecision": {
       "requiredDepth": "moderate",
-      "minimumComponentLevels": [
-        "macro",
-        "meso",
-        "micro"
-      ],
+      "minimumComponentLevels": ["macro", "meso", "micro"],
       "needsRepetitionSystems": true,
       "needsMaterialLocalOverrides": true,
       "needsMultipleReviewViews": true,
@@ -345,9 +332,7 @@
         "qualityCriteria": [
           "Bounding shape, dominant curves, negative spaces, and scale relationships are explicitly described."
         ],
-        "evidenceRefs": [
-          "full-object"
-        ],
+        "evidenceRefs": ["full-object"],
         "failureModes": [
           "model reads as a generic placeholder instead of the reference object",
           "major proportions are guessed without evidence"
@@ -360,9 +345,7 @@
         "qualityCriteria": [
           "Major parts, joints, seams, contact points, and parent-child relationships are named before code generation."
         ],
-        "evidenceRefs": [
-          "full-object"
-        ],
+        "evidenceRefs": ["full-object"],
         "failureModes": [
           "large visible parts are merged into one mesh",
           "component hierarchy is too shallow for the observed complexity"
@@ -375,9 +358,7 @@
         "qualityCriteria": [
           "Every visible child appendage, branch, limb, handle, connector, tube, cable, horn, wing, leg, or hinged part has an attachment contract with parent socket, localStart/localEnd, contact type, embed/overlap, and gap tolerance."
         ],
-        "evidenceRefs": [
-          "full-object"
-        ],
+        "evidenceRefs": ["full-object"],
         "failureModes": [
           "child part root floats away from the parent",
           "branch/limb/tube is centered in space instead of pivoting from its root",
@@ -393,9 +374,7 @@
           "Important materials define independent albedo, roughness, height/normal, and AO responses instead of reusing one texture for unrelated PBR channels.",
           "Surface response is decomposed into macro, meso, and micro frequency bands with scale and amplitude tied to object scale."
         ],
-        "evidenceRefs": [
-          "full-object"
-        ],
+        "evidenceRefs": ["full-object"],
         "failureModes": [
           "surface looks like flat plastic",
           "local material variation is missing or not tied to image evidence"
@@ -411,9 +390,7 @@
           "Lighting-pass names key/fill/rim or environment light, exposure, tone mapping, background, and contact shadow behavior.",
           "Neutral, grazing-angle, and reference-matched renders prove that surface relief survives relighting and is not painted into albedo."
         ],
-        "evidenceRefs": [
-          "full-object"
-        ],
+        "evidenceRefs": ["full-object"],
         "failureModes": [
           "model has acceptable shape but reads as flat shaded or plastic",
           "colors are a generic average instead of reference-observed local color zones",
@@ -466,17 +443,9 @@
       "Heavy bound end-post system",
       "Two readable cross rails"
     ],
-    "niceToHave": [
-      "subtle material age variation",
-      "secondary micro-surface breakup"
-    ],
+    "niceToHave": ["subtle material age variation", "secondary micro-surface breakup"],
     "fpsTarget": 60,
-    "reviewViewpoints": [
-      "front",
-      "side",
-      "rear",
-      "hero"
-    ]
+    "reviewViewpoints": ["front", "side", "rear", "hero"]
   },
   "selfCorrectLoop": {
     "enabled": true,
@@ -516,13 +485,7 @@
       "interaction-pass",
       "optimization-pass"
     ],
-    "allowedActions": [
-      "continue",
-      "refine-spec",
-      "refine-code",
-      "request-input",
-      "stop"
-    ],
+    "allowedActions": ["continue", "refine-spec", "refine-code", "request-input", "stop"],
     "specRefineTriggers": [
       "missing component",
       "wrong primitive family",
@@ -563,56 +526,31 @@
       "id": "jagged-stake-row",
       "name": "Jagged repeated sharpened stake silhouette",
       "tier": "critical",
-      "passIds": [
-        "blockout",
-        "form-refinement"
-      ],
+      "passIds": ["blockout", "form-refinement"],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": [
-        "stake-row"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "front"
-      ]
+      "componentRefs": ["stake-row"],
+      "evidenceRefs": ["hero", "front"]
     },
     {
       "id": "bound-end-posts",
       "name": "Heavy bound end-post system",
       "tier": "critical",
-      "passIds": [
-        "structural-pass",
-        "material-pass"
-      ],
+      "passIds": ["structural-pass", "material-pass"],
       "minimumScore": 0.8,
       "mustPass": true,
-      "componentRefs": [
-        "end-posts",
-        "bindings"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "side"
-      ]
+      "componentRefs": ["end-posts", "bindings"],
+      "evidenceRefs": ["hero", "side"]
     },
     {
       "id": "fortification-rails",
       "name": "Two readable cross rails",
       "tier": "important",
-      "passIds": [
-        "structural-pass",
-        "material-pass"
-      ],
+      "passIds": ["structural-pass", "material-pass"],
       "minimumScore": 0.72,
       "mustPass": false,
-      "componentRefs": [
-        "cross-rails"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "rear"
-      ]
+      "componentRefs": ["cross-rails"],
+      "evidenceRefs": ["hero", "rear"]
     }
   ],
   "sculptPipeline": {
@@ -715,25 +653,11 @@
   },
   "silhouette": {
     "boundingShape": "A long thin wall with ten irregular sharpened stakes and taller end posts.",
-    "aspectRatios": [
-      "width:height about 1.75:1",
-      "depth:width about 0.12:1"
-    ],
+    "aspectRatios": ["width:height about 1.75:1", "depth:width about 0.12:1"],
     "symmetry": "Broadly balanced end-to-end but intentionally irregular stake heights.",
-    "dominantCurves": [
-      "jagged sawtooth top line",
-      "slight rope catenary"
-    ],
-    "negativeSpaces": [
-      "narrow seams between stakes",
-      "clear ground gap beneath lower rail"
-    ],
-    "landmarks": [
-      "pointed stake row",
-      "heavy end posts",
-      "two rails",
-      "teal end tab"
-    ]
+    "dominantCurves": ["jagged sawtooth top line", "slight rope catenary"],
+    "negativeSpaces": ["narrow seams between stakes", "clear ground gap beneath lower rail"],
+    "landmarks": ["pointed stake row", "heavy end posts", "two rails", "teal end tab"]
   },
   "viewEvidence": [
     {
@@ -763,9 +687,7 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": [
-        "heavy end posts"
-      ],
+      "observations": ["heavy end posts"],
       "confidence": 0.9
     },
     {
@@ -779,9 +701,7 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": [
-        "two rails"
-      ],
+      "observations": ["two rails"],
       "confidence": 0.9
     },
     {
@@ -795,9 +715,7 @@
         "height": 0.5,
         "units": "normalized montage quadrant"
       },
-      "observations": [
-        "teal end tab"
-      ],
+      "observations": ["teal end tab"],
       "confidence": 0.9
     }
   ],
@@ -812,9 +730,7 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Grounded modular wall span is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "raw-timber",
-      "materialLayers": [
-        "raw-timber"
-      ],
+      "materialLayers": ["raw-timber"],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -823,21 +739,9 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -860,28 +764,14 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": [
-        "grounded-baseline",
-        "thin-wall-depth"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "front"
-      ],
+      "localFeatures": ["grounded-baseline", "thin-wall-depth"],
+      "evidenceRefs": ["hero", "front"],
       "actionProfile": {
         "animationRole": "root",
         "pivot": {
           "mode": "floor-center",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -918,9 +808,7 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Irregular sharpened stake row is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "raw-timber",
-      "materialLayers": [
-        "raw-timber"
-      ],
+      "materialLayers": ["raw-timber"],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -929,21 +817,9 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -966,28 +842,14 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": [
-        "ten-stake-rhythm",
-        "alternating-point-heights"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "side"
-      ],
+      "localFeatures": ["ten-stake-rhythm", "alternating-point-heights"],
+      "evidenceRefs": ["hero", "side"],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1024,9 +886,7 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Oversized squared terminal posts is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "raw-timber",
-      "materialLayers": [
-        "raw-timber"
-      ],
+      "materialLayers": ["raw-timber"],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1035,21 +895,9 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1072,27 +920,14 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": [
-        "heavy-end-caps"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "front"
-      ],
+      "localFeatures": ["heavy-end-caps"],
+      "evidenceRefs": ["hero", "front"],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1129,9 +964,7 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Two horizontal binding rails is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "raw-timber",
-      "materialLayers": [
-        "raw-timber"
-      ],
+      "materialLayers": ["raw-timber"],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1140,21 +973,9 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1177,27 +998,14 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": [
-        "upper-and-lower-rails"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "side"
-      ],
+      "localFeatures": ["upper-and-lower-rails"],
+      "evidenceRefs": ["hero", "side"],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1234,9 +1042,7 @@
       "topologyClass": "assembled-solid",
       "topologyRationale": "Iron bands and rope wraps is visibly assembled from discrete low-poly solids with readable overlaps and contact seams.",
       "material": "iron-and-rope",
-      "materialLayers": [
-        "iron-and-rope"
-      ],
+      "materialLayers": ["iron-and-rope"],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1245,21 +1051,9 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1282,28 +1076,14 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": [
-        "end-post-bands",
-        "rope-lashing-lines"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "front"
-      ],
+      "localFeatures": ["end-post-bands", "rope-lashing-lines"],
+      "evidenceRefs": ["hero", "front"],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1340,9 +1120,7 @@
       "topologyClass": "conforming-shell",
       "topologyRationale": "Small teal identification tab is visibly thin, layered over the supporting assembly, and must read from both face and edge views.",
       "material": "teal-marker",
-      "materialLayers": [
-        "teal-marker"
-      ],
+      "materialLayers": ["teal-marker"],
       "dimensions": {
         "width": 1,
         "height": 1,
@@ -1351,21 +1129,9 @@
         "confidence": 0.86
       },
       "transform": {
-        "position": [
-          0,
-          0,
-          0
-        ],
-        "rotation": [
-          0,
-          0,
-          0
-        ],
-        "scale": [
-          1,
-          1,
-          1
-        ]
+        "position": [0, 0, 0],
+        "rotation": [0, 0, 0],
+        "scale": [1, 1, 1]
       },
       "geometryDescriptor": {
         "topologyIntent": "low-poly shipping silhouette with deterministic primitive assembly",
@@ -1388,27 +1154,14 @@
       "seams": [
         "overlap adjacent solids by at least 0.02 native units where visible contact is required"
       ],
-      "localFeatures": [
-        "single-teal-tab"
-      ],
-      "evidenceRefs": [
-        "hero",
-        "side"
-      ],
+      "localFeatures": ["single-teal-tab"],
+      "evidenceRefs": ["hero", "side"],
       "actionProfile": {
         "animationRole": "static-detail",
         "pivot": {
           "mode": "component-center",
-          "localPosition": [
-            0,
-            0,
-            0
-          ],
-          "axis": [
-            0,
-            1,
-            0
-          ],
+          "localPosition": [0, 0, 0],
+          "axis": [0, 1, 0],
           "confidence": 0.9
         },
         "transformChannels": {
@@ -1446,17 +1199,11 @@
       "color": "#765236",
       "albedo": {
         "dominant": "#765236",
-        "secondary": [
-          "#523b29",
-          "#765236"
-        ],
+        "secondary": ["#523b29", "#765236"],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": [
-          "#765236",
-          "#523b29"
-        ],
+        "palette": ["#765236", "#523b29"],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1464,10 +1211,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1515,9 +1259,7 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": [
-          "short direction-following marks"
-        ],
+        "scratches": ["short direction-following marks"],
         "chips": []
       },
       "dirt": {
@@ -1529,10 +1271,7 @@
         {
           "id": "split-grain-and-dark-bases",
           "description": "Observed local response for split raw palisade timber.",
-          "evidenceRefs": [
-            "hero",
-            "front"
-          ],
+          "evidenceRefs": ["hero", "front"],
           "roughness": 0.78
         }
       ],
@@ -1550,17 +1289,11 @@
       "color": "#34383a",
       "albedo": {
         "dominant": "#34383a",
-        "secondary": [
-          "#34383a",
-          "#d3be8c"
-        ],
+        "secondary": ["#34383a", "#d3be8c"],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": [
-          "#34383a",
-          "#d3be8c"
-        ],
+        "palette": ["#34383a", "#d3be8c"],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1568,10 +1301,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1619,9 +1349,7 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": [
-          "short direction-following marks"
-        ],
+        "scratches": ["short direction-following marks"],
         "chips": []
       },
       "dirt": {
@@ -1633,10 +1361,7 @@
         {
           "id": "band-edge-and-rope-wrap",
           "description": "Observed local response for iron bands and hemp lashings.",
-          "evidenceRefs": [
-            "hero",
-            "front"
-          ],
+          "evidenceRefs": ["hero", "front"],
           "roughness": 0.45999999999999996
         }
       ],
@@ -1654,17 +1379,11 @@
       "color": "#276a6f",
       "albedo": {
         "dominant": "#276a6f",
-        "secondary": [
-          "#34383a",
-          "#d3be8c"
-        ],
+        "secondary": ["#34383a", "#d3be8c"],
         "samplingNotes": "Mapped from the labeled turnaround zones; preserve local hue separation after semantic-mesh merge."
       },
       "colorVariation": {
-        "palette": [
-          "#276a6f",
-          "#d3be8c"
-        ],
+        "palette": ["#276a6f", "#d3be8c"],
         "pattern": "component-local deterministic variation",
         "amplitude": 0.12,
         "heightCorrelation": 0.2
@@ -1672,10 +1391,7 @@
       "textureResolution": 512,
       "textureProjection": {
         "mode": "shared Fenbridge fixed 12-world-yard atlas-cell projection plus baked vertex palette",
-        "repeat": [
-          1,
-          1
-        ],
+        "repeat": [1, 1],
         "anisotropy": 4,
         "texelDensityIntent": "Keep one padded semantic cell at a fixed physical scale without wrapping into neighboring cells or adding per-asset texture resources."
       },
@@ -1723,9 +1439,7 @@
       },
       "wear": {
         "edgeWear": 0.08,
-        "scratches": [
-          "short direction-following marks"
-        ],
+        "scratches": ["short direction-following marks"],
         "chips": []
       },
       "dirt": {
@@ -1737,10 +1451,7 @@
         {
           "id": "weathered-teal-tab",
           "description": "Observed local response for teal boundary marker cloth.",
-          "evidenceRefs": [
-            "hero",
-            "front"
-          ],
+          "evidenceRefs": ["hero", "front"],
           "roughness": 0.54
         }
       ],
@@ -2230,9 +1941,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2300,9 +2009,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2369,9 +2076,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2438,9 +2143,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2507,9 +2210,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2576,9 +2277,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2645,9 +2344,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
@@ -2689,9 +2386,7 @@
         "deterministic authored structure",
         "shipping interaction and budget contract"
       ],
-      "mismatches": [
-        "No blocking mismatch remains in the accepted stylized target"
-      ],
+      "mismatches": ["No blocking mismatch remains in the accepted stylized target"],
       "specFixes": [],
       "codeFixes": [],
       "evidence": [
