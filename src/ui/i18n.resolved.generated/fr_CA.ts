@@ -2352,6 +2352,7 @@ export const fr_CA: EnTranslations = {
       "billboard": {
         "label": "Tableau d'affichage de la guilde",
         "empty": "Rien sur le tableau d'affichage pour le moment.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Défini par {name}",
         "save": "Enregistrer",
         "placeholder": "Écrivez un message pour la guilde",
@@ -6807,6 +6808,10 @@ export const fr_CA: EnTranslations = {
         "leader": "Maître de guilde",
         "officer": "Officier",
         "member": "Membre"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "vous êtes {rank}, {count} membre",
       "guildHeadMany": "vous êtes {rank}, {count} membres"

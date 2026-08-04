@@ -2352,6 +2352,7 @@ export const es_ES: EnTranslations = {
       "billboard": {
         "label": "Tablón de la Hermandad",
         "empty": "Aún no hay nada publicado en el tablón.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Fijado por {name}",
         "save": "Guardar",
         "placeholder": "Escribe un mensaje para la hermandad",
@@ -6807,6 +6808,10 @@ export const es_ES: EnTranslations = {
         "leader": "Maestro de hermandad",
         "officer": "Oficial",
         "member": "Miembro"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "eres {rank}, {count} miembro",
       "guildHeadMany": "eres {rank}, {count} miembros"

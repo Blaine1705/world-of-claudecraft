@@ -2352,6 +2352,7 @@ export const nl_NL: EnTranslations = {
       "billboard": {
         "label": "Gildeprikbord",
         "empty": "Nog niets op het prikbord.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Geplaatst door {name}",
         "save": "Opslaan",
         "placeholder": "Schrijf een bericht voor de gilde",
@@ -6807,6 +6808,10 @@ export const nl_NL: EnTranslations = {
         "leader": "Gildemeester",
         "officer": "Officier",
         "member": "Lid"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "je bent {rank}, {count} lid",
       "guildHeadMany": "je bent {rank}, {count} leden"

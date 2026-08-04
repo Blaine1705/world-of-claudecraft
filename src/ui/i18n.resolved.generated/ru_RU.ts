@@ -2352,6 +2352,7 @@ export const ru_RU: EnTranslations = {
       "billboard": {
         "label": "Доска объявлений гильдии",
         "empty": "На доске объявлений пока пусто.",
+        "loginLine": "Доска объявлений гильдии: {text}",
         "setBy": "Разместил(а): {name}",
         "save": "Сохранить",
         "placeholder": "Напишите сообщение для гильдии",
@@ -6807,6 +6808,10 @@ export const ru_RU: EnTranslations = {
         "leader": "Глава гильдии",
         "officer": "Офицер",
         "member": "Участник"
+      },
+      "tenure": {
+        "recruit": "Новобранец",
+        "veteran": "Ветеран"
       },
       "guildHeadOne": "вы {rank}, {count} участник",
       "guildHeadMany": "вы {rank}, {count} участников"

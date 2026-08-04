@@ -2352,6 +2352,7 @@ export const pt_BR: EnTranslations = {
       "billboard": {
         "label": "Mural da Guilda",
         "empty": "Ainda não há nada no mural.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Definido por {name}",
         "save": "Salvar",
         "placeholder": "Escreva uma mensagem para a guilda",
@@ -6807,6 +6808,10 @@ export const pt_BR: EnTranslations = {
         "leader": "Mestre da guilda",
         "officer": "Oficial",
         "member": "Membro"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "você é {rank}, {count} membro",
       "guildHeadMany": "você é {rank}, {count} membros"

@@ -2352,6 +2352,7 @@ export const de_DE: EnTranslations = {
       "billboard": {
         "label": "Gildenpinnwand",
         "empty": "Noch nichts an der Pinnwand.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Festgelegt von {name}",
         "save": "Speichern",
         "placeholder": "Schreib eine Nachricht für die Gilde...",
@@ -6807,6 +6808,10 @@ export const de_DE: EnTranslations = {
         "leader": "Gildenmeister",
         "officer": "Offizier",
         "member": "Mitglied"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "Ihr seid {rank}, {count} Mitglied",
       "guildHeadMany": "Ihr seid {rank}, {count} Mitglieder"

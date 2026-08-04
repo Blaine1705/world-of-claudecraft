@@ -2352,6 +2352,7 @@ export const vi_VN: EnTranslations = {
       "billboard": {
         "label": "Bảng Tin Bang Hội",
         "empty": "Bảng tin chưa có gì được dán lên.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Đặt bởi {name}",
         "save": "Lưu",
         "placeholder": "Viết tin nhắn cho bang hội",
@@ -6807,6 +6808,10 @@ export const vi_VN: EnTranslations = {
         "leader": "Hội Chủ",
         "officer": "Sĩ Quan",
         "member": "Thành Viên"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "bạn là {rank}, {count} thành viên",
       "guildHeadMany": "bạn là {rank}, {count} thành viên"

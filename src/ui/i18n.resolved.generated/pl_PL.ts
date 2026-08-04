@@ -2352,6 +2352,7 @@ export const pl_PL: EnTranslations = {
       "billboard": {
         "label": "Tablica ogłoszeń gildii",
         "empty": "Na tablicy ogłoszeń nic jeszcze nie ma.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Ustawione przez {name}",
         "save": "Zapisz",
         "placeholder": "Napisz wiadomość dla gildii",
@@ -6807,6 +6808,10 @@ export const pl_PL: EnTranslations = {
         "leader": "Mistrz gildii",
         "officer": "Oficer",
         "member": "Członek"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "jesteś {rank}, {count} członek",
       "guildHeadMany": "jesteś {rank}, {count} członków"

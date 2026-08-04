@@ -2352,6 +2352,7 @@ export const ja_JP: EnTranslations = {
       "billboard": {
         "label": "ギルド掲示板",
         "empty": "掲示板にはまだ何もありません。",
+        "loginLine": "ギルド掲示板：{text}",
         "setBy": "{name}が設定",
         "save": "保存",
         "placeholder": "ギルドへのメッセージを書く",
@@ -6807,6 +6808,10 @@ export const ja_JP: EnTranslations = {
         "leader": "ギルドマスター",
         "officer": "士官",
         "member": "メンバー"
+      },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "古参"
       },
       "guildHeadOne": "あなたは{rank}、{count}人のメンバー",
       "guildHeadMany": "あなたは{rank}、{count}人のメンバー"

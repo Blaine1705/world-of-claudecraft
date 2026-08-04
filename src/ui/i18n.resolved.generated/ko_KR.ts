@@ -2352,6 +2352,7 @@ export const ko_KR: EnTranslations = {
       "billboard": {
         "label": "길드 게시판",
         "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "loginLine": "길드 게시판: {text}",
         "setBy": "{name} 설정",
         "save": "저장",
         "placeholder": "길드에 전할 메시지를 작성하세요",
@@ -6807,6 +6808,10 @@ export const ko_KR: EnTranslations = {
         "leader": "길드장",
         "officer": "장교",
         "member": "회원"
+      },
+      "tenure": {
+        "recruit": "신병",
+        "veteran": "베테랑"
       },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",
       "guildHeadMany": "당신은 {rank}, {count}명 회원"

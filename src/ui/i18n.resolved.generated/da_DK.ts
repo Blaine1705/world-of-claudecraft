@@ -2352,6 +2352,7 @@ export const da_DK: EnTranslations = {
       "billboard": {
         "label": "Laugsopslagstavle",
         "empty": "Der er intet på opslagstavlen endnu.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Sat af {name}",
         "save": "Gem",
         "placeholder": "Skriv en besked til lauget",
@@ -6807,6 +6808,10 @@ export const da_DK: EnTranslations = {
         "leader": "Lavsmester",
         "officer": "Officer",
         "member": "Medlem"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "du er {rank}, {count} medlem",
       "guildHeadMany": "du er {rank}, {count} medlemmer"

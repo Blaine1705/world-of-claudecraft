@@ -2352,6 +2352,7 @@ export const en_XA: EnTranslations = {
       "billboard": {
         "label": "[Ĝúíļð Ɓíļļƀóáŕð]",
         "empty": "[Ñóţĥíñĝ óñ ţĥé ƀíļļƀóáŕð ýéţ.]",
+        "loginLine": "[Ĝúíļð ƀíļļƀóáŕð: {text}]",
         "setBy": "[Šéţ ƀý {name}]",
         "save": "[Šáʋé]",
         "placeholder": "[Ŵŕíţé á ɱéššáĝé ƒóŕ ţĥé ĝúíļð]",
@@ -6807,6 +6808,10 @@ export const en_XA: EnTranslations = {
         "leader": "[Ĝúíļð Ɱášţéŕ]",
         "officer": "[Óƒƒíçéŕ]",
         "member": "[Ɱéɱƀéŕ]"
+      },
+      "tenure": {
+        "recruit": "[Ŕéçŕúíţ]",
+        "veteran": "[Ʋéţéŕáñ]"
       },
       "guildHeadOne": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕ]",
       "guildHeadMany": "[ýóú áŕé {rank}, {count} ɱéɱƀéŕš]"

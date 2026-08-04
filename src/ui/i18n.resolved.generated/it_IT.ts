@@ -2352,6 +2352,7 @@ export const it_IT: EnTranslations = {
       "billboard": {
         "label": "Bacheca della Gilda",
         "empty": "Non c'è ancora nulla sulla bacheca.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Impostato da {name}",
         "save": "Salva",
         "placeholder": "Scrivi un messaggio per la gilda",
@@ -6807,6 +6808,10 @@ export const it_IT: EnTranslations = {
         "leader": "Capo gilda",
         "officer": "Ufficiale",
         "member": "Membro"
+      },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
       },
       "guildHeadOne": "sei {rank}, {count} membro",
       "guildHeadMany": "sei {rank}, {count} membri"
