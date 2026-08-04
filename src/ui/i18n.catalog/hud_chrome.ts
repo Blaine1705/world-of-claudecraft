@@ -1852,6 +1852,11 @@ export const hudChromeStrings = {
     // Accessible-name sibling for the authored masterwork seal. Keep the whole
     // phrase in one key so punctuation and status placement remain localizable.
     itemAriaMasterwork: '{item}, quantity {count}, masterwork',
+    // Accessible-name arm of the quest-purpose bag mark (bag_quest_mark_view.ts):
+    // the corner seal is aria-hidden, so the CELL's name carries the quest fact
+    // that the rim/wash/seal show sighted players. Purpose class, not a quality
+    // tier; whole sentence in one key so punctuation stays localizable.
+    itemAriaQuest: '{item}, quantity {count}, quest item',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',

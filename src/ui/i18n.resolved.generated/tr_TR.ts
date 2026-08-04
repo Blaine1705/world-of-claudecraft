@@ -1735,6 +1735,7 @@ export const tr_TR: EnTranslations = {
       "itemAriaEnchanted": "{item}, adet {count}, büyülü kopya",
       "itemAriaBound": "{item}, adet {count}, bağlı kopya",
       "itemAriaMasterwork": "{item}, adet {count}, şaheser",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Çantaları kategoriye göre filtrele",
       "filterAll": "Tümü",
       "filterWeapon": "Silahlar",

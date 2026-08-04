@@ -1735,6 +1735,7 @@ export const ru_RU: EnTranslations = {
       "itemAriaEnchanted": "{item}, количество {count}, зачарованный экземпляр",
       "itemAriaBound": "{item}, количество {count}, привязанный экземпляр",
       "itemAriaMasterwork": "{item}, количество {count}, шедевр",
+      "itemAriaQuest": "{item}, количество {count}, предмет задания",
       "filterGroupAria": "Фильтровать сумки по категории",
       "filterAll": "Все",
       "filterWeapon": "Оружие",

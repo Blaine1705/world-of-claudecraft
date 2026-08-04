@@ -8706,6 +8706,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.makersMark': 'Создатель: {name}',
   'hudChrome.bags.itemAriaInstanced': '{item}, количество {count}, копия с клеймом мастера',
   'hudChrome.bags.itemAriaMasterwork': '{item}, количество {count}, шедевр',
+  'hudChrome.bags.itemAriaQuest': '{item}, количество {count}, предмет задания',
   'hudChrome.crafting.gatheredBy': 'Сборщик: {name}',
   'hudChrome.crafting.masterworkSeal': 'Шедевр',
   'hudChrome.crafting.stationRequired': 'Для изготовления нужно находиться у станции "{station}".',

@@ -1735,6 +1735,7 @@ export const ja_JP: EnTranslations = {
       "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
+      "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",

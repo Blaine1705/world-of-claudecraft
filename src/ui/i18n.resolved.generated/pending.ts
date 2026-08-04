@@ -10,27 +10,33 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "es_ES": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_FR": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "fr_CA": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "de_DE": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
@@ -39,39 +45,48 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "nl_NL": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "pl_PL": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "id_ID": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "tr_TR": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "sv_SE": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "vi_VN": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ],
   "da_DK": [
+    "hudChrome.bags.itemAriaQuest",
     "hudChrome.crafting.dialogOption",
     "hudChrome.crafting.dialogOptionAria"
   ]

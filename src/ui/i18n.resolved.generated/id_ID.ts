@@ -1735,6 +1735,7 @@ export const id_ID: EnTranslations = {
       "itemAriaEnchanted": "{item}, jumlah {count}, salinan dimantrai",
       "itemAriaBound": "{item}, jumlah {count}, salinan terikat",
       "itemAriaMasterwork": "{item}, jumlah {count}, karya master",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Saring tas menurut kategori",
       "filterAll": "Semua",
       "filterWeapon": "Senjata",

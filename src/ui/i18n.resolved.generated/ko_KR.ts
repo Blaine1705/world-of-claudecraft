@@ -1735,6 +1735,7 @@ export const ko_KR: EnTranslations = {
       "itemAriaEnchanted": "{item}, 수량 {count}, 마법부여된 사본",
       "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
+      "itemAriaQuest": "{item}, 수량 {count}, 퀘스트 아이템",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",

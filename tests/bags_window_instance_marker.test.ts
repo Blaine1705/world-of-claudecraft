@@ -252,6 +252,67 @@ describe('bags grid instanced-slot marker', () => {
   });
 });
 
+describe('bags grid quest-purpose mark', () => {
+  it('a quest stack gets bag-quest, the seal, and quest aria; junk does not', () => {
+    const root = windowFor([
+      { itemId: 'boar_hide', count: 1 },
+      { itemId: 'copper_ore', count: 1 },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    expect(cells[0].classList.contains('bag-quest')).toBe(true);
+    expect(cells[1].classList.contains('bag-quest')).toBe(false);
+    const seal = cells[0].querySelector('.bi-quest-seal');
+    expect(seal).not.toBeNull();
+    expect(seal?.getAttribute('aria-hidden')).toBe('true');
+    expect(cells[1].querySelector('.bi-quest-seal')).toBeNull();
+    expect(cells[0].getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 1, quest item');
+    expect(cells[1].getAttribute('aria-label')).toBe('Copper Ore, quantity 1');
+  });
+
+  it('quest seal outranks instance glyphs; masterwork seal outranks quest seal', () => {
+    // Priority pin: masterwork > quest > enchanted. Quest items rarely carry
+    // instance payloads, but the composition must still pick exactly one corner
+    // mark so two treatments never stack. Purpose-class aria always says quest
+    // item even when masterwork wins the corner (policy: purpose outranks copy).
+    const root = windowFor([
+      {
+        itemId: 'boar_hide',
+        count: 1,
+        instance: { enchant: 'enchant_chest_stamina' },
+      },
+      {
+        itemId: 'boar_hide',
+        count: 1,
+        instance: { signer: 'Anna', rolled: { masterwork: true, stats: { sta: 1 } } },
+      },
+    ]);
+    const cells = root.querySelectorAll('button.bag-item');
+    expect(cells.length).toBe(2);
+    // Quest + enchanted: quest seal wins; no bi-glyph-enchanted.
+    expect(cells[0].classList.contains('bag-quest')).toBe(true);
+    expect(cells[0].querySelector('.bi-quest-seal')).not.toBeNull();
+    expect(cells[0].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[0].querySelector('.bi-masterwork-seal')).toBeNull();
+    expect(cells[0].getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 1, quest item');
+    // Quest + masterwork: masterwork seal wins; rim still marks quest.
+    expect(cells[1].classList.contains('bag-quest')).toBe(true);
+    expect(cells[1].querySelector('.bi-masterwork-seal')).not.toBeNull();
+    expect(cells[1].querySelector('.bi-quest-seal')).toBeNull();
+    expect(cells[1].querySelector('.bi-glyph')).toBeNull();
+    expect(cells[1].getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 1, quest item');
+    expect(cells[1].getAttribute('aria-label')).not.toContain('masterwork');
+  });
+
+  it('a counted quest stack keeps its count badge beside the seal', () => {
+    const root = windowFor([{ itemId: 'boar_hide', count: 5 }]);
+    const cell = root.querySelector('button.bag-item');
+    expect(cell?.querySelector('.bi-quest-seal')).not.toBeNull();
+    expect(cell?.querySelector('.bi-count')?.textContent).toContain('5');
+    expect(cell?.getAttribute('aria-label')).toBe('Bristly Boar Hide, quantity 5, quest item');
+  });
+});
+
 describe('marker stylesheet contract (source pins)', () => {
   // jsdom gives import.meta.url an http URL, which readFileSync(new URL(...))
   // rejects (the vendor_window_painter precedent): resolve from __dirname.
@@ -305,5 +366,52 @@ describe('marker stylesheet contract (source pins)', () => {
     // The painter carries no inline color for the glyphs.
     const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
     expect(painter).not.toContain('bi-glyph" style=');
+  });
+
+  it('quest bag treatment is always-on, tokenized, and never an --fx gate', () => {
+    const tokens = readFileSync(join(__dirname, '../src/styles/tokens.css'), 'utf8');
+    expect(tokens).toContain('--color-quest:');
+    expect(tokens).toContain('#ffd12d');
+    // Bag tokens must alias the DESIGN.md --color-quest lineage, not invent a second yellow.
+    expect(tokens).toMatch(/--color-bag-quest-rim:\s*var\(--color-quest\)/);
+    expect(tokens).toMatch(/--color-bag-quest-seal:\s*var\(--color-quest\)/);
+    expect(tokens).toContain('--color-bag-quest-wash:');
+    expect(tokens).toMatch(/--color-bag-quest-wash:[\s\S]*?var\(--color-quest\)/);
+    const commonStart = components.indexOf('.bag-item.q-common');
+    const questCellStart = components.indexOf('.bag-item.bag-quest {');
+    expect(questCellStart).toBeGreaterThan(-1);
+    // Quest rim must follow the common/poor neutral reset so equal-specificity
+    // !important border-color wins for purpose gold.
+    expect(commonStart).toBeGreaterThan(-1);
+    expect(questCellStart).toBeGreaterThan(commonStart);
+    const questCellBlock = components.slice(
+      questCellStart,
+      components.indexOf('}', questCellStart),
+    );
+    expect(questCellBlock).toContain('border-color:');
+    expect(questCellBlock).toContain('!important');
+    expect(questCellBlock).toContain('box-shadow:');
+    expect(questCellBlock).toContain('var(--color-bag-quest-rim)');
+    expect(questCellBlock).toContain('var(--color-bag-quest-wash)');
+    expect(questCellBlock).not.toContain('--fx-');
+    expect(components).not.toContain('.bag-item:hover .bi-quest-seal');
+    const questSealStart = components.indexOf('.bag-item .bi-quest-seal {');
+    expect(questSealStart).toBeGreaterThan(-1);
+    const questSealBlock = components.slice(
+      questSealStart,
+      components.indexOf('}', questSealStart),
+    );
+    expect(questSealBlock).toContain('position: absolute');
+    expect(questSealBlock).toContain('top: 1px');
+    expect(questSealBlock).toContain('left: 1px');
+    expect(questSealBlock).toContain('var(--color-bag-quest-seal)');
+    expect(questSealBlock).not.toContain('--fx-');
+    // Painter paints classes only; no raw quest hex in bags_window.
+    const painter = readFileSync(join(__dirname, '../src/ui/bags_window.ts'), 'utf8');
+    expect(painter).not.toContain('#ffd12d');
+    expect(painter).not.toContain('#ffd100');
+    expect(painter).toContain('bag-quest');
+    expect(painter).toContain('bi-quest-seal');
+    expect(painter).toContain('bagQuestMarkKind');
   });
 });

@@ -1735,6 +1735,7 @@ export const it_IT: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantita {count}, copia incantata",
       "itemAriaBound": "{item}, quantita {count}, copia vincolata",
       "itemAriaMasterwork": "{item}, quantita {count}, capolavoro",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filtra le borse per categoria",
       "filterAll": "Tutti",
       "filterWeapon": "Armi",

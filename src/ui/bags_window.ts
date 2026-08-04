@@ -35,6 +35,7 @@ import {
 } from './bag_filter';
 import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
+import { bagQuestMarkKind } from './bag_quest_mark_view';
 import {
   type BagDestroyAction,
   type BagMode,
@@ -108,6 +109,8 @@ const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconN
 // three visual kinds must not collapse back into one label. 'signed' and the
 // unclassified 'generic' both keep the pre-existing maker-marked wording, which
 // is accurate for a signer payload and is the status quo for the rest.
+// Quest stacks use itemAriaQuest instead (purpose class outranks copy flags for
+// the spoken name; the rim/wash always marks them as quest for sighted players).
 const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> = {
   masterwork: 'hudChrome.bags.itemAriaMasterwork',
   enchanted: 'hudChrome.bags.itemAriaEnchanted',
@@ -682,7 +685,10 @@ export class BagsWindow {
     {
       const row = document.createElement('button');
       row.type = 'button';
-      row.className = `bag-item q-${bagQualityKey(item)}`;
+      // Quest-purpose mark (bag_quest_mark_view.ts): kind===quest gets the
+      // .bag-quest rim/wash class. Purpose class, not a quality tier.
+      const questMark = bagQuestMarkKind(item);
+      row.className = `bag-item q-${bagQualityKey(item)}${questMark ? ' bag-quest' : ''}`;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
@@ -700,16 +706,21 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
-      // The single corner-glyph decision for this stack (bag_instance_glyph_view.ts
-      // owns the priority: masterwork, then enchanted, signed, bound, generic).
+      // Corner-glyph priority (composed from bag_instance_glyph_view +
+      // bag_quest_mark_view): masterwork > quest seal > enchanted / signed /
+      // bound > generic wedge. Rim/wash for quest is independent of the seal.
       const glyphKind = bagInstanceGlyphKind(s.instance);
       const isMasterwork = glyphKind === 'masterwork';
+      const showQuestSeal = questMark !== null && !isMasterwork;
       row.style.setProperty('--bag-slot-quality', qColor);
-      // An instanced stack's accessible name carries the per-copy flag the
-      // aria-hidden corner glyph shows sighted players (the review's a11y arm),
-      // now per KIND so the two channels agree; plain stacks keep the plain
-      // label.
-      const itemAriaKey = glyphKind ? BAG_GLYPH_ARIA_KEYS[glyphKind] : 'itemUi.bags.itemAria';
+      // Accessible name: quest stacks always announce quest item (the seal is
+      // aria-hidden). Non-quest instanced stacks keep their per-copy flag.
+      // Plain stacks keep the plain label.
+      const itemAriaKey = questMark
+        ? 'hudChrome.bags.itemAriaQuest'
+        : glyphKind
+          ? BAG_GLYPH_ARIA_KEYS[glyphKind]
+          : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
@@ -717,24 +728,25 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // The instanced-slot corner marker (Professions 2.0): one glyph per
-      // stack, naming WHICH kind of special copy it is. A masterwork keeps the
-      // authored seal exactly as before; enchanted / signed / bound each get
-      // their own procedural glyph (no new binary asset); an instanced payload
-      // matching none of them keeps the pre-existing generic tab, so no copy
-      // silently loses its marker. Exactly one treatment ever renders, it
-      // composes with the bottom-right count badge, and it stays visible
-      // without hover on desktop and touch, identical on every graphics preset.
-      const instanceMark =
-        glyphKind === 'generic'
-          ? '<span class="bi-instance" aria-hidden="true"></span>'
-          : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
-            ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
-            : '';
+      // Exactly one corner treatment ever renders: masterwork seal, quest seal,
+      // or an instance glyph/tab. Composes with the bottom-right count badge,
+      // always visible without hover on desktop and touch, identical on every
+      // graphics preset (no --fx gate).
       const masterworkSeal = isMasterwork
         ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
         : '';
-      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      const questSeal = showQuestSeal
+        ? `<span class="bi-quest-seal" aria-hidden="true">${svgIcon('questlog')}</span>`
+        : '';
+      const instanceMark =
+        !isMasterwork && !showQuestSeal
+          ? glyphKind === 'generic'
+            ? '<span class="bi-instance" aria-hidden="true"></span>'
+            : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
+              ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
+              : ''
+          : '';
+      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       row.addEventListener('click', (ev) => {
         // On touch, the click that ends a long-press peek inspects the stack (its
         // tooltip is already shown) instead of running its action (use / sell /

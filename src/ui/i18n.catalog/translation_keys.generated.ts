@@ -6288,6 +6288,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.bags.itemAriaEnchanted'
   | 'hudChrome.bags.itemAriaInstanced'
   | 'hudChrome.bags.itemAriaMasterwork'
+  | 'hudChrome.bags.itemAriaQuest'
   | 'hudChrome.bags.noMatch'
   | 'hudChrome.bags.reorderNeedsRecent'
   | 'hudChrome.bags.rightClickDestroy'

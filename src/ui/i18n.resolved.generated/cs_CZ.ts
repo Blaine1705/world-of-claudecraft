@@ -1735,6 +1735,7 @@ export const cs_CZ: EnTranslations = {
       "itemAriaEnchanted": "{item}, množství {count}, okouzlená kopie",
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",

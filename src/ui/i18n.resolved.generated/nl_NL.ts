@@ -1735,6 +1735,7 @@ export const nl_NL: EnTranslations = {
       "itemAriaEnchanted": "{item}, aantal {count}, betoverd exemplaar",
       "itemAriaBound": "{item}, aantal {count}, gebonden exemplaar",
       "itemAriaMasterwork": "{item}, hoeveelheid {count}, meesterwerk",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Tassen filteren op categorie",
       "filterAll": "Alle",
       "filterWeapon": "Wapens",

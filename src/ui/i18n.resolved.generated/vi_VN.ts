@@ -1735,6 +1735,7 @@ export const vi_VN: EnTranslations = {
       "itemAriaEnchanted": "{item}, số lượng {count}, bản đã pháp khắc",
       "itemAriaBound": "{item}, số lượng {count}, bản sao ràng buộc",
       "itemAriaMasterwork": "{item}, số lượng {count}, kiệt tác",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Lọc túi đồ theo danh mục",
       "filterAll": "Tất cả",
       "filterWeapon": "Vũ khí",

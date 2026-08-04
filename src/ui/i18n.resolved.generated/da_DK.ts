@@ -1735,6 +1735,7 @@ export const da_DK: EnTranslations = {
       "itemAriaEnchanted": "{item}, antal {count}, fortryllet kopi",
       "itemAriaBound": "{item}, antal {count}, bundet kopi",
       "itemAriaMasterwork": "{item}, antal {count}, mesterværk",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filtrér tasker efter kategori",
       "filterAll": "Alle",
       "filterWeapon": "Våben",

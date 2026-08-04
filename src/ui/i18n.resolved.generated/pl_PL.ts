@@ -1735,6 +1735,7 @@ export const pl_PL: EnTranslations = {
       "itemAriaEnchanted": "{item}, ilość {count}, zaklęta kopia",
       "itemAriaBound": "{item}, ilość {count}, związana kopia",
       "itemAriaMasterwork": "{item}, ilość {count}, arcydzieło",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filtruj torby według kategorii",
       "filterAll": "Wszystko",
       "filterWeapon": "Bronie",

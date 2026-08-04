@@ -8571,6 +8571,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.makersMark': '製作者：{name}',
   'hudChrome.bags.itemAriaInstanced': '{item}、数量 {count}、銘入りの品',
   'hudChrome.bags.itemAriaMasterwork': '{item}、数量 {count}、傑作',
+  'hudChrome.bags.itemAriaQuest': '{item}、数量 {count}、クエストアイテム',
   'hudChrome.crafting.gatheredBy': '採集者：{name}',
   'hudChrome.crafting.masterworkSeal': '傑作',
   'hudChrome.crafting.stationRequired': 'それを製作するには{station}にいる必要があります。',

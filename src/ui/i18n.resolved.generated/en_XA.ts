@@ -1735,6 +1735,7 @@ export const en_XA: EnTranslations = {
       "itemAriaEnchanted": "[{item}, ɋúáñţíţý {count}, éñçĥáñţéð çóþý]",
       "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
+      "itemAriaQuest": "[{item}, ɋúáñţíţý {count}, ɋúéšţ íţéɱ]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",

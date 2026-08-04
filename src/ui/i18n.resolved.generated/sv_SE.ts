@@ -1735,6 +1735,7 @@ export const sv_SE: EnTranslations = {
       "itemAriaEnchanted": "{item}, antal {count}, förtrollad kopia",
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",
