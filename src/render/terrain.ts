@@ -687,6 +687,15 @@ function buildSplatMaterial(
         float wocCamDist = length(pRay);`
             : 'float wocCamDist = length(cameraPosition - vWPos);'
         }
+        // Detail-distance fade: the fine grain (grass octave jitter, the mid
+        // octave, the hue drift, and every per-layer detail-normal tap) is
+        // sub-pixel past ~60yd, where mips have already averaged the maps to
+        // their DC. Each gated effect multiplies by this fade so it reaches
+        // exactly zero BEFORE its taps stop being sampled: the skip is
+        // seam-free by construction and the far field drops around a dozen
+        // texture taps per fragment.
+        float wocDetailFade = 1.0 - smoothstep(46.0, 62.0, wocCamDist);
+        bool wocNearDetail = wocDetailFade > 0.001;
         ${
           // upW feeds both the parallax fade and the cavity slope fade; emit
           // it once whenever any relief level is active.
@@ -834,15 +843,17 @@ function buildSplatMaterial(
           // ?talbedo=off is the dev perf-attribution kill switch.
           richTerrainSplat()
             ? `vec2 grassJitter = vec2(0.0);
-        if ( wocHasGrass ) {
+        if ( wocHasGrass && wocNearDetail ) {
           // Per-octave scale jitter: a slow (~36yd) two-channel drift field
         // nudges each octave's sample position a different amount and sign,
         // so the tilings slide against each other across the map and their
         // repeats never line up into one fixed cadence. The warp gradient is
         // tiny (well under a yard of drift over ~36yd) so nothing smears.
+        // Faded with distance (wocDetailFade) so the far tap-skip cannot seam.
           grassJitter = (vec2(
             texture2D(uMacro, vWPos.xz * 0.028 + 0.07).r,
-            texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5) * WOC_GRASS_SCALE_JITTER;
+            texture2D(uMacro, vWPos.xz * 0.028 + 0.63).r) - 0.5)
+            * (WOC_GRASS_SCALE_JITTER * wocDetailFade);
         }
         // Combed growth direction: the finest grass detail samples through a
         // locally-rotating ANISOTROPIC transform (comb frame: compressed
@@ -873,16 +884,21 @@ function buildSplatMaterial(
         // sin 0.3907 folded into the constants), with its own seed offset so
         // it shares no phase with either neighbour. Variety without
         // amplitude: a third uncorrelated voice against the pair's residual
-        // shared repeat, too faint to form patches of its own.
-        vec2 grassUvMid = vec2(tuv.x * 0.525 - tuv.y * 0.223, tuv.x * 0.223 + tuv.y * 0.525);
-        grassAlb = mix(grassAlb,
-          texture2D(uGrass, grassUvMid + vec2(0.41, 0.87) + grassJitter * 0.8).rgb,
-          WOC_GRASS_MID_OCTAVE);
+        // shared repeat, too faint to form patches of its own. Mid octave and
+        // hue drift both fade with wocDetailFade, so skipping their taps in
+        // the far field changes nothing at the boundary.
+        if ( wocNearDetail ) {
+          vec2 grassUvMid = vec2(tuv.x * 0.525 - tuv.y * 0.223, tuv.x * 0.223 + tuv.y * 0.525);
+          grassAlb = mix(grassAlb,
+            texture2D(uGrass, grassUvMid + vec2(0.41, 0.87) + grassJitter * 0.8).rgb,
+            WOC_GRASS_MID_OCTAVE * wocDetailFade);
         // ~42yd hue rotation: meadows drift a few percent between warm
         // yellow-green and cool blue-green. Value-neutral endpoints, so it
         // adds randomness you feel across a field without a patch to point at.
           float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-          grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
+          grassAlb *= mix(vec3(1.0),
+            mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT), wocDetailFade);
+        }
         }`
             : `// No-relief tiers: the plain two-octave anti-tiling mix (the
         // 90-degree-rotated coarse octave still kills the shared repeat).
@@ -1168,19 +1184,22 @@ function buildSplatMaterial(
         // space; the chain rule scales the along-comb slope by the
         // compression, which IS the combed look: smooth along the growth
         // direction, ridged across it.
+        // Every per-layer detail-normal tap is gated on wocNearDetail: past
+        // the fade band the maps have mipped to flat and detN is multiplied
+        // to zero below, so the far field skips the whole tap set for free.
         vec2 gNxy = vec2(0.0);
-        if ( wocHasGrass ) {
+        if ( wocHasGrass && wocNearDetail ) {
           vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
           gNxy = gN.x * WOC_COMB_COMPRESS * combDir + gN.y * combPerp;
         }
         vec3 dN = vec3(0.0);
-        if ( wocHasDirt )
+        if ( wocHasDirt && wocNearDetail )
           dN = texture2D(uDirtN, tuv * 0.55).xyz * 2.0 - 1.0;
         vec3 rN = vec3(0.0);
-        if ( wocHasRock )
+        if ( wocHasRock && wocNearDetail )
           rN = texture2D(uRockN, tuv * 0.6).xyz * 2.0 - 1.0;
         vec3 sN = vec3(0.0);
-        if ( wocHasSand )
+        if ( wocHasSand && wocNearDetail )
           sN = texture2D(uSandN, tuv).xyz * 2.0 - 1.0;
         ${
           richTerrainSplat()
@@ -1190,13 +1209,13 @@ function buildSplatMaterial(
         // source map is indistinguishable once summed into a layer's normal:
         // the hard layers share the crisp tap, the soft layers the gentle one.
         vec2 fineHard = vec2(0.0);
-        if ( wocHasDirt || wocHasRock )
+        if ( (wocHasDirt || wocHasRock) && wocNearDetail )
           fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;
         // The fine-soft grain is combed like the blade normal (the 3x tiling
         // was the single loudest dot-scale voice): elongated micro-grain for
         // grass, and on sand it reads as wind-swept ripple rather than dots.
         vec2 fineSoft = vec2(0.0);
-        if ( wocHasGrass || wocHasSand ) {
+        if ( (wocHasGrass || wocHasSand) && wocNearDetail ) {
           vec2 fineSoftRaw = texture2D(uGrassN, combT * 3.0).xy * 2.0 - 1.0;
           fineSoft = fineSoftRaw.x * WOC_COMB_COMPRESS * combDir + fineSoftRaw.y * combPerp;
         }
@@ -1204,7 +1223,7 @@ function buildSplatMaterial(
         // path shows is lit rather than painted (gravelW already fades it
         // with the marsh mud swap)
         vec2 gvN = vec2(0.0);
-        if ( wocHasDirt )
+        if ( wocHasDirt && wocNearDetail )
           gvN = texture2D(uRockN, tuv * 1.8).xy * 2.0 - 1.0;`
             : `// Simple-splat tiers: base-scale detail normals only (the
         // merge-base budget); the fine octaves fold to zero and every term
@@ -1231,6 +1250,10 @@ function buildSplatMaterial(
         // into vertical streaks there; fade them out by slope and let the
         // wall projection below own the cliff relief.
         detN *= smoothstep(0.5, 0.82, vWNorm.y);
+        // ...and by distance, reaching exactly zero before the tap skip above
+        // engages (the wall projection below stays ungated: its features are
+        // yards wide and carry distant cliff relief).
+        detN *= wocDetailFade;
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the

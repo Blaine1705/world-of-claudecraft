@@ -40,7 +40,6 @@ import { meshTerrainHeight } from './terrain_mesh_height';
 import { BIOME_PALETTE, ROCK_SLOPE_START, TERRAIN_TONES } from './terrain_palette';
 
 const SKIRT_DROP = 0.3;
-const SLOPE_EPS = 1.5; // matches the legacy color pass so tints don't shift
 // Three-quad tiles keep a compact working set across both diagonal choices.
 // The old full-row walk evicted one grid row before the next quad could reuse
 // it on the 25-52-quad chunk widths.
@@ -182,16 +181,45 @@ export function groundLushnessAt(x: number, z: number, seed: number): number {
   return fbm2(x * 0.045, z * 0.045, seed + 53, 3);
 }
 
-function sampleVertex(x: number, z: number, seed: number, lowShade: boolean): VertexSample {
-  const h = meshTerrainHeight(x, z, seed);
-  const hx = meshTerrainHeight(x + SLOPE_EPS, z, seed) - meshTerrainHeight(x - SLOPE_EPS, z, seed);
-  const hz = meshTerrainHeight(x, z + SLOPE_EPS, seed) - meshTerrainHeight(x, z - SLOPE_EPS, seed);
-  const slope = Math.sqrt(hx * hx + hz * hz) / (2 * SLOPE_EPS);
-  const invLen = 1 / Math.hypot(hx / (2 * SLOPE_EPS), 1, hz / (2 * SLOPE_EPS));
+// The height lattice a chunk's vertex samples share. The old sampler paid
+// FIVE meshTerrainHeight taps per vertex (the vertex plus a four-tap
+// central-difference stencil at a fixed 1.5yd epsilon); adjacent vertices
+// never shared their stencil taps, so a chunk resampled the heightfield
+// almost fivefold. The lattice computes each height ONCE on the vertex grid
+// plus a one-cell margin ring, and normals difference the neighboring
+// lattice heights instead (epsilon = the chunk's own vertex spacing): about
+// 4.6x fewer heightfield evaluations per chunk, which is what pays for the
+// natural-relief field being richer per sample.
+function ensureHeightRow(state: ChunkGeometryBuildState, hcj: number): void {
+  if (state.heightRowDone[hcj]) return;
+  state.heightRowDone[hcj] = 1;
+  const { nx, x0, z0, stepX, stepZ, seed } = state;
+  const hw = nx + 3;
+  const z = z0 + (hcj - 1) * stepZ;
+  const rowStart = hcj * hw;
+  for (let hci = 0; hci < hw; hci++) {
+    state.heights[rowStart + hci] = meshTerrainHeight(x0 + (hci - 1) * stepX, z, seed);
+  }
+}
+
+function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): VertexSample {
+  const { nx, x0, z0, stepX, stepZ, seed, lowShade } = state;
+  const x = x0 + ci * stepX;
+  const z = z0 + cj * stepZ;
+  const hw = nx + 3;
+  ensureHeightRow(state, cj);
+  ensureHeightRow(state, cj + 1);
+  ensureHeightRow(state, cj + 2);
+  const hAt = (i: number, j: number): number => state.heights[(j + 1) * hw + (i + 1)];
+  const h = hAt(ci, cj);
+  const hx = hAt(ci + 1, cj) - hAt(ci - 1, cj);
+  const hz = hAt(ci, cj + 1) - hAt(ci, cj - 1);
+  const slope = Math.hypot(hx / (2 * stepX), hz / (2 * stepZ));
+  const invLen = 1 / Math.hypot(hx / (2 * stepX), 1, hz / (2 * stepZ));
   const normal: [number, number, number] = [
-    -(hx / (2 * SLOPE_EPS)) * invLen,
+    -(hx / (2 * stepX)) * invLen,
     invLen,
-    -(hz / (2 * SLOPE_EPS)) * invLen,
+    -(hz / (2 * stepZ)) * invLen,
   ];
 
   paletteAt(x, z);
@@ -424,6 +452,11 @@ export interface ChunkGeometryBuildState extends ChunkGeometryArrays {
    *  document/navigator, so a worker would resolve a different tier. */
   lowShade: boolean;
   sampleCache: Map<number, VertexSample>;
+  /** The shared height lattice: (nx+3) x (nz+3) heights covering the vertex
+   *  grid plus a one-cell margin ring for the normal stencil, each height
+   *  computed once (see ensureHeightRow). */
+  heights: Float32Array;
+  heightRowDone: Uint8Array;
 }
 
 export function beginChunkGeometry(
@@ -480,11 +513,13 @@ export function beginChunkGeometry(
     extras,
     indices,
     sampleCache: new Map<number, VertexSample>(),
+    heights: new Float32Array((nx + 3) * (nz + 3)),
+    heightRowDone: new Uint8Array(nz + 3),
   };
 }
 
 export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): void {
-  const { nx, nz, gw, x0, z0, stepX, stepZ, seed, skirtSpan, worldDepth, lowShade } = state;
+  const { nx, nz, gw, x0, z0, stepX, stepZ, skirtSpan, worldDepth } = state;
   for (let gi = 0; gi < gw; gi++) {
     const i = gi - 1,
       j = gj - 1; // interior indices; -1 / n+1 are skirt
@@ -497,7 +532,7 @@ export function fillChunkVertexRow(state: ChunkGeometryBuildState, gj: number): 
     const cacheKey = cj * gw + ci;
     let s = state.sampleCache.get(cacheKey);
     if (!s) {
-      s = sampleVertex(x, z, seed, lowShade);
+      s = sampleVertex(state, ci, cj);
       state.sampleCache.set(cacheKey, s);
     }
     const vi = gj * gw + gi;
