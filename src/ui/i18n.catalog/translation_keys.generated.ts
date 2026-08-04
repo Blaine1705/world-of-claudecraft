@@ -7194,6 +7194,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.finder.lootMaybe'
   | 'hudChrome.finder.mech.deathless_rage'
   | 'hudChrome.finder.mech.deathstalker_cleave'
+  | 'hudChrome.finder.mech.dread_curse'
   | 'hudChrome.finder.mech.enrage'
   | 'hudChrome.finder.mech.grave_cleaver'
   | 'hudChrome.finder.mech.grave_inferno'

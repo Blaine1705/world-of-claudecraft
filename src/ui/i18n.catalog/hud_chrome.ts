@@ -3848,6 +3848,7 @@ export const hudChromeStrings = {
       soul_rend: 'Soul Rend (marked players must spread and be healed)',
       deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
       wardstones: 'Wardstone channels (phase transition)',
+      dread_curse: 'Dread Curse (heroic only, stacking tank-swap debuff)',
     },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,
