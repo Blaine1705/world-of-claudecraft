@@ -1898,6 +1898,7 @@ export class Hud {
       openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
+      openCrafting: (craftId) => this.openCrafting(craftId),
       openMarket: () => this.openMarket(),
       openDelveBoard: (npcId) => this.openDelveBoard(npcId),
       openValeCup: () => this.toggleValeCup(),
@@ -13748,9 +13749,21 @@ export class Hud {
     this.openCrafting();
   }
 
-  openCrafting(): void {
+  // `craftId` (the gossip dialog's Crafting shortcut on a station master)
+  // pre-selects that craft's tab exactly like a tab click would: same field,
+  // same persistence, same fresh-tab scroll reset. resolveSelectedCraft still
+  // guards a craft the viewer has no tab for (falls back to the first tab).
+  openCrafting(craftId?: string): void {
+    if (craftId !== undefined && craftId !== this.selectedCraftTab) {
+      this.selectedCraftTab = craftId;
+      this.persistCraftingTab();
+    }
     this.closeOtherWindows('#crafting-window');
     this.renderCrafting();
+    if (craftId !== undefined) {
+      const scroller = $('#crafting-window').querySelector('.crafting-body');
+      if (scroller) scroller.scrollTop = 0;
+    }
   }
 
   private renderCrafting(): void {

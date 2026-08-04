@@ -2590,6 +2590,8 @@ export const id_ID: EnTranslations = {
     "crafting": {
       "title": "kerajinan",
       "close": "Tutup kerajinan",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window to {craft}",
       "craft": "Keahlian",
       "reagentsNeeded": "Memerlukan:",
       "reagentLine": "{name}: {have}/{required}",

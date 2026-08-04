@@ -2590,6 +2590,8 @@ export const nl_NL: EnTranslations = {
     "crafting": {
       "title": "Knutselen",
       "close": "Sluit het maken",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window to {craft}",
       "craft": "Ambacht",
       "reagentsNeeded": "Vereist:",
       "reagentLine": "{name}: {have}/{required}",

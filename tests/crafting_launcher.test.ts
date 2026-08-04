@@ -95,6 +95,18 @@ describe('shared behavior across all screen sizes', () => {
   });
 });
 
+describe('gossip Crafting shortcut launcher (station masters)', () => {
+  it('routes the quest dialog dep into openCrafting and pre-selects the tab like a tab click', () => {
+    expect(hud).toContain('openCrafting: (craftId) => this.openCrafting(craftId),');
+    expect(hud).toContain('openCrafting(craftId?: string): void {');
+    // The pre-select is the tab-click contract (same field, same persistence,
+    // then the repaint), so the shortcut can never drift from onSelectCraft.
+    expect(hud).toMatch(
+      /openCrafting\(craftId\?: string\): void \{[\s\S]*?this\.selectedCraftTab = craftId;\s*this\.persistCraftingTab\(\);[\s\S]*?this\.renderCrafting\(\);/,
+    );
+  });
+});
+
 describe('side rail height budget', () => {
   // #side-buttons is bottom-anchored and grows upward. It used to be one long
   // column (#side-buttons stacked all launchers directly), which forced a

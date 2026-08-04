@@ -2590,6 +2590,8 @@ export const en: EnTranslations = {
     "crafting": {
       "title": "Crafting",
       "close": "Close crafting",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window to {craft}",
       "craft": "Craft",
       "reagentsNeeded": "Requires:",
       "reagentLine": "{name} x{have}/{required}",

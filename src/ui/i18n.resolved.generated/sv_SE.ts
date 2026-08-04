@@ -2590,6 +2590,8 @@ export const sv_SE: EnTranslations = {
     "crafting": {
       "title": "Hantverk",
       "close": "Nära hantverk",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window to {craft}",
       "craft": "Hantverk",
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
