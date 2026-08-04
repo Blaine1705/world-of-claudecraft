@@ -1342,6 +1342,8 @@ export const it_IT: EnTranslations = {
       "buttons": "Disposizione dei pulsanti",
       "resetButtons": "Ripristina disposizione dei pulsanti",
       "menuAction": "Menu di gioco",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Lo stick sinistro muove, quello destro orienta la telecamera. Apri una finestra per usare il puntatore a schermo."
     },
     "perf": {

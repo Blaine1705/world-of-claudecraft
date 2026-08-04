@@ -1342,6 +1342,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {

@@ -1342,6 +1342,8 @@ export const pt_BR: EnTranslations = {
       "buttons": "Disposição dos Botões",
       "resetButtons": "Redefinir Disposição dos Botões",
       "menuAction": "Menu do Jogo",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "O analógico esquerdo move, o direito controla a câmera. Abra uma janela para usar o ponteiro na tela."
     },
     "perf": {

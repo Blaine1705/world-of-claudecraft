@@ -1342,6 +1342,8 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren."
     },
     "perf": {

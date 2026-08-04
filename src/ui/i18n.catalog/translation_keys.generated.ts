@@ -6624,6 +6624,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.controller.resetButtons'
   | 'hudChrome.controller.title'
   | 'hudChrome.controller.vibration'
+  | 'hudChrome.controller.zoomIn'
+  | 'hudChrome.controller.zoomOut'
   | 'hudChrome.corpseHarvest.alreadyHarvested'
   | 'hudChrome.corpseHarvest.componentAria'
   | 'hudChrome.corpseHarvest.componentAriaNoYield'
