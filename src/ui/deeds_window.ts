@@ -136,8 +136,14 @@ export class DeedsWindow {
   // This session's non-retro unlock ids in drain order (the HUD's noteUnlocks
   // feed), bounded to DEEDS_RECENT_CAP: the freshest recency signal.
   private sessionUnlocks: string[] = [];
-  // One-shot: the deed to spotlight (scroll + flash) after the next paint.
+  // One-shot: the deed to spotlight (scroll + focus) after the next paint.
   private focusDeedId: string | null = null;
+  // Sticky flash target: a cold open always fires fetchRecent (and sometimes
+  // fetchRarity), whose in-place re-render would strip .deed-card-flash before
+  // the first paint. The id is re-attached only when reattachFlash is set by
+  // those fetch arms, never by a user-driven repaint (filter/search/slow band).
+  private flashDeedId: string | null = null;
+  private reattachFlash = false;
 
   constructor(private readonly deps: DeedsWindowDeps) {}
 
@@ -167,10 +173,19 @@ export class DeedsWindow {
     this.fetchRecent();
     this.render();
     this.deps.root().style.display = 'flex';
-    // Move keyboard focus into the freshly opened window (onto the close button),
-    // matching the sibling cold windows, so a keyboard user is not stranded on the
-    // opener while the focus trap is active.
-    (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    // A jump-to-deed open already put the reading position on the landed card
+    // (and may have scrolled under display:none). Prefer that card over the
+    // sibling-window Close park: re-scroll now that the root is visible, and
+    // do not steal focus the jump promised. Plain opens still land on Close.
+    const flashed = this.deps.root().querySelector<HTMLElement>('.deed-card-flash');
+    if (flashed) {
+      if (typeof flashed.scrollIntoView === 'function') {
+        flashed.scrollIntoView({ block: 'center' });
+      }
+      flashed.focus({ preventScroll: true });
+    } else {
+      (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+    }
     audio.click();
   }
 
@@ -186,6 +201,8 @@ export class DeedsWindow {
       .then((rarity) => {
         if (seq !== this.rarityFetchSeq || !this.opened || rarity === null) return;
         this.rarity = rarity;
+        // Fetch-driven rebuild: re-attach a live jump flash (see flashDeedId).
+        this.reattachFlash = true;
         this.render();
       })
       .catch(() => {
@@ -207,6 +224,10 @@ export class DeedsWindow {
       .then((order) => {
         if (seq !== this.recentFetchSeq || !this.opened || order === null) return;
         this.recentOrder = order;
+        // Fetch-driven rebuild: re-attach a live jump flash (see flashDeedId).
+        // Offline this lands on a microtask and would otherwise strip the
+        // spotlight before the first paint on a cold openWithDeed.
+        this.reattachFlash = true;
         this.render();
       })
       .catch(() => {
@@ -243,6 +264,8 @@ export class DeedsWindow {
       this.filter = 'all';
       this.search = '';
       this.focusDeedId = deedId;
+      // Sticky across the open-time recent/rarity fetch re-render.
+      this.flashDeedId = deedId;
     }
     if (!this.opened) {
       this.open();
@@ -256,6 +279,8 @@ export class DeedsWindow {
     const el = this.deps.root();
     el.style.display = 'none';
     this.opened = false;
+    this.flashDeedId = null;
+    this.reattachFlash = false;
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -344,11 +369,21 @@ export class DeedsWindow {
       const fresh = refocusSel === null ? null : el.querySelector<HTMLElement>(refocusSel);
       (fresh ?? (el.querySelector('[data-close]') as HTMLElement | null))?.focus();
     }
-    if (model.focusDeedId !== null) this.spotlightCard(el, model.focusDeedId);
+    // Jump spotlight: full focus+scroll on the one-shot arm; flash-only reattach
+    // after a fetch-driven rebuild (focus restored because innerHTML orphaned
+    // the previous card, but no re-scroll so a player who nudged the list keeps
+    // their place).
+    if (model.focusDeedId !== null) {
+      this.spotlightCard(el, model.focusDeedId, { focus: true, scroll: true });
+      this.flashDeedId = model.focusDeedId;
+    } else if (this.reattachFlash && this.flashDeedId !== null) {
+      this.spotlightCard(el, this.flashDeedId, { focus: true, scroll: false });
+    }
     // One-shot regardless of the echo: an id the core could not echo (content
     // drift between paints) must not stay latched and scroll at some
     // arbitrary later render.
     this.focusDeedId = null;
+    this.reattachFlash = false;
     // Latch the painted state's signature so the next slow-band tick elides:
     // without this, open() (lastSig = '') and every jump-driven render would
     // be rebuilt within 500ms, wiping the spotlight and, under
@@ -356,21 +391,25 @@ export class DeedsWindow {
     this.lastSig = this.currentSig();
   }
 
-  /** One-shot spotlight after a paint that carried focusDeedId: move the
-   *  reading position onto the card (the jump button promised a navigation,
-   *  so focus must follow, not just the viewport), scroll it into view, and
-   *  flash it (a pure CSS animation, so the cold window gains no timer;
-   *  reduced-motion swaps in a static ring). The selector escape is the
-   *  refocusSelector rule (quote+backslash; CSS.escape is absent in the
-   *  jsdom test env). */
-  private spotlightCard(el: HTMLElement, deedId: string): void {
+  /** Spotlight a deed card after paint: flash class always; focus and scroll
+   *  are opt-in so a fetch reattach can keep the gold ring without yanking the
+   *  scroll offset. Pure CSS animation (no timer); reduced-motion swaps in a
+   *  static ring. The selector escape is the refocusSelector rule
+   *  (quote+backslash; CSS.escape is absent in the jsdom test env). */
+  private spotlightCard(
+    el: HTMLElement,
+    deedId: string,
+    opts: { focus: boolean; scroll: boolean },
+  ): void {
     const cssValue = deedId.replace(/["\\]/g, '\\$&');
     const card = el.querySelector<HTMLElement>(`.deed-card[data-deed="${cssValue}"]`);
     if (!card) return;
     card.tabIndex = -1;
-    card.focus({ preventScroll: true });
+    if (opts.focus) card.focus({ preventScroll: true });
     // Guarded: jsdom (the focus/behavior test env) ships no scrollIntoView.
-    if (typeof card.scrollIntoView === 'function') card.scrollIntoView({ block: 'center' });
+    if (opts.scroll && typeof card.scrollIntoView === 'function') {
+      card.scrollIntoView({ block: 'center' });
+    }
     card.classList.add('deed-card-flash');
   }
 

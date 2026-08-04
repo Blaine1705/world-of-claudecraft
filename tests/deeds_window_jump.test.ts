@@ -127,6 +127,18 @@ describe('openWithDeed: the chat-link landing', () => {
     expect(document.activeElement).toBe(card);
   });
 
+  it('a cold open leaves reading position on the landed card, not Close', () => {
+    // open() parks on Close for a plain open; a jump must not let that park
+    // steal the focus the navigation promised (the closed-Book chat-link path).
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    const { w, el } = makeWindow(state, false);
+    w.openWithDeed('prog_first_steps');
+    const card = el.querySelector('.deed-card[data-deed="prog_first_steps"]') as HTMLElement;
+    expect(document.activeElement).toBe(card);
+    expect(el.querySelector('[data-close]')).not.toBe(document.activeElement);
+  });
+
   it('scrolls the landed card into view once, centered', () => {
     const spy = vi.fn();
     (Element.prototype as unknown as { scrollIntoView: unknown }).scrollIntoView = spy;
@@ -135,11 +147,34 @@ describe('openWithDeed: the chat-link landing', () => {
       state.deedsEarned.set('prog_first_steps', '2026-07-01');
       const { w } = makeWindow(state, false);
       w.openWithDeed('prog_first_steps');
-      expect(spy).toHaveBeenCalledTimes(1);
+      // Once under display:none during render, once after open() sets flex so
+      // the scroll is reliable against a visible root.
+      expect(spy).toHaveBeenCalledTimes(2);
       expect(spy).toHaveBeenCalledWith({ block: 'center' });
     } finally {
       Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
     }
+  });
+
+  it('the spotlight survives the recent-order fetch repaint after a cold open', async () => {
+    // Cold open always starts fetchRecent; offline (and a fast online reply)
+    // resolves on a microtask and re-renders. Without a sticky flash that
+    // rebuild strips .deed-card-flash before the first paint, so the gold
+    // ring (and the reduced-motion static ring) never shows on the main
+    // closed-Book chat-link path.
+    const state = baseState();
+    state.deedsEarned.set('prog_first_steps', '2026-07-01');
+    state.deedsEarned.set('cmb_first_blood', '2026-07-01');
+    state.recent = ['prog_first_steps', 'cmb_first_blood'];
+    const { w, el } = makeWindow(state, false);
+    w.openWithDeed('prog_first_steps');
+    expect(flashed(el)).toBe('prog_first_steps');
+    await settle();
+    expect(flashed(el)).toBe('prog_first_steps');
+    // The card, not Close, still holds the reading position after the rebuild.
+    expect(document.activeElement).toBe(
+      el.querySelector('.deed-card[data-deed="prog_first_steps"]'),
+    );
   });
 
   it('an EARNED hidden deed is jumpable: revealed on the Feats shelf, flashed', () => {
