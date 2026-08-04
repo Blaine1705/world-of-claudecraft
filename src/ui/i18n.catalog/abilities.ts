@@ -1213,12 +1213,12 @@ const classAbilityNamesEn = {
       [
         'hex_of_violence',
         'Hex of Violence',
-        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 22 Shadow damage.',
+        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage.',
       ],
       [
         'cruel_pact',
         'Cruel Pact',
-        'Sacrifices 12% of your maximum health to restore 15% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+        'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
       ],
       [
         'vicarious_suffering',

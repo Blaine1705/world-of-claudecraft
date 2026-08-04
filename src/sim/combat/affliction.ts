@@ -380,7 +380,7 @@ export function moveEvilEye(ctx: SimContext, warlock: Entity, target: Entity): v
 }
 
 export function maledictGazeDamage(level: number): number {
-  if (level >= 20) return 14;
+  if (level >= 20) return 10;
   if (level >= 12) return 9;
   return 5;
 }
@@ -678,7 +678,7 @@ function endgameCompressionProgress(level: number): number {
 }
 
 export function sentenceEndgameDamageMultiplier(level: number): number {
-  return Math.round((1 - endgameCompressionProgress(level) * 0.2) * 1000) / 1000;
+  return Math.round((1 - endgameCompressionProgress(level) * 0.45) * 1000) / 1000;
 }
 
 export function possessedSentenceEchoMultiplier(level: number): number {

@@ -4481,7 +4481,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 3,
         level: 20,
         cost: 35,
-        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 60, max: 70 }],
+        effects: [{ type: 'afflictionNeedle' }, { type: 'directDamage', min: 45, max: 53 }],
       },
     ],
     description:
@@ -4541,11 +4541,11 @@ export const ABILITIES: Record<string, AbilityDef> = {
         duration: 8,
         charges: 3,
         doomPerProc: 7,
-        damage: 22,
+        damage: 16,
       },
     ],
     description:
-      'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 22 Shadow damage.',
+      'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage.',
   },
   cruel_pact: {
     id: 'cruel_pact',
@@ -4563,12 +4563,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         type: 'afflictionCruelPact',
         healthPct: 0.12,
-        manaPctMax: 0.15,
+        manaPctMax: 0.015,
         doom: 20,
       },
     ],
     description:
-      'Sacrifices 12% of your maximum health to restore 15% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
+      'Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health.',
   },
   vicarious_suffering: {
     id: 'vicarious_suffering',
@@ -5181,7 +5181,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       {
         rank: 3,
         level: 20,
-        cost: 65,
+        cost: 55,
         effects: [
           { type: 'directDamage', min: 54, max: 66 },
           { type: 'gainSoulFragments', amount: 1 },

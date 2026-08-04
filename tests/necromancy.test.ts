@@ -290,6 +290,17 @@ describe('Necromancy Warlock', () => {
     });
   });
 
+  it('pins the level-20 Essence Reap sustain cost', () => {
+    expect(ABILITIES.soul_harvest.ranks?.find((rank) => rank.rank === 3)).toMatchObject({
+      level: 20,
+      cost: 55,
+      effects: [
+        { type: 'directDamage', min: 54, max: 66 },
+        { type: 'gainSoulFragments', amount: 1 },
+      ],
+    });
+  });
+
   it('emits stable premium-VFX identities for Soul Lance and every Ossuary Mark phase', () => {
     const sim = makeNecromancer();
     const target = addTarget(sim);
