@@ -43,7 +43,6 @@ import {
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
-import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import {
   buildTerrainRegionIndex,
   TERRAIN_APPLIER,
@@ -53,6 +52,7 @@ import {
   terrainRegionCellAt,
   terrainRegionHas,
 } from './terrain_region_index';
+import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import type { BiomeId, HeightStamp, WorldContent, ZoneDef } from './types';
 import { isInSowfieldShell, SOWFIELD_FLAT, sowfieldStandLift } from './vale_cup_layout';
 import { wildheartFieldHeight } from './wildheart_field';
@@ -129,37 +129,39 @@ export function waterBodies(): { x: number; z: number; radius: number }[] {
 // biome. `crag` is the ridged-multifractal layer's full-mask height
 // (terrain_relief.ts): how far sharp ridgelines can crown this biome's
 // uplands. 0 keeps a biome exactly as calm as its hills (wetlands, lawns).
-const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: number; crag: number }> =
-  {
-    vale: { hill: 26, base: 0, hubHeight: 1.5, crag: 5 },
-    marsh: { hill: 11, base: -1.0, hubHeight: 1.2, crag: 0 },
-    peaks: { hill: 34, base: 7, hubHeight: 9, crag: 26 },
-    // The Veiled Hollow: a sheltered valley, gentler than the peaks that hide it.
-    dusk: { hill: 14, base: 2, hubHeight: 2.5, crag: 4 },
-    ember: { hill: 16, base: 2.5, hubHeight: 2.5, crag: 8 },
-    frost: { hill: 26, base: 6, hubHeight: 3, crag: 10 },
-    // the Amberfall: rolling autumn weald around the Great Mere
-    amber: { hill: 15, base: 2, hubHeight: 2.5, crag: 4 },
-    // the Willowfen: low, wet, and gentle
-    fen: { hill: 8, base: -0.3, hubHeight: 2, crag: 0 },
-    // the Nightbloom: soft moonlit downs, a touch more rolling than the fen
-    night: { hill: 12, base: 1, hubHeight: 2.5, crag: 4 },
-    // the Wraithwood: low haunted forest floor under the giant canopies
-    haunt: { hill: 13, base: 1.5, hubHeight: 2.5, crag: 5 },
-    // the Palmreach: low tropical relief, the coasts flattened to beach by
-    // the jungle coast applier
-    jungle: { hill: 11, base: 1.2, hubHeight: 2, crag: 4 },
-    // the Evergarden: groomed parkland, gentle as a lawn
-    garden: { hill: 9, base: 1.8, hubHeight: 2, crag: 0 },
-    // the Galecrest: rolling wind-scoured headland downs over sea cliffs
-    gale: { hill: 14, base: 2.4, hubHeight: 2.5, crag: 8 },
-    // Paint-only biomes (the editor's biome brush): never a zone band in the
-    // built-in world, so these rows only shape painted cells on custom maps.
-    beach: { hill: 5, base: -2.4, hubHeight: 0.8, crag: 0 },
-    desert: { hill: 15, base: 2.5, hubHeight: 2, crag: 12 },
-    volcano: { hill: 42, base: 9, hubHeight: 6, crag: 30 },
-    cave: { hill: 9, base: 1, hubHeight: 1, crag: 6 },
-  };
+const BIOME_SHAPE: Record<
+  BiomeId,
+  { hill: number; base: number; hubHeight: number; crag: number }
+> = {
+  vale: { hill: 26, base: 0, hubHeight: 1.5, crag: 5 },
+  marsh: { hill: 11, base: -1.0, hubHeight: 1.2, crag: 0 },
+  peaks: { hill: 34, base: 7, hubHeight: 9, crag: 26 },
+  // The Veiled Hollow: a sheltered valley, gentler than the peaks that hide it.
+  dusk: { hill: 14, base: 2, hubHeight: 2.5, crag: 4 },
+  ember: { hill: 16, base: 2.5, hubHeight: 2.5, crag: 8 },
+  frost: { hill: 26, base: 6, hubHeight: 3, crag: 10 },
+  // the Amberfall: rolling autumn weald around the Great Mere
+  amber: { hill: 15, base: 2, hubHeight: 2.5, crag: 4 },
+  // the Willowfen: low, wet, and gentle
+  fen: { hill: 8, base: -0.3, hubHeight: 2, crag: 0 },
+  // the Nightbloom: soft moonlit downs, a touch more rolling than the fen
+  night: { hill: 12, base: 1, hubHeight: 2.5, crag: 4 },
+  // the Wraithwood: low haunted forest floor under the giant canopies
+  haunt: { hill: 13, base: 1.5, hubHeight: 2.5, crag: 5 },
+  // the Palmreach: low tropical relief, the coasts flattened to beach by
+  // the jungle coast applier
+  jungle: { hill: 11, base: 1.2, hubHeight: 2, crag: 4 },
+  // the Evergarden: groomed parkland, gentle as a lawn
+  garden: { hill: 9, base: 1.8, hubHeight: 2, crag: 0 },
+  // the Galecrest: rolling wind-scoured headland downs over sea cliffs
+  gale: { hill: 14, base: 2.4, hubHeight: 2.5, crag: 8 },
+  // Paint-only biomes (the editor's biome brush): never a zone band in the
+  // built-in world, so these rows only shape painted cells on custom maps.
+  beach: { hill: 5, base: -2.4, hubHeight: 0.8, crag: 0 },
+  desert: { hill: 15, base: 2.5, hubHeight: 2, crag: 12 },
+  volcano: { hill: 42, base: 9, hubHeight: 6, crag: 30 },
+  cave: { hill: 9, base: 1, hubHeight: 1, crag: 6 },
+};
 
 // Ridge walls along every shared zone edge, each opened by a road pass. A
 // zone with sealedSouthBorder instead gets a taller, narrower wall with NO

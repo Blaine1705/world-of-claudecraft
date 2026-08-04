@@ -49,11 +49,7 @@ const n2dScratch = { v: 0, dx: 0, dy: 0 };
  * bilinear form n = a + (b-a)u + (c-a)v + (a-b-c+d)uv differentiates to
  * dn/dx = ((b-a) + (a-b-c+d)v) * u'(xf) (Quilez, morenoise).
  */
-export function noise2d(
-  x: number,
-  y: number,
-  seed: number,
-): { v: number; dx: number; dy: number } {
+export function noise2d(x: number, y: number, seed: number): { v: number; dx: number; dy: number } {
   const xi = Math.floor(x),
     yi = Math.floor(y);
   const xf = x - xi,
@@ -66,8 +62,8 @@ export function noise2d(
     v = fade(yf);
   const k3 = a - b - c + d;
   n2dScratch.v = a + (b - a) * u + (c - a) * v + k3 * u * v;
-  n2dScratch.dx = ((b - a) + k3 * v) * dFade(xf);
-  n2dScratch.dy = ((c - a) + k3 * u) * dFade(yf);
+  n2dScratch.dx = (b - a + k3 * v) * dFade(xf);
+  n2dScratch.dy = (c - a + k3 * u) * dFade(yf);
   return n2dScratch;
 }
 
