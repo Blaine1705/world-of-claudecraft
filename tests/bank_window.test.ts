@@ -284,10 +284,12 @@ describe('bank_window: search / sort / deposit-all', () => {
     const code = painter.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '');
     expect(code).toContain("const BANK_FILTER_KEY = 'woc_bank_filter'");
     // The per-visit search rule holds at BOTH ends of the round trip:
-    // construction drops any stored query (legacy or reload-stranded)...
-    expect(code).toContain(
-      "{ ...parseBagFilter(localStorage.getItem(BANK_FILTER_KEY)), search: '' }",
-    );
+    // construction drops any stored query (legacy or reload-stranded) and
+    // eagerly rewrites a non-empty stored search out of existence...
+    expect(code).toContain('parseBagFilter(localStorage.getItem(BANK_FILTER_KEY))');
+    expect(code).toContain("const next = { ...parsed, search: '' }");
+    expect(code).toContain("if (parsed.search !== '')");
+    expect(code).toContain('localStorage.setItem(BANK_FILTER_KEY, serializeBagFilter(next))');
     // ...and the serializer strips it from every write.
     expect(code).toContain("serializeBagFilter({ ...this.filter, search: '' })");
   });

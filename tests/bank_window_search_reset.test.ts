@@ -1,13 +1,14 @@
 // @vitest-environment happy-dom
 //
 // The bank search is a per-visit filter: closing the window resets it, no
-// persist write ever stores it, and construction never restores one, so a
-// reopen never starts pre-narrowed to a stale query (items silently hidden
-// with no cue why). The persisted category/sort preferences still survive the
-// close/reopen and the session boundary; only the search is transient. Drives
-// the REAL BankWindow (the bags_window_focus_restore harness idiom) against a
-// stubbed IWorld bank mirror, in both the offline Sim shape (bonusSources: [])
-// and the online ClientWorld shape (a server-stamped bonus breakdown).
+// persist write ever stores it, and construction never restores one (and
+// eagerly scrubs a stranded stored query), so a reopen never starts
+// pre-narrowed to a stale query (items silently hidden with no cue why). The
+// persisted category/sort preferences still survive the close/reopen and the
+// session boundary; only the search is transient. Drives the REAL BankWindow
+// (the bags_window_focus_restore harness idiom) against a stubbed IWorld bank
+// mirror, in both the offline Sim shape (bonusSources: []) and the online
+// ClientWorld shape (a server-stamped bonus breakdown).
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot } from '../src/sim/types';
@@ -207,12 +208,16 @@ describe('bank window search reset on close', () => {
   it('never restores a stale persisted search on construction (reload while the bank was open)', () => {
     // A reload while the bank sat open never runs close(), so a pre-fix session
     // can have left a query in the stored filter; the next session must not
-    // resurface it, while the category/sort preferences do come back.
+    // resurface it, while the category/sort preferences do come back. Construction
+    // also eagerly rewrites the stranded query out of storage (no need to open
+    // or close the bank for the scrub to land).
     localStorage.setItem(
       BANK_FILTER_KEY,
       JSON.stringify({ category: 'weapon', sort: 'name', search: 'copper' }),
     );
     const { root, w } = harness();
+    // Scrub is construction-time, before open: storage must already be clean.
+    expect(storedFilter()).toEqual({ category: 'weapon', sort: 'name', search: '' });
     w.open();
     expect(searchInput(root).value).toBe('');
     expect(activeCategory(root)).toBe('weapon');
@@ -221,7 +226,6 @@ describe('bank window search reset on close', () => {
     // 'copper' search still applied, ZERO cells would match (the ore is no weapon).
     expect(occupiedCells(root)).toBe(1);
     w.close();
-    // The close-path persist rewrote the legacy stored query out of existence.
     expect(storedFilter()).toEqual({ category: 'weapon', sort: 'name', search: '' });
   });
 
@@ -261,9 +265,12 @@ describe('bank window search reset on close', () => {
     world.bankInfo = null;
     const now = performance.now();
     const spy = vi.spyOn(performance, 'now').mockReturnValue(now + 60_000);
-    w.refreshIfChanged();
-    spy.mockRestore();
-    expect(w.isOpen).toBe(false);
+    try {
+      w.refreshIfChanged();
+      expect(w.isOpen).toBe(false);
+    } finally {
+      spy.mockRestore();
+    }
     world.bankInfo = bankInfo();
     w.open();
     expect(searchInput(root).value).toBe('');
