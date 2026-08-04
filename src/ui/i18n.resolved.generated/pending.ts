@@ -459,7 +459,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.bank.guildDepositGoldTitle",
     "hudChrome.bank.guildDepositHint",
     "hudChrome.bank.guildDormantAria",
-    "hudChrome.bank.guildDormantHint",
+    "hudChrome.bank.guildDormantHint",https://github.com/levy-street/world-of-claudecraft/pull/2715
     "hudChrome.bank.guildDormantNote",
     "hudChrome.bank.guildEmpty",
     "hudChrome.bank.guildGoldAvailable",

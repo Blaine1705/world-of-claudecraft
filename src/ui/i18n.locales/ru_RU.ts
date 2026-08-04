@@ -1050,6 +1050,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': 'Высокая контрастность',
   'hudChrome.landing.highContrastAria':
     'Переключить фон высокой контрастности: отключает движущийся ролик, чтобы текст начального экрана оставался читаемым',
+  'hudChrome.landing.browserSupport.title': 'Внимание: неподдерживаемый браузер',
+  'hudChrome.landing.browserSupport.body':
+    'В этом браузере производительность может быть снижена. Для наилучшего результата установите настольное приложение для Windows, macOS или Linux. Предпочитаете играть в браузере? Chrome обеспечивает наилучшую производительность, также поддерживаются Firefox и Safari.',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'Получить настольное приложение',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'Продолжить в браузере',
+  'hudChrome.landing.browserSupport.dismissAria': 'Закрыть уведомление о неподдерживаемом браузере',
   'hudChrome.talents.defaultBuildName': 'Билд {n}',
   'hudChrome.tips.joinChannels':
     'Совет: введите /join world или /join lfg, чтобы общаться с игроками по всему миру.',

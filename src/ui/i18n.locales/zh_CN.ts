@@ -1003,6 +1003,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.itemScoreLine': '评分 {score}',
   'hudChrome.landing.highContrast': '高对比度',
   'hudChrome.landing.highContrastAria': '切换高对比度背景：关闭动态预告片，使开始界面文字保持清晰',
+  'hudChrome.landing.browserSupport.title': '提示：不受支持的浏览器',
+  'hudChrome.landing.browserSupport.body':
+    '此浏览器中性能可能会下降。为获得最佳体验，请下载适用于 Windows、macOS 或 Linux 的桌面客户端。想在浏览器中游玩？Chrome 性能最佳，Firefox 和 Safari 也受支持。',
+  'hudChrome.landing.browserSupport.getDesktopApp': '获取桌面客户端',
+  'hudChrome.landing.browserSupport.continueInBrowser': '继续在浏览器中游玩',
+  'hudChrome.landing.browserSupport.dismissAria': '关闭不受支持浏览器的提示',
   'hudChrome.talents.defaultBuildName': '配置 {n}',
   'hudChrome.tips.joinChannels': '提示：输入 /join world 或 /join lfg，与全服玩家聊天。',
   'meta.builtOn': '构建于 {date}',

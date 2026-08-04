@@ -1376,7 +1376,14 @@ export const ko_KR: EnTranslations = {
     },
     "landing": {
       "highContrast": "고대비",
-      "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다"
+      "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다",
+      "browserSupport": {
+        "title": "알림: 지원되지 않는 브라우저",
+        "body": "이 브라우저에서는 성능이 저하될 수 있습니다. 최상의 경험을 위해 Windows, macOS 또는 Linux용 데스크톱 앱을 받아보세요. 브라우저에서 계속 플레이하시겠습니까? Chrome이 가장 성능이 좋으며 Firefox와 Safari도 지원됩니다.",
+        "getDesktopApp": "데스크톱 앱 받기",
+        "continueInBrowser": "브라우저에서 계속하기",
+        "dismissAria": "지원되지 않는 브라우저 알림 닫기"
+      }
     },
     "warfare": {
       "honorAmount": "명예 {amount}",

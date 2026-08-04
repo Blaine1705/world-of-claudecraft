@@ -1041,6 +1041,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.landing.highContrast': '高コントラスト',
   'hudChrome.landing.highContrastAria':
     '高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします',
+  'hudChrome.landing.browserSupport.title': 'ご注意：サポート対象外のブラウザです',
+  'hudChrome.landing.browserSupport.body':
+    'このブラウザではパフォーマンスが低下する場合があります。最高の体験のために、Windows、macOS、Linux 向けデスクトップアプリの入手をお勧めします。ブラウザでのプレイをご希望ですか？Chrome が最もパフォーマンスに優れ、Firefox と Safari もサポートされています。',
+  'hudChrome.landing.browserSupport.getDesktopApp': 'デスクトップアプリを入手',
+  'hudChrome.landing.browserSupport.continueInBrowser': 'ブラウザで続ける',
+  'hudChrome.landing.browserSupport.dismissAria': 'サポート対象外ブラウザの通知を閉じる',
   'hudChrome.talents.defaultBuildName': 'ビルド {n}',
   'hudChrome.tips.joinChannels':
     'ヒント：/join world または /join lfg と入力すると、ワールド全体のプレイヤーとチャットできます。',
