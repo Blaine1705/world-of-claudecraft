@@ -2885,7 +2885,8 @@ export const ru_RU: EnTranslations = {
         "raise_fallen": "Поднятие павших (периодические волны прислужников)",
         "soul_rend": "Разрыв души (отмеченным разойтись и получать лечение)",
         "deathless_rage": "Бессмертная ярость (прерывается у охранных камней)",
-        "wardstones": "Охранные камни (смена фазы)"
+        "wardstones": "Охранные камни (смена фазы)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

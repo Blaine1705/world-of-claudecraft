@@ -2885,7 +2885,8 @@ export const id_ID: EnTranslations = {
         "raise_fallen": "Bangkitkan Yang Gugur (gelombang bala bantuan berkala)",
         "soul_rend": "Robek Jiwa (pemain yang ditandai harus menyebar dan disembuhkan)",
         "deathless_rage": "Murka Abadi (diputus di wardstone)",
-        "wardstones": "Saluran Wardstone (transisi fase)"
+        "wardstones": "Saluran Wardstone (transisi fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

@@ -2885,7 +2885,8 @@ export const nl_NL: EnTranslations = {
         "raise_fallen": "Gevallenen Herrijzen (periodieke golven van toevoegingen)",
         "soul_rend": "Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)",
         "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
-        "wardstones": "Wardstone-kanalen (faseovergang)"
+        "wardstones": "Wardstone-kanalen (faseovergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
