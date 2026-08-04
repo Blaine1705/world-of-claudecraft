@@ -7,7 +7,11 @@
 
 import { describe, expect, it } from 'vitest';
 import { BIOME_HAZE_DECLARATIONS, biomeHazeUniforms } from '../src/render/biome_haze_field';
-import { HAZE_AERIAL_MAX, HAZE_SKY_SAMPLE_DIST } from '../src/render/biome_haze_field_core';
+import {
+  HAZE_AERIAL_MAX,
+  HAZE_SKY_SAMPLE_DIST,
+  HAZE_SKY_TINT_MAX,
+} from '../src/render/biome_haze_field_core';
 import { skyZoneHazeInternalsForTest } from '../src/render/sky';
 
 const { skyFrag } = skyZoneHazeInternalsForTest;
@@ -43,8 +47,14 @@ describe('the composed dome fragment', () => {
     expect(HAZE_SKY_SAMPLE_DIST).toBeLessThanOrEqual(900);
   });
 
-  it('caps the tint at the geometry consumers own ceiling', () => {
-    expect(skyFrag(true)).toContain(`${HAZE_AERIAL_MAX.toFixed(6)} * wocSkyHaze.a`);
+  it('caps the tint at its OWN constant, not the ground border ceiling', () => {
+    expect(skyFrag(true)).toContain(`${HAZE_SKY_TINT_MAX.toFixed(6)} * wocSkyHaze.a`);
+    // The dome's job is matching the hazed geometry in front of it near the
+    // horizon, which is the FAR term's business; it once borrowed the ground's
+    // border-band ceiling, so retuning that band silently dimmed the sky with
+    // it. Pinned as a real separation: the two may hold equal values, but the
+    // dome must not read the border constant.
+    expect(skyFrag(true)).not.toContain(`${HAZE_AERIAL_MAX.toFixed(6)} * wocSkyHaze.a`);
   });
 
   it('lands AFTER the fog band: inside it the band ramp multiplies the tint away', () => {

@@ -19,7 +19,6 @@ import {
   getContentGeneration,
   instanceOrigin,
   instanceSlotForZ,
-  ROADS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
@@ -714,6 +713,108 @@ function applyFenCoast(x: number, z: number, h: number): number {
   const passN = (1 - smoothstep(26, 52, Math.abs(x + 400))) * smoothstep(640, 685, z);
   if (passN > 0) out = out + (6 + (out - 6) * 0.15 - out) * passN;
   return h + (out - h) * seam * zSeam;
+}
+
+// ---------------------------------------------------------------------------
+// The fen's SOUTH SHORE: the world's southwest perimeter.
+//
+// The west column begins at the Willowfen, so everything south and west of the
+// fen's zMin is open ocean, and nothing shaped that coast. Two appliers met on
+// the z = FEN_ZMIN line and both got it wrong there:
+//   - applyFenCoast fades its own carve OUT across zMin +-8 (a zone-seam
+//     cross-fade with no southern neighbour to yield to), so the un-carved base
+//     field stood back up as a ruled lip of dry ground along the whole line;
+//   - the row-bound carve in terrainHeightUnpadded switched ON south of it
+//     (worldXBoundsAt is a STEP function of z, the same trap the Amberfall's
+//     z = 2380 wall hit), dropping the ground straight to the seabed.
+// The result was one ruled cliff of dry land over sunk sea running the fen's
+// whole 330yd south edge: up to 11.8yd of instant drop, reported from the water
+// as a hard edge on the map.
+//
+// The fix is the recipe the Frostveil's north shore already uses: a waterline
+// that WANDERS with fixed-seed noise, ground shaved to a bank climbing inland
+// from it, and the seabed reached by the perimeter line, so the row-bound carve
+// south of it meets water on both sides and the step it still makes is
+// underwater (invisible) instead of a dry wall. No cliffs in a fen: the bank is
+// shallower than the northern grid's and the shallows are wide, so the realm
+// ends in reed flats and bog water easing into open sea.
+// ---------------------------------------------------------------------------
+// Where the perimeter turns north: east of here the vale's own northwest
+// headland carries on south across the line as unbroken land (its west shore
+// climbs from x -182 at z 132 to x -230 at z 176), so the fen's shore bends
+// into a bay to meet it instead of running on through standing ground.
+const FEN_SHORE_CORNER_X = -232;
+const FEN_SHORE_CORNER_FADE = 30; // yards of x the shore releases over
+// Mean yards of shallows between the perimeter and the waterline, before the
+// wander below bends it into coves and reed spits.
+const FEN_SHORE_BAND = 44;
+// The bank climbing inland from the waterline, and how far past it the shave
+// still reaches. 0.34 rise/run is gentler than the northern grid's 0.55: this
+// is bog country, and the whole point is that nothing stands tall at the water.
+const FEN_SHORE_BANK_SLOPE = 0.34;
+const FEN_SHORE_BANK_REACH = 84;
+// Widest the wander can push the waterline inland (FEN_SHORE_BAND + the two
+// noise amplitudes), so the support box below is exact.
+const FEN_SHORE_MAX_BAND = FEN_SHORE_BAND + 28;
+export const FEN_SHORE_SUPPORT = FEN_SHORE_MAX_BAND + FEN_SHORE_BANK_REACH;
+// The applier releases south of this, where the vale headland's own coast owns
+// the water and the ground is already well under it. Fading (not cutting) so
+// the release itself never becomes another window-edge step.
+const FEN_SHORE_TAIL_Z = 132;
+// The row-bound carve's outer skirt (see applyFenSouthShore): yards of z the
+// carve is carried north of the row line before it releases. 36 turns the
+// corner's 8.6yd disagreement into a 0.24 rise/run shoulder.
+const FEN_SHORE_ROW_SKIRT = 36;
+function applyFenSouthShore(x: number, z: number, h: number): number {
+  const dEdge = z - FEN_ZMIN;
+  if (dEdge > FEN_SHORE_SUPPORT || z < FEN_SHORE_TAIL_Z) return h;
+  if (x < -566) return h; // nothing west of the world
+  // First, the row-bound carve's OUTER SKIRT. That carve measures against
+  // worldXBoundsAt, a STEP function of z: at the fen's zMin the west column's
+  // row appears and the carve switched off along the whole line, so wherever
+  // its own x ramp was only PARTWAY down (the vale headland's northwest tip,
+  // x -250 to -206) the two sides of the line disagreed by up to 8.6yd of DRY
+  // ground. Carry it north at the strength it holds ON the line and fade it out
+  // over the cape's shoulder, exactly the skirt STRIP_FLANK_OUTER_SKIRT and
+  // GREEN_SEAM_SOUTH_SKIRT give their own appliers for the same reason. Gated
+  // to the ramp band: west of it the carve is saturated and the shore below
+  // already reaches the same seabed. Runs BEFORE the shore shaping so both
+  // sides of the line feed it identical ground.
+  if (dEdge >= 0) {
+    const beyond = STRIP_MIN_X - 26 - x;
+    if (beyond > 0) {
+      const skirt =
+        (1 - smoothstep(FEN_ZMIN, FEN_ZMIN + FEN_SHORE_ROW_SKIRT, z)) * smoothstep(-256, -246, x);
+      const t = smoothstep(0, 44, beyond) * skirt;
+      if (t > 0) h = h * (1 - t) + (WATER_LEVEL - 6) * t;
+    }
+  }
+  // The shore itself owns the west column only: it releases into the corner bay
+  // before the vale headland, and never reaches the strip's border ridge.
+  const w =
+    (1 - smoothstep(FEN_SHORE_CORNER_X - FEN_SHORE_CORNER_FADE, FEN_SHORE_CORNER_X, x)) *
+    smoothstep(FEN_SHORE_TAIL_Z, FEN_ZMIN - 8, z);
+  if (w <= 0) return h;
+  // two octaves of fixed-seed noise bend the waterline into coves and reed
+  // spits, so the fen ends in a wandering bog shore and never a ruled line
+  const wob =
+    (fbm2(x * 0.013, z * 0.013, 9351, 3) - 0.5) * 42 +
+    (fbm2(x * 0.041, z * 0.041, 9353, 2) - 0.5) * 14;
+  // The Amberfen Steps land on a reed spit: the shore bends seaward under the
+  // stair so the waykeeper, the POI, and the Steps' dressing keep dry footing
+  // (the same local pass cap applyFenCoast gives the Mirewalk).
+  const spit = 1 - smoothstep(15, 54, Math.abs(x + 382));
+  const band = Math.max(10, FEN_SHORE_BAND + wob - 34 * spit);
+  const inland = Math.max(0, dEdge);
+  const capW = (1 - smoothstep(band + 34, band + FEN_SHORE_BANK_REACH, inland)) * w;
+  if (capW > 0) {
+    const cap = WATER_LEVEL + 0.6 + FEN_SHORE_BANK_SLOPE * Math.max(0, inland - band * 0.5);
+    if (h > cap) h = h + (cap - h) * capW;
+  }
+  const seaT = (1 - smoothstep(0, band, inland)) * w;
+  if (seaT <= 0) return h;
+  const floor = Math.min(h, WATER_LEVEL - 6);
+  return h + (floor - h) * seaT;
 }
 
 // ---------------------------------------------------------------------------
@@ -4048,6 +4149,13 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   // Last: the northern grid's outer edges dive to open ocean with a wavy
   // coast, after every land-raising pass, so no realm's land hugs the map edge.
   h = applyWorldEdgeSea(x, z, h);
+  // ...and the world's SOUTHWEST perimeter the same way: the west column starts
+  // at the fen, so its south end is open ocean too. After the row-bound carve
+  // above (whose z step this coast is what hides) and after the rims, for the
+  // same reason applyWorldEdgeSea runs here.
+  if (terrainRegionHas(region, TERRAIN_APPLIER.fenSouthShore)) {
+    h = applyFenSouthShore(x, z, h);
+  }
   // The Sowfield plateau (Vale Cup) is the LAST word on the southern-vale
   // terrain: a LEVEL pull toward the pitch height applied AFTER every coast, rim,
   // and sea pass (like the Tablecrag / Veilspires bespoke plateaus above), so the
@@ -4318,48 +4426,63 @@ function catmullRom(
   };
 }
 
-const SMOOTH_ROADS: SmoothRoad[] = ROADS.map((road) => {
-  const pts: { x: number; z: number }[] = [];
-  if (road.length < 2) {
-    pts.push(...road);
-  } else {
-    for (let i = 0; i < road.length - 1; i++) {
-      const p0 = road[Math.max(0, i - 1)];
-      const p1 = road[i];
-      const p2 = road[i + 1];
-      const p3 = road[Math.min(road.length - 1, i + 2)];
-      const segLen = Math.hypot(p2.x - p1.x, p2.z - p1.z);
-      const steps = Math.max(1, Math.ceil(segLen / ROAD_SAMPLE_STEP));
-      for (let k = 0; k < steps; k++) pts.push(catmullRom(p0, p1, p2, p3, k / steps));
+function smoothRoads(roads: readonly (readonly { x: number; z: number }[])[]): SmoothRoad[] {
+  return roads.map((road) => {
+    const pts: { x: number; z: number }[] = [];
+    if (road.length < 2) {
+      pts.push(...road);
+    } else {
+      for (let i = 0; i < road.length - 1; i++) {
+        const p0 = road[Math.max(0, i - 1)];
+        const p1 = road[i];
+        const p2 = road[i + 1];
+        const p3 = road[Math.min(road.length - 1, i + 2)];
+        const segLen = Math.hypot(p2.x - p1.x, p2.z - p1.z);
+        const steps = Math.max(1, Math.ceil(segLen / ROAD_SAMPLE_STEP));
+        for (let k = 0; k < steps; k++) pts.push(catmullRom(p0, p1, p2, p3, k / steps));
+      }
+      pts.push(road[road.length - 1]);
     }
-    pts.push(road[road.length - 1]);
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minZ = Infinity;
+    let maxZ = -Infinity;
+    for (const p of pts) {
+      if (p.x < minX) minX = p.x;
+      if (p.x > maxX) maxX = p.x;
+      if (p.z < minZ) minZ = p.z;
+      if (p.z > maxZ) maxZ = p.z;
+    }
+    return {
+      pts,
+      minX: minX - ROAD_BBOX_MARGIN,
+      maxX: maxX + ROAD_BBOX_MARGIN,
+      minZ: minZ - ROAD_BBOX_MARGIN,
+      maxZ: maxZ + ROAD_BBOX_MARGIN,
+    };
+  });
+}
+
+let smoothRoadGeneration = -1;
+let cachedSmoothRoads: SmoothRoad[] = [];
+
+function activeSmoothRoads(): readonly SmoothRoad[] {
+  const generation = getContentGeneration();
+  if (generation !== smoothRoadGeneration) {
+    cachedSmoothRoads = smoothRoads(getActiveWorldContent().roads);
+    smoothRoadGeneration = generation;
   }
-  let minX = Infinity;
-  let maxX = -Infinity;
-  let minZ = Infinity;
-  let maxZ = -Infinity;
-  for (const p of pts) {
-    if (p.x < minX) minX = p.x;
-    if (p.x > maxX) maxX = p.x;
-    if (p.z < minZ) minZ = p.z;
-    if (p.z > maxZ) maxZ = p.z;
-  }
-  return {
-    pts,
-    minX: minX - ROAD_BBOX_MARGIN,
-    maxX: maxX + ROAD_BBOX_MARGIN,
-    minZ: minZ - ROAD_BBOX_MARGIN,
-    maxZ: maxZ + ROAD_BBOX_MARGIN,
-  };
-});
+  return cachedSmoothRoads;
+}
 
 // Distance from (x,z) to the nearest road curve.
 export function roadDistance(x: number, z: number): number {
+  const roads = activeSmoothRoads();
   // cheap first: most queries are nowhere near a road, so gate on the raw
   // bboxes (their margin already covers the meander) before paying for the
   // warp noise or any segment math
   let anyNear = false;
-  for (const road of SMOOTH_ROADS) {
+  for (const road of roads) {
     if (x >= road.minX && x <= road.maxX && z >= road.minZ && z <= road.maxZ) {
       anyNear = true;
       break;
@@ -4370,7 +4493,7 @@ export function roadDistance(x: number, z: number): number {
   const wx = x + (fbm2(x * 0.045, z * 0.045, 9203, 2) - 0.5) * ROAD_MEANDER;
   const wz = z + (fbm2(x * 0.045 + 37, z * 0.045 - 11, 9205, 2) - 0.5) * ROAD_MEANDER;
   let best2 = Infinity;
-  for (const road of SMOOTH_ROADS) {
+  for (const road of roads) {
     if (wx < road.minX || wx > road.maxX || wz < road.minZ || wz > road.maxZ) continue;
     const pts = road.pts;
     for (let i = 0; i < pts.length - 1; i++) {

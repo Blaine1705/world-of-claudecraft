@@ -17,12 +17,20 @@ import {
   globalDayness,
   LUNAR_CYCLE_MS,
   lunarPhase,
+  MIN_DAYNIGHT_AMPLITUDE,
   moonDirection,
   moonTerminator,
   NEUTRAL_DAY_GRADE,
+  NIGHT_BASE_LIGHT,
+  NIGHT_IBL_REFERENCE,
+  nightIblScale,
   nightSkyDesat,
   nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
+  REALM_MOON_TINT,
+  REALM_NIGHT_PALETTE,
+  REALM_SKY_IRRADIANCE,
+  realmLightTint,
   skyTintForDayness,
   sunDirection,
   sunsetWarmGate,
@@ -70,6 +78,19 @@ describe('water follows the cycle (source pins)', () => {
     const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
     expect(source).toContain('setWaterSunDirection(this.lightDir);');
     expect(source).toContain('setWaterDayNight(this.dnGrade.fog);');
+  });
+
+  it('precipitation follows the cycle too, or snow falls white at midnight', () => {
+    // A PointsMaterial takes NO scene light, so nothing else in the renderer can
+    // darken snow or rain: they need the grade handed to them explicitly, the
+    // same way the unlit water surface does. Without it, a snowing realm poured
+    // pure white flakes through an otherwise dark world.
+    const weather = readFileSync(new URL('../src/render/weather.ts', import.meta.url), 'utf8');
+    expect(weather).toContain('setDayNight(');
+    // the style colour and the grade are kept apart, so they cannot compound
+    expect(weather).toContain('this.material.color.copy(this.styleColor);');
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(renderer).toContain('this.weather.setDayNight(this.dnGrade.fog);');
   });
 });
 
@@ -159,15 +180,204 @@ describe('REALM_DAYNIGHT_AMPLITUDE', () => {
     }
   });
 
-  it('gives neutral daylight realms the full swing and signature realms less', () => {
-    // neutral realms take the whole day/night grade
-    for (const b of ['vale', 'marsh', 'peaks', 'fen', 'garden', 'gale'] as BiomeId[]) {
-      expect(REALM_DAYNIGHT_AMPLITUDE[b]).toBe(1);
+  it('gives EVERY realm the full swing: night is one depth the world over', () => {
+    // The band is collapsed to a point on purpose. Held-back daylight mixed
+    // toward WHITE, which desaturated the very night colour a signature realm
+    // exists for, so compressing the swing worked against the identity it was
+    // meant to protect. Identity is hue now, not level.
+    for (const amp of Object.values(REALM_DAYNIGHT_AMPLITUDE)) expect(amp).toBe(1);
+  });
+
+  it('keeps every realm inside the band, so night is night everywhere', () => {
+    // The defect this pins: the weights once spanned 0.35 to 1, which left the
+    // Veiled Hollow at 65 percent daylight at world-midnight and the Amberreach
+    // at 45, while a neutral realm across the border went fully dark. A "night"
+    // screenshot in those realms was a daylight screenshot with a warm grade.
+    for (const [biome, amp] of Object.entries(REALM_DAYNIGHT_AMPLITUDE)) {
+      expect(amp, `${biome} amplitude`).toBeGreaterThanOrEqual(MIN_DAYNIGHT_AMPLITUDE);
+      expect(amp, `${biome} amplitude`).toBeLessThanOrEqual(1);
     }
-    // realms whose fixed time of day is their identity swing less than neutral
-    for (const b of ['night', 'dusk', 'ember', 'amber', 'frost', 'haunt'] as BiomeId[]) {
-      expect(REALM_DAYNIGHT_AMPLITUDE[b]).toBeLessThan(1);
+    // and the spread of midnight brightness across the whole world stays tight
+    const midnight = Object.keys(REALM_DAYNIGHT_AMPLITUDE).map((b) =>
+      effectiveDayness(0, b as BiomeId),
+    );
+    expect(Math.min(...midnight)).toBe(0);
+    expect(Math.max(...midnight)).toBe(1 - MIN_DAYNIGHT_AMPLITUDE);
+    // no realm keeps ANY daylight at world-midnight
+    expect(Math.max(...midnight)).toBe(0);
+  });
+
+  it('keeps each realm its own after dark, which is what carries the style', () => {
+    // Normalizing the SWING must not normalize the LOOK: the realms whose mood
+    // is a colour still own their night palette, or every realm would converge
+    // on the same blue midnight and the compression would have cost identity.
+    for (const b of ['night', 'ember', 'amber', 'dusk', 'frost', 'haunt'] as BiomeId[]) {
+      expect(REALM_NIGHT_PALETTE[b], `${b} night palette`).toBeDefined();
     }
+    const emberNight = dayNightGrade(effectiveDayness(0, 'ember'), 'ember');
+    const valeNight = dayNightGrade(effectiveDayness(0, 'vale'), 'vale');
+    // the Drakelands' midnight stays warm (red over blue); a neutral realm's
+    // stays cool (blue over red). Same depth of night, different world.
+    expect(emberNight.fog[0]).toBeGreaterThan(emberNight.fog[2]);
+    expect(valeNight.fog[2]).toBeGreaterThan(valeNight.fog[0]);
+  });
+});
+
+describe('the realm night palettes', () => {
+  const luma = (c: readonly [number, number, number]) =>
+    0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+  // The neutral night endpoints every realm palette is levelled against.
+  const neutral = dayNightGrade(0);
+
+  it('levels every realm night to the neutral night, so no realm is brighter', () => {
+    // The defect: these are hand-picked colours and their LEVELS had drifted.
+    // The Amberreach's night sky was 1.60x the neutral night and its fog 1.38x,
+    // the Drakelands' 1.44x and 1.20x, while the Nightbloom's sat at 1.00x. A
+    // "night colour" authored bright IS a bright night whatever the grade does,
+    // which is why the Amberreach kept reading as golden hour after dark.
+    for (const [biome, palette] of Object.entries(REALM_NIGHT_PALETTE)) {
+      if (!palette) continue;
+      expect(luma(palette.sky), `${biome} night sky level`).toBeCloseTo(luma(neutral.sky), 6);
+      expect(luma(palette.fog), `${biome} night fog level`).toBeCloseTo(luma(neutral.fog), 6);
+    }
+  });
+
+  it('keeps every authored hue exactly, because the hue IS the identity', () => {
+    // Levelling must not flatten the palettes into one grey night: each realm's
+    // channel BALANCE has to survive untouched, only its magnitude changes.
+    const hue = (c: readonly [number, number, number]) => {
+      const total = c[0] + c[1] + c[2];
+      return c.map((v) => v / total);
+    };
+    // authored source values, as written in REALM_NIGHT_PALETTE
+    const authored: Partial<Record<BiomeId, [number, number, number]>> = {
+      amber: [0.14, 0.095, 0.05],
+      ember: [0.16, 0.075, 0.045],
+      frost: [0.035, 0.07, 0.16],
+      night: [0.09, 0.045, 0.17],
+    };
+    for (const [biome, sky] of Object.entries(authored)) {
+      const palette = REALM_NIGHT_PALETTE[biome as BiomeId];
+      if (!palette || !sky) throw new Error(`${biome} palette missing`);
+      const got = hue(palette.sky);
+      const want = hue(sky);
+      for (let i = 0; i < 3; i++) {
+        expect(got[i], `${biome} night sky hue channel ${i}`).toBeCloseTo(want[i], 6);
+      }
+    }
+    // and the moods still read as themselves: golden Amberreach, frozen Frostveil
+    const amber = REALM_NIGHT_PALETTE.amber;
+    const frost = REALM_NIGHT_PALETTE.frost;
+    if (!amber || !frost) throw new Error('signature palettes missing');
+    expect(amber.sky[0]).toBeGreaterThan(amber.sky[2]);
+    expect(frost.sky[2]).toBeGreaterThan(frost.sky[0]);
+  });
+});
+
+describe('the realm light tint after dark', () => {
+  const luma = (c: readonly number[]) => 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+
+  it('re-colours a light without brightening it', () => {
+    // Luminance-neutral by construction, or this would be a second exposure
+    // knob wearing a tint's clothes and night would creep back up. Stated
+    // against a neutral light, which is where the property is exact: the tint's
+    // own channels are what must average back to unity.
+    for (const biome of ['ember', 'amber', 'frost', 'vale', 'night'] as BiomeId[]) {
+      const g = dayNightGrade(effectiveDayness(0, biome), biome);
+      const tint = realmLightTint(g.fog, g.nightAmt * REALM_MOON_TINT);
+      expect(luma(tint), `${biome} tint is luminance-neutral`).toBeCloseTo(1, 6);
+      // and it never drives a channel negative or past a doubling, so no light
+      // it touches can blow out however saturated the realm's night is
+      for (const channel of tint) {
+        expect(channel).toBeGreaterThan(0);
+        expect(channel).toBeLessThan(2);
+      }
+    }
+  });
+
+  it('carries each realm its own way, so a realm still tints what it lights', () => {
+    // The Drakelands' grass is GREEN; it reads red by day only because the ember
+    // key light tints it. That has to survive the night or the realm stops being
+    // itself after dark.
+    const ember = dayNightGrade(effectiveDayness(0, 'ember'), 'ember');
+    const emberTint = realmLightTint(ember.fog, ember.nightAmt * REALM_MOON_TINT);
+    expect(emberTint[0]).toBeGreaterThan(1);
+    expect(emberTint[2]).toBeLessThan(1);
+    // and the Frostveil pulls the other way, toward its frozen blue
+    const frost = dayNightGrade(effectiveDayness(0, 'frost'), 'frost');
+    const frostTint = realmLightTint(frost.fog, frost.nightAmt * REALM_MOON_TINT);
+    expect(frostTint[2]).toBeGreaterThan(frostTint[0]);
+  });
+
+  it('is the identity by day, so the authored daylight rig is untouched', () => {
+    const noon = dayNightGrade(1);
+    const tint = realmLightTint(noon.fog, noon.nightAmt * REALM_MOON_TINT);
+    for (const channel of tint) expect(channel).toBeCloseTo(1, 12);
+    // and a degenerate grade can never produce a NaN multiplier
+    expect(realmLightTint([0, 0, 0], 1)).toEqual([1, 1, 1]);
+  });
+});
+
+describe('the night IBL normalization', () => {
+  // The defect: night brightness per realm looked arbitrary because the IBL is
+  // the realm's own daytime sky, and those skies differ twenty-two fold in
+  // measured irradiance. The Vale, Thornpeak and the Nightbloom read as night;
+  // Willowfen, Palmreach, Evergarden, Farshore, Galecrest and Mirefen read as
+  // an overcast afternoon, at the identical ambient scale.
+  it('leaves DAY completely untouched in every realm', () => {
+    // The rig and the per-biome HDRI gains are tuned against the authored day,
+    // so this correction must be invisible until the sun goes down.
+    for (const biome of Object.keys(REALM_SKY_IRRADIANCE) as BiomeId[]) {
+      expect(nightIblScale(biome, 0), `${biome} by day`).toBe(1);
+    }
+  });
+
+  it('corrects in BOTH directions, because night fails bright and dark alike', () => {
+    // measured brighter than the Vale: normalized down
+    for (const biome of ['fen', 'jungle', 'garden', 'gale', 'marsh'] as BiomeId[]) {
+      expect(REALM_SKY_IRRADIANCE[biome]).toBeGreaterThan(NIGHT_IBL_REFERENCE);
+      expect(nightIblScale(biome, 1), `${biome} at night`).toBeLessThan(1);
+    }
+    // measured a little under it: lifted, which is what Thornpeak needed
+    for (const biome of ['peaks', 'frost', 'haunt'] as BiomeId[]) {
+      expect(REALM_SKY_IRRADIANCE[biome]).toBeLessThan(NIGHT_IBL_REFERENCE);
+      expect(nightIblScale(biome, 1), `${biome} at night`).toBeGreaterThan(1);
+    }
+    // the datum itself is untouched
+    expect(nightIblScale('vale', 1)).toBeCloseTo(1, 12);
+  });
+
+  it('lands every realm on the same night ambient, whatever its sky', () => {
+    // Same brightness, different tint: the HDRIs keep their colour, so the
+    // Drakelands still reads ember and the Nightbloom violet, they simply stop
+    // being the only realms where night is also darker.
+    for (const biome of Object.keys(REALM_SKY_IRRADIANCE) as BiomeId[]) {
+      const energy = REALM_SKY_IRRADIANCE[biome] * nightIblScale(biome, 1);
+      expect(energy, `${biome} night ambient`).toBeCloseTo(NIGHT_IBL_REFERENCE, 6);
+    }
+  });
+
+  it('equalizes the ambient every realm actually receives at full night', () => {
+    // The point of the whole correction: irradiance times the night scale must
+    // land in one tight band across the world, instead of spanning 22x.
+    const rawSpread =
+      Math.max(...Object.values(REALM_SKY_IRRADIANCE)) /
+      Math.min(...Object.values(REALM_SKY_IRRADIANCE));
+    expect(rawSpread).toBeGreaterThan(20);
+    for (const biome of Object.keys(REALM_SKY_IRRADIANCE) as BiomeId[]) {
+      const nightEnergy = REALM_SKY_IRRADIANCE[biome] * nightIblScale(biome, 1);
+      expect(nightEnergy, `${biome} night ambient`).toBeLessThanOrEqual(NIGHT_IBL_REFERENCE + 1e-9);
+    }
+  });
+
+  it('eases in with the night rather than snapping at dusk', () => {
+    const half = nightIblScale('fen', 0.5);
+    expect(half).toBeGreaterThan(nightIblScale('fen', 1));
+    expect(half).toBeLessThan(1);
+    expect(half).toBeCloseTo((1 + nightIblScale('fen', 1)) / 2, 12);
+    // and it is clamped, so an out-of-range grade can never invert it
+    expect(nightIblScale('fen', 2)).toBe(nightIblScale('fen', 1));
+    expect(nightIblScale('fen', -1)).toBe(1);
   });
 });
 
@@ -246,7 +456,7 @@ describe('fullDayGrade', () => {
 
 describe('per-realm night palettes (region style survives the dark)', () => {
   it('holds the raised moonlit floor for the neutral night', () => {
-    expect(dayNightGrade(0).lightScale).toBeCloseTo(0.36, 12);
+    expect(dayNightGrade(0).lightScale).toBeCloseTo(NIGHT_BASE_LIGHT * 0.46, 12);
   });
 
   it('keeps realms without a palette on the global deep-blue night', () => {
@@ -254,14 +464,15 @@ describe('per-realm night palettes (region style survives the dark)', () => {
     expect(dayNightGrade(0.4, 'marsh')).toEqual(dayNightGrade(0.4));
   });
 
-  it('gives the Nightbloom a violet night, darker than neutral', () => {
+  it('gives the Nightbloom a violet night, lifted just off the global floor', () => {
     const g = dayNightGrade(0, 'night');
     // violet: red beats green, blue leads both
     expect(g.sky[0]).toBeGreaterThan(g.sky[1]);
     expect(g.sky[2]).toBeGreaterThan(g.sky[0]);
     expect(g.fog[2]).toBeGreaterThan(g.fog[1]);
-    // and its floor dips under the global moonlit floor
-    expect(g.lightScale).toBeLessThan(dayNightGrade(0).lightScale);
+    // and its LEVEL is the neutral night exactly: no realm scales its own floor
+    // any more, because the whole world is meant to be one depth of night.
+    expect(g.lightScale).toBe(dayNightGrade(0).lightScale);
   });
 
   it('keeps the Drakelands night warm: embers, not moonlight', () => {
@@ -269,8 +480,11 @@ describe('per-realm night palettes (region style survives the dark)', () => {
     expect(g.sky[0]).toBeGreaterThan(g.sky[1]);
     expect(g.sky[1]).toBeGreaterThan(g.sky[2]);
     expect(g.fog[0]).toBeGreaterThan(g.fog[2]);
-    // the lava glow keeps its floor a touch above the global night
-    expect(g.lightScale).toBeGreaterThan(dayNightGrade(0).lightScale);
+    // Its LEVEL is the neutral night exactly. The lava glow used to lift this
+    // realm's floor, which made the Drakelands brighter than its neighbours
+    // rather than warmer than them; the warmth is carried by the hue above and
+    // by REALM_MOON_TINT, so the ember reads without the realm being lighter.
+    expect(g.lightScale).toBe(dayNightGrade(0).lightScale);
   });
 
   it('always lands day on the identity grade regardless of realm', () => {
@@ -293,7 +507,7 @@ describe('the night ambient floor (readable silhouettes at deep night)', () => {
     // that keeps terrain shape and bodies legible. Pinning both to one floor is
     // what made night read as a black cutout.
     expect(g.ambientScale).toBeGreaterThan(g.lightScale);
-    expect(g.ambientScale).toBeCloseTo(0.78, 12);
+    expect(g.ambientScale).toBeCloseTo(NIGHT_BASE_LIGHT, 12);
     // The CONTRAST between the two halves is the night cue, not the absolute
     // level: the ambient may be walked up for readability, but if it ever
     // reaches the key light the moon stops casting and the frame reads as an
@@ -318,13 +532,16 @@ describe('the night ambient floor (readable silhouettes at deep night)', () => {
     }
   });
 
-  it('takes the realm floor scale, capped so a warm realm cannot outshine noon', () => {
-    // the Nightbloom scales its floor DOWN (0.85), so its ambient dips with it
-    expect(dayNightGrade(0, 'night').ambientScale).toBeLessThan(dayNightGrade(0).ambientScale);
-    // the Drakelands scale UP (1.1): warmer than neutral, still under the day
-    const ember = dayNightGrade(0, 'ember');
-    expect(ember.ambientScale).toBeGreaterThan(dayNightGrade(0).ambientScale);
-    expect(ember.ambientScale).toBeLessThanOrEqual(1);
+  it('gives every realm the same night level, so only the tint differs', () => {
+    // No realm scales its floor: floorScale survives as an escape hatch but is
+    // deliberately unused, because per-realm LEVEL is exactly what made night
+    // read as a different time of day realm to realm.
+    const neutral = dayNightGrade(0);
+    for (const biome of ['night', 'ember', 'amber', 'dusk', 'frost', 'haunt'] as BiomeId[]) {
+      const g = dayNightGrade(0, biome);
+      expect(g.ambientScale, `${biome} ambient`).toBe(neutral.ambientScale);
+      expect(g.lightScale, `${biome} key`).toBe(neutral.lightScale);
+    }
   });
 
   it('survives the dusk warm untouched (warmDuskGrade is hue only)', () => {

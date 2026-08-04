@@ -1,25 +1,36 @@
-// Streetlamps: an iron post with a warm lantern head, standing beside every
-// road in the world. Dark by day, lit through the night, so the whole road
-// network stays readable after dusk without the world ceasing to read as night.
+// Streetlamps: one modeled fixture identity per authored area, standing beside
+// every road in the world. Dark by day, lit through the night, so the whole
+// road network stays readable after dusk without the world ceasing to read as
+// night. The compact procedural fixture below is retained only as a synchronous
+// fallback for headless tests or a failed/missing preload.
 //
-// Procedural, in the low-poly kit style the rest of the world dressing uses
-// (frost_sky.ts's Icemantle lanterns are the nearest sibling): a merged
-// six-sided fixture and an octahedral glass, instanced once per zone so a zone
-// costs three draws and the zone-feature distance cull drops the zones the
-// player is not standing in.
+// A lamp is a REAL light, not a decal. Two things make it, and neither is a
+// painted pool on the ground:
+//   1. the night light field (night_light_field.ts), which lights terrain with
+//      true direction, distance falloff and surface normal from the fixture's
+//      authored socket, so the road brightens because something above it is
+//      burning, not because a sprite was laid over it,
+//   2. the fixture's own AUTHORED emissive materials (streetlamp_emissive.ts),
+//      driven above the bloom threshold so the lamp reads as the source.
+// Per-fixture PointLights are still deliberately avoided: the renderer budgets
+// them by proximity, which made identical lamps alternate between blown-out and
+// dim. The field is the same physics without the budget lottery.
 //
-// Three layers make the light, in falling cost order:
-//   1. a terrain-draped additive ground pool under every lamp (the thing that
-//      actually paints the road; one merged draw per zone, every tier; see
-//      ground_glow_patch.ts for why it drapes instead of lying flat),
-//   2. an HDR emissive lantern head above the bloom threshold, so the lamp reads
-//      as a light source on the composer tiers,
-//   3. a real THREE.PointLight on every third lamp, riding the renderer's shared
-//      fire-light budget (renderer.ts budgetFireLights), which keeps only the
-//      nearest GFX.maxPointLights alive.
-// Layers 1 and 2 are what a low tier keeps if the budget never reaches a lamp,
-// and they are the layers that carry the readability; the point lights only add
-// falloff on nearby geometry.
+// The additive draped pool this used to stack on top of the field is GONE. It
+// was the artificial half: a flat radial sprite that ignored the surface it
+// lay on and read as a painted disc rather than as light. It survives only on
+// the Lambert tier, which compiles no standard splat material for the field to
+// splice and would otherwise have no ground illumination at all.
+//
+// Every anchor below comes from the model's own authored LIGHT_SOCKET, so a
+// hanging lantern lights the ground under the LANTERN rather than under the
+// foot of its post, and the light cannot drift from the thing that glows.
+//
+// The same socket decides which way a fixture is turned. Each style is measured
+// once (streetlamp_assets `lightAxis`: foot of the post to socket), and every
+// post is instanced at the yaw that swings that axis over the road, so the lit
+// end of a fixture overhangs the track and the post is left standing on the far
+// side of it, whichever edge the artist hung the light off.
 //
 // Placement is streetlamp_placement_core.ts (pure, tested): every road end to
 // end, clearance-banded against the sim's roadDistance so a post stands beside
@@ -28,23 +39,26 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { resolvePosition } from '../sim/colliders';
-import { getActiveWorldContent, zoneAt } from '../sim/data';
-import { propPlacementRoll } from '../sim/prop_layout';
+import { getActiveWorldContent, STRIP_MAX_X, STRIP_MIN_X } from '../sim/data';
 import { roadDistance, terrainHeight } from '../sim/world';
-import { EMISSIVE_LIGHT, GFX } from './gfx';
+import { attachBiomeHaze } from './biome_haze_field';
+import { GFX } from './gfx';
 import { buildDrapedGlowGeometry, type GlowPatchSite } from './ground_glow_patch';
 import { hasNightLightField, registerStaticNightLights } from './night_light_field';
+import { STREETLAMP_ASSET_DEFS, streetlampAsset } from './streetlamp_assets';
+import { type StreetlampEmissiveState, updateStreetlampEmissive } from './streetlamp_emissive';
 import {
   type LampSite,
-  lampCarriesLight,
+  lampFixtureYaw,
   planStreetlamps,
   type StreetlampPlan,
 } from './streetlamp_placement_core';
+import { resolveStreetlampStyle, type StreetlampStyleId } from './streetlamp_style_core';
 import { radialGlowTexture } from './textures';
 
 export interface StreetlampsView {
   group: THREE.Group;
-  /** point lights for the renderer's shared fire-light budget */
+  /** Kept for the renderer feature-view contract; lamp illumination is field-based. */
   glowLights: THREE.PointLight[];
   /** per-zone subtrees, so the zone-feature distance cull works per zone */
   cullGroups: THREE.Group[];
@@ -60,26 +74,31 @@ const IRON_COLOR = 0x3a3128;
 const GLASS_COLOR = 0xffdca0;
 // Warmer than the first pass on purpose: the lantern reads amber, not white.
 const GLASS_EMISSIVE = 0xffa14a;
-const LIGHT_COLOR = 0xff9d42;
-const LIGHT_INTENSITY = 14;
-const LIGHT_DISTANCE = 28;
-/** The glass centre of the scaled fixture, where the real light hangs. */
-const LIGHT_HEIGHT = (POST_HEIGHT + 0.45) * LAMP_SCALE;
-const POOL_RADIUS = 4.2;
-// Every lamp lays one of these, and a town centre has a dozen lamps in frame:
-// what looks right for a single pool stacks into a lit plaza, so this is tuned
-// against the crowd of them, not against one.
-const POOL_OPACITY = 0.3;
+const FALLBACK_SOURCE_EMISSIVE = 0.8;
+/** Lambert-tier fallback only: the field needs a standard splat material to
+ *  splice, so the low tier keeps the draped pool rather than an unlit road. */
+const POOL_RADIUS = 6.5;
+const POOL_OPACITY = 0.5;
 /** Night-light-field entries: the punctual cutoff and candela-style level.
  *  Calibrated to the ground, not to the units: the head hangs 4.7 yd up, so
  *  the patch straight below it gets intensity * 0.045 / pi of the albedo,
- *  and reading CLEARLY lit on dark night ground needs the level up here. */
-const FIELD_RADIUS = 22;
-const FIELD_INTENSITY = 40;
-/** Lantern glow as warm linear amber. */
-const FIELD_COLOR = [1.0, 0.52, 0.16] as const;
-/** A glassed lantern wavers gently, a shade under the shared fire-flicker
- *  amplitude its own point light rides, so post and ground breathe together. */
+ *  and reading CLEARLY lit on dark night ground needs the level up here.
+ *  Raised with the pools removed (the field now carries the road alone), and
+ *  again when the palette dropped to a true ~1800K flame amber: that colour
+ *  carries far less luminance per unit intensity than the pale amber before it,
+ *  so the same number would have read as a dimmer road.
+ *
+ *  The cutoff is the REACH knob and the intensity is the BRIGHTNESS knob, and
+ *  they are deliberately turned separately: with decay-2 falloff the level
+ *  under the lamp is set by 1/d^2 at four yards, which the cutoff barely
+ *  touches, while the cutoff window is what strangles the tail. Widening the
+ *  cutoff therefore carries lamplight further down the road (halfway to the
+ *  next town lamp is roughly twice as lit as it was) without touching the pool
+ *  underneath, which is already where it should be. */
+const FIELD_RADIUS = 48;
+const FIELD_INTENSITY = 205;
+/** A glassed lantern wavers gently, so the authored source and ground breathe
+ *  together without introducing fixture-to-fixture brightness differences. */
 const FIELD_FLICKER = 0.1;
 /** How far a lamp may be nudged by a collider before we give up on the spot. */
 const CLEARANCE_EPSILON = 0.05;
@@ -132,16 +151,43 @@ function glassMaterial(): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial
     emissiveIntensity: 0,
     flatShading: true,
   };
-  return GFX.standardMaterials
+  const material = GFX.standardMaterials
     ? new THREE.MeshStandardMaterial({ ...opts, roughness: 0.45, metalness: 0 })
     : new THREE.MeshLambertMaterial(opts);
+  attachBiomeHaze(material);
+  return material;
 }
 
 function ironMaterial(): THREE.MeshStandardMaterial | THREE.MeshLambertMaterial {
   const opts = { color: IRON_COLOR, flatShading: true };
-  return GFX.standardMaterials
-    ? new THREE.MeshStandardMaterial({ ...opts, roughness: 0.82, metalness: 0.25 })
+  const material = GFX.standardMaterials
+    ? new THREE.MeshStandardMaterial({
+        ...opts,
+        roughness: 0.82,
+        metalness: 0.25,
+      })
     : new THREE.MeshLambertMaterial(opts);
+  attachBiomeHaze(material);
+  return material;
+}
+
+function strictAreaAt(
+  x: number,
+  z: number,
+  zones: readonly {
+    id: string;
+    zMin: number;
+    zMax: number;
+    xMin?: number;
+    xMax?: number;
+  }[],
+): string | null {
+  for (const zone of zones) {
+    const xMin = zone.xMin ?? STRIP_MIN_X;
+    const xMax = zone.xMax ?? STRIP_MAX_X;
+    if (x >= xMin && x < xMax && z >= zone.zMin && z < zone.zMax) return zone.id;
+  }
+  return null;
 }
 
 function buildPlan(seed: number): StreetlampPlan {
@@ -162,8 +208,8 @@ function buildPlan(seed: number): StreetlampPlan {
         Math.abs(resolved.x - x) > CLEARANCE_EPSILON || Math.abs(resolved.z - z) > CLEARANCE_EPSILON
       );
     },
-    roll: propPlacementRoll,
     roadClear: roadDistance,
+    areaAt: (x, z) => strictAreaAt(x, z, content.zones),
   });
 }
 
@@ -173,59 +219,107 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
   const glowLights: THREE.PointLight[] = [];
   const cullGroups: THREE.Group[] = [];
   const poolMeshes: THREE.Mesh[] = [];
+  const poolMaterials = new Set<THREE.MeshBasicMaterial>();
+  const emitterMaterials = new Map<
+    THREE.MeshStandardMaterial | THREE.MeshLambertMaterial,
+    number
+  >();
+  const authoredGlowStates = new Set<StreetlampEmissiveState>();
 
   const plan = buildPlan(seed);
   if (plan.sites.length === 0) {
+    registerStaticNightLights('streetlamps', []);
     return { group, glowLights, cullGroups, update: () => undefined };
   }
 
-  // The ground illumination: EVERY lamp joins the night light field where the
-  // terrain splices it (real reactive light, not just the stride-3 budget
-  // lights); the draped pools below are the fallback where it does not.
+  const content = getActiveWorldContent();
+  const zoneIndexById = new Map(content.zones.map((zone, index) => [zone.id, index]));
+  const zoneBiomeById = new Map(content.zones.map((zone) => [zone.id, zone.biome]));
+  const styleFor = (site: LampSite): StreetlampStyleId =>
+    resolveStreetlampStyle(
+      site.areaId,
+      site.areaId ? (zoneBiomeById.get(site.areaId) ?? null) : null,
+    );
+
+  /**
+   * Where the light actually comes from, in world space. The authored
+   * LIGHT_SOCKET is the truth; `lightOffset` only stands in for the procedural
+   * fallback fixture, which has no model to read a socket from.
+   */
+  const socketFor = (style: StreetlampStyleId): readonly [number, number, number] =>
+    streetlampAsset(style)?.socket ?? STREETLAMP_ASSET_DEFS[style].lightOffset;
+
+  const lightAnchor = (
+    site: LampSite,
+    yaw: number,
+    socket: readonly [number, number, number],
+  ): { x: number; y: number; z: number } => {
+    const [ox, oy, oz] = socket;
+    const c = Math.cos(yaw);
+    const s = Math.sin(yaw);
+    return {
+      x: site.x + ox * c + oz * s,
+      y: site.y + oy,
+      z: site.z - ox * s + oz * c,
+    };
+  };
+
+  interface StyledSite {
+    site: LampSite;
+    style: StreetlampStyleId;
+    yaw: number;
+  }
+  // Style and yaw are resolved ONCE per site, here, and every consumer below
+  // reads the same record. The field anchor and the instance transform must
+  // agree on the yaw or the light drifts off the lantern that casts it.
+  const styled: StyledSite[] = plan.sites.map((site) => {
+    const style = styleFor(site);
+    const axis = streetlampAsset(style)?.lightAxis;
+    return {
+      site,
+      style,
+      // Turn the fixture's own lit end over the road: a hanging lantern reaches
+      // out across the track, its post left standing out on the verge.
+      yaw: lampFixtureYaw(site.roadYaw, axis?.[0] ?? 0, axis?.[1] ?? 0),
+    };
+  });
+
+  // EVERY lamp joins the night light field, from its own authored socket. This
+  // path is identical for every fixture, regardless of camera range, which is
+  // what keeps a plaza of fourteen different styles reading as one warm night.
   registerStaticNightLights(
     'streetlamps',
-    plan.sites.map((site) => ({
-      x: site.x,
-      y: site.y + LIGHT_HEIGHT,
-      z: site.z,
-      radius: FIELD_RADIUS,
-      r: FIELD_COLOR[0],
-      g: FIELD_COLOR[1],
-      b: FIELD_COLOR[2],
-      intensity: FIELD_INTENSITY,
-      flicker: FIELD_FLICKER,
-    })),
+    styled.map(({ site, style, yaw }) => {
+      const def = STREETLAMP_ASSET_DEFS[style];
+      const anchor = lightAnchor(site, yaw, socketFor(style));
+      return {
+        ...anchor,
+        radius: FIELD_RADIUS,
+        r: def.fieldColor[0],
+        g: def.fieldColor[1],
+        b: def.fieldColor[2],
+        intensity: FIELD_INTENSITY,
+        flicker: FIELD_FLICKER,
+      };
+    }),
   );
-  const usePools = !hasNightLightField();
+  // Pools ONLY where the field cannot run. Wherever the field is spliced the
+  // real light is the whole story and no sprite is built at all.
+  const fieldActive = hasNightLightField();
+  const usePools = typeof document !== 'undefined' && !fieldActive;
 
-  // Bucket by zone so the distance cull drops the zones the player is not in
-  // (the lamps span the whole road network now, so per-town groups no longer
-  // cover them; this is the ember_pools bucketing).
-  const content = getActiveWorldContent();
-  const byZone = new Map<number, LampSite[]>();
-  for (const site of plan.sites) {
-    const zoneIndex = content.zones.indexOf(zoneAt(site.x, site.z));
+  const byZone = new Map<number, StyledSite[]>();
+  for (const entry of styled) {
+    const zoneIndex = entry.site.areaId ? (zoneIndexById.get(entry.site.areaId) ?? -1) : -1;
     const bucket = byZone.get(zoneIndex);
-    if (bucket) bucket.push(site);
-    else byZone.set(zoneIndex, [site]);
+    if (bucket) bucket.push(entry);
+    else byZone.set(zoneIndex, [entry]);
   }
 
-  const fixtureGeo = buildLampFixtureGeometry();
-  const glassGeo = buildLampGlassGeometry();
-  const ironMat = ironMaterial();
-  const glassMat = glassMaterial();
-  // Built only on the fallback tiers: on field tiers no pool mesh exists, and
-  // a material attached to nothing would be dead per-frame opacity writes.
-  const poolMat = usePools
-    ? new THREE.MeshBasicMaterial({
-        map: radialGlowTexture(),
-        color: LIGHT_COLOR,
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      })
-    : null;
+  let fallbackFixtureGeo: THREE.BufferGeometry | null = null;
+  let fallbackGlassGeo: THREE.BufferGeometry | null = null;
+  let fallbackIronMat: THREE.Material | null = null;
+  let fallbackGlassMat: THREE.MeshStandardMaterial | THREE.MeshLambertMaterial | null = null;
 
   const matrix = new THREE.Matrix4();
   const quaternion = new THREE.Quaternion();
@@ -234,52 +328,101 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
   const up = new THREE.Vector3(0, 1, 0);
   const patchSites: GlowPatchSite[] = [];
 
-  for (const [zoneIndex, sites] of byZone) {
+  for (const [zoneIndex, zoneSites] of byZone) {
     const zoneGroup = new THREE.Group();
     zoneGroup.name = `streetlamps-zone-${zoneIndex}`;
-    const fixtures = new THREE.InstancedMesh(fixtureGeo, ironMat, sites.length);
-    const glasses = new THREE.InstancedMesh(glassGeo, glassMat, sites.length);
+    const byStyle = new Map<StreetlampStyleId, StyledSite[]>();
+    for (const entry of zoneSites) {
+      const bucket = byStyle.get(entry.style);
+      if (bucket) bucket.push(entry);
+      else byStyle.set(entry.style, [entry]);
+    }
 
-    patchSites.length = 0;
-    for (let i = 0; i < sites.length; i++) {
-      const site = sites[i];
-      quaternion.setFromAxisAngle(up, site.yaw);
-      position.set(site.x, site.y, site.z);
-      fixtures.setMatrixAt(i, matrix.compose(position, quaternion, scale));
-      glasses.setMatrixAt(i, matrix.compose(position, quaternion, scale));
-      patchSites.push({ x: site.x, z: site.z, radius: POOL_RADIUS });
-      if (lampCarriesLight(i)) {
-        const light = new THREE.PointLight(LIGHT_COLOR, 0, LIGHT_DISTANCE, 2);
-        light.position.set(site.x, site.y + LIGHT_HEIGHT, site.z);
-        light.userData.baseIntensity = 0;
-        // The renderer pins the VISIBLE point-light count at GFX.maxPointLights
-        // from the first frame (pad lights fill the rest); a lamp that arrived
-        // visible would push the count over and recompile every lit material.
-        light.visible = false;
-        glowLights.push(light);
-        zoneGroup.add(light);
+    for (const [style, sites] of byStyle) {
+      const def = STREETLAMP_ASSET_DEFS[style];
+      const asset = streetlampAsset(style);
+      const styleGroup = new THREE.Group();
+      styleGroup.name = `streetlamps-${style}`;
+      let parts = asset?.parts;
+      if (!parts) {
+        fallbackFixtureGeo ??= buildLampFixtureGeometry();
+        fallbackIronMat ??= ironMaterial();
+        parts = [{ geometry: fallbackFixtureGeo, material: fallbackIronMat }];
       }
+
+      const bodies = parts.map((part) => {
+        const body = new THREE.InstancedMesh(part.geometry, part.material, sites.length);
+        body.userData.streetlampRole = 'body';
+        body.castShadow = true;
+        body.receiveShadow = true;
+        styleGroup.add(body);
+        return body;
+      });
+
+      let emitters: THREE.InstancedMesh | null = null;
+      if (asset) {
+        // The GLB's own LAMP_GLASS / LAMP_SOURCE materials, already normalized
+        // to a constant luminance when authored. Nothing per-style is applied
+        // on top, which is exactly why every fixture reads equally lit.
+        for (const state of asset.glowStates) authoredGlowStates.add(state);
+      } else {
+        fallbackGlassGeo ??= buildLampGlassGeometry();
+        fallbackGlassMat ??= glassMaterial();
+        emitterMaterials.set(fallbackGlassMat, FALLBACK_SOURCE_EMISSIVE);
+        emitters = new THREE.InstancedMesh(fallbackGlassGeo, fallbackGlassMat, sites.length);
+        emitters.userData.streetlampRole = 'emitter';
+        styleGroup.add(emitters);
+      }
+
+      patchSites.length = 0;
+      const socket = socketFor(style);
+      for (let i = 0; i < sites.length; i++) {
+        const { site, yaw } = sites[i];
+        quaternion.setFromAxisAngle(up, yaw);
+        position.set(site.x, site.y, site.z);
+        const instanceMatrix = matrix.compose(position, quaternion, scale);
+        for (const body of bodies) body.setMatrixAt(i, instanceMatrix);
+        emitters?.setMatrixAt(i, instanceMatrix);
+        if (usePools) {
+          // Project from the authored socket, including off-axis hanging
+          // lanterns, instead of from the foot of the post.
+          const anchor = lightAnchor(site, yaw, socket);
+          patchSites.push({ x: anchor.x, z: anchor.z, radius: POOL_RADIUS });
+        }
+      }
+      for (const body of bodies) {
+        body.instanceMatrix.needsUpdate = true;
+        body.computeBoundingBox();
+        body.computeBoundingSphere();
+      }
+      if (emitters) {
+        emitters.instanceMatrix.needsUpdate = true;
+        emitters.computeBoundingBox();
+        emitters.computeBoundingSphere();
+      }
+
+      if (usePools) {
+        const poolMat = new THREE.MeshBasicMaterial({
+          map: radialGlowTexture(),
+          color: def.lightColor,
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        });
+        poolMaterials.add(poolMat);
+        const pools = new THREE.Mesh(
+          buildDrapedGlowGeometry(patchSites, (x, z) => terrainHeight(x, z, seed)),
+          poolMat,
+        );
+        pools.geometry.computeBoundingSphere();
+        pools.renderOrder = 1;
+        pools.visible = false;
+        poolMeshes.push(pools);
+        styleGroup.add(pools);
+      }
+      zoneGroup.add(styleGroup);
     }
-    fixtures.instanceMatrix.needsUpdate = true;
-    glasses.instanceMatrix.needsUpdate = true;
-    fixtures.castShadow = true;
-    fixtures.computeBoundingSphere();
-    glasses.computeBoundingSphere();
-    if (poolMat) {
-      // The fallback pool: one merged terrain-draped patch per zone, so a
-      // hillside road keeps its lamplight when the shader field is absent.
-      const pools = new THREE.Mesh(
-        buildDrapedGlowGeometry(patchSites, (x, z) => terrainHeight(x, z, seed)),
-        poolMat,
-      );
-      pools.geometry.computeBoundingSphere();
-      pools.renderOrder = 1; // over the ground it drapes on
-      pools.visible = false; // no pool until the lamps light
-      poolMeshes.push(pools);
-      zoneGroup.add(pools);
-    }
-    zoneGroup.add(fixtures);
-    zoneGroup.add(glasses);
     group.add(zoneGroup);
     cullGroups.push(zoneGroup);
   }
@@ -296,21 +439,23 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
         for (const pool of poolMeshes) pool.visible = lit;
       }
       if (!lit) {
-        glassMat.emissiveIntensity = 0;
-        if (poolMat) poolMat.opacity = 0;
-        for (const light of glowLights) light.userData.baseIntensity = 0;
+        for (const material of emitterMaterials.keys()) material.emissiveIntensity = 0;
+        for (const state of authoredGlowStates) updateStreetlampEmissive(state, 0);
+        for (const material of poolMaterials) material.opacity = 0;
         return;
       }
       // A lantern flame breathes rather than strobing: two slow out-of-phase
       // sines, the same idiom the Icemantle lanterns use.
       const flicker = 1 + Math.sin(time * 5.7) * 0.05 + Math.sin(time * 1.9) * 0.04;
-      glassMat.emissiveIntensity = EMISSIVE_LIGHT * glow * flicker;
-      if (poolMat) poolMat.opacity = POOL_OPACITY * glow;
-      // The budget owns light.intensity (renderer.ts applyPointLightBudget +
-      // flickerContributingFireLights read this base), so a lamp out of budget
-      // costs nothing and a lit one picks the level up on the next pass.
-      const base = LIGHT_INTENSITY * glow;
-      for (const light of glowLights) light.userData.baseIntensity = base;
+      for (const [material, intensity] of emitterMaterials) {
+        material.emissiveIntensity = intensity * glow * flicker;
+      }
+      // One drive for every fixture: the per-role level is authored in the GLB,
+      // so nothing here can make one style brighter than another.
+      for (const state of authoredGlowStates) {
+        updateStreetlampEmissive(state, glow * flicker);
+      }
+      for (const material of poolMaterials) material.opacity = POOL_OPACITY * glow;
     },
   };
 }

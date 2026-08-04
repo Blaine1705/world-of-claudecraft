@@ -199,8 +199,9 @@ uniform vec2 uHazeCam;`;
  * makes a neighbouring realm look like itself from across a bay. The amount
  * is the Node-tested `aerialHazeAmount` curve (two summed Gaussian-shoulder
  * terms, both zero-derivative at their onsets so neither draws a ring): the
- * border-band term that puts a realm's air on it from across the line, and
- * the far term that fades distance out into the LOCAL area's fog colour.
+ * border-band term that puts a realm's air on it from across the line, scaled
+ * by that realm's own murk, and the camera's air column, which fades distance
+ * out into the LOCAL area's fog colour at the same depth everywhere.
  */
 export function biomeHazeFragmentGlsl(worldXZ: string): string {
   return `
@@ -210,8 +211,8 @@ export function biomeHazeFragmentGlsl(worldXZ: string): string {
     float wocHazeD = distance(wocHazeXZ, uHazeCam);
     float wocHazeT = max(0.0, wocHazeD - ${glsl(HAZE_AERIAL_ONSET)}) / ${glsl(HAZE_AERIAL_REF)};
     float wocHazeT2 = max(0.0, wocHazeD - ${glsl(HAZE_FAR_ONSET)}) / ${glsl(HAZE_FAR_REF)};
-    float wocHazeA = wocHaze.a * (${glsl(HAZE_AERIAL_MAX)} * (1.0 - exp(-wocHazeT * wocHazeT))
-      + ${glsl(HAZE_FAR_CEIL - HAZE_AERIAL_MAX)} * (1.0 - exp(-wocHazeT2 * wocHazeT2)));
+    float wocHazeA = wocHaze.a * ${glsl(HAZE_AERIAL_MAX)} * (1.0 - exp(-wocHazeT * wocHazeT))
+      + ${glsl(HAZE_FAR_CEIL - HAZE_AERIAL_MAX)} * (1.0 - exp(-wocHazeT2 * wocHazeT2));
     gl_FragColor.rgb = mix(gl_FragColor.rgb, wocHaze.rgb * uHazeGrade, wocHazeA);
   }`;
 }

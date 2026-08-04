@@ -22,8 +22,12 @@ import {
   biomeHazeUniforms,
   hasBiomeHazeField,
 } from './biome_haze_field';
+import { stoneDetailNormal } from './detail_normals';
 import {
   createFarTileBuilder,
+  FAR_DETAIL_GRAIN,
+  FAR_DETAIL_NORMAL,
+  FAR_DETAIL_YARDS,
   type FarTile,
   type FarVistaPlan,
   farGridIndices,
@@ -32,6 +36,7 @@ import {
   farTileVisible,
   planFarTiles,
 } from './far_terrain_core';
+import { GFX } from './gfx';
 import { getGrassGroundBake } from './grass_ground_bake';
 import { idleSlot } from './idle_queue';
 import { GRASS_BAKE_PATCH_YARDS, GRASS_PAINT_GAIN } from './meadow_tuning';
@@ -50,12 +55,19 @@ function sharedIndexFor(tileSize: number, spacing: number): THREE.BufferAttribut
   return index;
 }
 
-// An idle-paced build slice. A 960u tile row is ~100 terrainHeight samples,
-// roughly half a millisecond, so 40 rows stays around 3ms per slice. The
-// budget matters less than the SLOT COUNT: this build takes an idle slot per
-// slice for its whole run and competes with near-terrain zone prepares for
-// the same idle time, so fewer, chunkier, more deferential slices (see the
-// timeout deferrals below) keep the vista from starving the detail horizon.
+// An idle-paced build slice, in BUDGET UNITS rather than rows: the builder's
+// phases are not equally expensive. A height row is about a hundred
+// farVertexHeight calls; a CELL row is about a hundred cells at seven
+// meshTerrainHeight probes each, some six times heavier. Charging both one unit
+// per row (as this did when every phase was a height row) let a 40-unit slice
+// run six times its intended ~3ms and blow through the requestIdleCallback
+// deadline, repeatedly, for the whole boot build. A slice runs to completion
+// once entered, so timeRemaining() cannot rescue it from inside.
+//
+// The budget matters less than the SLOT COUNT: this build takes an idle slot per
+// slice for its whole run and competes with near-terrain zone prepares for the
+// same idle time, so fewer, chunkier, more deferential slices (see the timeout
+// deferrals below) keep the vista from starving the detail horizon.
 const FAR_BUILD_ROWS_PER_SLICE = 40;
 const FAR_BUILD_TIMEOUT_MS = 200;
 /** Timed-out slots deferred before forcing progress: the far vista is the
@@ -88,15 +100,54 @@ interface BuiltFarTile {
 const FAR_NIGHT_FLOOR: [number, number, number] = [0.026, 0.03, 0.044];
 const farNightFloor = { value: new THREE.Color(0, 0, 0) };
 
-/** Per-frame, from the renderer's day/night update: scales the moonlit
- *  ambient floor with how deep into night the cycle sits (0 by day). */
-export function setFarTerrainNightFloor(nightAmt: number): void {
+/**
+ * What the vista's ALBEDO is multiplied by at deepest night, the other half of
+ * the same problem the floor above solves and the opposite symptom.
+ *
+ * The grade's ambient half (hemisphere plus IBL) deliberately holds a high
+ * night floor (day_night_core.ts NIGHT_AMBIENT_FLOOR) because that is what
+ * keeps terrain shape and body silhouettes readable underfoot. Out on the
+ * vista the same floor lands on large high-albedo faces (snow caps, pale rim
+ * rock) which are almost entirely ambient-lit, so they held roughly two thirds
+ * of their DAY brightness against a sky graded down to a deep navy: distant
+ * peaks read as glowing cutouts pasted over the night, the single loudest
+ * "the far terrain ignores the day/night cycle" tell.
+ *
+ * A flat albedo multiply is the right shape for the fix: every light term
+ * except the emissive floor multiplies albedo, so sun, hemisphere and IBL all
+ * come down together and the surface keeps its light-and-shade RATIO (dimming
+ * the ambient alone would flatten the shading it exists to preserve). The
+ * night floor is applied after this and is albedo-shaped, so it scales with it
+ * and keeps its relative say against the lit terms.
+ *
+ * Cosmetic and gameplay-neutral by construction: this material only ever draws
+ * past the detail envelope (see FAR_DISCARD_MARGIN), where no actionable
+ * information lives; the near terrain a player reads is untouched.
+ */
+const FAR_NIGHT_ALBEDO_DIM = 0.5;
+const farNightDim = { value: 1 };
+
+/** Per-frame, from the renderer's day/night update: scales the moonlit ambient
+ *  floor and the night albedo dim with how deep into night the cycle sits.
+ *  Both are the identity by day, so the day frame is byte-identical. */
+export function setFarTerrainNightGrade(nightAmt: number): void {
   farNightFloor.value.setRGB(
     FAR_NIGHT_FLOOR[0] * nightAmt,
     FAR_NIGHT_FLOOR[1] * nightAmt,
     FAR_NIGHT_FLOOR[2] * nightAmt,
   );
+  farNightDim.value = 1 - (1 - FAR_NIGHT_ALBEDO_DIM) * nightAmt;
 }
+
+/** The night-grade uniforms and their endpoints, for tests/far_terrain_night.
+ *  The uniform objects are the live ones every tile's material shares, so a
+ *  test reads exactly what a fragment would. */
+export const farTerrainNightInternalsForTest = {
+  farNightFloor,
+  farNightDim,
+  FAR_NIGHT_FLOOR,
+  FAR_NIGHT_ALBEDO_DIM,
+};
 
 export interface FarTerrainView {
   group: THREE.Group;
@@ -122,7 +173,11 @@ export function buildFarTerrain(
   const built: BuiltFarTile[] = [];
   let cancelled = false;
 
-  if (!plan.enabled) {
+  // ?farvista=off takes the WHOLE coarse layer out, which is the one A/B that
+  // answers "is that smooth thing on the mountain this layer or the real
+  // terrain" in a single look. Same arm as a tier that never enables the vista,
+  // so the horizon past the detail envelope simply ends.
+  if (!plan.enabled || renderLayerDisabled('farvista')) {
     return {
       group,
       update: () => {},
@@ -146,8 +201,11 @@ export function buildFarTerrain(
     metalness: 0,
   });
   material.name = 'farTerrain';
-  // The near-field discard (see FAR_DISCARD_MARGIN). uTime-style shared
-  // uniforms are overkill here: one vec3 (camera xz + cutoff) per frame.
+  // The near-field discard (see FAR_DISCARD_MARGIN). One vec3 per frame:
+  // camera xz plus the cutoff radius. The mesh's own HEIGHT is what guarantees
+  // it sits under the near terrain now (far_surface_core.ts bakes a per-vertex
+  // clearance at build time), so the vertex stage reads nothing here and the
+  // guarantee holds at every distance instead of across one tuned band.
   const farCut = { value: new THREE.Vector3(0, 0, 0) };
   // Meadow-continuum ground paint: the far tiles multiply the SAME baked
   // blade texture the near splat terrain paints with, at the same true
@@ -157,12 +215,32 @@ export function buildFarTerrain(
   // the near ground shows, and the handoff at the detail horizon is
   // invisible by construction. ?grassbake=off keeps the legacy flat tint.
   const grassBake = renderLayerDisabled('grassbake') ? null : getGrassGroundBake();
+  // Rock surface detail (see FAR_DETAIL_*): the shared terrain rock normal, the
+  // same file detail_normals.ts already preloads for the stone families, so this
+  // costs one extra sampler and no extra fetch. That texture's own repeat and
+  // offset are irrelevant here, because the sample is taken at WORLD scale from
+  // vFarXZ rather than through three's uv transform.
+  //
+  // It arrives on a deferred preload, so it can still be null when this material
+  // compiles. The arm is therefore decided at compile time (tier, plus the
+  // ?fardetail=off A/B) while the TEXTURE fills in later through a shared
+  // uniform, behind an amount that stays 0 until it lands: sampling a null
+  // sampler binds three's white placeholder, which would read as one constant
+  // tilt over the entire world instead of as nothing.
+  const detailArm = GFX.standardMaterials && !renderLayerDisabled('fardetail');
+  const farDetail: { value: THREE.Texture | null } = { value: null };
+  const farDetailAmt = { value: 0 };
   // Distant-zone atmosphere: whether the biome haze field exists is decided
   // once, before the material compiles, so a tier without one is byte-identical.
   const zoneHaze = hasBiomeHazeField();
   material.onBeforeCompile = (shader) => {
     shader.uniforms.uFarCut = farCut;
     shader.uniforms.uFarNightFloor = farNightFloor;
+    shader.uniforms.uFarNightDim = farNightDim;
+    if (detailArm) {
+      shader.uniforms.uFarDetail = farDetail;
+      shader.uniforms.uFarDetailAmt = farDetailAmt;
+    }
     if (grassBake) shader.uniforms.uGrassBake = { value: grassBake.texture };
     shader.vertexShader = shader.vertexShader
       .replace(
@@ -172,38 +250,86 @@ export function buildFarTerrain(
         }`,
       )
       .replace(
+        // The overlap-band sink (farOverlapSink, whose Node twin pins this
+        // curve). Inside the band the real terrain draws too, and this mesh is
+        // biased upward to protect ridge silhouettes, so without the sink it
+        // wins the depth test and drapes a smooth skin over the real hillside.
+        // Only `transformed` moves: vFarXZ stays the true world xz, so colour,
+        // grass paint and haze are all sampled exactly as before, and outside
+        // the band the sink is zero and the surface is untouched.
         '#include <begin_vertex>',
-        `#include <begin_vertex>\nvFarXZ = (modelMatrix * vec4(position, 1.0)).xz;${
-          grassBake ? '\nvGrassW = aGrassW;' : ''
+        `#include <begin_vertex>
+        vFarXZ = (modelMatrix * vec4(position, 1.0)).xz;${
+          grassBake ? '\n        vGrassW = aGrassW;' : ''
         }`,
       );
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        `#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;\nuniform vec3 uFarNightFloor;${
-          grassBake ? '\nvarying float vGrassW;\nuniform sampler2D uGrassBake;' : ''
-        }`,
+        `#include <common>\nvarying vec2 vFarXZ;\nuniform vec3 uFarCut;\nuniform vec3 uFarNightFloor;\nuniform float uFarNightDim;${
+          detailArm ? '\nuniform sampler2D uFarDetail;\nuniform float uFarDetailAmt;' : ''
+        }${grassBake ? '\nvarying float vGrassW;\nuniform sampler2D uGrassBake;' : ''}`,
       )
       .replace(
         'void main() {',
         'void main() {\n\tif (distance(vFarXZ, uFarCut.xy) < uFarCut.z) discard;',
       )
       .replace(
-        // The deep-night ambient floor (see FAR_NIGHT_FLOOR): albedo-shaped,
-        // added where emissive lands so it survives the night light scale.
-        '#include <emissivemap_fragment>',
-        '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += uFarNightFloor * diffuseColor.rgb;',
-      );
-    if (grassBake) {
-      shader.fragmentShader = shader.fragmentShader.replace(
+        // Everything that shapes ALBEDO, in one patch and in this order: the
+        // meadow-continuum ground paint, then the night dim (see
+        // FAR_NIGHT_ALBEDO_DIM), so the dim always lands on the final ground
+        // colour whether or not the bake is present. One replace rather than a
+        // second pass over the same anchor: chaining two replaces of
+        // <color_fragment> only works because the anchor survives inside the
+        // first replacement, which is a trap for whoever adds the third.
         '#include <color_fragment>',
-        `#include <color_fragment>
+        `#include <color_fragment>${
+          detailArm
+            ? `
+        // Rock surface detail, sampled at world scale (see FAR_DETAIL_*). Taken
+        // HERE, before the shading normal is resolved, so the normal patch below
+        // reuses this one fetch instead of taking a second.
+        vec3 wocFarRN = texture2D(uFarDetail, vFarXZ * ${(1 / FAR_DETAIL_YARDS).toFixed(6)}).xyz * 2.0 - 1.0;
+        float wocFarGrain = clamp(0.5 + 0.5 * (wocFarRN.x + wocFarRN.y), 0.0, 1.0);
+        diffuseColor.rgb *= mix(1.0,
+          mix(${(1 - FAR_DETAIL_GRAIN).toFixed(4)}, ${(1 + FAR_DETAIL_GRAIN).toFixed(4)}, wocFarGrain),
+          uFarDetailAmt);`
+            : ''
+        }${
+          grassBake
+            ? `
         diffuseColor.rgb *= mix(vec3(1.0),
           texture2D(uGrassBake, vFarXZ * ${(1 / GRASS_BAKE_PATCH_YARDS).toFixed(6)}).rgb
             * ${GRASS_PAINT_GAIN.toFixed(4)},
-          vGrassW);`,
+          vGrassW);`
+            : ''
+        }
+        diffuseColor.rgb *= uFarNightDim;`,
+      )
+      .replace(
+        // Tilt the SHADING normal by the same detail sample. This is the half
+        // that stops the vista reading as plastic: flat-shaded coarse triangles
+        // take one light value each however good the albedo is, and rock is
+        // legible mostly through the break-up of its shading. Perturbed in world
+        // space and rotated into view space (three declares viewMatrix in the
+        // fragment stage), because the sample's tangent frame here IS world up:
+        // the texture is projected down the y axis.
+        '#include <normal_fragment_begin>',
+        detailArm
+          ? `#include <normal_fragment_begin>
+        normal = normalize(normal + (viewMatrix
+          * vec4(wocFarRN.x, 0.0, wocFarRN.y, 0.0)).xyz
+          * (${FAR_DETAIL_NORMAL.toFixed(4)} * uFarDetailAmt));`
+          : '#include <normal_fragment_begin>',
+      )
+      .replace(
+        // The deep-night ambient floor (see FAR_NIGHT_FLOOR): albedo-shaped,
+        // added where emissive lands so it survives the night light scale.
+        // Shaped by the DIMMED albedo above, so the floor keeps the same
+        // relative say against the lit terms after dark that it was tuned for.
+        '#include <emissivemap_fragment>',
+        '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += uFarNightFloor * diffuseColor.rgb;',
       );
-    }
     // Per-zone aerial perspective (biome_haze_field.ts). Self-contained and
     // additive on purpose: its own uniforms, its own two replaces, and it
     // lands immediately before <fog_fragment> so the horizon haze band still
@@ -273,6 +399,16 @@ export function buildFarTerrain(
     update(camX, camZ, detailFar, viewFar, outdoor): void {
       group.visible = outdoor;
       if (!outdoor) return;
+      // The rock detail arrives on a deferred preload, so adopt it on the first
+      // frame it exists and then never look again. Zero-cost steady state: one
+      // null check per frame, and the amount gates the shader until then.
+      if (detailArm && farDetail.value === null) {
+        const tex = stoneDetailNormal();
+        if (tex) {
+          farDetail.value = tex;
+          farDetailAmt.value = 1;
+        }
+      }
       farCut.value.set(camX, camZ, Math.max(0, detailFar - FAR_DISCARD_MARGIN));
       for (const b of built) {
         b.mesh.visible = farTileVisible(b.tile, camX, camZ, viewFar);

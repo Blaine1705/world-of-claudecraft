@@ -331,6 +331,31 @@ describe('shared GLSL and constants', () => {
     expect(src.slice(normalHook, offsetHook)).toContain('vec3 objectNormal');
   });
 
+  it('takes the distant-zone air, and attaches it AFTER its own two hooks', () => {
+    // Past the detail envelope these sprites ARE the trees, rocks and
+    // buildings, so a sprite holding full local colour over hazed ground is
+    // the self-cancelling failure biome_haze_field.ts warns about: the vista
+    // splits into hazed ground with an unhazed collage on top, which reads as
+    // no atmosphere at all. Every other lit surface gets this through
+    // surfaceMat; this material is built by hand and so must ask.
+    const src = readFileSync(new URL('../src/render/foliage_impostor.ts', import.meta.url), 'utf8');
+    expect(src).toContain('attachBiomeHaze');
+    // Order is load-bearing: attachBiomeHaze CHAINS the onBeforeCompile and
+    // customProgramCacheKey it finds at attach time, so attaching before the
+    // sprite installs its own would silently drop the billboard vertex stage
+    // (every sprite a flat unrotated quad) and let the two arms share a program.
+    const attach = src.indexOf('attachBiomeHaze(mat)');
+    expect(attach).toBeGreaterThan(src.indexOf('mat.onBeforeCompile = '));
+    expect(attach).toBeGreaterThan(src.indexOf('mat.customProgramCacheKey = '));
+    // and it must land on the DRAW material, never the bake material: the
+    // atlas is rendered once at boot and baking the air into it would freeze
+    // one camera distance and one time of day into every sprite forever.
+    const bakeStart = src.indexOf('function bakeMaterialFor');
+    const bakeEnd = src.indexOf('\n}', bakeStart);
+    expect(bakeStart).toBeGreaterThan(0);
+    expect(src.slice(bakeStart, bakeEnd)).not.toContain('attachBiomeHaze');
+  });
+
   it('never sets vertexColors while the sprite quad carries no colour attribute', () => {
     // The regression that made every sprite a flat cutout. three defines
     // USE_COLOR in the VERTEX prefix from material.vertexColors alone, and

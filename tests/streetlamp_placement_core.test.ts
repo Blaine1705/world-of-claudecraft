@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { NIGHT_LIGHT_STATIC_SLOTS } from '../src/render/night_light_field_core';
 import {
+  LAMP_LIGHT_AXIS_MIN,
   LAMP_LIGHT_STRIDE,
+  type LampSite,
   type LampTown,
   lampCarriesLight,
+  lampFixtureYaw,
   planStreetlamps,
   type StreetlampProbes,
 } from '../src/render/streetlamp_placement_core';
 import { resolvePosition } from '../src/sim/colliders';
-import { getActiveWorldContent } from '../src/sim/data';
-import { propPlacementRoll } from '../src/sim/prop_layout';
+import { BUILTIN_WORLD, getActiveWorldContent, setActiveWorldContent } from '../src/sim/data';
 import { roadDistance, terrainHeight } from '../src/sim/world';
 
 // streetlamp_placement_core: where the streetlamps stand. Pure, so the layout
@@ -38,7 +41,7 @@ function chordDistance(
   return best;
 }
 
-/** Flat ground, nothing in the way, a fixed roll: the layout under a microscope.
+/** Flat ground and nothing in the way: the layout under a microscope.
  *  roadClear reports the true chord distance, as if the paint had no meander. */
 function openGround(
   roads: readonly (readonly { x: number; z: number }[])[],
@@ -47,10 +50,37 @@ function openGround(
   return {
     groundAt: () => 0,
     blocked: () => false,
-    roll: () => 0.5,
     roadClear: (x, z) => chordDistance(roads, x, z),
     ...overrides,
   };
+}
+
+/** The closest any two lamps in a plan stand to each other. */
+function closestPair(sites: readonly LampSite[]): number {
+  let closest = Infinity;
+  for (let i = 0; i < sites.length; i++) {
+    for (let j = i + 1; j < sites.length; j++) {
+      closest = Math.min(closest, Math.hypot(sites[i].x - sites[j].x, sites[i].z - sites[j].z));
+    }
+  }
+  return closest;
+}
+
+/** A yard along a site's road-facing yaw, in the same convention a Three Y
+ *  rotation composes in (local +z at yaw 0, angles as `atan2(x, z)`). */
+function stepTowardRoad(site: LampSite, distance: number): { x: number; z: number } {
+  return {
+    x: site.x + Math.sin(site.roadYaw) * distance,
+    z: site.z + Math.cos(site.roadYaw) * distance,
+  };
+}
+
+/** Turn a fixture-local horizontal direction into world space at a given yaw:
+ *  the exact transform streetlamps.ts instances a lamp body with. */
+function rotate(axisX: number, axisZ: number, yaw: number): { x: number; z: number } {
+  const c = Math.cos(yaw);
+  const s = Math.sin(yaw);
+  return { x: axisX * c + axisZ * s, z: -axisX * s + axisZ * c };
 }
 
 const HUB: LampTown = { x: 0, z: 0, radius: 20 };
@@ -85,6 +115,9 @@ describe('planStreetlamps: the whole network is lit', () => {
     const plan = planStreetlamps(STRAIGHT, [HUB], openGround(STRAIGHT), {
       spacing: 10,
       openSpacing: 30,
+      // this case is about the two spacing tiers, so the crowding floor (which
+      // would eat a deliberately 10 yd town step) is lifted out of the way
+      minSeparation: 4,
     });
     const zs = plan.sites.map((s) => s.z).sort((a, b) => a - b);
     const reach = HUB.radius * 1.6 + 60;
@@ -126,6 +159,15 @@ describe('planStreetlamps: the whole network is lit', () => {
     expect(xs.some((x) => x < 0)).toBe(true);
     for (const x of xs) expect(Math.abs(x)).toBeGreaterThan(2.9);
   });
+
+  it('assigns area identity from the road centre before alternating sides', () => {
+    const plan = planStreetlamps(STRAIGHT, [], {
+      ...openGround(STRAIGHT),
+      areaAt: (x) => (x < 0 ? 'west' : 'east'),
+    });
+    expect(plan.sites.length).toBeGreaterThan(3);
+    expect(plan.sites.every((site) => site.areaId === 'east')).toBe(true);
+  });
 });
 
 describe('planStreetlamps: the clearance band against the painted road', () => {
@@ -166,6 +208,80 @@ describe('planStreetlamps: the clearance band against the painted road', () => {
   });
 });
 
+describe('planStreetlamps: which way a lamp faces', () => {
+  it('turns every post toward the road it stands beside, on either side', () => {
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT));
+    const bySide = { east: 0, west: 0 };
+    for (const site of plan.sites) {
+      // The road runs due north at x = 0, so facing it is purely +/-x.
+      expect(Math.cos(site.roadYaw)).toBeCloseTo(0, 6);
+      expect(Math.sin(site.roadYaw)).toBeCloseTo(site.x > 0 ? -1 : 1, 6);
+      if (site.x > 0) bySide.east++;
+      else bySide.west++;
+    }
+    // both sides represented, so the assertion above covered both signs
+    expect(bySide.east).toBeGreaterThan(2);
+    expect(bySide.west).toBeGreaterThan(2);
+  });
+
+  it('faces the painted track, not the raw chord, after a meander nudged the post', () => {
+    // The paint is the chord shifted 2.5 yd toward +x, so posts on the +x side
+    // are pushed outward: a yaw derived from the side a post STARTED on would
+    // still be right here, but only because it is measured after the nudge.
+    const shifted = (x: number, z: number) => chordDistance(STRAIGHT, x - 2.5, z);
+    const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT, { roadClear: shifted }));
+    expect(plan.sites.length).toBeGreaterThan(5);
+    for (const site of plan.sites) {
+      const here = shifted(site.x, site.z);
+      const ahead = stepTowardRoad(site, 1);
+      // one step along the facing yaw always gets closer to the paint
+      expect(shifted(ahead.x, ahead.z)).toBeCloseTo(here - 1, 6);
+    }
+  });
+});
+
+describe('lampFixtureYaw: the fixture hangs its light over the road', () => {
+  // A post on the +x side of a road running due north: facing it means facing -x.
+  const roadYaw = Math.atan2(-1, 0);
+
+  it('swings a side-arm lantern out over the track and leaves the base outside', () => {
+    // A lantern hung off the model's +x edge, 1.2 yd out from its own post.
+    const yaw = lampFixtureYaw(roadYaw, 1.2, 0);
+    const light = rotate(1.2, 0, yaw);
+    expect(light.x).toBeCloseTo(-1.2, 6);
+    expect(light.z).toBeCloseTo(0, 6);
+    // and the post, which is the other end of that axis, ends up on the verge
+    const base = rotate(-1.2, 0, yaw);
+    expect(base.x).toBeCloseTo(1.2, 6);
+  });
+
+  it('lands the same way for a fixture whose light hangs off a different edge', () => {
+    // The whole point of measuring the axis per model: an arm authored along
+    // -z reaches over the road exactly as the +x one does, with no per-style
+    // table to keep in step with the art.
+    for (const axis of [
+      [1.2, 0],
+      [-1.2, 0],
+      [0, 1.2],
+      [0, -1.2],
+      [0.85, 0.85],
+    ] as const) {
+      const light = rotate(axis[0], axis[1], lampFixtureYaw(roadYaw, axis[0], axis[1]));
+      expect(light.x).toBeCloseTo(-Math.hypot(axis[0], axis[1]), 6);
+      expect(light.z).toBeCloseTo(0, 6);
+    }
+  });
+
+  it('squares a centred fixture up to the road rather than spinning it', () => {
+    // A lantern carried straight above its post has no lit side to present, so
+    // it simply faces the road; a row of them then reads as one aligned street.
+    expect(lampFixtureYaw(roadYaw, 0, 0)).toBe(roadYaw);
+    expect(lampFixtureYaw(roadYaw, LAMP_LIGHT_AXIS_MIN * 0.99, 0)).toBe(roadYaw);
+    // just past the threshold the axis takes over
+    expect(lampFixtureYaw(roadYaw, LAMP_LIGHT_AXIS_MIN * 1.01, 0)).not.toBe(roadYaw);
+  });
+});
+
 describe('planStreetlamps: the rejection probes', () => {
   it('drops a site standing in water or over a void', () => {
     const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT, { groundAt: () => -8 }));
@@ -201,13 +317,33 @@ describe('planStreetlamps: the rejection probes', () => {
     ];
     const plan = planStreetlamps(crossing, [], openGround(crossing), { minSeparation: 8 });
     expect(plan.sites.length).toBeGreaterThan(10);
-    for (let i = 0; i < plan.sites.length; i++) {
-      for (let j = i + 1; j < plan.sites.length; j++) {
-        const dx = plan.sites[i].x - plan.sites[j].x;
-        const dz = plan.sites[i].z - plan.sites[j].z;
-        expect(Math.hypot(dx, dz)).toBeGreaterThanOrEqual(8);
-      }
-    }
+    expect(closestPair(plan.sites)).toBeGreaterThanOrEqual(8);
+  });
+
+  it('leaves a real gap by default, not a token one', () => {
+    // Two roads leaving a hub on a shallow fork: the pair of runs stays within
+    // a few yards of each other for the first stretch, which is exactly where
+    // posts used to end up close enough to read as one doubled fixture. The
+    // default floor is two thirds of the town step, so a crowded pair collapses
+    // while the rhythm of a lit street survives.
+    const forked = [
+      [
+        { x: 0, z: 0 },
+        { x: 0, z: 400 },
+      ],
+      [
+        { x: 0, z: 0 },
+        { x: 56, z: 400 },
+      ],
+    ];
+    const plan = planStreetlamps(forked, [], openGround(forked));
+    expect(plan.sites.length).toBeGreaterThan(10);
+    expect(closestPair(plan.sites)).toBeGreaterThanOrEqual(18);
+    // and the fork is genuinely tight, so the floor did the work rather than
+    // the geometry never bringing two lamps near each other in the first place
+    const tight = planStreetlamps(forked, [], openGround(forked), { minSeparation: 1 });
+    expect(closestPair(tight.sites)).toBeLessThan(11);
+    expect(tight.sites.length).toBeGreaterThan(plan.sites.length);
   });
 });
 
@@ -219,7 +355,6 @@ describe('planStreetlamps is deterministic and finite on the real world', () => 
       const resolved = resolvePosition(SEED, x, z, 1.1);
       return Math.abs(resolved.x - x) > 0.05 || Math.abs(resolved.z - z) > 0.05;
     },
-    roll: propPlacementRoll,
     roadClear: roadDistance,
   });
   const realPlan = () => {
@@ -256,8 +391,66 @@ describe('planStreetlamps is deterministic and finite on the real world', () => 
     for (const site of plan.sites) expect(site.y).toBeGreaterThanOrEqual(-3);
   });
 
+  it('fits every lamp within a hundred yards into the night field, with room for the fires', () => {
+    // The field carries only its nearest NIGHT_LIGHT_STATIC_SLOTS fixed lights,
+    // and a lamp outside that window casts NOTHING: its ground stays dark while
+    // the lamp overhead lights a pool, which is what "the light only shows when
+    // you are close" looked like. So the densest stretch of road has to leave
+    // headroom for the camp braziers and fires that share the window.
+    const sites = realPlan().sites;
+    let crowded = 0;
+    for (const anchor of sites) {
+      let near = 0;
+      for (const other of sites) {
+        if (Math.hypot(other.x - anchor.x, other.z - anchor.z) <= 100) near++;
+      }
+      crowded = Math.max(crowded, near);
+    }
+    expect(crowded).toBeGreaterThan(8); // the busy stretches are genuinely busy
+    expect(crowded).toBeLessThanOrEqual(NIGHT_LIGHT_STATIC_SLOTS - 8);
+  });
+
+  it('never crowds two lamps together, anywhere on the network', () => {
+    // Junctions, hairpins and roads running in parallel are where a pair of
+    // posts used to end up almost touching. The floor holds across the whole
+    // network, not just the crossing the unit case builds.
+    expect(closestPair(realPlan().sites)).toBeGreaterThanOrEqual(18);
+  });
+
+  it('turns every lamp on the network toward the road it lights', () => {
+    // The facing yaw is only useful if stepping along it actually approaches
+    // the PAINTED track, on meandering real roads rather than a test chord.
+    for (const site of realPlan().sites) {
+      const here = roadDistance(site.x, site.z);
+      const ahead = stepTowardRoad(site, 1);
+      expect(roadDistance(ahead.x, ahead.z)).toBeLessThan(here);
+    }
+  });
+
   it('produces the identical layout twice (no hidden global state)', () => {
     expect(realPlan()).toEqual(realPlan());
+  });
+});
+
+describe('roadDistance follows the active custom-world roads', () => {
+  it('drops the built-in smooth-road cache after a content swap', () => {
+    const customRoads = [
+      [
+        { x: 1000, z: 1000 },
+        { x: 1000, z: 1200 },
+      ],
+    ];
+    setActiveWorldContent({ ...BUILTIN_WORLD, roads: customRoads });
+    try {
+      expect(roadDistance(1004, 1100)).toBeLessThan(12);
+      const plan = planStreetlamps(customRoads, [], {
+        ...openGround(customRoads),
+        roadClear: roadDistance,
+      });
+      expect(plan.sites.length).toBeGreaterThan(0);
+    } finally {
+      setActiveWorldContent(null);
+    }
   });
 });
 

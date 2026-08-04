@@ -5,6 +5,8 @@ import {
   createFarTileBuilder,
   detailCullFar,
   FAR_MESH_DROP,
+  FAR_RIM_TINT_ALT,
+  FAR_RIM_TINT_BASE,
   FAR_TILE_FOG_MARGIN,
   FAR_TILE_SIZE,
   FAR_WORLD_MARGIN,
@@ -232,7 +234,7 @@ describe('createFarTileBuilder: real heights, deterministic, incremental', () =>
     return b.result();
   };
 
-  it('positions carry the crest-preserving height minus the anti-poke drop', () => {
+  it('positions carry the sampled height minus the drop and the clearance', () => {
     const data = buildAll(64);
     const side = farGridSide(tile.size, SPACING);
     expect(data.positions.length).toBe(side * side * 3);
@@ -247,17 +249,64 @@ describe('createFarTileBuilder: real heights, deterministic, incremental', () =>
       const z = tile.z0 + iz * SPACING;
       expect(data.positions[vi]).toBe(x);
       expect(data.positions[vi + 2]).toBe(z);
-      // farVertexHeight, not the raw point sample: the crest max keeps ridge
-      // silhouettes truthful now that no fog hides the shaving.
-      expect(data.positions[vi + 1]).toBeCloseTo(
-        farVertexHeight(x, z, SPACING, SEED) - FAR_MESH_DROP,
-        4,
+      // At or under farVertexHeight minus the drop: the builder also subtracts a
+      // per-vertex CLEARANCE (far_surface_core.ts), which is zero on ground the
+      // flat triangles already sit under and grows where they would bridge a
+      // dip. Never above, which is the invariant the whole layer rests on.
+      expect(data.positions[vi + 1]).toBeLessThanOrEqual(
+        farVertexHeight(x, z, SPACING, SEED) - FAR_MESH_DROP + 1e-4,
       );
-      expect(data.positions[vi + 1]).toBeGreaterThanOrEqual(
-        terrainHeight(x, z, SEED) - FAR_MESH_DROP - 1e-4,
+      expect(data.positions[vi + 1]).toBeLessThanOrEqual(
+        terrainHeight(x, z, SEED) - FAR_MESH_DROP + 1e-4,
       );
     }
     expect(data.minY).toBeLessThanOrEqual(data.maxY);
+  });
+
+  it('NEVER rises above the real terrain, at any spacing, on any ground', () => {
+    // The invariant this whole layer lives or dies by. The coarse mesh is a
+    // stand-in; the instant it sits higher than the terrain it stands in for,
+    // it wins the depth test and surfaces through the detailed terrain as a
+    // smooth skin in the wrong shape. Swept rather than spot-checked, because
+    // the failure only appeared on steep ground: the previous recipe took the
+    // MAX of the half-cell neighbourhood and then ADDED up to 4.75 units of
+    // crag, so it cleared the true surface almost everywhere with any slope.
+    for (const spacing of [8, 10, 12, 16]) {
+      let worst = Number.NEGATIVE_INFINITY;
+      let worstAt = '';
+      // A transect over the mountain-heavy north (Thornpeak z 540..900) plus the
+      // valley and coast bands, so cliffs, ridges, meadow and shore all appear.
+      for (let z = -160; z <= 900; z += 37) {
+        for (let x = -500; x <= 500; x += 53) {
+          const over = farVertexHeight(x, z, spacing, SEED) - terrainHeight(x, z, SEED);
+          if (over > worst) {
+            worst = over;
+            worstAt = `spacing ${spacing} at ${x},${z}`;
+          }
+        }
+      }
+      // Zero, not a tolerance: the min can only equal the point sample, and the
+      // crag only subtracts. FAR_MESH_DROP is then pure headroom on top.
+      expect(worst, worstAt).toBeLessThanOrEqual(1e-6);
+    }
+  });
+
+  it('still breaks up high ground, so peaks are not smooth cones', () => {
+    // The crag now carves instead of building, and it still has to DO something:
+    // a coarse peak with no relief reads as a cone whatever its colour.
+    const spacing = 10;
+    let varied = 0;
+    let samples = 0;
+    for (let z = 540; z <= 900; z += 11) {
+      for (let x = -400; x <= 400; x += 17) {
+        const raw = terrainHeight(x, z, SEED);
+        if (raw < 20) continue; // crag only engages on high ground
+        samples++;
+        if (Math.abs(farVertexHeight(x, z, spacing, SEED) - raw) > 0.5) varied++;
+      }
+    }
+    expect(samples).toBeGreaterThan(50);
+    expect(varied / samples).toBeGreaterThan(0.5);
   });
 
   it('a one-row-at-a-time build is byte-identical to a one-shot build', () => {
@@ -316,14 +365,35 @@ describe('farGroundColor: the far recipe reads like the world it stands in for',
     expect(r).toBeGreaterThanOrEqual(b); // warm volcanic rock, not blue-white
   });
 
-  it('the world rim fades toward the atmospheric haze tone', () => {
+  it('the world rim shifts COOL toward the atmospheric haze tone', () => {
     const rim = color(WORLD_MAX_X + 120, 1200);
     const interior = color(0, 1200);
-    // the rim tone is the hazy blue: blue channel dominates its red
-    expect(rim[2]).toBeGreaterThan(rim[0]);
-    // and it is far from the interior ground color
+    // The direction is what the wash means, and it survives whatever base tone
+    // (green, rock, sand) the rim happens to stand on: the hazy peak tone is
+    // blue-dominant, so mixing toward it always widens blue over red. An
+    // absolute "blue beats red" only held while the wash was heavy enough to
+    // overwhelm a warm base, which is exactly the strength it should not have.
+    expect(rim[2] - rim[0]).toBeGreaterThan(interior[2] - interior[0]);
+    // and it is a visible shift, not a rounding difference
     const dist = Math.hypot(rim[0] - interior[0], rim[1] - interior[1], rim[2] - interior[2]);
     expect(dist).toBeGreaterThan(0.05);
+  });
+
+  it('the rim wash stays a hint: the LIVE haze owns the recession, not the bake', () => {
+    // Baked paint cannot answer the sky, the hour, or the weather, and the
+    // per-zone haze field now puts real aerial perspective on exactly the
+    // kilometre-plus distances the rim band sits at. Their sum is the contract:
+    // at 0.18 plus 0.30 the two painted the same recession twice and the rim
+    // range read as flat pale cones under every light.
+    expect(FAR_RIM_TINT_BASE + FAR_RIM_TINT_ALT).toBeLessThanOrEqual(0.25);
+    // ...and never zero, or a rim valley loses its distance cue entirely
+    expect(FAR_RIM_TINT_BASE).toBeGreaterThan(0);
+    expect(FAR_RIM_TINT_ALT).toBeGreaterThan(0);
+    // altitude still weighted: a summit recedes further than the ground below it
+    const low = color(WORLD_MAX_X + 120, 1200);
+    const high: [number, number, number] = [0, 0, 0];
+    farGroundColor(WORLD_MAX_X + 120, 1200, 46, 0.1, 0, 0, SEED, high);
+    expect(high[2] - high[0]).toBeGreaterThan(low[2] - low[0]);
   });
 
   it('stays deterministic: same input, same triple', () => {

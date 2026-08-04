@@ -3183,6 +3183,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
     detailFar: 0,
     revealScale: 1,
     fogLimit: 0,
+    maxFromNearEdge: false,
   };
   // Reused per frame for the same reason as bucketWindow above.
   const collapseWindows: CollapseWindowValues = {
@@ -3403,6 +3404,10 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
                 : detailFar;
         bucketWindow.revealScale = revealScale;
         bucketWindow.fogLimit = fogLimit;
+        // Shadow clones are the one row with no fallback once the bucket drops
+        // (no impostor takes over, no per-instance window splits them), so
+        // their cap measures from the near edge. See bucketVisible.
+        bucketWindow.maxFromNearEdge = b.lod === 'shadow';
         bucketWindow.spriteRow = b.lod === 'impostor';
         bucketWindow.swapFade = collapseWindows.fade;
         bucketWindow.spriteFar = collapseWindows.spriteFar;

@@ -207,31 +207,55 @@ describe('aerial distance ramp', () => {
   it('keeps the border band moderate and lets the far term start past it', () => {
     // The far term must not thicken the 150 to 400 yard border band the near
     // term was tuned for: it opens only after the near shoulder has saturated.
-    expect(HAZE_AERIAL_MAX).toBeLessThanOrEqual(0.5);
+    expect(HAZE_AERIAL_MAX).toBeLessThanOrEqual(0.4);
     expect(HAZE_FAR_ONSET).toBeGreaterThanOrEqual(HAZE_AERIAL_ONSET + 2 * HAZE_AERIAL_REF);
     expect(aerialHazeAmount(400, 1)).toBeLessThanOrEqual(HAZE_AERIAL_MAX);
   });
 
-  it('fades distance most of the way out into the local air, never a white-out', () => {
-    const clearest = hazeStrengthForFogFar(HAZE_DENSITY_CLEAR_FAR);
-    const murkiest = hazeStrengthForFogFar(HAZE_DENSITY_THICK_FAR);
-    expect(HAZE_FAR_CEIL).toBeLessThanOrEqual(0.9);
-    expect(aerialHazeAmount(4000, clearest)).toBeGreaterThan(0.5);
-    expect(aerialHazeAmount(4000, clearest)).toBeLessThan(0.6);
-    expect(aerialHazeAmount(4000, murkiest)).toBeGreaterThan(0.8);
-    expect(aerialHazeAmount(4000, murkiest)).toBeLessThanOrEqual(HAZE_FAR_CEIL);
+  it('leaves the mid field its own light and shade, out to the detail horizon', () => {
+    // THE regression this curve exists to prevent. A mix toward one constant
+    // colour costs shading contrast in proportion, so anything inside the
+    // detail horizon (far_terrain_core FOGLESS_DETAIL_FAR, 700) that is mostly
+    // haze is a hillside with no light on it: an earlier ship of this ramp put
+    // 27 percent on 300 yards and saturated by 400, and the vista read as flat
+    // pastel cutouts that ignored the hour. A clear realm must stay mostly its
+    // own colour across that whole band.
+    const clear = hazeStrengthForFogFar(HAZE_DENSITY_CLEAR_FAR);
+    expect(aerialHazeAmount(200, clear)).toBeLessThan(0.05);
+    expect(aerialHazeAmount(300, clear)).toBeLessThan(0.14);
+    expect(aerialHazeAmount(400, clear)).toBeLessThan(0.22);
+    expect(aerialHazeAmount(700, clear)).toBeLessThan(0.3);
+    // and even the murkiest realm keeps most of the ground it is standing on
+    expect(aerialHazeAmount(700, hazeStrengthForFogFar(HAZE_DENSITY_THICK_FAR))).toBeLessThan(0.42);
   });
 
-  it('reads as real fog tint at the BORDER sightline, not only mid-vista', () => {
-    // Standing at a zone border looking in, the neighbour's land fills the
-    // 150 to 400 yard band. Two ships of this ramp under-shot there and both
-    // play-read as "the air did not change": these floors are the fix and
-    // must not regress.
-    expect(aerialHazeAmount(200, 0.8)).toBeGreaterThan(0.1);
-    expect(aerialHazeAmount(250, 0.8)).toBeGreaterThan(0.2);
-    expect(aerialHazeAmount(300, 0.8)).toBeGreaterThan(0.28);
-    expect(aerialHazeAmount(400, 0.83)).toBeGreaterThan(0.35);
-    expect(aerialHazeAmount(700, 0.83)).toBeGreaterThan(0.38);
+  it('converges at the world rim for EVERY realm, not only the murky ones', () => {
+    // The far term is the camera's own air column, so it is not scaled by the
+    // destination's murk (see aerialHazeAmount). Scaling it was what left a
+    // clear realm's rim at about 0.56: a crisp pale silhouette at the world
+    // edge, bright by day and glowing against a navy night sky.
+    const clearest = hazeStrengthForFogFar(HAZE_DENSITY_CLEAR_FAR);
+    const murkiest = hazeStrengthForFogFar(HAZE_DENSITY_THICK_FAR);
+    expect(aerialHazeAmount(3000, clearest)).toBeGreaterThan(0.8);
+    expect(aerialHazeAmount(3000, murkiest)).toBeGreaterThan(0.9);
+    // still short of a white-out: the ground keeps a say even at the rim
+    expect(HAZE_FAR_CEIL).toBeLessThanOrEqual(0.95);
+    expect(aerialHazeAmount(4000, murkiest)).toBeLessThanOrEqual(HAZE_FAR_CEIL);
+    // the ordering survives: thicker air still previews heavier at range
+    expect(aerialHazeAmount(3000, murkiest)).toBeGreaterThan(aerialHazeAmount(3000, clearest));
+  });
+
+  it('still reads as a change of air at the BORDER sightline', () => {
+    // Standing at a zone border looking in, the neighbour's land fills the 150
+    // to 400 yard band, and two ships of this ramp under-shot it badly enough
+    // to play as "the air did not change" (0.046 at 300 yards). The band is
+    // deliberately lighter than the pass that over-corrected, but must stay
+    // comfortably above those numbers; the rest of the neighbour's identity is
+    // carried by the baked COLOUR (hue, light level, weather veil), which is
+    // per realm at any mix.
+    expect(aerialHazeAmount(300, 0.8)).toBeGreaterThan(0.08);
+    expect(aerialHazeAmount(400, 0.8)).toBeGreaterThan(0.15);
+    expect(aerialHazeAmount(700, 0.83)).toBeGreaterThan(0.25);
   });
 });
 

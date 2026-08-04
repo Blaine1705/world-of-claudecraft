@@ -1,7 +1,16 @@
 import * as THREE from 'three';
-import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, WORLD_SIZE, ZONES } from '../sim/data';
+import {
+  STRIP_MAX_X,
+  STRIP_MIN_X,
+  WORLD_MAX_X,
+  WORLD_MAX_Z,
+  WORLD_MIN_X,
+  WORLD_MIN_Z,
+  WORLD_SIZE,
+  ZONES,
+} from '../sim/data';
 import type { ZoneDef } from '../sim/types';
-import { waterLevel } from '../sim/world';
+import { waterLevel, waterLevelAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import {
@@ -23,6 +32,13 @@ import {
   WATER_FOAM_WIDTH_YARDS,
   WATER_SEABED_CLAMP_YARDS,
 } from './water_core';
+import {
+  coveredByOtherSheet,
+  gapsAdjacentTo,
+  type WaterSheetRect,
+  waterCoverageGaps,
+  zoneSheetRects,
+} from './water_coverage_core';
 import { WaterSimulation, type WaterWaveUniforms } from './water_simulation';
 import { WATER_TIME_PERIOD, WATER_WAVE_GLSL } from './water_wave_core';
 
@@ -54,6 +70,23 @@ import { WATER_TIME_PERIOD, WATER_WAVE_GLSL } from './water_wave_core';
 // left the open sea (mostly apron) with no travelling waves at all.
 
 const SEGMENTS_PER_ZONE = 180; // ~2u vertex spacing, enough for the foam band
+// The zone rects do not tile the world's bounding box, and every un-zoned cell
+// used to be left to the horizon apron, whose cells are ~48 x 57 yards. That is
+// fine over open ocean and wrong anywhere there is a coastline: interpolating
+// depth, seabed slope, foam and alpha across a 48 yard triangle is exactly the
+// hard wedges and diagonal colour steps reported along the southwest shore
+// (x -540..-180 by z -180..180, the one un-zoned cell carrying real coast: the
+// vale's west headland stands 15 yards over its own beach there). Gap cells get
+// the SAME fine sheet a zone does; see water_coverage_core.ts.
+const WATER_ZONE_RECTS = zoneSheetRects(ZONES, STRIP_MIN_X, STRIP_MAX_X);
+const WATER_GAP_RECTS = waterCoverageGaps(
+  ZONES,
+  { minX: WORLD_MIN_X, maxX: WORLD_MAX_X, minZ: WORLD_MIN_Z, maxZ: WORLD_MAX_Z },
+  STRIP_MIN_X,
+  STRIP_MAX_X,
+);
+// Chop-feather abutment and gap adjacency both read the whole sheet set.
+const WATER_SHEET_RECTS: readonly WaterSheetRect[] = [...WATER_ZONE_RECTS, ...WATER_GAP_RECTS];
 // terrainHeight is deliberately rich and sampling all 32k water vertices in
 // one timer was a measured 170-260ms live-play freeze. Background zone loads
 // fill a handful of rows per idle callback instead; four rows stay around the
@@ -968,42 +1001,67 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
   // (the border meres); a body would have to be under two strides across in
   // BOTH axes to slip through.
   const WETNESS_SCAN_STRIDE = 3;
-  const zoneHasWater = async (
-    zone: ZoneDef,
-    x0: number,
-    x1: number,
+  /**
+   * One coarse pass over a sheet rect reporting whether it holds water at all
+   * and whether it holds dry ground too (so a coastline runs through it).
+   *
+   * A ZONE builds its plane on `wet` alone, unchanged. A GAP builds only when
+   * it also has land: a gap that is open water end to end has no shore to
+   * resolve, and there the apron's constant deep reading is exactly right, so a
+   * 32k vertex sheet over it would be pure cost. That is the rule the apron is
+   * actually valid under, stated once rather than tuned per map.
+   */
+  const scanRect = async (
+    rect: WaterSheetRect,
     idlePace: boolean,
-  ): Promise<boolean> => {
-    const step = ((x1 - x0) / SEGMENTS_PER_ZONE) * WETNESS_SCAN_STRIDE;
-    const zStep = ((zone.zMax - zone.zMin) / SEGMENTS_PER_ZONE) * WETNESS_SCAN_STRIDE;
+  ): Promise<{ wet: boolean; dry: boolean }> => {
+    const step = ((rect.xMax - rect.xMin) / SEGMENTS_PER_ZONE) * WETNESS_SCAN_STRIDE;
+    const zStep = ((rect.zMax - rect.zMin) / SEGMENTS_PER_ZONE) * WETNESS_SCAN_STRIDE;
     let sincePause = 0;
-    for (let z = zone.zMin; z <= zone.zMax; z += zStep) {
-      for (let x = x0; x <= x1; x += step) {
-        if (shoreDepthAt(x, z, seed) > 0) return true;
+    let wet = false;
+    let dry = false;
+    for (let z = rect.zMin; z <= rect.zMax; z += zStep) {
+      for (let x = rect.xMin; x <= rect.xMax; x += step) {
+        if (shoreDepthAt(x, z, seed) > 0) wet = true;
+        else dry = true;
       }
+      if (wet && dry) return { wet, dry };
       if (idlePace && ++sincePause >= WATER_ROWS_PER_IDLE_SLICE) {
         sincePause = 0;
         await idleSlot(WATER_IDLE_TIMEOUT_MS);
       }
     }
-    return false;
+    return { wet, dry };
   };
-  const buildZone = async (zone: ZoneDef, idlePace: boolean): Promise<THREE.Mesh | null> => {
-    const depth = zone.zMax - zone.zMin;
-    // each plane covers its zone's own rect: the side columns live at
-    // x beyond the strip, and a strip-centered plane would leave their
-    // shores (and the border meres straddling the column line) on the
-    // featureless apron with no foam or shallow grading
-    const x0 = zone.xMin ?? -WORLD_SIZE / 2;
-    const x1 = zone.xMax ?? WORLD_SIZE / 2;
-    if (!(await zoneHasWater(zone, x0, x1, idlePace))) return null;
+  /**
+   * Build one fine water sheet over `rect`. Zone planes and gap sheets are the
+   * same thing: the builder only ever needed the rectangle and an id, so both
+   * kinds share every downstream contract (2 yard grid, baked shore attributes,
+   * swell gate, dry-tile cull, underside twin, refit closure).
+   */
+  const buildSheet = async (
+    rect: WaterSheetRect,
+    opts: { slice: boolean; visible: boolean; requireShore: boolean },
+  ): Promise<THREE.Mesh | null> => {
+    const idlePace = opts.slice;
+    const requireShore = opts.requireShore;
+    const depth = rect.zMax - rect.zMin;
+    // each plane covers its own rect: the side columns live at x beyond the
+    // strip, and a strip-centered plane would leave their shores (and the
+    // border meres straddling the column line) on the featureless apron with
+    // no foam or shallow grading
+    const x0 = rect.xMin;
+    const x1 = rect.xMax;
+    const scan = await scanRect(rect, idlePace);
+    if (!scan.wet) return null;
+    if (requireShore && !scan.dry) return null;
     const geo = new THREE.PlaneGeometry(
       x1 - x0,
       depth,
       SEGMENTS_PER_ZONE,
       SEGMENTS_PER_ZONE,
     ).rotateX(-Math.PI / 2);
-    geo.translate((x0 + x1) / 2, 0, (zone.zMin + zone.zMax) / 2);
+    geo.translate((x0 + x1) / 2, 0, (rect.zMin + rect.zMax) / 2);
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const shoreDepth = new Float32Array(pos.count);
     const shoreSlope = new Float32Array(pos.count);
@@ -1015,27 +1073,22 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // plane carries identical chop on both sides, and feathering there cut a
     // visible calm stripe down every internal border water (the column
     // straits, the row meres). Abutment is per COORDINATE, not per edge:
-    // the zone grid has coverage gaps, so one edge can be plane on part of
-    // its run and apron on the rest. Static per-vertex geometry: bakes once.
-    const otherZoneCovers = (px: number, pz: number): boolean =>
-      ZONES.some(
-        (zz) =>
-          zz.id !== zone.id &&
-          px >= (zz.xMin ?? -WORLD_SIZE / 2) &&
-          px <= (zz.xMax ?? WORLD_SIZE / 2) &&
-          pz >= zz.zMin &&
-          pz <= zz.zMax,
-      );
+    // one edge can be sheet on part of its run and apron on the rest. Gap
+    // sheets count here exactly like zone planes, or the new seam between a
+    // zone and its gap neighbour grows that same stripe. Static per-vertex
+    // geometry: bakes once.
+    const otherSheetCovers = (px: number, pz: number): boolean =>
+      coveredByOtherSheet(WATER_SHEET_RECTS, rect.id, px, pz);
     const swellW = new Float32Array(pos.count);
     const probe = 0.5;
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
       let edge = Number.POSITIVE_INFINITY;
-      if (!otherZoneCovers(x0 - probe, z)) edge = Math.min(edge, x - x0);
-      if (!otherZoneCovers(x1 + probe, z)) edge = Math.min(edge, x1 - x);
-      if (!otherZoneCovers(x, zone.zMin - probe)) edge = Math.min(edge, z - zone.zMin);
-      if (!otherZoneCovers(x, zone.zMax + probe)) edge = Math.min(edge, zone.zMax - z);
+      if (!otherSheetCovers(x0 - probe, z)) edge = Math.min(edge, x - x0);
+      if (!otherSheetCovers(x1 + probe, z)) edge = Math.min(edge, x1 - x);
+      if (!otherSheetCovers(x, rect.zMin - probe)) edge = Math.min(edge, z - rect.zMin);
+      if (!otherSheetCovers(x, rect.zMax + probe)) edge = Math.min(edge, rect.zMax - z);
       swellW[i] =
         1 +
         (edge === Number.POSITIVE_INFINITY
@@ -1100,7 +1153,11 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
     // The renderer compiles a background zone's material while this mesh is
     // hidden, then reveals it. Adding it visible here lets the next rAF draw
     // (and synchronously upload/link) it before prepareZoneAt can prewarm it.
-    mesh.visible = !idlePace;
+    // A gap sheet passes visible:true regardless: it is never awaited by a
+    // prepare, so nothing would ever reveal it, and it shares the one water
+    // material the apron has been drawing with since construction, so there is
+    // no unlinked program for a live frame to race.
+    mesh.visible = opts.visible;
     meshes.push(mesh);
     group.add(mesh);
     addUnderside(mesh);
@@ -1125,10 +1182,39 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       const scheduled = idlePace
         ? idleSlot(WATER_IDLE_TIMEOUT_MS)
         : new Promise<void>((resolve) => setTimeout(resolve, 0));
+      const zoneRect =
+        WATER_ZONE_RECTS.find((r) => r.id === zone.id) ??
+        ({
+          id: zone.id,
+          xMin: zone.xMin ?? -WORLD_SIZE / 2,
+          xMax: zone.xMax ?? WORLD_SIZE / 2,
+          zMin: zone.zMin,
+          zMax: zone.zMax,
+        } satisfies WaterSheetRect);
       const task = scheduled
         .then(async () => {
-          const mesh = await buildZone(zone, idlePace);
+          const mesh = await buildSheet(zoneRect, {
+            slice: idlePace,
+            visible: !idlePace,
+            requireShore: false,
+          });
           loadedZones.add(zone.id);
+          // Gap sheets belong to no zone, so nothing streams them. Build each
+          // one alongside the first ADJACENT zone that prepares: the whole rule
+          // stays inside this view (no renderer change) and a gap is ready
+          // before the player can stand in a neighbouring zone and look at it.
+          //
+          // Deliberately NOT awaited, and always sliced. A gap is adjacent
+          // water, never the zone being entered, so it must not hold the
+          // loading screen: awaiting one on the gating prepare put its full
+          // 32k-vertex terrain bake (~5 terrainHeight samples per vertex) in
+          // front of first paint. Sliced and detached, it lands a moment later
+          // over water the player has not reached yet.
+          for (const gap of gapsAdjacentTo(WATER_GAP_RECTS, zoneRect)) {
+            if (loadedZones.has(gap.id)) continue;
+            loadedZones.add(gap.id);
+            void buildSheet(gap, { slice: true, visible: true, requireShore: true });
+          }
           return mesh ? [mesh] : [];
         })
         .finally(() => pendingZones.delete(zone.id));
@@ -1144,10 +1230,30 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       cameraY = Number.POSITIVE_INFINITY,
     ): number {
       WATER_TIME.value = _time % WATER_TIME_PERIOD;
-      // Slack over the waterline so the swell never strands the camera
-      // between a displaced front face and a hidden ceiling: must exceed the
-      // worst-case combined chop + groundswell + wobble displacement.
-      const under = cameraY < waterLevel() + 1.1;
+      // THE CEILING FOLLOWS THE WATER THAT IS ACTUALLY THERE, not the global
+      // constant. waterLevelAt is the SAME predicate the renderer's underwater
+      // fog reads, so the two can no longer disagree about whether the camera
+      // is submerged.
+      //
+      // The old test was `cameraY < waterLevel() + 1.1` on the GLOBAL level.
+      // That is true anywhere the camera dips below the world waterline, INCLUDING
+      // over ground that carries no water: waterLevelAt returns -Infinity off a
+      // water body (and it is cell-quantized, so the beach right beside the surf
+      // reads dry). A third-person boom sinking below the waterline while it
+      // hangs over the sand therefore turned the near-opaque BackSide ceiling on
+      // while the fog, reading the true surface, stayed OUTDOOR: a hard-edged
+      // dark slab hung across an ordinary, clear, un-fogged night beach. That is
+      // the reported "looking up out of the water" artifact, and it did not need
+      // the camera to be in any water at all.
+      //
+      // The slack survives, and only the slack: over real water the surface is
+      // displaced by the swell, so a camera just above the flat level can still
+      // be under a passing crest, and the ceiling has to be available there.
+      // Above the flat surface it costs nothing anyway (a BackSide sheet is
+      // back-face culled from above until displacement lifts it over the eye),
+      // and it must exceed the worst-case chop + groundswell + wobble lift.
+      const surfaceY = waterLevelAt(cameraX, cameraZ, seed);
+      const under = cameraY < surfaceY + 1.1;
       for (const pair of underPairs) {
         pair.under.position.y = pair.front.position.y;
         pair.under.visible = under && pair.front.visible;

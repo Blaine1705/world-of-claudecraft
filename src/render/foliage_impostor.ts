@@ -30,7 +30,9 @@
 import * as THREE from 'three';
 import { WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data';
 import { terrainHeight } from '../sim/world';
-import { FAR_MESH_DROP, FAR_WORLD_MARGIN, farVertexHeight, farVistaPlan } from './far_terrain_core';
+import { attachBiomeHaze } from './biome_haze_field';
+import { farRenderedCellHeight } from './far_surface_core';
+import { FAR_WORLD_MARGIN, farVertexRenderY, farVistaPlan } from './far_terrain_core';
 import { collapseWindowUniforms } from './foliage_collapse';
 import {
   CANOPY_EMISSIVE_FLOOR,
@@ -581,6 +583,15 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
       );
   };
   mat.customProgramCacheKey = () => `foliage-impostor-${CATEGORY_VIEWS[category]}`;
+  // The distant-zone air (biome_haze_field.ts), and this layer is the one that
+  // most needs it: past the detail envelope the sprites ARE the trees, rocks
+  // and buildings, so a sprite holding full local colour over hazed ground is
+  // the exact self-cancelling failure that field's own header warns about (it
+  // reads as "there is no fog at all", with the vista splitting into hazed
+  // ground plus unhazed collage on top of it). Attached LAST on purpose:
+  // attachBiomeHaze wraps whatever onBeforeCompile and customProgramCacheKey
+  // are already installed, so it has to see the two set above.
+  attachBiomeHaze(mat);
   materialCache.set(category, mat);
   return mat;
 }
@@ -589,17 +600,27 @@ function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THR
 // Session
 // ---------------------------------------------------------------------------
 
-// How far the coarse far-tile surface sits BELOW a sprite's true base: its
-// safety drop plus the crest chord error of the tier's sampling grid,
-// bilinearly reconstructed the way the far mesh itself samples. Sprites past
-// the detail envelope ease down by this much so their bases stay planted on
-// the vista instead of floating over shaved ridge crests.
+// How far the coarse far-tile surface sits BELOW a sprite's true base. Sprites
+// past the detail envelope ease down by this much so their bases stay planted
+// on the vista instead of floating over it.
+//
+// Reconstructed the way the far mesh is actually TRIANGULATED (the anti-diagonal
+// split farGridIndices emits), not bilinearly: the two disagree on a saddle, and
+// a saddle is exactly a ridge shoulder where sprites stand. The corner heights
+// come from farVertexRenderY, the same value the tile builder writes, so this
+// tracks the mesh's per-vertex clearance instead of guessing at a fixed drop.
+// Keyed on the FULL input, not just the position: farVertexRenderY depends on
+// the spacing (the clearance is measured over cells one spacing out) and on the
+// seed. Both are fixed for a session, so a position-only key was merely latent
+// rather than live, but the editor rebuilds at other seeds and a tier change
+// rebuilds at another spacing, and either would have silently reused heights
+// from the previous world.
 const farCornerCache = new Map<string, number>();
 function farCornerHeight(x: number, z: number, spacing: number, seed: number): number {
-  const key = `${x}:${z}`;
+  const key = `${x}:${z}:${spacing}:${seed}`;
   const cached = farCornerCache.get(key);
   if (cached !== undefined) return cached;
-  const y = farVertexHeight(x, z, spacing, seed);
+  const y = farVertexRenderY(x, z, spacing, seed);
   farCornerCache.set(key, y);
   return y;
 }
@@ -618,8 +639,10 @@ function farMeshShortfall(x: number, z: number, baseY: number, seed: number): nu
   const h10 = farCornerHeight(x0 + spacing, z0, spacing, seed);
   const h01 = farCornerHeight(x0, z0 + spacing, spacing, seed);
   const h11 = farCornerHeight(x0 + spacing, z0 + spacing, spacing, seed);
-  const farY = (h00 * (1 - tx) + h10 * tx) * (1 - tz) + (h01 * (1 - tx) + h11 * tx) * tz;
-  return Math.max(0, baseY - (farY - FAR_MESH_DROP));
+  const farY = farRenderedCellHeight(h00, h10, h01, h11, tx, tz);
+  // farVertexRenderY already carries FAR_MESH_DROP and the clearance, so the
+  // surface here is the finished one: no second drop to subtract.
+  return Math.max(0, baseY - farY);
 }
 
 const scratchMatrix = new THREE.Matrix4();

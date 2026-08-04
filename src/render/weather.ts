@@ -133,6 +133,12 @@ export class Weather {
   private phase: Float32Array; // per-particle sway phase
   private readonly count: number;
   private readonly textures: { flake: THREE.CanvasTexture; streak: THREE.CanvasTexture };
+  /** The style's authored colour, kept apart from the day/night multiply so the
+   *  two never compound: applyStyle sets this, the grade multiplies it. */
+  private readonly styleColor = new THREE.Color(STYLES.snow.color);
+  /** The frame's day/night colour multiply, the same `dnGrade.fog` the scene fog
+   *  and the water surface take. */
+  private readonly dayNight: [number, number, number] = [1, 1, 1];
 
   private mode: Precip = 'snow';
   private intensity = 0; // current eased opacity 0..1
@@ -213,11 +219,38 @@ export class Weather {
     this.material.opacity = 0;
   }
 
+  /**
+   * Precipitation is UNLIT (a PointsMaterial takes no scene light), so nothing
+   * else in the renderer can darken it: without this, snow fell pure white at
+   * midnight through an otherwise dark world and read as daylight confetti.
+   * It takes the same grade the fog and the water surface take, so a flake in
+   * the air matches the air it is falling through.
+   */
+  setDayNight(mul: readonly [number, number, number]): void {
+    if (this.dayNight[0] === mul[0] && this.dayNight[1] === mul[1] && this.dayNight[2] === mul[2]) {
+      return;
+    }
+    this.dayNight[0] = mul[0];
+    this.dayNight[1] = mul[1];
+    this.dayNight[2] = mul[2];
+    this.applyTint();
+  }
+
+  /** Multiply in linear space, channel by channel: the style colour keeps its
+   *  own sRGB decode from setHex and the grade is a plain multiplier. */
+  private applyTint(): void {
+    this.material.color.copy(this.styleColor);
+    this.material.color.r *= this.dayNight[0];
+    this.material.color.g *= this.dayNight[1];
+    this.material.color.b *= this.dayNight[2];
+  }
+
   private applyStyle(mode: Precip): void {
     const s = STYLES[mode];
     this.material.map = this.textures[s.texture];
-    this.material.color.setHex(s.color);
+    this.styleColor.setHex(s.color);
     this.material.size = s.size;
+    this.applyTint();
   }
 
   /**

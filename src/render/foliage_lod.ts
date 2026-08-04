@@ -170,6 +170,12 @@ export interface BucketWindowInput {
   swapFade?: number;
   /** live fog wall for sprite rows (defaults to fogLimit) */
   spriteFar?: number;
+  /**
+   * Measure `maxDist` from the bucket's NEAR EDGE instead of its centre. Set
+   * for rows that have no fallback representation once they drop, which today
+   * means the shadow-only clones (see the note on the centre rule below).
+   */
+  maxFromNearEdge?: boolean;
 }
 
 /**
@@ -188,6 +194,19 @@ export interface BucketWindowInput {
  * have flipped to impostors, putting cones a few strides away; keyed near-edge
  * only, as this was before the shader owned the boundary, every tree in a
  * 540x240u slab drew at full detail until the whole slab left the swap.
+ *
+ * `maxFromNearEdge` extends that same COVERAGE reasoning to the numeric cap,
+ * for rows where dropping the bucket drops the content outright. The shadow
+ * clones are the case: they are the only thing casting a tree's shadow (the
+ * per-instance collapse cannot reach three's shadow depth material, so they
+ * carry no shader window to split them), and buckets are one x-half by one
+ * z-band, about 180x240u, so their centre sits up to ~168u from their own
+ * nearest tree. Centre-keyed against a cap of treeDetailFar * distanceScale
+ * (216 to 300u as the budget moves), a player standing near a band boundary
+ * had the trees a few paces away deleted from the shadow pass as a slab,
+ * flipping on a few yards of camera drift or a nudge in the budget scale.
+ * Near-edge, the slab only leaves once its NEAREST tree is past the cap, which
+ * is the point at which nothing visible is lost.
  */
 export function bucketVisible(w: BucketWindowInput): boolean {
   const nearEdge = w.centerDist - w.radius;
@@ -197,7 +216,8 @@ export function bucketVisible(w: BucketWindowInput): boolean {
     w.maxDist === undefined
       ? Number.POSITIVE_INFINITY
       : w.maxDist * w.distanceScale * w.revealScale;
-  if (w.centerDist < minCap || w.centerDist >= maxCap) return false;
+  const maxProbe = w.maxFromNearEdge ? nearEdge : w.centerDist;
+  if (w.centerDist < minCap || maxProbe >= maxCap) return false;
 
   if (w.minAtDetail) {
     // Sprite rows come alive at the earliest per-instance handoff their

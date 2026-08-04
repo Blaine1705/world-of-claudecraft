@@ -4,7 +4,7 @@ import type { BiomeId } from '../sim/types';
 import { SOWFIELD_CENTER } from '../sim/vale_cup_layout';
 import { loadHdr, loadTexture } from './assets/loader';
 import { BIOME_HAZE_DECLARATIONS, biomeHazeUniforms, hasBiomeHazeField } from './biome_haze_field';
-import { HAZE_AERIAL_MAX, HAZE_SKY_SAMPLE_DIST } from './biome_haze_field_core';
+import { HAZE_SKY_SAMPLE_DIST, HAZE_SKY_TINT_MAX } from './biome_haze_field_core';
 import {
   createEnvironmentBlend,
   SKY_ENVIRONMENT_RESPONSE,
@@ -657,7 +657,7 @@ ${
       vec2 wocSkyXZ = uHazeCam + normalize(dir.xz + vec2(1e-5, 0.0)) * ${HAZE_SKY_SAMPLE_DIST.toFixed(1)};
       vec4 wocSkyHaze = texture2D(uHazeField, (wocSkyXZ - uHazeRect.xy) * uHazeRect.zw);
       float wocSkyBand = smoothstep(0.02, 0.1, dir.y) * (1.0 - smoothstep(0.16, 0.38, dir.y));
-      c = mix(c, wocSkyHaze.rgb * uHazeGrade, ${HAZE_AERIAL_MAX.toFixed(6)} * wocSkyHaze.a * wocSkyBand);
+      c = mix(c, wocSkyHaze.rgb * uHazeGrade, ${HAZE_SKY_TINT_MAX.toFixed(6)} * wocSkyHaze.a * wocSkyBand);
     }
 `
     : ''

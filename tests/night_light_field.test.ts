@@ -53,10 +53,18 @@ describe('the GLSL strings', () => {
   it('lights against the surface normal with the punctual falloff', () => {
     const glsl = nightLightFragmentGlsl('vWPos.xyz');
     expect(glsl).toContain('inverseTransformDirection(normal, viewMatrix)');
-    expect(glsl).toContain('dot(');
-    // three's own point-light curve: the pow4 cutoff window over 1/d^2
-    expect(glsl).toContain('pow4(');
-    expect(glsl).toContain('pow2(saturate(');
+    // three's own point-light curve, stated in SQUARED distance: pow4(d / r)
+    // is pow2(d2 / r2), and the attenuation divides by d2 either way, so the
+    // window and the falloff need no root at all.
+    expect(glsl).toContain('float wocNLDist2 = dot(wocNLTo, wocNLTo);');
+    expect(glsl).toContain('pow2(saturate(1.0 - pow2(wocNLDist2 / wocNLCutoff2)))');
+    expect(glsl).toContain('wocNLWin / max(wocNLDist2, 0.01)');
+    // the one root left is the lambert direction, and it is INSIDE the range
+    // branch: a light the fragment is out of range of never pays for it, which
+    // is what keeps a wide slot window affordable
+    expect(glsl).toContain('inversesqrt(');
+    expect(glsl.indexOf('inversesqrt(')).toBeGreaterThan(glsl.indexOf('if (wocNLDist2 <'));
+    expect(glsl).not.toContain('length(wocNLTo)');
   });
 });
 
@@ -106,9 +114,16 @@ describe('the consumer seams (source pins)', () => {
   });
 
   it('the fallback layers stand down where the field runs', () => {
-    // Both pool builders and the disc pool must consult the field, or the
-    // ground would be lit twice (the decal on top of the real light).
-    expect(read('../src/render/streetlamps.ts')).toContain('!hasNightLightField()');
+    // Streetlamps no longer blend a decal under the real light: where the field
+    // runs, no pool is BUILT at all, so the lamp is a light source and nothing
+    // else. The sprite survives only on the tier that cannot splice the field.
+    const streetlamps = read('../src/render/streetlamps.ts');
+    expect(streetlamps).toContain('const fieldActive = hasNightLightField()');
+    expect(streetlamps).toContain(
+      "const usePools = typeof document !== 'undefined' && !fieldActive",
+    );
+    // and the pool opacity no longer carries a field-present blend factor
+    expect(streetlamps).not.toContain('fieldActive ? 0.52 : 1');
     expect(read('../src/render/camp_braziers.ts')).toContain('!hasNightLightField()');
     expect(read('../src/render/ember_pools.ts')).toContain('hasNightLightField()');
     expect(read('../src/render/renderer.ts')).toContain('hasNightLightField() ? 0 : bodyGlow');

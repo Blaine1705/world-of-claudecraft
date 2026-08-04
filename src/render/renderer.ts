@@ -115,7 +115,7 @@ import {
 } from './characters/skin_attack';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
-import { fogFarForBuiltGround } from './chunk_residency_core';
+import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import { CompileGateQueue, settlePendingSwap } from './compile_gate';
@@ -142,6 +142,9 @@ import {
   globalDayness,
   moonDirection,
   NEUTRAL_DAY_GRADE,
+  nightIblScale,
+  realmLightTint,
+  REALM_MOON_TINT,
   nightSkyDesat,
   nightStarAmount,
   REALM_DAYNIGHT_AMPLITUDE,
@@ -152,6 +155,7 @@ import {
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
+import { detailHorizonStarved } from './detail_horizon_core';
 import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_portal';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
@@ -177,7 +181,7 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
-import { buildFarTerrain, type FarTerrainView, setFarTerrainNightFloor } from './far_terrain';
+import { buildFarTerrain, type FarTerrainView, setFarTerrainNightGrade } from './far_terrain';
 import {
   detailCullFar,
   type FarVistaPlan,
@@ -1677,6 +1681,15 @@ export class Renderer {
   private farVista: FarVistaPlan;
   private farTerrainView!: FarTerrainView;
   private detailFogFar: number;
+  // Scratch for the residency clamp's view wedge: the camera forward the clamp
+  // reads, kept off the shared tmpV pool because updateAmbience runs in the
+  // middle of sync's entity work and must not disturb it.
+  private residencyForward = new THREE.Vector3();
+  private readonly residencyCone: { forwardX: number; forwardZ: number; halfAngle: number } = {
+    forwardX: 0,
+    forwardZ: 0,
+    halfAngle: Math.PI / 2,
+  };
   /** Fired whenever a zone becomes resident (any prepare path). Wired by
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
    *  background) prewarm alongside the zone itself. */
@@ -7988,12 +8001,24 @@ export class Renderer {
       const ground = this.terrainView.groundResidency();
       const detailSource = vista ? this.detailFogFar : fog.far;
       const atmosphericFar = dampedValue(detailSource, requestedFar, dt, ZONE_ENVIRONMENT_RESPONSE);
+      // Ask the clamp only about ground the camera can see. Radially, the
+      // binding chunk orbits with the third-person boom, so standing still and
+      // turning on the spot dragged the detail horizon between 170 and 700
+      // yards and deleted mid-field scenery and shadows with it.
+      this.camera.getWorldDirection(this.residencyForward);
+      this.residencyCone.forwardX = this.residencyForward.x;
+      this.residencyCone.forwardZ = this.residencyForward.z;
+      this.residencyCone.halfAngle = groundViewConeHalfAngle(
+        THREE.MathUtils.degToRad(this.camera.fov),
+        this.camera.aspect,
+      );
       const residencyFar = fogFarForBuiltGround(
         ground.grid,
         ground.isPending,
         this.camera.position.x,
         this.camera.position.z,
         atmosphericFar,
+        this.residencyCone,
       );
       if (vista) {
         this.detailFogFar = easedFogFar(this.detailFogFar, requestedFar, residencyFar, dt);
@@ -8042,12 +8067,21 @@ export class Renderer {
       // orange while the gate still passes it at full strength, which is what
       // makes the golden hour read as a band rather than an instant.
       const warmAmt = sunsetWarmGate(sunElev) * (0.58 + lowness * 0.42);
+      // The realm's own night hue, as a luminance-neutral multiplier. Applied
+      // to the key light and both hemisphere halves AFTER they cool toward the
+      // moon, so a realm keeps tinting the world it lights after dark: the
+      // Drakelands' grass is green and reads red under its ember light, and
+      // that has to survive the night or the realm stops being itself.
+      const realmTint = realmLightTint(g.fog, g.nightAmt * REALM_MOON_TINT);
       this.dnColorScratch.setHex(light.sun);
       this.dnColorScratch.lerp(this.dnMoonScratch.setHex(WARM_SUN_COLOR), warmAmt);
       this.dnColorScratch.lerp(
         this.dnMoonScratch.setHex(MOON_SUN_COLOR),
         g.nightAmt * NIGHT_SUN_COOL,
       );
+      this.dnColorScratch.r *= realmTint[0];
+      this.dnColorScratch.g *= realmTint[1];
+      this.dnColorScratch.b *= realmTint[2];
       this.sun.color.lerp(this.dnColorScratch, k);
       this.dnColorScratch
         .setHex(light.hemiSky)
@@ -8056,6 +8090,9 @@ export class Renderer {
           DAY_HEMI_SKY_WARMTH * (1 - g.nightAmt),
         )
         .lerp(this.dnMoonScratch.setHex(MOON_HEMI_SKY_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
+      this.dnColorScratch.r *= realmTint[0];
+      this.dnColorScratch.g *= realmTint[1];
+      this.dnColorScratch.b *= realmTint[2];
       this.hemi.color.lerp(this.dnColorScratch, k);
       // the ground bounce cools with the sky side so night shading does not keep
       // a warm daytime tint (its brightness still rides the hemi intensity above)
@@ -8066,6 +8103,9 @@ export class Renderer {
           DAY_HEMI_GROUND_WARMTH * (1 - g.nightAmt),
         )
         .lerp(this.dnMoonScratch.setHex(MOON_HEMI_GROUND_COLOR), g.nightAmt * NIGHT_HEMI_COOL);
+      this.dnColorScratch.r *= realmTint[0];
+      this.dnColorScratch.g *= realmTint[1];
+      this.dnColorScratch.b *= realmTint[2];
       this.hemi.groundColor.lerp(this.dnColorScratch, k);
       this.sun.intensity +=
         (SUN_INTENSITY * g.lightScale * (light.sunScale ?? 1) - this.sun.intensity) * k;
@@ -8099,9 +8139,19 @@ export class Renderer {
       dominant in Renderer.BIOME_LIGHT
         ? (Renderer.BIOME_LIGHT[dominant as BiomeId].envScale ?? 1)
         : 1;
+    // ...and at night the realm's own sky energy is normalized toward the Vale's.
+    // The IBL is the realm's DAYTIME HDRI and those differ twenty-two fold in
+    // measured irradiance, so an identical ambient scale left Willowfen and
+    // Palmreach reading as an overcast afternoon while Eastbrook read as night.
+    // Level only: the HDRI keeps its colour, so a realm's night stays its own.
+    const nightEnvScale =
+      dominant in Renderer.BIOME_LIGHT
+        ? nightIblScale(dominant as BiomeId, this.dnGrade.nightAmt)
+        : 1;
     const target = this.envRTs.has(dominant) ? dominant : this.envTransition.current;
     // The IBL is ambient, so it follows the grade's ambient floor, not the sun's.
-    const settledIntensity = this.envOutdoorIntensity * this.dnGrade.ambientScale * envScale;
+    const settledIntensity =
+      this.envOutdoorIntensity * this.dnGrade.ambientScale * envScale * nightEnvScale;
     // Interior presets write the scene intensity directly. Re-seed from that
     // live value on the first outdoor frame so returning outside never jumps
     // back to a stale transition scalar.
@@ -8140,8 +8190,9 @@ export class Renderer {
       // the world (its baked palette would otherwise stay day-bright at night)
       setWaterSunDirection(this.lightDir);
       setWaterDayNight(this.dnGrade.fog);
-      // the far vista's deep-night ambient floor rides the same grade
-      setFarTerrainNightFloor(this.dnGrade.nightAmt);
+      // the far vista's deep-night ambient floor and night albedo dim ride
+      // the same grade
+      setFarTerrainNightGrade(this.dnGrade.nightAmt);
     }
     this.sun.target.position.set(pp.x, pp.y, pp.z);
   }
@@ -9805,6 +9856,29 @@ export class Renderer {
       if (standingZoneId !== null && this.pendingZonePrepares.has(standingZoneId)) {
         this.terrainView.escalateZone(standingZoneId);
       }
+      // ...and so does a NEIGHBOUR's unbuilt ground while it is holding the
+      // detail horizon in. Standing-zone-only escalation left the common case
+      // unserved: unbuilt ground a couple of hundred yards over a border
+      // collapses the horizon the player is looking through and hands the
+      // mid-field to the coarse vista mesh, which carries no splat texture and
+      // takes no shadows. (The clamp is directional now, so this fires on
+      // ground actually in frame rather than on anything within a radius; that
+      // makes it rarer, not less worth escalating.) Every prepare in flight is
+      // escalated rather than the one owning the binding chunk: the queue is
+      // urgency-ordered nearest-first and runs one zone at a time, so that is
+      // the same zone in all but a race, at no spatial-query cost. See
+      // detail_horizon_core.ts for why this is safe to leave on.
+      //
+      // Vista arm only, deliberately. The fogged arm hides the same clamp
+      // behind its murk wall rather than showing coarse ground through it, so
+      // the artifact this trades frame time for does not exist there, and its
+      // tiers are the ones least able to afford the trade.
+      const vistaOutdoor = this.farVista.enabled && this.fogState === 'outdoor';
+      if (vistaOutdoor && detailHorizonStarved(fogFar, this.lastRequestedFogFar)) {
+        for (const zoneId of this.pendingZonePrepares.keys()) {
+          this.terrainView.escalateZone(zoneId);
+        }
+      }
     }
     this.terrainView.update(this.camera.position.x, this.camera.position.z, fogFar);
     this.farTerrainView.update(
@@ -9947,6 +10021,9 @@ export class Renderer {
     // precipitation only falls outdoors; indoors/underwater pass null to clear.
     // The sampler lets a neighbouring zone's weather fall inside the box while
     // the player stands outside it (weather_field_core.ts).
+    // Precipitation is unlit, so it takes the grade explicitly or snow stays
+    // pure white at midnight. Same multiply as the fog and the water surface.
+    this.weather.setDayNight(this.dnGrade.fog);
     this.weather.update(
       this.camera.position,
       dt,

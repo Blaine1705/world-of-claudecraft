@@ -18,7 +18,7 @@
 import { MOB_GLOW_RANGE, mobGlowStrength } from './night_lighting_core';
 
 /** Total uniform slots the terrain shader loops over. */
-export const NIGHT_LIGHT_SLOTS = 24;
+export const NIGHT_LIGHT_SLOTS = 40;
 /** Slots reserved for moving bodies (the player and nearby characters). The
  *  disc layer this replaces pooled MOB_GLOW_POOL discs; a field slot only
  *  matters within a body light's short reach, so a camera-local camp is
@@ -26,7 +26,18 @@ export const NIGHT_LIGHT_SLOTS = 24;
  *  hold a busy pull: raid-sized crowds beyond it go without ground light,
  *  which is the same crowd-safe failure mode the disc pool chose. */
 export const NIGHT_LIGHT_DYNAMIC_SLOTS = 14;
-/** Slots for the world's fixed lights (lamps, braziers, camp fires). */
+/**
+ * Slots for the world's fixed lights (lamps, braziers, camp fires).
+ *
+ * This is the range the lit world reaches, not a memory budget: a static light
+ * outside the window casts NOTHING, so the count decides how far down a road a
+ * player sees lamplight on the ground. At ten the window closed inside 60 yards
+ * in the busy places (a town's lamps plus a camp's braziers filled it), so the
+ * next lamp up the road stood over dark ground while the one overhead lit a
+ * pool. The wide window is what makes a road read as lit ahead of the player
+ * rather than only underfoot; the shader still loops only over the live count,
+ * so an empty wilderness costs exactly what it did before.
+ */
 export const NIGHT_LIGHT_STATIC_SLOTS = NIGHT_LIGHT_SLOTS - NIGHT_LIGHT_DYNAMIC_SLOTS;
 
 /** One light the field can carry. Colour is linear 0..1; radius in yards.

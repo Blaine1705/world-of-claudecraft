@@ -147,6 +147,13 @@ uniform int uNightLightCount;`;
  * The falloff is three's own punctual attenuation (decay 2 with the pow4
  * cutoff window, nightLightFalloff in the core, mirrored term for term), so
  * field light and the budget's real point lights agree about reach.
+ *
+ * The loop works in SQUARED distance: `pow4(d / r)` is `pow2(d2 / r2)` and the
+ * attenuation divides by d2 anyway, so the only root left is the one the
+ * lambert term's direction needs, inside the branch a culled light never
+ * enters. A light the fragment is out of range of therefore costs a subtract,
+ * a dot and a compare, which is what lets the slot window be wide enough to
+ * light a road ahead of the player instead of only the ground beneath them.
  */
 export function nightLightFragmentGlsl(worldPos: string): string {
   return `
@@ -156,12 +163,12 @@ export function nightLightFragmentGlsl(worldPos: string): string {
     for (int i = 0; i < ${NIGHT_LIGHT_SLOTS}; i++) {
       if (i >= uNightLightCount) break;
       vec3 wocNLTo = uNightLightPosR[i].xyz - ${worldPos};
-      float wocNLDist = length(wocNLTo);
-      float wocNLCutoff = uNightLightPosR[i].w;
-      if (wocNLDist < wocNLCutoff) {
-        float wocNLWin = pow2(saturate(1.0 - pow4(wocNLDist / wocNLCutoff)));
-        float wocNLAtt = wocNLWin / max(wocNLDist * wocNLDist, 0.01);
-        float wocNLLambert = saturate(dot(wocNLNormal, wocNLTo / max(wocNLDist, 1e-4)));
+      float wocNLDist2 = dot(wocNLTo, wocNLTo);
+      float wocNLCutoff2 = uNightLightPosR[i].w * uNightLightPosR[i].w;
+      if (wocNLDist2 < wocNLCutoff2) {
+        float wocNLWin = pow2(saturate(1.0 - pow2(wocNLDist2 / wocNLCutoff2)));
+        float wocNLAtt = wocNLWin / max(wocNLDist2, 0.01);
+        float wocNLLambert = saturate(dot(wocNLNormal, wocNLTo * inversesqrt(max(wocNLDist2, 1e-8))));
         wocNLIrradiance += uNightLightColor[i] * (wocNLAtt * wocNLLambert);
       }
     }

@@ -59,31 +59,54 @@ export const HAZE_DENSITY_CLEAR_FAR = 700;
 /** Strength of the clearest realm's air, as a fraction of the murkiest. */
 export const HAZE_STRENGTH_MIN = 0.66;
 
-// The distance ramp, now a genuine LIGHT FOG in the zone's own colour rather
-// than a hint. Onset just under the 120 yard interest radius (the Gaussian
-// shoulder keeps the radius itself under 1 percent, so nothing a player
-// fights, loots or reads is ever hazed), then a fast rise tuned to the
-// BORDER SIGHTLINE: the neighbour's land fills the 150 to 400 yard band, and
-// two ships of this ramp (onset 150 / ref 350, then ref 200) still played as
-// "the air did not change". Now 200 yards carries about 15 percent, 300
-// about a third, saturating near 40 percent for a clear realm and
-// HAZE_AERIAL_MAX for the murkiest. A little fog, deliberately not a lot:
-// the ceiling stays at half, so the distant ground always keeps its own
-// colour under the air.
-export const HAZE_AERIAL_ONSET = 100;
-export const HAZE_AERIAL_REF = 150;
-export const HAZE_AERIAL_MAX = 0.5;
+// The BORDER term: a zone's own air, read from across the line. Onset just
+// under the 120 yard interest radius (the Gaussian shoulder keeps the radius
+// itself under 1 percent, so nothing a player fights, loots or reads is ever
+// hazed), then a rise tuned to the BORDER SIGHTLINE, where the neighbour's
+// land fills the 150 to 400 yard band.
+//
+// The ref is 300 rather than the 150 the previous pass shipped, and that is
+// the fix for the flat mid-field. A mix toward one constant colour costs
+// shading contrast in proportion, and at ref 150 this term was already 27
+// percent at 300 yards and saturated by 400: every hillside between the
+// player and the detail horizon (FOGLESS_DETAIL_FAR, 700) lost a third of its
+// light-and-shade to a flat wash, which is what made ridges a few hundred
+// yards out read as pastel cutouts with no day/night response. The band still
+// carries real air (about 10 percent at 300, 18 at 400, 24 at 700 for a clear
+// realm) and the zone's IDENTITY there is carried mostly by colour: the baked
+// hue, its light level, and its weather veil, all of which differ per realm
+// even at a low mix. Two earlier ships under-shot this band at ONE tenth of
+// those numbers; the answer to "the air did not change" was never to keep
+// doubling the wash.
+export const HAZE_AERIAL_ONSET = 110;
+export const HAZE_AERIAL_REF = 300;
+export const HAZE_AERIAL_MAX = 0.36;
 
-// The FAR term: past the border band the air keeps thickening, so distance
-// genuinely fades out into the LOCAL zone's fog colour (the field sample, so
-// the fade is always the colour of the area it covers, never the camera
-// zone's). A second Gaussian shoulder starting where the near term has
-// saturated; the two sum to HAZE_FAR_CEIL for the murkiest realm at extreme
-// range, which still leaves the horizon band and the ground's own colour a
-// say: more fade with distance, deliberately not a white-out.
-export const HAZE_FAR_ONSET = 450;
-export const HAZE_FAR_REF = 500;
-export const HAZE_FAR_CEIL = 0.85;
+// The FAR term: the camera's OWN air column, which is why it opens only once
+// the border term has saturated and why it is NOT scaled by the field
+// strength (see aerialHazeAmount). A murky realm's air is thicker to look
+// INTO from outside; the kilometre of atmosphere between the camera and the
+// world rim is the same kilometre whichever realm the rim belongs to, and
+// only its COLOUR is local (the field sample, so the fade is always the
+// colour of the area it covers, never the camera zone's).
+//
+// It converges near 1 rather than the 0.85-times-strength the previous pass
+// gave, because a clear realm's rim was landing at 0.56 and holding a
+// crisp pale silhouette out at the world edge: bright by day, and outright
+// glowing at night, where the vista keeps most of its ambient light while the
+// sky crushes to navy. Real distance does not do that. Converging here means
+// the rim genuinely becomes its own atmosphere, which is also what lets the
+// horizon haze band and the sky dome agree with it at the rim.
+export const HAZE_FAR_ONSET = 720;
+export const HAZE_FAR_REF = 900;
+export const HAZE_FAR_CEIL = 0.95;
+
+/** Strength of the SKY dome's horizon-band tint (sky.ts), kept separate from
+ *  the ground's border ceiling above. The dome's job is to match the hazed
+ *  geometry sitting in front of it near the horizon, which is the far term's
+ *  business, so retuning the ground's border band must not dim the sky with
+ *  it (the two shared one constant, and the coupling was silent). */
+export const HAZE_SKY_TINT_MAX = 0.5;
 
 // How far along the view ray the SKY dome samples the field for its
 // horizon-band tint (sky.ts): the mid-vista distance where a neighbouring
@@ -206,16 +229,24 @@ export function hazeLightLevel(sunScale = 1, hemiScale = 1, envScale = 1): numbe
 /**
  * How much of the sampled haze a fragment takes, from its distance to the
  * camera. The Node twin of the GLSL in biome_haze_field.ts: both sum the
- * border-band term `MAX * (1 - exp(-t1^2))` and the far term
- * `(CEIL - MAX) * (1 - exp(-t2^2))`, scaled by the field strength, so a test
- * can pin the exact curve the shader runs at both ranges.
+ * border-band term `strength * MAX * (1 - exp(-t1^2))` and the far term
+ * `(CEIL - MAX) * (1 - exp(-t2^2))`, so a test can pin the exact curve the
+ * shader runs at both ranges.
+ *
+ * Only the BORDER term takes the field strength. That term is "how thick is
+ * the air over THERE", which is exactly what a realm's fog preset says; the
+ * far term is the camera's own air column, the same depth of atmosphere
+ * whichever realm it happens to end on, so scaling it by the destination's
+ * murk left the clear realms with a hard bright rim at the world edge while
+ * the murky ones melted correctly. Colour stays local either way, which is
+ * the whole point of the field.
  */
 export function aerialHazeAmount(distance: number, strength: number): number {
   const t1 = Math.max(0, distance - HAZE_AERIAL_ONSET) / HAZE_AERIAL_REF;
   const t2 = Math.max(0, distance - HAZE_FAR_ONSET) / HAZE_FAR_REF;
-  const near = HAZE_AERIAL_MAX * (1 - Math.exp(-t1 * t1));
+  const border = strength * HAZE_AERIAL_MAX * (1 - Math.exp(-t1 * t1));
   const far = (HAZE_FAR_CEIL - HAZE_AERIAL_MAX) * (1 - Math.exp(-t2 * t2));
-  return strength * (near + far);
+  return border + far;
 }
 
 /**

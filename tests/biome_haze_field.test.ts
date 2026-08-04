@@ -85,8 +85,13 @@ describe('the spliced snippet', () => {
     const glsl = biomeHazeFragmentGlsl('vFarXZ');
     const near = /float wocHazeT = max\(0\.0, wocHazeD - ([0-9.]+)\) \/ ([0-9.]+);/.exec(glsl);
     const far = /float wocHazeT2 = max\(0\.0, wocHazeD - ([0-9.]+)\) \/ ([0-9.]+);/.exec(glsl);
+    // Only the BORDER term carries wocHaze.a (the field strength); the camera's
+    // own air column is the same depth whichever realm the ray lands on, so the
+    // strength must multiply the first term ALONE. Anchored on the parentheses
+    // for exactly that reason: re-wrapping the sum would make the shader scale
+    // both terms again and this pin is what says so.
     const amps =
-      /wocHaze\.a \* \(([0-9.]+) \* \(1\.0 - exp\(-wocHazeT \* wocHazeT\)\)\s*\+ ([0-9.]+) \* \(1\.0 - exp\(-wocHazeT2 \* wocHazeT2\)\)\)/.exec(
+      /wocHaze\.a \* ([0-9.]+) \* \(1\.0 - exp\(-wocHazeT \* wocHazeT\)\)\s*\+ ([0-9.]+) \* \(1\.0 - exp\(-wocHazeT2 \* wocHazeT2\)\);/.exec(
         glsl,
       );
     const onset1 = Number(near?.[1]);
@@ -103,8 +108,21 @@ describe('the spliced snippet', () => {
         const t1 = Math.max(0, distance - onset1) / ref1;
         const t2 = Math.max(0, distance - onset2) / ref2;
         const shader =
-          strength * (max1 * (1 - Math.exp(-t1 * t1)) + span2 * (1 - Math.exp(-t2 * t2)));
+          strength * max1 * (1 - Math.exp(-t1 * t1)) + span2 * (1 - Math.exp(-t2 * t2));
         expect(shader).toBeCloseTo(aerialHazeAmount(distance, strength), 6);
+      }
+    }
+  });
+
+  it('never mixes past 1, so the haze can only ever tint and never invert', () => {
+    // The two terms are summed rather than nested now, so nothing structurally
+    // bounds the total: a future retune that lifts either amplitude has to keep
+    // the sum a legal mix factor at every distance and strength.
+    for (let d = 0; d <= 6000; d += 50) {
+      for (const strength of [0, 0.66, 0.83, 1]) {
+        const a = aerialHazeAmount(d, strength);
+        expect(a).toBeGreaterThanOrEqual(0);
+        expect(a).toBeLessThanOrEqual(1);
       }
     }
   });

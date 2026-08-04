@@ -54,6 +54,16 @@ describe('the slot layout', () => {
     expect(NIGHT_LIGHT_DYNAMIC_SLOTS).toBeGreaterThan(0);
   });
 
+  it('holds enough fixed-light slots to light the road ahead, not only underfoot', () => {
+    // The static window IS the range the lit world reaches: a light outside it
+    // casts nothing at all. Lamps stand about 26 yd apart on a town street and
+    // camps add braziers on top, so a ten-slot window shut inside 60 yd and the
+    // next lamp up the road stood over dark ground while the one overhead lit a
+    // pool. The companion pin against the real network (how many lamps fall
+    // inside a hundred yards) lives in tests/streetlamp_placement_core.test.ts.
+    expect(NIGHT_LIGHT_STATIC_SLOTS).toBeGreaterThanOrEqual(24);
+  });
+
   it('holds enough body slots for a busy camp pull', () => {
     // The disc layer this stands in for pooled 64 discs; the field spends
     // per-fragment shader work per slot, so it cannot match that, but it must
