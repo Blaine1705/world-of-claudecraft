@@ -2901,6 +2901,7 @@ export const vi_VN: EnTranslations = {
       "countLabel": "{earned}/{total} kỳ công",
       "completionAria": "Kỳ công đã lập: {earned} trên {total}",
       "recentLabel": "Gần đây:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Sắp đạt:",
       "filterGroupAria": "Lọc kỳ công",
       "filterAll": "Tất Cả",

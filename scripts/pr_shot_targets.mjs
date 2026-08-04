@@ -2368,6 +2368,78 @@ export const TARGETS = [
     },
   },
   {
+    key: 'deed-chat-link-lines',
+    label: 'Chat: deed unlock and broadcast announcements carry a clickable deed link',
+    when: ['ui/hud/chat/deed_chat_line', 'ui/deeds_window', 'ui/deeds_view'],
+    // Drives the REAL earned moment (handleDeedUnlocks) plus the guild
+    // broadcast event arm, so the capture exercises the actual splice path
+    // (logNodes -> deed_chat_line), then shoots the chat pane with both
+    // announcement lines in it. The same recipe shoots the BEFORE (plain
+    // text) frame: the gate below counts lines, not links.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        hud?.handleDeedUnlocks?.([{ deedId: 'prog_first_steps' }]);
+        hud?.handleEvents?.([
+          { type: 'deedBroadcast', characterName: 'Hilda', deedId: 'cmb_first_blood' },
+        ]);
+      });
+      await wait(400);
+      // Mobile: the chat pane sits behind the Chat button; tap it open first.
+      await page.evaluate(() => {
+        const wrap = document.querySelector('#chatlog-wrap');
+        const hidden = !(wrap instanceof HTMLElement) || wrap.offsetParent === null;
+        if (hidden) document.querySelector('#mobile-chat')?.click();
+      });
+      await wait(400);
+      const shown = await page.evaluate(
+        () => document.querySelectorAll('#chatlog > div').length >= 2,
+      );
+      return shown ? { clip: '#chatlog-wrap' } : {};
+    },
+  },
+  {
+    key: 'deed-recent-strip-jump',
+    label: 'Book of Deeds: clickable recent strip and the jump-to-card spotlight',
+    when: ['ui/hud/chat/deed_chat_line', 'ui/deeds_window', 'ui/deeds_view'],
+    // Seed two earned deeds, fire the real unlock drain (which also feeds the
+    // session recency order), then activate the newest chat deed link with a
+    // real click so the Book opens through openWithDeed: category switched,
+    // card scrolled and flashed, the recent strip rendered as jump buttons.
+    // On the BEFORE build no link exists, so the recipe falls back to a plain
+    // openDeeds and shoots the old non-clickable strip.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        if (!game?.sim || !game.hud) return;
+        game.sim.deedsEarned.set('cmb_first_blood', '2026-08-01');
+        game.sim.deedsEarned.set('prog_first_steps', '2026-08-03');
+        game.hud.handleDeedUnlocks([{ deedId: 'cmb_first_blood' }, { deedId: 'prog_first_steps' }]);
+      });
+      await wait(300);
+      let opened = false;
+      for (let attempt = 0; attempt < 3 && !opened; attempt++) {
+        await page.evaluate(() => {
+          const links = document.querySelectorAll('#chatlog .chat-deed-link');
+          const last = links[links.length - 1];
+          if (last instanceof HTMLElement) last.click();
+          else window.__game?.hud?.openDeeds?.();
+        });
+        opened = await pollForSize(page, '#deeds-window', 10, 500);
+      }
+      if (!opened) throw new Error('deeds window did not open');
+      await wait(400);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
     key: 'worn-enchant-tooltip',
     label: 'Paperdoll tooltip after enchanting the WORN piece in place',
     when: ['professions/enchanting', 'ui/enchant_apply_view'],

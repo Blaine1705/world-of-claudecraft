@@ -2901,6 +2901,7 @@ export const pl_PL: EnTranslations = {
       "countLabel": "{earned}/{total} czynów",
       "completionAria": "Zdobyte czyny: {earned} z {total}",
       "recentLabel": "Ostatnie:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Prawie u celu:",
       "filterGroupAria": "Filtruj czyny",
       "filterAll": "Wszystkie",

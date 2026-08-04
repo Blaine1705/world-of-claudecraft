@@ -2901,6 +2901,7 @@ export const fr_CA: EnTranslations = {
       "countLabel": "{earned}/{total} hauts faits",
       "completionAria": "Hauts faits obtenus: {earned} sur {total}",
       "recentLabel": "Récents:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Presque au but:",
       "filterGroupAria": "Filtrer les hauts faits",
       "filterAll": "Tous",

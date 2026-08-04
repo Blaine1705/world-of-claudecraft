@@ -2901,6 +2901,7 @@ export const id_ID: EnTranslations = {
       "countLabel": "{earned}/{total} jasa",
       "completionAria": "Jasa yang diraih: {earned} dari {total}",
       "recentLabel": "Terbaru:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Hampir tercapai:",
       "filterGroupAria": "Saring jasa",
       "filterAll": "Semua",
