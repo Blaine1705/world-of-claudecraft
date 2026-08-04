@@ -43,6 +43,7 @@ import {
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
+import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './terrain_relief';
 import {
   buildTerrainRegionIndex,
   TERRAIN_APPLIER,
@@ -124,37 +125,41 @@ export function waterBodies(): { x: number; z: number; radius: number }[] {
   return out;
 }
 
-// Hill amplitude / base elevation / hub plateau height per biome.
-const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: number }> = {
-  vale: { hill: 26, base: 0, hubHeight: 1.5 },
-  marsh: { hill: 11, base: -1.0, hubHeight: 1.2 },
-  peaks: { hill: 34, base: 7, hubHeight: 9 },
-  // The Veiled Hollow: a sheltered valley, gentler than the peaks that hide it.
-  dusk: { hill: 14, base: 2, hubHeight: 2.5 },
-  ember: { hill: 16, base: 2.5, hubHeight: 2.5 },
-  frost: { hill: 26, base: 6, hubHeight: 3 },
-  // the Amberfall: rolling autumn weald around the Great Mere
-  amber: { hill: 15, base: 2, hubHeight: 2.5 },
-  // the Willowfen: low, wet, and gentle
-  fen: { hill: 8, base: -0.3, hubHeight: 2 },
-  // the Nightbloom: soft moonlit downs, a touch more rolling than the fen
-  night: { hill: 12, base: 1, hubHeight: 2.5 },
-  // the Wraithwood: low haunted forest floor under the giant canopies
-  haunt: { hill: 13, base: 1.5, hubHeight: 2.5 },
-  // the Palmreach: low tropical relief, the coasts flattened to beach by
-  // the jungle coast applier
-  jungle: { hill: 11, base: 1.2, hubHeight: 2 },
-  // the Evergarden: groomed parkland, gentle as a lawn
-  garden: { hill: 9, base: 1.8, hubHeight: 2 },
-  // the Galecrest: rolling wind-scoured headland downs over sea cliffs
-  gale: { hill: 14, base: 2.4, hubHeight: 2.5 },
-  // Paint-only biomes (the editor's biome brush): never a zone band in the
-  // built-in world, so these rows only shape painted cells on custom maps.
-  beach: { hill: 5, base: -2.4, hubHeight: 0.8 },
-  desert: { hill: 15, base: 2.5, hubHeight: 2 },
-  volcano: { hill: 42, base: 9, hubHeight: 6 },
-  cave: { hill: 9, base: 1, hubHeight: 1 },
-};
+// Hill amplitude / base elevation / hub plateau height / crag amplitude per
+// biome. `crag` is the ridged-multifractal layer's full-mask height
+// (terrain_relief.ts): how far sharp ridgelines can crown this biome's
+// uplands. 0 keeps a biome exactly as calm as its hills (wetlands, lawns).
+const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: number; crag: number }> =
+  {
+    vale: { hill: 26, base: 0, hubHeight: 1.5, crag: 5 },
+    marsh: { hill: 11, base: -1.0, hubHeight: 1.2, crag: 0 },
+    peaks: { hill: 34, base: 7, hubHeight: 9, crag: 26 },
+    // The Veiled Hollow: a sheltered valley, gentler than the peaks that hide it.
+    dusk: { hill: 14, base: 2, hubHeight: 2.5, crag: 4 },
+    ember: { hill: 16, base: 2.5, hubHeight: 2.5, crag: 8 },
+    frost: { hill: 26, base: 6, hubHeight: 3, crag: 10 },
+    // the Amberfall: rolling autumn weald around the Great Mere
+    amber: { hill: 15, base: 2, hubHeight: 2.5, crag: 4 },
+    // the Willowfen: low, wet, and gentle
+    fen: { hill: 8, base: -0.3, hubHeight: 2, crag: 0 },
+    // the Nightbloom: soft moonlit downs, a touch more rolling than the fen
+    night: { hill: 12, base: 1, hubHeight: 2.5, crag: 4 },
+    // the Wraithwood: low haunted forest floor under the giant canopies
+    haunt: { hill: 13, base: 1.5, hubHeight: 2.5, crag: 5 },
+    // the Palmreach: low tropical relief, the coasts flattened to beach by
+    // the jungle coast applier
+    jungle: { hill: 11, base: 1.2, hubHeight: 2, crag: 4 },
+    // the Evergarden: groomed parkland, gentle as a lawn
+    garden: { hill: 9, base: 1.8, hubHeight: 2, crag: 0 },
+    // the Galecrest: rolling wind-scoured headland downs over sea cliffs
+    gale: { hill: 14, base: 2.4, hubHeight: 2.5, crag: 8 },
+    // Paint-only biomes (the editor's biome brush): never a zone band in the
+    // built-in world, so these rows only shape painted cells on custom maps.
+    beach: { hill: 5, base: -2.4, hubHeight: 0.8, crag: 0 },
+    desert: { hill: 15, base: 2.5, hubHeight: 2, crag: 12 },
+    volcano: { hill: 42, base: 9, hubHeight: 6, crag: 30 },
+    cave: { hill: 9, base: 1, hubHeight: 1, crag: 6 },
+  };
 
 // Ridge walls along every shared zone edge, each opened by a road pass. A
 // zone with sealedSouthBorder instead gets a taller, narrower wall with NO
@@ -2886,17 +2891,19 @@ export function terrainRegionCandidateCountsAt(
 // strip's band boundaries cascade by z as they always did, and column zones
 // blend in sideways (columnBlendAt), so an east map's hills arrive across
 // its border pass exactly like a northern realm's do.
-const shapeScratch = { hill: 0, base: 0 };
+const shapeScratch = { hill: 0, base: 0, crag: 0 };
 
-function shapeAt(x: number, z: number): { hill: number; base: number } {
+function shapeAt(x: number, z: number): { hill: number; base: number; crag: number } {
   let hill = BIOME_SHAPE[STRIP_ZONES[0].biome].hill;
   let base = BIOME_SHAPE[STRIP_ZONES[0].biome].base;
+  let crag = BIOME_SHAPE[STRIP_ZONES[0].biome].crag;
   for (let i = 0; i + 1 < STRIP_ZONES.length; i++) {
     const boundary = STRIP_ZONES[i].zMax;
     const t = smoothstep(boundary - 30, boundary + 35, z);
     const next = BIOME_SHAPE[STRIP_ZONES[i + 1].biome];
     hill = lerp(hill, next.hill, t);
     base = lerp(base, next.base, t);
+    crag = lerp(crag, next.crag, t);
   }
   for (const col of COLUMN_ZONES) {
     const t = columnBlendAt(col, x, z);
@@ -2904,11 +2911,13 @@ function shapeAt(x: number, z: number): { hill: number; base: number } {
     const shape = BIOME_SHAPE[col.biome];
     hill = lerp(hill, shape.hill, t);
     base = lerp(base, shape.base, t);
+    crag = lerp(crag, shape.crag, t);
   }
-  // baseHeight is the only caller and reads both fields before any nested
+  // baseHeight is the only caller and reads every field before any nested
   // terrain sample, so the shared result is never retained across a reuse.
   shapeScratch.hill = hill;
   shapeScratch.base = base;
+  shapeScratch.crag = crag;
   return shapeScratch;
 }
 
@@ -2919,9 +2928,109 @@ function baseHeight(
   region: TerrainRegionCell = terrainRegionAt(x, z),
 ): number {
   const shape = shapeAt(x, z);
-  let h =
-    (fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4) - 0.5) * shape.hill + shape.base;
-  h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * 2.2;
+  const hillAmp = shape.hill;
+  const cragAmp = shape.crag;
+  // The calm field: every character layer below (the warp's meander, the
+  // upland detail boost, the crag crests) eases off beside roads and around
+  // settlement pads, so the ways and camps built for the old rolling terrain
+  // stay ridable and their flatten rings never inherit a cliff-sized
+  // mismatch from the rougher field. roadDistance is bbox-gated and returns
+  // Infinity away from every road; the camp/hub rings ride the same coarse
+  // region index the flatten loops use (whose one-guard-cell margin, 128yd,
+  // comfortably covers the slightly wider calm rings), so open wilderness
+  // pays four compares and keeps calm exactly 1.
+  let calm = smoothstep(4, 18, roadDistance(x, z));
+  if (calm > 0) {
+    for (const campIndex of region.campIndices) {
+      const camp = CAMPS[campIndex];
+      const cdx = x - camp.center.x,
+        cdz = z - camp.center.z;
+      const calmGate = camp.radius * 2.2;
+      if (cdx * cdx + cdz * cdz >= calmGate * calmGate) continue;
+      const t = smoothstep(camp.radius * 1.1, calmGate, Math.sqrt(cdx * cdx + cdz * cdz));
+      if (t < calm) calm = t;
+      if (calm === 0) break;
+    }
+  }
+  if (calm > 0) {
+    for (const zoneIndex of region.hubIndices) {
+      const hub = terrainHubZones[zoneIndex].hub;
+      const hdx = x - hub.x,
+        hdz = z - hub.z;
+      const calmGate = hub.radius * 2.0;
+      if (hdx * hdx + hdz * hdz >= calmGate * calmGate) continue;
+      const t = smoothstep(hub.radius * 1.1, calmGate, Math.sqrt(hdx * hdx + hdz * hdz));
+      if (t < calm) calm = t;
+      if (calm === 0) break;
+    }
+  }
+  // The Drakemaw volcano field is precision-graded terrain (crater benches,
+  // the escape gorge: tests/terrain_escape_walkout.test.ts walks every ramp
+  // under the climb gate), so the character layers ease off over the cones
+  // and lava-pool shores exactly as they do over camps. The literal bbox
+  // covers every cone and pool ring below with margin; the rest of the
+  // world pays two compares.
+  if (calm > 0 && x > 160 && z > 2150) {
+    for (const v of EMBER_VOLCANOES) {
+      const vdx = x - v.x,
+        vdz = z - v.z;
+      const calmGate = v.r * 1.7;
+      if (vdx * vdx + vdz * vdz >= calmGate * calmGate) continue;
+      const t = smoothstep(v.r * 1.05, calmGate, Math.sqrt(vdx * vdx + vdz * vdz));
+      if (t < calm) calm = t;
+    }
+    if (calm > 0) {
+      for (const pool of EMBER_LAVA_POOLS) {
+        const pdx = x - pool.x,
+          pdz = z - pool.z;
+        const calmGate = pool.r * 2.8;
+        if (pdx * pdx + pdz * pdz >= calmGate * calmGate) continue;
+        const t = smoothstep(pool.r * 1.5, calmGate, Math.sqrt(pdx * pdx + pdz * pdz));
+        if (t < calm) calm = t;
+      }
+    }
+  }
+  // The natural-relief stack (terrain_relief.ts): the hill layer reads
+  // through a shared low-frequency domain warp so contours meander, and its
+  // fbm damps octaves on accumulated gradient so valley floors come out
+  // smooth while uplands stay rough. Where calm falls below 1 the hill
+  // layer BLENDS back to the legacy plain-fbm2 field, so at calm 0 (a road,
+  // a camp core, a hub, the Drakemaw's graded benches) the finished height
+  // is the exact classic terrain those features were graded against; the
+  // legacy octaves are only paid where calm actually bites.
+  const warped = warpedCoords(x, z, seed, calm);
+  const wx = warped.x,
+    wz = warped.z;
+  const baseNew = reliefBase(wx, wz, seed, HILL_SCALE);
+  const baseV =
+    calm >= 1
+      ? baseNew
+      : (() => {
+          const legacy = fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4);
+          return legacy + (baseNew - legacy) * calm;
+        })();
+  let h = (baseV - 0.5) * hillAmp + shape.base;
+  // The crag layer: ridged-multifractal crests, masked to the uplands the
+  // hill layer already raised (mountains grow out of hills, proportionally;
+  // lowlands never spike) and scaled by the biome's crag amplitude. Kept
+  // farther off the roads than the authored massifs' (7, 16) gate: the crag
+  // layer is sharp, and roadDistance's meander means the walked way can sit
+  // yards off the authored polyline. The gate math runs only where the
+  // layer could contribute visibly; elsewhere the added term is exactly +0,
+  // so skipping it is bit-identical.
+  const upland = highlandMask(baseV);
+  const cragHere = cragAmp * upland * calm;
+  if (cragHere > 0.25) {
+    const roadGate = smoothstep(9, 24, roadDistance(x, z));
+    if (roadGate > 0) h += cragLayer(wx, wz, seed) * cragHere * roadGate;
+  }
+  // Fine detail rides the relief: amplitude proportional to the biome's own
+  // hill scale (wetlands stay glassy, mountain realms grain up) and to the
+  // upland mask (sediment-smooth valley floors, rough slopes and tops). The
+  // amplitude lerps from the legacy flat 2.2 as calm falls, completing the
+  // exact-classic-terrain guarantee at calm 0.
+  const detailAmp = 2.2 + ((0.7 + 0.075 * hillAmp) * (0.55 + 0.85 * upland) - 2.2) * calm;
+  h += (fbm2(x * DETAIL_SCALE, z * DETAIL_SCALE, seed + 7, 2) - 0.5) * detailAmp;
   // Flatten each zone's hub settlement into a plateau. The ACTIVE content's
   // zones read RAW, exactly like the lake-carve loop below (no empty-list
   // fallback on either): the hub and lake FEATURES follow the active content
@@ -3668,7 +3777,27 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
       const peaksSwell = peaksEdge
         ? 0.55 + 0.9 * fbm2(along * 0.009, edge.at * 0.009, seed + 37, 2)
         : 1;
-      const crest = (1 + (edge.sealed ? Math.abs(crestNoise) : crestNoise)) * peaksSwell;
+      // Ridged-multifractal crest teeth for the mountain edges: the range
+      // breaks into sharp summits and deep saddles instead of one smooth
+      // berm. Recentred near the ridged field's measured mean (0.42) so the
+      // average wall height holds; the sealed wall's smaller swing keeps its
+      // crest well above half height everywhere (the movement seal is
+      // independent). Road-gated like the relief's character layers: beside
+      // a way (a pass road's shoulders, or any road inside the gaussian
+      // tail's reach) the term is exactly +0 and the crest is the classic
+      // one bit for bit.
+      let teethTerm = 0;
+      if (peaksEdge || edge.sealed) {
+        const teethGate = smoothstep(4, 18, roadDistance(x, z));
+        if (teethGate > 0) {
+          teethTerm =
+            (ridged2(along * 0.02, edge.at * 0.02, seed + 23, 2) - 0.42) *
+            (edge.sealed ? 0.5 : 0.85) *
+            teethGate;
+        }
+      }
+      const crest =
+        (1 + (edge.sealed ? Math.abs(crestNoise) : crestNoise) + teethTerm) * peaksSwell;
       // the marsh's mountain range (the z540 marsh|peaks wall) sits a little
       // lower than the peaks' inner crags
       const peaksHeight = edge.kind === 'h' && edge.at === 540 ? 27 : 34;
@@ -3853,7 +3982,16 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
   // world's (their coasts and ranges do the framing; the old causeway gate
   // cap is now the Wyrmgate ridge with a real pass through it)
   const rimScale = z > 960 && z <= WORLD_MAX_Z ? 0.6 : 1;
-  h += Math.max(rimX, rimS, rimN) * 40 * rimScale;
+  const rimW = Math.max(rimX, rimS, rimN);
+  if (rimW > 0) {
+    // the rim ranges break into ridged summits and saddles instead of one
+    // smooth wall: pure horizon dressing (the rim's containment is its
+    // steepness plus the world bounds, and the dips stay a full wall tall)
+    const rimTeeth = ridged2(x * 0.016, z * 0.016, seed + 43, 3);
+    // 0.78 + 0.56 * mean(0.392) = 1.0: the average rim keeps its classic
+    // 40yd height while summits reach 1.34x and saddles dip to 0.78x
+    h += rimW * 40 * rimScale * (0.78 + 0.56 * rimTeeth);
+  }
   // Brother Aldric's wall: the Mirefen keeps a relic of its old east rim
   // beside the crater fixture (the green seam replaced the rest of that rim
   // with the Windway's approach downs), so the impact site still reads as a
