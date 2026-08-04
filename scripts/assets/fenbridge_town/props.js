@@ -5,8 +5,6 @@ import {
   addCylinder,
   addGeometry,
   addLantern,
-  addOctahedron,
-  addPitchedRoof,
   addShingledRoof,
   FENBRIDGE_PALETTE as P,
 } from './shared.js';
@@ -94,7 +92,16 @@ export function buildPalisadeWing(buckets) {
   for (let i = 0; i < count; i += 1) {
     const x = -span / 2 + (span * i) / (count - 1);
     const h = 2.55 + (i % 3) * 0.12;
-    addCylinder(buckets, 'timber', 0.16, 0.18, h, 6, [x, h / 2, 0], i % 2 ? P.timberDark : P.timberDeep);
+    addCylinder(
+      buckets,
+      'timber',
+      0.16,
+      0.18,
+      h,
+      6,
+      [x, h / 2, 0],
+      i % 2 ? P.timberDark : P.timberDeep,
+    );
     addGeometry(buckets, 'timber', new THREE.ConeGeometry(0.14, 0.38, 5), P.timberDark, {
       position: [x, h + 0.12, 0],
     });
@@ -140,14 +147,7 @@ export function buildGateArch(buckets) {
       }
     }
     // Diagonal brace inward
-    addBox(
-      buckets,
-      'timber',
-      [0.18, 1.8, 0.18],
-      [sx * 2.2, 2.4, 0],
-      P.timber,
-      [0, 0, sx * 0.55],
-    );
+    addBox(buckets, 'timber', [0.18, 1.8, 0.18], [sx * 2.2, 2.4, 0], P.timber, [0, 0, sx * 0.55]);
     // Spike pickets on outer face
     for (let i = 0; i < 3; i += 1) {
       addBox(buckets, 'timber', [0.12, 0.7, 0.12], [sx * 3.15, 0.9 + i * 0.55, 0], P.timberDeep);
@@ -165,18 +165,17 @@ export function buildGateArch(buckets) {
   for (let c = 0; c < 6; c += 1) {
     const t = (c + 0.5) / 6;
     const z = -0.55 + t * 1.1;
-    addBox(buckets, 'roof', [6.3, 0.04, 0.18], [0, 4.05 + t * 0.35, z], c % 2 ? P.roofDeep : P.roofLight, [
-      0.15 * (z > 0 ? 1 : -1),
-      0,
-      0,
-    ]);
+    addBox(
+      buckets,
+      'roof',
+      [6.3, 0.04, 0.18],
+      [0, 4.05 + t * 0.35, z],
+      c % 2 ? P.roofDeep : P.roofLight,
+      [0.15 * (z > 0 ? 1 : -1), 0, 0],
+    );
   }
   // Signal horn under lintel (larger, more readable)
-  addCylinder(buckets, 'metal', 0.1, 0.16, 0.65, 7, [0, 3.3, 0.2], P.brass, [
-    Math.PI / 2,
-    0.35,
-    0,
-  ]);
+  addCylinder(buckets, 'metal', 0.1, 0.16, 0.65, 7, [0, 3.3, 0.2], P.brass, [Math.PI / 2, 0.35, 0]);
   addCylinder(buckets, 'metal', 0.05, 0.05, 0.28, 5, [0.35, 3.3, 0.28], P.brassLight, [
     Math.PI / 2,
     0.35,
@@ -208,13 +207,7 @@ export function buildGateArch(buckets) {
 export function buildBoardwalk(buckets) {
   for (let i = 0; i < 8; i += 1) {
     const x = -1.75 + i * 0.5;
-    addBox(
-      buckets,
-      'timber',
-      [0.42, 0.08, 1.25],
-      [x, 0.06, 0],
-      i % 2 ? P.timberLight : P.timber,
-    );
+    addBox(buckets, 'timber', [0.42, 0.08, 1.25], [x, 0.06, 0], i % 2 ? P.timberLight : P.timber);
   }
   for (const z of [-0.55, 0.55]) {
     addBox(buckets, 'timber', [3.9, 0.1, 0.12], [0, 0.02, z], P.timberDark);

@@ -531,7 +531,6 @@ function addRainChain(buckets, x, topY, z, length = 1.38) {
   }
 }
 
-
 /**
  * Warden Gatehouse: exterior-only multi-round rebuild from admitted turnaround crops.
  * Identity: moss-stone footing, timber stilts/pickets, tall plank tower, iron straps,
@@ -642,7 +641,13 @@ export function buildWardenGatehouse(buckets) {
   }
 
   // ---- Round 3: tall timber shell + iron straps ----
-  addBox(buckets, 'timber', [bodyW * 0.88, wallH * 0.96, bodyD * 0.86], [0, wallCy, 0], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 0.88, wallH * 0.96, bodyD * 0.86],
+    [0, wallCy, 0],
+    P.timberDeep,
+  );
   addVerticalPlankFace(buckets, 'front', bodyW * 0.95, wallH, [0, wallCy, frontZ - 0.05], {
     plankCount: 9,
   });
@@ -658,25 +663,107 @@ export function buildWardenGatehouse(buckets) {
   for (const x of [-bodyW * 0.46, bodyW * 0.46]) {
     for (const z of [rearZ + 0.05, frontZ - 0.05]) {
       addBox(buckets, 'timber', [0.24, wallH + 0.22, 0.24], [x, wallCy, z], P.timberDark);
-      for (const y of [wallBottom + 0.55, wallBottom + wallH * 0.35, wallBottom + wallH * 0.65, wallTop - 0.55]) {
+      for (const y of [
+        wallBottom + 0.55,
+        wallBottom + wallH * 0.35,
+        wallBottom + wallH * 0.65,
+        wallTop - 0.55,
+      ]) {
         addBox(buckets, 'metal', [0.3, 0.12, 0.3], [x, y, z], P.iron);
-        addBox(buckets, 'metal', [0.08, 0.08, 0.08], [x + Math.sign(x) * 0.12, y, z + Math.sign(z || 1) * 0.12], P.ironLight);
+        addBox(
+          buckets,
+          'metal',
+          [0.08, 0.08, 0.08],
+          [x + Math.sign(x) * 0.12, y, z + Math.sign(z || 1) * 0.12],
+          P.ironLight,
+        );
       }
     }
   }
   for (const z of [frontZ - 0.03, rearZ + 0.03]) {
-    for (const y of [wallBottom + wallH * 0.28, wallBottom + wallH * 0.52, wallBottom + wallH * 0.76, wallTop - 0.1]) {
-      addBox(buckets, 'timber', [bodyW * 0.97, 0.13, 0.13], [0, y, z], y > wallTop - 0.2 ? P.timber : P.timberDark);
+    for (const y of [
+      wallBottom + wallH * 0.28,
+      wallBottom + wallH * 0.52,
+      wallBottom + wallH * 0.76,
+      wallTop - 0.1,
+    ]) {
+      addBox(
+        buckets,
+        'timber',
+        [bodyW * 0.97, 0.13, 0.13],
+        [0, y, z],
+        y > wallTop - 0.2 ? P.timber : P.timberDark,
+      );
     }
   }
-  addBox(buckets, 'timber', [bodyW * 1.06, 0.16, bodyD * 1.06], [0, wallTop - 0.02, 0], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 1.06, 0.16, bodyD * 1.06],
+    [0, wallTop - 0.02, 0],
+    P.timberDark,
+  );
   // Diagonal braces (sides/rear only; front door bay stays open).
-  addBeamXY(buckets, 'timber', [-bodyW * 0.4, wallBottom + 0.45], [-bodyW * 0.1, wallTop - 1.3], rearZ + 0.04, 0.1, 0.11, P.timber);
-  addBeamXY(buckets, 'timber', [bodyW * 0.4, wallBottom + 0.45], [bodyW * 0.1, wallTop - 1.3], rearZ + 0.04, 0.1, 0.11, P.timber);
-  addDiagonalYZ(buckets, 'timber', -bodyW * 0.48, [wallBottom + 0.55, -1.3], [wallTop - 1.5, 1.05], 0.1, 0.11, P.timberDark);
-  addDiagonalYZ(buckets, 'timber', bodyW * 0.48, [wallBottom + 0.55, -1.3], [wallTop - 1.5, 1.05], 0.1, 0.11, P.timberDark);
-  addDiagonalYZ(buckets, 'timber', -bodyW * 0.48, [wallBottom + 2.2, 1.05], [wallTop - 0.8, -1.0], 0.09, 0.1, P.timber);
-  addDiagonalYZ(buckets, 'timber', bodyW * 0.48, [wallBottom + 2.2, 1.05], [wallTop - 0.8, -1.0], 0.09, 0.1, P.timber);
+  addBeamXY(
+    buckets,
+    'timber',
+    [-bodyW * 0.4, wallBottom + 0.45],
+    [-bodyW * 0.1, wallTop - 1.3],
+    rearZ + 0.04,
+    0.1,
+    0.11,
+    P.timber,
+  );
+  addBeamXY(
+    buckets,
+    'timber',
+    [bodyW * 0.4, wallBottom + 0.45],
+    [bodyW * 0.1, wallTop - 1.3],
+    rearZ + 0.04,
+    0.1,
+    0.11,
+    P.timber,
+  );
+  addDiagonalYZ(
+    buckets,
+    'timber',
+    -bodyW * 0.48,
+    [wallBottom + 0.55, -1.3],
+    [wallTop - 1.5, 1.05],
+    0.1,
+    0.11,
+    P.timberDark,
+  );
+  addDiagonalYZ(
+    buckets,
+    'timber',
+    bodyW * 0.48,
+    [wallBottom + 0.55, -1.3],
+    [wallTop - 1.5, 1.05],
+    0.1,
+    0.11,
+    P.timberDark,
+  );
+  addDiagonalYZ(
+    buckets,
+    'timber',
+    -bodyW * 0.48,
+    [wallBottom + 2.2, 1.05],
+    [wallTop - 0.8, -1.0],
+    0.09,
+    0.1,
+    P.timber,
+  );
+  addDiagonalYZ(
+    buckets,
+    'timber',
+    bodyW * 0.48,
+    [wallBottom + 2.2, 1.05],
+    [wallTop - 0.8, -1.0],
+    0.09,
+    0.1,
+    P.timber,
+  );
 
   // ---- Round 4: shingled teal slopes + timber gable faces (kill flat end-caps) ----
   // Concept front is a TIMBER gable, not a smooth teal triangle. Slopes carry
@@ -702,14 +789,11 @@ export function buildWardenGatehouse(buckets) {
         const z = end * (halfD * 0.94);
         const courseDepth = Math.max(0.14, halfW / 11 + 0.04);
         const color = course % 3 === 0 ? P.roofDeep : course % 2 === 0 ? P.roof : P.roofLight;
-        addBox(
-          buckets,
-          'roof',
-          [courseDepth, 0.055, 0.16],
-          [x, y, z],
-          color,
-          [0, 0, -slope * pitch * 0.95],
-        );
+        addBox(buckets, 'roof', [courseDepth, 0.055, 0.16], [x, y, z], color, [
+          0,
+          0,
+          -slope * pitch * 0.95,
+        ]);
       }
     }
   }
@@ -797,11 +881,17 @@ export function buildWardenGatehouse(buckets) {
     // Peak plate + front shield disc (concept ornament under peak).
     addBox(buckets, 'timber', [0.36, 0.22, 0.14], [0, peakY - 0.02, z], P.timberLight);
     if (end > 0) {
-      addCylinder(buckets, 'timber', 0.28, 0.28, 0.1, 8, [0, peakY - 0.62, z + 0.04], P.timberDark, [
-        Math.PI / 2,
-        0,
-        0,
-      ]);
+      addCylinder(
+        buckets,
+        'timber',
+        0.28,
+        0.28,
+        0.1,
+        8,
+        [0, peakY - 0.62, z + 0.04],
+        P.timberDark,
+        [Math.PI / 2, 0, 0],
+      );
       addCylinder(buckets, 'metal', 0.12, 0.12, 0.07, 6, [0, peakY - 0.62, z + 0.09], P.ironLight, [
         Math.PI / 2,
         0,
@@ -893,11 +983,17 @@ export function buildWardenGatehouse(buckets) {
     }
   }
   // Signal horn under front eave (service cue, concept brass).
-  addCylinder(buckets, 'metal', 0.08, 0.14, 0.46, 6, [0.5, wallTop + 0.08, frontZ + 0.08], P.brass, [
-    Math.PI / 2,
-    0.22,
-    0,
-  ]);
+  addCylinder(
+    buckets,
+    'metal',
+    0.08,
+    0.14,
+    0.46,
+    6,
+    [0.5, wallTop + 0.08, frontZ + 0.08],
+    P.brass,
+    [Math.PI / 2, 0.22, 0],
+  );
   addCylinder(
     buckets,
     'metal',
@@ -930,7 +1026,13 @@ export function buildWardenGatehouse(buckets) {
     0,
   ]);
   for (const x of [-0.78, 0.78]) {
-    addBox(buckets, 'timber', [0.14, 2.35, 0.14], [x, wallBottom + 1.25, frontZ - 0.05], P.timberDark);
+    addBox(
+      buckets,
+      'timber',
+      [0.14, 2.35, 0.14],
+      [x, wallBottom + 1.25, frontZ - 0.05],
+      P.timberDark,
+    );
     for (const y of [wallBottom + 0.7, wallBottom + 1.4, wallBottom + 2.1]) {
       addBox(buckets, 'metal', [0.2, 0.1, 0.18], [x, y, frontZ - 0.02], P.iron);
     }
@@ -951,9 +1053,21 @@ export function buildWardenGatehouse(buckets) {
     const t = (row + 0.45) / 5;
     const y = porchEave + porchRise * t;
     const w = Math.max(0.2, 2.2 * (1 - t));
-    addBox(buckets, 'timber', [w, 0.09, 0.07], [0, y, porchZ + 0.55], row % 2 ? P.timber : P.timberLight);
+    addBox(
+      buckets,
+      'timber',
+      [w, 0.09, 0.07],
+      [0, y, porchZ + 0.55],
+      row % 2 ? P.timber : P.timberLight,
+    );
   }
-  addBox(buckets, 'timber', [0.1, porchRise * 0.9, 0.1], [0, porchEave + porchRise * 0.45, porchZ + 0.55], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [0.1, porchRise * 0.9, 0.1],
+    [0, porchEave + porchRise * 0.45, porchZ + 0.55],
+    P.timberDark,
+  );
   for (const x of [-1.05, 1.05]) {
     addBox(buckets, 'timber', [0.15, 1.42, 0.15], [x, wallBottom + 1.65, porchZ], P.timberDark);
     addBox(buckets, 'metal', [0.2, 0.1, 0.2], [x, wallBottom + 0.14, porchZ], P.iron);
@@ -989,11 +1103,17 @@ export function buildWardenGatehouse(buckets) {
   // Front apron rope chain posts (concept).
   for (const x of [-1.15, 1.15]) {
     addBox(buckets, 'timber', [0.1, 0.55, 0.1], [x, baseH + 0.35, porchZ + 0.75], P.timberDark);
-    addCylinder(buckets, 'cloth', 0.03, 0.03, 1.0, 5, [x * 0.5, baseH + 0.55, porchZ + 0.75], P.rope, [
-      0,
-      0,
-      x > 0 ? 0.05 : -0.05,
-    ]);
+    addCylinder(
+      buckets,
+      'cloth',
+      0.03,
+      0.03,
+      1.0,
+      5,
+      [x * 0.5, baseH + 0.55, porchZ + 0.75],
+      P.rope,
+      [0, 0, x > 0 ? 0.05 : -0.05],
+    );
   }
 
   // ---- Round 7: windows + iron frame depth ----
@@ -1002,7 +1122,13 @@ export function buildWardenGatehouse(buckets) {
     frameBucket: 'metal',
   });
   // Window hood shelf (concept timber lintel over upper window).
-  addBox(buckets, 'timber', [1.35, 0.12, 0.18], [0, wallBottom + 4.55, frontZ + 0.05], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [1.35, 0.12, 0.18],
+    [0, wallBottom + 4.55, frontZ + 0.05],
+    P.timberDark,
+  );
   addBox(buckets, 'timber', [1.15, 0.08, 0.12], [0, wallBottom + 4.68, frontZ + 0.02], P.timber);
   addMullionedWindow(buckets, [-bodyW * 0.48, wallBottom + 3.25, 0.45], 0.9, {
     face: 'left',
@@ -1074,19 +1200,43 @@ export function buildWardenGatehouse(buckets) {
   }
 
   // ---- Round 9: lantern cage arm + banner + winch + rope ----
-  addBox(buckets, 'timber', [2.15, 0.14, 0.14], [-2.0, wallBottom + 3.7, frontZ + 0.32], P.timberDark, [
-    0,
-    0,
-    -0.08,
-  ]);
+  addBox(
+    buckets,
+    'timber',
+    [2.15, 0.14, 0.14],
+    [-2.0, wallBottom + 3.7, frontZ + 0.32],
+    P.timberDark,
+    [0, 0, -0.08],
+  );
   addBox(buckets, 'timber', [0.15, 0.5, 0.15], [-1.12, wallBottom + 3.55, frontZ + 0.28], P.timber);
   addBox(buckets, 'metal', [0.2, 0.12, 0.2], [-1.12, wallBottom + 3.85, frontZ + 0.28], P.iron);
   addBox(buckets, 'metal', [0.14, 0.14, 0.14], [-2.95, wallBottom + 3.58, frontZ + 0.32], P.iron);
-  addCylinder(buckets, 'metal', 0.03, 0.03, 1.05, 5, [-2.95, wallBottom + 2.95, frontZ + 0.32], P.iron);
+  addCylinder(
+    buckets,
+    'metal',
+    0.03,
+    0.03,
+    1.05,
+    5,
+    [-2.95, wallBottom + 2.95, frontZ + 0.32],
+    P.iron,
+  );
   // Lantern cage frame (taller iron lattice).
-  addBox(buckets, 'metal', [0.32, 0.52, 0.32], [-2.95, wallBottom + 2.38, frontZ + 0.32], P.ironLight);
+  addBox(
+    buckets,
+    'metal',
+    [0.32, 0.52, 0.32],
+    [-2.95, wallBottom + 2.38, frontZ + 0.32],
+    P.ironLight,
+  );
   for (const dx of [-0.1, 0.1]) {
-    addBox(buckets, 'metal', [0.04, 0.48, 0.04], [-2.95 + dx, wallBottom + 2.38, frontZ + 0.32], P.iron);
+    addBox(
+      buckets,
+      'metal',
+      [0.04, 0.48, 0.04],
+      [-2.95 + dx, wallBottom + 2.38, frontZ + 0.32],
+      P.iron,
+    );
   }
   addLantern(buckets, [-2.95, wallBottom + 2.28, frontZ + 0.32], 1.1);
   addCylinder(
@@ -1102,21 +1252,42 @@ export function buildWardenGatehouse(buckets) {
   );
 
   // Banner arm on right (concept) + blank teal cloth.
-  addBox(buckets, 'timber', [0.12, 0.12, 1.15], [2.05, wallBottom + 4.25, -frontZ - 0.05], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [0.12, 0.12, 1.15],
+    [2.05, wallBottom + 4.25, -frontZ - 0.05],
+    P.timberDark,
+  );
   addBox(buckets, 'metal', [0.14, 0.1, 0.14], [2.05, wallBottom + 4.25, -frontZ - 0.55], P.iron);
-  addBox(buckets, 'cloth', [0.09, 1.65, 0.82], [2.05, wallBottom + 3.3, -frontZ - 0.55], P.clothTeal, [
-    0,
-    0,
-    -0.05,
-  ]);
-  addBox(buckets, 'cloth', [0.07, 0.42, 0.35], [1.88, wallBottom + 2.48, -frontZ - 0.68], P.roofDeep, [
-    0,
-    0,
-    -0.14,
-  ]);
+  addBox(
+    buckets,
+    'cloth',
+    [0.09, 1.65, 0.82],
+    [2.05, wallBottom + 3.3, -frontZ - 0.55],
+    P.clothTeal,
+    [0, 0, -0.05],
+  );
+  addBox(
+    buckets,
+    'cloth',
+    [0.07, 0.42, 0.35],
+    [1.88, wallBottom + 2.48, -frontZ - 0.68],
+    P.roofDeep,
+    [0, 0, -0.14],
+  );
 
   addSideWinch(buckets, -bodyW * 0.55, wallBottom + 1.75, -0.45);
-  addCylinder(buckets, 'cloth', 0.032, 0.032, 1.65, 5, [-bodyW * 0.55, wallBottom + 0.9, -0.45], P.rope);
+  addCylinder(
+    buckets,
+    'cloth',
+    0.032,
+    0.032,
+    1.65,
+    5,
+    [-bodyW * 0.55, wallBottom + 0.9, -0.45],
+    P.rope,
+  );
   addCylinder(
     buckets,
     'cloth',
@@ -1179,7 +1350,13 @@ export function buildWardenGatehouse(buckets) {
   }
   // Mid belt iron studs on front.
   for (const x of [-1.15, -0.55, 0, 0.55, 1.15]) {
-    addBox(buckets, 'metal', [0.1, 0.1, 0.07], [x, wallBottom + wallH * 0.5, frontZ + 0.03], P.ironLight);
+    addBox(
+      buckets,
+      'metal',
+      [0.1, 0.1, 0.07],
+      [x, wallBottom + wallH * 0.5, frontZ + 0.03],
+      P.ironLight,
+    );
   }
 }
 
@@ -1246,7 +1423,13 @@ export function buildLanternChapel(buckets) {
   }
 
   // ---- Round 2: timber nave shell + iron straps + wall plate ----
-  addBox(buckets, 'timber', [bodyW * 0.88, wallH * 0.96, bodyD * 0.86], [0, wallCy, 0], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 0.88, wallH * 0.96, bodyD * 0.86],
+    [0, wallCy, 0],
+    P.timberDeep,
+  );
   addVerticalPlankFace(buckets, 'front', bodyW * 0.95, wallH, [0, wallCy, frontZ - 0.04], {
     plankCount: 11,
   });
@@ -1292,7 +1475,13 @@ export function buildLanternChapel(buckets) {
     }
   }
   // Wall plate the roof seats on.
-  addBox(buckets, 'timber', [bodyW * 1.06, 0.16, bodyD * 1.06], [0, wallTop - 0.02, 0], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 1.06, 0.16, bodyD * 1.06],
+    [0, wallTop - 0.02, 0],
+    P.timberDark,
+  );
   // Front gable truss braces (concept diagonal timber).
   addBeamXY(
     buckets,
@@ -1391,7 +1580,13 @@ export function buildLanternChapel(buckets) {
       );
     }
     // King post + short edge posts only (no long raking sticks above the ridge).
-    addBox(buckets, 'timber', [0.14, rise * 0.98, 0.12], [0, eaveY + rise * 0.5, z + end * 0.04], P.timberDark);
+    addBox(
+      buckets,
+      'timber',
+      [0.14, rise * 0.98, 0.12],
+      [0, eaveY + rise * 0.5, z + end * 0.04],
+      P.timberDark,
+    );
     // Bargeboard strips as short stepped segments along the roof edge.
     for (const side of [-1, 1]) {
       for (let s = 0; s < 5; s += 1) {
@@ -1481,7 +1676,13 @@ export function buildLanternChapel(buckets) {
     position: [0, bellPeakY + 0.4, bellZ],
   });
   // Small rear-gable peak plate only (no free-standing knobs on the slope).
-  addBox(buckets, 'timber', [0.28, 0.16, 0.12], [0, peakY - 0.04, -roofHalfD - 0.02], P.timberLight);
+  addBox(
+    buckets,
+    'timber',
+    [0.28, 0.16, 0.12],
+    [0, peakY - 0.04, -roofHalfD - 0.02],
+    P.timberLight,
+  );
 
   // ---- Round 5: pointed portal, double door, steps (clear approach) ----
   // Nested pointed arch frame.
@@ -1527,15 +1728,25 @@ export function buildLanternChapel(buckets) {
         P.iron,
       );
     }
-    addBox(buckets, 'metal', [0.08, 0.7, 0.06], [sx * 0.48, wallBottom + 1.15, frontZ + 0.09], P.ironLight);
+    addBox(
+      buckets,
+      'metal',
+      [0.08, 0.7, 0.06],
+      [sx * 0.48, wallBottom + 1.15, frontZ + 0.09],
+      P.ironLight,
+    );
   }
   // Door handles (brass rings).
   for (const sx of [-1, 1]) {
-    addTorus(buckets, 'metal', 0.09, 0.025, [sx * 0.18, wallBottom + 1.15, frontZ + 0.12], P.brass, [
-      Math.PI / 2,
-      0,
-      0,
-    ]);
+    addTorus(
+      buckets,
+      'metal',
+      0.09,
+      0.025,
+      [sx * 0.18, wallBottom + 1.15, frontZ + 0.12],
+      P.brass,
+      [Math.PI / 2, 0, 0],
+    );
   }
   // Steps clear to socket.
   addSteps(buckets, 0, frontZ + 0.55, 1.9, 4, 1, 0.02);
@@ -1550,11 +1761,14 @@ export function buildLanternChapel(buckets) {
   ]);
   addBox(buckets, 'metal', [0.48, 0.06, 0.08], [0, wallBottom + 3.55, frontZ + 0.05], P.iron);
   addBox(buckets, 'metal', [0.06, 0.48, 0.08], [0, wallBottom + 3.55, frontZ + 0.05], P.iron);
-  addBox(buckets, 'timber', [0.55, 0.55, 0.08], [0, wallBottom + 3.55, frontZ - 0.02], P.timberDark, [
-    0,
-    0,
-    Math.PI / 4,
-  ]);
+  addBox(
+    buckets,
+    'timber',
+    [0.55, 0.55, 0.08],
+    [0, wallBottom + 3.55, frontZ - 0.02],
+    P.timberDark,
+    [0, 0, Math.PI / 4],
+  );
   // Flanking pointed lancets beside portal (concept).
   for (const sx of [-1.15, 1.15]) {
     addMullionedWindow(buckets, [sx, wallBottom + 1.55, frontZ - 0.02], 0.72, {
@@ -1619,8 +1833,20 @@ export function buildLanternChapel(buckets) {
   // Push slightly outward so left elevation reads the service cue clearly.
   const archX = -halfW * 1.02;
   const archZ = 0.2;
-  addBox(buckets, 'timber', [0.65, 1.25, 1.55], [archX - 0.2, wallBottom + 1.4, archZ], P.timberDeep);
-  addBox(buckets, 'timber', [0.78, 0.12, 1.7], [archX - 0.15, wallBottom + 2.05, archZ], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [0.65, 1.25, 1.55],
+    [archX - 0.2, wallBottom + 1.4, archZ],
+    P.timberDeep,
+  );
+  addBox(
+    buckets,
+    'timber',
+    [0.78, 0.12, 1.7],
+    [archX - 0.15, wallBottom + 2.05, archZ],
+    P.timberDark,
+  );
   // Mini shingle awning over niche (ridge along Z so it faces outward on left).
   addPitchedRoof(buckets, 'roof', 0.85, 1.7, wallBottom + 2.08, wallBottom + 2.65, P.roof, {
     ridgeAxis: 'z',
@@ -1670,18 +1896,30 @@ export function buildLanternChapel(buckets) {
       [0, 0, Math.PI / 2],
     );
   }
-  // Blank scroll panel (no text) — push outward for left-elevation read.
-  addBox(buckets, 'parchment', [0.08, 0.62, 0.85], [archX - 0.05, wallBottom + 1.5, archZ + 0.05], P.parchment, [
-    0,
-    0.06,
-    0,
-  ]);
-  addBox(buckets, 'parchment', [0.06, 0.4, 0.5], [archX - 0.08, wallBottom + 1.35, archZ - 0.15], P.parchmentDark, [
-    0,
-    -0.1,
-    0,
-  ]);
-  addBox(buckets, 'metal', [0.05, 0.08, 0.08], [archX - 0.02, wallBottom + 1.75, archZ + 0.05], P.brass);
+  // Blank scroll panel (no text): push outward for left-elevation read.
+  addBox(
+    buckets,
+    'parchment',
+    [0.08, 0.62, 0.85],
+    [archX - 0.05, wallBottom + 1.5, archZ + 0.05],
+    P.parchment,
+    [0, 0.06, 0],
+  );
+  addBox(
+    buckets,
+    'parchment',
+    [0.06, 0.4, 0.5],
+    [archX - 0.08, wallBottom + 1.35, archZ - 0.15],
+    P.parchmentDark,
+    [0, -0.1, 0],
+  );
+  addBox(
+    buckets,
+    'metal',
+    [0.05, 0.08, 0.08],
+    [archX - 0.02, wallBottom + 1.75, archZ + 0.05],
+    P.brass,
+  );
   // Niche posts.
   for (const z of [archZ - 0.6, archZ + 0.6]) {
     addBox(buckets, 'timber', [0.12, 1.5, 0.12], [archX - 0.35, wallBottom + 1.0, z], P.timberDark);
@@ -1704,21 +1942,57 @@ export function buildLanternChapel(buckets) {
     addCylinder(buckets, 'metal', 0.1, 0.1, 0.12, 6, [x, wallBottom + 2.55, z], P.iron);
   }
   // Hanging lantern arms (front left concept + side).
-  addBox(buckets, 'timber', [1.15, 0.12, 0.12], [-1.55, wallBottom + 2.85, frontZ + 0.25], P.timberDark, [
-    0,
-    0,
-    -0.12,
-  ]);
+  addBox(
+    buckets,
+    'timber',
+    [1.15, 0.12, 0.12],
+    [-1.55, wallBottom + 2.85, frontZ + 0.25],
+    P.timberDark,
+    [0, 0, -0.12],
+  );
   addBox(buckets, 'metal', [0.12, 0.12, 0.12], [-2.35, wallBottom + 2.7, frontZ + 0.28], P.iron);
-  addCylinder(buckets, 'metal', 0.025, 0.025, 0.55, 5, [-2.35, wallBottom + 2.35, frontZ + 0.28], P.iron);
+  addCylinder(
+    buckets,
+    'metal',
+    0.025,
+    0.025,
+    0.55,
+    5,
+    [-2.35, wallBottom + 2.35, frontZ + 0.28],
+    P.iron,
+  );
   addLantern(buckets, [-2.35, wallBottom + 1.95, frontZ + 0.28], 0.95);
   // Right-side hanging lantern.
-  addBox(buckets, 'timber', [0.12, 0.12, 0.85], [halfW * 0.95, wallBottom + 2.7, -2.0], P.timberDark);
-  addCylinder(buckets, 'metal', 0.025, 0.025, 0.5, 5, [halfW * 0.95, wallBottom + 2.35, -2.55], P.iron);
+  addBox(
+    buckets,
+    'timber',
+    [0.12, 0.12, 0.85],
+    [halfW * 0.95, wallBottom + 2.7, -2.0],
+    P.timberDark,
+  );
+  addCylinder(
+    buckets,
+    'metal',
+    0.025,
+    0.025,
+    0.5,
+    5,
+    [halfW * 0.95, wallBottom + 2.35, -2.55],
+    P.iron,
+  );
   addLantern(buckets, [halfW * 0.95, wallBottom + 1.95, -2.55], 0.9);
   // Rear hanging lantern.
   addBox(buckets, 'timber', [0.9, 0.1, 0.1], [1.1, wallBottom + 2.6, rearZ - 0.15], P.timberDark);
-  addCylinder(buckets, 'metal', 0.025, 0.025, 0.45, 5, [1.7, wallBottom + 2.3, rearZ - 0.2], P.iron);
+  addCylinder(
+    buckets,
+    'metal',
+    0.025,
+    0.025,
+    0.45,
+    5,
+    [1.7, wallBottom + 2.3, rearZ - 0.2],
+    P.iron,
+  );
   addLantern(buckets, [1.7, wallBottom + 1.95, rearZ - 0.2], 0.88);
   // Iron chain accents (concept hanging chains on rear/side).
   for (const [x, z, h] of [
@@ -1738,7 +2012,13 @@ export function buildLanternChapel(buckets) {
   }
   // Mid iron belt studs on front rails.
   for (const x of [-1.6, -0.7, 0.7, 1.6]) {
-    addBox(buckets, 'metal', [0.1, 0.1, 0.07], [x, wallBottom + wallH * 0.5, frontZ + 0.03], P.ironLight);
+    addBox(
+      buckets,
+      'metal',
+      [0.1, 0.1, 0.07],
+      [x, wallBottom + wallH * 0.5, frontZ + 0.03],
+      P.ironLight,
+    );
   }
   // Corner moss pads.
   for (const [x, z] of [
@@ -1805,7 +2085,13 @@ export function buildGildedStrongbox(buckets) {
   }
 
   // R3 shell
-  addBox(buckets, 'timber', [bodyW * 0.88, wallH * 0.96, bodyD * 0.86], [0, wallCy, 0], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 0.88, wallH * 0.96, bodyD * 0.86],
+    [0, wallCy, 0],
+    P.timberDeep,
+  );
   addVerticalPlankFace(buckets, 'front', bodyW * 0.95, wallH, [0, wallCy, frontZ - 0.04], {
     plankCount: 12,
   });
@@ -1826,7 +2112,13 @@ export function buildGildedStrongbox(buckets) {
       }
     }
   }
-  addBox(buckets, 'timber', [bodyW * 1.05, 0.15, bodyD * 1.05], [0, wallTop - 0.02, 0], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [bodyW * 1.05, 0.15, bodyD * 1.05],
+    [0, wallTop - 0.02, 0],
+    P.timberDark,
+  );
 
   // R4-5 roof ridge X (long front eaves under porch) with dormers
   addShingledRoof(buckets, bodyW * 1.2, bodyD * 1.18, wallTop + 0.02, peakY, {
@@ -1847,15 +2139,39 @@ export function buildGildedStrongbox(buckets) {
 
   // R6-8 teller window (left front) + vault door (right front)
   // Teller bar window
-  addBox(buckets, 'timber', [1.55, 1.05, 0.12], [-1.25, wallBottom + 1.55, frontZ + 0.02], P.timberDark);
+  addBox(
+    buckets,
+    'timber',
+    [1.55, 1.05, 0.12],
+    [-1.25, wallBottom + 1.55, frontZ + 0.02],
+    P.timberDark,
+  );
   addBox(buckets, 'warm', [1.25, 0.75, 0.06], [-1.25, wallBottom + 1.55, frontZ + 0.05], P.warm);
   for (const dx of [-0.4, -0.15, 0.15, 0.4]) {
-    addBox(buckets, 'metal', [0.05, 0.7, 0.05], [-1.25 + dx, wallBottom + 1.55, frontZ + 0.08], P.ironLight);
+    addBox(
+      buckets,
+      'metal',
+      [0.05, 0.7, 0.05],
+      [-1.25 + dx, wallBottom + 1.55, frontZ + 0.08],
+      P.ironLight,
+    );
   }
   for (const dy of [-0.25, 0, 0.25]) {
-    addBox(buckets, 'metal', [1.15, 0.05, 0.05], [-1.25, wallBottom + 1.55 + dy, frontZ + 0.08], P.iron);
+    addBox(
+      buckets,
+      'metal',
+      [1.15, 0.05, 0.05],
+      [-1.25, wallBottom + 1.55 + dy, frontZ + 0.08],
+      P.iron,
+    );
   }
-  addBox(buckets, 'timber', [1.45, 0.12, 0.35], [-1.25, wallBottom + 1.0, frontZ + 0.2], P.timberLight);
+  addBox(
+    buckets,
+    'timber',
+    [1.45, 0.12, 0.35],
+    [-1.25, wallBottom + 1.0, frontZ + 0.2],
+    P.timberLight,
+  );
   // Vault door right
   addIronboundDoor(buckets, 1.55, wallBottom + 1.15, frontZ - 0.02, 1.15, 2.1, 'rounded');
   addBox(buckets, 'metal', [0.2, 0.35, 0.08], [1.85, wallBottom + 1.15, frontZ + 0.08], P.brass);
@@ -1863,7 +2179,13 @@ export function buildGildedStrongbox(buckets) {
   addSteps(buckets, 1.55, frontZ + 0.45, 1.5, 3, 1, 0.02);
   // Porch posts
   for (const x of [-2.4, -0.3, 0.9, 2.5]) {
-    addBox(buckets, 'timber', [0.16, 1.55, 0.16], [x, wallBottom + 0.9, frontZ + 0.55], P.timberDark);
+    addBox(
+      buckets,
+      'timber',
+      [0.16, 1.55, 0.16],
+      [x, wallBottom + 0.9, frontZ + 0.55],
+      P.timberDark,
+    );
     addBox(buckets, 'metal', [0.2, 0.1, 0.2], [x, wallBottom + 0.12, frontZ + 0.55], P.iron);
   }
   addBox(buckets, 'timber', [5.2, 0.12, 0.12], [0, wallBottom + 1.7, frontZ + 0.55], P.timber);
@@ -1878,11 +2200,17 @@ export function buildGildedStrongbox(buckets) {
     frameBucket: 'metal',
   });
   // Vault wheel window
-  addCylinder(buckets, 'metal', 0.35, 0.35, 0.1, 10, [-halfW * 0.95, wallBottom + 2.0, -0.1], P.iron, [
-    0,
-    Math.PI / 2,
-    0,
-  ]);
+  addCylinder(
+    buckets,
+    'metal',
+    0.35,
+    0.35,
+    0.1,
+    10,
+    [-halfW * 0.95, wallBottom + 2.0, -0.1],
+    P.iron,
+    [0, Math.PI / 2, 0],
+  );
   addMullionedWindow(buckets, [0.3, wallBottom + 2.55, -frontZ + 0.03], 0.65, {
     face: 'back',
     frameBucket: 'metal',
@@ -1901,15 +2229,30 @@ export function buildGildedStrongbox(buckets) {
 
   // R10-12 sign, chest, lanterns, pipes
   addBox(buckets, 'timber', [0.1, 0.1, 1.0], [2.9, wallBottom + 2.4, frontZ + 0.3], P.timberDark);
-  addBox(buckets, 'metal', [0.55, 0.75, 0.08], [2.9, wallBottom + 2.0, frontZ + 0.85], P.brass, [
-    0,
-    0.15,
-    0,
-  ]);
+  addBox(
+    buckets,
+    'metal',
+    [0.55, 0.75, 0.08],
+    [2.9, wallBottom + 2.0, frontZ + 0.85],
+    P.brass,
+    [0, 0.15, 0],
+  );
   // Ironbound chest on left platform
-  addBox(buckets, 'timber', [0.85, 0.55, 0.55], [-2.85, wallBottom + 0.55, frontZ * 0.3], P.timberDeep);
+  addBox(
+    buckets,
+    'timber',
+    [0.85, 0.55, 0.55],
+    [-2.85, wallBottom + 0.55, frontZ * 0.3],
+    P.timberDeep,
+  );
   for (const y of [0.15, 0.4]) {
-    addBox(buckets, 'metal', [0.9, 0.08, 0.58], [-2.85, wallBottom + y + 0.35, frontZ * 0.3], P.iron);
+    addBox(
+      buckets,
+      'metal',
+      [0.9, 0.08, 0.58],
+      [-2.85, wallBottom + y + 0.35, frontZ * 0.3],
+      P.iron,
+    );
   }
   addBox(buckets, 'metal', [0.15, 0.12, 0.12], [-2.5, wallBottom + 0.65, frontZ * 0.55], P.brass);
   addBarrel(buckets, [-2.5, baseH + 0.35, frontZ * 0.7], 0.65);
@@ -1956,7 +2299,13 @@ export function buildGildedStrongbox(buckets) {
     );
   }
   for (const x of [-2.2, -1.0, 0.2, 1.4, 2.4]) {
-    addBox(buckets, 'metal', [0.1, 0.1, 0.07], [x, wallBottom + wallH * 0.45, frontZ + 0.02], P.ironLight);
+    addBox(
+      buckets,
+      'metal',
+      [0.1, 0.1, 0.07],
+      [x, wallBottom + wallH * 0.45, frontZ + 0.02],
+      P.ironLight,
+    );
   }
   for (const [x, h] of [
     [-1.8, 1.4],
@@ -2045,11 +2394,14 @@ export function buildMirelightCistern(buckets) {
   // Extra moss pads on ring stones
   for (let i = 0; i < 6; i += 1) {
     const a = (i / 6) * Math.PI * 2;
-    addBox(buckets, 'stone', [0.3, 0.08, 0.25], [Math.cos(a) * 1.5, 0.52, Math.sin(a) * 1.5], P.moss, [
-      0,
-      -a,
-      0,
-    ]);
+    addBox(
+      buckets,
+      'stone',
+      [0.3, 0.08, 0.25],
+      [Math.cos(a) * 1.5, 0.52, Math.sin(a) * 1.5],
+      P.moss,
+      [0, -a, 0],
+    );
   }
 
   // R9-12 brazier + kettle + winch
@@ -2076,4 +2428,3 @@ export function buildMirelightCistern(buckets) {
     addBox(buckets, 'fenlight', [0.14, 0.22, 0.14], [x, 1.55, z], P.fenlight);
   }
 }
-
