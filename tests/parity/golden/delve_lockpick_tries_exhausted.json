@@ -10,7 +10,7 @@
     "chest opens at LOW tier (attemptAvailable=false, looted=true), no deed, no coffer + surface exit opens"
   ],
   "draws": 5,
-  "drawDigest": "d337efdc",
+  "drawDigest": "50aeceb5",
   "frames": [
     {
       "tick": 0,
@@ -143,78 +143,78 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 974,
-      "state": "21e0cf0e",
-      "events": "21b74e5a",
+      "nextId": 978,
+      "state": "309815b2",
+      "events": "682fd366",
       "rng": {
         "draws": 3,
-        "digest": "56bb6f30"
+        "digest": "8261aa7c"
       }
     },
     {
       "tick": 20,
       "time": 1,
-      "nextId": 974,
-      "state": "f9b4d4f0",
+      "nextId": 978,
+      "state": "cc6555cc",
       "events": "cc147418",
       "rng": {
         "draws": 3,
-        "digest": "56bb6f30"
+        "digest": "8261aa7c"
       }
     },
     {
       "tick": 30,
       "time": 1.5,
-      "nextId": 974,
-      "state": "cbc6dc66",
+      "nextId": 978,
+      "state": "7ff1fc8a",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "56bb6f30"
+        "digest": "8261aa7c"
       }
     },
     {
       "tick": 40,
       "time": 2,
-      "nextId": 974,
-      "state": "c038dfd4",
+      "nextId": 978,
+      "state": "e4c393b8",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "56bb6f30"
+        "digest": "8261aa7c"
       }
     },
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 974,
-      "state": "4014486e",
+      "nextId": 978,
+      "state": "61506512",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "56bb6f30"
+        "digest": "8261aa7c"
       }
     },
     {
       "tick": 60,
       "time": 3,
-      "nextId": 974,
-      "state": "e8ef9f80",
+      "nextId": 978,
+      "state": "adddb91c",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "56bb6f30"
+        "digest": "8261aa7c"
       }
     },
     {
       "tick": 69,
       "time": 3.45,
-      "nextId": 975,
-      "state": "13e2e198",
-      "events": "9ef041c2",
+      "nextId": 979,
+      "state": "c1c503ce",
+      "events": "af3f35f7",
       "rng": {
         "draws": 5,
-        "digest": "d337efdc"
+        "digest": "50aeceb5"
       },
       "label": "lockpick-tries-exhausted",
       "players": [
@@ -234,7 +234,7 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 12,
+          "copper": 10,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
@@ -385,7 +385,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 973,
+          "id": 977,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -418,23 +418,23 @@
     {
       "tick": 70,
       "time": 3.5,
-      "nextId": 975,
-      "state": "63efca7e",
+      "nextId": 979,
+      "state": "f9d576e8",
       "events": "741638a5",
       "rng": {
         "draws": 5,
-        "digest": "d337efdc"
+        "digest": "50aeceb5"
       }
     },
     {
       "tick": 71,
       "time": 3.55,
-      "nextId": 975,
-      "state": "f349e6f0",
+      "nextId": 979,
+      "state": "0f8bb9c6",
       "events": "741638a5",
       "rng": {
         "draws": 5,
-        "digest": "d337efdc"
+        "digest": "50aeceb5"
       },
       "label": "final",
       "players": [
@@ -454,7 +454,7 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 12,
+          "copper": 10,
           "counters": {
             "damageDealt": 636,
             "kills": 1,
@@ -605,7 +605,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 973,
+          "id": 977,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",

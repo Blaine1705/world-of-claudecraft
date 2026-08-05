@@ -12,7 +12,7 @@
     "gatherResult itemId carries the resolved grade"
   ],
   "draws": 6,
-  "drawDigest": "2c41400b",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
@@ -151,11 +151,11 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "43909670",
-      "events": "0e7303b4",
+      "state": "16387263",
+      "events": "2953a226",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "fine-grade-at-full-tier-vein",
       "players": [
@@ -238,7 +238,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -327,11 +327,11 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 964,
-      "state": "88a8664b",
+      "state": "d7f4a900",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
-        "digest": "b247a679"
+        "digest": "49d036fe"
       },
       "label": "plain-grade-at-lower-tier-vein",
       "players": [
@@ -415,7 +415,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             },
             {
@@ -512,11 +512,11 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "637dfc99",
-      "events": "459b8e0e",
+      "state": "f56c4dba",
+      "events": "6c52f970",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "wrong-profession-tool-does-not-upgrade",
       "players": [
@@ -602,7 +602,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             },
             {
@@ -613,7 +613,10 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 1,
+              "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "goldleaf_herb"
             }
           ],
@@ -704,11 +707,11 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "2d585fa2",
+      "state": "b8cb605f",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [
@@ -794,7 +797,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             },
             {
@@ -805,7 +808,10 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 1,
+              "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "goldleaf_herb"
             }
           ],

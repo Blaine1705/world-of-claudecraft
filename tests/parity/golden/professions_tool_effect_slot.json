@@ -17,7 +17,7 @@
     "R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)"
   ],
   "draws": 6,
-  "drawDigest": "2c41400b",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
@@ -309,11 +309,11 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "2a57854e",
-      "events": "fe777845",
+      "state": "8d9fee81",
+      "events": "a10631da",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "harvest-with-effect-applied",
       "players": [
@@ -392,7 +392,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -490,11 +490,11 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 964,
-      "state": "bc40ed6b",
+      "state": "b8e1a580",
       "events": "414479fe",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "same-vein-denied-by-own-timer",
       "players": [
@@ -573,7 +573,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -671,11 +671,11 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 964,
-      "state": "46a8eca1",
+      "state": "ab8da7e2",
       "events": "1796b529",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "prompt-mode-reslotted",
       "players": [
@@ -754,7 +754,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -852,11 +852,11 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 964,
-      "state": "f34253e4",
+      "state": "4d9de127",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
-        "digest": "b247a679"
+        "digest": "49d036fe"
       },
       "label": "prompt-unconfirmed-skips-whole",
       "players": [
@@ -936,7 +936,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1042,11 +1042,11 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "06a56065",
-      "events": "bc352f64",
+      "state": "a1df8cec",
+      "events": "7f087928",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "prompt-confirmed-fires-and-spends",
       "players": [
@@ -1126,7 +1126,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 4,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1135,6 +1135,13 @@
                 "signer": "Adventurer"
               },
               "itemId": "iron_ore"
+            },
+            {
+              "count": 4,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
             }
           ],
           "lifetimeXp": 108,
@@ -1233,11 +1240,11 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "8c979e02",
+      "state": "22e1ffab",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [
@@ -1317,7 +1324,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 4,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1326,6 +1333,13 @@
                 "signer": "Adventurer"
               },
               "itemId": "iron_ore"
+            },
+            {
+              "count": 4,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
             }
           ],
           "lifetimeXp": 108,

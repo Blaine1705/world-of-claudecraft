@@ -16,8 +16,8 @@
     "petTaunt -> applyTaunt manual arm + PET_GROWL_INTERVAL cooldown",
     "stowPetForDelve/restorePetFromDelveStash (serializePet/restorePet round-trip)"
   ],
-  "draws": 299,
-  "drawDigest": "5a37b492",
+  "draws": 286,
+  "drawDigest": "a616493f",
   "frames": [
     {
       "tick": 0,
@@ -2215,33 +2215,33 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "5bca83ec",
-      "events": "6d8e730a",
+      "state": "ce60aca8",
+      "events": "c8d5ae52",
       "rng": {
-        "draws": 157,
-        "digest": "a9a077c8"
+        "draws": 151,
+        "digest": "1e93d795"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 972,
-      "state": "d3215a84",
+      "state": "bb831346",
       "events": "76fbfd1a",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 972,
-      "state": "d3215a84",
+      "state": "bb831346",
       "events": "741638a5",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "demon-heal-tick",
       "players": [
@@ -2261,9 +2261,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
@@ -2400,14 +2398,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -2452,7 +2450,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2611,11 +2609,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 974,
-      "state": "70253930",
+      "state": "148061ba",
       "events": "869c6ace",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "demon-resummoned",
       "players": [
@@ -2635,9 +2633,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
@@ -2774,14 +2770,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -2826,7 +2822,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2986,11 +2982,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 976,
-      "state": "43bb7d0f",
+      "state": "6d16e2c5",
       "events": "67fda175",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "demon-despawned",
       "players": [
@@ -3010,9 +3006,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
@@ -3149,14 +3143,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -3201,7 +3195,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3369,11 +3363,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 976,
-      "state": "43bb7d0f",
+      "state": "6d16e2c5",
       "events": "741638a5",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "final",
       "players": [
@@ -3393,9 +3387,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
@@ -3532,14 +3524,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -3584,7 +3576,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

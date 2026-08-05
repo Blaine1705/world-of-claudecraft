@@ -1590,17 +1590,18 @@ function masterLoot(): Scenario {
       'resolveLootRoll tie-break rng.int over tied need rolls',
     ],
     // Seed re-hunted 1091 -> 1326 by the release/v0.32.0 base merge, then
-    // 1326 -> 1383 by the zones 1 to 3 quest-dedupe content, then 1383 -> 247 by
-    // the Galecrest unspawnable-quest camp fix (shoal_scuttler/gale_wisp). This
-    // branch never touches master-loot logic (src/sim/loot/loot_roll.ts has no
-    // commits here); its extra content just moves the shared rng before the
-    // rolls, and at the old seed the need rolls stopped TYING. The tie is the
-    // whole point of the scenario's last coverage line (resolveLootRoll's
-    // tie-break rng.int), so the seed is re-hunted to keep two rollers level
-    // rather than re-recorded to whatever the new draw happens to be.
+    // 1326 -> 1383 by the zones 1 to 3 quest-dedupe content, 1383 -> 247 by
+    // the Galecrest unspawnable-quest camp fix, and 247 -> 38 when those late
+    // quest camps moved onto their private scatter stream. This branch never
+    // touches master-loot logic (src/sim/loot/loot_roll.ts has no commits
+    // here); its extra content just moves the shared rng before the rolls, and
+    // at the old seed the need rolls stopped TYING. The tie is the whole point
+    // of the scenario's last coverage line (resolveLootRoll's tie-break
+    // rng.int), so the seed is re-hunted to keep two rollers level rather than
+    // re-recorded to whatever the new draw happens to be.
     build: () =>
       new Sim({
-        seed: 247,
+        seed: 38,
         playerClass: 'warrior',
         noPlayer: true,
       }),
@@ -4548,11 +4549,11 @@ function cardDuel(): Scenario {
 // literal is pinned here. Re-hunted after the new-realm quest pass shifted the
 // construction-time draw stream (quest camps + escort NPC spawns across the new
 // realms), again after the Eastbrook camp respacing thinned the zone-1 camp
-// counts, again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
-// clutch camps, the new elites) moved the shared stream once more, and again
-// (5 -> 2) after the Galecrest unspawnable-quest camp fix (shoal_scuttler/
-// gale_wisp) moved it again.
-function professionsCraft(seed = 2): Scenario {
+    // counts, again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
+    // clutch camps, the new elites) moved the shared stream once more, again
+    // (5 -> 2) after the Galecrest unspawnable-quest camp fix, and back to 5
+    // when those late quest camps moved onto their private scatter stream.
+function professionsCraft(seed = 5): Scenario {
   return {
     name: 'professions_craft',
     coverage: [
