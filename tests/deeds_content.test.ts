@@ -486,7 +486,7 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // block, the gatherer and first-cast pair for frostveil, amberfall,
   // nightbloom, wraithwood, palmreach, and evergarden (drakelands already
   // covered by the brood rework above). No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = 'PLACEHOLDER';
+  const FROZEN_CATALOG_SHA256 = '13e7c4339c93ebe4ba43fd3e6bb3ba71760c3a8ade24ccf8bce4dcddfd4b30b8';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
