@@ -500,7 +500,18 @@ export function farGroundColor(
   if (biome === 'ember') {
     if (h > 20) lerp3(out, TONE.emberBasalt, clamp01((h - 20) / 8) * 0.8);
   } else {
-    if (h > 22) lerp3(out, TONE.rock, clamp01((h - 22) / 10) * 0.6);
+    if (h > 22) {
+      const rockT = clamp01((h - 22) / 10) * 0.6;
+      lerp3(out, TONE.rock, rockT);
+      // the same 30yd stone-tone field the near vertex tint carries
+      // (terrain_chunk_build.ts): whole high faces shift a shade lighter or
+      // darker, so distant domes stop reading as one flat pour
+      const tone = fbm2(x * 0.033, z * 0.033, seed + 87, 2);
+      const f = 1 + (tone - 0.5) * 0.3 * rockT;
+      out[0] *= f;
+      out[1] *= f;
+      out[2] *= f;
+    }
     const snowPatch = fbm2(x * 0.05, z * 0.05, seed + 61, 2);
     const snow = clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
     if (snow > 0) lerp3(out, TONE.snowCap, snow);

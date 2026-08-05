@@ -248,12 +248,16 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // green sheet (noise-modulated splat rule; the groomed garden and the
   // snowbound frost keep their even cover).
   if (biome !== 'garden' && biome !== 'frost') {
-    const dry = fbm2(x * 0.026, z * 0.026, seed + 83, 2);
-    const dryW = clamp01((dry - 0.6) * 3.2);
+    // two uncorrelated scales: broad worn regions (~80yd) carrying smaller
+    // bare patches (~38yd), so the wear reads fractal instead of one dot size
+    const dry =
+      fbm2(x * 0.026, z * 0.026, seed + 83, 2) * 0.62 +
+      fbm2(x * 0.012, z * 0.012, seed + 89, 2) * 0.38;
+    const dryW = clamp01((dry - 0.58) * 3.2);
     if (dryW > 0) {
-      cTmp.lerp(dirtC, dryW * 0.4);
+      cTmp.lerp(dirtC, dryW * 0.5);
       cTmp.lerp(grassYellowC, dryW * 0.35);
-      lerpSplat(w, 1, dryW * 0.4);
+      lerpSplat(w, 1, dryW * 0.45);
     }
   }
   if (biome === 'ember') {
@@ -358,10 +362,12 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   // streak field instead of tracing one smooth slope contour, and the blend
   // is a touch sharper so the margin reads as a ragged edge, not a fade.
   const rockEdge = rockStart + (rockStreak - 0.5) * 0.5;
+  let rockTintW = 0;
   if (slope > rockEdge) {
     const t = Math.min(1, (slope - rockEdge) * 2.6);
+    rockTintW = t;
     cTmp.lerp(rockC, t);
-    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.35);
+    cTmp.lerp(dirtDarkC, t * (rockStreak - 0.5) * 0.5);
     lerpSplat(w, 2, t);
     // (the Great Maze's hedge walls are modeled props over flat lawn now:
     // no steep terrain faces remain inside the maze to restyle)
@@ -373,12 +379,12 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
       cTmp.lerp(duskCliffC, t * nearSea * (0.45 + band * 0.35));
       cTmp.lerp(duskStrataC, t * nearSea * (1 - band) * 0.3);
     } else {
-      // every other realm's stone carries subtle warm strata: height-keyed
-      // bands wobbled by the streak noise, so cliff faces and crags read as
+      // every other realm's stone carries warm strata: height-keyed bands
+      // wobbled by the streak noise, so cliff faces and crags read as
       // layered geology instead of one smooth pour
       const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
-      cTmp.lerp(dirtDarkC, t * band * 0.2);
-      cTmp.lerp(duskStrataC, t * (1 - band) * 0.12);
+      cTmp.lerp(dirtDarkC, t * band * 0.3);
+      cTmp.lerp(duskStrataC, t * (1 - band) * 0.18);
     }
   }
   // high ground (ridges, peaks) goes rocky then snowy (the Drakelands' high
@@ -416,15 +422,24 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
   const highH = 22 + (rockStreak - 0.5) * 7;
   if (h > highH) {
     const rockT = clamp01((h - highH) / 10) * (0.6 + rockStreak * 0.25);
+    rockTintW = Math.max(rockTintW, rockT);
     cTmp.lerp(biome === 'ember' ? emberBasaltC : rockC, rockT);
     snow = biome === 'ember' ? 0 : clamp01((h - 34 + (snowPatch - 0.5) * 14) / 26) * 0.85;
     if (biome !== 'ember') {
       const band = (Math.sin(h * 0.52 + (rockStreak - 0.5) * 5.2) + 1) * 0.5;
-      cTmp.lerp(dirtDarkC, rockT * (1 - snow) * band * 0.18);
-      cTmp.lerp(duskStrataC, rockT * (1 - snow) * (1 - band) * 0.1);
+      cTmp.lerp(dirtDarkC, rockT * (1 - snow) * band * 0.26);
+      cTmp.lerp(duskStrataC, rockT * (1 - snow) * (1 - band) * 0.14);
     }
     cTmp.lerp(snowCapC, snow);
     lerpSplat(w, 2, clamp01((h - highH) / 10) * 0.8);
+  }
+  // A 30yd stone-tone field over every rock-tinted vertex: whole faces
+  // shift a shade lighter or darker at a scale that survives any view
+  // distance, so distant mountainsides read as varied stone masses instead
+  // of one flat pour (fine texture mips away; this scale does not).
+  if (rockTintW > 0.05) {
+    const rockTone = fbm2(x * 0.033, z * 0.033, seed + 87, 2);
+    cTmp.multiplyScalar(1 + (rockTone - 0.5) * 0.3 * Math.min(1, rockTintW) * (1 - snow));
   }
   if (impact.scorch > 0) {
     cTmp.lerp(impactScorchC, 0.88 * impact.scorch);

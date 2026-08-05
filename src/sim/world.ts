@@ -2975,24 +2975,24 @@ function shapeAt(x: number, z: number): { hill: number; base: number; crag: numb
   return shapeScratch;
 }
 
-function baseHeight(
-  x: number,
-  z: number,
-  seed: number,
-  region: TerrainRegionCell = terrainRegionAt(x, z),
-): number {
-  const shape = shapeAt(x, z);
-  const hillAmp = shape.hill;
-  const cragAmp = shape.crag;
-  // The calm field: every character layer below (the warp's meander, the
-  // upland detail boost, the crag crests) eases off beside roads and around
-  // settlement pads, so the ways and camps built for the old rolling terrain
-  // stay ridable and their flatten rings never inherit a cliff-sized
-  // mismatch from the rougher field. roadDistance is bbox-gated and returns
-  // Infinity away from every road; the camp/hub rings ride the same coarse
-  // region index the flatten loops use (whose one-guard-cell margin, 128yd,
-  // comfortably covers the slightly wider calm rings), so open wilderness
-  // pays four compares and keeps calm exactly 1.
+// The calm field: every character layer of the natural relief (the warp's
+// meander, the upland detail boost, the crag crests, the altitude
+// roughening) eases off beside roads and around settlement pads, gather
+// nodes, NPC anchors, the maze lawn, and the Drakemaw's graded benches, so
+// ground built and balanced on the old rolling terrain keeps its exact
+// classic surface. roadDistance is bbox-gated and returns Infinity away
+// from every road; the camp/hub rings ride the same coarse region index the
+// flatten loops use (whose one-guard-cell margin, 128yd, comfortably covers
+// the slightly wider calm rings), so open wilderness pays a few compares
+// and keeps calm exactly 1. Two callers evaluate it for the same sample
+// (baseHeight's character layers and terrainHeightUnpadded's altitude
+// roughening), so a single-entry memo dedupes the pair; keyed on region
+// identity too, so a content-generation rebuild can never reuse a stale
+// value.
+const calmMemo = { x: Number.NaN, z: Number.NaN, region: null as TerrainRegionCell | null, v: 1 };
+
+function terrainCalmAt(x: number, z: number, region: TerrainRegionCell): number {
+  if (calmMemo.x === x && calmMemo.z === z && calmMemo.region === region) return calmMemo.v;
   let calm = smoothstep(4, 18, roadDistance(x, z));
   if (calm > 0) {
     for (const campIndex of region.campIndices) {
@@ -3077,6 +3077,23 @@ function baseHeight(
       }
     }
   }
+  calmMemo.x = x;
+  calmMemo.z = z;
+  calmMemo.region = region;
+  calmMemo.v = calm;
+  return calm;
+}
+
+function baseHeight(
+  x: number,
+  z: number,
+  seed: number,
+  region: TerrainRegionCell = terrainRegionAt(x, z),
+): number {
+  const shape = shapeAt(x, z);
+  const hillAmp = shape.hill;
+  const cragAmp = shape.crag;
+  const calm = terrainCalmAt(x, z, region);
   // The natural-relief stack (terrain_relief.ts): the hill layer reads
   // through a shared low-frequency domain warp so contours meander, and its
   // fbm damps octaves on accumulated gradient so valley floors come out
@@ -4091,6 +4108,24 @@ function terrainHeightUnpadded(x: number, z: number, seed: number): number {
     // ...with a walkable breach at the wall's north end, so the relic is a
     // landmark to route around, not a shut border
     (1 - 0.85 * (1 - smoothstep(10, 26, Math.abs(z - 348))));
+  // Universal altitude roughening, over the FINISHED mountain mass: base
+  // hills, border walls, authored massif lobes, rim ranges, and the Aldric
+  // relic alike. Any ground standing above the mid heights breaks into
+  // ridged rock, so no smooth cone survives regardless of which system
+  // built it (the smooth-dome report: authored lobes and non-peaks border
+  // berms carried no crag layer of their own). Calm-gated like every
+  // character layer, so pass roads, camps, and graded benches keep their
+  // exact classic ground, and recentred near the ridged field's measured
+  // mean (0.40) so average summit heights hold. The mesa/plateau flattens
+  // below run AFTER this and level their crowns over it.
+  const highT = smoothstep(14, 34, h);
+  if (highT > 0.02) {
+    const calmHere = terrainCalmAt(x, z, region);
+    if (calmHere > 0.02) {
+      const rw = warpedCoords(x, z, seed, calmHere);
+      h += (ridged2(rw.x * 0.02, rw.z * 0.02, seed + 57, 3) - 0.4) * 6.5 * highT * calmHere;
+    }
+  }
   // the Tablecrag's crown: a level table cut into the eastern border range
   // (flattened AFTER the rims so the top is a true plateau, not rim noise)
   const dMesa = Math.hypot(x + 168, z - 1195);

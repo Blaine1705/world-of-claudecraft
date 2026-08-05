@@ -535,8 +535,8 @@ const float WOC_GRASS_MID_OCTAVE = 0.22;
 // Both endpoints average ~1.0 so the drift is value-neutral: it can never
 // read as light/dark patching, only as hue you feel across a field.
 const float WOC_GRASS_HUE_DRIFT_FREQ = 0.024;
-const vec3 WOC_GRASS_HUE_WARM = vec3(1.035, 1.012, 0.955);
-const vec3 WOC_GRASS_HUE_COOL = vec3(0.968, 0.995, 1.042);
+const vec3 WOC_GRASS_HUE_WARM = vec3(1.05, 1.015, 0.94);
+const vec3 WOC_GRASS_HUE_COOL = vec3(0.952, 0.99, 1.058);
 // WOC_COMB_*: combed-turf anisotropy. The finest grass detail (the fine
 // albedo octave, the blade normal, the 3x fine-soft grain) samples through a
 // locally-rotating anisotropic transform: features stretch 1/COMPRESS
@@ -892,13 +892,15 @@ function buildSplatMaterial(
           grassAlb = mix(grassAlb,
             texture2D(uGrass, grassUvMid + vec2(0.41, 0.87) + grassJitter * 0.8).rgb,
             WOC_GRASS_MID_OCTAVE * wocDetailFade);
+        }
         // ~42yd hue rotation: meadows drift a few percent between warm
         // yellow-green and cool blue-green. Value-neutral endpoints, so it
-        // adds randomness you feel across a field without a patch to point at.
-          float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
-          grassAlb *= mix(vec3(1.0),
-            mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT), wocDetailFade);
-        }
+        // adds randomness you feel across a field without a patch to point
+        // at. Deliberately OUTSIDE the detail-distance fade: this is a
+        // macro-scale term whose whole job is to keep the FAR field from
+        // washing into one uniform green sheet.
+        float grassHueT = texture2D(uMacro, vWPos.xz * WOC_GRASS_HUE_DRIFT_FREQ + 0.53).r;
+        grassAlb *= mix(WOC_GRASS_HUE_WARM, WOC_GRASS_HUE_COOL, grassHueT);
         }`
             : `// No-relief tiers: the plain two-octave anti-tiling mix (the
         // 90-degree-rotated coarse octave still kills the shared repeat).

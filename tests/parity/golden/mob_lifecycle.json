@@ -1774,7 +1774,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 954,
-      "state": "3e56f026",
+      "state": "ab287124",
       "events": "3faed325",
       "rng": {
         "draws": 20,
@@ -2264,7 +2264,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 37.196548,
+          "fallStartY": 34.742103,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 953,
@@ -2272,7 +2272,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": 100100,
-            "y": 37.196548,
+            "y": 34.742103,
             "z": 300
           },
           "level": 5,
@@ -2290,14 +2290,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 100100,
-            "y": 37.196548,
+            "y": 34.742103,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 100100,
-            "y": 37.196548,
+            "y": 34.742103,
             "z": 300
           },
           "stats": {
@@ -2317,7 +2317,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 954,
-      "state": "3e56f026",
+      "state": "ab287124",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2807,7 +2807,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 37.196548,
+          "fallStartY": 34.742103,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 953,
@@ -2815,7 +2815,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": 100100,
-            "y": 37.196548,
+            "y": 34.742103,
             "z": 300
           },
           "level": 5,
@@ -2833,14 +2833,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 100100,
-            "y": 37.196548,
+            "y": 34.742103,
             "z": 300
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 100100,
-            "y": 37.196548,
+            "y": 34.742103,
             "z": 300
           },
           "stats": {
