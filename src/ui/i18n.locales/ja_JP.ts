@@ -9250,6 +9250,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.soul_rend': 'ソウルレンド（対象は散開して回復を受ける）',
   'hudChrome.finder.mech.deathless_rage': '不死の憤怒（ウォードストーンで妨害）',
   'hudChrome.finder.mech.wardstones': 'ウォードストーンの詠唱（フェーズ移行）',
+  'hudChrome.finder.mech.dread_curse': 'ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）',
   'hudChrome.steam.link': 'Steamと連携',
   'hudChrome.steam.unlink': 'Steam連携を解除',
   'hudChrome.steam.linked': 'Steamアカウント {id} と連携済み',

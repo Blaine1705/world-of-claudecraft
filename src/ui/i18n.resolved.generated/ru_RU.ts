@@ -3069,7 +3069,7 @@ export const ru_RU: EnTranslations = {
         "soul_rend": "Разрыв души (отмеченным разойтись и получать лечение)",
         "deathless_rage": "Бессмертная ярость (прерывается у охранных камней)",
         "wardstones": "Охранные камни (смена фазы)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Проклятие ужаса (только на героическом, накапливающийся дебафф смены танка)"
       }
     },
     "deeds": {

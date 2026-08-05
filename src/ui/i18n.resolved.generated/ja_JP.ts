@@ -3069,7 +3069,7 @@ export const ja_JP: EnTranslations = {
         "soul_rend": "ソウルレンド（対象は散開して回復を受ける）",
         "deathless_rage": "不死の憤怒（ウォードストーンで妨害）",
         "wardstones": "ウォードストーンの詠唱（フェーズ移行）",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）"
       }
     },
     "deeds": {

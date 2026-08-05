@@ -3069,7 +3069,7 @@ export const zh_TW: EnTranslations = {
         "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
         "deathless_rage": "不死之怒（需在護符石處打斷）",
         "wardstones": "護符石引導（階段轉換）",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "恐懼詛咒（僅英雄難度，累加坦克輪換減益）"
       }
     },
     "deeds": {
