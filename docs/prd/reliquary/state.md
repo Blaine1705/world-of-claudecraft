@@ -26,13 +26,14 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 7 implementation complete (Professions shelf).
+- **Current phase:** Phase 7 QA complete (Professions shelf verified).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 7 QA. Do **not** skip the release pull.
-  Do **not** start Phase 8 until Phase 7 QA is green.
+  `origin/release/v0.35.0`, then Phase 8 (Horizons shelf). Do **not** skip
+  the release pull. Do **not** open a PR until Phase 9.
 - **Blocker:** none.
-- **Release tip after Phase 7 pull:** `origin/release/v0.35.0` @
-  `401bfdaccc` (bank instance marks; feature merge `17e0e87c0f`).
+- **Release tip after Phase 7 QA pull:** `origin/release/v0.35.0` @
+  `84b704c1c7` (feature merge `40cae153de`; includes Thornhollow Fields,
+  commission orders, profession rare-tier deeds, and related UI).
 
 ## Locked design decisions
 
@@ -73,7 +74,7 @@ session load:
 | Wire event | `reliquaryUnlock` in `src/sim/types.ts` SimEvent union |
 | Heavy self key | `reliq` in `server/game.ts` (HEAVY_SELF + `reliquaryUnlock` in HEAVY_SELF_EVENTS) |
 | ClientWorld mirror | `src/net/online.ts` (`reliquaryFirstFind` / Marks / Recent + completion helpers) |
-| Parity pin | `tests/world_api_parity.test.ts` (296 members, 32 facets) |
+| Parity pin | `tests/world_api_parity.test.ts` (306 members, 33 facets after release union) |
 | Wire thrift tests | `tests/reliquary_wire.test.ts` |
 | Grant hub | `src/sim/sim.ts` `addItem` / `addItemInstance` |
 | DeedStats | `src/sim/types.ts` `DeedStats` |

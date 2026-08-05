@@ -82,6 +82,21 @@ describe('painter hygiene', () => {
     expect(painter).toContain('attachTooltip');
     // Live firstFind meta must feed the pure model (owned-cell clear# tooltips).
     expect(code).toContain('firstFind: world.reliquaryFirstFind');
+    // Phase 7: profession mark ownership must feed the pure model (owned vs
+    // missing cells). Dropping this leaves every mark painted missing.
+    expect(code).toContain('marks: world.reliquaryMarks');
+    expect(code).toContain('marksSize: world.reliquaryMarks.size');
+  });
+
+  it('paints profession mark cells with quality silhouettes and markFind labels', () => {
+    // Masterwork marks read epic; rare field notes read rare. Labels resolve
+    // through reliquaryMarkFindKey so chrome stays on t() keys.
+    expect(painter).toContain("cell.id.startsWith('masterwork:')");
+    expect(painter).toContain("return 'epic'");
+    expect(painter).toContain("cell.id.startsWith('gather_event:')");
+    expect(painter).toContain("return 'rare'");
+    expect(painter).toContain('reliquaryMarkFindKey');
+    expect(painter).toMatch(/cell\.kind === 'mark'[\s\S]*?reliquaryMarkFindKey/);
   });
 
   it('preserves scroll and restores focus across rebuilds', () => {

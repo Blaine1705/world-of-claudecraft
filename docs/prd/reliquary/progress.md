@@ -21,7 +21,7 @@
 | 6 Curator ranks + cosmetics | **done** | pure ranks, seals, rank-up celebration, zero-Renown deed bridges |
 | 6 QA | **done** | exit criteria verified; same-event Illumination + pin holes closed; release @ 0d2d5d1833 |
 | 7 Professions shelf | **done** | authored pages, lifetime marks, thin craft/gather call sites, UI |
-| 7 QA | pending | same worktree + pull |
+| 7 QA | **done** | exit criteria verified; pin holes closed; release @ 84b704c1c7 |
 | 8 Horizons shelf | pending | same worktree + pull |
 | 8 QA | pending | same worktree + pull |
 | 9 Social, wiki, polish, gate, PR | pending | same worktree + pull |
@@ -313,6 +313,43 @@
   Manual craft/gather smoke not run (static + unit pins only).
   Residual risks: no behavioral masterwork integration test beyond source pin
   (gather e2e pins marks); page-name content i18n deferred; Horizons still stub.
+
+- Phase 7 QA: merged `origin/release/v0.35.0` (advanced past bank instance
+  marks through Thornhollow Fields, commission orders, profession rare-tier
+  deeds, and related UI) to tip `84b704c1c7` (feature merge commit
+  `40cae153de`). Green after pin union + coverage close:
+  - `npx vitest run tests/reliquary_content.test.ts tests/reliquary_state.test.ts tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/architecture.test.ts tests/reliquary_wire.test.ts tests/gather_rare_events.test.ts` (**191 passed**)
+  - Plus merge-surface suite: world_api_parity, snapshots delta keys, deeds
+    content/view/i18n, hud_update_drive, professions_deeds_playthrough
+  - `npm run i18n:gen`
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  Checklist (all held):
+  - 3 authored profession pages; every markId/itemId real; 25 total pages
+  - Lifetime marks catalog-only; non-catalog ignored; sparse serialize
+  - Field notes reuse gather_event:*; masterwork live-only (no invent)
+  - Thin craft/gather/corpse call sites; specimens via itemsDiscovered
+  - No skill power / drop rate / pity from marks
+  - No per-drop saveCharacter on pure mark/item fill
+  - UI: Professions navigable; grids owned vs missing; mark toast via t()
+  - Overview / shelf totals via catalogRelicCompletion (items + marks)
+  - Module-first; English markFind + M16 non-Latin; no em dash / emoji
+  - No Phase 8 Horizons authoring; no Phase 9 wiki/PR gate
+  Defects fixed (test-only, Phase 7 surface): window suite pins
+  `marks: world.reliquaryMarks` + mark quality/markFind paint; craft/gather
+  call-site regex pins on the live success arms; catalogRelicCompletion
+  total = items + RELIQUARY_MARK_IDS.size; perfect_specimen playthrough
+  asserts `meta.reliquary.marks`. Merge-only pin unions for deeds catalog
+  (249 / 2970 renown, 34 titles), IWorld 306/79/227 + 33 facets, ALL_DELTA_KEYS
+  67, HUD surfaces {43, 75, 16}.
+  Reviews: architecture **GREEN** (0 BLOCKING/SHOULD-FIX); frontend **GREEN**;
+  database-performance **PASS**; test-coverage SHOULD-FIX high-value pins
+  closed (residuals: forced masterwork craft e2e, dedicated pure-mark
+  saveCharacter spy arm, both non-blocking); qa-checklist **GREEN**.
+  Manual craft/gather smoke not run (static + unit pins only).
+  Residual risks: page-name content i18n deferred; Latin markFind overlays
+  pending (PR-tier OK); forced-masterwork craft integration still source-
+  pinned rather than proc-forced e2e.
 
 ## Surprises / decisions during implementation
 

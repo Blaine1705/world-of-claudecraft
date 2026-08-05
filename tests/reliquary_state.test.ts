@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import {
   isCataloguedRelicItem,
+  RELIQUARY_MARK_IDS,
   RELIQUARY_PAGES,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
@@ -305,8 +306,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
       itemsDiscovered: new Set(),
       marks: new Set([FIELD_NOTE]),
     });
-    expect(withMarks.total).toBeGreaterThan(itemsOnly.total);
+    // Load-bearing: every authored mark slot is a unique catalogued relic.
+    // total must equal item slots + mark slots (not merely greaterThan).
+    expect(withMarks.total).toBe(itemsOnly.total + RELIQUARY_MARK_IDS.size);
     expect(withMarks.owned).toBe(1);
+    expect(withMarks.owned).toBeLessThan(withMarks.total);
   });
 
   it('join retroFallbackGrants wires silent mark sync before curator rank', () => {
@@ -325,6 +329,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
       path.join(__dirname, '../src/sim/professions/crafting.ts'),
       'utf8',
     );
+    // Marks must sit on the live masterwork success arm, not a cold path.
+    const masterworkArm = craftSrc.match(
+      /if \(result\.masterwork\) \{[\s\S]*?noteReliquaryMark\(ctx, r\.meta, 'masterwork:first'\);[\s\S]*?noteReliquaryMark\(ctx, r\.meta, `masterwork:\$\{craftId\}`\);[\s\S]*?\}/,
+    );
+    expect(masterworkArm, 'masterwork arm notes first + per-craft marks').toBeTruthy();
     expect(craftSrc).toContain('noteReliquaryMark');
     expect(craftSrc).toContain('masterwork:first');
     expect(craftSrc).toContain('masterwork:${craftId}');
@@ -333,15 +342,18 @@ describe('Reliquary profession marks (Phase 7)', () => {
       path.join(__dirname, '../src/sim/professions/gather_events.ts'),
       'utf8',
     );
-    expect(gatherSrc).toContain('noteReliquaryMark');
-    expect(gatherSrc).toContain('gather_event:');
+    // announceGatherEvent writes visit then the Reliquary mark together.
+    expect(gatherSrc).toMatch(
+      /const visitMark = 'gather_event:' \+ flavor;[\s\S]*?ctx\.markVisited\(finder, visitMark\);[\s\S]*?noteReliquaryMark\(ctx, finder, visitMark\);/,
+    );
 
     const interactionSrc = fs.readFileSync(
       path.join(__dirname, '../src/sim/interaction.ts'),
       'utf8',
     );
-    expect(interactionSrc).toContain(
-      "noteReliquaryMark(ctx, meta, 'gather_event:perfect_specimen')",
+    // Perfect specimen land: deed visit + Reliquary mark on the same arm.
+    expect(interactionSrc).toMatch(
+      /ctx\.markVisited\(meta, 'gather_event:perfect_specimen'\);[\s\S]*?noteReliquaryMark\(ctx, meta, 'gather_event:perfect_specimen'\);/,
     );
   });
 });
