@@ -44,7 +44,11 @@ const BOW_ATTACK: SkinAttackClips = {
 // CharacterVisual binds these alongside the def's own clip names; a rig that
 // does not ship them (no animUrls entry) simply skips the absent names, so
 // only the hunter pays the extra action.
-export const SKIN_ATTACK_CLIP_NAMES: readonly string[] = ['Bow_Draw_Shot'];
+/** The static full-draw pose the cast state holds (bow_hold_anim.glb, built by
+ *  scripts/build_bow_hold_anim.mjs by resampling the draw's own hold window). */
+const BOW_CAST_CLIP = 'Bow_Draw_Hold';
+
+export const SKIN_ATTACK_CLIP_NAMES: readonly string[] = ['Bow_Draw_Shot', BOW_CAST_CLIP];
 
 /** How a ranged skin is held and fired: its weapon type, unless the def
  *  carries a `handling` override (a bow-slot gun aims like a crossbow). */
@@ -58,6 +62,22 @@ export function weaponSkinHandling(skin: WeaponSkinDef): string {
 export function weaponSkinAttackClips(weaponSkinId: string | null): SkinAttackClips | null {
   const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
   return skin && weaponSkinHandling(skin) === 'bow' ? BOW_ATTACK : null;
+}
+
+/** The clip the CAST base state should hold while this skin is displayed, or
+ *  null to keep the visual's authored cast.
+ *
+ *  Casting is a HELD state, not a one-shot, and every class takes `Spellcasting`
+ *  from the shared kaykit() ClipMap. That is a caster's arm-circling gesture, so
+ *  a hunter part-way through a cast-time shot (Long Draw, castTime 3.0) looked
+ *  like a mage waving at a bow. A drawn bow holds the draw instead.
+ *
+ *  Keyed off HANDLING like the attack substitution: a crossbow (and a bow-slot
+ *  gun, which aims like one) is shouldered rather than drawn, so it keeps the
+ *  authored cast until a pose exists for it. */
+export function weaponSkinCastClip(weaponSkinId: string | null): string | null {
+  const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
+  return skin && weaponSkinHandling(skin) === 'bow' ? BOW_CAST_CLIP : null;
 }
 
 export type SkinOrientPinMode = 'aimDuringShot' | 'carryOutsideShot';

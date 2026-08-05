@@ -6205,6 +6205,90 @@ export const TARGETS = [
       return { clip: '#desktop-update-toast' };
     },
   },
+  {
+    key: 'bow-cast-pose',
+    label: 'Hunter mid-cast with a bow: the drawn hold, not the caster gesture',
+    when: ['render/characters/skin_attack', 'players/bow_hold_anim', 'build_bow_hold_anim'],
+    variants: [{ key: 'long-draw-desktop', charClass: 'hunter', charName: 'Drawick' }],
+    async capture(page, _variant) {
+      // Entry is async: stage against the world global, not a fixed settle.
+      await page.waitForFunction(() => !!window.__game?.sim?.player, {
+        timeout: 90000,
+        polling: 250,
+      });
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        sim.setPlayerLevel?.(60, player.id);
+        sim.addItem('direfang_greatblade', 1);
+        sim.equipItem('direfang_greatblade');
+        sim.changeWeaponSkin('winterbite');
+        return { ok: true };
+      });
+      if (!staged.ok) throw new Error(`bow cast staging failed: ${staged.reason}`);
+      // Level-up deed banners cross mid-screen for seconds after the grant.
+      await wait(9000);
+      await page.evaluate(() => {
+        const b = document.querySelector('#banner');
+        if (b) b.style.display = 'none';
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (game?.input) game.input.camDist = 6;
+        // Long Draw is a 35yd damage cast and the nearest spawn sits past it.
+        let best = null;
+        let bestD = Infinity;
+        for (const e of sim?.entities?.values?.() ?? []) {
+          if (e === p || e.kind !== 'mob' || e.dead) continue;
+          const d = Math.hypot(e.pos.x - p.pos.x, e.pos.z - p.pos.z);
+          if (d < bestD) {
+            bestD = d;
+            best = e;
+          }
+        }
+        if (best) {
+          // 15yd: outside Long Draw's minRange 8 dead zone (the classic ranged
+          // rule casting_lifecycle enforces, and the reason a 6yd stance was
+          // refused with no error line) and well inside its 35yd range.
+          p.pos.x = best.pos.x - 15;
+          p.pos.z = best.pos.z;
+          // prevPos MUST follow the teleport (tests/CLAUDE.md's recipe). Without
+          // it the next tick sees a 40yd delta, reads the player as moving, and
+          // movement cancels the cast: the whole reason this shot would not fire.
+          p.prevPos = { ...p.pos };
+          p.facing = Math.atan2(best.pos.x - p.pos.x, best.pos.z - p.pos.z);
+          p.prevFacing = p.facing;
+          sim.targetEntity(best.id);
+        }
+        // Assign the slot in the SAME evaluate as the click: the HUD repaints
+        // from its saved slot map and drops an older assignment.
+        game.hud.hotbarActions[0] = { type: 'ability', id: 'aimed_shot' };
+        game.hud.saveSlotMap?.();
+      });
+      await page.click('.action-btn[data-hotbar-slot="1"]');
+      // Shoot INSIDE the 3s cast, past the fade-in so the pose is fully driven.
+      await wait(1200);
+      const cast = await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        return { casting: !!p?.castingAbility, ability: p?.castingAbility ?? null };
+      });
+      if (!cast.casting && process.env.SHOT_BASELINE !== '1') {
+        throw new Error(`the cast never started: ${JSON.stringify(cast)}`);
+      }
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return {};
+    },
+  },
 ];
 
 // Grant one staged stack (a plain count, or a specific ItemInstancePayload) and

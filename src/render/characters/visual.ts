@@ -37,7 +37,12 @@ import {
 import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
-import { SKIN_ATTACK_CLIP_NAMES, weaponSkinAttackClips, weaponSkinOrientPin } from './skin_attack';
+import {
+  SKIN_ATTACK_CLIP_NAMES,
+  weaponSkinAttackClips,
+  weaponSkinCastClip,
+  weaponSkinOrientPin,
+} from './skin_attack';
 import { configureTightBoneTextures } from './skin_gpu_layout';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { weaponAttackStyle } from './weapon_attack_style_core';
@@ -1939,7 +1944,13 @@ export class CharacterVisual {
       case 'run':
         return this.action(c.run) ?? this.action(c.walk);
       case 'cast':
-        return this.action(c.cast) ?? this.action(c.idle);
+        // A displayed bow holds its draw here instead of the shared caster
+        // gesture; every other weapon keeps the rig's authored cast.
+        return (
+          this.action(weaponSkinCastClip(this.weaponSkinId) ?? undefined) ??
+          this.action(c.cast) ??
+          this.action(c.idle)
+        );
       case 'spin':
         return this.action(c.attack[0]) ?? this.action(c.idle);
       case 'swim':
