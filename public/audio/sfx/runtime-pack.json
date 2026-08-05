@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "da104efc5862e1c7228c7140f6bb263634f585e2c7e64037a9aa4dc8eefdeb1b",
-  "catalogHash": "963571394edee9cd53dd38a2344f61014028e85ab24b4d96044134eded4ddacd",
+  "bundleId": "fb13087105128ddda502d3abb9d211ed1fe06e4c3cfe9c91db29bd3ba799222c",
+  "catalogHash": "e448b626a86e5fda6ba29cdd4c190e21ab2e05d8bc4f8080c8e0aa58379ff037",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -2858,12 +2858,36 @@
       "variants": [
         {
           "id": "main",
-          "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=7508c4a5ad92",
-          "bytes": 15716,
-          "sha256": "7508c4a5ad925cbf152c3143b23215c1e1a653ea0f30b9b9d7a89044d9849b06"
+          "url": "/audio/sfx/mount_run_terrorspark_groundshaker.mp3?v=0a736f1befdb",
+          "bytes": 167435,
+          "sha256": "0a736f1befdb490135fd93ffff0bb9593c59b96308bc4e974a0e1e3e5668ed09"
         }
       ],
-      "gain": 1,
+      "gain": 2.041738,
+      "playbackRate": 1
+    },
+    "mount_run_terrorspark_groundshaker_start": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_terrorspark_groundshaker_start.mp3?v=475c5288cbe9",
+          "bytes": 21985,
+          "sha256": "475c5288cbe9b2968876bd88102b358288bfb75bf74609bec2cee3a37d698db4"
+        }
+      ],
+      "gain": 1.840772,
+      "playbackRate": 1
+    },
+    "mount_run_terrorspark_groundshaker_stop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/mount_run_terrorspark_groundshaker_stop.mp3?v=35c7dc124cf4",
+          "bytes": 18224,
+          "sha256": "35c7dc124cf494ae69f19f65cd2a9e5019a6e8251d0ca18d27f25767f9eb04c5"
+        }
+      ],
+      "gain": 1.840772,
       "playbackRate": 1
     },
     "mount_run_thunderstrut_gobbler": {
