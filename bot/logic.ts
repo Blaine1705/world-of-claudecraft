@@ -765,15 +765,17 @@ export function buildActivityMessage(item: ActivityItem): Record<string, unknown
 }
 
 // ── Daily rewards winners feed ────────────────────────────────────────────────
+// One winner row as the server's outbox actually ships it since the #2791
+// narrowing: exactly what the message builder renders plus the payout status.
+// The old wide row (day, txSignature, and more) is gone from the wire; do not
+// re-add fields here without the server serving them again.
 export interface DailyRewardWinner {
-  day: string;
   rank: number;
   username: string;
   points: number;
   prizePercent: number;
   prizeUsd: number;
   status: string;
-  txSignature: string | null;
 }
 
 export interface DailyRewardWinnersDay {

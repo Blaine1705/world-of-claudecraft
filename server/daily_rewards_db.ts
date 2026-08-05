@@ -119,12 +119,30 @@ export type DailyRewardPayoutAttemptClaimResult =
 
 export type DailyRewardFinalizeOutcome = 'finalized' | 'already_finalized';
 
+/**
+ * One winner row as the Discord announcement ships it: the fields the bot's
+ * message builder renders (rank, name, points, prize math) plus the payout
+ * status. Deliberately NARROWER than DailyRewardInternalPayoutRow: the wide
+ * row carried tx_signature, wallet pubkeys, and the voided_by_* operator
+ * identity to a caller that never used them, and the byte-parity pin against
+ * the standalone winners GET that blocked narrowing retired with that route
+ * (#2791). The ops/admin reads keep the full row.
+ */
+export interface DailyRewardWinnerPayoutRow {
+  rank: number;
+  username: string;
+  points: number;
+  prizePercent: number;
+  prizeUsd: number;
+  status: string;
+}
+
 export interface DailyRewardWinnerAnnouncement {
   day: string;
   realm: string;
   prizePoolUsd: number;
   finalizedAt: string | null;
-  payouts: DailyRewardInternalPayoutRow[];
+  payouts: DailyRewardWinnerPayoutRow[];
 }
 
 export interface DailyRewardDb {
@@ -257,6 +275,17 @@ function internalPayoutRow(row: Record<string, unknown>): DailyRewardInternalPay
     ...payoutRow(row),
     realm: String(row.realm),
     signedTransaction: optionalString(row.signed_transaction),
+  };
+}
+
+function winnerPayoutRow(row: Record<string, unknown>): DailyRewardWinnerPayoutRow {
+  return {
+    rank: Number(row.rank),
+    username: String(row.username),
+    points: Number(row.points),
+    prizePercent: Number(row.prize_percent),
+    prizeUsd: Number(row.prize_usd),
+    status: String(row.status),
   };
 }
 
@@ -831,13 +860,12 @@ export class PgDailyRewardDb implements DailyRewardDb {
     );
     const out: DailyRewardWinnerAnnouncement[] = [];
     for (const day of days.rows) {
+      // Announcement-narrow on purpose (DailyRewardWinnerPayoutRow): no
+      // tx_signature, wallet pubkey, or voided_by_* operator identity here, and
+      // no wallet_links join, because announcing renders none of them (#2791).
       const payouts = await pool.query(
-        `SELECT p.day, p.realm, p.rank, p.account_id, p.username,
-                COALESCE(p.wallet_pubkey, wl.pubkey) AS wallet_pubkey, p.points,
-                p.prize_percent, p.prize_usd, p.status, p.tx_signature, p.paid_at,
-                p.void_reason, p.voided_by_id, p.voided_by_username, p.voided_at
+        `SELECT p.rank, p.username, p.points, p.prize_percent, p.prize_usd, p.status
            FROM daily_reward_payouts p
-           LEFT JOIN wallet_links wl ON wl.account_id = p.account_id
           WHERE p.day = $1 AND p.realm = $2
             AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
           ORDER BY p.rank ASC
@@ -849,7 +877,7 @@ export class PgDailyRewardDb implements DailyRewardDb {
         realm: String(day.realm),
         prizePoolUsd: Number(day.prize_pool_usd),
         finalizedAt: dateString(day.finalized_at),
-        payouts: payouts.rows.map(internalPayoutRow),
+        payouts: payouts.rows.map(winnerPayoutRow),
       });
     }
     return out;

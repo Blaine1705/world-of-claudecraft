@@ -564,7 +564,9 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   // parallel list. The oauth surface migrates ONLY its POST JSON rows: the two GET
   // consent/device HTML pages stay on the top-level ladder, off the route table,
   // served through the dispatcher's delegate. The internal migration moved EVERY
-  // handleInternalApi row (11: restart-countdown + the 10 Discord-bot routes) and
+  // handleInternalApi row (then 11: restart-countdown + the 10 Discord-bot
+  // routes; the three per-endpoint GET pickups the outbox replaced have since
+  // been RETIRED from both arms, #2791) and
   // at first left the separate /internal/daily-rewards/* ops family delegate-only;
   // the late-arrival pass put that family on the table too (behind the fail-closed
   // requireInternalSecretFailClosed gate), so the internal derivation now spans
@@ -584,12 +586,13 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
   it('derives the expected non-empty ladders', () => {
     expect(oauthPostLadder.length).toBe(5);
     expect(oauthGetLadder.length).toBe(2);
-    // 21 = the handleInternalApi twelve (restart-countdown + the 11 Discord-bot
-    // routes, flaired-ids included) plus the seven-route payout and moderation ops
+    // 18 = the handleInternalApi nine (restart-countdown + the 8 Discord-bot
+    // routes, flaired-ids included; the retired relay/activity/winners GETs
+    // have no rows since #2791) plus the seven-route payout and moderation ops
     // family below, plus the two registry-only rows (POST
     // /internal/discord/flex-batch and GET /internal/discord/outbox), which have
     // no legacy ladder arm by design and so are the internal rows with no twin.
-    expect(internalLadder.length).toBe(21);
+    expect(internalLadder.length).toBe(18);
     expect(opsFamilyRows.length).toBe(7);
   });
 
