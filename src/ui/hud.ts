@@ -3393,10 +3393,12 @@ export class Hud {
       return;
     }
     const stack = $('#actionbar-stack');
-    // insertBefore with the frame's next sibling puts the strip back directly
-    // after the player frame, which is where the docked layout expects it; the
-    // frame itself has already been restored to the stack's head above.
-    if (pet.parentElement !== stack) stack.insertBefore(pet, frame.nextSibling);
+    // Docked, the strip sits directly ABOVE the player frame, so it goes back in
+    // immediately before it. setPlayerFrameDetached has already restored the frame
+    // to the stack's head, so inserting before it makes the strip the new head and
+    // the order reads pet, player, bars from the top. #petbar is positioned against
+    // the stack's TOP EDGE (top: -52px), so it rides above the strip on its own.
+    if (pet.parentElement !== stack) stack.insertBefore(pet, frame);
   }
 
   // Buffs on the Player Frame (aurasOnPlayerFrame): reparent the player's own

@@ -2574,7 +2574,26 @@ describe('pet frame follows the player frame when it is dragged', () => {
     );
     expect(body).toContain('frame.appendChild(pet)');
     expect(body).toContain("$('#actionbar-stack')");
-    expect(body).toContain('stack.insertBefore(pet, frame.nextSibling)');
+    // Docked, the strip goes back immediately BEFORE the player frame: it sits
+    // above it, matching where the mobile layout already puts it.
+    expect(body).toContain('stack.insertBefore(pet, frame)');
+  });
+
+  // Both entry documents must carry the strip ahead of the player frame, or the
+  // first paint before any drag would show it in the wrong place.
+  it.each([
+    ['index.html', 'index.html'],
+    ['play.html', 'play.html'],
+  ])('%s orders the pet frame above the player frame', (_label, file) => {
+    const src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+    const pet = src.indexOf('id="pet-frame"');
+    const player = src.indexOf('id="player-frame"');
+    const petbar = src.indexOf('id="petbar"');
+    expect(pet).toBeGreaterThan(-1);
+    expect(pet).toBeLessThan(player);
+    // The pet ACTION bar is not part of that move: it is positioned against the
+    // stack's top edge and stays with the action bars.
+    expect(player).toBeLessThan(petbar);
   });
 
   it('CSS anchors the strip under the detached frame instead of leaving it in flow', () => {

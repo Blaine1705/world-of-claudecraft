@@ -621,10 +621,13 @@
     flex: none;
     width: 190px;
   }
-  /* Pet frame: the hunter/warlock/mage pet's health strip, in flow directly under
-     the player frame inside #actionbar-stack. The stack is bottom-anchored
-     (#bottom-bar sits at bottom: 6px), so this grows the stack UPWARD: the action
-     bars keep their position and the player frame lifts by this strip's height.
+  /* Pet frame: the hunter/warlock/mage pet's health strip, in flow directly ABOVE
+     the player frame inside #actionbar-stack, which is also where the mobile layout
+     puts it (bottom-centre column, above the player frame), so the two platforms
+     agree. The stack is bottom-anchored (#bottom-bar sits at bottom: 6px), so this
+     grows the stack UPWARD: the action bars and the player frame keep their
+     positions and the strip appears above them. #petbar is positioned against the
+     stack's top edge, so it rides above the strip without its own rule.
      Hidden until the player actually has a pet; the family painter sets the inline
      display:flex, which outranks the `none` here.
 
@@ -677,7 +680,7 @@
      same scale to its own children, which now include this frame. */
   #player-frame.pf-detached > #pet-frame {
     position: absolute;
-    top: calc(100% + 4px);
+    bottom: calc(100% + 4px);
     left: 0;
     width: auto;
     margin: 0;
