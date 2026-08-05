@@ -334,6 +334,26 @@ const DRUID_PBE_LOADOUT: PbeLoadout = {
   ring1: 'architects_cornerstone',
   ring2: 'nielas_coldlight_band',
 };
+// Moongrove is a spell caster: its best-in-slot is an intellect leather set
+// (spell power at this level comes from intellect), not the agility set the
+// melee Wildfang cat lanes are anchored on. Measuring a caster in agility gear
+// hid its real gear scaling and forced its base numbers high. This fixed set
+// is the greedy intellect pick over the epic pool (spellPower ~105), so the
+// "full BiS" balance anchor reflects a caster the way the guide's gear-by-
+// measurement axis intends.
+const MOONGROVE_PBE_LOADOUT: PbeLoadout = {
+  mainhand: 'heroic_wildheart_hexwood_staff',
+  helmet: 'sunbone_oracles_crown',
+  neck: 'zense_meridian',
+  shoulder: 'voidweave_mantle',
+  chest: 'verdant_heart_vestment',
+  waist: 'lunarward_cinch',
+  legs: 'necromancers_legwraps',
+  gloves: 'shadowpulse_handwraps',
+  feet: 'heroic_necromancers_soulsteps',
+  ring1: 'architects_cornerstone',
+  ring2: 'riftbound_band_of_insight',
+};
 
 export const OWNED_CLASS_PBE_LOADOUTS: Readonly<Record<OwnedDpsSpec, PbeLoadout>> = {
   packlord: HUNTER_PBE_LOADOUT,
@@ -342,7 +362,7 @@ export const OWNED_CLASS_PBE_LOADOUTS: Readonly<Record<OwnedDpsSpec, PbeLoadout>
   thundercall: THUNDERCALL_PBE_LOADOUT,
   warspirit: WARSPIRIT_PBE_LOADOUT,
   vespers: VESPERS_PBE_LOADOUT,
-  moongrove: DRUID_PBE_LOADOUT,
+  moongrove: MOONGROVE_PBE_LOADOUT,
   wildfang: DRUID_PBE_LOADOUT,
 };
 
@@ -777,6 +797,12 @@ export function runOwnedClassDpsProbe(
   seed = 29_900,
   head = 'working-tree',
   talentRows?: Record<number, string>,
+  // Gear tier axis: 'pbe' is the fixed best-in-slot loadout (the balance
+  // anchor; Moongrove's is its intellect caster set), 'naked' equips nothing so
+  // the base spell/weapon numbers alone drive the result. The naked tier
+  // isolates un-geared spec parity, the same low-gear axis a leveling or
+  // fresh-alt player experiences.
+  gear: 'pbe' | 'naked' = 'pbe',
 ): OwnedClassBalanceResult {
   const fixture = FIXTURES[spec];
   const sim = new Sim({ seed, playerClass: fixture.cls, autoEquip: false }) as ProbeSim;
@@ -789,7 +815,7 @@ export function runOwnedClassDpsProbe(
   if (!sim.applyTalents(talents)) {
     throw new Error(`failed to apply ${fixture.talentSpec}`);
   }
-  equipPbeLoadout(sim, spec);
+  if (gear === 'pbe') equipPbeLoadout(sim, spec);
   // Keep all three targets in one unobstructed cluster. The starter-world origin
   // has a static collider just left of the player, so a negative offset turns the
   // third target into a line-of-sight fixture instead of an area-damage fixture.

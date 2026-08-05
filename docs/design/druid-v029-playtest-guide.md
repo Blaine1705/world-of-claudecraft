@@ -2,8 +2,13 @@
 
 Companion to `druid-v029-class-design.md`. Probe numbers come from
 `scripts/druid_balance_probe.ts`: 123 seconds, level 20, fixed PBE gear, and an
-eight-seed deterministic average. The probe uses normal resource regeneration
-and does not inject mana, energy, or rage.
+eight-seed deterministic average. Moongrove wears an intellect caster set (a
+spell caster scales with spell power, not the agility set the melee Wildfang cat
+lanes are anchored on); Wildfang and Groveheart wear their own fixed sets. The
+probe uses normal resource regeneration and does not inject mana, energy, or
+rage. A pure-zero run at a seed whose terrain breaks the fixed anchor's line of
+sight for the distance-18 caster target is dropped as an anchor artifact, not
+balance signal.
 
 ## Probe result
 
@@ -12,14 +17,21 @@ profile.
 
 | Profile | Best capstone | Metric | Result |
 |---|---|---|---:|
-| Moongrove, one target | Nature's Echo | DPS | 209.0 |
-| Moongrove, three targets | Nature's Echo | DPS | 176.5 |
-| Wildfang, Wolf | Quickening | DPS | 211.9 |
+| Moongrove, one target | Wild Apex | DPS | 199.7 |
+| Moongrove, three targets | Wild Apex | DPS | 194.7 |
+| Wildfang, Wolf | Quickening | DPS | 176.5 |
 | Groveheart, three injured allies | Wild Apex | HPS | 20.7 |
 
-Moongrove and Wolf are both near the 200 DPS peer anchor, with a 1.4% spread
-between their measured best one-target builds, and each of the three lanes
-measures a DISTINCT best capstone (Nature's Echo, Quickening, Wild Apex). Wolf pays no hybrid tax.
+Moongrove sits at the 200 DPS peer anchor; Wolf is seated ~23 DPS below it (an
+11.6% spread between their measured best one-target builds, inside the 15%
+envelope). The v0.29 Balance pass shifted Moongrove's power off flat base numbers
+onto spell-power coefficients on its Moontide payoffs (Moonsurge and Sunwake), so
+a caster scales with gear like a caster: in full best-in-slot it lands at the 200
+DPS anchor, and un-geared it sits inside the naked peer band (within 15% of the
+other naked specs) instead of towering over it the way the old flat numbers did.
+The v0.29 cat re-band trimmed Wolf (Redharvest, Flense, Rendclaw) so its
+best-in-slot output seats a touch under the anchor rather than a touch over. Wolf
+pays no hybrid tax.
 Groveheart heals from a dedicated intellect-leather fixture, uses a real
 three-ally pressure profile with normal mana limits, and is not compared
 against a fake damage rotation. On the 60-second owned-class HPS harness it
@@ -27,11 +39,13 @@ lands inside the peer healer envelope (91.3 HPS one ally, 42.4 HPS three
 allies at the shared seed), clustering with the triage healers; the gap to
 the AoE chain healers over long pressure windows is a flagged PBE question.
 
-The attacking-live-mob profile produced 5,302 Moonwing damage with 6 chosen
-payoffs, 5,925 Wolf damage with 12 payoffs, and 2,192 Bruin damage with three
-Marrowbreaks under Craven Roar upkeep. Bruin took 139 incoming damage and
-built 5,741.4 threat during the 30-second profile. This is the tank-behavior
-check, not a claim that Bruin should match a damage arm.
+The attacking-live-mob profile (which equips the shared agility dev best-in-slot,
+so it verifies the rotation fires, not the caster-gear DPS the matrix measures)
+produced 3,232 Moonwing damage with 5 chosen payoffs, 5,044 Wolf damage with 10
+payoffs, and 2,192 Bruin damage with three Marrowbreaks under Craven Roar upkeep.
+Bruin took 139 incoming damage and built 5,741.4 threat during the 30-second
+profile. This is the tank-behavior check, not a claim that Bruin should match a
+damage arm.
 
 The Bruin tank profile (`runDruidBruinTankProbe`, seed 42920) measured 22.0%
 less incoming damage than Wolf posture over a 30-second passive window under
@@ -44,9 +58,9 @@ handoff under the classic 110% rule after shifting out.
 
 | Profile | Nature's Echo | Wild Apex | Quickening |
 |---|---:|---:|---:|
-| Moongrove, one target DPS | 209.0 | 204.1 | 193.8 |
-| Moongrove, three target DPS | 176.5 | 145.9 | 175.0 |
-| Wildfang, Wolf DPS | 209.7 | 196.9 | 211.9 |
+| Moongrove, one target DPS | 196.7 | 199.7 | 180.4 |
+| Moongrove, three target DPS | 187.5 | 194.7 | 178.8 |
+| Wildfang, Wolf DPS | 175.5 | 170.9 | 176.5 |
 | Groveheart, three ally HPS | 20.3 | 20.7 | 20.3 |
 
 ## Setup

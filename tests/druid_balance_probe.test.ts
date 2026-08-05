@@ -27,10 +27,12 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     const best = bestDruidBuilds(results);
     const moongrove = best.find((result) => result.profile === 'moongrove_1t');
     const wildfang = best.find((result) => result.profile === 'wildfang');
+    // Moongrove sits at the 200 DPS anchor; Wildfang (Feral cat) is intentionally
+    // seated ~25 DPS below it per the v0.29 cat re-band, still within 15%.
     expect(moongrove?.value).toBeGreaterThanOrEqual(180);
     expect(moongrove?.value).toBeLessThanOrEqual(225);
-    expect(wildfang?.value).toBeGreaterThanOrEqual(180);
-    expect(wildfang?.value).toBeLessThanOrEqual(225);
+    expect(wildfang?.value).toBeGreaterThanOrEqual(165);
+    expect(wildfang?.value).toBeLessThanOrEqual(205);
     const spread =
       Math.abs((moongrove?.value ?? 0) - (wildfang?.value ?? 0)) /
       Math.max(moongrove?.value ?? 1, wildfang?.value ?? 1);

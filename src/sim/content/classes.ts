@@ -5949,7 +5949,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         effects: [{ type: 'directDamage', min: 24, max: 29 }],
       },
       { rank: 3, level: 14, cost: 48, effects: [{ type: 'directDamage', min: 70, max: 84 }] },
-      { rank: 4, level: 20, cost: 70, effects: [{ type: 'directDamage', min: 100, max: 118 }] },
+      {
+        rank: 4,
+        level: 20,
+        cost: 70,
+        effects: [{ type: 'directDamage', min: 38, max: 48, spellPowerCoeff: 0.8 }],
+      },
     ],
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
     specNotes: {
@@ -6083,7 +6088,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       { type: 'extendDot', dot: 'moonfire', seconds: 6, maxBonus: 6 },
     ],
     description:
-      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 240 to 285 Arcane damage that spends all 3.',
+      'Moonwing Form only. Strikes for $d Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3.',
   },
   rejuvenation: {
     id: 'rejuvenation',
@@ -6343,8 +6348,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 18,
         cost: 35,
         effects: [
-          { type: 'weaponStrike', bonus: 45 },
-          { type: 'dot', total: 130, duration: 18, interval: 3 },
+          { type: 'weaponStrike', bonus: 34 },
+          { type: 'dot', total: 99, duration: 18, interval: 3 },
         ],
       },
     ],
@@ -6368,7 +6373,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     awardsCombo: 1,
     requiresForm: 'cat',
     effects: [{ type: 'weaponStrike', bonus: 25 }],
-    ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 72 }] }],
+    ranks: [{ rank: 2, level: 18, cost: 45, effects: [{ type: 'weaponStrike', bonus: 55 }] }],
     description: 'Claw the enemy for weapon damage plus $d. Awards 1 combo point. Wolf Form only.',
     specNotes: {
       feral: 'Each hit that lands adds 1 Old Blood (max 3).',
@@ -6392,7 +6397,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Finishing move that causes $d. Wolf Form only.',
     specNotes: {
       feral:
-        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 91 plus 55 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
+        'Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy.',
     },
   },
   swipe: {
@@ -6507,7 +6512,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     description: 'Calls down a bolt of stellar fire, causing $d Arcane damage.',
     specNotes: {
       balance:
-        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 160 to 190 Nature damage plus a 75 burn over 9 sec, restoring 35 mana and spending all 3.',
+        'In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3.',
     },
   },
   travel_form: {
@@ -7512,7 +7517,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // and must never eat the form itself.
     requiresAuraKind: 'form_moonkin',
     consumesRequiredAura: false,
-    effects: [{ type: 'directDamage', min: 240, max: 285 }],
+    effects: [{ type: 'directDamage', min: 136, max: 162, spellPowerCoeff: 1.6 }],
     description:
       'Spends your 3 Moontide for a heavy strike of $d Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
   },
@@ -7533,8 +7538,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraKind: 'form_moonkin',
     consumesRequiredAura: false,
     effects: [
-      { type: 'directDamage', min: 160, max: 190 },
-      { type: 'dot', total: 75, duration: 9, interval: 3 },
+      { type: 'directDamage', min: 80, max: 100, spellPowerCoeff: 1.6 },
+      { type: 'dot', total: 45, duration: 9, interval: 3 },
       { type: 'gainResource', amount: 35 },
     ],
     description:
@@ -7558,7 +7563,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     spendsCombo: true,
     comboOptional: true,
     effects: [
-      { type: 'finisherDamage', base: 91, perCombo: 55, variance: 10 },
+      { type: 'finisherDamage', base: 70, perCombo: 43, variance: 10 },
       { type: 'consumeDot', dot: 'rake' },
       { type: 'consumeDot', dot: 'rip' },
       { type: 'gainResource', amount: 30 },
