@@ -2120,7 +2120,7 @@ describe('client HTML shell', () => {
     // a child of the move joystick, so it follows that mirror without its own
     // satellite placement rules.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: 0;\n  }',
+      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: max(18px, env(safe-area-inset-right));\n  }',
     );
   });
 

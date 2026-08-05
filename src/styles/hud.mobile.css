@@ -2333,7 +2333,7 @@
      under the mirrored action ring on the left). */
   body.mobile-touch.mobile-left-handed #mobile-move-zone {
     left: auto;
-    right: 0;
+    right: max(18px, env(safe-area-inset-right));
   }
   /* The paged action ring (Phase 1) lives bottom-right, the same corner the
      move joystick mirrors to above. Pin the ring to the LEFT in left-handed
