@@ -1997,6 +1997,7 @@ export const en_XA: EnTranslations = {
     "materialHint": {
       "fineGrade": "[Ƒíñé ĝŕáðé. Ĝáţĥéŕéð ƒŕóɱ á ƒúļļ-ţíéŕ ʋéíñ ŵíţĥ á ţóóļ ŕáñķéð áƀóʋé ţĥé ɱáţéŕíáļ, áñð çóúñţš áš ţĥé óŕðíñáŕý ʋéŕšíóñ ŵĥéŕéʋéŕ óñé íš ŕéɋúíŕéð.]",
       "cookingCatch": "[Çóóķíñĝ íñĝŕéðíéñţ. Ɱúšţ ƀé çóóķéð ƀéƒóŕé éáţíñĝ.]",
+      "usedBy": "[Úšéð ƀý {crafts}.]",
       "arcaneDust": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ çóɱɱóñ áñð úñçóɱɱóñ ĝéáŕ.]",
       "arcaneEssence": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ ŕáŕé ĝéáŕ.]",
       "arcaneShard": "[Éñçĥáñţíñĝ ŕéáĝéñţ. Ðíšéñçĥáñţéð ƒŕóɱ éþíç áñð ļéĝéñðáŕý ĝéáŕ.]",
@@ -2627,6 +2628,18 @@ export const en_XA: EnTranslations = {
         "artisansEye": "[Áŕţíšáñ'š Éýé]",
         "quickeningCharm": "[Šþŕíñĝƀáçķ Çĥáŕɱ]"
       },
+      "toolEffectTooltip": {
+        "kind": "[Ţóóļ çĥáŕɱ]",
+        "bonus": {
+          "gatherersCache": "[+1 ýíéļð þéŕ ĥáŕʋéšţ ŵĥíļé çĥáŕĝéð.]",
+          "artisansEye": "[Ŕáíšéš ţĥé ĥáŕʋéšţ ĝŕáðé ƀý 1 ţóóļ ţíéŕ ŵĥíļé çĥáŕĝéð.]",
+          "quickeningCharm": "[Šĥóŕţéñš ţĥé ñóðé ŕéšþáŵñ ţíɱéŕ íţ ţŕíĝĝéŕš.]"
+        },
+        "howToSlot": "[Šļóţ óñţó á ɱíñíñĝ, ļóĝĝíñĝ, óŕ ĥéŕƀáļíšɱ ţóóļ ƒŕóɱ ţĥé Þŕóƒéššíóñš ŵíñðóŵ. Çóñšúɱéð ŵĥéñ šļóţţéð.]",
+        "charges": "[Šţáŕţš ŵíţĥ {base} çĥáŕĝéš óñ á çóɱɱóñ ţóóļ (+{bonus} þéŕ ŕáŕíţý ŕúñĝ).]",
+        "landOnly": "[Ðóéš ñóţ šļóţ óñ ƒíšĥíñĝ ŕóðš.]",
+        "openProfessions": "[Óþéñ Þŕóƒéššíóñš ţó šļóţ ţĥíš óñţó á ĝáţĥéŕíñĝ ţóóļ.]"
+      },
       "toolEffectSlotButton": "[Šļóţ {effect}]",
       "toolEffectRechargeButton": "[Ŕéçĥáŕĝé]",
       "toolEffectSlotted": "[{effect} šļóţţéð óñ {profession}.]",
@@ -2739,6 +2752,8 @@ export const en_XA: EnTranslations = {
       "masterworkToast": "[Ɱášţéŕŵóŕķ! {name}]",
       "masterworkZoneLine": "[{crafter} çŕáƒţéð á ɱášţéŕŵóŕķ {name}!]",
       "tierUpToast": "[{craft} áðʋáñçéð ţó ţíéŕ {tier}!]",
+      "skillUpToast": "[{skill} šķíļļ íñçŕéášéð ţó {level}!]",
+      "skillUpSubtext": "[Šķíļļ íñçŕéášéð ţó {level}!]",
       "trendNudge": "[Ýóúŕ ĥáñðš áŕé ļéáñíñĝ ţóŵáŕð ţĥé {archetype}. Íţš áţţúñéɱéñţ ŵáíţš ŵíţĥ {master}.]",
       "trendNudgeNoMaster": "[Ýóúŕ ĥáñðš áŕé ļéáñíñĝ ţóŵáŕð ţĥé {archetype}. Šééķ á çŕáƒţ ɱášţéŕ ţó ţáķé íţ úþ.]",
       "attunedZoneLine": "[{name} ĥáš áţţúñéð áš {archetype}!]",

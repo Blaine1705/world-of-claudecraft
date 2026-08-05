@@ -1376,6 +1376,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Thú Cưng: Tấn Công',
   'hudChrome.keybinds.petDefensive': 'Thú Cưng: Phòng Thủ',
   'hudChrome.keybinds.petStop': 'Thú Cưng: Dừng',
+  'hudChrome.keybinds.targetPet': 'Thú Cưng: Chọn',
   'hudChrome.keybinds.petTaunt': 'Thú Cưng: Khiêu Khích',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Gửi bớt một {item}',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Gửi thêm một {item}',
@@ -7657,6 +7658,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Nhóm {n}',
   'hudChrome.unitFrame.partyLabel': 'Đội Của Bạn',
   'hudChrome.unitFrame.playerLabel': 'Anh Hùng Của Bạn',
+  'hudChrome.unitFrame.petLabel': 'Thú Cưng Của Bạn',
   'hudChrome.unitFrame.targetAnnounce': 'Đánh Dấu {name}',
   'hudChrome.unitFrame.targetLabel': 'Mục Tiêu Của Bạn',
   'hudChrome.widgets.clockTitle': 'Giờ địa phương - nhấp để chuyển 12/24 giờ',
@@ -10058,6 +10060,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} lẩn tránh {ability} của bạn.',
   'hudChrome.options.mouseoverCast': 'Thi Triển Khi Rê Chuột Trên Khung Tổ Đội',
   'hudChrome.options.showTargetOfTarget': 'Hiện Mục Tiêu Của Mục Tiêu',
+  'hudChrome.options.showPetFrame': 'Hiện Thú Cưng',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Mục Tiêu Của Mục Tiêu',
   'itemUi.market.rarityLegendary': 'Huyền thoại',
   'loading.reconnectingAttempt':

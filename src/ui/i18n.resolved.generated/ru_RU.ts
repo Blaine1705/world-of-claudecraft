@@ -786,7 +786,7 @@ export const ru_RU: EnTranslations = {
       "targetAnnounce": "Цель: {name}",
       "targetOfTargetLabel": "Цель цели",
       "partyLabel": "Ваша группа",
-      "petLabel": "Your Pet",
+      "petLabel": "Ваш питомец",
       "partyChip": "Группа",
       "partyGroup": "Группа {n}",
       "durationUnitSeconds": "с",
@@ -958,7 +958,7 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Питомец: цель",
       "mount": "Сесть / Спешиться",
       "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
@@ -1220,7 +1220,7 @@ export const ru_RU: EnTranslations = {
       "showThirdActionBar": "Показывать третью панель действий",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Показывать питомца",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
@@ -1997,6 +1997,7 @@ export const ru_RU: EnTranslations = {
     "materialHint": {
       "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
       "cookingCatch": "Ингредиент для готовки. Сначала нужно приготовить.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.",
       "arcaneEssence": "Реагент для наложения чар. Выпадает при распылении редкого снаряжения.",
       "arcaneShard": "Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.",
@@ -2627,6 +2628,18 @@ export const ru_RU: EnTranslations = {
         "artisansEye": "Глаз ремесленника",
         "quickeningCharm": "Оберег возрождения"
       },
+      "toolEffectTooltip": {
+        "kind": "Талисман для инструмента",
+        "bonus": {
+          "gatherersCache": "Пока есть заряды, каждый сбор приносит +1 к добыче.",
+          "artisansEye": "Пока есть заряды, повышает класс добычи на 1 уровень инструмента.",
+          "quickeningCharm": "Сокращает таймер возрождения источника, на котором сработал."
+        },
+        "howToSlot": "Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.",
+        "charges": "На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).",
+        "landOnly": "На удочку не устанавливается.",
+        "openProfessions": "Откройте окно профессий, чтобы установить талисман на инструмент для сбора."
+      },
       "toolEffectSlotButton": "Установить {effect}",
       "toolEffectRechargeButton": "Перезарядить",
       "toolEffectSlotted": "{effect} установлен: {profession}.",
@@ -2739,6 +2752,8 @@ export const ru_RU: EnTranslations = {
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
       "tierUpToast": "{craft}: достигнут ранг {tier}!",
+      "skillUpToast": "{skill}: навык повышен до {level}!",
+      "skillUpSubtext": "Навык повышен до {level}!",
       "trendNudge": "Ваши руки склоняются к пути «{archetype}». Настройка на него ждёт у {master}.",
       "trendNudgeNoMaster": "Ваши руки склоняются к пути «{archetype}». Найдите мастера ремесла, чтобы встать на него.",
       "attunedZoneLine": "{name} настроился как «{archetype}»!",

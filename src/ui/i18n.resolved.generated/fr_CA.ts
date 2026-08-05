@@ -786,7 +786,7 @@ export const fr_CA: EnTranslations = {
       "targetAnnounce": "Cible : {name}",
       "targetOfTargetLabel": "Cible de la cible",
       "partyLabel": "Votre groupe",
-      "petLabel": "Your Pet",
+      "petLabel": "Votre familier",
       "partyChip": "Groupe",
       "partyGroup": "Groupe {n}",
       "durationUnitSeconds": "s",
@@ -958,7 +958,7 @@ export const fr_CA: EnTranslations = {
       "petTaunt": "Familier : provoquer",
       "petDefensive": "Familier : défensif",
       "petAggressive": "Familier : agressif",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Familier : cibler",
       "mount": "Monter / Descendre",
       "mouseHint": "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde."
     },
@@ -1220,7 +1220,7 @@ export const fr_CA: EnTranslations = {
       "showThirdActionBar": "Afficher la troisième barre d'action",
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Afficher le familier",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",
@@ -1997,6 +1997,7 @@ export const fr_CA: EnTranslations = {
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
       "cookingCatch": "Ingrédient de cuisine. Doit être cuit avant d'être consommé.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
       "arcaneEssence": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement rare.",
       "arcaneShard": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement épique et légendaire.",
@@ -2627,6 +2628,18 @@ export const fr_CA: EnTranslations = {
         "artisansEye": "Œil de l'artisan",
         "quickeningCharm": "Breloque à ressort"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Sertir {effect}",
       "toolEffectRechargeButton": "Recharger",
       "toolEffectSlotted": "Vous sertissez {effect} sur {profession}.",
@@ -2739,6 +2752,8 @@ export const fr_CA: EnTranslations = {
       "masterworkToast": "Chef-d'œuvre ! {name}",
       "masterworkZoneLine": "{crafter} a créé un chef-d'œuvre {name} !",
       "tierUpToast": "{craft} a avancé au niveau {tier} !",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Vos mains se penchent vers {archetype}. Son harmonisation vous attend avec {master}.",
       "trendNudgeNoMaster": "Vos mains se penchent vers {archetype}. Cherchez un maître des métiers pour la prendre.",
       "attunedZoneLine": "{name} s'est harmonisé en tant que {archetype} !",

@@ -786,7 +786,7 @@ export const nl_NL: EnTranslations = {
       "targetAnnounce": "Markeer {name}",
       "targetOfTargetLabel": "Doelwit van het doelwit",
       "partyLabel": "Je Bende",
-      "petLabel": "Your Pet",
+      "petLabel": "Je Huisdier",
       "partyChip": "Groep",
       "partyGroup": "Groep {n}",
       "durationUnitSeconds": "s",
@@ -958,7 +958,7 @@ export const nl_NL: EnTranslations = {
       "petTaunt": "Huisdier: Uitdagen",
       "petDefensive": "Huisdier: Verdedigend",
       "petAggressive": "Huisdier: Agressief",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Huisdier: Aanwijzen",
       "mount": "Opstijgen / Afstijgen",
       "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld."
     },
@@ -1220,7 +1220,7 @@ export const nl_NL: EnTranslations = {
       "showThirdActionBar": "Derde actiebalk tonen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Huisdier tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
@@ -1997,6 +1997,7 @@ export const nl_NL: EnTranslations = {
     "materialHint": {
       "fineGrade": "Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.",
       "cookingCatch": "Kookingrediënt. Moet worden gekookt voordat het gegeten wordt.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Betoveringsreagens. Verkregen door het onbetoveren van gewone en ongewone uitrusting.",
       "arcaneEssence": "Betoveringsreagens. Verkregen door het onbetoveren van zeldzame uitrusting.",
       "arcaneShard": "Betoveringsreagens. Verkregen door het onbetoveren van epische en legendarische uitrusting.",
@@ -2627,6 +2628,18 @@ export const nl_NL: EnTranslations = {
         "artisansEye": "Ambachtsoog",
         "quickeningCharm": "Veerkrachtamulet"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "{effect} plaatsen",
       "toolEffectRechargeButton": "Opladen",
       "toolEffectSlotted": "{effect} geplaatst op {profession}.",
@@ -2739,6 +2752,8 @@ export const nl_NL: EnTranslations = {
       "masterworkToast": "Meesterwerk! {name}",
       "masterworkZoneLine": "{crafter} heeft het meesterwerk {name} gemaakt!",
       "tierUpToast": "{craft} is doorgegaan naar niveau {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Je handen neigen naar {archetype}. De afstemming wacht bij {master}.",
       "trendNudgeNoMaster": "Je handen neigen naar {archetype}. Zoek een ambachtsmeester om dit op te pakken.",
       "attunedZoneLine": "{name} is afgestemd als {archetype}!",

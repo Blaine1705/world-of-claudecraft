@@ -10,144 +10,254 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "es_ES": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "fr_FR": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "fr_CA": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "en_CA": [],
   "it_IT": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "de_DE": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "zh_CN": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.partyFrames.showPets"
   ],
   "zh_TW": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.partyFrames.showPets"
   ],
   "ko_KR": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.partyFrames.showPets"
   ],
   "ja_JP": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.partyFrames.showPets"
   ],
   "pt_BR": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "ru_RU": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.partyFrames.showPets"
   ],
   "cs_CZ": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "nl_NL": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "pl_PL": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "id_ID": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "tr_TR": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "sv_SE": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "vi_VN": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "da_DK": [
-    "hudChrome.keybinds.targetPet",
-    "hudChrome.options.showPetFrame",
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
     "hudChrome.partyFrames.petHealth",
     "hudChrome.partyFrames.showPets",
-    "hudChrome.unitFrame.petLabel"
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
   ]
 };
