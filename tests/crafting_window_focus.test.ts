@@ -123,20 +123,23 @@ describe('crafting window: Tab focus trap and restore-on-close', () => {
     const capturedOpener = bridge.captureFocus();
     expect(capturedOpener).toBe(opener);
 
-    // Document order in the panel title: Orders, then Close; then tab strip
-    // and Craft in the body (release surface added the Orders control).
-    const closeBtn = el.querySelector<HTMLButtonElement>('[data-close]');
+    // Document order: the commission-board button then Close (both panel-title),
+    // the craft's tab-strip button (.crafting-tabs), then the Craft row button
+    // (.crafting-body).
     const ordersBtn = el.querySelector<HTMLButtonElement>('[data-open-orders]');
+    const closeBtn = el.querySelector<HTMLButtonElement>('[data-close]');
     const tabBtn = el.querySelector<HTMLButtonElement>('.crafting-tab');
     const craftBtn = el.querySelector<HTMLButtonElement>('.crafting-recipe-btn');
-    expect(closeBtn).not.toBeNull();
     expect(ordersBtn).not.toBeNull();
+    expect(closeBtn).not.toBeNull();
     expect(tabBtn).not.toBeNull();
     expect(craftBtn).not.toBeNull();
     expect(craftBtn?.disabled).toBe(false); // the craftable fixture precondition
 
-    // Walk the full focusable cycle starting at Orders (first in document order).
-    // Every Tab is intercepted; wrap returns to Orders, never the outer opener.
+    // Walk the full four-control cycle: every Tab is intercepted (the trap
+    // is really installed, not a no-op that happens to leave focus alone),
+    // and it wraps back to the first control rather than ever reaching the
+    // opener or body.
     ordersBtn?.focus();
     expect(document.activeElement).toBe(ordersBtn);
     expect(pressTab()).toBe(true);
