@@ -103,10 +103,9 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   let target = pet.aggroTargetId !== null ? (ctx.entities.get(pet.aggroTargetId) ?? null) : null;
   if (target && (target.dead || !ctx.isHostileTo(pet, target) || !petCanSeeTarget(pet, target)))
     target = null;
-  if (target && dist2d(owner.pos, pet.pos) > PET_LEASH) target = null;
-  // Drop a target the pet already had, so mounting up disengages it rather than
-  // leaving it locked on while you ride away.
-  if (travelling) target = null;
+  // Both arms are the same rule: stop fighting something the owner has left behind.
+  // Out of leash range they walked away from it; mounted they rode away from it.
+  if (target && (travelling || dist2d(owner.pos, pet.pos) > PET_LEASH)) target = null;
   if (!target && !owner.dead) target = petPickTarget(ctx, pet, owner);
   pet.aggroTargetId = target?.id ?? null;
   pet.inCombat = target !== null;
