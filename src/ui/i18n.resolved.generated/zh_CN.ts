@@ -786,6 +786,7 @@ export const zh_CN: EnTranslations = {
       "targetAnnounce": "目标：{name}",
       "targetOfTargetLabel": "目标的目标",
       "partyLabel": "你的队伍",
+      "petLabel": "你的宠物",
       "partyChip": "小队",
       "partyGroup": "小队 {n}",
       "durationUnitSeconds": "秒",
@@ -959,6 +960,7 @@ export const zh_CN: EnTranslations = {
       "petTaunt": "宠物：嘲讽",
       "petDefensive": "宠物：防御",
       "petAggressive": "宠物：攻击性",
+      "targetPet": "宠物：选中",
       "mount": "骑乘 / 下骑",
       "mouseHint": "鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。"
     },
@@ -1309,6 +1311,7 @@ export const zh_CN: EnTranslations = {
       "hideUnusedActionSlots": "隐藏未使用的动作栏位",
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
+      "showPetFrame": "显示你的宠物",
       "showAttackButton": "显示攻击按钮",
       "showDailyRewardsChest": "显示每日奖励宝箱",
       "mobileCameraJoystick": "摄像机摇杆",

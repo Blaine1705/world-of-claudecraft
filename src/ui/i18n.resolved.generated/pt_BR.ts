@@ -786,6 +786,7 @@ export const pt_BR: EnTranslations = {
       "targetAnnounce": "Alvo: {name}",
       "targetOfTargetLabel": "Alvo do alvo",
       "partyLabel": "Seu grupo",
+      "petLabel": "Seu mascote",
       "partyChip": "Grupo",
       "partyGroup": "Grupo {n}",
       "durationUnitSeconds": "s",
@@ -959,6 +960,7 @@ export const pt_BR: EnTranslations = {
       "petTaunt": "Mascote: provocar",
       "petDefensive": "Mascote: defensivo",
       "petAggressive": "Mascote: agressivo",
+      "targetPet": "Mascote: selecionar",
       "mount": "Montar / Desmontar",
       "mouseHint": "Os botões do mouse também funcionam: pressione o botão do meio (M3) ou um botão lateral (M4, M5) ao atribuir a tecla. Os botões esquerdo e direito continuam reservados para a câmera, o clique para mover e cliques em objetos no mundo."
     },
@@ -1309,6 +1311,7 @@ export const pt_BR: EnTranslations = {
       "hideUnusedActionSlots": "Ocultar Espaços de Ação Não Utilizados",
       "lockActionBars": "Travar barras de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
+      "showPetFrame": "Mostrar seu mascote",
       "showAttackButton": "Exibir Botão de Ataque",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",

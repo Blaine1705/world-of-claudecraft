@@ -369,6 +369,7 @@ const UI_PURE_CORES = [
   'src/ui/town_focus_view.ts',
   'src/ui/mount_race_view.ts',
   'src/ui/pet_action_icons.ts',
+  'src/ui/pet_frame_view.ts',
   'src/ui/loading_slow_hint_core.ts',
   'src/ui/reconnect_status_core.ts',
   'src/ui/chat_bubble_style.ts',

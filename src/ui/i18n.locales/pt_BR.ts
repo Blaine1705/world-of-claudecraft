@@ -2596,6 +2596,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupo {n}',
   'hudChrome.unitFrame.partyLabel': 'Seu grupo',
   'hudChrome.unitFrame.playerLabel': 'Seu personagem',
+  'hudChrome.unitFrame.petLabel': 'Seu mascote',
   'hudChrome.unitFrame.targetAnnounce': 'Alvo: {name}',
   'hudChrome.unitFrame.targetLabel': 'Seu alvo',
   'seo.officialLabel': 'Site oficial de World of ClaudeCraft',
@@ -9321,6 +9322,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Mascote: atacar',
   'hudChrome.keybinds.petDefensive': 'Mascote: defensivo',
   'hudChrome.keybinds.petStop': 'Mascote: parar',
+  'hudChrome.keybinds.targetPet': 'Mascote: selecionar',
   'hudChrome.keybinds.petTaunt': 'Mascote: provocar',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Enviar um {item} a menos',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Enviar um {item} a mais',
@@ -10187,6 +10189,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Sua chance de aparar completamente um ataque corpo a corpo frontal, sem sofrer dano. Um golpe pelas costas não pode ser aparado.',
   'hudChrome.options.mouseoverCast': 'Conjuração ao Apontar nos Quadros do Grupo',
   'hudChrome.options.showTargetOfTarget': 'Mostrar Alvo do Alvo',
+  'hudChrome.options.showPetFrame': 'Mostrar seu mascote',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Alvo do alvo',
   'itemUi.market.rarityLegendary': 'Lendário',
   'loading.reconnectingAttempt':

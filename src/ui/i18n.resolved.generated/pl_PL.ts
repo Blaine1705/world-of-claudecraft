@@ -786,6 +786,7 @@ export const pl_PL: EnTranslations = {
       "targetAnnounce": "Oznacz {name}",
       "targetOfTargetLabel": "Cel celu",
       "partyLabel": "Twoja drużyna",
+      "petLabel": "Twoje zwierzę",
       "partyChip": "Drużyna",
       "partyGroup": "Grupa {n}",
       "durationUnitSeconds": "s",
@@ -959,6 +960,7 @@ export const pl_PL: EnTranslations = {
       "petTaunt": "Zwierzę: Prowokacja",
       "petDefensive": "Zwierzę: Obronne",
       "petAggressive": "Zwierzę: Agresywne",
+      "targetPet": "Zwierzę: Obierz",
       "mount": "Dosiądź / Zsiądź",
       "mouseHint": "Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie."
     },
@@ -1309,6 +1311,7 @@ export const pl_PL: EnTranslations = {
       "hideUnusedActionSlots": "Ukryj nieużywane pola akcji",
       "lockActionBars": "Zablokuj paski akcji",
       "showTargetOfTarget": "Pokaż cel celu",
+      "showPetFrame": "Pokaż swoje zwierzę",
       "showAttackButton": "Pokaż Przycisk Ataku",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
       "mobileCameraJoystick": "Joystick aparatu",

@@ -786,6 +786,7 @@ export const id_ID: EnTranslations = {
       "targetAnnounce": "Tandai {name}",
       "targetOfTargetLabel": "Sasaran dari Sasaran",
       "partyLabel": "Kelompok Anda",
+      "petLabel": "Peliharaan Anda",
       "partyChip": "Kelompok",
       "partyGroup": "Grup {n}",
       "durationUnitSeconds": "d",
@@ -959,6 +960,7 @@ export const id_ID: EnTranslations = {
       "petTaunt": "Peliharaan: Ejek",
       "petDefensive": "Peliharaan: Defensif",
       "petAggressive": "Peliharaan: Agresif",
+      "targetPet": "Peliharaan: Bidik",
       "mount": "Naiki / Turun",
       "mouseHint": "Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia."
     },
@@ -1309,6 +1311,7 @@ export const id_ID: EnTranslations = {
       "hideUnusedActionSlots": "Sembunyikan Slot Aksi yang Tidak Terpakai",
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
+      "showPetFrame": "Tampilkan Peliharaan Anda",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",

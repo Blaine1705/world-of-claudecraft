@@ -786,6 +786,7 @@ export const zh_TW: EnTranslations = {
       "targetAnnounce": "目標：{name}",
       "targetOfTargetLabel": "目標的目標",
       "partyLabel": "你的隊伍",
+      "petLabel": "你的寵物",
       "partyChip": "隊伍",
       "partyGroup": "小隊 {n}",
       "durationUnitSeconds": "秒",
@@ -959,6 +960,7 @@ export const zh_TW: EnTranslations = {
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
       "petAggressive": "寵物：攻擊性",
+      "targetPet": "寵物：選取",
       "mount": "騎乘 / 下騎",
       "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。"
     },
@@ -1309,6 +1311,7 @@ export const zh_TW: EnTranslations = {
       "hideUnusedActionSlots": "隱藏未使用的動作欄位",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
+      "showPetFrame": "顯示你的寵物",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",

@@ -786,6 +786,7 @@ export const nl_NL: EnTranslations = {
       "targetAnnounce": "Markeer {name}",
       "targetOfTargetLabel": "Doelwit van het doelwit",
       "partyLabel": "Je Bende",
+      "petLabel": "Je Huisdier",
       "partyChip": "Groep",
       "partyGroup": "Groep {n}",
       "durationUnitSeconds": "s",
@@ -959,6 +960,7 @@ export const nl_NL: EnTranslations = {
       "petTaunt": "Huisdier: Uitdagen",
       "petDefensive": "Huisdier: Verdedigend",
       "petAggressive": "Huisdier: Agressief",
+      "targetPet": "Huisdier: Aanwijzen",
       "mount": "Opstijgen / Afstijgen",
       "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld."
     },
@@ -1309,6 +1311,7 @@ export const nl_NL: EnTranslations = {
       "hideUnusedActionSlots": "Ongebruikte actievakjes verbergen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
+      "showPetFrame": "Je huisdier tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",

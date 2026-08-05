@@ -786,6 +786,7 @@ export const es: EnTranslations = {
       "targetAnnounce": "Objetivo: {name}",
       "targetOfTargetLabel": "Objetivo del objetivo",
       "partyLabel": "Tu grupo",
+      "petLabel": "Tu mascota",
       "partyChip": "Grupo",
       "partyGroup": "Grupo {n}",
       "durationUnitSeconds": "s",
@@ -959,6 +960,7 @@ export const es: EnTranslations = {
       "petTaunt": "Mascota: provocar",
       "petDefensive": "Mascota: defensiva",
       "petAggressive": "Mascota: agresiva",
+      "targetPet": "Mascota: seleccionar",
       "mount": "Montar / Desmontar",
       "mouseHint": "Los botones del ratón también funcionan: pulsa el botón central (M3) o un botón lateral (M4, M5) mientras asignas la tecla. Los botones izquierdo y derecho quedan reservados para la cámara, el clic para moverse y el clic sobre objetos del mundo."
     },
@@ -1309,6 +1311,7 @@ export const es: EnTranslations = {
       "hideUnusedActionSlots": "Ocultar espacios de acción no utilizados",
       "lockActionBars": "Bloquear barras de acción",
       "showTargetOfTarget": "Mostrar el objetivo del objetivo",
+      "showPetFrame": "Mostrar tu mascota",
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",

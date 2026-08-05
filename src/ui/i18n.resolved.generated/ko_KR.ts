@@ -786,6 +786,7 @@ export const ko_KR: EnTranslations = {
       "targetAnnounce": "대상: {name}",
       "targetOfTargetLabel": "대상의 대상",
       "partyLabel": "내 파티",
+      "petLabel": "내 펫",
       "partyChip": "파티",
       "partyGroup": "{n}번 그룹",
       "durationUnitSeconds": "초",
@@ -959,6 +960,7 @@ export const ko_KR: EnTranslations = {
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
+      "targetPet": "펫: 대상 지정",
       "mount": "탑승 / 하차",
       "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
     },
@@ -1309,6 +1311,7 @@ export const ko_KR: EnTranslations = {
       "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
+      "showPetFrame": "내 펫 표시",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",

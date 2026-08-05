@@ -786,6 +786,7 @@ export const en: EnTranslations = {
       "targetAnnounce": "Mark {name}",
       "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Your Band",
+      "petLabel": "Your Pet",
       "partyChip": "Party",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
@@ -959,6 +960,7 @@ export const en: EnTranslations = {
       "petTaunt": "Pet: Taunt",
       "petDefensive": "Pet: Defensive",
       "petAggressive": "Pet: Aggressive",
+      "targetPet": "Pet: Mark",
       "mount": "Mount / Dismount",
       "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
@@ -1309,6 +1311,7 @@ export const en: EnTranslations = {
       "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
