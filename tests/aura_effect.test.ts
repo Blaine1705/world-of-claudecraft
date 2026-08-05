@@ -269,6 +269,20 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ kind: 'imbue', value: 0 })?.key).toBe('hudChrome.auraEffect.imbue');
   });
 
+  it('teaches the Galeheart Weapon echo mechanic instead of the generic imbue line', () => {
+    expect(desc({ id: 'galeheart_weapon', kind: 'imbue', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.galeheartWeapon',
+      nums: { steps: 3, count: 2, pct: 50 },
+    });
+  });
+
+  it('describes both halves of Elemental Trance (damage reduction and mana return)', () => {
+    expect(desc({ id: 'elemental_trance', kind: 'buff_dr', value: 0.3 })).toEqual({
+      key: 'hudChrome.auraEffect.elementalTrance',
+      nums: { pct: 30, mana: 20 },
+    });
+  });
+
   it('describes structural states instead of falling back to a blank effect line', () => {
     expect(desc({ kind: 'righteous_fury', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.righteousFury',

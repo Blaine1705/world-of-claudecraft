@@ -24,6 +24,12 @@ import {
   REDLINE_MAX_DEPTH,
   VENOM_RITUAL_STAGES,
 } from '../sim/combat/rogue_engines';
+import {
+  ELEMENTAL_TRANCE_MANA_PCT,
+  GALEHEART_ECHO_COUNT,
+  GALEHEART_ECHO_DAMAGE,
+  WARSPIRIT_CADENCE_STEPS,
+} from '../sim/combat/shaman_warspirit';
 import type { AuraKind } from '../sim/types';
 import {
   ENRAGE_DMG_DONE,
@@ -96,6 +102,22 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   }
   if (a.id === 'convergence_mark' && a.kind === 'internal_cd') {
     return { key: `${KEY}.elementalConvergencePrimed`, nums: {} };
+  }
+  if (a.id === 'galeheart_weapon' && a.kind === 'imbue') {
+    return {
+      key: `${KEY}.galeheartWeapon`,
+      nums: {
+        steps: WARSPIRIT_CADENCE_STEPS,
+        count: GALEHEART_ECHO_COUNT,
+        pct: pctFromFrac(GALEHEART_ECHO_DAMAGE),
+      },
+    };
+  }
+  if (a.id === 'elemental_trance' && a.kind === 'buff_dr') {
+    return {
+      key: `${KEY}.elementalTrance`,
+      nums: { pct: pctFromFrac(a.value), mana: pctFromFrac(ELEMENTAL_TRANCE_MANA_PCT) },
+    };
   }
   if (a.kind === 'hunter_ferocity') {
     const stacks = Math.min(3, Math.max(0, Math.trunc(a.stacks ?? a.value)));

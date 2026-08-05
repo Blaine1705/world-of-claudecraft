@@ -444,6 +444,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'stormsurge',
       'lifespring_weapon',
       'unleash_weapon',
+      'elemental_trance',
       'healing_wave',
       'tidecall',
       'ancestor_return',
@@ -4582,6 +4583,22 @@ export const ABILITIES: Record<string, AbilityDef> = {
       'Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current.',
   },
   // Shared Shaman action whose effect follows the active spec weapon enchant.
+  elemental_trance: {
+    id: 'elemental_trance',
+    name: 'Elemental Trance',
+    class: 'shaman',
+    specs: ['enhancement'],
+    learnLevel: 20,
+    cost: 0,
+    castTime: 0,
+    cooldown: 120,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [{ type: 'selfBuff', kind: 'buff_dr', value: 0.3, duration: 15 }],
+    description:
+      'Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)',
+  },
   unleash_weapon: {
     id: 'unleash_weapon',
     name: 'Unleash Weapon',

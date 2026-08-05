@@ -11551,4 +11551,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
   'itemUi.vendor.buyStack': '{count}個購入',
   'itemUi.vendor.buyStackAria': '{item}を{count}個、{price}で購入',
+  'hudChrome.auraEffect.galeheartWeapon':
+      'ウォースピリットの{steps}連撃サイクルを完了すると、その一撃が{count}回反響し、それぞれダメージの{pct}%の自然ダメージを与える',
+  'hudChrome.auraEffect.elementalTrance':
+      '受けるダメージが{pct}%軽減される。与えた全ダメージの{mana}%がマナに変換される',
+  'entities.abilities.elemental_trance.name': 'エレメンタルトランス',
+  'entities.abilities.elemental_trance.description':
+      '15秒間エレメンタルトランス状態に入り、受けるダメージを30%軽減し、与えた全ダメージの20%をマナに変換する。（ウォースピリット固有能力）',
 };

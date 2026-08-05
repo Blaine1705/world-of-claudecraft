@@ -1952,6 +1952,8 @@ export const es_ES: EnTranslations = {
       "disarm": "Desarme: no puede usar ataques con arma",
       "lockout": "Escuela mágica bloqueada",
       "imbue": "Arma encantada con efectos adicionales",
+      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
+      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
       "stealth": "Encubierto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Forma de Bruin: mayor salud y armadura",
       "formCat": "Forma felina, daño cuerpo a cuerpo y energía",
@@ -8533,6 +8535,10 @@ export const es_ES: EnTranslations = {
       "unleash_weapon": {
         "name": "Desatar Arma",
         "description": "Desata el encantamiento activo de tu arma. La Marca Pírica inflige de 54 a 64 de daño de Fuego, gana un 30% del poder con hechizos y otorga 2 de Trueno. El Corazón de Vendaval golpea con tu arma, avanza la Cadencia del Espíritu Guerrero y otorga un 20% de velocidad de ataque durante 6 s. El Ligado a la Piedra golpea por un 75% del daño de arma, obliga al objetivo a atacarte y reduce el daño recibido un 20% durante 4 s. El Manantial de Vida consume tu Corriente Sanadora, sana por un 125% de su sanación restante y reduce el siguiente golpe en 8 s un 50% de la salud restaurada."
+      },
+      "elemental_trance": {
+        "name": "Elemental Trance",
+        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
       },
       "primal_exaltation": {
         "name": "Exaltación Primigenia",

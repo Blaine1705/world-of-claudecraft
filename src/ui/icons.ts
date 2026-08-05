@@ -4508,6 +4508,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'earthquake',
   'bloodlust',
   'elemental_mastery',
+  'elemental_trance',
   'chain_heal',
   'galeheart_weapon',
   'thunder_reservoir',
@@ -4611,6 +4612,7 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'earthbind',
   'earthquake',
   'elemental_mastery',
+  'elemental_trance',
   'healing_stream',
   // warlock
   'chaos_bolt',

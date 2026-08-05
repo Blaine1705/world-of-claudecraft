@@ -10937,6 +10937,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '古血：第{stacks}/{max}层。裂爪、剐削、血裂、血噬、横扫利爪与碎骨击的命中各累积1层。达到{max}层时：狼形态下血噬变为血收，巨熊形态下碎骨击变为碎髓',
   'hudChrome.auraEffect.verdance':
     '繁茂：第{stacks}/{max}层。每种下一个新的野性绽放或二度绽放累积1层。达到{max}层时，迅捷治愈变为盛放',
+  'hudChrome.auraEffect.galeheartWeapon':
+    '完成战魂的{steps}连击节奏后，该次打击回响{count}次，每次造成其伤害{pct}%的自然伤害',
+  'hudChrome.auraEffect.elementalTrance': '受到的伤害降低{pct}%。你造成的所有伤害的{mana}%转化为法力值',
   'entities.abilities.moonseed.name': '月种',
   'entities.abilities.moonseed.description':
     '仅限月翼形态。造成{damage}点奥术伤害，累积1层月潮（最多3层），并将你的月光风暴延长6秒；每次施加最多延长6秒。月潮达到3层时，此按钮变为月涌：瞬发打击，造成240至285点奥术伤害，并消耗全部3层。',
@@ -10956,6 +10959,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.name': '盛放',
   'entities.abilities.overbloom.description':
     '消耗你的5层繁茂：每个持有你的持续治疗效果的盟友立即恢复这些效果剩余治疗量的60%，这些效果随之移除，并为目标种下一个新的野性绽放。',
+  'entities.abilities.elemental_trance.name': '元素恍惚',
+  'entities.abilities.elemental_trance.description':
+    '进入元素恍惚状态，持续15秒：受到的伤害降低30%，你造成的所有伤害的20%转化为法力值。（战魂特色技能）',
   'hudChrome.continentMap.title': '世界地图',
   'hudChrome.continentMap.summary': '世界地图。选择一个地区以打开其地图。',
   'hudChrome.continentMap.toWorld': '世界地图',

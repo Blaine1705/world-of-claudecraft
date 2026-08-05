@@ -11472,6 +11472,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '오랜 피: {stacks}/{max}단계. 가르는 발톱, 저미기, 피의 균열, 유혈 물어뜯기, 휩쓰는 발톱, 뼈 분쇄의 적중한 공격이 각각 1단계를 쌓습니다. {max}단계에서 늑대 변신의 유혈 물어뜯기는 피의 수확으로, 큰곰 변신의 뼈 분쇄는 골수분쇄로 변합니다',
   'hudChrome.auraEffect.verdance':
     '푸른 생장: {stacks}/{max}단계. 새로 심는 야생 개화와 두 번째 개화가 각각 1단계를 쌓으며, {max}단계에서 신속한 치유가 만개로 변합니다',
+  'hudChrome.auraEffect.galeheartWeapon':
+    '{steps}회 타격의 전쟁정령 리듬을 완성하면 그 일격이 {count}번 메아리쳐 각각 피해의 {pct}%만큼 자연 피해를 입힙니다',
+  'hudChrome.auraEffect.elementalTrance':
+    '받는 피해가 {pct}% 감소합니다. 입힌 모든 피해의 {mana}%가 마나로 전환됩니다',
   'entities.abilities.moonseed.name': '달씨앗',
   'entities.abilities.moonseed.description':
     '달날개 형상 전용입니다. {damage}의 비전 피해를 입히고, 달물결을 1단계 올리며(최대 3단계), 달빛 폭풍을 6초 연장합니다. 적용 한 번당 최대 6초입니다. 달물결 3단계에서 이 버튼이 달의 격동으로 변합니다: 240에서 285의 비전 피해를 입히는 즉시 공격으로, 3단계를 모두 소모합니다.',
@@ -11492,6 +11496,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.overbloom.name': '만개',
   'entities.abilities.overbloom.description':
     '푸른 생장 5단계를 소모합니다: 자신의 지속 치유 효과를 지닌 모든 아군이 해당 효과의 남은 치유량 중 60%를 즉시 회복하고, 해당 효과는 제거되며, 대상에게 새로운 야생 개화를 심습니다.',
+  'entities.abilities.elemental_trance.name': '정령의 무아지경',
+  'entities.abilities.elemental_trance.description':
+    '15초 동안 정령의 무아지경에 들어가 받는 피해를 30% 줄이고, 입힌 모든 피해의 20%를 마나로 전환합니다. (전쟁정령 고유 능력)',
   'hudChrome.continentMap.title': '세계 지도',
   'hudChrome.continentMap.summary': '세계 지도. 지역을 선택하면 해당 지도가 열립니다.',
   'hudChrome.continentMap.toWorld': '세계 지도',

@@ -2123,6 +2123,10 @@ export const hudChromeStrings = {
     disarm: 'Disarmed: cannot use weapon attacks',
     lockout: 'Spell school locked out',
     imbue: 'Weapon imbued with bonus effects',
+    galeheartWeapon:
+      'Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage',
+    elementalTrance:
+      'Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana',
     stealth: 'Concealed; movement speed reduced by {pct}%',
     formBear: 'Bruin Form: increased health and armor',
     formCat: 'Wolf Form: melee damage and energy',

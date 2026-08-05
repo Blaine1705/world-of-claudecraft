@@ -117,6 +117,7 @@ import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
+import { elementalTranceManaFromDamage } from './shaman_warspirit';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
@@ -1078,6 +1079,9 @@ export function dealDamage(
   if (source && source.kind === 'player' && source.id !== target.id) {
     const meta = ctx.players.get(source.id);
     if (meta) meta.counters.damageDealt += amount;
+    // Elemental Trance (shaman Warspirit signature): the trance returns a
+    // fifth of all damage dealt as mana. Deterministic, no rng, no events.
+    elementalTranceManaFromDamage(ctx, source, amount);
     // Talent procs listening for spell crits (deterministic, no rng draw).
     if (crit && school !== 'physical' && ability) {
       onSpellCrit(ctx, source, abilityId, target);

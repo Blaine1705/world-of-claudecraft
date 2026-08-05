@@ -237,6 +237,14 @@
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for shaman\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Primal Mastery (elemental_mastery)\nCanonical mechanic: Primal Mastery makes the next spell instant; the armed effect lasts up to 60 sec and has a 120 sec cooldown.\nSubject: Earth, flame, frost, and lightning motes converging into a rune that shatters an hourglass.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
     },
     {
+      "abilityId": "elemental_trance",
+      "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
+      "source": "Interim duplicate of elemental_mastery.webp (same accepted painted art) pending bespoke Elemental Trance art",
+      "owner": "World of ClaudeCraft",
+      "license": "project asset, rights reserved",
+      "output": "elemental_trance.webp"
+    },
+    {
       "abilityId": "chain_heal",
       "sourcePack": "woc_openai_missing_painted_icons_2026_08_01",
       "sourceFile": "tmp/imagegen/missing-painted-icons/accepted/abilities/shaman/chain_heal.png",

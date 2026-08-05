@@ -33,6 +33,8 @@ export const STONEBOUND_DAMAGE_REDUCTION = 0.1;
 export const STONEBOUND_THREAT_MULTIPLIER = 2;
 export const STONEBOUND_WARD_SMOOTH_REDUCTION = 0.1;
 export const STONEBOUND_WARD_SMOOTH_DURATION = 3;
+export const ELEMENTAL_TRANCE_ID = 'elemental_trance';
+export const ELEMENTAL_TRANCE_MANA_PCT = 0.2;
 
 const STORMSURGE_FAILURE_COUNTER = 'shaman_stormsurge_failures';
 
@@ -374,6 +376,23 @@ export function applyStoneboundWardSmoothing(
     sourceId: player.id,
     school: 'nature',
   });
+}
+
+/**
+ * Elemental Trance's mana return: while the trance buff is worn, a fifth of
+ * ALL damage the shaman deals comes back as mana. Runs on the landed amount in
+ * dealDamage's dealt-side block (beside rage-from-dealing), draws no rng and
+ * emits nothing, so the shared draw order and event stream are untouched.
+ */
+export function elementalTranceManaFromDamage(
+  ctx: SimContext,
+  source: Entity,
+  amount: number,
+): void {
+  if (amount <= 0 || source.resourceType !== 'mana') return;
+  if (!source.auras.some((aura) => aura.id === ELEMENTAL_TRANCE_ID)) return;
+  const gain = Math.max(1, Math.round(amount * ELEMENTAL_TRANCE_MANA_PCT));
+  source.resource = Math.min(source.maxResource, source.resource + gain);
 }
 
 export function clearWarspiritState(ctx: SimContext, player: Entity): void {
