@@ -6124,7 +6124,7 @@ export class GameServer {
           // client, or a hand-crafted frame) falls back to 'time', the free
           // tier, so it never charges a client that never chose a tier.
           const tier: RespecPaymentTier =
-            typeof msg.tier === 'string' && msg.tier in RESPEC_TIER_CONFIG
+            typeof msg.tier === 'string' && Object.hasOwn(RESPEC_TIER_CONFIG, msg.tier)
               ? (msg.tier as RespecPaymentTier)
               : 'time';
           sim.setTownFocus(allocation, tier, pid);

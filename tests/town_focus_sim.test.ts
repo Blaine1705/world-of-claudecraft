@@ -491,6 +491,21 @@ describe('the server forwards and validates the set_town_focus payment tier (#11
     dispatch(server, session, { allocation: { hide: 4 }, tier: 7 });
     expect(spy).toHaveBeenCalledWith({ hide: 4 }, 'time', session.pid);
   });
+
+  // Review finding: `msg.tier in RESPEC_TIER_CONFIG` accepts inherited
+  // Object.prototype properties (`toString`, `constructor`, `__proto__`), so
+  // a crafted frame naming one would have passed the `in` check and reached
+  // `computeRespecCost` with an undefined config row (NaN cost), instead of
+  // falling back to the free 'time' tier like any other malformed tier.
+  it('falls back to the free time tier for an inherited Object.prototype key', () => {
+    const { server, session } = joinedServer();
+    const spy = vi.spyOn(server.sim, 'setTownFocus').mockImplementation(() => {});
+    for (const tier of ['toString', 'constructor', '__proto__', 'hasOwnProperty']) {
+      spy.mockClear();
+      dispatch(server, session, { allocation: { hide: 4 }, tier });
+      expect(spy).toHaveBeenCalledWith({ hide: 4 }, 'time', session.pid);
+    }
+  });
 });
 
 // #1144: the re-spec cost model, wired end to end through the real Sim
