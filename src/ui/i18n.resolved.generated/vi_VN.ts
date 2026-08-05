@@ -2736,6 +2736,8 @@ export const vi_VN: EnTranslations = {
       "masterworkToast": "Tuyệt tác! {name}",
       "masterworkZoneLine": "{crafter} đã tạo ra một kiệt tác {name}!",
       "tierUpToast": "{craft} đã thăng cấp lên cấp {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Đôi bàn tay của bạn đang nghiêng về {archetype}. Sự thụ ngộ của nó đang chờ với {master}.",
       "trendNudgeNoMaster": "Đôi bàn tay của bạn đang nghiêng về {archetype}. Hãy tìm kiếm một bậc thầy thủ công để theo đuổi nó.",
       "attunedZoneLine": "{name} đã thụ ngộ là {archetype}!",

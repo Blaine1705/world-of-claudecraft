@@ -10,6 +10,8 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -46,6 +48,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "es_ES": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -82,6 +86,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "fr_FR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -118,6 +124,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "fr_CA": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -155,6 +163,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -191,6 +201,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "de_DE": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -243,6 +255,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.progressText"
   ],
   "pt_BR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -283,6 +297,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.progressText"
   ],
   "cs_CZ": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -319,6 +335,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "nl_NL": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -355,6 +373,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "pl_PL": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -391,6 +411,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "id_ID": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -427,6 +449,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "tr_TR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -463,6 +487,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "sv_SE": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -499,6 +525,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "vi_VN": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
@@ -535,6 +563,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.unlockToast"
   ],
   "da_DK": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",

@@ -2736,6 +2736,8 @@ export const pt_BR: EnTranslations = {
       "masterworkToast": "Obra-prima! {name}",
       "masterworkZoneLine": "{crafter} criou uma obra-prima {name}!",
       "tierUpToast": "{craft} avançou para o nível {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Suas mãos estão se inclinando para {archetype}. Sua sintonização aguarda com {master}.",
       "trendNudgeNoMaster": "Suas mãos estão se inclinando para {archetype}. Procure um mestre de ofício para assumir.",
       "attunedZoneLine": "{name} se sintonizou como {archetype}!",

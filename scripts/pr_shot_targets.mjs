@@ -173,6 +173,87 @@ async function stubDesktopUpdateBridge(page) {
 
 export const TARGETS = [
   {
+    key: 'skill-milestone-plate',
+    label: 'Banner: gathering skill milestone plate (#2934)',
+    when: ['ui/skill_level_toast_view'],
+    // Drives the REAL observation path: the handleEvents tail baselines the
+    // live meta proficiency on one drain, then a later mutation crosses 25 (a
+    // milestone, safely below the 100/200 deed bands so no deed plate
+    // contends for the slot) and the copper plate paints through the live
+    // 20 Hz drain with its crest, fade, and chime. On a base build without
+    // the feature nothing paints and the shot falls back to the whole HUD,
+    // which is the honest BEFORE frame.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // The camera choice, tutorial prompt, and GPU notice each appear on
+      // their own schedule after entry, so sweep the dismissals through the
+      // settle window instead of clicking once. The window also lets the
+      // zone-entry banner clear: a live ambient banner would hold the slot
+      // and queue the celebration plate past the shot.
+      for (let i = 0; i < 12; i++) {
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+        });
+        await wait(500);
+      }
+      // The offline world can lag the page's load event by several seconds on
+      // a cold transform cache, so poll for the player meta instead of
+      // failing one probe.
+      let staged = { ok: false, reason: 'player meta is unavailable' };
+      for (let i = 0; i < 20 && !staged.ok; i++) {
+        staged = await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          const meta = sim?.players?.get?.(sim?.playerId);
+          if (!meta?.gatheringProficiency)
+            return { ok: false, reason: 'player meta is unavailable' };
+          meta.gatheringProficiency.mining = 24.2;
+          return { ok: true };
+        });
+        if (!staged.ok) await wait(500);
+      }
+      if (!staged.ok) throw new Error(staged.reason);
+      // One drain observes 24.2 (a chat line, no plate), then the crossing
+      // below celebrates.
+      await wait(600);
+      const crossed = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const meta = sim?.players?.get?.(sim?.playerId);
+        if (!meta?.gatheringProficiency) return { ok: false, reason: 'world went away' };
+        meta.gatheringProficiency.mining = 25.1;
+        return { ok: true };
+      });
+      if (!crossed.ok) throw new Error(crossed.reason);
+      // Poll for the SKILL plate at full opacity and shoot immediately: the
+      // class check keeps a live ambient banner (the Ravenpost mail line has
+      // raced this shot) from satisfying the poll while the celebration sits
+      // queued behind it, and the generous window covers that queued case
+      // (ambient hold plus advance gap plus the 1.2s fade). On a base build
+      // without the feature the poll exhausts and the frame is the honest
+      // BEFORE. Whole HUD, not a tight '#banner' crop: the plate reads in
+      // context and the BEFORE frame keeps identical framing.
+      for (let i = 0; i < 60; i++) {
+        const visible = await page.evaluate(() => {
+          // Overlays keep their own schedules (the tutorial re-prompts), so
+          // keep dismissing right up to the shot.
+          document.querySelector('.camera-prompt-confirm')?.click();
+          document.querySelector('.tut-skip')?.click();
+          document.querySelector('.gpu-notice-dismiss')?.click();
+          const el = document.querySelector('#banner');
+          return (
+            el !== null &&
+            el.classList.contains('banner-skill') &&
+            Number(getComputedStyle(el).opacity) > 0.95
+          );
+        });
+        if (visible) break;
+        await wait(100);
+      }
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'longbuff-vfx',
     label: 'Long-worn buff read: buffed character idle past the cast moment',
     when: ['render/ability_vfx'],

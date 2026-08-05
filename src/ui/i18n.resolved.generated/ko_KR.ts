@@ -2736,6 +2736,8 @@ export const ko_KR: EnTranslations = {
       "masterworkToast": "걸작! {name}",
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
       "tierUpToast": "{craft} 티어 {tier} 달성!",
+      "skillUpToast": "{skill} 기술 {level} 달성!",
+      "skillUpSubtext": "기술 {level} 달성!",
       "trendNudge": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 조율 임무는 {master}에게 있습니다.",
       "trendNudgeNoMaster": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 길을 택하려면 공예 명인을 찾으세요.",
       "attunedZoneLine": "{name}님이 {archetype}(으)로 조율했습니다!",

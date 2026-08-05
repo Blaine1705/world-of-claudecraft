@@ -2736,6 +2736,8 @@ export const tr_TR: EnTranslations = {
       "masterworkToast": "Şaheser! {name}",
       "masterworkZoneLine": "{crafter} bir şaheser {name} yarattı!",
       "tierUpToast": "{craft}, {tier} seviyesine yükseldi!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Elleriniz {archetype} yönüne eğiliyor. Uyumu {master} ile bekliyor.",
       "trendNudgeNoMaster": "Elleriniz {archetype} yönüne eğiliyor. Onu benimsemek için bir zanaat ustası arayın.",
       "attunedZoneLine": "{name}, {archetype} olarak uyumlandı!",
