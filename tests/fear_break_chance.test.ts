@@ -100,7 +100,9 @@ describe('G5: damage-scaled fear break', () => {
     // Seed hunted (post-merge camp order) so the level-14-vs-20 Harrow cast
     // is not resisted: the fear must actually land for the aura assertions.
     // Re-hunted (1 -> 3) after the Eastbrook camp respacing thinned the zone-1
-    // camp counts. Spares on record: 4, 7.
+    // camp counts, then (3 -> 1) after the Galecrest quest camps (#2887) and
+    // the Reliquary branch's own world-gen draws shifted the stream again.
+    // No spares on record for the current stream (the old 4, 7 predate it).
     const sim = new Sim({ seed: 1, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(14);
     const mob = addTarget(sim, 3);

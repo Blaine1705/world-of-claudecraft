@@ -20,9 +20,12 @@
 // respacing merged into this branch (3 to 60, 14 to 991, 22 to 12, 23 to
 // 15303, 30 to 785, 122 to 492), then again after the zones 1-3 quest-dedupe
 // content pass (60 to 39, 991 to 2167, 12 to 30, 15303 to 14107, 785 to 3066,
-// and the shared mire_prowler seed 104 to 211): any content add shifts the
-// camp-driven world-gen draw sequence, and with it every seed's stream and
-// the recorded rolls. Each replacement reproduces its slot's ORIGINAL roll
+// and the shared mire_prowler seed 104 to 211), then a third time after the
+// Galecrest quest camps (#2887) plus the Reliquary branch's world-gen draws
+// (39 to 24, 2167 to 464, 14107 to 50, 3066 to 10, 30 to 21, and mire_prowler
+// 211 to 277): any content add shifts the camp-driven world-gen draw
+// sequence, and with it every seed's stream and the recorded rolls. Each
+// replacement reproduces its slot's ORIGINAL roll
 // exactly, quantity and rarity and kind, so every `yields` literal below is
 // unchanged: the seeds moved and nothing else did. Seed 5, whose arms pin only
 // loot-flag counts, needed no re-hunt either time. The three-and-four-property
@@ -292,7 +295,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
   });
 
   it('all three kinds can ride one command', () => {
-    // Seed 14107 signs both wolf families: hide procs its specimen, fang signs
+    // Seed 50 signs both wolf families: hide procs its specimen, fang signs
     // itself. Proof the three arms compose rather than shadowing each other.
     const { sim, a, mob } = setup(50);
     const { results } = harvest(sim, mob.id, undefined, a);

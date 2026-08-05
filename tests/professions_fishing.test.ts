@@ -153,13 +153,16 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
   return out;
 }
 
-// The literal band-0 catch sequence at seed 2 under the LIVE loop,
-// re-recorded after the zones 1-3 quest-dedupe content pass (its new camps,
-// mobs, and items all move construction-time draws, so the v0.32.0 recording
-// no longer holds): each session consumes TWO draws, draw 2i the hidden bite
-// delay and draw 2i+1 the table walk against the band-0 Vale rows (trout 46 /
-// perch 31 / weed 12 / koi 1 / null 10). Any accidental extra draw,
-// band-boundary change, or band-0 table drift breaks this pin.
+// The literal band-0 catch sequence at seed 2 under the LIVE loop: each
+// session consumes TWO draws, draw 2i the hidden bite delay and draw 2i+1 the
+// table walk against the band-0 Vale rows (trout 46 / perch 31 / weed 12 /
+// koi 1 / null 10). Any accidental extra draw, band-boundary change, or
+// band-0 table drift breaks this pin.
+//
+// The seed moved 467 to 2 after the Galecrest quest-camp pass (#2887) plus
+// the Reliquary branch's world-gen draws shifted the construction-time
+// stream (previously re-recorded for the zones 1-3 quest-dedupe pass); seed
+// 2 was hunted so all three band walks still differ within the recording.
 const B0_SEQ_2: (string | null)[] = [
   TROUT,
   TROUT,
@@ -195,15 +198,13 @@ const B0_SEQ_2: (string | null)[] = [
 
 // The literal band-1 live-loop sequence for the SAME seed with fishing
 // proficiency 150 (band-1 Vale weights trout 49 / perch 32 / weed 8 / koi 3 /
-// null 8). It first diverges from B0_SEQ_2 at index 13 (trout where band 0
-// draws a perch: the trout row rises 46 to 49 across that band step), again
-// at 15 (perch, not band 0's tangled weed: the junk de-weighting) and at 24,
-// so matching the full 30-cast walk proves the live path actually switched
-// tables; index 1 is the hunted band DISCRIMINATOR against band 2 (the
-// tangled weed here, the perch there: the junk row falls 8 to 4 across that
-// step). The divergence is asserted rather than described: see the
-// discriminator pin below, which fails if the walks ever collapse onto each
-// other. Re-recorded after the zones 1-3 quest-dedupe content pass.
+// null 8). It diverges from B0_SEQ_2 at index 3 (trout where band 0 draws a
+// perch: the trout row rises 46 to 49 across that band step), so matching
+// the full 30-cast walk proves the live path actually switched tables;
+// index 2 is the hunted band DISCRIMINATOR against band 2 (the tangled weed
+// here, the perch there: the junk row falls 8 to 4 across that step). The
+// divergence is asserted rather than described: see the divergence-set pin
+// below, which holds every index named here to the recording.
 const B1_SEQ_2: (string | null)[] = [
   TROUT,
   TROUT,
@@ -240,13 +241,13 @@ const B1_SEQ_2: (string | null)[] = [
 // The literal band-2 live-loop sequence for the SAME seed with fishing
 // proficiency 200 (band-2 Vale weights trout 50 / perch 34 / weed 4 / koi 6 /
 // null 6) against the same interleaved stream. It diverges, decisively, from
-// BOTH the band-0 and band-1 walks at index 1: that table draw lands where
+// BOTH the band-0 and band-1 walks at index 2: that table draw lands where
 // the lower bands yield tangled weed but band 2 yields the perch (the junk
 // row falls to 4 and the perch span widens across the band step, the hunted
 // divergence cell under the two-draw stream), so matching this sequence
 // proves the live path resolved FISHING_TABLES_BY_BAND[2], not a band-1
 // collapse (the top-band wiring was previously unpinned on the live path).
-// Re-recorded after the zones 1-3 quest-dedupe content pass.
+// Re-recorded at seed 2 with the Galecrest plus Reliquary stream shift.
 const B2_SEQ_2: (string | null)[] = [
   TROUT,
   TROUT,
@@ -972,9 +973,8 @@ describe('fishing band selection liveness (pin 6)', () => {
     // rod-independent given the band.
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // B1_SEQ_2 first diverges from B0_SEQ_2 at index 13 for the same rng
-    // stream, so this full-walk match proves the live path actually switched
-    // tables.
+    // B1_SEQ_2 diverges from B0_SEQ_2 at index 3 for the same rng stream,
+    // so this full-walk match proves the live path actually switched tables.
     expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_2);
   });
 
@@ -985,7 +985,7 @@ describe('fishing band selection liveness (pin 6)', () => {
     // Band 2 needs the tier-3 rod (band b requires tool tier b + 1).
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Index 1 is the hunted band-discriminating cell (the perch here, where
+    // Index 2 is the hunted band-discriminating cell (the perch here, where
     // the band-1 table yields tangled weed; see the B2_SEQ_2 derivation
     // comment), so this match proves the live path resolved the TOP band, not
     // a band-1 collapse.
@@ -1010,8 +1010,8 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // arm's intent, unchanged.
     sim.addItem('simple_fishing_pole', 1);
     teleportToValeShore(sim);
-    // B0 and B1 diverge at indices 13, 15, and 24 on this stream, so the
-    // full 30-session walk is decisive: band-1 proficiency without a rod
+    // B0 and B1 diverge at index 3 on this stream, so the full 30-session
+    // walk is decisive: band-1 proficiency without a rod
     // still walks the SHIPPED band-0 table, and nothing else changes (no
     // error, no event).
     expect(catchSequenceLive(sim, meta, 30)).toEqual(B0_SEQ_2);
@@ -1023,11 +1023,11 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     meta.gatheringProficiency.fishing = 250;
     sim.addItem('ironreel_fishing_rod', 1);
     teleportToValeShore(sim);
-    // Indices 13, 15, and 24 (trout and perch, not band 0's perch and weed)
-    // prove the walk left band 0; index 1 is the hunted band DISCRIMINATOR:
-    // that table draw lands where band 2 yields the perch but band 1 yields
-    // tangled weed (the B2_SEQ_2 derivation comment), so that cell proves
-    // the tier-2 rod held the walk at band 1 despite band-2 proficiency.
+    // Index 3 (trout, not band 0's perch) proves the walk left band 0;
+    // index 2 is the hunted band DISCRIMINATOR: that table draw lands where
+    // band 2 yields the perch but band 1 yields tangled weed (the B2_SEQ_2
+    // derivation comment), so that cell proves the tier-2 rod held the walk
+    // at band 1 despite band-2 proficiency.
     expect(catchSequenceLive(sim, meta, 30)).toEqual(B1_SEQ_2);
   });
 
@@ -1048,8 +1048,8 @@ describe('fishing band tool cap (Professions 2.0)', () => {
     // allowedBand): a fresh buyer of the 150c rod cannot fish the band-2
     // table. Every other cap test binds the rod arm or the equal case, so
     // this is the only guard against the min() collapsing to allowedBand
-    // alone. B0 diverges from B2 at index 1 (the tangled weed vs the perch),
-    // so 12 sessions are decisive.
+    // alone. B0 diverges from B2 at index 2 (the tangled weed vs the perch)
+    // and again at 3, so 12 sessions are decisive.
     sim.addItem('silverstream_fishing_rod', 1);
     teleportToValeShore(sim);
     expect(catchSequenceLive(sim, meta, 12)).toEqual(B0_SEQ_2.slice(0, 12));

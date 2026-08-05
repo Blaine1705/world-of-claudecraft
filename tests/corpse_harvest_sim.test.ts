@@ -439,7 +439,9 @@ describe('signed Pristine specimens (#1145)', () => {
     // grant is more than a single unit (harvestTierQuantity(tier), #1142).
     // Quantity re-recorded after the Eastbrook camp respacing (2 to 3), then
     // again after the zones 1-3 quest-dedupe content pass shifted the shared
-    // stream (back to 2); the below-rare property held both times.
+    // stream (back to 2), then to 4 after the Galecrest quest-camp pass
+    // (#2887) shifted it once more; the below-rare property held every time,
+    // so the seed itself never had to move.
     expect(sim.countItem('rough_hide', a)).toBe(4);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
   });
