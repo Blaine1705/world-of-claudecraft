@@ -616,10 +616,6 @@
     justify-content: flex-start;
     z-index: 6;
   }
-  #player-frame.pf-detached .uf-bars {
-    flex: none;
-    width: 190px;
-  }
   /* Pet cluster: ONE row above the player frame holding the pet command bar on the
      left and the pet's health frame on the right. Stacking the two as separate rows
      spent about 52px of vertical space on what is one subject, and left the health
