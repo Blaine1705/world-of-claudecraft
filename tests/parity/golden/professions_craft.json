@@ -449,7 +449,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "7f47903a",
+      "state": "70ba48e7",
       "events": "247eea32",
       "rng": {
         "draws": 2,
@@ -504,6 +504,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},
@@ -667,7 +671,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "be1e1d47",
+      "state": "2e1cff9e",
       "events": "1c2f4eb7",
       "rng": {
         "draws": 3,
@@ -722,6 +726,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},
@@ -883,7 +891,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e8b58ae5",
+      "state": "abf7b62c",
       "events": "cff806af",
       "rng": {
         "draws": 3,
@@ -938,6 +946,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},
@@ -1116,7 +1128,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e8b58ae5",
+      "state": "abf7b62c",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1171,6 +1183,10 @@
               "spider_leg",
               "spool_of_thread",
               "worn_sword"
+            ],
+            "visited": [
+              "masterwork:first",
+              "masterwork:tailoring"
             ]
           },
           "delveClears": {},

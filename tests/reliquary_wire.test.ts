@@ -220,6 +220,32 @@ describe('Reliquary wire thrift', () => {
     expect(ev.message).toBeUndefined();
     expect(ev.text).toBeUndefined();
   });
+
+  it('a retro fill keeps its retro flag all the way to the client frame', () => {
+    const server = new GameServer();
+    const fw = fakeWs();
+    const session = joinAt(server, fw, 7, 'RelicG');
+    const sim = server.sim as Sim;
+    const meta = sim.players.get(session.pid)!;
+
+    sim.drainEvents();
+    fw.sent.length = 0;
+    // The join seed's own call shape (deeds.ts seedItemDiscovery). Online, the
+    // flag is the client's only signal to collapse a veteran's catch-up into
+    // one summary line; if it were dropped anywhere between the sim and the
+    // routed frame, that login would toast once per seeded relic.
+    markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC, undefined, { retro: true });
+    const events = sim.drainEvents();
+    routeEvents(server, events);
+    (server as any).broadcastSnapshots();
+
+    const unlocks = lastEvents(fw.sent).filter((e) => e.type === 'reliquaryUnlock');
+    expect(unlocks.length).toBe(1);
+    expect(unlocks[0].retro).toBe(true);
+    expect(unlocks[0].itemId).toBe(CATALOGUE_RELIC);
+    // Silent on the state side too: logging in is not a find moment.
+    expect(meta.reliquary.recent).toEqual([]);
+  });
 });
 
 describe('Reliquary online / offline parity for scripted state', () => {

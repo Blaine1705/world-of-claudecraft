@@ -848,6 +848,60 @@ describe('buildReliquaryUnlockPlan', () => {
     expect(plan.motion).toBe(false);
     expect(plan.curatorRank).toBe(3);
   });
+
+  it('counts retro fills into the summary and gives them nothing else', () => {
+    // The on-join seed: dozens of fills at once. They are counted and that is
+    // all, exactly like the Book of Deeds retro pass.
+    const plan = buildReliquaryUnlockPlan(
+      [
+        { itemId: 'a', retro: true },
+        { markId: 'mw_a', retro: true },
+      ],
+      false,
+    );
+    expect(plan.retroCount).toBe(2);
+    expect(plan.logs).toEqual([]);
+    expect(plan.banner).toBeNull();
+    expect(plan.playSound).toBe(false);
+    expect(plan.motion).toBe(false);
+    expect(plan.refreshWindow).toBe(false);
+  });
+
+  it('never lets a retro fill claim Illumination, rank-up, or the banner from a live find', () => {
+    // A retro event carrying illuminatedPageId / curatorRank must not steal a
+    // slot: only the live find in the same drain gets presentation.
+    const plan = buildReliquaryUnlockPlan(
+      [
+        { itemId: 'seeded', illuminatedPageId: 'crypt_n', curatorRank: 4, retro: true },
+        { itemId: 'live' },
+      ],
+      false,
+    );
+    expect(plan.retroCount).toBe(1);
+    expect(plan.logs).toEqual([{ kind: 'item', id: 'live' }]);
+    expect(plan.banner).toEqual({ kind: 'unlock', relic: { kind: 'item', id: 'live' } });
+    expect(plan.illuminatedPageId).toBeNull();
+    expect(plan.curatorRank).toBeNull();
+    // The live find still owns sound, motion, and the window rebuild.
+    expect(plan.playSound).toBe(true);
+    expect(plan.motion).toBe(true);
+    expect(plan.refreshWindow).toBe(true);
+  });
+
+  it('leaves retroCount at zero for a drain of live finds', () => {
+    const plan = buildReliquaryUnlockPlan([{ itemId: 'a' }, { markId: 'mw_a' }], false);
+    expect(plan.retroCount).toBe(0);
+    expect(plan.logs).toHaveLength(2);
+  });
+
+  it('drops an empty retro payload before it can be counted', () => {
+    // Intent pin: the neither-itemId-nor-markId skip (content drift, an empty
+    // wire payload) happens AHEAD of the retro branch, so such an event never
+    // inflates the catch-up line with a relic the client could not name.
+    const plan = buildReliquaryUnlockPlan([{ retro: true }, { itemId: 'a', retro: true }], false);
+    expect(plan.retroCount).toBe(1);
+    expect(plan.logs).toEqual([]);
+  });
 });
 
 describe('reliquaryRefreshSig', () => {

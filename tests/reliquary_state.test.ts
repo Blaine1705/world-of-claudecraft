@@ -29,6 +29,8 @@ import {
   noteReliquaryMark,
   onItemDiscovered,
   pageCompletion,
+  RELIQUARY_ITEM_TO_PAGES,
+  RELIQUARY_PAGES_BY_ID,
   RELIQUARY_RECENT_CAP,
   reliquaryOwnershipOpts,
   restoreReliquaryState,
@@ -272,18 +274,27 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(m2.reliquary.recent).toEqual([FIELD_NOTE]);
   });
 
-  it('syncReliquaryMarksFromVisited retro-fills field notes only (no masterwork invent)', () => {
+  it('syncReliquaryMarksFromVisited retro-fills every catalog mark on the visit ledger', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
     meta.deedStats.visited.add(FIELD_NOTE);
     meta.deedStats.visited.add('gather_event:moonlit_bloom');
+    // Masterwork marks now retro-fill too: the live proc arm in crafting.ts
+    // stamps the visit ledger beside the mark, so the visit is PROOF the proc
+    // happened. A sparse blob that lost the mark heals from that history
+    // instead of stranding a lifetime trophy; nothing is invented, because
+    // only a real proc ever writes the visit.
+    meta.deedStats.visited.add(MASTERWORK_FIRST);
+    meta.deedStats.visited.add('masterwork:weaponcrafting');
     meta.deedStats.visited.add('gather:eastbrook:ore'); // not a Reliquary mark
-    // Visited alone does not invent masterwork lifetime history.
     const added = syncReliquaryMarksFromVisited(meta);
-    expect(added).toBe(2);
+    expect(added).toBe(4);
     expect(meta.reliquary.marks.has(FIELD_NOTE)).toBe(true);
     expect(meta.reliquary.marks.has('gather_event:moonlit_bloom')).toBe(true);
-    expect(meta.reliquary.marks.has(MASTERWORK_FIRST)).toBe(false);
+    expect(meta.reliquary.marks.has(MASTERWORK_FIRST)).toBe(true);
+    expect(meta.reliquary.marks.has('masterwork:weaponcrafting')).toBe(true);
+    // A visited id outside the catalog is still refused.
+    expect(meta.reliquary.marks.has('gather:eastbrook:ore')).toBe(false);
     expect(meta.reliquary.recent).toEqual([]); // silent retro, no recent push
     // Idempotent.
     expect(syncReliquaryMarksFromVisited(meta)).toBe(0);
@@ -517,17 +528,6 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(mTitle.renown).toBe(renownBeforeTitle + (DEEDS.prog_veteran.renown ?? 0));
   });
 
-  it('join retroFallbackGrants wires silent mark sync before curator rank', () => {
-    const deedsSrc = fs.readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8');
-    const retroArm = deedsSrc.slice(deedsSrc.indexOf('export function retroFallbackGrants'));
-    expect(retroArm).toContain('syncReliquaryMarksFromVisited');
-    expect(retroArm).toContain('syncCuratorRankDeeds');
-    // Mark sync must run before rank deeds so field-note fills can rank up.
-    expect(retroArm.indexOf('syncReliquaryMarksFromVisited')).toBeLessThan(
-      retroArm.indexOf('syncCuratorRankDeeds'),
-    );
-  });
-
   it('craft and gather call sites note catalog marks only (source pins)', () => {
     const craftSrc = fs.readFileSync(
       path.join(__dirname, '../src/sim/professions/crafting.ts'),
@@ -535,11 +535,14 @@ describe('Reliquary profession marks (Phase 7)', () => {
     );
     // Marks must sit on the live masterwork success arm (applyCraftSuccessHooks
     // after craft-cast), not a cold path. meta is the cast-complete hook param
-    // (was r.meta when craftItem still resolved instantly).
+    // (was r.meta when craftItem still resolved instantly). The visit write
+    // rides beside each mark (the gather_events and interaction arms below use
+    // the same idiom): the per-craft one is CATALOG-GATED, since a craft with
+    // no authored mark must not write ledger noise nothing can read back.
     const masterworkArm = craftSrc.match(
-      /if \(result\.masterwork\) \{[\s\S]*?noteReliquaryMark\(ctx, meta, 'masterwork:first'\);[\s\S]*?noteReliquaryMark\(ctx, meta, `masterwork:\$\{craftId\}`\);[\s\S]*?\}/,
+      /if \(result\.masterwork\) \{[\s\S]*?ctx\.markVisited\(meta, 'masterwork:first'\);[\s\S]*?noteReliquaryMark\(ctx, meta, 'masterwork:first'\);[\s\S]*?const markId = `masterwork:\$\{craftId\}`;[\s\S]*?if \(isCataloguedRelicMark\(markId\)\) ctx\.markVisited\(meta, markId\);[\s\S]*?noteReliquaryMark\(ctx, meta, markId\);[\s\S]*?\}/,
     );
-    expect(masterworkArm, 'masterwork arm notes first + per-craft marks').toBeTruthy();
+    expect(masterworkArm, 'masterwork arm visits + notes first and per-craft marks').toBeTruthy();
     expect(craftSrc).toContain('noteReliquaryMark');
     expect(craftSrc).toContain('masterwork:first');
     expect(craftSrc).toContain('masterwork:${craftId}');
@@ -597,6 +600,69 @@ describe('Reliquary recent ring cap', () => {
     expect(meta.reliquary.recent[0]).toBe('synth_5');
     expect(meta.reliquary.recent[RELIQUARY_RECENT_CAP - 1]).toBe(
       `synth_${RELIQUARY_RECENT_CAP + 4}`,
+    );
+  });
+
+  // The ring pushes at the tail and drops the head, so index 0 is the OLDEST
+  // entry. A refresh guard written against index 0 refuses to move the oldest
+  // id and instead leaves the ring in an order the window then paints wrong.
+  it('re-noting refreshes mid-ring AND oldest entries, and leaves the newest alone', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ].slice(0, 3);
+    const [a, b, c] = ids;
+    // noteRelicItemFind is the public write seam; it short-circuits on an
+    // existing firstFind entry, so a re-find clears that entry first (the
+    // sibling cap test above drives the ring the same way).
+    const reNote = (id: string) => {
+      delete meta.reliquary.firstFind[id];
+      noteRelicItemFind(meta, id);
+    };
+    for (const id of ids) noteRelicItemFind(meta, id);
+    expect(meta.reliquary.recent).toEqual([a, b, c]);
+
+    reNote(b); // mid-ring
+    expect(meta.reliquary.recent).toEqual([a, c, b]);
+
+    reNote(a); // the OLDEST entry: the index-0 guard used to drop this move
+    expect(meta.reliquary.recent).toEqual([c, b, a]);
+
+    reNote(a); // already newest: nothing moves
+    expect(meta.reliquary.recent).toEqual([c, b, a]);
+  });
+
+  it('restore de-dupes the recent ring on pushRecent semantics (last wins, newest survive)', () => {
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ];
+    const [a, b, c] = ids;
+    // A blob that repeats an id must not burn two of the twelve slots: the
+    // live ring holds each id exactly once. Which occurrence survives is not
+    // a free choice: pushRecent moves a repeat to the TAIL, so the LAST
+    // occurrence is the one that carries the id's real recency.
+    expect(restoreReliquaryState({ recent: [a, b, a, c, b] }).recent).toEqual([a, c, b]);
+
+    // Over the cap, the NEWEST survivors are kept (the head is the oldest end,
+    // exactly what pushRecent's shift drops). Interleaved duplicates so the
+    // de-dupe and the truncation are both load-bearing: a first-occurrence
+    // de-dupe would keep the same set but a head-side cut would return
+    // many.slice(0, CAP) instead.
+    const many = ids.slice(0, RELIQUARY_RECENT_CAP + 4);
+    expect(many.length, 'the catalog must supply more item ids than the cap').toBe(
+      RELIQUARY_RECENT_CAP + 4,
+    );
+    expect(restoreReliquaryState({ recent: many.flatMap((id) => [id, id]) }).recent).toEqual(
+      many.slice(-RELIQUARY_RECENT_CAP),
     );
   });
 });
@@ -692,7 +758,9 @@ describe('Reliquary pure completion + curator rank', () => {
     markItemDiscovered(sim.ctx, meta, catalogIds[9]!);
     const events = sim.drainEvents();
     const unlocks = events.filter((e) => e.type === 'reliquaryUnlock');
-    expect(unlocks.length).toBeGreaterThanOrEqual(1);
+    // Exactly one: emitReliquaryUnlock fires once per fill, and the rank-up
+    // rides the same event via curatorRank rather than a second emit.
+    expect(unlocks.length).toBe(1);
     const rankUp = unlocks.find((e) => e.type === 'reliquaryUnlock' && e.curatorRank === 2);
     expect(rankUp).toBeTruthy();
     expect(rankUp && 'curatorRank' in rankUp && rankUp.curatorRank).toBe(2);
@@ -773,15 +841,6 @@ describe('Reliquary pure completion + curator rank', () => {
       0,
     );
     expect(sim.reliquaryCuratorRank()).toBe(0);
-  });
-
-  it('join retroFallbackGrants wires syncCuratorRankDeeds for veterans', () => {
-    // Source-guard: removing the join call strands veterans who already own
-    // enough catalog fills without a live rank-up path. Mirrors prog_guildsworn.
-    const deedsSrc = fs.readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8');
-    const retroArm = deedsSrc.slice(deedsSrc.indexOf('export function retroFallbackGrants'));
-    expect(retroArm).toContain('syncCuratorRankDeeds');
-    expect(retroArm).toContain('{ retro: true }');
   });
 
   it('veteran retro sync grants all zero-Renown rank bridges up to owned count', () => {
@@ -867,5 +926,221 @@ describe('Reliquary determinism', () => {
     // No wall-clock or Math.random in the path: two runs stay bit-equal.
     expect(a.first).toContain(CATALOGUE_RELIC);
     expect(a.recent).toEqual([CATALOGUE_RELIC]);
+  });
+});
+
+// The join seed drives real Sim.addPlayer with a veteran-shaped save: relics
+// HELD in bags and bank, discovery ledger predating them. Behavioral on
+// purpose, replacing the two source scrapes that only proved retroFallbackGrants
+// mentioned the right function names.
+describe('Reliquary join seed is silent, flagged, and provenance-honest', () => {
+  const catalogItemIds = [
+    ...new Set(
+      RELIQUARY_PAGES.flatMap((p) =>
+        p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+      ),
+    ),
+  ];
+  // Twelve fills clear the rank-2 threshold, so the join also has to produce
+  // rank-bridge deeds; without that the retro deed assertion would be vacuous.
+  const SEEDED = catalogItemIds.slice(0, 12);
+
+  /** A real save, then desynced the way a pre-rollout character reads. */
+  function veteranState(): CharacterState {
+    const donor = makeSim();
+    const state = donor.serializeCharacter(donor.playerId)!;
+    return {
+      ...state,
+      inventory: SEEDED.slice(0, 8).map((itemId) => ({ itemId, count: 1 })),
+      bank: {
+        inventory: SEEDED.slice(8).map((itemId) => ({ itemId, count: 1 })),
+        purchasedSlots: 0,
+        bonusSlots: 0,
+      },
+      // The whole point of the fixture: the ledger has not heard of them.
+      deedStats: undefined,
+      reliquary: undefined,
+    };
+  }
+
+  it('seeds held relics with retro events, an untouched recent ring, and no invented clears', () => {
+    const sim = makeSim();
+    sim.drainEvents(); // discard the host sim's own join events
+    const pid = sim.addPlayer('warrior', 'Veteran', { state: veteranState() });
+    const meta = sim.players.get(pid)!;
+    const events = sim.drainEvents().filter((e) => e.pid === pid);
+
+    const unlocks = events.filter((e) => e.type === 'reliquaryUnlock');
+    // Exact, not a floor: the seed fires once per held relic and the base
+    // character contributes no catalogued relic of its own, so a stray extra
+    // unlock (a double-walk of a container, say) has to red here.
+    expect(unlocks.length).toBe(SEEDED.length);
+    for (const ev of unlocks) {
+      expect(ev.type === 'reliquaryUnlock' && ev.retro).toBe(true);
+    }
+    const rankBridges = events.filter(
+      (e) => e.type === 'deedUnlocked' && e.deedId.startsWith('col_reliquary_rank_'),
+    );
+    // Twelve fills reach rank 2 and no further, and rank 1 has no bridge deed,
+    // so exactly one bridge is correct; more would mean a threshold moved.
+    expect(rankBridges.length).toBe(1);
+    for (const ev of rankBridges) {
+      expect(ev.type === 'deedUnlocked' && ev.retro).toBe(true);
+    }
+
+    // Silent: logging in is not a find moment.
+    expect(meta.reliquary.recent).toEqual([]);
+    // Provenance is never fabricated: today's clear count is not the count at
+    // the real first obtain, so the key is absent entirely (not zero).
+    const seededEntries = Object.entries(meta.reliquary.firstFind);
+    expect(seededEntries.length).toBe(SEEDED.length);
+    for (const [itemId, entry] of seededEntries) {
+      expect(Object.hasOwn(entry, 'clears'), `${itemId} must carry no clears`).toBe(false);
+    }
+    // The serialized blob stays honest too (no clears key round-trips out).
+    // Count first: an empty firstFind would pass the loop vacuously.
+    const saved = sim.serializeCharacter(pid)!;
+    expect(Object.keys(saved.reliquary?.firstFind ?? {}).length).toBe(SEEDED.length);
+    for (const [itemId, entry] of Object.entries(saved.reliquary?.firstFind ?? {})) {
+      // hasOwn, not toBeUndefined: an explicit `clears: undefined` key would
+      // survive the round trip and still read as undefined.
+      expect(Object.hasOwn(entry, 'clears'), `saved ${itemId} must carry no clears`).toBe(false);
+    }
+    // And the full round trip: reload the save into a fresh sim and prove the
+    // sparse entries stay sparse (restore must not synthesize a clears key).
+    // The ledger already holds the ids, so the reload seeds nothing new.
+    const reloaded = new Sim({ seed: 43, playerClass: 'warrior', autoEquip: false });
+    const rid = reloaded.addPlayer('warrior', 'reloaded', { state: saved });
+    const rentries = Object.entries(reloaded.meta(rid)!.reliquary.firstFind);
+    expect(rentries.length).toBe(SEEDED.length);
+    for (const [itemId, entry] of rentries) {
+      expect(Object.hasOwn(entry, 'clears'), `reloaded ${itemId} must carry no clears`).toBe(
+        false,
+      );
+    }
+  });
+
+  it('refills marks from the visit ledger BEFORE scoring rank, so mark fills can rank up', () => {
+    // Ordering guard with teeth: syncReliquaryMarksFromVisited has to run
+    // ahead of the rank sync, or these marks score zero and the veteran is
+    // stranded below the bridge they already earned.
+    const catalogMarks = [...RELIQUARY_MARK_IDS];
+    expect(catalogMarks.length).toBeGreaterThanOrEqual(CURATOR_RANK_DEFS[1].threshold);
+    const donor = makeSim();
+    const base = donor.serializeCharacter(donor.playerId)!;
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Fieldhand', {
+      state: { ...base, deedStats: { visited: catalogMarks }, reliquary: undefined },
+    });
+    const meta = sim.players.get(pid)!;
+
+    for (const mark of catalogMarks) expect(meta.reliquary.marks.has(mark)).toBe(true);
+    expect(meta.reliquary.recent).toEqual([]); // still silent
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    const bridge = sim
+      .drainEvents()
+      .filter((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_2');
+    expect(bridge.length).toBe(1);
+    expect(bridge[0].type === 'deedUnlocked' && bridge[0].retro).toBe(true);
+  });
+
+  it('a LIVE find after the same join toasts without retro, pushes recent, and stamps clears', () => {
+    const sim = makeSim();
+    const pid = sim.addPlayer('warrior', 'Veteran', { state: veteranState() });
+    const meta = sim.players.get(pid)!;
+    sim.drainEvents();
+    expect(meta.reliquary.recent).toEqual([]);
+
+    // A catalogued relic the seed did not cover, on a page that actually has a
+    // clear source, so the stamped-clears half of the contract is observable.
+    const liveRelic = catalogItemIds.find((id) => {
+      if (SEEDED.includes(id)) return false;
+      const pageId = RELIQUARY_ITEM_TO_PAGES.get(id)?.[0];
+      const source = pageId ? RELIQUARY_PAGES_BY_ID[pageId]?.clearSource : undefined;
+      return source !== undefined && source.kind !== 'none';
+    });
+    expect(liveRelic, 'a clear-sourced catalogued relic outside the seed').toBeDefined();
+
+    sim.addItem(liveRelic!, 1, pid);
+    const unlocks = sim
+      .drainEvents()
+      .filter((e) => e.type === 'reliquaryUnlock' && e.itemId === liveRelic);
+    expect(unlocks.length).toBe(1);
+    expect(unlocks[0].type === 'reliquaryUnlock' && unlocks[0].retro).toBeUndefined();
+    expect(meta.reliquary.recent).toEqual([liveRelic]);
+    expect(Object.hasOwn(meta.reliquary.firstFind[liveRelic!], 'clears')).toBe(true);
+  });
+
+  it('a join that only holds mount reins keeps its rank-up retro-flagged', () => {
+    // Mount reins are not catalogued item relics, so the seed takes the early
+    // mount arm (onItemDiscovered -> maybeSyncCuratorRankDeeds), which runs
+    // BEFORE retroFallbackGrants and grants first (grantDeed is idempotent).
+    // This pins the retro PASS-THROUGH on that arm: drop the opts there and
+    // the grant lands unflagged from the earlier call, reddening this test.
+    // It does not pin the arm's existence (delete the call and the later
+    // retro fallback grants the same bridge, flagged); the live mount test
+    // above owns arm liveness. The empty unlock list below proves no
+    // catalogued item arm fired on this join.
+    const marks = [...RELIQUARY_MARK_IDS].slice(0, CURATOR_RANK_DEFS[1].threshold - 1);
+    expect(marks.length).toBe(CURATOR_RANK_DEFS[1].threshold - 1);
+    const donor = makeSim();
+    const base = donor.serializeCharacter(donor.playerId)!;
+    const sim = makeSim();
+    sim.drainEvents();
+    const pid = sim.addPlayer('warrior', 'Stablehand', {
+      state: {
+        ...base,
+        inventory: [],
+        // Reins in the BANK: the seed walks it like any other container.
+        bank: {
+          inventory: [{ itemId: 'reins_valorsteed', count: 1 }],
+          purchasedSlots: 0,
+          bonusSlots: 0,
+        },
+        // Marks arrive already restored, so they plus the one mount sit at the
+        // rank-2 threshold the moment the seed reaches the bank.
+        reliquary: { marks },
+        deedStats: undefined,
+      },
+    });
+    const meta = sim.players.get(pid)!;
+    const events = sim.drainEvents().filter((e) => e.pid === pid);
+
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBeGreaterThanOrEqual(
+      CURATOR_RANK_DEFS[1].threshold,
+    );
+    // No catalogued item relic was seeded, so the item arm never synced rank.
+    expect(events.filter((e) => e.type === 'reliquaryUnlock')).toEqual([]);
+    const bridges = events.filter(
+      (e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_2',
+    );
+    expect(bridges.length).toBe(1);
+    expect(bridges[0].type === 'deedUnlocked' && bridges[0].retro).toBe(true);
+    // Mount membership stays live-seam only: no invented firstFind entry.
+    expect(meta.reliquary.firstFind.reins_valorsteed).toBeUndefined();
+  });
+
+  it('a firstFind blob ahead of the ledger stays silent but still syncs rank', () => {
+    // The desync a veteran save can carry: the sparse blob already knows these
+    // relics, itemsDiscovered does not. The unlock event is the first-find
+    // MOMENT, so it must stay silent, while the rank sync keys on the ledger
+    // add instead and still credits the threshold this discover just crossed.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const threshold = CURATOR_RANK_DEFS[1].threshold;
+    const ids = catalogItemIds.slice(0, threshold);
+    expect(ids.length).toBe(threshold);
+    for (const id of ids) {
+      expect(meta.deedStats.itemsDiscovered.has(id), `${id} must start undiscovered`).toBe(false);
+      meta.reliquary.firstFind[id] = { pageId: RELIQUARY_ITEM_TO_PAGES.get(id)?.[0] };
+    }
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(false);
+    sim.drainEvents();
+
+    for (const id of ids) markItemDiscovered(sim.ctx, meta, id);
+
+    const events = sim.drainEvents();
+    expect(events.filter((e) => e.type === 'reliquaryUnlock')).toEqual([]);
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
   });
 });

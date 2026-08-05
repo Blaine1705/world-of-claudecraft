@@ -285,6 +285,15 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toContain('reliquaryMarkFindKey');
     expect(handler).toContain("t('hudChrome.reliquary.rankUpToast'");
     expect(handler).toContain("banner.kind === 'rankUp'");
+    // On-join catch-up: one localized summary line off plan.retroCount, the
+    // deeds idiom (tests/deeds_window.test.ts pins its sibling the same way).
+    // One regex, so the guard and its body cannot drift apart: two independent
+    // toContain calls would still pass with the summary line moved outside the
+    // count check, which puts a toast per seeded relic back in a veteran's
+    // chat pane.
+    expect(handler).toMatch(
+      /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.reliquary\.retroSummary'/,
+    );
     // Shared key table (window export) so toast/banner cannot desync from Overview.
     expect(hud).toContain('curatorRankNameKey');
     // Pure-core definition (view) + re-export from the painter for existing imports.
