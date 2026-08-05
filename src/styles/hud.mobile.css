@@ -5635,7 +5635,8 @@
     /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,
-    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar {
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {
       left: calc(50% + 10px);
     }
   }

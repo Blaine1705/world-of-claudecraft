@@ -2632,8 +2632,8 @@ describe('pet cluster layout', () => {
           r !== null && /left:\s*calc\(50%/.test(r.body) && r.selector.includes('#castbar'),
       );
     // Vacuity floor: the five known column nudges must actually be found (compact,
-    // compact left-handed, their two narrow-phone variants, and the tablet tier).
-    expect(nudges.length).toBeGreaterThanOrEqual(5);
+    // compact left-handed, their two narrow-phone variants, and both tablet tiers).
+    expect(nudges.length).toBeGreaterThanOrEqual(6);
     for (const rule of nudges) {
       expect(rule.selector).toContain('#pet-frame');
     }

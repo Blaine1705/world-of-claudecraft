@@ -2660,7 +2660,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Gruppe {n}',
   'hudChrome.unitFrame.partyLabel': 'Eure Gruppe',
   'hudChrome.unitFrame.playerLabel': 'Euer Charakter',
-  'hudChrome.unitFrame.petLabel': 'Euer Begleiter',
   'hudChrome.unitFrame.targetAnnounce': 'Ziel: {name}',
   'hudChrome.unitFrame.targetLabel': 'Euer Ziel',
   'seo.officialLabel': 'Offizielle Website von World of ClaudeCraft',
@@ -8442,7 +8441,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Begleiter: Angreifen',
   'hudChrome.keybinds.petDefensive': 'Begleiter: Defensiv',
   'hudChrome.keybinds.petStop': 'Begleiter: Stopp',
-  'hudChrome.keybinds.targetPet': 'Begleiter: Anvisieren',
   'hudChrome.keybinds.petTaunt': 'Begleiter: Verspotten',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Ein Stück weniger von {item} senden',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Ein Stück mehr von {item} senden',
@@ -9258,7 +9256,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.',
   'hudChrome.options.mouseoverCast': 'Mouseover-Wirken auf Gruppenfenstern',
   'hudChrome.options.showTargetOfTarget': 'Ziel des Ziels anzeigen',
-  'hudChrome.options.showPetFrame': 'Euren Begleiter anzeigen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Ziel des Ziels',
   'itemUi.market.rarityLegendary': 'Legendär',
   'loading.reconnectingAttempt':

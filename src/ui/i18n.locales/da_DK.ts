@@ -6917,7 +6917,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Gruppe {n}',
   'hudChrome.unitFrame.partyLabel': 'Dit følge',
   'hudChrome.unitFrame.playerLabel': 'Din helt',
-  'hudChrome.unitFrame.petLabel': 'Dit kæledyr',
   'hudChrome.unitFrame.targetAnnounce': 'Markér {name}',
   'hudChrome.unitFrame.targetLabel': 'Dit mål',
   'hudChrome.widgets.clockTitle': 'Lokal tid - klik for at skifte mellem 12/24-timers',
@@ -9162,7 +9161,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Kæledyr: Angrib',
   'hudChrome.keybinds.petDefensive': 'Kæledyr: Defensiv',
   'hudChrome.keybinds.petStop': 'Kæledyr: Stop',
-  'hudChrome.keybinds.targetPet': 'Kæledyr: Sigt',
   'hudChrome.keybinds.petTaunt': 'Kæledyr: Hån',
   'hudChrome.keybinds.mount': 'Stig op / Stig af',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Send én {item} mindre',
@@ -10068,7 +10066,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': 'Din {ability} undgås af {target}.',
   'hudChrome.options.mouseoverCast': 'Museover-kast på grupperammer',
   'hudChrome.options.showTargetOfTarget': 'Vis målets mål',
-  'hudChrome.options.showPetFrame': 'Vis dit kæledyr',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets Mål',
   'itemUi.market.rarityLegendary': 'Legendarisk',
   'loading.reconnectingAttempt':
