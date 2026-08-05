@@ -44,7 +44,9 @@ function shaman(
   rows: Record<number, string> = {},
   spec: 'elemental' | 'enhancement' | 'restoration' = 'elemental',
 ): { sim: Sim; player: Entity; ally: Entity } {
-  const sim = new Sim({ seed: 2904, playerClass: 'shaman', noPlayer: true });
+  // Seed re-hunted (2904 to 2905) after the v0.34.0 catch-up merge shifted the
+  // shared draw order; an avoided shock never lands its control effect.
+  const sim = new Sim({ seed: 2905, playerClass: 'shaman', noPlayer: true });
   const pid = sim.addPlayer('shaman', 'Talent Shaman');
   const allyId = sim.addPlayer('warrior', 'Protected Ally');
   sim.setPlayerLevel(20, pid);

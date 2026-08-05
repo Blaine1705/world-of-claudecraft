@@ -437,7 +437,6 @@ export function meleeSwing(
     // weaponStrike path threads it here so per-ability crit talents reach the
     // shared hit table.
     critBonus?: number;
-    abilityId?: string;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
     // The casting ability's stable content id, threaded onto the landed-hit
@@ -561,7 +560,7 @@ export function meleeSwing(
     opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);
-  druidEngineOnLandedStrike(ctx, attacker, opts.abilityId);
+  druidEngineOnLandedStrike(ctx, attacker, opts.abilityId ?? undefined);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND
   // the weaponStrike ability path, which resolves through this shell). Gated on
   // setProcs inside applySetProcs, so proc-less players draw no rng.

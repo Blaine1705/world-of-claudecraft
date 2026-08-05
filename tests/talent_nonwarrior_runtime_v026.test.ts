@@ -109,15 +109,26 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
   });
 
   it('Borrowed Tempo makes Cutthroat Tempo free without spending banked combo points (issue #2426)', () => {
-    const sim = simWithRows('rogue', { 11: 'rog_r11_improved_slice_and_dice' });
-    const target = addTarget(sim);
+    // The v0.29 rogue rework retired rog_r11_improved_slice_and_dice (Borrowed
+    // Tempo's arming talent), so the empowerment is applied directly: the pin
+    // is the DISPATCH contract (a next_cast_free cast banks its combo points),
+    // not the arming vehicle.
+    const sim = simWithRows('rogue', {});
+    addTarget(sim);
     sim.player.resource = sim.player.maxResource;
     sim.player.comboPoints = 5;
 
-    // Every 3rd builder arms a next_cast_free empowerment scoped to slice_and_dice.
-    onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
-    onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
-    onCastCompleted(sim.ctx, sim.player, 'sinister_strike', target);
+    sim.player.auras.push({
+      id: 'rog_borrowed_tempo',
+      name: 'Borrowed Tempo',
+      kind: 'next_cast_free',
+      remaining: 8,
+      duration: 8,
+      value: 0,
+      sourceId: sim.player.id,
+      school: 'physical',
+      empowerAbilities: ['slice_and_dice'],
+    });
     expect(sim.player.auras.some((a) => a.kind === 'next_cast_free')).toBe(true);
 
     const resourceBefore = sim.player.resource;
@@ -127,8 +138,9 @@ describe('retained v0.26 non-Warrior row runtime contracts', () => {
     expect(sim.player.resource).toBe(resourceBefore); // the whole cast was free: no energy spent
     expect(sim.player.comboPoints).toBe(comboBefore); // combo points banked, not consumed
     // the finisher still applied its buff, scaled off the banked combo points
+    // (v0.29 rogue rework tuning: 12 sec base plus 4 sec per combo point)
     const haste = sim.player.auras.find((a) => a.kind === 'buff_haste');
-    expect(haste?.duration).toBeCloseTo(9 + 3 * comboBefore, 5);
+    expect(haste?.duration).toBeCloseTo(12 + 4 * comboBefore, 5);
   });
 
   it('a normal (non-empowered) Cutthroat Tempo still spends its combo points', () => {

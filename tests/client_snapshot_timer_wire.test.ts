@@ -143,7 +143,7 @@ describe('stable snapshot timer protocol', () => {
   });
 
   it('does not age persistent engine auras when stable snapshots omit them', () => {
-    const client = bareClient(1, 'shaman');
+    const client = bareClient(1, { playerClass: 'shaman' });
     apply(client, {
       tw: 2,
       time: 10,

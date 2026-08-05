@@ -2158,7 +2158,7 @@ describe('client-side delta merge', () => {
       },
     );
 
-    const client = bareClient(e.id + 1000, 'priest');
+    const client = bareClient(e.id + 1000, { playerClass: 'priest' });
     (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
     const mirrored = client.entities.get(e.id);
     if (!mirrored) throw new Error('online priest missing');

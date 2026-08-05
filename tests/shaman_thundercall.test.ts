@@ -13,7 +13,9 @@ function place(sim: Sim, entity: Entity, x: number, z: number): void {
   (sim as unknown as { rebucket(entity: Entity): void }).rebucket(entity);
 }
 
-function setup(seed = 2801): { sim: Sim; shaman: Entity; target: Entity } {
+// Default seed re-hunted (2801 to 2802) after the v0.34.0 catch-up merge shifted
+// the shared draw order; a missed Arc Bolt impact banks no charge.
+function setup(seed = 2802): { sim: Sim; shaman: Entity; target: Entity } {
   const sim = new Sim({ seed, playerClass: 'shaman', noPlayer: true });
   const pid = sim.addPlayer('shaman', 'Stormbank');
   sim.setPlayerLevel(20, pid);

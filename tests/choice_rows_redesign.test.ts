@@ -14,8 +14,13 @@ import type { Entity } from '../src/sim/types';
 // uses it, on a real Sim. Deterministic setups; every assertion is a behavior a
 // player would see.
 
-function rig(cls: 'priest' | 'shaman' | 'paladin', level: number, rows: Record<number, string>) {
-  const sim = new Sim({ seed: 11, playerClass: cls, autoEquip: true });
+function rig(
+  cls: 'priest' | 'shaman' | 'paladin',
+  level: number,
+  rows: Record<number, string>,
+  seed = 11,
+) {
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
