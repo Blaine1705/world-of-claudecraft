@@ -5686,14 +5686,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.nav.quests': '任务',
   'guide.nav.deeds': '功绩之书',
   'guide.nav.reliquary': '圣物库',
-  'guide.reliquaryPage.intro': '圣物库是你已收录的独特战利品博物馆：地下城追逐装备、专业奖杯、坐骑、武器外观与头衔。它与功绩之书的关系，就像奖杯厅与成就簿的关系。',
+  'guide.reliquaryPage.intro':
+    '圣物库是你已收录的独特战利品博物馆：地下城追逐装备、专业奖杯、坐骑、武器外观与头衔。它与功绩之书的关系，就像奖杯厅与成就簿的关系。',
   'guide.reliquaryPage.howHeading': '收藏如何运作',
-  'guide.reliquaryPage.howBody': '在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。实时发现会弹出提示并刷新已打开的窗口；进度按角色计算，武器外观除外（账号外观）。',
+  'guide.reliquaryPage.howBody':
+    '在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。实时发现会弹出提示并刷新已打开的窗口；进度按角色计算，武器外观除外（账号外观）。',
   'guide.reliquaryPage.ranksHeading': '策展人等级',
-  'guide.reliquaryPage.ranksBody': '策展人等级随已收录的独特圣物上升，仅授予装饰性头衔与边框。不会提供战斗强度、掉落率或保底。账号武器外观不计策展人等级，因此声望保持角色持久。',
+  'guide.reliquaryPage.ranksBody':
+    '策展人等级随已收录的独特圣物上升，仅授予装饰性头衔与边框。不会提供战斗强度、掉落率或保底。账号武器外观不计策展人等级，因此声望保持角色持久。',
   'guide.reliquaryPage.catalogHeading': '页面目录',
-  'guide.reliquaryPage.catalogBody': '每一页已编写的圣物库页面及其圣物名称。此列表仅含防剧透名称：请在游戏中打开圣物库查看你的进度、通关次数与剪影。',
-  'guide.reliquaryPage.spoilerNote': '个人首次发现记录、通关次数以及已有/未有状态保留在游戏客户端。维基从不发布玩家收藏。',
+  'guide.reliquaryPage.catalogBody':
+    '每一页已编写的圣物库页面及其圣物名称。此列表仅含防剧透名称：请在游戏中打开圣物库查看你的进度、通关次数与剪影。',
+  'guide.reliquaryPage.spoilerNote':
+    '个人首次发现记录、通关次数以及已有/未有状态保留在游戏客户端。维基从不发布玩家收藏。',
   'guide.reliquaryPage.shelfHeading': '{label}（{count}）',
   'guide.reliquaryPage.shelf.conquerors': '征服者',
   'guide.reliquaryPage.shelf.professions': '专业',

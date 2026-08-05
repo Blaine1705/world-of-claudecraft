@@ -2543,8 +2543,8 @@ export const DEEDS: Record<string, DeedDef> = {
   // board (docs/design/reliquary.md + deeds.md rule 2). Manual: granted by
   // syncCuratorRankDeeds when the pure rank threshold is crossed (and on
   // join retro for veterans who already crossed). Titles/borders only.
-// Appended after the profession rare-tier block so DEED_ORDER stays
-// append-only across the release merge.
+  // Appended after the profession rare-tier block so DEED_ORDER stays
+  // append-only across the release merge.
   col_reliquary_rank_2: {
     id: 'col_reliquary_rank_2',
     name: 'Spoilskeeper',

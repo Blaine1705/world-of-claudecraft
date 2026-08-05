@@ -5903,14 +5903,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.nav.quests': 'クエスト',
   'guide.nav.deeds': '功績の書',
   'guide.nav.reliquary': '聖遺物庫',
-  'guide.reliquaryPage.intro': '聖遺物庫は、カタログに載せたユニークな戦利品の博物館です。ダンジョンの追撃装備、職業のトロフィー、マウント、武器スキン、称号。功績の書に対して、トロフィー室と実績帳のような関係です。',
+  'guide.reliquaryPage.intro':
+    '聖遺物庫は、カタログに載せたユニークな戦利品の博物館です。ダンジョンの追撃装備、職業のトロフィー、マウント、武器スキン、称号。功績の書に対して、トロフィー室と実績帳のような関係です。',
   'guide.reliquaryPage.howHeading': 'コレクションの仕組み',
-  'guide.reliquaryPage.howBody': 'ゲーム内で聖遺物庫を開きます（既定は Shift+X）。各棚にユニークな聖遺物のページがあります。キャラクターが初めてその品を得るとシルエットが埋まり、ページ上のすべてが埋まると点灯します。ライブの発見はトーストと開いているウィンドウの更新になります。進捗はキャラクター単位で、武器スキンだけはアカウントの見た目です。',
+  'guide.reliquaryPage.howBody':
+    'ゲーム内で聖遺物庫を開きます（既定は Shift+X）。各棚にユニークな聖遺物のページがあります。キャラクターが初めてその品を得るとシルエットが埋まり、ページ上のすべてが埋まると点灯します。ライブの発見はトーストと開いているウィンドウの更新になります。進捗はキャラクター単位で、武器スキンだけはアカウントの見た目です。',
   'guide.reliquaryPage.ranksHeading': 'キュレーターランク',
-  'guide.reliquaryPage.ranksBody': 'キュレーターランクはカタログに載せたユニーク埋めで上がり、装飾の称号と枠だけを与えます。戦闘力、ドロップ率、天井はありません。アカウントの武器スキンはキュレーターランクに数えず、名声はキャラクターに残ります。',
+  'guide.reliquaryPage.ranksBody':
+    'キュレーターランクはカタログに載せたユニーク埋めで上がり、装飾の称号と枠だけを与えます。戦闘力、ドロップ率、天井はありません。アカウントの武器スキンはキュレーターランクに数えず、名声はキャラクターに残ります。',
   'guide.reliquaryPage.catalogHeading': 'ページ一覧',
-  'guide.reliquaryPage.catalogBody': '著された聖遺物庫の全ページと、そこに載る聖遺物の名前。防ネタバレの名前だけです。自分の進捗、クリア数、シルエットはゲーム内の聖遺物庫で確認してください。',
-  'guide.reliquaryPage.spoilerNote': '個人の初発見履歴、クリア数、所持／未所持の状態はゲームクライアントに残ります。ウィキはプレイヤーのコレクションを公開しません。',
+  'guide.reliquaryPage.catalogBody':
+    '著された聖遺物庫の全ページと、そこに載る聖遺物の名前。防ネタバレの名前だけです。自分の進捗、クリア数、シルエットはゲーム内の聖遺物庫で確認してください。',
+  'guide.reliquaryPage.spoilerNote':
+    '個人の初発見履歴、クリア数、所持／未所持の状態はゲームクライアントに残ります。ウィキはプレイヤーのコレクションを公開しません。',
   'guide.reliquaryPage.shelfHeading': '{label}（{count}）',
   'guide.reliquaryPage.shelf.conquerors': '征服者',
   'guide.reliquaryPage.shelf.professions': '職業',
@@ -9371,7 +9376,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ヒント：複数の特性ロードアウトを保存しておけば、ポイントを使い直さずにビルドを切り替えられます。',
   'loading.tips.pvp':
     'ヒント：他のプレイヤーに友好的な決闘を申し込むか、灰塵のコロシアムに参加してビルドを試してみましょう。',
-  'loading.tips.reliquary': 'ヒント：聖遺物庫は集めたユニークな戦利品を記録します。既定では Shift+X で開きます。',
+  'loading.tips.reliquary':
+    'ヒント：聖遺物庫は集めたユニークな戦利品を記録します。既定では Shift+X で開きます。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乗 / 降車',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
