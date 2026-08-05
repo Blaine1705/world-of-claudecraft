@@ -786,6 +786,7 @@ export const ja_JP: EnTranslations = {
       "targetAnnounce": "ターゲット：{name}",
       "targetOfTargetLabel": "ターゲットのターゲット",
       "partyLabel": "あなたのパーティ",
+      "petLabel": "Your Pet",
       "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
@@ -957,6 +958,7 @@ export const ja_JP: EnTranslations = {
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
       "petAggressive": "ペット：攻撃的",
+      "targetPet": "Pet: Mark",
       "mount": "騎乗 / 降車",
       "mouseHint": "マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。"
     },
@@ -1218,6 +1220,7 @@ export const ja_JP: EnTranslations = {
       "showThirdActionBar": "3本目のアクションバーを表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",

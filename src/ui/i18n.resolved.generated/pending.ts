@@ -9,25 +9,105 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "es_ES": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "fr_FR": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "fr_CA": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "de_DE": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "zh_CN": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "zh_TW": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "ko_KR": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "ja_JP": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "pt_BR": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "ru_RU": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "cs_CZ": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "nl_NL": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "pl_PL": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "id_ID": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "tr_TR": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "sv_SE": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "vi_VN": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ],
+  "da_DK": [
+    "hudChrome.keybinds.targetPet",
+    "hudChrome.options.showPetFrame",
+    "hudChrome.unitFrame.petLabel"
+  ]
 };

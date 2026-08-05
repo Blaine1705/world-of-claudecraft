@@ -786,6 +786,7 @@ export const da_DK: EnTranslations = {
       "targetAnnounce": "Markér {name}",
       "targetOfTargetLabel": "Målets Mål",
       "partyLabel": "Dit følge",
+      "petLabel": "Your Pet",
       "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
@@ -957,6 +958,7 @@ export const da_DK: EnTranslations = {
       "petTaunt": "Kæledyr: Hån",
       "petDefensive": "Kæledyr: Defensiv",
       "petAggressive": "Kæledyr: Aggressiv",
+      "targetPet": "Pet: Mark",
       "mount": "Stig op / Stig af",
       "mouseHint": "Museknapper virker også: tryk på midterknappen (M3) eller en tommelfingerknap (M4, M5), mens du binder. Venstre og højre er fortsat forbeholdt kameraet, klik for at flytte og at klikke på ting i verden."
     },
@@ -1218,6 +1220,7 @@ export const da_DK: EnTranslations = {
       "showThirdActionBar": "Vis tredje handlingslinje",
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",

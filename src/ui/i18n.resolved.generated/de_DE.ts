@@ -786,6 +786,7 @@ export const de_DE: EnTranslations = {
       "targetAnnounce": "Ziel: {name}",
       "targetOfTargetLabel": "Ziel des Ziels",
       "partyLabel": "Eure Gruppe",
+      "petLabel": "Your Pet",
       "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
@@ -957,6 +958,7 @@ export const de_DE: EnTranslations = {
       "petTaunt": "Begleiter: Verspotten",
       "petDefensive": "Begleiter: Defensiv",
       "petAggressive": "Begleiter: Aggressiv",
+      "targetPet": "Pet: Mark",
       "mount": "Aufsitzen / Absitzen",
       "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten."
     },
@@ -1218,6 +1220,7 @@ export const de_DE: EnTranslations = {
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",

@@ -786,6 +786,7 @@ export const it_IT: EnTranslations = {
       "targetAnnounce": "Bersaglio: {name}",
       "targetOfTargetLabel": "Il bersaglio del bersaglio",
       "partyLabel": "Il tuo gruppo",
+      "petLabel": "Your Pet",
       "partyChip": "Gruppo",
       "partyGroup": "Gruppo {n}",
       "durationUnitSeconds": "s",
@@ -957,6 +958,7 @@ export const it_IT: EnTranslations = {
       "petTaunt": "Famiglio: provoca",
       "petDefensive": "Famiglio: difensivo",
       "petAggressive": "Famiglio: aggressivo",
+      "targetPet": "Pet: Mark",
       "mount": "Monta / Smonta",
       "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo."
     },
@@ -1218,6 +1220,7 @@ export const it_IT: EnTranslations = {
       "showThirdActionBar": "Mostra la terza barra delle azioni",
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Mostra Pulsante Attacco",
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",

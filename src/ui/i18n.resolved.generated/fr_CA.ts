@@ -786,6 +786,7 @@ export const fr_CA: EnTranslations = {
       "targetAnnounce": "Cible : {name}",
       "targetOfTargetLabel": "Cible de la cible",
       "partyLabel": "Votre groupe",
+      "petLabel": "Your Pet",
       "partyChip": "Groupe",
       "partyGroup": "Groupe {n}",
       "durationUnitSeconds": "s",
@@ -957,6 +958,7 @@ export const fr_CA: EnTranslations = {
       "petTaunt": "Familier : provoquer",
       "petDefensive": "Familier : défensif",
       "petAggressive": "Familier : agressif",
+      "targetPet": "Pet: Mark",
       "mount": "Monter / Descendre",
       "mouseHint": "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde."
     },
@@ -1218,6 +1220,7 @@ export const fr_CA: EnTranslations = {
       "showThirdActionBar": "Afficher la troisième barre d'action",
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",

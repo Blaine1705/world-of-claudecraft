@@ -786,6 +786,7 @@ export const vi_VN: EnTranslations = {
       "targetAnnounce": "Đánh Dấu {name}",
       "targetOfTargetLabel": "Mục Tiêu Của Mục Tiêu",
       "partyLabel": "Đội Của Bạn",
+      "petLabel": "Your Pet",
       "partyChip": "Tổ Đội",
       "partyGroup": "Nhóm {n}",
       "durationUnitSeconds": "s",
@@ -957,6 +958,7 @@ export const vi_VN: EnTranslations = {
       "petTaunt": "Thú Cưng: Khiêu Khích",
       "petDefensive": "Thú Cưng: Phòng Thủ",
       "petAggressive": "Thú Cưng: Hung Hăng",
+      "targetPet": "Pet: Mark",
       "mount": "Cưỡi Thú / Xuống Thú",
       "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới."
     },
@@ -1218,6 +1220,7 @@ export const vi_VN: EnTranslations = {
       "showThirdActionBar": "Hiển thị thanh hành động thứ ba",
       "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",

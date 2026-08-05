@@ -786,6 +786,7 @@ export const tr_TR: EnTranslations = {
       "targetAnnounce": "{name} hedefini işaretle",
       "targetOfTargetLabel": "Hedefin Hedefi",
       "partyLabel": "Takımın",
+      "petLabel": "Your Pet",
       "partyChip": "Grup",
       "partyGroup": "Grup {n}",
       "durationUnitSeconds": "sn",
@@ -957,6 +958,7 @@ export const tr_TR: EnTranslations = {
       "petTaunt": "Yoldaş: Kışkırt",
       "petDefensive": "Yoldaş: Savunmacı",
       "petAggressive": "Yoldaş: Saldırgan",
+      "targetPet": "Pet: Mark",
       "mount": "Bin / İn",
       "mouseHint": "Fare düğmeleri de işe yarar: atama yaparken orta düğmeye (M3) veya bir yan düğmeye (M4, M5) bas. Sol ve sağ düğmeler kamera, tıklayarak hareket ve dünyadaki nesnelere tıklamak için ayrılmıştır."
     },
@@ -1218,6 +1220,7 @@ export const tr_TR: EnTranslations = {
       "showThirdActionBar": "Üçüncü Eylem Çubuğunu Göster",
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",

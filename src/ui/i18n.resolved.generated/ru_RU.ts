@@ -786,6 +786,7 @@ export const ru_RU: EnTranslations = {
       "targetAnnounce": "Цель: {name}",
       "targetOfTargetLabel": "Цель цели",
       "partyLabel": "Ваша группа",
+      "petLabel": "Your Pet",
       "partyChip": "Группа",
       "partyGroup": "Группа {n}",
       "durationUnitSeconds": "с",
@@ -957,6 +958,7 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
+      "targetPet": "Pet: Mark",
       "mount": "Сесть / Спешиться",
       "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
@@ -1218,6 +1220,7 @@ export const ru_RU: EnTranslations = {
       "showThirdActionBar": "Показывать третью панель действий",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",

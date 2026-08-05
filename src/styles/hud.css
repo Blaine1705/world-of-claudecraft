@@ -613,6 +613,41 @@
     flex: none;
     width: 190px;
   }
+  /* Pet frame: the hunter/warlock/mage pet's health strip, in flow directly under
+     the player frame inside #actionbar-stack. The stack is bottom-anchored
+     (#bottom-bar sits at bottom: 6px), so this grows the stack UPWARD: the action
+     bars keep their position and the player frame lifts by this strip's height.
+     Hidden until the player actually has a pet; the family painter sets the inline
+     display:flex, which outranks the `none` here. It follows --player-frame-scale
+     because it belongs to the player frame, and rides slightly smaller so it reads
+     as subordinate to it (the same trick #totarget-frame uses under the target). */
+  #pet-frame {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 0 auto 4px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    zoom: calc(0.82 * var(--player-frame-scale, 1));
+  }
+  #pet-frame .uf-bars {
+    flex: none;
+    width: 210px;
+  }
+  #pet-frame:hover {
+    outline: 1px solid var(--gold-dim);
+  }
+  #pet-frame:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* A dead pet stays visible and selectable (Revive lives on the pet bar), so it
+     dims rather than hiding, matching the party frames' dead treatment. */
+  #pet-frame.dead {
+    opacity: 0.7;
+  }
   #target-frame {
     left: 12px;
     top: 12px;

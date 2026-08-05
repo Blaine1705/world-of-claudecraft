@@ -1810,6 +1810,36 @@
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
   }
+  /* Pet frame on mobile: the desktop rule keeps it in the #actionbar-stack flow,
+     which does not exist here (the player frame is lifted out to position:fixed),
+     so re-seat it into the same reserved bottom-centre column, stacked ABOVE the
+     cast and swing bars (player frame 14px, cast 68px, swing 76px). Seating it on
+     top of the column rather than between the frame and the bars is deliberate:
+     the pet strip appears and disappears with the pet, and displacing the two bars
+     would move a cast bar mid-cast. The portrait is dropped here (the desktop
+     strip keeps it) so the row stays one thin line in the densest layout, the same
+     trade the cast bar makes with its label. */
+  body.mobile-touch #pet-frame {
+    position: fixed;
+    left: 50%;
+    top: auto;
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    z-index: 21;
+    width: 300px;
+    margin: 0;
+    justify-content: flex-start;
+    zoom: 1;
+    transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform-origin: center bottom;
+  }
+  body.mobile-touch #pet-frame .portrait-wrap {
+    display: none;
+  }
+  body.mobile-touch #pet-frame .uf-bars {
+    width: 224px;
+    max-width: 224px;
+    flex: none;
+  }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
   }
@@ -5131,6 +5161,13 @@
       min-width: 0;
       height: 4px;
     }
+    /* Same bottom-centre column as portrait, one notch lower to match the shorter
+       landscape band (player frame 10px, cast 62px, swing 70px), and at the
+       landscape frame scale so the strip matches the player frame's width. */
+    body.mobile-touch #pet-frame {
+      bottom: calc(80px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
       /* No scale(0.88) on landscape: it shrank the 40px pet command buttons to
@@ -5452,7 +5489,8 @@
     left: calc(50% - 15px);
   }
   body.mobile-touch.hud-mobile-compact #castbar,
-  body.mobile-touch.hud-mobile-compact #swingbar {
+  body.mobile-touch.hud-mobile-compact #swingbar,
+  body.mobile-touch.hud-mobile-compact #pet-frame {
     left: calc(50% - 15px);
   }
   /* Left-handed mirrors Jump (and the ring) to the left, so mirror this nudge
@@ -5461,7 +5499,8 @@
     left: calc(50% + 15px);
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
-  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
     left: calc(50% + 15px);
   }
   /* Narrowest compact phones (galaxy-s8-class 740px and below): at that width the

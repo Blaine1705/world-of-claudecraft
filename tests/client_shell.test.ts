@@ -2161,8 +2161,10 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toContain(
       'body.mobile-touch.hud-mobile-compact #player-frame {\n    left: calc(50% - 15px);\n  }',
     );
+    // The pet frame joins the same nudge: it shares the bottom-centre column with
+    // the player frame and the two bars, so it has to travel with them.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar {\n    left: calc(50% - 15px);\n  }',
+      'body.mobile-touch.hud-mobile-compact #castbar,\n  body.mobile-touch.hud-mobile-compact #swingbar,\n  body.mobile-touch.hud-mobile-compact #pet-frame {\n    left: calc(50% - 15px);\n  }',
     );
     // Left-handed mode mirrors the floating capture zone; the autorun target is
     // a child of the move joystick, so it follows that mirror without its own

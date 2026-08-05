@@ -786,6 +786,7 @@ export const en_XA: EnTranslations = {
       "targetAnnounce": "[Ɱáŕķ {name}]",
       "targetOfTargetLabel": "[Ɱáŕķ'š Ɱáŕķ]",
       "partyLabel": "[Ýóúŕ Ɓáñð]",
+      "petLabel": "[Ýóúŕ Þéţ]",
       "partyChip": "[Þáŕţý]",
       "partyGroup": "[Ĝŕóúþ {n}]",
       "durationUnitSeconds": "[š]",
@@ -957,6 +958,7 @@ export const en_XA: EnTranslations = {
       "petTaunt": "[Þéţ: Ţáúñţ]",
       "petDefensive": "[Þéţ: Ðéƒéñšíʋé]",
       "petAggressive": "[Þéţ: Áĝĝŕéššíʋé]",
+      "targetPet": "[Þéţ: Ɱáŕķ]",
       "mount": "[Ɱóúñţ / Ðíšɱóúñţ]",
       "mouseHint": "[Ɱóúšé ƀúţţóñš ŵóŕķ ţóó: þŕéšš ţĥé ɱíððļé ƀúţţóñ (Ɱ3) óŕ á ţĥúɱƀ ƀúţţóñ (Ɱ4, Ɱ5) ŵĥíļé ƀíñðíñĝ. Ļéƒţ áñð ŕíĝĥţ šţáý ŕéšéŕʋéð ƒóŕ ţĥé çáɱéŕá, çļíçķ ţó ɱóʋé, áñð çļíçķíñĝ ţĥíñĝš íñ ţĥé ŵóŕļð.]"
     },
@@ -1218,6 +1220,7 @@ export const en_XA: EnTranslations = {
       "showThirdActionBar": "[Šĥóŵ Ţĥíŕð Áçţíóñ Ɓáŕ]",
       "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
+      "showPetFrame": "[Šĥóŵ Ýóúŕ Þéţ]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",
       "showDailyRewardsChest": "[Šĥóŵ Ðáíļý Ŕéŵáŕðš Çĥéšţ]",
       "mobileCameraJoystick": "[Çáɱéŕá ĵóýšţíçķ]",

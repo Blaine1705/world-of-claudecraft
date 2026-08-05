@@ -508,6 +508,20 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'hides the target frame when there is no target',
   },
   {
+    call: 'this.ownPet',
+    band: 'frame',
+    gate: 'this.showPetFrame',
+    surface: 'none',
+    why: 'resolves the player-owned pet out of the entity roster for the pet frame below; a single early-returning scan (findOwnPet, pet_frame_view.ts), skipped entirely when the option is off',
+  },
+  {
+    call: 'this.petFramePainter.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the pet health frame under the player frame, deliberately UNTIERED and on the frame band (pet health is information the owner acts on, so a tier knob may not delay it); every write is elided, so a pet at steady health costs nothing, and a null pet paints it hidden',
+  },
+  {
     call: 'this.targetAurasWindow.clear',
     band: 'frame',
     gate: "!(target && target.kind !== 'object')",
@@ -1422,7 +1436,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 72, none: 15 });
+    ).toEqual({ window: 41, chrome: 73, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
