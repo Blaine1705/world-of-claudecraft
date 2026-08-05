@@ -444,7 +444,12 @@ export class GuildBankTab {
       });
     }
     // Dormant wording outranks the per-copy flag (the lock is the action fact);
-    // otherwise a masterwork / signed / enchanted copy announces itself.
+    // otherwise a masterwork / signed / enchanted copy announces itself. The
+    // guild pane keeps the KNOWN key family even for an unknown id: itemName is
+    // already the localized unknown-item label here (the label carries the
+    // unknown fact, the raw id lives in the tooltip), where the personal bank
+    // announces the raw id via the UNKNOWN_ siblings instead. Deliberate; the
+    // guild marker suite pins the exact strings.
     cell.setAttribute(
       'aria-label',
       slot.dormant

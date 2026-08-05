@@ -790,8 +790,16 @@ describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)',
     // Plain unknown cells use unknownItemAria; instanced unknown cells (a
     // masterwork / signed copy whose def this client predates) use the shared
     // UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS so the per-copy flag still announces.
-    expect(code).toContain("'itemUi.bags.unknownItemAria'");
-    expect(code).toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS');
+    // Both pins are scoped to the grid-fill loop (a whole-file contain is
+    // satisfied by the import line alone), and the argument literal keeps the
+    // raw id as the {id} the unknown wording speaks.
+    const loop = code.slice(
+      code.indexOf('for (const slot of visible)'),
+      code.indexOf('private appendEmptyCells('),
+    );
+    expect(loop).toContain("'itemUi.bags.unknownItemAria'");
+    expect(loop).toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]');
+    expect(loop).toContain('{ id: slot.itemId, count: countLabel }');
   });
 
   it('never skips a slot in the grid fill (no continue of any wording)', () => {

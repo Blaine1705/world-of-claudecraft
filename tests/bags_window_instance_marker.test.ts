@@ -393,7 +393,9 @@ describe('marker stylesheet contract (source pins)', () => {
   it('the per-kind glyphs share the same always-on, preset-independent contract', () => {
     // Bags and bank share one dual-selector rule so a banked masterwork keeps
     // the same seal art. Match the bag half of the selector (with optional bank
-    // twin) rather than a bags-only brace form.
+    // twin) rather than a bags-only brace form. The bank twin is optional HERE
+    // only because tests/bank_window_instance_marker.test.ts pins the dual
+    // selector non-optionally; keep that pair in sync.
     const glyphStart = components.search(/\.bag-item \.bi-glyph(?:,\s*\.bank-item \.bi-glyph)? \{/);
     expect(glyphStart).toBeGreaterThan(-1);
     const glyphBlock = components.slice(glyphStart, components.indexOf('}', glyphStart));

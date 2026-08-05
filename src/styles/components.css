@@ -6174,7 +6174,8 @@
      gate, no hover reveal); the tooltip carries the semantics, the glyph is
      aria-hidden. Colors come from tokens, never a literal in the painter.
      Bank cells share the same top-left marks so a banked masterwork keeps its
-     seal (bags already painted it; the bank used to drop it on deposit). */
+     seal: the payload always survived deposit in the sim, but the bank grids
+     never painted the mark bags already had. */
   .bag-item .bi-glyph,
   .bank-item .bi-glyph {
     position: absolute;

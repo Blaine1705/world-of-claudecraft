@@ -9,8 +9,7 @@
 // bags painter composes masterwork > quest > other instance marks itself. This
 // helper only mints ONE instance mark from a resolved kind.
 
-import type { ItemInstancePayload } from '../sim/types';
-import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import type { BagInstanceGlyphKind } from './bag_instance_glyph_view';
 import type { TranslationKey } from './i18n';
 import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import { svgIcon, type UiIconName } from './ui_icons';
@@ -56,9 +55,4 @@ export function instanceGlyphMarkHtml(kind: BagInstanceGlyphKind): string {
     return '<span class="bi-instance" aria-hidden="true"></span>';
   }
   return `<span class="bi-glyph bi-glyph-${kind}" aria-hidden="true">${svgIcon(GLYPH_ICONS[kind])}</span>`;
-}
-
-/** Convenience: resolve the payload kind and mint its corner mark in one step. */
-export function itemInstanceGlyphMarkHtml(instance?: ItemInstancePayload): string {
-  return instanceGlyphMarkHtml(bagInstanceGlyphKind(instance));
 }

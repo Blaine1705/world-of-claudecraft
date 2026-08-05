@@ -84,13 +84,15 @@ describe('bank grid instanced-slot marker', () => {
     expect(seal?.getAttribute('draggable')).toBe('false');
     expect(cells[0].querySelector('.bi-instance')).toBeNull();
     expect(cells[0].querySelector('.bi-glyph')).toBeNull();
-    expect(cells[0].getAttribute('aria-label')).toMatch(/masterwork/i);
-    expect(cells[0].getAttribute('aria-label')).not.toMatch(/maker-marked copy/i);
-    // Plain sibling keeps no marker and no masterwork wording.
+    // Exact full string: the UNKNOWN key family shares the ', masterwork'
+    // tail, so only the resolved display name plus the whole wording proves
+    // the KNOWN family ran (a key-map swap in the painter cannot mint this).
+    expect(cells[0].getAttribute('aria-label')).toBe('Pitted Shortsword, quantity 1, masterwork');
+    // Plain sibling keeps no marker and the plain aria wording.
     expect(cells[1].querySelector('.bi-masterwork-seal')).toBeNull();
     expect(cells[1].querySelector('.bi-glyph')).toBeNull();
     expect(cells[1].querySelector('.bi-instance')).toBeNull();
-    expect(cells[1].getAttribute('aria-label')).not.toMatch(/masterwork/i);
+    expect(cells[1].getAttribute('aria-label')).toBe('Pitted Shortsword, quantity 1');
   });
 
   it('each kind paints its own distinct glyph, exactly one per cell', () => {
@@ -112,12 +114,31 @@ describe('bank grid instanced-slot marker', () => {
       const markers = cell.querySelectorAll('.bi-glyph, .bi-instance, .bi-masterwork-seal');
       expect(markers.length).toBe(1);
     }
+    // Exact strings, not regexes: the unknown-key siblings carry the same
+    // per-kind tail wording, so only the full string (display name included)
+    // proves the KNOWN family ran. signed and the generic fallback share the
+    // maker-marked wording by design.
     const names = [...cells].map((c) => c.getAttribute('aria-label') ?? '');
-    expect(names[0]).toMatch(/enchanted copy/i);
-    expect(names[1]).toMatch(/maker-marked copy/i);
-    expect(names[2]).toMatch(/bound copy/i);
-    expect(names[4]).toMatch(/masterwork/i);
-    expect(new Set(names.slice(0, 3).concat(names[4])).size).toBe(4);
+    expect(names[0]).toBe('Copper Ore, quantity 1, enchanted copy');
+    expect(names[1]).toBe('Copper Ore, quantity 1, maker-marked copy');
+    expect(names[2]).toBe('Copper Ore, quantity 1, bound copy');
+    expect(names[3]).toBe('Copper Ore, quantity 1, maker-marked copy');
+    expect(names[4]).toBe('Copper Ore, quantity 1, masterwork');
+  });
+
+  it('an unknown-id instanced slot keeps the mark and the UNKNOWN aria wording', () => {
+    // Stale-client guard (R34) meets the per-copy flag: the raw id is the only
+    // handle the player has for an unknown stack, so the UNKNOWN wording keeps
+    // it while the flag still announces. No key-family swap can mint this
+    // exact string, which is what makes the assertion decisive.
+    const root = windowFor([
+      slot('not_a_real_item_id', { rolled: { masterwork: true, stats: { sta: 1 } } }),
+    ]);
+    const cell = root.querySelector('button.bank-item');
+    expect(cell?.querySelector('.bi-masterwork-seal')).not.toBeNull();
+    expect(cell?.getAttribute('aria-label')).toBe(
+      'Unknown item not_a_real_item_id, quantity 1, masterwork',
+    );
   });
 
   it('a counted masterwork keeps its count badge without restoring the generic marker', () => {
@@ -156,21 +177,31 @@ describe('bank-item instance mark stylesheet contract', () => {
     expect(components).toMatch(/\.bag-item \.bi-instance,\s*\.bank-item \.bi-instance \{/);
     expect(components).not.toContain('.bank-item:hover .bi-masterwork-seal');
     expect(components).not.toContain('.bank-item:hover .bi-glyph');
-    // Tokenized per-kind tints ride the same bag tokens.
+    // Tokenized per-kind tints ride the same bag tokens. Each rule is sliced
+    // to its first closing brace before asserting the token, so the match
+    // cannot drift across rule boundaries.
     for (const kind of ['enchanted', 'signed', 'bound']) {
-      expect(components).toMatch(
-        new RegExp(
-          `\\.bag-item \\.bi-glyph-${kind},\\s*\\.bank-item \\.bi-glyph-${kind} \\{[\\s\\S]*?var\\(--color-bag-glyph-${kind}\\)`,
-        ),
-      );
+      const start = components.indexOf(`.bag-item .bi-glyph-${kind},`);
+      expect(start).toBeGreaterThan(-1);
+      const rule = components.slice(start, components.indexOf('}', start));
+      expect(rule).toContain(`.bank-item .bi-glyph-${kind}`);
+      expect(rule).toContain(`var(--color-bag-glyph-${kind})`);
     }
   });
 
   it('the bank painter mints marks through the shared helper, not a private fork', () => {
-    const painter = readFileSync(join(__dirname, '../src/ui/bank_window.ts'), 'utf8');
-    expect(painter).toContain('instanceGlyphMarkHtml');
-    expect(painter).toContain('bagInstanceGlyphKind');
-    expect(painter).toContain('INSTANCE_GLYPH_ARIA_KEYS');
+    // Comment-stripped (the bank_window.test.ts idiom) so prose naming the
+    // seal class can neither satisfy a positive pin nor false-fail a negative.
+    const painter = readFileSync(join(__dirname, '../src/ui/bank_window.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/[^\n]*/g, '');
+    expect(painter).toContain('instanceGlyphMarkHtml(glyphKind)');
+    expect(painter).toContain('bagInstanceGlyphKind(slot.instance)');
+    // The KNOWN key family must be used on its own: the lookbehind skips the
+    // UNKNOWN_ sibling, whose name contains this one as a substring (a bare
+    // contain could never fail while the import line exists).
+    expect(painter).toMatch(/(?<!UNKNOWN_)INSTANCE_GLYPH_ARIA_KEYS\[glyphKind\]/);
+    expect(painter).toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind]');
     // No private seal URL or class fork that could drift from bags.
     expect(painter).not.toContain('MASTERWORK_SEAL_IMAGE_URL');
     expect(painter).not.toContain('bi-masterwork-seal');

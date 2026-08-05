@@ -8,7 +8,6 @@ import { bagInstanceGlyphKind } from '../src/ui/bag_instance_glyph_view';
 import {
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
-  itemInstanceGlyphMarkHtml,
   UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
 } from '../src/ui/item_instance_glyph_mark';
 import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
@@ -16,7 +15,7 @@ import { MASTERWORK_SEAL_IMAGE_URL } from '../src/ui/profession_art';
 describe('item_instance_glyph_mark', () => {
   it('returns empty HTML for a plain fungible stack', () => {
     expect(instanceGlyphMarkHtml(null)).toBe('');
-    expect(itemInstanceGlyphMarkHtml(undefined)).toBe('');
+    expect(instanceGlyphMarkHtml(bagInstanceGlyphKind(undefined))).toBe('');
   });
 
   it('mints the authored masterwork seal image with a11y attributes', () => {
@@ -49,13 +48,19 @@ describe('item_instance_glyph_mark', () => {
   });
 
   it('resolves payload to HTML through the pure kind priority', () => {
+    // The painters compose the pure kind core with the mark mint themselves
+    // (they need the kind for the aria key too); this pins that composition.
     expect(
-      itemInstanceGlyphMarkHtml({
-        signer: 'Anna',
-        rolled: { masterwork: true, stats: { sta: 1 } },
-      }),
+      instanceGlyphMarkHtml(
+        bagInstanceGlyphKind({
+          signer: 'Anna',
+          rolled: { masterwork: true, stats: { sta: 1 } },
+        }),
+      ),
     ).toContain('bi-masterwork-seal');
-    expect(itemInstanceGlyphMarkHtml({ signer: 'Anna' })).toContain('bi-glyph-signed');
+    expect(instanceGlyphMarkHtml(bagInstanceGlyphKind({ signer: 'Anna' }))).toContain(
+      'bi-glyph-signed',
+    );
     expect(bagInstanceGlyphKind({ rolled: { masterwork: true, stats: { sta: 1 } } })).toBe(
       'masterwork',
     );
