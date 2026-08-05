@@ -618,6 +618,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': 'Показывать ману, ярость и энергию',
   'hudChrome.partyFrames.showAbsorbs': 'Показывать щиты поглощения',
   'hudChrome.partyFrames.showAuras': 'Показывать усиления и ослабления',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Показывать питомцев',
   'hudChrome.partyFrames.showSelf': 'Показывать вашу рамку',
   'hudChrome.frameReset.label': 'Сбросить положение рамок',
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',

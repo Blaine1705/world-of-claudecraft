@@ -1979,7 +1979,7 @@ export const ko_KR: EnTranslations = {
       "showResource": "마나, 분노, 에너지 표시",
       "showAbsorbs": "흡수 보호막 표시",
       "showAuras": "버프 및 디버프 표시",
-      "showPets": "Show Pets",
+      "showPets": "펫 표시",
       "petHealth": "{name} {pct}",
       "showSelf": "내 프레임 표시"
     },

@@ -1979,7 +1979,7 @@ export const da_DK: EnTranslations = {
       "showResource": "Vis mana, raseri og energi",
       "showAbsorbs": "Vis absorberingsskjolde",
       "showAuras": "Vis styrkelser og svækkelser",
-      "showPets": "Show Pets",
+      "showPets": "Vis kæledyr",
       "petHealth": "{name} {pct}",
       "showSelf": "Vis din ramme"
     },

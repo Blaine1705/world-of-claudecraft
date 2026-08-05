@@ -10043,6 +10043,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Gruppe- og raidrammer',
   'hudChrome.partyFrames.showAbsorbs': 'Vis absorberingsskjolde',
   'hudChrome.partyFrames.showAuras': 'Vis styrkelser og svækkelser',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Vis kæledyr',
   'hudChrome.partyFrames.showResource': 'Vis mana, raseri og energi',
   'hudChrome.partyFrames.showSelf': 'Vis din ramme',
   'hudChrome.partyFrames.sort': 'Sortér spillere',

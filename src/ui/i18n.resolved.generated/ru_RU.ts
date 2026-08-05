@@ -1979,7 +1979,7 @@ export const ru_RU: EnTranslations = {
       "showResource": "Показывать ману, ярость и энергию",
       "showAbsorbs": "Показывать щиты поглощения",
       "showAuras": "Показывать усиления и ослабления",
-      "showPets": "Show Pets",
+      "showPets": "Показывать питомцев",
       "petHealth": "{name} {pct}",
       "showSelf": "Показывать вашу рамку"
     },

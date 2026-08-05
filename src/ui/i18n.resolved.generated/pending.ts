@@ -13,8 +13,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -28,8 +26,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -43,8 +39,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -58,8 +52,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -74,8 +66,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -89,8 +79,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -101,31 +89,21 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "zh_CN": [
-    "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets"
+    "hudChrome.materialHint.usedBy"
   ],
   "zh_TW": [
-    "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets"
+    "hudChrome.materialHint.usedBy"
   ],
   "ko_KR": [
-    "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets"
+    "hudChrome.materialHint.usedBy"
   ],
   "ja_JP": [
-    "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets"
+    "hudChrome.materialHint.usedBy"
   ],
   "pt_BR": [
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -136,16 +114,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "ru_RU": [
-    "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets"
+    "hudChrome.materialHint.usedBy"
   ],
   "cs_CZ": [
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -159,8 +133,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -174,8 +146,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -189,8 +159,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -204,8 +172,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -219,8 +185,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -234,8 +198,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -249,8 +211,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
     "hudChrome.materialHint.usedBy",
-    "hudChrome.partyFrames.petHealth",
-    "hudChrome.partyFrames.showPets",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",

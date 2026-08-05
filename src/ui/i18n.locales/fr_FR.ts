@@ -10462,6 +10462,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Cadres de groupe et de raid',
   'hudChrome.partyFrames.showAbsorbs': 'Afficher les boucliers d’absorption',
   'hudChrome.partyFrames.showAuras': 'Afficher les améliorations et affaiblissements',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Afficher les familiers',
   'hudChrome.partyFrames.showResource': 'Afficher le mana, la rage et l’énergie',
   'hudChrome.partyFrames.showSelf': 'Afficher votre cadre',
   'hudChrome.partyFrames.sort': 'Trier les joueurs',

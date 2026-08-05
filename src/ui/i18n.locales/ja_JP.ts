@@ -621,6 +621,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': 'マナ・怒り・エネルギーを表示',
   'hudChrome.partyFrames.showAbsorbs': '吸収シールドを表示',
   'hudChrome.partyFrames.showAuras': 'バフとデバフを表示',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'ペットを表示',
   'hudChrome.partyFrames.showSelf': '自分のフレームを表示',
   'hudChrome.frameReset.label': 'フレーム位置をリセット',
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',

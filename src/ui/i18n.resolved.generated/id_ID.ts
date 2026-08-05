@@ -1979,7 +1979,7 @@ export const id_ID: EnTranslations = {
       "showResource": "Tampilkan Mana, Amukan, dan Energi",
       "showAbsorbs": "Tampilkan Perisai Serap",
       "showAuras": "Tampilkan Buff dan Debuff",
-      "showPets": "Show Pets",
+      "showPets": "Tampilkan Peliharaan",
       "petHealth": "{name} {pct}",
       "showSelf": "Tampilkan Bingkaimu"
     },

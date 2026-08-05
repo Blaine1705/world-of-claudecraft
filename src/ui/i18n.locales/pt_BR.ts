@@ -10169,6 +10169,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Quadros de grupo e raide',
   'hudChrome.partyFrames.showAbsorbs': 'Mostrar escudos de absorção',
   'hudChrome.partyFrames.showAuras': 'Mostrar bônus e penalidades',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Mostrar mascotes',
   'hudChrome.partyFrames.showResource': 'Mostrar mana, raiva e energia',
   'hudChrome.partyFrames.showSelf': 'Mostrar seu quadro',
   'hudChrome.partyFrames.sort': 'Ordenar jogadores',

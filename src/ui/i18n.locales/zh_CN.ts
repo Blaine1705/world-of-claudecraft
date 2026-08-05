@@ -605,6 +605,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': '显示法力、怒气和能量',
   'hudChrome.partyFrames.showAbsorbs': '显示吸收护盾',
   'hudChrome.partyFrames.showAuras': '显示增益和减益',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': '显示宠物',
   'hudChrome.partyFrames.showSelf': '显示你的框体',
   'hudChrome.frameReset.label': '重置框体位置',
   'hudChrome.options.playerFrameScale': '玩家框缩放',

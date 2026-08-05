@@ -10253,6 +10253,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Ramki grupy i rajdu',
   'hudChrome.partyFrames.showAbsorbs': 'Pokaż tarcze absorpcji',
   'hudChrome.partyFrames.showAuras': 'Pokaż wzmocnienia i osłabienia',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Pokaż zwierzęta',
   'hudChrome.partyFrames.showResource': 'Pokaż manę, szał i energię',
   'hudChrome.partyFrames.showSelf': 'Pokaż własną ramkę',
   'hudChrome.partyFrames.sort': 'Sortuj graczy',

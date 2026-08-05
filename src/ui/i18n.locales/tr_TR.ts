@@ -10035,6 +10035,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Grup ve Akın Çerçeveleri',
   'hudChrome.partyFrames.showAbsorbs': 'Soğurma Kalkanlarını Göster',
   'hudChrome.partyFrames.showAuras': 'Güçlendirmeleri ve Zayıflatmaları Göster',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Yoldaşları Göster',
   'hudChrome.partyFrames.showResource': 'Mana, Öfke ve Enerjiyi Göster',
   'hudChrome.partyFrames.showSelf': 'Kendi Çerçeveni Göster',
   'hudChrome.partyFrames.sort': 'Oyuncuları Sırala',

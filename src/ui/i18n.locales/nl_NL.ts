@@ -10127,6 +10127,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Groeps- en raidframes',
   'hudChrome.partyFrames.showAbsorbs': 'Absorptieschilden tonen',
   'hudChrome.partyFrames.showAuras': 'Versterkingen en verzwakkingen tonen',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Huisdieren tonen',
   'hudChrome.partyFrames.showResource': 'Mana, woede en energie tonen',
   'hudChrome.partyFrames.showSelf': 'Je eigen frame tonen',
   'hudChrome.partyFrames.sort': 'Spelers sorteren',

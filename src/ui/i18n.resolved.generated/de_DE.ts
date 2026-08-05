@@ -1979,7 +1979,7 @@ export const de_DE: EnTranslations = {
       "showResource": "Mana, Wut und Energie anzeigen",
       "showAbsorbs": "Absorptionsschilde anzeigen",
       "showAuras": "Stärkungs- und Schwächungseffekte anzeigen",
-      "showPets": "Show Pets",
+      "showPets": "Begleiter anzeigen",
       "petHealth": "{name} {pct}",
       "showSelf": "Eigenen Rahmen anzeigen"
     },

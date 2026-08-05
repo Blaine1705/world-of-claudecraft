@@ -1979,7 +1979,7 @@ export const sv_SE: EnTranslations = {
       "showResource": "Visa mana, raseri och energi",
       "showAbsorbs": "Visa absorptionssköldar",
       "showAuras": "Visa positiva och negativa effekter",
-      "showPets": "Show Pets",
+      "showPets": "Visa djur",
       "petHealth": "{name} {pct}",
       "showSelf": "Visa din ram"
     },

@@ -10030,6 +10030,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Rámečky skupiny a raidu',
   'hudChrome.partyFrames.showAbsorbs': 'Zobrazit absorpční štíty',
   'hudChrome.partyFrames.showAuras': 'Zobrazit posílení a oslabení',
+  'hudChrome.partyFrames.petHealth': '{name} {pct}',
+  'hudChrome.partyFrames.showPets': 'Zobrazit mazlíčky',
   'hudChrome.partyFrames.showResource': 'Zobrazit manu, vztek a energii',
   'hudChrome.partyFrames.showSelf': 'Zobrazit vlastní rámeček',
   'hudChrome.partyFrames.sort': 'Seřadit hráče',
