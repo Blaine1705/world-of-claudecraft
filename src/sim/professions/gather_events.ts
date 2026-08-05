@@ -96,7 +96,7 @@ export function announceGatherRareEvent(
   // deed (col_pristine_vein / col_ancient_heartwood / col_moonlit_bloom).
   // Reliquary field-note trophies reuse the same stable gather_event:* ids
   // (catalog allowlist only; noteReliquaryMark no-ops unknown ids).
-  const visitMark = 'gather_event:' + flavor;
+  const visitMark = `gather_event:${flavor}`;
   ctx.markVisited(finder, visitMark);
   noteReliquaryMark(ctx, finder, visitMark);
 }
