@@ -161,14 +161,17 @@ describe('the Glacier Tarn ramp keeps the tarn intact', () => {
     // WEST FLANK and must not lift or dig the pond it runs down into. (The
     // east shallow at (60, 1630.4) is the tarn's own organic shore wobble,
     // above the waterline before the fix and after it.)
+    // (re-captured for the natural-relief heightfield: the tarn's partial-
+    // carve blend reads the base field, so these drift with any deliberate
+    // terrain change; the pin's job is unchanged, the RAMP must not move them)
     const bed: [number, number, number][] = [
       [60, 1640, -7.6],
-      [69.6, 1640, -6.6074798367305],
+      [69.6, 1640, -6.705307736857302],
       [60, 1630.4, -4.421488179551974],
       [58, 1634, -6.9929825395840535],
       [48, 1652, -7.6],
-      [53.4, 1652, -7.597759267257777],
-      [42.6, 1652, -7.401574172538028],
+      [53.4, 1652, -7.598384612093657],
+      [42.6, 1652, -7.410710642832379],
     ];
     for (const [x, z, h] of bed) {
       expect(terrainHeight(x, z, SEED), `pond bed at (${x}, ${z})`).toBeCloseTo(h, 10);

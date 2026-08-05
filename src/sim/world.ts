@@ -15,10 +15,12 @@ import {
   DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
+  GATHER_NODES,
   getActiveWorldContent,
   getContentGeneration,
   instanceOrigin,
   instanceSlotForZ,
+  NPCS,
   ROADS,
   STRIP_MAX_X,
   STRIP_MIN_X,
@@ -2888,6 +2890,56 @@ export function terrainRegionCandidateCountsAt(
   };
 }
 
+// ---------------------------------------------------------------------------
+// Static calm anchors: every gather node and NPC anchor keeps classic
+// workable ground underfoot (the same calm the roads and camps get), so a
+// node stays harvestable and a wilderness quest giver keeps a level stand
+// even where the natural relief turns the surrounding country craggy.
+// Coarse bucket index over the static content tables, built once on first
+// use; instanced-interior anchors are skipped (their floors are flat).
+// ---------------------------------------------------------------------------
+const CALM_ANCHOR_CELL = 64;
+interface CalmAnchor {
+  x: number;
+  z: number;
+  rIn: number;
+  rOut: number;
+}
+let calmAnchorIndex: Map<number, CalmAnchor[]> | null = null;
+
+const calmAnchorKey = (c: number, r: number): number => (c + 4096) * 8192 + (r + 4096);
+
+function calmAnchorCells(): Map<number, CalmAnchor[]> {
+  if (calmAnchorIndex) return calmAnchorIndex;
+  const index = new Map<number, CalmAnchor[]>();
+  const add = (x: number, z: number, rIn: number, rOut: number): void => {
+    if (x > DUNGEON_X_THRESHOLD) return;
+    const c0 = Math.floor((x - rOut) / CALM_ANCHOR_CELL);
+    const c1 = Math.floor((x + rOut) / CALM_ANCHOR_CELL);
+    const r0 = Math.floor((z - rOut) / CALM_ANCHOR_CELL);
+    const r1 = Math.floor((z + rOut) / CALM_ANCHOR_CELL);
+    const anchor: CalmAnchor = { x, z, rIn, rOut };
+    for (let r = r0; r <= r1; r++) {
+      for (let c = c0; c <= c1; c++) {
+        const key = calmAnchorKey(c, r);
+        let bucket = index.get(key);
+        if (!bucket) {
+          bucket = [];
+          index.set(key, bucket);
+        }
+        bucket.push(anchor);
+      }
+    }
+  };
+  for (const node of GATHER_NODES) add(node.pos.x, node.pos.z, 5, 12);
+  for (const id in NPCS) {
+    const npc = NPCS[id];
+    add(npc.pos.x, npc.pos.z, 6, 14);
+  }
+  calmAnchorIndex = index;
+  return index;
+}
+
 // Blended biome shape at a position. Zone interiors keep their exact shape;
 // blends happen across the same -30/+35yd windows at every border: the
 // strip's band boundaries cascade by z as they always did, and column zones
@@ -2947,11 +2999,44 @@ function baseHeight(
       const camp = CAMPS[campIndex];
       const cdx = x - camp.center.x,
         cdz = z - camp.center.z;
-      const calmGate = camp.radius * 2.2;
+      // The radius floor covers point-camps (a fixture like the Highwatch
+      // training dummy is a radius-0 camp): even a single-spawn anchor
+      // keeps a small disc of classic ground underfoot.
+      const campR = Math.max(camp.radius, 4);
+      const calmGate = campR * 2.2;
       if (cdx * cdx + cdz * cdz >= calmGate * calmGate) continue;
-      const t = smoothstep(camp.radius * 1.1, calmGate, Math.sqrt(cdx * cdx + cdz * cdz));
+      const t = smoothstep(campR * 1.1, calmGate, Math.sqrt(cdx * cdx + cdz * cdz));
       if (t < calm) calm = t;
       if (calm === 0) break;
+    }
+  }
+  if (calm > 0) {
+    // gather nodes + NPC anchors (the static calm-anchor index above)
+    const bucket = calmAnchorCells().get(
+      calmAnchorKey(Math.floor(x / CALM_ANCHOR_CELL), Math.floor(z / CALM_ANCHOR_CELL)),
+    );
+    if (bucket) {
+      for (const a of bucket) {
+        const adx = x - a.x,
+          adz = z - a.z;
+        if (adx * adx + adz * adz >= a.rOut * a.rOut) continue;
+        const t = smoothstep(a.rIn, a.rOut, Math.sqrt(adx * adx + adz * adz));
+        if (t < calm) calm = t;
+        if (calm === 0) break;
+      }
+    }
+  }
+  // The Great Maze's lawn is one flat playfield (its hedge walls are modeled
+  // props; tests/evergarden.test.ts pins wall-vs-corridor lawn continuity),
+  // so the maze footprint is fully calm, feathered over the surrounding lawn.
+  if (calm > 0) {
+    const mx0 = MAZE_X0 - 3;
+    const mx1 = MAZE_X0 + MAZE_COLS * MAZE_CELL + 3;
+    if (x > mx0 - 14 && x < mx1 + 14 && z > MAZE_Z0 - 17 && z < MAZE_Z1 + 17) {
+      const mdx = Math.max(0, mx0 - x, x - mx1);
+      const mdz = Math.max(0, MAZE_Z0 - 3 - z, z - (MAZE_Z1 + 3));
+      const t = smoothstep(0, 14, Math.hypot(mdx, mdz));
+      if (t < calm) calm = t;
     }
   }
   if (calm > 0) {
