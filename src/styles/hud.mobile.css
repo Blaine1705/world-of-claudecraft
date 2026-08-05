@@ -5628,18 +5628,14 @@
   @media (orientation: landscape) {
     body.mobile-touch.hud-mobile-tablet #player-frame,
     body.mobile-touch.hud-mobile-tablet #castbar,
-    body.mobile-touch.hud-mobile-tablet #swingbar {
-      left: calc(50% - 10px);
-    }
+    body.mobile-touch.hud-mobile-tablet #swingbar,
     body.mobile-touch.hud-mobile-tablet #pet-frame {
       left: calc(50% - 10px);
     }
     /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,
-    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar {
-      left: calc(50% + 10px);
-    }
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {
       left: calc(50% + 10px);
     }
