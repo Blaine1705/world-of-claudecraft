@@ -4940,6 +4940,55 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "category": "chronicle",
     "renown": 10,
     "feat": false
+  },
+  {
+    "id": "prog_engineering_rare",
+    "name": "Precision Engineering",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_alchemy_rare",
+    "name": "A Rare Vintage",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_cooking_rare",
+    "name": "A Dish to Remember",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_leatherworking_rare",
+    "name": "Fine Tanning",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_tailoring_rare",
+    "name": "A Master's Stitch",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_weaponcrafting_rare",
+    "name": "Tempered to a Shine",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_armorcrafting_rare",
+    "name": "Plated to Perfection",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
   }
 ];
 
