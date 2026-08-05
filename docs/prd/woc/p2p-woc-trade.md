@@ -259,3 +259,61 @@ This shares the builder, verifier and releaser with an auction, so it cannot be
 tested end to end until those exist. It should land **after** the chain wiring
 (`MARKET_CHAIN_WIRING.md` in the payout service), and reuse rather than
 parallel-build.
+
+## Implementation status
+
+Updated 2026-08-06. The server foundation has landed; the client cannot reach
+it yet, which is deliberate rather than half-wired: a directed listing simply
+does not exist until something creates one.
+
+### Landed (game `12543c8d55`, service `f2ea381`)
+
+| Piece | Where |
+|---|---|
+| `directed_buyer_account`, additive DDL + partial index | `WOC_MARKET_SCHEMA` |
+| Account-keyed field on the params + row | `WocListingParams`, `WocListingRow` |
+| Directed rows excluded from public browse | `browseListings` (SQL) |
+| Detail refuses non-parties; `viewerAccount` is REQUIRED | `WocMarketService.listingDetail` |
+| `buyNow` refuses a non-designated buyer as `not_found` | `WocMarketService.buyNow` |
+| Cap exemption, both the pre-check and the locked transaction | `woc_market.ts`, `woc_market_db.ts` |
+| Auction form + malformed account id refused | `validListingParams` |
+| The three USD legs on `/estimate` | service `splitMarketProceedsCents` |
+
+Tests: `tests/woc_market_rules.test.ts` (the directed-sale describe),
+`tests/server/woc_market_service.test.ts` (the two-parties describe), and
+`tests/server/woc_market_directed_sql.test.ts`, which exists because the
+service tests run against `FakeWocMarketDb` and therefore stay green when the
+real SQL predicate is deleted. That file drives `PgWocMarketDb` against a mock
+pool and pins the predicate on every sort. Every gate above is mutation-tested.
+
+### Remaining
+
+1. **Offer / accept / decline endpoints.** `RouteDef` modules registered in
+   `server/http/registry.ts`. The offer route must resolve the counterparty
+   from the agreed trade; taking an account id from the seller's request body
+   would make any account a drop target, which is why `createListing` passes
+   `directedBuyerAccount: null` unconditionally today.
+2. **Counterparty wallet-verified status.** A server-fed sibling field, NOT a
+   member of `TradeInfo`: the sim builds that and may not know about wallets
+   (`src/sim/social/trade.ts` is inside the token firewall's scanned tree and
+   not on its allowlist). Drives the "recipient must connect a wallet" copy.
+3. **Escrow on mutual acceptance, delivery on verified payment.**
+   `extractTradableCopy` then `mailSystemParcel` with a custody ref, reusing
+   the settlement machinery so the existing expiry sweep supplies the strike
+   and the sale flows into the public history unchanged.
+4. **The trade window's $WOC arm.** Pure `*_view.ts` core registered in
+   `UI_PURE_CORES` plus a thin cold painter: USD entry showing the $WOC
+   equivalent, net AND fee from the server split, gold/$WOC mutual exclusivity,
+   filtering to $WOC-tradable items, and the wallet-required message. English
+   `t()` keys only, in `i18n.catalog/hud_chrome.ts`.
+5. **An auction-listed item must not be offerable p2p**, per the requester.
+6. `npm run gate`.
+
+### Two decisions worth re-reading before starting
+
+The sim trade session is NOT used for $WOC mode (see "Second round of
+decisions"): its confirm performs the swap in the same tick, and a $WOC payment
+is asynchronous. The window is an agree-terms surface that hands off.
+
+`createListing` still has no 2FA, which is the real theft vector on this rail
+and is independent of this feature. Recorded, undecided, tracked separately.
