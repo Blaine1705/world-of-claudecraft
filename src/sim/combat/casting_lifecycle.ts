@@ -28,6 +28,7 @@
 // tests/architecture.test.ts.
 
 import { isDispellableAura } from '../aura_classify';
+import { nearestAttackerId } from '../auto_acquire_target';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { isShieldItem } from '../equipment_rules';
@@ -610,6 +611,27 @@ function vanishedLowBlowFallbackTarget(
   return nearest;
 }
 
+// Auto-acquire on cast with no target (issue #2787): the nearest live,
+// hostile mob currently attacking (Entity.aggroTargetId) the caster. Called
+// only from castAbility's target-resolution branches below, and only when
+// the caster has no current target at all (p.targetId === null); it never
+// overrides an existing (even stale) selection.
+function nearestAttackingMob(ctx: SimContext, p: Entity): Entity | null {
+  const candidates: { id: number; d: number; facingDiff: number }[] = [];
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind !== 'mob' || entity.dead) continue;
+    if (entity.aggroTargetId !== p.id) continue;
+    if (!ctx.isHostileTo(p, entity)) continue;
+    candidates.push({
+      id: entity.id,
+      d: dist2d(p.pos, entity.pos),
+      facingDiff: Math.abs(normAngle(angleTo(p.pos, entity.pos) - p.facing)),
+    });
+  }
+  const id = nearestAttackerId(candidates);
+  return id !== null ? (ctx.entities.get(id) ?? null) : null;
+}
+
 export function castAbility(
   ctx: SimContext,
   abilityId: string,
@@ -831,6 +853,12 @@ export function castAbility(
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
     target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
+    // Auto-acquire (issue #2787): only when nothing is targeted at all, never
+    // overriding an existing (even stale/invalid) selection.
+    if (!target && p.targetId === null) {
+      target = nearestAttackingMob(ctx, p);
+      if (target) p.targetId = target.id;
+    }
     if (
       !target ||
       target.dead ||
@@ -854,10 +882,18 @@ export function castAbility(
       return;
     }
   } else if (ability.requiresTarget) {
-    target =
-      p.targetId !== null
-        ? (ctx.entities.get(p.targetId) ?? null)
-        : vanishedLowBlowFallbackTarget(ctx, p, ability);
+    if (p.targetId !== null) {
+      target = ctx.entities.get(p.targetId) ?? null;
+    } else {
+      // The stealth ambush fallback (Kidney Shot) takes priority when it
+      // applies; it deliberately never becomes the current target. Auto-
+      // acquire (issue #2787) only kicks in when that yields nothing either.
+      target = vanishedLowBlowFallbackTarget(ctx, p, ability);
+      if (!target) {
+        target = nearestAttackingMob(ctx, p);
+        if (target) p.targetId = target.id;
+      }
+    }
     // Vanish (hasEscapeStealth) makes the target fully undetectable, same gate
     // the mob AI already applies (mob/targeting.ts): a hostile cast against it
     // is refused exactly like an out-of-range or dead target (issue #2426).
