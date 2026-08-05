@@ -193,8 +193,8 @@
       "tick": 120,
       "time": 6,
       "nextId": 948,
-      "state": "812f01b6",
-      "events": "df7a1fb8",
+      "state": "01811162",
+      "events": "b720c3f1",
       "rng": {
         "draws": 681,
         "digest": "03c0facf"
@@ -204,7 +204,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 948,
-      "state": "a120d591",
+      "state": "5469940d",
       "events": "203d6a80",
       "rng": {
         "draws": 904,
@@ -215,8 +215,8 @@
       "tick": 160,
       "time": 8,
       "nextId": 948,
-      "state": "6c85aee3",
-      "events": "54368888",
+      "state": "5b7e11d1",
+      "events": "d2d6c32f",
       "rng": {
         "draws": 1160,
         "digest": "c70e0836"
@@ -226,7 +226,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 948,
-      "state": "3ccdf671",
+      "state": "399c4847",
       "events": "7d61815e",
       "rng": {
         "draws": 1426,
@@ -237,8 +237,8 @@
       "tick": 200,
       "time": 10,
       "nextId": 948,
-      "state": "df4b4eb6",
-      "events": "fa3544ff",
+      "state": "897206ab",
+      "events": "65b017e6",
       "rng": {
         "draws": 1695,
         "digest": "e1941942"
@@ -248,7 +248,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 948,
-      "state": "ec114a55",
+      "state": "17f7ad2e",
       "events": "7d61815e",
       "rng": {
         "draws": 1842,
@@ -259,7 +259,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 948,
-      "state": "fe677f97",
+      "state": "794ec6fa",
       "events": "741638a5",
       "rng": {
         "draws": 1842,
@@ -378,7 +378,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 845,
+          "resource": 863,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -424,6 +424,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
+          "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 10,
@@ -518,8 +519,8 @@
       "tick": 224,
       "time": 11.2,
       "nextId": 948,
-      "state": "644c9800",
-      "events": "aaaf38f1",
+      "state": "d8f54c61",
+      "events": "3de3f36e",
       "rng": {
         "draws": 1883,
         "digest": "d1018ffa"
@@ -637,7 +638,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 845,
+          "resource": 863,
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
@@ -684,6 +685,7 @@
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
+          "petAutoSkill": true,
           "petAutoTaunt": true,
           "petMode": "aggressive",
           "petTauntTimer": 9.8,

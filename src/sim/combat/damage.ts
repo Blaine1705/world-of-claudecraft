@@ -113,7 +113,6 @@ import {
   priestOnVigilTriggered,
 } from './priest/talents';
 import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
-import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
 import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiritmend';
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
