@@ -4,12 +4,18 @@ vi.mock('../server/db', () => ({
   pool: { query: vi.fn(), connect: vi.fn() },
 }));
 
-import { pool } from '../server/db';
 import {
-  createBugReport, listBugReports, getBugReportScreenshot,
-  isStorableScreenshot, clampBugReportMeta,
-  BugReportRateLimitError, BUG_REPORT_RATE_LIMIT, BUG_SCREENSHOT_MAX,
+  BUG_REPORT_RATE_LIMIT,
+  BUG_SCREENSHOT_MAX,
+  BugReportRateLimitError,
+  clampBugReportMeta,
+  createBugReport,
+  getBugReportScreenshot,
+  isStorableScreenshot,
+  listBugReports,
+  pruneBugReportsBatch,
 } from '../server/bug_report_db';
+import { pool } from '../server/db';
 
 const query = vi.mocked(pool.query);
 
@@ -70,7 +76,10 @@ describe('createBugReport', () => {
     query
       .mockResolvedValueOnce({ rows: [{ n: 0 }] } as any)
       .mockResolvedValueOnce({ rows: [{ id: 1 }] } as any);
-    await createBugReport({ ...base, meta: { build: 'v1', evil: 'x'.repeat(99999), nested: { a: 1 } } });
+    await createBugReport({
+      ...base,
+      meta: { build: 'v1', evil: 'x'.repeat(99999), nested: { a: 1 } },
+    });
     const stored = JSON.parse(query.mock.calls[1][1]?.[9] as string);
     expect(stored.build).toBe('v1');
     expect(stored.evil).toBeUndefined(); // unknown field dropped
@@ -99,7 +108,9 @@ describe('isStorableScreenshot', () => {
     expect(isStorableScreenshot('https://example.com/x.jpg')).toBe(false);
     expect(isStorableScreenshot(null)).toBe(false);
     expect(isStorableScreenshot(42)).toBe(false);
-    expect(isStorableScreenshot('data:image/jpeg;base64,' + 'A'.repeat(BUG_SCREENSHOT_MAX))).toBe(false);
+    expect(isStorableScreenshot('data:image/jpeg;base64,' + 'A'.repeat(BUG_SCREENSHOT_MAX))).toBe(
+      false,
+    );
   });
 });
 
@@ -107,8 +118,13 @@ describe('clampBugReportMeta', () => {
   it('returns the bounded shape and drops unknown fields', () => {
     const m = clampBugReportMeta({ build: 'b', extra: 'drop me', viewport: { w: 100, h: 200 } });
     expect(m).toEqual({
-      build: 'b', userAgent: '', viewport: { w: 100, h: 200, dpr: 1 },
-      zone: '', level: 0, className: '', cameraYaw: 0,
+      build: 'b',
+      userAgent: '',
+      viewport: { w: 100, h: 200, dpr: 1 },
+      zone: '',
+      level: 0,
+      className: '',
+      cameraYaw: 0,
     });
     expect(m).not.toHaveProperty('extra');
   });
@@ -129,7 +145,12 @@ describe('clampBugReportMeta', () => {
 describe('listBugReports', () => {
   it('returns rows + total, never selects the raw screenshot, newest first, capped', async () => {
     query
-      .mockResolvedValueOnce({ rows: [{ id: 2, has_screenshot: true }, { id: 1, has_screenshot: false }] } as any)
+      .mockResolvedValueOnce({
+        rows: [
+          { id: 2, has_screenshot: true },
+          { id: 1, has_screenshot: false },
+        ],
+      } as any)
       .mockResolvedValueOnce({ rows: [{ total: 2 }] } as any);
     const { rows, total } = await listBugReports(9999, 0);
     expect(rows.map((r) => r.id)).toEqual([2, 1]);
@@ -158,5 +179,48 @@ describe('getBugReportScreenshot', () => {
   it('returns null for a non-finite id without querying', async () => {
     expect(await getBugReportScreenshot(NaN)).toBeNull();
     expect(query).not.toHaveBeenCalled();
+  });
+});
+
+describe('pruneBugReportsBatch (the retention-sweep primitive)', () => {
+  // Mirrors tests/unstuck_db.test.ts's pruneUnstuckReportsBatch suite: the
+  // sweep owns cadence, budget, and batching, this primitive owns exactly
+  // one bounded delete on the shared pool.
+  it('runs one sibling-shaped bounded delete on the shared pool', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 4 } as any);
+
+    await expect(pruneBugReportsBatch(90, 1000)).resolves.toBe(4);
+
+    expect(query).toHaveBeenCalledTimes(1);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('DELETE FROM bug_reports');
+    expect(sql).toContain("created_at < now() - ($1::int * INTERVAL '1 day')");
+    expect(sql).toContain('ORDER BY created_at ASC, id ASC');
+    expect(sql).toContain('LIMIT $2');
+    expect(params).toEqual([90, 1000]);
+  });
+
+  it('keeps forever on zero and negative retention (the destructive-delete safe side)', async () => {
+    await expect(pruneBugReportsBatch(0, 1000)).resolves.toBe(0);
+    await expect(pruneBugReportsBatch(-3, 1000)).resolves.toBe(0);
+    await expect(pruneBugReportsBatch(Number.NaN, 1000)).resolves.toBe(0);
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('normalizes fractional retention days up to one full day, never to zero', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
+    await pruneBugReportsBatch(0.5, 1000);
+    expect(query.mock.calls[0][1]).toEqual([1, 1000]);
+  });
+
+  it('floors the batch size at one row (no LIMIT 0 infinite no-op)', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 } as any);
+    await pruneBugReportsBatch(90, 0);
+    expect(query.mock.calls[0][1]).toEqual([90, 1]);
+  });
+
+  it('a driver null rowCount reads as zero deleted, not a crash or NaN', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: null } as any);
+    await expect(pruneBugReportsBatch(90, 1000)).resolves.toBe(0);
   });
 });
