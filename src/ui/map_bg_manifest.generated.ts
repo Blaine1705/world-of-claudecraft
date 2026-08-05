@@ -10,17 +10,17 @@ export const BAKED_MAP_BG = {
   "eastbrook_vale": {
     "w": 480,
     "h": 480,
-    "rowHash": "34748d3e"
+    "rowHash": "5348677c"
   },
   "mirefen_marsh": {
     "w": 480,
     "h": 480,
-    "rowHash": "968d6e97"
+    "rowHash": "0576b60c"
   },
   "thornpeak_heights": {
     "w": 480,
     "h": 480,
-    "rowHash": "7788193f"
+    "rowHash": "64f3ed37"
   },
   "veiled_hollow": {
     "w": 720,
@@ -45,7 +45,7 @@ export const BAKED_MAP_BG = {
   "willowfen": {
     "w": 587,
     "h": 694,
-    "rowHash": "e5330cb1"
+    "rowHash": "b497d16e"
   },
   "nightbloom": {
     "w": 613,
@@ -55,7 +55,7 @@ export const BAKED_MAP_BG = {
   "wraithwood": {
     "w": 613,
     "h": 746,
-    "rowHash": "d535dd7d"
+    "rowHash": "fe751ecf"
   },
   "palmreach": {
     "w": 613,
@@ -70,7 +70,7 @@ export const BAKED_MAP_BG = {
   "galecrest": {
     "w": 587,
     "h": 694,
-    "rowHash": "8c694fe4"
+    "rowHash": "9e0f3e3c"
   },
   "farshore_isle": {
     "w": 480,

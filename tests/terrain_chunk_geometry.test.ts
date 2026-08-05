@@ -123,7 +123,7 @@ describe('generated chunk geometry is stable', () => {
     // lattice in terrain_chunk_build.ts (vertex normals now difference the
     // lattice at the chunk's own spacing instead of a fixed 1.5yd stencil).
     // Both were intended, reviewed visual changes.
-    expect(digestOf(inRect)).toBe('76edadfe06b00b8ba47bec9842dc528a');
+    expect(digestOf(inRect)).toBe('7fdd682e1b2668c0da7124b284939b7b');
     // The gap super-chunks take the same re-mint.
     expect(digestOf(gapFill)).toBe('0a6da9382c9bc0a9d6c7adcc752fb27b');
 
