@@ -439,6 +439,18 @@ export const SFX = [
     custom: true,
   },
   {
+    key: 'emboldening_roar',
+    custom: true,
+  },
+  {
+    key: 'defiant_bellow',
+    custom: true,
+  },
+  {
+    key: 'rallying_cry',
+    custom: true,
+  },
+  {
     key: 'ice_block',
     custom: true,
   },

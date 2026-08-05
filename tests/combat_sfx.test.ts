@@ -292,10 +292,13 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'intimidating_shout', anchorId: 10 });
   });
 
-  it('gives Battle Shout and Demoralizing Shout their own cast cue via fx:shout', () => {
+  it('gives Battle Shout, Demoralizing Shout, Emboldening Roar, Defiant Bellow, and Valor Roar their own cast cue via fx:shout', () => {
     for (const [ability, key] of [
       ['battle_shout', 'battle_shout'],
       ['demoralizing_shout', 'demoralizing_shout'],
+      ['emboldening_roar', 'emboldening_roar'],
+      ['defiant_bellow', 'defiant_bellow'],
+      ['rallying_cry', 'rallying_cry'],
     ] as const) {
       expect(
         spellFxCue({

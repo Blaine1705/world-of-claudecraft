@@ -111,18 +111,20 @@ const BLINK_STEP_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 };
 
 // fx:'shout' fires from casting_lifecycle.ts's generic castFx completion
-// block for every ability with `castFx: 'shout'` on its definition (currently
-// Iron Bellow/battle_shout, Direhowl/demoralizing_shout, and Intimidating
-// Shout, none of which had a cue hooked up here before: the event fired but
-// nothing in combat_sfx.ts recognized the 'shout' fx kind at all). Battle
-// Shout and Demoralizing Shout have no other cast-time emit, so this table
-// is their whole read; Intimidating Shout ALSO emits its own fx:'nova' (its
-// effect is archetype aoeFear, effect_dispatch.ts's case 'aoeFear'), which is
-// where its cue actually resolves (NOVA_ABILITY_CUES above), so it is
-// deliberately absent here to avoid a double cast sound on the same cast.
+// block for every ability with `castFx: 'shout'` on its definition. None of
+// the five below have any other cast-time emit (their effects - aoeAllySureCrit,
+// aoeTaunt, aoeAllyMaxHp, buffTarget, aoeAttackPower - apply auras directly,
+// with no spellfx of their own), so this table is their whole cast-time read.
+// Intimidating Shout is the one exception: it ALSO emits its own fx:'nova'
+// (its effect is archetype aoeFear, effect_dispatch.ts's case 'aoeFear'),
+// which is where its cue actually resolves (NOVA_ABILITY_CUES above), so it
+// is deliberately absent here to avoid a double cast sound on the same cast.
 const SHOUT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   battle_shout: 'battle_shout',
   demoralizing_shout: 'demoralizing_shout',
+  emboldening_roar: 'emboldening_roar',
+  defiant_bellow: 'defiant_bellow',
+  rallying_cry: 'rallying_cry',
 };
 
 // Exported (read-only, `as const`) purely so a test can pin its key set
