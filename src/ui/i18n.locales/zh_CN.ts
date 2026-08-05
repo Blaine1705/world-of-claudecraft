@@ -5815,7 +5815,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': '目标选择与战斗',
   'guide.controls.groupInterface': '界面',
   'guide.controls.controllerBody':
-    '手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角。',
+    '手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角，还可以将一个按键绑定为拉近或拉远镜头（默认未绑定）。',
   'guide.controls.controllerHeading': '使用手柄',
   'guide.controls.cycleFriendly': '循环选择友方目标',
   'guide.controls.targetAuras': '目标增益和减益效果',
