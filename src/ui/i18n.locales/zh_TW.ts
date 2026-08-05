@@ -10386,9 +10386,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '署名作品',
   'guide.profPages.econ.provenanceBody':
     '精良及以上的成品與發現都帶有製作者的署名，而署名完全相同的物品仍可堆疊。',
-  'guide.profPages.econ.throttleHeading': '操作限頻',
-  'guide.profPages.econ.throttleBody':
-    '製作、分解、附魔與回收共用一個限頻：每{seconds}秒最多{actions}次操作。',
   'guide.profPages.econ.doctrineHeading': '玩家與玩家交易',
   'guide.profPages.econ.doctrineBody':
     '製作裝備的強度始終低於團隊副本的底線，而上述費用會把貨物推向玩家之間的交易，而非商店循環。',
@@ -10663,4 +10660,32 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '以太奔湧',
   'itemUi.vendor.buyStack': '購買 {count} 個',
   'itemUi.vendor.buyStackAria': '以 {price} 購買 {count} 個 {item}',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '製作',
+  'abilityUi.cast.disenchanting': '分解',
+  'abilityUi.cast.enchanting_apply': '附魔',
+  'abilityUi.cast.salvaging': '拆解',
+  'abilityUi.cast.tool_recharge': '充能',
+  'hudChrome.crafting.crafting': '製作中',
+  'hudChrome.crafting.create': '製作',
+  'hudChrome.crafting.createAll': '全部製作',
+  'hudChrome.crafting.createAllAria': '依目前材料可製作的最大數量製作此配方',
+  'hudChrome.crafting.qtyRowAria': '製作數量',
+  'hudChrome.crafting.qtyDecreaseAria': '減少製作數量',
+  'hudChrome.crafting.qtyIncreaseAria': '增加製作數量',
+  'hudChrome.crafting.qtyValueAria': '製作數量，{count}',
+  'hudChrome.crafting.batchRemaining': '剩餘 {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '還剩 {remaining} 個，共 {total} 個',
+  'hudChrome.crafting.durationAria': '{seconds} 秒讀條',
+  'hudChrome.crafting.progressAria': '製作進度',
+  'hudChrome.crafting.announceStart': '正在製作 {name}',
+  'hudChrome.crafting.announceComplete': '已完成製作 {name}',
+  'hudChrome.crafting.announceCancel': '製作已取消',
+  'hudChrome.crafting.busy': '你正忙著。',
+  'hudChrome.enchanting.disenchantBusy': '你正忙著。',
+  'hudChrome.enchanting.salvageBusy': '你正忙著。',
+  'hudChrome.enchanting.enchantBusy': '你正忙著。',
+  'guide.profPages.econ.castPaceHeading': '讀條時間與金幣消耗',
+  'guide.profPages.econ.castPaceBody':
+    '專業動作需要真實讀條時間：簡單的野外配方大約一秒半，高階階梯配方則需要數秒；分解、附魔、拆解與工具效果充能各自有固定的短讀條。中途取消不會損失材料。每次成功製作還會依物品預算支付銅幣費用。加上材料、工作台與技能上限，這種節奏在不設額外動作配額的情況下，也能讓市場保持健康。',
 };

@@ -5661,6 +5661,157 @@
   .crafting-recipe-btn:disabled .crafting-craft-chip {
     filter: grayscale(0.7);
   }
+  /* Active craft row: gold wash on the chip (still disabled; progress is the
+     strip). Tint is a redundant hint next to the "Crafting" label + aria-busy. */
+  .crafting-recipe-btn.casting .crafting-craft-chip {
+    filter: none;
+    box-shadow: inset 0 0 0 1px var(--gold);
+  }
+  /* Duration chip: expected cast time before the click (actionable pace info,
+     identical on every graphics preset; never tier-gated or color-only). */
+  .crafting-duration-chip {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 0 5px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 3px;
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  /* Polite live region: off-screen, announces cast start/complete/cancel. */
+  .crafting-live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  /* In-window craft-cast progress strip (Craft Cast System Phase 2): tracks
+     the real entity cast, not a client timer. Hidden when idle. */
+  .crafting-cast-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 4px;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.3);
+  }
+  .crafting-cast-progress[hidden] {
+    display: none;
+  }
+  .crafting-cast-progress-track {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--color-border-default);
+    overflow: hidden;
+  }
+  .crafting-cast-progress-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--gold-dim, #a07a30), var(--gold));
+    /* Width is set every frame from real cast fields (no CSS animation). Always
+       transition:none so reduced-motion and full-motion read the same bar;
+       remaining time also lives in .crafting-cast-progress-timer text + aria. */
+    transition: none;
+  }
+  .crafting-cast-progress-timer {
+    flex: none;
+    min-width: 2.5em;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+    text-align: right;
+  }
+  /* Phase 3 batch remaining on the cast strip (hidden when total <= 1). */
+  .crafting-cast-progress-batch {
+    flex: none;
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  .crafting-cast-progress-batch[hidden] {
+    display: none;
+  }
+  /* Phase 3 qty stepper + Create All under each recipe card. */
+  .crafting-batch-row {
+    flex: 1 0 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px 8px;
+  }
+  .crafting-qty-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .crafting-qty-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: 4px;
+    background: var(--color-bg-input);
+    color: var(--color-text-light);
+    font-family: var(--ui-font);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .crafting-qty-btn:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+  .crafting-qty-btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+  .crafting-qty-value {
+    min-width: 1.75em;
+    text-align: center;
+    font-family: var(--ui-font);
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    color: var(--color-text-light);
+  }
+  .crafting-create-all-btn {
+    min-height: 32px;
+    padding: 5px 12px;
+    border: 1px solid #6a5320;
+    border-radius: 5px;
+    background: linear-gradient(180deg, #c9a24a, #8a6820);
+    color: #1c1206;
+    font-family: var(--title-font);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .crafting-create-all-btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+  }
+  .crafting-create-all-btn:disabled {
+    filter: grayscale(0.7);
+    opacity: 0.55;
+    cursor: default;
+  }
   .crafting-recipe-item > .crafting-combo-requirement {
     flex: 1 0 100%;
     margin: 0;

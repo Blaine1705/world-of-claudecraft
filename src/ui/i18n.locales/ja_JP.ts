@@ -10881,9 +10881,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '署名入りの品',
   'guide.profPages.econ.provenanceBody':
     'レア以上の製作品と発見には作り手の署名が入り、署名が完全に一致する品は今でもスタックできます。',
-  'guide.profPages.econ.throttleHeading': '行動の制限',
-  'guide.profPages.econ.throttleBody':
-    '製作・分解・エンチャント・サルベージはひとつの制限を共有します。{seconds}秒あたり最大{actions}回です。',
   'guide.profPages.econ.doctrineHeading': 'プレイヤー同士の取引',
   'guide.profPages.econ.doctrineBody':
     '製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。',
@@ -11168,4 +11165,32 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
   'itemUi.vendor.buyStack': '{count}個購入',
   'itemUi.vendor.buyStackAria': '{item}を{count}個、{price}で購入',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '製作',
+  'abilityUi.cast.disenchanting': '分解',
+  'abilityUi.cast.enchanting_apply': '付魔',
+  'abilityUi.cast.salvaging': '解体',
+  'abilityUi.cast.tool_recharge': '充填',
+  'hudChrome.crafting.crafting': '製作中',
+  'hudChrome.crafting.create': '作成',
+  'hudChrome.crafting.createAll': 'すべて作成',
+  'hudChrome.crafting.createAllAria': '所持材料で作れる最大数までこのレシピを作成する',
+  'hudChrome.crafting.qtyRowAria': '作成数',
+  'hudChrome.crafting.qtyDecreaseAria': '作成数を減らす',
+  'hudChrome.crafting.qtyIncreaseAria': '作成数を増やす',
+  'hudChrome.crafting.qtyValueAria': '作成数、{count}',
+  'hudChrome.crafting.batchRemaining': '残り {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '残り {remaining} 個、合計 {total} 個',
+  'hudChrome.crafting.durationAria': '{seconds} 秒の詠唱',
+  'hudChrome.crafting.progressAria': '製作の進行',
+  'hudChrome.crafting.announceStart': '{name} を製作中',
+  'hudChrome.crafting.announceComplete': '{name} の製作が完了',
+  'hudChrome.crafting.announceCancel': '製作をキャンセルした',
+  'hudChrome.crafting.busy': '手が離せません。',
+  'hudChrome.enchanting.disenchantBusy': '手が離せません。',
+  'hudChrome.enchanting.salvageBusy': '手が離せません。',
+  'hudChrome.enchanting.enchantBusy': '手が離せません。',
+  'guide.profPages.econ.castPaceHeading': '詠唱時間とゴールドの消費',
+  'guide.profPages.econ.castPaceBody':
+    '専門職の行動には実際の詠唱時間がかかります。簡単な野外レシピは約1.5秒、上位の梯子レシピは数秒、分解・付魔・解体・道具効果の充填はそれぞれ固定の短い詠唱です。詠唱中にキャンセルしても損失はありません。成功した製作にはアイテム予算に応じた銅貨の手数料もかかります。材料・作業台・技能上限と合わせて、別枠の行動上限がなくても市場を健全に保てます。',
 };

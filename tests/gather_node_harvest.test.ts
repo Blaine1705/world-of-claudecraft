@@ -46,6 +46,7 @@ import { type Entity, INTERACT_RANGE, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
 import { placeAtHarvestSpot } from './helpers/harvest_spot';
+import { runRecharge } from './helpers/enchant_family_cast';
 
 function mustMeta(sim: Sim, pid: number) {
   const meta = sim.players.get(pid);
@@ -1618,7 +1619,7 @@ describe('fine material grades on the live harvest path', () => {
     slot.durability = 5;
     sim.addItem('arcane_dust', 10, pid);
     sim.addItem('arcane_shard', 10, pid);
-    sim.rechargeToolEffect('mining', pid);
+    runRecharge(sim, 'mining', pid);
     sim.tick();
     expect(sim.countItem('arcane_dust', pid)).toBe(10);
     expect(sim.countItem('arcane_shard', pid)).toBe(8);

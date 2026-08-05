@@ -6253,7 +6253,13 @@ export class GameServer {
         // check (the dispatch type-guard rule); anything else reads as false.
         // The sim honors it only for eligible equipment outputs and mints the
         // bindOnTrade arm itself, so nothing here trusts client data.
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        // Phase 3 optional `count`: finite numbers only; sim clamps to batch
+        // max and mats-fit (default 1 when omitted or non-numeric).
+        if (typeof msg.recipe === 'string') {
+          const count =
+            typeof msg.count === 'number' && Number.isFinite(msg.count) ? Math.floor(msg.count) : 1;
+          sim.craftItem(msg.recipe, msg.commission === true, pid, count);
+        }
         break;
       // Enchanting profession commands (Professions 2.0): the sim
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted

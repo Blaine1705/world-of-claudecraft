@@ -31,6 +31,23 @@ function grantItem(sim: Sim, itemId: string, count: number, pid: number) {
   for (let i = 0; i < count; i++) sim.addItem(itemId, 1, pid);
 }
 
+/** Finish a started craft cast (updateCasting shape: clear cast, then complete). */
+function completeCraftCastNow(sim: Sim, pid = sim.playerId) {
+  const p = (sim as any).entities.get(pid);
+  const meta = (sim as any).players.get(pid);
+  if (!p || !meta) throw new Error('player missing');
+  p.castingAbility = null;
+  p.castRemaining = 0;
+  sim.ctx.completeCraftCast(p, meta);
+}
+
+/** Start via Sim.craftItem and complete in-harness (Phase 1 cast path). */
+function craftItemComplete(sim: Sim, recipeId: string, commission = false, pid?: number) {
+  const id = pid ?? sim.playerId;
+  sim.craftItem(recipeId, commission, id);
+  completeCraftCastNow(sim, id);
+}
+
 // Station-bound recipes gate on POSITION only (the old level-20 hub
 // arm retired), so a harness just walks the player onto the recipe's station
 // (the STATIONS record, so a content re-placement can never strand this).
@@ -395,7 +412,7 @@ describe('craftItem command (#1127)', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     grantItem(sim, 'spider_leg', 1, pid);
-    sim.craftItem('recipe_tough_jerky', false, pid);
+    craftItemComplete(sim, 'recipe_tough_jerky', false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     expect(sim.lastCraftResult?.itemId).toBe('tough_jerky');
     // Quality is the OUTPUT DEF quality (tough_jerky: common), and a
@@ -818,9 +835,9 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
     grantItem(sim, 'spider_leg', 1, pid);
 
     sim.drainEvents();
-    // The coordinator command (not the pure resolveCraft) is what emits the
+    // The coordinator command starts a cast; completeCraftCast emits the
     // craftResult event the client hooks audio onto.
-    sim.craftItem('recipe_tough_jerky', false, pid);
+    craftItemComplete(sim, 'recipe_tough_jerky', false, pid);
     const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
     if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
     expect(craft.ok).toBe(true);
@@ -897,7 +914,7 @@ describe('masterwork proc (Professions 2.0)', () => {
     rng.setObserver(() => {
       draws++;
     });
-    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    craftItemComplete(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     rng.setObserver(null);
 
     // Still exactly one draw across the whole command path: the proc roll.
@@ -971,7 +988,7 @@ describe('masterwork proc (Professions 2.0)', () => {
       draws++;
       roll = value;
     });
-    sim.craftItem('recipe_eastbrook_chain_vest', false, pid);
+    craftItemComplete(sim, 'recipe_eastbrook_chain_vest', false, pid);
     rng.setObserver(null);
 
     // The proc draw is unconditional on the success path: exactly one draw

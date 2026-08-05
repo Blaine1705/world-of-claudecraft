@@ -24,6 +24,7 @@
 // finding: it means the boundary has no round trip a player can observe.
 
 import { describe, expect, it } from 'vitest';
+import { runApplyEnchant, runCraft, runDisenchant } from './helpers/enchant_family_cast';
 import { moveBetweenContainers } from '../src/sim/bank';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import { MAIL_DELIVERY_SECONDS } from '../src/sim/mail/post_office';
@@ -315,7 +316,7 @@ describe('provenance survives every container boundary', () => {
     sim.addItem('arcane_dust', 10, pid);
     sim.addItem('arcane_essence', 10, pid);
 
-    sim.applyEnchant(GEAR, 'enchant_chest_stamina', undefined, undefined, pid);
+    runApplyEnchant(sim, GEAR, 'enchant_chest_stamina', undefined, undefined, pid);
     expect(sim.lastEnchantResultFor(pid)?.ok, 'the enchant applied').toBe(true);
     const after = gearSlot(sim, pid);
     expect(after?.instance?.signer, 'signer').toBe(SIGNER);
@@ -335,14 +336,14 @@ describe('provenance survives every container boundary', () => {
     const meta = metaFor(sim, pid);
     sim.addItem('copper_ore', 4, pid);
     sim.addItem('smithing_flux', 9, pid);
-    sim.craftItem(GEAR_RECIPE, false, pid);
+    runCraft(sim, GEAR_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     sim.addItem('arcane_dust', 10, pid);
     sim.addItem('arcane_essence', 10, pid);
 
-    sim.applyEnchant(GEAR, 'enchant_chest_stamina', undefined, undefined, pid);
+    runApplyEnchant(sim, GEAR, 'enchant_chest_stamina', undefined, undefined, pid);
     const afterApply = meta.craftSkills.enchanting;
-    sim.disenchantItem(
+    runDisenchant(sim, 
       GEAR,
       pid,
       inv(sim, pid).findIndex((s) => s.itemId === GEAR),

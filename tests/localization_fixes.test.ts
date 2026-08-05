@@ -1021,13 +1021,6 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // every new sim module joins the scan list in the same change so any
     // future emit added here lands under the drift guard from day one.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/mastery_reset.ts'), 'utf8'),
-    // Professions 2.0: the shared action-throttle module (the
-    // crafting window logic extracted from crafting.ts). It emits no player
-    // text itself (the throttled denial is a reason code its callers
-    // localize), but every new sim module joins the scan list in the same
-    // change so any future emit added here lands under the drift guard from
-    // day one.
-    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/action_throttle.ts'), 'utf8'),
     // Professions 2.0: the typed disenchant-secondary mapper. It emits
     // no player text itself (a pure def -> material-id mapping consumed by
     // enchanting.ts), but every new sim module joins the scan list in the same

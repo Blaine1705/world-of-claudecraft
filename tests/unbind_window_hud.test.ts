@@ -140,7 +140,7 @@ describe('hud.ts commission opt-in state contract (source pins)', () => {
     // silently arm every subsequent craft of that recipe and no sim-side pin
     // could catch it (the sim honors whatever flag arrives).
     expect(hudSource).toContain('const commission = this.craftCommissionOptIn.delete(recipeId);');
-    expect(hudSource).toContain('this.sim.craftItem(recipeId, commission);');
+    expect(hudSource).toContain('this.sim.craftItem(recipeId, commission, batchCount);');
   });
 
   it('the checkbox paints from has() and toggles through add/delete', () => {

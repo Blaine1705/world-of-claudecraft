@@ -38,6 +38,7 @@ import { type CraftSkills, emptyCraftSkills } from '../src/sim/professions/wheel
 import type { Rng } from '../src/sim/rng';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
+import { runCraft } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 42) {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -383,7 +384,7 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     const draws: number[] = [];
     const rng: Rng = ctxOf(sim).rng;
     rng.setObserver((v) => draws.push(v));
-    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     rng.setObserver(null);
     expect(draws.length).toBe(2);
     const [varianceRoll, procRoll] = draws;
@@ -403,7 +404,7 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     const draws: number[] = [];
     const rng: Rng = ctxOf(sim).rng;
     rng.setObserver((v) => draws.push(v));
-    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     rng.setObserver(null);
     expect(draws.length).toBe(2);
     const [varianceRoll, procRoll] = draws;
@@ -423,7 +424,7 @@ describe('the variance roll actually changes the masterwork outcome (#1296, hunt
     const pid = sim.playerId;
     const meta = metaOf(sim, pid);
     vestmentsScenario(sim, pid, meta, true);
-    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     expect(sim.lastCraftResult?.variance).toBe('normal');
   });
 });

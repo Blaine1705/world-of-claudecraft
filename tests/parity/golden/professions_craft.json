@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "dda489a5",
+      "state": "e8f24f59",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -103,6 +103,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -151,7 +152,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "375e0f60",
+      "state": "1f36e004",
       "events": "88c1187c",
       "rng": {
         "draws": 0,
@@ -239,6 +240,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -287,8 +289,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "9feb220c",
-      "events": "fa11ab2f",
+      "state": "05184e04",
+      "events": "1c2f4eb7",
       "rng": {
         "draws": 1,
         "digest": "3d9489e0"
@@ -316,9 +318,7 @@
           "craftSkills": {
             "alchemy": 1
           },
-          "craftThrottle": {
-            "count": 1
-          },
+          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "craftsPerformed": 1
@@ -391,11 +391,13 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 1.75,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -444,8 +446,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "ce79fe09",
-      "events": "07f633f6",
+      "state": "bc8d8250",
+      "events": "d5054716",
       "rng": {
         "draws": 2,
         "digest": "13fe82e1"
@@ -481,9 +483,7 @@
             "alchemy": 1,
             "tailoring": 200
           },
-          "craftThrottle": {
-            "count": 2
-          },
+          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "craftsPerformed": 2,
@@ -600,11 +600,13 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 1.75,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -653,8 +655,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "edbb15a9",
-      "events": "fa11ab2f",
+      "state": "c7f3362b",
+      "events": "1c2f4eb7",
       "rng": {
         "draws": 3,
         "digest": "bfe71585"
@@ -690,9 +692,7 @@
             "alchemy": 2,
             "tailoring": 200
           },
-          "craftThrottle": {
-            "count": 3
-          },
+          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "craftsPerformed": 3,
@@ -807,11 +807,13 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 1.75,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -860,7 +862,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "edbb15a9",
+      "state": "c7f3362b",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -897,9 +899,7 @@
             "alchemy": 2,
             "tailoring": 200
           },
-          "craftThrottle": {
-            "count": 3
-          },
+          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "craftsPerformed": 3,
@@ -1014,11 +1014,13 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 1.75,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,

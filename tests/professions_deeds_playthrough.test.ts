@@ -22,6 +22,7 @@ import { queueGatheringGrant } from '../src/sim/professions/gathering';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { FISHING_CAST_ID, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const PLAYTHROUGH_SEED = 4242;
 const PAIR = 'weaponcrafting+armorcrafting';
@@ -81,7 +82,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // The vestments recipe gained cloth and thread volume.
     sim.addItem('homespun_cloth', 3, pid);
     sim.addItem('spool_of_thread', 5, pid);
-    sim.craftItem(VESTMENTS_RECIPE, false, pid);
+    runCraft(sim, VESTMENTS_RECIPE, false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     // Hunted precondition of the whole run: seed 4242's FIRST craft does not
     // masterwork-proc (base 3 percent), so the Masterwright beat below stays
@@ -160,17 +161,16 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.addItem('spider_leg', 1, pid);
       sim.addItem('homespun_cloth', 3, pid);
       sim.addItem('spool_of_thread', 5, pid);
-      sim.craftItem(VESTMENTS_RECIPE, false, pid);
+      runCraft(sim, VESTMENTS_RECIPE, false, pid);
       if (!sim.lastCraftResult?.ok)
         throw new Error(`craft ${i} denied: ${sim.lastCraftResult?.reason}`);
       if (sim.lastCraftResult.masterwork === true) procAt = i;
       else purgeItem('eastbrook_ritual_vestments'); // keep the bags clear between attempts
     }
     // Hunted literal (seed 4242, this exact beat order, re-recorded after the
-    // zones 1-3 quest-dedupe content pass added camps, mobs, and items, which
-    // shifts every world-gen draw downstream): the proc lands on attempt
-    // index 7.
-    expect(procAt).toBe(7);
+    // craft-cast system landed: craft start/complete split shifts shared-stream
+    // draws vs the instant-craft era): the proc lands on attempt index 1.
+    expect(procAt).toBe(1);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -303,16 +303,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above), re-recorded on this
-    // v0.34.0 sync merge, where the release side's shifts (the packet's tuned
-    // band tables and world-gen, the Idol Guardian phasesThroughObstacles wander
-    // timing, and the Dragonkin brood replacing the emberwing drakes in shipped
-    // camp slots) compose with this branch's zones 1-3 quest-dedupe content pass,
-    // whose added camps, mobs and items move every shared-stream draw downstream.
-    // Neither parent's recorded value survives the composition, so this is a
-    // fresh hunt, the same cause and protocol as this merge's parity golden
-    // re-mint: the koi bites on session index 0.
-    expect(koiSession).toBe(0);
+    // Hunted literal (seed 4242, after every beat above), re-recorded with the
+    // craft-cast system: shared-stream draws shift vs the instant-craft era.
+    // The koi bites on session index 10.
+    expect(koiSession).toBe(10);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -339,18 +333,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 100 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 2 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 319,
+        hitAt: 165,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 130,
+        hitAt: 2,
       },
     ];
     for (const hunt of hunts) {
@@ -408,11 +402,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above), re-recorded on this
-    // merge, the same composed stream shift as the koi literal above: the
-    // rare-or-better rarity roll that mints the signed specimen lands on
-    // attempt index 8.
-    expect(hitAt).toBe(8);
+    // Hunted literal (seed 4242, after every beat above), re-recorded with the
+    // craft-cast system: the rare-or-better rarity roll that mints the signed
+    // specimen lands on attempt index 15.
+    expect(hitAt).toBe(15);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);
@@ -451,7 +444,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     meta.craftThrottle.count = 0;
     sim.addItem('fine_iron_ore', 4, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
-    sim.craftItem('recipe_thorium_mining_pick', false, pid);
+    runCraft(sim, 'recipe_thorium_mining_pick', false, pid);
     expect(sim.lastCraftResult?.ok, 'engineering craft').toBe(true);
     expect(sim.lastCraftResult?.quality, 'engineering craft').toBe('rare');
 
@@ -462,7 +455,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.addItem('pristine_silk', 2, pid);
     sim.addItem('spider_silk', 4, pid);
     sim.addItem('spool_of_thread', 2, pid);
-    sim.craftItem('recipe_wardweave_cowl', false, pid);
+    runCraft(sim, 'recipe_wardweave_cowl', false, pid);
     expect(sim.lastCraftResult?.ok, 'tailoring craft').toBe(true);
     expect(sim.lastCraftResult?.quality, 'tailoring craft').toBe('rare');
 
@@ -472,7 +465,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.addItem('pristine_hide', 3, pid);
     sim.addItem('rough_hide', 2, pid);
     sim.addItem('tanning_agent', 1, pid);
-    sim.craftItem('recipe_duskhide_wraps', false, pid);
+    runCraft(sim, 'recipe_duskhide_wraps', false, pid);
     expect(sim.lastCraftResult?.ok, 'leatherworking craft').toBe(true);
     expect(sim.lastCraftResult?.quality, 'leatherworking craft').toBe('rare');
 
@@ -480,7 +473,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     meta.craftThrottle.count = 0;
     sim.addItem('thorium_ore', 7, pid);
     sim.addItem('smithing_flux', 5, pid);
-    sim.craftItem('recipe_sootscale_mantle', false, pid);
+    runCraft(sim, 'recipe_sootscale_mantle', false, pid);
     expect(sim.lastCraftResult?.ok, 'armorcrafting craft').toBe(true);
     expect(sim.lastCraftResult?.quality, 'armorcrafting craft').toBe('rare');
 
@@ -498,7 +491,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.addItem('thorium_ore', 4, pid);
     sim.addItem('iron_ore', 2, pid);
     sim.addItem('smithing_flux', 2, pid);
-    sim.craftItem('recipe_thorium_warblade', false, pid);
+    runCraft(sim, 'recipe_thorium_warblade', false, pid);
     expect(sim.lastCraftResult?.ok, 'weaponcrafting craft').toBe(true);
     expect(sim.lastCraftResult?.quality, 'weaponcrafting craft').toBe('rare');
 
@@ -511,7 +504,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.addItem('raw_mirror_trout', 1, pid);
     sim.addItem('goldleaf_herb', 1, pid);
     sim.addItem('cooking_salt', 1, pid);
-    sim.craftItem('recipe_silvered_carp_supper', false, pid);
+    runCraft(sim, 'recipe_silvered_carp_supper', false, pid);
     expect(sim.lastCraftResult?.ok, 'cooking craft').toBe(true);
     expect(sim.lastCraftResult?.quality, 'cooking craft').toBe('rare');
 
@@ -523,7 +516,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.addItem('sunpetal_herb', 2, pid);
     sim.addItem('goldleaf_herb', 1, pid);
     sim.addItem('glass_vial', 1, pid);
-    sim.craftItem('recipe_sunpetal_mana_draught', false, pid);
+    runCraft(sim, 'recipe_sunpetal_mana_draught', false, pid);
     expect(sim.lastCraftResult?.ok, 'alchemy craft').toBe(true);
     expect(sim.lastCraftResult?.quality, 'alchemy craft').toBe('rare');
 

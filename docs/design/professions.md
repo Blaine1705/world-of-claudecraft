@@ -293,10 +293,12 @@ agi 25, sta 24 for +240 HP, int 24, spi 12, armor 35, roughly 13 to 21
 percent of the recomputed level-20 BiS budget per axis), the
 Greater-beats-base-by-3 step, and runed strict betweenness are all pinned in
 `tests/enchants_magnitude_invariants.test.ts`. Salvage rides the same seam,
-confirm machinery, and shared throttle as disenchant; it grants no craft
-skill (maintainer-accepted). Crafting, disenchant, enchant-apply, and
-salvage share ONE action window (`CRAFT_THROTTLE_MAX_PER_WINDOW` per
-`CRAFT_THROTTLE_WINDOW_SECONDS`).
+confirm machinery as disenchant; it grants no craft skill
+(maintainer-accepted). Crafting, disenchant, enchant-apply, salvage, and
+tool-effect recharge are cast-paced (recipe-band craft durations; fixed
+1.5 s for enchant-family and recharge). Economy brakes are cast time,
+materials, the gold sink, stations, and skill ceilings, not a shared
+action quota.
 
 ### Commissions and the Maker's Bond
 Opt-in at craft time, equipment only (weapon, armor, held_offhand). The
@@ -453,7 +455,7 @@ guards.
 | maxSkill (crafts / gathering / fishing) | src/sim/content/professions.ts | 125 / 100 / 200 |
 | specializedSkillThreshold / materialDiscountPct | src/sim/content/professions.ts | 75 / 0.2 |
 | CRAFT_GOLD_SINK_COPPER_PER_BUDGET | src/sim/content/professions.ts | 2 |
-| CRAFT_THROTTLE_MAX_PER_WINDOW / WINDOW_SECONDS | src/sim/content/professions.ts | 10 / 60 |
+| CRAFT_CAST_DURATION_* / ENCHANT_FAMILY / TOOL_RECHARGE (sec) | src/sim/content/professions.ts | field 1.75 to ladder 4.0; floor 1.5 / ceiling 5.0; family+recharge 1.5 |
 | TRAINING_FEE_BY_TIER | src/sim/professions/training.ts | [0, 2500, 10000, 40000, 160000] copper, clamp to last |
 | UNBIND_FEE_BY_QUALITY_TIER | src/sim/professions/commission.ts | [2500, 10000, 40000] copper, clamp both ends |
 | GATHER_CAST_BASE / FLOOR / TOOL_TIER / BAND (sec) | src/sim/professions/gathering.ts | 2.5 / 1.5 / 0.4 / 0.15 |

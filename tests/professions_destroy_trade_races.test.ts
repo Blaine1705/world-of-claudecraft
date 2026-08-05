@@ -5,6 +5,7 @@
 // Every scenario asserts CONSERVATION: total copies across both players plus
 // destructions balances exactly; no dupe, no double-destroy, coherent lastX.
 import { describe, expect, it, vi } from 'vitest';
+import { completeEnchantFamilyCast } from './helpers/enchant_family_cast';
 
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
@@ -69,6 +70,12 @@ function placeAt(server: GameServer, pid: number, pos: { x: number; z: number })
 }
 
 function routeTick(server: GameServer): void {
+  // Profession destroy commands are cast-paced: flush every player's cast after
+  // the command tick so race pins still see a completed destroy.
+  (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
+  for (const pid of server.sim.players.keys()) {
+    completeEnchantFamilyCast(server.sim as never, pid);
+  }
   (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
 }
 
@@ -133,8 +140,10 @@ describe('race: disenchant vs concurrent trade of the same copy', () => {
     openTrade(p);
     cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 1 }] });
     cmd(p.server, p.a, { cmd: 'trade_confirm' });
-    // A destroys the offered copy BEFORE B's confirm lands, all in one tick.
+    // Cast-paced destroy: complete the disenchant cast BEFORE B's confirm so the
+    // offered copy is gone when the trade revalidates (instant-destroy race).
     cmd(p.server, p.a, { cmd: 'disenchant_item', item: SWORD });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 
@@ -214,7 +223,10 @@ describe('race: disenchant vs concurrent trade of the same copy', () => {
     openTrade(p);
     cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 2 }] });
     cmd(p.server, p.a, { cmd: 'trade_confirm' });
+    // Cast-paced destroy: complete the disenchant before B confirms so stock
+    // drops under the offer (same race as instant-destroy mid-trade).
     cmd(p.server, p.a, { cmd: 'disenchant_item', item: SWORD });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 
@@ -240,6 +252,7 @@ describe('race: salvage vs concurrent trade of the same copy', () => {
     cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 1 }] });
     cmd(p.server, p.a, { cmd: 'trade_confirm' });
     cmd(p.server, p.a, { cmd: 'salvage_item', item: SWORD });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 
@@ -266,6 +279,8 @@ describe('race: salvage vs concurrent trade of the same copy', () => {
 
     const salv = eventsFor(p.fcA.sent, 'salvageResult');
     expect(salv).toHaveLength(1);
+    // Trade already moved the only copy to B: late salvage is not_held (no
+    // concurrent cast here; busy applies only when a cast is already running).
     expect((salv[0] as { reason?: string }).reason).toBe('not_held');
     expect(p.server.sim.lastSalvageResultFor(p.a.pid)?.reason).toBe('not_held');
     expect(p.server.sim.countItem(BONE, p.a.pid)).toBe(boneBefore);
@@ -284,7 +299,9 @@ describe('race: salvage vs concurrent trade of the same copy', () => {
     const salv = eventsFor(p.fcA.sent, 'salvageResult');
     expect((denc[0] as { ok?: boolean }).ok).toBe(true);
     expect((salv[0] as { ok?: boolean; reason?: string }).ok).toBe(false);
-    expect((salv[0] as { reason?: string }).reason).toBe('not_held');
+    // Cast pacing: the second destroy in the same tick is busy (one non-spell cast at a time),
+    // not not_held (instant-destroy era).
+    expect((salv[0] as { reason?: string }).reason).toBe('busy');
     expect(p.server.sim.countItem(DUST, p.a.pid)).toBeGreaterThan(0);
     expect(p.server.sim.countItem(BONE, p.a.pid)).toBe(0);
     expect(p.server.sim.countItem(SWORD, p.a.pid)).toBe(0);
@@ -371,6 +388,7 @@ describe('race: apply_enchant vs concurrent trade of the target copy', () => {
     // The enchant transforms the offered copy into an instanced enchanted copy
     // of the SAME item id (count stays 1) before B's confirm.
     cmd(p.server, p.a, { cmd: 'apply_enchant', item: SWORD, enchant: WEAPON_ENCHANT });
+    routeTick(p.server);
     cmd(p.server, p.b, { cmd: 'trade_confirm' });
     routeTick(p.server);
 

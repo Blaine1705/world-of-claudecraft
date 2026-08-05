@@ -9,6 +9,12 @@ import { stationsOfType } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent, StationType } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import {
+  runApplyEnchant,
+  runCraft,
+  runDisenchant,
+  runSalvage,
+} from './helpers/enchant_family_cast';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 // Every grant in the game flows through the one shared inventory hub
@@ -183,7 +189,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     sim.addItem('spider_leg', 1, pid); // the reagent grant itself stays loud
-    sim.craftItem('recipe_tough_jerky', false, pid);
+    runCraft(sim, 'recipe_tough_jerky', false, pid);
     expect(sim.lastCraftResult?.ok).toBe(true);
     const events = lootEvents(sim.tick());
     // The reagent grant (loud + logged) plus the crafted-output grant (silent
@@ -212,7 +218,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
       for (const reagent of recipe.reagents) sim.addItem(reagent.itemId, reagent.count * 4, pid);
       if (recipe.stationType) placeAtStationFor(sim, pid, recipe.stationType);
       sim.tick(); // drain the (loud) reagent grants before isolating the craft
-      sim.craftItem(recipe.id, false, pid);
+      runCraft(sim, recipe.id, false, pid);
       expect(sim.lastCraftResult?.ok, `${recipe.id}: ${sim.lastCraftResult?.reason}`).toBe(true);
       expect(sim.lastCraftResult?.count, recipe.id).toBeGreaterThan(1);
       const events = lootEvents(sim.tick());
@@ -229,7 +235,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     const pid = sim.playerId;
     sim.addItem('eastbrook_arming_sword', 1, pid);
     sim.tick(); // drain the (loud) sword grant before isolating the disenchant
-    sim.disenchantItem('eastbrook_arming_sword', pid);
+    runDisenchant(sim, 'eastbrook_arming_sword', pid);
     expect(sim.lastDisenchantResult?.ok).toBe(true);
     const events = lootEvents(sim.tick());
     expect(events.length).toBe(1);
@@ -243,7 +249,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     sim.addItem('eastbrook_arming_sword', 1, pid);
     sim.addItem('arcane_dust', 5, pid);
     sim.tick(); // drain the (loud) sword + reagent grants before isolating the enchant
-    sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
+    runApplyEnchant(sim, 'eastbrook_arming_sword', 'enchant_weapon_might');
     expect(sim.lastEnchantResult?.ok).toBe(true);
     const events = lootEvents(sim.tick());
     expect(events.length).toBe(1);
@@ -262,10 +268,10 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     sim.addItem('eastbrook_arming_sword', 1, pid);
     sim.addItem('arcane_dust', 20, pid);
     sim.tick();
-    sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
+    runApplyEnchant(sim, 'eastbrook_arming_sword', 'enchant_weapon_might');
     expect(sim.lastEnchantResult?.ok).toBe(true);
     sim.tick(); // drain the first (already silent) apply before isolating the replace
-    sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_intellect', undefined, true);
+    runApplyEnchant(sim, 'eastbrook_arming_sword', 'enchant_weapon_intellect', undefined, true);
     expect(sim.lastEnchantResult?.ok).toBe(true);
     const events = lootEvents(sim.tick());
     expect(events.length).toBe(1);
@@ -283,12 +289,12 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     sim.addItem('eastbrook_arming_sword', 1, pid);
     sim.addItem('arcane_dust', 20, pid);
     sim.tick();
-    sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_might');
+    runApplyEnchant(sim, 'eastbrook_arming_sword', 'enchant_weapon_might');
     expect(sim.lastEnchantResult?.ok).toBe(true);
     sim.tick();
     sim.equipItem('eastbrook_arming_sword', pid);
     sim.tick();
-    sim.applyEnchant('eastbrook_arming_sword', 'enchant_weapon_intellect', 'mainhand', true);
+    runApplyEnchant(sim, 'eastbrook_arming_sword', 'enchant_weapon_intellect', 'mainhand', true);
     expect(sim.lastEnchantResult?.ok).toBe(true);
     expect(lootEvents(sim.tick()).length).toBe(0);
   });
@@ -298,7 +304,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     const pid = sim.playerId;
     sim.addItem('eastbrook_arming_sword', 1, pid);
     sim.tick(); // drain the (loud) sword grant before isolating the salvage
-    sim.salvageItem('eastbrook_arming_sword', pid);
+    runSalvage(sim, 'eastbrook_arming_sword', pid);
     expect(sim.lastSalvageResult?.ok).toBe(true);
     const events = lootEvents(sim.tick());
     expect(events.length).toBe(1);
@@ -318,7 +324,7 @@ describe('professions grants suppress BOTH generic hub feedbacks', () => {
     // yield is a primary PLUS at least one secondary.
     sim.addItem('moggers_copper_cudgel', 1, pid);
     sim.tick(); // drain the (loud) weapon grant before isolating the disenchant
-    sim.disenchantItem('moggers_copper_cudgel', pid);
+    runDisenchant(sim, 'moggers_copper_cudgel', pid);
     const result = sim.lastDisenchantResult;
     expect(result?.ok).toBe(true);
     expect(result?.secondaryItemId).toBeTruthy();
@@ -360,7 +366,7 @@ describe('the craft output arms each stand their hub line down', () => {
     sim.addItem('mithril_mining_pick', 1, pid);
     placeAtStationFor(sim, pid, 'toolworks');
     sim.tick(); // drain the (loud) reagent grants
-    sim.craftItem('recipe_thorium_mining_pick', false, pid);
+    runCraft(sim, 'recipe_thorium_mining_pick', false, pid);
     expect(sim.lastCraftResult?.ok, sim.lastCraftResult?.reason).toBe(true);
     // The arm identity: a rare def at resultCount 1 mints ONE signed instance,
     // and not via the masterwork branch.
@@ -382,7 +388,7 @@ describe('the craft output arms each stand their hub line down', () => {
     sim.addItem('bone_fragments', 4, pid);
     sim.addItem('smithing_flux', 6, pid);
     sim.tick();
-    sim.craftItem('recipe_eastbrook_arming_sword', true, pid);
+    runCraft(sim, 'recipe_eastbrook_arming_sword', true, pid);
     expect(sim.lastCraftResult?.ok, sim.lastCraftResult?.reason).toBe(true);
     // The arm identity: commission forces the instance path even for a
     // sub-rare output a plain grant would leave fungible.
@@ -415,9 +421,9 @@ describe('the craft output arms each stand their hub line down', () => {
     for (let i = 0; i < 9; i++) sim.addItem('homespun_cloth', 1, pid);
     for (let i = 0; i < 15; i++) sim.addItem('spool_of_thread', 1, pid);
     sim.tick();
-    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     sim.tick();
-    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     expect(sim.lastCraftResult?.ok, sim.lastCraftResult?.reason).toBe(true);
     // The arm identity, and the whole point of the case.
     expect(sim.lastCraftResult?.masterwork).toBe(true);

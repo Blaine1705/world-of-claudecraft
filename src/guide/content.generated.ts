@@ -267,7 +267,6 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];
@@ -10043,10 +10042,6 @@ export const GUIDE_PROF_MASTERWORK: GuideProfMasterwork = {
 
 export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
   "craftFeeCopperPerBudgetPoint": 2,
-  "actionThrottle": {
-    "windowSeconds": 60,
-    "maxActions": 10
-  },
   "marketCutPct": 5,
   "listingDepositCopper": 0,
   "trainingFeeCopperByTier": [

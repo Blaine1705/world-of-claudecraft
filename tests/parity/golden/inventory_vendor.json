@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "0dc72727",
+      "state": "5f8686cb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -120,6 +120,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -168,7 +169,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e4b677f4",
+      "state": "3b3bebd0",
       "events": "a005f741",
       "rng": {
         "draws": 0,
@@ -263,6 +264,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -311,7 +313,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "6ac9417b",
+      "state": "908927b7",
       "events": "da42f643",
       "rng": {
         "draws": 0,
@@ -413,6 +415,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 130,
@@ -461,7 +464,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "27ef8b74",
+      "state": "d7135130",
       "events": "67742213",
       "rng": {
         "draws": 0,
@@ -563,6 +566,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
@@ -611,7 +615,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "67570d3e",
+      "state": "1118aaaa",
       "events": "5ae2a56a",
       "rng": {
         "draws": 0,
@@ -716,6 +720,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -764,7 +769,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "f27434d0",
+      "state": "4fa036f4",
       "events": "6024a757",
       "rng": {
         "draws": 0,
@@ -881,6 +886,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -930,7 +936,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "5f48c8c1",
+      "state": "d71ba8f5",
       "events": "bf90a36a",
       "rng": {
         "draws": 0,
@@ -1043,6 +1049,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -1092,7 +1099,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "7c851724",
+      "state": "576c71a8",
       "events": "128abc98",
       "rng": {
         "draws": 0,
@@ -1216,6 +1223,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1265,7 +1273,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "a723c8b5",
+      "state": "d8b05ba1",
       "events": "c6f07715",
       "rng": {
         "draws": 0,
@@ -1393,6 +1401,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1442,7 +1451,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "1d7ad194",
+      "state": "e771ba18",
       "events": "cd1eb7e0",
       "rng": {
         "draws": 0,
@@ -1575,6 +1584,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1624,7 +1634,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b993527d",
+      "state": "e88144d1",
       "events": "c9308034",
       "rng": {
         "draws": 0,
@@ -1763,6 +1773,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1812,7 +1823,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "324c791a",
+      "state": "7180672e",
       "events": "0dc07402",
       "rng": {
         "draws": 0,
@@ -1956,6 +1967,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -2005,7 +2017,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "93be0ee7",
+      "state": "61b73bd3",
       "events": "54f870b1",
       "rng": {
         "draws": 0,
@@ -2145,6 +2157,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -2194,7 +2207,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "93be0ee7",
+      "state": "61b73bd3",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2334,6 +2347,7 @@
             "kind": "food",
             "remaining": 18
           },
+          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,

@@ -83,7 +83,7 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
 - `enchanting.ts` / `disenchant_reagents.ts` / `salvage.ts`: disenchant
   (universal ladder + typed rare+ secondaries, bindOnTrade-armed), apply an
   enchant onto a SPECIFIC instanced copy (`ItemInstancePayload`), break items
-  back into materials; all off-wheel, ungated, on the shared throttle. An
+  back into materials; all off-wheel, ungated, cast-paced (Phase 4/5). An
   already-enchanted copy is REPLACEABLE only behind the explicit
   confirmReplace flag (#2415: old enchant destroyed, no refund, surgical swap
   via `replacedEnchantPayloadFor`); without it the deny is the dedicated
@@ -92,8 +92,8 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `already_enchanted`, because the flag check precedes the id compare.
 - `commission.ts`: the Maker's Bond (commission opt-in mints `bindOnTrade`,
   `resolveUnbind` + the quality-tier fee ladder).
-- `action_throttle.ts`: the ONE shared action window for crafting,
-  disenchant, enchant-apply, and salvage.
+- Craft Cast System Phase 5 retired `action_throttle.ts`: profession actions
+  are cast-paced; `PlayerMeta.craftThrottle` is kept inert for save stability.
 - `training.ts`: master training (`resolveTrain`, tier-gated learning,
   `TRAINING_FEE_BY_TIER`, the one-time `PRE_TRAINING_RECIPE_IDS`
   grandfather).

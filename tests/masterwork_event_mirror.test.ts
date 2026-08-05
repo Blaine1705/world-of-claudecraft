@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
+import { runCraft } from './helpers/enchant_family_cast';
 
 // Hunted proc seed, pinned (re-recorded after the zones 1-3 quest-dedupe
 // content pass added camps, mobs, and items, shifting the construction-time
@@ -30,7 +31,7 @@ function craftMasterwork() {
   sim.addItem('spider_leg', 1, pid);
   sim.addItem('homespun_cloth', 3, pid);
   sim.addItem('spool_of_thread', 5, pid);
-  sim.craftItem(RECIPE_ID, false, pid);
+  runCraft(sim, RECIPE_ID, false, pid);
   const events = sim.drainEvents().filter((ev) => ev.type === 'masterwork');
   return { sim, pid, events };
 }

@@ -1,5 +1,5 @@
 // Professions economy reference (/wiki/professions/economy): the exact fees,
-// sinks, throttles, work orders, and the Maker's Bond commission rules.
+// sinks, cast pacing, work orders, and the Maker's Bond commission rules.
 // Renders entirely from GUIDE_PROF_ECONOMY plus guide.* t() keys; NPC and
 // material names are baked English proper nouns. TRANSPARENCY POLICY
 // this page publishes EXACT numbers; the mirrored
@@ -119,12 +119,9 @@ export function economyDetailHtml(): string {
         <h2>${esc(t('guide.profPages.econ.collectorsHeading'))}</h2>
         ${paras('guide.profPages.econ.collectorsBody')}
       </section>
-      <section class="guide-block" id="prof-throttle">
-        <h2>${esc(t('guide.profPages.econ.throttleHeading'))}</h2>
-        ${paras('guide.profPages.econ.throttleBody', {
-          actions: formatNumber(e.actionThrottle.maxActions),
-          seconds: formatNumber(e.actionThrottle.windowSeconds),
-        })}
+      <section class="guide-block" id="prof-cast-pace">
+        <h2>${esc(t('guide.profPages.econ.castPaceHeading'))}</h2>
+        ${paras('guide.profPages.econ.castPaceBody')}
       </section>
       <section class="guide-block" id="prof-doctrine">
         <h2>${esc(t('guide.profPages.econ.doctrineHeading'))}</h2>

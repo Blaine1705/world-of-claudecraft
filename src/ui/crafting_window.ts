@@ -7,9 +7,26 @@
 // craft tab strip is painted from the pure craftingTabs/resolveSelectedCraft
 // helpers (crafting_view.ts); the selected craft lives with the HUD (the
 // commission opt-in precedent) so it survives staleness repaints.
+//
+// Craft Cast System Phase 2: duration chip, craft-button state machine,
+// in-window progress strip (live fill via paintCraftCastProgress, no full
+// rebuild per tick), aria-busy + polite live region. Progress always tracks
+// real entity cast fields (never a client-side outcome timer).
+// Phase 3: qty stepper, Create / Create All, batch remaining on the strip.
 
 import type { StationType } from '../sim/professions/stations';
 import { craftNameText } from './char_window';
+import {
+  type CraftButtonState,
+  type CraftCastSessionView,
+  clampCraftQty,
+  craftBatchIndicatorVisible,
+  craftButtonBusy,
+  craftButtonEnabled,
+  craftButtonState,
+  IDLE_CRAFT_CAST_SESSION,
+  maxCraftsFromReagents,
+} from './craft_cast_view';
 import {
   type CraftDifficulty,
   type CraftingView,
@@ -20,6 +37,7 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
 import type { PainterHostPresentation } from './painter_host';
@@ -28,6 +46,13 @@ import { renderProfessionIdentityCard } from './profession_identity_card';
 import type { ProfessionIdentityModel } from './profession_identity_view';
 import { qualityGlowShadow } from './quality_glow';
 import { svgIcon } from './ui_icons';
+
+// Percent width precision for the in-window cast strip (matches cast_bar_painter).
+const PROGRESS_PERCENT_DIGITS = 1;
+// Remaining-seconds display precision on the strip timer.
+const PROGRESS_TIMER_DIGITS = 1;
+// Duration chip: one decimal when non-integer (1.75s), whole seconds otherwise.
+const DURATION_FRACTION_DIGITS = 2;
 
 // Skill-gain difficulty labels, the classic four-color recipe intuition
 // orange = full gains, yellow = reduced, green = minimal,
@@ -63,7 +88,8 @@ export function stationNameText(type: StationType): string {
 
 export interface CraftingWindowDeps extends PainterHostPresentation {
   hideTooltip(): void;
-  onCraft(recipeId: string): void;
+  /** Start a craft (or batch) for `recipeId` with the given count (clamped in sim). */
+  onCraft(recipeId: string, count: number): void;
   onClose(): void;
   /** Opens the commission order board (issue #1298), the crafting window's
    *  one entry point to it: a header button beside the close button. */
@@ -74,6 +100,9 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
    *  The painter renders the control only on commissionEligible rows. */
   commissionChecked(recipeId: string): boolean;
   onToggleCommission(recipeId: string, on: boolean): void;
+  /** Per-recipe qty stepper value (HUD-held so repaints keep the pick). */
+  craftQty(recipeId: string): number;
+  onCraftQty(recipeId: string, qty: number): void;
   /** The craft tab the player last picked (null before any pick), held by the
    *  HUD like the commission set above; the painter resolves it against the
    *  live tab list (resolveSelectedCraft) so a stale pick falls back safely. */
@@ -81,22 +110,36 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
   onSelectCraft(professionId: string): void;
 }
 
+/** Format a cast duration for the row chip (localized number + s unit key). */
+function durationChipText(durationSec: number): string {
+  const whole = Number.isInteger(durationSec);
+  return t('hudChrome.crafting.durationChip', {
+    seconds: formatNumber(durationSec, {
+      maximumFractionDigits: whole ? 0 : DURATION_FRACTION_DIGITS,
+      minimumFractionDigits: whole ? 0 : 0,
+    }),
+  });
+}
+
 /** Paint the crafting panel from a prepared view. `learnHints` maps a
  *  craft id to the station + master where the viewer can learn recipes they have
  *  not learned; the selected craft renders its "learnable at a master" hint iff
- *  its craft is present. */
+ *  its craft is present. `session` is the live craft-cast state (idle when
+ *  no craft cast is running). */
 export function renderCraftingWindow(
   el: HTMLElement,
   view: CraftingView,
   deps: CraftingWindowDeps,
   identity?: ProfessionIdentityModel,
   learnHints: ReadonlyMap<string, CraftLearnHint> = new Map(),
+  session: CraftCastSessionView = IDLE_CRAFT_CAST_SESSION,
 ): void {
   deps.hideTooltip();
   // A standalone trapping window (the train/professions shape), not the
   // vendor's docked bags pairing: announce it as a labeled dialog for the
   // focus contract (src/ui/CLAUDE.md).
   markDialogRoot(el, { label: t('hudChrome.crafting.title') });
+  const focusKey = captureFocusKey(el);
   const scrollTop = el.querySelector('.crafting-body')?.scrollTop ?? 0;
   // The tab strip is its own horizontal scroller on mobile (hud.mobile.css
   // `.crafting-tabs { overflow-x: auto }`) and is rebuilt with everything
@@ -114,7 +157,7 @@ export function renderCraftingWindow(
   const skillListScrollTop = oldSkillList?.scrollTop ?? 0;
   const skillListHadFocus = oldSkillList !== null && document.activeElement === oldSkillList;
   const cardScrollTop = el.querySelector('.profession-identity-card')?.scrollTop ?? 0;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="crafting-orders-btn" data-open-orders aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="crafting-orders-btn" data-open-orders data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div><div class="crafting-live" role="status" aria-live="polite"></div>`;
   el.querySelector('[data-open-orders]')?.addEventListener('click', () => deps.onOpenOrders());
 
   if (identity) renderProfessionIdentityCard(el, identity);
@@ -166,6 +209,19 @@ export function renderCraftingWindow(
   const body = document.createElement('div');
   body.className = 'crafting-body';
   el.appendChild(body);
+
+  // In-window cast progress: always present so live ticks only write fill /
+  // timer (no structure churn). Hidden when idle.
+  const progress = document.createElement('div');
+  progress.className = 'crafting-cast-progress';
+  progress.setAttribute('role', 'progressbar');
+  progress.setAttribute('aria-label', t('hudChrome.crafting.progressAria'));
+  progress.innerHTML =
+    `<div class="crafting-cast-progress-track"><div class="crafting-cast-progress-fill"></div></div>` +
+    `<span class="crafting-cast-progress-batch"></span>` +
+    `<span class="crafting-cast-progress-timer"></span>`;
+  body.appendChild(progress);
+  paintCraftCastProgress(el, session);
 
   const rows = selected !== null ? (sections.get(selected) ?? []) : [];
   if (selected !== null) {
@@ -304,15 +360,25 @@ export function renderCraftingWindow(
       const icon = row.result ? deps.itemIcon(row.result) : '';
       const glow = row.result?.quality ? qualityGlowShadow(QUALITY_COLOR[row.result.quality]) : '';
       const socket = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${icon}</span>`;
+      const btnState: CraftButtonState = craftButtonState(row, session);
+      const canCraft = craftButtonEnabled(btnState);
+      const castingActive = session.active;
+      const matsFit = maxCraftsFromReagents(row.reagents);
+      const qty = clampCraftQty(deps.craftQty(row.recipeId), matsFit);
+      const durationText = durationChipText(row.durationSec);
       const craftBtn = document.createElement('button');
       craftBtn.type = 'button';
-      craftBtn.className = 'vendor-item crafting-recipe-btn';
-      craftBtn.disabled = !row.craftable;
+      craftBtn.className = `vendor-item crafting-recipe-btn${btnState === 'casting' ? ' casting' : ''}`;
+      craftBtn.disabled = !canCraft;
+      craftBtn.dataset.focusKey = `craft:${row.recipeId}`;
+      if (craftButtonBusy(btnState)) craftBtn.setAttribute('aria-busy', 'true');
+      else craftBtn.removeAttribute('aria-busy');
       // Folds the reagent requirements into the accessible name (not just the hover
       // tooltip, which keyboard, screen-reader, and mobile no-hover users never reach).
+      // Duration is actionable pace info (fairness): always in the name, never color-only.
       craftBtn.setAttribute(
         'aria-label',
-        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}. ${skillLine}. ${difficultyLabel}${stationAccessible}${comboAccessible}`,
+        `${t('hudChrome.crafting.resultAria', { name: resultName })}. ${t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) })}. ${t('hudChrome.crafting.reagentsNeeded')} ${reagentLines}. ${skillLine}. ${difficultyLabel}${stationAccessible}${comboAccessible}`,
       );
       const resultCountSuffix =
         row.resultCount > 1
@@ -325,16 +391,79 @@ export function renderCraftingWindow(
       const stationBadgeHtml = row.station
         ? `<span class="crafting-station-badge${row.station.inRange ? '' : ' out-of-range'}">${esc(stationLabel)}</span>`
         : '';
-      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span><span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml}</span></span><span class="vi-price crafting-craft-chip">${esc(t('hudChrome.crafting.craft'))}</span>`;
+      const chipLabel =
+        btnState === 'casting' ? t('hudChrome.crafting.crafting') : t('hudChrome.crafting.create');
+      craftBtn.innerHTML = `${socket}<span class="vi-name"><span class="crafting-recipe-name">${esc(resultName)}${esc(resultCountSuffix)}</span><span class="vi-sub crafting-reagent-line">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${reagentHtml}</span><span class="vi-sub crafting-skill-line">${esc(skillLine)} <span class="crafting-difficulty" data-difficulty="${esc(row.difficulty)}">${esc(difficultyLabel)}</span>${stationBadgeHtml} <span class="crafting-duration-chip">${esc(durationText)}</span></span></span><span class="vi-price crafting-craft-chip">${esc(chipLabel)}</span>`;
       craftBtn.addEventListener('click', () => {
-        if (row.craftable) deps.onCraft(row.recipeId);
+        if (canCraft) deps.onCraft(row.recipeId, qty);
       });
       deps.attachTooltip(
         craftBtn,
         () =>
-          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div><div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
+          `<div class="tt-profession-header">${sectionImageUrl ? `<img src="${esc(sectionImageUrl)}" alt="" draggable="false">` : ''}<span>${esc(sectionName)}</span></div>${row.result ? deps.itemTooltip(row.result) : ''}<div class="tt-sub">${esc(t('hudChrome.crafting.reagentsNeeded'))} ${esc(reagentLines)}</div><div class="tt-sub">${esc(skillLine)} ${esc(difficultyLabel)}</div><div class="tt-sub">${esc(t('hudChrome.crafting.durationAria', { seconds: formatNumber(row.durationSec, { maximumFractionDigits: DURATION_FRACTION_DIGITS }) }))}</div>${row.station ? `<div class="tt-sub">${esc(stationLabel)}${stationOutOfRange ? ` ${esc(stationOutOfRange)}` : ''}</div>` : ''}${comboLine ? `<div class="tt-sub">${esc(comboLine)} ${esc(comboStatus)}</div>` : ''}`,
       );
       item.appendChild(craftBtn);
+
+      // Phase 3 batch controls: qty stepper + Create All. Disabled while any
+      // craft cast is running so the player cannot change mid-batch qty.
+      const batchRow = document.createElement('div');
+      batchRow.className = 'crafting-batch-row';
+      const qtyGroup = document.createElement('div');
+      qtyGroup.className = 'crafting-qty-row';
+      qtyGroup.setAttribute('role', 'group');
+      qtyGroup.setAttribute('aria-label', t('hudChrome.crafting.qtyRowAria'));
+      const decBtn = document.createElement('button');
+      decBtn.type = 'button';
+      decBtn.className = 'crafting-qty-btn';
+      decBtn.dataset.focusKey = `qty-dec:${row.recipeId}`;
+      decBtn.textContent = '-';
+      decBtn.setAttribute('aria-label', t('hudChrome.crafting.qtyDecreaseAria'));
+      decBtn.disabled = castingActive || qty <= 1;
+      decBtn.addEventListener('click', () => {
+        if (castingActive) return;
+        deps.onCraftQty(row.recipeId, clampCraftQty(qty - 1, matsFit));
+      });
+      const qtyValue = document.createElement('span');
+      qtyValue.className = 'crafting-qty-value';
+      qtyValue.textContent = formatNumber(qty, { maximumFractionDigits: 0 });
+      qtyValue.setAttribute(
+        'aria-label',
+        t('hudChrome.crafting.qtyValueAria', {
+          count: formatNumber(qty, { maximumFractionDigits: 0 }),
+        }),
+      );
+      const incBtn = document.createElement('button');
+      incBtn.type = 'button';
+      incBtn.className = 'crafting-qty-btn';
+      incBtn.dataset.focusKey = `qty-inc:${row.recipeId}`;
+      incBtn.textContent = '+';
+      incBtn.setAttribute('aria-label', t('hudChrome.crafting.qtyIncreaseAria'));
+      // Ceiling is min(50, mats-fit); when mats-fit is 0 the stepper still shows 1.
+      const maxQty = clampCraftQty(matsFit > 0 ? matsFit : 1, matsFit > 0 ? matsFit : 1);
+      incBtn.disabled = castingActive || qty >= maxQty;
+      incBtn.addEventListener('click', () => {
+        if (castingActive) return;
+        deps.onCraftQty(row.recipeId, clampCraftQty(qty + 1, matsFit));
+      });
+      qtyGroup.appendChild(decBtn);
+      qtyGroup.appendChild(qtyValue);
+      qtyGroup.appendChild(incBtn);
+      batchRow.appendChild(qtyGroup);
+      const createAllBtn = document.createElement('button');
+      createAllBtn.type = 'button';
+      createAllBtn.className = 'crafting-create-all-btn';
+      createAllBtn.dataset.focusKey = `create-all:${row.recipeId}`;
+      createAllBtn.textContent = t('hudChrome.crafting.createAll');
+      createAllBtn.setAttribute('aria-label', t('hudChrome.crafting.createAllAria'));
+      createAllBtn.disabled = !canCraft || matsFit < 1;
+      createAllBtn.addEventListener('click', () => {
+        if (!canCraft || matsFit < 1) return;
+        const all = clampCraftQty(matsFit, matsFit);
+        deps.onCraftQty(row.recipeId, all);
+        deps.onCraft(row.recipeId, all);
+      });
+      batchRow.appendChild(createAllBtn);
+      item.appendChild(batchRow);
       // Commission opt-in (the Maker's Bond): a per-recipe pill toggle-chip
       // in the card's chip language, right-aligned in the card footer so it
       // stacks under the gold Craft chip as one action column. Rendered ONLY
@@ -400,4 +529,166 @@ export function renderCraftingWindow(
   }
   const newCard = el.querySelector<HTMLElement>('.profession-identity-card');
   if (newCard) newCard.scrollTop = cardScrollTop;
+  // Focus across rebuild: craft buttons and close carry data-focus-key so a
+  // cast-start repaint does not drop keyboard focus to body.
+  if (focusKey !== null) {
+    const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
+    const exact = keyed.find((node) => node.dataset.focusKey === focusKey) ?? null;
+    restoreFirstEnabled([exact, el.querySelector<HTMLElement>('[data-close]')]);
+  }
+  // Live region: announce craft start only on idle→active edge. Complete and
+  // cancel announcements are set by the HUD event arms (setCraftCastLiveMessage).
+  // Re-announcing on every full paint would spam "Crafting {name}" on bag/
+  // reagent-driven rebuilds mid-cast.
+  const prevSig = el.dataset.craftLiveStartSig ?? '';
+  const nextSig = session.active ? `start:${session.recipeId}` : '';
+  if (session.active && nextSig !== prevSig) {
+    const activeRow = view.recipes.find((r) => r.recipeId === session.recipeId);
+    const name = activeRow?.result
+      ? itemDisplayName(activeRow.result)
+      : activeRow?.resultItemId || session.recipeId;
+    if (name) setCraftCastLiveMessage(el, t('hudChrome.crafting.announceStart', { name }));
+  }
+  el.dataset.craftLiveStartSig = nextSig;
+}
+
+/** Cached progress-strip refs + last written values for write-elision. */
+interface CraftProgressPaintCache {
+  root: HTMLElement;
+  fill: HTMLElement | null;
+  timer: HTMLElement | null;
+  batch: HTMLElement | null;
+  active: boolean;
+  width: string;
+  valueNow: string;
+  timerText: string;
+  batchText: string;
+  batchHidden: boolean;
+  batchAria: string;
+}
+
+const craftProgressCache = new WeakMap<HTMLElement, CraftProgressPaintCache>();
+
+function craftProgressPaintCacheFor(el: HTMLElement): CraftProgressPaintCache | null {
+  const hit = craftProgressCache.get(el);
+  if (hit && hit.root.isConnected) return hit;
+  const root = el.querySelector<HTMLElement>('.crafting-cast-progress');
+  if (!root) return null;
+  const cache: CraftProgressPaintCache = {
+    root,
+    fill: root.querySelector<HTMLElement>('.crafting-cast-progress-fill'),
+    timer: root.querySelector<HTMLElement>('.crafting-cast-progress-timer'),
+    batch: root.querySelector<HTMLElement>('.crafting-cast-progress-batch'),
+    active: false,
+    width: '',
+    valueNow: '',
+    timerText: '',
+    batchText: '',
+    batchHidden: true,
+    batchAria: '',
+  };
+  craftProgressCache.set(el, cache);
+  return cache;
+}
+
+/**
+ * Update only the in-window cast progress strip (fill + timer + visibility).
+ * Safe to call every frame while a craft cast is running: no subtree rebuild.
+ * Reads real session progress (never invents timers). Write-elides identical
+ * frames (cached element refs + last width/timer/batch keys).
+ */
+export function paintCraftCastProgress(el: HTMLElement, session: CraftCastSessionView): void {
+  const cache = craftProgressPaintCacheFor(el);
+  if (!cache) return;
+  const { root, fill, timer, batch } = cache;
+  if (!session.active) {
+    // Always force idle visibility on the first paint (cache.active starts
+    // false, but the fresh progress node is not hidden by default).
+    if (cache.active || !root.hidden) {
+      root.hidden = true;
+      root.removeAttribute('aria-valuenow');
+      root.removeAttribute('aria-valuemin');
+      root.removeAttribute('aria-valuemax');
+      if (fill && cache.width !== '0%') fill.style.width = '0%';
+      if (timer && cache.timerText !== '') timer.textContent = '';
+      if (batch && (!cache.batchHidden || cache.batchText !== '')) {
+        batch.textContent = '';
+        batch.hidden = true;
+        batch.removeAttribute('aria-label');
+      }
+      cache.active = false;
+      cache.width = '0%';
+      cache.valueNow = '';
+      cache.timerText = '';
+      cache.batchText = '';
+      cache.batchHidden = true;
+      cache.batchAria = '';
+    }
+    return;
+  }
+  if (!cache.active) {
+    root.hidden = false;
+    root.setAttribute('aria-valuemin', '0');
+    root.setAttribute('aria-valuemax', '100');
+    cache.active = true;
+  }
+  // CSS width is a layout token, not player-facing text: toFixed (cast_bar_painter).
+  const width = `${(session.progress * 100).toFixed(PROGRESS_PERCENT_DIGITS)}%`;
+  if (fill && cache.width !== width) {
+    fill.style.width = width;
+    cache.width = width;
+  }
+  const valueNow = String(Math.round(session.progress * 100));
+  if (cache.valueNow !== valueNow) {
+    root.setAttribute('aria-valuenow', valueNow);
+    cache.valueNow = valueNow;
+  }
+  const timerText = t('hudChrome.crafting.progressTimer', {
+    seconds: formatNumber(session.remainingSec, {
+      maximumFractionDigits: PROGRESS_TIMER_DIGITS,
+      minimumFractionDigits: 0,
+    }),
+  });
+  if (timer && cache.timerText !== timerText) {
+    timer.textContent = timerText;
+    cache.timerText = timerText;
+  }
+  if (batch) {
+    if (craftBatchIndicatorVisible(session)) {
+      const batchText = t('hudChrome.crafting.batchRemaining', {
+        remaining: formatNumber(session.batchRemaining, { maximumFractionDigits: 0 }),
+        total: formatNumber(session.batchTotal, { maximumFractionDigits: 0 }),
+      });
+      const batchAria = t('hudChrome.crafting.batchRemainingAria', {
+        remaining: formatNumber(session.batchRemaining, { maximumFractionDigits: 0 }),
+        total: formatNumber(session.batchTotal, { maximumFractionDigits: 0 }),
+      });
+      if (cache.batchHidden) {
+        batch.hidden = false;
+        cache.batchHidden = false;
+      }
+      if (cache.batchText !== batchText) {
+        batch.textContent = batchText;
+        cache.batchText = batchText;
+      }
+      if (cache.batchAria !== batchAria) {
+        batch.setAttribute('aria-label', batchAria);
+        cache.batchAria = batchAria;
+      }
+    } else if (!cache.batchHidden || cache.batchText !== '' || cache.batchAria !== '') {
+      batch.textContent = '';
+      batch.hidden = true;
+      batch.removeAttribute('aria-label');
+      cache.batchText = '';
+      cache.batchHidden = true;
+      cache.batchAria = '';
+    }
+  }
+}
+
+/** Write a polite live-region line into the open crafting window (start /
+ *  complete / cancel). No-op when the region is absent (window never painted). */
+export function setCraftCastLiveMessage(el: HTMLElement, text: string): void {
+  const live = el.querySelector<HTMLElement>('.crafting-live');
+  if (live) live.textContent = text;
 }

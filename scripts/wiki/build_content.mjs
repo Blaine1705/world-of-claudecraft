@@ -33,8 +33,7 @@ const entrySource = `
   export { VISUALS, visualKeyFor } from './src/render/characters/manifest.ts';
   export {
     CRAFT_RING, STATIONS, STATION_TYPE_BY_CRAFT, STATION_RADIUS, PERK_THRESHOLDS,
-    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, CRAFT_THROTTLE_WINDOW_SECONDS,
-    CRAFT_THROTTLE_MAX_PER_WINDOW, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
+    CRAFT_GOLD_SINK_COPPER_PER_BUDGET, GATHERING_PROFESSIONS, GATHERING_PROFESSION_IDS,
   } from './src/sim/content/professions.ts';
   export { ALL_RECIPES } from './src/sim/content/recipes.ts';
   export { ENCHANTS } from './src/sim/content/enchants.ts';
@@ -119,8 +118,6 @@ const {
   STATION_RADIUS,
   PERK_THRESHOLDS,
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  CRAFT_THROTTLE_WINDOW_SECONDS,
-  CRAFT_THROTTLE_MAX_PER_WINDOW,
   GATHERING_PROFESSIONS,
   GATHERING_PROFESSION_IDS,
   ALL_RECIPES,
@@ -880,10 +877,6 @@ const workOrders = Object.values(QUESTS)
   });
 const profEconomy = {
   craftFeeCopperPerBudgetPoint: CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
-  actionThrottle: {
-    windowSeconds: CRAFT_THROTTLE_WINDOW_SECONDS,
-    maxActions: CRAFT_THROTTLE_MAX_PER_WINDOW,
-  },
   marketCutPct: pct(MARKET_CUT),
   listingDepositCopper: MARKET_LISTING_DEPOSIT_COPPER,
   trainingFeeCopperByTier: [...TRAINING_FEE_BY_TIER],
@@ -1180,7 +1173,6 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];

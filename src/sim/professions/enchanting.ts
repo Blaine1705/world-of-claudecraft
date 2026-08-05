@@ -57,9 +57,11 @@
 
 import { bagCapacity, consumeOneScratch, countFit, fitsAll, removeStacked } from '../bags';
 import { ENCHANTS, type EnchantDef } from '../content/enchants';
+import { ENCHANT_FAMILY_CAST_DURATION_SEC } from '../content/professions';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { requiredLevelFor } from '../item_level_req';
+import { forceDismount } from '../mounts';
 import type { Rng } from '../rng';
 // Type-only import (the crafting.ts/commission.ts idiom): PlayerMeta is a
 // shape, never the Sim class, so this module stays host-agnostic.
@@ -67,13 +69,16 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import {
   cloneItemInstancePayload,
+  DISENCHANT_CAST_ID,
+  type Entity,
+  ENCHANT_CAST_ID,
   type EquipSlot,
   type InventoryUnit,
   type InvSlot,
+  isConsuming,
   type ItemDef,
   type ItemInstancePayload,
 } from '../types';
-import { recordAction, withinActionThrottle } from './action_throttle';
 import { enchantingGainMultiplier } from './archetype';
 import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';
 import { gainCraftSkill } from './wheel';
@@ -259,10 +264,11 @@ function isCraftedDisenchantVictim(consumed: ConsumedDisenchantUnit | undefined)
  *  performs, in one place because all skill-granting arms do exactly this and
  *  only the input tier differs: the quality-tiered 'enchanting' skill gain
  *  (soft-clamped to the archetype ceiling and run through the four-state
- *  mastery curve; a zero gray gain never blocks the action), the shared
- *  action-throttle stamp, and the deed re-check the skill gain's craftSkill
- *  triggers need (the crafting.ts craftItem contract: the gaining site marks
- *  the player dirty itself). */
+ *  mastery curve; a zero gray gain never blocks the action), and the deed
+ *  re-check the skill gain's craftSkill triggers need (the crafting.ts
+ *  craftItem contract: the gaining site marks the player dirty itself).
+ *  Craft Cast System Phase 4: no shared action-throttle stamp; pace is the
+ *  1.5 s cast, not a quota. */
 function grantEnchantingSkill(ctx: SimContext, meta: PlayerMeta, inputTier: number): void {
   gainCraftSkill(
     meta.craftSkills,
@@ -276,7 +282,6 @@ function grantEnchantingSkill(ctx: SimContext, meta: PlayerMeta, inputTier: numb
         inputTier,
       ),
   );
-  recordAction(meta);
   ctx.markDeedsDirty(meta.entityId);
 }
 
@@ -294,7 +299,16 @@ export interface DisenchantResult {
    *  piece, 1 or 2 (one rng draw) for an epic/legendary piece. Set iff
    *  secondaryItemId is. */
   secondaryCount?: number;
-  reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
+  /** True when the command admitted and started a DISENCHANT_CAST_ID cast
+   *  (no materials granted yet). Absent on complete resolves and denials. */
+  casting?: boolean;
+  reason?:
+    | 'unknown_item'
+    | 'not_disenchantable'
+    | 'not_held'
+    | 'throttled'
+    | 'no_bag_space'
+    | 'busy';
 }
 
 function consumeSelectedInventorySlot(
@@ -365,12 +379,6 @@ export function resolveDisenchant(
   if (!isDisenchantable(def)) return { ok: false, itemId, reason: 'not_disenchantable' };
   if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
   const meta = ctx.players.get(pid);
-  // Shared action throttle (action_throttle.ts): disenchant draws
-  // from the same 10-per-60s budget as crafting, checked (no side effect
-  // beyond the window's own natural rollover) before anything is consumed.
-  if (meta && !withinActionThrottle(meta, ctx.time)) {
-    return { ok: false, itemId, reason: 'throttled' };
-  }
   // The yield plan (pure def lookups, no rng): hoisted above the capacity
   // gate so the gate can model the exact grants the success path mints below.
   const quality = def.quality ?? 'common';
@@ -383,6 +391,7 @@ export function resolveDisenchant(
   // arm on the sub-rare yield, and two secondaries on an epic/legendary
   // piece. The denial draws nothing and has no side effect, like every other
   // arm above; a granted roll can never exceed what was checked.
+  // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   if (meta) {
     const scratch = meta.inventory.map((s) => ({ ...s }));
     if (consumeSelectedInventorySlot(scratch, itemId, slotIndex) === null) {
@@ -462,11 +471,12 @@ export function resolveDisenchant(
   }
   if (meta) {
     // Quality-tiered gain: the disenchanted item's def quality is the input
-    // tier. Crafted-provenance copies still yield materials and spend the
-    // shared throttle, but they do not teach enchanting, preventing a craft
-    // then disenchant loop from double-dipping profession progression.
-    if (isCraftedDisenchantVictim(consumed)) recordAction(meta);
-    else grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
+    // tier. Crafted-provenance copies still yield materials, but they do not
+    // teach enchanting, preventing a craft then disenchant loop from
+    // double-dipping profession progression. Phase 4: no throttle stamp.
+    if (!isCraftedDisenchantVictim(consumed)) {
+      grantEnchantingSkill(ctx, meta, ENCHANTING_GAIN_TIER_BY_QUALITY[quality]);
+    }
   }
   const result: DisenchantResult = { ok: true, itemId, materialItemId, count };
   if (secondaryItemId && secondaryCount) {
@@ -476,10 +486,109 @@ export function resolveDisenchant(
   return result;
 }
 
-/** Command entry point, mirroring professions/salvage.ts's salvageItem shape
- *  exactly: resolves the caller's own player entity via ctx.resolve, then
- *  delegates to resolveDisenchant. Runs on the deterministic tick the
- *  command arrives on, never off-tick. */
+/** Pre-consume admission for a disenchant cast start (and complete re-check
+ *  still lives inside resolveDisenchant). No side effects, no rng. */
+export function evaluateDisenchantAdmission(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  slotIndex?: number,
+): DisenchantResult | null {
+  const def = ITEMS[itemId];
+  if (!def) return { ok: false, itemId, reason: 'unknown_item' };
+  if (!isDisenchantable(def)) return { ok: false, itemId, reason: 'not_disenchantable' };
+  if (ctx.countItem(itemId, pid) < 1) return { ok: false, itemId, reason: 'not_held' };
+  const meta = ctx.players.get(pid);
+  if (!meta) return null;
+  const quality = def.quality ?? 'common';
+  const materialItemId = DISENCHANT_MATERIAL_BY_QUALITY[quality] ?? 'arcane_dust';
+  const isRarePlus = quality === 'rare' || quality === 'epic' || quality === 'legendary';
+  const secondaryItemId = typedSecondaryFor(def);
+  const scratch = meta.inventory.map((s) => ({ ...s }));
+  if (consumeSelectedInventorySlot(scratch, itemId, slotIndex) === null) {
+    return { ok: false, itemId, reason: 'not_held' };
+  }
+  if (slotIndex === undefined) consumePreferredDisenchantVictim(scratch, itemId);
+  const adds: InvSlot[] = isRarePlus
+    ? [{ itemId: materialItemId, count: 1 }]
+    : [{ itemId: materialItemId, count: maxDisenchantYield(def) }];
+  if (isRarePlus && secondaryItemId) {
+    adds.push({
+      itemId: secondaryItemId,
+      count: quality === 'rare' ? 1 : 2,
+      instance: { bindOnTrade: true },
+    });
+  }
+  if (!fitsAll(scratch, bagCapacity(meta.bags), adds)) {
+    return { ok: false, itemId, reason: 'no_bag_space' };
+  }
+  return null;
+}
+
+function beginEnchantFamilyCast(
+  ctx: SimContext,
+  p: Entity,
+  castId: typeof DISENCHANT_CAST_ID | typeof ENCHANT_CAST_ID,
+  session: {
+    itemId: string;
+    bagSlot: number;
+    enchantId: string;
+    equipSlot: string;
+    confirmReplace: boolean;
+  },
+): void {
+  if (p.sitting) ctx.standUp(p);
+  if (p.mountKey !== '') forceDismount(ctx, p);
+  if (p.mountCastKey !== '') {
+    p.mountCastRemaining = 0;
+    p.mountCastKey = '';
+  }
+  p.queuedCastAbility = null;
+  p.queuedCastAim = null;
+  const duration = ENCHANT_FAMILY_CAST_DURATION_SEC;
+  p.castingAbility = castId;
+  p.castTotal = duration;
+  p.castRemaining = duration;
+  p.castTargetId = null;
+  p.channeling = false;
+  p.enchantCastItemId = session.itemId;
+  p.enchantCastBagSlot = session.bagSlot;
+  p.enchantCastEnchantId = session.enchantId;
+  p.enchantCastEquipSlot = session.equipSlot;
+  p.enchantCastConfirmReplace = session.confirmReplace;
+  ctx.emit({
+    type: 'castStart',
+    entityId: p.id,
+    ability: castId,
+    time: duration,
+  });
+}
+
+function clearEnchantCastSession(p: Entity): {
+  itemId: string;
+  bagSlot: number;
+  enchantId: string;
+  equipSlot: string;
+  confirmReplace: boolean;
+} {
+  const session = {
+    itemId: p.enchantCastItemId,
+    bagSlot: p.enchantCastBagSlot,
+    enchantId: p.enchantCastEnchantId,
+    equipSlot: p.enchantCastEquipSlot,
+    confirmReplace: p.enchantCastConfirmReplace,
+  };
+  p.enchantCastItemId = '';
+  p.enchantCastBagSlot = -1;
+  p.enchantCastEnchantId = '';
+  p.enchantCastEquipSlot = '';
+  p.enchantCastConfirmReplace = false;
+  return session;
+}
+
+/** Command entry point: validates and STARTS a DISENCHANT_CAST_ID cast.
+ *  Materials resolve only on completeDisenchantCast. Runs on the
+ *  deterministic tick the command arrives on, never off-tick. */
 export function disenchantItem(
   ctx: SimContext,
   itemId: string,
@@ -488,13 +597,49 @@ export function disenchantItem(
 ): DisenchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, reason: 'unknown_item' };
-  return resolveDisenchant(ctx, r.meta.entityId, itemId, slotIndex);
+  const { meta, e: p } = r;
+  if (p.castingAbility || isConsuming(p)) {
+    return { ok: false, itemId, reason: 'busy' };
+  }
+  const denial = evaluateDisenchantAdmission(ctx, meta.entityId, itemId, slotIndex);
+  if (denial) return denial;
+  beginEnchantFamilyCast(ctx, p, DISENCHANT_CAST_ID, {
+    itemId,
+    bagSlot: slotIndex === undefined ? -1 : slotIndex,
+    enchantId: '',
+    equipSlot: '',
+    confirmReplace: false,
+  });
+  return { ok: true, itemId, casting: true };
+}
+
+/** Completion of a running disenchant cast (updateCasting routes here).
+ *  Re-validates and applies resolveDisenchant; emits disenchantResult. */
+export function completeDisenchantCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  const session = clearEnchantCastSession(p);
+  const slotIndex = session.bagSlot < 0 ? undefined : session.bagSlot;
+  const result = resolveDisenchant(ctx, meta.entityId, session.itemId, slotIndex);
+  meta.lastDisenchantResult = result;
+  ctx.emit({
+    type: 'disenchantResult',
+    ok: result.ok,
+    itemId: result.itemId,
+    materialItemId: result.materialItemId,
+    count: result.count,
+    secondaryItemId: result.secondaryItemId,
+    secondaryCount: result.secondaryCount,
+    reason: result.reason,
+    pid: meta.entityId,
+  });
 }
 
 export interface ApplyEnchantResult {
   ok: boolean;
   itemId: string;
   enchantId: string;
+  /** True when the command admitted and started an ENCHANT_CAST_ID cast
+   *  (no reagents consumed yet). Absent on complete resolves and denials. */
+  casting?: boolean;
   reason?:
     | 'unknown_item'
     | 'unknown_enchant'
@@ -508,7 +653,8 @@ export interface ApplyEnchantResult {
     // not_held), and the identical-enchant-id re-apply, denied on every arm
     // because its accept would be pure reagent loss with zero state change.
     | 'already_enchanted'
-    | 'same_enchant';
+    | 'same_enchant'
+    | 'busy';
 }
 
 /** The exact instance payload an apply-enchant mints from the copy it
@@ -674,11 +820,7 @@ function resolveApplyEnchantWorn(
       return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
     }
   }
-  // Shared action throttle (action_throttle.ts), the same 10-per-60s budget the
-  // bagged arm and crafting draw from, checked before anything is consumed.
-  if (!withinActionThrottle(meta, ctx.time)) {
-    return { ok: false, itemId, enchantId, reason: 'throttled' };
-  }
+  // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   // NO #2350 bag-capacity gate on this arm, deliberately: nothing enters the
   // bags. The enchanted copy is rewritten in place on the worn slot and the
   // reagents only leave, so this action can never need a free bag slot. The
@@ -761,11 +903,7 @@ function resolveReplaceEnchantBagged(
       return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
     }
   }
-  // Shared action throttle (action_throttle.ts): the same 10-per-60s budget
-  // every enchanting arm draws from, checked before anything is consumed.
-  if (!withinActionThrottle(meta, ctx.time)) {
-    return { ok: false, itemId, enchantId, reason: 'throttled' };
-  }
+  // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   // #2350 capacity gate. Replacement is nearly always net-neutral (one copy
   // out, one copy in, reagents only leave), but not provably: the victim can
   // sit in a surviving multi-unit stack (identical enchanted copies merged),
@@ -911,13 +1049,7 @@ export function resolveApplyEnchant(
     }
   }
   const meta = ctx.players.get(pid);
-  // Shared action throttle (action_throttle.ts): enchant-apply
-  // draws from the same 10-per-60s budget as crafting, checked (no side
-  // effect beyond the window's own natural rollover) before anything is
-  // consumed.
-  if (meta && !withinActionThrottle(meta, ctx.time)) {
-    return { ok: false, itemId, enchantId, reason: 'throttled' };
-  }
+  // Craft Cast System Phase 4: no shared action throttle; cast duration paces.
   // #2350 capacity gate: the freshly-enchanted instance must fit AFTER the
   // consumed copy and every reagent leave, so model all of it on a scratch
   // copy: the victim via consumeOneScratch (the isEnchantedInstance exclusion
@@ -972,10 +1104,122 @@ export function resolveApplyEnchant(
   return { ok: true, itemId, enchantId };
 }
 
-/** Command entry point, same shape as disenchantItem/salvageItem above.
- *  `slot`, when present, names the WORN equipment slot to enchant in place;
- *  `confirmReplace` is the #2415 explicit consent to replace an existing
- *  enchant (see resolveApplyEnchant). */
+/**
+ * Pre-consume admission for an apply-enchant cast start. Mirrors the deny
+ * arms of resolveApplyEnchant (and its worn/replace sub-arms) without
+ * mutating inventory or equipment. confirmReplace must already be true to
+ * start a cast against an already-enchanted target (confirm dialog is the
+ * gate; the cast is only the pace).
+ */
+export function evaluateApplyEnchantAdmission(
+  ctx: SimContext,
+  pid: number,
+  itemId: string,
+  enchantId: string,
+  slot?: EquipSlot,
+  confirmReplace?: boolean,
+): ApplyEnchantResult | null {
+  const itemDef = ITEMS[itemId];
+  if (!itemDef) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
+  const enchant = ENCHANTS[enchantId];
+  if (!enchant) return { ok: false, itemId, enchantId, reason: 'unknown_enchant' };
+  if (itemDef.slot !== enchant.itemSlot) {
+    return { ok: false, itemId, enchantId, reason: 'wrong_slot' };
+  }
+  const r = ctx.resolve(pid);
+  if (!r) return { ok: false, itemId, enchantId, reason: 'not_held' };
+  const { meta } = r;
+
+  if (slot) {
+    if (meta.equipment[slot] !== itemId) {
+      return { ok: false, itemId, enchantId, reason: 'not_held' };
+    }
+    const worn = meta.equipmentInstance?.[slot];
+    const replacing = worn !== undefined && isEnchantedInstance(worn);
+    if (replacing) {
+      if (confirmReplace !== true) {
+        return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
+      }
+      if (worn.enchant === enchantId) {
+        return { ok: false, itemId, enchantId, reason: 'same_enchant' };
+      }
+      if (worn.enchant !== undefined && !ENCHANTS[worn.enchant]) {
+        return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
+      }
+    }
+    for (const reagent of enchant.reagents) {
+      if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
+        return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
+      }
+    }
+    return null;
+  }
+
+  const enchantableHeld = ctx.countEnchantableItem(itemId, pid);
+  const enchantedHeld = ctx.countItem(itemId, pid) - enchantableHeld;
+  if (confirmReplace === true && enchantedHeld >= 1) {
+    const victimIdx = replaceVictimIndex(meta.inventory, itemId);
+    const victim = victimIdx >= 0 ? meta.inventory[victimIdx].instance : undefined;
+    if (!victim) return { ok: false, itemId, enchantId, reason: 'not_held' };
+    if (victim.enchant === enchantId) {
+      return { ok: false, itemId, enchantId, reason: 'same_enchant' };
+    }
+    if (victim.enchant !== undefined && !ENCHANTS[victim.enchant]) {
+      return { ok: false, itemId, enchantId, reason: 'already_enchanted' };
+    }
+    for (const reagent of enchant.reagents) {
+      if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
+        return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
+      }
+    }
+    const scratch = meta.inventory.map((s) => ({ ...s }));
+    const scratchVictim = consumeEnchantedVictim(scratch, itemId) ?? {
+      instance: victim,
+      craftedRecipeId: meta.inventory[victimIdx]?.craftedRecipeId,
+    };
+    for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
+    if (
+      countFit(
+        scratch,
+        bagCapacity(meta.bags),
+        itemId,
+        1,
+        replacedEnchantPayloadFor(scratchVictim.instance ?? victim, enchant),
+        scratchVictim.craftedRecipeId,
+      ) < 1
+    ) {
+      return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
+    }
+    return null;
+  }
+  if (enchantableHeld < 1) {
+    return {
+      ok: false,
+      itemId,
+      enchantId,
+      reason: enchantedHeld >= 1 ? 'already_enchanted' : 'not_held',
+    };
+  }
+  for (const reagent of enchant.reagents) {
+    if (ctx.countItem(reagent.itemId, pid) < reagent.count) {
+      return { ok: false, itemId, enchantId, reason: 'insufficient_materials' };
+    }
+  }
+  const scratch = meta.inventory.map((s) => ({ ...s }));
+  const victim = consumeOneScratch(scratch, itemId, isEnchantedInstance);
+  for (const reagent of enchant.reagents) removeStacked(scratch, reagent.itemId, reagent.count);
+  if (
+    countFit(scratch, bagCapacity(meta.bags), itemId, 1, enchantedPayloadFor(victim, enchant)) < 1
+  ) {
+    return { ok: false, itemId, enchantId, reason: 'no_bag_space' };
+  }
+  return null;
+}
+
+/** Command entry point: validates and STARTS an ENCHANT_CAST_ID cast.
+ *  Reagents and the enchant apply resolve only on completeApplyEnchantCast.
+ *  `slot` names a worn equipment slot; `confirmReplace` is #2415 consent
+ *  (required before start when the target is already enchanted). */
 export function applyEnchant(
   ctx: SimContext,
   itemId: string,
@@ -986,5 +1230,49 @@ export function applyEnchant(
 ): ApplyEnchantResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, enchantId, reason: 'unknown_item' };
-  return resolveApplyEnchant(ctx, r.meta.entityId, itemId, enchantId, slot, confirmReplace);
+  const { meta, e: p } = r;
+  if (p.castingAbility || isConsuming(p)) {
+    return { ok: false, itemId, enchantId, reason: 'busy' };
+  }
+  const denial = evaluateApplyEnchantAdmission(
+    ctx,
+    meta.entityId,
+    itemId,
+    enchantId,
+    slot,
+    confirmReplace,
+  );
+  if (denial) return denial;
+  beginEnchantFamilyCast(ctx, p, ENCHANT_CAST_ID, {
+    itemId,
+    bagSlot: -1,
+    enchantId,
+    equipSlot: slot ?? '',
+    confirmReplace: confirmReplace === true,
+  });
+  return { ok: true, itemId, enchantId, casting: true };
+}
+
+/** Completion of a running apply-enchant cast. Re-validates and applies
+ *  resolveApplyEnchant; emits enchantResult. */
+export function completeApplyEnchantCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  const session = clearEnchantCastSession(p);
+  const equipSlot = session.equipSlot ? (session.equipSlot as EquipSlot) : undefined;
+  const result = resolveApplyEnchant(
+    ctx,
+    meta.entityId,
+    session.itemId,
+    session.enchantId,
+    equipSlot,
+    session.confirmReplace,
+  );
+  meta.lastEnchantResult = result;
+  ctx.emit({
+    type: 'enchantResult',
+    ok: result.ok,
+    itemId: result.itemId,
+    enchantId: result.enchantId,
+    reason: result.reason,
+    pid: meta.entityId,
+  });
 }
