@@ -2050,6 +2050,14 @@
   body.mobile-touch #party-frames .party-frame .pf-badge {
     font-size: 9px;
   }
+  /* The pet sliver shrinks with the rest of the mobile row (its bars are 5px here,
+     down from 9px on desktop), staying a hairline cue rather than competing with the
+     member's own health. It is not a primary tap target on mobile: the member row
+     owns the tap, and selecting a party member's pet is a desktop-scale interaction. */
+  body.mobile-touch #party-frames .party-frame .pfm-pet {
+    height: 3px;
+    margin-top: 1px;
+  }
   body.mobile-touch #party-frames .party-frame .bar {
     height: 5px;
     margin-top: 1px;

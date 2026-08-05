@@ -12,102 +12,142 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "es_ES": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "fr_FR": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "fr_CA": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "de_DE": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "zh_CN": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "zh_TW": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "ko_KR": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "ja_JP": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "pt_BR": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "ru_RU": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "cs_CZ": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "nl_NL": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "pl_PL": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "id_ID": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "tr_TR": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "sv_SE": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "vi_VN": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ],
   "da_DK": [
     "hudChrome.keybinds.targetPet",
     "hudChrome.options.showPetFrame",
+    "hudChrome.partyFrames.petHealth",
+    "hudChrome.partyFrames.showPets",
     "hudChrome.unitFrame.petLabel"
   ]
 };

@@ -415,6 +415,7 @@ const FRAMES_KEYS = [
   'partyFrameShowResource',
   'partyFrameShowAbsorbs',
   'partyFrameShowAuras',
+  'partyFrameShowPets',
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
   'showTargetOfTarget',

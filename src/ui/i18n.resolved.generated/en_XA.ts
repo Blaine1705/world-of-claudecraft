@@ -1979,6 +1979,8 @@ export const en_XA: EnTranslations = {
       "showResource": "[Šĥóŵ Ɱáñá, Ŕáĝé, áñð Éñéŕĝý]",
       "showAbsorbs": "[Šĥóŵ Áƀšóŕƀ Šĥíéļðš]",
       "showAuras": "[Šĥóŵ Ɓúƒƒš áñð Ðéƀúƒƒš]",
+      "showPets": "[Šĥóŵ Þéţš]",
+      "petHealth": "[{name} {pct}]",
       "showSelf": "[Šĥóŵ Ýóúŕ Ƒŕáɱé]"
     },
     "frameReset": {

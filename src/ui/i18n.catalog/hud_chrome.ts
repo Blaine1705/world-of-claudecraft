@@ -2198,6 +2198,15 @@ export const hudChromeStrings = {
     showResource: 'Show Mana, Rage, and Energy',
     showAbsorbs: 'Show Absorb Shields',
     showAuras: 'Show Buffs and Debuffs',
+    // Interface toggle for the pet health sliver on a party member's row. Kept
+    // NON-WORDY (no run of four+ lowercase) so an English-filled non-Latin locale
+    // does not trip the M16 untranslated-leak guard.
+    showPets: 'Show Pets',
+    // The sliver's accessible name, the only way a screen-reader user gets the pet's
+    // health (the sliver itself is a bar with no visible text). {name} is the pet's
+    // name and {pct} its health percent, both substituted, so the literal part stays
+    // non-wordy for the same guard.
+    petHealth: '{name} {pct}',
     showSelf: 'Show Your Frame',
   },
   // Interface panel row: snap both movable unit frames back to their stock

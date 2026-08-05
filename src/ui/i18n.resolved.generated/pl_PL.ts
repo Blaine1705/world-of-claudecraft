@@ -1979,6 +1979,8 @@ export const pl_PL: EnTranslations = {
       "showResource": "Pokaż manę, szał i energię",
       "showAbsorbs": "Pokaż tarcze absorpcji",
       "showAuras": "Pokaż wzmocnienia i osłabienia",
+      "showPets": "Show Pets",
+      "petHealth": "{name} {pct}",
       "showSelf": "Pokaż własną ramkę"
     },
     "frameReset": {

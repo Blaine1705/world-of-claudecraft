@@ -30,6 +30,7 @@ import { partyChipState } from './party_collapse';
 import {
   createPartyRow,
   createPartyRowsWrapper,
+  PARTY_BAR_SCALE_PRECISION,
   PARTY_CREST_KEY_PREFIX,
   PARTY_LEADER_GLYPH,
   type PartyRow,
@@ -71,6 +72,10 @@ const ARIA_FALSE = 'false';
 // Badge visibility: '' reverts to the stylesheet display (shown), 'none' hides. The
 // badges persist in the DOM and only their display toggles, so the icon cue survives
 // forced-colors (where the combat box-shadow is dropped).
+// The pet sliver's show/hide values and dead-state class, mirroring the badge pair.
+const PET_SHOWN = '';
+const PET_HIDDEN = 'none';
+const PET_DEAD_CLASS = 'dead';
 const BADGE_SHOWN = '';
 const BADGE_HIDDEN = 'none';
 
@@ -81,6 +86,11 @@ export interface PartyFramesPainterDeps {
   onContextMenu: (pid: number, name: string, x: number, y: number) => void;
   /** Hover tracking for Clique-style mouseover casts: pid on enter, null on leave. */
   onHover: (pid: number | null) => void;
+  /** Select a member's PET by entity id (the pet sliver's click / Enter). */
+  onTargetPet: (entityId: number) => void;
+  /** The localized accessible name for a pet sliver ("Fang, 65%"), re-read each
+   *  paint so a language switch re-localizes it through the elided setText. */
+  petLabel: (name: string, frac: number) => string;
   /** The localized "Party" chip caption, re-read each update so an in-game language
    *  switch re-localizes it (through the elided setText). Mobile only. */
   chipLabel: () => string;
@@ -141,6 +151,7 @@ export class PartyFramesPainter {
       onTarget: deps.onTarget,
       onContextMenu: deps.onContextMenu,
       onHover: deps.onHover,
+      onTargetPet: deps.onTargetPet,
     };
   }
 
@@ -409,6 +420,7 @@ export class PartyFramesPainter {
     this.writers.setDisplay(row.badges.combat, inCombat ? BADGE_SHOWN : BADGE_HIDDEN);
     this.writers.setDisplay(row.badges.oor, m.oor ? BADGE_SHOWN : BADGE_HIDDEN);
     this.writers.setDisplay(row.badges.offline, m.connected === 0 ? BADGE_SHOWN : BADGE_HIDDEN);
+    this.paintPet(row, m);
     // The member's mini aura strip: the row's own keyed aura pool (writes elided
     // inside it). Signature-gated like the rest of this sync, never per frame.
     row.paintAuras(config?.showAuras === false ? [] : (m.auras ?? []));
@@ -417,6 +429,26 @@ export class PartyFramesPainter {
   /** The localized "Group n" raid cue for a member, or '' outside raid. The group number
    *  goes through formatNumber (i18n digits). Used by paintRow and by relocalize (so a
    *  language switch re-emits it from the last synced raid flag). */
+  // The member's pet health sliver. `m.pet` is attached client-side from the entity
+  // roster, so it is simply absent for a petless member, a pet outside the client's
+  // interest scope, or with the Show Pets option off: all three collapse to hiding
+  // the sliver, which is why there is no separate "has pet" flag to keep in sync.
+  private paintPet(row: PartyRow, m: PartyFrameMember): void {
+    const pet = m.pet;
+    if (!pet) {
+      this.writers.setDisplay(row.petBar, PET_HIDDEN);
+      // Blank the label too: a screen reader walking a hidden-but-labelled node
+      // would otherwise still read the last pet's health.
+      this.writers.setText(row.petLabel, '');
+      return;
+    }
+    this.writers.setDisplay(row.petBar, PET_SHOWN);
+    const frac = Math.max(0, Math.min(1, pet.hp / Math.max(1, pet.maxHp)));
+    this.writers.setTransform(row.petFill, `scaleX(${frac.toFixed(PARTY_BAR_SCALE_PRECISION)})`);
+    this.writers.toggleClass(row.petBar, PET_DEAD_CLASS, pet.dead);
+    this.writers.setText(row.petLabel, this.deps.petLabel(pet.name, frac));
+  }
+
   private groupLabel(m: PartyFrameMember, raid: boolean): string {
     return raid
       ? t('hudChrome.unitFrame.partyGroup', {

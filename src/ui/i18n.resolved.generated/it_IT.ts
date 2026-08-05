@@ -1979,6 +1979,8 @@ export const it_IT: EnTranslations = {
       "showResource": "Mostra mana, rabbia ed energia",
       "showAbsorbs": "Mostra scudi di assorbimento",
       "showAuras": "Mostra potenziamenti e penalità",
+      "showPets": "Show Pets",
+      "petHealth": "{name} {pct}",
       "showSelf": "Mostra il tuo riquadro"
     },
     "frameReset": {

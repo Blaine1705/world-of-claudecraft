@@ -1979,6 +1979,8 @@ export const en_CA: EnTranslations = {
       "showResource": "Show Mana, Rage, and Energy",
       "showAbsorbs": "Show Absorb Shields",
       "showAuras": "Show Buffs and Debuffs",
+      "showPets": "Show Pets",
+      "petHealth": "{name} {pct}",
       "showSelf": "Show Your Frame"
     },
     "frameReset": {

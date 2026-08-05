@@ -55,6 +55,8 @@ export interface PartyRowSlot {
  *  context menu on right-click or the Menu key, and the hover tracking behind
  *  Clique-style mouseover casts: pid on enter, null on leave). */
 export interface PartyRowDeps {
+  /** Select the member's PET by its entity id (the pet sliver's click / Enter). */
+  onTargetPet(entityId: number): void;
   onTarget: (pid: number) => void;
   onContextMenu: (pid: number, name: string, x: number, y: number) => void;
   onHover: (pid: number | null) => void;
@@ -75,6 +77,10 @@ export interface PartyRow {
   group: HTMLElement;
   rewind: HTMLElement;
   incoming: HTMLElement;
+  /** The pet health sliver and its parts; the painter drives all three. */
+  petBar: HTMLElement;
+  petFill: HTMLElement;
+  petLabel: HTMLElement;
   relocalize: () => void;
   /** Repaint the member's mini aura strip (its own keyed AurasPainter pool per row).
    *  Called by the pool on each signature-gated sync, never per frame. */
@@ -122,6 +128,33 @@ export function partyRowHandlers(slot: PartyRowSlot, deps: PartyRowDeps) {
     // recycled row under the cursor reports its current member.
     mouseenter: (): void => deps.onHover(slot.member.pid),
     mouseleave: (): void => deps.onHover(null),
+  };
+}
+
+/**
+ * The PET sliver's handlers, split from the row's own so the two selections cannot be
+ * confused: clicking the sliver selects the member's PET, clicking anywhere else on
+ * the row selects the MEMBER. Both stop propagation, or the click would bubble to the
+ * row handler and immediately re-select the member over the pet.
+ *
+ * Reads the LIVE slot for the same reason the row handlers do: rows are pooled and
+ * recycled to a different member, so a captured pet id would go stale. A no-op when
+ * the current member has no visible pet.
+ */
+export function petRowHandlers(slot: PartyRowSlot, deps: PartyRowDeps) {
+  const select = (ev: Event): void => {
+    ev.stopPropagation();
+    const pet = slot.member.pet;
+    if (!pet) return;
+    deps.onTargetPet(pet.id);
+  };
+  return {
+    click: select,
+    keydown: (ev: KeyboardEvent): void => {
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      ev.preventDefault();
+      select(ev);
+    },
   };
 }
 
@@ -240,6 +273,25 @@ export function createPartyRow(
   resFill.className = 'bar-fill';
   resBar.append(resFill);
 
+  // The member's PET health sliver. Deliberately NOT class `bar`: two shipped rules
+  // select every non-hp `.bar` child of a row (the Show Resource toggle hides them,
+  // and raid style absolutely positions them into one 3px strip), so a `.bar` here
+  // would vanish with the resource bar and overlap it in raid style. It is its own
+  // clickable control: clicking the sliver selects the PET, while a click anywhere
+  // else on the row still selects the member, so the handler stops propagation.
+  const petBar = doc.createElement('div');
+  petBar.className = 'pfm-pet';
+  petBar.setAttribute('role', 'button');
+  petBar.tabIndex = 0;
+  const petFill = doc.createElement('div');
+  petFill.className = 'pfm-pet-fill';
+  const petLabel = doc.createElement('span');
+  petLabel.className = 'pfm-pet-label visually-hidden';
+  petBar.append(petFill, petLabel);
+  const petHandlers = petRowHandlers(slot, deps);
+  petBar.addEventListener('click', petHandlers.click);
+  petBar.addEventListener('keydown', petHandlers.keydown);
+
   // The member's mini aura strip (their buffs/debuffs), a per-row instance of the
   // keyed aura pool under the bars. paintAuras converts the compact wire summaries
   // into the aura core's input shape (no countdown: remaining rides as Infinity, so
@@ -265,7 +317,7 @@ export function createPartyRow(
     aurasPainter.paint(aurasView.tick(aurasEntity));
   };
 
-  row.append(nameRow, hpBar, resBar, aurasEl);
+  row.append(nameRow, hpBar, resBar, petBar, aurasEl);
 
   const handlers = partyRowHandlers(slot, deps);
   row.addEventListener('click', handlers.click);
@@ -309,6 +361,9 @@ export function createPartyRow(
     group,
     rewind,
     incoming,
+    petBar,
+    petFill,
+    petLabel,
     paintAuras,
   };
 }

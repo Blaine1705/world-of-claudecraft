@@ -13,6 +13,7 @@ import {
   type PartyRowAuraDeps,
   type PartyRowSlot,
   partyRowHandlers,
+  petRowHandlers,
 } from '../src/ui/party_frame_row';
 import { DEFAULT_PARTY_FRAME_DISPLAY, type PartyFrameMember } from '../src/ui/party_frames';
 import { PartyFramesPainter } from '../src/ui/party_frames_painter';
@@ -85,6 +86,7 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
       onTarget: (pid) => targets.push(pid),
       onContextMenu: (pid, name) => menus.push([pid, name]),
       onHover: () => {},
+      onTargetPet: () => {},
     });
 
     handlers.click();
@@ -107,6 +109,7 @@ describe('partyRowHandlers: the closures read the LIVE slot, never a captured me
       onTarget: (pid) => targets.push(pid),
       onContextMenu: (pid, _name, x, y) => menus.push([pid, x, y]),
       onHover: () => {},
+      onTargetPet: () => {},
     });
     for (const key of ['Enter', ' ']) {
       handlers.keydown({ key, preventDefault() {} } as unknown as KeyboardEvent);
@@ -274,7 +277,7 @@ describe('createPartyRow: decorative badges + relocalize hook (a11y + live langu
     createPartyRow(
       fakeDoc,
       recordingFacet().writers,
-      { onTarget() {}, onContextMenu() {}, onHover() {} },
+      { onTarget() {}, onContextMenu() {}, onHover() {}, onTargetPet() {} },
       member({ pid: 1 }),
       auraDeps,
     );
@@ -339,6 +342,8 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
         onTarget: (pid) => targeted.push(pid),
         onContextMenu: () => {},
         onHover: () => {},
+        onTargetPet: () => {},
+        petLabel: (name: string, frac: number) => `${name} ${Math.round(frac * 100)}%`,
         chipLabel: () => 'Party',
         onToggleCollapse: () => {
           toggles++;
@@ -796,5 +801,80 @@ describe('PartyFramesPainter: keyed pool over the elided writers', () => {
     calls.length = 0;
     painter.relocalize();
     expect(calls.some((c) => c.m === 'setText' && c.args[0] === 'Party')).toBe(true);
+  });
+});
+
+// The pet sliver is a control INSIDE the row button. Clicking it must select the pet,
+// not the member, which means stopping propagation: without that the click bubbles to
+// the row handler and the member is selected right back over the pet.
+describe('petRowHandlers: the pet sliver selects the pet, not the member', () => {
+  const slotFor = (pet?: { id: number }) => ({
+    member: { pid: 7, name: 'Ally', pet } as unknown as PartyFrameMember,
+  });
+  const deps = () => {
+    const calls: { member: number[]; pet: number[]; stopped: number } = {
+      member: [],
+      pet: [],
+      stopped: 0,
+    };
+    return {
+      calls,
+      deps: {
+        onTarget: (pid: number) => calls.member.push(pid),
+        onContextMenu: () => {},
+        onHover: () => {},
+        onTargetPet: (id: number) => calls.pet.push(id),
+      },
+    };
+  };
+  const ev = (calls: { stopped: number }) =>
+    ({ stopPropagation: () => calls.stopped++, preventDefault: () => {} }) as unknown as Event;
+
+  it('targets the pet entity id, never the member pid', () => {
+    const { calls, deps: d } = deps();
+    petRowHandlers(slotFor({ id: 90 }), d).click(ev(calls));
+    expect(calls.pet).toEqual([90]);
+    expect(calls.member).toEqual([]);
+  });
+
+  it('stops propagation so the row handler does not re-select the member', () => {
+    const { calls, deps: d } = deps();
+    petRowHandlers(slotFor({ id: 90 }), d).click(ev(calls));
+    expect(calls.stopped).toBe(1);
+  });
+
+  it('is a no-op when the member has no visible pet', () => {
+    const { calls, deps: d } = deps();
+    petRowHandlers(slotFor(undefined), d).click(ev(calls));
+    expect(calls.pet).toEqual([]);
+    expect(calls.member).toEqual([]);
+  });
+
+  it('reads the LIVE slot, so a recycled row targets its current member pet', () => {
+    const { calls, deps: d } = deps();
+    const slot = slotFor({ id: 90 });
+    const handlers = petRowHandlers(slot, d);
+    handlers.click(ev(calls));
+    slot.member = { pid: 8, name: 'Other', pet: { id: 91 } } as unknown as PartyFrameMember;
+    handlers.click(ev(calls));
+    expect(calls.pet).toEqual([90, 91]);
+  });
+
+  it('activates on Enter and Space, and ignores other keys', () => {
+    const { calls, deps: d } = deps();
+    const h = petRowHandlers(slotFor({ id: 90 }), d);
+    for (const key of ['Enter', ' ']) {
+      h.keydown({
+        key,
+        stopPropagation: () => calls.stopped++,
+        preventDefault: () => {},
+      } as unknown as KeyboardEvent);
+    }
+    h.keydown({
+      key: 'a',
+      stopPropagation: () => calls.stopped++,
+      preventDefault: () => {},
+    } as unknown as KeyboardEvent);
+    expect(calls.pet).toEqual([90, 90]);
   });
 });

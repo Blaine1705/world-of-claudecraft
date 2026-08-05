@@ -1979,6 +1979,8 @@ export const ja_JP: EnTranslations = {
       "showResource": "マナ・怒り・エネルギーを表示",
       "showAbsorbs": "吸収シールドを表示",
       "showAuras": "バフとデバフを表示",
+      "showPets": "Show Pets",
+      "petHealth": "{name} {pct}",
       "showSelf": "自分のフレームを表示"
     },
     "frameReset": {

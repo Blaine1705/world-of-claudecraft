@@ -5881,6 +5881,51 @@
     background: color-mix(in srgb, var(--color-friendly) 55%, transparent);
     pointer-events: none;
   }
+  /* The pet health sliver on a member's row. NOT class `bar` on purpose: the two
+     rules just below select every non-hp `.bar` child, so a `.bar` here would be
+     hidden by the Show Resource toggle and collapsed onto the resource bar by raid
+     style. Thinner than the member's own bars so it reads as subordinate, and it is
+     its own clickable control (clicking it selects the pet, not the member). */
+  .party-frame .pfm-pet {
+    position: relative;
+    height: 5px;
+    margin-top: 2px;
+    background: #0c0c14;
+    border: 1px solid #000;
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: var(--cursor-point);
+  }
+  .party-frame .pfm-pet-fill {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    background: linear-gradient(180deg, #6fbf5a, #3f8a33);
+  }
+  .party-frame .pfm-pet.dead .pfm-pet-fill {
+    background: linear-gradient(180deg, #6a6a6a, #3a3a3a);
+  }
+  .party-frame .pfm-pet:hover {
+    outline: 1px solid var(--gold-dim);
+  }
+  .party-frame .pfm-pet:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* Raid style compacts the row to a fixed height with overflow hidden, so the
+     sliver rides as a second thin strip directly above the resource strip rather
+     than in flow, where it would be clipped. */
+  #party-frames.party-style-raid .party-frame .pfm-pet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 3px;
+    height: 2px;
+    margin: 0;
+    z-index: 4;
+    border: 0;
+    border-radius: 0;
+  }
   .party-frame.pf-hide-resource > .bar:not(.hp),
   .party-frame.pf-hide-auras .pfm-auras {
     display: none;

@@ -2229,6 +2229,7 @@ async function startGame(
       key === 'partyFrameShowResource' ||
       key === 'partyFrameShowAbsorbs' ||
       key === 'partyFrameShowAuras' ||
+      key === 'partyFrameShowPets' ||
       key === 'partyFrameShowSelf'
     ) {
       // Read live by Hud.updatePartyFrames (its config is rebuilt from settings each
