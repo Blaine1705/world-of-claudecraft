@@ -1434,6 +1434,20 @@ describe('Input touch invert-look', () => {
 
     expect(dragYawDelta).toBeGreaterThan(rawYawDelta * 1.5);
   });
+
+  it('honors the Touch Look Speed setting on the default one-finger swipe-drag path', () => {
+    const { input } = makeInput();
+    const baseYaw = input.camYaw;
+    input.applyTouchLookDelta(100, 0);
+    const defaultDelta = Math.abs(input.camYaw - baseYaw);
+
+    input.camYaw = baseYaw;
+    input.setTouchLookSpeed(2);
+    input.applyTouchLookDelta(100, 0);
+    const doubledDelta = Math.abs(input.camYaw - baseYaw);
+
+    expect(doubledDelta).toBeCloseTo(defaultDelta * 2);
+  });
 });
 
 describe('Input camera zoom (issue 1657)', () => {

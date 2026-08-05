@@ -152,6 +152,7 @@ import {
   BannerQueue,
   bannerSubtextLines,
 } from './banner_queue';
+import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
@@ -188,6 +189,8 @@ import {
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
 } from './combat_sfx';
+import { buildCommissionOrderBoardModel } from './commission_order_view';
+import { renderCommissionOrderWindow } from './commission_order_window';
 import { type CardinalId, compassView } from './compass';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
@@ -247,12 +250,14 @@ import {
   dungeonDisplayName,
   itemDisplayName,
   knownLetterId,
+  riftFloorLabel,
   tEntity,
   zoneDisplayName,
   zonePoiLabel,
 } from './entity_i18n';
 import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
+import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
@@ -468,6 +473,7 @@ import {
   nextMapZoom,
   zoomOutExitsZoneLevel,
 } from './map_pinch_zoom_core';
+import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
 import {
   type MapRegion,
   mapCanvasHeight,
@@ -1575,6 +1581,11 @@ export class Hud {
   private openUnbindNpcId: number | null = null;
   private readonly unbindWindowFocus = this.windowFocus('#unbind-window');
   private unbindOpenerFocus: HTMLElement | null = null;
+  // The crafting window (#1127) was the one standalone-window holdout that
+  // never installed the shared Tab trap or returned focus to its opener: the
+  // same train/unbind shape, added here so it stops being the exception.
+  private readonly craftingWindowFocus = this.windowFocus('#crafting-window');
+  private craftingOpenerFocus: HTMLElement | null = null;
   // Craft tier-up snapshot (Professions 2.0): the last SYNCED
   // craftSkills observation handleEvents diffs for tier crossings. null until
   // the first synced observation, which initializes silently (no toasts for
@@ -1625,6 +1636,12 @@ export class Hud {
       return null;
     }
   })();
+  // Commission order board (issue #1298): whether #commission-board-window
+  // is the viewer's own open window this session. No opener-focus tracking
+  // (the crafting window precedent: a non-modal reference window, not a
+  // trapping dialog), and no location gate (opening/cancelling an order
+  // carries no escrow).
+  private commissionBoardOpen = false;
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
   private readonly riftTracker: RiftFloorTrackerController;
@@ -3263,6 +3280,9 @@ export class Hud {
         break;
       case 'crafting-window':
         this.closeCrafting();
+        break;
+      case 'commission-board-window':
+        this.closeCommissionBoard();
         break;
       case 'loot-window':
         this.closeLoot();
@@ -5347,6 +5367,7 @@ export class Hud {
       familyLabel,
       color: mobTooltipConColor(diff, entity.dead, friendlyPet),
       hostile: entity.hostile,
+      rank: targetRankView(template),
       quests: mobQuests.map((q) => ({
         title: questTitle(q.questId),
         progress: this.questProgressText(
@@ -5908,6 +5929,10 @@ export class Hud {
     // string, so a switch can never draw the old language; clearing is about not
     // carrying dead rasters in the sprite budget.
     this.mapPainter.relocalize();
+    // The delve minimap/world-map schematic bakes the localized compass-north
+    // glyph into its cached background canvas, keyed only on module id; a
+    // language switch alone never busts that cache, so force one rebuild.
+    this.delvePainter.relocalize();
     // The unit-frame move/lock buttons' labels are set once at construction + on
     // toggle, so re-localize them in place on a language switch (same reason as
     // the party rows above).
@@ -10011,14 +10036,21 @@ export class Hud {
 
   // Dungeon Finder "Show on Map": open the world map on the entrance's zone
   // band, pan to the authored door position, and ring it. Never teleports; the
-  // highlight clears when the map closes or is reopened normally.
+  // highlight clears when the map closes or is reopened normally. The pan/zoom
+  // + forced per-zone level all come from showOnMapPanState (map_show_on_map_core.ts):
+  // see its header for why the level write is not optional (the continent
+  // overview branch of updateMapWindow never reads mapPing/mapZoom/mapCenter
+  // at all, so a map left open on that level swallowed the ping silently).
   showFinderOnMap(x: number, z: number): void {
     const el = $('#map-window');
     if (el.style.display !== 'block') this.toggleMap();
-    this.mapZoneOverride = zoneAt(x, z).id;
-    this.mapPing = { x, z };
-    this.mapZoom = Math.max(this.mapZoom, 2);
-    this.mapCenter = { x, z };
+    const next = showOnMapPanState(this.mapZoom, x, z, zoneAt(x, z).id);
+    this.mapZoneOverride = next.zoneOverride;
+    this.mapPing = next.ping;
+    this.mapZoom = next.zoom;
+    this.mapCenter = next.center;
+    this.mapLevel = next.level;
+    this.mapHoverZone = next.hoverZone;
     this.updateMapWindow();
   }
 
@@ -10133,10 +10165,15 @@ export class Hud {
         : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
     // Crossing a zone while the map is open starts that zone at its full frame;
     // a pan target from the previous zone must never leak into the new one.
+    // shouldResetMapPanOnZoneCross (map_show_on_map_core.ts) is what keeps a
+    // pending Show-on-Map ping's own zoom/pan from being clobbered by this
+    // same guard on the redraw right after the ping fires.
     if (this.mapZoneId !== zone.id) {
       this.mapZoneId = zone.id;
-      this.mapZoom = MAP_OPEN_ZOOM;
-      this.mapCenter = null;
+      if (shouldResetMapPanOnZoneCross(this.mapPing !== null, this.mapZoneOverride, zone.id)) {
+        this.mapZoom = MAP_OPEN_ZOOM;
+        this.mapCenter = null;
+      }
     }
     const zoneBg = {
       canvas: this.mapZoneBg(zone),
@@ -10156,7 +10193,14 @@ export class Hud {
     this.mapGatherNodes = result.gatherNodes;
     this.mapGatherTipMemo = null;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
-    this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
+    // Inside a rift the aria-live summary must name the generated floor, not
+    // the overworld zone the far-off rift x would otherwise resolve to
+    // (mirrors the on-canvas title map_window_painter now draws).
+    const riftFloor = this.sim.riftFloor;
+    const zoneLabel = riftFloor
+      ? riftFloorLabel(riftFloor.name, riftFloor.tier)
+      : zoneDisplayName(zone.id);
+    this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneLabel }));
   }
 
   // Tooltip body for a hovered zone region on the continent overview: the zone's
@@ -10689,10 +10733,14 @@ export class Hud {
           }
           // A landed hit: the mapper resolves damage-done (player dealt to other) vs
           // damage-taken (player took) vs null (a hit between two non-player entities, which
-          // floats nothing). The amount text + target entity stay at the call site.
+          // floats nothing). A shield block is ALSO a landed hit (still dealing real,
+          // blockValue-reduced damage, unlike the avoidance words above), so it is passed
+          // through here too, but with its own damageKind so it reads with its own colour
+          // and combat-log sentence instead of an indistinguishable plain hit. The amount
+          // text + target entity stay at the call site.
           const hitShape = fctSpawnShape({
             type: 'damage',
-            damageKind: 'hit',
+            damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
@@ -10731,6 +10779,56 @@ export class Hud {
             // in the open world only a HEAVY hit kicks the camera (a tenth of
             // max HP in one blow, or any crit), so routine chip damage stays
             // still. addShake is a reduced-motion no-op.
+            if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.34 : 0.14);
+            else if (tgt && (ev.crit || ev.amount >= tgt.maxHp * 0.1)) {
+              this.renderer.addShake(ev.crit ? 0.26 : 0.16);
+            }
+          } else if (hitShape && hitShape.kind === 'damage-done-block') {
+            this.fctPainter.spawn(
+              {
+                ...hitShape,
+                text: t('hud.combat.floatingBlock', {
+                  amount: blockFctAmountText(ev.amount, ev.crit, false),
+                }),
+                target: tgt,
+              },
+              now,
+            );
+            const logKey = blockLandingLogKey(isPlayerSource, isPlayerTarget);
+            if (logKey)
+              this.combatLog(
+                t(logKey, {
+                  ability: combatAbilityName(ev.ability),
+                  target: entityDisplayName(tgt),
+                  amount: ev.amount,
+                }),
+                '#b8c4d9',
+              );
+            // Same Fiesta/heavy-hit shake feel as an unblocked hit dealt: the block only
+            // changes how the number READS, not the impact.
+            if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.3 : 0.12);
+          } else if (hitShape && hitShape.kind === 'damage-taken-block') {
+            this.fctPainter.spawn(
+              {
+                ...hitShape,
+                text: t('hud.combat.floatingBlock', {
+                  amount: blockFctAmountText(ev.amount, ev.crit, true),
+                }),
+                target: tgt,
+              },
+              now,
+            );
+            const logKey = blockLandingLogKey(isPlayerSource, isPlayerTarget);
+            if (logKey)
+              this.combatLog(
+                t(logKey, {
+                  source: src ? entityDisplayName(src) : '?',
+                  amount: ev.amount,
+                }),
+                '#7ec8e3',
+              );
+            // Same Fiesta/heavy-hit shake feel as an unblocked hit taken: the block only
+            // changes how the number READS, not the impact.
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.34 : 0.14);
             else if (tgt && (ev.crit || ev.amount >= tgt.maxHp * 0.1)) {
               this.renderer.addShake(ev.crit ? 0.26 : 0.16);
@@ -11099,6 +11197,75 @@ export class Hud {
             QUALITY_COLOR.epic,
             MASTERWORK_SEAL_IMAGE_URL,
           );
+          break;
+        }
+        case 'commissionOrderResult': {
+          // Commission order board (issue #1298). Text-free event: derive
+          // the item name from ev.itemId (resolved sim-side off the live
+          // board for every action, not just deliver) plus static content.
+          // ONE chat line either way (the trainResult/unbindResult
+          // single-surface rule: no toast, no extra sound cue).
+          const orderItem = ev.itemId ? ITEMS[ev.itemId] : undefined;
+          const orderItemName = orderItem ? itemDisplayName(orderItem) : (ev.itemId ?? '');
+          if (ev.ok) {
+            const successKey =
+              ev.action === 'open'
+                ? 'hudChrome.commissionBoard.opened'
+                : ev.action === 'cancel'
+                  ? 'hudChrome.commissionBoard.cancelled'
+                  : ev.action === 'accept'
+                    ? 'hudChrome.commissionBoard.accepted'
+                    : 'hudChrome.commissionBoard.delivered';
+            this.log(
+              t(successKey, {
+                item: orderItemName,
+                // Only 'deliver' interpolates {name}, and it names the
+                // REQUESTER (who receives the item), not ev.pid (the
+                // acting crafter): resolve off the event's own
+                // requesterName, never the crafter's own entity name.
+                name: ev.action === 'deliver' ? (ev.requesterName ?? '') : '',
+              }),
+              '#7fdc4f',
+            );
+          } else if (ev.reason) {
+            const denyKey =
+              ev.reason === 'unknown_recipe'
+                ? 'hudChrome.commissionBoard.denyUnknownRecipe'
+                : ev.reason === 'not_commission_eligible'
+                  ? 'hudChrome.commissionBoard.denyNotCommissionEligible'
+                  : ev.reason === 'unknown_crafter'
+                    ? 'hudChrome.commissionBoard.denyUnknownCrafter'
+                    : ev.reason === 'self_crafter'
+                      ? 'hudChrome.commissionBoard.denySelfCrafter'
+                      : ev.reason === 'too_many_open'
+                        ? 'hudChrome.commissionBoard.denyTooManyOpen'
+                        : ev.reason === 'unknown_order'
+                          ? 'hudChrome.commissionBoard.denyUnknownOrder'
+                          : ev.reason === 'order_not_open'
+                            ? 'hudChrome.commissionBoard.denyOrderNotOpen'
+                            : ev.reason === 'self_order'
+                              ? 'hudChrome.commissionBoard.denySelfOrder'
+                              : ev.reason === 'not_eligible_crafter'
+                                ? 'hudChrome.commissionBoard.denyNotEligibleCrafter'
+                                : ev.reason === 'not_your_order'
+                                  ? 'hudChrome.commissionBoard.denyNotYourOrder'
+                                  : ev.reason === 'order_not_accepted'
+                                    ? 'hudChrome.commissionBoard.denyOrderNotAccepted'
+                                    : ev.reason === 'not_your_acceptance'
+                                      ? 'hudChrome.commissionBoard.denyNotYourAcceptance'
+                                      : ev.reason === 'not_crafted'
+                                        ? 'hudChrome.commissionBoard.denyNotCrafted'
+                                        : ev.reason === 'deliver_out_of_range'
+                                          ? 'hudChrome.commissionBoard.denyOutOfRange'
+                                          : 'hudChrome.commissionBoard.denyNoSpace';
+            this.log(t(denyKey), '#ff6b6b');
+          }
+          // Refresh the board window if open (renderCommissionBoard no-ops
+          // when it is not); deliver also touches bags on the crafter's own
+          // arm (the requester's side rides the ordinary loot event's bag
+          // refresh).
+          this.renderCommissionBoard();
+          if (ev.action === 'deliver' && $('#bags').style.display !== 'none') this.renderBags();
           break;
         }
         case 'toolEffectResult': {
@@ -14463,16 +14630,19 @@ export class Hud {
     }
     this.closeOtherWindows('#crafting-window');
     this.renderCrafting();
+    // AFTER the paint, the train / unbind ordering (see toggleTownFocus):
+    // captureFocus records the opener and installs the trap over a root that
+    // is by then populated and displayed. #crafting-window now installs its
+    // own trap (this change), so the craftId branch below only needs to move
+    // focus onto the selected tab within that trap, not chase it back from body.
+    this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
     if (craftId !== undefined) {
       const scroller = $('#crafting-window').querySelector('.crafting-body');
       if (scroller) scroller.scrollTop = 0;
       // The gossip route reaches here after the dialog released its focus
-      // trap WITHOUT restoring (the successor-window premise), and
-      // #crafting-window installs no trap of its own: land keyboard focus on
-      // the selected tab (onSelectCraft's refocus target) so the handoff
-      // never strands focus on body. Promoting this window into the
-      // windowFocus system proper is the #2525 town-focus precedent, a
-      // separate ruling, not this change.
+      // trap WITHOUT restoring (the successor-window premise): land keyboard
+      // focus on the selected tab (onSelectCraft's refocus target) so the
+      // handoff never strands focus on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
     }
   }
@@ -14525,6 +14695,7 @@ export class Hud {
           if ($('#bags').style.display !== 'none') this.renderBags();
         },
         onClose: () => this.closeCrafting(),
+        onOpenOrders: () => this.openCommissionBoard(),
         commissionChecked: (recipeId) => this.craftCommissionOptIn.has(recipeId),
         onToggleCommission: (recipeId, on) => {
           if (on) this.craftCommissionOptIn.add(recipeId);
@@ -14555,6 +14726,8 @@ export class Hud {
   closeCrafting(): void {
     $('#crafting-window').style.display = 'none';
     this.hideTooltip();
+    this.craftingWindowFocus.restoreFocus(this.craftingOpenerFocus);
+    this.craftingOpenerFocus = null;
     // Commission opt-ins are per-session-of-the-window: closing it drops any
     // armed-but-uncrafted checkboxes, so reopening always starts clean (the
     // off-by-default rule). The selected tab is persisted separately
@@ -14569,6 +14742,51 @@ export class Hud {
       /* storage unavailable (private mode); tab pick still works in-session */
     }
   }
+
+  // -------------------------------------------------------------------------
+  // Commission order board (issue #1298): a lightweight job board layered on
+  // the Maker's Bond (unbind service above). Opened from the crafting
+  // window's header; non-modal like crafting itself, so no focus trap.
+  // -------------------------------------------------------------------------
+
+  openCommissionBoard(): void {
+    this.closeOtherWindows('#commission-board-window');
+    this.commissionBoardOpen = true;
+    this.renderCommissionBoard();
+  }
+
+  private renderCommissionBoard(): void {
+    if (!this.commissionBoardOpen) return;
+    // The "open a new order" picker is the CUSTOMER side of the board: the
+    // sim accepts a commission for any commission-eligible recipe, whether
+    // or not the requester knows it themselves (that is the crafter's job).
+    // Pass the full recipe catalog, not craftingIdentity.knownRecipes (the
+    // crafting window's own recipe-book gate); buildCommissionOrderBoardModel
+    // narrows it to commission-eligible outputs itself.
+    renderCommissionOrderWindow(
+      $('#commission-board-window'),
+      buildCommissionOrderBoardModel(this.sim.commissionOrders, this.sim.recipeList, ITEMS),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onOpen: (recipeId, scope, crafterName) => {
+          this.sim.openCommissionOrder(recipeId, scope, crafterName);
+        },
+        onCancel: (orderId) => this.sim.cancelCommissionOrder(orderId),
+        onAccept: (orderId) => this.sim.acceptCommissionOrder(orderId),
+        onDeliver: (orderId) => this.sim.deliverCommissionOrder(orderId),
+        onClose: () => this.closeCommissionBoard(),
+      },
+    );
+  }
+
+  closeCommissionBoard(): void {
+    if (!this.commissionBoardOpen) return;
+    $('#commission-board-window').style.display = 'none';
+    this.commissionBoardOpen = false;
+    this.hideTooltip();
+  }
+
   // -------------------------------------------------------------------------
   // The World Market — the Merchant's auction house
   // -------------------------------------------------------------------------
