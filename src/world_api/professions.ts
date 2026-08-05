@@ -122,8 +122,6 @@ export interface SalvageResultView {
   itemId: string;
   materialItemId?: string;
   count?: number;
-  /** Present when a cast admitted (result event itself is complete-only). */
-  casting?: boolean;
   reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
 }
 
@@ -140,7 +138,6 @@ export interface DisenchantResultView {
   count?: number;
   secondaryItemId?: string;
   secondaryCount?: number;
-  casting?: boolean;
   reason?:
     | 'unknown_item'
     | 'not_disenchantable'
@@ -157,7 +154,6 @@ export interface ApplyEnchantResultView {
   ok: boolean;
   itemId: string;
   enchantId: string;
-  casting?: boolean;
   reason?:
     | 'unknown_item'
     | 'unknown_enchant'

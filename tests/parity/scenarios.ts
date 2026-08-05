@@ -4618,6 +4618,21 @@ function professionsCraft(seed = 2): Scenario {
       sim.addItem('silverleaf_herb', 2, pid);
       runCraft(sim, 'recipe_minor_healing_potion', false, pid);
       rec.snapshot('craft-plain-2');
+
+      // Step 5: the ARMED craft-cast frame (Craft Cast System). Start a real
+      // batch through Sim.craftItem (the three-arg count form the offline HUD
+      // uses) and snapshot WITHOUT ticking: the sampler pins the live session
+      // shape itself (castingAbility, castTotal/castRemaining, the 1-based
+      // craftCastRecipeId capture, and the batch counters at 2 of 2) instead
+      // of only the at-rest zeros. Deliberately no ticks: this scenario's
+      // coverage pin is draw-PRECISE (each craft draws exactly once, the
+      // denial zero), and a cast start draws nothing, so the stream stays at
+      // three draws and the armed cast simply never completes in-scenario.
+      sim.addItem('linen_scrap', 2, pid);
+      sim.addItem('spider_leg', 2, pid);
+      sim.addItem('silverleaf_herb', 4, pid);
+      sim.craftItem('recipe_minor_healing_potion', false, 2);
+      rec.snapshot('craft-cast-armed');
     },
   };
 }
