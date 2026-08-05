@@ -25,7 +25,6 @@
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { DUNGEON_X_THRESHOLD, MOBS, YUMI_MAZE_SLOT_COUNT, yumiMazeOrigin } from '../data';
 import { createMob } from '../entity';
-import { type MatchPetSnapshot, snapshotMatchPet } from '../pet/pet_match_return';
 import { Rng } from '../rng';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -208,16 +207,11 @@ export function startYumiMatch(
   ctx.yumiBusySlots.add(slot);
   const returns = new Map<number, { x: number; z: number; facing: number }>();
   const preMatchPools = new Map<number, ArenaReturnPools>();
-  // The maze runs the shared arena return path, so it snapshots the fighter's
-  // living pet the same way: a familiar hunt must not cost a hunter their beast.
-  const preMatchPets = new Map<number, MatchPetSnapshot>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i];
     if (!e) throw new Error(`Yumi participant ${allPids[i]} is missing`);
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
     preMatchPools.set(allPids[i], arenaMod.snapshotArenaReturnPools(e));
-    const pet = snapshotMatchPet(ctx, allPids[i]);
-    if (pet) preMatchPets.set(allPids[i], pet);
   }
   const matchId = ctx.nextArenaMatchId++;
   const layout = yumiMazeLayout();
@@ -258,7 +252,6 @@ export function startYumiMatch(
     timer: YUMI_COUNTDOWN,
     returns,
     preMatchPools,
-    preMatchPets,
     ratingA: arenaMod.arenaTeamRating(ctx, teamA, '2v2'),
     ratingB: arenaMod.arenaTeamRating(ctx, teamB, '2v2'),
     defeated: new Set(),

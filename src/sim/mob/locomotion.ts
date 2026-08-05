@@ -40,7 +40,6 @@ import { resetDrownedLitanyBossEncounter } from '../delves/drowned_litany_boss';
 import { clearDelveRaiseDeadChannel } from '../delves/runs';
 import { isEscortNpcTemplate } from '../escort';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
-import { noteMatchPetUnravelled } from '../pet/pet_match_return';
 import {
   capRiftNonLethalMechanicDamage,
   RIFT_S_ZONE_TEMPO,
@@ -150,14 +149,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     }
     // a slain summoned demon unravels rather than respawning into the wild
     if (mob.ownerId !== null && MOBS[mob.templateId]?.family === 'demon') {
-      if (mob.corpseTimer <= 0) {
-        // An owner inside an arena-shaped match is owed this pet back on the way
-        // out, and this is the ONE disappearance the world causes rather than the
-        // owner (pet/pet_match_return.ts). Recorded before the entity goes, since
-        // afterwards it is unknowable. Pure state, no rng.
-        noteMatchPetUnravelled(ctx, mob);
-        ctx.despawnPet(mob);
-      }
+      if (mob.corpseTimer <= 0) ctx.despawnPet(mob);
       return;
     }
     // dungeon mobs stay dead until the instance resets
