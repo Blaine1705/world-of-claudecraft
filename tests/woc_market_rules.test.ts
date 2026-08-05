@@ -586,7 +586,7 @@ describe('custody references: the PostOffice book-once dedupe keys', () => {
 describe('a directed sale (the p2p trade agreed in the trade window)', () => {
   const directed = (over: Partial<WocListingParams> = {}): WocListingParams => ({
     format: 'buy_now',
-    startCents: 1000,
+    startCents: 2000,
     reserveCents: null,
     buyNowCents: 2000,
     durationHours: 12,
@@ -638,7 +638,22 @@ describe('a directed sale (the p2p trade agreed in the trade window)', () => {
     });
   });
 
-  it('leaves a public listing (null) completely unaffected', () => {
-    expect(validListingParams(directed({ directedBuyerAccount: null }))).toEqual({ ok: true });
+  it('requires the two price fields to AGREE, where a public listing requires them to differ', () => {
+    // One agreed price means start and buy-now are the same number. A second,
+    // higher buy-now would be a price the two players never agreed on.
+    expect(validListingParams(directed({ buyNowCents: 3000 }))).toEqual({
+      ok: false,
+      reason: 'bad_buy_now',
+    });
+    // And the public rule is genuinely the opposite, which is what proves the
+    // two arms are separate rather than one accidentally covering both: the SAME
+    // params with no designated buyer are refused for having equal prices.
+    expect(validListingParams(directed({ directedBuyerAccount: null }))).toEqual({
+      ok: false,
+      reason: 'bad_buy_now',
+    });
+    expect(
+      validListingParams(directed({ directedBuyerAccount: null, buyNowCents: 3000 })),
+    ).toEqual({ ok: true });
   });
 });

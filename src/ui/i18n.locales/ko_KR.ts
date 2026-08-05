@@ -8536,6 +8536,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.woc_market.paused':
     '가격 정보가 복구될 때까지 거래소 거래가 일시 중지됩니다. 경매 카운트다운은 계속됩니다.',
   'apiError.woc_market.wallet_required': '거래소에서 거래하기 전에 지갑을 연동하고 인증하세요.',
+  'apiError.woc_market.recipient_wallet_required': '해당 플레이어가 $WOC 결제를 받으려면 먼저 지갑을 연결해야 합니다.',
+  'apiError.woc_market.self_offer': '자신에게 $WOC 제안을 보낼 수 없습니다.',
+  'apiError.woc_market.offer_expired': '해당 $WOC 제안이 만료되었습니다. 새로 요청하세요.',
   'apiError.woc_market.terms_required': '계속하려면 거래소 정산 약관에 동의하세요.',
   'apiError.woc_market.totp_required':
     '이 금액에는 2단계 인증이 필요합니다. 계정 설정에서 활성화한 뒤 코드를 입력하세요.',

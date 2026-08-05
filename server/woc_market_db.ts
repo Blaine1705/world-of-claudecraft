@@ -10,6 +10,7 @@
 // Money is INTEGER USD CENTS end to end. Item snapshots are JSONB InvSlot
 // copies (the escrow-by-removal custody model in docs/prd/woc/marketplace.md).
 
+import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { Pool, PoolClient } from 'pg';
 import type { InvSlot } from '../src/sim/types';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
@@ -19,6 +20,8 @@ import type {
   WocBidRow,
   WocBondState,
   WocBrowseQuery,
+  WocDirectedOfferRow,
+  WocDirectedOfferStatus,
   WocListingResolution,
   WocListingRow,
   WocMarketDb,
@@ -245,6 +248,54 @@ CREATE TABLE IF NOT EXISTS woc_market_terms (
   account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
   accepted_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- A directed OFFER: the seller's proposed p2p sale, before the buyer agrees.
+--
+-- This precedes the listing rather than being one, because escrow happens at
+-- mutual acceptance (docs/prd/woc/p2p-woc-trade.md): escrowing at offer time
+-- would let anyone lock a chosen player's item by proposing deals they never
+-- intend to complete. Accepting is what creates the directed listing and takes
+-- the item into custody, and from there the ordinary buy-now settlement runs.
+--
+-- The item is referenced, NOT held: item_ref carries the same {index, itemId,
+-- expectInstance} an extraction takes, so acceptance re-validates against the
+-- live bags and a copy that moved in the meantime refuses as a stale copy.
+CREATE TABLE IF NOT EXISTS woc_market_directed_offers (
+  id BIGSERIAL PRIMARY KEY,
+  realm TEXT NOT NULL,
+  seller_account INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  -- Deliberately NOT an FK, matching woc_market_listings.seller_character.
+  seller_character INT NOT NULL,
+  seller_name TEXT NOT NULL,
+  buyer_account INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
+  buyer_name TEXT NOT NULL,
+  item_ref JSONB NOT NULL CHECK (jsonb_typeof(item_ref) = 'object'),
+  item_id TEXT NOT NULL,
+  usd_cents INT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'accepted', 'declined', 'withdrawn', 'expired')),
+  -- Set when accepted: the directed listing this offer became.
+  listing_id BIGINT REFERENCES woc_market_listings(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  expires_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+-- The buyer's inbox and the seller's outbox: both page the pending set only.
+CREATE INDEX IF NOT EXISTS woc_market_offers_buyer_pending
+  ON woc_market_directed_offers(realm, buyer_account, created_at DESC)
+  WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS woc_market_offers_seller_pending
+  ON woc_market_directed_offers(realm, seller_account, created_at DESC)
+  WHERE status = 'pending';
+-- The expiry sweep's due-claim seek.
+CREATE INDEX IF NOT EXISTS woc_market_offers_due
+  ON woc_market_directed_offers(realm, expires_at)
+  WHERE status = 'pending';
+-- Retention prune cursor (resolved offers, oldest first). This table grows per
+-- offer, so it registers a prune primitive rather than keeping forever.
+CREATE INDEX IF NOT EXISTS woc_market_offers_resolved_updated
+  ON woc_market_directed_offers(updated_at)
+  WHERE status <> 'pending';
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
@@ -257,6 +308,10 @@ const LISTING_COLS =
   'quality, format, start_cents, reserve_cents, buy_now_cents, offer_next, status, resolution, ' +
   'item_disposed, current_bid_cents, current_bid_id, ends_at, base_ends_at, ' +
   'buy_now_lock_account, buy_now_lock_expires, created_at, directed_buyer_account';
+
+const OFFER_COLS =
+  'id, realm, seller_account, seller_character, seller_name, buyer_account, buyer_name, ' +
+  'item_ref, item_id, usd_cents, status, listing_id, created_at, expires_at';
 
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
@@ -305,6 +360,25 @@ function toListing(row: Row): WocListingRow {
     buyNowLockExpiresMs: msOrNull(row.buy_now_lock_expires),
     createdAtMs: ms(row.created_at),
     directedBuyerAccount: row.directed_buyer_account ?? null,
+  };
+}
+
+function toOffer(row: Row): WocDirectedOfferRow {
+  return {
+    id: Number(row.id),
+    realm: row.realm,
+    sellerAccount: row.seller_account,
+    sellerCharacter: row.seller_character,
+    sellerName: row.seller_name,
+    buyerAccount: row.buyer_account,
+    buyerName: row.buyer_name,
+    itemRef: row.item_ref as ExtractRef,
+    itemId: row.item_id,
+    usdCents: row.usd_cents,
+    status: row.status as WocDirectedOfferStatus,
+    listingId: row.listing_id === null ? null : Number(row.listing_id),
+    createdAtMs: ms(row.created_at),
+    expiresAtMs: ms(row.expires_at),
   };
 }
 
@@ -568,6 +642,111 @@ export class PgWocMarketDb implements WocMarketDb {
       [realm, account],
     );
     return res.rows[0]?.n ?? 0;
+  }
+
+  // --- Directed p2p offers ---------------------------------------------------
+
+  async insertDirectedOffer(offer: {
+    realm: string;
+    sellerAccount: number;
+    sellerCharacter: number;
+    sellerName: string;
+    buyerAccount: number;
+    buyerName: string;
+    itemRef: ExtractRef;
+    itemId: string;
+    usdCents: number;
+    expiresAtMs: number;
+  }): Promise<WocDirectedOfferRow> {
+    const res = await this.pool.query(
+      `INSERT INTO woc_market_directed_offers (
+         realm, seller_account, seller_character, seller_name,
+         buyer_account, buyer_name, item_ref, item_id, usd_cents, expires_at
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, to_timestamp($10 / 1000.0))
+       RETURNING ${OFFER_COLS}`,
+      [
+        offer.realm,
+        offer.sellerAccount,
+        offer.sellerCharacter,
+        offer.sellerName,
+        offer.buyerAccount,
+        offer.buyerName,
+        JSON.stringify(offer.itemRef),
+        offer.itemId,
+        offer.usdCents,
+        offer.expiresAtMs,
+      ],
+    );
+    return toOffer(res.rows[0]);
+  }
+
+  async directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null> {
+    const res = await this.pool.query(
+      `SELECT ${OFFER_COLS} FROM woc_market_directed_offers WHERE realm = $1 AND id = $2`,
+      [realm, id],
+    );
+    return res.rows[0] ? toOffer(res.rows[0]) : null;
+  }
+
+  async directedOffersForAccount(
+    realm: string,
+    account: number,
+  ): Promise<WocDirectedOfferRow[]> {
+    // Both partial indexes cover one arm each; the UNION keeps them usable
+    // rather than OR-ing them into a seq scan (the DAILY_REWARD view precedent).
+    const res = await this.pool.query(
+      `SELECT ${OFFER_COLS} FROM woc_market_directed_offers
+        WHERE realm = $1 AND buyer_account = $2 AND status = 'pending'
+       UNION ALL
+       SELECT ${OFFER_COLS} FROM woc_market_directed_offers
+        WHERE realm = $1 AND seller_account = $2 AND status = 'pending'
+       ORDER BY created_at DESC LIMIT 50`,
+      [realm, account],
+    );
+    return res.rows.map(toOffer);
+  }
+
+  async resolveDirectedOffer(
+    realm: string,
+    id: number,
+    to: Exclude<WocDirectedOfferStatus, 'pending'>,
+    opts: { listingId?: number } = {},
+  ): Promise<WocDirectedOfferRow | null> {
+    // The status predicate is the compare-and-set. Two concurrent accepts both
+    // read 'pending', but only one UPDATE matches, so only one reaches escrow.
+    const res = await this.pool.query(
+      `UPDATE woc_market_directed_offers
+          SET status = $3, listing_id = COALESCE($4, listing_id), updated_at = now()
+        WHERE realm = $1 AND id = $2 AND status = 'pending'
+        RETURNING ${OFFER_COLS}`,
+      [realm, id, to, opts.listingId ?? null],
+    );
+    return res.rows[0] ? toOffer(res.rows[0]) : null;
+  }
+
+  async reopenDirectedOffer(realm: string, id: number): Promise<void> {
+    // listing_id IS NULL is the safety: an offer that genuinely became a listing
+    // must never be reopened, or the item could be escrowed a second time.
+    await this.pool.query(
+      `UPDATE woc_market_directed_offers
+          SET status = 'pending', updated_at = now()
+        WHERE realm = $1 AND id = $2 AND status = 'accepted' AND listing_id IS NULL`,
+      [realm, id],
+    );
+  }
+
+  async expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number> {
+    const res = await this.pool.query(
+      `UPDATE woc_market_directed_offers
+          SET status = 'expired', updated_at = now()
+        WHERE id IN (
+          SELECT id FROM woc_market_directed_offers
+           WHERE realm = $1 AND status = 'pending' AND expires_at <= to_timestamp($2 / 1000.0)
+           LIMIT $3
+        )`,
+      [realm, nowMs, limit],
+    );
+    return res.rowCount ?? 0;
   }
 
   /** The buyer's side: directed offers addressed to this account. Rides the

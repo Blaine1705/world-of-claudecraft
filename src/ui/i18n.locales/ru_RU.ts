@@ -8681,6 +8681,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Торги на бирже приостановлены до восстановления цен. Отсчёт аукционов продолжается.',
   'apiError.woc_market.wallet_required':
     'Перед торговлей на бирже привяжите и подтвердите кошелёк.',
+  'apiError.woc_market.recipient_wallet_required': 'Этот игрок должен подключить кошелёк, прежде чем сможет принимать платежи в $WOC.',
+  'apiError.woc_market.self_offer': 'Нельзя отправить предложение $WOC самому себе.',
+  'apiError.woc_market.offer_expired': 'Это предложение $WOC истекло. Запросите новое.',
   'apiError.woc_market.terms_required': 'Чтобы продолжить, примите условия расчётов биржи.',
   'apiError.woc_market.totp_required':
     'Для этой суммы требуется двухфакторная аутентификация. Включите её в настройках аккаунта и введите код.',

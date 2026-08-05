@@ -39,6 +39,7 @@ import { REALM } from './realm';
 import type {
   WocBidRow,
   WocBrowseQuery,
+  WocDirectedOfferRow,
   WocEstimate,
   WocListingRow,
   WocMarketConfig,
@@ -157,6 +158,12 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   bad_buy_now: { status: 400, code: 'woc_market.invalid_params' },
   bad_duration: { status: 400, code: 'woc_market.invalid_params' },
   bad_directed_buyer: { status: 400, code: 'woc_market.invalid_params' },
+  // Its own code, deliberately not folded into wallet_required: the two say
+  // different things to the seller ("link YOUR wallet" versus "they must link
+  // theirs"), and only the second is actionable by someone else.
+  recipient_wallet_required: { status: 403, code: 'woc_market.recipient_wallet_required' },
+  self_offer: { status: 400, code: 'woc_market.self_offer' },
+  offer_expired: { status: 410, code: 'woc_market.offer_expired' },
 };
 
 function throwRefusal(reason: WocMarketRefusal): never {
@@ -644,7 +651,109 @@ const ADMIN_TARGET_META = {
 // setAdminDbForTests seam reaches these routes too.
 const requireAdmin = createRequireAdmin((): AdminAuthDb => adminDb());
 
+// ---------------------------------------------------------------------------
+// Directed p2p offers (docs/prd/woc/p2p-woc-trade.md)
+// ---------------------------------------------------------------------------
+
+function offerView(offer: WocDirectedOfferRow, viewer: number | null) {
+  return {
+    id: offer.id,
+    sellerName: offer.sellerName,
+    buyerName: offer.buyerName,
+    itemId: offer.itemId,
+    usdCents: offer.usdCents,
+    status: offer.status,
+    listingId: offer.listingId,
+    expiresAtMs: offer.expiresAtMs,
+    // Which side the caller is on, so the client picks accept/decline versus
+    // withdraw without having to compare account ids it should not be sent.
+    role: viewer === offer.buyerAccount ? 'buyer' : 'seller',
+  };
+}
+
+async function createOfferHandler(ctx: Ctx): Promise<void> {
+  const body = bodyOf(ctx);
+  const expectInstance = optionalInstance(body.expectInstance);
+  const out = await useService().createDirectedOffer({
+    account: ctxAccountId(ctx),
+    characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
+    itemRef: {
+      index: intField(body.itemIndex, 0, 10_000),
+      itemId: stringField(body.itemId, 128),
+      ...(expectInstance === undefined ? {} : { expectInstance }),
+    },
+    buyerAccount: intField(body.buyerAccount, 1, 2_147_483_647),
+    usdCents: intField(body.usdCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),
+  });
+  if (!out.ok) throwRefusal(out.reason);
+  json(ctx.res, 200, { offer: offerView(out.offer, ctxAccountId(ctx)) });
+}
+
+async function acceptOfferHandler(ctx: Ctx): Promise<void> {
+  const out = await useService().acceptDirectedOffer(ctxAccountId(ctx), idParam(ctx));
+  if (!out.ok) throwRefusal(out.reason);
+  json(ctx.res, 200, { listing: listingView(out.listing, ctxAccountId(ctx)) });
+}
+
+async function declineOfferHandler(ctx: Ctx): Promise<void> {
+  const out = await useService().resolveDirectedOffer(ctxAccountId(ctx), idParam(ctx), 'decline');
+  if (!out.ok) throwRefusal(out.reason);
+  json(ctx.res, 200, { ok: true });
+}
+
+async function withdrawOfferHandler(ctx: Ctx): Promise<void> {
+  const out = await useService().resolveDirectedOffer(ctxAccountId(ctx), idParam(ctx), 'withdraw');
+  if (!out.ok) throwRefusal(out.reason);
+  json(ctx.res, 200, { ok: true });
+}
+
+async function listOffersHandler(ctx: Ctx): Promise<void> {
+  const viewer = ctxAccountId(ctx);
+  const offers = await useService().directedOffers(viewer);
+  json(ctx.res, 200, { offers: offers.map((o) => offerView(o, viewer)) });
+}
+
 export const routes: RouteDef[] = [
+  {
+    method: 'GET',
+    path: '/api/woc-market/offers',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_READ_POLICY)],
+    handler: listOffersHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/woc-market/offers',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_LIST_POLICY), withBody()],
+    handler: createOfferHandler,
+  },
+  {
+    // Acceptance escrows the item, so it rides the LIST policy (the escrow
+    // limiter), not the cheaper read one.
+    method: 'POST',
+    path: '/api/woc-market/offers/:id/accept',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_LIST_POLICY), withBody()],
+    meta: NO_OWNER,
+    handler: acceptOfferHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/woc-market/offers/:id/decline',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_BID_POLICY), withBody()],
+    meta: NO_OWNER,
+    handler: declineOfferHandler,
+  },
+  {
+    method: 'POST',
+    path: '/api/woc-market/offers/:id/withdraw',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_BID_POLICY), withBody()],
+    meta: NO_OWNER,
+    handler: withdrawOfferHandler,
+  },
   {
     method: 'GET',
     path: '/api/woc-market/status',

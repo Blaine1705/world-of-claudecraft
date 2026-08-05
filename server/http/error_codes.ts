@@ -237,6 +237,13 @@ export const ERROR_CODES = deepFreeze({
   'woc_market.paused': { params: [] },
   // A verified wallet link is required for this action (403).
   'woc_market.wallet_required': { params: [] },
+  // A directed p2p offer's named recipient has no verified wallet, so they
+  // could not accept a $WOC payment (403).
+  'woc_market.recipient_wallet_required': { params: [] },
+  // A directed p2p offer addressed to the sender's own account (400).
+  'woc_market.self_offer': { params: [] },
+  // The directed p2p offer's acceptance window elapsed (410).
+  'woc_market.offer_expired': { params: [] },
   // The variable-token settlement terms must be accepted first (403).
   'woc_market.terms_required': { params: [] },
   // 2FA is required at or above the configured USD threshold (403).

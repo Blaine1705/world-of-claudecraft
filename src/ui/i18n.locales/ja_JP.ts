@@ -8563,6 +8563,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '価格情報が回復するまで取引所の取引は一時停止中です。オークションのカウントダウンは続行されます。',
   'apiError.woc_market.wallet_required':
     '取引所で取引する前に、ウォレットを連携して認証してください。',
+  'apiError.woc_market.recipient_wallet_required': 'そのプレイヤーが $WOC の支払いを受け取るには、先にウォレットを接続する必要があります。',
+  'apiError.woc_market.self_offer': '自分自身に $WOC のオファーを送ることはできません。',
+  'apiError.woc_market.offer_expired': 'その $WOC オファーは期限切れです。新しいものを依頼してください。',
   'apiError.woc_market.terms_required': '続行するには取引所の決済条件に同意してください。',
   'apiError.woc_market.totp_required':
     'この金額には二要素認証が必要です。アカウント設定で有効にしてからコードを入力してください。',

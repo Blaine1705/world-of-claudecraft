@@ -118,7 +118,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(38);
+    expect(rows).toHaveLength(41);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -184,6 +184,9 @@ describe('the refusal-to-wire mapping', () => {
     ['bad_buy_now', 400, 'woc_market.invalid_params'],
     ['bad_duration', 400, 'woc_market.invalid_params'],
     ['bad_directed_buyer', 400, 'woc_market.invalid_params'],
+    ['recipient_wallet_required', 403, 'woc_market.recipient_wallet_required'],
+    ['self_offer', 400, 'woc_market.self_offer'],
+    ['offer_expired', 410, 'woc_market.offer_expired'],
   ];
 
   it('pins EVERY refusal in the map, with no row left to the generic sweep', () => {
@@ -460,7 +463,7 @@ describe('the :id parameter', () => {
 describe('the route table shape', () => {
   it('gates every route behind a guard, and every mutation behind a limiter too', () => {
     const api = routes.filter((r) => r.surface === 'api');
-    expect(api).toHaveLength(14);
+    expect(api).toHaveLength(19);
     for (const route of api) {
       expect(route.middleware?.length ?? 0, `${route.method} ${route.path}`).toBeGreaterThan(0);
     }
@@ -487,7 +490,7 @@ describe('the route table shape', () => {
     // a deliberately public one (anyone may bid on anyone's listing) needs the
     // publicRead marker. Neither means the route is silently unguarded.
     const idRoutes = routes.filter((r) => r.surface === 'api' && r.path.includes('/:'));
-    expect(idRoutes).toHaveLength(9);
+    expect(idRoutes).toHaveLength(12);
     for (const route of idRoutes) {
       const meta = route.meta as { requireOwned?: unknown; publicRead?: boolean } | undefined;
       expect(

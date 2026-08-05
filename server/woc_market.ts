@@ -32,6 +32,8 @@ import {
   validListingParams,
   WOC_MARKET_BOND_PENDING_TTL_SECONDS,
   WOC_MARKET_BUY_NOW_LOCK_SECONDS,
+  WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS,
+  WOC_MARKET_DURATION_HOURS,
   WOC_MARKET_MAX_ACTIVE_LISTINGS,
   WOC_MARKET_RESTRICTED_POLICY,
   WOC_MARKET_SETTLEMENT_WINDOW_SECONDS,
@@ -86,6 +88,31 @@ export interface WocListingRow {
    *  A non-null value means the row is invisible to browse and buyable only by
    *  that account (docs/prd/woc/p2p-woc-trade.md). */
   directedBuyerAccount: number | null;
+}
+
+export type WocDirectedOfferStatus =
+  | 'pending' // awaiting the named buyer
+  | 'accepted' // became a directed listing; the item is now in escrow
+  | 'declined' // the buyer said no
+  | 'withdrawn' // the seller pulled it before acceptance
+  | 'expired'; // the TTL elapsed unanswered
+
+export interface WocDirectedOfferRow {
+  id: number;
+  realm: string;
+  sellerAccount: number;
+  sellerCharacter: number;
+  sellerName: string;
+  buyerAccount: number;
+  buyerName: string;
+  /** The referenced copy, re-validated at acceptance (never held before it). */
+  itemRef: ExtractRef;
+  itemId: string;
+  usdCents: number;
+  status: WocDirectedOfferStatus;
+  listingId: number | null;
+  createdAtMs: number;
+  expiresAtMs: number;
 }
 
 export type WocBondState =
@@ -209,6 +236,49 @@ export interface WocMarketDb {
   ): Promise<{ rows: WocListingRow[]; hasMore: boolean }>;
   listingsBySeller(realm: string, account: number): Promise<WocListingRow[]>;
   countActiveBySeller(realm: string, account: number): Promise<number>;
+
+  // --- Directed p2p offers (pre-escrow; acceptance is what creates a listing) --
+  insertDirectedOffer(offer: {
+    realm: string;
+    sellerAccount: number;
+    sellerCharacter: number;
+    sellerName: string;
+    buyerAccount: number;
+    buyerName: string;
+    itemRef: ExtractRef;
+    itemId: string;
+    usdCents: number;
+    expiresAtMs: number;
+  }): Promise<WocDirectedOfferRow>;
+  directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null>;
+  /** Pending offers this account may act on, both directions. */
+  directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]>;
+  /**
+   * Move a PENDING offer to a terminal status, atomically.
+   *
+   * Returns the row on success and null when it was not pending, which is what
+   * makes accept idempotent under a double-click: the second call loses the
+   * compare-and-set and never reaches the escrow path, so one offer can never
+   * extract two copies.
+   */
+  resolveDirectedOffer(
+    realm: string,
+    id: number,
+    to: Exclude<WocDirectedOfferStatus, 'pending'>,
+    opts?: { listingId?: number },
+  ): Promise<WocDirectedOfferRow | null>;
+  /** Expire pending offers past their TTL. Returns how many were expired. */
+  expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number>;
+  /**
+   * Put an 'accepted' offer back to pending after its escrow failed.
+   *
+   * The compensating half of the claim-then-escrow ordering: the status flip has
+   * to happen first (it is the lock that stops a double accept extracting twice),
+   * so a failed escrow must undo it or the deal is silently dead while both
+   * players still believe it is live. Narrowed to 'accepted' with no listing, so
+   * it can never resurrect an offer that really did become a listing.
+   */
+  reopenDirectedOffer(realm: string, id: number): Promise<void>;
   /** Cancel iff still active with no pending/active bid. Returns the row for
    *  the return flight. */
   cancelListingIfUnbid(
@@ -490,6 +560,10 @@ export type WocMarketRefusal =
   | 'lease_lost'
   | 'signature_reused'
   | 'stale_copy'
+  // Directed p2p offers
+  | 'recipient_wallet_required' // the named buyer has no verified wallet
+  | 'self_offer' // seller and buyer are the same account
+  | 'offer_expired'
   | ExtractRefusal
   | WocEligibilityRefusal
   | ListingParamsRefusal;
@@ -733,6 +807,154 @@ export class WocMarketService {
     const row = await this.deps.db.listingById(this.cfg.realm, inserted.id);
     if (!row) throw new Error('woc_market: listing vanished after insert');
     return { ok: true, listing: row };
+  }
+
+  // -------------------------------------------------------------------------
+  // Directed p2p offers (docs/prd/woc/p2p-woc-trade.md)
+  // -------------------------------------------------------------------------
+
+  /** The listing a directed offer becomes. One agreed price, so start and
+   *  buy-now are the same number; validListingParams requires that for a
+   *  directed sale and refuses any attempt to smuggle a second price in. */
+  private directedParams(usdCents: number, buyerAccount: number): WocListingParams {
+    return {
+      format: 'buy_now',
+      startCents: usdCents,
+      reserveCents: null,
+      buyNowCents: usdCents,
+      // The shortest duration on the allowlist. A directed listing is bought
+      // immediately or not at all, and this is only the backstop that returns
+      // the item if the buyer never pays.
+      durationHours: WOC_MARKET_DURATION_HOURS[0],
+      offerNext: false,
+      directedBuyerAccount: buyerAccount,
+    };
+  }
+
+  /**
+   * The seller proposes a p2p sale. Nothing is escrowed yet: acceptance is what
+   * takes the item, so a stream of offers cannot lock a chosen player's goods.
+   */
+  async createDirectedOffer(args: {
+    account: number;
+    characterId: number;
+    itemRef: ExtractRef;
+    buyerAccount: number;
+    usdCents: number;
+  }): Promise<{ ok: true; offer: WocDirectedOfferRow } | Refused> {
+    const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
+    if (gate) return gate;
+    if (args.buyerAccount === args.account) return refuse('self_offer');
+    const wallet = await this.deps.verifiedWallet(args.account);
+    if (!wallet) return refuse('wallet_required');
+    // The recipient's wallet is checked HERE rather than at acceptance, because
+    // this is the refusal the seller's trade window turns into "the recipient
+    // must connect a wallet before they can accept $WOC". Re-checked at
+    // acceptance anyway, since a wallet can be unlinked in between.
+    if (!(await this.deps.verifiedWallet(args.buyerAccount))) {
+      return refuse('recipient_wallet_required');
+    }
+    // Validate the params acceptance WILL use, not a looser approximation, so an
+    // offer can never be created that its own acceptance would refuse.
+    const params = validListingParams(this.directedParams(args.usdCents, args.buyerAccount));
+    if (!params.ok) return refuse(params.reason);
+    const eligible = listingEligibility(
+      ITEMS[args.itemRef.itemId],
+      args.itemRef.expectInstance ?? undefined,
+      this.cfg.policy,
+    );
+    if (!eligible.ok) return refuse(eligible.reason);
+    const seller = await this.deps.db.deliveryTarget(
+      this.cfg.realm,
+      args.account,
+      args.characterId,
+    );
+    if (!seller || seller.characterId !== args.characterId) return refuse('character_invalid');
+    // deliveryTarget doubles as the recipient check: it resolves any character
+    // the buyer holds ON THIS REALM, so an account with none refuses here rather
+    // than at acceptance, when the seller has already agreed a price.
+    const buyer = await this.deps.db.deliveryTarget(this.cfg.realm, args.buyerAccount, 0);
+    if (!buyer) return refuse('not_found');
+    const offer = await this.deps.db.insertDirectedOffer({
+      realm: this.cfg.realm,
+      sellerAccount: args.account,
+      sellerCharacter: args.characterId,
+      sellerName: seller.name,
+      buyerAccount: args.buyerAccount,
+      buyerName: buyer.name,
+      itemRef: args.itemRef,
+      itemId: args.itemRef.itemId,
+      usdCents: args.usdCents,
+      expiresAtMs: this.now() + WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS * 1000,
+    });
+    return { ok: true, offer };
+  }
+
+  /**
+   * The named buyer agrees. This is the moment the deal exists: the offer flips
+   * to accepted and the item leaves the seller's bags into custody escrow.
+   *
+   * The status flip happens FIRST and is a compare-and-set, so a double-click
+   * cannot extract two copies: the second call finds the offer no longer
+   * pending and never reaches createListing. If the listing then fails (the
+   * copy moved, the seller went offline), the offer is put back to pending so
+   * the buyer can retry inside the TTL rather than losing the deal to a
+   * transient refusal.
+   */
+  async acceptDirectedOffer(
+    account: number,
+    offerId: number,
+  ): Promise<{ ok: true; listing: WocListingRow } | Refused> {
+    const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(account));
+    if (gate) return gate;
+    const offer = await this.deps.db.directedOfferById(this.cfg.realm, offerId);
+    // not_found for a stranger, matching the directed-listing convention: an id
+    // prober must not learn that someone else's private offer exists.
+    if (!offer || offer.buyerAccount !== account) return refuse('not_found');
+    if (offer.status !== 'pending') return refuse('not_pending');
+    if (offer.expiresAtMs <= this.now()) return refuse('offer_expired');
+    if (!(await this.deps.verifiedWallet(account))) return refuse('wallet_required');
+
+    const claimed = await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, 'accepted');
+    if (!claimed) return refuse('not_pending');
+    const created = await this.createListing({
+      account: offer.sellerAccount,
+      characterId: offer.sellerCharacter,
+      itemRef: offer.itemRef,
+      params: this.directedParams(offer.usdCents, offer.buyerAccount),
+    });
+    if (!created.ok) {
+      await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);
+      return created;
+    }
+    await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, 'accepted', {
+      listingId: created.listing.id,
+    });
+    return { ok: true, listing: created.listing };
+  }
+
+  /** The buyer says no, or the seller pulls it. Nothing was escrowed, so this
+   *  is a status flip and nothing else. */
+  async resolveDirectedOffer(
+    account: number,
+    offerId: number,
+    action: 'decline' | 'withdraw',
+  ): Promise<{ ok: true } | Refused> {
+    if (!this.cfg.enabled) return refuse('disabled');
+    const offer = await this.deps.db.directedOfferById(this.cfg.realm, offerId);
+    if (!offer) return refuse('not_found');
+    const actor = action === 'decline' ? offer.buyerAccount : offer.sellerAccount;
+    if (actor !== account) return refuse('not_found');
+    if (offer.status !== 'pending') return refuse('not_pending');
+    const to = action === 'decline' ? 'declined' : 'withdrawn';
+    const done = await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, to);
+    return done ? { ok: true } : refuse('not_pending');
+  }
+
+  /** Pending offers this account may act on, both directions. */
+  async directedOffers(account: number): Promise<WocDirectedOfferRow[]> {
+    if (!this.cfg.enabled) return [];
+    return this.deps.db.directedOffersForAccount(this.cfg.realm, account);
   }
 
   async cancelListing(account: number, listingId: number): Promise<{ ok: true } | Refused> {

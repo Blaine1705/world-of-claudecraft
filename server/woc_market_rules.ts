@@ -80,6 +80,17 @@ export const WOC_MARKET_MAX_PRICE_CENTS = 100_000;
 export const WOC_MARKET_BUY_NOW_LOCK_SECONDS = WOC_MARKET_QUOTE_TTL_SECONDS * 3;
 /** How long a listing may sit mid-resolution before the sweep reclaims it. */
 export const WOC_MARKET_STRANDED_RECLAIM_SECONDS = 300;
+/**
+ * How long a directed p2p offer waits for its named buyer.
+ *
+ * Short on purpose, and short for a different reason than the settlement
+ * window. A pending offer escrows NOTHING, so it costs the seller no custody;
+ * what it does cost is certainty, because the referenced copy must still be in
+ * the seller's bags when the buyer accepts. Ten minutes is about as long as two
+ * players stand at a trade window, and a stale offer that refuses cleanly is
+ * better than one that lingers and fails at acceptance.
+ */
+export const WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS = 600;
 
 // ---------------------------------------------------------------------------
 // Bidding math
@@ -235,12 +246,22 @@ export function validListingParams(
     }
   }
   if (p.buyNowCents !== null) {
-    const floor = Math.max(p.startCents, p.reserveCents ?? 0);
-    // STRICTLY above the floor, not at it. A buy-now equal to the starting bid
-    // is not a price, it is the same number twice: the first bid would match it
-    // and the listing's two prices would say different things about one sale.
-    if (!isCents(p.buyNowCents) || p.buyNowCents <= floor) {
-      return { ok: false, reason: 'bad_buy_now' };
+    if (!isCents(p.buyNowCents)) return { ok: false, reason: 'bad_buy_now' };
+    if (p.directedBuyerAccount !== null) {
+      // A directed sale is ONE agreed price, so its two price fields must be the
+      // same number. The strict inequality below exists because a public listing
+      // with buy-now equal to the start would have its first bid match the
+      // buy-now, leaving two prices describing one sale. A directed sale has no
+      // bidding and exactly one permitted buyer, so that ambiguity cannot arise,
+      // and requiring equality is what stops a caller smuggling a second price
+      // past the number the two players actually agreed on.
+      if (p.buyNowCents !== p.startCents) return { ok: false, reason: 'bad_buy_now' };
+    } else {
+      const floor = Math.max(p.startCents, p.reserveCents ?? 0);
+      // STRICTLY above the floor, not at it. A buy-now equal to the starting bid
+      // is not a price, it is the same number twice: the first bid would match it
+      // and the listing's two prices would say different things about one sale.
+      if (p.buyNowCents <= floor) return { ok: false, reason: 'bad_buy_now' };
     }
   }
   return { ok: true };

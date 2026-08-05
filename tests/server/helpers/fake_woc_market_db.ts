@@ -12,12 +12,15 @@
 // (the compensation/restore paths), and `escrowSaves` records every character
 // save the escrow edge received.
 
+import type { ExtractRef } from '../../../src/sim/inventory_extract';
 import type {
   CharacterSaveArgs,
   NewWocListing,
   WocBidRow,
   WocBondState,
   WocBrowseQuery,
+  WocDirectedOfferRow,
+  WocDirectedOfferStatus,
   WocListingResolution,
   WocListingRow,
   WocMarketDb,
@@ -230,6 +233,97 @@ export class FakeWocMarketDb implements WocMarketDb {
       .sort((a, b) => b.createdAtMs - a.createdAtMs || b.id - a.id)
       .slice(0, 50)
       .map((r) => this.listingOut(r));
+  }
+
+  // --- Directed p2p offers ---------------------------------------------------
+  // The real table's semantics that the service depends on: a compare-and-set
+  // resolve (so a double accept cannot escrow twice) and a reopen narrowed to an
+  // accepted offer with no listing.
+  readonly offers = new Map<number, WocDirectedOfferRow>();
+  private nextOfferId = 1;
+
+  async insertDirectedOffer(offer: {
+    realm: string;
+    sellerAccount: number;
+    sellerCharacter: number;
+    sellerName: string;
+    buyerAccount: number;
+    buyerName: string;
+    itemRef: ExtractRef;
+    itemId: string;
+    usdCents: number;
+    expiresAtMs: number;
+  }): Promise<WocDirectedOfferRow> {
+    const row: WocDirectedOfferRow = {
+      id: this.nextOfferId++,
+      ...offer,
+      status: 'pending',
+      listingId: null,
+      createdAtMs: 0,
+    };
+    this.offers.set(row.id, row);
+    return row;
+  }
+
+  async directedOfferById(realm: string, id: number): Promise<WocDirectedOfferRow | null> {
+    const row = this.offers.get(id);
+    return row && row.realm === realm ? row : null;
+  }
+
+  async directedOffersForAccount(
+    realm: string,
+    account: number,
+  ): Promise<WocDirectedOfferRow[]> {
+    return [...this.offers.values()].filter(
+      (o) =>
+        o.realm === realm &&
+        o.status === 'pending' &&
+        (o.buyerAccount === account || o.sellerAccount === account),
+    );
+  }
+
+  async resolveDirectedOffer(
+    realm: string,
+    id: number,
+    to: Exclude<WocDirectedOfferStatus, 'pending'>,
+    opts: { listingId?: number } = {},
+  ): Promise<WocDirectedOfferRow | null> {
+    const row = this.offers.get(id);
+    if (!row || row.realm !== realm) return null;
+    // The compare-and-set. Without this the fake would let a second accept
+    // through and the double-escrow test would pass against a fake that cannot
+    // reproduce the race it is meant to prove is closed.
+    if (row.status !== 'pending') {
+      // An accepted offer being stamped with its listing id is the one legal
+      // non-pending write (the service's second call after createListing).
+      if (to === 'accepted' && row.status === 'accepted' && opts.listingId !== undefined) {
+        row.listingId = opts.listingId;
+        return row;
+      }
+      return null;
+    }
+    row.status = to;
+    if (opts.listingId !== undefined) row.listingId = opts.listingId;
+    return row;
+  }
+
+  async reopenDirectedOffer(realm: string, id: number): Promise<void> {
+    const row = this.offers.get(id);
+    if (row && row.realm === realm && row.status === 'accepted' && row.listingId === null) {
+      row.status = 'pending';
+    }
+  }
+
+  async expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number> {
+    let n = 0;
+    for (const row of this.offers.values()) {
+      if (n >= limit) break;
+      if (row.realm === realm && row.status === 'pending' && row.expiresAtMs <= nowMs) {
+        row.status = 'expired';
+        n += 1;
+      }
+    }
+    return n;
   }
 
   async countActiveBySeller(realm: string, account: number): Promise<number> {

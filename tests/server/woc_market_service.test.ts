@@ -1802,7 +1802,7 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
   const directedParams = (over: Partial<WocListingParams> = {}) =>
     listingParams({
       format: 'buy_now',
-      startCents: 2000,
+      startCents: 5000,
       reserveCents: null,
       buyNowCents: 5000,
       directedBuyerAccount: BUYER_A,
@@ -1893,5 +1893,151 @@ describe('a directed sale is visible and buyable only to its two parties', () =>
       acceptTerms: true,
     });
     expect(res.ok, 'a public buy-now must not be caught by the directed guard').toBe(true);
+  });
+});
+
+describe('directed p2p offers: propose, accept, and the escrow moment', () => {
+  function stocked(): Harness {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [
+      { itemId: EPIC_ITEM, count: 1 },
+      { itemId: EPIC_ITEM, count: 1 },
+    ]);
+    return h;
+  }
+  const offerArgs = (over: Record<string, unknown> = {}) => ({
+    account: SELLER,
+    characterId: SELLER_CHAR,
+    itemRef: { index: 0, itemId: EPIC_ITEM },
+    buyerAccount: BUYER_A,
+    usdCents: 5000,
+    ...over,
+  });
+
+  it('escrows NOTHING at offer time: the seller keeps the item until acceptance', async () => {
+    // This is the whole reason an offer is not a listing. If proposing escrowed,
+    // anyone could lock a chosen player's goods by offering deals they never
+    // intend to complete.
+    const h = stocked();
+    const before = bagsOf(h, SELLER_CHAR).length;
+    const res = await h.service.createDirectedOffer(offerArgs());
+    expect(res.ok).toBe(true);
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(before);
+  });
+
+  it('refuses when the named recipient has no verified wallet', async () => {
+    // The refusal the seller's window turns into "that player must connect a
+    // wallet", so it must be its own reason and not a generic wallet_required.
+    const h = stocked();
+    h.wallets.delete(BUYER_A);
+    const res = await h.service.createDirectedOffer(offerArgs());
+    expect(res).toEqual({ ok: false, reason: 'recipient_wallet_required' });
+  });
+
+  it('refuses an offer addressed to yourself', async () => {
+    const h = stocked();
+    const res = await h.service.createDirectedOffer(offerArgs({ buyerAccount: SELLER }));
+    expect(res).toEqual({ ok: false, reason: 'self_offer' });
+  });
+
+  it('accepting escrows the item and produces a directed listing at the agreed price', async () => {
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const before = bagsOf(h, SELLER_CHAR).length;
+    const accepted = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    if (!accepted.ok) throw new Error(`accept refused: ${(accepted as { reason: string }).reason}`);
+    expect(bagsOf(h, SELLER_CHAR), 'the copy left the bags').toHaveLength(before - 1);
+    expect(accepted.listing.directedBuyerAccount).toBe(BUYER_A);
+    // One agreed price, carried onto both price fields.
+    expect(accepted.listing.buyNowCents).toBe(5000);
+    expect(accepted.listing.startCents).toBe(5000);
+  });
+
+  it('refuses acceptance by anyone but the named buyer, as not_found', async () => {
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const res = await h.service.acceptDirectedOffer(BUYER_B, offer.offer.id);
+    expect(res).toEqual({ ok: false, reason: 'not_found' });
+    expect(bagsOf(h, SELLER_CHAR), 'a refused accept escrows nothing').toHaveLength(2);
+  });
+
+  it('accepting twice CONCURRENTLY escrows exactly one copy', async () => {
+    // Fired in parallel, deliberately. Awaiting them in sequence proves nothing:
+    // the second call would see status 'accepted' and be turned away by the
+    // pre-check, so the test passes even with the compare-and-set claim removed.
+    // The real shape is a double-click putting two requests in flight together,
+    // where both read 'pending' before either writes, and only the claim's
+    // compare-and-set stops both reaching createListing and taking two copies.
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const [first, second] = await Promise.all([
+      h.service.acceptDirectedOffer(BUYER_A, offer.offer.id),
+      h.service.acceptDirectedOffer(BUYER_A, offer.offer.id),
+    ]);
+    expect([first.ok, second.ok].filter(Boolean), 'exactly one accept wins').toHaveLength(1);
+    expect(bagsOf(h, SELLER_CHAR), 'exactly one copy escrowed').toHaveLength(1);
+  });
+
+  it('a sequential second accept is also refused', async () => {
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    expect((await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id)).ok).toBe(true);
+    expect(await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id)).toEqual({
+      ok: false,
+      reason: 'not_pending',
+    });
+  });
+
+  it('reopens the offer when the escrow fails, so a transient refusal is retryable', async () => {
+    // The compensating half of claim-then-escrow. Without it the offer is
+    // silently dead while both players still see it as live.
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    h.db.failNextEscrow = 'lease_lost';
+    const failed = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    expect(failed.ok).toBe(false);
+    expect(bagsOf(h, SELLER_CHAR), 'the copy came back').toHaveLength(2);
+    // Still pending, so the buyer can simply try again.
+    const retried = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    expect(retried.ok, 'the reopened offer accepts on retry').toBe(true);
+  });
+
+  it('refuses acceptance after the TTL, and never escrows for an expired offer', async () => {
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    h.setNow(offer.offer.expiresAtMs);
+    const res = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    expect(res).toEqual({ ok: false, reason: 'offer_expired' });
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+  });
+
+  it('lets the buyer decline and the seller withdraw, but not the reverse', async () => {
+    const h = stocked();
+    const a = await h.service.createDirectedOffer(offerArgs());
+    const b = await h.service.createDirectedOffer(offerArgs({ itemRef: { index: 1, itemId: EPIC_ITEM } }));
+    if (!a.ok || !b.ok) throw new Error('offer refused');
+    // Wrong actor for each verb reads as not_found, same anti-enumeration shape.
+    expect(await h.service.resolveDirectedOffer(SELLER, a.offer.id, 'decline')).toEqual({
+      ok: false,
+      reason: 'not_found',
+    });
+    expect(await h.service.resolveDirectedOffer(BUYER_A, b.offer.id, 'withdraw')).toEqual({
+      ok: false,
+      reason: 'not_found',
+    });
+    expect(await h.service.resolveDirectedOffer(BUYER_A, a.offer.id, 'decline')).toEqual({
+      ok: true,
+    });
+    expect(await h.service.resolveDirectedOffer(SELLER, b.offer.id, 'withdraw')).toEqual({
+      ok: true,
+    });
+    // Neither verb touches custody.
+    expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
   });
 });
