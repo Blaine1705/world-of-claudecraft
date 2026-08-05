@@ -38,8 +38,8 @@ import { buildHalo } from './halo';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
 import { SkeletonUpdateCache, type SkeletonUpdateStats } from './skeleton_update_cache';
 import {
+  pickSkinAttackClips,
   SKIN_ATTACK_CLIP_NAMES,
-  weaponSkinAttackClips,
   weaponSkinCastClip,
   weaponSkinOrientPin,
 } from './skin_attack';
@@ -1006,7 +1006,10 @@ export class CharacterVisual {
       this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
       return;
     }
-    const skinAttack = weaponSkinAttackClips(this.weaponSkinId);
+    // Resolved against THIS rig's bound clips: a rig without the substitute
+    // (every body but the hunter) keeps its own authored attack instead of
+    // swinging with no animation at all.
+    const skinAttack = pickSkinAttackClips(this.weaponSkinId, (c) => this.action(c) !== null);
     const style = weaponAttackStyle(this.weaponItemId, this.offhandItemId);
     const handClip = style ? this.def.clips.attackByHand?.[style] : undefined;
     if (!skinAttack && handClip && this.action(handClip)) {

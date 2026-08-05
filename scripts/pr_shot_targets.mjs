@@ -6712,6 +6712,118 @@ export const TARGETS = [
     },
   },
   {
+    key: 'mech-weapon-skins',
+    label: 'Weapon skins on the Combat Mech: which weapon shows, and in which hand',
+    // The rule module decides WHICH types apply, the manifest and assets decide
+    // what the body actually holds, and skin_attack decides how it is swung.
+    when: [
+      'sim/content/weapon_skin_rules',
+      'render/characters/skin_attack',
+      'render/characters/manifest',
+      'render/characters/assets',
+    ],
+    // One hunter, one greatblade, four looks. The class-rig variant is the
+    // CONTROL: it must be pixel-identical before and after, since the whole
+    // change is scoped to the body that shows the equipped weapon.
+    variants: [
+      {
+        key: 'hunter-classrig-bow-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'class',
+        skinId: 'winterbite',
+      },
+      {
+        key: 'hunter-mech-bow-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'mech',
+        skinId: 'winterbite',
+      },
+      {
+        key: 'hunter-mech-gun-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'mech',
+        skinId: 'encore_bow',
+      },
+      {
+        key: 'hunter-mech-sword-desktop',
+        charClass: 'hunter',
+        charName: 'Fenwick',
+        catalog: 'mech',
+        skinId: 'ice_fang_sword',
+      },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const staged = await page.evaluate((shot) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return { ok: false, reason: 'offline world unavailable' };
+        // Level for the equip gate, then equip through the real inventory path
+        // so the mainhand lands the way a player's would.
+        sim.setPlayerLevel?.(60, player.id);
+        sim.addItem('direfang_greatblade', 1);
+        sim.equipItem('direfang_greatblade');
+        sim.changeSkin(0, shot.catalog);
+        sim.changeWeaponSkin(shot.skinId);
+        return {
+          ok: sim.equipment?.mainhand === 'direfang_greatblade',
+          reason: 'the greatblade did not equip',
+          // Reported, never asserted: on the BEFORE pass a mech sword skin is
+          // legitimately rejected, which is the regression being shown.
+          applied: player.weaponSkinId ?? null,
+        };
+      }, variant);
+      if (!staged.ok) throw new Error(`mech weapon skin staging failed: ${staged.reason}`);
+      // The mech body is lazy-loaded and every skin model is streamed, so the
+      // first frames after staging can still show the class rig or the plain
+      // item model. Poll for the swap rather than trusting a fixed wait.
+      if (variant.catalog === 'mech') {
+        await page.waitForFunction(() => window.__game?.sim?.player?.skinCatalog === 'mech', {
+          timeout: 30000,
+          polling: 250,
+        });
+      }
+      // Levelling to 60 fires a cascade of deed banners plus the Ravenpost mail
+      // banner across mid-screen, exactly where the character stands. Let them
+      // run out, then hide the plate so a late one cannot land on the frame.
+      await wait(9000);
+      // Shoot the character sheet's paperdoll turntable, not the world.
+      // The in-world camera was tried first and is the wrong instrument here:
+      // the body drifts to face nearby mobs between variants, the world camera
+      // frames a 2.6yd character inside a whole town, and the held weapon came
+      // out a smudge at the default distance while a closer camera clipped it
+      // against the unit frame. The paperdoll is centered, lit, uncluttered,
+      // identical across variants, and it runs the same resolveActiveWeaponSkin
+      // call the world does (hud.ts mountCharPreview), so it is a real read of
+      // this change rather than a staged one.
+      await page.evaluate(() => {
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.display = 'none';
+        window.__game?.hud?.toggleChar?.();
+      });
+      if (!(await pollForSize(page, '#char-model-preview'))) {
+        throw new Error('character sheet paperdoll did not open');
+      }
+      // The turntable needs a beat to mount the rig, stream the skin GLB and
+      // settle its pose before it is worth shooting.
+      await wait(3500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#char-model-preview' };
+    },
+  },
+  {
     key: 'auto-acquire-target',
     label: 'Target frame after auto-acquiring the nearest attacking mob (issue #2787)',
     when: ['casting_lifecycle', 'auto_acquire_target'],
