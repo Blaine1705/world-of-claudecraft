@@ -1175,6 +1175,15 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     requiredItems: ['copper_mining_pick'],
     completionEffect: { type: 'attunePair', mode: 'new', pairId: 'weaponcrafting+armorcrafting' },
   },
+  // STALE-OVERLAY NOTE (docs/i18n-scaling/translation-workflow.md, "Rewording an
+  // existing English value"): the giver text and objectives.0.label for this key
+  // were reworded (mob display names webwood spider -> Sableweb Lurker) without a
+  // matching overlay re-fill. The status registry has no staleness detection yet
+  // (srcHash/enHash comparison is dormant), so translated locales keep rendering
+  // the OLD mob name and the release-tier pending gate will NOT catch it. Flagging
+  // here for the next maintainer i18n-locale-fill pass to re-do
+  // entities.quests.q_prof_attune_outfitter.{text,objectives.0.label} in every
+  // locale overlay.
   q_prof_attune_outfitter: {
     id: 'q_prof_attune_outfitter',
     name: "The Outfitter's Measure",
@@ -1254,6 +1263,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
       pairId: 'weaponcrafting+armorcrafting',
     },
   },
+  // STALE-OVERLAY NOTE: same reword-without-refill gap as q_prof_attune_outfitter
+  // above (webwood spider -> Sableweb Lurker), needs an i18n-locale-fill pass for
+  // entities.quests.q_prof_amends_outfitter.{text,objectives.0.label}.
   q_prof_amends_outfitter: {
     id: 'q_prof_amends_outfitter',
     name: 'Threads Rejoined',
@@ -1290,6 +1302,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     resolvedObjectiveCounts: 'archetypeAmends',
     completionEffect: { type: 'attunePair', mode: 'return', pairId: 'alchemy+cooking' },
   },
+  // STALE-OVERLAY NOTE: same reword-without-refill gap as q_prof_attune_outfitter
+  // above (tunnel rat -> Deeprock Digger), needs an i18n-locale-fill pass for
+  // entities.quests.q_prof_amends_bombardier.{text,objectives.0.label}.
   q_prof_amends_bombardier: {
     id: 'q_prof_amends_bombardier',
     name: 'The Ledger Grows',
