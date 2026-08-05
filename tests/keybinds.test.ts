@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   ACTION_BAR_SLOTS,
@@ -766,5 +767,94 @@ describe('modifiers and held (movement) actions', () => {
     expect(kb.heldActionForCode('Space')).toBe('jump');
     // edge keys are not held
     expect(kb.heldActionForCode('Digit1')).toBe(null);
+  });
+});
+
+describe('mouse buttons as bindable keys', () => {
+  it('binds a mouse pseudo-code to an action-bar slot and labels it as a keycap', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'Mouse4')).toBe(true);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot3');
+    expect(kb.primaryLabel('slot3')).toBe('M4');
+    expect(keyCapLabel(kb.primaryLabel('slot3'))).toBe('m4');
+  });
+
+  it('binds a mouse button to a held (movement) action so the per-frame poll matches', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('strafeLeft', 0, 'Mouse5')).toBe(true);
+    expect(kb.heldActionForCode('Mouse5')).toBe('strafeLeft');
+  });
+
+  it('keeps a mouse chord distinct from the bare button, like a key chord', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot4', 0, 'Shift+Mouse4')).toBe(true);
+    expect(kb.bind('slot5', 0, 'Mouse4')).toBe(true);
+    expect(kb.edgeActionForCombo('Shift+Mouse4')).toBe('slot4');
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot5');
+    expect(kb.primaryLabel('slot4')).toBe('Shift+M4');
+  });
+
+  it('refuses the left and right buttons, which the camera and click-picking own', () => {
+    const kb = new Keybinds();
+    expect(isReservedCode('Mouse1')).toBe(true);
+    expect(isReservedCode('Mouse2')).toBe(true);
+    expect(isReservedCode('Shift+Mouse2')).toBe(true); // a chord on them is reserved too
+    expect(isReservedCode('Mouse3')).toBe(false);
+    expect(kb.bind('slot3', 0, 'Mouse1')).toBe(false);
+    expect(kb.bind('slot3', 0, 'Mouse2')).toBe(false);
+    // the refused binds left the slot on its default, not unbound or overwritten
+    expect(kb.codeAt('slot3', 0)).toBe('Digit4');
+  });
+
+  it('evicts a mouse binding when its button is reassigned, like any other code', () => {
+    const kb = new Keybinds();
+    kb.bind('slot3', 0, 'Mouse4');
+    kb.bind('slot7', 0, 'Mouse4');
+    expect(kb.codeAt('slot3', 0)).toBe(null);
+    expect(kb.edgeActionForCombo('Mouse4')).toBe('slot7');
+  });
+
+  it('persists a mouse binding across reloads, and drops a stored reserved one', () => {
+    const kb = new Keybinds();
+    kb.bind('slot3', 0, 'Mouse4');
+    expect(new Keybinds().codeAt('slot3', 0)).toBe('Mouse4');
+    // A hand-edited / legacy blob holding a reserved button must not load: the
+    // camera button would otherwise fire an ability on every click.
+    localStorage.setItem('woc_keybinds', JSON.stringify({ slot3: ['Mouse1', null] }));
+    const reloaded = new Keybinds();
+    expect(reloaded.codeAt('slot3', 0)).toBe(null);
+    expect(reloaded.edgeActionForCombo('Mouse1')).toBe(null);
+  });
+});
+
+// Every bindable action's Key Bindings row must localize. actionDisplayName
+// (src/ui/options_window.ts) resolves a row's label through BIND_ACTION_LABEL_KEYS
+// and falls back to the RAW ENGLISH BindAction.label when the id is absent, so a
+// missing entry ships hard-coded English in all 22 locales and silently orphans the
+// catalog key someone added for it. Nothing else catches that: the i18n gates check
+// that keys EXIST, not that a key is reachable, and every keybind test before this
+// one asserted on codes rather than labels. Scanned from source because the map is
+// module-private in a DOM window module this Node suite cannot import.
+describe('every bind action has a localized label key', () => {
+  const optionsWindowSrc = readFileSync(
+    new URL('../src/ui/options_window.ts', import.meta.url),
+    'utf8',
+  );
+  const mapBody = optionsWindowSrc.slice(
+    optionsWindowSrc.indexOf('const BIND_ACTION_LABEL_KEYS'),
+    optionsWindowSrc.indexOf('};', optionsWindowSrc.indexOf('const BIND_ACTION_LABEL_KEYS')),
+  );
+
+  it('reads a non-empty map (the scan would pass vacuously on a rename)', () => {
+    expect(mapBody).toContain('BIND_ACTION_LABEL_KEYS');
+    expect(mapBody.split('\n').filter((l) => /^\s+\w+:\s+'/.test(l)).length).toBeGreaterThan(30);
+  });
+
+  // Action-bar slots resolve through their own numeric branch in actionDisplayName,
+  // never the map, so they are the one exempt family.
+  const mapped = BIND_ACTIONS.filter((a) => !a.id.startsWith('slot'));
+
+  it.each(mapped.map((a) => [a.id] as const))('%s is in BIND_ACTION_LABEL_KEYS', (id) => {
+    expect(new RegExp(`^\\s+${id}:\\s+'`, 'm').test(mapBody)).toBe(true);
   });
 });

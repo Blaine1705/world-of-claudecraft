@@ -594,6 +594,14 @@
     min-width: 0;
     max-width: 520px;
   }
+  /* How far the player frame's centred content row sits from the left edge of its
+     612px box: (612 - (portrait + the 520px bar column)) / 2. The pet frame hangs
+     beneath with a shorter row, so it cannot reach the same column by centring and
+     pays this inset explicitly instead. Held as one token so the two cannot drift
+     apart; measured against the rendered frames, not derived on paper. */
+  #actionbar-stack {
+    --unit-frame-content-inset: 18px;
+  }
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
      transformed #bottom-bar ancestor would hijack the positioning), where it
@@ -612,6 +620,65 @@
   #player-frame.pf-detached .uf-bars {
     flex: none;
     width: 190px;
+  }
+  /* Pet cluster: ONE row above the player frame holding the pet command bar on the
+     left and the pet's health frame on the right. Stacking the two as separate rows
+     spent about 52px of vertical space on what is one subject, and left the health
+     strip reading as a satellite of the player frame rather than part of the pet UI.
+     Side by side they measure ~294px (two 3-button groups) plus ~270px (portrait +
+     bars), which fits the 612px stack with room to spare.
+
+     The stack is bottom-anchored (#bottom-bar sits at bottom: 6px), so this grows it
+     UPWARD: the action bars and the player frame keep their positions and the
+     cluster appears above them. #petbar drops its absolute top:-52px seat here and
+     becomes an ordinary flex item; the mobile sheet keeps the two apart instead (see
+     hud.mobile.css), because there the command bar belongs under the thumb at the top
+     of the screen while the health strip belongs in the bottom-centre column. */
+  #pet-cluster {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 612px;
+    margin: 0 auto;
+    padding-left: var(--unit-frame-content-inset);
+  }
+  #pet-cluster > #petbar {
+    position: static;
+    margin-bottom: 4px;
+  }
+  /* The health half of the cluster. Hidden until the player actually has a pet; the
+     family painter sets the inline display:flex, which outranks the `none` here. It
+     takes no width or centring of its own (the cluster row owns the layout) and no
+     extra zoom, so it scales with the player frame rather than drifting from it. */
+  #pet-frame {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: 0 0 4px;
+    display: none;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+  }
+  #pet-frame > * {
+    zoom: var(--player-frame-scale, 1);
+  }
+  #pet-frame .uf-bars {
+    flex: none;
+    width: 210px;
+  }
+  #pet-frame:hover {
+    outline: 1px solid var(--gold-dim);
+  }
+  #pet-frame:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* A dead pet stays visible and selectable (Revive lives on the pet bar), so it
+     dims rather than hiding, matching the party frames' dead treatment. */
+  #pet-frame.dead {
+    opacity: 0.7;
   }
   #target-frame {
     left: 12px;
@@ -1711,6 +1778,22 @@
     cursor: default;
     box-shadow: inset 0 0 10px #000;
   }
+  /* Issue 2429: the "Hide Unused Action Slots" Interface option (hideUnusedActionSlots,
+     applied as this body class by main.ts). A slot with no ability or item bound loses
+     its black background, border, and keybind label so an unlearned class's bar reads
+     clean instead of a wall of empty squares; the box stays in the flex row (no
+     display: none) so it neither shifts a bound neighbor on the extra rows nor disturbs
+     the deliberate slot layout those rows exist for. The .action-btn:hover rule above
+     still applies (border-color: var(--gold)), so the slot stays a discoverable drop
+     target for dragging a new ability or item in. */
+  body.hide-unused-action-slots .action-btn.empty {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  body.hide-unused-action-slots .action-btn.empty .keybind {
+    display: none;
+  }
   .action-btn .keybind {
     position: absolute;
     top: 1px;
@@ -2410,6 +2493,22 @@
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
+  /* Deed chat link (the unlock/broadcast announcements): the color inherits
+     the line's own announcement color (gold for your unlock, guild green for
+     a broadcast), so the underline and hover are what mark it as a jump. */
+  .chat-deed-link {
+    cursor: var(--cursor-point);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+  .chat-deed-link:hover {
+    filter: brightness(1.25);
+  }
+  .chat-deed-link:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   .chat-pane::-webkit-scrollbar {
     width: 8px;
   }
@@ -2616,6 +2715,15 @@
   }
   #quest-tracker .qt-title:hover {
     color: #fff;
+  }
+  /* Bag-hover highlight: matching quest title while a quest stack is hovered
+     in bags. Information-add, always-on (no --fx gate). Quest gold wash, not
+     a second yellow. Shape of the title row is unchanged. */
+  #quest-tracker .qt-title.qt-bag-hover {
+    color: var(--color-quest-tracker-bag-hover);
+    text-shadow:
+      0 0 6px color-mix(in srgb, var(--color-quest-tracker-bag-hover) 55%, transparent),
+      1px 1px 2px #000;
   }
   #quest-tracker .qt-title:focus-visible {
     outline: 2px solid var(--gold);
@@ -3542,6 +3650,29 @@
     color: var(--color-text-muted);
     white-space: nowrap;
   }
+  /* Contributor subtotal on the damage/healing breakdown: the member, then each
+     pet that acted. It reads as a heading over the abilities nested beneath it,
+     which is what lets a hunter separate their own output from the pet's. */
+  #tooltip .mt-tip-head {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-top: 3px;
+  }
+  #tooltip .mt-tip-head:first-child {
+    margin-top: 0;
+  }
+  #tooltip .mt-tip-head .mt-tip-val {
+    color: var(--color-text);
+  }
+  /* The abilities belonging to the subtotal directly above. Indented rather than
+     boxed: the tooltip is narrow, and a border would compete with the mini bars
+     already drawn behind every row. */
+  #tooltip .mt-tip-group {
+    padding-left: 10px;
+  }
+  #tooltip .mt-tip-group .mt-tip-name {
+    color: var(--color-text-muted);
+  }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
     overflow-y: auto;
@@ -4216,6 +4347,17 @@
     color: var(--color-accent);
     margin-top: 4px;
     font-size: 11.5px;
+  }
+  /* Profession affinity on honest materials ("Used by Leatherworking, ...").
+     Soft craft-teal wash on the accent so multi-use reagents scan apart from
+     food/potion use lines without inventing a new rarity color. The color is
+     a theme-emitted token (src/ui/theme.ts), NOT a color-mix over
+     --color-accent: mixing a fixed light teal into the contrast-repaired
+     accent re-lightens it below the large-text floor on the light Parchment
+     panel, so the wash is repaired per preset like --color-quest-tag-text.
+     Always-on (no --fx gate; fairness). */
+  #tooltip .tt-desc.tt-material-use {
+    color: var(--color-material-use, #d6ce3b);
   }
   #tooltip .tt-stat {
     color: #fff;
@@ -5242,6 +5384,13 @@
     font-weight: 600;
     letter-spacing: 0;
   }
+  /* A banner may carry SEVERAL secondary lines (the battleground verdict: the
+     score and rating swing, why the match ended, the first-win bonus). Only the
+     first one needs the gap under the title; the rest stack tight so three lines
+     still read as one block rather than a list. */
+  #banner .banner-subtext + .banner-subtext {
+    margin-top: 2px;
+  }
   #banner.banner-with-art {
     display: flex;
     align-items: center;
@@ -5254,6 +5403,22 @@
     height: 46px;
     object-fit: contain;
     filter: drop-shadow(var(--art-shadow-lg));
+  }
+  /* Art AND subtext on one plate (hud.ts paintBanner's .banner-art-copy
+     wrapper): has-subtext alone stacks title over subtext; with art the
+     plate becomes a row and the title/detail column moves into the wrapper.
+     Variant-agnostic on purpose: any future art-plus-detail banner lays out
+     correctly without borrowing a variant's cosmetic class. */
+  #banner.banner-with-art.has-subtext {
+    flex-direction: row;
+    align-items: center;
+  }
+  #banner.banner-with-art.has-subtext .banner-art-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    min-width: 0;
   }
   /* The Book of Deeds variant (hud.ts showBanner variant='deed'). A deed
      unlock used to fire this element with the level-up's exact colour, size
@@ -5278,6 +5443,40 @@
     text-shadow:
       0 0 10px #00000088,
       1px 1px 4px #000;
+  }
+  /* Gathering skill milestone plate (hud.ts showBanner variant='skill').
+     Framed copper craft card with the profession crest: distinct from the
+     bare gold character level-up AND the parchment deed plate, so a Mining
+     milestone never steals the "I leveled" reading. Layout comes from the
+     variant-agnostic banner-with-art rules above; this class is cosmetic. */
+  #banner.banner-skill {
+    color: var(--color-skill-banner-text);
+    font-size: 28px;
+    letter-spacing: 0.6px;
+    padding: 10px 26px 12px;
+    border: 1px solid var(--color-skill-banner-border);
+    border-radius: 10px;
+    background: var(--skill-banner-bg);
+    box-shadow:
+      0 0 0 1px var(--color-skill-banner-inset) inset,
+      0 4px calc(18px * var(--fx-shadow, 1)) var(--color-art-shadow);
+    text-shadow:
+      0 0 12px #00000099,
+      1px 1px 4px #000;
+  }
+  #banner.banner-skill .banner-subtext {
+    color: var(--color-skill-banner-subtext);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-top: 4px;
+  }
+  #banner.banner-skill.banner-with-art {
+    gap: 12px;
+  }
+  #banner.banner-skill .banner-art {
+    width: 52px;
+    height: 52px;
   }
   /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
      appears and clears instantly, same text and duration, no fade. */

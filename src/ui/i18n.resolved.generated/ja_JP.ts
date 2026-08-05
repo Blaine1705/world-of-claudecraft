@@ -786,6 +786,7 @@ export const ja_JP: EnTranslations = {
       "targetAnnounce": "ターゲット：{name}",
       "targetOfTargetLabel": "ターゲットのターゲット",
       "partyLabel": "あなたのパーティ",
+      "petLabel": "あなたのペット",
       "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
@@ -820,7 +821,7 @@ export const ja_JP: EnTranslations = {
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",
       "hideKeyboard": "キーボードを隠す",
-      "chatPlaceholder": "発言する..."
+      "chatPlaceholder": "発言する... (! でコミュニティコマンド)"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -911,6 +912,7 @@ export const ja_JP: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
+      "threatFallback": "リアルタイムのヘイトなし：{name}へのダメージを表示",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
@@ -950,6 +952,7 @@ export const ja_JP: EnTranslations = {
       "targetFriendlyNext": "味方ターゲットを順に切り替え",
       "discord": "Discord",
       "valecup": "ヴェイルカップ",
+      "bgFlag": "戦場フラッグアクション",
       "sheathe": "武器を納刀/抜刀",
       "categoryPet": "ペット",
       "petAttack": "ペット：攻撃",
@@ -957,7 +960,9 @@ export const ja_JP: EnTranslations = {
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
       "petAggressive": "ペット：攻撃的",
-      "mount": "騎乗 / 降車"
+      "targetPet": "ペット：ターゲット",
+      "mount": "騎乗 / 降車",
+      "mouseHint": "マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。"
     },
     "actionBar": {
       "editKeys": "アクションバーのキーを編集",
@@ -966,7 +971,7 @@ export const ja_JP: EnTranslations = {
       "bannerCapturing": "キーを押してこのスロットに割り当てます…",
       "boundToKey": "{key} に割り当てました。",
       "reset": "リセット",
-      "done": "Done",
+      "done": "完了",
       "cancel": "キャンセル",
       "resetConfirmTitle": "アクションバーのキーをリセットしますか？",
       "resetConfirmBody": "1本目のバーはデフォルトのキーに戻り、2本目と3本目のバーは未設定になります。この操作は取り消せません。"
@@ -996,6 +1001,7 @@ export const ja_JP: EnTranslations = {
       "name_stormfeather_griffin": "スカイリーチ・ストームフェザー",
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
       "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
+      "name_drakemaw_raptor": "火口のラプトル",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -1003,7 +1009,8 @@ export const ja_JP: EnTranslations = {
       "desc_shadowjump_toad": "どんな地形も影の跳躍で瞬時に越える、巨大で足取り確かなガマ。",
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
-      "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。"
+      "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
+      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -1023,6 +1030,93 @@ export const ja_JP: EnTranslations = {
       "timeout": "レース失敗",
       "progress": "障害 {n} / {total}",
       "timeLeft": "{seconds}秒"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "ソーンホロウ平原",
+      "blurb": "ソーンピークの影が落ちる、壁に囲まれた窪地を挟んで二つの廃城が向かい合う。南に真紅、北に蒼藍、その間には未だどちらの手にも落ちていない古い廃墟の中庭が横たわる。五対五、旗は各一本。相手の旗を三度持ち帰った側が戦場を制する。",
+      "modeTag": "5v5キャプチャー・ザ・フラッグ",
+      "offlineNote": "ソーンホロウ平原は同期中です。レルムの応答後にキューが開きます。",
+      "ratingSummary": "レーティング。{wins}勝 / {losses}敗",
+      "careerCaptures": "通算キャプチャー:{count}",
+      "enterQueue": "キューに参加",
+      "enterQueueParty": "キューに参加({count}人パーティ)",
+      "leaveQueue": "キューを離脱",
+      "searching": "検索中。キュー {count}/{size}。",
+      "queuedParty": "{count}人パーティ。",
+      "queueNote": "5人ずつの2チーム。敵の軍旗を奪い、自軍の砦へ持ち帰れ。先に3回キャプチャーしたチームの勝利。最大5人のパーティで一緒に参加可能。スプリントルーンを拾い、遮蔽物を縫って追手を振り切ろう。",
+      "matchInProgress": "戦闘中。{crimson}:{azure}。",
+      "ladderAllTime": "ラダー。歴代ランキング",
+      "noRanked": "まだ誰もランクインしていません。一番乗りを目指せ。",
+      "ladderOnline": "ラダー。オンライン中",
+      "noChallengers": "今オンラインの勇者はいません。一番乗りを目指せ。",
+      "playerLevelClassTitle": "{name}。レベル{level} {className}",
+      "playerClassTitle": "{name}。{className}",
+      "crimson": "クリムゾン",
+      "azure": "アズール",
+      "yourTeamTitle": "あなたのチーム",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "整列:{seconds}",
+      "firstTo": "先取{caps}キャプチャー",
+      "flagState": {
+        "home": "旗は砦にある",
+        "carried": "旗が奪われた!",
+        "dropped": "旗は地面にある"
+      },
+      "respawnIn": "次のウェーブ:{seconds}秒後に復活",
+      "resultVictory": "勝利!",
+      "resultDefeat": "敗北",
+      "resultDraw": "引き分け",
+      "leavingIn": "{seconds}秒後に戦場を離れます",
+      "killFeed": "{killer}が{victim}を倒した",
+      "killFeedFallen": "{victim}が倒れた",
+      "foundBanner": "マッチ成立。あなたは{team}として戦います!",
+      "countdownBanner": "ソーンホロウ平原開始まで{seconds}",
+      "startBanner": "旗を奪え!",
+      "flagTakenLog": "{name}が{team}の旗を奪った!",
+      "flagDroppedLog": "{team}の旗が落とされた。",
+      "flagReturnedLog": "{team}の旗が戻された。",
+      "dropFlagConfirmTitle": "旗を落としますか？",
+      "dropFlagConfirmBody": "敵の旗を運搬中です。落とすと旗は地面に残り、どちらの陣営も拾えます。",
+      "dropFlagConfirmAccept": "旗を落とす",
+      "boardToggleLabel": "試合スコアボード。Enterで全体ボードを固定表示します。",
+      "levelRequirement": "この戦場のキュー参加はレベル{level}で解放されます。",
+      "board": {
+        "kills": "キル",
+        "assists": "アシスト",
+        "deaths": "デス",
+        "captures": "奪取"
+      },
+      "flagTakenBanner": "{takers}が{team}の旗を奪った!",
+      "flagReturnedBanner": "{team}の旗が戻された!",
+      "capturedTeamBanner": "{takers}が{team}の旗をキャプチャー!{crimson}:{azure}",
+      "capturedLog": "{name}が{team}の旗をキャプチャー。スコア{crimson}:{azure}。",
+      "victoryBanner": "勝利!ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "defeatBanner": "敗北。ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "drawBanner": "ソーンホロウ平原引き分け{crimson}:{azure}。レーティング{rating}({delta})",
+      "endBannerDetail": "ソーンホロウ平原{crimson}:{azure}。レーティング{rating}({delta})",
+      "endLog": "ソーンホロウ平原終了、{crimson}:{azure}。レーティング{rating}({delta})。",
+      "endedTimer": "時間切れ",
+      "endedForfeit": "この試合は棄権で終了しました",
+      "endedTimerLog": "試合時間が尽き、得点の高い側が戦場を制しました。",
+      "endedForfeitLog": "この試合は棄権で終了しました。",
+      "firstWinBonusLine": "本日の初勝利:名誉+{honor}",
+      "firstWinBonusLog": "本日の初勝利:追加で名誉を{honor}獲得しました。",
+      "timeWarningMinutes": "残り{minutes}分",
+      "timeWarningOneMinute": "残り1分",
+      "timeWarningMinutesLog": "戦闘は残り{minutes}分です。",
+      "timeWarningOneMinuteLog": "戦闘は残り1分です。",
+      "map": {
+        "crimsonKeep": "真紅の城塞",
+        "azureKeep": "蒼藍の城塞",
+        "ruinCourtyard": "廃墟の中庭",
+        "graveyard": "墓地"
+      }
     },
     "vcup": {
       "title": "ヴェイルカップ",
@@ -1174,6 +1268,15 @@ export const ja_JP: EnTranslations = {
       "browserEffectsReduced": "軽減",
       "browserEffectsMinimal": "最小",
       "browserEffectsNote": "自動はブラウザとデバイスに応じて、負荷の高い CSS エフェクト（ぼかし・グロー・背景アニメーション）を抑えます。動作が重い場合は手動で下げてください。",
+      "graphicsApply": "グラフィックを適用",
+      "graphicsApplying": "グラフィック設定を適用中...",
+      "graphicsApplied": "グラフィック設定を適用しました。",
+      "graphicsSaved": "グラフィック設定を保存しました。現在のレンダラーはすでに同じ設定です。",
+      "graphicsFailed": "グラフィック設定を適用できませんでした。以前の設定は引き続き有効です。",
+      "graphicsRetry": "グラフィックを再試行",
+      "graphicsFatal": "グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。",
+      "graphicsReload": "ゲームを再読み込み",
+      "graphicsDraftChanged": "グラフィックの変更を適用できます。",
       "interfaceMode": "操作モード",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "デスクトップ",
@@ -1195,6 +1298,7 @@ export const ja_JP: EnTranslations = {
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
+      "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
       "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
@@ -1204,7 +1308,10 @@ export const ja_JP: EnTranslations = {
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showThirdActionBar": "3本目のアクションバーを表示",
+      "hideUnusedActionSlots": "未使用のアクションスロットを非表示",
+      "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
+      "showPetFrame": "自分のペットを表示",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
@@ -1365,20 +1472,38 @@ export const ja_JP: EnTranslations = {
     },
     "landing": {
       "highContrast": "高コントラスト",
-      "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします"
+      "highContrastAria": "高コントラスト背景を切り替えます。動画トレーラーを無効にして、スタート画面のテキストを読みやすくします",
+      "browserSupport": {
+        "title": "ご注意：サポート対象外のブラウザです",
+        "body": "このブラウザではパフォーマンスが低下する場合があります。最高の体験のために、Windows、macOS、Linux 向けデスクトップアプリの入手をお勧めします。ブラウザでのプレイをご希望ですか？Chrome が最もパフォーマンスに優れ、Firefox と Safari もサポートされています。",
+        "getDesktopApp": "デスクトップアプリを入手",
+        "continueInBrowser": "ブラウザで続ける",
+        "dismissAria": "サポート対象外ブラウザの通知を閉じる"
+      }
     },
     "warfare": {
       "honorAmount": "名誉 {amount}",
       "dualPrice": "{money} + {honor}",
       "balance": "名誉: {amount}",
       "honorFloat": "名誉 +{amount}",
+      "honorFloatReason": "名誉 +{amount}（{reason}）",
       "honorGain": "名誉を {amount} 獲得しました（{reason}）。",
       "notEnoughHonor": "名誉が足りません。",
       "reasons": {
         "arenaWin": "アリーナ勝利",
         "fiestaKill": "フィエスタ撃破",
         "fiestaComplete": "フィエスタ完遂",
-        "fiestaWin": "フィエスタ勝利"
+        "fiestaWin": "フィエスタ勝利",
+        "battlegroundWin": "ソーンホロウ平原勝利",
+        "battlegroundFirstWin": "本日のソーンホロウ平原初勝利",
+        "battlegroundComplete": "ソーンホロウ平原参戦",
+        "battlegroundKill": "名誉ある撃破",
+        "battlegroundAssist": "撃破アシスト"
+      },
+      "floatReasons": {
+        "kill": "撃破",
+        "assist": "アシスト",
+        "firstWin": "初勝利"
       }
     },
     "charSheet": {
@@ -1734,6 +1859,7 @@ export const ja_JP: EnTranslations = {
       "itemAriaEnchanted": "{item}、数量 {count}、エンチャント済みの品",
       "itemAriaBound": "{item}、数量 {count}、バインド済みの品",
       "itemAriaMasterwork": "{item}、数量 {count}、傑作",
+      "itemAriaQuest": "{item}、数量 {count}、クエストアイテム",
       "filterGroupAria": "バッグをカテゴリーで絞り込む",
       "filterAll": "すべて",
       "filterWeapon": "武器",
@@ -1742,6 +1868,7 @@ export const ja_JP: EnTranslations = {
       "filterMaterial": "素材",
       "filterTool": "道具",
       "filterQuest": "クエスト",
+      "filterQuestCountAria": "クエスト、{count} 個のアイテム",
       "filterMount": "マウント",
       "sortAria": "バッグのアイテムを並べ替える",
       "sortRecent": "最近",
@@ -1750,6 +1877,7 @@ export const ja_JP: EnTranslations = {
       "searchPlaceholder": "アイテムを検索",
       "searchAria": "名前でバッグのアイテムを検索",
       "noMatch": "条件に一致するアイテムはありません。",
+      "noQuestItems": "バッグにクエストアイテムはありません。",
       "capacity": "{used}/{total}",
       "capacityAria": "使用中のバッグスロット: {total}個中{used}個",
       "backpack": "バックパック",
@@ -1783,6 +1911,7 @@ export const ja_JP: EnTranslations = {
       "dmgDoneReduce": "与えるダメージを{pct}%低下させる",
       "heatingUp": "次の炎系ビルダーが連続でクリティカルになるとホットストリークを獲得し、クリティカルでなければヒーティングアップが解除されます",
       "elementalConvergencePrimed": "次に異なる属性の呪文を唱えると、エレメンタル・コンバージェンスが発動します",
+      "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
       "crit": "クリティカル率を{pct}%上昇させる",
@@ -1968,6 +2097,8 @@ export const ja_JP: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
+      "cookingCatch": "料理材料。食べる前に調理が必要です。",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "エンチャントの材料。一般と良質の装備を魔力分解して得られる。",
       "arcaneEssence": "エンチャントの材料。レアの装備を魔力分解して得られる。",
       "arcaneShard": "エンチャントの材料。エピックと伝説の装備を魔力分解して得られる。",
@@ -2249,6 +2380,7 @@ export const ja_JP: EnTranslations = {
       "depositHint": "クリックで預ける",
       "depositPartialHint": "Shift+クリックで一部だけ預ける",
       "cannotDeposit": "銀行に預けられません",
+      "cannotDepositNow": "今は預けられません",
       "depositQuantityTitle": "{item}を預ける",
       "depositQuantityInput": "預ける数量",
       "depositQuantityConfirm": "預ける",
@@ -2259,6 +2391,7 @@ export const ja_JP: EnTranslations = {
       "sortAria": "銀行のアイテムを並べ替える",
       "searchAria": "名前で銀行のアイテムを検索",
       "depositAll": "すべての素材を預ける",
+      "depositAllTooltip": "カバン内の製作素材とがらくたをまとめて銀行に預けます。採集用道具、装備中の防具、クエストアイテム、消耗品は対象外です。",
       "depositAllDone": "素材を預けました：{count}。",
       "depositAllFull": "素材を預けました：{count}。銀行がいっぱいになりました。",
       "depositAllNone": "銀行がいっぱいです：何も預けられませんでした。",
@@ -2274,7 +2407,50 @@ export const ja_JP: EnTranslations = {
       "bonusAdvertWallet": "ウォレットを連携すると2スロット獲得できます。",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "友達を招待しましょう：友達がレベル10に達すると、お互いに2スロット獲得できます。友達は最大5人までです。",
-      "bonusSectionAria": "ボーナス銀行スロットと獲得方法"
+      "bonusSectionAria": "ボーナス銀行スロットと獲得方法",
+      "tabsAria": "銀行タブ",
+      "personalTab": "個人",
+      "guildTab": "ギルド",
+      "guildCapacityAria": "使用中のギルド銀行スロット: {total}個中{used}個",
+      "guildEmpty": "ギルド銀行は空です。",
+      "guildTreasury": "ギルド金庫",
+      "guildDepositGold": "お金を預ける",
+      "guildWithdrawGold": "お金を引き出す",
+      "guildDepositGoldTitle": "ギルド金庫にお金を預ける",
+      "guildWithdrawGoldTitle": "ギルド金庫からお金を引き出す",
+      "guildGoldAvailable": "利用可能: {amount}",
+      "guildBuyConfirm": "ギルド金庫から {price} でギルド銀行スロットを{count}個追加購入しますか？",
+      "guildBuyNote": "ギルド金庫から支払われます",
+      "guildTreasuryShort": "金庫の資金不足",
+      "guildOpenBank": "ギルド銀行を開設する",
+      "guildOpenConfirm": "{price} でギルド銀行を開設しますか？この費用はあなた自身の所持金から支払われます。",
+      "guildOpenAccept": "開設",
+      "guildOpenNote": "ギルド金庫ではなく、あなた自身の所持金から支払われます",
+      "guildPurseShort": "所持金不足",
+      "guildDormantNote": "ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。",
+      "guildDormantHint": "このアイテムはギルド銀行にロックされており、引き出せません。",
+      "guildDormantAria": "{item}、数量 {count}、引き出し不可",
+      "guildUnknownItem": "不明なアイテム",
+      "guildDepositHint": "クリックでギルド銀行に預ける",
+      "guildCannotDeposit": "ギルド銀行には入れられません",
+      "guildGoldCannotMove": "現在その金額は移動できません。",
+      "guildViewsAria": "ギルド銀行の表示",
+      "guildContentsTab": "内容",
+      "guildLogTab": "ログ",
+      "logAria": "ギルド銀行の活動ログ",
+      "logNote": "直近{count}件のギルド銀行の操作です。",
+      "logLoading": "ギルド銀行のログを読み込んでいます...",
+      "logEmpty": "ギルド銀行にはまだ何も出し入れされていません。",
+      "logRefused": "ギルド銀行のログを閲覧できるのはギルド役員のみです。",
+      "logFormerMember": "元ギルドメンバー",
+      "logDepositItem": "{actor} が {item} を {count} 個預けました",
+      "logWithdrawItem": "{actor} が {item} を {count} 個引き出しました",
+      "logDepositMoney": "{actor} が {amount} を預けました",
+      "logWithdrawMoney": "{actor} が {amount} を引き出しました",
+      "logBuySlots": "{actor} が {amount} で銀行の拡張を購入しました",
+      "logOpenBank": "{actor} が {amount} でギルド銀行を開設しました",
+      "logCharterFee": "{actor} がギルド設立費用 {amount} を支払いました",
+      "logAdminPurge": "管理者が {item} を {count} 個削除しました"
     },
     "calendar": {
       "title": "イベントカレンダー",
@@ -2312,10 +2488,6 @@ export const ja_JP: EnTranslations = {
           "title": "市の日",
           "note": "商人が新しい品を待っている。ワールドマーケットを見て回るのに良い日。"
         },
-        "fiestaNight": {
-          "title": "フィエスタナイト",
-          "note": "今夜の2v2フィエスタのリングは大賑わい。"
-        },
         "arenaClash": {
           "title": "アリーナ激突",
           "note": "決闘者たちが灰燼の闘技場へ。キューに並んでラダーを駆け上がろう。"
@@ -2352,6 +2524,7 @@ export const ja_JP: EnTranslations = {
       "billboard": {
         "label": "ギルド掲示板",
         "empty": "掲示板にはまだ何もありません。",
+        "loginLine": "ギルド掲示板：{text}",
         "setBy": "{name}が設定",
         "save": "保存",
         "placeholder": "ギルドへのメッセージを書く",
@@ -2552,6 +2725,18 @@ export const ja_JP: EnTranslations = {
         "artisansEye": "職人の眼",
         "quickeningCharm": "早戻りの護符"
       },
+      "toolEffectTooltip": {
+        "kind": "道具用の護符",
+        "bonus": {
+          "gatherersCache": "充填中は採集ごとに産出+1。",
+          "artisansEye": "充填中は収穫の品質がツール1段階ぶん上がる。",
+          "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。"
+        },
+        "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。",
+        "charges": "コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。",
+        "landOnly": "釣り竿には装着できない。",
+        "openProfessions": "専門技能ウィンドウを開き、採集ツールに装着しよう。"
+      },
       "toolEffectSlotButton": "{effect}を装着",
       "toolEffectRechargeButton": "再充填",
       "toolEffectSlotted": "{effect}を{profession}に装着した。",
@@ -2588,6 +2773,8 @@ export const ja_JP: EnTranslations = {
     "crafting": {
       "title": "製作",
       "close": "製作を閉じる",
+      "dialogOption": "製作",
+      "dialogOptionAria": "{craft}の製作ウィンドウを開く",
       "craft": "製作",
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2662,6 +2849,8 @@ export const ja_JP: EnTranslations = {
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
       "tierUpToast": "{craft}がティア {tier} に到達しました！",
+      "skillUpToast": "{skill}の技能が {level} に上がりました！",
+      "skillUpSubtext": "技能が {level} に上がりました！",
       "trendNudge": "あなたの腕は{archetype}へと傾いています。その調律の依頼は{master}のもとで待っています。",
       "trendNudgeNoMaster": "あなたの腕は{archetype}へと傾いています。その道に進むには工芸の師匠を探しましょう。",
       "attunedZoneLine": "{name}が{archetype}として調律しました！",
@@ -2787,6 +2976,59 @@ export const ja_JP: EnTranslations = {
       "outOfRange": "バインド解除するには作業台のそばにいる必要があります。",
       "noSpace": "バッグにバインド解除したアイテムを入れる空きがありません。"
     },
+    "commissionBoard": {
+      "title": "依頼ボード",
+      "close": "依頼ボードを閉じる",
+      "openButton": "依頼",
+      "openButtonAria": "依頼ボードを開く",
+      "intro": "職人に一品の製作を依頼するか、他の人の依頼を引き受けましょう。",
+      "formTitle": "依頼を出す",
+      "recipeLabel": "アイテム",
+      "recipeEmpty": "まだ依頼できる装備のレシピを習得していません。",
+      "scopeLabel": "誰が引き受けられるか",
+      "scopeOpen": "誰でも（公開依頼）",
+      "scopeCrafter": "特定の職人",
+      "crafterNameLabel": "職人の名前",
+      "crafterNamePlaceholder": "キャラクター名",
+      "openSubmit": "依頼を出す",
+      "sectionMine": "自分の依頼",
+      "sectionToCraft": "引き受けた依頼",
+      "sectionBoard": "公開依頼",
+      "boardEmpty": "現在、公開されている依頼はありません。",
+      "mineEmpty": "まだ依頼を出していません。",
+      "toCraftEmpty": "現在、誰の依頼も引き受けていません。",
+      "rowFor": "{item}（依頼者：{requester}）",
+      "rowTargeted": "{item}（依頼者：{requester} / 指名：{crafter}）",
+      "acceptedBy": "{name}が引き受け済み",
+      "statusOpen": "募集中",
+      "statusAccepted": "引き受け済み",
+      "statusDelivered": "納品済み",
+      "statusCancelled": "キャンセル済み",
+      "statusExpired": "期限切れ",
+      "cancelButton": "キャンセル",
+      "acceptButton": "引き受ける",
+      "deliverButton": "納品",
+      "deliverHint": "受注品として（受注トグルをオンにして）製作してから、ここに戻って納品してください。",
+      "opened": "{item}の依頼を出しました。",
+      "cancelled": "{item}の依頼をキャンセルしました。",
+      "accepted": "{item}の依頼を引き受けました。",
+      "delivered": "{item}を{name}に納品しました。",
+      "denyUnknownRecipe": "そのレシピは存在しません。",
+      "denyNotCommissionEligible": "そのレシピは依頼できません。",
+      "denyUnknownCrafter": "その名前のキャラクターは見つかりません。",
+      "denySelfCrafter": "自分自身に依頼することはできません。",
+      "denyTooManyOpen": "募集中の依頼が上限に達しています。",
+      "denyUnknownOrder": "その依頼はもう存在しません。",
+      "denyOrderNotOpen": "その依頼はもう募集していません。",
+      "denySelfOrder": "自分が出した依頼は引き受けられません。",
+      "denyNotEligibleCrafter": "その依頼は別の職人に指名されています。",
+      "denyNotYourOrder": "それはあなたの依頼ではありません。",
+      "denyOrderNotAccepted": "その依頼はまだ引き受けられていません。",
+      "denyNotYourAcceptance": "あなたはその依頼を引き受けていません。",
+      "denyNotCrafted": "先に受注品を製作してください（受注トグルをオンに）。",
+      "denyOutOfRange": "納品するには依頼者の近くにいる必要があります。",
+      "denyNoSpace": "依頼者のバッグに空きがありません。"
+    },
     "finder": {
       "title": "ダンジョンファインダー",
       "close": "閉じる",
@@ -2897,6 +3139,7 @@ export const ja_JP: EnTranslations = {
       "countLabel": "功績 {earned}/{total}",
       "completionAria": "獲得済みの功績: {earned}/{total}",
       "recentLabel": "最近:",
+      "recentJumpAria": "{name}へ移動",
       "nearestLabel": "あと少し:",
       "filterGroupAria": "功績を絞り込む",
       "filterAll": "すべて",
@@ -3122,6 +3365,7 @@ export const ja_JP: EnTranslations = {
       "talents": "タレント",
       "arena": "アリーナとPvP",
       "valeCup": "ヴェイルカップ",
+      "thornhollow": "ソーンホロウ平原",
       "deeds": "功績の書",
       "glossary": "用語集",
       "wishIKnew": "知っておきたかったこと",
@@ -3892,23 +4136,25 @@ export const ja_JP: EnTranslations = {
       "duelsBody": "出会った相手なら誰でも友好的な決闘に挑めます。賭けるのはプライドだけなので、相性を学んだり仲間内の言い争いに決着をつけたりするのに一番手軽な方法です。",
       "coliseumHeading": "灰のコロシアム",
       "coliseumBody": "灰の闘技場はレルムのアリーナで、ランクマッチで他のプレイヤーと対戦します。一対一、あるいは二対二です。各ブラケットはそれぞれ独自の順位を保つので、勝てばそのラダーを駆け上がり、レルム全体に見てもらえます。アリーナのウィンドウを開き、一人で、あるいはパートナーとブラケットに登録しましょう。",
-      "fiestaHeading": "2対2のフィエスタ",
-      "fiestaBody": "フィエスタは、一つの途切れない試合として行うテンポの速い2対2の乱戦で、すべての戦士が対等な条件で戦います。試合が進むにつれてオーグメント、つまりその場で構成を組み替える手早い強化をドラフトするので、同じマッチは二つとありません。",
-      "augmentsNote": "オーグメントやパワーアップはそのマッチの間だけ続きます。持続的な強さではなく、その場で組む遊び心のあるビルドが目的なので、課金で勝ちを買えるわけではありません。",
-      "wavesTitle": "オーグメントはウェーブで訪れる",
-      "wavesBody": "フィエスタの試合では、進行に応じて新たな一手が手に入り、試合が長引くほどその一手は大胆になっていきます。一つのウェーブから次へとビルドを築き上げ、毎回いくつかの候補から一つを選び、残りの試合の間はそれを持ち続けます。",
-      "waveSilverTitle": "シルバー",
-      "waveSilverBody": "最初のウェーブ。単一ステータスを伸ばすシンプルな強化で、クラスの基本を研ぎ澄まします。",
-      "waveGoldTitle": "ゴールド",
-      "waveGoldBody": "中盤のウェーブ。両刃の組み合わせが並び、あなたのビルドが形を成して輝き始めます。",
-      "wavePrismaticTitle": "プリズマティック",
-      "wavePrismaticBody": "最後のウェーブ。ビルドを決定づける、画面を溶かすほどのスパイク。最高の意味でばかげていると感じられるよう作られています。",
-      "yumiHeading": "Yumiを守れ",
-      "yumiBody": "Protect Yumiは迷路で行うチーム目標モード。各チームは自分の猫の使い魔を守りながら、敵の使い魔を狙います。二匹の猫は時折迷路の別の場所へ転移するため、防衛、追撃、捜索の間で戦況が揺れ動きます。3対3か5対5でキューに参加でき、倒れても少しの間ベンチに下がるだけです。",
-      "powerupsTitle": "リングのパワーアップ",
-      "powerupsBody": "戦いの最中、光り輝くオーブがアリーナに落ちてきます。先に取った者の自由になり、しかも狙い通りに度を越していて、効果はほんの一瞬だけ。スピードデーモンは目もくらむ速さへ、コロッサスはのっそりと歩く巨人へ、ムーンブーツは低重力で跳ね回るジャンプへ、バーサーカーは突如あふれる怒りへとあなたを変えます。",
       "ladderHeading": "ラダーを駆け上がる",
       "ladderBody": "ランクプレイでは時間をかけて順位を記録します。リーダーボードを確認すれば、自分の位置やレルムの頂点に立つのが誰かが分かります。"
+    },
+    "thornhollowPage": {
+      "heading": "ソーンホロウ平原",
+      "intro": "ソーンピークの下、古い森に抱かれた壁に囲まれた窪地で戦うランク制5対5の旗奪取戦場。峡谷の両端で二つの廃城が向かい合い、その間にはどちらの手にも落ちたことのない、より古い中庭が横たわる。五人ずつ、城は二つ、目的は一つ。相手の旗を奪い、こちらの旗を奪われる前に持ち帰れ。",
+      "queueHeading": "キューへの参加",
+      "queueBody": "ソーンホロウ平原パネルを開けばソロで参加できるほか、最大5人のパーティで一緒に並べます。パーティは必ず同じチームに配置され、残りの席はソロの勇者で埋まります。10人が揃うと両チームが砦に配置され、短い整列ののち旗が有効になります。",
+      "fieldHeading": "戦場",
+      "fieldBody": "壁に囲まれた野外の戦場は、3つの区画に分かれています。両チームそれぞれの前庭と、その間に挟まれた「廃墟の中庭」です。全幅を貫く2枚の隔壁が境界となり、区画間の移動は必ず争奪点を通ります。広い正門と、隔壁をまたぐ門楼です。門楼の2つの扉は互い違いに開いており、伏撃の角を回り込む必要があります。各砦は正面口以外が完全に封じられているため、旗をめぐる出入りは必ず同じ開口部を通ります。その正面口には低いバリケードが立ち、まっすぐな突撃を阻みます。中庭には空洞の中心遺跡と側翼の2つのスプリントルーンがあり、残る2つは旗への進路に待っています。さらに各正門の中庭側入口にはバトルルーンまたはウォードルーン(短時間、与ダメージ増加か被ダメージ軽減)が待機:両方の台は同じ面で試合を開始し、取得のたびに面が切り替わります。",
+      "flagsHeading": "旗",
+      "flagsBody": "各砦は自軍の旗を守っています。敵の旗を奪って自軍の旗座まで運べば得点。先に3回キャプチャーしたチームの勝利で、時間切れの戦いはスコアで決着します。倒された運び手はその場に旗を落とします。敵は拾い直せますが、旗の持ち主チームは近づくだけで即座に旗を戻せます。また、旗は決して隠れません。旗を拾うとステルスは解除され、運び手がどんな手段であれ姿を消せば、旗はその場に落ちます。",
+      "pickupNote": "旗を拾うのは常に戦場アクションキーの意図的な押下です。誤って旗の上を走り抜けて運び手になることはありません。",
+      "respawnHeading": "戦場での死",
+      "respawnBody": "死は古典の儀式のまま:遺体はあなた自身が解放するまでその場に残り、魂は自陣キープの傍らの柵に囲まれた墓地に現れ、次のチーム復活ウェーブまでそこに縛られます。ウェーブは待機中の霊体を全員同時に蘇らせます。両チームのウェーブは意図的にずらされており、戦いが同時に完全リセットされることはありません。遺体走りも、スピリットヒーラーとの取引もありません:解放し、ウェーブを待ち、戦うのみ。",
+      "carrierHeading": "旗の運搬",
+      "carrierBody": "敵の旗を長く持ちすぎた運び手はどんどん脆くなり、旗がキャプチャー、ドロップ、返還されるまで被ダメージが増え続けます。旗を抱えて隠れるのは負け筋。持ち帰るのが勝ち筋です。",
+      "ladderHeading": "ラダー",
+      "ladderBody": "勝っても負けても、毎試合キャラクターごとの戦場レーティングが動き、歴代ランキングがレルムの王者を記録します。勝利と最後まで戦い抜いた敗北にはウォーフェアシステムを通じて名誉も支払われます。"
     },
     "valeCupPage": {
       "heading": "ヴェイルカップ",
@@ -4284,8 +4530,8 @@ export const ja_JP: EnTranslations = {
       "toolUnavailable": "非売品",
       "priceNone": "非売品",
       "toolTierReq": "ティア{tier}の道具",
-      "colWield": "Use at",
-      "wieldNone": "Any",
+      "colWield": "使用熟練度",
+      "wieldNone": "制限なし",
       "yieldsHeading": "採集の実り",
       "yieldsBody": "採集のたびに品質が抽選され、その確率は熟練度がすべてです。始めたばかりの採集者は常にコモン品ですが、熟練が上がるほど高い等級へ重みが移り、決して後退しません。上限100ではコモンが完全に消え、60%が良質、30%がレア、8%がエピック、2%が伝説になります。品質は量でもあります。コモンは1個、良質とレアは2個、エピックは3個、伝説は4個。レア以上の収穫はあなたの署名入り（Gathered by）で届き、上限では十回に四回、名前が刻まれます。",
       "bandsHeading": "熟練度バンド",
@@ -5796,7 +6042,6 @@ export const ja_JP: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3v3",
     "bracket5": "Yumi 5v5",
-    "enterQueue": "Protect Yumiに参加！",
     "queue": {
       "join": "Protect Yumiのキューに参加しました。使い魔を守りましょう…",
       "leave": "Protect Yumiのキューを離れました。",
@@ -5834,9 +6079,6 @@ export const ja_JP: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Fiestaに参加！",
-    "practice": "🎉 ボットとの練習",
-    "practiceNote": "オフライン練習：AIボットを3体出現させ、2v2 Fiestaのキューに登録します。もう一度クリックで停止。",
     "banner": {
       "wave": "ウェーブ {wave}/{total} — オーグメントを選べ！",
       "augmentGained": "オーグメント獲得：{name}！",
@@ -6093,10 +6335,16 @@ export const ja_JP: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "アップデート {version} をダウンロード中...",
-      "ready": "アップデート {version} の準備ができました。ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
+      "checkingTitle": "アップデートを確認中...",
+      "checkingBody": "ゲームは自動的に最新の状態に保たれます。",
+      "uptodateTitle": "お使いのバージョンは最新です。",
+      "downloadingTitle": "アップデート {version} をダウンロード中...",
+      "downloadingBody": "プレイは続けられます。アップデートはゲーム終了時にインストールされます。",
+      "readyTitle": "アップデート {version} の準備ができました",
+      "readyBody": "ゲーム終了時に自動でインストールされます。今すぐ再起動もできます。",
       "restart": "今すぐ再起動",
-      "later": "後で"
+      "later": "後で",
+      "dismiss": "閉じる"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6284,7 +6532,7 @@ export const ja_JP: EnTranslations = {
       "releaseSpirit": "霊魂を解放",
       "chatTab": "チャット",
       "combatLogTab": "戦闘ログ",
-      "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help)",
+      "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help、! でコミュニティコマンド)",
       "chatChannels": {
         "add": "チャットチャンネルを追加",
         "addTitle": "チャンネルを追加",
@@ -6312,7 +6560,6 @@ export const ja_JP: EnTranslations = {
       "mobileMore": "その他",
       "mobileMoreAria": "その他のメニューを表示",
       "mobileSocial": "ソーシャル",
-      "mobileArena": "アリーナ",
       "mobileMenu": "メニュー",
       "mobileSettings": "設定",
       "mobileUse": "使用",
@@ -6429,7 +6676,7 @@ export const ja_JP: EnTranslations = {
         "nameplates": "ネームプレート切り替え",
         "meters": "ダメージメーター",
         "social": "フレンド & ギルド",
-        "arena": "アリーナ（灰の闘技場）",
+        "arena": "PvP(ソーンホロウ平原とアリーナ)",
         "chat": "チャットを開く",
         "attack": "攻撃",
         "actionBarSlot": "アクションバー {slot}"
@@ -6563,6 +6810,11 @@ export const ja_JP: EnTranslations = {
     },
     "system": {
       "playerDeath": "死亡しました。",
+      "deathRecapKillerAbility": "死亡しました。{killer}の{ability}に倒されました。",
+      "deathRecapKiller": "死亡しました。{killer}に倒されました。",
+      "deathRecapAbility": "死亡しました。{ability}によって死亡しました。",
+      "deathRecapFalling": "死亡しました。転落死しました。",
+      "deathRecapDrowned": "死亡しました。溺死しました。",
       "respawn": "再び休まり、完全な状態になりました。",
       "ignoringChat": "{name}のチャットを無視します。",
       "noLongerIgnoring": "{name}の無視を解除しました。",
@@ -6808,6 +7060,10 @@ export const ja_JP: EnTranslations = {
         "officer": "士官",
         "member": "メンバー"
       },
+      "tenure": {
+        "recruit": "新兵",
+        "veteran": "古参"
+      },
       "guildHeadOne": "あなたは{rank}、{count}人のメンバー",
       "guildHeadMany": "あなたは{rank}、{count}人のメンバー"
     },
@@ -7049,6 +7305,7 @@ export const ja_JP: EnTranslations = {
       "quest": "クエストアイテム",
       "junk": "雑貨",
       "fineMaterial": "上質な素材",
+      "material": "素材",
       "food": "食べ物",
       "drink": "飲み物",
       "tool": "道具",
@@ -7081,6 +7338,9 @@ export const ja_JP: EnTranslations = {
       "useFood": "使用: {seconds}秒かけて体力を{amount}回復します。食事中は座ったままでいる必要があります。",
       "useDrink": "使用: {seconds}秒かけてマナを{amount}回復します。飲んでいる間は座ったままでいる必要があります。",
       "questItem": "クエストアイテム",
+      "questRelated": "クエスト：{quest}",
+      "questRules": "売却、銀行預け入れ、取引はできません。",
+      "questOrphaned": "進行中のクエストでは必要ありません。",
       "classes": "クラス: {classes}",
       "sellPrice": "売却価格: {money}",
       "clickBuy": "クリックして購入",
@@ -7129,15 +7389,15 @@ export const ja_JP: EnTranslations = {
       "buyStack": "{count}個購入",
       "buyStackAria": "{item}を{count}個、{price}で購入",
       "qtyRowAria": "購入数量",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "{count}個",
       "qtyMultipleAria": "一度に{count}個ずつ購入",
       "qtyCustom": "カスタム",
       "qtyCustomAria": "購入数を自分で指定",
-      "buyCountAria": "Buy {count} of {item} for {price}",
-      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyCountAria": "{item}を{count}個、{price}で購入",
+      "buyCountAriaWithRequirement": "{item}を{count}個、{price}で購入。{requirement}",
       "buyQuantityTitle": "{item}をいくつ購入しますか？最大{max}。",
       "buyQuantityInput": "購入する数量",
-      "buyQuantityConfirm": "Buy",
+      "buyQuantityConfirm": "購入",
       "buybackTitle": "買い戻し",
       "buybackEmpty": "アイテムなし",
       "buybackAria": "{item}を{price}で買い戻す",
@@ -7216,6 +7476,12 @@ export const ja_JP: EnTranslations = {
       "reclaim": "回収",
       "buyAria": "{item}を{price}で購入",
       "reclaimAria": "{item}を回収",
+      "buyConfirmTitle": "購入の確認",
+      "buyConfirmBody": "{item}を{price}で購入しますか？",
+      "buyConfirmBodyStack": "{item} x{count}を{price}（各 {each}）で購入しますか？",
+      "buyConfirmAccept": "購入",
+      "buyConfirmCancel": "キャンセル",
+      "buyChanged": "その出品は確認する前に変更されました。価格を確認してからもう一度お試しください。",
       "sellNote": "バッグから品物を出品します。売れると商人が{cut}%を受け取ります。出品枠 {used}/{max} を使用中です。",
       "sellPickEmpty": "売るものを選ぶにはバッグ内のアイテムをクリックしてください。",
       "quantity": "数量",
@@ -8703,6 +8969,18 @@ export const ja_JP: EnTranslations = {
       "fen_muster_order": {
         "name": "フェンブリッジ召集令"
       },
+      "firebottle": {
+        "name": "火炎瓶"
+      },
+      "murloc_hut": {
+        "name": "泥ひれの小屋"
+      },
+      "restless_skull": {
+        "name": "安らがぬ頭蓋骨"
+      },
+      "vanguard_bone": {
+        "name": "先兵の骨"
+      },
       "mire_prowler_pelt": {
         "name": "沼の徘徊者の毛皮"
       },
@@ -9978,6 +10256,21 @@ export const ja_JP: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "テラースパークの始動キー"
       },
+      "reins_drakemaw_raptor": {
+        "name": "火口のラプトルの手綱"
+      },
+      "moggers_hide_quiver": {
+        "name": "モガーの革の矢筒"
+      },
+      "cragmaw_huntquiver": {
+        "name": "クラッグモウの狩猟矢筒"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "墓ワームの骨の矢筒"
+      },
+      "direfang_quiver": {
+        "name": "ダイアファングの矢筒"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },
@@ -10973,6 +11266,21 @@ export const ja_JP: EnTranslations = {
       "spider_egg_sac": {
         "name": "蜘蛛の卵嚢"
       },
+      "spider_egg": {
+        "name": "群れの母の卵"
+      },
+      "widow_hatchling": {
+        "name": "ウィドウの幼体"
+      },
+      "drowned_warlord": {
+        "name": "溺れの武将"
+      },
+      "brakka_wallbreaker": {
+        "name": "壁砕きのブラッカ"
+      },
+      "threnos_first_voice": {
+        "name": "第一の声スレノス"
+      },
       "grave_silt_bulwark": {
         "name": "墓泥の防壁"
       },
@@ -11152,6 +11460,18 @@ export const ja_JP: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "シンドラレス、火口の母竜"
+      },
+      "dragonkin_egg": {
+        "name": "ドラゴンキンの卵"
+      },
+      "dragonkin_whelp": {
+        "name": "ドラゴンキンの仔"
+      },
+      "dragonkin_broodguard": {
+        "name": "ドラゴンキンの巣守り"
+      },
+      "drakemaw_broodlord": {
+        "name": "火口の巣主"
       },
       "gilded_stag": {
         "name": "黄金の牡鹿"
@@ -12185,7 +12505,7 @@ export const ja_JP: EnTranslations = {
       },
       "q_no_rest": {
         "title": "葦の中に安息なし",
-        "text": "その儀式は湿地が触れる場所で溺死者を起こします。まだ壊せませんが、兵を14体減らせます。",
+        "text": "その香炉の儀式は溺れ死者を起こします。そして今、彼らを率いるほど強い者まで蘇らせました。番人たちは彼を「溺れの武将」と呼びます。彼が沈んだ礼拝堂を占める限り、死者は隊列を崩しません。{playerName}、彼を打ち倒してください。残りは泥沼へ散り散りに戻るはずです。",
         "completion": "あなたは死者に、主たちより多くの慈悲を与えました。受け取ってください。",
         "objectives": {
           "0": {
@@ -12463,9 +12783,6 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ワーム教団の狂信者を討伐"
-          },
-          "1": {
-            "label": "ワーム教団の命令書"
           }
         }
       },
@@ -12476,9 +12793,6 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ワーム教団の死霊術師を討伐"
-          },
-          "1": {
-            "label": "儀式の経箱"
           }
         }
       },

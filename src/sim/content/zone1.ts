@@ -247,6 +247,9 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { itemId: 'moggers_shiv', chance: 0.25, rollGroup: 'mogger_chase' },
       { itemId: 'cryptstalker_jerkin', chance: 0.25, rollGroup: 'mogger_chase' },
       { itemId: 'valefire_lantern', chance: 0.2 },
+      // The hunter offhand rides its own independent roll beside the caster
+      // lantern, so neither class's odds depend on the other's.
+      { itemId: 'moggers_hide_quiver', chance: 0.2 },
     ],
     scale: 1.28,
     color: 0x8e5b33,
@@ -405,6 +408,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
       { copper: 30, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
       { itemId: 'ghostly_essence', chance: 0.55, questId: 'q_rite' },
+      { itemId: 'restless_skull', chance: 1, questId: 'q_bones' },
     ],
     scale: 1.0,
     color: 0xd5dbdb,
@@ -931,17 +935,18 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   },
   q_bones: {
     id: 'q_bones',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Restless Dead',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: 'The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Grant them peace, $N — return 8 Restless Bones to the earth.',
+    text: 'The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Put them down and bring me a skull from each you lay to rest, $N, eight in all, so I may speak the rites over them and grant the peace they were denied.',
     completionText: 'May they rest now, and may the Light forgive whatever woke them.',
     objectives: [
       {
-        type: 'kill',
-        targetMobId: 'restless_bones',
+        type: 'collect',
+        itemId: 'restless_skull',
         count: 8,
-        label: 'Restless Bones laid to rest',
+        label: 'Restless Skulls recovered',
       },
     ],
     xpReward: 700,

@@ -17,6 +17,39 @@
 
 import type { TranslationKey } from './i18n.catalog';
 
+/** Copy at the ownership boundary so a caller can never mutate the applied
+ *  renderer snapshot while editing its local options draft. */
+export function copyGraphicsDraft<K extends string>(
+  source: Readonly<Record<K, number>>,
+): Record<K, number> {
+  return { ...source };
+}
+
+/** Dirty is intentionally raw-value equality. A change and exact revert clears
+ *  dirty even when two distinct raw profiles would resolve to the same effective
+ *  renderer tier. Effective no-op detection belongs to the apply coordinator. */
+export function graphicsDraftDirty<K extends string>(
+  keys: readonly K[],
+  draft: Readonly<Record<K, number>>,
+  applied: Readonly<Record<K, number>>,
+): boolean {
+  return keys.some((key) => draft[key] !== applied[key]);
+}
+
+/** Overlay just the caller-identified staged numbers onto the live settings projection. */
+export function withGraphicsDraft<K extends string>(
+  live: OptionsSettingsSource,
+  keys: readonly K[],
+  draft: Readonly<Record<K, number>>,
+): OptionsSettingsSource {
+  const keySet: ReadonlySet<string> = new Set(keys);
+  return {
+    num: (key) => (keySet.has(key) ? draft[key as K] : live.num(key)),
+    bool: (key) => live.bool(key),
+    range: (key) => live.range(key),
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Control primitive descriptors (cluster 1)
 // ---------------------------------------------------------------------------
@@ -505,6 +538,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
       boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
+      boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
     ]),
     ...tag('chat', [
       slider(s, 'chatFontScale', 'hud.options.chatFontScale'),
@@ -513,6 +547,11 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
     ]),
     ...tag('combat', [
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
+      boolToggle(
+        s,
+        'stopAutoAttackOnTargetSwitch',
+        'hudChrome.options.stopAutoAttackOnTargetSwitch',
+      ),
       boolToggle(s, 'showAttackButton', 'hudChrome.options.showAttackButton'),
       boolToggle(s, 'walkByAutoloot', 'hudChrome.options.walkByAutoloot'),
       boolToggle(s, 'groundReticle', 'hudChrome.options.groundReticle'),
@@ -525,6 +564,8 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'showThirdActionBar', 'hudChrome.options.showThirdActionBar', {
         disabled: !s.bool('showSecondaryActionBar'),
       }),
+      boolToggle(s, 'hideUnusedActionSlots', 'hudChrome.options.hideUnusedActionSlots'),
+      boolToggle(s, 'lockActionBars', 'hudChrome.options.lockActionBars'),
     ]),
   ];
 }

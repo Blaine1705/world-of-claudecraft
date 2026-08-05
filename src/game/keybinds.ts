@@ -12,6 +12,7 @@
 // game menu, so it stays out of the registry and is refused by bind().
 
 import { repairStoredBindings } from './keybinds_repair';
+import { isReservedMouseCode, mouseCodeLabel } from './mouse_binds';
 
 export type BindKind = 'held' | 'edge';
 
@@ -162,6 +163,17 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyF'],
   },
+  {
+    // The deliberate Thornhollow Fields flag press (never a walk-over). The bare
+    // interact key also routes here inside a live match (main.ts), so this
+    // dedicated bind is the rebindable, always-explicit form on F's shifted
+    // layer (the thematically nearest key: it IS an interaction).
+    id: 'bgFlag',
+    label: 'Battleground Flag Action',
+    category: 'Targeting',
+    kind: 'edge',
+    defaults: ['Shift+KeyF'],
+  },
   // Only acts while the Attack Move setting is on; shares its default key with
   // Turn Left intentionally, and only that key is reserved while active.
   {
@@ -213,7 +225,7 @@ export const BIND_ACTIONS: BindAction[] = [
   },
   {
     id: 'arena',
-    label: 'Arena (Ashen Coliseum)',
+    label: 'PvP (Thornhollow Fields and Arenas)',
     category: 'Interface',
     kind: 'edge',
     defaults: ['KeyG'],
@@ -329,6 +341,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Ctrl+Digit5'],
   },
+  // Selects your own pet, the keyboard route to what clicking the pet frame does.
+  // Ctrl+6 continues the pet row (Ctrl+1..5 above) and collides with nothing.
+  {
+    id: 'targetPet',
+    label: 'Pet: Mark',
+    category: 'Pet',
+    kind: 'edge',
+    defaults: ['Ctrl+Digit6'],
+  },
   // Action bar (slot 0 = Attack)
   ...SLOT_DEFAULTS.map(
     (code, i): BindAction => ({
@@ -431,11 +452,17 @@ export function comboMods(combo: string): KeyMods {
 }
 
 export function isReservedCode(combo: string): boolean {
-  return comboCode(combo) === 'Escape'; // the game-menu key is never rebindable
+  const code = comboCode(combo);
+  // Escape always toggles the game menu; the left and right mouse buttons drive
+  // mouselook, click-to-move, and click-picking (see mouse_binds.ts). Neither is
+  // ever rebindable.
+  return code === 'Escape' || isReservedMouseCode(code);
 }
 
 // short on-screen label for a single e.code (the keycap glyph)
 function codeLabel(code: string): string {
+  const mouse = mouseCodeLabel(code); // "Mouse4" -> "M4"
+  if (mouse !== null) return mouse;
   if (/^Digit\d$/.test(code)) return code.slice(5);
   if (/^Key[A-Z]$/.test(code)) return code.slice(3);
   if (/^F\d{1,2}$/.test(code)) return code;

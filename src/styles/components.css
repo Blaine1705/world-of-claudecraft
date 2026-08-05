@@ -5924,6 +5924,153 @@
     opacity: 0.7;
   }
 
+  /* ---------- commission order board (issue #1298) ---------- */
+  /* The crafting window's header button that opens the board, sized like the
+     adjacent .x-btn close button but text-bearing (a pill, not a glyph). */
+  .crafting-orders-btn {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 8px;
+    padding: 4px 12px;
+    min-height: 26px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-orders-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  @media (pointer: coarse) {
+    .crafting-orders-btn {
+      min-height: 40px;
+    }
+  }
+  #commission-board-window {
+    width: 460px;
+  }
+  .commission-board-intro {
+    display: block;
+    padding: 4px 6px 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  /* The "open a new order" form: the mail-send form's field layout (label
+     stacked over control), a new class family since this is a distinct
+     surface, never a second edit of .mail-field. */
+  .commission-board-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 6px;
+    margin: 0 6px 10px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .commission-form-title {
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--gold);
+  }
+  .commission-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .commission-field label {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .commission-field input[type="text"] {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 16px;
+    background: #120d07;
+    border: 1px solid #5a4a2a;
+    border-radius: 6px;
+    color: #ffe6a8;
+    font-family: Georgia, serif;
+  }
+  .commission-field input[type="text"]:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+    border-color: var(--color-border-focus);
+  }
+  .commission-radio-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .commission-radio-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--color-text);
+    text-transform: none;
+    letter-spacing: normal;
+    cursor: var(--cursor-point);
+  }
+  .commission-submit-btn {
+    padding: 10px;
+    min-height: 40px;
+    font-family: var(--title-font);
+    font-size: 13px;
+    color: #1c1206;
+    background: linear-gradient(180deg, #e9c064, #b98a2e);
+    border: 1px solid #7a5a1e;
+    border-radius: 6px;
+    cursor: var(--cursor-point);
+  }
+  .commission-submit-btn:hover {
+    filter: brightness(1.08);
+  }
+  .commission-submit-btn:focus-visible,
+  .commission-order-btn:focus-visible,
+  .crafting-orders-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .commission-board-sections {
+    display: flex;
+    flex-direction: column;
+  }
+  /* One order row: the vendor-item card, non-button (several actions may
+     apply to one row), so the action chips live in their own trailing
+     cluster instead of the card itself being clickable. */
+  .commission-order-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .commission-order-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .commission-order-btn {
+    cursor: var(--cursor-point);
+    border: none;
+  }
+  @media (pointer: coarse) {
+    .commission-order-btn {
+      min-height: 40px;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+  }
+
   /* ---------- bags ---------- */
   /* bags, centred in the bottom gap between the action cluster and micro-menu */
   #bags {
@@ -6085,6 +6232,31 @@
     border: 0;
     border-radius: 4px;
   }
+  /* A firebottle mid-throw-cooldown (q_deepfen_purge) drains this dark curtain from
+     its seeded height to empty over the remaining seconds. bags_window seeds
+     --cd-start / --cd-dur from world.player.firebottleCdRemaining, and the sweep is a
+     self-contained CSS animation: the bags window is a cold window with no per-frame
+     driver, so it runs without JS. Same bottom-up curtain language as the action
+     bar recharge veil. */
+  .bag-item .bag-cd-curtain {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--cd-start, 0%);
+    background: #000c;
+    border-radius: 0 0 4px 4px;
+    pointer-events: none;
+    animation: bag-cd-drain var(--cd-dur, 0s) linear forwards;
+  }
+  @keyframes bag-cd-drain {
+    from {
+      height: var(--cd-start, 0%);
+    }
+    to {
+      height: 0%;
+    }
+  }
   /* the cell owns the quality border; a soft outer glow from the same quality
      color (set by the painter from the shared QUALITY_COLOR map) lifts rare+ */
   .bag-item[class*=" q-"] {
@@ -6098,6 +6270,39 @@
   .bag-item.q-common {
     border-color: #4a3d26 !important;
     box-shadow: inset 0 1px 4px #000c;
+  }
+  /* Quest-purpose cells (kind === quest): thin quest-gold rim, soft inner
+     wash, optional outer glow. Purpose class, not a quality tier: never
+     reuses green/blue/purple rarity borders. Placed after the common/poor
+     neutral reset so the quest rim wins at equal specificity. Always-on on
+     every graphics preset (no --fx-* gate, fairness). Reduced motion must
+     not drop the rim or seal (only optional future pulse may yield). */
+  .bag-item.bag-quest {
+    border-color: var(--color-bag-quest-rim) !important;
+    box-shadow:
+      inset 0 0 10px var(--color-bag-quest-wash),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-bag-quest-rim) 45%, transparent),
+      inset 0 1px 4px #000c,
+      0 0 5px color-mix(in srgb, var(--color-bag-quest-rim) 28%, transparent);
+  }
+  /* Fine-grade material cells (material_grades fine_* ids): cool refined
+     teal-silver rim + soft wash so craft reagents stand apart from plain
+     white common stacks. Grade class, not a rarity tier: never reuses
+     green/blue/purple quality borders or quest gold. Placed after the
+     common/poor neutral reset so the fine rim wins at equal specificity;
+     the rim glow is a deliberate, nine-id exception to that reset's
+     no-glow-on-commons rule (the whole point of the mark). Purpose outranks
+     grade: the painter (bag_corner_mark_view.ts bagRimClasses) never emits
+     .bag-fine together with .bag-quest, so this block's source order against
+     .bag-quest above is not load-bearing. Always-on, no --fx-* gate
+     (fairness). */
+  .bag-item.bag-fine {
+    border-color: var(--color-bag-fine-rim) !important;
+    box-shadow:
+      inset 0 0 10px var(--color-bag-fine-wash),
+      inset 0 0 0 1px color-mix(in srgb, var(--color-bag-fine-rim) 45%, transparent),
+      inset 0 1px 4px #000c,
+      0 0 6px color-mix(in srgb, var(--color-bag-fine-rim) 32%, transparent);
   }
   .bag-item .bi-count {
     position: absolute;
@@ -6117,7 +6322,8 @@
      the named kinds below. Always visible on the cell itself on desktop and
      touch (information-add, identical on every graphics preset, so no --fx-*
      gate). Top-left, clear of the bottom-right count badge. */
-  .bag-item .bi-instance {
+  .bag-item .bi-instance,
+  .bank-item .bi-instance {
     position: absolute;
     top: 1px;
     left: 1px;
@@ -6132,8 +6338,19 @@
      WHICH kind of special copy this is instead of only that it is one. Same
      always-on, preset-independent contract as .bi-instance above (no --fx-*
      gate, no hover reveal); the tooltip carries the semantics, the glyph is
-     aria-hidden. Colors come from tokens, never a literal in the painter. */
-  .bag-item .bi-glyph {
+     aria-hidden. Colors come from tokens, never a literal in the painter.
+     The BOX is shared by every 12px chrome-SVG corner mark (per-copy glyphs,
+     quest seal, fine seal): top-left, clear of the bottom-right count badge,
+     one dark drop-shadow for contrast; each kind carries only its color below.
+     The masterwork seal is the one outlier (a 16px authored image).
+     Bank cells share the per-copy glyph mark so a banked masterwork keeps its
+     seal: the payload always survived deposit in the sim, but the bank grids
+     never painted the mark bags already had. Quest and fine seals stay
+     bag-only (quest items cannot enter the bank; fine needs the def). */
+  .bag-item .bi-glyph,
+  .bank-item .bi-glyph,
+  .bag-item .bi-quest-seal,
+  .bag-item .bi-fine-seal {
     position: absolute;
     top: 1px;
     left: 1px;
@@ -6143,21 +6360,28 @@
     pointer-events: none;
     filter: drop-shadow(0 1px 1px #000);
   }
-  .bag-item .bi-glyph .ui-icon {
+  .bag-item .bi-glyph .ui-icon,
+  .bank-item .bi-glyph .ui-icon,
+  .bag-item .bi-quest-seal .ui-icon,
+  .bag-item .bi-fine-seal .ui-icon {
     display: block;
     width: 100%;
     height: 100%;
   }
-  .bag-item .bi-glyph-enchanted {
+  .bag-item .bi-glyph-enchanted,
+  .bank-item .bi-glyph-enchanted {
     color: var(--color-bag-glyph-enchanted);
   }
-  .bag-item .bi-glyph-signed {
+  .bag-item .bi-glyph-signed,
+  .bank-item .bi-glyph-signed {
     color: var(--color-bag-glyph-signed);
   }
-  .bag-item .bi-glyph-bound {
+  .bag-item .bi-glyph-bound,
+  .bank-item .bi-glyph-bound {
     color: var(--color-bag-glyph-bound);
   }
-  .bag-item .bi-masterwork-seal {
+  .bag-item .bi-masterwork-seal,
+  .bank-item .bi-masterwork-seal {
     position: absolute;
     top: 1px;
     left: 1px;
@@ -6166,6 +6390,50 @@
     object-fit: contain;
     pointer-events: none;
     filter: drop-shadow(var(--art-shadow-sm));
+  }
+  /* Quest-purpose corner seal: small questlog glyph in quest gold (box shared
+     with .bi-glyph above). Aria-hidden; the cell accessible name carries the
+     quest fact. Glyph priority: masterwork seal outranks this; this outranks
+     the fine seal and every instance mark. */
+  .bag-item .bi-quest-seal {
+    color: var(--color-bag-quest-seal);
+  }
+  /* Fine-grade corner seal: small crafting glyph in refined teal (box shared
+     with .bi-glyph above). Aria-hidden; the item NAME carries the grade word,
+     so the cell accessible name needs no dedicated sentence. Glyph priority:
+     masterwork > quest > fine > instance marks (bag_corner_mark_view.ts). */
+  .bag-item .bi-fine-seal {
+    color: var(--color-bag-fine-seal);
+  }
+  /* Ready-to-turn-in: brighter static seal (shape stays primary). Optional
+     soft pulse is decorative only and yields under prefers-reduced-motion;
+     the brighter seal and rim/wash never hide (fairness). */
+  .bag-item.bag-quest-ready .bi-quest-seal,
+  .bag-item .bi-quest-seal-ready {
+    color: var(--color-bag-quest-seal-ready);
+    filter: drop-shadow(0 1px 1px #000)
+      drop-shadow(0 0 3px color-mix(in srgb, var(--color-bag-quest-seal-ready) 70%, transparent));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .bag-item.bag-quest-ready .bi-quest-seal-ready {
+      animation: bag-quest-ready-pulse 1.8s ease-in-out infinite;
+    }
+  }
+  @keyframes bag-quest-ready-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 1px 1px #000)
+        drop-shadow(0 0 2px color-mix(in srgb, var(--color-bag-quest-seal-ready) 55%, transparent));
+    }
+    50% {
+      filter: drop-shadow(0 1px 1px #000)
+        drop-shadow(0 0 5px color-mix(in srgb, var(--color-bag-quest-seal-ready) 85%, transparent));
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bag-item.bag-quest-ready .bi-quest-seal-ready {
+      animation: none;
+    }
   }
   .bag-item.empty {
     cursor: default;
@@ -6271,6 +6539,42 @@
   .bag-chip:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
+  }
+  /* Quest filter chip stack-count badge (bagQuestItemCount). Quest gold so
+     the purpose class is glanceable on the chip row; aria-hidden (the chip
+     aria-label carries the count). Always-on, no --fx gate. */
+  .bag-chip .bag-chip-count {
+    display: inline-block;
+    margin-left: 5px;
+    min-width: 1.1em;
+    padding: 1px 5px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #15110a;
+    background: var(--color-quest);
+  }
+  .bag-chip.active .bag-chip-count {
+    background: color-mix(in srgb, var(--color-quest) 85%, #15110a);
+    color: #15110a;
+  }
+  /* Soft Quest section header in a derived bag list only (not All+recent
+     manual cells). Thin parchment caption using quest gold; not a drop
+     target. Spans the full grid row via grid-column. */
+  .bag-grid .bag-section-header {
+    grid-column: 1 / -1;
+    margin: 4px 0 2px;
+    padding: 2px 4px 1px;
+    font-family: var(--ui-font);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-quest);
+    border-bottom: 1px solid color-mix(in srgb, var(--color-quest) 35%, transparent);
+    pointer-events: none;
+    user-select: none;
   }
   body.mobile-touch .bag-chip {
     min-height: 40px;
@@ -6536,6 +6840,275 @@
     font-family: var(--title-font);
     font-size: 12px;
   }
+  /* Personal/Guild tab strip: rendered only while guildBankInfo is non-null
+     (an officer-plus standing at a banker, online). Mirrors the .soc-tabs
+     WAI-ARIA strip; the 40px min-height keeps the tabs comfortable on touch. */
+  .bank-tabs {
+    display: flex;
+    gap: 4px;
+    margin: 6px 0 2px;
+    flex: none;
+  }
+  .bank-tab {
+    flex: 1;
+    padding: 7px 0;
+    font-size: 13px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .bank-tab:hover {
+    color: var(--gold);
+  }
+  .bank-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .bank-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: linear-gradient(#2a2436, #161220);
+  }
+  /* The Guild pane's role=tabpanel wrapper. It exists for ACCESSIBILITY, not
+     layout (the pane holds a nested tab list, which needs an owning panel to be
+     intelligible), so it is a transparent flex passthrough: it reproduces the
+     window's own column so the sections inside size exactly as they did when
+     they mounted flat on #bank-window. */
+  .gbank-pane {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  /* The Guild pane's Contents / Log sub-strip. Its own tab class rather than a
+     shared .bank-tab: the outer Personal/Guild strip is wired by querying
+     .bank-tab, so a shared class would hand these buttons to the wrong
+     handler. Visually a quieter sibling (smaller, no gradient) so the nesting
+     reads as a sub-choice and not a second top-level strip. */
+  .gbank-view-tabs {
+    margin: 2px 0 4px;
+  }
+  .gbank-view-tab {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 12px;
+    font-family: var(--title-font);
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+    background: #15100d;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    text-align: center;
+  }
+  .gbank-view-tab:hover {
+    color: var(--gold);
+  }
+  .gbank-view-tab:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .gbank-view-tab.on {
+    color: var(--gold);
+    border-color: #6f5a2a;
+    background: #221c14;
+  }
+  /* The activity log: the officer-visible history of guild bank actions. A
+     plain reading surface (no controls in a row), so it is a list rather than a
+     grid, and it fills the pane so the shared .bank-scroll inside it scrolls
+     instead of the window. */
+  .gbank-log {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: 1;
+  }
+  .gbank-log-note {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 0 0 4px;
+  }
+  .gbank-log-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .gbank-log-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 3px;
+    background: #17120e;
+  }
+  .gbank-log-row:nth-child(even) {
+    background: #1c1611;
+  }
+  .gbank-log-time {
+    flex: none;
+    font-size: 10px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+  .gbank-log-text {
+    font-size: 12px;
+    /* Names and item names are player/content text of unbounded width: wrap
+       rather than clipping a sentence a player is meant to be able to read. */
+    overflow-wrap: anywhere;
+  }
+  /* Loading / refused / empty all share the .bank-empty look; the refusal is
+     tinted because "you may not read this" is not the same news as "nothing has
+     happened", and the words say so too (never color alone). */
+  .gbank-log-refused {
+    color: var(--color-text-error);
+  }
+  /* Guild treasury header row: label + coin readout + the two gold actions. */
+  .gbank-treasury {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 4px 0 6px;
+    flex: none;
+  }
+  .gbank-treasury-label {
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .gbank-treasury-amount {
+    font-size: 13px;
+  }
+  .gbank-treasury-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .gbank-gold-btn {
+    font-family: var(--title-font);
+    font-size: 12px;
+    cursor: var(--cursor-point);
+    color: var(--gold-dim);
+    background: #1a1410;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    padding: 6px 10px;
+  }
+  .gbank-gold-btn:hover:not(:disabled) {
+    color: var(--gold);
+  }
+  .gbank-gold-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .gbank-gold-btn:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  /* Dormant (pipe-refused) slots are unwithdrawable BOTH ways and block guild
+     disband (the documented v1 limitation), so the state reads three ways at
+     once, never color alone: dimmed grayscale icon behind a dashed border, a
+     lock mark on the cell, and the always-visible legend line below the
+     treasury row. */
+  .gbank-dormant-note {
+    flex: none;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin: 0 0 4px;
+  }
+  .bank-item.gbank-dormant {
+    border-style: dashed;
+  }
+  .bank-item.gbank-dormant .item-icon {
+    filter: grayscale(1) brightness(0.55);
+  }
+  .gbank-dormant-mark {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    color: var(--gold-dim);
+    pointer-events: none;
+  }
+  .gbank-dormant-mark .ui-icon {
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 1px 2px #000);
+  }
+  /* Unknown-id (removed-def) slots: still withdrawable (the recovery path),
+     named by the localized unknown-item label since no def exists to draw. */
+  .bank-item.gbank-unknown {
+    border-style: dashed;
+  }
+  .gbank-unknown-label {
+    position: absolute;
+    inset: 3px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    line-height: 1.15;
+    color: var(--color-text-muted);
+    text-align: center;
+    pointer-events: none;
+  }
+  /* Guild buy-row extras: the treasury-paid note and the visible shortfall
+     marker (text on top of the styling class, never color alone). */
+  .gbank-buy-row {
+    flex-wrap: wrap;
+  }
+  .gbank-buy-note {
+    flex-basis: 100%;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  .gbank-buy-short-label {
+    font-size: 11px;
+    color: var(--color-text-error);
+  }
+  /* The gold deposit/withdraw prompt: the mailbox coin-row idiom inside the
+     bank prompt chrome (the .coininput skin mirrors .mkt-price-row's). */
+  .gbank-gold-available {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0;
+  }
+  .gbank-coin-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 8px 0;
+  }
+  /* The gold prompt's inline refusal line (polite live region): empty until a
+     refused submit fills it, so it reserves no height while blank. */
+  .gbank-gold-error {
+    font-size: 12px;
+    color: var(--color-text-error);
+  }
+  .gbank-gold-error:empty {
+    display: none;
+  }
+  .gbank-coin-row .coininput {
+    width: 56px;
+    background: #120d07;
+    border: 1px solid #5a4a2a;
+    color: #ffe6a8;
+    border-radius: 4px;
+    padding: 4px 6px;
+    font-family: var(--ui-font, inherit);
+    font-size: 12px;
+  }
   /* Bonus-slot breakdown footer (online only): a compact non-interactive
      text block advertising the account-link and referral bonuses, riding as the TAIL
      of the .bank-scroll region (scrolling past the last cells reaches it on every
@@ -6694,6 +7267,26 @@
   .deeds-strip-label {
     font-family: var(--title-font);
   }
+  /* A recent-strip crest is a jump button to its deed's card: a quiet chrome
+     reset around the crest, with the affordance carried by hover/focus. */
+  .deeds-recent-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    margin: 0;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: none;
+    cursor: var(--cursor-point);
+  }
+  .deeds-recent-item:hover {
+    border-color: var(--gold-dim);
+  }
+  .deeds-recent-item:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
   .deeds-nearest-row {
     display: inline-flex;
     align-items: center;
@@ -6784,6 +7377,30 @@
   .deed-card.earned {
     border-color: #6a5320;
     background: linear-gradient(160deg, #221b0e, #120e08);
+  }
+  /* The jump spotlight (a chat deed-link or recent-strip landing): one gold
+     pulse that fades on its own, no timer in the painter. Reduced motion
+     swaps in a static ring, cleared by the next repaint. */
+  .deed-card-flash {
+    animation: deed-card-flash 1.6s ease-out 1;
+  }
+  @keyframes deed-card-flash {
+    0% {
+      box-shadow:
+        inset 0 0 0 2px var(--gold),
+        0 0 12px 2px rgba(230, 199, 106, 0.55);
+    }
+    100% {
+      box-shadow:
+        inset 0 0 0 2px transparent,
+        0 0 0 0 rgba(230, 199, 106, 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .deed-card-flash {
+      animation: none;
+      box-shadow: inset 0 0 0 2px var(--gold-dim);
+    }
   }
   .deed-crest {
     width: 40px;
@@ -7305,6 +7922,13 @@
     gap: 4px 8px;
     font-size: 11px;
     color: var(--color-text-light);
+  }
+  /* Live effect rows carry a hover card (tool_effect_tooltip.ts) explaining
+     the bonus and charge ladder. A help cursor is the discoverability cue
+     that the compact line is not the whole story; no motion on hover
+     (the a11y contract forbids scale transforms on list rows). */
+  .prof-effect[data-effect-tip] {
+    cursor: help;
   }
   .prof-effect-name {
     color: var(--gold-dim);
@@ -8802,6 +9426,497 @@
     font-size: 11px;
     color: #d8cba0;
     margin-top: 4px;
+  }
+
+  /* ---------- Thornhollow Fields (the merged PvP window's primary tab) ---------- */
+  /* The mode tag sits BESIDE the field's name, and both live in the title row's
+     display font. Left inline it wrapped mid-phrase ("5v5 Capture the / Flag")
+     on a narrow panel and pushed the close button around, so the tag drops to
+     its own line as a subtitle instead of competing for the same one. */
+  #arena-window #arena-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    min-width: 0;
+  }
+  #arena-window .bg-mode-tag {
+    color: #998d6a;
+    font-size: 11px;
+    font-family: var(--ui-font);
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  /* The two-sentence pitch under the tab strip: what the place is, then what
+     the match is. Body font, not the display face, so it reads as prose. */
+  #arena-window .bg-blurb {
+    font-family: var(--ui-font);
+    font-size: 12px;
+    line-height: 1.5;
+    color: #b6ad93;
+    margin: 8px 0 10px;
+  }
+  .bg-sub {
+    font-family: var(--title-font);
+    color: var(--gold, #c8a857);
+    font-size: 12px;
+    margin: 12px 0 5px;
+    border-bottom: 1px solid #463a1c;
+    padding-bottom: 3px;
+  }
+  .bg-rank {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 2px 0 2px;
+  }
+  .bg-rank .rating {
+    font-family: var(--title-font);
+    font-size: 30px;
+    color: #7fb8ff;
+    text-shadow:
+      0 0 10px #3a78d166,
+      1px 1px 2px #000;
+  }
+  .bg-rank .wl {
+    font-size: 12px;
+    color: #cfc6a8;
+  }
+  .bg-captures {
+    font-size: 11px;
+    color: #b6ad8c;
+    margin: 0 0 6px;
+  }
+  .bg-note {
+    font-size: 11.5px;
+    color: #b6ad8c;
+    line-height: 1.45;
+    margin: 4px 0 2px;
+    font-family: Georgia, serif;
+  }
+  /* The first-win-of-the-day invitation, sitting directly above the queue
+     button. A gold-edged chip rather than another grey note line, because the
+     whole point is that it is the one thing on this panel worth acting on
+     today; it removes itself once the win claims it. Wraps instead of
+     overflowing on a narrow panel (no viewport units, layout-stable). */
+  .bg-firstwin-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 6px 0 8px;
+    padding: 6px 10px;
+    border: 1px solid var(--gold, #c8a857);
+    border-radius: 6px;
+    /* Derived from the accent rather than a one-off literal, so the theme
+       picker moves the chip with the rest of the gold chrome. */
+    background: color-mix(in srgb, var(--gold, #c8a857) 12%, transparent);
+    color: var(--gold, #c8a857);
+    font-family: var(--title-font);
+    font-size: 12.5px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .bg-firstwin-chip .ui-icon {
+    flex: 0 0 auto;
+    width: 15px;
+    height: 15px;
+  }
+  .bg-queue-status {
+    font-size: 12px;
+    color: #7fd4ff;
+    margin-top: 6px;
+    text-align: center;
+  }
+
+  /* kill feed: BIG banner entries stacked under the minimap block, clear of
+     the compass strip; names wear their team colors, the killer's team edges
+     the card. Actionable, tier-identical (fairness contract). */
+  #bg-killfeed {
+    position: absolute;
+    top: 285px;
+    right: 12px;
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 7px;
+    pointer-events: none;
+    z-index: 17;
+  }
+  .bgkf-line {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 100%;
+    font-family: var(--title-font);
+    font-size: 19px;
+    letter-spacing: 0.4px;
+    color: #d8d2c0;
+    background: linear-gradient(100deg, #10131add, #080a0eee);
+    border: 1px solid #3a4a66;
+    border-right-width: 5px;
+    border-radius: 8px;
+    padding: 7px 14px;
+    text-shadow: 1px 1px 3px #000;
+    box-shadow: 0 2px 12px #0009;
+    animation: bgkf-in 0.32s cubic-bezier(0.2, 1.4, 0.4, 1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bgkf-line.crimson {
+    border-right-color: var(--color-team-red);
+  }
+  .bgkf-line.azure {
+    border-right-color: var(--color-team-blue);
+  }
+  .bgkf-mark {
+    width: 19px;
+    height: 19px;
+    flex: none;
+    color: var(--gold);
+    filter: drop-shadow(1px 1px 2px #000);
+  }
+  .bgkf-name {
+    font-weight: 700;
+    font-size: 21px;
+  }
+  .bgkf-name.crimson {
+    color: #ff6a5c;
+  }
+  .bgkf-name.azure {
+    color: #6aa8ff;
+  }
+  .bgkf-verb {
+    color: #b8b09a;
+    font-size: 16px;
+  }
+  @keyframes bgkf-in {
+    from {
+      opacity: 0;
+      transform: translateX(26px) scale(1.12);
+    }
+    60% {
+      opacity: 1;
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* in-match scoreboard strip: pinned top centre; every state here is
+     actionable information and paints identically on every graphics tier */
+  #bg-scoreboard {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    text-align: center;
+    /* interactive: hovering (or tapping) the strip reveals the expanded
+       match board; the strip footprint is small and top-center */
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 18;
+    min-width: 320px;
+    background: linear-gradient(#10131add, #080a0edd);
+    border: 1px solid #3a4a66;
+    border-radius: 9px;
+    padding: 6px 18px 8px;
+    box-shadow: 0 2px 16px #000a;
+  }
+  .bg-score-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: var(--title-font);
+  }
+  .bg-team {
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .bg-team.crimson {
+    color: var(--color-team-red);
+  }
+  .bg-team.azure {
+    color: var(--color-team-blue);
+  }
+  .bg-team.mine {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+  }
+  #bg-scoreboard .bg-board {
+    display: none;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid #3a4a66;
+    text-align: left;
+    font-family: var(--ui-font);
+  }
+  /* `.ended` is deliberately NOT in this list. The result-hold reveal is driven
+     by the painter (battleground_scoreboard_painter), which also writes
+     aria-expanded: a second, invisible reveal here left the aria state lying to
+     assistive tech and made the outside-click dismissal inert during the hold. */
+  #bg-scoreboard:hover .bg-board,
+  #bg-scoreboard:focus-within .bg-board,
+  #bg-scoreboard.expanded .bg-board {
+    display: block;
+  }
+  /* the frozen post-match result screen: verdict header over the pinned board */
+  #bg-scoreboard .bg-result {
+    display: none;
+  }
+  #bg-scoreboard.ended .bg-result {
+    display: block;
+    font-family: var(--title-font);
+    font-size: 26px;
+    letter-spacing: 1px;
+    color: var(--gold);
+    text-shadow: 1px 1px 4px #000;
+    padding: 2px 0 4px;
+  }
+  #bg-scoreboard.ended .bg-result.win {
+    color: #8fe06a;
+  }
+  #bg-scoreboard.ended .bg-result.loss {
+    color: #ff7a6a;
+  }
+  #bg-scoreboard.ended {
+    top: 48px;
+    min-width: 380px;
+  }
+  .bg-brow {
+    display: grid;
+    /* name + the four tallies. A track per cell: the row is a grid, so a cell
+       without a track of its own wraps to a second line (which is exactly what
+       adding the assists column did before this track existed). */
+    grid-template-columns: minmax(0, 1fr) 52px 60px 56px 68px;
+    gap: 4px;
+    align-items: center;
+    font-size: 12px;
+    line-height: 1;
+    min-height: 22px;
+    padding: 0 8px;
+    border-radius: 4px;
+  }
+  /* even, banded player rows (the classic scoreboard read): alternating
+     washes so the table scans as rows, never floating numbers */
+  .bg-brow.bg-bplayer {
+    background: #ffffff08;
+  }
+  .bg-brow.bg-bplayer:nth-of-type(odd) {
+    background: #ffffff03;
+  }
+  .bg-brow.bg-bhead {
+    color: #d8cba0;
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  .bg-bteam {
+    margin-top: 8px;
+    margin-bottom: 3px;
+    padding: 0 8px 2px;
+    font-size: 10.5px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ffffff14;
+  }
+  /* a clear breath between the two team sections */
+  .bg-bteam.azure {
+    margin-top: 14px;
+    font-family: var(--title-font);
+    font-size: 11px;
+    letter-spacing: 0.6px;
+  }
+  .bg-bteam.crimson {
+    color: var(--color-team-red);
+  }
+  .bg-bteam.azure {
+    color: var(--color-team-blue);
+  }
+  .bg-brow .bb-name {
+    font-family: var(--ui-font);
+    font-size: 13px;
+  }
+  .bg-brow.crimson .bb-name {
+    color: var(--color-team-red);
+  }
+  .bg-brow.azure .bb-name {
+    color: var(--color-team-blue);
+  }
+  .bg-brow.me .bb-name {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .bg-brow.dead .bb-name {
+    opacity: 0.55;
+  }
+  .bg-brow.flag .bb-name::after {
+    content: "\2691";
+    margin-left: 5px;
+  }
+  .bg-brow .bb-k,
+  .bg-brow .bb-a,
+  .bg-brow .bb-d,
+  .bg-brow .bb-c {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    /* explicit: the strip root uses the display font, whose digits render
+       tiny and raised; the stat cells must read as plain legible numbers */
+    font-family: var(--ui-font);
+    font-size: 13px;
+    color: #ded8c4;
+  }
+  .bg-brow.bg-bhead .bb-k,
+  .bg-brow.bg-bhead .bb-a,
+  .bg-brow.bg-bhead .bb-d,
+  .bg-brow.bg-bhead .bb-c {
+    font-size: 10px;
+    color: #d8cba0;
+  }
+  .bg-score {
+    font-size: 26px;
+    font-family: var(--title-font);
+    text-shadow: 1px 1px 2px #000;
+  }
+  .bg-score.crimson {
+    color: var(--color-team-red);
+  }
+  .bg-score.azure {
+    color: var(--color-team-blue);
+  }
+  .bg-score-colon {
+    color: #998d6a;
+    font-size: 18px;
+  }
+  /* flag glyph: a small banner square whose state class recolors it (home is
+     dim, carried glows gold, dropped glows orange); never hidden by tier */
+  .bg-flag {
+    width: 11px;
+    height: 13px;
+    display: inline-block;
+    clip-path: polygon(0 0, 100% 0, 72% 28%, 100% 56%, 0 56%, 0 100%, 0 0);
+  }
+  .bg-flag.crimson {
+    background: var(--color-team-red);
+  }
+  .bg-flag.azure {
+    background: var(--color-team-blue);
+  }
+  /* Non-color state channel (fairness: state must survive colorblindness and
+     forced-colors): home stands upright and dim, carried waves at a tilt,
+     dropped lies on its side. */
+  .bg-flag.home {
+    opacity: 0.45;
+  }
+  .bg-flag.carried {
+    opacity: 1;
+    transform: rotate(-18deg) translateY(-1px);
+    filter: drop-shadow(0 0 4px #ffd24a);
+  }
+  .bg-flag.dropped {
+    opacity: 1;
+    transform: rotate(80deg) translateY(2px);
+    filter: drop-shadow(0 0 4px #ff9a3c);
+  }
+  @media (forced-colors: active) {
+    .bg-flag {
+      background: CanvasText;
+    }
+    .bg-flag.home {
+      opacity: 0.5;
+    }
+    .bg-flag.carried,
+    .bg-flag.dropped {
+      opacity: 1;
+      outline: 2px solid Highlight;
+    }
+  }
+  /* Row two: each side's flag status flanking the match clock. Three fixed
+     columns so the clock never shifts as status text changes length. */
+  .bg-under {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: baseline;
+    gap: 14px;
+    margin-top: 3px;
+  }
+  .bg-clock {
+    font-size: 13px;
+    color: #cfc6a8;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+  }
+  .bg-fstate {
+    font-family: var(--ui-font);
+    font-size: 10.5px;
+    letter-spacing: 0.3px;
+    color: #8b96a6;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bg-fstate.crimson {
+    text-align: right;
+  }
+  .bg-fstate.azure {
+    text-align: left;
+  }
+  /* the quiet baseline is at-the-keep; a taken or grounded flag is the call.
+     The carried orange is the shared token the M-map's carry ring also
+     resolves, so the strip and the map can never drift apart. */
+  .bg-fstate.carried {
+    color: var(--color-bg-carry-ring);
+    font-weight: 600;
+  }
+  .bg-fstate.dropped {
+    color: #e8d24a;
+  }
+  /* the caps target lives in the expanded board's header line */
+  .bg-bcaps {
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #8b96a6;
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  #bg-respawn {
+    position: absolute;
+    left: 50%;
+    top: 54%;
+    transform: translate(-50%, -50%);
+    display: none;
+    text-align: center;
+    color: #ff8d7a;
+    font-family: var(--title-font);
+    font-size: 22px;
+    text-shadow: 2px 2px 6px #000;
+    z-index: 60;
+    pointer-events: none;
+  }
+  #bg-protected {
+    position: absolute;
+    left: 50%;
+    top: 62%;
+    transform: translate(-50%, -50%);
+    display: none;
+    text-align: center;
+    color: #9fdc7f;
+    font-family: var(--title-font);
+    font-size: 13px;
+    text-shadow: 1px 1px 3px #000;
+    z-index: 60;
+    pointer-events: none;
   }
 
   /* ---------- The Vale Cup (boarball at the Sowfield) ---------- */
@@ -10710,6 +11825,36 @@
     margin: 6px 0 2px;
     line-height: 1.4;
   }
+  .graphics-controls-disabled {
+    opacity: 0.55;
+  }
+  .graphics-apply {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    min-height: 40px;
+    margin: 8px 0;
+    padding: 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 5px;
+    background: var(--color-bg-input);
+  }
+  .graphics-apply-status {
+    min-width: 0;
+    min-height: 1.4em;
+    color: var(--color-text-muted);
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+  .graphics-apply-status[role="alert"] {
+    color: var(--color-text-error);
+    font-weight: 700;
+  }
+  .graphics-apply-btn {
+    min-width: 132px;
+    margin: 0;
+  }
   .set-seg {
     display: flex;
     gap: 4px;
@@ -11663,27 +12808,6 @@
 
   /* Fiesta arena-bracket integration: style the .btn (windows) and .arena-bracket
      (Ashen Coliseum) bases, co-located with those bases in @layer components. */
-  .btn.fiesta-practice {
-    background: linear-gradient(135deg, #ff3df0, #1b9fff);
-    border-color: #ff3df0;
-    color: #fff;
-    font-weight: 800;
-  }
-  .btn.fiesta-practice:hover {
-    box-shadow: 0 0 14px #ff3df088;
-  }
-  .arena-bracket.fiesta {
-    background: linear-gradient(135deg, #ff3df033, #1b9fff22);
-  }
-  .arena-bracket.fiesta.active {
-    background: linear-gradient(135deg, #ff3df0, #1b9fff);
-    color: #fff;
-    border-color: #ff3df0;
-  }
-  .arena-bracket-tag.fiesta {
-    background: linear-gradient(90deg, #ff3df0, #1b9fff);
-    color: #fff;
-  }
   /* ---------- paperdoll unequip + bags drop-target ---------- */
   /* Character-window / bags chrome that rode inline past the windows extraction;
      homed here beside the other window bodies under @layer components. */

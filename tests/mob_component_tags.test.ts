@@ -52,11 +52,16 @@ describe('mob component-type tags', () => {
     expect(allUnmapped).toEqual(['fen_troll']);
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep.
-    // 39 since the Drakelands/Willowfen/Evergarden harvest-gap fix tagged
-    // dune_troll, bogtoad, and hedge_knight on top of the prior 36 (Evergarden's
-    // topiary trio stays untagged: they are the hedge-construct exception in
-    // tests/economy_yield.test.ts); fen_troll is still the only all-unmapped one.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(39);
+    // 36 after the farm-economy pass added mapped tags to 15 coinless trash
+    // templates, then 39 once the Drakelands brood (whelp, broodguard,
+    // broodlord) shipped hide+fang, and 40 with this branch's quest-dedupe pass
+    // (threnos_first_voice salvages cloth like the zealot flock he leads).
+    // Then 43 since the Drakelands/Willowfen/Evergarden harvest-gap fix tagged
+    // dune_troll, bogtoad, and hedge_knight (Evergarden's topiary trio stays
+    // untagged: they are the hedge-construct exception in
+    // tests/economy_yield.test.ts). fen_troll is still the only all-unmapped
+    // one: neither pass tags a template with claw/tusk/gills/horn only.
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(43);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {

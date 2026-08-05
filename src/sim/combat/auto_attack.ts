@@ -34,6 +34,7 @@ import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import { addThreat, hasEscapeStealth } from '../threat';
 import {
   angleTo,
@@ -211,6 +212,12 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     let abilityName: string | null = null;
     let threatFlat = 0;
     let threatMult = 1;
+    // The resolved talent/mastery damage multiplier for the queued on-swing
+    // ability (weaponMult, mirroring weaponStrike's own field): meleeSwing
+    // applies it to the WHOLE swing (weapon roll + AP), not just `bonus`, so a
+    // "+X%" mastery/talent reaches the weapon+AP portion of a Heroic Strike /
+    // Raptor Strike style on-next-swing hit too (issue #1803).
+    let weaponMult = 1;
     if (p.queuedOnSwing) {
       const queued = ctx.resolvedAbility(p.queuedOnSwing, p.id);
       if (queued) {
@@ -229,6 +236,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
           abilityName = queued.def.name;
           threatFlat = queued.threatFlat;
           threatMult = queued.threatMult;
+          weaponMult = resolveTalentHitMult(queued.def, ctx.playerMods(meta)).dmgMult;
         }
       }
       p.queuedOnSwing = null;
@@ -239,6 +247,7 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
       autoAttackHand: 'mainhand',
       threatFlat,
       threatMult,
+      weaponMult,
       whiteDualWieldPenalty: p.dualWielding && abilityName === null,
     });
     // Thuggery mastery (Sword Specialization shape): a landed mainhand auto has
@@ -424,6 +433,14 @@ export function meleeSwing(
     critBonus?: number;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    // The casting ability's stable content id, threaded onto the landed-hit
+    // damage event's abilityId field (the weaponStrike path only; a plain
+    // auto-attack swing has no ability and leaves this unset). abilityName
+    // above stays the display label, so a client-side impact-cue lookup
+    // keyed off it silently breaks on the next rename (review finding, PR
+    // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
+    // impact cues unreachable).
+    abilityId?: string | null;
   },
 ): boolean {
   const missChance =
@@ -529,6 +546,12 @@ export function meleeSwing(
       flat: opts.threatFlat ?? 0,
       mult: opts.threatMult ?? 1,
     },
+    true,
+    false,
+    false,
+    // Cue-presentation only on this path: onSpellCrit skips the physical
+    // school, so the id can never newly arm an ability-filtered proc here.
+    opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND

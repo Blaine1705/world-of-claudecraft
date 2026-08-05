@@ -113,6 +113,13 @@ export const GROUND_PICKUP_PROVING_QUESTS: readonly string[] = [
 // against the real tables).
 export const MAX_CREDITABLE_MOB_LEVEL = 23;
 
+// How many recent unlock ids the IWorldDeeds.deedsRecent() read returns, on
+// every host: the Sim serves its live grant order, the online client fetches
+// the same count from the server's character_deeds record. Slightly above the
+// Book's 5-slot recent strip so the view core keeps spares after it dedups
+// the session-fresh unlocks against the fetched order.
+export const DEEDS_RECENT_CAP = 8;
+
 // Dungeon final bosses whose kill credit bumps deedStats.dungeonClears (keys
 // '<dungeonId>' and '<dungeonId>:heroic') and the dungeonFinalBossKills
 // counter. PINNED as of v1: a future dungeon's boss gets a new deed; this
@@ -224,6 +231,11 @@ export const RARE_SLAIN_TEMPLATES = new Set([
   'gleamstag',
   'old_marrowshell',
   'aurelhorn',
+  // The Drakelands dragonkin brood rework (v0.35): the four standing
+  // broodlords (rare-flagged camp elites). Cindraleth's deed rides her kill
+  // QUEST trigger instead of a slain mark, so the shipped boss template
+  // needs no rare flag.
+  'drakemaw_broodlord',
 ]);
 
 // Zone fishing catches that count as "a fish" for the chr_ first-cast deeds
@@ -614,6 +626,8 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   talentPoints: [],
   arenaRankedMatches: [],
   arenaRankedWins: [],
+  bgWins: [],
+  bgCaptures: [],
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
@@ -719,6 +733,8 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   talentPoints: (m) => pointsSpent(m.talents),
   arenaRankedMatches: (m) => m.arenaWins + m.arenaLosses + m.arena2v2Wins + m.arena2v2Losses,
   arenaRankedWins: (m) => m.arenaWins + m.arena2v2Wins,
+  bgWins: (m) => m.bgWins,
+  bgCaptures: (m) => m.bgCaptures,
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,
@@ -1878,4 +1894,7 @@ export const VISITED_MARK_NAMESPACES = [
   // already carries (they serialized fine but were dropped on load while the
   // namespace was unregistered).
   'gather_event',
+  // Per-craft rare-tier milestones (issue #2055): the first rare-or-better
+  // output a player crafts IN THAT CRAFT (professions/crafting.ts craftItem).
+  'craft_rare',
 ] as const;

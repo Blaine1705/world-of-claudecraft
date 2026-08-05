@@ -17,9 +17,11 @@ import type { LetterDef } from './content/letters';
 import type { TalentModifiers } from './content/talents';
 import type { DeedRuntime } from './deeds';
 import type { DelayedEvent, GroundAoE } from './entity_roster';
+import type { GuildBankState } from './guild_bank';
 import type { PendingLootRoll } from './loot/loot_roll';
 import type { MarketListing } from './market';
 import type { MobScanCounters } from './mob/scan_counters';
+import type { CommissionOrder } from './professions/commission_order';
 import type { PendingProjectile } from './projectile_travel';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
@@ -39,6 +41,8 @@ import type {
   ResolvedAbility,
   TradeSession,
 } from './sim';
+import type { BgMatch, BgQueueGroup } from './social/battleground';
+import type { BgOutcomeRecord } from './social/battleground_outcomes';
 import type { CardDuelMatch } from './social/card_duel';
 import type { FinderFormationUnit } from './social/party';
 import type { VcState } from './social/vale_cup';
@@ -56,6 +60,7 @@ import type {
   ErrorReason,
   EscortRunState,
   GatherNodeDef,
+  InventoryUnit,
   ItemInstancePayload,
   PendingResurrection,
   PlayerClass,
@@ -196,6 +201,19 @@ export interface SimContextPrimitives {
   arenaQueueYumi5: ArenaQueueUnit[];
   readonly yumiBusySlots: Set<number>;
   readonly yumiCatMatches: Map<number, ArenaMatch>;
+  // Thornhollow Fields battleground state (social/battleground.ts). The queue array is
+  // REASSIGNED by the matchmaker's prune filters (read-write, the arena-queue
+  // precedent); the pid -> shared-match map, the busy slot pool (its own pool,
+  // never the arena's: slot numbers collide across pools) and the match-id
+  // counter are mutated in place. Backing fields stay on Sim.
+  bgQueue: BgQueueGroup[];
+  readonly bgMatches: Map<number, BgMatch>;
+  readonly bgBusySlots: Set<number>;
+  nextBgMatchId: number;
+  // Resolved-match records the authoritative host drains post-tick
+  // (social/battleground_outcomes.ts). Observability only: no gameplay branch
+  // reads it and nothing here draws rng. Live view; the array stays on Sim.
+  readonly bgOutcomes: BgOutcomeRecord[];
   // Escort quest runs keyed by EscortDef id (src/sim/escort.ts owns every
   // mutation; the backing map stays on Sim). Live view.
   readonly escortRuns: Map<string, EscortRunState>;
@@ -245,6 +263,12 @@ export interface SimContextPrimitives {
   // standing near a banker. Sim-owned, mutated only at construction (push), never
   // reassigned, so a live read-only view like `marketListings`.
   readonly bankerIds: number[];
+  // Guild Bank books: guild id -> live GuildBankState, owned by Sim and fed by
+  // the server per realm through guild_bank.ts loadGuildBank (the one write-in
+  // path; Phase 3 wires the DB). Sim-owned Map mutated in place, never
+  // reassigned, so a live read-only view like bankerIds. Always empty offline
+  // (guilds are a server social system).
+  readonly guildBanks: Map<number, GuildBankState>;
   // The Vale Cup boarball state (social/vale_cup.ts): ONE holder object on Sim
   // (queues/deserters/botPids mutated in place, the match slot reassigned INSIDE
   // the holder), so a read-only live view suffices. Consumed by the vale_cup
@@ -279,6 +303,16 @@ export interface SimContextPrimitives {
   // reassigned), so a read-only live view; the fields themselves stay writable so
   // the hot paths can increment them. Feeds no gameplay branch and draws no rng.
   readonly mobScanCounters: MobScanCounters;
+  // Commission order board (Professions 2.0, issue #1298): the live order
+  // list, mutated in place by professions/commission_order.ts (push on open,
+  // field updates on accept/deliver, splice on the retention sweep), like
+  // groundAoEs/marketListings above. Named `commissionOrderBoard` (not
+  // `commissionOrders`) so it never collides with the IWorldProfessions
+  // per-viewer PROJECTION of the same name (Sim.commissionOrders): two
+  // different shapes, the raw shared list versus one viewer's filtered rows.
+  // `nextCommissionOrderId` is the id counter, read-write like nextLootRollId.
+  readonly commissionOrderBoard: CommissionOrder[];
+  nextCommissionOrderId: number;
 }
 
 // Cross-system callbacks. Each signature mirrors the still-on-`Sim` method it
@@ -355,7 +389,7 @@ export interface SimContextCallbacks {
     // marked ally at a reduced rate. Defaults false.
     aoe?: boolean,
   ): number;
-  handleDeath(entity: Entity, killer: Entity | null): void;
+  handleDeath(entity: Entity, killer: Entity | null, killerAbility?: string | null): void;
   cancelCast(entity: Entity): void;
   pushbackCast(entity: Entity): void;
   refreshMobLeashFromAction(source: Entity | null, target: Entity): void;
@@ -526,11 +560,13 @@ export interface SimContextCallbacks {
   // professions/enchanting.ts instead of countFungibleItem/removeFungibleItem
   // so crafted single-copy rares remain disenchantable/enchantable.
   countEnchantableItem(itemId: string, pid?: number): number;
-  // Returns the consumed slots' `instance` payloads (removeItem's contract),
-  // so applyEnchant can merge a crafted copy's signer, legacy rolled.quality,
-  // and masterwork bonus into the freshly-enchanted instance instead of
-  // dropping them.
-  removeEnchantableItem(itemId: string, count: number, pid?: number): ItemInstancePayload[];
+  // Returns one InventoryUnit per consumed unit (types.ts): the slot's
+  // `instance` payload AND its plain-stack craftedRecipeId marker, so
+  // applyEnchant can merge a crafted copy's signer, legacy rolled.quality, and
+  // masterwork bonus into the freshly-enchanted instance instead of dropping
+  // them, and can re-stamp the craft marker a plain crafted stack carries on
+  // the slot rather than in a payload.
+  removeEnchantableItem(itemId: string, count: number, pid?: number): InventoryUnit[];
   completeQuestForDev(questId: string, pid?: number): boolean;
   completeCurrentQuestsForDev(pid?: number): number;
 
@@ -804,6 +840,7 @@ export interface SimContextCallbacks {
       forceCrit?: boolean;
       critBonus?: number;
       onDealt?: (amount: number) => void;
+      abilityId?: string | null;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;
@@ -962,6 +999,20 @@ export interface SimContextCallbacks {
   vcupShoot(caster: Entity, power: number, loft: number, range: number): void;
   vcupSportDash(caster: Entity, distance: number, catchBall: boolean): void;
   vcupSportShove(caster: Entity, target: Entity, distance: number): void;
+  // Thornhollow Fields battleground (social/battleground.ts). bgOnPlayerDeath is the
+  // death hook the damage hub calls for a fallen battleground player (carrier
+  // death drops the flag in place; releasing sends the spirit to the warded
+  // graveyard and the team wave raises it).
+  bgOnPlayerDeath(e: Entity, killer: Entity | null): void;
+  /** Damage hook: remember an enemy hit so the kill it leads to can pay assists. */
+  bgOnPlayerDamaged(victim: Entity, source: Entity): void;
+  /** Heal hook: remember allied support so a kill can pay the healers too. */
+  bgOnPlayerHealed(target: Entity, source: Entity): void;
+  /** Buff-cancel hook: `Sim.cancelAura` offers every cancel here FIRST. Returns
+   *  true when the id is the battleground's carried-flag buff, which is a DROP
+   *  affordance rather than a plain buff, so the generic aura splice must not
+   *  run for it (a carrier's cancel drops the flag; anyone else's is a no-op). */
+  bgCancelFlagAura(e: Entity, auraId: string): boolean;
 }
 
 // The seam consumed by extracted modules.
@@ -1145,6 +1196,27 @@ export function createSimContext(host: SimContextHost): SimContext {
     get yumiCatMatches() {
       return host.yumiCatMatches;
     },
+    get bgQueue() {
+      return host.bgQueue;
+    },
+    set bgQueue(v) {
+      host.bgQueue = v;
+    },
+    get bgMatches() {
+      return host.bgMatches;
+    },
+    get bgBusySlots() {
+      return host.bgBusySlots;
+    },
+    get bgOutcomes() {
+      return host.bgOutcomes;
+    },
+    get nextBgMatchId() {
+      return host.nextBgMatchId;
+    },
+    set nextBgMatchId(v) {
+      host.nextBgMatchId = v;
+    },
     get escortRuns() {
       return host.escortRuns;
     },
@@ -1199,6 +1271,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     get bankerIds() {
       return host.bankerIds;
     },
+    get guildBanks() {
+      return host.guildBanks;
+    },
     get vcup() {
       return host.vcup;
     },
@@ -1219,6 +1294,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get mobScanCounters() {
       return host.mobScanCounters;
+    },
+    get commissionOrderBoard() {
+      return host.commissionOrderBoard;
+    },
+    get nextCommissionOrderId() {
+      return host.nextCommissionOrderId;
+    },
+    set nextCommissionOrderId(v) {
+      host.nextCommissionOrderId = v;
     },
     emit: host.emit,
     error: host.error,
@@ -1459,5 +1543,10 @@ export function createSimContext(host: SimContextHost): SimContext {
     vcupShoot: host.vcupShoot,
     vcupSportDash: host.vcupSportDash,
     vcupSportShove: host.vcupSportShove,
+    // Thornhollow Fields battleground hooks (points at social/battleground.ts via Sim).
+    bgOnPlayerDeath: host.bgOnPlayerDeath,
+    bgOnPlayerDamaged: host.bgOnPlayerDamaged,
+    bgOnPlayerHealed: host.bgOnPlayerHealed,
+    bgCancelFlagAura: host.bgCancelFlagAura,
   };
 }

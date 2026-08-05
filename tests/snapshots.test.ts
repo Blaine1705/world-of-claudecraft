@@ -3316,9 +3316,11 @@ const ALL_DELTA_KEYS = [
   'atitle',
   'bags',
   'bank',
+  'bg',
   'buyback',
   'cardDuel',
   'cds',
+  'corder',
   'corpse',
   'cosmetics',
   'cprof',
@@ -3338,6 +3340,7 @@ const ALL_DELTA_KEYS = [
   'ench',
   'equip',
   'gprof',
+  'guildBank',
   'hbl',
   'honor',
   'inv',
@@ -3395,6 +3398,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   buyback: 'vendorBuyback',
   bval: 'blockValue',
   cds: 'cooldowns',
+  corder: 'commissionOrders',
   cosmetics: 'accountCosmetics',
   cprof: 'craftingIdentity',
   dclears: 'delveClears',
@@ -3412,6 +3416,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ench: 'lastEnchantResult',
   equip: 'equipment',
   gprof: 'gatheringProficiency',
+  guildBank: 'guildBankInfo',
   inv: 'inventory',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
@@ -3511,6 +3516,15 @@ function dirtyEveryDeltaField(): {
   const banker = sim.entities.get(sim.bankerIds[0]);
   if (banker) banker.pos = { ...p.pos };
   meta.bank.inventory = [{ itemId: 'wolf_fang', count: 2 }];
+  // `guildBank`: guildBankInfoFor additionally needs an officer-plus membership
+  // stamp and a loaded guild book (the banker relocated above covers proximity);
+  // a non-empty treasury + slot makes the mirror distinguishable.
+  sim.setPlayerGuildMembership(lp, { guildId: 7, rank: 'officer' });
+  sim.loadGuildBank(7, {
+    treasury: 12345,
+    inventory: [{ itemId: 'wolf_fang', count: 4 }],
+    purchasedSlots: 30, // opened (24) + one expansion: a valid ladder position
+  });
 
   // Direct PlayerMeta fields.
   // The reins item both dirties `inv` further and flips `mntOwn` (the owned
@@ -3562,6 +3576,7 @@ function dirtyEveryDeltaField(): {
     attunedPairs: ['weaponcrafting+armorcrafting'],
     switchCount: 2,
     amendsProgress: 4,
+    isJackOfAllTrades: false,
   };
   // An ACTIVE mobile crafting station (`mst`): set directly on the
   // meta slot (the placement command's specialization gate is pinned in
@@ -3726,6 +3741,7 @@ describe('full self-state snapshot delta fixture', () => {
       attunedPairs: ['weaponcrafting+armorcrafting'],
       switchCount: 0,
       amendsProgress: 0,
+      isJackOfAllTrades: false,
     };
     // Reagents for the warplate helm.
     meta.inventory = [
@@ -3894,10 +3910,20 @@ describe('full self-state snapshot delta fixture', () => {
     expect((client.tradeInfo as any)?.otherPid).toBe(memberPid); // trade -> tradeInfo
     expect((client.duelInfo as any)?.state).toBe('countdown'); // duel -> duelInfo
     expect(client.arenaInfo).not.toBeNull(); // arena -> arenaInfo
+    expect(client.bgInfo).not.toBeNull(); // bg -> bgInfo (queue/standing readout)
     expect(client.marketInfo).not.toBeNull(); // market -> marketInfo
     expect(client.marketCollectPending).toBe(true); // mktU -> marketCollectPending (truthy bit)
     expect(client.bankInfo).not.toBeNull(); // bank -> bankInfo
     expect(client.bankInfo?.slots).toEqual([{ itemId: 'wolf_fang', count: 2 }]); // bank contents mirror
+    expect(client.guildBankInfo).not.toBeNull(); // guildBank -> guildBankInfo
+    // guild bank mirror: the officer-gated boundary clone survives the wire whole
+    expect(client.guildBankInfo).toEqual({
+      treasury: 12345,
+      slots: [{ itemId: 'wolf_fang', count: 4 }],
+      capacity: 30,
+      purchasedSlots: 30,
+      nextExpansionPrice: 50000, // rung-2 literal
+    });
     expect(client.activeLootRolls().map((r) => r.rollId)).toEqual([1]); // lroll -> lootRollPrompts
     // mloot -> masterLootPrompts, via the activeMasterLootRolls() accessor. Roll 2
     // only: the curate-phase master roll is master-looter-only, and roll 1 (a plain
@@ -4180,9 +4206,11 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 63 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(63);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(63);
+  it('ALL_DELTA_KEYS contains exactly 66 unique keys in sorted order', () => {
+    // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
+    // commission order board's corder key (issue #1298).
+    expect(ALL_DELTA_KEYS).toHaveLength(66);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(66);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4204,8 +4232,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
-    // plus the packet's slotted-tool-effects key tslot for 63.
-    expect(scraped.size).toBe(63);
+    // plus the packet's slotted-tool-effects key tslot for 63, the
+    // battleground's bg self key for 64, guildBank (Guild Bank Phase 2)
+    // for 65, and this branch's commission order board key corder
+    // (issue #1298) for 66.
+    expect(scraped.size).toBe(66);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
