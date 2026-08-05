@@ -6654,6 +6654,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.recipeNotLearned'
   | 'hudChrome.crafting.resultAria'
   | 'hudChrome.crafting.skillReqLine'
+  | 'hudChrome.crafting.skillUpSubtext'
+  | 'hudChrome.crafting.skillUpToast'
   | 'hudChrome.crafting.stationBadge'
   | 'hudChrome.crafting.stationName.apothecary'
   | 'hudChrome.crafting.stationName.forge'

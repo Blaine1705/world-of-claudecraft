@@ -2747,6 +2747,8 @@ export const en_XA: EnTranslations = {
       "masterworkToast": "[Ɱášţéŕŵóŕķ! {name}]",
       "masterworkZoneLine": "[{crafter} çŕáƒţéð á ɱášţéŕŵóŕķ {name}!]",
       "tierUpToast": "[{craft} áðʋáñçéð ţó ţíéŕ {tier}!]",
+      "skillUpToast": "[{skill} šķíļļ íñçŕéášéð ţó {level}!]",
+      "skillUpSubtext": "[Šķíļļ íñçŕéášéð ţó {level}!]",
       "trendNudge": "[Ýóúŕ ĥáñðš áŕé ļéáñíñĝ ţóŵáŕð ţĥé {archetype}. Íţš áţţúñéɱéñţ ŵáíţš ŵíţĥ {master}.]",
       "trendNudgeNoMaster": "[Ýóúŕ ĥáñðš áŕé ļéáñíñĝ ţóŵáŕð ţĥé {archetype}. Šééķ á çŕáƒţ ɱášţéŕ ţó ţáķé íţ úþ.]",
       "attunedZoneLine": "[{name} ĥáš áţţúñéð áš {archetype}!]",

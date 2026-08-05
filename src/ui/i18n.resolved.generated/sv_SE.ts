@@ -2747,6 +2747,8 @@ export const sv_SE: EnTranslations = {
       "masterworkToast": "Mästerverk! {name}",
       "masterworkZoneLine": "{crafter} skapade ett mästerverk {name}!",
       "tierUpToast": "{craft} avancerat till nivå {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Dina händer lutar mot {archetype}. Dess inriktning väntar hos {master}.",
       "trendNudgeNoMaster": "Dina händer lutar mot {archetype}. Sök en hantverksmästare för att ta det upp.",
       "attunedZoneLine": "{name} har inriktats som {archetype}!",

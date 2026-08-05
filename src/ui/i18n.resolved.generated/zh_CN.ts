@@ -2747,6 +2747,8 @@ export const zh_CN: EnTranslations = {
       "masterworkToast": "杰作！{name}",
       "masterworkZoneLine": "{crafter}制作出了杰作{name}！",
       "tierUpToast": "{craft}提升至阶级 {tier}！",
+      "skillUpToast": "{skill}技能提升至 {level}！",
+      "skillUpSubtext": "技能提升至 {level}！",
       "trendNudge": "你的双手正倾向于{archetype}之道。其调谐任务在{master}处等候。",
       "trendNudgeNoMaster": "你的双手正倾向于{archetype}之道。去寻找一位工艺大师来踏上此道吧。",
       "attunedZoneLine": "{name}已调谐为{archetype}！",

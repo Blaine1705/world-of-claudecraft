@@ -2747,6 +2747,8 @@ export const ru_RU: EnTranslations = {
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
       "tierUpToast": "{craft}: достигнут ранг {tier}!",
+      "skillUpToast": "{skill}: навык повышен до {level}!",
+      "skillUpSubtext": "Навык повышен до {level}!",
       "trendNudge": "Ваши руки склоняются к пути «{archetype}». Настройка на него ждёт у {master}.",
       "trendNudgeNoMaster": "Ваши руки склоняются к пути «{archetype}». Найдите мастера ремесла, чтобы встать на него.",
       "attunedZoneLine": "{name} настроился как «{archetype}»!",

@@ -2747,6 +2747,8 @@ export const da_DK: EnTranslations = {
       "masterworkToast": "Mesterværk! {name}",
       "masterworkZoneLine": "{crafter} lavede et mesterværk {name}!",
       "tierUpToast": "{craft} avanceret til niveau {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Dine hænder læner sig mod {archetype}. Dens indstilling venter hos {master}.",
       "trendNudgeNoMaster": "Dine hænder læner sig mod {archetype}. Søg en håndværksmester for at tage det op.",
       "attunedZoneLine": "{name} er indstillet som {archetype}!",

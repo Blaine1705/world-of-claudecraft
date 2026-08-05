@@ -530,7 +530,7 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
-import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
+import { MASTERWORK_SEAL_IMAGE_URL, professionImageUrl } from './profession_art';
 import { type ProfessionEventInput, planProfessionEvent } from './profession_event_lines_core';
 import {
   buildProfessionIdentityView,
@@ -554,6 +554,12 @@ import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import { localizeSimText } from './sim_i18n';
 import { openSimpleMenu } from './simple_context_menu';
+import {
+  advanceSkillLevelObservation,
+  buildSkillLevelCelebrationPlan,
+  type SkillLevelUp,
+  skillLevelArtId,
+} from './skill_level_toast_view';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stanceBarView, WARRIOR_STANCE_GROUP } from './stance_bar_view';
@@ -957,8 +963,10 @@ const PET_MODE_DESC_KEYS: Record<PetMode, TranslationKey> = {
  *  crossing, craft masterwork, duel result). 'deed' is the Book of Deeds
  *  plate: a framed, quieter parchment treatment, because a deed accomplishment
  *  firing an identical gold banner to a real level-up is a known cause of
- *  players reading routine gathering progress as leveling. */
-export type BannerVariant = 'default' | 'deed';
+ *  players reading routine gathering progress as leveling. 'skill' is the
+ *  gathering skill milestone plate: copper craft framing with the profession
+ *  crest, so a Mining 50 plate can never steal the character level-up reading. */
+export type BannerVariant = 'default' | 'deed' | 'skill';
 
 /** Everything one banner paint needs, held whole so a queued banner (R38)
  *  renders later exactly as it would have rendered immediately. */
@@ -1514,6 +1522,13 @@ export class Hud {
   // Drains left in the post-craftResult window during which the tier-up diff
   // runs (0 = disarmed; see the handleEvents tail).
   private craftTierUpDrains = 0;
+  // Profession skill level-up snapshots (craft + gathering): the last SYNCED
+  // observation handleEvents diffs for floored integer skill climbs. null
+  // until the first synced observation (silent login/join baseline). Separate
+  // from the tier-up snapshot so a fractional craft skill carry never desyncs
+  // either consumer, and so gathering proficiency has its own baseline.
+  private prevCraftSkillLevels: Record<string, number> | null = null;
+  private prevGatheringSkillLevels: Record<string, number> | null = null;
   // Signature of the in-range station-type set as of the last crafting-window
   // paint (stations.ts stationTypesSignature): the slow band compares the live
   // set against this to keep an OPEN window fresh without per-frame repaints
@@ -12281,16 +12296,105 @@ export class Hud {
     // event payload. The armed-window rules (bounded post-craftResult drains,
     // the synced guard, the silent first init, disarm-on-change) live in the
     // pure step observeCraftSkillsForTierUps (craft_celebration_view.ts).
+    // One craftingIdentity/craftSkills read per drain, shared by the tier-up
+    // and skill-level observations below: this tail runs every drain and the
+    // offline getters allocate a fresh copy per access.
+    const identitySynced = sim.craftingIdentity.synced;
+    const craftSkillsNow = sim.craftSkills;
     const obs = observeCraftSkillsForTierUps(
-      sim.craftingIdentity.synced,
+      identitySynced,
       this.prevCraftSkills,
-      sim.craftSkills,
+      craftSkillsNow,
       this.craftTierUpDrains,
     );
     this.prevCraftSkills = obs.prev;
     this.craftTierUpDrains = obs.drains;
     if (masterworkItemId !== null || obs.tierUps.length > 0)
       this.handleCraftCelebrations(masterworkItemId, obs.tierUps);
+    // Profession skill level-ups (floored craft skill + gathering proficiency):
+    // also STATE-driven. Always-on after a silent synced baseline so a quiet
+    // post-gather drain (proficiency applies the next tick) and enchant /
+    // battlefield trickle still land their chat lines without arming every
+    // event arm. Both families gate on the cprof identity sync flag: the
+    // server ships cprof and gprof unconditionally in the same self snapshot
+    // (server/game.ts selfWireJson), and offline both are always synced.
+    const craftSkillObs = advanceSkillLevelObservation(
+      identitySynced,
+      this.prevCraftSkillLevels,
+      craftSkillsNow,
+    );
+    this.prevCraftSkillLevels = craftSkillObs.prev;
+    const gatherSkillObs = advanceSkillLevelObservation(
+      identitySynced,
+      this.prevGatheringSkillLevels,
+      sim.gatheringProficiency,
+    );
+    this.prevGatheringSkillLevels = gatherSkillObs.prev;
+    if (craftSkillObs.skillUps.length > 0 || gatherSkillObs.skillUps.length > 0)
+      this.handleSkillLevelCelebrations(
+        craftSkillObs.skillUps,
+        gatherSkillObs.skillUps,
+        // One celebration chime per drain across the whole tail: stand down
+        // when a tier-up, masterwork, or deed celebration just chimed (a
+        // retro-only deed drain draws no chime; over-suppressing there only
+        // quiets a login catch-up, never a live earned moment).
+        masterworkItemId !== null || obs.tierUps.length > 0 || deedUnlocks.length > 0,
+      );
+  }
+
+  // Profession skill level-ups (gathering + craft counters): pure plan in
+  // skill_level_toast_view.ts. Chat log for EVERY floor climb (the classic
+  // per-point skill message); the copper skill plate, polite announce, and
+  // celebration chime only for a gathering milestone crossing (the plan's
+  // cadence rules; craft boundaries belong to the tier-up celebration).
+  // Presentation is deliberately NOT the bare gold level-up language
+  // (players used to misread gathering milestones as character levels).
+  private handleSkillLevelCelebrations(
+    craftUps: SkillLevelUp[],
+    gatherUps: SkillLevelUp[],
+    celebrationAlreadyChimed: boolean,
+  ): void {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = buildSkillLevelCelebrationPlan(
+      craftUps,
+      gatherUps,
+      reducedMotion,
+      celebrationAlreadyChimed,
+    );
+    const skillName = (skillId: string): string => {
+      const gatherKey = gatheringProfessionNameKey(skillId);
+      if (gatherKey) return t(gatherKey);
+      return craftNameText(skillId);
+    };
+    const toastText = (up: SkillLevelUp) =>
+      t('hudChrome.crafting.skillUpToast', {
+        skill: skillName(up.skillId),
+        level: formatNumber(up.toLevel, { maximumFractionDigits: 0 }),
+      });
+    for (const up of plan.skillUpLogs) this.log(toastText(up), '#ffd100');
+    if (plan.banner !== null) {
+      const artUrl = professionImageUrl(skillLevelArtId(plan.banner.skillId));
+      // Celebration class 'deed': queues behind level-ups, never ambient
+      // replace, so a milestone landing after a ding still plays in order.
+      // The skill VARIANT is the copper plate; class and variant are
+      // orthogonal. The title is the skill name, already localized through
+      // gatheringProfessionNameKey above, so no wrapper key is needed.
+      this.showCelebrationBanner(
+        skillName(plan.banner.skillId),
+        'deed',
+        'skill',
+        plan.motion,
+        artUrl ?? undefined,
+        t('hudChrome.crafting.skillUpSubtext', {
+          level: formatNumber(plan.banner.toLevel, { maximumFractionDigits: 0 }),
+        }),
+      );
+      // The banner div carries no live semantics, so the polite #combat-live
+      // region carries the combined line (skill name AND level in one string,
+      // the level the visual title omits).
+      this.combatAnnouncer.push(toastText(plan.banner), performance.now());
+    }
+    if (plan.playSound) audio.achievement();
   }
 
   // The crafted earned moment, planned purely (craft_celebration_view) so the
@@ -13270,18 +13374,21 @@ export class Hud {
   }
 
   /** The celebration form of showBanner (R38): full motion, the standard
-   *  2600ms duration, queued under the given class. Exists so the four
+   *  2600ms duration, queued under the given class. Exists so the
    *  celebration call sites stop threading five defaults positionally to
    *  reach the class argument (and so changing the default duration cannot
    *  strand them). `motion` stays a parameter for the reduced-motion
-   *  celebration plans (the attunement banner). */
+   *  celebration plans; `decorativeIconUrl` and `subtext` carry the art-plus-
+   *  detail plates (the gathering skill milestone). */
   showCelebrationBanner(
     text: string,
     bannerClass: 'levelup' | 'deed',
     variant: BannerVariant = 'default',
     motion = true,
+    decorativeIconUrl?: string,
+    subtext?: string,
   ): void {
-    this.showBanner(text, motion, undefined, variant, undefined, 2600, null, bannerClass);
+    this.showBanner(text, motion, decorativeIconUrl, variant, subtext, 2600, null, bannerClass);
   }
 
   /** The paint half of the banner slot: renders one payload and arms the
@@ -13298,7 +13405,20 @@ export class Hud {
       const detail = document.createElement('span');
       detail.className = 'banner-subtext';
       detail.textContent = subtext;
-      this.bannerEl.replaceChildren(title, detail);
+      if (decorativeIconUrl) {
+        // Art-plus-subtext plate (the gathering skill milestone, and any
+        // future variant): crest beside a title/detail column. The wrapper is
+        // variant-agnostic; #banner.banner-with-art.has-subtext styles it.
+        const copy = document.createElement('span');
+        copy.className = 'banner-art-copy';
+        copy.append(title, detail);
+        this.bannerEl.replaceChildren(
+          decorativeArtImg(document, 'banner-art', decorativeIconUrl),
+          copy,
+        );
+      } else {
+        this.bannerEl.replaceChildren(title, detail);
+      }
     } else {
       const copy = document.createElement('span');
       copy.className = 'banner-copy';
@@ -13312,11 +13432,12 @@ export class Hud {
         this.bannerEl.replaceChildren(copy);
       }
     }
-    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl) && !subtext);
+    this.bannerEl.classList.toggle('banner-with-art', Boolean(decorativeIconUrl));
     // The banner is ONE reused element, so every variant class must be
     // toggled off as well as on: the next unrelated banner through this slot
     // would otherwise inherit the previous one's visual language.
     this.bannerEl.classList.toggle('banner-deed', variant === 'deed');
+    this.bannerEl.classList.toggle('banner-skill', variant === 'skill');
     // Reduced-motion celebrations (craft plan.motion) show and hide the
     // banner without the fade transition: identical text and duration, no
     // animation. Motion-trimming only; information always survives.
