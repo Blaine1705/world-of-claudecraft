@@ -9401,6 +9401,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.soul_rend': 'Разрыв души (отмеченным разойтись и получать лечение)',
   'hudChrome.finder.mech.deathless_rage': 'Бессмертная ярость (прерывается у охранных камней)',
   'hudChrome.finder.mech.wardstones': 'Охранные камни (смена фазы)',
+  'hudChrome.finder.mech.dread_curse':
+    'Проклятие ужаса (только на героическом, накапливающийся дебафф смены танка)',
   'hudChrome.steam.link': 'Привязать Steam',
   'hudChrome.steam.unlink': 'Отвязать Steam',
   'hudChrome.steam.linked': 'Привязан аккаунт Steam {id}',

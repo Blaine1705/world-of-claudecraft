@@ -726,7 +726,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_CN": [
     "hudChrome.bg.clock",
-    "hudChrome.finder.mech.dread_curse",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
@@ -734,7 +733,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "zh_TW": [
     "hudChrome.bg.clock",
-    "hudChrome.finder.mech.dread_curse",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
@@ -742,7 +740,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ko_KR": [
     "hudChrome.bg.clock",
-    "hudChrome.finder.mech.dread_curse",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
@@ -750,7 +747,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ja_JP": [
     "hudChrome.bg.clock",
-    "hudChrome.finder.mech.dread_curse",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
@@ -877,7 +873,6 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "ru_RU": [
     "hudChrome.bg.clock",
-    "hudChrome.finder.mech.dread_curse",
     "hudChrome.materialHint.usedBy",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
