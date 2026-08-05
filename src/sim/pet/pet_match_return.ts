@@ -70,8 +70,9 @@ export function snapshotMatchPet(ctx: SimContext, ownerPid: number): MatchPetSna
 
 /**
  * Carry forward harmless pre-fight pet changes that happen after match formation.
- * The countdown can tick pet owner-scaling and passive regen before the gates open,
- * so the return snapshot must follow the same living entity into the active bout.
+ * The countdown can tick passive regen before the gates open, so the return
+ * snapshot follows the same living entity into the active bout. Call this before
+ * fighter normalization, which can rescale the owner's pet.
  */
 export function refreshMatchPetSnapshot(
   ctx: SimContext,

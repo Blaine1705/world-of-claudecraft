@@ -636,10 +636,10 @@ export function updateArena(ctx: SimContext): void {
         match.state = 'active';
         match.timer = 0;
         const matchPids = arenaAllPids(match);
-        for (const e of fighters)
-          readyArenaFighter(ctx, e, { clearPrep: false, keepValidTargetPids: matchPids });
         for (const pid of matchPids)
           refreshMatchPetSnapshot(ctx, pid, match.preMatchPets?.get(pid));
+        for (const e of fighters)
+          readyArenaFighter(ctx, e, { clearPrep: false, keepValidTargetPids: matchPids });
         for (const mPid of arenaAllPids(match)) {
           ctx.emit({
             type: 'log',
