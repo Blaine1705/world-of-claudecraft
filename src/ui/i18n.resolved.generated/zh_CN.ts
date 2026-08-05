@@ -2624,6 +2624,18 @@ export const zh_CN: EnTranslations = {
         "artisansEye": "匠人之眼",
         "quickeningCharm": "回春符"
       },
+      "toolEffectTooltip": {
+        "kind": "工具符咒",
+        "bonus": {
+          "gatherersCache": "充能期间每次采集产出+1。",
+          "artisansEye": "充能期间将收获品级提升1个工具等级。",
+          "quickeningCharm": "缩短其触发的资源节点重生计时。"
+        },
+        "howToSlot": "在专业窗口中将其镶嵌到采矿、伐木或草药学工具上。镶嵌后即消耗。",
+        "charges": "普通品质工具初始有{base}次充能（稀有度每升一级+{bonus}次）。",
+        "landOnly": "无法镶嵌到鱼竿上。",
+        "openProfessions": "打开专业窗口，将其镶嵌到采集工具上。"
+      },
       "toolEffectSlotButton": "镶嵌{effect}",
       "toolEffectRechargeButton": "充能",
       "toolEffectSlotted": "{effect}已镶嵌到{profession}。",
