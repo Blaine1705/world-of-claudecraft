@@ -104,11 +104,44 @@ describe('ranged carries are not handed', () => {
   // Bows are left-hand props (weaponSkinAttachBone moves drawn bows to
   // handslot.l for the draw animation's front arm), so before this rule every
   // sheathed bow took the mirrored pose.
-  for (const family of ['VAR_BOW', 'VAR_CROSSBOW', '1H_Crossbow', '2H_Crossbow']) {
+  for (const family of ['VAR_CROSSBOW', '1H_Crossbow', '2H_Crossbow']) {
     it(`${family} sheathes identically in either hand`, () => {
       expect(backGripFor(family, 'l')).toEqual(backGripFor(family, 'r'));
     });
   }
+
+  it('a sheathed BOW lies diagonally across the back, not vertically up the spine', () => {
+    // Reported from live play: the bow stood straight up the spine. It had
+    // inherited the crossbow carry, whose Math.PI / 2 yaw lays a wide T-shaped
+    // body flat across the shoulders but leaves a tall bow arc vertical.
+    const rotate = (q: readonly number[], v: readonly number[]) => {
+      const [x, y, z, w] = q;
+      const [vx, vy, vz] = v;
+      const ix = w * vx + y * vz - z * vy;
+      const iy = w * vy + z * vx - x * vz;
+      const iz = w * vz + x * vy - y * vx;
+      const iw = -x * vx - y * vy - z * vz;
+      return [
+        ix * w + iw * -x + iy * -z - iz * -y,
+        iy * w + iw * -y + iz * -x - ix * -z,
+        iz * w + iw * -z + ix * -y - iy * -x,
+      ];
+    };
+    // The bow models are long along their local +Y (1.80 of a 2.6 body).
+    const tiltOf = (family: string) => {
+      const a = rotate(backGripFor(family, 'r').quaternion, [0, 1, 0]);
+      return (Math.atan2(Math.hypot(a[0], a[2]), Math.abs(a[1])) * 180) / Math.PI;
+    };
+    // Diagonal, in the same band as the greatsword carry it borrows from.
+    expect(tiltOf('VAR_BOW')).toBeGreaterThan(30);
+    expect(tiltOf('VAR_BOW')).toBeCloseTo(tiltOf('2H_Sword'), 0);
+    // The crossbow keeps its own flat-across-the-shoulders carry.
+    expect(tiltOf('VAR_CROSSBOW')).toBeLessThan(5);
+    // And the bow must not poke out through the chest: the long axis stays
+    // near the back plane rather than swinging forward.
+    const axis = rotate(backGripFor('VAR_BOW', 'r').quaternion, [0, 1, 0]);
+    expect(Math.abs(axis[2])).toBeLessThan(0.2);
+  });
 
   it('still mirrors a bladed carry, so dual wield keeps its crossed blades', () => {
     const right = backGripFor('1H_Sword', 'r');
