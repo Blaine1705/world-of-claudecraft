@@ -16,6 +16,7 @@ import {
   cssEffectsTier,
   readBrowserEnv,
 } from './game/browser_env';
+import { hideBrowserSupportNotice, initBrowserSupportNotice } from './game/browser_support_notice';
 import { isCameraDrivenFacingActive } from './game/camera_driven_facing';
 import {
   cameraFollowShouldSettle,
@@ -61,6 +62,19 @@ import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
+import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
+import {
+  type GraphicsSettingsSnapshot,
+  graphicsApplyMode,
+  graphicsSettingsSnapshotsEqual,
+  normalizeGraphicsSettingsSnapshot,
+} from './game/graphics_rebuild_core';
+import {
+  clearGraphicsRebuildProbe,
+  consumeGraphicsRebuildCrashProbe,
+  stampGraphicsRebuildProbe,
+  updateGraphicsRebuildProbePhase,
+} from './game/graphics_rebuild_crash_guard';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
@@ -98,6 +112,7 @@ import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
 import { tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
+import { padReelItemId } from './game/pad_reel';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
@@ -120,7 +135,7 @@ import {
 } from './game/spawn_cinematic';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
-import { resolveUiEffectsProfile } from './game/ui_effects_profile';
+import { loadingCurtainFadeMs, resolveUiEffectsProfile } from './game/ui_effects_profile';
 import { currentUtcDay } from './game/utc_day';
 import { voice } from './game/voice';
 import { telemetryZoneId } from './game/world_telemetry';
@@ -159,6 +174,10 @@ import {
 } from './net/native_discord';
 import { notifyOtaAppReady } from './net/native_ota';
 import {
+  createNativeSolanaWalletClient,
+  nativeSolanaMobileBridge,
+} from './net/native_solana_mobile';
+import {
   Api,
   ApiError,
   type CharacterSummary,
@@ -178,10 +197,15 @@ import {
   resumeRoute,
   savePlayMarker,
 } from './net/resume_play';
+import { createSeekerEntitlementSync } from './net/seeker_entitlement_sync';
 import { openStripeCheckout } from './net/stripe_checkout';
 import type { WalletOption, WalletPickerMode, WalletPickerResult } from './net/wallet';
 import { resolveWalletCapability } from './net/wallet_capability';
 import { installWalletResumeHandlers } from './net/wallet_resume';
+import {
+  prepareGraphicsProfileAssets,
+  resetGraphicsProfileDerivedCaches,
+} from './render/assets/graphics_profile';
 import { assetsReady, beginDeferredPreloads } from './render/assets/preload';
 import { CharacterPreview, type PreviewAppearance } from './render/characters';
 import {
@@ -195,10 +219,20 @@ import {
   onPortraitsReady,
   onPortraitUpdate,
   playerPortraitDataUrl,
+  resetPortraitRendererForGraphicsRebuild,
 } from './render/characters/portrait';
+import { type RecycledRendererContext, recycleWebGL2Context } from './render/context_recycle';
 import { installWebGLContextRelease } from './render/context_release';
 import { setDayNightPhaseOverride } from './render/day_night_clock';
-import { firstRunGraphicsPreset, GFX, graphicsPresetLabel } from './render/gfx';
+import {
+  activateGfxProfile,
+  captureGfxCapabilities,
+  firstRunGraphicsPreset,
+  GFX,
+  getActiveGfxProfile,
+  graphicsPresetLabel,
+  resolveGfxProfile,
+} from './render/gfx';
 import { Renderer } from './render/renderer';
 import {
   hasAuthoritativeSelfPositionDiscontinuity,
@@ -224,6 +258,7 @@ import {
 } from './sim/data';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
+import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
@@ -237,6 +272,7 @@ import {
   type WorldContent,
 } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
+import { WORLD_SEED } from './sim/world_seed';
 import { startSitePresence } from './site_presence';
 import {
   accountPortalModel,
@@ -287,8 +323,11 @@ import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { refreshEpicLinkStatus, wireEpicLink } from './ui/epic_link';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
-import { attachGatherNodeHoverTooltip, gatherNodeToolGateFor } from './ui/gather_node_tooltip';
-import { gatherToolNoNodeKey } from './ui/gathering_view';
+import {
+  attachGatherNodeHoverTooltip,
+  gatherNodeToolGateFor,
+} from './ui/gather_node_tooltip_controller';
+import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/gathering_view';
 import { loadHighscoresInto } from './ui/highscore_board';
 import { type ClaudiumHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
@@ -324,6 +363,7 @@ import {
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
+import { mobileMountAction } from './ui/mount_quick_summon';
 import { applyNativeDeviceLanguage } from './ui/native_language';
 import { scheduleNativeUpdateCheck } from './ui/native_update_prompt';
 import { loadNewsInto } from './ui/news_feed';
@@ -360,7 +400,6 @@ import { buildWalletConnectionView } from './ui/wallet_connection_view';
 import { formatXp } from './ui/xp_bar';
 import type { IWorld, LeaderboardEntry } from './world_api';
 
-const WORLD_SEED = 20061; // fixed: World of ClaudeCraft is a persistent place
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
 const CLICK_MOVE_REROUTE_DISTANCE = 4; // yards; live entity targets can move this far before we recompute the path
@@ -871,12 +910,18 @@ function requestPreferredFullscreen(): void {
 // Loading screen (shown from "enter world" until the first frame renders)
 // ---------------------------------------------------------------------------
 
-const LOADING_FADE_MS = 350; // keep in sync with the #loading-screen CSS transition
 const LOADING_TIP_ROTATE_MS = 5000;
 
 let loadingHideTimer: number | null = null;
 let loadingTipRotation: LoadingTipRotation | null = null;
 let loadingTipTimer: number | null = null;
+
+function loadingCurtainFadeDelayMs(): number {
+  const osReducedMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return loadingCurtainFadeMs(new Settings().get('reduceMotion') || osReducedMotion);
+}
 
 function showLoadingScreen(statusText: string): void {
   const el = $('#loading-screen');
@@ -947,7 +992,7 @@ function hideLoadingScreen(): void {
   loadingHideTimer = window.setTimeout(() => {
     el.classList.remove('visible', 'fade');
     loadingHideTimer = null;
-  }, LOADING_FADE_MS);
+  }, loadingCurtainFadeDelayMs());
 }
 
 // Resolve only after the browser has actually painted. The scene build
@@ -978,6 +1023,9 @@ function enterLoadingState(statusText: string): void {
   showLoadingScreen(statusText);
   $('#start-screen').style.display = 'none';
   releaseStartScreenPreview();
+  // Landing-only advisory: never let it survive into the world on top of
+  // in-world HUD chrome (it shares the chat frame's bottom-left corner).
+  hideBrowserSupportNotice();
 }
 
 async function prepareWorldEntry(): Promise<boolean> {
@@ -1083,6 +1131,9 @@ async function startGame(
   }
   let renderer!: Renderer;
   let rendererReady = false;
+  // The world and socket stay live, but every client-frame owner pauses while
+  // the renderer is recycled. The frame loop also clears its offline backlog.
+  let graphicsRebuildPaused = false;
   let hud!: Hud;
   const baseEntryDiagnostics = (): EntryDiagnostics => {
     const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
@@ -1299,7 +1350,7 @@ async function startGame(
     // constructor ran initGfxTier, so the adapter verdict is resolved by now.
     initSoftwareRenderNotice(DESKTOP_APP);
     hud = new Hud(world, renderer, keybinds, {
-      dailyRewardsEnabled: !NATIVE_APP,
+      dailyRewardsEnabled: NATIVE_APP ? await walletCapabilityReady : true,
       devCommandsEnabled: import.meta.env.DEV,
       constrainedMemory: GFX.constrainedMemory,
     });
@@ -1614,6 +1665,7 @@ async function startGame(
   // One keyboard/gamepad action gate for every blocking client surface. The
   // camera prompt lives outside Hud, so it reports its open state explicitly.
   const gameplayInputBlocked = () =>
+    graphicsRebuildPaused ||
     hud.isModalOpen() ||
     hud.promptModalOpen() ||
     cameraPromptOpen() ||
@@ -1767,7 +1819,19 @@ async function startGame(
   const mobileControls = new MobileControls(input, {
     onCycleTarget: () => world.tabTarget(),
     onJump: () => input.triggerTouchJump(),
-    onInteract: () => interactKey(),
+    onInteract: () => {
+      // The touch twin of the pad reel arm (pad_reel.ts, the dispatch's
+      // 'interact' case below): mid fishing cast the Use press answers the
+      // bite with the carried implement instead of running the nearby scan
+      // over a live bobber (the phase 14 QA found the touch path still had
+      // the exact failure the pad arm closed).
+      const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+      if (reelRod !== null) {
+        world.useItem(reelRod);
+        return;
+      }
+      interactKey();
+    },
     onChat: () => openChat(),
     onChatOpen: () => openChatRead(),
     onChatClose: () => closeChat(),
@@ -1792,7 +1856,17 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
-    onMountToggle: () => world.toggleMounted(),
+    onMountToggle: () => {
+      // Dismount is the shared toggleMounted() path (unchanged); summoning an
+      // owned mount from a single tap goes through its reins item directly,
+      // since toggleMounted() itself never summons (src/ui/mount_quick_summon.ts).
+      // bagOwnedMounts (bags only, never bank) matches what useItem can
+      // actually summon: world.ownedMounts() includes bank-only reins that
+      // useItem would refuse (#2739 followup).
+      const action = mobileMountAction(world.player.mountKey, bagOwnedMounts(world.inventory));
+      if (action.kind === 'summon') world.useItem(action.itemId);
+      else world.toggleMounted();
+    },
     onProfessions: () => hud.toggleProfessions(),
     onNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
     onMusic: () => {
@@ -1889,9 +1963,21 @@ async function startGame(
       case 'targetFriendlyNext':
         world.friendlyTabTarget();
         break;
-      case 'interact':
+      case 'interact': {
+        // The pad reel (the UX pass): mid fishing cast, the interact press
+        // answers the bite by re-using the rod (the sim's armed-window arm),
+        // instead of running a nearby scan over a live bobber and forcing
+        // the angler into cursor-mode bag clicks. Resolves the B-button
+        // interact conflict for pad anglers; keyboard anglers keep their
+        // hotbar/bags press unchanged.
+        const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+        if (reelRod !== null) {
+          world.useItem(reelRod);
+          break;
+        }
         interactKey();
         break;
+      }
       case 'bags':
         hud.toggleBags();
         break;
@@ -1946,6 +2032,44 @@ async function startGame(
       case 'professions':
         hud.toggleProfessions();
         break;
+      case 'crafting':
+        // The controller panel has always OFFERED this bind (it lists every
+        // edge keybind action); the dispatch dropped it silently.
+        hud.toggleCrafting();
+        break;
+      case 'petStop':
+        // The pet edges, the dungeon finder, and the sheathe toggle: the
+        // same offered-but-dropped sweep that found Crafting (the controller
+        // panel lists every edge keybind action), each wired to its exact
+        // keyboard handler.
+        world.setPetMode('passive');
+        break;
+      case 'petTaunt':
+        world.petTaunt();
+        break;
+      case 'petAttack':
+        world.petAttack();
+        break;
+      case 'petDefensive':
+        world.setPetMode('defensive');
+        break;
+      case 'petAggressive':
+        world.setPetMode('aggressive');
+        break;
+      case 'dungeonFinder':
+        hud.toggleDungeonFinder();
+        break;
+      case 'sheathe': {
+        // The keyboard arm's exact rule: the world owns the gate, the cue
+        // plays only when the state moved.
+        const wasStowed = world.player.weaponStowed;
+        world.toggleWeaponStow();
+        if (world.player.weaponStowed !== wasStowed) {
+          if (world.player.weaponStowed) audio.weaponSheathe();
+          else audio.weaponUnsheathe();
+        }
+        break;
+      }
       case 'chat':
         openChat();
         break;
@@ -2374,6 +2498,194 @@ async function startGame(
   const saved = settings.all();
   for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
 
+  const captureGraphicsSettings = (): GraphicsSettingsSnapshot =>
+    normalizeGraphicsSettingsSnapshot({
+      graphicsPreset: settings.get('graphicsPreset'),
+      terrainDetail: settings.get('terrainDetail'),
+      foliageDensity: settings.get('foliageDensity'),
+      surfaceDetail: settings.get('surfaceDetail'),
+      effectsQuality: settings.get('effectsQuality'),
+      shadowQuality: settings.get('shadowQuality'),
+    });
+  let appliedGraphicsSettings = captureGraphicsSettings();
+  const graphicsCapabilities = captureGfxCapabilities(renderer.webgl);
+
+  const configureRebuiltRenderer = (next: Renderer): void => {
+    next.showNameplates = renderer.showNameplates;
+    next.showDevBadges = settings.get('showDevBadges');
+    next.showOwnNameplate = settings.get('showOwnNameplate');
+    next.showPlayerNameplates = settings.get('showPlayerNameplates');
+    next.reduceMotionSetting = settings.get('reduceMotion');
+    next.setBrightness(settings.get('brightness'));
+    next.setCameraFov(settings.get('cameraFov'));
+    next.setRenderScale(settings.get('renderScale'));
+    next.setWeatherEnabled(settings.get('weather') >= 0.5);
+    next.camYaw = input.camYaw;
+    next.camPitch = input.camPitch;
+    next.camDist = input.camDist;
+    next.onZonePrepared = (zoneId) => hud.queueMapBgPrewarm(zoneId);
+    if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
+      next.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
+    }
+  };
+
+  const graphicsRebuild = new GraphicsRebuildCoordinator<
+    GraphicsSettingsSnapshot,
+    Renderer,
+    RecycledRendererContext
+  >({
+    currentRenderer: () => renderer,
+    captureSettings: () => appliedGraphicsSettings,
+    settingsEqual: graphicsSettingsSnapshotsEqual,
+    preflightContext: (current) => current.preflightContextRecycle(),
+    setClientPaused: (paused) => {
+      graphicsRebuildPaused = paused;
+      if (!paused) {
+        last = performance.now();
+        acc = 0;
+      }
+    },
+    resetInput: () => {
+      input.resetForClientTransition();
+      pendingReleaseFacing = null;
+      prevCameraDrivenFacing = false;
+      Object.assign(kbTurn, newKeyboardTurnState());
+      hud.cancelGroundAim();
+      mobileControls.syncAutorun(false);
+    },
+    neutralizeOnlineInput: () => {
+      online?.neutralizeInputForClientPause();
+    },
+    showOpaqueCurtain: () => showLoadingScreen(t('hudChrome.options.graphicsApplying')),
+    awaitCurtainPaint: nextPaint,
+    hideOpaqueCurtain: hideLoadingScreen,
+    prepareTargetAssets: async (target, onProgress) => {
+      const profile = resolveGfxProfile(graphicsCapabilities, target, location.search);
+      await prepareGraphicsProfileAssets(profile.settings, world.player.pos, onProgress);
+    },
+    resetAuxiliaryRenderers: () => {
+      const resetErrors: unknown[] = [];
+      try {
+        hud.resetGraphicsPreviewContexts();
+      } catch (error) {
+        resetErrors.push(error);
+      }
+      try {
+        resetPortraitRendererForGraphicsRebuild();
+      } catch (error) {
+        resetErrors.push(error);
+      }
+      if (resetErrors.length > 0) {
+        throw new AggregateError(resetErrors, 'Graphics preview teardown failed');
+      }
+    },
+    captureRendererContext: (current) => ({
+      canvas: current.webgl.domElement,
+      context: current.webgl.getContext() as WebGL2RenderingContext,
+    }),
+    shutdownRenderer: async (current) => {
+      perf.setRenderer(null);
+      current.onZonePrepared = null;
+      current.setAudioSink(null);
+      rendererReady = false;
+      const recycled = await current.shutdown();
+      return recycled;
+    },
+    recycleContext: recycleWebGL2Context,
+    activateProfile: (target) =>
+      activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
+    resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
+    buildRenderer: (target, recycled) => {
+      const next = new Renderer(world, recycled.canvas, nameplates, {
+        context: recycled.context,
+        initializeGfx: false,
+      });
+      configureRebuiltRenderer(next);
+      return next;
+    },
+    prepareCurrentZone: (next) =>
+      next.prepareZoneAt(world.player.pos.x, world.player.pos.z, (done, total) =>
+        setLoadingProgressRange(done, total, 35, 65),
+      ),
+    prepareNeighborZones: (next) =>
+      next.prepareZonesAround(
+        world.player.pos.x,
+        world.player.pos.z,
+        ARRIVAL_NEIGHBOR_STREAM_RADIUS,
+        (done, total) => setLoadingProgressRange(done, total, 65, 88),
+      ),
+    prewarmRenderer: async (next) => {
+      await next.prewarmInitialScene();
+    },
+    validateRenderer: (next) => {
+      next.sync(1, 0, null, 0, null);
+      if (next.webgl.getContext().isContextLost()) {
+        throw new Error('WebGL2 context was lost while validating the rebuilt renderer');
+      }
+    },
+    commit: (next, target) => {
+      settings.patch(target);
+      configureRebuiltRenderer(next);
+      next.setAudioSink(sfx);
+      renderer = next;
+      rendererReady = true;
+      hud.replaceRenderer(next);
+      perf.setRenderer(next);
+      perf.reset();
+      appliedGraphicsSettings = normalizeGraphicsSettingsSnapshot(target);
+      uiEffectsApplier.applyNow();
+      applyBrowserEffects(settings.get('browserEffects'));
+      const devGame = (window as unknown as { __game?: { renderer?: Renderer } }).__game;
+      if (devGame) devGame.renderer = next;
+      try {
+        hud.restoreGraphicsPreviewContexts();
+      } catch (error) {
+        console.warn('Graphics preview restoration failed after renderer rebuild', error);
+      }
+    },
+    onProgress: ({ stage, done, total }) => {
+      if (stage === 'assets' && done !== undefined && total !== undefined) {
+        setLoadingProgressRange(done, total, 0, 35);
+      } else if (stage === 'current-zone') {
+        setLoadingPercent(35, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'neighbor-zones') {
+        setLoadingPercent(65, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'prewarm') {
+        setLoadingPercent(90, t('hudChrome.options.graphicsApplying'));
+      } else if (stage === 'validation') {
+        setLoadingPercent(98, t('hudChrome.options.graphicsApplying'));
+      }
+    },
+    suspendEntryDiagnostics: () => entryDiagnostics.suspend(),
+    resumeEntryDiagnostics: (target) => entryDiagnostics.resume(target.graphicsPreset),
+    markCrashPhase: (phase, from, target, generation) => {
+      if (phase === 'starting') {
+        stampGraphicsRebuildProbe({
+          generation,
+          at: Date.now(),
+          phase,
+          from: { ...from },
+          target: { ...target },
+        });
+      } else {
+        updateGraphicsRebuildProbePhase(phase);
+      }
+    },
+    clearCrashMarker: clearGraphicsRebuildProbe,
+    isContextFailure: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      return /WebGL(?:2)? context|WEBGL_lose_context|context (?:lost|recycle|restored|replaced)/i.test(
+        message,
+      );
+    },
+    showFatalReload: (error) => {
+      console.error('Live graphics renderer rebuild failed fatally', error);
+      fatalOverlay(t('hudChrome.options.graphicsFatal'), {
+        buttonLabel: t('hudChrome.options.graphicsReload'),
+      });
+    },
+  });
+
   // the options menu drives logout + key-capture + settings, all of which need
   // refs that only exist now (input/renderer) or are page-level (reload)
   hud.attachOptions({
@@ -2388,6 +2700,27 @@ async function startGame(
     captureKey: (cb) => input.captureNextKey(cb),
     settings,
     onSettingChange: (key, value) => applySetting(key, value),
+    graphicsApplied: () => appliedGraphicsSettings,
+    applyGraphics: async (draft) => {
+      const target = normalizeGraphicsSettingsSnapshot(draft);
+      const targetProfile = resolveGfxProfile(graphicsCapabilities, target, location.search);
+      const mode = graphicsApplyMode(
+        appliedGraphicsSettings,
+        target,
+        getActiveGfxProfile().fingerprint,
+        targetProfile.fingerprint,
+      );
+      if (mode === 'unchanged') return 'applied';
+      if (mode === 'saved') {
+        settings.patch(target);
+        appliedGraphicsSettings = target;
+        uiEffectsApplier.applyNow();
+        return 'saved';
+      }
+      const outcome = await graphicsRebuild.rebuild(target);
+      if (outcome.status === 'applied' || outcome.status === 'unchanged') return 'applied';
+      return outcome.status === 'fatal' ? 'fatal' : 'failed';
+    },
     theme: {
       get: () => themeStore.get(),
       setPreset: (id: PresetId) => {
@@ -2730,6 +3063,15 @@ async function startGame(
       }
     }
   }
+  // The R40 per-use effect confirm gate, shared by every gather entry point
+  // (world click, interact key, gathering-tool use): the pure question from
+  // the view core, the ask through the HUD's confirm-dialog family. The
+  // harvest proceeds on either answer; only the charge follows it.
+  const gatherEffectConfirm = {
+    needed: (nodeId: string) => gatherEffectPrompt(world, nodeId),
+    ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
+      hud.confirmToolEffectUse(prompt, proceed),
+  };
   function interactKey(): void {
     stopAutorunForInteraction(
       tryNearbyInteraction(
@@ -2741,6 +3083,8 @@ async function startGame(
         t('hudChrome.gathering.notReady'),
         t('questUi.errors.escortAway'),
         t('errors.nothingInteract'),
+        undefined,
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,
@@ -2772,7 +3116,15 @@ async function startGame(
     // ignoreFences: the player can hop fences, so route straight over them
     // instead of around, resolveMove fires the jump as we reach the rail.
     // swim: the player can swim, so let the route cross/enter water.
-    return findPlayerPath(world.cfg.seed, world.player.pos, target, undefined, true, true);
+    return findPlayerPath(
+      world.cfg.seed,
+      world.player.pos,
+      target,
+      undefined,
+      true,
+      true,
+      world.riftCollisionToken,
+    );
   }
 
   function resolvedClickMoveTarget(target: { x: number; z: number }): {
@@ -2780,7 +3132,7 @@ async function startGame(
     z: number;
   } {
     // swim: keep a clicked water destination instead of snapping it to shore.
-    return resolvePlayerDestination(world.cfg.seed, target, true);
+    return resolvePlayerDestination(world.cfg.seed, target, true, world.riftCollisionToken);
   }
 
   function syncGroundAimReticle(): void {
@@ -2851,6 +3203,7 @@ async function startGame(
             t('questUi.errors.tooFar'),
             t('hudChrome.gathering.notReady'),
             gatherNodeToolGateFor(world, node),
+            gatherEffectConfirm,
           ),
           input,
           mobileControls,
@@ -3389,7 +3742,15 @@ async function startGame(
               clickMoveStuckSince = now;
               input.rerouteClickMoveTarget(
                 goal,
-                findPlayerPath(world.cfg.seed, world.player.pos, goal, undefined, false, true),
+                findPlayerPath(
+                  world.cfg.seed,
+                  world.player.pos,
+                  goal,
+                  undefined,
+                  false,
+                  true,
+                  world.riftCollisionToken,
+                ),
               );
             } else {
               input.clearClickMove();
@@ -3480,6 +3841,7 @@ async function startGame(
         t('questUi.errors.tooFar'),
         t('hudChrome.gathering.notReady'),
         gatherNodeToolGateFor(world, node),
+        gatherEffectConfirm,
       ),
       input,
       mobileControls,
@@ -3522,6 +3884,7 @@ async function startGame(
   // perf_metrics_sampler.ts; here we inject the live sources.
   const sampleMetrics = createMetricsSampler({
     renderer,
+    getRenderer: () => renderer,
     meter: perfMeter,
     getOnline: () => online,
     getEntityCount: () => world.entities.size,
@@ -3548,6 +3911,11 @@ async function startGame(
 
   function frame(now: number): void {
     requestAnimationFrame(frame);
+    if (graphicsRebuildPaused) {
+      last = now;
+      acc = 0;
+      return;
+    }
     maybeWarmCurrentZone();
     let frameDt = (now - last) / 1000;
     last = now;
@@ -3646,7 +4014,13 @@ async function startGame(
         );
         Object.assign(offlineSim.moveInput, mi);
         const stepFacing = movementFacing ?? facing;
-        if (stepFacing !== null) offlineSim.player.facing = stepFacing;
+        // A stun locks facing (issue #2426): stepPlayerMotion already blocks
+        // turnLeft/turnRight while stunned, but mouselook/controller facing is
+        // applied out of band, here, before tick(), and must honor the same gate
+        // or a stunned player can still turn to face away from a positional attack.
+        if (stepFacing !== null && !isStunned(offlineSim.player)) {
+          offlineSim.player.facing = stepFacing;
+        }
         offlineSim.updateFiestaBots(); // dev: steer Fiesta practice bots (no-op unless active)
         perf.markInputSent(performance.now());
         const simStart = perf.startTime();
@@ -3679,6 +4053,19 @@ async function startGame(
         pendingReleaseFacing = null;
         acc -= DT;
       }
+      // Re-check immediately after the tick loop, before renderer.sync() below reads
+      // offlineSim.player.pos for this frame. The call at the top of frame() only sees
+      // the position as of the START of the frame; a tick above can itself teleport the
+      // player (release-spirit/resurrect landing in a different zone, a dungeon door or
+      // portal trigger reached mid-tick), which the top-of-frame call has no way to see.
+      // Left unchecked, this frame would still render the just-teleported position with
+      // no loading curtain and an unprepared destination zone (a one-frame flash of an
+      // empty/black view). maybeWarmCurrentZone() is idempotent per call (it early-returns
+      // once a warmup is already in flight or the zone is ready), so calling it twice in
+      // one frame is safe; it does not remove the top-of-frame call, which still owns the
+      // input-suspend handling and catches a teleport triggered from outside the tick
+      // (e.g. a UI action) before this frame's tick even runs.
+      maybeWarmCurrentZone();
       const pp = offlineSim.player;
       traceStart = perf.startTrace();
       try {
@@ -4250,7 +4637,7 @@ async function startGame(
             },
           );
         }
-      }, LOADING_FADE_MS);
+      }, loadingCurtainFadeDelayMs());
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
@@ -4343,6 +4730,15 @@ async function startOffline(
 // ---------------------------------------------------------------------------
 
 const api = new Api();
+const seekerEntitlementSync = createSeekerEntitlementSync({
+  entitlement: async () => (await api.seekerEntitlement()).entitled,
+  createClaimProof: () => createNativeAttestationProof(api.base, 'seeker-claim'),
+  claim: async (proof) => (await api.claimSeekerEntitlement(proof)).entitled,
+  onPermanentFailure: (error) => {
+    console.error('[wallet] Seeker entitlement sync was rejected', error);
+    flashWalletError(userFacingApiError(error));
+  },
+});
 
 // Referral capture: a visitor who arrives from a shared player card link
 // (?ref=<slug>) carries the referrer's slug into registration. Read it once at
@@ -5684,7 +6080,10 @@ async function refreshCharacters(): Promise<void> {
   }
 }
 
-function fatalOverlay(message: string, opts?: { keepResumeMarker?: boolean }): void {
+function fatalOverlay(
+  message: string,
+  opts?: { keepResumeMarker?: boolean; buttonLabel?: string },
+): void {
   // A fatal overlay is a terminal client state whose only exit is a reload, so
   // clearing the resume marker HERE covers every present and future caller: the
   // reload lands on the normal boot path instead of auto-resuming into the same
@@ -5702,7 +6101,7 @@ function fatalOverlay(message: string, opts?: { keepResumeMarker?: boolean }): v
   el.appendChild(messageEl);
   const btn = document.createElement('button');
   btn.className = 'btn';
-  btn.textContent = t('errors.returnToLogin');
+  btn.textContent = opts?.buttonLabel ?? t('errors.returnToLogin');
   btn.addEventListener('click', () => location.reload());
   el.appendChild(btn);
   document.body.appendChild(el);
@@ -6611,7 +7010,7 @@ const walletCapabilityReady = resolveWalletCapability({
   disabled: String(import.meta.env.VITE_WALLET_DISABLED ?? '').trim() === '1',
   nativeApp: NATIVE_APP,
   desktopApp: DESKTOP_APP,
-  bridge: DESKTOP_APP ? desktopBridge() : null,
+  bridge: NATIVE_APP ? nativeSolanaMobileBridge : DESKTOP_APP ? desktopBridge() : null,
 }).then((enabled) => {
   WALLET_ENABLED = enabled;
   return enabled;
@@ -6660,6 +7059,9 @@ function loadWallet(): Promise<typeof import('./net/wallet')> {
     ? Promise.resolve(walletMod)
     : import('./net/wallet').then((m) => {
         walletMod = m;
+        if (NATIVE_APP) {
+          walletMod.configureNativeSolanaWallet(createNativeSolanaWalletClient());
+        }
         walletMod.configureWalletConnect(
           String(import.meta.env.VITE_REOWN_PROJECT_ID ?? '').trim() || null,
         );
@@ -6775,8 +7177,9 @@ function showWalletPicker(
     const extensionHelp = document.createElement('p');
     extensionHelp.className = 'wallet-picker-help wallet-picker-extension-help';
     extensionHelp.id = 'wallet-picker-extension-help';
-    extensionHelp.textContent =
-      mode === 'standalone'
+    extensionHelp.textContent = NATIVE_APP
+      ? t('wallet.seekerAppHelp')
+      : mode === 'standalone'
         ? t('wallet.standaloneAppHelp')
         : mode === 'mobile'
           ? t('wallet.mobileAppHelp')
@@ -7890,6 +8293,7 @@ function clearDiscordChoice(): void {
 
 async function refreshWalletLinkStatus(): Promise<void> {
   if (!(await walletCapabilityReady)) {
+    seekerEntitlementSync.reset();
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     connectedWocBalance = null;
@@ -7899,6 +8303,7 @@ async function refreshWalletLinkStatus(): Promise<void> {
     return;
   }
   if (!api.token) {
+    seekerEntitlementSync.reset();
     linkedWalletPubkey = null;
     linkedWocBalance = null;
     desktopWalletBrowserSessionActive = false;
@@ -7925,6 +8330,13 @@ async function refreshWalletLinkStatus(): Promise<void> {
   }
   updateWalletButton();
   const pubkey = linkedWalletPubkey;
+  if (statusKnown) {
+    await seekerEntitlementSync.sync({
+      accountKey: api.username ?? '',
+      walletPubkey: pubkey,
+      eligible: NATIVE_APP && WALLET_ENABLED,
+    });
+  }
   if (pubkey && WALLET_ENABLED) {
     try {
       const wallet = await loadWallet();
@@ -7957,6 +8369,12 @@ async function completeWalletVerifyFlow(address: string): Promise<void> {
     setWalletFlowStatus('verify');
     const result = await api.linkWallet(address, signature, nonce);
     linkedWalletPubkey = result.pubkey;
+    if (NATIVE_APP) {
+      const attestation = await createNativeAttestationProof(api.base, 'seeker-claim');
+      if (!attestation || !(await api.claimSeekerEntitlement(attestation)).entitled) {
+        throw new Error('Seeker entitlement verification failed');
+      }
+    }
     linkedWocBalance = connectedWocBalance;
     if (linkedWocBalance === null) linkedWocBalance = await wallet.fetchWocBalance(address);
     updateWalletButton();
@@ -8131,6 +8549,13 @@ async function switchWallet(): Promise<void> {
 async function wireWallet(): Promise<void> {
   setWalletUiEnabled(false);
   await walletCapabilityReady;
+  document.body.classList.toggle('seeker-wallet-enabled', NATIVE_APP && WALLET_ENABLED);
+  if (NATIVE_APP && WALLET_ENABLED) {
+    const dailyRewardsButton = document.getElementById('mobile-daily-rewards');
+    if (dailyRewardsButton) {
+      document.getElementById('mobile-combat-controls')?.appendChild(dailyRewardsButton);
+    }
+  }
   setWalletUiEnabled(WALLET_ENABLED);
   // Feature-gate: when explicitly disabled, remove the wallet row entirely and
   // never download the wallet chunk.
@@ -9338,6 +9763,7 @@ function wireStartScreens(): void {
   });
   setupNavBtn(navBtnDownload, '#download-view');
   initDesktopDownload();
+  initBrowserSupportNotice();
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });
@@ -9622,7 +10048,21 @@ function wireStartScreens(): void {
   // runtimes, the environments where the OS reload makes the crash otherwise invisible;
   // elsewhere the probe is only logged (and cleared: it is a one-shot signal).
   const entryRecoveryAt = Date.now();
-  const entryRecovery = planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt);
+  const interruptedGraphicsRebuild = consumeGraphicsRebuildCrashProbe(entryRecoveryAt);
+  if (interruptedGraphicsRebuild) {
+    // Settings are committed only after a candidate validates, so the persisted
+    // old profile is already the safe boot choice. Clear the generic probe too:
+    // this was a named live rebuild, not a failed initial world entry, and must
+    // never cost the player an unrelated automatic downgrade.
+    clearEntryProbe();
+    console.warn(
+      `[graphics-rebuild] previous live rebuild ended at phase=${interruptedGraphicsRebuild.phase} ` +
+        `generation=${interruptedGraphicsRebuild.generation}; retained saved graphics settings`,
+    );
+  }
+  const entryRecovery = interruptedGraphicsRebuild
+    ? null
+    : planEntryCrashRecovery(readEntryProbeRaw(), entryRecoveryAt);
   if (entryRecovery) persistEntryRecoveryLog(entryRecovery, entryRecoveryAt);
   clearEntryProbe();
   if (entryRecovery) {

@@ -16,14 +16,14 @@ import { roadDistance, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { type ChunkGrid, type GroundPendingAt, orderCellsForEntry } from './chunk_residency_core';
-import { GFX, SUN_DIR } from './gfx';
+import { GFX, type GfxSettings, SUN_DIR } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // The terrain relief ladder (GFX.terrainRelief, one source for the tier
 // ladder and the Advanced Terrain Detail dial): 0 none (medium and below),
-// 1 cavity shading only, 2 adds the parallax walk (high), 3 adds the micro
-// sun-shadow (ultra/insane). ?trelief=off is the dev perf-attribution kill
-// switch (render_dev_flags.ts).
+// 1 cavity shading only (high), 2 adds the parallax walk (Advanced), 3 adds
+// the parallax walk plus micro sun-shadow (ultra/insane). ?trelief=off is the
+// dev perf-attribution kill switch (render_dev_flags.ts).
 const terrainReliefLevel = (): number => (renderLayerDisabled('trelief') ? 0 : GFX.terrainRelief);
 
 // The rich splat-albedo profile (multi-octave grass/dirt/rock, wall plate
@@ -71,7 +71,7 @@ import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textu
 //   plus the vertex slope times the coarsest band spacing, since a T-junction
 //   hole grows with both the neighbor's chord span and the local gradient
 //   (terraced cliffs open multi-yard holes that a flat drop cannot cover).
-// - High tier: MeshStandardMaterial + splat shading (grass/dirt/rock/sand
+// - Medium and above: MeshStandardMaterial + splat shading (grass/dirt/rock/sand
 //   weights precomputed per vertex from slope/height/roadDistance into a vec4
 //   attribute) over the biome vertex-color tint, plus a world-space macro
 //   normal map baked from the mesh height view (terrain_mesh_height.ts).
@@ -89,51 +89,64 @@ const IDLE_BUILD_TIMEOUT_MS = 200;
 // ---------------------------------------------------------------------------
 
 const TERRAIN_TEX: Record<string, THREE.Texture> = {};
+const terrainTexTasks = new Map<string, Promise<void>>();
 const ALBEDO_ANISOTROPY = 8;
 const NORMAL_ANISOTROPY = 4;
 
-function kickTerrainTex(key: string, file: string, srgb: boolean): void {
-  registerDeferredPreload(() =>
-    loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true }).then((tex) => {
+function prepareTerrainTex(key: string, file: string, srgb: boolean): Promise<void> {
+  if (TERRAIN_TEX[key]) return Promise.resolve();
+  const existing = terrainTexTasks.get(key);
+  if (existing) return existing;
+  const task = loadTexture(`/textures/terrain/${file}`, { srgb, repeat: true })
+    .then((tex) => {
       tex.anisotropy = srgb ? ALBEDO_ANISOTROPY : NORMAL_ANISOTROPY;
       TERRAIN_TEX[key] = tex;
-      return tex;
-    }),
-  );
+    })
+    .catch((err) => {
+      terrainTexTasks.delete(key);
+      throw err;
+    });
+  terrainTexTasks.set(key, task);
+  return task;
 }
 
-// ~15MB of JPEGs — skip when the URL already forces the Lambert tier (an
-// auto-detected low tier still fetches them; the URL guess can't know yet)
-if (GFX.terrainSplat) {
-  kickTerrainTex('grassC', 'Grass001_Color.jpg', true);
-  kickTerrainTex('grassN', 'Grass001_NormalGL.jpg', false);
-  // Ground023 (leaf-littered packed earth), not Ground048: at the splat tile
-  // scale 048 is one uniform high-frequency crumble (measured large/fine
-  // luminance-std ratio 0.21, saturation 0.39, R/G 1.35) and paths read as
-  // pink carpet. 023 carries real medium-scale features (ratio 0.47), an
-  // earthier desaturated hue (R/G 1.15, saturation 0.26), a clean row/col
-  // variance ratio (1.34, no corduroy) and a usable AO map (sd 0.117).
-  kickTerrainTex('dirtC', 'Ground023_Color.jpg', true);
-  kickTerrainTex('dirtN', 'Ground023_NormalGL.jpg', false);
-  // Rock026 (fractured cliff plates), not Rock051: Rock051's striations are
-  // directional (anisotropy 2.57), and wall-projecting them at one scale is
-  // what gave mountainsides the vertical corduroy. Rock051 stays on disk for
-  // voxel_terrain.
-  kickTerrainTex('rockC', 'Rock026_Color.jpg', true);
-  kickTerrainTex('rockN', 'Rock026_NormalGL.jpg', false);
-  kickTerrainTex('sandC', 'Ground080_Color.jpg', true);
-  kickTerrainTex('sandN', 'Ground080_NormalGL.jpg', false);
-  kickTerrainTex('mudC', 'Ground071_Color.jpg', true); // marsh wet mud (dirt variant)
-  kickTerrainTex('snowC', 'Snow010A_Color.jpg', true);
-  // The packs' relief channels, packed offline into one RGBA texture by
-  // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
-  // A sand AO): one sampler instead of four keeps the splat material under
-  // the 16-sampler fragment limit. B is a Rock026+Rock060 displacement blend,
-  // not an AO map: Rock026's authored AO is near-white, and displacement is
-  // the honest cavity signal for the new rocks. Linear data: cavity = dark,
-  // open surface = bright.
-  kickTerrainTex('groundAO', 'GroundAO_Packed.png', false);
+/** Prepare the terrain texture channel selected by an explicit target profile. */
+export function prepareTerrainProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  if (!target.terrainSplat) return Promise.resolve();
+  const tasks = [
+    prepareTerrainTex('grassC', 'Grass001_Color.jpg', true),
+    prepareTerrainTex('grassN', 'Grass001_NormalGL.jpg', false),
+    // Ground023 (leaf-littered packed earth), not Ground048: at the splat tile
+    // scale 048 is one uniform high-frequency crumble (measured large/fine
+    // luminance-std ratio 0.21, saturation 0.39, R/G 1.35) and paths read as
+    // pink carpet. 023 carries real medium-scale features (ratio 0.47), an
+    // earthier desaturated hue (R/G 1.15, saturation 0.26), a clean row/col
+    // variance ratio (1.34, no corduroy) and a usable AO map (sd 0.117).
+    prepareTerrainTex('dirtC', 'Ground023_Color.jpg', true),
+    prepareTerrainTex('dirtN', 'Ground023_NormalGL.jpg', false),
+    // Rock026 (fractured cliff plates), not Rock051: Rock051's striations are
+    // directional (anisotropy 2.57), and wall-projecting them at one scale is
+    // what gave mountainsides the vertical corduroy. Rock051 stays on disk for
+    // voxel_terrain.
+    prepareTerrainTex('rockC', 'Rock026_Color.jpg', true),
+    prepareTerrainTex('rockN', 'Rock026_NormalGL.jpg', false),
+    prepareTerrainTex('sandC', 'Ground080_Color.jpg', true),
+    prepareTerrainTex('sandN', 'Ground080_NormalGL.jpg', false),
+    prepareTerrainTex('mudC', 'Ground071_Color.jpg', true),
+    prepareTerrainTex('snowC', 'Snow010A_Color.jpg', true),
+    // The packs' relief channels, packed offline into one RGBA texture by
+    // scripts/assets/pack_ground_ao.mjs (R grass AO, G dirt AO, B rock height,
+    // A sand AO): one sampler instead of four keeps the splat material under
+    // the 16-sampler fragment limit. B is a Rock026+Rock060 displacement blend,
+    // not an AO map: Rock026's authored AO is near-white, and displacement is
+    // the honest cavity signal for the new rocks. Linear data: cavity = dark,
+    // open surface = bright.
+    prepareTerrainTex('groundAO', 'GroundAO_Packed.png', false),
+  ];
+  return Promise.all(tasks).then(() => undefined);
 }
+
+registerDeferredPreload(() => prepareTerrainProfileAssets(GFX));
 
 export function hasTerrainSplatAssets(): boolean {
   return Boolean(
@@ -685,10 +698,9 @@ function buildSplatMaterial(
               : ''
         }
         ${
-          // The parallax walk is relief level 2+ (high and up): medium
-          // compiles the splat pipeline but has the least frame budget of the
-          // PBR tiers (the round-10 medium regate), so it keeps flat-lit
-          // ground.
+          // The parallax walk is relief level 2+: the standard ladder reaches
+          // it at ultra, while Advanced Terrain Detail exposes level 2. High
+          // keeps cavity-only relief and medium keeps flat-lit ground.
           terrainReliefLevel() >= 2
             ? `float pDist = wocCamDist;
         // Outside either smoothstep support the fade is exactly zero. Keep
@@ -721,8 +733,7 @@ function buildSplatMaterial(
           // second iteration: re-read the height where the first offset
           // landed, which keeps steep clod edges from overshooting and
           // swimming at grazing view angles (three more taps of the 512^2
-          // packed AO texture; every relief tier affords it now that the
-          // stack starts at high)
+          // packed AO texture; every parallax tier affords it)
           pOff = pDir * wocGroundHeightSmooth(tuv + pOff, pAmp) * pFade;
           pOff /= max(1.0, length(pOff) / WOC_PARALLAX_CLAMP);
           tuv += pOff;
@@ -1400,6 +1411,10 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     size: number;
     spacing: number;
   }[] = [];
+  let lastVisibilityX = Number.NaN;
+  let lastVisibilityZ = Number.NaN;
+  let lastVisibilityFar = Number.NaN;
+  let lastVisibilityChunkCount = -1;
 
   // True when the chunk cell overlaps a mountain-wall band: an inter-zone
   // ridge line (ZONES[i].zMax) or the world rim. Those chunks always take the
@@ -1779,11 +1794,24 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
       pool?.dispose();
     },
     update(camX: number, camZ: number, fogFar: number): void {
+      if (
+        camX === lastVisibilityX &&
+        camZ === lastVisibilityZ &&
+        fogFar === lastVisibilityFar &&
+        chunks.length === lastVisibilityChunkCount
+      ) {
+        return;
+      }
+      lastVisibilityX = camX;
+      lastVisibilityZ = camZ;
+      lastVisibilityFar = fogFar;
+      lastVisibilityChunkCount = chunks.length;
       // fully-fogged chunks are pure overdraw; drop them before the frustum
+      const fogFarSq = fogFar * fogFar;
       for (const chunk of chunks) {
         const dx = Math.max(Math.abs(camX - chunk.x) - chunk.half, 0);
         const dz = Math.max(Math.abs(camZ - chunk.z) - chunk.half, 0);
-        chunk.mesh.visible = Math.hypot(dx, dz) < fogFar;
+        chunk.mesh.visible = fogFar > 0 && dx * dx + dz * dz < fogFarSq;
       }
     },
     rebuildRegion(minX: number, minZ: number, maxX: number, maxZ: number): void {

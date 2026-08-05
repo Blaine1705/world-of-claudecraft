@@ -46,25 +46,35 @@ export function isDebuffAura(kind: AuraKind, value: number): boolean {
   return DEBUFF_AURA_KINDS.has(kind) || (kind.startsWith('buff_') && value < 0);
 }
 
+// The one rule for "may a player counter take this aura off at all", ahead of any
+// question of school or polarity. Two aura classes answer no: encounter-authored
+// unbreakable control (the script owns its release) and `undispellable` penalties
+// (the recovery sicknesses, which only their own timer clears). Every removal path a
+// player can drive routes through here so the answer cannot drift between them: the
+// dispel executor and its requiresDispellable cast gate (isDispellableAura below),
+// the cleanseSelf executor (combat/effect_dispatch.ts), and the right-click buff
+// cancel (combat/aura_cancel.ts).
+export function isPlayerRemovableAura(
+  aura: Pick<Aura, 'kind' | 'unbreakableControl' | 'undispellable'>,
+): boolean {
+  return !isUnbreakableControlAura(aura) && aura.undispellable !== true;
+}
+
 // The dispel eligibility rule, shared by the dispel executor and the
-// requiresDispellable cast gate so the two can never drift: magic-school only,
-// and the cast's direction picks the polarity (an OFFENSIVE dispel strips a
-// benefit off an enemy; a friendly one strips a harmful effect off an ally).
+// requiresDispellable cast gate so the two can never drift: player-removable and
+// magic-school only, and the cast's direction picks the polarity (an OFFENSIVE dispel
+// strips a benefit off an enemy; a friendly one strips a harmful effect off an ally).
 export function isDispellableAura(
   aura: Pick<Aura, 'kind' | 'value' | 'school'> &
-    Partial<Pick<Aura, 'id' | 'unbreakableControl' | 'permanent'>>,
+    Partial<Pick<Aura, 'id' | 'unbreakableControl' | 'undispellable' | 'permanent'>>,
   offensive: boolean,
 ): boolean {
   // Ascension is a player-owned resource state surfaced as an aura for HUD clarity,
   // not a transferable magic buff. Letting dispel/steal remove only the synthetic
   // icon would leave its charges active invisibly (or copy a mechanically inert icon).
-  if (
-    aura.id === 'divine_ascension' ||
-    aura.unbreakableControl ||
-    aura.school === 'physical' ||
-    aura.permanent
-  )
-    return false;
+  if (aura.id === 'divine_ascension' || aura.permanent) return false;
+  if (!isPlayerRemovableAura(aura)) return false;
+  if (aura.school === 'physical') return false;
   const harmful = isDebuffAura(aura.kind, aura.value);
   return offensive ? !harmful : harmful;
 }

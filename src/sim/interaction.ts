@@ -36,6 +36,7 @@ import {
 } from './encounters/nythraxis';
 import { tryStartEscort } from './escort';
 import { isInRaidInstance } from './instances/dungeons';
+import { HUT_OBJECT_ID, tryBurnHut } from './interactions/firebottle_hut';
 import { hasSharedLootRights as computeSharedLootRights, lootHasGoneFfa } from './loot/loot_ffa';
 import {
   awardSharedLootItem,
@@ -60,7 +61,11 @@ import {
   yieldingFocusComponents,
 } from './professions/gathering';
 import { type HarvestYield, recordHarvestYield } from './professions/harvest_yields';
-import { bestOwnedAnyGatherToolTier, canHarvestMonsterMaterial } from './professions/tools';
+import { canHarvestMonsterMaterial } from './professions/tools';
+import {
+  bestWieldableAnyGatherToolTier,
+  minWieldRequirementToWorkAny,
+} from './professions/wield_gate';
 import type { SimContext } from './sim_context';
 import {
   cloneItemInstancePayload,
@@ -410,13 +415,16 @@ export function harvestCorpse(
   mob.harvestClaimedBy = claim.claimedBy;
   // Tool gate for the PREMIUM arm only: the plain component grant is
   // never gated (the bare-hands floor), but a signable rarity roll's
-  // signed/specimen upgrade needs the player's best owned gathering tool of
-  // ANY profession to cover the component family's material tier. Resolved
-  // once, rng-free, before the per-yield loop. Every wave-one family is tier 1
-  // (content/professions.ts MONSTER_MATERIAL_TIERS, the prime directive), so
-  // in shipped content this gate never fires: it is the seam future
-  // higher-tier corpse families compose with.
-  const bestAny = bestOwnedAnyGatherToolTier(meta.inventory, ITEMS);
+  // signed/specimen upgrade needs the player's best WIELDABLE gathering tool
+  // of ANY profession to cover the component family's material tier (R50,
+  // the R22 corpse arm: each land profession's contribution filters by its
+  // own counter, a rod contributes unfiltered per the rod exemption, and the
+  // bare-hands floor stands). Resolved once, rng-free, before the per-yield
+  // loop. Every wave-one family is tier 1 (content/professions.ts
+  // MONSTER_MATERIAL_TIERS, the prime directive) and bare hands float the
+  // scan at 1, so in shipped content this gate never fires: it is the seam
+  // future higher-tier corpse families compose with.
+  const bestAny = bestWieldableAnyGatherToolTier(meta.inventory, meta.gatheringProficiency, ITEMS);
   let toolDeniedEmitted = false;
   // #2457: the yield ledger the single harvestResult event below carries. Every
   // grant in this function passes { silent: true, callerLogs: true } from here
@@ -495,11 +503,20 @@ export function harvestCorpse(
       recordHarvestYield(granted, { itemId, qty, rarity, kind: 'plain' });
       if (!toolDeniedEmitted) {
         toolDeniedEmitted = true;
+        // The R22 wield split, corpse flavor: when a covering land tool is
+        // in the bags and only its counter is short, name the smallest
+        // proficiency that would put something already carried to work.
+        const wieldReq = minWieldRequirementToWorkAny(
+          meta.inventory,
+          monsterMaterialTierFor(y.component),
+          ITEMS,
+        );
         ctx.emit({
           type: 'gatherDenied',
           pid: meta.entityId,
           surface: 'corpse',
           requiredTier: monsterMaterialTierFor(y.component),
+          ...(wieldReq !== null && wieldReq > 0 ? { wieldProficiency: wieldReq } : {}),
         });
       }
       continue;
@@ -741,6 +758,12 @@ export function pickUpObject(
   const beforeRelicNextId = ctx.nextId;
   if (activateNythraxisRelic(ctx, obj, meta)) {
     return obj.lootable !== beforeRelicLootable || ctx.nextId !== beforeRelicNextId;
+  }
+  // Murloc huts (q_deepfen_purge) are torched with a thrown firebottle, not a
+  // plain click: route them to the firebottle handler (which does its own
+  // gating, cooldown, and objective credit) so a bare click never burns one.
+  if (objectItemId === HUT_OBJECT_ID) {
+    return tryBurnHut(ctx, obj, p, meta);
   }
   const beforeQuestProgress = meta.counters.questProgress;
   const beforeQuestNextId = ctx.nextId;

@@ -182,6 +182,12 @@ describe('shaman redesign', () => {
   });
 
   it('Improved Cinder Jolt: Earthen Jolt detonates the Cinder Jolt DoT', () => {
+    // Seed hunted so the Earthen Jolt that detonates actually LANDS: an avoided
+    // shock draws no detonation and the DoT survives, which is the only way this
+    // assertion can fail without the mechanic being broken. Re-hunted from 12
+    // after the v0.34.0 merge composed this branch's quest-dedupe content with
+    // the release's Dragonkin brood, shifting every shared-stream draw. Not a
+    // behavior regression: 71 of seeds 1 to 80 detonate. Spares: 2, 3.
     const { sim } = rig(
       'shaman',
       20,
@@ -189,7 +195,7 @@ describe('shaman redesign', () => {
         8: 'sha_r8_shock_efficiency',
         14: 'sha_r14_improved_flame_shock',
       },
-      12,
+      1,
     );
     const mob = addTargetMob(sim, 100000, 8);
     castAndSettle(sim, 'flame_shock', 7); // the shocks share a cooldown; wait it out
