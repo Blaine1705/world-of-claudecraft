@@ -632,10 +632,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // bounded ground-object reuse pool (storePooledObject/takePooledObject cap), the
 // rendererIntegration leaf, so the composite (and the metadata file's second-order
 // digest that embeds it) re-mint once more.
+// Re-pinned once more for the weapon-skin VFX connection-freeze fix: the
+// budgeted apply queue and the vfx.weapon-skins prewarm entry move
+// src/render/renderer.ts, the rendererIntegration leaf, so the composite and the
+// metadata seal that embeds it both re-mint (remint_polish_provenance.mjs).
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '90d5ab49680e3e2bf8be49f35acdc0d964275a51a337715fc57497acfeaf95a6';
+  '9cf550f46ef55a57214291fe6cfb458fb96da3dd0d08bc9ef0790a1a23f990dd';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '628f66e2ba22fb456ca64603dfee7311bf766ee5d9ebe71d5e2b2109b01f1d3b';
+  'e5a151c80866a5e22af5653124c95c2bbee3e0e7102d6e7a1a22f524b9e5de1c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1505,8 +1509,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // matched the merged tree, and no capture was retaken here.
     // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
     // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
+    // Re-pinned once more for the weapon-skin VFX connection-freeze fix's
+    // src/render/renderer.ts change (budgeted apply queue plus the
+    // vfx.weapon-skins prewarm entry), same script, no capture retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'd26892a5c5ea31b30370b477a5eb610a21b1267e7556b1efcdb6a6b96beb9d62',
+      'be9ead8fc6cc1bafa351f01329ccbacf00675785f329c8598eda12f0f11f9c63',
     );
   });
 

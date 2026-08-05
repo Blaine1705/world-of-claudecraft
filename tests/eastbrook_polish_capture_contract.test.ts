@@ -384,7 +384,12 @@ describe('Eastbrook polish capture contract', () => {
       // bounded ground-object reuse pool (storePooledObject/takePooledObject cap),
       // the renderer-integration leaf, so the composite re-mints again. Regenerated
       // via scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '628f66e2ba22fb456ca64603dfee7311bf766ee5d9ebe71d5e2b2109b01f1d3b',
+      // Re-pinned for the weapon-skin VFX connection-freeze fix:
+      // src/render/renderer.ts gains the budgeted weapon-skin apply queue and the
+      // vfx.weapon-skins boot prewarm entry, the renderer-integration leaf, so the
+      // composite re-mints once more. Same script; no Eastbrook input, geometry
+      // value, or capture moved.
+      fingerprint: 'e5a151c80866a5e22af5653124c95c2bbee3e0e7102d6e7a1a22f524b9e5de1c',
       components: {
         captureContract: {
           id: 'polish-v2',
