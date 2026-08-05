@@ -42,11 +42,7 @@ import { type ArenaMatch, type InstanceSlot, type PlayerMeta, Sim } from '../src
 import { endArenaMatch } from '../src/sim/social/arena';
 import { applyResurrectionSickness } from '../src/sim/spirit';
 import type { DungeonDifficulty, Entity, Vec3 } from '../src/sim/types';
-import {
-  completeCraftCast,
-  runApplyEnchant,
-  runDisenchant,
-} from './helpers/enchant_family_cast';
+import { completeCraftCast, runApplyEnchant, runDisenchant } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 42): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });

@@ -22,7 +22,12 @@ import { Sim } from '../src/sim/sim';
 import { SPIRIT_HEALER_RANGE } from '../src/sim/spirit';
 import { dist2d, type Entity, INTERACT_RANGE, type SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
-import { runCraft, runDisenchant, runSalvage, runApplyEnchant } from './helpers/enchant_family_cast';
+import {
+  runApplyEnchant,
+  runCraft,
+  runDisenchant,
+  runSalvage,
+} from './helpers/enchant_family_cast';
 
 type AnyEntity = Entity & Record<string, any>;
 type AnySim = Sim & Record<string, any>;

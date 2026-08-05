@@ -24,12 +24,12 @@
 // finding: it means the boundary has no round trip a player can observe.
 
 import { describe, expect, it } from 'vitest';
-import { runApplyEnchant, runCraft, runDisenchant } from './helpers/enchant_family_cast';
 import { moveBetweenContainers } from '../src/sim/bank';
 import { rekeyInstanceSigner } from '../src/sim/character_rename';
 import { MAIL_DELIVERY_SECONDS } from '../src/sim/mail/post_office';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, InvSlot, ItemInstancePayload } from '../src/sim/types';
+import { runApplyEnchant, runCraft, runDisenchant } from './helpers/enchant_family_cast';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // A crafted, masterwork-procced, enchanted, signed piece: every marker channel
@@ -343,7 +343,8 @@ describe('provenance survives every container boundary', () => {
 
     runApplyEnchant(sim, GEAR, 'enchant_chest_stamina', undefined, undefined, pid);
     const afterApply = meta.craftSkills.enchanting;
-    runDisenchant(sim, 
+    runDisenchant(
+      sim,
       GEAR,
       pid,
       inv(sim, pid).findIndex((s) => s.itemId === GEAR),

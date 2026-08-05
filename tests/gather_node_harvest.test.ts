@@ -45,8 +45,8 @@ import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
-import { placeAtHarvestSpot } from './helpers/harvest_spot';
 import { runRecharge } from './helpers/enchant_family_cast';
+import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 function mustMeta(sim: Sim, pid: number) {
   const meta = sim.players.get(pid);

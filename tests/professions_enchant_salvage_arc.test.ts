@@ -719,7 +719,8 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
     const afterApply = meta.craftSkills.enchanting;
 
-    runDisenchant(sim, 
+    runDisenchant(
+      sim,
       CRAFTED_COMMON_ARMOR,
       pid,
       simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),
@@ -739,7 +740,8 @@ describe('apply-enchant keeps the crafted-provenance marker (the anti-farm gate)
     runApplyEnchant(sim, CRAFTED_COMMON_ARMOR, CHEST_ENCHANT, undefined, undefined, pid);
     const afterApply = meta.craftSkills.enchanting;
 
-    runDisenchant(sim, 
+    runDisenchant(
+      sim,
       CRAFTED_COMMON_ARMOR,
       pid,
       simInv(sim, pid).findIndex((s) => s.itemId === CRAFTED_COMMON_ARMOR),

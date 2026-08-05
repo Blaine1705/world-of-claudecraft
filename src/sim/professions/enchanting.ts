@@ -70,14 +70,14 @@ import type { SimContext } from '../sim_context';
 import {
   cloneItemInstancePayload,
   DISENCHANT_CAST_ID,
-  type Entity,
   ENCHANT_CAST_ID,
+  type Entity,
   type EquipSlot,
   type InventoryUnit,
   type InvSlot,
-  isConsuming,
   type ItemDef,
   type ItemInstancePayload,
+  isConsuming,
 } from '../types';
 import { enchantingGainMultiplier } from './archetype';
 import { DISENCHANT_MATERIAL_BY_QUALITY, typedSecondaryFor } from './disenchant_reagents';

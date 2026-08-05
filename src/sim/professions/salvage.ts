@@ -25,7 +25,7 @@ import { riftSalvageYield } from '../rift/progression';
 import type { Rng } from '../rng';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Entity, isConsuming, type ItemDef, SALVAGE_CAST_ID } from '../types';
+import { type Entity, type ItemDef, isConsuming, SALVAGE_CAST_ID } from '../types';
 
 const QUALITY_ORDER: readonly NonNullable<ItemDef['quality']>[] = [
   'poor',
@@ -100,13 +100,7 @@ export interface SalvageResult {
   /** True when the command admitted and started a SALVAGE_CAST_ID cast
    *  (no materials granted yet). Absent on complete resolves and denials. */
   casting?: boolean;
-  reason?:
-    | 'unknown_item'
-    | 'not_salvageable'
-    | 'not_held'
-    | 'throttled'
-    | 'no_bag_space'
-    | 'busy';
+  reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space' | 'busy';
 }
 
 /**
