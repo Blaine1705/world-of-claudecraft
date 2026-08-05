@@ -1823,7 +1823,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatTab': '채팅',
   'hud.core.combatLogTab': '전투 기록',
   'hud.core.chatPlaceholder':
-    '메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반)',
+    '메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반, ! 커뮤니티 명령어)',
   'hud.core.communityLinks': '커뮤니티 링크',
   'hud.core.mobileControls': '모바일 조작',
   'hud.core.mobileMove': '이동',
@@ -8712,7 +8712,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionPageIndicator': '{page}페이지',
   'hudChrome.mobile.spellbookPageLabel': '페이지 {page}',
   'hudChrome.mobile.hideKeyboard': '키보드 숨기기',
-  'hudChrome.mobile.chatPlaceholder': '메시지 입력...',
+  'hudChrome.mobile.chatPlaceholder': '메시지 입력... (! 커뮤니티 명령어)',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '베일 컵',
   'hudChrome.keybinds.categoryPet': '펫',

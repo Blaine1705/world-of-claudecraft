@@ -820,7 +820,7 @@ export const en_CA: EnTranslations = {
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}",
       "hideKeyboard": "Hide keyboard",
-      "chatPlaceholder": "Say something..."
+      "chatPlaceholder": "Say something... (! for community commands)"
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -6476,7 +6476,7 @@ export const en_CA: EnTranslations = {
       "releaseSpirit": "Release Spirit",
       "chatTab": "Chat",
       "combatLogTab": "Combat Log",
-      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)",
+      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help, ! for community commands)",
       "chatChannels": {
         "add": "Add chat channel",
         "addTitle": "Add channel",

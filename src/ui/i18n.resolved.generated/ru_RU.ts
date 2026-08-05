@@ -820,7 +820,7 @@ export const ru_RU: EnTranslations = {
       "targetCycleShort": "Цель",
       "spellbookPageLabel": "Страница {page}",
       "hideKeyboard": "Скрыть клавиатуру",
-      "chatPlaceholder": "Напишите сообщение..."
+      "chatPlaceholder": "Напишите сообщение... (! команды сообщества)"
     },
     "tutorial": {
       "moveBodyTouch": "Используйте джойстик передвижения, чтобы двигаться, и проведите по экрану, чтобы осмотреться. Сделайте несколько шагов, чтобы начать.",
@@ -6476,7 +6476,7 @@ export const ru_RU: EnTranslations = {
       "releaseSpirit": "Освободить дух",
       "chatTab": "Чат",
       "combatLogTab": "Журнал боя",
-      "chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий)",
+      "chatPlaceholder": "Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий, ! команды сообщества)",
       "chatChannels": {
         "add": "Добавить канал чата",
         "addTitle": "Добавить канал",

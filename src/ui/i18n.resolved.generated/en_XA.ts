@@ -820,7 +820,7 @@ export const en_XA: EnTranslations = {
       "targetCycleShort": "[Ţáŕĝéţ]",
       "spellbookPageLabel": "[Þáĝé {page}]",
       "hideKeyboard": "[Ĥíðé ķéýƀóáŕð]",
-      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ...]"
+      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (! ƒóŕ çóɱɱúñíţý çóɱɱáñðš)]"
     },
     "tutorial": {
       "moveBodyTouch": "[Úšé ţĥé ɱóʋéɱéñţ šţíçķ ţó ɱóʋé áñð ðŕáĝ ţĥé šçŕééñ ţó ļóóķ áŕóúñð. Ţáķé á ƒéŵ šţéþš ţó ƀéĝíñ.]",
@@ -6476,7 +6476,7 @@ export const en_XA: EnTranslations = {
       "releaseSpirit": "[Ŕéļéášé Šþíŕíţ]",
       "chatTab": "[Çĥáţ]",
       "combatLogTab": "[Çóɱƀáţ Ļóĝ]",
-      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (/š šáý, /ŵ ñáɱé ŵĥíšþéŕ, /ŕ ŕéþļý, /þ þáŕţý, /ĝú ĝúíļð, /ó óƒƒíçéŕ, /ĝéñéŕáļ ĝéñéŕáļ, /ĥéļþ)]",
+      "chatPlaceholder": "[Šáý šóɱéţĥíñĝ... (/š šáý, /ŵ ñáɱé ŵĥíšþéŕ, /ŕ ŕéþļý, /þ þáŕţý, /ĝú ĝúíļð, /ó óƒƒíçéŕ, /ĝéñéŕáļ ĝéñéŕáļ, /ĥéļþ, ! ƒóŕ çóɱɱúñíţý çóɱɱáñðš)]",
       "chatChannels": {
         "add": "[Áðð çĥáţ çĥáññéļ]",
         "addTitle": "[Áðð çĥáññéļ]",

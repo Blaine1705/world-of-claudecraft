@@ -820,7 +820,7 @@ export const zh_TW: EnTranslations = {
       "targetCycleShort": "目標",
       "spellbookPageLabel": "頁{page}",
       "hideKeyboard": "隱藏鍵盤",
-      "chatPlaceholder": "說點什麼..."
+      "chatPlaceholder": "說點什麼...（! 顯示社群指令）"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -6476,7 +6476,7 @@ export const zh_TW: EnTranslations = {
       "releaseSpirit": "釋放靈魂",
       "chatTab": "聊天",
       "combatLogTab": "戰鬥紀錄",
-      "chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合）",
+      "chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合，! 顯示社群指令）",
       "chatChannels": {
         "add": "新增聊天頻道",
         "addTitle": "新增頻道",

@@ -1858,7 +1858,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatTab': 'Чат',
   'hud.core.combatLogTab': 'Журнал боя',
   'hud.core.chatPlaceholder':
-    'Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий)',
+    'Напишите сообщение... (/w имя шепот, /r ответ, /p группа, /gu гильдия, /o офицеры, /general общий, ! команды сообщества)',
   'hud.core.communityLinks': 'Ссылки сообщества',
   'hud.core.mobileControls': 'Мобильное управление',
   'hud.core.mobileMove': 'Движение',
@@ -8861,7 +8861,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionPageIndicator': 'Стр. {page}',
   'hudChrome.mobile.spellbookPageLabel': 'Страница {page}',
   'hudChrome.mobile.hideKeyboard': 'Скрыть клавиатуру',
-  'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение...',
+  'hudChrome.mobile.chatPlaceholder': 'Напишите сообщение... (! команды сообщества)',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'Кубок Долины',
   'hudChrome.keybinds.categoryPet': 'Питомец',

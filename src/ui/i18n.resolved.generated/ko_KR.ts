@@ -820,7 +820,7 @@ export const ko_KR: EnTranslations = {
       "targetCycleShort": "대상",
       "spellbookPageLabel": "페이지 {page}",
       "hideKeyboard": "키보드 숨기기",
-      "chatPlaceholder": "메시지 입력..."
+      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)"
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -6476,7 +6476,7 @@ export const ko_KR: EnTranslations = {
       "releaseSpirit": "영혼 풀어주기",
       "chatTab": "채팅",
       "combatLogTab": "전투 기록",
-      "chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반)",
+      "chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반, ! 커뮤니티 명령어)",
       "chatChannels": {
         "add": "채팅 채널 추가",
         "addTitle": "채널 추가",

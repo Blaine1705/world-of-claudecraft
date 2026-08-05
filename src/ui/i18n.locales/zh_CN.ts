@@ -1747,7 +1747,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatTab': '聊天',
   'hud.core.combatLogTab': '战斗记录',
   'hud.core.chatPlaceholder':
-    '说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合）',
+    '说点什么...（/s 说话，/w 名字 密语，/r 回复，/p 队伍，/gu 公会，/o 官员，/general 综合，! 显示社区指令）',
   'hud.core.communityLinks': '社区链接',
   'hud.core.mobileControls': '移动端控制',
   'hud.core.mobileMove': '移动',
@@ -8326,7 +8326,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionPageIndicator': '第{page}页',
   'hudChrome.mobile.spellbookPageLabel': '页{page}',
   'hudChrome.mobile.hideKeyboard': '隐藏键盘',
-  'hudChrome.mobile.chatPlaceholder': '说点什么...',
+  'hudChrome.mobile.chatPlaceholder': '说点什么...（! 显示社区指令）',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': '溪谷杯',
   'hudChrome.keybinds.categoryPet': '宠物',

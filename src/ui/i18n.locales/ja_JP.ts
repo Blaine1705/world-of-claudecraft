@@ -1841,7 +1841,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.core.chatTab': 'チャット',
   'hud.core.combatLogTab': '戦闘ログ',
   'hud.core.chatPlaceholder':
-    '発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help)',
+    '発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help、! でコミュニティコマンド)',
   'hud.core.communityLinks': 'コミュニティリンク',
   'hud.core.mobileControls': 'モバイル操作',
   'hud.core.mobileMove': '移動',
@@ -8730,7 +8730,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobile.actionPageIndicator': '{page}ページ',
   'hudChrome.mobile.spellbookPageLabel': 'ページ{page}',
   'hudChrome.mobile.hideKeyboard': 'キーボードを隠す',
-  'hudChrome.mobile.chatPlaceholder': '発言する...',
+  'hudChrome.mobile.chatPlaceholder': '発言する... (! でコミュニティコマンド)',
   // The Vale Cup boarball minigame (docs/prd/vale-cup.md).
   'hudChrome.keybinds.valecup': 'ヴェイルカップ',
   'hudChrome.keybinds.categoryPet': 'ペット',
