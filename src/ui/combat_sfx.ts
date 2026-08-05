@@ -294,12 +294,23 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
 // it). Ice Block (Cold Coffin), Cloak of Shadows (Shadecloak, an absorb
 // aura, same apply path), Vanish (Smokestep, a toggle stealth selfBuff, same
 // apply path too), and Stealth (Duskveil, the opening rogue stealth toggle,
-// identical selfBuff shape) get their own distinct cue instead.
+// identical selfBuff shape) get their own distinct cue instead. Greater
+// Invisibility (mage, kind:'stealth' too, effect_dispatch.ts's
+// greaterInvisibility case) and Prowl (druid Cat Form stealth, id 'prowl',
+// display name Stalk, also kind:'stealth') reuse the rogue Stealth recording
+// rather than getting their own: same read, same table key. Shadowform
+// (Gloamveil, priest, kind:'form_shadow', a different aura kind entirely)
+// also reuses it for its apply moment by explicit request, even though it
+// isn't mechanically a stealth aura: BUFF_APPLY_ABILITY_CUES keys off
+// Aura.id, not Aura.kind, so this is a normal override regardless.
 const BUFF_APPLY_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   ice_block: 'ice_block',
   cloak_of_shadows: 'cloak_of_shadows',
   vanish: 'vanish',
   stealth: 'stealth',
+  greater_invisibility: 'stealth',
+  prowl: 'stealth',
+  shadowform: 'stealth',
 };
 
 export function auraApplyCue(event: AuraEvent, aura: Aura | null): SfxId | null {

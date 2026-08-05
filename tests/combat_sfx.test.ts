@@ -689,6 +689,19 @@ describe('combat SFX policy', () => {
     expect(auraApplyCue(gained, { ...aura('stealth'), id: 'stealth' })).toBe('stealth');
   });
 
+  it('reuses the Stealth recording for Greater Invisibility, Prowl, and Shadowform', () => {
+    const gained = { type: 'aura', targetId: 1, name: 'Test Aura', gained: true } as const;
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'greater_invisibility' })).toBe(
+      'stealth',
+    );
+    expect(auraApplyCue(gained, { ...aura('stealth'), id: 'prowl' })).toBe('stealth');
+    // Shadowform is kind:'form_shadow', not 'stealth': the override is keyed
+    // off Aura.id, not Aura.kind, so it still resolves regardless of the
+    // aura's real kind. Not a debuff (form_shadow is absent from
+    // DEBUFF_AURA_KINDS), so it reaches the buff-apply table at all.
+    expect(auraApplyCue(gained, { ...aura('form_shadow'), id: 'shadowform' })).toBe('stealth');
+  });
+
   it('uses unarmed swings in both druid combat forms', () => {
     const druid = target('player', 'druid');
     expect(weaponSwingCue(druid)).toBe('melee_swing_heavy');
