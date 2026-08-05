@@ -3103,6 +3103,11 @@ function calmAnchorCells(): Map<number, CalmAnchor[]> {
     const npc = NPCS[id];
     add(npc.pos.x, npc.pos.z, 6, 14);
   }
+  // Precision-graded landforms outside the content tables: the Glacier Tarn
+  // ramp and bowl (tests/frostveil_pit_escape.test.ts walks the descent
+  // under the fall-damage and climb gates, and pins the bed and the Rime
+  // Elemental beach to literals).
+  add(50, 1646, 22, 34);
   calmAnchorIndex = index;
   return index;
 }

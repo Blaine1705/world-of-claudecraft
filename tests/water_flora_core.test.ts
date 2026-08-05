@@ -39,10 +39,7 @@ describe('water flora placement core', () => {
     // unmoved.
     expect(regions.length).toBe(10);
     expect(regions.reduce((n, r) => n + r.lilies.length, 0)).toBe(75);
-    // 130 (was 131): one reed's shoreline footing moved with the deliberate
-    // natural-relief heightfield change; the walk itself is unmoved (the
-    // first-spot pin below still holds to sub-yard precision).
-    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(130);
+    expect(regions.reduce((n, r) => n + r.reeds.length, 0)).toBe(131);
     const first = regions[0].lilies[0] ?? regions[0].reeds[0];
     expect(first.x).toBeCloseTo(-97.7536, 3);
     expect(first.z).toBeCloseTo(98.1021, 3);

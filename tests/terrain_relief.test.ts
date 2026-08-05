@@ -60,10 +60,10 @@ describe('the calm field keeps graded features on their exact classic terrain', 
   // to full float precision; a drift here means a road, camp pad, or graded
   // bench no longer stands on the terrain it was built against.
   const goldens: [string, number, number, number][] = [
-    ['vale road', 0, 160, -3.5240606337549165],
+    ['vale road', 0, 160, -3.3480606337549164],
     ['peaks road', -98, 727, 10.139872348652359],
     ['marsh road', 20, 470, -1.769678368869094],
-    ['frost road', -73, 1696, 13.619770689175882],
+    ['frost road', -73, 1696, 13.619770689175878],
     ['peaks camp core', -90, 700, 12.536439409032718],
     ['tiny camp core', -78, 716, 13.501711523786856],
     ['ember camp core', 392, 2296, 10.399999999999999],

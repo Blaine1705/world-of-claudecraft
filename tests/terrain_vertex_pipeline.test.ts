@@ -47,7 +47,7 @@ describe('terrain vertex pipeline', () => {
     // re-minted it). It ignores only triangle submission order, retaining
     // each triangle's winding exactly.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      '79cb81b9a01d5207c2c6a0f7292ad402542f9915a254e6ed955c2a39bb20c5fe',
+      'f3d917b6699065b024e7ece57b8c2fddb03c3c4a63ebfaf67baf947cebca6198',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);
