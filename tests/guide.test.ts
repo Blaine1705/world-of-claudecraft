@@ -107,6 +107,7 @@ import {
   TIER5_TOOL_WIELD_PROFICIENCY,
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
+import type { DeedDef } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -134,6 +135,17 @@ const generatedSource = readFileSync(
   new URL('../src/guide/content.generated.ts', import.meta.url),
   'utf8',
 );
+
+// The player-facing prose that would spoil a hidden deed on any public surface: its name, its
+// criteria, and (when it grants one) the title text the secret rewards. The title text is in
+// scope because it spoils as much as the name and it is what actually leaked: the deeds arm
+// filtered hidden defs, but a Reliquary title relic published the reward text anyway. Callers
+// that also forbid the bare id prepend it; the module scan below deliberately does not.
+const hiddenDeedProse = (d: DeedDef): string[] => [
+  d.name,
+  d.desc,
+  ...(d.reward?.kind === 'title' ? [d.reward.text] : []),
+];
 
 describe('Guide routes', () => {
   it('treats the base and empty sub as the home route', () => {
@@ -540,8 +552,12 @@ describe('Guide deeds spoiler safety', () => {
     // filter were deleted, a hidden deed's id and name would appear here and fail the assert.
     const hidden = Object.values(DEEDS).filter((d) => d.hidden);
     expect(hidden.length).toBeGreaterThan(0); // the catalog has hidden deeds; this guard is meaningful
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
     for (const d of hidden) {
-      for (const needle of [d.id, d.name, d.desc]) {
+      for (const needle of [d.id, ...hiddenDeedProse(d)]) {
         expect(
           generatedSource.includes(needle),
           `hidden deed "${d.id}" leaked "${needle}" into content.generated.ts`,
@@ -844,8 +860,14 @@ describe('Guide deeds page render (continued)', () => {
     // sanctioned Chronicler flavor
     expect(html).toContain('Saul');
     // no hidden deed and no boss:true name reaches the rendered page
-    for (const d of Object.values(DEEDS).filter((x) => x.hidden)) {
-      for (const needle of [d.id, d.name, d.desc]) {
+    const hidden = Object.values(DEEDS).filter((x) => x.hidden);
+    expect(hidden.length).toBeGreaterThan(0);
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
+    for (const d of hidden) {
+      for (const needle of [d.id, ...hiddenDeedProse(d)]) {
         expect(html.includes(needle), `hidden "${d.id}" leaked "${needle}"`).toBe(false);
       }
     }
@@ -1023,15 +1045,19 @@ describe('Guide module-graph spoiler containment', () => {
 
     // And no hidden deed prose rides ANY module the guide graph reaches (a
     // future aggregate or a copied table would re-leak the secret without
-    // touching content/deeds.ts). Bare ids are tolerated by maintainer
-    // judgment: deed_image_ids.ts carries them for the committed crest art,
-    // and an id alone spoils nothing.
+    // touching content/deeds.ts), reward titles included. Bare ids are
+    // tolerated by maintainer judgment: deed_image_ids.ts carries them for the
+    // committed crest art, and an id alone spoils nothing.
     const hidden = Object.values(DEEDS).filter((d) => d.hidden);
     expect(hidden.length).toBeGreaterThan(0);
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
     for (const file of reached) {
       const source = readFileSync(file, 'utf8');
       for (const d of hidden) {
-        for (const needle of [d.name, d.desc]) {
+        for (const needle of hiddenDeedProse(d)) {
           expect(
             source.includes(needle),
             `hidden deed "${d.id}" prose leaked into guide-reachable ${file.slice(repoRoot.length)}`,

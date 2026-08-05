@@ -120,6 +120,11 @@ export const RELIQUARY_HORIZON_WEAPON_SKINS = [
   'meteorlatch_crossbow',
 ] as const;
 
+// Hidden deeds NEVER enter the Reliquary, not even as a masked or locked slot:
+// a hidden deed's existence is itself the secret, so a placeholder row would
+// spoil it just as loudly as the name. The Book of Deeds is their only home,
+// where they stay invisible until earned. Keep this list to non-hidden title
+// rewards; tests/reliquary_content.test.ts pins both directions.
 /** Deeds that grant a title reward (real DEEDS ids only; no invented titles). */
 export const RELIQUARY_HORIZON_TITLES = [
   'prog_veteran',
@@ -140,7 +145,6 @@ export const RELIQUARY_HORIZON_TITLES = [
   'pvp_vcup_wins_25',
   'soc_market_magnate',
   'exp_world_traveler',
-  'hid_saul_footnote',
   'prog_guildsworn',
   'prog_masterwright',
   'prog_master_angler',
@@ -159,8 +163,10 @@ export const RELIQUARY_HORIZON_TITLES = [
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
-// for rare field notes (`gather_event:*`). Masterwork marks are live-only
-// (no invented craft history on join).
+// for rare field notes (`gather_event:*`). Masterwork marks pair with
+// `masterwork:*` visited entries written at proc time, so a crash before
+// autosave retro-fills on join; history is never invented (the visit exists
+// only if the proc really happened).
 export const RELIQUARY_PROFESSION_MARKS = {
   /** First lifetime masterwork proc (any craft). */
   masterworkFirst: 'masterwork:first',

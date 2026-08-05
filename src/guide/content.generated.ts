@@ -6171,10 +6171,6 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "title",
-        "name": "the Footnote"
-      },
-      {
-        "kind": "title",
         "name": "Craftsworn"
       },
       {

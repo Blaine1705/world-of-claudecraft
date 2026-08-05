@@ -557,7 +557,14 @@ function reliquaryRelicName(relic) {
     return copy.name;
   }
   if (relic.kind === 'title') {
-    const reward = DEEDS[relic.deedId]?.reward;
+    const def = DEEDS[relic.deedId];
+    // Same structural hidden filter the deeds arm above applies, at the one other place a
+    // deed's prose can reach the wiki: a hidden deed's title text IS the secret's reward,
+    // so a title relic pointing at one fails the build instead of publishing it.
+    if (def?.hidden) {
+      throw new Error(`reliquary wiki emit: title relic ${relic.deedId} references a hidden deed`);
+    }
+    const reward = def?.reward;
     if (reward?.kind !== 'title') {
       throw new Error(`reliquary wiki emit: title relic ${relic.deedId} has no title reward`);
     }

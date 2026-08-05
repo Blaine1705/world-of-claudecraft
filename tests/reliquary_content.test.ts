@@ -65,6 +65,22 @@ describe('Reliquary Conqueror catalog structure', () => {
     ]);
   });
 
+  it('keeps every page single-kind (the emit path depends on it)', () => {
+    // Structural, not cosmetic. emitReliquaryUnlock (src/sim/reliquary.ts)
+    // decides Illumination from characterReliquaryOwnership, which deliberately
+    // omits account weapon skins: the server cannot answer account cosmetics
+    // from inside the sim. That is only safe while a page holds ONE relic kind,
+    // because an item or mark fill can then only ever reach item or mark pages,
+    // never a skin page whose ownership the emit path cannot see. A mixed page
+    // would illuminate inconsistently online (window says complete, emit does
+    // not, or the reverse), so it must not ship silently: land the account
+    // cosmetic surface on the emit path first, then relax this.
+    for (const page of RELIQUARY_PAGES) {
+      const kinds = new Set(page.relics.map((r) => r.kind));
+      expect(kinds.size, `${page.id} mixes relic kinds: ${[...kinds].sort().join(', ')}`).toBe(1);
+    }
+  });
+
   it('keeps page ids unique and PAGE_ORDER identical to table order', () => {
     const ids = RELIQUARY_PAGES.map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
@@ -471,15 +487,30 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('title page lists every deed with a title reward and only those', () => {
+  it('title page lists every non-hidden deed with a title reward and only those', () => {
     const page = RELIQUARY_PAGES_BY_ID.horizons_titles;
     const ids = page.relics.filter((r) => r.kind === 'title').map((r) => r.deedId);
     expect(ids).toEqual([...RELIQUARY_HORIZON_TITLES]);
-    const liveTitles = DEED_ORDER.filter((id) => DEEDS[id].reward?.kind === 'title');
+    // Bidirectional: the hand list is exactly the live non-hidden title rewards, so a new
+    // title deed must be added here and a hidden one can never silently re-enter.
+    const liveTitles = DEED_ORDER.filter(
+      (id) => DEEDS[id].reward?.kind === 'title' && !DEEDS[id].hidden,
+    );
     expect([...ids].sort()).toEqual([...liveTitles].sort());
     for (const id of ids) {
       expect(DEEDS[id], id).toBeDefined();
       expect(DEEDS[id].reward?.kind).toBe('title');
+      expect(DEEDS[id].hidden, id).toBeFalsy();
+    }
+    // Hidden deeds stay out of the Reliquary entirely (no masked slots); the Book of Deeds
+    // is their home. Anchored on a real hidden title deed so the filter arm above is proven
+    // live: this reds if hid_saul_footnote is re-listed OR loses its `hidden` flag.
+    const hiddenTitles = DEED_ORDER.filter(
+      (id) => DEEDS[id].reward?.kind === 'title' && DEEDS[id].hidden,
+    );
+    expect(hiddenTitles).toContain('hid_saul_footnote');
+    for (const id of hiddenTitles) {
+      expect(ids, id).not.toContain(id);
     }
     // Border-only curator rank 5 is not a title relic.
     expect(ids).not.toContain('col_reliquary_rank_5');
