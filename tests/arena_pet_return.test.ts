@@ -259,6 +259,21 @@ describe('arena pet return: what it must NOT do', () => {
     expect(sim.petOf(hunter)).toBeNull(); // still no LIVING pet
   });
 
+  it('does not rebuild a beast the owner abandoned AFTER the bout killed it', () => {
+    // abandonPet takes dead pets too (petOf includeDead) and drops the entity, so a
+    // killed-then-abandoned beast reaches the return path looking exactly like an
+    // unravelled demon. Keying the rebuild on the unravel, not the death, is what
+    // tells them apart (PR 2944 review).
+    const { sim, hunter, pet, match } = liveBout();
+    sim.ctx.handleDeath(pet, null);
+    sim.abandonPet(hunter);
+    expect(sim.entities.get(pet.id)).toBeUndefined();
+
+    arena.endArenaMatch(sim.ctx, match, 'B', 'forfeit');
+
+    expect(sim.petOf(hunter, true)).toBeNull(); // abandoned stays abandoned
+  });
+
   it('does not resurrect a pet the owner deliberately parted with mid-bout', () => {
     const { sim, hunter, pet, match } = liveBout();
     sim.abandonPet(hunter); // the beast goes back to the wild, by choice

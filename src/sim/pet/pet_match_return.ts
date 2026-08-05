@@ -14,8 +14,8 @@
 //     it walked in at, and a full rebuild payload, and only for a LIVING pet (a
 //     fighter who queued with a corpse is owed nothing, so the arena can never be a
 //     free pet revive).
-//   - noteMatchPetDeath: stamped by the owned-pet arm of handleDeath, the one place
-//     that knows the bout is what killed it.
+//   - noteMatchPetUnravelled: stamped at the corpse-decay unravel in
+//     mob/locomotion.ts, the one place that means "the world removed this corpse".
 //   - restoreMatchPet: called at the END of the return path, after the fighter is
 //     already standing at their queue spot, so the beast is placed beside its owner
 //     in the world instead of back on the sands.
@@ -27,10 +27,12 @@
 // seconds of dying (handleDeath gives an owned demon corpseTimer 3, then despawnPet
 // removes it), so there is nothing left to revive and it is REBUILT from the payload.
 //
-// The rebuild arm is deliberately the narrow one: it fires only for a pet the bout
-// actually killed (the death stamp) whose owner has not already replaced it. A pet
-// parted with on purpose, or a fresh summon standing at the end of the bout, is
-// never overwritten or handed back.
+// The rebuild arm is deliberately the narrow one, and it keys on the UNRAVEL, never
+// on the death. A missing entity is not evidence of anything by itself: abandonPet
+// accepts a dead pet and drops its entity too, so keying on "the bout killed it"
+// would hand a hunter back the corpse they deliberately abandoned mid-bout. Only
+// the corpse-decay unravel in mob/locomotion.ts stamps the snapshot, and the
+// rebuild additionally refuses when the owner already has a pet standing.
 //
 // `src/sim`-pure and rng-free: no DOM/Three/render/ui/game/net imports, no
 // Math.random/Date.now, and no draw sites (the revive is straight-line state).
@@ -49,8 +51,8 @@ export interface MatchPetSnapshot {
   hp: number;
   /** Everything needed to rebuild a pet whose entity does not outlive its death. */
   state: PetState;
-  /** Set by noteMatchPetDeath: the BOUT killed it, so a rebuild is owed. */
-  died?: boolean;
+  /** Set by noteMatchPetUnravelled: the corpse decayed away, so a rebuild is owed. */
+  unravelled?: boolean;
 }
 
 /**
@@ -67,14 +69,16 @@ export function snapshotMatchPet(ctx: SimContext, ownerPid: number): MatchPetSna
 }
 
 /**
- * Stamp a snapshotted pet as killed BY the bout. Called from the owned-pet arm of
- * handleDeath, the one site that sees the death itself: a warlock demon's entity is
- * gone seconds later, so by return time the death is otherwise unknowable.
+ * Stamp a snapshotted pet whose CORPSE has decayed away. Called from the one site
+ * that unravels an owned corpse (the demon arm of updateMob in mob/locomotion.ts):
+ * every other way a pet entity can vanish mid-bout is the owner's own doing, and
+ * must not earn a rebuild. Once the entity is gone this is unknowable, so it has to
+ * be recorded here rather than inferred at return time.
  */
-export function noteMatchPetDeath(ctx: SimContext, pet: Entity): void {
+export function noteMatchPetUnravelled(ctx: SimContext, pet: Entity): void {
   if (pet.ownerId === null) return;
   const snap = ctx.arenaMatches.get(pet.ownerId)?.preMatchPets?.get(pet.ownerId);
-  if (snap?.petId === pet.id) snap.died = true;
+  if (snap?.petId === pet.id) snap.unravelled = true;
 }
 
 /**
@@ -133,12 +137,13 @@ export function restoreMatchPet(
 /**
  * The warlock arm: the snapshotted entity is gone, so rebuild it from the payload
  * through the ordinary load path. Guarded twice over, because this arm CREATES a pet
- * rather than un-killing one: only a pet the bout itself killed is owed a rebuild,
- * and never when the owner already has one standing (a mid-bout re-summon is the
- * pet they chose to keep).
+ * rather than un-killing one. Only a corpse the WORLD took away is owed a rebuild
+ * (an entity the owner dropped themselves, by abandoning a beast alive or dead, is
+ * not), and never when the owner already has a pet standing (a mid-bout re-summon is
+ * the pet they chose to keep).
  */
 function rebuildMatchPet(ctx: SimContext, owner: Entity, snap: MatchPetSnapshot): void {
-  if (!snap.died || petOf(ctx, owner.id, true)) return;
+  if (!snap.unravelled || petOf(ctx, owner.id, true)) return;
   restorePet(ctx, owner, { ...snap.state, dead: false, hp: snap.hp });
   const rebuilt = petOf(ctx, owner.id);
   // restorePet already explains itself when the creature template is gone (a
