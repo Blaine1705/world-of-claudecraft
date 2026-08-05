@@ -8,14 +8,19 @@
 //
 // SAFETY DIRECTION: code=true means "run the full PR tier"; code=false means
 // "docs-only, skip pr-gate/pr-checks/browser-gate". Every unprovable case
-// (non-PR event, missing context, API error, pagination overflow, payload
+// (non-PR event, missing context, API error, truncated listing, payload
 // mismatch, unclassifiable entry) must resolve to code=true. A slow green is
 // acceptable; a fast false-green is not.
 
-// The code path set, matching the shell case patterns the changes job carried
-// inline before extraction (kept in the same order). A shell case `dir/*`
-// matches any path under the directory (case globs cross `/`), so directory
-// entries here are prefixes; bare filenames are exact top-level matches.
+// The code path set. The first block matches the shell case patterns the
+// changes job carried inline before extraction (kept in the same order); a
+// shell case `dir/*` matches any path under the directory (case globs cross
+// `/`), so directory entries here are prefixes and bare filenames are exact
+// top-level matches. The second block widens the set with root-level build
+// and supply-chain inputs the inline set missed (flagged in security review
+// when the rules became a tested module): every one of these feeds a shipped
+// bundle or the install itself, so a change to any of them must reach the
+// malware gate and the builds, never skip them as docs.
 const CODE_PATH_PREFIXES = Object.freeze([
   'src/',
   'server/',
@@ -32,6 +37,8 @@ const CODE_PATH_PREFIXES = Object.freeze([
   'deploy/',
   'mediawiki/',
   'Dockerfile.',
+  // Widened beyond the old inline set: bundled game data.
+  'data/',
 ]);
 
 const CODE_PATH_EXACT = Object.freeze([
@@ -45,10 +52,28 @@ const CODE_PATH_EXACT = Object.freeze([
   'Dockerfile',
   'docker-compose.yml',
   'docker-compose.yaml',
+  // Widened beyond the old inline set: the shipped entry documents (they
+  // carry inline scripts and third-party tags), the build/install configs,
+  // and the deploy-image filter.
+  'index.html',
+  'play.html',
+  'admin.html',
+  'guide.html',
+  'editor.html',
+  'wallet-handoff.html',
+  'music_editor.html',
+  'svelte.config.js',
+  'capacitor.config.ts',
+  'tsconfig.bot.json',
+  'turbo.json',
+  '.npmrc',
+  '.browserslistrc',
+  '.dockerignore',
 ]);
 
-// The pull request files endpoint lists at most 3000 files; past that the
-// listing is silently incomplete, so classification cannot be proven.
+// The pull request files endpoint lists at most 3000 files; a listing that
+// reaches that ceiling is indistinguishable from a truncated one, so reaching
+// it (not just exceeding it) is treated as unprovable.
 export const PR_FILES_CAP = 3000;
 
 /**
@@ -67,10 +92,17 @@ export function isCodePath(path) {
 
 /**
  * Classify a full PR file listing. A rename is classified by BOTH ends
- * (`filename` and `previous_filename`): the API folds a rename into one entry,
- * but a file renamed out of the code path set still changes the code path set,
- * exactly as the old `git diff --diff-filter=ACMRD` (which listed the delete
- * and the add separately) saw it.
+ * (`filename` and `previous_filename`). This is deliberately STRICTER than the
+ * old `git diff --name-only` classifier: under git's default rename detection
+ * that command printed only the destination path, so a file renamed out of the
+ * code path set (src/x.ts to docs/x.md) classified as docs-only. The API folds
+ * a rename into one entry but keeps the source in `previous_filename`, and a
+ * rename out of the code path set still changes the code path set, so both
+ * ends are checked. Do not "restore parity" by dropping the second arm.
+ *
+ * Filenames are attacker-controlled (git allows newlines in paths), and the
+ * reason string is echoed into the CI job log where line-leading `::` workflow
+ * commands are parsed, so embedded filenames are JSON-escaped.
  *
  * @param {ReadonlyArray<{ filename?: string, previous_filename?: string | null }>} files
  * @returns {{ code: boolean, reason: string }}
@@ -81,12 +113,15 @@ export function classifyPrFiles(files) {
       return { code: true, reason: 'unclassifiable file entry: full PR tier (code=true)' };
     }
     if (isCodePath(file.filename)) {
-      return { code: true, reason: `code path change detected (${file.filename}): full PR tier` };
+      return {
+        code: true,
+        reason: `code path change detected (${JSON.stringify(file.filename)}): full PR tier`,
+      };
     }
     if (file.previous_filename != null && isCodePath(file.previous_filename)) {
       return {
         code: true,
-        reason: `code path change detected (renamed from ${file.previous_filename}): full PR tier`,
+        reason: `code path change detected (renamed from ${JSON.stringify(file.previous_filename)}): full PR tier`,
       };
     }
   }
@@ -98,9 +133,16 @@ export function classifyPrFiles(files) {
 
 /**
  * Fetch the complete changed-file list for a pull request, paginated. Throws
- * on any HTTP error, non-array payload, or a listing that exceeds `cap`
- * (provably or by exhausting the page budget); callers translate a throw into
- * code=true.
+ * on any HTTP error, non-array payload, or a listing that reaches `cap`
+ * (the endpoint's ceiling, past which truncation is silent); callers translate
+ * a throw into code=true. The loop needs no page budget: a short page returns,
+ * a non-array throws, and a server that keeps sending full pages hits the cap
+ * throw, so every path terminates.
+ *
+ * One AbortSignal covers the WHOLE listing, not each page: the enclosing CI
+ * job has a 5 minute timeout, and a per-page budget could otherwise let a
+ * slow-but-not-erroring API run the job into the hard kill (where dependents
+ * skip) instead of the fail-closed code=true path.
  *
  * @param {{
  *   repo: string,
@@ -126,10 +168,8 @@ export async function fetchPrFiles({
 }) {
   /** @type {Array<{ filename?: string, previous_filename?: string | null }>} */
   const files = [];
-  // One page past the cap: reaching it proves the listing overflowed rather
-  // than looping forever on a misbehaving endpoint.
-  const maxPages = Math.ceil(cap / perPage) + 1;
-  for (let page = 1; page <= maxPages; page++) {
+  const signal = AbortSignal.timeout(timeoutMs);
+  for (let page = 1; ; page++) {
     const url = `${apiUrl}/repos/${repo}/pulls/${prNumber}/files?per_page=${perPage}&page=${page}`;
     const res = await fetchImpl(url, {
       headers: {
@@ -137,7 +177,7 @@ export async function fetchPrFiles({
         Accept: 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
       },
-      signal: AbortSignal.timeout(timeoutMs),
+      signal,
     });
     if (!res.ok) {
       throw new Error(`pull request files page ${page} failed: HTTP ${res.status}`);
@@ -147,20 +187,22 @@ export async function fetchPrFiles({
       throw new Error(`pull request files page ${page} returned a non-array payload`);
     }
     files.push(...batch);
-    if (files.length > cap) {
-      throw new Error(`pull request lists more than ${cap} files; listing is incomplete`);
+    if (files.length >= cap) {
+      throw new Error(
+        `pull request lists ${cap} or more files; the listing cannot be proven complete`,
+      );
     }
     if (batch.length < perPage) return files;
   }
-  throw new Error(`pull request files pagination exceeded ${maxPages} pages`);
 }
 
 /**
  * The whole decision, fail closed end to end: never throws, and every path
  * that cannot PROVE a docs-only change returns code=true. `reportedCount` is
  * the event payload's `changed_files`; a mismatch against the fetched listing
- * (a push racing the pagination, or a truncated listing) discards the
- * classification.
+ * (a push racing the pagination) discards the classification. The docs-only
+ * reason carries the listed and reported counts so a suspicious skip can be
+ * audited from the job log alone.
  *
  * @param {{
  *   eventName: string,
@@ -202,7 +244,15 @@ export async function detectCode({
         reason: `listed ${files.length} files but the event reports ${reportedCount}: full PR tier (code=true)`,
       };
     }
-    return classifyPrFiles(files);
+    const result = classifyPrFiles(files);
+    if (!result.code) {
+      const reported = Number.isInteger(reportedCount) ? reportedCount : 'n/a';
+      return {
+        code: false,
+        reason: `${result.reason} (${files.length} files listed; event reports ${reported})`,
+      };
+    }
+    return result;
   } catch (err) {
     const detail = err instanceof Error ? err.message : String(err);
     return {

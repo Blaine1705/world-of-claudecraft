@@ -1,4 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { spawn } from 'node:child_process';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { createServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   classifyPrFiles,
   detectCode,
@@ -10,9 +17,9 @@ import {
 type Entry = { filename?: string; previous_filename?: string | null };
 
 // Minimal fetch stub: serves `files` through the paginated PR files endpoint
-// shape (per_page/page query params), recording every call for order and
-// header assertions. Plain objects stand in for Response; the lib only reads
-// ok, status, and json().
+// shape (per_page/page query params), recording every call for order, header,
+// and signal assertions. Plain objects stand in for Response; the lib only
+// reads ok, status, and json().
 function pagedFetch(files: Entry[]) {
   const calls: Array<{ url: string; init: RequestInit | undefined }> = [];
   const impl = (async (url: string | URL, init?: RequestInit) => {
@@ -49,6 +56,7 @@ describe('isCodePath', () => {
     expect(isCodePath('src/ui/hud/town/index.ts')).toBe(true);
     expect(isCodePath('scripts/lib/ci_change_classify.mjs')).toBe(true);
     expect(isCodePath('.github/workflows/ci.yml')).toBe(true);
+    expect(isCodePath('data/battleground/thornhollow.map.json')).toBe(true);
     // Sibling-name near misses must not match: prefixes end at the slash.
     expect(isCodePath('srcs/notes.md')).toBe(false);
     expect(isCodePath('docs/src/diagram.md')).toBe(false);
@@ -78,6 +86,30 @@ describe('isCodePath', () => {
     expect(isCodePath('docs/examples/Dockerfile')).toBe(false);
   });
 
+  it('classifies the root build and supply-chain inputs as code (widened set)', () => {
+    // These were holes in the old inline set: each feeds a shipped bundle or
+    // the install itself, so skipping the malware gate and builds on them was
+    // a bypass (index.html alone carries inline scripts and third-party tags).
+    for (const widened of [
+      'index.html',
+      'play.html',
+      'admin.html',
+      'guide.html',
+      'editor.html',
+      'wallet-handoff.html',
+      'music_editor.html',
+      'svelte.config.js',
+      'capacitor.config.ts',
+      'tsconfig.bot.json',
+      'turbo.json',
+      '.npmrc',
+      '.browserslistrc',
+      '.dockerignore',
+    ]) {
+      expect(isCodePath(widened)).toBe(true);
+    }
+  });
+
   it('leaves documentation surfaces classifiable as non-code', () => {
     expect(isCodePath('README.md')).toBe(false);
     expect(isCodePath('CLAUDE.md')).toBe(false);
@@ -94,14 +126,20 @@ describe('isCodePath', () => {
 });
 
 describe('classifyPrFiles', () => {
-  it('flags a code file anywhere in the listing and names it in the reason', () => {
+  it('flags a code file anywhere in the listing and names it, JSON-escaped, in the reason', () => {
     const result = classifyPrFiles([
       { filename: 'docs/prd/spec.md' },
       { filename: 'server/game.ts' },
       { filename: 'README.md' },
     ]);
     expect(result.code).toBe(true);
-    expect(result.reason).toBe('code path change detected (server/game.ts): full PR tier');
+    expect(result.reason).toBe('code path change detected ("server/game.ts"): full PR tier');
+    // Filenames are attacker-controlled and the reason reaches the CI log,
+    // where a line-leading :: is a workflow command; a newline must arrive
+    // escaped, never literal.
+    const sneaky = classifyPrFiles([{ filename: 'src/a\n::error::forged' }]);
+    expect(sneaky.reason).not.toContain('\n');
+    expect(sneaky.reason).toContain('\\n::error::forged');
   });
 
   it('classifies a fully non-code listing as docs-only with the skip reason', () => {
@@ -116,15 +154,17 @@ describe('classifyPrFiles', () => {
     });
   });
 
-  it('classifies both ends of a rename, like the old add+delete diff pair', () => {
-    // Renamed OUT of the code path set: the API folds this into one entry
-    // whose filename is non-code; only previous_filename betrays it.
+  it('classifies both ends of a rename, stricter than the old diff on purpose', () => {
+    // The old git-diff classifier printed only the DESTINATION under default
+    // rename detection, so renaming src/sim/old.ts to docs/old_sim.md read as
+    // docs-only. previous_filename closes that hole; this pin keeps a future
+    // "restore parity" cleanup from reopening it.
     const out = classifyPrFiles([
       { filename: 'docs/old_sim.md', previous_filename: 'src/sim/old.ts' },
     ]);
     expect(out.code).toBe(true);
     expect(out.reason).toBe(
-      'code path change detected (renamed from src/sim/old.ts): full PR tier',
+      'code path change detected (renamed from "src/sim/old.ts"): full PR tier',
     );
     // A rename fully inside docs stays non-code.
     const docs = classifyPrFiles([
@@ -155,14 +195,20 @@ describe('fetchPrFiles', () => {
     );
   });
 
-  it('sends the token and API headers on every page request', async () => {
-    const { impl, calls } = pagedFetch([{ filename: 'docs/a.md' }]);
+  it('sends the token and API headers, and ONE shared deadline, on every page', async () => {
+    const files: Entry[] = Array.from({ length: 250 }, (_, i) => ({ filename: `docs/f${i}.md` }));
+    const { impl, calls } = pagedFetch(files);
     await fetchPrFiles({ ...BASE, fetchImpl: impl });
     const headers = calls[0].init?.headers as Record<string, string>;
     expect(headers.Authorization).toBe('Bearer ghs_test');
     expect(headers.Accept).toBe('application/vnd.github+json');
     expect(headers['X-GitHub-Api-Version']).toBe('2022-11-28');
+    // One AbortSignal instance across all pages: the timeout bounds the whole
+    // listing, so a slow API fails closed inside the job's 5 minute timeout
+    // instead of running it into the hard kill (where dependents skip).
+    expect(calls).toHaveLength(3);
     expect(calls[0].init?.signal).toBeInstanceOf(AbortSignal);
+    expect(new Set(calls.map((c) => c.init?.signal)).size).toBe(1);
   });
 
   it('throws on an HTTP error status', async () => {
@@ -180,12 +226,22 @@ describe('fetchPrFiles', () => {
     await expect(fetchPrFiles({ ...BASE, fetchImpl: impl })).rejects.toThrow(/non-array/);
   });
 
-  it('throws once the listing exceeds the completeness cap', async () => {
-    const files: Entry[] = Array.from({ length: 250 }, (_, i) => ({ filename: `docs/f${i}.md` }));
-    const { impl } = pagedFetch(files);
-    await expect(fetchPrFiles({ ...BASE, fetchImpl: impl, cap: 200 })).rejects.toThrow(
-      /more than 200 files/,
-    );
+  it('throws once the listing REACHES the completeness cap, not only past it', async () => {
+    // The endpoint truncates at the cap silently, so a listing of exactly cap
+    // entries is indistinguishable from a truncated one and must fail closed
+    // on its own, without depending on the optional changed_files field.
+    const files = (n: number): Entry[] =>
+      Array.from({ length: n }, (_, i) => ({ filename: `docs/f${i}.md` }));
+    await expect(
+      fetchPrFiles({ ...BASE, fetchImpl: pagedFetch(files(250)).impl, cap: 200 }),
+    ).rejects.toThrow(/200 or more files/);
+    await expect(
+      fetchPrFiles({ ...BASE, fetchImpl: pagedFetch(files(200)).impl, cap: 200 }),
+    ).rejects.toThrow(/200 or more files/);
+    // One under the cap is a complete, provable listing.
+    await expect(
+      fetchPrFiles({ ...BASE, fetchImpl: pagedFetch(files(199)).impl, cap: 200 }),
+    ).resolves.toHaveLength(199);
     // The real cap matches the documented endpoint limit.
     expect(PR_FILES_CAP).toBe(3000);
   });
@@ -252,19 +308,29 @@ describe('detectCode (fail closed end to end)', () => {
     });
   });
 
-  it('classifies a docs-only PR as code=false when the listing is complete', async () => {
+  it('classifies a docs-only PR as code=false with an auditable count in the reason', async () => {
     const docs: Entry[] = [
       { filename: 'docs/prd/spec.md' },
       { filename: 'README.md' },
       { filename: 'docs/screenshots/after.png' },
     ];
     const { impl } = pagedFetch(docs);
-    const counted = await detectCode({ ...BASE, reportedCount: 3, fetchImpl: impl });
-    expect(counted.code).toBe(false);
+    // The skip decision must be auditable from the job log alone: how many
+    // files were listed and what the event reported.
+    expect(await detectCode({ ...BASE, reportedCount: 3, fetchImpl: impl })).toEqual({
+      code: false,
+      reason:
+        'docs-only (or non-code) change: skip pr-gate, pr-checks, browser-gate (3 files listed; event reports 3)',
+    });
     // changed_files missing from the payload skips the count check but still
-    // classifies (the listing itself terminated normally).
+    // classifies (pagination terminated below the cap, so the listing is
+    // complete), and the log says the report was absent.
     const { impl: uncounted } = pagedFetch(docs);
-    expect((await detectCode({ ...BASE, fetchImpl: uncounted })).code).toBe(false);
+    expect(await detectCode({ ...BASE, fetchImpl: uncounted })).toEqual({
+      code: false,
+      reason:
+        'docs-only (or non-code) change: skip pr-gate, pr-checks, browser-gate (3 files listed; event reports n/a)',
+    });
   });
 
   it('classifies a code PR as code=true through the same path', async () => {
@@ -272,7 +338,95 @@ describe('detectCode (fail closed end to end)', () => {
     const result = await detectCode({ ...BASE, reportedCount: 2, fetchImpl: impl });
     expect(result).toEqual({
       code: true,
-      reason: 'code path change detected (src/sim/sim.ts): full PR tier',
+      reason: 'code path change detected ("src/sim/sim.ts"): full PR tier',
     });
+  });
+});
+
+// The entry script is the wiring between the Actions environment and the
+// tested lib, and its GITHUB_OUTPUT write is what the three dependent jobs
+// gate on: a silently missing write leaves the output empty and every
+// dependent SKIPS, which is a false green. So the entry runs for real here,
+// as a subprocess, against a local HTTP stub standing in for the API.
+describe('detect_code_changes.mjs entry (subprocess)', () => {
+  const repoRoot = fileURLToPath(new URL('..', import.meta.url));
+  const scratch = mkdtempSync(join(tmpdir(), 'wocc-detect-entry-'));
+  let apiUrl = '';
+  const server = createServer((_req, res) => {
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify([{ filename: 'docs/prd/spec.md' }, { filename: 'README.md' }]));
+  });
+
+  beforeAll(async () => {
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    apiUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  });
+  afterAll(async () => {
+    await new Promise<void>((resolve, reject) =>
+      server.close((err) => (err ? reject(err) : resolve())),
+    );
+  });
+
+  async function runEntry(name: string, env: Record<string, string>) {
+    const outFile = join(scratch, `${name}.out`);
+    writeFileSync(outFile, '');
+    const child = spawn(process.execPath, ['scripts/detect_code_changes.mjs'], {
+      cwd: repoRoot,
+      env: { PATH: process.env.PATH ?? '', GITHUB_OUTPUT: outFile, ...env },
+    });
+    let log = '';
+    child.stdout.on('data', (chunk) => {
+      log += String(chunk);
+    });
+    child.stderr.on('data', (chunk) => {
+      log += String(chunk);
+    });
+    const exitCode = await new Promise<number | null>((resolve) => child.on('close', resolve));
+    return { exitCode, log, output: readFileSync(outFile, 'utf8') };
+  }
+
+  function eventFixture(name: string, payload: unknown): string {
+    const file = join(scratch, `${name}.json`);
+    writeFileSync(file, JSON.stringify(payload));
+    return file;
+  }
+
+  it('writes code=true to GITHUB_OUTPUT for a push event', async () => {
+    const run = await runEntry('push', { GITHUB_EVENT_NAME: 'push' });
+    expect(run.exitCode).toBe(0);
+    expect(run.output).toBe('code=true\n');
+    expect(run.log).toContain('non-PR event');
+  });
+
+  it('writes code=false for a docs-only PR through the real fetch path', async () => {
+    const run = await runEntry('docs', {
+      GITHUB_EVENT_NAME: 'pull_request',
+      GITHUB_EVENT_PATH: eventFixture('docs-event', {
+        pull_request: { number: 12, changed_files: 2 },
+      }),
+      GITHUB_REPOSITORY: 'levy-street/world-of-claudecraft',
+      GITHUB_TOKEN: 'ghs_test',
+      GITHUB_API_URL: apiUrl,
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.output).toBe('code=false\n');
+    expect(run.log).toContain('2 files listed; event reports 2');
+  });
+
+  it('fails closed when the payload count disagrees with the listing', async () => {
+    // This also pins that changed_files is actually read and passed through:
+    // if that wiring broke, this case would classify docs-only.
+    const run = await runEntry('mismatch', {
+      GITHUB_EVENT_NAME: 'pull_request',
+      GITHUB_EVENT_PATH: eventFixture('mismatch-event', {
+        pull_request: { number: 12, changed_files: 5 },
+      }),
+      GITHUB_REPOSITORY: 'levy-street/world-of-claudecraft',
+      GITHUB_TOKEN: 'ghs_test',
+      GITHUB_API_URL: apiUrl,
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.output).toBe('code=true\n');
+    expect(run.log).toContain('listed 2 files but the event reports 5');
   });
 });

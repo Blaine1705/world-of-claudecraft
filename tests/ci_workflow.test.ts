@@ -109,6 +109,25 @@ const CODE_PATH_SAMPLES = [
   ['Dockerfile.*', 'Dockerfile.bot'],
   ['docker-compose.yml', 'docker-compose.yml'],
   ['docker-compose.yaml', 'docker-compose.yaml'],
+  // Widened when the rules became a tested module: root build and
+  // supply-chain inputs the old inline set skipped (the shipped entry
+  // documents carry inline scripts and third-party tags; the configs steer
+  // the install and every bundle).
+  ['index.html', 'index.html'],
+  ['play.html', 'play.html'],
+  ['admin.html', 'admin.html'],
+  ['guide.html', 'guide.html'],
+  ['editor.html', 'editor.html'],
+  ['wallet-handoff.html', 'wallet-handoff.html'],
+  ['music_editor.html', 'music_editor.html'],
+  ['svelte.config.js', 'svelte.config.js'],
+  ['capacitor.config.ts', 'capacitor.config.ts'],
+  ['tsconfig.bot.json', 'tsconfig.bot.json'],
+  ['turbo.json', 'turbo.json'],
+  ['.npmrc', '.npmrc'],
+  ['.browserslistrc', '.browserslistrc'],
+  ['.dockerignore', '.dockerignore'],
+  ['data/*', 'data/battleground/thornhollow.map.json'],
 ] as const;
 
 // Paths that must stay classifiable as docs-only, or every documentation PR
@@ -387,11 +406,18 @@ describe('CI workflow parity', () => {
     expect(changes).toContain('id: filter');
     expect(changes).toContain('outputs:');
     expect(changes).toContain('code: ${{ steps.filter.outputs.code }}');
-    expect(changes).toContain('run: node scripts/detect_code_changes.mjs');
-    // The only checkout is blob-less, shallow, and sparse: the ~10 minute
+    // Anchored, not toContain: a YAML-commented-out step keeps the substring
+    // but loses the indented shape, and this one line is the whole classifier.
+    expect(changes).toMatch(/\n {8}run: node scripts\/detect_code_changes\.mjs\n/);
+    // The script's appendFile is the ONLY writer of the code output: a shell
+    // step echoing into GITHUB_OUTPUT could override the classifier verdict.
+    expect(changes).not.toContain('GITHUB_OUTPUT');
+    // Exactly one checkout, blob-less, shallow, and sparse: the ~10 minute
     // full-history checkout (which also wedged for 90+ minutes twice) must not
     // return, and nothing in this job may need the tree beyond scripts/.
-    expect(changes).not.toContain('fetch-depth');
+    expect(changes.match(/uses: actions\/checkout/g)).toHaveLength(1);
+    expect(changes).not.toMatch(/^\s+fetch-depth:/m);
+    expect(changes).not.toContain('--unshallow');
     expect(changes).toContain('filter: blob:none');
     expect(changes).toMatch(/sparse-checkout: \|\n {12}scripts\n/);
     // No toolchain setup or dependency install on this serial critical path:
@@ -605,7 +631,9 @@ describe('CI workflow parity', () => {
     expect(jobSource('changes')).toMatch(
       /\n {4}permissions:\n {6}contents: read\n {6}pull-requests: read\n/,
     );
-    expect(workflow).not.toMatch(/^\s*[\w-]+: write\s*$/m);
+    // \b, not $: a trailing comment after a write scope must not hide it, and
+    // \b after "write" also matches the write-all shorthand.
+    expect(workflow).not.toMatch(/^\s*[\w-]+:\s*write\b/m);
     expect(workflow).not.toContain('secrets.');
     expect(workflow).not.toContain("secrets['");
     expect(workflow).not.toContain('secrets["');
