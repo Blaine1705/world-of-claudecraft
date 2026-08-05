@@ -3236,12 +3236,12 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // shrunk sweep reads as wrong rather than merely smaller.
     // Spent rose 86 to 152 with the farm-economy pass, which gave 15 coinless
     // trash templates their mapped harvest tags. The Drakelands brood,
-    // zones 1 to 3 quest-dedupe content, and the Drakelands/Willowfen/
-    // Evergarden harvest-gap fix together add mapped harvest rows. bogtoad's
-    // all-unmapped ['gills'] subset is the one new refusal.
-    expect(spent).toBe(175);
+    // zones 1 to 3 quest-dedupe content, the Drakelands/Willowfen/Evergarden
+    // harvest-gap fix, and the Galecrest quest beasts together add mapped
+    // harvest rows. bogtoad's all-unmapped ['gills'] subset remains a refusal.
+    expect(spent).toBe(177);
     expect(refused).toBe(17);
-    expect(spent + refused).toBe(192);
+    expect(spent + refused).toBe(194);
   });
 
   // The six mapped families and their item ids, spelled out. Deriving them from
@@ -3326,9 +3326,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     expect(unmappedOffered).toBe(39);
     // 113 to 217 for the same reason as the spend census above: more mapped
     // families in the corpus. The Drakelands brood, zones 1 to 3 quest-dedupe
-    // content, and the Drakelands/Willowfen/Evergarden harvest-gap fix combine
-    // to move this corpus census to 248.
-    expect(extracted).toBe(248);
+    // content, the Drakelands/Willowfen/Evergarden harvest-gap fix, and the
+    // Galecrest quest beasts combine to move this corpus census to 250.
+    expect(extracted).toBe(250);
   });
 
   it('keeps every mixed template harvestable, so the gate is not a blanket refusal', () => {
