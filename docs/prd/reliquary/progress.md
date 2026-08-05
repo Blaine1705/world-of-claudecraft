@@ -24,7 +24,7 @@
 | 7 QA | **done** | exit criteria verified; pin holes closed; release @ 84b704c1c7 |
 | 8 Horizons shelf | **done** | mounts / skins / titles pages; ownership seams; UI |
 | 8 QA | **done** | exit criteria verified; rank-sync + pin defects fixed; release @ d3190ff008 |
-| 9 Social, wiki, polish, gate, PR | **done** | sheet + public + wiki + tip + screenshots + gate + PR |
+| 9 Social, wiki, polish, gate, PR | **impl done; gate residual** | product matrix green; full gate seed re-pin remaining |
 
 ## Verified outcomes
 
@@ -448,6 +448,15 @@
   Reviews: qa NOT-READY only on process until gate/PR; privacy GREEN;
   architecture 0 BLOCKING; frontend 0 BLOCKING (SHOULD-FIX pins closed);
   test-coverage BLOCKING pins closed; database-performance PASS.
+
+
+- Phase 9 gate residual (2026-08-05 tip fe9af498d3): `npm run gate` fails at
+  full vitest (~95 tests / 22 files). Phase 9 product matrix is green
+  (reliquary_*, character_sheet, guide, architecture, localization_coverage).
+  Remaining failures are seed-pinned profession/combat suites whose world-gen
+  draw order shifted on the feature branch (masterwork seed re-pinned 53->70;
+  corpse rare 30->9 partial). Need a bulk seed re-hunt pass before PR.
+  Specialist reviews: 0 BLOCKING on product surface (privacy GREEN, DB PASS).
 
 - Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
 - Phase 2 absorbed the stub page id: Hollow Crypt now lists cryptbone / greyjaw / gravewoven uniques; `boundstone_helm` lives on Sanctum (its real drop).
