@@ -7593,6 +7593,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.graphicsRetry'
   | 'hudChrome.options.graphicsSaved'
   | 'hudChrome.options.groundReticle'
+  | 'hudChrome.options.hideUnusedActionSlots'
   | 'hudChrome.options.highContrastBackground'
   | 'hudChrome.options.interfaceMode'
   | 'hudChrome.options.interfaceModeAuto'

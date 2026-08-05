@@ -1305,6 +1305,7 @@ export const cs_CZ: EnTranslations = {
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showThirdActionBar": "Zobrazit třetí panel akcí",
+      "hideUnusedActionSlots": "Skrýt nepoužitá políčka akcí",
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
       "showAttackButton": "Zobrazit tlačítko útoku",

@@ -8002,6 +8002,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Anuncia una banda, quedada o evento',
   'hudChrome.discord.relay.help.label': 'Necesito ayuda',
   'hudChrome.discord.relay.help.hint': 'Pide ayuda a la comunidad',
+  'hudChrome.options.hideUnusedActionSlots': 'Ocultar espacios de acción no utilizados',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar barra de acción secundaria',
   'errors.api.desktopCodeInvalid':
     'El código de inicio de sesión de escritorio no es válido o expiró. Inténtalo de nuevo.',

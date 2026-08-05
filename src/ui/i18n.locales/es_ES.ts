@@ -369,4 +369,5 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Se ha anulado una invitación de hermandad pendiente porque la hermandad ha cambiado de nombre.',
   'hud.prompts.guildRenamed':
     'Tu hermandad ha sido renombrada a {name} por el equipo de moderación.',
+  'hudChrome.options.hideUnusedActionSlots': 'Ocultar casillas de acción sin usar',
 };

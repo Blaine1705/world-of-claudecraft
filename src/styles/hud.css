@@ -1711,6 +1711,22 @@
     cursor: default;
     box-shadow: inset 0 0 10px #000;
   }
+  /* Issue 2429: the "Hide Unused Action Slots" Interface option (hideUnusedActionSlots,
+     applied as this body class by main.ts). A slot with no ability or item bound loses
+     its black background, border, and keybind label so an unlearned class's bar reads
+     clean instead of a wall of empty squares; the box stays in the flex row (no
+     display: none) so it neither shifts a bound neighbor on the extra rows nor disturbs
+     the deliberate slot layout those rows exist for. The .action-btn:hover rule above
+     still applies (border-color: var(--gold)), so the slot stays a discoverable drop
+     target for dragging a new ability or item in. */
+  body.hide-unused-action-slots .action-btn.empty {
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+  body.hide-unused-action-slots .action-btn.empty .keybind {
+    display: none;
+  }
   .action-btn .keybind {
     position: absolute;
     top: 1px;

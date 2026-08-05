@@ -7861,6 +7861,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Annonsera en raid, träff eller ett evenemang',
   'hudChrome.discord.relay.help.label': 'Behöver hjälp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hjälp',
+  'hudChrome.options.hideUnusedActionSlots': 'Dölj oanvända åtgärdsrutor',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
   'errors.api.desktopCodeInvalid':
     'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',

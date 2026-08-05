@@ -1305,6 +1305,7 @@ export const en_XA: EnTranslations = {
       "itemScoreLine": "[Šçóŕé {score}]",
       "showSecondaryActionBar": "[Šĥóŵ Šéçóñðáŕý Áçţíóñ Ɓáŕ]",
       "showThirdActionBar": "[Šĥóŵ Ţĥíŕð Áçţíóñ Ɓáŕ]",
+      "hideUnusedActionSlots": "[Ĥíðé Úñúšéð Áçţíóñ Šļóţš]",
       "lockActionBars": "[Ļóçķ Áçţíóñ Ɓáŕš]",
       "showTargetOfTarget": "[Šĥóŵ Ţáŕĝéţ óƒ Ţáŕĝéţ]",
       "showAttackButton": "[Šĥóŵ Áţţáçķ Ɓúţţóñ]",

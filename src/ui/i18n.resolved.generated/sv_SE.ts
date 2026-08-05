@@ -1305,6 +1305,7 @@ export const sv_SE: EnTranslations = {
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
+      "hideUnusedActionSlots": "Dölj oanvända åtgärdsrutor",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
       "showAttackButton": "Visa attackknapp",

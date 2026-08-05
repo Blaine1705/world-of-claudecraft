@@ -1263,6 +1263,12 @@ export const hudChromeStrings = {
     // Enabled only while the secondary row is visible. Slots remain reachable
     // through keybinds and the mobile action-ring pages while this row is hidden.
     showThirdActionBar: 'Show Third Action Bar',
+    // Interface panel toggle (off by default): strips the black background,
+    // border, and keybind label from action-bar slots with no ability or item
+    // bound, so an unlearned class's bar reads clean instead of a wall of empty
+    // squares. Bound slots (and the fixed Attack button) are unaffected, so the
+    // slot layout used to arrange buffs/consumables on the extra rows holds.
+    hideUnusedActionSlots: 'Hide Unused Action Slots',
     // Interface panel toggle (off by default) that locks the action bar slots
     // against drag-to-move, drag-to-replace, and clear so an accidental
     // click-and-drag mid-fight can't disturb a slot. Abilities still fire from

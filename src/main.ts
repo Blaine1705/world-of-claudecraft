@@ -2267,6 +2267,15 @@ async function startGame(
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
       return;
     }
+    if (key === 'hideUnusedActionSlots') {
+      // Purely presentational (issue 2429): a body class the action-bar CSS reads
+      // to strip the empty-slot chrome. No live subsystem to update.
+      document.body.classList.toggle(
+        'hide-unused-action-slots',
+        settings.set('hideUnusedActionSlots', !!value),
+      );
+      return;
+    }
     if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
       const visibility = resolveActionBarVisibility(
         {

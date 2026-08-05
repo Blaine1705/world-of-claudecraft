@@ -8592,6 +8592,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Bir akın, buluşma veya etkinlik duyur',
   'hudChrome.discord.relay.help.label': 'Yardım Lazım',
   'hudChrome.discord.relay.help.hint': 'Topluluktan yardım iste',
+  'hudChrome.options.hideUnusedActionSlots': 'Kullanılmayan Eylem Alanlarını Gizle',
   'hudChrome.options.showSecondaryActionBar': 'İkincil Eylem Çubuğunu Göster',
   'errors.api.desktopCodeInvalid':
     'Masaüstü giriş kodu geçersiz veya süresi dolmuş. Lütfen tekrar deneyin.',

@@ -1105,6 +1105,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '显示物品等级',
   'hudChrome.options.showSecondaryActionBar': '显示副动作条',
   'hudChrome.options.showThirdActionBar': '显示第三动作条',
+  'hudChrome.options.hideUnusedActionSlots': '隐藏未使用的动作栏位',
   'hudChrome.options.lockActionBars': '锁定动作条',
   'hudChrome.options.showDailyRewardsChest': '显示每日奖励宝箱',
   'hudChrome.options.mobileCameraJoystick': '摄像机摇杆',

@@ -1144,6 +1144,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': '아이템 레벨 표시',
   'hudChrome.options.showSecondaryActionBar': '보조 액션 바 표시',
   'hudChrome.options.showThirdActionBar': '세 번째 액션 바 표시',
+  'hudChrome.options.hideUnusedActionSlots': '사용하지 않는 행동 칸 숨기기',
   'hudChrome.options.lockActionBars': '액션 바 잠금',
   'hudChrome.options.showDailyRewardsChest': '일일 보상 보물상자 표시',
   'hudChrome.options.mobileCameraJoystick': '카메라 조이스틱',

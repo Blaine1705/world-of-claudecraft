@@ -320,6 +320,13 @@ export const BOOL_SETTINGS = {
   // 23..33). main.ts enforces that this row can only remain enabled while the
   // secondary row is visible. Mobile exposes the same slots through ring pages.
   showThirdActionBar: { def: false },
+  // off by default (the classic look, unchanged out of the box): strips the black
+  // background, border, and keybind label from desktop action-bar slots that hold
+  // no ability or item, via a body class main.ts toggles (issue 2429). The fixed
+  // Attack slot and any bound slot are unaffected, so the emptied-out look never
+  // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
+  // and consumables); the slots stay in place and keybind-reachable either way.
+  hideUnusedActionSlots: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display

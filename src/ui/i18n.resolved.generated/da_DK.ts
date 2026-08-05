@@ -1305,6 +1305,7 @@ export const da_DK: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
       "showThirdActionBar": "Vis tredje handlingslinje",
+      "hideUnusedActionSlots": "Skjul ubrugte handlingsfelter",
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
       "showAttackButton": "Vis angrebsknap",

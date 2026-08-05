@@ -8574,6 +8574,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Thông báo một trận raid, buổi gặp mặt hoặc sự kiện',
   'hudChrome.discord.relay.help.label': 'Cần Trợ Giúp',
   'hudChrome.discord.relay.help.hint': 'Nhờ cộng đồng giúp đỡ',
+  'hudChrome.options.hideUnusedActionSlots': 'Ẩn Ô Hành Động Chưa Sử Dụng',
   'hudChrome.options.showSecondaryActionBar': 'Hiện Thanh Hành Động Phụ',
   'desktop.crash.body': 'Khung trò chơi đã ngừng hoạt động. Tải lại chứ?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft gặp lỗi không mong muốn và cần đóng lại.',

@@ -8645,6 +8645,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Umumkan raid, pertemuan, atau acara',
   'hudChrome.discord.relay.help.label': 'Butuh Bantuan',
   'hudChrome.discord.relay.help.hint': 'Minta bantuan dari komunitas',
+  'hudChrome.options.hideUnusedActionSlots': 'Sembunyikan Slot Aksi yang Tidak Terpakai',
   'hudChrome.options.showSecondaryActionBar': 'Tampilkan Bilah Aksi Sekunder',
   'errors.api.desktopCodeInvalid':
     'Kode masuk desktop tidak valid atau kedaluwarsa. Silakan coba lagi.',

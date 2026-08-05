@@ -1305,6 +1305,7 @@ export const ja_JP: EnTranslations = {
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showThirdActionBar": "3本目のアクションバーを表示",
+      "hideUnusedActionSlots": "未使用のアクションスロットを非表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
       "showAttackButton": "攻撃ボタンを表示",

@@ -1305,6 +1305,7 @@ export const pt_BR: EnTranslations = {
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
       "showThirdActionBar": "Mostrar terceira barra de ação",
+      "hideUnusedActionSlots": "Ocultar Espaços de Ação Não Utilizados",
       "lockActionBars": "Travar barras de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
       "showAttackButton": "Exibir Botão de Ataque",

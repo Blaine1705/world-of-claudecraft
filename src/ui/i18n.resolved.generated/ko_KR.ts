@@ -1305,6 +1305,7 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
       "showAttackButton": "공격 버튼 표시",
