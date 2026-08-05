@@ -608,6 +608,12 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
 }
 
+// FROZEN, and no longer equal to the live town fingerprint: this is the identity of
+// the tree the v2 polish captures were taken against, not a mirror of the current
+// one. It first diverged when a lockfile-only dependency bump re-minted the town
+// fingerprint to aa0df220..., which moved the live value without retaking a single
+// screenshot. Do NOT sweep this to the live value along with the neighbouring
+// literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
@@ -633,9 +639,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // rendererIntegration leaf, so the composite (and the metadata file's second-order
 // digest that embeds it) re-mint once more.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'f7e1c25c0f34b7e9e7c77e05d72c8a1592a8aa50822867912173ea729cf99562';
+  '515dade30aaad522cbda78d46b01b6c533a8eb4d9d05f11c65b761ced62cbb3b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '09f6f78b9c049ba5df01a27ddf054f00928dce957dec2b4d819d5109e83c4d10';
+  '9ed193cbbdadd0b3923427002f07252968b3969b273d24f2a7a200c214d1ef72';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1506,7 +1512,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
     // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
     expect(fingerprint.digest('hex')).toBe(
-      'c267d652d45e85fa4378aa5e080c78c8f95b0266cfa83b6a4394758f9f1a09ac',
+      '46522bd82e547f81b7a97c52333ce561223f18e09f715cc42a10f5c5a0d593d1',
     );
   });
 
