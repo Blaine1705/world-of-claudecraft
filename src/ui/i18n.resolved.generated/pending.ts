@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -20,6 +21,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "es_ES": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -30,6 +32,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "fr_FR": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -40,6 +43,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "fr_CA": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -51,6 +55,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -61,6 +66,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "de_DE": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -70,11 +76,20 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.landOnly",
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "zh_TW": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ko_KR": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ja_JP": [
+    "hudChrome.materialHint.usedBy"
+  ],
   "pt_BR": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -84,8 +99,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.landOnly",
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.materialHint.usedBy"
+  ],
   "cs_CZ": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -96,6 +114,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "nl_NL": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -106,6 +125,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "pl_PL": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -116,6 +136,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "id_ID": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -126,6 +147,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "tr_TR": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -136,6 +158,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "sv_SE": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -146,6 +169,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "vi_VN": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
@@ -156,6 +180,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
   "da_DK": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
     "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",

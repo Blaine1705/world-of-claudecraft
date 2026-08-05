@@ -1992,6 +1992,7 @@ export const vi_VN: EnTranslations = {
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
       "cookingCatch": "Nguyên liệu nấu ăn. Phải nấu chín trước khi ăn.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.",
       "arcaneEssence": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị hiếm.",
       "arcaneShard": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị sử thi và huyền thoại.",

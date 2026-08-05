@@ -7396,6 +7396,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.materialHint.resonantSteel'
   | 'hudChrome.materialHint.resonantThread'
   | 'hudChrome.materialHint.resonantTimber'
+  | 'hudChrome.materialHint.usedBy'
   | 'hudChrome.meters.autoShowHint'
   | 'hudChrome.meters.breakdownOther'
   | 'hudChrome.meters.breakdownRow'
