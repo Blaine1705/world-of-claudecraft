@@ -389,7 +389,7 @@ describe('Eastbrook polish capture contract', () => {
       // vfx.weapon-skins boot prewarm entry, the renderer-integration leaf, so the
       // composite re-mints once more. Same script; no Eastbrook input, geometry
       // value, or capture moved.
-      fingerprint: 'e5a151c80866a5e22af5653124c95c2bbee3e0e7102d6e7a1a22f524b9e5de1c',
+      fingerprint: 'd8dd9c46b4667c35decb97486350e4a7a8cfb3b1ecc9057412a1892027cf1ddb',
       components: {
         captureContract: {
           id: 'polish-v2',
