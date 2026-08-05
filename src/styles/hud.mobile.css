@@ -1407,6 +1407,15 @@
     width: 100%;
     min-width: 0;
   }
+  /* Desktop groups the pet command bar and the pet health frame into one row
+     (#pet-cluster). Mobile deliberately splits them again: the command bar belongs
+     under the thumb at the top of the screen, the health strip belongs in the
+     bottom-centre column with the player frame, and one 570px row would not fit a
+     phone anyway. display:contents dissolves the wrapper so each child keeps the
+     independent fixed seat the rules below give it. */
+  body.mobile-touch #pet-cluster {
+    display: contents;
+  }
   body.mobile-touch #petbar {
     position: fixed;
     left: 50%;

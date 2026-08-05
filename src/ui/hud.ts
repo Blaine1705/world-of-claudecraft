@@ -3373,32 +3373,11 @@ export class Hud {
       const stack = $('#actionbar-stack');
       if (frame.parentElement !== stack) stack.insertBefore(frame, stack.firstChild);
     }
-    this.anchorPetFrameToPlayer(active);
-  }
-
-  // The pet frame belongs to the player frame, so it has to travel with it.
-  // DOCKED it stays an in-flow sibling right after the player frame, so the
-  // bottom-anchored stack reserves its height and it never overlays the action
-  // bars. Once the player frame is DRAGGED it moves to #ui, and a sibling left in
-  // the stack would be stranded at the bottom of the screen while the frame it
-  // belongs to sits wherever the player dropped it, so the pet frame moves inside
-  // the frame and CSS hangs it underneath. Same reparent-and-restore shape the
-  // buff row uses for the Buffs on the Player Frame option below.
-  private anchorPetFrameToPlayer(detached: boolean): void {
-    const pet = this.petFrameEl;
-    if (!pet) return;
-    const frame = this.playerFrameEl;
-    if (detached) {
-      if (pet.parentElement !== frame) frame.appendChild(pet);
-      return;
-    }
-    const stack = $('#actionbar-stack');
-    // Docked, the strip sits directly ABOVE the player frame, so it goes back in
-    // immediately before it. setPlayerFrameDetached has already restored the frame
-    // to the stack's head, so inserting before it makes the strip the new head and
-    // the order reads pet, player, bars from the top. #petbar is positioned against
-    // the stack's TOP EDGE (top: -52px), so it rides above the strip on its own.
-    if (pet.parentElement !== stack) stack.insertBefore(pet, frame);
+    // The pet cluster (#pet-cluster: command bar plus health frame) deliberately
+    // does NOT travel with the player frame. It is its own row at the top of the
+    // action-bar stack, holding the pet's controls as well as its health, so it
+    // belongs with the bars rather than hanging off the player frame; dragging the
+    // player frame elsewhere leaves the pet UI where the player put the bars.
   }
 
   // Buffs on the Player Frame (aurasOnPlayerFrame): reparent the player's own

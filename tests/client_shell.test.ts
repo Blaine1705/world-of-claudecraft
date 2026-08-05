@@ -2549,67 +2549,54 @@ describe('client HTML shell', () => {
   });
 });
 
-// The pet frame belongs to the player frame and must travel with it. Dragging the
-// player frame reparents it out of #actionbar-stack into #ui (pf-detached), and
-// before this was wired the pet strip stayed behind in the stack, stranded at the
-// bottom of the screen while the frame it hangs off sat wherever it was dropped.
-// Both halves are pinned because either alone silently restores the bug: the
-// hud.ts call that moves the node, and the CSS that anchors it once moved.
-describe('pet frame follows the player frame when it is dragged', () => {
-  const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+// The pet cluster: the pet command bar and the pet health frame share ONE row above
+// the player frame on desktop, and are deliberately SPLIT again on mobile (command bar
+// under the thumb at the top, health strip in the bottom-centre column). Both halves
+// are pinned because either one alone silently changes the layout: the markup that
+// puts the two in one wrapper, and the mobile rule that dissolves it.
+describe('pet cluster layout', () => {
   const hudCssSrc = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+  const hudMobileSrc = readFileSync(
+    new URL('../src/styles/hud.mobile.css', import.meta.url),
+    'utf8',
+  );
 
-  it('setPlayerFrameDetached hands off to the pet-frame anchor', () => {
-    const body = hudSrc.slice(
-      hudSrc.indexOf('private setPlayerFrameDetached'),
-      hudSrc.indexOf('private anchorPetFrameToPlayer'),
-    );
-    expect(body).toContain('this.anchorPetFrameToPlayer(active)');
+  it.each([['index.html'], ['play.html']])(
+    '%s wraps the pet bar and pet frame in one cluster above the player frame',
+    (file) => {
+      const src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
+      const cluster = src.indexOf('id="pet-cluster"');
+      const petbar = src.indexOf('id="petbar"');
+      const petFrame = src.indexOf('id="pet-frame"');
+      const player = src.indexOf('id="player-frame"');
+      expect(cluster).toBeGreaterThan(-1);
+      // Bar on the left, health on the right, and the whole row above the player.
+      expect(cluster).toBeLessThan(petbar);
+      expect(petbar).toBeLessThan(petFrame);
+      expect(petFrame).toBeLessThan(player);
+    },
+  );
+
+  it('lays the cluster out as one row and un-anchors the pet bar from the stack edge', () => {
+    expect(hudCssSrc).toMatch(/#pet-cluster \{[^}]*display: flex/);
+    // The bar keeps its own absolute top:-52px seat for the mobile sheet, so the
+    // desktop cluster has to override it or the two halves overlap.
+    expect(hudCssSrc).toMatch(/#pet-cluster > #petbar \{[^}]*position: static/);
   });
 
-  it('the anchor reparents into the player frame when detached and back when docked', () => {
-    const body = hudSrc.slice(
-      hudSrc.indexOf('private anchorPetFrameToPlayer'),
-      hudSrc.indexOf('setAurasOnPlayerFrame'),
-    );
-    expect(body).toContain('frame.appendChild(pet)');
-    expect(body).toContain("$('#actionbar-stack')");
-    // Docked, the strip goes back immediately BEFORE the player frame: it sits
-    // above it, matching where the mobile layout already puts it.
-    expect(body).toContain('stack.insertBefore(pet, frame)');
-  });
-
-  // Both entry documents must carry the strip ahead of the player frame, or the
-  // first paint before any drag would show it in the wrong place.
-  it.each([
-    ['index.html', 'index.html'],
-    ['play.html', 'play.html'],
-  ])('%s orders the pet frame above the player frame', (_label, file) => {
-    const src = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
-    const pet = src.indexOf('id="pet-frame"');
-    const player = src.indexOf('id="player-frame"');
-    const petbar = src.indexOf('id="petbar"');
-    expect(pet).toBeGreaterThan(-1);
-    expect(pet).toBeLessThan(player);
-    // The pet ACTION bar is not part of that move: it is positioned against the
-    // stack's top edge and stays with the action bars.
-    expect(player).toBeLessThan(petbar);
-  });
-
-  it('CSS anchors the strip under the detached frame instead of leaving it in flow', () => {
-    expect(hudCssSrc).toContain('#player-frame.pf-detached > #pet-frame {');
-    expect(hudCssSrc).toMatch(/#player-frame\.pf-detached > #pet-frame \{[^}]*position: absolute/);
-  });
-
-  // Docked, the two frames share one 612px box and this inset is what puts the pet
-  // portrait in the same column as the player portrait. Measured against the
-  // rendered frames (both portraits land on the same x); a drifted value is exactly
-  // the "floating, unattached" look the inset exists to prevent.
-  it('shares one content inset between the player and pet frames', () => {
+  it('shares one content inset with the player frame so the row lines up with it', () => {
     expect(hudCssSrc).toContain('--unit-frame-content-inset: 18px;');
-    expect(hudCssSrc).toMatch(/#pet-frame \{[^}]*padding-left: var\(--unit-frame-content-inset\)/);
-    // No extra zoom of its own: any scale the two frames do not share moves the
-    // pet portrait off that column.
-    expect(hudCssSrc).toMatch(/#pet-frame > \* \{\s*zoom: var\(--player-frame-scale, 1\);\s*\}/);
+    expect(hudCssSrc).toMatch(
+      /#pet-cluster \{[^}]*padding-left: var\(--unit-frame-content-inset\)/,
+    );
+  });
+
+  // display:contents dissolves the wrapper so each child keeps its own fixed seat.
+  // Without it the mobile layout inherits the desktop row and the command bar is
+  // dragged down out of thumb reach into the bottom-centre column.
+  it('dissolves the cluster on mobile so the two halves keep separate seats', () => {
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #pet-cluster \{\s*display: contents;\s*\}/);
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #petbar \{[^}]*position: fixed/);
+    expect(hudMobileSrc).toMatch(/body\.mobile-touch #pet-frame \{[^}]*position: fixed/);
   });
 });
