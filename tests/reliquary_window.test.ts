@@ -194,11 +194,20 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler, 'handleReliquaryUnlocks body').toBeTruthy();
     expect(handler).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
     expect(handler).toContain('buildReliquaryUnlockPlan(events, reducedMotion)');
-    expect(handler).toContain('plan.motion');
+    // Plan fields must actually drive presentation (not only plan.motion token).
+    expect(handler).toContain('for (const log of plan.logs)');
+    expect(handler).toContain('plan.banner');
+    expect(handler).toContain("t('hudChrome.reliquary.unlockToast'");
+    expect(handler).toContain("t('hudChrome.reliquary.illuminateBanner'");
+    expect(handler).toContain("t('hudChrome.reliquary.illuminateToast'");
+    expect(handler).toContain("showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion)");
     expect(handler).toContain('if (plan.playSound) audio.achievement()');
     // Force open-window rebuild on unlock; membership still comes from mirrors.
     expect(handler).toContain('plan.refreshWindow && this.reliquaryWindow.isOpen');
     expect(handler).toContain('this.reliquaryWindow.render()');
+    // Presentation-only: never write discovery / firstFind from the event.
+    expect(handler).not.toMatch(/itemsDiscovered\.(add|has)/);
+    expect(handler).not.toMatch(/reliquaryFirstFind\s*=/);
   });
 
   it('maps the reliquary keybind action through t() in Options', () => {

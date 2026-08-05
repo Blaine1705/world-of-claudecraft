@@ -17,7 +17,7 @@
 | 4 Window shell + Overview | **done** | pure view + cold window, Overview, shelf chrome, keybind Shift+X, minimap/More, i18n English |
 | 4 QA | **done** | exit criteria verified; M16 + Options keybind defects fixed; release @ 5e83ba89d0 |
 | 5 Page grids + live UX | **done** | grid cells, silhouettes, unlock toast, Illumination, ownershipDigest |
-| 5 QA | pending | same worktree + pull; next after implementation |
+| 5 QA | **done** | exit criteria verified; pin holes closed; release @ 413de574cf |
 | 6 Curator ranks + cosmetics | pending | same worktree + pull |
 | 6 QA | pending | same worktree + pull |
 | 7 Professions shelf | pending | same worktree + pull |
@@ -169,7 +169,45 @@
   CSS; page-name content i18n deferred as Phase 4); test-coverage BLOCKING/
   SHOULD-FIX pins addressed (scoped CSS, Illumination order, HUD plan body,
   firstFind + ownershipDigest wiring); qa-checklist READY for Phase 5 QA.
-  Commit: `ca54319fd7`.
+  Commit: `f7066ca009`.
+
+- Phase 5 QA: merged `origin/release/v0.35.0` (profession skill-level toast PR
+  #2934) to tip `413de574cf`. Conflict only in generated `pending.ts`, resolved
+  via `npm run i18n:gen`. Merge commit `18985ba602`.
+  Initial matrix green (**201 passed**, 4 skipped). Specialist review:
+  - frontend-seam-reviewer: **GREEN** (0 BLOCKING / 0 SHOULD-FIX)
+  - test-coverage-auditor: **YELLOW** high SHOULD-FIX pins closed test-first:
+    - `buildReliquaryView` firstFind pass-through on pageDetail cells
+      (owned clear# + spoof-without-ownership + retro-owned)
+    - `handleReliquaryUnlocks` body must apply `plan.logs` / `plan.banner` /
+      `showCelebrationBanner(..., plan.motion)` / illuminate + unlock toast
+      keys (not only `plan.motion` token); presentation-only (no membership write)
+  - qa-checklist: **READY** (architecture / cross-platform N/A for Phase 5 UI)
+  Green after pin fixes:
+  - `npx vitest run tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/hud_update_drive.test.ts tests/hud_perf_budget.test.ts tests/architecture.test.ts tests/i18n_completeness.test.ts` (**202 passed**, 4 skipped)
+  - `npm run i18n:gen` (merge resolution)
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  - biome on changed test files
+  Checklist (all held):
+  - Open page: owned art vs quality silhouettes; progress X/Y; clear count
+  - Tooltips: owned item catalog tip + firstFind clear#; missing name + status
+  - Live unlock: toast + force open-window render; membership from mirrors
+  - Illumination: last-wins banner; reduced-motion trims motion only
+  - `ownershipDigest` + `clearsDigest` in `reliquaryRefreshSig`
+  - Decisive grid / unlock plan / window wiring pins (firstFind feed, HUD body, CSS)
+  - Desktop + mobile styles; touch targets >= 40px; DESIGN tokens
+  - Ownership = `deedStats.itemsDiscovered` (+ marks when authored)
+  - No per-drop saveCharacter; no membership invent from `reliquaryUnlock`
+  - Cold window: signature latch; focus_restore; scroll preserve
+  - Fairness: no graphics-tier gate on owned/missing/clears
+  - Cosmetic only; luck never scores Renown
+  - Thin Hud compose; `reliquary_view` in UI_PURE_CORES
+  - No em dash / emoji on Phase 5 surface
+  - No Phase 6 rank cosmetics / deed bridges; no Phase 7 profession marks
+  - Page content names remain catalog English (deferred)
+  - Cell fill-flash CSS intentionally not shipped
+  Manual open/Esc/mobile/unlock smoke not run (static + unit pins only).
 
 ## Surprises / decisions during implementation
 

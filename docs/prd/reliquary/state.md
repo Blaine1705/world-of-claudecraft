@@ -26,14 +26,14 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 5 implementation complete (page grids, silhouettes,
-  live unlock UX, Illumination).
+- **Current phase:** Phase 5 QA complete (page grids, silhouettes, live unlock
+  UX, Illumination verified).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 5 QA. Do **not** skip the release pull.
-  Do **not** start Phase 6 until Phase 5 QA is green.
+  `origin/release/v0.35.0`, then Phase 6 (Curator ranks / cosmetics / deed
+  bridges). Do **not** skip the release pull.
 - **Blocker:** none.
-- **Release tip at Phase 5 start:** merged `origin/release/v0.35.0` to
-  `93863f9a95` (material-usedby-tooltip and related release commits).
+- **Release tip at Phase 5 QA:** merged `origin/release/v0.35.0` to
+  `413de574cf` (profession skill-level toast #2934); merge commit `18985ba602`.
 
 ## Locked design decisions
 

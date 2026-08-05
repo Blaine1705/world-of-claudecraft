@@ -464,6 +464,33 @@ describe('page grid cells', () => {
     expect(open.pageDetail?.illuminated).toBe(false);
   });
 
+  it('threads firstFind into pageDetail cells through buildReliquaryView', () => {
+    // Guards the pass-through at buildReliquaryView (firstFind: input.firstFind);
+    // buildReliquaryPageCells alone would stay green if that wire were dropped.
+    const open = buildReliquaryView(
+      input({
+        nav: 'conquerors',
+        pageId: 'crypt_n',
+        itemsDiscovered: ownedSet('crypt_helm', 'crypt_ring'),
+        firstFind: {
+          crypt_helm: { clears: 4, pageId: 'crypt_n' },
+          // Spoof without discovery must not invent ownership or clear meta.
+          crypt_blade: { clears: 99 },
+        },
+      }),
+    );
+    expect(open.pageDetail).not.toBeNull();
+    const cells = open.pageDetail?.cells ?? [];
+    const byId = new Map(cells.map((c) => [c.id, c]));
+    expect(byId.get('crypt_helm')?.owned).toBe(true);
+    expect(byId.get('crypt_helm')?.firstFindClears).toBe(4);
+    expect(byId.get('crypt_blade')?.owned).toBe(false);
+    expect(byId.get('crypt_blade')?.firstFindClears).toBeUndefined();
+    // Retro-owned (discovered, no firstFind entry): clear# stays undefined.
+    expect(byId.get('crypt_ring')?.owned).toBe(true);
+    expect(byId.get('crypt_ring')?.firstFindClears).toBeUndefined();
+  });
+
   it('marks complete pages illuminated without inventing membership from marks alone', () => {
     const complete = buildReliquaryView(
       input({
