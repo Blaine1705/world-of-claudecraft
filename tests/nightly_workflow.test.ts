@@ -141,6 +141,11 @@ describe('nightly gate workflow', () => {
     // run-line sequences must match exactly, in order.
     const releaseChecks = jobSourceIn(ciWorkflow, 'release-checks', 'ci.yml');
     const checks = jobSource('checks');
+    // runLines reads single-line run: steps only, so a block scalar would be
+    // compared by its first line alone; refuse loudly instead of comparing a
+    // truncated view.
+    expect(checks).not.toContain('run: |');
+    expect(releaseChecks).not.toContain('run: |');
     expect(runLines(checks)).toEqual(runLines(releaseChecks));
     expect(checks).not.toContain('run: npm test');
     const browser = jobSource('browser');
@@ -152,7 +157,9 @@ describe('nightly gate workflow', () => {
   it('always reports, and only the report job may write issues', () => {
     const report = jobSource('report');
     expect(report).toMatch(/^\s{4}needs: \[targets, tests, checks, browser\]$/m);
-    expect(report).toMatch(/^ {4}if: .*always\(\)/m);
+    // Anchored to the full line (both legal spellings): `always() && false`
+    // would silently disable the workflow's only alerting deliverable.
+    expect(report).toMatch(/^ {4}if: (\$\{\{ always\(\) \}\}|always\(\))$/m);
     expect(report).toMatch(stepLine('run: node scripts/nightly_report.mjs'));
     expect(report).toContain('GITHUB_TOKEN: ${{ github.token }}');
     expect(report).toContain('NIGHTLY_TARGETS: ${{ needs.targets.outputs.refs }}');

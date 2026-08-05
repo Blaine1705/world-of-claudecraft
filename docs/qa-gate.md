@@ -191,7 +191,7 @@ and `scripts/lib/test_visibility.mjs`, all pinned by `tests/gate_select_plan.tes
 ### Nightly full gate (scheduled backstop)
 
 `.github/workflows/nightly.yml` re-proves the tips of `main` and the highest
-`release/vX.Y.Z` branch every night: the full unsharded test suite, the serialized
+`release/vX.Y.Z` branch (the `v` is optional) every night: the full unsharded test suite, the serialized
 checks lane (mirroring ci.yml's release-checks run steps), and the Chromium browser
 lane, per ref. It exists because a red release tip once sat unwatched for days while
 every open PR inherited its failures; push runs show rot, but only to someone looking.
@@ -202,7 +202,8 @@ repeat failures, closed with a recovery comment on the first green run. A run th
 reports no failures but did not actually complete its lanes counts as red ("unproven"),
 never as recovery. A `workflow_dispatch` with the `ref` input gates exactly that ref and
 reports under the separate `nightly-gate-drill` identity, so acceptance drills never
-touch the production issue.
+touch the production issue; nothing scheduled drains a red drill's issue, so close it
+by hand or finish the drill with a green dispatch at the same ref.
 
 Deliberate exclusions: the release-i18n 21-locale lane (expected red mid-cycle, issue
 #2820) and the release version gate (cannot rot without a push, which ci.yml covers).

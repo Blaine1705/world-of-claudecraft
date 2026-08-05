@@ -24,11 +24,14 @@ name: Nightly gate
 # ci.yml still carries that lane.
 #
 # The schedule fires on the default branch, so the cron arms only once this
-# file reaches main; until then (and for the acceptance drill against a
-# scratch branch with a deliberately broken test) use workflow_dispatch with
-# the ref input, which gates exactly that one ref. A dispatch run reports
-# under the separate nightly-gate-drill issue identity, so drills never touch
-# the production tracking issue.
+# file reaches main. workflow_dispatch has two modes: with the ref input
+# EMPTY it is a manual production pass (gates main plus the release tip and
+# reports under the production issue identity); with a ref it gates exactly
+# that one ref and reports under the separate nightly-gate-drill identity, so
+# an acceptance drill against a scratch branch with a deliberately broken
+# test never touches the production tracking issue. A red drill's issue has
+# nothing scheduled to drain it: close it by hand, or finish the drill with a
+# green dispatch at the same ref.
 on:
   schedule:
     # Daily, 04:47 UTC. Off the hour so this does not pile into the
