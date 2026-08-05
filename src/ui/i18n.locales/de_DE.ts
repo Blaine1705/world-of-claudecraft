@@ -2403,9 +2403,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Bruder Halven markiert seine Karten: ein guter Tag, um das Eingestürzte Reliquiar zu wagen.',
   'hudChrome.calendar.events.delveDay.title': 'Tiefgang-Tag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Der 2v2-Fiesta-Ring zieht heute Nacht sein lautestes Publikum an.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-Nacht',
   'hudChrome.calendar.events.fishingDerby.note':
     'Angler säumen die Seen. Bring eine Rute mit und tausche Anglergeschichten aus.',
   'hudChrome.calendar.events.fishingDerby.title': 'Angelderby',
@@ -2663,6 +2660,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Gruppe {n}',
   'hudChrome.unitFrame.partyLabel': 'Eure Gruppe',
   'hudChrome.unitFrame.playerLabel': 'Euer Charakter',
+  'hudChrome.unitFrame.petLabel': 'Euer Begleiter',
   'hudChrome.unitFrame.targetAnnounce': 'Ziel: {name}',
   'hudChrome.unitFrame.targetLabel': 'Euer Ziel',
   'seo.officialLabel': 'Offizielle Website von World of ClaudeCraft',
@@ -3482,7 +3480,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Mehr',
   'hud.core.mobileMoreAria': 'Weitere Menüs anzeigen',
   'hud.core.mobileSocial': 'Soziales',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menü',
   'hud.core.mobileSettings': 'Einstellungen',
   'hud.core.mobileUse': 'Benutzen',
@@ -3592,7 +3589,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Namensplaketten umschalten',
   'hud.keybinds.actions.meters': 'Schadensanzeigen',
   'hud.keybinds.actions.social': 'Freunde & Gilde',
-  'hud.keybinds.actions.arena': 'Arena (Aschenes Kolosseum)',
   'hud.keybinds.actions.chat': 'Chat öffnen',
   'hud.keybinds.actions.attack': 'Angreifen',
   'hud.keybinds.actions.actionBarSlot': 'Aktionsleiste {slot}',
@@ -4941,6 +4937,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Balg eines Gratpirschers',
   'entities.items.old_cragmaws_pelt.name': 'Balg des alten Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Jagdgurt von Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Jagdköcher von Cragmaw',
   'entities.items.glowing_wax.name': 'Glühendes Wachs',
   'entities.items.ogre_war_totem.name': 'Ogerkriegstotem',
   'entities.items.storm_core.name': 'Sturmkern',
@@ -5017,6 +5014,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': 'Mirejaw-Schuppenweste',
   'entities.items.moggers_copper_cudgel.name': 'Moggers Kupferknüppel',
   'entities.items.moggers_shiv.name': 'Moggers Messer',
+  'entities.items.moggers_hide_quiver.name': 'Moggers Fellköcher',
   'entities.items.moggers_stomper_boots.name': 'Moggers Stampfstiefel',
   'entities.items.necromancers_legwraps.name': 'Mournweave-Beinwickel',
   'entities.items.necromancers_soulsteps.name': 'Mournweave-Seelenschritte',
@@ -5041,6 +5039,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': 'Gruftknochenschulterstücke',
   'entities.items.deathlords_dread_visage.name': 'Barrowlords Schreckensantlitz',
   'entities.items.gravewyrm_gauntlets.name': 'Gravewyrm-Stulpen',
+  'entities.items.gravewyrm_bone_quiver.name': 'Gravewyrm-Knochenköcher',
   'entities.items.gravewyrm_mantle.name': 'Gravewyrm-Mantel',
   'entities.items.mistveil_cord.name': 'Nebelschleierkordel',
   'entities.items.mistveil_grips.name': 'Nebelschleiergriffe',
@@ -5966,7 +5965,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA-UNENTSCHIEDEN! Zu knapp, um zu entscheiden!',
   'fiesta.end.loss': 'FIESTA VERLOREN! Versucht es erneut!',
   'fiesta.end.win': 'FIESTA GEWONNEN! 🎉 Was für ein Fest!',
-  'fiesta.enterQueue': 'Tretet der Fiesta bei!',
   'fiesta.error.leaderOnly': 'Nur der Gruppenleiter darf Euer Team für {label} anmelden.',
   'fiesta.error.noAugment': 'Ihr habt im Moment keine Augmentierung zur Wahl.',
   'fiesta.error.notOnOffer': 'Diese Augmentierung wird nicht angeboten.',
@@ -5983,9 +5981,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Koloss',
   'fiesta.powerup.pow_moon_boots.name': 'Mondstiefel',
   'fiesta.powerup.pow_speed_demon.name': 'Geschwindigkeitsdämon',
-  'fiesta.practice': '🎉 Übung gegen Bots',
-  'fiesta.practiceNote':
-    'Offline-Übung: erzeugt 3 KI-Bots und meldet Euch für eine 2-gegen-2-Fiesta an. Klickt erneut zum Beenden.',
   'fiesta.queue.join':
     'Ihr tretet der Warteschlange für die 2-gegen-2-Fiesta bei. Macht Euch bereit zum FEIERN…',
   'fiesta.queue.leave': 'Ihr verlasst die Warteschlange für die 2-gegen-2-Fiesta.',
@@ -6180,6 +6175,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schulterplatten',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Großschwert',
   'entities.items.direfang_greatblade.name': 'Direfang-Großklinge',
+  'entities.items.direfang_quiver.name': 'Direfang-Köcher',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought-Bollwerk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-Kugel',
   'hud.chat.context.convertToRaid': 'In Schlachtzug umwandeln',
@@ -6809,17 +6805,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thunder_clap': 'Trifft alles um dich herum und verlangsamt deren Angriffe.',
   'guide.abilityHook.wrath':
     'Ein Naturblitz, den du aus der Distanz auf ein Ziel schleuderst, dein erster Schadenszauber.',
-  'guide.arenaPage.augmentsNote':
-    'Augmentierungen und Verstärkungen halten nur für das Match. Es geht um verspielte Builds aus dem Moment heraus, nicht um anhaltende Macht, sodass sich niemand den Sieg erkaufen kann.',
   'guide.arenaPage.coliseumBody':
     'Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar. Öffne das Arenafenster, um dich für eine Wertungsklasse anzumelden, allein oder mit deinem Partner.',
   'guide.arenaPage.coliseumHeading': 'Das Aschene Kolosseum',
   'guide.arenaPage.duelsBody':
     'Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.',
   'guide.arenaPage.duelsHeading': 'Duelle',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta ist ein schneller Zwei-gegen-Zwei-Kampf, als ein durchgehendes Gefecht ausgetragen, bei dem jeder Kämpfer auf gleiche Ausgangslage gebracht wird. Während der Kampf läuft, draftest du Augmentierungen, schnelle Boosts, die dein Repertoire spontan umformen, sodass kein Match dem anderen gleicht.',
-  'guide.arenaPage.fiestaHeading': 'Zwei gegen Zwei Fiesta',
   'guide.arenaPage.heading': 'Arena und PvP',
   'guide.arenaPage.intro':
     'Willst du dich mit anderen Spielern messen? Spieler gegen Spieler ist eingebaut, und es ist immer deine Wahl, niemals etwas, das dir aufgezwungen wird.',
@@ -6978,21 +6969,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Drei Gebiete, von Süden nach Norden, jedes eine Stufe höher im Level. Folge der Questspur, und das Land trägt dich vom Tal bis zu den Gipfeln.',
   'guide.worldPage.places': 'Bemerkenswerte Orte',
   'guide.worldPage.residents': 'Wem du begegnen wirst',
-  'guide.arenaPage.powerupsBody':
-    'Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.',
-  'guide.arenaPage.powerupsTitle': 'Powerups im Ring',
-  'guide.arenaPage.waveGoldBody':
-    'Die mittlere Welle: zweischneidige Kombinationen, in denen dein Build allmählich Gestalt annimmt und zu glänzen beginnt.',
-  'guide.arenaPage.waveGoldTitle': 'Gold',
-  'guide.arenaPage.wavePrismaticBody':
-    'Die letzte Welle: build-prägende, bildschirmschmelzende Ausschläge, die sich auf die beste Art lächerlich anfühlen sollen.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisch',
-  'guide.arenaPage.waveSilverBody':
-    'Die Eröffnungswelle: klare Boosts auf einen einzelnen Wert, die die Grundlagen deiner Klasse schärfen.',
-  'guide.arenaPage.waveSilverTitle': 'Silber',
-  'guide.arenaPage.wavesBody':
-    'Ein Fiesta-Gefecht reicht dir im Verlauf frische Auswahlmöglichkeiten, und sie werden mutiger, je länger der Kampf dauert. Du baust von einer Welle zur nächsten auf, wählst jedes Mal eine von wenigen Optionen und behältst sie für den Rest des Gefechts.',
-  'guide.arenaPage.wavesTitle': 'Augmentierungen kommen in Wellen',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Gewandete Diener des Todeskults, deren Treiben die Gräber vom Tal bis zu den Gipfeln schändet. Wo sie sich versammeln, ruhen die Toten nicht.',
   'guide.bestiary.flavor.grubjaw':
@@ -7917,6 +7893,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Kündige einen Schlachtzug, ein Treffen oder ein Event an',
   'hudChrome.discord.relay.help.label': 'Hilfe benötigt',
   'hudChrome.discord.relay.help.hint': 'Bitte die Gemeinschaft um Hilfe',
+  'hudChrome.options.hideUnusedActionSlots': 'Ungenutzte Aktionsfelder ausblenden',
   'hudChrome.options.showSecondaryActionBar': 'Zweite Aktionsleiste anzeigen',
   'errors.api.desktopCodeInvalid':
     'Der Desktop-Anmeldecode ist ungültig oder abgelaufen. Bitte versuche es erneut.',
@@ -8257,9 +8234,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.training_dummy.name': 'Trainingspuppe',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Wasserelementar',
-  'guide.arenaPage.yumiBody':
-    'Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.',
-  'guide.arenaPage.yumiHeading': 'Yumi beschützen',
   'hudChrome.archetypeTitle.hobbyLabel': 'Freizeit',
   'hudChrome.auraEffect.armorPct': 'Verringert Rüstung um {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Verringert Rüstung um {pct}% ({stacks} Stapel)',
@@ -8280,7 +8254,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 gegen 5',
   'yumi.end.loss': 'NIEDERLAGE! Eure Yumi ist gefallen.',
   'yumi.end.win': 'SIEG! Yumi ist in Sicherheit!',
-  'yumi.enterQueue': 'Yumi beschützen beitreten!',
   'yumi.error.partyTooBig3':
     'Bei Yumi beschützen 3 gegen 3 ist eine Gruppe von bis zu drei Spielern erlaubt.',
   'yumi.error.partyTooBig5':
@@ -8469,6 +8442,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Begleiter: Angreifen',
   'hudChrome.keybinds.petDefensive': 'Begleiter: Defensiv',
   'hudChrome.keybinds.petStop': 'Begleiter: Stopp',
+  'hudChrome.keybinds.targetPet': 'Begleiter: Anvisieren',
   'hudChrome.keybinds.petTaunt': 'Begleiter: Verspotten',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Ein Stück weniger von {item} senden',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Ein Stück mehr von {item} senden',
@@ -9284,6 +9258,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.',
   'hudChrome.options.mouseoverCast': 'Mouseover-Wirken auf Gruppenfenstern',
   'hudChrome.options.showTargetOfTarget': 'Ziel des Ziels anzeigen',
+  'hudChrome.options.showPetFrame': 'Euren Begleiter anzeigen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Ziel des Ziels',
   'itemUi.market.rarityLegendary': 'Legendär',
   'loading.reconnectingAttempt':
