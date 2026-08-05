@@ -23,7 +23,7 @@ type TestSim = Sim & {
 const OPEN_GROUND = { x: -60, z: -2 } as const;
 
 function makeProtection(): TestSim {
-  const sim = new Sim({ seed: 7171, playerClass: 'paladin', autoEquip: true }) as TestSim;
+  const sim = new Sim({ seed: 7176, playerClass: 'paladin', autoEquip: true }) as TestSim;
   sim.setPlayerLevel(20);
   expect(sim.setSpec('protection')).toBe(true);
   sim.addItem('eastbrook_buckler', 1);

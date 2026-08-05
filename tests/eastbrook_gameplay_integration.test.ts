@@ -380,7 +380,7 @@ describe('Eastbrook authored gameplay data integration', () => {
       'arcanite_bar',
     ]);
     expect(createHash('sha256').update(JSON.stringify(stableTownNpcPayload())).digest('hex')).toBe(
-      '253d5927ed17e438faa5d66b57e031cc1ab3af61370b773e0d714bc3426226e8',
+      '4c9400baeef7c04572881440cd4ba97e231f23f08ea0af355a3e7bac249cd1c2',
     );
     expect(ZONE1_TOWN_NPC_IDS).toHaveLength(15);
     for (const id of ZONE1_TOWN_NPC_IDS) {

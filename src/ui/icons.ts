@@ -4178,16 +4178,12 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'deep_freeze',
   'spellsteal',
   // paladin
-  'aura_surge',
   'avenging_wrath',
-  'cleansing_verdict',
   'crusader_strike',
-  'divine_shield',
   'hammer_of_wrath',
   'holy_shield',
   'holy_shock',
   'holy_taunt',
-  'holy_wrath',
   'rebuke',
   'sacred_bulwark',
   // priest

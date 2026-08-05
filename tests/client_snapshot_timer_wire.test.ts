@@ -121,11 +121,15 @@ describe('stable snapshot timer protocol', () => {
     // ages between snapshots without the wire resending it, and the read
     // drains to null exactly when the readiness flips.
     const client = bareClient(1);
-    apply(client, { tw: 2, time: 10, self: playerWire(1, { ncd: { ore: 12 } }) });
+    apply(client, {
+      tw: STABLE_TIMER_WIRE_VERSION,
+      time: 10,
+      self: playerWire(1, { ncd: { ore: 12 } }),
+    });
     expect(client.nodeRespawnSeconds('ore')).toBe(2);
-    apply(client, { tw: 2, time: 11, self: playerWire(1) });
+    apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 11, self: playerWire(1) });
     expect(client.nodeRespawnSeconds('ore')).toBe(1);
-    apply(client, { tw: 2, time: 13.1, self: playerWire(1) });
+    apply(client, { tw: STABLE_TIMER_WIRE_VERSION, time: 13.1, self: playerWire(1) });
     expect(client.nodeRespawnSeconds('ore')).toBeNull();
     expect(client.nodeHarvestableByMe('ore')).toBe(true);
   });
