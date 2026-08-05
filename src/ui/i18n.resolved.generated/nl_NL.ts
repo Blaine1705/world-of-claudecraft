@@ -10203,6 +10203,18 @@ export const nl_NL: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
       },
+      "moggers_hide_quiver": {
+        "name": "Moggers Leren Pijlkoker"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Cragmaws Jachtpijlkoker"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Grafwurm-Beenpijlkoker"
+      },
+      "direfang_quiver": {
+        "name": "Direfang-Pijlkoker"
+      },
       "conjured_water4": {
         "name": "Getoverd bronwater"
       },

@@ -10203,6 +10203,18 @@ export const ja_JP: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
       },
+      "moggers_hide_quiver": {
+        "name": "モガーの革の矢筒"
+      },
+      "cragmaw_huntquiver": {
+        "name": "クラッグモウの狩猟矢筒"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "墓ワームの骨の矢筒"
+      },
+      "direfang_quiver": {
+        "name": "ダイアファングの矢筒"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

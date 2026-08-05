@@ -10203,6 +10203,18 @@ export const ru_RU: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Поводья раптора Дрейкмо"
       },
+      "moggers_hide_quiver": {
+        "name": "Кожаный колчан Моггера"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Охотничий колчан Крэгмо"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Костяной колчан Могильного Вирма"
+      },
+      "direfang_quiver": {
+        "name": "Колчан Лютого Клыка"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },
