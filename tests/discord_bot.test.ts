@@ -349,9 +349,14 @@ describe('slash commands + messages', () => {
     expect(
       buildWhoamiContent({ linked: false, statusTier: 0, points: 0, lifetimePoints: 0 }),
     ).toContain('/link');
-    expect(
-      buildWhoamiContent({ linked: true, statusTier: 5, points: 100, lifetimePoints: 5000 }),
-    ).toContain('Champion');
+    const linked = buildWhoamiContent({
+      linked: true,
+      statusTier: 5,
+      points: 100,
+      lifetimePoints: 5000,
+    });
+    expect(linked).toContain('Champion');
+    expect(linked).not.toContain('/flex'); // /flex was removed
     expect(buildLinkContent('https://woc')).toContain('https://woc');
     expect(buildWelcomeMessage({ userMention: '<@1>', gameUrl: 'https://woc' })).toContain('<@1>');
   });

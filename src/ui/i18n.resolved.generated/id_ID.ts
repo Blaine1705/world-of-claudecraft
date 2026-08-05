@@ -5062,6 +5062,7 @@ export const id_ID: EnTranslations = {
       "terrainCapReached": "Batas suntingan medan tercapai ({max}). Cap pahatan berlebih tidak ditambahkan.",
       "placementCapReached": "Batas penempatan tercapai ({max}). Aset berlebih tidak ditambahkan.",
       "blockerCapReached": "Batas dinding penghalang tercapai ({max}). Dinding baru tidak ditambahkan.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Simpan otomatis dimatikan: {reason} Simpan secara manual, lalu nyalakan kembali."
     },
     "confirm": {

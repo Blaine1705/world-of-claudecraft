@@ -5062,6 +5062,7 @@ export const it_IT: EnTranslations = {
       "terrainCapReached": "Limite di modifiche al terreno raggiunto ({max}). Le impronte di scultura in eccesso non sono state aggiunte.",
       "placementCapReached": "Limite di posizionamenti raggiunto ({max}). Gli asset in eccesso non sono stati aggiunti.",
       "blockerCapReached": "Limite di muri invisibili raggiunto ({max}). Il nuovo muro non è stato aggiunto.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Salvataggio automatico disattivato: {reason} Salva manualmente, poi riattivalo."
     },
     "confirm": {

@@ -5062,6 +5062,7 @@ export const es_ES: EnTranslations = {
       "terrainCapReached": "Límite de ediciones de terreno alcanzado ({max}). Las marcas de esculpido adicionales no se añadieron.",
       "placementCapReached": "Límite de colocaciones alcanzado ({max}). Los elementos adicionales no se añadieron.",
       "blockerCapReached": "Límite de muros de bloqueo alcanzado ({max}). El muro nuevo no se añadió.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Autoguardado desactivado: {reason} Guarda manualmente y luego vuelve a activarlo."
     },
     "confirm": {

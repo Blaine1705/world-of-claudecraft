@@ -841,6 +841,7 @@ export type TranslationKeyFlat =
   | 'editor.status.autosaveFailed'
   | 'editor.status.autosaveOff'
   | 'editor.status.blockerCapReached'
+  | 'editor.status.campCapReached'
   | 'editor.status.deleted'
   | 'editor.status.draftRestored'
   | 'editor.status.draftSaved'

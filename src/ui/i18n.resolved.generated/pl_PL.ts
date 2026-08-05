@@ -5062,6 +5062,7 @@ export const pl_PL: EnTranslations = {
       "terrainCapReached": "Osiągnięto limit edycji terenu ({max}). Nadmiarowe stemple rzeźbienia nie zostały dodane.",
       "placementCapReached": "Osiągnięto limit rozmieszczeń ({max}). Nadmiarowe zasoby nie zostały dodane.",
       "blockerCapReached": "Osiągnięto limit ścian blokujących ({max}). Nowa ściana nie została dodana.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Automatyczny zapis wyłączony: {reason} Zapisz ręcznie, a potem włącz go ponownie."
     },
     "confirm": {

@@ -5062,6 +5062,7 @@ export const cs_CZ: EnTranslations = {
       "terrainCapReached": "Dosažen limit úprav terénu ({max}). Nadbytečné otisky tvarování nebyly přidány.",
       "placementCapReached": "Dosažen limit umístění ({max}). Nadbytečné prvky nebyly přidány.",
       "blockerCapReached": "Dosažen limit blokujících zdí ({max}). Nová zeď nebyla přidána.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Automatické ukládání vypnuto: {reason} Ulož ručně a potom ho znovu zapni."
     },
     "confirm": {

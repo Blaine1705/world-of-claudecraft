@@ -5062,6 +5062,7 @@ export const nl_NL: EnTranslations = {
       "terrainCapReached": "Limiet voor terreinbewerkingen bereikt ({max}). Extra beeldhouwstempels zijn niet toegevoegd.",
       "placementCapReached": "Plaatsingslimiet bereikt ({max}). Extra assets zijn niet toegevoegd.",
       "blockerCapReached": "Limiet voor blokkademuren bereikt ({max}). De nieuwe muur is niet toegevoegd.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Automatisch opslaan uitgeschakeld: {reason} Sla handmatig op en zet het daarna weer aan."
     },
     "confirm": {

@@ -5062,6 +5062,7 @@ export const tr_TR: EnTranslations = {
       "terrainCapReached": "Arazi düzenleme sınırına ulaşıldı ({max}). Fazladan şekillendirme damgaları eklenmedi.",
       "placementCapReached": "Yerleştirme sınırına ulaşıldı ({max}). Fazladan varlıklar eklenmedi.",
       "blockerCapReached": "Engel duvarı sınırına ulaşıldı ({max}). Yeni duvar eklenmedi.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Otomatik kayıt kapatıldı: {reason} Elle kaydet, sonra yeniden aç."
     },
     "confirm": {

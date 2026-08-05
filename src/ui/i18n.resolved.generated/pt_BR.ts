@@ -5062,6 +5062,7 @@ export const pt_BR: EnTranslations = {
       "terrainCapReached": "Limite de edições de terreno atingido ({max}). Os carimbos de escultura excedentes não foram adicionados.",
       "placementCapReached": "Limite de colocações atingido ({max}). Os recursos excedentes não foram adicionados.",
       "blockerCapReached": "Limite de paredes de bloqueio atingido ({max}). A nova parede não foi adicionada.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Salvamento automático desativado: {reason} Salve manualmente e depois reative-o."
     },
     "confirm": {
