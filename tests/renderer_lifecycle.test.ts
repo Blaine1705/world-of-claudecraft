@@ -96,6 +96,19 @@ describe('Renderer lifecycle wiring', () => {
     expect(cleanup).toContain('throw error');
   });
 
+  it('resets an entity engine-mount audio state on every mountKey transition', () => {
+    const mountKeyEdge = slice(
+      'if (e.mountKey !== v.lastMountKey) {',
+      '\n      }\n\n      // per-ability windup orb',
+    );
+    // Covers dismount (mountKey -> ''), a live mount swap (mountKey -> a
+    // different mountKey), and a fresh summon reusing this entity id
+    // ('' -> mountKey): all three funnel through this one check, and
+    // mountEngineReset is a safe no-op when there is no engine-mount state
+    // to drop (an ordinary mount, or no prior mount at all).
+    expect(mountKeyEdge).toContain('this.audioSink?.mountEngineReset(e.id)');
+  });
+
   it('returns the recyclable pair and finishes terminal cleanup after a view disposal throws', async () => {
     const events: string[] = [];
     const canvas = {} as HTMLCanvasElement;

@@ -10219,6 +10219,14 @@ export class Renderer {
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
+          // A mountKey change (dismount, a live mount swap, or a fresh summon
+          // reusing this entity id) must drop any engine mount's windup/loop
+          // state; otherwise the old loop node stays connected forever once
+          // logicallyMounted goes false (the entity/view-removal reset at
+          // removeView() never fires for a live swap or dismount), and a swap
+          // would carry the old moving state into the new mount, skipping its
+          // windup.
+          this.audioSink?.mountEngineReset(e.id);
         }
       }
 
