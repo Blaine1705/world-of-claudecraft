@@ -174,8 +174,12 @@ describe('Reliquary wire thrift', () => {
     expect(ev.markId).toBeUndefined();
     expect(ev.pageIds).toEqual([PAGE_ID]);
     expect(ev.pid).toBe(session.pid);
+    // First catalogued fill ranks up to 1; curatorRank is an id-only numeric.
+    expect(ev.curatorRank).toBe(1);
     // Wire keys are the id-only contract; no display text fields.
-    expect(Object.keys(ev).sort()).toEqual(['itemId', 'pageIds', 'pid', 'type'].sort());
+    expect(Object.keys(ev).sort()).toEqual(
+      ['curatorRank', 'itemId', 'pageIds', 'pid', 'type'].sort(),
+    );
     expect(ev.name).toBeUndefined();
     expect(ev.label).toBeUndefined();
     expect(ev.message).toBeUndefined();

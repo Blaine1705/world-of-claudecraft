@@ -109,6 +109,7 @@ describe('buildReliquaryView empty state', () => {
       total: 9, // unique item relics across conqueror pages (marks/mounts excluded from catalog count)
       fraction: 0,
       curatorRank: 0,
+      curatorSealId: null,
     });
     expect(model.recent).toEqual([]);
     expect(model.nearly).toEqual([]);
@@ -148,8 +149,9 @@ describe('buildReliquaryView progress and rank', () => {
     expect(model.progress.owned).toBe(3);
     expect(model.progress.total).toBe(9);
     expect(model.progress.fraction).toBeCloseTo(3 / 9, 5);
-    // Rank thresholds: 1, 10, 25, 50, 100. Owned 3 => rank 1.
+    // Rank thresholds: 1, 10, 25, 50, 100. Owned 3 => rank 1 (apprentice seal).
     expect(model.progress.curatorRank).toBe(1);
+    expect(model.progress.curatorSealId).toBe('apprentice');
   });
 
   it('does not invent membership from recent alone', () => {
@@ -534,6 +536,7 @@ describe('buildReliquaryUnlockPlan', () => {
     expect(plan.motion).toBe(true);
     expect(plan.refreshWindow).toBe(true);
     expect(plan.illuminatedPageId).toBeNull();
+    expect(plan.curatorRank).toBeNull();
   });
 
   it('lets Illumination outrank a plain unlock for the banner slot', () => {
@@ -590,6 +593,57 @@ describe('buildReliquaryUnlockPlan', () => {
     expect(plan.playSound).toBe(true);
     expect(plan.motion).toBe(false);
     expect(plan.refreshWindow).toBe(true);
+    expect(plan.curatorRank).toBeNull();
+  });
+
+  it('lets rank-up outrank Illumination and plain unlock for the banner slot', () => {
+    const plan = buildReliquaryUnlockPlan(
+      [
+        { itemId: 'a', illuminatedPageId: 'crypt_n' },
+        { itemId: 'b', curatorRank: 2 },
+        { itemId: 'c' },
+      ],
+      false,
+    );
+    expect(plan.logs).toHaveLength(3);
+    expect(plan.banner).toEqual({ kind: 'rankUp', rank: 2 });
+    expect(plan.curatorRank).toBe(2);
+    // Illumination still recorded for any secondary chrome that wants it.
+    expect(plan.illuminatedPageId).toBe('crypt_n');
+    expect(plan.playSound).toBe(true);
+  });
+
+  it('Illumination does not overwrite an earlier rank-up banner', () => {
+    const plan = buildReliquaryUnlockPlan(
+      [
+        { itemId: 'a', curatorRank: 1 },
+        { itemId: 'b', illuminatedPageId: 'crypt_n' },
+      ],
+      false,
+    );
+    expect(plan.banner).toEqual({ kind: 'rankUp', rank: 1 });
+    expect(plan.illuminatedPageId).toBe('crypt_n');
+    expect(plan.curatorRank).toBe(1);
+  });
+
+  it('later rank-up replaces an earlier rank-up; last rank wins', () => {
+    const plan = buildReliquaryUnlockPlan(
+      [
+        { itemId: 'a', curatorRank: 1 },
+        { itemId: 'b', curatorRank: 2 },
+      ],
+      false,
+    );
+    expect(plan.banner).toEqual({ kind: 'rankUp', rank: 2 });
+    expect(plan.curatorRank).toBe(2);
+  });
+
+  it('reducedMotion keeps rank-up log, banner text plan, and sound', () => {
+    const plan = buildReliquaryUnlockPlan([{ itemId: 'a', curatorRank: 3 }], true);
+    expect(plan.banner).toEqual({ kind: 'rankUp', rank: 3 });
+    expect(plan.playSound).toBe(true);
+    expect(plan.motion).toBe(false);
+    expect(plan.curatorRank).toBe(3);
   });
 });
 

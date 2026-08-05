@@ -179,6 +179,14 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain("missingTooltipStatus: 'Not yet found'");
     expect(chrome).toContain("firstFindClears: 'First found on clear {count}'");
     expect(chrome).toContain("gridAria: 'Relics on {name}'");
+    // Phase 6 Curator rank chrome.
+    expect(chrome).toContain("curatorRankName1: 'Apprentice Curator'");
+    expect(chrome).toContain("curatorRankName2: 'Spoilskeeper'");
+    expect(chrome).toContain("curatorRankName3: 'Master Curator'");
+    expect(chrome).toContain("curatorRankName4: 'Grand Curator'");
+    expect(chrome).toContain("curatorRankName5: 'Eternal Curator'");
+    expect(chrome).toContain("rankUpBanner: 'Curator rank {rank}: {name}'");
+    expect(chrome).toContain("rankUpToast: 'Curator rank {rank} reached: {name}'");
   });
 
   it('wires reliquaryUnlock presentation through the pure plan (no membership invent)', () => {
@@ -200,6 +208,11 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toContain("t('hudChrome.reliquary.unlockToast'");
     expect(handler).toContain("t('hudChrome.reliquary.illuminateBanner'");
     expect(handler).toContain("t('hudChrome.reliquary.illuminateToast'");
+    expect(handler).toContain("t('hudChrome.reliquary.rankUpBanner'");
+    expect(handler).toContain("t('hudChrome.reliquary.rankUpToast'");
+    expect(handler).toContain("banner.kind === 'rankUp'");
+    // Illumination log still fires when rank-up owns the banner slot.
+    expect(handler).toContain('plan.illuminatedPageId');
     expect(handler).toContain("showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion)");
     expect(handler).toContain('if (plan.playSound) audio.achievement()');
     // Force open-window rebuild on unlock; membership still comes from mirrors.
@@ -208,6 +221,21 @@ describe('entry HTML and i18n chrome', () => {
     // Presentation-only: never write discovery / firstFind from the event.
     expect(handler).not.toMatch(/itemsDiscovered\.(add|has)/);
     expect(handler).not.toMatch(/reliquaryFirstFind\s*=/);
+  });
+
+  it('paints named rank + seal chrome from live progress (not a dead placeholder)', () => {
+    // Comment-stripped summaryHtml must use named rank keys and seal attrs.
+    const summary = painter
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n')
+      .match(/private summaryHtml\([\s\S]*?\n {2}private railHtml/)?.[0];
+    expect(summary, 'summaryHtml body').toBeTruthy();
+    expect(summary).toContain('curatorRankNameKey(p.curatorRank)');
+    expect(summary).toContain('p.curatorSealId');
+    expect(summary).toContain('data-seal=');
+    expect(summary).toContain('reliquary-rank-seal');
+    expect(summary).toContain("t('hudChrome.reliquary.curatorUnranked')");
   });
 
   it('maps the reliquary keybind action through t() in Options', () => {
@@ -230,6 +258,14 @@ describe('styles and architecture registration', () => {
     expect(reliquaryCss).toContain('.reliquary-grid');
     expect(reliquaryCss).toContain('.reliquary-cell--missing');
     expect(reliquaryCss).toContain('.reliquary-cell--owned');
+    // Phase 6 seal chrome (cosmetic ranks).
+    expect(reliquaryCss).toContain('.reliquary-rank-seal');
+    expect(reliquaryCss).toContain('data-seal="apprentice"');
+    expect(reliquaryCss).toContain('data-seal="keeper"');
+    expect(reliquaryCss).toContain('data-seal="master"');
+    expect(reliquaryCss).toContain('data-seal="grand"');
+    expect(reliquaryCss).toContain('data-seal="eternal"');
+    expect(reliquaryCss).toContain('prefers-reduced-motion: reduce');
     expect(hudMobile).toContain('body.mobile-touch #reliquary-window');
     expect(hudMobile).toContain('env(safe-area-inset-left)');
     expect(hudMobile).toContain('body.mobile-touch #reliquary-window .reliquary-grid');

@@ -18,7 +18,7 @@
 | 4 QA | **done** | exit criteria verified; M16 + Options keybind defects fixed; release @ 5e83ba89d0 |
 | 5 Page grids + live UX | **done** | grid cells, silhouettes, unlock toast, Illumination, ownershipDigest |
 | 5 QA | **done** | exit criteria verified; pin holes closed; release @ 413de574cf |
-| 6 Curator ranks + cosmetics | pending | same worktree + pull |
+| 6 Curator ranks + cosmetics | **done** | pure ranks, seals, rank-up celebration, zero-Renown deed bridges |
 | 6 QA | pending | same worktree + pull |
 | 7 Professions shelf | pending | same worktree + pull |
 | 7 QA | pending | same worktree + pull |
@@ -209,6 +209,34 @@
   - Cell fill-flash CSS intentionally not shipped
   Manual open/Esc/mobile/unlock smoke not run (static + unit pins only).
 
+- Phase 6: merged `origin/release/v0.35.0` (already up to date @ `413de574cf`).
+  Green:
+  - `npx vitest run tests/reliquary_state.test.ts tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/architecture.test.ts tests/deeds_content.test.ts tests/deeds_completion.test.ts tests/deed_i18n.test.ts tests/deeds_view.test.ts tests/reliquary_wire.test.ts tests/language_fanout_registry.test.ts` (**235+ passed** under limited workers)
+  - `npm run i18n:gen`
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  - biome on changed files (errors fixed; pre-existing warnings only)
+  Landed:
+  - `CURATOR_RANK_DEFS` thresholds [1, 10, 25, 50, 100] with seal ids
+    apprentice/keeper/master/grand/eternal (pure; no power fields)
+  - Rank from unique catalogued item fills only (`catalogItemCompletion`)
+  - `reliquaryUnlock.curatorRank` on threshold cross (id-only numeric)
+  - Rank-up banner priority: rankUp > Illumination > unlock; reduced-motion
+    trims motion only; Illumination toast still logs under rank-up banner
+  - Overview named ranks + window seal chrome (`data-seal` + CSS)
+  - Zero-Renown manual deed bridges `col_reliquary_rank_2..5` (titles ranks
+    2 to 4; border `reliquary_gilt` at rank 5); sticky = `deedsEarned` via
+    `grantDeed` (no `rankRewardsGranted` blob)
+  - Live grant on rank-up; join `retroFallbackGrants` sync for veterans
+  - English chrome + M16 non-Latin fills for rank names / rank-up toast
+  - Language fan-out registry row for `reliquary_window` (BLOCKING fix)
+  Decisions: no sticky Reliquary blob field; deeds own durability. Rank 1 is
+  chrome-only (no deed). No per-drop saveCharacter; grantDeed only when a
+  title/border bridge actually unlocks. No Phase 7 profession marks.
+  Manual rank-up smoke not run (static + unit pins only).
+  Reviews: architecture GREEN (0 BLOCKING; SHOULD-FIX retro pin added);
+  test-coverage SHOULD-FIX pins closed; frontend BLOCKING fan-out fixed.
+
 ## Surprises / decisions during implementation
 
 - Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
@@ -234,3 +262,8 @@
 - Phase 5: page content names stay catalog English (same Phase 4 deferral;
   content re-localize is not Phase 5 scope). Cell fill-flash CSS was dropped
   rather than left unwired; celebration is banner + toast + sound.
+- Phase 6: Curator rank thresholds stay [1, 10, 25, 50, 100]. Named ranks:
+  Apprentice / Spoilskeeper / Master / Grand / Eternal Curator. Deed bridges
+  at ranks 2 to 5 only (renown 0); rank 1 is seal chrome only. Sticky grants
+  reuse `deedsEarned` (no `rankRewardsGranted` on ReliquaryState). Rank-up
+  outranks Illumination for the single banner slot.

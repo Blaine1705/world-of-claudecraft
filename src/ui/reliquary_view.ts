@@ -4,7 +4,8 @@
 // UI_PURE_CORES; unit-tested in tests/reliquary_view.test.ts.
 //
 // Phase 5: page grids (owned art vs silhouette), unlock/Illumination plan, and
-// grid-relevant refresh signature dimensions. Curator cosmetics land in Phase 6.
+// grid-relevant refresh signature dimensions. Phase 6: Curator rank names,
+// seal chrome, and rank-up celebration plan.
 
 import type {
   ReliquaryPageDef,
@@ -14,6 +15,7 @@ import type {
 import {
   catalogItemCompletion,
   curatorRankFromOwned,
+  curatorSealIdForRank,
   isRelicFilled,
   pageCompletion,
 } from '../sim/reliquary';
@@ -70,6 +72,11 @@ export interface ReliquaryProgressModel {
   fraction: number;
   /** Cosmetic Curator rank index (0 = none). */
   curatorRank: number;
+  /**
+   * Window seal chrome id for the current rank (null when unranked).
+   * Derived pure; never invents power or Renown.
+   */
+  curatorSealId: string | null;
 }
 
 export interface ReliquaryRecentFindModel {
@@ -224,11 +231,13 @@ export function buildReliquaryPageCells(
 export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewModel {
   const opts = ownershipOpts(input);
   const catalog = catalogItemCompletion(input.itemsDiscovered, input.pages);
+  const curatorRank = curatorRankFromOwned(catalog.owned);
   const progress: ReliquaryProgressModel = {
     owned: catalog.owned,
     total: catalog.total,
     fraction: catalog.total > 0 ? catalog.owned / catalog.total : 0,
-    curatorRank: curatorRankFromOwned(catalog.owned),
+    curatorRank,
+    curatorSealId: curatorSealIdForRank(curatorRank),
   };
 
   const recent: ReliquaryRecentFindModel[] = [];
@@ -363,20 +372,23 @@ export interface ReliquaryUnlockEventModel {
   markId?: string;
   pageIds?: readonly string[];
   illuminatedPageId?: string;
+  /** New Curator rank when this fill crossed a threshold (cosmetic only). */
+  curatorRank?: number;
 }
 
 export type ReliquaryUnlockLog = { kind: 'item'; id: string } | { kind: 'mark'; id: string };
 
 export type ReliquaryUnlockBanner =
   | { kind: 'unlock'; relic: ReliquaryUnlockLog }
-  | { kind: 'illuminate'; pageId: string };
+  | { kind: 'illuminate'; pageId: string }
+  | { kind: 'rankUp'; rank: number };
 
 export interface ReliquaryUnlockPlan {
   /** One durable log line per catalogued unlock in drain order. */
   logs: ReliquaryUnlockLog[];
   /**
-   * Single banner slot: Illumination outranks a plain unlock, and among
-   * Illuminations / unlocks the LAST wins (the log carries every line).
+   * Single banner slot priority (highest wins; last of same tier wins):
+   * rankUp > Illumination > plain unlock. The log still carries every line.
    */
   banner: ReliquaryUnlockBanner | null;
   /** One celebration sound per drain with at least one unlock. */
@@ -390,6 +402,8 @@ export interface ReliquaryUnlockPlan {
   refreshWindow: boolean;
   /** Last illuminated page id in the drain, if any. */
   illuminatedPageId: string | null;
+  /** Highest Curator rank-up in the drain, if any (cosmetic only). */
+  curatorRank: number | null;
 }
 
 /**
@@ -404,6 +418,7 @@ export function buildReliquaryUnlockPlan(
   const logs: ReliquaryUnlockLog[] = [];
   let banner: ReliquaryUnlockBanner | null = null;
   let illuminatedPageId: string | null = null;
+  let curatorRank: number | null = null;
 
   for (const event of events) {
     let log: ReliquaryUnlockLog | null = null;
@@ -412,11 +427,24 @@ export function buildReliquaryUnlockPlan(
     if (!log) continue;
     logs.push(log);
 
-    if (event.illuminatedPageId) {
+    const rankUp =
+      typeof event.curatorRank === 'number' &&
+      Number.isFinite(event.curatorRank) &&
+      event.curatorRank > 0
+        ? Math.floor(event.curatorRank)
+        : null;
+    if (rankUp !== null) {
+      curatorRank = rankUp;
+      // Rank-up outranks Illumination and plain unlock (rarer prestige moment).
+      banner = { kind: 'rankUp', rank: rankUp };
+    } else if (event.illuminatedPageId) {
       illuminatedPageId = event.illuminatedPageId;
-      banner = { kind: 'illuminate', pageId: event.illuminatedPageId };
+      // Illumination outranks plain unlock; never overwrites a rank-up banner.
+      if (banner === null || banner.kind === 'unlock' || banner.kind === 'illuminate') {
+        banner = { kind: 'illuminate', pageId: event.illuminatedPageId };
+      }
     } else if (banner === null || banner.kind === 'unlock') {
-      // Plain unlock only fills the slot when no Illumination has claimed it yet
+      // Plain unlock only fills the slot when no higher tier has claimed it yet
       // in this drain; a later plain unlock still updates the unlock banner.
       banner = { kind: 'unlock', relic: log };
     }
@@ -429,6 +457,7 @@ export function buildReliquaryUnlockPlan(
     motion: logs.length > 0 && !reducedMotion,
     refreshWindow: logs.length > 0,
     illuminatedPageId,
+    curatorRank,
   };
 }
 

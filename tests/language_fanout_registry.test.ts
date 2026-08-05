@@ -107,6 +107,9 @@ const FANOUT_ARMS: readonly string[] = [
   'this.bankWindow.render|this.bankWindow.isOpen',
   'this.deedsWindow.render|this.deedsWindow.isOpen',
   'this.professionsWindow.render|this.professionsWindow.isOpen',
+  // The Reliquary cold window is signature-gated (lastSig); language switch
+  // must force render while open so curator rank chrome and shelf labels re-t().
+  'this.reliquaryWindow.render|this.reliquaryWindow.isOpen',
   // The crafting window's repaint memos are all text-independent (station
   // set, reagent sig, profession surface sig), so an open window kept the
   // previous locale until data moved; the forced rebuild re-runs every t(),
@@ -231,6 +234,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSig'],
     answer: 'this.deedsWindow.render',
     why: 'the earned/watched deed ids and their counters',
+  },
+  {
+    file: 'reliquary_window.ts',
+    memos: ['lastSig'],
+    answer: 'this.reliquaryWindow.render',
+    why: 'catalog progress, Curator rank labels, shelf page lists, and grid chrome',
   },
   {
     file: 'dungeon_finder_proposal_popup.ts',

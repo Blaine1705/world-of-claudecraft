@@ -26,14 +26,14 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 5 QA complete (page grids, silhouettes, live unlock
-  UX, Illumination verified).
+- **Current phase:** Phase 6 implementation complete (Curator ranks, cosmetics,
+  zero-Renown deed bridges).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 6 (Curator ranks / cosmetics / deed
-  bridges). Do **not** skip the release pull.
+  `origin/release/v0.35.0`, then Phase 6 QA. Do **not** skip the release pull.
+  Do **not** start Phase 7 until Phase 6 QA is green.
 - **Blocker:** none.
-- **Release tip at Phase 5 QA:** merged `origin/release/v0.35.0` to
-  `413de574cf` (profession skill-level toast #2934); merge commit `18985ba602`.
+- **Release tip at Phase 6 implementation:** already up to date with
+  `origin/release/v0.35.0` @ `413de574cf` (same tip as Phase 5 QA).
 
 ## Locked design decisions
 
@@ -110,11 +110,14 @@ session load:
 | `reliq` wire key | `server/game.ts` / `src/net/online.ts` | **landed** (heavy-gated sparse) |
 | `reliquaryWireBlob` | `src/sim/reliquary.ts` | **landed** |
 | `buildReliquaryView` / `reliquaryRefreshSig` | `src/ui/reliquary_view.ts` | **landed** (UI_PURE_CORES; Phase 5 grid + unlock plan) |
-| `buildReliquaryPageCells` / `buildReliquaryUnlockPlan` | `src/ui/reliquary_view.ts` | **landed** (Phase 5) |
+| `buildReliquaryPageCells` / `buildReliquaryUnlockPlan` | `src/ui/reliquary_view.ts` | **landed** (Phase 5 + Phase 6 rankUp banner) |
+| `CURATOR_RANK_DEFS` / `curatorSealIdForRank` / `syncCuratorRankDeeds` | `src/sim/reliquary.ts` | **landed** (Phase 6) |
+| `col_reliquary_rank_2..5` | `src/sim/content/deeds.ts` | **landed** (Phase 6; renown 0 manual) |
+| `reliquaryUnlock.curatorRank` | `src/sim/types.ts` | **landed** (Phase 6 id-only rank-up) |
 | `reliquaryOwnershipDigest` | `src/ui/reliquary_view.ts` | **landed** (Phase 5 open-window grid live) |
-| `ReliquaryWindow` | `src/ui/reliquary_window.ts` | **landed** (cold; Overview + page grids) |
-| Hud `handleReliquaryUnlocks` | `src/ui/hud.ts` | **landed** (presentation toast + Illumination) |
-| `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | **landed** (English chrome keys + Phase 5 unlock/grid) |
+| `ReliquaryWindow` | `src/ui/reliquary_window.ts` | **landed** (cold; Overview + page grids + rank seals) |
+| Hud `handleReliquaryUnlocks` | `src/ui/hud.ts` | **landed** (presentation toast + Illumination + rank-up) |
+| `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | **landed** (English chrome + Phase 5/6 rank keys) |
 | Keybind `reliquary` | `src/game/keybinds.ts` | **landed** (default Shift+KeyX) |
 | Options BIND map | `src/ui/options_window.ts` `BIND_ACTION_LABEL_KEYS.reliquary` | **landed** (Phase 4 QA) |
 | M16 non-Latin chrome | `src/ui/i18n.locales/{zh_CN,zh_TW,ja_JP,ko_KR,ru_RU}.ts` | **landed** (Phase 4 + Phase 5 wordy keys) |

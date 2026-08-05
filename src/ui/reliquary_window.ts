@@ -47,6 +47,22 @@ const NAV_LABEL_KEYS: Record<ReliquaryNavId, TranslationKey> = {
   horizons: 'hudChrome.reliquary.navHorizons',
 };
 
+/** Named Curator rank chrome keys (Phase 6). Falls back to numeric rank label. */
+const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
+  'hudChrome.reliquary.curatorRankName1',
+  'hudChrome.reliquary.curatorRankName2',
+  'hudChrome.reliquary.curatorRankName3',
+  'hudChrome.reliquary.curatorRankName4',
+  'hudChrome.reliquary.curatorRankName5',
+];
+
+function curatorRankNameKey(rank: number): TranslationKey {
+  if (rank >= 1 && rank <= CURATOR_RANK_NAME_KEYS.length) {
+    return CURATOR_RANK_NAME_KEYS[rank - 1]!;
+  }
+  return 'hudChrome.reliquary.curatorRank';
+}
+
 /**
  * Hud-supplied glue: shared presentation bag plus the window surface (world
  * reads, focus capture/return, close chrome).
@@ -206,12 +222,16 @@ export class ReliquaryWindow {
     const pct = Math.round(p.fraction * 100);
     const rankLabel =
       p.curatorRank > 0
-        ? t('hudChrome.reliquary.curatorRank', { rank: this.fmt(p.curatorRank) })
+        ? t(curatorRankNameKey(p.curatorRank), { rank: this.fmt(p.curatorRank) })
         : t('hudChrome.reliquary.curatorUnranked');
+    const sealAttr = p.curatorSealId ? ` data-seal="${esc(p.curatorSealId)}"` : '';
+    const sealClass = p.curatorSealId ? ' has-seal' : '';
     return (
-      `<div class="reliquary-summary">` +
+      `<div class="reliquary-summary${sealClass}"${sealAttr}>` +
       `<span class="reliquary-count">${esc(t('hudChrome.reliquary.countLabel', { owned, total }))}</span>` +
-      `<span class="reliquary-rank">${esc(rankLabel)}</span>` +
+      `<span class="reliquary-rank" data-rank="${p.curatorRank}">` +
+      `<span class="reliquary-rank-seal" aria-hidden="true"></span>` +
+      `${esc(rankLabel)}</span>` +
       `<span class="reliquary-pct" role="img" aria-label="${esc(t('hudChrome.reliquary.completionAria', { owned, total }))}">` +
       `<span class="reliquary-bar"><span class="reliquary-bar-fill" style="width:${pct}%"></span></span> ${esc(pctText)}</span>` +
       `</div>`

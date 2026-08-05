@@ -1092,6 +1092,19 @@ function yellVoiceKey(text: string): string {
 
 const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 
+/** Named Curator rank for rank-up toast/banner (cosmetic chrome only). */
+function curatorRankDisplayName(rank: number): string {
+  const keys = [
+    'hudChrome.reliquary.curatorRankName1',
+    'hudChrome.reliquary.curatorRankName2',
+    'hudChrome.reliquary.curatorRankName3',
+    'hudChrome.reliquary.curatorRankName4',
+    'hudChrome.reliquary.curatorRankName5',
+  ] as const;
+  if (rank >= 1 && rank <= keys.length) return t(keys[rank - 1]!);
+  return t('hudChrome.reliquary.curatorRank', { rank: formatNumber(rank) });
+}
+
 export class Hud {
   // Ability slots across three rows: 1..11 primary, 12..22 secondary, and
   // 23..33 third (slot 0 is the Attack toggle on the primary row). Every row
@@ -12553,9 +12566,9 @@ export class Hud {
   }
 
   // Reliquary catalog fill: planned purely (buildReliquaryUnlockPlan). Each
-  // unlock gets a gold log line; Illumination outranks a plain unlock for the
-  // single banner slot; one sound per drain; reducedMotion trims motion only.
-  // Membership is NEVER invented here: the event is presentation-only.
+  // unlock gets a gold log line; rank-up outranks Illumination outranks a plain
+  // unlock for the single banner slot; one sound per drain; reducedMotion trims
+  // motion only. Membership is NEVER invented here: the event is presentation-only.
   private handleReliquaryUnlocks(events: ReliquaryUnlockEventModel[]): void {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const plan = buildReliquaryUnlockPlan(events, reducedMotion);
@@ -12568,10 +12581,29 @@ export class Hud {
             : log.id.replace(/_/g, ' ');
       this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
     }
+    // Durable Illumination log survives even when rank-up claims the banner slot.
+    if (plan.illuminatedPageId && plan.banner?.kind !== 'illuminate') {
+      const page = RELIQUARY_PAGES.find((p) => p.id === plan.illuminatedPageId);
+      const pageName = page?.name ?? plan.illuminatedPageId;
+      this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+    }
     if (plan.banner) {
       const banner = plan.banner;
       let bannerText: string;
-      if (banner.kind === 'illuminate') {
+      if (banner.kind === 'rankUp') {
+        const rankName = curatorRankDisplayName(banner.rank);
+        bannerText = t('hudChrome.reliquary.rankUpBanner', {
+          rank: formatNumber(banner.rank),
+          name: rankName,
+        });
+        this.log(
+          t('hudChrome.reliquary.rankUpToast', {
+            rank: formatNumber(banner.rank),
+            name: rankName,
+          }),
+          '#ffd100',
+        );
+      } else if (banner.kind === 'illuminate') {
         const page = RELIQUARY_PAGES.find((p) => p.id === banner.pageId);
         const pageName = page?.name ?? banner.pageId;
         bannerText = t('hudChrome.reliquary.illuminateBanner', { name: pageName });

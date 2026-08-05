@@ -61,8 +61,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 234 deeds worth 2815 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(234);
+  it('ships exactly 238 deeds worth 2815 total Renown', () => {
+    // +4 Reliquary Curator rank bridges (all renown 0).
+    expect(DEED_ORDER.length).toBe(238);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2815);
   });
 
@@ -75,7 +76,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       dungeon: 29,
       delve: 13,
       chronicle: 37,
-      collection: 28,
+      collection: 32,
       pvp: 28,
       social: 18,
       exploration: 9,
@@ -150,6 +151,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // shipped capstone the first reckoning never credited.
       'chr_drakemaw_broodlord',
       'chr_maw_matriarch',
+      // Reliquary Curator rank bridges (zero Renown; catalog prestige never
+      // scores the board). Manual grant via syncCuratorRankDeeds.
+      'col_reliquary_rank_2',
+      'col_reliquary_rank_3',
+      'col_reliquary_rank_4',
+      'col_reliquary_rank_5',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -335,16 +342,22 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(DEEDS.prog_ringwright).toBeUndefined();
   });
 
-  it('ships exactly 30 titles and 3 borders', () => {
+  it('ships exactly 33 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
-    expect(titles.length).toBe(30);
-    expect(borders.length).toBe(3);
+    // Reliquary Curator ranks append 3 titles + 1 border (cosmetic only).
+    expect(titles.length).toBe(33);
+    expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(30);
+    expect(new Set(titleTexts).size).toBe(33);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
-    expect([...borderSlugs].sort()).toEqual(['curators_gilt', 'deepward', 'prestige_laurels']);
+    expect([...borderSlugs].sort()).toEqual([
+      'curators_gilt',
+      'deepward',
+      'prestige_laurels',
+      'reliquary_gilt',
+    ]);
   });
 
   it('pins the launch era constant', () => {
@@ -397,7 +410,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // standing broodlord rares) and chr_maw_matriarch (quest-trigger credit for
   // the shipped Cindraleth capstone). Both parents appended only, so no
   // shipped trigger or renown changed on either side.
-  const FROZEN_CATALOG_SHA256 = '4421793493830ebbde6691ea8af7f18a99d6917281c94f0b069bb66c1c82e9b1';
+  // Re-baselined for Reliquary Phase 6: four appended zero-Renown Curator
+  // rank bridges (col_reliquary_rank_2..5); no shipped trigger or renown
+  // changed on prior deeds.
+  const FROZEN_CATALOG_SHA256 = 'a0bb4452100e26a2dc177e02addf7e99066ed7a48efe7b7419ae0edefcb03c46';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -591,7 +607,7 @@ describe('table shape', () => {
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_maw_matriarch');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_reliquary_rank_5');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

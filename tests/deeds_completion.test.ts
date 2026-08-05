@@ -117,6 +117,8 @@ describe('the real catalog', () => {
       // Deliberate growth: the four luck-based rare-find deeds
       // (pristine vein, ancient heartwood, moonlit bloom, perfect specimen)
       // join the zero-renown class per rule 2 (luck earns no Renown).
+      // Reliquary Curator rank bridges (col_reliquary_rank_*) are also zero
+      // Renown: catalog prestige never scores the board.
       'col_ancient_heartwood',
       'col_first_epic',
       'col_first_legendary',
@@ -125,6 +127,10 @@ describe('the real catalog', () => {
       'col_moonlit_bloom',
       'col_perfect_specimen',
       'col_pristine_vein',
+      'col_reliquary_rank_2',
+      'col_reliquary_rank_3',
+      'col_reliquary_rank_4',
+      'col_reliquary_rank_5',
       'col_set_boundstone_vanguard',
       'col_set_crownforged',
       'col_set_deathlord',

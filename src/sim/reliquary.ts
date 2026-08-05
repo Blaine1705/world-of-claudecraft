@@ -174,14 +174,24 @@ function dungeonClearCount(
 /**
  * Hook from markItemDiscovered after a NEW item id enters itemsDiscovered.
  * Writes sparse firstFind + capped recent only for catalogued relic item ids,
- * then emits id-only reliquaryUnlock for presentation. Idempotent: a second
- * call for the same id is a no-op. Does not call saveCharacter and does not
- * dual-write discovery.
+ * then emits id-only reliquaryUnlock for presentation (including curatorRank
+ * when this fill crossed a cosmetic rank threshold). Syncs zero-Renown rank
+ * deed bridges via grantDeed (durability path for titles only). Idempotent:
+ * a second call for the same id is a no-op. Does not call saveCharacter on
+ * pure silhouette fill and does not dual-write discovery.
  */
 export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: string): void {
   if (!isCataloguedRelicItem(itemId)) return;
+  // Rank is derived from itemsDiscovered (already includes this id). The prior
+  // unique catalog fill count is owned - 1 because this discover is the first
+  // time the id entered the set (markItemDiscovered only calls on first add).
+  const owned = catalogItemCompletion(meta.deedStats.itemsDiscovered).owned;
+  const previousRank = curatorRankFromOwned(Math.max(0, owned - 1));
+  const newRank = curatorRankFromOwned(owned);
   if (!noteRelicItemFind(meta, itemId)) return;
-  emitReliquaryUnlock(ctx, meta, { itemId });
+  const rankedUp = newRank > previousRank ? newRank : undefined;
+  emitReliquaryUnlock(ctx, meta, { itemId, curatorRank: rankedUp });
+  if (rankedUp !== undefined) syncCuratorRankDeeds(ctx, meta);
 }
 
 /**
@@ -224,11 +234,12 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
 /**
  * Id-only presentation event for a new catalogued relic or mark. Never
  * English. Membership authority stays on itemsDiscovered + sparse blob.
+ * Optional curatorRank is the new cosmetic rank index when this fill ranked up.
  */
 function emitReliquaryUnlock(
   ctx: SimContext,
   meta: PlayerMeta,
-  ids: { itemId?: string; markId?: string },
+  ids: { itemId?: string; markId?: string; curatorRank?: number },
 ): void {
   const pageIds = ids.itemId !== undefined ? RELIQUARY_ITEM_TO_PAGES.get(ids.itemId) : undefined;
   let illuminatedPageId: string | undefined;
@@ -253,6 +264,9 @@ function emitReliquaryUnlock(
     ...(ids.markId !== undefined ? { markId: ids.markId } : {}),
     ...(pageIds && pageIds.length > 0 ? { pageIds: [...pageIds] } : {}),
     ...(illuminatedPageId !== undefined ? { illuminatedPageId } : {}),
+    ...(ids.curatorRank !== undefined && ids.curatorRank > 0
+      ? { curatorRank: ids.curatorRank }
+      : {}),
   });
 }
 
@@ -350,11 +364,36 @@ export function catalogItemCompletion(
 }
 
 /**
- * Pure Curator rank index from unique owned relic count.
- * Thresholds are cosmetic-only; Phase 6 may expand rewards. Rank 0 = none.
- * Thresholds are inclusive minimums for rank 1..N.
+ * Pure Curator rank tiers: cosmetic-only. Rank from unique catalogued relic
+ * fills (never kill count alone). Rewards are titles / borders / window seal
+ * chrome; never combat stats, drop rate, pity, or actionable combat info.
+ * Thresholds are inclusive minimums for rank 1..N. Rank 0 = none.
  */
-export const CURATOR_RANK_THRESHOLDS: readonly number[] = [1, 10, 25, 50, 100];
+export interface CuratorRankDef {
+  /** Rank index 1..N (matches curatorRankFromOwned). */
+  rank: number;
+  /** Inclusive unique-owned minimum for this rank. */
+  threshold: number;
+  /** Window seal chrome id (CSS data-seal); derived, never stored. */
+  sealId: string;
+  /**
+   * Optional zero-Renown deed bridge granted when this rank is first reached.
+   * Titles/borders only; renown must stay 0 (luck/catalog prestige never
+   * scores Renown). grantDeed is the sticky set; no rankRewardsGranted blob.
+   */
+  deedId?: string;
+}
+
+export const CURATOR_RANK_DEFS: readonly CuratorRankDef[] = [
+  { rank: 1, threshold: 1, sealId: 'apprentice' },
+  { rank: 2, threshold: 10, sealId: 'keeper', deedId: 'col_reliquary_rank_2' },
+  { rank: 3, threshold: 25, sealId: 'master', deedId: 'col_reliquary_rank_3' },
+  { rank: 4, threshold: 50, sealId: 'grand', deedId: 'col_reliquary_rank_4' },
+  { rank: 5, threshold: 100, sealId: 'eternal', deedId: 'col_reliquary_rank_5' },
+];
+
+/** Inclusive unique-owned thresholds for rank 1..N (derived from CURATOR_RANK_DEFS). */
+export const CURATOR_RANK_THRESHOLDS: readonly number[] = CURATOR_RANK_DEFS.map((d) => d.threshold);
 
 export function curatorRankFromOwned(
   ownedUnique: number,
@@ -367,6 +406,34 @@ export function curatorRankFromOwned(
     else break;
   }
   return rank;
+}
+
+/** Seal chrome id for a rank, or null when unranked. Pure; never invents power. */
+export function curatorSealIdForRank(rank: number): string | null {
+  if (!(rank > 0)) return null;
+  const def = CURATOR_RANK_DEFS[rank - 1];
+  return def?.sealId ?? null;
+}
+
+/**
+ * Grant zero-Renown Curator rank deed bridges for every rank the player has
+ * already earned by unique catalogued fill count. Idempotent via grantDeed.
+ * Does not force saveCharacter itself: grantDeed (title/border durability)
+ * is the existing durability-critical path when a new deed lands.
+ */
+export function syncCuratorRankDeeds(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  opts?: { retro?: boolean },
+): void {
+  const owned = catalogItemCompletion(meta.deedStats.itemsDiscovered).owned;
+  const rank = curatorRankFromOwned(owned);
+  if (rank <= 0) return;
+  for (let i = 0; i < rank; i++) {
+    const deedId = CURATOR_RANK_DEFS[i]?.deedId;
+    if (!deedId) continue;
+    ctx.grantDeed(meta, deedId, opts?.retro ? { retro: true } : undefined);
+  }
 }
 
 /** Convenience: live pages in append order (skip missing defs). */

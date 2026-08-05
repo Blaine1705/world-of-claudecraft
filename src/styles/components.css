@@ -7508,6 +7508,56 @@
   .reliquary-summary b,
   .reliquary-rank {
     color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info). */
+  .reliquary-rank-seal {
+    display: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border-showcase);
+    background: var(--color-surface-inset, #14110b);
+    box-shadow: inset 0 0 0 2px var(--color-surface-hover, #1c1812);
+    flex: none;
+  }
+  .reliquary-summary.has-seal .reliquary-rank-seal {
+    display: inline-block;
+  }
+  .reliquary-summary[data-seal="apprentice"] .reliquary-rank-seal {
+    border-color: var(--gold-dim);
+    background: linear-gradient(to bottom, var(--gold-dim), var(--color-surface-inset, #14110b));
+  }
+  .reliquary-summary[data-seal="keeper"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: linear-gradient(to bottom, var(--gold-dim), var(--gold));
+  }
+  .reliquary-summary[data-seal="master"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: linear-gradient(to bottom, var(--gold), var(--gold-dim));
+    box-shadow: 0 0 4px color-mix(in srgb, var(--gold) 40%, transparent);
+  }
+  .reliquary-summary[data-seal="grand"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: radial-gradient(circle at 35% 30%, var(--gold), var(--gold-dim) 70%);
+    box-shadow: 0 0 6px color-mix(in srgb, var(--gold) 55%, transparent);
+  }
+  .reliquary-summary[data-seal="eternal"] .reliquary-rank-seal {
+    border-color: var(--gold);
+    background: radial-gradient(
+      circle at 35% 30%,
+      color-mix(in srgb, var(--gold) 35%, white),
+      var(--gold) 45%,
+      var(--gold-dim) 85%
+    );
+    box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 70%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reliquary-summary[data-seal] .reliquary-rank-seal {
+      box-shadow: none;
+    }
   }
   .reliquary-pct {
     display: inline-flex;
@@ -7528,7 +7578,7 @@
   .reliquary-bar-fill {
     display: block;
     height: 100%;
-    background: linear-gradient(var(--gold), var(--gold-dim));
+    background: linear-gradient(to bottom, var(--gold), var(--gold-dim));
   }
   .reliquary-body {
     flex: 1 1 auto;
@@ -7566,7 +7616,11 @@
   .reliquary-nav.active {
     color: var(--gold);
     border-color: var(--color-border-active, #6a5320);
-    background: linear-gradient(var(--color-surface-active-top, #2a220f), var(--color-surface-hover, #1c1812));
+    background: linear-gradient(
+      to bottom,
+      var(--color-surface-active-top, #2a220f),
+      var(--color-surface-hover, #1c1812)
+    );
   }
   .reliquary-nav:focus-visible {
     outline: 2px solid var(--color-border-focus);

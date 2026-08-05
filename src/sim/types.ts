@@ -4234,6 +4234,8 @@ export type SimEvent = { pid?: number } & (
       markId?: string;
       pageIds?: string[];
       illuminatedPageId?: string;
+      /** New cosmetic Curator rank index when this fill crossed a threshold. */
+      curatorRank?: number;
     }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from

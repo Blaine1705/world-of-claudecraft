@@ -2399,6 +2399,48 @@ export const DEEDS: Record<string, DeedDef> = {
     // already finished the chain), so the boss template needs no rare flag.
     trigger: { kind: 'quest', questId: 'q_dk_matriarch_of_the_maw' },
   },
+
+  // The Reliquary Curator ranks (cosmetic prestige over unique catalogued
+  // relic fills). Zero Renown: catalog / luck prestige never scores the
+  // board (docs/design/reliquary.md + deeds.md rule 2). Manual: granted by
+  // syncCuratorRankDeeds when the pure rank threshold is crossed (and on
+  // join retro for veterans who already crossed). Titles/borders only.
+  col_reliquary_rank_2: {
+    id: 'col_reliquary_rank_2',
+    name: 'Spoilskeeper',
+    desc: 'Reach Curator rank 2 in The Reliquary (10 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Spoilskeeper' },
+  },
+  col_reliquary_rank_3: {
+    id: 'col_reliquary_rank_3',
+    name: 'The Cataloguer',
+    desc: 'Reach Curator rank 3 in The Reliquary (25 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'the Cataloguer' },
+  },
+  col_reliquary_rank_4: {
+    id: 'col_reliquary_rank_4',
+    name: 'Arch-Curator',
+    desc: 'Reach Curator rank 4 in The Reliquary (50 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Arch-Curator' },
+  },
+  col_reliquary_rank_5: {
+    id: 'col_reliquary_rank_5',
+    name: 'Eternal Spoils',
+    desc: 'Reach Curator rank 5 in The Reliquary (100 unique catalogued relics).',
+    category: 'collection',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'border', slug: 'reliquary_gilt' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

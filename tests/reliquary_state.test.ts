@@ -1,6 +1,7 @@
 // Reliquary Phase 1 foundation: sparse state, mark hooks, serialize omit-empty,
 // pure completion helpers. No UI / wire coverage here.
 import { describe, expect, it } from 'vitest';
+import { DEEDS } from '../src/sim/content/deeds';
 import {
   isCataloguedRelicItem,
   RELIQUARY_PAGES,
@@ -8,10 +9,12 @@ import {
 } from '../src/sim/content/reliquary';
 import { markItemDiscovered } from '../src/sim/deeds';
 import {
+  CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
   catalogItemCompletion,
   clearCountForSource,
   curatorRankFromOwned,
+  curatorSealIdForRank,
   freshReliquaryState,
   isReliquaryStateEmpty,
   noteRelicItemFind,
@@ -20,6 +23,7 @@ import {
   RELIQUARY_RECENT_CAP,
   restoreReliquaryState,
   serializeReliquaryState,
+  syncCuratorRankDeeds,
 } from '../src/sim/reliquary';
 import { type CharacterState, Sim } from '../src/sim/sim';
 
@@ -275,12 +279,156 @@ describe('Reliquary pure completion + curator rank', () => {
   });
 
   it('curatorRankFromOwned is pure and threshold-driven', () => {
+    expect(CURATOR_RANK_THRESHOLDS).toEqual([1, 10, 25, 50, 100]);
+    expect(CURATOR_RANK_DEFS.map((d) => d.threshold)).toEqual([...CURATOR_RANK_THRESHOLDS]);
     expect(curatorRankFromOwned(0)).toBe(0);
     expect(curatorRankFromOwned(1)).toBe(1);
     expect(curatorRankFromOwned(9)).toBe(1);
     expect(curatorRankFromOwned(10)).toBe(2);
+    expect(curatorRankFromOwned(24)).toBe(2);
+    expect(curatorRankFromOwned(25)).toBe(3);
+    expect(curatorRankFromOwned(49)).toBe(3);
+    expect(curatorRankFromOwned(50)).toBe(4);
+    expect(curatorRankFromOwned(99)).toBe(4);
     expect(curatorRankFromOwned(CURATOR_RANK_THRESHOLDS[CURATOR_RANK_THRESHOLDS.length - 1])).toBe(
       CURATOR_RANK_THRESHOLDS.length,
+    );
+    // Seal chrome is pure and cosmetic-only (no power fields on defs).
+    expect(curatorSealIdForRank(0)).toBeNull();
+    expect(curatorSealIdForRank(1)).toBe('apprentice');
+    expect(curatorSealIdForRank(2)).toBe('keeper');
+    expect(curatorSealIdForRank(3)).toBe('master');
+    expect(curatorSealIdForRank(4)).toBe('grand');
+    expect(curatorSealIdForRank(5)).toBe('eternal');
+    expect(CURATOR_RANK_DEFS.map((d) => d.deedId)).toEqual([
+      undefined,
+      'col_reliquary_rank_2',
+      'col_reliquary_rank_3',
+      'col_reliquary_rank_4',
+      'col_reliquary_rank_5',
+    ]);
+    for (const def of CURATOR_RANK_DEFS) {
+      expect(def).not.toHaveProperty('stats');
+      expect(def).not.toHaveProperty('dropRate');
+      expect(def).not.toHaveProperty('pity');
+    }
+  });
+
+  it('rank-up emit includes curatorRank and grants zero-Renown deed bridges', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // Seed 9 non-catalog discoveries do not affect rank; seed 9 catalogued
+    // uniques so the next catalogued fill crosses rank 2 (threshold 10).
+    const catalogIds = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ];
+    expect(catalogIds.length).toBeGreaterThanOrEqual(10);
+    for (const id of catalogIds.slice(0, 9)) {
+      markItemDiscovered(sim.ctx, meta, id);
+    }
+    sim.drainEvents();
+    expect(curatorRankFromOwned(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned)).toBe(
+      1,
+    );
+    // Rank 1 has no deed bridge; rank 2 does.
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(false);
+
+    const renownBeforeRank2 = meta.renown;
+    markItemDiscovered(sim.ctx, meta, catalogIds[9]!);
+    const events = sim.drainEvents();
+    const unlocks = events.filter((e) => e.type === 'reliquaryUnlock');
+    expect(unlocks.length).toBeGreaterThanOrEqual(1);
+    const rankUp = unlocks.find((e) => e.type === 'reliquaryUnlock' && e.curatorRank === 2);
+    expect(rankUp).toBeTruthy();
+    expect(rankUp && 'curatorRank' in rankUp && rankUp.curatorRank).toBe(2);
+    // Zero-Renown title bridge: renown must not move from the rank-2 grant.
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    expect(meta.renown).toBe(renownBeforeRank2);
+    expect(DEEDS.col_reliquary_rank_2.renown).toBe(0);
+    expect(DEEDS.col_reliquary_rank_3.renown).toBe(0);
+    expect(DEEDS.col_reliquary_rank_4.renown).toBe(0);
+    expect(DEEDS.col_reliquary_rank_5.renown).toBe(0);
+    expect(DEEDS.col_reliquary_rank_2.reward).toEqual({ kind: 'title', text: 'Spoilskeeper' });
+    expect(DEEDS.col_reliquary_rank_3.reward).toEqual({
+      kind: 'title',
+      text: 'the Cataloguer',
+    });
+    expect(DEEDS.col_reliquary_rank_4.reward).toEqual({ kind: 'title', text: 'Arch-Curator' });
+    expect(DEEDS.col_reliquary_rank_5.reward).toEqual({
+      kind: 'border',
+      slug: 'reliquary_gilt',
+    });
+    // Idempotent: re-sync does not double-grant.
+    const sizeBefore = meta.deedsEarned.size;
+    syncCuratorRankDeeds(sim.ctx, meta);
+    expect(meta.deedsEarned.size).toBe(sizeBefore);
+  });
+
+  it('first catalogued fill ranks up to 1 without a deed bridge', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const renownBefore = meta.renown;
+    expect(CURATOR_RANK_DEFS.find((d) => d.rank === 1)?.deedId).toBeUndefined();
+    markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
+    const events = sim.drainEvents();
+    const unlock = events.find((e) => e.type === 'reliquaryUnlock');
+    expect(unlock).toMatchObject({ itemId: CATALOGUE_RELIC, curatorRank: 1 });
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(false);
+    expect(meta.renown).toBe(renownBefore);
+  });
+
+  it('non-catalog discoveries never raise Curator rank', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    markItemDiscovered(sim.ctx, meta, NON_RELIC);
+    expect(isCataloguedRelicItem(NON_RELIC)).toBe(false);
+    expect(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned).toBe(0);
+    expect(curatorRankFromOwned(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned)).toBe(
+      0,
+    );
+    markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
+    expect(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned).toBe(1);
+    expect(curatorRankFromOwned(1)).toBe(1);
+  });
+
+  it('veteran retro sync grants all zero-Renown rank bridges up to owned count', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    const catalogIds = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ];
+    // 25 unique catalogued fills => rank 3; seed discovery without live rank-up
+    // celebration path (direct set membership) so only retro sync grants deeds.
+    for (const id of catalogIds.slice(0, 25)) {
+      meta.deedStats.itemsDiscovered.add(id);
+    }
+    expect(curatorRankFromOwned(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned)).toBe(
+      3,
+    );
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(false);
+    expect(meta.deedsEarned.has('col_reliquary_rank_3')).toBe(false);
+    const renownBefore = meta.renown;
+    syncCuratorRankDeeds(sim.ctx, meta, { retro: true });
+    expect(meta.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_rank_3')).toBe(true);
+    expect(meta.deedsEarned.has('col_reliquary_rank_4')).toBe(false);
+    expect(meta.renown).toBe(renownBefore);
+    const retroUnlocks = sim
+      .drainEvents()
+      .filter((e) => e.type === 'deedUnlocked' && e.retro === true);
+    expect(retroUnlocks.some((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_2')).toBe(
+      true,
+    );
+    expect(retroUnlocks.some((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_3')).toBe(
+      true,
     );
   });
 

@@ -31,7 +31,7 @@ import { pointsSpent } from './content/talents';
 import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
-import { onItemDiscovered as onReliquaryItemDiscovered } from './reliquary';
+import { onItemDiscovered as onReliquaryItemDiscovered, syncCuratorRankDeeds } from './reliquary';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -1148,6 +1148,11 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   if (player.level >= MAX_LEVEL && meta.restedXp <= 0) {
     grantDeed(ctx, meta, 'prog_well_rested', { retro: true });
   }
+  // Proof: unique catalogued Reliquary fills already live on itemsDiscovered.
+  // Veterans who crossed Curator rank thresholds before the rank deed bridges
+  // shipped get cosmetic titles/borders on join (zero Renown; grantDeed is
+  // idempotent). Live rank-ups still grant from onItemDiscovered.
+  syncCuratorRankDeeds(ctx, meta, { retro: true });
 }
 
 // ---------------------------------------------------------------------------
