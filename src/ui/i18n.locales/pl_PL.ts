@@ -10306,7 +10306,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} unika twojego {ability}.',
   'hudChrome.options.mouseoverCast': 'Rzucanie po najechaniu na ramki drużyny',
   'hudChrome.options.showTargetOfTarget': 'Pokaż cel celu',
-  'hudChrome.options.showPetFrame': 'Pokaż zwierzę',
+  'hudChrome.options.showPetFrame': 'Pokaż swoje zwierzę',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cel celu',
   'itemUi.market.rarityLegendary': 'Legendarny',
   'loading.reconnectingAttempt':

@@ -1220,7 +1220,7 @@ export const id_ID: EnTranslations = {
       "showThirdActionBar": "Tampilkan Bilah Tindakan Ketiga",
       "lockActionBars": "Kunci Bilah Aksi",
       "showTargetOfTarget": "Tampilkan Sasaran dari Sasaran",
-      "showPetFrame": "Tampilkan Peliharaan",
+      "showPetFrame": "Tampilkan Peliharaan Anda",
       "showAttackButton": "Tampilkan Tombol Serang",
       "showDailyRewardsChest": "Tampilkan Peti Hadiah Harian",
       "mobileCameraJoystick": "Joystick kamera",

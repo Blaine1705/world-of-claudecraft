@@ -10182,7 +10182,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} ontloopt je {ability}.',
   'hudChrome.options.mouseoverCast': 'Mouseover-bezwering op groepsframes',
   'hudChrome.options.showTargetOfTarget': 'Doelwit van doelwit tonen',
-  'hudChrome.options.showPetFrame': 'Huisdier tonen',
+  'hudChrome.options.showPetFrame': 'Je huisdier tonen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Doelwit van het doelwit',
   'itemUi.market.rarityLegendary': 'Legendarisch',
   'loading.reconnectingAttempt':

@@ -1220,7 +1220,7 @@ export const ja_JP: EnTranslations = {
       "showThirdActionBar": "3本目のアクションバーを表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
-      "showPetFrame": "ペットを表示",
+      "showPetFrame": "自分のペットを表示",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",

@@ -1220,7 +1220,7 @@ export const sv_SE: EnTranslations = {
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
-      "showPetFrame": "Visa djur",
+      "showPetFrame": "Visa ditt djur",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",

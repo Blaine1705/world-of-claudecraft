@@ -1220,7 +1220,7 @@ export const da_DK: EnTranslations = {
       "showThirdActionBar": "Vis tredje handlingslinje",
       "lockActionBars": "Lås handlingsbjælker",
       "showTargetOfTarget": "Vis målets mål",
-      "showPetFrame": "Vis kæledyr",
+      "showPetFrame": "Vis dit kæledyr",
       "showAttackButton": "Vis angrebsknap",
       "showDailyRewardsChest": "Vis kisten med daglige belønninger",
       "mobileCameraJoystick": "Kamera joystick",

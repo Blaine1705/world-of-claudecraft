@@ -1220,7 +1220,7 @@ export const nl_NL: EnTranslations = {
       "showThirdActionBar": "Derde actiebalk tonen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
-      "showPetFrame": "Huisdier tonen",
+      "showPetFrame": "Je huisdier tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",

@@ -1220,7 +1220,7 @@ export const de_DE: EnTranslations = {
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
-      "showPetFrame": "Begleiter anzeigen",
+      "showPetFrame": "Euren Begleiter anzeigen",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",

@@ -1220,7 +1220,7 @@ export const cs_CZ: EnTranslations = {
       "showThirdActionBar": "Zobrazit třetí panel akcí",
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
-      "showPetFrame": "Zobrazit mazlíčka",
+      "showPetFrame": "Zobrazit tvého mazlíčka",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",

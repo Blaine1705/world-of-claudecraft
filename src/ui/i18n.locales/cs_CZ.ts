@@ -10083,7 +10083,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} uniká tvé schopnosti {ability}.',
   'hudChrome.options.mouseoverCast': 'Sesílání najetím myší na rámech skupiny',
   'hudChrome.options.showTargetOfTarget': 'Zobrazit cíl cíle',
-  'hudChrome.options.showPetFrame': 'Zobrazit mazlíčka',
+  'hudChrome.options.showPetFrame': 'Zobrazit tvého mazlíčka',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Značka tvé značky',
   'itemUi.market.rarityLegendary': 'Legendární',
   'loading.reconnectingAttempt':

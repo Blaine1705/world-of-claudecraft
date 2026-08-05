@@ -10096,7 +10096,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': 'Din {ability} undgås af {target}.',
   'hudChrome.options.mouseoverCast': 'Museover-kast på grupperammer',
   'hudChrome.options.showTargetOfTarget': 'Vis målets mål',
-  'hudChrome.options.showPetFrame': 'Vis kæledyr',
+  'hudChrome.options.showPetFrame': 'Vis dit kæledyr',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Målets Mål',
   'itemUi.market.rarityLegendary': 'Legendarisk',
   'loading.reconnectingAttempt':

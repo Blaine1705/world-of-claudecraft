@@ -1220,7 +1220,7 @@ export const zh_TW: EnTranslations = {
       "showThirdActionBar": "顯示第三動作列",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
-      "showPetFrame": "顯示寵物",
+      "showPetFrame": "顯示你的寵物",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",

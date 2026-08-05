@@ -1220,7 +1220,7 @@ export const tr_TR: EnTranslations = {
       "showThirdActionBar": "Üçüncü Eylem Çubuğunu Göster",
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
-      "showPetFrame": "Yoldaşı Göster",
+      "showPetFrame": "Yoldaşını Göster",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",

@@ -1220,7 +1220,7 @@ export const pt_BR: EnTranslations = {
       "showThirdActionBar": "Mostrar terceira barra de ação",
       "lockActionBars": "Travar barras de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
-      "showPetFrame": "Mostrar Mascote",
+      "showPetFrame": "Mostrar seu mascote",
       "showAttackButton": "Exibir Botão de Ataque",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",

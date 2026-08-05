@@ -10516,7 +10516,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Vos chances de parer entièrement une attaque de mêlée frontale, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
   'hudChrome.options.mouseoverCast': 'Incantation au survol sur les cadres de groupe',
   'hudChrome.options.showTargetOfTarget': 'Afficher la cible de la cible',
-  'hudChrome.options.showPetFrame': 'Afficher le familier',
+  'hudChrome.options.showPetFrame': 'Afficher votre familier',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cible de la cible',
   'itemUi.market.rarityLegendary': 'Légendaire',
   'loading.reconnectingAttempt':

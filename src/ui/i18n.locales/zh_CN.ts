@@ -9326,7 +9326,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target}回避了你的{ability}。',
   'hudChrome.options.mouseoverCast': '队伍头像上鼠标悬停施法',
   'hudChrome.options.showTargetOfTarget': '显示目标的目标',
-  'hudChrome.options.showPetFrame': '显示宠物',
+  'hudChrome.options.showPetFrame': '显示你的宠物',
   'hudChrome.options.stickyTarget': '点击地面时保留目标',
   'hudChrome.unitFrame.targetOfTargetLabel': '目标的目标',
   'hudChrome.mobile.professions': '专业',

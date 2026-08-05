@@ -9779,7 +9779,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target}は{ability}を完全回避しました。',
   'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
-  'hudChrome.options.showPetFrame': 'ペットを表示',
+  'hudChrome.options.showPetFrame': '自分のペットを表示',
   'hudChrome.options.stickyTarget': '地面クリックでターゲットを維持',
   'hudChrome.unitFrame.targetOfTargetLabel': 'ターゲットのターゲット',
   'hudChrome.mobile.professions': '専門技能',

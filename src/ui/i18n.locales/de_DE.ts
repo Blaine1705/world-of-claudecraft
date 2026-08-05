@@ -9286,7 +9286,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Deine Chance, einen frontalen Nahkampfangriff vollständig zu parieren und keinen Schaden zu erleiden. Ein Schlag von hinten kann nicht pariert werden.',
   'hudChrome.options.mouseoverCast': 'Mouseover-Wirken auf Gruppenfenstern',
   'hudChrome.options.showTargetOfTarget': 'Ziel des Ziels anzeigen',
-  'hudChrome.options.showPetFrame': 'Begleiter anzeigen',
+  'hudChrome.options.showPetFrame': 'Euren Begleiter anzeigen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Ziel des Ziels',
   'itemUi.market.rarityLegendary': 'Legendär',
   'loading.reconnectingAttempt':

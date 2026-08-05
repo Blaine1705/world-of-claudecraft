@@ -10217,7 +10217,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Sua chance de aparar completamente um ataque corpo a corpo frontal, sem sofrer dano. Um golpe pelas costas não pode ser aparado.',
   'hudChrome.options.mouseoverCast': 'Conjuração ao Apontar nos Quadros do Grupo',
   'hudChrome.options.showTargetOfTarget': 'Mostrar Alvo do Alvo',
-  'hudChrome.options.showPetFrame': 'Mostrar Mascote',
+  'hudChrome.options.showPetFrame': 'Mostrar seu mascote',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Alvo do alvo',
   'itemUi.market.rarityLegendary': 'Lendário',
   'loading.reconnectingAttempt':

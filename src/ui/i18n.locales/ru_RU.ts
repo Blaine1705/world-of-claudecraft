@@ -9941,7 +9941,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} ускользает от вашего {ability}.',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
-  'hudChrome.options.showPetFrame': 'Показывать питомца',
+  'hudChrome.options.showPetFrame': 'Показывать вашего питомца',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
   'hudChrome.mobile.professions': 'Профессии',

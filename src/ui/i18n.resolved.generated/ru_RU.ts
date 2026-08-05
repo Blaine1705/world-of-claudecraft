@@ -1220,7 +1220,7 @@ export const ru_RU: EnTranslations = {
       "showThirdActionBar": "Показывать третью панель действий",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
-      "showPetFrame": "Показывать питомца",
+      "showPetFrame": "Показывать вашего питомца",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",

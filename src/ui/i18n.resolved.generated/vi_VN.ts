@@ -1220,7 +1220,7 @@ export const vi_VN: EnTranslations = {
       "showThirdActionBar": "Hiển thị thanh hành động thứ ba",
       "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
-      "showPetFrame": "Hiện Thú Cưng",
+      "showPetFrame": "Hiện Thú Cưng Của Bạn",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",

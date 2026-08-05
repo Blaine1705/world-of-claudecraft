@@ -10086,7 +10086,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target}, {ability} yeteneğinden kaçındı.',
   'hudChrome.options.mouseoverCast': 'Grup Çerçevelerinde İmleçle Büyü Yapma',
   'hudChrome.options.showTargetOfTarget': 'Hedefin Hedefini Göster',
-  'hudChrome.options.showPetFrame': 'Yoldaşı Göster',
+  'hudChrome.options.showPetFrame': 'Yoldaşını Göster',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Hedefin Hedefi',
   'itemUi.market.rarityLegendary': 'Efsanevi',
   'loading.reconnectingAttempt':

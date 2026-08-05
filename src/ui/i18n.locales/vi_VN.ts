@@ -10060,7 +10060,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} lẩn tránh {ability} của bạn.',
   'hudChrome.options.mouseoverCast': 'Thi Triển Khi Rê Chuột Trên Khung Tổ Đội',
   'hudChrome.options.showTargetOfTarget': 'Hiện Mục Tiêu Của Mục Tiêu',
-  'hudChrome.options.showPetFrame': 'Hiện Thú Cưng',
+  'hudChrome.options.showPetFrame': 'Hiện Thú Cưng Của Bạn',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Mục Tiêu Của Mục Tiêu',
   'itemUi.market.rarityLegendary': 'Huyền thoại',
   'loading.reconnectingAttempt':

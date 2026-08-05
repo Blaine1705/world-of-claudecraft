@@ -10209,7 +10209,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{ability}-mu dihindari oleh {target}.',
   'hudChrome.options.mouseoverCast': 'Rapal Saat Menyorot Bingkai Kelompok',
   'hudChrome.options.showTargetOfTarget': 'Tampilkan Sasaran dari Sasaran',
-  'hudChrome.options.showPetFrame': 'Tampilkan Peliharaan',
+  'hudChrome.options.showPetFrame': 'Tampilkan Peliharaan Anda',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Sasaran dari Sasaran',
   'itemUi.market.rarityLegendary': 'Legendaris',
   'loading.reconnectingAttempt':
