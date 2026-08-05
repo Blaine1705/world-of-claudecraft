@@ -85,11 +85,11 @@ sim/server stay language-agnostic with matcher rules in the same change.
 
 ## Phase summary
 
-| Phase | Title | Size | Ultracode |
+| Phase | Title | Size | Ultracode (impl) |
 |---|---|---|---|
 | 10 | Sim correctness close-out | M | no |
 | 11 | Page-name localization + i18n hygiene | M | no |
-| 12 | Test integrity + catalog pins + record corrections | L | yes |
+| 12 | Test integrity + catalog pins + record corrections | L | YES |
 | 13 | Window structure + information UX | L | no |
 | 14 | Overview flagship + Illumination celebration | M | no |
 | 15 | Deep links, clickable chat, tracker, guide search | M | no |
@@ -98,8 +98,16 @@ sim/server stay language-agnostic with matcher rules in the same change.
 | 18 | Rewards ladder | M | no |
 | 19 | Borders in-world (nameplates + portraits) | L | no |
 | 20 | Inspect + social surfaces | M | no |
-| 21 | Catalog growth (Rift, rares, PvP, fishing, retired) | L | yes |
+| 21 | Catalog growth (Rift, rares, PvP, fishing, retired) | L | YES |
 | 22 | Population rarity + records close-out | M | no |
+
+EVERY QA phase runs with ultracode (adversarial-verify fan-out is the QA quality
+lever; QA is read-mostly, so wide fan-out has no shared-tree write risk). The
+implementation phases NOT marked YES stay on plain xhigh with their hand fan-out:
+they are integration-heavy vertical slices where forcing a wide workflow fragments
+coherent work and risks interleaved edits in the one shared worktree. The keyword
+must appear in the runner prompt the user TYPES; the copies inside the phase files
+are reminders, not the opt-in.
 
 Dependency notes: 11 before 13 and 14 (they render new localized text through the Phase
 11 channel). 19 before 20 (inspect shows the active border). 12 any time after 10 (it

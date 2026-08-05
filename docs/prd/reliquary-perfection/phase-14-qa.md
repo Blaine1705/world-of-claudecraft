@@ -2,6 +2,8 @@
 
 ### QA Starter Prompt
 ```
+ultracode
+
 This is Phase 14 QA of the Reliquary Perfection packet.
 
 Model: session default frontier at xhigh. Harness: Claude Code.
