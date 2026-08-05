@@ -1,552 +1,344 @@
-# Nythraxis class balance, Monte Carlo
+# Nythraxis: every spec, its BiS build, its rotation, and what the numbers say
 
+**Revision 3, 2026-08-06, measured at `integration/v031-class-overhauls` @ `94675f5a14`.**
+Revision 2 (2026-08-04, measured at `5f35bbeb44`) was written but never committed; this
+revision folds it in. Its numbers appear throughout as the comparison column and its raw
+results are preserved in `tmp/mc_baseline_20260803/` (the July originals remain in
+`tmp/mc_baseline_20260729/`). Every number here was re-measured from scratch on the current
+tip: 24 combat seeds per spec per difficulty, gear AND talents chosen by measurement,
+windows snapshotted from one 300 s run per seed. The full mechanical tables live in
+`tmp/mc/report.md`; this document is the reading of them.
 
-Every class and spec at level 20 in best-in-slot gear, sampled against the Nythraxis raid boss
-on the `integration/v031-class-overhauls` tree. All numbers are absolute DPS, HPS or damage
-taken per second out of the real `src/sim` core, not ratios.
+What landed on the branch between revision 2 and this study, in measurement order of
+importance:
 
-## How it was measured
+- **The whole v0.34.0 base refresh** (977 commits of content). Content adds shift the
+  shared rng draw order, so every fixture was re-validated before any number was trusted:
+  all 29 fixtures (19 DPS rotations, 6 healers, 4 tanks) still fire their buttons. No
+  fixture rot this time.
+- **`fbd9d06d6d`: Wicked Slash is normalized** (dagger 1.7, other one-hand 2.4) and the
+  Thronebane energy runaway was tamed. This was aimed at the number one outlier of both
+  prior studies and it landed hard; see the rogue section.
+- **`ac5d34f7e4`: five new rogue daggers with on-hit procs.** They rank 4 to 6 in the
+  weighted shortlist, inside the measured search's breadth, so the greedy gear search saw
+  them; two of them win offhand slots in the zero-legendary world.
+- **`19db0845cd` (rode in with the v0.34.0 catch-up): the warlock endgame sustain
+  re-tune.** Cruel Pact's mana restore cut from 15% to 1.5% of maximum mana, Sentence's
+  level-20 compression deepened from x0.8 to x0.55, Needle and Maledict Gaze re-banded
+  down, soul_harvest cheapened 65 to 55.
+- **`5b86b6d643`: shaman changes.** New level-20 Enhancement signature Elemental Trance
+  (2 min cooldown, 15 s, 30% damage reduction, 20% of damage dealt returned as mana) and
+  creature crit immunity for the Stonebound posture.
+- **`27f5c30139`: the druid Balance re-seat** (Moontide payoffs and Wildbolt moved onto
+  spell-power coefficients, flat base re-banded down) and the Feral cat trim. This commit
+  was still sitting on the druid PR head when the study began; it was merged into
+  integration as `ed55c470bc` (with the `druid_engines` parity golden re-minted as
+  `94675f5a14`) so the study measures the tree as it will actually compose.
 
-- **Target.** The `nythraxis_scourge_of_thornpeak` template as a dummy: its real level, armor
-  and `undead` family, inert so the number is the class rotation and not the encounter script.
-  Normal is level 20 / 798 armor; heroic is the `nythraxis_boss_arena` heroic record (level 22,
-  `armorMultiplier` 1.2, so 1,058 armor). Boss health is re-pinned every tick so a 300 s window
-  always completes.
-- **Windows.** One 300 s run per seed, with cumulative damage snapshotted at 15 / 30 / 60 / 120 /
-  300 s. Under a fixed seed a shorter window is an exact prefix of the longer one. A separate
-  30 s bench pins the boss at 15% health for the sub-20% execute phase.
-- **Seeds.** 24 combat seeds per spec per difficulty. Sim seeds drive world generation as well as
-  the rng, so the world is pinned to the live realm seed (20061) and only the combat stream
-  varies. Sampling the sim seed directly resamples the terrain: one seed dropped the probe target
-  inside a collider and read a spec at 0 DPS.
-- **BiS means best gear AND best talents.** Per spec the harness greedily swaps every equipment
-  slot and every one of the six talent rows, keeping whatever MEASURES highest over a fixed seed
-  set. This matters: the shipped probe reads Thundercall about 30% higher on its hand-picked rows
-  than on the class default build. Pet picks are optimised the same way (Ridge Stalker is the
-  best legal tame, the Doomguard the best demon).
-- **Item pool.** The whole table at level 20, Nythraxis drops and heroic variants included. A
-  second pass repeats everything with legendaries excluded, because one legendary distorts the
-  comparison badly enough to need its own control.
+Methodology, carried from revision 2 plus three additions:
 
-### What this does not model
+- **Build reconciliation, now on all three tiers.** The greedy search is seed-noisy, so
+  every spec's revision-2 build was replayed under the current sim on the full 24-seed
+  set and the better of {old build, fresh build} kept, per tier (decision window 60 s for
+  full and epic-only, 300 s for the sustain tier). 19 of 57 builds kept the revision-2
+  search: all three rogues, all three hunters, both mages and Enhancement on the full
+  tier; the fresh searches there were 8 to 14% worse.
+- **A paired-weapon A/B for Assassination.** Single-slot greedy swaps cannot see a
+  dagger-pair optimum, so seven hand-built pairs were measured against the reconciled
+  champion on the full seed set. The champion (heroic Thronebane plus Mistcaller's Fang)
+  stood; every pure dagger pair was 14 to 17% behind.
+- **Elemental Trance in both Enhancement fixtures**, gated at 80% mana (A/B over never /
+  0.4 / 0.6 / 0.8 / on-cooldown: the 0.8 floor wins 120 s and 300 s and ties 60 s;
+  casting at full mana wastes the return, waiting longer delays the later trances).
 
-Encounter mechanics (Gravebreaker splash, Soul Rend, add waves, Dread Curse), raid buffs from
-other classes, consumables, movement, and target swapping. It is a patchwerk bench: the ceiling
-each spec can reach standing still on one target, plus an execute-phase and a heroic-armor
-variant. Treat it as the relative ordering and the absolute floor, not a live parse.
+DPS is absolute, out of the real `src/sim` core, single target, standing still. No
+encounter mechanics, no raid buffs, no consumables: the ceiling and the ordering, not a
+live parse. GCD idle percent is not a rotation-quality score for proc and energy specs.
 
-Search note: the greedy build search landed in a worse local optimum on the full item pool for druid/balance, hunter/marksmanship, hunter/survival, mage/fire, paladin/retribution, shaman/elemental, warlock/affliction, warlock/demonology, warrior/arms, so those rows use the epic-only build (a legal member of the full pool) instead.
+---
 
-## DPS: full best-in-slot (legendaries included)
+# The table at a glance (normal, full BiS)
 
-### Normal Nythraxis (level 20, 798 armor)
+| Spec | 15s | 60s | 300s | Execute | Heroic 60s | rev2 60s | change |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Destruction (Ruination) | 285 | **288** | 197 | 317 | 282 | 283 | +2% |
+| Fury (Bloodrush) | 331 | **275** | 266 | 296 | 239 | 251 | +10% |
+| Demonology (Pactbound) | 283 | **261** | 172 | 308 | 231 | 261 | 0% |
+| Balance (Moongrove) | 227 | **258** | 265 | 250 | 246 | 269 | -4% |
+| Affliction (Hexcraft) | 319 | **238** | 231 | 257 | 231 | 278 | **-14%** |
+| Retribution (Dawnreaver) | 341 | **228** | 213 | 279 | 220 | 229 | -1% |
+| Enhancement (Warspirit) | 256 | **224** | 206 | 233 | 209 | 231 | -3% |
+| Feral cat (Wildfang) | 235 | **209** | 200 | 217 | 192 | 233 | **-10%** |
+| Subtlety (Skulduggery) | 222 | **205** | 205 | 203 | 182 | 198 | +3% |
+| Arms (Battlecraft) | 240 | **203** | 192 | 209 | 183 | 200 | +2% |
+| Frost (Cryomancy) | 188 | **200** | 169 | 197 | 196 | 203 | -2% |
+| Beast Mastery (Packlord) | 252 | **199** | 85 | 204 | 176 | 196 | +2% |
+| Combat (Thuggery) | 218 | **194** | 191 | 206 | 175 | 203 | -5% |
+| Fire (Pyromancy) | 290 | **191** | 108 | 310 | 187 | 189 | +1% |
+| Assassination (Knifework) | 194 | **179** | 173 | 172 | 164 | 307 | **-42%** |
+| Shadow (Vespers) | 176 | **178** | 181 | 179 | 174 | 173 | +2% |
+| Survival (Fieldcraft) | 155 | **153** | 84 | 157 | 139 | 151 | +1% |
+| Elemental (Thundercall) | 175 | **150** | 139 | 160 | 150 | 147 | +2% |
+| Marksmanship (Coldsight) | 156 | **139** | 54 | 146 | 126 | 138 | +1% |
 
-| Spec | 15s burst | 30s | 60s | 120s | 300s | sub-20% | +/- (60s) | GCD idle | OOM |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Assassination (Knifework) | 293 | 297 | **308** | 313 | 315 | 297 | 11.6 | 1% | - |
-| Balance (Moongrove) | 248 | 263 | **275** | 280 | 283 | 263 | 9.0 | 0% | - |
-| Fury (Bloodrush) | 307 | 272 | **258** | 247 | 252 | 278 | 16.8 | 9% | - |
-| Feral cat (Wildfang) | 256 | 241 | **230** | 223 | 221 | 241 | 9.4 | 40% | - |
-| Retribution (Dawnreaver) | 336 | 261 | **222** | 205 | 209 | 273 | 8.4 | 23% | - |
-| Enhancement (Warspirit) | 226 | 224 | **220** | 190 | 169 | 224 | 13.1 | 58% | 69s |
-| Subtlety (Skulduggery) | 219 | 200 | **204** | 204 | 209 | 200 | 11.0 | 62% | - |
-| Frost (Cryomancy) | 205 | 207 | **202** | 200 | 133 | 207 | 10.8 | 39% | 126s |
-| Combat (Thuggery) | 222 | 211 | **201** | 201 | 201 | 211 | 9.9 | 58% | - |
-| Beast Mastery (Packlord) | 256 | 208 | **196** | 185 | 90 | 208 | 12.2 | 23% | - |
-| Arms (Battlecraft) | 234 | 208 | **195** | 189 | 187 | 208 | 10.0 | 1% | - |
-| Fire (Pyromancy) | 294 | 209 | **186** | 150 | 86 | 310 | 16.6 | 62% | 96s |
-| Shadow (Vespers) | 175 | 175 | **173** | 174 | 153 | 175 | 3.4 | 14% | 222s |
-| Survival (Fieldcraft) | 157 | 161 | **163** | 153 | 87 | 161 | 6.4 | 0% | - |
-| Affliction (Hexcraft) | 135 | 144 | **157** | 149 | 135 | 144 | 5.9 | 8% | 225s |
-| Elemental (Thundercall) | 170 | 157 | **152** | 147 | 106 | 157 | 4.8 | 30% | 160s |
-| Demonology (Pactbound) | 154 | 157 | **151** | 137 | 97 | 157 | 4.0 | 43% | 138s |
-| Marksmanship (Coldsight) | 148 | 141 | **141** | 136 | 63 | 141 | 7.3 | 0% | - |
-| Destruction (Ruination) | 107 | 117 | **130** | 119 | 80 | 117 | 3.7 | 44% | 131s |
+**Spread at 60 s: 2.07x** (288 to 139, median 203), against 2.23x in revision 2 and 2.37x
+in revision 1. The table keeps tightening toward the repo's declared plus or minus 15%
+intent, and for the first time the movement came from the top coming down (Assassination)
+rather than the bottom being raised. At 300 s the spread is still 4.94x (266 to 54): the
+long fight remains the game's real balance problem. The zero-legendary control spread is
+2.19x at 60 s.
 
-Spread at 60 s: 308 top, 130 bottom, median 196, top/bottom 2.37x.
+Everything outside the three targeted classes (rogue, warlock, druid) moved a few percent
+at most. Fury's +10% is the one exception: its fresh gear search found a genuinely better
+basin (the reconciliation confirmed it against the old build on the full seed set), not a
+sim change.
 
-### Heroic Nythraxis (level 22, 958 armor)
+---
 
-| Spec | 15s burst | 30s | 60s | 120s | 300s | sub-20% | +/- (60s) | GCD idle | OOM |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Assassination (Knifework) | 270 | 275 | **283** | 287 | 288 | 275 | 11.1 | 1% | - |
-| Balance (Moongrove) | 226 | 245 | **253** | 259 | 263 | 245 | 14.0 | 0% | - |
-| Fury (Bloodrush) | 284 | 245 | **228** | 222 | 223 | 251 | 16.5 | 11% | - |
-| Feral cat (Wildfang) | 237 | 223 | **214** | 206 | 203 | 223 | 8.2 | 40% | - |
-| Retribution (Dawnreaver) | 318 | 246 | **208** | 195 | 198 | 259 | 9.3 | 23% | - |
-| Enhancement (Warspirit) | 212 | 206 | **205** | 178 | 157 | 206 | 12.1 | 58% | 70s |
-| Frost (Cryomancy) | 189 | 193 | **193** | 190 | 125 | 193 | 14.4 | 39% | 126s |
-| Combat (Thuggery) | 207 | 191 | **183** | 183 | 182 | 191 | 10.8 | 58% | - |
-| Fire (Pyromancy) | 272 | 192 | **180** | 145 | 84 | 294 | 15.4 | 62% | 96s |
-| Subtlety (Skulduggery) | 188 | 181 | **180** | 182 | 187 | 181 | 15.8 | 62% | - |
-| Beast Mastery (Packlord) | 240 | 191 | **179** | 170 | 85 | 191 | 17.7 | 23% | - |
-| Arms (Battlecraft) | 207 | 189 | **179** | 175 | 173 | 190 | 9.4 | 2% | - |
-| Shadow (Vespers) | 175 | 175 | **173** | 175 | 153 | 175 | 3.4 | 14% | 222s |
-| Affliction (Hexcraft) | 134 | 143 | **152** | 143 | 130 | 143 | 4.0 | 8% | 227s |
-| Demonology (Pactbound) | 148 | 153 | **147** | 133 | 95 | 153 | 6.6 | 43% | 139s |
-| Elemental (Thundercall) | 174 | 149 | **147** | 144 | 85 | 149 | 5.2 | 42% | 126s |
-| Survival (Fieldcraft) | 139 | 147 | **146** | 139 | 82 | 147 | 6.2 | 0% | - |
-| Destruction (Ruination) | 107 | 118 | **130** | 119 | 80 | 118 | 3.5 | 44% | 131s |
-| Marksmanship (Coldsight) | 136 | 129 | **127** | 123 | 58 | 129 | 4.9 | 0% | - |
+# The rogue re-band, measured
 
-Spread at 60 s: 283 top, 127 bottom, median 180, top/bottom 2.22x.
+`fbd9d06d6d` normalized Wicked Slash and tamed the Thronebane energy runaway, aimed
+exactly at revision 2's number one outlier. It landed:
 
-## DPS: builds searched for the long fight
+- **Assassination fell 307 to 179 at 60 s, first place to fifteenth.** The old build
+  fired Wicked Slash off a 2.8-speed legendary two roll bands above every dagger; the
+  normalized strike now contributes 16% of the spec's damage (it was the majority), and
+  the tamed energy engine leaves the rotation idle 61% of its GCDs. Auto attack is now
+  60% of Assassination's damage.
+- **The dagger pool finally exists.** In the zero-legendary world the new daggers win
+  slots on all three specs (Mistcaller's Fang mainhand everywhere; Rimefang or heroic
+  Duskwhisper offhand), and Combat's full-BiS search picked heroic Duskwhisper over an
+  offhand Thronebane. The paired-dagger A/B confirms the design intent is close but not
+  closed: heroic Thronebane mainhand plus a dagger offhand still beats every pure dagger
+  pair by 14 to 17%, entirely through white damage.
+- **Thronebane itself is STILL offhand-legal** (`hand` unset, unchanged through three
+  studies) and still farmable in normal and heroic variants. What changed is the size of
+  the distortion: the zero-legendary control now prices it at +29% for Assassination
+  (was +71%), +47% Combat, +39% Subtlety, +34% Fury, +30% Enhancement. It is no longer
+  an ability amplifier, but it is still the single largest gear distortion in the game,
+  and the fix is still one line plus a weapon re-band.
+- The three rogue specs now sit 179 to 205 with Subtlety on top: the class went from
+  owning first place to being the tightest class cluster in the table. Whether 179 (below
+  the 203 median, 61% idle) is the intended seat for the assassination fantasy is an
+  owner call; the energy engine, not the weapon, is now the binding constraint (40%
+  starved at 60 s).
 
-The same greedy search run against a 180 s objective instead of 45 s, so a mana capstone like
-Evocation can actually pay for itself. The 300 s column below is the honest sustain number; the
-burst tables above are the honest burst number. Where the two differ a lot, the spec is really
-two builds.
+# The warlock sustain re-tune, measured
 
-### Normal Nythraxis, sustain-objective builds
+`19db0845cd` was Blaine's answer to the composed tree running 26% over the sustain bands.
+It cut levels, not loops:
 
-| Spec | 15s burst | 30s | 60s | 120s | 300s | sub-20% | +/- (60s) | GCD idle | OOM |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Assassination (Knifework) | 306 | 307 | **315** | 317 | 319 | 307 | 13.8 | 1% | - |
-| Fury (Bloodrush) | 354 | 319 | **296** | 285 | 288 | 321 | 23.5 | 7% | - |
-| Balance (Moongrove) | 241 | 272 | **283** | 281 | 284 | 272 | 8.8 | 0% | - |
-| Feral cat (Wildfang) | 252 | 240 | **235** | 227 | 223 | 240 | 10.8 | 40% | - |
-| Enhancement (Warspirit) | 228 | 223 | **219** | 209 | 175 | 223 | 13.0 | 48% | 114s |
-| Subtlety (Skulduggery) | 211 | 204 | **218** | 225 | 235 | 204 | 17.0 | 58% | - |
-| Combat (Thuggery) | 235 | 229 | **214** | 212 | 211 | 229 | 14.3 | 58% | - |
-| Retribution (Dawnreaver) | 284 | 247 | **213** | 210 | 214 | 250 | 13.6 | 20% | - |
-| Arms (Battlecraft) | 242 | 209 | **202** | 196 | 196 | 210 | 9.0 | 1% | - |
-| Frost (Cryomancy) | 191 | 208 | **200** | 201 | 132 | 208 | 9.9 | 38% | 130s |
-| Beast Mastery (Packlord) | 237 | 201 | **189** | 184 | 104 | 201 | 10.9 | 26% | - |
-| Fire (Pyromancy) | 284 | 199 | **180** | 150 | 88 | 288 | 14.4 | 60% | 96s |
-| Shadow (Vespers) | 163 | 172 | **174** | 176 | 175 | 172 | 3.6 | 4% | 265s |
-| Survival (Fieldcraft) | 169 | 166 | **162** | 161 | 114 | 166 | 6.9 | 0% | - |
-| Affliction (Hexcraft) | 130 | 149 | **156** | 143 | 128 | 149 | 4.3 | 14% | 199s |
-| Demonology (Pactbound) | 157 | 157 | **153** | 136 | 99 | 157 | 6.1 | 40% | 147s |
-| Elemental (Thundercall) | 184 | 159 | **146** | 145 | 106 | 159 | 7.0 | 28% | 170s |
-| Destruction (Ruination) | 110 | 130 | **133** | 128 | 95 | 130 | 3.9 | 35% | 166s |
-| Marksmanship (Coldsight) | 121 | 118 | **118** | 112 | 56 | 118 | 4.0 | 0% | - |
+- **Affliction 278 to 238 at 60 s (-14%)**, second place to fifth. The Cruel Pact mana
+  nerf (15% to 1.5%) sounds existential and is not: the cast still pays 20 Condemnation,
+  and the spec's costs are low enough that it still NEVER runs dry (0% starved, flat 231
+  at 300 s, the third best five-minute number in the game). The opener also survived:
+  319 at 15 s is still the best in the class. What the nerf actually removed is the
+  headroom; Sentence at x0.55 compression plus the Needle re-band pulled the whole curve
+  down evenly.
+- **Demonology and Destruction still die on the same cliff, eleven seconds later.**
+  OOM moved from 199 s to 210 s (the cheaper soul_harvest) and 195 s to 210 s
+  respectively; Destruction's sustain build pushes its first dry cast to 257 s and holds
+  213 at 300 s. But the shape is unchanged: 261 and 288 at 60 s become 172 and 197 at
+  300 s, with 37% and 49% of ready GCDs starved. The re-tune moved the cliff, not the
+  physics; a Ruin or Fragment mana rebate remains the open design item.
+- **Destruction is the new number one at 60 s (288) and on heroic (282)**, because
+  nothing in its kit rolls the heroic resist table (2% tax). The top of the table is now
+  Destruction, Fury, Demonology: one warlock fewer than revision 2's podium sweep.
+- **The gear-flat scaling risk is intact.** Naked Affliction still does 67% of its BiS
+  output, naked Destruction 67%, naked Demonology 66%; Sentence takes no spell power and
+  the Dominion servants still ignore owner stats entirely. A naked Affliction warlock
+  (160 DPS) still out-damages a fresh-geared one of most other specs.
 
-Spread at 60 s: 315 top, 118 bottom, median 200, top/bottom 2.67x.
+# The druid re-seat, measured
 
-### Burst build against sustain build, at 300 s
+`27f5c30139` moved Balance onto spell-power coefficients and trimmed the cat. Both landed,
+one with a caveat:
 
-| Spec | burst build @300s | sustain build @300s | change |
-|---|---:|---:|---:|
-| Survival (Fieldcraft) | 87 | 114 | +32% |
-| Destruction (Ruination) | 80 | 95 | +18% |
-| Shadow (Vespers) | 153 | 175 | +15% |
-| Beast Mastery (Packlord) | 90 | 104 | +15% |
-| Fury (Bloodrush) | 252 | 288 | +14% |
-| Subtlety (Skulduggery) | 209 | 235 | +13% |
-| Combat (Thuggery) | 201 | 211 | +5% |
-| Arms (Battlecraft) | 187 | 196 | +5% |
-| Enhancement (Warspirit) | 169 | 175 | +3% |
-| Demonology (Pactbound) | 97 | 99 | +3% |
-| Retribution (Dawnreaver) | 209 | 214 | +2% |
-| Fire (Pyromancy) | 86 | 88 | +2% |
-| Assassination (Knifework) | 315 | 319 | +1% |
-| Feral cat (Wildfang) | 221 | 223 | +1% |
-| Balance (Moongrove) | 283 | 284 | +0% |
-| Elemental (Thundercall) | 106 | 106 | +0% |
-| Frost (Cryomancy) | 133 | 132 | +-0% |
-| Affliction (Hexcraft) | 135 | 128 | -5% |
-| Marksmanship (Coldsight) | 63 | 56 | -10% |
+- **Feral cat 233 to 209 (-10%)**, exactly the intended trim, now seated 49 DPS below
+  Balance rather than the intended 25 (because Balance in true BiS sits higher than the
+  owner's anchor, next point).
+- **Balance reads 258 at 60 s in searched BiS, not the 200 the commit seats it at.** The
+  owner's anchor was measured on a fixed intellect loadout with the owned-probe build;
+  the measured search finds the Berserk row plus the legendary Deathless Heartwood staff
+  and lands 29% above the anchor. The zero-legendary control still reads 259, so the gap
+  is the build search, not the legendary. The intended "200 anchor, inside the naked peer
+  band" holds only for the fixed probe loadout; real BiS Balance is a top-four spec with
+  the game's best sustain curve (265 at 300 s, never dry, 0% starved).
+- **The gear-scaling repair worked.** Naked Balance is now 40% of its BiS (was 59% in
+  revision 2, the highest naked number in the game); its damage finally lives on the
+  gear axis like every other caster.
 
-## DPS: epic-only control (no legendaries)
+# Elemental Trance, measured (new this revision)
 
-### Normal Nythraxis, epics only
+The new Enhancement signature was added to both fixtures with a measured 0.8 mana-floor
+gate:
 
-| Spec | 15s burst | 30s | 60s | 120s | 300s | sub-20% | +/- (60s) | GCD idle | OOM |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Balance (Moongrove) | 240 | 255 | **266** | 272 | 276 | 255 | 9.7 | 0% | - |
-| Assassination (Knifework) | 229 | 239 | **252** | 259 | 262 | 239 | 12.2 | 1% | - |
-| Feral cat (Wildfang) | 256 | 241 | **230** | 223 | 221 | 241 | 9.4 | 40% | - |
-| Retribution (Dawnreaver) | 336 | 261 | **222** | 205 | 209 | 273 | 8.4 | 23% | - |
-| Fury (Bloodrush) | 261 | 218 | **204** | 194 | 194 | 236 | 15.2 | 17% | - |
-| Frost (Cryomancy) | 205 | 207 | **202** | 200 | 133 | 207 | 10.8 | 39% | 126s |
-| Arms (Battlecraft) | 234 | 208 | **195** | 189 | 187 | 208 | 10.0 | 1% | - |
-| Fire (Pyromancy) | 294 | 209 | **186** | 150 | 86 | 310 | 16.6 | 62% | 96s |
-| Enhancement (Warspirit) | 225 | 189 | **174** | 151 | 131 | 189 | 10.3 | 61% | 81s |
-| Shadow (Vespers) | 175 | 175 | **173** | 174 | 153 | 175 | 3.4 | 14% | 222s |
-| Beast Mastery (Packlord) | 221 | 174 | **170** | 163 | 77 | 174 | 6.9 | 21% | - |
-| Survival (Fieldcraft) | 157 | 161 | **163** | 153 | 87 | 161 | 6.4 | 0% | - |
-| Affliction (Hexcraft) | 135 | 144 | **157** | 149 | 135 | 144 | 5.9 | 8% | 225s |
-| Combat (Thuggery) | 168 | 166 | **156** | 155 | 155 | 166 | 8.2 | 58% | - |
-| Subtlety (Skulduggery) | 149 | 147 | **153** | 156 | 159 | 147 | 10.4 | 62% | - |
-| Elemental (Thundercall) | 170 | 157 | **152** | 147 | 106 | 157 | 4.8 | 30% | 160s |
-| Demonology (Pactbound) | 154 | 157 | **151** | 137 | 97 | 157 | 4.0 | 43% | 138s |
-| Marksmanship (Coldsight) | 148 | 141 | **141** | 136 | 63 | 141 | 7.3 | 0% | - |
-| Destruction (Ruination) | 115 | 113 | **126** | 122 | 84 | 113 | 3.4 | 43% | 137s |
+- **DPS: the 300 s cliff is fixed.** Enhancement held 206 at 300 s against revision 2's
+  169 (+22%), holding 92% of its 60 s output over five minutes; first dry cast moved
+  from 69 s to 114 s and starved GCDs fell from the high fifties to 29%. Three trances
+  fit a 300 s fight; each returns roughly 660 mana at the spec's damage rate. The 60 s
+  number is nearly unchanged (224 vs 231): the trance is a sustain lever, exactly as
+  designed.
+- **Tank: the heroic threat collapse is gone.** The Stonebound bench holds 207 TPS on
+  heroic (was 124, a starvation collapse); the trance's mana return keeps the threat
+  loop fed while the 30% damage reduction rides along.
 
-Spread at 60 s: 266 top, 126 bottom, median 173, top/bottom 2.11x.
+# The gear-progression axis
 
-### What the legendaries are worth
+All 19 DPS specs at four gear states, talent rows pinned to the BiS build: **naked**,
+**floor** (naked plus the weakest legal melee weapon), **fresh 20** (greens and below),
+**full BiS**. 60 s DPS, normal, 24 seeds, naked as percent of BiS:
 
-| Spec | 60s full BiS | 60s epic only | legendary gain |
-|---|---:|---:|---:|
-| Subtlety (Skulduggery) | 204 | 153 | +33% |
-| Combat (Thuggery) | 201 | 156 | +28% |
-| Fury (Bloodrush) | 258 | 204 | +27% |
-| Enhancement (Warspirit) | 220 | 174 | +26% |
-| Assassination (Knifework) | 308 | 252 | +22% |
-| Beast Mastery (Packlord) | 196 | 170 | +15% |
-| Balance (Moongrove) | 275 | 266 | +3% |
-| Destruction (Ruination) | 130 | 126 | +3% |
-| Feral cat (Wildfang) | 230 | 230 | +0% |
-| Marksmanship (Coldsight) | 141 | 141 | +0% |
-| Survival (Fieldcraft) | 163 | 163 | +0% |
-| Fire (Pyromancy) | 186 | 186 | +0% |
-| Frost (Cryomancy) | 202 | 202 | +0% |
-| Retribution (Dawnreaver) | 222 | 222 | +0% |
-| Shadow (Vespers) | 173 | 173 | +0% |
-| Elemental (Thundercall) | 152 | 152 | +0% |
-| Affliction (Hexcraft) | 157 | 157 | +0% |
-| Demonology (Pactbound) | 151 | 151 | +0% |
-| Arms (Battlecraft) | 195 | 195 | +0% |
-
-## Resource economy
-
-Does each spec's own resource design actually hold up over a five minute fight? "Starved" is the
-share of GCD-ready moments where NOTHING in the kit was affordable, and "dry at" is the first
-second that happened. "Capped" is time sitting at maximum, i.e. regeneration thrown away, which
-matters for rage, energy and focus rather than mana.
-
-| Spec | Resource | Avg held | Capped | Starved | Dry at | Below 25% | Cheapest press |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Balance (Moongrove) | mana | 98% | 33% | 0% | never | 0% | 10 |
-| Feral cat (Wildfang) | energy | 25% | 0% | 2% | 52s | 40% | 10 |
-| Beast Mastery (Packlord) | focus | 91% | 45% | 0% | never | 0% | 20 |
-| Marksmanship (Coldsight) | focus | 48% | 1% | 12% | 13s | 15% | 20 |
-| Survival (Fieldcraft) | focus | 93% | 62% | 0% | never | 0% | 20 |
-| Fire (Pyromancy) | mana | 16% | 0% | 26% | 112s | 78% | 15 |
-| Frost (Cryomancy) | mana | 22% | 0% | 44% | 137s | 68% | 15 |
-| Retribution (Dawnreaver) | mana | 86% | 2% | 0% | never | 0% | 15 |
-| Shadow (Vespers) | mana | 35% | 0% | 65% | 245s | 46% | 30 |
-| Assassination (Knifework) | energy | 66% | 4% | 0% | 243s | 1% | 20 |
-| Combat (Thuggery) | energy | 20% | 0% | 41% | 3s | 71% | 20 |
-| Subtlety (Skulduggery) | energy | 17% | 0% | 40% | 4s | 69% | 20 |
-| Elemental (Thundercall) | mana | 28% | 1% | 80% | 164s | 59% | 35 |
-| Enhancement (Warspirit) | mana | 13% | 1% | 37% | 77s | 82% | 25 |
-| Affliction (Hexcraft) | mana | 27% | 0% | 38% | 227s | 48% | 35 |
-| Demonology (Pactbound) | mana | 20% | 0% | 66% | 138s | 64% | 35 |
-| Destruction (Ruination) | mana | 19% | 1% | 93% | 131s | 65% | 35 |
-| Arms (Battlecraft) | rage | 68% | 8% | 2% | never | 4% | 10 |
-| Fury (Bloodrush) | rage | 48% | 2% | 2% | never | 26% | 10 |
-
-## Healers
-
-### Normal pressure
-
-| Spec | HPS | absorb/s | total/s | incoming | overheal | deaths | avg mana | starved | dry at | DPS |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Restoration (Spiritmend) | 121 | 0 | **121** | 136 | 22% | 1.3 | 48% | 38% | 174s | 15 |
-| Restoration (Groveheart) | 106 | 0 | **106** | 137 | 16% | 12.9 | 35% | 15% | 157s | 8 |
-| Holy (Sunmender) | 87 | 0 | **87** | 138 | 38% | 21.3 | 34% | 44% | 125s | 61 |
-| Discipline (Doctrine) | 43 | 35 | **79** | 135 | 24% | 21.4 | 19% | 74% | 67s | 8 |
-| Holy (Benison) | 73 | 0 | **73** | 135 | 39% | 24.0 | 21% | 50% | 75s | 6 |
-| Arcane (Chronomancy) | 45 | 0 | **45** | 134 | 22% | 39.3 | 20% | 28% | 86s | 22 |
-
-### Heroic pressure
-
-| Spec | HPS | absorb/s | total/s | incoming | overheal | deaths | avg mana | starved | dry at | DPS |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Restoration (Spiritmend) | 150 | 0 | **150** | 243 | 12% | 36.5 | 47% | 56% | 167s | 7 |
-| Restoration (Groveheart) | 115 | 0 | **115** | 244 | 13% | 40.8 | 36% | 12% | 148s | 1 |
-| Holy (Sunmender) | 93 | 0 | **93** | 246 | 30% | 44.8 | 25% | 53% | 85s | 50 |
-| Holy (Benison) | 91 | 0 | **91** | 240 | 27% | 37.0 | 21% | 54% | 82s | 8 |
-| Discipline (Doctrine) | 66 | 23 | **89** | 239 | 15% | 46.1 | 17% | 67% | 62s | 1 |
-| Arcane (Chronomancy) | 45 | 0 | **45** | 238 | 17% | 63.3 | 18% | 34% | 76s | 17 |
-
-## Tanks
-
-### Normal Nythraxis melee
-
-| Spec | pool | armor | DTPS | unhealed survival | biggest hit | avoided | blocked | threat/s | DPS |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Protection (Ironguard) | 2632 | 3007 | **112** | 23.6s | 875 (33%) | 27% | 5% | 173 | 64 |
-| Protection (Faithwarden) | 2318 | 3122 | **136** | 17.2s | 860 (37%) | 16% | 50% | 620 | 123 |
-| Feral bear (Wildfang) | 1957 | 4507 | **196** | 10.0s | 794 (41%) | 17% | 0% | 158 | 70 |
-| Stonebound off-tank (Warspirit) | 1733 | 3657 | **201** | 8.7s | 1252 (72%) | 13% | 0% | 187 | 97 |
-
-### Heroic Nythraxis melee
-
-| Spec | pool | armor | DTPS | unhealed survival | biggest hit | avoided | blocked | threat/s | DPS |
-|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Protection (Ironguard) | 2632 | 3007 | **179** | 14.9s | 1405 (53%) | 29% | 5% | 161 | 58 |
-| Protection (Faithwarden) | 2318 | 3122 | **249** | 9.4s | 1389 (60%) | 15% | 50% | 607 | 118 |
-| Feral bear (Wildfang) | 1957 | 4507 | **325** | 6.1s | 1321 (68%) | 18% | 0% | 142 | 63 |
-| Stonebound off-tank (Warspirit) | 1733 | 3657 | **399** | 4.4s | 2433 (140%) | 14% | 0% | 23 | 59 |
-
-## What the spread costs the raid
-
-Nythraxis is a 10-player encounter (`suggestedPlayers: 10`) with a 60,000 pool on normal and
-192,000 on heroic. A standard 1 tank / 2 healer / 7 DPS split turns each DPS number into a kill
-time; the tank contributes its measured boss damage and healers their filler damage.
-
-| Comp | 7 DPS drawn from | normal kill | heroic kill |
-|---|---|---:|---:|
-| best 7 | Assassination, Balance, Fury, Feral cat, Retribution, Enhancement, Subtlety | 33s | 118s |
-| middle 7 | Subtlety, Frost, Combat, Beast Mastery, Arms, Fire, Shadow | 41s | 146s |
-| worst 7 | Shadow, Survival, Affliction, Elemental, Demonology, Marksmanship, Destruction | 51s | 179s |
-
-## Builds the optimiser landed on
-
-- **Balance (Moongrove)** rows: L14 dru_r14_moonfury, L20 dru_r20_berserk
-  - gear: mainhand=heroic_deathless_heartwood helmet=soulflame_cowl neck=zense_meridian shoulder=heroic_soulflame_mantle chest=heroic_necromancers_starshroud waist=soulflame_cord legs=necromancers_legwraps gloves=soulflame_gloves feet=heroic_necromancers_soulsteps ring1=architects_cornerstone ring2=sutils_gambit
-  - damage: Wildbolt 46%, Moonsurge 42%, Lunar Tempest 6%, Moonseed 4%, Deathbloom 1%, Wand 1%
-- **Feral cat (Wildfang)** rows: L14 dru_r14_savage_fury, L20 dru_r20_tranquility
-  - gear: mainhand=heroic_maul_of_the_scourged_wilds helmet=heroic_nighttalon_crown neck=medallion_of_endless_profit shoulder=heroic_nighttalon_shoulderguards chest=heroic_wyrmshadow_harness waist=nighttalon_waistband legs=heroic_wyrmshadow_legguards gloves=heroic_wyrmshadow_talongrips feet=dreamroot_boots ring1=seal_of_the_nine_oaths ring2=oath_of_the_round_table
-  - damage: Auto Attack 41%, Redharvest 28%, Flense 17%, Rendclaw 14%
-- **Beast Mastery (Packlord)** rows: class default
-  - gear: mainhand=heroic_direfang_greatblade helmet=heroic_nighttalon_crown neck=swiftfang_talisman shoulder=heroic_nighttalon_shoulderguards chest=heroic_wyrmshadow_harness waist=nighttalon_waistband legs=heroic_wyrmshadow_legguards gloves=heroic_wyrmshadow_talongrips feet=bonechill_striders ring1=sutils_gambit ring2=fleetblood_band
-  - damage: Stampede 33%, Auto Shot 31%, Auto Attack 21%, Fell Shot 9%, Pack Command 3%, Unleash Beast Clap 2%
-- **Marksmanship (Coldsight)** rows: L14 hun_r14_trapcraft, L17 hun_r17_shell_and_fang, L20 hun_r20_fang_chorus
-  - gear: mainhand=heroic_direfang_greatblade helmet=heroic_nighttalon_crown neck=swiftfang_talisman shoulder=heroic_nighttalon_shoulderguards chest=heroic_wyrmshadow_harness waist=nighttalon_waistband legs=heroic_wyrmshadow_legguards gloves=nighttalon_grips feet=heroic_wyrmshadow_treads ring1=sutils_gambit ring2=fleetblood_band
-  - damage: Auto Shot 31%, Long Draw 19%, Auto Attack 18%, Fevered Draw 11%, Measured Shot 8%, Venom Barb 6%
-- **Survival (Fieldcraft)** rows: L20 hun_r20_fang_chorus
-  - gear: mainhand=heroic_bonewrought_greatsword helmet=heroic_nighttalon_crown neck=swiftfang_talisman shoulder=heroic_nighttalon_shoulderguards chest=heroic_wyrmshadow_harness waist=nighttalon_waistband legs=heroic_wyrmshadow_legguards gloves=nighttalon_grips feet=heroic_wyrmshadow_treads ring1=sutils_gambit ring2=architects_cornerstone
-  - damage: Auto Attack 49%, Woundrend 17%, Bloodhook Wound 8%, Gutting Strike 8%, Shrapnel Charge 7%, Hunting Momentum 5%
-- **Fire (Pyromancy)** rows: class default
-  - gear: mainhand=scepter_of_the_deathless_court helmet=heroic_soulflame_cowl neck=zense_meridian shoulder=heroic_soulflame_mantle chest=heroic_necromancers_starshroud waist=soulflame_cord legs=necromancers_legwraps gloves=soulflame_gloves feet=heroic_necromancers_soulsteps ring1=nielas_coldlight_band ring2=ashen_focus_ring
-  - damage: Cinderfall 24%, Ignite 19%, Scald 18%, Pyrelance 18%, Cinderbolt 17%, Wand 3%
-- **Frost (Cryomancy)** rows: class default
-  - gear: mainhand=scepter_of_the_deathless_court helmet=heroic_soulflame_cowl neck=zense_meridian shoulder=heroic_soulflame_mantle chest=shroud_of_the_gravewyrm waist=soulflame_cord legs=necromancers_legwraps gloves=soulflame_gloves feet=heroic_necromancers_soulsteps ring1=nielas_coldlight_band ring2=ashen_focus_ring
-  - damage: Ice Lance 41%, Winterlash 18%, Rimelance 15%, Glacial Spike 12%, Auto Attack 9%, Frozen Orb 3%
-- **Retribution (Dawnreaver)** rows: L14 pal_r14_zeal, L17 pal_r17_sanctified_fervor, L20 pal_r20_dawn_echo
-  - gear: mainhand=deathless_greatblade helmet=heroic_soulflame_cowl neck=medallion_of_endless_profit shoulder=heroic_crownforged_warspaulders chest=morthens_cryptforged_hauberk waist=crownforged_girdle legs=deathless_warguard_legmail gloves=crownforged_gauntlets feet=tideworn_warboots ring1=seal_of_the_nine_oaths ring2=oath_of_the_round_table
-  - damage: Auto Attack 28%, Hammer of Wrath 19%, Final Edict 18%, Holy Ground 11%, Hammer of Grace 9%, Requital Aura 4%
-- **Shadow (Vespers)** rows: L20 pri_r20_incarnate_spirit
-  - gear: mainhand=lunar_tide_greatstaff helmet=heroic_soulflame_cowl neck=zense_meridian shoulder=heroic_soulflame_mantle chest=heroic_necromancers_starshroud waist=soulflame_cord legs=necromancers_legwraps gloves=soulflame_gloves feet=heroic_necromancers_soulsteps ring1=nielas_coldlight_band ring2=architects_cornerstone
-  - damage: Litany of Woe 38%, Tithefiend Strike 27%, Mindfracture 17%, Dirge of Decay 16%, Wand 1%
-- **Assassination (Knifework)** rows: L14 rog_r14_ceaseless_cuts
-  - gear: mainhand=heroic_kingsbane_last_oath offhand=mistcallers_fang helmet=heroic_nighttalon_crown neck=swiftfang_talisman shoulder=heroic_nighttalon_shoulderguards chest=heroic_wyrmshadow_harness waist=nighttalon_waistband legs=heroic_wyrmshadow_legguards gloves=nighttalon_grips feet=heroic_wyrmshadow_treads ring1=seal_of_the_nine_oaths ring2=oath_of_the_round_table
-  - damage: Wicked Slash 36%, Auto Attack 35%, Venomrend 18%, Second Shadow 3%, Dirt Nap 3%, Chain Arc 2%
-- **Combat (Thuggery)** rows: L14 rog_r14_ceaseless_cuts
-  - gear: mainhand=heroic_kingsbane_last_oath offhand=kingsbane_last_oath helmet=heroic_nighttalon_crown neck=swiftfang_talisman shoulder=heroic_nighttalon_shoulderguards chest=heroic_wyrmshadow_harness waist=nighttalon_waistband legs=heroic_wyrmshadow_legguards gloves=heroic_wyrmshadow_talongrips feet=dreamroot_boots ring1=sutils_gambit ring2=seal_of_the_nine_oaths
-  - damage: Auto Attack 67%, Wicked Slash 13%, Body Blow 10%, Dirt Nap 3%, Chain Arc 2%, Venom Dart 2%
-- **Subtlety (Skulduggery)** rows: L14 rog_r14_venom_dividend, L20 rog_r20_deathmark
-  - gear: mainhand=heroic_kingsbane_last_oath offhand=kingsbane_last_oath helmet=heroic_nighttalon_crown neck=yumis_keepsake_locket shoulder=heroic_nighttalon_shoulderguards chest=heroic_wyrmshadow_harness waist=nighttalon_waistband legs=heroic_wyrmshadow_legguards gloves=heroic_wyrmshadow_talongrips feet=dreamroot_boots ring1=sutils_gambit ring2=fleetblood_band
-  - damage: Auto Attack 64%, Red Ribbon 27%, Throat Wire 4%, Chain Arc 2%, Bleed Out 2%, Dirt Nap 1%
-- **Elemental (Thundercall)** rows: L14 sha_r14_chain_lightning, L20 sha_r20_tidal_waves
-  - gear: mainhand=stormcallers_focus helmet=heroic_soulflame_cowl neck=zense_meridian shoulder=heroic_soulflame_mantle chest=heroic_necromancers_starshroud waist=soulflame_cord legs=necromancers_legwraps gloves=wyrmchoir_handwraps feet=heroic_necromancers_soulsteps ring1=architects_cornerstone ring2=zyzzs_deathless_signet offhand=pearlward_aegis
-  - damage: Arc Bolt 77%, Earthen Jolt 23%
-- **Enhancement (Warspirit)** rows: L14 sha_r14_improved_flame_shock, L20 sha_r20_elemental_fury
-  - gear: mainhand=heroic_kingsbane_last_oath offhand=kingsbane_last_oath helmet=heroic_nighttalon_crown neck=medallion_of_endless_profit shoulder=heroic_nighttalon_shoulderguards chest=morthens_cryptforged_hauberk waist=gravescale_girdle legs=lunar_choir_leggings gloves=gravewyrm_claws feet=tideworn_warboots ring1=seal_of_the_nine_oaths ring2=oath_of_the_round_table
-  - damage: Auto Attack 47%, Galeheart Echo 27%, Arc Bolt 16%, Ancestral Strike 7%, Chain Arc 2%, Cinder Jolt 1%
-- **Affliction (Hexcraft)** rows: L5 wlk_r5_improved_immolate
-  - gear: mainhand=scepter_of_the_deathless_court helmet=heroic_soulflame_cowl neck=zense_meridian shoulder=heroic_soulflame_mantle chest=heroic_necromancers_starshroud waist=soulflame_cord legs=necromancers_legwraps gloves=soulflame_gloves feet=heroic_necromancers_soulsteps ring1=architects_cornerstone ring2=nielas_coldlight_band
-  - damage: Gloom Bolt 19%, Auto Attack 19%, Burning Pact 13%, Blackrot 12%, Ruinbolt 11%, Hex of Anguish 10%
-- **Demonology (Pactbound)** rows: L5 wlk_r5_improved_immolate, L20 wlk_r20_curse_mastery
-  - gear: mainhand=scepter_of_the_deathless_court helmet=heroic_soulflame_cowl neck=zense_meridian shoulder=heroic_soulflame_mantle chest=heroic_necromancers_starshroud waist=soulflame_cord legs=necromancers_legwraps gloves=soulflame_gloves feet=heroic_necromancers_soulsteps ring1=architects_cornerstone ring2=nielas_coldlight_band
-  - damage: Auto Attack 28%, Gloom Bolt 26%, Burning Pact 14%, Hex of Anguish 13%, Blackrot 12%, Duskfire 4%
-- **Destruction (Ruination)** rows: L5 wlk_r5_improved_immolate
-  - gear: mainhand=heroic_deathless_heartwood helmet=heroic_soulflame_cowl neck=yumis_keepsake_locket shoulder=heroic_soulflame_mantle chest=shroud_of_the_gravewyrm waist=soulflame_cord legs=lunar_choir_leggings gloves=soulflame_gloves feet=shadowpulse_slippers ring1=nielas_coldlight_band ring2=architects_cornerstone
-  - damage: Auto Attack 31%, Burning Pact 27%, Conflagrate 16%, Ruinbolt 10%, Wand 4%, Hex of Anguish 4%
-- **Arms (Battlecraft)** rows: L14 war_row_battle_rhythm, L20 war_row_bladestorm
-  - gear: mainhand=deathless_greatblade helmet=heroic_crownforged_dreadhelm neck=medallion_of_endless_profit shoulder=heroic_crownforged_warspaulders chest=morthens_cryptforged_hauberk waist=crownforged_girdle legs=deathless_warguard_legmail gloves=crownforged_gauntlets feet=tideworn_warboots ring1=seal_of_the_nine_oaths ring2=oath_of_the_round_table
-  - damage: Auto Attack 34%, Redhand 27%, Maiming Strike 20%, Brute Swing 7%, Gaping Wounds 5%, Bonesplinter 4%
-- **Fury (Bloodrush)** rows: L14 war_row_blood_offering
-  - gear: mainhand=kingsbane_last_oath offhand=gravewyrm_cleaver helmet=heroic_crownforged_dreadhelm neck=zense_meridian shoulder=heroic_crownforged_warspaulders chest=morthens_cryptforged_hauberk waist=crownforged_girdle legs=deathless_warguard_legmail gloves=crownforged_gauntlets feet=dreamroot_boots ring1=unbroken_circle ring2=oath_of_the_round_table
-  - damage: Auto Attack 43%, Red Harvest 24%, Twinstrike 19%, Bloodletting 6%, Chain Arc 4%, Bonesplinter 3%
-# Findings
-
-## 1. Thronebane is an item bug, and it is the top of the DPS table
-
-`kingsbane_last_oath` (and its auto-minted `heroic_kingsbane_last_oath`) carries
-**21.4 weapon dps**, above the 19.1 that every two-hander in the level-20 table
-tops out at, and it still has **no `hand` field**. `canEquipItemInSlot` therefore
-returns true for the OFFHAND on Fury warrior, all three Rogue specs, and
-Enhancement shaman. Both the normal and the heroic variant exist, so the pair is
-farmable without a duplicate drop.
-
-Measured over 24 seeds at 60 s, full BiS against the epic-only control:
-
-| Spec | full BiS | epic only | legendary worth |
-|---|---:|---:|---:|
-| Subtlety rogue | 200 | 146 | **+36%** |
-| Combat rogue | 201 | 156 | **+28%** |
-| Fury warrior | 258 | 204 | **+27%** |
-| Enhancement shaman | 220 | 174 | **+26%** |
-| Assassination rogue | 308 | 252 | **+22%** |
-| Fire mage | 198 | 164 | +21% |
-| Beast Mastery hunter | 196 | 170 | +15% |
-| Elemental shaman | 150 | 132 | +14% |
-
-The top five are exactly the five specs that can hold Thronebane in BOTH hands.
-Fire mage, Beast Mastery and Elemental gain from their own class legendaries
-(`heroic_deathless_heartwood` for the casters), which is legendaries working as
-intended; the dual-wield cluster is the outlier, and it also locks Mage, Priest,
-Warlock and Druid out of the best weapon in the game entirely (`requiredClass`
-is warrior/rogue/hunter/shaman/paladin).
-
-READ THE ZEROES WITH CARE: eight specs show +0% because the greedy search found
-a worse local optimum on the full item pool than on epics alone, so the study
-substituted the epic build for both columns. Those rows mean "the search found no
-legendary upgrade", not "no legendary upgrade exists".
-
-This is the same defect the v0.30.0 fury study found and sized; the fix never
-reached this branch. That study measured a mainhand lock ALONE as insufficient,
-so the package is still: add `hand: 'mainhand'` AND re-band the weapon to at or
-under the 19.1 two-hander ceiling. Item ids resolve on load, so it is
-retroactive with no migration.
-
-## 2. The spread is about 2.4x against a declared intent of about 1.15x
-
-`tests/owned_class_balance_harness.test.ts` states the intended shape: Vespers
-within 0.9-1.2x of Thundercall, Warspirit within 0.95-1.15x of Vespers, Moongrove
-and Wildfang both inside 180-225 with a spread cap of 0.15. That is a plus or
-minus 15% band. The measured roster is much wider, and the epic-only control
-shows removing the legendary does not close it:
-
-| Window | Top | Bottom | Median | Spread |
+| Spec | naked | fresh 20 | BiS | naked as % of BiS |
 |---|---:|---:|---:|---:|
-| 15 s | 336 (Retribution) | 107 (Destruction) | 222 | **3.15x** |
-| 30 s | 297 | 117 | 208 | 2.53x |
-| 60 s | 308 (Assassination) | 130 (Destruction) | 198 | **2.37x** |
-| 120 s | 313 | 119 | 189 | 2.63x |
-| 300 s | 315 (Assassination) | 58 (Marksmanship) | 153 | **5.39x** |
+| Affliction | 160 | 164 | 238 | **67%** |
+| Destruction | 194 | 213 | 288 | 67% |
+| Demonology | 172 | 187 | 261 | 66% |
+| Retribution | 138 | 166 | 228 | 61% |
+| Beast Mastery | 114 | 123 | 199 | 57% |
+| Marksmanship | 79 | 91 | 139 | 57% |
+| Shadow | 98 | 106 | 178 | 55% |
+| Elemental | 74 | 81 | 150 | 49% |
+| Frost | 92 | 102 | 200 | 46% |
+| Fire | 83 | 103 | 191 | 44% |
+| Survival | 64 | 93 | 153 | 42% |
+| Balance | 103 | 120 | 258 | 40% |
+| Feral cat | 82 | 127 | 209 | 39% |
+| Assassination | 66 | 83 | 179 | 37% |
+| Subtlety | 60 | 79 | 205 | 29% |
+| Combat | 56 | 80 | 194 | 29% |
+| Enhancement | 59 | 94 | 224 | 26% |
+| Fury | 34 | 89 | 275 | **12%** |
+| Arms | 23 | 88 | 203 | **11%** |
 
-Epic-only at 60 s is still 2.11x (266 top, 126 bottom), and heroic is 2.27x. The
-item is a real problem but it is not the reason the roster is wide.
+The revision-2 shape holds: the warlock barely scales with gear, the warriors are the
+mirror image (rage generation itself scales with weapon damage), and fresh-vs-naked is
+nearly flat for casters while doubling melee output. The one mover is Balance, off the
+top of the naked table and into the caster pack, per the re-seat above. The floor-weapon
+column (a truer "nothing" than bare fists) changes no ordering: it is worth about 25
+DPS to Enhancement and under 12 to everyone else.
 
-Retribution owns the opening 15 seconds at 336 and settles to 222 by one minute;
-Assassination is the opposite shape, starting at 293 and still climbing at five
-minutes. Both are inside the same table, which is what a 3.15x burst spread
-against a 2.37x sustained spread actually looks like in play.
+---
 
-## 3. The sustain cliff is the biggest single effect, and it tracks resource type
+# Healers
 
-The gap between the 60 s and 300 s columns separates the roster almost perfectly
-by what the spec spends. Normal Nythraxis is roughly a 40 s kill for a competent
-10-man and heroic is around 140 s, so the long column is what heroic progression
-actually feels like.
+Same bench as the prior revisions (tank swing plus raid pulse, ~136 incoming DTPS
+normal, ~242 heroic, 180 s, five to keep alive). Normal pressure:
 
-| Retains most of its 60 s DPS at 300 s | Retains least |
-|---|---|
-| Balance druid 103%, Assassination rogue 102%, Combat rogue 100% | Fire mage 41%, Marksmanship hunter 42% |
-| Fury warrior 97%, Subtlety rogue 97%, Arms warrior 96%, Feral druid 96% | Beast Mastery hunter 46%, Survival hunter 53% |
-| Retribution paladin 94%, Shadow priest 88%, Affliction warlock 86% | Destruction warlock 62%, Demonology warlock 64%, Frost mage 67% |
+| Healer | HPS | Absorb/s | Total/s | Overheal | Deaths | Dry at |
+|---|---:|---:|---:|---:|---:|---:|
+| Restoration shaman | 124 | 0 | **124** | 23% | **0.3** | never |
+| Holy paladin | 117 | 6 | **122** | 41% | **0.3** | 172s |
+| Restoration druid | 122 | 0 | **122** | 16% | 5.6 | 167s |
+| Holy priest | 94 | 0 | **94** | 40% | 15.9 | 93s |
+| Discipline priest | 51 | 36 | **87** | 17% | 18.4 | 81s |
+| Arcane mage | 56 | 0 | **56** | 21% | 33.7 | 87s |
 
-Everything in the left column runs on rage, energy, or a self-sustaining mana
-engine. Everything in the right column runs on a mana or focus pool that simply
-empties. Marksmanship falls from 139 DPS to 58.
+**The revision-2 restoration druid "regression" was never a sim bug, and the bisect it
+asked for is unnecessary.** Replaying revision 2's druid build under the current sim
+reproduces revision 2's numbers exactly (86 HPS, 22 deaths); this run's fresh support
+search reads 122 HPS with 5.6 deaths on the same sim. The revision-2 support search had
+left the healer on the Berserk DPS capstone where this run's takes Tranquility, plus four
+gear-slot differences: greedy-search noise, not a repair regression. Two lessons ship
+with this finding: restoration druid is actually the third healer that can hold a group
+on normal, and support builds need the same build-reconciliation pass the DPS tiers get
+(adopted into the method from this revision on).
 
-CAVEAT ON MY OWN METHOD: the first build search used a 45 s objective, which
-cannot see mana recovery and therefore never picked Evocation. The study re-ran
-the whole search against a 180 s objective; the sustain table in the report is
-that second search. What the second search found is the interesting part, and it
-is not "the cliff was an artifact":
+Elsewhere the shape holds: restoration shaman and (since the solarReprisal repair) holy
+paladin are effectively perfect on normal, both priests still run dry around 90 s
+pointing at the priest pool, and Chronomancy slid further (68 to 56 total, worst-healer
+seat, its loop remains the least trustworthy in the harness). Heroic remains uncoverable
+by any single healer (best 159 against 242 incoming).
 
-- **Priest HAS an answer and takes it.** The 180 s search picks
-  `pri_r11_meditation` (every 3rd spell costs 50% less, +7.4%) and
-  `pri_r20_incarnate_spirit` (+17.4%). Shadow priest retains 88% at 300 s.
-- **Mage has an answer and REJECTS it.** `mag_r20_evocation` (Aetherwell:
-  channel to restore mana) exists on the row, and the search still prefers
-  `mag_r20_rune_of_power` (+10% damage aura) even over a three-minute fight. The
-  mana capstone loses its own row, so Fire mage keeps its 41% retention.
-- **Hunter has no answer at all.** Every level-20 option (Overdraw, Chain
-  Reaction, Fang Chorus) is a damage talent; there is no focus restoration
-  anywhere on the tree. Marksmanship cannot spec out of falling to 58 DPS.
+# Tanks
 
-Re-measuring every spec on its sustain build settles it. Speccing for the long
-fight rescues several: Survival hunter 87 -> 114 at 300 s (+31%), Destruction
-warlock 80 -> 95, Beast Mastery 90 -> 104, Fury 252 -> 288, Shadow priest
-153 -> 175. It does NOT rescue the two worst: **Fire mage gets WORSE**
-(82 -> 78) and **Marksmanship stays on the floor** (58 -> 60).
+| Tank | Pool | Armor | DTPS n/h | Survival n/h | Threat/s n/h | DPS |
+|---|---:|---:|---:|---:|---:|---:|
+| Ironguard warrior | 2562 | 3094 | **98 / 165** | 26.5s / 15.6s | 164 / 156 | 60 |
+| Faithwarden paladin | 2698 | 3436 | 126 / 238 | 21.5s / 11.4s | **704 / 693** | 153 |
+| Stonebound shaman | 1833 | 3784 | 177 / 305 | 10.5s / 6.0s | 219 / 207 | **107** |
+| Wildfang bear | 2256 | 4495 | 204 / 339 | 11.1s / 6.7s | 176 / 159 | 77 |
 
-So the cliff is a real design gap, and it is a DIFFERENT gap per class: the mage
-needs Evocation to be worth its row, the hunter needs a focus talent to exist,
-and those are exactly the two specs no build can save.
+The order holds (Raised Guard keeps the warrior a class apart, the paladin trades intake
+for 4x threat), but the Stonebound story changed twice:
 
-## 4. One healer holds the group; the priests run dry in about a minute
+- **The creature crit immunity works.** Stonebound's largest observed heroic hit is now
+  1,322 against its 1,833 pool (72%): a hard hit, no longer the literal one-shot of
+  revision 2 (1,958 against 1,933, 107%). Its normal intake dropped 197 to 177 DTPS.
+- **The trance fixed its heroic threat.** 207 TPS on heroic against revision 2's
+  starvation collapse to 124. Stonebound is now a genuine normal-mode fourth tank that
+  degrades on heroic instead of failing outright; it also now out-threats the bear on
+  both difficulties while keeping the highest tank DPS in the game.
 
-Every healer faced an identical pattern: a boss swing on the tank every 2.6 s
-plus a raid-wide pulse worth 10% of each member's own pool every 15 s, about
-136 incoming DTPS on normal.
+---
 
-| Healer | Throughput/s | Covers | Deaths | Runs dry |
-|---|---:|---:|---:|---:|
-| Restoration shaman | **121** | 89% | **1.3** | 169 s |
-| Restoration druid | 106 | 78% | 12.9 | 123 s |
-| Holy paladin | 87 | 63% | 21.3 | 115 s |
-| Discipline priest | 79 | 58% | 21.4 | **63 s** |
-| Holy priest | 73 | 54% | 24.0 | **68 s** |
-| Arcane mage (Chronomancy) | **41** | 30% | 42.8 | **55 s** |
+# Cross-cutting findings
 
-Restoration shaman is the only spec that both sustains its pool and holds the
-group. Chronomancy covers under a third of the incoming damage and is dry at
-55 s: as a healer it does not currently function. Note that Chronomancy is the
-one healer loop authored from scratch for this study rather than ported from the
-shipped probe, so its number carries the most rotation risk of the six.
+1. **The targeted fixes all landed, and none overshot except possibly Assassination.**
+   Wicked Slash normalization (-42%, first to fifteenth), the warlock sustain re-tune
+   (-14% Affliction with its economy intact), the Feral trim (-10%), the Balance
+   re-seat (gear scaling repaired), Elemental Trance (+22% at 300 s, heroic tank threat
+   fixed), Stonebound crit immunity (one-shot gone). Assassination at 179, below the
+   median with 61% idle GCDs, is the one that may want a partial walk-back.
+2. **Thronebane's `hand` field is still unset after three studies.** The normalization
+   demoted it from ability amplifier to white-damage stat stick, but it is still worth
+   +29 to +47% to five specs in the epic-only comparison and it still decides the top
+   rogue. One line plus a re-band.
+3. **The 300 s cliff is the game's dominant imbalance now** (spread 4.94x at 300 s vs
+   2.07x at 60 s). Members: Marksmanship 54 (no focus lever exists on its tree),
+   Beast Mastery 85, Survival 84, Fire 108, then the warlock pair at 172/197. The
+   sustain-objective builds recover only 18 to 29 DPS for the hunters; kit changes, not
+   tuning, remain the answer there.
+4. **The resource axis health check:** Balance, Affliction, Retribution, Shadow, and
+   both war-resources (Arms, Fury) are healthy; Beast Mastery still caps its focus 57%
+   of the fight (income thrown away); the energy rogues now all sit around 40% starved
+   (the tamed Thronebane engine moved Combat and Subtlety from cap-starved to
+   income-starved); Destruction (49%), Demonology (37%), Enhancement (29%) still starve
+   on mana.
+5. **The heroic step still taxes melee, not casters.** Elemental literally ties its
+   normal number (its BiS is hit-capped and nature damage ignores armor); Destruction,
+   Fire, Frost, Shadow, Affliction all lose 2 to 3%; the melee cluster loses 8 to 13%.
+6. **Kill-time cost of comp** (7 DPS at these curves): the best seven burn normal
+   Nythraxis in 31 s and heroic in 124 s; the worst seven need 50 s and 204 s. The
+   best-seven set is warlock x3, Fury, Balance, Retribution, Enhancement.
 
-On heroic the pattern is 243 incoming DTPS against a best-case 150, so heroic
-needs two healers minimum and three for anything but a perfect pull.
+# Suggested order of work
 
-## 5. Raised Guard gives the warrior a permanent 50% physical reduction
+Reconciled against revision 2's list:
 
-| Tank | Mitigation | Cost | Cooldown | Duration | Uptime | Effect |
-|---|---|---:|---:|---:|---:|---|
-| Ironguard warrior | Raised Guard | 15 rage | 12 s, **2 charges** | 6 s | ~100% | **50% physical DR** |
-| Faithwarden paladin | Bastion Rite | 20 | 10 s | 6 s | ~60% | 20% DR + 20% block |
-| Wildfang bear | Barkskin | 30 | **60 s** | 15 s | 25% | **+150 armor** |
+1. **Thronebane `hand` field** (rev-2 item 1, still open, third study running): the
+   normalization made it cheaper to fix (the ability amplification is gone; what remains
+   is a legal offhand legendary with a two-hander's weapon budget). `hand: 'mainhand'`
+   plus the re-band, as originally specified.
+2. **Assassination's seat** (new): 179 at 60 s, 61% idle, 40% energy-starved, auto
+   attack 60% of damage. If the intent was pack-level, it landed low; a modest energy
+   income or Wicked Slash coefficient bump (1.7 to ~2.0 dagger) would lift it without
+   re-opening the runaway.
+3. **Warlock mana past 120 s** (rev-2 item 2, moved eleven seconds, not fixed):
+   Demonology and Destruction still lose a third of their damage by 300 s. The re-tune
+   proved the levels can be moved without touching the loops; the loop itself (a Ruin
+   or Fragment mana rebate) is what is missing.
+4. **Warlock gear scaling** (rev-2 item 3, unchanged): naked warlocks still do two
+   thirds of their BiS output. Same suggested shape: a small spell-power rider on
+   Sentence and the servants, base re-banded down.
+5. **Restoration druid bisect** (rev-2 item 4): CLOSED, no sim change existed; it was
+   support-search noise. Method fix adopted instead: support builds now go through
+   build reconciliation like the DPS tiers.
+6. **The standing kit items** (rev-2 item 5, unchanged): Marksmanship has no sustain
+   lever, Survival and Beast Mastery focus regeneration does nothing, the priest mana
+   pool, bear percentage mitigation, and now Chronomancy (56 total throughput, worst
+   healer, loop least trusted; it needs an owner before it needs numbers).
 
-Two charges on a 12 s recharge covering a 6 s buff is continuous uptime.
-Barkskin grants flat armor to a bear already above 4,600, worth roughly 1%
-damage reduction: at that armor level it is not functionally a mitigation
-cooldown. Re-running the bear's whole build search with Barkskin in its rotation
-produced an identical score (12.6 both times), which confirms this is the kit and
-not the loop.
+# Confidence and known limits
 
-The paladin blocks half of all incoming swings and still takes more damage per
-second than the warrior, while generating **3.6x the warrior's threat** (620 vs
-173 TPS). The three tanks are unequal on two different axes in opposite
-directions: the warrior survives, the paladin holds aggro, and the bear does
-neither.
-
-## 6. The heroic level step only taxes direct casts
-
-Heroic Nythraxis is level 22, and a +2 level target costs 14 points of spell hit
-(96% to 82% before hit rating). But `isSpellResisted` is rolled ONCE per cast, at
-projectile impact (`casting_lifecycle.ts:2071`), and never per damage-over-time
-tick. So:
-
-- Shadow priest: 173.2 DPS on normal, 173.2 on heroic. Identical to the digit.
-- Destruction warlock: 130.0 on both.
-- Balance druid, direct-cast heavy: 274.6 to 243.7, an 11% loss.
-
-A DoT-heavy or pet-heavy spec pays nothing for the difficulty step while a
-direct-cast spec pays a tenth of its damage, and the advantage grows with every
-level of content above the player.
-
-## How much of this is my rotations?
-
-A weak rotation and a weak spec look identical in a DPS column, so every spec
-that finished near the bottom was re-measured against alternative loops:
-
-| Spec | study rotation | best alternative tried |
-|---|---:|---|
-| Destruction warlock | 120.6 | late Conflagrate, **+2.9%** |
-| Marksmanship hunter | 116.4 | maintain Serpent Sting, **+6.1%** |
-| Elemental shaman | 148.4 | Earth Shock at 4 charges, **+4.0%** |
-| Affliction warlock | 142.7 | Drain Life filler, -9.9% |
-| Shadow priest | 174.1 | never clip Mind Flay, -26.6% |
-
-The largest upside available to any bottom finisher is 6.1%, so the floor of the
-table is real. Read Marksmanship as roughly 147 rather than 139 at 60 s: it wants
-Serpent Sting kept up and the study's loop did not. Shadow priest confirms the
-opposite: clipping Mind Flay with Mind Blast is correct by 27%.
-
-The three tanks and six healers carry more rotation risk than the DPS specs,
-because their loops are hand-authored rather than ported. Chronomancy is the
-least trustworthy number in the whole study.
-
-## Suggested order of work
-
-1. **Thronebane.** `hand: 'mainhand'` plus a weapon re-band to at or under 19.1.
-   Cheap, retroactive, and it removes the largest single distortion.
-2. **The sustain cliff**, which is two separate fixes. For the mage, make
-   `mag_r20_evocation` worth its row (it currently loses to a +10% damage aura
-   even in a three-minute fight). For the hunter, there is no focus-restoration
-   talent anywhere on the tree to take. Neither is a damage-tuning problem.
-3. **Bear mitigation.** Barkskin needs to be a percentage damage reduction (or a
-   far shorter cooldown) to be a cooldown at all at endgame armor values.
-4. **Warrior threat or paladin threat.** A 3.6x threat gap between two tanks
-   means one of them cannot main-tank a pull the other can.
-5. **Chronomancy.** Verify against a hand-played parse before tuning: this study
-   authored its rotation and it is the least trustworthy number in the set.
+Rotations engine-derived per spec; the reconciliation pass replayed every revision-2
+build under the current sim so no spec's move is search noise, and the Assassination
+paired-dagger A/B closed the one pair-synergy hole single-slot greedy search cannot see.
+Known soft spots, carried forward deliberately: the inert dummy understates Affliction
+in a real raid (the uncapped enemy-action Condemnation source and hex_of_violence both
+read zero on a target that never acts); Elemental's heroic immunity is a hit-cap plus
+armor-ignoring-school artifact of its BiS, not a kit property at all gear levels;
+Destruction and Balance read marginally higher epic-only than full BiS (within greedy
+noise, the reconciliation keeps whichever measured higher per tier); healer and tank
+loops remain hand-authored; and support builds before this revision were un-reconciled
+(the cause of revision 2's phantom druid regression).
