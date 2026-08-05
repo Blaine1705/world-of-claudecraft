@@ -2591,6 +2591,34 @@ describe('pet cluster layout', () => {
     );
   });
 
+  // The bottom-centre column (player frame, cast bar, swing bar, pet strip) is nudged
+  // sideways by FOUR separate rules: compact, compact+left-handed, and a narrow-phone
+  // variant of each. A rule that moves the bars but forgets the pet strip leaves it
+  // horizontally detached from the column it belongs to, and the left-handed rule's
+  // extra class means it WINS over the narrow rule, so the omission does not even fall
+  // back to a sane value. Pinned as an invariant over every such rule rather than as
+  // four string literals: only one of the four was pinned before, which is how the
+  // narrow left-handed variant shipped without the strip twice.
+  it('nudges the pet strip in EVERY rule that nudges the cast bar', () => {
+    const rules = hudMobileSrc.split('}');
+    const nudges = rules
+      .map((block) => {
+        const open = block.lastIndexOf('{');
+        if (open === -1) return null;
+        return { selector: block.slice(0, open), body: block.slice(open + 1) };
+      })
+      .filter(
+        (r): r is { selector: string; body: string } =>
+          r !== null && /left:\s*calc\(50%/.test(r.body) && r.selector.includes('#castbar'),
+      );
+    // Vacuity floor: the five known column nudges must actually be found (compact,
+    // compact left-handed, their two narrow-phone variants, and the tablet tier).
+    expect(nudges.length).toBeGreaterThanOrEqual(5);
+    for (const rule of nudges) {
+      expect(rule.selector).toContain('#pet-frame');
+    }
+  });
+
   // display:contents dissolves the wrapper so each child keeps its own fixed seat.
   // Without it the mobile layout inherits the desktop row and the command bar is
   // dragged down out of thumb reach into the bottom-centre column.
