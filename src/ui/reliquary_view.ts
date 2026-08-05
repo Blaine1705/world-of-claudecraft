@@ -13,7 +13,7 @@ import type {
   ReliquaryShelfId,
 } from '../sim/content/reliquary';
 import {
-  catalogItemCompletion,
+  catalogRelicCompletion,
   curatorRankFromOwned,
   curatorSealIdForRank,
   isRelicFilled,
@@ -23,6 +23,15 @@ import {
 /** Top-level nav: virtual Overview plus the three catalog shelves. */
 export const RELIQUARY_NAV = ['overview', 'conquerors', 'professions', 'horizons'] as const;
 export type ReliquaryNavId = (typeof RELIQUARY_NAV)[number];
+
+/**
+ * i18n key for a catalogued profession mark find label.
+ * Mark ids use colon namespaces (`gather_event:pristine_vein`); the leaf key
+ * replaces `:` with `_` under `hudChrome.reliquary.markFind.*`.
+ */
+export function reliquaryMarkFindKey(markId: string): string {
+  return `hudChrome.reliquary.markFind.${markId.replace(/:/g, '_')}`;
+}
 
 /** How incomplete a page must be (and how full) to appear in nearly-complete. */
 export const RELIQUARY_NEARLY_MIN_OWNED = 1;
@@ -38,7 +47,7 @@ export interface ReliquaryViewInput {
   pages: readonly ReliquaryPageDef[];
   /** Item ownership = itemsDiscovered (or a test Set). */
   itemsDiscovered: { has(id: string): boolean };
-  /** Authored non-item marks (empty until professions shelf marks land). */
+  /** Authored non-item marks (profession trophies, etc.). */
   marks: { has(id: string): boolean };
   /** Capped recent find ids (item or mark), oldest-first from the facet. */
   recent: readonly string[];
@@ -230,7 +239,10 @@ export function buildReliquaryPageCells(
 /** Build the whole cold-window model. Per-call allocation is fine (event-driven). */
 export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewModel {
   const opts = ownershipOpts(input);
-  const catalog = catalogItemCompletion(input.itemsDiscovered, input.pages);
+  const catalog = catalogRelicCompletion(
+    { itemsDiscovered: input.itemsDiscovered, marks: input.marks },
+    input.pages,
+  );
   const curatorRank = curatorRankFromOwned(catalog.owned);
   const progress: ReliquaryProgressModel = {
     owned: catalog.owned,

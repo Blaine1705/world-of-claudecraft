@@ -46,7 +46,7 @@ import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
-  catalogItemCompletion,
+  catalogRelicCompletion,
   clearCountForSource,
   curatorRankFromOwned,
   pageCompletion,
@@ -4743,10 +4743,18 @@ export class ClientWorld implements IWorld {
     });
   }
   reliquaryCatalogCompletion(): ReliquaryCatalogCompletion {
-    return catalogItemCompletion(this.deedStats.itemsDiscovered);
+    return catalogRelicCompletion({
+      itemsDiscovered: this.deedStats.itemsDiscovered,
+      marks: this.reliquaryMarks,
+    });
   }
   reliquaryCuratorRank(): number {
-    return curatorRankFromOwned(catalogItemCompletion(this.deedStats.itemsDiscovered).owned);
+    return curatorRankFromOwned(
+      catalogRelicCompletion({
+        itemsDiscovered: this.deedStats.itemsDiscovered,
+        marks: this.reliquaryMarks,
+      }).owned,
+    );
   }
   reliquaryPageClearCount(pageId: string): number | undefined {
     const page = RELIQUARY_PAGES_BY_ID[pageId];

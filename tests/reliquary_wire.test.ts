@@ -35,8 +35,8 @@ const HOLLOW_CRYPT_RELICS = [
   'greyjaw_hide_boots',
   'gravewoven_bag',
 ] as const;
-/** Authored mark id seeded only for wire shape pins (no mark catalog pages yet). */
-const SEEDED_MARK_ID = 'reliquary_test_mark';
+/** Authored profession mark id (Phase 7 field note) for sparse marks[] wire pins. */
+const SEEDED_MARK_ID = 'gather_event:pristine_vein';
 
 function fakeWs() {
   const sent: any[] = [];

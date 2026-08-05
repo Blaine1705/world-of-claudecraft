@@ -13,8 +13,10 @@
 
 import {
   isCataloguedRelicItem,
+  isCataloguedRelicMark,
   RELIQUARY_ITEM_TO_PAGES,
   RELIQUARY_MARK_IDS,
+  RELIQUARY_MARK_TO_PAGES,
   RELIQUARY_PAGE_ORDER,
   RELIQUARY_PAGES,
   RELIQUARY_PAGES_BY_ID,
@@ -182,10 +184,13 @@ function dungeonClearCount(
  */
 export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: string): void {
   if (!isCataloguedRelicItem(itemId)) return;
-  // Rank is derived from itemsDiscovered (already includes this id). The prior
-  // unique catalog fill count is owned - 1 because this discover is the first
-  // time the id entered the set (markItemDiscovered only calls on first add).
-  const owned = catalogItemCompletion(meta.deedStats.itemsDiscovered).owned;
+  // Rank is unique catalogued relic fills (items + marks). The prior unique
+  // fill count is owned - 1 because this discover is the first time the id
+  // entered itemsDiscovered (markItemDiscovered only calls on first add).
+  const owned = catalogRelicCompletion({
+    itemsDiscovered: meta.deedStats.itemsDiscovered,
+    marks: meta.reliquary.marks,
+  }).owned;
   const previousRank = curatorRankFromOwned(Math.max(0, owned - 1));
   const newRank = curatorRankFromOwned(owned);
   if (!noteRelicItemFind(meta, itemId)) return;
@@ -221,14 +226,46 @@ export function noteRelicItemFind(meta: PlayerMeta, itemId: string): boolean {
   return true;
 }
 
-/** Grant an authored non-item Reliquary mark (profession trophy, etc.). */
+/**
+ * Grant an authored non-item Reliquary mark (profession trophy, etc.).
+ * Only catalog mark ids land; unknown ids are ignored. Cosmetic only: no
+ * skill power, drop rate, or pity. No saveCharacter on pure mark fill.
+ * @returns true when a new mark was written.
+ */
 export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: string): boolean {
   if (!RELIQUARY_MARK_IDS.has(markId)) return false;
   if (meta.reliquary.marks.has(markId)) return false;
+  // Rank uses pre-add owned so this mark is the +1 that may cross a threshold.
+  const previousOwned = catalogRelicCompletion({
+    itemsDiscovered: meta.deedStats.itemsDiscovered,
+    marks: meta.reliquary.marks,
+  }).owned;
   meta.reliquary.marks.add(markId);
   pushRecent(meta.reliquary, markId);
-  emitReliquaryUnlock(ctx, meta, { markId });
+  const newOwned = previousOwned + 1;
+  const previousRank = curatorRankFromOwned(previousOwned);
+  const newRank = curatorRankFromOwned(newOwned);
+  const rankedUp = newRank > previousRank ? newRank : undefined;
+  emitReliquaryUnlock(ctx, meta, { markId, curatorRank: rankedUp });
+  if (rankedUp !== undefined) syncCuratorRankDeeds(ctx, meta);
   return true;
+}
+
+/**
+ * Join / load retro: copy existing visited gather_event:* (and any other
+ * catalog mark ids already on the deed visit ledger) into the sparse marks
+ * Set. Silent: no unlock toast, no recent push, no invented masterwork
+ * history (masterwork marks are live-only). Returns how many marks were added.
+ */
+export function syncReliquaryMarksFromVisited(meta: PlayerMeta): number {
+  let added = 0;
+  for (const mark of meta.deedStats.visited) {
+    if (!RELIQUARY_MARK_IDS.has(mark)) continue;
+    if (meta.reliquary.marks.has(mark)) continue;
+    meta.reliquary.marks.add(mark);
+    added++;
+  }
+  return added;
 }
 
 /**
@@ -241,7 +278,12 @@ function emitReliquaryUnlock(
   meta: PlayerMeta,
   ids: { itemId?: string; markId?: string; curatorRank?: number },
 ): void {
-  const pageIds = ids.itemId !== undefined ? RELIQUARY_ITEM_TO_PAGES.get(ids.itemId) : undefined;
+  const pageIds =
+    ids.itemId !== undefined
+      ? RELIQUARY_ITEM_TO_PAGES.get(ids.itemId)
+      : ids.markId !== undefined
+        ? RELIQUARY_MARK_TO_PAGES.get(ids.markId)
+        : undefined;
   let illuminatedPageId: string | undefined;
   if (pageIds && pageIds.length > 0) {
     const opts = {
@@ -364,6 +406,32 @@ export function catalogItemCompletion(
 }
 
 /**
+ * Catalog-wide unique relic progress for Curator rank and Overview totals:
+ * de-duped item relics plus de-duped authored mark relics. Mount / skin /
+ * title kinds stay out until Horizons (Phase 8) owns those ownership surfaces.
+ */
+export function catalogRelicCompletion(
+  opts: {
+    itemsDiscovered: OwnedIdLookup;
+    marks?: OwnedIdLookup;
+  },
+  pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
+): { owned: number; total: number } {
+  const items = catalogItemCompletion(opts.itemsDiscovered, pages);
+  const allMarks = new Set<string>();
+  let marksOwned = 0;
+  for (const page of pages) {
+    for (const relic of page.relics) {
+      if (relic.kind !== 'mark') continue;
+      if (allMarks.has(relic.markId)) continue;
+      allMarks.add(relic.markId);
+      if (opts.marks?.has(relic.markId) === true) marksOwned++;
+    }
+  }
+  return { owned: items.owned + marksOwned, total: items.total + allMarks.size };
+}
+
+/**
  * Pure Curator rank tiers: cosmetic-only. Rank from unique catalogued relic
  * fills (never kill count alone). Rewards are titles / borders / window seal
  * chrome; never combat stats, drop rate, pity, or actionable combat info.
@@ -426,7 +494,10 @@ export function syncCuratorRankDeeds(
   meta: PlayerMeta,
   opts?: { retro?: boolean },
 ): void {
-  const owned = catalogItemCompletion(meta.deedStats.itemsDiscovered).owned;
+  const owned = catalogRelicCompletion({
+    itemsDiscovered: meta.deedStats.itemsDiscovered,
+    marks: meta.reliquary.marks,
+  }).owned;
   const rank = curatorRankFromOwned(owned);
   if (rank <= 0) return;
   for (let i = 0; i < rank; i++) {
@@ -452,8 +523,10 @@ export function orderedReliquaryPages(
 // Re-export catalog lookup helpers so callers can import from one runtime module.
 export {
   isCataloguedRelicItem,
+  isCataloguedRelicMark,
   RELIQUARY_ITEM_TO_PAGES,
   RELIQUARY_MARK_IDS,
+  RELIQUARY_MARK_TO_PAGES,
   RELIQUARY_PAGE_ORDER,
   RELIQUARY_PAGES,
   RELIQUARY_PAGES_BY_ID,

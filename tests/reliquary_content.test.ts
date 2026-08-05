@@ -5,13 +5,19 @@
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
+import { CRAFT_RING } from '../src/sim/content/professions';
 import {
   isCataloguedRelicItem,
+  isCataloguedRelicMark,
   RELIQUARY_HEROIC_GEAR,
   RELIQUARY_ITEM_TO_PAGES,
+  RELIQUARY_MARK_IDS,
+  RELIQUARY_MARK_TO_PAGES,
   RELIQUARY_PAGE_ORDER,
   RELIQUARY_PAGES,
   RELIQUARY_PAGES_BY_ID,
+  RELIQUARY_PROFESSION_MARKS,
+  RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
   RELIQUARY_SET_MEMBERS,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
@@ -19,9 +25,15 @@ import { DELVES, DUNGEONS, ITEMS } from '../src/sim/data';
 import { DEED_STAT_KEYS } from '../src/sim/types';
 
 const CONQUEROR_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'conquerors');
+const PROFESSION_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'professions');
+const HORIZON_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'horizons');
 
 function itemRelicIds(page: ReliquaryPageDef): string[] {
   return page.relics.filter((r) => r.kind === 'item').map((r) => r.itemId);
+}
+
+function markRelicIds(page: ReliquaryPageDef): string[] {
+  return page.relics.filter((r) => r.kind === 'mark').map((r) => r.markId);
 }
 
 /** Mount reins are Horizons-owned; Conqueror heroic pages must not list them. */
@@ -30,11 +42,15 @@ function isMountReinsId(itemId: string): boolean {
 }
 
 describe('Reliquary Conqueror catalog structure', () => {
-  it('ships only conqueror pages in Phase 2 (no professions/horizons yet)', () => {
-    expect(RELIQUARY_PAGES.every((p) => p.shelf === 'conquerors')).toBe(true);
-    expect(CONQUEROR_PAGES.length).toBe(RELIQUARY_PAGES.length);
-    // Literal: update when product adds a Conqueror page.
-    expect(RELIQUARY_PAGES.length).toBe(22);
+  it('ships Conquerors + Professions (no Horizons pages yet)', () => {
+    expect(CONQUEROR_PAGES.length).toBe(22);
+    expect(PROFESSION_PAGES.length).toBe(3);
+    expect(HORIZON_PAGES.length).toBe(0);
+    // Literal: update when product adds a page.
+    expect(RELIQUARY_PAGES.length).toBe(25);
+    expect(
+      RELIQUARY_PAGES.every((p) => p.shelf === 'conquerors' || p.shelf === 'professions'),
+    ).toBe(true);
   });
 
   it('keeps page ids unique and PAGE_ORDER identical to table order', () => {
@@ -329,5 +345,81 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
     // Common delve greens stay off the unique grid.
     expect(litany).not.toContain('reliquary_plate_chest');
     expect(litany).not.toContain('siltguard_helm');
+  });
+});
+
+describe('Reliquary Professions shelf (Phase 7)', () => {
+  it('authors masterwork, field notes, and specimen pages (not empty stubs)', () => {
+    expect(PROFESSION_PAGES.map((p) => p.id).sort()).toEqual(
+      ['professions_field_notes', 'professions_masterwork', 'professions_specimens'].sort(),
+    );
+    for (const page of PROFESSION_PAGES) {
+      expect(page.relics.length).toBeGreaterThan(0);
+      expect(page.clearSource).toEqual({ kind: 'none' });
+    }
+  });
+
+  it('masterwork page lists first + gear-craft lifetime marks only', () => {
+    const page = RELIQUARY_PAGES_BY_ID.professions_masterwork;
+    // Literal pin (not self-comparison of the content export).
+    expect(markRelicIds(page)).toEqual([
+      'masterwork:first',
+      'masterwork:weaponcrafting',
+      'masterwork:armorcrafting',
+      'masterwork:tailoring',
+      'masterwork:leatherworking',
+      'masterwork:engineering',
+    ]);
+    expect(RELIQUARY_PROFESSION_MARKS.masterworkFirst).toBe('masterwork:first');
+    // Craft suffixes must match live CRAFT_RING ids (call site uses professionId).
+    const craftIds = new Set(CRAFT_RING.map((c) => c.id));
+    for (const markId of RELIQUARY_PROFESSION_MARKS.masterworkByCraft) {
+      const craftId = markId.slice('masterwork:'.length);
+      expect(craftIds.has(craftId), markId).toBe(true);
+    }
+  });
+
+  it('field notes reuse visited gather_event:* namespaces', () => {
+    const page = RELIQUARY_PAGES_BY_ID.professions_field_notes;
+    // Literal pin matches deed visit marks (col_pristine_vein etc.).
+    expect(markRelicIds(page)).toEqual([
+      'gather_event:pristine_vein',
+      'gather_event:ancient_heartwood',
+      'gather_event:moonlit_bloom',
+      'gather_event:perfect_specimen',
+    ]);
+    expect([...RELIQUARY_PROFESSION_MARKS.fieldNotes]).toEqual(markRelicIds(page));
+  });
+
+  it('specimen page item ids all exist in ITEMS and match the curated export', () => {
+    const page = RELIQUARY_PAGES_BY_ID.professions_specimens;
+    // Literal pin (not only self-comparison of the content export).
+    expect(itemRelicIds(page)).toEqual([
+      'pristine_hide',
+      'pristine_silk',
+      'pristine_venom_gland',
+      'prime_cut',
+      'fine_thorium_ore',
+      'fine_elderwood_log',
+      'fine_sunpetal_herb',
+    ]);
+    expect([...RELIQUARY_PROFESSION_SPECIMEN_ITEMS]).toEqual(itemRelicIds(page));
+    for (const id of itemRelicIds(page)) {
+      expect(ITEMS[id], id).toBeDefined();
+      expect(isCataloguedRelicItem(id)).toBe(true);
+    }
+  });
+
+  it('RELIQUARY_MARK_IDS is derived from pages and indexes mark pages', () => {
+    expect(RELIQUARY_MARK_IDS.size).toBeGreaterThan(0);
+    for (const markId of RELIQUARY_MARK_IDS) {
+      expect(isCataloguedRelicMark(markId)).toBe(true);
+      expect(RELIQUARY_MARK_TO_PAGES.get(markId)?.length).toBeGreaterThan(0);
+    }
+    // Unknown ids never land in the allowlist.
+    expect(isCataloguedRelicMark('not_a_mark')).toBe(false);
+    expect(isCataloguedRelicMark('masterwork:cooking')).toBe(false);
+    expect(RELIQUARY_MARK_IDS.has('gather_event:pristine_vein')).toBe(true);
+    expect(RELIQUARY_MARK_IDS.has('masterwork:first')).toBe(true);
   });
 });

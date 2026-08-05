@@ -6,6 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { RELIQUARY_MARK_IDS } from '../src/sim/content/reliquary';
 
 const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8');
 
@@ -187,6 +188,19 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain("curatorRankName5: 'Eternal Curator'");
     expect(chrome).toContain("rankUpBanner: 'Curator rank {rank}: {name}'");
     expect(chrome).toContain("rankUpToast: 'Curator rank {rank} reached: {name}'");
+    // Phase 7 profession mark find labels.
+    expect(chrome).toContain('markFind: {');
+    expect(chrome).toContain("masterwork_first: 'First Masterwork'");
+    expect(chrome).toContain("gather_event_pristine_vein: 'Pristine Vein'");
+  });
+
+  it('authors a markFind leaf for every catalogued Reliquary mark id', () => {
+    // Dynamic t() keys use as TranslationKey; this pin fails if catalog grows
+    // without a matching hudChrome.reliquary.markFind leaf.
+    for (const markId of RELIQUARY_MARK_IDS) {
+      const leaf = markId.replace(/:/g, '_');
+      expect(chrome, markId).toContain(`${leaf}:`);
+    }
   });
 
   it('wires reliquaryUnlock presentation through the pure plan (no membership invent)', () => {
@@ -209,6 +223,8 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toContain("t('hudChrome.reliquary.illuminateBanner'");
     expect(handler).toContain("t('hudChrome.reliquary.illuminateToast'");
     expect(handler).toContain("t('hudChrome.reliquary.rankUpBanner'");
+    // Phase 7: mark unlocks resolve display names via markFind keys.
+    expect(handler).toContain('reliquaryMarkFindKey');
     expect(handler).toContain("t('hudChrome.reliquary.rankUpToast'");
     expect(handler).toContain("banner.kind === 'rankUp'");
     // Shared key table (window export) so toast/banner cannot desync from Overview.

@@ -15,18 +15,21 @@ import {
   CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
   catalogItemCompletion,
+  catalogRelicCompletion,
   clearCountForSource,
   curatorRankFromOwned,
   curatorSealIdForRank,
   freshReliquaryState,
   isReliquaryStateEmpty,
   noteRelicItemFind,
+  noteReliquaryMark,
   onItemDiscovered,
   pageCompletion,
   RELIQUARY_RECENT_CAP,
   restoreReliquaryState,
   serializeReliquaryState,
   syncCuratorRankDeeds,
+  syncReliquaryMarksFromVisited,
 } from '../src/sim/reliquary';
 import { type CharacterState, Sim } from '../src/sim/sim';
 
@@ -215,6 +218,131 @@ describe('Reliquary serialize / restore round-trip', () => {
     expect(m2.reliquary.firstFind.not_a_real_relic).toBeUndefined();
     expect(m2.reliquary.marks.size).toBe(0);
     expect(m2.reliquary.recent).toEqual([CATALOGUE_RELIC]);
+  });
+});
+
+describe('Reliquary profession marks (Phase 7)', () => {
+  const FIELD_NOTE = 'gather_event:pristine_vein';
+  const MASTERWORK_FIRST = 'masterwork:first';
+
+  it('noteReliquaryMark grants catalog marks sparsely and ignores unknown ids', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    expect(noteReliquaryMark(sim.ctx, meta, 'not_an_authored_mark')).toBe(false);
+    expect(meta.reliquary.marks.size).toBe(0);
+
+    expect(noteReliquaryMark(sim.ctx, meta, FIELD_NOTE)).toBe(true);
+    expect(meta.reliquary.marks.has(FIELD_NOTE)).toBe(true);
+    expect(meta.reliquary.recent.at(-1)).toBe(FIELD_NOTE);
+    // Second grant is a no-op (idempotent).
+    expect(noteReliquaryMark(sim.ctx, meta, FIELD_NOTE)).toBe(false);
+    expect(meta.reliquary.marks.size).toBe(1);
+
+    const events = sim.drainEvents().filter((e) => e.type === 'reliquaryUnlock');
+    expect(events.some((e) => e.type === 'reliquaryUnlock' && e.markId === FIELD_NOTE)).toBe(true);
+    const unlock = events.find((e) => e.type === 'reliquaryUnlock' && e.markId === FIELD_NOTE);
+    expect(unlock && 'pageIds' in unlock && unlock.pageIds).toContain('professions_field_notes');
+  });
+
+  it('serialize marks sparse + omit-empty; restore drops unknown mark ids', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    noteReliquaryMark(sim.ctx, meta, FIELD_NOTE);
+    const state = sim.serializeCharacter(sim.playerId)!;
+    expect(state.reliquary?.marks).toEqual([FIELD_NOTE]);
+    // Pure mark fill must not invent firstFind noise.
+    expect(state.reliquary?.firstFind).toBeUndefined();
+
+    const dirty: CharacterState = {
+      ...state,
+      reliquary: {
+        marks: [FIELD_NOTE, 'not_an_authored_mark', 'masterwork:cooking'],
+        recent: [FIELD_NOTE, 'not_an_authored_mark'],
+      },
+    };
+    const sim2 = makeSim();
+    const pid = sim2.addPlayer('warrior', 'Reload', { state: dirty });
+    const m2 = sim2.players.get(pid)!;
+    expect([...m2.reliquary.marks]).toEqual([FIELD_NOTE]);
+    expect(m2.reliquary.recent).toEqual([FIELD_NOTE]);
+  });
+
+  it('syncReliquaryMarksFromVisited retro-fills field notes only (no masterwork invent)', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.deedStats.visited.add(FIELD_NOTE);
+    meta.deedStats.visited.add('gather_event:moonlit_bloom');
+    meta.deedStats.visited.add('gather:eastbrook:ore'); // not a Reliquary mark
+    // Visited alone does not invent masterwork lifetime history.
+    const added = syncReliquaryMarksFromVisited(meta);
+    expect(added).toBe(2);
+    expect(meta.reliquary.marks.has(FIELD_NOTE)).toBe(true);
+    expect(meta.reliquary.marks.has('gather_event:moonlit_bloom')).toBe(true);
+    expect(meta.reliquary.marks.has(MASTERWORK_FIRST)).toBe(false);
+    expect(meta.reliquary.recent).toEqual([]); // silent retro, no recent push
+    // Idempotent.
+    expect(syncReliquaryMarksFromVisited(meta)).toBe(0);
+  });
+
+  it('pageCompletion counts mark ownership for profession pages', () => {
+    const page = RELIQUARY_PAGES.find((p) => p.id === 'professions_field_notes')!;
+    expect(page).toBeDefined();
+    const empty = pageCompletion(page, {
+      itemsDiscovered: new Set(),
+      marks: new Set(),
+    });
+    expect(empty.owned).toBe(0);
+    expect(empty.complete).toBe(false);
+    const marks = new Set(page.relics.filter((r) => r.kind === 'mark').map((r) => r.markId));
+    const full = pageCompletion(page, { itemsDiscovered: new Set(), marks });
+    expect(full.owned).toBe(full.total);
+    expect(full.complete).toBe(true);
+  });
+
+  it('catalogRelicCompletion includes marks in overview totals', () => {
+    const itemsOnly = catalogItemCompletion(new Set());
+    const withMarks = catalogRelicCompletion({
+      itemsDiscovered: new Set(),
+      marks: new Set([FIELD_NOTE]),
+    });
+    expect(withMarks.total).toBeGreaterThan(itemsOnly.total);
+    expect(withMarks.owned).toBe(1);
+  });
+
+  it('join retroFallbackGrants wires silent mark sync before curator rank', () => {
+    const deedsSrc = fs.readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8');
+    const retroArm = deedsSrc.slice(deedsSrc.indexOf('export function retroFallbackGrants'));
+    expect(retroArm).toContain('syncReliquaryMarksFromVisited');
+    expect(retroArm).toContain('syncCuratorRankDeeds');
+    // Mark sync must run before rank deeds so field-note fills can rank up.
+    expect(retroArm.indexOf('syncReliquaryMarksFromVisited')).toBeLessThan(
+      retroArm.indexOf('syncCuratorRankDeeds'),
+    );
+  });
+
+  it('craft and gather call sites note catalog marks only (source pins)', () => {
+    const craftSrc = fs.readFileSync(
+      path.join(__dirname, '../src/sim/professions/crafting.ts'),
+      'utf8',
+    );
+    expect(craftSrc).toContain('noteReliquaryMark');
+    expect(craftSrc).toContain('masterwork:first');
+    expect(craftSrc).toContain('masterwork:${craftId}');
+
+    const gatherSrc = fs.readFileSync(
+      path.join(__dirname, '../src/sim/professions/gather_events.ts'),
+      'utf8',
+    );
+    expect(gatherSrc).toContain('noteReliquaryMark');
+    expect(gatherSrc).toContain('gather_event:');
+
+    const interactionSrc = fs.readFileSync(
+      path.join(__dirname, '../src/sim/interaction.ts'),
+      'utf8',
+    );
+    expect(interactionSrc).toContain(
+      "noteReliquaryMark(ctx, meta, 'gather_event:perfect_specimen')",
+    );
   });
 });
 

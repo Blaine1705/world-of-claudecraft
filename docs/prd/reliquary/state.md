@@ -26,14 +26,13 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 6 QA complete (Curator ranks, cosmetics, zero-Renown
-  deed bridges verified).
+- **Current phase:** Phase 7 implementation complete (Professions shelf).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 7 (Professions shelf). Do **not** skip
-  the release pull.
+  `origin/release/v0.35.0`, then Phase 7 QA. Do **not** skip the release pull.
+  Do **not** start Phase 8 until Phase 7 QA is green.
 - **Blocker:** none.
-- **Release tip after Phase 6 QA pull:** `origin/release/v0.35.0` @
-  `0d2d5d1833` (tool-charm tooltips merge; pending.ts resolved via i18n:gen).
+- **Release tip after Phase 7 pull:** `origin/release/v0.35.0` @
+  `401bfdaccc` (bank instance marks; feature merge `17e0e87c0f`).
 
 ## Locked design decisions
 
@@ -98,7 +97,13 @@ session load:
 
 | Symbol | Path | Status |
 |---|---|---|
-| `RELIQUARY_PAGES` / shelves | `src/sim/content/reliquary.ts` | **landed** (22 Conqueror pages) |
+| `RELIQUARY_PAGES` / shelves | `src/sim/content/reliquary.ts` | **landed** (22 Conqueror + 3 Profession pages) |
+| Profession mark constants | `src/sim/content/reliquary.ts` | **landed** (`RELIQUARY_PROFESSION_MARKS`, specimens) |
+| `RELIQUARY_MARK_TO_PAGES` | `src/sim/content/reliquary.ts` | **landed** (Phase 7) |
+| `noteReliquaryMark` / `syncReliquaryMarksFromVisited` | `src/sim/reliquary.ts` | **landed** (Phase 7) |
+| `catalogRelicCompletion` | `src/sim/reliquary.ts` | **landed** (items + marks for rank/Overview) |
+| Craft/gather mark call sites | `crafting.ts` / `gather_events.ts` / `interaction.ts` | **landed** (thin post-success) |
+| Mark find i18n | `hudChrome.reliquary.markFind.*` | **landed** (English + M16 non-Latin) |
 | `RELIQUARY_HEROIC_GEAR` / `RELIQUARY_SET_MEMBERS` | `src/sim/content/reliquary.ts` | **landed** (pin targets) |
 | `ReliquaryClearSource` deed_stat | `src/sim/content/reliquary.ts` | **landed** (Thunzharr) |
 | `ReliquaryState` / `SavedReliquaryState` | `src/sim/reliquary.ts` | **landed** |
@@ -146,6 +151,8 @@ session load:
 - [x] Wire event id-only; sparse blob dirty-gated (Phase 3)
 - [x] Cold window: signature latch; no per-frame full rebuild (Phase 4)
 - [x] Open-window grid live: ownershipDigest + clearsDigest in refresh sig (Phase 5)
+- [x] Profession marks catalog-capped; sparse serialize; no per-drop save (Phase 7)
+- [x] Field-note retro from visited only; no invented masterwork craft history (Phase 7)
 
 ## Gotchas
 

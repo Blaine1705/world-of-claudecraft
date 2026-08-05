@@ -3015,7 +3015,19 @@ export const ru_RU: EnTranslations = {
       "firstFindClears": "Впервые найдено на прохождении {count}",
       "unlockToast": "Реликвия каталогизирована: {name}",
       "illuminateBanner": "Страница озарена: {name}",
-      "illuminateToast": "Все реликвии на странице {name} заполнены."
+      "illuminateToast": "Все реликвии на странице {name} заполнены.",
+      "markFind": {
+        "masterwork_first": "Первый шедевр",
+        "masterwork_weaponcrafting": "Шедевр оружейного дела",
+        "masterwork_armorcrafting": "Шедевр доспешного дела",
+        "masterwork_tailoring": "Шедевр портняжного дела",
+        "masterwork_leatherworking": "Шедевр кожевничества",
+        "masterwork_engineering": "Шедевр инженерии",
+        "gather_event_pristine_vein": "Нетронутая жила",
+        "gather_event_ancient_heartwood": "Древняя сердцевина",
+        "gather_event_moonlit_bloom": "Лунный цвет",
+        "gather_event_perfect_specimen": "Идеальный образец"
+      }
     },
     "deeds": {
       "title": "Книга деяний",

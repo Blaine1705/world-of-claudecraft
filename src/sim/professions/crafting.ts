@@ -72,6 +72,7 @@ import { bagCapacity, countStacked, fitsAll, removeStacked } from '../bags';
 import { CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
+import { noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../types';
@@ -862,6 +863,11 @@ export function craftItem(
     // counter simply earns it on the next proc.
     if (result.masterwork) {
       ctx.bumpDeedStat(r.meta, 'masterworksCrafted', 1);
+      // Reliquary lifetime trophies (catalog ids only; cosmetic prestige).
+      // No skill power, no invented retro history for veterans.
+      noteReliquaryMark(ctx, r.meta, 'masterwork:first');
+      const craftId = recipeById(recipeId)?.professionId;
+      if (craftId) noteReliquaryMark(ctx, r.meta, `masterwork:${craftId}`);
     }
     // The dirty mark also covers the craft-skill gain the resolve applied.
     ctx.markDeedsDirty(r.meta.entityId);

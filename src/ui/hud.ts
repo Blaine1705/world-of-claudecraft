@@ -550,7 +550,11 @@ import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
-import { buildReliquaryUnlockPlan, type ReliquaryUnlockEventModel } from './reliquary_view';
+import {
+  buildReliquaryUnlockPlan,
+  type ReliquaryUnlockEventModel,
+  reliquaryMarkFindKey,
+} from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
@@ -12573,9 +12577,11 @@ export class Hud {
       const name =
         log.kind === 'item' && ITEMS[log.id]
           ? itemDisplayName(ITEMS[log.id])
-          : log.id.includes(':')
-            ? log.id.slice(log.id.lastIndexOf(':') + 1).replace(/_/g, ' ')
-            : log.id.replace(/_/g, ' ');
+          : log.kind === 'mark'
+            ? t(reliquaryMarkFindKey(log.id) as TranslationKey)
+            : log.id.includes(':')
+              ? log.id.slice(log.id.lastIndexOf(':') + 1).replace(/_/g, ' ')
+              : log.id.replace(/_/g, ' ');
       this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
     }
     // Durable Illumination log survives even when rank-up claims the banner slot.
@@ -12610,7 +12616,9 @@ export class Hud {
         const name =
           relic.kind === 'item' && ITEMS[relic.id]
             ? itemDisplayName(ITEMS[relic.id])
-            : relic.id.replace(/_/g, ' ');
+            : relic.kind === 'mark'
+              ? t(reliquaryMarkFindKey(relic.id) as TranslationKey)
+              : relic.id.replace(/_/g, ' ');
         bannerText = t('hudChrome.reliquary.unlockToast', { name });
       }
       this.showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion);

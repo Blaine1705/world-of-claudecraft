@@ -3015,7 +3015,19 @@ export const ja_JP: EnTranslations = {
       "firstFindClears": "初回入手：クリア {count} 回目",
       "unlockToast": "聖遺物を収蔵：{name}",
       "illuminateBanner": "ページが照耀されました：{name}",
-      "illuminateToast": "{name} の聖遺物がすべて埋まりました。"
+      "illuminateToast": "{name} の聖遺物がすべて埋まりました。",
+      "markFind": {
+        "masterwork_first": "初めての名作",
+        "masterwork_weaponcrafting": "武器製作の名作",
+        "masterwork_armorcrafting": "防具製作の名作",
+        "masterwork_tailoring": "裁縫の名作",
+        "masterwork_leatherworking": "皮革細工の名作",
+        "masterwork_engineering": "工学の名作",
+        "gather_event_pristine_vein": "無垢の鉱脈",
+        "gather_event_ancient_heartwood": "古代の心材",
+        "gather_event_moonlit_bloom": "月明かりの花",
+        "gather_event_perfect_specimen": "完璧な標本"
+      }
     },
     "deeds": {
       "title": "功績の書",

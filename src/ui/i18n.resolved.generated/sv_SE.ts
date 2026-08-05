@@ -3015,7 +3015,19 @@ export const sv_SE: EnTranslations = {
       "firstFindClears": "First found on clear {count}",
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
-      "illuminateToast": "Every relic on {name} is filled."
+      "illuminateToast": "Every relic on {name} is filled.",
+      "markFind": {
+        "masterwork_first": "First Masterwork",
+        "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
+        "masterwork_armorcrafting": "Armorcrafting Masterwork",
+        "masterwork_tailoring": "Tailoring Masterwork",
+        "masterwork_leatherworking": "Leatherworking Masterwork",
+        "masterwork_engineering": "Engineering Masterwork",
+        "gather_event_pristine_vein": "Pristine Vein",
+        "gather_event_ancient_heartwood": "Ancient Heartwood",
+        "gather_event_moonlit_bloom": "Moonlit Bloom",
+        "gather_event_perfect_specimen": "Perfect Specimen"
+      }
     },
     "deeds": {
       "title": "Bedrifternas bok",

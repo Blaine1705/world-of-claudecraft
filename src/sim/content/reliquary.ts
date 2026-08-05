@@ -5,8 +5,9 @@
 //
 // Page table is append-only once product pages ship: append new pages at the
 // END and never reorder or remove an id (ids may be referenced by firstFind
-// diagnostics and content pin tests). Phase 2 authors the full Conquerors
-// shelf against live loot / set tables; Professions and Horizons follow later.
+// diagnostics and content pin tests). Phase 2 authors Conquerors; Phase 7
+// appends Professions (masterwork marks, rare field notes, key specimens).
+// Horizons remain later (Phase 8).
 //
 // Curation rule (performance + product): every relic is hand-listed. Do not
 // auto-scrape every loot row. Prefer rare+ chase uniques, signature dungeon
@@ -55,6 +56,44 @@ export interface ReliquaryPageDef {
 function items(...ids: readonly string[]): ReliquaryRelicDef[] {
   return ids.map((itemId) => ({ kind: 'item' as const, itemId }));
 }
+
+function marks(...ids: readonly string[]): ReliquaryRelicDef[] {
+  return ids.map((markId) => ({ kind: 'mark' as const, markId }));
+}
+
+// Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
+// for rare field notes (`gather_event:*`). Masterwork marks are live-only
+// (no invented craft history on join).
+export const RELIQUARY_PROFESSION_MARKS = {
+  /** First lifetime masterwork proc (any craft). */
+  masterworkFirst: 'masterwork:first',
+  /** First masterwork per gear-capable craft on the ring. */
+  masterworkByCraft: [
+    'masterwork:weaponcrafting',
+    'masterwork:armorcrafting',
+    'masterwork:tailoring',
+    'masterwork:leatherworking',
+    'masterwork:engineering',
+  ],
+  /** Rare gather / corpse specimen visit marks already written by professions. */
+  fieldNotes: [
+    'gather_event:pristine_vein',
+    'gather_event:ancient_heartwood',
+    'gather_event:moonlit_bloom',
+    'gather_event:perfect_specimen',
+  ],
+} as const;
+
+/** Apex fine-grade materials (key signed-field trophies via itemsDiscovered). */
+export const RELIQUARY_PROFESSION_SPECIMEN_ITEMS = [
+  'pristine_hide',
+  'pristine_silk',
+  'pristine_venom_gland',
+  'prime_cut',
+  'fine_thorium_ore',
+  'fine_elderwood_log',
+  'fine_sunpetal_herb',
+] as const;
 
 // Epic set members, pinned to the same id lists as col_set_* deeds in
 // content/deeds.ts so collection pages and Reliquary set pages stay aligned.
@@ -436,6 +475,35 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     clearSource: { kind: 'none' },
     relics: items(...RELIQUARY_SET_MEMBERS.stormcallers),
   },
+
+  // ---- Professions shelf (Phase 7): lifetime prestige, not every craft ----
+  {
+    id: 'professions_masterwork',
+    shelf: 'professions',
+    name: 'Masterwork Gallery',
+    desc: 'Lifetime trophies for first masterworks. Empty until the next proc if a veteran predates the gallery (no invented craft history).',
+    clearSource: { kind: 'none' },
+    relics: marks(
+      RELIQUARY_PROFESSION_MARKS.masterworkFirst,
+      ...RELIQUARY_PROFESSION_MARKS.masterworkByCraft,
+    ),
+  },
+  {
+    id: 'professions_field_notes',
+    shelf: 'professions',
+    name: 'Rare Field Notes',
+    desc: 'Signature rare finds from the wild: veins, heartwood, moonlit blooms, and perfect specimens.',
+    clearSource: { kind: 'none' },
+    relics: marks(...RELIQUARY_PROFESSION_MARKS.fieldNotes),
+  },
+  {
+    id: 'professions_specimens',
+    shelf: 'professions',
+    name: 'Key Specimens',
+    desc: 'Pristine corpse specimens and apex fine-grade field materials that stock a crafter museum.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_PROFESSION_SPECIMEN_ITEMS),
+  },
 ];
 
 /** Append-only page order (table order). */
@@ -471,6 +539,25 @@ export const RELIQUARY_MARK_IDS: ReadonlySet<string> = (() => {
   return set;
 })();
 
+/** Mark id -> page ids that list it (multi-page fill is intentional). */
+export const RELIQUARY_MARK_TO_PAGES: ReadonlyMap<string, readonly string[]> = (() => {
+  const map = new Map<string, string[]>();
+  for (const page of RELIQUARY_PAGES) {
+    for (const relic of page.relics) {
+      if (relic.kind !== 'mark') continue;
+      const list = map.get(relic.markId);
+      if (list) list.push(page.id);
+      else map.set(relic.markId, [page.id]);
+    }
+  }
+  return map;
+})();
+
 export function isCataloguedRelicItem(itemId: string): boolean {
   return RELIQUARY_ITEM_TO_PAGES.has(itemId);
+}
+
+/** True when markId is an authored Reliquary trophy mark. */
+export function isCataloguedRelicMark(markId: string): boolean {
+  return RELIQUARY_MARK_IDS.has(markId);
 }

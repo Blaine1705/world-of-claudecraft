@@ -31,7 +31,11 @@ import { pointsSpent } from './content/talents';
 import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
-import { onItemDiscovered as onReliquaryItemDiscovered, syncCuratorRankDeeds } from './reliquary';
+import {
+  onItemDiscovered as onReliquaryItemDiscovered,
+  syncCuratorRankDeeds,
+  syncReliquaryMarksFromVisited,
+} from './reliquary';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -1152,6 +1156,9 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // Veterans who crossed Curator rank thresholds before the rank deed bridges
   // shipped get cosmetic titles/borders on join (zero Renown; grantDeed is
   // idempotent). Live rank-ups still grant from onItemDiscovered.
+  // Profession field-note marks reuse visited gather_event:*; silent retro
+  // only (no unlock toast, no invented masterwork craft history).
+  syncReliquaryMarksFromVisited(meta);
   syncCuratorRankDeeds(ctx, meta, { retro: true });
 }
 

@@ -3015,7 +3015,19 @@ export const ko_KR: EnTranslations = {
       "firstFindClears": "첫 획득: 클리어 {count}회차",
       "unlockToast": "성물 수록: {name}",
       "illuminateBanner": "페이지 조명됨: {name}",
-      "illuminateToast": "{name}의 모든 성물이 채워졌습니다."
+      "illuminateToast": "{name}의 모든 성물이 채워졌습니다.",
+      "markFind": {
+        "masterwork_first": "첫 명작",
+        "masterwork_weaponcrafting": "무기제작 명작",
+        "masterwork_armorcrafting": "방어구제작 명작",
+        "masterwork_tailoring": "재봉 명작",
+        "masterwork_leatherworking": "가죽세공 명작",
+        "masterwork_engineering": "공학 명작",
+        "gather_event_pristine_vein": "완벽한 광맥",
+        "gather_event_ancient_heartwood": "고대 심재",
+        "gather_event_moonlit_bloom": "달빛 꽃",
+        "gather_event_perfect_specimen": "완벽한 표본"
+      }
     },
     "deeds": {
       "title": "업적의 서",

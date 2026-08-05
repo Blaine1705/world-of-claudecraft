@@ -3756,6 +3756,20 @@ export const hudChromeStrings = {
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
     illuminateToast: 'Every relic on {name} is filled.',
+    // Phase 7: profession mark find labels (player-visible chrome; catalog page
+    // names may stay English content until a later re-localize pass).
+    markFind: {
+      masterwork_first: 'First Masterwork',
+      masterwork_weaponcrafting: 'Weaponcrafting Masterwork',
+      masterwork_armorcrafting: 'Armorcrafting Masterwork',
+      masterwork_tailoring: 'Tailoring Masterwork',
+      masterwork_leatherworking: 'Leatherworking Masterwork',
+      masterwork_engineering: 'Engineering Masterwork',
+      gather_event_pristine_vein: 'Pristine Vein',
+      gather_event_ancient_heartwood: 'Ancient Heartwood',
+      gather_event_moonlit_bloom: 'Moonlit Bloom',
+      gather_event_perfect_specimen: 'Perfect Specimen',
+    },
   },
   deeds: {
     title: 'Book of Deeds',

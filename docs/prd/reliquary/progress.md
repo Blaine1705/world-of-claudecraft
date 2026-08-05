@@ -20,7 +20,7 @@
 | 5 QA | **done** | exit criteria verified; pin holes closed; release @ 413de574cf |
 | 6 Curator ranks + cosmetics | **done** | pure ranks, seals, rank-up celebration, zero-Renown deed bridges |
 | 6 QA | **done** | exit criteria verified; same-event Illumination + pin holes closed; release @ 0d2d5d1833 |
-| 7 Professions shelf | pending | same worktree + pull |
+| 7 Professions shelf | **done** | authored pages, lifetime marks, thin craft/gather call sites, UI |
 | 7 QA | pending | same worktree + pull |
 | 8 Horizons shelf | pending | same worktree + pull |
 | 8 QA | pending | same worktree + pull |
@@ -281,6 +281,39 @@
   Latin overlays pending (PR-tier OK); mobile/browser E2E of seal chrome
   and reduced-motion not exercised live.
 
+- Phase 7: merged `origin/release/v0.35.0` (bank instance marks) to tip
+  `401bfdaccc` (feature merge commit `17e0e87c0f`). Green:
+  - `npx vitest run tests/reliquary_content.test.ts tests/reliquary_state.test.ts tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/architecture.test.ts tests/reliquary_wire.test.ts tests/gather_rare_events.test.ts` (**190 passed**)
+  - `npm run i18n:gen`
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  - biome on changed hand-authored TS files
+  Landed:
+  - 3 Professions pages (append-only): `professions_masterwork`,
+    `professions_field_notes`, `professions_specimens` (25 total pages)
+  - Masterwork marks: `masterwork:first` + five gear crafts (weaponcrafting,
+    armorcrafting, tailoring, leatherworking, engineering); live craft only
+    (no invented retro craft history)
+  - Field notes: reuse `gather_event:pristine_vein|ancient_heartwood|moonlit_bloom|perfect_specimen`
+  - Specimens: pristine corpse items + apex fine grades (item ownership via
+    `itemsDiscovered`)
+  - `noteReliquaryMark` + `syncReliquaryMarksFromVisited` (join silent retro
+    of visited field notes only); `RELIQUARY_MARK_TO_PAGES` for Illumination
+  - `catalogRelicCompletion` (items + marks) for Overview totals and Curator rank
+  - Thin call sites: craft masterwork, gather rare announce, perfect specimen land
+  - UI: markFind `t()` labels; epic/rare mark silhouettes; shelf progress
+  - English chrome + M16 non-Latin for all markFind leaves
+  Decisions: masterwork retro empty until next craft; field notes dual-write
+  visited + marks Set; cooking/alchemy/etc. not catalogued for masterwork;
+  page names still catalog English (deferred with Conquerors).
+  Reviews: architecture 0 BLOCKING (SHOULD-FIX CRAFT_RING + call-site pins
+  addressed); frontend 0 BLOCKING (SHOULD-FIX markFind completeness + mark
+  grid pins addressed); test-coverage BLOCKING gather fakeCtx + literal pins
+  fixed; database-performance **PASS**.
+  Manual craft/gather smoke not run (static + unit pins only).
+  Residual risks: no behavioral masterwork integration test beyond source pin
+  (gather e2e pins marks); page-name content i18n deferred; Horizons still stub.
+
 ## Surprises / decisions during implementation
 
 - Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
@@ -296,6 +329,12 @@
 - Phase 4: launcher uses `data-icon="crown"` (SVG glyph; no painted chrome webp yet).
 - Phase 4: page grids intentionally stub lists with live progress + clears;
   full silhouette grid is Phase 5.
+- Phase 7: field-note mark ids are the same strings as deed `visited` marks
+  (`gather_event:*`); ownership for Reliquary grids is the sparse `marks` Set
+  (joined from visited on retro, dual-written on live rare finds).
+- Phase 7: Curator rank / Overview totals now use `catalogRelicCompletion`
+  (unique items + unique authored marks); prior Phase 6 item-only rank math
+  is replaced so profession prestige can rank up.
 - Phase 5: missing cells paint the item icon under a silhouette filter (quality
   border retained) so the grid reads as a museum silhouette, not an empty slot.
 - Phase 5: owned item tooltips reuse full `itemTooltip` (catalog stats) and

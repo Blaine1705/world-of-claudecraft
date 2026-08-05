@@ -12,6 +12,7 @@ import {
   RELIQUARY_NAV,
   RELIQUARY_NEARLY_MAX,
   type ReliquaryViewInput,
+  reliquaryMarkFindKey,
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
@@ -85,6 +86,17 @@ function input(partial: Partial<ReliquaryViewInput> = {}): ReliquaryViewInput {
   };
 }
 
+describe('reliquaryMarkFindKey', () => {
+  it('maps colon namespaces to hudChrome.reliquary.markFind leaves', () => {
+    expect(reliquaryMarkFindKey('gather_event:pristine_vein')).toBe(
+      'hudChrome.reliquary.markFind.gather_event_pristine_vein',
+    );
+    expect(reliquaryMarkFindKey('masterwork:first')).toBe(
+      'hudChrome.reliquary.markFind.masterwork_first',
+    );
+  });
+});
+
 describe('RELIQUARY_NAV', () => {
   it('is overview plus the three catalog shelves in fixed order', () => {
     expect(RELIQUARY_NAV).toEqual(['overview', 'conquerors', 'professions', 'horizons']);
@@ -106,7 +118,8 @@ describe('buildReliquaryView empty state', () => {
     const model = buildReliquaryView(input());
     expect(model.progress).toEqual({
       owned: 0,
-      total: 9, // unique item relics across conqueror pages (marks/mounts excluded from catalog count)
+      // Unique item relics (9) + authored mark relics (1); mounts wait for Horizons.
+      total: 10,
       fraction: 0,
       curatorRank: 0,
       curatorSealId: null,
@@ -147,8 +160,9 @@ describe('buildReliquaryView progress and rank', () => {
       input({ itemsDiscovered: ownedSet('crypt_helm', 'crypt_blade', 'dl_chest') }),
     );
     expect(model.progress.owned).toBe(3);
-    expect(model.progress.total).toBe(9);
-    expect(model.progress.fraction).toBeCloseTo(3 / 9, 5);
+    // 9 unique items + 1 authored mark slot (unowned) on the synthetic catalog.
+    expect(model.progress.total).toBe(10);
+    expect(model.progress.fraction).toBeCloseTo(3 / 10, 5);
     // Rank thresholds: 1, 10, 25, 50, 100. Owned 3 => rank 1 (apprentice seal).
     expect(model.progress.curatorRank).toBe(1);
     expect(model.progress.curatorSealId).toBe('apprentice');
@@ -166,16 +180,17 @@ describe('buildReliquaryView progress and rank', () => {
     expect(model.recent).toEqual([{ id: 'crypt_helm', kind: 'item' }]);
   });
 
-  it('does not invent catalog progress from marks alone', () => {
-    // Marks may feed shelf progress later; catalog owned/total stays item-only.
+  it('counts authored marks in catalog progress and profession shelf totals', () => {
+    // Phase 7: marks are unique catalogued relics (cosmetic prestige only).
     const model = buildReliquaryView(
       input({
         itemsDiscovered: ownedSet(),
         marks: ownedSet('mw_a'),
       }),
     );
-    expect(model.progress.owned).toBe(0);
-    expect(model.progress.total).toBe(9);
+    expect(model.progress.owned).toBe(1);
+    expect(model.progress.total).toBe(10);
+    expect(model.progress.curatorRank).toBe(1);
     const prof = buildReliquaryView(
       input({
         nav: 'professions',
@@ -395,7 +410,7 @@ describe('buildReliquaryView shelf and page', () => {
     expect(model.activePage).toBeNull();
   });
 
-  it('professions and horizons shelves list their stub pages', () => {
+  it('professions and horizons shelves list their pages from the injected catalog', () => {
     const prof = buildReliquaryView(input({ nav: 'professions' }));
     expect(prof.shelfPages.map((p) => p.pageId)).toEqual(['prof_stub']);
     const horiz = buildReliquaryView(input({ nav: 'horizons' }));
@@ -416,6 +431,25 @@ describe('buildReliquaryView shelf and page', () => {
 });
 
 describe('page grid cells', () => {
+  it('lists mark cells owned vs missing without inventing firstFind clears', () => {
+    const page = TEST_PAGES.find((p) => p.id === 'prof_stub')!;
+    const cells = buildReliquaryPageCells(page, {
+      itemsDiscovered: ownedSet(),
+      marks: ownedSet('mw_a'),
+      firstFind: { mw_a: { clears: 99 } }, // spoof: marks never take firstFind
+    });
+    expect(cells).toHaveLength(1);
+    expect(cells[0]).toMatchObject({ id: 'mw_a', kind: 'mark', owned: true });
+    // Marks never surface firstFind clears (even if a spoof firstFind entry exists).
+    expect(cells[0]?.firstFindClears).toBeUndefined();
+    // Missing mark: no ownership invent from empty marks set.
+    const missing = buildReliquaryPageCells(page, {
+      itemsDiscovered: ownedSet(),
+      marks: ownedSet(),
+    });
+    expect(missing[0]).toMatchObject({ id: 'mw_a', kind: 'mark', owned: false });
+  });
+
   it('lists owned vs missing in catalog order with firstFind clears on owned items', () => {
     const page = TEST_PAGES[0];
     const cells = buildReliquaryPageCells(page, {
@@ -503,8 +537,8 @@ describe('page grid cells', () => {
       }),
     );
     expect(complete.pageDetail?.illuminated).toBe(true);
-    // Catalog progress stays item-only.
-    expect(complete.progress.owned).toBe(3);
+    // Catalog progress includes authored marks (3 items + 1 mark).
+    expect(complete.progress.owned).toBe(4);
 
     // Marks on another shelf cannot force a conqueror page Illumination.
     const incomplete = buildReliquaryView(

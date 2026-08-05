@@ -3015,7 +3015,19 @@ export const en_XA: EnTranslations = {
       "firstFindClears": "[Ƒíŕšţ ƒóúñð óñ çļéáŕ {count}]",
       "unlockToast": "[Ŕéļíç çáţáļóĝúéð: {name}]",
       "illuminateBanner": "[Þáĝé íļļúɱíñáţéð: {name}]",
-      "illuminateToast": "[Éʋéŕý ŕéļíç óñ {name} íš ƒíļļéð.]"
+      "illuminateToast": "[Éʋéŕý ŕéļíç óñ {name} íš ƒíļļéð.]",
+      "markFind": {
+        "masterwork_first": "[Ƒíŕšţ Ɱášţéŕŵóŕķ]",
+        "masterwork_weaponcrafting": "[Ŵéáþóñçŕáƒţíñĝ Ɱášţéŕŵóŕķ]",
+        "masterwork_armorcrafting": "[Áŕɱóŕçŕáƒţíñĝ Ɱášţéŕŵóŕķ]",
+        "masterwork_tailoring": "[Ţáíļóŕíñĝ Ɱášţéŕŵóŕķ]",
+        "masterwork_leatherworking": "[Ļéáţĥéŕŵóŕķíñĝ Ɱášţéŕŵóŕķ]",
+        "masterwork_engineering": "[Éñĝíñééŕíñĝ Ɱášţéŕŵóŕķ]",
+        "gather_event_pristine_vein": "[Þŕíšţíñé Ʋéíñ]",
+        "gather_event_ancient_heartwood": "[Áñçíéñţ Ĥéáŕţŵóóð]",
+        "gather_event_moonlit_bloom": "[Ɱóóñļíţ Ɓļóóɱ]",
+        "gather_event_perfect_specimen": "[Þéŕƒéçţ Šþéçíɱéñ]"
+      }
     },
     "deeds": {
       "title": "[Ɓóóķ óƒ Ðééðš]",

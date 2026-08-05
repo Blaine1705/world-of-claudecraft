@@ -438,7 +438,7 @@ import { advancePendingProjectiles, type PendingProjectile } from './projectile_
 import * as honorMod from './pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import {
-  catalogItemCompletion,
+  catalogRelicCompletion,
   clearCountForSource,
   curatorRankFromOwned,
   freshReliquaryState,
@@ -4454,11 +4454,17 @@ export class Sim {
     });
   }
   reliquaryCatalogCompletion(): import('../world_api').ReliquaryCatalogCompletion {
-    return catalogItemCompletion(this.primary.deedStats.itemsDiscovered);
+    return catalogRelicCompletion({
+      itemsDiscovered: this.primary.deedStats.itemsDiscovered,
+      marks: this.primary.reliquary.marks,
+    });
   }
   reliquaryCuratorRank(): number {
     return curatorRankFromOwned(
-      catalogItemCompletion(this.primary.deedStats.itemsDiscovered).owned,
+      catalogRelicCompletion({
+        itemsDiscovered: this.primary.deedStats.itemsDiscovered,
+        marks: this.primary.reliquary.marks,
+      }).owned,
     );
   }
   reliquaryPageClearCount(pageId: string): number | undefined {

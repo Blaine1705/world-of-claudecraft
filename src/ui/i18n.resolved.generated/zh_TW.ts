@@ -3015,7 +3015,19 @@ export const zh_TW: EnTranslations = {
       "firstFindClears": "首次獲得於第 {count} 次通關",
       "unlockToast": "聖物已收錄：{name}",
       "illuminateBanner": "頁面已點亮：{name}",
-      "illuminateToast": "{name} 上的每一件聖物均已填滿。"
+      "illuminateToast": "{name} 上的每一件聖物均已填滿。",
+      "markFind": {
+        "masterwork_first": "首件傑作",
+        "masterwork_weaponcrafting": "武器鍛造傑作",
+        "masterwork_armorcrafting": "護甲鍛造傑作",
+        "masterwork_tailoring": "裁縫傑作",
+        "masterwork_leatherworking": "製皮傑作",
+        "masterwork_engineering": "工程學傑作",
+        "gather_event_pristine_vein": "完美礦脈",
+        "gather_event_ancient_heartwood": "古木心材",
+        "gather_event_moonlit_bloom": "月華花蕾",
+        "gather_event_perfect_specimen": "完美標本"
+      }
     },
     "deeds": {
       "title": "功績之書",

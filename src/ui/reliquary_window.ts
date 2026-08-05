@@ -33,6 +33,7 @@ import {
   type ReliquaryRecentFindModel,
   type ReliquaryViewInput,
   type ReliquaryViewModel,
+  reliquaryMarkFindKey,
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
@@ -429,6 +430,11 @@ export class ReliquaryWindow {
       const def = ITEMS[cell.id];
       if (def?.quality) return def.quality;
     }
+    // Profession marks: masterworks read as epic; rare field notes as rare.
+    if (cell.kind === 'mark') {
+      if (cell.id.startsWith('masterwork:')) return 'epic';
+      if (cell.id.startsWith('gather_event:')) return 'rare';
+    }
     return 'common';
   }
 
@@ -436,6 +442,9 @@ export class ReliquaryWindow {
     if (cell.kind === 'item') {
       const def = ITEMS[cell.id];
       if (def) return itemDisplayName(def);
+    }
+    if (cell.kind === 'mark') {
+      return t(reliquaryMarkFindKey(cell.id) as TranslationKey);
     }
     const bare = cell.id.includes(':') ? cell.id.slice(cell.id.lastIndexOf(':') + 1) : cell.id;
     return bare.replace(/_/g, ' ');
@@ -480,8 +489,9 @@ export class ReliquaryWindow {
       const def = ITEMS[find.id];
       if (def) return itemDisplayName(def);
     }
-    // Mark ids and unknown ids: show the raw id as a last resort until
-    // profession mark i18n lands (Phase 7). Prefer a short trailing segment.
+    if (find.kind === 'mark') {
+      return t(reliquaryMarkFindKey(find.id) as TranslationKey);
+    }
     const bare = find.id.includes(':') ? find.id.slice(find.id.lastIndexOf(':') + 1) : find.id;
     return bare.replace(/_/g, ' ');
   }
