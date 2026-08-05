@@ -131,10 +131,13 @@ describe('nightkin family bespoke attack (issue #2889)', () => {
 
     // Every other VisualDef still pointing at the shared constant is untouched
     // by THIS migration. The ghost family's own follow-up migration to
-    // GHOST_FLOATING (tests/anim_pipeline_hunter_ghost.test.ts) also lands on
-    // this branch, leaving exactly 5 remaining direct `clips: FLOATING,`
-    // usages (other batches migrating other members land as separate PRs).
+    // GHOST_FLOATING (tests/anim_pipeline_hunter_ghost.test.ts), the round-2
+    // glub migration (tests/anim_pipeline_glub.test.ts), and the dragonkin
+    // family's own follow-up migration to DRAGONKIN_FLOATING
+    // (tests/anim_pipeline_druid_dragonkin.test.ts) also land on this branch,
+    // leaving exactly 4 remaining direct `clips: FLOATING,` usages (other
+    // batches migrating other members land as separate PRs).
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(5);
+    expect(remaining).toBe(4);
   });
 });

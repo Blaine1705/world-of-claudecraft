@@ -57,6 +57,6 @@ describe('glub family bespoke attack (issue #2889 round 2)', () => {
     // mob_nightkin and mob_ghost already migrated off FLOATING on this
     // branch's base; mob_glub migrates off it above.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(5);
+    expect(remaining).toBe(4);
   });
 });
