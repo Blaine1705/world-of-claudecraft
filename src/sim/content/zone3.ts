@@ -296,6 +296,36 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     scale: 1.3,
     color: 0x9e7b53,
   },
+  brakka_wallbreaker: {
+    id: 'brakka_wallbreaker',
+    // Named quest capstone: single spawn on the slow elite respawn cadence
+    // (the Old Cragmaw precedent), not the trash farm population.
+    respawnMult: 7.2,
+    name: 'Brakka the Wallbreaker',
+    minLevel: 17,
+    maxLevel: 17,
+    family: 'ogre',
+    elite: true,
+    hpBase: 80,
+    hpPerLevel: 26,
+    dmgBase: 13,
+    dmgPerLevel: 3,
+    attackSpeed: 2.5,
+    armorPerLevel: 24,
+    moveSpeed: 6.5,
+    aggroRadius: 13,
+    concuss: { chance: 0.3, duration: 2, name: 'Wallbreaker Smash' },
+    loot: [
+      { copper: 300, chance: 1 },
+      // No cragprowl_belt here: an elite source re-derives an item's level
+      // (+1), and the belt is pinned at 17 from its ogre_crusher source
+      // (tests/itemization_coverage.test.ts). The guaranteed ring plus elite
+      // copper is the drop; the quest pays the real reward.
+      { itemId: 'ogre_toe_ring', chance: 1 },
+    ],
+    scale: 1.7,
+    color: 0x7a5230,
+  },
   ogre_crusher: {
     id: 'ogre_crusher',
     name: 'Thornpeak Crusher',
@@ -331,6 +361,19 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     family: 'ogre',
     elite: true,
     boss: true,
+    // THREE MINUTES (7.2 * 25), the shipped cadence for a quest kill target
+    // (Old Cragmaw, Captain Verlan). He declared no cadence at all before, and
+    // boss/elite do not feed the respawn policy (only respawnMult or rare: true
+    // do), so he silently inherited the open-world TRASH timer and was 24% of
+    // the whole Glimmermere corridor's gold by himself.
+    //
+    // The fix is NOT a long boss cadence, even though his loot is priced with
+    // Marrowlord Varkas (1hr) and Brutok Skullsmasher (3hr): q_drogmar has a
+    // hard kill objective on him at suggestedPlayers 3, so a party would sit
+    // waiting, and queue behind other parties, for a REQUIRED quest step. He
+    // has to stay available, which makes coin rather than cadence the lever
+    // (see the loot table below).
+    respawnMult: 7.2,
     hpBase: 200,
     hpPerLevel: 30,
     dmgBase: 12,
@@ -345,8 +388,14 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     // drawn-out fight snowballs, so burn him down or kite him off you to bleed
     // the stacks back off.
     rampage: { ap: 20, maxStacks: 5, duration: 10, name: 'Mounting Rage', school: 'physical' },
+    // 650 guaranteed copper, matching Marrowlord Varkas. His TOTAL value per
+    // kill was always in line with his neighbours (3285 against Varkas's 3222
+    // and Brutok's 2557); what was out of line was the SPLIT, at 2000 coin
+    // against their 650 and 320. Since he must stay on a quest-friendly three
+    // minutes, this is the knob that keeps the corridor honest, and it leaves
+    // all three unique drops intact so the kill still pays like a boss.
     loot: [
-      { copper: 2000, chance: 1 },
+      { copper: 650, chance: 1 },
       { itemId: 'drogmar_warboots', chance: 0.3 },
       { itemId: 'drogmars_skullcleaver', chance: 0.25 },
       { itemId: 'thunderward_legguards', chance: 0.25 },
@@ -479,7 +528,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 11,
     loot: [
       { copper: 90, chance: 1 },
-      { itemId: 'wyrmcult_orders', chance: 0.5, questId: 'q_cult_orders' },
+      { itemId: 'wyrmcult_orders', chance: 0.1, questId: 'q_cult_orders' },
       { itemId: 'frayed_prayer_beads', chance: 0.35 },
       { itemId: 'shardsong_mantle', chance: 0.04 },
     ],
@@ -522,6 +571,38 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
     color: 0x533566,
     componentTags: ['cloth'],
   },
+  threnos_first_voice: {
+    id: 'threnos_first_voice',
+    // Named quest capstone: single spawn on the slow elite respawn cadence
+    // (the Old Cragmaw precedent), not the trash farm population.
+    respawnMult: 7.2,
+    name: 'Threnos the First Voice',
+    minLevel: 19,
+    maxLevel: 19,
+    family: 'humanoid',
+    elite: true,
+    hpBase: 88,
+    hpPerLevel: 24,
+    dmgBase: 14,
+    dmgPerLevel: 2.8,
+    attackSpeed: 2.0,
+    armorPerLevel: 18,
+    moveSpeed: 7,
+    aggroRadius: 12,
+    // The loudest of the choir: Korzul speaks through him, and his chant claws
+    // deeper at the mind than any common zealot's (a stronger Maddening Whisper).
+    enfeeble: { chance: 0.35, int: 18, duration: 12, name: 'The Waking Voice', school: 'shadow' },
+    // Like his flock, he brands away a victim's fire so none may rival the wyrm's.
+    lockout: { chance: 0.3, duration: 6, name: 'Wyrmward Sigil', school: 'fire' },
+    loot: [
+      { copper: 300, chance: 1 },
+      { itemId: 'frayed_prayer_beads', chance: 1 },
+      { itemId: 'shardsong_mantle', chance: 0.06 },
+    ],
+    scale: 1.3,
+    color: 0x9b59b6,
+    componentTags: ['cloth'],
+  },
   boneclad_revenant: {
     id: 'boneclad_revenant',
     name: 'Boneclad Revenant',
@@ -541,6 +622,7 @@ export const ZONE3_MOBS: Record<string, MobTemplate> = {
       { copper: 100, chance: 1 },
       { itemId: 'bone_fragments', chance: 0.6 },
       { itemId: 'runed_bone_shard', chance: 0.7, questId: 'q_nythraxis_restless_dead' },
+      { itemId: 'vanguard_bone', chance: 0.7, questId: 'q_revenant_vanguard' },
       // A grindable long-shot at the epic T1 cloth legs that also drop from
       // Marrowlord Varkas: a rare per-kill chance so the bonefields are a
       // farmable path to the legwraps, not just the once-per-respawn rare.
@@ -1147,7 +1229,9 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'windguard_leggings',
       // Gathering tools (#2343: every node harvest needs a matching tool, so
       // each zone hub stocks the tiers its own nodes use; Thornpeak has
-      // tier-1 through tier-3 nodes). Tiered rods stay a Wilkes exclusive.
+      // tier-1 through tier-3 nodes). Rods follow the same rule now that
+      // water has a tier: the silverstream row below is this hub's rung, and
+      // Wilkes keeps the whole ladder as the buy-ahead counter (R20).
       'copper_mining_pick',
       'iron_mining_pick',
       'mithril_mining_pick',
@@ -1158,16 +1242,18 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
       'bronze_sickle',
       'silverleaf_sickle',
       'simple_fishing_pole',
+      // The peaks take a tier-3 rod (professions/fishing_zones.ts): the same
+      // rule the land tools above follow, now that fishing water has a tier of
+      // its own. Trader Wilkes keeps the whole rod ladder as the one place you
+      // can buy ahead; this row is so you never have to.
+      'silverstream_fishing_rod',
       // Tier 4/5 station-recipe reagents (items.ts): Bree is the Highwatch
-      // trade-goods vendor, so every station-bound (stationType) recipe has
-      // a live reagent source (prog_tools_of_the_trade needs at least one
-      // station craft to be possible).
-      'thorium_ore',
+      // trade-goods vendor, but she carries only arcanite_bar, the one premium
+      // reagent that is refined rather than gathered (no node anywhere yields
+      // it). The other five (thorium_ore, ashwood_log, elderwood_log,
+      // goldleaf_herb, sunpetal_herb) are node yields, and no NPC stocks a
+      // gathered material (professions.md, Locked rulings).
       'arcanite_bar',
-      'ashwood_log',
-      'elderwood_log',
-      'goldleaf_herb',
-      'sunpetal_herb',
     ],
     greeting:
       'Wool, hardtack, and steel-shod boots — Highwatch runs on all three, and I am short of everything.',
@@ -1394,7 +1480,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Old Cragmaw',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: 'The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, $N. Its den sits on the western ridge above the road south. Bring a friend, and put the old devil down.',
+    text: 'The mountain folk put a name to the prints my scout found: Old Cragmaw, a scar-pelted tyrant of a cat that has outlived three generations of its own pack. It is the reason the stalkers flood my road, $N. Its den sits on the eastern ridge above the road south. Bring a friend, and put the old devil down.',
     completionText:
       'Down at last. The mountain folk swore that cat would outlive the wall itself. The stalkers will keep to their high snows now, $N, and my patrols will walk the road without bleeding for it. The whole ridge is quieter for your work.',
     objectives: [
@@ -1468,14 +1554,20 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_ogre_bounty: {
     id: 'q_ogre_bounty',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: "The Captain's Bounty",
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: "Maren's totems tell me all I need to know: the clans are bought, and my wall is their first errand. I will not wait for them to muster. Fourteen more Thornpeak Ogres, $N — and I will pay bounty on every one.",
+    text: "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, $N, and Highwatch will pay a captain's bounty.",
     completionText:
       'Bounty paid in full. The foothills are quieter — now we deal with the ones doing the buying.',
     objectives: [
-      { type: 'kill', targetMobId: 'thornpeak_ogre', count: 14, label: 'Thornpeak Ogre slain' },
+      {
+        type: 'kill',
+        targetMobId: 'brakka_wallbreaker',
+        count: 1,
+        label: 'Brakka the Wallbreaker slain',
+      },
     ],
     xpReward: 3000,
     copperReward: 1500,
@@ -1593,15 +1685,15 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_cult_orders: {
     id: 'q_cult_orders',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'Orders from Below',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'The zealots move with purpose now — watches set, supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, $N. Kill eight more and bring me four sets of their written orders. I would know the hand that commands them.',
+    text: 'The zealots move with purpose now, watches set and supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, $N. One of them is carrying written orders from below. Find the zealot who has them and bring the orders to me: I would know the hand that commands them.',
     completionText:
       "This script... I last saw its like in Morthen's grimoire, in Eastbrook. The same hand has guided every grave we have fought over, $N.",
     objectives: [
-      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 8, label: 'Wyrmcult Zealot slain' },
-      { type: 'collect', itemId: 'wyrmcult_orders', count: 4, label: 'Wyrmcult Orders' },
+      { type: 'collect', itemId: 'wyrmcult_orders', count: 1, label: 'Orders from Below' },
     ],
     xpReward: 3800,
     copperReward: 1800,
@@ -1610,20 +1702,15 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_necromancers: {
     id: 'q_necromancers',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Phylactery Ring',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'The orders speak of a "ring of phylacteries" — soul-vessels, $N, set about the Sanctum to feed it. The cult\'s necromancers carry them like holy relics. Kill eight necromancers and bring me three phylacteries unbroken. I must know what souls they hold.',
+    text: 'The orders speak of a "ring of phylacteries", soul-vessels, $N, set about the Sanctum to feed it. The cult\'s necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.',
     completionText:
       'Light forgive us. These hold the dead of the Vale and the fen — every corpse the Gravecallers ever raised, harvested. They were never building an army, $N. They were gathering a tithe.',
     objectives: [
-      {
-        type: 'kill',
-        targetMobId: 'wyrmcult_necromancer',
-        count: 8,
-        label: 'Wyrmcult Necromancer slain',
-      },
-      { type: 'collect', itemId: 'ritual_phylactery', count: 3, label: 'Ritual Phylactery' },
+      { type: 'collect', itemId: 'ritual_phylactery', count: 5, label: 'Ritual Phylactery' },
     ],
     xpReward: 4200,
     copperReward: 2200,
@@ -1654,18 +1741,19 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_revenant_vanguard: {
     id: 'q_revenant_vanguard',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'Bones of the Vanguard',
     giverNpcId: 'captain_thessaly',
     turnInNpcId: 'captain_thessaly',
-    text: 'The revenants are forming ranks, $N — true ranks, shield-lines and columns, drilling with no drummer. They are being mustered for the Sanctum gate. Break fourteen more before that march begins, and Highwatch will owe you its best steel.',
+    text: 'The revenants are forming ranks, $N, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.',
     completionText:
       'The fields lie still again. Take this — it was made for the defenders of the wall, and no one has earned it more.',
     objectives: [
       {
-        type: 'kill',
-        targetMobId: 'boneclad_revenant',
-        count: 14,
-        label: 'Boneclad Revenant slain',
+        type: 'collect',
+        itemId: 'vanguard_bone',
+        count: 10,
+        label: 'Vanguard Bone recovered',
       },
     ],
     xpReward: 4500,
@@ -1710,14 +1798,20 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
   },
   q_voice_below: {
     id: 'q_voice_below',
+    rev: 1, // objective rework (zones 1-3 dedupe): pre-rework in-flight runs reset on restore
     name: 'The Voice Below',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'Last night the whole cult camp knelt at once, $N — every zealot, every necromancer, all facing the Sanctum. Korzul speaks to them in their sleep now; Vael heard the same voice in the fen, and Morthen before him. Cut the congregation down — ten zealots, six necromancers — before that voice has hands enough to pull the gate open itself.',
+    text: 'Last night the whole cult camp knelt at once, $N, every zealot and necromancer facing the Sanctum, and one throat led the chant. They call him Threnos, the First Voice, and Korzul speaks through his mouth. Vael heard the same voice in the fen, and Morthen before him. Silence Threnos and cut down the six necromancers who keep his choir, before that voice has hands enough to pull the gate open itself.',
     completionText:
-      'The kneeling has stopped. We have not silenced the voice, $N — only thinned its choir. It must be enough.',
+      'Threnos is silent, and the kneeling has stopped, $N. We have not ended the voice below, only taken from it the mouth that carried it. It must be enough.',
     objectives: [
-      { type: 'kill', targetMobId: 'wyrmcult_zealot', count: 10, label: 'Wyrmcult Zealot slain' },
+      {
+        type: 'kill',
+        targetMobId: 'threnos_first_voice',
+        count: 1,
+        label: 'Threnos the First Voice silenced',
+      },
       {
         type: 'kill',
         targetMobId: 'wyrmcult_necromancer',
@@ -1851,7 +1945,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'Graves of the Forgotten',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the eastern rise, High Priest Malric near the central broken road, and Royal Assassin Voss by the western cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
+    text: 'I have seen these marks before, on three old graves around the northern battlefield. Captain Aldren lies on the western rise, High Priest Malric further south along the western edge, and Royal Assassin Voss by the eastern cliff. Touch each grave and listen, $N. The dead may remember what the living forgot.',
     completionText:
       'Aldren remained loyal, Malric refused to accept death, and Voss saw the danger before anyone else. All three served the same forgotten king.',
     objectives: [
@@ -1885,7 +1979,7 @@ export const ZONE3_QUESTS: Record<string, QuestDef> = {
     name: 'The Abandoned Crypt',
     giverNpcId: 'brother_aldric_highwatch',
     turnInNpcId: 'brother_aldric_highwatch',
-    text: "The visions point to the abandoned crypt in the western cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
+    text: "The visions point to the abandoned crypt in the eastern cliff. There is an old legend that the crypt housed a king. Perhaps Thornpeak sealed him below after Malric's ritual twisted him into something deathless. Enter the crypt and see what remains inside.",
     completionText:
       "The keystone halves fit together, and Voss's diary names what they sealed: the signet of King Nythraxis. If the diary is true, that signet is the key to his tomb.",
     objectives: [
@@ -2065,6 +2159,8 @@ export const ZONE3_CAMPS: CampDef[] = [
   // Ogres: eastern foothills rising to Drogmar's war-camp
   { mobId: 'thornpeak_ogre', center: { x: -90, z: 700 }, radius: 22, count: 7 },
   { mobId: 'thornpeak_ogre', center: { x: -60, z: 730 }, radius: 18, count: 6 },
+  // Quest capstone: the elite ogre chieftain for q_ogre_bounty.
+  { mobId: 'brakka_wallbreaker', center: { x: -78, z: 716 }, radius: 3, count: 1 },
   { mobId: 'ogre_crusher', center: { x: -125, z: 740 }, radius: 18, count: 8 },
   { mobId: 'warlord_drogmar', center: { x: -132, z: 748 }, radius: 2, count: 1 },
   // A lone rare ogre prowls the ridge north of the warband
@@ -2079,6 +2175,9 @@ export const ZONE3_CAMPS: CampDef[] = [
   { mobId: 'wyrmcult_zealot', center: { x: 55, z: 820 }, radius: 20, count: 8 },
   { mobId: 'wyrmcult_zealot', center: { x: 34, z: 845 }, radius: 16, count: 6 },
   { mobId: 'wyrmcult_necromancer', center: { x: 40, z: 855 }, radius: 14, count: 5 },
+  // Quest capstone: Threnos the First Voice leads the congregation before the
+  // Sanctum gate (q_voice_below).
+  { mobId: 'threnos_first_voice', center: { x: 44, z: 848 }, radius: 3, count: 1 },
   // Revenants: the old battlefield (Revenant Fields). The second pack used to sit
   // at (-15, 860), right where the x=0 Sanctum Approach road ends and only ~20yd
   // from the gate, so (aggroRadius 11) it jumped players entering/exiting the
@@ -2225,6 +2324,13 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'quest',
     sellValue: 0,
     questId: 'q_necromancers',
+  },
+  vanguard_bone: {
+    id: 'vanguard_bone',
+    name: 'Vanguard Bone',
+    kind: 'quest',
+    sellValue: 0,
+    questId: 'q_revenant_vanguard',
   },
   gravewyrm_sigil: {
     id: 'gravewyrm_sigil',
@@ -3078,17 +3184,18 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
       },
     ],
   },
-  // Collectible mounts (src/sim/mounts.ts mountOwned): soulbound reins items;
-  // owning the item is owning the mount. The toad drops from Korzul the
-  // Gravewyrm, the griffin from Nythraxis (the raid pinnacle drop), the
-  // gobbler from Thunzharr the world boss (a personal-loot chase drop).
+  // Collectible mounts (src/sim/mounts.ts mountOwned): unbound reins items;
+  // owning the item is owning the mount, and the item transfers like any
+  // other. The toad drops from Korzul the Gravewyrm, the griffin from
+  // Nythraxis (the raid pinnacle drop), the gobbler from Thunzharr the world
+  // boss (a personal-loot chase drop).
   reins_shadowjump_toad: {
     id: 'reins_shadowjump_toad',
     name: 'Reins of Kama-Kage the Shadow-Jump Toad',
     kind: 'mount',
     mount: 'shadowjump_toad',
     quality: 'uncommon',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
@@ -3098,7 +3205,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'mount',
     mount: 'stormfeather_griffin',
     quality: 'uncommon',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },
@@ -3108,7 +3215,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     kind: 'mount',
     mount: 'thunderstrut_gobbler',
     quality: 'epic',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
   },

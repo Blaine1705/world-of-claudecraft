@@ -127,6 +127,10 @@ export interface AuraInput {
   // Encounter-owned control cannot be canceled by the player. Mirrored over the
   // online aura wire so the cancel affordance matches the authoritative sim.
   unbreakableControl?: true;
+  // The other arm of the same rule: a penalty no player counter may shed (the recovery
+  // sicknesses). Also mirrored over the wire (terse `und`), so the cancel affordance
+  // cannot offer what the sim's cancel path would refuse.
+  undispellable?: true;
 }
 
 /** The entity fields the core reads: just its aura list. */
@@ -367,7 +371,12 @@ export function createAurasView(
         slot.sourceId = a.sourceId;
         // The buff bar (mode 'buffs', the player's own auras) offers right-click-cancel;
         // a helpful buff is cancelable, a debuff never. The target debuff strip
-        // (mode 'debuffs') is read-only, so nothing there is cancelable.
+        // (mode 'debuffs') is read-only, so nothing there is cancelable. The
+        // removability term routes through isCancelableAura, the same predicate the
+        // sim's cancel path answers to (combat/aura_cancel.ts, which folds in
+        // isPlayerRemovableAura), so the affordance can never offer a cancel the
+        // server would refuse: the encounter-control and undispellable arms ride
+        // the wire (ub / und) for exactly this reader.
         slot.cancelable = mode === 'buffs' && isCancelableAura(a);
         const cachedEffect = effectHtmlCache[count];
         if (

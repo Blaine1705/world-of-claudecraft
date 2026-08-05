@@ -55,17 +55,24 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(ev.some((e) => e.type === 'lockpickStep')).toBe(true);
   });
 
-  it('delve_lockpick_fail: idling past the step clock jams the chest and opens the exit', () => {
-    const rec = run('delve_lockpick_fail');
+  it('delve_lockpick_tries_exhausted: idling past the step clock still opens the chest at the LOW consolation tier (issue #2585)', () => {
+    const rec = run('delve_lockpick_tries_exhausted');
     const sim = rec.sim as any;
     const ev = rec.allEvents as Ev[];
-    // The attempt engaged, then the server clock (not the client) burned the single try.
+    // The attempt engaged, then the server clock (not the client) burned the single
+    // try. Tries running out grants the chest instead of jamming it, but this is NOT
+    // a solve: the reward is capped at the base `low` tier, not the Premium ante's tier.
     expect(ev.some((e) => e.type === 'lockpickSession')).toBe(true);
-    expect(ev.some((e) => e.type === 'lockpickEnd' && e.outcome === 'fail')).toBe(true);
-    // The chest jams (lost until the delve is re-cleared) but the surface exit still opens.
+    expect(ev.some((e) => e.type === 'lockpickEnd' && e.outcome === 'success')).toBe(true);
+    const loot = ev.find((e) => e.type === 'delveChestLoot') as any;
+    expect(loot).toBeDefined();
+    expect(loot.lootTier).toBe('low');
+    expect(loot.bountiful).toBe(false);
     const r = sim.delveRunForPlayer(sim.playerId);
     const chestId = rec.notes.chestId as number;
-    expect(r.objectState[chestId].attemptAvailable).toBe(false);
+    expect(r.objectState[chestId].attemptAvailable).toBe(false); // consumed by the grant
+    expect(r.objectState[chestId].looted).toBe(true);
+    expect(r.objectState[chestId].lootedTier).toBe('low');
     expect(r.surfaceExitId).not.toBeNull();
     expect(r.objectState[r.surfaceExitId].open).toBe(true);
   });
@@ -202,11 +209,12 @@ describe('coverage: each scenario fires its subsystem', () => {
     const needRolls = evs
       .filter((e) => e.type === 'loot' && e.pid === a && /^Need Roll - /.test(text(e)))
       .map((e) => Number(/^Need Roll - (\d+)/.exec(text(e))?.[1]));
-    // Re-seeded 1091 -> 1326 by the v0.32.0 base merge: the tie SHAPE is preserved
-    // (the same two rollers level at the same 97), only the third roll and the
-    // tie-break's winner moved, because this branch's content shifts the shared rng
-    // and not master-loot logic itself.
-    expect(needRolls).toEqual([97, 97, 85]); // b and c tie at the top, d below
+    // Re-seeded 1091 -> 1326 by the v0.32.0 base merge, then 1326 -> 1383 by the
+    // quest-dedupe content pass: the tie SHAPE is preserved (two rollers level at
+    // the top), only which rollers tie, the third roll, and the tie-break's
+    // winner move, because these branches shift the shared rng and never
+    // master-loot logic itself.
+    expect(needRolls).toEqual([69, 35, 69]); // b and d tie at the top, c below
     // The tie-break picked b, and that outcome is the one observable effect of the
     // master-loot-only draw, so it is pinned by name and by winning roll. WHICH of
     // the tied rollers wins is the rng's call and may move with the seed; that a
@@ -214,7 +222,7 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(
       evs.filter(
         (e) =>
-          e.type === 'loot' && text(e) === `Bbb wins [[i:greyjaw_hide_boots]] (${needRolls[1]})`,
+          e.type === 'loot' && text(e) === `Bbb wins [[i:greyjaw_hide_boots]] (${needRolls[0]})`,
       ).length,
     ).toBe(4); // announced once to each party member
 

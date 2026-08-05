@@ -253,6 +253,54 @@ describe('client HTML shell', () => {
     }
   });
 
+  it('removes loading-curtain and progress motion for reduced-motion players', () => {
+    expect(shellCss).toContain('transition: opacity calc(0.35s * var(--motion-scale)) ease;');
+    expect(shellCss).toContain('transition: width calc(0.2s * var(--motion-scale)) ease;');
+    const reducedMotion = shellCss.match(
+      /@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n {2}\}/,
+    )?.[1];
+    expect(reducedMotion).toContain('#loading-screen');
+    expect(reducedMotion).toContain('#ls-fill');
+    expect(reducedMotion).toContain('transition: none;');
+    expect(mainTs).toContain(
+      "return loadingCurtainFadeMs(new Settings().get('reduceMotion') || osReducedMotion);",
+    );
+    expect(mainTs.match(/}, loadingCurtainFadeDelayMs\(\)\);/g)).toHaveLength(2);
+  });
+
+  it('restores graphics preview contexts only after rebinding the committed renderer', () => {
+    const commitAt = mainTs.indexOf('commit: (next, target) => {');
+    const progressAt = mainTs.indexOf('onProgress:', commitAt);
+    const commit = mainTs.slice(commitAt, progressAt);
+    const replaceAt = commit.indexOf('hud.replaceRenderer(next);');
+    const restoreAt = commit.indexOf('hud.restoreGraphicsPreviewContexts();');
+    expect(commitAt).toBeGreaterThan(-1);
+    expect(progressAt).toBeGreaterThan(commitAt);
+    expect(replaceAt).toBeGreaterThan(-1);
+    expect(restoreAt).toBeGreaterThan(replaceAt);
+  });
+
+  it('keeps live graphics rebuilds bound to the existing world and online session', () => {
+    const buildAt = mainTs.indexOf('buildRenderer: (target, recycled) => {');
+    const prepareAt = mainTs.indexOf('prepareCurrentZone:', buildAt);
+    const build = mainTs.slice(buildAt, prepareAt);
+    expect(buildAt).toBeGreaterThan(-1);
+    expect(prepareAt).toBeGreaterThan(buildAt);
+    expect(build).toContain('new Renderer(world, recycled.canvas, nameplates, {');
+    expect(mainTs).toContain('online?.neutralizeInputForClientPause();');
+  });
+
+  it('attempts both auxiliary graphics teardown arms before reporting reset failures', () => {
+    const resetAt = mainTs.indexOf('resetAuxiliaryRenderers: () => {');
+    const captureAt = mainTs.indexOf('captureRendererContext:', resetAt);
+    const reset = mainTs.slice(resetAt, captureAt);
+    expect(resetAt).toBeGreaterThan(-1);
+    expect(captureAt).toBeGreaterThan(resetAt);
+    expect(reset).toMatch(/try\s*\{\s*hud\.resetGraphicsPreviewContexts\(\);\s*\} catch/);
+    expect(reset).toMatch(/try\s*\{\s*resetPortraitRendererForGraphicsRebuild\(\);\s*\} catch/);
+    expect(reset).toContain('throw new AggregateError');
+  });
+
   it('places skip links as the first focusable elements in BOTH entries', () => {
     for (const entry of [html, playHtml]) {
       const skipMain = entry.indexOf('class="hud-skip" href="#ui"');
@@ -839,11 +887,12 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain("'DiscordClick'");
   });
 
-  it('excludes wallet surfaces from native and Steam builds while allowing website desktop', () => {
+  it('excludes wallet surfaces from unverified native and Steam builds while allowing Seeker', () => {
     expect(hudCss).toContain('body.native-app #nav-btn-download,');
     expect(hudCss).toContain(
-      'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
+      'body.native-app:not(.seeker-wallet-enabled) .cs-wallet,\n  body.native-app:not(.seeker-wallet-enabled) .cs-wallet-hidden-note,\n  body.native-app:not(.seeker-wallet-enabled) .account-wallet-card',
     );
+    expect(hudCss).not.toContain('body.native-app .cs-wallet,');
     expect(hudCss).toContain('body.native-app #performance-tip,');
     expect(hudCss).toContain('body.desktop-app #token-ca,\n  body.desktop-app .official-site-copy');
     expect(hudCss).not.toContain('body.desktop-app .cs-wallet');
@@ -2071,9 +2120,12 @@ describe('client HTML shell', () => {
     expect(mainTs).toContain('stopAutorunForInteraction(\n      tryNearbyInteraction(');
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
-    // corpse-claim mirror online); the call now closes right after the
-    // nothing-to-interact string.
-    expect(mainTs).toContain("t('errors.nothingInteract'),\n      ),");
+    // corpse-claim mirror online). The R40 confirm gate now trails the
+    // nothing-to-interact string, with harvestStateReliable still an
+    // explicit `undefined` (the default), never a live override.
+    expect(mainTs).toContain(
+      "t('errors.nothingInteract'),\n        undefined,\n        gatherEffectConfirm,\n      ),",
+    );
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here
     // would silently make those quests uncompletable again.
@@ -2089,6 +2141,12 @@ describe('client HTML shell', () => {
       'stopAutorunForInteraction(interactionOutcome, input, mobileControls);',
     );
     expect(mainTs).toContain('stopAutorunForInteraction(\n          handleGatherNodeInteract(');
+    // The R40 gate rides the CLICK dispatch too (the phase 14 QA found only
+    // the interact-key site pinned): the world-click harvest passes the same
+    // confirm gate, trailing the tool gate.
+    expect(mainTs).toContain(
+      'gatherNodeToolGateFor(world, node),\n            gatherEffectConfirm,\n          ),',
+    );
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-utility-cluster');
     expect(hudMobileCss).not.toContain('body.mobile-touch #mobile-autorun {');
     // The cast bar sits at the classic centre seat above the bottom-centre

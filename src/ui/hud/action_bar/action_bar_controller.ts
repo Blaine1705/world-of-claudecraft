@@ -2,6 +2,7 @@ import { SPORT_ABILITIES } from '../../../sim/content/vale_cup';
 import { ABILITIES, ITEMS } from '../../../sim/data';
 import type { PlayerClass } from '../../../sim/types';
 import type { ActionBarLayout } from '../../../world_api/action_bar';
+import { knownItemDef } from '../../known_item';
 import { isStanceBarAbilityGroup } from '../../stance_bar_view';
 import { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 import {
@@ -341,6 +342,19 @@ export class ActionBarController {
     );
   }
 
+  /**
+   * The STORED-layout keep predicate (stale-client guard, R34), distinct from
+   * isAssignableAction's strict placement gate: the layout is per-character
+   * SERVER state and the save path is a wholesale overwrite, so an id this
+   * bundle predates must ride through parse and save as an INERT slot (its
+   * press arms already no-op on an unresolvable def) rather than be nulled
+   * and silently destroyed for every other device. Known-but-ineligible ids
+   * (a kind that stopped being placeable) keep today's strip.
+   */
+  keepsStoredItemId(itemId: string): boolean {
+    return this.isHotbarItemId(itemId) || knownItemDef(ITEMS, itemId) === undefined;
+  }
+
   isAssignableAction(action: Exclude<HotbarAction, null>): boolean {
     if (action.type === 'item') return this.isHotbarItemId(action.id);
     return (
@@ -494,7 +508,10 @@ export class ActionBarController {
       normalRaw,
       ACTION_BAR_ABILITY_SLOTS,
       (id) => !!ABILITIES[id] || !!SPORT_ABILITIES[id],
-      (id) => this.isHotbarItemId(id),
+      // The stored-layout keep predicate here too: a normal bar holding an
+      // unknown-id slot must still read as occupied, or the seeding decision
+      // treats it as emptier than it is.
+      (id) => this.keepsStoredItemId(id),
     );
 
     this.markFormBarSeeded();
@@ -525,7 +542,7 @@ export class ActionBarController {
       raw,
       ACTION_BAR_ABILITY_SLOTS,
       (id) => this.isStoredAbilityEligible(id),
-      (id) => this.isHotbarItemId(id),
+      (id) => this.keepsStoredItemId(id),
     );
     if (stored && storedHotbarHasIneligibleAbility(raw, (id) => this.isStoredAbilityEligible(id))) {
       try {
@@ -580,7 +597,7 @@ export class ActionBarController {
         this.deps.storage,
         key,
         (id) => this.deps.knownAbilityIds().includes(id) && this.isAbilityPlacementAllowed(id),
-        (id) => this.isHotbarItemId(id),
+        (id) => this.keepsStoredItemId(id),
       );
       if (storedRaw !== null && this.attackActionState === null) this.deps.storage.removeItem(key);
     } catch {
