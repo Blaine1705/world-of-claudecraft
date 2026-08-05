@@ -28,9 +28,11 @@ import {
   type ZonePropsDef,
 } from '../src/sim/types';
 import type { Decoration } from '../src/sim/world';
+import { isNodeToolLockedFor } from '../src/ui/gathering_view';
 import {
   buildOverworldMapModel,
   gatherNodeMarkerAt,
+  MAP_GATHER_NODE_HIT_RADIUS,
   MAP_MAX_ZOOM,
   mapBuildingMarkerKind,
   mapWindowMode,
@@ -865,21 +867,115 @@ describe('zone-map gather nodes', () => {
       gatheringProficiency: Record<string, number>;
       nodeHarvestableByMe: (id: string) => boolean;
     };
-    // A copper pick (tier 1 mining) unlocks ore; herb/wood stay locked without
-    // their tools. Mark the first eastbrook ore on cooldown for this viewer.
+    // A copper pick (tier 1 mining) unlocks ore; wood AND herb stay locked
+    // without their tools (each profession resolves its own tool scan, so a
+    // wrong NODE_HARVEST_TABLE professionId shows here). Mark the first
+    // eastbrook ore on cooldown for this viewer.
     world.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
     world.gatheringProficiency = { mining: 1 };
     const coolId = 'ore_eastbrook_1';
     world.nodeHarvestableByMe = (id) => id !== coolId;
     const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
     const ore = model.gatherNodes.filter((n) => n.type === 'ore');
+    const wood = model.gatherNodes.filter((n) => n.type === 'wood');
     const herb = model.gatherNodes.filter((n) => n.type === 'herb');
     expect(ore.length).toBeGreaterThan(0);
+    expect(wood.length).toBeGreaterThan(0);
     expect(herb.length).toBeGreaterThan(0);
     for (const n of ore) expect(n.locked).toBe(false);
+    for (const n of wood) expect(n.locked).toBe(true);
     for (const n of herb) expect(n.locked).toBe(true);
     const cooled = model.gatherNodes.find((n) => n.nodeId === coolId);
     expect(cooled).toMatchObject({ ready: false, locked: false, type: 'ore' });
+  });
+
+  it('reads each node tier through the wield gate (mixed-tier zone, both boundary sides)', () => {
+    const mirefen = ZONES[1];
+    expect(mirefen.id, 'the mixed-tier zone this test leans on').toBe('mirefen_marsh');
+    const build = (
+      inventory: { itemId: string; count: number }[],
+      proficiency: Record<string, number> | undefined,
+    ) => {
+      const world = makeOverworldWorld('sim') as unknown as {
+        inventory: unknown;
+        gatheringProficiency: unknown;
+      };
+      world.inventory = inventory;
+      world.gatheringProficiency = proficiency;
+      return buildOverworldMapModel({
+        ...input(world as unknown as IWorld, 1),
+        zone: mirefen,
+      });
+    };
+    const lockOf = (model: { gatherNodes: { nodeId: string; locked: boolean }[] }, id: string) =>
+      model.gatherNodes.find((n) => n.nodeId === id)?.locked;
+    // A tier-1 pick works tier-1 veins only: the per-node tier read.
+    const copper = build([{ itemId: 'copper_mining_pick', count: 1 }], { mining: 1 });
+    expect(lockOf(copper, 'ore_mirefen_1')).toBe(false);
+    expect(lockOf(copper, 'ore_mirefen_t2')).toBe(true);
+    // An iron (tier 2) pick wields at proficiency 40 exactly (the shipped
+    // TIER2 wield floor, pinned as a literal)...
+    const wields = build([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 40 });
+    expect(lockOf(wields, 'ore_mirefen_1')).toBe(false);
+    expect(lockOf(wields, 'ore_mirefen_t2')).toBe(false);
+    // ...and is wield-filtered out at 39: no usable tool at all, so even the
+    // tier-1 veins lock (the wield arm, not the tier compare).
+    const under = build([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 39 });
+    expect(lockOf(under, 'ore_mirefen_1')).toBe(true);
+    expect(lockOf(under, 'ore_mirefen_t2')).toBe(true);
+    // A client mirror before its first gprof delta has NO proficiency map at
+    // all: the read fails closed (coerced to 0), never open.
+    const preGprof = build([{ itemId: 'iron_mining_pick', count: 1 }], undefined);
+    expect(lockOf(preGprof, 'ore_mirefen_1')).toBe(true);
+    expect(lockOf(preGprof, 'ore_mirefen_t2')).toBe(true);
+  });
+
+  it('locked agrees with the minimap classifier for every in-zone node', () => {
+    // The map inlines the memoized lock resolve; isNodeToolLockedFor is the
+    // classifier the minimap and the node tooltip share. A mixed inventory
+    // (ore unlocked, wood/herb locked) keeps both arms of the comparison live.
+    const world = makeOverworldWorld('sim') as unknown as {
+      inventory: { itemId: string; count: number }[];
+      gatheringProficiency: Record<string, number>;
+    };
+    world.inventory = [{ itemId: 'copper_mining_pick', count: 1 }];
+    world.gatheringProficiency = { mining: 1 };
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    const locks = new Set(model.gatherNodes.map((n) => n.locked));
+    expect(locks).toEqual(new Set([true, false]));
+    for (const marker of model.gatherNodes) {
+      const content = GATHER_NODES.find((c) => c.id === marker.nodeId);
+      expect(content).toBeDefined();
+      if (!content) continue;
+      expect(marker.locked, `${marker.nodeId} lock agrees with isNodeToolLockedFor`).toBe(
+        isNodeToolLockedFor(world as unknown as IWorld, content),
+      );
+    }
+  });
+
+  it('memoizes the tool scan per profession and reads proficiency once per build', () => {
+    let inventoryReads = 0;
+    let proficiencyReads = 0;
+    const world = makeOverworldWorld('sim') as unknown as Record<string, unknown>;
+    Object.defineProperty(world, 'inventory', {
+      get: () => {
+        inventoryReads += 1;
+        return [];
+      },
+    });
+    Object.defineProperty(world, 'gatheringProficiency', {
+      get: () => {
+        proficiencyReads += 1;
+        return {};
+      },
+    });
+    const model = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+    // The loop genuinely crossed every node (the count proves the scan ran).
+    expect(model.gatherNodes).toHaveLength(zoneNodes.length);
+    // One viewerUsableToolTier resolve per profession, never per node.
+    expect(inventoryReads).toBe(3);
+    // The proficiency map is hoisted beside the memo: exactly one read.
+    expect(proficiencyReads).toBe(1);
   });
 
   it('hit-tests the nearest gather icon and misses outside the radius', () => {
@@ -904,8 +1000,68 @@ describe('zone-map gather nodes', () => {
     }
     expect(gatherNodeMarkerAt(model.gatherNodes, node.mx, node.my)).toBe(node);
     expect(gatherNodeMarkerAt(model.gatherNodes, node.mx + 2, node.my - 2)).toBe(node);
-    expect(gatherNodeMarkerAt(model.gatherNodes, node.mx + 500, node.my)).toBeNull();
+    // Pin the radius itself, both sides of the boundary (an isolated node, so
+    // no neighbour can absorb the outside probe).
+    expect(
+      gatherNodeMarkerAt(model.gatherNodes, node.mx + MAP_GATHER_NODE_HIT_RADIUS - 0.5, node.my),
+    ).toBe(node);
+    expect(
+      gatherNodeMarkerAt(model.gatherNodes, node.mx + MAP_GATHER_NODE_HIT_RADIUS + 0.5, node.my),
+    ).toBeNull();
     expect(gatherNodeMarkerAt([], node.mx, node.my)).toBeNull();
+  });
+
+  it('resolves the NEAREST icon in a tight field (not the first, not the last)', () => {
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
+    // The three Copper Dig veins project ~7.8px apart at zone scale, so a
+    // probe near one keeps its neighbours inside the radius too: first-wins,
+    // last-wins, and nearest-wins genuinely disagree here.
+    const first = model.gatherNodes.find((n) => n.nodeId === 'ore_eastbrook_1');
+    const last = model.gatherNodes.find((n) => n.nodeId === 'ore_eastbrook_3');
+    expect(first).toBeDefined();
+    expect(last).toBeDefined();
+    if (!first || !last) return;
+    const d2 = (ax: number, ay: number, bx: number, by: number) =>
+      (ax - bx) * (ax - bx) + (ay - by) * (ay - by);
+    const r2 = MAP_GATHER_NODE_HIT_RADIUS * MAP_GATHER_NODE_HIT_RADIUS;
+    // Fixture guard: each probe keeps BOTH veins in radius, so the scan has a
+    // real choice to make (a drifted content layout would silently defuse
+    // this test without it).
+    const probeFirst = { mx: first.mx + 1, my: first.my + 1 };
+    const probeLast = { mx: last.mx + 1, my: last.my + 1 };
+    expect(d2(probeFirst.mx, probeFirst.my, last.mx, last.my)).toBeLessThanOrEqual(r2);
+    expect(d2(probeLast.mx, probeLast.my, first.mx, first.my)).toBeLessThanOrEqual(r2);
+    // Biased toward the FIRST vein in model order: a last-wins scan fails.
+    expect(gatherNodeMarkerAt(model.gatherNodes, probeFirst.mx, probeFirst.my)).toBe(first);
+    // Biased toward the LAST vein in the field: a first-wins scan fails.
+    expect(gatherNodeMarkerAt(model.gatherNodes, probeLast.mx, probeLast.my)).toBe(last);
+  });
+
+  it('drops every node when only the committed zone id differs (the id filter alone)', () => {
+    // Same frame as Eastbrook, a different committed zone id: every Eastbrook
+    // node still projects inside the view rect, so ONLY the zone-id guard can
+    // empty this model. No authored foreign node currently falls inside the
+    // Eastbrook frame, so the leak test below cannot see a deleted id filter;
+    // this one can.
+    const model = buildOverworldMapModel({
+      ...input(makeOverworldWorld('sim'), 1),
+      zone: { ...ZONE, id: ZONES[1].id },
+    });
+    expect(model.gatherNodes).toEqual([]);
+  });
+
+  it('culls nodes outside the zoomed view rect (pan pays only for what is on screen)', () => {
+    // zoom 3 framed at the player (0, 0): the visible square is 120yd wide
+    // and the cull pads it by the marker margin. The Copper Dig west field
+    // stays inside the pad; the far-west veins and the outlying wood / herb
+    // spawns drop.
+    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 3));
+    const kept = new Set(model.gatherNodes.map((n) => n.nodeId));
+    expect(kept.has('wood_eastbrook_2')).toBe(true); // (-57, -6): in view
+    expect(kept.has('ore_eastbrook_1')).toBe(true); // (-70, -53): inside the pad
+    expect(kept.has('ore_eastbrook_4')).toBe(false); // (-92, -48): west of the pad
+    expect(kept.has('herb_eastbrook_4')).toBe(false); // (23, -99): south of the pad
+    expect(model.gatherNodes).toHaveLength(8);
   });
 
   it('never leaks nodes from another zone into the committed zone model', () => {

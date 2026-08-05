@@ -1656,6 +1656,12 @@ export class Hud {
   // Gather-node icons of the last overworld map paint (zone map only), for the
   // hover/tap tooltip hit-test. Empty in delve mode and on the continent.
   private mapGatherNodes: MapGatherNodeMarker[] = [];
+  // Last gather-tip resolve, keyed by node id: pointermove hit-tests on every
+  // mouse move, and rebuilding the tooltip model per move would re-scan the
+  // bags per event (the src/ui/CLAUDE.md resolve-elision rule). Reset beside
+  // every mapGatherNodes rebuild, so a respawn or lock flip is at most one
+  // mediumHud repaint behind, the same freshness as the painted icon.
+  private mapGatherTipMemo: { nodeId: string; html: string } | null = null;
   // World-map level: the per-zone detail map, or the WoW-style continent overview
   // reached by right-click / the level-toggle button. Reset to 'zone' on open.
   private mapLevel: 'zone' | 'continent' = 'zone';
@@ -2497,9 +2503,10 @@ export class Hud {
     // quest-giver glyph ('!'/'?', quest names + level requirements) sits ON TOP of
     // gather icons and quest blobs, so it wins; then a gather node (precise
     // resource target); otherwise a quest-objective area shows its objectives
-    // with live tracker progress. Hit-tests run against the markers of the
-    // last paint, scaled from CSS px to the canvas backing space the model projects
-    // into.
+    // with live tracker progress. An arm that resolves no html falls through to
+    // the next (a glyph whose quests are all missing from content no longer
+    // blanks the tip). Hit-tests run against the markers of the last paint,
+    // scaled from CSS px to the canvas backing space the model projects into.
     let mapAreaTipShown = false;
     let mapTapStart: { x: number; y: number } | null = null;
     const hideMapAreaTip = (): void => {
@@ -9824,6 +9831,7 @@ export class Hud {
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
       this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
       this.continentRegions = [];
       this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const run = this.sim.delveRun;
@@ -9848,6 +9856,7 @@ export class Hud {
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
       this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
       this.mapView = null; // panning/zoom belong to the per-zone level only
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
@@ -9892,6 +9901,7 @@ export class Hud {
     this.mapQuestAreas = result.questAreas;
     this.mapNpcMarkers = result.npcs;
     this.mapGatherNodes = result.gatherNodes;
+    this.mapGatherTipMemo = null;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneDisplayName(zone.id) }));
   }
@@ -9914,10 +9924,14 @@ export class Hud {
 
   // Tooltip body for a hovered gather node on the zone map: reuses the world
   // hover's pure model + HTML (name, tool gate, ready/cooldown, fine preview)
-  // so the map and the 3D node tip never disagree.
+  // so the map and the 3D node tip never disagree. Memoized per node id (see
+  // mapGatherTipMemo) so a pointer sweeping across one icon resolves once.
   private gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string {
+    if (this.mapGatherTipMemo?.nodeId === marker.nodeId) return this.mapGatherTipMemo.html;
     const model = buildGatherNodeTooltip(this.sim, marker.nodeId);
-    return model ? gatherNodeTooltipHtml(model) : '';
+    const html = model ? gatherNodeTooltipHtml(model) : '';
+    this.mapGatherTipMemo = { nodeId: marker.nodeId, html };
+    return html;
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest

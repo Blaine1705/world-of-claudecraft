@@ -110,12 +110,12 @@ const GATHER_LOCK_OVERREACH = 1.75;
 // Herb clover: three petal offsets as fractions of radius (equilateral).
 const HERB_PETAL_OFFSET = 0.55;
 const HERB_PETAL_SCALE = 0.55;
-// Wood pine: tip / base / trunk proportions of the ready radius.
+// Wood pine: tip / base / trunk proportions of the ready radius. The trunk
+// hangs from the crown base line on both sides (symmetric outline).
 const WOOD_TIP_Y = -1;
 const WOOD_BASE_Y = 0.55;
 const WOOD_HALF_WIDTH = 0.85;
 const WOOD_TRUNK_HALF = 0.22;
-const WOOD_TRUNK_TOP = 0.45;
 const WOOD_TRUNK_BOTTOM = 1.05;
 // Ore hexagon: flat-top, radius is the vertex distance from center.
 const ORE_HEX_SIDES = 6;
@@ -347,6 +347,15 @@ export class MapWindowPainter {
       }
     }
 
+    // Gather nodes: profession-colored type silhouettes over the quest-area
+    // blobs (a resource field still reads inside a blue objective region) but
+    // under the zone title, POI labels, portals, and quest glyphs, so label
+    // text and quest / dungeon chrome stay readable on top.
+    // Tier-identical (fairness): never preset- or governor-gated.
+    if (model.gatherNodes.length > 0) {
+      this.drawGatherNodes(ctx, model.gatherNodes, colors);
+    }
+
     // Zone title (drawn on-canvas; the world map has no DOM zone label).
     this.labels.draw(ctx, zoneDisplayName(model.zoneId), S / 2, TITLE_BASELINE_Y, {
       font: TITLE_FONT,
@@ -364,14 +373,6 @@ export class MapWindowPainter {
     };
     for (const poi of model.pois) {
       this.labels.draw(ctx, zonePoiLabel(poi.zoneId, poi.poiIndex), poi.mx, poi.my, poiLabel);
-    }
-
-    // Gather nodes: profession-colored type silhouettes under portals / glyphs
-    // so quest and dungeon chrome stay readable on top, but over quest-area
-    // blobs so a resource field still reads inside a blue objective region.
-    // Tier-identical (fairness): never preset- or governor-gated.
-    if (model.gatherNodes.length > 0) {
-      this.drawGatherNodes(ctx, model.gatherNodes, colors);
     }
 
     // Dungeon entrance portals: a purple dot plus the dungeon name above it. The
@@ -534,9 +535,9 @@ export class MapWindowPainter {
           ? gatherReadyColor(colors, node.type)
           : gatherCooldownColor(colors, node.type);
       // Soft halo under unlocked ready nodes only (the classic "this is up"
-      // cue). Locked and cooldown keep the silhouette alone so the state stays
-      // readable without a second color channel alone (DESIGN.md color
-      // independence: lock also gets the strike below).
+      // cue). Cooldown and locked keep the bare silhouette: ready vs cooldown
+      // reads through size, outline, and glow, never hue alone, and the lock
+      // adds the diagonal strike below (DESIGN.md color independence).
       if (node.ready && !node.locked) {
         ctx.fillStyle = gatherGlowColor(colors, node.type);
         ctx.beginPath();
@@ -642,15 +643,15 @@ function pathGatherSilhouette(
     // One closed path (no ctx.rect): the fake 2D context in the painter suite
     // only stubs path primitives the rest of the map uses.
     const trunkHalf = radius * WOOD_TRUNK_HALF;
-    const trunkTop = my + radius * WOOD_TRUNK_TOP;
+    const crownBase = my + radius * WOOD_BASE_Y;
     const trunkBottom = my + radius * WOOD_TRUNK_BOTTOM;
     ctx.moveTo(mx, my + radius * WOOD_TIP_Y);
-    ctx.lineTo(mx + radius * WOOD_HALF_WIDTH, my + radius * WOOD_BASE_Y);
-    ctx.lineTo(mx + trunkHalf, my + radius * WOOD_BASE_Y);
+    ctx.lineTo(mx + radius * WOOD_HALF_WIDTH, crownBase);
+    ctx.lineTo(mx + trunkHalf, crownBase);
     ctx.lineTo(mx + trunkHalf, trunkBottom);
     ctx.lineTo(mx - trunkHalf, trunkBottom);
-    ctx.lineTo(mx - trunkHalf, trunkTop);
-    ctx.lineTo(mx - radius * WOOD_HALF_WIDTH, my + radius * WOOD_BASE_Y);
+    ctx.lineTo(mx - trunkHalf, crownBase);
+    ctx.lineTo(mx - radius * WOOD_HALF_WIDTH, crownBase);
     ctx.closePath();
     return;
   }
