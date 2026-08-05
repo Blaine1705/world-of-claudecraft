@@ -33,8 +33,8 @@ function primary(sim: Sim) {
   return { meta, e };
 }
 
-/** Catalogued Phase 1 stub relic (Hollow Crypt unique). */
-const CATALOGUE_RELIC = 'boundstone_helm';
+/** Catalogued Hollow Crypt unique (Phase 2 expanded conquerors_hollow_crypt). */
+const CATALOGUE_RELIC = 'cryptbone_helm';
 /** Real item that is NOT a catalogued Reliquary relic. */
 const NON_RELIC = 'glimmerfin_koi';
 
@@ -120,11 +120,16 @@ describe('Reliquary retro ownership without inventing firstFind clears', () => {
     const owned = new Set([CATALOGUE_RELIC]);
     const page = RELIQUARY_PAGES.find((p) => p.id === 'conquerors_hollow_crypt')!;
     const progress = pageCompletion(page, { itemsDiscovered: owned });
-    expect(progress).toEqual({ owned: 1, total: 1, complete: true });
+    expect(progress.owned).toBe(1);
+    expect(progress.total).toBe(page.relics.length);
+    expect(progress.complete).toBe(false);
+    // Own every slot: retro completion without firstFind clears.
+    const allOwned = new Set(page.relics.filter((r) => r.kind === 'item').map((r) => r.itemId));
+    expect(pageCompletion(page, { itemsDiscovered: allOwned }).complete).toBe(true);
 
     const catalog = catalogItemCompletion(owned);
     expect(catalog.owned).toBe(1);
-    expect(catalog.total).toBeGreaterThanOrEqual(1);
+    expect(catalog.total).toBeGreaterThan(1);
   });
 
   it('a pre-Reliquary save with discovery loads owned without firstFind clears', () => {
@@ -151,11 +156,11 @@ describe('Reliquary retro ownership without inventing firstFind clears', () => {
     expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toBeUndefined();
     expect(isReliquaryStateEmpty(meta.reliquary)).toBe(true);
 
-    // Pure completion still sees the item as owned.
+    // Pure completion still sees the item as owned (partial page is fine).
     const page = RELIQUARY_PAGES.find((p) => p.id === 'conquerors_hollow_crypt')!;
-    expect(pageCompletion(page, { itemsDiscovered: meta.deedStats.itemsDiscovered }).complete).toBe(
-      true,
-    );
+    const progress = pageCompletion(page, { itemsDiscovered: meta.deedStats.itemsDiscovered });
+    expect(progress.owned).toBe(1);
+    expect(progress.complete).toBe(false);
 
     // Re-discover does not invent a late firstFind once already in the set
     // (the hub short-circuits before the Reliquary hook).
@@ -218,7 +223,7 @@ describe('Reliquary recent ring cap', () => {
     // Drive the ring through noteRelicItemFind after clearing firstFind so
     // each push is accepted (simulates many distinct catalogued finds).
     for (let i = 0; i < RELIQUARY_RECENT_CAP + 3; i++) {
-      const fakeId = `boundstone_helm`; // same id: re-note is no-op
+      const fakeId = CATALOGUE_RELIC; // same id: re-note is no-op
       delete meta.reliquary.firstFind[fakeId];
       // Push via onItemDiscovered which re-notes and re-pushes.
       noteRelicItemFind(meta, fakeId);
@@ -298,6 +303,11 @@ describe('Reliquary pure completion + curator rank', () => {
       }),
     ).toBe(2);
     expect(clearCountForSource(meta, { kind: 'none' })).toBeUndefined();
+    // World-boss kills ride deedStats.counters.thunzharrKills.
+    expect(clearCountForSource(meta, { kind: 'deed_stat', stat: 'thunzharrKills' })).toBe(0);
+    meta.deedStats.counters.thunzharrKills = 5;
+    expect(clearCountForSource(meta, { kind: 'deed_stat', stat: 'thunzharrKills' })).toBe(5);
+    expect(clearCountForSource(meta, { kind: 'deed_stat', stat: 'not_a_real_stat' })).toBe(0);
   });
 });
 

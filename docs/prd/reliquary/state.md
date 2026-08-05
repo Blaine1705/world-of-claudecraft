@@ -26,11 +26,13 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 1 complete (sim foundation). Phase 1 QA not started.
+- **Current phase:** Phase 2 complete. Ready for Phase 2 QA, then Phase 3
+  (IWorld + wire thrift).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then run Phase 1 QA (or proceed to Phase 2 after QA).
+  `origin/release/v0.35.0`, run Phase 2 QA (content + state pins, tsc, checklist
+  in progress.md), then Phase 3: IWorld facet, sparse wire, ClientWorld parity.
 - **Blocker:** none.
-- **Release tip at Phase 1:** `de450dc41f` (already up to date on merge).
+- **Release tip at Phase 2:** `de450dc41f` (already up to date on merge).
 
 ## Locked design decisions
 
@@ -63,16 +65,17 @@ session load:
 | Concern | Anchor |
 |---|---|
 | Design contract | `docs/design/reliquary.md` |
-| Catalog types + stub page | `src/sim/content/reliquary.ts` (`RELIQUARY_PAGES`, `isCataloguedRelicItem`) |
-| Runtime + serialize | `src/sim/reliquary.ts` (`ReliquaryState`, `onItemDiscovered`, pure completion) |
+| Catalog types + Conqueror pages | `src/sim/content/reliquary.ts` (`RELIQUARY_PAGES`, `RELIQUARY_HEROIC_GEAR`, `RELIQUARY_SET_MEMBERS`, `isCataloguedRelicItem`) |
+| Runtime + serialize | `src/sim/reliquary.ts` (`ReliquaryState`, `onItemDiscovered`, pure completion, `deed_stat` clear reads) |
 | Discovery hub | `src/sim/deeds.ts` `markItemDiscovered` (calls `onItemDiscovered`) |
 | Player state field | `PlayerMeta.reliquary` / `CharacterState.reliquary` in `src/sim/sim.ts` |
 | Grant hub | `src/sim/sim.ts` `addItem` / `addItemInstance` |
 | DeedStats | `src/sim/types.ts` `DeedStats` |
 | Dungeon clears | `deedStats.dungeonClears`, `FINAL_BOSS_DUNGEONS` |
 | Delve clears | `PlayerMeta.delveClears`, `grantDelveClearTo` |
+| World boss kills | `deedStats.counters.thunzharrKills` (clearSource `deed_stat`) |
 | Heroic loot | `src/sim/content/heroic_loot.ts` |
-| Sets | `src/sim/content/item_sets.ts` |
+| Sets | `src/sim/content/item_sets.ts` + col_set_* deeds |
 | World bosses | `src/sim/world_boss.ts` |
 | Mounts | `src/sim/mounts.ts`, `src/sim/content/mounts.ts` |
 | Weapon skins | `src/sim/content/weapon_skins.ts` + account cosmetics |
@@ -82,12 +85,15 @@ session load:
 | Interface standard | `DESIGN.md` |
 | Deeds doctrine | `docs/design/deeds.md` |
 | Phase 1 tests | `tests/reliquary_state.test.ts` |
+| Phase 2 content pins | `tests/reliquary_content.test.ts` |
 
 ## Naming ledger (fill as Phase 1 lands)
 
 | Symbol | Path | Status |
 |---|---|---|
-| `RELIQUARY_PAGES` / shelves | `src/sim/content/reliquary.ts` | **landed** (stub page) |
+| `RELIQUARY_PAGES` / shelves | `src/sim/content/reliquary.ts` | **landed** (22 Conqueror pages) |
+| `RELIQUARY_HEROIC_GEAR` / `RELIQUARY_SET_MEMBERS` | `src/sim/content/reliquary.ts` | **landed** (pin targets) |
+| `ReliquaryClearSource` deed_stat | `src/sim/content/reliquary.ts` | **landed** (Thunzharr) |
 | `ReliquaryState` / `SavedReliquaryState` | `src/sim/reliquary.ts` | **landed** |
 | `onItemDiscovered` / `noteRelicItemFind` | `src/sim/reliquary.ts` | **landed** |
 | `pageCompletion` / `catalogItemCompletion` / `curatorRankFromOwned` | `src/sim/reliquary.ts` | **landed** |
@@ -118,9 +124,9 @@ session load:
 - [x] Serialize omits empty Reliquary fields
 - [x] firstFind / marks only catalog ids
 - [x] recent ring buffer capped (plan: 12)
+- [x] Content pins prevent unbounded auto-scrape of entire loot tables (Phase 2)
 - [ ] Wire event id-only; sparse blob dirty-gated (Phase 3)
 - [ ] Cold window: signature latch; no per-frame full rebuild (Phase 4+)
-- [ ] Content pins prevent unbounded auto-scrape of entire loot tables (Phase 2)
 
 ## Gotchas
 
@@ -128,6 +134,7 @@ session load:
   live **inside** that hub (or only callee), not only in `addItem`.
 - Heroic variants credit base ids for discovery; page authoring must decide
   base vs heroic row display without double-counting completion incorrectly.
+  Phase 2 catalogs base ids only (never `heroic_<base>`).
 - Character autosave already full-rewrites JSONB every 30s for all online
   sessions; Reliquary must stay sparse so veterans do not inflate every tick's
   serialize cost.
@@ -140,6 +147,8 @@ session load:
 - Do not grow `hud.ts` or `sim.ts` with markup or method banks.
 - Retro veterans with items already in `itemsDiscovered` own the relic for
   completion math but do **not** receive invented firstFind clear history.
+- Mount reins appear on `HEROIC_BOSS_LOOT` but stay off Conqueror pages
+  (Horizons Phase 8).
 
 ## Research notes (plan-time)
 

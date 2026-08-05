@@ -24,7 +24,8 @@ import {
 } from './content/reliquary';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import type { DeedStats } from './types';
+import type { DeedStatKey, DeedStats } from './types';
+import { DEED_STAT_KEYS } from './types';
 
 /** Cap for the recent-find ring buffer (plan: 12). Drop oldest on push. */
 export const RELIQUARY_RECENT_CAP = 12;
@@ -143,6 +144,13 @@ export function clearCountForSource(
   if (!source || source.kind === 'none') return undefined;
   if (source.kind === 'delve') {
     const n = meta.delveClears[source.delveId];
+    return typeof n === 'number' && n > 0 ? Math.floor(n) : 0;
+  }
+  if (source.kind === 'deed_stat') {
+    // Only authored DEED_STAT_KEYS are readable; unknown strings yield 0 so a
+    // hand-edited catalog cannot invent a parallel counter channel.
+    if (!(DEED_STAT_KEYS as readonly string[]).includes(source.stat)) return 0;
+    const n = meta.deedStats.counters[source.stat as DeedStatKey];
     return typeof n === 'number' && n > 0 ? Math.floor(n) : 0;
   }
   // dungeon

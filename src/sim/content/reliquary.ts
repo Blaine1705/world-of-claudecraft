@@ -5,9 +5,15 @@
 //
 // Page table is append-only once product pages ship: append new pages at the
 // END and never reorder or remove an id (ids may be referenced by firstFind
-// diagnostics and content pin tests). Phase 1 ships a minimal stub page so
-// state hooks and tests exercise a real catalogued relic id; Phase 2 expands
-// the Conqueror set against live loot tables.
+// diagnostics and content pin tests). Phase 2 authors the full Conquerors
+// shelf against live loot / set tables; Professions and Horizons follow later.
+//
+// Curation rule (performance + product): every relic is hand-listed. Do not
+// auto-scrape every loot row. Prefer rare+ chase uniques, signature dungeon
+// brand pieces, HEROIC_BOSS_LOOT gear (not mount reins; those are Horizons),
+// and epic set members. Heroic upgraded variants (heroic_<base>) are NOT
+// catalogued: markItemDiscovered already credits the base id, so listing both
+// would double-count completion.
 
 /** Top-level shelf ids (Overview is virtual UI, not a catalog shelf row). */
 export type ReliquaryShelfId = 'conquerors' | 'professions' | 'horizons';
@@ -16,6 +22,8 @@ export type ReliquaryShelfId = 'conquerors' | 'professions' | 'horizons';
 export type ReliquaryClearSource =
   | { kind: 'dungeon'; dungeonId: string; difficulty?: 'normal' | 'heroic' | 'any' }
   | { kind: 'delve'; delveId: string }
+  /** Existing DeedStats.counters key (e.g. thunzharrKills for the world boss). */
+  | { kind: 'deed_stat'; stat: string }
   | { kind: 'none' };
 
 /** One unique slot on a page. Item relics own via itemsDiscovered; other kinds
@@ -40,17 +48,393 @@ export interface ReliquaryPageDef {
   relics: readonly ReliquaryRelicDef[];
 }
 
-// Phase 1 stub: one Conqueror page with a single live unique so discovery
-// hooks and content-shaped tests have a real catalogued id. Phase 2 replaces
-// this with the full dungeon / raid / world-boss / delve authoring pass.
+// ---------------------------------------------------------------------------
+// Item-relic helpers (keep page tables readable; no engine behavior)
+// ---------------------------------------------------------------------------
+
+function items(...ids: readonly string[]): ReliquaryRelicDef[] {
+  return ids.map((itemId) => ({ kind: 'item' as const, itemId }));
+}
+
+// Epic set members, pinned to the same id lists as col_set_* deeds in
+// content/deeds.ts so collection pages and Reliquary set pages stay aligned.
+// Leveling haste kits (vale / boundstone / greyjaw) stay out of Conquerors;
+// they are world-drop kits, not instance spoils.
+export const RELIQUARY_SET_MEMBERS = {
+  deathlord: [
+    'deathlord_warplate',
+    'deathlord_legguards',
+    'deathlord_sabatons',
+    'deathlords_dread_visage',
+  ],
+  wyrmshadow: [
+    'wyrmshadow_harness',
+    'wyrmshadow_treads',
+    'wyrmshadow_legguards',
+    'wyrmshadow_talongrips',
+  ],
+  necromancers: [
+    'necromancers_starshroud',
+    'necromancers_soulsteps',
+    'necromancers_legwraps',
+    'necromancers_soulspire_mantle',
+  ],
+  crownforged: [
+    'crownforged_gauntlets',
+    'crownforged_girdle',
+    'crownforged_dreadhelm',
+    'crownforged_warspaulders',
+  ],
+  nighttalon: [
+    'nighttalon_grips',
+    'nighttalon_waistband',
+    'nighttalon_crown',
+    'nighttalon_shoulderguards',
+  ],
+  soulflame: ['soulflame_gloves', 'soulflame_cord', 'soulflame_cowl', 'soulflame_mantle'],
+  stormcallers: [
+    'stormcallers_handguards',
+    'stormcallers_waistguard',
+    'stormcallers_crown',
+    'stormcallers_spaulders',
+  ],
+} as const;
+
+// HEROIC_BOSS_LOOT gear only (mount reins excluded; Horizons owns mounts).
+// Tests pin these lists against the live table so a new heroic gear row fails
+// until it is deliberately added here.
+export const RELIQUARY_HEROIC_GEAR = {
+  morthen: [
+    'morthens_cryptforged_hauberk',
+    'shadowpulse_handwraps',
+    'bonechill_striders',
+    'lunarward_cinch',
+    'cryptplate_helm',
+    'shadowpulse_slippers',
+    'bonechill_cord',
+  ],
+  vael_the_mistcaller: [
+    'mistcallers_fang',
+    'tidebound_spaulders',
+    'sash_of_the_sunken_court',
+    'mistforged_pauldrons',
+    'tideguard_faceguard',
+    'sunken_court_mantle',
+    'dreamroot_boots',
+  ],
+  ysolei: [
+    'lunar_tide_greatstaff',
+    'tidewoven_trousers',
+    'choirmothers_casque',
+    'stormbark_mantle',
+    'lunar_choir_leggings',
+    'choir_blessed_spaulders',
+    'tideworn_warboots',
+  ],
+  korzul_the_gravewyrm: [
+    'gravewyrm_cleaver',
+    'shroud_of_the_gravewyrm',
+    'sanctum_prowlers_grips',
+    'gravewyrm_claws',
+    'gravescale_girdle',
+    'wyrmchoir_handwraps',
+    'wildsoul_maul',
+  ],
+  wildheart_high_priest: [
+    'basin_stalkers_tunic',
+    'verdant_heart_vestment',
+    'sunbone_ritual_hauberk',
+    'greatfang_of_the_basin',
+    'sunbone_oracles_crown',
+    'bloodmane_war_legguards',
+  ],
+  nythraxis_scourge_of_thornpeak: [
+    'deathless_greatblade',
+    'scepter_of_the_deathless_court',
+    'stormcallers_focus',
+  ],
+} as const;
+
+// ---------------------------------------------------------------------------
+// Conquerors shelf (Phase 2)
+// ---------------------------------------------------------------------------
+// Order: append-only. Phase 1 stub id `conquerors_hollow_crypt` is kept and
+// expanded with real Hollow Crypt uniques (boundstone_helm moved to Sanctum).
+
 export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
+  // ---- Five-man dungeons: normal chase uniques ----
   {
     id: 'conquerors_hollow_crypt',
     shelf: 'conquerors',
     name: 'The Hollow Crypt',
-    desc: 'Uniques claimed from the Hollow Crypt.',
-    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'any' },
-    relics: [{ kind: 'item', itemId: 'boundstone_helm' }],
+    desc: 'Signature spoils claimed from Morthen and the Hollow Crypt.',
+    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'normal' },
+    relics: items(
+      'cryptbone_greaves',
+      'cryptbone_helm',
+      'cryptbone_pauldrons',
+      'greyjaw_hide_boots',
+      'gravewoven_bag',
+    ),
+  },
+  {
+    id: 'conquerors_hollow_crypt_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Hollow Crypt',
+    desc: 'Heroic-only epics from Morthen the Gravecaller.',
+    clearSource: { kind: 'dungeon', dungeonId: 'hollow_crypt', difficulty: 'heroic' },
+    relics: items(...RELIQUARY_HEROIC_GEAR.morthen),
+  },
+  {
+    id: 'conquerors_sunken_bastion',
+    shelf: 'conquerors',
+    name: 'The Sunken Bastion',
+    desc: 'Rare and epic spoils from Olen and Vael the Fogbinder.',
+    clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'normal' },
+    relics: items(
+      'tideguard_greaves',
+      'tideguard_sabatons',
+      'eelscale_leggings',
+      'tidescale_vest',
+      'drowned_prayer_leggings',
+      'drowned_prayer_sandals',
+      'eelscale_treads',
+      'mistcallers_duffel',
+    ),
+  },
+  {
+    id: 'conquerors_sunken_bastion_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Sunken Bastion',
+    desc: 'Heroic-only epics from Vael the Fogbinder.',
+    clearSource: { kind: 'dungeon', dungeonId: 'sunken_bastion', difficulty: 'heroic' },
+    relics: items(...RELIQUARY_HEROIC_GEAR.vael_the_mistcaller),
+  },
+  {
+    id: 'conquerors_drowned_temple',
+    shelf: 'conquerors',
+    name: 'The Drowned Temple',
+    desc: 'Moonshroud spoils from Ysolei, Avatar of the Drowned Moon.',
+    clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'normal' },
+    relics: items(
+      'ysols_pearl_greaves',
+      'moonshroud_breastplate',
+      'moonshroud_robe',
+      'moonshroud_tunic',
+    ),
+  },
+  {
+    id: 'conquerors_drowned_temple_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Drowned Temple',
+    desc: 'Heroic-only epics from Ysolei.',
+    clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'heroic' },
+    relics: items(...RELIQUARY_HEROIC_GEAR.ysolei),
+  },
+  {
+    id: 'conquerors_gravewyrm_sanctum',
+    shelf: 'conquerors',
+    name: 'Gravewyrm Sanctum',
+    desc: 'Rare and epic spoils from the Sanctum bosses and Korzul the Gravewyrm.',
+    clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'normal' },
+    relics: items(
+      // Mid-boss and trash chase (rare+)
+      'boundstone_helm',
+      'boundstone_girdle',
+      'gravewyrm_mantle',
+      'gravewyrm_gauntlets',
+      'gravewyrm_thornmaul',
+      'korgaths_chainwraps',
+      'staff_of_velkhar',
+      'shadowmeld_tunic',
+      'wyrmcult_grand_robe',
+      'gravewyrm_sabatons',
+      'wyrmcult_soulsteps',
+      'wyrmshadow_treads',
+      'boneguard_breastplate',
+      'gravewyrm_stalkers_treads',
+      'deathlord_legguards',
+      'necromancers_soulsteps',
+      'wyrmshadow_legguards',
+      // Korzul final
+      'wyrmfang_greatblade',
+      'staff_of_the_gravewyrm',
+      'fang_of_korzul',
+      'deathlord_warplate',
+      'necromancers_starshroud',
+      'wyrmshadow_harness',
+      'deathlords_dread_visage',
+      'necromancers_soulspire_mantle',
+      'wyrmshadow_talongrips',
+      'nightfangs_greatstaff',
+      'wildgrowth_leggings',
+      'grovewardens_grips',
+      'verdant_walkers',
+    ),
+  },
+  {
+    id: 'conquerors_gravewyrm_sanctum_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Gravewyrm Sanctum',
+    desc: 'Heroic-only epics from Korzul the Gravewyrm.',
+    clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'heroic' },
+    relics: items(...RELIQUARY_HEROIC_GEAR.korzul_the_gravewyrm),
+  },
+  {
+    id: 'conquerors_wildheart_basin',
+    shelf: 'conquerors',
+    name: 'The Wildheart Basin',
+    desc: 'Signature weapons from Zulgar and the Fanglord.',
+    clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'normal' },
+    relics: items(
+      'fanglords_beastspear',
+      'wildheart_tuskblade',
+      'wildheart_hexwood_staff',
+      'wildheart_fangknife',
+    ),
+  },
+  {
+    id: 'conquerors_wildheart_basin_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Wildheart Basin',
+    desc: 'Heroic-only epics from Zulgar, Voice of the Basin.',
+    clearSource: { kind: 'dungeon', dungeonId: 'wildheart_basin', difficulty: 'heroic' },
+    relics: items(...RELIQUARY_HEROIC_GEAR.wildheart_high_priest),
+  },
+  // ---- Raid ----
+  {
+    id: 'conquerors_nythraxis',
+    shelf: 'conquerors',
+    name: 'Nythraxis Raid',
+    desc: 'Epic and legendary spoils from Nythraxis, Scourge of Thornpeak.',
+    clearSource: { kind: 'dungeon', dungeonId: 'nythraxis_boss_arena', difficulty: 'normal' },
+    relics: items(
+      'deathless_heartwood',
+      'kingsbane_last_oath',
+      'bonewrought_greatsword',
+      'bonewrought_bulwark',
+      'direfang_greatblade',
+      'wraithfire_orb',
+      'maul_of_the_scourged_wilds',
+      'crownforged_dreadhelm',
+      'crownforged_warspaulders',
+      'nighttalon_crown',
+      'nighttalon_shoulderguards',
+      'soulflame_cowl',
+      'soulflame_mantle',
+      'stormcallers_crown',
+      'stormcallers_spaulders',
+    ),
+  },
+  {
+    id: 'conquerors_nythraxis_heroic',
+    shelf: 'conquerors',
+    name: 'Heroic Nythraxis Raid',
+    desc: 'Heroic-only raid weapons from Nythraxis.',
+    clearSource: { kind: 'dungeon', dungeonId: 'nythraxis_boss_arena', difficulty: 'heroic' },
+    relics: items(...RELIQUARY_HEROIC_GEAR.nythraxis_scourge_of_thornpeak),
+  },
+  // ---- World boss ----
+  {
+    id: 'conquerors_thunzharr',
+    shelf: 'conquerors',
+    name: 'Thunzharr, the Waking Peak',
+    desc: 'Personal epic spoils from the Waking Peak world boss.',
+    clearSource: { kind: 'deed_stat', stat: 'thunzharrKills' },
+    relics: items(
+      'crownforged_gauntlets',
+      'nighttalon_grips',
+      'soulflame_gloves',
+      'stormcallers_handguards',
+      'crownforged_girdle',
+      'nighttalon_waistband',
+      'soulflame_cord',
+      'stormcallers_waistguard',
+      'vestments_of_the_waking_grove',
+    ),
+  },
+  // ---- Delves (rare+ uniques; mark-shop signature pieces included) ----
+  {
+    id: 'conquerors_collapsed_reliquary',
+    shelf: 'conquerors',
+    name: 'The Collapsed Reliquary',
+    desc: 'Signature rares from the Collapsed Reliquary lockpick chest.',
+    clearSource: { kind: 'delve', delveId: 'collapsed_reliquary' },
+    relics: items('deacon_reliquary_helm', 'varric_shadow_cowl'),
+  },
+  {
+    id: 'conquerors_drowned_litany',
+    shelf: 'conquerors',
+    name: 'The Drowned Litany',
+    desc: 'Rare and epic spoils from the Drowned Litany.',
+    clearSource: { kind: 'delve', delveId: 'drowned_litany' },
+    relics: items(
+      'nhalias_bell_maul',
+      'widow_silk_hood',
+      'nhalias_litany_rod',
+      'blackwater_vanguard_chest',
+      'siltstep_leggings',
+      'sunken_reliquary_hood',
+      'sister_nhalia_choir_plate',
+      'drowned_choir_fang',
+    ),
+  },
+  // ---- Epic set pages (members shared with dungeon/world-boss pages) ----
+  {
+    id: 'conquerors_set_deathlord',
+    shelf: 'conquerors',
+    name: 'Barrowlord Battlegear',
+    desc: 'The full Deathlord plate family.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_SET_MEMBERS.deathlord),
+  },
+  {
+    id: 'conquerors_set_wyrmshadow',
+    shelf: 'conquerors',
+    name: 'Nightfang Vestments',
+    desc: 'The full Wyrmshadow leather family.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_SET_MEMBERS.wyrmshadow),
+  },
+  {
+    id: 'conquerors_set_necromancers',
+    shelf: 'conquerors',
+    name: 'Mournweave Raiment',
+    desc: 'The full Necromancers cloth family.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_SET_MEMBERS.necromancers),
+  },
+  {
+    id: 'conquerors_set_crownforged',
+    shelf: 'conquerors',
+    name: 'Bonewrought Regalia',
+    desc: 'The full Crownforged plate family.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_SET_MEMBERS.crownforged),
+  },
+  {
+    id: 'conquerors_set_nighttalon',
+    shelf: 'conquerors',
+    name: 'Direfang Pelt',
+    desc: 'The full Nighttalon leather family.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_SET_MEMBERS.nighttalon),
+  },
+  {
+    id: 'conquerors_set_soulflame',
+    shelf: 'conquerors',
+    name: 'Wraithfire Regalia',
+    desc: 'The full Soulflame cloth family.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_SET_MEMBERS.soulflame),
+  },
+  {
+    id: 'conquerors_set_stormcallers',
+    shelf: 'conquerors',
+    name: 'Galecall Vestments',
+    desc: 'The full Stormcallers cloth family.',
+    clearSource: { kind: 'none' },
+    relics: items(...RELIQUARY_SET_MEMBERS.stormcallers),
   },
 ];
 
