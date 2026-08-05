@@ -3228,7 +3228,7 @@ export const ko_KR: EnTranslations = {
       "levels": "레벨 {min}부터 {max}까지"
     },
     "arenaGate": {
-      "minLevelNote": "레벨 {level} 필요"
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

@@ -3228,7 +3228,7 @@ export const ru_RU: EnTranslations = {
       "levels": "Уровни {min} до {max}"
     },
     "arenaGate": {
-      "minLevelNote": "Требуется уровень {level}"
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {

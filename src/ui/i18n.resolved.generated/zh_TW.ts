@@ -3228,7 +3228,7 @@ export const zh_TW: EnTranslations = {
       "levels": "等級 {min} 至 {max}"
     },
     "arenaGate": {
-      "minLevelNote": "需要等級 {level}"
+      "minLevelNote": "Requires level {level}"
     }
   },
   "gatherEvent": {
