@@ -924,9 +924,16 @@ export async function listAccounts(
   const offset = (page - 1) * limit;
   const direction = dir === 'asc' ? 'ASC' : 'DESC';
   const column = ACCOUNT_SORT_COLUMNS[sort];
+  // a.last_login is nullable (accounts that never logged in): Postgres sorts NULL
+  // before every non-null value on DESC, which would put never-logged-in accounts
+  // ahead of recently active ones under a descending "Last login" sort, the opposite
+  // of what the header implies. Pin NULLS LAST for both directions so "never" always
+  // sorts as the oldest possible login, not the newest.
+  const nullsPolicy = sort === 'last_login' ? ' NULLS LAST' : '';
   // a.id is always the unique tiebreaker; for the id sort itself that would
   // just repeat "a.id DESC, a.id DESC", so it is the whole ORDER BY on its own.
-  const order = sort === 'id' ? `a.id ${direction}` : `${column} ${direction}, a.id ${direction}`;
+  const order =
+    sort === 'id' ? `a.id ${direction}` : `${column} ${direction}${nullsPolicy}, a.id ${direction}`;
   const [rows, total] = await Promise.all([
     pool.query(
       `SELECT a.id, a.username, a.created_at, a.last_login, a.is_admin,
