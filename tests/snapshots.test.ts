@@ -5334,8 +5334,8 @@ describe('negotiated Warlock pet-special wire v1', () => {
     expect(legacySnap.psw).toBeUndefined();
     expect(capableSnap.psw).toBe(1);
 
-    const legacyClient = bareClient(legacy.pid, 'warlock');
-    const capableClient = bareClient(capable.pid, 'warlock');
+    const legacyClient = bareClient(legacy.pid, { playerClass: 'warlock' });
+    const capableClient = bareClient(capable.pid, { playerClass: 'warlock' });
     (legacyClient as any).applySnapshot(legacySnap);
     (capableClient as any).applySnapshot(capableSnap);
     expect(legacyClient.petSpecialCommandsSupported).toBe(false);
