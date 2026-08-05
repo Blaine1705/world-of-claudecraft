@@ -23,10 +23,13 @@ const PNPM_VERSION = (() => {
 })();
 
 // Same job-boundary slicing as tests/ci_workflow.test.ts: the lookahead stops
-// at the next two-space job key so one job's text cannot satisfy a pin meant
-// for another.
+// at the next two-space job key OR a top-level comment line (which documents
+// the next job), so one job's text or a neighbour's comment cannot satisfy a
+// pin meant for another.
 function jobSourceIn(text: string, name: string, file: string): string {
-  const match = text.match(new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [A-Za-z][A-Za-z0-9_-]*:|$)`));
+  const match = text.match(
+    new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [A-Za-z][A-Za-z0-9_-]*:|\\n  #|$)`),
+  );
   if (!match) throw new Error(`missing ${file} job: ${name}`);
   return match[0];
 }
