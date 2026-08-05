@@ -427,6 +427,7 @@ import {
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
+import { unitFrameCurrentMaxText } from './hud_frames';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -5893,6 +5894,13 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    // The player unit frame's hp/resource text is memoized on the raw value,
+    // which does not change on a locale switch, so clear the memo to force
+    // unitFrameCurrentMaxText to re-render for the new language (#2900 review).
+    this.lastPlayerFrameHp = Number.NaN;
+    this.lastPlayerFrameMaxHp = Number.NaN;
+    this.lastPlayerFrameResource = Number.NaN;
+    this.lastPlayerFrameMaxResource = Number.NaN;
     this.syncDailyRewardsSurfaceLabels();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
@@ -8305,7 +8313,7 @@ export class Hud {
     if (p.hp !== this.lastPlayerFrameHp || p.maxHp !== this.lastPlayerFrameMaxHp) {
       this.lastPlayerFrameHp = p.hp;
       this.lastPlayerFrameMaxHp = p.maxHp;
-      playerFrame.hpText = `${p.hp} / ${p.maxHp}`;
+      playerFrame.hpText = unitFrameCurrentMaxText(p.hp, p.maxHp);
     }
     playerFrame.resourceKind = p.resourceType;
     playerFrame.resFrac = p.resource / Math.max(1, p.maxResource);
@@ -8315,7 +8323,7 @@ export class Hud {
     ) {
       this.lastPlayerFrameResource = p.resource;
       this.lastPlayerFrameMaxResource = p.maxResource;
-      playerFrame.resText = `${Math.round(p.resource)} / ${p.maxResource}`;
+      playerFrame.resText = unitFrameCurrentMaxText(Math.round(p.resource), p.maxResource);
     }
     if (p.level !== this.lastPlayerFrameLevel) {
       this.lastPlayerFrameLevel = p.level;
@@ -8417,7 +8425,9 @@ export class Hud {
         const targetFrame = this.targetFrameDescriptor;
         targetFrame.present = true;
         targetFrame.hpFrac = target.hp / Math.max(1, target.maxHp);
-        targetFrame.hpText = target.dead ? t('hud.core.dead') : `${target.hp} / ${target.maxHp}`;
+        targetFrame.hpText = target.dead
+          ? t('hud.core.dead')
+          : unitFrameCurrentMaxText(target.hp, target.maxHp);
         targetFrame.showAbsorbText = !target.dead;
         // The target's power bar (classic target frame): players and caster
         // mobs show their mana/rage/energy; a resource-less target (a plain
@@ -8434,7 +8444,7 @@ export class Hud {
         targetFrame.resText =
           target.dead || !target.resourceType
             ? ''
-            : `${Math.round(target.resource)} / ${target.maxResource}`;
+            : unitFrameCurrentMaxText(Math.round(target.resource), target.maxResource);
         targetFrame.levelText = String(target.level);
         targetFrame.name = entityDisplayName(target);
         targetFrame.titlePre = this.targetTitleDecoration.pre;
@@ -8523,7 +8533,9 @@ export class Hud {
           const totFrame = this.totFrameDescriptor;
           totFrame.present = true;
           totFrame.hpFrac = tot.hp / Math.max(1, tot.maxHp);
-          totFrame.hpText = tot.dead ? t('hud.core.dead') : `${tot.hp} / ${tot.maxHp}`;
+          totFrame.hpText = tot.dead
+            ? t('hud.core.dead')
+            : unitFrameCurrentMaxText(tot.hp, tot.maxHp);
           totFrame.showAbsorbText = false;
           totFrame.resourceKind = 'none';
           totFrame.resFrac = 0;
