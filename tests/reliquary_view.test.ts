@@ -118,8 +118,8 @@ describe('buildReliquaryView empty state', () => {
     const model = buildReliquaryView(input());
     expect(model.progress).toEqual({
       owned: 0,
-      // Unique item relics (9) + authored mark relics (1); mounts wait for Horizons.
-      total: 10,
+      // Unique item relics (9) + authored mark (1) + mount (1) from TEST_PAGES.
+      total: 11,
       fraction: 0,
       curatorRank: 0,
       curatorSealId: null,
@@ -160,9 +160,9 @@ describe('buildReliquaryView progress and rank', () => {
       input({ itemsDiscovered: ownedSet('crypt_helm', 'crypt_blade', 'dl_chest') }),
     );
     expect(model.progress.owned).toBe(3);
-    // 9 unique items + 1 authored mark slot (unowned) on the synthetic catalog.
-    expect(model.progress.total).toBe(10);
-    expect(model.progress.fraction).toBeCloseTo(3 / 10, 5);
+    // 9 unique items + 1 mark + 1 mount (unowned Horizons) on the synthetic catalog.
+    expect(model.progress.total).toBe(11);
+    expect(model.progress.fraction).toBeCloseTo(3 / 11, 5);
     // Rank thresholds: 1, 10, 25, 50, 100. Owned 3 => rank 1 (apprentice seal).
     expect(model.progress.curatorRank).toBe(1);
     expect(model.progress.curatorSealId).toBe('apprentice');
@@ -189,7 +189,7 @@ describe('buildReliquaryView progress and rank', () => {
       }),
     );
     expect(model.progress.owned).toBe(1);
-    expect(model.progress.total).toBe(10);
+    expect(model.progress.total).toBe(11);
     expect(model.progress.curatorRank).toBe(1);
     const prof = buildReliquaryView(
       input({
@@ -199,6 +199,27 @@ describe('buildReliquaryView progress and rank', () => {
       }),
     );
     expect(prof.shelfPages.find((p) => p.pageId === 'prof_stub')).toMatchObject({
+      owned: 1,
+      total: 1,
+      complete: true,
+    });
+  });
+
+  it('counts Horizons mounts in catalog and shelf totals from ownedMounts', () => {
+    const model = buildReliquaryView(
+      input({
+        ownedMounts: ownedSet('steed_a'),
+      }),
+    );
+    expect(model.progress.owned).toBe(1);
+    expect(model.progress.total).toBe(11);
+    const horiz = buildReliquaryView(
+      input({
+        nav: 'horizons',
+        ownedMounts: ownedSet('steed_a'),
+      }),
+    );
+    expect(horiz.shelfPages.find((p) => p.pageId === 'horiz_stub')).toMatchObject({
       owned: 1,
       total: 1,
       complete: true,
@@ -384,6 +405,7 @@ describe('buildReliquaryView shelf and page', () => {
       illuminated: true,
       owned: 3,
       total: 3,
+      accountScoped: false,
     });
     expect(model.pageDetail?.cells).toHaveLength(3);
     expect(model.pageDetail?.cells.every((c) => c.owned)).toBe(true);
@@ -448,6 +470,79 @@ describe('page grid cells', () => {
       marks: ownedSet(),
     });
     expect(missing[0]).toMatchObject({ id: 'mw_a', kind: 'mark', owned: false });
+  });
+
+  it('lists mount / skin / title cells owned vs missing (skins empty without cosmetics)', () => {
+    const mountPage: ReliquaryPageDef = {
+      id: 'h_m',
+      shelf: 'horizons',
+      name: 'Mounts',
+      relics: [{ kind: 'mount', mountId: 'valorsteed' }],
+    };
+    const skinPage: ReliquaryPageDef = {
+      id: 'h_s',
+      shelf: 'horizons',
+      name: 'Skins',
+      relics: [{ kind: 'weapon_skin', skinId: 'guildmark_arming_sword' }],
+    };
+    const titlePage: ReliquaryPageDef = {
+      id: 'h_t',
+      shelf: 'horizons',
+      name: 'Titles',
+      relics: [{ kind: 'title', deedId: 'prog_veteran' }],
+    };
+    expect(
+      buildReliquaryPageCells(mountPage, {
+        itemsDiscovered: ownedSet(),
+        ownedMounts: ownedSet('valorsteed'),
+      })[0],
+    ).toMatchObject({ id: 'valorsteed', kind: 'mount', owned: true });
+    expect(buildReliquaryPageCells(mountPage, { itemsDiscovered: ownedSet() })[0]).toMatchObject({
+      owned: false,
+    });
+    // Skins empty when account cosmetics absent.
+    expect(buildReliquaryPageCells(skinPage, { itemsDiscovered: ownedSet() })[0]).toMatchObject({
+      id: 'guildmark_arming_sword',
+      kind: 'weapon_skin',
+      owned: false,
+    });
+    expect(
+      buildReliquaryPageCells(skinPage, {
+        itemsDiscovered: ownedSet(),
+        weaponSkins: ownedSet('guildmark_arming_sword'),
+      })[0],
+    ).toMatchObject({ owned: true });
+    expect(
+      buildReliquaryPageCells(titlePage, {
+        itemsDiscovered: ownedSet(),
+        deedsEarned: ownedSet('prog_veteran'),
+      })[0],
+    ).toMatchObject({ id: 'prog_veteran', kind: 'title', owned: true });
+    expect(buildReliquaryPageCells(titlePage, { itemsDiscovered: ownedSet() })[0]).toMatchObject({
+      id: 'prog_veteran',
+      kind: 'title',
+      owned: false,
+    });
+  });
+
+  it('marks weapon-skin pages accountScoped in pageDetail', () => {
+    const pages: ReliquaryPageDef[] = [
+      {
+        id: 'horiz_skins',
+        shelf: 'horizons',
+        name: 'Weapon Skins',
+        relics: [{ kind: 'weapon_skin', skinId: 'guildmark_arming_sword' }],
+      },
+    ];
+    const model = buildReliquaryView(
+      input({
+        pages,
+        nav: 'horizons',
+        pageId: 'horiz_skins',
+      }),
+    );
+    expect(model.pageDetail?.accountScoped).toBe(true);
+    expect(model.pageDetail?.cells[0]?.owned).toBe(false);
   });
 
   it('lists owned vs missing in catalog order with firstFind clears on owned items', () => {

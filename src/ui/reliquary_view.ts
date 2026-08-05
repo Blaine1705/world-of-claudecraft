@@ -13,6 +13,7 @@ import type {
   ReliquaryShelfId,
 } from '../sim/content/reliquary';
 import {
+  catalogRankOwned,
   catalogRelicCompletion,
   curatorRankFromOwned,
   curatorSealIdForRank,
@@ -66,11 +67,11 @@ export interface ReliquaryViewInput {
    * Used only for owned-cell tooltips (clear#); never invents ownership.
    */
   firstFind?: ReliquaryFirstFindLookup;
-  /** Optional mount ownership for Horizons stubs (Phase 8 fills this). */
+  /** Mount ownership (live ownedMounts / reins seam). */
   ownedMounts?: { has(id: string): boolean };
-  /** Optional weapon-skin ownership for Horizons stubs (Phase 8). */
+  /** Account weapon-skin unlocks (empty when account cosmetics absent). */
   weaponSkins?: { has(id: string): boolean };
-  /** Optional title ownership via deeds earned (Phase 8). */
+  /** Title ownership via deeds earned (deeds with title rewards only). */
   deedsEarned?: { has(id: string): boolean };
 }
 
@@ -134,6 +135,11 @@ export interface ReliquaryPageDetailModel extends ReliquaryShelfPageModel {
   cells: ReliquaryGridCellModel[];
   /** Alias of complete for Illumination chrome (first-time celebration is event-driven). */
   illuminated: boolean;
+  /**
+   * True when the page is account-scoped (weapon skins). UI labels the scope;
+   * empty when account cosmetics are absent.
+   */
+  accountScoped: boolean;
 }
 
 export interface ReliquaryNavModel {
@@ -239,11 +245,11 @@ export function buildReliquaryPageCells(
 /** Build the whole cold-window model. Per-call allocation is fine (event-driven). */
 export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewModel {
   const opts = ownershipOpts(input);
-  const catalog = catalogRelicCompletion(
-    { itemsDiscovered: input.itemsDiscovered, marks: input.marks },
-    input.pages,
-  );
-  const curatorRank = curatorRankFromOwned(catalog.owned);
+  // Overview totals include all shelves (including account skins). Curator rank
+  // scores only character-durable fills (excludes weapon skins) so seal chrome
+  // matches syncCuratorRankDeeds / grant path.
+  const catalog = catalogRelicCompletion(opts, input.pages);
+  const curatorRank = curatorRankFromOwned(catalogRankOwned(opts, input.pages));
   const progress: ReliquaryProgressModel = {
     owned: catalog.owned,
     total: catalog.total,
@@ -312,6 +318,8 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
           ...header,
           cells,
           illuminated: header.complete,
+          // Weapon skins are account cosmetics; label the scope in the cold UI.
+          accountScoped: page.relics.some((r) => r.kind === 'weapon_skin'),
         };
       }
     }

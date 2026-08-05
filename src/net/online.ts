@@ -46,11 +46,13 @@ import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
+  catalogRankOwned,
   catalogRelicCompletion,
   clearCountForSource,
   curatorRankFromOwned,
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
+  reliquaryOwnershipOpts,
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';
@@ -4818,29 +4820,29 @@ export class ClientWorld implements IWorld {
     this.cmd({ cmd: 'deed_set_title', deedId });
   }
   // --- IWorldReliquary pure completion helpers: recompute from catalog +
-  // mirrored ownership (deedStats.itemsDiscovered + sparse marks). Identical
-  // offline Sim formulas so online/offline answer the same for scripted state. ---
+  // mirrored ownership (itemsDiscovered, marks, mounts, account skins, deeds).
+  // Identical offline Sim formulas so online/offline answer the same for
+  // scripted state. ---
+  private reliquaryOwnershipSurfaces() {
+    return reliquaryOwnershipOpts({
+      itemsDiscovered: this.deedStats.itemsDiscovered,
+      marks: this.reliquaryMarks,
+      ownedMounts: this.ownedMounts(),
+      weaponSkinIds: this.accountCosmetics.weaponSkinIds,
+      deedsEarned: this.deedsEarned,
+    });
+  }
   reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null {
     const page = RELIQUARY_PAGES_BY_ID[pageId];
     if (!page) return null;
-    return pageCompletion(page, {
-      itemsDiscovered: this.deedStats.itemsDiscovered,
-      marks: this.reliquaryMarks,
-    });
+    return pageCompletion(page, this.reliquaryOwnershipSurfaces());
   }
   reliquaryCatalogCompletion(): ReliquaryCatalogCompletion {
-    return catalogRelicCompletion({
-      itemsDiscovered: this.deedStats.itemsDiscovered,
-      marks: this.reliquaryMarks,
-    });
+    return catalogRelicCompletion(this.reliquaryOwnershipSurfaces());
   }
   reliquaryCuratorRank(): number {
-    return curatorRankFromOwned(
-      catalogRelicCompletion({
-        itemsDiscovered: this.deedStats.itemsDiscovered,
-        marks: this.reliquaryMarks,
-      }).owned,
-    );
+    // Rank excludes account weapon skins so display matches grant path.
+    return curatorRankFromOwned(catalogRankOwned(this.reliquaryOwnershipSurfaces()));
   }
   reliquaryPageClearCount(pageId: string): number | undefined {
     const page = RELIQUARY_PAGES_BY_ID[pageId];

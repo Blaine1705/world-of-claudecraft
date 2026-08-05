@@ -3184,7 +3184,9 @@ export const ko_KR: EnTranslations = {
         "gather_event_ancient_heartwood": "고대 심재",
         "gather_event_moonlit_bloom": "달빛 꽃",
         "gather_event_perfect_specimen": "완벽한 표본"
-      }
+      },
+      "accountScopeBadge": "계정",
+      "accountScopeNote": "계정 수집: 이 계정의 모든 캐릭터에서 해금됩니다."
     },
     "deeds": {
       "title": "업적의 서",

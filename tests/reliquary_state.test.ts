@@ -16,6 +16,7 @@ import {
   CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
   catalogItemCompletion,
+  catalogRankOwned,
   catalogRelicCompletion,
   clearCountForSource,
   curatorRankFromOwned,
@@ -306,11 +307,114 @@ describe('Reliquary profession marks (Phase 7)', () => {
       itemsDiscovered: new Set(),
       marks: new Set([FIELD_NOTE]),
     });
-    // Load-bearing: every authored mark slot is a unique catalogued relic.
-    // total must equal item slots + mark slots (not merely greaterThan).
-    expect(withMarks.total).toBe(itemsOnly.total + RELIQUARY_MARK_IDS.size);
+    // Load-bearing: every authored mark, mount, skin, and title slot is a unique
+    // catalogued relic. total must include all kinds (Horizons Phase 8).
+    const horizonExtra = RELIQUARY_PAGES.reduce((n, p) => {
+      for (const r of p.relics) {
+        if (r.kind === 'mount' || r.kind === 'weapon_skin' || r.kind === 'title') n++;
+      }
+      return n;
+    }, 0);
+    expect(withMarks.total).toBe(itemsOnly.total + RELIQUARY_MARK_IDS.size + horizonExtra);
     expect(withMarks.owned).toBe(1);
     expect(withMarks.owned).toBeLessThan(withMarks.total);
+  });
+
+  it('pageCompletion owns mounts / skins / titles from live seams only', () => {
+    const mountsPage = RELIQUARY_PAGES.find((p) => p.id === 'horizons_mounts')!;
+    const skinsPage = RELIQUARY_PAGES.find((p) => p.id === 'horizons_weapon_skins')!;
+    const titlesPage = RELIQUARY_PAGES.find((p) => p.id === 'horizons_titles')!;
+    expect(mountsPage.relics.length).toBeGreaterThan(0);
+    expect(skinsPage.relics.length).toBeGreaterThan(0);
+    expect(titlesPage.relics.length).toBeGreaterThan(0);
+
+    const empty = {
+      itemsDiscovered: new Set<string>(),
+      marks: new Set<string>(),
+    };
+    expect(pageCompletion(mountsPage, empty).owned).toBe(0);
+    expect(pageCompletion(skinsPage, empty).owned).toBe(0);
+    expect(pageCompletion(titlesPage, empty).owned).toBe(0);
+
+    const firstMount = mountsPage.relics.find((r) => r.kind === 'mount')!.mountId;
+    const firstSkin = skinsPage.relics.find((r) => r.kind === 'weapon_skin')!.skinId;
+    const firstTitle = titlesPage.relics.find((r) => r.kind === 'title')!.deedId;
+
+    expect(pageCompletion(mountsPage, { ...empty, ownedMounts: new Set([firstMount]) }).owned).toBe(
+      1,
+    );
+    // Skins empty when account cosmetics absent (no weaponSkins lookup).
+    expect(pageCompletion(skinsPage, empty).owned).toBe(0);
+    expect(pageCompletion(skinsPage, { ...empty, weaponSkins: new Set([firstSkin]) }).owned).toBe(
+      1,
+    );
+    expect(pageCompletion(titlesPage, { ...empty, deedsEarned: new Set([firstTitle]) }).owned).toBe(
+      1,
+    );
+
+    // Full fill via live ownership seams only (no invented second discovery set).
+    const allMounts = new Set(
+      mountsPage.relics.filter((r) => r.kind === 'mount').map((r) => r.mountId),
+    );
+    const allSkins = new Set(
+      skinsPage.relics.filter((r) => r.kind === 'weapon_skin').map((r) => r.skinId),
+    );
+    const allTitles = new Set(
+      titlesPage.relics.filter((r) => r.kind === 'title').map((r) => r.deedId),
+    );
+    expect(pageCompletion(mountsPage, { ...empty, ownedMounts: allMounts }).complete).toBe(true);
+    expect(pageCompletion(skinsPage, { ...empty, weaponSkins: allSkins }).complete).toBe(true);
+    expect(pageCompletion(titlesPage, { ...empty, deedsEarned: allTitles }).complete).toBe(true);
+  });
+
+  it('catalogRelicCompletion counts Horizons fills for Overview totals', () => {
+    const base = catalogRelicCompletion({
+      itemsDiscovered: new Set(),
+      marks: new Set(),
+    });
+    const withHorizons = catalogRelicCompletion({
+      itemsDiscovered: new Set(),
+      marks: new Set(),
+      ownedMounts: new Set(['valorsteed']),
+      weaponSkins: new Set(['guildmark_arming_sword']),
+      deedsEarned: new Set(['prog_veteran']),
+    });
+    expect(withHorizons.total).toBe(base.total);
+    expect(withHorizons.owned).toBe(3);
+    expect(base.owned).toBe(0);
+  });
+
+  it('catalogRankOwned excludes account weapon skins (grant/display rank align)', () => {
+    const skinsOnly = catalogRankOwned({
+      itemsDiscovered: new Set(),
+      marks: new Set(),
+      ownedMounts: new Set(),
+      deedsEarned: new Set(),
+    });
+    // Skins never enter the rank opts; overview can still count them separately.
+    expect(skinsOnly).toBe(0);
+    const characterHorizons = catalogRankOwned({
+      itemsDiscovered: new Set(),
+      marks: new Set(),
+      ownedMounts: new Set(['valorsteed']),
+      deedsEarned: new Set(['prog_veteran']),
+    });
+    expect(characterHorizons).toBe(2);
+    // Full overview owned can include skins while rank stays character-only.
+    const overview = catalogRelicCompletion({
+      itemsDiscovered: new Set(),
+      ownedMounts: new Set(['valorsteed']),
+      weaponSkins: new Set(['guildmark_arming_sword']),
+      deedsEarned: new Set(['prog_veteran']),
+    });
+    expect(overview.owned).toBe(3);
+    expect(
+      catalogRankOwned({
+        itemsDiscovered: new Set(),
+        ownedMounts: new Set(['valorsteed']),
+        deedsEarned: new Set(['prog_veteran']),
+      }),
+    ).toBe(2);
   });
 
   it('join retroFallbackGrants wires silent mark sync before curator rank', () => {

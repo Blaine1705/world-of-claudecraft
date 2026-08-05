@@ -3184,7 +3184,9 @@ export const zh_TW: EnTranslations = {
         "gather_event_ancient_heartwood": "古木心材",
         "gather_event_moonlit_bloom": "月華花蕾",
         "gather_event_perfect_specimen": "完美標本"
-      }
+      },
+      "accountScopeBadge": "帳號",
+      "accountScopeNote": "帳號收藏：此帳號下所有角色均可解鎖。"
     },
     "deeds": {
       "title": "功績之書",

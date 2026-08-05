@@ -26,14 +26,15 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 7 QA complete (Professions shelf verified).
+- **Current phase:** Phase 8 implementation complete (Horizons shelf).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 8 (Horizons shelf). Do **not** skip
-  the release pull. Do **not** open a PR until Phase 9.
+  `origin/release/v0.35.0`, then Phase 8 QA. Do **not** skip the release
+  pull. Do **not** start Phase 9 or open a PR until Phase 8 QA is green.
 - **Blocker:** none.
-- **Release tip after Phase 7 QA pull:** `origin/release/v0.35.0` @
-  `84b704c1c7` (feature merge `40cae153de`; includes Thornhollow Fields,
-  commission orders, profession rare-tier deeds, and related UI).
+- **Release tip after Phase 8 impl pull:** `origin/release/v0.35.0` @
+  `0ff3b52964` (Rift Book of Deeds coverage; feature merge `90cee587f8`
+  unions Rift deeds with Reliquary Curator bridges). Tip may have advanced
+  past this at QA time; re-pull.
 
 ## Locked design decisions
 
@@ -98,7 +99,11 @@ session load:
 
 | Symbol | Path | Status |
 |---|---|---|
-| `RELIQUARY_PAGES` / shelves | `src/sim/content/reliquary.ts` | **landed** (22 Conqueror + 3 Profession pages) |
+| `RELIQUARY_PAGES` / shelves | `src/sim/content/reliquary.ts` | **landed** (22 Conqueror + 3 Profession + 3 Horizons) |
+| Horizons hand lists | `src/sim/content/reliquary.ts` | **landed** (`RELIQUARY_HORIZON_MOUNTS` / `_WEAPON_SKINS` / `_TITLES`) |
+| `catalogRankOwned` | `src/sim/reliquary.ts` | **landed** (character-durable rank; excludes account skins) |
+| `characterReliquaryOwnership` | `src/sim/reliquary.ts` | **landed** (uses `ownedMounts` live seam) |
+| Account-scope chrome | `hudChrome.reliquary.accountScope*` | **landed** (English + M16 non-Latin) |
 | Profession mark constants | `src/sim/content/reliquary.ts` | **landed** (`RELIQUARY_PROFESSION_MARKS`, specimens) |
 | `RELIQUARY_MARK_TO_PAGES` | `src/sim/content/reliquary.ts` | **landed** (Phase 7) |
 | `noteReliquaryMark` / `syncReliquaryMarksFromVisited` | `src/sim/reliquary.ts` | **landed** (Phase 7) |
@@ -154,6 +159,8 @@ session load:
 - [x] Open-window grid live: ownershipDigest + clearsDigest in refresh sig (Phase 5)
 - [x] Profession marks catalog-capped; sparse serialize; no per-drop save (Phase 7)
 - [x] Field-note retro from visited only; no invented masterwork craft history (Phase 7)
+- [x] Horizons ownership from live seams only (ownedMounts / account skins / deedsEarned); no dual discovery (Phase 8)
+- [x] Curator rank excludes account skins (grant/display aligned); Overview totals include skins (Phase 8)
 
 ## Gotchas
 

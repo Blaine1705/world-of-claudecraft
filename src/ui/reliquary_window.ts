@@ -13,9 +13,13 @@
 // reliquary_view and applied by a thin Hud arm.
 
 import { audio } from '../game/audio';
+import { MOUNTS } from '../sim/content/mounts';
 import { RELIQUARY_PAGES } from '../sim/content/reliquary';
+import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
 import type { IWorld } from '../world_api';
+import { localizeWeaponSkin } from './armory_labels';
+import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
@@ -172,6 +176,9 @@ export class ReliquaryWindow {
 
   private buildInput(): ReliquaryViewInput {
     const world = this.deps.world();
+    // Horizons ownership: live seams only (no parallel discovery set).
+    // Mounts = ownedMounts(); skins = account cosmetics (empty offline/stub);
+    // titles = deedsEarned for deeds with title rewards.
     return {
       pages: RELIQUARY_PAGES,
       itemsDiscovered: world.deedStats.itemsDiscovered,
@@ -181,6 +188,9 @@ export class ReliquaryWindow {
       pageId: this.pageId,
       clearCount: (pageId) => world.reliquaryPageClearCount(pageId),
       firstFind: world.reliquaryFirstFind,
+      ownedMounts: new Set(world.ownedMounts()),
+      weaponSkins: new Set(world.accountCosmetics.weaponSkinIds),
+      deedsEarned: world.deedsEarned,
     };
   }
 
@@ -370,6 +380,9 @@ export class ReliquaryWindow {
       page.clears !== undefined
         ? `<p class="reliquary-page-clears">${esc(t('hudChrome.reliquary.clearsLabel', { count: this.fmt(page.clears) }))}</p>`
         : '';
+    const accountScope = page.accountScoped
+      ? `<p class="reliquary-account-scope" data-account-scope="1">${esc(t('hudChrome.reliquary.accountScopeNote'))}</p>`
+      : '';
     const done = page.illuminated
       ? `<span class="reliquary-complete-badge reliquary-page-illuminated">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
       : '';
@@ -378,11 +391,12 @@ export class ReliquaryWindow {
         ? `<p class="reliquary-empty">${esc(t('hudChrome.reliquary.shelfEmpty'))}</p>`
         : `<div class="reliquary-grid" role="list" aria-label="${esc(t('hudChrome.reliquary.gridAria', { name: page.name }))}">${page.cells.map((c) => this.cellHtml(c)).join('')}</div>`;
     return (
-      `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}">` +
+      `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}">` +
       `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
       `<header class="reliquary-page-header">` +
       `<h3 class="reliquary-page-title">${esc(page.name)}</h3>${done}` +
       `</header>` +
+      accountScope +
       `<div class="reliquary-page-progress-row" role="img" aria-label="${esc(
         t('hudChrome.reliquary.pageProgressAria', {
           owned: this.fmt(page.owned),
@@ -435,6 +449,15 @@ export class ReliquaryWindow {
       if (cell.id.startsWith('masterwork:')) return 'epic';
       if (cell.id.startsWith('gather_event:')) return 'rare';
     }
+    if (cell.kind === 'mount') {
+      const def = MOUNTS[cell.id as keyof typeof MOUNTS];
+      if (def?.rarity) return def.rarity;
+    }
+    if (cell.kind === 'weapon_skin') {
+      const def = WEAPON_SKINS[cell.id];
+      if (def?.rarity) return def.rarity;
+    }
+    if (cell.kind === 'title') return 'epic';
     return 'common';
   }
 
@@ -445,6 +468,21 @@ export class ReliquaryWindow {
     }
     if (cell.kind === 'mark') {
       return t(reliquaryMarkFindKey(cell.id) as TranslationKey);
+    }
+    if (cell.kind === 'mount') {
+      const key = `hudChrome.mounts.name_${cell.id}` as TranslationKey;
+      const labeled = t(key);
+      if (labeled && labeled !== key) return labeled;
+      const def = MOUNTS[cell.id as keyof typeof MOUNTS];
+      if (def) return def.name;
+    }
+    if (cell.kind === 'weapon_skin') {
+      const def = WEAPON_SKINS[cell.id];
+      if (def) return localizeWeaponSkin(def).name;
+    }
+    if (cell.kind === 'title') {
+      const title = deedTitleText(cell.id);
+      if (title) return title;
     }
     const bare = cell.id.includes(':') ? cell.id.slice(cell.id.lastIndexOf(':') + 1) : cell.id;
     return bare.replace(/_/g, ' ');
@@ -457,6 +495,9 @@ export class ReliquaryWindow {
       : t('hudChrome.reliquary.missingTooltipStatus');
     let body = `<div class="tt-name q-${esc(this.cellQuality(cell))}">${esc(name)}</div>`;
     body += `<div class="tt-line">${esc(status)}</div>`;
+    if (cell.kind === 'weapon_skin') {
+      body += `<div class="tt-line">${esc(t('hudChrome.reliquary.accountScopeBadge'))}</div>`;
+    }
     if (cell.owned && cell.firstFindClears !== undefined) {
       body += `<div class="tt-line">${esc(
         t('hudChrome.reliquary.firstFindClears', {

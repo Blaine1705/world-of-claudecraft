@@ -4020,6 +4020,9 @@ export const hudChromeStrings = {
       gather_event_moonlit_bloom: 'Moonlit Bloom',
       gather_event_perfect_specimen: 'Perfect Specimen',
     },
+    // Phase 8: Horizons account-scope chrome for weapon skins (account cosmetics).
+    accountScopeBadge: 'Account',
+    accountScopeNote: 'Account collection: unlocked across every character on this account.',
   },
   deeds: {
     title: 'Book of Deeds',

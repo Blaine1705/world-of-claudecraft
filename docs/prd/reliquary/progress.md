@@ -22,7 +22,7 @@
 | 6 QA | **done** | exit criteria verified; same-event Illumination + pin holes closed; release @ 0d2d5d1833 |
 | 7 Professions shelf | **done** | authored pages, lifetime marks, thin craft/gather call sites, UI |
 | 7 QA | **done** | exit criteria verified; pin holes closed; release @ 84b704c1c7 |
-| 8 Horizons shelf | pending | same worktree + pull |
+| 8 Horizons shelf | **done** | mounts / skins / titles pages; ownership seams; UI |
 | 8 QA | pending | same worktree + pull |
 | 9 Social, wiki, polish, gate, PR | pending | same worktree + pull |
 
@@ -352,6 +352,41 @@
   pinned rather than proc-forced e2e.
 
 ## Surprises / decisions during implementation
+
+- Phase 8: merged `origin/release/v0.35.0` (Rift Book of Deeds coverage) to
+  tip `0ff3b52964` (feature merge `90cee587f8`). Union: Rift deeds + Reliquary
+  Curator bridges = 251 deeds / 3000 renown / 34 titles. Green:
+  - `npx vitest run tests/reliquary_content.test.ts tests/reliquary_state.test.ts tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/architecture.test.ts tests/reliquary_wire.test.ts` (**181 passed**)
+  - `npm run i18n:gen`
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  - biome on changed hand-authored files
+  Landed:
+  - 3 Horizons pages (append-only): `horizons_mounts`, `horizons_weapon_skins`,
+    `horizons_titles` (28 total pages)
+  - Hand lists pinned to live `MOUNT_KEYS`, `WEAPON_SKIN_LIST`, and deeds with
+    title rewards only (border-only `col_reliquary_rank_5` excluded)
+  - Ownership pure: mounts via `ownedMounts` / bags+bank reins; skins via
+    `accountCosmetics.weaponSkinIds` (empty offline/stub); titles via
+    `deedsEarned`
+  - Overview / shelf totals via `catalogRelicCompletion` (all kinds)
+  - Curator rank via `catalogRankOwned` (character-durable only: excludes
+    account skins so grant path and display rank stay aligned)
+  - UI: account-scope chrome on weapon skins page; reuses mount / armory /
+    deed title i18n; English + M16 for accountScope* keys
+  - IWorld/wire did not grow; both hosts wire horizons into completion helpers
+  Decisions: rank never scores account skins; Horizons fills are read-only
+  (no equip/summon reimplementation; no reliquaryUnlock for mount/skin/title
+  obtain in this phase). Manual Horizons smoke not run (static + unit pins
+  only).
+  Reviews: architecture SHOULD-FIX dual-rank + parallel mount collector closed
+  (catalogRankOwned + ownedMounts); frontend GREEN; cross-platform MATCH (no
+  IWorld growth); test-coverage pins closed for title missing, chrome English,
+  host ownership surfaces.
+  Residual risks: no wire e2e snap seeding mntOwn/cosmetics/deeds for Horizons
+  page completion (pure + host source pins); page-name content i18n deferred;
+  mount/title obtain does not emit reliquaryUnlock toast (membership via live
+  seams only).
 
 - Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
 - Phase 2 absorbed the stub page id: Hollow Crypt now lists cryptbone / greyjaw / gravewoven uniques; `boundstone_helm` lives on Sanctum (its real drop).

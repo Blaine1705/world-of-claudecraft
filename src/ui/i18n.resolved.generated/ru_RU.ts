@@ -3184,7 +3184,9 @@ export const ru_RU: EnTranslations = {
         "gather_event_ancient_heartwood": "Древняя сердцевина",
         "gather_event_moonlit_bloom": "Лунный цвет",
         "gather_event_perfect_specimen": "Идеальный образец"
-      }
+      },
+      "accountScopeBadge": "Аккаунт",
+      "accountScopeNote": "Коллекция аккаунта: открыто для всех персонажей на этом аккаунте."
     },
     "deeds": {
       "title": "Книга деяний",

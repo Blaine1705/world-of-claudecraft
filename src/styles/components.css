@@ -7919,10 +7919,14 @@
   }
   .reliquary-page-progress,
   .reliquary-page-clears,
-  .reliquary-page-stub-note {
+  .reliquary-page-stub-note,
+  .reliquary-account-scope {
     margin: 0;
     font-size: 13px;
     color: var(--gold-dim);
+  }
+  .reliquary-account-scope {
+    margin-bottom: 6px;
   }
   .reliquary-page-detail.is-illuminated .reliquary-page-illuminated {
     letter-spacing: 0.06em;

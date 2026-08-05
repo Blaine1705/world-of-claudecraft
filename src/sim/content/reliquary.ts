@@ -6,8 +6,8 @@
 // Page table is append-only once product pages ship: append new pages at the
 // END and never reorder or remove an id (ids may be referenced by firstFind
 // diagnostics and content pin tests). Phase 2 authors Conquerors; Phase 7
-// appends Professions (masterwork marks, rare field notes, key specimens).
-// Horizons remain later (Phase 8).
+// appends Professions (masterwork marks, rare field notes, key specimens);
+// Phase 8 appends Horizons (mounts, weapon skins, titles).
 //
 // Curation rule (performance + product): every relic is hand-listed. Do not
 // auto-scrape every loot row. Prefer rare+ chase uniques, signature dungeon
@@ -60,6 +60,103 @@ function items(...ids: readonly string[]): ReliquaryRelicDef[] {
 function marks(...ids: readonly string[]): ReliquaryRelicDef[] {
   return ids.map((markId) => ({ kind: 'mark' as const, markId }));
 }
+
+function mounts(...ids: readonly string[]): ReliquaryRelicDef[] {
+  return ids.map((mountId) => ({ kind: 'mount' as const, mountId }));
+}
+
+function weaponSkins(...ids: readonly string[]): ReliquaryRelicDef[] {
+  return ids.map((skinId) => ({ kind: 'weapon_skin' as const, skinId }));
+}
+
+function titles(...ids: readonly string[]): ReliquaryRelicDef[] {
+  return ids.map((deedId) => ({ kind: 'title' as const, deedId }));
+}
+
+// Horizons curated lists (Phase 8). Pin tests lock these to live MOUNTS,
+// WEAPON_SKINS, and deeds with title rewards. Ownership stays on existing
+// seams (ownedMounts, accountCosmetics.weaponSkinIds, deedsEarned).
+export const RELIQUARY_HORIZON_MOUNTS = [
+  'valorsteed',
+  'stormfeather_griffin',
+  'shadowjump_toad',
+  'grag_bear',
+  'stalkglider_snail',
+  'aether_hover_cycle',
+  'thunderstrut_gobbler',
+  'drakemaw_raptor',
+  'terrorspark_groundshaker',
+] as const;
+
+export const RELIQUARY_HORIZON_WEAPON_SKINS = [
+  'guildmark_arming_sword',
+  'brasscap_axe',
+  'tempered_flanged_mace',
+  'guildmark_dirk',
+  'brasscrown_staff',
+  'lacquered_wand',
+  'fletcher_s_guild_bow',
+  'cinderbrand_sword',
+  'emberbite_axe',
+  'smoulderfall_mace',
+  'ashspark_dagger',
+  'forgeheart_staff',
+  'emberwrought_wand',
+  'cinderlatch_crossbow',
+  'ice_fang_sword',
+  'glaciersplit_axe',
+  'rimecrusher_mace',
+  'frostbite_dagger',
+  'hoarfrost_vigil_staff',
+  'everwinter_wand',
+  'winterbite',
+  'solheim_sword',
+  'skyrender_axe',
+  'starfall_mace',
+  'astravyr_dagger',
+  'cosmarch_staff',
+  'emberwish_wand',
+  'encore_bow',
+  'meteorlatch_crossbow',
+] as const;
+
+/** Deeds that grant a title reward (real DEEDS ids only; no invented titles). */
+export const RELIQUARY_HORIZON_TITLES = [
+  'prog_veteran',
+  'prog_champion',
+  'prog_paragon',
+  'prog_mythic',
+  'prog_eternal',
+  'dgn_korzul_flawless',
+  'dgn_nythraxis_deathless',
+  'cmb_thunzharr_unbroken',
+  'dlv_nhalia_bells',
+  'chr_vale_chapter_iii',
+  'chr_marsh_chapter_iii',
+  'chr_peaks_chapter_iii',
+  'col_discovery_150',
+  'col_seven_regalia',
+  'pvp_arena_1v1_1900',
+  'pvp_vcup_wins_25',
+  'soc_market_magnate',
+  'exp_world_traveler',
+  'hid_saul_footnote',
+  'prog_guildsworn',
+  'prog_masterwright',
+  'prog_master_angler',
+  'prog_grandmaster_engineering',
+  'prog_grandmaster_alchemy',
+  'prog_grandmaster_cooking',
+  'prog_grandmaster_leatherworking',
+  'prog_grandmaster_tailoring',
+  'prog_grandmaster_enchanting',
+  'prog_grandmaster_weaponcrafting',
+  'prog_grandmaster_armorcrafting',
+  'pvp_bg_wins_25',
+  'col_reliquary_rank_2',
+  'col_reliquary_rank_3',
+  'col_reliquary_rank_4',
+] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
 // for rare field notes (`gather_event:*`). Masterwork marks are live-only
@@ -503,6 +600,32 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     desc: 'Pristine corpse specimens and apex fine-grade field materials that stock a crafter museum.',
     clearSource: { kind: 'none' },
     relics: items(...RELIQUARY_PROFESSION_SPECIMEN_ITEMS),
+  },
+
+  // ---- Horizons shelf (Phase 8): mounts, account weapon skins, deed titles ----
+  {
+    id: 'horizons_mounts',
+    shelf: 'horizons',
+    name: 'Mounts',
+    desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
+    clearSource: { kind: 'none' },
+    relics: mounts(...RELIQUARY_HORIZON_MOUNTS),
+  },
+  {
+    id: 'horizons_weapon_skins',
+    shelf: 'horizons',
+    name: 'Weapon Skins',
+    desc: 'Account-wide Armory weapon skins. Empty offline or without account cosmetics; never character loot.',
+    clearSource: { kind: 'none' },
+    relics: weaponSkins(...RELIQUARY_HORIZON_WEAPON_SKINS),
+  },
+  {
+    id: 'horizons_titles',
+    shelf: 'horizons',
+    name: 'Titles',
+    desc: 'Titles earned from the Book of Deeds. Cosmetic only: never power, drop rate, or pity.',
+    clearSource: { kind: 'none' },
+    relics: titles(...RELIQUARY_HORIZON_TITLES),
   },
 ];
 

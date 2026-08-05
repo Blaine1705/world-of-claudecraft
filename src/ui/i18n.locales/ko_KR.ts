@@ -10352,8 +10352,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.navProfessions': '전문 기술',
   'hudChrome.reliquary.navHorizons': '지평선',
   'hudChrome.reliquary.navCountAria': '{shelf}: 성물 {owned}/{total} 채움',
-  'hudChrome.reliquary.overviewEmpty':
-    '던전, 공격대, 심층에서 고유 성물을 모아 성물고를 채우세요.',
+  'hudChrome.reliquary.overviewEmpty': '던전, 공격대, 심층에서 고유 성물을 모아 성물고를 채우세요.',
   'hudChrome.reliquary.shelfEmpty': '이 선반에는 아직 페이지가 없습니다.',
   'hudChrome.reliquary.pageComplete': '조명됨',
   'hudChrome.reliquary.clearsLabel': '클리어 {count}회',
@@ -10387,6 +10386,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '고대 심재',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': '달빛 꽃',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': '완벽한 표본',
+  'hudChrome.reliquary.accountScopeBadge': '계정',
+  'hudChrome.reliquary.accountScopeNote': '계정 수집: 이 계정의 모든 캐릭터에서 해금됩니다.',
   'entities.items.resonant_thread.name': '공명의 실',
   'entities.items.resonant_hide.name': '공명의 가죽',
   'entities.items.resonant_links.name': '공명의 사슬',

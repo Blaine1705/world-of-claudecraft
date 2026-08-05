@@ -7921,6 +7921,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.readyCheck.prompt'
   | 'hudChrome.readyCheck.ready'
   | 'hudChrome.readyCheck.result'
+  | 'hudChrome.reliquary.accountScopeBadge'
+  | 'hudChrome.reliquary.accountScopeNote'
   | 'hudChrome.reliquary.backToShelf'
   | 'hudChrome.reliquary.cellMissingAria'
   | 'hudChrome.reliquary.cellOwnedAria'

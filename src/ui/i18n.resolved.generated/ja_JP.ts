@@ -3184,7 +3184,9 @@ export const ja_JP: EnTranslations = {
         "gather_event_ancient_heartwood": "古代の心材",
         "gather_event_moonlit_bloom": "月明かりの花",
         "gather_event_perfect_specimen": "完璧な標本"
-      }
+      },
+      "accountScopeBadge": "アカウント",
+      "accountScopeNote": "アカウント収集：このアカウントの全キャラクターで解除されます。"
     },
     "deeds": {
       "title": "功績の書",

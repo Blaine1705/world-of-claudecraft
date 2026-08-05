@@ -24,6 +24,7 @@ import {
   type ReliquaryPageDef,
   type ReliquaryRelicDef,
 } from './content/reliquary';
+import { ownedMounts as ownedMountKeys } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { DeedStatKey, DeedStats } from './types';
@@ -184,13 +185,10 @@ function dungeonClearCount(
  */
 export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: string): void {
   if (!isCataloguedRelicItem(itemId)) return;
-  // Rank is unique catalogued relic fills (items + marks). The prior unique
-  // fill count is owned - 1 because this discover is the first time the id
-  // entered itemsDiscovered (markItemDiscovered only calls on first add).
-  const owned = catalogRelicCompletion({
-    itemsDiscovered: meta.deedStats.itemsDiscovered,
-    marks: meta.reliquary.marks,
-  }).owned;
+  // Rank is character-durable catalogued fills (items + marks + mounts + titles;
+  // never account skins). Prior count is owned - 1 because this discover is the
+  // first time the id entered itemsDiscovered (markItemDiscovered only calls on first add).
+  const owned = catalogRankOwned(characterReliquaryOwnership(meta));
   const previousRank = curatorRankFromOwned(Math.max(0, owned - 1));
   const newRank = curatorRankFromOwned(owned);
   if (!noteRelicItemFind(meta, itemId)) return;
@@ -236,10 +234,7 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
   if (!RELIQUARY_MARK_IDS.has(markId)) return false;
   if (meta.reliquary.marks.has(markId)) return false;
   // Rank uses pre-add owned so this mark is the +1 that may cross a threshold.
-  const previousOwned = catalogRelicCompletion({
-    itemsDiscovered: meta.deedStats.itemsDiscovered,
-    marks: meta.reliquary.marks,
-  }).owned;
+  const previousOwned = catalogRankOwned(characterReliquaryOwnership(meta));
   meta.reliquary.marks.add(markId);
   pushRecent(meta.reliquary, markId);
   const newOwned = previousOwned + 1;
@@ -286,10 +281,7 @@ function emitReliquaryUnlock(
         : undefined;
   let illuminatedPageId: string | undefined;
   if (pageIds && pageIds.length > 0) {
-    const opts = {
-      itemsDiscovered: meta.deedStats.itemsDiscovered,
-      marks: meta.reliquary.marks,
-    };
+    const opts = characterReliquaryOwnership(meta);
     for (const pageId of pageIds) {
       const page = RELIQUARY_PAGES_BY_ID[pageId];
       if (!page) continue;
@@ -407,28 +399,142 @@ export function catalogItemCompletion(
 
 /**
  * Catalog-wide unique relic progress for Curator rank and Overview totals:
- * de-duped item relics plus de-duped authored mark relics. Mount / skin /
- * title kinds stay out until Horizons (Phase 8) owns those ownership surfaces.
+ * de-duped item relics, authored mark relics, and Horizons mounts / skins /
+ * titles. Ownership stays on existing seams (itemsDiscovered, marks,
+ * ownedMounts, weaponSkins, deedsEarned); never a second discovery set.
  */
 export function catalogRelicCompletion(
   opts: {
     itemsDiscovered: OwnedIdLookup;
     marks?: OwnedIdLookup;
+    ownedMounts?: OwnedIdLookup;
+    weaponSkins?: OwnedIdLookup;
+    deedsEarned?: OwnedIdLookup;
   },
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
 ): { owned: number; total: number } {
   const items = catalogItemCompletion(opts.itemsDiscovered, pages);
   const allMarks = new Set<string>();
+  const allMounts = new Set<string>();
+  const allSkins = new Set<string>();
+  const allTitles = new Set<string>();
   let marksOwned = 0;
+  let mountsOwned = 0;
+  let skinsOwned = 0;
+  let titlesOwned = 0;
   for (const page of pages) {
     for (const relic of page.relics) {
-      if (relic.kind !== 'mark') continue;
-      if (allMarks.has(relic.markId)) continue;
-      allMarks.add(relic.markId);
-      if (opts.marks?.has(relic.markId) === true) marksOwned++;
+      if (relic.kind === 'mark') {
+        if (allMarks.has(relic.markId)) continue;
+        allMarks.add(relic.markId);
+        if (opts.marks?.has(relic.markId) === true) marksOwned++;
+      } else if (relic.kind === 'mount') {
+        if (allMounts.has(relic.mountId)) continue;
+        allMounts.add(relic.mountId);
+        if (opts.ownedMounts?.has(relic.mountId) === true) mountsOwned++;
+      } else if (relic.kind === 'weapon_skin') {
+        if (allSkins.has(relic.skinId)) continue;
+        allSkins.add(relic.skinId);
+        if (opts.weaponSkins?.has(relic.skinId) === true) skinsOwned++;
+      } else if (relic.kind === 'title') {
+        if (allTitles.has(relic.deedId)) continue;
+        allTitles.add(relic.deedId);
+        if (opts.deedsEarned?.has(relic.deedId) === true) titlesOwned++;
+      }
     }
   }
-  return { owned: items.owned + marksOwned, total: items.total + allMarks.size };
+  return {
+    owned: items.owned + marksOwned + mountsOwned + skinsOwned + titlesOwned,
+    total: items.total + allMarks.size + allMounts.size + allSkins.size + allTitles.size,
+  };
+}
+
+/**
+ * Character-durable fills for Curator rank thresholds and rank-deed grants:
+ * items + marks + mounts + titles. Account weapon skins never score rank
+ * (they are not on PlayerMeta; Overview totals still count them via
+ * catalogRelicCompletion). Keeps grant path and display rank aligned.
+ */
+export function catalogRankOwned(
+  opts: {
+    itemsDiscovered: OwnedIdLookup;
+    marks?: OwnedIdLookup;
+    ownedMounts?: OwnedIdLookup;
+    deedsEarned?: OwnedIdLookup;
+  },
+  pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
+): number {
+  const full = catalogRelicCompletion(
+    {
+      itemsDiscovered: opts.itemsDiscovered,
+      marks: opts.marks,
+      ownedMounts: opts.ownedMounts,
+      deedsEarned: opts.deedsEarned,
+      // Explicitly omit weapon skins from rank scoring.
+      weaponSkins: undefined,
+    },
+    pages,
+  );
+  // Subtract skin *slots* from total is not needed: owned ignores skins when
+  // weaponSkins is absent (owned stays 0 for those slots). Rank uses owned only.
+  return full.owned;
+}
+
+/**
+ * Pure ownership surfaces for Reliquary completion reads. Prefer this helper
+ * so Sim, ClientWorld, and tests share one opts shape (no parallel discovery).
+ */
+export function reliquaryOwnershipOpts(input: {
+  itemsDiscovered: OwnedIdLookup;
+  marks?: OwnedIdLookup;
+  ownedMounts?: readonly string[] | OwnedIdLookup;
+  weaponSkinIds?: readonly string[] | OwnedIdLookup;
+  deedsEarned?: OwnedIdLookup;
+}): {
+  itemsDiscovered: OwnedIdLookup;
+  marks?: OwnedIdLookup;
+  ownedMounts?: OwnedIdLookup;
+  weaponSkins?: OwnedIdLookup;
+  deedsEarned?: OwnedIdLookup;
+} {
+  return {
+    itemsDiscovered: input.itemsDiscovered,
+    marks: input.marks,
+    ownedMounts: asOwnedLookup(input.ownedMounts),
+    weaponSkins: asOwnedLookup(input.weaponSkinIds),
+    deedsEarned: input.deedsEarned,
+  };
+}
+
+/**
+ * Character-scoped ownership for mutation paths and join sync: items, marks,
+ * live ownedMounts (bags+bank reins), and deedsEarned. Weapon skins are
+ * account cosmetics and are not on PlayerMeta; hosts pass them separately
+ * for page/Overview fills only (never rank grants).
+ */
+export function characterReliquaryOwnership(meta: PlayerMeta): {
+  itemsDiscovered: OwnedIdLookup;
+  marks: OwnedIdLookup;
+  ownedMounts: OwnedIdLookup;
+  deedsEarned: OwnedIdLookup;
+} {
+  return {
+    itemsDiscovered: meta.deedStats.itemsDiscovered,
+    marks: meta.reliquary.marks,
+    ownedMounts: new Set(ownedMountKeys(meta)),
+    deedsEarned: meta.deedsEarned,
+  };
+}
+
+function asOwnedLookup(
+  value: readonly string[] | OwnedIdLookup | undefined,
+): OwnedIdLookup | undefined {
+  if (value === undefined) return undefined;
+  if (typeof (value as OwnedIdLookup).has === 'function' && !Array.isArray(value)) {
+    return value as OwnedIdLookup;
+  }
+  const set = new Set(value as readonly string[]);
+  return set;
 }
 
 /**
@@ -494,10 +600,7 @@ export function syncCuratorRankDeeds(
   meta: PlayerMeta,
   opts?: { retro?: boolean },
 ): void {
-  const owned = catalogRelicCompletion({
-    itemsDiscovered: meta.deedStats.itemsDiscovered,
-    marks: meta.reliquary.marks,
-  }).owned;
+  const owned = catalogRankOwned(characterReliquaryOwnership(meta));
   const rank = curatorRankFromOwned(owned);
   if (rank <= 0) return;
   for (let i = 0; i < rank; i++) {

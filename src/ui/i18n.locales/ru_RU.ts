@@ -10563,6 +10563,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': 'Древняя сердцевина',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': 'Лунный цвет',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': 'Идеальный образец',
+  'hudChrome.reliquary.accountScopeBadge': 'Аккаунт',
+  'hudChrome.reliquary.accountScopeNote':
+    'Коллекция аккаунта: открыто для всех персонажей на этом аккаунте.',
   'entities.items.resonant_thread.name': 'Резонирующая нить',
   'entities.items.resonant_hide.name': 'Резонирующая шкура',
   'entities.items.resonant_links.name': 'Резонирующие звенья',

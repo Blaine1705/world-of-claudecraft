@@ -10399,6 +10399,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古代の心材',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': '月明かりの花',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': '完璧な標本',
+  'hudChrome.reliquary.accountScopeBadge': 'アカウント',
+  'hudChrome.reliquary.accountScopeNote':
+    'アカウント収集：このアカウントの全キャラクターで解除されます。',
   'entities.items.resonant_thread.name': '共鳴の糸',
   'entities.items.resonant_hide.name': '共鳴の獣皮',
   'entities.items.resonant_links.name': '共鳴の鎖',

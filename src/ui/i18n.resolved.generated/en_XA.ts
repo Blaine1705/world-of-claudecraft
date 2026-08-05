@@ -3184,7 +3184,9 @@ export const en_XA: EnTranslations = {
         "gather_event_ancient_heartwood": "[Áñçíéñţ Ĥéáŕţŵóóð]",
         "gather_event_moonlit_bloom": "[Ɱóóñļíţ Ɓļóóɱ]",
         "gather_event_perfect_specimen": "[Þéŕƒéçţ Šþéçíɱéñ]"
-      }
+      },
+      "accountScopeBadge": "[Áççóúñţ]",
+      "accountScopeNote": "[Áççóúñţ çóļļéçţíóñ: úñļóçķéð áçŕóšš éʋéŕý çĥáŕáçţéŕ óñ ţĥíš áççóúñţ.]"
     },
     "deeds": {
       "title": "[Ɓóóķ óƒ Ðééðš]",

@@ -3,13 +3,17 @@
 // growth is curated (hand lists), never an unbounded auto-scrape of every loot
 // row. Update these pins deliberately when product adds a page or unique.
 import { describe, expect, it } from 'vitest';
-import { DEEDS } from '../src/sim/content/deeds';
+import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
+import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 import { CRAFT_RING } from '../src/sim/content/professions';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
   RELIQUARY_HEROIC_GEAR,
+  RELIQUARY_HORIZON_MOUNTS,
+  RELIQUARY_HORIZON_TITLES,
+  RELIQUARY_HORIZON_WEAPON_SKINS,
   RELIQUARY_ITEM_TO_PAGES,
   RELIQUARY_MARK_IDS,
   RELIQUARY_MARK_TO_PAGES,
@@ -21,6 +25,7 @@ import {
   RELIQUARY_SET_MEMBERS,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
+import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import { DELVES, DUNGEONS, ITEMS } from '../src/sim/data';
 import { DEED_STAT_KEYS } from '../src/sim/types';
 
@@ -42,15 +47,22 @@ function isMountReinsId(itemId: string): boolean {
 }
 
 describe('Reliquary Conqueror catalog structure', () => {
-  it('ships Conquerors + Professions (no Horizons pages yet)', () => {
+  it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
     expect(CONQUEROR_PAGES.length).toBe(22);
     expect(PROFESSION_PAGES.length).toBe(3);
-    expect(HORIZON_PAGES.length).toBe(0);
+    expect(HORIZON_PAGES.length).toBe(3);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(25);
+    expect(RELIQUARY_PAGES.length).toBe(28);
     expect(
-      RELIQUARY_PAGES.every((p) => p.shelf === 'conquerors' || p.shelf === 'professions'),
+      RELIQUARY_PAGES.every(
+        (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
+      ),
     ).toBe(true);
+    expect(HORIZON_PAGES.map((p) => p.id)).toEqual([
+      'horizons_mounts',
+      'horizons_weapon_skins',
+      'horizons_titles',
+    ]);
   });
 
   it('keeps page ids unique and PAGE_ORDER identical to table order', () => {
@@ -421,5 +433,64 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     expect(isCataloguedRelicMark('masterwork:cooking')).toBe(false);
     expect(RELIQUARY_MARK_IDS.has('gather_event:pristine_vein')).toBe(true);
     expect(RELIQUARY_MARK_IDS.has('masterwork:first')).toBe(true);
+  });
+});
+
+describe('Reliquary Horizons shelf (Phase 8)', () => {
+  it('authors non-empty Horizons pages with only mount / skin / title relics', () => {
+    for (const page of HORIZON_PAGES) {
+      expect(page.relics.length).toBeGreaterThan(0);
+      expect(page.clearSource).toEqual({ kind: 'none' });
+      for (const relic of page.relics) {
+        expect(['mount', 'weapon_skin', 'title']).toContain(relic.kind);
+      }
+    }
+  });
+
+  it('mount page lists every live mount key exactly once (hand list = MOUNT_KEYS)', () => {
+    const page = RELIQUARY_PAGES_BY_ID.horizons_mounts;
+    const ids = page.relics.filter((r) => r.kind === 'mount').map((r) => r.mountId);
+    expect(ids).toEqual([...RELIQUARY_HORIZON_MOUNTS]);
+    expect([...ids].sort()).toEqual([...MOUNT_KEYS].sort());
+    for (const id of ids) {
+      expect(MOUNTS[id as keyof typeof MOUNTS], id).toBeDefined();
+    }
+    // No duplicate slots.
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('weapon skin page lists every live Armory skin exactly once', () => {
+    const page = RELIQUARY_PAGES_BY_ID.horizons_weapon_skins;
+    const ids = page.relics.filter((r) => r.kind === 'weapon_skin').map((r) => r.skinId);
+    expect(ids).toEqual([...RELIQUARY_HORIZON_WEAPON_SKINS]);
+    const live = WEAPON_SKIN_LIST.map((s) => s.id).sort();
+    expect([...ids].sort()).toEqual(live);
+    for (const id of ids) {
+      expect(WEAPON_SKINS[id], id).toBeDefined();
+    }
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('title page lists every deed with a title reward and only those', () => {
+    const page = RELIQUARY_PAGES_BY_ID.horizons_titles;
+    const ids = page.relics.filter((r) => r.kind === 'title').map((r) => r.deedId);
+    expect(ids).toEqual([...RELIQUARY_HORIZON_TITLES]);
+    const liveTitles = DEED_ORDER.filter((id) => DEEDS[id].reward?.kind === 'title');
+    expect([...ids].sort()).toEqual([...liveTitles].sort());
+    for (const id of ids) {
+      expect(DEEDS[id], id).toBeDefined();
+      expect(DEEDS[id].reward?.kind).toBe('title');
+    }
+    // Border-only curator rank 5 is not a title relic.
+    expect(ids).not.toContain('col_reliquary_rank_5');
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('does not place mount reins as item relics on any page', () => {
+    for (const page of RELIQUARY_PAGES) {
+      for (const id of itemRelicIds(page)) {
+        expect(isMountReinsId(id), `${page.id}:${id}`).toBe(false);
+      }
+    }
   });
 });

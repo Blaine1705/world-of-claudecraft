@@ -86,6 +86,10 @@ describe('painter hygiene', () => {
     // missing cells). Dropping this leaves every mark painted missing.
     expect(code).toContain('marks: world.reliquaryMarks');
     expect(code).toContain('marksSize: world.reliquaryMarks.size');
+    // Phase 8: Horizons ownership from live seams only.
+    expect(code).toContain('ownedMounts: new Set(world.ownedMounts())');
+    expect(code).toContain('weaponSkins: new Set(world.accountCosmetics.weaponSkinIds)');
+    expect(code).toContain('deedsEarned: world.deedsEarned');
   });
 
   it('paints profession mark cells with quality silhouettes and markFind labels', () => {
@@ -97,6 +101,38 @@ describe('painter hygiene', () => {
     expect(painter).toContain("return 'rare'");
     expect(painter).toContain('reliquaryMarkFindKey');
     expect(painter).toMatch(/cell\.kind === 'mark'[\s\S]*?reliquaryMarkFindKey/);
+  });
+
+  it('labels account-scoped weapon skins and resolves Horizons display names', () => {
+    // Account-scope chrome (never reimplements equip/summon).
+    const code = painter
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
+    expect(code).toMatch(/page\.accountScoped[\s\S]*?accountScopeNote/);
+    expect(code).toMatch(/cell\.kind === 'weapon_skin'[\s\S]*?accountScopeBadge/);
+    expect(code).toContain('data-account-scope');
+    // Prefer existing mount / armory / deed title i18n.
+    expect(painter).toContain('hudChrome.mounts.name_');
+    expect(painter).toContain('localizeWeaponSkin');
+    expect(painter).toContain('deedTitleText');
+    expect(components).toContain('.reliquary-account-scope');
+  });
+
+  it('wires host completion helpers with Horizons ownership surfaces (Sim + ClientWorld)', () => {
+    const simSrc = read('../src/sim/sim.ts');
+    const onlineSrc = read('../src/net/online.ts');
+    for (const [name, src] of [
+      ['sim', simSrc],
+      ['online', onlineSrc],
+    ] as const) {
+      expect(src, name).toContain('reliquaryOwnershipOpts');
+      expect(src, name).toContain('ownedMounts: this.ownedMounts()');
+      expect(src, name).toContain('weaponSkinIds: this.accountCosmetics.weaponSkinIds');
+      expect(src, name).toMatch(/deedsEarned: this\.(primary\.)?deedsEarned/);
+      // Rank excludes skins via catalogRankOwned (aligned with grant path).
+      expect(src, name).toContain('catalogRankOwned');
+    }
   });
 
   it('preserves scroll and restores focus across rebuilds', () => {
@@ -207,6 +243,12 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain('markFind: {');
     expect(chrome).toContain("masterwork_first: 'First Masterwork'");
     expect(chrome).toContain("gather_event_pristine_vein: 'Pristine Vein'");
+    // Phase 8 Horizons account-scope chrome.
+    expect(chrome).toContain("navHorizons: 'Horizons'");
+    expect(chrome).toContain("accountScopeBadge: 'Account'");
+    expect(chrome).toContain(
+      "accountScopeNote: 'Account collection: unlocked across every character on this account.'",
+    );
   });
 
   it('authors a markFind leaf for every catalogued Reliquary mark id', () => {

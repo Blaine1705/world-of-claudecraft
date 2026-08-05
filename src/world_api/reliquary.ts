@@ -49,15 +49,19 @@ export interface IWorldReliquary {
   reliquaryRecent: readonly string[];
   /**
    * Page progress X/Y for a catalog page id, or null when the id is not a
-   * live page. Owned counts come from itemsDiscovered + marks (and later
-   * mounts/skins/titles when those shelves ship).
+   * live page. Owned counts come from itemsDiscovered, marks, ownedMounts,
+   * account weapon skins, and deedsEarned (title relics).
    */
   reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null;
-  /** Catalog-wide unique item-relic progress (item ids de-duped across pages). */
+  /**
+   * Catalog-wide unique relic progress (items + marks + mounts + skins +
+   * titles, de-duped across pages). Overview totals use this full set.
+   */
   reliquaryCatalogCompletion(): ReliquaryCatalogCompletion;
   /**
-   * Pure Curator rank index from unique owned catalogued item relics.
-   * Cosmetic-only; rank 0 means none.
+   * Pure Curator rank index from character-durable catalogued fills (items,
+   * marks, mounts, titles). Account weapon skins never score rank so grants
+   * and display stay aligned. Cosmetic-only; rank 0 means none.
    */
   reliquaryCuratorRank(): number;
   /**

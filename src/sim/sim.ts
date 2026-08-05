@@ -452,6 +452,7 @@ import { advancePendingProjectiles, type PendingProjectile } from './projectile_
 import * as honorMod from './pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import {
+  catalogRankOwned,
   catalogRelicCompletion,
   clearCountForSource,
   curatorRankFromOwned,
@@ -459,6 +460,7 @@ import {
   pageCompletion,
   RELIQUARY_PAGES_BY_ID,
   type ReliquaryState,
+  reliquaryOwnershipOpts,
   restoreReliquaryState,
   type SavedReliquaryState,
   serializeReliquaryState,
@@ -4553,27 +4555,27 @@ export class Sim {
   get reliquaryRecent(): readonly string[] {
     return this.primary.reliquary.recent;
   }
+  /** Full Reliquary ownership surfaces (items, marks, mounts, skins, titles). */
+  private reliquaryOwnershipSurfaces() {
+    return reliquaryOwnershipOpts({
+      itemsDiscovered: this.primary.deedStats.itemsDiscovered,
+      marks: this.primary.reliquary.marks,
+      ownedMounts: this.ownedMounts(),
+      weaponSkinIds: this.accountCosmetics.weaponSkinIds,
+      deedsEarned: this.primary.deedsEarned,
+    });
+  }
   reliquaryPageCompletion(pageId: string): import('../world_api').ReliquaryPageCompletion | null {
     const page = RELIQUARY_PAGES_BY_ID[pageId];
     if (!page) return null;
-    return pageCompletion(page, {
-      itemsDiscovered: this.primary.deedStats.itemsDiscovered,
-      marks: this.primary.reliquary.marks,
-    });
+    return pageCompletion(page, this.reliquaryOwnershipSurfaces());
   }
   reliquaryCatalogCompletion(): import('../world_api').ReliquaryCatalogCompletion {
-    return catalogRelicCompletion({
-      itemsDiscovered: this.primary.deedStats.itemsDiscovered,
-      marks: this.primary.reliquary.marks,
-    });
+    return catalogRelicCompletion(this.reliquaryOwnershipSurfaces());
   }
   reliquaryCuratorRank(): number {
-    return curatorRankFromOwned(
-      catalogRelicCompletion({
-        itemsDiscovered: this.primary.deedStats.itemsDiscovered,
-        marks: this.primary.reliquary.marks,
-      }).owned,
-    );
+    // Rank excludes account weapon skins so display matches grant path.
+    return curatorRankFromOwned(catalogRankOwned(this.reliquaryOwnershipSurfaces()));
   }
   reliquaryPageClearCount(pageId: string): number | undefined {
     const page = RELIQUARY_PAGES_BY_ID[pageId];

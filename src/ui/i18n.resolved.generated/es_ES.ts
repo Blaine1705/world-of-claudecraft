@@ -3184,7 +3184,9 @@ export const es_ES: EnTranslations = {
         "gather_event_ancient_heartwood": "Ancient Heartwood",
         "gather_event_moonlit_bloom": "Moonlit Bloom",
         "gather_event_perfect_specimen": "Perfect Specimen"
-      }
+      },
+      "accountScopeBadge": "Account",
+      "accountScopeNote": "Account collection: unlocked across every character on this account."
     },
     "deeds": {
       "title": "Libro de Gestas",
