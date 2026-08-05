@@ -23,6 +23,7 @@ import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
@@ -35,6 +36,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
@@ -109,6 +111,11 @@ const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 // so bags, bank, and guild bank paint the same masterwork seal / glyphs. Quest
 // stacks still use itemAriaQuest here (purpose class outranks copy flags for
 // the spoken name; the rim/wash always marks them as quest for sighted players).
+// Fine-grade stacks deliberately have NO dedicated aria key: every fine id's
+// item NAME already carries the grade word in every locale (Fine Copper Ore),
+// so a grade arm would announce it twice while costing an instanced fine copy
+// its per-copy flag (bound is the flag a player checks before trading). The
+// rim/wash/seal are salience for sighted scanning, not new information.
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
@@ -732,9 +739,14 @@ export class BagsWindow {
       // Quest-purpose mark (bag_quest_mark_view.ts): kind===quest gets the
       // .bag-quest rim/wash class; questReady adds .bag-quest-ready for the
       // brighter seal. Purpose class, not a quality tier.
+      // Fine-grade mark (bag_fine_mark_view.ts): fine_* materials get .bag-fine
+      // rim/wash + seal so they never read as plain white reagents. Grade class,
+      // not a quality tier; distinct lineage from quest gold. Purpose outranks
+      // grade: bagRimClasses never emits both rim classes at once.
       const questMark = bagQuestMarkKind(item, this.questMarkProgress(item));
       const questReady = questMark === 'questReady';
-      row.className = `bag-item q-${bagQualityKey(item)}${questMark ? ' bag-quest' : ''}${questReady ? ' bag-quest-ready' : ''}`;
+      const fineMark = bagFineMark(item.id);
+      row.className = `bag-item q-${bagQualityKey(item)}${bagRimClasses(questMark, fineMark)}`;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
@@ -752,16 +764,18 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
-      // Corner-glyph priority (composed from bag_instance_glyph_view +
-      // bag_quest_mark_view): masterwork > quest seal > enchanted / signed /
-      // bound > generic wedge. Rim/wash for quest is independent of the seal.
+      // Corner-glyph priority (bag_corner_mark_view.ts, composed from
+      // bag_instance_glyph_view + bag_quest_mark_view + bag_fine_mark_view):
+      // masterwork > quest seal > fine seal > enchanted / signed / bound >
+      // generic wedge. The fine rim/wash is independent of which seal wins the
+      // corner (a masterwork fine stack keeps its rim).
       const glyphKind = bagInstanceGlyphKind(s.instance);
-      const isMasterwork = glyphKind === 'masterwork';
-      const showQuestSeal = questMark !== null && !isMasterwork;
+      const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
       row.style.setProperty('--bag-slot-quality', qColor);
       // Accessible name: quest stacks always announce quest item (the seal is
-      // aria-hidden). Non-quest instanced stacks keep their per-copy flag.
-      // Plain stacks keep the plain label.
+      // aria-hidden). Instanced stacks keep their per-copy flag. Plain stacks,
+      // fine included, keep the plain label: a fine id's NAME already carries
+      // the grade word (see the fine-grade aria note above the category map).
       const itemAriaKey = questMark
         ? 'hudChrome.bags.itemAriaQuest'
         : glyphKind
@@ -774,19 +788,32 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // Exactly one corner treatment ever renders: masterwork seal, quest seal,
-      // or an instance glyph/tab. Composes with the bottom-right count badge,
-      // always visible without hover on desktop and touch, identical on every
-      // graphics preset (no --fx gate). Ready seals share the seal markup and
-      // brighten via .bi-quest-seal-ready (static; optional pulse is CSS-only).
-      // Masterwork and other instance marks come from the shared mark helper so
-      // bank/guild-bank cells paint the same art; quest seal stays bag-only.
-      const masterworkSeal = isMasterwork ? instanceGlyphMarkHtml('masterwork') : '';
-      const questSeal = showQuestSeal
-        ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
-        : '';
-      const instanceMark = !isMasterwork && !showQuestSeal ? instanceGlyphMarkHtml(glyphKind) : '';
-      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      // Exactly one corner treatment ever renders (cornerMark is a single
+      // discriminant): masterwork seal, quest seal, fine seal, or an instance
+      // glyph/tab. Composes with the bottom-right count badge, always visible
+      // without hover on desktop and touch, identical on every graphics preset
+      // (no --fx gate). Ready seals share the seal markup and brighten via
+      // .bi-quest-seal-ready (static; optional pulse is CSS-only).
+      // The masterwork seal and the per-copy glyph/tab are minted through the
+      // shared item_instance_glyph_mark helper so bank/guild-bank cells paint
+      // the same art; the quest and fine seals stay bag-only.
+      const masterworkSeal = cornerMark === 'masterwork' ? instanceGlyphMarkHtml('masterwork') : '';
+      const questSeal =
+        cornerMark === 'quest'
+          ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
+          : '';
+      const fineSeal =
+        cornerMark === 'fine'
+          ? `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`
+          : '';
+      const instanceMark =
+        cornerMark === 'generic' ||
+        cornerMark === 'enchanted' ||
+        cornerMark === 'signed' ||
+        cornerMark === 'bound'
+          ? instanceGlyphMarkHtml(cornerMark)
+          : '';
+      row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}${fineSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
@@ -1056,6 +1083,11 @@ export class BagsWindow {
     );
     if (cell !== null) row.dataset.bagIndex = String(cell);
     this.bindBagCellDrop(row, cell);
+    // Deliberately no quest or fine mark here: both need the item DEF (quest
+    // kind) or a MATERIAL_GRADES row the client shipped WITH its ITEMS row, so
+    // an unknown-def stack can never honestly claim either. The per-copy
+    // marks are def-free (instance payload only) and do apply, minted through
+    // the shared item_instance_glyph_mark helper.
     const instanceMark = instanceGlyphMarkHtml(glyphKind);
     row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
     if (canDeposit) {

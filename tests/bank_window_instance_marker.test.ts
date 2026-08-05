@@ -173,7 +173,9 @@ describe('bank-item instance mark stylesheet contract', () => {
     expect(components).toMatch(
       /\.bag-item \.bi-masterwork-seal,\s*\.bank-item \.bi-masterwork-seal \{/,
     );
-    expect(components).toMatch(/\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph \{/);
+    // The glyph box is a wider family rule (quest / fine seals ride it too,
+    // bag-only); the pin is the bank twin sitting right beside its bag half.
+    expect(components).toMatch(/\.bag-item \.bi-glyph,\s*\.bank-item \.bi-glyph,/);
     expect(components).toMatch(/\.bag-item \.bi-instance,\s*\.bank-item \.bi-instance \{/);
     expect(components).not.toContain('.bank-item:hover .bi-masterwork-seal');
     expect(components).not.toContain('.bank-item:hover .bi-glyph');
