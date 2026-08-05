@@ -421,6 +421,31 @@ export function buildLinkContent(gameUrl: string): string {
   return `Connect your Discord to World of ClaudeCraft to earn rewards and flex your characters: open ${gameUrl}, log in, and press the Discord button in the game HUD (or "Continue with Discord" on the login screen).`;
 }
 
+/** Shown when a slash-command reply itself fails (a Discord/network error). */
+export const INTERACTION_FAILURE_CONTENT =
+  'Something went wrong handling that command. Please try again in a moment.';
+
+/**
+ * What the interaction handler should do when it catches an error midway
+ * through a slash command, so the caller can best-effort tell the player
+ * instead of leaving Discord's "Bot is thinking..." placeholder (or a bare
+ * "did not respond") up until Discord's own ~15 minute webhook-token expiry.
+ *
+ * `acknowledged` is whether the interaction already got its ONE allowed
+ * initial response (a `respondInteraction`/`deferInteraction` call that
+ * actually succeeded): an interaction can only be acknowledged once, so once
+ * that has happened the sole remaining way to reach the player is editing
+ * that response (`via: 'edit'`); otherwise the initial-response slot is still
+ * open, so the fallback itself becomes that response (`via: 'respond'`).
+ */
+export function interactionFailureFallback(
+  acknowledged: boolean,
+): { via: 'edit'; content: string } | { via: 'respond'; content: string } {
+  return acknowledged
+    ? { via: 'edit', content: INTERACTION_FAILURE_CONTENT }
+    : { via: 'respond', content: INTERACTION_FAILURE_CONTENT };
+}
+
 /** Welcome message for a new guild member. */
 export function buildWelcomeMessage(opts: { userMention: string; gameUrl: string }): string {
   return `Welcome to World of ClaudeCraft, ${opts.userMention}! Play at ${opts.gameUrl} and link your Discord in the game HUD to earn rewards, claim swag, and rank up here in the server.`;
