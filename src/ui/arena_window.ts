@@ -495,7 +495,7 @@ export class ArenaWindow {
     return (
       rank +
       this.partyHtml(view.party) +
-      this.actionHtml(view.action, view.bracket, view.matchMap) +
+      this.actionHtml(view.action, view.matchMap) +
       `<div class="arena-sub">${esc(t('hud.arena.ladderOnline'))}</div>` +
       this.ladderHtml(view.ladder) +
       allTimeSection
@@ -526,7 +526,7 @@ export class ArenaWindow {
     return '';
   }
 
-  private actionHtml(action: ArenaAction, bracket: ArenaFormat, matchMap: ArenaMapId | null): string {
+  private actionHtml(action: ArenaAction, matchMap: ArenaMapId | null): string {
     if (action.kind === 'in-match') {
       // the bout's fixed map (slot-parity selected), shown from queue pop on
       const mapRow = matchMap
@@ -543,19 +543,13 @@ export class ArenaWindow {
       );
     }
     const btnCls = action.queueDisabled ? 'btn disabled' : 'btn';
-    const queueLabel =
-      bracket === 'fiesta'
-        ? t('fiesta.enterQueue')
-        : bracket === 'yumi3' || bracket === 'yumi5'
-          ? t('yumi.enterQueue')
-          : t('hud.arena.enterQueue');
     const note = action.belowMinLevel
       ? t('hudChrome.arenaGate.minLevelNote', {
           level: formatNumber(ARENA_MIN_LEVEL, { maximumFractionDigits: 0 }),
         })
       : t('hud.arena.queueNote');
     return (
-      `<button class="${btnCls}" data-act="queue"${action.queueDisabled ? ' disabled' : ''}>${esc(queueLabel)}</button>` +
+      `<button class="${btnCls}" data-act="queue"${action.queueDisabled ? ' disabled' : ''}>${esc(t('hud.arena.enterQueue'))}</button>` +
       `<div class="arena-note">${esc(note)}</div>`
     );
   }

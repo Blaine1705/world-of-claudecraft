@@ -187,7 +187,7 @@ describe('buildArenaView: ranked minimum-level gate', () => {
     expect(v.action).toEqual({ kind: 'idle', queueDisabled: false, belowMinLevel: false });
   });
 
-  it('disables an at-level leader\'s 2v2 queue when a teammate is below the floor', () => {
+  it("disables an at-level leader's 2v2 queue when a teammate is below the floor", () => {
     const v = live(
       buildArenaView(
         input({
