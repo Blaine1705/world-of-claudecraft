@@ -533,9 +533,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // (guildBankLog, a method because reading it is what requests the cold
     // payload on demand: it has no snapshot key), leaving 288.
     // The controlled Warlock pet's signature-skill command and autocast toggle
-    // add two methods, leaving 291.
-    expect(IWORLD_MEMBERS.length).toBe(291);
-    expect(DATA_MEMBERS.length).toBe(74);
+    // add two methods, and its pet-bar mirror adds one data read, leaving 292.
+    expect(IWORLD_MEMBERS.length).toBe(292);
+    expect(DATA_MEMBERS.length).toBe(75);
     expect(METHOD_MEMBERS.length).toBe(217);
   });
   it('has no duplicate member names', () => {
@@ -1704,8 +1704,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(291);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(291);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(292);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(292);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

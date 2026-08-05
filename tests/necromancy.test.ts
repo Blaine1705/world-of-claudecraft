@@ -579,7 +579,7 @@ describe('Necromancy Warlock', () => {
   });
 
   it('spends fragments to make every undead reap the primary target in unison', () => {
-    const sim = makeNecromancer();
+    const sim = makeNecromancer(43);
     const primary = addTarget(sim);
     const secondary = addTarget(sim);
     secondary.pos.x = primary.pos.x + 2;
@@ -1276,7 +1276,7 @@ describe('Necromancy Warlock', () => {
   });
 
   it('makes Soul Lance pierce the two nearest enemies during Lich Form', () => {
-    const sim = makeNecromancer();
+    const sim = makeNecromancer(43);
     const primary = addTarget(sim);
     const nearest = addNearbyTarget(sim, primary, 0.5);
     const secondNearest = addNearbyTarget(sim, primary, 1);

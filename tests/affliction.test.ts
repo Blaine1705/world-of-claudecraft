@@ -464,7 +464,7 @@ describe('Affliction Warlock', () => {
   });
 
   it('refunds 50 Condemnation from only the first Sentence during Hour of Judgment', () => {
-    const sim = makeAffliction();
+    const sim = makeAffliction(44);
     const target = addTarget(sim, 8);
     finishCast(sim, 'evil_eye', target);
     finishCast(sim, 'hour_of_judgment', target);
@@ -1462,7 +1462,7 @@ describe('Affliction Warlock', () => {
   });
 
   it('applies Sentence healing, splash, boss bonus, and normal-enemy execution tiers', () => {
-    const healingSim = makeAffliction(501);
+    const healingSim = makeAffliction(504);
     const healingTarget = addTarget(healingSim);
     finishCast(healingSim, 'evil_eye', healingTarget);
     healingSim.player.hp = 1;

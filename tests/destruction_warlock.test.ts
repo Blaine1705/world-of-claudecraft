@@ -16,7 +16,7 @@ import { channelTickBonus } from '../src/sim/spell_scaling';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 function destructionAt(level = 20) {
-  const sim = new Sim({ seed: 71, playerClass: 'warlock', autoEquip: true });
+  const sim = new Sim({ seed: 72, playerClass: 'warlock', autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.setSpec('destruction')).toBe(true);
   sim.tick();
