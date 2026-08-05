@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
 import { WEAPON_VFX } from '../src/render/weapon_vfx';
 import {
   eligibleClassesForWeaponSkinType,
@@ -348,6 +349,64 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(damage).toContain('ev.attackAnimationStarted,');
     expect(launch).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
     expect(damage).not.toContain('weaponSkinAttackClips(source.weaponSkinId)');
+  });
+
+  it('a displayed bow skin still wins over a hunter ability-specific attackByAbility override (PR #2958 review)', async () => {
+    // Regression for the CharacterVisual.playAttack precedence bug flagged in
+    // review: hunter_ability_anims.glb's per-ability overrides (aimed_shot ->
+    // Hunter_Shot_LongDraw) must not shadow the bow-skin substitution, or a
+    // visible bow would fire the crossbow-shoulder ability pose instead of
+    // Bow_Draw_Shot.
+    vi.resetModules();
+    const clip = (name: string) => new THREE.AnimationClip(name, 1, []);
+    vi.doMock('../src/render/assets/loader', () => ({
+      loadGltf: vi.fn(() =>
+        Promise.resolve({
+          scene: new THREE.Group(),
+          animations: [
+            '2H_Ranged_Shoot',
+            'Hunter_Shot_LongDraw',
+            'Bow_Draw_Shot',
+            'Idle',
+            'Walk',
+            'Run',
+          ].map(clip),
+        }),
+      ),
+      loadHdr: vi.fn(() => new Promise(() => undefined)),
+      loadTexture: vi.fn(() => Promise.resolve(new THREE.Texture())),
+      releaseGltf: vi.fn(),
+    }));
+    const { charactersReady } = await import('../src/render/characters/assets');
+    await charactersReady();
+    const { createCharacterVisual } = await import('../src/render/characters/index');
+    const { CharacterVisual } = await import('../src/render/characters/visual');
+    type ActionPeek = { current: { getClip(): { name: string } } | null };
+
+    const hunterEntity = {
+      kind: 'player',
+      id: 1,
+      templateId: 'hunter',
+      color: 0xffffff,
+      skin: 0,
+      mainhandItemId: null,
+      offhandItemId: null,
+    } as unknown as import('../src/sim/types').Entity;
+
+    const visual = createCharacterVisual(hunterEntity);
+    expect(visual).not.toBeNull();
+    if (!visual) return;
+    expect(visual).toBeInstanceOf(CharacterVisual);
+
+    // No skin displayed: the authored ability override plays.
+    visual.playAttack('aimed_shot');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Shot_LongDraw');
+
+    // A bow skin displayed: the same ability call must fall back to the
+    // draw clip instead, not the crossbow-shoulder ability pose.
+    visual.setWeaponSkin('winterbite');
+    visual.playAttack('aimed_shot');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Bow_Draw_Shot');
   });
 });
 
