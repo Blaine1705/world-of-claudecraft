@@ -9,25 +9,215 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "es_ES": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "fr_FR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "fr_CA": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "de_DE": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "zh_CN": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "zh_TW": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ko_KR": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ja_JP": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "pt_BR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "ru_RU": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "cs_CZ": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "nl_NL": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "pl_PL": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "id_ID": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "tr_TR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "sv_SE": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "vi_VN": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ],
+  "da_DK": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy",
+    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
+    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
+    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
+    "hudChrome.professions.toolEffectTooltip.charges",
+    "hudChrome.professions.toolEffectTooltip.howToSlot",
+    "hudChrome.professions.toolEffectTooltip.kind",
+    "hudChrome.professions.toolEffectTooltip.landOnly",
+    "hudChrome.professions.toolEffectTooltip.openProfessions"
+  ]
 };
