@@ -9978,8 +9978,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Khung Tổ Đội và Raid',
   'hudChrome.partyFrames.showAbsorbs': 'Hiện Khiên Hấp Thụ',
   'hudChrome.partyFrames.showAuras': 'Hiện Buff và Debuff',
-  'hudChrome.partyFrames.petHealth': '{name} {pct}',
-  'hudChrome.partyFrames.showPets': 'Hiện Thú Cưng',
   'hudChrome.partyFrames.showResource': 'Hiện Mana, Nộ Khí và Năng Lượng',
   'hudChrome.partyFrames.showSelf': 'Hiện Khung Của Bạn',
   'hudChrome.partyFrames.sort': 'Sắp Xếp Người Chơi',

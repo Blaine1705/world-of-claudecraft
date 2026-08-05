@@ -10126,8 +10126,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Bingkai Grup dan Raid',
   'hudChrome.partyFrames.showAbsorbs': 'Tampilkan Perisai Serap',
   'hudChrome.partyFrames.showAuras': 'Tampilkan Buff dan Debuff',
-  'hudChrome.partyFrames.petHealth': '{name} {pct}',
-  'hudChrome.partyFrames.showPets': 'Tampilkan Peliharaan',
   'hudChrome.partyFrames.showResource': 'Tampilkan Mana, Amukan, dan Energi',
   'hudChrome.partyFrames.showSelf': 'Tampilkan Bingkaimu',
   'hudChrome.partyFrames.sort': 'Urutkan Pemain',

@@ -9209,8 +9209,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Gruppen- und Schlachtzugsrahmen',
   'hudChrome.partyFrames.showAbsorbs': 'Absorptionsschilde anzeigen',
   'hudChrome.partyFrames.showAuras': 'Stärkungs- und Schwächungseffekte anzeigen',
-  'hudChrome.partyFrames.petHealth': '{name} {pct}',
-  'hudChrome.partyFrames.showPets': 'Begleiter anzeigen',
   'hudChrome.partyFrames.showResource': 'Mana, Wut und Energie anzeigen',
   'hudChrome.partyFrames.showSelf': 'Eigenen Rahmen anzeigen',
   'hudChrome.partyFrames.sort': 'Spieler sortieren',

@@ -10310,8 +10310,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Riquadri gruppo e incursione',
   'hudChrome.partyFrames.showAbsorbs': 'Mostra scudi di assorbimento',
   'hudChrome.partyFrames.showAuras': 'Mostra potenziamenti e penalità',
-  'hudChrome.partyFrames.petHealth': '{name} {pct}',
-  'hudChrome.partyFrames.showPets': 'Mostra i famigli',
   'hudChrome.partyFrames.showResource': 'Mostra mana, rabbia ed energia',
   'hudChrome.partyFrames.showSelf': 'Mostra il tuo riquadro',
   'hudChrome.partyFrames.sort': 'Ordina giocatori',

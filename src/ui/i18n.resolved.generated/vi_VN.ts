@@ -2084,7 +2084,7 @@ export const vi_VN: EnTranslations = {
       "showResource": "Hiện Mana, Nộ Khí và Năng Lượng",
       "showAbsorbs": "Hiện Khiên Hấp Thụ",
       "showAuras": "Hiện Buff và Debuff",
-      "showPets": "Hiện Thú Cưng",
+      "showPets": "Show Pets",
       "petHealth": "{name} {pct}",
       "showSelf": "Hiện Khung Của Bạn"
     },

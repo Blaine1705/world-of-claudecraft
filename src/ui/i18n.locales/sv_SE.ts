@@ -10025,8 +10025,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.section': 'Grupp- och raidramar',
   'hudChrome.partyFrames.showAbsorbs': 'Visa absorptionssköldar',
   'hudChrome.partyFrames.showAuras': 'Visa positiva och negativa effekter',
-  'hudChrome.partyFrames.petHealth': '{name} {pct}',
-  'hudChrome.partyFrames.showPets': 'Visa djur',
   'hudChrome.partyFrames.showResource': 'Visa mana, raseri och energi',
   'hudChrome.partyFrames.showSelf': 'Visa din ram',
   'hudChrome.partyFrames.sort': 'Sortera spelare',

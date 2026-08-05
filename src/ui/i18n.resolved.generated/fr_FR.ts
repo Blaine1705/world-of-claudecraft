@@ -2084,7 +2084,7 @@ export const fr_FR: EnTranslations = {
       "showResource": "Afficher le mana, la rage et l’énergie",
       "showAbsorbs": "Afficher les boucliers d’absorption",
       "showAuras": "Afficher les améliorations et affaiblissements",
-      "showPets": "Afficher les familiers",
+      "showPets": "Show Pets",
       "petHealth": "{name} {pct}",
       "showSelf": "Afficher votre cadre"
     },

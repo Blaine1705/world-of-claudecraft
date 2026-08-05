@@ -2084,7 +2084,7 @@ export const pt_BR: EnTranslations = {
       "showResource": "Mostrar mana, raiva e energia",
       "showAbsorbs": "Mostrar escudos de absorção",
       "showAuras": "Mostrar bônus e penalidades",
-      "showPets": "Mostrar mascotes",
+      "showPets": "Show Pets",
       "petHealth": "{name} {pct}",
       "showSelf": "Mostrar seu quadro"
     },

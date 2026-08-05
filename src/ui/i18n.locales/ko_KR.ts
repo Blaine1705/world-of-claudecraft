@@ -623,8 +623,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': '마나, 분노, 에너지 표시',
   'hudChrome.partyFrames.showAbsorbs': '흡수 보호막 표시',
   'hudChrome.partyFrames.showAuras': '버프 및 디버프 표시',
-  'hudChrome.partyFrames.petHealth': '{name} {pct}',
-  'hudChrome.partyFrames.showPets': '펫 표시',
   'hudChrome.partyFrames.showSelf': '내 프레임 표시',
   'hudChrome.frameReset.label': '프레임 위치 초기화',
   'hudChrome.options.playerFrameScale': '플레이어 프레임 크기',

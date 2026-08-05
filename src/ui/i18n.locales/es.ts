@@ -10014,8 +10014,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': 'Mostrar maná, ira y energía',
   'hudChrome.partyFrames.showAbsorbs': 'Mostrar escudos de absorción',
   'hudChrome.partyFrames.showAuras': 'Mostrar beneficios y perjuicios',
-  'hudChrome.partyFrames.petHealth': '{name} {pct}',
-  'hudChrome.partyFrames.showPets': 'Mostrar mascotas',
   'hudChrome.partyFrames.showSelf': 'Mostrar tu marco',
   'game.talents.choicesTab': 'Elecciones',
   'game.talents.rowUnlockToast': '¡Nueva elección de talento disponible!',
