@@ -8958,13 +8958,18 @@ export class Sim {
     const out = extractTradableCopy(r.meta.inventory, ref, def);
     if (out.ok) {
       this.ctx.onInventoryChangedForQuests(r.meta);
-      // Escrow is the FIRST way a mount can leave a player's possession: reins
-      // are soulbound and noDiscard, so before the Exchange traded them nothing
-      // could remove one from the bags or the bank. Ownership is derived from
-      // holding the item (mountOwned), but a live ride is never re-validated
-      // once it has started, so a seller who lists the mount under themselves
-      // would keep its speed for the rest of the session while the buyer owned
-      // it. Dismount them here, at the one point where ownership actually ends.
+      // Ownership is derived from HOLDING the item (mountOwned reads the bags and
+      // the bank), but a live ride is never re-validated once it has started. So
+      // a seller who lists the mount they are riding would keep its speed for the
+      // rest of the session while the buyer owned it. Dismount at the point
+      // ownership actually ends.
+      //
+      // This was the only ownership-loss path when it was written, because reins
+      // were soulbound and noDiscard. v0.35.0 un-soulbound the player reins, so
+      // trade, mail and the guild bank can now move a mount too, and none of
+      // those dismount the rider (social/trade.ts and mail/post_office.ts make no
+      // mention of mountKey). That is a gap in those paths rather than this one,
+      // and it is the same shape: the fix belongs at each point ownership ends.
       if (def?.kind === 'mount' && r.e.mountKey === def.mount && !mountOwned(r.meta, def.mount)) {
         forceDismountImpl(this.ctx, r.e);
       }

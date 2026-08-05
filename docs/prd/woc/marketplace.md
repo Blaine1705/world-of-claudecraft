@@ -175,11 +175,14 @@ Eligibility is a per-server policy, not a hardcoded rule set
 - Eligible: **rideable mounts at every rarity** (the reins and ignition items,
   `kind: 'mount'`). Deliberately unfloored: a mount's rarity is a look and a
   speed tier rather than item power, so the equipment floor would hide every
-  common, uncommon and rare mount while reporting it ineligible. Mounts are
-  soulbound by content design, because holding the reins IS owning the mount
-  (`src/sim/mounts.ts` `mountOwned`); that flag keeps them out of the gold
-  economy's trade window and vendors and still does. The tolerance is scoped to
-  this rail and the item defs are untouched.
+  common, uncommon and rare mount while reporting it ineligible. The policy also
+  tolerates `soulbound` for this category, so a bound mount still trades here.
+  That was written when every reins item was soulbound, because holding the reins
+  IS owning the mount (`src/sim/mounts.ts` `mountOwned`); v0.35.0 then un-soulbound
+  the player reins deliberately, so ownership transfers through the ordinary
+  economy too and only the developer-only tank stays bound. The tolerance is kept
+  because it is what guarantees the rule that every mount trades regardless of
+  tier, whichever ones content binds in future. No item def is modified either way.
 - Eligible: **mech chroma plates at every rarity** (the suit skins,
   `use.type === 'mechChroma'`), for the same reasons. Each plate carries
   `noMarketList`, which keeps it off the in-game gold market; tolerated here at

@@ -58,11 +58,15 @@ export function exchangeItemCategory(def: ItemDef): ExchangeItemCategory {
  * not tolerate them, which is where the two collectible categories differ from
  * everything else:
  *
- * - A MOUNT is soulbound by content design, because holding the reins IS owning
- *   the mount (src/sim/mounts.ts mountOwned reads the bags and the bank). That
- *   flag exists to keep mounts out of the gold economy's trade window and
- *   vendors, and it still does: this tolerance is scoped to the Exchange, and
- *   the item defs are untouched.
+ * - A MOUNT may be soulbound, and the tolerance exists so that a soulbound one
+ *   still trades here. This was written when EVERY reins item was soulbound,
+ *   because holding the reins IS owning the mount (src/sim/mounts.ts mountOwned
+ *   reads the bags and the bank). v0.35.0 then un-soulbound the player reins on
+ *   purpose, so ownership now transfers through the ordinary economy too
+ *   (MountItemDef in types.ts), and only the developer-only tank stays bound.
+ *   The tolerance is kept rather than removed: it is what guarantees the stated
+ *   product rule that EVERY mount trades regardless of tier, whichever ones
+ *   content decides to bind in future.
  * - A MECH CHROMA plate is flagged noMarketList, which keeps it off the in-game
  *   gold market for the same reason. Tolerated here for the same scope.
  *

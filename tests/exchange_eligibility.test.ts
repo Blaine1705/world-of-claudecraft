@@ -112,9 +112,17 @@ describe('the REAL catalog clears every mount and every chroma plate', () => {
     expect(mountItems.length).toBe(Object.keys(MOUNTS).length);
     const blocked = mountItems.filter((i) => exchangeHardLock(i, undefined) !== null);
     expect(blocked.map((i) => i.id)).toEqual([]);
-    // Non-vacuity: these really are the soulbound items, so the tolerance is
-    // load-bearing and not passing because the flag happens to be absent.
-    expect(mountItems.every((i) => i.soulbound === true)).toBe(true);
+    // Non-vacuity, weakened deliberately in v0.35.0. It used to assert that EVERY
+    // mount item is soulbound, which held when the tolerance was written: back then
+    // the flag was what kept mounts out of the gold economy. v0.35.0 un-soulbound
+    // the player reins on purpose ("Player reins are NOT soulbound, so ownership
+    // transfers with the item", MountItemDef in types.ts), leaving only the
+    // developer-only tank bound.
+    //
+    // So the honest bar is that AT LEAST ONE mount item is soulbound, which is what
+    // makes the tolerance load-bearing rather than decorative. A non-soulbound mount
+    // clears the locks without needing any tolerance at all.
+    expect(mountItems.some((i) => i.soulbound === true)).toBe(true);
     expect(mountItems.length).toBeGreaterThanOrEqual(8);
   });
 
