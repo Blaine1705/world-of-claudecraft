@@ -736,7 +736,9 @@ export const TARGETS = [
           });
           sim?.addItemInstance?.('wolf_fang', { enchant: 'enchant_chest_stamina' });
           sim?.addItemInstance?.('wolf_fang', { signer: 'Toralin' });
-          sim?.addItemInstance?.('boar_hide', { bindOnTrade: true });
+          // rough_hide, not a quest-kind hide: the bank refuses quest items,
+          // so a quest-flagged fixture would silently drop the bound cell.
+          sim?.addItemInstance?.('rough_hide', { bindOnTrade: true });
           sim?.addItem?.('baked_bread', 3);
         } catch {}
         // Stand beside the banker so the proximity-gated bank snapshot is
