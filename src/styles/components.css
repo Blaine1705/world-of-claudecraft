@@ -7765,6 +7765,13 @@
     font-size: 11px;
     color: var(--color-text-light);
   }
+  /* Live effect rows carry a hover card (tool_effect_tooltip.ts) explaining
+     the bonus and charge ladder. A help cursor is the discoverability cue
+     that the compact line is not the whole story; no motion on hover
+     (the a11y contract forbids scale transforms on list rows). */
+  .prof-effect[data-effect-tip] {
+    cursor: help;
+  }
   .prof-effect-name {
     color: var(--gold-dim);
   }
