@@ -949,15 +949,17 @@ describe('graphics tier resolution', () => {
       expect(
         resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 4 }),
       ).toBe(1);
+      // One above the tight-memory threshold is still LOW because the mobile
+      // first-run floor is broader than the RAM-only emergency cap.
       expect(
         resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 5 }),
-      ).toBe(3);
+      ).toBe(1);
       // Never fires on desktop (not mobile) even at the same low deviceMemory: PITFALL 1's
       // "thin RAM never pulls a tier down" rule still holds for the GPU-capability ladder.
       expect(resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 3 })).toBe(2);
-      // Never fires when mem is unreported (Safari/Firefox never expose deviceMemory, so a
-      // flagship iPhone must not be misread as tight): the flagship-mobile HIGH default holds.
-      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple A17 Pro GPU' })).toBe(3);
+      // Unreported memory (Safari/Firefox) must not fabricate a tight-memory
+      // reason, but the broader mobile first-run floor still starts low.
+      expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple A17 Pro GPU' })).toBe(1);
     });
 
     it('defaults Apple Silicon Macs to MEDIUM, not ultra (thermally constrained laptops, issue 1676)', () => {
