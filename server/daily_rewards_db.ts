@@ -303,6 +303,19 @@ function scoreRow(row: Record<string, unknown>): DailyRewardScoreRow {
   };
 }
 
+// The winner-announcement payouts query, exported so a test can pin the RAW
+// text the call site executes: announcement-narrow on purpose
+// (DailyRewardWinnerPayoutRow), with no tx_signature, wallet pubkey (nor the
+// wallet_links join), or voided_by_* operator identity, because announcing
+// renders none of them (#2791). Widening this SELECT again is a data-exposure
+// decision, not a refactor; the pin makes it a deliberate one.
+export const DAILY_REWARD_WINNER_PAYOUTS_SQL = `SELECT p.rank, p.username, p.points, p.prize_percent, p.prize_usd, p.status
+           FROM daily_reward_payouts p
+          WHERE p.day = $1 AND p.realm = $2
+            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
+          ORDER BY p.rank ASC
+          LIMIT 10`;
+
 // banForAccount's query text, exported so an integration suite can execute the
 // real text against a scoped schema.
 export const DAILY_REWARD_BAN_FOR_ACCOUNT_SQL = `SELECT reason, expires_at
@@ -860,18 +873,10 @@ export class PgDailyRewardDb implements DailyRewardDb {
     );
     const out: DailyRewardWinnerAnnouncement[] = [];
     for (const day of days.rows) {
-      // Announcement-narrow on purpose (DailyRewardWinnerPayoutRow): no
-      // tx_signature, wallet pubkey, or voided_by_* operator identity here, and
-      // no wallet_links join, because announcing renders none of them (#2791).
-      const payouts = await pool.query(
-        `SELECT p.rank, p.username, p.points, p.prize_percent, p.prize_usd, p.status
-           FROM daily_reward_payouts p
-          WHERE p.day = $1 AND p.realm = $2
-            AND NOT EXISTS (SELECT 1 FROM daily_reward_excluded_accounts b WHERE b.account_id = p.account_id)
-          ORDER BY p.rank ASC
-          LIMIT 10`,
-        [String(day.day), String(day.realm)],
-      );
+      const payouts = await pool.query(DAILY_REWARD_WINNER_PAYOUTS_SQL, [
+        String(day.day),
+        String(day.realm),
+      ]);
       out.push({
         day: String(day.day),
         realm: String(day.realm),

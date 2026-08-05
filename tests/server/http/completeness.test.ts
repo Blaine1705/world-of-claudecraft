@@ -635,6 +635,20 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
     expect(dropped).toEqual([]);
   });
 
+  it('the retired per-endpoint Discord GET pickups resolve OFF the table (#2791)', () => {
+    // notFound, not methodNotAllowed: no sibling method survives on these
+    // paths and no dynamic pattern may shadow them, so the dispatcher
+    // delegates each to the legacy ladder's terminal 404 (the ladder-arm half
+    // is pinned in tests/server/internal.test.ts with a valid secret).
+    for (const path of [
+      '/internal/discord/relay',
+      '/internal/discord/activity',
+      '/internal/discord/daily-rewards-winners',
+    ]) {
+      expect(apiRegistry.resolve('GET', path).kind, path).toBe('notFound');
+    }
+  });
+
   it('every oauth RouteDef selects the RFC 6749 envelope', () => {
     const oauthRoutes = [...apiRoutes].filter((r) => r.path.startsWith('/oauth/'));
     expect(oauthRoutes.length).toBeGreaterThan(0);

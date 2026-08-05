@@ -1038,6 +1038,35 @@ describe('discord/member', () => {
 // now. Numbering is kept so the later section anchors stay stable.
 // ---------------------------------------------------------------------------
 
+describe('retired per-endpoint pickup GETs (#2791)', () => {
+  // The decisive absence pin: with the CORRECT secret, the legacy ladder
+  // answers its terminal 404 for each retired path (the arm is gone, not just
+  // the RouteDef), and EXPECTED_ROUTES above already proves the registry side.
+  // Re-adding either arm turns one of these into a 200 and fails here.
+  it.each([
+    '/internal/discord/relay',
+    '/internal/discord/activity',
+    '/internal/discord/daily-rewards-winners',
+  ])('GET %s with a valid secret answers the ladder terminal 404', async (path) => {
+    process.env.DISCORD_BOT_SECRET = DISCORD_SECRET;
+    const req = makeReq({ method: 'GET', url: path, headers: DISCORD_HEADERS });
+    const res = new FakeRes();
+    await handleInternalApi(req, res as unknown as http.ServerResponse, null as never);
+
+    expect(res.statusCode).toBe(404);
+    expect(JSON.parse(res.body)).toEqual({
+      success: false,
+      data: null,
+      error: 'unknown endpoint',
+    });
+    // Nothing was drained on the way to the 404: a retired pickup must never
+    // consume queue items it can no longer deliver.
+    expect(vi.mocked(drainRelay)).not.toHaveBeenCalled();
+    expect(vi.mocked(drainActivity)).not.toHaveBeenCalled();
+    expect(vi.mocked(dailyRewardService.discordWinnerAnnouncements)).not.toHaveBeenCalled();
+  });
+});
+
 // ---------------------------------------------------------------------------
 // 10. discord/daily-rewards-winners/mark (POST).
 // ---------------------------------------------------------------------------

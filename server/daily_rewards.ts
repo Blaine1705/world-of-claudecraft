@@ -127,14 +127,17 @@ interface RuntimeConfigCacheEntry {
 }
 
 // How many distinct reward days the runtime-config cache holds at once. The
-// live processes only ever ask about a handful: the current day on every
-// player-facing path, and the winners-cache refresh's pending day plus its
-// successor. Four covers that working set with room for a day rollover; the
+// live working set is up to four: the reward-clock day the player-facing
+// status/spin paths ask for, the plain utcRewardDay() default the eligibility
+// and price reads use (a DIFFERENT day inside the dayStartUtcMinutes window,
+// between 00:00Z and the offset), and the winners-cache refresh's pending day
+// plus its successor (often one of the former). Four covers that set; the
 // bound exists so the map can never grow with arbitrary requested days. The
 // map REPLACED a single-slot cache (#2791): with one slot, each winners
 // refresh evicted the live day's config underneath the player-facing status
-// and spin paths, forcing a re-fetch per TTL for no reason.
-const RUNTIME_CONFIG_CACHE_DAYS = 4;
+// and spin paths, forcing a re-fetch per TTL for no reason. Exported so its
+// value and eviction are pinned by tests (tunables + daily_rewards_table).
+export const RUNTIME_CONFIG_CACHE_DAYS = 4;
 
 interface Eligibility {
   eligible: boolean;
@@ -1675,8 +1678,9 @@ export function bustDailyRewardBoardCache(): void {
 // on the module singleton. main.ts wires this into bustBoardCaches, the
 // post-moderation hook, because the daily-reward ban and IP-ban writes feed the
 // daily_reward_excluded_accounts view that unannouncedWinnerDays filters its
-// payouts through: without the bust, a just-excluded winner's username and wallet
-// pubkey stay announceable for up to a TTL. A suite driving the real service over
+// payouts through: without the bust, a just-excluded winner's username stays
+// announceable for up to a TTL (wallet pubkeys left the winner rows with the
+// #2791 narrowing). A suite driving the real service over
 // db fakes also resets the snapshot through this handle.
 export function bustDailyRewardWinnersCache(): void {
   dailyRewardService.bustWinnersCache();

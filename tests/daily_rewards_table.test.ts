@@ -16,6 +16,7 @@ import type {
   DailyRewardTaskSeed,
   DailyRewardWinnerAnnouncement,
 } from '../server/daily_rewards_db';
+import { DAILY_REWARD_WINNER_PAYOUTS_SQL } from '../server/daily_rewards_db';
 
 const walletMock = vi.hoisted(() => ({
   row: { account_id: 1, pubkey: 'Wallet1111111111111111111111111111111111111', linked_at: 'now' },
@@ -39,6 +40,7 @@ import {
   dailyRewardPayoutSplits,
   dailyRewardRuntimeConfig,
   nextUtcResetIso,
+  RUNTIME_CONFIG_CACHE_DAYS,
   resetDailyRewardPriceCacheForTests,
   rewardDayForDate,
 } from '../server/daily_rewards';
@@ -414,6 +416,85 @@ describe('daily rewards', () => {
     expect(status.prizePoolSol).toBeCloseTo(0.75);
   });
 
+  describe('the runtime-config cache is a bounded per-day map (#2791)', () => {
+    function configFetchDays(): string[] {
+      return vi
+        .mocked(fetch)
+        .mock.calls.map(([input]) => new URL(String(input)))
+        .filter((url) => url.pathname === '/daily-config')
+        .map((url) => url.searchParams.get('day') ?? '');
+    }
+
+    it('holds several days at once: a second day does not evict the first', async () => {
+      // The reason the map replaced the single slot: the winners refresh asks
+      // about a pending day and its successor, and under one slot each of
+      // those evicted the LIVE day's config underneath the player-facing
+      // status and spin paths, forcing a payout-service round trip per TTL.
+      await dailyRewardRuntimeConfig('2026-07-01');
+      await dailyRewardRuntimeConfig('2026-07-02');
+      expect(configFetchDays()).toEqual(['2026-07-01', '2026-07-02']);
+
+      // Warm within the TTL for BOTH days: no re-fetch (the single slot would
+      // have re-fetched 2026-07-01 here).
+      await dailyRewardRuntimeConfig('2026-07-01');
+      await dailyRewardRuntimeConfig('2026-07-02');
+      expect(configFetchDays()).toEqual(['2026-07-01', '2026-07-02']);
+    });
+
+    it('caps at RUNTIME_CONFIG_CACHE_DAYS, evicting the least recently written day', async () => {
+      const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04', '2026-07-05'];
+      expect(days).toHaveLength(RUNTIME_CONFIG_CACHE_DAYS + 1);
+      for (const day of days) await dailyRewardRuntimeConfig(day);
+      expect(configFetchDays()).toEqual(days);
+
+      // The newest four are warm, so re-asking them costs nothing...
+      for (const day of days.slice(1)) await dailyRewardRuntimeConfig(day);
+      expect(configFetchDays()).toEqual(days);
+      // ...while the oldest was evicted by the cap and re-fetches on ask.
+      await dailyRewardRuntimeConfig(days[0]);
+      expect(configFetchDays()).toEqual([...days, days[0]]);
+    });
+
+    it('re-storing a day refreshes its eviction position (least recently WRITTEN)', async () => {
+      // The delete-before-set in storeRuntimeConfig is what makes the bound
+      // evict by WRITE recency: after re-storing the oldest day (requireFresh
+      // forces a store without waiting out the TTL), a fifth day must evict
+      // the SECOND-oldest instead. Without the delete, a re-stored day keeps
+      // its original map position and gets evicted anyway.
+      const days = ['2026-07-01', '2026-07-02', '2026-07-03', '2026-07-04'];
+      for (const day of days) await dailyRewardRuntimeConfig(day);
+      await dailyRewardRuntimeConfig('2026-07-01', true); // re-store, now newest
+      const warmed = [...days, '2026-07-01'];
+      expect(configFetchDays()).toEqual(warmed);
+
+      await dailyRewardRuntimeConfig('2026-07-05'); // cap: evicts 2026-07-02
+      await dailyRewardRuntimeConfig('2026-07-01'); // still warm
+      expect(configFetchDays()).toEqual([...warmed, '2026-07-05']);
+      await dailyRewardRuntimeConfig('2026-07-02'); // evicted: re-fetches
+      expect(configFetchDays()).toEqual([...warmed, '2026-07-05', '2026-07-02']);
+    });
+
+    it('scopes the failure fallback per day: a bad day does not poison its neighbor', async () => {
+      // One 500 for the first asked day: the fallback (enabled: false) must be
+      // cached under THAT day only, while the next day fetches normally and a
+      // warm re-ask of either costs nothing. Under the old single slot the
+      // second day's store evicted the first's fallback, re-fetching a known-bad
+      // upstream every time the two alternated.
+      vi.mocked(fetch).mockImplementationOnce(async () => new Response('nope', { status: 500 }));
+
+      const bad = await dailyRewardRuntimeConfig('2026-07-01');
+      expect(bad.enabled).toBe(false);
+      const good = await dailyRewardRuntimeConfig('2026-07-02');
+      expect(good.enabled).toBe(true);
+
+      // Both days are warm within the TTL: the failed day serves its cached
+      // fallback (no retry storm) and the good day its real config.
+      expect((await dailyRewardRuntimeConfig('2026-07-01')).enabled).toBe(false);
+      expect((await dailyRewardRuntimeConfig('2026-07-02')).enabled).toBe(true);
+      expect(configFetchDays()).toEqual(['2026-07-01', '2026-07-02']);
+    });
+  });
+
   it('records one daily spin and awards its points', async () => {
     const db = new FakeDailyRewardDb();
     const service = new DailyRewardService(db);
@@ -656,6 +737,27 @@ describe('daily rewards', () => {
       clock.ms += 1;
       await service.discordWinnerAnnouncements();
       expect(db.unannouncedWinnerDaysCalls).toBe(2);
+    });
+
+    it('the winner payouts SQL stays announcement-narrow and exclusion-filtered', () => {
+      // The RAW text the call site executes (exported for exactly this pin):
+      // re-widening it is a data-exposure decision (#2791), and the exclusion
+      // filter is what keeps a banned winner out of the announcement.
+      for (const column of [
+        'p.rank',
+        'p.username',
+        'p.points',
+        'p.prize_percent',
+        'p.prize_usd',
+        'p.status',
+      ]) {
+        expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).toContain(column);
+      }
+      expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).not.toMatch(
+        /tx_signature|wallet|paid_at|voided_by|void_reason|voided_at|signed_transaction|error/,
+      );
+      expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).toContain('daily_reward_excluded_accounts');
+      expect(DAILY_REWARD_WINNER_PAYOUTS_SQL).toMatch(/p\.day = \$1 AND p\.realm = \$2/);
     });
 
     it('hands out copies, so a caller mutating its result cannot poison the snapshot', async () => {
