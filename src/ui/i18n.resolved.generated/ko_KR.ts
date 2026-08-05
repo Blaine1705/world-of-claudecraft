@@ -786,6 +786,7 @@ export const ko_KR: EnTranslations = {
       "targetAnnounce": "대상: {name}",
       "targetOfTargetLabel": "대상의 대상",
       "partyLabel": "내 파티",
+      "petLabel": "내 펫",
       "partyChip": "파티",
       "partyGroup": "{n}번 그룹",
       "durationUnitSeconds": "초",
@@ -820,7 +821,7 @@ export const ko_KR: EnTranslations = {
       "targetCycleShort": "대상",
       "spellbookPageLabel": "페이지 {page}",
       "hideKeyboard": "키보드 숨기기",
-      "chatPlaceholder": "메시지 입력..."
+      "chatPlaceholder": "메시지 입력... (! 커뮤니티 명령어)"
     },
     "tutorial": {
       "moveBodyTouch": "이동 스틱으로 이동하고 화면을 끌어 주위를 둘러보세요. 몇 걸음 움직여 시작하세요.",
@@ -911,6 +912,7 @@ export const ko_KR: EnTranslations = {
       "minutesSeconds": "{m}분 {s}초",
       "seconds": "{s}초",
       "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
+      "threatFallback": "실시간 위협 없음: {name}에게 입힌 피해 표시",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "기타 ({count})",
@@ -950,6 +952,7 @@ export const ko_KR: EnTranslations = {
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
+      "bgFlag": "전장 깃발 행동",
       "sheathe": "무기 넣기/빼기",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
@@ -957,7 +960,9 @@ export const ko_KR: EnTranslations = {
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
-      "mount": "탑승 / 하차"
+      "targetPet": "펫: 대상 지정",
+      "mount": "탑승 / 하차",
+      "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
     },
     "actionBar": {
       "editKeys": "액션 바 키 편집",
@@ -966,7 +971,7 @@ export const ko_KR: EnTranslations = {
       "bannerCapturing": "키를 눌러 이 슬롯에 지정하세요...",
       "boundToKey": "{key}(으)로 지정되었습니다.",
       "reset": "초기화",
-      "done": "Done",
+      "done": "완료",
       "cancel": "취소",
       "resetConfirmTitle": "액션 바 키를 초기화하시겠습니까?",
       "resetConfirmBody": "첫 번째 바는 기본 키로 되돌아가고, 두 번째와 세 번째 바는 지정 해제됩니다. 이 작업은 되돌릴 수 없습니다."
@@ -996,6 +1001,7 @@ export const ko_KR: EnTranslations = {
       "name_stormfeather_griffin": "하늘닿이 폭풍깃",
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
+      "name_drakemaw_raptor": "화산구 랩터",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -1003,7 +1009,8 @@ export const ko_KR: EnTranslations = {
       "desc_shadowjump_toad": "어떤 지형이든 번개 같은 그림자 도약으로 누비도록 훈련된 거대한 두꺼비입니다.",
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
-      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다."
+      "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
+      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -1023,6 +1030,93 @@ export const ko_KR: EnTranslations = {
       "timeout": "레이스 실패",
       "progress": "장애물 {n} / {total}",
       "timeLeft": "{seconds}초"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "쏜할로우 평원",
+      "blurb": "가시봉 그늘에 성벽으로 둘러싸인 분지를 사이에 두고 두 폐허가 된 요새가 마주 본다. 남쪽은 크림슨, 북쪽은 애저, 그 사이의 오래된 폐허 안뜰은 아직 누구도 차지하지 못했다. 5대 5, 깃발은 하나씩. 상대의 깃발을 먼저 세 번 가져오는 쪽이 전장을 차지한다.",
+      "modeTag": "5v5 깃발 뺏기",
+      "offlineNote": "쏜할로우 평원 동기화 중입니다. 서버 응답 후 대기열이 열립니다.",
+      "ratingSummary": "레이팅. {wins}승 / {losses}패",
+      "careerCaptures": "통산 탈취: {count}",
+      "enterQueue": "대기열 참가",
+      "enterQueueParty": "대기열 참가({count}인 파티)",
+      "leaveQueue": "대기열 나가기",
+      "searching": "검색 중. 대기열 {count}/{size}.",
+      "queuedParty": "{count}인 파티.",
+      "queueNote": "5인 2개 팀. 적의 군기를 빼앗아 아군 요새로 가져오세요. 먼저 3회 탈취한 팀이 승리합니다. 최대 5인 파티로 함께 참가할 수 있습니다. 질주 룬을 줍고 엄폐물 사이로 추격자를 따돌리세요.",
+      "matchInProgress": "전투 진행 중. {crimson}:{azure}.",
+      "ladderAllTime": "순위표. 역대 기록",
+      "noRanked": "아직 순위에 오른 용사가 없습니다. 첫 주인공이 되어보세요.",
+      "ladderOnline": "순위표. 현재 접속 중",
+      "noChallengers": "지금 접속 중인 용사가 없습니다. 첫 주인공이 되어보세요.",
+      "playerLevelClassTitle": "{name}. {level}레벨 {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "진홍팀",
+      "azure": "청람팀",
+      "yourTeamTitle": "내 팀",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "집결: {seconds}",
+      "firstTo": "{caps}회 선취 시 승리",
+      "flagState": {
+        "home": "깃발이 요새에 있음",
+        "carried": "깃발을 빼앗겼습니다!",
+        "dropped": "깃발이 바닥에 있음"
+      },
+      "respawnIn": "다음 웨이브: {seconds}초 후 부활",
+      "resultVictory": "승리!",
+      "resultDefeat": "패배",
+      "resultDraw": "무승부",
+      "leavingIn": "{seconds}초 후 전장을 떠납니다",
+      "killFeed": "{killer}이(가) {victim}을(를) 처치했습니다",
+      "killFeedFallen": "{victim}이(가) 쓰러졌습니다",
+      "foundBanner": "전투 성사. 당신은 {team} 소속입니다!",
+      "countdownBanner": "쏜할로우 평원 시작까지 {seconds}",
+      "startBanner": "깃발을 빼앗아라!",
+      "flagTakenLog": "{name}이(가) {team} 깃발을 빼앗았습니다!",
+      "flagDroppedLog": "{team} 깃발이 떨어졌습니다.",
+      "flagReturnedLog": "{team} 깃발이 반환되었습니다.",
+      "dropFlagConfirmTitle": "깃발을 내려놓을까요?",
+      "dropFlagConfirmBody": "적의 깃발을 운반하고 있습니다. 내려놓으면 깃발이 바닥에 남아 양 팀 모두 주울 수 있습니다.",
+      "dropFlagConfirmAccept": "깃발 내려놓기",
+      "boardToggleLabel": "경기 점수판. Enter 키로 전체 보드를 고정합니다.",
+      "levelRequirement": "이 전장의 대기열은 레벨 {level}에 도달하면 잠금 해제됩니다.",
+      "board": {
+        "kills": "처치",
+        "assists": "도움",
+        "deaths": "죽음",
+        "captures": "탈취"
+      },
+      "flagTakenBanner": "{takers} 팀이 {team} 깃발을 빼앗았습니다!",
+      "flagReturnedBanner": "{team} 깃발이 반환되었습니다!",
+      "capturedTeamBanner": "{takers} 팀이 {team} 깃발을 탈취!{crimson}:{azure}",
+      "capturedLog": "{name}이(가) {team} 깃발을 탈취했습니다. 점수 {crimson}:{azure}.",
+      "victoryBanner": "승리! 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "defeatBanner": "패배. 쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "drawBanner": "쏜할로우 평원 무승부 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "endBannerDetail": "쏜할로우 평원 {crimson}:{azure}. 레이팅 {rating}({delta})",
+      "endLog": "쏜할로우 평원 종료, {crimson}:{azure}. 레이팅 {rating}({delta}).",
+      "endedTimer": "시간 종료",
+      "endedForfeit": "이 경기는 기권으로 끝났습니다",
+      "endedTimerLog": "경기 시간이 끝나 점수가 높은 쪽이 전장을 차지했습니다.",
+      "endedForfeitLog": "이 경기는 기권으로 끝났습니다.",
+      "firstWinBonusLine": "오늘의 첫 승리: 명예 +{honor}",
+      "firstWinBonusLog": "오늘의 첫 승리: 추가로 명예를 {honor} 획득했습니다.",
+      "timeWarningMinutes": "{minutes}분 남았습니다",
+      "timeWarningOneMinute": "1분 남았습니다",
+      "timeWarningMinutesLog": "전투가 {minutes}분 남았습니다.",
+      "timeWarningOneMinuteLog": "전투가 1분 남았습니다.",
+      "map": {
+        "crimsonKeep": "크림슨 요새",
+        "azureKeep": "애저 요새",
+        "ruinCourtyard": "폐허 안뜰",
+        "graveyard": "묘지"
+      }
     },
     "vcup": {
       "title": "베일 컵",
@@ -1174,6 +1268,15 @@ export const ko_KR: EnTranslations = {
       "browserEffectsReduced": "감소",
       "browserEffectsMinimal": "최소",
       "browserEffectsNote": "자동은 브라우저와 기기에 맞춰 무거운 CSS 효과(흐림, 글로우, 배경 모션)를 낮춥니다. 인터페이스가 느리게 느껴지면 수동으로 낮추세요.",
+      "graphicsApply": "그래픽 적용",
+      "graphicsApplying": "그래픽 설정 적용 중...",
+      "graphicsApplied": "그래픽 설정이 적용되었습니다.",
+      "graphicsSaved": "그래픽 설정이 저장되었습니다. 현재 렌더러가 이미 같은 설정을 사용 중입니다.",
+      "graphicsFailed": "그래픽 설정을 적용하지 못했습니다. 이전 설정이 계속 활성화되어 있습니다.",
+      "graphicsRetry": "그래픽 다시 시도",
+      "graphicsFatal": "그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.",
+      "graphicsReload": "게임 다시 불러오기",
+      "graphicsDraftChanged": "그래픽 변경 사항을 적용할 수 있습니다.",
       "interfaceMode": "인터페이스 모드",
       "interfaceModeAuto": "자동",
       "interfaceModeDesktop": "데스크톱",
@@ -1195,6 +1298,7 @@ export const ko_KR: EnTranslations = {
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
+      "stopAutoAttackOnTargetSwitch": "대상 전환 시 자동 공격 중지",
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
       "mouseoverCast": "파티 창에서 마우스오버 시전",
@@ -1204,7 +1308,10 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
+      "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
+      "showPetFrame": "내 펫 표시",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
@@ -1365,20 +1472,38 @@ export const ko_KR: EnTranslations = {
     },
     "landing": {
       "highContrast": "고대비",
-      "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다"
+      "highContrastAria": "고대비 배경 전환: 움직이는 예고편을 꺼서 시작 화면 텍스트를 읽기 쉽게 유지합니다",
+      "browserSupport": {
+        "title": "알림: 지원되지 않는 브라우저",
+        "body": "이 브라우저에서는 성능이 저하될 수 있습니다. 최상의 경험을 위해 Windows, macOS 또는 Linux용 데스크톱 앱을 받아보세요. 브라우저에서 계속 플레이하시겠습니까? Chrome이 가장 성능이 좋으며 Firefox와 Safari도 지원됩니다.",
+        "getDesktopApp": "데스크톱 앱 받기",
+        "continueInBrowser": "브라우저에서 계속하기",
+        "dismissAria": "지원되지 않는 브라우저 알림 닫기"
+      }
     },
     "warfare": {
       "honorAmount": "명예 {amount}",
       "dualPrice": "{money} + {honor}",
       "balance": "명예: {amount}",
       "honorFloat": "명예 +{amount}",
+      "honorFloatReason": "명예 +{amount} ({reason})",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
-        "fiestaWin": "피에스타 승리"
+        "fiestaWin": "피에스타 승리",
+        "battlegroundWin": "쏜할로우 평원 승리",
+        "battlegroundFirstWin": "오늘의 쏜할로우 평원 첫 승리",
+        "battlegroundComplete": "쏜할로우 평원 참전",
+        "battlegroundKill": "명예로운 처치",
+        "battlegroundAssist": "처치 도움"
+      },
+      "floatReasons": {
+        "kill": "처치",
+        "assist": "도움",
+        "firstWin": "첫 승리"
       }
     },
     "charSheet": {
@@ -1734,6 +1859,7 @@ export const ko_KR: EnTranslations = {
       "itemAriaEnchanted": "{item}, 수량 {count}, 마법부여된 사본",
       "itemAriaBound": "{item}, 수량 {count}, 귀속된 사본",
       "itemAriaMasterwork": "{item}, 수량 {count}, 걸작",
+      "itemAriaQuest": "{item}, 수량 {count}, 퀘스트 아이템",
       "filterGroupAria": "가방을 분류별로 필터링",
       "filterAll": "전체",
       "filterWeapon": "무기",
@@ -1742,6 +1868,7 @@ export const ko_KR: EnTranslations = {
       "filterMaterial": "재료",
       "filterTool": "도구",
       "filterQuest": "퀘스트",
+      "filterQuestCountAria": "퀘스트, 아이템 {count}개",
       "filterMount": "탈것",
       "sortAria": "가방 아이템 정렬",
       "sortRecent": "최근",
@@ -1750,6 +1877,7 @@ export const ko_KR: EnTranslations = {
       "searchPlaceholder": "아이템 검색",
       "searchAria": "이름으로 가방 아이템 검색",
       "noMatch": "필터와 일치하는 아이템이 없습니다.",
+      "noQuestItems": "가방에 퀘스트 아이템이 없습니다.",
       "capacity": "{used}/{total}",
       "capacityAria": "사용 중인 가방 칸: {total}칸 중 {used}칸",
       "backpack": "배낭",
@@ -1783,6 +1911,7 @@ export const ko_KR: EnTranslations = {
       "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
       "heatingUp": "다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다",
       "elementalConvergencePrimed": "다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다",
+      "carriedFlag": "적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
       "crit": "치명타 확률이 {pct}% 증가합니다",
@@ -1968,6 +2097,8 @@ export const ko_KR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
+      "cookingCatch": "요리 재료. 먹기 전에 먼저 요리해야 합니다.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -2249,6 +2380,7 @@ export const ko_KR: EnTranslations = {
       "depositHint": "클릭하여 넣기",
       "depositPartialHint": "Shift+클릭하여 일부만 넣기",
       "cannotDeposit": "은행에 보관할 수 없음",
+      "cannotDepositNow": "지금은 보관할 수 없음",
       "depositQuantityTitle": "{item} 넣기",
       "depositQuantityInput": "넣을 수량",
       "depositQuantityConfirm": "넣기",
@@ -2259,6 +2391,7 @@ export const ko_KR: EnTranslations = {
       "sortAria": "은행 아이템 정렬",
       "searchAria": "이름으로 은행 아이템 검색",
       "depositAll": "모든 재료 보관",
+      "depositAllTooltip": "가방에 있는 모든 제작 재료와 잡동사니를 한 번에 은행에 보관합니다. 채집 도구, 장착한 장비, 퀘스트 아이템, 소모품은 영향을 받지 않습니다.",
       "depositAllDone": "보관한 재료: {count}.",
       "depositAllFull": "보관한 재료: {count}. 은행이 가득 찼습니다.",
       "depositAllNone": "은행이 가득 참: 아무것도 보관하지 못했습니다.",
@@ -2274,7 +2407,50 @@ export const ko_KR: EnTranslations = {
       "bonusAdvertWallet": "지갑을 연동하면 2칸을 얻습니다.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "친구를 초대하세요: 친구가 10레벨에 도달하면 서로 2칸씩 얻으며, 최대 5명까지 가능합니다.",
-      "bonusSectionAria": "보너스 은행 칸과 획득 방법"
+      "bonusSectionAria": "보너스 은행 칸과 획득 방법",
+      "tabsAria": "은행 탭",
+      "personalTab": "개인",
+      "guildTab": "길드",
+      "guildCapacityAria": "사용 중인 길드 은행 칸: {total}칸 중 {used}칸",
+      "guildEmpty": "길드 은행이 비어 있습니다.",
+      "guildTreasury": "길드 금고",
+      "guildDepositGold": "돈 넣기",
+      "guildWithdrawGold": "돈 꺼내기",
+      "guildDepositGoldTitle": "길드 금고에 돈 넣기",
+      "guildWithdrawGoldTitle": "길드 금고에서 돈 꺼내기",
+      "guildGoldAvailable": "사용 가능: {amount}",
+      "guildBuyConfirm": "길드 금고에서 {price}(으)로 길드 은행 칸 {count}칸을 추가로 구매하시겠습니까?",
+      "guildBuyNote": "길드 금고에서 지불됩니다",
+      "guildTreasuryShort": "금고 부족",
+      "guildOpenBank": "길드 은행 개설",
+      "guildOpenConfirm": "{price}(으)로 길드 은행을 개설하시겠습니까? 이 비용은 본인의 소지금에서 지불됩니다.",
+      "guildOpenAccept": "개설",
+      "guildOpenNote": "길드 금고가 아닌 본인의 소지금에서 지불됩니다",
+      "guildPurseShort": "소지금 부족",
+      "guildDormantNote": "잠긴 아이템은 꺼낼 수 없으며 길드 해산을 막습니다.",
+      "guildDormantHint": "이 아이템은 길드 은행에 잠겨 있어 꺼낼 수 없습니다.",
+      "guildDormantAria": "{item}, 수량 {count}, 꺼낼 수 없음",
+      "guildUnknownItem": "알 수 없는 아이템",
+      "guildDepositHint": "클릭하여 길드 은행에 넣기",
+      "guildCannotDeposit": "길드 은행에 넣을 수 없음",
+      "guildGoldCannotMove": "지금은 해당 금액을 옮길 수 없습니다.",
+      "guildViewsAria": "길드 은행 보기",
+      "guildContentsTab": "내용물",
+      "guildLogTab": "기록",
+      "logAria": "길드 은행 활동 기록",
+      "logNote": "최근 길드 은행 활동 {count}건입니다.",
+      "logLoading": "길드 은행 기록을 불러오는 중...",
+      "logEmpty": "아직 길드 은행에 넣거나 뺀 것이 없습니다.",
+      "logRefused": "길드 장교만 길드 은행 기록을 볼 수 있습니다.",
+      "logFormerMember": "탈퇴한 길드원",
+      "logDepositItem": "{actor}님이 {item} {count}개를 넣었습니다",
+      "logWithdrawItem": "{actor}님이 {item} {count}개를 꺼냈습니다",
+      "logDepositMoney": "{actor}님이 {amount}을(를) 넣었습니다",
+      "logWithdrawMoney": "{actor}님이 {amount}을(를) 꺼냈습니다",
+      "logBuySlots": "{actor}님이 {amount}을(를) 들여 은행을 확장했습니다",
+      "logOpenBank": "{actor}님이 {amount}을(를) 들여 길드 은행을 열었습니다",
+      "logCharterFee": "{actor}님이 길드 창설 비용 {amount}을(를) 지불했습니다",
+      "logAdminPurge": "관리자가 {item} {count}개를 삭제했습니다"
     },
     "calendar": {
       "title": "이벤트 달력",
@@ -2312,10 +2488,6 @@ export const ko_KR: EnTranslations = {
           "title": "장날",
           "note": "상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날."
         },
-        "fiestaNight": {
-          "title": "피에스타의 밤",
-          "note": "오늘 밤 2대2 피에스타 링이 가장 붐빕니다."
-        },
         "arenaClash": {
           "title": "투기장 격돌",
           "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
@@ -2352,6 +2524,7 @@ export const ko_KR: EnTranslations = {
       "billboard": {
         "label": "길드 게시판",
         "empty": "게시판에 아직 아무 내용도 없습니다.",
+        "loginLine": "길드 게시판: {text}",
         "setBy": "{name} 설정",
         "save": "저장",
         "placeholder": "길드에 전할 메시지를 작성하세요",
@@ -2552,6 +2725,18 @@ export const ko_KR: EnTranslations = {
         "artisansEye": "장인의 눈",
         "quickeningCharm": "회복의 부적"
       },
+      "toolEffectTooltip": {
+        "kind": "도구 부적",
+        "bonus": {
+          "gatherersCache": "충전된 동안 채집당 획득량 +1.",
+          "artisansEye": "충전된 동안 수확 등급이 도구 1단계만큼 올라갑니다.",
+          "quickeningCharm": "발동한 자원 채집지의 재생성 시간을 단축합니다."
+        },
+        "howToSlot": "전문 기술 창에서 채광, 벌목, 약초학 도구에 장착합니다. 장착 시 소모됩니다.",
+        "charges": "일반 등급 도구에서는 {base}회 충전으로 시작합니다(희귀도 한 단계마다 +{bonus}회).",
+        "landOnly": "낚싯대에는 장착할 수 없습니다.",
+        "openProfessions": "전문 기술 창을 열어 채집 도구에 장착하세요."
+      },
       "toolEffectSlotButton": "{effect} 장착",
       "toolEffectRechargeButton": "재충전",
       "toolEffectSlotted": "{effect}이(가) {profession}에 장착되었습니다.",
@@ -2588,6 +2773,8 @@ export const ko_KR: EnTranslations = {
     "crafting": {
       "title": "제작",
       "close": "제작 닫기",
+      "dialogOption": "제작",
+      "dialogOptionAria": "{craft} 제작 창 열기",
       "craft": "제작",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
@@ -2662,6 +2849,8 @@ export const ko_KR: EnTranslations = {
       "masterworkToast": "걸작! {name}",
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
       "tierUpToast": "{craft} 티어 {tier} 달성!",
+      "skillUpToast": "{skill} 기술 {level} 달성!",
+      "skillUpSubtext": "기술 {level} 달성!",
       "trendNudge": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 조율 임무는 {master}에게 있습니다.",
       "trendNudgeNoMaster": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 길을 택하려면 공예 명인을 찾으세요.",
       "attunedZoneLine": "{name}님이 {archetype}(으)로 조율했습니다!",
@@ -2787,6 +2976,59 @@ export const ko_KR: EnTranslations = {
       "outOfRange": "귀속을 해제하려면 작업대 옆에 있어야 합니다.",
       "noSpace": "가방에 귀속 해제한 아이템을 넣을 공간이 없습니다."
     },
+    "commissionBoard": {
+      "title": "의뢰 게시판",
+      "close": "의뢰 게시판 닫기",
+      "openButton": "의뢰",
+      "openButtonAria": "의뢰 게시판 열기",
+      "intro": "제작자에게 아이템 제작을 의뢰하거나, 다른 사람의 의뢰를 받으세요.",
+      "formTitle": "의뢰 등록",
+      "recipeLabel": "아이템",
+      "recipeEmpty": "아직 의뢰할 수 있는 장비 제작법을 알지 못합니다.",
+      "scopeLabel": "수락 가능 대상",
+      "scopeOpen": "누구나 (공개 게시판)",
+      "scopeCrafter": "특정 제작자",
+      "crafterNameLabel": "제작자 이름",
+      "crafterNamePlaceholder": "캐릭터 이름",
+      "openSubmit": "의뢰 등록",
+      "sectionMine": "내 의뢰",
+      "sectionToCraft": "내가 맡은 의뢰",
+      "sectionBoard": "공개 게시판",
+      "boardEmpty": "현재 공개된 의뢰가 없습니다.",
+      "mineEmpty": "등록한 의뢰가 없습니다.",
+      "toCraftEmpty": "현재 맡은 의뢰가 없습니다.",
+      "rowFor": "{item} (의뢰인: {requester})",
+      "rowTargeted": "{item} (의뢰인: {requester}, 지정 제작자: {crafter})",
+      "acceptedBy": "{name}님이 수락함",
+      "statusOpen": "모집 중",
+      "statusAccepted": "수락됨",
+      "statusDelivered": "전달 완료",
+      "statusCancelled": "취소됨",
+      "statusExpired": "만료됨",
+      "cancelButton": "취소",
+      "acceptButton": "수락",
+      "deliverButton": "전달",
+      "deliverHint": "주문 제작품으로 (주문 제작 토글을 켜고) 만든 뒤, 여기로 돌아와 전달하세요.",
+      "opened": "{item} 의뢰를 등록했습니다.",
+      "cancelled": "{item} 의뢰를 취소했습니다.",
+      "accepted": "{item} 의뢰를 수락했습니다.",
+      "delivered": "{item}을(를) {name}님에게 전달했습니다.",
+      "denyUnknownRecipe": "해당 제작법이 존재하지 않습니다.",
+      "denyNotCommissionEligible": "해당 제작법은 의뢰할 수 없습니다.",
+      "denyUnknownCrafter": "해당 이름의 캐릭터를 찾을 수 없습니다.",
+      "denySelfCrafter": "자신에게 의뢰할 수 없습니다.",
+      "denyTooManyOpen": "모집 중인 의뢰가 이미 너무 많습니다.",
+      "denyUnknownOrder": "해당 의뢰가 더 이상 존재하지 않습니다.",
+      "denyOrderNotOpen": "해당 의뢰는 더 이상 모집 중이 아닙니다.",
+      "denySelfOrder": "자신이 등록한 의뢰는 수락할 수 없습니다.",
+      "denyNotEligibleCrafter": "해당 의뢰는 다른 제작자에게 지정되었습니다.",
+      "denyNotYourOrder": "당신의 의뢰가 아닙니다.",
+      "denyOrderNotAccepted": "해당 의뢰는 아직 수락되지 않았습니다.",
+      "denyNotYourAcceptance": "해당 의뢰를 수락하지 않았습니다.",
+      "denyNotCrafted": "먼저 주문 제작품을 만드세요 (주문 제작 토글을 켜고).",
+      "denyOutOfRange": "의뢰를 전달하려면 의뢰인 근처에 있어야 합니다.",
+      "denyNoSpace": "의뢰인의 가방에 공간이 없습니다."
+    },
     "finder": {
       "title": "던전 찾기",
       "close": "닫기",
@@ -2897,6 +3139,7 @@ export const ko_KR: EnTranslations = {
       "countLabel": "업적 {earned}/{total}",
       "completionAria": "획득한 업적: {earned}/{total}",
       "recentLabel": "최근:",
+      "recentJumpAria": "{name}(으)로 이동",
       "nearestLabel": "달성 임박:",
       "filterGroupAria": "업적 필터",
       "filterAll": "전체",
@@ -3122,6 +3365,7 @@ export const ko_KR: EnTranslations = {
       "talents": "특성",
       "arena": "투기장과 PvP",
       "valeCup": "베일 컵",
+      "thornhollow": "쏜할로우 평원",
       "deeds": "업적의 서",
       "glossary": "용어집",
       "wishIKnew": "미리 알았으면 좋았을 것들",
@@ -3892,23 +4136,25 @@ export const ko_KR: EnTranslations = {
       "duelsBody": "마주치는 누구에게나 가벼운 결투를 신청할 수 있습니다. 자존심 외에는 걸린 것이 없으므로, 상대법을 익히거나 가벼운 논쟁을 가리는 가장 쉬운 방법입니다.",
       "coliseumHeading": "잿빛 콜로세움",
       "coliseumBody": "콜로세움은 왕국의 투기장으로, 1대1 또는 2대2 등급전에서 다른 플레이어들과 맞붙는 곳입니다. 등급 구간마다 별도의 순위가 매겨지므로, 승리하면 그 사다리에서 순위가 올라 왕국 전체가 그 결과를 보게 됩니다. 투기장 창을 열어 혼자 또는 파트너와 함께 등급 구간에 참가 신청을 하세요.",
-      "fiestaHeading": "2대 2 피에스타",
-      "fiestaBody": "피에스타는 하나의 연속된 시합으로 치러지는 빠른 2대2 난투로, 모든 참가자가 동등한 조건에서 싸웁니다. 싸움이 진행되는 동안 증강을 골라 뽑는데, 이는 그때그때 구성을 바꾸는 빠른 강화 효과이므로 어떤 경기도 똑같이 흘러가지 않습니다.",
-      "augmentsNote": "증강과 강화 효과는 해당 경기 동안에만 유지됩니다. 지속적인 힘이 아니라 그 자리에서 재미있게 빌드를 짜는 것이 목적이므로, 돈으로 승리를 사는 일은 없습니다.",
-      "wavesTitle": "증강은 웨이브로 찾아옵니다",
-      "wavesBody": "피에스타 시합은 진행되면서 새로운 선택지를 건네주며, 시합이 길어질수록 그 선택은 점점 대담해집니다. 한 웨이브에서 다음 웨이브로 빌드를 쌓아 가는데, 매번 몇 가지 중 하나를 골라 남은 시합 동안 계속 지니게 됩니다.",
-      "waveSilverTitle": "실버",
-      "waveSilverBody": "첫 웨이브: 군더더기 없이 능력치 하나만 끌어올려 당신 직업의 기본기를 다듬어 줍니다.",
-      "waveGoldTitle": "골드",
-      "waveGoldBody": "중반 웨이브: 양날의 조합으로, 이 무렵부터 당신의 빌드가 모습을 갖추고 노래하기 시작합니다.",
-      "wavePrismaticTitle": "프리즘",
-      "wavePrismaticBody": "마지막 웨이브: 빌드를 결정짓고 화면을 녹여 버리는 폭발적인 한 방으로, 더없이 통쾌하게 터무니없는 느낌을 주려는 것입니다.",
-      "yumiHeading": "Yumi를 지켜라",
-      "yumiBody": "Protect Yumi는 미로에서 펼쳐지는 팀 목표 모드입니다. 각 팀은 아군 고양이 소환수를 지키면서 상대의 소환수를 사냥합니다. 두 고양이는 이따금 미로의 새 구석으로 순간이동하므로 전투는 수비, 추격, 수색 사이를 오갑니다. 3대3 또는 5대5로 참가할 수 있으며, 쓰러져도 잠시 벤치에 앉을 뿐입니다.",
-      "powerupsTitle": "원형 안의 강화 효과",
-      "powerupsBody": "빛나는 구슬이 전투 도중 투기장 안으로 떨어지기도 하며, 먼저 닿는 사람이 임자입니다. 일부러 과장되게 만들어졌고 효과는 잠깐뿐입니다. 눈이 멀 듯한 속도를 주는 스피드 데몬, 굼뜬 거인으로 부풀어 오르는 콜로서스, 저중력으로 통통 튀어 오르게 하는 문 부츠, 그리고 분노가 한순간에 폭발하는 버서커가 있습니다.",
       "ladderHeading": "순위 올리기",
       "ladderBody": "등급전은 시간이 지나며 당신의 순위를 기록합니다. 순위표를 확인해 자신의 위치와 서버 정상에 오른 이가 누구인지 살펴보세요."
+    },
+    "thornhollowPage": {
+      "heading": "쏜할로우 평원",
+      "intro": "가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.",
+      "queueHeading": "대기열 참가",
+      "queueBody": "쏜할로우 평원 창을 열어 혼자 대기열에 서거나, 최대 5인 파티로 함께 참가하세요. 파티는 항상 같은 팀에 배치되고 남는 자리는 솔로 용사들로 채워집니다. 열 명이 모이면 양 팀이 각자의 요새에 배치되고, 짧은 집결 후 깃발이 활성화됩니다.",
+      "fieldHeading": "전장",
+      "fieldBody": "성벽으로 둘러싸인 야외 전장이 세 구역으로 나뉩니다. 양 팀 각자의 앞마당과 그 사이에 낀 폐허 안뜰입니다. 전장을 가로지르는 두 장벽이 경계를 이루며, 구역 사이를 오가려면 반드시 쟁탈 지점을 지나야 합니다. 넓은 정문과 장벽에 걸쳐 앉은 문루입니다. 문루의 두 문은 엇갈리게 나 있어 매복 모퉁이를 돌아가야 합니다. 각 요새는 정문을 제외하면 완전히 막혀 있어 깃발을 노리는 출입은 반드시 같은 입구를 지나며, 그 정문 앞에는 낮은 방책이 서서 일직선 돌격을 막습니다. 안뜰에는 속이 빈 중앙 유적과 측면의 질주 룬 2개가 있으며, 나머지 2개는 깃발 진입로에 놓여 있습니다.또한 각 정문의 안뜰 입구에는 전투 룬 또는 수호 룬(짧은 시간 동안 피해 증가 또는 피해 감소)이 기다립니다. 두 받침대는 같은 면으로 경기를 시작하며 차지할 때마다 면이 뒤집힙니다.",
+      "flagsHeading": "깃발",
+      "flagsBody": "각 요새는 자기 팀의 깃발을 지킵니다. 적 깃발을 빼앗아 아군 깃대까지 가져오면 득점하며, 먼저 3회 탈취한 팀이 승리하고 시간이 다 된 전투는 점수로 판가름납니다. 운반자가 쓰러지면 깃발은 그 자리에 떨어집니다. 적은 다시 주울 수 있지만, 깃발 주인 팀은 가까이 가기만 해도 즉시 되찾아옵니다. 또한 깃발은 결코 숨지 않습니다. 깃발을 주우면 은신이 풀리고, 운반자가 어떤 수단으로든 모습을 감추면 깃발은 그 자리에 떨어집니다.",
+      "pickupNote": "깃발 줍기는 언제나 전장 행동 키를 의도적으로 누르는 행위입니다. 깃발 위를 스쳐 지나갔다고 운반자가 되는 일은 없습니다.",
+      "respawnHeading": "전장에서의 죽음",
+      "respawnBody": "죽음은 고전 의식을 그대로 따릅니다. 시신은 직접 영혼을 해방할 때까지 그 자리에 남고, 영혼은 아군 요새 옆 울타리 묘지에서 일어나 다음 아군 부활 파도까지 그곳에 결박됩니다. 파도는 기다리던 모든 영혼을 함께 일으킵니다. 두 팀의 파도는 의도적으로 엇갈려 있어 전투가 한꺼번에 완전히 초기화되는 일은 없습니다. 시신 달리기도, 영혼 치유사와의 거래도 없습니다. 해방하고, 파도를 기다리고, 다시 싸우십시오.",
+      "carrierHeading": "깃발 운반",
+      "carrierBody": "적 깃발을 너무 오래 들고 있는 운반자는 점점 취약해져, 깃발이 탈취되거나 떨어지거나 반환될 때까지 받는 피해가 계속 늘어납니다. 깃발을 안고 숨는 것은 지는 길이고, 집으로 가져오는 것이 이기는 길입니다.",
+      "ladderHeading": "순위표",
+      "ladderBody": "승패와 관계없이 매 경기 캐릭터별 전장 레이팅이 움직이며, 역대 순위표가 서버의 챔피언을 기록합니다. 승리와 끝까지 싸운 패배에는 전쟁 체계를 통해 명예도 지급됩니다."
     },
     "valeCupPage": {
       "heading": "베일 컵",
@@ -4284,8 +4530,8 @@ export const ko_KR: EnTranslations = {
       "toolUnavailable": "판매 없음",
       "priceNone": "판매 없음",
       "toolTierReq": "{tier}티어 도구",
-      "colWield": "Use at",
-      "wieldNone": "Any",
+      "colWield": "사용 숙련도",
+      "wieldNone": "제한 없음",
       "yieldsHeading": "채집의 수확물",
       "yieldsBody": "채집마다 품질을 굴리는데, 그 확률은 숙련도가 전부다. 갓 시작한 채집가는 언제나 일반 등급을 얻지만, 숙련이 오를수록 무게가 높은 등급으로 옮겨 가며 절대 후퇴하지 않는다. 상한 100에서는 일반이 완전히 사라져 60% 고급, 30% 희귀, 8% 영웅, 2% 전설이 된다. 품질은 곧 수량이다. 일반 1개, 고급과 희귀 2개, 영웅 3개, 전설 4개. 희귀 이상은 서명이 새겨져(Gathered by) 도착하며, 상한에서는 열 번 중 네 번에 이름이 남는다.",
       "bandsHeading": "숙련도 구간",
@@ -5796,7 +6042,6 @@ export const ko_KR: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3대3",
     "bracket5": "Yumi 5대5",
-    "enterQueue": "Protect Yumi 참가!",
     "queue": {
       "join": "Protect Yumi 대기열에 참가했습니다. 소환수를 지키세요…",
       "leave": "Protect Yumi 대기열에서 나갑니다.",
@@ -5834,9 +6079,6 @@ export const ko_KR: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Fiesta에 참가하세요!",
-    "practice": "🎉 봇 상대 연습",
-    "practiceNote": "오프라인 연습: AI 봇 3기를 소환하고 2대2 Fiesta 대기열에 등록합니다. 다시 클릭하면 중지합니다.",
     "banner": {
       "wave": "웨이브 {wave}/{total} - 증강을 선택하세요!",
       "augmentGained": "증강 획득: {name}!",
@@ -6093,10 +6335,16 @@ export const ko_KR: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "업데이트 {version} 다운로드 중...",
-      "ready": "업데이트 {version} 준비 완료. 게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
+      "checkingTitle": "업데이트 확인 중...",
+      "checkingBody": "게임은 자동으로 최신 상태로 유지됩니다.",
+      "uptodateTitle": "현재 최신 버전입니다.",
+      "downloadingTitle": "업데이트 {version} 다운로드 중...",
+      "downloadingBody": "계속 플레이할 수 있습니다. 업데이트는 게임 종료 시 설치됩니다.",
+      "readyTitle": "업데이트 {version} 준비 완료",
+      "readyBody": "게임을 종료하면 자동으로 설치되며, 지금 다시 시작할 수도 있습니다.",
       "restart": "지금 다시 시작",
-      "later": "나중에"
+      "later": "나중에",
+      "dismiss": "닫기"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6284,7 +6532,7 @@ export const ko_KR: EnTranslations = {
       "releaseSpirit": "영혼 풀어주기",
       "chatTab": "채팅",
       "combatLogTab": "전투 기록",
-      "chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반)",
+      "chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반, ! 커뮤니티 명령어)",
       "chatChannels": {
         "add": "채팅 채널 추가",
         "addTitle": "채널 추가",
@@ -6312,7 +6560,6 @@ export const ko_KR: EnTranslations = {
       "mobileMore": "더보기",
       "mobileMoreAria": "메뉴 더 보기",
       "mobileSocial": "소셜",
-      "mobileArena": "투기장",
       "mobileMenu": "메뉴",
       "mobileSettings": "설정",
       "mobileUse": "사용",
@@ -6429,7 +6676,7 @@ export const ko_KR: EnTranslations = {
         "nameplates": "이름표 전환",
         "meters": "피해량 미터",
         "social": "친구 및 길드",
-        "arena": "투기장 (잿빛 원형경기장)",
+        "arena": "PvP(쏜할로우 평원과 투기장)",
         "chat": "채팅 열기",
         "attack": "공격",
         "actionBarSlot": "행동 단축바 {slot}"
@@ -6534,6 +6781,7 @@ export const ko_KR: EnTranslations = {
       "floatingParry": "무기 막기",
       "floatingResist": "저항",
       "floatingEvade": "완전 회피",
+      "floatingBlock": "{amount} 방어",
       "floatingHealFull": "가득 참",
       "floatingHealAbsorbed": "흡수됨",
       "cannotMove": "이동 불가!",
@@ -6547,6 +6795,8 @@ export const ko_KR: EnTranslations = {
       "parried": "{target}이 당신의 {ability}을 무기로 막았습니다.",
       "resisted": "{target}이 {ability}을 저항했습니다.",
       "evaded": "{target}이 당신의 {ability}을 완전히 회피했습니다.",
+      "blockedDone": "{target}이 당신의 {ability}을 방어하여 {amount}의 피해를 입혔습니다.",
+      "blockedTaken": "{source}의 공격을 방어하여 {amount}의 피해를 받았습니다.",
       "healSelf": "{ability}이 자신을 {amount}만큼 치유했습니다.",
       "healSelfCrit": "{ability}이 자신을 치명타 치유로 {amount}만큼 회복했습니다.",
       "healOther": "{ability}이 {target}을 {amount}만큼 치유했습니다.",
@@ -6563,6 +6813,11 @@ export const ko_KR: EnTranslations = {
     },
     "system": {
       "playerDeath": "사망했습니다.",
+      "deathRecapKillerAbility": "사망했습니다. {killer}의 {ability}에 쓰러졌습니다.",
+      "deathRecapKiller": "사망했습니다. {killer}에게 쓰러졌습니다.",
+      "deathRecapAbility": "사망했습니다. {ability}(으)로 사망했습니다.",
+      "deathRecapFalling": "사망했습니다. 추락사했습니다.",
+      "deathRecapDrowned": "사망했습니다. 익사했습니다.",
       "respawn": "다시 온전하고 편안한 상태가 되었습니다.",
       "ignoringChat": "{name}의 채팅을 차단합니다.",
       "noLongerIgnoring": "{name}을 더 이상 차단하지 않습니다.",
@@ -6808,6 +7063,10 @@ export const ko_KR: EnTranslations = {
         "officer": "장교",
         "member": "회원"
       },
+      "tenure": {
+        "recruit": "신병",
+        "veteran": "베테랑"
+      },
       "guildHeadOne": "당신은 {rank}, {count}명 회원",
       "guildHeadMany": "당신은 {rank}, {count}명 회원"
     },
@@ -7049,6 +7308,7 @@ export const ko_KR: EnTranslations = {
       "quest": "퀘스트 아이템",
       "junk": "잡동사니",
       "fineMaterial": "상급 재료",
+      "material": "재료",
       "food": "음식",
       "drink": "음료",
       "tool": "도구",
@@ -7081,6 +7341,9 @@ export const ko_KR: EnTranslations = {
       "useFood": "사용 효과: {seconds}초에 걸쳐 생명력 {amount} 회복. 먹는 동안 앉아 있어야 합니다.",
       "useDrink": "사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.",
       "questItem": "퀘스트 아이템",
+      "questRelated": "퀘스트: {quest}",
+      "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",
+      "questOrphaned": "진행 중인 퀘스트에 필요하지 않습니다.",
       "classes": "직업: {classes}",
       "sellPrice": "판매 가격: {money}",
       "clickBuy": "클릭하여 구매",
@@ -7129,15 +7392,15 @@ export const ko_KR: EnTranslations = {
       "buyStack": "{count}개 구매",
       "buyStackAria": "{price}에 {item} {count}개 구매",
       "qtyRowAria": "구매 수량",
-      "qtyMultiple": "{count}x",
+      "qtyMultiple": "{count}개",
       "qtyMultipleAria": "한 번에 {count}개씩 구매",
       "qtyCustom": "직접 입력",
       "qtyCustomAria": "구매 수량 직접 입력",
-      "buyCountAria": "Buy {count} of {item} for {price}",
-      "buyCountAriaWithRequirement": "Buy {count} of {item} for {price}. {requirement}",
+      "buyCountAria": "{price}에 {item} {count}개 구매",
+      "buyCountAriaWithRequirement": "{price}에 {item} {count}개 구매. {requirement}",
       "buyQuantityTitle": "{item}을(를) 몇 개 구매하시겠습니까? 최대 {max}개.",
       "buyQuantityInput": "구매할 수량",
-      "buyQuantityConfirm": "Buy",
+      "buyQuantityConfirm": "구매",
       "buybackTitle": "되사기",
       "buybackEmpty": "물품 없음",
       "buybackAria": "{item}을(를) {price}에 되사기",
@@ -7216,6 +7479,12 @@ export const ko_KR: EnTranslations = {
       "reclaim": "회수",
       "buyAria": "{price}에 {item} 구매",
       "reclaimAria": "{item} 회수",
+      "buyConfirmTitle": "구매 확인",
+      "buyConfirmBody": "{price}에 {item}을(를) 구매할까요?",
+      "buyConfirmBodyStack": "{price}에 {item} x{count}(개당 {each})를 구매할까요?",
+      "buyConfirmAccept": "구매",
+      "buyConfirmCancel": "취소",
+      "buyChanged": "확인하기 전에 등록이 변경되었습니다. 가격을 확인한 후 다시 시도하세요.",
       "sellNote": "가방의 상품을 올립니다. 아이템이 팔리면 상인이 {cut}%를 가져갑니다. 등록 칸 {used}/{max}개 사용 중입니다.",
       "sellPickEmpty": "판매할 아이템을 선택하려면 가방에서 클릭하세요.",
       "quantity": "수량",
@@ -8703,6 +8972,18 @@ export const ko_KR: EnTranslations = {
       "fen_muster_order": {
         "name": "펜브리지 소집 명령서"
       },
+      "firebottle": {
+        "name": "화염병"
+      },
+      "murloc_hut": {
+        "name": "진흙지느러미 오두막"
+      },
+      "restless_skull": {
+        "name": "불안한 두개골"
+      },
+      "vanguard_bone": {
+        "name": "선봉대의 뼈"
+      },
       "mire_prowler_pelt": {
         "name": "수렁 배회자 가죽"
       },
@@ -9978,6 +10259,21 @@ export const ko_KR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "테러스파크 시동 열쇠"
       },
+      "reins_drakemaw_raptor": {
+        "name": "화산구 랩터의 고삐"
+      },
+      "moggers_hide_quiver": {
+        "name": "모거의 가죽 화살통"
+      },
+      "cragmaw_huntquiver": {
+        "name": "크래그모의 사냥 화살통"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "무덤고룡 뼈 화살통"
+      },
+      "direfang_quiver": {
+        "name": "흉포송곳니 화살통"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },
@@ -10973,6 +11269,21 @@ export const ko_KR: EnTranslations = {
       "spider_egg_sac": {
         "name": "거미 알집"
       },
+      "spider_egg": {
+        "name": "거미어미의 알"
+      },
+      "widow_hatchling": {
+        "name": "과부거미 새끼"
+      },
+      "drowned_warlord": {
+        "name": "익사한 전쟁군주"
+      },
+      "brakka_wallbreaker": {
+        "name": "성벽파괴자 브라카"
+      },
+      "threnos_first_voice": {
+        "name": "첫 번째 목소리 스레노스"
+      },
       "grave_silt_bulwark": {
         "name": "무덤진흙 방벽"
       },
@@ -11152,6 +11463,18 @@ export const ko_KR: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "화산구의 어미 신드랄레스"
+      },
+      "dragonkin_egg": {
+        "name": "용족 알"
+      },
+      "dragonkin_whelp": {
+        "name": "용족 새끼"
+      },
+      "dragonkin_broodguard": {
+        "name": "용족 둥지 수호병"
+      },
+      "drakemaw_broodlord": {
+        "name": "화산구의 둥지군주"
       },
       "gilded_stag": {
         "name": "금빛 수사슴"
@@ -12185,7 +12508,7 @@ export const ko_KR: EnTranslations = {
       },
       "q_no_rest": {
         "title": "갈대밭에 안식은 없다",
-        "text": "그 의식은 습지가 닿는 곳마다 익사자를 일으킵니다. 아직 풀 수 없지만, 병사 14구를 주인에게서 빼앗을 수 있습니다.",
+        "text": "그 향로의 의식은 익사자를 일으키고, 이제 그들을 이끌 만큼 강한 자까지 일으켰습니다. 파수꾼들은 그를 익사한 전쟁군주라 부릅니다. 그가 잠긴 예배당을 차지하고 있는 한 망자들은 대열을 지킵니다. {playerName}이여, 그를 쓰러뜨리십시오. 남은 것들은 진창으로 흩어져 돌아갈 것입니다.",
         "completion": "당신은 죽은 자들에게 주인들보다 큰 자비를 베풀었습니다. 받으십시오.",
         "objectives": {
           "0": {
@@ -12463,9 +12786,6 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "고룡교단 광신도 처치"
-          },
-          "1": {
-            "label": "고룡교단 명령서"
           }
         }
       },
@@ -12476,9 +12796,6 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "고룡교단 강령술사 처치"
-          },
-          "1": {
-            "label": "의식 성물함"
           }
         }
       },

@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Kuluçka Kırıcı',
+    desc: "Bir Ejder Ağzı Yuva Lordu'nu, narasına, yarma darbesine ve ateşine rağmen, yumurtalarının ortasında öldür.",
+  },
+  chr_maw_matriarch: {
+    name: 'Gök Sessizleşiyor',
+    desc: "Ağız Anaerkili Cindraleth'i, Ejder Ağzı'nın üzerindeki krater tüneğinde öldür.",
+  },
   pvp_card_duel_first_win: {
     name: 'Ev Kuralları',
     desc: "Kart Ustası'nın yanında bir Kart Düellosu kazan.",
@@ -776,6 +784,10 @@ export const table: DeedLocaleTable = {
     name: 'Kahramanca: Yaban Yürek Çukuru',
     desc: "Yaban Yürek Çukuru'nda Zulgar, Çukurun Sesi'ni Kahramanca zorlukta alt et.",
   },
+  chr_peaks_gatherer: {
+    name: 'Yükseklerin Hasadı',
+    desc: "Dikenzirve Tepeleri'nde bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
   chr_marsh_rares_ii: {
     name: 'Obur, Hesaba Katıldı',
     desc: "Mirefen Bataklığı'nın ilk sayımda atlanan dördüncü namlı dehşeti Obur Grubjaw'ı öldür.",
@@ -791,5 +803,57 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Sürü Unutmaz',
     desc: "Örtülü Vadi'nin iki gezgin ender patronunu öldür: Yaşlı Marrowshell ve Sürünün İlki Aurelhorn.",
+  },
+  chr_willowfen_gatherer: {
+    name: 'Söğütlük Bereketi',
+    desc: "Söğüt Bataklığı'nda bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
+  chr_willowfen_first_cast: {
+    name: "Zambak Bozkırları'nda Su Halkaları",
+    desc: "Söğüt Bataklığı'nın sularından bir balık tut.",
+  },
+  chr_galecrest_gatherer: {
+    name: 'Yamaç Başında Hasat',
+    desc: "Fırtına Sırtı'nda bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
+  chr_galecrest_first_cast: {
+    name: "Ayna Gölü'nde Bir Misina",
+    desc: "Fırtına Sırtı'nın sularından bir balık tut.",
+  },
+  chr_farshore_gatherer: {
+    name: 'Ada Erzağı',
+    desc: "Uzak Kıyı'da bir cevher damarı, bir kesimlik ağaç ve bir şifalı ot öbeği topla.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Martıların Bildiği',
+    desc: "Uzak Kıyı'nın sularından bir balık tut.",
+  },
+  prog_engineering_rare: {
+    name: 'Hassas Mühendislik',
+    desc: 'Mühendislikte ilk ender eşyanı işle.',
+  },
+  prog_alchemy_rare: {
+    name: 'Ender Bir Yıllık',
+    desc: 'Simyada ilk ender eşyanı işle.',
+  },
+  prog_cooking_rare: {
+    name: 'Unutulmaz Bir Yemek',
+    desc: 'Yemek Pişirmede ilk ender eşyanı işle.',
+  },
+  prog_leatherworking_rare: {
+    name: 'İnce Tabaklama',
+    desc: 'Deri İşlemede ilk ender eşyanı işle.',
+  },
+  prog_tailoring_rare: {
+    name: 'Bir Usta Dikişi',
+    desc: 'Terzilikte ilk ender eşyanı işle.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Parlayana Kadar Tavlandı',
+    desc: 'Silah Yapımında ilk ender eşyanı işle.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Kusursuza Kaplandı',
+    desc: 'Zırh Yapımında ilk ender eşyanı işle.',
   },
 };

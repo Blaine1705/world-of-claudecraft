@@ -167,9 +167,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       else purgeItem('eastbrook_ritual_vestments'); // keep the bags clear between attempts
     }
     // Hunted literal (seed 4242, this exact beat order, re-recorded after the
-    // Eastbrook camp respacing thinned the zone-1 camp counts, which shifts every
-    // world-gen draw downstream): the proc lands on attempt index 3.
-    expect(procAt).toBe(3);
+    // zones 1-3 quest-dedupe content pass added camps, mobs, and items, which
+    // shifts every world-gen draw downstream): the proc lands on attempt
+    // index 7.
+    expect(procAt).toBe(7);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -259,10 +260,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false);
   });
 
-  // 90s budget: the re-hunted koi session sits at index 26 in the shared
+  // 90s budget: the re-hunted koi session sits at index 7 in the shared
   // stream, and every session ticks the REAL world to its bite.
   // Raised timeout (the climb_slope idiom): this beat drives thousands of
-  // REAL world ticks (9 bite-and-reel sessions plus bounded combat waits),
+  // REAL world ticks (8 bite-and-reel sessions plus bounded combat waits),
   // which overruns the 5s default under CI/core contention; every loop is
   // guard-bounded, so a genuine hang still terminates into a failed pin.
   it('beat 11: the koi lands through the REAL bite-and-reel loop and the deed fires on the catch', {
@@ -302,13 +303,16 @@ describe('scripted playthrough (one sim, live sites only)', () => {
         sawBiteOnKoiSession = bit;
       }
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded on the
-    // v0.34.0 release merge: BOTH parents moved the shared stream since the
-    // last recording, the packet's tuned band tables and world-gen on one
-    // side and the release's Idol Guardian phasesThroughObstacles wander
-    // timing on the other, the same cause as this merge's parity golden
-    // re-mint): the koi bites on session index 42.
-    expect(koiSession).toBe(42);
+    // Hunted literal (seed 4242, after every beat above), re-recorded on this
+    // v0.34.0 sync merge, where the release side's shifts (the packet's tuned
+    // band tables and world-gen, the Idol Guardian phasesThroughObstacles wander
+    // timing, and the Dragonkin brood replacing the emberwing drakes in shipped
+    // camp slots) compose with this branch's zones 1-3 quest-dedupe content pass,
+    // whose added camps, mobs and items move every shared-stream draw downstream.
+    // Neither parent's recorded value survives the composition, so this is a
+    // fresh hunt, the same cause and protocol as this merge's parity golden
+    // re-mint: the koi bites on session index 0.
+    expect(koiSession).toBe(0);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -322,11 +326,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // no later beat reads the inventory. Pure state cleanup, zero draws.
     meta.inventory.length = 0;
     // Hunted literals (seed 4242, after every beat above, re-recorded after
-    // the Idol Guardian gained phasesThroughObstacles on this branch: its
-    // ambient wander no longer stalls on the Sunken Idol relic colliders, so
-    // every shared-stream draw after its wander-arrival shifts, the same
-    // cause as this branch's parity golden re-mint): the harvest index where
-    // each flavor's 1-in-90 event fires under the shared stream.
+    // the zones 1-3 quest-dedupe content pass: its added camps, mobs, and
+    // items move every shared-stream draw downstream, the same cause as that
+    // pass's parity scenario re-hunt): the harvest index where each flavor's
+    // 1-in-90 event fires under the shared stream.
     // #2343: each hunt's harvest needs its profession's tool in bags. The
     // tier-1 tools ride the whole beat (purgeItem never touches them) and
     // addItem draws no rng, so the hunted hitAt literals hold.
@@ -336,18 +339,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 58 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 100 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 87,
+        hitAt: 319,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 79,
+        hitAt: 130,
       },
     ];
     for (const hunt of hunts) {
@@ -405,17 +408,135 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       sim.harvestCorpse(mob.id, ['hide'], pid);
       if (sim.countItem('pristine_hide', pid) > 0) hitAt = i;
     }
-    // Hunted literal (seed 4242, after every beat above, re-recorded on the
-    // v0.34.0 release merge, the same both-parents stream shift as the koi
-    // literal above): the rare-or-better rarity roll that mints the signed
-    // specimen lands on attempt index 2.
-    expect(hitAt).toBe(2);
+    // Hunted literal (seed 4242, after every beat above), re-recorded on this
+    // merge, the same composed stream shift as the koi literal above: the
+    // rare-or-better rarity roll that mints the signed specimen lands on
+    // attempt index 8.
+    expect(hitAt).toBe(8);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);
     sim.tick();
     expect(meta.deedsEarned.has('col_perfect_specimen')).toBe(true);
     sim.entities.delete(mob.id);
+  });
+
+  // Basic universal profession deeds (issue #2055): one rare-or-better craft
+  // per craft on the ring lands that craft's milestone. Output quality is a
+  // static fact of the recipe's result def (the Professions 2.0 output roll
+  // is retired), so every craft below succeeds on the first attempt: no
+  // hunt needed, unlike the masterwork proc beat. Four recipes are
+  // grandfathered (TOOL_RECIPES/CASTER_HUB_RECIPES, no acquisition list):
+  // materials and station presence alone unlock them. The other three ship
+  // only trainer-taught rare recipes, so this beat trains each for real
+  // through sim.trainRecipe before crafting it; the copper grant and the
+  // direct craft-skill bumps are preconditions only (exactly the beats-3-to-5
+  // idiom above), never the deed's own trigger.
+  it('beat 16: every craft with a rare-tier recipe lands its per-craft rare-tier milestone', () => {
+    const rareDeedIds = [
+      'prog_engineering_rare',
+      'prog_alchemy_rare',
+      'prog_cooking_rare',
+      'prog_leatherworking_rare',
+      'prog_tailoring_rare',
+      'prog_weaponcrafting_rare',
+      'prog_armorcrafting_rare',
+    ];
+    for (const id of rareDeedIds) expect(meta.deedsEarned.has(id), id).toBe(false);
+    // Free the bags: the earlier gather/fishing/harvest beats leave a full
+    // hold, and this beat needs room for seven crafted outputs plus reagents.
+    meta.inventory.length = 0;
+
+    moveToNpc('tinker_gizzel'); // engineering: station_eastbrook_toolworks
+    meta.craftThrottle.count = 0;
+    sim.addItem('fine_iron_ore', 4, pid);
+    sim.addItem('mithril_mining_pick', 1, pid);
+    sim.craftItem('recipe_thorium_mining_pick', false, pid);
+    expect(sim.lastCraftResult?.ok, 'engineering craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'engineering craft').toBe('rare');
+
+    moveToNpc('weaver_ottilie'); // tailoring: station_eastbrook_loom
+    meta.craftThrottle.count = 0;
+    sim.addItem('sunpetal_herb', 2, pid);
+    sim.addItem('goldleaf_herb', 2, pid);
+    sim.addItem('pristine_silk', 2, pid);
+    sim.addItem('spider_silk', 4, pid);
+    sim.addItem('spool_of_thread', 2, pid);
+    sim.craftItem('recipe_wardweave_cowl', false, pid);
+    expect(sim.lastCraftResult?.ok, 'tailoring craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'tailoring craft').toBe('rare');
+
+    moveToNpc('tanner_hesk'); // leatherworking: station_fenbridge_tannery
+    meta.craftThrottle.count = 0;
+    sim.addItem('thorium_ore', 6, pid);
+    sim.addItem('pristine_hide', 3, pid);
+    sim.addItem('rough_hide', 2, pid);
+    sim.addItem('tanning_agent', 1, pid);
+    sim.craftItem('recipe_duskhide_wraps', false, pid);
+    expect(sim.lastCraftResult?.ok, 'leatherworking craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'leatherworking craft').toBe('rare');
+
+    moveToNpc(SMITH_MASTER); // armorcrafting: station_eastbrook_forge
+    meta.craftThrottle.count = 0;
+    sim.addItem('thorium_ore', 7, pid);
+    sim.addItem('smithing_flux', 5, pid);
+    sim.craftItem('recipe_sootscale_mantle', false, pid);
+    expect(sim.lastCraftResult?.ok, 'armorcrafting craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'armorcrafting craft').toBe('rare');
+
+    // The remaining three crafts ship only trainer-taught rare recipes
+    // (skillReq 50, so teachTierMet needs tier 2). A flat copper grant funds
+    // every training fee (a pure gold-sink precondition; trainRecipe itself
+    // still charges it for real).
+    meta.copper += 100000;
+
+    sim.gainCraftSkill(pid, 'weaponcrafting', 50);
+    moveToNpc(SMITH_MASTER); // weaponcrafting is also taught at the forge
+    sim.trainRecipe('recipe_thorium_warblade', pid);
+    expect(meta.lastTrainResult?.ok, 'weaponcrafting train').toBe(true);
+    meta.craftThrottle.count = 0;
+    sim.addItem('thorium_ore', 4, pid);
+    sim.addItem('iron_ore', 2, pid);
+    sim.addItem('smithing_flux', 2, pid);
+    sim.craftItem('recipe_thorium_warblade', false, pid);
+    expect(sim.lastCraftResult?.ok, 'weaponcrafting craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'weaponcrafting craft').toBe('rare');
+
+    sim.gainCraftSkill(pid, 'cooking', 50);
+    moveToNpc('cook_marlow'); // cooking: station_eastbrook_kitchens
+    sim.trainRecipe('recipe_silvered_carp_supper', pid);
+    expect(meta.lastTrainResult?.ok, 'cooking train').toBe(true);
+    meta.craftThrottle.count = 0;
+    sim.addItem('raw_stonescale_carp', 3, pid);
+    sim.addItem('raw_mirror_trout', 1, pid);
+    sim.addItem('goldleaf_herb', 1, pid);
+    sim.addItem('cooking_salt', 1, pid);
+    sim.craftItem('recipe_silvered_carp_supper', false, pid);
+    expect(sim.lastCraftResult?.ok, 'cooking craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'cooking craft').toBe('rare');
+
+    sim.gainCraftSkill(pid, 'alchemy', 50);
+    moveToNpc('alchemist_verane'); // alchemy: station_highwatch_apothecary
+    sim.trainRecipe('recipe_sunpetal_mana_draught', pid);
+    expect(meta.lastTrainResult?.ok, 'alchemy train').toBe(true);
+    meta.craftThrottle.count = 0;
+    sim.addItem('sunpetal_herb', 2, pid);
+    sim.addItem('goldleaf_herb', 1, pid);
+    sim.addItem('glass_vial', 1, pid);
+    sim.craftItem('recipe_sunpetal_mana_draught', false, pid);
+    expect(sim.lastCraftResult?.ok, 'alchemy craft').toBe(true);
+    expect(sim.lastCraftResult?.quality, 'alchemy craft').toBe('rare');
+
+    // Every mark sweeps at the tick tail, all seven in one grant pass.
+    for (const id of rareDeedIds) expect(meta.deedsEarned.has(id), id).toBe(false);
+    const evs = sim.tick();
+    const firedIds = deedEvents(evs).map((ev) => ev.deedId);
+    for (const id of rareDeedIds) {
+      expect(firedIds, id).toContain(id);
+      expect(meta.deedsEarned.has(id), id).toBe(true);
+      expect(DEEDS[id].renown, id).toBe(10);
+      expect(DEEDS[id].reward, id).toBeUndefined();
+    }
   });
 
   it('epilogue: the whole playthrough earned every beat deed exactly once', () => {
@@ -434,6 +555,13 @@ describe('scripted playthrough (one sim, live sites only)', () => {
       'col_ancient_heartwood',
       'col_moonlit_bloom',
       'col_perfect_specimen',
+      'prog_engineering_rare',
+      'prog_alchemy_rare',
+      'prog_cooking_rare',
+      'prog_leatherworking_rare',
+      'prog_tailoring_rare',
+      'prog_weaponcrafting_rare',
+      'prog_armorcrafting_rare',
     ];
     for (const id of earned) expect(meta.deedsEarned.has(id), id).toBe(true);
     // deedsEarned is a Map, so "exactly once" is structural; the renown total

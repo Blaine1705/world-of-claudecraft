@@ -24,9 +24,12 @@ import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
+import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
 import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
+import { SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
+import { applyResurrectionSickness, applyUnstuckSickness } from '../spirit';
 import {
   type ArenaCombatant,
   type ArenaFormat,
@@ -64,13 +67,43 @@ export function cloneAbilityCharges(
 }
 
 export function snapshotArenaReturnPools(e: Entity): ArenaReturnPools {
+  const sickness = e.auras.find((a) => SICKNESS_AURA_IDS.has(a.id));
   return {
     hp: e.hp,
     resource: e.resource,
     cooldowns: new Map(e.cooldowns),
     abilityCharges: cloneAbilityCharges(e.abilityCharges),
     ccDr: cloneCcDr(e.ccDr),
+    // A recovery sickness is owed, not carried: the bout itself runs on the clean
+    // slate (nobody fights a normalized match at a quarter of their stats), but the
+    // remaining seconds come back on the way out. Without this the wipe in
+    // readyArenaFighter laundered the whole penalty for the price of one queue.
+    sickness: sickness ? { id: sickness.id, remaining: sickness.remaining } : undefined,
   };
+}
+
+// Hand back exactly what a fighter carried in. Shared by every arena-shaped mode's
+// return path (ranked arena and Fiesta via returnFromArena, Yumi through the same,
+// and Vale Cup), which is what keeps "a match is a parenthesis, not a rest stop"
+// (issue #1600) from drifting between them.
+//
+// Order is load-bearing: the sickness goes back FIRST because applyAura recalcs the
+// player, so the hp/resource clamp below has to see the drained maxHp, not the
+// healthy one. Everything else is a straight restore.
+export function restoreArenaReturnPools(ctx: SimContext, e: Entity, pools: ArenaReturnPools): void {
+  e.cooldowns = new Map(pools.cooldowns);
+  e.abilityCharges =
+    Object.keys(pools.abilityCharges).length > 0
+      ? cloneAbilityCharges(pools.abilityCharges)
+      : undefined;
+  e.ccDr = cloneCcDr(pools.ccDr);
+  if (pools.sickness) {
+    const { id, remaining } = pools.sickness;
+    if (id === UNSTUCK_SICKNESS_ID) applyUnstuckSickness(ctx, e, remaining);
+    else applyResurrectionSickness(ctx, e, remaining);
+  }
+  e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
+  e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
 }
 
 // Ashen Coliseum 1v1 arena tuning consts (moved with the slice). FIESTA_COUNTDOWN
@@ -826,10 +859,15 @@ export function startArenaMatch(
   // below, so returnFromArena restores what they walked in with instead of a free
   // full restore (issue #1600). Fiesta captures the pre-standardization pools.
   const preMatchPools = new Map<number, ArenaReturnPools>();
+  // Same idea for the fighter's pet: a beast that walks in alive walks back out
+  // alive, so a normalized bout never costs a hunter their companion.
+  const preMatchPets = new Map<number, MatchPetSnapshot>();
   for (let i = 0; i < allPids.length; i++) {
     const e = entities[i]!;
     returns.set(allPids[i], { x: e.pos.x, z: e.pos.z, facing: e.facing });
     preMatchPools.set(allPids[i], snapshotArenaReturnPools(e));
+    const pet = snapshotMatchPet(ctx, allPids[i]);
+    if (pet) preMatchPets.set(allPids[i], pet);
   }
   const isFiesta = format === 'fiesta';
   const countdown = isFiesta ? FIESTA_COUNTDOWN : ARENA_COUNTDOWN;
@@ -843,6 +881,7 @@ export function startArenaMatch(
     timer: countdown,
     returns,
     preMatchPools,
+    preMatchPets,
     ratingA: arenaTeamRating(ctx, teamA, format),
     ratingB: arenaTeamRating(ctx, teamB, format),
     defeated: new Set(),
@@ -1161,24 +1200,21 @@ export function returnFromArena(ctx: SimContext, match: ArenaMatch): void {
     // restore and hand back exactly the HP, resource, cooldowns, and CC DR the fighter
     // carried in, so an arena match can never be farmed as a free heal, mana
     // refill, or cooldown reset (issue #1600). recalcPlayerStats already ran
-    // inside resetForArena, so maxHp/maxResource are current for the clamp. Auras
-    // stay cleared (the documented arena clean-slate).
+    // inside resetForArena, so maxHp/maxResource are current for the clamp. Ordinary
+    // auras stay cleared (the documented arena clean-slate); a recovery sickness is
+    // the one exception and rides back through the shared restore.
     const pools = match.preMatchPools?.get(pid);
-    if (pools) {
-      e.cooldowns = new Map(pools.cooldowns);
-      e.abilityCharges =
-        Object.keys(pools.abilityCharges).length > 0
-          ? cloneAbilityCharges(pools.abilityCharges)
-          : undefined;
-      e.ccDr = cloneCcDr(pools.ccDr);
-      e.hp = Math.max(0, Math.min(pools.hp, e.maxHp));
-      e.resource = Math.max(0, Math.min(pools.resource, e.maxResource));
-    }
+    if (pools) restoreArenaReturnPools(ctx, e, pools);
     e.pos = ctx.groundPos(ret.x, ret.z);
     e.prevPos = { ...e.pos };
     e.facing = ret.facing;
     e.dead = false;
     ctx.rebucket(e);
+    // The fighter is standing at their queue spot now, so the pet the bout killed
+    // is stood back up HERE, beside them in the world (never back on the sands).
+    // Runs after the Fiesta restore above so the revived pet's owner is already
+    // back at their real level and stats.
+    restoreMatchPet(ctx, e, match.preMatchPets?.get(pid));
     ctx.emit({ type: 'respawn', pid: e.id });
   }
 }

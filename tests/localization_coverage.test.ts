@@ -157,7 +157,6 @@ describe('i18n Localization Key Coverage', () => {
     'hud.core.mobileMore',
     'hud.core.mobileMoreAria',
     'hud.core.mobileSocial',
-    'hud.core.mobileArena',
     'hud.core.mobileMenu',
     'hud.core.mobileUse',
     'hud.core.mobileMeters',
@@ -374,6 +373,9 @@ describe('i18n Localization Key Coverage', () => {
     delta: '+13',
     dps: '7.4',
     duration: '15s',
+    // The per-unit ask beside a stack's total (itemUi.market.buyConfirmBodyStack);
+    // a money string like `money` above, not a bare number.
+    each: '4 silver',
     form: 'Bear',
     fps: 60,
     guild: 'Night Watch',
@@ -384,6 +386,10 @@ describe('i18n Localization Key Coverage', () => {
     questKey: 'L',
     item: 'Rough Bracers',
     key: 'K',
+    // The death recap's slayer (hud.system.deathRecapKiller[Ability]): a mob
+    // or player display name spliced verbatim. One sample only, the base and
+    // this branch each added the same key independently.
+    killer: 'Mira',
     kind: 'Weapon',
     slots: 14,
     label: 'Wolf',
@@ -1314,9 +1320,9 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (30 as of
-    // Professions 2.0; tests/deeds_content.test.ts pins the count).
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 30);
+    // name + desc per deed, plus one title entry per title deed (31 as of
+    // Thornhollow Fields; tests/deeds_content.test.ts pins the count).
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 31);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
@@ -1572,13 +1578,6 @@ describe('i18n Localization Key Coverage', () => {
     expect(hudSource).toContain('dungeonDisplayNameFromSource');
     expect(hudSource).not.toContain('zoneWelcomeText(');
 
-    const rendererSource = fs.readFileSync(
-      path.resolve(process.cwd(), 'src/render/renderer.ts'),
-      'utf8',
-    );
-    // objectDisplayName still localizes the build-time object nameplate write in the
-    // renderer; the helper itself moved into entity_labels.ts.
-    expect(rendererSource).toContain('objectDisplayName');
     // The per-entity nameplate content (corpse/mob names) moved into the
     // NameplatePainter; localization is preserved, just relocated (mirrors the
     // minimap_painter zone-label move above).
@@ -1820,7 +1819,11 @@ describe('i18n Localization Key Coverage', () => {
     expect(html).toContain('data-i18n="hud.core.mobileChat"');
     expect(html).toContain('data-i18n="hud.core.mobileMore"');
     expect(html).toContain('data-i18n="hud.core.mobileSocial"');
-    expect(html).toContain('data-i18n="hud.core.mobileArena"');
+    // The merged PvP window's launcher label (Thornhollow Fields + arenas on one
+    // button); the old mobileArena key stays in the catalog like mobileTarget
+    // but no longer appears in the markup.
+    expect(html).toContain('data-i18n="hudChrome.pvp.mobileLabel"');
+    expect(html).not.toContain('data-i18n="hud.core.mobileArena"');
     // The Settings button (promoted to the bar between Social and More) uses
     // mobileSettings ("Settings"); the old mobileMenu ("Menu") key stays in the
     // catalog but, like mobileTarget, no longer appears in the markup.

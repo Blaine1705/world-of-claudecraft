@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: '卵砕き',
+    desc: '咆哮と薙ぎ払い、そして業火をくぐり抜け、卵に囲まれた火口の巣主を討ち取れ。',
+  },
+  chr_maw_matriarch: {
+    name: '空の静寂',
+    desc: 'ドレイクモウを見下ろす火口のねぐらで、シンドラレス、火口の母竜を討ち取れ。',
+  },
   pvp_card_duel_first_win: {
     name: '我が流儀',
     desc: 'カードマスターのもとでカードデュエルに勝利する。',
@@ -685,6 +693,10 @@ export const table: DeedLocaleTable = {
     name: '英雄: ワイルドハート盆地',
     desc: '英雄難易度のワイルドハート盆地で盆地の声ズルガーを倒す。',
   },
+  chr_peaks_gatherer: {
+    name: '高嶺の実り',
+    desc: 'ソーンピーク高地で鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
   chr_marsh_rares_ii: {
     name: '大食らい、勘定に載る',
     desc: '最初の勘定から漏れていたマイアフェン湿地の4体目の恐怖、大食らいのグラブジョーを討ち倒す。',
@@ -700,5 +712,57 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: '群れは忘れない',
     desc: 'ヴェールの幽谷を彷徨う2体の稀少ボス、老いたるマロウシェルと群れの長アウレルホーンを討ち倒す。',
+  },
+  chr_willowfen_gatherer: {
+    name: 'フェンの恵み',
+    desc: 'ウィローフェンで鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_willowfen_first_cast: {
+    name: 'リリームーアの波紋',
+    desc: 'ウィローフェンの水辺で魚を釣り上げる。',
+  },
+  chr_galecrest_gatherer: {
+    name: '岬の収穫',
+    desc: 'ゲイルクレストで鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_galecrest_first_cast: {
+    name: 'ミラーターンに糸を垂れて',
+    desc: 'ゲイルクレストの水辺で魚を釣り上げる。',
+  },
+  chr_farshore_gatherer: {
+    name: '島の糧',
+    desc: '遠つ岸で鉱脈、木立、薬草の茂みをそれぞれ採取する。',
+  },
+  chr_farshore_first_cast: {
+    name: 'カモメは知っている',
+    desc: '遠つ岸の水辺で魚を釣り上げる。',
+  },
+  prog_engineering_rare: {
+    name: '精密工作',
+    desc: '工作で初めてのレア級アイテムを作る。',
+  },
+  prog_alchemy_rare: {
+    name: '稀少な逸品',
+    desc: '錬金術で初めてのレア級アイテムを作る。',
+  },
+  prog_cooking_rare: {
+    name: '忘れられぬ一皿',
+    desc: '料理で初めてのレア級アイテムを作る。',
+  },
+  prog_leatherworking_rare: {
+    name: '上質ななめし',
+    desc: '皮革加工で初めてのレア級アイテムを作る。',
+  },
+  prog_tailoring_rare: {
+    name: '名匠の一針',
+    desc: '裁縫で初めてのレア級アイテムを作る。',
+  },
+  prog_weaponcrafting_rare: {
+    name: '磨き上げた輝き',
+    desc: '武器鍛冶で初めてのレア級アイテムを作る。',
+  },
+  prog_armorcrafting_rare: {
+    name: '完璧な装甲',
+    desc: '防具鍛冶で初めてのレア級アイテムを作る。',
   },
 };
