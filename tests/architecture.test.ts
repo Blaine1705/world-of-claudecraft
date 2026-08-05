@@ -257,6 +257,7 @@ const UI_PURE_CORES = [
   'src/ui/craft_name_view.ts',
   'src/ui/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
+  'src/ui/item_instance_glyph_mark.ts',
   'src/ui/bag_corner_mark_view.ts',
   'src/ui/bag_fine_mark_view.ts',
   'src/ui/bag_quest_mark_view.ts',
@@ -469,6 +470,7 @@ const RENDER_PURE_CORES = [
 // reverse-completeness guard.
 const BARE_NAMED = [
   'src/ui/banner_queue.ts',
+  'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/item_name_color.ts',
   'src/render/foliage_lod.ts',
@@ -1080,6 +1082,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/guild_motd_login.ts',
   'src/ui/hud/delve/delve_map.ts',
   'src/ui/hud/quest/quest_tracker.ts',
+  'src/ui/item_instance_glyph_mark.ts',
   'src/ui/item_kind_label.ts',
   'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
