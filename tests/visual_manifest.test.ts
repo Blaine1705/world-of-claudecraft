@@ -352,14 +352,14 @@ describe('character visual manifest', () => {
     // class it shares a model with. At their pre-fix strengths (0.5 / 0.4 /
     // 0.45) the tint color dominated the authored texture and the default
     // (skin 0) appearance read as a solid-color, corrupted model on the
-    // character-create screen. The upper bound keeps any future tint bump
-    // inside the "faint wash" band the repo already uses elsewhere for
-    // model-sharing differentiation (see mob_troll's 0.12 above).
+    // character-create screen. Pinned to the exact 0.12 the manifest ships
+    // (the same "faint wash" strength used elsewhere for model-sharing
+    // differentiation, see mob_troll's 0.12 above), not just an upper bound,
+    // so a future bump toward the wash can't silently pass this test.
     for (const key of ['player_priest', 'player_shaman', 'player_warlock'] as const) {
       const visual = VISUALS[key];
       expect(typeof visual.tint, key).toBe('number');
-      expect(visual.tintStrength, key).toBeLessThanOrEqual(0.15);
-      expect(visual.tintStrength, key).toBeGreaterThan(0);
+      expect(visual.tintStrength, key).toBe(0.12);
     }
     // The classes that own their model outright (no sharing) stay tint-free:
     // a wash there would be pure regression, never intentional.
