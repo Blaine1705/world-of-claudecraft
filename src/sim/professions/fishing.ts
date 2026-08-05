@@ -14,10 +14,11 @@
 // and which rod it takes to cast there at all, live in professions/fishing_zones.ts.
 // Draw contract: a normal session draws one rng
 // value at cast start (the bite delay) and one more at a landed reel (the
-// table); a miss stays at one; the codfather reel draws nothing (early
-// return); a bags-full reel still draws the table (capacity gates after the
-// roll). Band selection is pure state, not a draw, and every deny arm is
-// draw-free.
+// table); a miss stays at one, as does an early reel (a pre-bite re-press
+// ends the session empty, the anti-spam arm in startFishing); the codfather
+// reel draws nothing (early return); a bags-full reel still draws the table
+// (capacity gates after the roll). Band selection is pure state, not a draw,
+// and every deny arm is draw-free.
 
 import { isActionLockingFormAuraKind } from '../combat/forms';
 import { FISHING_RARE_ID, FISHING_TABLES_BY_BAND, isRawCookingCatch } from '../content/items';
@@ -313,8 +314,9 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // isSwimming reads), with self-movement cancelling and every landed hit,
   // blocked or fully absorbed, cancelling too. A future displacement that
   // omits that clamp must either keep it or re-check the swim gate here.
-  // A re-press BEFORE the bite or AFTER
-  // the deadline falls through to the busy error below.
+  // A re-press BEFORE the bite ends the session empty (the early-reel arm
+  // below); a re-press AFTER the deadline falls through to the busy error
+  // (the miss arm owns that tick).
   // Boundary contract (pinned): the reel is valid while ctx.tickCount <=
   // fishReelDeadlineTick; the miss fires at deadline + 1 in the tick phase.
   if (
@@ -331,6 +333,34 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
     // Cleared AFTER completeFishing on purpose: the completion reads the
     // pinned zone for the table and the deed credit.
     p.fishCastZoneId = '';
+    return;
+  }
+  // The early reel: a pole re-press during one's own session BEFORE the bite
+  // (fishBiteAtTick is still armed; the bite arm zeroes it when it fires)
+  // pulls the line in empty and ends the session. This arm is what keeps the
+  // bite a reaction test: it used to fall through to the free busy no-op
+  // below, which made spam-pressing a guaranteed catch, since one press
+  // always fell inside the armed reel window while every earlier press cost
+  // nothing. Now a press either answers the bite (the reel arm above) or
+  // ends the cast, so spamming casts and cancels forever and never lands a
+  // fish. Hoisted ABOVE the combat denial for the same reason the reel arm
+  // is: were the denial to win, an in-combat spammer would keep the free
+  // no-ops and the exploit. Fully self-guarded (only a LIVE pre-bite fishing
+  // session of one's own passes; the parity drives that direct-assign
+  // castingAbility leave fishBiteAtTick 0 and keep the busy denial), and
+  // draw-free on every path: the session's one bite-delay draw is simply
+  // abandoned, zoneId/band resolve from pure state like the miss arm's.
+  // Costs nothing but the ended cast; recast immediately.
+  if (p.castingAbility === FISHING_CAST_ID && p.fishBiteAtTick > 0) {
+    const zoneId = p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id;
+    const band = effectiveFishingBand(meta);
+    p.castingAbility = null;
+    p.castRemaining = 0;
+    p.fishBiteAtTick = 0;
+    p.fishReelDeadlineTick = 0;
+    p.fishCastZoneId = '';
+    ctx.emit({ type: 'fishingEarlyReel', pid: p.id, zoneId, band });
+    ctx.emit({ type: 'castStop', entityId: p.id, success: false });
     return;
   }
   if (p.inCombat) {

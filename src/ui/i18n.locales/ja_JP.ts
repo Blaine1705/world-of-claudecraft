@@ -8566,6 +8566,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '{name}を釣り上げた',
   'hudChrome.gathering.biteLine': '何かが食いついた！',
   'hudChrome.gathering.gotAwayLine': '逃げられてしまった。',
+  'hudChrome.gathering.earlyReelLine': '巻き上げるのが早すぎた。まだ何も食いついていなかった。',
   'hudChrome.gathering.nodeName.ore': '鉱脈',
   'hudChrome.gathering.nodeName.wood': '立木',
   'hudChrome.gathering.nodeName.herb': '薬草の群生地',

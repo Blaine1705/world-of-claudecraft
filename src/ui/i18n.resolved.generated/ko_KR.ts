@@ -2552,6 +2552,7 @@ export const ko_KR: EnTranslations = {
       "catchLine": "{name}을(를) 낚아 올렸습니다",
       "biteLine": "무언가 미끼를 물었습니다!",
       "gotAwayLine": "놓쳐 버렸습니다.",
+      "earlyReelLine": "너무 일찍 줄을 감았습니다. 아직 아무것도 미끼를 물지 않았습니다.",
       "nodeName": {
         "ore": "광맥",
         "wood": "벌목 나무",

@@ -1673,6 +1673,23 @@ describe('fishing over the live server (pin 8)', () => {
     expect(empty).toBe(true);
   });
 
+  it('a pre-bite re-press over the live server reels in early: personal fishingEarlyReel, no busy error, recast allowed', () => {
+    const { server, fcA, fcB, sa, angler } = setupAngler();
+    // The probe cast is live and pre-bite straight out of setup.
+    expect(angler.castingAbility).toBe(FISHING_CAST_ID);
+    expect(angler.fishBiteAtTick).toBeGreaterThan(0);
+    server.sim.useItem('simple_fishing_pole', sa.pid); // the spam press
+    (server as any).routeEvents(server.sim.drainEvents());
+    expect(angler.castingAbility).toBe(null);
+    // The personal event reached the angler only, and no busy error did.
+    expect(deliveredEvents(fcA).some((ev) => ev.type === 'fishingEarlyReel')).toBe(true);
+    expect(deliveredEvents(fcB).some((ev) => ev.type === 'fishingEarlyReel')).toBe(false);
+    expect(deliveredEvents(fcA).some((ev) => ev.type === 'error')).toBe(false);
+    // The early reel costs only the cast: the recast starts immediately.
+    server.sim.useItem('simple_fishing_pole', sa.pid);
+    expect(angler.castingAbility).toBe(FISHING_CAST_ID);
+  });
+
   it('a missed reel window gets away server-side: personal fishingGotAway, no catch, no grant', () => {
     const { server, fcA, fcB, sa, angler, meta } = setupAngler();
     let missed = false;
@@ -1738,10 +1755,12 @@ describe('the reel is exempt from the in-combat gate', () => {
     p.inCombat = false;
   });
 
-  it('in combat with NO armed reel, the cast is still denied (order pin)', () => {
-    // Pre-bite: the session runs but the deadline is unarmed, so a re-press
-    // falls through the reel arm and the combat denial still fires (it sits
-    // above the plain busy arm exactly as before).
+  it('in combat with NO armed reel, a re-press reels in early instead of a free denial (order pin)', () => {
+    // Pre-bite: the session runs but the deadline is unarmed. The early-reel
+    // arm sits ABOVE the combat denial for the same reason the reel arm does:
+    // were the denial to win, an in-combat spammer would get free no-op
+    // presses until the bite armed the window and the hoisted reel arm landed
+    // the catch anyway (the spam-click exploit, combat variant).
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
@@ -1759,20 +1778,15 @@ describe('the reel is exempt from the in-combat gate', () => {
     } finally {
       sim.rng.setObserver(null);
     }
-    expect(
-      sim.events.some(
-        (e) =>
-          (e as { type: string; text?: string }).type === 'error' &&
-          (e as { text?: string }).text === "You can't do that while in combat.",
-      ),
-    ).toBe(true);
-    // The session itself is untouched and no draw was spent.
-    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    // The session ended as an early reel: no combat denial, no draw spent.
+    expect(sim.events.some((e) => (e as { type: string }).type === 'error')).toBe(false);
+    expect(sim.events).toContainEqual(expect.objectContaining({ type: 'fishingEarlyReel' }));
+    expect(p.castingAbility).toBeNull();
     expect(draws).toBe(0);
     p.inCombat = false;
   });
 
-  it('a reel past the deadline still gets the busy error, in combat or not', () => {
+  it('a reel past the deadline still gets the busy error, in combat or not (the miss arm owns that tick)', () => {
     const sim = makeSim(4242);
     const meta = sim.meta(sim.playerId)!;
     teleportToValeShore(sim);
@@ -1792,6 +1806,126 @@ describe('the reel is exempt from the in-combat gate', () => {
           (e as { text?: string }).text === 'You are busy.',
       ),
     ).toBe(true);
+  });
+});
+
+describe('a pre-bite re-press reels in early: the spam-click exploit stays closed', () => {
+  // THE EXPLOIT THIS PINS SHUT: a re-press before the bite used to fall
+  // through to the free "You are busy." no-op, so holding the pole button on
+  // a spam cadence was a guaranteed catch: one of the presses always fell
+  // inside the armed reel window, and the reaction minigame (attention over
+  // reflexes, docs/design/professions.md) never happened. Now every pre-bite
+  // press reels the line in empty and ends the session, so spam casts and
+  // cancels forever and only a press that answers the BITE can land a fish.
+  it('spam-pressing the pole never lands a reel', () => {
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    const before = new Map(VALE_CATCH_IDS.map((id) => [id, sim.countItem(id)]));
+    // 100 press cycles at 4 ticks (0.2 s) apart: pre-fix the first session's
+    // bite (3 to 8 s in) always armed the window under a live session and the
+    // next spam press landed the reel. Post-fix no session survives past one
+    // cycle, so no bite ever fires.
+    let earlyReels = 0;
+    for (let i = 0; i < 100; i++) {
+      if (p.castingAbility !== FISHING_CAST_ID) startFishing(sim.ctx, p, meta);
+      for (let t = 0; t < 4; t++) {
+        sim.tickCount += 1;
+        updateCasting(sim.ctx, p, meta);
+      }
+      startFishing(sim.ctx, p, meta); // the spam press
+    }
+    earlyReels = sim.events.filter(
+      (e) => (e as { type: string }).type === 'fishingEarlyReel',
+    ).length;
+    // No reel ever resolved: no landed catch, no empty hook, no successful
+    // castStop, no item, no proficiency grant. Every spam press was an early
+    // reel instead.
+    expect(fishingResultsIn(sim.events)).toHaveLength(0);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'fishingEmptyHook')).toBe(false);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'fishingBite')).toBe(false);
+    expect(
+      sim.events.some(
+        (e) =>
+          (e as { type: string; success?: boolean }).type === 'castStop' &&
+          (e as { success?: boolean }).success === true,
+      ),
+    ).toBe(false);
+    for (const id of VALE_CATCH_IDS) expect(sim.countItem(id)).toBe(before.get(id));
+    expect(meta.pendingGatherGrants).toHaveLength(0);
+    expect(earlyReels).toBe(100);
+  });
+
+  it('the early reel ends the session draw-free with the pinned zone and no busy error', () => {
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    const pinnedZone = p.fishCastZoneId;
+    expect(pinnedZone).not.toBe('');
+    sim.tickCount += 1;
+    updateCasting(sim.ctx, p, meta);
+    expect(p.fishBiteAtTick).toBeGreaterThan(sim.tickCount); // still pre-bite
+    sim.events = [];
+    let draws = 0;
+    sim.rng.setObserver(() => draws++);
+    try {
+      startFishing(sim.ctx, p, meta); // the early re-press
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    // Session over, hidden state cleared, zero draws (the one-draw-per-cast
+    // contract: a session that ends early spent only its bite-delay draw).
+    expect(draws).toBe(0);
+    expect(p.castingAbility).toBeNull();
+    expect(p.fishBiteAtTick).toBe(0);
+    expect(p.fishReelDeadlineTick).toBe(0);
+    expect(p.fishCastZoneId).toBe('');
+    // The event carries the rod-gate-validated cast zone and the effective
+    // band, exactly like the miss family it sits beside.
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({
+        type: 'fishingEarlyReel',
+        pid: sim.playerId,
+        zoneId: pinnedZone,
+        band: 0,
+      }),
+    );
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'castStop', entityId: sim.playerId, success: false }),
+    );
+    // The old free no-op is gone, and the miss family is untouched: an early
+    // reel is not a got-away (the telemetry counts them apart).
+    expect(sim.events.some((e) => (e as { type: string }).type === 'error')).toBe(false);
+    expect(sim.events.some((e) => (e as { type: string }).type === 'fishingGotAway')).toBe(false);
+    // Recasting is immediate: the early reel costs only the cast itself.
+    startFishing(sim.ctx, p, meta);
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+  });
+
+  it('a direct-assigned session with inert hidden state still gets the busy error', () => {
+    // The parity/cancel drives assign castingAbility directly and never arm
+    // fishBiteAtTick; the early-reel arm keys on a LIVE pre-bite session
+    // (fishBiteAtTick > 0), so those drives keep the plain busy denial.
+    const sim = makeSim(467);
+    const meta = sim.meta(sim.playerId)!;
+    teleportToValeShore(sim);
+    sim.addItem('simple_fishing_pole', 1);
+    const p = sim.player;
+    p.castingAbility = FISHING_CAST_ID;
+    expect(p.fishBiteAtTick).toBe(0);
+    sim.events = [];
+    startFishing(sim.ctx, p, meta);
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'You are busy.' }),
+    );
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    p.castingAbility = null;
   });
 });
 

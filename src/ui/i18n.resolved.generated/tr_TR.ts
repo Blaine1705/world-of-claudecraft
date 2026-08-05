@@ -2552,6 +2552,7 @@ export const tr_TR: EnTranslations = {
       "catchLine": "Çekiyorsunuz: {name}",
       "biteLine": "Bir şey yemi aldı!",
       "gotAwayLine": "Kaçtı gitti.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Maden Damarı",
         "wood": "Kereste Koruluğu",

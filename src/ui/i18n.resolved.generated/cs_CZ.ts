@@ -2552,6 +2552,7 @@ export const cs_CZ: EnTranslations = {
       "catchLine": "Vytahuješ: {name}",
       "biteLine": "Něco zabralo!",
       "gotAwayLine": "Ta ti unikla.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Rudná žíla",
         "wood": "Kmen stromů",

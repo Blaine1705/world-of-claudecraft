@@ -209,7 +209,7 @@ describe('bite delay draw contract and rod-tiered bounds', () => {
 });
 
 describe('reel deadline boundary', () => {
-  it('a re-press at exactly the deadline tick lands the catch (and pre-bite re-press stays busy)', () => {
+  it('a re-press at exactly the deadline tick lands the catch (and a pre-bite re-press reels in early)', () => {
     const sim = makeSim(4242);
     const meta = mustMeta(sim, sim.playerId);
     sim.addItem('simple_fishing_pole', 1); // #2343: casting needs an implement
@@ -219,14 +219,15 @@ describe('reel deadline boundary', () => {
     sim.rng.setObserver(() => draws++);
     try {
       startFishing(sim.ctx, p, meta);
-      // Pre-bite re-press: the reel window is not armed, so the busy error
-      // holds and the session continues.
+      // Pre-bite re-press: the anti-spam early reel ends the session empty
+      // (draw-free), instead of the old free busy no-op that let a spammer
+      // ride every press through to the armed window.
       sim.events = [];
       startFishing(sim.ctx, p, meta);
-      expect(sim.events).toContainEqual(
-        expect.objectContaining({ type: 'error', text: 'You are busy.' }),
-      );
-      expect(p.castingAbility).toBe(FISHING_CAST_ID);
+      expect(sim.events).toContainEqual(expect.objectContaining({ type: 'fishingEarlyReel' }));
+      expect(p.castingAbility).toBe(null);
+      // Recast, then answer the bite on the LAST valid reel tick.
+      startFishing(sim.ctx, p, meta);
       sim.tickCount = p.fishBiteAtTick;
       updateCasting(sim.ctx, p, meta); // the bite
       sim.tickCount = p.fishReelDeadlineTick; // the LAST valid reel tick
@@ -235,7 +236,7 @@ describe('reel deadline boundary', () => {
     } finally {
       sim.rng.setObserver(null);
     }
-    expect(draws).toBe(2); // delay + the landed table draw
+    expect(draws).toBe(3); // two cast delays + the landed table draw
     expect(p.castingAbility).toBe(null);
     expect(sim.events).toContainEqual(expect.objectContaining({ type: 'castStop', success: true }));
   });
@@ -1114,7 +1115,8 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     expect(p.fishCastZoneId).toBe('');
     // Without the cancelCast clears, this recast would still see the OLD
     // deadline armed and the immediate re-press would land a catch with no
-    // bite: the re-press must stay the busy error instead.
+    // bite: the re-press must resolve as the draw-free early reel (the
+    // anti-spam arm), never as a landed reel.
     startFishing(sim.ctx, p, meta);
     expect(p.castingAbility).toBe(FISHING_CAST_ID);
     let draws = 0;
@@ -1126,9 +1128,9 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
       sim.rng.setObserver(null);
     }
     expect(draws).toBe(0);
-    expect(p.castingAbility).toBe(FISHING_CAST_ID);
-    expect(sim.events).toContainEqual(
-      expect.objectContaining({ type: 'error', text: 'You are busy.' }),
+    expect(sim.events).toContainEqual(expect.objectContaining({ type: 'fishingEarlyReel' }));
+    expect(sim.events).not.toContainEqual(
+      expect.objectContaining({ type: 'castStop', success: true }),
     );
   });
 

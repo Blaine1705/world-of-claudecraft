@@ -2552,6 +2552,7 @@ export const pt_BR: EnTranslations = {
       "catchLine": "Você recolhe: {name}",
       "biteLine": "Algo morde a isca!",
       "gotAwayLine": "Ele escapou.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Veio de Minério",
         "wood": "Arvoredo de Madeira",

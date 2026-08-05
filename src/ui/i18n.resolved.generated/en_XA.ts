@@ -2552,6 +2552,7 @@ export const en_XA: EnTranslations = {
       "catchLine": "[Ýóú ŕééļ íñ: {name}]",
       "biteLine": "[Šóɱéţĥíñĝ ţáķéš ţĥé ƀáíţ!]",
       "gotAwayLine": "[Íţ ĝóţ áŵáý.]",
+      "earlyReelLine": "[Ýóú ŕééļ íñ ţóó šóóñ. Ñóţĥíñĝ ĥáð ţáķéñ ţĥé ƀáíţ.]",
       "nodeName": {
         "ore": "[Óŕé Ʋéíñ]",
         "wood": "[Ţíɱƀéŕ Šţáñð]",

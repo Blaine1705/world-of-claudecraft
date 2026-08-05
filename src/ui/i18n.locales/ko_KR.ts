@@ -8543,6 +8543,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '{name}을(를) 낚아 올렸습니다',
   'hudChrome.gathering.biteLine': '무언가 미끼를 물었습니다!',
   'hudChrome.gathering.gotAwayLine': '놓쳐 버렸습니다.',
+  'hudChrome.gathering.earlyReelLine':
+    '너무 일찍 줄을 감았습니다. 아직 아무것도 미끼를 물지 않았습니다.',
   'hudChrome.gathering.nodeName.ore': '광맥',
   'hudChrome.gathering.nodeName.wood': '벌목 나무',
   'hudChrome.gathering.nodeName.herb': '약초 군락',

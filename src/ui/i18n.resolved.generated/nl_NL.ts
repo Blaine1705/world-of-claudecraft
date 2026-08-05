@@ -2552,6 +2552,7 @@ export const nl_NL: EnTranslations = {
       "catchLine": "Je trekt in: {name}",
       "biteLine": "Er hapt iets naar het aas!",
       "gotAwayLine": "Hij ontsnapte.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Ertsslagader",
         "wood": "Houtopstand",

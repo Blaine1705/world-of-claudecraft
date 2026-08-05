@@ -2552,6 +2552,7 @@ export const ru_RU: EnTranslations = {
       "catchLine": "Вы выуживаете: {name}",
       "biteLine": "Что-то клюнуло!",
       "gotAwayLine": "Добыча сорвалась.",
+      "earlyReelLine": "Вы подсекли слишком рано. Рыба ещё не клюнула.",
       "nodeName": {
         "ore": "Рудная жила",
         "wood": "Древостой",

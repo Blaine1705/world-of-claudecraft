@@ -8174,6 +8174,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '你钓上了：{name}',
   'hudChrome.gathering.biteLine': '有东西上钩了！',
   'hudChrome.gathering.gotAwayLine': '它跑掉了。',
+  'hudChrome.gathering.earlyReelLine': '收线太早了，还没有鱼上钩。',
   'hudChrome.gathering.nodeName.ore': '矿脉',
   'hudChrome.gathering.nodeName.wood': '林木',
   'hudChrome.gathering.nodeName.herb': '草药丛',

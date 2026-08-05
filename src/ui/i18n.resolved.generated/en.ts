@@ -2552,6 +2552,7 @@ export const en: EnTranslations = {
       "catchLine": "You reel in: {name}",
       "biteLine": "Something takes the bait!",
       "gotAwayLine": "It got away.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Ore Vein",
         "wood": "Timber Stand",

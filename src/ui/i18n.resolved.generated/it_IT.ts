@@ -2552,6 +2552,7 @@ export const it_IT: EnTranslations = {
       "catchLine": "Riporti in superficie: {name}",
       "biteLine": "Qualcosa abbocca alla lenza!",
       "gotAwayLine": "E' fuggito.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Filone di minerale",
         "wood": "Boschetto di alberi",

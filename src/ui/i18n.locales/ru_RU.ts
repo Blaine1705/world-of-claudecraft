@@ -8695,6 +8695,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': 'Вы выуживаете: {name}',
   'hudChrome.gathering.biteLine': 'Что-то клюнуло!',
   'hudChrome.gathering.gotAwayLine': 'Добыча сорвалась.',
+  'hudChrome.gathering.earlyReelLine': 'Вы подсекли слишком рано. Рыба ещё не клюнула.',
   'hudChrome.gathering.nodeName.ore': 'Рудная жила',
   'hudChrome.gathering.nodeName.wood': 'Древостой',
   'hudChrome.gathering.nodeName.herb': 'Заросли трав',

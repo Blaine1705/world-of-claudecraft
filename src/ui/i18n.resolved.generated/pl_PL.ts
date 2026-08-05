@@ -2552,6 +2552,7 @@ export const pl_PL: EnTranslations = {
       "catchLine": "Wyciągasz: {name}",
       "biteLine": "Coś wzięło przynętę!",
       "gotAwayLine": "Uciekło.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Żyła rudy",
         "wood": "Drzewostan",

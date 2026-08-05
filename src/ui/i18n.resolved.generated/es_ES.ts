@@ -2552,6 +2552,7 @@ export const es_ES: EnTranslations = {
       "catchLine": "Recoges: {name}",
       "biteLine": "¡Algo muerde el anzuelo!",
       "gotAwayLine": "Se escapó.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Veta de mineral",
         "wood": "Rodal de madera",

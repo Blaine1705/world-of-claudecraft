@@ -7307,6 +7307,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.gathering.catchLine'
   | 'hudChrome.gathering.downgradeFind'
   | 'hudChrome.gathering.downgradeMark'
+  | 'hudChrome.gathering.earlyReelLine'
   | 'hudChrome.gathering.emptyHookNote'
   | 'hudChrome.gathering.fineGradePreview'
   | 'hudChrome.gathering.fishing'

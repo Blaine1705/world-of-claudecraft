@@ -2552,6 +2552,7 @@ export const id_ID: EnTranslations = {
       "catchLine": "Kamu menarik: {name}",
       "biteLine": "Sesuatu menggigit umpannya!",
       "gotAwayLine": "Ikannya kabur.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Urat Bijih",
         "wood": "Rumpun Kayu",

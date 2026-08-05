@@ -2552,6 +2552,7 @@ export const sv_SE: EnTranslations = {
       "catchLine": "Du drar in: {name}",
       "biteLine": "Något nappar på betet!",
       "gotAwayLine": "Det kom undan.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Malmåder",
         "wood": "Timmerbestånd",
