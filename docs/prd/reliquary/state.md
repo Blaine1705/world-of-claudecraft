@@ -26,15 +26,13 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 4 complete (window shell + Overview). Ready for
-  Phase 4 QA (or Phase 5 if QA is green).
+- **Current phase:** Phase 4 QA green (window shell + Overview verified).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 4 QA (re-run validation matrix +
-  specialist review) or Phase 5 (page grids, silhouettes, live unlock UX,
-  Illumination). Do **not** skip the release pull.
+  `origin/release/v0.35.0`, then Phase 5 (page grids, silhouettes, live unlock
+  UX, Illumination). Do **not** skip the release pull.
 - **Blocker:** none.
-- **Release tip at Phase 4:** `5e83ba89d0` (already up to date with
-  origin/release/v0.35.0 at Phase 4 start).
+- **Release tip at Phase 4 QA:** `5e83ba89d0` (already up to date with
+  origin/release/v0.35.0 at Phase 4 QA start).
 
 ## Locked design decisions
 
@@ -114,6 +112,8 @@ session load:
 | `ReliquaryWindow` | `src/ui/reliquary_window.ts` | **landed** (cold; Overview + shelf stubs) |
 | `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | **landed** (English chrome keys) |
 | Keybind `reliquary` | `src/game/keybinds.ts` | **landed** (default Shift+KeyX) |
+| Options BIND map | `src/ui/options_window.ts` `BIND_ACTION_LABEL_KEYS.reliquary` | **landed** (Phase 4 QA) |
+| M16 non-Latin chrome | `src/ui/i18n.locales/{zh_CN,zh_TW,ja_JP,ko_KR,ru_RU}.ts` | **landed** (wordy reliquary keys) |
 
 ## Validation matrix (default commands)
 

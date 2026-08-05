@@ -17,6 +17,7 @@ const inputSrc = read('../src/game/input.ts');
 const keybindsSrc = read('../src/game/keybinds.ts');
 const mobileControlsSrc = read('../src/game/mobile_controls.ts');
 const chrome = read('../src/ui/i18n.catalog/hud_chrome.ts');
+const optionsWindow = read('../src/ui/options_window.ts');
 const components = read('../src/styles/components.css');
 const hudMobile = read('../src/styles/hud.mobile.css');
 const architecture = read('./architecture.test.ts');
@@ -44,11 +45,16 @@ describe('painter hygiene', () => {
   });
 
   it('elides slow-band repaints through the pure refresh signature', () => {
-    expect(painter).toContain('const input = this.buildInput()');
-    expect(painter).toContain('const sig = this.sigFromInput(input)');
-    expect(painter).toContain('if (sig === this.lastSig) return');
-    expect(painter).toContain('reliquaryRefreshSig');
-    expect(painter).toContain('clearsDigest');
+    // Strip whole-line comments so a comment-only mention cannot false-green.
+    const code = painter
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
+    expect(code).toContain('const input = this.buildInput()');
+    expect(code).toContain('const sig = this.sigFromInput(input)');
+    expect(code).toContain('if (sig === this.lastSig) return');
+    // clearsDigest must be an argument to reliquaryRefreshSig (not only computed).
+    expect(code).toMatch(/reliquaryRefreshSig\(\{[\s\S]*?clearsDigest[\s\S]*?\}\)/);
   });
 
   it('preserves scroll and restores focus across rebuilds', () => {
@@ -134,7 +140,17 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain("title: 'The Reliquary'");
     expect(chrome).toContain("navOverview: 'Overview'");
     expect(chrome).toContain("navConquerors: 'Conquerors'");
+    expect(chrome).toContain("curatorUnranked: 'Unranked Curator'");
+    expect(chrome).toContain("nearlyLabel: 'Nearly complete:'");
+    expect(chrome).toContain('overviewEmpty:');
+    expect(chrome).toContain('pageStubNote:');
+    expect(chrome).toContain("clearsLabel: '{count} clears'");
     expect(chrome).toContain("reliquary: 'Reliquary'");
+  });
+
+  it('maps the reliquary keybind action through t() in Options', () => {
+    // Without this entry, Options/gamepad fall back to raw English BIND_ACTIONS labels.
+    expect(optionsWindow).toContain("reliquary: 'hudChrome.reliquary.title'");
   });
 });
 

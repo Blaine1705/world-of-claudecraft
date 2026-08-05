@@ -122,6 +122,18 @@ describe('buildReliquaryView empty state', () => {
       { id: 'horizons', owned: 0, total: 1 },
     ]);
   });
+
+  it('tallies non-zero shelf owned counts from discovery', () => {
+    const model = buildReliquaryView(
+      input({ itemsDiscovered: ownedSet('crypt_helm', 'dl_chest') }),
+    );
+    expect(model.shelves).toEqual([
+      { id: 'overview', owned: 0, total: 0 },
+      { id: 'conquerors', owned: 2, total: 9 },
+      { id: 'professions', owned: 0, total: 1 },
+      { id: 'horizons', owned: 0, total: 1 },
+    ]);
+  });
 });
 
 describe('buildReliquaryView progress and rank', () => {
@@ -146,6 +158,30 @@ describe('buildReliquaryView progress and rank', () => {
     expect(model.progress.owned).toBe(0);
     // Recent still lists the id (presentation); ownership stays authoritative.
     expect(model.recent).toEqual([{ id: 'crypt_helm', kind: 'item' }]);
+  });
+
+  it('does not invent catalog progress from marks alone', () => {
+    // Marks may feed shelf progress later; catalog owned/total stays item-only.
+    const model = buildReliquaryView(
+      input({
+        itemsDiscovered: ownedSet(),
+        marks: ownedSet('mw_a'),
+      }),
+    );
+    expect(model.progress.owned).toBe(0);
+    expect(model.progress.total).toBe(9);
+    const prof = buildReliquaryView(
+      input({
+        nav: 'professions',
+        itemsDiscovered: ownedSet(),
+        marks: ownedSet('mw_a'),
+      }),
+    );
+    expect(prof.shelfPages.find((p) => p.pageId === 'prof_stub')).toMatchObject({
+      owned: 1,
+      total: 1,
+      complete: true,
+    });
   });
 });
 
@@ -220,8 +256,11 @@ describe('buildReliquaryView nearly-complete', () => {
     expect(model.nearly).toEqual([]);
   });
 
-  it('caps the nearly list at the literal five', () => {
+  it('caps the nearly list at the best five by ranking order', () => {
     expect(RELIQUARY_NEARLY_MAX).toBe(5);
+    // Eight incomplete pages, equal owned fraction (1/2), distinct remaining via
+    // page size so ranking is remaining-primary then pageId. Wrong-end slice
+    // would keep page_3..page_7 instead of page_0..page_4.
     const many: ReliquaryPageDef[] = [];
     const owned: string[] = [];
     for (let i = 0; i < RELIQUARY_NEARLY_MAX + 3; i++) {
@@ -240,6 +279,43 @@ describe('buildReliquaryView nearly-complete', () => {
     }
     const model = buildReliquaryView(input({ pages: many, itemsDiscovered: ownedSet(...owned) }));
     expect(model.nearly).toHaveLength(5);
+    expect(model.nearly.map((n) => n.pageId)).toEqual([
+      'page_0',
+      'page_1',
+      'page_2',
+      'page_3',
+      'page_4',
+    ]);
+  });
+
+  it('breaks nearly ties by stable pageId when remaining and fraction match', () => {
+    const pages: ReliquaryPageDef[] = [
+      {
+        id: 'zeta_page',
+        shelf: 'conquerors',
+        name: 'Zeta',
+        relics: [
+          { kind: 'item', itemId: 'z_a' },
+          { kind: 'item', itemId: 'z_b' },
+        ],
+      },
+      {
+        id: 'alpha_page',
+        shelf: 'conquerors',
+        name: 'Alpha',
+        relics: [
+          { kind: 'item', itemId: 'a_a' },
+          { kind: 'item', itemId: 'a_b' },
+        ],
+      },
+    ];
+    const model = buildReliquaryView(
+      input({
+        pages,
+        itemsDiscovered: ownedSet('z_a', 'a_a'),
+      }),
+    );
+    expect(model.nearly.map((n) => n.pageId)).toEqual(['alpha_page', 'zeta_page']);
   });
 });
 

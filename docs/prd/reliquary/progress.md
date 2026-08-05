@@ -15,7 +15,7 @@
 | 3 IWorld + wire thrift | **done** | IWorldReliquary facet, reliq heavy self, reliquaryUnlock, ClientWorld parity |
 | 3 QA | **done** | exit criteria verified; pin defects fixed; release @ 5e83ba89d0 |
 | 4 Window shell + Overview | **done** | pure view + cold window, Overview, shelf chrome, keybind Shift+X, minimap/More, i18n English |
-| 4 QA | pending | same worktree + pull |
+| 4 QA | **done** | exit criteria verified; M16 + Options keybind defects fixed; release @ 5e83ba89d0 |
 | 5 Page grids + live UX | pending | same worktree + pull |
 | 5 QA | pending | same worktree + pull |
 | 6 Curator ranks + cosmetics | pending | same worktree + pull |
@@ -116,6 +116,40 @@
   Reviews: frontend-seam-reviewer YELLOW (SHOULD-FIX: clearsDigest + CSS banner
   + view/window tests addressed; page-name content i18n deferred); test-coverage
   auditor YELLOW (BLOCKING nearly-rank + cap pin fixed).
+
+- Phase 4 QA: re-pulled `origin/release/v0.35.0` (already up to date @
+  `5e83ba89d0`). Initial matrix green; specialist review found defects fixed
+  test-first:
+  - `BIND_ACTION_LABEL_KEYS.reliquary` -> `hudChrome.reliquary.title` (Options
+    / gamepad keybind labels were falling back to raw English)
+  - M16 non-Latin fills for wordy `hudChrome.reliquary.*` +
+    `hudChrome.mobile.reliquary` (zh_CN, zh_TW, ja_JP, ko_KR, ru_RU)
+  - Stronger pure-core pins: nearly best-five order, pageId tie-break, marks
+    alone do not invent catalog progress, non-zero shelf totals; window
+    clearsDigest must be an arg to `reliquaryRefreshSig` (comment-stripped)
+  Green after fixes:
+  - `npx vitest run tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/hud_update_drive.test.ts tests/hud_perf_budget.test.ts tests/architecture.test.ts tests/i18n_completeness.test.ts` (**189 passed**, 4 skipped)
+  - `npm run i18n:gen`
+  - `npx tsc --noEmit`
+  - biome on changed TS files
+  Checklist (all held):
+  - Openable Reliquary: Overview + shelf chrome; page lists stub
+  - `reliquary_view` in UI_PURE_CORES; cold window signature latch
+  - `reliquaryRefreshSig` + `clearsDigest`; focus_restore; scroll preserve
+  - Keybind `reliquary` Shift+KeyX; bare KeyX remains emote wheel
+  - Minimap + More tray launchers; Options BIND map uses t()
+  - Thin Hud compose only
+  - English chrome + M16 non-Latin fills; Latin overlays pending (PR-tier OK)
+  - Overview totals / Curator placeholder / recent / nearly from discovery
+  - Fairness: no graphics-tier gate on owned/missing/clears
+  - No silhouette grids / Illumination celebration (Phase 5)
+  - No per-drop saveCharacter; no membership from reliquaryUnlock
+  - No em dash / emoji
+  - Performance budget Phase 4 cold-window row still checked in state.md
+  Reviews: frontend-seam-reviewer BLOCKING (M16) fixed; qa-checklist BLOCKING
+  (BIND map) fixed; test-coverage SHOULD-FIX pins addressed. architecture
+  not re-run (no sim path change). Manual open/Esc/mobile smoke not run
+  (static + unit pins only).
 
 ## Surprises / decisions during implementation
 
