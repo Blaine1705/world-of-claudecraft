@@ -73,6 +73,12 @@ export const CC_IMPACT_ABILITIES: ReadonlySet<string> = new Set([
   'sap',
 ]);
 
+/** Ground-zone abilities (groundAoE, effect_dispatch.ts) whose pulse now has a
+ *  dedicated recording (fx:'tick', combat_sfx.ts's GROUND_TICK_ABILITY_CUES):
+ *  Meteor's single delayed hit. Every other zone (Consecration, Blizzard's
+ *  damage pulse) has no recording and keeps the procedural 'pulse' voice. */
+export const PULSE_IMPACT_ABILITIES: ReadonlySet<string> = new Set(['meteor']);
+
 /** The six schools with a recorded launch whoosh (combat_sfx.ts SCHOOL_CUES
  *  .projectile: proj_fire, proj_frost, proj_arcane, proj_shadow, proj_holy,
  *  proj_nature). There is deliberately no 'physical' member: a physical
@@ -136,9 +142,13 @@ export function isAbilityMomentRecorded(
     // that intent instead of sneaking a synthetic sting back in.
     case 'crit':
       return true;
-    // No recording covers a cast-windup bed, a zone re-hit pulse, a creature
-    // apparition call, or set-piece motif foley: these are what the ability
-    // VFX work actually adds, so they keep their procedural voice.
+    // Meteor's one delayed zone hit now has a dedicated recording (see
+    // PULSE_IMPACT_ABILITIES); every other zone re-hit pulse has none.
+    case 'pulse':
+      return !!ctx.abilityId && PULSE_IMPACT_ABILITIES.has(ctx.abilityId);
+    // No recording covers a cast-windup bed, a creature apparition call, or
+    // set-piece motif foley: these are what the ability VFX work actually
+    // adds, so they keep their procedural voice.
     default:
       return false;
   }

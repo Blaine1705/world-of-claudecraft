@@ -157,7 +157,7 @@ describe('crit: combat_crit is a recording', () => {
 });
 
 describe('the moments no recording covers keep their procedural voice', () => {
-  it('leaves windup, pulse, spirit and motif uncovered', () => {
+  it('leaves windup, pulse, spirit and motif uncovered (no per-ability override)', () => {
     const uncovered: AbilityAudioMoment[] = ['windup', 'pulse', 'spirit', 'motif'];
     for (const moment of uncovered) {
       expect(isAbilityMomentRecorded(moment, { school: 'fire', archetype: 'bolt' })).toBe(false);
@@ -165,5 +165,11 @@ describe('the moments no recording covers keep their procedural voice', () => {
         false,
       );
     }
+  });
+
+  it('is recorded for pulse ONLY for Meteor (PULSE_IMPACT_ABILITIES), every other zone stays uncovered', () => {
+    expect(isAbilityMomentRecorded('pulse', { abilityId: 'meteor' })).toBe(true);
+    expect(isAbilityMomentRecorded('pulse', { abilityId: 'consecration' })).toBe(false);
+    expect(isAbilityMomentRecorded('pulse', {})).toBe(false);
   });
 });
