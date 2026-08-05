@@ -5933,7 +5933,9 @@ export type DeedStatKey =
   | 'hubCraftsPerformed'
   | 'attunementsCompleted'
   | 'masterworksCrafted'
-  | 'salvagesPerformed';
+  | 'salvagesPerformed'
+  | 'riftClears'
+  | 'riftSRankClears';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -5962,6 +5964,8 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'attunementsCompleted',
   'masterworksCrafted',
   'salvagesPerformed',
+  'riftClears',
+  'riftSRankClears',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new
