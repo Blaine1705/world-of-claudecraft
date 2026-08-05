@@ -3939,15 +3939,32 @@ export const TARGETS = [
           if (el) el.style.display = 'none';
           game.hud.toggleBags?.();
         });
-        await wait(700);
-        const hovered = await page.evaluate(() => {
-          const rows = [...document.querySelectorAll('#bags .bag-item')];
-          const row = rows.find((r) => r.classList.contains('q-rare'));
-          if (!row) return false;
-          row.dispatchEvent(new MouseEvent('mouseenter'));
-          return true;
-        });
-        if (!hovered) throw new Error('charm bag row not found to hover');
+        const bagsOpen = await pollForSize(page, '#bags');
+        if (!bagsOpen) throw new Error('bags window did not open');
+        // Poll for the granted charm's row: the grant and the bag paint can
+        // land a beat after the toggle on a cold contended run.
+        let hovered = false;
+        for (let attempt = 0; attempt < 10 && !hovered; attempt++) {
+          hovered = await page.evaluate(() => {
+            // The exact handle: bag rows key their focus by item id
+            // (bags_window.ts stackOrdinal mint), so the charm cannot be
+            // confused with any other rare the starter kit carries.
+            const row = document.querySelector('#bags [data-focus-key^="bag:gatherers_cache:"]');
+            if (!row) return false;
+            row.dispatchEvent(new MouseEvent('mouseenter'));
+            return true;
+          });
+          if (!hovered) await wait(500);
+        }
+        if (!hovered) {
+          const diag = await page.evaluate(() => ({
+            rows: document.querySelectorAll('#bags .bag-item').length,
+            classes: [...document.querySelectorAll('#bags .bag-item')]
+              .slice(0, 8)
+              .map((r) => r.className),
+          }));
+          throw new Error(`charm bag row not found to hover: ${JSON.stringify(diag)}`);
+        }
         await wait(400);
         return { clip: '#tooltip' };
       }
@@ -3957,6 +3974,40 @@ export const TARGETS = [
       await page.evaluate(() => {
         const game = window.__game;
         if (!game) return;
+        // Gathering (and its effect lines) renders only in FULL mode, and the
+        // sandbox character is unattuned (simplified), so stage an attuned
+        // identity plus a mining row (the professions target's stub precedent).
+        Object.defineProperty(game.world, 'craftingIdentity', {
+          value: {
+            version: 1,
+            synced: true,
+            craftSkills: {
+              weaponcrafting: 125,
+              armorcrafting: 87,
+              tailoring: 0,
+              leatherworking: 0,
+              cooking: 26,
+              alchemy: 0,
+              engineering: 0,
+              enchanting: 0,
+              jewelcrafting: 0,
+              inscription: 0,
+            },
+            activeArchetype: 'weaponcrafting',
+            pairedMajor: 'armorcrafting',
+            hobbyCraft: 'cooking',
+            attunedPairs: ['weaponcrafting+armorcrafting'],
+            switchCount: 1,
+            amendsProgress: 2,
+            amendsRequired: 8,
+            knownRecipes: [],
+          },
+          configurable: true,
+        });
+        Object.defineProperty(game.world, 'professionsState', {
+          value: { skills: [{ professionId: 'mining', skill: 88, maxSkill: 100 }] },
+          configurable: true,
+        });
         Object.defineProperty(game.world, 'toolEffectSlots', {
           value: [
             {
@@ -3975,14 +4026,37 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#professions-window');
       if (!open) throw new Error('professions window did not open');
-      const hovered = await page.evaluate(() => {
-        const row = document.querySelector('#professions-window [data-effect-tip]');
-        if (!row) return false;
-        row.scrollIntoView({ block: 'center' });
-        row.dispatchEvent(new MouseEvent('mouseenter'));
-        return true;
+      // Repaint to pick the stubs up in case the first paint raced them, then
+      // poll for the marked row.
+      await page.evaluate(() => {
+        window.__game?.hud?.toggleProfessions?.();
+        window.__game?.hud?.toggleProfessions?.();
       });
-      if (!hovered) throw new Error('live effect row with data-effect-tip not found');
+      let hovered = false;
+      for (let attempt = 0; attempt < 10 && !hovered; attempt++) {
+        hovered = await page.evaluate(() => {
+          const row = document.querySelector('#professions-window [data-effect-tip]');
+          if (!row) return false;
+          row.scrollIntoView({ block: 'center' });
+          row.dispatchEvent(new MouseEvent('mouseenter'));
+          return true;
+        });
+        if (!hovered) await wait(500);
+      }
+      if (!hovered) {
+        const diag = await page.evaluate(() => ({
+          effects: document.querySelectorAll('#professions-window .prof-effect').length,
+          gatherRows: document.querySelectorAll('#professions-window .prof-gather-row').length,
+          slots: (() => {
+            try {
+              return JSON.stringify(window.__game?.world?.toolEffectSlots);
+            } catch (e) {
+              return String(e);
+            }
+          })(),
+        }));
+        throw new Error(`live effect row with data-effect-tip not found: ${JSON.stringify(diag)}`);
+      }
       await wait(400);
       return { clip: '#tooltip' };
     },

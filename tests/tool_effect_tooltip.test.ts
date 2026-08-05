@@ -11,6 +11,7 @@ import { RARITY_DURABILITY_BONUS, slotToolEffectRefused } from '../src/sim/profe
 import type { ItemDef } from '../src/sim/types';
 import { itemNameColor } from '../src/ui/item_name_color';
 import {
+  hasToolEffectCard,
   isToolEffectItem,
   toolEffectStandaloneTooltip,
   toolEffectTooltipLines,
@@ -121,6 +122,24 @@ describe('toolEffectStandaloneTooltip: professions window card', () => {
 
   it('renders nothing for an unknown effect id', () => {
     expect(toolEffectStandaloneTooltip('not_a_real_effect')).toBe('');
+  });
+
+  it('hasToolEffectCard gates exactly the ids with a card (the painter mint gate)', () => {
+    for (const id of Object.keys(TOOL_EFFECTS)) expect(hasToolEffectCard(id), id).toBe(true);
+    expect(hasToolEffectCard('not_a_real_effect')).toBe(false);
+    expect(hasToolEffectCard('')).toBe(false);
+  });
+
+  it('every shipped charm item is rare, the tripwire for the title-color derivation', () => {
+    // Today the derived color (itemNameColor on the charm def) and the
+    // no-item fallback are byte-identical, both QUALITY_COLOR.rare, so the
+    // color assertion above cannot distinguish derive from hardcode. This
+    // pin is the tripwire: the first non-rare charm fails it, and THAT
+    // change must bring a fixture proving the derivation renders the new
+    // quality.
+    const charms = Object.values(ITEMS).filter((def) => def.use?.type === 'toolEffect');
+    expect(charms.length).toBeGreaterThan(0);
+    for (const def of charms) expect(def.quality, def.id).toBe('rare');
   });
 
   it('covers every live TOOL_EFFECTS catalog entry with its OWN bonus line', () => {

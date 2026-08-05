@@ -28,8 +28,16 @@ vi.mock('../src/ui/icons', () => ({
   // hardcoded profession/gathering resolver argument.
   professionIconUrl: (id: string) => `/test-professions/${id}.webp`,
   // The tool-effect hover card (tool_effect_tooltip.ts) colors its title by
-  // item quality; mirror the record so wiring the card does not crash here.
-  QUALITY_COLOR: { common: '#ffffff', uncommon: '#1eff00', rare: '#0070dd', epic: '#a335ee' },
+  // item quality; mirror the full record so wiring the card does not crash
+  // here and a partial-mock miss cannot bite a later quality.
+  QUALITY_COLOR: {
+    poor: '#9d9d9d',
+    common: '#ffffff',
+    uncommon: '#1eff00',
+    rare: '#0070dd',
+    epic: '#a335ee',
+    legendary: '#ff8000',
+  },
 }));
 
 interface WorldState {
@@ -682,8 +690,11 @@ describe('ProfessionsWindow: tool-effect hover cards', () => {
     expect(row?.getAttribute('data-effect-tip')).toBe('gatherers_cache');
     // The row is a div, so without a tab stop the card would be mouse-only;
     // once the charm is slotted and no spare is carried this row is the only
-    // surface still explaining the bonus.
+    // surface still explaining the bonus. The focus key is what the restore
+    // ladder re-lands a focused row on after a repaint (the focus rig pins
+    // the restore itself).
     expect(row?.getAttribute('tabindex')).toBe('0');
+    expect(row?.getAttribute('data-focus-key')).toBe('effect:mining');
     const card = attached.find((a) => a.el === row);
     expect(card).toBeDefined();
     const html = card?.html() ?? '';
@@ -738,11 +749,23 @@ describe('ProfessionsWindow: tool-effect hover cards', () => {
           recharges.push(professionId);
         },
       }) as never;
-    const peeked = makeWindow(state, { world: worldOver, consumePeek: () => true });
+    let hidden = 0;
+    const peeked = makeWindow(state, {
+      world: worldOver,
+      consumePeek: () => true,
+      hideTooltip: () => {
+        hidden++;
+      },
+    });
+    const hiddenAfterOpen = hidden; // render() itself hides once per repaint
     peeked.el.querySelector<HTMLElement>('[data-slot-effect]')?.click();
     peeked.el.querySelector<HTMLElement>('[data-recharge-profession]')?.click();
     expect(slots).toEqual([]);
     expect(recharges).toEqual([]);
+    // The swallowed release also DISMISSES the card (the bags cell contract):
+    // on touch there is no mouseleave, so without this the card would stay
+    // painted over the window.
+    expect(hidden).toBe(hiddenAfterOpen + 2);
     // The other arm: a plain tap / desktop click (no peek) still acts.
     const tapped = makeWindow(state, { world: worldOver, consumePeek: () => false });
     tapped.el.querySelector<HTMLElement>('[data-slot-effect]')?.click();

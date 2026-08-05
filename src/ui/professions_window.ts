@@ -39,7 +39,7 @@ import {
   type RingLayout,
 } from './professions_view';
 import { toolEffectNameKey } from './tool_effect_name';
-import { toolEffectStandaloneTooltip } from './tool_effect_tooltip';
+import { hasToolEffectCard, toolEffectStandaloneTooltip } from './tool_effect_tooltip';
 import { svgIcon } from './ui_icons';
 
 // Ring node distance from the container center, in percent of the box
@@ -600,12 +600,20 @@ export class ProfessionsWindow {
             : '';
         // data-effect-tip marks the live row for the shared attachTooltip
         // wiring below: the hover card explains the bonus and charge ladder
-        // the compact line cannot fit. tabindex puts the row in the tab order
-        // so the card is keyboard-reachable (attachTooltip's focusin path);
-        // once the charm is slotted and no spare is carried, this row is the
-        // only surface still explaining the bonus.
+        // the compact line cannot fit. Minted only when the id has a full
+        // card (hasToolEffectCard), so the marker, the cursor:help cue, the
+        // tab stop, and the attach can never disagree. tabindex puts the row
+        // in the tab order so the card is keyboard-reachable (attachTooltip's
+        // focusin path): once the charm is slotted and no spare is carried,
+        // this row is the only surface still explaining the bonus. The
+        // focus key is the restore ladder's "non-spending middle rung" (see
+        // render): without it a repaint under a focused row parks focus on
+        // Close and the next Enter closes the window.
+        const tipAttrs = hasToolEffectCard(effect.effectId)
+          ? ` data-effect-tip="${esc(effect.effectId)}" data-focus-key="effect:${esc(row.professionId)}" tabindex="0"`
+          : '';
         html +=
-          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}" data-effect-tip="${esc(effect.effectId)}" tabindex="0">` +
+          `<div class="prof-effect${effect.spent ? ' prof-effect-spent' : ''}"${tipAttrs}>` +
           `<span class="prof-effect-name">${esc(t(nameKey))}</span>` +
           `<span class="prof-effect-charges">${esc(charges)}</span>${modeChip}${recharge}</div>`;
       }
@@ -675,16 +683,20 @@ export class ProfessionsWindow {
     for (const button of el.querySelectorAll<HTMLElement>('[data-slot-effect]')) {
       const effectId = button.getAttribute('data-slot-effect');
       // Hover card: what the charm does and how slotting works, so a player
-      // never has to burn a charm to learn the bonus. A retired id builds an
-      // empty card, so skip the attach entirely rather than show an empty box.
-      // The lazy closure is the attachTooltip family idiom (deeds/bank cells).
-      if (effectId !== null && toolEffectStandaloneTooltip(effectId) !== '') {
+      // never has to burn a charm to learn the bonus. A retired id has no
+      // card, so skip the attach rather than show an empty box. The lazy
+      // closure is the attachTooltip family idiom (deeds/bank cells).
+      if (effectId !== null && hasToolEffectCard(effectId)) {
         this.deps.attachTooltip(button, () => toolEffectStandaloneTooltip(effectId));
       }
       button.addEventListener('click', () => {
         // A long-press that showed the hover card peeks; its release click
-        // must inspect, never spend the charm (the bags cell contract).
-        if (this.deps.consumePeek()) return;
+        // must inspect, never spend the charm (the bags cell contract:
+        // dismiss the card, fire nothing).
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
         if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-slot-profession');
         const slotEffectId = button.getAttribute('data-slot-effect');
@@ -702,18 +714,13 @@ export class ProfessionsWindow {
     }
     // Live effect rows: same hover card as the slot buttons, so an already-
     // slotted charm still explains its bonus without forcing the player to
-    // open the bags and re-read the item.
+    // open the bags and re-read the item. Every marked row has a card by
+    // construction: the painter mints data-effect-tip only when
+    // hasToolEffectCard says so (and skips retired-name rows entirely,
+    // pinned by the layout rig's retired-id case).
     for (const row of el.querySelectorAll<HTMLElement>('[data-effect-tip]')) {
       const effectId = row.getAttribute('data-effect-tip');
       if (effectId === null) continue;
-      if (toolEffectStandaloneTooltip(effectId) === '') {
-        // A retired id has no card: drop the marker (and the tab stop that
-        // exists only to reach the card) so the cursor:help cue and the
-        // attribute never advertise a tooltip that will not come.
-        row.removeAttribute('data-effect-tip');
-        row.removeAttribute('tabindex');
-        continue;
-      }
       this.deps.attachTooltip(row, () => toolEffectStandaloneTooltip(effectId));
     }
     // The R40 mode toggles: flip the painter-local choice and repaint (the
@@ -734,8 +741,12 @@ export class ProfessionsWindow {
       button.addEventListener('click', () => {
         // The recharge button sits inside the live effect row, whose hover
         // card arms the peek guard on a long press (the pointerdown bubbles
-        // to the row); the release click must not spend materials.
-        if (this.deps.consumePeek()) return;
+        // to the row); the release click must dismiss the card and not
+        // spend materials.
+        if (this.deps.consumePeek()) {
+          this.deps.hideTooltip();
+          return;
+        }
         if (button.dataset.sent !== undefined) return;
         const professionId = button.getAttribute('data-recharge-profession');
         if (professionId === null) return;

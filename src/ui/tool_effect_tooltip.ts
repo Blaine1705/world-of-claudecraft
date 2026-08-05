@@ -36,10 +36,11 @@ function line(cls: 'tt-sub' | 'tt-desc' | 'tt-green', text: string): string {
 
 type ToolEffectUse = Extract<ItemUse, { type: 'toolEffect' }>;
 
-/** True when the def is a tool-effect charm (use.type 'toolEffect'). */
-export function isToolEffectItem(
-  item: Pick<ItemDef, 'use'>,
-): item is Pick<ItemDef, 'use'> & { use: ToolEffectUse } {
+/** True when the def is a tool-effect charm (use.type 'toolEffect'). Generic so
+ *  the guarded branch keeps the caller's full item type, not just the pick. */
+export function isToolEffectItem<T extends Pick<ItemDef, 'use'>>(
+  item: T,
+): item is T & { use: ToolEffectUse } {
   return item.use?.type === 'toolEffect';
 }
 
@@ -49,13 +50,32 @@ export function toolEffectBonusKey(effectId: string): TranslationKey | undefined
   return Object.hasOwn(BONUS_KEYS, effectId) ? BONUS_KEYS[effectId as ToolEffectId] : undefined;
 }
 
-/** The charm ItemDef whose use slots `effectId`, or undefined for a
- *  catalog-only effect that mints no item (Springback Charm today). */
+/** True when `effectId` has a full card to show (a display name, bonus copy,
+ *  and a live catalog entry). The Professions painter gates its data-effect-tip
+ *  mint and hover attaches on this, so the marker, the cursor cue, the tab
+ *  stop, and the tooltip can never disagree. */
+export function hasToolEffectCard(effectId: string): boolean {
+  return (
+    toolEffectNameKey(effectId) !== undefined &&
+    toolEffectBonusKey(effectId) !== undefined &&
+    Object.hasOwn(TOOL_EFFECTS, effectId)
+  );
+}
+
+/** Effect id -> charm ItemDef, built once from static content on first use.
+ *  The first catalog entry wins a duplicate effect id (today ids map 1:1).
+ *  Undefined for a catalog-only effect that mints no item (Springback Charm). */
+let charmItems: Map<string, ItemDef> | undefined;
 function charmItemFor(effectId: string): ItemDef | undefined {
-  for (const def of Object.values(ITEMS)) {
-    if (def.use?.type === 'toolEffect' && def.use.effectId === effectId) return def;
+  if (charmItems === undefined) {
+    charmItems = new Map();
+    for (const def of Object.values(ITEMS)) {
+      if (def.use?.type === 'toolEffect' && !charmItems.has(def.use.effectId)) {
+        charmItems.set(def.use.effectId, def);
+      }
+    }
   }
-  return undefined;
+  return charmItems.get(effectId);
 }
 
 /** The card body both surfaces agree on: kind, bonus, how to slot, the charge
@@ -102,7 +122,7 @@ export function toolEffectStandaloneTooltip(effectId: string): string {
   // keeps the charm family's rare tint.
   const item = charmItemFor(effectId);
   const color = item ? itemNameColor(item) : QUALITY_COLOR.rare;
-  return `<div class="tt-title" style="color:${color}">${esc(t(nameKey))}</div>` + body;
+  return `<div class="tt-title" style="color:${color}">${esc(t(nameKey))}</div>${body}`;
 }
 
 /** The tooltip lines for one tool-effect charm item, or '' for any other item.
