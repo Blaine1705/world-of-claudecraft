@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
@@ -105,6 +105,8 @@ describe('isCodePath', () => {
       '.npmrc',
       '.browserslistrc',
       '.dockerignore',
+      'python/wow_env.py',
+      'python/example_random_agent.py',
     ]) {
       expect(isCodePath(widened)).toBe(true);
     }
@@ -281,8 +283,10 @@ describe('detectCode (fail closed end to end)', () => {
     }) as unknown as typeof fetch;
     const rejected = await detectCode({ ...BASE, fetchImpl: rejecting });
     expect(rejected.code).toBe(true);
+    // The detail is JSON-escaped like the filenames: V8 parse errors embed
+    // raw response snippets, newlines included, and this reaches the CI log.
     expect(rejected.reason).toBe(
-      'changed-file listing failed (ECONNRESET): full PR tier (code=true)',
+      'changed-file listing failed ("ECONNRESET"): full PR tier (code=true)',
     );
     const denied = await detectCode({ ...BASE, fetchImpl: failingFetch(401) });
     expect(denied.code).toBe(true);
@@ -350,7 +354,7 @@ describe('detectCode (fail closed end to end)', () => {
 // as a subprocess, against a local HTTP stub standing in for the API.
 describe('detect_code_changes.mjs entry (subprocess)', () => {
   const repoRoot = fileURLToPath(new URL('..', import.meta.url));
-  const scratch = mkdtempSync(join(tmpdir(), 'wocc-detect-entry-'));
+  let scratch = '';
   let apiUrl = '';
   const server = createServer((_req, res) => {
     res.setHeader('content-type', 'application/json');
@@ -358,6 +362,9 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
   });
 
   beforeAll(async () => {
+    // In beforeAll, not at collection time: a filtered run that skips this
+    // describe must not mint a scratch dir, and afterAll removes it.
+    scratch = mkdtempSync(join(tmpdir(), 'wocc-detect-entry-'));
     await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
     apiUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   });
@@ -365,6 +372,7 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
     await new Promise<void>((resolve, reject) =>
       server.close((err) => (err ? reject(err) : resolve())),
     );
+    rmSync(scratch, { recursive: true, force: true });
   });
 
   async function runEntry(name: string, env: Record<string, string>) {
@@ -372,7 +380,15 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
     writeFileSync(outFile, '');
     const child = spawn(process.execPath, ['scripts/detect_code_changes.mjs'], {
       cwd: repoRoot,
-      env: { PATH: process.env.PATH ?? '', GITHUB_OUTPUT: outFile, ...env },
+      // Minimal on purpose: keeps the runner's real GITHUB_* vars and
+      // vitest's NODE_OPTIONS out of the child. Windows children still need
+      // SystemRoot for network/crypto init.
+      env: {
+        PATH: process.env.PATH ?? '',
+        ...(process.env.SystemRoot ? { SystemRoot: process.env.SystemRoot } : {}),
+        GITHUB_OUTPUT: outFile,
+        ...env,
+      },
     });
     let log = '';
     child.stdout.on('data', (chunk) => {
@@ -381,7 +397,23 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
     child.stderr.on('data', (chunk) => {
       log += String(chunk);
     });
-    const exitCode = await new Promise<number | null>((resolve) => child.on('close', resolve));
+    const exitCode = await new Promise<number | null>((resolve, reject) => {
+      // A hung or unspawnable entry must fail THIS test with its log, not
+      // stall the vitest worker or orphan the child.
+      const killer = setTimeout(() => {
+        child.kill('SIGKILL');
+        reject(new Error(`entry did not exit within 15s; log so far:\n${log}`));
+      }, 15_000);
+      killer.unref();
+      child.on('error', (err) => {
+        clearTimeout(killer);
+        reject(err);
+      });
+      child.on('close', (code) => {
+        clearTimeout(killer);
+        resolve(code);
+      });
+    });
     return { exitCode, log, output: readFileSync(outFile, 'utf8') };
   }
 

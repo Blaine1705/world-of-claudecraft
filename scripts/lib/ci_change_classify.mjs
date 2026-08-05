@@ -37,8 +37,10 @@ const CODE_PATH_PREFIXES = Object.freeze([
   'deploy/',
   'mediawiki/',
   'Dockerfile.',
-  // Widened beyond the old inline set: bundled game data.
+  // Widened beyond the old inline set: bundled game data, and the shipped
+  // Python RL bindings (scanner-relevant sources nothing else checks).
   'data/',
+  'python/',
 ]);
 
 const CODE_PATH_EXACT = Object.freeze([
@@ -254,7 +256,9 @@ export async function detectCode({
     }
     return result;
   } catch (err) {
-    const detail = err instanceof Error ? err.message : String(err);
+    // JSON-escaped like the filenames: V8 parse errors embed raw response
+    // snippets (newlines included), and this string reaches the CI log.
+    const detail = JSON.stringify(err instanceof Error ? err.message : String(err));
     return {
       code: true,
       reason: `changed-file listing failed (${detail}): full PR tier (code=true)`,

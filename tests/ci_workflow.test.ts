@@ -128,6 +128,7 @@ const CODE_PATH_SAMPLES = [
   ['.browserslistrc', '.browserslistrc'],
   ['.dockerignore', '.dockerignore'],
   ['data/*', 'data/battleground/thornhollow.map.json'],
+  ['python/*', 'python/wow_env.py'],
 ] as const;
 
 // Paths that must stay classifiable as docs-only, or every documentation PR
@@ -145,8 +146,11 @@ function jobSource(name: string): string {
   // uppercase initial: a future job id like `pr-gate2` or `Release` would
   // otherwise not terminate the previous slice, letting one job's text bleed
   // into another and quietly satisfying a by-name pin from the wrong job.
+  // It also stops at a top-level (two-space) comment line: those document the
+  // NEXT job, and letting them bleed into the previous slice makes negative
+  // pins (not.toContain) fail on a neighbour's comment text.
   const match = workflow.match(
-    new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [A-Za-z][A-Za-z0-9_-]*:|$)`),
+    new RegExp(`\\n  ${name}:[\\s\\S]*?(?=\\n  [A-Za-z][A-Za-z0-9_-]*:|\\n  #|$)`),
   );
   if (!match) throw new Error(`missing CI job: ${name}`);
   return match[0];
