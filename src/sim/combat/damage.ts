@@ -31,6 +31,7 @@ import { DAMAGE_IDLE_DESPAWN_MOB_IDS, DAMAGE_IDLE_DESPAWN_SECONDS } from '../ent
 import { weaponHand } from '../equipment_rules';
 import { lockNormalDungeonResetOnBossKill, spawnBossExitPortal } from '../instances/dungeons';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
+import { noteMatchPetDeath } from '../pet/pet_match_return';
 import { pvpDamageMultiplier } from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
@@ -1299,6 +1300,11 @@ export function handleDeath(
       e.hostile = false;
       e.inCombat = false;
       ctx.emit({ type: 'log', text: `${e.name} dies.`, color: '#f66', pid: e.ownerId });
+      // An owner inside an arena-shaped match is owed this pet back on the way out
+      // (pet/pet_match_return.ts). Stamped HERE because a demon's corpse unravels
+      // within seconds: by return time the death would be unknowable. Pure state,
+      // no rng.
+      noteMatchPetDeath(ctx, e);
       // a slain summoned demon lingers only briefly, then unravels (updateMob)
       if (MOBS[e.templateId]?.family === 'demon') e.corpseTimer = 3;
       return; // owned pets drop no loot/credit; demons unravel, hunters revive or abandon

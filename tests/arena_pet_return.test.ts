@@ -10,7 +10,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, DUNGEON_X_THRESHOLD } from '../src/sim/data';
-import { restorePet } from '../src/sim/pet/pet_commands';
+import { restorePet, summonPet } from '../src/sim/pet/pet_commands';
 import { snapshotMatchPet } from '../src/sim/pet/pet_match_return';
 import type { Sim as SimType } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
@@ -30,6 +30,7 @@ const ARENA_TEST_WORLD: WorldContent = {
 };
 
 const PET_TEMPLATE = 'wild_boar';
+const DEMON_TEMPLATE = 'emberkin';
 
 function makeWorld(): AnySim {
   return new Sim({
@@ -64,21 +65,28 @@ function givePet(sim: AnySim, pid: number, dead = false): Entity {
   return sim.petOf(pid, true)!;
 }
 
-// Queue a hunter (with whatever pet state the caller set up) against one opponent
-// and tick until the bout is live.
-function liveBout(petDead = false): {
+// Give a warlock a live demon through the ordinary summon path.
+function giveDemon(sim: AnySim, pid: number): Entity {
+  summonPet(sim.ctx, sim.entities.get(pid)!, DEMON_TEMPLATE);
+  return sim.petOf(pid)!;
+}
+
+// Queue a pet class (with whatever pet state the caller set up) against one
+// opponent and tick until the bout is live.
+function liveBout(opts: { cls?: 'hunter' | 'warlock'; petDead?: boolean } = {}): {
   sim: AnySim;
   hunter: number;
   foe: number;
   pet: Entity;
   match: any;
 } {
+  const cls = opts.cls ?? 'hunter';
   const sim = makeWorld();
-  const hunter = sim.addPlayer('hunter', 'Rexx');
+  const hunter = sim.addPlayer(cls, cls === 'hunter' ? 'Rexx' : 'Gulda');
   const foe = sim.addPlayer('mage', 'Bet');
   teleport(sim, hunter, 0, -40);
   teleport(sim, foe, 6, -40);
-  const pet = givePet(sim, hunter, petDead);
+  const pet = cls === 'warlock' ? giveDemon(sim, hunter) : givePet(sim, hunter, opts.petDead);
   arena.arenaQueueJoin(sim.ctx, hunter);
   arena.arenaQueueJoin(sim.ctx, foe);
   for (let i = 0; i < 20 * 8; i++) {
@@ -97,7 +105,11 @@ describe('arena pet return: the snapshot', () => {
 
     const pet = givePet(sim, pid);
     pet.hp = 27;
-    expect(snapshotMatchPet(sim.ctx, pid)).toEqual({ petId: pet.id, hp: 27 });
+    expect(snapshotMatchPet(sim.ctx, pid)).toMatchObject({
+      petId: pet.id,
+      hp: 27,
+      state: { templateId: PET_TEMPLATE, dead: false },
+    });
 
     sim.ctx.handleDeath(pet, null);
     // A fighter who queues with a corpse is owed nothing, so the arena can never
@@ -107,7 +119,7 @@ describe('arena pet return: the snapshot', () => {
 
   it('seats the snapshot on the match at formation', () => {
     const { match, hunter, foe, pet } = liveBout();
-    expect(match.preMatchPets.get(hunter)).toEqual({ petId: pet.id, hp: pet.hp });
+    expect(match.preMatchPets.get(hunter)).toMatchObject({ petId: pet.id, hp: pet.hp });
     expect(match.preMatchPets.has(foe)).toBe(false); // the mage has no pet
   });
 });
@@ -168,9 +180,74 @@ describe('arena pet return: a beast killed on the sands', () => {
   });
 });
 
+// A demon does not leave a corpse to revive: handleDeath gives it corpseTimer 3 and
+// updateMob then unravels the entity, so the warlock arm has to rebuild it.
+describe('arena pet return: a demon that unravels', () => {
+  function unravel(sim: AnySim, petId: number): void {
+    for (let i = 0; i < 20 * 5; i++) {
+      sim.tick();
+      if (!sim.entities.get(petId)) return;
+    }
+    throw new Error('the demon corpse never unravelled');
+  }
+
+  it('rebuilds the warlock a demon after its corpse has unravelled', () => {
+    const { sim, hunter: lock, pet, match } = liveBout({ cls: 'warlock' });
+    const hpIn = pet.hp;
+    sim.ctx.handleDeath(pet, null);
+    unravel(sim, pet.id);
+    expect(sim.petOf(lock, true)).toBeNull(); // nothing left to revive in place
+
+    arena.endArenaMatch(sim.ctx, match, 'B', 'forfeit');
+
+    const after = sim.petOf(lock);
+    expect(after).not.toBeNull();
+    expect(after!.templateId).toBe(DEMON_TEMPLATE);
+    expect(after!.name).toBe(pet.name);
+    expect(after!.dead).toBe(false);
+    expect(after!.hp).toBe(hpIn);
+    expect(after!.ownerId).toBe(lock);
+    // Exactly one demon: the rebuild must never leave a second entity behind.
+    const owned = [...sim.entities.values()].filter((e: Entity) => e.ownerId === lock);
+    expect(owned).toHaveLength(1);
+
+    const owner = sim.entities.get(lock)!;
+    expect(after!.pos.x).toBeLessThan(DUNGEON_X_THRESHOLD);
+    expect(dist2d(after!.pos, owner.pos)).toBeLessThan(6);
+  });
+
+  it('leaves a demon the warlock re-summoned mid-bout alone', () => {
+    const { sim, hunter: lock, pet, match } = liveBout({ cls: 'warlock' });
+    sim.ctx.handleDeath(pet, null);
+    unravel(sim, pet.id);
+    const resummoned = giveDemon(sim, lock); // the warlock pays for a fresh one
+    resummoned.hp = 5;
+
+    arena.endArenaMatch(sim.ctx, match, 'B', 'forfeit');
+
+    const after = sim.petOf(lock)!;
+    expect(after.id).toBe(resummoned.id); // the pet they chose to keep
+    expect(after.hp).toBe(5); // untouched: it is not the pet the bout killed
+    const owned = [...sim.entities.values()].filter((e: Entity) => e.ownerId === lock);
+    expect(owned).toHaveLength(1);
+  });
+
+  it('never rebuilds a demon that died outside a match', () => {
+    const sim = makeWorld();
+    const lock = sim.addPlayer('warlock', 'Gulda');
+    teleport(sim, lock, 0, -40);
+    const pet = giveDemon(sim, lock);
+    sim.ctx.handleDeath(pet, null);
+    for (let i = 0; i < 20 * 5; i++) sim.tick();
+    // No match, so no snapshot and no rebuild: an open-world demon death is still
+    // a re-summon, exactly as before this fix.
+    expect(sim.petOf(lock, true)).toBeNull();
+  });
+});
+
 describe('arena pet return: what it must NOT do', () => {
   it('leaves a pet that walked in dead exactly as dead (no free revive)', () => {
-    const { sim, hunter, pet, match } = liveBout(true);
+    const { sim, hunter, pet, match } = liveBout({ petDead: true });
     expect(pet.dead).toBe(true);
 
     arena.endArenaMatch(sim.ctx, match, 'B', 'forfeit');
