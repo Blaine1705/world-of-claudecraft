@@ -23,6 +23,7 @@ import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { bagCornerMark, bagRimClasses } from './bag_corner_mark_view';
 import {
   BAG_CATEGORIES,
   BAG_SORTS,
@@ -119,8 +120,11 @@ const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconN
 // is accurate for a signer payload and is the status quo for the rest.
 // Quest stacks use itemAriaQuest instead (purpose class outranks copy flags for
 // the spoken name; the rim/wash always marks them as quest for sighted players).
-// Fine-grade materials use itemAriaFine (grade class outranks copy flags; rim
-// and seal keep them from reading as plain white reagents).
+// Fine-grade stacks deliberately have NO dedicated aria key: every fine id's
+// item NAME already carries the grade word in every locale (Fine Copper Ore),
+// so a grade arm would announce it twice while costing an instanced fine copy
+// its per-copy flag (bound is the flag a player checks before trading). The
+// rim/wash/seal are salience for sighted scanning, not new information.
 const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> = {
   masterwork: 'hudChrome.bags.itemAriaMasterwork',
   enchanted: 'hudChrome.bags.itemAriaEnchanted',
@@ -766,11 +770,12 @@ export class BagsWindow {
       // brighter seal. Purpose class, not a quality tier.
       // Fine-grade mark (bag_fine_mark_view.ts): fine_* materials get .bag-fine
       // rim/wash + seal so they never read as plain white reagents. Grade class,
-      // not a quality tier; distinct lineage from quest gold.
+      // not a quality tier; distinct lineage from quest gold. Purpose outranks
+      // grade: bagRimClasses never emits both rim classes at once.
       const questMark = bagQuestMarkKind(item, this.questMarkProgress(item));
       const questReady = questMark === 'questReady';
       const fineMark = bagFineMark(item.id);
-      row.className = `bag-item q-${bagQualityKey(item)}${questMark ? ' bag-quest' : ''}${questReady ? ' bag-quest-ready' : ''}${fineMark ? ' bag-fine' : ''}`;
+      row.className = `bag-item q-${bagQualityKey(item)}${bagRimClasses(questMark, fineMark)}`;
       // The stack's live inventory INDEX, resolved by REFERENCE (duplicate stacks and
       // instanced copies share an itemId): that is what the move command sends as `from`.
       const index = bagStackIndex(world.inventory, s);
@@ -788,26 +793,23 @@ export class BagsWindow {
       this.bindBagCellDrop(row, cell);
       const qColor = QUALITY_COLOR[bagQualityKey(item)] ?? QUALITY_DEFAULT_COLOR;
       const itemName = itemDisplayName(item);
-      // Corner-glyph priority (composed from bag_instance_glyph_view +
-      // bag_quest_mark_view + bag_fine_mark_view): masterwork > quest seal >
-      // fine seal > enchanted / signed / bound > generic wedge. Rim/wash for
-      // quest and fine is independent of which seal wins the corner.
+      // Corner-glyph priority (bag_corner_mark_view.ts, composed from
+      // bag_instance_glyph_view + bag_quest_mark_view + bag_fine_mark_view):
+      // masterwork > quest seal > fine seal > enchanted / signed / bound >
+      // generic wedge. The fine rim/wash is independent of which seal wins the
+      // corner (a masterwork fine stack keeps its rim).
       const glyphKind = bagInstanceGlyphKind(s.instance);
-      const isMasterwork = glyphKind === 'masterwork';
-      const showQuestSeal = questMark !== null && !isMasterwork;
-      const showFineSeal = fineMark && !isMasterwork && !showQuestSeal;
+      const cornerMark = bagCornerMark(glyphKind, questMark, fineMark);
       row.style.setProperty('--bag-slot-quality', qColor);
       // Accessible name: quest stacks always announce quest item (the seal is
-      // aria-hidden). Fine stacks announce fine material. Non-quest non-fine
-      // instanced stacks keep their per-copy flag. Plain stacks keep the plain
-      // label.
+      // aria-hidden). Instanced stacks keep their per-copy flag. Plain stacks,
+      // fine included, keep the plain label: a fine id's NAME already carries
+      // the grade word (see BAG_GLYPH_ARIA_KEYS above).
       const itemAriaKey = questMark
         ? 'hudChrome.bags.itemAriaQuest'
-        : fineMark
-          ? 'hudChrome.bags.itemAriaFine'
-          : glyphKind
-            ? BAG_GLYPH_ARIA_KEYS[glyphKind]
-            : 'itemUi.bags.itemAria';
+        : glyphKind
+          ? BAG_GLYPH_ARIA_KEYS[glyphKind]
+          : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
@@ -815,29 +817,30 @@ export class BagsWindow {
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
-      // Exactly one corner treatment ever renders: masterwork seal, quest seal,
-      // fine seal, or an instance glyph/tab. Composes with the bottom-right
-      // count badge, always visible without hover on desktop and touch,
-      // identical on every graphics preset (no --fx gate). Ready seals share
-      // the seal markup and brighten via .bi-quest-seal-ready (static; optional
-      // pulse is CSS-only).
-      const masterworkSeal = isMasterwork
-        ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
-        : '';
-      const questSeal = showQuestSeal
-        ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
-        : '';
-      const fineSeal = showFineSeal
-        ? `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`
-        : '';
-      const instanceMark =
-        !isMasterwork && !showQuestSeal && !showFineSeal
-          ? glyphKind === 'generic'
-            ? '<span class="bi-instance" aria-hidden="true"></span>'
-            : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
-              ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
-              : ''
+      // Exactly one corner treatment ever renders (cornerMark is a single
+      // discriminant): masterwork seal, quest seal, fine seal, or an instance
+      // glyph/tab. Composes with the bottom-right count badge, always visible
+      // without hover on desktop and touch, identical on every graphics preset
+      // (no --fx gate). Ready seals share the seal markup and brighten via
+      // .bi-quest-seal-ready (static; optional pulse is CSS-only).
+      const masterworkSeal =
+        cornerMark === 'masterwork'
+          ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
           : '';
+      const questSeal =
+        cornerMark === 'quest'
+          ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
+          : '';
+      const fineSeal =
+        cornerMark === 'fine'
+          ? `<span class="bi-fine-seal" aria-hidden="true">${svgIcon('crafting')}</span>`
+          : '';
+      const instanceMark =
+        cornerMark === 'generic'
+          ? '<span class="bi-instance" aria-hidden="true"></span>'
+          : cornerMark === 'enchanted' || cornerMark === 'signed' || cornerMark === 'bound'
+            ? `<span class="bi-glyph bi-glyph-${cornerMark}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[cornerMark])}</span>`
+            : '';
       row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}${fineSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
@@ -1108,6 +1111,10 @@ export class BagsWindow {
     );
     if (cell !== null) row.dataset.bagIndex = String(cell);
     this.bindBagCellDrop(row, cell);
+    // Deliberately no quest or fine mark here: both need the item DEF (quest
+    // kind) or a MATERIAL_GRADES row the client shipped WITH its ITEMS row, so
+    // an unknown-def stack can never honestly claim either. The per-copy
+    // glyphs below are def-free (instance payload only) and do apply.
     const instanceMark =
       glyphKind === 'generic'
         ? '<span class="bi-instance" aria-hidden="true"></span>'

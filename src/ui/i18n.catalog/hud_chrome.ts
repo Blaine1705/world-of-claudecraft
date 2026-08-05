@@ -1885,11 +1885,6 @@ export const hudChromeStrings = {
     // that the rim/wash/seal show sighted players. Purpose class, not a quality
     // tier; whole sentence in one key so punctuation stays localizable.
     itemAriaQuest: '{item}, quantity {count}, quest item',
-    // Accessible-name arm of the fine-grade bag mark (bag_fine_mark_view.ts):
-    // the corner seal is aria-hidden, so the CELL's name carries the fine-material
-    // fact that the refined rim/wash/seal show sighted players. Grade class, not
-    // a quality tier; whole sentence in one key so punctuation stays localizable.
-    itemAriaFine: '{item}, quantity {count}, fine material',
     filterGroupAria: 'Filter bags by category',
     filterAll: 'All',
     filterWeapon: 'Weapons',

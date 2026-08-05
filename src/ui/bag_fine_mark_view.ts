@@ -9,13 +9,15 @@
 //
 // Grade class, not rarity: thin rim + soft wash + small seal from a cool
 // refined lineage distinct from quest gold and from green/blue/purple quality
-// borders. Always-on, no --fx gate (fairness).
+// borders. Always-on, no --fx gate (fairness). No dedicated aria key: a fine
+// id's item NAME already carries the grade word in every locale, so the cell's
+// accessible name announces the grade without a new sentence and an instanced
+// fine copy keeps its per-copy flag.
 //
-// Glyph priority (composed by the painter with bag_instance_glyph_view and
-// bag_quest_mark_view):
-//   masterwork > quest seal > fine seal > enchanted / signed / bound > generic.
-// Rim and wash always apply for any fine id even when a higher-priority seal
-// wins the corner.
+// Composition with the sibling cores lives in bag_corner_mark_view.ts:
+//   corner: masterwork > quest seal > fine seal > per-copy glyphs > generic;
+//   rim: purpose outranks grade (a quest stack never wears .bag-fine); the
+//   fine rim/wash still applies when the masterwork seal wins the corner.
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 

@@ -1,13 +1,18 @@
 // Pure-core pins for the bag grid's fine-grade material mark. The painter
-// (bags_window) consumes bagFineMark for the .bag-fine class, corner seal, and
-// aria key; these tests own the on/off decision only (DOM/CSS contracts live
-// next to the instance-marker suite).
+// (bags_window) consumes bagFineMark through bag_corner_mark_view for the
+// .bag-fine class and corner seal; these tests own the on/off decision only
+// (DOM/CSS contracts live next to the instance-marker suite).
 import { describe, expect, it } from 'vitest';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { bagFineMark } from '../src/ui/bag_fine_mark_view';
 
 describe('bag_fine_mark_view: fine grade mark', () => {
   it('marks every fine grade id from MATERIAL_GRADES', () => {
+    // Literal anchor plus a table floor first: the loops below derive their
+    // expectations from the same table the core reads, so without these an
+    // emptied or renamed table would pass vacuously.
+    expect(bagFineMark('fine_copper_ore')).toBe(true);
+    expect(Object.keys(MATERIAL_GRADES).length).toBeGreaterThanOrEqual(9);
     for (const row of Object.values(MATERIAL_GRADES)) {
       expect(bagFineMark(row.fineItemId), row.fineItemId).toBe(true);
     }

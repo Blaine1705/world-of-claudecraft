@@ -1755,7 +1755,6 @@ export const sv_SE: EnTranslations = {
       "itemAriaBound": "{item}, antal {count}, bunden kopia",
       "itemAriaMasterwork": "{item}, antal {count}, mästerverk",
       "itemAriaQuest": "{item}, antal {count}, uppdragsföremål",
-      "itemAriaFine": "{item}, quantity {count}, fine material",
       "filterGroupAria": "Filtrera väskor efter kategori",
       "filterAll": "Alla",
       "filterWeapon": "Vapen",

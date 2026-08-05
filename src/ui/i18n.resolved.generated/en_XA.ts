@@ -1755,7 +1755,6 @@ export const en_XA: EnTranslations = {
       "itemAriaBound": "[{item}, ɋúáñţíţý {count}, ƀóúñð çóþý]",
       "itemAriaMasterwork": "[{item}, ɋúáñţíţý {count}, ɱášţéŕŵóŕķ]",
       "itemAriaQuest": "[{item}, ɋúáñţíţý {count}, ɋúéšţ íţéɱ]",
-      "itemAriaFine": "[{item}, ɋúáñţíţý {count}, ƒíñé ɱáţéŕíáļ]",
       "filterGroupAria": "[Ƒíļţéŕ ƀáĝš ƀý çáţéĝóŕý]",
       "filterAll": "[Áļļ]",
       "filterWeapon": "[Ŵéáþóñš]",

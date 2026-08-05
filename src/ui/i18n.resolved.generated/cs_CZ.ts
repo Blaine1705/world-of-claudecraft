@@ -1755,7 +1755,6 @@ export const cs_CZ: EnTranslations = {
       "itemAriaBound": "{item}, množství {count}, vázaná kopie",
       "itemAriaMasterwork": "{item}, množství {count}, mistrovské dílo",
       "itemAriaQuest": "{item}, množství {count}, úkolový předmět",
-      "itemAriaFine": "{item}, quantity {count}, fine material",
       "filterGroupAria": "Filtrovat batohy podle kategorie",
       "filterAll": "Vše",
       "filterWeapon": "Zbraně",

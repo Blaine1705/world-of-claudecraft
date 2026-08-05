@@ -1755,7 +1755,6 @@ export const zh_CN: EnTranslations = {
       "itemAriaBound": "{item}，数量 {count}，已绑定的副本",
       "itemAriaMasterwork": "{item}，数量 {count}，杰作",
       "itemAriaQuest": "{item}，数量 {count}，任务物品",
-      "itemAriaFine": "{item}, quantity {count}, fine material",
       "filterGroupAria": "按类别筛选背包",
       "filterAll": "全部",
       "filterWeapon": "武器",

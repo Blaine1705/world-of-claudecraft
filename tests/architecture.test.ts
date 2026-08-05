@@ -255,6 +255,7 @@ const UI_PURE_CORES = [
   'src/ui/material_hint_view.ts',
   'src/ui/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
+  'src/ui/bag_corner_mark_view.ts',
   'src/ui/bag_fine_mark_view.ts',
   'src/ui/bag_quest_mark_view.ts',
   'src/ui/bag_quest_tracker_highlight_view.ts',
