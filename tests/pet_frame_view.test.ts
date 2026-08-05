@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { findOwnPet, type PetFrameUnit, petFrameDescriptorInto } from '../src/ui/pet_frame_view';
+import {
+  DELVE_COMPANION_TEMPLATE_IDS,
+  findOwnPet,
+  type PetFrameUnit,
+  petFrameDescriptorInto,
+} from '../src/ui/pet_frame_view';
 import type { UnitFrameDescriptor } from '../src/ui/unit_frame';
 
 const PLAYER_ID = 7;
+// Taken from the real content table rather than hard-coded, so this tracks a rename.
+const COMPANION_TEMPLATE = [...DELVE_COMPANION_TEMPLATE_IDS][0];
 
 function unit(over: Partial<PetFrameUnit> = {}): PetFrameUnit {
   return {
@@ -62,6 +69,42 @@ describe('findOwnPet', () => {
 
   it('returns null on an empty roster', () => {
     expect(findOwnPet([], PLAYER_ID)).toBeNull();
+  });
+
+  // A delve companion carries the player's ownerId too, so ownership alone cannot
+  // tell it from a pet. The sim's own petOf excludes companions; so must this, or a
+  // hunter in a delve (whose real pet is stowed for the run) gets the companion's
+  // health under a frame labelled as their pet.
+  it('skips a delve companion and keeps looking', () => {
+    const realPet = unit({ id: 5, templateId: 'wolf' });
+    const found = findOwnPet([unit({ id: 4, templateId: COMPANION_TEMPLATE }), realPet], PLAYER_ID);
+    expect(found).toBe(realPet);
+  });
+
+  it('returns null when a delve companion is the ONLY owned mob', () => {
+    expect(findOwnPet([unit({ templateId: COMPANION_TEMPLATE })], PLAYER_ID)).toBeNull();
+  });
+
+  it('knows at least one companion template, so the exclusion is not vacuous', () => {
+    expect(DELVE_COMPANION_TEMPLATE_IDS.size).toBeGreaterThan(0);
+  });
+
+  // The core is consumed by both worlds through IWorld's shared entity roster. Sim
+  // holds real Entity records and ClientWorld rebuilds them from wire fields, so the
+  // same roster is driven here in each shape to pin that neither drifts.
+  it('resolves identically for a Sim-shaped and a ClientWorld-shaped roster', () => {
+    const simShaped = unit({ id: 11, name: 'Fang' });
+    // ClientWorld decodes ownerId from the wire `own` field and defaults the pet
+    // fields it does not receive; the shape the core reads is the same.
+    const wireShaped = {
+      ...unit({ id: 11, name: 'Fang' }),
+      petMode: 'defensive',
+      petTauntTimer: 0,
+    };
+    expect(findOwnPet([simShaped], PLAYER_ID)?.id).toBe(findOwnPet([wireShaped], PLAYER_ID)?.id);
+    const a = petFrameDescriptorInto(blankDescriptor(), simShaped, 'Dead');
+    const b = petFrameDescriptorInto(blankDescriptor(), wireShaped, 'Dead');
+    expect({ ...a }).toEqual({ ...b });
   });
 });
 

@@ -13,7 +13,16 @@
 // entity whose ownerId is its owner's entity id (src/sim/pet/pet_commands.ts,
 // petOf), so ownership is re-derived from the roster on both hosts identically.
 
+import { DELVE_COMPANIONS } from '../sim/data';
 import type { UnitFrameDescriptor } from './unit_frame';
+
+/** The mob templates that are delve COMPANIONS rather than pets. A companion also
+ *  carries its owner's id, so ownership alone cannot tell the two apart; this is the
+ *  same discriminator the sim's own petOf uses (Sim.isDelveCompanionMob). Built once
+ *  at module load from the content table, so a new companion joins it for free. */
+export const DELVE_COMPANION_TEMPLATE_IDS: ReadonlySet<string> = new Set(
+  Object.values(DELVE_COMPANIONS).map((c) => c.mobTemplateId),
+);
 
 /** The entity fields the pet frame reads. Structural on purpose: the offline Sim
  *  and the online ClientWorld both hold full `Entity` records, and a test can pass
@@ -33,16 +42,23 @@ export interface PetFrameUnit {
  * The player's own pet, or null when they have none.
  *
  * DEAD pets are returned deliberately: a hunter's pet survives its owner's death as
- * a revivable corpse, and both the pet action bar (Revive) and this frame must keep
- * showing it. Delve companions are NOT excluded here, matching the roster scan this
- * replaces; the sim-side petOf excludes them, but the HUD never has.
+ * a revivable corpse, and both the pet frame and the target-frame revive menu must
+ * keep showing it (the pet ACTION bar hides itself while the pet is dead, so the
+ * frame is the affordance that survives).
+ *
+ * Delve companions are excluded, matching the sim's own petOf. They carry an ownerId
+ * too, so without this a hunter inside a delve, whose real pet is stowed for the run,
+ * would see the companion's health under a frame labelled as their pet, and clicking
+ * it would select a different entity than the pet bar and the pet keybinds act on.
  */
 export function findOwnPet<T extends PetFrameUnit>(
   entities: Iterable<T>,
   playerId: number,
 ): T | null {
   for (const e of entities) {
-    if (e.kind === 'mob' && e.ownerId === playerId) return e;
+    if (e.kind !== 'mob' || e.ownerId !== playerId) continue;
+    if (DELVE_COMPANION_TEMPLATE_IDS.has(e.templateId)) continue;
+    return e;
   }
   return null;
 }

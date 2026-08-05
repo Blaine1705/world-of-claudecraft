@@ -7573,9 +7573,11 @@ export class Hud {
     }
   }
 
-  private renderPetBar(): void {
+  // `pet` is resolved ONCE per frame by update() and passed in, shared with the pet
+  // frame above it: both surfaces need the same entity, and each resolving its own
+  // would walk the interest-scoped roster twice per frame.
+  private renderPetBar(pet: Entity | null): void {
     const bar = $('#petbar') as HTMLElement;
-    const pet = this.ownPet();
     // Value-diffed body-class flag the mobile top-band layout reads (see field doc):
     // toggled only on a real transition so the per-frame path stays write-free.
     // Deliberately toggled on EVERY host, not just touch: only body.mobile-touch
@@ -8415,12 +8417,16 @@ export class Hud {
     // pet whose health has not moved costs zero DOM mutations. When the player has no
     // pet (six of the nine classes, always) or the option is off, this paints hidden,
     // which also resets the painter's portrait gate for the next summon or tame.
-    const pet = this.showPetFrame ? this.ownPet() : null;
-    this.petPortraitSubject = pet;
+    // ONE roster scan per frame, shared with renderPetBar below (it takes `pet` as a
+    // parameter for exactly this reason): the pet bar already resolved the pet every
+    // frame before this change, so the frame adds a surface, not a second walk.
+    const pet = this.ownPet();
+    const framedPet = this.showPetFrame ? pet : null;
+    this.petPortraitSubject = framedPet;
     this.petFramePainter.paint(
       unitFrameViewInto(
         this.petFrameBuffer,
-        petFrameDescriptorInto(this.petFrameDescriptor, pet, t('hud.core.dead')),
+        petFrameDescriptorInto(this.petFrameDescriptor, framedPet, t('hud.core.dead')),
       ),
     );
 
@@ -8516,7 +8522,7 @@ export class Hud {
       };
       this.actionBarWorldInput = actionBarWorld;
     }
-    this.renderPetBar();
+    this.renderPetBar(pet);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();

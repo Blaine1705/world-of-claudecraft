@@ -1816,9 +1816,11 @@
      cast and swing bars (player frame 14px, cast 68px, swing 76px). Seating it on
      top of the column rather than between the frame and the bars is deliberate:
      the pet strip appears and disappears with the pet, and displacing the two bars
-     would move a cast bar mid-cast. The portrait is dropped here (the desktop
-     strip keeps it) so the row stays one thin line in the densest layout, the same
-     trade the cast bar makes with its label. */
+     would move a cast bar mid-cast. It KEEPS its portrait here, unlike the cast bar
+     which drops its label: the frame is a tap target that selects the pet, and a
+     portrait-less strip renders about 20px tall, under the 40x40 mobile touch
+     floor. With the portrait the visible frame is ~48px rendered at this scale, so
+     the tap area is the floor without an invisible band over the world. */
   body.mobile-touch #pet-frame {
     position: fixed;
     left: 50%;
@@ -1831,9 +1833,6 @@
     zoom: 1;
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
-  }
-  body.mobile-touch #pet-frame .portrait-wrap {
-    display: none;
   }
   body.mobile-touch #pet-frame .uf-bars {
     width: 224px;
@@ -5163,7 +5162,13 @@
     }
     /* Same bottom-centre column as portrait, one notch lower to match the shorter
        landscape band (player frame 10px, cast 62px, swing 70px), and at the
-       landscape frame scale so the strip matches the player frame's width. */
+       landscape frame scale so the strip matches the player frame's width.
+       0.6 renders the frame ~35px, under the 40px touch floor: deliberately the
+       SAME size as the #player-frame directly below it, which is itself a tap
+       target (self-target) already shipping at this scale in landscape. Sizing
+       the pet frame larger than the frame it hangs under to win the floor would
+       invert their visual hierarchy; the landscape tier trades size for the
+       shorter viewport everywhere, and this follows the established baseline. */
     body.mobile-touch #pet-frame {
       bottom: calc(80px + env(safe-area-inset-bottom));
       transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
@@ -5520,7 +5525,8 @@
   @media (max-width: 800px) and (orientation: landscape) {
     body.mobile-touch.hud-mobile-compact #player-frame,
     body.mobile-touch.hud-mobile-compact #castbar,
-    body.mobile-touch.hud-mobile-compact #swingbar {
+    body.mobile-touch.hud-mobile-compact #swingbar,
+    body.mobile-touch.hud-mobile-compact #pet-frame {
       left: calc(50% - 44px);
     }
     /* Left-handed mirror of the nudge above, same magnitude, opposite side. */

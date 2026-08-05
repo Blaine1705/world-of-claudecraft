@@ -510,9 +510,9 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.ownPet',
     band: 'frame',
-    gate: 'this.showPetFrame',
+    gate: '',
     surface: 'none',
-    why: 'resolves the player-owned pet out of the entity roster for the pet frame below; a single early-returning scan (findOwnPet, pet_frame_view.ts), skipped entirely when the option is off',
+    why: 'resolves the player-owned pet out of the entity roster ONCE per frame (findOwnPet, pet_frame_view.ts, early-returning), shared by the pet frame here and renderPetBar below, which takes it as a parameter; ungated on purpose because the pet BAR needs it whatever showPetFrame says, and it replaces the scan renderPetBar previously did itself, so the frame costs no extra walk',
   },
   {
     call: 'this.petFramePainter.paint',
