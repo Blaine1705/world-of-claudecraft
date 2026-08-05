@@ -370,6 +370,17 @@ const ELEMENTAL_FLOATING: ClipMap = {
   attack: ['Elemental_Attack'],
 };
 
+// The nightkin family's own attack (scripts/build_nightkin_anims.mjs, issue
+// #2889): FLOATING's Headbutt/Punch is shared by reference across 8 other
+// unrelated families (a ghost, a dragon, a flying demon imp, a glowing wisp
+// among them). This clip is baked off tribal.glb's own donor poses (a
+// forward lunge plus its two unused gesture clips), so only mob_nightkin
+// gets it; the other FLOATING families are untouched.
+const NIGHTKIN_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Nightkin_Attack'],
+};
+
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
 const ENEMY_BITE: ClipMap = {
   idle: 'Idle',
@@ -910,7 +921,42 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warlock: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
+    clips: {
+      ...kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
+      // Ability-specific spellcasts (scripts/build_warlock_ability_anims.mjs,
+      // issue #2889): the warlock had zero attackByAbility overrides across
+      // its kit, so every spell played the same wand zap. Mapped by school
+      // (src/sim/content/classes.ts): shadow curses get the decisive clawed
+      // point (Warlock_Cast_Shadow), fire gets the scrappier ignite flick
+      // (Warlock_Cast_Fire), the life-drain channel gets its own sustained
+      // pull (Warlock_Cast_Drain), and every instant-cast (castTime 0)
+      // ability, regardless of mechanic, shares one fast decisive gesture
+      // (Warlock_Cast_Burst), the same call the mage batch made folding
+      // three different AoE mechanics into one Cast_Nova. This maps the
+      // whole non-pet kit: the seven summon_* pet abilities are channels
+      // with no combat swing to author, excluded the same way the hunter
+      // batch excluded tame_beast/dismiss_pet/revive_pet.
+      attackByAbility: {
+        shadow_bolt: 'Warlock_Cast_Shadow',
+        corruption: 'Warlock_Cast_Shadow',
+        curse_of_agony: 'Warlock_Cast_Shadow',
+        immolate: 'Warlock_Cast_Fire',
+        searing_pain: 'Warlock_Cast_Fire',
+        rain_of_fire: 'Warlock_Cast_Fire',
+        drain_life: 'Warlock_Cast_Drain',
+        shadowburn: 'Warlock_Cast_Burst',
+        fear: 'Warlock_Cast_Burst',
+        life_tap: 'Warlock_Cast_Burst',
+        demon_skin: 'Warlock_Cast_Burst',
+        spell_lock: 'Warlock_Cast_Burst',
+      },
+    },
+    // Ability-specific spellcast clips (scripts/build_warlock_ability_anims.mjs):
+    // a mesh-free clip donor GLB baked off this same mage.glb rig's own
+    // poses, but its OWN clip names and timing, not a reuse of the mage's
+    // mage_ability_anims.glb (the two GLBs are wired onto different
+    // VisualDefs and never load together).
+    animUrls: [`${PLAYERS}/warlock_ability_anims.glb`],
     show: [],
     attach: [
       { url: `${WEAPONS}/wand.glb`, bone: 'handslot.r' },
@@ -1546,7 +1592,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/tribal.glb`,
     height: 1.9,
     hover: 0.3,
-    clips: FLOATING,
+    clips: NIGHTKIN_FLOATING,
+    // Nightkin_Attack clip donor (scripts/build_nightkin_anims.mjs):
+    // mesh-free, baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/nightkin_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.3,
   },
