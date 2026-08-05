@@ -187,6 +187,13 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default (issue #1358): the classic MMO default is that switching
+  // targets while auto-attacking carries the swing over to the new target
+  // (Tab, click, nearest-enemy, assist, any method). Turning this on flips
+  // that: every target switch disengages auto-attack instead. Mirrored onto
+  // the authoritative sim via setStopAutoAttackOnTargetSwitch (see
+  // src/sim/targeting.ts), since the sim stays authoritative for auto-attack.
+  stopAutoAttackOnTargetSwitch: { def: false },
   // off by default: lock the action bar slots against drag-to-move,
   // drag-to-replace, and clear (right-click / shift+clear-key) so an
   // accidental click-and-drag mid-fight can't move or wipe a slot. Abilities

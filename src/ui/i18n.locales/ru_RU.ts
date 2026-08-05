@@ -1141,6 +1141,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
   'hudChrome.options.startAttackOnAbility': 'Автоатака при использовании способности',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': 'Останавливать автоатаку при смене цели',
   'hudChrome.options.walkByAutoloot': 'Автосбор добычи при проходе',
   'hudChrome.options.lockCursorOnRotate': 'Блокировать курсор при вращении',
   'hudChrome.options.keybindHelpLockCursorOnRotate':

@@ -1129,6 +1129,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceSounds': '인터페이스 및 피드백 소리',
   'hudChrome.options.clickFeedback': '클릭 표시',
   'hudChrome.options.startAttackOnAbility': '스킬 사용 시 자동 공격',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': '대상 전환 시 자동 공격 중지',
   'hudChrome.options.walkByAutoloot': '지나가며 자동 획득',
   'hudChrome.options.lockCursorOnRotate': '회전 중 커서 고정',
   'hudChrome.options.keybindHelpLockCursorOnRotate':

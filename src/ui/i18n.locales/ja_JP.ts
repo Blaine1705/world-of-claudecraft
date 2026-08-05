@@ -1132,6 +1132,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
   'hudChrome.options.startAttackOnAbility': 'アビリティ使用時に自動攻撃',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': 'ターゲット切り替え時に自動攻撃を停止',
   'hudChrome.options.walkByAutoloot': '通りがかり自動ルート',
   'hudChrome.options.lockCursorOnRotate': '回転中はカーソルを固定',
   'hudChrome.options.keybindHelpLockCursorOnRotate':

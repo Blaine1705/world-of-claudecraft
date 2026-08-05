@@ -42,9 +42,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // guild_bank_* cluster (Guild Bank Phase 2), +1 on both for guild_bank_log
 // (the activity log's on-demand READ request; its answer comes back on its own
 // one-shot 'gbanklog' frame, not the snapshot); the battleground adds three
-// sends plus the dev-only force start.
-const EXPECTED_SEND_COUNT = 185; // +3 battleground sends
-const EXPECTED_DISPATCH_COUNT = 198; // +3 battleground sends, +1 dev_bg_start
+// sends plus the dev-only force start; stopAutoAttackOnTargetSwitch joined as
+// a send + dispatch pair (issue #1358).
+const EXPECTED_SEND_COUNT = 186; // +3 battleground sends, +1 stopAutoAttackOnTargetSwitch
+const EXPECTED_DISPATCH_COUNT = 199; // +3 battleground sends, +1 dev_bg_start, +1 stopAutoAttackOnTargetSwitch
 const EXPECTED_DISPATCH_ONLY_COUNT = 13; // + dev_bg_start + dev_profiler_invulnerable
 
 // The chat sub-channel routing switch (server/game.ts `switch

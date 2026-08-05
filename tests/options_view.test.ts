@@ -422,6 +422,7 @@ const FRAMES_KEYS = [
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat'];
 const COMBAT_KEYS = [
   'startAttackOnAbilityUse',
+  'stopAutoAttackOnTargetSwitch',
   'showAttackButton',
   'walkByAutoloot',
   'groundReticle',

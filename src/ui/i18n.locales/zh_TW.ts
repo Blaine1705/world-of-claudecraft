@@ -1092,6 +1092,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.interfaceSounds': '介面與回饋音效',
   'hudChrome.options.clickFeedback': '點擊標記',
   'hudChrome.options.startAttackOnAbility': '使用技能時自動攻擊',
+  'hudChrome.options.stopAutoAttackOnTargetSwitch': '切換目標時停止自動攻擊',
   'hudChrome.options.walkByAutoloot': '路過自動拾取',
   'hudChrome.options.lockCursorOnRotate': '旋轉時鎖定游標',
   'hudChrome.options.keybindHelpLockCursorOnRotate':
