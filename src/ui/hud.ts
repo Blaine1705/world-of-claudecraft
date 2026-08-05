@@ -3279,9 +3279,9 @@ export class Hud {
   // move/lock button, pointer drag, localStorage persistence) lives in the
   // shared MovableFrame controller (movable_frame.ts); the pure position math
   // in target_frame_pos.ts. Two instances: the target frame keeps its stock
-  // look wherever it lands; the player frame DETACHES from the action-bar
-  // stack once moved (pf-detached: position fixed + the compact target-frame
-  // bar width), so it can sit anywhere and read like the target frame.
+  // look wherever it lands; the player frame DETACHES from the action-bar stack
+  // once moved (pf-detached: absolute positioning with its full configured
+  // width), so it can sit anywhere without shrinking the primary health frame.
   // -------------------------------------------------------------------------
 
   private initFrameMovers(): void {
