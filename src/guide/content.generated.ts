@@ -995,8 +995,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_priest",
     "tint": "#f0e9d6",
-    "tintStrength": 0.15,
-    "still": "/guide-stills/player_priest__f0e9d6__s15.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_priest__f0e9d6__s12.webp"
   },
   {
     "id": "shaman",
@@ -1100,8 +1100,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_shaman",
     "tint": "#6f8fc9",
-    "tintStrength": 0.15,
-    "still": "/guide-stills/player_shaman__6f8fc9__s15.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_shaman__6f8fc9__s12.webp"
   },
   {
     "id": "mage",
@@ -1479,8 +1479,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_warlock",
     "tint": "#8d5fd3",
-    "tintStrength": 0.15,
-    "still": "/guide-stills/player_warlock__8d5fd3__s15.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_warlock__8d5fd3__s12.webp"
   },
   {
     "id": "druid",
@@ -4938,6 +4938,55 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "id": "chr_maw_matriarch",
     "name": "The Sky Goes Quiet",
     "category": "chronicle",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_engineering_rare",
+    "name": "Precision Engineering",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_alchemy_rare",
+    "name": "A Rare Vintage",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_cooking_rare",
+    "name": "A Dish to Remember",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_leatherworking_rare",
+    "name": "Fine Tanning",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_tailoring_rare",
+    "name": "A Master's Stitch",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_weaponcrafting_rare",
+    "name": "Tempered to a Shine",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_armorcrafting_rare",
+    "name": "Plated to Perfection",
+    "category": "progression",
     "renown": 10,
     "feat": false
   }
@@ -10177,7 +10226,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ],
-    "tintStrength": 0.15
+    "tintStrength": 0.12
   },
   "player_shaman": {
     "url": "models/chars/players/barbarian.glb",
@@ -10196,7 +10245,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.15
+    "tintStrength": 0.12
   },
   "player_mage": {
     "url": "models/chars/players/mage.glb",
@@ -10228,7 +10277,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "gripRef": "Spellbook_open"
       }
     ],
-    "tintStrength": 0.15
+    "tintStrength": 0.12
   },
   "player_druid": {
     "url": "models/chars/players/druid.glb",
