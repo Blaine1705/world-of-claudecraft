@@ -13,8 +13,21 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { methodBody } from './helpers/method_body';
 
-const hudSource = readFileSync(resolve(__dirname, '../src/ui/hud.ts'), 'utf8');
+// Comment-stripped (the crafting_reagent_refresh idiom, `://` preserved):
+// prose alone must never satisfy a pin, and a commented-out call must never
+// keep one green.
+function stripComments(src: string): string {
+  return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+}
+
+const hudSource = stripComments(readFileSync(resolve(__dirname, '../src/ui/hud.ts'), 'utf8'));
+
+/** One hud.ts method's body, via the shared two-space-close bound. */
+function hudMethod(opener: string): string {
+  return methodBody(hudSource, opener);
+}
 
 function trainResultArm(): string {
   const start = hudSource.indexOf("case 'trainResult': {");
@@ -152,25 +165,57 @@ describe('hud.ts train window wiring (source pins)', () => {
     );
   });
 
-  it('reprices an open train (and unbind) window on every inventory/purse delta', () => {
-    // Online a trainer fee is a money-only self delta: trainResult can repaint
-    // before ClientWorld mirrors the new copper, so sibling Learn rows stayed
-    // gold-chip ready until a failed click. onInventoryChanged is the same
-    // edge that keeps vendor affordability honest (#2373); pin both service
-    // windows so a future edit cannot drop the train arm alone.
-    const start = hudSource.indexOf('onInventoryChanged(): void {');
-    expect(start, 'onInventoryChanged method present').toBeGreaterThan(-1);
-    const end = hudSource.indexOf('\n  onCosmeticsChanged()', start);
-    expect(end, 'onInventoryChanged precedes onCosmeticsChanged').toBeGreaterThan(start);
-    const arm = hudSource.slice(start, end);
-    expect(arm).toContain('this.openTrainNpcId !== null');
-    expect(arm).toContain("$('#train-window').style.display === 'block'");
-    expect(arm).toContain('this.renderTrain();');
-    expect(arm).toContain('this.openUnbindNpcId !== null');
-    expect(arm).toContain("$('#unbind-window').style.display === 'block'");
-    expect(arm).toContain('this.renderUnbind();');
-    // Vendor stays on the same hook (regression guard for the family).
-    expect(arm).toContain('this.renderVendor();');
+  it('reprices every open service window on an inventory/purse delta', () => {
+    // Online a trainer fee is a money-only self delta and heroic marks are a
+    // bag count: trainResult can repaint before ClientWorld mirrors the new
+    // copper, so stale rows advertised fees the purse no longer covered.
+    // onInventoryChanged is the edge that keeps vendor affordability honest
+    // (#2373); it must dispatch the whole family through the shared helper.
+    const hook = hudMethod('onInventoryChanged(): void {');
+    expect(hook).toContain('this.repaintOpenServiceWindows();');
+    // The helper carries one open-plus-shown guard per service window, so a
+    // future edit cannot drop the train arm alone (the language fan-out
+    // registry pins the relocalize call site; THIS pins the membership).
+    // The vendor/heroic guards are pinned as their FULL condition lines: the
+    // display half is the behavior that changed when the old unguarded
+    // renderVendor arm moved into the helper.
+    const helper = hudMethod('private repaintOpenServiceWindows(): void {');
+    expect(helper).toContain(
+      "this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
+    );
+    expect(helper).toContain('this.renderVendor();');
+    expect(helper).toContain(
+      "this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block'",
+    );
+    expect(helper).toContain('this.renderHeroicVendor();');
+    expect(helper).toContain('this.openTrainNpcId !== null');
+    expect(helper).toContain("$('#train-window').style.display === 'block'");
+    expect(helper).toContain('this.renderTrain();');
+    expect(helper).toContain('this.openUnbindNpcId !== null');
+    expect(helper).toContain("$('#unbind-window').style.display === 'block'");
+    expect(helper).toContain('this.renderUnbind();');
+  });
+
+  it("the guards' display sentinel matches what every service painter sets", () => {
+    // The helper's `=== 'block'` guards and each painter's
+    // `el.style.display = 'block'` are independent literals with nothing else
+    // tying them: a painter moved to 'flex' (as #crafting-window uses) would
+    // silently stop its window repainting on this edge while both sides'
+    // separate pins stayed green. Painter sources are comment-stripped for
+    // the same reason hud.ts is: prose must never satisfy the pin.
+    const helper = hudMethod('private repaintOpenServiceWindows(): void {');
+    expect(helper.match(/=== 'block'/g)).toHaveLength(4);
+    for (const painter of [
+      'vendor_window.ts',
+      'heroic_vendor_window.ts',
+      'train_window.ts',
+      'unbind_window.ts',
+    ]) {
+      const src = stripComments(
+        readFileSync(resolve(__dirname, `../src/ui/hud/vendor/${painter}`), 'utf8'),
+      );
+      expect(src, painter).toContain("el.style.display = 'block';");
+    }
   });
 });
 
