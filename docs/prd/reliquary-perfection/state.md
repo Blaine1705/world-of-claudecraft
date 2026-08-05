@@ -92,14 +92,25 @@ Current phase: 10 (not started). Update this line as phases complete.
 - Phase 22: (pending)
 
 ## OPEN items / known gotchas
-- Frostveil descent loses ~40 HP on the release base with no known mechanic (no breath
-  or drowning exists in src/sim/). Phase 12 owns the decision: diagnose or restore the
-  strict pin and prepare the release-side issue text (maintainer files by hand).
-- Release tip inherited-red suites (corpse_harvest_sim and friends) were re-pinned green
-  on this branch under a false attribution; Phase 12 fixes the comments, Phase 22 the PR
-  body. A release-side re-pin chore rider is prepared in Phase 22.
-- The branch's own test comment at tests/professions_fishing.test.ts:941-943 and the
-  gathering_rhythm comment both carry the false "Reliquary world-gen" attribution.
+- RESOLVED (Phase 10 sync, release commit 4c2b43f8f7): the frostveil ~40 HP loss was
+  the Rime Elementals camped in the bowl swinging at the walker, not terrain. The
+  release root-caused it and restored the strict contract (heal-through loop plus a
+  'Falling'-damage-empty pin); the branch's relaxed assertions were superseded in the
+  merge. Phase 12's frostveil decision item and the release-side issue text are moot.
+- RESOLVED (Phase 10 sync): the release re-hunted its own inherited-red suites in
+  4c2b43f8f7, attributing the shift to the Galecrest quest camps (#2887). The Phase 22
+  release-side re-pin chore rider is obsolete; drop it. The Phase 22 PR-body correction
+  still stands (the Phase 9 commit messages in history still carry the false
+  "feature-branch world-gen" attribution).
+- Comment attributions fixed in the Phase 10 sync merge (Phase 12 verifies, does not
+  redo): professions_fishing (divergence-index prose to the recorded sets B0/B1 at 3,
+  B1/B2 at 2 and 17; the :941-943 meta-test comment and both derivation comments now
+  name the Galecrest shift), gathering_rhythm, fear_break_chance (seed chain plus
+  release-hunt spares 4, 6, 8), corpse_harvest_result_event (header seed map extended,
+  inline seed prose), corpse_harvest_sim (quantity history), whirlwind_echo (old
+  default 31337 named). Evidence the Reliquary branch adds no world-gen draws: at the
+  same seeds both sides recorded identical values (gathering_rhythm 89/80/72,
+  corpse_harvest quantity 4, whirlwind 31338 valid on both).
 - i18n release fill: all reliquary keys pending in the 15 Latin locales; exact worklist
   in the Phase 22 record. Locale overlays for ja/ko/ru/zh_CN/zh_TW already carry
   contributor-authored fills (correct M16 mechanics, flagged for maintainer review).

@@ -111,9 +111,10 @@ describe('Bladed Gyre arms the echo', () => {
 describe('single-target casts echo onto enemies near the target', () => {
   it('(b) a single strike also hits the second enemy at the echo fraction and spends one charge', () => {
     // Seed hunted like (d): the echo replays a RESOLVED amount, so the primary
-    // Bloodletting has to connect for there to be anything to replay. The default
-    // integration seed whiffs it since the Galecrest quest camps (#2887) added
-    // world-gen draws and moved the shared stream. Spares on record: 31340, 31341.
+    // Bloodletting has to connect for there to be anything to replay. The old
+    // default seed 31337 whiffs it since the Galecrest quest camps (#2887)
+    // added world-gen draws and moved the shared stream (31338 is now also the
+    // makeSim default). Spares on record: 31340, 31341.
     const { sim, p } = makeSim(31338);
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;
@@ -158,8 +159,8 @@ describe('single-target casts echo onto enemies near the target', () => {
   });
 
   it('(d) Red Harvest consumes ONE charge and echoes all three strikes', () => {
-    // This seed lands all three independently rolled weapon strikes. The
-    // default integration seed deterministically whiffs one of them.
+    // This seed lands all three independently rolled weapon strikes. The old
+    // default seed 31337 deterministically whiffs one of them.
     const { sim, p } = makeSim(31338);
     const { primary, near, far } = arena(sim, p);
     p.resource = 100;

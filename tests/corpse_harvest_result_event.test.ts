@@ -21,7 +21,7 @@
 // 15303, 30 to 785, 122 to 492), then again after the zones 1-3 quest-dedupe
 // content pass (60 to 39, 991 to 2167, 12 to 30, 15303 to 14107, 785 to 3066,
 // and the shared mire_prowler seed 104 to 211), then a third time after the
-// Galecrest quest camps (#2887) plus the Reliquary branch's world-gen draws
+// Galecrest quest camps (#2887) shifted the stream on the release base
 // (39 to 24, 2167 to 464, 14107 to 50, 3066 to 10, 30 to 21, and mire_prowler
 // 211 to 277): any content add shifts the camp-driven world-gen draw
 // sequence, and with it every seed's stream and the recorded rolls. Each

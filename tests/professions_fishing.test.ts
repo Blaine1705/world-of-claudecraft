@@ -159,10 +159,10 @@ function catchSequenceLive(sim: Sim, meta: PlayerMeta, n: number): (string | nul
 // koi 1 / null 10). Any accidental extra draw, band-boundary change, or
 // band-0 table drift breaks this pin.
 //
-// The seed moved 467 to 2 after the Galecrest quest-camp pass (#2887) plus
-// the Reliquary branch's world-gen draws shifted the construction-time
-// stream (previously re-recorded for the zones 1-3 quest-dedupe pass); seed
-// 2 was hunted so all three band walks still differ within the recording.
+// The seed moved 467 to 2 after the Galecrest quest-camp pass (#2887)
+// shifted the construction-time stream (inherited from the release base;
+// previously re-recorded for the zones 1-3 quest-dedupe pass); seed 2 was
+// hunted so all three band walks still differ within the recording.
 const B0_SEQ_2: (string | null)[] = [
   TROUT,
   TROUT,
@@ -247,7 +247,7 @@ const B1_SEQ_2: (string | null)[] = [
 // divergence cell under the two-draw stream), so matching this sequence
 // proves the live path resolved FISHING_TABLES_BY_BAND[2], not a band-1
 // collapse (the top-band wiring was previously unpinned on the live path).
-// Re-recorded at seed 2 with the Galecrest plus Reliquary stream shift.
+// Re-recorded at seed 2 after the Galecrest quest-camp stream shift.
 const B2_SEQ_2: (string | null)[] = [
   TROUT,
   TROUT,
@@ -938,8 +938,9 @@ describe('fishing table structure (pin 5)', () => {
     expect(B0_SEQ_2[3]).not.toBe(B1_SEQ_2[3]);
     expect(B1_SEQ_2[2]).not.toBe(B2_SEQ_2[2]);
     // The EXACT divergence sets, so every comment naming an index is held to
-    // the recording rather than trusted: seed-2 re-record after Reliquary
-    // world-gen draw-order shift (prior seed-467 sets no longer hold).
+    // the recording rather than trusted: seed-2 re-record after the Galecrest
+    // quest-camp stream shift inherited from the release base (the prior
+    // seed-467 sets no longer hold).
     const differing01 = B0_SEQ_2.map((v, i) => (v === B1_SEQ_2[i] ? -1 : i)).filter((i) => i >= 0);
     expect(differing01).toEqual([3]);
     const differing = B1_SEQ_2.map((v, i) => (v === B2_SEQ_2[i] ? -1 : i)).filter((i) => i >= 0);
