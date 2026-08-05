@@ -7650,7 +7650,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '自動儲存失敗（瀏覽器儲存空間已滿或被封鎖）。請匯出地圖以保留備份。',
   'editor.status.terrainCapReached': '已達到地形編輯上限（{max}）。多餘的雕刻印記未被加入。',
   'editor.status.placementCapReached': '已達到放置上限（{max}）。多餘的資源未被加入。',
-  'editor.status.campCapReached': '已達到營地上限（{max}）。新營地未被加入。',
   'editor.confirm.ok': '確定',
   'editor.confirm.cancel': '取消',
   'editor.confirm.discardTitle': '捨棄變更？',

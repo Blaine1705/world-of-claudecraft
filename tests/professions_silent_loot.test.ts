@@ -396,7 +396,7 @@ describe('the craft output arms each stand their hub line down', () => {
   });
 
   it('a MASTERWORK proc stands both down on the baked instance', () => {
-    // Seed 53 with tailoring at skill 200 is the hunted proc window
+    // Seed 3 with tailoring at skill 200 is the hunted proc window
     // tests/professions_masterwork.test.ts uses: the second successful
     // vestments craft procs. Reused rather than re-hunted so the two files
     // cannot disagree about which craft is the masterwork one. (That suite
@@ -404,7 +404,7 @@ describe('the craft output arms each stand their hub line down', () => {
     // world-gen draw sequence, then 90 -> 53 after the Eastbrook camp
     // respacing thinned the zone-1 camp counts; this case follows it, and was
     // left behind at 90 for one hop, which is what reddened it here.)
-    const sim = new Sim({ seed: 53, playerClass: 'warrior', autoEquip: false });
+    const sim = new Sim({ seed: 3, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     sim.acceptArchetypeQuest('tailoring');
     const meta = sim.players.get(pid);

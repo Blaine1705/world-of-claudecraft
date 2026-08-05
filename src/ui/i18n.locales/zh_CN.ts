@@ -7650,7 +7650,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'editor.status.autosaveFailed': '自动保存失败（浏览器存储已满或被禁用）。请导出地图以保留备份。',
   'editor.status.terrainCapReached': '已达到地形编辑上限（{max}）。多余的雕刻印记未被添加。',
   'editor.status.placementCapReached': '已达到放置上限（{max}）。多余的资源未被添加。',
-  'editor.status.campCapReached': '已达到营地上限（{max}）。新营地未被添加。',
   'editor.confirm.ok': '确定',
   'editor.confirm.cancel': '取消',
   'editor.confirm.discardTitle': '放弃更改？',

@@ -447,11 +447,11 @@ describe('archetype ceilings gate the masterwork effect (ceilings bind craft out
   // craft's proc roll is the FIRST rng draw after Sim construction in every
   // arm below (nothing else here draws), so the identical roll value reaches
   // the proc comparison each time: only the archetype ceiling changes the
-  // outcome, which is exactly what these cases pin. Re-hunted (37 -> 107)
+  // outcome, which is exactly what these cases pin. Re-hunted (107 -> 70)
   // after the zones 1-3 quest-dedupe content pass added camps, mobs, and
   // items (world-gen draws moved the post-construction rng position). Spares
-  // on record: 111, 118, 123, and 136.
-  const PROC_SEED = 107;
+  // on record: 94, 128, 130, and 131.
+  const PROC_SEED = 70;
 
   function makeSim() {
     return new Sim({ seed: PROC_SEED, playerClass: 'warrior', autoEquip: false });

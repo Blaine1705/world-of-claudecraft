@@ -6,17 +6,9 @@ that observes but never invents outcomes. This page is the system in brief
 plus the contract every new Reliquary page (and every new piece of
 conquerable unique loot) must follow.
 
-Companion documents: the multi-session implementation packet under
-`docs/prd/reliquary/`, Book of Deeds at `docs/design/deeds.md` (achievements;
+Companion documents: Book of Deeds at `docs/design/deeds.md` (achievements;
 orthogonal surface), professions at `docs/design/professions.md`, interface
 standard at `DESIGN.md`.
-
-**Implementation worktree (mandatory):**
-`/Users/fernando/Documents/wocc-reliquary` on branch `feature/reliquary`.
-Every phase and QA pass starts by fetching and merging
-`origin/release/v0.35.0` (or the current release tip) in that worktree only.
-Do not implement this feature in other checkouts; many parallel sessions share
-the monorepo.
 
 ## Vocabulary (player-facing, all rendered through t())
 
@@ -164,7 +156,8 @@ links to deeds (`col_*`, clear milestones).
 
 | Concern | Path / symbol |
 |---|---|
-| Design packet | `docs/prd/reliquary/` |
+| Runtime | `src/sim/reliquary.ts`, `src/sim/content/reliquary.ts` |
+| UI | `src/ui/reliquary_view.ts`, `src/ui/reliquary_window.ts`, `src/ui/reliquary_sheet_view.ts` |
 | Discovery hub | `src/sim/deeds.ts` `markItemDiscovered` |
 | Clear counts | `DeedStats.dungeonClears`, `PlayerMeta.delveClears` |
 | Heroic uniques | `src/sim/content/heroic_loot.ts` |

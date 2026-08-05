@@ -170,7 +170,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // zones 1-3 quest-dedupe content pass added camps, mobs, and items, which
     // shifts every world-gen draw downstream): the proc lands on attempt
     // index 7.
-    expect(procAt).toBe(7);
+    expect(procAt).toBe(1);
     expect(meta.deedStats.counters.masterworksCrafted).toBe(1);
     const evs = sim.tick();
     const ev = deedEvents(evs).find((e) => e.deedId === 'prog_masterwright');
@@ -312,7 +312,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Neither parent's recorded value survives the composition, so this is a
     // fresh hunt, the same cause and protocol as this merge's parity golden
     // re-mint: the koi bites on session index 0.
-    expect(koiSession).toBe(0);
+    expect(koiSession).toBe(10);
     expect(sawBiteOnKoiSession).toBe(true); // the celebration follows the bite moment
     expect(meta.deedsEarned.has('col_glimmerfin')).toBe(false); // grant sweeps at the tick tail
     const evs = sim.tick();
@@ -339,18 +339,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // Hunted literals (seed 4242, after every beat above): the harvest index
     // where each flavor's 1-in-90 event fires under the shared stream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 100 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 2 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 319,
+        hitAt: 165,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 130,
+        hitAt: 2,
       },
     ];
     for (const hunt of hunts) {
@@ -412,7 +412,7 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // merge, the same composed stream shift as the koi literal above: the
     // rare-or-better rarity roll that mints the signed specimen lands on
     // attempt index 8.
-    expect(hitAt).toBe(8);
+    expect(hitAt).toBe(15);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

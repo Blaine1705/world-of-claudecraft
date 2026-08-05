@@ -384,7 +384,7 @@ describe('Eastbrook polish capture contract', () => {
       // bounded ground-object reuse pool (storePooledObject/takePooledObject cap),
       // the renderer-integration leaf, so the composite re-mints again. Regenerated
       // via scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '628f66e2ba22fb456ca64603dfee7311bf766ee5d9ebe71d5e2b2109b01f1d3b',
+      fingerprint: '09f6f78b9c049ba5df01a27ddf054f00928dce957dec2b4d819d5109e83c4d10',
       components: {
         captureContract: {
           id: 'polish-v2',
