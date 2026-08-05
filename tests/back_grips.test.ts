@@ -95,6 +95,31 @@ describe('backGripFor', () => {
 // The asset tables (assets.ts) import three.js, so they cannot be imported in the
 // plain-Node env: scan the source instead. This is the guard that would have caught
 // the Season 1 Armory families (maces, wands, bows, crossbows) sheathing as swords.
+describe('ranged carries are not handed', () => {
+  // A bow/crossbow lies FLAT across the shoulders (the VAR_BOW spec's own
+  // comment), which reads the same whichever hand drew it. The mirror exists so
+  // dual-wielded BLADES cross; applying it to a ranged carry flips the weapon
+  // end-for-end and it hangs vertically down the back instead.
+  //
+  // Bows are left-hand props (weaponSkinAttachBone moves drawn bows to
+  // handslot.l for the draw animation's front arm), so before this rule every
+  // sheathed bow took the mirrored pose.
+  for (const family of ['VAR_BOW', 'VAR_CROSSBOW', '1H_Crossbow', '2H_Crossbow']) {
+    it(`${family} sheathes identically in either hand`, () => {
+      expect(backGripFor(family, 'l')).toEqual(backGripFor(family, 'r'));
+    });
+  }
+
+  it('still mirrors a bladed carry, so dual wield keeps its crossed blades', () => {
+    const right = backGripFor('1H_Sword', 'r');
+    const left = backGripFor('1H_Sword', 'l');
+    expect(left).not.toEqual(right);
+    expect(left.position[0]).toBeCloseTo(-right.position[0], 6);
+    // The default (unknown family) carry keeps mirroring too.
+    expect(backGripFor(null, 'l')).not.toEqual(backGripFor(null, 'r'));
+  });
+});
+
 describe('every weapon grip family has a tuned on-back carry', () => {
   const assetsSrc = readFileSync(
     new URL('../src/render/characters/assets.ts', import.meta.url),

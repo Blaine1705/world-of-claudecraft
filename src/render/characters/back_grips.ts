@@ -103,11 +103,29 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
  *  fails when a new family lands without a carry. */
 export const BACK_GRIP_FAMILIES: ReadonlySet<string> = new Set(Object.keys(BACK_GRIPS));
 
+/** Families whose on-back carry is NOT handed. A bow or crossbow lies FLAT
+ *  across the shoulders (see the VAR_BOW spec above), a pose that reads the
+ *  same whichever hand drew it. The mirror below exists so dual-wielded BLADES
+ *  cross; applying it to a ranged carry rotates the weapon end-for-end and it
+ *  hangs vertically down the back instead of lying strapped across it.
+ *
+ *  This bites because bows ARE left-hand props: weaponSkinAttachBone moves a
+ *  drawn bow to handslot.l so it sits in the draw animation's front arm, and
+ *  handSide() then reports 'l' to this function when the weapon is sheathed. */
+const SIDE_AGNOSTIC_BACK_GRIPS: ReadonlySet<string> = new Set([
+  '1H_Crossbow',
+  '2H_Crossbow',
+  'VAR_CROSSBOW',
+  'VAR_BOW',
+]);
+
 /** The on-back transform for a sheathed prop: family-specific, mirrored across X
- *  (position and lean) for a left-hand prop, defaulting for unknown families. */
+ *  (position and lean) for a left-hand prop, defaulting for unknown families.
+ *  The ranged families opt out of the mirror (see above). */
 export function backGripFor(accessory: string | null, side: 'r' | 'l'): BackGripTransform {
   const spec = (accessory && BACK_GRIPS[accessory]) || DEFAULT_BACK;
-  const mirror = side === 'l' ? -1 : 1;
+  const handed = !(accessory && SIDE_AGNOSTIC_BACK_GRIPS.has(accessory));
+  const mirror = side === 'l' && handed ? -1 : 1;
   return {
     position: [spec.position[0] * mirror, spec.position[1], spec.position[2]],
     quaternion: quatFromEulerXYZ(spec.euler[0], spec.euler[1] * mirror, spec.euler[2] * mirror),
