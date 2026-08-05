@@ -24,7 +24,8 @@ the base three independent ways, strong family reuse in the UI.
 
 Below the bar: a hidden-deed spoiler leak, page names bypassing t(), a join-time retro
 path that celebrates and broadcasts, gameable catalog and cap pins, a stub Overview, an
-inverted reward curve (nothing past 100 of 184 relics; the rank 5 border invisible),
+inverted reward curve (nothing past 100 of 184 relics, 183 since the Phase 10
+hidden-deed removal; the rank 5 border invisible),
 missing surfaces from the maintainer's checklist (nameplate/portrait chrome, inspect,
 tracker, clickable chat, obtain counts), and catalog blind spots (Rift, overworld rares,
 three omitted drops, PvP gallery).
@@ -97,8 +98,8 @@ Should-fix:
 - Illumination ownership surface excludes weaponSkins vs display completion (latent
   mixed-page hazard): Phase 10.
 - Masterwork marks have no crash-recovery second home (add visited mirror): Phase 10.
-- Rank 5 invisible capstone, nothing past 100 of 184, Illumination invisible to others:
-  Phases 18 and 19.
+- Rank 5 invisible capstone, nothing past 100 of 184 (183 since the Phase 10
+  hidden-deed removal), Illumination invisible to others: Phases 18 and 19.
 - Rift zero presence; overworld rares zero presence; gravewyrm_bone_quiver,
   direfang_quiver, selthes_seastriders omitted: Phases 21 (systems) and 12 (three drops).
 - Screenshot deliverable wrong (desktop is the marketing homepage; mobile cropped above
@@ -107,7 +108,9 @@ Should-fix:
 Nits and notes (all owned):
 - 44px touch shrink rule, dead .reliquary-page-stub CSS, .reliquary-summary b selector,
   reduced-motion box-shadow query, inline width style, inert cell cursor/hover, header
-  count demotion, 239 vs 213 reconciliation: Phases 13 and 14.
+  count demotion, 239 vs 213 reconciliation (238 vs 212 since the Phase 10
+  hidden-deed removal: the entries side and the distinct side each lost the
+  hidden title): Phases 13 and 14.
 - buildInput allocations before signature elide, Object.keys length: Phase 14.
 - pushRecent inverted de-dupe guard (dead), restore no-dedupe, deeds.ts rank-bridge
   comment drift: Phase 10.

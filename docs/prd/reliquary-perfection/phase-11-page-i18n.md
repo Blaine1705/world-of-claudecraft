@@ -114,3 +114,24 @@ STEP 7 - FINAL RESPONSE: status, files, validation, verdicts, handoff to Phase 1
 STOPPING RULES: stop and ask if the deed_i18n pattern cannot cleanly host page descs
 too (Phase 13 depends on that surface existing).
 ```
+
+## Rider from Phase 10 QA (2026-08-05)
+
+Both retro catch-up summaries render a hardcoded plural and read wrong at count 1
+("Your reliquary catches up: 1 relics catalogued." / "Your chronicle catches up:
+1 deeds recorded."). Convert BOTH to the existing CLDR channel in this phase's i18n
+hygiene pass, together, never one alone (frontend-seam and qa reviewers both ruled
+splitting them worse than leaving them):
+- New bases hudChrome.plurals.reliquaryRetroSummary and
+  hudChrome.plurals.deedsRetroSummary with one/other English leaves, rendered via
+  tPlural (src/ui/i18n.ts) from hud.ts handleReliquaryUnlocks / handleDeedUnlocks;
+  retire the flat hudChrome.reliquary.retroSummary and hudChrome.deeds.retroSummary
+  keys and their overlay rows.
+- Migrate existing locale fills to the .other leaf where a translation already
+  exists (the five non-Latin reliquary fills from Phase 10; the full deeds fill
+  set); leave .one pending for the Phase 22 release fill. CJK locales select only
+  "other"; Russian needs one/few/many at release fill time.
+- Update the emission pins in tests/reliquary_window.test.ts and
+  tests/deeds_window.test.ts (both literal-pin the retroText log and announcer
+  push lines; the reliquary side also pins the t('...retroSummary') construction)
+  and the i18n completeness/emit-shape suites.

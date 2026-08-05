@@ -83,6 +83,10 @@ Agent B deliverables (retro-safe join + sim robustness):
   completion includes them; make the emit accept the same optional weaponSkins lookup
   the hosts pass to completion reads, so a future mixed page cannot illuminate
   inconsistently (parity W3; latent, fix while here).
+  (Post-review packet note: this deliverable was implemented and then deliberately
+  REVERSED in review; the single-kind-pages content pin in
+  tests/reliquary_content.test.ts ships as the guard instead, and online W3 stays
+  documented-open. See state.md, Phase 10 surfaces.)
 - Reorder onItemDiscovered so the noteRelicItemFind early-return sits ABOVE the rank
   math, or move the rank sync ahead of it, so a ledger/blob disagreement cannot drop a
   rank-threshold crossing (arch finding 4).
@@ -126,15 +130,15 @@ STEP 4 - COMMIT CADENCE (explicit paths):
 - test(reliquary): behavioral join coverage and cascaded totals
 
 STEP 5 - ACCEPTANCE CRITERIA:
-- [ ] The hidden deed's reward title text (DEEDS hid_saul_footnote reward.text) appears
+- [x] The hidden deed's reward title text (DEEDS hid_saul_footnote reward.text) appears
       nowhere in src/guide/content.generated.ts or any window render path; guide.test
       needles cover reward.text; wiki emitter throws on hidden.
-- [ ] The behavioral join test passes and proves: no unflagged event, no fan-out-eligible
+- [x] The behavioral join test passes and proves: no unflagged event, no fan-out-eligible
       deed grant, no recent push, no clears stamp on the seed path; live fills still
       celebrate.
-- [ ] ownedMounts throws on partial meta again; all suites green.
-- [ ] pushRecent refresh works when the id is mid-ring (new unit case).
-- [ ] Full listed validation matrix green.
+- [x] ownedMounts throws on partial meta again; all suites green.
+- [x] pushRecent refresh works when the id is mid-ring (new unit case).
+- [x] Full listed validation matrix green.
 
 STEP 6 - DOC UPDATES: progress.md (Phase 10 complete + notes), state.md (surfaces:
 reliquaryUnlock.retro, hudChrome.reliquary.retroSummary key, titles page 33, totals 212/183).

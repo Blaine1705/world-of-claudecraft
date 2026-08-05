@@ -5,7 +5,7 @@
 | Phase | Status | Started | Completed |
 |---|---|---|---|
 | 10 Sim correctness close-out | complete | 2026-08-05 | 2026-08-05 |
-| 10 QA | not started | | |
+| 10 QA | complete | 2026-08-05 | 2026-08-05 |
 | 11 Page-name localization + i18n hygiene | not started | | |
 | 11 QA | not started | | |
 | 12 Test integrity + catalog pins + records | not started | | |
@@ -71,3 +71,34 @@ happened.
   the wiki hidden-throw is belt-and-braces and deliberately untested (the content pin
   makes the state unreachable); no screenshot for the retro summary chat line (single
   log line, mirrors the deeds precedent which has none).
+
+### Phase 10 QA (2026-08-05)
+- Verdict: PASS-WITH-FOLLOWUPS (one follow-up, the Phase 11 plural rider below; all
+  other findings fixed in this round). The QA round closes by pushing this commit set
+  to origin/feature/reliquary (PR 2976).
+- Release sync brought the pnpm-audit corrections (PR 2966); the six eastbrook
+  evidence/pin conflicts resolved to the release side (its re-mint matches the merged
+  lockfile; our Phase 9 local re-pins were computed against the old lockfile and are
+  superseded). Both eastbrook suites now pass locally, clearing the old local-only red.
+- Audit shape: ultracode workflow (correctness, mutation-proven test decisiveness in a
+  detached scratch worktree, cleanup; every finding adversarially verified, zero
+  refuted, zero unverified) plus four direct reviewers (architecture, cross-platform
+  sync, frontend seam, qa-checklist). Mutation evidence: baseline 412 green; the retro
+  guards, the hidden-title filter, and the pushRecent guard each reddened their named
+  tests when reverted.
+- Found and fixed: 1 blocking (Biome format diff, the only error in the changed set);
+  4 unique should-fix (retro summary emission unpinned in the window test; masterwork
+  header claimed a crash-recovery mechanism the single-blob save path rules out;
+  golden re-record provenance comment missing from scenarios.ts against the packet
+  re-pin ruling; ownedMounts blast-radius question, judged no-change); 16 actionable
+  nice-to-haves (Readonly retro opts, dead undefined-check removal, import
+  consolidation, creation-disjoint pin, reload event assertion, comment-stripped
+  craft pin, doc/comment accuracy across brainstorm/design/phase-10/types/mounts).
+- QA-round test additions: the emission pin (log + announcer inside the reliquary
+  handler body), the creation-disjoint pin (no class starter kit id is catalogued,
+  with field-liveness guards), the reload-emits-nothing assertion, and the
+  comment-strip hardening of the craft source pin.
+- Decisions recorded in state.md Phase 10 QA: item-fills-only summary count;
+  ownedMounts stays strict; four no-action observations.
+- Rider filed in phase-11-page-i18n.md: plural forms for BOTH retro summaries
+  (reliquary and deeds) via tPlural, moved together.

@@ -99,6 +99,30 @@ Current phase: 10 complete; next: 10 QA. Update this line as phases complete.
   note for release ops: a pre-Reliquary binary autosaving a rolled-forward character
   drops the reliquary key and the masterwork:* visits permanently (itemsDiscovered
   survives, so fill and rank recover; provenance and recent do not).
+- Phase 10 QA (2026-08-05): fix round applied 1 blocking (Biome format diff in
+  tests/reliquary_state.test.ts), the emission pin (tests/reliquary_window.test.ts now
+  pins this.log + combatAnnouncer.push of retroText inside the reliquary handler body,
+  matching the deeds sibling), the masterwork header's real refill mechanism (restore
+  filter asymmetry, not crash insurance), the golden re-record's adjacent provenance
+  comment (tests/parity/scenarios.ts, which also records the one-commit bisect false
+  red between the visit write and the re-record), Readonly retro opts, the deed_stat
+  clear-source header line, the reliquaryUnlock retro doc de-ambiguation, a
+  creation-disjoint content pin (no class starter kit id is a catalogued relic:
+  creation runs the retro seed), a reload-emits-nothing event assertion, and
+  comment-stripped craft source pins. DECIDED, not drift: the join summary line counts
+  ITEM fills only; mark refills are silent AND uncounted (deeds.ts records it at the
+  call site). DECIDED: ownedMounts stays strict; the join-abort blast radius was
+  traced by three reviewers to zero partial-meta production callers, and strictness is
+  the phase's own acceptance criterion. DEFERRED to Phase 11 (i18n hygiene): plural
+  forms for BOTH retro summaries (reliquary AND deeds; "1 relics catalogued" /
+  "1 deeds recorded") via tPlural + hudChrome.plurals leaves; both siblings move
+  together or not at all (two reviewers, same call). Recorded observations, no action:
+  the combatAnnouncer burst-collapse can supersede a live-find announcement in a
+  mixed drain (documented combat_announcer behavior, deeds identical); retro events
+  keep curatorRank/illuminatedPageId fields the client plan discards (uniform emit is
+  the safer shape); a spectator session receives the spectated character's retro
+  summary (pre-existing pid routing, near-unreachable, shared with deeds); every
+  masterwork proc now dirties the visited deed key (bounded by the proc rate).
 - Phase 11: (pending)
 - Phase 12: (pending)
 - Phase 13: (pending)

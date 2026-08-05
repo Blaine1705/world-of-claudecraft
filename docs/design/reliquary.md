@@ -114,8 +114,10 @@ Shelves (v1 ship set):
 4. **Horizons** - mounts, weapon skins (account cosmetics), titles earned.
 
 Each page declares: stable id, shelf, display keys (i18n), clear-count
-source (or none), ordered relic list (item ids and/or mark kinds), optional
-links to deeds (`col_*`, clear milestones).
+source (or none), ordered relic list (one relic kind per page: items, marks,
+mounts, weapon skins, or titles; single-kind is pinned by
+tests/reliquary_content.test.ts and the reliquaryUnlock emit path depends on
+it), optional links to deeds (`col_*`, clear milestones).
 
 ## Adding a page (the recipe)
 
