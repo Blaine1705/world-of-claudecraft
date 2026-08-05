@@ -6,16 +6,20 @@
 //
 // Numbers come from the sim catalog and charge ladder, never re-invented copy:
 // TOOL_EFFECTS.startingDurability and RARITY_DURABILITY_BONUS (tools.ts). The
-// bonus prose tracks applyEffectBonus kinds (quantity / quality / respawnSpeed).
+// bonus prose tracks applyEffectBonus kinds (quantity / quality / respawnSpeed);
+// the "+1" the English spells out as prose is pinned back to TOOL_EFFECTS[*].bonus
+// by the test file, so a rebalance forces the copy to move with it.
 // Fishing is never advertised as a slot target: slotToolEffectRefused refuses
 // every effect on fishing until an arm has real fishing behavior.
 
 import { TOOL_EFFECTS, type ToolEffectId } from '../sim/content/professions';
+import { ITEMS } from '../sim/data';
 import { RARITY_DURABILITY_BONUS } from '../sim/professions/tools';
-import type { ItemDef } from '../sim/types';
+import type { ItemDef, ItemUse } from '../sim/types';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
+import { itemNameColor } from './item_name_color';
 import { toolEffectNameKey } from './tool_effect_name';
 
 /** Effect id -> bonus-description key. Mirrors TOOL_EFFECTS; an id absent here
@@ -30,8 +34,12 @@ function line(cls: 'tt-sub' | 'tt-desc' | 'tt-green', text: string): string {
   return `<div class="${cls}">${esc(text)}</div>`;
 }
 
+type ToolEffectUse = Extract<ItemUse, { type: 'toolEffect' }>;
+
 /** True when the def is a tool-effect charm (use.type 'toolEffect'). */
-export function isToolEffectItem(item: Pick<ItemDef, 'use'>): boolean {
+export function isToolEffectItem(
+  item: Pick<ItemDef, 'use'>,
+): item is Pick<ItemDef, 'use'> & { use: ToolEffectUse } {
   return item.use?.type === 'toolEffect';
 }
 
@@ -41,15 +49,22 @@ export function toolEffectBonusKey(effectId: string): TranslationKey | undefined
   return Object.hasOwn(BONUS_KEYS, effectId) ? BONUS_KEYS[effectId as ToolEffectId] : undefined;
 }
 
-/**
- * Standalone tooltip body for one tool-effect id (title + bonus + how-to), used
- * by the Professions window on slot buttons and live effect rows. Empty string
- * when the id has no display name or bonus copy (a retired effect).
- */
-export function toolEffectStandaloneTooltip(effectId: string): string {
-  const nameKey = toolEffectNameKey(effectId);
+/** The charm ItemDef whose use slots `effectId`, or undefined for a
+ *  catalog-only effect that mints no item (Springback Charm today). */
+function charmItemFor(effectId: string): ItemDef | undefined {
+  for (const def of Object.values(ITEMS)) {
+    if (def.use?.type === 'toolEffect' && def.use.effectId === effectId) return def;
+  }
+  return undefined;
+}
+
+/** The card body both surfaces agree on: kind, bonus, how to slot, the charge
+ *  ladder, and the land-only scope. One builder so the item card and the
+ *  Professions hover card can never drift line by line. Empty string when the
+ *  id has no bonus copy or no live catalog entry (a retired effect). */
+function toolEffectBodyLines(effectId: string): string {
   const bonusKey = toolEffectBonusKey(effectId);
-  if (nameKey === undefined || bonusKey === undefined) return '';
+  if (bonusKey === undefined) return '';
   const def = Object.hasOwn(TOOL_EFFECTS, effectId)
     ? TOOL_EFFECTS[effectId as ToolEffectId]
     : undefined;
@@ -57,7 +72,6 @@ export function toolEffectStandaloneTooltip(effectId: string): string {
   const baseCharges = formatNumber(def.startingDurability, { maximumFractionDigits: 0 });
   const rarityBonus = formatNumber(RARITY_DURABILITY_BONUS, { maximumFractionDigits: 0 });
   return (
-    `<div class="tt-title" style="color:${QUALITY_COLOR.rare}">${esc(t(nameKey))}</div>` +
     line('tt-sub', t('hudChrome.professions.toolEffectTooltip.kind')) +
     line('tt-green', t(bonusKey)) +
     line('tt-desc', t('hudChrome.professions.toolEffectTooltip.howToSlot')) +
@@ -72,32 +86,33 @@ export function toolEffectStandaloneTooltip(effectId: string): string {
   );
 }
 
+/**
+ * Standalone tooltip body for one tool-effect id (title + the shared body),
+ * used by the Professions window on slot buttons and live effect rows. Empty
+ * string when the id has no display name or bonus copy (a retired effect).
+ * No "open Professions" cue: the player is already there.
+ */
+export function toolEffectStandaloneTooltip(effectId: string): string {
+  const nameKey = toolEffectNameKey(effectId);
+  if (nameKey === undefined) return '';
+  const body = toolEffectBodyLines(effectId);
+  if (body === '') return '';
+  // Title color follows the charm item's own rarity (the itemNameColor idiom
+  // Hud.itemTooltip uses for item titles); a catalog-only effect with no item
+  // keeps the charm family's rare tint.
+  const item = charmItemFor(effectId);
+  const color = item ? itemNameColor(item) : QUALITY_COLOR.rare;
+  return `<div class="tt-title" style="color:${color}">${esc(t(nameKey))}</div>` + body;
+}
+
 /** The tooltip lines for one tool-effect charm item, or '' for any other item.
  *  Composed into Hud.itemTooltip so bags, bank, crafting, market, and every
- *  other surface that reuses itemTooltip show the same card. */
+ *  other surface that reuses itemTooltip show the same card. No title (the
+ *  item tooltip already prints the name) and no "open Professions" line: the
+ *  howToSlot line names the window, and the bag hover appends the
+ *  openProfessions affordance hint (bagTooltipHintKey), which would double
+ *  the sentence if repeated here. */
 export function toolEffectTooltipLines(item: ItemDef): string {
-  const use = item.use;
-  if (use?.type !== 'toolEffect') return '';
-  const bonusKey = toolEffectBonusKey(use.effectId);
-  if (bonusKey === undefined) return '';
-  const def = Object.hasOwn(TOOL_EFFECTS, use.effectId)
-    ? TOOL_EFFECTS[use.effectId as ToolEffectId]
-    : undefined;
-  if (!def) return '';
-  const baseCharges = formatNumber(def.startingDurability, { maximumFractionDigits: 0 });
-  const rarityBonus = formatNumber(RARITY_DURABILITY_BONUS, { maximumFractionDigits: 0 });
-  return (
-    line('tt-sub', t('hudChrome.professions.toolEffectTooltip.kind')) +
-    line('tt-green', t(bonusKey)) +
-    line('tt-desc', t('hudChrome.professions.toolEffectTooltip.howToSlot')) +
-    line(
-      'tt-desc',
-      t('hudChrome.professions.toolEffectTooltip.charges', {
-        base: baseCharges,
-        bonus: rarityBonus,
-      }),
-    ) +
-    line('tt-sub', t('hudChrome.professions.toolEffectTooltip.landOnly')) +
-    line('tt-sub', t('hudChrome.professions.toolEffectTooltip.openProfessions'))
-  );
+  if (!isToolEffectItem(item)) return '';
+  return toolEffectBodyLines(item.use.effectId);
 }

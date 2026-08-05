@@ -2623,16 +2623,16 @@ export const ru_RU: EnTranslations = {
         "quickeningCharm": "Оберег возрождения"
       },
       "toolEffectTooltip": {
-        "kind": "Tool charm",
+        "kind": "Талисман для инструмента",
         "bonus": {
-          "gatherersCache": "+1 yield per harvest while charged.",
-          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
-          "quickeningCharm": "Shortens the node respawn timer it triggers."
+          "gatherersCache": "Пока есть заряды, каждый сбор приносит +1 к добыче.",
+          "artisansEye": "Пока есть заряды, повышает класс добычи на 1 уровень инструмента.",
+          "quickeningCharm": "Сокращает таймер возрождения источника, на котором сработал."
         },
-        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
-        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
-        "landOnly": "Does not slot on fishing rods.",
-        "openProfessions": "Open Professions to slot this onto a gathering tool."
+        "howToSlot": "Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.",
+        "charges": "На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).",
+        "landOnly": "На удочку не устанавливается.",
+        "openProfessions": "Откройте окно профессий, чтобы установить талисман на инструмент для сбора."
       },
       "toolEffectSlotButton": "Установить {effect}",
       "toolEffectRechargeButton": "Перезарядить",

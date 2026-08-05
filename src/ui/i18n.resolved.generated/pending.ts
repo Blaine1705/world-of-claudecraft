@@ -70,46 +70,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.landOnly",
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
-  "zh_CN": [
-    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
-    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
-    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
-    "hudChrome.professions.toolEffectTooltip.charges",
-    "hudChrome.professions.toolEffectTooltip.howToSlot",
-    "hudChrome.professions.toolEffectTooltip.kind",
-    "hudChrome.professions.toolEffectTooltip.landOnly",
-    "hudChrome.professions.toolEffectTooltip.openProfessions"
-  ],
-  "zh_TW": [
-    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
-    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
-    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
-    "hudChrome.professions.toolEffectTooltip.charges",
-    "hudChrome.professions.toolEffectTooltip.howToSlot",
-    "hudChrome.professions.toolEffectTooltip.kind",
-    "hudChrome.professions.toolEffectTooltip.landOnly",
-    "hudChrome.professions.toolEffectTooltip.openProfessions"
-  ],
-  "ko_KR": [
-    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
-    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
-    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
-    "hudChrome.professions.toolEffectTooltip.charges",
-    "hudChrome.professions.toolEffectTooltip.howToSlot",
-    "hudChrome.professions.toolEffectTooltip.kind",
-    "hudChrome.professions.toolEffectTooltip.landOnly",
-    "hudChrome.professions.toolEffectTooltip.openProfessions"
-  ],
-  "ja_JP": [
-    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
-    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
-    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
-    "hudChrome.professions.toolEffectTooltip.charges",
-    "hudChrome.professions.toolEffectTooltip.howToSlot",
-    "hudChrome.professions.toolEffectTooltip.kind",
-    "hudChrome.professions.toolEffectTooltip.landOnly",
-    "hudChrome.professions.toolEffectTooltip.openProfessions"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
@@ -120,16 +84,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.professions.toolEffectTooltip.landOnly",
     "hudChrome.professions.toolEffectTooltip.openProfessions"
   ],
-  "ru_RU": [
-    "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
-    "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",
-    "hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm",
-    "hudChrome.professions.toolEffectTooltip.charges",
-    "hudChrome.professions.toolEffectTooltip.howToSlot",
-    "hudChrome.professions.toolEffectTooltip.kind",
-    "hudChrome.professions.toolEffectTooltip.landOnly",
-    "hudChrome.professions.toolEffectTooltip.openProfessions"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.professions.toolEffectTooltip.bonus.artisansEye",
     "hudChrome.professions.toolEffectTooltip.bonus.gatherersCache",

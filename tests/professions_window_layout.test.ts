@@ -27,6 +27,9 @@ vi.mock('../src/ui/icons', () => ({
   // Echo the requested id into the URL so painter tests catch a wrong or
   // hardcoded profession/gathering resolver argument.
   professionIconUrl: (id: string) => `/test-professions/${id}.webp`,
+  // The tool-effect hover card (tool_effect_tooltip.ts) colors its title by
+  // item quality; mirror the record so wiring the card does not crash here.
+  QUALITY_COLOR: { common: '#ffffff', uncommon: '#1eff00', rare: '#0070dd', epic: '#a335ee' },
 }));
 
 interface WorldState {
@@ -651,6 +654,101 @@ describe('ProfessionsWindow: the slotted tool effect row', () => {
     const toollessState = slotted({ charges: 3, maxCharges: 20 });
     const { el: toollessEl } = makeWindow(toollessState);
     expect(toollessEl.querySelector('[data-recharge-profession]')).toBeNull();
+  });
+});
+
+describe('ProfessionsWindow: tool-effect hover cards', () => {
+  const slotted = (over: Record<string, unknown> = {}) => {
+    const state = baseState();
+    state.toolEffects = [
+      {
+        professionId: 'mining',
+        effectId: 'gatherers_cache',
+        charges: 12,
+        maxCharges: 30,
+        confirmMode: 'always',
+        ...over,
+      } as WorldState['toolEffects'] extends (infer R)[] | undefined ? R : never,
+    ];
+    return state;
+  };
+
+  it('a live effect row mints data-effect-tip, joins the tab order, and attaches the charm card', () => {
+    const attached: { el: HTMLElement; html: () => string }[] = [];
+    const { el } = makeWindow(slotted(), {
+      attachTooltip: (target, html) => attached.push({ el: target, html }),
+    });
+    const row = el.querySelector<HTMLElement>('.prof-effect');
+    expect(row?.getAttribute('data-effect-tip')).toBe('gatherers_cache');
+    // The row is a div, so without a tab stop the card would be mouse-only;
+    // once the charm is slotted and no spare is carried this row is the only
+    // surface still explaining the bonus.
+    expect(row?.getAttribute('tabindex')).toBe('0');
+    const card = attached.find((a) => a.el === row);
+    expect(card).toBeDefined();
+    const html = card?.html() ?? '';
+    expect(html).toContain('Gatherer&#39;s Cache');
+    expect(html).toContain('Tool charm');
+    expect(html).toContain('+1 yield per harvest while charged.');
+    // The standalone card never tells the player to open the window they are in.
+    expect(html).not.toContain('Open Professions to slot this');
+  });
+
+  it('a slot button attaches the same standalone card for its own effect', () => {
+    const state = baseState();
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const attached: { el: HTMLElement; html: () => string }[] = [];
+    const { el } = makeWindow(state, {
+      attachTooltip: (target, html) => attached.push({ el: target, html }),
+    });
+    const button = el.querySelector<HTMLElement>('[data-slot-effect]');
+    const card = attached.find((a) => a.el === button);
+    expect(card).toBeDefined();
+    const html = card?.html() ?? '';
+    expect(html).toContain('Artisan&#39;s Eye');
+    expect(html).toContain('Raises the harvest grade by 1 tool tier while charged.');
+  });
+
+  it('a peeked long-press release inspects: it never slots and never recharges', () => {
+    // The TouchPeekGuard contract (touch_peek.ts): showing the hover card on
+    // a touch hold means the release click must be swallowed, or reading
+    // what a charm does would BURN the charm (slot) or spend materials
+    // (recharge). Both handlers consume the peek before acting.
+    const state = slotted({ charges: 3, maxCharges: 20 });
+    state.inventory = [
+      { itemId: 'copper_mining_pick', count: 1 },
+      { itemId: 'artisans_eye', count: 1 },
+    ];
+    const slots: string[] = [];
+    const recharges: string[] = [];
+    const worldOver = () =>
+      ({
+        craftingIdentity: state.identity,
+        professionsState: { skills: state.gathering },
+        toolEffectSlots: state.toolEffects,
+        inventory: state.inventory,
+        player: { name: 'Testchar' },
+        slotToolEffect: (professionId: string) => {
+          slots.push(professionId);
+        },
+        rechargeToolEffect: (professionId: string) => {
+          recharges.push(professionId);
+        },
+      }) as never;
+    const peeked = makeWindow(state, { world: worldOver, consumePeek: () => true });
+    peeked.el.querySelector<HTMLElement>('[data-slot-effect]')?.click();
+    peeked.el.querySelector<HTMLElement>('[data-recharge-profession]')?.click();
+    expect(slots).toEqual([]);
+    expect(recharges).toEqual([]);
+    // The other arm: a plain tap / desktop click (no peek) still acts.
+    const tapped = makeWindow(state, { world: worldOver, consumePeek: () => false });
+    tapped.el.querySelector<HTMLElement>('[data-slot-effect]')?.click();
+    tapped.el.querySelector<HTMLElement>('[data-recharge-profession]')?.click();
+    expect(slots).toEqual(['mining']);
+    expect(recharges).toEqual(['mining']);
   });
 });
 

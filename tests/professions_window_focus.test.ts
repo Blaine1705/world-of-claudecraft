@@ -18,6 +18,9 @@ vi.mock('../src/ui/icons', () => ({
   // Echo the requested id into the URL so painter tests catch a wrong or
   // hardcoded profession/gathering resolver argument.
   professionIconUrl: (id: string) => `/test-professions/${id}.webp`,
+  // The tool-effect hover card (tool_effect_tooltip.ts) colors its title by
+  // item quality; mirror the record so wiring the card does not crash here.
+  QUALITY_COLOR: { common: '#ffffff', uncommon: '#1eff00', rare: '#0070dd', epic: '#a335ee' },
 }));
 
 interface WorldState {

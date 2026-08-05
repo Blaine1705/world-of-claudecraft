@@ -2623,16 +2623,16 @@ export const ja_JP: EnTranslations = {
         "quickeningCharm": "早戻りの護符"
       },
       "toolEffectTooltip": {
-        "kind": "Tool charm",
+        "kind": "道具用の護符",
         "bonus": {
-          "gatherersCache": "+1 yield per harvest while charged.",
-          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
-          "quickeningCharm": "Shortens the node respawn timer it triggers."
+          "gatherersCache": "充填中は採集ごとに産出+1。",
+          "artisansEye": "充填中は収穫の品質がツール1段階ぶん上がる。",
+          "quickeningCharm": "発動した資源ノードの再生タイマーを短縮する。"
         },
-        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
-        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
-        "landOnly": "Does not slot on fishing rods.",
-        "openProfessions": "Open Professions to slot this onto a gathering tool."
+        "howToSlot": "専門技能ウィンドウから採掘・伐採・薬草学のツールに装着する。装着すると消費される。",
+        "charges": "コモン品質のツールでは{base}回の充填から始まる（レア度が1段階上がるごとに+{bonus}回）。",
+        "landOnly": "釣り竿には装着できない。",
+        "openProfessions": "専門技能ウィンドウを開き、採集ツールに装着しよう。"
       },
       "toolEffectSlotButton": "{effect}を装着",
       "toolEffectRechargeButton": "再充填",

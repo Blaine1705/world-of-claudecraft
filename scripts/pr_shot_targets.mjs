@@ -3915,6 +3915,79 @@ export const TARGETS = [
     },
   },
   {
+    key: 'tool-charm-cards',
+    label: 'Tool charm explainer cards: bag item tooltip and Professions live-row hover card',
+    when: ['src/ui/tool_effect_tooltip.ts'],
+    variants: [{ key: 'bag-tooltip' }, { key: 'professions-live-row' }],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+      });
+      await wait(300);
+      if (variant?.key === 'bag-tooltip') {
+        // Grant the charm, open bags, hover its row: the tooltip card is the
+        // whole change, so the clip is the shared #tooltip box itself.
+        await page.evaluate(() => {
+          const game = window.__game;
+          if (!game) return;
+          try {
+            game.sim?.addItem('gatherers_cache', 1);
+          } catch {}
+          const el = document.querySelector('#bags');
+          if (el) el.style.display = 'none';
+          game.hud.toggleBags?.();
+        });
+        await wait(700);
+        const hovered = await page.evaluate(() => {
+          const rows = [...document.querySelectorAll('#bags .bag-item')];
+          const row = rows.find((r) => r.classList.contains('q-rare'));
+          if (!row) return false;
+          row.dispatchEvent(new MouseEvent('mouseenter'));
+          return true;
+        });
+        if (!hovered) throw new Error('charm bag row not found to hover');
+        await wait(400);
+        return { clip: '#tooltip' };
+      }
+      // The live-row card: stage a slotted effect through the IWorld read (the
+      // professions target's renown-board precedent), open the window, hover
+      // the row the wiring marked with data-effect-tip.
+      await page.evaluate(() => {
+        const game = window.__game;
+        if (!game) return;
+        Object.defineProperty(game.world, 'toolEffectSlots', {
+          value: [
+            {
+              professionId: 'mining',
+              effectId: 'gatherers_cache',
+              charges: 12,
+              maxCharges: 30,
+              confirmMode: 'always',
+            },
+          ],
+          configurable: true,
+        });
+        const el = document.querySelector('#professions-window');
+        if (el) el.style.display = 'none';
+        game.hud.toggleProfessions?.();
+      });
+      const open = await pollForSize(page, '#professions-window');
+      if (!open) throw new Error('professions window did not open');
+      const hovered = await page.evaluate(() => {
+        const row = document.querySelector('#professions-window [data-effect-tip]');
+        if (!row) return false;
+        row.scrollIntoView({ block: 'center' });
+        row.dispatchEvent(new MouseEvent('mouseenter'));
+        return true;
+      });
+      if (!hovered) throw new Error('live effect row with data-effect-tip not found');
+      await wait(400);
+      return { clip: '#tooltip' };
+    },
+  },
+  {
     key: 'vendor-tool-gate',
     label: 'Vendor goods: advisory wield-requirement lines on the tool ladder (R22)',
     when: [
