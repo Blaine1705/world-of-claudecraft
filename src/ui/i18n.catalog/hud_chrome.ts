@@ -3704,7 +3704,19 @@ export const hudChromeStrings = {
     pageComplete: 'Illuminated',
     clearsLabel: '{count} clears',
     backToShelf: 'Back to shelf',
+    // Phase 4 stub copy retained for locale back-compat; the page view paints a grid.
     pageStubNote: 'The full relic grid arrives in a later update. Progress above is live.',
+    // Phase 5: page grid, live unlock toast, Illumination celebration.
+    gridAria: 'Relics on {name}',
+    pageProgressAria: 'Page progress: {owned} of {total} relics filled',
+    cellOwnedAria: '{name}, catalogued',
+    cellMissingAria: '{name}, not yet found',
+    ownedTooltipStatus: 'Catalogued in The Reliquary',
+    missingTooltipStatus: 'Not yet found',
+    firstFindClears: 'First found on clear {count}',
+    unlockToast: 'Relic catalogued: {name}',
+    illuminateBanner: 'Page illuminated: {name}',
+    illuminateToast: 'Every relic on {name} is filled.',
   },
   deeds: {
     title: 'Book of Deeds',

@@ -2984,7 +2984,17 @@ export const en_XA: EnTranslations = {
       "pageComplete": "[Íļļúɱíñáţéð]",
       "clearsLabel": "[{count} çļéáŕš]",
       "backToShelf": "[Ɓáçķ ţó šĥéļƒ]",
-      "pageStubNote": "[Ţĥé ƒúļļ ŕéļíç ĝŕíð áŕŕíʋéš íñ á ļáţéŕ úþðáţé. Þŕóĝŕéšš áƀóʋé íš ļíʋé.]"
+      "pageStubNote": "[Ţĥé ƒúļļ ŕéļíç ĝŕíð áŕŕíʋéš íñ á ļáţéŕ úþðáţé. Þŕóĝŕéšš áƀóʋé íš ļíʋé.]",
+      "gridAria": "[Ŕéļíçš óñ {name}]",
+      "pageProgressAria": "[Þáĝé þŕóĝŕéšš: {owned} óƒ {total} ŕéļíçš ƒíļļéð]",
+      "cellOwnedAria": "[{name}, çáţáļóĝúéð]",
+      "cellMissingAria": "[{name}, ñóţ ýéţ ƒóúñð]",
+      "ownedTooltipStatus": "[Çáţáļóĝúéð íñ Ţĥé Ŕéļíɋúáŕý]",
+      "missingTooltipStatus": "[Ñóţ ýéţ ƒóúñð]",
+      "firstFindClears": "[Ƒíŕšţ ƒóúñð óñ çļéáŕ {count}]",
+      "unlockToast": "[Ŕéļíç çáţáļóĝúéð: {name}]",
+      "illuminateBanner": "[Þáĝé íļļúɱíñáţéð: {name}]",
+      "illuminateToast": "[Éʋéŕý ŕéļíç óñ {name} íš ƒíļļéð.]"
     },
     "deeds": {
       "title": "[Ɓóóķ óƒ Ðééðš]",

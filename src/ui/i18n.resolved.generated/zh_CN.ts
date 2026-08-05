@@ -2984,7 +2984,17 @@ export const zh_CN: EnTranslations = {
       "pageComplete": "已点亮",
       "clearsLabel": "{count} 次通关",
       "backToShelf": "返回书架",
-      "pageStubNote": "完整圣物网格将在后续更新中到来。上方进度已生效。"
+      "pageStubNote": "完整圣物网格将在后续更新中到来。上方进度已生效。",
+      "gridAria": "{name} 的圣物",
+      "pageProgressAria": "页面进度：已填入 {owned}/{total} 件圣物",
+      "cellOwnedAria": "{name}，已收录",
+      "cellMissingAria": "{name}，尚未获得",
+      "ownedTooltipStatus": "已收录于圣物库",
+      "missingTooltipStatus": "尚未获得",
+      "firstFindClears": "首次获得于第 {count} 次通关",
+      "unlockToast": "圣物已收录：{name}",
+      "illuminateBanner": "页面已点亮：{name}",
+      "illuminateToast": "{name} 上的每一件圣物均已填满。"
     },
     "deeds": {
       "title": "功绩之书",

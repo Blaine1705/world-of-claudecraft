@@ -26,13 +26,14 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 4 QA green (window shell + Overview verified).
+- **Current phase:** Phase 5 implementation complete (page grids, silhouettes,
+  live unlock UX, Illumination).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 5 (page grids, silhouettes, live unlock
-  UX, Illumination). Do **not** skip the release pull.
+  `origin/release/v0.35.0`, then Phase 5 QA. Do **not** skip the release pull.
+  Do **not** start Phase 6 until Phase 5 QA is green.
 - **Blocker:** none.
-- **Release tip at Phase 4 QA:** `5e83ba89d0` (already up to date with
-  origin/release/v0.35.0 at Phase 4 QA start).
+- **Release tip at Phase 5 start:** merged `origin/release/v0.35.0` to
+  `93863f9a95` (material-usedby-tooltip and related release commits).
 
 ## Locked design decisions
 
@@ -108,12 +109,15 @@ session load:
 | `IWorldReliquary` | `src/world_api/reliquary.ts` | **landed** |
 | `reliq` wire key | `server/game.ts` / `src/net/online.ts` | **landed** (heavy-gated sparse) |
 | `reliquaryWireBlob` | `src/sim/reliquary.ts` | **landed** |
-| `buildReliquaryView` / `reliquaryRefreshSig` | `src/ui/reliquary_view.ts` | **landed** (UI_PURE_CORES) |
-| `ReliquaryWindow` | `src/ui/reliquary_window.ts` | **landed** (cold; Overview + shelf stubs) |
-| `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | **landed** (English chrome keys) |
+| `buildReliquaryView` / `reliquaryRefreshSig` | `src/ui/reliquary_view.ts` | **landed** (UI_PURE_CORES; Phase 5 grid + unlock plan) |
+| `buildReliquaryPageCells` / `buildReliquaryUnlockPlan` | `src/ui/reliquary_view.ts` | **landed** (Phase 5) |
+| `reliquaryOwnershipDigest` | `src/ui/reliquary_view.ts` | **landed** (Phase 5 open-window grid live) |
+| `ReliquaryWindow` | `src/ui/reliquary_window.ts` | **landed** (cold; Overview + page grids) |
+| Hud `handleReliquaryUnlocks` | `src/ui/hud.ts` | **landed** (presentation toast + Illumination) |
+| `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | **landed** (English chrome keys + Phase 5 unlock/grid) |
 | Keybind `reliquary` | `src/game/keybinds.ts` | **landed** (default Shift+KeyX) |
 | Options BIND map | `src/ui/options_window.ts` `BIND_ACTION_LABEL_KEYS.reliquary` | **landed** (Phase 4 QA) |
-| M16 non-Latin chrome | `src/ui/i18n.locales/{zh_CN,zh_TW,ja_JP,ko_KR,ru_RU}.ts` | **landed** (wordy reliquary keys) |
+| M16 non-Latin chrome | `src/ui/i18n.locales/{zh_CN,zh_TW,ja_JP,ko_KR,ru_RU}.ts` | **landed** (Phase 4 + Phase 5 wordy keys) |
 
 ## Validation matrix (default commands)
 
@@ -138,6 +142,7 @@ session load:
 - [x] Content pins prevent unbounded auto-scrape of entire loot tables (Phase 2)
 - [x] Wire event id-only; sparse blob dirty-gated (Phase 3)
 - [x] Cold window: signature latch; no per-frame full rebuild (Phase 4)
+- [x] Open-window grid live: ownershipDigest + clearsDigest in refresh sig (Phase 5)
 
 ## Gotchas
 

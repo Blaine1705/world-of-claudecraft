@@ -2984,7 +2984,17 @@ export const ru_RU: EnTranslations = {
       "pageComplete": "Озарено",
       "clearsLabel": "Прохождений: {count}",
       "backToShelf": "Назад к полке",
-      "pageStubNote": "Полная сетка реликвий появится в следующем обновлении. Прогресс выше уже актуален."
+      "pageStubNote": "Полная сетка реликвий появится в следующем обновлении. Прогресс выше уже актуален.",
+      "gridAria": "Реликвии на странице {name}",
+      "pageProgressAria": "Прогресс страницы: {owned} из {total} реликвий",
+      "cellOwnedAria": "{name}, каталогизировано",
+      "cellMissingAria": "{name}, ещё не найдено",
+      "ownedTooltipStatus": "Каталогизировано в Реликварие",
+      "missingTooltipStatus": "Ещё не найдено",
+      "firstFindClears": "Впервые найдено на прохождении {count}",
+      "unlockToast": "Реликвия каталогизирована: {name}",
+      "illuminateBanner": "Страница озарена: {name}",
+      "illuminateToast": "Все реликвии на странице {name} заполнены."
     },
     "deeds": {
       "title": "Книга деяний",

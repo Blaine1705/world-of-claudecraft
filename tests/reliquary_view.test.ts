@@ -1,14 +1,18 @@
 // Unit tests for The Reliquary pure view-core (src/ui/reliquary_view.ts):
 // empty state, progress totals, curator rank, recent newest-first, nearly-
-// complete ranking, shelf nav counts, page stubs, and the refresh signature.
+// complete ranking, shelf nav counts, page grids, unlock/Illumination plan,
+// and the refresh signature (including ownershipDigest).
 import { describe, expect, it } from 'vitest';
 import type { ReliquaryPageDef } from '../src/sim/content/reliquary';
 import {
+  buildReliquaryPageCells,
+  buildReliquaryUnlockPlan,
   buildReliquaryView,
   isReliquaryNavId,
   RELIQUARY_NAV,
   RELIQUARY_NEARLY_MAX,
   type ReliquaryViewInput,
+  reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
 } from '../src/ui/reliquary_view';
@@ -343,7 +347,7 @@ describe('buildReliquaryView shelf and page', () => {
     expect(setPage?.clears).toBeUndefined();
   });
 
-  it('resolves an active page stub', () => {
+  it('resolves an active page stub and pageDetail grid', () => {
     const model = buildReliquaryView(
       input({
         nav: 'conquerors',
@@ -358,6 +362,14 @@ describe('buildReliquaryView shelf and page', () => {
       total: 3,
       complete: true,
     });
+    expect(model.pageDetail).toMatchObject({
+      pageId: 'crypt_n',
+      illuminated: true,
+      owned: 3,
+      total: 3,
+    });
+    expect(model.pageDetail?.cells).toHaveLength(3);
+    expect(model.pageDetail?.cells.every((c) => c.owned)).toBe(true);
   });
 
   it('resolves activePage from full catalog when nav is overview', () => {
@@ -401,6 +413,159 @@ describe('buildReliquaryView shelf and page', () => {
   });
 });
 
+describe('page grid cells', () => {
+  it('lists owned vs missing in catalog order with firstFind clears on owned items', () => {
+    const page = TEST_PAGES[0];
+    const cells = buildReliquaryPageCells(page, {
+      itemsDiscovered: ownedSet('crypt_helm', 'crypt_ring'),
+      firstFind: { crypt_helm: { clears: 4, pageId: 'crypt_n' } },
+    });
+    expect(
+      cells.map((c) => ({ id: c.id, owned: c.owned, firstFindClears: c.firstFindClears })),
+    ).toEqual([
+      { id: 'crypt_helm', owned: true, firstFindClears: 4 },
+      { id: 'crypt_blade', owned: false, firstFindClears: undefined },
+      { id: 'crypt_ring', owned: true, firstFindClears: undefined },
+    ]);
+    expect(cells.map((c) => c.index)).toEqual([0, 1, 2]);
+  });
+
+  it('does not invent firstFind clears for missing or retro-owned relics', () => {
+    const page = TEST_PAGES[0];
+    // Retro: owned via discovery but no firstFind entry (no invented clear history).
+    const cells = buildReliquaryPageCells(page, {
+      itemsDiscovered: ownedSet('crypt_helm'),
+      firstFind: {},
+    });
+    expect(cells[0].id).toBe('crypt_helm');
+    expect(cells[0].owned).toBe(true);
+    expect(cells[0].firstFindClears).toBeUndefined();
+    // firstFind without ownership must not mark owned.
+    const spoof = buildReliquaryPageCells(page, {
+      itemsDiscovered: ownedSet(),
+      firstFind: { crypt_blade: { clears: 99 } },
+    });
+    const blade = spoof.find((c) => c.id === 'crypt_blade');
+    expect(blade?.owned).toBe(false);
+    expect(blade?.firstFindClears).toBeUndefined();
+  });
+
+  it('pageDetail is null without a page selection and fills on selection', () => {
+    expect(buildReliquaryView(input({ nav: 'conquerors' })).pageDetail).toBeNull();
+    const open = buildReliquaryView(
+      input({
+        nav: 'conquerors',
+        pageId: 'crypt_n',
+        itemsDiscovered: ownedSet('crypt_helm'),
+      }),
+    );
+    expect(open.pageDetail?.cells).toHaveLength(3);
+    expect(open.pageDetail?.cells.filter((c) => c.owned)).toHaveLength(1);
+    expect(open.pageDetail?.illuminated).toBe(false);
+  });
+
+  it('marks complete pages illuminated without inventing membership from marks alone', () => {
+    const complete = buildReliquaryView(
+      input({
+        nav: 'conquerors',
+        pageId: 'crypt_n',
+        itemsDiscovered: ownedSet('crypt_helm', 'crypt_blade', 'crypt_ring'),
+        marks: ownedSet('mw_a'),
+      }),
+    );
+    expect(complete.pageDetail?.illuminated).toBe(true);
+    // Catalog progress stays item-only.
+    expect(complete.progress.owned).toBe(3);
+
+    // Marks on another shelf cannot force a conqueror page Illumination.
+    const incomplete = buildReliquaryView(
+      input({
+        nav: 'conquerors',
+        pageId: 'crypt_n',
+        itemsDiscovered: ownedSet('crypt_helm'),
+        marks: ownedSet('mw_a'),
+      }),
+    );
+    expect(incomplete.pageDetail?.illuminated).toBe(false);
+    expect(incomplete.pageDetail?.owned).toBe(1);
+  });
+});
+
+describe('buildReliquaryUnlockPlan', () => {
+  it('logs every unlock and coalesces the banner to the last plain unlock', () => {
+    const plan = buildReliquaryUnlockPlan(
+      [{ itemId: 'a' }, { itemId: 'b' }, { markId: 'mw_a' }],
+      false,
+    );
+    expect(plan.logs).toEqual([
+      { kind: 'item', id: 'a' },
+      { kind: 'item', id: 'b' },
+      { kind: 'mark', id: 'mw_a' },
+    ]);
+    expect(plan.banner).toEqual({ kind: 'unlock', relic: { kind: 'mark', id: 'mw_a' } });
+    expect(plan.playSound).toBe(true);
+    expect(plan.motion).toBe(true);
+    expect(plan.refreshWindow).toBe(true);
+    expect(plan.illuminatedPageId).toBeNull();
+  });
+
+  it('lets Illumination outrank a plain unlock for the banner slot', () => {
+    const illuminateFirst = buildReliquaryUnlockPlan(
+      [{ itemId: 'a', illuminatedPageId: 'crypt_n' }, { itemId: 'b' }],
+      false,
+    );
+    // Log still carries every unlock; banner stays Illumination from the first.
+    expect(illuminateFirst.logs).toHaveLength(2);
+    expect(illuminateFirst.banner).toEqual({ kind: 'illuminate', pageId: 'crypt_n' });
+    expect(illuminateFirst.illuminatedPageId).toBe('crypt_n');
+
+    // Plain-then-Illumination: Illumination must replace an existing unlock banner
+    // (not only keep a slot it already holds).
+    const illuminateLast = buildReliquaryUnlockPlan(
+      [{ itemId: 'b' }, { itemId: 'a', illuminatedPageId: 'crypt_n' }],
+      false,
+    );
+    expect(illuminateLast.banner).toEqual({ kind: 'illuminate', pageId: 'crypt_n' });
+    expect(illuminateLast.illuminatedPageId).toBe('crypt_n');
+  });
+
+  it('later Illumination replaces an earlier one; last illuminatedPageId wins', () => {
+    const plan = buildReliquaryUnlockPlan(
+      [
+        { itemId: 'a', illuminatedPageId: 'crypt_n' },
+        { itemId: 'b', illuminatedPageId: 'sanctum_n' },
+      ],
+      false,
+    );
+    expect(plan.banner).toEqual({ kind: 'illuminate', pageId: 'sanctum_n' });
+    expect(plan.illuminatedPageId).toBe('sanctum_n');
+  });
+
+  it('skips empty payloads and never invents membership from pageIds alone', () => {
+    const plan = buildReliquaryUnlockPlan(
+      [{ pageIds: ['crypt_n'], illuminatedPageId: 'crypt_n' }, {}],
+      false,
+    );
+    expect(plan.logs).toEqual([]);
+    expect(plan.banner).toBeNull();
+    expect(plan.playSound).toBe(false);
+    expect(plan.refreshWindow).toBe(false);
+    expect(plan.illuminatedPageId).toBeNull();
+  });
+
+  it('reducedMotion trims motion only (log, banner, sound survive)', () => {
+    const plan = buildReliquaryUnlockPlan([{ itemId: 'crypt_helm' }], true);
+    expect(plan.logs).toEqual([{ kind: 'item', id: 'crypt_helm' }]);
+    expect(plan.banner).toEqual({
+      kind: 'unlock',
+      relic: { kind: 'item', id: 'crypt_helm' },
+    });
+    expect(plan.playSound).toBe(true);
+    expect(plan.motion).toBe(false);
+    expect(plan.refreshWindow).toBe(true);
+  });
+});
+
 describe('reliquaryRefreshSig', () => {
   it('elides when every dimension is equal', () => {
     const a = reliquaryRefreshSig({
@@ -434,6 +599,7 @@ describe('reliquaryRefreshSig', () => {
       nav: 'overview' as const,
       pageId: null as string | null,
       clearsDigest: 0,
+      ownershipDigest: 0,
     };
     const baseSig = reliquaryRefreshSig(base);
     expect(reliquaryRefreshSig({ ...base, owned: 3 })).not.toBe(baseSig);
@@ -444,6 +610,17 @@ describe('reliquaryRefreshSig', () => {
     expect(reliquaryRefreshSig({ ...base, pageId: 'crypt_n' })).not.toBe(baseSig);
     expect(reliquaryRefreshSig({ ...base, marksSize: 1 })).not.toBe(baseSig);
     expect(reliquaryRefreshSig({ ...base, clearsDigest: 1 })).not.toBe(baseSig);
+    expect(reliquaryRefreshSig({ ...base, ownershipDigest: 1 })).not.toBe(baseSig);
+  });
+
+  it('reliquaryOwnershipDigest moves on discovered size, firstFind, or pageOwned', () => {
+    const base = { discoveredSize: 3, marksSize: 0, firstFindCount: 1, pageOwned: 1 };
+    const baseD = reliquaryOwnershipDigest(base);
+    expect(reliquaryOwnershipDigest({ ...base, discoveredSize: 4 })).not.toBe(baseD);
+    expect(reliquaryOwnershipDigest({ ...base, firstFindCount: 2 })).not.toBe(baseD);
+    expect(reliquaryOwnershipDigest({ ...base, pageOwned: 2 })).not.toBe(baseD);
+    expect(reliquaryOwnershipDigest({ ...base, marksSize: 1 })).not.toBe(baseD);
+    expect(reliquaryOwnershipDigest(base)).toBe(baseD);
   });
 
   it('reliquaryRecentSig preserves order and joins with unit separator', () => {

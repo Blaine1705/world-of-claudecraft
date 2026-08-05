@@ -7676,11 +7676,18 @@
     gap: 8px;
     flex-wrap: wrap;
   }
-  .reliquary-page-stub {
+  .reliquary-page-stub,
+  .reliquary-page-detail {
     display: flex;
     flex-direction: column;
     gap: 8px;
     padding: 4px 2px 8px;
+  }
+  .reliquary-page-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
   }
   .reliquary-page-title {
     margin: 0;
@@ -7688,12 +7695,78 @@
     font-size: 16px;
     color: var(--gold);
   }
+  .reliquary-page-progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .reliquary-page-bar {
+    width: 140px;
+    max-width: 100%;
+  }
   .reliquary-page-progress,
   .reliquary-page-clears,
   .reliquary-page-stub-note {
     margin: 0;
     font-size: 13px;
     color: var(--gold-dim);
+  }
+  .reliquary-page-detail.is-illuminated .reliquary-page-illuminated {
+    letter-spacing: 0.06em;
+  }
+  /* Page relic grid: owned art vs quality silhouettes. Tokens only; no
+     raw hex on the focus ring. Touch targets meet the 40px mobile floor. */
+  .reliquary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(56px, 1fr));
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .reliquary-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    min-width: 48px;
+    min-height: 48px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 6px;
+    background: var(--color-surface-inset, #171309);
+    cursor: var(--cursor-point);
+    outline: none;
+  }
+  .reliquary-cell:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .reliquary-cell-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .reliquary-cell-art .item-icon {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
+  }
+  .reliquary-cell--owned {
+    box-shadow: inset 0 0 0 1px var(--color-border-active, #6a5320);
+  }
+  .reliquary-cell--missing {
+    opacity: 0.72;
+  }
+  .reliquary-cell--missing .item-icon {
+    filter: brightness(0.18) contrast(1.1);
+    opacity: 0.9;
+  }
+  body.mobile-touch .reliquary-cell {
+    min-width: 44px;
+    min-height: 44px;
   }
   .reliquary-empty {
     padding: 16px 8px;

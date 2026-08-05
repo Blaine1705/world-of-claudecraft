@@ -4066,6 +4066,18 @@
       gap: 4px;
     }
   }
+  body.mobile-touch #reliquary-window .reliquary-grid {
+    grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+    gap: 6px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-cell {
+    min-width: 48px;
+    min-height: 48px;
+  }
+  body.mobile-touch #reliquary-window .reliquary-page-bar {
+    width: 100%;
+    max-width: 220px;
+  }
   /* ---------- mobile professions (standalone window) ---------- */
   /* The Professions window follows the deeds/bank STANDALONE full-screen
      convention on touch (no companion panel, so no 50/50 pairing): fixed

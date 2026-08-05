@@ -2984,7 +2984,17 @@ export const ja_JP: EnTranslations = {
       "pageComplete": "照耀済み",
       "clearsLabel": "クリア {count} 回",
       "backToShelf": "棚に戻る",
-      "pageStubNote": "完全な聖遺物グリッドは今後の更新で追加されます。上の進捗は反映済みです。"
+      "pageStubNote": "完全な聖遺物グリッドは今後の更新で追加されます。上の進捗は反映済みです。",
+      "gridAria": "{name} の聖遺物",
+      "pageProgressAria": "ページ進捗：聖遺物 {owned}/{total} 埋め済み",
+      "cellOwnedAria": "{name}、収蔵済み",
+      "cellMissingAria": "{name}、未発見",
+      "ownedTooltipStatus": "聖遺物庫に収蔵済み",
+      "missingTooltipStatus": "まだ見つかっていません",
+      "firstFindClears": "初回入手：クリア {count} 回目",
+      "unlockToast": "聖遺物を収蔵：{name}",
+      "illuminateBanner": "ページが照耀されました：{name}",
+      "illuminateToast": "{name} の聖遺物がすべて埋まりました。"
     },
     "deeds": {
       "title": "功績の書",

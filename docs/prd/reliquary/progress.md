@@ -16,8 +16,8 @@
 | 3 QA | **done** | exit criteria verified; pin defects fixed; release @ 5e83ba89d0 |
 | 4 Window shell + Overview | **done** | pure view + cold window, Overview, shelf chrome, keybind Shift+X, minimap/More, i18n English |
 | 4 QA | **done** | exit criteria verified; M16 + Options keybind defects fixed; release @ 5e83ba89d0 |
-| 5 Page grids + live UX | pending | same worktree + pull |
-| 5 QA | pending | same worktree + pull |
+| 5 Page grids + live UX | **done** | grid cells, silhouettes, unlock toast, Illumination, ownershipDigest |
+| 5 QA | pending | same worktree + pull; next after implementation |
 | 6 Curator ranks + cosmetics | pending | same worktree + pull |
 | 6 QA | pending | same worktree + pull |
 | 7 Professions shelf | pending | same worktree + pull |
@@ -151,6 +151,26 @@
   not re-run (no sim path change). Manual open/Esc/mobile smoke not run
   (static + unit pins only).
 
+- Phase 5: merged `origin/release/v0.35.0` (material-usedby-tooltip) resolving
+  generated `pending.ts` via `i18n:gen`; tip `93863f9a95`. Green:
+  - `npx vitest run tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/hud_update_drive.test.ts tests/hud_perf_budget.test.ts tests/architecture.test.ts` (**193 passed**, 4 skipped)
+  - `npm run i18n:gen`
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  - biome on changed TS files
+  Landed: pure page grid cells + unlock/Illumination plan in `reliquary_view`,
+  cold page detail painter (owned art vs quality silhouettes, tooltips,
+  progress bar + clears, Illuminated badge), `ownershipDigest` in refresh sig,
+  thin Hud `handleReliquaryUnlocks` (toast + celebration banner + force open
+  window render), Phase 5 English chrome + M16 non-Latin fills, desktop +
+  mobile grid styles. No Curator cosmetics (Phase 6); no profession mark
+  authoring (Phase 7); SFX reuses `audio.achievement()` (no new sample assets).
+  Reviews (pre-commit): frontend-seam YELLOW (SHOULD-FIX: drop dead just-filled
+  CSS; page-name content i18n deferred as Phase 4); test-coverage BLOCKING/
+  SHOULD-FIX pins addressed (scoped CSS, Illumination order, HUD plan body,
+  firstFind + ownershipDigest wiring); qa-checklist READY for Phase 5 QA.
+  Commit: `ca54319fd7`.
+
 ## Surprises / decisions during implementation
 
 - Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
@@ -166,3 +186,13 @@
 - Phase 4: launcher uses `data-icon="crown"` (SVG glyph; no painted chrome webp yet).
 - Phase 4: page grids intentionally stub lists with live progress + clears;
   full silhouette grid is Phase 5.
+- Phase 5: missing cells paint the item icon under a silhouette filter (quality
+  border retained) so the grid reads as a museum silhouette, not an empty slot.
+- Phase 5: owned item tooltips reuse full `itemTooltip` (catalog stats) and
+  append first-find clear# when present; missing tips are name + status only
+  (no invented power).
+- Phase 5: Illumination celebration reuses the deed banner variant + achievement
+  sound; motion flag honors reduced-motion (information always survives).
+- Phase 5: page content names stay catalog English (same Phase 4 deferral;
+  content re-localize is not Phase 5 scope). Cell fill-flash CSS was dropped
+  rather than left unwired; celebration is banner + toast + sound.

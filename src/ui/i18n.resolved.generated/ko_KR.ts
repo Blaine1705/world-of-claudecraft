@@ -2984,7 +2984,17 @@ export const ko_KR: EnTranslations = {
       "pageComplete": "조명됨",
       "clearsLabel": "클리어 {count}회",
       "backToShelf": "선반으로 돌아가기",
-      "pageStubNote": "전체 성물 격자는 이후 업데이트에서 제공됩니다. 위 진행도는 이미 반영됩니다."
+      "pageStubNote": "전체 성물 격자는 이후 업데이트에서 제공됩니다. 위 진행도는 이미 반영됩니다.",
+      "gridAria": "{name}의 성물",
+      "pageProgressAria": "페이지 진행도: 성물 {owned}/{total} 채움",
+      "cellOwnedAria": "{name}, 수록됨",
+      "cellMissingAria": "{name}, 아직 없음",
+      "ownedTooltipStatus": "성물고에 수록됨",
+      "missingTooltipStatus": "아직 찾지 못함",
+      "firstFindClears": "첫 획득: 클리어 {count}회차",
+      "unlockToast": "성물 수록: {name}",
+      "illuminateBanner": "페이지 조명됨: {name}",
+      "illuminateToast": "{name}의 모든 성물이 채워졌습니다."
     },
     "deeds": {
       "title": "업적의 서",

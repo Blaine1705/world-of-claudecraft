@@ -53,8 +53,34 @@ describe('painter hygiene', () => {
     expect(code).toContain('const input = this.buildInput()');
     expect(code).toContain('const sig = this.sigFromInput(input)');
     expect(code).toContain('if (sig === this.lastSig) return');
-    // clearsDigest must be an argument to reliquaryRefreshSig (not only computed).
+    // clearsDigest + ownershipDigest must be arguments to reliquaryRefreshSig.
     expect(code).toMatch(/reliquaryRefreshSig\(\{[\s\S]*?clearsDigest[\s\S]*?\}\)/);
+    expect(code).toMatch(/reliquaryRefreshSig\(\{[\s\S]*?ownershipDigest[\s\S]*?\}\)/);
+    // Digest return value must feed the sig (not a discarded call).
+    expect(code).toMatch(
+      /const ownershipDigest = reliquaryOwnershipDigest\(\{[\s\S]*?discoveredSize[\s\S]*?firstFindCount[\s\S]*?pageOwned[\s\S]*?\}\)/,
+    );
+  });
+
+  it('paints a real page grid (owned vs missing cells) instead of a Phase 4 stub note', () => {
+    const code = painter
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
+    expect(painter).toContain('pageDetailHtml');
+    expect(painter).toContain('reliquary-grid');
+    // Class names are composed as reliquary-cell-- + owned|missing.
+    expect(painter).toContain('reliquary-cell--');
+    expect(painter).toMatch(/stateClass = cell\.owned \? 'owned' : 'missing'/);
+    // Active page path must not still ship the Phase 4 stub-only note.
+    const pageDetailFn = painter.match(
+      /private pageDetailHtml\([\s\S]*?\n {2}private [a-zA-Z]/,
+    )?.[0];
+    expect(pageDetailFn, 'pageDetailHtml present').toBeTruthy();
+    expect(pageDetailFn).not.toContain('pageStubNote');
+    expect(painter).toContain('attachTooltip');
+    // Live firstFind meta must feed the pure model (owned-cell clear# tooltips).
+    expect(code).toContain('firstFind: world.reliquaryFirstFind');
   });
 
   it('preserves scroll and restores focus across rebuilds', () => {
@@ -143,9 +169,36 @@ describe('entry HTML and i18n chrome', () => {
     expect(chrome).toContain("curatorUnranked: 'Unranked Curator'");
     expect(chrome).toContain("nearlyLabel: 'Nearly complete:'");
     expect(chrome).toContain('overviewEmpty:');
-    expect(chrome).toContain('pageStubNote:');
     expect(chrome).toContain("clearsLabel: '{count} clears'");
     expect(chrome).toContain("reliquary: 'Reliquary'");
+    // Phase 5 live UX chrome.
+    expect(chrome).toContain("unlockToast: 'Relic catalogued: {name}'");
+    expect(chrome).toContain("illuminateBanner: 'Page illuminated: {name}'");
+    expect(chrome).toContain("illuminateToast: 'Every relic on {name} is filled.'");
+    expect(chrome).toContain("ownedTooltipStatus: 'Catalogued in The Reliquary'");
+    expect(chrome).toContain("missingTooltipStatus: 'Not yet found'");
+    expect(chrome).toContain("firstFindClears: 'First found on clear {count}'");
+    expect(chrome).toContain("gridAria: 'Relics on {name}'");
+  });
+
+  it('wires reliquaryUnlock presentation through the pure plan (no membership invent)', () => {
+    expect(hud).toContain("case 'reliquaryUnlock':");
+    expect(hud).toContain('handleReliquaryUnlocks');
+    // Comment-stripped body of handleReliquaryUnlocks: reduced-motion and plan
+    // application must not be hard-coded away.
+    const handler = hud
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n')
+      .match(/private handleReliquaryUnlocks\([\s\S]*?\n {2}private handleDeedUnlocks/)?.[0];
+    expect(handler, 'handleReliquaryUnlocks body').toBeTruthy();
+    expect(handler).toContain("matchMedia('(prefers-reduced-motion: reduce)')");
+    expect(handler).toContain('buildReliquaryUnlockPlan(events, reducedMotion)');
+    expect(handler).toContain('plan.motion');
+    expect(handler).toContain('if (plan.playSound) audio.achievement()');
+    // Force open-window rebuild on unlock; membership still comes from mirrors.
+    expect(handler).toContain('plan.refreshWindow && this.reliquaryWindow.isOpen');
+    expect(handler).toContain('this.reliquaryWindow.render()');
   });
 
   it('maps the reliquary keybind action through t() in Options', () => {
@@ -158,8 +211,19 @@ describe('styles and architecture registration', () => {
   it('has a desktop ten-dash section banner and mobile full-bleed rules', () => {
     expect(components).toContain('/* ---------- reliquary ---------- */');
     expect(components).toContain('#reliquary-window');
+    // Scope CSS pins to the Reliquary ten-dash section (not whole components.css).
+    const reliquaryStart = components.indexOf('/* ---------- reliquary ---------- */');
+    const nextSection = components.indexOf('/* ----------', reliquaryStart + 20);
+    expect(reliquaryStart).toBeGreaterThanOrEqual(0);
+    expect(nextSection).toBeGreaterThan(reliquaryStart);
+    const reliquaryCss = components.slice(reliquaryStart, nextSection);
+    expect(reliquaryCss).toContain('#reliquary-window');
+    expect(reliquaryCss).toContain('.reliquary-grid');
+    expect(reliquaryCss).toContain('.reliquary-cell--missing');
+    expect(reliquaryCss).toContain('.reliquary-cell--owned');
     expect(hudMobile).toContain('body.mobile-touch #reliquary-window');
     expect(hudMobile).toContain('env(safe-area-inset-left)');
+    expect(hudMobile).toContain('body.mobile-touch #reliquary-window .reliquary-grid');
   });
 
   it('registers the pure core in UI_PURE_CORES', () => {

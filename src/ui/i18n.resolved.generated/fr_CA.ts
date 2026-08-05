@@ -2984,7 +2984,17 @@ export const fr_CA: EnTranslations = {
       "pageComplete": "Illuminated",
       "clearsLabel": "{count} clears",
       "backToShelf": "Back to shelf",
-      "pageStubNote": "The full relic grid arrives in a later update. Progress above is live."
+      "pageStubNote": "The full relic grid arrives in a later update. Progress above is live.",
+      "gridAria": "Relics on {name}",
+      "pageProgressAria": "Page progress: {owned} of {total} relics filled",
+      "cellOwnedAria": "{name}, catalogued",
+      "cellMissingAria": "{name}, not yet found",
+      "ownedTooltipStatus": "Catalogued in The Reliquary",
+      "missingTooltipStatus": "Not yet found",
+      "firstFindClears": "First found on clear {count}",
+      "unlockToast": "Relic catalogued: {name}",
+      "illuminateBanner": "Page illuminated: {name}",
+      "illuminateToast": "Every relic on {name} is filled."
     },
     "deeds": {
       "title": "Livre des hauts faits",

@@ -41,6 +41,7 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
+import { RELIQUARY_PAGES } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -549,6 +550,7 @@ import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { buildReliquaryUnlockPlan, type ReliquaryUnlockEventModel } from './reliquary_view';
 import { ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
@@ -10282,6 +10284,9 @@ export class Hud {
     // banners coalesce to the last unlock, retro back-credits collapse into
     // one summary line, and the celebration sound plays once.
     const deedUnlocks: { deedId: string; retro?: boolean }[] = [];
+    // Reliquary catalog fills batch the same way (handleReliquaryUnlocks):
+    // presentation-only; membership stays on discovery mirrors.
+    const reliquaryUnlocks: ReliquaryUnlockEventModel[] = [];
     // Personal masterwork procs batch the same way (handleCraftCelebrations):
     // coalesced to the drain's last proc, planned purely alongside tier-ups.
     let masterworkItemId: string | null = null;
@@ -10603,6 +10608,10 @@ export class Hud {
         }
         case 'deedUnlocked': {
           deedUnlocks.push(ev);
+          break;
+        }
+        case 'reliquaryUnlock': {
+          reliquaryUnlocks.push(ev);
           break;
         }
         case 'learnAbility':
@@ -12292,6 +12301,7 @@ export class Hud {
       }
     }
     if (deedUnlocks.length > 0) this.handleDeedUnlocks(deedUnlocks);
+    if (reliquaryUnlocks.length > 0) this.handleReliquaryUnlocks(reliquaryUnlocks);
     // Craft tier crossings are STATE-driven, not event-driven: online the
     // cprof mirror can land a snapshot after (or without) this drain's
     // events, so the observation reads the live craftSkills rather than an
@@ -12436,6 +12446,49 @@ export class Hud {
     this.professionTutorialTrap?.release();
     this.professionTutorialTrap = null;
     document.getElementById('profession-tutorial')?.remove();
+  }
+
+  // Reliquary catalog fill: planned purely (buildReliquaryUnlockPlan). Each
+  // unlock gets a gold log line; Illumination outranks a plain unlock for the
+  // single banner slot; one sound per drain; reducedMotion trims motion only.
+  // Membership is NEVER invented here: the event is presentation-only.
+  private handleReliquaryUnlocks(events: ReliquaryUnlockEventModel[]): void {
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const plan = buildReliquaryUnlockPlan(events, reducedMotion);
+    for (const log of plan.logs) {
+      const name =
+        log.kind === 'item' && ITEMS[log.id]
+          ? itemDisplayName(ITEMS[log.id])
+          : log.id.includes(':')
+            ? log.id.slice(log.id.lastIndexOf(':') + 1).replace(/_/g, ' ')
+            : log.id.replace(/_/g, ' ');
+      this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
+    }
+    if (plan.banner) {
+      const banner = plan.banner;
+      let bannerText: string;
+      if (banner.kind === 'illuminate') {
+        const page = RELIQUARY_PAGES.find((p) => p.id === banner.pageId);
+        const pageName = page?.name ?? banner.pageId;
+        bannerText = t('hudChrome.reliquary.illuminateBanner', { name: pageName });
+        this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
+      } else {
+        const relic = banner.relic;
+        const name =
+          relic.kind === 'item' && ITEMS[relic.id]
+            ? itemDisplayName(ITEMS[relic.id])
+            : relic.id.replace(/_/g, ' ');
+        bannerText = t('hudChrome.reliquary.unlockToast', { name });
+      }
+      this.showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion);
+      this.combatAnnouncer.push(bannerText, performance.now());
+    }
+    if (plan.playSound) audio.achievement();
+    // Force open-window rebuild so silhouette grids fill live (signature would
+    // also catch it on the slow band; immediate paint feels better).
+    if (plan.refreshWindow && this.reliquaryWindow.isOpen) {
+      this.reliquaryWindow.render();
+    }
   }
 
   // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the
