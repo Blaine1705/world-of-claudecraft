@@ -5953,7 +5953,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 4,
         level: 20,
         cost: 70,
-        effects: [{ type: 'directDamage', min: 38, max: 48, spellPowerCoeff: 0.8 }],
+        effects: [{ type: 'directDamage', min: 38, max: 48, spellPowerCoeff: 0.45 }],
       },
     ],
     description: 'Hurls a bolt of nature energy for $d Nature damage.',
@@ -7517,7 +7517,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // and must never eat the form itself.
     requiresAuraKind: 'form_moonkin',
     consumesRequiredAura: false,
-    effects: [{ type: 'directDamage', min: 136, max: 162, spellPowerCoeff: 1.6 }],
+    effects: [{ type: 'directDamage', min: 136, max: 162, spellPowerCoeff: 0.9 }],
     description:
       'Spends your 3 Moontide for a heavy strike of $d Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one.',
   },
@@ -7538,7 +7538,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresAuraKind: 'form_moonkin',
     consumesRequiredAura: false,
     effects: [
-      { type: 'directDamage', min: 80, max: 100, spellPowerCoeff: 1.6 },
+      { type: 'directDamage', min: 80, max: 100, spellPowerCoeff: 0.9 },
       { type: 'dot', total: 45, duration: 9, interval: 3 },
       { type: 'gainResource', amount: 35 },
     ],
