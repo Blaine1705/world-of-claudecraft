@@ -3305,6 +3305,15 @@ export const hudChromeStrings = {
     masterworkToast: 'Masterwork! {name}',
     masterworkZoneLine: '{crafter} crafted a masterwork {name}!',
     tierUpToast: '{craft} advanced to tier {tier}!',
+    // Profession skill level-up (skill_level_toast_view.ts). skillUpToast is
+    // the per-point chat line (and the polite announcer line) for every
+    // floored craft or gathering skill climb. skillUpSubtext is the copper
+    // milestone plate's detail line; the plate's title is the profession
+    // name itself (already localized), so it carries no key. Distinct
+    // presentation from character level-up and from craft tier-up (which
+    // names the tier bucket, not the skill counter).
+    skillUpToast: '{skill} skill increased to {level}!',
+    skillUpSubtext: 'Skill increased to {level}!',
     // Professions 2.0 attunement + trend events (profession_event_lines
     // _core.ts). Trend nudge: the soft in-world hint that an unattuned crafter's
     // skills lean toward a pair; {archetype} is the pair's archetype title,

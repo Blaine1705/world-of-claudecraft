@@ -2735,6 +2735,8 @@ export const ja_JP: EnTranslations = {
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}が傑作{name}を作り上げました！",
       "tierUpToast": "{craft}がティア {tier} に到達しました！",
+      "skillUpToast": "{skill}の技能が {level} に上がりました！",
+      "skillUpSubtext": "技能が {level} に上がりました！",
       "trendNudge": "あなたの腕は{archetype}へと傾いています。その調律の依頼は{master}のもとで待っています。",
       "trendNudgeNoMaster": "あなたの腕は{archetype}へと傾いています。その道に進むには工芸の師匠を探しましょう。",
       "attunedZoneLine": "{name}が{archetype}として調律しました！",

@@ -2735,6 +2735,8 @@ export const en_CA: EnTranslations = {
       "masterworkToast": "Masterwork! {name}",
       "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
       "tierUpToast": "{craft} advanced to tier {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Your hands are leaning toward the {archetype}. Its attunement waits with {master}.",
       "trendNudgeNoMaster": "Your hands are leaning toward the {archetype}. Seek a craft master to take it up.",
       "attunedZoneLine": "{name} has attuned as {archetype}!",
