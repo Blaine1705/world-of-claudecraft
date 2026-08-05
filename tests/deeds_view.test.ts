@@ -667,11 +667,12 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 238 deeds - 3 feats - 9 hidden = 226 visible to a fresh character
-    // (+4 Reliquary Curator rank bridges; none are feats or hidden).
-    expect(view.summary.visibleTotal).toBe(226);
+    // 249 deeds - 3 feats - 9 hidden = 237 visible to a fresh character
+    // (release base brood/battleground/profession rares plus four Reliquary
+    // Curator rank bridges; none a feat or hidden).
+    expect(view.summary.visibleTotal).toBe(237);
     // The bucket sum adds the Feats shelf's own 3 rows back on top.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(229);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(240);
   });
 
   it('maps every live catalog category onto a display bucket', () => {

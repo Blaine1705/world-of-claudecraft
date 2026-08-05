@@ -76,6 +76,7 @@ function makeInput(userAgent?: string) {
     onTargetFriendly: vi.fn(),
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
+    onTargetPet: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),

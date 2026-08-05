@@ -44,11 +44,13 @@ describe('deed_i18n English resolution', () => {
 
   it('manifests one row per name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 238 deeds x (name + desc) + the 33 shipped title rewards (both counts
-    // pinned by tests/deeds_content.test.ts). +4 Reliquary Curator rank
-    // bridges (3 titles + 1 border; border has no title manifest row).
-    expect(manifest.length).toBe(238 * 2 + 33);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(33);
+    // 249 deeds x (name + desc) + the 34 shipped title rewards (both counts
+    // pinned by tests/deeds_content.test.ts): release base (brood pair,
+    // Thornhollow Fields, seven per-craft rare-tier profession deeds) plus
+    // four Reliquary Curator rank bridges (3 titles + 1 border; border has
+    // no title manifest row).
+    expect(manifest.length).toBe(249 * 2 + 34);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(34);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

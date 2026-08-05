@@ -63,6 +63,9 @@ export interface InputCallbacks {
   // Pet-bar command (bound to Ctrl+1..5 by default): attack the current target,
   // stop (passive stance), taunt, or set the defensive/aggressive stance.
   onPet(action: 'attack' | 'stop' | 'taunt' | 'defensive' | 'aggressive'): void;
+  // Select your own pet (Ctrl+6 by default). Separate from onPet: this targets the
+  // pet rather than commanding it, so it belongs with the targeting callbacks above.
+  onTargetPet(): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -85,6 +88,7 @@ export interface InputCallbacks {
       | 'social'
       | 'arena'
       | 'valecup'
+      | 'bgFlag'
       | 'dungeonFinder'
       | 'leaderboard'
       | 'calendar'
@@ -1045,6 +1049,9 @@ export class Input {
       case 'petAggressive':
         this.cb.onPet('aggressive');
         return;
+      case 'targetPet':
+        this.cb.onTargetPet();
+        return;
       case 'interact':
         this.cb.onUiKey('interact');
         return;
@@ -1092,6 +1099,9 @@ export class Input {
         return;
       case 'valecup':
         this.cb.onUiKey('valecup');
+        return;
+      case 'bgFlag':
+        this.cb.onUiKey('bgFlag');
         return;
       case 'leaderboard':
         this.cb.onUiKey('leaderboard');
