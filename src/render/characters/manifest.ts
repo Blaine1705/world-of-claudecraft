@@ -744,7 +744,34 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
+      // Ability-specific clips (scripts/build_paladin_ability_anims.mjs,
+      // issue #2889 follow-up batch): the paladin had zero attackByAbility
+      // overrides across its kit, so every ability played the same melee
+      // chop. Almost the whole kit shares school: 'holy' (classes.ts), so
+      // school cannot differentiate anything the way it did for the mage:
+      // mapped instead by the ability's EFFECT TYPE (judgement, groundAoE,
+      // stun, absorb/defensive selfBuff, buffTarget/aura selfBuff, heal).
+      // Not every ability in the kit is listed: this is a representative
+      // slice, not exhaustive coverage (seal_of_righteousness, exorcism,
+      // holy_taunt, and rebuke keep the default chop until a later batch).
+      attackByAbility: {
+        judgement: 'Cast_Verdict',
+        consecration: 'Cast_Consecrate',
+        hammer_of_justice: 'Cast_HammerBash',
+        divine_protection: 'Cast_Ward',
+        sacred_bulwark: 'Cast_Ward',
+        blessing_of_might: 'Cast_Blessing',
+        devotion_aura: 'Cast_Blessing',
+        retribution_aura: 'Cast_Blessing',
+        righteous_fury: 'Cast_Blessing',
+        holy_light: 'Cast_HolyMend',
+        flash_of_light: 'Cast_HolyMend',
+        lay_on_hands: 'Cast_HolyMend',
+      },
     },
+    // Ability-specific clips (scripts/build_paladin_ability_anims.mjs): a
+    // mesh-free clip donor GLB baked off this rig's own poses.
+    animUrls: [`${PLAYERS}/paladin_ability_anims.glb`],
     // dedicated paladin model (helmeted variant) — ships its own Cape + Helmet
     // meshes and texture, so no show-list/tint. Shield + paladin hammer arrive
     // in the weapons pass; the gripped axe holds the slot until then.
@@ -1735,7 +1762,19 @@ export const VISUALS: Record<string, VisualDef> = {
   skel_golem: {
     url: `${ENEMIES}/skeleton_golem.glb`,
     height: 3.4,
-    clips: skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+    // Bespoke attack (scripts/build_skeleton_golem_anims.mjs, issue #2889
+    // follow-up batch): this rig backs four named boss/rare VisualDef
+    // assignments (nythraxis_scourge_of_thornpeak, a dungeon final boss; plus
+    // ancient_guardian, waking_warden, idol_guardian below), but still played
+    // the exact same generic swing every plain humanoid mob uses. Spreads the
+    // original skeletonLargeClips result and overrides just the attack
+    // field, the same pattern ELEMENTAL_FLOATING uses over the shared
+    // FLOATING constant: idle/walk/run/hit/death stay the shared set.
+    clips: {
+      ...skeletonLargeClips(['2H_Melee_Attack_Chop', '1H_Melee_Attack_Chop']),
+      attack: ['Golem_Slam'],
+    },
+    animUrls: [`${ENEMIES}/skeleton_golem_anims.glb`],
     // the baked golem axe ships without the 180° grip flip the rig expects, so
     // the blade faces backwards; spin it about its handle (local Y) to face out.
     weaponFix: [{ node: 'Skeleton_Golem_Axe', rotY: Math.PI }],
