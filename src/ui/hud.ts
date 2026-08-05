@@ -551,7 +551,7 @@ import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { buildReliquaryUnlockPlan, type ReliquaryUnlockEventModel } from './reliquary_view';
-import { ReliquaryWindow } from './reliquary_window';
+import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -1095,15 +1095,7 @@ const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 
 /** Named Curator rank for rank-up toast/banner (cosmetic chrome only). */
 function curatorRankDisplayName(rank: number): string {
-  const keys = [
-    'hudChrome.reliquary.curatorRankName1',
-    'hudChrome.reliquary.curatorRankName2',
-    'hudChrome.reliquary.curatorRankName3',
-    'hudChrome.reliquary.curatorRankName4',
-    'hudChrome.reliquary.curatorRankName5',
-  ] as const;
-  if (rank >= 1 && rank <= keys.length) return t(keys[rank - 1]!);
-  return t('hudChrome.reliquary.curatorRank', { rank: formatNumber(rank) });
+  return t(curatorRankNameKey(rank), { rank: formatNumber(rank) });
 }
 
 export class Hud {

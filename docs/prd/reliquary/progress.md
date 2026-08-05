@@ -19,7 +19,7 @@
 | 5 Page grids + live UX | **done** | grid cells, silhouettes, unlock toast, Illumination, ownershipDigest |
 | 5 QA | **done** | exit criteria verified; pin holes closed; release @ 413de574cf |
 | 6 Curator ranks + cosmetics | **done** | pure ranks, seals, rank-up celebration, zero-Renown deed bridges |
-| 6 QA | pending | same worktree + pull |
+| 6 QA | **done** | exit criteria verified; same-event Illumination + pin holes closed; release @ 0d2d5d1833 |
 | 7 Professions shelf | pending | same worktree + pull |
 | 7 QA | pending | same worktree + pull |
 | 8 Horizons shelf | pending | same worktree + pull |
@@ -236,6 +236,50 @@
   Manual rank-up smoke not run (static + unit pins only).
   Reviews: architecture GREEN (0 BLOCKING; SHOULD-FIX retro pin added);
   test-coverage SHOULD-FIX pins closed; frontend BLOCKING fan-out fixed.
+
+- Phase 6 QA: merged `origin/release/v0.35.0` (tool-charm tooltips) to tip
+  `0d2d5d1833`. Conflict only in generated `pending.ts`, resolved via
+  `npm run i18n:gen`. Merge commit `8e5c2e6f13`.
+  Initial matrix green (**252 passed**, 1 skipped). Specialist review:
+  - architecture-reviewer: **GREEN** (0 BLOCKING; SHOULD-FIX catalog total
+    >= 100 reachability pin closed)
+  - frontend-seam-reviewer: **GREEN** (0 BLOCKING; SHOULD-FIX shared
+    `curatorRankNameKey` for Hud + window closed)
+  - test-coverage-auditor: **RED** then fixed:
+    - **BLOCKING:** same-event rank-up + Illumination dropped
+      `illuminatedPageId` in `buildReliquaryUnlockPlan` (production emit ships
+      both on one event). Fixed: always capture Illumination for secondary log;
+      banner priority still rankUp > Illumination > unlock. Decisive test added.
+    - SHOULD-FIX pins closed: clears-alone never raise rank; join
+      `retroFallbackGrants` source-guard for `syncCuratorRankDeeds`; no
+      `rankRewardsGranted` on serialize; manual triggers for
+      `col_reliquary_rank_2..5`; rank-5 boundary `100 -> 5`; catalog total
+      >= 100.
+  Green after fixes:
+  - `npx vitest run tests/reliquary_state.test.ts tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/architecture.test.ts tests/deeds_content.test.ts tests/deeds_completion.test.ts tests/deed_i18n.test.ts tests/deeds_view.test.ts tests/reliquary_wire.test.ts tests/language_fanout_registry.test.ts` (**255 passed**, 1 skipped)
+  - `npm run i18n:gen` (merge resolution)
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  - biome on changed files (warnings only; no errors)
+  Checklist (all held):
+  - Pure rank thresholds [1, 10, 25, 50, 100]; seals + deedId linkage pinned
+  - Cosmetic only: titles/borders/seal chrome; no stats/dropRate/pity
+  - Rank from unique catalogued item fills; non-catalog and clears-alone stay 0
+  - Luck/rank bridges renown 0; sticky via deedsEarned / grantDeed only
+  - Rank-up celebration: same-event Illumination log under rank-up banner;
+    reduced-motion trims motion only; rankUp > Illumination > unlock
+  - No rankRewardsGranted blob; serialize keys firstFind/marks/recent only
+  - Overview named rank + seal; shared curatorRankNameKey
+  - No per-drop saveCharacter; no second discovery set
+  - Module-first; language fan-out includes reliquary_window
+  - English + M16 non-Latin for Phase 6 wordy chrome
+  - No em dash / emoji on Phase 6 surface
+  - No Phase 7 profession marks / Phase 8 Horizons / Phase 9 wiki-PR
+  - Catalog unique total >= 100 (Eternal rank reachable; currently 124)
+  Manual rank-up smoke not run (static + unit pins only).
+  Residual risks: page content names still catalog English (deferred);
+  Latin overlays pending (PR-tier OK); mobile/browser E2E of seal chrome
+  and reduced-motion not exercised live.
 
 ## Surprises / decisions during implementation
 

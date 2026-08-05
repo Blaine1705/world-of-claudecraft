@@ -1,5 +1,8 @@
 // Reliquary Phase 1 foundation: sparse state, mark hooks, serialize omit-empty,
 // pure completion helpers. No UI / wire coverage here.
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import {
@@ -26,6 +29,8 @@ import {
   syncCuratorRankDeeds,
 } from '../src/sim/reliquary';
 import { type CharacterState, Sim } from '../src/sim/sim';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function makeSim(seed = 42): Sim {
   return new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -290,9 +295,9 @@ describe('Reliquary pure completion + curator rank', () => {
     expect(curatorRankFromOwned(49)).toBe(3);
     expect(curatorRankFromOwned(50)).toBe(4);
     expect(curatorRankFromOwned(99)).toBe(4);
-    expect(curatorRankFromOwned(CURATOR_RANK_THRESHOLDS[CURATOR_RANK_THRESHOLDS.length - 1])).toBe(
-      CURATOR_RANK_THRESHOLDS.length,
-    );
+    expect(curatorRankFromOwned(100)).toBe(5);
+    // Live catalog must make the highest threshold reachable (no dead Eternal rank).
+    expect(catalogItemCompletion(new Set()).total).toBeGreaterThanOrEqual(100);
     // Seal chrome is pure and cosmetic-only (no power fields on defs).
     expect(curatorSealIdForRank(0)).toBeNull();
     expect(curatorSealIdForRank(1)).toBe('apprentice');
@@ -352,6 +357,10 @@ describe('Reliquary pure completion + curator rank', () => {
     expect(DEEDS.col_reliquary_rank_3.renown).toBe(0);
     expect(DEEDS.col_reliquary_rank_4.renown).toBe(0);
     expect(DEEDS.col_reliquary_rank_5.renown).toBe(0);
+    expect(DEEDS.col_reliquary_rank_2.trigger).toEqual({ kind: 'manual' });
+    expect(DEEDS.col_reliquary_rank_3.trigger).toEqual({ kind: 'manual' });
+    expect(DEEDS.col_reliquary_rank_4.trigger).toEqual({ kind: 'manual' });
+    expect(DEEDS.col_reliquary_rank_5.trigger).toEqual({ kind: 'manual' });
     expect(DEEDS.col_reliquary_rank_2.reward).toEqual({ kind: 'title', text: 'Spoilskeeper' });
     expect(DEEDS.col_reliquary_rank_3.reward).toEqual({
       kind: 'title',
@@ -362,6 +371,16 @@ describe('Reliquary pure completion + curator rank', () => {
       kind: 'border',
       slug: 'reliquary_gilt',
     });
+    // Sticky grants live on deedsEarned only; no rankRewardsGranted blob.
+    expect(meta.reliquary).not.toHaveProperty('rankRewardsGranted');
+    const serialized = serializeReliquaryState(meta.reliquary);
+    expect(serialized).toBeDefined();
+    if (!serialized) throw new Error('expected sparse serialize after catalog fills');
+    expect(serialized).not.toHaveProperty('rankRewardsGranted');
+    const allowed = new Set(['firstFind', 'marks', 'recent']);
+    for (const key of Object.keys(serialized)) {
+      expect(allowed.has(key)).toBe(true);
+    }
     // Idempotent: re-sync does not double-grant.
     const sizeBefore = meta.deedsEarned.size;
     syncCuratorRankDeeds(sim.ctx, meta);
@@ -395,6 +414,30 @@ describe('Reliquary pure completion + curator rank', () => {
     expect(curatorRankFromOwned(1)).toBe(1);
   });
 
+  it('clear meters alone never raise Curator rank', () => {
+    // Rank is unique catalogued relic fills only (never kill/clear count alone).
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    meta.deedStats.dungeonClears.hollow_crypt = 999;
+    meta.deedStats.dungeonClears['hollow_crypt:heroic'] = 999;
+    meta.deedStats.counters.thunzharrKills = 999;
+    meta.delveClears = { ...meta.delveClears, collapsed_reliquary: 999 };
+    expect(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned).toBe(0);
+    expect(curatorRankFromOwned(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned)).toBe(
+      0,
+    );
+    expect(sim.reliquaryCuratorRank()).toBe(0);
+  });
+
+  it('join retroFallbackGrants wires syncCuratorRankDeeds for veterans', () => {
+    // Source-guard: removing the join call strands veterans who already own
+    // enough catalog fills without a live rank-up path. Mirrors prog_guildsworn.
+    const deedsSrc = fs.readFileSync(path.join(__dirname, '../src/sim/deeds.ts'), 'utf8');
+    const retroArm = deedsSrc.slice(deedsSrc.indexOf('export function retroFallbackGrants'));
+    expect(retroArm).toContain('syncCuratorRankDeeds');
+    expect(retroArm).toContain('{ retro: true }');
+  });
+
   it('veteran retro sync grants all zero-Renown rank bridges up to owned count', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
@@ -424,12 +467,12 @@ describe('Reliquary pure completion + curator rank', () => {
     const retroUnlocks = sim
       .drainEvents()
       .filter((e) => e.type === 'deedUnlocked' && e.retro === true);
-    expect(retroUnlocks.some((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_2')).toBe(
-      true,
-    );
-    expect(retroUnlocks.some((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_3')).toBe(
-      true,
-    );
+    expect(
+      retroUnlocks.some((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_2'),
+    ).toBe(true);
+    expect(
+      retroUnlocks.some((e) => e.type === 'deedUnlocked' && e.deedId === 'col_reliquary_rank_3'),
+    ).toBe(true);
   });
 
   it('clearCountForSource reads dungeon clears without inventing state', () => {

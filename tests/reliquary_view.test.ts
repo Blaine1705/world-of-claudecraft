@@ -613,6 +613,21 @@ describe('buildReliquaryUnlockPlan', () => {
     expect(plan.playSound).toBe(true);
   });
 
+  it('same-event rank-up + Illumination keeps illuminatedPageId for secondary log', () => {
+    // Production emitReliquaryUnlock ships one event with both fields when a
+    // catalog fill ranks up and completes a page. Banner stays rankUp; the
+    // Illumination log field must not be dropped by the rank-up branch.
+    const plan = buildReliquaryUnlockPlan(
+      [{ itemId: 'a', illuminatedPageId: 'crypt_n', curatorRank: 2 }],
+      false,
+    );
+    expect(plan.banner).toEqual({ kind: 'rankUp', rank: 2 });
+    expect(plan.curatorRank).toBe(2);
+    expect(plan.illuminatedPageId).toBe('crypt_n');
+    expect(plan.logs).toEqual([{ kind: 'item', id: 'a' }]);
+    expect(plan.playSound).toBe(true);
+  });
+
   it('Illumination does not overwrite an earlier rank-up banner', () => {
     const plan = buildReliquaryUnlockPlan(
       [

@@ -26,14 +26,14 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 6 implementation complete (Curator ranks, cosmetics,
-  zero-Renown deed bridges).
+- **Current phase:** Phase 6 QA complete (Curator ranks, cosmetics, zero-Renown
+  deed bridges verified).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 6 QA. Do **not** skip the release pull.
-  Do **not** start Phase 7 until Phase 6 QA is green.
+  `origin/release/v0.35.0`, then Phase 7 (Professions shelf). Do **not** skip
+  the release pull.
 - **Blocker:** none.
-- **Release tip at Phase 6 implementation:** already up to date with
-  `origin/release/v0.35.0` @ `413de574cf` (same tip as Phase 5 QA).
+- **Release tip after Phase 6 QA pull:** `origin/release/v0.35.0` @
+  `0d2d5d1833` (tool-charm tooltips merge; pending.ts resolved via i18n:gen).
 
 ## Locked design decisions
 

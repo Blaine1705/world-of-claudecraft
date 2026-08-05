@@ -48,7 +48,7 @@ const NAV_LABEL_KEYS: Record<ReliquaryNavId, TranslationKey> = {
 };
 
 /** Named Curator rank chrome keys (Phase 6). Falls back to numeric rank label. */
-const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
+export const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
   'hudChrome.reliquary.curatorRankName1',
   'hudChrome.reliquary.curatorRankName2',
   'hudChrome.reliquary.curatorRankName3',
@@ -56,7 +56,8 @@ const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
   'hudChrome.reliquary.curatorRankName5',
 ];
 
-function curatorRankNameKey(rank: number): TranslationKey {
+/** Shared key picker for Overview seal chrome and Hud rank-up toast/banner. */
+export function curatorRankNameKey(rank: number): TranslationKey {
   if (rank >= 1 && rank <= CURATOR_RANK_NAME_KEYS.length) {
     return CURATOR_RANK_NAME_KEYS[rank - 1]!;
   }

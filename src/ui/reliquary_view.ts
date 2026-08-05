@@ -433,12 +433,17 @@ export function buildReliquaryUnlockPlan(
       event.curatorRank > 0
         ? Math.floor(event.curatorRank)
         : null;
+    // Always capture Illumination for the secondary log, even when the same
+    // production event also carries curatorRank (emitReliquaryUnlock ships both).
+    // Banner priority is gated separately; do not drop the log field on rank-up.
+    if (event.illuminatedPageId) {
+      illuminatedPageId = event.illuminatedPageId;
+    }
     if (rankUp !== null) {
       curatorRank = rankUp;
       // Rank-up outranks Illumination and plain unlock (rarer prestige moment).
       banner = { kind: 'rankUp', rank: rankUp };
     } else if (event.illuminatedPageId) {
-      illuminatedPageId = event.illuminatedPageId;
       // Illumination outranks plain unlock; never overwrites a rank-up banner.
       if (banner === null || banner.kind === 'unlock' || banner.kind === 'illuminate') {
         banner = { kind: 'illuminate', pageId: event.illuminatedPageId };

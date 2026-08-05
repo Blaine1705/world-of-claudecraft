@@ -211,6 +211,9 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toContain("t('hudChrome.reliquary.rankUpBanner'");
     expect(handler).toContain("t('hudChrome.reliquary.rankUpToast'");
     expect(handler).toContain("banner.kind === 'rankUp'");
+    // Shared key table (window export) so toast/banner cannot desync from Overview.
+    expect(hud).toContain('curatorRankNameKey');
+    expect(painter).toContain('export function curatorRankNameKey');
     // Illumination log still fires when rank-up owns the banner slot.
     expect(handler).toContain('plan.illuminatedPageId');
     expect(handler).toContain("showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion)");
