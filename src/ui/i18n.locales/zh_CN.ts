@@ -6089,7 +6089,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetTitle': '重置你的副本',
   'guide.dungeonsPage.sanctumBody': '棘峰的黑暗核心，邪教漫长的图谋在此达到可怖的顶点。',
   'guide.dungeonsPage.wildheartBody':
-    '一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔上迎战祖尔加。',
+    '一座被暖雨浸透的丛林火山口，两条高起的猎径环绕着碧色深潭。穿过兽巢与先祖遗迹，在仪式金字塔顶端看看是谁在等待。',
   'guide.dungeonsPage.raidName': '终局团队副本',
   'guide.dungeonsPage.raidBody':
     '在一扇封印的皇家大门之后，等待着一场十人试炼：一场多阶段的战斗，以及一股不死之力，需要整支团队齐心协力将其镇压。先赢得入场资格，再带上九位好友。',

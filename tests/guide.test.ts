@@ -105,7 +105,7 @@ import {
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
-import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
+import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
@@ -1035,6 +1035,32 @@ describe('Guide deeds cross-page surfaces', () => {
         `boss personal name "${personalName}" leaked into the dungeons page`,
       ).toBe(false);
     }
+  });
+
+  it('never leaks the Wildheart Basin boss name in a translated locale either', async () => {
+    // Follow-up regression pin (review on PR #2903): the first fix only reworded the
+    // English catalog value plus the eager en/en_CA/en_XA bundles, leaving every
+    // translated overlay still naming the boss. Drive a non-English locale, the same
+    // way a real translated visitor would (ensureLocaleLoaded before render), and check
+    // the same personal-name segment the English pin above checks.
+    const wildheartBoss = Object.values(MOBS).find((m) => m.id === 'wildheart_high_priest');
+    expect(wildheartBoss, 'wildheart_high_priest mob missing from content').toBeTruthy();
+    const personalName = (wildheartBoss?.name ?? '').split(',')[0];
+    const locales: SupportedLanguage[] = ['es', 'fr_FR', 'de_DE', 'zh_CN', 'ja_JP', 'ko_KR'];
+    for (const locale of locales) {
+      await ensureLocaleLoaded(locale);
+      setLanguage(locale);
+      const html = dungeonsPage.render({
+        params: [],
+        sub: 'dungeons',
+        titleKey: 'guide.nav.dungeons',
+      });
+      expect(
+        html.includes(personalName),
+        `boss personal name "${personalName}" leaked into the ${locale} dungeons page`,
+      ).toBe(false);
+    }
+    setLanguage('en');
   });
 
   it('documents the new default binds on the controls page', () => {

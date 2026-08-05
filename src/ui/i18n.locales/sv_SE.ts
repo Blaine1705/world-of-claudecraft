@@ -10045,7 +10045,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.',
   'guide.dungeonsPage.wildheartBody':
-    'En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att möta Zulgar.',
+    'En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att se vem som väntar på toppen.',
   'guide.gear.itemLevelBody':
     'Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.',
   'hudChrome.auraEffect.battleStance': 'Stridsställning: 10% mer raserigenerering',

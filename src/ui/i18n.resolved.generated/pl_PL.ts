@@ -4090,7 +4090,7 @@ export const pl_PL: EnTranslations = {
       "bastionBody": "Zalana forteca utracona na rzecz bagien, dzierżona przez utopionych obrońców i sam przybierający przypływ.",
       "templeBody": "Skąpane w blasku księżyca sanktuarium zatopione pod świetlistym górskim jeziorkiem wysoko w szczytach, do którego dociera się przez bramę zimnego światła. Utopiony kult wciąż śpiewa tam na dole w swych zbutwiałych szatach, a ostrzeżenia wyryte na brzegu mówią, że coś na dole tylko śpi. Samodzielna tajemnica, oddzielona od głównej historii, dla ciekawskich i dobrze przygotowanych.",
       "sanctumBody": "Mroczne serce Ciernistego Szczytu, gdzie długa praca kultu osiąga swój straszliwy szczyt.",
-      "wildheartBody": "Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by stawić czoła Zulgarowi.",
+      "wildheartBody": "Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by zobaczyć, kto czeka na szczycie.",
       "raidName": "Rajd na koniec gry",
       "raidBody": "Za zapieczętowanymi królewskimi drzwiami czeka próba dla dziesięciu graczy: wielofazowa walka i nieśmiertelna moc, którą cały rajd musi wspólnie powstrzymać. Wywalcz sobie wstęp, a potem przyprowadź dziewięcioro przyjaciół.",
       "heroicTitle": "Tryb heroiczny",

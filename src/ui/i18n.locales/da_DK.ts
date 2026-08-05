@@ -10028,7 +10028,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Hvis du skifter sværhedsgrad, mens gruppen stadig har krævede gennemløb, bliver de gamle krav stående et stykke tid. Gruppelederen kan straks opgive dem ved at vælge Nulstil alle instanser i menuen på sit eget portræt eller skrive /dungeon reset. Sværhedsgraden skal faktisk være ændret, ingen levende eller faldne må være indenfor, og der er en kort nedkøling mellem nulstillinger. Ved døren på forkert sværhedsgrad advarer spillet før start. Raidet nulstilles aldrig sådan; dets egne låsningsregler gælder.',
   'guide.dungeonsPage.wildheartBody':
-    'En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at møde Zulgar.',
+    'En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at se, hvem der venter på toppen.',
   'guide.gear.itemLevelBody':
     'Slå Vis genstandsniveau til i indstillingerne for hurtigt at sammenligne to dele. Udstyr med en kendt kilde, fra fjender, opgaver og håndværksfag, viser derefter et genstandsniveau: et enkelt tal, der omtrent angiver styrken ud fra oprindelsen og gør opgraderinger sammenlignelige, selv på tværs af pladser. Dele uden en sådan kilde, som simple handelsvarer og startudstyr, viser intet niveau; et manglende tal er normalt.',
   'hudChrome.auraEffect.battleStance': 'Kampstilling: 10% mere raserigenerering',
