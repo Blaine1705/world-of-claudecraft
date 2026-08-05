@@ -10216,7 +10216,7 @@ export const es_ES: EnTranslations = {
         "name": "Carcaj de hueso del Gravewyrm"
       },
       "direfang_quiver": {
-        "name": "Carcaj Direfang"
+        "name": "Carcaj de Direfang"
       },
       "conjured_water4": {
         "name": "Agua de Manantial Invocada"
