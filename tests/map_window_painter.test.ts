@@ -426,9 +426,10 @@ describe('map_window_painter: cadence + cached background preserved', () => {
     expect(glyphAt).toBeGreaterThan(-1);
     expect(gatherAt).toBeGreaterThan(glyphAt);
     expect(areaAt).toBeGreaterThan(gatherAt);
-    // The gather arm resolves through the shared world-hover pair, so the map
-    // tip and the 3D node tip can never disagree.
-    expect(hud).toContain('buildGatherNodeTooltip(this.sim, marker.nodeId)');
+    // The gather arm resolves through the shared world-hover pair (behind the
+    // tested memo seam), so the map tip and the 3D node tip cannot disagree.
+    expect(hud).toContain('resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId');
+    expect(hud).toContain('buildGatherNodeTooltip(this.sim, nodeId)');
     expect(hud).toContain('gatherNodeTooltipHtml(model)');
   });
 
@@ -1273,6 +1274,10 @@ describe('map_window_painter: zone-map gather nodes', () => {
     // ready profession color and never a glow halo.
     const { result, gatherFills, strikes } = paintGatherZone(mapWorld());
     expect(result.gatherNodes.length).toBeGreaterThan(0);
+    // Fixture guard: every node is locked AND ready here, so the no-glow
+    // assertion below genuinely exercises the `!node.locked` conjunct of the
+    // glow gate (a not-ready fixture would defuse it silently).
+    expect(result.gatherNodes.every((n) => n.locked && n.ready)).toBe(true);
     const lockedFills = gatherFills.filter(
       (fill) => fill.style === 'paint:--color-map-gather-locked',
     );
@@ -1314,6 +1319,13 @@ describe('map_window_painter: zone-map gather nodes', () => {
     // strike strokes at all.
     expect(silhouetteStrokes.length).toBe(result.gatherNodes.length);
     expect(strikes.length).toBe(0);
+  });
+
+  it('the locked token references the minimap rust token (both surfaces retune together)', () => {
+    // The map side of the agreement is this var() reference; the minimap side
+    // (the declaration of --color-minimap-node-locked itself) is pinned by
+    // tests/minimap_painter.test.ts, so a rename of either end fails a suite.
+    expect(tokens).toContain('--color-map-gather-locked: var(--color-minimap-node-locked)');
   });
 
   it('cooldown viewer: desaturated type token, no glow, no outline, no strike', () => {

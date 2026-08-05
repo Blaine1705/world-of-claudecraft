@@ -445,6 +445,7 @@ import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
+import { type MapGatherTipMemo, resolveGatherTipMemo } from './map_gather_tip_memo';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
 import {
   MAP_TAP_MOVE_TOLERANCE_PX,
@@ -1656,12 +1657,11 @@ export class Hud {
   // Gather-node icons of the last overworld map paint (zone map only), for the
   // hover/tap tooltip hit-test. Empty in delve mode and on the continent.
   private mapGatherNodes: MapGatherNodeMarker[] = [];
-  // Last gather-tip resolve, keyed by node id: pointermove hit-tests on every
-  // mouse move, and rebuilding the tooltip model per move would re-scan the
-  // bags per event (the src/ui/CLAUDE.md resolve-elision rule). Reset beside
-  // every mapGatherNodes rebuild, so a respawn or lock flip is at most one
-  // mediumHud repaint behind, the same freshness as the painted icon.
-  private mapGatherTipMemo: { nodeId: string; html: string } | null = null;
+  // Last gather-tip resolve, keyed by node id (map_gather_tip_memo.ts, the
+  // resolve-elision seam). Reset beside every mapGatherNodes rebuild, so a
+  // respawn or lock flip is at most one mediumHud repaint behind, the same
+  // freshness as the painted icon.
+  private mapGatherTipMemo: MapGatherTipMemo | null = null;
   // World-map level: the per-zone detail map, or the WoW-style continent overview
   // reached by right-click / the level-toggle button. Reset to 'zone' on open.
   private mapLevel: 'zone' | 'continent' = 'zone';
@@ -9927,11 +9927,11 @@ export class Hud {
   // so the map and the 3D node tip never disagree. Memoized per node id (see
   // mapGatherTipMemo) so a pointer sweeping across one icon resolves once.
   private gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string {
-    if (this.mapGatherTipMemo?.nodeId === marker.nodeId) return this.mapGatherTipMemo.html;
-    const model = buildGatherNodeTooltip(this.sim, marker.nodeId);
-    const html = model ? gatherNodeTooltipHtml(model) : '';
-    this.mapGatherTipMemo = { nodeId: marker.nodeId, html };
-    return html;
+    this.mapGatherTipMemo = resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId, (nodeId) => {
+      const model = buildGatherNodeTooltip(this.sim, nodeId);
+      return model ? gatherNodeTooltipHtml(model) : '';
+    });
+    return this.mapGatherTipMemo.html;
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest

@@ -974,7 +974,10 @@ describe('zone-map gather nodes', () => {
     expect(model.gatherNodes).toHaveLength(zoneNodes.length);
     // One viewerUsableToolTier resolve per profession, never per node.
     expect(inventoryReads).toBe(3);
-    // The proficiency map is hoisted beside the memo: exactly one read.
+    // The proficiency map is hoisted beside the memo: one read for a defined
+    // map like this stub's. (An undefined getter cannot stick in `??=` and
+    // re-reads per profession; that pre-gprof arm is covered by the wield
+    // test above, and correctness there is the fail-closed lock.)
     expect(proficiencyReads).toBe(1);
   });
 

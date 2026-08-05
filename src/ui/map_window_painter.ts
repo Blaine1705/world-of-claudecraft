@@ -535,9 +535,10 @@ export class MapWindowPainter {
           ? gatherReadyColor(colors, node.type)
           : gatherCooldownColor(colors, node.type);
       // Soft halo under unlocked ready nodes only (the classic "this is up"
-      // cue). Cooldown and locked keep the bare silhouette: ready vs cooldown
-      // reads through size, outline, and glow, never hue alone, and the lock
-      // adds the diagonal strike below (DESIGN.md color independence).
+      // cue); cooldown and locked forgo the glow. Ready vs cooldown reads
+      // through size, outline, and glow, never hue alone; a locked-but-ready
+      // node keeps its outline stroke under the diagonal strike below
+      // (DESIGN.md color independence).
       if (node.ready && !node.locked) {
         ctx.fillStyle = gatherGlowColor(colors, node.type);
         ctx.beginPath();
