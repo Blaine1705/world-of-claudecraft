@@ -8811,6 +8811,7 @@ export class Renderer {
       );
       if (!v.visual) continue;
       const veilboundState = characterVeilboundState(e);
+      const paladinAegisActive = e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
       // Decide visibility from the real world position before presentation work.
       // Audio and state derivation below remain active even for hidden actors.
       let charOnScreen = true;
@@ -8884,8 +8885,6 @@ export class Renderer {
           dt,
           this.reducedMotion(),
         );
-        const paladinAegisActive =
-          e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
         v.paladinAegisVisual = syncPaladinAegisVisual(
           v.paladinAegisVisual,
           v.group,

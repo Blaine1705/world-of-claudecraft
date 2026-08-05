@@ -115,8 +115,6 @@ describe('stable snapshot timer protocol', () => {
     }
   });
 
-  it('ages omitted stable timers and preserves auras on moving lite records', () => {
-
   it('ages the nodeRespawnSeconds countdown off the stable ncd deadlines', () => {
     // The countdown read rides the same deadline set the readiness mirror
     // does: ncd { ore: 12 } at stable time 10 is a deadline, so the remaining
@@ -132,7 +130,7 @@ describe('stable snapshot timer protocol', () => {
     expect(client.nodeHarvestableByMe('ore')).toBe(true);
   });
 
-  it('ages omitted v2 timers and preserves auras on moving lite records', () => {
+  it('ages omitted stable timers and preserves auras on moving lite records', () => {
     const client = bareClient(1);
     apply(client, {
       tw: STABLE_TIMER_WIRE_VERSION,
