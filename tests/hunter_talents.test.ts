@@ -316,7 +316,9 @@ describe('Hunter v0.29 choice-row mechanics', () => {
   });
 
   it('Fang Chorus echoes every spender and turns the third echo into a clap', () => {
-    const sim = hunter('marksmanship', { 20: 'hun_r20_fang_chorus' }, 2935);
+    // Seed re-hunted (2935 to 2937) after the v0.34.0 catch-up merge shifted
+    // the shared draw order; a missed spender draws no echo and no clap.
+    const sim = hunter('marksmanship', { 20: 'hun_r20_fang_chorus' }, 2937);
     anchorProbeInOpenField(sim);
     addPet(sim);
     const primary = addMob(sim, 20);

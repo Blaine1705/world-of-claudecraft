@@ -20,6 +20,7 @@ import {
   moveBetweenContainers,
   sanitizeBankState,
 } from '../src/sim/bank';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type {
@@ -674,6 +675,80 @@ describe('moveBetweenContainers (container-agnostic guild-bank seam)', () => {
       { itemId: 'wolf_fang', count: 5 },
       { itemId: 'wolf_fang', count: 3, craftedRecipeId: 'r_wolf_fang' },
     ]);
+  });
+
+  // The SAME defect, one arm over. The fix above threaded craftedRecipeId
+  // through the PLAIN arm and left the INSTANCED arm omitting it, so a slot
+  // carrying BOTH an instance payload and a craft marker (a crafted weapon
+  // that was worn while enchanted is exactly that shape) still lost the marker
+  // on one bank round trip. This is the SHIPPED personal bank, not just the
+  // guild bank: it launders a self-crafted item into an indistinguishable
+  // found one and it then disenchants for the enchanting skill the anti-farm
+  // gate exists to deny.
+  it('carries craftedRecipeId through the INSTANCED arm too, in both directions', () => {
+    const payload = { signer: 'Ana' };
+    const src: InvSlot[] = [
+      { itemId: 'wolf_fang', count: 3, instance: { ...payload }, craftedRecipeId: 'r_wolf_fang' },
+    ];
+    const dst: InvSlot[] = [];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+    const back: InvSlot[] = [];
+    expect(moveBetweenContainers(dst, 0, undefined, back, 10)).toEqual({ moved: 3 });
+    expect(back).toEqual([
+      { itemId: 'wolf_fang', count: 3, instance: payload, craftedRecipeId: 'r_wolf_fang' },
+    ]);
+  });
+
+  it('never merges a crafted INSTANCED stack into a same-payload uncrafted one', () => {
+    // The stacking key is three-dimensional (id, payload, provenance): merging
+    // across the provenance line is how the marker disappears without any
+    // single call looking wrong.
+    const src: InvSlot[] = [
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 10)).toEqual({ moved: 3 });
+    expect(dst).toEqual([
+      { itemId: 'wolf_fang', count: 5, instance: { signer: 'Ana' } },
+      {
+        itemId: 'wolf_fang',
+        count: 3,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ]);
+  });
+
+  it('keeps the FIT CHECK and the GRANT on the same key: no_fit, never an overflow', () => {
+    // Threading the marker into only ONE of countFit/addStacked would make the
+    // two disagree about which dest stacks are mergeable, so a move could pass
+    // the fit check and then need a slot the capacity does not have. Capacity
+    // 1, already full with a same-payload UNCRAFTED stack that has room: the
+    // crafted copy cannot merge into it, so the move must be refused rather
+    // than appending a second slot.
+    const src: InvSlot[] = [
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: 'Ana' },
+        craftedRecipeId: 'r_wolf_fang',
+      },
+    ];
+    const dst: InvSlot[] = [{ itemId: 'wolf_fang', count: 1, instance: { signer: 'Ana' } }];
+    expect(moveBetweenContainers(src, 0, undefined, dst, 1)).toEqual({
+      moved: 0,
+      refusal: 'no_fit',
+    });
+    expect(dst).toHaveLength(1);
+    expect(src).toHaveLength(1); // nothing moved, nothing lost
   });
 });
 
@@ -1654,5 +1729,68 @@ describe('server-stamped bank bonus', () => {
     info!.bonusSources.push({ id: 'fake', slots: 2, maxSlots: 2 });
     const m = meta(sim, pid);
     expect(m.bankBonusSources).toEqual(SOURCES);
+  });
+});
+
+describe('the instanced move keeps the slot-level crafted marker (round 5)', () => {
+  it('an instanced marker-bearing slot round-trips the bank with craftedRecipeId intact', () => {
+    // The instanced arm used to call addStacked without slot.craftedRecipeId,
+    // so a deposit stripped the crafted-provenance marker from exactly the
+    // shape that carries it ONLY at slot level (commissioned sub-rare
+    // equipment: instance holds bind data, the marker rides the slot).
+    const source: import('../src/sim/types').InvSlot[] = [
+      {
+        itemId: 'eastbrook_arming_sword',
+        count: 1,
+        instance: { boundTo: 41 },
+        craftedRecipeId: 'recipe_eastbrook_arming_sword',
+      },
+    ];
+    const dest: import('../src/sim/types').InvSlot[] = [];
+    const r = moveBetweenContainers(source, 0, undefined, dest, 24);
+    expect(r.moved).toBe(1);
+    expect(dest[0]).toEqual({
+      itemId: 'eastbrook_arming_sword',
+      count: 1,
+      instance: { boundTo: 41 },
+      craftedRecipeId: 'recipe_eastbrook_arming_sword',
+    });
+    // And back out, still intact.
+    const home: import('../src/sim/types').InvSlot[] = [];
+    const r2 = moveBetweenContainers(dest, 0, undefined, home, 24);
+    expect(r2.moved).toBe(1);
+    expect(home[0]?.craftedRecipeId).toBe('recipe_eastbrook_arming_sword');
+    // The merge predicate still separates marked from unmarked: an unmarked
+    // byte-equal instanced stack does not absorb the marked one.
+    const mixed: import('../src/sim/types').InvSlot[] = [
+      { itemId: 'eastbrook_arming_sword', count: 1, instance: { boundTo: 41 } },
+    ];
+    const r3 = moveBetweenContainers(home, 0, undefined, mixed, 24);
+    expect(r3.moved).toBe(1);
+    expect(mixed).toHaveLength(2);
+    // Existence arm: the fixture pair is real shipped content, so a rename
+    // cannot leave this test exercising the unknown-item fallback.
+    expect(ITEMS.eastbrook_arming_sword).toBeTruthy();
+    expect(ALL_RECIPES.some((r) => r.id === 'recipe_eastbrook_arming_sword')).toBe(true);
+  });
+
+  it('a marked instanced slot does not count an unmarked stack as room (the stricter fit)', () => {
+    // The user-visible half of threading the marker through countFit: on a
+    // FULL destination whose only same-item stack is unmarked, the deposit
+    // now refuses no_fit instead of laundering the marker into that stack.
+    const dest: import('../src/sim/types').InvSlot[] = [
+      { itemId: 'eastbrook_arming_sword', count: 1, instance: { boundTo: 41 } },
+    ];
+    const source: import('../src/sim/types').InvSlot[] = [
+      {
+        itemId: 'eastbrook_arming_sword',
+        count: 1,
+        instance: { boundTo: 41 },
+        craftedRecipeId: 'recipe_eastbrook_arming_sword',
+      },
+    ];
+    const r = moveBetweenContainers(source, 0, undefined, dest, 1); // capacity 1: full
+    expect(r).toEqual({ moved: 0, refusal: 'no_fit' });
+    expect(source).toHaveLength(1); // all-or-nothing: nothing moved
   });
 });
