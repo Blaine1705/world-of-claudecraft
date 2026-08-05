@@ -33,6 +33,14 @@
        the #0070dd anchor). The theme system re-emits this per preset via
        ensureReadable, so the light Parchment panel darkens it to AA. */
     --color-quest-tag-text: #3d9bff;
+    /* Profession-affinity tooltip line ("Used by Leatherworking, ...", the
+       tt-material-use class): the craft-teal wash over the accent, at the
+       classic-preset value. The theme system re-emits this per preset via
+       ensureReadable (src/ui/theme.ts) so the light Parchment panel darkens
+       it until it clears the contrast floor. Named for the tooltip surface,
+       NOT --color-craft-*: that family below is the crafting-difficulty ramp
+       and this token is unrelated to it. */
+    --color-material-use: #d6ce3b;
     /* Quest moments (DESIGN.md section 4.3 / principle 4): tracked titles,
        bag-grid quest purpose marks, map quest markers. Bright saturated
        yellow reserved for quest, never chrome. Distinct from --gold / --color-accent

@@ -468,7 +468,7 @@ import {
 import { marketCollectIndicatorView } from './market_view';
 import { MarketWindow } from './market_window';
 import { materialHintLine } from './material_hint_view';
-import { materialProfessionHintLine } from './material_profession_hint_view';
+import { materialProfessionHintText } from './material_profession_hint_view';
 import { Meters } from './meters';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
@@ -5350,8 +5350,13 @@ export class Hud {
     }
     // Profession affinity for honest materials (material_profession_hint_view.ts):
     // "Used by Leatherworking, ..." derived from live recipe/enchant consumers.
-    // Skips when a more specific purpose line above already covers a single craft.
-    html += materialProfessionHintLine(item.id);
+    // Skips when a more specific purpose line above already covers a single
+    // craft. Painted like the cooking hint (createElement, no HTML-string
+    // growth); the tt-material-use modifier carries the theme-emitted tint.
+    const materialUseText = materialProfessionHintText(item.id);
+    if (materialUseText) {
+      html += createTooltipLine(materialUseText, 'tt-desc', 'tt-material-use').outerHTML;
+    }
     if (item.potionHp)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)

@@ -5,7 +5,7 @@
 // that consume it when an item can serve more than one role. Kind stays
 // 'junk' internally for Sell Junk / taxonomy; the kind line already reads
 // "Material" via item_kind_label.ts. This module adds the second line:
-// "Used by Leatherworking, Armorcrafting, and Weaponcrafting."
+// "Used by Leatherworking, Weaponcrafting, and Armorcrafting."
 //
 // Data half is content-derived (sim/material_profession_affinity.ts). Specific
 // purpose hints win when they already answer "what is this for" more clearly
@@ -14,44 +14,19 @@
 // material_hint_view. Multi-craft cooking reagents (e.g. a catch also used by
 // Engineering) still get this line so secondary crafts are not hidden.
 //
+// TEXT only, no markup: the host paints via createTooltipLine
+// (tooltip_line.ts) with the tt-material-use modifier, per the
+// cooking_catch_hint_view precedent, so this feature does not grow the
+// legacy HTML-string tooltip path.
+//
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
 import { craftIdsForMaterialItem } from '../sim/material_profession_affinity';
 import { MATERIAL_ITEM_IDS } from '../sim/material_taxonomy';
 import { cookingCatchHintKey } from './cooking_catch_hint_view';
-import { esc } from './esc';
-import { getLanguage, languageTag, type TranslationKey, t } from './i18n';
+import { craftNameKey } from './craft_name_view';
+import { formatList, t } from './i18n';
 import { materialHintKey } from './material_hint_view';
-
-/** Per-craft display names (same keys as char_window CRAFT_NAME_KEYS / CRAFT_RING). */
-const CRAFT_NAME_KEYS: Readonly<Record<string, TranslationKey>> = {
-  armorcrafting: 'hudChrome.craftName.armorcrafting',
-  weaponcrafting: 'hudChrome.craftName.weaponcrafting',
-  jewelcrafting: 'hudChrome.craftName.jewelcrafting',
-  alchemy: 'hudChrome.craftName.alchemy',
-  engineering: 'hudChrome.craftName.engineering',
-  cooking: 'hudChrome.craftName.cooking',
-  inscription: 'hudChrome.craftName.inscription',
-  enchanting: 'hudChrome.craftName.enchanting',
-  tailoring: 'hudChrome.craftName.tailoring',
-  leatherworking: 'hudChrome.craftName.leatherworking',
-};
-
-const listFormatCache = new Map<string, Intl.ListFormat>();
-
-function listFormatFor(tag: string): Intl.ListFormat {
-  let fmt = listFormatCache.get(tag);
-  if (!fmt) {
-    fmt = new Intl.ListFormat(tag, { style: 'long', type: 'conjunction' });
-    listFormatCache.set(tag, fmt);
-  }
-  return fmt;
-}
-
-function craftDisplayName(craftId: string): string {
-  const key = CRAFT_NAME_KEYS[craftId];
-  return key ? t(key) : craftId;
-}
 
 /**
  * Whether this material already has a more specific purpose sentence that
@@ -65,8 +40,15 @@ function hasSupersedingPurposeHint(itemId: string, craftIds: readonly string[]):
   if (cookingCatchHintKey(itemId) !== undefined) {
     return craftIds.length === 1 && craftIds[0] === 'cooking';
   }
-  // Enchanting materials already open with "Enchanting reagent. ..."
-  if (materialHintKey(itemId) !== undefined) {
+  // The arcane/resonant materials open with "Enchanting reagent. ...", which
+  // already names the one craft. MATERIAL_HINT_KEYS also holds the nine fine
+  // grades sharing the fineGrade key, but that sentence names NO craft, so a
+  // fine grade never supersedes: even a hypothetical enchanting-only fine
+  // grade still needs its Used-by line. The key literal below is type-safe,
+  // not stringly: TranslationKey is the generated catalog union, so a renamed
+  // fineGrade key turns this comparison into a tsc no-overlap error.
+  const hintKey = materialHintKey(itemId);
+  if (hintKey !== undefined && hintKey !== 'hudChrome.materialHint.fineGrade') {
     return craftIds.length === 1 && craftIds[0] === 'enchanting';
   }
   return false;
@@ -82,16 +64,13 @@ export function materialProfessionHintText(itemId: string): string {
   const craftIds = craftIdsForMaterialItem(itemId);
   if (craftIds.length === 0) return '';
   if (hasSupersedingPurposeHint(itemId, craftIds)) return '';
-  const names = craftIds.map(craftDisplayName);
-  const crafts = listFormatFor(languageTag(getLanguage())).format(names);
-  return t('hudChrome.materialHint.usedBy', { crafts });
-}
-
-/**
- * The hint as a tooltip description line, or '' when none. Same muted
- * tt-desc style as material_hint_view / cooking catch purpose lines.
- */
-export function materialProfessionHintLine(itemId: string): string {
-  const text = materialProfessionHintText(itemId);
-  return text ? `<div class="tt-desc tt-material-use">${esc(text)}</div>` : '';
+  const names: string[] = [];
+  for (const craftId of craftIds) {
+    // Structurally dead skip: the affinity returns only ring ids and the
+    // craft_name_view pin covers every ring id. Never render a raw id.
+    const key = craftNameKey(craftId);
+    if (key !== undefined) names.push(t(key));
+  }
+  if (names.length === 0) return '';
+  return t('hudChrome.materialHint.usedBy', { crafts: formatList(names) });
 }

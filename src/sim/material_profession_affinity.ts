@@ -12,18 +12,20 @@
 // intentional order rather than first-seen recipe order.
 //
 // HARD RULE: no file under src/sim may import this module (same cycle hazard
-// as material_taxonomy.ts). UI and tests are the only consumers.
+// as material_taxonomy.ts; enforced beside it by the shared importer scan in
+// tests/material_taxonomy.test.ts, and first-evaluation safety is proven by
+// tests/material_profession_affinity_bootstrap.test.ts). UI and tests are
+// the only consumers. Recipes are imported from content/recipes directly,
+// NOT via data.ts, so this leaf keeps the whole data.ts closure out of its
+// import graph and the hazard stays as small as the content tables it reads.
 
 import { ENCHANTS } from './content/enchants';
 import { CRAFT_RING } from './content/professions';
-import { ALL_RECIPES } from './data';
+import { ALL_RECIPES } from './content/recipes';
 import { baseMaterialFor } from './professions/material_grades';
 
 /** Direct item id -> craft ids that list it as a reagent (recipes + enchants). */
-function deriveDirectCraftConsumers(
-  recipes: typeof ALL_RECIPES,
-  enchants: typeof ENCHANTS,
-): ReadonlyMap<string, ReadonlySet<string>> {
+function deriveDirectCraftConsumers(): ReadonlyMap<string, ReadonlySet<string>> {
   const map = new Map<string, Set<string>>();
   const add = (itemId: string, craftId: string): void => {
     let set = map.get(itemId);
@@ -33,12 +35,12 @@ function deriveDirectCraftConsumers(
     }
     set.add(craftId);
   };
-  for (const recipe of recipes) {
+  for (const recipe of ALL_RECIPES) {
     for (const reagent of recipe.reagents) {
       add(reagent.itemId, recipe.professionId);
     }
   }
-  for (const enchant of Object.values(enchants)) {
+  for (const enchant of Object.values(ENCHANTS)) {
     for (const reagent of enchant.reagents) {
       add(reagent.itemId, 'enchanting');
     }
@@ -46,12 +48,16 @@ function deriveDirectCraftConsumers(
   return map;
 }
 
-const DIRECT_CONSUMERS: ReadonlyMap<string, ReadonlySet<string>> = deriveDirectCraftConsumers(
-  ALL_RECIPES,
-  ENCHANTS,
-);
+const DIRECT_CONSUMERS: ReadonlyMap<string, ReadonlySet<string>> = deriveDirectCraftConsumers();
 
 const CRAFT_RING_ORDER: readonly string[] = CRAFT_RING.map((craft) => craft.id);
+
+// The content tables never change after module evaluation, so the ring-ordered
+// result per item id is memoized on first ask (tooltips re-ask on every hover).
+// Misses memoize too, which is fine while callers pass catalog item ids (the
+// tooltip does); a future caller feeding unbounded arbitrary ids would need a
+// cap here first.
+const CRAFTS_BY_ITEM = new Map<string, readonly string[]>();
 
 /**
  * Craft ids that consume `itemId` as a reagent, in CRAFT_RING order.
@@ -59,6 +65,8 @@ const CRAFT_RING_ORDER: readonly string[] = CRAFT_RING.map((craft) => craft.id);
  * Empty when nothing on the craft ring or enchant table consumes the id.
  */
 export function craftIdsForMaterialItem(itemId: string): readonly string[] {
+  const memo = CRAFTS_BY_ITEM.get(itemId);
+  if (memo !== undefined) return memo;
   const crafts = new Set<string>();
   const direct = DIRECT_CONSUMERS.get(itemId);
   if (direct) {
@@ -72,6 +80,8 @@ export function craftIdsForMaterialItem(itemId: string): readonly string[] {
       for (const craftId of baseCrafts) crafts.add(craftId);
     }
   }
-  if (crafts.size === 0) return [];
-  return CRAFT_RING_ORDER.filter((craftId) => crafts.has(craftId));
+  const result: readonly string[] =
+    crafts.size === 0 ? [] : CRAFT_RING_ORDER.filter((craftId) => crafts.has(craftId));
+  CRAFTS_BY_ITEM.set(itemId, result);
+  return result;
 }

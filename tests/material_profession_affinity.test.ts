@@ -3,8 +3,10 @@
 // craft ring. A pure sim leaf; no DOM.
 
 import { describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import { CRAFT_RING } from '../src/sim/content/professions';
-import { ALL_RECIPES } from '../src/sim/data';
+import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { ALL_RECIPES as ALL_RECIPES_VIA_DATA } from '../src/sim/data';
 import { craftIdsForMaterialItem } from '../src/sim/material_profession_affinity';
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
 import { baseMaterialFor, MATERIAL_GRADES } from '../src/sim/professions/material_grades';
@@ -88,5 +90,63 @@ describe('craftIdsForMaterialItem', () => {
     expect(craftIdsForMaterialItem('rusty_sword')).toEqual([]);
     expect(craftIdsForMaterialItem('not_a_real_item')).toEqual([]);
     expect(craftIdsForMaterialItem('simple_fishing_pole')).toEqual([]);
+  });
+
+  it('data.ts ALL_RECIPES stays a verbatim copy of the content export', () => {
+    // The module (and the oracle below) read content/recipes directly, so a
+    // future data.ts that merges an extra recipe family would diverge from
+    // both invisibly: the tooltip would under-report and the oracle would
+    // agree with it. Pin the two exports element-for-element so that
+    // divergence fails here first.
+    expect(ALL_RECIPES_VIA_DATA).toEqual(ALL_RECIPES);
+  });
+
+  it('matches an independently re-derived consumer set for every material', () => {
+    // Double-entry oracle: rebuild the expected set here from the same content
+    // tables (recipes, enchants, downward grade substitution) and require
+    // exact-set equality per material. The property arms above cannot catch a
+    // partial silent drop (an item consumed by three crafts returning two,
+    // still ring-ordered) or the ring filter quietly losing an off-ring
+    // consumer; this arm fails loudly on both.
+    const direct = new Map<string, Set<string>>();
+    const add = (itemId: string, craftId: string): void => {
+      let set = direct.get(itemId);
+      if (!set) {
+        set = new Set();
+        direct.set(itemId, set);
+      }
+      set.add(craftId);
+    };
+    for (const recipe of ALL_RECIPES) {
+      for (const reagent of recipe.reagents) add(reagent.itemId, recipe.professionId);
+    }
+    for (const enchant of Object.values(ENCHANTS)) {
+      for (const reagent of enchant.reagents) add(reagent.itemId, 'enchanting');
+    }
+    for (const itemId of MATERIAL_ITEM_IDS) {
+      const expected = new Set(direct.get(itemId) ?? []);
+      const baseItemId = baseMaterialFor(itemId);
+      if (baseItemId !== undefined) {
+        for (const craftId of direct.get(baseItemId) ?? []) expected.add(craftId);
+      }
+      expect(new Set(craftIdsForMaterialItem(itemId)), itemId).toEqual(expected);
+    }
+  });
+
+  it('no enchant reagent is a graded base material (substitution asymmetry tripwire)', () => {
+    // The craft path consumes through downward grade substitution
+    // (planGradeRemoval), but the enchant path removes by exact item id with
+    // no substitution. The fine-grade inheritance in craftIdsForMaterialItem
+    // is therefore only honest while no enchant lists a graded BASE material:
+    // the day one does, the fine grade would claim "Used by Enchanting" while
+    // applyEnchant refuses it. Trip here so that day is a deliberate call.
+    for (const enchant of Object.values(ENCHANTS)) {
+      for (const reagent of enchant.reagents) {
+        expect(
+          MATERIAL_GRADES[reagent.itemId],
+          `${reagent.itemId} is a graded base consumed by an enchant`,
+        ).toBeUndefined();
+      }
+    }
   });
 });
