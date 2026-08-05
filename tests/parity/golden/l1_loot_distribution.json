@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "fc6a89ff",
+      "state": "a73503a9",
       "events": "b1db937b",
       "rng": {
         "draws": 1,
@@ -58,7 +58,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -121,7 +120,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -183,7 +181,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -244,7 +241,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.596036,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -295,7 +291,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.485736,
           "fiveSecondRule": 99,
           "hp": 54,
@@ -347,7 +342,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.335688,
           "fiveSecondRule": 99,
           "hp": 62,
@@ -407,7 +401,6 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.65162,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -466,7 +459,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "8a67974d",
+      "state": "e3beff13",
       "events": "22d50c10",
       "rng": {
         "draws": 3,
@@ -494,7 +487,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -569,7 +561,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -638,7 +629,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -706,7 +696,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.596036,
           "fiveSecondRule": 99.05,
           "hp": 100,
@@ -757,7 +746,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.485736,
           "fiveSecondRule": 99.05,
           "hp": 54,
@@ -809,7 +797,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.335688,
           "fiveSecondRule": 99.05,
           "hp": 62,
@@ -869,7 +856,6 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.65162,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -934,7 +920,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "cc30434b",
+      "state": "657e7395",
       "events": "024a26d2",
       "rng": {
         "draws": 3,
@@ -962,7 +948,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -1037,7 +1022,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1115,7 +1099,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1183,7 +1166,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.596036,
           "fiveSecondRule": 99.05,
           "hp": 100,
@@ -1234,7 +1216,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.485736,
           "fiveSecondRule": 99.05,
           "hp": 54,
@@ -1286,7 +1267,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.335688,
           "fiveSecondRule": 99.05,
           "hp": 62,
@@ -1346,7 +1326,6 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.65162,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -1395,7 +1374,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 967,
-      "state": "876ee61a",
+      "state": "c8907f7e",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1423,7 +1402,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -1498,7 +1476,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1576,7 +1553,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1644,7 +1620,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.596036,
           "fiveSecondRule": 99.15,
           "hp": 100,
@@ -1695,7 +1670,6 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.485736,
           "fiveSecondRule": 99.15,
           "hp": 54,
@@ -1747,7 +1721,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.335688,
           "fiveSecondRule": 99.15,
           "hp": 62,
@@ -1807,7 +1780,6 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.65162,
           "fiveSecondRule": 99,
           "hostile": true,

@@ -35,7 +35,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "5f8686cb",
+      "state": "9ff362cf",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,7 +61,6 @@
           "copper": 1000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -120,7 +119,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -169,7 +167,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "3b3bebd0",
+      "state": "da17cafe",
       "events": "a005f741",
       "rng": {
         "draws": 0,
@@ -195,7 +193,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -264,7 +261,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -313,7 +309,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "908927b7",
+      "state": "f8c7c7a9",
       "events": "da42f643",
       "rng": {
         "draws": 0,
@@ -339,7 +335,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -415,7 +410,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 130,
@@ -464,7 +458,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "d7135130",
+      "state": "a357a41c",
       "events": "67742213",
       "rng": {
         "draws": 0,
@@ -490,7 +484,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -566,7 +559,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 120,
@@ -615,7 +607,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "1118aaaa",
+      "state": "827332e8",
       "events": "5ae2a56a",
       "rng": {
         "draws": 0,
@@ -641,7 +633,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -720,7 +711,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -769,7 +759,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "4fa036f4",
+      "state": "f1c73818",
       "events": "6024a757",
       "rng": {
         "draws": 0,
@@ -795,7 +785,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -886,7 +875,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -936,7 +924,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "d71ba8f5",
+      "state": "79d4bbcf",
       "events": "bf90a36a",
       "rng": {
         "draws": 0,
@@ -962,7 +950,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1049,7 +1036,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -1099,7 +1085,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "576c71a8",
+      "state": "b001472c",
       "events": "128abc98",
       "rng": {
         "draws": 0,
@@ -1125,7 +1111,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1223,7 +1208,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1273,7 +1257,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "d8b05ba1",
+      "state": "762e1d63",
       "events": "c6f07715",
       "rng": {
         "draws": 0,
@@ -1299,7 +1283,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1401,7 +1384,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1451,7 +1433,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e771ba18",
+      "state": "3e91ea1a",
       "events": "cd1eb7e0",
       "rng": {
         "draws": 0,
@@ -1477,7 +1459,6 @@
           "copper": 710,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1584,7 +1565,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1634,7 +1614,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e88144d1",
+      "state": "2af1a267",
       "events": "c9308034",
       "rng": {
         "draws": 0,
@@ -1660,7 +1640,6 @@
           "copper": 714,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1773,7 +1752,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -1823,7 +1801,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "7180672e",
+      "state": "915f6eb2",
       "events": "0dc07402",
       "rng": {
         "draws": 0,
@@ -1849,7 +1827,6 @@
           "copper": 720,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1967,7 +1944,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -2017,7 +1993,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "61b73bd3",
+      "state": "2c56c891",
       "events": "54f870b1",
       "rng": {
         "draws": 0,
@@ -2043,7 +2019,6 @@
           "copper": 716,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2157,7 +2132,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,
@@ -2207,7 +2181,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "61b73bd3",
+      "state": "2c56c891",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2233,7 +2207,6 @@
           "copper": 716,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2347,7 +2320,6 @@
             "kind": "food",
             "remaining": 18
           },
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 220,

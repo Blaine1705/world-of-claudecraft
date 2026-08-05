@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "50498096",
+      "state": "56ea11a2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -88,7 +87,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 62,
@@ -145,7 +143,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 974,
-      "state": "5c2a7b4e",
+      "state": "3769053c",
       "events": "16ac6f59",
       "rng": {
         "draws": 7,
@@ -156,7 +154,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 974,
-      "state": "29d94346",
+      "state": "4b60ae1c",
       "events": "cc147418",
       "rng": {
         "draws": 7,
@@ -167,7 +165,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 974,
-      "state": "b05935ab",
+      "state": "9948e1af",
       "events": "a7d6b368",
       "rng": {
         "draws": 10,
@@ -178,7 +176,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 976,
-      "state": "34ca5b21",
+      "state": "7eb7a0f9",
       "events": "f83a7208",
       "rng": {
         "draws": 13,
@@ -209,7 +207,6 @@
             "xpGained": 898
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 1635,
@@ -298,7 +295,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "enchantCastBagSlot": -1,
           "fiveSecondRule": 100.9,
           "hp": 50000,
           "id": 959,
@@ -356,7 +352,6 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 62,
@@ -399,7 +394,6 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -454,7 +448,6 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,
@@ -492,7 +485,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "a06f51af",
+      "state": "3f9aa957",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -503,7 +496,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 976,
-      "state": "a06f51af",
+      "state": "3f9aa957",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -534,7 +527,6 @@
             "xpGained": 898
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 1635,
@@ -623,7 +615,6 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "enchantCastBagSlot": -1,
           "fiveSecondRule": 101,
           "hp": 50000,
           "id": 959,
@@ -681,7 +672,6 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "facing": -1.570796,
           "fiveSecondRule": 99,
           "hp": 62,
@@ -724,7 +714,6 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "facing": 1.570796,
           "fiveSecondRule": 99,
           "hostile": true,
@@ -779,7 +768,6 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "enchantCastBagSlot": -1,
           "facing": 3.141593,
           "fiveSecondRule": 99,
           "hp": 1,

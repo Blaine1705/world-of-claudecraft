@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "d2f92d18",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -49,7 +49,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -108,7 +107,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -157,7 +155,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "a107d4da",
+      "state": "f7b3a426",
       "events": "df133d2d",
       "rng": {
         "draws": 0,
@@ -183,7 +181,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -262,7 +259,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -311,7 +307,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "f1f14692",
+      "state": "149d5bb4",
       "events": "fe777845",
       "rng": {
         "draws": 2,
@@ -339,7 +335,6 @@
             "xpGained": 36
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -444,7 +439,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.136687,
           "fiveSecondRule": 101.55,
           "hp": 100,
@@ -493,7 +487,7 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 964,
-      "state": "01889b8f",
+      "state": "50b38beb",
       "events": "414479fe",
       "rng": {
         "draws": 2,
@@ -521,7 +515,6 @@
             "xpGained": 36
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -626,7 +619,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.136687,
           "fiveSecondRule": 101.65,
           "hp": 100,
@@ -675,7 +667,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 964,
-      "state": "50eea2b5",
+      "state": "aeec96ef",
       "events": "1796b529",
       "rng": {
         "draws": 2,
@@ -703,7 +695,6 @@
             "xpGained": 36
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -808,7 +799,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.136687,
           "fiveSecondRule": 101.75,
           "hp": 100,
@@ -857,7 +847,7 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 964,
-      "state": "9ea04d30",
+      "state": "9c614696",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
@@ -885,7 +875,6 @@
             "xpGained": 72
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -999,7 +988,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.314273,
           "fiveSecondRule": 104.3,
           "hp": 100,
@@ -1048,7 +1036,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "adbc87e9",
+      "state": "5ceae577",
       "events": "bc352f64",
       "rng": {
         "draws": 6,
@@ -1076,7 +1064,6 @@
             "xpGained": 108
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1191,7 +1178,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 2.911251,
           "fiveSecondRule": 106.85,
           "hp": 100,
@@ -1240,7 +1226,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "a183471e",
+      "state": "93e6ab9a",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -1268,7 +1254,6 @@
             "xpGained": 108
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1383,7 +1368,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 2.911251,
           "fiveSecondRule": 106.95,
           "hp": 100,

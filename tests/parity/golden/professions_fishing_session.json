@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "d2f92d18",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,7 +44,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -103,7 +102,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hp": 100,
@@ -152,7 +150,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "0e107654",
+      "state": "eb9c3728",
       "events": "9988cb27",
       "rng": {
         "draws": 1,
@@ -178,7 +176,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -245,7 +242,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.981028,
           "fishBiteAtTick": 86,
           "fishCastZoneId": "eastbrook_vale",
@@ -296,7 +292,7 @@
       "tick": 86,
       "time": 4.3,
       "nextId": 964,
-      "state": "507151c3",
+      "state": "0024c8f9",
       "events": "affa4108",
       "rng": {
         "draws": 1,
@@ -322,7 +318,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -389,7 +384,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.981028,
           "fishCastZoneId": "eastbrook_vale",
           "fishReelDeadlineTick": 136,
@@ -440,7 +434,7 @@
       "tick": 86,
       "time": 4.3,
       "nextId": 964,
-      "state": "e930bc31",
+      "state": "2f38981b",
       "events": "e279fb5a",
       "rng": {
         "draws": 2,
@@ -466,7 +460,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -545,7 +538,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.981028,
           "fiveSecondRule": 103.3,
           "hp": 100,
@@ -594,7 +586,7 @@
       "tick": 94,
       "time": 4.7,
       "nextId": 964,
-      "state": "22374711",
+      "state": "4ee68767",
       "events": "943b953c",
       "rng": {
         "draws": 3,
@@ -620,7 +612,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -708,7 +699,6 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "enchantCastBagSlot": -1,
           "fallStartY": -2.981028,
           "fishBiteAtTick": 219,
           "fishCastZoneId": "eastbrook_vale",
