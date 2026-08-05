@@ -10383,6 +10383,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.toolEffectName.quickeningCharm': 'Оберег возрождения',
   'hudChrome.professions.toolEffectName.artisansEye': 'Глаз ремесленника',
   'hudChrome.professions.toolEffectName.gatherersCache': 'Сумка собирателя',
+  'hudChrome.professions.toolEffectTooltip.kind': 'Талисман для инструмента',
+  'hudChrome.professions.toolEffectTooltip.bonus.gatherersCache':
+    'Пока есть заряды, каждый сбор приносит +1 к добыче.',
+  'hudChrome.professions.toolEffectTooltip.bonus.artisansEye':
+    'Пока есть заряды, повышает класс добычи на 1 уровень инструмента.',
+  'hudChrome.professions.toolEffectTooltip.bonus.quickeningCharm':
+    'Сокращает таймер возрождения источника, на котором сработал.',
+  'hudChrome.professions.toolEffectTooltip.howToSlot':
+    'Устанавливается на инструмент для горного дела, лесозаготовки или травничества в окне профессий. Расходуется при установке.',
+  'hudChrome.professions.toolEffectTooltip.charges':
+    'На обычном инструменте изначально {base} зарядов (+{bonus} за каждую ступень редкости).',
+  'hudChrome.professions.toolEffectTooltip.landOnly': 'На удочку не устанавливается.',
+  'hudChrome.professions.toolEffectTooltip.openProfessions':
+    'Откройте окно профессий, чтобы установить талисман на инструмент для сбора.',
   'hudChrome.professions.toolEffectSlotButton': 'Установить {effect}',
   'hudChrome.professions.toolEffectRechargeButton': 'Перезарядить',
   'hudChrome.professions.toolEffectNoGain': '{effect} уже установлен и полностью заряжен.',

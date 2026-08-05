@@ -2627,6 +2627,18 @@ export const en_XA: EnTranslations = {
         "artisansEye": "[Áŕţíšáñ'š Éýé]",
         "quickeningCharm": "[Šþŕíñĝƀáçķ Çĥáŕɱ]"
       },
+      "toolEffectTooltip": {
+        "kind": "[Ţóóļ çĥáŕɱ]",
+        "bonus": {
+          "gatherersCache": "[+1 ýíéļð þéŕ ĥáŕʋéšţ ŵĥíļé çĥáŕĝéð.]",
+          "artisansEye": "[Ŕáíšéš ţĥé ĥáŕʋéšţ ĝŕáðé ƀý 1 ţóóļ ţíéŕ ŵĥíļé çĥáŕĝéð.]",
+          "quickeningCharm": "[Šĥóŕţéñš ţĥé ñóðé ŕéšþáŵñ ţíɱéŕ íţ ţŕíĝĝéŕš.]"
+        },
+        "howToSlot": "[Šļóţ óñţó á ɱíñíñĝ, ļóĝĝíñĝ, óŕ ĥéŕƀáļíšɱ ţóóļ ƒŕóɱ ţĥé Þŕóƒéššíóñš ŵíñðóŵ. Çóñšúɱéð ŵĥéñ šļóţţéð.]",
+        "charges": "[Šţáŕţš ŵíţĥ {base} çĥáŕĝéš óñ á çóɱɱóñ ţóóļ (+{bonus} þéŕ ŕáŕíţý ŕúñĝ).]",
+        "landOnly": "[Ðóéš ñóţ šļóţ óñ ƒíšĥíñĝ ŕóðš.]",
+        "openProfessions": "[Óþéñ Þŕóƒéššíóñš ţó šļóţ ţĥíš óñţó á ĝáţĥéŕíñĝ ţóóļ.]"
+      },
       "toolEffectSlotButton": "[Šļóţ {effect}]",
       "toolEffectRechargeButton": "[Ŕéçĥáŕĝé]",
       "toolEffectSlotted": "[{effect} šļóţţéð óñ {profession}.]",

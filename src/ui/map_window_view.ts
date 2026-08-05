@@ -514,8 +514,8 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
   // so a panned sub-rect only pays for what is on screen. Tool-tier memo is
   // per-build and per-profession (the minimap shape): empty inventory locks
   // every node, and a tool picked up between redraws re-resolves next paint.
-  // Cap is tiny (six of each type per zone in content), so individual markers
-  // stay cheap at every zoom, including the full-zone frame.
+  // Cap is tiny (at most six of each type per zone in content), so individual
+  // markers stay cheap at every zoom, including the full-zone frame.
   const gatherNodes: MapGatherNodeMarker[] = [];
   let bestToolTiers: Map<GatheringProfessionId, number> | null = null;
   let proficiency: Readonly<Record<string, number>> | undefined;

@@ -446,6 +446,7 @@ import { mailIndicatorView } from './mailbox_view';
 import { MailboxWindow } from './mailbox_window';
 import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
+import { type MapGatherTipMemo, resolveGatherTipMemo } from './map_gather_tip_memo';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
 import {
   MAP_TAP_MOVE_TOLERANCE_PX,
@@ -597,6 +598,7 @@ import { targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
+import { toolEffectTooltipLines } from './tool_effect_tooltip';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
@@ -1679,6 +1681,11 @@ export class Hud {
   // Gather-node icons of the last overworld map paint (zone map only), for the
   // hover/tap tooltip hit-test. Empty in delve mode and on the continent.
   private mapGatherNodes: MapGatherNodeMarker[] = [];
+  // Last gather-tip resolve, keyed by node id (map_gather_tip_memo.ts, the
+  // resolve-elision seam). Reset beside every mapGatherNodes rebuild, so a
+  // respawn or lock flip is at most one mediumHud repaint behind, the same
+  // freshness as the painted icon.
+  private mapGatherTipMemo: MapGatherTipMemo | null = null;
   // World-map level: the per-zone detail map, or the WoW-style continent overview
   // reached by right-click / the level-toggle button. Reset to 'zone' on open.
   private mapLevel: 'zone' | 'continent' = 'zone';
@@ -2520,9 +2527,10 @@ export class Hud {
     // quest-giver glyph ('!'/'?', quest names + level requirements) sits ON TOP of
     // gather icons and quest blobs, so it wins; then a gather node (precise
     // resource target); otherwise a quest-objective area shows its objectives
-    // with live tracker progress. Hit-tests run against the markers of the
-    // last paint, scaled from CSS px to the canvas backing space the model projects
-    // into.
+    // with live tracker progress. An arm that resolves no html falls through to
+    // the next (a glyph whose quests are all missing from content no longer
+    // blanks the tip). Hit-tests run against the markers of the last paint,
+    // scaled from CSS px to the canvas backing space the model projects into.
     let mapAreaTipShown = false;
     let mapTapStart: { x: number; y: number } | null = null;
     const hideMapAreaTip = (): void => {
@@ -5378,6 +5386,10 @@ export class Hud {
     // pole render their kind, requirement, use, and bonus lines from the
     // pure sibling module (the item_instance_tooltip.ts pattern).
     html += gatherToolTooltipLines(item);
+    // Tool-effect charms (Gatherer's Cache / Artisan's Eye): what the charm
+    // does, how to slot it from Professions, and the charge ladder. Bags,
+    // bank, crafting, and market all compose this through itemTooltip.
+    html += toolEffectTooltipLines(item);
     // Purpose hint for the eight enchanting materials (material_hint_view.ts
     // keys the table by item id): what the reagent is for and which gear
     // disenchants into it. Every other item id renders nothing here.
@@ -9861,6 +9873,7 @@ export class Hud {
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
       this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
       this.continentRegions = [];
       this.delvePainter.paintWorldMapDelve(ctx, this.sim, S);
       const run = this.sim.delveRun;
@@ -9885,6 +9898,7 @@ export class Hud {
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
       this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
       this.mapView = null; // panning/zoom belong to the per-zone level only
       const result = this.continentPainter.paintContinent(ctx, this.sim, {
         canvasSize: S,
@@ -9934,6 +9948,7 @@ export class Hud {
     this.mapQuestAreas = result.questAreas;
     this.mapNpcMarkers = result.npcs;
     this.mapGatherNodes = result.gatherNodes;
+    this.mapGatherTipMemo = null;
     if (!this.mapDrag) canvas.style.cursor = result.cursor;
     // Inside a rift the aria-live summary must name the generated floor, not
     // the overworld zone the far-off rift x would otherwise resolve to
@@ -9963,10 +9978,14 @@ export class Hud {
 
   // Tooltip body for a hovered gather node on the zone map: reuses the world
   // hover's pure model + HTML (name, tool gate, ready/cooldown, fine preview)
-  // so the map and the 3D node tip never disagree.
+  // so the map and the 3D node tip never disagree. Memoized per node id (see
+  // mapGatherTipMemo) so a pointer sweeping across one icon resolves once.
   private gatherNodeMapTooltipHtml(marker: MapGatherNodeMarker): string {
-    const model = buildGatherNodeTooltip(this.sim, marker.nodeId);
-    return model ? gatherNodeTooltipHtml(model) : '';
+    this.mapGatherTipMemo = resolveGatherTipMemo(this.mapGatherTipMemo, marker.nodeId, (nodeId) => {
+      const model = buildGatherNodeTooltip(this.sim, nodeId);
+      return model ? gatherNodeTooltipHtml(model) : '';
+    });
+    return this.mapGatherTipMemo.html;
   }
 
   // Tooltip body for a hovered quest-giver glyph on the world map: each quest

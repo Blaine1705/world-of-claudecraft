@@ -242,8 +242,9 @@
     --color-map-campfire: #ff9a3c;
     /* Zone-map gather nodes (profession-colored, distinct from the minimap's
        single ready-green): ore copper, wood forest, herb violet. Cooldown is a
-       desaturated sibling of the ready hue; locked reuses the minimap rust so
-       both surfaces agree. Glow is a soft ready halo (rgba) under the icon. */
+       desaturated sibling of the ready hue; locked references the minimap rust
+       token so both surfaces agree structurally (retune one, both follow).
+       Glow is a soft ready halo (rgba) under the icon. */
     --color-map-gather-ore-ready: #e8a44a;
     --color-map-gather-ore-cooldown: #7a6240;
     --color-map-gather-ore-glow: rgba(232, 164, 74, 0.32);
@@ -253,7 +254,7 @@
     --color-map-gather-herb-ready: #c084fc;
     --color-map-gather-herb-cooldown: #6a5288;
     --color-map-gather-herb-glow: rgba(192, 132, 252, 0.32);
-    --color-map-gather-locked: #8a4a3a;
+    --color-map-gather-locked: var(--color-minimap-node-locked);
     /* continent overview: the open water the world_overview plate is letterboxed
        into (resolved by continent_map_painter.ts). Its own token rather than
        --color-map-ocean above, because the plate is a tall portrait crop of the
