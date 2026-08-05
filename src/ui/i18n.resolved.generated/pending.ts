@@ -9,25 +9,95 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "es_ES": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "fr_FR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "fr_CA": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
-  "pt_BR": [],
-  "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "it_IT": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "de_DE": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "zh_CN": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "zh_TW": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ko_KR": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ja_JP": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "pt_BR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ru_RU": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "cs_CZ": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "nl_NL": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "pl_PL": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "id_ID": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "tr_TR": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "sv_SE": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "vi_VN": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ],
+  "da_DK": [
+    "hudChrome.crafting.skillUpSubtext",
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
+  ]
 };
