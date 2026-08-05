@@ -139,18 +139,24 @@ export class FakeWocMarketDb implements WocMarketDb {
       if (
         row.realm === listing.realm &&
         row.sellerAccount === listing.sellerAccount &&
-        row.status !== 'closed'
+        row.status !== 'closed' &&
+        row.directedBuyerAccount === null
       ) {
         active += 1;
       }
     }
-    if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
+    // Public-listing-only in both directions, mirroring the real transaction.
+    if (
+      listing.params.directedBuyerAccount === null &&
+      active >= WOC_MARKET_MAX_ACTIVE_LISTINGS
+    ) {
       return { ok: false, reason: 'cap_reached' };
     }
     const id = this.nextListingId++;
     const row: WocListingRow = {
       id,
       realm: listing.realm,
+      directedBuyerAccount: listing.params.directedBuyerAccount,
       sellerAccount: listing.sellerAccount,
       sellerCharacter: listing.sellerCharacter,
       sellerName: listing.sellerName,
@@ -193,6 +199,10 @@ export class FakeWocMarketDb implements WocMarketDb {
       (row) =>
         row.realm === realm &&
         (row.status === 'active' || row.status === 'settling' || row.status === 'ending') &&
+        // Mirrors the real query's unconditional exclusion. Without this the
+        // fake would report a directed row as publicly browsable and the test
+        // asserting it is hidden would pass against a fake that never hides it.
+        row.directedBuyerAccount === null &&
         (q.quality === null || row.quality === q.quality) &&
         (q.format === null || row.format === q.format) &&
         (itemIds === null || itemIds.includes(row.itemId)),
@@ -225,7 +235,16 @@ export class FakeWocMarketDb implements WocMarketDb {
   async countActiveBySeller(realm: string, account: number): Promise<number> {
     let n = 0;
     for (const row of this.listings.values()) {
-      if (row.realm === realm && row.sellerAccount === account && row.status !== 'closed') n += 1;
+      // Directed offers are exempt from the cap (see countActiveBySeller in
+      // server/woc_market_db.ts); the fake must exempt them too.
+      if (
+        row.realm === realm &&
+        row.sellerAccount === account &&
+        row.status !== 'closed' &&
+        row.directedBuyerAccount === null
+      ) {
+        n += 1;
+      }
     }
     return n;
   }

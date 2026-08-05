@@ -101,6 +101,22 @@ CREATE INDEX IF NOT EXISTS woc_market_listings_closed_updated
   ON woc_market_listings(updated_at)
   WHERE status = 'closed' AND item_disposed = true;
 
+-- A DIRECTED sale: one named counterparty, agreed in the trade window and sold
+-- on this same rail (docs/prd/woc/p2p-woc-trade.md). NULL is the ordinary public
+-- listing, so every existing row keeps its meaning and the column is additive.
+--
+-- Keyed on ACCOUNT, not character, because the wallet check that decides whether
+-- the buyer can pay is account-level, and the delivery character is already
+-- recorded separately on the settlement. ON DELETE CASCADE matches
+-- seller_account: a deleted account cannot be owed a directed sale.
+ALTER TABLE woc_market_listings
+  ADD COLUMN IF NOT EXISTS directed_buyer_account INT REFERENCES accounts(id) ON DELETE CASCADE;
+-- The buyer's "offers made to me" read. Partial, because directed rows are a
+-- small minority of the table and the public browse must never touch them.
+CREATE INDEX IF NOT EXISTS woc_market_listings_directed_buyer
+  ON woc_market_listings(realm, directed_buyer_account, created_at DESC)
+  WHERE directed_buyer_account IS NOT NULL AND status <> 'closed';
+
 CREATE TABLE IF NOT EXISTS woc_market_bids (
   id BIGSERIAL PRIMARY KEY,
   listing_id BIGINT NOT NULL REFERENCES woc_market_listings(id) ON DELETE CASCADE,
@@ -240,7 +256,7 @@ const LISTING_COLS =
   'id, realm, seller_account, seller_character, seller_name, seller_wallet, item, item_id, ' +
   'quality, format, start_cents, reserve_cents, buy_now_cents, offer_next, status, resolution, ' +
   'item_disposed, current_bid_cents, current_bid_id, ends_at, base_ends_at, ' +
-  'buy_now_lock_account, buy_now_lock_expires, created_at';
+  'buy_now_lock_account, buy_now_lock_expires, created_at, directed_buyer_account';
 
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
@@ -288,6 +304,7 @@ function toListing(row: Row): WocListingRow {
     buyNowLockAccount: row.buy_now_lock_account ?? null,
     buyNowLockExpiresMs: msOrNull(row.buy_now_lock_expires),
     createdAtMs: ms(row.created_at),
+    directedBuyerAccount: row.directed_buyer_account ?? null,
   };
 }
 
@@ -398,13 +415,21 @@ export class PgWocMarketDb implements WocMarketDb {
       await client.query('SELECT 1 FROM accounts WHERE id = $1 FOR UPDATE', [
         listing.sellerAccount,
       ]);
-      const count = await client.query(
-        `SELECT COUNT(*)::int AS n FROM woc_market_listings
-          WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'`,
-        [listing.realm, listing.sellerAccount],
-      );
-      if ((count.rows[0]?.n ?? 0) >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
-        throw new TxAbort({ ok: false as const, reason: 'cap_reached' as const });
+      // The cap is PUBLIC-listing-only in both directions, matching the service's
+      // pre-check: a directed offer is exempt from it and invisible to it. This
+      // is the AUTHORITATIVE half (the pre-check races; this runs under the row
+      // lock), so the exemption has to be spelled here too or a directed offer
+      // would pass the pre-check and abort in the transaction.
+      if (listing.params.directedBuyerAccount === null) {
+        const count = await client.query(
+          `SELECT COUNT(*)::int AS n FROM woc_market_listings
+            WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'
+              AND directed_buyer_account IS NULL`,
+          [listing.realm, listing.sellerAccount],
+        );
+        if ((count.rows[0]?.n ?? 0) >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
+          throw new TxAbort({ ok: false as const, reason: 'cap_reached' as const });
+        }
       }
       const saved = await saveCharacterStateOnClient(
         client,
@@ -420,9 +445,9 @@ export class PgWocMarketDb implements WocMarketDb {
         `INSERT INTO woc_market_listings (
            realm, seller_account, seller_character, seller_name, seller_wallet,
            item, item_id, quality, format, start_cents, reserve_cents,
-           buy_now_cents, offer_next, ends_at, base_ends_at
+           buy_now_cents, offer_next, ends_at, base_ends_at, directed_buyer_account
          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
-                   to_timestamp($14 / 1000.0), to_timestamp($14 / 1000.0))
+                   to_timestamp($14 / 1000.0), to_timestamp($14 / 1000.0), $15)
          RETURNING id`,
         [
           listing.realm,
@@ -439,6 +464,7 @@ export class PgWocMarketDb implements WocMarketDb {
           listing.params.buyNowCents,
           listing.params.offerNext,
           listing.endsAtMs,
+          listing.params.directedBuyerAccount,
         ],
       );
       return { ok: true as const, id: Number(inserted.rows[0].id) };
@@ -457,7 +483,17 @@ export class PgWocMarketDb implements WocMarketDb {
     realm: string,
     q: WocBrowseQuery,
   ): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
-    const where: string[] = ['realm = $1', "status IN ('active', 'settling', 'ending')"];
+    // A directed sale is addressed to ONE named account, so it must never enter
+    // the public result set: a stranger who saw it could buy an item meant for
+    // someone else. This is a security boundary, not a display preference, which
+    // is why it is unconditional here rather than an option on WocBrowseQuery.
+    // The buyNow guard refuses a non-designated buyer as well, so this and that
+    // are two independent defences over the same rule.
+    const where: string[] = [
+      'realm = $1',
+      "status IN ('active', 'settling', 'ending')",
+      'directed_buyer_account IS NULL',
+    ];
     const params: unknown[] = [realm];
     if (q.quality) {
       params.push(q.quality);
@@ -510,13 +546,40 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows.map(toListing);
   }
 
+  /**
+   * The 12-listing cap counts PUBLIC listings only.
+   *
+   * The cap exists to bound two things: how much of one seller's inventory sits
+   * in escrow, and how far one seller can flood the public browse. A directed
+   * offer is addressed to a single named account and never appears in browse, so
+   * it cannot flood anything, and the requester chose to exempt it: a private
+   * deal with a friend should not be blocked because the seller happens to have
+   * twelve auctions running.
+   *
+   * The escrow half of the bound is genuinely loosened by that, and the
+   * mitigation is elsewhere: a directed offer holds its item only for the
+   * settlement window, which is far shorter than an auction's 12 to 48 hours.
+   */
   async countActiveBySeller(realm: string, account: number): Promise<number> {
     const res = await this.pool.query(
       `SELECT COUNT(*)::int AS n FROM woc_market_listings
-        WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'`,
+        WHERE realm = $1 AND seller_account = $2 AND status <> 'closed'
+          AND directed_buyer_account IS NULL`,
       [realm, account],
     );
     return res.rows[0]?.n ?? 0;
+  }
+
+  /** The buyer's side: directed offers addressed to this account. Rides the
+   *  woc_market_listings_directed_buyer partial index. */
+  async directedOffersForBuyer(realm: string, account: number): Promise<WocListingRow[]> {
+    const res = await this.pool.query(
+      `SELECT ${LISTING_COLS} FROM woc_market_listings
+        WHERE realm = $1 AND directed_buyer_account = $2 AND status <> 'closed'
+        ORDER BY created_at DESC LIMIT 50`,
+      [realm, account],
+    );
+    return res.rows.map(toListing);
   }
 
   async cancelListingIfUnbid(

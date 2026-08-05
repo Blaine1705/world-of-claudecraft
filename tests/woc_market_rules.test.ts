@@ -179,6 +179,7 @@ describe('strikeSuspensionMs: the progressive suspension ladder', () => {
 describe('validListingParams', () => {
   const params = (over: Partial<WocListingParams> = {}): WocListingParams => ({
     format: 'auction',
+    directedBuyerAccount: null,
     startCents: 1000,
     reserveCents: null,
     buyNowCents: null,
@@ -579,5 +580,65 @@ describe('custody references: the PostOffice book-once dedupe keys', () => {
     expect(settlementCustodyRef(7)).toBe('woc_settlement:7');
     expect(listingReturnCustodyRef(7)).toBe('woc_listing_return:7');
     expect(listingSoldNoticeCustodyRef(7)).toBe('woc_listing_sold:7');
+  });
+});
+
+describe('a directed sale (the p2p trade agreed in the trade window)', () => {
+  const directed = (over: Partial<WocListingParams> = {}): WocListingParams => ({
+    format: 'buy_now',
+    startCents: 1000,
+    reserveCents: null,
+    buyNowCents: 2000,
+    durationHours: 12,
+    offerNext: false,
+    directedBuyerAccount: 77,
+    ...over,
+  });
+
+  it('accepts a fixed price addressed to one account', () => {
+    expect(validListingParams(directed())).toEqual({ ok: true });
+  });
+
+  it('refuses an AUCTION form, which a single permitted buyer cannot bid in', () => {
+    // Not a policy preference: an auction's mechanism is competing bidders, and
+    // a directed sale permits exactly one, so the form would be a bidding war
+    // held with oneself.
+    expect(validListingParams(directed({ format: 'auction', buyNowCents: null }))).toEqual({
+      ok: false,
+      reason: 'bad_directed_buyer',
+    });
+    // 'auction_buy_now' is refused one step earlier as bad_format, because it is
+    // not creatable in ANY listing. Pinned so the directed rule is never
+    // credited with a refusal the format allowlist was already making.
+    expect(validListingParams(directed({ format: 'auction_buy_now' }))).toEqual({
+      ok: false,
+      reason: 'bad_format',
+    });
+  });
+
+  it('refuses an account id that is not a real positive integer', () => {
+    // This value alone decides who may buy, so a malformed one must never reach
+    // the row: 0 and negatives address nobody, and a float addresses no row at all.
+    for (const bad of [0, -1, 1.5, Number.NaN, Number.MAX_SAFE_INTEGER + 2]) {
+      const res = validListingParams(directed({ directedBuyerAccount: bad }));
+      expect(res, `${bad}`).toEqual({ ok: false, reason: 'bad_directed_buyer' });
+    }
+  });
+
+  it('still applies every ordinary price rule', () => {
+    // A directed sale is the same listing with a counterparty, not a bypass: the
+    // floor, the ceiling and the duration allowlist all continue to hold.
+    expect(validListingParams(directed({ buyNowCents: 1 }))).toEqual({
+      ok: false,
+      reason: 'bad_buy_now',
+    });
+    expect(validListingParams(directed({ durationHours: 72 }))).toEqual({
+      ok: false,
+      reason: 'bad_duration',
+    });
+  });
+
+  it('leaves a public listing (null) completely unaffected', () => {
+    expect(validListingParams(directed({ directedBuyerAccount: null }))).toEqual({ ok: true });
   });
 });

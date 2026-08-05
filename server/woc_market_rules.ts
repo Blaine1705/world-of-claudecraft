@@ -157,7 +157,8 @@ export type ListingParamsRefusal =
   | 'bad_start'
   | 'bad_reserve'
   | 'bad_buy_now'
-  | 'bad_duration';
+  | 'bad_duration'
+  | 'bad_directed_buyer';
 
 export interface WocListingParams {
   format: WocListingFormat;
@@ -166,7 +167,20 @@ export interface WocListingParams {
   buyNowCents: number | null;
   durationHours: number;
   offerNext: boolean;
+  /**
+   * The account a DIRECTED sale is addressed to, or null for a public listing.
+   *
+   * A directed sale is the p2p trade agreed in the trade window, sold on this
+   * rail so it inherits custody escrow, the fee split, settlement and strikes
+   * unchanged (docs/prd/woc/p2p-woc-trade.md). It is deliberately part of the
+   * same params object rather than a parallel creation path: everything a public
+   * buy-now validates, a directed sale validates identically.
+   */
+  directedBuyerAccount: number | null;
 }
+
+/** The accounts.id ceiling: a signed 32-bit Postgres INT. */
+const PG_INT_MAX = 2_147_483_647;
 
 const isCents = (v: number): boolean =>
   Number.isInteger(v) && v >= WOC_MARKET_MIN_PRICE_CENTS && v <= WOC_MARKET_MAX_PRICE_CENTS;
@@ -187,6 +201,25 @@ export function validListingParams(
   // and the database CHECK deliberately stays permissive.
   if (p.format !== 'auction' && p.format !== 'buy_now') {
     return { ok: false, reason: 'bad_format' };
+  }
+  // A directed sale is a fixed price to one named account. It may not be an
+  // AUCTION, and the reason is structural rather than a policy choice: an
+  // auction's whole mechanism is competing bidders, and there is exactly one
+  // permitted buyer here, so an auction form would be a bidding war a single
+  // account holds with itself. The account id must also be a real positive
+  // integer, since it is about to become the sole key deciding who may buy.
+  if (p.directedBuyerAccount !== null) {
+    // The ceiling is the accounts.id column's, not a safe-integer check:
+    // directed_buyer_account is a Postgres INT, so a larger value is refused by
+    // the database at INSERT time as a 500 rather than here as a clean 400.
+    if (
+      !Number.isInteger(p.directedBuyerAccount) ||
+      p.directedBuyerAccount <= 0 ||
+      p.directedBuyerAccount > PG_INT_MAX
+    ) {
+      return { ok: false, reason: 'bad_directed_buyer' };
+    }
+    if (p.format !== 'buy_now') return { ok: false, reason: 'bad_directed_buyer' };
   }
   if (!isCents(p.startCents)) return { ok: false, reason: 'bad_start' };
   if (!(WOC_MARKET_DURATION_HOURS as readonly number[]).includes(p.durationHours)) {

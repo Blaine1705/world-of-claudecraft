@@ -23,7 +23,13 @@
 // It is wired ONLY when ALLOW_DEV_COMMANDS=1 AND WOC_MARKET_DEV_SERVICE=1
 // (main.ts), the dev-cheat gating precedent; production never sees it.
 
-import type { WocEstimate, WocMarketEconomy, WocPriceInfo, WocQuoteIntent } from './woc_market';
+import type {
+  WocEstimate,
+  WocEstimateSplit,
+  WocMarketEconomy,
+  WocPriceInfo,
+  WocQuoteIntent,
+} from './woc_market';
 import { WOC_MARKET_QUOTE_TTL_SECONDS } from './woc_market_rules';
 
 const SERVICE_TIMEOUT_MS = 5000;
@@ -131,6 +137,7 @@ interface WireEstimate {
   ok?: boolean;
   amount?: WireLeg | null;
   asOfMs?: number | null;
+  split?: { sellerCents?: number; burnCents?: number; treasuryCents?: number } | null;
 }
 interface WireQuote {
   ok?: boolean;
@@ -156,6 +163,34 @@ interface WireBondAction {
 function leg(value: WireLeg | null | undefined): { base: string; tokens: number } | null {
   if (!value || typeof value.base !== 'string' || typeof value.tokens !== 'number') return null;
   return { base: value.base, tokens: value.tokens };
+}
+
+/**
+ * The service's fee split, accepted only when it is arithmetically usable.
+ *
+ * Two ways this is legitimately absent, and both must render as "no split shown"
+ * rather than a wrong number: an older service build that predates the field, and
+ * any response whose legs do not sum to the amount they describe. The sum check
+ * is the load-bearing one, because this figure is shown to a seller as the money
+ * they will receive, and a split that does not reconcile is not a rounding
+ * disagreement, it is a different sale. Fail closed and the UI omits the line.
+ */
+function estimateSplit(
+  value: WireEstimate['split'],
+  usdCents: number,
+): WocEstimateSplit | null {
+  if (!value) return null;
+  const { sellerCents, burnCents, treasuryCents } = value;
+  const legs = [sellerCents, burnCents, treasuryCents];
+  if (!legs.every((n) => typeof n === 'number' && Number.isInteger(n) && n >= 0)) return null;
+  if ((sellerCents as number) + (burnCents as number) + (treasuryCents as number) !== usdCents) {
+    return null;
+  }
+  return {
+    sellerCents: sellerCents as number,
+    burnCents: burnCents as number,
+    treasuryCents: treasuryCents as number,
+  };
 }
 
 function toQuote(wire: WireQuote | null): WocQuoteIntent {
@@ -209,8 +244,14 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
       });
       const value: WocEstimate =
         wire && wire.ok === true
-          ? { available: true, usdCents, amount: leg(wire.amount), asOfMs: wire.asOfMs ?? null }
-          : { available: false, usdCents, amount: null, asOfMs: null };
+          ? {
+              available: true,
+              usdCents,
+              amount: leg(wire.amount),
+              asOfMs: wire.asOfMs ?? null,
+              split: estimateSplit(wire.split, usdCents),
+            }
+          : { available: false, usdCents, amount: null, asOfMs: null, split: null };
       if (estimateCache.size >= ESTIMATE_CACHE_MAX_ENTRIES) {
         const oldest = estimateCache.keys().next().value;
         if (oldest !== undefined) estimateCache.delete(oldest);
@@ -277,6 +318,13 @@ export function createWocMarketEconomyProxy(): WocMarketEconomy {
 // ---------------------------------------------------------------------------
 
 const DEV_TOKEN_DECIMALS = 9;
+/** The service's DEFAULT schedule (3% burn, 7% treasury, 90% seller), mirrored
+ *  so the dev economy renders the same breakdown a real one would. A deployment
+ *  that retunes WOC_MARKET_BURN_BPS / WOC_MARKET_TREASURY_BPS on the SERVICE is
+ *  not reflected here: the dev arm never talks to it, and a dev build showing
+ *  the default schedule is the intended behaviour, not a drift bug. */
+const DEV_BURN_BPS = 300;
+const DEV_TREASURY_BPS = 700;
 
 function devPriceMicroUsd(): number {
   const raw = Number(process.env.WOC_MARKET_DEV_PRICE_MICRO_USD ?? '1000');
@@ -288,6 +336,22 @@ function devLeg(usdCents: number, priceMicroUsd: number): { base: string; tokens
   const tokens = (usdCents * 10_000) / priceMicroUsd;
   const base = BigInt(Math.round(tokens * 10 ** 6)) * BigInt(10 ** (DEV_TOKEN_DECIMALS - 6));
   return { base: base.toString(), tokens };
+}
+
+/**
+ * The dev economy's stand-in for the service's fee split.
+ *
+ * This is the dev economy SIMULATING the service, not the game deriving money:
+ * that distinction is why the arithmetic is allowed to live here at all, and it
+ * is the same licence under which devLeg above fabricates a price. It reproduces
+ * the service's ordering exactly (each fee leg rounds UP, the seller absorbs the
+ * remainder) so a dev build shows the same numbers a real one would, including
+ * the off-by-a-cent cases that a flat percentage gets wrong.
+ */
+function devSplit(usdCents: number): WocEstimateSplit {
+  const burnCents = Math.ceil((usdCents * DEV_BURN_BPS) / 10_000);
+  const treasuryCents = Math.ceil((usdCents * DEV_TREASURY_BPS) / 10_000);
+  return { sellerCents: usdCents - burnCents - treasuryCents, burnCents, treasuryCents };
 }
 
 /** The in-memory dev economy: the same interface, a fixed price, references
@@ -340,6 +404,7 @@ export function createDevWocMarketEconomy(now: () => number = Date.now): WocMark
         usdCents,
         amount: devLeg(usdCents, devPriceMicroUsd()),
         asOfMs: now(),
+        split: devSplit(usdCents),
       };
     },
     async bondQuote(args): Promise<WocQuoteIntent> {

@@ -248,3 +248,54 @@ describe('graceful degradation is the contract', () => {
     expect(price.available).toBe(false);
   });
 });
+
+describe('the estimate fee split is accepted only when it reconciles', () => {
+  // This figure is shown to a seller as the money they will receive, so a split
+  // that does not add up is not a rounding disagreement, it is a different sale.
+  // Every rejection below must surface as "no split" and never as a wrong number.
+  const withSplit = (split: unknown) => () => ({
+    status: 200,
+    body: { ok: true, amount: { base: '1', tokens: 1 }, asOfMs: 1, split },
+  });
+
+  it('passes a split whose legs sum to the amount', async () => {
+    respond = withSplit({ sellerCents: 90, burnCents: 3, treasuryCents: 7 });
+    const est = await createWocMarketEconomyProxy().estimate(100);
+    expect(est.split).toEqual({ sellerCents: 90, burnCents: 3, treasuryCents: 7 });
+  });
+
+  it('reports no split when the service omits it (an older build)', async () => {
+    respond = () => ({ status: 200, body: { ok: true, amount: { base: '1', tokens: 1 } } });
+    const est = await createWocMarketEconomyProxy().estimate(100);
+    expect(est.available).toBe(true);
+    expect(est.split).toBeNull();
+  });
+
+  it('refuses a split that does not sum to the amount', async () => {
+    // One cent short: the shape is perfect and the number is a lie.
+    respond = withSplit({ sellerCents: 89, burnCents: 3, treasuryCents: 7 });
+    expect((await createWocMarketEconomyProxy().estimate(100)).split).toBeNull();
+  });
+
+  it('refuses non-integer, negative, and missing legs', async () => {
+    for (const bad of [
+      { sellerCents: 90.5, burnCents: 3, treasuryCents: 6.5 },
+      { sellerCents: 104, burnCents: -1, treasuryCents: -3 },
+      { sellerCents: 90, burnCents: 3 },
+      { sellerCents: '90', burnCents: 3, treasuryCents: 7 },
+    ]) {
+      respond = withSplit(bad);
+      expect(
+        (await createWocMarketEconomyProxy().estimate(100)).split,
+        JSON.stringify(bad),
+      ).toBeNull();
+    }
+  });
+
+  it('reports no split when the estimate itself is unavailable', async () => {
+    respond = () => ({ status: 200, body: { ok: false, reason: 'unhealthy' } });
+    const est = await createWocMarketEconomyProxy().estimate(100);
+    expect(est.available).toBe(false);
+    expect(est.split).toBeNull();
+  });
+});

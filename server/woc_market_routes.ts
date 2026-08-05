@@ -156,6 +156,7 @@ export const REFUSAL_ERRORS: Record<WocMarketRefusal, { status: number; code: Er
   bad_reserve: { status: 400, code: 'woc_market.invalid_params' },
   bad_buy_now: { status: 400, code: 'woc_market.invalid_params' },
   bad_duration: { status: 400, code: 'woc_market.invalid_params' },
+  bad_directed_buyer: { status: 400, code: 'woc_market.invalid_params' },
 };
 
 function throwRefusal(reason: WocMarketRefusal): never {
@@ -397,7 +398,7 @@ async function browseHandler(ctx: Ctx): Promise<void> {
 
 async function listingDetailHandler(ctx: Ctx): Promise<void> {
   const id = idParam(ctx);
-  const detail = await useService().listingDetail(id);
+  const detail = await useService().listingDetail(id, ctxAccountId(ctx));
   if (!detail) throw new HttpError(404, 'woc_market.not_found');
   json(ctx.res, 200, {
     listing: listingView(detail.listing, ctxAccountId(ctx)),
@@ -432,6 +433,11 @@ async function createListingHandler(ctx: Ctx): Promise<void> {
       buyNowCents: optionalCents(body.buyNowCents),
       durationHours: intField(body.durationHours, 1, 1_000),
       offerNext: body.offerNext === true,
+      // Public listings only. A directed sale is created by the p2p offer route,
+      // which resolves the counterparty from the agreed trade rather than taking
+      // an account id from the seller's request body: letting a caller nominate
+      // an arbitrary buyer here would make any account a drop target.
+      directedBuyerAccount: null,
     },
   });
   if (!out.ok) throwRefusal(out.reason);

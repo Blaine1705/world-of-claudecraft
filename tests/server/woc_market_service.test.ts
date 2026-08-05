@@ -21,6 +21,7 @@ import { describe, expect, it } from 'vitest';
 import type {
   Refused,
   WocBidRow,
+  WocBrowseQuery,
   WocCustodyExtract,
   WocListingRow,
   WocMarketCustody,
@@ -259,6 +260,7 @@ function unwrap<T extends { ok: true }>(res: T | Refused, label: string): T {
 function listingParams(over: Partial<WocListingParams> = {}): WocListingParams {
   return {
     format: 'auction',
+    directedBuyerAccount: null,
     startCents: 5000,
     reserveCents: null,
     buyNowCents: null,
@@ -479,7 +481,7 @@ describe('cancelListing', () => {
     const h = makeHarness();
     const listing = await listEpic(h);
     const res = await h.service.cancelListing(SELLER, listing.id);
-    expect(res).toEqual({ ok: true });
+    expect(res.ok, 'a public buy-now must not be caught by the directed guard').toBe(true);
     const row = await getListing(h, listing.id);
     expect(row.status).toBe('closed');
     expect(row.resolution).toBe('cancelled');
@@ -739,6 +741,7 @@ describe('placeBid', () => {
       ...h.economy,
       estimate: async (usdCents) => ({
         available: false,
+        split: null,
         usdCents,
         amount: null,
         asOfMs: null,
@@ -1782,5 +1785,113 @@ describe('owned loaders (the requireOwned 404 seam)', () => {
     // foreign read is the one that matters most here.
     expect(await h.service.ownedSettlement(BUYER_C, settlement.id)).toBeNull();
     expect(await h.service.ownedSettlement(BUYER_A, settlement.id + 999)).toBeNull();
+  });
+});
+
+describe('a directed sale is visible and buyable only to its two parties', () => {
+  // The row id is a small integer and therefore guessable, so browse exclusion
+  // alone is not a defence. Each test below covers one independent gate.
+  const BROWSE: WocBrowseQuery = {
+    page: 0,
+    pageSize: 50,
+    quality: null,
+    format: null,
+    itemIds: null,
+    sort: 'ending',
+  };
+  const directedParams = (over: Partial<WocListingParams> = {}) =>
+    listingParams({
+      format: 'buy_now',
+      startCents: 2000,
+      reserveCents: null,
+      buyNowCents: 5000,
+      directedBuyerAccount: BUYER_A,
+      ...over,
+    });
+  /** Two epic copies, so one listing does not consume the other's item. */
+  function stocked(): Harness {
+    const h = makeHarness();
+    h.custody.bags.set(
+      SELLER_CHAR,
+      Array.from({ length: WOC_MARKET_MAX_ACTIVE_LISTINGS + 3 }, () => ({
+        itemId: EPIC_ITEM,
+        count: 1,
+      })),
+    );
+    return h;
+  }
+
+  it('never appears in the public browse result set', async () => {
+    const h = stocked();
+    const directed = await listEpic(h, directedParams());
+    const open = await listEpic(h, { format: 'auction', startCents: 2000 });
+    const ids = (await h.service.browse(BROWSE)).rows.map((r) => r.id);
+    expect(ids, 'the public listing must still browse').toContain(open.id);
+    expect(ids, 'the directed listing must be invisible to everyone').not.toContain(directed.id);
+  });
+
+  it('reads as not-found for a stranger, and resolves for either party', async () => {
+    const h = stocked();
+    const directed = await listEpic(h, directedParams());
+    expect(await h.service.listingDetail(directed.id, BUYER_B)).toBeNull();
+    // Signed out is the same answer: an absent viewer must not be a bypass.
+    expect(await h.service.listingDetail(directed.id, null)).toBeNull();
+    expect((await h.service.listingDetail(directed.id, BUYER_A))?.listing.id).toBe(directed.id);
+    expect((await h.service.listingDetail(directed.id, SELLER))?.listing.id).toBe(directed.id);
+  });
+
+  it('refuses buyNow from anyone but the designated buyer, as not_found', async () => {
+    const h = stocked();
+    const directed = await listEpic(h, directedParams());
+    const res = await h.service.buyNow({
+      account: BUYER_B,
+      characterId: CHAR_B,
+      listingId: directed.id,
+      acceptTerms: true,
+    });
+    expect(res.ok).toBe(false);
+    // not_found, NOT a distinct "not for you": a caller probing ids must not be
+    // able to tell an empty id from someone else's private trade in flight.
+    expect((res as { reason: string }).reason).toBe('not_found');
+  });
+
+  it('does not count against the seller 12-listing cap', async () => {
+    const h = stocked();
+    for (let i = 0; i < WOC_MARKET_MAX_ACTIVE_LISTINGS; i += 1) await listEpic(h);
+    const blocked = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: listingParams(),
+    });
+    expect(blocked, 'a 13th public listing must be refused').toEqual({
+      ok: false,
+      reason: 'cap_reached',
+    });
+    const directed = await h.service.createListing({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      params: directedParams(),
+    });
+    expect(directed.ok, 'a directed offer must be exempt from the cap').toBe(true);
+  });
+
+  it('leaves a PUBLIC buy-now buyable by any account', async () => {
+    // The guard must key on the directed field, never on "is this a buy_now".
+    const h = stocked();
+    const open = await listEpic(h, {
+      format: 'buy_now',
+      startCents: 2000,
+      reserveCents: null,
+      buyNowCents: 5000,
+    });
+    const res = await h.service.buyNow({
+      account: BUYER_B,
+      characterId: CHAR_B,
+      listingId: open.id,
+      acceptTerms: true,
+    });
+    expect(res.ok, 'a public buy-now must not be caught by the directed guard').toBe(true);
   });
 });

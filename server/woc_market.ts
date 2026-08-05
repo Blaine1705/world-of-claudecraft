@@ -82,6 +82,10 @@ export interface WocListingRow {
   buyNowLockAccount: number | null;
   buyNowLockExpiresMs: number | null;
   createdAtMs: number;
+  /** The one account this sale is addressed to, or null for a public listing.
+   *  A non-null value means the row is invisible to browse and buyable only by
+   *  that account (docs/prd/woc/p2p-woc-trade.md). */
+  directedBuyerAccount: number | null;
 }
 
 export type WocBondState =
@@ -362,11 +366,23 @@ export interface WocPriceInfo {
   asOfMs: number | null;
 }
 
+/** The fee split for an amount, in USD CENTS, as computed by the economy
+ *  service. The game NEVER derives these: the real split rounds each fee leg up
+ *  and gives the seller the remainder, so a percentage recomputed here would
+ *  disagree with the settlement by a cent. Null whenever the estimate is
+ *  unavailable, and also on an older service build that does not send it. */
+export interface WocEstimateSplit {
+  sellerCents: number;
+  burnCents: number;
+  treasuryCents: number;
+}
+
 export interface WocEstimate {
   available: boolean;
   usdCents: number;
   amount: WocQuoteLeg | null;
   asOfMs: number | null;
+  split: WocEstimateSplit | null;
 }
 
 export interface WocQuoteIntent {
@@ -535,12 +551,30 @@ export class WocMarketService {
     return this.deps.db.browseListings(this.cfg.realm, q);
   }
 
+  /**
+   * One listing, for the detail pane.
+   *
+   * `viewerAccount` is REQUIRED rather than optional, even though a public
+   * listing ignores it. A directed sale is visible only to its two parties, and
+   * an optional parameter is a defence a caller can forget to pass: making it
+   * required means a new call site cannot silently become a leak. Absent or
+   * unmatched, a directed row reads as `null`, the same answer a missing id
+   * gives, so the two are indistinguishable to a caller probing ids.
+   */
   async listingDetail(
     id: number,
+    viewerAccount: number | null,
   ): Promise<{ listing: WocListingRow; estimate: WocEstimate | null } | null> {
     if (!this.cfg.enabled) return null;
     const listing = await this.deps.db.listingById(this.cfg.realm, id);
     if (!listing) return null;
+    if (listing.directedBuyerAccount !== null) {
+      const isParty =
+        viewerAccount !== null &&
+        (viewerAccount === listing.directedBuyerAccount ||
+          viewerAccount === listing.sellerAccount);
+      if (!isParty) return null;
+    }
     const estimateCents = listing.currentBidCents ?? listing.startCents;
     const estimate = await this.deps.economy.estimate(estimateCents).catch(() => null);
     return { listing, estimate };
@@ -548,7 +582,7 @@ export class WocMarketService {
 
   async estimate(usdCents: number): Promise<WocEstimate> {
     if (!this.cfg.enabled || !Number.isInteger(usdCents) || usdCents <= 0) {
-      return { available: false, usdCents, amount: null, asOfMs: null };
+      return { available: false, usdCents, amount: null, asOfMs: null, split: null };
     }
     return this.deps.economy.estimate(usdCents);
   }
@@ -644,8 +678,14 @@ export class WocMarketService {
       this.cfg.policy,
     );
     if (!eligible.ok) return refuse(eligible.reason);
-    const active = await this.deps.db.countActiveBySeller(this.cfg.realm, args.account);
-    if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) return refuse('cap_reached');
+    // The cap governs PUBLIC listings only, in both directions: a directed offer
+    // neither counts toward it (see countActiveBySeller) nor is blocked by it. A
+    // private deal with a named friend must not be refused because the seller
+    // happens to have twelve auctions running.
+    if (args.params.directedBuyerAccount === null) {
+      const active = await this.deps.db.countActiveBySeller(this.cfg.realm, args.account);
+      if (active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) return refuse('cap_reached');
+    }
 
     // Custody edge: the copy leaves the live bags in memory, then the
     // character save and the listing insert commit together. Any persist
@@ -832,6 +872,22 @@ export class WocMarketService {
     if (preGate) return preGate;
     const listingPeek = await this.deps.db.listingById(this.cfg.realm, args.listingId);
     if (!listingPeek) return refuse('not_found');
+    // A directed sale is buyable ONLY by the account it was addressed to. This
+    // is the second of two independent defences (browse already excludes the
+    // row), because the row id is guessable and browse exclusion alone would
+    // leave a stranger who guesses one able to buy it.
+    //
+    // The refusal is `not_found`, deliberately, NOT a distinct "not for you":
+    // the anti-enumeration convention already used by not_yours. A caller
+    // probing ids must not be able to tell "no such listing" from "a listing
+    // exists here and it is not yours", because the second answer confirms both
+    // that the id is real and that a private trade is in flight.
+    if (
+      listingPeek.directedBuyerAccount !== null &&
+      listingPeek.directedBuyerAccount !== args.account
+    ) {
+      return refuse('not_found');
+    }
     if (listingPeek.buyNowCents === null) return refuse('no_buy_now');
     const gate =
       (await this.guardSuspended(args.account)) ??

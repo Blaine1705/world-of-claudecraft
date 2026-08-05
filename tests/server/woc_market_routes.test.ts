@@ -70,6 +70,7 @@ function service(overrides: Partial<WocMarketService>): void {
 function listingRow(over: Partial<WocListingRow> = {}): WocListingRow {
   return {
     id: 41,
+    directedBuyerAccount: null,
     realm: 'Claudemoon',
     sellerAccount: SELLER,
     sellerCharacter: 12,
@@ -117,7 +118,7 @@ describe('the refusal-to-wire mapping', () => {
     const rows = Object.entries(REFUSAL_ERRORS);
     // The EXACT count, not a floor. A floor of 35 let four union members vanish
     // silently; tsc catches a deleted Record key but not a shrunken union.
-    expect(rows).toHaveLength(37);
+    expect(rows).toHaveLength(38);
     for (const [reason, mapped] of rows) {
       expect(mapped.code, reason).toMatch(/^woc_market\./);
       expect(mapped.status, reason).toBeGreaterThanOrEqual(400);
@@ -182,6 +183,7 @@ describe('the refusal-to-wire mapping', () => {
     ['bad_reserve', 400, 'woc_market.invalid_params'],
     ['bad_buy_now', 400, 'woc_market.invalid_params'],
     ['bad_duration', 400, 'woc_market.invalid_params'],
+    ['bad_directed_buyer', 400, 'woc_market.invalid_params'],
   ];
 
   it('pins EVERY refusal in the map, with no row left to the generic sweep', () => {
@@ -209,6 +211,7 @@ describe('the refusal-to-wire mapping', () => {
     // client renders as one generic message, passed every other test here.
     expect(withCode('woc_market.invalid_params')).toEqual([
       'bad_buy_now',
+      'bad_directed_buyer',
       'bad_duration',
       'bad_format',
       'bad_reserve',
