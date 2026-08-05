@@ -8693,6 +8693,9 @@ export class GameServer {
       if (ev.type === 'fishingGotAway') {
         gameMetricsCounters().fishingGotAway(ev.zoneId, fishingBandLabel(ev.band));
       }
+      if (ev.type === 'fishingEarlyReel') {
+        gameMetricsCounters().fishingEarlyReel(ev.zoneId, fishingBandLabel(ev.band));
+      }
       if (ev.type === 'fishingEmptyHook') {
         gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));
       }
