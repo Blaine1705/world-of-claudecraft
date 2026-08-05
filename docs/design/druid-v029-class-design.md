@@ -49,12 +49,16 @@ measurably out-damage Sunwake's hit plus burn, or the mana refund makes
 Sunwake strictly better and the choice dies; the probe owns that margin.
 
 Moongrove is a spell caster, and its damage scales with spell power like one.
-The Moontide payoffs (Moonsurge and Sunwake) carry a spell-power rider that
-reflects the three builder presses invested in the bank, and the flat base
-numbers were re-banded down to match: in full best-in-slot (an intellect caster
-set) the spec lands at the 200 DPS peer anchor, and un-geared it sits inside the
-naked peer band rather than towering over it on flat numbers alone. Best-in-slot
-and naked balance are both owned by the owned-class harness.
+The Moontide payoffs (Moonsurge and Sunwake) carry a spell-power rider, and the
+flat base numbers were re-banded down to match, so un-geared it sits inside the
+naked peer band rather than towering over it on flat numbers alone. The rider was
+calibrated against the endgame searched best-in-slot (spell power near 150), where
+the cross-spec Nythraxis montecarlo seats the spec at the ~200 DPS anchor; an
+earlier over-scaled pass read 258 there and the coefficients were pulled down to
+hit 200. The owned-class harness runs a level-20 fixed loadout that caps near
+spell power 105, so it reads Balance as a low-SP proxy (~160), not the real BiS
+anchor: naked parity is owned by that harness, but real best-in-slot balance is
+owned by the montecarlo.
 
 Two deliberate boundaries on the no-decay promise. The BANK never decays: a
 full Moontide holds until spent. And a resisted Wildbolt or Skyfall still

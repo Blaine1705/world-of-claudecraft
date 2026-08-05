@@ -2,36 +2,44 @@
 
 Companion to `druid-v029-class-design.md`. Probe numbers come from
 `scripts/druid_balance_probe.ts`: 123 seconds, level 20, fixed PBE gear, and an
-eight-seed deterministic average. Moongrove wears an intellect caster set (a
-spell caster scales with spell power, not the agility set the melee Wildfang cat
-lanes are anchored on); Wildfang and Groveheart wear their own fixed sets. The
-probe uses normal resource regeneration and does not inject mana, energy, or
-rage. A pure-zero run at a seed whose terrain breaks the fixed anchor's line of
-sight for the distance-18 caster target is dropped as an anchor artifact, not
-balance signal.
+eight-seed deterministic average. Moongrove wears an intellect caster set;
+Wildfang and Groveheart wear their own fixed sets. The probe uses normal resource
+regeneration and does not inject mana, energy, or rage. A pure-zero run at a seed
+whose terrain breaks the fixed anchor's line of sight for the distance-18 caster
+target is dropped as an anchor artifact, not balance signal.
+
+IMPORTANT gear caveat for Balance. This fixed PBE loadout is a level-20 caster
+PROXY: at this tier the item pool caps a druid's spell power near 105. Balance's
+damage was re-seated onto spell-power coefficients (below), so it scales with
+gear like a caster; on the endgame tree's real searched best-in-slot (spell power
+near 150) it lands at the ~200 DPS anchor the Nythraxis cross-spec montecarlo
+measures, and the coefficients are calibrated to that anchor. On this low-SP proxy
+it therefore reads ~160, not 200. Real-BiS Balance parity is owned by that
+montecarlo; the melee arms (Wildfang cat, agility) are not under-geared here, so
+the two do not compare directly on the proxy.
 
 ## Probe result
 
 The table records the measured best capstone for each 123-second, eight-seed
-profile.
+profile on the fixed PBE loadout (a low-SP proxy for Balance; see the caveat).
 
-| Profile | Best capstone | Metric | Result |
+| Profile | Best capstone | Metric | Result (proxy) |
 |---|---|---|---:|
-| Moongrove, one target | Wild Apex | DPS | 199.7 |
-| Moongrove, three targets | Wild Apex | DPS | 194.7 |
+| Moongrove, one target | Wild Apex | DPS | 160.8 |
+| Moongrove, three targets | Wild Apex | DPS | 162.7 |
 | Wildfang, Wolf | Quickening | DPS | 176.5 |
 | Groveheart, three injured allies | Wild Apex | HPS | 20.7 |
 
-Moongrove sits at the 200 DPS peer anchor; Wolf is seated ~23 DPS below it (an
-11.6% spread between their measured best one-target builds, inside the 15%
-envelope). The v0.29 Balance pass shifted Moongrove's power off flat base numbers
-onto spell-power coefficients on its Moontide payoffs (Moonsurge and Sunwake), so
-a caster scales with gear like a caster: in full best-in-slot it lands at the 200
-DPS anchor, and un-geared it sits inside the naked peer band (within 15% of the
-other naked specs) instead of towering over it the way the old flat numbers did.
-The v0.29 cat re-band trimmed Wolf (Redharvest, Flense, Rendclaw) so its
-best-in-slot output seats a touch under the anchor rather than a touch over. Wolf
-pays no hybrid tax.
+The v0.29 Balance pass shifted Moongrove's power off flat base numbers onto
+spell-power coefficients on its Moontide payoffs (Moonsurge and Sunwake) and the
+Wildbolt filler, so a caster scales with gear like a caster. On the endgame
+searched best-in-slot the montecarlo reads Balance at ~200 DPS (the coefficients
+were calibrated down from an earlier over-scaling pass that read 258 there); the
+proxy above reads ~160 because it caps at spell power 105. Un-geared, Balance now
+sits inside the naked peer band (within 15% of the other naked specs) instead of
+towering over it the way the old flat numbers did. The v0.29 cat re-band trimmed
+Wolf (Redharvest, Flense, Rendclaw) so real-BiS Feral seats alongside Balance
+(~200 to 210 on the montecarlo) rather than above it. Wolf pays no hybrid tax.
 Groveheart heals from a dedicated intellect-leather fixture, uses a real
 three-ally pressure profile with normal mana limits, and is not compared
 against a fake damage rotation. On the 60-second owned-class HPS harness it
@@ -58,8 +66,8 @@ handoff under the classic 110% rule after shifting out.
 
 | Profile | Nature's Echo | Wild Apex | Quickening |
 |---|---:|---:|---:|
-| Moongrove, one target DPS | 196.7 | 199.7 | 180.4 |
-| Moongrove, three target DPS | 187.5 | 194.7 | 178.8 |
+| Moongrove, one target DPS (proxy) | 158.9 | 160.8 | 145.5 |
+| Moongrove, three target DPS (proxy) | 157.7 | 162.7 | 150.0 |
 | Wildfang, Wolf DPS | 175.5 | 170.9 | 176.5 |
 | Groveheart, three ally HPS | 20.3 | 20.7 | 20.3 |
 
