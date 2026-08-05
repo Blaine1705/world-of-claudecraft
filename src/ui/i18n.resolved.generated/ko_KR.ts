@@ -10200,6 +10200,18 @@ export const ko_KR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
       },
+      "moggers_hide_quiver": {
+        "name": "모거의 가죽 화살통"
+      },
+      "cragmaw_huntquiver": {
+        "name": "크래그모의 사냥 화살통"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "무덤고룡 뼈 화살통"
+      },
+      "direfang_quiver": {
+        "name": "흉포송곳니 화살통"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

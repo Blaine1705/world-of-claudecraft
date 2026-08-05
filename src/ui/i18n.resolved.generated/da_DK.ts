@@ -10200,6 +10200,18 @@ export const da_DK: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Tøjler til Dragegabets Raptor"
       },
+      "moggers_hide_quiver": {
+        "name": "Moggers Skindkogger"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Klippegabs Jagtkogger"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravorm-Benkogger"
+      },
+      "direfang_quiver": {
+        "name": "Direfang-Kogger"
+      },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
       },

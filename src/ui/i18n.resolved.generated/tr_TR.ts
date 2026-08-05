@@ -10200,6 +10200,18 @@ export const tr_TR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
       },
+      "moggers_hide_quiver": {
+        "name": "Mogger'ın Deri Sadağı"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Cragmaw'un Av Sadağı"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Mezarejderi Kemik Sadağı"
+      },
+      "direfang_quiver": {
+        "name": "Direfang Sadağı"
+      },
       "conjured_water4": {
         "name": "Sihirle Yaratılmış Kaynak Suyu"
       },

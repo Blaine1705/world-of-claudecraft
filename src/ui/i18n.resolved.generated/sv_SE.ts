@@ -10200,6 +10200,18 @@ export const sv_SE: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
       },
+      "moggers_hide_quiver": {
+        "name": "Moggers skinnkoger"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Klippkäftens jaktkoger"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravlindormens benkoger"
+      },
+      "direfang_quiver": {
+        "name": "Direfang-koger"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },
