@@ -65,10 +65,26 @@ describe('farVistaPlan: per-tier vista envelopes', () => {
   });
 
   it('every enabled spacing divides the tile size (shared-edge grid, no cracks)', () => {
-    for (const tier of ['medium', 'high', 'ultra'] as const) {
+    for (const tier of ['medium', 'high', 'ultra', 'insane'] as const) {
       const plan = farVistaPlan(tier, false);
       expect(FAR_TILE_SIZE % plan.spacing).toBe(0);
     }
+  });
+
+  it('ultra does not tessellate the vista finer than high, which buys nothing', () => {
+    // The layer's nearest fragment sits past the detail horizon less the
+    // discard margin, about 640 yards out, where one cell of either grid is
+    // barely more than a dozen screen pixels: the extra vertices bought
+    // sub-pixel silhouette accuracy and cost 44 percent more vista triangles
+    // every frame plus 44 percent more terrainHeight sampling in the boot
+    // build. The ladder still has to be monotone, and insane still exists to
+    // measure the finer grid against.
+    const high = farVistaPlan('high', false).spacing;
+    const ultra = farVistaPlan('ultra', false).spacing;
+    const insane = farVistaPlan('insane', false).spacing;
+    expect(ultra).toBe(high);
+    expect(insane).toBeLessThan(ultra);
+    expect(ultra).toBeLessThan(farVistaPlan('medium', false).spacing);
   });
 });
 

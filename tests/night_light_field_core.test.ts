@@ -3,6 +3,7 @@ import {
   BODY_LIGHT_INTENSITY,
   BODY_LIGHT_RANGE,
   collectBodyNightLights,
+  NIGHT_LIGHT_BOUND_FLOATS,
   NIGHT_LIGHT_DYNAMIC_SLOTS,
   NIGHT_LIGHT_SLOTS,
   NIGHT_LIGHT_STATIC_SLOTS,
@@ -29,9 +30,10 @@ function pack(
   camX = 0,
   camZ = 0,
   time = 0,
-): { count: number; posRadius: Float32Array; color: Float32Array } {
+): { count: number; posRadius: Float32Array; color: Float32Array; bound: Float32Array } {
   const posRadius = new Float32Array(NIGHT_LIGHT_SLOTS * 4);
-  const color = new Float32Array(NIGHT_LIGHT_SLOTS * 3);
+  const color = new Float32Array(NIGHT_LIGHT_SLOTS * 4);
+  const bound = new Float32Array(NIGHT_LIGHT_BOUND_FLOATS);
   const count = packNightLights(
     statics,
     dynamics,
@@ -43,8 +45,9 @@ function pack(
     time,
     posRadius,
     color,
+    bound,
   );
-  return { count, posRadius, color };
+  return { count, posRadius, color, bound };
 }
 
 describe('the slot layout', () => {
@@ -122,7 +125,9 @@ describe('packNightLights', () => {
   it('packs a small set fully, position, radius, and glow-scaled colour', () => {
     const { count, posRadius, color } = pack([site(3, 4, { y: 7, radius: 12 })], [], 0.5);
     expect(count).toBe(1);
-    expect(Array.from(posRadius.slice(0, 4))).toEqual([3, 7, 4, 12]);
+    // the radius arrives SQUARED: the fragment loop compares against squared
+    // distance, so squaring a constant once per frame beats once per fragment
+    expect(Array.from(posRadius.slice(0, 4))).toEqual([3, 7, 4, 144]);
     // colour = channel * intensity * glow = (1, .6, .3) * 2 * 0.5
     expect(color[0]).toBeCloseTo(1, 5);
     expect(color[1]).toBeCloseTo(0.6, 5);
@@ -152,8 +157,9 @@ describe('packNightLights', () => {
   it('honours the dynamics COUNT, not the pooled array length (stale tails)', () => {
     const dynamics = [site(1, 1), site(2, 2), site(999, 999)];
     const posRadius = new Float32Array(NIGHT_LIGHT_SLOTS * 4);
-    const color = new Float32Array(NIGHT_LIGHT_SLOTS * 3);
-    const count = packNightLights(SITES_NONE, dynamics, 2, 0, 0, 1, 1, 0, posRadius, color);
+    const color = new Float32Array(NIGHT_LIGHT_SLOTS * 4);
+    const bound = new Float32Array(NIGHT_LIGHT_BOUND_FLOATS);
+    const count = packNightLights(SITES_NONE, dynamics, 2, 0, 0, 1, 1, 0, posRadius, color, bound);
     expect(count).toBe(2);
   });
 
@@ -161,7 +167,7 @@ describe('packNightLights', () => {
     const statics: NightLightSite[] = [];
     for (let i = 0; i < NIGHT_LIGHT_STATIC_SLOTS; i++) statics.push(site(10 + i * 5, 0));
     const { color } = pack(statics, []);
-    const level = (k: number) => color[k * 3];
+    const level = (k: number) => color[k * 4];
     // the nearest entries carry full weight
     expect(level(0)).toBeCloseTo(2, 5);
     // the last entries step down through the published taper
@@ -204,6 +210,92 @@ describe('packNightLights', () => {
 });
 
 const SITES_NONE: NightLightSite[] = [];
+
+// The two exits the terrain fragment loop takes are the reason this pack is
+// shaped the way it is, and they are only safe while they stay CONSERVATIVE:
+// the shader must never skip a light that would have added irradiance. That is
+// a property of the packed numbers, so it is provable here without a GPU.
+describe('the early exits the fragment loop takes', () => {
+  /** Replay the shader's decision: which slots does it actually evaluate? */
+  function evaluatedSlots(
+    packed: { count: number; posRadius: Float32Array; color: Float32Array; bound: Float32Array },
+    fx: number,
+    fz: number,
+  ): number[] {
+    const [ax, az, boundSq] = packed.bound;
+    const anchor2 = (fx - ax) ** 2 + (fz - az) ** 2;
+    if (packed.count === 0 || anchor2 >= boundSq) return [];
+    const anchorD = Math.sqrt(anchor2);
+    const slots: number[] = [];
+    for (let i = 0; i < packed.count; i++) {
+      if (packed.color[i * 4 + 3] >= anchorD) break;
+      slots.push(i);
+    }
+    return slots;
+  }
+
+  /** A town-sized spread: lamps on a grid of streets plus a couple of bodies. */
+  function townPack(): ReturnType<typeof pack> {
+    const statics: NightLightSite[] = [];
+    for (let row = -2; row <= 2; row++) {
+      for (let step = -4; step <= 4; step++) {
+        statics.push(site(step * 26, row * 30, { y: 4.7, radius: 48, intensity: 205 }));
+      }
+    }
+    const bodies = [site(3, 2, { y: 1.1, radius: 10 }), site(-18, 9, { y: 1.1, radius: 10 })];
+    return pack(statics, bodies, 1, 1, 4, -3);
+  }
+
+  it('never skips a slot that would have lit the fragment', () => {
+    const packed = townPack();
+    // the static window is genuinely full, so the sweep below is over the real
+    // worst case rather than a handful of lamps
+    expect(packed.count).toBe(NIGHT_LIGHT_STATIC_SLOTS + 2);
+    for (let fx = -260; fx <= 260; fx += 17) {
+      for (let fz = -260; fz <= 260; fz += 19) {
+        const kept = new Set(evaluatedSlots(packed, fx, fz));
+        for (let i = 0; i < packed.count; i++) {
+          if (kept.has(i)) continue;
+          const radius = Math.sqrt(packed.posRadius[i * 4 + 3]);
+          const lit = nightLightFalloff(
+            fx - packed.posRadius[i * 4],
+            // the fragment is ground, the lamp head hangs above it
+            0 - packed.posRadius[i * 4 + 1],
+            fz - packed.posRadius[i * 4 + 2],
+            radius,
+          );
+          expect(lit).toBe(0);
+        }
+      }
+    }
+  });
+
+  it('actually stops early, or the exits would be pure overhead', () => {
+    const packed = townPack();
+    // standing at the anchor: only the lamps whose windows still reach it
+    expect(evaluatedSlots(packed, 4, -3).length).toBeLessThan(packed.count * 0.6);
+    // out past the whole lit blob: the loop never runs at all
+    expect(evaluatedSlots(packed, 900, 900)).toEqual([]);
+  });
+
+  it('orders slots by reach, which is what makes the break legal', () => {
+    const packed = townPack();
+    for (let i = 1; i < packed.count; i++) {
+      expect(packed.color[i * 4 + 3]).toBeGreaterThanOrEqual(packed.color[(i - 1) * 4 + 3]);
+    }
+  });
+
+  it('bounds the packed set at the anchor, and collapses to nothing by day', () => {
+    const packed = pack([site(60, 0, { radius: 20 }), site(-10, 0, { radius: 9 })], []);
+    expect(packed.bound[0]).toBe(0);
+    expect(packed.bound[1]).toBe(0);
+    // the farthest reach is the 60 yd lamp plus its own 20 yd radius
+    expect(Math.sqrt(packed.bound[2])).toBeCloseTo(80, 4);
+    const dark = pack([site(60, 0, { radius: 20 })], [], 0, 0);
+    expect(dark.count).toBe(0);
+    expect(dark.bound[2]).toBe(0);
+  });
+});
 
 describe('collectBodyNightLights', () => {
   const makeViews = (

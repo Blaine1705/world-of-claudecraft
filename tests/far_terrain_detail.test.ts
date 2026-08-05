@@ -82,6 +82,18 @@ describe('the spliced detail', () => {
     expect(SRC).toContain('${(1 + FAR_DETAIL_GRAIN).toFixed(4)}');
   });
 
+  it('skips the meadow ground tap where the vertex grass weight is zero', () => {
+    // Same <color_fragment> patch, and the one place on this layer where a
+    // texture fetch can be skipped with a PIXEL-IDENTICAL result: at vGrassW 0
+    // the mix collapses to vec3(1.0). The vista's zero-weight ground (rock
+    // past the slope threshold, full shore band) is a large share of the
+    // layer's pixels, so the gate has to be a real branch rather than the
+    // multiply-by-zero it replaced.
+    const gate = SRC.indexOf('if (vGrassW > 0.0) {');
+    expect(gate).toBeGreaterThan(0);
+    expect(SRC.indexOf('texture2D(uGrassBake')).toBeGreaterThan(gate);
+  });
+
   it('keeps the grain gentle enough that the zone colour recipe still reads', () => {
     // The vista's whole job is showing which realm the distant land belongs to.
     expect(FAR_DETAIL_GRAIN).toBeGreaterThan(0);

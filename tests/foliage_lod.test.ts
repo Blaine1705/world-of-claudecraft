@@ -349,76 +349,23 @@ describe('foliage LOD: the real-model and impostor windows cover the world', () 
   });
 });
 
-describe('foliage LOD: shadow clones keep casting for the trees next to you', () => {
-  // The shadow-only clones foliage.ts registers as lod 'shadow': capped at
-  // treeDetailFar, and the ONLY thing casting a tree's shadow (no impostor
-  // takes over, and the per-instance collapse cannot reach three's shadow
-  // depth material, so no shader window splits them).
-  const shadowRow = (centerDist: number, over: Partial<BucketWindowInput> = {}) =>
-    windowFor({
-      centerDist,
-      maxDist: LOD_HIGH.treeDetailFar,
-      maxAtDetail: true,
-      maxFromNearEdge: true,
-      ...over,
-    });
-  // A full bucket is one x-half by one z-band, about 180x240u: hypot / 2 plus
-  // the 18u canopy margin foliage.ts adds.
-  const BUCKET_RADIUS = Math.hypot(180, 240) / 2 + 18;
+describe('foliage LOD: the shadow clones no longer take this window', () => {
+  // They key on the key light's own orthographic shadow volume instead
+  // (src/render/foliage_shadow_core.ts, tests/foliage_shadow_core.test.ts).
+  // Nothing here may grow a shadow-specific arm again: the near-edge probe this
+  // module briefly carried for them inflated their kept radius by a bucket
+  // bounding radius, ~290u on the shipped ~500x240u slabs.
+  const lodSrc = readFileSync(new URL('../src/render/foliage_lod.ts', import.meta.url), 'utf8');
 
-  it('keeps a slab whose nearest trees are still well inside the cap', () => {
-    // The reported bug: standing near a z-band boundary, the trees a few paces
-    // away belong to the NEXT bucket, whose centre is most of a slab off. Keyed
-    // on that centre the whole slab left the shadow pass at once, so a few
-    // yards of camera drift deleted the shadow of a tree 70u away.
-    const cap = LOD_HIGH.treeDetailFar * BEST_SCALE;
-    const centre = cap + 30; // centre past the cap, nearest trees far inside it
-    // How much view the centre rule was throwing away: the slab's nearest tree
-    // is over 100u inside the cap and it still lost its shadow.
-    expect(cap - (centre - BUCKET_RADIUS)).toBeGreaterThan(100);
-    expect(bucketVisible(shadowRow(centre, { radius: BUCKET_RADIUS, detailFar: 900 }))).toBe(true);
-    // Centre-keyed, which is what shipped, the same bucket went dark.
-    expect(
-      bucketVisible(
-        shadowRow(centre, { radius: BUCKET_RADIUS, detailFar: 900, maxFromNearEdge: false }),
-      ),
-    ).toBe(false);
+  it('keeps bucketVisible camera-keyed on the bucket centre for every row', () => {
+    expect(lodSrc).not.toContain('maxFromNearEdge');
+    expect(lodSrc).toContain('if (w.centerDist < minCap || w.centerDist >= maxCap) return false;');
   });
 
-  it('still drops a slab once its nearest tree is past the cap', () => {
-    // The cap is not removed, only re-keyed: nothing casts from beyond it.
-    const cap = LOD_HIGH.treeDetailFar * BEST_SCALE;
-    const gone = cap + BUCKET_RADIUS + 1;
-    expect(bucketVisible(shadowRow(gone, { radius: BUCKET_RADIUS, detailFar: 900 }))).toBe(false);
-  });
-
-  it('does not flip on a yard of camera drift while the near trees stay in range', () => {
-    // The symptom as reported: "shadows can just disappear on a small camera
-    // shift". Sweep the centre across the cap a yard at a time and the answer
-    // must not change while the slab still holds trees inside it.
-    const cap = LOD_HIGH.treeDetailFar * BEST_SCALE;
-    for (let centre = cap - 20; centre <= cap + 20; centre++) {
-      expect(
-        bucketVisible(shadowRow(centre, { radius: BUCKET_RADIUS, detailFar: 900 })),
-        `centre ${centre}`,
-      ).toBe(true);
-    }
-  });
-
-  it('does not flip when the adaptive budget scale moves under a fixed camera', () => {
-    // The other half: maxCap is treeDetailFar * distanceScale, so the budget
-    // moved the threshold under a stationary player. 0.72 to 1 is the shipped
-    // non-lean span (foliageDistanceScale).
-    const centre = 250;
-    for (const q of QUALITY_LEVELS) {
-      const scale = foliageDistanceScale(q, false);
-      expect(
-        bucketVisible(
-          shadowRow(centre, { radius: BUCKET_RADIUS, detailFar: 900, distanceScale: scale }),
-        ),
-        `quality ${q}`,
-      ).toBe(true);
-    }
+  it('routes the shadow rows to the light-volume core', () => {
+    const foliageSrc = readFileSync(new URL('../src/render/foliage.ts', import.meta.url), 'utf8');
+    expect(foliageSrc).toContain("from './foliage_shadow_core'");
+    expect(foliageSrc).toContain('shadowRowVisible(');
   });
 });
 

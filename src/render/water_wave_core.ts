@@ -29,6 +29,15 @@
  */
 export const WATER_TIME_PERIOD = 600;
 
+/**
+ * Range-fade weight under which a wave family is skipped outright instead of
+ * evaluated at a vanishing amplitude. Spliced into the GLSL as WAVE_SKIP and
+ * exported so a test can re-derive the shading error it admits: the largest
+ * normal tilt a skipped family can cost is uSwellAmp * this * |k| * 5.5, and
+ * the amplitude scale each family carries only shrinks it further.
+ */
+export const WAVE_SKIP_WEIGHT = 0.01;
+
 const TWO_PI = Math.PI * 2;
 
 /** Angular speed (radians per second) for a whole cycle count per wrap period. */
@@ -184,6 +193,15 @@ export const WATER_WAVE_GLSL = /* glsl */ `
   const vec2 MSWELL_FADE = vec2(420.0, 1100.0);
   const vec2 GSWELL_FADE = vec2(1400.0, 3000.0);
 
+  // Weight under which a family is skipped outright rather than evaluated at a
+  // vanishing amplitude (WAVE_SKIP_WEIGHT). A family at this weight moves the
+  // shading normal by uSwellAmp * weight * |k| * 5.5, under a thousandth of a
+  // radian for every member: far below what a glint, a whitecap threshold or
+  // the scatter term can resolve. It retires the last few percent of each
+  // family's fade tail, which is exactly the band that covers the most SCREEN
+  // area at a grazing sea angle and contributes the least to it.
+  const float WAVE_SKIP = ${WAVE_SKIP_WEIGHT};
+
   // Half-amplitude of the mid waves as a multiple of uSwellAmp: about 0.9
   // yards, so a 50 yard wave carries a height-to-length ratio near 1/28, the
   // slope a moderate sea really has. It costs no geometry (shading only).
@@ -227,16 +245,29 @@ export const WATER_WAVE_GLSL = /* glsl */ `
     return p + WARP_AMP * vec2(sin(a) + 0.6 * cos(b), sin(b) - 0.6 * cos(a));
   }
 
+  // THE WARPED FORMS, and why they exist. The mid waves, the groundswell and
+  // the group envelope all bend through the SAME warp of the SAME world
+  // position, so a stage that wants more than one of them can evaluate
+  // waveWarp ONCE and hand the warped point to these *At forms. Three separate
+  // warps is four redundant wavePhase evaluations and eight redundant sin/cos
+  // on every single water pixel, for a value that cannot differ between them.
+  // The one-argument wrappers below are the definition; the *At forms are the
+  // same arithmetic with the common subexpression lifted out, so a caller can
+  // pick either and get identical output.
+
   // The slow envelope that gathers waves into SETS. Ranges 0.04 to 1.0: the
   // deep floor is deliberate, a real lull goes near-glassy, and the contrast
   // between a running set and the calm behind it is most of what reads as
   // "random" from the shore.
-  float waveGroup(vec2 p, float t) {
-    vec2 q = waveWarp(p, t);
+  float waveGroupAt(vec2 q, float t) {
     return 0.52 + 0.48
       * sin(wavePhase(q, GROUP_K1, GROUP_W1, t))
       * (0.62 * sin(wavePhase(q, GROUP_K2, GROUP_W2, t))
        + 0.38 * sin(wavePhase(q, GROUP_K3, GROUP_W3, t)));
+  }
+
+  float waveGroup(vec2 p, float t) {
+    return waveGroupAt(waveWarp(p, t), t);
   }
 
   void chopField(vec2 p, float t, out float crest, out vec2 slope) {
@@ -247,21 +278,27 @@ export const WATER_WAVE_GLSL = /* glsl */ `
     addWave(p, t, SWELL_K3, SWELL_W3, 0.18, crest, slope);
   }
 
-  void midField(vec2 p, float t, out float crest, out vec2 slope) {
+  void midFieldAt(vec2 q, float t, out float crest, out vec2 slope) {
     crest = 0.0;
     slope = vec2(0.0);
-    vec2 q = waveWarp(p, t);
     addWave(q, t, MSWELL_K1, MSWELL_W1, 0.45, crest, slope);
     addWave(q, t, MSWELL_K2, MSWELL_W2, 0.33, crest, slope);
     addWave(q, t, MSWELL_K3, MSWELL_W3, 0.22, crest, slope);
   }
 
-  void groundswellField(vec2 p, float t, out float crest, out vec2 slope) {
+  void midField(vec2 p, float t, out float crest, out vec2 slope) {
+    midFieldAt(waveWarp(p, t), t, crest, slope);
+  }
+
+  void groundswellFieldAt(vec2 q, float t, out float crest, out vec2 slope) {
     crest = 0.0;
     slope = vec2(0.0);
-    vec2 q = waveWarp(p, t);
     addWave(q, t, GSWELL_K1, GSWELL_W1, 0.46, crest, slope);
     addWave(q, t, GSWELL_K2, GSWELL_W2, 0.33, crest, slope);
     addWave(q, t, GSWELL_K3, GSWELL_W3, 0.21, crest, slope);
+  }
+
+  void groundswellField(vec2 p, float t, out float crest, out vec2 slope) {
+    groundswellFieldAt(waveWarp(p, t), t, crest, slope);
   }
 `;

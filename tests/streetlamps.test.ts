@@ -383,3 +383,70 @@ describe('streetlamp GLB preparation', () => {
     expect(nightLightStaticCount()).toBe(0);
   });
 });
+
+describe('the per-frame lamp drive', () => {
+  /** Install one source on every style, carrying an authored emitter. */
+  function installGlowingSource(): void {
+    const source = new THREE.Group();
+    const post = new THREE.Mesh(new THREE.BoxGeometry(1, 5.5, 1), new THREE.MeshStandardMaterial());
+    post.position.y = 2.75;
+    const flame = new THREE.Mesh(
+      new THREE.BoxGeometry(0.3, 0.4, 0.3),
+      new THREE.MeshStandardMaterial({
+        name: LAMP_SOURCE_MATERIAL,
+        emissive: new THREE.Color(0.74, 0.49, 0.21),
+        emissiveIntensity: 1,
+      }),
+    );
+    flame.position.y = 4.7;
+    source.add(post, flame);
+    for (const style of Object.keys(streetlampPreloadInternalsForTest.assetDefs)) {
+      streetlampPreloadInternalsForTest.installSource(
+        style as keyof typeof streetlampPreloadInternalsForTest.assetDefs,
+        source,
+      );
+    }
+  }
+
+  function emitterMaterials(view: { group: THREE.Group }): THREE.MeshStandardMaterial[] {
+    const found: THREE.MeshStandardMaterial[] = [];
+    view.group.traverse((object) => {
+      if (!(object instanceof THREE.InstancedMesh)) return;
+      const material = object.material as THREE.MeshStandardMaterial;
+      if (material.name.endsWith(LAMP_SOURCE_MATERIAL)) found.push(material);
+    });
+    return found;
+  }
+
+  it('writes the dark state once instead of every frame of daylight', () => {
+    // The lamps are out for the whole daylight half of a 20 minute cycle, and
+    // the drive used to rewrite the same zero into every authored emitter of
+    // every style on every one of those frames. Poking a value in and watching
+    // it survive is the decisive test: an elided write leaves it alone.
+    ensureNightLightField();
+    installGlowingSource();
+    const view = buildStreetlamps(0);
+    const emitters = emitterMaterials(view);
+    expect(emitters.length).toBeGreaterThan(0);
+
+    view.update(0, 1);
+    for (const material of emitters) expect(material.emissiveIntensity).toBe(0);
+    for (const material of emitters) material.emissiveIntensity = 0.5;
+    view.update(0, 2);
+    view.update(0, 3);
+    for (const material of emitters) expect(material.emissiveIntensity).toBe(0.5);
+  });
+
+  it('resumes driving the moment the lamplighter is out, and stands down after', () => {
+    ensureNightLightField();
+    installGlowingSource();
+    const view = buildStreetlamps(0);
+    const emitters = emitterMaterials(view);
+
+    view.update(0, 1);
+    view.update(1, 2);
+    for (const material of emitters) expect(material.emissiveIntensity).toBeGreaterThan(0);
+    view.update(0, 3);
+    for (const material of emitters) expect(material.emissiveIntensity).toBe(0);
+  });
+});

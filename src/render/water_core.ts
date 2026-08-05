@@ -254,6 +254,105 @@ export function buildWaterSurfaceIndex(
   return vertexCount > 65535 ? new Uint32Array(quads) : new Uint16Array(quads);
 }
 
+/** A rectangular block of QUADS on a water sheet's lattice, half-open in both
+ *  axes: quad columns [col0, col1) by quad rows [row0, row1). */
+export interface WaterGridRegion {
+  readonly col0: number;
+  readonly col1: number;
+  readonly row0: number;
+  readonly row1: number;
+}
+
+/**
+ * Partition a (columns x rows) VERTEX lattice's quads into `tilesPerSide`
+ * squared blocks, with the remainder spread over the leading blocks so no tile
+ * is more than one quad wider than another. Every quad lands in exactly one
+ * tile, so the tiles together draw the identical triangle set the whole-sheet
+ * index does.
+ *
+ * WHY THE HORIZON APRON IS TILED AT ALL. It is one sheet thousands of yards
+ * across with a bounding volume to match, so it intersects the view frustum
+ * from every camera in the world and every kept triangle is submitted every
+ * frame. A horizontal sheet that big is mostly BEHIND or beside the camera: at
+ * a typical field of view the visible wedge out to the far plane is a small
+ * fraction of its area. Split, three.js culls the blocks that are not in view
+ * on their own bounds and the frame submits the wedge instead of the ocean.
+ * The cost is one draw call per surviving block, which is the trade the frame
+ * wants: the apron's vertex stage carries the whole analytic wave field.
+ *
+ * Zone sheets are NOT tiled: a zone rect is ~360 yards across, it already
+ * frustum-culls as one unit, and splitting it would only add draw calls.
+ */
+export function waterSheetTilePlan(
+  columns: number,
+  rows: number,
+  tilesPerSide: number,
+): WaterGridRegion[] {
+  const quadColumns = Math.max(0, columns - 1);
+  const quadRows = Math.max(0, rows - 1);
+  const nx = Math.max(1, Math.min(tilesPerSide, quadColumns));
+  const nz = Math.max(1, Math.min(tilesPerSide, quadRows));
+  if (quadColumns === 0 || quadRows === 0) return [];
+  const edges = (total: number, count: number): number[] => {
+    const base = Math.floor(total / count);
+    const extra = total % count;
+    const out = [0];
+    for (let i = 0; i < count; i++) out.push(out[i] + base + (i < extra ? 1 : 0));
+    return out;
+  };
+  const xs = edges(quadColumns, nx);
+  const zs = edges(quadRows, nz);
+  const plan: WaterGridRegion[] = [];
+  for (let r = 0; r < nz; r++) {
+    for (let c = 0; c < nx; c++) {
+      plan.push({ col0: xs[c], col1: xs[c + 1], row0: zs[r], row1: zs[r + 1] });
+    }
+  }
+  return plan;
+}
+
+/**
+ * The dry-tile-culled index for ONE region of a sheet's lattice. Same keep
+ * rule, same triangle order and winding as buildWaterSurfaceIndex, restricted
+ * to the region's quads, so concatenating a whole plan's regions reproduces
+ * that function's triangle set exactly (in a different order, which a depth-
+ * independent transparent sheet does not care about).
+ *
+ * Returns an EMPTY array for a region with no wet quad at all: that is a block
+ * of the apron buried under land or off the map, and the caller skips building
+ * a mesh for it entirely. (buildWaterSurfaceIndex's null means the opposite,
+ * "nothing was dropped, keep the geometry's own index", so the two never share
+ * a return contract.)
+ */
+export function buildWaterSurfaceTileIndex(
+  depth: ArrayLike<number>,
+  columns: number,
+  region: WaterGridRegion,
+): Uint16Array | Uint32Array {
+  const quads: number[] = [];
+  for (let r = region.row0; r < region.row1; r++) {
+    for (let c = region.col0; c < region.col1; c++) {
+      const a = r * columns + c;
+      const b = (r + 1) * columns + c;
+      const cc = (r + 1) * columns + c + 1;
+      const d = r * columns + c + 1;
+      if (
+        depth[a] > WATER_TILE_KEEP_ABOVE ||
+        depth[b] > WATER_TILE_KEEP_ABOVE ||
+        depth[cc] > WATER_TILE_KEEP_ABOVE ||
+        depth[d] > WATER_TILE_KEEP_ABOVE
+      ) {
+        quads.push(a, b, d, b, cc, d);
+      }
+    }
+  }
+  // The index addresses the WHOLE sheet's vertex buffer, which every region
+  // shares, so the width question is the sheet's vertex count, never the
+  // region's. Caller passes rows via the region; columns bounds the rest.
+  const maxVertex = region.row1 * columns + region.col1;
+  return maxVertex > 65535 ? new Uint32Array(quads) : new Uint16Array(quads);
+}
+
 /**
  * Deepest the terrain generator ever puts the seabed below the water line.
  * Measured across a 30 sample coastline survey: every sample tops out at

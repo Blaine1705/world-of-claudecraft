@@ -43,7 +43,7 @@ interface PrecipStyle {
 
 const STYLES: Record<Precip, PrecipStyle> = {
   // soft, slow, wind-swayed flakes. `size` is in world units (sizeAttenuation),
-  // so it must read as a real flake (~a hand's width), not a boulder — anything
+  // so it must read as a real flake (~a hand's width), not a boulder: anything
   // approaching a yard stays huge on screen even far off and looks like flying
   // snowballs. Kept just above the ambient motes (0.5) so it still registers
   // against bright snowfields.
@@ -70,7 +70,7 @@ const STYLES: Record<Precip, PrecipStyle> = {
 };
 
 // Tiny deterministic RNG (mulberry32) so particle seeding never reaches for
-// Math.random — keeps this in step with the "procedural-everything is seeded"
+// Math.random, keeping this in step with the "procedural-everything is seeded"
 // ethos of the renderer even though it's not on the sim determinism path.
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
@@ -83,7 +83,7 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-// A soft round flake — radial alpha falloff, painted white so the material's
+// A soft round flake: radial alpha falloff, painted white so the material's
 // `color` tints it.
 function flakeTexture(): THREE.CanvasTexture {
   const c = document.createElement('canvas');
@@ -174,7 +174,7 @@ export class Weather {
       THREE.DynamicDrawUsage,
     );
     geo.setAttribute('position', this.positionAttribute);
-    // generous bounding sphere — the cloud is re-centred on the camera every
+    // generous bounding sphere: the cloud is re-centred on the camera every
     // frame, so a fixed large radius avoids per-frame recompute and culling.
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), Math.hypot(HX, HY, HZ));
 
@@ -271,14 +271,28 @@ export class Weather {
     // Any weathered biome in the box drives the mode (own zone first); the
     // player's own biome staying clear no longer clears the box. `biome`
     // stays the suppression channel: null (indoors/underwater) always stops.
-    this.planTimer -= dt;
-    if (this.planTimer <= 0) {
-      this.planTimer = PLAN_INTERVAL;
-      const plan = remotePrecipPlan(cam.x, cam.z, HX, HZ, biomeAt);
-      this.planMode = plan.mode;
-      this.planLocal = plan.local;
+    //
+    // Suppressed, the scan is skipped outright rather than run and discarded:
+    // its answer feeds `want` only on the arm that is already null here, so a
+    // suppressed frame was paying 49 biomeAt taps twice a second for a value
+    // nothing could read. The cached plan is dropped with it so a resume
+    // re-scans against wherever the camera has since ended up instead of
+    // opening on a stale mode.
+    const suppressed = !this.enabled || biome === null;
+    if (suppressed) {
+      this.planTimer = 0;
+      this.planMode = null;
+      this.planLocal = true;
+    } else {
+      this.planTimer -= dt;
+      if (this.planTimer <= 0) {
+        this.planTimer = PLAN_INTERVAL;
+        const plan = remotePrecipPlan(cam.x, cam.z, HX, HZ, biomeAt);
+        this.planMode = plan.mode;
+        this.planLocal = plan.local;
+      }
     }
-    const want: Precip | null = !this.enabled || biome === null ? null : this.planMode;
+    const want: Precip | null = suppressed ? null : this.planMode;
 
     // While the visible type still differs from what we want, drive opacity to
     // zero first; once faded out, swap the material and let it climb again.

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   campfireEmberSites,
@@ -238,5 +239,31 @@ describe('fireflyBlink', () => {
     const a = fireflyBlink(0.2, 0);
     const b = fireflyBlink(0.2, 0.5);
     expect(a).not.toBeCloseTo(b, 3);
+  });
+});
+
+// The Three half (night_accents.ts) cannot build in Node: it mints a canvas
+// sprite and a Three scene graph. What a unit test CAN hold is the seam that
+// decides its per-frame cost, so it is pinned here the way the night light
+// field pins its own consumer seams.
+describe('the Three consumer seam (source pins)', () => {
+  const source = readFileSync(new URL('../src/render/night_accents.ts', import.meta.url), 'utf8');
+
+  it('drives the frame glow through the shared material, not the instance buffer', () => {
+    // Every cap takes the SAME level each frame, so it belongs on the one
+    // material colour three multiplies into the instance colour. Folding it
+    // into the instance colours instead re-uploaded the whole cap buffer every
+    // frame of every night for a value that is identical across all of them.
+    expect(source).toContain('capMat.color.setScalar(EMISSIVE_GLOW * glow * pulse)');
+    const perFrame = source.slice(source.indexOf('    update(glow: number'));
+    expect(perFrame).not.toContain('instanceColor');
+  });
+
+  it('writes the per-cap tint on a cell crossing, where the fill is rebuilt', () => {
+    const rebuild = source.slice(
+      source.indexOf('function rebuildFlora('),
+      source.indexOf('// ---- fireflies'),
+    );
+    expect(rebuild).toContain('if (tints) tints.needsUpdate = true;');
   });
 });

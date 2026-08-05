@@ -120,7 +120,6 @@ export function buildNightAccents(seed = 0): NightAccentsView {
 
   const floraSlots: GlowFloraCap[] = [];
   const floraTint = new THREE.Color();
-  const floraBase: number[] = [];
   let floraCount = 0;
   let floraCx = Number.NaN;
   let floraCz = Number.NaN;
@@ -144,6 +143,7 @@ export function buildNightAccents(seed = 0): NightAccentsView {
 
   function rebuildFlora(camX: number, camZ: number): void {
     floraCount = glowFloraCaps(camX, camZ, probes, floraSlots);
+    const tints = caps.instanceColor;
     for (let i = 0; i < floraCount; i++) {
       const slot = floraSlots[i];
       quaternion.setFromAxisAngle(up, slot.yaw);
@@ -152,17 +152,24 @@ export function buildNightAccents(seed = 0): NightAccentsView {
       matrix.compose(position, quaternion, scaleVec);
       caps.setMatrixAt(i, matrix);
       stalks.setMatrixAt(i, matrix);
-      // The realm's tint, shaded apart per cap so a cluster is not one flat blob.
+      // The realm's tint, shaded apart per cap so a cluster is not one flat
+      // blob. This is the CAP'S OWN colour and nothing else: the frame's glow
+      // and pulse ride the shared material below, so the buffer is written on
+      // a cell crossing and never per frame.
       const biome: BiomeId = zoneBiomeAt(slot.x, slot.z);
-      floraTint.setHex(FLORA_TINT[biome]);
-      floraBase[i * 3] = floraTint.r * (0.7 + slot.variant * 0.5);
-      floraBase[i * 3 + 1] = floraTint.g * (0.7 + slot.variant * 0.5);
-      floraBase[i * 3 + 2] = floraTint.b * (0.7 + slot.variant * 0.5);
+      floraTint.setHex(FLORA_TINT[biome]).multiplyScalar(0.7 + slot.variant * 0.5);
+      if (tints) {
+        const array = tints.array as Float32Array;
+        array[i * 3] = floraTint.r;
+        array[i * 3 + 1] = floraTint.g;
+        array[i * 3 + 2] = floraTint.b;
+      }
     }
     caps.count = floraCount;
     stalks.count = floraCount;
     caps.instanceMatrix.needsUpdate = true;
     stalks.instanceMatrix.needsUpdate = true;
+    if (tints) tints.needsUpdate = true;
   }
 
   // ---- fireflies ----------------------------------------------------------
@@ -240,15 +247,18 @@ export function buildNightAccents(seed = 0): NightAccentsView {
         floraCz = cell.cz;
         rebuildFlora(camX, camZ);
       }
-      if (floraCount > 0 && caps.instanceColor) {
+      if (floraCount > 0) {
         // Emissive-by-brightness: an unlit basic material scaled by the glow is
         // the cheapest way to carry an HDR cap past the bloom threshold on the
         // composer tiers while collapsing to nothing by day.
+        //
+        // The level is the SAME for every cap, so it rides the shared material
+        // colour (which three multiplies into the instance colour) rather than
+        // being multiplied into a few hundred instance-colour floats and
+        // re-uploaded every frame. Identical pixels, one uniform instead of a
+        // buffer upload per frame for the whole night.
         const pulse = 0.9 + Math.sin(time * 0.9) * 0.1;
-        const level = EMISSIVE_GLOW * glow * pulse;
-        const array = caps.instanceColor.array as Float32Array;
-        for (let i = 0; i < floraCount * 3; i++) array[i] = floraBase[i] * level;
-        caps.instanceColor.needsUpdate = true;
+        capMat.color.setScalar(EMISSIVE_GLOW * glow * pulse);
       }
       // --- fireflies: recycle out-of-ring flies, drift and blink the rest
       if (!fliesSeeded) {

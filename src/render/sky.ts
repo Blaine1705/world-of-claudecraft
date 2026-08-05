@@ -19,7 +19,7 @@ import { skyTexture } from './textures';
 // High tier: the dome fragment shader samples real Poly Haven equirect HDRIs
 // (one per biome) by view direction, cross-fading two maps across the same
 // zone-boundary windows the terrain palette uses. Each HDRI's sample is
-// rotated in azimuth so its real sun sits at SUN_ANCHOR's azimuth — the one
+// rotated in azimuth so its real sun sits at SUN_ANCHOR's azimuth, the one
 // canonical sun that shadows, god rays and water glints all share. Procedural
 // warm sun-glow lobes stay layered on top so the anchor direction always
 // carries the glow even where the HDRI sun's elevation differs.
@@ -531,16 +531,28 @@ const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
 
   vec3 sampleSky(sampler2D map, vec3 dir, float uOff, vec3 tune, float lift) {
     // lift resamples low view angles from just above the photographed ridge
-    // line, dissolving the HDRI's baked-in horizon hills into clean sky
-    float y = mix(dir.y, 0.26, lift * smoothstep(0.24, -0.06, dir.y));
+    // line, dissolving the HDRI's baked-in horizon hills into clean sky. Every
+    // shipped sky is generated with a clean ocean horizon and lifts nothing,
+    // so the common path is a uniform 0 where the mix collapses to dir.y; the
+    // branch is on a uniform, so the whole draw takes one path.
+    float y = dir.y;
+    if (lift > 0.0) y = mix(dir.y, 0.26, lift * smoothstep(0.24, -0.06, dir.y));
     vec2 uv = vec2(
       atan(dir.z, dir.x) * 0.15915494 + 0.5 + uOff,
       asin(clamp(y, -1.0, 1.0)) * 0.31830989 + 0.5);
     vec3 c = texture2D(map, uv).rgb * tune.x;
     // per-biome contrast around a fixed pivot just under the cloud whites:
     // deepens the open sky between clouds and spreads cloud shading back out
-    // before the ACES highlight shoulder compresses it flat
-    c = 0.8 * pow(max(c, vec3(0.0)) / 0.8, vec3(tune.z));
+    // before the ACES highlight shoulder compresses it flat.
+    //
+    // Half the shipped skies (the mood-dark ones, and every biome the table
+    // leaves at the default) run contrast 1, where this is arithmetically the
+    // identity. A uniform is not a compile-time constant, so nothing folds it
+    // away and those skies paid three pow() per sample, twice per pixel across
+    // the biome blend. The branch is on a uniform, so a whole draw takes one
+    // path, and skipping it is not merely equal but exact: pow(x, 1.0) is
+    // exp2(log2(x)) on the hardware, which does not round-trip perfectly.
+    if (tune.z != 1.0) c = 0.8 * pow(max(c, vec3(0.0)) / 0.8, vec3(tune.z));
     return min(c, vec3(tune.y));
   }
 
@@ -632,15 +644,30 @@ const skyFrag = (zoneHaze: boolean): string => /* glsl */ `${
     // stars: a fine field of small twinkling points at hash-jittered spots, only
     // above the horizon, fading in as the sky darkens
     if (uStarAmt > 0.001) {
-      vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 72.0;
-      vec2 scell = floor(suv);
-      float present = step(0.9, hash12(scell));
-      vec2 sf = fract(suv) - vec2(hash12(scell + 7.0), hash12(scell + 13.0));
-      float point = smoothstep(0.012, 0.0, dot(sf, sf));            // small points
-      float twinkle = 0.55 + 0.45 * sin(uTime * (1.5 + hash12(scell + 3.0) * 3.5) + hash12(scell + 19.0) * 6.2832);
-      float star = present * point * (0.4 + 0.6 * hash12(scell + 41.0)) * twinkle;
+      // THREE NESTED EARLY-OUTS, and none of them changes a pixel. The field
+      // is six hash12 (a sin each) plus a twinkle sine plus an atan/asin pair
+      // on EVERY sky pixel of every night frame, and almost all of it lands on
+      // zero: below the horizon there are no stars at all, only about one cell
+      // in ten holds one, and a star's disc covers a few percent of the cell
+      // that holds it. Each gate below is the exact condition under which the
+      // term it guards was already multiplied out to zero, so the output is
+      // identical and only the work is gone. The gates are coherent too: the
+      // horizon test is a band, and a cell is ~0.8 degrees, which at a 1280
+      // wide frame is roughly a ten pixel block taking one path.
       float upper = smoothstep(-0.02, 0.2, dir.y);                  // no stars below the horizon
-      c += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
+      if (upper > 0.0) {
+        vec2 suv = vec2(atan(dir.z, dir.x), asin(clamp(dir.y, -1.0, 1.0))) * 72.0;
+        vec2 scell = floor(suv);
+        if (hash12(scell) >= 0.9) {                                 // this cell holds a star
+          vec2 sf = fract(suv) - vec2(hash12(scell + 7.0), hash12(scell + 13.0));
+          float point = smoothstep(0.012, 0.0, dot(sf, sf));        // small points
+          if (point > 0.0) {                                        // inside its disc
+            float twinkle = 0.55 + 0.45 * sin(uTime * (1.5 + hash12(scell + 3.0) * 3.5) + hash12(scell + 19.0) * 6.2832);
+            float star = point * (0.4 + 0.6 * hash12(scell + 41.0)) * twinkle;
+            c += vec3(0.9, 0.93, 1.0) * star * upper * uStarAmt;
+          }
+        }
+      }
     }
     // Horizon fog band: blend the dome into the scene's fog color at low view
     // angles, so fully fogged geometry (far trees, unloaded land, distant
@@ -916,7 +943,7 @@ export function buildSky(
       // dome samples at u + off. three r165 negates environmentRotation
       // before building the PMREM lookup matrix ("accommodate left-handed
       // frame", WebGLMaterials.js), so the effective lookup azimuth is
-      // alpha + theta — matching the dome needs theta = +off*2pi. (A negated
+      // alpha + theta, so matching the dome needs theta = +off*2pi. (A negated
       // value lands the env sun 2x the offset away from the dome's.)
       return sunOffsetU(biome, sun) * 2 * Math.PI;
     },

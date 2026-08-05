@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  ensureNightLightField,
+  hasNightLightField,
   NIGHT_LIGHT_DECLARATIONS,
   nightLightFragmentGlsl,
   nightLightStaticCount,
@@ -25,11 +27,50 @@ describe('the GLSL strings', () => {
     expect(NIGHT_LIGHT_DECLARATIONS).toContain(`[${NIGHT_LIGHT_SLOTS}]`);
   });
 
+  it('sizes every uniform VALUE to the type it is declared as', () => {
+    // A flat array whose length disagrees with its GLSL type is the silent
+    // failure of this pattern: three uploads whatever it is handed and the
+    // shader reads the wrong stride, so the lamps land in the wrong places
+    // with no error anywhere. Both packed arrays carry four floats a slot (the
+    // fourth being the squared cutoff and the reach key), and the bound is one
+    // vec3 of (anchor.x, anchor.z, boundRadius squared).
+    const uniforms = nightLightUniforms() as Record<string, { value: Float32Array }>;
+    expect(NIGHT_LIGHT_DECLARATIONS).toContain(
+      `uniform vec4 uNightLightPosR[${NIGHT_LIGHT_SLOTS}]`,
+    );
+    expect(uniforms.uNightLightPosR.value).toHaveLength(NIGHT_LIGHT_SLOTS * 4);
+    expect(NIGHT_LIGHT_DECLARATIONS).toContain(
+      `uniform vec4 uNightLightColor[${NIGHT_LIGHT_SLOTS}]`,
+    );
+    expect(uniforms.uNightLightColor.value).toHaveLength(NIGHT_LIGHT_SLOTS * 4);
+    expect(NIGHT_LIGHT_DECLARATIONS).toContain('uniform vec3 uNightLightBound;');
+    expect(uniforms.uNightLightBound.value).toHaveLength(3);
+  });
+
   it('loops a compile-time constant bound and exits on the live count', () => {
     const glsl = nightLightFragmentGlsl('vWPos.xyz');
     expect(glsl).toContain(`for (int i = 0; i < ${NIGHT_LIGHT_SLOTS}; i++)`);
     expect(glsl).toContain('if (i >= uNightLightCount) break;');
     expect(glsl).toContain('vWPos.xyz');
+  });
+
+  it('takes both early exits the pack computes, the reason the loop is affordable', () => {
+    // This block runs on every terrain fragment on screen after dark, so the
+    // pack precomputes two conservative bounds for it (night_light_field_core
+    // proves they never drop a contributing light). Losing either one in a
+    // refactor is invisible on screen and expensive, which is why they are
+    // pinned rather than left to a comment.
+    const glsl = nightLightFragmentGlsl('vWPos.xyz');
+    // the anchor bound: ground out past every packed light skips the block
+    expect(glsl).toContain('uNightLightCount > 0 && wocNLAnchor2 < uNightLightBound.z');
+    // the reach key, in the slot's own colour slot, ends the walk
+    expect(glsl).toContain('if (wocNLTint.w >= wocNLAnchorD) break;');
+    expect(glsl.indexOf('if (wocNLTint.w >= wocNLAnchorD) break;')).toBeLessThan(
+      glsl.indexOf('float wocNLDist2 = dot(wocNLTo, wocNLTo);'),
+    );
+    // the cutoff arrives pre-squared, so the loop never re-squares a constant
+    expect(glsl).toContain('float wocNLCutoff2 = wocNLSite.w;');
+    expect(glsl).not.toContain('uNightLightPosR[i].w * uNightLightPosR[i].w');
   });
 
   it('avoids the ES 3.00 reserved words that kill promoted shaders silently', () => {
@@ -88,6 +129,31 @@ describe('the registry and the frame update', () => {
     updateNightLightField(0, 0, 1, 1, 0, [], 0);
     const uniforms = nightLightUniforms();
     expect((uniforms.uNightLightCount as { value: number }).value).toBe(0);
+    resetNightLightFieldForTest();
+  });
+
+  it('publishes the anchor bound the shader gates on, and drops it by day', () => {
+    // End to end through the live uniform block: the bound is what decides
+    // whether the fragment loop runs at all, so a pack that filled the slots
+    // but left the bound at zero would render the whole feature invisible.
+    resetNightLightFieldForTest();
+    ensureNightLightField();
+    expect(hasNightLightField()).toBe(true);
+    registerStaticNightLights('streetlamps', [
+      { x: 30, y: 4.7, z: 40, radius: 48, r: 1, g: 0.55, b: 0.2, intensity: 205 },
+    ]);
+    const uniforms = nightLightUniforms() as Record<string, { value: Float32Array | number }>;
+    updateNightLightField(0, 0, 1, 1, 0, [], 0);
+    expect(uniforms.uNightLightCount.value).toBe(1);
+    const bound = uniforms.uNightLightBound.value as Float32Array;
+    // anchor plus the lamp's own reach: 50 yd out, 48 yd radius
+    expect(Array.from(bound.subarray(0, 2))).toEqual([0, 0]);
+    expect(Math.sqrt(bound[2])).toBeCloseTo(98, 4);
+    // and the squared cutoff rides the position slot, so the loop never squares it
+    expect((uniforms.uNightLightPosR.value as Float32Array)[3]).toBeCloseTo(48 * 48, 3);
+    updateNightLightField(0, 0, 0, 0, 0, [], 0);
+    expect(uniforms.uNightLightCount.value).toBe(0);
+    expect(bound[2]).toBe(0);
     resetNightLightFieldForTest();
   });
 });

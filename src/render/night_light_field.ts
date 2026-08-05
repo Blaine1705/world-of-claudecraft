@@ -8,24 +8,40 @@
 // file only owns the registry, the uniforms, and the strings. The pattern is
 // biome_haze_field.ts, the repo's cross-surface shader service reference.
 //
-// Cost: two flat uniform arrays (16 vec4 + 16 vec3) written once per frame,
-// and a bounded loop in the terrain fragment shader that the count uniform
-// exits immediately by day (the count is 0 whenever the world is lit). This
-// is how "every lamp lights the road" coexists with the pinned live
-// THREE.PointLight budget: the point lights still light characters and props
-// near the player; the field carries the ground everywhere else.
+// Cost: two flat uniform arrays written once per frame, and a bounded loop in
+// the terrain fragment shader that the count uniform exits immediately by day
+// (the count is 0 whenever the world is lit). This is how "every lamp lights
+// the road" coexists with the pinned live THREE.PointLight budget: the point
+// lights still light characters and props near the player; the field carries
+// the ground everywhere else.
+//
+// After dark the loop is the most-run code the renderer owns (every terrain
+// fragment on screen), so it carries TWO exact early exits the pack computes
+// for it, both described in night_light_field_core.ts: `uNightLightBound`, the
+// sphere around the anchor holding every packed light's reach, skips the whole
+// block for ground out past all of them, and the ascending reach key in
+// `uNightLightColor[i].w` stops the walk once the remaining slots are all too
+// far out to touch this fragment. Neither changes a pixel; they only stop the
+// shader paying for lights that were already contributing zero.
 //
 // `?nightlights=off` is the A/B switch back to the draped ground pools, which
 // remain the fallback wherever the field is absent (the Lambert tier splats no
 // standard material to splice).
 
 import { GFX } from './gfx';
-import { NIGHT_LIGHT_SLOTS, type NightLightSite, packNightLights } from './night_light_field_core';
+import {
+  NIGHT_LIGHT_BOUND_FLOATS,
+  NIGHT_LIGHT_SLOTS,
+  type NightLightSite,
+  packNightLights,
+} from './night_light_field_core';
 import { renderLayerDisabled } from './render_dev_flags';
 
 const uNightLightPosR = { value: new Float32Array(NIGHT_LIGHT_SLOTS * 4) };
-const uNightLightColor = { value: new Float32Array(NIGHT_LIGHT_SLOTS * 3) };
+const uNightLightColor = { value: new Float32Array(NIGHT_LIGHT_SLOTS * 4) };
 const uNightLightCount = { value: 0 };
+/** (anchor.x, anchor.z, boundRadius^2): the packed set's whole reach. */
+const uNightLightBound = { value: new Float32Array(NIGHT_LIGHT_BOUND_FLOATS) };
 
 let active = false;
 let decided = false;
@@ -99,13 +115,14 @@ export function updateNightLightField(
     time,
     uNightLightPosR.value,
     uNightLightColor.value,
+    uNightLightBound.value,
   );
 }
 
 /** The uniforms a consumer material installs in its onBeforeCompile. Shared
  *  objects, never copies (the sharedUniforms.uTime idiom). */
 export function nightLightUniforms(): Record<string, { value: unknown }> {
-  return { uNightLightPosR, uNightLightColor, uNightLightCount };
+  return { uNightLightPosR, uNightLightColor, uNightLightCount, uNightLightBound };
 }
 
 /** Reset for tests: the field is deliberately session-static otherwise. */
@@ -117,6 +134,7 @@ export function resetNightLightFieldForTest(): void {
   uNightLightCount.value = 0;
   uNightLightPosR.value.fill(0);
   uNightLightColor.value.fill(0);
+  uNightLightBound.value.fill(0);
 }
 
 /** How many static sites are registered (diagnostics and tests). */
@@ -127,8 +145,9 @@ export function nightLightStaticCount(): number {
 /** Fragment-stage declarations. Splice into the fragment `<common>` patch. */
 export const NIGHT_LIGHT_DECLARATIONS = `
 uniform vec4 uNightLightPosR[${NIGHT_LIGHT_SLOTS}];
-uniform vec3 uNightLightColor[${NIGHT_LIGHT_SLOTS}];
-uniform int uNightLightCount;`;
+uniform vec4 uNightLightColor[${NIGHT_LIGHT_SLOTS}];
+uniform int uNightLightCount;
+uniform vec3 uNightLightBound;`;
 
 /**
  * The lighting block. Splice immediately BEFORE `#include <lights_fragment_end>`,
@@ -154,22 +173,45 @@ uniform int uNightLightCount;`;
  * enters. A light the fragment is out of range of therefore costs a subtract,
  * a dot and a compare, which is what lets the slot window be wide enough to
  * light a road ahead of the player instead of only the ground beneath them.
+ * The cutoff arrives pre-squared in `.w`, so the loop does not re-square a
+ * constant radius once per fragment per slot either.
+ *
+ * TWO EXACT EARLY EXITS carry the rest, both precomputed by the pack (the
+ * layout comment in night_light_field_core.ts states the geometry):
+ *   - the anchor bound. Every packed light reaches at most `uNightLightBound.z`
+ *     (squared) from the anchor, so ground out past that is unlit by all of
+ *     them and skips the block for the cost of one subtract, one dot and one
+ *     compare. This is what makes the distant half of the ground free again,
+ *     and in open country, where the nearest lamps may be hundreds of yards
+ *     off, it is nearly the whole screen.
+ *   - the reach key. Slots arrive ordered by how close to the anchor they can
+ *     still reach, so the first slot that cannot reach this fragment ends the
+ *     walk. Standing under a lamp in a lit town, that stops the loop after the
+ *     handful of lamps around you instead of walking the whole window.
+ * Both are conservative bounds on the same `wocNLDist2 < wocNLCutoff2` test the
+ * loop already ran, so nothing they skip could have added light.
  */
 export function nightLightFragmentGlsl(worldPos: string): string {
   return `
-  if (uNightLightCount > 0) {
+  vec2 wocNLAnchorTo = (${worldPos}).xz - uNightLightBound.xy;
+  float wocNLAnchor2 = dot(wocNLAnchorTo, wocNLAnchorTo);
+  if (uNightLightCount > 0 && wocNLAnchor2 < uNightLightBound.z) {
+    float wocNLAnchorD = sqrt(wocNLAnchor2);
     vec3 wocNLIrradiance = vec3(0.0);
     vec3 wocNLNormal = inverseTransformDirection(normal, viewMatrix);
     for (int i = 0; i < ${NIGHT_LIGHT_SLOTS}; i++) {
       if (i >= uNightLightCount) break;
-      vec3 wocNLTo = uNightLightPosR[i].xyz - ${worldPos};
+      vec4 wocNLTint = uNightLightColor[i];
+      if (wocNLTint.w >= wocNLAnchorD) break;
+      vec4 wocNLSite = uNightLightPosR[i];
+      vec3 wocNLTo = wocNLSite.xyz - ${worldPos};
       float wocNLDist2 = dot(wocNLTo, wocNLTo);
-      float wocNLCutoff2 = uNightLightPosR[i].w * uNightLightPosR[i].w;
+      float wocNLCutoff2 = wocNLSite.w;
       if (wocNLDist2 < wocNLCutoff2) {
         float wocNLWin = pow2(saturate(1.0 - pow2(wocNLDist2 / wocNLCutoff2)));
         float wocNLAtt = wocNLWin / max(wocNLDist2, 0.01);
         float wocNLLambert = saturate(dot(wocNLNormal, wocNLTo * inversesqrt(max(wocNLDist2, 1e-8))));
-        wocNLIrradiance += uNightLightColor[i] * (wocNLAtt * wocNLLambert);
+        wocNLIrradiance += wocNLTint.rgb * (wocNLAtt * wocNLLambert);
       }
     }
     reflectedLight.directDiffuse += wocNLIrradiance * BRDF_Lambert(diffuseColor.rgb);

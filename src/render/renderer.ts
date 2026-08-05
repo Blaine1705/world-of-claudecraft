@@ -198,9 +198,11 @@ import { FishingBobberVisual } from './fishing_bobber';
 import {
   buildFoliage,
   buildFoliageMaterialPrewarmGroup,
+  clearFoliageShadowVolume,
   type FoliagePerfStats,
   type FoliageView,
   foliageResidencySources,
+  setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
 import {
@@ -8321,6 +8323,15 @@ export class Renderer {
       // the far vista's deep-night ambient floor and night albedo dim ride
       // the same grade
       setFarTerrainNightGrade(this.dnGrade.nightAmt);
+      // The foliage shadow clones cull against this ortho box rather than
+      // against camera distance: geometry outside it cannot write a shadow
+      // texel (foliage_shadow_core.ts). Push it here, where the light's own
+      // direction and target are decided, so the two can never disagree.
+      if (this.sun.castShadow) {
+        setFoliageShadowVolume(this.lightDir, pp, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE);
+      } else {
+        clearFoliageShadowVolume();
+      }
     }
     this.sun.target.position.set(pp.x, pp.y, pp.z);
   }

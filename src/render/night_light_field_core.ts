@@ -14,6 +14,29 @@
 //
 // A src/render pure core: no Three, no DOM. The Three half (uniforms, GLSL,
 // registry) is night_light_field.ts; renderer.ts drives it per frame.
+//
+// THE PACKED LAYOUT, and why it is shaped for the fragment loop rather than for
+// the reader. Every terrain fragment on screen runs this loop after dark, so a
+// per-slot term the shader can test and STOP on is worth far more than a tidy
+// array. Per slot i:
+//
+//   posRadius[i] = (x, y, z, cutoffRadius SQUARED)
+//   color[i]     = (r, g, b, reachKey)
+//
+// `reachKey` is `|light.xz - anchor.xz| - radius`: the closest the fragment can
+// be to the anchor and still be inside this light. Slots are written in
+// ASCENDING reachKey, so once a fragment's own anchor distance falls below
+// slot i's key, no slot from i on can reach it and the loop breaks. Paired with
+// the anchor bound below (the farthest any packed light reaches), the two
+// bounds cut the loop at both ends: a fragment out past every light skips it
+// entirely, and a fragment standing among the lights only walks the ones whose
+// windows can still be open. Both are exact, not approximations, so the picture
+// is identical to evaluating all forty every time.
+//
+// Everything is measured in the XZ plane, which is what lets the bound use the
+// anchor renderer.ts already passes (the player's ground position, no height).
+// A 3D hit implies a 2D hit, so a 2D reject can never drop a light that would
+// have contributed.
 
 import { MOB_GLOW_RANGE, mobGlowStrength } from './night_lighting_core';
 
@@ -96,6 +119,9 @@ export function nightLightFlicker(time: number, x: number, z: number, amplitude:
   );
 }
 
+/** Floats a caller must hand `packNightLights` for the anchor bound uniform. */
+export const NIGHT_LIGHT_BOUND_FLOATS = 3;
+
 /**
  * Pack this frame's lights into the two flat uniform arrays. Returns the live
  * count; slots past it are stale and the shader must not read them (the count
@@ -111,10 +137,18 @@ export function nightLightFlicker(time: number, x: number, z: number, amplitude:
  * point-light budget and the disc layer rank by, so every night-light system
  * agrees about whose surroundings are lit.
  *
- * Selection is a bounded insertion into the slot window rather than a sort.
- * It runs every frame (dynamics move every frame); over the world's few
- * hundred static sites the whole pack measures ~0.01 ms, and by day the glow
- * gate makes it free.
+ * `outBound` receives (anchorX, anchorZ, boundRadius SQUARED): the sphere
+ * around the anchor that contains every packed light's reach. A fragment
+ * outside it is provably unlit by all of them, which is what lets the shader
+ * skip the loop over the whole distant half of the ground. It is 0 when
+ * nothing packed, so the same one compare also carries the daylight case.
+ *
+ * Selection is a bounded insertion into the slot window rather than a sort;
+ * the staged winners are then ordered once by reach key (at most forty entries,
+ * arriving as two already-ascending runs, so the insertion sort barely moves
+ * anything). It runs every frame (dynamics move every frame); over the world's
+ * few hundred static sites the whole pack measures ~0.01 ms, and by day the
+ * glow gate makes it free.
  */
 export function packNightLights(
   statics: readonly NightLightSite[],
@@ -127,9 +161,10 @@ export function packNightLights(
   time: number,
   outPosRadius: Float32Array,
   outColor: Float32Array,
+  outBound: Float32Array,
 ): number {
   let count = 0;
-  count = packNearest(
+  count = stageNearest(
     statics,
     statics.length,
     anchorX,
@@ -138,10 +173,8 @@ export function packNightLights(
     time,
     NIGHT_LIGHT_STATIC_SLOTS,
     count,
-    outPosRadius,
-    outColor,
   );
-  count = packNearest(
+  count = stageNearest(
     dynamics,
     Math.min(dynamicsCount, dynamics.length),
     anchorX,
@@ -150,17 +183,41 @@ export function packNightLights(
     time,
     NIGHT_LIGHT_DYNAMIC_SLOTS,
     count,
-    outPosRadius,
-    outColor,
   );
+  sortStagedByReach(count);
+  let bound = 0;
+  for (let i = 0; i < count; i++) {
+    if (stageFar[i] > bound) bound = stageFar[i];
+    const site = stageSite[i];
+    outPosRadius[i * 4] = site.x;
+    outPosRadius[i * 4 + 1] = site.y;
+    outPosRadius[i * 4 + 2] = site.z;
+    // squared here, once per frame, rather than per fragment in the loop
+    outPosRadius[i * 4 + 3] = site.radius * site.radius;
+    const level = stageLevel[i];
+    outColor[i * 4] = site.r * level;
+    outColor[i * 4 + 1] = site.g * level;
+    outColor[i * 4 + 2] = site.b * level;
+    outColor[i * 4 + 3] = stageNear[i];
+  }
+  outBound[0] = anchorX;
+  outBound[1] = anchorZ;
+  outBound[2] = bound * bound;
   return count;
 }
 
 /** scratch windows for the bounded nearest-K insertion (module-owned, no allocs) */
 const pickIndex = new Int32Array(NIGHT_LIGHT_SLOTS);
 const pickDist = new Float64Array(NIGHT_LIGHT_SLOTS);
+/** the staged winners, in selection order, before the reach ordering */
+const stageSite: NightLightSite[] = new Array(NIGHT_LIGHT_SLOTS);
+const stageLevel = new Float64Array(NIGHT_LIGHT_SLOTS);
+/** nearest anchor distance this light can still reach: |light.xz - anchor| - r */
+const stageNear = new Float64Array(NIGHT_LIGHT_SLOTS);
+/** farthest anchor distance it can reach: |light.xz - anchor| + r */
+const stageFar = new Float64Array(NIGHT_LIGHT_SLOTS);
 
-function packNearest(
+function stageNearest(
   sites: readonly NightLightSite[],
   siteCount: number,
   anchorX: number,
@@ -168,11 +225,9 @@ function packNearest(
   glow: number,
   time: number,
   slots: number,
-  writeFrom: number,
-  outPosRadius: Float32Array,
-  outColor: Float32Array,
+  stagedFrom: number,
 ): number {
-  if (glow <= 0.001 || siteCount === 0 || slots <= 0) return writeFrom;
+  if (glow <= 0.001 || siteCount === 0 || slots <= 0) return stagedFrom;
   let picked = 0;
   for (let i = 0; i < siteCount; i++) {
     const site = sites[i];
@@ -192,22 +247,50 @@ function packNearest(
     if (picked < slots) picked++;
   }
   const taperFrom = slots - NIGHT_LIGHT_TAIL_TAPER.length;
-  let write = writeFrom;
+  let staged = stagedFrom;
   for (let k = 0; k < picked; k++) {
     const site = sites[pickIndex[k]];
-    outPosRadius[write * 4] = site.x;
-    outPosRadius[write * 4 + 1] = site.y;
-    outPosRadius[write * 4 + 2] = site.z;
-    outPosRadius[write * 4 + 3] = site.radius;
     const taper = k >= taperFrom ? NIGHT_LIGHT_TAIL_TAPER[k - taperFrom] : 1;
-    const level =
+    // the ONE root the pack takes, at most forty per frame, and it buys the
+    // shader both of its early exits
+    const distance = Math.sqrt(pickDist[k]);
+    stageSite[staged] = site;
+    stageLevel[staged] =
       site.intensity * glow * taper * nightLightFlicker(time, site.x, site.z, site.flicker ?? 0);
-    outColor[write * 3] = site.r * level;
-    outColor[write * 3 + 1] = site.g * level;
-    outColor[write * 3 + 2] = site.b * level;
-    write++;
+    stageNear[staged] = distance - site.radius;
+    stageFar[staged] = distance + site.radius;
+    staged++;
   }
-  return write;
+  return staged;
+}
+
+/**
+ * Order the staged winners by their nearest reach, ascending, which is the
+ * whole reason the shader may `break` instead of walking every slot. Insertion
+ * sort on purpose: the input is two runs that are each already ascending in
+ * DISTANCE, so it is near-linear in practice, it is stable (equal keys keep
+ * their selection order, so the pack stays deterministic), and it moves the
+ * parallel arrays with no allocation.
+ */
+function sortStagedByReach(count: number): void {
+  for (let i = 1; i < count; i++) {
+    const site = stageSite[i];
+    const level = stageLevel[i];
+    const near = stageNear[i];
+    const far = stageFar[i];
+    let at = i - 1;
+    while (at >= 0 && stageNear[at] > near) {
+      stageSite[at + 1] = stageSite[at];
+      stageLevel[at + 1] = stageLevel[at];
+      stageNear[at + 1] = stageNear[at];
+      stageFar[at + 1] = stageFar[at];
+      at--;
+    }
+    stageSite[at + 1] = site;
+    stageLevel[at + 1] = level;
+    stageNear[at + 1] = near;
+    stageFar[at + 1] = far;
+  }
 }
 
 /**

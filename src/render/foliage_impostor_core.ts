@@ -128,6 +128,37 @@ export const IMPOSTOR_MIN_BAND = 48;
  */
 export const IMPOSTOR_SWAP_FADE = 24;
 
+/**
+ * How much of the budgeted real-model radius the SPRITE arm actually spends.
+ *
+ * The lean arm has no impostors, so its trees must run to the full budgeted
+ * radius or the forest visibly ends (treeDetailDistance in foliage_lod.ts).
+ * The sprite arm is under no such obligation: past the handoff the tree is
+ * still there, drawn as a baked picture of itself at the same base, height,
+ * tint and sway. So the budgeted radius is a CEILING on quality, not a floor
+ * on correctness, and the outermost stretch of it is the most expensive part
+ * of the whole foliage layer: real-model cost grows with the SQUARE of the
+ * radius, so the last 22 percent of the disc's reach is 39 percent of its
+ * area, and every tree in that ring costs a hundred-odd triangles instead of
+ * two.
+ *
+ * 0.78 puts the clear-air handoff at 234 yards where it used to sit at 300
+ * (times the governor's own lever, so a starved budget still pulls in from
+ * there). At 234 yards a 14 yard tree is about 50 screen pixels tall against
+ * an 80 pixel atlas cell, so the sprite is still oversampled, and 12 baked
+ * yaw views blended pairwise means the camera has to travel roughly 120 yards
+ * sideways before the sprite even changes view pair. The floor below
+ * (SPRITE_SWAP_MIN, the authors' own clear-air limit at 150) is untouched and
+ * still binds first, so this can never push a card into the near field.
+ *
+ * What it costs, stated honestly: between 234 and 300 yards a tree is a
+ * billboard rather than geometry, so it loses canopy self-parallax under
+ * camera translation and its silhouette stops changing with pitch. Both are
+ * things you can find at 234 yards if you go looking for them with the camera;
+ * neither is something you notice while playing.
+ */
+export const SPRITE_SWAP_BUDGET = 0.78;
+
 /** The closest swap the blend law allows for this fog pair. */
 export function spriteSwapFloor(fogNear: number, fogFar: number): number {
   if (!(fogFar > fogNear)) return SPRITE_SWAP_MIN;
@@ -141,6 +172,12 @@ export function spriteSwapFloor(fogNear: number, fogFar: number): number {
  * LIVE foliage cull; the final clamp against it is what parks the swap on a
  * residency fog wall (real trees to the wall, no sprites in the camera's lap)
  * while the wall lasts.
+ *
+ * `base` is the tier's authored detail radius and `distanceScale` the
+ * governor's lever; the sprite arm spends SPRITE_SWAP_BUDGET of their product
+ * rather than all of it, because past the handoff the tree keeps being drawn
+ * (see that constant for the trade). Every other law here is unchanged, and
+ * the floor still wins where it is higher.
  */
 export function spriteSwapDistance(
   base: number,
@@ -149,7 +186,7 @@ export function spriteSwapDistance(
   fogFar: number,
   fogLimit: number,
 ): number {
-  const budgeted = base * distanceScale;
+  const budgeted = base * distanceScale * SPRITE_SWAP_BUDGET;
   const band = Math.min(IMPOSTOR_MIN_BAND, 0.25 * fogLimit);
   const swap = Math.max(Math.min(budgeted, fogLimit - band), spriteSwapFloor(fogNear, fogFar));
   return Math.min(swap, fogLimit);

@@ -307,10 +307,19 @@ export function buildFarTerrain(
         }${
           grassBake
             ? `
-        diffuseColor.rgb *= mix(vec3(1.0),
-          texture2D(uGrassBake, vFarXZ * ${(1 / GRASS_BAKE_PATCH_YARDS).toFixed(6)}).rgb
-            * ${GRASS_PAINT_GAIN.toFixed(4)},
-          vGrassW);`
+        // Gated on the weight being non-zero rather than multiplied by it: at
+        // vGrassW 0 the mix below is exactly vec3(1.0), so skipping it is
+        // pixel-identical, and the vista's zero-weight regions are the ones
+        // that fill the most of it (every rock face past the slope threshold,
+        // every full shore band). The gate is a varying, so it is not
+        // wave-uniform, but it is strongly wave-COHERENT: grass weight varies
+        // over whole hillsides, not per fragment.
+        if (vGrassW > 0.0) {
+          diffuseColor.rgb *= mix(vec3(1.0),
+            texture2D(uGrassBake, vFarXZ * ${(1 / GRASS_BAKE_PATCH_YARDS).toFixed(6)}).rgb
+              * ${GRASS_PAINT_GAIN.toFixed(4)},
+            vGrassW);
+        }`
             : ''
         }
         diffuseColor.rgb *= uFarNightDim;`,

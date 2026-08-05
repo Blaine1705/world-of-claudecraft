@@ -574,6 +574,32 @@ const float WOC_GRASS_H_MEAN = 0.812;   // measured R-channel mean
 const float WOC_GRASS_H_INV_SD = 12.9;  // 1 / measured R-channel sd 0.0775
 const float WOC_GRASS_HEIGHT_SHADE = 0.10;
 const float WOC_GRASS_RECESS_SAT = 0.12;
+// --- distance gates: stop paying for taps whose signal has mipped away ---
+// WOC_MICRO_SHADOW_*: the micro sun-shadow marches the height proxy one
+// SUN_UV_STEP (0.016 uv = 0.073 yards = about 8 texels of the 512px packed AO
+// field) toward the sun and shades where the sunward neighbourhood reads
+// higher. Once mip selection picks a footprint wider than that step BOTH
+// probes land in the same texel and occl is zero BY ARITHMETIC, which the
+// shipped code still paid two to six texture taps to compute. That happens
+// near 59 yards (one texel subtends a pixel at about 7.4 yards, so the step is
+// covered at mip 3), so the term fades out over 40 to 70 and the taps are
+// skipped entirely past the far end: no visible change, the shader simply
+// stops computing a zero.
+const float WOC_MICRO_SHADOW_NEAR = 40.0;
+const float WOC_MICRO_SHADOW_FAR = 70.0;
+// WOC_DETAIL_N_*: the planar-XZ detail normals (grass blade, dirt, rock, sand,
+// the fine octaves and the gravel grain) all live at 4.5 to 8 yard tilings, so
+// mip averaging pulls a normal map toward flat (0, 0, 1) and their
+// perturbation decays with the mip scale: roughly 7 percent of the near-field
+// amplitude at 100 yards and under 4 percent past 220, on top of the slope
+// fade that already keeps them to near-horizontal ground. Fading them out over
+// 120 to 220 and skipping the taps past that is the one place this shader
+// trades something real, and what it trades is a few percent of micro relief
+// on flat ground more than 120 yards away. The CLIFF wall normals are
+// deliberately NOT gated: wall relief is what makes a mountainside read as
+// rock all the way out to the detail horizon.
+const float WOC_DETAIL_N_NEAR = 120.0;
+const float WOC_DETAIL_N_FAR = 220.0;
 `;
 
 // The paint-free ring: inside the dense blade carpet the soil shows the
@@ -1032,12 +1058,20 @@ function buildSplatMaterial(
         // scale, so march the height proxy two steps toward the sun and shade
         // texels whose sunward neighbourhood sits higher, creating clod-scale
         // self-shadowing that gives the relief a lit and a shade side.
-        {
+        //
+        // Distance-gated (WOC_MICRO_SHADOW_*): the march is one clod wide, so
+        // past the mip level that covers it both probes read the same texel
+        // and occl is zero on its own. The gate only stops the shader paying
+        // two to six texture taps to arrive at that zero; the smoothstep is
+        // what guarantees no ring at the boundary.
+        float microFade = 1.0
+          - smoothstep(WOC_MICRO_SHADOW_NEAR, WOC_MICRO_SHADOW_FAR, wocCamDist);
+        if (microFade > 0.0) {
           vec2 sunStep = vec2(${SUN_UV_STEP.x}, ${SUN_UV_STEP.y});
           float occl = max(
             wocGroundHeight(tuv + sunStep, swShade) - cavH - 0.02,
             (wocGroundHeight(tuv + sunStep * 2.2, swShade) - cavH) * 0.55 - 0.02);
-          groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW;
+          groundShade *= 1.0 - min(max(occl, 0.0) * 4.5, 0.42) * cavW * microFade;
         }`
             : ''
         }`
@@ -1430,6 +1464,15 @@ function buildSplatMaterial(
         // space; the chain rule scales the along-comb slope by the
         // compression, which IS the combed look: smooth along the growth
         // direction, ridged across it.
+        //
+        // The whole planar-XZ cluster is distance-gated (WOC_DETAIL_N_*): every
+        // tap here samples a 4.5 to 8 yard tiling, which mips toward flat, so
+        // past the fade the perturbation these seven taps compute is a few
+        // percent of what it is underfoot. The cliff wall normals further down
+        // stay ungated on purpose.
+        vec2 detN = vec2(0.0);
+        float wocDetailN = 1.0 - smoothstep(WOC_DETAIL_N_NEAR, WOC_DETAIL_N_FAR, wocCamDist);
+        if (wocDetailN > 0.0) {
         vec2 gNxy = vec2(0.0);
         if ( wocHasGrass ) {
           vec3 gN = texture2D(uGrassN, combT + grassJitter).xyz * 2.0 - 1.0;
@@ -1484,15 +1527,17 @@ function buildSplatMaterial(
         // single-frequency speckle dominate again; grass fine grain down to
         // 0.45 (was 0.65): with the comb stretch it supplies direction, not
         // contrast, and the combed blade normal gNxy keeps full weight
-        vec2 detN = (gNxy + fineSoft * 0.45) * vSplatR.x * 1.5
-                  + (dN.xy + fineHard * 0.7 + gvN * gravelW * 0.5) * vSplatR.y * 1.55 * dirtDetail
-                  + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
-                  + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
+        detN = (gNxy + fineSoft * 0.45) * vSplatR.x * 1.5
+             + (dN.xy + fineHard * 0.7 + gvN * gravelW * 0.5) * vSplatR.y * 1.55 * dirtDetail
+             + (rN.xy + fineHard * 0.9) * vSplatR.z * 1.5 * (1.0 - wallW)
+             + (sN.xy + fineSoft * 0.9) * vSplatR.w * 1.1;
         detN *= 1.0 - vExtra.y * 0.7; // snow softens the relief beneath it
         // Planar-XZ UVs stretch on steep faces and the detail normals smear
         // into vertical streaks there; fade them out by slope and let the
-        // wall projection below own the cliff relief.
-        detN *= smoothstep(0.5, 0.82, vWNorm.y);
+        // wall projection below own the cliff relief. The distance fade rides
+        // the same multiply, so the gate can never open a step at its edge.
+        detN *= smoothstep(0.5, 0.82, vWNorm.y) * wocDetailN;
+        }
         normal = normalize(normal + tbn * vec3(detN, 0.0));
         // cliffs: wall-projected rock normal so steep faces get real relief
         // (approximate world-space tangent frames per projection plane; the

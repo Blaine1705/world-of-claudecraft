@@ -406,6 +406,7 @@ const RENDER_PURE_CORES = [
   'src/render/fishing_bobber_core.ts',
   'src/render/foliage_core.ts',
   'src/render/foliage_shader_core.ts',
+  'src/render/foliage_shadow_core.ts',
   'src/render/frost_ice_fields_core.ts',
   'src/render/gfx_aa_policy_core.ts',
   'src/render/gfx_override_core.ts',

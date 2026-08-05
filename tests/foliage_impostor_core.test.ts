@@ -19,6 +19,7 @@ import {
   impostorSpriteNormal,
   packImpostorAtlas,
   SPRITE_MIN_FOG_BLEND,
+  SPRITE_SWAP_BUDGET,
   SPRITE_SWAP_MIN,
   shippedImpostorInventory,
   spriteSwapDistance,
@@ -153,11 +154,26 @@ describe('sprite swap law', () => {
 
   it('follows the budget in the open realms: no fog floor pushes it out', () => {
     // Vale: near 55, far 700. The old cone law parked the swap at ~506u to
-    // hide the cones; the sprite law hands off at the budgeted radius and the
-    // sprites (legible in clear air) carry the rest.
+    // hide the cones; the sprite law hands off inside the budgeted radius
+    // (SPRITE_SWAP_BUDGET of it) and the sprites carry the rest.
     const fogLimit = foliageFogLimit(700, 1);
-    expect(spriteSwapDistance(base, scaleAt(1), 55, 700, fogLimit)).toBe(300);
-    expect(spriteSwapDistance(base, scaleAt(0), 55, 700, fogLimit)).toBeCloseTo(216, 9);
+    expect(spriteSwapDistance(base, scaleAt(1), 55, 700, fogLimit)).toBeCloseTo(234, 9);
+    expect(spriteSwapDistance(base, scaleAt(0), 55, 700, fogLimit)).toBeCloseTo(168.48, 9);
+  });
+
+  it('spends only part of the budgeted radius, since the tree keeps being drawn', () => {
+    // The saving is quadratic in the radius, which is the whole point: the
+    // ring this gives up is a much larger share of the disc's AREA (and so of
+    // the real-model triangle count) than of its reach.
+    const fogLimit = foliageFogLimit(700, 1);
+    const budgeted = base * scaleAt(1);
+    const swap = spriteSwapDistance(base, scaleAt(1), 55, 700, fogLimit);
+    expect(SPRITE_SWAP_BUDGET).toBeLessThan(1);
+    expect(swap).toBeCloseTo(budgeted * SPRITE_SWAP_BUDGET, 9);
+    // over a third of the real-model disc handed to 2-triangle sprites
+    expect(1 - (swap / budgeted) ** 2).toBeGreaterThan(0.35);
+    // and never inside the authors' own clear-air floor
+    expect(swap).toBeGreaterThan(SPRITE_SWAP_MIN);
   });
 
   it('never hands off closer than the clear-air floor', () => {

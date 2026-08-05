@@ -26,11 +26,14 @@ import { waterNormalish, waterNormalMaps } from './textures';
 import {
   bakeSwellGate,
   buildWaterSurfaceIndex,
+  buildWaterSurfaceTileIndex,
   shoreDepthAt,
   shoreSlopeAt,
   WATER_FIELD_EDGE_FEATHER_UV,
   WATER_FOAM_WIDTH_YARDS,
   WATER_SEABED_CLAMP_YARDS,
+  type WaterGridRegion,
+  waterSheetTilePlan,
 } from './water_core';
 import {
   coveredByOtherSheet,
@@ -157,6 +160,27 @@ const WATER_DEEP_DISTANCE_STRENGTH = 0.92;
 /** GLSL needs a decimal point on every float literal. */
 const glsl = (n: number): string => (Number.isInteger(n) ? `${n}.0` : String(n));
 /**
+ * Ceiling of the group envelope's surge multiplier (`0.55 + 0.65 * group`,
+ * and the envelope tops out at 1). The foam band's reach is this times the
+ * band width, so it is what bounds where the envelope can still matter.
+ */
+const WATER_FOAM_SURGE_MAX = 1.2;
+/**
+ * Peak magnitude of the detail-map jitter added to the recovered shore
+ * distance inside the foam smoothstep (`n1.x * 0.7 + n2.y * 0.4`, each channel
+ * decoded to [-1, 1]). Counted at its extreme so the bound below is strict.
+ */
+const WATER_FOAM_JITTER_MAX = 0.7 + 0.4;
+/**
+ * Shore distance past which `foamBand` is identically zero for EVERY phase the
+ * group envelope can take. Past it nothing downstream reads the envelope, so
+ * the fragment stage skips the whole wave block (the envelope included) on
+ * open water that has also faded out of every wave family. Derived, never
+ * tuned: widening the surf band or the jitter moves this with them.
+ */
+const WATER_FOAM_GROUP_REACH =
+  WATER_FOAM_WIDTH_YARDS * WATER_FOAM_SURGE_MAX + WATER_FOAM_JITTER_MAX;
+/**
  * The one shared, wrapped water clock every water material binds as uTime.
  * It wraps at WATER_TIME_PERIOD so shader phases never grow unbounded; every
  * wave frequency (water_wave_core.ts) is a whole number of cycles per that
@@ -189,6 +213,30 @@ const APRON_SEGMENTS = 192;
  * dry land across the horizon. Fade to the constant deep sea before that.
  */
 const APRON_TERRAIN_FADE_YARDS = 240;
+/**
+ * Blocks per axis the horizon apron is drawn in (see waterSheetTilePlan). The
+ * apron is one sheet thousands of yards across and a horizontal sheet that big
+ * is mostly out of view: at a typical field of view the visible wedge out to
+ * the far plane is a small fraction of its area, but a single mesh's bounds
+ * intersect the frustum from everywhere, so every kept triangle was submitted
+ * every frame. Five per axis is the measured knee, over six ground cameras at
+ * the ultra vista config (163,992 kept triangles in the whole apron):
+ *
+ *   per side |  blocks | avg draws | avg triangles submitted | worst camera
+ *          3 |       9 |         5 |                  90,264 |      108,696
+ *          4 |      16 |         8 |                  81,397 |      101,784
+ *          5 |      25 |         9 |                  60,493 |       65,208
+ *          6 |      36 |        13 |                  58,357 |       62,616
+ *
+ * Five costs one draw more than four and submits 21k fewer triangles, and it
+ * is where the WORST camera stops being an outlier (65k against 102k): a
+ * coarser split leaves one block straddling the view on some headings and
+ * hands back most of the win. Six buys 2k more triangles for four more draws,
+ * which is the wrong side of the trade when calls are a currency too. The
+ * extra draws all share one program, one material and one set of vertex
+ * buffers; only the index binding changes between them.
+ */
+const WATER_APRON_TILES_PER_SIDE = 5;
 
 // Real water normal maps, fetched at module import and gated by the boot
 // preload only for the shader tier. Low/mobile uses generated canvas water
@@ -420,7 +468,12 @@ const WATER_VERT = /* glsl */ `
     // feathering back to 1 approaching the rect edge the apron shares).
     float chopW = clamp(aSwellW - 1.0, 0.0, 1.0);
     float gswW = clamp(aSwellW, 0.0, 1.0);
-    float group = waveGroup(pos.xz, uTime);
+    // ONE meander warp for the whole stage. The groundswell and the group
+    // envelope bend through the identical warp of the identical point, so
+    // evaluating it once and passing the warped position to the *At forms is
+    // the same arithmetic with the common subexpression lifted out.
+    vec2 warped = waveWarp(pos.xz, uTime);
+    float group = waveGroupAt(warped, uTime);
     float chopCrest;
     vec2 chopSlope;
     chopField(pos.xz, uTime, chopCrest, chopSlope);
@@ -432,7 +485,7 @@ const WATER_VERT = /* glsl */ `
     // the rollers arrive in sets instead of a metronome.
     float gsCrest;
     vec2 gsSlope;
-    groundswellField(pos.xz, uTime, gsCrest, gsSlope);
+    groundswellFieldAt(warped, uTime, gsCrest, gsSlope);
     pos.y += gsCrest * uSwellAmp * 2.0 * depthFade * gswW * (0.5 + 0.8 * group);
     vOpenSea = gswW;
     pos.y += (sin(uTime * WOBBLE_W1 + pos.x * 0.35) + sin(uTime * WOBBLE_W2 + pos.z * 0.28))
@@ -477,7 +530,6 @@ ${BIOME_HAZE_DECLARATIONS}
   uniform float uWaveEnabled;
   uniform vec2 uWaveOrigin;
   uniform float uWaveSize;
-  uniform float uShoreEdgeFade;
   uniform vec3 uScatter;
   uniform float uSwellAmp;
   varying vec3 vWPos;
@@ -488,6 +540,7 @@ ${BIOME_HAZE_DECLARATIONS}
   #include <fog_pars_fragment>
   ${WATER_WAVE_GLSL}
   ${WAVE_SAMPLE_GLSL}
+  const float FOAM_GROUP_REACH = ${glsl(WATER_FOAM_GROUP_REACH)};
   void main() {
     float camDist = length(cameraPosition - vWPos);
     // dual-scroll detail ripples (real three.js water normal maps)
@@ -521,36 +574,57 @@ ${BIOME_HAZE_DECLARATIONS}
     // also what puts travelling waves on the OPEN sea, which is mostly apron
     // and previously carried nothing but scrolling normal maps.
     float waveDepthFade = clamp(vShoreDepth * 0.8, 0.0, 1.0);
-    float group = waveGroup(vWPos.xz, uTime);
     float openW = vOpenSea * waveDepthFade;
     float chopW = openW * (1.0 - smoothstep(CHOP_FADE.x, CHOP_FADE.y, camDist));
     float midW = openW * (1.0 - smoothstep(MSWELL_FADE.x, MSWELL_FADE.y, camDist));
     float gsW = openW * (1.0 - smoothstep(GSWELL_FADE.x, GSWELL_FADE.y, camDist));
+    // Horizontal distance to the waterline, recovered as depth / seabed slope.
+    // Hoisted above the wave block because it is also the bound that says
+    // whether the group envelope can still reach the foam band (see below);
+    // the surf itself reads it much further down.
+    float shoreDist = vShoreDepth / vShoreSlope;
     vec2 swellSlope = vec2(0.0);
     float crestSum = 0.0;
-    // Each family is skipped once it has faded out. camDist varies smoothly
-    // across the screen, so these branches are coherent: whole tiles of the
-    // distant sea take the same path and pay for none of the trig.
-    if (chopW > 0.002) {
-      float crest;
-      vec2 slope;
-      chopField(vWPos.xz, uTime, crest, slope);
-      swellSlope += slope * (uSwellAmp * chopW * (0.55 + 0.9 * group));
-      crestSum += crest * chopW * (0.35 + 0.65 * group);
-    }
-    if (midW > 0.002) {
-      float crest;
-      vec2 slope;
-      midField(vWPos.xz, uTime, crest, slope);
-      swellSlope += slope * (uSwellAmp * MSWELL_AMP_SCALE * midW * (0.45 + 0.75 * group));
-      crestSum += crest * midW * (0.32 + 0.58 * group);
-    }
-    if (gsW > 0.002) {
-      float crest;
-      vec2 slope;
-      groundswellField(vWPos.xz, uTime, crest, slope);
-      swellSlope += slope * (uSwellAmp * 2.0 * gsW * (0.5 + 0.8 * group));
-      crestSum += crest * gsW * 0.45 * group;
+    // Still water reads as the envelope's midpoint. Nothing consumes this
+    // value on the path that skips the block: crestSum stays 0 (so crestN
+    // lands at 0.5, which is the no-op for both the crest tint and the
+    // whitecap threshold) and the foam band is identically zero past
+    // FOAM_GROUP_REACH for every phase the envelope can take.
+    float group = 0.5;
+    // ONE meander warp per pixel, and only where something still consumes the
+    // field. The mid waves, the groundswell and the group envelope all bend
+    // through the same warp of the same world position, so evaluating it three
+    // times (once inside each) cost four redundant wavePhase evaluations and
+    // eight redundant sin/cos on every water pixel for a value that cannot
+    // differ between them. Each family is then skipped once its range fade has
+    // taken it under WAVE_SKIP. camDist varies smoothly across the screen, so
+    // these branches are coherent: whole tiles of the distant sea take the
+    // same path and pay for none of the trig.
+    if (chopW > WAVE_SKIP || midW > WAVE_SKIP || gsW > WAVE_SKIP
+        || shoreDist < FOAM_GROUP_REACH) {
+      vec2 warped = waveWarp(vWPos.xz, uTime);
+      group = waveGroupAt(warped, uTime);
+      if (chopW > WAVE_SKIP) {
+        float crest;
+        vec2 slope;
+        chopField(vWPos.xz, uTime, crest, slope);
+        swellSlope += slope * (uSwellAmp * chopW * (0.55 + 0.9 * group));
+        crestSum += crest * chopW * (0.35 + 0.65 * group);
+      }
+      if (midW > WAVE_SKIP) {
+        float crest;
+        vec2 slope;
+        midFieldAt(warped, uTime, crest, slope);
+        swellSlope += slope * (uSwellAmp * MSWELL_AMP_SCALE * midW * (0.45 + 0.75 * group));
+        crestSum += crest * midW * (0.32 + 0.58 * group);
+      }
+      if (gsW > WAVE_SKIP) {
+        float crest;
+        vec2 slope;
+        groundswellFieldAt(warped, uTime, crest, slope);
+        swellSlope += slope * (uSwellAmp * 2.0 * gsW * (0.5 + 0.8 * group));
+        crestSum += crest * gsW * 0.45 * group;
+      }
     }
     // Normalized crest height, 0.5 = still water. Drives the whitecaps and the
     // sun-through-swell scatter, and is per-pixel for the same reason the
@@ -581,9 +655,13 @@ ${BIOME_HAZE_DECLARATIONS}
     // outside it closes into the deep, the total-internal-reflection look.
     // Around the sun's column light wells down and refracted glints dance.
     float upDot = abs(dot(N, V));
-    float tir = pow(1.0 - upDot, 2.0);
+    // Whole-number powers as multiplies (see the fresnel note on the other arm).
+    float away = 1.0 - upDot;
+    float tir = away * away;
     float snellW = smoothstep(0.655, 0.70, upDot);
-    float sunWell = pow(max(dot(uSunDir, N), 0.0), 4.0);
+    float wellDot = max(dot(uSunDir, N), 0.0);
+    float wellDot2 = wellDot * wellDot;
+    float sunWell = wellDot2 * wellDot2;
     vec3 ceiling = mix(uDeep * 0.5, mix(uShallow * 0.75, uSkyColor * 0.9, 0.45), snellW);
     ceiling += uShallow * sunWell * 0.25;
     ceiling += uSunColor * pow(max(dot(reflect(-uSunDir, N), -V), 0.0), 60.0) * 0.6;
@@ -591,9 +669,13 @@ ${BIOME_HAZE_DECLARATIONS}
     float alpha = clamp(0.88 + tir * 0.12, 0.0, 1.0);
   #else
     // clamp(), not max(): max() leaves the upper bound open, and a normalized
-    // dot product that overshoots 1.0 by an ulp makes the pow() base negative,
-    // which is NaN. One NaN pixel becomes a black rectangle after the bloom blur.
-    float fresnel = 0.05 + 0.95 * pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 4.0);
+    // dot product that overshoots 1.0 by an ulp would take the fourth power of
+    // a negative base. One NaN pixel becomes a black rectangle after the bloom
+    // blur. Squared twice rather than pow(x, 4.0): a whole-number power this
+    // small is two multiplies against a log2/exp2 pair, and it is exact.
+    float grazeN = 1.0 - clamp(dot(N, V), 0.0, 1.0);
+    float grazeN2 = grazeN * grazeN;
+    float fresnel = 0.05 + 0.95 * grazeN2 * grazeN2;
     // The seabed is hard clamped at ${WATER_SEABED_CLAMP_YARDS} yards. A linear ramp spends the
     // whole palette in the shallows, and an exponential is still climbing when
     // it reaches the clamp, which creases the colour field along the clamp
@@ -611,8 +693,11 @@ ${BIOME_HAZE_DECLARATIONS}
     // VIEW DISTANCE the way real water does. This is what makes the far sea read
     // as ocean rather than as an endless shallow, and it hides the apron seam.
     col = mix(col, uDeep, smoothstep(${glsl(WATER_DEEP_NEAR_YARDS)}, ${glsl(WATER_DEEP_FAR_YARDS)}, camDist) * ${glsl(WATER_DEEP_DISTANCE_STRENGTH)});
+    // The one near-field falloff the shimmer and the wake sheen both ride.
+    // Same exponent, same argument: two exp() calls per pixel for one value.
+    float nearFade = exp(-camDist * 0.022);
     // dappled shimmer that fades with distance so it never reads as speckle
-    float shimmer = max(n1.x * 0.7 + n2.y * 0.55, 0.0) * exp(-camDist * 0.022);
+    float shimmer = max(n1.x * 0.7 + n2.y * 0.55, 0.0) * nearFade;
     col *= 0.92 + 0.4 * shimmer;
     // wind lanes: hue and brightness drift with the lane field
     col = mix(col, col * vec3(0.86, 1.04, 1.07), (seaLane - 0.5) * 0.9);
@@ -630,18 +715,28 @@ ${BIOME_HAZE_DECLARATIONS}
     vec3 skyRef = mix(uSkyColor, fogColor, 0.5);
     col = mix(col, skyRef, min(fresnel * 0.65, 0.42));
     float sunAlign = max(dot(reflect(-uSunDir, N), V), 0.0);
+    // THREE glint lobes off ONE base. A GPU evaluates pow(x, n) as
+    // exp2(n * log2(x)), so three pow() calls on the same base cost three
+    // log2() where one does. The floor keeps log2 off zero (the exponents are
+    // all well above 1, so the tail underflows to nothing either way, which is
+    // what pow returned there anyway).
+    float logAlign = log2(max(sunAlign, 1e-8));
     // sparkle glints (>1 -> bloom), jittered by the detail maps so they
     // twinkle in patches instead of lighting one uniform stripe
-    col += uSunColor * pow(sunAlign, 130.0) * (1.4 + 2.4 * clamp(n1.x * 3.0 + 0.5, 0.0, 1.0));
-    col += uSunColor * pow(sunAlign, 28.0) * 0.30;                   // wider lobe: survives steep cameras
-    col += uSunColor * pow(sunAlign, 6.0) * 0.05;                    // faint warm sheen sunward
+    col += uSunColor * exp2(130.0 * logAlign) * (1.4 + 2.4 * clamp(n1.x * 3.0 + 0.5, 0.0, 1.0));
+    col += uSunColor * exp2(28.0 * logAlign) * 0.30;                 // wider lobe: survives steep cameras
+    col += uSunColor * exp2(6.0 * logAlign) * 0.05;                  // faint warm sheen sunward
     // Sun-through-swell scattering: looking INTO the sun across running water,
     // light enters the back of a crest and scatters out of its face as a
     // turquoise glow. Gated on the crest height and a grazing view, so calm
     // water seen from above is untouched; the interactive wake energy feeds it
     // too, so a churned wake glows the same way.
-    float intoSun = pow(max(dot(-V, uSunDir), 0.0), 3.0);
-    float grazing = 1.0 - max(dot(N, V), 0.0);
+    float sunFace = max(dot(-V, uSunDir), 0.0);
+    float intoSun = sunFace * sunFace * sunFace;
+    // The same grazing term the fresnel already computed. It reuses the
+    // CLAMPED dot, so an overshoot of an ulp reads as zero here instead of a
+    // hair below it, which is the arm this additive term wanted anyway.
+    float grazing = grazeN;
     float churn = clamp(crestN + waveEnergy * 2.0, 0.0, 1.3);
     col += uScatter * (intoSun * grazing * (0.25 + 0.75 * churn));
     // Whitecap mottling where grouped crests peak. The thresholds roll out
@@ -660,12 +755,11 @@ ${BIOME_HAZE_DECLARATIONS}
     float capTex = smoothstep(0.52, 0.82, n2.x * 0.5 + 0.5);
     float capBreak = mix(capTex, smoothstep(0.30, 0.78, seaLane), farW);
     col = mix(col, vec3(0.99), capMask * capBreak * 0.45);
-    // Shoreline foam keyed on HORIZONTAL distance to the waterline, recovered
-    // as depth / seabed slope, NOT on depth. Measured shelves range from 3.2
-    // yards of depth in 4 yards of run to 0.2 yards of depth sustained over 40,
-    // so any depth threshold either floods a flat bay or vanishes on a steep
-    // one. Distance to shore is the same signal on both.
-    float shoreDist = vShoreDepth / vShoreSlope;
+    // Shoreline foam keyed on HORIZONTAL distance to the waterline (shoreDist,
+    // recovered above as depth / seabed slope), NOT on depth. Measured shelves
+    // range from 3.2 yards of depth in 4 yards of run to 0.2 yards of depth
+    // sustained over 40, so any depth threshold either floods a flat bay or
+    // vanishes on a steep one. Distance to shore is the same signal on both.
     // The surf BREATHES with the wave sets: the group envelope (the same field
     // that gathers the swell into sets offshore) drives the band's reach, so a
     // set runs the wash line up the beach and the lull between sets lets it
@@ -694,7 +788,7 @@ ${BIOME_HAZE_DECLARATIONS}
       + 0.26 * sin(uTime * FOAM_LAP_W2 - shoreDist * 1.1 + vWPos.x * 0.071 + vWPos.z * 0.053 + n2.x * 2.5);
     float foam = foamBand * foamWave * lap * exp(-camDist * ${glsl(WATER_FOAM_DISTANCE_FADE)});
     // disturbed water reads brighter and skyward, the way a real wake does
-    float contactSheen = smoothstep(0.025, 0.13, waveEnergy) * exp(-camDist * 0.022);
+    float contactSheen = smoothstep(0.025, 0.13, waveEnergy) * nearFade;
     col = mix(col, mix(uShallow, uSkyColor, 0.52), contactSheen * 0.24);
     col = mix(col, vec3(1.05), clamp(foam, 0.0, 0.9));
     float surfaceAccent = clamp(foam + contactSheen * 0.12, 0.0, 0.92);
@@ -717,13 +811,20 @@ ${BIOME_HAZE_DECLARATIONS}
       mix(${glsl(WATER_SHALLOW_ALPHA)}, ${glsl(WATER_DEEP_ALPHA)}, opacityDepth) * shoreFilm,
       surfaceAccent * 0.95 * foamFilm
     );
-    // Contour waterline (uShoreEdgeFade, interior strips/pools only): the
-    // surface dissolves where the baked depth reaches zero, so the visible
-    // bank is the terrain's own wet line, never the mesh rectangle. The noise
-    // term wobbles the line so it reads as a shore, not a clip path. Off (0)
-    // collapses the mix to 1.0: the overworld shader is byte-identical.
+  #ifdef WATER_SHORE_EDGE_FADE
+    // Contour waterline (interior strips/pools only): the surface dissolves
+    // where the baked depth reaches zero, so the visible bank is the terrain's
+    // own wet line, never the mesh rectangle. The noise term wobbles the line
+    // so it reads as a shore, not a clip path.
+    //
+    // A DEFINE, not the uniform it used to be. Off, the mix collapsed to
+    // exactly 1.0 and the two sin() calls feeding it were dead: a uniform is
+    // not a compile-time constant, so no driver folds them away, and every
+    // overworld water pixel in the world paid for a term that could not change
+    // its alpha. The overworld output is unchanged, byte for byte.
     float edgeWobble = 0.18 * sin(vWPos.x * 1.7 + vWPos.z * 2.3) + 0.12 * sin(vWPos.z * 4.1 - vWPos.x * 3.3);
-    alpha *= mix(1.0, smoothstep(0.12, 0.85, vShoreDepth + edgeWobble * uShoreEdgeFade), uShoreEdgeFade);
+    alpha *= smoothstep(0.12, 0.85, vShoreDepth + edgeWobble);
+  #endif
   #endif
     // World day/night grade: this shader is unlit (baked palette), so the same
     // multiplier the fog takes dims the whole surface, glints and foam
@@ -781,8 +882,10 @@ export function zeroWaveUniforms(): WaterWaveUniforms {
  * boundary. The overworld planes leave it off (their rect edges hide under
  * carved bathymetry and the apron); an interior strip or pool laid over its
  * own heightfield turns it on so a rectangular mesh cannot read as a
- * hard-edged sheet. Off is the exact pre-option shader (the mix collapses to
- * 1.0), so overworld output is unchanged.
+ * hard-edged sheet. It is a DEFINE rather than a uniform: off compiles the
+ * block (and the two sin() calls that fed it) out entirely instead of leaving
+ * a dead term every overworld water pixel evaluates, and the overworld output
+ * is unchanged either way.
  */
 export function createWaterSurfaceMaterial(
   wave: WaterWaveUniforms,
@@ -796,6 +899,7 @@ export function createWaterSurfaceMaterial(
   return new THREE.ShaderMaterial({
     defines: {
       ...(opts?.underside ? { WATER_UNDERSIDE: '' } : {}),
+      ...(opts?.shoreEdgeFade ? { WATER_SHORE_EDGE_FADE: '' } : {}),
       ...(zoneHaze ? { WOC_ZONE_HAZE: '' } : {}),
     },
     uniforms: {
@@ -815,7 +919,6 @@ export function createWaterSurfaceMaterial(
       uWaveEnabled: wave.uWaveEnabled,
       uWaveOrigin: wave.uWaveOrigin,
       uWaveSize: wave.uWaveSize,
-      uShoreEdgeFade: { value: opts?.shoreEdgeFade ? 1 : 0 },
       uSwellAmp: { value: WATER_SWELL_AMP },
       uScatter: { value: SCATTER_COLOR },
     },
@@ -982,35 +1085,90 @@ function buildShaderWater(seed: number, renderer?: THREE.WebGLRenderer): WaterVi
       );
       (geo.attributes.aSwellGate as THREE.BufferAttribute).needsUpdate = true;
     };
-    geo.computeBoundingBox();
-    geo.computeBoundingSphere();
-    // Dry-tile culling: the apron spans the whole world rect too, and its
-    // interior is mostly LAND under the zone planes. Bounding volumes stay
-    // the full-rect ones baked above (conservative, still correct).
-    const fullIndex = geo.getIndex();
-    const cullApron = (): void => {
+    // ONE VERTEX BUFFER, MANY DRAWABLE BLOCKS. The apron reaches thousands of
+    // yards past the map on the vista tiers, so a single mesh's bounding
+    // volume intersects the frustum from every camera in the world and the
+    // whole kept sheet is submitted every frame, most of it behind or beside
+    // the view. Each block below is its own THREE.Mesh over the SAME attribute
+    // buffers with its own index and its own bounds, so three.js culls the
+    // blocks that are out of view and the frame pays for the wedge that is in
+    // it. The triangle set is identical: waterSheetTilePlan partitions the
+    // quads, it never re-samples anything, and every block shares the one
+    // material, so the split costs state changes, not programs.
+    const tilePlan = waterSheetTilePlan(apronColumns, apronColumns, WATER_APRON_TILES_PER_SIDE);
+    // Y half-extent the swell can lift a block's surface by, over the flat
+    // waterline. Deliberately generous against the real ceiling (chop plus
+    // groundswell plus wobble plus the height field's 0.65 clamp): a bound too
+    // TIGHT culls a block that is actually on screen, which reads as a hole in
+    // the ocean, and a bound too loose only ever costs a draw.
+    const APRON_TILE_Y_MARGIN = 4;
+    const apronTiles: {
+      mesh: THREE.Mesh;
+      geometry: THREE.BufferGeometry;
+      region: WaterGridRegion;
+    }[] = [];
+    for (const region of tilePlan) {
+      const index = buildWaterSurfaceTileIndex(deep, apronColumns, region);
+      const tileGeo = new THREE.BufferGeometry();
+      // The SAME BufferAttribute objects, never copies: one upload feeds every
+      // block, and the refit below writes through all of them at once.
+      for (const [name, attribute] of Object.entries(geo.attributes)) {
+        tileGeo.setAttribute(name, attribute as THREE.BufferAttribute);
+      }
+      tileGeo.setIndex(new THREE.BufferAttribute(index, 1));
+      // Bounds from the block's own corner vertices. computeBoundingBox would
+      // read the whole shared position attribute and hand every block the full
+      // sheet's bounds, which is exactly the culling this split exists for.
+      const x0 = pos.getX(region.row0 * apronColumns + region.col0);
+      const x1 = pos.getX(region.row0 * apronColumns + region.col1);
+      const z0 = pos.getZ(region.row0 * apronColumns + region.col0);
+      const z1 = pos.getZ(region.row1 * apronColumns + region.col0);
+      tileGeo.boundingBox = new THREE.Box3(
+        new THREE.Vector3(Math.min(x0, x1), -APRON_TILE_Y_MARGIN, Math.min(z0, z1)),
+        new THREE.Vector3(Math.max(x0, x1), APRON_TILE_Y_MARGIN, Math.max(z0, z1)),
+      );
+      tileGeo.boundingSphere = new THREE.Sphere();
+      tileGeo.boundingBox.getBoundingSphere(tileGeo.boundingSphere);
+      const tile = new THREE.Mesh(tileGeo, material);
+      tile.position.y = waterLevel() - 0.02;
+      tile.renderOrder = WATER_APRON_RENDER_ORDER;
+      // A block with no wet quad at all (buried under the world's land, or off
+      // the map's own water entirely) is HIDDEN, not skipped: it costs no draw
+      // while it is dry, and an editor water-level rise can bring it back
+      // without the mesh list, the underside pairs or the refit closures
+      // changing shape underneath everything that already holds them.
+      tile.visible = index.length > 0;
+      meshes.push(tile);
+      group.add(tile);
+      addUnderside(tile);
+      apronTiles.push({ mesh: tile, geometry: tileGeo, region });
+    }
+    const recullApron = (): void => {
       // The LIVE segment count, never the APRON_SEGMENTS constant: the vista
       // tiers build a denser apron (288), and a cull index computed over the
       // wrong grid dimensions keeps and drops the wrong triangles (seen live
-      // as hard dark wedges and stray slivers along the coast).
-      const culled = buildWaterSurfaceIndex(deep, apronSegments + 1, apronSegments + 1);
-      geo.setIndex(culled ? new THREE.BufferAttribute(culled, 1) : fullIndex);
+      // as hard dark wedges and stray slivers along the coast). The block
+      // partition is fixed, so a re-cull only re-emits each block's own index
+      // and re-decides whether it has anything to draw: a level change that
+      // floods a dry block has to bring it back, or the editor leaves a hole
+      // in the new sea.
+      for (const tile of apronTiles) {
+        const index = buildWaterSurfaceTileIndex(deep, apronColumns, tile.region);
+        tile.geometry.setIndex(new THREE.BufferAttribute(index, 1));
+        tile.mesh.visible = index.length > 0;
+      }
     };
-    cullApron();
-    const apron = new THREE.Mesh(geo, material);
-    apron.position.y = waterLevel() - 0.02;
-    apron.renderOrder = WATER_APRON_RENDER_ORDER;
-    meshes.push(apron);
-    group.add(apron);
-    addUnderside(apron);
     refits.push(() => {
       fillApron();
       (geo.attributes.aShoreDepth as THREE.BufferAttribute).needsUpdate = true;
       (geo.attributes.aShoreSlope as THREE.BufferAttribute).needsUpdate = true;
       refitApronGate();
-      cullApron();
-      apron.position.y = waterLevel() - 0.02;
+      recullApron();
+      for (const tile of apronTiles) tile.mesh.position.y = waterLevel() - 0.02;
     });
+    // The source geometry only ever carried the shared attributes; the blocks
+    // own the draws, so it holds no index of its own and is never rendered.
+    geo.setIndex(null);
   }
   // Coarse wetness scan: samples the zone rect on a 3-vertex stride (about 6
   // yards) and reports whether ANY sample is submerged. A fully dry zone then

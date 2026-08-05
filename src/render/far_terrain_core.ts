@@ -179,7 +179,19 @@ export function farVistaPlan(
     return { enabled: true, spacing: 12, envelopeFar: 3200, cameraFar: 3600 };
   }
   if (tier === 'ultra') {
-    return { enabled: true, spacing: 10, envelopeFar: 3200, cameraFar: 3600 };
+    // Deliberately the SAME grid high runs, not a finer one. This layer only
+    // ever draws past FAR_DISCARD_MARGIN inside the detail horizon, so its
+    // NEAREST fragment sits about 640 yards out, and from there the grid only
+    // gets smaller on screen: at 640 yards a 10 yard cell spans about 13
+    // screen pixels at 720p against a 12 yard cell's 15, and past a kilometre
+    // both are single digits. What the finer grid buys is a slightly truer
+    // ridge crest on the handful of cells that straddle one; what it costs is
+    // 44 percent more vista triangles in every frame and 44 percent more
+    // terrainHeight sampling in the boot build, which competes with
+    // near-terrain streaming for the same idle slots. High has shipped the 12
+    // yard grid all along. insane keeps the 8 yard grid for the same reason it
+    // keeps everything else: it exists to be measured against.
+    return { enabled: true, spacing: 12, envelopeFar: 3200, cameraFar: 3600 };
   }
   if (tier === 'insane') {
     return { enabled: true, spacing: 8, envelopeFar: 3200, cameraFar: 3600 };

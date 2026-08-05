@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { WATER_FOAM_WIDTH_YARDS } from '../src/render/water_core';
 import {
   WATER_TIME_PERIOD,
   WATER_WAVE_GLSL,
+  WAVE_SKIP_WEIGHT,
   waveCycles,
   waveLengthYards,
   waveSpeed,
@@ -163,6 +165,22 @@ describe('water wave field: the meander warp', () => {
     }
   });
 
+  it('offers each warped family a form that takes the warp already applied', () => {
+    // The one-argument forms above are the definition; the *At forms are the
+    // same arithmetic with the shared warp lifted out, so a stage that wants
+    // more than one family evaluates it once. Each wrapper must DELEGATE to
+    // its *At twin rather than carry a second copy of the wave list, or the
+    // two can drift apart and the vertex and fragment stages stop agreeing.
+    for (const [wrapper, at] of [
+      ['midField', 'midFieldAt'],
+      ['groundswellField', 'groundswellFieldAt'],
+      ['waveGroup', 'waveGroupAt'],
+    ]) {
+      expect(glslFunction(wrapper), wrapper).toContain(`${at}(waveWarp(p, t), t`);
+      expect(glslFunction(at), at).not.toContain('waveWarp');
+    }
+  });
+
   it('leaves the chop unwarped', () => {
     // The chop is the one family the fine zone-plane grid displaces, and it is
     // already decorrelated by the group envelope and the detail maps; keeping
@@ -205,11 +223,38 @@ describe('water shader: one field, both stages, no grid', () => {
   it('shades from world position per pixel, never from a vertex varying', () => {
     // The seam this closes: a varying carries whatever the vertex stage could
     // sample, which differs per sheet. World position does not.
-    for (const call of ['waveGroup(vWPos.xz', 'chopField(vWPos.xz', 'midField(vWPos.xz']) {
-      expect(frag).toContain(call);
+    //
+    // The three warped families and the group envelope go through the shared
+    // warp of vWPos.xz rather than warping it once each, which is the same
+    // arithmetic with the common subexpression lifted out; the unwarped chop
+    // still reads vWPos.xz directly. What must never appear is a VARYING
+    // carrying any part of the field: that is the whole seam, so the negatives
+    // below name the vertex-side quantities by their varying prefix.
+    expect(frag).toContain('waveWarp(vWPos.xz, uTime)');
+    expect(frag).toContain('chopField(vWPos.xz');
+    expect(frag).toContain('midFieldAt(warped, uTime');
+    expect(frag).toContain('groundswellFieldAt(warped, uTime');
+    expect(frag).toContain('waveGroupAt(warped, uTime)');
+    for (const varyingName of ['vSwell', 'vWarp', 'vGroup', 'vCrest']) {
+      expect(frag, `${varyingName} would put the field back on a vertex`).not.toContain(
+        varyingName,
+      );
     }
-    expect(frag).toContain('groundswellField(vWPos.xz');
-    expect(frag).not.toContain('vSwell');
+  });
+
+  it('evaluates the meander warp exactly once per pixel', () => {
+    // Three warps per fragment was four redundant wavePhase evaluations and
+    // eight redundant sin/cos on every water pixel, for a value that cannot
+    // differ between the three callers. Anything above one is that regression.
+    expect([...frag.matchAll(/waveWarp\(/g)]).toHaveLength(1);
+  });
+
+  it('skips a family and the envelope once nothing downstream reads them', () => {
+    // The envelope only ever reaches the surf band and the three families, so
+    // open water past every fade AND past the band's reach needs none of it.
+    expect(frag).toContain('float group = 0.5;');
+    expect(frag).toMatch(/chopW > WAVE_SKIP \|\| midW > WAVE_SKIP \|\| gsW > WAVE_SKIP/);
+    expect(frag).toContain('shoreDist < FOAM_GROUP_REACH');
   });
 
   it('hands the fragment stage an open-water gate with no rect-edge feather', () => {
@@ -247,6 +292,76 @@ describe('water shader: one field, both stages, no grid', () => {
     // It must still beat the vertex chop's old hard stop at 300 yards, or the
     // open sea gains nothing from being per-pixel.
     expect(fades.CHOP_FADE[1]).toBeGreaterThan(300);
+  });
+
+  it('bounds the shading error the skip weight admits', () => {
+    // A skipped family is DROPPED, not faded further, so the error it admits
+    // is its whole remaining contribution at the cutoff. Worst case per
+    // family: uSwellAmp * its amplitude scale * WAVE_SKIP_WEIGHT * its
+    // steepest member's |k|, times the shader's 5.5 slope gain into nm, times
+    // the group envelope's ceiling. The result is an xy offset on a normal
+    // whose z is 3.1, so the angle it moves the surface by is the arctangent.
+    expect(WATER_WAVE_GLSL).toContain(`const float WAVE_SKIP = ${WAVE_SKIP_WEIGHT}`);
+    const swellAmp = Number(
+      waterSource.match(/const WATER_SWELL_AMP = ([\d.]+);/)?.[1] ?? Number.NaN,
+    );
+    expect(swellAmp).toBeGreaterThan(0);
+    const midScale = Number(
+      WATER_WAVE_GLSL.match(/const float MSWELL_AMP_SCALE = ([\d.]+);/)?.[1] ?? Number.NaN,
+    );
+    expect(midScale).toBeGreaterThan(0);
+    const vectors = waveVectorsIn(WATER_WAVE_GLSL);
+    const steepestIn = (prefix: string): number =>
+      Math.max(
+        ...vectors.filter((v) => v.name.startsWith(prefix)).map((v) => Math.hypot(v.kx, v.kz)),
+      );
+    // Amplitude scale per family, as the shader applies it: the chop rides
+    // uSwellAmp alone, the mid waves MSWELL_AMP_SCALE, the groundswell 2.
+    const worst = Math.max(
+      steepestIn('SWELL_K'),
+      midScale * steepestIn('MSWELL_K'),
+      2 * steepestIn('GSWELL_K'),
+    );
+    const envelopeCeiling = 1.5; // the largest (a + b * group) any family uses
+    const offset = swellAmp * worst * WAVE_SKIP_WEIGHT * 5.5 * envelopeCeiling;
+    expect(Math.atan(offset / 3.1)).toBeLessThan(0.005); // radians: under 0.3 degrees
+  });
+});
+
+describe('water shader: the group envelope reaches only the surf it feeds', () => {
+  const frag = shaderSource('WATER_FRAG');
+
+  it('derives the foam reach from the band width, never a tuned literal', () => {
+    // The skip is only sound because past this shore distance foamBand is
+    // identically zero for EVERY phase the envelope can take: the band spans
+    // WATER_FOAM_WIDTH_YARDS * surge (surge tops out at 1.2) and the
+    // detail-map jitter inside the smoothstep spans +/- 1.1. Widening either
+    // has to move the bound with it, so the shader must splice a derived
+    // number rather than carry its own copy.
+    expect(waterSource).toContain(
+      'WATER_FOAM_WIDTH_YARDS * WATER_FOAM_SURGE_MAX + WATER_FOAM_JITTER_MAX',
+    );
+    // The shader splices that derived constant rather than a literal of its own.
+    expect(frag).toMatch(/const float FOAM_GROUP_REACH = \$\{glsl\(WATER_FOAM_GROUP_REACH\)\};/);
+    // And each term of the derivation is the one the shader actually runs, so
+    // retuning the surf in the shader alone cannot leave the bound behind.
+    const surgeMax = Number(
+      waterSource.match(/const WATER_FOAM_SURGE_MAX = ([\d.]+);/)?.[1] ?? Number.NaN,
+    );
+    const surge = frag.match(/float surge = ([\d.]+) \+ ([\d.]+) \* group;/);
+    expect(surge, 'the surf surge expression moved').not.toBeNull();
+    expect(Number(surge?.[1]) + Number(surge?.[2])).toBeCloseTo(surgeMax, 6);
+    const jitterMax = waterSource.match(/const WATER_FOAM_JITTER_MAX = ([\d.]+) \+ ([\d.]+);/);
+    expect(jitterMax, 'the foam jitter constant moved').not.toBeNull();
+    const jitter = frag.match(/shoreDist \+ n1\.x \* ([\d.]+) \+ n2\.y \* ([\d.]+)\)/);
+    expect(jitter, 'the foam band jitter moved').not.toBeNull();
+    expect(Number(jitter?.[1])).toBeCloseTo(Number(jitterMax?.[1]), 6);
+    expect(Number(jitter?.[2])).toBeCloseTo(Number(jitterMax?.[2]), 6);
+    // The band width itself is the shared one, not a second copy. (Matched by
+    // regex: the shader is a template literal, so its splices are live `${}`
+    // interpolations in the source text this test reads.)
+    expect(frag).toMatch(/smoothstep\(\$\{glsl\(WATER_FOAM_WIDTH_YARDS\)\} \* surge/);
+    expect(WATER_FOAM_WIDTH_YARDS).toBeGreaterThan(0);
   });
 });
 

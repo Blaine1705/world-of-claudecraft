@@ -378,6 +378,7 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
   }
 
   let poolsShown = false;
+  let darkened = false;
   return {
     group,
     glowLights,
@@ -389,11 +390,18 @@ export function buildStreetlamps(seed = 0): StreetlampsView {
         for (const pool of poolMeshes) pool.visible = lit;
       }
       if (!lit) {
+        // Write-elided: the lamps are out for the whole daylight half of the
+        // cycle, and a fixture already dark has nothing to be told. Rewriting
+        // the same zero into every authored emitter of all fourteen styles,
+        // every frame, all day, is cost with no pixel behind it.
+        if (darkened) return;
+        darkened = true;
         for (const material of emitterMaterials.keys()) material.emissiveIntensity = 0;
         for (const state of authoredGlowStates) updateStreetlampEmissive(state, 0);
         for (const material of poolMaterials) material.opacity = 0;
         return;
       }
+      darkened = false;
       // A lantern flame breathes rather than strobing: two slow out-of-phase
       // sines, the same idiom the Icemantle lanterns use.
       const flicker = 1 + Math.sin(time * 5.7) * 0.05 + Math.sin(time * 1.9) * 0.04;
