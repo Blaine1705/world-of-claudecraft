@@ -200,9 +200,14 @@ export function onCastCompleted(
   rogueEngineOnCast(ctx, player, abilityId, target);
   druidEngineOnCast(ctx, player, abilityId, target);
   if (wasEmpowered) return;
+  const meta = ctx.players.get(player.id);
+  const spec = meta ? ctx.playerMods(meta).spec : null;
   for (const def of procsFor(ctx, player)) {
     const trigger = def.trigger;
     if (trigger.on !== 'castNth' || !trigger.abilities.includes(abilityId)) continue;
+    // Spec-inert procs never fire and never bank toward n (they draw no rng, so
+    // skipping here leaves every other proc's draw order untouched).
+    if (spec && def.excludeSpecs?.includes(spec)) continue;
     const procState = state(player);
     // G2 guard: while a castNth internal cooldown runs, matching casts are
     // ignored entirely: nothing fires and nothing is banked toward n.

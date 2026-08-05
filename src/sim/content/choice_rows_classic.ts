@@ -967,7 +967,11 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
           // the generic poison economy for the spec that actually slashes.
           // Haymaker counts: it IS Wicked Slash while the Redline window
           // runs, and the window starving itself would kill the sprint.
-          description: 'Every 3rd Wicked Slash restores 50 energy.',
+          // Inert for the dagger specs (Knifework/Skulduggery thrust and ribbon,
+          // they do not slash): otherwise a non-dagger legendary forces
+          // Assassination onto the Wicked Slash fallback and this refund would
+          // fund a runaway spam it was never balanced for.
+          description: 'Every 3rd Wicked Slash restores 50 energy. (Combat)',
           icon: 'sinister_strike',
           effect: {
             proc: {
@@ -975,6 +979,7 @@ export const ROGUE_CHOICE_ROWS: ClassChoiceRows = {
               name: 'Ceaseless Cuts',
               trigger: { on: 'castNth', n: 3, abilities: ['sinister_strike', 'body_blow'] },
               responses: [{ kind: 'resource', amount: 50, resourceType: 'energy' }],
+              excludeSpecs: ['assassination', 'subtlety'],
             },
           },
         },

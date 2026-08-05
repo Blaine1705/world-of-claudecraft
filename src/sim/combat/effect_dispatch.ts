@@ -440,6 +440,7 @@ export function runEffects(
         weaponMult *= consumeVeiledEdge(ctx, p, ability.id);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
           cannotBeDodged: eff.cannotBeDodged,
+          normalizedInstant: eff.normalized,
           weaponMult,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,

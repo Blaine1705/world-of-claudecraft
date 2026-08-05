@@ -2119,6 +2119,12 @@ export type AbilityEffect =
       cannotBeDodged?: boolean;
       requiresBehind?: boolean;
       weaponMult?: number;
+      // Classic instant-attack normalization: when set, the weapon-damage
+      // portion is scaled to a fixed normalized speed by weapon class (dagger
+      // 1.7, other one-hand 2.4) instead of the weapon's real speed, so a slow
+      // high-per-hit weapon cannot inflate an energy-gated instant it is pressed
+      // at will. Off by default (the un-normalized classic-era behavior).
+      normalized?: boolean;
     } // instant special attack (sinister strike, overpower, backstab)
   | {
       type: 'directDamage';

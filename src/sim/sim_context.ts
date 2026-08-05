@@ -809,6 +809,7 @@ export interface SimContextCallbacks {
     abilityName: string | null,
     opts: {
       cannotBeDodged?: boolean;
+      normalizedInstant?: boolean;
       weaponMult?: number;
       threatFlat?: number;
       threatMult?: number;
