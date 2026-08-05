@@ -370,6 +370,21 @@ const ELEMENTAL_FLOATING: ClipMap = {
   attack: ['Elemental_Attack'],
 };
 
+// The ghost family's own attack (scripts/build_ghost_anims.mjs, issue #2889):
+// FLOATING's Headbutt/Punch is shared by reference across 8 remaining
+// families after the elemental's migration above (a dragon, the flying demon
+// imp, the Nightbloom nightkin, the mushroom-folk glub among them). This clip
+// is baked off ghost.glb's own donor poses (the same shared rig
+// golelingevolved.glb uses, so the same forward-lunge Punch plus its two
+// unused gesture clips No/Yes), so only mob_ghost gets it; the wisps
+// (mob_glimmerwisp/mob_duskwisp) are unrigged bespoke meshes on a DIFFERENT
+// GLB where FLOATING's clip names simply no-op, and the other FLOATING
+// families stay untouched.
+const GHOST_FLOATING: ClipMap = {
+  ...FLOATING,
+  attack: ['Ghost_Attack'],
+};
+
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
 const ENEMY_BITE: ClipMap = {
   idle: 'Idle',
@@ -758,11 +773,44 @@ export const VISUALS: Record<string, VisualDef> = {
   player_hunter: {
     url: `${PLAYERS}/ranger.glb`,
     height: HUMANOID_H,
-    clips: kaykit(['2H_Ranged_Shoot']),
+    clips: {
+      ...kaykit(['2H_Ranged_Shoot']),
+      // Ability-specific attacks (scripts/build_hunter_ability_anims.mjs,
+      // issue #2889): the hunter had zero attackByAbility overrides across
+      // its kit, so every ability played the same crossbow-shoulder shot.
+      // The three melee abilities (range 0) get a bespoke swing each; the
+      // ranged shots split into a quick snap (every instant no-cast-time
+      // shot) versus the slow full draw Long Draw's own 3.0s cast time
+      // names; Volley gets its own rapid-pulse barrage. The three aspect
+      // toggles plus Fevered Draw are self-buffs with no swing to author, so
+      // they point straight at ranger.glb's own already-baked
+      // 'Spellcast_Raise' clip, the same no-bake pattern player_warrior's
+      // sanguine_aura already uses. Not every ability in the kit is listed:
+      // this batch's representative slice (tame_beast/dismiss_pet/revive_pet
+      // are pet-command channels with no combat swing to author, matching
+      // batch 1's own utility/summon exclusions for the mage).
+      attackByAbility: {
+        raptor_strike: 'Hunter_Melee_Gut',
+        mongoose_bite: 'Hunter_Melee_Counter',
+        wing_clip: 'Hunter_Melee_Clip',
+        serpent_sting: 'Hunter_Shot_Snap',
+        arcane_shot: 'Hunter_Shot_Snap',
+        concussive_shot: 'Hunter_Shot_Snap',
+        counter_shot: 'Hunter_Shot_Snap',
+        aimed_shot: 'Hunter_Shot_LongDraw',
+        volley: 'Hunter_Shot_Volley',
+        aspect_of_the_hawk: 'Spellcast_Raise',
+        aspect_of_the_monkey: 'Spellcast_Raise',
+        aspect_of_the_cheetah: 'Spellcast_Raise',
+        rapid_fire: 'Spellcast_Raise',
+      },
+    },
     // Bow-draw clips for the Season 1 bow skins (scripts/build_bow_anims.mjs):
     // with a bow displayed the shot plays a draw instead of the crossbow
-    // shoulder-aim (visual.ts weaponSkinAttackClips).
-    animUrls: [`${PLAYERS}/bow_anims.glb`],
+    // shoulder-aim (visual.ts weaponSkinAttackClips). Ability-specific attack
+    // clips (scripts/build_hunter_ability_anims.mjs) ride the same mesh-free
+    // donor GLB mechanism, appended alongside: both GLBs' clips load together.
+    animUrls: [`${PLAYERS}/bow_anims.glb`, `${PLAYERS}/hunter_ability_anims.glb`],
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
     attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
@@ -1556,7 +1604,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/ghost.glb`,
     height: 1.6,
     hover: 0.4,
-    clips: FLOATING,
+    clips: GHOST_FLOATING,
+    // Ghost_Attack clip donor (scripts/build_ghost_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/ghost_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },
