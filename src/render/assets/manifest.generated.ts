@@ -274,6 +274,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/chars/players/Mech/textures/uncommon/combatmech_steel_orange.png": "/media/models/chars/players/Mech/textures/uncommon/combatmech_steel_orange.5007bd646698.png",
   "models/chars/players/barbarian.glb": "/media/models/chars/players/barbarian.2fb8d32c29d2.glb",
   "models/chars/players/bow_anims.glb": "/media/models/chars/players/bow_anims.11f1982870b3.glb",
+  "models/chars/players/bow_hold_anim.glb": "/media/models/chars/players/bow_hold_anim.55a03fd920b3.glb",
   "models/chars/players/druid.glb": "/media/models/chars/players/druid.b1156d55834d.glb",
   "models/chars/players/knight.glb": "/media/models/chars/players/knight.063f81b53c35.glb",
   "models/chars/players/mage.glb": "/media/models/chars/players/mage.28bbbc7a04fa.glb",

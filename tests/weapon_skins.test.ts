@@ -306,6 +306,61 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(weaponSkinOrientPin(null)).toBeNull();
   });
 
+  it('a drawn bow holds its draw while CASTING, instead of the caster gesture', async () => {
+    const { weaponSkinCastClip, weaponSkinHandling, SKIN_ATTACK_CLIP_NAMES } = await import(
+      '../src/render/characters/skin_attack'
+    );
+    // Casting is a HELD base state, and every class takes `Spellcasting` from
+    // the shared kaykit() ClipMap, so a hunter part-way through Long Draw
+    // (castTime 3.0) played a caster's arm circle while holding a bow.
+    expect(weaponSkinCastClip('winterbite')).toBe('Bow_Draw_Hold');
+    expect(weaponSkinCastClip('fletcher_s_guild_bow')).toBe('Bow_Draw_Hold');
+    // Crossbow handling is shouldered, not drawn: it keeps the authored cast
+    // until a pose exists for it. The encore gun aims like a crossbow.
+    expect(weaponSkinCastClip('meteorlatch_crossbow')).toBeNull();
+    expect(weaponSkinHandling(WEAPON_SKINS.encore_bow)).toBe('crossbow');
+    expect(weaponSkinCastClip('encore_bow')).toBeNull();
+    // Melee skins and no skin never substitute a cast pose.
+    expect(weaponSkinCastClip('ice_fang_sword')).toBeNull();
+    expect(weaponSkinCastClip(null)).toBeNull();
+    expect(weaponSkinCastClip('not_a_skin')).toBeNull();
+    // The constructor only binds names in this list, so an unlisted clip would
+    // resolve to no action and silently fall through to the caster gesture.
+    expect(SKIN_ATTACK_CLIP_NAMES).toContain('Bow_Draw_Hold');
+  });
+
+  it('the cast pose GLB ships, holds a STATIC pose, and shares the draw rig', () => {
+    const parse = (rel: string) => {
+      const b = readFileSync(join(ROOT, rel));
+      return JSON.parse(b.subarray(20, 20 + b.readUInt32LE(12)).toString('utf8'));
+    };
+    const hold = parse('public/models/chars/players/bow_hold_anim.glb');
+    const draw = parse('public/models/chars/players/bow_anims.glb');
+    expect((hold.animations ?? []).map((a: { name?: string }) => a.name)).toEqual([
+      'Bow_Draw_Hold',
+    ]);
+    // Clip donor only: no mesh rides along (the draw GLB's contract too).
+    expect(hold.meshes ?? []).toEqual([]);
+    // Same skeleton as the draw it was resampled from, so the pose binds on any
+    // rig the draw already binds on.
+    const names = (d: { nodes?: { name?: string }[] }) =>
+      new Set((d.nodes ?? []).flatMap((n) => (n.name ? [n.name] : [])));
+    const held = names(hold);
+    expect([...names(draw)].filter((n) => !held.has(n))).toEqual([]);
+    // STATIC: both keys carry the same value, or the "hold" would drift.
+    const anim = hold.animations[0];
+    const sampler = anim.samplers[0];
+    const acc = hold.accessors[sampler.output];
+    expect(acc.count).toBe(2);
+    // The hunter loads it.
+    const manifestSrc = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
+    const hunterBlock = manifestSrc.slice(
+      manifestSrc.indexOf('player_hunter: {'),
+      manifestSrc.indexOf('player_rogue: {'),
+    );
+    expect(hunterBlock).toContain('bow_hold_anim.glb');
+  });
+
   it('the hunter ships the bow clip via animUrls and the GLB carries it', async () => {
     // Source scan, not an import: pulling the manifest into Node would kick
     // the module-import GLB preloads (assets.ts loading contract).
