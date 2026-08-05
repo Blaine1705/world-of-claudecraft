@@ -131,5 +131,17 @@ describe('resolveDirectPickEntityId', () => {
       const map = entities([{ id: 10, kind: 'mob', dead: true, lootable: true }]);
       expect(resolveDirectPickEntityId([10], map)).toBe(10);
     });
+
+    it('ignores a live NPC behind the corpse: loot the corpse, not the NPC (OSSBrain review)', () => {
+      // A non-hostile NPC is never a valid direct-pick target (npc dialog is
+      // opened through interact/proximity, not click-pick priority), so it
+      // must not steal the pick away from the ordinary corpse-loot branch,
+      // same as the 'object' case above.
+      const map = entities([
+        { id: 10, kind: 'mob', dead: true, lootable: true },
+        { id: 15, kind: 'npc', dead: false },
+      ]);
+      expect(resolveDirectPickEntityId([10, 15], map)).toBe(10); // unchanged
+    });
   });
 });

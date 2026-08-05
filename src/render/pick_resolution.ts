@@ -7,11 +7,12 @@ function lootableCorpse(e: PickEntity): boolean {
 }
 
 // A live, selectable creature: a mob or player still standing. Excludes
-// 'object' (never targetable) and anything dead. Issue #2787: this is the
-// pick priority a click resolves to before it is allowed to fall into the
-// dead-corpse loot branch below.
+// 'npc' and 'object' (a lootable corpse must never lose priority to a
+// non-combat NPC or a world prop standing behind it) and anything dead.
+// Issue #2787: this is the pick priority a click resolves to before it is
+// allowed to fall into the dead-corpse loot branch below.
 function isLiveTargetable(e: PickEntity): boolean {
-  return e.kind !== 'object' && !e.dead;
+  return (e.kind === 'mob' || e.kind === 'player') && !e.dead;
 }
 
 export function resolveDirectPickEntityId(
