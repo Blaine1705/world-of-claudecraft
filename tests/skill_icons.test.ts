@@ -90,9 +90,13 @@ function webpSize(file: string): { width: number; height: number } {
 const webpFiles = (): string[] =>
   walk(skillsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
 
+// The 12 rework ids whose art was superseded by the accepted release art in the
+// v0.34.0 missing-painted-icons wave (bestial_wrath, counter_shot, volley,
+// holy_nova, prayer_of_healing, psychic_scream, shadowform, bloodlust,
+// chain_heal, chain_lightning, earthquake, elemental_mastery) are pinned by the
+// generated-additions test below instead of this PR-provenance fixture.
 const PR_2218_OWNED_CLASS_ICON_IDS = {
   hunter: [
-    'bestial_wrath',
     'bloodhook',
     'bloodtrail_assault',
     'cold_focus',
@@ -107,17 +111,10 @@ const PR_2218_OWNED_CLASS_ICON_IDS = {
     'stampede',
     'trailbreak',
     'unleash_beast',
-    'counter_shot',
-    'volley',
     'wildheart',
   ],
   shaman: [
     'ancestor_return',
-    'bloodlust',
-    'chain_heal',
-    'chain_lightning',
-    'earthquake',
-    'elemental_mastery',
     'galeheart_weapon',
     'lifespring_weapon',
     'primal_exaltation',
@@ -130,14 +127,10 @@ const PR_2218_OWNED_CLASS_ICON_IDS = {
   ],
   priest: [
     'choir_of_deliverance',
-    'holy_nova',
     'martyrs_aegis',
-    'prayer_of_healing',
-    'psychic_scream',
     'scouring_mercy',
     'seraphic_vigil',
     'summon_tithefiend',
-    'shadowform',
     'veilstep',
   ],
 } as const;
@@ -387,7 +380,7 @@ describe('class ability webp icons', () => {
     ).toEqual([]);
   });
 
-  it('D) keeps every PR #2218 ability icon at the canonical 128px square size', async () => {
+  it('keeps every PR #2218 ability icon at the canonical 128px square size', async () => {
     const wrongSize: string[] = [];
     for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
       for (const id of ids) {

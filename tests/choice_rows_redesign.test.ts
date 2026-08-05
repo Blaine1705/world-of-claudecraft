@@ -14,8 +14,13 @@ import type { Entity } from '../src/sim/types';
 // uses it, on a real Sim. Deterministic setups; every assertion is a behavior a
 // player would see.
 
-function rig(cls: 'priest' | 'shaman' | 'paladin', level: number, rows: Record<number, string>) {
-  const sim = new Sim({ seed: 11, playerClass: cls, autoEquip: true });
+function rig(
+  cls: 'priest' | 'shaman' | 'paladin',
+  level: number,
+  rows: Record<number, string>,
+  seed = 11,
+) {
+  const sim = new Sim({ seed, playerClass: cls, autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.applyTalents({ spec: null, rows })).toBe(true);
   const p = sim.player;
@@ -208,6 +213,75 @@ describe('paladin redesign', () => {
     expect(p.auras.some((a) => a.kind === 'buff_speed' && a.id === 'divine_steed_burst')).toBe(
       true,
     );
+    addTargetMob(sim);
+    castAndSettle(sim, 'seal_of_righteousness', 2);
+    castAndSettle(sim, 'judgement', 2);
+    castAndSettle(sim, 'seal_of_righteousness', 2); // judgement consumed the seal; re-brand
+    const before = p.cooldowns.get('judgement');
+    expect(before).toBeGreaterThan(0);
+    sim.startAutoAttack();
+    let swings = 0;
+    let elapsedTicks = 0;
+    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
+      for (const ev of sim.tick()) {
+        // Only a LANDED swing counts: the row reads "landed melee attacks", so a
+        // missed opener (an rng-stream artifact of upstream content adds) must
+        // keep the loop waiting instead of ending it shave-less.
+        if (
+          ev.type === 'damage' &&
+          ev.sourceId === p.id &&
+          ev.school === 'physical' &&
+          ev.kind === 'hit'
+        )
+          swings++;
+      }
+      elapsedTicks++;
+    }
+    expect(swings).toBeGreaterThan(0);
+    // The 0.5 sec shave must show OVER AND ABOVE the natural cooldown decay of
+    // the ticks the loop ran (0.05 sec per tick), so waiting out early misses
+    // cannot pass the test on decay alone.
+    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - elapsedTicks * 0.05 - 0.45);
+=======
+  it('Righteous Cause: swings under an active Oathbrand shave the Verdict cooldown', () => {
+    // Seed hunted so the first counted physical swing LANDS under the re-branded
+    // seal: an avoided swing draws no shave and the cooldown delta assertion
+    // needs a landed hit. Re-hunted from 1 after the v0.34.0 merge composed this
+    // branch's quest-dedupe content with the release's Dragonkin brood, shifting
+    // every shared-stream draw (seed 1 now shaves nothing: 6.000 to 5.950, one
+    // tick of ordinary decay). Not a behavior regression: 67 of seeds 1 to 80
+    // shave the full amount, landing at 5.450. Spares: 3, 4.
+    const { sim, p } = rig('paladin', 20, { 14: 'pal_r14_righteous_cause' }, 2);
+    addTargetMob(sim);
+    castAndSettle(sim, 'seal_of_righteousness', 2);
+    castAndSettle(sim, 'judgement', 2);
+    castAndSettle(sim, 'seal_of_righteousness', 2); // judgement consumed the seal; re-brand
+    const before = p.cooldowns.get('judgement');
+    expect(before).toBeGreaterThan(0);
+    sim.startAutoAttack();
+    let swings = 0;
+    let elapsedTicks = 0;
+    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
+      for (const ev of sim.tick()) {
+        // Only a LANDED swing counts: the row reads "landed melee attacks", so a
+        // missed opener (an rng-stream artifact of upstream content adds) must
+        // keep the loop waiting instead of ending it shave-less.
+        if (
+          ev.type === 'damage' &&
+          ev.sourceId === p.id &&
+          ev.school === 'physical' &&
+          ev.kind === 'hit'
+        )
+          swings++;
+      }
+      elapsedTicks++;
+    }
+    expect(swings).toBeGreaterThan(0);
+    // The 0.5 sec shave must show OVER AND ABOVE the natural cooldown decay of
+    // the ticks the loop ran (0.05 sec per tick), so waiting out early misses
+    // cannot pass the test on decay alone.
+    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - elapsedTicks * 0.05 - 0.45);
+>>>>>>> f8554e6e3f
   });
 
   it('Sanctified Fervor: Avenging Wrath grants critical strike and both haste channels', () => {

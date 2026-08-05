@@ -10115,6 +10115,16 @@ export class Renderer {
             this.recklessSkulls.spawn(v.group, active.height * e.scale);
           }
         }
+        if (!e.dead && (ferocityStage > 0 || petFrenzy)) {
+          this.vfx.castSparkle(
+            e.id,
+            'fire',
+            dt * (0.45 + ferocityStage * 0.35 + (petFrenzy ? 1 : 0)),
+          );
+        }
+        if (tithefiendEmpoweredActive(e)) {
+          this.vfx.castSparkle(e.id, 'shadow', dt * 2.4);
+        }
         // Shapeshift-form particle auras riding the tints above: metamorph fire,
         // moonkin star motes, shadowform gloom wisps. Suppressed for the dead
         // (the auras themselves drop, but a corpse must not smolder for a frame).

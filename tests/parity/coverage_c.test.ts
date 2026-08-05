@@ -422,7 +422,6 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(abilities).toContain('Overbloom');
   });
 
-
   it('priest_codex: all three baseline loops fire and respec cleanup completes', () => {
     const rec = run('priest_codex');
     const ev = rec.allEvents as Ev[];

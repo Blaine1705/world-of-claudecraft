@@ -827,7 +827,6 @@ export interface SimContextCallbacks {
       threatMult?: number;
       forceCrit?: boolean;
       critBonus?: number;
-      abilityId?: string;
       onDealt?: (amount: number) => void;
       onEffectiveDamage?: (amount: number) => void;
       abilityId?: string | null;
