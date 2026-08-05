@@ -20,8 +20,8 @@ export const SETTING_RANGES = {
   // (resolveDefaultGraphicsPreset in gfx.ts), so a phone is not stuck on a tier it cannot enter
   // the world at and a strong desktop is not capped below what it can drive. EVERY touch device
   // resolves to LOW there, so a phone is persisted at 1 on its first boot and never re-detected.
-  // A masked/inconclusive DESKTOP
-  // stays on this medium default and keeps re-detecting on later boots (see graphicsDefaultApplied).
+  // A masked/inconclusive DESKTOP stays on this medium default and keeps re-detecting on later
+  // boots (see graphicsDefaultApplied).
   // An explicit player choice (stored here) is never overridden.
   // max 6: 1 low .. 4 ultra, 5 advanced, 6 insane (the everything-on showcase;
   // manual opt-in only, hardware detection never selects it).
@@ -189,6 +189,13 @@ export const BOOL_SETTINGS = {
   // startAutoAttack still no-ops unless a valid hostile target is in range, and
   // heals / buffs / damage-breakable CC (gouge, sap, sheep) never trigger it.
   startAttackOnAbilityUse: { def: true },
+  // off by default (issue #1358): the classic MMO default is that switching
+  // targets while auto-attacking carries the swing over to the new target
+  // (Tab, click, nearest-enemy, assist, any method). Turning this on flips
+  // that: every target switch disengages auto-attack instead. Mirrored onto
+  // the authoritative sim via setStopAutoAttackOnTargetSwitch (see
+  // src/sim/targeting.ts), since the sim stays authoritative for auto-attack.
+  stopAutoAttackOnTargetSwitch: { def: false },
   // off by default: lock the action bar slots against drag-to-move,
   // drag-to-replace, and clear (right-click / shift+clear-key) so an
   // accidental click-and-drag mid-fight can't move or wipe a slot. Abilities
@@ -322,12 +329,25 @@ export const BOOL_SETTINGS = {
   // 23..33). main.ts enforces that this row can only remain enabled while the
   // secondary row is visible. Mobile exposes the same slots through ring pages.
   showThirdActionBar: { def: false },
+  // off by default (the classic look, unchanged out of the box): strips the black
+  // background, border, and keybind label from desktop action-bar slots that hold
+  // no ability or item, via a body class main.ts toggles (issue 2429). The fixed
+  // Attack slot and any bound slot are unaffected, so the emptied-out look never
+  // disturbs the deliberate slot layout the extra rows exist for (arranging buffs
+  // and consumables); the slots stay in place and keybind-reachable either way.
+  hideUnusedActionSlots: { def: false },
   // off by default: the classic "target of target" mini-frame. When on, and you have
   // a target, a small unit frame under the target frame shows who YOUR target is
   // targeting (a mob's aggro target, a player's selected target). Purely a display
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  // on by default: the pet health strip under the player frame (hunter / warlock /
+  // mage). It paints only while the player actually HAS a pet, so the six petless
+  // classes never see it and the default costs them nothing. Purely a display
+  // preference read by the HUD's pet-frame update; the pet already rides the wire
+  // as an ordinary owned mob entity.
+  showPetFrame: { def: true },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },
