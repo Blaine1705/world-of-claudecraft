@@ -1109,7 +1109,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "zh_CN": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.keybinds.targetPet",
     "hudChrome.materialHint.usedBy",
@@ -1123,7 +1122,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.petLabel"
   ],
   "zh_TW": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.keybinds.targetPet",
     "hudChrome.materialHint.usedBy",
@@ -1137,7 +1135,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.petLabel"
   ],
   "ko_KR": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.keybinds.targetPet",
     "hudChrome.materialHint.usedBy",
@@ -1151,7 +1148,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.unitFrame.petLabel"
   ],
   "ja_JP": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.keybinds.targetPet",
     "hudChrome.materialHint.usedBy",
@@ -1348,7 +1344,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "ru_RU": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.keybinds.targetPet",
     "hudChrome.materialHint.usedBy",
