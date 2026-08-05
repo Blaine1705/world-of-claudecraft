@@ -2168,7 +2168,27 @@ describe('client HTML shell', () => {
     // a child of the move joystick, so it follows that mirror without its own
     // satellite placement rules.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: 0;\n  }',
+      'body.mobile-touch.mobile-left-handed #mobile-move-zone {\n    left: auto;\n    right: max(18px, env(safe-area-inset-right));\n  }',
+    );
+  });
+
+  // #mobile-move-zone is the floating capture zone the joystick above rests
+  // in; every other touch control anchors off env(safe-area-inset-*), but
+  // this one was still pinned to the literal device corner (left: 0; bottom:
+  // 0), so on a notched/rounded-corner phone it could sit under the home
+  // indicator gesture strip. Mirror the same left/bottom offsets the
+  // adjacent .mobile-joystick rule uses, without touching the zone's own
+  // width/height (it must not shrink the capture area).
+  it('anchors the move-zone capture area off the safe-area insets like its sibling joystick', () => {
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #mobile-move-zone {\n' +
+        '    position: absolute;\n' +
+        '    left: max(18px, env(safe-area-inset-left));\n' +
+        '    bottom: calc(26px + env(safe-area-inset-bottom));\n' +
+        '    width: min(30vw, 132px);',
+    );
+    expect(hudMobileCss).toContain(
+      'min-width: 112px;\n    max-width: 132px;\n    height: min(36vh, 172px);',
     );
   });
 
