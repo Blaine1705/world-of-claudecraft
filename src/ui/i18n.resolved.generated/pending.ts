@@ -11,68 +11,93 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "es_ES": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "fr_FR": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "fr_CA": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "de_DE": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "zh_TW": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ko_KR": [
+    "hudChrome.materialHint.usedBy"
+  ],
+  "ja_JP": [
+    "hudChrome.materialHint.usedBy"
+  ],
   "pt_BR": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.materialHint.usedBy"
+  ],
   "cs_CZ": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "nl_NL": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "pl_PL": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "id_ID": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "tr_TR": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "sv_SE": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "vi_VN": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ],
   "da_DK": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpToast"
+    "hudChrome.crafting.skillUpToast",
+    "hudChrome.materialHint.usedBy"
   ]
 };
