@@ -8128,7 +8128,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Allt på den här sidan lever i spelet: tryck på Esc för att öppna alternativen. Menyn öppnas på en Översikt av fästa väsentligheter, med kategorierna på en rad bredvid: inställningarna nedan finns under Grafik, Gränssnitt och Tillgänglighet i Skärm-gruppen, och Prestandaöverlägget under System. Ännu snabbare: skriv in ett namn i sökrutan högst upp och hoppa direkt dit.',
   'guide.settingsPage.whyLabel': 'Varför det fungerar:',
   'hudChrome.crafting.close': 'Nära hantverk',
-  'hudChrome.crafting.craft': 'Hantverk',
   'hudChrome.crafting.craftedToast': 'Tillverkad: {name}',
   'hudChrome.crafting.empty': 'Inga recept kända än.',
   'hudChrome.crafting.insufficientMaterials': 'Du har inte materialet för det.',
@@ -8222,7 +8221,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Ökar Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Ökar Uthållighet med {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Du har inte lärt dig det receptet än.',
-  'hudChrome.crafting.throttled': 'Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.',
   'hudChrome.mobile.chatPlaceholder': 'Säg något...',
   'hudChrome.mobile.hideKeyboard': 'Dölj tangentbordet',
   'hudChrome.unitFrame.partyChip': 'Grupp',
@@ -10762,13 +10760,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger arkanmaterial. Det kan inte ångras.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Avförtrylla {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du avförtrollar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.disenchantedLine': 'Du avförtrollar {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du förtrollar {item} med {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Du har inte materialet för den förtrollningen.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du förtrollar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.enchantUnknown': 'Den förtrollningen finns inte.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Den förtrollningen kan inte appliceras på det föremålet.',
@@ -10783,7 +10777,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger hantverksmaterial. Det kan inte ångras.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Bärga {item}?',
-  'hudChrome.enchanting.salvageThrottled': 'Du bärgar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.salvagedLine': 'Du bärgar {item}.',
   'hudChrome.enchanting.targetTitle': 'Välj ett föremål att förtrylla',
   'hudChrome.gathering.biteLine': 'Något nappar på betet!',

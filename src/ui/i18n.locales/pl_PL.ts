@@ -6821,13 +6821,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały arkaniczne. Nie można tego cofnąć.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Rozbroić {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Rozbrajasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.disenchantedLine': 'Rozbrajasz {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Zaklinasz {item} za pomocą {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Nie masz materiałów na to zaklinanie.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Zaklinasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.enchantUnknown': 'To zaklinanie nie istnieje.',
   'hudChrome.enchanting.enchantWrongSlot':
     'To zaklinanie nie może być zastosowane do tego przedmiotu.',
@@ -6842,8 +6838,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały rzemieślnicze. Nie można tego cofnąć.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Odzyskać {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Odzyskujesz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.salvagedLine': 'Odzyskujesz {item}.',
   'hudChrome.enchanting.targetTitle': 'Wybierz przedmiot do zaklinania',
   'hudChrome.keybinds.emoteWheel': 'Koło emotek',
@@ -8352,7 +8346,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wszystko na tej stronie jest obecne w grze: naciśnij Esc, aby otworzyć opcje. Menu otwiera się na Przeglądzie przypiętych najważniejszych ustawień, z kategoriami na listwie obok: opisane niżej ustawienia znajdziesz w grupie Ekran, pod Grafiką, Interfejsem i Dostępnością, a Nakładkę wydajności pod Systemem. Jeszcze szybciej: wpisz nazwę w pole wyszukiwania na górze i przejdź prosto do niej.',
   'guide.settingsPage.whyLabel': 'Dlaczego to działa:',
   'hudChrome.crafting.close': 'Zamknij rzemiosło',
-  'hudChrome.crafting.craft': 'Rzemiosło',
   'hudChrome.crafting.craftedToast': 'Wykonane: {name}',
   'hudChrome.crafting.empty': 'Nie są jeszcze znane żadne przepisy.',
   'hudChrome.crafting.insufficientMaterials': 'Nie masz na to materiałów.',
@@ -8446,7 +8439,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zwiększa Intelekt o {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Zwiększa Wytrzymałość o {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Nie nauczyłeś się jeszcze tego przepisu.',
-  'hudChrome.crafting.throttled': 'Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.',
   'hudChrome.mobile.chatPlaceholder': 'Powiedz coś...',
   'hudChrome.mobile.hideKeyboard': 'Ukryj klawiaturę',
   'hudChrome.unitFrame.partyChip': 'Drużyna',

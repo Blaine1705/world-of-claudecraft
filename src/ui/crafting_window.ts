@@ -8,11 +8,20 @@
 // helpers (crafting_view.ts); the selected craft lives with the HUD (the
 // commission opt-in precedent) so it survives staleness repaints.
 //
-// Craft Cast System Phase 2: duration chip, craft-button state machine,
-// in-window progress strip (live fill via paintCraftCastProgress, no full
-// rebuild per tick), aria-busy + polite live region. Progress always tracks
-// real entity cast fields (never a client-side outcome timer).
+// Craft Cast System Phase 2: duration chip, craft-button state machine, and
+// the in-window cast strip. While the crafting window is open the strip is
+// the SINGLE progress surface for a craft cast (the HUD suppresses the
+// overlay #castbar for CRAFT_CAST_ID only; closing the window hands the cast
+// back to the overlay bar, so a cast is never invisible). The strip's
+// per-frame fill/label/timer/aria writes ride a CastBarPainter instance the
+// HUD rebuilds after each full paint (PainterHost elided writers, the
+// family reuse rule); this painter only builds the strip DOM and paints the
+// cold batch label on the full-paint path. Progress always tracks real
+// entity cast fields (never a client-side outcome timer).
 // Phase 3: qty stepper, Create / Create All, batch remaining on the strip.
+// Announcements ride the static #crafting-live region via deps.announce (a
+// region inside the rebuilt subtree is wiped by the same task that writes
+// it, so assistive tech never sees the text).
 
 import type { StationType } from '../sim/professions/stations';
 import { craftNameText } from './char_window';
@@ -47,11 +56,8 @@ import type { ProfessionIdentityModel } from './profession_identity_view';
 import { qualityGlowShadow } from './quality_glow';
 import { svgIcon } from './ui_icons';
 
-// Percent width precision for the in-window cast strip (matches cast_bar_painter).
-const PROGRESS_PERCENT_DIGITS = 1;
-// Remaining-seconds display precision on the strip timer.
-const PROGRESS_TIMER_DIGITS = 1;
-// Duration chip: one decimal when non-integer (1.75s), whole seconds otherwise.
+// Duration chip and aria: up to two decimals when non-integer (1.75s),
+// whole seconds otherwise.
 const DURATION_FRACTION_DIGITS = 2;
 
 // Skill-gain difficulty labels, the classic four-color recipe intuition
@@ -103,6 +109,10 @@ export interface CraftingWindowDeps extends PainterHostPresentation {
   /** Per-recipe qty stepper value (HUD-held so repaints keep the pick). */
   craftQty(recipeId: string): number;
   onCraftQty(recipeId: string, qty: number): void;
+  /** Write one polite line into the static #crafting-live region (HUD-owned;
+   *  a live region inside this rebuilt subtree would be wiped by the same
+   *  task that writes it, so assistive tech never announces it). */
+  announce(text: string): void;
   /** The craft tab the player last picked (null before any pick), held by the
    *  HUD like the commission set above; the painter resolves it against the
    *  live tab list (resolveSelectedCraft) so a stale pick falls back safely. */
@@ -116,7 +126,6 @@ function durationChipText(durationSec: number): string {
   return t('hudChrome.crafting.durationChip', {
     seconds: formatNumber(durationSec, {
       maximumFractionDigits: whole ? 0 : DURATION_FRACTION_DIGITS,
-      minimumFractionDigits: whole ? 0 : 0,
     }),
   });
 }
@@ -133,6 +142,10 @@ export function renderCraftingWindow(
   identity?: ProfessionIdentityModel,
   learnHints: ReadonlyMap<string, CraftLearnHint> = new Map(),
   session: CraftCastSessionView = IDLE_CRAFT_CAST_SESSION,
+  // The recipe whose cast JUST ended, for the focus degrade ladder: a repaint
+  // on the cast-end edge hides the strip the player may be standing on, and
+  // this names the row button focus should land back on.
+  focusReturnRecipeId = '',
 ): void {
   deps.hideTooltip();
   // A standalone trapping window (the train/professions shape), not the
@@ -157,7 +170,7 @@ export function renderCraftingWindow(
   const skillListScrollTop = oldSkillList?.scrollTop ?? 0;
   const skillListHadFocus = oldSkillList !== null && document.activeElement === oldSkillList;
   const cardScrollTop = el.querySelector('.profession-identity-card')?.scrollTop ?? 0;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="crafting-orders-btn" data-open-orders data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div><div class="crafting-live" role="status" aria-live="polite"></div>`;
+  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.crafting.title'))}</span><button type="button" class="crafting-orders-btn" data-open-orders data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
   el.querySelector('[data-open-orders]')?.addEventListener('click', () => deps.onOpenOrders());
 
   if (identity) renderProfessionIdentityCard(el, identity);
@@ -206,22 +219,51 @@ export function renderCraftingWindow(
     strip.scrollLeft = tabScrollLeft;
   }
 
-  const body = document.createElement('div');
-  body.className = 'crafting-body';
-  el.appendChild(body);
-
-  // In-window cast progress: always present so live ticks only write fill /
-  // timer (no structure churn). Hidden when idle.
+  // In-window cast strip: a header band ABOVE the scrollable body (a strip
+  // inside the scroller could scroll the live cast out of view), the SINGLE
+  // craft-cast progress surface while this window is open. Structure follows
+  // the DESIGN.md 10.5 progress-bar grammar: dark inset track, gold hardcast
+  // fill, parchment label centered in the bar, tabular timer right, batch
+  // chip beside the track. display:none at rest; the HUD's CastBarPainter
+  // instance owns show/hide + fill/label/timer/aria-valuenow per frame, and
+  // this full paint owns only the COLD batch label. tabindex -1 so the focus
+  // ladder can park keyboard focus here while every row control is disabled
+  // mid-cast (programmatic focus only, never in the Tab cycle).
   const progress = document.createElement('div');
   progress.className = 'crafting-cast-progress';
   progress.setAttribute('role', 'progressbar');
   progress.setAttribute('aria-label', t('hudChrome.crafting.progressAria'));
+  progress.setAttribute('aria-valuemin', '0');
+  progress.setAttribute('aria-valuemax', '100');
+  progress.tabIndex = -1;
+  progress.dataset.focusKey = 'cast-strip';
   progress.innerHTML =
-    `<div class="crafting-cast-progress-track"><div class="crafting-cast-progress-fill"></div></div>` +
-    `<span class="crafting-cast-progress-batch"></span>` +
-    `<span class="crafting-cast-progress-timer"></span>`;
-  body.appendChild(progress);
-  paintCraftCastProgress(el, session);
+    `<div class="crafting-cast-progress-track"><div class="crafting-cast-progress-fill"></div><span class="crafting-cast-progress-label"></span><span class="crafting-cast-progress-timer"></span></div>` +
+    `<span class="crafting-cast-progress-batch"></span>`;
+  el.appendChild(progress);
+  const batchEl = progress.querySelector<HTMLElement>('.crafting-cast-progress-batch');
+  if (batchEl) {
+    if (craftBatchIndicatorVisible(session)) {
+      batchEl.hidden = false;
+      batchEl.textContent = t('hudChrome.crafting.batchRemaining', {
+        remaining: formatNumber(session.batchRemaining, { maximumFractionDigits: 0 }),
+        total: formatNumber(session.batchTotal, { maximumFractionDigits: 0 }),
+      });
+      batchEl.setAttribute(
+        'aria-label',
+        t('hudChrome.crafting.batchRemainingAria', {
+          remaining: formatNumber(session.batchRemaining, { maximumFractionDigits: 0 }),
+          total: formatNumber(session.batchTotal, { maximumFractionDigits: 0 }),
+        }),
+      );
+    } else {
+      batchEl.hidden = true;
+    }
+  }
+
+  const body = document.createElement('div');
+  body.className = 'crafting-body';
+  el.appendChild(body);
 
   const rows = selected !== null ? (sections.get(selected) ?? []) : [];
   if (selected !== null) {
@@ -412,38 +454,56 @@ export function renderCraftingWindow(
       qtyGroup.className = 'crafting-qty-row';
       qtyGroup.setAttribute('role', 'group');
       qtyGroup.setAttribute('aria-label', t('hudChrome.crafting.qtyRowAria'));
+      const qtyCount = formatNumber(qty, { maximumFractionDigits: 0 });
+      // A bare span exposes no accessible name, so the CURRENT value rides
+      // the two buttons' labels instead ({count} param), and every change is
+      // echoed through the polite live region below: the pragmatic fold the
+      // a11y review chose over a composite spinbutton widget.
       const decBtn = document.createElement('button');
       decBtn.type = 'button';
       decBtn.className = 'crafting-qty-btn';
       decBtn.dataset.focusKey = `qty-dec:${row.recipeId}`;
       decBtn.textContent = '-';
-      decBtn.setAttribute('aria-label', t('hudChrome.crafting.qtyDecreaseAria'));
+      decBtn.setAttribute(
+        'aria-label',
+        t('hudChrome.crafting.qtyDecreaseAria', { count: qtyCount }),
+      );
       decBtn.disabled = castingActive || qty <= 1;
       decBtn.addEventListener('click', () => {
         if (castingActive) return;
-        deps.onCraftQty(row.recipeId, clampCraftQty(qty - 1, matsFit));
+        const next = clampCraftQty(qty - 1, matsFit);
+        deps.announce(
+          t('hudChrome.crafting.qtyValueAria', {
+            count: formatNumber(next, { maximumFractionDigits: 0 }),
+          }),
+        );
+        deps.onCraftQty(row.recipeId, next);
       });
       const qtyValue = document.createElement('span');
       qtyValue.className = 'crafting-qty-value';
-      qtyValue.textContent = formatNumber(qty, { maximumFractionDigits: 0 });
-      qtyValue.setAttribute(
-        'aria-label',
-        t('hudChrome.crafting.qtyValueAria', {
-          count: formatNumber(qty, { maximumFractionDigits: 0 }),
-        }),
-      );
+      qtyValue.textContent = qtyCount;
+      qtyValue.setAttribute('aria-hidden', 'true');
       const incBtn = document.createElement('button');
       incBtn.type = 'button';
       incBtn.className = 'crafting-qty-btn';
       incBtn.dataset.focusKey = `qty-inc:${row.recipeId}`;
       incBtn.textContent = '+';
-      incBtn.setAttribute('aria-label', t('hudChrome.crafting.qtyIncreaseAria'));
+      incBtn.setAttribute(
+        'aria-label',
+        t('hudChrome.crafting.qtyIncreaseAria', { count: qtyCount }),
+      );
       // Ceiling is min(50, mats-fit); when mats-fit is 0 the stepper still shows 1.
       const maxQty = clampCraftQty(matsFit > 0 ? matsFit : 1, matsFit > 0 ? matsFit : 1);
       incBtn.disabled = castingActive || qty >= maxQty;
       incBtn.addEventListener('click', () => {
         if (castingActive) return;
-        deps.onCraftQty(row.recipeId, clampCraftQty(qty + 1, matsFit));
+        const next = clampCraftQty(qty + 1, matsFit);
+        deps.announce(
+          t('hudChrome.crafting.qtyValueAria', {
+            count: formatNumber(next, { maximumFractionDigits: 0 }),
+          }),
+        );
+        deps.onCraftQty(row.recipeId, next);
       });
       qtyGroup.appendChild(decBtn);
       qtyGroup.appendChild(qtyValue);
@@ -529,166 +589,58 @@ export function renderCraftingWindow(
   }
   const newCard = el.querySelector<HTMLElement>('.profession-identity-card');
   if (newCard) newCard.scrollTop = cardScrollTop;
-  // Focus across rebuild: craft buttons and close carry data-focus-key so a
-  // cast-start repaint does not drop keyboard focus to body.
+  // Focus across rebuild, with the per-window degrade ladder (#2528 shape):
+  // 1. the same control (skipped by restoreFirstEnabled when the rebuild
+  //    disabled it, which is every row control while a cast runs);
+  // 2. the ACTIVE cast strip (tabindex -1), so Enter on Create never lands
+  //    on Close and closes the window with the next keypress;
+  // 3. the row button of the cast that just ended (focusReturnRecipeId),
+  //    handing focus back where the player started;
+  // 4. the orders button, then Close, the calm last resorts.
   if (focusKey !== null) {
     const keyed = [...el.querySelectorAll<HTMLElement>('[data-focus-key]')];
     const exact = keyed.find((node) => node.dataset.focusKey === focusKey) ?? null;
-    restoreFirstEnabled([exact, el.querySelector<HTMLElement>('[data-close]')]);
+    const stripCandidate = session.active ? progress : null;
+    const returnRow = focusReturnRecipeId
+      ? (keyed.find((node) => node.dataset.focusKey === `craft:${focusReturnRecipeId}`) ?? null)
+      : null;
+    restoreFirstEnabled([
+      exact === progress && !session.active ? null : exact,
+      stripCandidate,
+      returnRow,
+      el.querySelector<HTMLElement>('[data-open-orders]'),
+      el.querySelector<HTMLElement>('[data-close]'),
+    ]);
   }
-  // Live region: announce craft start only on idle→active edge. Complete and
-  // cancel announcements are set by the HUD event arms (setCraftCastLiveMessage).
-  // Re-announcing on every full paint would spam "Crafting {name}" on bag/
-  // reagent-driven rebuilds mid-cast.
+  // Announce craft start only on the idle-to-active edge (re-announcing on
+  // every full paint would spam "Crafting {name}" on bag/reagent-driven
+  // rebuilds mid-cast). Complete and cancel lines come from the HUD event
+  // arms. When no display name resolves, say nothing: a raw internal id read
+  // aloud is worse than silence.
   const prevSig = el.dataset.craftLiveStartSig ?? '';
   const nextSig = session.active ? `start:${session.recipeId}` : '';
   if (session.active && nextSig !== prevSig) {
     const activeRow = view.recipes.find((r) => r.recipeId === session.recipeId);
-    const name = activeRow?.result
-      ? itemDisplayName(activeRow.result)
-      : activeRow?.resultItemId || session.recipeId;
-    if (name) setCraftCastLiveMessage(el, t('hudChrome.crafting.announceStart', { name }));
+    const name = activeRow?.result ? itemDisplayName(activeRow.result) : '';
+    if (name) deps.announce(t('hudChrome.crafting.announceStart', { name }));
   }
   el.dataset.craftLiveStartSig = nextSig;
 }
 
-/** Cached progress-strip refs + last written values for write-elision. */
-interface CraftProgressPaintCache {
-  root: HTMLElement;
-  fill: HTMLElement | null;
-  timer: HTMLElement | null;
-  batch: HTMLElement | null;
-  active: boolean;
-  width: string;
-  valueNow: string;
-  timerText: string;
-  batchText: string;
-  batchHidden: boolean;
-  batchAria: string;
-}
-
-const craftProgressCache = new WeakMap<HTMLElement, CraftProgressPaintCache>();
-
-function craftProgressPaintCacheFor(el: HTMLElement): CraftProgressPaintCache | null {
-  const hit = craftProgressCache.get(el);
-  if (hit && hit.root.isConnected) return hit;
-  const root = el.querySelector<HTMLElement>('.crafting-cast-progress');
-  if (!root) return null;
-  const cache: CraftProgressPaintCache = {
-    root,
-    fill: root.querySelector<HTMLElement>('.crafting-cast-progress-fill'),
-    timer: root.querySelector<HTMLElement>('.crafting-cast-progress-timer'),
-    batch: root.querySelector<HTMLElement>('.crafting-cast-progress-batch'),
-    active: false,
-    width: '',
-    valueNow: '',
-    timerText: '',
-    batchText: '',
-    batchHidden: true,
-    batchAria: '',
-  };
-  craftProgressCache.set(el, cache);
-  return cache;
-}
-
-/**
- * Update only the in-window cast progress strip (fill + timer + visibility).
- * Safe to call every frame while a craft cast is running: no subtree rebuild.
- * Reads real session progress (never invents timers). Write-elides identical
- * frames (cached element refs + last width/timer/batch keys).
- */
-export function paintCraftCastProgress(el: HTMLElement, session: CraftCastSessionView): void {
-  const cache = craftProgressPaintCacheFor(el);
-  if (!cache) return;
-  const { root, fill, timer, batch } = cache;
-  if (!session.active) {
-    // Always force idle visibility on the first paint (cache.active starts
-    // false, but the fresh progress node is not hidden by default).
-    if (cache.active || !root.hidden) {
-      root.hidden = true;
-      root.removeAttribute('aria-valuenow');
-      root.removeAttribute('aria-valuemin');
-      root.removeAttribute('aria-valuemax');
-      if (fill && cache.width !== '0%') fill.style.width = '0%';
-      if (timer && cache.timerText !== '') timer.textContent = '';
-      if (batch && (!cache.batchHidden || cache.batchText !== '')) {
-        batch.textContent = '';
-        batch.hidden = true;
-        batch.removeAttribute('aria-label');
-      }
-      cache.active = false;
-      cache.width = '0%';
-      cache.valueNow = '';
-      cache.timerText = '';
-      cache.batchText = '';
-      cache.batchHidden = true;
-      cache.batchAria = '';
-    }
-    return;
-  }
-  if (!cache.active) {
-    root.hidden = false;
-    root.setAttribute('aria-valuemin', '0');
-    root.setAttribute('aria-valuemax', '100');
-    cache.active = true;
-  }
-  // CSS width is a layout token, not player-facing text: toFixed (cast_bar_painter).
-  const width = `${(session.progress * 100).toFixed(PROGRESS_PERCENT_DIGITS)}%`;
-  if (fill && cache.width !== width) {
-    fill.style.width = width;
-    cache.width = width;
-  }
-  const valueNow = String(Math.round(session.progress * 100));
-  if (cache.valueNow !== valueNow) {
-    root.setAttribute('aria-valuenow', valueNow);
-    cache.valueNow = valueNow;
-  }
-  const timerText = t('hudChrome.crafting.progressTimer', {
-    seconds: formatNumber(session.remainingSec, {
-      maximumFractionDigits: PROGRESS_TIMER_DIGITS,
-      minimumFractionDigits: 0,
-    }),
-  });
-  if (timer && cache.timerText !== timerText) {
-    timer.textContent = timerText;
-    cache.timerText = timerText;
-  }
-  if (batch) {
-    if (craftBatchIndicatorVisible(session)) {
-      const batchText = t('hudChrome.crafting.batchRemaining', {
-        remaining: formatNumber(session.batchRemaining, { maximumFractionDigits: 0 }),
-        total: formatNumber(session.batchTotal, { maximumFractionDigits: 0 }),
-      });
-      const batchAria = t('hudChrome.crafting.batchRemainingAria', {
-        remaining: formatNumber(session.batchRemaining, { maximumFractionDigits: 0 }),
-        total: formatNumber(session.batchTotal, { maximumFractionDigits: 0 }),
-      });
-      if (cache.batchHidden) {
-        batch.hidden = false;
-        cache.batchHidden = false;
-      }
-      if (cache.batchText !== batchText) {
-        batch.textContent = batchText;
-        cache.batchText = batchText;
-      }
-      if (cache.batchAria !== batchAria) {
-        batch.setAttribute('aria-label', batchAria);
-        cache.batchAria = batchAria;
-      }
-    } else if (!cache.batchHidden || cache.batchText !== '' || cache.batchAria !== '') {
-      batch.textContent = '';
-      batch.hidden = true;
-      batch.removeAttribute('aria-label');
-      cache.batchText = '';
-      cache.batchHidden = true;
-      cache.batchAria = '';
-    }
-  }
-}
-
-/** Write a polite live-region line into the open crafting window (start /
- *  complete / cancel). No-op when the region is absent (window never painted). */
-export function setCraftCastLiveMessage(el: HTMLElement, text: string): void {
-  const live = el.querySelector<HTMLElement>('.crafting-live');
-  if (live) live.textContent = text;
+/** The cast strip's element set for the HUD's per-frame CastBarPainter
+ *  instance (bar / fill / label / timer, the CastBarElements shape), re-read
+ *  after every full paint because the rebuild replaces the nodes. Null when
+ *  the window has never painted. The painter owns show/hide (display flex /
+ *  none), fill width, the label (the recipe's display name), the timer, and
+ *  aria-valuenow, all through the PainterHost elided writers; the batch chip
+ *  is painted cold by renderCraftingWindow. */
+export function craftCastStripElements(
+  el: HTMLElement,
+): { bar: HTMLElement; fill: HTMLElement; label: HTMLElement; timer: HTMLElement } | null {
+  const bar = el.querySelector<HTMLElement>('.crafting-cast-progress');
+  const fill = el.querySelector<HTMLElement>('.crafting-cast-progress-fill');
+  const label = el.querySelector<HTMLElement>('.crafting-cast-progress-label');
+  const timer = el.querySelector<HTMLElement>('.crafting-cast-progress-timer');
+  if (!bar || !fill || !label || !timer) return null;
+  return { bar, fill, label, timer };
 }

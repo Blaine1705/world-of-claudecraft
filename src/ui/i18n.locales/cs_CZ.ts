@@ -4561,7 +4561,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.commissionToggleHint': 'Váže se na první postavu, která ho přijme v obchodu.',
   'hudChrome.crafting.commissionUnbound': 'Zakázkový předmět: váže se na prvního příjemce',
   'hudChrome.crafting.close': 'Zavřít výrobu',
-  'hudChrome.crafting.craft': 'Vyrobit',
   'hudChrome.crafting.craftedToast': 'Vyrobeno: {name}',
   'hudChrome.crafting.difficultyMinimal': 'Minimální zisk dovednosti',
   'hudChrome.crafting.empty': 'Zatím nejsou známy žádné recepty.',
@@ -8189,7 +8188,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zvyšuje Intelekt o {pct} %',
   'hudChrome.auraEffect.increasePct.sta': 'Zvyšuje Výdrž o {pct} %',
   'hudChrome.crafting.recipeNotLearned': 'Tento recept ses ještě nenaučil.',
-  'hudChrome.crafting.throttled': 'Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.mobile.chatPlaceholder': 'Něco napiš...',
   'hudChrome.mobile.hideKeyboard': 'Skrýt klávesnici',
   'hudChrome.unitFrame.partyChip': 'Skupina',
@@ -10719,13 +10717,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš arcanové materiály. Tuto akci nelze vrátit.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Rozzačarovat {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Rozzačaruješ příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.disenchantedLine': 'Rozzačaruješ {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Okouzlíš {item} pomocí {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Na toto okouzlení nemáš materiály.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Okouzluješ příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.enchantUnknown': 'Toto okouzlení neexistuje.',
   'hudChrome.enchanting.enchantWrongSlot': 'Toto okouzlení nelze aplikovat na tento předmět.',
   'hudChrome.enchanting.noEnchants': 'Žádné okouzlení nepoužívá tuto reagencii.',
@@ -10739,8 +10733,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš řemeslné materiály. Tuto akci nelze vrátit.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Rozebrat {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Rozebíráš příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.salvagedLine': 'Rozebereš {item}.',
   'hudChrome.enchanting.targetTitle': 'Vybrat předmět',
   'hudChrome.unbind.cannotAfford': 'Na odpoutání nemáš dostatek prostředků.',

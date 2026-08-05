@@ -1247,7 +1247,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "zh_CN": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.crafting.durationChip",
     "hudChrome.crafting.progressTimer",
@@ -1258,7 +1257,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "zh_TW": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.crafting.durationChip",
     "hudChrome.crafting.progressTimer",
@@ -1269,7 +1267,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "ko_KR": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.crafting.durationChip",
     "hudChrome.crafting.progressTimer",
@@ -1280,7 +1277,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "ja_JP": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.crafting.durationChip",
     "hudChrome.crafting.progressTimer",
@@ -1497,7 +1493,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "ru_RU": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.crafting.durationChip",
     "hudChrome.crafting.progressTimer",

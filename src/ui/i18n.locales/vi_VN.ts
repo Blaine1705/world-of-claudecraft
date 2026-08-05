@@ -2406,13 +2406,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Thao tác này phá hủy một bản đặc biệt của {item} (có chữ ký, kiệt tác hoặc đã pháp khắc) và thu được nguyên liệu huyền bí. Không thể hoàn tác.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Hủy Pháp Khắc {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Bạn đang hủy pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.',
   'hudChrome.enchanting.disenchantedLine': 'Bạn hủy pháp khắc {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Bạn pháp khắc {item} với {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Bạn không có đủ nguyên liệu cho phép khắc đó.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Bạn đang pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.',
   'hudChrome.enchanting.enchantUnknown': 'Phép khắc đó không tồn tại.',
   'hudChrome.enchanting.enchantWrongSlot': 'Phép khắc đó không thể áp dụng cho vật phẩm đó.',
   'hudChrome.enchanting.noEnchants': 'Không có phép khắc nào dùng nguyên liệu này.',
@@ -2426,8 +2422,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Thao tác này phá hủy một bản đặc biệt của {item} (có chữ ký, kiệt tác hoặc đã pháp khắc) và thu được nguyên liệu chế tác. Không thể hoàn tác.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Tháo Dỡ {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Bạn đang tháo dỡ quá nhanh. Hãy đợi một lát rồi thử lại.',
   'hudChrome.enchanting.salvagedLine': 'Bạn tháo dỡ {item}.',
   'hudChrome.enchanting.targetTitle': 'Chọn vật phẩm để pháp khắc',
   'hudChrome.frameReset.label': 'Đặt Lại Vị Trí Các Khung',
@@ -8820,7 +8814,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Mọi thứ trên trang này đều tồn tại trong trò chơi: nhấn Esc để mở phần tùy chọn. Menu mở ra ở một Tổng Quan gồm những mục thiết yếu được ghim, với các hạng mục trên một thanh bên cạnh: các cài đặt dưới đây nằm trong Đồ Họa, Giao Diện, và Trợ Năng thuộc nhóm Hiển Thị, còn Lớp Phủ Hiệu Suất nằm trong Hệ Thống. Nhanh hơn nữa, gõ một cái tên vào ô tìm kiếm ở phía trên và nhảy thẳng tới nó.',
   'guide.settingsPage.whyLabel': 'Tại sao nó hoạt động:',
   'hudChrome.crafting.close': 'Đóng chế tạo',
-  'hudChrome.crafting.craft': 'thủ công',
   'hudChrome.crafting.craftedToast': 'Đã chế tác: {name}',
   'hudChrome.crafting.empty': 'Chưa có công thức nấu ăn nào được biết đến.',
   'hudChrome.crafting.insufficientMaterials': 'Bạn không có tài liệu cho việc đó.',
@@ -8914,7 +8907,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Tăng Trí Tuệ thêm {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Tăng Thể Lực thêm {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Bạn chưa học công thức đó.',
-  'hudChrome.crafting.throttled': 'Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.',
   'hudChrome.mobile.chatPlaceholder': 'Nói gì đó...',
   'hudChrome.mobile.hideKeyboard': 'Ẩn bàn phím',
   'hudChrome.unitFrame.partyChip': 'Tổ Đội',

@@ -4,10 +4,10 @@
 // Host-agnostic and DOM/i18n-free: duration chips, craft-button state machine,
 // in-window progress fraction, and batch qty clamp all resolve here from
 // recipe + entity cast session inputs. The thin painter (crafting_window.ts)
-// localizes and paints. Session recipe id prefers the sim field (offline);
-// online clients that never wire craftCastRecipeId may pass a click-time
-// fallbackRecipeId. Batch remaining/total prefer entity fields when set;
-// online may pass click-time fallbacks (session fields are never wired).
+// localizes and paints. The entity cast/session fields are authoritative on
+// BOTH hosts: the offline Sim writes them directly and the online mirror
+// decodes the self-only `ccast` wire fragment into the same fields, so the
+// window needs no click-time guesses.
 
 import { CRAFT_BATCH_MAX } from '../sim/content/professions';
 import { craftCastDurationSec } from '../sim/professions/craft_cast_duration';
@@ -32,13 +32,11 @@ export interface CraftCastSessionInput {
   castingAbility: string | null;
   castRemaining: number;
   castTotal: number;
-  /** Entity craftCastRecipeId ('' when idle or unwired online). */
+  /** Entity craftCastRecipeId ('' when idle). */
   craftCastRecipeId: string;
-  /** Click-time recipe id when the entity field is empty (online client). */
-  fallbackRecipeId?: string;
-  /** Entity craftCastBatchRemaining, or online click-time fallback. */
+  /** Entity craftCastBatchRemaining (0 when idle). */
   craftCastBatchRemaining?: number;
-  /** Entity craftCastBatchTotal, or online click-time fallback. */
+  /** Entity craftCastBatchTotal (0 when idle). */
   craftCastBatchTotal?: number;
 }
 
@@ -80,8 +78,7 @@ export function buildCraftCastSession(input: CraftCastSessionInput): CraftCastSe
   }
   const remainingSec = Math.max(0, input.castRemaining);
   const totalSec = Math.max(0, input.castTotal);
-  const recipeId =
-    input.craftCastRecipeId !== '' ? input.craftCastRecipeId : (input.fallbackRecipeId ?? '');
+  const recipeId = input.craftCastRecipeId;
   const batchRemaining = Math.max(0, Math.floor(input.craftCastBatchRemaining ?? 0));
   const batchTotal = Math.max(0, Math.floor(input.craftCastBatchTotal ?? 0));
   return {
@@ -171,7 +168,11 @@ export function recipeDurationSec(recipe: {
 }
 
 /** Compact signature of craft-cast activity for cold-window rebuild gates:
- *  active flag + recipe id only (progress ticks use paintCraftCastProgress). */
+ *  active flag + recipe id + batch counters, so every batch item boundary
+ *  repaints the window (the batch label and button states are painted on the
+ *  full-paint path; per-frame fill/timer ride the strip painter alone). */
 export function craftCastActivitySig(session: CraftCastSessionView): string {
-  return session.active ? `1:${session.recipeId}` : '0';
+  return session.active
+    ? `1:${session.recipeId}:${session.batchRemaining}:${session.batchTotal}`
+    : '0';
 }

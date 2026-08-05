@@ -8843,7 +8843,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bu sayfadaki her şey oyunun içindedir: seçenekleri açmak için Esc tuşuna basın. Menü, sabitlenmiş temel ayarların bir Genel Bakış ekranıyla açılır ve kategoriler onun yanındaki bir rayda yer alır: aşağıdaki ayarlar Ekran grubundaki Grafikler, Arayüz ve Erişilebilirlik başlıkları altında, Performans Arayüzü ise Sistem altında bulunur. Daha da hızlısı, üstteki arama kutusuna bir ad yazıp doğrudan ona atlayın.',
   'guide.settingsPage.whyLabel': 'Neden işe yarıyor:',
   'hudChrome.crafting.close': 'İşçiliği kapat',
-  'hudChrome.crafting.craft': 'Zanaat',
   'hudChrome.crafting.craftedToast': 'Hazırlanma Tarihi: {name}',
   'hudChrome.crafting.empty': 'Henüz bilinen bir tarif yok.',
   'hudChrome.crafting.insufficientMaterials': 'Bunun için malzemeleriniz yok.',
@@ -8937,7 +8936,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zekayı %{pct} artırır',
   'hudChrome.auraEffect.increasePct.sta': 'Dayanıklılığı %{pct} artırır',
   'hudChrome.crafting.recipeNotLearned': 'Bu tarifi henüz öğrenmedin.',
-  'hudChrome.crafting.throttled': 'Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.',
   'hudChrome.mobile.chatPlaceholder': 'Bir şey söyle...',
   'hudChrome.mobile.hideKeyboard': 'Klavyeyi gizle',
   'hudChrome.unitFrame.partyChip': 'Grup',
@@ -10811,13 +10809,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve arkanik malzeme verir. Bu geri alınamaz.",
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} büyüsü bozulsun mu?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Çok hızlı büyü bozuyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.disenchantedLine': '{item} büyüsünü bozdunuz.',
   'hudChrome.enchanting.enchantAppliedLine': '{item} üzerine {enchant} büyüsü uyguladınız.',
   'hudChrome.enchanting.enchantInsufficient': 'O büyü için malzemeniz yok.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Çok hızlı büyü yapıyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.enchantUnknown': 'O büyü mevcut değil.',
   'hudChrome.enchanting.enchantWrongSlot': 'Bu büyü o eşyaya uygulanamaz.',
   'hudChrome.enchanting.noEnchants': 'Hiçbir büyü bu malzemeyi kullanmıyor.',
@@ -10831,8 +10825,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve zanaat malzemesi verir. Bu geri alınamaz.",
   'hudChrome.enchanting.salvageConfirmTitle': '{item} parçalansın mı?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Çok hızlı parçalıyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.salvagedLine': '{item} parçaladınız.',
   'hudChrome.enchanting.targetTitle': 'Büyülenecek eşya seçin',
   'hudChrome.unbind.cannotAfford': 'Çözüm ücretini karşılayamazsınız.',

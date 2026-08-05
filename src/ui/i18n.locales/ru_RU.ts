@@ -7706,7 +7706,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': 'Крафт',
   'hudChrome.crafting.dialogOptionAria': 'Открыть окно крафта: {craft}',
   'hudChrome.crafting.close': 'Закрыть крафт',
-  'hudChrome.crafting.craft': 'Создать',
   'hudChrome.crafting.reagentsNeeded': 'Требуется:',
   'hudChrome.crafting.empty': 'Известных рецептов пока нет.',
   'hudChrome.crafting.resultAria': 'Создать {name}',
@@ -8063,6 +8062,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.prev': 'Предыдущая страница',
   'editor.openDrawer.next': 'Следующая страница',
   'editor.openDrawer.page': 'Страница {page}',
+  'editor.status.campCapReached': 'Достигнут предел лагерей ({max}). Новый лагерь не добавлен.',
   'editor.status.savedLocal': 'Карта «{name}» сохранена в этом браузере.',
   'editor.status.savedServer': 'Карта «{name}» сохранена на сервере (v{version}).',
   'editor.status.savedLocalOnly':
@@ -8809,8 +8809,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': 'ПОРАЖЕНИЕ! Ваша Yumi пала.',
   'hudChrome.crafting.comboRequirementUnmet':
     'У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.',
-  'hudChrome.crafting.throttled':
-    'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
   'hudChrome.crafting.noBagSpace': 'В сумках нет места для созданного предмета.',
   // Professions 2.0 (M16 non-Latin fills).
@@ -10579,12 +10577,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': 'У вас нет этого предмета.',
   'hudChrome.enchanting.notDisenchantable': 'Это нельзя распылить.',
   'hudChrome.enchanting.notSalvageable': 'Это нельзя разобрать.',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Вы распыляете слишком быстро. Подождите немного и попробуйте снова.',
-  'hudChrome.enchanting.salvageThrottled':
-    'Вы разбираете слишком быстро. Подождите немного и попробуйте снова.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Вы зачаровываете слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.enchanting.enchantWrongSlot': 'Эти чары нельзя наложить на этот предмет.',
   'hudChrome.enchanting.enchantUnknown': 'Таких чар не существует.',
   'hudChrome.enchanting.enchantInsufficient': 'У вас нет материалов для этих чар.',
@@ -11346,12 +11338,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.createAll': 'Создать всё',
   'hudChrome.crafting.createAllAria': 'Создать максимальное число копий этого рецепта из имеющихся материалов',
   'hudChrome.crafting.qtyRowAria': 'Количество',
-  'hudChrome.crafting.qtyDecreaseAria': 'Уменьшить количество',
-  'hudChrome.crafting.qtyIncreaseAria': 'Увеличить количество',
+  'hudChrome.crafting.qtyDecreaseAria': 'Уменьшить количество (сейчас {count})',
+  'hudChrome.crafting.qtyIncreaseAria': 'Увеличить количество (сейчас {count})',
   'hudChrome.crafting.qtyValueAria': 'Количество, {count}',
   'hudChrome.crafting.batchRemaining': 'Осталось {remaining} из {total}',
   'hudChrome.crafting.batchRemainingAria': 'Осталось {remaining} из {total} созданий',
-  'hudChrome.crafting.durationAria': 'Применение {seconds} с',
+  'hudChrome.crafting.durationAria': 'Время применения: {seconds} с',
   'hudChrome.crafting.progressAria': 'Прогресс изготовления',
   'hudChrome.crafting.announceStart': 'Изготавливается: {name}',
   'hudChrome.crafting.announceComplete': 'Изготовлено: {name}',

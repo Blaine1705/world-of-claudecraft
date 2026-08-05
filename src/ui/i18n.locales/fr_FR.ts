@@ -6685,14 +6685,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux arcaniques. Cette action est irréversible.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Désenchanter {item} ?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Vous désenchantez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.disenchantedLine': 'Vous désenchantez {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Vous enchantez {item} avec {enchant}.',
   'hudChrome.enchanting.enchantInsufficient':
     "Vous n'avez pas les matériaux pour cet enchantement.",
-  'hudChrome.enchanting.enchantThrottled':
-    'Vous enchantez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.enchantUnknown': "Cet enchantement n'existe pas.",
   'hudChrome.enchanting.enchantWrongSlot':
     'Cet enchantement ne peut pas être appliqué à cet objet.',
@@ -6707,8 +6703,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     "Cela détruit une copie spéciale de {item} (signée, de maître ou enchantée) et donne des matériaux d'artisanat. Cette action est irréversible.",
   'hudChrome.enchanting.salvageConfirmTitle': 'Récupérer {item} ?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Vous récupérez trop vite. Attendez un instant et réessayez.',
   'hudChrome.enchanting.salvagedLine': 'Vous récupérez {item}.',
   'hudChrome.enchanting.targetTitle': 'Choisissez un objet à enchanter',
   'hudChrome.meters.move': 'Faites glisser pour déplacer ce compteur',
@@ -8867,7 +8861,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Tout ce qui figure sur cette page vit dans le jeu : appuyez sur Échap pour ouvrir les options. Le menu s'ouvre sur un Aperçu des essentiels épinglés, les catégories rangées sur un rail à côté : les réglages ci-dessous se trouvent sous Graphiques, Interface et Accessibilité dans le groupe Affichage, et la Superposition de performances sous Système. Plus rapide encore, tapez un nom dans la barre de recherche en haut pour y accéder directement.",
   'guide.settingsPage.whyLabel': 'Pourquoi ça marche$1',
   'hudChrome.crafting.close': 'Fermer la fabrication',
-  'hudChrome.crafting.craft': 'Artisanat',
   'hudChrome.crafting.craftedToast': 'Fabriqué$1 {name}',
   'hudChrome.crafting.empty': "Aucune recette connue pour l'instant.",
   'hudChrome.crafting.insufficientMaterials': "Vous n'avez pas le matériel pour cela.",
@@ -9064,7 +9057,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': "Augmente l'intelligence de {pct}%",
   'hudChrome.auraEffect.increasePct.sta': "Augmente l'endurance de {pct}%",
   'hudChrome.crafting.recipeNotLearned': "Vous n'avez pas encore appris cette recette.",
-  'hudChrome.crafting.throttled': 'Vous fabriquez trop vite. Patientez un instant et réessayez.',
   'hudChrome.mobile.chatPlaceholder': 'Dites quelque chose…',
   'hudChrome.mobile.hideKeyboard': 'Masquer le clavier',
   'hudChrome.unitFrame.partyChip': 'Groupe',

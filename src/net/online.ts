@@ -3226,6 +3226,13 @@ export class ClientWorld implements IWorld {
             ticksElapsed: 0,
           }
         : null;
+      // Craft-cast session mirror (self-only `ccast`, the eat/drk shape): the
+      // crafting window reads the SAME entity fields offline and online, so
+      // the recipe highlight and batch counter survive a mid-cast window
+      // close/reopen and always show the server's clamped batch numbers.
+      e.craftCastRecipeId = s.ccast?.r ?? '';
+      e.craftCastBatchRemaining = s.ccast?.rem ?? 0;
+      e.craftCastBatchTotal = s.ccast?.tot ?? 0;
       // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
       // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
       // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,

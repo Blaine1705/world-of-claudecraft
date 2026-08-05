@@ -95,13 +95,12 @@ describe('buildCraftCastSession', () => {
     ).toBe(false);
   });
 
-  it('is active for CRAFT_CAST_ID with positive total and prefers entity recipe id', () => {
+  it('is active for CRAFT_CAST_ID with positive total and carries the entity recipe id', () => {
     const session = buildCraftCastSession({
       castingAbility: CRAFT_CAST_ID,
       castRemaining: 1,
       castTotal: 2,
       craftCastRecipeId: 'recipe_entity',
-      fallbackRecipeId: 'recipe_click',
       craftCastBatchRemaining: 2,
       craftCastBatchTotal: 5,
     });
@@ -115,15 +114,18 @@ describe('buildCraftCastSession', () => {
     expect(craftBatchIndicatorVisible(session)).toBe(true);
   });
 
-  it('uses fallbackRecipeId when the entity field is empty (online client)', () => {
+  it('stays active with an empty recipe id (mirror gap frame): rows read busy, never a stale name', () => {
+    // Entity fields are authoritative on both hosts (the self-only ccast wire
+    // fragment online); an empty id on an active cast is at most a one-frame
+    // decode gap and must not invent a recipe.
     const session = buildCraftCastSession({
       castingAbility: CRAFT_CAST_ID,
       castRemaining: 2,
       castTotal: 2,
       craftCastRecipeId: '',
-      fallbackRecipeId: 'recipe_click',
     });
-    expect(session.recipeId).toBe('recipe_click');
+    expect(session.active).toBe(true);
+    expect(session.recipeId).toBe('');
     expect(session.progress).toBe(0);
   });
 });
@@ -231,8 +233,30 @@ describe('craftCastActivitySig', () => {
       castTotal: 2,
       craftCastRecipeId: 'recipe_a',
     });
-    expect(craftCastActivitySig(mid)).toBe('1:recipe_a');
+    expect(craftCastActivitySig(mid)).toBe('1:recipe_a:0:0');
     expect(craftCastActivitySig(later)).toBe(craftCastActivitySig(mid));
     expect(craftCastActivitySig(IDLE_CRAFT_CAST_SESSION)).toBe('0');
+  });
+
+  it('moves on batch item boundaries so the cold batch label repaints', () => {
+    const two = buildCraftCastSession({
+      castingAbility: CRAFT_CAST_ID,
+      castRemaining: 1,
+      castTotal: 2,
+      craftCastRecipeId: 'recipe_a',
+      craftCastBatchRemaining: 2,
+      craftCastBatchTotal: 3,
+    });
+    const one = buildCraftCastSession({
+      castingAbility: CRAFT_CAST_ID,
+      castRemaining: 2,
+      castTotal: 2,
+      craftCastRecipeId: 'recipe_a',
+      craftCastBatchRemaining: 1,
+      craftCastBatchTotal: 3,
+    });
+    expect(craftCastActivitySig(two)).toBe('1:recipe_a:2:3');
+    expect(craftCastActivitySig(one)).toBe('1:recipe_a:1:3');
+    expect(craftCastActivitySig(two)).not.toBe(craftCastActivitySig(one));
   });
 });

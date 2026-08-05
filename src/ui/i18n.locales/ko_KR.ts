@@ -7584,7 +7584,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': '제작',
   'hudChrome.crafting.dialogOptionAria': '{craft} 제작 창 열기',
   'hudChrome.crafting.close': '제작 닫기',
-  'hudChrome.crafting.craft': '제작',
   'hudChrome.crafting.reagentsNeeded': '필요 재료:',
   'hudChrome.crafting.empty': '알려진 제작법이 없습니다.',
   'hudChrome.crafting.resultAria': '{name} 제작',
@@ -7932,6 +7931,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.prev': '이전 페이지',
   'editor.openDrawer.next': '다음 페이지',
   'editor.openDrawer.page': '{page}페이지',
+  'editor.status.campCapReached': '캠프 한도({max})에 도달했습니다. 새 캠프가 추가되지 않았습니다.',
   'editor.status.savedLocal': '"{name}"을(를) 이 브라우저에 저장했습니다.',
   'editor.status.savedServer': '"{name}"을(를) 서버에 저장했습니다 (v{version}).',
   'editor.status.savedLocalOnly':
@@ -8662,7 +8662,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '패배! 아군 Yumi가 쓰러졌습니다.',
   'hudChrome.crafting.comboRequirementUnmet':
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
-  'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
   'hudChrome.crafting.noBagSpace': '가방에 제작한 아이템을 넣을 공간이 없습니다.',
   // Professions 2.0 (M16 non-Latin fills).
@@ -10404,12 +10403,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': '해당 아이템을 가지고 있지 않습니다.',
   'hudChrome.enchanting.notDisenchantable': '해당 아이템은 마력을 추출할 수 없습니다.',
   'hudChrome.enchanting.notSalvageable': '해당 아이템은 분해할 수 없습니다.',
-  'hudChrome.enchanting.disenchantThrottled':
-    '너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.enchanting.salvageThrottled':
-    '너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.enchanting.enchantThrottled':
-    '너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.enchanting.enchantWrongSlot': '그 마법부여는 해당 아이템에 적용할 수 없습니다.',
   'hudChrome.enchanting.enchantUnknown': '해당 마법부여가 존재하지 않습니다.',
   'hudChrome.enchanting.enchantInsufficient': '해당 마법부여에 필요한 재료가 없습니다.',
@@ -11164,12 +11157,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.createAll': '모두 제작',
   'hudChrome.crafting.createAllAria': '보유 재료로 만들 수 있는 최대 개수만큼 이 제작법을 만듭니다',
   'hudChrome.crafting.qtyRowAria': '제작 수량',
-  'hudChrome.crafting.qtyDecreaseAria': '제작 수량 줄이기',
-  'hudChrome.crafting.qtyIncreaseAria': '제작 수량 늘리기',
+  'hudChrome.crafting.qtyDecreaseAria': '제작 수량 줄이기 (현재 {count})',
+  'hudChrome.crafting.qtyIncreaseAria': '제작 수량 늘리기 (현재 {count})',
   'hudChrome.crafting.qtyValueAria': '제작 수량, {count}',
   'hudChrome.crafting.batchRemaining': '남은 수 {remaining}/{total}',
   'hudChrome.crafting.batchRemainingAria': '{total}개 중 {remaining}개 남음',
-  'hudChrome.crafting.durationAria': '{seconds}초 시전',
+  'hudChrome.crafting.durationAria': '시전 시간: {seconds}초',
   'hudChrome.crafting.progressAria': '제작 진행',
   'hudChrome.crafting.announceStart': '{name} 제작 중',
   'hudChrome.crafting.announceComplete': '{name} 제작 완료',

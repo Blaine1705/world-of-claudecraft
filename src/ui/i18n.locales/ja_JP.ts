@@ -7593,7 +7593,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': '製作',
   'hudChrome.crafting.dialogOptionAria': '{craft}の製作ウィンドウを開く',
   'hudChrome.crafting.close': '製作を閉じる',
-  'hudChrome.crafting.craft': '製作',
   'hudChrome.crafting.reagentsNeeded': '必要素材:',
   'hudChrome.crafting.empty': '既知のレシピはありません。',
   'hudChrome.crafting.resultAria': '{name}を製作',
@@ -7946,6 +7945,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.prev': '前のページ',
   'editor.openDrawer.next': '次のページ',
   'editor.openDrawer.page': 'ページ {page}',
+  'editor.status.campCapReached': 'キャンプ数の上限（{max}）に達しました。新しいキャンプは追加されませんでした。',
   'editor.status.savedLocal': '「{name}」をこのブラウザーに保存しました。',
   'editor.status.savedServer': '「{name}」をサーバーに保存しました（v{version}）。',
   'editor.status.savedLocalOnly':
@@ -8680,7 +8680,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '敗北！Yumiが倒れてしまった。',
   'hudChrome.crafting.comboRequirementUnmet':
     'その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。',
-  'hudChrome.crafting.throttled': '製作が速すぎます。少し待ってからもう一度お試しください。',
   'hudChrome.crafting.recipeNotLearned': 'そのレシピはまだ習得していません。',
   'hudChrome.crafting.noBagSpace': 'バッグに製作したアイテムを入れる空きがありません。',
   // Professions 2.0 (M16 non-Latin fills).
@@ -10413,12 +10412,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': 'そのアイテムを所持していません。',
   'hudChrome.enchanting.notDisenchantable': 'それは魔力分解できません。',
   'hudChrome.enchanting.notSalvageable': 'それは解体できません。',
-  'hudChrome.enchanting.disenchantThrottled':
-    '魔力分解が速すぎます。少し待ってからもう一度お試しください。',
-  'hudChrome.enchanting.salvageThrottled':
-    '解体が速すぎます。少し待ってからもう一度お試しください。',
-  'hudChrome.enchanting.enchantThrottled':
-    'エンチャントが速すぎます。少し待ってからもう一度お試しください。',
   'hudChrome.enchanting.enchantWrongSlot': 'そのエンチャントはそのアイテムには付与できません。',
   'hudChrome.enchanting.enchantUnknown': 'そのエンチャントは存在しません。',
   'hudChrome.enchanting.enchantInsufficient': 'そのエンチャントに必要な素材がありません。',
@@ -11176,12 +11169,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.createAll': 'すべて作成',
   'hudChrome.crafting.createAllAria': '所持材料で作れる最大数までこのレシピを作成する',
   'hudChrome.crafting.qtyRowAria': '作成数',
-  'hudChrome.crafting.qtyDecreaseAria': '作成数を減らす',
-  'hudChrome.crafting.qtyIncreaseAria': '作成数を増やす',
+  'hudChrome.crafting.qtyDecreaseAria': '作成数を減らす（現在 {count}）',
+  'hudChrome.crafting.qtyIncreaseAria': '作成数を増やす（現在 {count}）',
   'hudChrome.crafting.qtyValueAria': '作成数、{count}',
   'hudChrome.crafting.batchRemaining': '残り {remaining}/{total}',
   'hudChrome.crafting.batchRemainingAria': '残り {remaining} 個、合計 {total} 個',
-  'hudChrome.crafting.durationAria': '{seconds} 秒の詠唱',
+  'hudChrome.crafting.durationAria': '詠唱時間: {seconds} 秒',
   'hudChrome.crafting.progressAria': '製作の進行',
   'hudChrome.crafting.announceStart': '{name} を製作中',
   'hudChrome.crafting.announceComplete': '{name} の製作が完了',

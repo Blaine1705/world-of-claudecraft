@@ -5682,59 +5682,83 @@
     white-space: nowrap;
   }
   /* Polite live region: off-screen, announces cast start/complete/cancel. */
-  .crafting-live {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-  /* In-window craft-cast progress strip (Craft Cast System Phase 2): tracks
-     the real entity cast, not a client timer. Hidden when idle. */
+  /* In-window craft-cast strip (Craft Cast System Phase 2): the SINGLE
+     progress surface for a craft cast while this window is open (the HUD
+     suppresses the overlay #castbar for craft casts only). A header band
+     between the tab strip and the scrollable body, on the DESIGN.md 10.5
+     progress-bar grammar: dark inset track under a one-pixel black keyline,
+     gold hardcast fill with a one-pixel top highlight, parchment label
+     centered IN the bar, tabular timer right, batch chip beside the track.
+     display:none at rest; the HUD's CastBarPainter owns show/hide (flex).
+     Tracks the real entity cast, never a client timer. */
   .crafting-cast-progress {
-    display: flex;
+    display: none;
     align-items: center;
-    gap: 8px;
-    margin: 0 0 4px;
+    gap: 10px;
+    margin: 8px 12px 0;
     padding: 6px 8px;
     border: 1px solid var(--color-border-showcase);
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
     background: rgba(0, 0, 0, 0.3);
   }
-  .crafting-cast-progress[hidden] {
-    display: none;
+  /* Programmatic focus target for the mid-cast focus ladder (tabindex -1):
+     the shared button ring does not apply to a div, so it gets its own. */
+  .crafting-cast-progress:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
   }
   .crafting-cast-progress-track {
+    position: relative;
     flex: 1 1 auto;
     min-width: 0;
-    height: 10px;
-    border-radius: 999px;
+    height: 20px;
+    border-radius: var(--radius-sm);
     background: rgba(0, 0, 0, 0.45);
-    border: 1px solid var(--color-border-default);
+    border: 1px solid rgba(0, 0, 0, 0.85);
     overflow: hidden;
   }
   .crafting-cast-progress-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
     height: 100%;
     width: 0%;
-    border-radius: inherit;
-    background: linear-gradient(90deg, var(--gold-dim, #a07a30), var(--gold));
+    background: linear-gradient(180deg, var(--gold), var(--gold-dim));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
     /* Width is set every frame from real cast fields (no CSS animation). Always
        transition:none so reduced-motion and full-motion read the same bar;
        remaining time also lives in .crafting-cast-progress-timer text + aria. */
     transition: none;
   }
+  /* The recipe's display name, centered IN the bar (10.5: centered text when
+     height allows), above the fill in paint order. */
+  .crafting-cast-progress-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3.5em;
+    font-family: var(--ui-font);
+    font-size: 12px;
+    color: var(--color-text-light);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+    overflow: hidden;
+  }
   .crafting-cast-progress-timer {
-    flex: none;
-    min-width: 2.5em;
+    position: absolute;
+    top: 0;
+    right: 8px;
+    bottom: 0;
+    display: flex;
+    align-items: center;
     font-family: var(--ui-font);
     font-size: 11px;
     font-variant-numeric: tabular-nums;
     color: var(--color-text-light);
-    text-align: right;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   }
   /* Phase 3 batch remaining on the cast strip (hidden when total <= 1). */
   .crafting-cast-progress-batch {
@@ -5795,9 +5819,9 @@
   .crafting-create-all-btn {
     min-height: 32px;
     padding: 5px 12px;
-    border: 1px solid #6a5320;
-    border-radius: 5px;
-    background: linear-gradient(180deg, #c9a24a, #8a6820);
+    border: 1px solid var(--color-gold-600);
+    border-radius: var(--radius-sm);
+    background: linear-gradient(180deg, var(--gold-dim), var(--color-gold-600));
     color: #1c1206;
     font-family: var(--title-font);
     font-size: 11px;

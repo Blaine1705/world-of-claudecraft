@@ -3376,7 +3376,6 @@ export const hudChromeStrings = {
     // aria is the localized craft name (craftName above).
     dialogOption: 'Crafting',
     dialogOptionAria: 'Open the crafting window for {craft}',
-    craft: 'Craft',
     // Craft Cast System Phase 2: button label while this recipe's cast runs.
     crafting: 'Crafting',
     // Phase 3 batch craft: primary action with the row qty, and mats-limited max.
@@ -3385,8 +3384,8 @@ export const hudChromeStrings = {
     createAllAria: 'Create the maximum number of this recipe from materials held',
     // Qty stepper group for one recipe row.
     qtyRowAria: 'Craft quantity',
-    qtyDecreaseAria: 'Decrease craft quantity',
-    qtyIncreaseAria: 'Increase craft quantity',
+    qtyDecreaseAria: 'Decrease craft quantity, currently {count}',
+    qtyIncreaseAria: 'Increase craft quantity, currently {count}',
     qtyValueAria: 'Craft quantity, {count}',
     // Batch progress on the in-window strip ({remaining} / {total} localized).
     batchRemaining: '{remaining} of {total} remaining',
@@ -3394,7 +3393,7 @@ export const hudChromeStrings = {
     // Compact row chip for expected cast time ({seconds} is a localized number).
     durationChip: '{seconds}s',
     // Accessible duration line (aria + tooltip); {seconds} is a localized number.
-    durationAria: '{seconds} second cast',
+    durationAria: 'Cast time: {seconds} seconds',
     // In-window progress strip accessible name.
     progressAria: 'Craft progress',
     // Remaining seconds on the in-window strip ({seconds} localized number).
@@ -3506,10 +3505,8 @@ export const hudChromeStrings = {
       toolworks: 'Toolworks',
     },
     // Craft Cast System: already casting or consuming when craft_item arrives.
-    // Cast duration paces craft-family actions (busy is the concurrent-cast deny).
-    // `throttled` is retired from production emits (Phase 5) but the English
-    // row stays so locale overlays that still name the key type-check.
-    throttled: 'You are busy.',
+    // Cast duration paces craft-family actions (busy is the concurrent-cast
+    // deny; the retired 'throttled' wire reason renders this same copy).
     busy: 'You are busy.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
@@ -3640,13 +3637,8 @@ export const hudChromeStrings = {
     notHeld: 'You do not have that item.',
     notDisenchantable: 'You cannot disenchant that.',
     notSalvageable: 'You cannot salvage that.',
-    // Craft Cast System Phase 4/5: cast busy gate when another cast is already running.
-    // Historical *Throttled rows redirect to the same busy prose so locale
-    // overlays that still fill those keys type-check; production never emits
-    // reason 'throttled' after Phase 5.
-    disenchantThrottled: 'You are busy.',
-    salvageThrottled: 'You are busy.',
-    enchantThrottled: 'You are busy.',
+    // Craft Cast System Phase 4/5: cast busy gate when another cast is already
+    // running (the retired 'throttled' wire reason renders the same copy).
     disenchantBusy: 'You are busy.',
     salvageBusy: 'You are busy.',
     enchantBusy: 'You are busy.',

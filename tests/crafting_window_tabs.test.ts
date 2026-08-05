@@ -55,6 +55,7 @@ function craftingDeps() {
     onToggleCommission: vi.fn(),
     craftQty: () => 1,
     onCraftQty: vi.fn(),
+    announce: vi.fn(),
     selectedCraft: () => null as string | null,
     onSelectCraft: vi.fn(),
   };

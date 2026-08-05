@@ -6637,13 +6637,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Dette ødelægger et særligt eksemplar af {item} (signeret, mesterværk eller fortryllet) og giver arkan materiale. Dette kan ikke fortrydes.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Affortrylle {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du affortrylles for hurtigt. Vent et øjeblik og prøv igen.',
   'hudChrome.enchanting.disenchantedLine': 'Du affortrylles {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du fortrylles {item} med {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Du har ikke materialerne til den fortryllelse.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du fortrylles for hurtigt. Vent et øjeblik og prøv igen.',
   'hudChrome.enchanting.enchantUnknown': 'Den fortryllelse eksisterer ikke.',
   'hudChrome.enchanting.enchantWrongSlot': 'Den fortryllelse kan ikke anvendes på den genstand.',
   'hudChrome.enchanting.noEnchants': 'Ingen fortryllelse bruger dette reagens.',
@@ -6657,7 +6653,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Dette ødelægger et særligt eksemplar af {item} (signeret, mesterværk eller fortryllet) og giver håndværksmaterialer. Dette kan ikke fortrydes.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Bjærg {item}?',
-  'hudChrome.enchanting.salvageThrottled': 'Du bjærger for hurtigt. Vent et øjeblik og prøv igen.',
   'hudChrome.enchanting.salvagedLine': 'Du bjærger {item}.',
   'hudChrome.enchanting.targetTitle': 'Vælg en genstand at fortryle',
   'hudChrome.keybinds.emoteWheel': 'Følelseshjul',
@@ -8188,7 +8183,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Alt på denne side lever i spillet: tryk på Esc for at åbne indstillingerne. Menuen åbner på en Oversigt over fastgjorte essentielle valg, med kategorierne på en skinne ved siden: indstillingerne nedenfor bor under Grafik, Interface og Tilgængelighed i Skærm-gruppen, og Performance Overlay under System. Endnu hurtigere, skriv et navn i søgefeltet øverst og spring direkte hen til det.',
   'guide.settingsPage.whyLabel': 'Hvorfor virker det:',
   'hudChrome.crafting.close': 'Tæt håndværk',
-  'hudChrome.crafting.craft': 'Håndværk',
   'hudChrome.crafting.craftedToast': 'Udformet: {name}',
   'hudChrome.crafting.empty': 'Ingen opskrifter kendt endnu.',
   'hudChrome.crafting.insufficientMaterials': 'Det har du ikke materialerne til.',
@@ -8282,7 +8276,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Øger Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Øger Udholdenhed med {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Du har ikke lært den opskrift endnu.',
-  'hudChrome.crafting.throttled': 'Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.',
   'hudChrome.mobile.chatPlaceholder': 'Sig noget...',
   'hudChrome.mobile.hideKeyboard': 'Skjul tastatur',
   'hudChrome.unitFrame.partyChip': 'Gruppe',

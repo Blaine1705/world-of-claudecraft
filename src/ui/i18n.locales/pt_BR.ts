@@ -8252,7 +8252,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Tudo nesta página fica no jogo: pressione Esc para abrir as opções. O menu abre em uma Visão Geral do essencial fixado, com as categorias em uma barra ao lado: as configurações abaixo ficam em Gráficos, Interface e Acessibilidade, no grupo Tela, e a Sobreposição de Desempenho em Sistema. Mais rápido ainda, digite um nome na caixa de busca no topo e vá direto até ele.',
   'guide.settingsPage.whyLabel': 'Por que funciona:',
   'hudChrome.crafting.close': 'Fechar elaboração',
-  'hudChrome.crafting.craft': 'Arte',
   'hudChrome.crafting.craftedToast': 'Feito: {name}',
   'hudChrome.crafting.empty': 'Nenhuma receita conhecida ainda.',
   'hudChrome.crafting.insufficientMaterials': 'Você não tem os materiais para isso.',
@@ -8448,8 +8447,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Aumenta o Intelecto em {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Aumenta o Vigor em {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Você ainda não aprendeu essa receita.',
-  'hudChrome.crafting.throttled':
-    'Você está criando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.mobile.chatPlaceholder': 'Diga algo...',
   'hudChrome.mobile.hideKeyboard': 'Ocultar teclado',
   'hudChrome.unitFrame.partyChip': 'Grupo',
@@ -10925,13 +10922,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Isso destrói uma cópia especial de {item} (assinada, obra-prima ou encantada) e produz materiais arcanos. Não pode ser desfeito.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Desencantar {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Você está desencantando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.enchanting.disenchantedLine': 'Você desencanta {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Você encanta {item} com {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Você não tem os materiais para esse encantamento.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Você está encantando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.enchanting.enchantUnknown': 'Esse encantamento não existe.',
   'hudChrome.enchanting.enchantWrongSlot': 'Esse encantamento não pode ser aplicado a esse item.',
   'hudChrome.enchanting.noEnchants': 'Nenhum encantamento usa esse reagente.',
@@ -10945,8 +10938,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Isso destrói uma cópia especial de {item} (assinada, obra-prima ou encantada) e produz materiais de artesanato. Não pode ser desfeito.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Recuperar {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Você está recuperando rápido demais. Espere um momento e tente de novo.',
   'hudChrome.enchanting.salvagedLine': 'Você recupera {item}.',
   'hudChrome.enchanting.targetTitle': 'Escolha um item para encantar',
   'hudChrome.gathering.biteLine': 'Algo morde a isca!',

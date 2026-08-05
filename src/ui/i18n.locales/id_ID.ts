@@ -8776,13 +8776,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan arkan. Tindakan ini tidak dapat dibatalkan.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Hancurkan pemantraan {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Kamu menghancurkan pemantraan terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.disenchantedLine': 'Kamu menghancurkan pemantraan {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Kamu memantrai {item} dengan {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Kamu tidak memiliki bahan untuk mantrai itu.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Kamu memantrai terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.enchantUnknown': 'Mantrai itu tidak ada.',
   'hudChrome.enchanting.enchantWrongSlot': 'Mantrai itu tidak bisa diterapkan pada barang itu.',
   'hudChrome.enchanting.noEnchants': 'Tidak ada mantrai yang menggunakan reagen ini.',
@@ -8796,8 +8792,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Ini menghancurkan salinan khusus dari {item} (bertanda tangan, karya besar, atau terpesonan) dan menghasilkan bahan kerajinan. Tindakan ini tidak dapat dibatalkan.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Salvasi {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Kamu menyalvasi terlalu cepat. Tunggu sebentar dan coba lagi.',
   'hudChrome.enchanting.salvagedLine': 'Kamu menyalvasi {item}.',
   'hudChrome.enchanting.targetTitle': 'Pilih barang untuk dimantrai',
   'hudChrome.gathering.herbalism': 'Herbalisme',
@@ -8966,7 +8960,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Segala sesuatu di halaman ini ada di dalam game: tekan Esc untuk membuka opsi. Menu terbuka pada Ikhtisar berisi hal-hal penting yang disematkan, dengan kategori-kategori di rel di sampingnya: pengaturan di bawah ini ada di bawah Grafik, Antarmuka, dan Aksesibilitas dalam grup Tampilan, dan Hamparan Kinerja di bawah Sistem. Lebih cepat lagi, ketik sebuah nama di kotak pencarian di puncak dan langsung melompat ke sana.',
   'guide.settingsPage.whyLabel': 'Mengapa ini berhasil:',
   'hudChrome.crafting.close': 'Tutup kerajinan',
-  'hudChrome.crafting.craft': 'Keahlian',
   'hudChrome.crafting.craftedToast': 'Dibuat: {name}',
   'hudChrome.crafting.empty': 'Belum ada resep yang diketahui.',
   'hudChrome.crafting.insufficientMaterials': 'Anda tidak memiliki bahan untuk itu.',
@@ -9060,7 +9053,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Meningkatkan Kecerdasan sebesar {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Meningkatkan Stamina sebesar {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Kamu belum mempelajari resep itu.',
-  'hudChrome.crafting.throttled': 'Kamu membuat terlalu cepat. Tunggu sejenak dan coba lagi.',
   'hudChrome.mobile.chatPlaceholder': 'Katakan sesuatu...',
   'hudChrome.mobile.hideKeyboard': 'Sembunyikan papan ketik',
   'hudChrome.unitFrame.partyChip': 'Kelompok',

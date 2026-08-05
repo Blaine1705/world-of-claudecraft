@@ -1874,13 +1874,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Dit vernietigt een speciaal exemplaar van {item} (gesigneerd, meesterwerk of betoverd) en levert arcanematerialen op. Dit kan niet ongedaan worden gemaakt.',
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} onbetoveren?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Je onbetoverd te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.enchanting.disenchantedLine': 'Je onbetoverd {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Je betoverd {item} met {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Je hebt de materialen niet voor die betovering.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Je betoverd te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.enchanting.enchantUnknown': 'Die betovering bestaat niet.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Die betovering kan niet op dat voorwerp worden aangebracht.',
@@ -1895,8 +1891,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Dit vernietigt een speciaal exemplaar van {item} (gesigneerd, meesterwerk of betoverd) en levert knutselmaterialen op. Dit kan niet ongedaan worden gemaakt.',
   'hudChrome.enchanting.salvageConfirmTitle': '{item} salvagen?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Je salvaged te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.enchanting.salvagedLine': 'Je salvaged {item}.',
   'hudChrome.enchanting.targetTitle': 'Kies een voorwerp om te betoveren',
   'hudChrome.itemProc.attackSlow':
@@ -8292,7 +8286,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Alles op deze pagina leeft in het spel: druk op Esc om de opties te openen. Het menu opent op een Overview met vastgezette essentiële instellingen, met de categorieën op een balk ernaast: de onderstaande instellingen vind je onder Graphics, Interface en Accessibility in de groep Display, en de Performance Overlay onder System. Nog sneller: typ een naam in het zoekvak bovenaan en spring er meteen naartoe.',
   'guide.settingsPage.whyLabel': 'Waarom het werkt:',
   'hudChrome.crafting.close': 'Sluit het maken',
-  'hudChrome.crafting.craft': 'Ambacht',
   'hudChrome.crafting.craftedToast': 'Gemaakt: {name}',
   'hudChrome.crafting.empty': 'Nog geen recepten bekend.',
   'hudChrome.crafting.insufficientMaterials': 'Daar heb je de materialen niet voor.',
@@ -8386,7 +8379,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Verhoogt Intellect met {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Verhoogt Uithoudingsvermogen met {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Je hebt dat recept nog niet geleerd.',
-  'hudChrome.crafting.throttled': 'Je maakt te snel. Wacht even en probeer het opnieuw.',
   'hudChrome.mobile.chatPlaceholder': 'Zeg iets...',
   'hudChrome.mobile.hideKeyboard': 'Toetsenbord verbergen',
   'hudChrome.unitFrame.partyChip': 'Groep',

@@ -8145,7 +8145,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Alles auf dieser Seite lebt im Spiel: Drücke Esc, um die Optionen zu öffnen. Das Menü öffnet mit einer Übersicht angehefteter Grundlagen, mit den Kategorien auf einer Leiste daneben: Die Einstellungen weiter unten liegen unter Grafik, Benutzeroberfläche und Barrierefreiheit in der Gruppe Anzeige, und die Leistungsüberlagerung unter System. Noch schneller: Tippe einen Namen in das Suchfeld oben und spring direkt dorthin.',
   'guide.settingsPage.whyLabel': 'Warum es funktioniert:',
   'hudChrome.crafting.close': 'Enges Basteln',
-  'hudChrome.crafting.craft': 'Handwerk',
   'hudChrome.crafting.craftedToast': 'Hergestellt: {name}',
   'hudChrome.crafting.empty': 'Noch keine Rezepte bekannt.',
   'hudChrome.crafting.insufficientMaterials': 'Dafür fehlen Ihnen die Materialien.',
@@ -8240,8 +8239,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Erhöht Intelligenz um {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Erhöht Ausdauer um {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Ihr habt dieses Rezept noch nicht erlernt.',
-  'hudChrome.crafting.throttled':
-    'Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut.',
   'hudChrome.mobile.chatPlaceholder': 'Sag etwas...',
   'hudChrome.mobile.hideKeyboard': 'Tastatur ausblenden',
   'hudChrome.unitFrame.partyChip': 'Gruppe',
@@ -9676,14 +9673,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Dies zerstört eine besondere Kopie von {item} (signiert, Meisterwerk oder verzaubert) und ergibt arkane Materialien. Dies kann nicht rückgängig gemacht werden.',
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} entzaubern?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du entzauberst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.disenchantedLine': 'Du entzauberst {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du verzauberst {item} mit {enchant}.',
   'hudChrome.enchanting.enchantInsufficient':
     'Du hast nicht die Materialien für diese Verzauberung.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du verzauberst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.enchantUnknown': 'Diese Verzauberung existiert nicht.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Diese Verzauberung kann nicht auf diesen Gegenstand angewendet werden.',
@@ -9698,8 +9691,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Dies zerstört eine besondere Kopie von {item} (signiert, Meisterwerk oder verzaubert) und ergibt Handwerksmaterialien. Dies kann nicht rückgängig gemacht werden.',
   'hudChrome.enchanting.salvageConfirmTitle': '{item} zerlegen?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Du zerlegst zu schnell. Warte einen Moment und versuche es erneut.',
   'hudChrome.enchanting.salvagedLine': 'Du zerlegst {item}.',
   'hudChrome.enchanting.targetTitle': 'Wähle einen Gegenstand zum Verzaubern',
   'hudChrome.gathering.biteLine': 'Etwas nimmt den Köder!',

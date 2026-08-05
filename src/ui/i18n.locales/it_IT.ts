@@ -6103,13 +6103,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Questo distrugge una copia speciale di {item} (firmata, capolavoro o incantata) e produce materiali arcani. Questa azione non puo essere annullata.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Disincanta {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Stai disincantando troppo velocemente. Attendi un momento e riprova.',
   'hudChrome.enchanting.disenchantedLine': 'Disincanti {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Incanti {item} con {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': "Non hai i materiali per quell'incantesimo.",
-  'hudChrome.enchanting.enchantThrottled':
-    'Stai incantando troppo velocemente. Attendi un momento e riprova.',
   'hudChrome.enchanting.enchantUnknown': "Quell'incantesimo non esiste.",
   'hudChrome.enchanting.enchantWrongSlot':
     "Quell'incantesimo non puo essere applicato a quell'oggetto.",
@@ -6124,8 +6120,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Questo distrugge una copia speciale di {item} (firmata, capolavoro o incantata) e produce materiali artigianali. Questa azione non puo essere annullata.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Smantella {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Stai smantellando troppo velocemente. Attendi un momento e riprova.',
   'hudChrome.enchanting.salvagedLine': 'Smantelli {item}.',
   'hudChrome.enchanting.targetTitle': 'Scegli un oggetto da incantare',
   'hudChrome.emoteWheel.edit': 'Modifica',
@@ -8413,7 +8407,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tutto in questa pagina risiede nel gioco: premi Esc per aprire le opzioni. Il menu si apre su una Panoramica degli elementi essenziali fissati, con le categorie su una barra laterale accanto: le impostazioni qui sotto si trovano sotto Grafica, Interfaccia e Accessibilità nel gruppo Schermo, e la Sovrapposizione prestazioni sotto Sistema. Più rapido ancora, scrivi un nome nella casella di ricerca in alto e salta dritto ad essa.',
   'guide.settingsPage.whyLabel': 'Perché funziona:',
   'hudChrome.crafting.close': 'Chiudi la lavorazione',
-  'hudChrome.crafting.craft': 'Mestiere',
   'hudChrome.crafting.craftedToast': 'Realizzato: {name}',
   'hudChrome.crafting.empty': 'Nessuna ricetta ancora conosciuta.',
   'hudChrome.crafting.insufficientMaterials': 'Non hai i materiali per quello.',
@@ -8609,8 +8602,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': "Aumenta l'intelletto del {pct}%",
   'hudChrome.auraEffect.increasePct.sta': 'Aumenta la tempra del {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Non hai ancora imparato quella ricetta.',
-  'hudChrome.crafting.throttled':
-    'Stai fabbricando troppo in fretta. Aspetta un momento e riprova.',
   'hudChrome.mobile.chatPlaceholder': 'Scrivi qualcosa...',
   'hudChrome.mobile.hideKeyboard': 'Nascondi tastiera',
   'hudChrome.unitFrame.partyChip': 'Gruppo',
