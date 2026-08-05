@@ -14383,7 +14383,9 @@ export class Hud {
     this.renderCrafting();
     // AFTER the paint, the train / unbind ordering (see toggleTownFocus):
     // captureFocus records the opener and installs the trap over a root that
-    // is by then populated and displayed.
+    // is by then populated and displayed. #crafting-window now installs its
+    // own trap (this change), so the craftId branch below only needs to move
+    // focus onto the selected tab within that trap, not chase it back from body.
     this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();
     if (craftId !== undefined) {
       const scroller = $('#crafting-window').querySelector('.crafting-body');
