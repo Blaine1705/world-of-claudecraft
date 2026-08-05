@@ -1303,10 +1303,12 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
     // And COMPLETES: the completion re-gate reserved the same base grade,
     // the grant minted it, and the unfired prompt effect kept its charge.
-    // 4 = the 1-ore partial stack plus a 3-unit epic-rarity mint: the zones
-    // 1-3 quest-dedupe content pass shifted the shared rng stream, moving the
-    // seed-42 rarity draw from common (1 unit) to epic (3 units).
-    expect(sim.countItem('iron_ore', pid)).toBe(4);
+    // 3 = the 1-ore partial stack plus a 2-unit rare-rarity mint. Content
+    // commits keep shifting the shared rng stream and with it the seed-42
+    // rarity draw: common (1 unit) before the zones 1-3 quest-dedupe pass,
+    // epic (3 units) after it, rare (2 units) since the v0.35.0 release
+    // content commits (enchant offhand, hunter offhand, the deeds catalog).
+    expect(sim.countItem('iron_ore', pid)).toBe(3);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(
       sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
@@ -1343,9 +1345,9 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // The confirmed mining use survived the herbalism mint: fine grade
-    // minted, mining charge spent. 3 units since the zones 1-3 quest-dedupe
-    // content pass moved the seed-42 rarity draw to epic (3 per mint).
-    expect(sim.countItem('fine_iron_ore', pid)).toBe(3);
+    // minted, mining charge spent. 2 units since the v0.35.0 release content
+    // commits moved the seed-42 rarity draw to rare (2 per mint).
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(2);
     expect(slot.durability).toBe(chargesBefore - 1);
   });
 
@@ -1376,11 +1378,11 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // Consent retired with the old slot: the new prompt slot did not fire,
-    // the harvest minted base grade, and the fresh charge is intact. 3 units
-    // since the zones 1-3 quest-dedupe content pass moved the seed-42 rarity
-    // draw to epic (3 per mint).
+    // the harvest minted base grade, and the fresh charge is intact. 2 units
+    // since the v0.35.0 release content commits moved the seed-42 rarity draw
+    // to rare (2 per mint).
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
-    expect(sim.countItem('iron_ore', pid)).toBe(3);
+    expect(sim.countItem('iron_ore', pid)).toBe(2);
     expect(minted?.durability).toBe(mintedCharges);
   });
 
