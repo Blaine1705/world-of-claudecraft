@@ -25,8 +25,9 @@ import { isSoftwareRendererName } from './software_renderer';
 //      (headless screenshot verification: stills render slowly but correctly)
 //   3. an explicit persisted graphics preset -> that tier
 //   4. no persisted preset (first boot / inconclusive detection) -> DEVICE-AWARE default via
-//      resolveDefaultGraphicsPreset (recognized weak/software -> low, strong desktop -> high/ultra,
-//      anything unrecognized -> medium), so the 3D tier matches the medium data-fx-level fallback
+//      resolveDefaultGraphicsPreset (any touch device -> low, recognized weak/software -> low,
+//      strong desktop -> high/ultra, anything unrecognized -> medium), so the 3D tier matches the
+//      medium data-fx-level fallback on the desktop path that still lands there
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
 
@@ -1334,9 +1335,11 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
 
 /**
  * The device-appropriate graphics preset (1 low .. 4 ultra) for a player who has NOT chosen one,
- * so a weak phone is not stuck on a tier it cannot run and a strong desktop is not capped below
- * what it can drive. MEDIUM (2) is the deliberate fallback whenever the signals are inconclusive
- * (the product call: a safe middle the runtime auto-governor can climb from). Pure function of
+ * so a phone is not stuck on a tier it cannot enter the world at and a strong desktop is not
+ * capped below what it can drive. EVERY touch device resolves to LOW (see the isMobile branch:
+ * the entry-time memory ceiling, not the frame rate, is what mobile is protected from). MEDIUM
+ * (2) is the deliberate DESKTOP fallback whenever the signals are inconclusive (the product
+ * call: a safe middle the runtime auto-governor can climb from). Pure function of
  * static device hints only (GPU name, deviceMemory, hardwareConcurrency, touch/coarse/narrow);
  * reads NO FPS governor and runs ONCE on first boot, so it never fights the runtime governor (the
  * two-controller rule). main.ts persists the result over the medium default so the 3D
@@ -1348,10 +1351,11 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
  * Grounded in the standard adaptive-quality practice (detect-gpu name tiering + web.dev adaptive
  * loading), first-match-wins. CRITICAL: deviceMemory + hardwareConcurrency may only RAISE a tier
  * or break a tie, NEVER pull one down. Safari caps hardwareConcurrency (2 on iOS, 8 on macOS) and
- * Safari + Firefox omit deviceMemory entirely (Chromium-only, clamped, max ~8), so a flagship
- * iPhone reports cores=2 / mem=undefined: a low-count down-rank would wrongly bucket it low. The
- * recognized GPU class sets the floor; a masked/unknown name lands on MEDIUM. Ultra is gated
- * behind a recognized strong-desktop GPU (a masked name cannot reach it).
+ * Safari + Firefox omit deviceMemory entirely (Chromium-only, clamped, max ~8), so a thin count is
+ * routinely a REPORTING artifact rather than a weak machine: a Safari desktop must not be
+ * down-ranked for it. The recognized GPU class sets the floor; a masked/unknown desktop name lands
+ * on MEDIUM. Ultra is gated behind a recognized strong-desktop GPU (a masked name cannot reach it)
+ * and is desktop-only, since every touch device now takes the LOW branch first.
  */
 export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   const gpu = classifyGpuRenderer(hints.gpuRenderer);
@@ -1366,19 +1370,29 @@ export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
     (cores !== undefined && cores >= AMPLE_LOGICAL_CORES);
 
   if (gpu === 'software' || gpu === 'weak') return PRESET_LOW;
-  if (gpu === 'strongDesktop' && !isMobile) return ampleOrUnknownMem ? PRESET_ULTRA : PRESET_HIGH;
-  // A strong/flagship GPU on a touch device: capped at HIGH (ultra is desktop-only) for thermals.
-  if (gpu === 'flagshipMobile' || (gpu === 'strongDesktop' && isMobile)) return PRESET_HIGH;
-  // Apple Silicon: an M-series iPad (touch) keeps the mobile HIGH cap above; an M-series Mac
-  // (non-touch) defaults to the safe middle. These SoCs can render high, but the thermally
-  // constrained MacBook form factor overheats and drains battery on a sustained ultra load, so
-  // medium is the right auto-default (the runtime governor can still climb; ultra stays a manual
-  // opt-in). Issue 1676.
-  if (gpu === 'appleSilicon') return isMobile ? PRESET_HIGH : PRESET_MEDIUM;
+  // EVERY touch device starts at LOW, whatever its GPU class reports. The tier the synchronous
+  // world-entry scene build runs at is what decides its peak memory footprint, and on phone-class
+  // WebKit crossing the per-process ceiling gets the tab's WebContent process killed with no
+  // error event (src/game/entry_crash_guard.ts). The previous mobile ladder (flagship or
+  // Apple-silicon touch to HIGH, masked/unknown phone to MEDIUM) entered above that ceiling often
+  // enough that the crash-recovery banner became a routine part of joining on a phone. Mobile now
+  // starts at the floor and CLIMBS only by an explicit player choice in Options; the runtime
+  // governor still moves render scale within the tier, and safeStartupGraphicsPreset still caps a
+  // stored ultra/insane choice on iOS. Detection can no longer pick a mobile tier that has to be
+  // walked back down one crash at a time.
+  if (isMobile) return PRESET_LOW;
+  if (gpu === 'strongDesktop') return ampleOrUnknownMem ? PRESET_ULTRA : PRESET_HIGH;
+  // A flagship MOBILE GPU on a device reporting no touch at all (an Android TV box, desktop
+  // device emulation): not a phone by the check above, so it keeps its historical HIGH.
+  if (gpu === 'flagshipMobile') return PRESET_HIGH;
+  // Apple Silicon Macs (touch devices took the LOW branch above): these SoCs can render high, but
+  // the thermally constrained MacBook form factor overheats and drains battery on a sustained
+  // ultra load, so medium is the right auto-default (the runtime governor can still climb; ultra
+  // stays a manual opt-in). Issue 1676.
+  if (gpu === 'appleSilicon') return PRESET_MEDIUM;
   if (gpu === 'midIntegrated' || gpu === 'midMobile') return PRESET_MEDIUM;
   if (
     gpu === 'unknown' &&
-    !isMobile &&
     mem !== undefined &&
     mem >= AMPLE_DEVICE_MEMORY_GIB &&
     cores !== undefined &&
