@@ -2502,9 +2502,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broeder Halven markeert zijn kaarten: een mooie dag om het Ingestorte Reliekschrijn te trotseren.',
   'hudChrome.calendar.events.delveDay.title': 'Delvedag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'De 2v2 Fiesta-ring trekt vanavond zijn luidruchtigste publiek.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiesta-avond',
   'hudChrome.calendar.events.fishingDerby.note':
     'Hengelaars staan langs de meren. Neem een hengel mee en wissel visverhalen uit.',
   'hudChrome.calendar.events.fishingDerby.title': 'Visderby',
@@ -3711,6 +3708,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.crag_warden_cudgel.name': 'Knuppel van de Rotswachter',
   'entities.items.craghorn_staff.name': 'Rotshoorn-Staf',
   'entities.items.cragmaw_huntcord.name': 'Cragmaws Jachtkoord',
+  'entities.items.cragmaw_huntquiver.name': 'Cragmaws Jachtpijlkoker',
   'entities.items.cragmaw_prowlboots.name': 'Cragmaw-Sluiplaarzen',
   'entities.items.cragwalker_boots.name': 'Rotsloperlaarzen',
   'entities.items.crimson_amber_armor_plate.name': 'Karmijnen Amber',
@@ -3790,6 +3788,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Grafwachters Steekmes',
   'entities.items.gravewoven_raiment.name': 'Grafgeweven Gewaad',
   'entities.items.gravewyrm_gauntlets.name': 'Grafwurm-Handschoenen',
+  'entities.items.gravewyrm_bone_quiver.name': 'Grafwurm-Beenpijlkoker',
   'entities.items.gravewyrm_mantle.name': 'Grafwurm-Mantel',
   'entities.items.gravewyrm_sabatons.name': 'Grafwurm-Sabatons',
   'entities.items.gravewyrm_scale_hauberk.name': 'Grafwurm-Schubmaliënkolder',
@@ -3850,6 +3849,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Nevelsluier-Grepen',
   'entities.items.moggers_copper_cudgel.name': 'Moggers Koperen Knuppel',
   'entities.items.moggers_shiv.name': 'Moggers Steekmes',
+  'entities.items.moggers_hide_quiver.name': 'Moggers Leren Pijlkoker',
   'entities.items.moggers_stomper_boots.name': 'Moggers Stamplaarzen',
   'entities.items.monarch_crown_helm.name': 'Monarchenkroon',
   'entities.items.copper_mining_pick.name': 'Koperen Mijnpik',
@@ -3973,6 +3973,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-Schouderstukken',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought-Grootzwaard',
   'entities.items.direfang_greatblade.name': 'Direfang-Grootkling',
+  'entities.items.direfang_quiver.name': 'Direfang-Pijlkoker',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought-Bolwerk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-Orb',
   'entities.items.stormshard_leggings.name': 'Stormscherf-Beenbescherming',
@@ -4855,7 +4856,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA GELIJKSPEL! Te dichtbij om te zeggen!',
   'fiesta.end.loss': 'FIESTA VERLOREN! Op naar de revanche!',
   'fiesta.end.win': 'FIESTA GEWONNEN! 🎉 Wat een feest!',
-  'fiesta.enterQueue': 'Doe mee aan de Fiesta!',
   'fiesta.error.leaderOnly':
     'Alleen de groepsleider mag je team in de wachtrij zetten voor {label}.',
   'fiesta.error.noAugment': 'Je hebt op dit moment geen versterking om te kiezen.',
@@ -4873,9 +4873,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Kolos',
   'fiesta.powerup.pow_moon_boots.name': 'Maanlaarzen',
   'fiesta.powerup.pow_speed_demon.name': 'Snelheidsduivel',
-  'fiesta.practice': '🎉 Oefenen tegen Bots',
-  'fiesta.practiceNote':
-    'Offline oefenen: brengt 3 AI-bots voort en zet je in de wachtrij voor een 2v2-Fiesta. Klik nogmaals om te stoppen.',
   'fiesta.queue.join': 'Je sluit je aan bij de 2v2-Fiesta-wachtrij. Maak je klaar om te FEESTEN…',
   'fiesta.queue.leave': 'Je verlaat de 2v2-Fiesta-wachtrij.',
   'fiesta.queue.teamLeave': 'Je team verlaat de 2v2-Fiesta-wachtrij.',
@@ -5124,38 +5121,18 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.abilityHook.thunder_clap': 'Raakt alles om je heen en vertraagt hun aanvallen.',
   'guide.abilityHook.wrath':
     'Een natuurbout die van afstand op een doelwit wordt geworpen, je vertrouwde nuke.',
-  'guide.arenaPage.augmentsNote':
-    'Augments en power-ups gelden alleen voor de wedstrijd. Ze draaien om speelse, ter plekke bedachte builds, niet om blijvende macht, zodat niemand zich een weg naar de winst koopt.',
   'guide.arenaPage.coliseumBody':
     'Het Coliseum is de arena van het rijk, waar je andere spelers tegemoet treedt in ranglijstwedstrijden, één tegen één of twee tegen twee. Elke categorie heeft zijn eigen ranglijst, dus een overwinning tilt je hoger op die ladder, zichtbaar voor het hele rijk. Open het Arenavenster om je in te schrijven voor een categorie, alleen of met je partner.',
   'guide.arenaPage.coliseumHeading': 'Het Asgrauwe Colosseum',
   'guide.arenaPage.duelsBody':
     'Daag elke speler die je tegenkomt uit voor een vriendschappelijk duel. Er staat niets op het spel behalve trots, dus het is de makkelijkste manier om een matchup te leren of een vriendschappelijk meningsverschil te beslechten.',
   'guide.arenaPage.duelsHeading': 'Duels',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta is een snel, twee-tegen-twee gevecht dat als één doorlopende partij wordt uitgevochten, waarbij elke strijder op gelijke voet wordt gebracht. Terwijl het gevecht loopt, draft je augments, snelle boosts die je kit gaandeweg hervormen, zodat geen twee wedstrijden helemaal hetzelfde spelen.',
-  'guide.arenaPage.fiestaHeading': 'Twee tegen twee Fiesta',
   'guide.arenaPage.heading': 'Arena en PvP',
   'guide.arenaPage.intro':
     'Wil je jezelf meten met andere spelers? Speler tegen speler is ingebouwd, en het is altijd iets wat je kiest, nooit iets wat je opgedrongen wordt.',
   'guide.arenaPage.ladderBody':
     'Ranglijstspel volgt je positie over de tijd. Bekijk het scorebord om te zien waar je staat en wie de top van het rijk bezit.',
   'guide.arenaPage.ladderHeading': 'De ladder beklimmen',
-  'guide.arenaPage.powerupsBody':
-    'Gloeiende bollen vallen ook middenin het gevecht in de arena, gratis voor wie ze als eerste bereikt. Ze zijn opzettelijk over de top en duren maar even: Speed Demon voor een flits van verblindend tempo, Colossus om uit te dijen tot een logge reus, Moon Boots voor een stuiterende sprong met lage zwaartekracht, en Berserker voor een plotselinge golf van razernij.',
-  'guide.arenaPage.powerupsTitle': 'Power-ups in de ring',
-  'guide.arenaPage.waveGoldBody':
-    "De middelste golf: tweesnijdende combo's waar je build vorm begint te krijgen en gaat zingen.",
-  'guide.arenaPage.waveGoldTitle': 'Goud',
-  'guide.arenaPage.wavePrismaticBody':
-    'De laatste golf: build-bepalende, schermversmeltende pieken bedoeld om belachelijk aan te voelen op de beste manier.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisch',
-  'guide.arenaPage.waveSilverBody':
-    'De openingsgolf: schone, enkelvoudige statboosts die de basis van je klasse aanscherpen.',
-  'guide.arenaPage.waveSilverTitle': 'Zilver',
-  'guide.arenaPage.wavesBody':
-    'Een Fiesta-partij reikt je gaandeweg verse keuzes aan, en de keuzes worden gewaagder naarmate het gevecht langer duurt. Je bouwt van de ene golf naar de volgende, kiest elke keer een van een paar opties en houdt het voor de rest van de partij.',
-  'guide.arenaPage.wavesTitle': 'Augments komen in golven',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Gewaden dragende dienaren van de doodscultus wier werk de graven bezoedelt van het Dal tot de toppen. Waar ze samenkomen, rusten de doden niet.',
   'guide.bestiary.flavor.grubjaw':
@@ -6232,7 +6209,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Kaart',
   'hud.core.mapSummary': 'Kaart van {zone}.',
   'hud.core.maxLevel': 'MAX NIVEAU',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Aanvallen',
   'hud.core.mobileCamera': 'Camera — dubbeltik om te centreren',
   'hud.core.mobileChat': 'Chat',
@@ -6330,7 +6306,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Er is geen speler met de naam '{name}' online.",
   'hud.errors.whisperSelf': 'Je mompelt in jezelf. Niemand hoort het.',
   'hud.keybinds.actions.actionBarSlot': 'Actiebalk {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Ashen Coliseum)',
   'hud.keybinds.actions.attack': 'Aanvallen',
   'hud.keybinds.actions.attackMove': 'Aanvalsverplaatsing',
   'hud.keybinds.actions.autorun': 'Automatisch rennen aan/uit',
@@ -7094,6 +7069,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Groep {n}',
   'hudChrome.unitFrame.partyLabel': 'Je Bende',
   'hudChrome.unitFrame.playerLabel': 'Je Held',
+  'hudChrome.unitFrame.petLabel': 'Je Huisdier',
   'hudChrome.unitFrame.targetAnnounce': 'Markeer {name}',
   'hudChrome.unitFrame.targetLabel': 'Je Doelwit',
   'hudChrome.widgets.clockTitle': 'Lokale tijd - klik om te wisselen tussen 12/24-uurs',
@@ -8048,6 +8024,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Kondig een raid, meetup of evenement aan',
   'hudChrome.discord.relay.help.label': 'Hulp nodig',
   'hudChrome.discord.relay.help.hint': 'Vraag de gemeenschap om hulp',
+  'hudChrome.options.hideUnusedActionSlots': 'Ongebruikte actievakjes verbergen',
   'hudChrome.options.showSecondaryActionBar': 'Secundaire actiebalk tonen',
   'errors.api.desktopCodeInvalid':
     'Desktop-inlogcode is ongeldig of verlopen. Probeer het opnieuw.',
@@ -8403,9 +8380,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Scheurt het pantser van het doelwit open en verlaagt het met {damage}% per toepassing. Stapelt tot 5 keer. Genereert veel dreiging.',
   'entities.mobs.training_dummy.name': 'Oefenpop',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Bescherm Yumi is een teamdoelspel dat in een doolhof wordt gespeeld: elke kant bewaakt zijn eigen kattenmetgezel terwijl hij die van de ander bejaagt. Zo nu en dan flitsen beide katten naar nieuwe hoeken van het doolhof, zodat het gevecht heen en weer gaat tussen verdedigen, jagen en de race om ze opnieuw te vinden. Sluit aan als drie tegen drie of vijf tegen vijf; sneuvelen in de strijd zet je maar even op de bank.',
-  'guide.arenaPage.yumiHeading': 'Bescherm Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Liefhebberij',
   'hudChrome.auraEffect.armorPct': 'Vermindert pantser met {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Vermindert pantser met {pct}% ({stacks} stapels)',
@@ -8425,7 +8399,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Bescherm Yumi 5v5',
   'yumi.end.loss': 'NEDERLAAG! Jouw Yumi is gevallen.',
   'yumi.end.win': 'OVERWINNING! Yumi is veilig!',
-  'yumi.enterQueue': 'Doe mee met Bescherm Yumi!',
   'yumi.error.partyTooBig3': 'Bescherm Yumi 3v3 staat een groep van maximaal drie toe.',
   'yumi.error.partyTooBig5': 'Bescherm Yumi 5v5 staat een groep van maximaal vijf toe.',
   'yumi.hud.aria': 'Jouw Yumi op {mine} van {max} gezondheid, vijandige Yumi op {theirs}.',
@@ -9262,6 +9235,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Huisdier: Aanvallen',
   'hudChrome.keybinds.petDefensive': 'Huisdier: Verdedigend',
   'hudChrome.keybinds.petStop': 'Huisdier: Stoppen',
+  'hudChrome.keybinds.targetPet': 'Huisdier: Aanwijzen',
   'hudChrome.keybinds.petTaunt': 'Huisdier: Uitdagen',
   'hudChrome.keybinds.mount': 'Opstijgen / Afstijgen',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Eén {item} minder versturen',
@@ -10180,6 +10154,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} ontloopt je {ability}.',
   'hudChrome.options.mouseoverCast': 'Mouseover-bezwering op groepsframes',
   'hudChrome.options.showTargetOfTarget': 'Doelwit van doelwit tonen',
+  'hudChrome.options.showPetFrame': 'Je huisdier tonen',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Doelwit van het doelwit',
   'itemUi.market.rarityLegendary': 'Legendarisch',
   'loading.reconnectingAttempt':
