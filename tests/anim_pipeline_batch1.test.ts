@@ -99,10 +99,16 @@ describe('elemental family bespoke attack (issue #2889 batch 1)', () => {
     const floatingConstBlock = manifestBlock('const FLOATING: ClipMap = {', '};');
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
-    // Every other VisualDef still pointing at the shared constant is untouched:
-    // exactly 8 remaining direct `clips: FLOATING,` usages (9 originally, minus
-    // the one migrated to ELEMENTAL_FLOATING above).
+    // Every other VisualDef still pointing at the shared constant is untouched.
+    // Not pinned to an exact remaining count: issue #2889 is a multi-PR
+    // initiative and later batches migrate OTHER FLOATING families off the
+    // shared constant too (see tests/anim_pipeline_priest_expansion.test.ts's
+    // mob_choir_thrall migration), so the total drifts batch over batch. This
+    // only needs to confirm mob_elemental's own migration didn't wipe out
+    // every other user, and that a family no batch has touched yet stays put.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(8);
+    expect(remaining).toBeGreaterThan(0);
+    const demonFlyingBlock = manifestBlock('mob_demon_flying: {', 'mob_alpaca: {');
+    expect(demonFlyingBlock).toContain('clips: FLOATING,');
   });
 });
