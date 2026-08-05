@@ -1074,7 +1074,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 951,
-      "state": "c1c8e6c8",
+      "state": "6ce1d76d",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -1482,7 +1482,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.703576,
-          "fallStartY": 6.781719,
+          "fallStartY": 6.818369,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -1497,13 +1497,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.861232,
-            "y": 6.765816,
+            "y": 6.797488,
             "z": 299.981465
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 6.781719,
+            "y": 6.818369,
             "z": 300
           },
           "stats": {
@@ -1512,7 +1512,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 297.990175,
-            "y": 6.546602,
+            "y": 6.548058,
             "z": 299.731557
           },
           "wanderTimer": 30,
@@ -1528,7 +1528,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 952,
-      "state": "e13f2b92",
+      "state": "492e8552",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -1936,7 +1936,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.703576,
-          "fallStartY": 6.781719,
+          "fallStartY": 6.818369,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -1951,13 +1951,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.861232,
-            "y": 6.765816,
+            "y": 6.797488,
             "z": 299.981465
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 6.781719,
+            "y": 6.818369,
             "z": 300
           },
           "stats": {
@@ -1966,7 +1966,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 297.990175,
-            "y": 6.546602,
+            "y": 6.548058,
             "z": 299.731557
           },
           "wanderTimer": 30,
@@ -1984,7 +1984,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "evadeEpoch": 1,
-          "fallStartY": 6.367613,
+          "fallStartY": 5.316257,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -1999,13 +1999,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "stats": {
@@ -2025,7 +2025,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 953,
-      "state": "8a74eba2",
+      "state": "d10861ba",
       "events": "42dbbf87",
       "rng": {
         "draws": 18,
@@ -2433,7 +2433,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.703576,
-          "fallStartY": 6.781719,
+          "fallStartY": 6.818369,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -2448,13 +2448,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.861232,
-            "y": 6.765816,
+            "y": 6.797488,
             "z": 299.981465
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 6.781719,
+            "y": 6.818369,
             "z": 300
           },
           "stats": {
@@ -2463,7 +2463,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 297.990175,
-            "y": 6.546602,
+            "y": 6.548058,
             "z": 299.731557
           },
           "wanderTimer": 30,
@@ -2481,7 +2481,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "evadeEpoch": 1,
-          "fallStartY": 6.367613,
+          "fallStartY": 5.316257,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -2496,13 +2496,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "stats": {
@@ -2567,7 +2567,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 953,
-      "state": "960a3555",
+      "state": "1705d67d",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -2975,7 +2975,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.703576,
-          "fallStartY": 6.781719,
+          "fallStartY": 6.818369,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -2990,13 +2990,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.861232,
-            "y": 6.765816,
+            "y": 6.797488,
             "z": 299.981465
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 6.781719,
+            "y": 6.818369,
             "z": 300
           },
           "stats": {
@@ -3005,7 +3005,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 297.990175,
-            "y": 6.546602,
+            "y": 6.548058,
             "z": 299.731557
           },
           "wanderTimer": 30,
@@ -3023,7 +3023,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "evadeEpoch": 1,
-          "fallStartY": 6.367613,
+          "fallStartY": 5.316257,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -3038,13 +3038,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "stats": {
@@ -3110,7 +3110,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 953,
-      "state": "960a3555",
+      "state": "1705d67d",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -3518,7 +3518,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.703576,
-          "fallStartY": 6.781719,
+          "fallStartY": 6.818369,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -3533,13 +3533,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 299.861232,
-            "y": 6.765816,
+            "y": 6.797488,
             "z": 299.981465
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 300,
-            "y": 6.781719,
+            "y": 6.818369,
             "z": 300
           },
           "stats": {
@@ -3548,7 +3548,7 @@
           "templateId": "forest_wolf",
           "wanderTarget": {
             "x": 297.990175,
-            "y": 6.546602,
+            "y": 6.548058,
             "z": 299.731557
           },
           "wanderTimer": 30,
@@ -3566,7 +3566,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "evadeEpoch": 1,
-          "fallStartY": 6.367613,
+          "fallStartY": 5.316257,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
@@ -3581,13 +3581,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 320,
-            "y": 6.367613,
+            "y": 5.316257,
             "z": 320
           },
           "stats": {

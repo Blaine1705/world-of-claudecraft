@@ -103,8 +103,11 @@ describe('insane terrain fragment shader', () => {
       `if ( wocHasGrass || wocHasRock )
           macro2 = texture2D(uMacro, vWPos.xz * 0.0045 + 0.37).r;`,
     );
+    // The presence-mask cull composes with the detail-distance fade: the
+    // fine octave taps skip both when a layer is chunk-uniform absent AND
+    // past the wocDetailFade band where their maps have mipped flat.
     expect(fragmentShader).toContain(
-      `if ( wocHasDirt || wocHasRock )
+      `if ( (wocHasDirt || wocHasRock) && wocNearDetail )
           fineHard = texture2D(uRockN, tuv * 2.4).xy * 2.0 - 1.0;`,
     );
   });

@@ -677,6 +677,14 @@ export function farGroundColor(
     if (highRock > 0) {
       lerp3(out, TONE.rock, highRock * 0.6);
       grassW *= 1 - highRock * 0.8;
+      // the same 30yd stone-tone field the near vertex tint carries
+      // (terrain_chunk_build.ts): whole high faces shift a shade lighter or
+      // darker, so distant domes stop reading as one flat pour
+      const tone = fbm2(x * 0.033, z * 0.033, seed + 87, 2);
+      const f = 1 + (tone - 0.5) * 0.3 * highRock * 0.6;
+      out[0] *= f;
+      out[1] *= f;
+      out[2] *= f;
     }
     // Snow is the pale end of the whole recipe, so it is the term that made
     // the coarse mountainside read as sawtooth facets: the patch noise shifts

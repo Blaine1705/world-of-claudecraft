@@ -42,10 +42,12 @@ describe('terrain vertex pipeline', () => {
     expect(state.indices).toBeInstanceOf(Uint16Array);
     expect(Math.max(...state.indices)).toBeLessThanOrEqual(65_534);
 
-    // Literal minted from the pre-change row-major stream. It ignores only
-    // triangle submission order, retaining each triangle's winding exactly.
+    // Literal minted from the current heightfield's row-major stream (the
+    // diagonal split follows vertex heights, so the natural-relief terrain
+    // re-minted it). It ignores only triangle submission order, retaining
+    // each triangle's winding exactly.
     expect(triangleMultisetFingerprint(state.indices)).toBe(
-      'b3743b0f76fccedc1e00ad7fd7f977d40a334a7e297d322940e3d012fe7a013a',
+      '79cb81b9a01d5207c2c6a0f7292ad402542f9915a254e6ed955c2a39bb20c5fe',
     );
     const tiledAcmr = acmr(state.indices, 16);
     expect(tiledAcmr).toBeLessThan(0.7);

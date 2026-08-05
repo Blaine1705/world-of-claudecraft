@@ -119,14 +119,13 @@ describe('generated chunk geometry is stable', () => {
     expect(inRect.length).toBe(36);
     expect(gapFill.length).toBe(12);
 
-    // Re-minted for the greenSeamT south-edge skirt: the seam used to switch
-    // on at full strength at z = 170, so the coast appliers it silences came
-    // back all at once and stepped the shore along that whole line. It now
-    // fades in across 154..170, which moves ground in that 16yd band only
-    // (bit-identical from z = 170 north). An INTENDED visual change.
-    expect(digestOf(inRect)).toBe('9d96e8f6df4c99904a6e8d97c1ed1c39');
-    // The gap super-chunks west of the rect straddle the same 154..170 band.
-    expect(digestOf(gapFill)).toBe('64228be53411273a266271503b82825d');
+    // Re-minted for the natural-relief heightfield plus the shared height
+    // lattice in terrain_chunk_build.ts (vertex normals now difference the
+    // lattice at the chunk's own spacing instead of a fixed 1.5yd stencil).
+    // Both were intended, reviewed visual changes.
+    expect(digestOf(inRect)).toBe('9998abe4bf7d26f2cb37161e8c72c215');
+    // The gap super-chunks take the same re-mint.
+    expect(digestOf(gapFill)).toBe('cd09a5c112a5b603feaa6e00327face7');
 
     terrain.cancelStreaming();
   });
