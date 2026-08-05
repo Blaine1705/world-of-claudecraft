@@ -2662,6 +2662,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '待機中のものはありません。売上と期限切れの出品はここで受け取ります。',
   'itemUi.market.collectNote': '商人が預かっている売上と返却品です。',
   'itemUi.market.saleProceeds': '売上',
+  'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
   'itemUi.market.collectAll': 'すべて受け取る',
   'itemUi.logs.listedItem': '{item}を{money}でワールドマーケットに出品しました。',
   'itemUi.logs.sellerSold':

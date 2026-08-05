@@ -185,7 +185,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "es_ES": [
     "editor.status.campCapReached",
@@ -363,7 +365,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "fr_FR": [
     "editor.status.campCapReached",
@@ -541,7 +545,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "fr_CA": [
     "editor.status.campCapReached",
@@ -719,7 +725,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "en_CA": [],
   "it_IT": [
@@ -898,7 +906,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "de_DE": [
     "editor.status.campCapReached",
@@ -1076,7 +1086,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "zh_CN": [
     "hudChrome.bg.clock",
@@ -1084,7 +1096,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.market.saleBuyer"
   ],
   "zh_TW": [
     "hudChrome.bg.clock",
@@ -1092,7 +1105,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.market.saleBuyer"
   ],
   "ko_KR": [
     "hudChrome.bg.clock",
@@ -1100,7 +1114,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.market.saleBuyer"
   ],
   "ja_JP": [
     "hudChrome.bg.clock",
@@ -1108,7 +1123,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.market.saleBuyer"
   ],
   "pt_BR": [
     "editor.status.campCapReached",
@@ -1286,7 +1302,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "ru_RU": [
     "hudChrome.bg.clock",
@@ -1294,7 +1312,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.market.saleBuyer"
   ],
   "cs_CZ": [
     "editor.status.campCapReached",
@@ -1472,7 +1491,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "nl_NL": [
     "editor.status.campCapReached",
@@ -1650,7 +1671,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "pl_PL": [
     "editor.status.campCapReached",
@@ -1828,7 +1851,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "id_ID": [
     "editor.status.campCapReached",
@@ -2006,7 +2031,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "tr_TR": [
     "editor.status.campCapReached",
@@ -2184,7 +2211,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "sv_SE": [
     "editor.status.campCapReached",
@@ -2362,7 +2391,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "vi_VN": [
     "editor.status.campCapReached",
@@ -2540,7 +2571,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ],
   "da_DK": [
     "editor.status.campCapReached",
@@ -2718,6 +2751,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundComplete",
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
-    "hudChrome.warfare.reasons.battlegroundWin"
+    "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.market.saleBuyer",
+    "itemUi.market.saleOlder"
   ]
 };

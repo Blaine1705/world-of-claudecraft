@@ -7499,6 +7499,8 @@ export const ru_RU: EnTranslations = {
       "collectEmpty": "Ничего не ждет. Выручка и истекшие лоты собираются здесь.",
       "collectNote": "Выручка и возвращенные товары, которые Торговец хранит для вас.",
       "saleProceeds": "Выручка",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Ещё {count} более ранних продаж, включены в общую сумму.",
       "collectAll": "Забрать все"
     },
     "logs": {

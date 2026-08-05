@@ -2681,6 +2681,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': 'Ничего не ждет. Выручка и истекшие лоты собираются здесь.',
   'itemUi.market.collectNote': 'Выручка и возвращенные товары, которые Торговец хранит для вас.',
   'itemUi.market.saleProceeds': 'Выручка',
+  'itemUi.market.saleOlder': 'Ещё {count} более ранних продаж, включены в общую сумму.',
   'itemUi.market.collectAll': 'Забрать все',
   'itemUi.logs.listedItem': '{item} выставлен на мировой рынок за {money}.',
   'itemUi.logs.sellerSold': '{buyer} купил ваш {item} за {money}. Заберите {proceeds} у Торговца.',
