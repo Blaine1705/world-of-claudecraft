@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { FocusTrapHandle } from '../src/ui/focus_manager';
@@ -25,7 +25,7 @@ function harness(reduceMotion = false) {
     clearTimeout,
   } as unknown as Window;
   const release = vi.fn();
-  const trap: FocusTrapHandle = { focusFirst: vi.fn(), release };
+  const trap: FocusTrapHandle = { focusFirst: vi.fn(), release, opener: vi.fn(() => null) };
   const closeTop = vi
     .fn()
     .mockReturnValueOnce(true)

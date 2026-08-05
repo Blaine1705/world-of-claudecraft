@@ -34,7 +34,7 @@ import { forceDismount } from '../mounts';
 import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { addThreat } from '../threat';
+import { addThreat, hasEscapeStealth } from '../threat';
 import {
   angleTo,
   armorReduction,
@@ -107,7 +107,10 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // still-alive snapshot just as quietly. A genuinely invalid target (none, or a
   // friendly) still reports the error.
   if (t?.dead) return;
-  if (!t || !ctx.isHostileTo(p, t)) {
+  // Vanish (hasEscapeStealth) makes the target fully undetectable, same as a
+  // mob that lost line of sight on a stealthed player (mob/targeting.ts): a
+  // fresh engage against it is refused exactly like any other invalid target.
+  if (!t || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
     ctx.error(p.id, 'Invalid attack target.');
     return;
   }
@@ -159,7 +162,11 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   }
   if (!p.autoAttack || p.castingAbility) return;
   const t = p.targetId !== null ? ctx.entities.get(p.targetId) : null;
-  if (!t || t.dead || !ctx.isHostileTo(p, t)) {
+  // A target that slips into Vanish's escape stealth mid-fight must drop the
+  // swing too (issue #2426): the client stops rendering it as targeted, but
+  // without this the swing kept connecting on a target the caster could no
+  // longer see, the same detection the mob AI already honors (mobCanSeeTarget).
+  if (!t || t.dead || !ctx.isHostileTo(p, t) || hasEscapeStealth(t)) {
     p.autoAttack = false;
     return;
   }
@@ -417,6 +424,14 @@ export function meleeSwing(
     critBonus?: number;
     onDealt?: (amount: number) => void;
     whiteDualWieldPenalty?: boolean;
+    // The casting ability's stable content id, threaded onto the landed-hit
+    // damage event's abilityId field (the weaponStrike path only; a plain
+    // auto-attack swing has no ability and leaves this unset). abilityName
+    // above stays the display label, so a client-side impact-cue lookup
+    // keyed off it silently breaks on the next rename (review finding, PR
+    // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
+    // impact cues unreachable).
+    abilityId?: string | null;
   },
 ): boolean {
   const missChance =
@@ -522,6 +537,12 @@ export function meleeSwing(
       flat: opts.threatFlat ?? 0,
       mult: opts.threatMult ?? 1,
     },
+    true,
+    false,
+    false,
+    // Cue-presentation only on this path: onSpellCrit skips the physical
+    // school, so the id can never newly arm an ability-filtered proc here.
+    opts.abilityId ?? null,
   );
   opts.onDealt?.(resolvedAmount);
   // 4-piece set procs keyed to weapon crits (melee arm; covers auto-attack AND

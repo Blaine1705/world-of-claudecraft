@@ -114,6 +114,7 @@ function makeCtx() {
     get players() {
       return players;
     },
+    masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
     get cfg() {
       return cfg;
@@ -243,6 +244,7 @@ function makeCtx() {
     devCommands: false,
     marketListings: [],
     bankerIds: [],
+    guildBanks: new Map(),
     vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
@@ -378,6 +380,7 @@ function makeCtx() {
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
+    mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
     // Vale Cup <-> Arena queue exclusion.
     vcupSeatedOrQueued: vi.fn(() => false),
