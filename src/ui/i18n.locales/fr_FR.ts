@@ -3070,6 +3070,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Groupe {n}',
   'hudChrome.unitFrame.partyLabel': 'Votre groupe',
   'hudChrome.unitFrame.playerLabel': 'Votre personnage',
+  'hudChrome.unitFrame.petLabel': 'Votre familier',
   'hudChrome.unitFrame.targetAnnounce': 'Cible : {name}',
   'hudChrome.unitFrame.targetLabel': 'Votre cible',
   'seo.officialLabel': 'Site officiel de World of ClaudeCraft',
@@ -9947,6 +9948,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Familier : attaquer',
   'hudChrome.keybinds.petDefensive': 'Familier : défensif',
   'hudChrome.keybinds.petStop': 'Familier : arrêter',
+  'hudChrome.keybinds.targetPet': 'Familier : cibler',
   'hudChrome.keybinds.petTaunt': 'Familier : provoquer',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Envoyer un {item} de moins',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Envoyer un {item} de plus',
@@ -10492,6 +10494,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Vos chances de parer entièrement une attaque de mêlée frontale, sans subir de dégâts. Un coup porté dans le dos ne peut pas être paré.',
   'hudChrome.options.mouseoverCast': 'Incantation au survol sur les cadres de groupe',
   'hudChrome.options.showTargetOfTarget': 'Afficher la cible de la cible',
+  'hudChrome.options.showPetFrame': 'Afficher votre familier',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Cible de la cible',
   'itemUi.market.rarityLegendary': 'Légendaire',
   'loading.reconnectingAttempt':

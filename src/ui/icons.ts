@@ -4566,6 +4566,10 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'chr_palmreach_first_cast',
   'chr_evergarden_gatherer',
   'chr_evergarden_first_cast',
+  // Rift coverage (procedural infinite-dungeon system, v0.35): both are 'dungeon', so both
+  // fall back to the deed_cat_dungeon crest until their commissioned art lands.
+  'dgn_rift',
+  'dgn_rift_s_rank',
   // Basic universal profession rare-craft milestones. They are progression deeds
   // and fall back to the deed_cat_progression crest until their commissioned art lands.
   'prog_engineering_rare',

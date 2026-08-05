@@ -342,6 +342,12 @@ export const BOOL_SETTINGS = {
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  // on by default: the pet health strip under the player frame (hunter / warlock /
+  // mage). It paints only while the player actually HAS a pet, so the six petless
+  // classes never see it and the default costs them nothing. Purely a display
+  // preference read by the HUD's pet-frame update; the pet already rides the wire
+  // as an ordinary owned mob entity.
+  showPetFrame: { def: true },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },

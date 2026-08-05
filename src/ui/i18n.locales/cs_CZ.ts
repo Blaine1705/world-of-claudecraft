@@ -4619,6 +4619,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Skupina {n}',
   'hudChrome.unitFrame.partyLabel': 'Tvoje družina',
   'hudChrome.unitFrame.playerLabel': 'Tvůj hrdina',
+  'hudChrome.unitFrame.petLabel': 'Tvůj mazlíček',
   'hudChrome.unitFrame.targetAnnounce': 'Označit {name}',
   'hudChrome.unitFrame.targetLabel': 'Tvoje značka',
   'hudChrome.compass.E': 'V',
@@ -9199,6 +9200,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Mazlíček: Útok',
   'hudChrome.keybinds.petDefensive': 'Mazlíček: Obranný',
   'hudChrome.keybinds.petStop': 'Mazlíček: Zastavit',
+  'hudChrome.keybinds.targetPet': 'Mazlíček: Zacílit',
   'hudChrome.keybinds.petTaunt': 'Mazlíček: Provokace',
   'hudChrome.keybinds.mount': 'Nasednout / Sesednout',
   'hudChrome.readyCheck.notReady': 'Nepřipraven(a)',
@@ -10058,6 +10060,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{target} uniká tvé schopnosti {ability}.',
   'hudChrome.options.mouseoverCast': 'Sesílání najetím myší na rámech skupiny',
   'hudChrome.options.showTargetOfTarget': 'Zobrazit cíl cíle',
+  'hudChrome.options.showPetFrame': 'Zobrazit tvého mazlíčka',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Značka tvé značky',
   'itemUi.market.rarityLegendary': 'Legendární',
   'loading.reconnectingAttempt':

@@ -2050,6 +2050,47 @@ export const TARGETS = [
     },
   },
   {
+    key: 'commission-board',
+    label: 'Commission order board (issue #1298)',
+    when: [
+      'ui/commission_order_view',
+      'ui/commission_order_window',
+      'sim/professions/commission_order',
+    ],
+    // Stages one order per section: an open request the viewer posted
+    // ("My Requests"), an order a second player accepted from the viewer
+    // ("My Requests" showing Accepted), and an open-board order from a third
+    // player the viewer could take ("Open Board"). The "open a new order"
+    // form is always visible above the sections.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        const pid = sim.primaryId;
+        const meta = sim.players?.get(pid);
+        if (meta) meta.knownRecipes.add('recipe_eastbrook_arming_sword');
+        // A second, offline "player" the shot can show as the board's
+        // requester (no server needed offline: addPlayer seats a bot-like
+        // entity the sim otherwise ignores).
+        let otherPid;
+        try {
+          otherPid = sim.addPlayer('warrior', 'Borin');
+        } catch {}
+        sim.openCommissionOrder?.('recipe_eastbrook_arming_sword', 'open', undefined, pid);
+        if (otherPid !== undefined) {
+          sim.openCommissionOrder?.('recipe_eastbrook_arming_sword', 'open', undefined, otherPid);
+        }
+        const el = document.querySelector('#commission-board-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openCommissionBoard?.();
+      });
+      const open = await pollForSize(page, '#commission-board-window');
+      return open ? { clip: '#commission-board-window' } : {};
+    },
+  },
+  {
     key: 'gather-tool-tooltip',
     label: 'Bag tooltip: gathering implement kind/requirement/use/bonus lines (#2343)',
     when: ['ui/gather_tool_tooltip', 'professions/tools'],
@@ -3010,6 +3051,70 @@ export const TARGETS = [
         return !!w && getComputedStyle(w).display !== 'none';
       });
       return open ? { clip: '#char-window' } : {};
+    },
+  },
+  {
+    key: 'pet-frame',
+    label: 'Pet frame: the pet health strip under the player frame',
+    when: ['ui/pet_frame_view', 'pet_frame_paint'],
+    // Hunter on purpose: it is the pet class players ask about most, and its pet is
+    // the one that survives the owner's death as a revivable corpse.
+    variants: [
+      { key: 'desktop', charClass: 'hunter', charName: 'Rhoswen' },
+      { key: 'mobile', charClass: 'hunter', charName: 'Rhoswen', mobile: true },
+    ],
+    // Summon a pet and wait for it to actually land, reusing the retry shape the
+    // meters target established: the summon mints its own entity, so scanning for
+    // it in the same evaluate races the spawn, and on the mobile page window.__game
+    // is sometimes not published on the first try.
+    //
+    // The clip is #actionbar-stack (desktop), NOT #pet-frame: the BEFORE run shoots
+    // this same target against a tree with no pet frame in it at all, and clipping
+    // to an element that does not exist there would silently fall back to a
+    // full-frame shot, making the pair uncomparable. The stack exists in both and
+    // holds the player frame, the new strip, and the pet bar together, which is
+    // exactly the region under review. Mobile takes the full frame instead, because
+    // there the player and pet frames are position:fixed OUT of the stack.
+    async capture(page, variant) {
+      const hasPet = () =>
+        page.evaluate(() => {
+          const sim = window.__game?.sim;
+          if (!sim?.player) return false;
+          for (const e of sim.entities.values()) {
+            if (e.kind === 'mob' && e.ownerId === sim.player.id) return true;
+          }
+          return false;
+        });
+      for (let attempt = 0; attempt < 30 && !(await hasPet()); attempt++) {
+        await page.evaluate(() => {
+          const sim = window.__game?.sim;
+          document.querySelector('#gpu-notice')?.remove();
+          document.querySelector('.camera-prompt-confirm')?.click();
+          if (!sim?.player) return;
+          try {
+            sim.summonPet?.(sim.player, 'forest_wolf');
+          } catch {}
+        });
+        await wait(500);
+      }
+      // Damage the pet so the health bar reads as a bar rather than a full block:
+      // a strip pinned at 100% cannot show that the fill tracks anything.
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        if (!sim?.player) return;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId === sim.player.id) {
+            e.hp = Math.max(1, Math.round(e.maxHp * 0.62));
+          }
+        }
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+      });
+      await wait(600);
+      // #bottom-bar, not #actionbar-stack: the pet ACTION bar is absolutely
+      // positioned above the stack's top edge, so a stack-clipped shot drops it
+      // and cuts the player frame's health bar with it.
+      return variant?.mobile ? {} : { clip: '#bottom-bar' };
     },
   },
   {

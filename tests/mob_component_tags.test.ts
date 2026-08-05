@@ -52,10 +52,10 @@ describe('mob component-type tags', () => {
     expect(allUnmapped).toEqual(['fen_troll']);
     // The complement, so an always-false predicate could not pass the row above
     // by emptying the sweep. The Drakelands brood, zones 1 to 3 quest-dedupe
-    // content, and the Drakelands/Willowfen/Evergarden harvest-gap fix bring
-    // the harvestable tagged corpus to 43. fen_troll is still the only
-    // all-unmapped one.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(43);
+    // content, the Drakelands/Willowfen/Evergarden harvest-gap fix, and the
+    // Galecrest scuttler reachability fix bring the harvestable tagged corpus to
+    // 44. fen_troll is still the only all-unmapped one.
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(44);
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {

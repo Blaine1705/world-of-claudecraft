@@ -264,16 +264,17 @@ describe('isHarvestableCorpse', () => {
     // 36 since the farm-economy pass: beast, spider and reptile trash pays in
     // harvestable components instead of coin, so 15 previously untagged
     // templates gained mapped tags (tests/economy_yield.test.ts enforces it).
-    // The Drakelands brood, zones 1 to 3 quest-dedupe content, and the
-    // Drakelands/Willowfen/Evergarden harvest-gap fix together bring it to 43.
-    expect(included).toHaveLength(43);
-    // ...and the untagged templates are counted rather than assumed: 186 of them
+    // The Drakelands brood, zones 1 to 3 quest-dedupe content, the
+    // Drakelands/Willowfen/Evergarden harvest-gap fix, and the Galecrest scuttler
+    // reachability fix together bring it to 44.
+    expect(included).toHaveLength(44);
+    // ...and the untagged templates are counted rather than assumed: 185 of them
     // ship, all excluded before this change and all excluded after it, which is
     // the path fen_troll now joins instead of getting one of its own. The merged
     // corpus is counted here rather than hand-waved from either side's prior
     // arithmetic.
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(186);
+    expect(untagged).toHaveLength(185);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

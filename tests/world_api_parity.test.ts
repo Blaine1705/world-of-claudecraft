@@ -337,6 +337,12 @@ export const IWORLD_MEMBERS = [
   { name: 'lastSalvageResult', kind: 'data' },
   // Maker's Bond unbind service (Professions 2.0).
   { name: 'unbindItem', kind: 'method' },
+  // Commission order board (issue #1298).
+  { name: 'commissionOrders', kind: 'data' },
+  { name: 'openCommissionOrder', kind: 'method' },
+  { name: 'cancelCommissionOrder', kind: 'method' },
+  { name: 'acceptCommissionOrder', kind: 'method' },
+  { name: 'deliverCommissionOrder', kind: 'method' },
   // Tool effect slotting: one read row per gathering profession that has a
   // slotted effect, the command that installs one (consuming a crafted charm
   // copy), and the recharge command (the R39/R30 refill).
@@ -541,10 +547,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // the bgInfo data member plus the bgQueueJoin / bgQueueLeave / bgFlagAction
     // commands, leaving 293 (this base tip already carries the Book of Deeds
     // recent strip's deedsRecent read). The stop-auto-attack-on-target-switch
-    // setting adds setStopAutoAttackOnTargetSwitch (method), leaving 294.
-    expect(IWORLD_MEMBERS.length).toBe(294);
-    expect(DATA_MEMBERS.length).toBe(75);
-    expect(METHOD_MEMBERS.length).toBe(219);
+    // setting adds setStopAutoAttackOnTargetSwitch (method), leaving 294. This
+    // branch's commission order board (issue #1298) adds commissionOrders
+    // (data) plus openCommissionOrder/cancelCommissionOrder/
+    // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
+    expect(IWORLD_MEMBERS.length).toBe(299);
+    expect(DATA_MEMBERS.length).toBe(76);
+    expect(METHOD_MEMBERS.length).toBe(223);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -557,6 +566,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(IWORLD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
       'accountCosmetics',
@@ -593,6 +603,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
+      'cancelCommissionOrder',
       'cardMinigameInfo',
       'castAbility',
       'castAbilityAt',
@@ -606,6 +617,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'claimEventSkin',
       'clearMarker',
       'collectDelveChestLoot',
+      'commissionOrders',
       'companionState',
       'companionUpgrade',
       'companionUpgrades',
@@ -625,6 +637,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'deedsRarity',
       'deedsRecent',
       'deleteLoadout',
+      'deliverCommissionOrder',
       'delveBuyShopItem',
       'delveDaily',
       'delveInteract',
@@ -742,6 +755,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveRaidMember',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
+      'openCommissionOrder',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -868,6 +882,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgInfo',
       'cardMinigameInfo',
       'cfg',
+      'commissionOrders',
       'companionState',
       'companionUpgrades',
       'copper',
@@ -936,6 +951,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     expect(METHOD_MEMBERS.map((m) => m.name).sort()).toEqual([
       'abandonPet',
       'abandonQuest',
+      'acceptCommissionOrder',
       'acceptLinkedQuest',
       'acceptQuest',
       'accountFlair',
@@ -960,6 +976,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'buyHeroicVendorItem',
       'buyItem',
       'cancelAura',
+      'cancelCommissionOrder',
       'castAbility',
       'castAbilityAt',
       'castAbilityBySlot',
@@ -982,6 +999,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'deedsRarity',
       'deedsRecent',
       'deleteLoadout',
+      'deliverCommissionOrder',
       'delveBuyShopItem',
       'delveInteract',
       'delveRiteChoose',
@@ -1070,6 +1088,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveRaidMember',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
+      'openCommissionOrder',
       'ownedMounts',
       'partyAccept',
       'partyDecline',
@@ -1631,6 +1650,11 @@ const FACET_PROFESSIONS = [
   'lastEnchantResult',
   'lastSalvageResult',
   'unbindItem',
+  'commissionOrders',
+  'openCommissionOrder',
+  'cancelCommissionOrder',
+  'acceptCommissionOrder',
+  'deliverCommissionOrder',
   'toolEffectSlots',
   'slotToolEffect',
   'rechargeToolEffect',
@@ -1725,8 +1749,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(294);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(294);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(299);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(299);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

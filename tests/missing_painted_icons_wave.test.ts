@@ -510,7 +510,7 @@ describe('missing painted item integration', () => {
 });
 
 describe('missing painted deed and Heroic weapon integration', () => {
-  it('leaves every deed it painted art-backed and records generated crest ownership', () => {
+  it('leaves only the pinned art-pending deeds without painted art, and records generated crest ownership', () => {
     const accepted = manifest();
     expect(accepted.targetSets.deeds).toEqual([
       'dgn_wildheart_basin',
@@ -521,7 +521,7 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // Read from DEED_ART_PENDING, the one enumeration of that debt
     // (src/ui/icons.ts), so this file cannot name a different pending set than
     // the other art suites.
-    expect(DEED_ORDER).toHaveLength(257);
+    expect(DEED_ORDER).toHaveLength(259);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

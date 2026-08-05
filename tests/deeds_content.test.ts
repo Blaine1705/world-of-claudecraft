@@ -62,9 +62,9 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 257 deeds worth 3030 total Renown', () => {
-    expect(DEED_ORDER.length).toBe(257);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3030);
+  it('ships exactly 259 deeds worth 3060 total Renown', () => {
+    expect(DEED_ORDER.length).toBe(259);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3060);
   });
 
   it('ships the audited per-category counts', () => {
@@ -73,7 +73,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 57,
       combat: 10,
-      dungeon: 29,
+      dungeon: 31,
       delve: 13,
       chronicle: 49,
       collection: 28,
@@ -171,9 +171,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_palmreach_first_cast',
       'chr_evergarden_gatherer',
       'chr_evergarden_first_cast',
+      // Rift coverage (procedural infinite-dungeon system, no fixed
+      // dungeonId to key a dungeonClears trigger against).
+      'dgn_rift',
+      'dgn_rift_s_rank',
       // Basic universal profession deeds (issue #2055): per-craft rare-tier
       // milestones, appended after the release branch's starter-zone
-      // chronicle pairs to preserve the append-only order of both parents.
+      // chronicle pairs and Rift pair to preserve append-only order.
       'prog_engineering_rare',
       'prog_alchemy_rare',
       'prog_cooking_rare',
@@ -258,6 +262,23 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       kind: 'quest',
       questId: 'q_dk_matriarch_of_the_maw',
     });
+  });
+
+  it('pins the Rift coverage: renown and trigger literals', () => {
+    expect(DEEDS.dgn_rift.category).toBe('dungeon');
+    expect(DEEDS.dgn_rift.renown).toBe(5);
+    expect(DEEDS.dgn_rift.trigger).toEqual({ kind: 'stat', stat: 'riftClears', count: 1 });
+    expect(DEEDS.dgn_rift.hidden ?? false).toBe(false);
+    expect(DEEDS.dgn_rift.feat ?? false).toBe(false);
+    expect(DEEDS.dgn_rift_s_rank.category).toBe('dungeon');
+    expect(DEEDS.dgn_rift_s_rank.renown).toBe(25);
+    expect(DEEDS.dgn_rift_s_rank.trigger).toEqual({
+      kind: 'stat',
+      stat: 'riftSRankClears',
+      count: 1,
+    });
+    expect(DEEDS.dgn_rift_s_rank.hidden ?? false).toBe(false);
+    expect(DEEDS.dgn_rift_s_rank.feat ?? false).toBe(false);
   });
 
   it('pins the professions additions: renown and trigger literals', () => {
@@ -482,10 +503,10 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // the four Thornhollow Fields battleground deeds. No shipped trigger or
   // renown changed on either side.
   // Re-baselined for issue #2055 (basic universal profession deeds): seven
-  // appended per-craft rare-tier milestones (prog_engineering_rare through
-  // prog_armorcrafting_rare), appended after the release branch's
+  // appended per-craft rare-tier milestones, and for Rift coverage
+  // (dgn_rift, dgn_rift_s_rank), appended after the release branch's
   // starter-zone chronicle pairs. No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = 'd13cff94c4c55876f6bbcb24bea6eac9114764582b50c6dd67f703ae5952594d';
+  const FROZEN_CATALOG_SHA256 = '438134afb50e9a2e15d6cd7acb713f8ed1290e02a68a961f7b6464462f1ed89f';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
