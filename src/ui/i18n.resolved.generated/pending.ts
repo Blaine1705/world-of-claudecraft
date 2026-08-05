@@ -1085,7 +1085,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "zh_CN": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1094,7 +1093,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "zh_TW": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1103,7 +1101,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "ko_KR": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1112,7 +1109,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "ja_JP": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1300,7 +1296,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "ru_RU": [
-    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
