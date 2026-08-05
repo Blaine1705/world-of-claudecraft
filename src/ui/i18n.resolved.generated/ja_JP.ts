@@ -786,6 +786,7 @@ export const ja_JP: EnTranslations = {
       "targetAnnounce": "ターゲット：{name}",
       "targetOfTargetLabel": "ターゲットのターゲット",
       "partyLabel": "あなたのパーティ",
+      "petLabel": "あなたのペット",
       "partyChip": "パーティ",
       "partyGroup": "グループ {n}",
       "durationUnitSeconds": "秒",
@@ -820,7 +821,7 @@ export const ja_JP: EnTranslations = {
       "targetCycleShort": "標的",
       "spellbookPageLabel": "ページ{page}",
       "hideKeyboard": "キーボードを隠す",
-      "chatPlaceholder": "発言する..."
+      "chatPlaceholder": "発言する... (! でコミュニティコマンド)"
     },
     "tutorial": {
       "moveBodyTouch": "移動スティックで移動し、画面をドラッグして周囲を見回します。数歩進んで始めましょう。",
@@ -911,6 +912,7 @@ export const ja_JP: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "パーティがダメージまたは回復を与えると行が自動的に表示され、戦闘終了の数秒後にこのセグメントは閉じます。",
+      "threatFallback": "リアルタイムのヘイトなし：{name}へのダメージを表示",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "その他（{count}）",
@@ -958,6 +960,7 @@ export const ja_JP: EnTranslations = {
       "petTaunt": "ペット：挑発",
       "petDefensive": "ペット：防御",
       "petAggressive": "ペット：攻撃的",
+      "targetPet": "ペット：ターゲット",
       "mount": "騎乗 / 降車",
       "mouseHint": "マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。"
     },
@@ -1295,6 +1298,7 @@ export const ja_JP: EnTranslations = {
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
+      "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
       "walkByAutoloot": "通りがかり自動ルート",
       "groundReticle": "地面ターゲットのレティクル",
       "mouseoverCast": "パーティフレームでマウスオーバーキャスト",
@@ -1304,8 +1308,10 @@ export const ja_JP: EnTranslations = {
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
       "showThirdActionBar": "3本目のアクションバーを表示",
+      "hideUnusedActionSlots": "未使用のアクションスロットを非表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
+      "showPetFrame": "自分のペットを表示",
       "showAttackButton": "攻撃ボタンを表示",
       "showDailyRewardsChest": "デイリー報酬の宝箱を表示",
       "mobileCameraJoystick": "カメラスティック",
@@ -2969,6 +2975,59 @@ export const ja_JP: EnTranslations = {
       "cannotAfford": "バインド解除の手数料を支払えません。",
       "outOfRange": "バインド解除するには作業台のそばにいる必要があります。",
       "noSpace": "バッグにバインド解除したアイテムを入れる空きがありません。"
+    },
+    "commissionBoard": {
+      "title": "依頼ボード",
+      "close": "依頼ボードを閉じる",
+      "openButton": "依頼",
+      "openButtonAria": "依頼ボードを開く",
+      "intro": "職人に一品の製作を依頼するか、他の人の依頼を引き受けましょう。",
+      "formTitle": "依頼を出す",
+      "recipeLabel": "アイテム",
+      "recipeEmpty": "まだ依頼できる装備のレシピを習得していません。",
+      "scopeLabel": "誰が引き受けられるか",
+      "scopeOpen": "誰でも（公開依頼）",
+      "scopeCrafter": "特定の職人",
+      "crafterNameLabel": "職人の名前",
+      "crafterNamePlaceholder": "キャラクター名",
+      "openSubmit": "依頼を出す",
+      "sectionMine": "自分の依頼",
+      "sectionToCraft": "引き受けた依頼",
+      "sectionBoard": "公開依頼",
+      "boardEmpty": "現在、公開されている依頼はありません。",
+      "mineEmpty": "まだ依頼を出していません。",
+      "toCraftEmpty": "現在、誰の依頼も引き受けていません。",
+      "rowFor": "{item}（依頼者：{requester}）",
+      "rowTargeted": "{item}（依頼者：{requester} / 指名：{crafter}）",
+      "acceptedBy": "{name}が引き受け済み",
+      "statusOpen": "募集中",
+      "statusAccepted": "引き受け済み",
+      "statusDelivered": "納品済み",
+      "statusCancelled": "キャンセル済み",
+      "statusExpired": "期限切れ",
+      "cancelButton": "キャンセル",
+      "acceptButton": "引き受ける",
+      "deliverButton": "納品",
+      "deliverHint": "受注品として（受注トグルをオンにして）製作してから、ここに戻って納品してください。",
+      "opened": "{item}の依頼を出しました。",
+      "cancelled": "{item}の依頼をキャンセルしました。",
+      "accepted": "{item}の依頼を引き受けました。",
+      "delivered": "{item}を{name}に納品しました。",
+      "denyUnknownRecipe": "そのレシピは存在しません。",
+      "denyNotCommissionEligible": "そのレシピは依頼できません。",
+      "denyUnknownCrafter": "その名前のキャラクターは見つかりません。",
+      "denySelfCrafter": "自分自身に依頼することはできません。",
+      "denyTooManyOpen": "募集中の依頼が上限に達しています。",
+      "denyUnknownOrder": "その依頼はもう存在しません。",
+      "denyOrderNotOpen": "その依頼はもう募集していません。",
+      "denySelfOrder": "自分が出した依頼は引き受けられません。",
+      "denyNotEligibleCrafter": "その依頼は別の職人に指名されています。",
+      "denyNotYourOrder": "それはあなたの依頼ではありません。",
+      "denyOrderNotAccepted": "その依頼はまだ引き受けられていません。",
+      "denyNotYourAcceptance": "あなたはその依頼を引き受けていません。",
+      "denyNotCrafted": "先に受注品を製作してください（受注トグルをオンに）。",
+      "denyOutOfRange": "納品するには依頼者の近くにいる必要があります。",
+      "denyNoSpace": "依頼者のバッグに空きがありません。"
     },
     "finder": {
       "title": "ダンジョンファインダー",
@@ -6473,7 +6532,7 @@ export const ja_JP: EnTranslations = {
       "releaseSpirit": "霊魂を解放",
       "chatTab": "チャット",
       "combatLogTab": "戦闘ログ",
-      "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help)",
+      "chatPlaceholder": "発言する... (/s 発言、/w 名前 ささやき、/r 返信、/p パーティ、/gu ギルド、/o オフィサー、/general 一般、/help、! でコミュニティコマンド)",
       "chatChannels": {
         "add": "チャットチャンネルを追加",
         "addTitle": "チャンネルを追加",
@@ -10199,6 +10258,18 @@ export const ja_JP: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
+      },
+      "moggers_hide_quiver": {
+        "name": "モガーの革の矢筒"
+      },
+      "cragmaw_huntquiver": {
+        "name": "クラッグモウの狩猟矢筒"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "墓ワームの骨の矢筒"
+      },
+      "direfang_quiver": {
+        "name": "ダイアファングの矢筒"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

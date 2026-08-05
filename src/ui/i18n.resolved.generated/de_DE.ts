@@ -786,6 +786,7 @@ export const de_DE: EnTranslations = {
       "targetAnnounce": "Ziel: {name}",
       "targetOfTargetLabel": "Ziel des Ziels",
       "partyLabel": "Eure Gruppe",
+      "petLabel": "Euer Begleiter",
       "partyChip": "Gruppe",
       "partyGroup": "Gruppe {n}",
       "durationUnitSeconds": "s",
@@ -911,6 +912,7 @@ export const de_DE: EnTranslations = {
       "minutesSeconds": "{m} Min. {s} Sek.",
       "seconds": "{s} Sek.",
       "autoShowHint": "Zeilen erscheinen automatisch, sobald deine Gruppe Schaden verursacht oder heilt, und dieses Segment schliessen sich einige Sekunden nach Kampfende.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Andere ({count})",
@@ -958,6 +960,7 @@ export const de_DE: EnTranslations = {
       "petTaunt": "Begleiter: Verspotten",
       "petDefensive": "Begleiter: Defensiv",
       "petAggressive": "Begleiter: Aggressiv",
+      "targetPet": "Begleiter: Anvisieren",
       "mount": "Aufsitzen / Absitzen",
       "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten."
     },
@@ -1295,6 +1298,7 @@ export const de_DE: EnTranslations = {
       "aurasOnPlayerFrame": "Stärkungszauber am Spielerfenster",
       "highContrastBackground": "Hintergrund mit hohem Kontrast",
       "startAttackOnAbility": "Auto-Angriff bei Fähigkeitseinsatz",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Plündern im Vorbeigehen",
       "groundReticle": "Bodenziel-Fadenkreuz",
       "mouseoverCast": "Mouseover-Wirken auf Gruppenfenstern",
@@ -1304,8 +1308,10 @@ export const de_DE: EnTranslations = {
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
+      "hideUnusedActionSlots": "Ungenutzte Aktionsfelder ausblenden",
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
+      "showPetFrame": "Euren Begleiter anzeigen",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
@@ -2969,6 +2975,59 @@ export const de_DE: EnTranslations = {
       "cannotAfford": "Du kannst die Entbindungsgebühr nicht bezahlen.",
       "outOfRange": "Du musst dich an einer Handwerksstation befinden, um zu entbinden.",
       "noSpace": "Du hast keinen Platz für die entbundene Kopie."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Instanzfinder",
@@ -10199,6 +10258,18 @@ export const de_DE: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Zügel des Drakenrachen-Raptors"
+      },
+      "moggers_hide_quiver": {
+        "name": "Moggers Fellköcher"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Jagdköcher von Cragmaw"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravewyrm-Knochenköcher"
+      },
+      "direfang_quiver": {
+        "name": "Direfang-Köcher"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

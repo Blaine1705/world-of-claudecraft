@@ -786,6 +786,7 @@ export const fr_FR: EnTranslations = {
       "targetAnnounce": "Cible : {name}",
       "targetOfTargetLabel": "Cible de la cible",
       "partyLabel": "Votre groupe",
+      "petLabel": "Votre familier",
       "partyChip": "Groupe",
       "partyGroup": "Groupe {n}",
       "durationUnitSeconds": "s",
@@ -911,6 +912,7 @@ export const fr_FR: EnTranslations = {
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
       "autoShowHint": "Les lignes apparaissent automatiquement dès que votre groupe inflige des dégâts ou des soins, et ce panneau se ferme quelques secondes après la fin du combat.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Autres ({count})",
@@ -958,6 +960,7 @@ export const fr_FR: EnTranslations = {
       "petTaunt": "Familier : provoquer",
       "petDefensive": "Familier : défensif",
       "petAggressive": "Familier : agressif",
+      "targetPet": "Familier : cibler",
       "mount": "Monter / Descendre",
       "mouseHint": "Les boutons de la souris fonctionnent aussi: appuyez sur le bouton central (M3) ou un bouton de pouce (M4, M5) pendant l'assignation. Les boutons gauche et droit restent réservés à la caméra, au clic pour se déplacer et au clic sur les éléments du monde."
     },
@@ -1295,6 +1298,7 @@ export const fr_FR: EnTranslations = {
       "aurasOnPlayerFrame": "Améliorations sur le cadre du joueur",
       "highContrastBackground": "Arrière-plan à contraste élevé",
       "startAttackOnAbility": "Attaque auto à l'utilisation d'une compétence",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Ramassage auto au passage",
       "groundReticle": "Réticule de ciblage au sol",
       "mouseoverCast": "Incantation au survol sur les cadres de groupe",
@@ -1304,8 +1308,10 @@ export const fr_FR: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Afficher la barre d'action secondaire",
       "showThirdActionBar": "Afficher la troisième barre d'action",
+      "hideUnusedActionSlots": "Masquer les emplacements d'action inutilisés",
       "lockActionBars": "Verrouiller les barres d'action",
       "showTargetOfTarget": "Afficher la cible de la cible",
+      "showPetFrame": "Afficher votre familier",
       "showAttackButton": "Afficher le bouton d'attaque",
       "showDailyRewardsChest": "Afficher le coffre des récompenses quotidiennes",
       "mobileCameraJoystick": "Manette de caméra",
@@ -2969,6 +2975,59 @@ export const fr_FR: EnTranslations = {
       "cannotAfford": "Vous n'avez pas les moyens de payer les frais de déliage.",
       "outOfRange": "Vous devez être à un établi pour délier.",
       "noSpace": "Vous n'avez pas de place pour l'exemplaire délié."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Chercheur de donjons",
@@ -10199,6 +10258,18 @@ export const fr_FR: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
+      },
+      "moggers_hide_quiver": {
+        "name": "Carquois en cuir de Mogger"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Carquois de chasse de Cragmaw"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Carquois en os du Gravewyrm"
+      },
+      "direfang_quiver": {
+        "name": "Carquois de Direfang"
       },
       "conjured_water4": {
         "name": "Eau de source invoquée"

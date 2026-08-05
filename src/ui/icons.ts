@@ -4512,6 +4512,7 @@ export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 // future development-only item may still use it temporarily. tests/item_icons.test.ts holds
 // the line from both sides: it rejects stale entries after art lands and unenumerated art
 // debt. Do not add to this list merely to silence that failure; commission the art.
+// Empty again after the hunter quiver art landed in the same branch that enumerated it.
 export const ITEM_ART_PENDING = new Set<string>();
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

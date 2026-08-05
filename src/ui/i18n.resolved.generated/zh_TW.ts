@@ -786,6 +786,7 @@ export const zh_TW: EnTranslations = {
       "targetAnnounce": "目標：{name}",
       "targetOfTargetLabel": "目標的目標",
       "partyLabel": "你的隊伍",
+      "petLabel": "你的寵物",
       "partyChip": "隊伍",
       "partyGroup": "小隊 {n}",
       "durationUnitSeconds": "秒",
@@ -820,7 +821,7 @@ export const zh_TW: EnTranslations = {
       "targetCycleShort": "目標",
       "spellbookPageLabel": "頁{page}",
       "hideKeyboard": "隱藏鍵盤",
-      "chatPlaceholder": "說點什麼..."
+      "chatPlaceholder": "說點什麼...（! 顯示社群指令）"
     },
     "tutorial": {
       "moveBodyTouch": "使用搖桿移動，拖曳螢幕環顧四周。先走幾步開始吧。",
@@ -911,6 +912,7 @@ export const zh_TW: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。",
+      "threatFallback": "無即時仇恨：顯示對{name}造成的傷害",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
@@ -958,6 +960,7 @@ export const zh_TW: EnTranslations = {
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
       "petAggressive": "寵物：攻擊性",
+      "targetPet": "寵物：選取",
       "mount": "騎乘 / 下騎",
       "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。"
     },
@@ -1295,6 +1298,7 @@ export const zh_TW: EnTranslations = {
       "aurasOnPlayerFrame": "增益顯示在玩家框",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
+      "stopAutoAttackOnTargetSwitch": "切換目標時停止自動攻擊",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "mouseoverCast": "對隊伍框架滑鼠指向施法",
@@ -1304,8 +1308,10 @@ export const zh_TW: EnTranslations = {
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
       "showThirdActionBar": "顯示第三動作列",
+      "hideUnusedActionSlots": "隱藏未使用的動作欄位",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
+      "showPetFrame": "顯示你的寵物",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
@@ -2969,6 +2975,59 @@ export const zh_TW: EnTranslations = {
       "cannotAfford": "你付不起解綁費用。",
       "outOfRange": "你必須站在對應的工作臺旁才能解綁。",
       "noSpace": "背包空間不足，無法存放解綁後的物品。"
+    },
+    "commissionBoard": {
+      "title": "委託訂單",
+      "close": "關閉委託訂單",
+      "openButton": "訂單",
+      "openButtonAria": "開啟委託訂單板",
+      "intro": "委託一位工匠為你製作一件物品，或接下別人發布的訂單。",
+      "formTitle": "發布委託",
+      "recipeLabel": "物品",
+      "recipeEmpty": "你還不會製作任何可委託的裝備配方。",
+      "scopeLabel": "誰可以接單",
+      "scopeOpen": "任何人（公開板）",
+      "scopeCrafter": "指定工匠",
+      "crafterNameLabel": "工匠名稱",
+      "crafterNamePlaceholder": "角色名稱",
+      "openSubmit": "發布訂單",
+      "sectionMine": "我的委託",
+      "sectionToCraft": "我承接的委託",
+      "sectionBoard": "公開委託板",
+      "boardEmpty": "目前沒有公開的委託訂單。",
+      "mineEmpty": "你還沒有發布任何委託。",
+      "toCraftEmpty": "你目前沒有承接任何人的委託。",
+      "rowFor": "{item}，委託人：{requester}",
+      "rowTargeted": "{item}，委託人：{requester}（指定工匠：{crafter}）",
+      "acceptedBy": "已由{name}接單",
+      "statusOpen": "待接單",
+      "statusAccepted": "已接單",
+      "statusDelivered": "已交付",
+      "statusCancelled": "已取消",
+      "statusExpired": "已過期",
+      "cancelButton": "取消",
+      "acceptButton": "接單",
+      "deliverButton": "交付",
+      "deliverHint": "先製作出委託的物品（勾選委託選項），再回到這裡交付。",
+      "opened": "你發布了一份{item}的委託訂單。",
+      "cancelled": "你取消了{item}的委託訂單。",
+      "accepted": "你接下了{item}的委託訂單。",
+      "delivered": "你將{item}交付給了{name}。",
+      "denyUnknownRecipe": "該配方不存在。",
+      "denyNotCommissionEligible": "該配方無法委託製作。",
+      "denyUnknownCrafter": "未找到該名稱的角色。",
+      "denySelfCrafter": "你不能委託自己。",
+      "denyTooManyOpen": "你的待接單委託訂單已達上限。",
+      "denyUnknownOrder": "該委託訂單已不存在。",
+      "denyOrderNotOpen": "該委託訂單已不再開放。",
+      "denySelfOrder": "你不能接下自己發布的委託訂單。",
+      "denyNotEligibleCrafter": "該委託訂單是發給另一位工匠的。",
+      "denyNotYourOrder": "這不是你的委託訂單。",
+      "denyOrderNotAccepted": "該委託訂單尚未被接單。",
+      "denyNotYourAcceptance": "你並未接下該委託訂單。",
+      "denyNotCrafted": "請先製作出委託物品（勾選委託選項）。",
+      "denyOutOfRange": "你必須靠近委託人才能交付委託。",
+      "denyNoSpace": "委託人的背包空間不足。"
     },
     "finder": {
       "title": "地城搜尋器",
@@ -6473,7 +6532,7 @@ export const zh_TW: EnTranslations = {
       "releaseSpirit": "釋放靈魂",
       "chatTab": "聊天",
       "combatLogTab": "戰鬥紀錄",
-      "chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合）",
+      "chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合，! 顯示社群指令）",
       "chatChannels": {
         "add": "新增聊天頻道",
         "addTitle": "新增頻道",
@@ -10199,6 +10258,18 @@ export const zh_TW: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
+      },
+      "moggers_hide_quiver": {
+        "name": "莫格的獸皮箭袋"
+      },
+      "cragmaw_huntquiver": {
+        "name": "裂顎的狩獵箭袋"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "墓龍骨箭袋"
+      },
+      "direfang_quiver": {
+        "name": "厲牙箭袋"
       },
       "conjured_water4": {
         "name": "魔法泉水"
