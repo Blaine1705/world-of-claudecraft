@@ -11102,7 +11102,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Das Blätterdach schließt sich über der Straße wie ein Deckel. Halte dich an die Laternen von Gallowmere, und antworte nicht, wenn der Wald deinen Namen ruft.',
   'fiesta.augment.cardAria': '{name} ({category}): {description}',
   'guide.dungeonsPage.wildheartBody':
-    'Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um Zulgar entgegenzutreten.',
+    'Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um zu sehen, wer oben wartet.',
   'guide.family.demon.desc':
     'Eindringlinge von jenseits der Risse, ganz Feuer und Bosheit. Wo einer steht, ist ein Durchbruch nie fern.',
   'guide.family.demon.name': 'Dämonen',
