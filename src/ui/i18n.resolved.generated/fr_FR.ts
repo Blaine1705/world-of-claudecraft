@@ -1992,6 +1992,7 @@ export const fr_FR: EnTranslations = {
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
       "cookingCatch": "Ingrédient de cuisine. Doit être cuit avant d'être consommé.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement commun et peu commun.",
       "arcaneEssence": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement rare.",
       "arcaneShard": "Réactif d'enchantement. Obtenu en désenchantant de l'équipement épique et légendaire.",

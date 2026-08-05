@@ -4243,6 +4243,17 @@
     margin-top: 4px;
     font-size: 11.5px;
   }
+  /* Profession affinity on honest materials ("Used by Leatherworking, ...").
+     Soft craft-teal wash on the accent so multi-use reagents scan apart from
+     food/potion use lines without inventing a new rarity color. The color is
+     a theme-emitted token (src/ui/theme.ts), NOT a color-mix over
+     --color-accent: mixing a fixed light teal into the contrast-repaired
+     accent re-lightens it below the large-text floor on the light Parchment
+     panel, so the wash is repaired per preset like --color-quest-tag-text.
+     Always-on (no --fx gate; fairness). */
+  #tooltip .tt-desc.tt-material-use {
+    color: var(--color-material-use, #d6ce3b);
+  }
   #tooltip .tt-stat {
     color: #fff;
     font-size: 11.5px;
