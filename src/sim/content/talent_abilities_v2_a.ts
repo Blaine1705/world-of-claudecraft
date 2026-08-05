@@ -214,7 +214,7 @@ export const TALENT_ABILITIES_V2_A = {
     // The Redline builder: Wicked Slash transforms into this while the window
     // runs (actionReplacement on sinister_strike). Each landing deepens the
     // run by one pip (rogueEngineOnCast), feeding the Knockout cash-out.
-    effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 1.3 }],
+    effects: [{ type: 'weaponStrike', bonus: 10, weaponMult: 1.3, normalized: true }],
     description:
       'A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)',
   },

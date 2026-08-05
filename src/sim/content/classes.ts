@@ -2837,25 +2837,25 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Thuggery engine (combat/rogue_engines.ts): while the Redline window
     // runs, the builder button is Haymaker, the pip-deepening heavy hit.
     actionReplacement: { abilityId: 'body_blow', auraKind: 'redline', minStacks: 1 },
-    effects: [{ type: 'weaponStrike', bonus: 3 }],
+    effects: [{ type: 'weaponStrike', bonus: 3, normalized: true }],
     ranks: [
       {
         rank: 2,
         level: 8,
         cost: 45,
-        effects: [{ type: 'weaponStrike', bonus: 6 }],
+        effects: [{ type: 'weaponStrike', bonus: 6, normalized: true }],
       },
       {
         rank: 3,
         level: 14,
         cost: 45,
-        effects: [{ type: 'weaponStrike', bonus: 12 }],
+        effects: [{ type: 'weaponStrike', bonus: 12, normalized: true }],
       },
       {
         rank: 4,
         level: 20,
         cost: 45,
-        effects: [{ type: 'weaponStrike', bonus: 18 }],
+        effects: [{ type: 'weaponStrike', bonus: 18, normalized: true }],
       },
     ],
     description: 'An instant strike for weapon damage plus $d. Awards 1 combo point.',

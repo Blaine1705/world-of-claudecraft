@@ -261,6 +261,11 @@ export interface ProcDef {
   school?: 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
   trigger: ProcTrigger;
   responses: ProcResponse[];
+  // Committed specs for which this proc is inert (it never fires and banks
+  // nothing). For a talent shared across a class's specs whose payoff is
+  // designed for one of them: e.g. Ceaseless Cuts is Combat's energy engine,
+  // so it stays dead for the dagger specs even if they pick the row.
+  excludeSpecs?: readonly string[];
 }
 
 export interface TalentEffect {

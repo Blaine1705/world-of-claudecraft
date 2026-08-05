@@ -10680,6 +10680,18 @@ export const id_ID: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "Air Mata Air Sihir"
       },

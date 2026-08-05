@@ -10680,6 +10680,18 @@ export const ja_JP: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "魔法の湧き水"
       },

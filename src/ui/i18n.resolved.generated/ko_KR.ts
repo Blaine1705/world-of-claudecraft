@@ -10680,6 +10680,18 @@ export const ko_KR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "창조된 샘물"
       },

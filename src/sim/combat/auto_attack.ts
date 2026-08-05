@@ -58,7 +58,7 @@ import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
-import { baseSwingSpeed, rangedAutoProfile } from './form_swing';
+import { baseSwingSpeed, normalizedInstantSpeed, rangedAutoProfile } from './form_swing';
 import { isTravelFormAuraKind } from './forms';
 import { tryGrantDawnsWrath } from './paladin_dawns_wrath';
 import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
@@ -461,6 +461,11 @@ export function meleeSwing(
     // #2861: this is what left Ambush/Backstab/Sinister Strike's dedicated
     // impact cues unreachable).
     abilityId?: string | null;
+    // Classic instant-attack normalization (weaponStrike effect `normalized`):
+    // scale the weapon-damage portion to a fixed normalized speed by weapon
+    // class instead of the weapon's real speed. Only meaningful for an ability
+    // swing (autoAttackHand undefined); a real auto attack ignores it.
+    normalizedInstant?: boolean;
   },
 ): boolean {
   const missChance =
@@ -521,9 +526,21 @@ export function meleeSwing(
   const weapon = opts.weapon ?? attacker.weapon;
   const autoAttackHand =
     opts.autoAttackHand === 'mainhand' ? mainhandAutoAttackHand(attacker) : opts.autoAttackHand;
+  // An instant special attack that opts into normalization is resolved as if
+  // the weapon swung at its normalized speed: both the weapon-roll portion and
+  // the AP-per-swing contribution use the normalized speed, not the real one.
+  // A real auto attack (autoAttackHand set) never normalizes.
+  const normSpeed =
+    opts.normalizedInstant && autoAttackHand === undefined
+      ? normalizedInstantSpeed(weapon)
+      : undefined;
   const weaponRollMult =
-    autoAttackHand === undefined ? 1 : autoAttackWeaponDamageMult(autoAttackHand, weapon.speed);
-  const apSwingSpeed = opts.apSwingSpeed ?? baseSwingSpeed(attacker);
+    autoAttackHand === undefined
+      ? normSpeed !== undefined
+        ? normSpeed / Math.max(0.1, weapon.speed)
+        : 1
+      : autoAttackWeaponDamageMult(autoAttackHand, weapon.speed);
+  const apSwingSpeed = opts.apSwingSpeed ?? normSpeed ?? baseSwingSpeed(attacker);
   // weapon imbues (seals, rockbiter) add flat damage to every swing
   let imbueBonus = 0;
   for (const a of attacker.auras) if (a.kind === 'imbue') imbueBonus += a.value;
@@ -628,7 +645,11 @@ export function meleeSwing(
     }
   }
   // Legendary on-hit weapon procs (e.g. Thronebane's Chain Arc). No-op (no rng
-  // draw) unless the attacker wields a proc weapon with a weaponHit proc.
-  runWeaponProcs(ctx, attacker, target, 'weaponHit');
+  // draw) unless the SWINGING hand's weapon carries a weaponHit proc: an
+  // off-hand swing rolls the OFF-HAND weapon's procs, not the mainhand's (the
+  // dual-wield bug). Ability strikes (autoAttackHand undefined) use the mainhand.
+  const procWeaponId =
+    autoAttackHand === 'offhand' ? attacker.offhandItemId : attacker.mainhandItemId;
+  runWeaponProcs(ctx, attacker, target, 'weaponHit', procWeaponId);
   return true;
 }

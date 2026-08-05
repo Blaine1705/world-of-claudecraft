@@ -10680,6 +10680,18 @@ export const zh_TW: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },

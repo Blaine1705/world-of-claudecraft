@@ -214,7 +214,13 @@ export function rogueEngineOnCast(
         VENOM_RITUAL_DURATION,
         VENOM_RITUAL_STAGES,
       );
-      if (p.resourceType === 'energy') {
+      // The energy refund is the THRUST's reward (Craven Thrust), not the
+      // Wicked Slash fallback's. The fallback still banks a ritual stage (so
+      // Venomrend keeps working when the angle is lost), but it must not
+      // self-fund a spam: a non-dagger build forced onto the fallback would
+      // otherwise turn the "lost the angle" button into a near-free primary
+      // builder (the Thronebane exploit, docs/design/rogue-v029-spec-engines).
+      if (abilityId === 'backstab' && p.resourceType === 'energy') {
         p.resource = Math.min(p.maxResource, p.resource + VENOM_STAGE_REFUND);
       }
     }
