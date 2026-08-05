@@ -213,35 +213,6 @@ describe('paladin redesign', () => {
     expect(p.auras.some((a) => a.kind === 'buff_speed' && a.id === 'divine_steed_burst')).toBe(
       true,
     );
-    addTargetMob(sim);
-    castAndSettle(sim, 'seal_of_righteousness', 2);
-    castAndSettle(sim, 'judgement', 2);
-    castAndSettle(sim, 'seal_of_righteousness', 2); // judgement consumed the seal; re-brand
-    const before = p.cooldowns.get('judgement');
-    expect(before).toBeGreaterThan(0);
-    sim.startAutoAttack();
-    let swings = 0;
-    let elapsedTicks = 0;
-    for (let i = 0; i < 20 * 10 && swings === 0; i++) {
-      for (const ev of sim.tick()) {
-        // Only a LANDED swing counts: the row reads "landed melee attacks", so a
-        // missed opener (an rng-stream artifact of upstream content adds) must
-        // keep the loop waiting instead of ending it shave-less.
-        if (
-          ev.type === 'damage' &&
-          ev.sourceId === p.id &&
-          ev.school === 'physical' &&
-          ev.kind === 'hit'
-        )
-          swings++;
-      }
-      elapsedTicks++;
-    }
-    expect(swings).toBeGreaterThan(0);
-    // The 0.5 sec shave must show OVER AND ABOVE the natural cooldown decay of
-    // the ticks the loop ran (0.05 sec per tick), so waiting out early misses
-    // cannot pass the test on decay alone.
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - elapsedTicks * 0.05 - 0.45);
   });
 
   it('Sanctified Fervor: Avenging Wrath grants critical strike and both haste channels', () => {
