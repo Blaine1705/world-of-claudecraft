@@ -2656,6 +2656,7 @@ export const de_DE: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Waffe verzaubern - Macht",
       "enchant_weapon_intellect": "Waffe verzaubern - Zaubermacht",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Helm verzaubern - Ausdauerkraft",
       "enchant_neck_spirit": "Amulett verzaubern - Geist",
       "enchant_shoulder_agility": "Schultern verzaubern - Beweglichkeit",

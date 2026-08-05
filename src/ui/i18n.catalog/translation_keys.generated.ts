@@ -7124,6 +7124,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.enchantName.enchant_neck_agility'
   | 'hudChrome.enchantName.enchant_neck_intellect'
   | 'hudChrome.enchantName.enchant_neck_spirit'
+  | 'hudChrome.enchantName.enchant_offhand_stamina'
   | 'hudChrome.enchantName.enchant_ring_agility'
   | 'hudChrome.enchantName.enchant_ring_intellect'
   | 'hudChrome.enchantName.enchant_ring_spirit'

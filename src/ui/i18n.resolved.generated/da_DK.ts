@@ -2656,6 +2656,7 @@ export const da_DK: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Fortryl våben - Magt",
       "enchant_weapon_intellect": "Fortryl våben - Besværgelsesstyrke",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Fortryl hjelm - Udholdenhed",
       "enchant_neck_spirit": "Fortryl halskæde - Ånd",
       "enchant_shoulder_agility": "Fortryl skuldre - Smidighed",

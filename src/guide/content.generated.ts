@@ -9217,6 +9217,24 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       ]
     },
     {
+      "id": "enchant_offhand_stamina",
+      "name": "Enchant Offhand - Stamina",
+      "slot": "offhand",
+      "tier": "base",
+      "reagents": [
+        {
+          "name": "Chime Dust",
+          "count": 5
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "sta",
+          "value": 3
+        }
+      ]
+    },
+    {
       "id": "enchant_helmet_fortitude",
       "name": "Enchant Helmet - Fortitude",
       "slot": "helmet",
