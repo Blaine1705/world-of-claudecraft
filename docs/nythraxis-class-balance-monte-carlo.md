@@ -264,6 +264,49 @@ top of the naked table and into the caster pack, per the re-seat above. The floo
 column (a truer "nothing" than bare fists) changes no ordering: it is worth about 25
 DPS to Enhancement and under 12 to everyone else.
 
+# The zero-legendary control, in full
+
+The same study with every legendary excluded (all six items: Thronebane and the
+Deathless Heartwood staff with their heroic variants, Heart of the Rift, Voidsong
+Dirk), gear and talents re-searched from scratch per spec. Normal, sorted by 60 s;
+"legendary worth" is what the full pool adds back:
+
+| Spec | 15s | 60s | 120s | 300s | Execute | Heroic 60s | OOM | full-BiS 60s | legendary worth |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Destruction (Ruination) | 286 | **290** | 251 | 185 | 320 | 263 | 190s | 288 | -1% |
+| Balance (Moongrove) | 223 | **261** | 258 | 258 | 251 | 249 | - | 258 | -1% |
+| Demonology (Pactbound) | 278 | **253** | 213 | 168 | 300 | 228 | 206s | 261 | +3% |
+| Retribution (Dawnreaver) | 345 | **224** | 212 | 214 | 275 | 215 | - | 228 | +2% |
+| Affliction (Hexcraft) | 318 | **215** | 225 | 215 | 256 | 215 | - | 238 | +11% |
+| Feral cat (Wildfang) | 235 | **209** | 204 | 200 | 217 | 192 | - | 209 | +0% |
+| Fury (Bloodrush) | 269 | **205** | 195 | 194 | 250 | 179 | - | 275 | +34% |
+| Arms (Battlecraft) | 240 | **203** | 195 | 192 | 209 | 183 | - | 203 | +0% |
+| Beast Mastery (Packlord) | 250 | **199** | 191 | 95 | 212 | 183 | - | 199 | -0% |
+| Frost (Cryomancy) | 181 | **192** | 190 | 159 | 187 | 175 | 171s | 200 | +4% |
+| Fire (Pyromancy) | 271 | **178** | 170 | 98 | 299 | 173 | 107s | 191 | +7% |
+| Shadow (Vespers) | 174 | **175** | 177 | 179 | 176 | 173 | - | 178 | +2% |
+| Enhancement (Warspirit) | 225 | **172** | 163 | 155 | 188 | 160 | 204s | 224 | +30% |
+| Subtlety (Skulduggery) | 131 | **147** | 147 | 151 | 136 | 131 | - | 205 | +39% |
+| Elemental (Thundercall) | 167 | **147** | 145 | 134 | 154 | 141 | 254s | 150 | +2% |
+| Survival (Fieldcraft) | 152 | **146** | 138 | 81 | 150 | 132 | - | 153 | +5% |
+| Assassination (Knifework) | 143 | **139** | 137 | 138 | 133 | 128 | - | 179 | +29% |
+| Marksmanship (Coldsight) | 146 | **136** | 131 | 61 | 139 | 121 | - | 139 | +2% |
+| Combat (Thuggery) | 143 | **132** | 132 | 132 | 139 | 121 | - | 194 | +47% |
+
+Spread 2.19x at 60 s (290 to 132, median 192), tightening to 1.97x at 120 s, the
+closest any view of the game gets to the plus or minus 15% intent. Four readings:
+
+1. **The caster top does not move.** Destruction, Balance, and Demonology sit within
+   noise of their full-BiS numbers; legendaries were never their story.
+2. **The whole rogue class collapses to the bottom of the table.** Combat 132 (last),
+   Assassination 139, Subtlety 147: without Thronebane the class's best spec is 45 DPS
+   below the median. The new daggers win the weapon slots here and are not enough; the
+   rogue baseline itself is under-tuned once the legendary is out of the picture.
+3. **Fury drops 275 to 205 (second to seventh) and Enhancement 224 to 172**, the other
+   two Thronebane clients.
+4. The warlock OOM arrives slightly earlier epic-only (Destruction 190 s against
+   210 s): less gear means less damage per mana spent, not more longevity.
+
 ---
 
 # Healers
@@ -355,7 +398,9 @@ Reconciled against revision 2's list:
 1. **Thronebane `hand` field** (rev-2 item 1, still open, third study running): the
    normalization made it cheaper to fix (the ability amplification is gone; what remains
    is a legal offhand legendary with a two-hander's weapon budget). `hand: 'mainhand'`
-   plus the re-band, as originally specified.
+   plus the re-band, as originally specified. The zero-legendary control adds one
+   warning: fix it alone and all three rogue specs land at the bottom of the table
+   (132 to 147), so the fix should ship together with the rogue base look in item 2.
 2. **Assassination's seat** (new): 179 at 60 s, 61% idle, 40% energy-starved, auto
    attack 60% of damage. If the intent was pack-level, it landed low; a modest energy
    income or Wicked Slash coefficient bump (1.7 to ~2.0 dagger) would lift it without
