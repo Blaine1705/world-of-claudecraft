@@ -356,6 +356,7 @@ const UI_PURE_CORES = [
   'src/ui/fct_event.ts',
   'src/ui/honor_float_view.ts',
   'src/ui/heal_landing_feedback_core.ts',
+  'src/ui/block_landing_feedback_core.ts',
   'src/ui/window_drag_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/window_stack_state_core.ts',

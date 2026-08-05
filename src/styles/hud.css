@@ -4469,9 +4469,10 @@
      el.style.color onto a class the pooled fct_painter toggles (no hex
      in TS). Each class carries the exact hex the live fct() passed, grouped by colour:
      miss/dodge keyed self (#bbb) vs other (#fff); damage done by ability (#ffe97a) vs
-     auto-attack (#fff); damage taken (#ff5544); heal (#3ce63c); xp (#d9a3ff); rested
-     xp (#6db8ff); Honor (#ffd100); the self note (#ff8c66). Crit stays the separate
-     .fct.crit class. */
+     auto-attack (#fff); damage taken (#ff5544); a shield block done (#b8c4d9, steel grey,
+     a landed hit blunted) vs taken (#7ec8e3, a cooler steel blue, a landed block you made);
+     heal (#3ce63c); xp (#d9a3ff); rested xp (#6db8ff); Honor (#ffd100); the self note
+     (#ff8c66). Crit stays the separate .fct.crit class. */
   .fct-miss-self,
   .fct-dodge-self {
     color: #bbb;
@@ -4486,6 +4487,12 @@
   }
   .fct-damage-taken {
     color: #ff5544;
+  }
+  .fct-damage-done-block {
+    color: #b8c4d9;
+  }
+  .fct-damage-taken-block {
+    color: #7ec8e3;
   }
   .fct-absorb {
     color: #9fd7ff;

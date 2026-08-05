@@ -152,6 +152,7 @@ import {
   BannerQueue,
   bannerSubtextLines,
 } from './banner_queue';
+import { blockLandingLogKey } from './block_landing_feedback_core';
 import { CalendarWindow } from './calendar_window';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
@@ -255,6 +256,7 @@ import {
 } from './entity_i18n';
 import { ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
+import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
@@ -10696,10 +10698,14 @@ export class Hud {
           }
           // A landed hit: the mapper resolves damage-done (player dealt to other) vs
           // damage-taken (player took) vs null (a hit between two non-player entities, which
-          // floats nothing). The amount text + target entity stay at the call site.
+          // floats nothing). A shield block is ALSO a landed hit (still dealing real,
+          // blockValue-reduced damage, unlike the avoidance words above), so it is passed
+          // through here too, but with its own damageKind so it reads with its own colour
+          // and combat-log sentence instead of an indistinguishable plain hit. The amount
+          // text + target entity stay at the call site.
           const hitShape = fctSpawnShape({
             type: 'damage',
-            damageKind: 'hit',
+            damageKind: ev.kind === 'block' ? 'block' : 'hit',
             ability: !!ev.ability,
             crit: ev.crit,
             isPlayerSource,
@@ -10738,6 +10744,56 @@ export class Hud {
             // in the open world only a HEAVY hit kicks the camera (a tenth of
             // max HP in one blow, or any crit), so routine chip damage stays
             // still. addShake is a reduced-motion no-op.
+            if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.34 : 0.14);
+            else if (tgt && (ev.crit || ev.amount >= tgt.maxHp * 0.1)) {
+              this.renderer.addShake(ev.crit ? 0.26 : 0.16);
+            }
+          } else if (hitShape && hitShape.kind === 'damage-done-block') {
+            this.fctPainter.spawn(
+              {
+                ...hitShape,
+                text: t('hud.combat.floatingBlock', {
+                  amount: blockFctAmountText(ev.amount, ev.crit, false),
+                }),
+                target: tgt,
+              },
+              now,
+            );
+            const logKey = blockLandingLogKey(isPlayerSource, isPlayerTarget);
+            if (logKey)
+              this.combatLog(
+                t(logKey, {
+                  ability: combatAbilityName(ev.ability),
+                  target: entityDisplayName(tgt),
+                  amount: ev.amount,
+                }),
+                '#b8c4d9',
+              );
+            // Same Fiesta/heavy-hit shake feel as an unblocked hit dealt: the block only
+            // changes how the number READS, not the impact.
+            if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.3 : 0.12);
+          } else if (hitShape && hitShape.kind === 'damage-taken-block') {
+            this.fctPainter.spawn(
+              {
+                ...hitShape,
+                text: t('hud.combat.floatingBlock', {
+                  amount: blockFctAmountText(ev.amount, ev.crit, true),
+                }),
+                target: tgt,
+              },
+              now,
+            );
+            const logKey = blockLandingLogKey(isPlayerSource, isPlayerTarget);
+            if (logKey)
+              this.combatLog(
+                t(logKey, {
+                  source: src ? entityDisplayName(src) : '?',
+                  amount: ev.amount,
+                }),
+                '#7ec8e3',
+              );
+            // Same Fiesta/heavy-hit shake feel as an unblocked hit taken: the block only
+            // changes how the number READS, not the impact.
             if (this.inFiesta()) this.renderer.addShake(ev.crit ? 0.34 : 0.14);
             else if (tgt && (ev.crit || ev.amount >= tgt.maxHp * 0.1)) {
               this.renderer.addShake(ev.crit ? 0.26 : 0.16);
