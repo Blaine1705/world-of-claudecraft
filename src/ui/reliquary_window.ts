@@ -25,6 +25,7 @@ import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { formatNumber, type TranslationKey, t } from './i18n';
+import { mountDisplayName } from './mount_labels';
 import type { PainterHostPresentation } from './painter_host';
 import {
   buildReliquaryView,
@@ -470,11 +471,8 @@ export class ReliquaryWindow {
       return t(reliquaryMarkFindKey(cell.id) as TranslationKey);
     }
     if (cell.kind === 'mount') {
-      const key = `hudChrome.mounts.name_${cell.id}` as TranslationKey;
-      const labeled = t(key);
-      if (labeled && labeled !== key) return labeled;
-      const def = MOUNTS[cell.id as keyof typeof MOUNTS];
-      if (def) return def.name;
+      // Shared mount-name map (bag tooltips / cast bar); no bespoke key cast.
+      return mountDisplayName(cell.id);
     }
     if (cell.kind === 'weapon_skin') {
       const def = WEAPON_SKINS[cell.id];

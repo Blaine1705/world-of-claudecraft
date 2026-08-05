@@ -23,7 +23,7 @@
 | 7 Professions shelf | **done** | authored pages, lifetime marks, thin craft/gather call sites, UI |
 | 7 QA | **done** | exit criteria verified; pin holes closed; release @ 84b704c1c7 |
 | 8 Horizons shelf | **done** | mounts / skins / titles pages; ownership seams; UI |
-| 8 QA | pending | same worktree + pull |
+| 8 QA | **done** | exit criteria verified; rank-sync + pin defects fixed; release @ d3190ff008 |
 | 9 Social, wiki, polish, gate, PR | pending | same worktree + pull |
 
 ## Verified outcomes
@@ -387,6 +387,43 @@
   page completion (pure + host source pins); page-name content i18n deferred;
   mount/title obtain does not emit reliquaryUnlock toast (membership via live
   seams only).
+
+- Phase 8 QA: merged `origin/release/v0.35.0` (editor camp cap, moderation
+  audit trail, ground-object pool, enchants) to tip `d3190ff008` (feature
+  merge `134267ba04`). Release surface did not move mounts / skins / deeds /
+  Reliquary catalog. Green after defect closes:
+  - `npx vitest run tests/reliquary_content.test.ts tests/reliquary_state.test.ts tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/architecture.test.ts tests/reliquary_wire.test.ts` (**184 passed**)
+  - `npm run i18n:gen`
+  - `npx vitest run tests/i18n_completeness.test.ts -t "non-Latin player surfaces"`
+  - `npx tsc --noEmit`
+  Checklist (all held):
+  - 3 authored Horizons pages; every mount/skin/title id real; 28 total pages
+  - Mount ownership via live `ownedMounts` (bags + bank); no parallel collector
+  - Weapon skins via account cosmetics; empty offline; accountScope chrome
+  - Titles = deeds with title rewards only; border-only rank 5 excluded
+  - Read-only presentation; no equip/summon reimplementation
+  - Overview / shelf totals via `catalogRelicCompletion` (all kinds)
+  - Curator rank via `catalogRankOwned` excludes account skins (host-shaped pin)
+  - Live mount first-discover + Horizons title grant sync rank deeds
+  - No skill power / combat stats / drop rate / pity from Horizons
+  - No per-drop saveCharacter; sparse blob unchanged; no dual itemsDiscovered
+  - Module-first; English + M16; no em dash / emoji; no Phase 9 work
+  Defects fixed this QA pass:
+  - M16: release-merge `editor.status.campCapReached` non-Latin fills
+  - SHOULD-FIX: `maybeSyncCuratorRankDeeds` on mount reins first-discover and
+    Horizons title `grantDeed` (grant path aligned with display rank)
+  - BLOCKING pin: host-shaped `catalogRankOwned` with skins present stays 2
+  - Live `characterReliquaryOwnership` bags+bank mount pins
+  - View totals for skins/titles; `accountScoped` false for mount pages
+  - Frontend: `mountDisplayName` family reuse
+  Reviews: architecture SHOULD-FIX rank-sync closed; test-coverage BLOCKING
+  host-shaped rank pin closed; frontend SHOULD-FIX mountDisplayName closed;
+  cross-platform **MATCH** (no IWorld growth); qa-checklist **READY**.
+  Manual Horizons smoke not run (static + unit pins only).
+  Residual risks: no wire e2e snap for mntOwn/cosmetics/deeds Horizons pages;
+  no reliquaryUnlock toast on Horizons obtain (intentional); page-name content
+  i18n deferred; mount rebuy after sell (already discovered reins) still
+  relies on join retro for rank grant if that fill alone crosses a threshold.
 
 - Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
 - Phase 2 absorbed the stub page id: Hollow Crypt now lists cryptbone / greyjaw / gravewoven uniques; `boundstone_helm` lives on Sanctum (its real drop).

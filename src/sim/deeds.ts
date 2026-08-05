@@ -32,6 +32,8 @@ import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
+  isHorizonsTitleDeed,
+  maybeSyncCuratorRankDeeds,
   onItemDiscovered as onReliquaryItemDiscovered,
   syncCuratorRankDeeds,
   syncReliquaryMarksFromVisited,
@@ -595,6 +597,13 @@ export function grantDeed(
     pid: meta.entityId,
     ...(opts?.retro ? { retro: true } : {}),
   });
+  // Horizons titles score catalogRankOwned. Live grant of a title relic can
+  // cross a Curator threshold; keep display rank and zero-Renown bridges aligned
+  // without waiting for join retro. Rank bridge deeds themselves are also
+  // Horizons titles: maybeSync early-outs when bridges are already earned.
+  if (def.reward?.kind === 'title' && isHorizonsTitleDeed(deedId)) {
+    maybeSyncCuratorRankDeeds(ctx, meta, opts?.retro ? { retro: true } : undefined);
+  }
   return true;
 }
 

@@ -14,6 +14,7 @@
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
+  RELIQUARY_HORIZON_TITLES,
   RELIQUARY_ITEM_TO_PAGES,
   RELIQUARY_MARK_IDS,
   RELIQUARY_MARK_TO_PAGES,
@@ -24,11 +25,15 @@ import {
   type ReliquaryPageDef,
   type ReliquaryRelicDef,
 } from './content/reliquary';
+import { ITEMS } from './data';
 import { ownedMounts as ownedMountKeys } from './mounts';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { DeedStatKey, DeedStats } from './types';
 import { DEED_STAT_KEYS } from './types';
+
+/** Horizon title deed ids that score catalogRankOwned (title rewards only). */
+const HORIZON_TITLE_DEED_IDS: ReadonlySet<string> = new Set(RELIQUARY_HORIZON_TITLES);
 
 /** Cap for the recent-find ring buffer (plan: 12). Drop oldest on push. */
 export const RELIQUARY_RECENT_CAP = 12;
@@ -182,9 +187,17 @@ function dungeonClearCount(
  * deed bridges via grantDeed (durability path for titles only). Idempotent:
  * a second call for the same id is a no-op. Does not call saveCharacter on
  * pure silhouette fill and does not dual-write discovery.
+ *
+ * Mount reins are not catalogued item relics (Horizons owns them via live
+ * ownedMounts). On first discovery of reins the item is already in bags, so
+ * rank may cross a threshold: sync deeds without inventing firstFind or a
+ * reliquaryUnlock toast (Phase 8 membership stays live-seam only).
  */
 export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: string): void {
-  if (!isCataloguedRelicItem(itemId)) return;
+  if (!isCataloguedRelicItem(itemId)) {
+    if (ITEMS[itemId]?.kind === 'mount') maybeSyncCuratorRankDeeds(ctx, meta);
+    return;
+  }
   // Rank is character-durable catalogued fills (items + marks + mounts + titles;
   // never account skins). Prior count is owned - 1 because this discover is the
   // first time the id entered itemsDiscovered (markItemDiscovered only calls on first add).
@@ -195,6 +208,37 @@ export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: stri
   const rankedUp = newRank > previousRank ? newRank : undefined;
   emitReliquaryUnlock(ctx, meta, { itemId, curatorRank: rankedUp });
   if (rankedUp !== undefined) syncCuratorRankDeeds(ctx, meta);
+}
+
+/**
+ * True when a deed id is a Horizons title relic (scores catalogRankOwned).
+ * Border-only curator rank 5 is not on the list.
+ */
+export function isHorizonsTitleDeed(deedId: string): boolean {
+  return HORIZON_TITLE_DEED_IDS.has(deedId);
+}
+
+/**
+ * Re-sync zero-Renown Curator rank deed bridges when character-durable
+ * ownership may have grown outside the item/mark unlock paths (mount reins
+ * first discover, Horizons title deed grant). Fast no-op when every bridge
+ * for the current rank is already earned. No reliquaryUnlock toast.
+ */
+export function maybeSyncCuratorRankDeeds(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  opts?: { retro?: boolean },
+): void {
+  const owned = catalogRankOwned(characterReliquaryOwnership(meta));
+  const rank = curatorRankFromOwned(owned);
+  if (rank <= 0) return;
+  for (let i = 0; i < rank; i++) {
+    const deedId = CURATOR_RANK_DEFS[i]?.deedId;
+    if (deedId && !meta.deedsEarned.has(deedId)) {
+      syncCuratorRankDeeds(ctx, meta, opts);
+      return;
+    }
+  }
 }
 
 /**

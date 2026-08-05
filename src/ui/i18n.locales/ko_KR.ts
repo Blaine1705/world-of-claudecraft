@@ -7959,6 +7959,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '지형 편집 한도에 도달했습니다({max}). 초과된 스컬프트 스탬프는 추가되지 않았습니다.',
   'editor.status.placementCapReached':
     '배치 한도에 도달했습니다({max}). 초과된 에셋은 추가되지 않았습니다.',
+  'editor.status.campCapReached':
+    '야영지 한도에 도달했습니다({max}). 새 야영지가 추가되지 않았습니다.',
   'editor.confirm.ok': '확인',
   'editor.confirm.cancel': '취소',
   'editor.confirm.discardTitle': '변경 사항을 버릴까요?',

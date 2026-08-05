@@ -225,6 +225,50 @@ describe('buildReliquaryView progress and rank', () => {
       complete: true,
     });
   });
+
+  it('counts Horizons skins and titles in catalog / shelf totals from live seams', () => {
+    // Dropping weaponSkins / deedsEarned from ownershipOpts would leave
+    // page-cell tests green while Overview/shelf totals go silent for these kinds.
+    const pages: ReliquaryPageDef[] = [
+      {
+        id: 'h_skins',
+        shelf: 'horizons',
+        name: 'Skins',
+        relics: [{ kind: 'weapon_skin', skinId: 'skin_a' }],
+      },
+      {
+        id: 'h_titles',
+        shelf: 'horizons',
+        name: 'Titles',
+        relics: [{ kind: 'title', deedId: 'title_a' }],
+      },
+    ];
+    const empty = buildReliquaryView(input({ pages }));
+    expect(empty.progress.owned).toBe(0);
+    expect(empty.progress.total).toBe(2);
+
+    const filled = buildReliquaryView(
+      input({
+        pages,
+        weaponSkins: ownedSet('skin_a'),
+        deedsEarned: ownedSet('title_a'),
+      }),
+    );
+    expect(filled.progress.owned).toBe(2);
+    const horiz = buildReliquaryView(
+      input({
+        pages,
+        nav: 'horizons',
+        weaponSkins: ownedSet('skin_a'),
+        deedsEarned: ownedSet('title_a'),
+      }),
+    );
+    expect(horiz.shelves.find((s) => s.id === 'horizons')).toMatchObject({ owned: 2, total: 2 });
+    expect(horiz.shelfPages.map((p) => ({ id: p.pageId, owned: p.owned }))).toEqual([
+      { id: 'h_skins', owned: 1 },
+      { id: 'h_titles', owned: 1 },
+    ]);
+  });
 });
 
 describe('buildReliquaryView recent', () => {
@@ -533,16 +577,31 @@ describe('page grid cells', () => {
         name: 'Weapon Skins',
         relics: [{ kind: 'weapon_skin', skinId: 'guildmark_arming_sword' }],
       },
+      {
+        id: 'horiz_mounts',
+        shelf: 'horizons',
+        name: 'Mounts',
+        relics: [{ kind: 'mount', mountId: 'valorsteed' }],
+      },
     ];
-    const model = buildReliquaryView(
+    const skins = buildReliquaryView(
       input({
         pages,
         nav: 'horizons',
         pageId: 'horiz_skins',
       }),
     );
-    expect(model.pageDetail?.accountScoped).toBe(true);
-    expect(model.pageDetail?.cells[0]?.owned).toBe(false);
+    expect(skins.pageDetail?.accountScoped).toBe(true);
+    expect(skins.pageDetail?.cells[0]?.owned).toBe(false);
+    // Mount/title pages must not inherit account scope from the shelf alone.
+    const mounts = buildReliquaryView(
+      input({
+        pages,
+        nav: 'horizons',
+        pageId: 'horiz_mounts',
+      }),
+    );
+    expect(mounts.pageDetail?.accountScoped).toBe(false);
   });
 
   it('lists owned vs missing in catalog order with firstFind clears on owned items', () => {

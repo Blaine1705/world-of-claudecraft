@@ -8091,6 +8091,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Достигнут лимит правок рельефа ({max}). Лишние штампы не были добавлены.',
   'editor.status.placementCapReached':
     'Достигнут лимит размещений ({max}). Лишние объекты не были добавлены.',
+  'editor.status.campCapReached':
+    'Достигнут лимит лагерей ({max}). Новый лагерь не добавлен.',
   'editor.confirm.ok': 'ОК',
   'editor.confirm.cancel': 'Отмена',
   'editor.confirm.discardTitle': 'Отменить изменения?',

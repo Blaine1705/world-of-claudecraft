@@ -11,13 +11,14 @@ import {
   RELIQUARY_PAGES,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
-import { markItemDiscovered } from '../src/sim/deeds';
+import { grantDeed, markItemDiscovered } from '../src/sim/deeds';
 import {
   CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
   catalogItemCompletion,
   catalogRankOwned,
   catalogRelicCompletion,
+  characterReliquaryOwnership,
   clearCountForSource,
   curatorRankFromOwned,
   curatorSealIdForRank,
@@ -28,6 +29,7 @@ import {
   onItemDiscovered,
   pageCompletion,
   RELIQUARY_RECENT_CAP,
+  reliquaryOwnershipOpts,
   restoreReliquaryState,
   serializeReliquaryState,
   syncCuratorRankDeeds,
@@ -385,36 +387,106 @@ describe('Reliquary profession marks (Phase 7)', () => {
   });
 
   it('catalogRankOwned excludes account weapon skins (grant/display rank align)', () => {
-    const skinsOnly = catalogRankOwned({
+    // Host-shaped opts (Sim + ClientWorld pass full surfaces including skins).
+    // The strip in catalogRankOwned must ignore weaponSkins even when present.
+    const hostOpts = reliquaryOwnershipOpts({
       itemsDiscovered: new Set(),
-      marks: new Set(),
-      ownedMounts: new Set(),
-      deedsEarned: new Set(),
-    });
-    // Skins never enter the rank opts; overview can still count them separately.
-    expect(skinsOnly).toBe(0);
-    const characterHorizons = catalogRankOwned({
-      itemsDiscovered: new Set(),
-      marks: new Set(),
-      ownedMounts: new Set(['valorsteed']),
+      ownedMounts: ['valorsteed'],
+      weaponSkinIds: ['guildmark_arming_sword'],
       deedsEarned: new Set(['prog_veteran']),
     });
-    expect(characterHorizons).toBe(2);
-    // Full overview owned can include skins while rank stays character-only.
-    const overview = catalogRelicCompletion({
-      itemsDiscovered: new Set(),
-      ownedMounts: new Set(['valorsteed']),
-      weaponSkins: new Set(['guildmark_arming_sword']),
-      deedsEarned: new Set(['prog_veteran']),
-    });
-    expect(overview.owned).toBe(3);
+    expect(hostOpts.weaponSkins?.has('guildmark_arming_sword')).toBe(true);
+    expect(catalogRelicCompletion(hostOpts).owned).toBe(3);
+    expect(catalogRankOwned(hostOpts)).toBe(2);
+
+    // Empty ownership stays 0 (skins alone cannot invent rank without strip).
     expect(
-      catalogRankOwned({
-        itemsDiscovered: new Set(),
-        ownedMounts: new Set(['valorsteed']),
-        deedsEarned: new Set(['prog_veteran']),
-      }),
-    ).toBe(2);
+      catalogRankOwned(
+        reliquaryOwnershipOpts({
+          itemsDiscovered: new Set(),
+          weaponSkinIds: ['guildmark_arming_sword'],
+        }),
+      ),
+    ).toBe(0);
+    expect(
+      catalogRelicCompletion(
+        reliquaryOwnershipOpts({
+          itemsDiscovered: new Set(),
+          weaponSkinIds: ['guildmark_arming_sword'],
+        }),
+      ).owned,
+    ).toBe(1);
+  });
+
+  it('characterReliquaryOwnership uses live ownedMounts (bags + bank reins)', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // No skins field: character path never carries account cosmetics.
+    const empty = characterReliquaryOwnership(meta);
+    expect(empty.ownedMounts.has('valorsteed')).toBe(false);
+    expect(empty).not.toHaveProperty('weaponSkins');
+
+    sim.addItem('reins_valorsteed', 1);
+    expect(characterReliquaryOwnership(meta).ownedMounts.has('valorsteed')).toBe(true);
+    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(1);
+
+    // Bank-only reins still count (ownedMounts = bags + bank).
+    const sim2 = makeSim();
+    const m2 = primary(sim2).meta;
+    sim2.addItem('reins_grag_bear', 1);
+    const slot = m2.inventory.find((s) => s.itemId === 'reins_grag_bear');
+    expect(slot).toBeTruthy();
+    if (!slot) throw new Error('expected grag reins in bags');
+    m2.inventory.splice(m2.inventory.indexOf(slot), 1);
+    m2.bank.inventory.push(slot);
+    expect(characterReliquaryOwnership(m2).ownedMounts.has('grag_bear')).toBe(true);
+  });
+
+  it('live mount first-discover and title grant sync Curator rank deeds', () => {
+    const catalogIds = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ];
+    expect(catalogIds.length).toBeGreaterThanOrEqual(9);
+
+    // Mount path: 9 catalogued items + first reins grant crosses rank 2.
+    const simMount = makeSim();
+    const mMount = primary(simMount).meta;
+    for (const id of catalogIds.slice(0, 9)) {
+      markItemDiscovered(simMount.ctx, mMount, id);
+    }
+    expect(mMount.deedsEarned.has('col_reliquary_rank_2')).toBe(false);
+    const renownBeforeMount = mMount.renown;
+    simMount.addItem('reins_valorsteed', 1);
+    // 9 items + mount (+ rank-2 title bridge, itself a Horizons title relic).
+    expect(catalogRankOwned(characterReliquaryOwnership(mMount))).toBeGreaterThanOrEqual(10);
+    expect(mMount.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    expect(mMount.renown).toBe(renownBeforeMount);
+    // No invent of firstFind / unlock toast for mount membership.
+    expect(mMount.reliquary.firstFind.reins_valorsteed).toBeUndefined();
+    const mountUnlocks = simMount
+      .drainEvents()
+      .filter(
+        (e) => e.type === 'reliquaryUnlock' && 'itemId' in e && e.itemId === 'reins_valorsteed',
+      );
+    expect(mountUnlocks).toEqual([]);
+
+    // Title path: 9 catalogued items + Horizons title deed crosses rank 2.
+    const simTitle = makeSim();
+    const mTitle = primary(simTitle).meta;
+    for (const id of catalogIds.slice(0, 9)) {
+      markItemDiscovered(simTitle.ctx, mTitle, id);
+    }
+    expect(mTitle.deedsEarned.has('col_reliquary_rank_2')).toBe(false);
+    const renownBeforeTitle = mTitle.renown;
+    expect(grantDeed(simTitle.ctx, mTitle, 'prog_veteran')).toBe(true);
+    // Title fill + rank-2 title bridge both score; rank is at least 2.
+    expect(catalogRankOwned(characterReliquaryOwnership(mTitle))).toBeGreaterThanOrEqual(10);
+    expect(mTitle.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
+    expect(mTitle.renown).toBe(renownBeforeTitle + (DEEDS.prog_veteran.renown ?? 0));
   });
 
   it('join retroFallbackGrants wires silent mark sync before curator rank', () => {

@@ -7977,6 +7977,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '地形編集の上限に達しました（{max}）。超過分のスカルプトは追加されませんでした。',
   'editor.status.placementCapReached':
     '配置数の上限に達しました（{max}）。超過分のアセットは追加されませんでした。',
+  'editor.status.campCapReached':
+    'キャンプの上限に達しました（{max}）。新しいキャンプは追加されませんでした。',
   'editor.confirm.ok': 'OK',
   'editor.confirm.cancel': 'キャンセル',
   'editor.confirm.discardTitle': '変更を破棄しますか？',

@@ -112,8 +112,9 @@ describe('painter hygiene', () => {
     expect(code).toMatch(/page\.accountScoped[\s\S]*?accountScopeNote/);
     expect(code).toMatch(/cell\.kind === 'weapon_skin'[\s\S]*?accountScopeBadge/);
     expect(code).toContain('data-account-scope');
-    // Prefer existing mount / armory / deed title i18n.
-    expect(painter).toContain('hudChrome.mounts.name_');
+    // Prefer existing mount / armory / deed title helpers (family reuse).
+    expect(painter).toContain("from './mount_labels'");
+    expect(painter).toContain('mountDisplayName');
     expect(painter).toContain('localizeWeaponSkin');
     expect(painter).toContain('deedTitleText');
     expect(components).toContain('.reliquary-account-scope');

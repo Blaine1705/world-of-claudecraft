@@ -26,15 +26,17 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 8 implementation complete (Horizons shelf).
+- **Current phase:** Phase 8 QA complete (Horizons shelf verified).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 8 QA. Do **not** skip the release
-  pull. Do **not** start Phase 9 or open a PR until Phase 8 QA is green.
+  `origin/release/v0.35.0`, then Phase 9 (social/wiki/polish/gate/PR). Do
+  **not** skip the release pull. Do **not** open a PR until Phase 9 gate is
+  green.
 - **Blocker:** none.
-- **Release tip after Phase 8 impl pull:** `origin/release/v0.35.0` @
-  `0ff3b52964` (Rift Book of Deeds coverage; feature merge `90cee587f8`
-  unions Rift deeds with Reliquary Curator bridges). Tip may have advanced
-  past this at QA time; re-pull.
+- **Release tip after Phase 8 QA pull:** `origin/release/v0.35.0` @
+  `d3190ff008` (editor camp cap / moderation / ground-object pool; feature
+  merge `134267ba04`). Horizons surface was not moved by the merge.
+- **Phase 8 feature tip (impl):** `4e13cac7b6`. QA defect fixes commit on
+  top of the release merge.
 
 ## Locked design decisions
 
@@ -103,6 +105,8 @@ session load:
 | Horizons hand lists | `src/sim/content/reliquary.ts` | **landed** (`RELIQUARY_HORIZON_MOUNTS` / `_WEAPON_SKINS` / `_TITLES`) |
 | `catalogRankOwned` | `src/sim/reliquary.ts` | **landed** (character-durable rank; excludes account skins) |
 | `characterReliquaryOwnership` | `src/sim/reliquary.ts` | **landed** (uses `ownedMounts` live seam) |
+| `maybeSyncCuratorRankDeeds` | `src/sim/reliquary.ts` | **landed** (Phase 8 QA: mount first-discover + title grant) |
+| `isHorizonsTitleDeed` | `src/sim/reliquary.ts` | **landed** (Phase 8 QA; grantDeed rank hook) |
 | Account-scope chrome | `hudChrome.reliquary.accountScope*` | **landed** (English + M16 non-Latin) |
 | Profession mark constants | `src/sim/content/reliquary.ts` | **landed** (`RELIQUARY_PROFESSION_MARKS`, specimens) |
 | `RELIQUARY_MARK_TO_PAGES` | `src/sim/content/reliquary.ts` | **landed** (Phase 7) |
@@ -161,6 +165,7 @@ session load:
 - [x] Field-note retro from visited only; no invented masterwork craft history (Phase 7)
 - [x] Horizons ownership from live seams only (ownedMounts / account skins / deedsEarned); no dual discovery (Phase 8)
 - [x] Curator rank excludes account skins (grant/display aligned); Overview totals include skins (Phase 8)
+- [x] Live mount first-discover + Horizons title grant re-sync rank deeds (Phase 8 QA)
 
 ## Gotchas
 
