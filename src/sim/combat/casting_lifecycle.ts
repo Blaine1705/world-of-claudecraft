@@ -39,6 +39,7 @@ import { scheduleProjectile } from '../projectile_travel';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import { hasEscapeStealth } from '../threat';
 import type { AbilityDef, AbilityEffect, Entity, Vec3 } from '../types';
 import {
@@ -355,7 +356,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
         ctx.applyDemonHealTick(p);
       } else {
         const res = ctx.resolvedAbility(abilityId, p.id);
-        if (res) applyChannelTick(ctx, p, res);
+        if (res) applyChannelTick(ctx, p, meta, res);
       }
     };
     p.channelTickTimer -= DT;
@@ -1345,7 +1346,19 @@ function armAbilityCooldown(
   p.cooldowns.set(abilityId, cooldown);
 }
 
-function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): void {
+function applyChannelTick(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  res: ResolvedAbility,
+): void {
+  // The resolved talent/mastery multiplier for this channel (talent_hit_mult.ts):
+  // reused across every branch below so a per-tick SP/AP rider scales with the
+  // same percentage already baked into the tick's base min/max (issue #1803).
+  const { dmgMult: talentDmgMult, healMult: talentHealMult } = resolveTalentHitMult(
+    res.def,
+    ctx.playerMods(meta),
+  );
   // Ground-targeted channels (Rain of Fire / Volley / Hurricane): each tick pulses
   // the ability's aoeDamage at the aimed point (clamped at cast start, held in
   // castAim for the channel's life), independent of any entity target.
@@ -1362,7 +1375,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
       radius,
       ability: res.def.id,
     });
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentDmgMult);
     // How many enemies this pulse actually struck: Blizzard's Frozen Orb
     // refund (frostMageChannelPulse below) scales with it.
     let struck = 0;
@@ -1409,7 +1422,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // ground point) and from the single-target channel below.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeDamage')) {
     const isSpell = res.def.school !== 'physical';
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentDmgMult);
     for (const eff of res.effects) {
       if (eff.type !== 'aoeDamage') continue;
       ctx.emit({
@@ -1478,7 +1491,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // Self-centered healing channels pulse around the caster's live position on
   // every tick. Instant aoeHeal effects still resolve once through effect_dispatch.
   if (!res.def.requiresTarget && res.effects.some((eff) => eff.type === 'aoeHeal')) {
-    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(p, res.def), res.def, talentHealMult);
     for (const eff of res.effects) {
       if (eff.type !== 'aoeHeal') continue;
       ctx.emit({
@@ -1532,7 +1545,7 @@ function applyChannelTick(ctx: SimContext, p: Entity, res: ResolvedAbility): voi
   // Each channel bolt (e.g. Arcane Missiles) deals its damage on arrival, not on the
   // tick it is fired; a target that dies mid-flight fizzles it (the drain's guard).
   scheduleProjectile(ctx, p, target, (src, tgt) => {
-    const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def);
+    const channelSp = channelTickBonus(abilityScalingPower(src, res.def), res.def, talentDmgMult);
     // Aether Darts: the FIRST landed missile consumes the caster's Arcane Charges
     // and locks a flat per-missile Arcane bonus (combat/chronomancy.ts); later
     // missiles reuse it. It is plain Arcane damage, so Temporal Echo heals from it
