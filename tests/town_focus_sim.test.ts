@@ -59,6 +59,22 @@ function setup() {
   return { sim, internals, a };
 }
 
+// #1144: the 'time'/'timeAndPartial' tiers now QUEUE a re-spec instead of
+// committing it immediately (Sim.setTownFocus / updateTownFocusRespec); the
+// dedicated timer describe below drives the real tick-based resolution path
+// end to end. Every other test in this file only cares about the resulting
+// allocation, so it force-resolves a queued 'time'-tier request the same way
+// updateTownFocusRespec would, without running Sim.tick() (which would draw
+// rng for unrelated systems and could desync a same-seed rng-stream
+// comparison elsewhere in this file).
+function forceResolveTownFocus(internals: SimInternals, pid: number): void {
+  const meta = internals.players.get(pid)!;
+  if (meta.pendingTownFocus) {
+    meta.townFocus = meta.pendingTownFocus.allocation;
+    meta.pendingTownFocus = undefined;
+  }
+}
+
 function spawnHideWolf(internals: SimInternals, id: number, pos: { x: number; z: number }) {
   const template = MOBS.forest_wolf;
   const mob = createMob(id, template, template.maxLevel, { x: pos.x, y: 0, z: pos.z });
@@ -74,12 +90,14 @@ describe('setTownFocus: gated on standing in the town hub', () => {
   it('is accepted while in town', () => {
     const { sim, internals, a } = setup();
     sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
+    forceResolveTownFocus(internals, a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: POINTS_PER_TIER_BONUS });
   });
 
   it('is rejected far outside the town hub, leaving the prior allocation unchanged', () => {
     const { sim, internals, a } = setup();
     sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
+    forceResolveTownFocus(internals, a);
     const e = internals.entities.get(a)!;
     e.pos = { x: ZONE1.hub.x + ZONE1.hub.radius * 20, y: 0, z: ZONE1.hub.z };
     sim.setTownFocus({ fang: POINTS_PER_TIER_BONUS }, 'time', a);
@@ -109,6 +127,7 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
   it('refuses the issue frame in town, leaving the stored allocation untouched', () => {
     const { sim, internals, a } = setup();
     sim.setTownFocus({ hide: 4 }, 'time', a);
+    forceResolveTownFocus(internals, a);
     sim.drainEvents();
     sim.setTownFocus({ not_a_real_tag: 5 }, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: 4 });
@@ -121,6 +140,7 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     // checkpoints, which the unfixed load arm satisfies just as well.
     const { sim, internals, a } = setup();
     sim.setTownFocus({ hide: 4 }, 'time', a);
+    forceResolveTownFocus(internals, a);
     sim.setTownFocus({ hide: 4, not_a_real_tag: 5 }, 'time', a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: 4 });
     const state = sim.serializeCharacter(a);
@@ -173,6 +193,7 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     reloaded.drainEvents();
 
     reloaded.setTownFocus({ ...reloaded.townFocusFor(b), hide: 4 }, 'time', b);
+    forceResolveTownFocus(internals, b);
     expect(internals.players.get(b)?.townFocus).toEqual({ hide: 4 });
     expect(errorsOf(reloaded)).toEqual([]);
   });
@@ -187,6 +208,7 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     const draft = stepTownFocus(stale, 'hide', 1, FOCUS_POINT_BUDGET);
     expect(draft).toEqual({ hide: 3 });
     sim.setTownFocus(draft, 'time', a);
+    forceResolveTownFocus(internals, a);
     expect(internals.players.get(a)?.townFocus).toEqual({ hide: 3 });
     expect(errorsOf(sim)).toEqual([]);
     // A decrement to zero still removes the row, and still emits nothing junk.
@@ -220,6 +242,11 @@ describe('an unknown allocation key never reaches the character save (#2511)', (
     e.pos = { x: ZONE1.hub.x, y: 0, z: ZONE1.hub.z };
     e.prevPos = { ...e.pos };
     reloaded.setTownFocus({ hide: 1 }, 'time', b);
+    // Real resolution (not forceResolveTownFocus): the deed grant depends on
+    // markDeedsDirty, which only updateTownFocusRespec calls, and this test's
+    // whole point is that the allocation actually reaches the deed evaluator.
+    reloaded.time = (reloaded as unknown as SimInternals).players.get(b)!
+      .pendingTownFocus!.readyAtTime;
     for (let i = 0; i < 5; i++) reloaded.tick();
     expect(earned()).toBe(true);
   });
@@ -231,7 +258,10 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
 
     function harvestTotal(focused: boolean) {
       const { sim, internals, a } = setup();
-      if (focused) sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
+      if (focused) {
+        sim.setTownFocus({ hide: POINTS_PER_TIER_BONUS }, 'time', a);
+        forceResolveTownFocus(internals, a);
+      }
       let total = 0;
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 10000 + i, ZONE1.hub);
@@ -259,7 +289,10 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
 
     function harvestTotal(points: number) {
       const { sim, internals, a } = setup();
-      if (points > 0) sim.setTownFocus({ hide: points }, 'time', a);
+      if (points > 0) {
+        sim.setTownFocus({ hide: points }, 'time', a);
+        forceResolveTownFocus(internals, a);
+      }
       let total = 0;
       for (let i = 0; i < trials; i++) {
         const mob = spawnHideWolf(internals, 30000 + i, ZONE1.hub);
@@ -287,6 +320,7 @@ describe('harvestCorpse + town focus: additive bonus, baseline never lowered', (
     // focused run to fang alone (the town-focus default) and
     // never harvest hide at all.
     sim.setTownFocus({ fang: 10 }, 'time', a);
+    forceResolveTownFocus(internals, a);
     const mob = spawnHideWolf(internals, 20000, ZONE1.hub);
     sim.harvestCorpse(mob.id, [], a);
     const withOtherFocused = sim.countItem('rough_hide', a);
@@ -313,7 +347,10 @@ describe('harvestCorpse omitted-components town-focus default', () => {
     components: string[] | undefined,
   ): { hide: number; fang: number } {
     const { sim, internals, a } = setup();
-    if (focus) sim.setTownFocus(focus, 'time', a);
+    if (focus) {
+      sim.setTownFocus(focus, 'time', a);
+      forceResolveTownFocus(internals, a);
+    }
     const mob = spawnHideWolf(internals, 40000, ZONE1.hub);
     sim.harvestCorpse(mob.id, components, a);
     return { hide: sim.countItem('rough_hide', a), fang: sim.countItem('wolf_fang', a) };
@@ -460,17 +497,31 @@ describe('the server forwards and validates the set_town_focus payment tier (#11
 // (charge/reject before the allocation commits). tests/focus.test.ts owns
 // computeRespecCost's own math; this drives the command path that spends it.
 describe('setTownFocus charges the #1144 re-spec cost model', () => {
-  it('the free time tier never charges coin or the arcane_dust material', () => {
+  it('the free time tier queues instead of committing, and charges nothing at any point', () => {
     const { sim, internals, a } = setup();
     const meta = internals.players.get(a)!;
     const startingCopper = meta.copper;
     sim.setTownFocus({ hide: FOCUS_POINT_BUDGET }, 'time', a);
+    // Not committed yet: the whole point of #1144's duration is that 'time'
+    // does not behave like 'instant'.
+    expect(meta.townFocus).toEqual({});
+    expect(meta.pendingTownFocus?.allocation).toEqual({ hide: FOCUS_POINT_BUDGET });
+    expect(meta.pendingTownFocus?.coin).toBe(0);
+    expect(meta.pendingTownFocus?.materials).toBe(0);
+    forceResolveTownFocus(internals, a);
     expect(meta.townFocus).toEqual({ hide: FOCUS_POINT_BUDGET });
     expect(meta.copper).toBe(startingCopper);
     expect(sim.countItem('arcane_dust', a)).toBe(0);
   });
 
-  it('a paid tier deducts coin, priced off the points actually moved', () => {
+  // #1144 review finding: `computeRespecCost` priced a duration for the
+  // 'time'/'timeAndPartial' tiers that `Sim.setTownFocus` never enforced, so
+  // every tier behaved identically to 'instant' except for the charge. This
+  // drives the real Sim clock (not a test-only shortcut) to prove the
+  // duration is now load-bearing: nothing commits or charges until it
+  // actually elapses, exactly the way `updateTownFocusRespec` resolves it in
+  // the live per-player tick loop.
+  it('a paid, timed tier queues the charge and only spends it once the real timer resolves', () => {
     const { sim, internals, a } = setup();
     const meta = internals.players.get(a)!;
     meta.copper = 10_000;
@@ -478,10 +529,49 @@ describe('setTownFocus charges the #1144 re-spec cost model', () => {
     // affordability check isolates the COIN assertion below.
     sim.addItem('arcane_dust', 50, a);
     sim.setTownFocus({ hide: 3 }, 'timeAndPartial', a);
+    // Neither committed nor charged yet.
+    expect(meta.townFocus).toEqual({});
+    expect(meta.copper).toBe(10_000);
+    expect(sim.countItem('arcane_dust', a)).toBe(50);
+    const pending = meta.pendingTownFocus!;
+    expect(pending.allocation).toEqual({ hide: 3 });
+    // RESPEC_TIER_CONFIG.timeAndPartial: 15s/point, 5 coin/point, 1 material/point.
+    expect(pending.readyAtTime).toBeCloseTo(sim.time + 45, 5);
+    expect(pending.coin).toBe(3 * 5);
+    expect(pending.materials).toBe(3 * 1);
+
+    // Advance the sim clock the way real elapsed ticks would, then let the
+    // per-player tick loop resolve it (updateTownFocusRespec).
+    sim.time = pending.readyAtTime;
+    sim.tick();
     expect(meta.townFocus).toEqual({ hide: 3 });
-    // RESPEC_TIER_CONFIG.timeAndPartial: 5 coin/point, magnitude 3 (0 -> 3).
     expect(meta.copper).toBe(10_000 - 3 * 5);
     expect(sim.countItem('arcane_dust', a)).toBe(50 - 3 * 1);
+  });
+
+  it('cancels a queued re-spec, without charging it, if the purse cannot afford it once the timer resolves', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    meta.copper = 10_000;
+    sim.addItem('arcane_dust', 50, a);
+    sim.setTownFocus({ hide: 3 }, 'timeAndPartial', a);
+    const pending = meta.pendingTownFocus!;
+    meta.copper = 0; // spent elsewhere while the re-spec was queued
+    sim.drainEvents();
+    sim.time = pending.readyAtTime;
+    // tick() drains and RETURNS this tick's events itself (a later
+    // drainEvents() call would find nothing), so the resolution error has to
+    // be read off its return value.
+    const tickEvents = sim.tick();
+    expect(meta.townFocus).toEqual({}); // never committed
+    expect(meta.pendingTownFocus).toBeUndefined(); // and not left queued forever
+    expect(meta.copper).toBe(0); // never charged
+    const errors = tickEvents
+      .filter((e): e is Extract<typeof e, { type: 'error' }> => e.type === 'error')
+      .map((e) => e.text);
+    expect(errors).toContain(
+      'You could not afford your pending focus re-spec, so it was cancelled.',
+    );
   });
 
   it('a materials-costing tier consumes arcane_dust from the bag', () => {
@@ -524,6 +614,7 @@ describe('setTownFocus charges the #1144 re-spec cost model', () => {
     const { sim, internals, a } = setup();
     const meta = internals.players.get(a)!;
     sim.setTownFocus({ hide: 3 }, 'time', a);
+    forceResolveTownFocus(internals, a); // commit the initial allocation
     meta.copper = 0; // now unaffordable for a REAL paid re-spec
     sim.setTownFocus({ hide: 3 }, 'instant', a);
     expect(meta.townFocus).toEqual({ hide: 3 });

@@ -1490,6 +1490,17 @@ export interface PlayerMeta {
   // Set only while standing in a town hub; adds a bonus to that component's
   // #1142 harvest yield, on top of the universal baseline, never below it.
   townFocus: Record<string, number>;
+  // #1144: a re-spec queued on the 'time' or 'timeAndPartial' payment tier,
+  // pending the tier's duration before it commits onto `townFocus` above.
+  // TRANSIENT (never serialized): a logout before it resolves simply drops the
+  // request (nothing was charged for it yet, see setTownFocus), the same way
+  // an unstarted timer costs nothing to abandon.
+  pendingTownFocus?: {
+    allocation: Record<string, number>;
+    readyAtTime: number;
+    coin: number;
+    materials: number;
+  };
   // Heroic reset-window circuit progress for the Book of Deeds. Reward eligibility
   // is gated only by raidLockouts; this persisted field records which distinct
   // heroic clears contributed to one authoritative reset window without gating rewards.
@@ -5655,6 +5666,10 @@ export class Sim {
           // Proficiency just became visible; the gathering predicates re-check.
           deedsMod.markDeedsDirty(this.ctx, p.id);
         }
+        // #1144: resolves a queued time-tier town-focus re-spec once its
+        // duration elapses. Draws no rng, so the tick-phase draw order is
+        // unchanged.
+        if (meta.pendingTownFocus) this.updateTownFocusRespec(meta);
         // Mount summon/dismount transition: decrement the timer, cancel a summon
         // on combat/swim, complete a mount/dismount, and force-dismount a mounted
         // swimmer. Live players only (a dead player is already force-dismounted by
@@ -8960,16 +8975,26 @@ export class Sim {
   // leave the previous allocation untouched and surface a toast.
   //
   // #1144: `tier` picks which of the three RESPEC_TIER_CONFIG rows prices the
-  // reallocation (computeRespecCost). The charge/reject happens HERE, between
-  // validating the request and delegating (committing `result.allocation`
-  // onto meta.townFocus): the pure validator runs first and never mutates
-  // state, so an invalid/over-budget/out-of-town request is rejected before
-  // any cost is even computed, and an unaffordable one is rejected before the
-  // allocation commits. Priced off `result.allocation` (the request AFTER the
-  // pure validator drops zero-point entries), not the raw `allocation`
-  // argument, so a caller cannot inflate the bill with junk the commit itself
-  // would discard. A no-op reallocation costs nothing at any tier and can
-  // never fail the affordability check.
+  // reallocation (computeRespecCost). The validity/afford checks happen HERE,
+  // between validating the request and either committing it (instant tier) or
+  // queuing it (time/timeAndPartial): the pure validator runs first and never
+  // mutates state, so an invalid/over-budget/out-of-town request is rejected
+  // before any cost is even computed, and an unaffordable one is rejected
+  // before anything is charged or queued. Priced off `result.allocation` (the
+  // request AFTER the pure validator drops zero-point entries), not the raw
+  // `allocation` argument, so a caller cannot inflate the bill with junk the
+  // commit itself would discard. A no-op reallocation costs nothing at any
+  // tier and can never fail the affordability check.
+  //
+  // A tier with durationMs > 0 (`time`/`timeAndPartial`) does NOT commit or
+  // charge here: it queues `meta.pendingTownFocus`, which the per-player tick
+  // loop resolves via `updateTownFocusRespec` once the duration elapses. That
+  // is what makes the 'free, slow' tier actually slow instead of a same-tick
+  // no-cost commit; only the `instant` tier (durationMs 0) ever runs the
+  // charge-then-commit path below directly. Charging only at resolution, not
+  // at the request, means an abandoned queue (a later request that replaces
+  // it, or a logout, since pendingTownFocus is transient) never spends
+  // anything.
   setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
@@ -8988,7 +9013,8 @@ export class Sim {
       );
       return;
     }
-    const cost = professionsFocus.computeRespecCost(meta.townFocus, result.allocation, tier);
+    const resolvedAllocation = result.allocation as Record<string, number>;
+    const cost = professionsFocus.computeRespecCost(meta.townFocus, resolvedAllocation, tier);
     const canAfford =
       meta.copper >= cost.coin &&
       this.countItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, meta.entityId) >= cost.materials;
@@ -8996,12 +9022,58 @@ export class Sim {
       this.error(meta.entityId, 'You cannot afford that focus re-spec.');
       return;
     }
+    if (cost.durationMs <= 0) {
+      this.chargeTownFocusRespec(meta, cost);
+      meta.townFocus = resolvedAllocation;
+      deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
+      return;
+    }
+    meta.pendingTownFocus = {
+      allocation: resolvedAllocation,
+      readyAtTime: this.time + cost.durationMs / 1000,
+      coin: cost.coin,
+      materials: cost.materials,
+    };
+    this.notice(
+      meta.entityId,
+      `Your focus re-spec will complete in ${Math.ceil(cost.durationMs / 1000)}s.`,
+    );
+  }
+
+  private chargeTownFocusRespec(meta: PlayerMeta, cost: professionsFocus.RespecCost): void {
     if (cost.coin > 0) meta.copper -= cost.coin;
     if (cost.materials > 0) {
       this.removeItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, cost.materials, meta.entityId);
     }
-    meta.townFocus = result.allocation as Record<string, number>;
+  }
+
+  // #1144: resolves a queued 're-spec' once its duration has elapsed. Called
+  // from the per-player tick loop for a live player. Re-checks affordability
+  // at resolution time (the charge happens here, never at the request), so a
+  // purse spent in the meantime cancels the queued re-spec instead of going
+  // negative or silently discarding materials the player no longer has.
+  private updateTownFocusRespec(meta: PlayerMeta): void {
+    const pending = meta.pendingTownFocus;
+    if (!pending || this.time < pending.readyAtTime) return;
+    meta.pendingTownFocus = undefined;
+    const canAfford =
+      meta.copper >= pending.coin &&
+      this.countItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, meta.entityId) >= pending.materials;
+    if (!canAfford) {
+      this.error(
+        meta.entityId,
+        'You could not afford your pending focus re-spec, so it was cancelled.',
+      );
+      return;
+    }
+    this.chargeTownFocusRespec(meta, {
+      durationMs: 0,
+      coin: pending.coin,
+      materials: pending.materials,
+    });
+    meta.townFocus = pending.allocation;
     deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
+    this.notice(meta.entityId, 'Your focus re-spec is complete.');
   }
 
   interact(pid?: number): void {

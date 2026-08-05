@@ -195,6 +195,13 @@ const baseEnTable = {
   'error.townFocusInvalid': 'Invalid focus allocation.',
   // #1144: the chosen re-spec payment tier's coin/material cost is unaffordable.
   'error.townFocusCannotAfford': 'You cannot afford that focus re-spec.',
+  // #1144: the 'time'/'timeAndPartial' tiers queue the reallocation instead of
+  // committing it immediately; these three cover the queue/resolve lifecycle
+  // (see Sim.setTownFocus / updateTownFocusRespec in src/sim/sim.ts).
+  'log.townFocusRespecQueued': 'Your focus re-spec will complete in {seconds}s.',
+  'log.townFocusRespecComplete': 'Your focus re-spec is complete.',
+  'error.townFocusRespecCancelled':
+    'You could not afford your pending focus re-spec, so it was cancelled.',
   // Custom per-item ground-pickup lines (src/sim/content/ground_pickup_lines.ts).
   // Emitted via def.pickupDeny/def.pickupEnough (variable-routed, so the S3 guard
   // cannot see them); values must stay byte-identical to that table for the EXACT
@@ -10013,6 +10020,11 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // #1144: timed town-focus re-spec queued (Sim.setTownFocus).
+  {
+    re: /^Your focus re-spec will complete in (\d+)s\.$/,
+    build: (m) => tSim('log.townFocusRespecQueued', { seconds: m[1] }),
+  },
   // Ready-check result summary (social/ready_check.ts finalizeReadyCheck).
   {
     re: /^Ready check: (\d+) ready, (\d+) not ready, (\d+) no response\.$/,
