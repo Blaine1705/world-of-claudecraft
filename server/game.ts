@@ -8972,6 +8972,9 @@ export class GameServer {
     // per batch, not per session, since it only reads the shared entity map.
     const ownerOf = (entityId: number): number | null =>
       this.sim.entities.get(entityId)?.ownerId ?? null;
+    const tapperOf = (entityId: number): number | null =>
+      this.sim.entities.get(entityId)?.tappedById ?? null;
+    const combatDeliveryLookups = { ownerOf, tapperOf };
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -8996,7 +8999,8 @@ export class GameServer {
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) continue;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, combatDeliveryLookups))
+            continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
