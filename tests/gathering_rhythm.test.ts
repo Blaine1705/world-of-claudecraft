@@ -41,6 +41,7 @@ import { createMob } from '../src/sim/entity';
 import {
   FISH_BITE_DELAY_MAX_SEC,
   FISH_BITE_DELAY_MIN_SEC,
+  FISH_EARLY_REEL_GRACE_SEC,
   startFishing,
 } from '../src/sim/professions/fishing';
 import {
@@ -219,9 +220,13 @@ describe('reel deadline boundary', () => {
     sim.rng.setObserver(() => draws++);
     try {
       startFishing(sim.ctx, p, meta);
-      // Pre-bite re-press: the anti-spam early reel ends the session empty
-      // (draw-free), instead of the old free busy no-op that let a spammer
-      // ride every press through to the armed window.
+      // Pre-bite re-press past the grace: the anti-spam early reel ends the
+      // session empty (draw-free), instead of the old free busy no-op that
+      // let a spammer ride every press through to the armed window.
+      for (let t = 0; t < Math.round(FISH_EARLY_REEL_GRACE_SEC / DT); t++) {
+        sim.tickCount += 1;
+        updateCasting(sim.ctx, p, meta);
+      }
       sim.events = [];
       startFishing(sim.ctx, p, meta);
       expect(sim.events).toContainEqual(expect.objectContaining({ type: 'fishingEarlyReel' }));
@@ -1114,14 +1119,34 @@ describe('every other cast-end path returns the hidden fields to inert (QA pins)
     expect(p.fishReelDeadlineTick).toBe(0);
     expect(p.fishCastZoneId).toBe('');
     // Without the cancelCast clears, this recast would still see the OLD
-    // deadline armed and the immediate re-press would land a catch with no
-    // bite: the re-press must resolve as the draw-free early reel (the
-    // anti-spam arm), never as a landed reel.
+    // deadline armed and an immediate re-press would land a catch with no
+    // bite. Immediately after the recast the re-press sits inside the
+    // double-press grace, so it must stay the plain busy no-op (session
+    // alive, zero draws): a stale deadline reaching the reel arm would have
+    // drawn the table and stopped the cast successfully.
     startFishing(sim.ctx, p, meta);
     expect(p.castingAbility).toBe(FISHING_CAST_ID);
     let draws = 0;
     sim.rng.setObserver(() => draws++);
     sim.events = [];
+    try {
+      startFishing(sim.ctx, p, meta);
+    } finally {
+      sim.rng.setObserver(null);
+    }
+    expect(draws).toBe(0);
+    expect(sim.events).toContainEqual(
+      expect.objectContaining({ type: 'error', text: 'You are busy.' }),
+    );
+    expect(p.castingAbility).toBe(FISHING_CAST_ID);
+    // And past the grace the same re-press resolves as the draw-free early
+    // reel, still never a landed one.
+    for (let t = 0; t < Math.round(FISH_EARLY_REEL_GRACE_SEC / DT); t++) {
+      sim.tickCount += 1;
+      updateCasting(sim.ctx, p, meta);
+    }
+    sim.events = [];
+    sim.rng.setObserver(() => draws++);
     try {
       startFishing(sim.ctx, p, meta);
     } finally {

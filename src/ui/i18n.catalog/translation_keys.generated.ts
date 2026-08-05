@@ -5004,6 +5004,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.fish.colGain'
   | 'guide.profPages.fish.colOdds'
   | 'guide.profPages.fish.colProficiency'
+  | 'guide.profPages.fish.earlyReelNote'
   | 'guide.profPages.fish.emptyHook'
   | 'guide.profPages.fish.koiBody'
   | 'guide.profPages.fish.koiHeading'

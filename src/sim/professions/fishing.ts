@@ -87,6 +87,16 @@ export const FISH_BITE_DELAY_ROD_REDUCTION_SEC = 1.5;
 export const FISH_REEL_WINDOW_SEC = 2.5;
 export const FISH_REEL_WINDOW_ROD_BONUS_SEC = 0.75;
 
+// The early-reel grace (the double-press guard): a re-press inside the first
+// second of a session falls through to the ordinary busy denial instead of
+// ending the cast, so a bag double-click, a held key's auto-repeat, or a pad
+// interact press right on the heels of the cast cannot silently burn the
+// session. MUST stay strictly under FISH_BITE_DELAY_MIN_SEC: were the grace
+// to reach the earliest possible bite, presses inside it would be free all
+// the way to an armed reel window and the spam-click exploit would reopen
+// (the derivation is pinned in tests/professions_fishing.test.ts).
+export const FISH_EARLY_REEL_GRACE_SEC = 1;
+
 // What a ROD's own rarity adds to the window, per rung above common (the
 // shared ladder, tools.ts rarityLadderIndex). The land tools' rarity buys
 // charges on a slotted effect instead; this is the rod half of the same
@@ -315,8 +325,9 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // blocked or fully absorbed, cancelling too. A future displacement that
   // omits that clamp must either keep it or re-check the swim gate here.
   // A re-press BEFORE the bite ends the session empty (the early-reel arm
-  // below); a re-press AFTER the deadline falls through to the busy error
-  // (the miss arm owns that tick).
+  // below), except inside the first FISH_EARLY_REEL_GRACE_SEC where it stays
+  // the busy denial (the double-press guard); a re-press AFTER the deadline
+  // falls through to the busy error (the miss arm owns that tick).
   // Boundary contract (pinned): the reel is valid while ctx.tickCount <=
   // fishReelDeadlineTick; the miss fires at deadline + 1 in the tick phase.
   if (
@@ -351,7 +362,26 @@ export function startFishing(ctx: SimContext, p: Entity, meta: PlayerMeta): void
   // draw-free on every path: the session's one bite-delay draw is simply
   // abandoned, zoneId/band resolve from pure state like the miss arm's.
   // Costs nothing but the ended cast; recast immediately.
-  if (p.castingAbility === FISHING_CAST_ID && p.fishBiteAtTick > 0) {
+  //
+  // The grace: inside the first FISH_EARLY_REEL_GRACE_SEC of the session a
+  // re-press falls through to the ordinary denials below (busy, or combat)
+  // instead of ending the cast, so an accidental double-press never burns
+  // the session. Session age is the count of elapsed casting ticks read off
+  // the castTotal/castRemaining pair (updateCasting subtracts DT once per
+  // tick; the half-tick epsilon keeps the float accumulation from moving
+  // the boundary tick). Safe against the exploit because the grace ends two
+  // full seconds before the earliest possible bite: every press a spammer
+  // lands past it still cancels long before a window can arm. NOTE the age
+  // clock counts CASTING ticks (updateCasting calls) while fishBiteAtTick
+  // counts absolute ticks; they stay in lockstep only because no live
+  // fishing session can skip an updateCasting call today. If casting can
+  // ever pause while a session stays live, re-derive this age off
+  // ctx.tickCount (a stored cast-start tick) instead.
+  if (
+    p.castingAbility === FISHING_CAST_ID &&
+    p.fishBiteAtTick > 0 &&
+    p.castTotal - p.castRemaining >= FISH_EARLY_REEL_GRACE_SEC - DT / 2
+  ) {
     const zoneId = p.fishCastZoneId || zoneAt(p.pos.x, p.pos.z).id;
     const band = effectiveFishingBand(meta);
     p.castingAbility = null;

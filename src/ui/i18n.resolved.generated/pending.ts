@@ -12,6 +12,7 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -191,6 +192,7 @@ export const pending: Record<string, readonly string[]> = {
   "es_ES": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -370,6 +372,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_FR": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -549,6 +552,7 @@ export const pending: Record<string, readonly string[]> = {
   "fr_CA": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -729,6 +733,7 @@ export const pending: Record<string, readonly string[]> = {
   "it_IT": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -908,6 +913,7 @@ export const pending: Record<string, readonly string[]> = {
   "de_DE": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -1119,6 +1125,7 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -1306,6 +1313,7 @@ export const pending: Record<string, readonly string[]> = {
   "cs_CZ": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -1485,6 +1493,7 @@ export const pending: Record<string, readonly string[]> = {
   "nl_NL": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -1664,6 +1673,7 @@ export const pending: Record<string, readonly string[]> = {
   "pl_PL": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -1843,6 +1853,7 @@ export const pending: Record<string, readonly string[]> = {
   "id_ID": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -2022,6 +2033,7 @@ export const pending: Record<string, readonly string[]> = {
   "tr_TR": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -2201,6 +2213,7 @@ export const pending: Record<string, readonly string[]> = {
   "sv_SE": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -2380,6 +2393,7 @@ export const pending: Record<string, readonly string[]> = {
   "vi_VN": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",
@@ -2559,6 +2573,7 @@ export const pending: Record<string, readonly string[]> = {
   "da_DK": [
     "editor.status.campCapReached",
     "guide.nav.thornhollow",
+    "guide.profPages.fish.earlyReelNote",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
     "guide.thornhollowPage.fieldBody",

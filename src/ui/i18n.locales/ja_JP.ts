@@ -10840,6 +10840,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': 'アタリとリール',
   'guide.profPages.fish.biteBody':
     'キャストから{min}から{max}秒でアタリが来ます（良い竿は待ちを最大{rod}秒縮めます）。リールの猶予は{reel}秒に竿がティア1つ上がるごとに{reelRod}秒加わり、1回のセッションは最長{cap}秒です。',
+  'guide.profPages.fish.earlyReelNote':
+    'せっかちな指への注意：アタリが来る前にもう一度竿を使うと空の糸を巻き上げ、そのキャストは終わります（キャスト直後のわずかな猶予がうっかりの二度押しを許してくれます）。釣りは我慢がすべて。アタリを待って、それから合わせましょう。',
   'guide.profPages.fish.scheduleHeading': '熟練度成長',
   'guide.profPages.fish.scheduleNote':
     '釣りの成長は熟練度ごとの固定スケジュールに従い、{cutoff}からはガラクタを釣っても何も学べません。',
