@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "4fdc99c9",
+      "state": "b98d3323",
       "events": "aa090f94",
       "rng": {
         "draws": 5,
@@ -90,6 +90,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -148,6 +151,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -320,7 +326,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "9f436caf",
+      "state": "650e12ab",
       "events": "59b1d898",
       "rng": {
         "draws": 10,
@@ -378,6 +384,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -436,6 +445,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -672,7 +684,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "4126fcb7",
+      "state": "91afa139",
       "events": "ddaf789b",
       "rng": {
         "draws": 17,
@@ -730,6 +742,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -788,6 +803,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1080,7 +1098,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "ce9459e2",
+      "state": "e6e121b0",
       "events": "741638a5",
       "rng": {
         "draws": 19,
@@ -1138,6 +1156,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1196,6 +1217,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1536,7 +1560,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 970,
-      "state": "808f66cd",
+      "state": "38107097",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -1594,6 +1618,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -1652,6 +1679,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -2035,7 +2065,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "2a2db665",
+      "state": "b86d2d0f",
       "events": "83c741bb",
       "rng": {
         "draws": 20,
@@ -2093,6 +2123,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -2151,6 +2184,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -2579,7 +2615,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "9fa5e262",
+      "state": "aa3e8e30",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2637,6 +2673,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -2695,6 +2734,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -3124,7 +3166,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "9fa5e262",
+      "state": "aa3e8e30",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -3182,6 +3224,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -3240,6 +3285,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },

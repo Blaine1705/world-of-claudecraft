@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "79743a94",
+      "state": "fdb7b133",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -149,7 +152,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 966,
-      "state": "081687cd",
+      "state": "80829e66",
       "events": "a5e3fe0a",
       "rng": {
         "draws": 4,
@@ -160,7 +163,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 966,
-      "state": "1a407794",
+      "state": "344205d5",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -171,7 +174,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 966,
-      "state": "a484a438",
+      "state": "fa8c18e9",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -243,6 +246,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -320,7 +326,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 966,
-      "state": "32b965bc",
+      "state": "b248a33d",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -392,6 +398,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -465,7 +474,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 966,
-      "state": "dade7ff0",
+      "state": "08f01e61",
       "events": "0e7100e6",
       "rng": {
         "draws": 4,
@@ -537,6 +546,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -616,7 +628,7 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 966,
-      "state": "1adac9c8",
+      "state": "124b3199",
       "events": "a0873ad4",
       "rng": {
         "draws": 4,
@@ -627,7 +639,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 966,
-      "state": "18ba3ead",
+      "state": "af63c386",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -699,6 +711,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}

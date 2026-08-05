@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "79743a94",
+      "state": "fdb7b133",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -149,7 +152,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "66adcb1f",
+      "state": "3f512976",
       "events": "65a4cf51",
       "rng": {
         "draws": 0,
@@ -222,6 +225,9 @@
             ]
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -298,7 +304,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "4db11bad",
+      "state": "29ad2944",
       "events": "0ce93a3d",
       "rng": {
         "draws": 40,
@@ -400,6 +406,9 @@
             ]
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}
@@ -478,7 +487,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "fb5c078c",
+      "state": "9d58982b",
       "events": "d6b1e3df",
       "rng": {
         "draws": 40,
@@ -571,6 +580,9 @@
             "q_wolves"
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}
@@ -650,7 +662,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 972,
-      "state": "bab1d90d",
+      "state": "03d2c7bc",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -743,6 +755,9 @@
             "q_wolves"
           ],
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 30,
           "talents": {
             "rows": {}

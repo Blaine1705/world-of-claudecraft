@@ -28,8 +28,8 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "cd2bef48",
-      "events": "4a8f3918",
+      "state": "ac9d162f",
+      "events": "3773324c",
       "rng": {
         "draws": 2,
         "digest": "abc5fd1d"
@@ -92,6 +92,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 5,
           "talents": {
             "rows": {}
@@ -162,6 +165,16 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {
+              "greyjaw_hide_boots": {
+                "pageId": "conquerors_hollow_crypt"
+              }
+            },
+            "recent": [
+              "greyjaw_hide_boots"
+            ]
+          },
           "renown": 5,
           "talents": {
             "rows": {}

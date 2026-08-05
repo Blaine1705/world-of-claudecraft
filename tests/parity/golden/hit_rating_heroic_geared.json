@@ -14,7 +14,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "ff2d9e02",
+      "state": "735c19e9",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -73,6 +73,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -136,8 +139,8 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 965,
-      "state": "015609ab",
-      "events": "ca917edb",
+      "state": "d1bee806",
+      "events": "e0bbbabd",
       "rng": {
         "draws": 3,
         "digest": "3e75db10"
@@ -147,7 +150,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "208f6efb",
+      "state": "7fd348b6",
       "events": "cc147418",
       "rng": {
         "draws": 3,
@@ -158,7 +161,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 965,
-      "state": "1de6612e",
+      "state": "1e9eb855",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -169,7 +172,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "f6b73637",
+      "state": "7df8dd6a",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -180,7 +183,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 965,
-      "state": "f5f9f1e6",
+      "state": "b3bb89dd",
       "events": "b9f5a602",
       "rng": {
         "draws": 76,
@@ -191,7 +194,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "dddb8542",
+      "state": "e508f411",
       "events": "741638a5",
       "rng": {
         "draws": 157,
@@ -202,7 +205,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 965,
-      "state": "859e680f",
+      "state": "d5973292",
       "events": "741638a5",
       "rng": {
         "draws": 248,
@@ -213,7 +216,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "8ba1527a",
+      "state": "3c20b339",
       "events": "17f6bb90",
       "rng": {
         "draws": 345,
@@ -224,7 +227,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 965,
-      "state": "45d999a5",
+      "state": "653b3a60",
       "events": "0e11323d",
       "rng": {
         "draws": 426,
@@ -235,7 +238,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 965,
-      "state": "89419fe2",
+      "state": "94eb0571",
       "events": "741638a5",
       "rng": {
         "draws": 522,
@@ -246,7 +249,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 965,
-      "state": "0c9fe7a1",
+      "state": "94502f34",
       "events": "741638a5",
       "rng": {
         "draws": 617,
@@ -257,7 +260,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "1cdbb2c8",
+      "state": "d2e8cf17",
       "events": "741638a5",
       "rng": {
         "draws": 707,
@@ -268,7 +271,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "1cdbb2c8",
+      "state": "d2e8cf17",
       "events": "741638a5",
       "rng": {
         "draws": 707,
@@ -378,6 +381,28 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {
+              "lunar_choir_leggings": {
+                "pageId": "conquerors_drowned_temple_heroic"
+              },
+              "lunar_tide_greatstaff": {
+                "pageId": "conquerors_drowned_temple_heroic"
+              },
+              "sash_of_the_sunken_court": {
+                "pageId": "conquerors_sunken_bastion_heroic"
+              },
+              "shadowpulse_handwraps": {
+                "pageId": "conquerors_hollow_crypt_heroic"
+              }
+            },
+            "recent": [
+              "shadowpulse_handwraps",
+              "sash_of_the_sunken_court",
+              "lunar_choir_leggings",
+              "lunar_tide_greatstaff"
+            ]
+          },
           "renown": 55,
           "talents": {
             "rows": {}
@@ -515,7 +540,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 965,
-      "state": "1cdbb2c8",
+      "state": "d2e8cf17",
       "events": "741638a5",
       "rng": {
         "draws": 707,
@@ -625,6 +650,28 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {
+              "lunar_choir_leggings": {
+                "pageId": "conquerors_drowned_temple_heroic"
+              },
+              "lunar_tide_greatstaff": {
+                "pageId": "conquerors_drowned_temple_heroic"
+              },
+              "sash_of_the_sunken_court": {
+                "pageId": "conquerors_sunken_bastion_heroic"
+              },
+              "shadowpulse_handwraps": {
+                "pageId": "conquerors_hollow_crypt_heroic"
+              }
+            },
+            "recent": [
+              "shadowpulse_handwraps",
+              "sash_of_the_sunken_court",
+              "lunar_choir_leggings",
+              "lunar_tide_greatstaff"
+            ]
+          },
           "renown": 55,
           "talents": {
             "rows": {}

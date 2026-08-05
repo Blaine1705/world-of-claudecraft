@@ -15,7 +15,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "b4034be4",
+      "state": "2ad1de23",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -139,7 +142,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 967,
-      "state": "c883da54",
+      "state": "a897cd15",
       "events": "e291449d",
       "rng": {
         "draws": 10,
@@ -150,7 +153,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "2ffb26fd",
+      "state": "685ae6f6",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -161,7 +164,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 967,
-      "state": "2541b028",
+      "state": "6f523e39",
       "events": "c3b59851",
       "rng": {
         "draws": 180,
@@ -172,7 +175,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 967,
-      "state": "bcfdea3d",
+      "state": "3aaf97b6",
       "events": "741638a5",
       "rng": {
         "draws": 344,
@@ -183,7 +186,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "bcc70589",
+      "state": "42f203a2",
       "events": "d1fe4275",
       "rng": {
         "draws": 540,
@@ -194,7 +197,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "6b7dc3f0",
+      "state": "88956a61",
       "events": "741638a5",
       "rng": {
         "draws": 751,
@@ -205,7 +208,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 967,
-      "state": "6b7dc3f0",
+      "state": "88956a61",
       "events": "741638a5",
       "rng": {
         "draws": 751,
@@ -288,6 +291,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 20,
           "talents": {
             "rows": {}

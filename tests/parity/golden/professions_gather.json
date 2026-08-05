@@ -21,7 +21,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "79743a94",
+      "state": "fdb7b133",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -78,6 +78,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -154,7 +157,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "95f91ab0",
+      "state": "576cada9",
       "events": "a9ac9759",
       "rng": {
         "draws": 2,
@@ -252,6 +255,9 @@
             "ore_eastbrook_1": 242.5
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -331,7 +337,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 964,
-      "state": "a8fbe5fe",
+      "state": "e18e06f1",
       "events": "8260c3ec",
       "rng": {
         "draws": 4,
@@ -449,6 +455,9 @@
             "wood_eastbrook_1": 245
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 25,
           "talents": {
             "rows": {}
@@ -528,7 +537,7 @@
       "tick": 500,
       "time": 25,
       "nextId": 964,
-      "state": "b6f27b49",
+      "state": "dd381684",
       "events": "805e7fdd",
       "rng": {
         "draws": 18,
@@ -539,7 +548,7 @@
       "tick": 1000,
       "time": 50,
       "nextId": 964,
-      "state": "ef7cb131",
+      "state": "d2792ade",
       "events": "6d19acfd",
       "rng": {
         "draws": 38,
@@ -550,7 +559,7 @@
       "tick": 1500,
       "time": 75,
       "nextId": 964,
-      "state": "3cbe4f17",
+      "state": "6daab6b2",
       "events": "2b55efa2",
       "rng": {
         "draws": 58,
@@ -561,8 +570,8 @@
       "tick": 2000,
       "time": 100,
       "nextId": 964,
-      "state": "4afde6fb",
-      "events": "1ea3dc52",
+      "state": "948f6bc1",
+      "events": "fcff7a84",
       "rng": {
         "draws": 78,
         "digest": "97046b18"
@@ -572,7 +581,7 @@
       "tick": 2500,
       "time": 125,
       "nextId": 964,
-      "state": "954e4110",
+      "state": "ab7c229a",
       "events": "d9ede772",
       "rng": {
         "draws": 96,
@@ -583,7 +592,7 @@
       "tick": 3000,
       "time": 150,
       "nextId": 964,
-      "state": "54cbe846",
+      "state": "53c0a52c",
       "events": "8c713a89",
       "rng": {
         "draws": 116,
@@ -594,7 +603,7 @@
       "tick": 3500,
       "time": 175,
       "nextId": 964,
-      "state": "b850733b",
+      "state": "18940479",
       "events": "c96919af",
       "rng": {
         "draws": 136,
@@ -605,7 +614,7 @@
       "tick": 4000,
       "time": 200,
       "nextId": 964,
-      "state": "9fdd8fa4",
+      "state": "4f88d9aa",
       "events": "f0818e21",
       "rng": {
         "draws": 156,
@@ -616,7 +625,7 @@
       "tick": 4500,
       "time": 225,
       "nextId": 964,
-      "state": "135212ee",
+      "state": "97be05a8",
       "events": "f0818e21",
       "rng": {
         "draws": 176,
@@ -627,7 +636,7 @@
       "tick": 5000,
       "time": 250,
       "nextId": 964,
-      "state": "8ec1e697",
+      "state": "b8be3a89",
       "events": "c11dfe26",
       "rng": {
         "draws": 194,
@@ -638,7 +647,7 @@
       "tick": 5206,
       "time": 260.3,
       "nextId": 964,
-      "state": "de660c19",
+      "state": "c125645f",
       "events": "f791a605",
       "rng": {
         "draws": 204,
@@ -781,6 +790,15 @@
             "wood_eastbrook_1": 245
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {},
+            "marks": [
+              "gather_event:moonlit_bloom"
+            ],
+            "recent": [
+              "gather_event:moonlit_bloom"
+            ]
+          },
           "renown": 40,
           "talents": {
             "rows": {}
@@ -860,7 +878,7 @@
       "tick": 5208,
       "time": 260.4,
       "nextId": 964,
-      "state": "02a3f454",
+      "state": "e008265e",
       "events": "741638a5",
       "rng": {
         "draws": 204,
@@ -1003,6 +1021,15 @@
             "wood_eastbrook_1": 245
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {},
+            "marks": [
+              "gather_event:moonlit_bloom"
+            ],
+            "recent": [
+              "gather_event:moonlit_bloom"
+            ]
+          },
           "renown": 40,
           "talents": {
             "rows": {}
