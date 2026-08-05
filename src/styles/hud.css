@@ -594,6 +594,14 @@
     min-width: 0;
     max-width: 520px;
   }
+  /* How far the player frame's centred content row sits from the left edge of its
+     612px box: (612 - (portrait + the 520px bar column)) / 2. The pet frame hangs
+     beneath with a shorter row, so it cannot reach the same column by centring and
+     pays this inset explicitly instead. Held as one token so the two cannot drift
+     apart; measured against the rendered frames, not derived on paper. */
+  #actionbar-stack {
+    --unit-frame-content-inset: 18px;
+  }
   /* The player frame once MOVED (MovableFrame sets pf-detached alongside the
      saved left/top): hud.ts reparents it from the action-bar stack to #ui (a
      transformed #bottom-bar ancestor would hijack the positioning), where it
@@ -618,19 +626,32 @@
      (#bottom-bar sits at bottom: 6px), so this grows the stack UPWARD: the action
      bars keep their position and the player frame lifts by this strip's height.
      Hidden until the player actually has a pet; the family painter sets the inline
-     display:flex, which outranks the `none` here. It follows --player-frame-scale
-     because it belongs to the player frame, and rides slightly smaller so it reads
-     as subordinate to it (the same trick #totarget-frame uses under the target). */
+     display:flex, which outranks the `none` here.
+
+     It shares the player frame's 612px box and its scale, and LEFT-ALIGNS its
+     content to --unit-frame-content-inset so the pet portrait sits in the same
+     column as the player portrait directly above it. Both halves of that matter:
+     the player frame CENTRES a full-width content row in the box, and this frame's
+     row is much shorter (one short bar, no resource rail), so centring would push
+     its portrait about 200px right of the player's and the pair reads as two
+     unrelated things floating over the action bar. It also takes NO extra zoom of
+     its own for the same reason: any scale the two frames do not share moves this
+     one's content off that column. The subordinate read comes from the shorter bar
+     and the single row, not from shrinking the frame. */
   #pet-frame {
     position: relative;
     top: auto;
     left: auto;
+    width: 612px;
     margin: 0 auto 4px;
     display: none;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    padding-left: var(--unit-frame-content-inset);
     cursor: pointer;
-    zoom: calc(0.82 * var(--player-frame-scale, 1));
+  }
+  #pet-frame > * {
+    zoom: var(--player-frame-scale, 1);
   }
   #pet-frame .uf-bars {
     flex: none;
@@ -647,6 +668,24 @@
      dims rather than hiding, matching the party frames' dead treatment. */
   #pet-frame.dead {
     opacity: 0.7;
+  }
+  /* Once the player frame is DRAGGED it leaves #actionbar-stack for #ui, so hud.ts
+     moves the pet frame inside it (anchorPetFrameToPlayer) and it hangs off the
+     frame here instead of sitting in the stack's flow. Without this the strip
+     stayed behind at the bottom of the screen while the frame it belongs to moved
+     away. The children-zoom is dropped because #player-frame already applies the
+     same scale to its own children, which now include this frame. */
+  #player-frame.pf-detached > #pet-frame {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    width: auto;
+    margin: 0;
+    padding-left: 0;
+    z-index: 6;
+  }
+  #player-frame.pf-detached > #pet-frame > * {
+    zoom: 1;
   }
   #target-frame {
     left: 12px;

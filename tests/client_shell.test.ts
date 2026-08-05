@@ -2548,3 +2548,49 @@ describe('client HTML shell', () => {
     expect(hudMobileCss).toMatch(/body\.mobile-touch #bags \{[\s\S]*?z-index:\s*95 !important;/);
   });
 });
+
+// The pet frame belongs to the player frame and must travel with it. Dragging the
+// player frame reparents it out of #actionbar-stack into #ui (pf-detached), and
+// before this was wired the pet strip stayed behind in the stack, stranded at the
+// bottom of the screen while the frame it hangs off sat wherever it was dropped.
+// Both halves are pinned because either alone silently restores the bug: the
+// hud.ts call that moves the node, and the CSS that anchors it once moved.
+describe('pet frame follows the player frame when it is dragged', () => {
+  const hudSrc = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+  const hudCssSrc = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
+
+  it('setPlayerFrameDetached hands off to the pet-frame anchor', () => {
+    const body = hudSrc.slice(
+      hudSrc.indexOf('private setPlayerFrameDetached'),
+      hudSrc.indexOf('private anchorPetFrameToPlayer'),
+    );
+    expect(body).toContain('this.anchorPetFrameToPlayer(active)');
+  });
+
+  it('the anchor reparents into the player frame when detached and back when docked', () => {
+    const body = hudSrc.slice(
+      hudSrc.indexOf('private anchorPetFrameToPlayer'),
+      hudSrc.indexOf('setAurasOnPlayerFrame'),
+    );
+    expect(body).toContain('frame.appendChild(pet)');
+    expect(body).toContain("$('#actionbar-stack')");
+    expect(body).toContain('stack.insertBefore(pet, frame.nextSibling)');
+  });
+
+  it('CSS anchors the strip under the detached frame instead of leaving it in flow', () => {
+    expect(hudCssSrc).toContain('#player-frame.pf-detached > #pet-frame {');
+    expect(hudCssSrc).toMatch(/#player-frame\.pf-detached > #pet-frame \{[^}]*position: absolute/);
+  });
+
+  // Docked, the two frames share one 612px box and this inset is what puts the pet
+  // portrait in the same column as the player portrait. Measured against the
+  // rendered frames (both portraits land on the same x); a drifted value is exactly
+  // the "floating, unattached" look the inset exists to prevent.
+  it('shares one content inset between the player and pet frames', () => {
+    expect(hudCssSrc).toContain('--unit-frame-content-inset: 18px;');
+    expect(hudCssSrc).toMatch(/#pet-frame \{[^}]*padding-left: var\(--unit-frame-content-inset\)/);
+    // No extra zoom of its own: any scale the two frames do not share moves the
+    // pet portrait off that column.
+    expect(hudCssSrc).toMatch(/#pet-frame > \* \{\s*zoom: var\(--player-frame-scale, 1\);\s*\}/);
+  });
+});

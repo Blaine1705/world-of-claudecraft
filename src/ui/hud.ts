@@ -3373,6 +3373,30 @@ export class Hud {
       const stack = $('#actionbar-stack');
       if (frame.parentElement !== stack) stack.insertBefore(frame, stack.firstChild);
     }
+    this.anchorPetFrameToPlayer(active);
+  }
+
+  // The pet frame belongs to the player frame, so it has to travel with it.
+  // DOCKED it stays an in-flow sibling right after the player frame, so the
+  // bottom-anchored stack reserves its height and it never overlays the action
+  // bars. Once the player frame is DRAGGED it moves to #ui, and a sibling left in
+  // the stack would be stranded at the bottom of the screen while the frame it
+  // belongs to sits wherever the player dropped it, so the pet frame moves inside
+  // the frame and CSS hangs it underneath. Same reparent-and-restore shape the
+  // buff row uses for the Buffs on the Player Frame option below.
+  private anchorPetFrameToPlayer(detached: boolean): void {
+    const pet = this.petFrameEl;
+    if (!pet) return;
+    const frame = this.playerFrameEl;
+    if (detached) {
+      if (pet.parentElement !== frame) frame.appendChild(pet);
+      return;
+    }
+    const stack = $('#actionbar-stack');
+    // insertBefore with the frame's next sibling puts the strip back directly
+    // after the player frame, which is where the docked layout expects it; the
+    // frame itself has already been restored to the stack's head above.
+    if (pet.parentElement !== stack) stack.insertBefore(pet, frame.nextSibling);
   }
 
   // Buffs on the Player Frame (aurasOnPlayerFrame): reparent the player's own

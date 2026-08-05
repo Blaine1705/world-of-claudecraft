@@ -1830,6 +1830,11 @@
     width: 300px;
     margin: 0;
     justify-content: flex-start;
+    /* The desktop rule pays --unit-frame-content-inset because the desktop player
+       frame CENTRES its content in a 612px box. The mobile player frame is
+       flex-start with no inset, so inheriting it here pushes this strip about 18px
+       right of the frame it hangs under. Reset, do not inherit. */
+    padding-left: 0;
     zoom: 1;
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
