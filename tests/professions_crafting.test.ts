@@ -44,7 +44,7 @@ function completeCraftCastNow(sim: Sim, pid = sim.playerId) {
 /** Start via Sim.craftItem and complete in-harness (Phase 1 cast path). */
 function craftItemComplete(sim: Sim, recipeId: string, commission = false, pid?: number) {
   const id = pid ?? sim.playerId;
-  sim.craftItem(recipeId, commission, id);
+  sim.craftItem(recipeId, commission, id, 1);
   completeCraftCastNow(sim, id);
 }
 
@@ -450,7 +450,7 @@ describe('craftItem command (#1127)', () => {
   it('denies a craft with an error event and leaves lastCraftResult reflecting the denial', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    sim.craftItem('recipe_tough_jerky', false, pid);
+    sim.craftItem('recipe_tough_jerky', false, pid, 1);
     expect(sim.lastCraftResult?.ok).toBe(false);
     expect(sim.lastCraftResult?.reason).toBe('insufficient_materials');
   });
@@ -738,7 +738,7 @@ describe('combo recipes requiring an adjacent craft pair (#1132)', () => {
     grantItem(sim, 'wolf_fang', 4, pid);
     grantItem(sim, 'smithing_flux', 2, pid);
 
-    sim.craftItem(comboRecipe.id, false, pid);
+    sim.craftItem(comboRecipe.id, false, pid, 1);
 
     expect(sim.lastCraftResult?.ok).toBe(false);
     expect(sim.lastCraftResult?.reason).toBe('combo_requirement_unmet');
@@ -858,7 +858,7 @@ describe('craft-completion event carries audio-relevant data (#1729)', () => {
     const pid = sim.playerId;
     // No materials granted: the insufficient_materials denial path.
     sim.drainEvents();
-    sim.craftItem('recipe_tough_jerky', false, pid);
+    sim.craftItem('recipe_tough_jerky', false, pid, 1);
     const craft = sim.drainEvents().find((e) => e.type === 'craftResult');
     if (craft?.type !== 'craftResult') throw new Error('expected a craftResult event');
     expect(craft.ok).toBe(false);

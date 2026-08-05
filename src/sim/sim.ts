@@ -8501,23 +8501,21 @@ export class Sim {
   // boolean opt-in off the craft command; the resolve honors it
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
-  // IWorld: craftItem(recipeId, commission?, count?). Multi-player / tests:
-  // craftItem(recipeId, commission?, pid?, count?) with pid as a known player
-  // entity id. When the third arg is a known player and the fourth is omitted,
-  // it is treated as pid (legacy). When the third arg is not a player id, it is
-  // the IWorld batch count. Four-arg form is always (pid, count).
-  craftItem(recipeId: string, commission?: boolean, pidOrCount?: number, count?: number): void {
+  // IWorld: craftItem(recipeId, commission?, count?), the third argument is
+  // ALWAYS the batch count. Crafting for another player (server dispatch,
+  // multi-player tests) REQUIRES the explicit four-arg form
+  // craftItem(recipeId, commission, pid, count): a bare third-arg pid is not
+  // supported, because batch counts and player entity ids share one integer
+  // space and a membership guess (the retired players.has() heuristic) made
+  // "craft N" and "craft as player N" collide silently.
+  craftItem(recipeId: string, commission?: boolean, countOrPid?: number, count?: number): void {
     let pid: number | undefined;
     let batchCount = 1;
     if (count !== undefined) {
-      pid = pidOrCount;
+      pid = countOrPid;
       batchCount = count;
-    } else if (pidOrCount !== undefined && this.players.has(pidOrCount)) {
-      pid = pidOrCount;
-      batchCount = 1;
-    } else if (pidOrCount !== undefined) {
-      batchCount = pidOrCount;
-      pid = undefined;
+    } else if (countOrPid !== undefined) {
+      batchCount = countOrPid;
     }
     // Dead gate for the profession-action family (this wrapper plus
     // trainRecipe/unbindItem/salvageItem/disenchantItem/applyEnchant below):

@@ -277,22 +277,24 @@ function emitRechargeDeny(
 }
 
 /**
- * Pre-consume admission for a tool-recharge cast. No side effects. Returns
- * null when the cast may start; otherwise the deny reason already emitted.
+ * Pre-consume admission for a tool-recharge cast: true when the cast may
+ * start; on false the deny event was already emitted. No side effects. The
+ * completion re-resolves slot and price from scratch (resolveRechargeBody),
+ * so nothing resolved here is threaded forward.
  */
 function evaluateRechargeAdmission(
   ctx: SimContext,
   r: NonNullable<ReturnType<SimContext['resolve']>>,
   professionId: string,
-): { ok: true; slot: ToolEffectSlot } | { ok: false } {
+): boolean {
   if (!(GATHERING_PROFESSION_IDS as readonly string[]).includes(professionId)) {
     emitRechargeDeny(ctx, r.meta.entityId, professionId, 'invalid_request');
-    return { ok: false };
+    return false;
   }
   const slot = r.meta.toolEffectSlots?.[professionId as GatheringProfessionId];
   if (!slot) {
     emitRechargeDeny(ctx, r.meta.entityId, professionId, 'no_slot');
-    return { ok: false };
+    return false;
   }
   const resolved = resolveRechargeToolEffect(
     r.meta.inventory,
@@ -304,7 +306,7 @@ function evaluateRechargeAdmission(
   );
   if (!resolved.ok) {
     emitRechargeDeny(ctx, r.meta.entityId, professionId, resolved.reason, slot.effectId);
-    return { ok: false };
+    return false;
   }
   if (ctx.countItem(resolved.materialItemId, r.meta.entityId) < resolved.count) {
     // insufficient_materials is the one surface that carries the price so the
@@ -320,9 +322,9 @@ function evaluateRechargeAdmission(
       count: resolved.count,
       pid: r.meta.entityId,
     });
-    return { ok: false };
+    return false;
   }
-  return { ok: true, slot };
+  return true;
 }
 
 function beginToolRechargeCast(ctx: SimContext, p: Entity, professionId: string): void {
@@ -449,8 +451,7 @@ export function rechargeToolEffectAction(
   // slot and carry it into the resolver (harmless only by the resolver's
   // internal check order). The repo's hasOwn doctrine for plain-object
   // tables, applied structurally.
-  const admission = evaluateRechargeAdmission(ctx, r, professionId);
-  if (!admission.ok) return;
+  if (!evaluateRechargeAdmission(ctx, r, professionId)) return;
   beginToolRechargeCast(ctx, p, professionId);
 }
 

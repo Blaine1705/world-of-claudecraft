@@ -525,6 +525,31 @@ export function evaluateDisenchantAdmission(
   return null;
 }
 
+/** Canonical JSON with recursively sorted object keys, so two structurally
+ *  identical instance payloads fingerprint identically regardless of key
+ *  insertion order (a save round-trip can reorder keys). Pure, draw-free. */
+function sortedJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(sortedJson).join(',')}]`;
+  if (value !== null && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const keys = Object.keys(record).sort();
+    return `{${keys.map((k) => `${JSON.stringify(k)}:${sortedJson(record[k])}`).join(',')}}`;
+  }
+  return JSON.stringify(value) ?? 'null';
+}
+
+/** Per-copy identity fingerprint of a pin-selected disenchant victim slot:
+ *  itemId + instance payload + slot craft marker, everything that
+ *  distinguishes one copy of an item id from another. '' for no slot. */
+export function disenchantVictimPin(slot: InvSlot | undefined): string {
+  if (!slot) return '';
+  return sortedJson({
+    c: slot.craftedRecipeId ?? null,
+    i: slot.itemId,
+    p: slot.instance ?? null,
+  });
+}
+
 function beginEnchantFamilyCast(
   ctx: SimContext,
   p: Entity,
@@ -535,6 +560,7 @@ function beginEnchantFamilyCast(
     enchantId: string;
     equipSlot: string;
     confirmReplace: boolean;
+    targetPin: string;
   },
 ): void {
   if (p.sitting) ctx.standUp(p);
@@ -552,10 +578,14 @@ function beginEnchantFamilyCast(
   p.castTargetId = null;
   p.channeling = false;
   p.enchantCastItemId = session.itemId;
-  p.enchantCastBagSlot = session.bagSlot;
+  // Stored 1-based (slotIndex + 1, 0 = not pin-selected) so the resting value
+  // is 0 and the parity sampler's default-omission drops it (a -1 rest value
+  // re-hashed every golden; see tests/parity/trace.ts canonical()).
+  p.enchantCastBagSlot = session.bagSlot + 1;
   p.enchantCastEnchantId = session.enchantId;
   p.enchantCastEquipSlot = session.equipSlot;
   p.enchantCastConfirmReplace = session.confirmReplace;
+  p.enchantCastTargetPin = session.targetPin;
   ctx.emit({
     type: 'castStart',
     entityId: p.id,
@@ -570,19 +600,23 @@ function clearEnchantCastSession(p: Entity): {
   enchantId: string;
   equipSlot: string;
   confirmReplace: boolean;
+  targetPin: string;
 } {
   const session = {
     itemId: p.enchantCastItemId,
-    bagSlot: p.enchantCastBagSlot,
+    // Decode the 1-based storage back to the -1-based session shape.
+    bagSlot: p.enchantCastBagSlot - 1,
     enchantId: p.enchantCastEnchantId,
     equipSlot: p.enchantCastEquipSlot,
     confirmReplace: p.enchantCastConfirmReplace,
+    targetPin: p.enchantCastTargetPin,
   };
   p.enchantCastItemId = '';
-  p.enchantCastBagSlot = -1;
+  p.enchantCastBagSlot = 0;
   p.enchantCastEnchantId = '';
   p.enchantCastEquipSlot = '';
   p.enchantCastConfirmReplace = false;
+  p.enchantCastTargetPin = '';
   return session;
 }
 
@@ -609,6 +643,10 @@ export function disenchantItem(
     enchantId: '',
     equipSlot: '',
     confirmReplace: false,
+    // Pin the SELECTED copy's identity, not just its index: the complete-side
+    // re-check below is what stops a mid-cast bag splice from redirecting the
+    // destroy onto a different copy of the same item id.
+    targetPin: slotIndex === undefined ? '' : disenchantVictimPin(meta.inventory[slotIndex]),
   });
   return { ok: true, itemId, casting: true };
 }
@@ -617,7 +655,32 @@ export function disenchantItem(
  *  Re-validates and applies resolveDisenchant; emits disenchantResult. */
 export function completeDisenchantCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   const session = clearEnchantCastSession(p);
+  // Empty session: silent no-op (completeRechargeCast precedent). Unreachable
+  // from the live path (every start writes a non-empty id); a defensive deny
+  // here would emit a phantom unknown_item toast for a cast that never was.
+  if (session.itemId === '') return;
   const slotIndex = session.bagSlot < 0 ? undefined : session.bagSlot;
+  // Pin re-check for a slot-selected disenchant: a mid-cast bag splice (move,
+  // destroy, sell, bank) can shift a DIFFERENT copy of the same item id under
+  // the pinned index, and resolveDisenchant's id-only slot check would then
+  // destroy a copy the player never selected (the enchanted or masterwork
+  // one). Deny not_held instead; the player re-picks. Unpinned disenchants
+  // re-resolve their preferred victim fresh and need no pin.
+  if (
+    slotIndex !== undefined &&
+    disenchantVictimPin(meta.inventory[slotIndex]) !== session.targetPin
+  ) {
+    const result: DisenchantResult = { ok: false, itemId: session.itemId, reason: 'not_held' };
+    meta.lastDisenchantResult = result;
+    ctx.emit({
+      type: 'disenchantResult',
+      ok: false,
+      itemId: session.itemId,
+      reason: 'not_held',
+      pid: meta.entityId,
+    });
+    return;
+  }
   const result = resolveDisenchant(ctx, meta.entityId, session.itemId, slotIndex);
   meta.lastDisenchantResult = result;
   ctx.emit({
@@ -1243,12 +1306,25 @@ export function applyEnchant(
     confirmReplace,
   );
   if (denial) return denial;
+  // #2415 consent pin: record WHICH existing enchant the confirmReplace
+  // consent was given against ('' when the target is unenchanted), so a
+  // mid-cast copy swap cannot spend the consent destroying a different one.
+  let targetPin = '';
+  if (confirmReplace === true) {
+    if (slot) {
+      targetPin = meta.equipmentInstance?.[slot]?.enchant ?? '';
+    } else {
+      const victimIdx = replaceVictimIndex(meta.inventory, itemId);
+      targetPin = victimIdx >= 0 ? (meta.inventory[victimIdx].instance?.enchant ?? '') : '';
+    }
+  }
   beginEnchantFamilyCast(ctx, p, ENCHANT_CAST_ID, {
     itemId,
     bagSlot: -1,
     enchantId,
     equipSlot: slot ?? '',
     confirmReplace: confirmReplace === true,
+    targetPin,
   });
   return { ok: true, itemId, enchantId, casting: true };
 }
@@ -1257,7 +1333,42 @@ export function applyEnchant(
  *  resolveApplyEnchant; emits enchantResult. */
 export function completeApplyEnchantCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   const session = clearEnchantCastSession(p);
+  // Empty session: silent no-op (completeRechargeCast precedent).
+  if (session.itemId === '') return;
   const equipSlot = session.equipSlot ? (session.equipSlot as EquipSlot) : undefined;
+  // #2415 consent staleness re-check: with replace consent armed, if the
+  // target NOW carries a different enchant than the one consented to (a
+  // mid-cast equip or bag swap), deny with already_enchanted so the player
+  // confirms against what is actually there. A target that lost its enchant
+  // mid-cast falls through to the plain arm (nothing is destroyed), so only
+  // a present-but-different enchant denies.
+  if (session.confirmReplace) {
+    let current = '';
+    if (equipSlot) {
+      current = meta.equipmentInstance?.[equipSlot]?.enchant ?? '';
+    } else {
+      const victimIdx = replaceVictimIndex(meta.inventory, session.itemId);
+      current = victimIdx >= 0 ? (meta.inventory[victimIdx].instance?.enchant ?? '') : '';
+    }
+    if (current !== '' && current !== session.targetPin) {
+      const result: ApplyEnchantResult = {
+        ok: false,
+        itemId: session.itemId,
+        enchantId: session.enchantId,
+        reason: 'already_enchanted',
+      };
+      meta.lastEnchantResult = result;
+      ctx.emit({
+        type: 'enchantResult',
+        ok: false,
+        itemId: session.itemId,
+        enchantId: session.enchantId,
+        reason: 'already_enchanted',
+        pid: meta.entityId,
+      });
+      return;
+    }
+  }
   const result = resolveApplyEnchant(
     ctx,
     meta.entityId,

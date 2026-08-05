@@ -79,7 +79,9 @@ describe('disenchant cast', () => {
     cancelCast(sim.ctx, p);
     expect(p.castingAbility).toBeNull();
     expect(p.enchantCastItemId).toBe('');
-    expect(p.enchantCastBagSlot).toBe(-1);
+    // 0 is the inert resting value (the field stores slotIndex + 1 so the
+    // parity sampler's default-omission drops it at rest).
+    expect(p.enchantCastBagSlot).toBe(0);
     expect(sim.countItem(SWORD, pid)).toBe(1);
     expect(sim.countItem('arcane_dust', pid)).toBe(0);
   });

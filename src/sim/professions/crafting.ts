@@ -72,7 +72,6 @@ import { bagCapacity, countStacked, fitsAll, removeStacked } from '../bags';
 import { CRAFT_BATCH_MAX, CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
 import { ITEMS } from '../data';
-import { refusedWhileDead } from '../dead_gate';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -849,9 +848,11 @@ export function resolveCraft(
   return resolveCraftForRecipe(ctx, pid, recipe, commission);
 }
 
-/** How many full crafts of `recipe` the player can pay for right now from
- *  materials alone (after specialization / self-signed discounts), capped at
- *  CRAFT_BATCH_MAX. Bag space is re-checked per complete, not here. */
+/** How many full crafts of `recipe` the player's current bags can pay for,
+ *  capped at CRAFT_BATCH_MAX, simulated craft by craft so the conditional
+ *  self-signed discount expires mid-batch when its copy is consumed (the
+ *  discount is hold-keyed, see hasSelfSignedInstance). Bag space is
+ *  re-checked per complete, not here. */
 export function maxCraftCountForRecipe(
   ctx: SimContext,
   recipe: ProfessionRecipeRecord,
@@ -860,14 +861,64 @@ export function maxCraftCountForRecipe(
   const meta = ctx.players.get(pid);
   const craftSkills = meta ? meta.craftSkills : {};
   if (recipe.reagents.length === 0) return CRAFT_BATCH_MAX;
-  let max = CRAFT_BATCH_MAX;
-  for (const reagent of recipe.reagents) {
-    const required = requiredReagentCount(meta, reagent, craftSkills, recipe.professionId).count;
-    if (required <= 0) continue;
-    const have = countAcrossGrades(reagent.itemId, (id) => ctx.countItem(id, pid));
-    max = Math.min(max, Math.floor(have / required));
+  if (!meta) {
+    // No meta resolves no inventory to simulate: keep the one-shot division
+    // (no self-signed copy can exist without a meta, so it cannot drift).
+    let max = CRAFT_BATCH_MAX;
+    for (const reagent of recipe.reagents) {
+      const required = requiredReagentCount(
+        undefined,
+        reagent,
+        craftSkills,
+        recipe.professionId,
+      ).count;
+      if (required <= 0) continue;
+      const have = countAcrossGrades(reagent.itemId, (id) => ctx.countItem(id, pid));
+      max = Math.min(max, Math.floor(have / required));
+    }
+    return Math.max(0, max);
   }
-  return Math.max(0, max);
+  // Simulate the batch craft by craft on a scratch copy, re-deriving each
+  // craft's per-reagent requirement from the SCRATCH state: the #1145
+  // self-signed discount is hold-keyed, so it expires the moment the last
+  // signed copy is consumed mid-batch. A one-shot division assumed the
+  // discount for the whole batch, overestimated for signed crafters, and
+  // ended Create All on a spurious insufficient_materials denial. Same
+  // removal walk as the real consumption (planGradeRemoval over grades).
+  // Pure, draw-free, bounded at CRAFT_BATCH_MAX iterations.
+  const scratch = meta.inventory.map((s) => ({ ...s }));
+  const isJack = !!meta.archetype?.isJackOfAllTrades;
+  let crafts = 0;
+  while (crafts < CRAFT_BATCH_MAX) {
+    const takes: { itemId: string; count: number }[] = [];
+    let payable = true;
+    for (const reagent of recipe.reagents) {
+      const hasSelfSigned = materialGradeIds(reagent.itemId).some((gradeId) =>
+        holdsSelfSignedInstance(scratch, meta.name, gradeId),
+      );
+      const required = requiredReagentCountFor(
+        hasSelfSigned,
+        reagent,
+        craftSkills,
+        recipe.professionId,
+        isJack,
+      ).count;
+      if (required <= 0) continue;
+      if (countAcrossGrades(reagent.itemId, (id) => countStacked(scratch, id)) < required) {
+        payable = false;
+        break;
+      }
+      for (const take of planGradeRemoval(reagent.itemId, required, (id) =>
+        countStacked(scratch, id),
+      )) {
+        takes.push(take);
+      }
+    }
+    if (!payable) break;
+    for (const take of takes) removeStacked(scratch, take.itemId, take.count);
+    crafts++;
+  }
+  return crafts;
 }
 
 /** Clamp a requested batch count: default/invalid -> 1, floor, then
@@ -882,7 +933,14 @@ export function clampCraftBatchCount(requested: number, maxByMats: number): numb
 
 /** Arm CRAFT_CAST_ID session fields and emit castStart. Caller owns admission
  *  and busy gates. batchRemaining/total are the Phase 3 session counters
- *  (including the cast about to run). */
+ *  (including the cast about to run).
+ *
+ *  Accepted amplification, recorded: castStart is world-scoped (no pid), so
+ *  routeEvents fans it to every session in EVENT_RADIUS, and a start-cancel
+ *  loop (craft_item + move) can emit at the command-lane ceiling with no GCD,
+ *  including at crowded town stations. Same kind as gather/fishing castStart;
+ *  bounded by the 30/s per-session command lane; a pacing token was ruled
+ *  out to keep cast start knob-free. */
 function beginCraftCast(
   ctx: SimContext,
   p: Entity,
@@ -1060,7 +1118,9 @@ export function completeCraftCast(ctx: SimContext, p: Entity, meta: PlayerMeta):
   const left = batchRemaining - 1;
   if (left <= 0) return;
   // Stop rules: death, busy (should not happen post-complete), admission deny.
-  if (refusedWhileDead(ctx, meta.entityId)) return;
+  // Pure dead read, NOT refusedWhileDead: that helper emits the shared error
+  // toast, and a stop rule inside a completion must not print anything.
+  if (p.dead) return;
   if (p.castingAbility || isConsuming(p)) return;
   const nextDenial = evaluateCraftAdmission(ctx, meta.entityId, recipe, commission);
   if (nextDenial) {

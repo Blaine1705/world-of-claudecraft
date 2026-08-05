@@ -312,10 +312,11 @@ export function fiestaDownEntity(ctx: SimContext, e: Entity, killer: Entity | nu
   e.craftCastBatchRemaining = 0;
   e.craftCastBatchTotal = 0;
   e.enchantCastItemId = '';
-  e.enchantCastBagSlot = -1;
+  e.enchantCastBagSlot = 0;
   e.enchantCastEnchantId = '';
   e.enchantCastEquipSlot = '';
   e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
   e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;

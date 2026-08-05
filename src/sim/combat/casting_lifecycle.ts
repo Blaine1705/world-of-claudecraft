@@ -561,10 +561,11 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   p.craftCastBatchRemaining = 0;
   p.craftCastBatchTotal = 0;
   p.enchantCastItemId = '';
-  p.enchantCastBagSlot = -1;
+  p.enchantCastBagSlot = 0;
   p.enchantCastEnchantId = '';
   p.enchantCastEquipSlot = '';
   p.enchantCastConfirmReplace = false;
+  p.enchantCastTargetPin = '';
   p.toolRechargeCastProfessionId = '';
   p.fishBiteAtTick = 0;
   p.fishReelDeadlineTick = 0;

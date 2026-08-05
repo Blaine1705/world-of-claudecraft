@@ -3546,8 +3546,12 @@ export interface Entity extends ClientMirroredEntityFields {
    */
   enchantCastItemId: string;
   /**
-   * Optional bag slot for a disenchant cast (-1 when not pin-selected).
-   * Read once at complete; cleared with the rest of the enchant session.
+   * Optional bag slot for a disenchant cast, stored 1-BASED (slotIndex + 1);
+   * 0 = not pin-selected. The 1-based encoding keeps the resting value 0 so
+   * the parity sampler's default-omission drops it (a -1 rest value re-hashed
+   * every golden). Encode/decode live only in beginEnchantFamilyCast /
+   * clearEnchantCastSession. Read once at complete; cleared with the rest of
+   * the enchant session.
    */
   enchantCastBagSlot: number;
   /**
@@ -3566,6 +3570,16 @@ export interface Entity extends ClientMirroredEntityFields {
    * start; inert (false) at rest and on disenchant/salvage casts.
    */
   enchantCastConfirmReplace: boolean;
+  /**
+   * Mid-cast target identity pin ('' = none). For a pin-selected disenchant
+   * cast: the canonical fingerprint of the selected copy (itemId + instance
+   * payload + craftedRecipeId), so a mid-cast bag splice cannot redirect the
+   * destroy onto a different copy of the same item id. For an apply-enchant
+   * cast with confirmReplace: the enchant id the consent was given against,
+   * so a mid-cast copy swap cannot spend the consent on a different enchant.
+   * Transient, never wired, never persisted; cleared on every cast end path.
+   */
+  enchantCastTargetPin: string;
   /**
    * Gathering profession id a running tool-recharge cast fills ('' = none).
    * Transient, never wired, never persisted. Cleared on complete, cancelCast,

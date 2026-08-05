@@ -211,10 +211,11 @@ function beginSalvageCast(ctx: SimContext, p: Entity, itemId: string): void {
   p.castTargetId = null;
   p.channeling = false;
   p.enchantCastItemId = itemId;
-  p.enchantCastBagSlot = -1;
+  p.enchantCastBagSlot = 0;
   p.enchantCastEnchantId = '';
   p.enchantCastEquipSlot = '';
   p.enchantCastConfirmReplace = false;
+  p.enchantCastTargetPin = '';
   ctx.emit({
     type: 'castStart',
     entityId: p.id,
@@ -241,12 +242,20 @@ export function salvageItem(ctx: SimContext, itemId: string, pid?: number): Salv
 /** Completion of a running salvage cast. Re-validates and applies
  *  resolveSalvage; emits salvageResult. */
 export function completeSalvageCast(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
+  // Shared enchant-family session bag (enchantCast*): safe because only one
+  // non-spell cast runs at a time and updateCasting dispatches on the cast id,
+  // so this reader always pairs with beginSalvageCast's write. A future
+  // direct-assigned castingAbility (the parity-harness drive style) must
+  // write the session fields too or the empty-session guard below no-ops.
   const itemId = p.enchantCastItemId;
   p.enchantCastItemId = '';
-  p.enchantCastBagSlot = -1;
+  p.enchantCastBagSlot = 0;
   p.enchantCastEnchantId = '';
   p.enchantCastEquipSlot = '';
   p.enchantCastConfirmReplace = false;
+  p.enchantCastTargetPin = '';
+  // Empty session: silent no-op (completeRechargeCast precedent).
+  if (itemId === '') return;
   const result = resolveSalvage(ctx, meta.entityId, itemId);
   meta.lastSalvageResult = result;
   ctx.emit({

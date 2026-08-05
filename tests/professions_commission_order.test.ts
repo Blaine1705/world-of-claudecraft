@@ -472,7 +472,7 @@ describe('the Sim facade emits the personal text-free commissionOrderResult even
     expect(events[0].reason).toBeUndefined();
 
     grantReagents(sim, SWORD_RECIPE, crafter);
-    sim.craftItem(SWORD_RECIPE, true, crafter);
+    sim.craftItem(SWORD_RECIPE, true, crafter, 1);
     completeCraftCast(sim, crafter);
     sim.drainEvents();
     sim.deliverCommissionOrder(orderId, crafter);
@@ -524,7 +524,7 @@ describe('determinism: the order-board arc replays byte-identically', () => {
       const orderId = sim.commissionOrderBoard[0].id;
       sim.acceptCommissionOrder(orderId, crafter);
       grantReagents(sim, SWORD_RECIPE, crafter);
-      sim.craftItem(SWORD_RECIPE, true, crafter);
+      sim.craftItem(SWORD_RECIPE, true, crafter, 1);
       completeCraftCast(sim, crafter);
       sim.deliverCommissionOrder(orderId, crafter);
       for (let i = 0; i < 40; i++) sim.tick();
