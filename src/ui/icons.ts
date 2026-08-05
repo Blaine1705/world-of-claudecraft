@@ -4552,8 +4552,9 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
   'chr_maw_matriarch',
-  // Remaining starter-zone chronicle gather/first-cast pairs. They intentionally ship
-  // art-trailing under docs/design/deeds.md rule 6 until the commissioned set lands.
+  // The remaining starter-tier zone chronicle pairs (frostveil, amberfall, nightbloom,
+  // wraithwood, palmreach, evergarden): all 'chronicle', so all fall back to the
+  // deed_cat_chronicle crest until their commissioned art lands.
   'chr_frostveil_gatherer',
   'chr_frostveil_first_cast',
   'chr_amberfall_gatherer',

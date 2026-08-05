@@ -517,10 +517,15 @@ describe('missing painted deed and Heroic weapon integration', () => {
       'dgn_wildheart_basin_heroic',
       'pvp_card_duel_first_win',
     ]);
-    // Later appended deeds can trail art under docs/design/deeds.md rule 6.
-    // Read from DEED_ART_PENDING, the one enumeration of that debt
-    // (src/ui/icons.ts), so this file cannot name a different pending set than
-    // the other art suites.
+    // The Drakelands brood merge, the seven per-craft rare-tier profession deeds
+    // (issue #2055), the remaining starter-zone chronicle pairs, and the Rift
+    // pair all appended deeds after this wave, so the live catalog is 259 and
+    // the wave's own claim is unchanged: every deed that existed when it landed
+    // is painted. The only artless ids are those appended later, which ride the
+    // category-crest fallback sanctioned by docs/design/deeds.md until their
+    // 512px sources are commissioned. Read from DEED_ART_PENDING, the one
+    // enumeration of that debt (src/ui/icons.ts), so this file cannot name a
+    // different pending set than the other art suites.
     expect(DEED_ORDER).toHaveLength(259);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

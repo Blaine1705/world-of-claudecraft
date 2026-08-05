@@ -369,7 +369,11 @@ describe('Book of Deeds webp icons', () => {
   it('an artless deed card resolves to a procedural crest (no committed image)', () => {
     // Any live deeds awaiting art must land on their category base crest, which carries no
     // image URL and falls through to the procedural canvas path. The pending set is pinned
-    // exhaustively in DEED_ART_PENDING, so unenumerated art debt reds here.
+    // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a
+    // third artless deed, a dropped webp, or a silent catalog append all red here. The twelve
+    // zone chronicle deeds added for frostveil/amberfall/nightbloom/wraithwood/palmreach/
+    // evergarden, the Rift pair, and the seven per-craft rare-tier profession deeds ship
+    // art-trailing per docs/design/deeds.md rule 6.
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
