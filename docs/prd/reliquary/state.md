@@ -26,17 +26,15 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 8 QA complete (Horizons shelf verified).
-- **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 9 (social/wiki/polish/gate/PR). Do
-  **not** skip the release pull. Do **not** open a PR until Phase 9 gate is
-  green.
+- **Current phase:** Phase 9 complete (social sheet, wiki, polish, gate, PR).
+- **Next action:** maintain PR; re-pull release if CI lags. Feature branch
+  is mergeable when gate stays green.
 - **Blocker:** none.
-- **Release tip after Phase 8 QA pull:** `origin/release/v0.35.0` @
-  `d3190ff008` (editor camp cap / moderation / ground-object pool; feature
-  merge `134267ba04`). Horizons surface was not moved by the merge.
-- **Phase 8 feature tip (impl):** `4e13cac7b6`. QA defect fixes commit on
-  top of the release merge.
+- **Release tip after Phase 9 pull:** `origin/release/v0.35.0` @
+  `9a4fce93ea` (password register error #2877; feature merge includes map
+  show-on-map + crafting focus + Discord bot work).
+- **Phase 9 screenshots:** `docs/screenshots/reliquary/after-desktop.png`,
+  `after-mobile.png`, `char-sheet-desktop.png`, `char-sheet-mobile.png`.
 
 ## Locked design decisions
 
@@ -136,6 +134,11 @@ session load:
 | Keybind `reliquary` | `src/game/keybinds.ts` | **landed** (default Shift+KeyX) |
 | Options BIND map | `src/ui/options_window.ts` `BIND_ACTION_LABEL_KEYS.reliquary` | **landed** (Phase 4 QA) |
 | M16 non-Latin chrome | `src/ui/i18n.locales/{zh_CN,zh_TW,ja_JP,ko_KR,ru_RU}.ts` | **landed** (Phase 4 + Phase 5 wordy keys) |
+| `catalogCharacterCompletion` | `src/sim/reliquary.ts` | **landed** (Phase 9 sheet pair; skins out of total) |
+| Sheet pure core | `src/ui/reliquary_sheet_view.ts` | **landed** (UI_PURE_CORES; progression lines) |
+| Public sheet block | `server/character_sheet.ts` `SheetReliquary` | **landed** (owned/total/curatorRank only) |
+| Wiki catalog | `GUIDE_RELIQUARY` + `src/guide/pages/reliquary.ts` | **landed** (spoiler-safe; Thunzharr safe label) |
+| Loading tip | `loading.tips.reliquary` | **landed** (Phase 9) |
 
 ## Validation matrix (default commands)
 
@@ -166,6 +169,9 @@ session load:
 - [x] Horizons ownership from live seams only (ownedMounts / account skins / deedsEarned); no dual discovery (Phase 8)
 - [x] Curator rank excludes account skins (grant/display aligned); Overview totals include skins (Phase 8)
 - [x] Live mount first-discover + Horizons title grant re-sync rank deeds (Phase 8 QA)
+- [x] Sheet + public sheet: character-scoped completion pair + rank only; no
+  firstFind/recent dump; skins excluded from both sides of the pair (Phase 9)
+- [x] Wiki spoiler-safe catalog (names/pages only); freshness via wiki:content (Phase 9)
 
 ## Gotchas
 

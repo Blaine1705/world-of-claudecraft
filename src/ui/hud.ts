@@ -578,6 +578,7 @@ import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
 import {
   buildReliquaryUnlockPlan,
   type ReliquaryUnlockEventModel,
@@ -4706,6 +4707,7 @@ export class Hud {
     },
     openPrestige: () => this.openPrestigeDialog(),
     openDeeds: () => this.openDeeds(),
+    openReliquary: () => this.openReliquary(),
     dragState: this.itemDragState,
     renderBags: () => this.renderBags(),
     showError: (text) => this.showError(text),
@@ -15022,7 +15024,12 @@ export class Hud {
   }
 
   // The Reliquary window entry point (keybind, minimap, and More-tray all
-  // toggle; Esc closes via the managed-window case directly).
+  // toggle; Esc closes via the managed-window case directly). open() is used
+  // by the character-sheet launch button so a second click never closes it.
+  openReliquary(): void {
+    this.reliquaryWindow.open();
+  }
+
   toggleReliquary(): void {
     this.reliquaryWindow.toggle();
   }
@@ -15589,6 +15596,9 @@ export class Hud {
         ? `<b class="cp-active-title">${esc(activeTitleText)}</b>`
         : `<span class="cp-none">${t('hudChrome.deeds.charTitleNone')}</span>`
     } <button type="button" class="btn cp-deeds-btn" data-act="open-deeds">${t('hudChrome.deeds.charOpenBook')}</button></div>`;
+    // Labeled Reliquary completion pair + Curator rank (character-scoped;
+    // pure core paints the chrome; open button wires through CharWindow).
+    html += reliquarySheetProgressionHtml(buildReliquarySheetModel(sim));
     if (level >= MAX_LEVEL) {
       // The button reflects the server's authoritative prestige gate (post-cap
       // XP earned). It's disabled — and the requirement shown — until eligible;

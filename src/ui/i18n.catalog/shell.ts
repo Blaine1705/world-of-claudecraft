@@ -71,6 +71,8 @@ export const shellStrings = {
         loadouts:
           'Tip: save more than one talent loadout to swap between builds without spending points twice.',
         pvp: 'Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build.',
+        reliquary:
+          'Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X.',
       },
     },
     errors: {

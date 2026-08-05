@@ -29,6 +29,8 @@ import { mountDisplayName } from './mount_labels';
 import type { PainterHostPresentation } from './painter_host';
 import {
   buildReliquaryView,
+  CURATOR_RANK_NAME_KEYS,
+  curatorRankNameKey,
   isReliquaryNavId,
   RELIQUARY_NAV,
   type ReliquaryGridCellModel,
@@ -46,29 +48,15 @@ import {
 import { svgIcon } from './ui_icons';
 import { knownItemIconHtml, unknownItemIconHtml } from './unknown_item_icon';
 
+// Re-export pure rank chrome helpers so existing imports keep resolving.
+export { CURATOR_RANK_NAME_KEYS, curatorRankNameKey };
+
 const NAV_LABEL_KEYS: Record<ReliquaryNavId, TranslationKey> = {
   overview: 'hudChrome.reliquary.navOverview',
   conquerors: 'hudChrome.reliquary.navConquerors',
   professions: 'hudChrome.reliquary.navProfessions',
   horizons: 'hudChrome.reliquary.navHorizons',
 };
-
-/** Named Curator rank chrome keys (Phase 6). Falls back to numeric rank label. */
-export const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
-  'hudChrome.reliquary.curatorRankName1',
-  'hudChrome.reliquary.curatorRankName2',
-  'hudChrome.reliquary.curatorRankName3',
-  'hudChrome.reliquary.curatorRankName4',
-  'hudChrome.reliquary.curatorRankName5',
-];
-
-/** Shared key picker for Overview seal chrome and Hud rank-up toast/banner. */
-export function curatorRankNameKey(rank: number): TranslationKey {
-  if (rank >= 1 && rank <= CURATOR_RANK_NAME_KEYS.length) {
-    return CURATOR_RANK_NAME_KEYS[rank - 1]!;
-  }
-  return 'hudChrome.reliquary.curatorRank';
-}
 
 /**
  * Hud-supplied glue: shared presentation bag plus the window surface (world

@@ -20,10 +20,28 @@ import {
   isRelicFilled,
   pageCompletion,
 } from '../sim/reliquary';
+import type { TranslationKey } from './i18n';
 
 /** Top-level nav: virtual Overview plus the three catalog shelves. */
 export const RELIQUARY_NAV = ['overview', 'conquerors', 'professions', 'horizons'] as const;
 export type ReliquaryNavId = (typeof RELIQUARY_NAV)[number];
+
+/** Named Curator rank chrome keys (Phase 6). Falls back to numeric rank label. */
+export const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
+  'hudChrome.reliquary.curatorRankName1',
+  'hudChrome.reliquary.curatorRankName2',
+  'hudChrome.reliquary.curatorRankName3',
+  'hudChrome.reliquary.curatorRankName4',
+  'hudChrome.reliquary.curatorRankName5',
+];
+
+/** Shared key picker for Overview seal chrome, sheet lines, and rank-up toast. */
+export function curatorRankNameKey(rank: number): TranslationKey {
+  if (rank >= 1 && rank <= CURATOR_RANK_NAME_KEYS.length) {
+    return CURATOR_RANK_NAME_KEYS[rank - 1]!;
+  }
+  return 'hudChrome.reliquary.curatorRank';
+}
 
 /**
  * i18n key for a catalogued profession mark find label.

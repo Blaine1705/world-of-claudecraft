@@ -24,6 +24,12 @@ import {
 import { zoneAt } from '../src/sim/data';
 import { completionCounts } from '../src/sim/deeds_completion';
 import { characterDerivedStats } from '../src/sim/entity';
+import { bagOwnedMounts } from '../src/sim/mounts';
+import {
+  catalogCharacterCompletion,
+  curatorRankFromOwned,
+  restoreReliquaryState,
+} from '../src/sim/reliquary';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 import { virtualLevel, xpToReachLevel } from '../src/sim/types';
@@ -119,6 +125,55 @@ export function sheetTitleText(activeTitle: string | null): string | null {
   return reward?.kind === 'title' ? reward.text : null;
 }
 
+/**
+ * Labeled Reliquary completion pair + Curator rank for sheet/public JSON.
+ * Character-scoped only: account weapon skins never invent either side of the
+ * pair or the rank. No firstFind / recent / marks dump (privacy-safe).
+ */
+export interface SheetReliquary {
+  owned: number;
+  total: number;
+  curatorRank: number;
+}
+
+/** English Curator rank names for the English-by-design /c/ SSR page. Mirror
+ *  hudChrome.reliquary.curatorRankName1..5; the JSON sheet carries the numeric
+ *  rank only so clients can localize. */
+const CURATOR_RANK_ENGLISH: readonly string[] = [
+  'Apprentice Curator',
+  'Spoilskeeper',
+  'Master Curator',
+  'Grand Curator',
+  'Eternal Curator',
+];
+
+/** English Curator rank label for public HTML, or null when unranked. */
+export function sheetCuratorRankText(curatorRank: number): string | null {
+  if (!(curatorRank > 0)) return null;
+  return CURATOR_RANK_ENGLISH[curatorRank - 1] ?? null;
+}
+
+/**
+ * Derive the privacy-safe Reliquary sheet block from a CharacterState blob.
+ * Mount ownership scans bags + bank reins (same bags+bank seam as live
+ * ownedMounts); skins are account cosmetics and are deliberately omitted.
+ */
+export function sheetReliquaryFromState(state: CharacterState): SheetReliquary {
+  const itemsDiscovered = new Set(state.deedStats?.itemsDiscovered ?? []);
+  const marks = restoreReliquaryState(state.reliquary).marks;
+  const inv = [...(state.inventory ?? []), ...(state.bank?.inventory ?? [])];
+  const ownedMounts = new Set(bagOwnedMounts(inv));
+  const deedsEarned = new Set(Object.keys(state.deeds ?? {}));
+  const opts = { itemsDiscovered, marks, ownedMounts, deedsEarned };
+  const completion = catalogCharacterCompletion(opts);
+  return {
+    owned: completion.owned,
+    total: completion.total,
+    // Rank scores the same character-durable owned count (one catalog walk).
+    curatorRank: curatorRankFromOwned(completion.owned),
+  };
+}
+
 export interface CharacterSheet {
   name: string;
   realm: string;
@@ -134,6 +189,8 @@ export interface CharacterSheet {
   guild: string | null;
   arena: Record<string, SheetArenaBracket>;
   deeds: SheetDeeds;
+  /** Character-scoped Reliquary completion + rank (both visibilities). */
+  reliquary: SheetReliquary;
   rank: SheetRank | null;
   profileUrl: string;
   visibility: SheetVisibility;
@@ -269,6 +326,8 @@ export function characterSheet(input: CharacterSheetInput): CharacterSheet {
               .map((r) => ({ deedId: r.deedId, earnedAt: r.earnedAt.slice(0, 10) }))
           : (input.deedsRecent ?? []),
     },
+    // Character-scoped completion pair + rank only. Never firstFind/recent.
+    reliquary: sheetReliquaryFromState(state),
     rank: rank ?? null,
     profileUrl,
     visibility,

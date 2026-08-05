@@ -508,20 +508,43 @@ export function catalogRankOwned(
   },
   pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
 ): number {
+  return catalogCharacterCompletion(opts, pages).owned;
+}
+
+/**
+ * Character-scoped Reliquary completion pair for character sheet and public
+ * sheet fields. Owned matches catalogRankOwned (items + marks + mounts +
+ * titles). Total excludes account weapon-skin slots so the pair never invents
+ * character progress from account cosmetics. Overview still uses the full
+ * catalogRelicCompletion (skins included when the host has them).
+ */
+export function catalogCharacterCompletion(
+  opts: {
+    itemsDiscovered: OwnedIdLookup;
+    marks?: OwnedIdLookup;
+    ownedMounts?: OwnedIdLookup;
+    deedsEarned?: OwnedIdLookup;
+  },
+  pages: readonly ReliquaryPageDef[] = RELIQUARY_PAGES,
+): { owned: number; total: number } {
   const full = catalogRelicCompletion(
     {
       itemsDiscovered: opts.itemsDiscovered,
       marks: opts.marks,
       ownedMounts: opts.ownedMounts,
       deedsEarned: opts.deedsEarned,
-      // Explicitly omit weapon skins from rank scoring.
+      // Explicitly omit weapon skins from character-scoped sheet math.
       weaponSkins: undefined,
     },
     pages,
   );
-  // Subtract skin *slots* from total is not needed: owned ignores skins when
-  // weaponSkins is absent (owned stays 0 for those slots). Rank uses owned only.
-  return full.owned;
+  const skinSlots = new Set<string>();
+  for (const page of pages) {
+    for (const relic of page.relics) {
+      if (relic.kind === 'weapon_skin') skinSlots.add(relic.skinId);
+    }
+  }
+  return { owned: full.owned, total: full.total - skinSlots.size };
 }
 
 /**

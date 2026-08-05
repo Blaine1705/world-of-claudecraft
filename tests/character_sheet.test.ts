@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { type CharacterSheetInput, characterSheet, splitCopper } from '../server/character_sheet';
+import {
+  type CharacterSheetInput,
+  characterSheet,
+  sheetCuratorRankText,
+  sheetReliquaryFromState,
+  splitCopper,
+} from '../server/character_sheet';
 import type { CharacterRow } from '../server/db';
 import { DEEDS } from '../src/sim/content/deeds';
 import { talentsFor } from '../src/sim/content/talents';
 import { zoneAt } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
+import { catalogCharacterCompletion } from '../src/sim/reliquary';
 import type { CharacterState } from '../src/sim/sim';
 import { type PlayerClass, virtualLevel } from '../src/sim/types';
 
@@ -189,6 +196,86 @@ describe('characterSheet: public variant leaks nothing sensitive', () => {
         expect('pos' in sheet).toBe(false);
       }
     }
+  });
+});
+
+describe('characterSheet: reliquary completion pair + rank', () => {
+  it('emits character-scoped zero completion and unranked on a fresh save', () => {
+    const sheet = characterSheet(input({ visibility: 'public' }));
+    const emptyTotal = catalogCharacterCompletion({ itemsDiscovered: new Set() }).total;
+    expect(sheet.reliquary).toEqual({ owned: 0, total: emptyTotal, curatorRank: 0 });
+    expect(Object.keys(sheet.reliquary).sort()).toEqual(['curatorRank', 'owned', 'total']);
+  });
+
+  it('counts catalogued discoveries and rank without inventing firstFind', () => {
+    const sheet = characterSheet(
+      input({
+        visibility: 'public',
+        row: makeRow(
+          'shaman',
+          20,
+          makeState({
+            deedStats: {
+              itemsDiscovered: ['boundstone_helm', 'cryptbone_helm'],
+            } as CharacterState['deedStats'],
+          }),
+        ),
+      }),
+    );
+    expect(sheet.reliquary.owned).toBe(2);
+    expect(sheet.reliquary.curatorRank).toBe(1);
+    expect(Object.keys(sheet.reliquary).sort()).toEqual(['curatorRank', 'owned', 'total']);
+  });
+
+  it('never dumps personal firstFind / marks / recent even when the blob has them', () => {
+    const state = makeState({
+      deedStats: {
+        itemsDiscovered: ['cryptbone_helm'],
+      } as CharacterState['deedStats'],
+      reliquary: {
+        firstFind: { cryptbone_helm: { clears: 3, pageId: 'conquerors_hollow_crypt' } },
+        marks: ['masterwork:first'],
+        recent: ['cryptbone_helm', 'masterwork:first'],
+      },
+    });
+    const sheet = characterSheet(
+      input({ visibility: 'public', row: makeRow('shaman', 20, state) }),
+    );
+    expect(Object.keys(sheet.reliquary).sort()).toEqual(['curatorRank', 'owned', 'total']);
+    // Mark ownership scores; personal meta never appears on the wire object.
+    expect(sheet.reliquary.owned).toBeGreaterThanOrEqual(2);
+    const json = JSON.stringify(sheet.reliquary);
+    expect(json).not.toContain('firstFind');
+    expect(json).not.toContain('masterwork:first');
+    expect(json).not.toContain('clears');
+  });
+
+  it('scores marks through sheetReliquaryFromState', () => {
+    const base = sheetReliquaryFromState(makeState());
+    const withMark = sheetReliquaryFromState(
+      makeState({
+        reliquary: { firstFind: {}, marks: ['masterwork:first'], recent: [] },
+      }),
+    );
+    expect(withMark.owned).toBe(base.owned + 1);
+  });
+
+  it('owner and public share the same reliquary numbers for the same blob', () => {
+    const state = makeState({
+      deedStats: {
+        itemsDiscovered: ['boundstone_helm'],
+      } as CharacterState['deedStats'],
+    });
+    const pub = characterSheet(input({ visibility: 'public', row: makeRow('shaman', 20, state) }));
+    const own = characterSheet(input({ visibility: 'owner', row: makeRow('shaman', 20, state) }));
+    expect(pub.reliquary).toEqual(own.reliquary);
+  });
+
+  it('sheetCuratorRankText returns English names for ranks 1 to 5 and null otherwise', () => {
+    expect(sheetCuratorRankText(0)).toBeNull();
+    expect(sheetCuratorRankText(1)).toBe('Apprentice Curator');
+    expect(sheetCuratorRankText(5)).toBe('Eternal Curator');
+    expect(sheetCuratorRankText(99)).toBeNull();
   });
 });
 

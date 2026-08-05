@@ -3187,7 +3187,11 @@ export const de_DE: EnTranslations = {
         "gather_event_perfect_specimen": "Perfect Specimen"
       },
       "accountScopeBadge": "Account",
-      "accountScopeNote": "Account collection: unlocked across every character on this account."
+      "accountScopeNote": "Account collection: unlocked across every character on this account.",
+      "charCompletionLabel": "Reliquary",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "Curator",
+      "charOpen": "The Reliquary"
     },
     "deeds": {
       "title": "Buch der Taten",
@@ -3426,6 +3430,7 @@ export const de_DE: EnTranslations = {
       "valeCup": "Talpokal",
       "thornhollow": "Thornhollow Fields",
       "deeds": "Buch der Taten",
+      "reliquary": "The Reliquary",
       "glossary": "Glossar",
       "wishIKnew": "Was ich gern früher gewusst hätte",
       "faq": "FAQ",
@@ -4277,6 +4282,22 @@ export const de_DE: EnTranslations = {
         "social": "Soziales",
         "exploration": "Erkundung",
         "feat": "Heldentaten"
+      }
+    },
+    "reliquaryPage": {
+      "intro": "The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.",
+      "howHeading": "How the collection works",
+      "howBody": "Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.",
+      "ranksHeading": "Curator ranks",
+      "ranksBody": "Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable.",
+      "catalogHeading": "Catalog of pages",
+      "catalogBody": "Every authored Reliquary page and the relic names it holds. This list is spoiler-safe names only: open The Reliquary in game to see your own progress, clear counts, and silhouettes.",
+      "spoilerNote": "Personal first-find history, clear numbers, and missing-versus-owned state stay in the game client. The wiki never publishes a player collection.",
+      "shelfHeading": "{label} ({count})",
+      "shelf": {
+        "conquerors": "Conquerors",
+        "professions": "Professions",
+        "horizons": "Horizons"
       }
     },
     "wishPage": {
@@ -6352,7 +6373,8 @@ export const de_DE: EnTranslations = {
       "guilds": "Tipp: Der Beitritt zu einer Gilde gibt dir einen privaten Chatkanal und eine gemeinsame Liste deiner Gildenmitglieder.",
       "professions": "Tipp: Sammel- und Handwerksberufe können parallel zu deiner Kampfklasse erlernt werden.",
       "loadouts": "Tipp: Speichere mehr als eine Talentausrüstung, um zwischen Builds zu wechseln, ohne Punkte doppelt auszugeben.",
-      "pvp": "Tipp: Fordere einen anderen Spieler zu einem freundschaftlichen Duell heraus oder reihe dich für die Arena des Aschenen Kolosseums ein, um deinen Build zu testen."
+      "pvp": "Tipp: Fordere einen anderen Spieler zu einem freundschaftlichen Duell heraus oder reihe dich für die Arena des Aschenen Kolosseums ein, um deinen Build zu testen.",
+      "reliquary": "Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X."
     }
   },
   "errors": {

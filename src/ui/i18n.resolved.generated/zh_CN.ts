@@ -3187,7 +3187,11 @@ export const zh_CN: EnTranslations = {
         "gather_event_perfect_specimen": "完美标本"
       },
       "accountScopeBadge": "账号",
-      "accountScopeNote": "账号收藏：此账号下所有角色均可解锁。"
+      "accountScopeNote": "账号收藏：此账号下所有角色均可解锁。",
+      "charCompletionLabel": "圣物库",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "策展人",
+      "charOpen": "圣物库"
     },
     "deeds": {
       "title": "功绩之书",
@@ -3426,6 +3430,7 @@ export const zh_CN: EnTranslations = {
       "valeCup": "溪谷杯",
       "thornhollow": "荆谷原野",
       "deeds": "功绩之书",
+      "reliquary": "圣物库",
       "glossary": "术语表",
       "wishIKnew": "我希望早点知道的事",
       "faq": "常见问题",
@@ -4277,6 +4282,22 @@ export const zh_CN: EnTranslations = {
         "social": "社交",
         "exploration": "探索",
         "feat": "壮举"
+      }
+    },
+    "reliquaryPage": {
+      "intro": "圣物库是你已收录的独特战利品博物馆：地下城追逐装备、专业奖杯、坐骑、武器外观与头衔。它与功绩之书的关系，就像奖杯厅与成就簿的关系。",
+      "howHeading": "收藏如何运作",
+      "howBody": "在游戏中打开圣物库（默认 Shift+X）。每个架上有多页独特圣物。角色首次获得该件时填满剪影；一页上的圣物全部填满时点亮该页。实时发现会弹出提示并刷新已打开的窗口；进度按角色计算，武器外观除外（账号外观）。",
+      "ranksHeading": "策展人等级",
+      "ranksBody": "策展人等级随已收录的独特圣物上升，仅授予装饰性头衔与边框。不会提供战斗强度、掉落率或保底。账号武器外观不计策展人等级，因此声望保持角色持久。",
+      "catalogHeading": "页面目录",
+      "catalogBody": "每一页已编写的圣物库页面及其圣物名称。此列表仅含防剧透名称：请在游戏中打开圣物库查看你的进度、通关次数与剪影。",
+      "spoilerNote": "个人首次发现记录、通关次数以及已有/未有状态保留在游戏客户端。维基从不发布玩家收藏。",
+      "shelfHeading": "{label}（{count}）",
+      "shelf": {
+        "conquerors": "征服者",
+        "professions": "专业",
+        "horizons": "远景"
       }
     },
     "wishPage": {
@@ -6352,7 +6373,8 @@ export const zh_CN: EnTranslations = {
       "guilds": "提示：加入公会可获得专属聊天频道和公会成员名单。",
       "professions": "提示：采集与制造类生活技能可以与你的战斗职业同时培养。",
       "loadouts": "提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。",
-      "pvp": "提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。"
+      "pvp": "提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。",
+      "reliquary": "提示：圣物库记录你收集的独特战利品。默认按 Shift+X 打开。"
     }
   },
   "errors": {

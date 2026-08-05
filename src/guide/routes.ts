@@ -176,6 +176,13 @@ export const GUIDE_ROUTES: GuideRoute[] = [
     descKey: 'guide.deedsPage.intro',
   },
   {
+    id: 'reliquary',
+    sub: 'reliquary',
+    navKey: 'guide.nav.reliquary',
+    group: 'compendium',
+    descKey: 'guide.reliquaryPage.intro',
+  },
+  {
     id: 'controls',
     sub: 'reference/controls',
     navKey: 'guide.nav.controls',

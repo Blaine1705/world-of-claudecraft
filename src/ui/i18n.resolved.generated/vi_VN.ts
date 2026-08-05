@@ -3187,7 +3187,11 @@ export const vi_VN: EnTranslations = {
         "gather_event_perfect_specimen": "Perfect Specimen"
       },
       "accountScopeBadge": "Account",
-      "accountScopeNote": "Account collection: unlocked across every character on this account."
+      "accountScopeNote": "Account collection: unlocked across every character on this account.",
+      "charCompletionLabel": "Reliquary",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "Curator",
+      "charOpen": "The Reliquary"
     },
     "deeds": {
       "title": "Sách Kỳ Công",
@@ -3426,6 +3430,7 @@ export const vi_VN: EnTranslations = {
       "valeCup": "Cúp Thung Lũng",
       "thornhollow": "Thornhollow Fields",
       "deeds": "Sách Kỳ Công",
+      "reliquary": "The Reliquary",
       "glossary": "Thuật Ngữ",
       "wishIKnew": "Những Điều Tôi Ước Mình Biết Sớm",
       "faq": "FAQ",
@@ -4277,6 +4282,22 @@ export const vi_VN: EnTranslations = {
         "social": "Xã Hội",
         "exploration": "Khám Phá",
         "feat": "Kỳ Tích"
+      }
+    },
+    "reliquaryPage": {
+      "intro": "The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.",
+      "howHeading": "How the collection works",
+      "howBody": "Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.",
+      "ranksHeading": "Curator ranks",
+      "ranksBody": "Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable.",
+      "catalogHeading": "Catalog of pages",
+      "catalogBody": "Every authored Reliquary page and the relic names it holds. This list is spoiler-safe names only: open The Reliquary in game to see your own progress, clear counts, and silhouettes.",
+      "spoilerNote": "Personal first-find history, clear numbers, and missing-versus-owned state stay in the game client. The wiki never publishes a player collection.",
+      "shelfHeading": "{label} ({count})",
+      "shelf": {
+        "conquerors": "Conquerors",
+        "professions": "Professions",
+        "horizons": "Horizons"
       }
     },
     "wishPage": {
@@ -6352,7 +6373,8 @@ export const vi_VN: EnTranslations = {
       "guilds": "Mẹo: gia nhập bang hội cho bạn một kênh trò chuyện riêng và danh sách chung các thành viên trong bang.",
       "professions": "Mẹo: có thể rèn luyện nghề thu thập và chế tác song song với lớp chiến đấu của bạn.",
       "loadouts": "Mẹo: lưu nhiều hơn một bộ tài năng để chuyển đổi giữa các lối xây dựng mà không phải dùng điểm hai lần.",
-      "pvp": "Mẹo: thách đấu người chơi khác trong một trận giao hữu, hoặc xếp hàng vào Đấu Trường Tro Tàn, để thử sức lối xây dựng của bạn."
+      "pvp": "Mẹo: thách đấu người chơi khác trong một trận giao hữu, hoặc xếp hàng vào Đấu Trường Tro Tàn, để thử sức lối xây dựng của bạn.",
+      "reliquary": "Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X."
     }
   },
   "errors": {

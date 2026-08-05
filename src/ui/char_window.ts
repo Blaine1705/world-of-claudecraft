@@ -126,6 +126,8 @@ export interface CharWindowDeps extends PainterHostPresentation {
   openPrestige(): void;
   /** Open the Book of Deeds (the active-title line's button). */
   openDeeds(): void;
+  /** Open The Reliquary (the sheet completion line's button). */
+  openReliquary(): void;
   /** The shared in-flight bag-item drag (published by the bags grid). The paperdoll
    *  sockets read it during dragover, where the DataTransfer payload is unreadable. */
   dragState: ItemDragState;
@@ -222,6 +224,10 @@ export class CharWindow {
     el.querySelector('[data-act="open-deeds"]')?.addEventListener('click', () => {
       audio.click();
       this.deps.openDeeds();
+    });
+    el.querySelector('[data-act="open-reliquary"]')?.addEventListener('click', () => {
+      audio.click();
+      this.deps.openReliquary();
     });
     el.querySelector('[data-act="share-card"]')?.addEventListener('click', () => {
       audio.click();

@@ -24,7 +24,7 @@
 | 7 QA | **done** | exit criteria verified; pin holes closed; release @ 84b704c1c7 |
 | 8 Horizons shelf | **done** | mounts / skins / titles pages; ownership seams; UI |
 | 8 QA | **done** | exit criteria verified; rank-sync + pin defects fixed; release @ d3190ff008 |
-| 9 Social, wiki, polish, gate, PR | pending | same worktree + pull |
+| 9 Social, wiki, polish, gate, PR | **done** | sheet + public + wiki + tip + screenshots + gate + PR |
 
 ## Verified outcomes
 
@@ -424,6 +424,30 @@
   no reliquaryUnlock toast on Horizons obtain (intentional); page-name content
   i18n deferred; mount rebuy after sell (already discovered reins) still
   relies on join retro for rank grant if that fill alone crosses a threshold.
+
+- Phase 9: merged `origin/release/v0.35.0` to tip `9a4fce93ea` (feature merge
+  after map show-on-map / crafting focus / Discord bot). Green matrix +
+  specialist reviews (0 BLOCKING after pin close). Landed:
+  - Character sheet: labeled Reliquary completion + Curator rank via pure
+    `reliquary_sheet_view` (character-scoped; skins excluded from pair/rank)
+  - Public sheet + `/c/` SSR: `sheet.reliquary` = owned/total/curatorRank only
+    (privacy-safe; no firstFind/marks/recent dump)
+  - Wiki `/wiki/reliquary`: spoiler-safe GUIDE_RELIQUARY catalog; Thunzharr
+    page uses safe label so boss proper name stays out of content.generated
+  - Loading tip `loading.tips.reliquary`; SFX still reuses achievement
+  - Screenshots: `docs/screenshots/reliquary/after-{desktop,mobile}.png` and
+    `char-sheet-{desktop,mobile}.png`
+  - English + M16 non-Latin for sheet chrome, guide page, tip
+  Residual risks carried from Phase 8:
+  - No wire e2e snap seeding mntOwn / cosmetics / deeds for Horizons pages
+  - Horizons obtains do not emit reliquaryUnlock toast (intentional)
+  - Page content names still catalog English (optional re-localize)
+  - Mount rebuy after sell (already discovered reins) join-retro rank edge
+  - Profile SSR Reliquary lines not unit-tested in profile_page.test (JSON
+    sheet + pure HTML pins cover the normalizer)
+  Reviews: qa NOT-READY only on process until gate/PR; privacy GREEN;
+  architecture 0 BLOCKING; frontend 0 BLOCKING (SHOULD-FIX pins closed);
+  test-coverage BLOCKING pins closed; database-performance PASS.
 
 - Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
 - Phase 2 absorbed the stub page id: Hollow Crypt now lists cryptbone / greyjaw / gravewoven uniques; `boundstone_helm` lives on Sanctum (its real drop).

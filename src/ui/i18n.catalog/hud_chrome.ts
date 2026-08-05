@@ -4024,6 +4024,11 @@ export const hudChromeStrings = {
     // Phase 8: Horizons account-scope chrome for weapon skins (account cosmetics).
     accountScopeBadge: 'Account',
     accountScopeNote: 'Account collection: unlocked across every character on this account.',
+    // Phase 9: character sheet labeled completion pair + Curator rank.
+    charCompletionLabel: 'Reliquary',
+    charCompletion: '{owned}/{total}',
+    charRankLabel: 'Curator',
+    charOpen: 'The Reliquary',
   },
   deeds: {
     title: 'Book of Deeds',

@@ -3165,6 +3165,36 @@ export const TARGETS = [
     },
   },
   {
+    key: 'reliquary-window',
+    label: 'The Reliquary: Overview shelf with completion and Curator rank',
+    when: [
+      'ui/reliquary_view',
+      'ui/reliquary_window',
+      'ui/reliquary_sheet_view',
+      'sim/content/reliquary',
+      'sim/reliquary',
+    ],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        // Seed a few catalogued discoveries so Overview is not an empty museum.
+        const game = window.__game;
+        const sim = game?.sim;
+        if (sim?.primary?.deedStats?.itemsDiscovered) {
+          for (const id of ['cryptbone_helm', 'boundstone_helm', 'cryptbone_pauldrons']) {
+            sim.primary.deedStats.itemsDiscovered.add(id);
+          }
+        }
+        game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
     key: 'deed-unlock-banner',
     label: 'Deed unlock banner (its own plate, not the level-up gold text)',
     when: ['ui/deeds_view', 'ui/deed_tracker', 'styles/hud.css'],

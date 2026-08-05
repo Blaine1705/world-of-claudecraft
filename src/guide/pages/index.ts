@@ -22,6 +22,7 @@ import { models } from './models';
 import { professions } from './professions';
 import { progression } from './progression';
 import { quests } from './quests';
+import { reliquary } from './reliquary';
 import { settings } from './settings';
 import { social } from './social';
 import { stats } from './stats';
@@ -53,6 +54,7 @@ const PAGES: Record<string, GuidePage> = {
   'thornhollow-fields': thornhollowFields,
   'vale-cup': valeCup,
   deeds,
+  reliquary,
   combat,
   stats,
   progression,

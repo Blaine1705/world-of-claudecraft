@@ -61,6 +61,7 @@ function craftingDeps(): CraftingWindowDeps {
     onToggleCommission: () => {},
     selectedCraft: () => null,
     onSelectCraft: () => {},
+    onOpenOrders: () => {},
   };
 }
 

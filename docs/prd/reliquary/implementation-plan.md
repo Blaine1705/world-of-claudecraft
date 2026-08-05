@@ -693,14 +693,14 @@ worktree + pull + invariants + validation shape.)
 
 ## Completion criteria (whole feature)
 
-- [ ] All phases 1 to 9 done; progress.md green
-- [ ] Design contract and packet match shipped symbols
-- [ ] Conquerors + Professions + Horizons + Overview live
-- [ ] Performance contract held (no per-drop save; sparse state; cold UI)
-- [ ] Cosmetic-only rewards; deeds Renown rules intact
-- [ ] Desktop + mobile screenshots in PR
+- [x] All phases 1 to 9 done; progress.md green
+- [x] Design contract and packet match shipped symbols
+- [x] Conquerors + Professions + Horizons + Overview live
+- [x] Performance contract held (no per-drop save; sparse state; cold UI)
+- [x] Cosmetic-only rewards; deeds Renown rules intact
+- [x] Desktop + mobile screenshots in PR
 - [ ] `npm run gate` green
-- [ ] Specialist reviews clean of BLOCKING
+- [x] Specialist reviews clean of BLOCKING
 - [ ] PR against latest release branch
 
 ## Recommended first executable step

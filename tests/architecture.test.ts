@@ -335,6 +335,7 @@ const UI_PURE_CORES = [
   'src/ui/daily_rewards_view.ts',
   'src/ui/deeds_view.ts',
   'src/ui/reliquary_view.ts',
+  'src/ui/reliquary_sheet_view.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',

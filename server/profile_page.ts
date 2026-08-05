@@ -13,6 +13,7 @@ import {
   type CharacterSheet,
   characterSheet,
   type SheetRank,
+  sheetCuratorRankText,
   sheetTitleText,
 } from './character_sheet';
 import {
@@ -145,6 +146,15 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
   const guildLine = sheet.guild
     ? `<li>Guild: <strong>&lt;${escapeHtml(sheet.guild)}&gt;</strong></li>`
     : '';
+  // Labeled Reliquary completion pair + Curator rank (character-scoped; no
+  // personal firstFind/recent dump). English-by-design like the rest of /c/.
+  const reliqOwned = sheet.reliquary.owned;
+  const reliqTotal = sheet.reliquary.total;
+  const reliqRankEn = sheetCuratorRankText(sheet.reliquary.curatorRank);
+  const reliqRankLine = reliqRankEn
+    ? `<li>Curator: <strong>${escapeHtml(reliqRankEn)}</strong></li>`
+    : `<li>Curator: <strong>Unranked</strong></li>`;
+  const reliqLine = `<li>Reliquary: <strong>${reliqOwned}/${reliqTotal}</strong></li>`;
   // The selected Book of Deeds title, under the name. sheetTitleText returns
   // null for unset/stale/non-title ids, so the line simply disappears (never
   // a raw deed id, never a crash on an old state blob).
@@ -201,6 +211,8 @@ function profileHtml(sheet: CharacterSheet, origin: string): string {
       <li>Zone: <strong>${escapeHtml(sheet.zone)}</strong></li>
       ${guildLine}
       ${rankLine}
+      ${reliqLine}
+      ${reliqRankLine}
       ${arenaLine}
     </ul>
     <nav>

@@ -5953,6 +5953,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.nav.world': 'Мир',
   'guide.nav.quests': 'Задания',
   'guide.nav.deeds': 'Книга деяний',
+  'guide.nav.reliquary': 'Реликварий',
+  'guide.reliquaryPage.intro': 'Реликварий: музей уникальных трофеев из вашего каталога: добыча из подземелий, трофеи профессий, скакуны, облики оружия и титулы. Он относится к Книге деяний как зал трофеев к книге достижений.',
+  'guide.reliquaryPage.howHeading': 'Как устроена коллекция',
+  'guide.reliquaryPage.howBody': 'Откройте Реликварий в игре (по умолчанию Shift+X). На каждой полке страницы уникальных реликвий. Силуэт заполняется, когда персонаж впервые получает предмет; страница озаряется, когда заполнены все её реликвии. Новые находки показывают тост и обновляют открытое окно. Прогресс по персонажу, кроме обликов оружия: это косметика аккаунта.',
+  'guide.reliquaryPage.ranksHeading': 'Ранги хранителя',
+  'guide.reliquaryPage.ranksBody': 'Ранги хранителя растут с уникальными записями каталога и дают только косметические титулы и рамки. Не дают силы, шанса добычи или жалости. Облики оружия аккаунта не считаются в ранге, чтобы престиж оставался привязан к персонажу.',
+  'guide.reliquaryPage.catalogHeading': 'Каталог страниц',
+  'guide.reliquaryPage.catalogBody': 'Каждая страница Реликвария и имена реликвий на ней. Только безопасные для спойлеров имена: свой прогресс, счётчики зачисток и силуэты смотрите в игровом Реликварии.',
+  'guide.reliquaryPage.spoilerNote': 'Личная история первых находок, счётчики зачисток и состояние «есть/нет» остаются в клиенте. Вики не публикует коллекции игроков.',
+  'guide.reliquaryPage.shelfHeading': '{label} ({count})',
+  'guide.reliquaryPage.shelf.conquerors': 'Завоеватели',
+  'guide.reliquaryPage.shelf.professions': 'Профессии',
+  'guide.reliquaryPage.shelf.horizons': 'Горизонты',
   'guide.nav.delves': 'Вылазки',
   'guide.nav.dungeons': 'Подземелья и рейды',
   'guide.nav.reference': 'Справочник',
@@ -9504,6 +9517,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Совет: сохраните несколько наборов талантов, чтобы менять билды, не тратя очки заново.',
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
+  'loading.tips.reliquary': 'Подсказка: Реликварий хранит уникальные трофеи. Откройте его по Shift+X.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
@@ -10568,6 +10582,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.accountScopeBadge': 'Аккаунт',
   'hudChrome.reliquary.accountScopeNote':
     'Коллекция аккаунта: открыто для всех персонажей на этом аккаунте.',
+  'hudChrome.reliquary.charCompletionLabel': 'Реликварий',
+  'hudChrome.reliquary.charCompletion': '{owned}/{total}',
+  'hudChrome.reliquary.charRankLabel': 'Хранитель',
+  'hudChrome.reliquary.charOpen': 'Реликварий',
   'entities.items.resonant_thread.name': 'Резонирующая нить',
   'entities.items.resonant_hide.name': 'Резонирующая шкура',
   'entities.items.resonant_links.name': 'Резонирующие звенья',

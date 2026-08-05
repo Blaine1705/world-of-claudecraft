@@ -47,6 +47,7 @@ export const guideStrings = {
     valeCup: 'Vale Cup',
     thornhollow: 'Thornhollow Fields',
     deeds: 'Book of Deeds',
+    reliquary: 'The Reliquary',
     glossary: 'Glossary',
     wishIKnew: 'Things I Wish I Knew',
     faq: 'FAQ',
@@ -1275,6 +1276,32 @@ export const guideStrings = {
       social: 'Social',
       exploration: 'Exploration',
       feat: 'Feats',
+    },
+  },
+
+  // The Reliquary (collection trophy hall) page. Spoiler-safe: shelves, page
+  // names, and relic display names only. No personal progress, clear counts,
+  // or drop sources. Page and relic names are English proper nouns baked from
+  // the sim and rendered as raw text, not from these keys.
+  reliquaryPage: {
+    intro:
+      'The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.',
+    howHeading: 'How the collection works',
+    howBody:
+      'Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.',
+    ranksHeading: 'Curator ranks',
+    ranksBody:
+      'Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable.',
+    catalogHeading: 'Catalog of pages',
+    catalogBody:
+      'Every authored Reliquary page and the relic names it holds. This list is spoiler-safe names only: open The Reliquary in game to see your own progress, clear counts, and silhouettes.',
+    spoilerNote:
+      'Personal first-find history, clear numbers, and missing-versus-owned state stay in the game client. The wiki never publishes a player collection.',
+    shelfHeading: '{label} ({count})',
+    shelf: {
+      conquerors: 'Conquerors',
+      professions: 'Professions',
+      horizons: 'Horizons',
     },
   },
 

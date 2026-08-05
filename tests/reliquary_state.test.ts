@@ -15,6 +15,7 @@ import { grantDeed, markItemDiscovered } from '../src/sim/deeds';
 import {
   CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
+  catalogCharacterCompletion,
   catalogItemCompletion,
   catalogRankOwned,
   catalogRelicCompletion,
@@ -384,6 +385,33 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(withHorizons.total).toBe(base.total);
     expect(withHorizons.owned).toBe(3);
     expect(base.owned).toBe(0);
+  });
+
+  it('catalogCharacterCompletion excludes skin slots from both sides of the pair', () => {
+    const items = new Set<string>(['cryptbone_helm']);
+    const char = catalogCharacterCompletion({ itemsDiscovered: items });
+    const full = catalogRelicCompletion({ itemsDiscovered: items });
+    // Exact skin-slot delta: every unique weapon_skin relic is out of total.
+    const skinSlots = new Set<string>();
+    for (const page of RELIQUARY_PAGES) {
+      for (const relic of page.relics) {
+        if (relic.kind === 'weapon_skin') skinSlots.add(relic.skinId);
+      }
+    }
+    expect(skinSlots.size).toBeGreaterThan(0);
+    expect(char.total).toBe(full.total - skinSlots.size);
+    expect(char.owned).toBe(1);
+    // Host-shaped skins present must not raise owned or total.
+    const withSkins = catalogCharacterCompletion(
+      reliquaryOwnershipOpts({
+        itemsDiscovered: items,
+        weaponSkinIds: [...skinSlots],
+      }),
+    );
+    // catalogCharacterCompletion ignores weaponSkins even if smuggled via opts shape:
+    // it only accepts character-durable fields; re-call with skins only via full.
+    expect(withSkins.owned).toBe(1);
+    expect(withSkins.total).toBe(char.total);
   });
 
   it('catalogRankOwned excludes account weapon skins (grant/display rank align)', () => {

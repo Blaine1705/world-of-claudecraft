@@ -3187,7 +3187,11 @@ export const zh_TW: EnTranslations = {
         "gather_event_perfect_specimen": "完美標本"
       },
       "accountScopeBadge": "帳號",
-      "accountScopeNote": "帳號收藏：此帳號下所有角色均可解鎖。"
+      "accountScopeNote": "帳號收藏：此帳號下所有角色均可解鎖。",
+      "charCompletionLabel": "聖物庫",
+      "charCompletion": "{owned}/{total}",
+      "charRankLabel": "策展人",
+      "charOpen": "聖物庫"
     },
     "deeds": {
       "title": "功績之書",
@@ -3426,6 +3430,7 @@ export const zh_TW: EnTranslations = {
       "valeCup": "溪谷盃",
       "thornhollow": "荊谷原野",
       "deeds": "功績之書",
+      "reliquary": "聖物庫",
       "glossary": "詞彙表",
       "wishIKnew": "我希望早點知道的事",
       "faq": "常見問題",
@@ -4277,6 +4282,22 @@ export const zh_TW: EnTranslations = {
         "social": "社交",
         "exploration": "探索",
         "feat": "壯舉"
+      }
+    },
+    "reliquaryPage": {
+      "intro": "聖物庫是你已收錄的獨特戰利品博物館：地城追逐裝備、專業獎盃、坐騎、武器外觀與頭銜。它與功績之書的關係，就像獎盃廳與成就簿的關係。",
+      "howHeading": "收藏如何運作",
+      "howBody": "在遊戲中開啟聖物庫（預設 Shift+X）。每個架上有多頁獨特聖物。角色首次獲得該件時填滿剪影；一頁上的聖物全部填滿時點亮該頁。即時發現會跳出提示並重新整理已開啟的視窗；進度按角色計算，武器外觀除外（帳號外觀）。",
+      "ranksHeading": "策展人等級",
+      "ranksBody": "策展人等級隨已收錄的獨特聖物上升，僅授予裝飾性頭銜與邊框。不會提供戰鬥強度、掉落率或保底。帳號武器外觀不計策展人等級，因此聲望保持角色持久。",
+      "catalogHeading": "頁面目錄",
+      "catalogBody": "每一頁已編寫的聖物庫頁面及其聖物名稱。此列表僅含防劇透名稱：請在遊戲中開啟聖物庫查看你的進度、通關次數與剪影。",
+      "spoilerNote": "個人首次發現紀錄、通關次數以及已有/未有狀態保留在遊戲用戶端。維基從不發佈玩家收藏。",
+      "shelfHeading": "{label}（{count}）",
+      "shelf": {
+        "conquerors": "征服者",
+        "professions": "專業",
+        "horizons": "遠景"
       }
     },
     "wishPage": {
@@ -6352,7 +6373,8 @@ export const zh_TW: EnTranslations = {
       "guilds": "提示：加入公會可獲得專屬聊天頻道與公會成員名單。",
       "professions": "提示：採集與製造類生活技能可以與你的戰鬥職業同時培養。",
       "loadouts": "提示：保存多套天賦配置，即可在不同組合間切換而無需重新分配天賦點。",
-      "pvp": "提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。"
+      "pvp": "提示：向其他玩家發起友誼決鬥，或報名灰燼競技場，來檢驗你的組合。",
+      "reliquary": "提示：聖物庫記錄你收集的獨特戰利品。預設按 Shift+X 開啟。"
     }
   },
   "errors": {

@@ -23,6 +23,7 @@ import {
   GUIDE_PROF_PAGES,
   GUIDE_PROF_RING,
   GUIDE_PROF_STATIONS,
+  GUIDE_RELIQUARY,
   GUIDE_WARLOCK_PETS,
   GUIDE_ZONES,
 } from '../src/guide/content.generated';
@@ -31,6 +32,7 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage } from '../src/guide/pages/professions';
+import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
 import { world as worldPage } from '../src/guide/pages/world';
 import {
   GUIDE_BASE,
@@ -59,6 +61,7 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
+import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
   TIER2_TOOL_GATE_PROFICIENCY,
   TIER3_TOOL_GATE_PROFICIENCY,
@@ -734,7 +737,80 @@ describe('Guide deeds spoiler safety', () => {
     expect(route?.navKey).toBe('guide.nav.deeds');
     expect(route?.group).toBe('compendium');
   });
+});
 
+// The Reliquary wiki page: spoiler-safe catalog of pages and relic names only.
+// Freshness of GUIDE_RELIQUARY is covered by the shared generator freshness gate;
+// these pins lock field allowlist, catalog parity, and render wiring.
+describe('Guide Reliquary spoiler-safe catalog', () => {
+  it('emits exactly the live RELIQUARY_PAGES ids in catalog order', () => {
+    expect(GUIDE_RELIQUARY.map((p) => p.id)).toEqual(RELIQUARY_PAGES.map((p) => p.id));
+    expect(GUIDE_RELIQUARY.length).toBe(RELIQUARY_PAGES.length);
+    expect(GUIDE_RELIQUARY.length).toBeGreaterThanOrEqual(28);
+  });
+
+  it('bakes only allowlisted fields (no progress, clears, firstFind, or sources)', () => {
+    const pageFields = new Set(['id', 'shelf', 'name', 'relics']);
+    const relicFields = new Set(['kind', 'name']);
+    for (const page of GUIDE_RELIQUARY) {
+      for (const k of Object.keys(page)) {
+        expect(pageFields.has(k), `page "${page.id}" unexpected field "${k}"`).toBe(true);
+      }
+      expect(page.relics.length, `page "${page.id}" empty`).toBeGreaterThan(0);
+      for (const relic of page.relics) {
+        for (const k of Object.keys(relic)) {
+          expect(relicFields.has(k), `page "${page.id}" relic unexpected "${k}"`).toBe(true);
+        }
+        expect(relic.name.length).toBeGreaterThan(0);
+      }
+    }
+    // Stronger: personal / progress tokens never appear as field names in the blob.
+    const blob = JSON.stringify(GUIDE_RELIQUARY);
+    for (const leak of [
+      'firstFind',
+      'clears',
+      'owned',
+      'recent',
+      'clearSource',
+      'itemId',
+      'markId',
+    ]) {
+      expect(blob.includes(`"${leak}"`), `leaked field token ${leak}`).toBe(false);
+    }
+  });
+
+  it('pins the reliquary route wiring to literals', () => {
+    const route = GUIDE_ROUTES.find((r) => r.id === 'reliquary');
+    expect(route?.sub).toBe('reliquary');
+    expect(route?.navKey).toBe('guide.nav.reliquary');
+    expect(route?.group).toBe('compendium');
+    expect(pageFor('reliquary')).toBe(reliquaryPage);
+  });
+
+  it('renders shelves and every page name without inventing player progress chrome', () => {
+    setLanguage('en');
+    const html = reliquaryPage.render({
+      params: [],
+      sub: 'reliquary',
+      titleKey: 'guide.nav.reliquary',
+    });
+    expect(html).toContain(t('guide.nav.reliquary'));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.conquerors' as never));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.professions' as never));
+    expect(html).toContain(t('guide.reliquaryPage.shelf.horizons' as never));
+    for (const page of GUIDE_RELIQUARY) {
+      expect(html).toContain(page.name);
+    }
+    // Pure catalog helper covers the same rows the page composes.
+    const sections = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    // Exact class token (not the h3's guide-reliquary-page-h prefix).
+    expect((sections.match(/class="guide-block guide-reliquary-page"/g) ?? []).length).toBe(
+      GUIDE_RELIQUARY.length,
+    );
+  });
+});
+
+describe('Guide deeds page render (continued)', () => {
   it('renders the whole page: correct per-category counts, no hidden or boss leak', () => {
     setLanguage('en');
     // GuidePage.render requires a PageContext; this page renders the same for any ctx
