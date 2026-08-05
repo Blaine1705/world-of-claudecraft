@@ -1,6 +1,6 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 10 (not started). Update this line as phases complete.
+Current phase: 10 complete; next: 10 QA. Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -74,10 +74,31 @@ Current phase: 10 (not started). Update this line as phases complete.
   (content-name localization pattern), DEED_IMAGE_IDS (crest art).
 - Guards: tests/architecture.test.ts (UI_PURE_CORES x3 lists), tests/
   hud_perf_budget.test.ts, tests/world_api_parity.test.ts (306/79/227, facet 33),
-  tests/guide.test.ts hidden-deed needles (:538-550).
+  tests/guide.test.ts hidden-deed needles (the three hiddenDeedProse guards).
 
 ## Surfaces added by this packet (append per phase as they land)
-- Phase 10: (pending)
+- Phase 10: reliquaryUnlock gained retro?: boolean (emitted only when true; client-only
+  presentation flag, self-scoped event, no server fan-out exists for it). New i18n key
+  hudChrome.reliquary.retroSummary (English catalog + the five non-Latin M16 fills;
+  ja uses the full-width colon). Titles page is 33 relics (hidden deeds excluded
+  structurally); derived totals are catalog 212 / character-scoped 183; NO literal
+  total pins exist anywhere, the suites derive them (the phase's cascade step was a
+  no-op, recorded so later phases do not hunt). markItemDiscovered gained trailing
+  opts {retro?: boolean} (module function only; the SimContext seam signature
+  deliberately does NOT carry it). The masterwork visited namespace is registered;
+  per-craft visits are gated on isCataloguedRelicMark. restoreReliquaryState recent
+  restore matches pushRecent semantics (last occurrence wins, newest survive the cap).
+  The W3 weapon-skin emit unification was REVERSED in review: three reviewers proved
+  the SimContext accountWeaponSkinIds callback inert on every host and mis-keyed on
+  primaryId; it was deleted, and the guard is now the single-kind-pages content pin in
+  tests/reliquary_content.test.ts (a mixed page cannot ship silently; online W3 stays
+  documented-open). Curator-rank note: removing hid_saul_footnote lowers the derived
+  owned count by one for a hidden-deed holder (a threshold-sitter would display one
+  rank lower); zero-impact today because the Reliquary is unreleased, bridge deeds are
+  never revoked, and the titles page becomes completable for everyone else. Rollback
+  note for release ops: a pre-Reliquary binary autosaving a rolled-forward character
+  drops the reliquary key and the masterwork:* visits permanently (itemsDiscovered
+  survives, so fill and rank recover; provenance and recent do not).
 - Phase 11: (pending)
 - Phase 12: (pending)
 - Phase 13: (pending)

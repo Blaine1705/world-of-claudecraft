@@ -52,8 +52,9 @@ Agent A deliverables (spoiler removal):
   hidden filter twenty lines above it).
 - Extend the tests/guide.test.ts hidden-deed needle set to include d.reward.text (for
   title rewards) so the guard catches reward-text leaks, not just id/name/desc.
-- Regenerate the wiki bundle (npm run wiki:content) and confirm "the Footnote" no longer
-  appears anywhere in src/guide/content.generated.ts.
+- Regenerate the wiki bundle (npm run wiki:content) and confirm the hidden deed's reward
+  title text (DEEDS hid_saul_footnote reward.text) no longer appears anywhere in
+  src/guide/content.generated.ts.
 - Cascade every literal total this changes (catalog 213 to 212, character-scoped 184 to
   183, titles 34 to 33) through tests/reliquary_content.test.ts,
   tests/reliquary_state.test.ts, tests/reliquary_view.test.ts, and any window test
@@ -125,8 +126,9 @@ STEP 4 - COMMIT CADENCE (explicit paths):
 - test(reliquary): behavioral join coverage and cascaded totals
 
 STEP 5 - ACCEPTANCE CRITERIA:
-- [ ] "the Footnote" appears nowhere in src/guide/content.generated.ts or any window
-      render path; guide.test needles cover reward.text; wiki emitter throws on hidden.
+- [ ] The hidden deed's reward title text (DEEDS hid_saul_footnote reward.text) appears
+      nowhere in src/guide/content.generated.ts or any window render path; guide.test
+      needles cover reward.text; wiki emitter throws on hidden.
 - [ ] The behavioral join test passes and proves: no unflagged event, no fan-out-eligible
       deed grant, no recent push, no clears stamp on the seed path; live fills still
       celebrate.

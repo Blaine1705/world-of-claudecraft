@@ -64,7 +64,7 @@ three omitted drops, PvP gallery).
 ## Finding-to-phase map (complete)
 
 Blocking:
-- Hidden deed leak (hid_saul_footnote / "the Footnote" on Titles page + public wiki): Phase 10.
+- Hidden deed leak (hid_saul_footnote reward title on the Titles page + public wiki): Phase 10.
 - 28 page names never pass t(): Phase 11.
 - Join-time retro celebrates, fans out to guild/followers/Discord, fabricates
   firstFind.clears: Phase 10.
