@@ -2,7 +2,7 @@
   "class": "paladin",
   "license": "Mixed: CraftPix premium for the legacy base set; project-owned original art for the paladin overhaul and talent abilities",
   "iconSize": 128,
-  "sourcePack": "tmp/asset_src/paladin-skill-icons (CraftPix — see license.txt)",
+  "sourcePack": "tmp/asset_src/paladin-skill-icons (CraftPix \u2014 see license.txt)",
   "runtimeDir": "public/ui/skills/paladin",
   "abilities": [
     {

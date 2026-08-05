@@ -3,6 +3,7 @@
 // i18n), so it lives in src/sim/ and both src/ui/hud.ts and src/sim/sim.ts import
 // it. Keeping ONE classifier avoids the drift where the HUD treated silence/disarm/
 // blind/etc. as debuffs but /targetbuffs (a narrower set) tagged them as buffs.
+import { isUnbreakableControlAura } from './combat/cc';
 import type { Aura, AuraKind } from './types';
 
 // A kind that is harmful by nature regardless of its value. Mirrors classic-era

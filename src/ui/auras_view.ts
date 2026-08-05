@@ -30,14 +30,6 @@
 import { isDebuffAura as classifyDebuffAura, DEBUFF_AURA_KINDS } from '../sim/aura_classify';
 import { isCancelableAura } from '../sim/combat/aura_cancel';
 import { isPersistentEngineAura } from '../sim/persistent_aura';
-=======
-import {
-  isDebuffAura as classifyDebuffAura,
-  DEBUFF_AURA_KINDS,
-  isPlayerRemovableAura,
-} from '../sim/aura_classify';
-import { isPersistentEngineAura } from '../sim/persistent_aura';
->>>>>>> f8554e6e3f
 import type { AuraKind } from '../sim/types';
 import type { AuraSchool } from './aura_effect';
 

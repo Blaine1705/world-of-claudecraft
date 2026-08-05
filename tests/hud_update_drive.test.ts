@@ -1473,9 +1473,6 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
     ).toEqual({ window: 41, chrome: 78, none: 16 });
-=======
-    ).toEqual({ window: 41, chrome: 72, none: 16 });
->>>>>>> f8554e6e3f
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

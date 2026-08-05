@@ -112,7 +112,7 @@ describe('self stat wire round-trip', () => {
     const snap = lastSnap(fc.sent);
     expect(snap.self.pdev).toEqual({ value: 7, charges: 3, remaining: 18.25 });
 
-    const client = bareClient(session.pid, 'paladin');
+    const client = bareClient(session.pid, { playerClass: 'paladin' });
     (client as any).applySnapshot(snap);
     expect(client.player.paladinDevotion).toMatchObject({
       value: 7,
@@ -5642,7 +5642,7 @@ describe('negotiated stable timer wire v3', () => {
         expect(snapshot.self.auras[0].rem).toBe(snapshot.self.auras[0].dur);
       }
 
-      const client = bareClient(session.pid, 'paladin');
+      const client = bareClient(session.pid, { playerClass: 'paladin' });
       (client as any).applySnapshot(snapshot);
       expect(client.player.auras[0]).toMatchObject({
         id: 'devotion_ward',

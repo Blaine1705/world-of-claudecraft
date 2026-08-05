@@ -203,11 +203,11 @@ describe("Retribution Paladin Dawn's Wrath", () => {
 
   it('replays auto attack, Final Edict, and empowered Hammer with an exact RNG trace', () => {
     function runTrace() {
-      // Seed re-hunted for the v0.32.1 catch-up (main's content adds shifted the
+      // Seed re-hunted for the v0.34.0 catch-up (main's content adds shifted the
       // world-construction stream): the first swing must LAND and PROC Dawn's
       // Wrath or the empowered Hammer is never castable and the trace collapses.
-      // Spare seeds with the same shape: 6, 8, 10.
-      const sim = new Sim({ seed: 4, playerClass: 'paladin', autoEquip: true }) as TestSim;
+      // Spare seeds with the same shape: 20.
+      const sim = new Sim({ seed: 13, playerClass: 'paladin', autoEquip: true }) as TestSim;
       sim.setPlayerLevel(20);
       expect(sim.setSpec('retribution')).toBe(true);
       const target = targetAt(sim, 2);
@@ -251,15 +251,15 @@ describe("Retribution Paladin Dawn's Wrath", () => {
     expect(runTrace()).toEqual(first);
     expect(first).toEqual({
       draws: [
-        0.51764, 0.927374, 0.267278, 0.112041, 0.785028, 0.576552, 0.954801, 0.493072, 0.827817,
-        0.78111, 0.680147,
+        0.881369, 0.599931, 0.574934, 0.142454, 0.642304, 0.290732, 0.157766, 0.643683, 0.914991,
+        0.328397, 0.508796,
       ],
       chances: [0.068, 0.15, 0.068, 0.15, 0.96, 0.0756],
-      autoHp: 49_975,
+      autoHp: 49976,
       autoAura: 8,
-      finalHp: 49_878,
+      finalHp: 49880,
       finalAura: 8,
-      hammerHp: 49_620,
+      hammerHp: 49641,
       procActive: false,
       hammerCooldown: 0,
       devotion: 2,
