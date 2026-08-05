@@ -11173,5 +11173,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.enchantBusy': '지금은 바쁩니다.',
   'guide.profPages.econ.castPaceHeading': '시전 시간과 골드 소모',
   'guide.profPages.econ.castPaceBody':
-    '전문 기술 행동은 실제 시전 시간이 걸립니다. 간단한 야외 제작법은 약 1.5초, 상위 사다리 제작법은 몇 초, 마력 추출·마법부여·분해·도구 효과 충전은 각각 짧은 고정 시전입니다. 시전 중 취소해도 재료를 잃지 않습니다. 성공한 제작마다 아이템 예산에 비례한 구리 수수료도 지불합니다. 재료, 작업대, 숙련도 상한과 함께 이 속도는 별도의 행동 한도 없이도 시장을 건전하게 유지합니다.',
+    '전문 기술 행동은 실제 시전 시간이 걸립니다. 간단한 야외 제작법은 2초 남짓, 상위 사다리 제작법은 몇 초, 마력 추출·마법부여·분해·도구 효과 충전은 각각 짧은 고정 시전입니다. 시전 중 취소해도 재료를 잃지 않습니다. 성공한 제작마다 아이템 예산에 비례한 구리 수수료도 지불합니다. 재료, 작업대, 숙련도 상한과 함께 이 속도는 별도의 행동 한도 없이도 시장을 건전하게 유지합니다. 숙련도 구간별 정확한 시전 시간은 아래에 있습니다.',
+  'guide.profPages.econ.castPaceField': '필드 제작법(숙련도 요구 없음): {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill25': '숙련도 25까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill50': '숙련도 50까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill75': '숙련도 75까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceCombo': '최상위 및 조합 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceEnchantFamily': '마력 추출·마법부여·분해: {seconds}초 시전',
+  'guide.profPages.econ.castPaceRecharge': '도구 효과 충전: {seconds}초 시전',
+  'guide.profPages.econ.castPaceBatch': '일괄 제작: 한 번에 최대 {count}개, 각각 시전',
 };

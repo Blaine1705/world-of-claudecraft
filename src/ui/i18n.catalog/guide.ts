@@ -1869,7 +1869,17 @@ export const guideStrings = {
       // against the cast-time prose (Craft Cast System Phase 5/6).
       castPaceHeading: 'Cast time and the gold sink',
       castPaceBody:
-        'Profession actions take real cast time: recipes scale from about one and a half seconds for simple field work up to a few seconds on the high ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota.',
+        'Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.',
+      // The exact cast-pace bands ({seconds}/{count} localized numbers from
+      // content constants; the transparency policy's number-bearing lines).
+      castPaceField: 'Field recipes (no skill requirement): {seconds}s cast',
+      castPaceSkill25: 'Recipes up to skill 25: {seconds}s cast',
+      castPaceSkill50: 'Recipes up to skill 50: {seconds}s cast',
+      castPaceSkill75: 'Recipes up to skill 75: {seconds}s cast',
+      castPaceCombo: 'Top-of-ladder and combo recipes: {seconds}s cast',
+      castPaceEnchantFamily: 'Disenchant, enchant, and salvage: {seconds}s cast',
+      castPaceRecharge: 'Tool-effect recharge: {seconds}s cast',
+      castPaceBatch: 'Batch crafting: up to {count} in one order, one cast each',
       doctrineHeading: 'Players trade with players',
       doctrineBody:
         'The crafting economy is built on one idea: players supply players. Gatherers feed crafters, crafters feed questers and raiders, and breakers feed enchanters, with vendors and station masters standing at the edges to absorb junk and coin rather than to compete with you. If you want to make money from a profession, your customer is a person: learn what other players burn through, price against the World Market, and treat the NPC systems as a floor under your prices, not as the market itself.\n\nCrafted gear is tuned to sit below the raid floor: even a masterwork is only ever one quality tier above its recipe, never past legendary, and its stat budget stays under the raid loot band. The forge gets you ready for the hardest content; it does not replace it. That keeps crafters, raiders, and the market in a stable triangle: raid drops stay aspirational, and crafted pieces stay the best gear money can actually buy.',

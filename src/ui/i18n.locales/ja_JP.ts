@@ -11185,5 +11185,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.enchantBusy': '手が離せません。',
   'guide.profPages.econ.castPaceHeading': '詠唱時間とゴールドの消費',
   'guide.profPages.econ.castPaceBody':
-    '専門職の行動には実際の詠唱時間がかかります。簡単な野外レシピは約1.5秒、上位の梯子レシピは数秒、分解・付魔・解体・道具効果の充填はそれぞれ固定の短い詠唱です。詠唱中にキャンセルしても損失はありません。成功した製作にはアイテム予算に応じた銅貨の手数料もかかります。材料・作業台・技能上限と合わせて、別枠の行動上限がなくても市場を健全に保てます。',
+    '専門職の行動には実際の詠唱時間がかかります。簡単な野外レシピは2秒弱、梯子の上位レシピは数秒、分解・付魔・解体・道具効果の充填はそれぞれ固定の短い詠唱です。詠唱中にキャンセルしても損失はありません。成功した製作にはアイテム予算に応じた銅貨の手数料もかかります。材料・作業台・技能上限と合わせて、別枠の行動上限がなくても市場を健全に保てます。スキル帯ごとの正確な詠唱時間は下記のとおりです。',
+  'guide.profPages.econ.castPaceField': 'フィールドレシピ（スキル要件なし）: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill25': 'スキル25までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill50': 'スキル50までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill75': 'スキル75までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceCombo': '最上位およびコンボレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceEnchantFamily': '分解・付魔・解体: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceRecharge': '道具効果の充填: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceBatch': 'まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱',
 };

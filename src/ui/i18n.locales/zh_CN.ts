@@ -10680,5 +10680,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.enchantBusy': '你正忙着。',
   'guide.profPages.econ.castPaceHeading': '读条时间与金币消耗',
   'guide.profPages.econ.castPaceBody':
-    '专业动作需要真实读条时间：简单的野外配方大约一秒半，高阶阶梯配方则需要数秒；分解、附魔、拆解与工具效果充能各自有固定的短读条。中途取消不会损失材料。每次成功制作还会按物品预算支付铜币费用。加上材料、工作台与技能上限，这种节奏在不设额外动作配额的情况下，也能让市场保持健康。',
+    '专业动作需要真实读条时间：简单的野外配方不到两秒，高阶阶梯配方则需要数秒；分解、附魔、拆解与工具效果充能各自有固定的短读条。中途取消不会损失材料。每次成功制作还会按物品预算支付铜币费用。加上材料、工作台与技能上限，这种节奏在不设额外动作配额的情况下，也能让市场保持健康。各技能区间的精确读条时间见下表。',
+  'guide.profPages.econ.castPaceField': '无技能要求的野外配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill25': '技能25以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill50': '技能50以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill75': '技能75以下配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceCombo': '顶级与组合配方：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceEnchantFamily': '分解、附魔与拆解：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceRecharge': '工具效果充能：施放 {seconds} 秒',
+  'guide.profPages.econ.castPaceBatch': '批量制作：单次最多 {count} 件，逐件施放',
 };

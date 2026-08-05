@@ -298,7 +298,22 @@ confirm machinery as disenchant; it grants no craft skill
 tool-effect recharge are cast-paced (recipe-band craft durations; fixed
 1.5 s for enchant-family and recharge). Economy brakes are cast time,
 materials, the gold sink, stations, and skill ceilings, not a shared
-action quota.
+action quota. Rate ruling, stated for the record: the retired quota
+allowed 10 actions per minute across the family; cast pacing allows one
+player roughly 15 to 40 per minute depending on band, and that faster
+ceiling is ACCEPTED because every craft still pays materials and the
+copper fee, and the enchant-family faucets stay bounded by the items a
+player actually holds.
+
+Craft cast band rationale (the ladder in `src/sim/content/professions.ts`,
+`CRAFT_CAST_DURATION_*`): skill bands rather than a flat cast so field
+recipes stay snappy while ladder-top and combo recipes read as deliberate
+work; the floor and ceiling clamp every band into the UX range where a
+cast bar is legible but never tedious. Locked starting numbers from the
+implementation plan; retune with evidence (market volume, session
+telemetry), not feel. The enchant family and tool recharge take the flat
+floor-length cast because their pacing brake is the consumed item or
+charge, not the recipe ladder.
 
 ### Commissions and the Maker's Bond
 Opt-in at craft time, equipment only (weapon, armor, held_offhand). The
@@ -494,7 +509,7 @@ top-rung materials from ten more zones (the all-zones supply arm in
 about 2.8 gather hours under the deliberately conservative model, floored
 at 2 as its trivially-short alarm), and predated the #2387 Battlefield
 Experience attribution fix; the measured all-levers climb lands nearer 1
-to 3 gathering hours plus the cast, throttle, and travel time, which is
+to 3 gathering hours plus the cast and travel time, which is
 where the band's low end comes from. One access assumption the figures
 rest on, stated: the expansion's thorium faucets are TIER-1 nodes, so
 under R22 they need only the tier-1 pick at any proficiency; only the
@@ -596,8 +611,9 @@ must be re-derived if either number is ever tuned on its own.
   `vendorItems` row anywhere, and priced with the same 4x `buyValue` for the
   same reason.
 - Market: gold buys MATERIALS, never skill. Fungible materials stay
-  listable; the curve, the shared throttle, and material volume are the
-  sanctioned brake on purchased progress.
+  listable; the curve, cast pacing, and material volume are the sanctioned
+  brake on purchased progress (the shared action throttle retired with the
+  Craft Cast System; cast time is the pacing brake now).
 - Unbind fees: never free, monotonic in quality, clamp both ends (the
   clamp-to-first-below reading is maintainer-ratified).
 - Enchant magnitudes are frozen post-launch; tune reagent costs instead.

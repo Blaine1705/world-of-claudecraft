@@ -1418,10 +1418,12 @@ export interface PlayerMeta {
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
   recipesGrandfathered: boolean;
   // INERT after Craft Cast System Phase 5: the shared 10-per-60s action
-  // throttle is retired; cast duration paces craft-family actions. Field
-  // kept (always {windowStart:0,count:0}) so older session shapes and any
-  // external pin that still names craftThrottle stay byte-stable. Never
-  // read or written by gameplay paths. Session-only, never persisted.
+  // throttle is retired; cast duration paces craft-family actions. This
+  // field was SESSION-ONLY from birth (never persisted, never wired), so no
+  // save shape depends on it; it survives only as the inert shape the
+  // retirement suite pins (tests/professions_action_throttle.test.ts stamps
+  // it and proves gameplay ignores it). The parity sampler excludes it
+  // (tests/parity/trace.ts META_EXCLUDE). Never read or written by gameplay.
   craftThrottle: { windowStart: number; count: number };
   // One-time mastery reset notice pending (Professions 2.0): set by
   // the load-time masteryResetApplied branch, consumed by the tick mail phase
