@@ -2231,6 +2231,13 @@ export const hudChromeStrings = {
     // reagents only; never edible raw. Painted via createTooltipLine, not the
     // materialHintLine HTML-string path.
     cookingCatch: 'Cooking ingredient. Must be cooked before eating.',
+    // Profession affinity for honest materials (material_profession_hint_view.ts).
+    // {crafts} is a locale-aware conjunction list of localized craft names
+    // (Intl.ListFormat), e.g. "Leatherworking" or "Alchemy, Cooking, and Tailoring".
+    // Kind stays junk internally; the kind line already reads Material, and this
+    // line names which craft(s) consume the stack when an item can serve more
+    // than one role (WoW Crafting Reagent + multi-profession materials pattern).
+    usedBy: 'Used by {crafts}.',
     arcaneDust: 'Enchanting reagent. Disenchanted from common and uncommon gear.',
     arcaneEssence: 'Enchanting reagent. Disenchanted from rare gear.',
     arcaneShard: 'Enchanting reagent. Disenchanted from epic and legendary gear.',

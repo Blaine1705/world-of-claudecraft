@@ -1993,6 +1993,7 @@ export const cs_CZ: EnTranslations = {
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
       "cookingCatch": "Kuchařská ingredience. Před snědením ji musíš uvařit.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
       "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
       "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",

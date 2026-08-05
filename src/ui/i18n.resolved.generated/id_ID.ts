@@ -1993,6 +1993,7 @@ export const id_ID: EnTranslations = {
     "materialHint": {
       "fineGrade": "Mutu halus. Dikumpulkan dari urat tingkat penuh dengan alat berperingkat di atas materialnya, dan dihitung sebagai versi biasa di mana pun versi biasa dibutuhkan.",
       "cookingCatch": "Bahan masakan. Harus dimasak sebelum dimakan.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan umum dan tak biasa.",
       "arcaneEssence": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan langka.",
       "arcaneShard": "Reagen Pemantraan. Dihasilkan dari menghancurkan pemantraan perlengkapan epik dan legendaris.",

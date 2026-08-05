@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -35,6 +36,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "es_ES": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -60,6 +62,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "fr_FR": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -85,6 +88,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "fr_CA": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -111,6 +115,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -136,6 +141,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "de_DE": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -161,18 +167,23 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "zh_CN": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.reliquary.progressText"
   ],
   "zh_TW": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.reliquary.progressText"
   ],
   "ko_KR": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.reliquary.progressText"
   ],
   "ja_JP": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.reliquary.progressText"
   ],
   "pt_BR": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -198,9 +209,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "ru_RU": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.reliquary.progressText"
   ],
   "cs_CZ": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -226,6 +239,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "nl_NL": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -251,6 +265,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "pl_PL": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -276,6 +291,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "id_ID": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -301,6 +317,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "tr_TR": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -326,6 +343,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "sv_SE": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -351,6 +369,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "vi_VN": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",
@@ -376,6 +395,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.title"
   ],
   "da_DK": [
+    "hudChrome.materialHint.usedBy",
     "hudChrome.mobile.reliquary",
     "hudChrome.reliquary.backToShelf",
     "hudChrome.reliquary.clearsLabel",

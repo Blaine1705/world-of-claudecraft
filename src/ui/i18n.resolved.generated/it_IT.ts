@@ -1993,6 +1993,7 @@ export const it_IT: EnTranslations = {
     "materialHint": {
       "fineGrade": "Grado pregiato. Raccolto da un filone di pieno livello con uno strumento di rango superiore al materiale, e vale come la versione ordinaria ovunque ne venga richiesta una.",
       "cookingCatch": "Ingrediente da cucina. Deve essere cucinato prima di essere mangiato.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
       "arcaneEssence": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
       "arcaneShard": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
