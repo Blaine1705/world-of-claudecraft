@@ -4,107 +4,27 @@ type CombatEventParty = {
   members: readonly number[];
 };
 
-/**
- * Resolve an entity's controller, or null when it has none. The broadcast path
- * supplies a lookup over the live entity map; a miss (the entity already
- * dropped) resolves to null, which degrades to the pre-pet behavior rather than
- * throwing inside the per-session fan-out.
- */
-export type CombatEventOwnerLookup = (entityId: number) => number | null;
-export type CombatEventTapperLookup = (entityId: number) => number | null;
-
-export interface CombatEventDeliveryLookups {
-  ownerOf: CombatEventOwnerLookup;
-  tapperOf: CombatEventTapperLookup;
-}
-
-/**
- * Who an entity acts FOR. A pet is not a combat participant in its own right:
- * its damage belongs to its owner, and so does damage taken by it. Anything
- * ownerless is its own principal, so this can only ever widen delivery relative
- * to the raw-id comparison it replaces, never narrow it.
- */
-function principalOf(entityId: number, ownerOf: CombatEventOwnerLookup): number {
-  return ownerOf(entityId) ?? entityId;
-}
-
-function combatOwnerOf(
-  entityId: number,
-  { ownerOf, tapperOf }: CombatEventDeliveryLookups,
-): number | null {
-  return ownerOf(entityId) ?? tapperOf(entityId);
-}
-
-function entityCombatPrincipal(
-  entityId: number,
-  lookups: CombatEventDeliveryLookups,
-): number | null {
-  return combatOwnerOf(entityId, lookups) ?? entityId;
-}
-
-function isViewerPrincipalParticipant(
-  first: number | null,
-  second: number | null,
-  viewerPid: number,
-  viewerParty: CombatEventParty | null,
-): boolean {
-  if (first === viewerPid || second === viewerPid) return true;
-  return (
-    (first !== null && viewerParty?.members.includes(first) === true) ||
-    (second !== null && viewerParty?.members.includes(second) === true)
-  );
-}
-
 function isViewerCombatParticipant(
   sourceId: number,
   targetId: number,
   viewerPid: number,
   viewerParty: CombatEventParty | null,
-  ownerOf: CombatEventOwnerLookup,
 ): boolean {
-  const source = principalOf(sourceId, ownerOf);
-  const target = principalOf(targetId, ownerOf);
-  if (source === viewerPid || target === viewerPid) return true;
+  if (sourceId === viewerPid || targetId === viewerPid) return true;
   return (
-    viewerParty?.members.includes(source) === true || viewerParty?.members.includes(target) === true
+    viewerParty?.members.includes(sourceId) === true ||
+    viewerParty?.members.includes(targetId) === true
   );
 }
 
-/**
- * Whether one combat event belongs in one viewer's frame.
- *
- * The filter keeps a player out of every stranger's swing in a crowded zone. Its
- * original form compared the RAW entity ids, so a pet matched nothing: a pet is
- * neither the viewer's pid nor a member of any party, and the owner therefore
- * never received their own pet's damage. That silently removed pet output from
- * the damage meter, the combat log and floating combat text for every pet class
- * (hunter, warlock, mage). Resolving each side to its OWNER first is the fix; a
- * stranger's pet resolves to that stranger and stays filtered out.
- *
- * `ownerOf` is required rather than optional on purpose: an omitted lookup would
- * silently reinstate the bug at a call site that forgot to pass one.
- */
 export function shouldDeliverCombatEventToViewer(
   ev: SimEvent,
   viewerPid: number,
   viewerParty: CombatEventParty | null,
-  lookups: CombatEventDeliveryLookups,
 ): boolean {
-  const { ownerOf } = lookups;
   if (ev.type === 'damage')
-    return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
+    return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty);
   if (ev.type === 'heal2')
-    return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
-  if (ev.type === 'death') {
-    const killedFor = entityCombatPrincipal(ev.entityId, lookups);
-    const killerFor = ev.killerId >= 0 ? entityCombatPrincipal(ev.killerId, lookups) : null;
-    if (combatOwnerOf(ev.entityId, lookups) === null && killerFor === null) return true;
-    return isViewerPrincipalParticipant(killedFor, killerFor, viewerPid, viewerParty);
-  }
-  if (ev.type === 'aura') {
-    const targetFor = combatOwnerOf(ev.targetId, lookups);
-    if (targetFor === null) return true;
-    return isViewerPrincipalParticipant(targetFor, null, viewerPid, viewerParty);
-  }
+    return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty);
   return true;
 }
