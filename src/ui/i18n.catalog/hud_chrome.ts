@@ -1057,6 +1057,29 @@ export const hudChromeStrings = {
     graphicsFatal: 'Graphics recovery failed. Reload the game to continue.',
     graphicsReload: 'Reload Game',
     graphicsDraftChanged: 'Graphics changes are ready to apply.',
+    // Graphics panel card titles (the wide two-column card form), the
+    // per-system dial labels the hud.options block does not already carry,
+    // and the notes under the dials.
+    gfxSectionQuality: 'Quality',
+    gfxSectionWorld: 'World Detail',
+    gfxSectionLighting: 'Lighting & Effects',
+    gfxSectionCamera: 'Camera',
+    gfxSectionDisplay: 'Display',
+    gfxSectionSystem: 'System',
+    gfxSectionTouch: 'Touch Controls',
+    gfxViewDistance: 'View Distance',
+    gfxWaterQuality: 'Water Quality',
+    gfxCharacterDetail: 'Character Detail',
+    gfxAmbientOcclusion: 'Ambient Occlusion',
+    gfxBloom: 'Bloom',
+    gfxAntiAliasing: 'Anti-Aliasing',
+    gfxDynamicLights: 'Dynamic Lights',
+    gfxParticleEffects: 'Particle Effects',
+    gfxHalf: 'Half',
+    gfxCustomNote:
+      'Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.',
+    gfxEffectsNote:
+      'Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.',
     // Interface Mode control (Graphics panel): desktop keyboard/mouse vs the
     // on-screen touch controls. Auto detects the device; the rest force one.
     interfaceMode: 'Interface Mode',

@@ -140,7 +140,7 @@ export interface ImpostorSession {
  * profile tests).
  */
 export function activeFarFieldPolicy(): FarFieldPolicy {
-  return farFieldPolicy(GFX.tier, GFX);
+  return farFieldPolicy(GFX.vistaTier, GFX);
 }
 
 /** Sprites ship per the shared far-field policy (never on lean or
