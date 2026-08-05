@@ -2791,7 +2791,6 @@ export const ru_RU: EnTranslations = {
       "durationChip": "{seconds}s",
       "durationAria": "Время применения: {seconds} с",
       "progressAria": "Прогресс изготовления",
-      "progressTimer": "{seconds}s",
       "announceStart": "Изготавливается: {name}",
       "announceComplete": "Изготовлено: {name}",
       "announceCancel": "Изготовление отменено",

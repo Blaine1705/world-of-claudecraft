@@ -2791,7 +2791,6 @@ export const zh_CN: EnTranslations = {
       "durationChip": "{seconds}s",
       "durationAria": "施放时间：{seconds} 秒",
       "progressAria": "制作进度",
-      "progressTimer": "{seconds}s",
       "announceStart": "正在制作 {name}",
       "announceComplete": "已完成制作 {name}",
       "announceCancel": "制作已取消",

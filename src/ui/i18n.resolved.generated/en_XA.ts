@@ -2791,7 +2791,6 @@ export const en_XA: EnTranslations = {
       "durationChip": "[{seconds}š]",
       "durationAria": "[Çášţ ţíɱé: {seconds} šéçóñðš]",
       "progressAria": "[Çŕáƒţ þŕóĝŕéšš]",
-      "progressTimer": "[{seconds}š]",
       "announceStart": "[Çŕáƒţíñĝ {name}]",
       "announceComplete": "[Ƒíñíšĥéð çŕáƒţíñĝ {name}]",
       "announceCancel": "[Çŕáƒţíñĝ çáñçéļļéð]",

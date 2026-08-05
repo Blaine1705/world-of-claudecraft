@@ -3396,8 +3396,6 @@ export const hudChromeStrings = {
     durationAria: 'Cast time: {seconds} seconds',
     // In-window progress strip accessible name.
     progressAria: 'Craft progress',
-    // Remaining seconds on the in-window strip ({seconds} localized number).
-    progressTimer: '{seconds}s',
     // Polite live-region lines for cast start / complete / cancel.
     announceStart: 'Crafting {name}',
     announceComplete: 'Finished crafting {name}',

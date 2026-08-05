@@ -2791,7 +2791,6 @@ export const pt_BR: EnTranslations = {
       "durationChip": "{seconds}s",
       "durationAria": "Cast time: {seconds} seconds",
       "progressAria": "Craft progress",
-      "progressTimer": "{seconds}s",
       "announceStart": "Crafting {name}",
       "announceComplete": "Finished crafting {name}",
       "announceCancel": "Crafting cancelled",

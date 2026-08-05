@@ -7945,7 +7945,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.prev': '前のページ',
   'editor.openDrawer.next': '次のページ',
   'editor.openDrawer.page': 'ページ {page}',
-  'editor.status.campCapReached': 'キャンプ数の上限（{max}）に達しました。新しいキャンプは追加されませんでした。',
+  'editor.status.campCapReached':
+    'キャンプ数の上限（{max}）に達しました。新しいキャンプは追加されませんでした。',
   'editor.status.savedLocal': '「{name}」をこのブラウザーに保存しました。',
   'editor.status.savedServer': '「{name}」をサーバーに保存しました（v{version}）。',
   'editor.status.savedLocalOnly':

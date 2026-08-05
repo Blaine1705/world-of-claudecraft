@@ -2791,7 +2791,6 @@ export const ko_KR: EnTranslations = {
       "durationChip": "{seconds}s",
       "durationAria": "시전 시간: {seconds}초",
       "progressAria": "제작 진행",
-      "progressTimer": "{seconds}s",
       "announceStart": "{name} 제작 중",
       "announceComplete": "{name} 제작 완료",
       "announceCancel": "제작이 취소됨",

@@ -6801,7 +6801,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.crafting.pairOptionLabel'
   | 'hudChrome.crafting.professionChoice'
   | 'hudChrome.crafting.progressAria'
-  | 'hudChrome.crafting.progressTimer'
   | 'hudChrome.crafting.qtyDecreaseAria'
   | 'hudChrome.crafting.qtyIncreaseAria'
   | 'hudChrome.crafting.qtyRowAria'

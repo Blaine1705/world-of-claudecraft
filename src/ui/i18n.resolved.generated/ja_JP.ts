@@ -2791,7 +2791,6 @@ export const ja_JP: EnTranslations = {
       "durationChip": "{seconds}s",
       "durationAria": "詠唱時間: {seconds} 秒",
       "progressAria": "製作の進行",
-      "progressTimer": "{seconds}s",
       "announceStart": "{name} を製作中",
       "announceComplete": "{name} の製作が完了",
       "announceCancel": "製作をキャンセルした",

@@ -151,6 +151,9 @@ describe('renderCraftingWindow craft-cast UX', () => {
     // Tab cycle.
     expect(progress!.tabIndex).toBe(-1);
     expect(progress!.dataset.focusKey).toBe('cast-strip');
+    // Idle build: CSS keeps the strip display:none, so the ladder never picks
+    // a hidden node when no cast runs (no inline display is written).
+    expect(progress!.style.display).toBe('');
     // The live region no longer lives in the rebuilt subtree (it would be
     // wiped by the same task that writes it): announcements ride
     // deps.announce into the static #crafting-live node.
@@ -171,6 +174,12 @@ describe('renderCraftingWindow craft-cast UX', () => {
     expect(btn!.getAttribute('aria-busy')).toBe('true');
     expect(btn!.classList.contains('casting')).toBe(true);
     expect(btn!.querySelector('.crafting-craft-chip')!.textContent).toMatch(/Crafting/);
+    // The build itself renders the strip when a session is ACTIVE: the focus
+    // ladder runs inside renderCraftingWindow, and focus() on a display:none
+    // node is a no-op in a real browser (focus would fall to body and the
+    // Tab trap would let go), so the inline flex must exist BEFORE any
+    // painter frame.
+    expect(el.querySelector<HTMLElement>('.crafting-cast-progress')!.style.display).toBe('flex');
     const { painter, elements } = stripPainter(el);
     painter.paint(castInput(session.progress, session.remainingSec));
     expect(elements.bar.style.display).toBe('flex');

@@ -240,6 +240,12 @@ export function renderCraftingWindow(
   progress.innerHTML =
     `<div class="crafting-cast-progress-track"><div class="crafting-cast-progress-fill"></div><span class="crafting-cast-progress-label"></span><span class="crafting-cast-progress-timer"></span></div>` +
     `<span class="crafting-cast-progress-batch"></span>`;
+  // Rendered SYNCHRONOUSLY when a cast is live: the focus ladder below may
+  // pick the strip, and focus() on a display:none element is a no-op in a
+  // real browser (focus would fall to body and the Tab trap would let go).
+  // The HUD's CastBarPainter writes the same 'flex' a moment later through
+  // the elided writers; this inline write is the build-time precondition.
+  if (session.active) progress.style.display = 'flex';
   el.appendChild(progress);
   const batchEl = progress.querySelector<HTMLElement>('.crafting-cast-progress-batch');
   if (batchEl) {
