@@ -14395,6 +14395,8 @@ export class Hud {
       // focus on the selected tab (onSelectCraft's refocus target) after the
       // crafting trap is installed so the handoff never strands focus on body.
       ($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();
+    } else {
+      this.focusManager.focusFirst($('#crafting-window'));
     }
   }
 
