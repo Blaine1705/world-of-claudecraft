@@ -80,6 +80,15 @@ function teleport(sim: AnySim, e: AnyEntity, x: number, z: number): void {
   sim.rebucket(e);
 }
 
+function requireValue<T>(value: T | null | undefined, context: string): T {
+  if (value == null) throw new Error(`${context} was not available`);
+  return value;
+}
+
+function requireEntity(sim: AnySim, id: number, context: string): AnyEntity {
+  return requireValue(sim.entities.get(id), context) as AnyEntity;
+}
+
 // Stand an entity exactly on a gather node, addressed by ID, with the position
 // read from content instead of copied into a literal here.
 //
@@ -830,8 +839,11 @@ function arena1v1(): Scenario {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
-      teleport(sim, sim.entities.get(a)!, 0, -40);
-      teleport(sim, sim.entities.get(b)!, 6, -40);
+      const playerA = sim.entities.get(a);
+      const playerB = sim.entities.get(b);
+      if (!playerA || !playerB) throw new Error('arena_1v1 setup failed to spawn players');
+      teleport(sim, playerA, 0, -40);
+      teleport(sim, playerB, 6, -40);
       sim.arenaQueueJoin(a);
       sim.arenaQueueJoin(b);
       rec.tick(1); // matchmake
@@ -874,7 +886,7 @@ function fiesta(): Scenario {
       ];
       const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 4, -40);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 4, -40);
       });
       pids.forEach((pid) => {
         sim.arenaQueueJoin(pid, 'fiesta');
@@ -936,7 +948,7 @@ function fiestaPowerups(): Scenario {
       ];
       const pids = classes.map((c, i) => sim.addPlayer(c, `P${i}`));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 4, -40);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 4, -40);
       });
       pids.forEach((pid) => {
         sim.arenaQueueJoin(pid, 'fiesta');
@@ -958,14 +970,19 @@ function fiestaPowerups(): Scenario {
         const p = f.powerups[0];
         if (p && p.state === 'ready') {
           const grabPid = match.teamA[0];
-          teleport(sim, sim.entities.get(grabPid)! as AnyEntity, p.x, p.z);
+          teleport(sim, requireEntity(sim, grabPid, 'parity scenario entity'), p.x, p.z);
           rec.tick(1);
         }
         // Hazard ring: close it tight and push a fighter well outside -> burn.
         f.ringRadius = 6;
         const origin = arenaOrigin(match.slot);
         const ringPid = match.teamA[0];
-        teleport(sim, sim.entities.get(ringPid)! as AnyEntity, origin.x + 30, origin.z);
+        teleport(
+          sim,
+          requireEntity(sim, ringPid, 'parity scenario entity'),
+          origin.x + 30,
+          origin.z,
+        );
         rec.tick(20); // ~1s; the ring burns twice a second
         // Down a cross-team fighter, then run their respawn timer out -> revive.
         const victimPid = match.teamB[0];
@@ -999,8 +1016,8 @@ function duelToWinner(): Scenario {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aleph', { autoEquip: true });
       const b = sim.addPlayer('mage', 'Bet', { autoEquip: true });
-      teleport(sim, sim.entities.get(a)!, 0, -40);
-      teleport(sim, sim.entities.get(b)!, 4, -40);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 0, -40);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 4, -40);
       rec.track(a, b);
       sim.duelRequest(b, a); // Aleph challenges Bet
       sim.duelAccept(b); // Bet accepts -> countdown
@@ -1048,7 +1065,7 @@ function arena2v2Wipe(): Scenario {
       const names = ['Aleph', 'Bet', 'Gimel', 'Dalet'];
       const pids = classes.map((c, i) => sim.addPlayer(c, names[i]));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 3, -40);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 3, -40);
       });
       rec.track(...pids);
       pids.forEach((pid) => {
@@ -1433,8 +1450,8 @@ function partyLoot(): Scenario {
       const b = sim.addPlayer('mage', 'Bbb');
       sim.partyInvite(b, a);
       sim.partyAccept(b);
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
       const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
         x: 20,
         y: terrainHeight(20, 22, sim.cfg.seed),
@@ -1489,9 +1506,9 @@ function l1LootDistribution(): Scenario {
       sim.partyAccept(b);
       sim.partyInvite(c, a);
       sim.partyAccept(c);
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
-      teleport(sim, sim.entities.get(c)!, 22, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
+      teleport(sim, requireEntity(sim, c, 'parity scenario entity'), 22, 20);
       const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, {
         x: 20,
         y: terrainHeight(20, 22, sim.cfg.seed),
@@ -1617,10 +1634,10 @@ function masterLoot(): Scenario {
       sim.partyAccept(c);
       sim.partyInvite(d, a);
       sim.partyAccept(d);
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
-      teleport(sim, sim.entities.get(c)!, 22, 20);
-      teleport(sim, sim.entities.get(d)!, 23, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
+      teleport(sim, requireEntity(sim, c, 'parity scenario entity'), 22, 20);
+      teleport(sim, requireEntity(sim, d, 'parity scenario entity'), 23, 20);
       // Leader-only switch, both message arms: enable (looter 0 = pinned to the
       // leader, a) above the drop's quality, then lower the threshold onto it.
       sim.setPartyLootMaster(true, 0, 'epic', a);
@@ -1830,7 +1847,7 @@ function fiestaMidcastKill(): Scenario {
       ];
       const pids = classes.map((c, i) => sim.addPlayer(c, `F${i}`));
       pids.forEach((pid, i) => {
-        teleport(sim, sim.entities.get(pid)!, i * 4, -40);
+        teleport(sim, requireEntity(sim, pid, 'parity scenario entity'), i * 4, -40);
       });
       pids.forEach((pid) => {
         sim.arenaQueueJoin(pid, 'fiesta');
@@ -2170,8 +2187,8 @@ function questLinkAbandon(): Scenario {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aleph'); // sharer
       const b = sim.addPlayer('mage', 'Bet'); // acceptor
-      teleport(sim, sim.entities.get(a)!, 20, 20);
-      teleport(sim, sim.entities.get(b)!, 21, 20);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 20, 20);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 21, 20);
       rec.notes.a = a;
       rec.notes.b = b;
       const questId = 'q_wolves';
@@ -4087,7 +4104,7 @@ function marketRoundTrip(): Scenario {
       teleport(sim, sim.entities.get(seller) as AnyEntity, merchant.pos.x, merchant.pos.z);
       teleport(sim, sim.entities.get(buyer) as AnyEntity, merchant.pos.x, merchant.pos.z);
       sim.addItem('wolf_fang', 4, seller);
-      sim.players.get(buyer)!.copper = 5000;
+      requireValue(sim.players.get(buyer), 'parity scenario player').copper = 5000;
       rec.notes.seller = seller;
       rec.notes.buyer = buyer;
       rec.snapshot('market-setup');
@@ -4126,20 +4143,29 @@ function marketRoundTrip(): Scenario {
 
       // 3) the buyer buys it: coin leaves the buyer, goods enter their bags, the
       // seller's proceeds (less the 5% cut) wait in their collection.
-      const sale = sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller')!;
+      const sale = requireValue(
+        sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
+        'parity scenario market listing',
+      );
       sim.marketBuy(sale.id, buyer);
       rec.snapshot('bought');
 
       // 4) list a second stack then reclaim it -> the escrow returns to the bags.
       sim.marketList('wolf_fang', 1, 150, seller);
-      const reclaim = sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller')!;
+      const reclaim = requireValue(
+        sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
+        'parity scenario market listing',
+      );
       sim.marketCancel(reclaim.id, seller);
       rec.snapshot('cancelled');
 
       // 5) list a third stack, force it past due, then run the once-a-second
       // sweep (updateMarket fires at tickCount % 20 === 0) -> returns to collection.
       sim.marketList('wolf_fang', 1, 200, seller);
-      const expiring = sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller')!;
+      const expiring = requireValue(
+        sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
+        'parity scenario market listing',
+      );
       expiring.expiresAt = sim.time - 1;
       rec.tick(20);
       rec.snapshot('expired');
@@ -4334,7 +4360,10 @@ function g1bXpPrestige(): Scenario {
       // 1. Rested accrual: park inside an inn footprint, out of combat, and tick.
       //    updateRested fires each regen-phase tick while isResting(p) is true,
       //    accruing a positive (sub-unit) pool off DT.
-      const innB = PROPS.buildings.find((b: any) => b.kind === 'inn')!;
+      const innB = requireValue(
+        PROPS.buildings.find((b: any) => b.kind === 'inn'),
+        'parity scenario building',
+      );
       teleport(sim, p, innB.x, innB.z);
       rec.tick(60);
       rec.notes.restedAfterAccrual = meta.restedXp;
@@ -4390,8 +4419,8 @@ function playerTrade(): Scenario {
       teleport(sim, sim.entities.get(b) as AnyEntity, 3, -40);
       sim.addItem('wolf_fang', 3, a);
       sim.addItem('baked_bread', 2, b);
-      sim.players.get(a)!.copper = 100;
-      sim.players.get(b)!.copper = 50;
+      requireValue(sim.players.get(a), 'parity scenario player').copper = 100;
+      requireValue(sim.players.get(b), 'parity scenario player').copper = 50;
       rec.notes.a = a;
       rec.notes.b = b;
       rec.snapshot('trade-setup');
@@ -4508,8 +4537,8 @@ function cardDuel(): Scenario {
       const sim = rec.sim as AnySim;
       const a = sim.addPlayer('warrior', 'Aleph');
       const b = sim.addPlayer('mage', 'Bet');
-      teleport(sim, sim.entities.get(a)!, 13, 2);
-      teleport(sim, sim.entities.get(b)!, 13, 2);
+      teleport(sim, requireEntity(sim, a, 'parity scenario entity'), 13, 2);
+      teleport(sim, requireEntity(sim, b, 'parity scenario entity'), 13, 2);
       sim.joinCardDuelQueue(a);
       sim.joinCardDuelQueue(b);
       rec.tick(1); // updateCardDuelQueue() matchmakes the pair (createCardHand x2)
@@ -4549,10 +4578,10 @@ function cardDuel(): Scenario {
 // literal is pinned here. Re-hunted after the new-realm quest pass shifted the
 // construction-time draw stream (quest camps + escort NPC spawns across the new
 // realms), again after the Eastbrook camp respacing thinned the zone-1 camp
-    // counts, again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
-    // clutch camps, the new elites) moved the shared stream once more, again
-    // (5 -> 2) after the Galecrest unspawnable-quest camp fix, and back to 5
-    // when those late quest camps moved onto their private scatter stream.
+// counts, again (10 -> 5) after the zones 1 to 3 quest-dedupe content (egg
+// clutch camps, the new elites) moved the shared stream once more, again
+// (5 -> 2) after the Galecrest unspawnable-quest camp fix, and back to 5
+// when those late quest camps moved onto their private scatter stream.
 function professionsCraft(seed = 5): Scenario {
   return {
     name: 'professions_craft',

@@ -138,8 +138,9 @@ export class FocusManager {
       // Skip dismiss and explicitly secondary header actions on open so focus
       // lands on the window's primary content; keep them in the Tab cycle.
       const target =
-        focusables.find((el) => !el.matches('[data-close]') && !el.matches('[data-skip-open-focus]')) ??
-        focusables[0];
+        focusables.find(
+          (el) => !el.matches('[data-close]') && !el.matches('[data-skip-open-focus]'),
+        ) ?? focusables[0];
       (target ?? root).focus();
     }, 0);
   }
