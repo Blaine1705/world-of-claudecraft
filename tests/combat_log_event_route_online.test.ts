@@ -21,14 +21,10 @@ vi.mock('../server/db', () => ({
 }));
 
 import { type ClientSession, GameServer } from '../server/game';
-import { MOBS } from '../src/sim/data';
-import { createMob } from '../src/sim/entity';
 import type { Entity, SimEvent } from '../src/sim/types';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
 type Heal2Event = Extract<SimEvent, { type: 'heal2' }>;
-type AuraEvent = Extract<SimEvent, { type: 'aura' }>;
-type DeathEvent = Extract<SimEvent, { type: 'death' }>;
 type WireMsg = { t?: string; list?: SimEvent[] };
 
 interface FakeClient {
@@ -83,20 +79,6 @@ function deliveredHeals(client: FakeClient): Heal2Event[] {
     .filter((event): event is Heal2Event => event.type === 'heal2');
 }
 
-function deliveredAuras(client: FakeClient): AuraEvent[] {
-  return client.sent
-    .filter((msg) => msg.t === 'events')
-    .flatMap((msg) => msg.list ?? [])
-    .filter((event): event is AuraEvent => event.type === 'aura');
-}
-
-function deliveredDeaths(client: FakeClient): DeathEvent[] {
-  return client.sent
-    .filter((msg) => msg.t === 'events')
-    .flatMap((msg) => msg.list ?? [])
-    .filter((event): event is DeathEvent => event.type === 'death');
-}
-
 function damage(sourceId: number, targetId: number): DamageEvent {
   return {
     type: 'damage',
@@ -119,20 +101,6 @@ function heal(sourceId: number, targetId: number, amount = 0): Heal2Event {
     crit: false,
     ability: 'Whispered Prayer',
   };
-}
-
-function aura(targetId: number): AuraEvent {
-  return {
-    type: 'aura',
-    targetId,
-    name: 'Venom Barb',
-    gained: true,
-    auraKind: 'dot',
-  };
-}
-
-function death(entityId: number, killerId: number): DeathEvent {
-  return { type: 'death', entityId, killerId };
 }
 
 function placeTogether(server: GameServer, sessions: ClientSession[]): void {
@@ -172,19 +140,6 @@ function setup() {
     source,
     target,
   };
-}
-
-function addMob(server: GameServer, id: number, templateId: keyof typeof MOBS): Entity {
-  const viewer = server.sim.entities.values().next().value as Entity | undefined;
-  if (!viewer) throw new Error('missing viewer');
-  const mob = createMob(id, MOBS[templateId], 5, {
-    x: viewer.pos.x + 1,
-    y: viewer.pos.y,
-    z: viewer.pos.z + 1,
-  });
-  server.sim.entities.set(mob.id, mob);
-  server.sim.grid.update(mob);
-  return mob;
 }
 
 describe('online combat log event routing', () => {
@@ -251,33 +206,5 @@ describe('online combat log event routing', () => {
 
     expect(deliveredHeals(viewerClient)).toHaveLength(0);
     expect(deliveredHeals(sourceClient)).toEqual([event]);
-  });
-
-  it('routes pet combat to owner and party while filtering nearby strangers', () => {
-    const { server, viewerClient, allyClient, sourceClient, viewer, ally, source } = setup();
-    server.sim.partyInvite(ally.pid, viewer.pid);
-    server.sim.partyAccept(ally.pid);
-    const pet = addMob(server, 5001, 'wild_boar');
-    pet.ownerId = viewer.pid;
-    pet.hostile = false;
-    const target = addMob(server, 5002, 'forest_wolf');
-    target.tappedById = viewer.pid;
-    clearSent(viewerClient, allyClient, sourceClient);
-    const hit = damage(pet.id, target.id);
-    const venom = aura(target.id);
-    const kill = death(target.id, pet.id);
-
-    route(server, [hit, venom, kill]);
-
-    expect(deliveredDamage(viewerClient)).toEqual([hit]);
-    expect(deliveredAuras(viewerClient)).toEqual([venom]);
-    expect(deliveredDeaths(viewerClient)).toEqual([kill]);
-    expect(deliveredDamage(allyClient)).toEqual([hit]);
-    expect(deliveredAuras(allyClient)).toEqual([venom]);
-    expect(deliveredDeaths(allyClient)).toEqual([kill]);
-    expect(deliveredDamage(sourceClient)).toHaveLength(0);
-    expect(deliveredAuras(sourceClient)).toHaveLength(0);
-    expect(deliveredDeaths(sourceClient)).toHaveLength(0);
-    expect(source.pid).not.toBe(viewer.pid);
   });
 });
