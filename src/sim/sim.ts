@@ -438,7 +438,12 @@ import { advancePendingProjectiles, type PendingProjectile } from './projectile_
 import * as honorMod from './pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import {
+  catalogItemCompletion,
+  clearCountForSource,
+  curatorRankFromOwned,
   freshReliquaryState,
+  pageCompletion,
+  RELIQUARY_PAGES_BY_ID,
   type ReliquaryState,
   restoreReliquaryState,
   type SavedReliquaryState,
@@ -4428,6 +4433,38 @@ export class Sim {
   setActiveTitle(deedId: string | null, pid?: number): void {
     const r = this.resolve(pid);
     if (r) deedsMod.setActiveTitle(r.meta, r.e, deedId);
+  }
+  // --- IWorldReliquary: sparse firstFind / marks / recent + pure completion.
+  // Thin reads over primary.reliquary; item ownership still rides deedStats. ---
+  get reliquaryFirstFind(): Readonly<Record<string, import('./reliquary').ReliquaryFirstFind>> {
+    return this.primary.reliquary.firstFind;
+  }
+  get reliquaryMarks(): ReadonlySet<string> {
+    return this.primary.reliquary.marks;
+  }
+  get reliquaryRecent(): readonly string[] {
+    return this.primary.reliquary.recent;
+  }
+  reliquaryPageCompletion(pageId: string): import('../world_api').ReliquaryPageCompletion | null {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return null;
+    return pageCompletion(page, {
+      itemsDiscovered: this.primary.deedStats.itemsDiscovered,
+      marks: this.primary.reliquary.marks,
+    });
+  }
+  reliquaryCatalogCompletion(): import('../world_api').ReliquaryCatalogCompletion {
+    return catalogItemCompletion(this.primary.deedStats.itemsDiscovered);
+  }
+  reliquaryCuratorRank(): number {
+    return curatorRankFromOwned(
+      catalogItemCompletion(this.primary.deedStats.itemsDiscovered).owned,
+    );
+  }
+  reliquaryPageClearCount(pageId: string): number | undefined {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return undefined;
+    return clearCountForSource(this.primary, page.clearSource);
   }
   // Offline the sandbox has no population, so there is no rarity to report:
   // always null (the facet's documented no-data value; the window hides the

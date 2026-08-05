@@ -3363,6 +3363,7 @@ const ALL_DELTA_KEYS = [
   'prof',
   'qdone',
   'qlog',
+  'reliq',
   'renown',
   'salv',
   'sport',
@@ -3620,6 +3621,10 @@ function dirtyEveryDeltaField(): {
   meta.deedStats.dungeonClears.hollow_crypt = 2;
   meta.renown = 15;
   meta.activeTitle = 'prog_veteran';
+  // Reliquary sparse blob (`reliq`): one catalogued first-find + capped recent
+  // so the codec pin is non-vacuous (empty {} would pass first-snapshot only).
+  meta.reliquary.firstFind.cryptbone_helm = { clears: 2, pageId: 'conquerors_hollow_crypt' };
+  meta.reliquary.recent = ['cryptbone_helm'];
   // the Vale Cup sport kit swap ('sport' heavy key) and queue readout ('vcup')
   meta.sportRole = 'keeper';
   meta.talentMods.spec = 'arms';
@@ -4045,6 +4050,13 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.deedStats.dungeonClears).toEqual({ hollow_crypt: 2 });
     expect(client.renown).toBe(15); // renown (same name both sides, no rename)
     expect(client.activeTitle).toBe('prog_veteran'); // atitle -> activeTitle
+    // reliq fans out to reliquaryFirstFind / Marks / Recent (asserted directly like
+    // tal; no TERSE_TO_IWORLD rename). Sparse blob only; not a second discovery set.
+    expect(client.reliquaryFirstFind.cryptbone_helm).toEqual({
+      clears: 2,
+      pageId: 'conquerors_hollow_crypt',
+    });
+    expect(client.reliquaryRecent).toEqual(['cryptbone_helm']);
     // tal -> talents / talentSpec / loadouts / activeLoadout
     expect(client.talents).toEqual({ spec: 'arms', rows: {} });
     expect(client.talentSpec).toBe('arms');
@@ -4311,6 +4323,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // past the sorted-membership and delta-key-or-scalar checks; pin it out here.
     expect('vcup' in TERSE_TO_IWORLD).toBe(false);
     expect('vcupb' in TERSE_TO_IWORLD).toBe(false);
+    // reliq fans out to three IWorld members (firstFind / marks / recent), so it
+    // is asserted directly and must never grow a single-target rename entry.
+    expect('reliq' in TERSE_TO_IWORLD).toBe(false);
     // sorted-membership pin: adding or renaming an entry must be a deliberate,
     // reviewable change landing in alphabetical order
     expect(Object.keys(TERSE_TO_IWORLD)).toEqual([...Object.keys(TERSE_TO_IWORLD)].sort());

@@ -4223,6 +4223,18 @@ export type SimEvent = { pid?: number } & (
   // ID only, never English text; `retro` marks the on-join back-credit pass so
   // the client can batch those into one summary line instead of banner spam.
   | { type: 'deedUnlocked'; deedId: string; retro?: boolean }
+  // Reliquary first fill (always personal: emitted with pid). Id-only: exactly
+  // one of itemId / markId is set for a catalogued relic or authored mark.
+  // pageIds list pages that list the relic; illuminatedPageId is set when a
+  // page became complete on this fill. Never English; presentation only
+  // (sparse self blob is the membership authority).
+  | {
+      type: 'reliquaryUnlock';
+      itemId?: string;
+      markId?: string;
+      pageIds?: string[];
+      illuminatedPageId?: string;
+    }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from
   // Sim.addItem/addItemInstance's opts param (the one place either gets set):

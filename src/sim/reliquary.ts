@@ -173,28 +173,31 @@ function dungeonClearCount(
 
 /**
  * Hook from markItemDiscovered after a NEW item id enters itemsDiscovered.
- * Writes sparse firstFind + capped recent only for catalogued relic item ids.
- * Idempotent: a second call for the same id is a no-op on firstFind.
- * Does not call saveCharacter and does not dual-write discovery.
+ * Writes sparse firstFind + capped recent only for catalogued relic item ids,
+ * then emits id-only reliquaryUnlock for presentation. Idempotent: a second
+ * call for the same id is a no-op. Does not call saveCharacter and does not
+ * dual-write discovery.
  */
-export function onItemDiscovered(_ctx: SimContext, meta: PlayerMeta, itemId: string): void {
+export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: string): void {
   if (!isCataloguedRelicItem(itemId)) return;
-  noteRelicItemFind(meta, itemId);
+  if (!noteRelicItemFind(meta, itemId)) return;
+  emitReliquaryUnlock(ctx, meta, { itemId });
 }
 
 /**
  * Record first-find meta and push the recent ring for a catalogued item relic.
  * Safe to call only when the item is already in itemsDiscovered (the deeds hub
  * owns that set). Retro ownership without this call leaves firstFind absent.
+ * @returns true when a new firstFind entry was written.
  */
-export function noteRelicItemFind(meta: PlayerMeta, itemId: string): void {
+export function noteRelicItemFind(meta: PlayerMeta, itemId: string): boolean {
   const pageIds = RELIQUARY_ITEM_TO_PAGES.get(itemId);
-  if (!pageIds || pageIds.length === 0) return;
+  if (!pageIds || pageIds.length === 0) return false;
 
   const state = meta.reliquary;
   if (state.firstFind[itemId] !== undefined) {
     // Already noted: do not re-stamp clears or re-push recent.
-    return;
+    return false;
   }
 
   const pageId = pageIds[0];
@@ -205,15 +208,60 @@ export function noteRelicItemFind(meta: PlayerMeta, itemId: string): void {
   if (pageId) entry.pageId = pageId;
   state.firstFind[itemId] = entry;
   pushRecent(state, itemId);
+  return true;
 }
 
 /** Grant an authored non-item Reliquary mark (profession trophy, etc.). */
-export function noteReliquaryMark(meta: PlayerMeta, markId: string): boolean {
+export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: string): boolean {
   if (!RELIQUARY_MARK_IDS.has(markId)) return false;
   if (meta.reliquary.marks.has(markId)) return false;
   meta.reliquary.marks.add(markId);
   pushRecent(meta.reliquary, markId);
+  emitReliquaryUnlock(ctx, meta, { markId });
   return true;
+}
+
+/**
+ * Id-only presentation event for a new catalogued relic or mark. Never
+ * English. Membership authority stays on itemsDiscovered + sparse blob.
+ */
+function emitReliquaryUnlock(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  ids: { itemId?: string; markId?: string },
+): void {
+  const pageIds = ids.itemId !== undefined ? RELIQUARY_ITEM_TO_PAGES.get(ids.itemId) : undefined;
+  let illuminatedPageId: string | undefined;
+  if (pageIds && pageIds.length > 0) {
+    const opts = {
+      itemsDiscovered: meta.deedStats.itemsDiscovered,
+      marks: meta.reliquary.marks,
+    };
+    for (const pageId of pageIds) {
+      const page = RELIQUARY_PAGES_BY_ID[pageId];
+      if (!page) continue;
+      if (pageCompletion(page, opts).complete) {
+        illuminatedPageId = pageId;
+        break;
+      }
+    }
+  }
+  ctx.emit({
+    type: 'reliquaryUnlock',
+    pid: meta.entityId,
+    ...(ids.itemId !== undefined ? { itemId: ids.itemId } : {}),
+    ...(ids.markId !== undefined ? { markId: ids.markId } : {}),
+    ...(pageIds && pageIds.length > 0 ? { pageIds: [...pageIds] } : {}),
+    ...(illuminatedPageId !== undefined ? { illuminatedPageId } : {}),
+  });
+}
+
+/**
+ * Sparse wire blob for the heavy self snapshot. Reuses the omit-empty
+ * serialize shape; never a second full itemsDiscovered array.
+ */
+export function reliquaryWireBlob(state: ReliquaryState): SavedReliquaryState {
+  return serializeReliquaryState(state) ?? {};
 }
 
 function pushRecent(state: ReliquaryState, id: string): void {

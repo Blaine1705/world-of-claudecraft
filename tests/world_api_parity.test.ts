@@ -68,6 +68,7 @@ import type { IWorldPet } from '../src/world_api/pet';
 import type { IWorldProfessions } from '../src/world_api/professions';
 import type { IWorldProgressionXp } from '../src/world_api/progression_xp';
 import type { IWorldQuests } from '../src/world_api/quests';
+import type { IWorldReliquary } from '../src/world_api/reliquary';
 import type { IWorldSocialGraph } from '../src/world_api/social_graph';
 import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
@@ -401,6 +402,15 @@ export const IWORLD_MEMBERS = [
   { name: 'deedsRarity', kind: 'method' },
   { name: 'deedsRecent', kind: 'method' },
   { name: 'deedsLeaderboard', kind: 'method' },
+  // --- The Reliquary (IWorldReliquary): sparse firstFind / marks / recent +
+  // pure completion helpers (item ownership still rides deedStats) ---
+  { name: 'reliquaryFirstFind', kind: 'data' },
+  { name: 'reliquaryMarks', kind: 'data' },
+  { name: 'reliquaryRecent', kind: 'data' },
+  { name: 'reliquaryPageCompletion', kind: 'method' },
+  { name: 'reliquaryCatalogCompletion', kind: 'method' },
+  { name: 'reliquaryCuratorRank', kind: 'method' },
+  { name: 'reliquaryPageClearCount', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
@@ -528,10 +538,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // IWorldGuildBank members (guildBankInfo, one data read, plus five
     // commands), leaving 287. The guild bank ACTIVITY LOG adds one read member
     // (guildBankLog, a method because reading it is what requests the cold
-    // payload on demand: it has no snapshot key), leaving 288.
-    expect(IWORLD_MEMBERS.length).toBe(289);
-    expect(DATA_MEMBERS.length).toBe(74);
-    expect(METHOD_MEMBERS.length).toBe(215);
+    // payload on demand: it has no snapshot key), leaving 288. The Reliquary
+    // facet adds seven members (3 data + 4 methods), leaving 296.
+    expect(IWORLD_MEMBERS.length).toBe(296);
+    expect(DATA_MEMBERS.length).toBe(77);
+    expect(METHOD_MEMBERS.length).toBe(219);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -756,6 +767,13 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'recipeList',
       'releaseEmpoweredAbility',
       'releaseSpirit',
+      'reliquaryCatalogCompletion',
+      'reliquaryCuratorRank',
+      'reliquaryFirstFind',
+      'reliquaryMarks',
+      'reliquaryPageClearCount',
+      'reliquaryPageCompletion',
+      'reliquaryRecent',
       'renamePet',
       'renown',
       'reportTelemetry',
@@ -895,6 +913,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'questsDone',
       'realm',
       'recipeList',
+      'reliquaryFirstFind',
+      'reliquaryMarks',
+      'reliquaryRecent',
       'renown',
       'restedXp',
       'riftCollisionToken',
@@ -1070,6 +1091,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'rechargeToolEffect',
       'releaseEmpoweredAbility',
       'releaseSpirit',
+      'reliquaryCatalogCompletion',
+      'reliquaryCuratorRank',
+      'reliquaryPageClearCount',
+      'reliquaryPageCompletion',
       'renamePet',
       'reportTelemetry',
       'respec',
@@ -1617,6 +1642,19 @@ const FACET_DEEDS = [
 ] as const satisfies readonly (keyof IWorldDeeds)[];
 type _ExhaustDeeds = AssertNever<Exclude<keyof IWorldDeeds, (typeof FACET_DEEDS)[number]>>;
 
+const FACET_RELIQUARY = [
+  'reliquaryFirstFind',
+  'reliquaryMarks',
+  'reliquaryRecent',
+  'reliquaryPageCompletion',
+  'reliquaryCatalogCompletion',
+  'reliquaryCuratorRank',
+  'reliquaryPageClearCount',
+] as const satisfies readonly (keyof IWorldReliquary)[];
+type _ExhaustReliquary = AssertNever<
+  Exclude<keyof IWorldReliquary, (typeof FACET_RELIQUARY)[number]>
+>;
+
 const FACET_ACTION_BAR = [
   'saveActionBarLayout',
   'takeActionBarLayoutRestore',
@@ -1657,12 +1695,13 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   mounts: FACET_MOUNTS,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
+  reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
   it('pins the facet count', () => {
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(31);
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(32);
   });
 
   it('each facet array is non-empty and internally duplicate-free', () => {
@@ -1690,8 +1729,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(289);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(289);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(296);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(296);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

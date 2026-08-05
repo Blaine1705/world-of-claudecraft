@@ -63,6 +63,7 @@ import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/se
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
 import { questProgressForWire } from '../src/sim/quests/interact_object_credit';
+import { reliquaryWireBlob } from '../src/sim/reliquary';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import type { CharacterState, PetState, PlayerMeta } from '../src/sim/sim';
 import { MAX_CHAT_MESSAGE_LEN, Sim } from '../src/sim/sim';
@@ -690,6 +691,9 @@ const HEAVY_SELF_EVENTS = new Set<string>([
   'levelup',
   'virtualLevelUp',
   'deedUnlocked', // the earned map + stat block ride the heavy-gated deeds/dstats keys
+  // Reliquary sparse firstFind / marks / recent ride the heavy-gated `reliq`
+  // key. Presentation-only event (no saveCharacter on pure fill).
+  'reliquaryUnlock',
   'questAccepted',
   'questProgress',
   'questReady',
@@ -8210,6 +8214,11 @@ export class GameServer {
         visited: [...meta.deedStats.visited],
         dungeonClears: meta.deedStats.dungeonClears,
       });
+      // Reliquary sparse blob only: firstFind / marks / recent (omit-empty).
+      // Item ownership stays on dstats.itemsDiscovered; never a second full
+      // discovery array. Heavy-gated: reliquaryUnlock is a HEAVY_SELF_EVENTS
+      // member so a fill re-diffs on the next snapshot without saveCharacter.
+      maybe('reliq', reliquaryWireBlob(meta.reliquary));
       // talents/spec/loadouts: the client recomputes its known abilities from this.
       maybe('tal', {
         alloc: meta.talents,

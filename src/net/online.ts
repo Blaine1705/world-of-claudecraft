@@ -45,6 +45,15 @@ import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
+import {
+  catalogItemCompletion,
+  clearCountForSource,
+  curatorRankFromOwned,
+  pageCompletion,
+  RELIQUARY_PAGES_BY_ID,
+  restoreReliquaryState,
+  type SavedReliquaryState,
+} from '../sim/reliquary';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
 import { repairTalentLoadouts } from '../sim/talent_loadouts';
@@ -124,6 +133,9 @@ import {
   type PresenceStatus,
   type RaidLockout,
   type RecipeDef,
+  type ReliquaryCatalogCompletion,
+  type ReliquaryFirstFindView,
+  type ReliquaryPageCompletion,
   type RiftFloorView,
   type SocialInfo,
   type ToolEffectSlotView,
@@ -1533,6 +1545,12 @@ export class ClientWorld implements IWorld {
   deedStats: DeedStats = freshDeedStats();
   renown = 0;
   activeTitle: string | null = null;
+  // --- IWorldReliquary: sparse firstFind / marks / recent from heavy-gated
+  // `s.reliq`. Item ownership still rides deedStats.itemsDiscovered (never a
+  // second discovery blob). `reliquaryUnlock` is presentation-only. ---
+  reliquaryFirstFind: Record<string, ReliquaryFirstFindView> = {};
+  reliquaryMarks: Set<string> = new Set();
+  reliquaryRecent: string[] = [];
   // --- IWorldDelves: active delve run + companion + marks/upgrades + daily, all
   // mirrored from the snapshot self (delta-omitted). lockpickState is the exception:
   // it has NO snapshot field and is rebuilt from the lockpick* events by the private
@@ -3365,6 +3383,16 @@ export class ClientWorld implements IWorld {
       }
       if (s.renown !== undefined) this.renown = s.renown ?? 0;
       if (s.atitle !== undefined) this.activeTitle = s.atitle ?? null;
+      // --- IWorldReliquary self-decode: `reliq` is heavy-gated and delta-omitted
+      // (a missing key keeps the prior mirror). Payload is the omit-empty
+      // SavedReliquaryState shape; never a second full itemsDiscovered array.
+      // `reliquaryUnlock` events are presentation only and never touch these. ---
+      if (s.reliq !== undefined) {
+        const restored = restoreReliquaryState((s.reliq ?? {}) as SavedReliquaryState | undefined);
+        this.reliquaryFirstFind = restored.firstFind;
+        this.reliquaryMarks = restored.marks;
+        this.reliquaryRecent = restored.recent;
+      }
       if (s.lroll !== undefined) this.lootRollPrompts = s.lroll ?? [];
       if (s.lrollg !== undefined) this.lootRollGroup = s.lrollg ?? [];
       if (s.mloot !== undefined) this.masterLootPrompts = s.mloot ?? [];
@@ -4702,6 +4730,32 @@ export class ClientWorld implements IWorld {
   // sim validator accepts, so a rejected send leaves the client untouched. ---
   setActiveTitle(deedId: string | null): void {
     this.cmd({ cmd: 'deed_set_title', deedId });
+  }
+  // --- IWorldReliquary pure completion helpers: recompute from catalog +
+  // mirrored ownership (deedStats.itemsDiscovered + sparse marks). Identical
+  // offline Sim formulas so online/offline answer the same for scripted state. ---
+  reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return null;
+    return pageCompletion(page, {
+      itemsDiscovered: this.deedStats.itemsDiscovered,
+      marks: this.reliquaryMarks,
+    });
+  }
+  reliquaryCatalogCompletion(): ReliquaryCatalogCompletion {
+    return catalogItemCompletion(this.deedStats.itemsDiscovered);
+  }
+  reliquaryCuratorRank(): number {
+    return curatorRankFromOwned(catalogItemCompletion(this.deedStats.itemsDiscovered).owned);
+  }
+  reliquaryPageClearCount(pageId: string): number | undefined {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    if (!page) return undefined;
+    // clearCountForSource reads deedStats + delveClears; ClientWorld mirrors both.
+    return clearCountForSource(
+      { deedStats: this.deedStats, delveClears: this.delveClears },
+      page.clearSource,
+    );
   }
   // The global rarity aggregate: a lazy anonymous REST read (the daily-rewards
   // async-read variant), resolving the endpoint payload verbatim or null on

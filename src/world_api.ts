@@ -48,6 +48,7 @@
 //   dungeon_finder.ts   IWorldDungeonFinder  Dungeon Finder queue/proposals/premade board
 //   deeds.ts            IWorldDeeds          earned deeds, lifetime stats, renown, active title,
 //                                            rarity + the account-Renown leaderboard reads
+//   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -85,6 +86,7 @@ import type { IWorldPet } from './world_api/pet';
 import type { IWorldProfessions } from './world_api/professions';
 import type { IWorldProgressionXp } from './world_api/progression_xp';
 import type { IWorldQuests } from './world_api/quests';
+import type { IWorldReliquary } from './world_api/reliquary';
 import type { IWorldSocialGraph } from './world_api/social_graph';
 import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
@@ -217,6 +219,11 @@ export type {
   LeaderboardEntry,
 } from './world_api/progression_xp';
 export type {
+  ReliquaryCatalogCompletion,
+  ReliquaryFirstFindView,
+  ReliquaryPageCompletion,
+} from './world_api/reliquary';
+export type {
   CharacterProfile,
   CharacterSearchResult,
   FriendInfo,
@@ -276,6 +283,7 @@ export interface IWorld
     IWorldDungeonFinder,
     IWorldActionBar,
     IWorldDeeds,
+    IWorldReliquary,
     IWorldMounts {}
 
 // ---------------------------------------------------------------------------
@@ -610,6 +618,7 @@ export type WorldFacet =
   | 'IWorldDungeonFinder'
   | 'IWorldActionBar'
   | 'IWorldDeeds'
+  | 'IWorldReliquary'
   | 'IWorldMounts';
 
 export const COMMAND_FACETS = {

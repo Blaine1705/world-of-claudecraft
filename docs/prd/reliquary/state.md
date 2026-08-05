@@ -26,13 +26,14 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 2 complete. Ready for Phase 2 QA, then Phase 3
-  (IWorld + wire thrift).
+- **Current phase:** Phase 3 complete. Ready for Phase 3 QA (then Phase 4 UI).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, run Phase 2 QA (content + state pins, tsc, checklist
-  in progress.md), then Phase 3: IWorld facet, sparse wire, ClientWorld parity.
+  `origin/release/v0.35.0`, then Phase 3 QA: re-run wire/parity validation,
+  confirm performance budget Phase 3 row, specialist reviews as needed. Do
+  **not** start Phase 4 UI until Phase 3 QA is green.
 - **Blocker:** none.
-- **Release tip at Phase 2:** `de450dc41f` (already up to date on merge).
+- **Release tip at Phase 3:** `5e83ba89d0` (merged fine-material bag UI from
+  release during Phase 3 start).
 
 ## Locked design decisions
 
@@ -66,9 +67,15 @@ session load:
 |---|---|
 | Design contract | `docs/design/reliquary.md` |
 | Catalog types + Conqueror pages | `src/sim/content/reliquary.ts` (`RELIQUARY_PAGES`, `RELIQUARY_HEROIC_GEAR`, `RELIQUARY_SET_MEMBERS`, `isCataloguedRelicItem`) |
-| Runtime + serialize | `src/sim/reliquary.ts` (`ReliquaryState`, `onItemDiscovered`, pure completion, `deed_stat` clear reads) |
+| Runtime + serialize | `src/sim/reliquary.ts` (`ReliquaryState`, `onItemDiscovered`, pure completion, `deed_stat` clear reads, `reliquaryWireBlob`) |
 | Discovery hub | `src/sim/deeds.ts` `markItemDiscovered` (calls `onItemDiscovered`) |
 | Player state field | `PlayerMeta.reliquary` / `CharacterState.reliquary` in `src/sim/sim.ts` |
+| IWorld facet | `src/world_api/reliquary.ts` (`IWorldReliquary`) |
+| Wire event | `reliquaryUnlock` in `src/sim/types.ts` SimEvent union |
+| Heavy self key | `reliq` in `server/game.ts` (HEAVY_SELF + `reliquaryUnlock` in HEAVY_SELF_EVENTS) |
+| ClientWorld mirror | `src/net/online.ts` (`reliquaryFirstFind` / Marks / Recent + completion helpers) |
+| Parity pin | `tests/world_api_parity.test.ts` (296 members, 32 facets) |
+| Wire thrift tests | `tests/reliquary_wire.test.ts` |
 | Grant hub | `src/sim/sim.ts` `addItem` / `addItemInstance` |
 | DeedStats | `src/sim/types.ts` `DeedStats` |
 | Dungeon clears | `deedStats.dungeonClears`, `FINAL_BOSS_DUNGEONS` |
@@ -80,7 +87,7 @@ session load:
 | Mounts | `src/sim/mounts.ts`, `src/sim/content/mounts.ts` |
 | Weapon skins | `src/sim/content/weapon_skins.ts` + account cosmetics |
 | Autosave | `server/game.ts` `AUTOSAVE_SECONDS = 30` |
-| Heavy self | `server/game.ts` self wire / `dstats` |
+| Heavy self | `server/game.ts` self wire / `dstats` / `reliq` |
 | Deeds UI exemplar | `src/ui/deeds_view.ts`, `deeds_window.ts` |
 | Interface standard | `DESIGN.md` |
 | Deeds doctrine | `docs/design/deeds.md` |
@@ -98,8 +105,10 @@ session load:
 | `onItemDiscovered` / `noteRelicItemFind` | `src/sim/reliquary.ts` | **landed** |
 | `pageCompletion` / `catalogItemCompletion` / `curatorRankFromOwned` | `src/sim/reliquary.ts` | **landed** |
 | `RELIQUARY_RECENT_CAP` (12) | `src/sim/reliquary.ts` | **landed** |
-| `reliquaryUnlock` SimEvent | `src/sim/types.ts` | planned (Phase 3) |
-| `IWorldReliquary` | `src/world_api/reliquary.ts` | planned (Phase 3) |
+| `reliquaryUnlock` SimEvent | `src/sim/types.ts` | **landed** (id-only) |
+| `IWorldReliquary` | `src/world_api/reliquary.ts` | **landed** |
+| `reliq` wire key | `server/game.ts` / `src/net/online.ts` | **landed** (heavy-gated sparse) |
+| `reliquaryWireBlob` | `src/sim/reliquary.ts` | **landed** |
 | `buildReliquaryView` | `src/ui/reliquary_view.ts` | planned (Phase 4) |
 | `ReliquaryWindow` | `src/ui/reliquary_window.ts` | planned (Phase 4) |
 | `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | planned (Phase 4) |
@@ -125,7 +134,7 @@ session load:
 - [x] firstFind / marks only catalog ids
 - [x] recent ring buffer capped (plan: 12)
 - [x] Content pins prevent unbounded auto-scrape of entire loot tables (Phase 2)
-- [ ] Wire event id-only; sparse blob dirty-gated (Phase 3)
+- [x] Wire event id-only; sparse blob dirty-gated (Phase 3)
 - [ ] Cold window: signature latch; no per-frame full rebuild (Phase 4+)
 
 ## Gotchas
@@ -149,6 +158,9 @@ session load:
   completion math but do **not** receive invented firstFind clear history.
 - Mount reins appear on `HEROIC_BOSS_LOOT` but stay off Conqueror pages
   (Horizons Phase 8).
+- Phase 3: `reliquaryUnlock` is presentation-only; membership authority is
+  `dstats.itemsDiscovered` + sparse `reliq`. Do not mutate ClientWorld mirrors
+  from the event.
 
 ## Research notes (plan-time)
 
