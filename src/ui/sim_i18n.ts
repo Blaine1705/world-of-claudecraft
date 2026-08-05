@@ -8074,8 +8074,6 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Old Blood': 'aura.oldBlood',
   Verdance: 'aura.verdance',
   'Loping Stride': 'aura.lopingStride',
-  // Marrowbreak's tank absorb guard (the absorb effect's aura in
-  // combat/effect_dispatch.ts carries the ability's display name).
   Marrowbreak: 'aura.marrowbreak',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
   // src/sim/content/classes.ts); shown on the buff bar and combat log.
