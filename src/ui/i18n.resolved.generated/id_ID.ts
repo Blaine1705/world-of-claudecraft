@@ -2735,7 +2735,6 @@ export const id_ID: EnTranslations = {
       "masterworkZoneLine": "{crafter} membuat karya besar {name}!",
       "tierUpToast": "{craft} maju ke tingkat {tier}!",
       "skillUpToast": "{skill} skill increased to {level}!",
-      "skillUpTitle": "{skill}",
       "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Tanganmu cenderung ke {archetype}. Penyelarasannya menunggumu dengan {master}.",
       "trendNudgeNoMaster": "Tanganmu cenderung ke {archetype}. Carilah seorang master kerajinan untuk mengambilnya.",

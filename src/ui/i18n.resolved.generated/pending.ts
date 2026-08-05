@@ -11,103 +11,68 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "es_ES": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "fr_FR": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "fr_CA": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "en_CA": [],
   "it_IT": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "de_DE": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
-  "zh_CN": [
-    "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
-    "hudChrome.crafting.skillUpToast"
-  ],
-  "zh_TW": [
-    "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
-    "hudChrome.crafting.skillUpToast"
-  ],
-  "ko_KR": [
-    "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
-    "hudChrome.crafting.skillUpToast"
-  ],
-  "ja_JP": [
-    "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
-    "hudChrome.crafting.skillUpToast"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
-  "ru_RU": [
-    "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
-    "hudChrome.crafting.skillUpToast"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "nl_NL": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "pl_PL": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "id_ID": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "tr_TR": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "sv_SE": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "vi_VN": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ],
   "da_DK": [
     "hudChrome.crafting.skillUpSubtext",
-    "hudChrome.crafting.skillUpTitle",
     "hudChrome.crafting.skillUpToast"
   ]
 };

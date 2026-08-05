@@ -2735,7 +2735,6 @@ export const pl_PL: EnTranslations = {
       "masterworkZoneLine": "{crafter} stworzył arcydzieło {name}!",
       "tierUpToast": "{craft} awansowany na poziom {tier}!",
       "skillUpToast": "{skill} skill increased to {level}!",
-      "skillUpTitle": "{skill}",
       "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Twoje ręce skłaniają się ku {archetype}. Jego dostrojenie czeka u {master}.",
       "trendNudgeNoMaster": "Twoje ręce skłaniają się ku {archetype}. Poszukaj mistrza rzemiosła, by je podjąć.",

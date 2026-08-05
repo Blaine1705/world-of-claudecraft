@@ -2735,7 +2735,6 @@ export const nl_NL: EnTranslations = {
       "masterworkZoneLine": "{crafter} heeft het meesterwerk {name} gemaakt!",
       "tierUpToast": "{craft} is doorgegaan naar niveau {tier}!",
       "skillUpToast": "{skill} skill increased to {level}!",
-      "skillUpTitle": "{skill}",
       "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Je handen neigen naar {archetype}. De afstemming wacht bij {master}.",
       "trendNudgeNoMaster": "Je handen neigen naar {archetype}. Zoek een ambachtsmeester om dit op te pakken.",

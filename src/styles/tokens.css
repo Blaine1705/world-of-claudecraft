@@ -23,17 +23,15 @@
     --color-deed-banner-text: #ffe27a;
     --color-deed-banner-border: #b8902a;
     --color-deed-banner-bg: rgb(26 21 12 / 92%);
-    /* Profession skill level-up plate (#banner.banner-skill). Warm copper
-       craft language, framed so a Mining 47 toast can never read as a
+    /* Gathering skill milestone plate (#banner.banner-skill). Warm copper
+       craft language, framed so a Mining 50 plate can never read as a
        character level-up (the bare --gold celebration). Distinct from the
-       parchment deed plate so both earned moments keep their own identity. */
+       parchment deed plate so both earned moments keep their own identity.
+       The gradient token drops the --color- prefix (the --panel-bg
+       precedent: --color-* names hold plain colors). */
     --color-skill-banner-text: #f0d078;
     --color-skill-banner-border: #c49a3c;
-    --color-skill-banner-bg: linear-gradient(
-      165deg,
-      rgb(42 32 14 / 94%) 0%,
-      rgb(18 14 8 / 96%) 100%
-    );
+    --skill-banner-bg: linear-gradient(165deg, rgb(42 32 14 / 94%) 0%, rgb(18 14 8 / 96%) 100%);
     --color-skill-banner-subtext: #e8d8a8;
     --color-skill-banner-inset: rgb(255 209 0 / 14%);
     --border: #6f5a2a;

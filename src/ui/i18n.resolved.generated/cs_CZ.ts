@@ -2735,7 +2735,6 @@ export const cs_CZ: EnTranslations = {
       "masterworkZoneLine": "{crafter} vytvořil mistrovské dílo {name}!",
       "tierUpToast": "{craft} postoupilo do úrovně {tier}!",
       "skillUpToast": "{skill} skill increased to {level}!",
-      "skillUpTitle": "{skill}",
       "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Tvoje ruce se klonívají k {archetype}. Jeho nalaďování tě čeká u {master}.",
       "trendNudgeNoMaster": "Tvoje ruce se klonívají k {archetype}. Vyhledej mistra řemesla a ujmi se ho.",

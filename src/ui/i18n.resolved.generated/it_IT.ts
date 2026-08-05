@@ -2735,7 +2735,6 @@ export const it_IT: EnTranslations = {
       "masterworkZoneLine": "{crafter} ha realizzato un capolavoro {name}!",
       "tierUpToast": "{craft} è avanzato al livello {tier}!",
       "skillUpToast": "{skill} skill increased to {level}!",
-      "skillUpTitle": "{skill}",
       "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Le tue mani tendono verso {archetype}. La sua sintonizzazione attende con {master}.",
       "trendNudgeNoMaster": "Le tue mani tendono verso {archetype}. Cerca un maestro artigiano per intraprenderlo.",
