@@ -1098,6 +1098,10 @@ async function startGame(
   // hoisting them ahead of mountGameUi is safe; everything DOM-bound (canvas
   // lookups, the context-lost listeners) stays below, after the template mounts.
   const settings = new Settings();
+  // "Stop Auto-Attack on Target Switch" (issue #1358) is authoritative on the
+  // sim, so a stored player preference must be re-pushed on every world entry
+  // (offline sim or online server), not just when the Options toggle changes.
+  world.setStopAutoAttackOnTargetSwitch(settings.get('stopAutoAttackOnTargetSwitch'));
   // First-run graphics default: until a device default has been applied (the dedicated
   // graphicsDefaultApplied marker, NOT the graphicsPreset key, which save() def-fills the moment
   // any unrelated setting is stored), probe the device (GPU name, memory, cores, touch) and
@@ -1430,8 +1434,6 @@ async function startGame(
     entryDiagnostics.markStable('[entry-guard] world entry stable; runtime probe armed');
   }, ENTRY_PROBE_STABLE_MS);
 
-  // Offline only: expose the dev "2v2 Fiesta vs Bots" practice toggle to the HUD.
-  if (offlineSim) hud.setFiestaPracticeHook(() => offlineSim.startFiestaPractice());
   // The Vale Cup practice-vs-bots button (the window calls world.vcupPracticeStart
   // through IWorld). Private instanced practice works online AND offline, so the
   // button is always available.
@@ -1739,6 +1741,9 @@ async function startGame(
           case 'valecup':
             hud.toggleValeCup();
             break;
+          case 'bgFlag':
+            bgFlagKey();
+            break;
           case 'mount':
             // Ride the pick immediately (every player always has one; the
             // character sheet's picker is where the pick changes).
@@ -2015,6 +2020,9 @@ async function startGame(
       case 'valecup':
         hud.toggleValeCup();
         break;
+      case 'bgFlag':
+        bgFlagKey();
+        break;
       case 'mount':
         world.toggleMounted();
         break;
@@ -2212,6 +2220,13 @@ async function startGame(
       settings.set('startAttackOnAbilityUse', !!value);
       return;
     }
+    if (key === 'stopAutoAttackOnTargetSwitch') {
+      // Authoritative on the sim (issue #1358): persist locally AND mirror the
+      // live value onto the player, so the very next target switch honors it.
+      const v = settings.set('stopAutoAttackOnTargetSwitch', !!value);
+      world.setStopAutoAttackOnTargetSwitch(v);
+      return;
+    }
     if (key === 'showAttackButton') {
       // Slot-0 mode switch, read LIVE by the HUD (attackSlotIsAttack): ON keeps the
       // classic Attack toggle; OFF turns the first slot into a normal assignable one
@@ -2267,6 +2282,15 @@ async function startGame(
     }
     if (key === 'compactChat') {
       document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
+      return;
+    }
+    if (key === 'hideUnusedActionSlots') {
+      // Purely presentational (issue 2429): a body class the action-bar CSS reads
+      // to strip the empty-slot chrome. No live subsystem to update.
+      document.body.classList.toggle(
+        'hide-unused-action-slots',
+        settings.set('hideUnusedActionSlots', !!value),
+      );
       return;
     }
     if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
@@ -2796,6 +2820,15 @@ async function startGame(
     online.onReconnected = () => {
       priorOnReconnected?.();
       hud.marketResyncAfterReconnect();
+      // A fresh join (as opposed to a resume within the linkdead grace window)
+      // hands the server a brand-new PlayerMeta with stopAutoAttackOnTargetSwitch
+      // undefined, so the stored preference needs a re-push, the same way it is
+      // pushed once on world entry above. onReconnected fires before ClientWorld
+      // marks itself connected again, so any send from here would be silently
+      // dropped; ClientWorld owns the re-push itself (it remembers the last
+      // value passed to setStopAutoAttackOnTargetSwitch and replays it right
+      // after connected flips true, and again after spectate ends), so nothing
+      // needs to happen on this side.
     };
     // A hosted dev/PBE realm booted with ALLOW_DEV_COMMANDS=1 lights the /dev GUI
     // even in a production client build, where import.meta.env.DEV is false. That
@@ -3068,6 +3101,14 @@ async function startGame(
       }
     }
   }
+  // The deliberate Thornhollow Fields flag press. Inside a live match the bare interact
+  // key also routes here (the field has no other interactables), which gives
+  // the mobile interact button flag parity for free; the world owns every rule
+  // (radius, team, the return-beats-press race), so a stray press is a no-op.
+  function bgFlagKey(): void {
+    if (world.bgInfo?.match) world.bgFlagAction();
+  }
+
   // The R40 per-use effect confirm gate, shared by every gather entry point
   // (world click, interact key, gathering-tool use): the pure question from
   // the view core, the ask through the HUD's confirm-dialog family. The
@@ -3078,6 +3119,10 @@ async function startGame(
       hud.confirmToolEffectUse(prompt, proceed),
   };
   function interactKey(): void {
+    if (world.bgInfo?.match?.state === 'active') {
+      world.bgFlagAction();
+      return;
+    }
     stopAutorunForInteraction(
       tryNearbyInteraction(
         world,

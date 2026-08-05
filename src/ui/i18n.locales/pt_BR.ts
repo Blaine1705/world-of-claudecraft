@@ -2348,9 +2348,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'O Irmão Halven marca seus mapas: um belo dia para desbravar o Relicário Desmoronado.',
   'hudChrome.calendar.events.delveDay.title': 'Dia de Incursão',
-  'hudChrome.calendar.events.fiestaNight.note':
-    'O ringue da Fiesta 2v2 atrai suas plateias mais barulhentas esta noite.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Noite de Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'Pescadores se enfileiram nos lagos. Traga uma vara e troque histórias de pesca.',
   'hudChrome.calendar.events.fishingDerby.title': 'Torneio de Pesca',
@@ -3422,7 +3419,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Mais',
   'hud.core.mobileMoreAria': 'Mostrar mais menus',
   'hud.core.mobileSocial': 'Comunidade',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menu',
   'hud.core.mobileSettings': 'Configurações',
   'hud.core.mobileUse': 'Usar',
@@ -3532,7 +3528,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Alternar placas de nome',
   'hud.keybinds.actions.meters': 'Medidores de dano',
   'hud.keybinds.actions.social': 'Amigos e guilda',
-  'hud.keybinds.actions.arena': 'Arena (Coliseu Cinzento)',
   'hud.keybinds.actions.chat': 'Abrir chat',
   'hud.keybinds.actions.attack': 'Atacar',
   'hud.keybinds.actions.actionBarSlot': 'Barra de ação {slot}',
@@ -4888,6 +4883,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Pele de espreitador da crista',
   'entities.items.old_cragmaws_pelt.name': 'Pele do Velho Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Cinta de caça de Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Aljava de caça de Cragmaw',
   'entities.items.glowing_wax.name': 'Cera brilhante',
   'entities.items.ogre_war_totem.name': 'Totem de guerra ogro',
   'entities.items.storm_core.name': 'Núcleo da tempestade',
@@ -4964,6 +4960,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': 'Colete de escamas de Mirejaw',
   'entities.items.moggers_copper_cudgel.name': 'Porrete de cobre de Mogger',
   'entities.items.moggers_shiv.name': 'Faca de Mogger',
+  'entities.items.moggers_hide_quiver.name': 'Aljava de couro de Mogger',
   'entities.items.moggers_stomper_boots.name': 'Botas pisoteadoras de Mogger',
   'entities.items.necromancers_legwraps.name': 'Envoltórios de Perna Mournweave',
   'entities.items.necromancers_soulsteps.name': 'Passos de Alma Mournweave',
@@ -4988,6 +4985,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': 'Espaldares Osso de Cripta',
   'entities.items.deathlords_dread_visage.name': 'Visagem Pavorosa de Barrowlord',
   'entities.items.gravewyrm_gauntlets.name': 'Manoplas do Gravewyrm',
+  'entities.items.gravewyrm_bone_quiver.name': 'Aljava de osso do Gravewyrm',
   'entities.items.gravewyrm_mantle.name': 'Manto do Gravewyrm',
   'entities.items.mistveil_cord.name': 'Cordão Véu-neblina',
   'entities.items.mistveil_grips.name': 'Pegas Véu-neblina',
@@ -5905,7 +5903,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'EMPATE NA FIESTA! Disputa acirrada!',
   'fiesta.end.loss': 'FIESTA PERDIDA! Tente de novo!',
   'fiesta.end.win': 'FIESTA VENCIDA! 🎉 Que festa!',
-  'fiesta.enterQueue': 'Entre na Fiesta!',
   'fiesta.error.leaderOnly': 'Apenas o líder do grupo pode inscrever sua equipe em {label}.',
   'fiesta.error.noAugment': 'Você não tem nenhum aprimoramento para escolher agora.',
   'fiesta.error.notOnOffer': 'Esse aprimoramento não está disponível.',
@@ -5922,9 +5919,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Colosso',
   'fiesta.powerup.pow_moon_boots.name': 'Botas Lunares',
   'fiesta.powerup.pow_speed_demon.name': 'Demônio da Velocidade',
-  'fiesta.practice': '🎉 Treino contra Bots',
-  'fiesta.practiceNote':
-    'Treino offline: invoca 3 bots de IA e inscreve você em uma Fiesta 2v2. Clique de novo para parar.',
   'fiesta.queue.join': 'Você entra na fila da Fiesta 2v2. Prepare-se para a FESTA…',
   'fiesta.queue.leave': 'Você sai da fila da Fiesta 2v2.',
   'fiesta.queue.teamLeave': 'Sua equipe sai da fila da Fiesta 2v2.',
@@ -6125,6 +6119,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Espaldares Galecall',
   'entities.items.bonewrought_greatsword.name': 'Espadão Bonewrought',
   'entities.items.direfang_greatblade.name': 'Grande lâmina Direfang',
+  'entities.items.direfang_quiver.name': 'Aljava Direfang',
   'entities.items.bonewrought_bulwark.name': 'Baluarte Bonewrought',
   'entities.items.wraithfire_orb.name': 'Orbe Wraithfire',
   'hud.chat.context.convertToRaid': 'Converter em raide',
@@ -6774,17 +6769,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Atinge tudo ao seu redor e reduz a velocidade dos ataques deles.',
   'guide.abilityHook.wrath':
     'Uma seta de natureza arremessada num alvo à distância, sua magia de ataque preferida.',
-  'guide.arenaPage.augmentsNote':
-    'Aprimoramentos e melhorias duram apenas a partida. Eles servem para builds divertidas e improvisadas, não para poder permanente, então ninguém compra a vitória.',
   'guide.arenaPage.coliseumBody':
     'O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas, um contra um ou dois contra dois. Cada categoria mantém sua própria classificação, então uma vitória o eleva naquele placar para o reino inteiro ver. Abra a janela da Arena para se inscrever em uma categoria, sozinho ou com seu parceiro.',
   'guide.arenaPage.coliseumHeading': 'O Coliseu das Cinzas',
   'guide.arenaPage.duelsBody':
     'Desafie qualquer jogador que encontrar para um duelo amistoso. Nada está em jogo além do orgulho, então é a forma mais fácil de aprender um confronto ou resolver uma discussão amigável.',
   'guide.arenaPage.duelsHeading': 'Duelos',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta é uma briga rápida de dois contra dois travada como uma única disputa contínua, com cada lutador colocado em pé de igualdade. Conforme a luta corre, você escolhe aprimoramentos, reforços rápidos que remodelam seu arsenal na hora, então nenhuma partida é igual à outra.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta dois contra dois',
   'guide.arenaPage.heading': 'Arena e JcJ',
   'guide.arenaPage.intro':
     'Quer se testar contra outros jogadores? O jogador contra jogador é integrado, e é sempre uma escolha sua, nunca algo imposto a você.',
@@ -6941,21 +6931,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Três zonas, do sul ao norte, cada uma um degrau acima em nível. Siga a trilha das missões e a terra leva você do vale aos picos.',
   'guide.worldPage.places': 'Lugares notáveis',
   'guide.worldPage.residents': 'Quem você vai encontrar',
-  'guide.arenaPage.powerupsBody':
-    'Orbes brilhantes também caem na arena no meio da luta, livres para quem alcançá-los primeiro. Eles são deliberadamente exagerados e duram só um instante: Demônio da Velocidade para um lampejo de ritmo alucinante, Colosso para inchar até virar um gigante pesado, Botas Lunares para um salto saltitante de baixa gravidade, e Berserker para uma súbita explosão de fúria.',
-  'guide.arenaPage.powerupsTitle': 'Power-ups na arena',
-  'guide.arenaPage.waveGoldBody':
-    'A onda do meio: combos de dois gumes onde sua build começa a tomar forma e a brilhar.',
-  'guide.arenaPage.waveGoldTitle': 'Ouro',
-  'guide.arenaPage.wavePrismaticBody':
-    'A onda final: picos que definem a build e derretem a tela, feitos para parecer ridículos no melhor sentido.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismático',
-  'guide.arenaPage.waveSilverBody':
-    'A onda de abertura: reforços limpos de um único atributo que afiam o básico da sua classe.',
-  'guide.arenaPage.waveSilverTitle': 'Prata',
-  'guide.arenaPage.wavesBody':
-    'Uma disputa de Fiesta lhe entrega novas escolhas conforme avança, e as escolhas ficam mais ousadas quanto mais a luta se estende. Você constrói de uma onda para a próxima, escolhendo uma de poucas opções a cada vez e mantendo-a pelo resto da disputa.',
-  'guide.arenaPage.wavesTitle': 'Os aprimoramentos chegam em ondas',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Servos encapuzados do culto da morte cuja obra profana as sepulturas do Vale aos cumes. Onde eles se reúnem, os mortos não descansam.',
   'guide.bestiary.flavor.grubjaw':
@@ -8033,6 +8008,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Anuncie um raide, encontro ou evento',
   'hudChrome.discord.relay.help.label': 'Preciso de Ajuda',
   'hudChrome.discord.relay.help.hint': 'Peça ajuda à comunidade',
+  'hudChrome.options.hideUnusedActionSlots': 'Ocultar Espaços de Ação Não Utilizados',
   'hudChrome.options.showSecondaryActionBar': 'Mostrar Barra de Ação Secundária',
   'errors.api.desktopCodeInvalid':
     'O código de login do desktop é inválido ou expirou. Tente novamente.',
@@ -8470,9 +8446,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Duende do Salgueiro',
   'entities.mobs.wood_wraith.name': 'Espectro do Bosque',
   'entities.mobs.wreck_thief.name': 'Ladrão dos Destroços',
-  'guide.arenaPage.yumiBody':
-    'Proteja a Yumi é um modo de objetivo em equipe disputado em um labirinto: cada lado protege a própria gata familiar enquanto caça a do inimigo. De tempos em tempos, as duas gatas saltam para novos cantos do labirinto, então a luta alterna entre defender, caçar e correr para reencontrá-las. Entre na fila em três contra três ou cinco contra cinco; cair em combate só o afasta por um instante.',
-  'guide.arenaPage.yumiHeading': 'Proteja a Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Passatempo',
   'hudChrome.auraEffect.armorPct': 'Reduz a armadura em {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Reduz a armadura em {pct}% ({stacks} acúmulos)',
@@ -8493,7 +8466,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5x5',
   'yumi.end.loss': 'DERROTA! Sua Yumi caiu.',
   'yumi.end.win': 'VITÓRIA! Sua Yumi está a salvo!',
-  'yumi.enterQueue': 'Entre no Proteja a Yumi!',
   'yumi.error.partyTooBig3': 'O Proteja a Yumi 3x3 permite um grupo de até três.',
   'yumi.error.partyTooBig5': 'O Proteja a Yumi 5x5 permite um grupo de até cinco.',
   'yumi.hud.aria': 'Sua Yumi com {mine} de {max} de vida, Yumi inimiga com {theirs}.',

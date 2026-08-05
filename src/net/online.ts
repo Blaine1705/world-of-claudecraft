@@ -1215,6 +1215,7 @@ function blankEntity(id: number): Entity {
     warcryTimer: 0,
     petPath: [],
     petPathCooldown: 0,
+    petOwnerHpBonus: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
     pos: { x: 0, y: 0, z: 0 },
@@ -1460,6 +1461,10 @@ export class ClientWorld implements IWorld {
   // arenaInfo.match.fiesta and its dynamics flow over the events queue. ---
   duelInfo: DuelInfo | null = null;
   arenaInfo: ArenaInfo | null = null;
+  // --- IWorldBattleground: Thornhollow Fields queue + live-match state, mirrored from
+  // the snapshot self (`s.bg`, delta-omitted); flag/score dynamics also ride
+  // the events queue for banners and the combat log. ---
+  bgInfo: import('../world_api').BgInfo | null = null;
   // --- IWorldDungeonFinder: group-finder state, mirrored from the snapshot
   // self (`s.df` personal blob + `s.dfb` shared board, both delta-omitted: a
   // missing key keeps the prior mirror, an explicit null clears it). ---
@@ -1747,6 +1752,10 @@ export class ClientWorld implements IWorld {
   onConnectionLost: ((attempt: number, maxAttempts: number, nextRetryAtMs: number) => void) | null =
     null;
   onReconnected: (() => void) | null = null;
+  // Last value passed to setStopAutoAttackOnTargetSwitch, re-pushed once the
+  // client is genuinely able to send commands again (see the hello handler):
+  // null means "never set this session", so nothing is re-sent on reconnect.
+  private lastStopAutoAttackOnTargetSwitch: boolean | null = null;
   private reconnectAttempts = 0;
   // consecutive 'character already in world' rejections during a reconnect;
   // see src/net/reconnect_policy.ts for why these are tolerated (bounded)
@@ -2288,6 +2297,13 @@ export class ClientWorld implements IWorld {
         this.onReconnected?.();
       }
       this.connected = true;
+      // onReconnected() above (and the join-time push in main.ts) can only
+      // queue session preferences before this point: canSendCommand() requires
+      // this.connected, so any cmd() sent from onReconnected is silently
+      // dropped (issue caught in review of #2723). Re-push the last-known
+      // value of every such preference here, now that sends genuinely reach
+      // the socket, rather than relying on callers to race this flag.
+      this.resendSessionPreferences();
       return;
     }
     if (msg.t === 'spectate') {
@@ -2303,6 +2319,10 @@ export class ClientWorld implements IWorld {
       if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
+        // cmd() drops every non-chat command while spectating (see below), so
+        // a preference toggled mid-spectate never reached the server; now
+        // that spectate has ended, re-push it the same way a reconnect does.
+        this.resendSessionPreferences();
       }
       Object.assign(this.moveInput, emptyMoveInput());
       this.mouselookFacing = null;
@@ -3314,6 +3334,7 @@ export class ClientWorld implements IWorld {
       if (s.trade !== undefined) this.tradeInfo = s.trade;
       if (s.duel !== undefined) this.duelInfo = s.duel;
       if (s.arena !== undefined) this.arenaInfo = s.arena;
+      if (s.bg !== undefined) this.bgInfo = s.bg;
       if (s.df !== undefined) this.dungeonFinderInfo = s.df;
       if (s.dfb !== undefined) this.dungeonFinderBoard = s.dfb;
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
@@ -3717,6 +3738,27 @@ export class ClientWorld implements IWorld {
   friendlyTabTarget(): void {
     this.pendingTargetEcho = null; // server-resolved retarget, as tabTarget
     this.cmd({ cmd: 'tabFriendly' });
+  }
+  setStopAutoAttackOnTargetSwitch(enabled: boolean): void {
+    this.lastStopAutoAttackOnTargetSwitch = enabled;
+    this.cmd({ cmd: 'stopAutoAttackOnTargetSwitch', enabled });
+  }
+
+  // Re-sends every session preference this class remembers, called once the
+  // client is actually able to send commands again: right after `connected`
+  // flips true on reconnect, and right after spectate ends. Both moments sit
+  // behind cmd()'s own guards (canSendCommand / the spectate drop), so this
+  // is a plain re-push through the normal setter, not a raw send.
+  private resendSessionPreferences(): void {
+    // typeof, not `!== null`: a bareClient built via Object.create(ClientWorld.prototype)
+    // (the pattern this suite's tests use) skips class field initializers entirely, so
+    // this field reads as undefined rather than its declared null default there.
+    if (typeof this.lastStopAutoAttackOnTargetSwitch === 'boolean') {
+      this.cmd({
+        cmd: 'stopAutoAttackOnTargetSwitch',
+        enabled: this.lastStopAutoAttackOnTargetSwitch,
+      });
+    }
   }
 
   // --- IWorldTelemetry: fire-and-forget metrics sink ---
@@ -4328,6 +4370,17 @@ export class ClientWorld implements IWorld {
   }
   arenaAugmentPick(augmentId: string): void {
     this.cmd({ cmd: 'arena_augment', augment: augmentId });
+  }
+  // --- IWorldBattleground: Thornhollow Fields queue + flag-action sends (bgInfo is a
+  // snapshot read, decoded in applySnapshot). ---
+  bgQueueJoin(): void {
+    this.cmd({ cmd: 'bg_queue' });
+  }
+  bgQueueLeave(): void {
+    this.cmd({ cmd: 'bg_leave' });
+  }
+  bgFlagAction(): void {
+    this.cmd({ cmd: 'bg_flag' });
   }
   // --- IWorldDungeonFinder: group-finder sends (dungeonFinderInfo and
   // dungeonFinderBoard are snapshot reads, decoded in applySnapshot). ---

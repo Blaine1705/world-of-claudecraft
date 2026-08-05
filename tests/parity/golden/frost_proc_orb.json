@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "294252ef",
+      "state": "a802cdd1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -37,6 +37,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {},
@@ -138,7 +139,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 947,
-      "state": "4f5a62b1",
+      "state": "5c6706a7",
       "events": "f89f8015",
       "rng": {
         "draws": 1,
@@ -149,7 +150,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 947,
-      "state": "ad118585",
+      "state": "89f4f73b",
       "events": "528c6651",
       "rng": {
         "draws": 2,
@@ -160,7 +161,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 947,
-      "state": "ae2b1ffa",
+      "state": "955c3e6c",
       "events": "b6dd8fb2",
       "rng": {
         "draws": 150,
@@ -171,7 +172,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 947,
-      "state": "b0acba74",
+      "state": "154b7c4e",
       "events": "808a9295",
       "rng": {
         "draws": 316,
@@ -182,8 +183,8 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 947,
-      "state": "eba33806",
-      "events": "7d487572",
+      "state": "2943d958",
+      "events": "345b796a",
       "rng": {
         "draws": 356,
         "digest": "6ca1a356"
@@ -203,16 +204,17 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 211
+            "damageDealt": 219
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 211
+              "dummyDamage": 219
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -391,7 +393,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499789,
+          "hp": 499781,
           "id": 946,
           "inCombat": true,
           "kind": "mob",
@@ -423,7 +425,7 @@
           "threat": [
             [
               941,
-              211
+              219
             ]
           ],
           "weapon": {
@@ -436,7 +438,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 947,
-      "state": "eba33806",
+      "state": "2943d958",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -457,16 +459,17 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "mage",
           "companionUpgrades": {},
           "counters": {
-            "damageDealt": 211
+            "damageDealt": 219
           },
           "craftSkills": {},
           "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "dummyDamage": 211
+              "dummyDamage": 219
             },
             "dungeonClears": {},
             "itemsDiscovered": [
@@ -645,7 +648,7 @@
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 499789,
+          "hp": 499781,
           "id": 946,
           "inCombat": true,
           "kind": "mob",
@@ -677,7 +680,7 @@
           "threat": [
             [
               941,
-              211
+              219
             ]
           ],
           "weapon": {

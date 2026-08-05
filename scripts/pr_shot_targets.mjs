@@ -173,6 +173,188 @@ async function stubDesktopUpdateBridge(page) {
 
 export const TARGETS = [
   {
+    key: 'ravenrift',
+    label:
+      'Thornhollow Fields 5v5 battleground: field, gatehouse, carry, queue window, mobile scoreboard',
+    // Match the SOURCE files (the `.ts` suffixes keep the sim/render tests from
+    // classifying as visual).
+    when: [
+      'sim/battleground_layout.ts',
+      'render/battleground.ts',
+      'render/battleground_core.ts',
+      'ui/hud/battleground/',
+      'sim/social/battleground.ts',
+    ],
+    variants: [
+      { key: 'queue-window', scene: 'queue' },
+      // First staged scene on purpose: the match seating just placed the
+      // player on their real spawn point, and the DEFAULT chase camera is the
+      // honest witness for the spawn-clearance contract (no camDist override).
+      { key: 'spawn-camera', scene: 'spawn' },
+      { key: 'field', scene: 'field' },
+      { key: 'gatehouse', scene: 'gatehouse' },
+      { key: 'carry-scoreboard', scene: 'carry' },
+      { key: 'scoreboard-mobile', scene: 'carry', mobile: true },
+      { key: 'match-board', scene: 'board' },
+      { key: 'field-map', scene: 'map' },
+      // last on purpose: it kills the player, which would pollute later scenes
+      { key: 'graveyard', scene: 'graveyard' },
+    ],
+    async capture(page, variant) {
+      const scene = variant?.scene ?? 'field';
+      if (scene === 'queue') {
+        const opened = await page.evaluate(() => {
+          const game = window.__game;
+          if (!game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+          game.hud.toggleBattleground();
+          return { ok: true };
+        });
+        if (!opened.ok) return { skip: opened.reason };
+        const ready = await pollForSize(page, '#arena-window');
+        if (!ready) return { skip: 'the PvP window never became visible' };
+        return { clip: '#arena-window' };
+      }
+      // Stage a live 5v5 offline: nine bots + the player queue, the form-up is
+      // fast-forwarded, and the camera frames the requested scene. Idempotent:
+      // a match already staged by an earlier variant is reused.
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim || !sim.player) return { ok: false, reason: 'offline world is unavailable' };
+        if (!sim.bgMatchFor(sim.player.id)) {
+          const classes = [
+            'warrior',
+            'paladin',
+            'hunter',
+            'rogue',
+            'mage',
+            'priest',
+            'shaman',
+            'warlock',
+            'druid',
+          ];
+          const names = ['Bryn', 'Cael', 'Dax', 'Eira', 'Finn', 'Gust', 'Hale', 'Ivo', 'Jor'];
+          for (let i = 0; i < 9; i++) {
+            const pid = sim.addPlayer(classes[i], names[i]);
+            const e = sim.entities.get(pid);
+            e.level = 20;
+            sim.bgQueueJoin(pid);
+          }
+          sim.player.level = Math.max(20, sim.player.level);
+          sim.bgQueueJoin();
+        }
+        return { ok: true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      await wait(400); // one tick seats the match
+      const live = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game.sim;
+        const match = sim.bgMatchFor(sim.player.id);
+        if (!match) return { ok: false, reason: 'match never seated' };
+        if (match.state === 'countdown') match.timer = 0.05; // skip the form-up
+        return { ok: true };
+      });
+      if (!live.ok) return { skip: live.reason };
+      await wait(600);
+      await page.evaluate((sceneKey) => {
+        const game = window.__game;
+        const sim = game.sim;
+        const match = sim.bgMatchFor(sim.player.id);
+        const myTeam = match.teams[0].includes(sim.player.id) ? 0 : 1;
+        const p = sim.player;
+        const tp = (x, z) => {
+          p.pos.x = x;
+          p.pos.z = z;
+          p.prevPos = { ...p.pos };
+        };
+        if (sceneKey === 'spawn') {
+          // No teleport: the seating placed us on the spawn ring. Face the
+          // enemy keep and put the chase camera behind at its defaults.
+          p.facing = myTeam === 0 ? 0 : Math.PI;
+          game.input.camYaw = p.facing;
+        } else if (sceneKey === 'field') {
+          // mid-field, camera pulled up and back over my keep's approach;
+          // offset east of the approach rune so the shot shows it LIVE
+          // instead of seizing it by standing on it
+          const home = match.flags[myTeam].home;
+          tp(home.x + 6, home.z + (myTeam === 0 ? 26 : -26));
+          game.input.camYaw = p.facing = myTeam === 0 ? 0 : Math.PI;
+          game.input.camDist = 24;
+          game.input.camPitch = 0.72;
+        } else if (sceneKey === 'gatehouse') {
+          // inside the south gatehouse, on the courtyard-door line (x -30,
+          // the 4yd door at x -32..-28), looking south through the room: the
+          // ambush crates, the offset field-side door beyond. The camera backs
+          // out through the courtyard door, so it never clips a wall.
+          const home = match.flags[0].home;
+          tp(home.x - 30, home.z + 66);
+          p.facing = Math.PI;
+          game.input.camYaw = Math.PI;
+          game.input.camDist = 11;
+          game.input.camPitch = 0.6;
+        } else {
+          // carry: stand on the ENEMY flag; the deliberate press follows
+          const foe = match.flags[myTeam === 0 ? 1 : 0];
+          tp(foe.pos.x, foe.pos.z);
+        }
+      }, scene);
+      if (scene === 'carry' || scene === 'board') {
+        await wait(300);
+        await page.evaluate(() => {
+          window.__game.sim.bgFlagAction();
+          window.__game.input.camDist = 11;
+          window.__game.input.camPitch = 0.4;
+        });
+        await wait(800);
+      }
+      if (scene === 'board') {
+        // pin the hover-expanded match board open and shoot just the strip
+        await page.evaluate(() => {
+          document.querySelector('#bg-scoreboard')?.classList.add('expanded');
+        });
+        await wait(400);
+        return { clip: '#bg-scoreboard' };
+      }
+      if (scene === 'map') {
+        // the M-key world map's Thornhollow Fields surface (schematic + honest markers)
+        const mapOk = await page.evaluate(() => {
+          const game = window.__game;
+          if (!game.sim.bgMatchFor(game.sim.player.id)) return false; // staging lost
+          game.hud.toggleMap();
+          return true;
+        });
+        if (!mapOk) return { skip: 'match staging lost before the map scene' };
+        await wait(600);
+        return { clip: '#map-window' };
+      }
+      if (scene === 'graveyard') {
+        await page.evaluate(() => {
+          const sim = window.__game.sim;
+          const p = sim.player;
+          sim.ctx.dealDamage(null, p, 9_999_999, false, 'physical', null, 'hit');
+        });
+        await wait(400);
+        await page.evaluate(() => {
+          // Drive the REAL death-overlay button, not the sim hook: this shot
+          // is also the regression check that the Release path works in a
+          // battleground (the sim-hook version masked a dead button once).
+          document.querySelector('#release-btn')?.click();
+          window.__game.input.camDist = 13;
+          window.__game.input.camPitch = 0.55;
+        });
+        await wait(600);
+        await page.evaluate(() => {
+          const game = window.__game;
+          game.input.camYaw = game.sim.player.facing; // chase behind the spirit
+        });
+        await wait(1200);
+      }
+      await wait(2600); // let the field build + banners settle
+      return {};
+    },
+  },
+  {
     key: 'skill-milestone-plate',
     label: 'Banner: gathering skill milestone plate (#2934)',
     when: ['ui/skill_level_toast_view'],
@@ -2597,6 +2779,96 @@ export const TARGETS = [
     },
   },
   {
+    key: 'threat-meter',
+    label: 'Threat tab: per-entity hate bars, the aggro marker, and the damage fallback',
+    // The threat tab reads its bars from the row model and its SUBJECT from the
+    // live-resolution core, so a change to either reshoots this. `ui/meters.ts`
+    // is matched by the bare `ui/meters` prefix the other meters targets avoid,
+    // which is deliberate: the subtitle and the row labels are painted there.
+    when: ['ui/meters.ts', 'ui/meters_rows_view', 'ui/threat_subject_core'],
+    variants: [
+      { key: 'live', charClass: 'warlock', charName: 'Nyxaris', scene: 'live' },
+      { key: 'fallback', charClass: 'warlock', charName: 'Nyxaris', scene: 'fallback' },
+    ],
+    // A warlock with a real summoned Emberkin, because the pet is the whole
+    // point: its hate is its own hate-table entry and the mob is swinging at it.
+    // The hate values are written onto the real mob entity and the damage rides
+    // the real Meters.onEvent path, so the panel resolves everything itself.
+    async capture(page, variant) {
+      await page.evaluate((scene) => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        let mob = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId == null && !e.dead) {
+            mob = e;
+            break;
+          }
+        }
+        if (!mob) return;
+        sim.summonPet?.(player, 'emberkin');
+        let pet = null;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId === player.id && !e.dead) {
+            pet = e;
+            break;
+          }
+        }
+        const meters = game?.hud?.meters;
+        if (!meters) return;
+        meters.dock?.('heal');
+        meters.dock?.('threat');
+        meters.resetFrames?.();
+        const hit = (sourceId, amount, ability) =>
+          meters.onEvent({
+            type: 'damage',
+            sourceId,
+            targetId: mob.id,
+            amount,
+            crit: false,
+            school: 'shadow',
+            ability,
+            kind: 'hit',
+          });
+        hit(player.id, 2400, 'Shadow Bolt');
+        hit(player.id, 800, 'Corruption');
+        if (pet) hit(pet.id, 2600, 'Ashbolt');
+
+        // The hate table the mob really compares: the Emberkin is ahead of its
+        // owner and is the one the mob is swinging at.
+        mob.threat.clear();
+        mob.threat.set(player.id, 3200);
+        if (pet) mob.threat.set(pet.id, 4100);
+        mob.aggroTargetId = pet ? pet.id : player.id;
+
+        if (scene === 'fallback') {
+          // Nothing live left: the tab has only the latched mob's damage to
+          // show, and must say so rather than pass it off as hate.
+          mob.dead = true;
+          mob.threat.clear();
+        }
+        const el = document.querySelector('#meters-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleMeters?.();
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+      }, variant.scene);
+      const open = await pollForSize(page, '#meters-window');
+      if (!open) return {};
+      await wait(600);
+      await page.evaluate(() => {
+        const el = document.querySelector('#meters-window .mt-tab[data-tab="threat"]');
+        if (el) el.click();
+      });
+      await wait(800);
+      return { clip: '#meters-window' };
+    },
+  },
+  {
     key: 'meters',
     label: 'Damage meters: bars plus the per-ability hover breakdown',
     when: ['ui/meters', 'meters_breakdown'],
@@ -2693,6 +2965,51 @@ export const TARGETS = [
       await pollForSize(page, '#tooltip');
       await wait(300);
       return {};
+    },
+  },
+  {
+    key: 'hunter-quiver-paperdoll',
+    label: 'Hunter paperdoll with a quiver in the off-hand',
+    // Quivers are the first items that put anything in a hunter's off-hand, so
+    // the paperdoll is the view that shows the change. Keyed on the quiver
+    // records themselves rather than a ui/ path: the diff is content-only.
+    when: ['content/zone3', 'content/items'],
+    variants: [
+      { key: 'desktop', charClass: 'hunter', charName: 'Fletcher' },
+      { key: 'mobile', mobile: true, charClass: 'hunter', charName: 'Fletcher' },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        // The epic rung derives a required level from its quality, so raise the
+        // player before equipping or the equip silently refuses.
+        try {
+          sim?.setPlayerLevel?.(20);
+        } catch {}
+        for (const id of [
+          'moggers_hide_quiver',
+          'cragmaw_huntquiver',
+          'gravewyrm_bone_quiver',
+          'direfang_quiver',
+        ]) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        try {
+          sim?.equipItem('direfang_quiver');
+        } catch {}
+        const el = document.querySelector('#char-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleChar?.();
+      });
+      await wait(900);
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#char-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      return open ? { clip: '#char-window' } : {};
     },
   },
   {

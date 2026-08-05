@@ -2267,9 +2267,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Broder Halven markerar i sina tabeller: en fin dag att trotsa Det rasade relikvariet.',
   'hudChrome.calendar.events.delveDay.title': 'Delve-dag',
-  'hudChrome.calendar.events.fiestaNight.note':
-    '2v2-fiestans ring drar sin högljuddaste publik i kväll.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Fiestanatt',
   'hudChrome.calendar.events.fishingDerby.note':
     'Metare kantar sjöarna. Ta med ett spö och byt fiskehistorier.',
   'hudChrome.calendar.events.fishingDerby.title': 'Fisketävling',
@@ -3456,6 +3453,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.cragthorn_greatstaff.name': 'Klipptörnets storstav',
   'entities.items.cragward_pauldrons.name': 'Klippvärnets axelplåtar',
   'entities.items.cragmaw_huntcord.name': 'Klippkäftens jaktlina',
+  'entities.items.cragmaw_huntquiver.name': 'Klippkäftens jaktkoger',
   'entities.items.cragmaw_prowlboots.name': 'Klippkäftens smygstövlar',
   'entities.items.cragwalker_boots.name': 'Klippvandrarstövlar',
   'entities.items.crimson_amber_armor_plate.name': 'Karmosinbärnsten',
@@ -3541,6 +3539,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.gravewardens_shiv.name': 'Gravväktarens stickkniv',
   'entities.items.gravewoven_raiment.name': 'Gravvävd skrud',
   'entities.items.gravewyrm_gauntlets.name': 'Gravlindormens pansarhandskar',
+  'entities.items.gravewyrm_bone_quiver.name': 'Gravlindormens benkoger',
   'entities.items.gravewyrm_thornmaul.name': 'Gravlindormens törnklubba',
   'entities.items.gravewyrm_mantle.name': 'Gravlindormsmantel',
   'entities.items.gravewyrm_sabatons.name': 'Gravlindormssabatoner',
@@ -3607,6 +3606,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.mistveil_grips.name': 'Dimslöjehandskar',
   'entities.items.moggers_copper_cudgel.name': 'Moggers kopparklubba',
   'entities.items.moggers_shiv.name': 'Moggers dolk',
+  'entities.items.moggers_hide_quiver.name': 'Moggers skinnkoger',
   'entities.items.moggers_stomper_boots.name': 'Moggers stampstövlar',
   'entities.items.monarch_crown_helm.name': 'Monarkens krona',
   'entities.items.moonbark_vestments.name': 'Månbarksklädsel',
@@ -3747,6 +3747,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Galecall-axelskydd',
   'entities.items.bonewrought_greatsword.name': 'Bonewrought storsvärd',
   'entities.items.direfang_greatblade.name': 'Direfang-storklinga',
+  'entities.items.direfang_quiver.name': 'Direfang-koger',
   'entities.items.bonewrought_bulwark.name': 'Bonewrought bålverk',
   'entities.items.wraithfire_orb.name': 'Wraithfire-sfär',
   'entities.items.stormshard_leggings.name': 'Stormskärvebenkläder',
@@ -4745,7 +4746,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA OAVGJORT! För jämnt för att avgöra!',
   'fiesta.end.loss': 'FIESTA FÖRLORAD! Kör igen!',
   'fiesta.end.win': 'FIESTA VUNNEN! 🎉 Vilket kalas!',
-  'fiesta.enterQueue': 'Gå med i Fiestan!',
   'fiesta.error.leaderOnly': 'Endast gruppledaren får ställa ditt lag i kö för {label}.',
   'fiesta.error.noAugment': 'Du har ingen förstärkning att välja just nu.',
   'fiesta.error.notOnOffer': 'Den förstärkningen erbjuds inte.',
@@ -4762,9 +4762,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Koloss',
   'fiesta.powerup.pow_moon_boots.name': 'Månstövlar',
   'fiesta.powerup.pow_speed_demon.name': 'Fartdemon',
-  'fiesta.practice': '🎉 Öva mot bottar',
-  'fiesta.practiceNote':
-    'Offlineträning: skapar 3 AI-bottar och ställer dig i kö för en 2v2-Fiesta. Klicka igen för att sluta.',
   'fiesta.queue.join': 'Du går med i 2v2-Fiestans kö. Gör dig redo att FESTA…',
   'fiesta.queue.leave': 'Du lämnar 2v2-Fiestans kö.',
   'fiesta.queue.teamLeave': 'Ditt lag lämnar 2v2-Fiestans kö.',
@@ -5003,38 +5000,18 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Skyddar en allierad så att närstridsangripare skadar sig själva när de slår.',
   'guide.abilityHook.thunder_clap': 'Slår allt runt omkring dig och saktar ner deras attacker.',
   'guide.abilityHook.wrath': 'En naturpil kastad mot ett mål från avstånd, din förstavalskanon.',
-  'guide.arenaPage.augmentsNote':
-    'Förstärkningar och kraftuppladdningar håller bara under matchen. De handlar om lekfulla, improviserade byggen, inte varaktig makt, så ingen köper sig till en seger.',
   'guide.arenaPage.coliseumBody':
     'Coliseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje division håller sin egen ställning, så en seger lyfter dig uppför den stegen för hela riket att se. Öppna Arena-fönstret för att anmäla dig till en division, ensam eller med din partner.',
   'guide.arenaPage.coliseumHeading': 'Det askgråa colosseumet',
   'guide.arenaPage.duelsBody':
     'Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.',
   'guide.arenaPage.duelsHeading': 'Dueller',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta är ett snabbt slagsmål två mot två som utkämpas som en enda sammanhängande drabbning, med varje kämpe ställd på jämn fot. Medan striden pågår draftar du förstärkningar, snabba boostar som omformar din uppsättning i farten, så att inga två matcher spelas riktigt likadant.',
-  'guide.arenaPage.fiestaHeading': 'Två-mot-två-fiesta',
   'guide.arenaPage.heading': 'Arena och PvP',
   'guide.arenaPage.intro':
     'Vill du testa dig själv mot andra spelare? Spelare mot spelare är inbyggt, och det är alltid något du väljer, aldrig något som påtvingas dig.',
   'guide.arenaPage.ladderBody':
     'Rankat spel följer din ställning över tid. Kolla topplistan för att se var du befinner dig och vem som håller rikets topp.',
   'guide.arenaPage.ladderHeading': 'Klättra på rankingstegen',
-  'guide.arenaPage.powerupsBody':
-    'Glödande klot faller också ner i arenan mitt i striden, fria för den som når dem först. De är medvetet överdrivna och håller bara en kort stund: Fartdemon för en blinkning av bländande fart, Koloss för att svälla upp till en lufsande jätte, Månstövlar för ett studsande hopp med låg gravitation, och Bärsärk för en plötslig våg av ursinne.',
-  'guide.arenaPage.powerupsTitle': 'Kraftuppladdningar i ringen',
-  'guide.arenaPage.waveGoldBody':
-    'Den mellersta vågen: tveeggade kombinationer där ditt bygge börjar ta form och sjunga.',
-  'guide.arenaPage.waveGoldTitle': 'Guld',
-  'guide.arenaPage.wavePrismaticBody':
-    'Den sista vågen: byggesdefinierande, skärmsmältande toppar avsedda att kännas löjliga på bästa sätt.',
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatisk',
-  'guide.arenaPage.waveSilverBody':
-    'Den inledande vågen: rena boostar för en enda egenskap som skärper grunderna i din klass.',
-  'guide.arenaPage.waveSilverTitle': 'Silver',
-  'guide.arenaPage.wavesBody':
-    'En Fiesta-drabbning ger dig färska val efter hand, och valen blir djärvare ju längre striden pågår. Du bygger från en våg till nästa, väljer ett av några få alternativ varje gång och behåller det resten av drabbningen.',
-  'guide.arenaPage.wavesTitle': 'Förstärkningar kommer i vågor',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Kåpklädda tjänare till dödskulten vars verk besudlar gravarna från dalen till topparna. Där de samlas vilar inte de döda.',
   'guide.bestiary.flavor.grubjaw':
@@ -6039,7 +6016,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapCanvasLabel': 'Karta',
   'hud.core.mapSummary': 'Karta över {zone}.',
   'hud.core.maxLevel': 'MAXNIVÅ',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileAttack': 'Anfall',
   'hud.core.mobileCamera': 'Kamera — dubbeltryck för att centrera',
   'hud.core.mobileChat': 'Chatt',
@@ -6135,7 +6111,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.whisperMissing': "Det finns ingen spelare vid namn '{name}' uppkopplad.",
   'hud.errors.whisperSelf': 'Du muttrar för dig själv. Ingen hör det.',
   'hud.keybinds.actions.actionBarSlot': 'Handlingsfält {slot}',
-  'hud.keybinds.actions.arena': 'Arena (Askgrå kolosseum)',
   'hud.keybinds.actions.attack': 'Anfall',
   'hud.keybinds.actions.attackMove': 'Anfallsförflyttning',
   'hud.keybinds.actions.autorun': 'Växla automatisk löpning',
@@ -7891,6 +7866,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Annonsera en raid, träff eller ett evenemang',
   'hudChrome.discord.relay.help.label': 'Behöver hjälp',
   'hudChrome.discord.relay.help.hint': 'Be gemenskapen om hjälp',
+  'hudChrome.options.hideUnusedActionSlots': 'Dölj oanvända åtgärdsrutor',
   'hudChrome.options.showSecondaryActionBar': 'Visa sekundärt handlingsfält',
   'errors.api.desktopCodeInvalid':
     'Inloggningskoden för skrivbordsappen är ogiltig eller har gått ut. Försök igen.',
@@ -8244,9 +8220,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Klyver målets rustning och sänker den med {damage}% per applicering. Stackas upp till 5 gånger. Vållar en stor mängd hot.',
   'entities.mobs.training_dummy.name': 'Träningsdocka',
   'entities.mobs.yumi_cat.name': 'Yumi',
-  'guide.arenaPage.yumiBody':
-    'Skydda Yumi är ett lagbaserat målläge som spelas i en labyrint: varje sida vaktar sin egen kattföljeslagare samtidigt som den jagar den andra. Med jämna mellanrum blinkar båda katterna till nya hörn av labyrinten, så striden pendlar mellan att försvara, jaga och kappas om att hitta dem igen. Köa som tre mot tre eller fem mot fem; att falla i strid sätter dig bara på bänken en kort stund.',
-  'guide.arenaPage.yumiHeading': 'Skydda Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Fritidssyssla',
   'hudChrome.auraEffect.armorPct': 'Minskar rustningen med {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Minskar rustningen med {pct}% ({stacks} stackar)',
@@ -8266,7 +8239,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5 mot 5',
   'yumi.end.loss': 'NEDERLAG! Din Yumi har fallit.',
   'yumi.end.win': 'SEGER! Yumi är trygg!',
-  'yumi.enterQueue': 'Gå med i Skydda Yumi!',
   'yumi.error.partyTooBig3': 'Skydda Yumi 3 mot 3 tillåter ett sällskap på upp till tre.',
   'yumi.error.partyTooBig5': 'Skydda Yumi 5 mot 5 tillåter ett sällskap på upp till fem.',
   'yumi.hud.aria': 'Din Yumi på {mine} av {max} hälsa, fiendens Yumi på {theirs}.',

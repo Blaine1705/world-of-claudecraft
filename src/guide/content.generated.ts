@@ -4851,6 +4851,35 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "crest": "/ui/deeds/chr_hollow_rares.webp"
   },
   {
+    "id": "pvp_bg_first_capture",
+    "name": "Banner in Hand",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "pvp_bg_first_win",
+    "name": "The Hollow Holds",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "pvp_bg_wins_25",
+    "name": "Warden of the Hollow",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Flagbearer"
+  },
+  {
+    "id": "pvp_bg_captures_100",
+    "name": "A Hundred Banners",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false
+  },
+  {
     "id": "chr_willowfen_gatherer",
     "name": "Fenland Bounty",
     "category": "chronicle",
@@ -4994,6 +5023,55 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "A Cast on the Petal Pond",
     "category": "chronicle",
     "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_engineering_rare",
+    "name": "Precision Engineering",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_alchemy_rare",
+    "name": "A Rare Vintage",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_cooking_rare",
+    "name": "A Dish to Remember",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_leatherworking_rare",
+    "name": "Fine Tanning",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_tailoring_rare",
+    "name": "A Master's Stitch",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_weaponcrafting_rare",
+    "name": "Tempered to a Shine",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_armorcrafting_rare",
+    "name": "Plated to Perfection",
+    "category": "progression",
+    "renown": 10,
     "feat": false
   }
 ];

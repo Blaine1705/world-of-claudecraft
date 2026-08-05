@@ -374,7 +374,7 @@ describe('Book of Deeds webp icons', () => {
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(246);
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(257);
     expect(DEED_IMAGE_IDS.size, 'the committed art set is unchanged by this merge').toBe(232);
     for (const id of artless) {
       const crestId = deedCrestId(id, DEEDS[id].category);

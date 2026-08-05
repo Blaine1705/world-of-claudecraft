@@ -2373,9 +2373,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.calendar.events.delveDay.note':
     'Fratello Halven annota le sue carte: un buon giorno per sfidare il Reliquiario Crollato.',
   'hudChrome.calendar.events.delveDay.title': "Giorno dell'Incursione",
-  'hudChrome.calendar.events.fiestaNight.note':
-    'Stanotte il ring della Fiesta 2v2 richiama il suo pubblico più fragoroso.',
-  'hudChrome.calendar.events.fiestaNight.title': 'Notte della Fiesta',
   'hudChrome.calendar.events.fishingDerby.note':
     'I pescatori affollano le rive dei laghi. Porta una canna e scambia storie di pesca.',
   'hudChrome.calendar.events.fishingDerby.title': 'Gara di Pesca',
@@ -3462,7 +3459,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.core.mobileMore': 'Altro',
   'hud.core.mobileMoreAria': 'Mostra altri menu',
   'hud.core.mobileSocial': 'Sociale',
-  'hud.core.mobileArena': 'Arena',
   'hud.core.mobileMenu': 'Menu',
   'hud.core.mobileSettings': 'Impostazioni',
   'hud.core.mobileUse': 'Usa',
@@ -3572,7 +3568,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hud.keybinds.actions.nameplates': 'Mostra nomi',
   'hud.keybinds.actions.meters': 'Misuratori danni',
   'hud.keybinds.actions.social': 'Amici e gilda',
-  'hud.keybinds.actions.arena': 'Arena (Colosseo Cinereo)',
   'hud.keybinds.actions.chat': 'Apri chat',
   'hud.keybinds.actions.attack': 'Attacca',
   'hud.keybinds.actions.actionBarSlot': 'Barra azioni {slot}',
@@ -4930,6 +4925,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.ridge_stalker_pelt.name': 'Pelliccia di predatore del crinale',
   'entities.items.old_cragmaws_pelt.name': 'Pelliccia del Vecchio Cragmaw',
   'entities.items.cragmaw_huntcord.name': 'Cinghia da caccia di Cragmaw',
+  'entities.items.cragmaw_huntquiver.name': 'Faretra da caccia di Cragmaw',
   'entities.items.glowing_wax.name': 'Cera luminosa',
   'entities.items.ogre_war_totem.name': 'Totem da guerra ogre',
   'entities.items.storm_core.name': 'Nucleo di tempesta',
@@ -5006,6 +5002,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.mirejaw_scale_vest.name': 'Gilet di scaglie di Mirejaw',
   'entities.items.moggers_copper_cudgel.name': 'Randello di rame di Mogger',
   'entities.items.moggers_shiv.name': 'Coltello di Mogger',
+  'entities.items.moggers_hide_quiver.name': 'Faretra di cuoio di Mogger',
   'entities.items.moggers_stomper_boots.name': 'Stivali pestatori di Mogger',
   'entities.items.necromancers_legwraps.name': 'Fasce gambe Mournweave',
   'entities.items.necromancers_soulsteps.name': "Passi d'anima Mournweave",
@@ -5030,6 +5027,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.cryptbone_pauldrons.name': "Paraspalle d'osso di cripta",
   'entities.items.deathlords_dread_visage.name': 'Volto del terrore di Barrowlord',
   'entities.items.gravewyrm_gauntlets.name': "Guanti d'arme del Gravewyrm",
+  'entities.items.gravewyrm_bone_quiver.name': "Faretra d'osso del Gravewyrm",
   'entities.items.gravewyrm_mantle.name': 'Manto del Gravewyrm',
   'entities.items.mistveil_cord.name': 'Cordone Velonebbia',
   'entities.items.mistveil_grips.name': 'Prese Velonebbia',
@@ -5946,7 +5944,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'fiesta.end.draw': 'FIESTA IN PAREGGIO! Troppo serrata per dire chi ha vinto!',
   'fiesta.end.loss': 'FIESTA PERSA! Rifatevi sotto!',
   'fiesta.end.win': 'FIESTA VINTA! 🎉 Che festa!',
-  'fiesta.enterQueue': 'Unisciti alla Fiesta!',
   'fiesta.error.leaderOnly': 'Solo il capogruppo può mettere la tua squadra in coda per {label}.',
   'fiesta.error.noAugment': 'Al momento non hai nessun potenziamento da scegliere.',
   'fiesta.error.notOnOffer': 'Quel potenziamento non è tra quelli offerti.',
@@ -5964,9 +5961,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'fiesta.powerup.pow_colossus.name': 'Colosso',
   'fiesta.powerup.pow_moon_boots.name': 'Stivali lunari',
   'fiesta.powerup.pow_speed_demon.name': 'Demone della velocità',
-  'fiesta.practice': '🎉 Pratica contro i bot',
-  'fiesta.practiceNote':
-    'Pratica offline: genera 3 bot IA e ti mette in coda per una Fiesta 2v2. Clicca di nuovo per interrompere.',
   'fiesta.queue.join': 'Ti unisci alla coda della Fiesta 2v2. Preparati a FARE FESTA…',
   'fiesta.queue.leave': 'Esci dalla coda della Fiesta 2v2.',
   'fiesta.queue.teamLeave': 'La tua squadra esce dalla coda della Fiesta 2v2.',
@@ -6240,6 +6234,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.stormcallers_spaulders.name': 'Spallacci Galecall',
   'entities.items.bonewrought_greatsword.name': 'Spadone Bonewrought',
   'entities.items.direfang_greatblade.name': 'Gran lama Direfang',
+  'entities.items.direfang_quiver.name': 'Faretra Direfang',
   'entities.items.bonewrought_bulwark.name': 'Baluardo Bonewrought',
   'entities.items.wraithfire_orb.name': 'Sfera Wraithfire',
   'hud.chat.context.convertToRaid': 'Converti in incursione',
@@ -6897,17 +6892,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Colpisce tutto ciò che ti circonda e rallenta i loro attacchi.',
   'guide.abilityHook.wrath':
     'Un dardo di natura scagliato su un bersaglio dalla distanza, il tuo colpo di riferimento.',
-  'guide.arenaPage.augmentsNote':
-    'Potenziamenti e bonus durano solo per la partita. Sono pensati per costruzioni giocose e improvvisate, non per un potere duraturo, così nessuno si compra la vittoria.',
   'guide.arenaPage.coliseumBody':
     "Il Colosseo è l'arena del reame, dove affronti altri giocatori in partite classificate, uno contro uno o due contro due. Ogni categoria mantiene la propria classifica, perciò una vittoria ti fa salire in quella graduatoria sotto gli occhi di tutto il reame. Apri la finestra dell'Arena per iscriverti a una categoria, da solo o con il tuo compagno.",
   'guide.arenaPage.coliseumHeading': 'Il Colosseo di Cenere',
   'guide.arenaPage.duelsBody':
     "Sfida a duello amichevole qualsiasi giocatore che incontri. In palio non c'è altro che l'orgoglio, quindi è il modo più semplice per imparare uno scontro o risolvere una disputa amichevole.",
   'guide.arenaPage.duelsHeading': 'Duelli',
-  'guide.arenaPage.fiestaBody':
-    'Fiesta è una rissa rapida due contro due giocata come un unico incontro continuo, con ogni combattente portato su un piano di parità. Man mano che lo scontro procede arruoli potenziamenti, boost veloci che rimodellano il tuo arsenale al volo, così non ci sono due partite uguali.',
-  'guide.arenaPage.fiestaHeading': 'Fiesta due contro due',
   'guide.arenaPage.heading': 'Arena e PvP',
   'guide.arenaPage.intro':
     'Vuoi metterti alla prova contro altri giocatori? Il giocatore contro giocatore è integrato, ed è sempre una scelta tua, mai qualcosa che ti viene imposto.',
@@ -7066,21 +7056,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Tre zone, da sud a nord, ognuna un gradino più in alto di livello. Segui la scia delle missioni e la terra ti porta dalla valle alle vette.',
   'guide.worldPage.places': 'Luoghi notevoli',
   'guide.worldPage.residents': 'Chi incontrerai',
-  'guide.arenaPage.powerupsBody':
-    "Durante lo scontro nell'arena cadono anche sfere luminose, libere per chiunque le raggiunga per primo. Sono volutamente sopra le righe e durano solo un istante: Demone della Velocità per un lampo di ritmo accecante, Colosso per gonfiarti in un gigante ingombrante, Stivali Lunari per un balzo rimbalzante a bassa gravità, e Berserker per un'improvvisa ondata di furia.",
-  'guide.arenaPage.powerupsTitle': "Potenziamenti nell'arena",
-  'guide.arenaPage.waveGoldBody':
-    "L'ondata intermedia: combo a doppio taglio in cui la tua build inizia a prendere forma e a cantare.",
-  'guide.arenaPage.waveGoldTitle': 'Oro',
-  'guide.arenaPage.wavePrismaticBody':
-    "L'ondata finale: picchi che definiscono la build e fanno sciogliere lo schermo, pensati per sembrare assurdi nel migliore dei modi.",
-  'guide.arenaPage.wavePrismaticTitle': 'Prismatico',
-  'guide.arenaPage.waveSilverBody':
-    "L'ondata d'apertura: potenziamenti netti a singola statistica che affinano le basi della tua classe.",
-  'guide.arenaPage.waveSilverTitle': 'Argento',
-  'guide.arenaPage.wavesBody':
-    "Un incontro di Fiesta ti offre nuove scelte man mano che procede, e le scelte si fanno più audaci quanto più a lungo dura lo scontro. Costruisci da un'ondata alla successiva, scegliendo ogni volta una tra poche opzioni e tenendola per il resto dell'incontro.",
-  'guide.arenaPage.wavesTitle': 'I potenziamenti arrivano a ondate',
   'guide.bestiary.flavor.gravecaller_cultist':
     'Servi incappucciati del culto della morte la cui opera profana le tombe dalla Valle alle vette. Dove si radunano, i morti non riposano.',
   'guide.bestiary.flavor.grubjaw':
@@ -8157,6 +8132,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': "Annuncia un'incursione, un raduno o un evento",
   'hudChrome.discord.relay.help.label': 'Serve aiuto',
   'hudChrome.discord.relay.help.hint': 'Chiedi aiuto alla comunita',
+  'hudChrome.options.hideUnusedActionSlots': 'Nascondi gli slot azione inutilizzati',
   'hudChrome.options.showSecondaryActionBar': 'Mostra la barra delle azioni secondaria',
   'errors.api.desktopCodeInvalid':
     'Il codice di accesso desktop non è valido o è scaduto. Riprova.',
@@ -8632,9 +8608,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Folletto del Salice',
   'entities.mobs.wood_wraith.name': 'Spettro del Bosco',
   'entities.mobs.wreck_thief.name': 'Ladro dei Relitti',
-  'guide.arenaPage.yumiBody':
-    'Proteggi Yumi è una modalità a obiettivi di squadra che si gioca in un labirinto: ogni fazione protegge il proprio famiglio felino mentre dà la caccia a quello avversario. Di tanto in tanto entrambi i gatti si teletrasportano in nuovi angoli del labirinto, così lo scontro oscilla tra difesa, caccia e corsa per ritrovarli. Mettiti in coda in tre contro tre o cinque contro cinque; cadere in battaglia ti tiene in panchina solo per un momento.',
-  'guide.arenaPage.yumiHeading': 'Proteggi Yumi',
   'hudChrome.archetypeTitle.hobbyLabel': 'Passatempo',
   'hudChrome.auraEffect.armorPct': "Riduce l'armatura del {pct}%",
   'hudChrome.auraEffect.armorPctStacks': "Riduce l'armatura del {pct}% ({stacks} accumuli)",
@@ -8655,7 +8628,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'yumi.bracket5': 'Yumi 5c5',
   'yumi.end.loss': 'SCONFITTA! Il tuo Yumi è caduto.',
   'yumi.end.win': 'VITTORIA! Yumi è al sicuro!',
-  'yumi.enterQueue': 'Unisciti a Proteggi Yumi!',
   'yumi.error.partyTooBig3': 'Proteggi Yumi 3c3 ammette un gruppo di massimo tre giocatori.',
   'yumi.error.partyTooBig5': 'Proteggi Yumi 5c5 ammette un gruppo di massimo cinque giocatori.',
   'yumi.hud.aria': 'Il tuo Yumi a {mine} di {max} salute, Yumi nemico a {theirs}.',

@@ -23,7 +23,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 946,
-      "state": "c05c28c6",
+      "state": "04167d50",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,6 +44,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -146,7 +147,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 948,
-      "state": "1836c0e7",
+      "state": "89c0260b",
       "events": "1c683304",
       "rng": {
         "draws": 0,
@@ -167,6 +168,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -266,6 +268,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -273,17 +276,18 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 194,
+          "hp": 12694,
           "id": 947,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "passive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -296,7 +300,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -311,7 +315,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 948,
-      "state": "f431dd19",
+      "state": "dde3bdf1",
       "events": "c95608a6",
       "rng": {
         "draws": 0,
@@ -332,6 +336,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -431,6 +436,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "auras": [
             {
               "duration": 5,
@@ -452,17 +458,18 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 97,
+          "hp": 6347,
           "id": 947,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -475,7 +482,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -490,7 +497,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 948,
-      "state": "cafba6d6",
+      "state": "1f7ada89",
       "events": "4ea5dca7",
       "rng": {
         "draws": 0,
@@ -501,7 +508,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 948,
-      "state": "ff60cd54",
+      "state": "a9596317",
       "events": "95fddaa3",
       "rng": {
         "draws": 0,
@@ -512,7 +519,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 949,
-      "state": "acb26974",
+      "state": "d1d8b54f",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -533,6 +540,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -651,6 +659,7 @@
         {
           "aggroTargetId": 948,
           "aiState": "idle",
+          "attackPower": 26,
           "auras": [
             {
               "duration": 5,
@@ -671,18 +680,19 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 127,
+          "hp": 6627,
           "id": 947,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "petTauntTimer": 10,
           "pos": {
             "x": 4,
@@ -696,7 +706,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -771,7 +781,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 949,
-      "state": "f8246353",
+      "state": "e1428379",
       "events": "b67167f4",
       "rng": {
         "draws": 0,
@@ -792,6 +802,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -969,7 +980,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 951,
-      "state": "1c457111",
+      "state": "cef690d5",
       "events": "f7115cd5",
       "rng": {
         "draws": 0,
@@ -990,6 +1001,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -1163,6 +1175,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1175,12 +1188,13 @@
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -1193,7 +1207,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -1208,7 +1222,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 951,
-      "state": "77b5560d",
+      "state": "a8ecabfa",
       "events": "2e74fa1c",
       "rng": {
         "draws": 0,
@@ -1229,6 +1243,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -1402,6 +1417,7 @@
         },
         {
           "aiState": "idle",
+          "attackPower": 26,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.05,
@@ -1409,17 +1425,18 @@
           "dodgeChance": 0.05,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 68,
+          "hp": 4443,
           "id": 950,
           "kind": "mob",
           "level": 12,
           "lootFfaTimer": "Infinity",
-          "maxHp": 194,
+          "maxHp": 12694,
           "moveSpeed": 8,
           "onGround": true,
           "overpowerUntil": -1,
           "ownerId": 941,
           "petMode": "defensive",
+          "petOwnerHpBonus": 12500,
           "pos": {
             "x": 4,
             "y": 1.5,
@@ -1432,7 +1449,7 @@
             "z": -1
           },
           "stats": {
-            "armor": 110
+            "armor": 202
           },
           "templateId": "forest_wolf",
           "weapon": {
@@ -1447,7 +1464,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 951,
-      "state": "f8246353",
+      "state": "e1428379",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1468,6 +1485,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -1645,7 +1663,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 952,
-      "state": "f8246353",
+      "state": "e1428379",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1666,6 +1684,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -1843,7 +1862,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 954,
-      "state": "96e1c58d",
+      "state": "0be8e269",
       "events": "951db7e3",
       "rng": {
         "draws": 0,
@@ -1864,6 +1883,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -1938,6 +1958,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -2194,7 +2215,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 954,
-      "state": "3f0740f4",
+      "state": "8cf31178",
       "events": "fd0c8856",
       "rng": {
         "draws": 151,
@@ -2205,7 +2226,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 954,
-      "state": "779459d4",
+      "state": "69112258",
       "events": "67ae243a",
       "rng": {
         "draws": 286,
@@ -2216,7 +2237,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 954,
-      "state": "779459d4",
+      "state": "69112258",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -2237,6 +2258,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -2311,6 +2333,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -2586,7 +2609,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 956,
-      "state": "0573a506",
+      "state": "78f8adb2",
       "events": "e3d5742e",
       "rng": {
         "draws": 286,
@@ -2607,6 +2630,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -2681,6 +2705,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -2957,7 +2982,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 958,
-      "state": "ecb820f5",
+      "state": "2e27a241",
       "events": "b3e7d531",
       "rng": {
         "draws": 286,
@@ -2978,6 +3003,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -3052,6 +3078,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
@@ -3336,7 +3363,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 958,
-      "state": "ecb820f5",
+      "state": "2e27a241",
       "events": "741638a5",
       "rng": {
         "draws": 286,
@@ -3357,6 +3384,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
           "counters": {},
@@ -3431,6 +3459,7 @@
             null
           ],
           "bank": {},
+          "bgRating": 1500,
           "cls": "warlock",
           "companionUpgrades": {},
           "counters": {},
