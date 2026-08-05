@@ -48,6 +48,14 @@ bank and disarms both payoffs without discarding anything. Moonsurge must
 measurably out-damage Sunwake's hit plus burn, or the mana refund makes
 Sunwake strictly better and the choice dies; the probe owns that margin.
 
+Moongrove is a spell caster, and its damage scales with spell power like one.
+The Moontide payoffs (Moonsurge and Sunwake) carry a spell-power rider that
+reflects the three builder presses invested in the bank, and the flat base
+numbers were re-banded down to match: in full best-in-slot (an intellect caster
+set) the spec lands at the 200 DPS peer anchor, and un-geared it sits inside the
+naked peer band rather than towering over it on flat numbers alone. Best-in-slot
+and naked balance are both owned by the owned-class harness.
+
 Two deliberate boundaries on the no-decay promise. The BANK never decays: a
 full Moontide holds until spent. And a resisted Wildbolt or Skyfall still
 banks its stage: the caster bank counts the player's completed presses, so

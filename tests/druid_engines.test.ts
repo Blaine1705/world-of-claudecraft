@@ -199,8 +199,11 @@ describe('Moongrove engine', () => {
         ?.effects.find((effect) => effect.type === 'directDamage');
       expect(direct).toMatchObject({ type: 'directDamage' });
       if (direct?.type !== 'directDamage') throw new Error('missing Sunlance damage');
-      expect(direct.min).toBeGreaterThan(160);
-      expect(direct.max).toBeGreaterThan(190);
+      // Sunwake resolves to its rebalanced Nature strike (base 80-100, lifted by
+      // the Balance spell-damage passive to ~98-123); the v0.29 pass moved its
+      // ceiling down and onto a spell-power rider so a caster scales with gear.
+      expect(direct.min).toBeGreaterThan(90);
+      expect(direct.max).toBeGreaterThan(110);
       player.resource = player.maxResource;
       player.gcdRemaining = 0;
       sim.castAbility('starfire');

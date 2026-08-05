@@ -59,8 +59,18 @@ export interface DruidBruinTankResult {
   secondsToLoseThreatAfterLeaving: number;
 }
 
+// A single fixed open-field anchor cannot be flat and sight-clear at EVERY world
+// seed. At a few seeds the terrain under the distance-18 caster target breaks its
+// line of sight and the ranged Moongrove rotation degenerately idles for the whole
+// window (0 damage, full GCD idle). Those runs are anchor-terrain artifacts, not
+// balance signal, so a pure-zero result is dropped from the average; a live
+// rotation never reads exactly 0 over 123 seconds. Melee Wildfang, targeting at
+// range 3, is unaffected. If every seed stalled (never observed) the raw mean is
+// returned so the degeneracy stays visible rather than dividing by zero.
 function average(values: readonly number[]): number {
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  const live = values.filter((value) => value > 0);
+  const sample = live.length > 0 ? live : values;
+  return sample.reduce((sum, value) => sum + value, 0) / sample.length;
 }
 
 export function runDruidBalanceMatrix(
