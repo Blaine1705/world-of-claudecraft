@@ -106,16 +106,21 @@ describe('the Glacier Tarn bowl is leavable on foot', () => {
   });
 
   it('walks back down the ramp into the bowl without a fall', { timeout: 60_000 }, () => {
-    // start on the bench above the ramp top and walk down to the water
+    // start on the bench above the ramp top and walk down to the water,
+    // stopping AT arrival: a fixed-length walk overshoots once the descent
+    // is smooth, swimming clear across the tarn onto the far shore's
+    // elemental beach (whose aggro is that camp working as authored, not a
+    // ramp defect)
     const top = { x: r.bx - 4, z: r.bz };
     const { sim, p, meta } = makeWalker(top);
     const startHp = p.hp;
     let airborneTicks = 0;
-    for (let i = 0; i < 20 * 10; i++) {
+    for (let i = 0; i < 20 * 20; i++) {
       meta.moveInput.forward = true;
       p.facing = DOWN_THE_RAMP;
       sim.tick();
       if (!p.onGround) airborneTicks++;
+      if (isInWaterBody(p.pos.x, p.pos.z) && p.pos.y < WATER_LEVEL + 1.5) break;
     }
     meta.moveInput.forward = false;
     // a slope no steeper than the climb gate is snapped down, never fallen

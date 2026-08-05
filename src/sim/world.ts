@@ -15,12 +15,10 @@ import {
   DUNGEON_FLOOR_Y,
   DUNGEON_X_THRESHOLD,
   dungeonAt,
-  GATHER_NODES,
   getActiveWorldContent,
   getContentGeneration,
   instanceOrigin,
   instanceSlotForZ,
-  NPCS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   STRIP_ZONES,
@@ -44,6 +42,12 @@ import {
 import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
+import {
+  CALM_SKIRT_MAX_WIDTH,
+  type CalmProbe,
+  calmSkirtWidth,
+  collectCalmAnchorPads,
+} from './terrain_calm_anchors';
 import {
   buildTerrainRegionIndex,
   TERRAIN_APPLIER,
@@ -3070,46 +3074,140 @@ interface CalmAnchor {
   x: number;
   z: number;
   rIn: number;
+  baseROut: number;
+  optional: boolean;
+  // NaN until the skirt is sized (see calmAnchorROut); 0 marks a dropped
+  // optional pad.
   rOut: number;
 }
-let calmAnchorIndex: Map<number, CalmAnchor[]> | null = null;
+
+// Per-seed calm tables: the anchor bucket index plus a [rIn, rOut] ring pair
+// per CAMPS entry. Keyed by seed because every skirt is sized from the
+// MEASURED legacy-vs-natural divergence around its pad
+// (terrain_calm_anchors.ts): a pad whose divergence already fits its classic
+// ring keeps that ring bit-identical, while a pad on a craggy mountainside
+// earns a wide walkable ramp instead of an unreachable ledge.
+//
+// Skirts are sized LAZILY, on the first sample that lands inside a pad's
+// maximum possible ring: sizing is a pure per-pad probe, so the values are
+// identical whatever order gameplay touches them in, and the ~1200-pad
+// roster never stalls the load path with one big probe pass.
+interface CalmSeedTables {
+  seed: number;
+  anchors: Map<number, CalmAnchor[]>;
+  campRings: Float32Array;
+}
+const calmSeedTables = new Map<number, CalmSeedTables>();
+
+// Build-time probe override: evaluates the finished height with the calm
+// factor FORCED to an endpoint. The override short-circuits terrainCalmAt
+// before any table lookup, so sizing a ring can never recurse into the build
+// that is sizing it, and the calm memo is bypassed in both directions (no
+// stale write, no poisoned read).
+let calmForce: number | null = null;
+
+export function terrainHeightWithForcedCalm(
+  x: number,
+  z: number,
+  seed: number,
+  calm: number,
+): number {
+  calmForce = calm;
+  try {
+    return terrainHeight(x, z, seed);
+  } finally {
+    calmForce = null;
+  }
+}
+
+// Exposed for tests/placement_integrity.test.ts: the calm factor at a
+// sample, resolved exactly as the height pipeline resolves it, so the gate
+// can assert a pad's character layers are fully off without re-deriving
+// ring membership.
+export function terrainCalmFactorAt(x: number, z: number, seed: number): number {
+  return terrainCalmAt(x, z, seed, terrainRegionAt(x, z));
+}
 
 const calmAnchorKey = (c: number, r: number): number => (c + 4096) * 8192 + (r + 4096);
 
-function calmAnchorCells(): Map<number, CalmAnchor[]> {
-  if (calmAnchorIndex) return calmAnchorIndex;
-  const index = new Map<number, CalmAnchor[]>();
-  const add = (x: number, z: number, rIn: number, rOut: number): void => {
-    if (x > DUNGEON_X_THRESHOLD) return;
-    const c0 = Math.floor((x - rOut) / CALM_ANCHOR_CELL);
-    const c1 = Math.floor((x + rOut) / CALM_ANCHOR_CELL);
-    const r0 = Math.floor((z - rOut) / CALM_ANCHOR_CELL);
-    const r1 = Math.floor((z + rOut) / CALM_ANCHOR_CELL);
-    const anchor: CalmAnchor = { x, z, rIn, rOut };
+function calmTablesFor(seed: number): CalmSeedTables {
+  const cached = calmSeedTables.get(seed);
+  if (cached) return cached;
+  const anchors = new Map<number, CalmAnchor[]>();
+  // The roster of pads lives in terrain_calm_anchors.ts (one row per
+  // authored open-world placement). Registration is cheap: each pad is
+  // bucketed by its MAXIMUM possible ring (rIn + the skirt cap), and the
+  // actual skirt is sized lazily on first touch.
+  for (const row of collectCalmAnchorPads()) {
+    if (row.x > DUNGEON_X_THRESHOLD) continue;
+    const rMax = row.rIn + CALM_SKIRT_MAX_WIDTH;
+    const c0 = Math.floor((row.x - rMax) / CALM_ANCHOR_CELL);
+    const c1 = Math.floor((row.x + rMax) / CALM_ANCHOR_CELL);
+    const r0 = Math.floor((row.z - rMax) / CALM_ANCHOR_CELL);
+    const r1 = Math.floor((row.z + rMax) / CALM_ANCHOR_CELL);
+    const anchor: CalmAnchor = {
+      x: row.x,
+      z: row.z,
+      rIn: row.rIn,
+      baseROut: row.baseROut,
+      optional: row.optional,
+      rOut: Number.NaN,
+    };
     for (let r = r0; r <= r1; r++) {
       for (let c = c0; c <= c1; c++) {
         const key = calmAnchorKey(c, r);
-        let bucket = index.get(key);
+        let bucket = anchors.get(key);
         if (!bucket) {
           bucket = [];
-          index.set(key, bucket);
+          anchors.set(key, bucket);
         }
         bucket.push(anchor);
       }
     }
-  };
-  for (const node of GATHER_NODES) add(node.pos.x, node.pos.z, 5, 12);
-  for (const id in NPCS) {
-    const npc = NPCS[id];
-    add(npc.pos.x, npc.pos.z, 6, 14);
   }
-  // Precision-graded landforms outside the content tables: the Glacier Tarn
-  // ramp and bowl (tests/frostveil_pit_escape.test.ts walks the descent
-  // under the fall-damage and climb gates, and pins the bed and the Rime
-  // Elemental beach to literals).
-  add(50, 1646, 22, 34);
-  calmAnchorIndex = index;
-  return index;
+  // Camp rings: same pads as before (the radius floor covers point-camps
+  // like the Highwatch training dummy), skirts sized like every anchor,
+  // lazily (NaN until first touch). The widest possible ring (radius 33
+  // camp: rIn 36.3 + the 36yd skirt cap) is comfortably inside the region
+  // index's one-guard-cell margin (128yd).
+  const campRings = new Float32Array(CAMPS.length * 2).fill(Number.NaN);
+  const tables: CalmSeedTables = { seed, anchors, campRings };
+  calmSeedTables.set(seed, tables);
+  return tables;
+}
+
+// The lazy skirt sizing. Pure per-pad probes, so WHEN a ring is sized can
+// never change its value; a dropped optional pad parks rOut at 0 (its
+// distance gate then rejects every sample).
+function calmAnchorROut(tables: CalmSeedTables, a: CalmAnchor): number {
+  if (!Number.isNaN(a.rOut)) return a.rOut;
+  const probe: CalmProbe = (px, pz, calm) => terrainHeightWithForcedCalm(px, pz, tables.seed, calm);
+  const width = calmSkirtWidth(a.x, a.z, a.rIn, a.baseROut - a.rIn, a.optional, probe);
+  a.rOut = width === null ? 0 : a.rIn + width;
+  return a.rOut;
+}
+
+function calmCampROut(tables: CalmSeedTables, campIndex: number): number {
+  const cached = tables.campRings[campIndex * 2 + 1];
+  if (!Number.isNaN(cached)) return cached;
+  const camp = CAMPS[campIndex];
+  const campR = Math.max(camp.radius, 4);
+  const rIn = campR * 1.1;
+  tables.campRings[campIndex * 2] = rIn;
+  // Instanced-interior camps (flat authored floors) keep the classic ring
+  // verbatim: probing out there would only churn instance-area terrain.
+  let rOut = campR * 2.2;
+  if (camp.center.x <= DUNGEON_X_THRESHOLD) {
+    const probe: CalmProbe = (px, pz, calm) =>
+      terrainHeightWithForcedCalm(px, pz, tables.seed, calm);
+    const width = calmSkirtWidth(camp.center.x, camp.center.z, rIn, campR * 1.1, false, probe);
+    rOut = rIn + (width ?? campR * 1.1);
+  }
+  tables.campRings[campIndex * 2 + 1] = rOut;
+  // Return the float32 round-trip, not the local double: every later read
+  // comes from the array, and a first-call-only wider value would make the
+  // one sample that triggered sizing disagree with all its successors.
+  return tables.campRings[campIndex * 2 + 1];
 }
 
 // Blended biome shape at a position. Zone interiors keep their exact shape;
@@ -3139,8 +3237,9 @@ function shapeAt(x: number, z: number): { hill: number; base: number; crag: numb
     base = lerp(base, shape.base, t);
     crag = lerp(crag, shape.crag, t);
   }
-  // baseHeight is the only caller and reads every field before any nested
-  // terrain sample, so the shared result is never retained across a reuse.
+  // baseHeight is the only caller and hoists every field into a local
+  // before its calm fetch (which can nest terrain samples through lazy
+  // ring sizing), so the shared result is never retained across a reuse.
   shapeScratch.hill = hill;
   shapeScratch.base = base;
   shapeScratch.crag = crag;
@@ -3161,38 +3260,59 @@ function shapeAt(x: number, z: number): { hill: number; base: number; crag: numb
 // roughening), so a single-entry memo dedupes the pair; keyed on region
 // identity too, so a content-generation rebuild can never reuse a stale
 // value.
-const calmMemo = { x: Number.NaN, z: Number.NaN, region: null as TerrainRegionCell | null, v: 1 };
+const calmMemo = {
+  x: Number.NaN,
+  z: Number.NaN,
+  seed: Number.NaN,
+  region: null as TerrainRegionCell | null,
+  v: 1,
+};
 
-function terrainCalmAt(x: number, z: number, region: TerrainRegionCell): number {
-  if (calmMemo.x === x && calmMemo.z === z && calmMemo.region === region) return calmMemo.v;
+function terrainCalmAt(x: number, z: number, seed: number, region: TerrainRegionCell): number {
+  if (calmForce !== null) return calmForce;
+  if (calmMemo.x === x && calmMemo.z === z && calmMemo.seed === seed && calmMemo.region === region)
+    return calmMemo.v;
+  const tables = calmTablesFor(seed);
   let calm = smoothstep(4, 18, roadDistance(x, z));
   if (calm > 0) {
     for (const campIndex of region.campIndices) {
       const camp = CAMPS[campIndex];
       const cdx = x - camp.center.x,
         cdz = z - camp.center.z;
-      // The radius floor covers point-camps (a fixture like the Highwatch
-      // training dummy is a radius-0 camp): even a single-spawn anchor
-      // keeps a small disc of classic ground underfoot.
-      const campR = Math.max(camp.radius, 4);
-      const calmGate = campR * 2.2;
-      if (cdx * cdx + cdz * cdz >= calmGate * calmGate) continue;
-      const t = smoothstep(campR * 1.1, calmGate, Math.sqrt(cdx * cdx + cdz * cdz));
+      const cdSq = cdx * cdx + cdz * cdz;
+      // Probed ring pair (see calmCampROut): the pad keeps the classic
+      // radius floor (a fixture like the Highwatch training dummy is a
+      // radius-0 camp), the skirt is divergence-sized, lazily. The cheap
+      // rMax pre-gate keeps far samples from sizing rings they can never
+      // be inside.
+      const campRMax = Math.max(camp.radius, 4) * 1.1 + CALM_SKIRT_MAX_WIDTH;
+      if (cdSq >= campRMax * campRMax) continue;
+      const rOut = calmCampROut(tables, campIndex);
+      if (cdSq >= rOut * rOut) continue;
+      const rIn = tables.campRings[campIndex * 2];
+      const t = smoothstep(rIn, rOut, Math.sqrt(cdSq));
       if (t < calm) calm = t;
       if (calm === 0) break;
     }
   }
   if (calm > 0) {
-    // gather nodes + NPC anchors (the static calm-anchor index above)
-    const bucket = calmAnchorCells().get(
+    // The static calm-anchor index (the roster in terrain_calm_anchors.ts:
+    // gather nodes, NPC anchors, dungeon doors, portals, graveyards,
+    // structural props, ...). The cheap rMax pre-gate keeps far samples from
+    // sizing skirts they can never be inside.
+    const bucket = tables.anchors.get(
       calmAnchorKey(Math.floor(x / CALM_ANCHOR_CELL), Math.floor(z / CALM_ANCHOR_CELL)),
     );
     if (bucket) {
       for (const a of bucket) {
         const adx = x - a.x,
           adz = z - a.z;
-        if (adx * adx + adz * adz >= a.rOut * a.rOut) continue;
-        const t = smoothstep(a.rIn, a.rOut, Math.sqrt(adx * adx + adz * adz));
+        const dSq = adx * adx + adz * adz;
+        const rMax = a.rIn + CALM_SKIRT_MAX_WIDTH;
+        if (dSq >= rMax * rMax) continue;
+        const rOut = calmAnchorROut(tables, a);
+        if (dSq >= rOut * rOut) continue;
+        const t = smoothstep(a.rIn, rOut, Math.sqrt(dSq));
         if (t < calm) calm = t;
         if (calm === 0) break;
       }
@@ -3251,6 +3371,7 @@ function terrainCalmAt(x: number, z: number, region: TerrainRegionCell): number 
   }
   calmMemo.x = x;
   calmMemo.z = z;
+  calmMemo.seed = seed;
   calmMemo.region = region;
   calmMemo.v = calm;
   return calm;
@@ -3263,9 +3384,13 @@ function baseHeight(
   region: TerrainRegionCell = terrainRegionAt(x, z),
 ): number {
   const shape = shapeAt(x, z);
+  // Every shape field is read into a local BEFORE the calm fetch:
+  // terrainCalmAt sizes rings lazily through nested full terrain samples,
+  // and a nested baseHeight overwrites the shared shapeScratch.
   const hillAmp = shape.hill;
   const cragAmp = shape.crag;
-  const calm = terrainCalmAt(x, z, region);
+  const shapeBase = shape.base;
+  const calm = terrainCalmAt(x, z, seed, region);
   // The natural-relief stack (terrain_relief.ts): the hill layer reads
   // through a shared low-frequency domain warp so contours meander, and its
   // fbm damps octaves on accumulated gradient so valley floors come out
@@ -3285,7 +3410,7 @@ function baseHeight(
           const legacy = fbm2(x * HILL_SCALE + 100, z * HILL_SCALE + 100, seed, 4);
           return legacy + (baseNew - legacy) * calm;
         })();
-  let h = (baseV - 0.5) * hillAmp + shape.base;
+  let h = (baseV - 0.5) * hillAmp + shapeBase;
   // The crag layer: ridged-multifractal crests, masked to the uplands the
   // hill layer already raised (mountains grow out of hills, proportionally;
   // lowlands never spike) and scaled by the biome's crag amplitude. Kept
@@ -4309,7 +4434,7 @@ function terrainHeightUnpadded(x: number, z: number, seed: number, skipEdits = f
   // below run AFTER this and level their crowns over it.
   const highT = smoothstep(14, 34, h);
   if (highT > 0.02) {
-    const calmHere = terrainCalmAt(x, z, region);
+    const calmHere = terrainCalmAt(x, z, seed, region);
     if (calmHere > 0.02) {
       const rw = warpedCoords(x, z, seed, calmHere);
       h += (ridged2(rw.x * 0.02, rw.z * 0.02, seed + 57, 3) - 0.4) * 6.5 * highT * calmHere;
