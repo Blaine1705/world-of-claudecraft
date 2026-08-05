@@ -2657,6 +2657,7 @@ export const tr_TR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Silah Büyüsü - Güç",
       "enchant_weapon_intellect": "Silah Büyüsü - Büyü Gücü",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Miğfer Büyüsü - Metanet",
       "enchant_neck_spirit": "Kolye Büyüsü - Ruh",
       "enchant_shoulder_agility": "Omuzluk Büyüsü - Çeviklik",
@@ -5117,6 +5118,7 @@ export const tr_TR: EnTranslations = {
       "terrainCapReached": "Arazi düzenleme sınırına ulaşıldı ({max}). Fazladan şekillendirme damgaları eklenmedi.",
       "placementCapReached": "Yerleştirme sınırına ulaşıldı ({max}). Fazladan varlıklar eklenmedi.",
       "blockerCapReached": "Engel duvarı sınırına ulaşıldı ({max}). Yeni duvar eklenmedi.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Otomatik kayıt kapatıldı: {reason} Elle kaydet, sonra yeniden aç."
     },
     "confirm": {

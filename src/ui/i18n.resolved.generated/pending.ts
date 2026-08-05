@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -157,6 +158,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -238,6 +240,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "es_ES": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -385,6 +388,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -466,6 +470,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "fr_FR": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -613,6 +618,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -694,6 +700,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "fr_CA": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -841,6 +848,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -923,6 +931,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -1070,6 +1079,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -1151,6 +1161,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "de_DE": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -1298,6 +1309,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -1379,6 +1391,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "zh_CN": [
+    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1388,6 +1401,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.progressText"
   ],
   "zh_TW": [
+    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1397,6 +1411,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.progressText"
   ],
   "ko_KR": [
+    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1406,6 +1421,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.progressText"
   ],
   "ja_JP": [
+    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1415,6 +1431,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.progressText"
   ],
   "pt_BR": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -1562,6 +1579,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -1643,6 +1661,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "ru_RU": [
+    "editor.status.campCapReached",
     "hudChrome.bg.clock",
     "hudChrome.materialHint.usedBy",
     "hudChrome.mobTooltip.boss",
@@ -1652,6 +1671,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.reliquary.progressText"
   ],
   "cs_CZ": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -1799,6 +1819,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -1880,6 +1901,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "nl_NL": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -2027,6 +2049,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -2108,6 +2131,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "pl_PL": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -2255,6 +2279,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -2336,6 +2361,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "id_ID": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -2483,6 +2509,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -2564,6 +2591,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "tr_TR": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -2711,6 +2739,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -2792,6 +2821,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "sv_SE": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -2939,6 +2969,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -3020,6 +3051,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "vi_VN": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -3167,6 +3199,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",
@@ -3248,6 +3281,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "da_DK": [
+    "editor.status.campCapReached",
     "guide.nav.thornhollow",
     "guide.thornhollowPage.carrierBody",
     "guide.thornhollowPage.carrierHeading",
@@ -3395,6 +3429,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.commissionBoard.toCraftEmpty",
     "hudChrome.crafting.skillUpSubtext",
     "hudChrome.crafting.skillUpToast",
+    "hudChrome.enchantName.enchant_offhand_stamina",
     "hudChrome.keybinds.bgFlag",
     "hudChrome.materialHint.usedBy",
     "hudChrome.meters.threatFallback",

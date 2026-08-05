@@ -2657,6 +2657,7 @@ export const en_XA: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "[Éñçĥáñţ Ŵéáþóñ - Ɱíĝĥţ]",
       "enchant_weapon_intellect": "[Éñçĥáñţ Ŵéáþóñ - Šþéļļþóŵéŕ]",
+      "enchant_offhand_stamina": "[Éñçĥáñţ Óƒƒĥáñð - Šţáɱíñá]",
       "enchant_helmet_fortitude": "[Éñçĥáñţ Ĥéļɱéţ - Ƒóŕţíţúðé]",
       "enchant_neck_spirit": "[Éñçĥáñţ Ñéçķļáçé - Šþíŕíţ]",
       "enchant_shoulder_agility": "[Éñçĥáñţ Šĥóúļðéŕš - Áĝíļíţý]",
@@ -5117,6 +5118,7 @@ export const en_XA: EnTranslations = {
       "terrainCapReached": "[Ţéŕŕáíñ éðíţ ļíɱíţ ŕéáçĥéð ({max}). Éẋţŕá šçúļþţ šţáɱþš ŵéŕé ñóţ áððéð.]",
       "placementCapReached": "[Þļáçéɱéñţ ļíɱíţ ŕéáçĥéð ({max}). Éẋţŕá áššéţš ŵéŕé ñóţ áððéð.]",
       "blockerCapReached": "[Ɓļóçķéŕ ŵáļļ ļíɱíţ ŕéáçĥéð ({max}). Ţĥé ñéŵ ŵáļļ ŵáš ñóţ áððéð.]",
+      "campCapReached": "[Çáɱþ ļíɱíţ ŕéáçĥéð ({max}). Ţĥé ñéŵ çáɱþ ŵáš ñóţ áððéð.]",
       "autosaveOff": "[Áúţóšáʋé ţúŕñéð óƒƒ: {reason} Šáʋé ɱáñúáļļý, ţĥéñ ţúŕñ íţ ƀáçķ óñ.]"
     },
     "confirm": {

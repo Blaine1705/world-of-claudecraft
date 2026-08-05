@@ -2657,6 +2657,7 @@ export const ru_RU: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Зачарование оружия - Мощь",
       "enchant_weapon_intellect": "Зачарование оружия - Сила заклинаний",
+      "enchant_offhand_stamina": "Зачарование левой руки - Выносливость",
       "enchant_helmet_fortitude": "Зачарование шлема - Стойкость",
       "enchant_neck_spirit": "Зачарование ожерелья - Дух",
       "enchant_shoulder_agility": "Зачарование наплечников - Ловкость",
@@ -5117,6 +5118,7 @@ export const ru_RU: EnTranslations = {
       "terrainCapReached": "Достигнут лимит правок рельефа ({max}). Лишние штампы не были добавлены.",
       "placementCapReached": "Достигнут лимит размещений ({max}). Лишние объекты не были добавлены.",
       "blockerCapReached": "Достигнут предел невидимых стен ({max}). Новая стена не добавлена.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Автосохранение отключено: {reason} Сохраните вручную, затем включите снова."
     },
     "confirm": {

@@ -2657,6 +2657,7 @@ export const ko_KR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "무기 마법부여 - 위력",
       "enchant_weapon_intellect": "무기 마법부여 - 주문력",
+      "enchant_offhand_stamina": "보조장비 마법부여 - 체력",
       "enchant_helmet_fortitude": "투구 마법부여 - 강건함",
       "enchant_neck_spirit": "목걸이 마법부여 - 정신력",
       "enchant_shoulder_agility": "어깨 마법부여 - 민첩성",
@@ -5117,6 +5118,7 @@ export const ko_KR: EnTranslations = {
       "terrainCapReached": "지형 편집 한도에 도달했습니다({max}). 초과된 스컬프트 스탬프는 추가되지 않았습니다.",
       "placementCapReached": "배치 한도에 도달했습니다({max}). 초과된 에셋은 추가되지 않았습니다.",
       "blockerCapReached": "차단벽 한도({max})에 도달했습니다. 새 벽이 추가되지 않았습니다.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "자동 저장이 꺼졌습니다: {reason} 수동으로 저장한 뒤 다시 켜세요."
     },
     "confirm": {

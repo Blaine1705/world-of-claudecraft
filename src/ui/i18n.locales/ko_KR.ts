@@ -10397,6 +10397,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.marketListBound': '그 아이템은 귀속되어 등록할 수 없습니다.',
   'hudChrome.enchantName.enchant_weapon_might': '무기 마법부여 - 위력',
   'hudChrome.enchantName.enchant_weapon_intellect': '무기 마법부여 - 주문력',
+  'hudChrome.enchantName.enchant_offhand_stamina': '보조장비 마법부여 - 체력',
   'hudChrome.enchantName.enchant_helmet_fortitude': '투구 마법부여 - 강건함',
   'hudChrome.enchantName.enchant_neck_spirit': '목걸이 마법부여 - 정신력',
   'hudChrome.enchantName.enchant_shoulder_agility': '어깨 마법부여 - 민첩성',

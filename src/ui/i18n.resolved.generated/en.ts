@@ -2657,6 +2657,7 @@ export const en: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Enchant Weapon - Might",
       "enchant_weapon_intellect": "Enchant Weapon - Spellpower",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Enchant Helmet - Fortitude",
       "enchant_neck_spirit": "Enchant Necklace - Spirit",
       "enchant_shoulder_agility": "Enchant Shoulders - Agility",
@@ -5117,6 +5118,7 @@ export const en: EnTranslations = {
       "terrainCapReached": "Terrain edit limit reached ({max}). Extra sculpt stamps were not added.",
       "placementCapReached": "Placement limit reached ({max}). Extra assets were not added.",
       "blockerCapReached": "Blocker wall limit reached ({max}). The new wall was not added.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Autosave turned off: {reason} Save manually, then turn it back on."
     },
     "confirm": {

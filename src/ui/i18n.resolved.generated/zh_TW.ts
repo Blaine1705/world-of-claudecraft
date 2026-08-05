@@ -2657,6 +2657,7 @@ export const zh_TW: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "附魔武器 - 威力",
       "enchant_weapon_intellect": "附魔武器 - 法術強度",
+      "enchant_offhand_stamina": "附魔副手 - 耐力",
       "enchant_helmet_fortitude": "附魔頭部 - 堅韌",
       "enchant_neck_spirit": "附魔頸部 - 精神",
       "enchant_shoulder_agility": "附魔肩部 - 敏捷",
@@ -5117,6 +5118,7 @@ export const zh_TW: EnTranslations = {
       "terrainCapReached": "已達到地形編輯上限（{max}）。多餘的雕刻印記未被加入。",
       "placementCapReached": "已達到放置上限（{max}）。多餘的資源未被加入。",
       "blockerCapReached": "已達到空氣牆上限（{max}）。新牆未被加入。",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "自動儲存已關閉：{reason} 請手動儲存後再重新開啟。"
     },
     "confirm": {

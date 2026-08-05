@@ -413,7 +413,7 @@ export function buildWhoamiContent(roles: {
     return 'Your Discord is not linked to a World of ClaudeCraft account yet. Use /link to connect it and start earning rewards.';
   }
   const rank = tierRoleName(roles.statusTier)?.replace('WoC ', '') ?? 'Unranked';
-  return `Linked. Rank: **${rank}** · ${roles.points} reward points (lifetime ${roles.lifetimePoints}). Use /flex to show off your top character.`;
+  return `Linked. Rank: **${rank}** · ${roles.points} reward points (lifetime ${roles.lifetimePoints}).`;
 }
 
 /** /link reply pointing at the in-game link flow. */
