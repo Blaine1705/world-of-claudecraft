@@ -253,8 +253,8 @@ describe('combat SFX policy', () => {
     ).toEqual({ key: 'spell_nova', anchorId: 20 });
   });
 
-  it('gives the three AoE fear shouts their own nova cue instead of the shared spell_nova', () => {
-    for (const ability of ['psychic_scream', 'howl_of_terror', 'intimidating_shout']) {
+  it('gives the two AoE fear shouts still on the shared fear_shout cue', () => {
+    for (const ability of ['psychic_scream', 'howl_of_terror']) {
       expect(
         spellFxCue({
           type: 'spellfx',
@@ -277,6 +277,62 @@ describe('combat SFX policy', () => {
         ability: 'arcane_explosion',
       }),
     ).toEqual({ key: 'spell_nova', anchorId: 10 });
+  });
+
+  it('gives Intimidating Shout its own distinct nova cue, not the shared fear_shout', () => {
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'shadow',
+        fx: 'nova',
+        ability: 'intimidating_shout',
+      }),
+    ).toEqual({ key: 'intimidating_shout', anchorId: 10 });
+  });
+
+  it('gives Battle Shout and Demoralizing Shout their own cast cue via fx:shout', () => {
+    for (const [ability, key] of [
+      ['battle_shout', 'battle_shout'],
+      ['demoralizing_shout', 'demoralizing_shout'],
+    ] as const) {
+      expect(
+        spellFxCue({
+          type: 'spellfx',
+          sourceId: 10,
+          targetId: 10,
+          school: 'physical',
+          fx: 'shout',
+          ability,
+        }),
+      ).toEqual({ key, anchorId: 10 });
+    }
+    // Intimidating Shout also carries castFx:'shout', but its cue resolves
+    // through the nova path above (its aoeFear effect emits fx:'nova'
+    // unconditionally); deliberately absent from SHOUT_ABILITY_CUES so the
+    // same cast never plays two different cues.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'shout',
+        ability: 'intimidating_shout',
+      }),
+    ).toBeNull();
+    // An unmapped shout id stays silent too.
+    expect(
+      spellFxCue({
+        type: 'spellfx',
+        sourceId: 10,
+        targetId: 10,
+        school: 'physical',
+        fx: 'shout',
+        ability: 'commanding_shout',
+      }),
+    ).toBeNull();
   });
 
   it('gives Frost Nova its own cast cue instead of the shared spell_nova', () => {

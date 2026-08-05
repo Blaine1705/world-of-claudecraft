@@ -32,14 +32,16 @@ const WAND_CUES: Partial<Record<MagicSchool, SfxId>> = {
 // A 'nova' fx event normally plays the shared spell_nova cue (every
 // self-centered or ground-targeted burst: Frost Nova, Arcane Explosion,
 // Ring of Frost, ...). A few abilities get their own distinct cast cue
-// instead, keyed off the casting ability id the event already carries: the
-// three AoE fear shouts (priest Psychic Scream, warlock Howl of Terror,
-// warrior Intimidating Shout, all archetype aoeFear), Frost Nova, and
-// Flamestrike (also archetype 'nova': a ground-targeted fire burst).
+// instead, keyed off the casting ability id the event already carries:
+// priest Psychic Scream, warlock Howl of Terror (both still on the shared
+// fear_shout, no dedicated recording of their own yet), warrior Intimidating
+// Shout (its own recording now, distinct from the other two fear casts),
+// Frost Nova, and Flamestrike (also archetype 'nova': a ground-targeted fire
+// burst).
 const NOVA_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   psychic_scream: 'fear_shout',
   howl_of_terror: 'fear_shout',
-  intimidating_shout: 'fear_shout',
+  intimidating_shout: 'intimidating_shout',
   frost_nova: 'frost_nova',
   flamestrike: 'flamestrike',
 };
@@ -106,6 +108,21 @@ const CC_IMPACT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
 const BLINK_STEP_ABILITY_CUES: Partial<Record<string, SfxId>> = {
   blink: 'blink',
   shadowstep: 'shadowstep',
+};
+
+// fx:'shout' fires from casting_lifecycle.ts's generic castFx completion
+// block for every ability with `castFx: 'shout'` on its definition (currently
+// Iron Bellow/battle_shout, Direhowl/demoralizing_shout, and Intimidating
+// Shout, none of which had a cue hooked up here before: the event fired but
+// nothing in combat_sfx.ts recognized the 'shout' fx kind at all). Battle
+// Shout and Demoralizing Shout have no other cast-time emit, so this table
+// is their whole read; Intimidating Shout ALSO emits its own fx:'nova' (its
+// effect is archetype aoeFear, effect_dispatch.ts's case 'aoeFear'), which is
+// where its cue actually resolves (NOVA_ABILITY_CUES above), so it is
+// deliberately absent here to avoid a double cast sound on the same cast.
+const SHOUT_ABILITY_CUES: Partial<Record<string, SfxId>> = {
+  battle_shout: 'battle_shout',
+  demoralizing_shout: 'demoralizing_shout',
 };
 
 // Exported (read-only, `as const`) purely so a test can pin its key set
@@ -284,6 +301,10 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
   }
   if (event.fx === 'dotApply') {
     const key = event.ability && DOT_APPLY_ABILITY_CUES[event.ability];
+    return key ? { key, anchorId: event.targetId } : null;
+  }
+  if (event.fx === 'shout') {
+    const key = event.ability && SHOUT_ABILITY_CUES[event.ability];
     return key ? { key, anchorId: event.targetId } : null;
   }
   return null;
