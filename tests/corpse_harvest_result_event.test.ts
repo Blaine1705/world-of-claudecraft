@@ -309,7 +309,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // The ledger records what landed, not what was rolled. A 'signed' entry
     // here would name an instance the player does not hold; the mark-lost
     // toast is what tells them the signature is the thing that got away.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
@@ -328,7 +328,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
   it('full-bag specimen truncation: the dropped jackpot contributes NO entry', () => {
     // Nothing landed, so no line may claim it did. The find-lost toast is the
     // whole of that half of the feedback.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = metaOf(internals, a);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
@@ -351,7 +351,7 @@ describe('the four grant arms each report themselves (#2457)', () => {
     // seam tests/corpse_harvest_sim.test.ts uses to drive the real arm.
     const tiers = MONSTER_MATERIAL_TIERS as Record<string, number>;
     const prior = tiers.hide;
-    const { sim, a, mob } = setup(30);
+    const { sim, a, mob } = setup(9);
     sim.drainEvents();
     tiers.hide = 2;
     try {

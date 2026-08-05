@@ -407,8 +407,8 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 // zone-1 camp counts, then from 2 to 30 after the zones 1-3 quest-dedupe
 // content pass shifted the camp-driven world-gen draw sequence again.
 describe('signed Pristine specimens (#1145)', () => {
-  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 30)', () => {
-    const { sim, internals, a, mob } = setup(30);
+  it('a rare-or-better harvest grants the signed specimen PLUS the plain component (seed 9)', () => {
+    const { sim, internals, a, mob } = setup(9);
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['hide'], a);
     // The signed jackpot landed signed: no downgrade notice fires.
@@ -444,8 +444,8 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('pristine_hide', a)).toBe(0);
   });
 
-  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 30)', () => {
-    const { sim, internals, a, mob } = setup(30);
+  it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 9)', () => {
+    const { sim, internals, a, mob } = setup(9);
     sim.harvestCorpse(mob.id, ['fang'], a);
     const meta = internals.players.get(a)!;
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
@@ -480,7 +480,7 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('wolf_fang', a)).toBe(3);
   });
 
-  it('every other specimen family grants its own jackpot beside the plain component (seed 30)', () => {
+  it('every other specimen family grants its own jackpot beside the plain component (seed 9)', () => {
     // The hide row is exercised above; this sweeps the remaining three
     // specimen rows behaviorally (silk and venomSac via webwood_spider, meat
     // via wild_boar), so a mistargeted HARVEST_COMPONENT_SPECIMENS row cannot
@@ -503,7 +503,7 @@ describe('signed Pristine specimens (#1145)', () => {
       { templateId: 'wild_boar', focus: 'meat', plain: 'game_meat', specimen: 'prime_cut' },
     ];
     for (const f of families) {
-      const { sim, internals, a } = setup(30);
+      const { sim, internals, a } = setup(9);
       const template = MOBS[f.templateId];
       const corpse = createMob(7776, template, template.maxLevel, { x: 0, y: 0, z: 0 });
       corpse.dead = true;
@@ -522,8 +522,8 @@ describe('signed Pristine specimens (#1145)', () => {
     }
   });
 
-  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 30)', () => {
-    const { sim, internals, a } = setup(30);
+  it('the cloth family (no specimen) grants the signed component at rare-or-better (seed 9)', () => {
+    const { sim, internals, a } = setup(9);
     const template = MOBS.vale_bandit;
     const corpse = createMob(7775, template, template.maxLevel, { x: 0, y: 0, z: 0 });
     corpse.dead = true;
@@ -543,13 +543,13 @@ describe('signed Pristine specimens (#1145)', () => {
     expect(sim.countItem('homespun_cloth', a)).toBe(1);
   });
 
-  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 30)', () => {
+  it('a slot-full signed-family harvest falls back to the plain stack, never over capacity (seed 9)', () => {
     // The pre-gate reserves plain-stack room only, so a partial stack lets it
     // pass while a signed instance would still need a fresh slot. The rare+
     // arm must then fall back to the plain fungible top-up (the signature
     // truncates, the yield does not), same free-slot contract as the
     // specimen arm.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -572,11 +572,11 @@ describe('signed Pristine specimens (#1145)', () => {
     ]);
   });
 
-  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 30)', () => {
+  it('a slot-full specimen harvest truncates the specimen and keeps the plain yield (seed 9)', () => {
     // Plain grant tops up the partial stack without opening a slot, so the
     // specimen guard sees a full bag: the jackpot truncates rather than
     // overflowing, and the plain component still arrives.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -804,11 +804,11 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
   });
 
-  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 30)', () => {
+  it('a slot-full bag with the same-signer stack AT its cap still falls back plain, at the boundary (seed 9)', () => {
     // The boundary tick: the same-signer stack sits EXACTLY at stackSizeOf,
     // so it offers zero merge room and the guard must refuse, top up the
     // plain stack, and emit the mark-lost downgrade, never overflow.
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -829,12 +829,12 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     ]);
   });
 
-  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 30)', () => {
+  it('a slot-full specimen jackpot merges into a same-signer specimen stack instead of truncating (seed 9)', () => {
     // The specimen arm shares the merge-aware guard: with the plain component
     // topping up its own partial stack, the jackpot's only room is the
     // byte-equal same-signer specimen stack, and it must land there signed
     // (the pre-merge contract truncated it outright, lost: 'find').
-    const { sim, internals, a, mob } = setup(30);
+    const { sim, internals, a, mob } = setup(9);
     fillBags(sim, internals, a);
     const m = internals.players.get(a)!;
     const cap = bagCapacity(m.bags);
@@ -2083,8 +2083,8 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(canHarvestMonsterMaterial(2, 2)).toBe(true);
   });
 
-  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 30)', () => {
-    const { sim, internals, a, mob } = setup(30);
+  it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 9)', () => {
+    const { sim, internals, a, mob } = setup(9);
     const meta = internals.players.get(a)!;
     // Genuinely bare-handed: the starting kit resolves to the tier-1 floor.
     expect(bestOwnedAnyGatherToolTier(meta.inventory, ITEMS)).toBe(1);

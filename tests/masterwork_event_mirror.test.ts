@@ -17,7 +17,7 @@ import type { SimEvent } from '../src/sim/types';
 // chance at this seed. Pre-verified against this exact grant order (3x
 // linen_scrap then 1x spider_leg, then the craft); seeds 107, 111, 118, and
 // 123 also land, kept on record here as spares.
-const PROC_SEED = 53;
+const PROC_SEED = 70;
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';
 

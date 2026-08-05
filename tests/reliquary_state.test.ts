@@ -548,7 +548,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     );
     // announceGatherEvent writes visit then the Reliquary mark together.
     expect(gatherSrc).toMatch(
-      /const visitMark = 'gather_event:' \+ flavor;[\s\S]*?ctx\.markVisited\(finder, visitMark\);[\s\S]*?noteReliquaryMark\(ctx, finder, visitMark\);/,
+      /const visitMark = `gather_event:\$\{flavor\}`;[\s\S]*?ctx\.markVisited\(finder, visitMark\);[\s\S]*?noteReliquaryMark\(ctx, finder, visitMark\);/,
     );
 
     const interactionSrc = fs.readFileSync(

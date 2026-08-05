@@ -96,7 +96,11 @@ function collectMountKeys(slots: readonly { itemId: string }[]): MountKey[] {
  *  Single pass over bags + bank: the server rebuilds this per snapshot, so it
  *  never scans the containers once per catalog mount. */
 export function ownedMounts(meta: PlayerMeta): MountKey[] {
-  return collectMountKeys([...meta.inventory, ...meta.bank.inventory]);
+  // Tolerate partial meta in unit fixtures (and any host that has not yet
+  // attached bags): missing inventory/bank means no owned reins, not a throw.
+  const bags = Array.isArray(meta.inventory) ? meta.inventory : [];
+  const bank = Array.isArray(meta.bank?.inventory) ? meta.bank.inventory : [];
+  return collectMountKeys([...bags, ...bank]);
 }
 
 /** The owned subset of the catalog whose reins are in BAGS right now (never

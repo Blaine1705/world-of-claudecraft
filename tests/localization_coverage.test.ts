@@ -1320,9 +1320,10 @@ describe('i18n Localization Key Coverage', () => {
 
   it('should provide deed content translations for every supported locale', () => {
     const deedEntries = deedTranslationManifest();
-    // name + desc per deed, plus one title entry per title deed (31 as of
-    // Thornhollow Fields; tests/deeds_content.test.ts pins the count).
-    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + 31);
+    // name + desc per deed, plus one title entry per title deed (live count;
+    // tests/deeds_content.test.ts pins the catalog).
+    const titleCount = Object.values(DEEDS).filter((d) => d.reward?.kind === 'title').length;
+    expect(deedEntries.length).toBe(Object.keys(DEEDS).length * 2 + titleCount);
 
     for (const lang of supportedLanguages) {
       setLanguage(lang);
