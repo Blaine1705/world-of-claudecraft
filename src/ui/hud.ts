@@ -5942,6 +5942,13 @@ export class Hud {
   }
 
   private refreshLocalizedDynamicUi(): void {
+    // The player unit frame's hp/resource text is memoized on the raw value,
+    // which does not change on a locale switch, so clear the memo to force
+    // unitFrameCurrentMaxText to re-render for the new language (#2900 review).
+    this.lastPlayerFrameHp = Number.NaN;
+    this.lastPlayerFrameMaxHp = Number.NaN;
+    this.lastPlayerFrameResource = Number.NaN;
+    this.lastPlayerFrameMaxResource = Number.NaN;
     this.syncDailyRewardsSurfaceLabels();
     this.storePromoCard?.relocalize({
       open: t('hudChrome.wocStore.title'),
