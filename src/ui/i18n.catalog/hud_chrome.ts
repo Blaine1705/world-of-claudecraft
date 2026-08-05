@@ -3772,6 +3772,71 @@ export const hudChromeStrings = {
     // unbound copy it peels off.
     noSpace: 'You do not have room for the unbound copy.',
   },
+  // Commission order board (issue #1298): a lightweight job board layered
+  // on the Maker's Bond above. Opened from a button in the crafting
+  // window's header; no location gate, since opening/cancelling an order
+  // carries no escrow. Chat lines answer commissionOrderResult (the
+  // trainResult/unbindResult single-surface rule: one line, no toast).
+  commissionBoard: {
+    title: 'Commission Orders',
+    close: 'Close commission orders',
+    openButton: 'Orders',
+    openButtonAria: 'Open the commission order board',
+    intro: "Commission a crafter to make you a piece, or take on someone else's order.",
+    // The "open a new order" form.
+    formTitle: 'Open a Commission',
+    recipeLabel: 'Item',
+    recipeEmpty: 'You know no craftable equipment recipes yet.',
+    scopeLabel: 'Who can accept',
+    scopeOpen: 'Anyone (open board)',
+    scopeCrafter: 'A specific crafter',
+    crafterNameLabel: 'Crafter name',
+    crafterNamePlaceholder: 'Character name',
+    openSubmit: 'Post Order',
+    // Section headings over the three row groups.
+    sectionMine: 'My Requests',
+    sectionToCraft: 'My Commissions',
+    sectionBoard: 'Open Board',
+    boardEmpty: 'No open orders right now.',
+    mineEmpty: 'You have not opened any commissions.',
+    toCraftEmpty: "You are not crafting anyone's order right now.",
+    // One row's line: "{item} for {requester}" / "for {crafter}" when a
+    // 'crafter'-scope order names a specific target.
+    rowFor: '{item} for {requester}',
+    rowTargeted: '{item} for {requester} (for {crafter})',
+    acceptedBy: 'Accepted by {name}',
+    statusOpen: 'Open',
+    statusAccepted: 'Accepted',
+    statusDelivered: 'Delivered',
+    statusCancelled: 'Cancelled',
+    statusExpired: 'Expired',
+    cancelButton: 'Cancel',
+    acceptButton: 'Accept',
+    deliverButton: 'Deliver',
+    deliverHint:
+      'Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.',
+    // commissionOrderResult chat lines, one success line per action (the
+    // trainResult single-surface rule) plus the shared deny-reason set.
+    opened: 'You post a commission order for {item}.',
+    cancelled: 'You cancel the commission order for {item}.',
+    accepted: 'You accept the commission order for {item}.',
+    delivered: 'You deliver {item} to {name}.',
+    denyUnknownRecipe: 'That recipe does not exist.',
+    denyNotCommissionEligible: 'That recipe cannot be commissioned.',
+    denyUnknownCrafter: 'No character by that name is known.',
+    denySelfCrafter: 'You cannot commission yourself.',
+    denyTooManyOpen: 'You already have too many open commission orders.',
+    denyUnknownOrder: 'That commission order no longer exists.',
+    denyOrderNotOpen: 'That commission order is no longer open.',
+    denySelfOrder: 'You cannot accept your own commission order.',
+    denyNotEligibleCrafter: 'That commission order was posted for someone else.',
+    denyNotYourOrder: 'That is not your commission order.',
+    denyOrderNotAccepted: 'That commission order has not been accepted yet.',
+    denyNotYourAcceptance: 'You did not accept that commission order.',
+    denyNotCrafted: 'Craft the commissioned piece first (with the commission toggle on).',
+    denyOutOfRange: 'You must be near the requester to deliver a commission.',
+    denyNoSpace: 'The requester has no room in their bags.',
+  },
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.

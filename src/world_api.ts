@@ -520,6 +520,14 @@ export const COMMAND_NAMES = [
   // Guild billboard: set (or clear, with '') the officer-editable message
   // pinned atop the social window's Guild tab (SocialService.guildSetMotd).
   'guild_set_motd',
+  // Commission order board (Professions 2.0, issue #1298): open/cancel a
+  // commission request, or accept/deliver one as a crafter (Sim.
+  // openCommissionOrder/cancelCommissionOrder/acceptCommissionOrder/
+  // deliverCommissionOrder via src/sim/professions/commission_order.ts).
+  'open_commission_order',
+  'cancel_commission_order',
+  'accept_commission_order',
+  'deliver_commission_order',
   // "Stop Auto-Attack on Target Switch" QoL preference (issue #1358): mirrors
   // the client setting onto the authoritative Targeting slice so every
   // target-switch selector can gate on it (Sim.setStopAutoAttackOnTargetSwitch

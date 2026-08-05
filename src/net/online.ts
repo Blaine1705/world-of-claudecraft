@@ -138,6 +138,8 @@ import {
 } from '../world_api/action_bar';
 import type {
   ApplyEnchantResultView,
+  CommissionOrderScope,
+  CommissionOrderView,
   DisenchantResultView,
   MasterworkView,
   SalvageResultView,
@@ -1686,6 +1688,10 @@ export class ClientWorld implements IWorld {
   // locally (net/ optimism rules), the delta lands after the server accepts
   // the specialization-gated command, and it flips back to null on expiry.
   activeMobileStationCraft: string | null = null;
+  // Commission order board (Professions 2.0, issue #1298), mirrored from the
+  // server's `corder` self-delta below: the viewer's own projection, small
+  // and diffed per tick like professionsState/craftingIdentity above.
+  commissionOrders: readonly CommissionOrderView[] = [];
   // Title granted by the active pair attunement (#1130, pair-named under
   // Professions 2.0): the canonical pair id, derived live from the cprof
   // mirror (applySnapshot replaces craftingIdentity wholesale on every cprof
@@ -3399,6 +3405,11 @@ export class ClientWorld implements IWorld {
       // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
       // explicit null (station expired or never placed) must overwrite.
       if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
+      // Commission order board (issue #1298): server-diffed per tick like
+      // prof/cprof above, so this is how BOTH sides of an accept/deliver
+      // converge (not the commissionOrderResult event, which is deny-toast
+      // only).
+      if (s.corder !== undefined) this.commissionOrders = s.corder ?? [];
       // Enchanting-action outcome mirrors (Professions 2.0): the
       // convergence arm for lastDisenchantResult/lastEnchantResult/lastSalvageResult
       // (the event mirror above is the immediacy arm; both feed the same field).
@@ -3987,6 +3998,28 @@ export class ClientWorld implements IWorld {
   // self inv delta.
   unbindItem(itemId: string): void {
     this.cmd({ cmd: 'unbind_item', item: itemId });
+  }
+  // Commission order board (Professions 2.0, issue #1298): command only,
+  // never predicted. The server re-validates every field in
+  // src/sim/professions/commission_order.ts and answers with the personal
+  // commissionOrderResult event; the durable order list itself mirrors back
+  // via the corder self-delta (applySnapshot above), for every affected
+  // viewer, not just the caller.
+  openCommissionOrder(recipeId: string, scope: CommissionOrderScope, crafterName?: string): void {
+    if (scope === 'crafter') {
+      this.cmd({ cmd: 'open_commission_order', recipe: recipeId, scope, crafter: crafterName });
+    } else {
+      this.cmd({ cmd: 'open_commission_order', recipe: recipeId, scope });
+    }
+  }
+  cancelCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'cancel_commission_order', order: orderId });
+  }
+  acceptCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'accept_commission_order', order: orderId });
+  }
+  deliverCommissionOrder(orderId: number): void {
+    this.cmd({ cmd: 'deliver_commission_order', order: orderId });
   }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });

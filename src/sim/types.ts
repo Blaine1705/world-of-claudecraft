@@ -4997,6 +4997,45 @@ export type SimEvent = { pid?: number } & (
         | 'unbind_cannot_afford';
       fee: number;
     }
+  // Commission order board outcome (issue #1298): mirrors one of
+  // professions/commission_order.ts's four result shapes (OpenOrderResult/
+  // CancelOrderResult/AcceptOrderResult/DeliverOrderResult), discriminated by
+  // `action`. Personal (emitted with pid = the acting player's entity id, the
+  // requester for 'open'/'cancel', the crafter for 'accept'/'deliver').
+  // Text-free on purpose (the trainResult precedent): the client derives
+  // recipe/item/player names from ids plus static content, so the event
+  // carries NO display text. `orderId` is absent only on 'open' failing
+  // before an order exists (unknown-recipe, ineligible output, unknown
+  // crafter, self-target, or the open-order cap); every other action always
+  // names the order id, even on a deny. `reason` is absent on success.
+  | {
+      type: 'commissionOrderResult';
+      action: 'open' | 'cancel' | 'accept' | 'deliver';
+      ok: boolean;
+      orderId?: number;
+      itemId?: string;
+      // The requester's display name, resolved off the still-retained order
+      // record (issue #1298 follow-up): 'deliver' is the crafter's own
+      // action, so ev.pid names the crafter, not the requester the client
+      // needs to greet in the success line.
+      requesterName?: string;
+      reason?:
+        | 'unknown_recipe'
+        | 'not_commission_eligible'
+        | 'unknown_crafter'
+        | 'self_crafter'
+        | 'too_many_open'
+        | 'unknown_order'
+        | 'order_not_open'
+        | 'self_order'
+        | 'not_eligible_crafter'
+        | 'not_your_order'
+        | 'order_not_accepted'
+        | 'not_your_acceptance'
+        | 'not_crafted'
+        | 'deliver_out_of_range'
+        | 'no_space';
+    }
   // Masterwork proc (Professions 2.0): a successful craft's single
   // output-side rng draw procced, minting a masterwork instance with baked
   // bonus stats. Personal (emitted with pid = the crafter's entity id, which

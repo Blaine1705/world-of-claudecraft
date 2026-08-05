@@ -2050,6 +2050,47 @@ export const TARGETS = [
     },
   },
   {
+    key: 'commission-board',
+    label: 'Commission order board (issue #1298)',
+    when: [
+      'ui/commission_order_view',
+      'ui/commission_order_window',
+      'sim/professions/commission_order',
+    ],
+    // Stages one order per section: an open request the viewer posted
+    // ("My Requests"), an order a second player accepted from the viewer
+    // ("My Requests" showing Accepted), and an open-board order from a third
+    // player the viewer could take ("Open Board"). The "open a new order"
+    // form is always visible above the sections.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        const pid = sim.primaryId;
+        const meta = sim.players?.get(pid);
+        if (meta) meta.knownRecipes.add('recipe_eastbrook_arming_sword');
+        // A second, offline "player" the shot can show as the board's
+        // requester (no server needed offline: addPlayer seats a bot-like
+        // entity the sim otherwise ignores).
+        let otherPid;
+        try {
+          otherPid = sim.addPlayer('warrior', 'Borin');
+        } catch {}
+        sim.openCommissionOrder?.('recipe_eastbrook_arming_sword', 'open', undefined, pid);
+        if (otherPid !== undefined) {
+          sim.openCommissionOrder?.('recipe_eastbrook_arming_sword', 'open', undefined, otherPid);
+        }
+        const el = document.querySelector('#commission-board-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openCommissionBoard?.();
+      });
+      const open = await pollForSize(page, '#commission-board-window');
+      return open ? { clip: '#commission-board-window' } : {};
+    },
+  },
+  {
     key: 'gather-tool-tooltip',
     label: 'Bag tooltip: gathering implement kind/requirement/use/bonus lines (#2343)',
     when: ['ui/gather_tool_tooltip', 'professions/tools'],
