@@ -1407,6 +1407,15 @@
     width: 100%;
     min-width: 0;
   }
+  /* Desktop groups the pet command bar and the pet health frame into one row
+     (#pet-cluster). Mobile deliberately splits them again: the command bar belongs
+     under the thumb at the top of the screen, the health strip belongs in the
+     bottom-centre column with the player frame, and one 570px row would not fit a
+     phone anyway. display:contents dissolves the wrapper so each child keeps the
+     independent fixed seat the rules below give it. */
+  body.mobile-touch #pet-cluster {
+    display: contents;
+  }
   body.mobile-touch #petbar {
     position: fixed;
     left: 50%;
@@ -1809,6 +1818,40 @@
     justify-content: flex-start;
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center bottom;
+  }
+  /* Pet frame on mobile: the desktop rule keeps it in the #actionbar-stack flow,
+     which does not exist here (the player frame is lifted out to position:fixed),
+     so re-seat it into the same reserved bottom-centre column, stacked ABOVE the
+     cast and swing bars (player frame 14px, cast 68px, swing 76px). Seating it on
+     top of the column rather than between the frame and the bars is deliberate:
+     the pet strip appears and disappears with the pet, and displacing the two bars
+     would move a cast bar mid-cast. It KEEPS its portrait here, unlike the cast bar
+     which drops its label: the frame is a tap target that selects the pet, and a
+     portrait-less strip renders about 20px tall, under the 40x40 mobile touch
+     floor. With the portrait the visible frame is ~48px rendered at this scale, so
+     the tap area is the floor without an invisible band over the world. */
+  body.mobile-touch #pet-frame {
+    position: fixed;
+    left: 50%;
+    top: auto;
+    bottom: calc(88px + env(safe-area-inset-bottom));
+    z-index: 21;
+    width: 300px;
+    margin: 0;
+    justify-content: flex-start;
+    /* The desktop rule pays --unit-frame-content-inset because the desktop player
+       frame CENTRES its content in a 612px box. The mobile player frame is
+       flex-start with no inset, so inheriting it here pushes this strip about 18px
+       right of the frame it hangs under. Reset, do not inherit. */
+    padding-left: 0;
+    zoom: 1;
+    transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+    transform-origin: center bottom;
+  }
+  body.mobile-touch #pet-frame .uf-bars {
+    width: 224px;
+    max-width: 224px;
+    flex: none;
   }
   body.mobile-touch #player-frame .portrait-wrap {
     z-index: 3;
@@ -2464,6 +2507,19 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+  /* The secondary lines scale with the title. Without this they stay at the
+     desktop 18px while the verdict drops to 26px, so on a phone a three-line
+     battleground result reads as four near-equal lines instead of one headline
+     over its detail, and the taller block runs into the result scoreboard
+     below it. */
+  body.mobile-touch #banner .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+    line-height: 1.25;
+    margin-top: 4px;
+  }
+  body.mobile-touch #banner .banner-subtext + .banner-subtext {
+    margin-top: 1px;
+  }
   body.mobile-touch #banner.banner-with-art {
     gap: 6px;
   }
@@ -2475,6 +2531,18 @@
   body.mobile-touch #banner.banner-deed {
     font-size: calc(19px * var(--mobile-chrome-scale, 1));
     padding: 6px 14px;
+  }
+  body.mobile-touch #banner.banner-skill {
+    font-size: calc(20px * var(--mobile-chrome-scale, 1));
+    padding: 8px 16px 10px;
+    gap: 8px;
+  }
+  body.mobile-touch #banner.banner-skill .banner-subtext {
+    font-size: calc(13px * var(--mobile-chrome-scale, 1));
+  }
+  body.mobile-touch #banner.banner-skill .banner-art {
+    width: 40px;
+    height: 40px;
   }
   body.mobile-touch #banner .banner-art {
     width: 34px;
@@ -2788,6 +2856,7 @@
   body.mobile-touch #vendor-window,
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window,
+  body.mobile-touch #commission-board-window,
   body.mobile-touch #market-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #calendar-window,
@@ -3838,6 +3907,51 @@
   body.mobile-touch.market-open #bags .bag-chip {
     flex: 0 0 auto;
   }
+  /* Guild tab controls hold the 40px touch floor: the Personal/Guild tabs and
+     the treasury gold buttons are primary tap targets on the phone pairing. */
+  body.mobile-touch #bank-window .bank-tab,
+  body.mobile-touch #bank-window .gbank-view-tab,
+  body.mobile-touch #bank-window .gbank-gold-btn {
+    min-height: 40px;
+  }
+  /* The gold prompt's three coin fields hold the same touch floor as the
+     market's price row (its skin source): 40px tap height and the 16px
+     anti-zoom font (base.css floors it too; declared here so the intent is
+     explicit beside its siblings). */
+  body.mobile-touch .gbank-coin-row .coininput {
+    min-height: 40px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  /* Short landscape phones: the Guild pane adds fixed chrome the personal
+     pane does not have (tab strip, treasury row, dormant legend, buy note),
+     so compress its margins under the same grid-floor carve-out the buy row
+     already relies on, keeping the transactional row inside the window. */
+  @media (max-height: 480px) {
+    body.mobile-touch #bank-window .bank-tabs {
+      margin: 3px 0 1px;
+    }
+    body.mobile-touch #bank-window .gbank-treasury {
+      margin: 2px 0 3px;
+      gap: 6px;
+    }
+    body.mobile-touch #bank-window .gbank-dormant-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+    body.mobile-touch #bank-window .gbank-buy-note {
+      font-size: 10px;
+    }
+    /* The log's own fixed chrome: the sub-strip and the scope line. The rows
+       themselves scroll, so only the chrome above them is compressed. */
+    body.mobile-touch #bank-window .gbank-view-tabs {
+      margin: 1px 0 2px;
+    }
+    body.mobile-touch #bank-window .gbank-log-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
+  }
   /* Short landscape phones: the 50/50 pairing box (viewport minus the 10px top
      inset and the 72px tray reservation) cannot hold the full-toolbar chrome, the
      two-row grid floor (components.css .bank-scroll), AND the buy row, so the buy
@@ -3915,6 +4029,15 @@
   }
   body.mobile-touch #deeds-window .deeds-cat-titles.active {
     border-top-color: #6a5320;
+  }
+  /* The recent-strip jump buttons keep the 40px touch floor on EVERY touch
+     device (unconditional, not just short-landscape phones: a landscape
+     tablet is body.mobile-touch too). The strip wraps horizontally, and on
+     short viewports the entry list is the flex arm that yields, so the
+     taller row cannot push the filter bar out. */
+  body.mobile-touch #deeds-window .deeds-recent-item {
+    min-width: 40px;
+    min-height: 40px;
   }
   /* Short landscape phones: the pinned chrome (title bar, summary, recent and
      nearest strips, chip row, filter bar) can eat the whole panel height and
@@ -4061,6 +4184,13 @@
   }
   body.mobile-touch .set-toggle {
     flex: 0 0 auto;
+    min-height: 40px;
+  }
+  body.mobile-touch .graphics-apply {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  body.mobile-touch .graphics-apply-btn {
+    width: 100%;
     min-height: 40px;
   }
   /* The master header stays centered + prominent on touch too. */
@@ -4431,6 +4561,25 @@
   body.mobile-touch #arena-window .btn {
     min-height: 40px;
     box-sizing: border-box;
+  }
+  /* Thornhollow Fields scoreboard: compacted for the 844x390 landscape HUD so it clears
+     the top button clusters; the respawn overlay rides the same midline. */
+  body.mobile-touch #bg-scoreboard {
+    top: 4px;
+    min-width: 250px;
+    padding: 3px 10px 5px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-score {
+    font-size: 19px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-team {
+    font-size: 11px;
+  }
+  body.mobile-touch #bg-scoreboard .bg-under {
+    font-size: 11px;
+  }
+  body.mobile-touch #bg-respawn {
+    font-size: 18px;
   }
   /* Vale Cup: the join/leave .btn and the guild-record toggle (its pickers already
      carry a pointer:coarse floor). */
@@ -5070,6 +5219,19 @@
       min-width: 0;
       height: 4px;
     }
+    /* Same bottom-centre column as portrait, one notch lower to match the shorter
+       landscape band (player frame 10px, cast 62px, swing 70px), and at the
+       landscape frame scale so the strip matches the player frame's width.
+       0.6 renders the frame ~35px, under the 40px touch floor: deliberately the
+       SAME size as the #player-frame directly below it, which is itself a tap
+       target (self-target) already shipping at this scale in landscape. Sizing
+       the pet frame larger than the frame it hangs under to win the floor would
+       invert their visual hierarchy; the landscape tier trades size for the
+       shorter viewport everywhere, and this follows the established baseline. */
+    body.mobile-touch #pet-frame {
+      bottom: calc(80px + env(safe-area-inset-bottom));
+      transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
     body.mobile-touch #petbar {
       top: max(6px, env(safe-area-inset-top));
       /* No scale(0.88) on landscape: it shrank the 40px pet command buttons to
@@ -5391,7 +5553,8 @@
     left: calc(50% - 15px);
   }
   body.mobile-touch.hud-mobile-compact #castbar,
-  body.mobile-touch.hud-mobile-compact #swingbar {
+  body.mobile-touch.hud-mobile-compact #swingbar,
+  body.mobile-touch.hud-mobile-compact #pet-frame {
     left: calc(50% - 15px);
   }
   /* Left-handed mirrors Jump (and the ring) to the left, so mirror this nudge
@@ -5400,7 +5563,8 @@
     left: calc(50% + 15px);
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
-  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
     left: calc(50% + 15px);
   }
   /* Narrowest compact phones (galaxy-s8-class 740px and below): at that width the
@@ -5420,13 +5584,15 @@
   @media (max-width: 800px) and (orientation: landscape) {
     body.mobile-touch.hud-mobile-compact #player-frame,
     body.mobile-touch.hud-mobile-compact #castbar,
-    body.mobile-touch.hud-mobile-compact #swingbar {
+    body.mobile-touch.hud-mobile-compact #swingbar,
+    body.mobile-touch.hud-mobile-compact #pet-frame {
       left: calc(50% - 44px);
     }
     /* Left-handed mirror of the nudge above, same magnitude, opposite side. */
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
-    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar {
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
       left: calc(50% + 44px);
     }
   }
@@ -5457,7 +5623,8 @@
   @media (orientation: landscape) {
     body.mobile-touch.hud-mobile-tablet #player-frame,
     body.mobile-touch.hud-mobile-tablet #castbar,
-    body.mobile-touch.hud-mobile-tablet #swingbar {
+    body.mobile-touch.hud-mobile-tablet #swingbar,
+    body.mobile-touch.hud-mobile-tablet #pet-frame {
       left: calc(50% - 10px);
     }
   }

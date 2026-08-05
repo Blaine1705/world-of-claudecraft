@@ -786,6 +786,7 @@ export const en_CA: EnTranslations = {
       "targetAnnounce": "Mark {name}",
       "targetOfTargetLabel": "Mark's Mark",
       "partyLabel": "Your Band",
+      "petLabel": "Your Pet",
       "partyChip": "Party",
       "partyGroup": "Group {n}",
       "durationUnitSeconds": "s",
@@ -820,7 +821,7 @@ export const en_CA: EnTranslations = {
       "targetCycleShort": "Target",
       "spellbookPageLabel": "Page {page}",
       "hideKeyboard": "Hide keyboard",
-      "chatPlaceholder": "Say something..."
+      "chatPlaceholder": "Say something... (! for community commands)"
     },
     "tutorial": {
       "moveBodyTouch": "Use the movement stick to move and drag the screen to look around. Take a few steps to begin.",
@@ -911,6 +912,7 @@ export const en_CA: EnTranslations = {
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
       "autoShowHint": "Rows appear automatically once your party deals damage or healing, and this segment closes a few seconds after combat ends.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Other ({count})",
@@ -950,6 +952,7 @@ export const en_CA: EnTranslations = {
       "targetFriendlyNext": "Cycle Friendly Target",
       "discord": "Discord",
       "valecup": "Vale Cup",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
@@ -957,7 +960,9 @@ export const en_CA: EnTranslations = {
       "petTaunt": "Pet: Taunt",
       "petDefensive": "Pet: Defensive",
       "petAggressive": "Pet: Aggressive",
-      "mount": "Mount / Dismount"
+      "targetPet": "Pet: Mark",
+      "mount": "Mount / Dismount",
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -996,6 +1001,7 @@ export const en_CA: EnTranslations = {
       "name_stormfeather_griffin": "Sky-Reach Stormfeather",
       "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "name_terrorspark_groundshaker": "Terrorspark Groundshaker",
+      "name_drakemaw_raptor": "Drakemaw Raptor",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
@@ -1003,7 +1009,8 @@ export const en_CA: EnTranslations = {
       "desc_shadowjump_toad": "A massive, sure-footed giant toad, trained in lightning-fast shadowed bounds that cover any terrain.",
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
       "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.",
-      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots."
+      "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
@@ -1023,6 +1030,93 @@ export const en_CA: EnTranslations = {
       "timeout": "Race Failed",
       "progress": "Gates {n} of {total}",
       "timeLeft": "{seconds}s"
+    },
+    "pvp": {
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "The Vale Cup",
@@ -1174,6 +1268,15 @@ export const en_CA: EnTranslations = {
       "browserEffectsReduced": "Reduced",
       "browserEffectsMinimal": "Minimal",
       "browserEffectsNote": "Auto tones down heavy CSS effects (blur, glow, background motion) based on your browser and device. Lower it manually if the interface feels sluggish.",
+      "graphicsApply": "Apply Graphics",
+      "graphicsApplying": "Applying graphics settings...",
+      "graphicsApplied": "Graphics settings applied.",
+      "graphicsSaved": "Graphics settings saved. The active renderer already matches them.",
+      "graphicsFailed": "Graphics could not be applied. Your previous settings are still active.",
+      "graphicsRetry": "Retry Graphics",
+      "graphicsFatal": "Graphics recovery failed. Reload the game to continue.",
+      "graphicsReload": "Reload Game",
+      "graphicsDraftChanged": "Graphics changes are ready to apply.",
       "interfaceMode": "Interface Mode",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1195,6 +1298,7 @@ export const en_CA: EnTranslations = {
       "aurasOnPlayerFrame": "Buffs on the Player Frame",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Walk-by Autoloot",
       "groundReticle": "Ground-Targeting Reticle",
       "mouseoverCast": "Mouseover Cast on Party Frames",
@@ -1204,7 +1308,10 @@ export const en_CA: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
       "showThirdActionBar": "Show Third Action Bar",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Show Attack Button",
       "showDailyRewardsChest": "Show Daily Rewards Chest",
       "mobileCameraJoystick": "Camera joystick",
@@ -1365,20 +1472,38 @@ export const en_CA: EnTranslations = {
     },
     "landing": {
       "highContrast": "High Contrast",
-      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible"
+      "highContrastAria": "Toggle high-contrast background: disables the moving trailer so start-screen text stays legible",
+      "browserSupport": {
+        "title": "Heads up: unsupported browser",
+        "body": "You may see reduced performance in this browser. For the best experience, get the desktop app for Windows, macOS, or Linux. Prefer playing in a browser? Chrome performs best, and Firefox and Safari are also supported.",
+        "getDesktopApp": "Get the desktop app",
+        "continueInBrowser": "Continue in browser",
+        "dismissAria": "Dismiss the unsupported browser notice"
+      }
     },
     "warfare": {
       "honorAmount": "{amount} Honor",
       "dualPrice": "{money} + {honor}",
       "balance": "Honor: {amount}",
       "honorFloat": "+{amount} Honor",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "You gain {amount} Honor ({reason}).",
       "notEnoughHonor": "Not enough Honor.",
       "reasons": {
         "arenaWin": "Arena victory",
         "fiestaKill": "Fiesta takedown",
         "fiestaComplete": "Fiesta completed",
-        "fiestaWin": "Fiesta victory"
+        "fiestaWin": "Fiesta victory",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1734,6 +1859,7 @@ export const en_CA: EnTranslations = {
       "itemAriaEnchanted": "{item}, quantity {count}, enchanted copy",
       "itemAriaBound": "{item}, quantity {count}, bound copy",
       "itemAriaMasterwork": "{item}, quantity {count}, masterwork",
+      "itemAriaQuest": "{item}, quantity {count}, quest item",
       "filterGroupAria": "Filter bags by category",
       "filterAll": "All",
       "filterWeapon": "Weapons",
@@ -1742,6 +1868,7 @@ export const en_CA: EnTranslations = {
       "filterMaterial": "Materials",
       "filterTool": "Tools",
       "filterQuest": "Quest",
+      "filterQuestCountAria": "Quest, {count} items",
       "filterMount": "Mounts",
       "sortAria": "Sort bag items",
       "sortRecent": "Recent",
@@ -1750,6 +1877,7 @@ export const en_CA: EnTranslations = {
       "searchPlaceholder": "Search items",
       "searchAria": "Search bag items by name",
       "noMatch": "No items match your filters.",
+      "noQuestItems": "No quest items in your bags.",
       "capacity": "{used}/{total}",
       "capacityAria": "Bag slots used: {used} of {total}",
       "backpack": "Backpack",
@@ -1783,6 +1911,7 @@ export const en_CA: EnTranslations = {
       "dmgDoneReduce": "Reduces damage dealt by {pct}%",
       "heatingUp": "Your next consecutive Fire builder critical strike grants Hot Streak; a non-critical builder removes Heating Up",
       "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "crit": "Increases critical strike chance by {pct}%",
@@ -1968,6 +2097,8 @@ export const en_CA: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
+      "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Enchanting reagent. Disenchanted from common and uncommon gear.",
       "arcaneEssence": "Enchanting reagent. Disenchanted from rare gear.",
       "arcaneShard": "Enchanting reagent. Disenchanted from epic and legendary gear.",
@@ -2249,6 +2380,7 @@ export const en_CA: EnTranslations = {
       "depositHint": "Click to deposit",
       "depositPartialHint": "Shift-click to deposit a partial amount",
       "cannotDeposit": "Cannot be banked",
+      "cannotDepositNow": "Cannot be deposited right now",
       "depositQuantityTitle": "Deposit {item}",
       "depositQuantityInput": "Quantity to deposit",
       "depositQuantityConfirm": "Deposit",
@@ -2259,6 +2391,7 @@ export const en_CA: EnTranslations = {
       "sortAria": "Sort bank items",
       "searchAria": "Search bank items by name",
       "depositAll": "Deposit all materials",
+      "depositAllTooltip": "Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.",
       "depositAllDone": "Materials deposited: {count}.",
       "depositAllFull": "Materials deposited: {count}. Bank now full.",
       "depositAllNone": "Bank full: nothing deposited.",
@@ -2274,7 +2407,50 @@ export const en_CA: EnTranslations = {
       "bonusAdvertWallet": "Link a wallet to earn 2 slots.",
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Invite a friend: when they reach level 10 you each earn 2 slots, up to 5 friends.",
-      "bonusSectionAria": "Bonus bank slots and how to earn more"
+      "bonusSectionAria": "Bonus bank slots and how to earn more",
+      "tabsAria": "Bank tabs",
+      "personalTab": "Personal",
+      "guildTab": "Guild",
+      "guildCapacityAria": "Guild bank slots used: {used} of {total}",
+      "guildEmpty": "The guild bank is empty.",
+      "guildTreasury": "Guild treasury",
+      "guildDepositGold": "Deposit money",
+      "guildWithdrawGold": "Withdraw money",
+      "guildDepositGoldTitle": "Deposit money into the guild treasury",
+      "guildWithdrawGoldTitle": "Withdraw money from the guild treasury",
+      "guildGoldAvailable": "Available: {amount}",
+      "guildBuyConfirm": "Purchase {count} additional guild bank slots for {price} from the guild treasury?",
+      "guildBuyNote": "Paid from the guild treasury",
+      "guildTreasuryShort": "Treasury short",
+      "guildOpenBank": "Open the guild bank",
+      "guildOpenConfirm": "Open the guild bank for {price}? This is paid from your own money.",
+      "guildOpenAccept": "Open",
+      "guildOpenNote": "Paid from your own money, not the guild treasury",
+      "guildPurseShort": "Not enough money",
+      "guildDormantNote": "Locked items cannot be withdrawn and prevent disbanding the guild.",
+      "guildDormantHint": "This item is locked in the guild bank and cannot be withdrawn.",
+      "guildDormantAria": "{item}, quantity {count}, cannot be withdrawn",
+      "guildUnknownItem": "Unknown item",
+      "guildDepositHint": "Click to deposit into the guild bank",
+      "guildCannotDeposit": "Cannot go in the guild bank",
+      "guildGoldCannotMove": "That amount cannot be moved right now.",
+      "guildViewsAria": "Guild bank views",
+      "guildContentsTab": "Contents",
+      "guildLogTab": "Log",
+      "logAria": "Guild bank activity log",
+      "logNote": "The {count} most recent guild bank actions.",
+      "logLoading": "Loading the guild bank log...",
+      "logEmpty": "Nothing has been moved in or out of the guild bank yet.",
+      "logRefused": "Only guild officers can read the guild bank log.",
+      "logFormerMember": "A former guild member",
+      "logDepositItem": "{actor} deposited {count} {item}",
+      "logWithdrawItem": "{actor} withdrew {count} {item}",
+      "logDepositMoney": "{actor} deposited {amount}",
+      "logWithdrawMoney": "{actor} withdrew {amount}",
+      "logBuySlots": "{actor} bought a bank expansion for {amount}",
+      "logOpenBank": "{actor} opened the guild bank for {amount}",
+      "logCharterFee": "{actor} paid the guild charter fee of {amount}",
+      "logAdminPurge": "An administrator removed {count} {item}"
     },
     "calendar": {
       "title": "Event Calendar",
@@ -2312,10 +2488,6 @@ export const en_CA: EnTranslations = {
           "title": "Market Day",
           "note": "The Merchant expects fresh stock. A fine day to browse the World Market."
         },
-        "fiestaNight": {
-          "title": "Fiesta Night",
-          "note": "The 2v2 Fiesta ring draws its loudest crowds tonight."
-        },
         "arenaClash": {
           "title": "Arena Clash",
           "note": "Duelists flock to the Ashen Coliseum. Queue up and climb the ladder."
@@ -2352,6 +2524,7 @@ export const en_CA: EnTranslations = {
       "billboard": {
         "label": "Guild Billboard",
         "empty": "Nothing on the billboard yet.",
+        "loginLine": "Guild billboard: {text}",
         "setBy": "Set by {name}",
         "save": "Save",
         "placeholder": "Write a message for the guild",
@@ -2552,6 +2725,18 @@ export const en_CA: EnTranslations = {
         "artisansEye": "Artisan's Eye",
         "quickeningCharm": "Springback Charm"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Slot {effect}",
       "toolEffectRechargeButton": "Recharge",
       "toolEffectSlotted": "{effect} slotted on {profession}.",
@@ -2588,6 +2773,8 @@ export const en_CA: EnTranslations = {
     "crafting": {
       "title": "Crafting",
       "close": "Close crafting",
+      "dialogOption": "Crafting",
+      "dialogOptionAria": "Open the crafting window for {craft}",
       "craft": "Craft",
       "reagentsNeeded": "Requires:",
       "reagentLine": "{name} x{have}/{required}",
@@ -2662,6 +2849,8 @@ export const en_CA: EnTranslations = {
       "masterworkToast": "Masterwork! {name}",
       "masterworkZoneLine": "{crafter} crafted a masterwork {name}!",
       "tierUpToast": "{craft} advanced to tier {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Your hands are leaning toward the {archetype}. Its attunement waits with {master}.",
       "trendNudgeNoMaster": "Your hands are leaning toward the {archetype}. Seek a craft master to take it up.",
       "attunedZoneLine": "{name} has attuned as {archetype}!",
@@ -2787,6 +2976,59 @@ export const en_CA: EnTranslations = {
       "outOfRange": "You must be at a crafting station to unbind.",
       "noSpace": "You do not have room for the unbound copy."
     },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
+    },
     "finder": {
       "title": "Dungeon Finder",
       "close": "Close",
@@ -2897,6 +3139,7 @@ export const en_CA: EnTranslations = {
       "countLabel": "{earned}/{total} deeds",
       "completionAria": "Deeds earned: {earned} of {total}",
       "recentLabel": "Recent:",
+      "recentJumpAria": "Jump to {name}",
       "nearestLabel": "Nearly there:",
       "filterGroupAria": "Filter deeds",
       "filterAll": "All",
@@ -3122,6 +3365,7 @@ export const en_CA: EnTranslations = {
       "talents": "Talents",
       "arena": "Arena & PvP",
       "valeCup": "Vale Cup",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Book of Deeds",
       "glossary": "Glossary",
       "wishIKnew": "Things I Wish I Knew",
@@ -3892,23 +4136,25 @@ export const en_CA: EnTranslations = {
       "duelsBody": "Challenge any player you meet to a friendly duel. Nothing is on the line but pride, so it is the easiest way to learn a matchup or settle a friendly argument.",
       "coliseumHeading": "The Ashen Coliseum",
       "coliseumBody": "The Coliseum is the realm's arena, where you face other players in ranked matches, one on one or two on two. Each bracket keeps its own standing, so a win lifts you up that ladder for the whole realm to see. Open the Arena window to sign up for a bracket, alone or with your partner.",
-      "fiestaHeading": "Two versus two Fiesta",
-      "fiestaBody": "Fiesta is a fast, two-on-two brawl fought as one continuous bout, with every fighter brought to an even footing. As the fight runs you draft augments, quick boosts that reshape your kit on the fly, so no two matches play quite the same.",
-      "augmentsNote": "Augments and power-ups last only for the match. They are about playful, on-the-spot builds, not lasting power, so nobody buys their way to a win.",
-      "wavesTitle": "Augments arrive in waves",
-      "wavesBody": "A Fiesta bout hands you fresh picks as it goes, and the picks grow bolder the longer the fight runs. You build from one wave to the next, choosing one of a few options each time and keeping it for the rest of the bout.",
-      "waveSilverTitle": "Silver",
-      "waveSilverBody": "The opening wave: clean, single-stat boosts that sharpen the basics of your class.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "The middle wave: two-edged combos where your build starts to take shape and sing.",
-      "wavePrismaticTitle": "Prismatic",
-      "wavePrismaticBody": "The final wave: build-defining, screen-melting spikes meant to feel ridiculous in the best way.",
-      "yumiHeading": "Protect Yumi",
-      "yumiBody": "Protect Yumi is a team objective mode played in a maze: each side guards its own cat familiar while hunting the other. Every so often both cats blink to new corners of the maze, so the fight swings between defending, hunting, and racing to find them again. Queue as three versus three or five versus five; falling in battle only benches you for a moment.",
-      "powerupsTitle": "Power-ups in the ring",
-      "powerupsBody": "Glowing orbs also drop into the arena mid-fight, free for whoever reaches them first. They are deliberately over the top and last only a short while: Speed Demon for a blink of blinding pace, Colossus to swell up into a lumbering giant, Moon Boots for a bouncing, low-gravity leap, and Berserker for a sudden surge of fury.",
       "ladderHeading": "Climbing the ladder",
       "ladderBody": "Ranked play tracks your standing over time. Check the leaderboard to see where you sit and who holds the top of the realm."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "The Vale Cup",
@@ -4058,8 +4304,8 @@ export const en_CA: EnTranslations = {
       "consumablesFood": "Food and drink restore you while you sit and rest between fights. Eating recovers health, drinking recovers mana, and resting this way is free. Sit down for a few seconds after a tough fight instead of running into the next one half-healed.",
       "consumablesElixirs": "Elixirs grant a temporary buff while you adventure, a small edge that helps when you want to push a little further.",
       "fishingTitle": "Fishing",
-      "fishingBody": "Fishing is a calm change of pace. Carry a fishing pole, use it beside open water, and reel in what bites. You mostly catch fish that are food you can eat, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
-      "fishingFood": "The fish you reel in are food: eat one while you sit to rest and it restores health, with the heartier fish coming from the colder, deeper waters in the north. A line in the lake is a quiet way to keep your pack stocked between fights.",
+      "fishingBody": "Fishing is a calm change of pace. Carry a fishing pole, use it beside open water, and reel in what bites. You mostly catch raw fish for the cooking pot, the odd bit of junk to sell for a few coins, and now and then a prized rare catch. What you find depends on the water you fish in.",
+      "fishingFood": "The fish you reel in are cooking ingredients, not trail snacks: cook them at a kitchen (or a specialized field kitchen) into sit-down meals that restore health over rest. Deeper zones stock higher-tier catches for better dishes, so a line in the lake is a quiet way to keep the cook and the party fed between fights.",
       "fishingRare": "Now and then your line catches something far better than supper: a shimmering prized fish that any angler might luck into in any water. Hook one and your log lights up with the catch. It is the kind of lucky pull that makes an idle afternoon at the lake worth telling people about.",
       "cosmeticsTitle": "Looks and cosmetics",
       "cosmeticsBody": "Some rewards change only how your character looks, never how strong you are. These cosmetic skins let you stand out without affecting the game, so wear whichever you like.",
@@ -4194,7 +4440,7 @@ export const en_CA: EnTranslations = {
           "identityHeading": "The pot that feeds the party",
           "identityBody": "Eat a cooked meal and it heals you over 18 seconds of rest, which between pulls is the cheapest healing in the game. The ladder runs from a 90-health Pan-Seared River Perch all the way to Marlow's Grand Roast at 980, a sit-heal nothing in the game beats.\n\nOn the ring Cooking sits between Alchemy and Leatherworking. Its living pair is the Apothecary, Alchemy and Cooking, sworn before Cook Marlow at the Eastbrook kitchens after hunting four wild boars for the pot; the Trapper pair with Leatherworking is named on the ring but has no oath quest yet.",
           "materialsHeading": "A pantry fed by rod and knife",
-          "materialsBody": "Fishing stocks the signature ingredients, zone by zone: mirror trout and river perch from the waters of Eastbrook Vale, marsh pike and bog eel from Mirefen Marsh, frostgill trout and slatefin carp from Thornpeak Heights. The rungs mix the zones freely (the free rung already wants marsh pike, the mid rung Thornpeak's frostgill, and the rare supper folds the Vale's mirror trout back in), so a cook who fishes wherever the road goes never runs dry.\n\nThe butcher's side comes off harvested corpses: game meat from boars and their kin, and, on a rare or better harvest roll, a signed Prime Cut, the centerpiece of the grand roast. Herbs season the better dishes, one ashwood log smokes the eel, and Cooking Salt runs 8 copper a pouch from Marlow's own stall.",
+          "materialsBody": "Fishing stocks the signature ingredients, zone by zone: raw mirror trout and river perch from the waters of Eastbrook Vale, marsh pike and bog eel from Mirefen Marsh, frostgill trout and slatefin carp from Thornpeak Heights. Raw catches never restore health on their own: they are kitchen reagents, and the cooked meals are what you eat. The rungs mix the zones freely (the free rung already wants marsh pike, the mid rung Thornpeak's frostgill, and the rare supper folds the Vale's mirror trout back in), so a cook who fishes wherever the road goes never runs dry.\n\nThe butcher's side comes off harvested corpses: game meat from boars and their kin, and, on a rare or better harvest roll, a signed Prime Cut, the centerpiece of the grand roast. Herbs season the better dishes, one ashwood log smokes the eel, and Cooking Salt runs 8 copper a pouch from Marlow's own stall.",
           "ladderHeading": "From jerky to the grand roast",
           "ladderBody": "Salted Jerky is the field recipe: known from the start, one spider leg, craftable anywhere, the trail food of every fresh adventurer. The trainer ladder cooks at the Eastbrook kitchens on the east side of the square: the free rung at skill 0 (the perch, Hunter's Game Skewer, Herbed Marsh Pike), the mid rung at skill 25 for 25 silver a recipe (Ashwood Smoked Eel, Goldleaf Game Stew, Frostgill Chowder), and the rare rung at skill 50 for 1 gold each (Silvered Carp Supper, Angler's Feast Platter, Marlow's Grand Roast).\n\nBatch dishes stretch your ingredients: the smoked eel and the game stew serve two per craft, and the feast platter serves three. Marlow teaches each rung the moment your tier in Cooking reaches it.",
           "routeHeading": "Specialization, not masterworks, and the route to 125",
@@ -4312,7 +4558,7 @@ export const en_CA: EnTranslations = {
         "colGain": "Gain per catch",
         "belowFmt": "Below {below}",
         "tablesHeading": "Catch tables",
-        "tablesNote": "Your proficiency selects one of three catch bands: band 0 from the start, band 1 at 100, band 2 at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of food fish, healing more the deeper the zone, all of them cooking inputs and perfectly good sit-and-eat food raw off the line. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
+        "tablesNote": "Your proficiency selects one of three catch bands: band 0 from the start, band 1 at 100, band 2 at 200, each shifting weight out of junk and empty hooks into real fish, zone by zone. Each band above the first also demands a rod: band 1 wants the tier 2 Ironreel, band 2 the tier 3 Silverstream. Your effective band is the lower of what your skill has earned and what your rod supports, and the cap is silent: with a lesser rod you still catch, just off the lower band's table, so if your catches feel stuck while your skill climbs, check your rod first.\n\nEach zone's waters hold their own pair of cooking catches, higher-tier fish the deeper the zone, all of them kitchen reagents that must be cooked before they restore anything. The rest of the table is the angler's tax: weed, the occasional boot, and the empty hook, which never fully disappears. How much you pay depends on the water your bobber lands in, not where you stand: a cast reaches up to 24 yards, and the rod the water demands, the table it draws from, the deed it credits, and how far it teaches all answer to the zone that water belongs to, decided the moment the line lands. Each zone's water is written for a band of its own, the Vale for band 0, the marsh for band 1, the peaks for band 2, and fishing one band under that turns roughly a third of your casts into empty hooks, two bands under it more than half. The rod gets you to the water; the skill is what makes it pay, and the climb is what pulls an angler deeper, because better bands are not just better pay: past the Vale they are the only waters that keep teaching. The {rare} is the one row that answers to your catch band and nothing else: the same odds in every zone, and six times likelier at band 2 than at band 0, so the rarest thing on the dock is the one a Master Angler really is better at.",
         "bandHeading": "Band {band}: proficiency {at} and up, rod tier {rod}",
         "colCatch": "Catch",
         "colOdds": "Odds",
@@ -5796,7 +6042,6 @@ export const en_CA: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3v3",
     "bracket5": "Yumi 5v5",
-    "enterQueue": "Join Protect Yumi!",
     "queue": {
       "join": "You join the Protect Yumi queue. Guard your familiar…",
       "leave": "You leave the Protect Yumi queue.",
@@ -5834,9 +6079,6 @@ export const en_CA: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Join the Fiesta!",
-    "practice": "🎉 Practice vs Bots",
-    "practiceNote": "Offline practice: spawns 3 AI bots and queues you for a 2v2 Fiesta. Click again to stop.",
     "banner": {
       "wave": "WAVE {wave}/{total} — CHOOSE AN AUGMENT!",
       "augmentGained": "Augment gained: {name}!",
@@ -6093,10 +6335,16 @@ export const en_CA: EnTranslations = {
   },
   "desktop": {
     "update": {
-      "downloading": "Downloading update {version}...",
-      "ready": "Update {version} is ready. It installs when you quit, or restart now.",
+      "checkingTitle": "Checking for updates...",
+      "checkingBody": "New versions download while you play.",
+      "uptodateTitle": "You're up to date",
+      "downloadingTitle": "Downloading update {version}...",
+      "downloadingBody": "You can keep playing. It installs when you quit.",
+      "readyTitle": "Update {version} is ready",
+      "readyBody": "Restart to install now, or keep playing and it installs when you quit.",
       "restart": "Restart now",
-      "later": "Later"
+      "later": "Later",
+      "dismiss": "Dismiss"
     },
     "crash": {
       "title": "World of ClaudeCraft",
@@ -6284,7 +6532,7 @@ export const en_CA: EnTranslations = {
       "releaseSpirit": "Release Spirit",
       "chatTab": "Chat",
       "combatLogTab": "Combat Log",
-      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)",
+      "chatPlaceholder": "Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help, ! for community commands)",
       "chatChannels": {
         "add": "Add chat channel",
         "addTitle": "Add channel",
@@ -6312,7 +6560,6 @@ export const en_CA: EnTranslations = {
       "mobileMore": "More",
       "mobileMoreAria": "Show more menus",
       "mobileSocial": "Social",
-      "mobileArena": "Arena",
       "mobileMenu": "Menu",
       "mobileSettings": "Settings",
       "mobileUse": "Interact",
@@ -6429,7 +6676,7 @@ export const en_CA: EnTranslations = {
         "nameplates": "Toggle Nameplates",
         "meters": "Damage Meters",
         "social": "Friends & Guild",
-        "arena": "Arena (Ashen Coliseum)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Open Chat",
         "attack": "Attack",
         "actionBarSlot": "Action Bar {slot}"
@@ -6563,6 +6810,11 @@ export const en_CA: EnTranslations = {
     },
     "system": {
       "playerDeath": "You have died.",
+      "deathRecapKillerAbility": "You have died. Slain by {killer}'s {ability}.",
+      "deathRecapKiller": "You have died. Slain by {killer}.",
+      "deathRecapAbility": "You have died. Slain by {ability}.",
+      "deathRecapFalling": "You have died. You fell to your death.",
+      "deathRecapDrowned": "You have died. You drowned.",
       "respawn": "You feel rested and whole again.",
       "ignoringChat": "Ignoring chat from {name}.",
       "noLongerIgnoring": "No longer ignoring {name}.",
@@ -6808,6 +7060,10 @@ export const en_CA: EnTranslations = {
         "officer": "Officer",
         "member": "Member"
       },
+      "tenure": {
+        "recruit": "Recruit",
+        "veteran": "Veteran"
+      },
       "guildHeadOne": "you are {rank}, {count} member",
       "guildHeadMany": "you are {rank}, {count} members"
     },
@@ -7049,6 +7305,7 @@ export const en_CA: EnTranslations = {
       "quest": "Quest Item",
       "junk": "Junk",
       "fineMaterial": "Fine Material",
+      "material": "Material",
       "food": "Food",
       "drink": "Drink",
       "tool": "Tool",
@@ -7081,6 +7338,9 @@ export const en_CA: EnTranslations = {
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
       "questItem": "Quest Item",
+      "questRelated": "Quest: {quest}",
+      "questRules": "Cannot be sold, banked, or traded.",
+      "questOrphaned": "Not needed for any active quest.",
       "classes": "Classes: {classes}",
       "sellPrice": "Sell price: {money}",
       "clickBuy": "Click to buy",
@@ -7216,6 +7476,12 @@ export const en_CA: EnTranslations = {
       "reclaim": "Reclaim",
       "buyAria": "Buy {item} for {price}",
       "reclaimAria": "Reclaim {item}",
+      "buyConfirmTitle": "Confirm Purchase",
+      "buyConfirmBody": "Buy {item} for {price}?",
+      "buyConfirmBodyStack": "Buy {item} x{count} for {price} ({each} each)?",
+      "buyConfirmAccept": "Buy",
+      "buyConfirmCancel": "Cancel",
+      "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
       "sellNote": "List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.",
       "sellPickEmpty": "Click an item in your bags to choose what to sell.",
       "quantity": "Quantity",
@@ -8703,6 +8969,18 @@ export const en_CA: EnTranslations = {
       "fen_muster_order": {
         "name": "Fenbridge Muster Order"
       },
+      "firebottle": {
+        "name": "Firebottle"
+      },
+      "murloc_hut": {
+        "name": "Mudfin Hut"
+      },
+      "restless_skull": {
+        "name": "Restless Skull"
+      },
+      "vanguard_bone": {
+        "name": "Vanguard Bone"
+      },
       "mire_prowler_pelt": {
         "name": "Mire Prowler Pelt"
       },
@@ -9978,6 +10256,21 @@ export const en_CA: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Terrorspark Groundshaker"
       },
+      "reins_drakemaw_raptor": {
+        "name": "Reins of the Drakemaw Raptor"
+      },
+      "moggers_hide_quiver": {
+        "name": "Mogger's Hide Quiver"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Cragmaw Huntquiver"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Gravewyrm Bone Quiver"
+      },
+      "direfang_quiver": {
+        "name": "Direfang Quiver"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -10973,6 +11266,21 @@ export const en_CA: EnTranslations = {
       "spider_egg_sac": {
         "name": "Spider Egg-Sac"
       },
+      "spider_egg": {
+        "name": "Broodmother Egg"
+      },
+      "widow_hatchling": {
+        "name": "Widow Hatchling"
+      },
+      "drowned_warlord": {
+        "name": "The Drowned Warlord"
+      },
+      "brakka_wallbreaker": {
+        "name": "Brakka the Wallbreaker"
+      },
+      "threnos_first_voice": {
+        "name": "Threnos the First Voice"
+      },
       "grave_silt_bulwark": {
         "name": "Grave-Silt Bulwark"
       },
@@ -11152,6 +11460,18 @@ export const en_CA: EnTranslations = {
       },
       "cindraleth_maw_matriarch": {
         "name": "Cindraleth the Maw Matriarch"
+      },
+      "dragonkin_egg": {
+        "name": "Dragonkin Egg"
+      },
+      "dragonkin_whelp": {
+        "name": "Dragonkin Whelp"
+      },
+      "dragonkin_broodguard": {
+        "name": "Dragonkin Broodguard"
+      },
+      "drakemaw_broodlord": {
+        "name": "Drakemaw Broodlord"
       },
       "gilded_stag": {
         "name": "Gilded Stag"
@@ -11946,11 +12266,11 @@ export const en_CA: EnTranslations = {
       },
       "q_bones": {
         "title": "The Restless Dead",
-        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Grant them peace, {playerName} - return 8 Restless Bones to the earth.",
+        "text": "The old ruin on the northwest hill was a chapel once, and its yard a resting place. Something has stirred the dead from their sleep. Put them down and bring me a skull from each you lay to rest, {playerName}, eight in all, so I may speak the rites over them and grant the peace they were denied.",
         "completion": "May they rest now, and may the Light forgive whatever woke them.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Restless Skulls recovered"
           }
         }
       },
@@ -12129,11 +12449,11 @@ export const en_CA: EnTranslations = {
       },
       "q_deepfen_purge": {
         "title": "Back to the Shallows",
-        "text": "Aldric says those idols are cult-make - which means the mudfins are hauling the marsh's old evil up one armful at a time. I will not have it washing onto my causeway. Go back to the shallows and break the dredging for good: 14 more snappers.",
+        "text": "Aldric says those idols are cult-make, which means the mudfins are hauling the marsh's old evil up one armful at a time, and it all funnels through their reed-huts on the shallows. I will not have it washing onto my causeway. Take this firebottle, get right up against each hut, and burn the lot. Five should break their dredging for good.",
         "completion": "Ruthless and thorough. If this marsh ever dries out, there's warden's work waiting for you.",
         "objectives": {
           "0": {
-            "label": "Deepfen Snapper slain"
+            "label": "Mudfin huts burned"
           }
         }
       },
@@ -12152,11 +12472,11 @@ export const en_CA: EnTranslations = {
       },
       "q_broodmother": {
         "title": "The Broodmother",
-        "text": "You have seen the webs - now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Burn through 8 more widows and put the old mother down before that clutch opens.",
+        "text": "You have seen the webs, now ask yourself what spins cables thick as a man's wrist. The wardens call her the Broodmother, and her clutch hangs over Widow Thicket like a second canopy. Smash 8 of her eggs and put the old mother down before the rest can hatch. Mind the clutch, some eggs will not go quietly.",
         "completion": "Dead? Truly dead? Then the thicket is just trees again. The Light bless your blade, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Mirefen Widow slain"
+            "label": "Broodmother eggs destroyed"
           },
           "1": {
             "label": "The Broodmother slain"
@@ -12185,11 +12505,11 @@ export const en_CA: EnTranslations = {
       },
       "q_no_rest": {
         "title": "No Rest in the Reeds",
-        "text": "The rite on those censers binds the drowned to rise wherever the marsh touches them - and the marsh touches everything. There will be no rest in these reeds until the dead outnumber the living. We cannot unmake the rite yet, but we can empty it of soldiers. Lay 14 more of the Drowned Dead to rest.",
-        "completion": "You give the dead more mercy than their masters ever did. Take this - you have more than earned it.",
+        "text": "The rite on those censers binds the drowned to rise, and now it has raised one strong enough to lead them. The wardens call him the Drowned Warlord, and while he holds the Drowned Chapel the dead keep their ranks. Break him, {playerName}, and the rest will scatter back into the mire.",
+        "completion": "You give the dead more mercy than their masters ever did. Take this, you have more than earned it.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "The Drowned Warlord slain"
           }
         }
       },
@@ -12388,11 +12708,11 @@ export const en_CA: EnTranslations = {
       },
       "q_ogre_bounty": {
         "title": "The Captain's Bounty",
-        "text": "Maren's totems tell me all I need to know: the clans are bought, and my wall is their first errand. I will not wait for them to muster. Fourteen more Thornpeak Ogres, {playerName} - and I will pay bounty on every one.",
+        "text": "Maren's totems name the hand that bought the clans: an ogre they call Brakka the Wallbreaker, and he is mustering the rest against my gate. Cut off the head and the clans scatter. Bring me Brakka, {playerName}, and Highwatch will pay a captain's bounty.",
         "completion": "Bounty paid in full. The foothills are quieter - now we deal with the ones doing the buying.",
         "objectives": {
           "0": {
-            "label": "Thornpeak Ogre slain"
+            "label": "Brakka the Wallbreaker slain"
           }
         }
       },
@@ -12458,26 +12778,20 @@ export const en_CA: EnTranslations = {
       },
       "q_cult_orders": {
         "title": "Orders from Below",
-        "text": "The zealots move with purpose now - watches set, supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. Kill eight more and bring me four sets of their written orders. I would know the hand that commands them.",
+        "text": "The zealots move with purpose now, watches set and supplies counted, like soldiers before a siege. Cultists who organize are cultists taking orders, {playerName}. One of them is carrying written orders from below. Find the zealot who has them and bring the orders to me: I would know the hand that commands them.",
         "completion": "This script... I last saw its like in Morthen's grimoire, in Eastbrook. The same hand has guided every grave we have fought over, {playerName}.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
-          },
-          "1": {
-            "label": "Wyrmcult Orders"
+            "label": "Orders from Below"
           }
         }
       },
       "q_necromancers": {
         "title": "The Phylactery Ring",
-        "text": "The orders speak of a \"ring of phylacteries\" - soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Kill eight necromancers and bring me three phylacteries unbroken. I must know what souls they hold.",
+        "text": "The orders speak of a \"ring of phylacteries\", soul-vessels, {playerName}, set about the Sanctum to feed it. The cult's necromancers carry them like holy relics. Take five phylacteries from them, unbroken, and bring them to me. I must know what souls they hold.",
         "completion": "Light forgive us. These hold the dead of the Vale and the fen - every corpse the Gravecallers ever raised, harvested. They were never building an army, {playerName}. They were gathering a tithe.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Necromancer slain"
-          },
-          "1": {
             "label": "Ritual Phylactery"
           }
         }
@@ -12494,11 +12808,11 @@ export const en_CA: EnTranslations = {
       },
       "q_revenant_vanguard": {
         "title": "Bones of the Vanguard",
-        "text": "The revenants are forming ranks, {playerName} - true ranks, shield-lines and columns, drilling with no drummer. They are being mustered for the Sanctum gate. Break fourteen more before that march begins, and Highwatch will owe you its best steel.",
+        "text": "The revenants are forming ranks, {playerName}, true ranks, shield-lines and columns, drilling with no drummer. Break their vanguard and bring me ten of their bones, so the smiths can read how they were bound. Do it before the march begins, and Highwatch will owe you its best steel.",
         "completion": "The fields lie still again. Take this - it was made for the defenders of the wall, and no one has earned it more.",
         "objectives": {
           "0": {
-            "label": "Boneclad Revenant slain"
+            "label": "Vanguard Bone recovered"
           }
         }
       },
@@ -12524,11 +12838,11 @@ export const en_CA: EnTranslations = {
       },
       "q_voice_below": {
         "title": "The Voice Below",
-        "text": "Last night the whole cult camp knelt at once, {playerName} - every zealot, every necromancer, all facing the Sanctum. Korzul speaks to them in their sleep now; Vael heard the same voice in the fen, and Morthen before him. Cut the congregation down - ten zealots, six necromancers - before that voice has hands enough to pull the gate open itself.",
-        "completion": "The kneeling has stopped. We have not silenced the voice, {playerName} - only thinned its choir. It must be enough.",
+        "text": "Last night the whole cult camp knelt at once, {playerName}, every zealot and necromancer facing the Sanctum, and one throat led the chant. They call him Threnos, the First Voice, and Korzul speaks through his mouth. Vael heard the same voice in the fen, and Morthen before him. Silence Threnos and cut down the six necromancers who keep his choir, before that voice has hands enough to pull the gate open itself.",
+        "completion": "Threnos is silent, and the kneeling has stopped, {playerName}. We have not ended the voice below, only taken from it the mouth that carried it. It must be enough.",
         "objectives": {
           "0": {
-            "label": "Wyrmcult Zealot slain"
+            "label": "Threnos the First Voice silenced"
           },
           "1": {
             "label": "Wyrmcult Necromancer slain"

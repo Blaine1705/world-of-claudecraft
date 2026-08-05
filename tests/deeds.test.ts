@@ -10,6 +10,7 @@ import { ITEMS, MOBS, QUESTS, ZONES } from '../src/sim/data';
 import {
   bumpDeedStat,
   checkDeedTrigger,
+  DEEDS_RECENT_CAP,
   evaluateDeedsFor,
   grantDeed,
   markItemDiscovered,
@@ -1360,6 +1361,58 @@ describe('meter triggers (negative then positive per resolver)', () => {
       expect(meta.deedsEarned.has('pvp_arena_first_match'), arm).toBe(true);
     }
   });
+
+  it('the battleground meters grant the first-win and first-capture deeds off PlayerMeta', () => {
+    // bgWins and bgCaptures are separate resolvers reading the persisted
+    // Thornhollow Fields standing: each arm gets a fresh Sim so a resolver that
+    // read the wrong field could not be masked by the other counter.
+    const winArm = makeSim();
+    const wm = primary(winArm).meta;
+    expect(wm.bgWins).toBe(0);
+    wm.bgWins = 1;
+    winArm.ctx.markDeedsDirty(wm.entityId);
+    winArm.tick();
+    expect(wm.deedsEarned.has('pvp_bg_first_win')).toBe(true);
+    // The capture deed must NOT ride along on a win.
+    expect(wm.deedsEarned.has('pvp_bg_first_capture')).toBe(false);
+
+    const capArm = makeSim();
+    const cm = primary(capArm).meta;
+    expect(cm.bgCaptures).toBe(0);
+    cm.bgCaptures = 1;
+    capArm.ctx.markDeedsDirty(cm.entityId);
+    capArm.tick();
+    expect(cm.deedsEarned.has('pvp_bg_first_capture')).toBe(true);
+    expect(cm.deedsEarned.has('pvp_bg_first_win')).toBe(false);
+  });
+
+  it('the battleground career deeds gate exactly at 25 wins and 100 captures', () => {
+    // Two-sided per threshold, fresh Sim per arm: the sticky grant means a
+    // single sim could never prove the below-threshold side after the fact.
+    const cases: { deedId: string; field: 'bgWins' | 'bgCaptures'; amount: number }[] = [
+      { deedId: 'pvp_bg_wins_25', field: 'bgWins', amount: 25 },
+      { deedId: 'pvp_bg_captures_100', field: 'bgCaptures', amount: 100 },
+    ];
+    for (const c of cases) {
+      // Pin the authored threshold so a content edit cannot silently drift the
+      // number this test claims to cover.
+      expect(DEEDS[c.deedId].trigger).toEqual({ kind: 'meter', meter: c.field, amount: c.amount });
+
+      const below = makeSim();
+      const bm = primary(below).meta;
+      bm[c.field] = c.amount - 1;
+      below.ctx.markDeedsDirty(bm.entityId);
+      below.tick();
+      expect(bm.deedsEarned.has(c.deedId), `${c.deedId} one short`).toBe(false);
+
+      const at = makeSim();
+      const am = primary(at).meta;
+      am[c.field] = c.amount;
+      at.ctx.markDeedsDirty(am.entityId);
+      at.tick();
+      expect(am.deedsEarned.has(c.deedId), `${c.deedId} at threshold`).toBe(true);
+    }
+  });
 });
 
 describe('flag triggers (one negative and one positive per predicate)', () => {
@@ -1820,6 +1873,48 @@ describe('deedsRarity (offline facet arm)', () => {
   it('always resolves null: a sandbox has no population to aggregate', async () => {
     const sim = makeSim();
     await expect(sim.deedsRarity()).resolves.toBeNull();
+  });
+});
+
+describe('deedsRecent (offline facet arm)', () => {
+  it('pins the cap literal and its strip relation', () => {
+    // A literal, never a self-comparison: the three enforcement points (the
+    // Sim slice, the server LIMIT, the client clamp) all import this
+    // constant, so only a literal pin can catch it silently shrinking below
+    // the Book's 5-slot recent strip.
+    expect(DEEDS_RECENT_CAP).toBe(8);
+    expect(DEEDS_RECENT_CAP).toBeGreaterThanOrEqual(5);
+  });
+
+  it('the offline save round-trip preserves the grant order deedsRecent serves', async () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // A deliberate non-catalog order, so the assertion can tell grant order
+    // from DEED_ORDER after the reload.
+    const granted = ['dgn_korzul_flawless', 'prog_first_steps', 'cmb_first_blood'];
+    for (const id of granted) grantDeed(sim.ctx, meta, id);
+    const state = sim.serializeCharacter(sim.playerId);
+    const sim2 = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    // JSON round-trip: exactly what the offline save does, and the step that
+    // would destroy the order if key order were not preserved.
+    sim2.addPlayer('warrior', 'Reload', { state: JSON.parse(JSON.stringify(state)) });
+    await expect(sim2.deedsRecent()).resolves.toEqual([...granted].reverse());
+  });
+
+  it('serves the live grant order newest first, capped at DEEDS_RECENT_CAP', async () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // No unlocks yet: an empty list, never null (the Sim always has its own
+    // grant-order record; null is the fetch-failure arm online).
+    await expect(sim.deedsRecent()).resolves.toEqual([]);
+    // Grant two more than the cap in a KNOWN order that is not catalog order,
+    // so the assertion can tell grant order from DEED_ORDER.
+    const granted = [...DEED_ORDER.slice(0, DEEDS_RECENT_CAP + 1), 'dgn_korzul_flawless'];
+    for (const id of granted) grantDeed(sim.ctx, meta, id);
+    const recent = await sim.deedsRecent();
+    expect(recent).toEqual(granted.slice(-DEEDS_RECENT_CAP).reverse());
+    expect(recent).toHaveLength(DEEDS_RECENT_CAP);
+    expect(recent?.[0]).toBe('dgn_korzul_flawless');
   });
 });
 

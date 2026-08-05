@@ -20,6 +20,7 @@ import {
   locomotionTimeScale,
   pickProxyHeight,
   scanAnimRepair,
+  shouldPlayLanding,
 } from './anim_state';
 import {
   applyMaterials,
@@ -366,6 +367,10 @@ export class CharacterVisual {
   private shadowformMaterials = new Map<THREE.Material, THREE.Material>();
   private moonkinMaterials = new Map<THREE.Material, THREE.Material>();
   private metamorphMaterials = new Map<THREE.Material, THREE.Material>();
+  // Thornhollow Fields rune buffs: a slight whole-body lean toward the rune's color
+  // (weakest treatment: every form/death tint above wins). Keyed per source
+  // material AND color, since the wearer can chain different runes.
+  private runeTintMaterials = new Map<string, THREE.Material>();
   // Ability VFX body glow (the gallery rim read): per-visual material clones
   // carrying an emissive tint while a spec'd cast or buff aura is live. Cloned
   // once per original because base materials are SHARED per-asset caches;
@@ -389,6 +394,8 @@ export class CharacterVisual {
     effectiveWeight: 0,
   };
   private wasDead = false;
+  /** previous frame's airborne flag, for the touchdown edge (see ClipMap.land) */
+  private wasAirborne = false;
   private initialized = false;
   private attackIdx = 0;
   private hitCooldown = 0;
@@ -428,6 +435,7 @@ export class CharacterVisual {
   private shadowform = false;
   private moonkin = false;
   private metamorph = false;
+  private runeTint: number | null = null;
   private bobPhase = Math.random() * Math.PI * 2;
 
   constructor(
@@ -595,6 +603,17 @@ export class CharacterVisual {
     this.wasDead = s.dead;
     this.initialized = true;
 
+    // Touchdown, edge-triggered locally like death/revive. Runs BEFORE the base
+    // machine below so its `currentIsOneShot` latch suppresses the jump->idle
+    // fade; onFinished then hands back to whatever base state we landed into.
+    const landClip = this.def.clips.land;
+    if (
+      landClip &&
+      shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip))
+    )
+      this.playOneShot(landClip, 1);
+    this.wasAirborne = s.airborne;
+
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -712,6 +731,30 @@ export class CharacterVisual {
       this.applyStowArmLift(dt);
       // Same rule for the climb's overhead reach.
       this.applyClimbPose();
+    }
+  }
+
+  /**
+   * Advance the bounded clocks that must not stall while this cosmetic rig is
+   * outside the camera frustum. The next visible update consumes the mixer
+   * debt, while state-machine, pose, and skeleton-palette work stays asleep.
+   * Actionable rigs never enter this path.
+   */
+  advanceOffscreen(dt: number): void {
+    this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
+    const stowTick = tickStow(this.stow, dt);
+    if (stowTick !== 'none') {
+      if (stowTick === 'swap') this.applyStowSwap();
+      this.endStowGesture();
+    }
+    this.pendingDt = Math.min(
+      MIXER_DT_CAP,
+      this.pendingDt + (this.holdT > 0 ? dt * this.holdScale : dt),
+    );
+    if (this.holdT > 0) {
+      this.holdT -= dt;
+      if (this.holdT <= 0) this.holdCooldown = HOLD_REFRACTORY_S;
     }
   }
 
@@ -1202,6 +1245,13 @@ export class CharacterVisual {
   setMetamorph(on: boolean): void {
     if (on === this.metamorph) return;
     this.metamorph = on;
+    this.applyVisualMaterials();
+  }
+
+  /** Slight whole-body color lean while a Thornhollow Fields rune buff rides (null = off). */
+  setRuneTint(color: number | null): void {
+    if (color === this.runeTint) return;
+    this.runeTint = color;
     this.applyVisualMaterials();
   }
 
@@ -1768,9 +1818,31 @@ export class CharacterVisual {
     if (this.metamorph) return this.metamorphMaterial(material);
     if (this.moonkin) return this.moonkinMaterial(material);
     if (this.shadowform) return this.shadowformMaterial(material);
+    if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
     return material;
+  }
+
+  private runeTintMaterial(material: THREE.Material, tint: number): THREE.Material {
+    const key = `${tint}:${material.uuid}`;
+    const cached = this.runeTintMaterials.get(key);
+    if (cached) return cached;
+    const marked = material.clone();
+    const withColor = marked as THREE.Material & {
+      color?: THREE.Color;
+      emissive?: THREE.Color;
+      emissiveIntensity?: number;
+    };
+    // "Very slight": lean the base color toward the rune color and add a low
+    // emissive of the same hue so the read survives bright daylight floors.
+    if (withColor.color) withColor.color.lerp(new THREE.Color(tint), 0.3);
+    if (withColor.emissive) {
+      withColor.emissive.setHex(tint);
+      withColor.emissiveIntensity = 0.18;
+    }
+    this.runeTintMaterials.set(key, marked);
+    return marked;
   }
 
   private ghostMaterial(material: THREE.Material): THREE.Material {
@@ -1946,9 +2018,16 @@ export class CharacterVisual {
     next.play();
   }
 
-  /** sit-down transitions play once, then hand off to the sit-idle loop */
+  /** Base clips that play once and CLAMP instead of looping: a sit-down
+   *  transition (which then hands off to the sit-idle loop), and the jump clip
+   *  of a rig that ships a landing one-shot, which holds its airborne pose for
+   *  as long as the body is off the ground. Rigs without a `land` clip keep
+   *  looping `jump` unchanged. */
   private isOnce(a: THREE.AnimationAction): boolean {
-    return this.baseState === 'sit' && a === this.action(this.def.clips.sitDown);
+    if (this.baseState === 'sit') return a === this.action(this.def.clips.sitDown);
+    if (this.baseState === 'jump' && this.def.clips.land)
+      return a === this.action(this.def.clips.jump);
+    return false;
   }
 
   private playOneShot(
@@ -1991,10 +2070,31 @@ export class CharacterVisual {
     }
   }
 
+  /** Two-state prop mobs (VisualDef.corpseMeshSwap): alive shows `hide`,
+   *  dead shows `show` (the dragonkin egg's cracked shell IS its corpse).
+   *  assembleModel seeds the alive state; the death/revive edges flip it. */
+  private applyCorpseMeshSwap(dead: boolean): void {
+    const swap = this.def.corpseMeshSwap;
+    if (!swap) return;
+    this.model.traverse((n) => {
+      if (n.name === swap.hide) n.visible = !dead;
+      else if (n.name === swap.show) n.visible = dead;
+    });
+  }
+
+  /** One-shot the flourish clip (skeleton awaken / boss taunt / the dragonkin
+   *  brood's Shout and the whelp's hatch pounce), off the 'shout'/'flourish'
+   *  spellfx cues. No-op for rigs without a flourish clip. */
+  playFlourish(): void {
+    const clip = this.def.clips.flourish;
+    if (clip && this.action(clip)) this.playOneShot(clip, 1);
+  }
+
   private enterDeath(): void {
     this.deadLock = true;
     this.currentIsOneShot = false;
     this.currentOneShotIsEmote = false;
+    this.applyCorpseMeshSwap(true);
     // Collapse the upright pick capsule to a flat, ground-hugging profile so a
     // near-eye click behind or above the now-lying corpse no longer intersects an
     // invisible standing column (issue 1486). The ground-level footprint stays, so
@@ -2036,6 +2136,7 @@ export class CharacterVisual {
   private revive(): void {
     this.deadLock = false;
     this.baseState = 'idle';
+    this.applyCorpseMeshSwap(false);
     // Release the one-shot latch: a `finished` that never arrived (the rig was
     // throttled, or the clip was cut) would otherwise leave every later base
     // change committing its state while silently skipping its fade.
@@ -2074,6 +2175,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.sitIdle,
     c.swim,
     c.jump,
+    c.land,
     c.walkBack,
     c.flourish,
     c.stow,

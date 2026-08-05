@@ -104,6 +104,14 @@ function sourceOver(server: GameServer): GameStateSource {
     dbPool: () => ({ total: 0, idle: 0, waiting: 0 }),
     lastTickAt: () => server.lastTickAt(),
     loopStartedAt: () => server.loopStartedAt(),
+    guildBankLogCache: () => ({
+      reads: 0,
+      refreshes: 0,
+      evictions: 0,
+      busts: 0,
+      entries: 0,
+      dirtyGuilds: 0,
+    }),
   };
 }
 
@@ -401,6 +409,7 @@ function recordingSink() {
   const fishingGotAways: Array<[string, string]> = [];
   const fishingEmptyHooks: Array<[string, string]> = [];
   const rodFees: string[] = [];
+  const bgResolved: Array<[string, string, number, number, number]> = [];
   const sink: GameMetricsCounters = {
     wsMessage(direction) {
       if (direction === 'in') wsIn++;
@@ -418,6 +427,7 @@ function recordingSink() {
       chats++;
     },
     characterCreated() {},
+    guildBankIncident() {},
     copperCredited(source, amount) {
       credited.push([source, amount]);
     },
@@ -442,9 +452,13 @@ function recordingSink() {
     rodFeePaid(recipeId) {
       rodFees.push(recipeId);
     },
+    battlegroundResolved(cause, composition, durationSec, scoreCrimson, scoreAzure) {
+      bgResolved.push([cause, composition, durationSec, scoreCrimson, scoreAzure]);
+    },
   };
   return {
     sink,
+    bgResolved,
     dropped,
     seqGaps,
     credited,

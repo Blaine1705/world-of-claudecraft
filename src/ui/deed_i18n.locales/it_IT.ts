@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Spezzacovata',
+    desc: 'Uccidi un Signore della covata di Drakemaw tra le sue uova, superando il grido, il fendente e il fuoco.',
+  },
+  chr_maw_matriarch: {
+    name: 'Il Cielo Tace',
+    desc: 'Uccidi Cindraleth, la Matriarca delle Fauci, nel suo nido nel cratere sopra il Drakemaw.',
+  },
   pvp_card_duel_first_win: {
     name: 'Regole di Casa',
     desc: 'Vinci un Duello di Carte dal Maestro delle Carte.',
@@ -852,6 +860,10 @@ export const table: DeedLocaleTable = {
     name: 'Eroico: Il Bacino di Wildheart',
     desc: 'Sconfiggi Zulgar, Voce del Bacino, nel Bacino di Wildheart in difficoltà Eroica.',
   },
+  chr_peaks_gatherer: {
+    name: 'Raccolto delle Alture',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sulle Alture di Thornpeak.",
+  },
   chr_marsh_rares_ii: {
     name: 'Il Ghiottone, Messo in Conto',
     desc: 'Uccidi Grubjaw il Ghiottone, un quarto terrore famigerato della Palude di Mirefen rimasto fuori dal primo conteggio.',
@@ -867,5 +879,57 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Il Branco Ricorda',
     desc: 'Uccidi il Vecchio Marrowshell e Aurelhorn, Primo del Branco, i due boss rari erranti della Valletta.',
+  },
+  chr_willowfen_gatherer: {
+    name: "L'Abbondanza del Willowfen",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Willowfen.",
+  },
+  chr_willowfen_first_cast: {
+    name: 'Increspature nelle Lilymoors',
+    desc: 'Pesca un pesce nelle acque del Willowfen.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Raccolto sul Promontorio',
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe nel Galecrest.",
+  },
+  chr_galecrest_first_cast: {
+    name: 'Una Lenza nel Laghetto Specchio',
+    desc: 'Pesca un pesce nelle acque del Galecrest.',
+  },
+  chr_farshore_gatherer: {
+    name: "Provviste dell'Isola",
+    desc: "Raccogli una vena di minerale, un ceppo di legname e una macchia d'erbe sul Farshore.",
+  },
+  chr_farshore_first_cast: {
+    name: 'Ciò che Sanno i Gabbiani',
+    desc: 'Pesca un pesce nelle acque del Farshore.',
+  },
+  prog_engineering_rare: {
+    name: 'Ingegneria di precisione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Ingegneria.',
+  },
+  prog_alchemy_rare: {
+    name: "Un'annata rara",
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Alchimia.',
+  },
+  prog_cooking_rare: {
+    name: 'Un piatto da ricordare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Cucina.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Concia raffinata',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Lavorazione del Cuoio.',
+  },
+  prog_tailoring_rare: {
+    name: 'Un punto da maestro',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Sartoria.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Temprato fino a brillare',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armi.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Placcato alla perfezione',
+    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armature.',
   },
 };

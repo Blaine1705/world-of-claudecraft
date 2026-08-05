@@ -110,8 +110,10 @@ const EXCLUDED_PATHS = new Set<string>(ORPHAN_DEVIATION?.routes ?? []);
 const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/rarity',
   '/api/deeds/broadcasts',
+  '/api/characters/:id/deeds-recent',
   '/api/steam/link',
   '/api/steam/status',
+  '/api/battleground/leaderboard',
   '/api/epic/link',
   '/api/epic/status',
   '/api/ota/updates',
@@ -231,6 +233,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/characters' },
     { method: 'GET', path: '/api/characters/:id/standing' },
     { method: 'GET', path: '/api/characters/:id/sheet' },
+    // Registry-only (born after the migration, the new-route rule): the
+    // owner's newest-first deed unlock ids for the Book's recent strip.
+    { method: 'GET', path: '/api/characters/:id/deeds-recent' },
     { method: 'POST', path: '/api/characters/:id/rename' },
     { method: 'POST', path: '/api/characters/:id/takeover' },
     { method: 'DELETE', path: '/api/characters/:id' },
@@ -312,6 +317,9 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/deeds/rarity' },
     { method: 'GET', path: '/api/deeds/broadcasts' },
     { method: 'POST', path: '/api/deeds/broadcasts' },
+    // The Thornhollow Fields ladder (server/battleground.ts): registry-only like the
+    // deeds family, per the same new-route rule.
+    { method: 'GET', path: '/api/battleground/leaderboard' },
     // The Steam link trio (server/steam/routes.ts): registry-only like the
     // deeds pair, env-gated dark until STEAM_ENABLED=1.
     { method: 'POST', path: '/api/steam/link' },

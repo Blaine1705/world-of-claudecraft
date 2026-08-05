@@ -7,6 +7,14 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  chr_drakemaw_broodlord: {
+    name: 'Gelegebrecher',
+    desc: 'Einen Drakenrachen-Brutfürsten inmitten seiner Eier erlegen, durch Schrei, Hieb und Feuer hindurch.',
+  },
+  chr_maw_matriarch: {
+    name: 'Der Himmel verstummt',
+    desc: 'Cindraleth, die Rachen-Matriarchin, in ihrem Kraterhorst über dem Drakenrachen erlegen.',
+  },
   pvp_card_duel_first_win: {
     name: 'Nach eigenen Regeln',
     desc: 'Gewinne einen Kartenkampf beim Kartenmeister.',
@@ -817,6 +825,10 @@ export const table: DeedLocaleTable = {
     name: 'Heroisch: Das Wildherzbecken',
     desc: 'Besiege Zulgar, Stimme des Beckens, im Wildherzbecken auf heroischem Schwierigkeitsgrad.',
   },
+  chr_peaks_gatherer: {
+    name: 'Die Ernte der Höhen',
+    desc: 'Ernte in den Thornpeak-Höhen eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
   chr_marsh_rares_ii: {
     name: 'Der Vielfraß, nachgetragen',
     desc: 'Erlege Grubjaw den Vielfraß, einen vierten namhaften Schrecken des Mirefen-Moors, den die erste Zählung ausließ.',
@@ -832,5 +844,57 @@ export const table: DeedLocaleTable = {
   chr_hollow_rares: {
     name: 'Die Herde vergisst nicht',
     desc: 'Erlege die Alte Markschale und Aurelhorn, den Ersten der Herde, die beiden wandernden seltenen Bosse der Schleiersenke.',
+  },
+  chr_willowfen_gatherer: {
+    name: 'Gaben des Moorlands',
+    desc: 'Ernte im Weidenmoor eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
+  chr_willowfen_first_cast: {
+    name: 'Wellenkreise in den Lilienmooren',
+    desc: 'Fange einen Fisch aus den Gewässern des Weidenmoors.',
+  },
+  chr_galecrest_gatherer: {
+    name: 'Ernte auf der Landzunge',
+    desc: 'Ernte auf dem Windkamm eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
+  chr_galecrest_first_cast: {
+    name: 'Eine Schnur im Spiegelweiher',
+    desc: 'Fange einen Fisch aus den Gewässern des Windkamms.',
+  },
+  chr_farshore_gatherer: {
+    name: 'Inselproviant',
+    desc: 'Ernte auf der Fernküste eine Erzader, ein Gehölz und ein Kräuterbeet.',
+  },
+  chr_farshore_first_cast: {
+    name: 'Was die Möwen wissen',
+    desc: 'Fange einen Fisch aus den Gewässern der Fernküste.',
+  },
+  prog_engineering_rare: {
+    name: 'Präzisionsingenieurwesen',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück im Ingenieurswesen.',
+  },
+  prog_alchemy_rare: {
+    name: 'Ein seltener Jahrgang',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Alchemie.',
+  },
+  prog_cooking_rare: {
+    name: 'Ein unvergessliches Gericht',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück im Kochen.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Feine Gerberei',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Lederverarbeitung.',
+  },
+  prog_tailoring_rare: {
+    name: 'Ein meisterhafter Stich',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Schneiderei.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Zu Glanz gehärtet',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Waffenherstellung.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Zur Perfektion gepanzert',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Rüstungsherstellung.',
   },
 };
