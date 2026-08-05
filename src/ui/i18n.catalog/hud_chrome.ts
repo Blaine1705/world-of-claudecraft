@@ -2311,10 +2311,12 @@ export const hudChromeStrings = {
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
-  // reuses the existing guide.family.<id>.name bestiary labels), then a
-  // Friendly/Hostile reaction line (green/red, from Entity.hostile). All three
-  // values below are wordy (M16): filled in the five non-Latin locales in this
-  // same change.
+  // reuses the existing guide.family.<id>.name bestiary labels), then an
+  // Elite/Boss rank badge (mirrors the target frame's rank chrome), then a
+  // Friendly/Hostile reaction line (green/red, from Entity.hostile). All the
+  // wordy ones (M16) are filled in the five non-Latin locales in this same
+  // change; "Boss" is not wordy (no four-plus consecutive-lowercase run) so
+  // it stays pending like the rest of a plain-word English addition.
   mobTooltip: {
     levelFamily: 'Level {level} {family}',
     // The one MobFamily with no guide.family.* bestiary entry (demons are
@@ -2323,6 +2325,11 @@ export const hudChromeStrings = {
     familyDemon: 'Demon',
     hostile: 'Hostile',
     friendly: 'Friendly',
+    // Elite/boss rank badge (target_rank_view.ts TargetRank), shown only when
+    // the mob's template carries elite/boss. "Elite" is wordy (M16, the
+    // "lite" run); "Boss" is not.
+    elite: 'Elite',
+    boss: 'Boss',
   },
   // Movable target frame: the small corner toggle that unlocks the frame for
   // dragging and locks it back in place (target_frame_pos.ts + hud.ts wiring).

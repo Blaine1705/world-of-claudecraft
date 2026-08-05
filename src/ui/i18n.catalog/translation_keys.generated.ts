@@ -7545,6 +7545,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.meters.seconds'
   | 'hudChrome.meters.separate'
   | 'hudChrome.meters.threatFallback'
+  | 'hudChrome.mobTooltip.boss'
+  | 'hudChrome.mobTooltip.elite'
   | 'hudChrome.mobTooltip.familyDemon'
   | 'hudChrome.mobTooltip.friendly'
   | 'hudChrome.mobTooltip.hostile'

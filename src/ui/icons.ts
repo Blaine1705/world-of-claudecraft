@@ -4552,6 +4552,25 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
   'chr_maw_matriarch',
+  // Rift coverage (procedural infinite-dungeon system, v0.35): both are 'dungeon', so both
+  // fall back to the deed_cat_dungeon crest until their commissioned art lands.
+  'dgn_rift',
+  'dgn_rift_s_rank',
+  // Basic universal profession deeds (issue #2055): all seven are 'progression', so all
+  // fall back to the deed_cat_progression crest until their commissioned art lands.
+  'prog_engineering_rare',
+  'prog_alchemy_rare',
+  'prog_cooking_rare',
+  'prog_leatherworking_rare',
+  'prog_tailoring_rare',
+  'prog_weaponcrafting_rare',
+  'prog_armorcrafting_rare',
+  // Reliquary Curator rank bridges (Phase 6): all four are 'collection', so
+  // they fall back to the deed_cat_collection crest until commissioned art lands.
+  'col_reliquary_rank_2',
+  'col_reliquary_rank_3',
+  'col_reliquary_rank_4',
+  'col_reliquary_rank_5',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

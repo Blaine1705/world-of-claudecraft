@@ -2048,7 +2048,9 @@ export const vi_VN: EnTranslations = {
       "levelFamily": "{family} cấp {level}",
       "familyDemon": "Ác Quỷ",
       "hostile": "Thù Địch",
-      "friendly": "Thân Thiện"
+      "friendly": "Thân Thiện",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Di chuyển khung mục tiêu",

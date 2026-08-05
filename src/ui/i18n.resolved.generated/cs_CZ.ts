@@ -2048,7 +2048,9 @@ export const cs_CZ: EnTranslations = {
       "levelFamily": "Úroveň {level} {family}",
       "familyDemon": "Démon",
       "hostile": "Nepřátelský",
-      "friendly": "Přátelský"
+      "friendly": "Přátelský",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Přesunout rám cíle",

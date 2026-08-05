@@ -596,6 +596,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': 'レベル{level} {family}',
   'hudChrome.mobTooltip.hostile': '敵対',
   'hudChrome.mobTooltip.friendly': '味方',
+  'hudChrome.mobTooltip.elite': 'エリート',
   'hudChrome.targetFrame.unlock': 'ターゲットフレームを移動',
   'hudChrome.targetFrame.lock': 'ターゲットフレームを固定',
   'hudChrome.playerFrame.unlock': 'プレイヤーフレームを移動',

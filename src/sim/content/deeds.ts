@@ -2448,6 +2448,27 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'quest', questId: 'q_dk_matriarch_of_the_maw' },
   },
 
+  // Rifts (src/sim/rift/): the procedural infinite-dungeon system, ranked C
+  // through S. No single dungeonId exists to key a dungeonClears trigger
+  // against (every rift regenerates from a seed), so both deeds read a
+  // lifetime counter instead, bumped in rift/runs.ts on run completion.
+  dgn_rift: {
+    id: 'dgn_rift',
+    name: 'Riftwalker',
+    desc: 'Clear a Rift by defeating its floor boss.',
+    category: 'dungeon',
+    renown: 5,
+    trigger: { kind: 'stat', stat: 'riftClears', count: 1 },
+  },
+  dgn_rift_s_rank: {
+    id: 'dgn_rift_s_rank',
+    name: 'Rift Sovereign',
+    desc: 'Clear an S-rank Rift, the hardest tier a Rift portal can spawn.',
+    category: 'dungeon',
+    renown: 25,
+    trigger: { kind: 'stat', stat: 'riftSRankClears', count: 1 },
+  },
+
   // Basic universal profession deeds, issue #2055: per-craft rare-tier
   // milestones. Each fires off the craft_rare:<craftId> mark
   // (professions/crafting.ts craftItem) the first time a player crafts a

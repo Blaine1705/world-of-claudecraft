@@ -62,12 +62,12 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 249 deeds worth 2970 total Renown', () => {
-    // Release base (245 / 2970) plus four Reliquary Curator rank bridges
-    // (all renown 0). Includes seven per-craft rare-tier profession deeds
-    // and four Thornhollow Fields battleground deeds.
-    expect(DEED_ORDER.length).toBe(249);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(2970);
+  it('ships exactly 251 deeds worth 3000 total Renown', () => {
+    // Release base (247 / 3000: brood, Thornhollow Fields, Rift pair, seven
+    // per-craft rare-tier profession deeds) plus four Reliquary Curator rank
+    // bridges (all renown 0).
+    expect(DEED_ORDER.length).toBe(251);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3000);
   });
 
   it('ships the audited per-category counts', () => {
@@ -76,7 +76,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     expect(byCategory).toEqual({
       progression: 57,
       combat: 10,
-      dungeon: 29,
+      // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
+      dungeon: 31,
       delve: 13,
       chronicle: 37,
       // +4 Reliquary Curator rank bridges on top of the release collection set.
@@ -162,9 +163,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // shipped capstone the first reckoning never credited.
       'chr_drakemaw_broodlord',
       'chr_maw_matriarch',
+      // Rift coverage (procedural infinite-dungeon system, no fixed
+      // dungeonId to key a dungeonClears trigger against).
+      'dgn_rift',
+      'dgn_rift_s_rank',
       // Basic universal profession deeds (issue #2055): per-craft rare-tier
-      // milestones, appended after the Drakelands brood rework block above
-      // (the release base merge put that block first).
+      // milestones, appended after the Rift coverage block above (the
+      // rebase onto the release base put the Rift pair first).
       'prog_engineering_rare',
       'prog_alchemy_rare',
       'prog_cooking_rare',
@@ -256,6 +261,23 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       kind: 'quest',
       questId: 'q_dk_matriarch_of_the_maw',
     });
+  });
+
+  it('pins the Rift coverage: renown and trigger literals', () => {
+    expect(DEEDS.dgn_rift.category).toBe('dungeon');
+    expect(DEEDS.dgn_rift.renown).toBe(5);
+    expect(DEEDS.dgn_rift.trigger).toEqual({ kind: 'stat', stat: 'riftClears', count: 1 });
+    expect(DEEDS.dgn_rift.hidden ?? false).toBe(false);
+    expect(DEEDS.dgn_rift.feat ?? false).toBe(false);
+    expect(DEEDS.dgn_rift_s_rank.category).toBe('dungeon');
+    expect(DEEDS.dgn_rift_s_rank.renown).toBe(25);
+    expect(DEEDS.dgn_rift_s_rank.trigger).toEqual({
+      kind: 'stat',
+      stat: 'riftSRankClears',
+      count: 1,
+    });
+    expect(DEEDS.dgn_rift_s_rank.hidden ?? false).toBe(false);
+    expect(DEEDS.dgn_rift_s_rank.feat ?? false).toBe(false);
   });
 
   it('pins the professions additions: renown and trigger literals', () => {
@@ -481,15 +503,14 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined at the v0.35.0 base merge, which unions the brood pair with
   // the four Thornhollow Fields battleground deeds. No shipped trigger or
   // renown changed on either side.
-  // Re-baselined for issue #2055 (basic universal profession deeds): seven
-  // appended per-craft rare-tier milestones (prog_engineering_rare through
-  // prog_armorcrafting_rare), appended after the Drakelands brood rework
-  // block. No shipped trigger or renown changed.
-  // Re-baselined for Reliquary Phase 6 across the release merge: four
-  // appended zero-Renown Curator rank bridges (col_reliquary_rank_2..5)
-  // after the profession rare-tier block; no shipped trigger or renown
-  // changed on prior deeds. Hash recomputed after the union.
-  const FROZEN_CATALOG_SHA256 = '2b247271b228b776f357dad4f0aa7a617f5e477072da4251623ddf93578113b5';
+  // Re-baselined for Rift coverage (dgn_rift, dgn_rift_s_rank) plus issue #2055
+  // (basic universal profession deeds: prog_engineering_rare through
+  // prog_armorcrafting_rare), which both append after the Drakelands brood
+  // rework block above, plus Reliquary Phase 6 zero-Renown Curator rank
+  // bridges (col_reliquary_rank_2..5) after the profession rare-tier block.
+  // No shipped trigger or renown changed on prior deeds. Hash recomputed
+  // after the union.
+  const FROZEN_CATALOG_SHA256 = 'e06fd8f6a5a4d35c91be540044b5a0ea2be609e9c65f4535422a448fe7979885';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
