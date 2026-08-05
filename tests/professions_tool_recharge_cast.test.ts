@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { cancelCast } from '../src/sim/combat/casting_lifecycle';
 import { TOOL_RECHARGE_CAST_DURATION_SEC } from '../src/sim/content/professions';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import { type Entity, TOOL_RECHARGE_CAST_ID } from '../src/sim/types';
+import { type Entity, type SimEvent, TOOL_RECHARGE_CAST_ID } from '../src/sim/types';
 import { completeRechargeCast, runRecharge } from './helpers/enchant_family_cast';
 
 function makeSim(seed = 11): Sim {
@@ -116,6 +116,34 @@ describe('tool recharge cast', () => {
     expect(metaOf(sim).craftThrottle.count).toBe(999);
     // 12 recharges at 1 dust each (self-crafted common).
     expect(sim.countItem('arcane_dust')).toBe(38);
+  });
+
+  it('complete denies insufficient_materials when the materials leave mid-cast', () => {
+    const sim = simWithDepletedSlot();
+    const { p } = playerOf(sim);
+    const slot = metaOf(sim).toolEffectSlots?.mining;
+    if (!slot) throw new Error('slot');
+    sim.rechargeToolEffect('mining');
+    expect(p.castingAbility).toBe(TOOL_RECHARGE_CAST_ID);
+    // The dust is spent elsewhere (a trade, an enchant) while the cast runs.
+    sim.removeItem('arcane_dust', 10);
+    sim.drainEvents();
+
+    completeRechargeCast(sim);
+
+    const results = sim
+      .drainEvents()
+      .filter(
+        (e): e is Extract<SimEvent, { type: 'toolEffectResult' }> => e.type === 'toolEffectResult',
+      );
+    expect(results).toHaveLength(1);
+    expect(results[0].action).toBe('recharge');
+    expect(results[0].ok).toBe(false);
+    expect(results[0].reason).toBe('insufficient_materials');
+    expect(slot.durability).toBe(0);
+    expect(p.castingAbility).toBeNull();
+    expect(p.toolRechargeCastProfessionId).toBe('');
+    expect(sim.countItem('arcane_dust')).toBe(0);
   });
 
   it('completeRechargeCast after cancel is a no-op (session already cleared)', () => {

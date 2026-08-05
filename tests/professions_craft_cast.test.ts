@@ -4,7 +4,9 @@
 // action throttle.
 
 import { describe, expect, it } from 'vitest';
+import { bagCapacity } from '../src/sim/bags';
 import { cancelCast, updateCasting } from '../src/sim/combat/casting_lifecycle';
+import { handleDeath } from '../src/sim/combat/damage';
 import {
   CRAFT_BATCH_MAX,
   CRAFT_CAST_DURATION_CEILING_SEC,
@@ -15,13 +17,15 @@ import {
   CRAFT_CAST_DURATION_SKILL_75_SEC,
   CRAFT_CAST_DURATION_SKILL_100_OR_COMBO_SEC,
 } from '../src/sim/content/professions';
-import { COMBO_RECIPES, COMMON_RECIPES, recipeById } from '../src/sim/content/recipes';
+import { ALL_RECIPES, COMBO_RECIPES, COMMON_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { STATIONS } from '../src/sim/data';
 import { craftCastDurationSec } from '../src/sim/professions/craft_cast_duration';
 import {
   clampCraftBatchCount,
   craftItem,
   maxCraftCountForRecipe,
+  requiredReagentCountFor,
+  resolveCraftForRecipe,
 } from '../src/sim/professions/crafting';
 import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
@@ -33,6 +37,7 @@ import {
   type Entity,
   isNonSpellCast,
   SALVAGE_CAST_ID,
+  type SimEvent,
   TOOL_RECHARGE_CAST_ID,
 } from '../src/sim/types';
 
@@ -75,6 +80,20 @@ function completeCraftNow(sim: Sim) {
   p.castingAbility = null;
   p.castRemaining = 0;
   sim.ctx.completeCraftCast(p, meta);
+}
+
+// A tool: one per slot, merges with nothing, so N of these fill exactly N
+// slots (the professions_capacity.test.ts filler idiom).
+const FILLER = 'simple_fishing_pole';
+
+function fillerSlots(n: number) {
+  return Array.from({ length: n }, () => ({ itemId: FILLER, count: 1 }));
+}
+
+function craftResults(sim: Sim): Extract<SimEvent, { type: 'craftResult' }>[] {
+  return sim
+    .drainEvents()
+    .filter((e): e is Extract<SimEvent, { type: 'craftResult' }> => e.type === 'craftResult');
 }
 
 describe('profession cast sentinels', () => {
@@ -508,5 +527,263 @@ describe('craft cast batch (Phase 3)', () => {
     sim.craftItem(recipe.id, false, pid, 2);
     expect(p.castingAbility).toBe(CRAFT_CAST_ID);
     expect(p.craftCastBatchTotal).toBe(2);
+  });
+
+  it('Sim.craftItem three-arg form reads the third arg as COUNT for the primary player', () => {
+    const sim = makeSim();
+    const { p, meta, pid } = playerOf(sim);
+    const recipe = COMMON_RECIPES[0];
+    meta.copper = 10_000;
+    grantReagents(sim, recipe, pid, 3);
+    sim.craftItem(recipe.id, false, 3);
+    expect(p.castingAbility).toBe(CRAFT_CAST_ID);
+    expect(p.craftCastRecipeId).toBe(recipe.id);
+    expect(p.craftCastBatchTotal).toBe(3);
+    expect(p.craftCastBatchRemaining).toBe(3);
+  });
+
+  it('Sim.craftItem four-arg form arms the NAMED player, never the primary', () => {
+    const sim = makeSim();
+    const { p: primary, pid } = playerOf(sim);
+    const pidB = sim.addPlayer('warrior', 'Bet');
+    const b = sim.entities.get(pidB);
+    if (!b) throw new Error('second player entity missing');
+    const recipe = COMMON_RECIPES[0];
+    // Only B holds reagents: the primary could not craft this even if aimed at.
+    grantReagents(sim, recipe, pidB, 1);
+    for (const r of recipe.reagents) expect(sim.countItem(r.itemId, pid)).toBe(0);
+
+    sim.craftItem(recipe.id, false, pidB, 1);
+
+    expect(b.castingAbility).toBe(CRAFT_CAST_ID);
+    expect(b.craftCastRecipeId).toBe(recipe.id);
+    expect(b.craftCastBatchTotal).toBe(1);
+    expect(primary.castingAbility).toBeNull();
+    expect(primary.craftCastRecipeId).toBe('');
+    expect(primary.craftCastBatchTotal).toBe(0);
+  });
+
+  it('a mid-batch admission denial after the first success stops the batch', () => {
+    // The auto-start gate, not the resolve: craft 1 succeeds and its OUTPUT is
+    // what takes the last free slot, so the batch's next admission denies on a
+    // state only the completed craft could have produced. The output is gear
+    // (stack cap 1), so a second copy can never merge into the first.
+    const sim = makeSim();
+    const { p, meta, pid } = playerOf(sim);
+    const recipe = COMMON_RECIPES[0];
+    meta.copper = 10_000;
+    meta.inventory = fillerSlots(12);
+    grantReagents(sim, recipe, pid, 3); // three surviving reagent stacks
+    expect(meta.inventory.length).toBe(15);
+    expect(bagCapacity(meta.bags)).toBe(16);
+    sim.drainEvents();
+
+    expect(craftItem(sim.ctx, recipe.id, false, pid, 2).casting).toBe(true);
+    expect(p.craftCastBatchTotal).toBe(2);
+    completeCraftNow(sim);
+
+    const results = craftResults(sim);
+    expect(results).toHaveLength(2);
+    expect(results[0].ok).toBe(true);
+    expect(results[0].itemId).toBe(recipe.resultItemId);
+    expect(results[1].ok).toBe(false);
+    expect(results[1].reason).toBe('no_bag_space');
+    expect(p.castingAbility).toBeNull();
+    expect(p.craftCastRecipeId).toBe('');
+    expect(p.craftCastBatchRemaining).toBe(0);
+    expect(p.craftCastBatchTotal).toBe(0);
+    // Exactly one output, and the denied craft's reagents are still in the bags.
+    expect(sim.countItem(recipe.resultItemId, pid)).toBe(1);
+    for (const r of recipe.reagents) {
+      expect(sim.countItem(r.itemId, pid)).toBe(r.count * 2);
+    }
+  });
+});
+
+describe('craft cast complete re-checks bag capacity', () => {
+  it('no_bag_space when the bags fill mid-cast: reagents, gold, and skill untouched', () => {
+    const sim = makeSim();
+    const { meta, pid } = playerOf(sim);
+    const recipe = COMMON_RECIPES[0];
+    meta.copper = 10_000;
+    meta.inventory = fillerSlots(11);
+    // Two crafts' worth, so one craft's consumption never frees a reagent slot.
+    grantReagents(sim, recipe, pid, 2);
+    expect(meta.inventory.length).toBe(14);
+    const skillBefore = meta.craftSkills[recipe.professionId] ?? 0;
+
+    expect(craftItem(sim.ctx, recipe.id, false, pid).casting).toBe(true);
+    // The bags fill while the cast runs (loot, a trade, a mail collect).
+    meta.inventory.push(...fillerSlots(bagCapacity(meta.bags) - meta.inventory.length));
+    expect(meta.inventory.length).toBe(16);
+    sim.drainEvents();
+
+    completeCraftNow(sim);
+
+    const results = craftResults(sim);
+    expect(results).toHaveLength(1);
+    expect(results[0].ok).toBe(false);
+    expect(results[0].reason).toBe('no_bag_space');
+    expect(meta.lastCraftResult?.reason).toBe('no_bag_space');
+    for (const r of recipe.reagents) {
+      expect(sim.countItem(r.itemId, pid)).toBe(r.count * 2);
+    }
+    expect(sim.countItem(recipe.resultItemId, pid)).toBe(0);
+    expect(meta.copper).toBe(10_000);
+    expect(meta.craftSkills[recipe.professionId] ?? 0).toBe(skillBefore);
+  });
+});
+
+describe('craft cast death teardown', () => {
+  it('death mid-cast clears every craft/enchant session field and spends nothing', () => {
+    const sim = makeSim();
+    const { p, meta, pid } = playerOf(sim);
+    const recipe = COMMON_RECIPES[0];
+    meta.copper = 10_000;
+    grantReagents(sim, recipe, pid, 2);
+    // commission true and count 2 so all four craft fields are non-inert.
+    expect(craftItem(sim.ctx, recipe.id, true, pid, 2).casting).toBe(true);
+    expect(p.craftCastCommission).toBe(true);
+    // Belt-and-braces (the gathering_rhythm.test.ts idiom): arm the enchant
+    // half of the shared session bag too, so each of the ten fields proves a
+    // real clear instead of resting at its inert value.
+    p.enchantCastItemId = 'eastbrook_arming_sword';
+    p.enchantCastBagSlot = 3;
+    p.enchantCastEnchantId = 'enchant_weapon_might';
+    p.enchantCastEquipSlot = 'mainhand';
+    p.enchantCastConfirmReplace = true;
+    p.enchantCastTargetPin = 'pinned';
+    sim.drainEvents();
+
+    handleDeath(sim.ctx, p, null);
+
+    expect(p.dead).toBe(true);
+    expect(p.castingAbility).toBeNull();
+    expect(p.craftCastRecipeId).toBe('');
+    expect(p.craftCastCommission).toBe(false);
+    expect(p.craftCastBatchRemaining).toBe(0);
+    expect(p.craftCastBatchTotal).toBe(0);
+    expect(p.enchantCastItemId).toBe('');
+    expect(p.enchantCastBagSlot).toBe(0);
+    expect(p.enchantCastEnchantId).toBe('');
+    expect(p.enchantCastEquipSlot).toBe('');
+    expect(p.enchantCastConfirmReplace).toBe(false);
+    expect(p.enchantCastTargetPin).toBe('');
+    // Nothing resolved: no craftResult, no grant, no fee.
+    expect(craftResults(sim)).toHaveLength(0);
+    for (const r of recipe.reagents) {
+      expect(sim.countItem(r.itemId, pid)).toBe(r.count * 2);
+    }
+    expect(sim.countItem(recipe.resultItemId, pid)).toBe(0);
+    expect(meta.copper).toBe(10_000);
+  });
+});
+
+describe('craft cast determinism', () => {
+  it('two sims on the same seed emit identical craftResults and draw identically', () => {
+    const runScript = () => {
+      const sim = makeSim(1234);
+      const { p, meta, pid } = playerOf(sim);
+      const recipe = COMMON_RECIPES[0];
+      meta.copper = 10_000;
+      grantReagents(sim, recipe, pid, 2);
+      sim.drainEvents();
+      let draws = 0;
+      sim.ctx.rng.setObserver(() => {
+        draws += 1;
+      });
+      try {
+        expect(craftItem(sim.ctx, recipe.id, false, pid, 2).casting).toBe(true);
+        // Tick the real lifecycle so both runs walk the same cast timeline.
+        let n = 0;
+        while (p.castingAbility && n++ < 400) updateCasting(sim.ctx, p, meta);
+        expect(p.castingAbility).toBeNull();
+      } finally {
+        sim.ctx.rng.setObserver(null);
+      }
+      return { draws, results: craftResults(sim) };
+    };
+
+    const first = runScript();
+    const second = runScript();
+
+    expect(first.results).toHaveLength(2);
+    expect(first.results[0].ok).toBe(true);
+    expect(first.results[1].ok).toBe(true);
+    expect(first.results).toEqual(second.results);
+    // One masterwork proc draw per successful craft, and nothing else in the
+    // whole start-to-complete script (start and cancel draw zero).
+    expect(first.draws).toBe(2);
+    expect(second.draws).toBe(2);
+  });
+});
+
+describe('maxCraftCountForRecipe with a self-signed reagent', () => {
+  // The #1145 discount is HOLD-keyed, so it survives only while a signed copy
+  // is still in the bags. planGradeRemoval drains the base grade first and
+  // removeStacked walks the inventory END-BACKWARD, so the signed copy
+  // (appended last by addItemInstance) is among the first units spent: the
+  // discount expires on craft 1 and every later craft pays the full count.
+  const signedRecipe: ProfessionRecipeRecord = {
+    id: '__craft_cast_signed_batch',
+    professionId: 'cooking',
+    resultItemId: 'tough_jerky',
+    resultCount: 1,
+    reagents: [{ itemId: 'copper_ore', count: 3 }],
+    skillReq: 0,
+    itemLevelBudget: 1,
+    level: 1,
+  };
+
+  it('pins the discounted and undiscounted per-craft requirement the ceiling is built on', () => {
+    // The arithmetic behind the literals below, read off the requirement
+    // function rather than off maxCraftCountForRecipe itself.
+    expect(
+      requiredReagentCountFor(true, signedRecipe.reagents[0], {}, signedRecipe.professionId).count,
+    ).toBe(2);
+    expect(
+      requiredReagentCountFor(false, signedRecipe.reagents[0], {}, signedRecipe.professionId).count,
+    ).toBe(3);
+  });
+
+  it('spends the signed copy on craft 1, so the ceiling is 3 and not the one-shot 4', () => {
+    const sim = makeSim();
+    const { meta, pid } = playerOf(sim);
+    meta.inventory = [];
+    sim.addItem('copper_ore', 7, pid);
+    sim.addItemInstance('copper_ore', { signer: meta.name }, pid, 1);
+    expect(sim.countItem('copper_ore', pid)).toBe(8);
+
+    // By hand: craft 1 costs 2 (discounted) and takes the signed copy with it,
+    // crafts 2 and 3 cost 3 each (8 - 2 - 3 - 3 = 0), craft 4 cannot be paid.
+    // A one-shot floor(8 / 2) division would have promised 4.
+    expect(maxCraftCountForRecipe(sim.ctx, signedRecipe, pid)).toBe(3);
+
+    // The walk-order premise, proved on the real consumption: one craft eats
+    // the signed copy, leaving six plain units and no signed copy at all.
+    expect(resolveCraftForRecipe(sim.ctx, pid, signedRecipe).ok).toBe(true);
+    expect(sim.countItem('copper_ore', pid)).toBe(6);
+    expect(meta.inventory.some((s) => s.itemId === 'copper_ore' && s.instance?.signer)).toBe(false);
+  });
+
+  it('the all-plain inverse arm is the plain floor(total / count) division', () => {
+    const sim = makeSim();
+    const { meta, pid } = playerOf(sim);
+    meta.inventory = [];
+    sim.addItem('copper_ore', 8, pid);
+    expect(sim.countItem('copper_ore', pid)).toBe(8);
+    // No signed copy, so no discount ever applies: floor(8 / 3).
+    expect(maxCraftCountForRecipe(sim.ctx, signedRecipe, pid)).toBe(2);
+  });
+});
+
+describe('recipe content', () => {
+  it('every shipped recipe declares at least one reagent', () => {
+    // maxCraftCountForRecipe short-circuits a zero-reagent recipe straight to
+    // CRAFT_BATCH_MAX (a free 50-item batch). No shipped recipe may reach it.
+    expect(ALL_RECIPES.length).toBeGreaterThan(0);
+    for (const recipe of ALL_RECIPES) {
+      expect(recipe.reagents.length, recipe.id).toBeGreaterThanOrEqual(1);
+    }
   });
 });

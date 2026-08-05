@@ -79,6 +79,20 @@ function routeTick(server: GameServer): void {
   (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
 }
 
+// Tick and route WITHOUT flushing casts: the arm where a race lands while the
+// destroy cast is still running, rather than after it has already resolved.
+function tickCastLive(server: GameServer): void {
+  (server as unknown as { routeEvents(e: SimEvent[]): void }).routeEvents(server.sim.tick());
+}
+
+function castingAbilityOf(server: GameServer, pid: number): string | null {
+  const entity = (
+    server.sim as unknown as { entities: Map<number, { castingAbility: string | null }> }
+  ).entities.get(pid);
+  if (!entity) throw new Error(`no entity for pid ${pid}`);
+  return entity.castingAbility;
+}
+
 function cmd(server: GameServer, session: ClientSession, body: Record<string, unknown>): void {
   server.handleMessage(session, JSON.stringify({ t: 'cmd', ...body }));
 }
@@ -214,6 +228,42 @@ describe('race: disenchant vs concurrent trade of the same copy', () => {
     expect(p.server.sim.countItem(SWORD, p.b.pid)).toBe(1);
     expect(p.server.sim.countItem(SWORD, p.a.pid)).toBe(0);
     expect(p.server.sim.countItem(DUST, p.a.pid)).toBe(dustBefore);
+    expect(totalOf(p.server, SWORD, [p.a.pid, p.b.pid])).toBe(1);
+  });
+
+  it('the trade lands WHILE the disenchant cast runs: the completion denies not_held', () => {
+    // The cast-paced arm the tests above deliberately skip past: the destroy
+    // is admitted and running, the copy is still in A's bags (a cast consumes
+    // nothing at start), and the trade swaps it away before the cast finishes.
+    const p = pairUp(709);
+    p.server.sim.addItem(SWORD, 1, p.a.pid);
+    openTrade(p);
+    cmd(p.server, p.a, { cmd: 'trade_offer', items: [{ itemId: SWORD, count: 1 }] });
+    cmd(p.server, p.a, { cmd: 'trade_confirm' });
+    cmd(p.server, p.a, { cmd: 'disenchant_item', item: SWORD });
+    tickCastLive(p.server);
+    // The cast really is mid-flight, and nothing has been consumed yet.
+    expect(castingAbilityOf(p.server, p.a.pid)).toBe('disenchanting');
+    expect(p.server.sim.countItem(SWORD, p.a.pid)).toBe(1);
+    expect(eventsFor(p.fcA.sent, 'disenchantResult')).toHaveLength(0);
+
+    cmd(p.server, p.b, { cmd: 'trade_confirm' });
+    tickCastLive(p.server);
+    expect(p.server.sim.countItem(SWORD, p.b.pid)).toBe(1);
+
+    // Now let the still-running cast finish against bags that no longer hold it.
+    completeEnchantFamilyCast(p.server.sim as never, p.a.pid);
+    tickCastLive(p.server);
+
+    const denc = eventsFor(p.fcA.sent, 'disenchantResult');
+    expect(denc).toHaveLength(1);
+    expect((denc[0] as { ok?: boolean }).ok).toBe(false);
+    expect((denc[0] as { reason?: string }).reason).toBe('not_held');
+    expect(p.server.sim.lastDisenchantResultFor(p.a.pid)?.reason).toBe('not_held');
+    // No material minted for the destroy that never happened, and conservation
+    // holds: one copy existed, one copy survives, with B.
+    expect(p.server.sim.countItem(DUST, p.a.pid)).toBe(0);
+    expect(p.server.sim.countItem(SWORD, p.a.pid)).toBe(0);
     expect(totalOf(p.server, SWORD, [p.a.pid, p.b.pid])).toBe(1);
   });
 

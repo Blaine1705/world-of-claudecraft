@@ -151,11 +151,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     sim.gainCraftSkill(pid, 'tailoring', 125 - meta.craftSkills.tailoring);
     let procAt = -1;
     for (let i = 0; i < 120 && procAt < 0; i++) {
-      // Session-only pacing state, reset per attempt so the hunt spends rng
-      // draws only through the ONE proc roll per successful craft (the shared
-      // action throttle would otherwise deny, which draws nothing and would
-      // stall the hunt).
-      meta.craftThrottle.count = 0;
       sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
       sim.addItem('linen_scrap', 1, pid);
       sim.addItem('spider_leg', 1, pid);
@@ -441,7 +436,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     meta.inventory.length = 0;
 
     moveToNpc('tinker_gizzel'); // engineering: station_eastbrook_toolworks
-    meta.craftThrottle.count = 0;
     sim.addItem('fine_iron_ore', 4, pid);
     sim.addItem('mithril_mining_pick', 1, pid);
     runCraft(sim, 'recipe_thorium_mining_pick', false, pid);
@@ -449,7 +443,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(sim.lastCraftResult?.quality, 'engineering craft').toBe('rare');
 
     moveToNpc('weaver_ottilie'); // tailoring: station_eastbrook_loom
-    meta.craftThrottle.count = 0;
     sim.addItem('sunpetal_herb', 2, pid);
     sim.addItem('goldleaf_herb', 2, pid);
     sim.addItem('pristine_silk', 2, pid);
@@ -460,7 +453,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(sim.lastCraftResult?.quality, 'tailoring craft').toBe('rare');
 
     moveToNpc('tanner_hesk'); // leatherworking: station_fenbridge_tannery
-    meta.craftThrottle.count = 0;
     sim.addItem('thorium_ore', 6, pid);
     sim.addItem('pristine_hide', 3, pid);
     sim.addItem('rough_hide', 2, pid);
@@ -470,7 +462,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     expect(sim.lastCraftResult?.quality, 'leatherworking craft').toBe('rare');
 
     moveToNpc(SMITH_MASTER); // armorcrafting: station_eastbrook_forge
-    meta.craftThrottle.count = 0;
     sim.addItem('thorium_ore', 7, pid);
     sim.addItem('smithing_flux', 5, pid);
     runCraft(sim, 'recipe_sootscale_mantle', false, pid);
@@ -487,7 +478,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     moveToNpc(SMITH_MASTER); // weaponcrafting is also taught at the forge
     sim.trainRecipe('recipe_thorium_warblade', pid);
     expect(meta.lastTrainResult?.ok, 'weaponcrafting train').toBe(true);
-    meta.craftThrottle.count = 0;
     sim.addItem('thorium_ore', 4, pid);
     sim.addItem('iron_ore', 2, pid);
     sim.addItem('smithing_flux', 2, pid);
@@ -499,7 +489,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     moveToNpc('cook_marlow'); // cooking: station_eastbrook_kitchens
     sim.trainRecipe('recipe_silvered_carp_supper', pid);
     expect(meta.lastTrainResult?.ok, 'cooking train').toBe(true);
-    meta.craftThrottle.count = 0;
     sim.addItem('raw_stonescale_carp', 3, pid);
     sim.addItem('raw_mirror_trout', 1, pid);
     sim.addItem('goldleaf_herb', 1, pid);
@@ -512,7 +501,6 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     moveToNpc('alchemist_verane'); // alchemy: station_highwatch_apothecary
     sim.trainRecipe('recipe_sunpetal_mana_draught', pid);
     expect(meta.lastTrainResult?.ok, 'alchemy train').toBe(true);
-    meta.craftThrottle.count = 0;
     sim.addItem('sunpetal_herb', 2, pid);
     sim.addItem('goldleaf_herb', 1, pid);
     sim.addItem('glass_vial', 1, pid);
