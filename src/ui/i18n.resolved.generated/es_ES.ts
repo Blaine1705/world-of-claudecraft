@@ -2047,7 +2047,9 @@ export const es_ES: EnTranslations = {
       "levelFamily": "Nivel {level} {family}",
       "familyDemon": "Demonio",
       "hostile": "Hostil",
-      "friendly": "Amistoso"
+      "friendly": "Amistoso",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Mover el marco del objetivo",

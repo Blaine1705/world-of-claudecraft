@@ -2047,7 +2047,9 @@ export const en_XA: EnTranslations = {
       "levelFamily": "[Ļéʋéļ {level} {family}]",
       "familyDemon": "[Ðéɱóñ]",
       "hostile": "[Ĥóšţíļé]",
-      "friendly": "[Ƒŕíéñðļý]"
+      "friendly": "[Ƒŕíéñðļý]",
+      "elite": "[Éļíţé]",
+      "boss": "[Ɓóšš]"
     },
     "targetFrame": {
       "unlock": "[Ɱóʋé ţáŕĝéţ ƒŕáɱé]",

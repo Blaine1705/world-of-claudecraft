@@ -2047,7 +2047,9 @@ export const ja_JP: EnTranslations = {
       "levelFamily": "レベル{level} {family}",
       "familyDemon": "デーモン",
       "hostile": "敵対",
-      "friendly": "味方"
+      "friendly": "味方",
+      "elite": "エリート",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "ターゲットフレームを移動",

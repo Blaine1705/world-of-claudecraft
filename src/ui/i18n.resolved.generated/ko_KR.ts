@@ -2047,7 +2047,9 @@ export const ko_KR: EnTranslations = {
       "levelFamily": "{level}레벨 {family}",
       "familyDemon": "악마",
       "hostile": "적대",
-      "friendly": "아군"
+      "friendly": "아군",
+      "elite": "정예",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "대상 프레임 이동",

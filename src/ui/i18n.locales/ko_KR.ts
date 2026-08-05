@@ -597,6 +597,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.levelFamily': '{level}레벨 {family}',
   'hudChrome.mobTooltip.hostile': '적대',
   'hudChrome.mobTooltip.friendly': '아군',
+  'hudChrome.mobTooltip.elite': '정예',
   'hudChrome.targetFrame.unlock': '대상 프레임 이동',
   'hudChrome.targetFrame.lock': '대상 프레임 고정',
   'hudChrome.playerFrame.unlock': '플레이어 프레임 이동',
