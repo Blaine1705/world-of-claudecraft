@@ -1051,6 +1051,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // helpers (no SimContext, no emits), but every new sim module joins the scan
     // list in the same change so any future emit lands under the drift guard.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/professions/cadence.ts'), 'utf8'),
+    // Craft Cast System: the pure content-band duration table (no SimContext,
+    // no emits), but every new sim module joins the scan list in the same
+    // change so any future emit lands under the drift guard from day one.
+    fs.readFileSync(
+      path.resolve(process.cwd(), 'src/sim/professions/craft_cast_duration.ts'),
+      'utf8',
+    ),
     // Professions 2.0: the shared displacement session teardown. It emits no
     // player text itself (it delegates to ctx.cancelCast, whose castStop is
     // text-free), but it takes a SimContext so ctx.error is one line away, and
