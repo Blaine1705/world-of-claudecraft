@@ -349,6 +349,18 @@ const ENEMY7: ClipMap = {
   death: 'Death',
 };
 
+// The kobold family's own attack (scripts/build_kobold_anims.mjs, issue
+// #2889): ENEMY7's Attack is shared by reference with mob_ogre (a giant
+// twice its height, on giant.glb), so a kobold currently swings the exact
+// same single double-claw chop. This clip is baked off goblin.glb's own
+// donor poses (Attack's own beats re-timed into a two-part combo, plus
+// Jump, a clip goblin.glb ships that ENEMY7 never wires), so only
+// mob_kobold gets it; mob_ogre stays on the shared constant untouched.
+const KOBOLD_ENEMY7: ClipMap = {
+  ...ENEMY7,
+  attack: ['Kobold_Pounce'],
+};
+
 // floating/flying rigs (goleling/dragon) — hover instead of walking
 const FLOATING: ClipMap = {
   idle: 'Flying_Idle',
@@ -695,6 +707,13 @@ export const VISUALS: Record<string, VisualDef> = {
   player_warrior: {
     url: `${PLAYERS}/knight.glb`,
     height: HUMANOID_H,
+    // Every clip knight.glb ships is already wired somewhere in this block
+    // (idle/walk/attack/hit/emotes account for the full shipped library, no
+    // spare donor pose), so Heroic Leap (issue #2889 batch, verified against
+    // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
+    // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
+    // instead of pointed at an unused clip.
+    animUrls: [`${PLAYERS}/warrior_ability_anims.glb`],
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: {
@@ -728,6 +747,41 @@ export const VISUALS: Record<string, VisualDef> = {
         // Jawcrack is a bare-fist interrupt: the synthesized punch
         // (scripts/_add_pummel_punch_anim.mjs), not a weapon swing.
         pummel: 'Punch_A',
+        // Heroic Leap is a position-targeted jump, not a swing: the bespoke
+        // pose-sample-and-blend clip (coil, airborne, driven two-hand slam on
+        // landing). It carries no castFx and resolves no target entity, so it
+        // completes through the renderer's generic 'selfCast' cue, which only
+        // draws a body gesture via this exact attackByAbility entry
+        // (CharacterVisual.hasAttackClipOverride, src/render/ability_vfx/
+        // painter.ts's non-contact 'selfCast' branch); with no entry it plays
+        // nothing at all on the body.
+        heroic_leap: 'Warrior_Heroic_Leap',
+        // Victory Rush is a real weapon strike (weaponStrike effect, not a
+        // pure buff), so it lands through the ordinary damage-event attack
+        // trigger like every entry above it: a confident decisive swing, the
+        // same clip heroic_strike/overpower/hamstring already use.
+        victory_rush: '1H_Melee_Attack_Slice_Diagonal',
+        // Seething Fury and Recklessness are both a defiant roar of rage: no
+        // castFx, no target, so (like Heroic Leap above) the existing Cheer
+        // gesture only shows up once an attackByAbility entry exists for it.
+        berserker_rage: 'Cheer',
+        recklessness: 'Cheer',
+        // Die by the Sword braces behind the blade: the existing raised_guard
+        // donor (Block) reads the same defensive beat, reached the same way.
+        die_by_sword: 'Block',
+        // Avatar's colossus transformation gets the raised-arm flourish
+        // (the longest clip on the rig, fits a dramatic moment), same path.
+        avatar: 'Spellcast_Raise',
+        // Piercing Howl's own description calls it "a piercing shout" even
+        // though it carries no castFx (unlike the six castFx:'shout'
+        // abilities below, which the painter's 'shout' case always plays as
+        // the Cheer EMOTE and never reaches attackByAbility at all - adding
+        // an entry for any of those would be dead code, so this batch leaves
+        // them alone). Piercing Howl's own selfCast cue DOES reach the same
+        // gesture path Heroic Leap/berserker_rage/etc use above, and the
+        // painter's shout-emote call right after it is guarded on
+        // isMidOneShot, so it does not stomp this gesture.
+        piercing_howl: 'Spellcast_Raise',
       },
     },
     show: ['Knight_Helmet', 'Knight_Cape'], // v2 knight dropped the built-in Badge_Shield mesh
@@ -1305,7 +1359,8 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_kobold: {
     url: `${CREATURES}/goblin.glb`,
     height: 2.1,
-    clips: ENEMY7,
+    animUrls: [`${CREATURES}/kobold_ability_anims.glb`],
+    clips: KOBOLD_ENEMY7,
     tint: 'entity',
     tintStrength: 0.2, // keep the green readable
   },
