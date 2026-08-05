@@ -4362,9 +4362,11 @@ export type SimEvent = { pid?: number } & (
       /** New cosmetic Curator rank index when this fill crossed a threshold. */
       curatorRank?: number;
       /**
-       * Set on the on-join seed pass, exactly like deedUnlocked: the client
-       * batches these into one summary line instead of a toast per relic, and
-       * the server never fans a retro fill out anywhere.
+       * Set on the on-join seed pass: the client batches these into one
+       * summary line instead of a toast per relic. Server-side this event is
+       * always self-scoped (a HEAVY_SELF_EVENTS member with no fan-out arm),
+       * so on reliquaryUnlock the flag is presentation only; the same flag on
+       * deedUnlocked is what gates that event's server fan-out.
        */
       retro?: boolean;
     }

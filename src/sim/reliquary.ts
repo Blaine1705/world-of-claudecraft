@@ -6,7 +6,8 @@
 //
 // Determinism: pure state transitions over live meta references. No Rng, no
 // wall clock, no Math.random / Date.now. Clear counts are READ from existing
-// dungeonClears / delveClears at first obtain only (never invented on retro).
+// sources (dungeonClears / delveClears / deedStats.counters via a deed_stat
+// clearSource) at first obtain only (never invented on retro).
 //
 // Performance: firstFind and marks are allowlist-only (catalogued ids).
 // recent is a fixed-cap ring. Serialize omits empty. No per-drop saveCharacter.
@@ -152,8 +153,7 @@ export function restoreReliquaryState(saved: SavedReliquaryState | undefined): R
       if (newestFirst.length >= RELIQUARY_RECENT_CAP) break;
     }
     for (let i = newestFirst.length - 1; i >= 0; i--) {
-      const id = newestFirst[i];
-      if (id !== undefined) state.recent.push(id);
+      state.recent.push(newestFirst[i]);
     }
   }
   return state;
@@ -226,7 +226,7 @@ export function onItemDiscovered(
   ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
-  opts?: { retro?: boolean },
+  opts?: Readonly<{ retro?: boolean }>,
 ): void {
   if (!isCataloguedRelicItem(itemId)) {
     if (ITEMS[itemId]?.kind === 'mount') maybeSyncCuratorRankDeeds(ctx, meta, opts);
@@ -268,7 +268,7 @@ export function isHorizonsTitleDeed(deedId: string): boolean {
 export function maybeSyncCuratorRankDeeds(
   ctx: SimContext,
   meta: PlayerMeta,
-  opts?: { retro?: boolean },
+  opts?: Readonly<{ retro?: boolean }>,
 ): void {
   const owned = catalogRankOwned(characterReliquaryOwnership(meta));
   const rank = curatorRankFromOwned(owned);
@@ -295,7 +295,7 @@ export function maybeSyncCuratorRankDeeds(
 export function noteRelicItemFind(
   meta: PlayerMeta,
   itemId: string,
-  opts?: { retro?: boolean },
+  opts?: Readonly<{ retro?: boolean }>,
 ): boolean {
   const pageIds = RELIQUARY_ITEM_TO_PAGES.get(itemId);
   if (!pageIds || pageIds.length === 0) return false;
@@ -735,7 +735,7 @@ export function curatorSealIdForRank(rank: number): string | null {
 export function syncCuratorRankDeeds(
   ctx: SimContext,
   meta: PlayerMeta,
-  opts?: { retro?: boolean },
+  opts?: Readonly<{ retro?: boolean }>,
 ): void {
   const owned = catalogRankOwned(characterReliquaryOwnership(meta));
   const rank = curatorRankFromOwned(owned);

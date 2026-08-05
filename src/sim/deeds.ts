@@ -538,7 +538,7 @@ export function markItemDiscovered(
   meta: PlayerMeta,
   itemId: string,
   rolledQuality?: string,
-  opts?: { retro?: boolean },
+  opts?: Readonly<{ retro?: boolean }>,
 ): void {
   // A heroic instance drops the generated heroic_<base> variant in place of
   // the base item (same display name, same set membership); collection deeds
@@ -583,7 +583,7 @@ export function grantDeed(
   ctx: SimContext,
   meta: PlayerMeta,
   deedId: string,
-  opts?: { retro?: boolean },
+  opts?: Readonly<{ retro?: boolean }>,
 ): boolean {
   const def = DEEDS[deedId];
   if (!def) return false;
@@ -1197,6 +1197,9 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // Profession marks reuse the visit ledger (gather_event:*, masterwork:*),
   // which their own live call sites write when the real event happens: silent
   // retro only (no unlock toast), and never a craft history nobody performed.
+  // Deliberately UNCOUNTED too: the client's one join summary line spends
+  // retro reliquaryUnlock events (item fills only); mark refills emit nothing
+  // and stay out of that count, so this call's return value is dropped.
   // Must run BEFORE the rank sync so a mark that refills here can rank up.
   syncReliquaryMarksFromVisited(meta);
   syncCuratorRankDeeds(ctx, meta, { retro: true });

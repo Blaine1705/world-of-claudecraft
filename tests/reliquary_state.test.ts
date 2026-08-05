@@ -529,10 +529,18 @@ describe('Reliquary profession marks (Phase 7)', () => {
   });
 
   it('craft and gather call sites note catalog marks only (source pins)', () => {
-    const craftSrc = fs.readFileSync(
-      path.join(__dirname, '../src/sim/professions/crafting.ts'),
-      'utf8',
-    );
+    // Full-line // comments are stripped so a line-commented arm cannot
+    // satisfy the literal-order pin (a /* */ block or a trailing comment
+    // still could). The parity golden (professions_craft.json)
+    // backstops the semantics the regex cannot see: it embeds the masterwork
+    // visited ids in pinned state hashes and snapshots plain crafts before
+    // the proc, so deleting the writes or hoisting them out of the proc arm
+    // reds the golden even if a doctored source still matches here.
+    const craftSrc = fs
+      .readFileSync(path.join(__dirname, '../src/sim/professions/crafting.ts'), 'utf8')
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
     // Marks must sit on the live masterwork success arm (applyCraftSuccessHooks
     // after craft-cast), not a cold path. meta is the cast-complete hook param
     // (was r.meta when craftItem still resolved instantly). The visit write
@@ -606,6 +614,11 @@ describe('Reliquary recent ring cap', () => {
   // The ring pushes at the tail and drops the head, so index 0 is the OLDEST
   // entry. A refresh guard written against index 0 refuses to move the oldest
   // id and instead leaves the ring in an order the window then paints wrong.
+  // Reaching the refresh from a LIVE caller takes a desynced blob (both call
+  // sites early-return when the find or mark is already held, so a re-push
+  // needs recent to hold an id whose firstFind entry is absent: a hand-edited
+  // or legacy save); the guard exists so pushRecent and restore agree on one
+  // semantic regardless of how the ring got its contents.
   it('re-noting refreshes mid-ring AND oldest entries, and leaves the newest alone', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
@@ -1014,10 +1027,15 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     const rentries = Object.entries(reloaded.meta(rid)!.reliquary.firstFind);
     expect(rentries.length).toBe(SEEDED.length);
     for (const [itemId, entry] of rentries) {
-      expect(Object.hasOwn(entry, 'clears'), `reloaded ${itemId} must carry no clears`).toBe(
-        false,
-      );
+      expect(Object.hasOwn(entry, 'clears'), `reloaded ${itemId} must carry no clears`).toBe(false);
     }
+    // "Seeds nothing new" asserted directly, not inferred from counts: a
+    // re-login must not re-emit the retro batch (that is one spurious
+    // catch-up line per relog). The itemsDiscovered short-circuit makes the
+    // seed idempotent, and this pins it at the event surface.
+    expect(
+      reloaded.drainEvents().filter((e) => e.pid === rid && e.type === 'reliquaryUnlock'),
+    ).toEqual([]);
   });
 
   it('refills marks from the visit ledger BEFORE scoring rank, so mark fills can rank up', () => {

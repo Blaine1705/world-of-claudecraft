@@ -4553,6 +4553,17 @@ function cardDuel(): Scenario {
 // clutch camps, the new elites) moved the shared stream once more, and again
 // (5 -> 2) after the Galecrest unspawnable-quest camp fix (shoal_scuttler/
 // gale_wisp) moved it again.
+//
+// The GOLDEN (not the seed: the pinned seed literal below is unchanged and no
+// re-hunt happened) was deliberately re-recorded when Reliquary Phase 10 made
+// masterwork procs write masterwork:* visited entries beside the marks
+// (applyCraftSuccessHooks in src/sim/professions/crafting.ts): only the state
+// hashes of the proc frame and the frames after it moved (their inlined
+// samples gain the two visited ids), while every event hash and the whole rng
+// draw digest stayed byte-identical, exactly what a markVisited-only change
+// predicts. The visit write landed one commit before the re-record, so a
+// bisect straddling that pair sees a false parity red on the intermediate
+// commit.
 function professionsCraft(seed = 2): Scenario {
   return {
     name: 'professions_craft',

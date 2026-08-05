@@ -164,9 +164,17 @@ export const RELIQUARY_HORIZON_TITLES = [
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
 // for rare field notes (`gather_event:*`). Masterwork marks pair with
-// `masterwork:*` visited entries written at proc time, so a crash before
-// autosave retro-fills on join; history is never invented (the visit exists
-// only if the proc really happened).
+// `masterwork:*` visited entries written at proc time. The visit is NOT crash
+// insurance (both ledgers persist in one character blob on one save cadence,
+// so a crash before autosave loses both together): it is the durable copy for
+// a blob whose reliquary marks were filtered away, because the restore paths
+// differ (restoreDeedStats keeps any registered namespace while
+// restoreReliquaryState keeps only currently catalogued ids), so a mark
+// dropped from the catalog and later re-added refills from the surviving
+// visit at join. A pre-Reliquary binary is NOT covered: it predates the
+// namespace registration and drops the visits too (state.md rollback note).
+// History is never invented (the visit exists only if the proc really
+// happened).
 export const RELIQUARY_PROFESSION_MARKS = {
   /** First lifetime masterwork proc (any craft). */
   masterworkFirst: 'masterwork:first',

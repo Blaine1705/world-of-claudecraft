@@ -3,6 +3,7 @@
 // growth is curated (hand lists), never an unbounded auto-scrape of every loot
 // row. Update these pins deliberately when product adds a page or unique.
 import { describe, expect, it } from 'vitest';
+import { CLASSES } from '../src/sim/content/classes';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
@@ -521,6 +522,38 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     for (const page of RELIQUARY_PAGES) {
       for (const id of itemRelicIds(page)) {
         expect(isMountReinsId(id), `${page.id}:${id}`).toBe(false);
+      }
+    }
+  });
+});
+
+describe('Reliquary vs character creation', () => {
+  it('no class starter kit item is a catalogued relic', () => {
+    // sim.addPlayer runs seedItemDiscovery for EVERY join, creation included,
+    // and the seed walks all held items with {retro: true}: a catalogued
+    // starter item would enter every brand-new character's Reliquary silently
+    // (no toast, no clears, retro provenance) on day one. Starter kits and
+    // the catalog must stay disjoint; a page that wants a starter id must
+    // instead decide what creation-time credit should look like.
+    const classIds = Object.keys(CLASSES);
+    expect(classIds.length).toBeGreaterThan(0);
+    // startOffhand is optional per class, so it has no per-class truthy guard;
+    // this keeps the field name itself live (a rename would skip that arm).
+    expect(Object.values(CLASSES).some((def) => def.startOffhand)).toBe(true);
+    for (const classId of classIds) {
+      const def = CLASSES[classId as keyof typeof CLASSES];
+      // Field liveness: a ClassDef rename would otherwise turn this loop
+      // vacuous (undefined ids skip the assertion).
+      expect(def.startWeapon, `${classId} startWeapon`).toBeTruthy();
+      expect(def.startChest, `${classId} startChest`).toBeTruthy();
+      const kit = [
+        def.startWeapon,
+        def.startChest,
+        ...(def.startOffhand ? [def.startOffhand] : []),
+        ...def.startItems.map((s) => s.itemId),
+      ];
+      for (const itemId of kit) {
+        expect(isCataloguedRelicItem(itemId), `${classId} starter ${itemId}`).toBe(false);
       }
     }
   });

@@ -484,6 +484,10 @@ describe('hud wiring', () => {
     expect(body).toContain('this.combatAnnouncer.push(bannerText, performance.now());');
     expect(body).toContain('this.combatAnnouncer.push(retroText, performance.now());');
     expect(body.match(/combatAnnouncer\.push/g)?.length).toBe(2);
+    // The chat-pane delivery too, not just the announcer: deleting the log
+    // call would compile and pass everything else while the visible catch-up
+    // line vanishes (the reliquary sibling pins its log line the same way).
+    expect(body).toContain("this.log(retroText, '#ffd100');");
   });
 
   it('marks the watch toggle state and names the recent-strip jump buttons', () => {

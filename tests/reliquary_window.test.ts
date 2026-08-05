@@ -294,6 +294,18 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toMatch(
       /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.reliquary\.retroSummary'/,
     );
+    // The regex above proves the line is BUILT; these prove it is DELIVERED.
+    // handler is already the reliquary body sliced before handleDeedUnlocks,
+    // so the deeds sibling's identical pushes cannot satisfy them. Without
+    // this, deleting the two display calls keeps every suite and tsc green
+    // (noUnusedLocals is off) while a veteran's one catch-up line vanishes:
+    // the deeds sibling pins its emission (tests/deeds_window.test.ts) and
+    // the reliquary side must too.
+    expect(handler).toContain("this.log(retroText, '#ffd100');");
+    expect(handler).toContain('this.combatAnnouncer.push(retroText, performance.now());');
+    // Exactly the live-find banner push plus the retro push: a stray or
+    // duplicated announcement cannot hide (the deeds sibling pins the same).
+    expect(handler?.match(/combatAnnouncer\.push/g)?.length).toBe(2);
     // Shared key table (window export) so toast/banner cannot desync from Overview.
     expect(hud).toContain('curatorRankNameKey');
     // Pure-core definition (view) + re-export from the painter for existing imports.

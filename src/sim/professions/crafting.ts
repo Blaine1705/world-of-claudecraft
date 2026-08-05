@@ -71,10 +71,9 @@
 import { bagCapacity, countStacked, fitsAll, removeStacked } from '../bags';
 import { CRAFT_BATCH_MAX, CRAFT_GOLD_SINK_COPPER_PER_BUDGET } from '../content/professions';
 import { recipeById } from '../content/recipes';
-import { isCataloguedRelicMark } from '../content/reliquary';
 import { ITEMS } from '../data';
 import { forceDismount } from '../mounts';
-import { noteReliquaryMark } from '../reliquary';
+import { isCataloguedRelicMark, noteReliquaryMark } from '../reliquary';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity, InvSlot, ItemDef, ItemInstancePayload } from '../types';
@@ -1048,6 +1047,11 @@ function applyCraftSuccessHooks(
     // sparse blob is missing the mark refills it from its own history at join
     // instead of losing a lifetime trophy. Nothing is invented: only a real
     // masterwork proc ever writes either id.
+    // The literal first-proc id needs no isCataloguedRelicMark gate: it is a
+    // RELIQUARY_PROFESSION_MARKS constant authored beside the catalog, so it
+    // cannot name a mark nobody authored; only the DERIVED per-craft id below
+    // can, hence its gate. (The craft_rare visit further down is ungated too,
+    // but its interpolation is bounded by the authored recipe set.)
     ctx.markVisited(meta, 'masterwork:first');
     noteReliquaryMark(ctx, meta, 'masterwork:first');
     const craftId = recipeById(recipeId)?.professionId;

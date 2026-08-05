@@ -425,8 +425,10 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // (and, through characterReliquaryOwnership, under-counts Curator rank).
     const noBags = { bank: { inventory: [] } } as unknown as PlayerMeta;
     expect(() => ownedMounts(noBags)).toThrow(TypeError);
-    // Engine-portable: V8 words this "meta.inventory is not iterable", other
-    // engines differ, so pin the offending surface and not the phrasing.
+    // The /inventory/ arm leans on V8 embedding the source expression in the
+    // message ("meta.inventory is not iterable"); JSC's wording, for one,
+    // omits the property name entirely. The suite runs under Node/V8, where
+    // this pins the offending surface rather than the full phrasing.
     expect(() => ownedMounts(noBags)).toThrow(/inventory/);
     const noBank = { inventory: [] } as unknown as PlayerMeta;
     expect(() => ownedMounts(noBank)).toThrow(TypeError);
