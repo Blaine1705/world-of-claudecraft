@@ -30,6 +30,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { filterBankSlots } from './bank_filter';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import {
@@ -56,7 +57,6 @@ import {
 } from './guild_bank_window';
 import { formatMoney, formatNumber, type TranslationKey, t } from './i18n';
 import { QUALITY_COLOR } from './icons';
-import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import {
   INSTANCE_GLYPH_ARIA_KEYS,
   instanceGlyphMarkHtml,
