@@ -129,12 +129,31 @@ export function restoreReliquaryState(saved: SavedReliquaryState | undefined): R
     if (typeof mark === 'string' && RELIQUARY_MARK_IDS.has(mark)) state.marks.add(mark);
   }
   if (Array.isArray(saved.recent)) {
-    for (const id of saved.recent) {
+    // The ring is OLDEST-first, and restore must agree with pushRecent: the
+    // live ring holds each id once (a repeat moves to the tail rather than
+    // appending), so a hand-edited or legacy blob carrying the same id twice
+    // must not burn two of the twelve slots. LAST occurrence wins, because a
+    // repeat find refreshes recency, and when the survivors exceed the cap the
+    // NEWEST ones survive (drop from the head, the oldest side), exactly as
+    // pushRecent's shift does. Relative order is preserved either way.
+    // Walking from the newest end makes both rules fall out at once: the first
+    // time an id is seen going backwards IS its last occurrence, and stopping
+    // at the cap keeps the newest survivors.
+    const seen = new Set<string>();
+    const newestFirst: string[] = [];
+    for (let i = saved.recent.length - 1; i >= 0; i--) {
+      const id = saved.recent[i];
       if (typeof id !== 'string') continue;
       // Recent may hold item or mark ids that are still catalogued.
       if (!isCataloguedRelicItem(id) && !RELIQUARY_MARK_IDS.has(id)) continue;
-      state.recent.push(id);
-      if (state.recent.length >= RELIQUARY_RECENT_CAP) break;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      newestFirst.push(id);
+      if (newestFirst.length >= RELIQUARY_RECENT_CAP) break;
+    }
+    for (let i = newestFirst.length - 1; i >= 0; i--) {
+      const id = newestFirst[i];
+      if (id !== undefined) state.recent.push(id);
     }
   }
   return state;
@@ -188,14 +207,29 @@ function dungeonClearCount(
  * a second call for the same id is a no-op. Does not call saveCharacter on
  * pure silhouette fill and does not dual-write discovery.
  *
+ * `opts.retro` is the join-time seed pass (seedItemDiscovery): the fill stays
+ * SILENT (no recent push, no fabricated clear provenance) and every event it
+ * emits carries the retro flag. That flag buys two things, and nothing else:
+ * the CLIENT collapses retro fills into one catch-up summary line instead of
+ * a toast per relic, and the deedUnlocked grants this same join pass produces
+ * stay out of the server's guild / activity-feed fan-out through its ev.retro
+ * gate (server/game.ts, which gates deedUnlocked only). reliquaryUnlock itself
+ * is never fanned out on any path: it is a self-scoped HEAVY_SELF_EVENTS
+ * member, so it only ever reaches the earner.
+ *
  * Mount reins are not catalogued item relics (Horizons owns them via live
  * ownedMounts). On first discovery of reins the item is already in bags, so
  * rank may cross a threshold: sync deeds without inventing firstFind or a
  * reliquaryUnlock toast (Phase 8 membership stays live-seam only).
  */
-export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: string): void {
+export function onItemDiscovered(
+  ctx: SimContext,
+  meta: PlayerMeta,
+  itemId: string,
+  opts?: { retro?: boolean },
+): void {
   if (!isCataloguedRelicItem(itemId)) {
-    if (ITEMS[itemId]?.kind === 'mount') maybeSyncCuratorRankDeeds(ctx, meta);
+    if (ITEMS[itemId]?.kind === 'mount') maybeSyncCuratorRankDeeds(ctx, meta, opts);
     return;
   }
   // Rank is character-durable catalogued fills (items + marks + mounts + titles;
@@ -204,10 +238,17 @@ export function onItemDiscovered(ctx: SimContext, meta: PlayerMeta, itemId: stri
   const owned = catalogRankOwned(characterReliquaryOwnership(meta));
   const previousRank = curatorRankFromOwned(Math.max(0, owned - 1));
   const newRank = curatorRankFromOwned(owned);
-  if (!noteRelicItemFind(meta, itemId)) return;
   const rankedUp = newRank > previousRank ? newRank : undefined;
-  emitReliquaryUnlock(ctx, meta, { itemId, curatorRank: rankedUp });
-  if (rankedUp !== undefined) syncCuratorRankDeeds(ctx, meta);
+  // The unlock event is the first-find MOMENT, so it fires only when a new
+  // firstFind entry actually landed (an already-noted id must never re-toast).
+  // The rank sync is keyed on the ledger add instead: a save whose sparse blob
+  // ran ahead of itemsDiscovered would otherwise drop the threshold crossing
+  // this discover just earned. grantDeed is idempotent, so the extra call is
+  // a no-op whenever the bridges are already held.
+  if (noteRelicItemFind(meta, itemId, opts)) {
+    emitReliquaryUnlock(ctx, meta, { itemId, curatorRank: rankedUp, retro: opts?.retro });
+  }
+  if (rankedUp !== undefined) syncCuratorRankDeeds(ctx, meta, opts);
 }
 
 /**
@@ -245,9 +286,17 @@ export function maybeSyncCuratorRankDeeds(
  * Record first-find meta and push the recent ring for a catalogued item relic.
  * Safe to call only when the item is already in itemsDiscovered (the deeds hub
  * owns that set). Retro ownership without this call leaves firstFind absent.
+ * `opts.retro` is the join-time seed: the entry lands sparse with NO clears
+ * key (the clear count now is not the count at the real first obtain, and
+ * provenance is never fabricated) and the recent ring is left alone (logging
+ * in is not a find moment).
  * @returns true when a new firstFind entry was written.
  */
-export function noteRelicItemFind(meta: PlayerMeta, itemId: string): boolean {
+export function noteRelicItemFind(
+  meta: PlayerMeta,
+  itemId: string,
+  opts?: { retro?: boolean },
+): boolean {
   const pageIds = RELIQUARY_ITEM_TO_PAGES.get(itemId);
   if (!pageIds || pageIds.length === 0) return false;
 
@@ -258,13 +307,17 @@ export function noteRelicItemFind(meta: PlayerMeta, itemId: string): boolean {
   }
 
   const pageId = pageIds[0];
-  const page = RELIQUARY_PAGES_BY_ID[pageId];
-  const clears = clearCountForSource(meta, page?.clearSource);
   const entry: ReliquaryFirstFind = {};
-  if (clears !== undefined) entry.clears = clears;
+  if (!opts?.retro) {
+    const page = RELIQUARY_PAGES_BY_ID[pageId];
+    const clears = clearCountForSource(meta, page?.clearSource);
+    if (clears !== undefined) entry.clears = clears;
+  }
+  // The crediting page is a catalog fact, not history, so it stays honest on
+  // a retro fill; only the clear count would be invented.
   if (pageId) entry.pageId = pageId;
   state.firstFind[itemId] = entry;
-  pushRecent(state, itemId);
+  if (!opts?.retro) pushRecent(state, itemId);
   return true;
 }
 
@@ -291,10 +344,12 @@ export function noteReliquaryMark(ctx: SimContext, meta: PlayerMeta, markId: str
 }
 
 /**
- * Join / load retro: copy existing visited gather_event:* (and any other
- * catalog mark ids already on the deed visit ledger) into the sparse marks
- * Set. Silent: no unlock toast, no recent push, no invented masterwork
- * history (masterwork marks are live-only). Returns how many marks were added.
+ * Join / load retro: copy every catalog mark id already on the deed visit
+ * ledger (gather_event:*, masterwork:*) into the sparse marks Set. Silent:
+ * no unlock toast and no recent push. Nothing is invented here: a mark only
+ * fills from a visit its own live call site wrote when the real event
+ * happened, so the ledger is proof, never a guess. Returns how many marks
+ * were added.
  */
 export function syncReliquaryMarksFromVisited(meta: PlayerMeta): number {
   let added = 0;
@@ -311,11 +366,22 @@ export function syncReliquaryMarksFromVisited(meta: PlayerMeta): number {
  * Id-only presentation event for a new catalogued relic or mark. Never
  * English. Membership authority stays on itemsDiscovered + sparse blob.
  * Optional curatorRank is the new cosmetic rank index when this fill ranked up.
+ * Optional retro marks the join-time seed pass (silent on the client, no
+ * server fan-out).
+ *
+ * Illumination computes from characterReliquaryOwnership, which deliberately
+ * OMITS account weapon skins: the server cannot answer account cosmetics from
+ * inside the sim, so any skin-aware read here would be online-inert and would
+ * disagree with itself per host. That is safe because every catalog page is
+ * single-kind (pinned in tests/reliquary_content.test.ts) and an item or mark
+ * fill can only ever reach item or mark pages, never a weapon-skin page. The
+ * online window-vs-emit skin gap (parity W3) stays open BY DESIGN until a
+ * mixed-kind page ships; the single-kind pin is what keeps that honest.
  */
 function emitReliquaryUnlock(
   ctx: SimContext,
   meta: PlayerMeta,
-  ids: { itemId?: string; markId?: string; curatorRank?: number },
+  ids: { itemId?: string; markId?: string; curatorRank?: number; retro?: boolean },
 ): void {
   const pageIds =
     ids.itemId !== undefined
@@ -345,6 +411,7 @@ function emitReliquaryUnlock(
     ...(ids.curatorRank !== undefined && ids.curatorRank > 0
       ? { curatorRank: ids.curatorRank }
       : {}),
+    ...(ids.retro ? { retro: true } : {}),
   });
 }
 
@@ -357,10 +424,13 @@ export function reliquaryWireBlob(state: ReliquaryState): SavedReliquaryState {
 }
 
 function pushRecent(state: ReliquaryState, id: string): void {
-  // De-dupe: if already newest, leave alone; otherwise move to front of "new".
+  // Ring layout: new entries land at the TAIL and the cap drops the HEAD, so
+  // index 0 is the OLDEST entry and the last index is the newest. De-dupe:
+  // only an id that is ALREADY the newest is left alone; anything else (the
+  // oldest entry included) moves to the tail.
   const existing = state.recent.indexOf(id);
-  if (existing === 0) return;
-  if (existing > 0) state.recent.splice(existing, 1);
+  if (existing >= 0 && existing === state.recent.length - 1) return;
+  if (existing >= 0) state.recent.splice(existing, 1);
   state.recent.push(id);
   while (state.recent.length > RELIQUARY_RECENT_CAP) state.recent.shift();
 }

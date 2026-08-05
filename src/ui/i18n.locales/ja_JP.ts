@@ -10402,6 +10402,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '聖遺物を収蔵：{name}',
   'hudChrome.reliquary.illuminateBanner': 'ページが照耀されました：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} の聖遺物がすべて埋まりました。',
+  'hudChrome.reliquary.retroSummary': '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
   'hudChrome.reliquary.curatorRankName1': '見習いキュレーター',
   'hudChrome.reliquary.curatorRankName2': '戦利品の守り手',
   'hudChrome.reliquary.curatorRankName3': 'マスターキュレーター',

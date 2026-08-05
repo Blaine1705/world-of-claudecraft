@@ -3189,6 +3189,7 @@ export const en_XA: EnTranslations = {
       "unlockToast": "[Ŕéļíç çáţáļóĝúéð: {name}]",
       "illuminateBanner": "[Þáĝé íļļúɱíñáţéð: {name}]",
       "illuminateToast": "[Éʋéŕý ŕéļíç óñ {name} íš ƒíļļéð.]",
+      "retroSummary": "[Ýóúŕ ŕéļíɋúáŕý çáţçĥéš úþ: {count} ŕéļíçš çáţáļóĝúéð.]",
       "markFind": {
         "masterwork_first": "[Ƒíŕšţ Ɱášţéŕŵóŕķ]",
         "masterwork_weaponcrafting": "[Ŵéáþóñçŕáƒţíñĝ Ɱášţéŕŵóŕķ]",

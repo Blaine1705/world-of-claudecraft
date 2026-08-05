@@ -528,12 +528,17 @@ export function bumpDeedStat(
 
 /** Record an item id as discovered (first time it ever enters possession).
  *  Also feeds the quality-first marks; `rolledQuality` carries an instance's
- *  rolled quality (gathered rares) which beats the static def quality. */
+ *  rolled quality (gathered rares) which beats the static def quality.
+ *  `opts.retro` is set ONLY by the join-time seed pass (seedItemDiscovery):
+ *  it makes the Reliquary fill silent and flags the events it emits, so a
+ *  veteran's first login after a rollout never reads as a live find. Every
+ *  live acquisition site omits it. */
 export function markItemDiscovered(
   ctx: SimContext,
   meta: PlayerMeta,
   itemId: string,
   rolledQuality?: string,
+  opts?: { retro?: boolean },
 ): void {
   // A heroic instance drops the generated heroic_<base> variant in place of
   // the base item (same display name, same set membership); collection deeds
@@ -554,7 +559,7 @@ export function markItemDiscovered(
       // Reliquary sparse first-find + capped recent for catalogued relics only.
       // Rides the same first-obtain hub (including buyback); never dual-writes
       // discovery and never forces saveCharacter (30s autosave / leave).
-      onReliquaryItemDiscovered(ctx, meta, id);
+      onReliquaryItemDiscovered(ctx, meta, id, opts);
     }
     const quality = (id === itemId ? rolledQuality : undefined) ?? def.quality;
     if (quality === 'rare' || quality === 'epic' || quality === 'legendary') {
@@ -599,8 +604,10 @@ export function grantDeed(
   });
   // Horizons titles score catalogRankOwned. Live grant of a title relic can
   // cross a Curator threshold; keep display rank and zero-Renown bridges aligned
-  // without waiting for join retro. Rank bridge deeds themselves are also
-  // Horizons titles: maybeSync early-outs when bridges are already earned.
+  // without waiting for join retro. The rank bridges for ranks 2 to 4 are
+  // themselves Horizons titles (rank 5 deliberately is not: it rewards window
+  // border chrome, so it never scores rank in turn), and maybeSync early-outs
+  // when every bridge for the current rank is already earned.
   if (def.reward?.kind === 'title' && isHorizonsTitleDeed(deedId)) {
     maybeSyncCuratorRankDeeds(ctx, meta, opts?.retro ? { retro: true } : undefined);
   }
@@ -1082,33 +1089,51 @@ export function recomputeRenown(meta: PlayerMeta): void {
   meta.renown = renown;
 }
 
+const RETRO_SEED = { retro: true } as const;
+
 /** Seed the discovery ledger from what the character already holds (bags,
  *  bank, equipment, and the vendor buyback list, whose entries were all once
  *  possessed), so veterans keep credit for what they still own. Runs on
- *  every join; the set only grows, so re-seeding is idempotent. */
+ *  every join; the set only grows, so re-seeding is idempotent.
+ *
+ *  Every call here is RETRO: the character already owned these before the
+ *  join, so the Reliquary fills silently (no recent push, no invented clear
+ *  provenance) and the events carry the retro flag. This is the ONLY caller
+ *  that sets it, and the flag buys exactly two things: the CLIENT collapses
+ *  the fills into one catch-up summary line instead of a toast per relic, and
+ *  the deedUnlocked grants this join pass produces skip the server's guild /
+ *  activity-feed fan-out through its ev.retro gate (server/game.ts gates
+ *  deedUnlocked only). reliquaryUnlock is self-scoped (HEAVY_SELF_EVENTS) and
+ *  is never fanned out on any path, retro or live. */
 export function seedItemDiscovery(ctx: SimContext, meta: PlayerMeta): void {
   for (const slot of meta.inventory) {
-    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
   }
   for (const slot of meta.bank.inventory) {
-    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
   }
   for (const [slot, itemId] of Object.entries(meta.equipment) as [
     EquipSlot,
     string | undefined,
   ][]) {
     if (itemId)
-      markItemDiscovered(ctx, meta, itemId, meta.equipmentInstance[slot]?.rolled?.quality);
+      markItemDiscovered(
+        ctx,
+        meta,
+        itemId,
+        meta.equipmentInstance[slot]?.rolled?.quality,
+        RETRO_SEED,
+      );
   }
   for (const bagId of meta.bags) {
-    if (bagId) markItemDiscovered(ctx, meta, bagId);
+    if (bagId) markItemDiscovered(ctx, meta, bagId, undefined, RETRO_SEED);
   }
   for (const slot of meta.vendorBuyback) {
     // Buyback entries can carry an instance payload (masterwork/signed sales,
     // #2398); the rolled quality rides along like the sibling loops so
     // quality-first discovery credit is never under-counted for a row that
     // preserved its instance.
-    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality);
+    markItemDiscovered(ctx, meta, slot.itemId, slot.instance?.rolled?.quality, RETRO_SEED);
   }
 }
 
@@ -1169,8 +1194,10 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // Veterans who crossed Curator rank thresholds before the rank deed bridges
   // shipped get cosmetic titles/borders on join (zero Renown; grantDeed is
   // idempotent). Live rank-ups still grant from onItemDiscovered.
-  // Profession field-note marks reuse visited gather_event:*; silent retro
-  // only (no unlock toast, no invented masterwork craft history).
+  // Profession marks reuse the visit ledger (gather_event:*, masterwork:*),
+  // which their own live call sites write when the real event happens: silent
+  // retro only (no unlock toast), and never a craft history nobody performed.
+  // Must run BEFORE the rank sync so a mark that refills here can rank up.
   syncReliquaryMarksFromVisited(meta);
   syncCuratorRankDeeds(ctx, meta, { retro: true });
 }
@@ -1923,4 +1950,10 @@ export const VISITED_MARK_NAMESPACES = [
   // Per-craft rare-tier milestones (issue #2055): the first rare-or-better
   // output a player crafts IN THAT CRAFT (professions/crafting.ts craftItem).
   'craft_rare',
+  // Lifetime masterwork procs (first ever, then first per craft), written on
+  // the same arm as the Reliquary mark in professions/crafting.ts. The visit
+  // is the durable proof of the proc, so it must survive a save: without the
+  // namespace registered it would serialize fine and be dropped on load,
+  // exactly the gather_event bug above, and the mark could never refill.
+  'masterwork',
 ] as const;

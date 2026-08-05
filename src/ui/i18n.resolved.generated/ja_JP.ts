@@ -3189,6 +3189,7 @@ export const ja_JP: EnTranslations = {
       "unlockToast": "聖遺物を収蔵：{name}",
       "illuminateBanner": "ページが照耀されました：{name}",
       "illuminateToast": "{name} の聖遺物がすべて埋まりました。",
+      "retroSummary": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
       "markFind": {
         "masterwork_first": "初めての名作",
         "masterwork_weaponcrafting": "武器製作の名作",

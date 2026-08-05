@@ -3189,6 +3189,7 @@ export const ko_KR: EnTranslations = {
       "unlockToast": "성물 수록: {name}",
       "illuminateBanner": "페이지 조명됨: {name}",
       "illuminateToast": "{name}의 모든 성물이 채워졌습니다.",
+      "retroSummary": "성물고가 따라잡았습니다: 성물 {count}개 수록.",
       "markFind": {
         "masterwork_first": "첫 명작",
         "masterwork_weaponcrafting": "무기제작 명작",

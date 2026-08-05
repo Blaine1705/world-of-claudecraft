@@ -3189,6 +3189,7 @@ export const ru_RU: EnTranslations = {
       "unlockToast": "Реликвия каталогизирована: {name}",
       "illuminateBanner": "Страница озарена: {name}",
       "illuminateToast": "Все реликвии на странице {name} заполнены.",
+      "retroSummary": "Реликварий наверстал упущенное: каталогизировано реликвий: {count}.",
       "markFind": {
         "masterwork_first": "Первый шедевр",
         "masterwork_weaponcrafting": "Шедевр оружейного дела",

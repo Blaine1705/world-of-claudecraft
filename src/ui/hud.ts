@@ -13266,6 +13266,16 @@ export class Hud {
     if (plan.refreshWindow && this.reliquaryWindow.isOpen) {
       this.reliquaryWindow.render();
     }
+    // On-join catch-up: one localized summary line, the same treatment the
+    // Book of Deeds gives its retro pass. No banner, no audio, and no forced
+    // window rebuild (the slow-band signature picks the new fills up).
+    if (plan.retroCount > 0) {
+      const retroText = t('hudChrome.reliquary.retroSummary', {
+        count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
+      });
+      this.log(retroText, '#ffd100');
+      this.combatAnnouncer.push(retroText, performance.now());
+    }
   }
 
   // The earned moment, planned purely (deeds_view buildDeedUnlockPlan) so the

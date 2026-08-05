@@ -9917,6 +9917,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '圣物已收录：{name}',
   'hudChrome.reliquary.illuminateBanner': '页面已点亮：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} 上的每一件圣物均已填满。',
+  'hudChrome.reliquary.retroSummary': '你的圣物库已更新：补录 {count} 件圣物。',
   'hudChrome.reliquary.curatorRankName1': '见习策展人',
   'hudChrome.reliquary.curatorRankName2': '战利品保管者',
   'hudChrome.reliquary.curatorRankName3': '大师策展人',

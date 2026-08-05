@@ -4033,6 +4033,9 @@ export const hudChromeStrings = {
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
     illuminateToast: 'Every relic on {name} is filled.',
+    // The on-join back-credit pass: one line for the whole seed, never a toast
+    // per relic (mirrors hudChrome.deeds.retroSummary).
+    retroSummary: 'Your reliquary catches up: {count} relics catalogued.',
     // Phase 7: profession mark find labels (player-visible chrome; catalog page
     // names may stay English content until a later re-localize pass).
     markFind: {

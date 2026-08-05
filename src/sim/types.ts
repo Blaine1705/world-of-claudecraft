@@ -4361,6 +4361,12 @@ export type SimEvent = { pid?: number } & (
       illuminatedPageId?: string;
       /** New cosmetic Curator rank index when this fill crossed a threshold. */
       curatorRank?: number;
+      /**
+       * Set on the on-join seed pass, exactly like deedUnlocked: the client
+       * batches these into one summary line instead of a toast per relic, and
+       * the server never fans a retro fill out anywhere.
+       */
+      retro?: boolean;
     }
   | { type: 'learnAbility'; abilityId: string; rank: number }
   // The hub grant event. Two independent stand-down flags, both set only from

@@ -3189,6 +3189,7 @@ export const zh_CN: EnTranslations = {
       "unlockToast": "圣物已收录：{name}",
       "illuminateBanner": "页面已点亮：{name}",
       "illuminateToast": "{name} 上的每一件圣物均已填满。",
+      "retroSummary": "你的圣物库已更新：补录 {count} 件圣物。",
       "markFind": {
         "masterwork_first": "首件杰作",
         "masterwork_weaponcrafting": "武器锻造杰作",

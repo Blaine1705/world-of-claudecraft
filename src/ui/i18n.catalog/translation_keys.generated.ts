@@ -8015,6 +8015,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.rankUpBanner'
   | 'hudChrome.reliquary.rankUpToast'
   | 'hudChrome.reliquary.recentLabel'
+  | 'hudChrome.reliquary.retroSummary'
   | 'hudChrome.reliquary.shelfEmpty'
   | 'hudChrome.reliquary.shelvesAria'
   | 'hudChrome.reliquary.title'

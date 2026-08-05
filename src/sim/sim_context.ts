@@ -979,6 +979,10 @@ export interface SimContextCallbacks {
   // lifetime-XP accrual, and similar); grantDeed is the idempotent unlock
   // every path shares (the evaluator and the bespoke manual-deed sites).
   bumpDeedStat(meta: PlayerMeta, stat: DeedStatKey, delta: number): void;
+  // No retro opts here on purpose: the join-time seed pass calls the deeds
+  // module function directly (deeds.ts seedItemDiscovery), so a future caller
+  // reaching through this seam cannot ask for a silent fill and gets live
+  // find semantics, which is the safe default for a live acquisition site.
   markItemDiscovered(meta: PlayerMeta, itemId: string, rolledQuality?: string): void;
   markVisited(meta: PlayerMeta, markId: string): void;
   markDeedsDirty(pid: number): void;

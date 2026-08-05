@@ -10564,6 +10564,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': 'Реликвия каталогизирована: {name}',
   'hudChrome.reliquary.illuminateBanner': 'Страница озарена: {name}',
   'hudChrome.reliquary.illuminateToast': 'Все реликвии на странице {name} заполнены.',
+  'hudChrome.reliquary.retroSummary': 'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
   'hudChrome.reliquary.curatorRankName1': 'Ученик хранителя',
   'hudChrome.reliquary.curatorRankName2': 'Хранитель трофеев',
   'hudChrome.reliquary.curatorRankName3': 'Мастер-хранитель',

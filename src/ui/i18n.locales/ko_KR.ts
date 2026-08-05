@@ -10389,6 +10389,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '성물 수록: {name}',
   'hudChrome.reliquary.illuminateBanner': '페이지 조명됨: {name}',
   'hudChrome.reliquary.illuminateToast': '{name}의 모든 성물이 채워졌습니다.',
+  'hudChrome.reliquary.retroSummary': '성물고가 따라잡았습니다: 성물 {count}개 수록.',
   'hudChrome.reliquary.curatorRankName1': '견습 큐레이터',
   'hudChrome.reliquary.curatorRankName2': '전리품 수호자',
   'hudChrome.reliquary.curatorRankName3': '마스터 큐레이터',

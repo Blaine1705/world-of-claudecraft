@@ -412,6 +412,8 @@ export interface ReliquaryUnlockEventModel {
   illuminatedPageId?: string;
   /** New Curator rank when this fill crossed a threshold (cosmetic only). */
   curatorRank?: number;
+  /** On-join back-credit: silent, counted into one summary line. */
+  retro?: boolean;
 }
 
 export type ReliquaryUnlockLog = { kind: 'item'; id: string } | { kind: 'mark'; id: string };
@@ -442,6 +444,13 @@ export interface ReliquaryUnlockPlan {
   illuminatedPageId: string | null;
   /** Highest Curator rank-up in the drain, if any (cosmetic only). */
   curatorRank: number | null;
+  /**
+   * On-join back-credits (the seed pass): NO log line, NO banner, NO audio,
+   * NO motion, NO window refresh, and they never claim the Illumination or
+   * rank slots. Just this count, which the HUD spends on ONE summary line
+   * (the deeds retro idiom).
+   */
+  retroCount: number;
 }
 
 /**
@@ -457,12 +466,21 @@ export function buildReliquaryUnlockPlan(
   let banner: ReliquaryUnlockBanner | null = null;
   let illuminatedPageId: string | null = null;
   let curatorRank: number | null = null;
+  let retroCount = 0;
 
   for (const event of events) {
     let log: ReliquaryUnlockLog | null = null;
     if (event.itemId) log = { kind: 'item', id: event.itemId };
     else if (event.markId) log = { kind: 'mark', id: event.markId };
     if (!log) continue;
+    // A veteran's first login can seed dozens of fills at once. Those are
+    // counted and nothing else: they must not steal the banner slot, the
+    // Illumination line, or the rank-up moment from a live find in the same
+    // drain, so the capture below is skipped entirely.
+    if (event.retro) {
+      retroCount++;
+      continue;
+    }
     logs.push(log);
 
     const rankUp =
@@ -501,6 +519,7 @@ export function buildReliquaryUnlockPlan(
     refreshWindow: logs.length > 0,
     illuminatedPageId,
     curatorRank,
+    retroCount,
   };
 }
 
@@ -560,7 +579,8 @@ export function reliquaryOwnershipDigest(parts: {
   );
 }
 
-/** Stable digest of the recent ring (order matters; newest-first join). */
+/** Stable digest of the recent ring (order matters; the ring arrives from the
+ *  facet oldest-first, and the join preserves that order verbatim). */
 export function reliquaryRecentSig(recent: readonly string[]): string {
   return recent.join('\u0001');
 }
