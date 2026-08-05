@@ -60,6 +60,24 @@ export function weaponSkinAttackClips(weaponSkinId: string | null): SkinAttackCl
   return skin && weaponSkinHandling(skin) === 'bow' ? BOW_ATTACK : null;
 }
 
+/** Cast-time abilities that are a DRAWN SHOT, so a bow should be held aimed
+ *  for their duration.
+ *
+ *  An allowlist rather than a derived rule, because every derivable signal is
+ *  wrong somewhere: `casting` alone is true for tame_beast (6s) and revive_pet
+ *  (3s), and `minRange` (the classic ranged dead zone) is also carried by the
+ *  melee gap-closers charge and bear_charge. A hunter holding a bow aimed
+ *  through a six-second beast taming is the bug this prevents.
+ *
+ *  `tests/weapon_skins.test.ts` scans the ability table and fails if a new
+ *  cast-time shot lands without a row here, so the list cannot silently rot. */
+const DRAWN_SHOT_CAST_IDS: ReadonlySet<string> = new Set(['aimed_shot']);
+
+/** True when this cast is a drawn shot (see DRAWN_SHOT_CAST_IDS). */
+export function isDrawnShotCast(abilityId: string | null | undefined): boolean {
+  return !!abilityId && DRAWN_SHOT_CAST_IDS.has(abilityId);
+}
+
 /** What the rig's current one-shot IS, for callers that must tell a shot apart
  *  from every other one-shot. `null` means no one-shot is playing. */
 export type OneShotKind = 'attack' | 'emote' | 'other' | null;
@@ -85,9 +103,9 @@ export type OneShotKind = 'attack' | 'emote' | 'other' | null;
  * it is true, a bow-slot gun carries muzzle-forward while it is false), so the
  * flinch and the draw are fixed for both weapons at once.
  */
-export function rangedSkinAiming(oneShot: OneShotKind, casting: boolean): boolean {
+export function rangedSkinAiming(oneShot: OneShotKind, castingAbility: string | null): boolean {
   if (oneShot !== null) return oneShot === 'attack';
-  return casting;
+  return isDrawnShotCast(castingAbility);
 }
 
 export type SkinOrientPinMode = 'aimDuringShot' | 'carryOutsideShot';

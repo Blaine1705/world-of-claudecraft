@@ -390,6 +390,9 @@ export class CharacterVisual {
   // the distinction (skin_attack.ts rangedSkinAiming); a stale true is harmless
   // because every read gates on currentIsOneShot first.
   private currentOneShotIsAttack = false;
+  /** The ability driving the cast base state, mirrored from AnimState so the
+   *  aim pin can tell a drawn shot from a pet utility cast. */
+  private castingAbility: string | null = null;
   private deadLock = false;
   /** consecutive frames with no action driving the pose (the T-pose watchdog) */
   private starvedFrames = 0;
@@ -620,6 +623,7 @@ export class CharacterVisual {
       this.playOneShot(landClip, 1);
     this.wasAirborne = s.airborne;
 
+    this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
     if (!this.deadLock) {
       const desired = this.desiredBase(s);
       const baseChanged = desired !== this.baseState;
@@ -1610,7 +1614,7 @@ export class CharacterVisual {
     // "Is this character shooting", asked properly: the attack one-shot (the
     // release) or an active cast (the draw of a cast-time shot). A hit react is
     // a one-shot and is NOT shooting; see rangedSkinAiming.
-    const shot = rangedSkinAiming(this.currentOneShotKind(), this.baseState === 'cast');
+    const shot = rangedSkinAiming(this.currentOneShotKind(), this.castingAbility);
     const step = dt / BOW_PIN_BLEND_S;
     this.root.getWorldQuaternion(BOW_Q_ROOT);
     for (const entry of this.orientPins) {

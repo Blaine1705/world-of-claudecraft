@@ -309,24 +309,51 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
   it('the aim pin tracks SHOOTING, not merely "some one-shot is playing"', async () => {
     const { rangedSkinAiming } = await import('../src/render/characters/skin_attack');
     // The release: the attack one-shot is the moment the pin was written for.
-    expect(rangedSkinAiming('attack', false)).toBe(true);
+    expect(rangedSkinAiming('attack', null)).toBe(true);
     // The DRAW: a cast-time shot (Long Draw, castTime 3.0) is a held base
     // state, not a one-shot, so the old "is a one-shot playing" test missed
     // the whole three seconds the bow should have been up.
-    expect(rangedSkinAiming(null, true)).toBe(true);
+    expect(rangedSkinAiming(null, 'aimed_shot')).toBe(true);
+    // ...but only for a SHOT. Reported by review on PR 2941: a hunter's pet
+    // utility casts also set the cast state, and holding a bow aimed through a
+    // six-second beast taming is wrong.
+    expect(rangedSkinAiming(null, 'tame_beast')).toBe(false);
+    expect(rangedSkinAiming(null, 'revive_pet')).toBe(false);
     // Taking a hit plays a one-shot and is NOT shooting. This is the case
     // that made a bow jerk upright through the flinch.
-    expect(rangedSkinAiming('other', false)).toBe(false);
+    expect(rangedSkinAiming('other', null)).toBe(false);
     // Emotes were already excluded and stay excluded.
-    expect(rangedSkinAiming('emote', false)).toBe(false);
+    expect(rangedSkinAiming('emote', null)).toBe(false);
     // Idle, doing nothing at all.
-    expect(rangedSkinAiming(null, false)).toBe(false);
+    expect(rangedSkinAiming(null, null)).toBe(false);
     // A one-shot that is not the attack wins over a concurrent cast flag:
     // whatever interrupted the draw is what the body is actually playing.
-    expect(rangedSkinAiming('other', true)).toBe(false);
+    expect(rangedSkinAiming('other', 'aimed_shot')).toBe(false);
     // ...and the attack one-shot during a cast stays aimed (the release frame
     // of a channelled shot, where both are briefly true).
-    expect(rangedSkinAiming('attack', true)).toBe(true);
+    expect(rangedSkinAiming('attack', 'aimed_shot')).toBe(true);
+  });
+
+  it('every cast-time ranged shot in the ability table is classified', async () => {
+    const { isDrawnShotCast } = await import('../src/render/characters/skin_attack');
+    const { ABILITIES } = await import('../src/sim/data');
+    // A DRAWN shot is the intersection the allowlist exists to name: it takes
+    // cast time (so the held pose is visible at all) and carries the classic
+    // ranged dead zone. Instant shots need no held pose, and a cast without a
+    // dead zone is a spell or a pet utility, not something a bow draws.
+    const candidates = Object.values(ABILITIES)
+      .filter((a) => (a.castTime ?? 0) > 0 && ((a as { minRange?: number }).minRange ?? 0) > 0)
+      .map((a) => a.id);
+    expect(candidates.length, 'the scan must not be vacuous').toBeGreaterThan(0);
+    const unclassified = candidates.filter((id) => !isDrawnShotCast(id));
+    expect(
+      unclassified,
+      `new cast-time ranged shot(s) with no DRAWN_SHOT_CAST_IDS row: ${unclassified.join(', ')}`,
+    ).toEqual([]);
+    // And the list must not creep the other way onto things that are not shots.
+    expect(isDrawnShotCast('tame_beast')).toBe(false);
+    expect(isDrawnShotCast('charge')).toBe(false);
+    expect(isDrawnShotCast(null)).toBe(false);
   });
 
   it('visual.ts asks the shared predicate rather than re-deriving the trigger', () => {
