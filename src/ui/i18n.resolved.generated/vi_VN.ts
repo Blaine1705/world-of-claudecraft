@@ -10319,6 +10319,18 @@ export const vi_VN: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "Nước Suối Được Tạo Phép"
       },

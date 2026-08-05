@@ -10319,6 +10319,18 @@ export const sv_SE: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"
       },

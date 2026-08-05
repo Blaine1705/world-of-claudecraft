@@ -10319,6 +10319,18 @@ export const en_XA: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "[Ŕéíñš óƒ ţĥé Ðŕáķéɱáŵ Ŕáþţóŕ]"
       },
+      "rimefang": {
+        "name": "[Ŕíɱéƒáñĝ]"
+      },
+      "marrowpoint": {
+        "name": "[Ɱáŕŕóŵþóíñţ]"
+      },
+      "duskwhisper": {
+        "name": "[Ðúšķŵĥíšþéŕ]"
+      },
+      "boneglass_shiv": {
+        "name": "[Ɓóñéĝļášš Šĥíʋ]"
+      },
       "conjured_water4": {
         "name": "[Çóñĵúŕéð Šþŕíñĝŵáţéŕ]"
       },

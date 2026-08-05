@@ -2401,6 +2401,10 @@ const ITEM_ENTITY_IDS = [
   'artisans_eye',
   'reins_terrorspark_groundshaker',
   'reins_drakemaw_raptor',
+  'rimefang',
+  'marrowpoint',
+  'duskwhisper',
+  'boneglass_shiv',
 ] as const;
 
 type ItemEntityId = (typeof ITEM_ENTITY_IDS)[number];
@@ -2410,6 +2414,10 @@ type ItemEntityTranslation = { name: string };
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  rimefang: 'Rimefang',
+  marrowpoint: 'Marrowpoint',
+  duskwhisper: 'Duskwhisper',
+  boneglass_shiv: 'Boneglass Shiv',
   rift_essence: 'Rift Essence',
   rift_gem_crimson: 'Crimson Rift Gem',
   rift_gem_azure: 'Azure Rift Gem',

@@ -10319,6 +10319,18 @@ export const cs_CZ: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"
       },

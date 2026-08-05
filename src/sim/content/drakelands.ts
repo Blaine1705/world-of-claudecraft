@@ -421,7 +421,10 @@ export const DRAKELANDS_MOBS: Record<string, MobTemplate> = {
     aggroRadius: 20,
     elite: true,
     offStreamIdle: true,
-    loot: [{ copper: 100, chance: 1 }],
+    loot: [
+      { copper: 100, chance: 1 },
+      { itemId: 'marrowpoint', chance: 0.15 },
+    ],
     // The matriarch keeps her half-again margin over the grown broodlords
     // (reach profile beside theirs in mob_combat.ts).
     scale: 2.85,
@@ -684,6 +687,38 @@ export const DRAKELANDS_QUEST_ORDER: string[] = [
 ];
 
 export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
+  // Rogue dagger (drops from Cindraleth the Maw Matriarch, the Drakelands world
+  // boss). A bleed-on-hit for the marrow/bone flavor.
+  marrowpoint: {
+    id: 'marrowpoint',
+    name: 'Marrowpoint',
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    weapon: { min: 21, max: 34, speed: 1.8, dagger: true },
+    stats: { agi: 13, sta: 6 },
+    sellValue: 9000,
+    requiredClass: ['rogue', 'hunter'],
+    requiredLevel: 20,
+    weaponProcs: [
+      {
+        id: 'marrowpoint_rend',
+        name: 'Marrow Rend',
+        trigger: 'weaponHit',
+        chance: 0.08,
+        effects: [
+          {
+            kind: 'dot',
+            name: 'Marrow Rend',
+            school: 'physical',
+            perTick: 8,
+            interval: 2,
+            duration: 6,
+          },
+        ],
+      },
+    ],
+  },
   // --- keepsakes ---
   // The Last Keep's entrance-hall souvenir: the interior instance's one
   // ground object (a dungeon must place at least one encounter; the

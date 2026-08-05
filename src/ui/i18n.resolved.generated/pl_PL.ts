@@ -10319,6 +10319,18 @@ export const pl_PL: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "Wyczarowana woda źródlana"
       },

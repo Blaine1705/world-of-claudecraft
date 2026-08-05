@@ -10319,6 +10319,18 @@ export const fr_FR: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
       },
+      "rimefang": {
+        "name": "Rimefang"
+      },
+      "marrowpoint": {
+        "name": "Marrowpoint"
+      },
+      "duskwhisper": {
+        "name": "Duskwhisper"
+      },
+      "boneglass_shiv": {
+        "name": "Boneglass Shiv"
+      },
       "conjured_water4": {
         "name": "Eau de source invoquée"
       },
