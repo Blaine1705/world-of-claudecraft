@@ -59,6 +59,7 @@ import {
 import { GamepadManager } from './game/gamepad';
 import { GamepadBindings } from './game/gamepad_bindings';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
+import { isGameplayInputBlocked } from './game/gameplay_input_gate';
 import { handleGatherNodeInteract } from './game/gather_node_interact';
 import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/gather_tool_use';
 import { Input } from './game/input';
@@ -1618,12 +1619,17 @@ async function startGame(
   chatDismiss?.addEventListener('click', () => chatInput.blur());
 
   // One keyboard/gamepad action gate for every blocking client surface. The
-  // camera prompt lives outside Hud, so it reports its open state explicitly.
+  // camera prompt lives outside Hud, so it reports its open state explicitly, and
+  // chat reports both its presence and its focus (only the latter blocks; see
+  // gameplay_input_gate.ts).
   const gameplayInputBlocked = () =>
-    hud.isModalOpen() ||
-    hud.promptModalOpen() ||
-    cameraPromptOpen() ||
-    chatInput.style.display === 'block';
+    isGameplayInputBlocked({
+      modalOpen: hud.isModalOpen(),
+      promptModalOpen: hud.promptModalOpen(),
+      cameraPromptOpen: cameraPromptOpen(),
+      chatComposerVisible: chatInput.style.display === 'block',
+      chatComposerFocused: document.activeElement === chatInput,
+    });
 
   const input = new Input(
     canvas,

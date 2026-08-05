@@ -318,6 +318,20 @@ export function buildDeedBroadcastRow(parent: HTMLElement, seam: DeedBroadcastSe
   parent.appendChild(row);
 }
 
+// The GameSettings keys the Key Bindings panel renders alongside the rebindable key
+// map (settingToggleKeybind rows plus the click-to-move mouse-button toggle). Reset
+// to Defaults on this panel must restore these too, not just the key map, since a
+// player reading "Reset to Defaults" on this screen expects the whole screen reset.
+const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
+  'mouseCamera',
+  'lockCursorOnRotate',
+  'clickToMove',
+  'clickToMoveButton',
+  'attackMove',
+  'leftHandedTouch',
+  'filterProfanity',
+];
+
 export class OptionsWindow {
   private view: OptionsView = 'main';
   // The active Interface sub-tab. Remembered for the SESSION (a field on the
@@ -1090,20 +1104,16 @@ export class OptionsWindow {
       this.renderThemeControls(body);
     }
 
+    // Built once, across every tab, so Reset to Defaults (settingsViewFooter below)
+    // covers the whole Interface/Comfort panel, not just the tab currently showing.
+    const fullControls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
+
     if (hooks)
-      this.applyControls(
-        body,
-        interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab),
-        hooks,
-        (focusKey) => {
-          this.renderInterface();
-          if (focusKey)
-            this.deps
-              .root()
-              .querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)
-              ?.focus();
-        },
-      );
+      this.applyControls(body, interfaceControlsForTab(fullControls, tab), hooks, (focusKey) => {
+        this.renderInterface();
+        if (focusKey)
+          this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
+      });
 
     // Frames closes with the unit-frames reset row.
     if (tab === 'frames') this.unitFramesResetRow(body);
@@ -1130,12 +1140,7 @@ export class OptionsWindow {
       }
     }
 
-    const back = document.createElement('button');
-    back.className = 'btn';
-    back.textContent = t('hud.options.back');
-    back.addEventListener('click', () => this.goBack());
-    el.appendChild(back);
-    el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+    this.settingsViewFooter(fullControls);
   }
 
   // The chat-timestamp on/off toggle plus the 12/24-hour clock-format pair (the
@@ -1742,6 +1747,9 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       this.deps.keybinds().reset();
+      const hooks = this.deps.options();
+      hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
+      for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));
       this.capturingKey = null;
       this.keybindNote = t('hud.options.keybindReset');
       this.deps.refreshKeybindLabels();

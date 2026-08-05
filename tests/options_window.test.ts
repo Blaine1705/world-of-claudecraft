@@ -139,9 +139,23 @@ describe('options_window: interface tab split', () => {
   });
 
   it('filters the declarative controls to the active tab', () => {
+    // The full control list is built once (so Reset to Defaults can cover every
+    // tab, #2901) and the active tab is filtered from it for rendering.
     expect(painter).toContain(
-      'interfaceControlsForTab(buildInterfaceControls(this.settingsSource(hooks)), tab)',
+      'const fullControls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];',
     );
+    expect(painter).toContain('interfaceControlsForTab(fullControls, tab)');
+  });
+
+  it('feeds the full (unfiltered) interface control list into settingsViewFooter, not just the active tab', () => {
+    // Regression guard for #2901: Reset to Defaults on the Interface/Comfort panel
+    // must cover every tab's controls (language, theme, UI scale, comfort, chat
+    // timestamps), not just whichever tab happens to be showing.
+    const start = painter.indexOf('private renderInterface(): void {');
+    expect(start).toBeGreaterThan(-1);
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    expect(body).toContain('this.settingsViewFooter(fullControls);');
   });
 
   it('places the bespoke rows into their approved tab', () => {
@@ -365,11 +379,12 @@ describe('options_window: title-bar back control', () => {
     expect(painter).toContain(
       "el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());",
     );
-    // the four footer Back buttons (settings shell, interface, bug report,
-    // keybinds) reuse the same path (no inline copies left)
+    // the three footer Back buttons (settingsViewFooter, shared by every scoped-reset
+    // sub-view including interface; bug report; keybinds) reuse the same path (no
+    // inline copies left)
     expect(
       painter.match(/back\.addEventListener\('click', \(\) => this\.goBack\(\)\);/g),
-    ).toHaveLength(4);
+    ).toHaveLength(3);
     // the click-then-flip-to-main sequence lives ONLY in goBack itself; a stray
     // inline copy in some handler would push this count past 1
     expect(painter.match(/audio\.click\(\);\s*this\.view = 'main';/g) ?? []).toHaveLength(1);
@@ -502,4 +517,45 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
       expect(body).toContain('this.settingsViewFooter(controls)');
     },
   );
+});
+
+// Regression guard for #2901: the Key Bindings panel's Reset to Defaults must reset
+// the GameSettings rows it renders alongside the key map (mouse camera, lock cursor
+// on rotate, click-to-move, click-to-move button, attack move, left-handed touch,
+// profanity filter), not the key map alone. The panel does not build an
+// OptionsControl[] like the settingsViewFooter-driven sub-views, so it carries its
+// own scoped key list and resets/re-applies it directly in its reset handler.
+describe('options_window: Key Bindings reset restores its GameSettings rows too (#2901)', () => {
+  it('declares the panel setting keys the reset handler restores', () => {
+    expect(painter).toMatch(/const KEYBIND_PANEL_SETTING_KEYS: \(keyof GameSettings\)\[\] = \[/);
+    for (const key of [
+      'mouseCamera',
+      'lockCursorOnRotate',
+      'clickToMove',
+      'clickToMoveButton',
+      'attackMove',
+      'leftHandedTouch',
+      'filterProfanity',
+    ]) {
+      expect(painter).toContain(`'${key}'`);
+    }
+  });
+
+  it('resets and re-applies KEYBIND_PANEL_SETTING_KEYS alongside keybinds().reset() in the reset handler', () => {
+    const keybindsStart = painter.indexOf('private renderKeybinds(): void {');
+    expect(keybindsStart).toBeGreaterThan(-1);
+    const resetBtn = painter.indexOf(
+      "reset.textContent = t('hud.options.resetToDefaults');",
+      keybindsStart,
+    );
+    expect(resetBtn).toBeGreaterThan(-1);
+    const handlerStart = painter.indexOf("reset.addEventListener('click', () => {", resetBtn);
+    expect(handlerStart).toBeGreaterThan(-1);
+    const rest = painter.slice(handlerStart);
+    const body = rest.slice(0, rest.indexOf('\n    });\n'));
+    expect(body).toContain('this.deps.keybinds().reset();');
+    expect(body).toContain('hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);');
+    expect(body).toContain('for (const k of KEYBIND_PANEL_SETTING_KEYS)');
+    expect(body).toContain('hooks?.onSettingChange(k, hooks.settings.get(k));');
+  });
 });
