@@ -4116,6 +4116,16 @@ export class ClientWorld implements IWorld {
       if (current?.skinCatalog === 'mech' && current.skin === skin) {
         current.skin = 0;
         current.skinCatalog = 'class';
+        // Dropping the chroma drops the wearer OFF the mech body, so this is a
+        // body change and re-resolves like changeSkin and Sim.setPlayerSkin do.
+        // Without it a mech hunter's sword skin stayed displayed on a class rig
+        // that cannot render one, until the next authoritative snapshot.
+        current.weaponSkinId = resolveActiveWeaponSkin(
+          current.templateId,
+          current.mainhandItemId,
+          current.weaponSkinLoadout,
+          current.skinCatalog,
+        );
       }
       const existing = this.inventory.find((slot) => slot.itemId === itemId);
       this.inventory = existing
