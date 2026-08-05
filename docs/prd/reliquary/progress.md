@@ -13,7 +13,7 @@
 | 2 Conqueror catalog | **done** | 22 conqueror pages: dungeon N/H, raid, Thunzharr, delves, epic sets; pin tests |
 | 2 QA | **done** | exit criteria verified; no defects; release still @ de450dc41f |
 | 3 IWorld + wire thrift | **done** | IWorldReliquary facet, reliq heavy self, reliquaryUnlock, ClientWorld parity |
-| 3 QA | pending | same worktree + pull |
+| 3 QA | **done** | exit criteria verified; pin defects fixed; release @ 5e83ba89d0 |
 | 4 Window shell + Overview | pending | same worktree + pull |
 | 4 QA | pending | same worktree + pull |
 | 5 Page grids + live UX | pending | same worktree + pull |
@@ -77,6 +77,27 @@
   parity pin 296 members / 32 facets, heavy-gated `reliq` sparse blob, id-only
   `reliquaryUnlock` SimEvent (HEAVY_SELF_EVENTS, no saveCharacter), wire thrift
   tests. No UI window.
+- Phase 3 QA: merged `origin/release/v0.35.0` (training-buy-button afford) to tip
+  `5e83ba89d0` (merge commit on feature). Green after pin fixes:
+  - `npx vitest run tests/world_api_parity.test.ts tests/reliquary_wire.test.ts tests/reliquary_state.test.ts tests/reliquary_content.test.ts` (**353 passed**)
+  - Snapshots delta-key + TERSE pins including `reliq` (ALL_DELTA_KEYS length 65)
+  - `npx tsc --noEmit`
+  Checklist (all held):
+  - IWorldReliquary on Sim + ClientWorld; barrel; parity 296 / 32 facets
+  - Online + offline completion identical for scripted state
+  - reliquaryUnlock id-only (itemId / pageIds / illuminatedPageId); no English
+  - Sparse `reliq` firstFind / marks[] / recent[]; heavy + dirty-only; omit-empty
+  - No dual itemsDiscovered on reliq; ownership stays on dstats
+  - No saveCharacter on pure relic fill (saveCharacter spy + deed contrast)
+  - Module-first thin IWorld reads only; no UI window / styles / keybind
+  - Sim purity; server observes; no em dash / emoji on Phase 3 surface
+  - Performance budget Phase 3 wire row still checked in state.md
+  Defects fixed (test-only): ALL_DELTA_KEYS count pin lagged reliq (+1); false-green
+  saveCharacter pin replaced with GameServer.saveCharacter spy + deed contrast;
+  marks[] / illuminatedPageId / presentation-only / absolute completion pins;
+  bareClient defaults for reliquary mirrors; loadAccountFlair mock for join noise.
+  Reviews: cross-platform-sync GREEN; database-performance PASS; test-coverage
+  auditor BLOCKING/SHOULD-FIX addressed. No architecture second look required.
 
 ## Surprises / decisions during implementation
 

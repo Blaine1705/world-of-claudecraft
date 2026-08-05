@@ -26,14 +26,14 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 3 complete. Ready for Phase 3 QA (then Phase 4 UI).
+- **Current phase:** Phase 3 QA complete. Ready for Phase 4 (window shell + Overview).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 3 QA: re-run wire/parity validation,
-  confirm performance budget Phase 3 row, specialist reviews as needed. Do
-  **not** start Phase 4 UI until Phase 3 QA is green.
+  `origin/release/v0.35.0`, then Phase 4: Reliquary window shell, Overview,
+  shelf chrome, keybind, i18n English keys, DESIGN.md layout. Do **not** skip
+  the release pull at Phase 4 start.
 - **Blocker:** none.
-- **Release tip at Phase 3:** `5e83ba89d0` (merged fine-material bag UI from
-  release during Phase 3 start).
+- **Release tip at Phase 3 QA:** `5e83ba89d0` (merged training-buy-button afford
+  from release during Phase 3 QA).
 
 ## Locked design decisions
 

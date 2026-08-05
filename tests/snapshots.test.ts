@@ -4214,9 +4214,10 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 64 unique keys in sorted order', () => {
-    expect(ALL_DELTA_KEYS).toHaveLength(64); // +1: guildBank (Guild Bank Phase 2)
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(64);
+  it('ALL_DELTA_KEYS contains exactly 65 unique keys in sorted order', () => {
+    // +1 guildBank (Guild Bank Phase 2), +1 reliq (Reliquary Phase 3 sparse blob).
+    expect(ALL_DELTA_KEYS).toHaveLength(65);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(65);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -4235,11 +4236,13 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect(scraped.has('lockouts')).toBe(true); // the multi-line call IS captured
     expect(scraped.has('vcupb')).toBe(true); // the maybeRaw calls ARE captured by the widened regex
     expect(scraped.has('dfb')).toBe(true); // incl. the multi-line maybeRaw('dfb', ...) form
+    expect(scraped.has('reliq')).toBe(true); // Reliquary Phase 3 sparse self blob
     // The base-merge union: v0.31's 56 (incl. the market-collect key mktU) plus
     // the Rift + mounts and worn-instance keys (einst, mntRtd and the rift
     // snapshot fragments) for 61, then v0.32's master-loot key mloot for 62,
-    // plus the packet's slotted-tool-effects key tslot for 63.
-    expect(scraped.size).toBe(64); // +1: guildBank (Guild Bank Phase 2)
+    // plus the packet's slotted-tool-effects key tslot for 63, guildBank for
+    // 64, and reliq for 65.
+    expect(scraped.size).toBe(65);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

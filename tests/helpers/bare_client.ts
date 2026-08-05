@@ -103,6 +103,10 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.bankInfo = null;
   c.deedsEarned = new Map();
   c.deedStats = freshDeedStats();
+  // IWorldReliquary sparse mirrors (heavy self `reliq`); empty until a snap.
+  c.reliquaryFirstFind = {};
+  c.reliquaryMarks = new Set();
+  c.reliquaryRecent = [];
   c.renown = 0;
   c.activeTitle = null;
   c.delveRun = null;
