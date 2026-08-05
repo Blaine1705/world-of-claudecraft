@@ -1514,6 +1514,11 @@ describe('bounded sets on load', () => {
       visited: [
         'poi:eastbrook_vale:eastbrook',
         'gather_event:perfect_specimen',
+        // Same round-trip contract for the masterwork proof marks: the
+        // Reliquary trophy refills from them at join, so a load-drop would
+        // strand a lifetime trophy on every relog.
+        'masterwork:first',
+        'masterwork:weaponcrafting',
         'garbage',
         'evil:namespace',
       ],
@@ -1522,6 +1527,8 @@ describe('bounded sets on load', () => {
     expect([...stats.visited]).toEqual([
       'poi:eastbrook_vale:eastbrook',
       'gather_event:perfect_specimen',
+      'masterwork:first',
+      'masterwork:weaponcrafting',
     ]);
   });
 });

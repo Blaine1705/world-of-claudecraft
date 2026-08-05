@@ -197,11 +197,15 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
     const players = new Map<number, PlayerMeta>();
     const entities = new Map<number, { pos: { x: number; y: number; z: number } }>();
     const addPlayer = (pid: number, name: string, z: number, x = 0) => {
-      // Reliquary field-note marks write through noteReliquaryMark; the finder
-      // must carry a real sparse reliquary state (not a bare stub).
+      // Reliquary field-note marks write through noteReliquaryMark, which
+      // scores curator rank off live ownedMounts: the finder needs a real
+      // sparse reliquary state AND the containers ownedMounts scans (bags and
+      // bank), not a bare stub.
       const meta = {
         entityId: pid,
         name,
+        inventory: [],
+        bank: { inventory: [], purchasedSlots: 0, bonusSlots: 0 },
         reliquary: freshReliquaryState(),
         deedStats: { itemsDiscovered: new Set<string>() },
       } as unknown as PlayerMeta;
