@@ -533,9 +533,11 @@ describe('Reliquary profession marks (Phase 7)', () => {
       path.join(__dirname, '../src/sim/professions/crafting.ts'),
       'utf8',
     );
-    // Marks must sit on the live masterwork success arm, not a cold path.
+    // Marks must sit on the live masterwork success arm (applyCraftSuccessHooks
+    // after craft-cast), not a cold path. meta is the cast-complete hook param
+    // (was r.meta when craftItem still resolved instantly).
     const masterworkArm = craftSrc.match(
-      /if \(result\.masterwork\) \{[\s\S]*?noteReliquaryMark\(ctx, r\.meta, 'masterwork:first'\);[\s\S]*?noteReliquaryMark\(ctx, r\.meta, `masterwork:\$\{craftId\}`\);[\s\S]*?\}/,
+      /if \(result\.masterwork\) \{[\s\S]*?noteReliquaryMark\(ctx, meta, 'masterwork:first'\);[\s\S]*?noteReliquaryMark\(ctx, meta, `masterwork:\$\{craftId\}`\);[\s\S]*?\}/,
     );
     expect(masterworkArm, 'masterwork arm notes first + per-craft marks').toBeTruthy();
     expect(craftSrc).toContain('noteReliquaryMark');

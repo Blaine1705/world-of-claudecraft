@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "f94577d0",
+      "state": "f1e7623e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -142,7 +141,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "e9fb0e06",
+      "state": "5d0e1964",
       "events": "a51d3032",
       "rng": {
         "draws": 1,
@@ -153,7 +152,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "23c2bae2",
+      "state": "826ebbf2",
       "events": "08879145",
       "rng": {
         "draws": 2,
@@ -164,7 +163,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "494ae331",
+      "state": "f396a791",
       "events": "9254444e",
       "rng": {
         "draws": 155,
@@ -175,7 +174,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "4498ef57",
+      "state": "45d426c9",
       "events": "100e961d",
       "rng": {
         "draws": 318,
@@ -186,7 +185,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "e687cbea",
+      "state": "abfc2e6a",
       "events": "54de3459",
       "rng": {
         "draws": 357,
@@ -214,7 +213,6 @@
             "damageDealt": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "dummyDamage": 207
@@ -444,7 +442,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "e687cbea",
+      "state": "abfc2e6a",
       "events": "741638a5",
       "rng": {
         "draws": 357,
@@ -472,7 +470,6 @@
             "damageDealt": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "dummyDamage": 207

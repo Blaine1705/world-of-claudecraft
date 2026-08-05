@@ -19,7 +19,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "a25bff84",
+      "state": "a38995b2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,7 +44,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -154,7 +153,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "dec0399f",
+      "state": "1bc481b1",
       "events": "88c1187c",
       "rng": {
         "draws": 0,
@@ -179,7 +178,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -293,8 +291,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "6302e6bb",
-      "events": "fa11ab2f",
+      "state": "5ac99495",
+      "events": "1c2f4eb7",
       "rng": {
         "draws": 1,
         "digest": "3d9489e0"
@@ -321,9 +319,6 @@
           },
           "craftSkills": {
             "alchemy": 1
-          },
-          "craftThrottle": {
-            "count": 1
           },
           "deedStats": {
             "counters": {
@@ -400,6 +395,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 1.75,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -453,8 +449,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "ce033ec7",
-      "events": "ddaa9652",
+      "state": "7f47903a",
+      "events": "247eea32",
       "rng": {
         "draws": 2,
         "digest": "13fe82e1"
@@ -489,9 +485,6 @@
           "craftSkills": {
             "alchemy": 1,
             "tailoring": 200
-          },
-          "craftThrottle": {
-            "count": 2
           },
           "deedStats": {
             "counters": {
@@ -620,6 +613,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 1.75,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -673,8 +667,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fcab298f",
-      "events": "fa11ab2f",
+      "state": "be1e1d47",
+      "events": "1c2f4eb7",
       "rng": {
         "draws": 3,
         "digest": "bfe71585"
@@ -709,9 +703,6 @@
           "craftSkills": {
             "alchemy": 2,
             "tailoring": 200
-          },
-          "craftThrottle": {
-            "count": 3
           },
           "deedStats": {
             "counters": {
@@ -838,6 +829,7 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castTotal": 1.75,
           "combatTimer": 99,
           "comboUntil": -1,
           "critChance": 0.06,
@@ -891,7 +883,240 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fcab298f",
+      "state": "e8b58ae5",
+      "events": "cff806af",
+      "rng": {
+        "draws": 3,
+        "digest": "bfe71585"
+      },
+      "label": "craft-cast-armed",
+      "players": [
+        {
+          "activeLoadout": -1,
+          "archetype": {
+            "activeArchetype": "tailoring",
+            "attunedPairs": [
+              "leatherworking+tailoring"
+            ],
+            "hobbyCraft": "weaponcrafting",
+            "pairedMajor": "leatherworking"
+          },
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {},
+          "bgRating": 1500,
+          "cls": "warrior",
+          "companionUpgrades": {},
+          "counters": {
+            "xpGained": 48
+          },
+          "craftSkills": {
+            "alchemy": 2,
+            "tailoring": 200
+          },
+          "deedStats": {
+            "counters": {
+              "craftsPerformed": 3,
+              "masterworksCrafted": 1
+            },
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "baked_bread",
+              "eastbrook_buckler",
+              "eastbrook_ritual_vestments",
+              "homespun_cloth",
+              "linen_scrap",
+              "minor_healing_potion",
+              "recruit_tunic",
+              "silverleaf_herb",
+              "spider_leg",
+              "spool_of_thread",
+              "worn_sword"
+            ]
+          },
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 959,
+          "equipment": {
+            "chest": "recruit_tunic",
+            "mainhand": "worn_sword",
+            "offhand": "eastbrook_buckler"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 2,
+              "itemId": "minor_healing_potion"
+            },
+            {
+              "count": 1,
+              "itemId": "homespun_cloth"
+            },
+            {
+              "count": 1,
+              "itemId": "spool_of_thread"
+            },
+            {
+              "count": 1,
+              "craftedRecipeId": "recipe_eastbrook_ritual_vestments",
+              "instance": {
+                "rolled": {
+                  "masterwork": true,
+                  "stats": {
+                    "int": 1,
+                    "spi": 1
+                  }
+                },
+                "signer": "Adventurer"
+              },
+              "itemId": "eastbrook_ritual_vestments"
+            },
+            {
+              "count": 2,
+              "itemId": "linen_scrap"
+            },
+            {
+              "count": 2,
+              "itemId": "spider_leg"
+            },
+            {
+              "count": 4,
+              "itemId": "silverleaf_herb"
+            }
+          ],
+          "lastCraftResult": {
+            "count": 1,
+            "itemId": "minor_healing_potion",
+            "ok": true,
+            "quality": "common",
+            "recipeId": "recipe_minor_healing_potion"
+          },
+          "lastMasterwork": {
+            "crafter": 959,
+            "itemId": "eastbrook_ritual_vestments",
+            "recipeId": "recipe_eastbrook_ritual_vestments"
+          },
+          "lifetimeXp": 48,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {},
+            "marks": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ],
+            "recent": [
+              "masterwork:first",
+              "masterwork:tailoring"
+            ]
+          },
+          "talents": {
+            "rows": {}
+          },
+          "tierMailSent": [
+            [
+              "leatherworking",
+              0
+            ],
+            [
+              "tailoring",
+              0
+            ]
+          ],
+          "townFocus": {},
+          "xp": 48
+        }
+      ],
+      "entities": [
+        {
+          "aiState": "idle",
+          "attackPower": 46,
+          "auras": [
+            {
+              "duration": 3600,
+              "id": "battle_stance",
+              "kind": "battle_stance",
+              "name": "Battle Stance",
+              "remaining": 3600,
+              "school": "physical",
+              "sourceId": 959
+            }
+          ],
+          "blockChance": 0.05,
+          "blockValue": 6,
+          "castRemaining": 1.75,
+          "castTotal": 1.75,
+          "castingAbility": "crafting",
+          "combatTimer": 99,
+          "comboUntil": -1,
+          "craftCastBatchRemaining": 2,
+          "craftCastBatchTotal": 2,
+          "craftCastRecipeId": "recipe_minor_healing_potion",
+          "critChance": 0.06,
+          "detonateTimer": "Infinity",
+          "dodgeChance": 0.06,
+          "fallStartY": 1.5,
+          "fiveSecondRule": 99,
+          "hp": 100,
+          "id": 959,
+          "kind": "player",
+          "level": 1,
+          "lootFfaTimer": "Infinity",
+          "maxHp": 100,
+          "maxResource": 100,
+          "moveSpeed": 7,
+          "offhandItemId": "eastbrook_buckler",
+          "onGround": true,
+          "overpowerUntil": -1,
+          "petMode": "defensive",
+          "pos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "potionCooldownUntil": -1,
+          "resourceType": "rage",
+          "spawnPos": {
+            "x": 2,
+            "y": 1.5,
+            "z": -2
+          },
+          "spellPower": 5,
+          "stats": {
+            "agi": 20,
+            "armor": 144,
+            "int": 10,
+            "spi": 11,
+            "sta": 23,
+            "str": 23
+          },
+          "templateId": "warrior",
+          "weapon": {
+            "max": 5,
+            "min": 2,
+            "speed": 2
+          }
+        }
+      ]
+    },
+    {
+      "tick": 0,
+      "time": 0,
+      "nextId": 964,
+      "state": "e8b58ae5",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -928,9 +1153,6 @@
             "alchemy": 2,
             "tailoring": 200
           },
-          "craftThrottle": {
-            "count": 3
-          },
           "deedStats": {
             "counters": {
               "craftsPerformed": 3,
@@ -993,6 +1215,18 @@
                 "signer": "Adventurer"
               },
               "itemId": "eastbrook_ritual_vestments"
+            },
+            {
+              "count": 2,
+              "itemId": "linen_scrap"
+            },
+            {
+              "count": 2,
+              "itemId": "spider_leg"
+            },
+            {
+              "count": 4,
+              "itemId": "silverleaf_herb"
             }
           ],
           "lastCraftResult": {
@@ -1056,8 +1290,14 @@
           ],
           "blockChance": 0.05,
           "blockValue": 6,
+          "castRemaining": 1.75,
+          "castTotal": 1.75,
+          "castingAbility": "crafting",
           "combatTimer": 99,
           "comboUntil": -1,
+          "craftCastBatchRemaining": 2,
+          "craftCastBatchTotal": 2,
+          "craftCastRecipeId": "recipe_minor_healing_potion",
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,

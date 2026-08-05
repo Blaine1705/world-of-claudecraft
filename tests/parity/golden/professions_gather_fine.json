@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fdb7b133",
+      "state": "60db104b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -44,7 +44,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -154,7 +153,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "a62dc71b",
+      "state": "3717936d",
       "events": "0e7303b4",
       "rng": {
         "draws": 2,
@@ -182,7 +181,6 @@
             "xpGained": 36
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -333,7 +331,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 964,
-      "state": "ec96ac1a",
+      "state": "3d103502",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
@@ -361,7 +359,6 @@
             "xpGained": 72
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -521,7 +518,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "4bae56d6",
+      "state": "04cff3c4",
       "events": "459b8e0e",
       "rng": {
         "draws": 6,
@@ -549,7 +546,6 @@
             "xpGained": 108
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -716,7 +712,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "7e61b833",
+      "state": "ac46df9b",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -744,7 +740,6 @@
             "xpGained": 108
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},

@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "fdb7b133",
+      "state": "60db104b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -152,7 +151,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "3f512976",
+      "state": "091eb548",
       "events": "65a4cf51",
       "rng": {
         "draws": 0,
@@ -178,7 +177,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -304,7 +302,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "29ad2944",
+      "state": "fd0b91f4",
       "events": "0ce93a3d",
       "rng": {
         "draws": 40,
@@ -334,7 +332,6 @@
             "questProgress": 8
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 8432,
@@ -487,7 +484,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 972,
-      "state": "9d58982b",
+      "state": "9a2cab9d",
       "events": "d6b1e3df",
       "rng": {
         "draws": 40,
@@ -520,7 +517,6 @@
             "xpGained": 250
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 8432,
@@ -662,7 +658,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 972,
-      "state": "03d2c7bc",
+      "state": "3035f21c",
       "events": "741638a5",
       "rng": {
         "draws": 40,
@@ -695,7 +691,6 @@
             "xpGained": 250
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 8432,

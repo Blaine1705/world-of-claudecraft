@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "329c627b",
+      "state": "44fcce3d",
       "events": "12a279d3",
       "rng": {
         "draws": 0,
@@ -56,7 +56,6 @@
           "copper": 100,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -118,7 +117,6 @@
           "copper": 50,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -280,7 +278,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "c30eeacb",
+      "state": "2db92ca1",
       "events": "617d372f",
       "rng": {
         "draws": 0,
@@ -306,7 +304,6 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -370,7 +367,6 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -539,7 +535,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "c30eeacb",
+      "state": "2db92ca1",
       "events": "09a1792d",
       "rng": {
         "draws": 0,
@@ -565,7 +561,6 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -629,7 +624,6 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -798,7 +792,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "c30eeacb",
+      "state": "2db92ca1",
       "events": "11d76342",
       "rng": {
         "draws": 0,
@@ -824,7 +818,6 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -888,7 +881,6 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -1057,7 +1049,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 965,
-      "state": "956aec1a",
+      "state": "b932dc7a",
       "events": "0d9f0e73",
       "rng": {
         "draws": 0,
@@ -1083,7 +1075,6 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -1154,7 +1145,6 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -1331,7 +1321,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 965,
-      "state": "956aec1a",
+      "state": "b932dc7a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1357,7 +1347,6 @@
           "copper": 80,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1
@@ -1428,7 +1417,6 @@
           "copper": 70,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "tradesCompleted": 1

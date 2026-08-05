@@ -45,6 +45,7 @@ import { Sim } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE, xpForLevel } from '../src/sim/types';
 import { groundHeight, terrainHeight, waterLevelAt } from '../src/sim/world';
 import { bareClient } from './helpers/bare_client';
+import { runRecharge } from './helpers/enchant_family_cast';
 import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 function mustMeta(sim: Sim, pid: number) {
@@ -1302,8 +1303,11 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
     // And COMPLETES: the completion re-gate reserved the same base grade,
     // the grant minted it, and the unfired prompt effect kept its charge.
-    // Partial stack plus rarity mint; quantity re-recorded after feature-branch
-    // world-gen draw-order shift (4 to 3).
+    // 3 = the 1-ore partial stack plus a 2-unit rare-rarity mint. Content
+    // commits keep shifting the shared rng stream and with it the seed-42
+    // rarity draw: common (1 unit) before the zones 1-3 quest-dedupe pass,
+    // epic (3 units) after it, rare (2 units) since the v0.35.0 release
+    // content commits (enchant offhand, hunter offhand, the deeds catalog).
     expect(sim.countItem('iron_ore', pid)).toBe(3);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(
@@ -1341,8 +1345,8 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // The confirmed mining use survived the herbalism mint: fine grade
-    // minted, mining charge spent. Quantity re-recorded after feature-branch
-    // world-gen draw-order shift (3 to 2).
+    // minted, mining charge spent. 2 units since the v0.35.0 release content
+    // commits moved the seed-42 rarity draw to rare (2 per mint).
     expect(sim.countItem('fine_iron_ore', pid)).toBe(2);
     expect(slot.durability).toBe(chargesBefore - 1);
   });
@@ -1374,8 +1378,9 @@ describe('fine material grades on the live harvest path', () => {
     sim.tick();
 
     // Consent retired with the old slot: the new prompt slot did not fire,
-    // the harvest minted base grade, and the fresh charge is intact. Quantity
-    // re-recorded after feature-branch world-gen draw-order shift (3 to 2).
+    // the harvest minted base grade, and the fresh charge is intact. 2 units
+    // since the v0.35.0 release content commits moved the seed-42 rarity draw
+    // to rare (2 per mint).
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(sim.countItem('iron_ore', pid)).toBe(2);
     expect(minted?.durability).toBe(mintedCharges);
@@ -1616,7 +1621,7 @@ describe('fine material grades on the live harvest path', () => {
     slot.durability = 5;
     sim.addItem('arcane_dust', 10, pid);
     sim.addItem('arcane_shard', 10, pid);
-    sim.rechargeToolEffect('mining', pid);
+    runRecharge(sim, 'mining', pid);
     sim.tick();
     expect(sim.countItem('arcane_dust', pid)).toBe(10);
     expect(sim.countItem('arcane_shard', pid)).toBe(8);

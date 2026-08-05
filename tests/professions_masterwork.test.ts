@@ -39,6 +39,7 @@ import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import type { Rng } from '../src/sim/rng';
 import { Sim } from '../src/sim/sim';
 import type { CoreStats } from '../src/sim/types';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const statSum = (stats: Partial<CoreStats> | null | undefined): number => {
   if (!stats) return 0;
@@ -398,11 +399,13 @@ describe('draw-order determinism over a real Sim', () => {
   // ceiling), skill 200 (tier-8 capability, past the specialization
   // threshold), so each successful vestments craft rolls the proc at
   // 0.03 + 0.08 + 0.03 = 0.14. Seed 3 was hunted (bounded scan from seed 1,
-  // re-recorded after the zones 1-3 quest-dedupe content pass added camps,
-  // mobs, and items, shifting the construction-time world-gen draw sequence)
-  // so the three-success sequence procs on the second and third successful
-  // crafts; only the pinned literal is committed, per the suite idiom. Spares
-  // on record: 7, 15, 28, 41, and 159.
+  // re-recorded whenever a content commit shifts the construction-time
+  // world-gen draw sequence: after the zones 1-3 quest-dedupe pass, then
+  // 74 -> 3 after the v0.35.0 release content commits added the enchant and
+  // hunter offhands and the deeds catalog) so the three-success sequence procs
+  // on the second and third successful crafts; only the pinned literal is
+  // committed, per the suite idiom. Spares on record: 7, 15, 28, 41, and 159.
+  // tests/professions_silent_loot.test.ts follows this same literal.
   const SEED = 3;
 
   function run() {
@@ -425,7 +428,7 @@ describe('draw-order determinism over a real Sim', () => {
     const drawCounts: number[] = [];
     const craft = (recipeId: string) => {
       const before = draws;
-      sim.craftItem(recipeId, false, pid);
+      runCraft(sim, recipeId, false, pid);
       drawCounts.push(draws - before);
       return { ...sim.lastCraftResult! };
     };
@@ -514,18 +517,19 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
     const pid = sim.playerId;
     setup(sim, pid);
-    sim.craftItem('recipe_eastbrook_ritual_vestments', false, pid);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
     return { ...sim.lastCraftResult! };
   }
 
   it('a self-signed reagent feeds the proc chance: the same seed procs only with the signed copy', () => {
-    // Seed 151, hunted (re-recorded after the zones 1-3 quest-dedupe content
-    // pass added camps, mobs, and items, shifting the construction-time
-    // world-gen draw sequence): the single proc draw lands in [0.03, 0.05),
-    // above the 3 percent base but under base plus the 2 percent
-    // signed-reagent bonus, so the proc fires ONLY when crafting.ts passes
-    // the signed-reagent holding check into masterworkProcChance. Spares on
-    // record: 141, 409, and 434.
+    // Seed 151, hunted (re-recorded whenever a content commit shifts the
+    // construction-time world-gen draw sequence: after the zones 1-3
+    // quest-dedupe pass, then 51 -> 151 after the v0.35.0 release content
+    // commits added the enchant and hunter offhands and the deeds catalog):
+    // the single proc draw lands in [0.03, 0.05), above the 3 percent base but
+    // under base plus the 2 percent signed-reagent bonus, so the proc fires
+    // ONLY when crafting.ts passes the signed-reagent holding check into
+    // masterworkProcChance. Spares on record: 186, 241, 259, and 287.
     const SEED = 151;
     const signed = craftVestments(SEED, (sim, pid) => {
       const meta = (sim as any).players.get(pid);
@@ -583,14 +587,15 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     // grades that player silently loses MASTERWORK_SIGNED_CHANCE for having
     // used the better tool.
     //
-    // Seed 21, re-hunted on this recipe after the zones 1-3 quest-dedupe
-    // content pass (the added camps, mobs, and items moved the
-    // construction-time draws, so the old 67 window and its spares all
-    // collapsed): the single proc draw lands where the 2 percent
-    // signed-reagent term alone decides the outcome. The spares (122, 253,
-    // 268) RUN below rather than sitting on record, so a draw-order shift
+    // Seed 87, re-hunted on this recipe after the v0.35.0 release content
+    // commits (the enchant offhand, the hunter offhand, and the deeds catalog
+    // moved the construction-time draws, so the old 21 window and its spares
+    // all collapsed, exactly as the 67 window collapsed before them at the
+    // zones 1-3 quest-dedupe pass): the single proc draw lands where the 2
+    // percent signed-reagent term alone decides the outcome. The spares (151,
+    // 186, 207) RUN below rather than sitting on record, so a draw-order shift
     // that collapses one window fails loudly instead of quietly narrowing
-    // the pin to a lone seed.
+    // the pin to a lone seed. Further hits on record: 227 and 259.
     const SEEDS = [87, 151, 186, 207];
     const craftLongsword = (seed: number, setup: (sim: Sim, pid: number) => void) => {
       const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -605,7 +610,7 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
       // other live-craft cases in this file reach a gated recipe.
       (sim as any).players.get(pid)?.knownRecipes?.add(recipe.id);
       setup(sim, pid);
-      sim.craftItem(recipe.id, false, pid);
+      runCraft(sim, recipe.id, false, pid);
       return { ...(sim as any).lastCraftResult };
     };
     const reagentsExceptOre = (sim: Sim, pid: number) => {
@@ -661,15 +666,17 @@ describe('proc-chance wiring over a real Sim (hunted boundary-window seeds)', ()
     // Premise anchor: the content threshold this boundary rides. A content
     // retune moves the boundary and this seed must be re-hunted.
     expect(PERK_THRESHOLDS.tailoring.specializedSkillThreshold).toBe(75);
-    // Seed 26, hunted (re-recorded after the zones 1-3 quest-dedupe content
-    // pass added camps, mobs, and items, shifting the construction-time
-    // world-gen draw sequence): the single proc draw lands in
-    // [0.06, 0.09). At skill 74 (tier 2, not specialized) the chance is
-    // 0.03 + 0.02 = 0.05: miss. At 75 and 76 (tier 3, specialized) it is
-    // 0.03 + 0.03 + 0.03 = 0.09: proc, and only if BOTH the tiersAboveRecipe
-    // term and isSpecialized are wired into masterworkProcChance by
-    // crafting.ts (either wiring dropped leaves the chance at or below 0.06,
-    // under the hunted draw). Spares on record: 93, 100, 131, and 175.
+    // Seed 26, hunted (re-recorded whenever a content commit shifts the
+    // construction-time world-gen draw sequence: after the zones 1-3
+    // quest-dedupe pass, then 66 -> 26 after the v0.35.0 release content
+    // commits added the enchant and hunter offhands and the deeds catalog):
+    // the single proc draw lands in [0.06, 0.09). At skill 74 (tier 2, not
+    // specialized) the chance is 0.03 + 0.02 = 0.05: miss. At 75 and 76
+    // (tier 3, specialized) it is 0.03 + 0.03 + 0.03 = 0.09: proc, and only if
+    // BOTH the tiersAboveRecipe term and isSpecialized are wired into
+    // masterworkProcChance by crafting.ts (either wiring dropped leaves the
+    // chance at or below 0.06, under the hunted draw). Spares on record: 36,
+    // 62, 83, and 87.
     const SEED = 26;
     const at = (skill: number) =>
       craftVestments(SEED, (sim, pid) => {

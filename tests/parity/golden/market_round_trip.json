@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "3bd18c53",
+      "state": "f246d073",
       "events": "c85885ae",
       "rng": {
         "draws": 0,
@@ -57,7 +57,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -119,7 +118,6 @@
           "copper": 5000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -282,7 +280,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "e64d71fd",
+      "state": "72809195",
       "events": "17ee87a4",
       "rng": {
         "draws": 0,
@@ -307,7 +305,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -369,7 +366,6 @@
           "copper": 5000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -532,7 +528,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "e64d71fd",
+      "state": "72809195",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -557,7 +553,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -619,7 +614,6 @@
           "copper": 5000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -782,7 +776,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "e64d71fd",
+      "state": "72809195",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -807,7 +801,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -869,7 +862,6 @@
           "copper": 5000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1032,7 +1024,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "9c37cf4e",
+      "state": "4d38a156",
       "events": "ac8345cb",
       "rng": {
         "draws": 0,
@@ -1057,7 +1049,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1119,7 +1110,6 @@
           "copper": 4700,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1287,7 +1277,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 965,
-      "state": "9c37cf4e",
+      "state": "4d38a156",
       "events": "5c87dfeb",
       "rng": {
         "draws": 0,
@@ -1312,7 +1302,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1374,7 +1363,6 @@
           "copper": 4700,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1542,7 +1530,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "976bf0ca",
+      "state": "3a2c93c2",
       "events": "1fc26b9f",
       "rng": {
         "draws": 0,
@@ -1553,7 +1541,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "976bf0ca",
+      "state": "3a2c93c2",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1578,7 +1566,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1643,7 +1630,6 @@
           "copper": 4700,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1814,7 +1800,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "6022647e",
+      "state": "1dd739aa",
       "events": "b6165e7f",
       "rng": {
         "draws": 0,
@@ -1840,7 +1826,6 @@
           "copper": 285,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "marketSaleCopper": 285
@@ -1907,7 +1892,6 @@
           "copper": 4700,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2078,7 +2062,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "6022647e",
+      "state": "1dd739aa",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -2104,7 +2088,6 @@
           "copper": 285,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "marketSaleCopper": 285
@@ -2171,7 +2154,6 @@
           "copper": 4700,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},

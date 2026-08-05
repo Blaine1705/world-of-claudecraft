@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "db584712",
+      "state": "ad083206",
       "events": "b1db937b",
       "rng": {
         "draws": 1,
@@ -58,7 +58,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -124,7 +123,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -189,7 +187,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -471,7 +468,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "925dc54f",
+      "state": "0c060dbb",
       "events": "a6391139",
       "rng": {
         "draws": 3,
@@ -499,7 +496,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -584,7 +580,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -656,7 +651,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -951,7 +945,7 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "406ae284",
+      "state": "3930d0ce",
       "events": "afbb260e",
       "rng": {
         "draws": 3,
@@ -979,7 +973,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -1064,7 +1057,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1152,7 +1144,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1431,7 +1422,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 967,
-      "state": "7b309c63",
+      "state": "9d3c7abf",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -1459,7 +1450,6 @@
             "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 34,
@@ -1544,7 +1534,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1632,7 +1621,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
