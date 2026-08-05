@@ -1579,11 +1579,11 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
       // Both sides of every v0.36.0 sync move this bucket split independently
-      // (the branch's reliquary window row and the char-sheet latch against the
-      // release's own window/chrome churn), so it cannot be reconciled by
-      // arithmetic across a merge. The numbers below were set from a suite run
-      // on the merged tree, not from either side's narrative.
-    ).toEqual({ window: 47, chrome: 82, none: 17 });
+      // (the branch's woc_market window row against the release's own
+      // window/chrome churn), so it cannot be reconciled by arithmetic across
+      // a merge. The numbers below were counted from the merged table itself,
+      // not from either side's narrative.
+    ).toEqual({ window: 48, chrome: 82, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

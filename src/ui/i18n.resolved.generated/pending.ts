@@ -176,9 +176,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -350,9 +347,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -524,9 +518,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -698,9 +689,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -873,9 +861,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -1047,9 +1032,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -1225,9 +1207,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -1400,9 +1379,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -1574,9 +1550,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -1748,9 +1721,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -1922,9 +1892,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -2096,9 +2063,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -2270,9 +2234,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -2444,9 +2405,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
@@ -2618,9 +2576,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabSell",
     "hudChrome.wocMarket.termsLabel",
     "hudChrome.wocMarket.title",
-    "hudChrome.wocMarket.totpLabel",
-    "hudChrome.wocMarket.totpNote",
-    "hudChrome.wocMarket.totpPlaceholder",
     "hudChrome.wocMarket.variableTokenWarning",
     "hudChrome.wocMarket.walletBanner",
     "hudChrome.wocMarket.yourListing"
