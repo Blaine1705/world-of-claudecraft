@@ -4405,6 +4405,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.showItemLevel': 'Zobrazit úroveň předmětu',
   'hudChrome.options.showOwnNameplate': 'Zobrazit mou jmenovku',
   'hudChrome.options.showPlayerNameplates': 'Zobrazit jmenovky hráčů',
+  'hudChrome.options.hideUnusedActionSlots': 'Skrýt nepoužitá políčka akcí',
   'hudChrome.options.showSecondaryActionBar': 'Zobrazit sekundární akční lištu',
   'hudChrome.options.showWalletOnCharacterScreen': 'Zobrazit peněženku na obrazovce postavy',
   'hudChrome.options.showWalletOnPlayerCard': 'Zobrazit peněženku na kartě hráče',

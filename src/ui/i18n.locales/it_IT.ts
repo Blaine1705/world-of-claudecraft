@@ -8127,6 +8127,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': "Annuncia un'incursione, un raduno o un evento",
   'hudChrome.discord.relay.help.label': 'Serve aiuto',
   'hudChrome.discord.relay.help.hint': 'Chiedi aiuto alla comunita',
+  'hudChrome.options.hideUnusedActionSlots': 'Nascondi gli slot azione inutilizzati',
   'hudChrome.options.showSecondaryActionBar': 'Mostra la barra delle azioni secondaria',
   'errors.api.desktopCodeInvalid':
     'Il codice di accesso desktop non è valido o è scaduto. Riprova.',

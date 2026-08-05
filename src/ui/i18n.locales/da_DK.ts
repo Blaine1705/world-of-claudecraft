@@ -7859,6 +7859,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.help.label': 'Brug for hjælp',
   'hudChrome.discord.relay.help.hint': 'Bed fællesskabet om hjælp',
   'hudChrome.options.showPlayerNameplates': 'Vis spillernavneskilte',
+  'hudChrome.options.hideUnusedActionSlots': 'Skjul ubrugte handlingsfelter',
   'hudChrome.options.showSecondaryActionBar': 'Vis sekundær handlingslinje',
   'desktop.crash.body': 'Spilvisningen holdt op med at virke. Genindlæs den?',
   'desktop.crash.fatalBody': 'World of ClaudeCraft stødte på en uventet fejl og skal lukke.',

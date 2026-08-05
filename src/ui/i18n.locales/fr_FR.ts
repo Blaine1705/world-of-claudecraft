@@ -8608,6 +8608,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.relay.event.hint': 'Annoncer un raid, une rencontre ou un événement',
   'hudChrome.discord.relay.help.label': "Besoin d'aide",
   'hudChrome.discord.relay.help.hint': "Demander de l'aide à la communauté",
+  'hudChrome.options.hideUnusedActionSlots': "Masquer les emplacements d'action inutilisés",
   'hudChrome.options.showSecondaryActionBar': "Afficher la barre d'action secondaire",
   'errors.api.desktopCodeInvalid':
     "Le code de connexion de l'application de bureau est invalide ou expiré. Veuillez réessayer.",
