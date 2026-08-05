@@ -11,6 +11,12 @@ type CombatEventParty = {
  * throwing inside the per-session fan-out.
  */
 export type CombatEventOwnerLookup = (entityId: number) => number | null;
+export type CombatEventTapperLookup = (entityId: number) => number | null;
+
+export interface CombatEventDeliveryLookups {
+  ownerOf: CombatEventOwnerLookup;
+  tapperOf: CombatEventTapperLookup;
+}
 
 /**
  * Who an entity acts FOR. A pet is not a combat participant in its own right:
@@ -20,6 +26,33 @@ export type CombatEventOwnerLookup = (entityId: number) => number | null;
  */
 function principalOf(entityId: number, ownerOf: CombatEventOwnerLookup): number {
   return ownerOf(entityId) ?? entityId;
+}
+
+function combatOwnerOf(
+  entityId: number,
+  { ownerOf, tapperOf }: CombatEventDeliveryLookups,
+): number | null {
+  return ownerOf(entityId) ?? tapperOf(entityId);
+}
+
+function entityCombatPrincipal(
+  entityId: number,
+  lookups: CombatEventDeliveryLookups,
+): number | null {
+  return combatOwnerOf(entityId, lookups) ?? entityId;
+}
+
+function isViewerPrincipalParticipant(
+  first: number | null,
+  second: number | null,
+  viewerPid: number,
+  viewerParty: CombatEventParty | null,
+): boolean {
+  if (first === viewerPid || second === viewerPid) return true;
+  return (
+    (first !== null && viewerParty?.members.includes(first) === true) ||
+    (second !== null && viewerParty?.members.includes(second) === true)
+  );
 }
 
 function isViewerCombatParticipant(
@@ -55,11 +88,23 @@ export function shouldDeliverCombatEventToViewer(
   ev: SimEvent,
   viewerPid: number,
   viewerParty: CombatEventParty | null,
-  ownerOf: CombatEventOwnerLookup,
+  lookups: CombatEventDeliveryLookups,
 ): boolean {
+  const { ownerOf } = lookups;
   if (ev.type === 'damage')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
   if (ev.type === 'heal2')
     return isViewerCombatParticipant(ev.sourceId, ev.targetId, viewerPid, viewerParty, ownerOf);
+  if (ev.type === 'death') {
+    const killedFor = entityCombatPrincipal(ev.entityId, lookups);
+    const killerFor = ev.killerId >= 0 ? entityCombatPrincipal(ev.killerId, lookups) : null;
+    if (combatOwnerOf(ev.entityId, lookups) === null && killerFor === null) return true;
+    return isViewerPrincipalParticipant(killedFor, killerFor, viewerPid, viewerParty);
+  }
+  if (ev.type === 'aura') {
+    const targetFor = combatOwnerOf(ev.targetId, lookups);
+    if (targetFor === null) return true;
+    return isViewerPrincipalParticipant(targetFor, null, viewerPid, viewerParty);
+  }
   return true;
 }
