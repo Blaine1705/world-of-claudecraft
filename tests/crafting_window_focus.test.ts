@@ -57,6 +57,10 @@ function craftingDeps(): CraftingWindowDeps {
     moneyHtml: () => '',
     itemTooltip: () => '',
     attachTooltip: () => {},
+    // Added by the commission order board (#2776), which extended
+    // CraftingWindowDeps without updating this fixture; the omission red-fails
+    // repo-wide tsc, so every branch inherits it until one of them supplies it.
+    onOpenOrders: () => {},
     commissionChecked: () => false,
     onToggleCommission: () => {},
     selectedCraft: () => null,
