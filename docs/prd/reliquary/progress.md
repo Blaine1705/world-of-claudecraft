@@ -99,17 +99,6 @@
   Reviews: cross-platform-sync GREEN; database-performance PASS; test-coverage
   auditor BLOCKING/SHOULD-FIX addressed. No architecture second look required.
 
-## Surprises / decisions during implementation
-
-- Phase 1 ships one stub Conqueror page (`conquerors_hollow_crypt` / `boundstone_helm`) so the discovery hook and tests exercise a real catalogued id; Phase 2 expands the full Conqueror catalog and may replace or absorb the stub.
-- Phase 2 absorbed the stub page id: Hollow Crypt now lists cryptbone / greyjaw / gravewoven uniques; `boundstone_helm` lives on Sanctum (its real drop).
-- Heroic pages list `HEROIC_BOSS_LOOT` gear only; mount reins stay for Horizons. `heroic_<base>` variants are not catalogued (base discovery already credits the base id).
-- World-boss clear meter uses existing `deedStats.counters.thunzharrKills` via a new `deed_stat` clearSource kind (no parallel counter).
-- Epic set pages pin members to the same lists as `col_set_*` deeds; multi-page fill is intentional for shared set pieces.
-- Phase 3: wire key `reliq` (omit-empty SavedReliquaryState). Fans out to three
-  IWorld members so it is outside TERSE_TO_IWORLD (asserted directly like tal).
-- Phase 3: `reliquaryUnlock` dirties heavy self only; detectActivity does not
-  force saveCharacter (unlike deedUnlocked).
 - Phase 4: merged `origin/release/v0.35.0` (already up to date @ `5e83ba89d0`).
   Green:
   - `npx vitest run tests/reliquary_view.test.ts tests/reliquary_window.test.ts tests/hud_update_drive.test.ts tests/hud_perf_budget.test.ts tests/architecture.test.ts` (**177 passed**, 4 skipped)
@@ -125,7 +114,7 @@
   content names still catalog English (content re-localize later); mark
   find labels deferred to Phase 7.
   Reviews: frontend-seam-reviewer YELLOW (SHOULD-FIX: clearsDigest + CSS banner
-  + window/window tests addressed; page-name content i18n deferred); test-coverage
+  + view/window tests addressed; page-name content i18n deferred); test-coverage
   auditor YELLOW (BLOCKING nearly-rank + cap pin fixed).
 
 ## Surprises / decisions during implementation
