@@ -1774,6 +1774,7 @@ export class Renderer {
   private visualPool = new Map<string, CharacterVisual[]>();
   private pooledVisualCount = 0;
   private objectPool = new Map<string, PooledObjectView[]>();
+  private pooledObjectCount = 0;
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
   private readonly canvas: HTMLCanvasElement;
   private unregisterWebGLContext: (() => void) | null = null;
@@ -2820,6 +2821,7 @@ export class Renderer {
     this.visualPool.clear();
     this.pooledVisualCount = 0;
     this.objectPool.clear();
+    this.pooledObjectCount = 0;
     this.clickTargets.length = 0;
     this.gatherNodeMeshes = [];
     this.viewLights.length = 0;
@@ -4595,6 +4597,8 @@ export class Renderer {
     const pool = this.objectPool.get(key);
     const object = pool?.pop() ?? null;
     if (!object) return null;
+    this.pooledObjectCount = Math.max(0, this.pooledObjectCount - 1);
+    if (pool?.length === 0) this.objectPool.delete(key);
     object.group.removeFromParent();
     object.group.visible = true;
     object.group.position.set(0, 0, 0);
@@ -4605,6 +4609,14 @@ export class Renderer {
 
   private storePooledObject(key: string, object: PooledObjectView): void {
     object.group.removeFromParent();
+    // Unlike the character-visual pool, an overflow view has nothing to .dispose(): its
+    // geometry/materials are shared per-item-template references (owned elsewhere), so
+    // simply not pooling it drops the only reference to its Group/Object3D graph and lets
+    // GC reclaim it. Without this cap every distinct harvest node/loot pile/quest pickup a
+    // player interacted with stayed retained for the rest of the session on every platform.
+    // shouldRetainPooledCharacterVisual is a generic bounded-retention check (currentCount
+    // < maxCount, Infinity-safe); reused here rather than duplicating it under a second name.
+    if (!shouldRetainPooledCharacterVisual(this.pooledObjectCount, GFX.maxPooledObjects)) return;
     object.group.visible = false;
     object.group.position.set(0, 0, 0);
     object.group.rotation.set(0, 0, 0);
@@ -4615,6 +4627,7 @@ export class Renderer {
       this.objectPool.set(key, pool);
     }
     pool.push(object);
+    this.pooledObjectCount++;
   }
 
   private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {

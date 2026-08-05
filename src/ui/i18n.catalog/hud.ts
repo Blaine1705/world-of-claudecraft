@@ -29,8 +29,14 @@ const hudStringsEn = {
       releaseSpirit: 'Release Spirit',
       chatTab: 'Chat',
       combatLogTab: 'Combat Log',
+      // Lists the slash-command legend AND, since issue #1230, a plain-language
+      // pointer to the "!" community-relay commands (LFG/WTS/WTB/recruit/event/
+      // help, src/sim/discord_relay.ts): the chatbox already opens an autocomplete
+      // on "!" (src/ui/chat_command_menu.ts), but nothing told a player it
+      // existed. Reworded value, not a new key: existing overlay translations
+      // stay in place until refreshed (README i18n workflow), same as any reword.
       chatPlaceholder:
-        'Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help)',
+        'Say something... (/s say, /w name whisper, /r reply, /p party, /gu guild, /o officer, /general general, /help, ! for community commands)',
       chatChannels: {
         add: 'Add chat channel',
         addTitle: 'Add channel',
