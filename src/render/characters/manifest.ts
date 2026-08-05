@@ -326,6 +326,17 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// mob_troll's own attack (scripts/build_troll_anims.mjs, issue #2889):
+// BIPED14's Punch/Weapon is shared by reference across 6 unrelated families
+// (a yeti, a frog-murloc, a demon and its alt among them). This clip is baked
+// off orc.glb's own donor poses (a crouch coil, the existing overhand club
+// swing, the existing punch's follow-through lean, and a head nod), so only
+// mob_troll gets it; the other 5 BIPED14 families are untouched.
+const TROLL_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Troll_Smash'],
+};
+
 // Tripo biped rig. These creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
@@ -784,8 +795,45 @@ export const VISUALS: Record<string, VisualDef> = {
         // Dirt Toss throws dirt, not daggers: the synthesized crouch-scoop
         // and underhand fling (scripts/_add_dirt_throw_anim.mjs).
         blind: 'Dirt_Throw',
+        // Rest of the kit (scripts/build_rogue_ability_anims.mjs, issue
+        // #2889): pose-sample-and-blend clips off rogue.glb's own donor
+        // poses. Wicked Slash is the combo-builder poke; Eye Jab and Sap
+        // share its silhouette since both are instant single-target
+        // debilitating strikes with no unique read of their own.
+        sinister_strike: 'Rogue_Quick_Strike',
+        gouge: 'Rogue_Quick_Strike',
+        sap: 'Rogue_Quick_Strike',
+        // Craven Thrust drives the dagger in from behind.
+        backstab: 'Rogue_Backstab',
+        // Lurker's Strike is the kit's biggest single hit (2.5x weapon,
+        // stealth-gated): its own bigger, more telegraphed lunge.
+        ambush: 'Rogue_Ambush',
+        // Gut Punch and Low Blow both land at gut/kidney height.
+        cheap_shot: 'Rogue_Low_Blow',
+        kidney_shot: 'Rogue_Low_Blow',
+        // Combo-spending finishers read as one decisive two-blade cut.
+        eviscerate: 'Rogue_Finisher_Slash',
+        rupture: 'Rogue_Finisher_Slash',
+        expose_armor: 'Rogue_Finisher_Slash',
+        // Ghostfoot is a defensive dodge buff: rogue.glb's own already-baked
+        // 'Block' guard, no bake needed (the pattern player_warrior's
+        // raised_guard already uses).
+        evasion: 'Block',
+        // Cutthroat Tempo, Smokestep, Quickened Blood, and Duskveil are all
+        // self-buff/stealth toggles with no combat swing to author: rogue.
+        // glb's own already-baked 'Spellcast_Raise', the pattern player_
+        // warrior's sanguine_aura and the hunter batch's aspect toggles both
+        // use. Adder's Bite and Festering Venom (the poison weapon imbues)
+        // are excluded, the same call the mage batch made for its own
+        // utility/summon abilities.
+        slice_and_dice: 'Spellcast_Raise',
+        vanish: 'Spellcast_Raise',
+        adrenaline_rush: 'Spellcast_Raise',
+        stealth: 'Spellcast_Raise',
       },
     },
+    // Ability-specific attack clips (scripts/build_rogue_ability_anims.mjs).
+    animUrls: [`${PLAYERS}/rogue_ability_anims.glb`],
     show: ['Rogue_Cape'],
     attach: [
       { url: `${WEAPONS}/dagger.glb`, bone: 'handslot.r' },
@@ -1332,7 +1380,10 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/orc.glb`,
     height: 2.4,
     // faint wash only — 0.35 flooded every material with the template green
-    clips: BIPED14,
+    clips: TROLL_BIPED14,
+    // Troll_Smash clip donor (scripts/build_troll_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/troll_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.12,
   },
