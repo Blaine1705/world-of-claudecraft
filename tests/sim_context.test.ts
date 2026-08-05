@@ -231,6 +231,7 @@ const CALLBACK_KEYS = [
   'queueQuestLetter',
   'mailHeroicMarks',
   'mailAuthoredLetter',
+  'mailboxHoldsItem',
   // Set proc firing.
   'applySetProcs',
   // Vale Cup <-> Arena queue exclusion (social/vale_cup.ts).
@@ -269,6 +270,7 @@ function makeFakeHost() {
       return entities;
     },
     players: new Map(),
+    masteryResetNoticeCounter: { pending: 0 },
     stationPlacements: [],
     primaryId: -1,
     tradeInvites: new Map(),
@@ -320,6 +322,7 @@ function makeFakeHost() {
     devCommands: false,
     marketListings: [],
     bankerIds: [],
+    guildBanks: new Map(),
     vcup: createVcState(),
     deedDirtyPids: new Set<number>(),
     deedDirtyKeys: new Map<number, Set<string>>(),
@@ -547,6 +550,7 @@ function makeFakeHost() {
     queueQuestLetter: vi.fn(),
     mailHeroicMarks: vi.fn(),
     mailAuthoredLetter: vi.fn(),
+    mailboxHoldsItem: vi.fn(() => false),
     applySetProcs: vi.fn(),
     // Vale Cup <-> Arena queue exclusion.
     vcupSeatedOrQueued: vi.fn(() => false),
@@ -585,6 +589,14 @@ describe('createSimContext (isolated, fake host)', () => {
     expect(ctx.bankerIds).toBe(host.bankerIds);
     host.bankerIds.push(4242); // the Sim ctor pushes ids after the ctx is built
     expect(ctx.bankerIds).toEqual([4242]);
+  });
+
+  it('exposes guildBanks as a live shared view (the bankerIds idiom)', () => {
+    const { host } = makeFakeHost();
+    const ctx = createSimContext(host);
+    expect(ctx.guildBanks).toBe(host.guildBanks);
+    host.guildBanks.set(3, { treasury: 0, inventory: [], purchasedSlots: 0 });
+    expect(ctx.guildBanks.get(3)).toEqual({ treasury: 0, inventory: [], purchasedSlots: 0 });
   });
 
   it('passes every callback through to the host by identity (no rewrapping)', () => {

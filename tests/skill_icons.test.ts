@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { closeSync, existsSync, openSync, readdirSync, readFileSync, readSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -60,9 +61,13 @@ function isValidWebp(file: string): boolean {
 const webpFiles = (): string[] =>
   walk(skillsDir).filter((p) => path.extname(p).toLowerCase() === '.webp');
 
+// The 12 rework ids whose art was superseded by the accepted release art in the
+// v0.34.0 missing-painted-icons wave (bestial_wrath, counter_shot, volley,
+// holy_nova, prayer_of_healing, psychic_scream, shadowform, bloodlust,
+// chain_heal, chain_lightning, earthquake, elemental_mastery) are pinned by the
+// generated-additions test below instead of this PR-provenance fixture.
 const PR_2218_OWNED_CLASS_ICON_IDS = {
   hunter: [
-    'bestial_wrath',
     'bloodhook',
     'bloodtrail_assault',
     'cold_focus',
@@ -77,17 +82,10 @@ const PR_2218_OWNED_CLASS_ICON_IDS = {
     'stampede',
     'trailbreak',
     'unleash_beast',
-    'counter_shot',
-    'volley',
     'wildheart',
   ],
   shaman: [
     'ancestor_return',
-    'bloodlust',
-    'chain_heal',
-    'chain_lightning',
-    'earthquake',
-    'elemental_mastery',
     'galeheart_weapon',
     'lifespring_weapon',
     'primal_exaltation',
@@ -100,14 +98,10 @@ const PR_2218_OWNED_CLASS_ICON_IDS = {
   ],
   priest: [
     'choir_of_deliverance',
-    'holy_nova',
     'martyrs_aegis',
-    'prayer_of_healing',
-    'psychic_scream',
     'scouring_mercy',
     'seraphic_vigil',
     'summon_tithefiend',
-    'shadowform',
     'veilstep',
   ],
 } as const;
@@ -117,6 +111,25 @@ const OWNED_CLASS_SPECS = {
   shaman: ['elemental', 'enhancement', 'restoration'],
   priest: ['discipline', 'holy', 'shadow'],
 } as const;
+
+interface MissingWaveAbilityPin {
+  kind: string;
+  id: string;
+  class: string;
+  runtimeUrl: string;
+  acceptedSha256: string;
+  acceptedBytes: number;
+}
+
+function missingWaveAbilityPins(): MissingWaveAbilityPin[] {
+  const manifest = JSON.parse(
+    readFileSync(
+      path.join(repoRoot, 'docs/achievements/missing-painted-icons-accepted-art.json'),
+      'utf8',
+    ),
+  ) as { assets: MissingWaveAbilityPin[] };
+  return manifest.assets.filter((asset) => asset.kind === 'ability');
+}
 
 describe('class ability webp icons', () => {
   it('has image-backed ability ids wired (guards the fixture)', () => {
@@ -238,7 +251,7 @@ describe('class ability webp icons', () => {
     ).toEqual([]);
   });
 
-  it('D) keeps every PR #2218 ability icon at the canonical 128px square size', async () => {
+  it('keeps every PR #2218 ability icon at the canonical 128px square size', async () => {
     const wrongSize: string[] = [];
     for (const [cls, ids] of Object.entries(PR_2218_OWNED_CLASS_ICON_IDS)) {
       for (const id of ids) {
@@ -250,5 +263,71 @@ describe('class ability webp icons', () => {
       }
     }
     expect(wrongSize).toEqual([]);
+  });
+
+  it('D) the 90 generated additions decode as unique, opaque, exact 128px reviewed art', async () => {
+    const pins = missingWaveAbilityPins();
+    expect(pins).toHaveLength(90);
+    const hashes = new Set<string>();
+    const mapped = new Set<string>();
+    for (const className of [
+      'druid',
+      'hunter',
+      'mage',
+      'paladin',
+      'priest',
+      'rogue',
+      'shaman',
+      'warlock',
+      'warrior',
+    ]) {
+      const mapping = JSON.parse(
+        readFileSync(path.join(skillsDir, className, 'mapping.json'), 'utf8'),
+      ) as {
+        abilities: Array<{
+          abilityId: string;
+          sourcePack: string;
+          source?: string;
+          owner?: string;
+          license?: string;
+        }>;
+      };
+      for (const entry of mapping.abilities.filter(
+        ({ sourcePack }) => sourcePack === 'woc_openai_missing_painted_icons_2026_08_01',
+      )) {
+        expect(entry.source, entry.abilityId).toBe('OpenAI built-in image generation');
+        expect(entry.owner, entry.abilityId).toBe('World of ClaudeCraft');
+        expect(entry.license, entry.abilityId).toContain('project asset');
+        expect(entry.license, entry.abilityId).not.toContain('CraftPix');
+        mapped.add(entry.abilityId);
+      }
+    }
+    expect([...mapped].sort()).toEqual(pins.map(({ id }) => id).sort());
+
+    for (const pin of pins) {
+      expect(ABILITY_IMAGE_IDS.has(pin.id), `${pin.id} registry wiring`).toBe(true);
+      expect(abilityImageUrl(pin.id), `${pin.id} runtime URL`).toBe(pin.runtimeUrl);
+      const file = path.join(publicDir, pin.runtimeUrl.replace(/^\//, ''));
+      const bytes = readFileSync(file);
+      expect(bytes.length, `${pin.id} accepted bytes`).toBe(pin.acceptedBytes);
+      expect(bytes.length, `${pin.id} weight ceiling`).toBeLessThanOrEqual(15 * 1024);
+      expect(createHash('sha256').update(bytes).digest('hex'), `${pin.id} accepted hash`).toBe(
+        pin.acceptedSha256,
+      );
+      expect(hashes.has(pin.acceptedSha256), `${pin.id} duplicate painted encoding`).toBe(false);
+      hashes.add(pin.acceptedSha256);
+      const decoded = await sharp(bytes).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      expect(decoded.info.width, `${pin.id} width`).toBe(128);
+      expect(decoded.info.height, `${pin.id} height`).toBe(128);
+      let opaque = true;
+      for (let offset = 3; offset < decoded.data.length; offset += decoded.info.channels) {
+        if (decoded.data[offset] !== 255) {
+          opaque = false;
+          break;
+        }
+      }
+      expect(opaque, `${pin.id} must keep its full-square opaque background`).toBe(true);
+    }
+    expect(hashes.size).toBe(90);
   });
 });

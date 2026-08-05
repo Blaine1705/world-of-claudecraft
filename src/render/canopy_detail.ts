@@ -23,15 +23,16 @@
 // NormalGL x/y sd 0.104/0.103 (isotropy 1.00).
 // Cost: alpha-rejected fragments pay zero canopy taps; surviving fragments
 // inside CANOPY_FADE_END pay 6, and fragments past it pay zero (distance fade
-// below). There is no per-frame CPU work. Gated to HIGH AND UP
-// (GFX.detailLayers, the round-10 medium regate: medium keeps its
-// pre-overhaul canopy look and cost); there is intentionally no parallax
-// here, a cutout canopy has no coherent view-ray height field to walk.
+// below). There is no per-frame CPU work. Gated to ULTRA AND UP
+// (GFX.canopyDetail; the Advanced Foliage Density dial can opt in separately).
+// High keeps plain leaf materials in the recovery profile. There is
+// intentionally no parallax here, a cutout canopy has no coherent view-ray
+// height field to walk.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
 import { patchCanopyDetailShaderSource } from './foliage_shader_core';
-import { GFX } from './gfx';
+import { GFX, type GfxSettings } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 
 const CANOPY_TEXTURE_DIR = '/textures/foliage/';
@@ -118,14 +119,12 @@ interface CanopyTextures {
   ao: THREE.Texture | null;
 }
 const TEX: CanopyTextures = { normal: null, ao: null };
+let canopyTextureTask: Promise<void> | null = null;
 
-// Tiers below high never compile the layer (GFX.canopyDetail, the round-10
-// medium regate), so skip the fetches there. The import-time tier is only a
-// guess; a lower live tier leaves the textures idle, and a higher live tier
-// fails soft to the plain leaf materials (the detail_normals null contract).
-// The loader cache is immutable: clone before the anisotropy tweak (the
-// worn_stone.ts pattern). Both maps are non-color data in linear space.
-if (GFX.canopyDetail) {
+/** Prepare the canopy texture channel selected by an explicit target profile. */
+export function prepareCanopyDetailProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
+  if (!target.canopyDetail || (TEX.normal && TEX.ao)) return Promise.resolve();
+  if (canopyTextureTask) return canopyTextureTask;
   const prep = (name: string): Promise<THREE.Texture> =>
     loadTexture(`${CANOPY_TEXTURE_DIR}${CANOPY_TEXTURE_PREFIX}_${name}.jpg`, {
       repeat: true,
@@ -135,13 +134,19 @@ if (GFX.canopyDetail) {
       t.needsUpdate = true;
       return t;
     });
-  registerDeferredPreload(() =>
-    Promise.all([prep('NormalGL'), prep('AmbientOcclusion')]).then(([n, a]) => {
+  canopyTextureTask = Promise.all([prep('NormalGL'), prep('AmbientOcclusion')])
+    .then(([n, a]) => {
       TEX.normal = n;
       TEX.ao = a;
-    }),
-  );
+    })
+    .catch((err) => {
+      canopyTextureTask = null;
+      throw err;
+    });
+  return canopyTextureTask;
 }
+
+registerDeferredPreload(() => prepareCanopyDetailProfileAssets(GFX));
 
 /**
  * The resolved clump textures for the renderer's boot-prewarm window: like the
@@ -171,8 +176,8 @@ const applied = new WeakSet<THREE.Material>();
 export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void {
   const spec = CANOPY_DETAIL_SPECS[sourceName];
   if (!spec) return;
-  // High and up only (GFX.canopyDetail, the round-10 medium regate; the
-  // Advanced Foliage Density dial maps onto the same knob); ?canopy=off is
+  // Ultra and up only (GFX.canopyDetail; the Advanced Foliage Density dial
+  // maps onto the same knob); ?canopy=off is
   // the dev-only perf-attribution kill switch (render_dev_flags.ts).
   if (!GFX.canopyDetail || renderLayerDisabled('canopy')) return;
   const std = mat as THREE.MeshStandardMaterial;
