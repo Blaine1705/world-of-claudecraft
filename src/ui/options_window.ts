@@ -116,22 +116,6 @@ interface NumericChoiceBinding {
   set(key: NumericSettingKey, value: number): void;
 }
 
-// The seven GameSettings the Key Bindings panel renders alongside the
-// rebindable keys (the settingToggleKeybind + clickMoveMouseButtonRow calls in
-// renderKeybinds below). Its Reset to Defaults must restore these too, not just
-// the key-code map: without this list, a player's custom mouse-camera,
-// click-to-move (and its mouse button), attack-move, left-handed-touch, or
-// profanity-filter choice silently survived a "reset everything" click.
-const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
-  'mouseCamera',
-  'lockCursorOnRotate',
-  'clickToMove',
-  'clickToMoveButton',
-  'attackMove',
-  'leftHandedTouch',
-  'filterProfanity',
-];
-
 // Endonyms for the in-game language picker; never localized (they render
 // identically in every locale, matching the homepage footer picker), keyed by
 // SupportedLanguage so a new locale appears once its label is added here.
@@ -350,6 +334,20 @@ export function buildDeedBroadcastRow(parent: HTMLElement, seam: DeedBroadcastSe
   row.append(name, toggle);
   parent.appendChild(row);
 }
+
+// The GameSettings keys the Key Bindings panel renders alongside the rebindable key
+// map (settingToggleKeybind rows plus the click-to-move mouse-button toggle). Reset
+// to Defaults on this panel must restore these too, not just the key map, since a
+// player reading "Reset to Defaults" on this screen expects the whole screen reset.
+const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [
+  'mouseCamera',
+  'lockCursorOnRotate',
+  'clickToMove',
+  'clickToMoveButton',
+  'attackMove',
+  'leftHandedTouch',
+  'filterProfanity',
+];
 
 export class OptionsWindow {
   private view: OptionsView = 'main';
@@ -883,6 +881,7 @@ export class OptionsWindow {
   // this render pass): Reset to Defaults scopes to exactly the setting keys
   // that view renders (issue 2341), rather than wiping the whole GameSettings
   // object. NoteControl/MusicToggleControl carry no key and are filtered out
+  // by optionsControlKeys.
   private settingsViewFooter(
     controls: OptionsControl[],
     resetAction?: (hooks: OptionsHooks, keys: readonly (keyof GameSettings)[]) => void,
@@ -1266,11 +1265,6 @@ export class OptionsWindow {
     const el = this.deps.root();
     const hooks = this.deps.options();
     const tab = this.interfaceTab;
-    // The full, untagged control list across all four tabs (~40 settings): the
-    // footer's Reset to Defaults must restore every Interface setting the panel
-    // governs, not just whichever tab happens to be open when the player clicks
-    // it, so switching tabs never changes what the shared button resets.
-    const controls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
 
     const stripHost = document.createElement('div');
     stripHost.innerHTML = tabStripHtml(
@@ -1300,8 +1294,12 @@ export class OptionsWindow {
       this.renderThemeControls(body);
     }
 
+    // Built once, across every tab, so Reset to Defaults (settingsViewFooter below)
+    // covers the whole Interface/Comfort panel, not just the tab currently showing.
+    const fullControls = hooks ? buildInterfaceControls(this.settingsSource(hooks)) : [];
+
     if (hooks)
-      this.applyControls(body, interfaceControlsForTab(controls, tab), hooks, (focusKey) => {
+      this.applyControls(body, interfaceControlsForTab(fullControls, tab), hooks, (focusKey) => {
         this.renderInterface();
         if (focusKey)
           this.deps.root().querySelector<HTMLElement>(`[data-setting-key="${focusKey}"]`)?.focus();
@@ -1332,7 +1330,7 @@ export class OptionsWindow {
       }
     }
 
-    this.settingsViewFooter(controls);
+    this.settingsViewFooter(fullControls);
   }
 
   // The chat-timestamp on/off toggle plus the 12/24-hour clock-format pair (the
@@ -1949,10 +1947,7 @@ export class OptionsWindow {
     reset.addEventListener('click', () => {
       audio.click();
       this.deps.keybinds().reset();
-      // The panel also renders seven GameSettings toggles alongside the
-      // rebindable keys (mouse camera, click-to-move and its mouse button,
-      // attack move, left-handed touch, profanity filter); Reset to Defaults
-      // must restore those too, not just the key-code map.
+      const hooks = this.deps.options();
       hooks?.settings.reset(KEYBIND_PANEL_SETTING_KEYS);
       for (const k of KEYBIND_PANEL_SETTING_KEYS) hooks?.onSettingChange(k, hooks.settings.get(k));
       this.capturingKey = null;

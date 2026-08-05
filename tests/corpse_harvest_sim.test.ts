@@ -3235,10 +3235,18 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // every tagged template (it grew with the templates #1584 added), stated so a
     // shrunk sweep reads as wrong rather than merely smaller.
     // Spent rose 86 to 152 with the farm-economy pass, which gave 15 coinless
-    // trash templates their mapped harvest tags. The Drakelands brood,
-    // zones 1 to 3 quest-dedupe content, the Drakelands/Willowfen/Evergarden
-    // harvest-gap fix, and the Galecrest quest beasts together add mapped
-    // harvest rows. bogtoad's all-unmapped ['gills'] subset remains a refusal.
+    // trash templates their mapped harvest tags; refused is untouched because
+    // that arm counts all-unmapped corpses, which neither pass added to.
+    // Then 152 to 164 for the Drakelands brood: whelp, broodguard and
+    // broodlord each carry hide+fang, so each contributes all 4 of its masks
+    // (2 mapped families means no selection can forfeit every yield) and none
+    // to refused, exactly +12/+0. Then 164 to 166 with this branch's zones 1-3
+    // quest-dedupe pass, whose tagged threnos_first_voice adds its two subsets.
+    // The Drakelands/Willowfen/Evergarden harvest-gap fix and the Galecrest
+    // quest beasts layer on top of that 166/16: dune_troll (4 submasks),
+    // bogtoad (4 submasks, one of them the all-unmapped ['gills'] refusal),
+    // hedge_knight (2 submasks), and the later quest targets leave the merged
+    // corpus at 177 spent and 17 refused.
     expect(spent).toBe(177);
     expect(refused).toBe(17);
     expect(spent + refused).toBe(194);
@@ -3325,9 +3333,15 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // so the counts rise while the property above is what actually holds the line.
     expect(unmappedOffered).toBe(39);
     // 113 to 217 for the same reason as the spend census above: more mapped
-    // families in the corpus. The Drakelands brood, zones 1 to 3 quest-dedupe
-    // content, the Drakelands/Willowfen/Evergarden harvest-gap fix, and the
-    // Galecrest quest beasts combine to move this corpus census to 250.
+    // families in the corpus, none of them unmapped, so only this half moves.
+    // 217 to 235 for the Drakelands brood, on the same footing: three hide+fang
+    // templates extract 2 + 1 + 1 + 2 families across their four masks, so +18
+    // here while unmappedOffered above stays put, since neither tag is unmapped.
+    // Then 235 to 237 with this branch's quest-dedupe pass: the tagged
+    // threnos_first_voice adds one cloth extraction on each of its two subsets.
+    // 237 to 248 with the Drakelands/Willowfen/Evergarden harvest-gap fix
+    // (dune_troll, bogtoad, and hedge_knight add mapped-family submasks of
+    // their own), then to 250 with the later Galecrest quest beasts.
     expect(extracted).toBe(250);
   });
 
