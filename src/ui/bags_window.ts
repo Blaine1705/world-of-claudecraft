@@ -35,7 +35,7 @@ import {
   parseBagFilter,
   serializeBagFilter,
 } from './bag_filter';
-import { type BagInstanceGlyphKind, bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
 import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
@@ -69,16 +69,20 @@ import { formatNumber, type TranslationKey, t } from './i18n';
 import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { BagItemDrag, ItemDragState } from './item_drag_state';
 import { resolveDropTargetAt } from './item_drop_hit_test';
+import {
+  INSTANCE_GLYPH_ARIA_KEYS,
+  instanceGlyphMarkHtml,
+  UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS,
+} from './item_instance_glyph_mark';
 import { knownItemDef } from './known_item';
 import type { PainterHostPresentation } from './painter_host';
-import { MASTERWORK_SEAL_IMAGE_URL } from './profession_art';
 import {
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
 } from './prompt_dialog';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
-import { svgIcon, type UiIconName } from './ui_icons';
+import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { totalHeldCount } from './vendor_sell_quantity';
 import { dropOnWorld } from './world_drop_target';
@@ -102,43 +106,10 @@ export function dismissBagPrompts(): void {
 // item with no quality field, so no raw hex lives in the painter.
 const QUALITY_DEFAULT_COLOR = 'var(--color-quality-default)';
 
-// The procedural chrome glyph each per-copy corner kind paints
-// (bag_instance_glyph_view.ts decides WHICH kind; this maps it to art). The
-// masterwork kind is absent on purpose: it keeps its authored seal IMAGE, and
-// the generic kind keeps the pre-existing CSS wedge. No binary asset is added.
-const BAG_GLYPH_ICONS: Readonly<Record<'enchanted' | 'signed' | 'bound', UiIconName>> = {
-  enchanted: 'enchant-rune',
-  signed: 'makers-mark',
-  bound: 'bond-link',
-};
-
-// The accessible name each corner kind gives its CELL. The glyph is aria-hidden,
-// so this is the ONLY channel carrying the per-copy fact to assistive tech: the
-// three visual kinds must not collapse back into one label. 'signed' and the
-// unclassified 'generic' both keep the pre-existing maker-marked wording, which
-// is accurate for a signer payload and is the status quo for the rest.
-// Quest stacks use itemAriaQuest instead (purpose class outranks copy flags for
+// Per-copy aria keys and corner-mark HTML live in item_instance_glyph_mark.ts
+// so bags, bank, and guild bank paint the same masterwork seal / glyphs. Quest
+// stacks still use itemAriaQuest here (purpose class outranks copy flags for
 // the spoken name; the rim/wash always marks them as quest for sighted players).
-const BAG_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> = {
-  masterwork: 'hudChrome.bags.itemAriaMasterwork',
-  enchanted: 'hudChrome.bags.itemAriaEnchanted',
-  signed: 'hudChrome.bags.itemAriaInstanced',
-  bound: 'hudChrome.bags.itemAriaBound',
-  generic: 'hudChrome.bags.itemAriaInstanced',
-};
-
-// The unknown-cell siblings (stale-client guard): the SAME kind map, but
-// every sentence keeps the UNKNOWN signal beside the per-copy flag, because
-// for an unknown stack the tooltip is the only other channel and it is
-// mouse-only. One key per kind, whole sentences, never composed at runtime.
-const UNKNOWN_GLYPH_ARIA_KEYS: Readonly<Record<NonNullable<BagInstanceGlyphKind>, TranslationKey>> =
-  {
-    masterwork: 'itemUi.bags.unknownItemAriaMasterwork',
-    enchanted: 'itemUi.bags.unknownItemAriaEnchanted',
-    signed: 'itemUi.bags.unknownItemAriaInstanced',
-    bound: 'itemUi.bags.unknownItemAriaBound',
-    generic: 'itemUi.bags.unknownItemAriaInstanced',
-  };
 
 const BAG_CATEGORY_LABEL_KEYS: Record<BagCategory, TranslationKey> = {
   all: 'hudChrome.bags.filterAll',
@@ -801,7 +772,7 @@ export class BagsWindow {
       const itemAriaKey = questMark
         ? 'hudChrome.bags.itemAriaQuest'
         : glyphKind
-          ? BAG_GLYPH_ARIA_KEYS[glyphKind]
+          ? INSTANCE_GLYPH_ARIA_KEYS[glyphKind]
           : 'itemUi.bags.itemAria';
       row.setAttribute(
         'aria-label',
@@ -815,20 +786,13 @@ export class BagsWindow {
       // always visible without hover on desktop and touch, identical on every
       // graphics preset (no --fx gate). Ready seals share the seal markup and
       // brighten via .bi-quest-seal-ready (static; optional pulse is CSS-only).
-      const masterworkSeal = isMasterwork
-        ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
-        : '';
+      // Masterwork and other instance marks come from the shared mark helper so
+      // bank/guild-bank cells paint the same art; quest seal stays bag-only.
+      const masterworkSeal = isMasterwork ? instanceGlyphMarkHtml('masterwork') : '';
       const questSeal = showQuestSeal
         ? `<span class="bi-quest-seal${questReady ? ' bi-quest-seal-ready' : ''}" aria-hidden="true">${svgIcon('questlog')}</span>`
         : '';
-      const instanceMark =
-        !isMasterwork && !showQuestSeal
-          ? glyphKind === 'generic'
-            ? '<span class="bi-instance" aria-hidden="true"></span>'
-            : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
-              ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
-              : ''
-          : '';
+      const instanceMark = !isMasterwork && !showQuestSeal ? instanceGlyphMarkHtml(glyphKind) : '';
       row.innerHTML = `${this.deps.itemIcon(item)}${instanceMark}${masterworkSeal}${questSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
@@ -1088,7 +1052,7 @@ export class BagsWindow {
           // signal and the per-copy flag (bound is the one a player checks
           // before trading). The per-kind unknown keys keep the pair as one
           // localizable sentence.
-          t(UNKNOWN_GLYPH_ARIA_KEYS[glyphKind], {
+          t(UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS[glyphKind], {
             id: s.itemId,
             count: formatNumber(s.count, { maximumFractionDigits: 0 }),
           })
@@ -1099,14 +1063,7 @@ export class BagsWindow {
     );
     if (cell !== null) row.dataset.bagIndex = String(cell);
     this.bindBagCellDrop(row, cell);
-    const instanceMark =
-      glyphKind === 'generic'
-        ? '<span class="bi-instance" aria-hidden="true"></span>'
-        : glyphKind === 'enchanted' || glyphKind === 'signed' || glyphKind === 'bound'
-          ? `<span class="bi-glyph bi-glyph-${glyphKind}" aria-hidden="true">${svgIcon(BAG_GLYPH_ICONS[glyphKind])}</span>`
-          : glyphKind === 'masterwork'
-            ? `<img class="bi-masterwork-seal" src="${MASTERWORK_SEAL_IMAGE_URL}" alt="" aria-hidden="true" draggable="false">`
-            : '';
+    const instanceMark = instanceGlyphMarkHtml(glyphKind);
     row.innerHTML = `${unknownItemIconHtml(s.itemId)}${instanceMark}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
     if (canDeposit) {
       row.addEventListener('click', (ev) => {

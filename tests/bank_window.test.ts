@@ -787,9 +787,11 @@ describe('bank_window: unknown-id slots stay visible (stale-client guard, R34)',
     // which is how a counted bank slot turned invisible.
     expect(code).not.toContain('if (!item) continue');
     expect(code).toContain('item ? this.deps.itemIcon(item) : unknownItemIconHtml(slot.itemId)');
-    expect(code).toContain(
-      "t('itemUi.bags.unknownItemAria', { id: slot.itemId, count: this.fmt(slot.count) })",
-    );
+    // Plain unknown cells use unknownItemAria; instanced unknown cells (a
+    // masterwork / signed copy whose def this client predates) use the shared
+    // UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS so the per-copy flag still announces.
+    expect(code).toContain("'itemUi.bags.unknownItemAria'");
+    expect(code).toContain('UNKNOWN_INSTANCE_GLYPH_ARIA_KEYS');
   });
 
   it('never skips a slot in the grid fill (no continue of any wording)', () => {
