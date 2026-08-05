@@ -17,6 +17,7 @@ import {
   craftingTabs,
   resolveSelectedCraft,
 } from './crafting_view';
+import { markDialogRoot } from './dialog_root';
 import { itemDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { formatNumber, type TranslationKey, t } from './i18n';
@@ -92,6 +93,10 @@ export function renderCraftingWindow(
   learnHints: ReadonlyMap<string, CraftLearnHint> = new Map(),
 ): void {
   deps.hideTooltip();
+  // A standalone trapping window (the train/professions shape), not the
+  // vendor's docked bags pairing: announce it as a labeled dialog for the
+  // focus contract (src/ui/CLAUDE.md).
+  markDialogRoot(el, { label: t('hudChrome.crafting.title') });
   const scrollTop = el.querySelector('.crafting-body')?.scrollTop ?? 0;
   // The tab strip is its own horizontal scroller on mobile (hud.mobile.css
   // `.crafting-tabs { overflow-x: auto }`) and is rebuilt with everything
