@@ -7776,6 +7776,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.layers.blocker': '차단벽',
   'editor.status.blockerCapReached':
     '차단벽 한도({max})에 도달했습니다. 새 벽이 추가되지 않았습니다.',
+  'editor.status.campCapReached':
+    '야영지 한도({max})에 도달했습니다. 새 야영지가 추가되지 않았습니다.',
   'editor.help.tool.blocker': '플레이테스트에서 이동을 막는 보이지 않는 벽을 드래그로 그립니다.',
   'editor.inspector.label': '도구 옵션',
   'editor.brush.title': '브러시',
@@ -7931,7 +7933,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.prev': '이전 페이지',
   'editor.openDrawer.next': '다음 페이지',
   'editor.openDrawer.page': '{page}페이지',
-  'editor.status.campCapReached': '캠프 한도({max})에 도달했습니다. 새 캠프가 추가되지 않았습니다.',
   'editor.status.savedLocal': '"{name}"을(를) 이 브라우저에 저장했습니다.',
   'editor.status.savedServer': '"{name}"을(를) 서버에 저장했습니다 (v{version}).',
   'editor.status.savedLocalOnly':

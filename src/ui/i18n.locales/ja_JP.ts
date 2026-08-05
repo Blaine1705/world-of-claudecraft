@@ -7786,6 +7786,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.layers.blocker': 'ブロッカー壁',
   'editor.status.blockerCapReached':
     'ブロッカー壁の上限（{max}）に達しました。新しい壁は追加されませんでした。',
+  'editor.status.campCapReached':
+    'キャンプの上限（{max}）に達しました。新しいキャンプは追加されませんでした。',
   'editor.help.tool.blocker': 'プレイテストで移動を妨げる見えない壁をドラッグで描きます。',
   'editor.inspector.label': 'ツールオプション',
   'editor.brush.title': 'ブラシ',
@@ -7945,8 +7947,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.prev': '前のページ',
   'editor.openDrawer.next': '次のページ',
   'editor.openDrawer.page': 'ページ {page}',
-  'editor.status.campCapReached':
-    'キャンプ数の上限（{max}）に達しました。新しいキャンプは追加されませんでした。',
   'editor.status.savedLocal': '「{name}」をこのブラウザーに保存しました。',
   'editor.status.savedServer': '「{name}」をサーバーに保存しました（v{version}）。',
   'editor.status.savedLocalOnly':
