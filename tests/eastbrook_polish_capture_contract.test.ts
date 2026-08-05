@@ -385,7 +385,12 @@ describe('Eastbrook polish capture contract', () => {
       // renderer; the release's bounded ground-object reuse pool), so the merged
       // tree mints a composite matching neither parent. Regenerated via
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: 'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9',
+      // Re-pinned for the weapon-skin VFX connection-freeze fix:
+      // src/render/renderer.ts gains the budgeted weapon-skin apply queue and the
+      // vfx.weapon-skins boot prewarm entry, the renderer-integration leaf, so the
+      // composite re-mints once more on top of that release base. Same script; no
+      // Eastbrook input, geometry value, or capture moved.
+      fingerprint: '214d84f280403acce49fb2513648ef6605870f1228f8008cf98194f44367bdef',
       components: {
         captureContract: {
           id: 'polish-v2',
