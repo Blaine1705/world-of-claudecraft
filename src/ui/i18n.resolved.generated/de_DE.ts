@@ -807,6 +807,7 @@ export const de_DE: EnTranslations = {
       "deeds": "Taten",
       "mounts": "Reittiere",
       "professions": "Berufe",
+      "reliquary": "Reliquary",
       "nameplates": "Namen",
       "haptics": "Haptik",
       "hapticsOff": "Haptik aus",
@@ -2959,6 +2960,30 @@ export const de_DE: EnTranslations = {
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
         "wardstones": "Schutzstein-Kanale (Phasenubergang)"
       }
+    },
+    "reliquary": {
+      "title": "The Reliquary",
+      "close": "Close The Reliquary",
+      "countLabel": "{owned}/{total} relics",
+      "completionAria": "Relics filled: {owned} of {total}",
+      "curatorRank": "Curator rank {rank}",
+      "curatorUnranked": "Unranked Curator",
+      "recentLabel": "Recent finds:",
+      "nearlyLabel": "Nearly complete:",
+      "nearlyJumpAria": "Open {name}, {owned} of {total} filled",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "Reliquary shelves",
+      "navOverview": "Overview",
+      "navConquerors": "Conquerors",
+      "navProfessions": "Professions",
+      "navHorizons": "Horizons",
+      "navCountAria": "{shelf}: {owned} of {total} relics filled",
+      "overviewEmpty": "Fill unique relics from dungeons, raids, and delves to stock The Reliquary.",
+      "shelfEmpty": "No pages on this shelf yet.",
+      "pageComplete": "Illuminated",
+      "clearsLabel": "{count} clears",
+      "backToShelf": "Back to shelf",
+      "pageStubNote": "The full relic grid arrives in a later update. Progress above is live."
     },
     "deeds": {
       "title": "Buch der Taten",

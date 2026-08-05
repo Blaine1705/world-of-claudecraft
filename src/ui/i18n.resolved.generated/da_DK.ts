@@ -807,6 +807,7 @@ export const da_DK: EnTranslations = {
       "deeds": "Bedrifter",
       "mounts": "Ridedyr",
       "professions": "Erhverv",
+      "reliquary": "Reliquary",
       "nameplates": "Navne",
       "haptics": "Haptik",
       "hapticsOff": "Haptik fra",
@@ -2959,6 +2960,30 @@ export const da_DK: EnTranslations = {
         "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
         "wardstones": "Vardstenskanaler (faseovergang)"
       }
+    },
+    "reliquary": {
+      "title": "The Reliquary",
+      "close": "Close The Reliquary",
+      "countLabel": "{owned}/{total} relics",
+      "completionAria": "Relics filled: {owned} of {total}",
+      "curatorRank": "Curator rank {rank}",
+      "curatorUnranked": "Unranked Curator",
+      "recentLabel": "Recent finds:",
+      "nearlyLabel": "Nearly complete:",
+      "nearlyJumpAria": "Open {name}, {owned} of {total} filled",
+      "progressText": "{owned}/{total}",
+      "shelvesAria": "Reliquary shelves",
+      "navOverview": "Overview",
+      "navConquerors": "Conquerors",
+      "navProfessions": "Professions",
+      "navHorizons": "Horizons",
+      "navCountAria": "{shelf}: {owned} of {total} relics filled",
+      "overviewEmpty": "Fill unique relics from dungeons, raids, and delves to stock The Reliquary.",
+      "shelfEmpty": "No pages on this shelf yet.",
+      "pageComplete": "Illuminated",
+      "clearsLabel": "{count} clears",
+      "backToShelf": "Back to shelf",
+      "pageStubNote": "The full relic grid arrives in a later update. Progress above is live."
     },
     "deeds": {
       "title": "Bedrifternes Bog",

@@ -1128,6 +1128,19 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Book of Deeds window',
   },
   {
+    call: 'this.reliquaryWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.reliquaryWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'reliquary_window.ts',
+      proof:
+        'const input = this.buildInput(); const sig = this.sigFromInput(input); if (sig === this.lastSig) return;',
+    },
+    why: 'The Reliquary window',
+  },
+  {
     call: 'this.refreshOpenProfessionSurfacesIfChanged',
     band: 'slow',
     gate: '',
@@ -1422,7 +1435,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 41, chrome: 72, none: 15 });
+    ).toEqual({ window: 42, chrome: 72, none: 15 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1434,7 +1447,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     for (const row of HUD_UPDATE_DRIVES)
       if (row.guard) byKind[row.guard.kind] = (byKind[row.guard.kind] ?? 0) + 1;
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
-      module: 22,
+      module: 23,
       hud: 5,
       callsite: 10,
       none: 4,
@@ -1491,6 +1504,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         // sig binding): render() re-latches lastSig from the one input it
         // painted, so the band never re-acts on a stale signature.
         'professions_window.ts: const input = this.buildInput(); const sig = professionsRefreshSig(input); if (sig === this.lastSig) return;',
+        'reliquary_window.ts: const input = this.buildInput(); const sig = this.sigFromInput(input); if (sig === this.lastSig) return;',
         'social_window.ts: if (struct !== this.lastStruct) {',
         // #2519 replaced the joined signature string this used to build every frame with
         // an in-place comparison against the retained numbers; same guard, same place, no

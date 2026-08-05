@@ -1753,6 +1753,9 @@ async function startGame(
           case 'professions':
             hud.toggleProfessions();
             break;
+          case 'reliquary':
+            hud.toggleReliquary();
+            break;
           case 'sheathe': {
             // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
             // combat auto-unsheathe); play the cue only when the state moved.
@@ -1851,6 +1854,7 @@ async function startGame(
     onLeaderboard: () => hud.toggleLeaderboard(),
     onDailyRewards: () => hud.toggleDailyRewards(),
     onDeeds: () => hud.toggleDeeds(),
+    onReliquary: () => hud.toggleReliquary(),
     onMountToggle: () => {
       // Dismount is the shared toggleMounted() path (unchanged); summoning an
       // owned mount from a single tap goes through its reins item directly,
@@ -2026,6 +2030,9 @@ async function startGame(
         break;
       case 'professions':
         hud.toggleProfessions();
+        break;
+      case 'reliquary':
+        hud.toggleReliquary();
         break;
       case 'crafting':
         // The controller panel has always OFFERED this bind (it lists every

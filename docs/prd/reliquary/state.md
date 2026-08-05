@@ -26,14 +26,15 @@ the new `origin/release/**` tip and note it here.
 
 ## Resume point
 
-- **Current phase:** Phase 3 QA complete. Ready for Phase 4 (window shell + Overview).
+- **Current phase:** Phase 4 complete (window shell + Overview). Ready for
+  Phase 4 QA (or Phase 5 if QA is green).
 - **Next action:** in `/Users/fernando/Documents/wocc-reliquary`, pull
-  `origin/release/v0.35.0`, then Phase 4: Reliquary window shell, Overview,
-  shelf chrome, keybind, i18n English keys, DESIGN.md layout. Do **not** skip
-  the release pull at Phase 4 start.
+  `origin/release/v0.35.0`, then Phase 4 QA (re-run validation matrix +
+  specialist review) or Phase 5 (page grids, silhouettes, live unlock UX,
+  Illumination). Do **not** skip the release pull.
 - **Blocker:** none.
-- **Release tip at Phase 3 QA:** `5e83ba89d0` (merged training-buy-button afford
-  from release during Phase 3 QA).
+- **Release tip at Phase 4:** `5e83ba89d0` (already up to date with
+  origin/release/v0.35.0 at Phase 4 start).
 
 ## Locked design decisions
 
@@ -109,9 +110,10 @@ session load:
 | `IWorldReliquary` | `src/world_api/reliquary.ts` | **landed** |
 | `reliq` wire key | `server/game.ts` / `src/net/online.ts` | **landed** (heavy-gated sparse) |
 | `reliquaryWireBlob` | `src/sim/reliquary.ts` | **landed** |
-| `buildReliquaryView` | `src/ui/reliquary_view.ts` | planned (Phase 4) |
-| `ReliquaryWindow` | `src/ui/reliquary_window.ts` | planned (Phase 4) |
-| `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | planned (Phase 4) |
+| `buildReliquaryView` / `reliquaryRefreshSig` | `src/ui/reliquary_view.ts` | **landed** (UI_PURE_CORES) |
+| `ReliquaryWindow` | `src/ui/reliquary_window.ts` | **landed** (cold; Overview + shelf stubs) |
+| `hudChrome.reliquary.*` | `src/ui/i18n.catalog/hud_chrome.ts` | **landed** (English chrome keys) |
+| Keybind `reliquary` | `src/game/keybinds.ts` | **landed** (default Shift+KeyX) |
 
 ## Validation matrix (default commands)
 
@@ -135,7 +137,7 @@ session load:
 - [x] recent ring buffer capped (plan: 12)
 - [x] Content pins prevent unbounded auto-scrape of entire loot tables (Phase 2)
 - [x] Wire event id-only; sparse blob dirty-gated (Phase 3)
-- [ ] Cold window: signature latch; no per-frame full rebuild (Phase 4+)
+- [x] Cold window: signature latch; no per-frame full rebuild (Phase 4)
 
 ## Gotchas
 

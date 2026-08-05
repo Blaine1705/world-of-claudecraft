@@ -548,6 +548,7 @@ import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -2345,6 +2346,7 @@ export class Hud {
     $('#mm-town-focus')?.addEventListener('click', () => this.toggleTownFocus());
     $('#mm-quest').addEventListener('click', () => this.toggleQuestLog());
     $('#mm-deeds').addEventListener('click', () => this.toggleDeeds());
+    $('#mm-reliquary')?.addEventListener('click', () => this.toggleReliquary());
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
     // Collapse/expand the on-screen quest tracker by clicking its header. The
     // overlay is click-through (pointer-events:none) except the header button, so
@@ -2422,6 +2424,7 @@ export class Hud {
       '#bank-window',
       '#bags',
       '#deeds-window',
+      '#reliquary-window',
       '#professions-window',
     ]) {
       $(panelId).addEventListener('keydown', (e) => {
@@ -3125,6 +3128,10 @@ export class Hud {
       case 'deeds-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
         this.deedsWindow.close();
+        break;
+      case 'reliquary-window':
+        // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
+        this.reliquaryWindow.close();
         break;
       case 'professions-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA).
@@ -4309,6 +4316,18 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
     ...this.windowFocus('#professions-window'),
+  });
+  // The Reliquary window painter (reliquary_view.ts core + reliquary_window.ts
+  // painter): Overview + shelf chrome over IWorldReliquary. A standalone
+  // trapping window (windowFocus), the deeds/professions shape exactly.
+  private readonly reliquaryWindow = new ReliquaryWindow({
+    ...this.presentationBag,
+    root: () => $('#reliquary-window'),
+    world: () => this.sim,
+    closeOthers: () => this.closeOtherWindows('#reliquary-window'),
+    hideTooltip: () => this.hideTooltip(),
+    consumePeek: () => this.peekGuard.consume(),
+    ...this.windowFocus('#reliquary-window'),
   });
   // Watchlist HUD tracker (#deed-tracker): slow-band painter over the one
   // reused tracker-view container (allocation-light by contract).
@@ -5695,6 +5714,7 @@ export class Hud {
     if (this.marketWindow.isOpen) this.marketWindow.render();
     if (this.bankWindow.isOpen) this.bankWindow.render();
     if (this.deedsWindow.isOpen) this.deedsWindow.render();
+    if (this.reliquaryWindow.isOpen) this.reliquaryWindow.render();
     if (this.professionsWindow.isOpen) this.professionsWindow.render();
     // The crafting window's repaint memos (station set, reagent sig, the
     // profession surface sig) are all text-independent, so a language switch
@@ -7255,6 +7275,7 @@ export class Hud {
       ['#mm-talents', 'talents', 'game.talents.title'],
       ['#mm-quest', 'questlog', 'questUi.log.title'],
       ['#mm-deeds', 'deeds', 'hudChrome.deeds.title'],
+      ['#mm-reliquary', 'reliquary', 'hudChrome.reliquary.title'],
       ['#mm-professions', 'professions', 'hudChrome.professions.title'],
       ['#mm-map', 'map', 'hud.core.mobileMap'],
       ['#mm-bag', 'bags', 'itemUi.bags.title'],
@@ -8697,6 +8718,7 @@ export class Hud {
     // the latch and repaints only its .money footer, never the whole grid.
     if (slowHud) this.bagsWindow.refreshIfChanged();
     if (slowHud && this.deedsWindow.isOpen) this.deedsWindow.refreshIfChanged();
+    if (slowHud && this.reliquaryWindow.isOpen) this.reliquaryWindow.refreshIfChanged();
     if (slowHud) this.refreshOpenProfessionSurfacesIfChanged();
     if (slowHud && this.professionsWindow.isOpen) this.professionsWindow.refreshIfChanged();
     // The gossip dialog's intro hint row watches the same online cprof edge:
@@ -14183,6 +14205,16 @@ export class Hud {
   // wrappers land only when a consumer lands with them.
   toggleProfessions(): void {
     this.professionsWindow.toggle();
+  }
+
+  // The Reliquary window entry point (keybind, minimap, and More-tray all
+  // toggle; Esc closes via the managed-window case directly).
+  toggleReliquary(): void {
+    this.reliquaryWindow.toggle();
+  }
+
+  get reliquaryWindowOpen(): boolean {
+    return this.reliquaryWindow.isOpen;
   }
 
   // Repaint the deed tracker from the live facet: the slow band, a watch

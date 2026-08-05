@@ -7475,6 +7475,232 @@
      hairline is the shared --color-border-showcase token, and the remaining
      inset-card cosmetics (rgba card fills, the ring stage haze) are
      deliberate literals shared with the char-window showcase family. */
+  /* ---------- reliquary ---------- */
+  /* The Reliquary: cold collection browser (summary strip, shelf rail,
+     Overview recent/nearly, shelf page stubs). Progress bars are build-time
+     writes; no per-frame rebuild. Tokens only (no raw hex for focus rings). */
+  #reliquary-window {
+    width: 720px;
+    max-height: calc(var(--app-vh, 100vh) * 0.82 / var(--window-scale) - 24px);
+    flex-direction: column;
+  }
+  #reliquary-window .panel-title {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  #reliquary-window .panel-title > span {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .reliquary-summary {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 2px 0 6px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--gold-dim);
+    flex-wrap: wrap;
+  }
+  .reliquary-summary b,
+  .reliquary-rank {
+    color: var(--gold);
+  }
+  .reliquary-pct {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+  }
+  .reliquary-bar {
+    display: inline-block;
+    width: 100px;
+    height: 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 4px;
+    background: var(--color-surface-inset, #14110b);
+    overflow: hidden;
+    vertical-align: middle;
+  }
+  .reliquary-bar-fill {
+    display: block;
+    height: 100%;
+    background: linear-gradient(var(--gold), var(--gold-dim));
+  }
+  .reliquary-body {
+    flex: 1 1 auto;
+    display: flex;
+    gap: 10px;
+    min-height: 140px;
+  }
+  .reliquary-rail {
+    flex: 0 0 148px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+  }
+  .reliquary-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-family: var(--title-font);
+    font-size: 12px;
+    text-align: left;
+    padding: 6px 8px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: none;
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+    min-height: 32px;
+  }
+  .reliquary-nav:hover {
+    color: var(--gold);
+    background: var(--color-surface-hover, #1c1812);
+  }
+  .reliquary-nav.active {
+    color: var(--gold);
+    border-color: var(--color-border-active, #6a5320);
+    background: linear-gradient(var(--color-surface-active-top, #2a220f), var(--color-surface-hover, #1c1812));
+  }
+  .reliquary-nav:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  .reliquary-nav-count {
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  body.mobile-touch .reliquary-nav {
+    min-height: 40px;
+  }
+  .reliquary-scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 100px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+  .reliquary-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .reliquary-recent,
+  .reliquary-nearly {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--gold-dim);
+  }
+  .reliquary-strip-label {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  .reliquary-recent-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 8px;
+    background: var(--color-surface-inset, #171309);
+  }
+  .reliquary-nearly-row,
+  .reliquary-page-row,
+  .reliquary-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--ui-font);
+    font-size: 13px;
+    text-align: left;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border-showcase);
+    background: var(--color-surface-inset, #171309);
+    color: var(--gold-dim);
+    cursor: var(--cursor-point);
+    min-height: 32px;
+  }
+  .reliquary-nearly-row:hover,
+  .reliquary-page-row:hover,
+  .reliquary-back:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .reliquary-nearly-row:focus-visible,
+  .reliquary-page-row:focus-visible,
+  .reliquary-back:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .reliquary-nearly-row,
+  body.mobile-touch .reliquary-page-row,
+  body.mobile-touch .reliquary-back {
+    min-height: 40px;
+  }
+  .reliquary-progress-text,
+  .reliquary-clears {
+    font-size: 11px;
+    opacity: 0.9;
+  }
+  .reliquary-complete-badge {
+    font-family: var(--title-font);
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+  }
+  .reliquary-page-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .reliquary-page-row {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .reliquary-page-name {
+    color: var(--gold);
+    font-family: var(--title-font);
+  }
+  .reliquary-page-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .reliquary-page-stub {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 2px 8px;
+  }
+  .reliquary-page-title {
+    margin: 0;
+    font-family: var(--title-font);
+    font-size: 16px;
+    color: var(--gold);
+  }
+  .reliquary-page-progress,
+  .reliquary-page-clears,
+  .reliquary-page-stub-note {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gold-dim);
+  }
+  .reliquary-empty {
+    padding: 16px 8px;
+    font-size: 13px;
+    color: var(--gold-dim);
+    text-align: center;
+  }
   #professions-window {
     width: 720px;
     max-height: calc(var(--app-vh, 100vh) * 0.85 / var(--window-scale) - 24px);

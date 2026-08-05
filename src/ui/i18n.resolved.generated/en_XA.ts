@@ -807,6 +807,7 @@ export const en_XA: EnTranslations = {
       "deeds": "[Ðééðš]",
       "mounts": "[Ɱóúñţš]",
       "professions": "[Þŕóƒéššíóñš]",
+      "reliquary": "[Ŕéļíɋúáŕý]",
       "nameplates": "[Ñáɱéš]",
       "haptics": "[Ĥáþţíçš]",
       "hapticsOff": "[Ĥáþţíçš Óƒƒ]",
@@ -2959,6 +2960,30 @@ export const en_XA: EnTranslations = {
         "deathless_rage": "[Ðéáţĥļéšš Ŕáĝé (íñţéŕŕúþţéð áţ ţĥé ŵáŕðšţóñéš)]",
         "wardstones": "[Ŵáŕðšţóñé çĥáññéļš (þĥášé ţŕáñšíţíóñ)]"
       }
+    },
+    "reliquary": {
+      "title": "[Ţĥé Ŕéļíɋúáŕý]",
+      "close": "[Çļóšé Ţĥé Ŕéļíɋúáŕý]",
+      "countLabel": "[{owned}/{total} ŕéļíçš]",
+      "completionAria": "[Ŕéļíçš ƒíļļéð: {owned} óƒ {total}]",
+      "curatorRank": "[Çúŕáţóŕ ŕáñķ {rank}]",
+      "curatorUnranked": "[Úñŕáñķéð Çúŕáţóŕ]",
+      "recentLabel": "[Ŕéçéñţ ƒíñðš:]",
+      "nearlyLabel": "[Ñéáŕļý çóɱþļéţé:]",
+      "nearlyJumpAria": "[Óþéñ {name}, {owned} óƒ {total} ƒíļļéð]",
+      "progressText": "[{owned}/{total}]",
+      "shelvesAria": "[Ŕéļíɋúáŕý šĥéļʋéš]",
+      "navOverview": "[Óʋéŕʋíéŵ]",
+      "navConquerors": "[Çóñɋúéŕóŕš]",
+      "navProfessions": "[Þŕóƒéššíóñš]",
+      "navHorizons": "[Ĥóŕížóñš]",
+      "navCountAria": "[{shelf}: {owned} óƒ {total} ŕéļíçš ƒíļļéð]",
+      "overviewEmpty": "[Ƒíļļ úñíɋúé ŕéļíçš ƒŕóɱ ðúñĝéóñš, ŕáíðš, áñð ðéļʋéš ţó šţóçķ Ţĥé Ŕéļíɋúáŕý.]",
+      "shelfEmpty": "[Ñó þáĝéš óñ ţĥíš šĥéļƒ ýéţ.]",
+      "pageComplete": "[Íļļúɱíñáţéð]",
+      "clearsLabel": "[{count} çļéáŕš]",
+      "backToShelf": "[Ɓáçķ ţó šĥéļƒ]",
+      "pageStubNote": "[Ţĥé ƒúļļ ŕéļíç ĝŕíð áŕŕíʋéš íñ á ļáţéŕ úþðáţé. Þŕóĝŕéšš áƀóʋé íš ļíʋé.]"
     },
     "deeds": {
       "title": "[Ɓóóķ óƒ Ðééðš]",

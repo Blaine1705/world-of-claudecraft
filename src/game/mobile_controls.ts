@@ -146,6 +146,8 @@ export interface MobileControlCallbacks {
   onDailyRewards(): void;
   /** Open the Book of Deeds window, folded into the More tray on mobile. */
   onDeeds(): void;
+  /** Open The Reliquary window, folded into the More tray on mobile. */
+  onReliquary(): void;
   /** Mount / dismount from the More tray. Dismounts instantly when riding;
    *  when unmounted, summons the player's first owned mount directly (no
    *  action-bar or bag detour needed), or falls back to the shared toggle's
@@ -512,6 +514,7 @@ export class MobileControls {
     this.bindButton('mobile-leaderboard', () => this.callbacks.onLeaderboard());
     this.bindButton('mobile-daily-rewards', () => this.callbacks.onDailyRewards());
     this.bindButton('mobile-deeds', () => this.callbacks.onDeeds());
+    this.bindButton('mobile-reliquary', () => this.callbacks.onReliquary());
     this.bindButton('mobile-mounts', () => this.callbacks.onMountToggle());
     this.bindButton('mobile-professions', () => this.callbacks.onProfessions());
     const nameplatesBtn = document.getElementById('mobile-nameplates');
