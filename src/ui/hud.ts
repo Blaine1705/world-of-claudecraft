@@ -1644,11 +1644,13 @@ export class Hud {
   // The static #crafting-live region (index.html/play.html): a polite live
   // region inside the rebuilt window subtree would be wiped by the same task
   // that writes it, so announcements ride this never-rebuilt node instead.
-  private readonly craftingLiveEl = $('#crafting-live');
+  // Nullable on purpose: test rigs construct Hud over minimal DOMs that
+  // carry neither node, so every consumer guards (the play.html ?. rule).
+  private readonly craftingLiveEl: HTMLElement | null = $('#crafting-live') ?? null;
   private readonly craftCastReannounce = new ReannounceMarker();
   // #crafting-window, cached once: paintOpenCraftingCastProgress runs on the
   // frame band, and a per-frame $() query is barred there (src/ui/CLAUDE.md).
-  private readonly craftingWindowEl = $('#crafting-window');
+  private readonly craftingWindowEl: HTMLElement | null = $('#crafting-window') ?? null;
   // Per-frame strip painter over the CURRENT strip nodes, rebuilt after every
   // full crafting-window paint (the rebuild replaces the elements). Writes go
   // through the PainterHost elided writers (CastBarPainter), so identical
@@ -8653,7 +8655,7 @@ export class Hud {
     if (
       playerCast.visible &&
       playerCast.label === CRAFT_CAST_ID &&
-      this.craftingWindowEl.style.display === 'flex'
+      this.craftingWindowEl?.style.display === 'flex'
     ) {
       playerCast.visible = false;
     }
@@ -11081,7 +11083,7 @@ export class Hud {
           // a session that later drops without one was cancelled. The paint
           // band re-arms the flag while a session stays active (mid-batch).
           this.craftCastExpectingResult = false;
-          if (ev.ok && ev.itemId && this.craftingWindowEl.style.display === 'flex') {
+          if (ev.ok && ev.itemId && this.craftingWindowEl?.style.display === 'flex') {
             const craftedItem = ITEMS[ev.itemId];
             // No display name resolves: say nothing (a raw internal id read
             // aloud is worse than silence).
@@ -14751,7 +14753,9 @@ export class Hud {
    *  ReannounceMarker forces a byte-different string when the same line
    *  repeats (two cancels in a row must both announce). */
   private announceCraftCast(text: string): void {
-    this.craftingLiveEl.textContent = this.craftCastReannounce.mark(text);
+    if (this.craftingLiveEl) {
+      this.craftingLiveEl.textContent = this.craftCastReannounce.mark(text);
+    }
   }
 
   /**
@@ -14764,7 +14768,7 @@ export class Hud {
   private paintOpenCraftingCastProgress(): void {
     // Closed window: never read cast fields or touch the painter (the
     // cold-window rule; activity signature is latched only while open).
-    if (this.craftingWindowEl.style.display !== 'flex') return;
+    if (this.craftingWindowEl?.style.display !== 'flex') return;
     const session = this.craftCastSessionForPlayer();
     if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {
       const prevSig = this.lastCraftingCastSig;
@@ -14901,7 +14905,7 @@ export class Hud {
     this.craftCastStripLabel = resultDef
       ? itemDisplayName(resultDef)
       : castDisplayName(CRAFT_CAST_ID);
-    const strip = craftCastStripElements(this.craftingWindowEl);
+    const strip = this.craftingWindowEl ? craftCastStripElements(this.craftingWindowEl) : null;
     this.craftCastStripPainter = strip
       ? new CastBarPainter(this.writerFacet, strip, {
           resolveCastLabel: () => this.craftCastStripLabel,
@@ -14922,7 +14926,7 @@ export class Hud {
   }
 
   closeCrafting(): void {
-    this.craftingWindowEl.style.display = 'none';
+    if (this.craftingWindowEl) this.craftingWindowEl.style.display = 'none';
     // The paint latch only: the cast session itself lives on the entity
     // fields (both hosts), so a mid-cast close/reopen loses nothing, and the
     // overlay cast bar takes over the moment this window stops being the
