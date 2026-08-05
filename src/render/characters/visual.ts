@@ -1382,7 +1382,17 @@ export class CharacterVisual {
   setWeaponSkin(weaponSkinId: string | null): THREE.Object3D[] | null {
     if (weaponSkinId === this.weaponSkinId) return null;
     this.weaponSkinId = weaponSkinId;
-    return this.reattachHeldWeapon();
+    const payloads = this.reattachHeldWeapon();
+    // The CAST pose depends on the displayed skin (a drawn bow holds its draw),
+    // but the base action is only re-selected on a base-state EDGE. A skin
+    // applied or removed mid-cast does not edge the state, so without this the
+    // rig keeps Spellcasting after equipping the bow, or keeps Bow_Draw_Hold
+    // after removing it, for the rest of the cast. Reported by review on 2950.
+    if (!this.deadLock && !this.currentIsOneShot && this.baseState === 'cast') {
+      const next = this.baseAction();
+      if (next && next !== this.current) this.fadeTo(next, FADE, false);
+    }
+    return payloads;
   }
 
   /** Re-attach BOTH held hands (gear swap / skin change), honoring an active
