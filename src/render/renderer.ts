@@ -6,6 +6,8 @@ import {
   ABILITIES,
   ARENA_SLOT_COUNT,
   arenaOrigin,
+  BG_SLOT_COUNT,
+  battlegroundOrigin,
   CAMPS,
   CLASSES,
   DELVE_MODULE_Z_START,
@@ -22,6 +24,7 @@ import {
   ITEM_SETS,
   instanceOrigin,
   isArenaPos,
+  isBgPos,
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
@@ -50,6 +53,10 @@ import { formatResidencyBudget, residencyBudget } from './assets/residency_budge
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { attachBankerChestToNpcView } from './banker_chest';
+import { type BattlegroundView, buildBattleground } from './battleground';
+import { BattlegroundFx } from './battleground_fx';
+import { updateBattlegroundOccluderFades } from './battleground_placements';
+import { buildBattlegroundObject } from './battleground_props';
 import { ensureBiomeHazeField, setBiomeHazeCamera, setBiomeHazeGrade } from './biome_haze_field';
 import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
 import { type BirdsView, buildBirds } from './birds';
@@ -74,7 +81,11 @@ import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
-import { type CharacterWeaponAura, characterWeaponAuraInto } from './character_effects';
+import {
+  type CharacterWeaponAura,
+  characterRuneTintColor,
+  characterWeaponAuraInto,
+} from './character_effects';
 import {
   addCharacterEffectAura,
   CHARACTER_EFFECT_RECKLESSNESS,
@@ -152,6 +163,7 @@ import {
   realmLightTint,
   sunDirection,
   sunsetWarmGate,
+  usesLiveDayNightLighting,
   warmDuskGrade,
 } from './day_night_core';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
@@ -182,7 +194,13 @@ import {
   ZONE_ENVIRONMENT_RESPONSE,
 } from './environment_transition_core';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
-import { buildFarTerrain, type FarTerrainView, setFarTerrainNightGrade } from './far_terrain';
+import {
+  buildFarTerrain,
+  FAR_VISTA_ENTRY_MAX_WAIT_MS,
+  type FarTerrainView,
+  farVistaGate,
+  setFarTerrainNightGrade,
+} from './far_terrain';
 import {
   detailCullFar,
   type FarVistaPlan,
@@ -230,6 +248,11 @@ import { GlacialFrontVisual } from './glacial_front_visual';
 import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
+import {
+  type PooledObjectView,
+  storePooledObject as storeGroundObjectInPool,
+  takeOrBuildGroundObject,
+} from './ground_object_pool';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { buildHollowGates } from './hollow_gates';
@@ -882,11 +905,6 @@ export interface RendererPrewarmStats {
   diagnosticsBaseline: RendererPrewarmDiagnosticsBaselineStats | null;
 }
 
-interface PooledObjectView {
-  group: THREE.Group;
-  height: number;
-}
-
 interface ClickMarkerSlot {
   group: THREE.Group;
   ring: THREE.Mesh;
@@ -1211,6 +1229,12 @@ function canvasDataUrlAsync(
 export interface RendererCreateOptions {
   context?: WebGL2RenderingContext;
   initializeGfx?: boolean;
+  /** Build the far-vista grid eagerly during construction (macrotask bites,
+   *  accelerateInitialBuild). Correct only behind an opaque curtain: the
+   *  boot and graphics-rebuild paths keep the default; the editor viewport,
+   *  which rebuilds a live Renderer against running frames on every document
+   *  load, passes false to stay on polite idle pacing. */
+  eagerFarVista?: boolean;
 }
 
 export class Renderer {
@@ -1646,6 +1670,15 @@ export class Renderer {
     forwardZ: 0,
     halfAngle: Math.PI / 2,
   };
+  /** The boot far-grid build, accelerated behind the entry curtain; the
+   *  entry gate (farVistaReady) awaits it. Editor terrain rebuilds mint a
+   *  new view but deliberately keep polite pacing and never re-arm this. */
+  private farVistaInitialBuild: Promise<void> = Promise.resolve();
+  /** Set by farVistaReady once the grid stands pre-reveal: the next outdoor
+   *  environment update settles scene fog at the horizon haze band instead
+   *  of easing it out on screen (fog only; the detail horizon stays
+   *  residency-governed). */
+  private vistaEntrySettlePending = false;
   /** Fired whenever a zone becomes resident (any prepare path). Wired by
    *  main.ts so presentation caches outside the renderer (the HUD's world-map
    *  background) prewarm alongside the zone itself. */
@@ -1670,6 +1703,9 @@ export class Renderer {
   private asyncCompileSupported = false;
   private readonly liveCompileGates = new CompileGateQueue(this.backgroundGpuWork);
   vfx: Vfx;
+  // Thornhollow Fields flag/rune per-frame dressing + transition bursts; runs off
+  // bgInfo and view userData only (battleground_fx.ts).
+  private bgFx!: BattlegroundFx;
   private raceLine: RaceLine;
   private mountBeacon: MountBeacon;
   // Per-ability spell VFX subsystem: the spec-driven painter plus the pooled
@@ -1810,6 +1846,7 @@ export class Renderer {
   private visualPool = new Map<string, CharacterVisual[]>();
   private pooledVisualCount = 0;
   private objectPool = new Map<string, PooledObjectView[]>();
+  private pooledObjectCount = 0;
   private prewarmDepthMaterials = new Map<string, THREE.MeshDepthMaterial>();
   private readonly canvas: HTMLCanvasElement;
   private unregisterWebGLContext: (() => void) | null = null;
@@ -2203,6 +2240,16 @@ export class Renderer {
     });
     setRenderCategory(this.farTerrainView.group, 'terrain');
     this.scene.add(this.farTerrainView.group);
+    // The curtained construction paths (boot, graphics rebuild) build the
+    // far grid eagerly: it overlaps the curtain's own asset waits and the
+    // vista stands before the reveal instead of tens of seconds into play
+    // on a loaded production client. The editor viewport constructs live
+    // Renderers with frames running and opts out (eagerFarVista false),
+    // keeping its rebuilds on polite idle pacing.
+    this.farVistaInitialBuild =
+      options.eagerFarVista === false
+        ? Promise.resolve()
+        : this.farTerrainView.accelerateInitialBuild();
     bd('terrain');
     this.waterView = buildWater(this.sim.cfg.seed, this.webgl);
     setRenderCategory(this.waterView.group, 'water');
@@ -2646,6 +2693,7 @@ export class Renderer {
     };
     this.vfx = new Vfx(this.scene, vfxAnchor);
     this.vfx.setViewportScale(this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(), 60);
+    this.bgFx = new BattlegroundFx(this.sim, this.views, this.vfx);
     this.abilityVfxFx = new AbilityVfxFx(
       this.scene,
       this.camera,
@@ -2874,6 +2922,7 @@ export class Renderer {
     this.visualPool.clear();
     this.pooledVisualCount = 0;
     this.objectPool.clear();
+    this.pooledObjectCount = 0;
     this.clickTargets.length = 0;
     this.gatherNodeMeshes = [];
     this.viewLights.length = 0;
@@ -4545,8 +4594,10 @@ export class Renderer {
       this.valeCupStadium.updateShadowVisibility(this.camera, this.shadowLightDirection, true);
     }
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    // The dome rides the camera, so it also serves Wildheart's open-air field.
-    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
+    // The dome rides the camera, so it serves every open-air state: the
+    // overworld, Wildheart's field, and the Thornhollow Fields hollow (hiding
+    // it there left a black void above the ramparts).
+    this.sky.visible = this.isOpenAirFog();
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       if (!this.lowGfx) {
@@ -4656,30 +4707,17 @@ export class Renderer {
     return `object:${e.objectItemId}`;
   }
 
-  private takePooledObject(key: string): PooledObjectView | null {
-    const pool = this.objectPool.get(key);
-    const object = pool?.pop() ?? null;
-    if (!object) return null;
-    object.group.removeFromParent();
-    object.group.visible = true;
-    object.group.position.set(0, 0, 0);
-    object.group.rotation.set(0, 0, 0);
-    object.group.scale.set(1, 1, 1);
-    return object;
-  }
-
   private storePooledObject(key: string, object: PooledObjectView): void {
-    object.group.removeFromParent();
-    object.group.visible = false;
-    object.group.position.set(0, 0, 0);
-    object.group.rotation.set(0, 0, 0);
-    object.group.scale.set(1, 1, 1);
-    let pool = this.objectPool.get(key);
-    if (!pool) {
-      pool = [];
-      this.objectPool.set(key, pool);
-    }
-    pool.push(object);
+    // Unlike the character-visual pool, an overflow view has nothing to .dispose(): its
+    // geometry/materials are shared per-item-template references (owned elsewhere), so
+    // simply not pooling it drops the only reference to its Group/Object3D graph and lets
+    // GC reclaim it. Without this cap every distinct harvest node/loot pile/quest pickup a
+    // player interacted with stayed retained for the rest of the session on every platform.
+    // shouldRetainPooledCharacterVisual is a generic bounded-retention check (currentCount
+    // < maxCount, Infinity-safe); reused here rather than duplicating it under a second name.
+    if (!shouldRetainPooledCharacterVisual(this.pooledObjectCount, GFX.maxPooledObjects)) return;
+    storeGroundObjectInPool(this.objectPool, key, object);
+    this.pooledObjectCount++;
   }
 
   private templateIdsInZone(zone: ZoneDef, kind: 'mob' | 'npc'): string[] {
@@ -6911,19 +6949,40 @@ export class Renderer {
         sparkle.position.y = 1.35;
         group.add(sparkle);
       }
+    } else if (e.kind === 'object' && e.templateId?.startsWith('bg_')) {
+      // Battleground flags/runes: stateful (team color, carrier), so skip the
+      // object pool (the delve_ precedent) and build the dedicated body. No
+      // loot sparkle: the flag pennant / rune glow is the beacon.
+      objectPoolKey = null;
+      const built = buildBattlegroundObject(e.templateId, e.color, this.lowGfx);
+      body = built.group;
+      height = built.height;
+      objectMesh = body!;
+      // Hoist the per-frame handles onto the VIEW group. battleground_fx.ts
+      // reads `view.group.userData.bg`, and view.group is this method's own
+      // wrapper, the built body goes in as a CHILD of it further down, so the
+      // refs the props builder set are one level too deep to be found. Without
+      // this the fx pass hits `if (!bg) continue` for every rune and flag and
+      // silently animates nothing: no rune spin or bob, no pad light pulse, no
+      // Ward shard orbit, and no flag carrier ring or lean.
+      group.userData.bg = built.group.userData.bg;
     } else if (e.kind === 'object') {
-      objectPoolKey = this.objectPoolKeyFor(e);
-      const pooled = objectPoolKey ? this.takePooledObject(objectPoolKey) : null;
-      if (pooled) {
-        body = pooled.group;
-        height = pooled.height;
-        body.rotation.y = (e.id % 7) * 0.45;
-      } else {
-        const built = buildGroundQuestObject(e.objectItemId ?? '', e.id);
-        body = built.group;
-        height = built.height;
-        objectPoolKey = null;
-      }
+      // Pool MISS keeps its pool key (mirrors the character-visual pool's
+      // "Pool MISS: build a fresh visual but KEEP its pool key" above): see
+      // ground_object_pool.ts for why nulling it here used to corrupt the
+      // forever-cached, geometry-sharing template every ground object clones.
+      const result = takeOrBuildGroundObject(this.objectPool, this.objectPoolKeyFor(e), () =>
+        buildGroundQuestObject(e.objectItemId ?? '', e.id),
+      );
+      // takeOrBuildGroundObject pops through its own internal takePooledObject,
+      // not this class's storePooledObject counterpart, so a HIT here must mirror
+      // storePooledObject's increment by decrementing pooledObjectCount itself;
+      // otherwise the retention cap (GFX.maxPooledObjects) only ever counts up.
+      if (result.reused) this.pooledObjectCount = Math.max(0, this.pooledObjectCount - 1);
+      objectPoolKey = result.poolKey;
+      body = result.object.group;
+      height = result.object.height;
+      if (result.reused) body.rotation.y = (e.id % 7) * 0.45;
       objectMesh = body;
       if (!this.sparkleMat) {
         this.sparkleMat = new THREE.SpriteMaterial({
@@ -7407,6 +7466,12 @@ export class Renderer {
     if (target.kind !== 'player' || target.dead || target.id === this.sim.playerId) return false;
     if (this.sim.duelInfo?.state === 'active' && this.sim.duelInfo.otherPid === target.id)
       return true;
+    // Thornhollow Fields: the opposing TEAM is hostile for the whole live match.
+    const bg = this.sim.bgInfo?.match;
+    if (bg?.state === 'active') {
+      const row = bg.players.find((p) => p.pid === target.id);
+      if (row && row.team !== bg.myTeam) return true;
+    }
     const match = this.sim.arenaInfo?.match;
     return (
       match?.state === 'active' &&
@@ -7435,6 +7500,13 @@ export class Renderer {
   // Protect Yumi maze interiors, one per match slot, built lazily like the
   // arena copies; their update() anchors the team beacons each frame.
   private yumiMazeViews = new Map<number, YumiMazeView>();
+  // Thornhollow Fields battleground fields, one per match slot, built lazily like the
+  // yumi maze copies; the geometry is static, and the only per-frame work is the
+  // occluder fade the placements own (battleground_placements.ts).
+  private bgViews = new Map<number, BattlegroundView>();
+  // Reused ward-state carrier: setWardState only READS these fields, so the
+  // per-frame push refills this object rather than minting a literal.
+  private bgWardState = { countdown: false, ghost: false, myTeam: null as number | null };
   // Blue/red team arrows above every yumi fighter (yumi_team_markers.ts).
   private readonly yumiTeamMarkers = new YumiTeamMarkers();
   // Delve module interiors build asynchronously; track in-flight keys so a
@@ -7453,6 +7525,7 @@ export class Renderer {
     | 'nythraxis'
     | 'delve'
     | 'yumiMaze'
+    | 'battleground'
     | 'underwater'
     | 'rift'
     | 'practice'
@@ -7550,6 +7623,8 @@ export class Renderer {
     // the Galecrest: scrubbed salt air, dawn-lit haze off the sea
     gale: { color: 0xccc9d8, near: 170, far: 645 },
   };
+
+  private static readonly BATTLEGROUND_FOG = { color: 0xaecbe0, near: 70, far: 210 };
   // Low tier trades view distance for draw count (its own perf knob, never a
   // gameplay one: entities draw within their own much shorter ranges on every
   // tier, so fog distance sheds only cosmetic scenery). Takes the same
@@ -7653,6 +7728,24 @@ export class Renderer {
     );
   }
 
+  /**
+   * The entry-curtain gate over the boot far-grid build: resolves true once
+   * the vista can stand in for the fog, or false after `maxWaitMs` so a
+   * pathological device never holds the player at the loading screen (the
+   * classic eased flip then covers the remainder, exactly as before). On
+   * success the next outdoor environment update settles scene fog at the
+   * horizon haze band, still behind the curtain, so the first visible frame
+   * carries the finished horizon rather than easing the fog out on screen.
+   * A no-op true on profiles with the vista off. Thin consumer: both gate
+   * arms live in farVistaGate (far_terrain.ts), pinned by its tests.
+   */
+  async farVistaReady(maxWaitMs: number = FAR_VISTA_ENTRY_MAX_WAIT_MS): Promise<boolean> {
+    if (!this.farVista.enabled) return true;
+    const ready = await farVistaGate(this.farVistaInitialBuild, maxWaitMs);
+    if (ready && this.vistaLive()) this.vistaEntrySettlePending = true;
+    return ready;
+  }
+
   /** The classic cull distance the detail subsystems key off: scene fog
    *  verbatim when the vista is off (identical to the fogged renderer), the
    *  residency-eased detail horizon capped at the classic envelope when it
@@ -7745,6 +7838,12 @@ export class Renderer {
   private updateAmbience(px: number, camY: number, dt: number): void {
     const inside = px > DUNGEON_X_THRESHOLD;
     const pz = this.sim.player.pos.z;
+    // The entry-curtain settle is one-shot and belongs to THIS update only:
+    // consumed by the outdoor arm below when the entry really is outdoors,
+    // discarded otherwise (an interior login must keep its normal eased
+    // transition when the player later walks outside).
+    const settleVistaEntry = this.vistaEntrySettlePending;
+    this.vistaEntrySettlePending = false;
     // Private Vale Cup practice instance: the pitch sits far out in an instance
     // band (which would otherwise read as a delve), so give it its own futuristic
     // skybox + matching fog instead of the delve murk. Detected by the match's
@@ -7841,6 +7940,18 @@ export class Renderer {
           this.yumiMazeViews.set(i, view);
         }
       }
+    } else if (inside && isBgPos(px)) {
+      // build the Thornhollow Fields copy the player was matched into (the yumi
+      // view-map pattern; the field is static, so no per-frame update hook)
+      for (let i = 0; i < BG_SLOT_COUNT; i++) {
+        if (this.bgViews.has(i)) continue;
+        const o = battlegroundOrigin(i);
+        if (Math.abs(px - o.x) < 220 && Math.abs(pz - o.z) < 200) {
+          const view = buildBattleground(o, this.sim.cfg.seed, { lowGfx: this.lowGfx });
+          this.scene.add(view.group);
+          this.bgViews.set(i, view);
+        }
+      }
     } else if (inside && isArenaPos(px)) {
       void ensureDungeonAssets().catch(() => undefined);
       // build the Ashen Coliseum copy the player was matched into
@@ -7917,8 +8028,11 @@ export class Renderer {
     // crypt's near-black, so its flooded halls feel underwater, not just dark
     const inDelve = inside && isDelvePos(px);
     const inYumiMaze = inside && isYumiMazePos(px);
+    const inBattleground = inside && isBgPos(px);
     const interior =
-      inside && !inDelve && !inYumiMaze && !isArenaPos(px) ? dungeonAt(px)?.interior : null;
+      inside && !inDelve && !inYumiMaze && !inBattleground && !isArenaPos(px)
+        ? dungeonAt(px)?.interior
+        : null;
     const inTemple = interior === 'temple';
     const inNythraxis = interior === 'nythraxis';
     // Wildheart is an OPEN-AIR jungle caldera, not a closed room: it keeps the
@@ -7931,25 +8045,27 @@ export class Renderer {
         ? 'delve'
         : inYumiMaze
           ? 'yumiMaze'
-          : inTemple
-            ? 'temple'
-            : inNythraxis
-              ? 'nythraxis'
-              : inWildheartField
-                ? 'wildheartField'
-                : inLastKeep
-                  ? 'lastkeep'
-                  : inside
-                    ? 'dungeon'
-                    : camY <
-                        waterLevelAt(
-                          this.camera.position.x,
-                          this.camera.position.z,
-                          this.sim.cfg.seed,
-                        ) -
-                          0.05
-                      ? 'underwater'
-                      : 'outdoor';
+          : inBattleground
+            ? 'battleground'
+            : inTemple
+              ? 'temple'
+              : inNythraxis
+                ? 'nythraxis'
+                : inWildheartField
+                  ? 'wildheartField'
+                  : inLastKeep
+                    ? 'lastkeep'
+                    : inside
+                      ? 'dungeon'
+                      : camY <
+                          waterLevelAt(
+                            this.camera.position.x,
+                            this.camera.position.z,
+                            this.sim.cfg.seed,
+                          ) -
+                            0.05
+                        ? 'underwater'
+                        : 'outdoor';
     const fog = this.scene.fog as THREE.Fog;
     // Procedural rift: dynamic fog from the generated floor style, re-applied when
     // the floor changes (descent keeps fogState='rift' but swaps the palette).
@@ -8024,6 +8140,19 @@ export class Renderer {
         fog.color.setHex(0x161d31);
         fog.near = 30;
         fog.far = 170;
+      } else if (desired === 'battleground') {
+        // Thornhollow Fields is OPEN-AIR at immersive scale (100x280): true
+        // view-distance fog, the open world's own rule. The fight around you
+        // (~a chamber) reads clearly; the far keep's detail still dissolves
+        // before the 236yd flag-to-flag line, so the far chambers stay places
+        // you travel to, not read from spawn. Pushed back from the original
+        // 55/130 after the playtest: the tighter wall of haze swallowed the
+        // sky and flattened the light; at 70/210 the dome and ramparts
+        // breathe while the tactical veil holds. Symmetric for both teams:
+        // distance, never information.
+        fog.color.setHex(0xaecbe0);
+        fog.near = 70;
+        fog.far = 210;
       } else if (desired === 'practice') {
         // The private practice pitch under its futuristic sky: tint the fog to
         // the sky variant and push it well back so the pitch reads clear and lit
@@ -8112,7 +8241,6 @@ export class Renderer {
     if (desired === 'outdoor') {
       const g = this.dnGrade;
       const preset = this.outdoorFogPreset();
-      const k = transitionAlpha(dt, ZONE_ENVIRONMENT_RESPONSE);
       // Vista tiers run WITHOUT outdoor fog: the detail horizon is a uniform
       // envelope in every realm (the presets' murk walls are retired), and
       // scene fog parks past the camera far plane where it occludes nothing.
@@ -8151,6 +8279,17 @@ export class Renderer {
         this.residencyCone,
       );
       if (vista) {
+        // Entry settle (one-shot, armed by farVistaReady behind the opaque
+        // curtain): start scene fog AT the horizon haze band instead of
+        // easing it out over the first seconds on screen. Fog only: the
+        // detail horizon stays residency-governed below and expands as
+        // chunks land, exactly as streaming always behaved; the far mesh
+        // stands beneath it, so no fog wall and no hole is ever visible.
+        if (settleVistaEntry) {
+          const entryHaze = horizonHazePlan(this.farVista.envelopeFar);
+          fog.far = entryHaze.far;
+          fog.near = entryHaze.near;
+        }
         this.detailFogFar = easedFogFar(this.detailFogFar, requestedFar, residencyFar, dt);
         // Fog itself eases out to the horizon haze band: zero effect across
         // every gameplay distance, a gentle realm-tinted aerial blend where
@@ -8163,6 +8302,14 @@ export class Renderer {
         fog.far = easedFogFar(fog.far, requestedFar, residencyFar, dt);
         fog.near = easedFogNear(fog.near, preset.near, fog.far, dt);
       }
+    }
+    // Every open-air state follows the live grade. Thornhollow keeps its
+    // authored fog range while sharing the overworld's color and light grade.
+    if (usesLiveDayNightLighting(desired)) {
+      const g = this.dnGrade;
+      const preset =
+        desired === 'battleground' ? Renderer.BATTLEGROUND_FOG : this.outdoorFogPreset();
+      const k = transitionAlpha(dt, ZONE_ENVIRONMENT_RESPONSE);
       if (this.lowGfx) return;
       // fog color: the biome hue multiplied by the day/night color (a dark
       // dusk-blue by night)
@@ -8258,7 +8405,9 @@ export class Renderer {
   // low contribution, authorizes the texture/rotation swap, then restores the
   // new biome on the same long response as fog and light tint.
   private updateEnvBiome(dt: number): void {
-    if (this.lowGfx || this.envRTs.size < 2 || this.fogState !== 'outdoor') return;
+    if (this.lowGfx || this.envRTs.size < 2 || !usesLiveDayNightLighting(this.fogState)) {
+      return;
+    }
     const blend = this.skyView.currentBiomeBlend();
     const dominant = blend.t < 0.5 ? blend.from : blend.to;
     // the biome's light-level scale applies to the IBL too, or a dimmed realm
@@ -8338,6 +8487,43 @@ export class Renderer {
 
   // Aim the sun and moon disc sprites along their directions and fade them by how
   // far each body sits above the horizon (out when below, and only outdoors).
+  /** Is the camera under real sky? The overworld, Wildheart's open field, and
+   *  the Thornhollow Fields hollow all render the dome; every enclosed state
+   *  (dungeon, temple, rift, underwater) does not. */
+  /** Drive the field wards off the live match view: the form-up gate while the
+   *  countdown holds, and the grave ward while the player waits as a spirit.
+   *  Only visibility flags, so this is cheap enough for the per-frame block. */
+  private updateBgWards(): void {
+    if (this.bgViews.size === 0) return;
+    const match = this.sim.bgInfo?.match ?? null;
+    // Scratch state, refilled in place: setWardState only reads the fields, so
+    // a fresh literal every frame would be pure garbage on the render path.
+    const state = this.bgWardState;
+    state.countdown = match?.state === 'countdown';
+    state.myTeam = match ? match.myTeam : null;
+    // The roster scan only matters while the match is live, so it is skipped as
+    // a whole outside that window rather than run and then discarded, and the
+    // plain loop over the at-most-ten rows allocates no per-frame closure.
+    state.ghost = false;
+    if (match?.state === 'active') {
+      const me = this.sim.playerId;
+      for (const row of match.players) {
+        if (row.pid !== me) continue;
+        state.ghost = row.dead;
+        break;
+      }
+    }
+    for (const view of this.bgViews.values()) view.setWardState(state);
+  }
+
+  private isOpenAirFog(): boolean {
+    return (
+      this.fogState === 'outdoor' ||
+      this.fogState === 'wildheartField' ||
+      this.fogState === 'battleground'
+    );
+  }
+
   private updateCelestialSprites(): void {
     // The basin keeps directional daylight and the sky dome, but the camera-
     // riding sun and moon sprites can clip against its high rim as oversized
@@ -9162,6 +9348,7 @@ export class Renderer {
       active.setShadowform(hasShadowform);
       active.setMoonkin(hasMoonkin);
       active.setMetamorph(hasMetamorph);
+      active.setRuneTint(characterRuneTintColor(e));
       v.visual.root.visible = active === v.visual && !fireballForm && !v.visualCompilePending;
       // saddle lift: the rider (click proxy included, a root child) sits at
       // the seat height while mounted; 0 whenever the mount is absent/hidden.
@@ -9952,6 +10139,8 @@ export class Renderer {
       this.camera.position.y,
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'water', worldStart);
+    this.bgFx.update(this.time);
+    this.updateBgWards();
     this.vfx.update(dt);
     // Racing line (cosmetic; reads the self race view only).
     this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
@@ -9989,6 +10178,19 @@ export class Renderer {
         dt,
         this.reducedMotion(),
       );
+    // Battleground keeps, gatehouses and towers fade when they come between the
+    // player and the chase camera (the same occluder-fade family every other
+    // interior-capable subsystem uses). A no-op loop while no field is built.
+    updateBattlegroundOccluderFades(
+      this.camera.position.x,
+      this.camera.position.y,
+      this.camera.position.z,
+      this.cameraLookAt.x,
+      this.cameraLookAt.y,
+      this.cameraLookAt.z,
+      dt,
+      this.reducedMotion(),
+    );
     this.yumiTeamMarkers.update(this.sim, this.views);
     this.tickValeCupFx(dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
@@ -10172,10 +10374,11 @@ export class Renderer {
       this.updateKeyLight(pp);
     }
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'shadows', worldStart);
-    // sky dome + sun disc ride along with the camera
+    // sky dome + sun disc ride along with the camera. The battleground is
+    // OPEN-AIR: dome, sun, and weather render over the band exactly like the
+    // overworld (hiding them left a black void above the ramparts).
     this.sky.position.set(this.camera.position.x, 0, this.camera.position.z);
-    // The dome rides the camera, so it also serves Wildheart's open-air field.
-    this.sky.visible = this.fogState === 'outdoor' || this.fogState === 'wildheartField';
+    this.sky.visible = this.isOpenAirFog();
     if (this.sky.visible) {
       this.skyView.setCameraPos(this.camera.position.x, this.camera.position.z, dt);
       if (!this.lowGfx) {
@@ -10440,11 +10643,12 @@ export class Renderer {
   // light shafts fade in as the camera turns toward the sun, outdoor only
   private updateGodRays(): void {
     if (this.godRays.length === 0) return;
-    // Wildheart is open-air, but the long screen-space shafts read as giant
-    // triangles against its enclosed caldera rim. The basin keeps the sun,
-    // sky, and outdoor grade while reserving these shafts for the overworld.
-    // Faded out entirely in the twilight/gloom realms (BIOME_GOD_RAYS): skip
-    // the draw as well as the math once the eased scale reaches zero.
+    // Wildheart and the Thornhollow hollow are open-air, but the long
+    // screen-space shafts read as giant triangles against an enclosed rim.
+    // Both keep the sun, sky, and outdoor grade while these shafts stay
+    // reserved for the overworld. Twilight and gloom realms also fade them
+    // completely through BIOME_GOD_RAYS, so skip their draw and math once the
+    // eased scale reaches zero.
     const shafts = this.fogState === 'outdoor' && this.godRayZoneScale > 0.02;
     // azimuth-only alignment, the chase cam always pitches down while the
     // sun sits high, so a full 3D dot product would never light the shafts

@@ -57,6 +57,13 @@ export interface DayNightGrade {
  *  behind; `/daynight <phase>` overrides the live clock either way. */
 export const DAY_ONLY = false;
 
+/** Open-air ambience states whose fog, key light, hemisphere light, and IBL
+ * must advance with the same live grade as the sky dome. Authored interiors
+ * keep their own fixed lighting rigs even when they happen to show a sky. */
+export function usesLiveDayNightLighting(fogState: string): boolean {
+  return fogState === 'outdoor' || fogState === 'battleground';
+}
+
 /** The identity grade: the world exactly as its authored daylight rig paints it.
  *  `dayNightGrade(1)` lands on these same values by construction (the day
  *  targets below are neutral), so the cycle's noon IS the authored day look. */

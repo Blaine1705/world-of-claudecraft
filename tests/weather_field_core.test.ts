@@ -29,11 +29,12 @@ function rng(seed: number): () => number {
 }
 
 describe('the precipitation table', () => {
-  it('keeps exactly the biomes weather.ts always ran: peaks and frost snow, marsh rains', () => {
+  it('keeps peaks and frost snow, plus the marsh and haunt rain', () => {
     expect(precipForBiome('peaks')).toBe('snow');
     expect(precipForBiome('frost')).toBe('snow');
     expect(precipForBiome('marsh')).toBe('rain');
-    for (const clear of ['vale', 'amber', 'night', 'haunt', 'jungle', 'garden'] as BiomeId[]) {
+    expect(precipForBiome('haunt')).toBe('rain');
+    for (const clear of ['vale', 'amber', 'night', 'jungle', 'garden'] as BiomeId[]) {
       expect(precipForBiome(clear)).toBeNull();
     }
   });

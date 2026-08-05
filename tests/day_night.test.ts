@@ -34,6 +34,7 @@ import {
   skyTintForDayness,
   sunDirection,
   sunsetWarmGate,
+  usesLiveDayNightLighting,
   warmDuskGrade,
 } from '../src/render/day_night_core';
 import type { BiomeId } from '../src/sim/types';
@@ -59,6 +60,21 @@ describe('the live cycle contract', () => {
     // The lighting rig and per-biome HDRI gains are tuned against the identity
     // grade, so the cycle must only ever dip DOWN from it, never re-dim day.
     expect(dayNightGrade(1)).toEqual(NEUTRAL_DAY_GRADE);
+  });
+});
+
+describe('open-air instances follow the live cycle (source pins)', () => {
+  it('includes the overworld and battleground, but no authored interior rig', () => {
+    expect(usesLiveDayNightLighting('outdoor')).toBe(true);
+    expect(usesLiveDayNightLighting('battleground')).toBe(true);
+    expect(usesLiveDayNightLighting('dungeon')).toBe(false);
+    expect(usesLiveDayNightLighting('wildheartField')).toBe(false);
+  });
+
+  it('keeps Thornhollow fog, lights, and IBL on the same live grade as its sky', () => {
+    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    expect(source).toContain('usesLiveDayNightLighting(desired)');
+    expect(source).toContain('usesLiveDayNightLighting(this.fogState)');
   });
 });
 

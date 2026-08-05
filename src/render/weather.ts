@@ -297,6 +297,7 @@ export class Weather {
     // While the visible type still differs from what we want, drive opacity to
     // zero first; once faded out, swap the material and let it climb again.
     let target: number;
+    let maskedModeSwap = false;
     if (want === null) {
       target = 0;
     } else if (want !== this.mode) {
@@ -304,6 +305,7 @@ export class Weather {
       if (this.intensity <= 0.02) {
         this.mode = want;
         this.applyStyle(want);
+        maskedModeSwap = !this.planLocal;
       }
     } else {
       target = STYLES[this.mode].target;
@@ -315,12 +317,13 @@ export class Weather {
 
     const live = this.intensity > 0.01;
     this.points.visible = live;
-    // A masked activation reseeds the whole pool into the weathered zone's
-    // cells: resting positions are uniform over the box, and waiting for each
-    // particle's first wrap would open the effect with a burst of snow over
+    // A masked activation or live style swap reseeds the whole pool into the
+    // weathered zone's cells. A type swap happens while the outgoing cloud is
+    // still barely visible, so wasLive alone cannot identify that boundary.
+    // Waiting for each particle's first wrap would open the new effect over
     // the WRONG (clear) side of the border.
     const masked = !this.planLocal;
-    if (live && !this.wasLive && masked) {
+    if (live && masked && (!this.wasLive || maskedModeSwap)) {
       for (let i = 0; i < this.count; i++) {
         const s = precipSpawnXZ(this.spawnRng, cam.x, cam.z, HX, HZ, this.mode, biomeAt);
         if (s) {

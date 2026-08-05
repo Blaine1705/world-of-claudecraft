@@ -30,10 +30,10 @@ import type { BiomeId } from '../sim/types';
 export type PrecipMode = 'snow' | 'rain';
 
 /** Which precipitation a biome carries. The one authoritative table: peaks
- *  and frost snow, the marsh rains, everything else stays clear. */
+ *  and frost snow, marsh and haunt rain, everything else stays clear. */
 export function precipForBiome(biome: BiomeId): PrecipMode | null {
   if (biome === 'peaks' || biome === 'frost') return 'snow';
-  if (biome === 'marsh') return 'rain';
+  if (biome === 'marsh' || biome === 'haunt') return 'rain';
   return null;
 }
 
