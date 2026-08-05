@@ -10205,6 +10205,18 @@ export const fr_CA: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
       },
+      "moggers_hide_quiver": {
+        "name": "Carquois en cuir de Mogger"
+      },
+      "cragmaw_huntquiver": {
+        "name": "Carquois de chasse de Cragmaw"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "Carquois en os du Gravewyrm"
+      },
+      "direfang_quiver": {
+        "name": "Carquois de Direfang"
+      },
       "conjured_water4": {
         "name": "Eau de source conjurée"
       },

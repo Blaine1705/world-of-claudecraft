@@ -10205,6 +10205,18 @@ export const zh_TW: EnTranslations = {
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
       },
+      "moggers_hide_quiver": {
+        "name": "莫格的獸皮箭袋"
+      },
+      "cragmaw_huntquiver": {
+        "name": "裂顎的狩獵箭袋"
+      },
+      "gravewyrm_bone_quiver": {
+        "name": "墓龍骨箭袋"
+      },
+      "direfang_quiver": {
+        "name": "厲牙箭袋"
+      },
       "conjured_water4": {
         "name": "魔法泉水"
       },
