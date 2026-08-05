@@ -1,11 +1,22 @@
 export const NIGHTLY_ISSUE_LABEL: string;
 export const NIGHTLY_ISSUE_TITLE: string;
+export const NIGHTLY_DRILL_ISSUE_LABEL: string;
+export const NIGHTLY_DRILL_ISSUE_TITLE: string;
+export const NIGHTLY_LANES_PER_REF: number;
 
 export interface NightlyJobResult {
   name: string;
   conclusion: string;
   html_url: string;
 }
+
+export function trackingIssueIdentity(drill: boolean): { label: string; title: string };
+
+export function refNamesFromMatchingRefs(entries: ReadonlyArray<{ ref?: unknown }>): string[];
+
+export function parseTargetsEnv(raw: string | undefined): string[];
+
+export function labelEnsureFailed(ok: boolean, status: number): boolean;
 
 export function pickActiveReleaseBranch(names: readonly string[]): string | null;
 
@@ -47,8 +58,15 @@ export type NightlyReportPlan =
 
 export function planNightlyReport(opts: {
   failed: readonly NightlyJobResult[];
-  openIssues: ReadonlyArray<{ number?: number; state?: string; pull_request?: unknown }>;
+  completed: readonly NightlyJobResult[];
+  openIssues: ReadonlyArray<{
+    number?: number;
+    state?: string;
+    title?: string;
+    pull_request?: unknown;
+  }>;
   runUrl: string;
   targets: readonly string[];
   timestamp: string;
+  drill?: boolean;
 }): NightlyReportPlan;

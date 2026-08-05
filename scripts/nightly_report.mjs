@@ -4,11 +4,21 @@
 // lib/nightly_plan.mjs (unit-tested); this file is the HTTP plumbing. No npm
 // deps: Node 18+ global fetch only.
 //
+// A dispatch drill (NIGHTLY_REF set) reports under the separate drill
+// label/title, so acceptance runs against a scratch branch never touch the
+// production tracking issue.
+//
 // Unlike the targets entry, an API failure HERE throws and fails the job: the
 // report is the alerting deliverable, so degrading it silently would recreate
 // the watched-by-nobody red tip this workflow exists to prevent. A red report
 // job is itself visible in the Actions list.
-import { NIGHTLY_ISSUE_LABEL, planNightlyReport, summarizeRunJobs } from './lib/nightly_plan.mjs';
+import {
+  labelEnsureFailed,
+  parseTargetsEnv,
+  planNightlyReport,
+  summarizeRunJobs,
+  trackingIssueIdentity,
+} from './lib/nightly_plan.mjs';
 
 const API = process.env.GITHUB_API_URL || 'https://api.github.com';
 const repo = process.env.GITHUB_REPOSITORY ?? '';
@@ -17,6 +27,12 @@ const runId = process.env.GITHUB_RUN_ID ?? '';
 const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com';
 if (!repo || !token || !runId) {
   throw new Error('missing GITHUB_REPOSITORY, GITHUB_TOKEN, or GITHUB_RUN_ID');
+}
+
+const drill = (process.env.NIGHTLY_REF ?? '').trim() !== '';
+const identity = trackingIssueIdentity(drill);
+if (drill) {
+  console.log(`[nightly_report] dispatch drill: reporting under the ${identity.label} identity`);
 }
 
 const headers = {
@@ -59,24 +75,17 @@ console.log(
 );
 
 const openIssues = await api(
-  `/repos/${repo}/issues?state=open&labels=${encodeURIComponent(NIGHTLY_ISSUE_LABEL)}&per_page=100`,
+  `/repos/${repo}/issues?state=open&labels=${encodeURIComponent(identity.label)}&per_page=100`,
 );
-
-/** @type {string[]} */
-let targets = [];
-try {
-  const parsed = JSON.parse(process.env.NIGHTLY_TARGETS ?? '');
-  if (Array.isArray(parsed)) targets = parsed.filter((ref) => typeof ref === 'string');
-} catch {
-  // Ref resolution failed upstream; the body says so instead of guessing.
-}
 
 const plan = planNightlyReport({
   failed,
+  completed,
   openIssues: Array.isArray(openIssues) ? openIssues : [],
   runUrl: `${serverUrl}/${repo}/actions/runs/${runId}`,
-  targets,
+  targets: parseTargetsEnv(process.env.NIGHTLY_TARGETS),
   timestamp: new Date().toISOString(),
+  drill,
 });
 
 if (plan.action === 'create') {
@@ -87,13 +96,15 @@ if (plan.action === 'create') {
     headers,
     signal: AbortSignal.timeout(30_000),
     body: JSON.stringify({
-      name: NIGHTLY_ISSUE_LABEL,
+      name: identity.label,
       color: 'b60205',
-      description: 'Tracking issue managed by the nightly full gate',
+      description: drill
+        ? 'Drill issue managed by the nightly full gate (dispatch runs)'
+        : 'Tracking issue managed by the nightly full gate',
     }),
   });
-  if (!labelRes.ok && labelRes.status !== 422) {
-    throw new Error(`ensuring the ${NIGHTLY_ISSUE_LABEL} label failed: HTTP ${labelRes.status}`);
+  if (labelEnsureFailed(labelRes.ok, labelRes.status)) {
+    throw new Error(`ensuring the ${identity.label} label failed: HTTP ${labelRes.status}`);
   }
   const issue = await api(`/repos/${repo}/issues`, {
     method: 'POST',

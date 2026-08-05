@@ -8,11 +8,89 @@
 // release tip carried 67 broken tests for days because push runs were red with
 // nobody watching): a red nightly run must land in exactly ONE open tracking
 // issue (create it if absent, update it if present, never stack a second), and
-// a green run must close that issue with a recovery comment. The label below
-// is the finder, so renaming it strands any issue created under the old name.
+// a green run must close that issue with a recovery comment. The finder is the
+// label AND the exact title together, so a human applying the label to an
+// unrelated issue can never get that issue's body overwritten or auto-closed.
+// Renaming either constant strands any issue created under the old identity.
+//
+// A dispatch drill (the ref input) files under a SEPARATE identity, so the
+// acceptance drill against a scratch branch never touches the production
+// tracking issue.
 
 export const NIGHTLY_ISSUE_LABEL = 'nightly-gate';
 export const NIGHTLY_ISSUE_TITLE = 'Nightly full gate is red';
+export const NIGHTLY_DRILL_ISSUE_LABEL = 'nightly-gate-drill';
+export const NIGHTLY_DRILL_ISSUE_TITLE = 'Nightly full gate drill is red';
+
+// The per-ref lanes the workflow fans out (tests, checks, browser). The
+// proven-green guard below counts successes against this, so removing a lane
+// from the workflow without updating this constant turns the nightly
+// permanently "unproven" (loudly red), never silently green.
+export const NIGHTLY_LANES_PER_REF = 3;
+
+/**
+ * The issue identity a run reports under: the production pair, or the drill
+ * pair when the run was dispatched at an explicit ref.
+ *
+ * @param {boolean} drill
+ * @returns {{ label: string, title: string }}
+ */
+export function trackingIssueIdentity(drill) {
+  return drill
+    ? { label: NIGHTLY_DRILL_ISSUE_LABEL, title: NIGHTLY_DRILL_ISSUE_TITLE }
+    : { label: NIGHTLY_ISSUE_LABEL, title: NIGHTLY_ISSUE_TITLE };
+}
+
+/**
+ * Branch names from a git matching-refs API batch. Entries that are not
+ * `refs/heads/...` strings are dropped. If this strip ever broke, every name
+ * would fail pickActiveReleaseBranch's anchor and the nightly would quietly
+ * gate main alone, which is why it lives here under test instead of inline in
+ * the entry.
+ *
+ * @param {ReadonlyArray<{ ref?: unknown }>} entries
+ * @returns {string[]}
+ */
+export function refNamesFromMatchingRefs(entries) {
+  /** @type {string[]} */
+  const names = [];
+  for (const entry of entries) {
+    if (typeof entry?.ref === 'string' && entry.ref.startsWith('refs/heads/')) {
+      names.push(entry.ref.slice('refs/heads/'.length));
+    }
+  }
+  return names;
+}
+
+/**
+ * Parse the NIGHTLY_TARGETS env value (the targets job's `refs` output).
+ * Anything that is not a JSON array collapses to [], which the report plan
+ * treats as "targets unknown" (fail closed toward an unproven verdict).
+ *
+ * @param {string | undefined} raw
+ * @returns {string[]}
+ */
+export function parseTargetsEnv(raw) {
+  try {
+    const parsed = JSON.parse(raw ?? '');
+    if (Array.isArray(parsed)) return parsed.filter((ref) => typeof ref === 'string');
+  } catch {
+    // Fall through to the unknown-targets shape.
+  }
+  return [];
+}
+
+/**
+ * Whether an ensure-label response is a real failure. 422 means the label
+ * already exists, which is the expected steady state.
+ *
+ * @param {boolean} ok
+ * @param {number} status
+ * @returns {boolean}
+ */
+export function labelEnsureFailed(ok, status) {
+  return !ok && status !== 422;
+}
 
 /**
  * Pick the active release branch from a list of branch names: the highest
@@ -63,9 +141,9 @@ export function buildTargets({ inputRef, releaseBranch, defaultBranch = 'main' }
  * Split a workflow run's job listing into completed jobs and failures. Only
  * completed jobs are judged (the report job itself is still in progress when
  * it asks); among those, anything that is not success, skipped, or neutral
- * counts as a failure: cancelled, timed_out, action_required, and stale all
- * mean "the nightly did not prove the tip green", which is the fail-closed
- * direction for an alerting job.
+ * counts as a failure: cancelled, timed_out, action_required, stale, and an
+ * unreadable conclusion all mean "the nightly did not prove the tip green",
+ * which is the fail-closed direction for an alerting job.
  *
  * @param {ReadonlyArray<{ name?: string, status?: string, conclusion?: string | null, html_url?: string }>} jobs
  * @returns {{
@@ -142,46 +220,91 @@ export function renderRecoveryComment({ runUrl, timestamp }) {
 }
 
 /**
- * Decide what to do to the tracking issue. `openIssues` may be the raw issues
- * listing: pull requests (which the issues API also returns) and anything not
- * open are filtered here, and when several tracking issues exist (which the
- * create rule makes impossible short of a manual duplicate) the OLDEST is
- * updated and none are created, preserving the exactly-one contract.
+ * Decide what to do to the tracking issue.
+ *
+ * The verdict is not "no failures": a run whose lanes never materialized (an
+ * empty matrix, a skipped chain, unknown targets) proves nothing, so a green
+ * verdict additionally requires one success for the targets job plus
+ * NIGHTLY_LANES_PER_REF successes per gated ref among the completed jobs.
+ * Anything short of that synthesizes an "unproven" failure, because closing
+ * the tracking issue on a run that ran nothing is exactly the silent-green
+ * failure mode this workflow exists to abolish.
+ *
+ * `openIssues` may be the raw issues listing: pull requests (which the issues
+ * API also returns) and anything not open are filtered here, and only issues
+ * whose title matches the run's identity are considered, so a human applying
+ * the label to an unrelated issue never gets it rewritten or closed. When
+ * several tracking issues exist, the OLDEST is updated and none are created;
+ * duplicates are possible only when a dispatch run races the scheduled run
+ * (they sit in different concurrency groups), and they drain one per green
+ * run through the close branch.
  *
  * @param {{
  *   failed: ReadonlyArray<{ name: string, conclusion: string, html_url: string }>,
- *   openIssues: ReadonlyArray<{ number?: number, state?: string, pull_request?: unknown }>,
+ *   completed: ReadonlyArray<{ name: string, conclusion: string, html_url: string }>,
+ *   openIssues: ReadonlyArray<{ number?: number, state?: string, title?: string, pull_request?: unknown }>,
  *   runUrl: string,
  *   targets: readonly string[],
  *   timestamp: string,
+ *   drill?: boolean,
  * }} opts
  * @returns {{ action: 'create', title: string, body: string, labels: string[] }
  *   | { action: 'update', issueNumber: number, body: string, comment: string }
  *   | { action: 'close', issueNumber: number, comment: string }
  *   | { action: 'none', reason: string }}
  */
-export function planNightlyReport({ failed, openIssues, runUrl, targets, timestamp }) {
+export function planNightlyReport({
+  failed,
+  completed,
+  openIssues,
+  runUrl,
+  targets,
+  timestamp,
+  drill = false,
+}) {
+  const identity = trackingIssueIdentity(drill);
   const tracking = openIssues
-    .filter((issue) => issue && issue.state === 'open' && issue.pull_request === undefined)
-    .filter((issue) => Number.isInteger(issue.number))
+    // pull_request == null tolerates both the omitted key (GitHub) and an
+    // explicit null (normalizing proxies); either way it is not a PR.
+    .filter((issue) => issue && issue.state === 'open' && issue.pull_request == null)
+    .filter((issue) => Number.isInteger(issue.number) && issue.title === identity.title)
     .sort((a, b) => a.number - b.number);
   const existing = tracking[0];
 
-  if (failed.length > 0) {
-    const body = renderIssueBody({ runUrl, targets, timestamp, failed });
+  const successCount = completed.filter((job) => job.conclusion === 'success').length;
+  const requiredSuccesses = targets.length > 0 ? 1 + NIGHTLY_LANES_PER_REF * targets.length : null;
+  const proven = requiredSuccesses !== null && successCount >= requiredSuccesses;
+  const effectiveFailed =
+    failed.length > 0
+      ? failed
+      : proven
+        ? []
+        : [
+            {
+              name:
+                requiredSuccesses === null
+                  ? 'nightly run reported no failures but its targets are unknown (unproven)'
+                  : `nightly run reported no failures but only ${successCount} of the ${requiredSuccesses} expected jobs succeeded (unproven)`,
+              conclusion: 'unproven',
+              html_url: '',
+            },
+          ];
+
+  if (effectiveFailed.length > 0) {
+    const body = renderIssueBody({ runUrl, targets, timestamp, failed: effectiveFailed });
     if (existing === undefined) {
       return {
         action: 'create',
-        title: NIGHTLY_ISSUE_TITLE,
+        title: identity.title,
         body,
-        labels: [NIGHTLY_ISSUE_LABEL],
+        labels: [identity.label],
       };
     }
     return {
       action: 'update',
       issueNumber: existing.number,
       body,
-      comment: renderFailureComment({ runUrl, timestamp, failed }),
+      comment: renderFailureComment({ runUrl, timestamp, failed: effectiveFailed }),
     };
   }
 

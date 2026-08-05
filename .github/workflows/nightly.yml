@@ -26,7 +26,9 @@ name: Nightly gate
 # The schedule fires on the default branch, so the cron arms only once this
 # file reaches main; until then (and for the acceptance drill against a
 # scratch branch with a deliberately broken test) use workflow_dispatch with
-# the ref input, which gates exactly that one ref.
+# the ref input, which gates exactly that one ref. A dispatch run reports
+# under the separate nightly-gate-drill issue identity, so drills never touch
+# the production tracking issue.
 on:
   schedule:
     # Daily, 04:47 UTC. Off the hour so this does not pile into the
@@ -43,7 +45,12 @@ permissions:
   contents: read
 
 # A dispatch must never cancel a running scheduled pass (or vice versa): the
-# event name and ref keep the groups apart, and nothing here cancels.
+# event name and ref keep the groups apart, and nothing here cancels. The
+# flip side (a dispatch report racing the scheduled report on the SAME issue
+# identity) is accepted rather than serialized with a job-level concurrency
+# group, because a queued-then-superseded report job would be cancelled
+# outright, losing that run's alert; the planner's oldest-wins update rule
+# bounds the damage to a duplicate issue that drains on green runs.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ inputs.ref || github.ref }}
   cancel-in-progress: false
@@ -69,12 +76,14 @@ jobs:
           filter: blob:none
           sparse-checkout: |
             scripts
+          persist-credentials: false
 
       - name: Resolve refs
         id: resolve
         env:
           GITHUB_TOKEN: ${{ github.token }}
           NIGHTLY_REF: ${{ inputs.ref }}
+          NIGHTLY_DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         # Stdlib-only script on the runner's preinstalled Node: no toolchain
         # setup for a single API call.
         run: node scripts/nightly_targets.mjs
@@ -98,6 +107,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ matrix.ref }}
+          persist-credentials: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -117,8 +127,9 @@ jobs:
         run: npm test -- --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
 
   # The serialized checks, mirroring the release-checks job in ci.yml (same
-  # step list, no tsc incremental cache: nightly wall clock is not worth a
-  # cache keyed to a moving tip).
+  # run-step list, pinned to it by tests/nightly_workflow.test.ts; the one
+  # omission is the tsc incremental cache step, which is a uses: cache keyed
+  # to a moving tip and not worth carrying here).
   checks:
     name: Nightly checks (${{ matrix.ref }})
     needs: targets
@@ -133,6 +144,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ matrix.ref }}
+          persist-credentials: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -150,6 +162,9 @@ jobs:
 
       - name: Generate i18n artifacts
         run: npm run i18n:gen
+
+      - name: Post i18n coverage summary
+        run: node scripts/i18n_coverage_summary.mjs
 
       - name: Verify committed i18n artifacts are fresh
         run: git diff --exit-code -- src/ui/i18n.resolved.generated src/admin/i18n.resolved.generated src/ui/i18n.catalog/translation_keys.generated.ts
@@ -187,6 +202,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           ref: ${{ matrix.ref }}
+          persist-credentials: false
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
@@ -239,12 +255,16 @@ jobs:
       - name: Check out report script
         uses: actions/checkout@v6
         with:
+          # No ref input here EVER: the write-scoped job runs only the
+          # workflow's own script, never code from a resolved ref.
           filter: blob:none
           sparse-checkout: |
             scripts
+          persist-credentials: false
 
       - name: File, update, or close the tracking issue
         env:
           GITHUB_TOKEN: ${{ github.token }}
           NIGHTLY_TARGETS: ${{ needs.targets.outputs.refs }}
+          NIGHTLY_REF: ${{ inputs.ref }}
         run: node scripts/nightly_report.mjs

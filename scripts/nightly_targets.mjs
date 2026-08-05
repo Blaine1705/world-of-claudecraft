@@ -8,11 +8,19 @@
 // here must not silence the whole run. On any failure the targets collapse to
 // the default branch alone, loudly, and the run still happens.
 import { appendFileSync } from 'node:fs';
-import { buildTargets, pickActiveReleaseBranch } from './lib/nightly_plan.mjs';
+import {
+  buildTargets,
+  pickActiveReleaseBranch,
+  refNamesFromMatchingRefs,
+} from './lib/nightly_plan.mjs';
 
 const API = process.env.GITHUB_API_URL || 'https://api.github.com';
 const repo = process.env.GITHUB_REPOSITORY ?? '';
 const token = process.env.GITHUB_TOKEN ?? '';
+// The workflow passes the real default branch; the 'main' fallback only
+// covers a missing env var, so a renamed default branch cannot strand the
+// nightly on a nonexistent ref.
+const defaultBranch = (process.env.NIGHTLY_DEFAULT_BRANCH ?? '').trim() || 'main';
 
 /** @returns {Promise<string[]>} branch names under release/ */
 async function listReleaseBranches() {
@@ -34,11 +42,7 @@ async function listReleaseBranches() {
     if (!res.ok) throw new Error(`matching-refs page ${page} failed: HTTP ${res.status}`);
     const batch = await res.json();
     if (!Array.isArray(batch)) throw new Error(`matching-refs page ${page}: non-array payload`);
-    for (const entry of batch) {
-      if (typeof entry?.ref === 'string' && entry.ref.startsWith('refs/heads/')) {
-        names.push(entry.ref.slice('refs/heads/'.length));
-      }
-    }
+    names.push(...refNamesFromMatchingRefs(batch));
     if (batch.length < 100) return names;
   }
   return names;
@@ -47,17 +51,17 @@ async function listReleaseBranches() {
 const inputRef = process.env.NIGHTLY_REF ?? '';
 let targets;
 if (inputRef.trim() !== '') {
-  targets = buildTargets({ inputRef });
+  targets = buildTargets({ inputRef, defaultBranch });
   console.log(`[nightly_targets] dispatch ref override: gating ${targets.join(', ')}`);
 } else {
   try {
     const releaseBranch = pickActiveReleaseBranch(await listReleaseBranches());
-    targets = buildTargets({ inputRef: null, releaseBranch });
+    targets = buildTargets({ inputRef: null, releaseBranch, defaultBranch });
     console.log(
       `[nightly_targets] gating ${targets.join(', ')}${releaseBranch ? '' : ' (no release/vX.Y.Z branch found)'}`,
     );
   } catch (err) {
-    targets = buildTargets({ inputRef: null, releaseBranch: null });
+    targets = buildTargets({ inputRef: null, releaseBranch: null, defaultBranch });
     const detail = err instanceof Error ? err.message : String(err);
     console.log(
       `[nightly_targets] release branch resolution failed (${detail}); gating ${targets.join(', ')} only`,
