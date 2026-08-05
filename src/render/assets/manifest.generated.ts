@@ -856,6 +856,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/leafy_fox_statue.glb": "/media/models/props/leafy_fox_statue.2bdf8bb9bc3b.glb",
   "models/props/leatherworking_rack.glb": "/media/models/props/leatherworking_rack.a2b5d6de9817.glb",
   "models/props/mailbox_pillar.glb": "/media/models/props/mailbox_pillar.599f931cebce.glb",
+  "models/props/maledict_eye.glb": "/media/models/props/maledict_eye.8c8cfa095629.glb",
   "models/props/market_stand_1.glb": "/media/models/props/market_stand_1.d59645bb1654.glb",
   "models/props/market_stand_2.glb": "/media/models/props/market_stand_2.b81f32ab47d1.glb",
   "models/props/marsh_bell_gallows.glb": "/media/models/props/marsh_bell_gallows.98cfbed07222.glb",

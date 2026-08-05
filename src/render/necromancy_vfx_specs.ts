@@ -1,4 +1,26 @@
 import type { AbilityVfxFullSpec, AbilityVfxSpec } from './ability_vfx_core';
+import { EMBERKIN_FELBOLT_VFX_FULL_SPEC, EMBERKIN_FELBOLT_VFX_SPEC } from './warlock_pet_vfx_specs';
+
+// Bone Mage keeps Emberkin's compact fel-lance silhouette and timing, retinted
+// violet so its shadow-school projectile reads as Necromancy at a glance.
+export const BONE_MAGE_SHADOW_BOLT_VFX_SPEC = {
+  ...EMBERKIN_FELBOLT_VFX_SPEC,
+  c: '#8f4dff',
+  p: 'shadow',
+} satisfies AbilityVfxSpec;
+
+export const BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC = {
+  ...EMBERKIN_FELBOLT_VFX_FULL_SPEC,
+  palette: 'shadow',
+  tint: '#8f4dff',
+  accent: '#d8b0ff',
+  rim: '#c998ff',
+  bolt: {
+    ...EMBERKIN_FELBOLT_VFX_FULL_SPEC.bolt,
+    core: '#18072f',
+    accent: '#d8b0ff',
+  },
+} satisfies AbilityVfxFullSpec;
 
 // Powerful VFX prompt:
 // "Tear open a towering black-violet ossuary portal in front of the

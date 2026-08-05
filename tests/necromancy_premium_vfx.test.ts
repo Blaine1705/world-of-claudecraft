@@ -9,6 +9,8 @@ import { abilityVfxFullSpec, abilityVfxSpec } from '../src/render/ability_vfx_re
 import {
   ARMY_OF_THE_DEAD_VFX_FULL_SPEC,
   ARMY_OF_THE_DEAD_VFX_SPEC,
+  BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC,
+  BONE_MAGE_SHADOW_BOLT_VFX_SPEC,
   CORPSE_EXPLOSION_VFX_FULL_SPEC,
   CORPSE_EXPLOSION_VFX_SPEC,
   DEATH_ECHO_VFX_FULL_SPEC,
@@ -21,6 +23,10 @@ import {
   SOUL_LANCE_VFX_FULL_SPEC,
   SOUL_LANCE_VFX_SPEC,
 } from '../src/render/necromancy_vfx_specs';
+import {
+  EMBERKIN_FELBOLT_VFX_FULL_SPEC,
+  EMBERKIN_FELBOLT_VFX_SPEC,
+} from '../src/render/warlock_pet_vfx_specs';
 
 function fakeTextures(): AbilityVfxTextures {
   const texture = (): THREE.CanvasTexture => new THREE.Texture() as THREE.CanvasTexture;
@@ -79,6 +85,117 @@ function painterHarness() {
 }
 
 describe('Necromancy premium VFX', () => {
+  it('retints Emberkin fel-lance anatomy violet for the Bone Mage projectile', () => {
+    expect(abilityVfxSpec('bone_mage_shadow_bolt')).toBe(BONE_MAGE_SHADOW_BOLT_VFX_SPEC);
+    expect(abilityVfxFullSpec('bone_mage_shadow_bolt')).toBe(BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC);
+    expect(BONE_MAGE_SHADOW_BOLT_VFX_SPEC).toMatchObject({
+      c: '#8f4dff',
+      p: 'shadow',
+      pw: 1.05,
+      sp: 30,
+      rg: 0.7,
+      b: { v: 30, h: 1.05, co: 1 },
+      a: 'bolt',
+    });
+    expect(BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC).toMatchObject({
+      archetype: 'bolt',
+      palette: 'shadow',
+      tint: '#8f4dff',
+      accent: '#d8b0ff',
+      rim: '#c998ff',
+      power: 1.05,
+      filler: true,
+      bolt: {
+        speed: 30,
+        headScale: 1.05,
+        style: 'felLance',
+        core: '#18072f',
+        accent: '#d8b0ff',
+        coils: true,
+        tracer: true,
+      },
+      impact: { ring: 0.7, sparks: 30, light: 1.15 },
+    });
+    expect(BONE_MAGE_SHADOW_BOLT_VFX_SPEC).toEqual({
+      ...EMBERKIN_FELBOLT_VFX_SPEC,
+      c: '#8f4dff',
+      p: 'shadow',
+    });
+    expect(BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC).toEqual({
+      ...EMBERKIN_FELBOLT_VFX_FULL_SPEC,
+      palette: 'shadow',
+      tint: '#8f4dff',
+      accent: '#d8b0ff',
+      rim: '#c998ff',
+      bolt: {
+        ...EMBERKIN_FELBOLT_VFX_FULL_SPEC.bolt,
+        core: '#18072f',
+        accent: '#d8b0ff',
+      },
+    });
+
+    const h = painterHarness();
+    expect(
+      h.painter.handleSpellfx({
+        sourceId: 4,
+        targetId: 2,
+        school: 'shadow',
+        fx: 'projectile',
+        ability: 'bone_mage_shadow_bolt',
+      }),
+    ).toBe(true);
+    expect(h.sequenceBolt).toHaveBeenCalledWith(
+      'bone_mage_shadow_bolt',
+      BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC,
+      4,
+      2,
+      0x8f4dff,
+      expect.any(Number),
+      0,
+      1,
+      expect.any(Number),
+    );
+  });
+
+  it('draws every Bone Mage fel-lance head piece from its purple palette', () => {
+    const scene = new THREE.Scene();
+    const anchors = new Map([
+      [1, new THREE.Vector3(0, 1, 0)],
+      [2, new THREE.Vector3(10, 1, 0)],
+    ]);
+    const ribbons = new AbilityVfxRibbons(
+      scene,
+      (id) => anchors.get(id)?.clone() ?? null,
+      fakeTextures(),
+    );
+    const bolt = BONE_MAGE_SHADOW_BOLT_VFX_FULL_SPEC.bolt;
+    if (!bolt) throw new Error('Bone Mage bolt DNA missing');
+
+    ribbons.spawnTrailStyled(1, 2, 0x8f4dff, 0.3, {
+      speed: bolt.speed ?? 30,
+      style: bolt.style ?? 'comet',
+      headSize: bolt.headScale ?? 1,
+      coreHex: bolt.core ? Number.parseInt(bolt.core.slice(1), 16) : undefined,
+      accentHex: bolt.accent ? Number.parseInt(bolt.accent.slice(1), 16) : undefined,
+      coils: bolt.coils === true,
+      jagTrail: false,
+      forkEvery: 0,
+      tracer: bolt.tracer === true,
+      delay: 0,
+      aimX: 0,
+      aimY: 0,
+      aimZ: 0,
+      groundY: () => 0,
+    });
+
+    const head = vi.fn();
+    ribbons.drawHeads(0, head);
+    const colors = head.mock.calls.map((call) => call[3]);
+
+    expect(colors).toEqual(expect.arrayContaining([0x8f4dff, 0x18072f]));
+    expect(colors).not.toContain(0x0b3d1b);
+  });
+
   it('opens Army of the Dead as a final-tier three-lane portal ritual', () => {
     expect(abilityVfxSpec('army_of_the_dead')).toBe(ARMY_OF_THE_DEAD_VFX_SPEC);
     expect(abilityVfxFullSpec('army_of_the_dead')).toBe(ARMY_OF_THE_DEAD_VFX_FULL_SPEC);
