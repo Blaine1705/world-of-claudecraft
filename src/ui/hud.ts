@@ -5685,14 +5685,7 @@ export class Hud {
     this.targetAurasWindow.relocalize();
     if (this.questlogWindow.isOpen) this.questlogWindow.render();
     if ($('#bags').style.display !== 'none') this.renderBags();
-    if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
-      this.renderVendor();
-    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
-      this.renderHeroicVendor();
-    if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
-      this.renderTrain();
-    if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
-      this.renderUnbind();
+    this.repaintOpenServiceWindows();
     // The Town Focus signature is text-independent (the allocation, the budget
     // and the in-town flag), so a language switch alone never moves it and the
     // slow-band probe would leave the panel in the old locale until the player
@@ -14316,7 +14309,14 @@ export class Hud {
     // inventory deltas landed here, but every money-only credit now routes through
     // this hook (#2373), so a hidden window would be rebuilt on each one.
     if (bagsWindowShown($('#bags').style.display)) this.renderBags();
-    if (this.openVendorNpcId !== null) this.renderVendor();
+    // A trainer fee is a money-only self delta online (no inv echo), and the
+    // heroic shop prices rows off a mark COUNT in the bag: every service
+    // window's affordability flag can go stale on a purse or inventory move,
+    // so re-price the whole open family here, the same edge the vendor path
+    // already used (#2373). Offline this hook barely fires (the bank window's
+    // wiring); the train ladder converges there through the Learn click and
+    // trainResult repaints instead.
+    this.repaintOpenServiceWindows();
     this.renderCharIfOpen();
     // The crafting window rides this hook too (#2375): it is the online
     // host's instant edge for an authoritative delta, and offline it is what
@@ -14338,6 +14338,23 @@ export class Hud {
     )
       return;
     this.renderCrafting();
+  }
+
+  /** Repaint every OPEN service window (copper vendor, heroic quartermaster,
+   *  training ladder, unbind list) behind its own open-plus-shown guard. All
+   *  four price their rows against the purse or a bag count, so the language
+   *  switch and the authoritative inventory hook repaint the family through
+   *  this one method; the per-site copies of the guard pack earned the
+   *  extraction (rule of three). */
+  private repaintOpenServiceWindows(): void {
+    if (this.openVendorNpcId !== null && $('#vendor-window').style.display === 'block')
+      this.renderVendor();
+    if (this.openHeroicVendorNpcId !== null && $('#vendor-window').style.display === 'block')
+      this.renderHeroicVendor();
+    if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
+      this.renderTrain();
+    if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
+      this.renderUnbind();
   }
 
   onCosmeticsChanged(): void {
