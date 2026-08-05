@@ -93,6 +93,52 @@ at most. Fury's +10% is the one exception: its fresh gear search found a genuine
 basin (the reconciliation confirmed it against the old build on the full seed set), not a
 sim change.
 
+# The two-minute window (the fairest single number)
+
+60 s flatters burst and 300 s is dominated by who has gone OOM; 120 s is where burst has
+faded but only the true mana cliffs have hit. Sorted by 120 s, with each spec's
+sustain-objective build beside it (past two minutes that is the build a mana spec would
+actually bring):
+
+| Spec | 60s | 120s | 300s | sustain 120s | best 120s | OOM |
+|---|---:|---:|---:|---:|---:|---:|
+| Fury (Bloodrush) | 275 | **263** | 266 | 279 | 279 | - |
+| Balance (Moongrove) | 258 | **260** | 265 | 266 | 266 | - |
+| Destruction (Ruination) | 288 | **253** | 197 | 247 | 253 | 210s |
+| Affliction (Hexcraft) | 238 | **229** | 231 | 217 | 229 | - |
+| Enhancement (Warspirit) | 224 | **218** | 206 | 217 | 218 | 114s |
+| Demonology (Pactbound) | 261 | **218** | 172 | 230 | 230 | 210s |
+| Retribution (Dawnreaver) | 228 | **212** | 213 | 213 | 213 | - |
+| Feral cat (Wildfang) | 209 | **204** | 200 | 197 | 204 | - |
+| Frost (Cryomancy) | 200 | **202** | 169 | 214 | 214 | 171s |
+| Subtlety (Skulduggery) | 205 | **202** | 205 | 218 | 218 | - |
+| Arms (Battlecraft) | 203 | **195** | 192 | 206 | 206 | - |
+| Combat (Thuggery) | 194 | **189** | 191 | 193 | 193 | - |
+| Fire (Pyromancy) | 191 | **189** | 108 | 189 | 189 | 115s |
+| Beast Mastery (Packlord) | 199 | **186** | 85 | 189 | 189 | - |
+| Shadow (Vespers) | 178 | **178** | 181 | 176 | 178 | - |
+| Assassination (Knifework) | 179 | **172** | 173 | 166 | 172 | - |
+| Elemental (Thundercall) | 150 | **147** | 139 | 155 | 155 | - |
+| Survival (Fieldcraft) | 153 | **143** | 84 | 151 | 151 | - |
+| Marksmanship (Coldsight) | 139 | **129** | 54 | 133 | 133 | - |
+
+Three readings:
+
+1. **The warlock lead is a 60-second phenomenon.** At two minutes the podium inverts to
+   Fury (279 sustain-built) and Balance (260, never dry); Destruction has already slid
+   35 DPS off its 60 s number and Demonology 43. Judge the class at 60 s and it looks
+   like the problem; judge it at 120 s and it is one strong spec plus two burst kits
+   paying for their opener.
+2. **The spread at 120 s is 2.04x** (263 to 129, median 202), the tightest of any
+   window: the roster is closest to the plus or minus 15% intent exactly where fights
+   actually live.
+3. The bottom three are the same kit-problem specs at every window (Marksmanship,
+   Survival, Elemental), which is why the suggested order of work targets kits, not
+   levels, below the median.
+
+(This study snapshots 15/30/60/120/300 s; a 180 s column would need a re-run with the
+window added and is the natural next refinement if two minutes still feels short.)
+
 ---
 
 # The rogue re-band, measured
