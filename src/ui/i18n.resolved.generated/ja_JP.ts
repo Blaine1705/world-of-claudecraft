@@ -3228,7 +3228,7 @@ export const ja_JP: EnTranslations = {
       "levels": "レベル {min} から {max}"
     },
     "arenaGate": {
-      "minLevelNote": "Requires level {level}"
+      "minLevelNote": "レベル {level} が必要です"
     }
   },
   "gatherEvent": {

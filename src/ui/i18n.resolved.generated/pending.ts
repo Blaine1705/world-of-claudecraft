@@ -1361,7 +1361,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "zh_CN": [
-    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bg.clock",
     "hudChrome.controller.zoomIn",
     "hudChrome.controller.zoomOut",
@@ -1373,7 +1372,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "zh_TW": [
-    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bg.clock",
     "hudChrome.controller.zoomIn",
     "hudChrome.controller.zoomOut",
@@ -1385,7 +1383,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "ko_KR": [
-    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bg.clock",
     "hudChrome.controller.zoomIn",
     "hudChrome.controller.zoomOut",
@@ -1397,7 +1394,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.pvp.launcherTitle"
   ],
   "ja_JP": [
-    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bg.clock",
     "hudChrome.controller.zoomIn",
     "hudChrome.controller.zoomOut",
@@ -1634,7 +1630,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin"
   ],
   "ru_RU": [
-    "hudChrome.arenaGate.minLevelNote",
     "hudChrome.bg.clock",
     "hudChrome.controller.zoomIn",
     "hudChrome.controller.zoomOut",
