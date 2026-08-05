@@ -17,8 +17,10 @@ export const SETTING_RANGES = {
   // localStorage during startup because tier choice controls preload. def is MEDIUM (a safe
   // middle, also the Reset target): on a player's FIRST run main.ts probes the device and
   // PERSISTS a device-appropriate preset over this default when the GPU is recognized
-  // (resolveDefaultGraphicsPreset in gfx.ts), so a weak phone is not stuck on a tier it cannot
-  // run and a strong desktop is not capped below what it can drive. A masked/inconclusive device
+  // (resolveDefaultGraphicsPreset in gfx.ts), so a phone is not stuck on a tier it cannot enter
+  // the world at and a strong desktop is not capped below what it can drive. EVERY touch device
+  // resolves to LOW there, so a phone is persisted at 1 on its first boot and never re-detected.
+  // A masked/inconclusive DESKTOP
   // stays on this medium default and keeps re-detecting on later boots (see graphicsDefaultApplied).
   // An explicit player choice (stored here) is never overridden.
   // max 6: 1 low .. 4 ultra, 5 advanced, 6 insane (the everything-on showcase;
