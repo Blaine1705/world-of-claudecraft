@@ -31,6 +31,7 @@ import { pointsSpent } from './content/talents';
 import { VC_ALLROUNDER_ONLY_MAX_BRACKET } from './content/vale_cup';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
+import { onItemDiscovered as onReliquaryItemDiscovered } from './reliquary';
 import { RESURRECTION_SICKNESS_ID } from './resurrection';
 import type { ArenaMatch, InstanceSlot, PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
@@ -544,6 +545,10 @@ export function markItemDiscovered(
     if (!meta.deedStats.itemsDiscovered.has(id)) {
       meta.deedStats.itemsDiscovered.add(id);
       markDeedDirtyKey(ctx, meta.entityId, 'items');
+      // Reliquary sparse first-find + capped recent for catalogued relics only.
+      // Rides the same first-obtain hub (including buyback); never dual-writes
+      // discovery and never forces saveCharacter (30s autosave / leave).
+      onReliquaryItemDiscovered(ctx, meta, id);
     }
     const quality = (id === itemId ? rolledQuality : undefined) ?? def.quality;
     if (quality === 'rare' || quality === 'epic' || quality === 'legendary') {

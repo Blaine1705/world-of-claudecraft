@@ -437,6 +437,13 @@ import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
+import {
+  freshReliquaryState,
+  type ReliquaryState,
+  restoreReliquaryState,
+  type SavedReliquaryState,
+  serializeReliquaryState,
+} from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
@@ -1466,6 +1473,10 @@ export interface PlayerMeta {
   deedStats: DeedStats;
   activeTitle: string | null;
   renown: number;
+  // The Reliquary (src/sim/reliquary.ts): sparse first-find meta, authored
+  // marks, capped recent. Item ownership stays on deedStats.itemsDiscovered;
+  // this field is omit-empty on serialize and never a second full discovery set.
+  reliquary: ReliquaryState;
 }
 
 // Away-from-keyboard / do-not-disturb presence. `afk` still delivers whispers
@@ -1708,6 +1719,9 @@ export interface CharacterState {
   deedStats?: SavedDeedStats;
   activeTitle?: string | null;
   renown?: number;
+  // The Reliquary (JSONB; optional, written only when non-empty so pre-system
+  // saves load cleanly and stay byte-equal until the system engages).
+  reliquary?: SavedReliquaryState;
 }
 
 export interface PetState {
@@ -2724,6 +2738,7 @@ export class Sim {
       deedStats: freshDeedStats(),
       activeTitle: null,
       renown: 0,
+      reliquary: freshReliquaryState(),
     };
     // A fresh character sets out provisioned (class-defined starter rations);
     // a saved character loads its own bags from savedState below.
@@ -3126,6 +3141,7 @@ export class Sim {
         if (typeof day === 'string') meta.deedsEarned.set(deedId, day);
       }
       meta.deedStats = restoreDeedStats(s.deedStats);
+      meta.reliquary = restoreReliquaryState(s.reliquary);
       deedsMod.unionLegacyMilestones(meta);
       deedsMod.recomputeRenown(meta);
       // The saved title re-applies through the same validator the setter
@@ -3870,6 +3886,12 @@ export class Sim {
       })(),
       ...(meta.activeTitle !== null ? { activeTitle: meta.activeTitle } : {}),
       ...(meta.renown > 0 ? { renown: meta.renown } : {}),
+      // Reliquary: absent while empty (zero-default omission), same contract as
+      // deedStats so pre-system saves stay byte-equal until a catalogued find.
+      ...(() => {
+        const reliquary = serializeReliquaryState(meta.reliquary);
+        return reliquary ? { reliquary } : {};
+      })(),
     };
     return sanitizeRemovedZone1Content(state).state;
   }
