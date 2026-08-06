@@ -236,3 +236,72 @@ happened.
   skips; sim blast-radius suites (architecture, parity, wire, snapshots,
   delves, delve_shop, deeds) all green after the sim fix.
 - Commits stay LOCAL per the plan; push happens after Phase 12 QA passes.
+
+## Phase 12 QA: Verify test integrity + catalog pins (2026-08-06)
+
+- Ultracode QA phase per the plan. Pre-flight: the release tip e8330dbf11
+  (merge-queue PR 3016) was already the sync merge fb6e012255's first parent,
+  so no new sync merge was owed; tree clean at f928641226 before work began.
+- Adversarial mutation audit, the phase's core: 33 gated mutations executed
+  red-then-restored across three central serial batteries (18 + 9 + 6), every
+  one KILLED. Harness: per-mutation anchor-count gates (exactly one match
+  required before patching), cp-restore (never checkout), patch-applied proof
+  via git diff, tests-ran proof from vitest JSON reporters, and a
+  porcelain-clean tree proven after every mutation. One extra exploratory
+  mutation (deleting the restore recent-ring catalog filter) confirmed existing
+  coverage in two tests rather than a gap.
+- Separations proven, not assumed: a page-side drop reds the totals literal
+  plus the equality while the vacuity floor stays green; a loot-side drop reds
+  the floor (failure-message verified) while the totals stay green; a
+  BOTH-sides drop still reds floor plus totals (the context pass had
+  hypothesized equality-invisibility; the hand-literal floors refute it); the
+  floored-readout pin alone carries the per-entry floor claim (the cross-module
+  writer test stays green under a floor regression); the bag and bank sheet
+  arms red independently; a synthetic sixth Curator rank reds ONLY the new
+  growth cross-pins; deleting a signature rare from the delve shop stock is
+  invisible to the page equality (the chest still derives it) and is caught
+  only by the strengthened stock pin.
+- Reviews (all read-only, coverage-prompted): architecture-reviewer SHIP
+  (0 blocking; 1 comment-precision should-fix, applied); cross-platform-sync
+  0 blocking / 0 should-fix (no host or IWorld drift; both worlds call the one
+  clearCountForSource); qa-checklist READY (0 blocking; confirmed the delve arm
+  was the ONLY reader/writer key mismatch in the file and that no shipped save
+  carries a bad clears stamp, the Reliquary having never shipped);
+  test-coverage-auditor PASS (1 should-fix: the server rank-6 boundary was a
+  hand literal, closed with CURATOR_RANK_DEFS growth cross-pins on BOTH the
+  server and client arms); comment-accuracy verifier: every 314187312e
+  correction ACCURATE with full git provenance (the seed-1 branch hunt vs
+  seed-5 release hunt history verified back to 3c0931fcdf and 58bf16476d).
+- Fix rounds: a381a6a391 applied every finding (new pins: observer-throw
+  propagation, string-clears and non-object restore arms, bidirectional
+  heroic-gear keys, desc staleness pins, portal-loot premise guard, rank
+  growth cross-pins, a line-adjacent cap literal, the border-kind pin; comment
+  corrections including the finding that reagent parity between the masterwork
+  arms is impossible by design, the 1145 self-signed reduction). The fresh
+  review of that round found 1 BLOCKING: the Thunzharr comment reword (sourced
+  from the comment verifier) was itself wrong, because the world-boss path caps
+  gear at one piece per kill via rollWorldBossLoot's gearWon discard; verified
+  in-source and restored with the both-groups-drawn / one-award wording in
+  1108acd6aa, together with that review's six should-fixes (range/int/pick
+  propagation arms, the client-side rank pin, the DESC_BOSSES table over every
+  page naming a full live boss, the portal vacuity floor, heroicClear gate
+  pins, module-private wording in the CLAUDE.md row, the file's last em dash).
+  All round-2 pins re-proven by mutation (6 further kills in the 33). A final
+  delta review of round 2 returned GO with one correction (the gear cap is per
+  CONTRIBUTOR; gearWon is declared inside the contributor loop) and flagged the
+  pre-existing zone3 Thunzharr comment as arithmetically stale (the vestments
+  chest joined the first group after it was written); round 3 (4b86153f0f)
+  applied both, trued the zone3 numbers in-source (40 percent gear group, ~19
+  percent effective belt), and made the DESC_BOSSES table self-checking by
+  deriving the (page, full-name) pair set from the live catalog, itself
+  mutation-proven (a heroic desc gaining a full boss name reds the guard; 34
+  gated kills total).
+- Validation: npx tsc clean throughout; node scripts/gate_select.mjs PASS on
+  a381a6a391 (all 8 steps green; full vitest 31572 passed with zero unexpected
+  failures, the previously inherited 3 reds cleared by the release-side red-tip
+  repair) and re-run on the final tree before push; biome clean on every
+  touched file.
+- Verdict: PASS. Pushed to origin feature/reliquary (PR 2976) after the final
+  gate run; CI babysat per the plan (AI-assist checks never gate; CANCELLED
+  counts as failure). NEXT: Phase 13 (window structure + information UX, plain
+  xhigh per the plan, not an ultracode phase).

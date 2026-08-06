@@ -339,7 +339,20 @@ Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
   grantDelveClearTo test; the follow-up shape is a shared delveClearTotal helper or
   restore-time normalization (sim.ts restores delveClears with zero validation), plus
   a finite guard in deeds.ts delveClearCount (offline-sandbox exposure only). Not
-  this packet.
+  this packet. Phase 12 QA additions to the same rider: the OLD delve arm read the
+  bare delveId key exclusively, so the fix flips which legacy key shape the page
+  meter honors (deeds counts both; no writer has ever produced a bare key,
+  verified back to the first delves commit 90c3e4f6f8); a shared
+  delveClearKey(delveId, tierId) builder would turn writer/reader divergence into
+  a tsc error and belongs in the same helper follow-up; DelveTierDef.unlock is
+  declared but never authored or read (dead type surface), and if it is ever
+  implemented it becomes a fourth reader that must agree with the other three.
+- Growth-sweep escape hatches (Phase 12 QA note): EXCLUDED_DUNGEONS and
+  WORLD_BOSS_PAGES in tests/reliquary_content.test.ts are author-serve opt-outs
+  that sit on both sides of their completeness equalities, so one added row turns
+  a new rare+ dungeon or world boss green with no contents pin. Deliberate for
+  curation (the rationale string is the review surface); reviewers should eyeball
+  any new row rather than trust the sweep alone.
 - Release-notes rider (Phase 22 records close-out): players who had completed the
   Drowned Temple, Gravewyrm Sanctum, or Nythraxis pages see them revert to
   incomplete until they find the newly catalogued relic. Nothing persistent is lost
