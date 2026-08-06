@@ -272,9 +272,10 @@ describe('i18n whole-catalog completeness', () => {
   it('names no keybind chord in any loading tip', () => {
     const tips = Object.entries(enFlat).filter(([key]) => key.startsWith('loading.tips.'));
     expect(tips.length, 'the loading tips rotation is empty').toBeGreaterThan(5);
-    const chord = /(Shift|Ctrl|Alt)\+/;
+    const chord = /(Shift|Ctrl|Alt|Cmd|Meta)\s*\+/;
     const named = tips.filter(([, value]) => chord.test(value)).map(([key]) => key);
     expect(chord.test('press Shift+X'), 'the chord guard itself must trip').toBe(true);
+    expect(chord.test('press Cmd + B'), 'the spaced macOS form must trip too').toBe(true);
     expect(
       named,
       `loading tips must not name a live keybind (no interpolation seam): ${named.join(', ')}`,

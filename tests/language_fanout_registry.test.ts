@@ -435,9 +435,14 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
     expect(start, 'changeLanguage was renamed or removed').toBeGreaterThan(-1);
     const end = main.indexOf('\n}\n', start);
     expect(end, 'changeLanguage body did not close').toBeGreaterThan(start);
-    expect(main.slice(start, end)).toMatch(
+    const body = main.slice(start, end);
+    expect(body).toMatch(
       /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*ensureDeedLocalesLoaded\(selected\),\s*ensureReliquaryLocalesLoaded\(selected\),?\s*\]\);/,
     );
+    // The await must PRECEDE the flip: hoisting setLanguage above it would
+    // repaint the picked locale with the previous locale's resident chunks.
+    // indexOf on a missing flip returns -1, which fails the comparison loudly.
+    expect(body.indexOf('await Promise.all([')).toBeLessThan(body.indexOf('setLanguage(selected)'));
   });
 
   it('wires the fan-out to the woc:languagechange event exactly once', () => {

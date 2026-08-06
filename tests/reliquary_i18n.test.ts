@@ -177,7 +177,9 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
   // this arm runs at both tiers so a page added without its five fills reds
   // immediately. Page DESCS (and the Latin locale tables) are release fill, so
   // desc rows are deliberately excluded here; the release fill widens this to the
-  // full manifest. Nothing in this file reads I18N_RELEASE_TIER any more, so it is
+  // full manifest. Nothing in this file reads I18N_RELEASE_TIER any more (that
+  // spelling is deliberate: the tier-list scan claims any file containing the
+  // full env accessor form, so do not add the prefix here), so it is
   // off the release-tier suite list; a release-tier desc arm landing here has to be
   // re-added to all three places that list holds (scripts/lib/gate_steps.mjs, the
   // release-i18n job in ci.yml, and the literal pin in
@@ -291,7 +293,10 @@ describe('the window paints the RESOLVED page name, never the model English', ()
     });
     expect(html).toContain('reliquary-nearly-row');
     expect(html).toContain(JA_FILL);
-    // Covers the visible row label AND the nearlyJumpAria label in one pass.
+    // The fill must land in BOTH sinks (the visible row label and the
+    // nearlyJumpAria label): a single occurrence means one of them was dropped
+    // or fell back to the raw model name.
+    expect(html.split(JA_FILL).length - 1).toBeGreaterThanOrEqual(2);
     expect(html).not.toContain(SENTINEL);
   });
 
@@ -300,7 +305,9 @@ describe('the window paints the RESOLVED page name, never the model English', ()
     expect(html).toContain('reliquary-page-title');
     expect(html).toContain('reliquary-grid');
     expect(html).toContain(JA_FILL);
-    // Covers the h3 title AND the gridAria label in one pass.
+    // The fill must land in BOTH sinks (the h3 title and the gridAria label):
+    // a single occurrence means one of them was dropped or fell back raw.
+    expect(html.split(JA_FILL).length - 1).toBeGreaterThanOrEqual(2);
     expect(html).not.toContain(SENTINEL);
   });
 });

@@ -129,6 +129,10 @@ describe('lazy reliquary locales: per-locale chunks, synchronous lookups around 
       );
     } finally {
       setLanguage('en');
+      // Residency is keyed by LANGUAGE, not by loader: deleting the loader does
+      // not evict the synthetic es_ES table, which stays resident for the rest
+      // of this file. Later arms deliberately use other locales; a future test
+      // expecting es_ES to fall back to English must reset residency first.
       delete record.es;
     }
   });
