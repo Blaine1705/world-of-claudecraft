@@ -391,7 +391,8 @@ export const ko_KR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "감정 표현",
-      "done": "완료"
+      "done": "완료",
+      "close": "감정 표현 닫기"
     },
     "dailyRewards": {
       "title": "일일 보상",
@@ -1348,6 +1349,8 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const ko_KR: EnTranslations = {
     },
     "itemHeroicTag": "[영웅]",
     "itemSoulbound": "귀속",
+    "itemUniqueEquipped": "착용 시 고유",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2554,6 +2558,7 @@ export const ko_KR: EnTranslations = {
       "catchLine": "{name}을(를) 낚아 올렸습니다",
       "biteLine": "무언가 미끼를 물었습니다!",
       "gotAwayLine": "놓쳐 버렸습니다.",
+      "earlyReelLine": "너무 일찍 줄을 감았습니다. 아직 아무것도 미끼를 물지 않았습니다.",
       "nodeName": {
         "ore": "광맥",
         "wood": "벌목 나무",
@@ -2780,7 +2785,22 @@ export const ko_KR: EnTranslations = {
       "close": "제작 닫기",
       "dialogOption": "제작",
       "dialogOptionAria": "{craft} 제작 창 열기",
-      "craft": "제작",
+      "crafting": "제작 중",
+      "create": "제작",
+      "createAll": "모두 제작",
+      "createAllAria": "보유 재료로 만들 수 있는 최대 개수만큼 이 제작법을 만듭니다",
+      "qtyRowAria": "제작 수량",
+      "qtyDecreaseAria": "제작 수량 줄이기 (현재 {count})",
+      "qtyIncreaseAria": "제작 수량 늘리기 (현재 {count})",
+      "qtyValueAria": "제작 수량, {count}",
+      "batchRemaining": "남은 수 {remaining}/{total}",
+      "batchRemainingAria": "{total}개 중 {remaining}개 남음",
+      "durationChip": "{seconds}s",
+      "durationAria": "시전 시간: {seconds}초",
+      "progressAria": "제작 진행",
+      "announceStart": "{name} 제작 중",
+      "announceComplete": "{name} 제작 완료",
+      "announceCancel": "제작이 취소됨",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
@@ -2840,7 +2860,7 @@ export const ko_KR: EnTranslations = {
         "loom": "베틀",
         "toolworks": "공작소"
       },
-      "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
+      "busy": "지금은 바쁩니다.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다.",
       "noBagSpace": "가방에 제작한 아이템을 넣을 공간이 없습니다.",
       "skillReqLine": "{craft} {skill} 필요",
@@ -2895,9 +2915,9 @@ export const ko_KR: EnTranslations = {
       "notHeld": "해당 아이템을 가지고 있지 않습니다.",
       "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
       "notSalvageable": "해당 아이템은 분해할 수 없습니다.",
-      "disenchantThrottled": "너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.",
-      "salvageThrottled": "너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.",
-      "enchantThrottled": "너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.",
+      "disenchantBusy": "지금은 바쁩니다.",
+      "salvageBusy": "지금은 바쁩니다.",
+      "enchantBusy": "지금은 바쁩니다.",
       "enchantWrongSlot": "그 마법부여는 해당 아이템에 적용할 수 없습니다.",
       "enchantUnknown": "해당 마법부여가 존재하지 않습니다.",
       "enchantInsufficient": "해당 마법부여에 필요한 재료가 없습니다.",
@@ -3132,7 +3152,8 @@ export const ko_KR: EnTranslations = {
         "raise_fallen": "망자 소생(주기적 증원)",
         "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
         "deathless_rage": "불사의 격노(수호석에서 저지)",
-        "wardstones": "수호석 정신집중(단계 전환)"
+        "wardstones": "수호석 정신집중(단계 전환)",
+        "dread_curse": "공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)"
       }
     },
     "deeds": {
@@ -3540,16 +3561,21 @@ export const ko_KR: EnTranslations = {
       "groupInterface": "인터페이스",
       "groupCamera": "카메라",
       "talents": "특성",
+      "professions": "생산 전문직",
       "arena": "투기장",
       "leaderboard": "순위표",
       "deeds": "업적의 서",
+      "sheathe": "무기 넣기/빼기",
       "crafting": "제작",
       "valeCup": "베일 컵",
+      "mount": "탑승 / 하차",
       "calendar": "이벤트 달력",
+      "dungeonFinder": "던전 찾기",
       "discord": "Discord",
       "abilities": "행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)",
       "targetFriendly": "가장 가까운 아군 대상 지정",
       "cycleFriendly": "아군 대상 순환",
+      "targetAuras": "대상 강화 및 약화 효과",
       "gameMenu": "게임 메뉴와 옵션 열기",
       "bothMouse": "마우스 양쪽 버튼",
       "runForward": "앞으로 달리기",
@@ -3560,7 +3586,7 @@ export const ko_KR: EnTranslations = {
       "mobileHeading": "모바일에서",
       "mobileBody": "휴대전화와 태블릿에서는 터치 조작이 자동으로 나타납니다. 왼쪽에는 이동 스틱, 그 밖의 아무 곳이나 끌면 시점 전환, 두 손가락으로 오므리면 카메라 확대, 그리고 능력과 메뉴를 위한 화면 버튼이 표시됩니다. 왼쪽 위 구석의 작은 화살표로 메뉴 버튼을 보이거나 숨길 수 있고, 그곳의 더 보기 버튼에 나머지 창들이 담겨 있습니다.",
       "controllerHeading": "컨트롤러에서",
-      "controllerBody": "게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있습니다."
+      "controllerBody": "게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있으며, 버튼 하나를 카메라 확대/축소에 배정할 수도 있습니다(기본값은 미배정)."
     },
     "settingsPage": {
       "heading": "설정 및 성능",
@@ -4301,6 +4327,8 @@ export const ko_KR: EnTranslations = {
       "sourcesBody": "초반 업그레이드 대부분은 퀘스트 보상이므로, 사냥을 반복하기보다 퀘스트를 끝내는 편이 이득입니다. 적은 처치하면 장비를 떨어뜨리고, 마을 상인은 든든한 기본 장비를 팔며, 제작자는 채집한 재료를 착용할 수 있는 장비로 바꾸고, 플레이어 시장에서는 다른 모험가에게서 살 수 있습니다. 그리고 성장의 정점에 이르면, 다른 어디에서도 구할 수 없는 장비를 파는 두 가지 증표 화폐가 기다립니다. 탐굴 증표는 탐굴 관리인에게, 영웅의 징표는 영웅 병참장교에게 씁니다.",
       "soulboundTitle": "귀속: 오직 당신의 것",
       "soulboundBody": "값진 장비 가운데 상당수는 귀속되어, 손에 넣는 순간부터 당신의 캐릭터에게 묶입니다. 귀속된 아이템은 거래하거나, 우편으로 보내거나, 상인에게 팔거나, 시장에 올릴 수 없습니다. 이제 그것은 당신 이야기의 일부이며, 누구도 대신 지녀 줄 수 없습니다.",
+      "uniqueTitle": "착용 시 고유: 같은 전설은 하나만",
+      "uniqueBody": "전설 아이템은 착용 시 고유입니다. 캐릭터는 같은 전설 아이템을 동시에 하나만 착용할 수 있으며, 영웅 버전도 같은 아이템으로 취급됩니다. 두 번째 사본은 가방, 은행, 시장에 둘 수 있지만 둘을 동시에 착용하려 하면 거부됩니다. 툴팁에는 금색 \"착용 시 고유\" 표시가 있어 두 개를 중심으로 빌드를 계획하기 전에 이 규칙을 확인할 수 있습니다.",
       "setsTitle": "세트와 세트 효과",
       "setsBody": "어떤 방어구는 서로 어울리는 한 벌로 나옵니다. 여러 부위가 하나처럼 보이고 또 하나처럼 싸우도록 지어진 것입니다. 같은 세트를 한 번에 충분히 갖춰 입으면 세트 효과가 깨어나 각 부위 고유의 능력치 위에 추가 효과를 더하고, 더 많은 부위를 입을수록 더 강해집니다. 이런 세트 몇몇은 레벨을 올리는 동안 귀한 드롭으로 모습을 드러내고, 가장 위대한 것들은 최고 레벨 부근의 가장 어려운 단체 콘텐츠에서 나오므로, 세트 한 벌을 완성하는 것은 전형적인 최종 단계 목표입니다.",
       "consumablesTitle": "소모품",
@@ -4557,6 +4585,7 @@ export const ko_KR: EnTranslations = {
         "startBody": "Simple Fishing Pole은 Eastbrook의 Fisherman Brandt가 20동에 판다(마을 동쪽 끝에서 Mirror Lake를 노려보는 노련한 낚시꾼이다). Tinker Gizzel, Fenbridge의 Provisioner Hale, Highwatch의 Quartermaster Bree도 재고가 있다. 전방 약 24야드 안의 충분히 깊은 물을 바라보고 낚싯대를 쓰면 찌가 날아간다. 전투 중, 수영 중, 사망 중에는 던질 수 없다. 물가에서 던지는 것이 정석이고, 어느 지역의 낚시 가능한 물이든 좋다.",
         "biteHeading": "입질과 릴 감기",
         "biteBody": "던진 뒤 {min}에서 {max}초 사이에 입질이 온다(좋은 낚싯대는 기다림을 최대 {rod}초 줄인다). 릴 감기 시간은 {reel}초에 낚싯대 티어가 하나 오를 때마다 {reelRod}초가 더해지고, 한 번의 낚시는 최대 {cap}초다.",
+        "earlyReelNote": "성급한 손끝을 위한 주의: 입질이 오기 전에 낚싯대를 다시 사용하면 빈 줄만 감아 올리고 낚시가 끝난다(던진 직후의 짧은 유예가 실수로 누른 연타는 용서해 준다). 낚시의 전부는 인내다. 입질을 기다렸다가 챔질하라.",
         "scheduleHeading": "숙련도 성장",
         "scheduleNote": "낚시 성장은 숙련도에 따른 고정 일정표를 따르며, {cutoff}부터는 잡동사니를 낚아도 아무것도 배우지 못한다.",
         "colProficiency": "숙련도",
@@ -4605,8 +4634,16 @@ export const ko_KR: EnTranslations = {
         "provenanceBody": "희귀 이상의 제작품과 발견물에는 제작자의 서명이 남고, 서명이 완전히 같은 물건은 여전히 겹쳐 쌓인다.",
         "collectorsHeading": "수집가, 전리품, 이야기의 값",
         "collectorsBody": "상인은 출처를 보지 못한다. 서명된 물건도 NPC에게는 일반품 값에 팔린다. 서명의 웃돈은 플레이어 사이에만 존재하고, 바로 그래서 흥미롭다. 이름난 채집가가 서명한 횡재 광석, Prime Cut 한 점, 은퇴한 장인의 이름이 새겨진 걸작 검. 값은 누군가의 기억이 정한다. 업적의 서도 같은 본능을 좇는다. Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, Glimmer of Hope는 모두 그 순간이 당신에게 일어났음을 증명하기 위해서만 존재하는 명성 0의 수집 표식이다. 이것은 힘이 아니다. 출처는 능력치를 사지도, 싸움을 이기지도 않는다. 좋은 날들의 영수증일 뿐이다.",
-        "throttleHeading": "행동 제한",
-        "throttleBody": "제작, 마력 추출, 마법부여, 해체는 하나의 제한을 나눠 쓴다. {seconds}초당 최대 {actions}회다.",
+        "castPaceHeading": "시전 시간과 골드 소모",
+        "castPaceBody": "전문 기술 행동은 실제 시전 시간이 걸립니다. 간단한 야외 제작법은 2초 남짓, 상위 사다리 제작법은 몇 초, 마력 추출·마법부여·분해·도구 효과 충전은 각각 짧은 고정 시전입니다. 시전 중 취소해도 재료를 잃지 않습니다. 성공한 제작마다 아이템 예산에 비례한 구리 수수료도 지불합니다. 재료, 작업대, 숙련도 상한과 함께 이 속도는 별도의 행동 한도 없이도 시장을 건전하게 유지합니다. 숙련도 구간별 정확한 시전 시간은 아래에 있습니다.",
+        "castPaceField": "필드 제작법(숙련도 요구 없음): {seconds}초 시전",
+        "castPaceSkill25": "숙련도 25까지의 제작법: {seconds}초 시전",
+        "castPaceSkill50": "숙련도 50까지의 제작법: {seconds}초 시전",
+        "castPaceSkill75": "숙련도 75까지의 제작법: {seconds}초 시전",
+        "castPaceCombo": "최상위 및 조합 제작법: {seconds}초 시전",
+        "castPaceEnchantFamily": "마력 추출·마법부여·분해: {seconds}초 시전",
+        "castPaceRecharge": "도구 효과 충전: {seconds}초 시전",
+        "castPaceBatch": "일괄 제작: 한 번에 최대 {count}개, 각각 시전",
         "doctrineHeading": "플레이어끼리의 거래",
         "doctrineBody": "제작 장비의 힘은 언제나 공격대 하한 아래에 머물고, 위의 비용들은 물건을 상점 순환이 아니라 플레이어 간 거래로 밀어낸다."
       },
@@ -7179,6 +7216,11 @@ export const ko_KR: EnTranslations = {
     "cast": {
       "fishing": "낚시",
       "gathering": "채집",
+      "crafting": "제작",
+      "disenchanting": "마력 추출",
+      "enchanting_apply": "마법부여",
+      "salvaging": "분해",
+      "tool_recharge": "충전",
       "demonHeal": "악마 치유",
       "thunzharrStormcall": "폭풍의 부름",
       "rift_frost_execution": "빙하의 무덤",
@@ -10279,6 +10321,15 @@ export const ko_KR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "흉포송곳니 화살통"
+      },
+      "sharp_claw": {
+        "name": "날카로운 발톱"
+      },
+      "curved_tusk": {
+        "name": "휘어진 엄니"
+      },
+      "pristine_claw": {
+        "name": "온전한 발톱"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

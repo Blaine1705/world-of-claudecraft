@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "ca07e711",
+      "state": "7e4e40e7",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -139,8 +138,8 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "25d6ed3b",
-      "events": "a51d3032",
+      "state": "6fa76e99",
+      "events": "8f67287a",
       "rng": {
         "draws": 1,
         "digest": "bc761fba"
@@ -150,8 +149,8 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "18813be7",
-      "events": "08879145",
+      "state": "139b2c97",
+      "events": "2b10b7b4",
       "rng": {
         "draws": 2,
         "digest": "e36d8886"
@@ -161,8 +160,8 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "439679b2",
-      "events": "9254444e",
+      "state": "1c417e52",
+      "events": "30a1e463",
       "rng": {
         "draws": 155,
         "digest": "03e519fa"
@@ -172,8 +171,8 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "dc76fd30",
-      "events": "100e961d",
+      "state": "aae4eb2a",
+      "events": "eca59838",
       "rng": {
         "draws": 318,
         "digest": "18478466"
@@ -183,8 +182,8 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "0bebd9af",
-      "events": "54de3459",
+      "state": "d470752f",
+      "events": "a9e46936",
       "rng": {
         "draws": 357,
         "digest": "4c41bac8"
@@ -211,7 +210,6 @@
             "damageDealt": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "dummyDamage": 207
@@ -438,7 +436,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "0bebd9af",
+      "state": "d470752f",
       "events": "741638a5",
       "rng": {
         "draws": 357,
@@ -466,7 +464,6 @@
             "damageDealt": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "dummyDamage": 207

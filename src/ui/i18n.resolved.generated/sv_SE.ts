@@ -391,7 +391,8 @@ export const sv_SE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Gester",
-      "done": "Klar"
+      "done": "Klar",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Dagliga belöningar",
@@ -1348,6 +1349,8 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const sv_SE: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Själabunden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2554,6 +2558,7 @@ export const sv_SE: EnTranslations = {
       "catchLine": "Du drar in: {name}",
       "biteLine": "Något nappar på betet!",
       "gotAwayLine": "Det kom undan.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Malmåder",
         "wood": "Timmerbestånd",
@@ -2780,7 +2785,22 @@ export const sv_SE: EnTranslations = {
       "close": "Nära hantverk",
       "dialogOption": "Hantverk",
       "dialogOptionAria": "Öppna hantverksfönstret för {craft}",
-      "craft": "Hantverk",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(förbrukar {count} av fin kvalitet)",
@@ -2840,7 +2860,7 @@ export const sv_SE: EnTranslations = {
         "loom": "Vävstol",
         "toolworks": "Verktygsverkstad"
       },
-      "throttled": "Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.",
+      "busy": "You are busy.",
       "recipeNotLearned": "Du har inte lärt dig det receptet än.",
       "noBagSpace": "Du har inte plats för det tillverkade föremålet.",
       "skillReqLine": "Kräver {craft} {skill}",
@@ -2895,9 +2915,9 @@ export const sv_SE: EnTranslations = {
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
       "notSalvageable": "Du kan inte bärga det.",
-      "disenchantThrottled": "Du avförtrollar för snabbt. Vänta en stund och försök igen.",
-      "salvageThrottled": "Du bärgar för snabbt. Vänta en stund och försök igen.",
-      "enchantThrottled": "Du förtrollar för snabbt. Vänta en stund och försök igen.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "Den förtrollningen kan inte appliceras på det föremålet.",
       "enchantUnknown": "Den förtrollningen finns inte.",
       "enchantInsufficient": "Du har inte materialet för den förtrollningen.",
@@ -3132,7 +3152,8 @@ export const sv_SE: EnTranslations = {
         "raise_fallen": "Res de fallna (periodiska vågor av tillskott)",
         "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
-        "wardstones": "Väktarstenarnas kanaler (fasövergång)"
+        "wardstones": "Väktarstenarnas kanaler (fasövergång)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3540,16 +3561,21 @@ export const sv_SE: EnTranslations = {
       "groupInterface": "Gränssnitt",
       "groupCamera": "Kamera",
       "talents": "Talanger",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Topplista",
       "deeds": "Bedrifternas bok",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Hantverk",
       "valeCup": "Dalcupen",
+      "mount": "Mount / Dismount",
       "calendar": "Händelsekalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Använd förmågor i handlingsfältet (sifferraden; ett andra fält ligger på det numeriska tangentbordet)",
       "targetFriendly": "Måla in närmaste vänliga",
       "cycleFriendly": "Växla mellan vänliga mål",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Öppna spelmeny och alternativ",
       "bothMouse": "Båda musknapparna",
       "runForward": "Spring framåt",
@@ -4301,6 +4327,8 @@ export const sv_SE: EnTranslations = {
       "sourcesBody": "Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.",
       "soulboundTitle": "Själsbunden: din och endast din",
       "soulboundBody": "Ett fåtal särskilda belöningar är själsbundna, bundna till din karaktär från det ögonblick du förtjänar dem. Ett själsbundet föremål kan inte bytas, skickas med post, säljas till en handlare eller läggas upp på marknaden; det är ditt och endast ditt. I dag skyddar det värnet prispolletter som Heroiska märken, medan utrustningen du vinner är din att byta, sälja eller dela fritt.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Set och setbonusar",
       "setsBody": "En del rustning kommer i matchande familjer, flera pjäser skurna för att se ut och slåss som en. Bär nog av en familj samtidigt så vaknar settet, vilket ger bonusar utöver varje pjäs egna egenskaper, och ju fler pjäser du bär desto starkare blir det. Några sådana familjer dyker upp som eftertraktade byten medan du klättrar i nivå; de främsta av dem kommer från det tuffaste gruppinnehållet nära nivåtaket, så att jaga ett komplett set är ett klassiskt slutspelsmål.",
       "consumablesTitle": "Förbrukningsvaror",
@@ -4557,6 +4585,7 @@ export const sv_SE: EnTranslations = {
         "startBody": "Ett Enkelt metspö kostar 20 koppar hos Fiskare Brandt i Östbäck (leta efter den gamla sjöbjörnen vid stadens östra kant, vid vägen mot Spegelsjön); Fixare Gizzel, Proviantmästare Hale i Fenbron och Kvartersmästare Bree i Högvakt har också spön i lager. Använd spöet vänd mot vatten som är djupt nog att hysa fisk, upp till ungefär 24 yard framför dig, så seglar flötet ut.\n\nDu kan inte kasta i strid, medan du simmar eller när du är död: att kasta från stranden är den avsedda hållningen. Vattnet blir dock svårare i takt med landet: träsket vill ha minst nivå 2-spöet Järnrullespöet och höjderna nivå 3-spöet Silverbäcksspöet, och en lina som kastas utan det spö vattnet kräver lämnar aldrig din hand. Två spön sitter ovanför dessa, Stormrullespöet och Tidvattensspöet: ingenjörer tillverkar dem vid verktygsverkstaden av det en lina drar upp, och delvedisken vid Den dränkta litanian säljer dem för Delve-märken bakom sina rensningsgrindar, men aldrig för mynt. Inget vatten kräver dem, så de köper kortare väntan och ett bredare indragningsfönster i stället för tillträde, vilket på det översta steget betyder ett napp på jämna tre sekunder.",
         "biteHeading": "Napp och indragning",
         "biteBody": "Efter kastet kommer ett napp i ett dolt ögonblick mellan {min} och {max} sekunder; fördröjningen avgörs när linan landar, så inga två kast känns riktigt lika. När flötet dyker har du ett fönster på {reel} sekunder att trycka på spöet igen och dra in: dra in inom det så landar fångsten, tveka förbi det och fisken kommer undan utan att lämna något efter sig. En hel session har ett tak på {cap} sekunder, så även ett stillsamt kast avgörs snabbt.\n\nBättre spön skärper båda ändarna av minispelet: varje spönivå över den första skalar bort {rod} sekunder från den längsta möjliga väntan, aldrig under golvet på tre sekunder som toppspöet redan tangerar, och lägger till {reelRod} sekunder på indragningsfönstret, så Järnrullespöet drar ner den värsta väntan till 6,5 sekunder med ett fönster på 3,25 sekunder, och Silverbäcksspöet till 5 med ett fönster förbi 4, där dess sällsynthet vidgar indragningen lite utöver vad nivån ensam betalar. De snabbaste nappen ändras aldrig oavsett vad du håller i, och ett spö behöver bara ligga i väskorna för att räknas.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Skicklighetsvinst",
         "scheduleNote": "Fiskevinsten följer ett fast schema utan tärningar: en hel poäng per fångst under 50 skicklighet, en halv poäng under 100, en tiondel under 150 och ett långsamt sipprande på 0,02 från 150 till 200. Den sista sträckan är med flit en resa på tusentals fångster: 200 är ett ställningstagande, inte en anhalt på vägen mot något annat.\n\nSkräp slutar lära ut helt vid {cutoff}: därifrån och framåt är sjögräs och stövlar bara sjögräs och stövlar. Vattnet självt sätter också tak för lärdomen: Dalens nivå 1-vatten (och varje ung strand bortom kärnlandet) lär inte ut något förbi 100, träskets slutar vid 150, och bara Törntopps vatten skolar en fiskare hela vägen till 200. Varje landad fångst ger annars vinst i schemats takt, så när räknaren stannar säger schemat åt dig att söka djupare vatten.",
         "colProficiency": "Skicklighet",
@@ -4605,8 +4634,16 @@ export const sv_SE: EnTranslations = {
         "provenanceBody": "Vissa föremål bär ett namn. För muspekaren över ett så säger verktygstipset Samlat av den och den på ett råmaterial, eller Skapad av den och den på en färdig pjäs: samma märke, formulerat efter hur föremålet blev till. En signatur är en del av föremålet självt, följer med det genom handel, banken, posten, Världsmarknaden och till och med ett återköp hos en handlare, och bleknar aldrig.\n\nInsamling signerar sitt bästa arbete automatiskt: varje skörd som rullar sällsynt eller bättre anländer signerad, och sällsynta fynd signerar hela sitt femfaldiga vindfall. En lycklig rullning vid en kroppsskörd signerar sitt utbyte där familjen inte har något exemplar att ge, och där den har det hålls utbytet enkelt och det signerade orörda exemplaret präglas bredvid. Hantverk signerar längs samma linje: varje kopia av ett resultat på sällsynt eller bättre präglas signerad, och ett mästerverk signerar alltid, oavsett kvalitet, så den finaste versionen av vilken pjäs som helst namnger alltid sin tillverkare. Det enda som kan kosta dig en signatur är en full väska: en signerad enhet behöver en egen plats att landa på, eller en signerad stapel som matchar.\n\nEn stapel föremål delar en enda identitet, så två kopior slås samman bara när varje märke matchar exakt: samma föremål, samma signerare, samma mästerverksegenskaper, samma förtrollning, samma band. En signerad stock går aldrig in i en enkel hög åt något håll (en sammanslagning skulle sudda ut någons namn), men identiska laster slås samman med glädje, så tjugo malm signerade av samma samlare sitter i en enda stapel och ett vindfall trasar inte sönder dina väskor.\n\nSignaturer betalar tillbaka till hantverkare: att hålla vilken signerad kopia som helst av ett reagens som krävs vid bänken, oavsett vem som signerat den, lägger till 2 procentenheters mästerverkschans, och att hålla ett reagens signerat av din egen hand skär ner det reagensets krävda antal med ett (aldrig under ett). Ditt eget signerade arbete på sällsynt eller bättre fortsätter till och med lära dig, i dag enbart genom flaskan: drick en dryck du signerat och ett litet sipprande av färdighet flyter tillbaka till hantverket som bryggde den, så länge det hantverket är ett av dina aktiva huvudyrken.",
         "collectorsHeading": "Samlare, trofeer, och priset pa en historia",
         "collectorsBody": "Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.",
-        "throttleHeading": "Atgärdsbegränsningen",
-        "throttleBody": "Produktionen har ett tak: hantverkande, avförtrollning, förtrollning, bärgning och uppladdningar av verktygseffekter delar på en enda budget om {actions} lyckade åtgärder i varje {seconds} sekunder långt fönster. Ett nekat försök kostar ingenting och drar ingen budget. Du kommer aldrig att känna av den i normalt spel; den finns för att en maxad specialist med full bank inte ska kunna översvämma Marknaden, oavsett skicklighet eller lager.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Spelare handlar med spelare",
         "doctrineBody": "Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa."
       },
@@ -7179,6 +7216,11 @@ export const sv_SE: EnTranslations = {
     "cast": {
       "fishing": "Fiske",
       "gathering": "Insamling",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop",
       "rift_frost_execution": "Glaciärgraven",
@@ -10279,6 +10321,15 @@ export const sv_SE: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-koger"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

@@ -279,6 +279,12 @@ import {
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
+import {
+  createParseSubsystem,
+  type FightParticipant,
+  type ParseSubsystem,
+  readBuildVersion,
+} from './parse';
 import { PartyFrameProjectionCache } from './party_frame_projection';
 import { applyBoostKitToPlayer, pbeBoostEnabled } from './pbe_boost';
 import { nextRaidResetMs } from './raid_reset';
@@ -677,7 +683,10 @@ const HEAVY_SELF_CMDS = new Set<string>([
   'equip',
   'inv_move', // rewrites the inventory array order: the self snapshot must resend it
   'unequip_item',
-  'salvage_item',
+  // salvage_item is deliberately ABSENT since the Craft Cast System: the
+  // command only starts a cast (nothing mutates on receipt), and the
+  // complete-time loot event is a HEAVY_SELF_EVENTS member, so listing it
+  // here would buy a wasted heavy re-serialize per cast start.
   'rift_upgrade_item',
   'rift_enchant_item',
   'rift_socket_gem',
@@ -1605,6 +1614,8 @@ export class GameServer {
   private readonly accountCosmeticsByAccount = new Map<number, AccountCosmetics>();
   private readonly botDetector: BotDetector = createBotDetector();
   readonly chatLog = new ChatLogger(insertChatLogs);
+  // Combat parse capture; constructed in the constructor (needs this.sim).
+  readonly parseCapture: ParseSubsystem;
   // Admin-managed soft/hard word lists + escalation config. Loaded from the DB
   // at boot (loadChatFilter) and refreshed whenever an admin edits the lists.
   readonly chatFilter = new ChatFilter();
@@ -1898,6 +1909,51 @@ export class GameServer {
       suspend: (input) => moderateAccount({ ...input, action: 'suspend' }),
       forceRename: (input) => forceCharacterRename(input),
     });
+    // Combat parse capture (server/parse/): a read-only observer at the tick
+    // drain, inert unless PARSE_CAPTURE=1 and an ingest URL is configured.
+    this.parseCapture = createParseSubsystem({
+      sim: this.sim,
+      realm: REALM,
+      build: readBuildVersion(),
+      resolveParticipant: (pid) => this.resolveParseParticipant(pid),
+    });
+  }
+
+  // Full participant identity for the parse recorder: stable characterId,
+  // display name, class (a player entity's templateId is its class), spec, and
+  // a MINIMIZED snapshot. Data-minimization rule (security review): only the
+  // fields the parse product reads (build + ratings + progression) leave the
+  // process; bags, bank, money, quests, mail, and position never enter a
+  // telemetry record. Null when the pid has no live session.
+  private resolveParseParticipant(pid: number): FightParticipant | null {
+    const session = this.clients.get(pid);
+    if (session === undefined || session.left) return null;
+    const entity = this.sim.entities.get(pid);
+    if (entity === undefined) return null;
+    const state = this.sim.serializeCharacter(pid);
+    const spec = state?.talents?.spec;
+    const snapshot =
+      state === null
+        ? null
+        : {
+            level: state.level,
+            lifetimeXp: state.lifetimeXp ?? 0,
+            prestigeRank: state.prestigeRank ?? 0,
+            talents: state.talents ?? null,
+            equipment: state.equipment,
+            arena1v1Rating: state.arena1v1Rating ?? null,
+            arena2v2Rating: state.arena2v2Rating ?? null,
+          };
+    return {
+      entityId: pid,
+      characterId: session.characterId,
+      name: session.name,
+      class: entity.templateId,
+      spec: typeof spec === 'string' && spec.length > 0 ? spec : null,
+      level: entity.level,
+      team: null,
+      snapshot,
+    };
   }
 
   // Returns the number of currently active WS sessions from the given IP.
@@ -2561,6 +2617,10 @@ export class GameServer {
             );
             this.recordBattlegroundOutcomes();
             this.enforceJailStates();
+            // Parse capture observes the full drained batch BEFORE routeEvents:
+            // routeEvents early-outs when no clients are connected, and the
+            // recorder must see every tick. Read-only; never mutates events.
+            this.parseCapture.observe(events);
             this.routeEvents(events);
             this.detectActivity(events);
             lap('events');
@@ -6253,7 +6313,13 @@ export class GameServer {
         // check (the dispatch type-guard rule); anything else reads as false.
         // The sim honors it only for eligible equipment outputs and mints the
         // bindOnTrade arm itself, so nothing here trusts client data.
-        if (typeof msg.recipe === 'string') sim.craftItem(msg.recipe, msg.commission === true, pid);
+        // Phase 3 optional `count`: finite numbers only; sim clamps to batch
+        // max and mats-fit (default 1 when omitted or non-numeric).
+        if (typeof msg.recipe === 'string') {
+          const count =
+            typeof msg.count === 'number' && Number.isFinite(msg.count) ? Math.floor(msg.count) : 1;
+          sim.craftItem(msg.recipe, msg.commission === true, pid, count);
+        }
         break;
       // Enchanting profession commands (Professions 2.0): the sim
       // resolvers re-validate ownership/eligibility/throttle (nothing trusted
@@ -8031,6 +8097,17 @@ export class GameServer {
       hirat: p.hitRating,
       eat: p.eating ? { remaining: round2(p.eating.remaining) } : null,
       drk: p.drinking ? { remaining: round2(p.drinking.remaining) } : null,
+      // Craft-cast session mirror (self-only, the eat/drk shape): the crafting
+      // window's recipe highlight and batch counter read these authoritatively
+      // online instead of click-time guesses, so the server's batch clamp and
+      // a mid-cast window close/reopen both stay truthful. Null at rest.
+      ccast: p.craftCastRecipeId
+        ? {
+            r: p.craftCastRecipeId,
+            rem: p.craftCastBatchRemaining,
+            tot: p.craftCastBatchTotal,
+          }
+        : null,
       opUntil: p.overpowerUntil > this.sim.time ? 1 : 0,
       opRem: round2(Math.max(0, p.overpowerUntil - this.sim.time)),
       ack: session.spectating ? 0 : anchorSession.lastInputSeq,
@@ -8663,6 +8740,9 @@ export class GameServer {
       }
       if (ev.type === 'fishingGotAway') {
         gameMetricsCounters().fishingGotAway(ev.zoneId, fishingBandLabel(ev.band));
+      }
+      if (ev.type === 'fishingEarlyReel') {
+        gameMetricsCounters().fishingEarlyReel(ev.zoneId, fishingBandLabel(ev.band));
       }
       if (ev.type === 'fishingEmptyHook') {
         gameMetricsCounters().fishingEmptyHook(ev.zoneId, fishingBandLabel(ev.band));

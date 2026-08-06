@@ -267,7 +267,16 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
+  castPace: {
+    fieldSec: number;
+    skill25Sec: number;
+    skill50Sec: number;
+    skill75Sec: number;
+    comboSec: number;
+    enchantFamilySec: number;
+    rechargeSec: number;
+    batchMax: number;
+  };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];
@@ -5025,6 +5034,90 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Plated to Perfection",
     "category": "progression",
     "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_frostveil_gatherer",
+    "name": "Terraced Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_frostveil_first_cast",
+    "name": "First Ice on the Tarn",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_amberfall_gatherer",
+    "name": "The Amberfall Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_amberfall_first_cast",
+    "name": "A Catch from the Great Mere",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_nightbloom_gatherer",
+    "name": "The Dreaming Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_nightbloom_first_cast",
+    "name": "A Ripple on the Moonwell",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_wraithwood_gatherer",
+    "name": "Harvest Under the Canopy",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_wraithwood_first_cast",
+    "name": "A Cast in the Looking-Glass",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_palmreach_gatherer",
+    "name": "Harvest on the Palmstrand",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_palmreach_first_cast",
+    "name": "Casting the Sapphire Lagoon",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_gatherer",
+    "name": "The Parterre's Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_first_cast",
+    "name": "A Cast on the Petal Pond",
+    "category": "chronicle",
+    "renown": 5,
     "feat": false
   }
 ];
@@ -10043,9 +10136,15 @@ export const GUIDE_PROF_MASTERWORK: GuideProfMasterwork = {
 
 export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
   "craftFeeCopperPerBudgetPoint": 2,
-  "actionThrottle": {
-    "windowSeconds": 60,
-    "maxActions": 10
+  "castPace": {
+    "fieldSec": 1.75,
+    "skill25Sec": 2.5,
+    "skill50Sec": 3,
+    "skill75Sec": 3.5,
+    "comboSec": 4,
+    "enchantFamilySec": 1.5,
+    "rechargeSec": 1.5,
+    "batchMax": 50
   },
   "marketCutPct": 5,
   "listingDepositCopper": 0,

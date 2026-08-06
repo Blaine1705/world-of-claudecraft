@@ -391,7 +391,8 @@ export const ja_JP: EnTranslations = {
     },
     "emoteEditor": {
       "title": "エモート",
-      "done": "完了"
+      "done": "完了",
+      "close": "エモートを閉じる"
     },
     "dailyRewards": {
       "title": "デイリー報酬",
@@ -1348,6 +1349,8 @@ export const ja_JP: EnTranslations = {
       "buttons": "ボタン配置",
       "resetButtons": "ボタン配置をリセット",
       "menuAction": "ゲームメニュー",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左スティックで移動、右スティックで視点。ウィンドウを開くと画面ポインターが使えます。"
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const ja_JP: EnTranslations = {
     },
     "itemHeroicTag": "[ヒロイック]",
     "itemSoulbound": "魂縛",
+    "itemUniqueEquipped": "装備ユニーク",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2554,6 +2558,7 @@ export const ja_JP: EnTranslations = {
       "catchLine": "{name}を釣り上げた",
       "biteLine": "何かが食いついた！",
       "gotAwayLine": "逃げられてしまった。",
+      "earlyReelLine": "巻き上げるのが早すぎた。まだ何も食いついていなかった。",
       "nodeName": {
         "ore": "鉱脈",
         "wood": "立木",
@@ -2780,7 +2785,22 @@ export const ja_JP: EnTranslations = {
       "close": "製作を閉じる",
       "dialogOption": "製作",
       "dialogOptionAria": "{craft}の製作ウィンドウを開く",
-      "craft": "製作",
+      "crafting": "製作中",
+      "create": "作成",
+      "createAll": "すべて作成",
+      "createAllAria": "所持材料で作れる最大数までこのレシピを作成する",
+      "qtyRowAria": "作成数",
+      "qtyDecreaseAria": "作成数を減らす（現在 {count}）",
+      "qtyIncreaseAria": "作成数を増やす（現在 {count}）",
+      "qtyValueAria": "作成数、{count}",
+      "batchRemaining": "残り {remaining}/{total}",
+      "batchRemainingAria": "残り {remaining} 個、合計 {total} 個",
+      "durationChip": "{seconds}s",
+      "durationAria": "詠唱時間: {seconds} 秒",
+      "progressAria": "製作の進行",
+      "announceStart": "{name} を製作中",
+      "announceComplete": "{name} の製作が完了",
+      "announceCancel": "製作をキャンセルした",
       "reagentsNeeded": "必要素材:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（上質な等級を{count}個消費）",
@@ -2840,7 +2860,7 @@ export const ja_JP: EnTranslations = {
         "loom": "織機",
         "toolworks": "工作場"
       },
-      "throttled": "製作が速すぎます。少し待ってからもう一度お試しください。",
+      "busy": "手が離せません。",
       "recipeNotLearned": "そのレシピはまだ習得していません。",
       "noBagSpace": "バッグに製作したアイテムを入れる空きがありません。",
       "skillReqLine": "{craft} {skill} が必要",
@@ -2895,9 +2915,9 @@ export const ja_JP: EnTranslations = {
       "notHeld": "そのアイテムを所持していません。",
       "notDisenchantable": "それは魔力分解できません。",
       "notSalvageable": "それは解体できません。",
-      "disenchantThrottled": "魔力分解が速すぎます。少し待ってからもう一度お試しください。",
-      "salvageThrottled": "解体が速すぎます。少し待ってからもう一度お試しください。",
-      "enchantThrottled": "エンチャントが速すぎます。少し待ってからもう一度お試しください。",
+      "disenchantBusy": "手が離せません。",
+      "salvageBusy": "手が離せません。",
+      "enchantBusy": "手が離せません。",
       "enchantWrongSlot": "そのエンチャントはそのアイテムには付与できません。",
       "enchantUnknown": "そのエンチャントは存在しません。",
       "enchantInsufficient": "そのエンチャントに必要な素材がありません。",
@@ -3132,7 +3152,8 @@ export const ja_JP: EnTranslations = {
         "raise_fallen": "死者蘇生（周期的な増援ウェーブ）",
         "soul_rend": "ソウルレンド（対象は散開して回復を受ける）",
         "deathless_rage": "不死の憤怒（ウォードストーンで妨害）",
-        "wardstones": "ウォードストーンの詠唱（フェーズ移行）"
+        "wardstones": "ウォードストーンの詠唱（フェーズ移行）",
+        "dread_curse": "ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）"
       }
     },
     "deeds": {
@@ -3540,16 +3561,21 @@ export const ja_JP: EnTranslations = {
       "groupInterface": "インターフェース",
       "groupCamera": "カメラ",
       "talents": "タレント",
+      "professions": "生産職",
       "arena": "アリーナ",
       "leaderboard": "リーダーボード",
       "deeds": "功績の書",
+      "sheathe": "武器を納刀/抜刀",
       "crafting": "製作",
       "valeCup": "ヴェイルカップ",
+      "mount": "騎乗 / 降車",
       "calendar": "イベントカレンダー",
+      "dungeonFinder": "ダンジョンファインダー",
       "discord": "Discord",
       "abilities": "アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）",
       "targetFriendly": "最も近い友好的な対象をターゲット",
       "cycleFriendly": "友好的なターゲットを順に切り替え",
+      "targetAuras": "ターゲットのバフとデバフ",
       "gameMenu": "ゲームメニューとオプションを開く",
       "bothMouse": "マウスの左右ボタン同時押し",
       "runForward": "前進",
@@ -3560,7 +3586,7 @@ export const ja_JP: EnTranslations = {
       "mobileHeading": "モバイルでは",
       "mobileBody": "スマートフォンやタブレットでは、タッチ操作が自動で表示されます。左側に移動用スティック、それ以外の場所はどこでもドラッグして視点操作、二本指でつまむとカメラをズームでき、そしてアビリティやメニュー用の画面上ボタンが現れます。左上隅の小さな矢印でメニューボタンの表示と非表示を切り替えられ、そこにある「その他」ボタンに残りのウィンドウがまとめられています。",
       "controllerHeading": "コントローラーでは",
-      "controllerBody": "ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。"
+      "controllerBody": "ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。ボタンをカメラのズームイン・ズームアウトに割り当てることもできます（初期状態では未割り当て）。"
     },
     "settingsPage": {
       "heading": "設定とパフォーマンス",
@@ -4301,6 +4327,8 @@ export const ja_JP: EnTranslations = {
       "sourcesBody": "序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。",
       "soulboundTitle": "魂縛：あなただけのもの",
       "soulboundBody": "価値ある品の多くは魂縛、つまり入手した瞬間からあなたのキャラクターに縛られています。魂縛のアイテムは取引にも郵送にも出せず、商人に売ることも、マーケットに出品することもできません。それはもうあなたの物語の一部であり、ほかの誰かが代わりに持ち運ぶことはできないのです。",
+      "uniqueTitle": "装備ユニーク：同じレジェンダリーは1つだけ",
+      "uniqueBody": "レジェンダリーアイテムは装備ユニークです。キャラクターは同じレジェンダリーを同時に1つしか装備できず、そのヒロイック版も同じアイテムとして扱われます。2つ目はバッグや銀行、マーケットに置けますが、両方を同時に装備しようとすると拒否されます。ツールチップには金色の「装備ユニーク」タグが表示されるので、2つ持ちのビルドを計画する前にこのルールを確認できます。",
       "setsTitle": "セットとセットボーナス",
       "setsBody": "一部の防具は、見た目も戦いぶりもひと揃いになるよう仕立てられた、おそろいのシリーズで手に入ります。同じシリーズを一定数まとめて装備するとセットが目を覚まし、各部位そのもののステータスに加えてボーナスを与え、装備する部位が多いほど効果は強まります。そうしたシリーズのいくつかは、レベリング中の貴重なドロップとしても現れます。最も偉大なものはレベル上限近くの最も手強いグループコンテンツから手に入るので、フルセットを追い求めることは古典的なエンドゲームの目標になっています。",
       "consumablesTitle": "消耗品",
@@ -4557,6 +4585,7 @@ export const ja_JP: EnTranslations = {
         "startBody": "Simple Fishing PoleはEastbrookのFisherman Brandtが20銅で売っています（町の東端でMirror Lakeを睨む老練の釣り師です）。Tinker Gizzel、FenbridgeのProvisioner Hale、HighwatchのQuartermaster Breeにも在庫があります。前方約24ヤード以内の十分に深い水面に向かって竿を使えば、浮きが飛んでいきます。戦闘中、泳いでいる間、死亡中は投げられません。岸から釣るのが本来の姿で、どの地方の釣れる水域でも構いません。",
         "biteHeading": "アタリとリール",
         "biteBody": "キャストから{min}から{max}秒でアタリが来ます（良い竿は待ちを最大{rod}秒縮めます）。リールの猶予は{reel}秒に竿がティア1つ上がるごとに{reelRod}秒加わり、1回のセッションは最長{cap}秒です。",
+        "earlyReelNote": "せっかちな指への注意：アタリが来る前にもう一度竿を使うと空の糸を巻き上げ、そのキャストは終わります（キャスト直後のわずかな猶予がうっかりの二度押しを許してくれます）。釣りは我慢がすべて。アタリを待って、それから合わせましょう。",
         "scheduleHeading": "熟練度成長",
         "scheduleNote": "釣りの成長は熟練度ごとの固定スケジュールに従い、{cutoff}からはガラクタを釣っても何も学べません。",
         "colProficiency": "熟練度",
@@ -4605,8 +4634,16 @@ export const ja_JP: EnTranslations = {
         "provenanceBody": "レア以上の製作品と発見には作り手の署名が入り、署名が完全に一致する品は今でもスタックできます。",
         "collectorsHeading": "収集家と戦利品、物語の値段",
         "collectorsBody": "商人は来歴を見ません。署名入りでもNPCへの売値は無印と同額です。署名の上乗せはプレイヤーの間にだけ存在し、だからこそ面白いのです。名の知れた採集者が署名した幸運の鉱石、Prime Cutの一切れ、引退した職人の名を刻む傑作の剣。値段は誰かの記憶が決めます。功績の書も同じ心を汲みます。Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen、Glimmer of Hopeはいずれも名声ゼロの収集印で、その瞬間があなたに起きた証のためだけにあります。これらは力ではありません。来歴は能力値を買わず、戦いにも勝ちません。良き日々の控えです。",
-        "throttleHeading": "行動の制限",
-        "throttleBody": "製作・分解・エンチャント・サルベージはひとつの制限を共有します。{seconds}秒あたり最大{actions}回です。",
+        "castPaceHeading": "詠唱時間とゴールドの消費",
+        "castPaceBody": "専門職の行動には実際の詠唱時間がかかります。簡単な野外レシピは2秒弱、梯子の上位レシピは数秒、分解・付魔・解体・道具効果の充填はそれぞれ固定の短い詠唱です。詠唱中にキャンセルしても損失はありません。成功した製作にはアイテム予算に応じた銅貨の手数料もかかります。材料・作業台・技能上限と合わせて、別枠の行動上限がなくても市場を健全に保てます。スキル帯ごとの正確な詠唱時間は下記のとおりです。",
+        "castPaceField": "フィールドレシピ（スキル要件なし）: 詠唱 {seconds} 秒",
+        "castPaceSkill25": "スキル25までのレシピ: 詠唱 {seconds} 秒",
+        "castPaceSkill50": "スキル50までのレシピ: 詠唱 {seconds} 秒",
+        "castPaceSkill75": "スキル75までのレシピ: 詠唱 {seconds} 秒",
+        "castPaceCombo": "最上位およびコンボレシピ: 詠唱 {seconds} 秒",
+        "castPaceEnchantFamily": "分解・付魔・解体: 詠唱 {seconds} 秒",
+        "castPaceRecharge": "道具効果の充填: 詠唱 {seconds} 秒",
+        "castPaceBatch": "まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱",
         "doctrineHeading": "プレイヤー同士の取引",
         "doctrineBody": "製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。"
       },
@@ -7179,6 +7216,11 @@ export const ja_JP: EnTranslations = {
     "cast": {
       "fishing": "釣り",
       "gathering": "採集",
+      "crafting": "製作",
+      "disenchanting": "分解",
+      "enchanting_apply": "付魔",
+      "salvaging": "解体",
+      "tool_recharge": "充填",
       "demonHeal": "悪魔の治癒",
       "thunzharrStormcall": "嵐の呼び声",
       "rift_frost_execution": "氷河の墓",
@@ -10279,6 +10321,15 @@ export const ja_JP: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "ダイアファングの矢筒"
+      },
+      "sharp_claw": {
+        "name": "鋭い鉤爪"
+      },
+      "curved_tusk": {
+        "name": "曲がった牙"
+      },
+      "pristine_claw": {
+        "name": "無傷の鉤爪"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"

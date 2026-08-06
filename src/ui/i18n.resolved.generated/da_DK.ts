@@ -391,7 +391,8 @@ export const da_DK: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Følelsesudtryk",
-      "done": "Færdig"
+      "done": "Færdig",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Daglige belønninger",
@@ -1348,6 +1349,8 @@ export const da_DK: EnTranslations = {
       "buttons": "Knaplayout",
       "resetButtons": "Nulstil knaplayout",
       "menuAction": "Spilmenu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Venstre stik bevæger, højre stik kigger. Åbn et vindue for at bruge skærmmarkøren."
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const da_DK: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Sjælebundet",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2554,6 +2558,7 @@ export const da_DK: EnTranslations = {
       "catchLine": "Du hiver ind: {name}",
       "biteLine": "Noget tager madden!",
       "gotAwayLine": "Det slap væk.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Malmåre",
         "wood": "Tømmerlund",
@@ -2780,7 +2785,22 @@ export const da_DK: EnTranslations = {
       "close": "Tæt håndværk",
       "dialogOption": "Håndværk",
       "dialogOptionAria": "Åbn håndværksvinduet for {craft}",
-      "craft": "Håndværk",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Kræver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(bruger {count} af fin kvalitet)",
@@ -2840,7 +2860,7 @@ export const da_DK: EnTranslations = {
         "loom": "væv",
         "toolworks": "Værktøjsværker"
       },
-      "throttled": "Du laver ting for hurtigt. Vent et øjeblik, og prøv igen.",
+      "busy": "You are busy.",
       "recipeNotLearned": "Du har ikke lært den opskrift endnu.",
       "noBagSpace": "Du har ikke plads til den fremstillede genstand.",
       "skillReqLine": "Kræver {craft} {skill}",
@@ -2895,9 +2915,9 @@ export const da_DK: EnTranslations = {
       "notHeld": "Du har ikke den genstand.",
       "notDisenchantable": "Du kan ikke affortrylle det.",
       "notSalvageable": "Du kan ikke bjærge det.",
-      "disenchantThrottled": "Du affortrylles for hurtigt. Vent et øjeblik og prøv igen.",
-      "salvageThrottled": "Du bjærger for hurtigt. Vent et øjeblik og prøv igen.",
-      "enchantThrottled": "Du fortrylles for hurtigt. Vent et øjeblik og prøv igen.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "Den fortryllelse kan ikke anvendes på den genstand.",
       "enchantUnknown": "Den fortryllelse eksisterer ikke.",
       "enchantInsufficient": "Du har ikke materialerne til den fortryllelse.",
@@ -3132,7 +3152,8 @@ export const da_DK: EnTranslations = {
         "raise_fallen": "Rejse de Faldne (periodiske bølger af tilkaldelser)",
         "soul_rend": "Sjælerivning (markerede spillere skal sprede sig og heles)",
         "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
-        "wardstones": "Vardstenskanaler (faseovergang)"
+        "wardstones": "Vardstenskanaler (faseovergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
@@ -3540,16 +3561,21 @@ export const da_DK: EnTranslations = {
       "groupInterface": "Brugerflade",
       "groupCamera": "Kamera",
       "talents": "Talenter",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Resultattavle",
       "deeds": "Bedrifternes Bog",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Håndværk",
       "valeCup": "Dalpokalen",
+      "mount": "Mount / Dismount",
       "calendar": "Begivenhedskalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Brug handlingsbjælkens evner (talrækken; en anden bjælke sidder på det numeriske tastatur)",
       "targetFriendly": "Vælg nærmeste venlige",
       "cycleFriendly": "Skift venligt mål",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Åbn spilmenu og indstillinger",
       "bothMouse": "Begge museknapper",
       "runForward": "Løb fremad",
@@ -4301,6 +4327,8 @@ export const da_DK: EnTranslations = {
       "sourcesBody": "De fleste af dine tidlige opgraderinger er opgavebelønninger, så det betaler sig at gøre opgaver færdige frem for at grinde. Fjender taber udstyr, når du besejrer dem, handlende i byen sælger solide basisvarer, håndværkere forvandler indsamlede materialer til bærbare stykker, og spillermarkedet lader dig købe fra andre eventyrere. På toppen af bakken køber to mærkevalutaer udstyr, som ikke findes andre steder: Delve-Mærker hos delve-vogteren og Heroiske Mærker hos den heroiske kvartermester.",
       "soulboundTitle": "Sjælebundet: din og din alene",
       "soulboundBody": "Nogle få særlige belønninger er sjælebundne, bundet til din karakter fra det øjeblik, du optjener dem. En sjælebunden genstand kan ikke byttes, sendes med posten, sælges til en handlende eller lægges op på markedet; den er din og din alene. I dag beskytter det præmietokens som Heroiske Mærker, mens det udstyr, du vinder, er dit at bytte, sælge eller dele frit.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sæt og sætbonusser",
       "setsBody": "Noget rustning kommer i matchede familier, flere stykker skåret til at se ud og kæmpe som ét. Bær nok af en familie på én gang, og sættet vågner og giver bonusser oven i hvert stykkes egne statistikker, og jo flere stykker du bærer, jo stærkere bliver det. Nogle få sådanne familier dukker op som eftertragtet bytte, mens du leveler; de største af dem kommer fra det sejeste gruppeindhold nær niveauloftet, så at jagte et fuldt sæt er et klassisk slutspilsmål.",
       "consumablesTitle": "Forbrugsvarer",
@@ -4557,6 +4585,7 @@ export const da_DK: EnTranslations = {
         "startBody": "En Simpel Fiskestang koster 20 kobber hos Fisker Brandt i Østbæk (kig efter den Gamle Søulk i byens østlige udkant, ved vejen til Spejlsøen); Tinker Gizel, Proviantmester Hale i Fenbridge og Kvartermester Bree i Højvagt fører også stænger. Brug stangen, mens du vender mod vand, der er dybt nok til at rumme fisk, op til omkring 24 yards foran dig, og din prop sejler ud.\n\nDu kan ikke kaste ud, mens du er i kamp, mens du svømmer, eller mens du er død: at kaste fra bredden er den tiltænkte stilling. Vandet bliver dog hårdere i takt med landet: sumpen vil have mindst niveau 2-stangen Jernhjulet og højderne niveau 3-stangen Sølvbækken, og en line, der kastes uden den stang, det vand kræver, forlader aldrig din hånd. To stænger sidder over dem, Stormhjulet og Tidevandssmedet: ingeniører fremstiller dem ved værktøjsværkerne af det, en line trækker op, og Det Druknede Litanis delve-disk sælger dem for Delve-Mærker bag sine rydningsporte, dog aldrig for mønt. Intet vand beder om dem, så de køber en kortere ventetid og et bredere indhivningsvindue frem for adgang, hvilket på det øverste trin betyder et bid på præcis tre sekunder.",
         "biteHeading": "Bid og indhivning",
         "biteBody": "Efter kastet kommer bidet i et skjult øjeblik mellem {min} og {max} sekunder; forsinkelsen afgøres, når linen lander, så ingen to kast føles helt ens. Når proppen bider, har du et vindue på {reel} sekunder til at trykke på stangen igen og hive ind: hiv inden for det, og fangsten lander, tøv forbi det, og fisken slipper væk uden noget at vise frem. En hel session har et loft på {cap} sekunder, så selv et stille kast afgøres hurtigt.\n\nBedre stænger skærper begge ender af minispillet: hvert stangniveau over det første trimmer {rod} sekunder af den længst mulige ventetid, aldrig under det gulv på tre sekunder, som topstangen allerede strejfer, og lægger {reelRod} sekunder til indhivningsvinduet, så Jernhjulet trækker den værste ventetid ned til 6,5 sekunder med et vindue på 3,25 sekunder, og Sølvbækken til 5 med et vindue over 4, idet dens sjældenhed udvider indhivningen en smule ud over, hvad niveauet alene betaler. De hurtigste bid ændrer sig aldrig, uanset hvad du holder, og en stang behøver kun at ligge i dine tasker for at tælle.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Færdighedspoint-optjening",
         "scheduleNote": "Fiskerioptjening følger en fast plan uden terninger: et helt point pr. fangst under 50 proficiens, et halvt point under 100, en tiendedel under 150 og et langsomt dryp på 0,02 fra 150 til 200. Den sidste strækning er med vilje en rejse på tusindvis af fangster: 200 er en erklæring, ikke et stoppested på vejen mod noget andet.\n\nSkrammel holder helt op med at lære fra sig ved {cutoff}: derfra er ukrudt og støvler bare ukrudt og støvler. Selve vandet sætter også loft over lektien: Dalens niveau 1-vande (og hver eneste unge kyst uden for kernelandet) lærer intet fra sig forbi 100, sumpens stopper ved 150, og kun Tornetops skoler en angler hele vejen til 200. Enhver landet fangst optjener ellers efter den fastsatte takst, så når tælleren står stille, fortæller planen dig, at du skal søge dybere vand.",
         "colProficiency": "Færdighed",
@@ -4605,8 +4634,16 @@ export const da_DK: EnTranslations = {
         "provenanceBody": "Nogle genstande bærer et navn. Hold musen over en, og værktøjstippet siger Indsamlet af den og den på et råmateriale, eller Udformet af den og den på et færdigt stykke: det samme mærke, formuleret efter hvordan genstanden blev til. En signatur er en del af selve genstanden, følger med den gennem handler, banken, posten, Verdensmarkedet og endda et tilbagekøb hos en sælger, og falmer aldrig.\n\nIndsamling signerer sit bedste arbejde automatisk: enhver høst, der ruller sjælden eller bedre, ankommer signeret, og sjældne fund signerer hele deres femdobbelte gevinst. Et heldigt kast ved en lighøst signerer sit udbytte, hvor familien ikke har noget eksemplar at give, og hvor den har, holder det udbyttet slet og præger det signerede uberørte eksemplar ved siden af. Fremstilling signerer efter samme linje: hvert eneste eksemplar af et resultat af sjælden kvalitet eller bedre præges signeret, og et mesterværk signerer altid, uanset dets kvalitet, så den fineste udgave af ethvert stykke nævner altid sin maker. Det ene, der kan koste dig en signatur, er en fuld taske: en signeret enhed skal have plads for sig selv, eller en matchende signeret stak, at lande i.\n\nEn stak genstande deler én identitet, så to eksemplarer smelter kun sammen, når hvert eneste mærke stemmer nøjagtigt: samme genstand, samme signatar, samme mesterværksstatistikker, samme fortryllelse, samme binding. En signeret stamme slutter sig aldrig til en slet bunke i nogen af retningerne (en sammensmeltning ville slette nogens navn), men identisk indhold smelter gerne sammen, så tyve malm signeret af den samme indsamler ligger i én stak, og en gevinst flår ikke dine tasker i stykker.\n\nSignaturer betaler håndværkere tilbage: at have et hvilket som helst signeret eksemplar af et nødvendigt reagens ved bænken, uanset hvem der signerede det, lægger 2 procentpoint til mesterværkschancen, og at have et reagens signeret af din egen hånd skærer én af det reagens' krævede antal (aldrig under et). Dit eget signerede arbejde af sjælden kvalitet eller bedre bliver endda ved med at lære dig noget, i dag kun gennem flasken: drik en eliksir, du har signeret, og et lille dryp færdighed flyder tilbage til det håndværk, der bryggede den, så længe det håndværk er et af dine aktive hovedfag.",
         "collectorsHeading": "Samlere, trofæer og prisen på en historie",
         "collectorsBody": "Handlende er blinde for ophav: en signeret genstand sælger til en NPC til præcis dens ordinære pris. Præmien på en signatur eksisterer kun mellem spillere, og det er præcis det, der gør det interessant: en stak vindfaldsmalm signeret af en berømt indsamler, en Førsteklasses Udskæring fra en heldig høst, et mestervåben der nævner en håndværker, som siden er gået på pension, alt koster hvad end nogen husker at det er værd.\n\nBedrifternes Bog spiller på den samme instinkt: Uberørt Åre, Gammelt Kernetræ, måneskinsblomst, Et Perfekt Eksemplar og Et Glimt af Håb er nul-Hæder samlermærker, der udelukkende eksisterer for at bevise, at et øjeblik skete for dig. Behold den genstand der optjente bedriften, og du holder kvitteringen. Intet af dette er magt; ophav køber ingen statistikker og vinder ingen kampe, det er spillets papirspor af gode dage.",
-        "throttleHeading": "Handlingsbegrænsningen",
-        "throttleBody": "Produktionen har et loft: fremstilling, affortrylling, fortryllelse, bjærgning og genopladning af værktøjseffekter deler ét budget på {actions} vellykkede handlinger i hvert vindue på {seconds} sekunder. Et afvist forsøg koster ingenting og bruger intet budget. Du kommer aldrig til at mærke det i normalt spil; det findes, så en specialist ved grænsen med en fuld bank ikke kan oversvømme Markedet, uanset færdighed eller lager.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Spillere handler med spillere",
         "doctrineBody": "Håndværksøkonomien er bygget på én idé: spillere forsyner spillere. Indsamlere fodrer håndværkere, håndværkere fodrer questere og raiders, og nedbrydere fodrer fortryllere, med handlende og stationsmestre, der står i kanten for at absorbere skrammel og mønt snarere end at konkurrere med dig. Hvis du vil tjene penge på et fag, er din kunde en person: lær hvad andre spillere brænder igennem, prissæt mod Verdensmarkedet, og behandl NPC-systemerne som et gulv under dine priser, ikke som markedet selv.\n\nFremstillet udstyr er afstemt til at ligge under raid-gulvet: selv et mesterværk er kun nogensinde ét kvalitetsniveau over sin opskrift, aldrig forbi legendarisk, og dets statistikbudget holder sig under raid-bytteområdet. Smedjen gør dig klar til det sværeste indhold; den erstatter det ikke. Det holder håndværkere, raiders og markedet i en stabil trekant: raid-bytte forbliver noget at stræbe efter, og fremstillede stykker forbliver det bedste udstyr, penge faktisk kan købe."
       },
@@ -7179,6 +7216,11 @@ export const da_DK: EnTranslations = {
     "cast": {
       "fishing": "Fiskeri",
       "gathering": "Indsamling",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Dæmonhelbredelse",
       "thunzharrStormcall": "Stormkald",
       "rift_frost_execution": "Iskold Grav",
@@ -10279,6 +10321,15 @@ export const da_DK: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-Kogger"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"
