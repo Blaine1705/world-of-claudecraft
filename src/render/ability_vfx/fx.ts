@@ -3,6 +3,8 @@ import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
   abilityHexColor,
+  MAX_STUN_STAR_BANDS,
+  STUN_STAR_ALPHA_FLOOR,
   STUN_STAR_BRIGHTNESS,
   STUN_STAR_COLOR,
   STUN_STAR_COUNT,
@@ -302,8 +304,12 @@ export class AbilityVfxFx implements SequencerHost {
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
   // Persistent stunned-star bands (holdStunStars), one entry per stunned
-  // entity, frame-stamp swept exactly like windups/orbits.
-  private stunStars = new Map<number, { remaining: number; stamp: number }>();
+  // entity, frame-stamp swept exactly like windups/orbits. Drawn for at most
+  // the MAX_STUN_STAR_BANDS entities nearest the camera per frame (the two
+  // fixed pick arrays are the selection scratch, reused every frame).
+  private stunStars = new Map<number, { remaining: number; color: number; stamp: number }>();
+  private stunPickIds: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
+  private stunPickDist: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
   private time = 0;
   private frame = 0;
   private qualityLevel = 1;
@@ -842,6 +848,15 @@ export class AbilityVfxFx implements SequencerHost {
     return this.anchor(id, frac);
   }
 
+  // True while the aura-driven stunned-star band is live for this entity
+  // (fed this frame; the sweep has not run when the sequencer asks, because
+  // sequencer.update runs inside this update's own frame). The sequencer's
+  // cast-moment ccStars stand down for it.
+  heldStunStars(targetId: number): boolean {
+    const s = this.stunStars.get(targetId);
+    return s !== undefined && s.stamp === this.frame;
+  }
+
   groundYAt(x: number, z: number): number {
     return this.groundY(x, z);
   }
@@ -1347,16 +1362,43 @@ export class AbilityVfxFx implements SequencerHost {
   // worn `kind: 'stun'` aura lives: the painter re-feeds it every frame from
   // its aura scan, and the update sweep drops it the frame the feed stops
   // (aura faded, entity left interest), so there is no teardown bookkeeping.
-  // remaining drives the fade over the stun's final second.
-  holdStunStars(entityId: number, remaining: number): void {
+  // remaining drives the fade toward the alpha floor over the stun's final
+  // second; color is the painter-resolved accent (the ability's own for a
+  // spec'd stun, classic gold otherwise).
+  holdStunStars(entityId: number, remaining: number, colorHex = STUN_STAR_COLOR): void {
     let s = this.stunStars.get(entityId);
     if (!s) {
-      s = { remaining, stamp: this.frame };
+      s = { remaining, color: colorHex, stamp: this.frame };
       this.stunStars.set(entityId, s);
       return;
     }
     s.remaining = remaining;
+    s.color = colorHex;
     s.stamp = this.frame;
+  }
+
+  // One held star band (the drawOrbit sibling): STUN_STAR_COUNT sprites
+  // orbiting the entity's head on the shared time base. Alpha reads the
+  // stun's remaining time but never falls below the floor while the aura
+  // lives: the fade above the floor is the duration read, the floor is the
+  // fairness rule (an active stun tell must stay readable to the last tick).
+  private drawStunStars(entityId: number, s: { remaining: number; color: number }): void {
+    const head = this.anchorOf(entityId, 1.0);
+    if (!head) return;
+    const alpha = Math.max(STUN_STAR_ALPHA_FLOOR, Math.min(1, s.remaining));
+    for (let k = 0; k < STUN_STAR_COUNT; k++) {
+      const a = this.time * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;
+      this.overlay.push(
+        head.x + Math.cos(a) * STUN_STAR_RADIUS,
+        head.y + STUN_STAR_LIFT,
+        head.z + Math.sin(a) * STUN_STAR_RADIUS,
+        s.color,
+        STUN_STAR_SIZE,
+        OVERLAY_CELL.star,
+        alpha,
+        STUN_STAR_BRIGHTNESS,
+      );
+    }
   }
 
   // ---- frame advance ------------------------------------------------------
@@ -1390,10 +1432,15 @@ export class AbilityVfxFx implements SequencerHost {
     this.spirits.update(dt);
     this.overlay.beginFrame();
     // The stunned-star bands draw FIRST in the frame's overlay batch: the
-    // stun tell is actionable information, so capacity contention with
-    // decorative sprites must never be able to drop it. Same angle base as
-    // the sequencer's cast-moment ccStars (time * rate, zero phase), so the
-    // impact stars and this held band coincide sprite for sprite.
+    // stun tell is actionable information, so capacity contention with the
+    // decorative sprites that follow must never be able to drop it. The band
+    // count is itself bounded (MAX_STUN_STAR_BANDS nearest the camera), so a
+    // raid-wide mass stun cannot starve the windup telegraphs and worn-debuff
+    // bands drawn after it. While an entity's band is live, the sequencer's
+    // cast-moment ccStars stand down for it (heldStunStars below; same
+    // constants, same time base, painter-matched accent), so the two are one
+    // continuous read, never a double draw and never a fade-out dip.
+    let stunPicks = 0;
     for (const [id, s] of this.stunStars) {
       if (s.stamp !== this.frame) {
         this.stunStars.delete(id);
@@ -1401,20 +1448,26 @@ export class AbilityVfxFx implements SequencerHost {
       }
       const head = this.anchorOf(id, 1.0);
       if (!head) continue;
-      const alpha = Math.min(1, s.remaining);
-      for (let k = 0; k < STUN_STAR_COUNT; k++) {
-        const a = this.time * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;
-        this.overlay.push(
-          head.x + Math.cos(a) * STUN_STAR_RADIUS,
-          head.y + STUN_STAR_LIFT,
-          head.z + Math.sin(a) * STUN_STAR_RADIUS,
-          STUN_STAR_COLOR,
-          STUN_STAR_SIZE,
-          OVERLAY_CELL.star,
-          alpha,
-          STUN_STAR_BRIGHTNESS,
-        );
+      const dx = head.x - camPosScratch.x;
+      const dy = head.y - camPosScratch.y;
+      const dz = head.z - camPosScratch.z;
+      const d = dx * dx + dy * dy + dz * dz;
+      // Insertion into the fixed nearest-N scratch (ascending by distance).
+      if (stunPicks < MAX_STUN_STAR_BANDS || d < this.stunPickDist[stunPicks - 1]) {
+        let i = Math.min(stunPicks, MAX_STUN_STAR_BANDS - 1);
+        while (i > 0 && this.stunPickDist[i - 1] > d) {
+          this.stunPickIds[i] = this.stunPickIds[i - 1];
+          this.stunPickDist[i] = this.stunPickDist[i - 1];
+          i--;
+        }
+        this.stunPickIds[i] = id;
+        this.stunPickDist[i] = d;
+        if (stunPicks < MAX_STUN_STAR_BANDS) stunPicks++;
       }
+    }
+    for (let i = 0; i < stunPicks; i++) {
+      const s = this.stunStars.get(this.stunPickIds[i]);
+      if (s) this.drawStunStars(this.stunPickIds[i], s);
     }
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)

@@ -17,7 +17,9 @@ import {
   localCasterTier,
   planCast,
   planImpact,
-  wornStunRemaining,
+  STUN_STAR_COLOR,
+  stunStarAccentColor,
+  wornStunIndex,
 } from '../ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
@@ -183,8 +185,10 @@ export interface AbilityVfxEntityState {
   // the offline sim's live Aura objects; mirrored online as a presence-only 1
   // via the aura wire's bt flag). kind/remaining feed the stunned-star tell
   // (both live on the offline Aura and on the online mirror via the aura
-  // wire's kind/rem); optional so tests can omit them.
+  // wire's kind/rem), and dead gates it off a corpse; optional so tests can
+  // omit them.
   auras: readonly { id: string; kind?: string; remaining?: number; breakThreshold?: number }[];
+  dead?: boolean;
   kind?: string;
   templateId?: string;
   // On-next-swing queue (heroic-strike style ability id while armed). Present
@@ -1324,9 +1328,30 @@ export class AbilityVfx {
     // included) and it works online for any victim in interest range, exactly
     // like the bands above. Actionable information: it rides outside the cast
     // budget, every quality tier keeps it, and the fx engine sweeps it the
-    // frame the aura fades.
-    const stunRemaining = wornStunRemaining(e.auras);
-    if (stunRemaining > 0) fx.holdStunStars(e.id, stunRemaining);
+    // frame the aura fades. A dead body sheds it (an unbreakable stun can
+    // survive death by design, e.g. the Nythraxis transition ghosts; a corpse
+    // must not wear a frozen band). Color: a spec-resolved stun wears the
+    // same accent the sequencer's cast-moment stars use, so the handoff never
+    // steps hue; unspec'd stuns wear classic gold.
+    if (e.dead !== true) {
+      const stunAt = wornStunIndex(e.auras);
+      if (stunAt >= 0) {
+        const stunAura = e.auras[stunAt];
+        // Color lookup only: effect dispatch names every ability stun
+        // `${abilityId}_stun`, a suffix deliberately absent from the general
+        // aura map (routing it there would hand a stun ability's caster buff
+        // DNA to its victim), so strip it here after the exact/mapped try.
+        const stunSpecId =
+          auraSpecId(stunAura.id) ??
+          (stunAura.id.endsWith('_stun') ? stunAura.id.slice(0, -'_stun'.length) : null);
+        const stunSpec = stunSpecId !== null ? ABILITY_VFX_SPECS[stunSpecId] : undefined;
+        fx.holdStunStars(
+          e.id,
+          stunAura.remaining ?? 1,
+          stunSpec ? stunStarAccentColor(abilityVfxColor(stunSpec)) : STUN_STAR_COLOR,
+        );
+      }
+    }
     // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
     // flag is armed, the queued ability's authored orbit rides the caster as
     // the empowerment tell - Reaver Strike's hot amber weaponGlow ember that

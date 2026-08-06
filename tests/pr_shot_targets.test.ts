@@ -57,6 +57,35 @@ describe('classifyDiff', () => {
     expect(captureSource).toContain("document.body.classList.contains('game-active')");
   });
 
+  it('captures the stunned-star band for any ability-vfx subsystem change', () => {
+    const plan = classifyDiff(['src/render/ability_vfx/fx.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('stun-stars');
+    // A focused stun_stars module path implies exactly this target, so a
+    // narrow diff never drags the whole subsystem tour along.
+    const focused = classifyDiff(['src/render/stun_stars.ts']);
+    expect(focused.specific.map((t: { key: string }) => t.key)).toEqual(['stun-stars']);
+    const target = plan.specific.find((t: { key: string }) => t.key === 'stun-stars');
+    expect(target.variants).toEqual([
+      {
+        key: 'sundering-gavel-desktop',
+        charClass: 'paladin',
+        charName: 'Aurelius',
+        abilityId: 'hammer_of_justice',
+      },
+    ]);
+    // The stun must come from the real action-bar click, never an injected
+    // aura, and the poll must key off the aura KIND, the same read the band
+    // itself uses.
+    const captureSource = target.capture.toString();
+    expect(captureSource).not.toMatch(/sim\.castAbility\s*\(/);
+    expect(captureSource).not.toMatch(/auras\.push/);
+    expect(captureSource).toContain('.action-btn[data-hotbar-slot="1"]');
+    expect(captureSource).toContain('button.click()');
+    expect(captureSource).toContain("a.kind === 'stun'");
+    expect(captureSource).toContain("document.body.classList.contains('game-active')");
+  });
+
   it('captures the market overview, the buy confirmation, and expanded armor filters for market window changes', () => {
     const plan = classifyDiff(['src/ui/market_window.ts']);
     expect(plan.isVisual).toBe(true);

@@ -356,12 +356,18 @@ export function planImpact(
 // The persistent stunned-star tell: any worn `kind: 'stun'` aura circles a
 // star band over the victim's head for the aura's whole life. Keyed off the
 // aura KIND, never the spec table, so every stun source (player abilities,
-// mob stomps, traps) reads without authoring a spec. Geometry mirrors the
-// sequencer's cast-moment ccStars band exactly (count/radius/lift/rate share
-// the same time base with zero phase), so the impact stars hand off to this
-// held band seamlessly. A stun is actionable information (the PvP "why can't
-// I act" read), so the painter feeds it outside the cast budget and no
-// quality tier sheds it.
+// mob stomps, traps) reads without authoring a spec. The sequencer's
+// cast-moment ccStars band shares these constants and the same time base and
+// STANDS DOWN while this band is live for the same victim (heldStunStars on
+// the SequencerHost seam): never a double draw, and never a dip where the
+// cast band's fade-out tail hides the held band's full alpha. A stun is
+// actionable information (the PvP "why can't I act"
+// read), so the painter feeds it outside the cast budget, no quality tier
+// sheds it, and the alpha floor keeps it readable for the stun's whole life
+// (the fade above the floor stays as the duration read). Scope note: 'stun'
+// is deliberately the only aura kind here; the other cannot-act kinds carry
+// their own dedicated reads (stasis: the Ice Block shell, polymorph: the
+// morphed rig, incapacitate: the temporal-hourglass visual).
 export const STUN_STAR_COUNT = 4;
 export const STUN_STAR_RADIUS = 0.45;
 export const STUN_STAR_LIFT = 0.55;
@@ -369,22 +375,43 @@ export const STUN_STAR_RATE = 2.4;
 export const STUN_STAR_SIZE = 0.2;
 export const STUN_STAR_BRIGHTNESS = 2.2;
 export const STUN_STAR_COLOR = 0xffd75e;
+export const STUN_STAR_ALPHA_FLOOR = 0.35;
+// The overlay point cloud is one shared hard-capped batch (128 sprites for
+// EVERY windup orb, orbit band, bolt head, and sequencer transient in the
+// scene), so the held bands are bounded too: the fx engine draws the nearest
+// N stunned entities to the camera and no more. 8 bands = 32 sprites, a
+// quarter of the batch, so a raid-wide mass stun can never starve the other
+// actionable reads (enemy windup telegraphs, worn-debuff bands) that draw
+// after it.
+export const MAX_STUN_STAR_BANDS = 8;
 
-// Longest remaining time across the entity's worn stun auras, 0 when none.
-// The painter's per-frame aura scan feeds it to the fx engine, whose star
-// alpha is min(1, remaining) (the ccStars fade idiom: full read for the
-// stun's life, fading over its final second). remaining is optional on the
-// slice; a stun aura carrying none stays fully opaque.
-export function wornStunRemaining(auras: readonly { kind?: string; remaining?: number }[]): number {
-  let max = 0;
+// Index of the worn stun aura with the longest remaining time, -1 when none
+// is live. Index rather than the record so the per-frame scan allocates
+// nothing. remaining is optional on the slice (mirrored auras always carry
+// it); a stun with none counts as 1s so it still reads, and a stun at
+// remaining 0 is already expiring and never picked.
+export function wornStunIndex(auras: readonly { kind?: string; remaining?: number }[]): number {
+  let best = 0;
+  let index = -1;
   for (let i = 0; i < auras.length; i++) {
     const a = auras[i];
     if (a.kind === 'stun') {
       const rem = a.remaining ?? 1;
-      if (rem > max) max = rem;
+      if (rem > best) {
+        best = rem;
+        index = i;
+      }
     }
   }
-  return max;
+  return index;
+}
+
+// The held band's color for a spec-resolved stun: the same accent the
+// sequencer gives its cast-moment stars (lighten 0.4 of the ability color),
+// so the handoff from impact stars to held band never steps hue. Unspec'd
+// stuns (mob stomps) fall back to STUN_STAR_COLOR classic gold.
+export function stunStarAccentColor(colorHex: number): number {
+  return lighten(colorHex, 0.4);
 }
 
 // Fixed-size ring buffers of timestamps: zero allocation in steady state (one

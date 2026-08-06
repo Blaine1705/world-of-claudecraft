@@ -2,15 +2,32 @@
 // band over the victim's head for the aura's whole life. Matched by aura KIND,
 // never the spec table, so every stun source reads (player abilities, mob
 // stomps) online and offline; the fx engine sweeps the band the frame the
-// aura fades. Covers the pure core read, the painter feed, and the fx-side
-// draw/sweep/sleep lifecycle.
+// aura fades. Covers the pure core read, the painter feed (color accent, dead
+// gate, presentation gate), and the fx-side draw/sweep/sleep lifecycle with
+// its fairness pins: first overlay slots, quality-tier immunity, the
+// MAX_STUN_STAR_BANDS cap, the alpha floor, and the sequencer handoff.
+// Exhaustive shed set, for the record: the only paths that drop a live band
+// are the frame-stamp sweep (aura faded or entity out of the renderer's sync
+// range), sleepEntity via syncEntity(e, false) (a frustum-culled,
+// non-actionable rig), the dead gate, and the nearest-camera cap; no quality
+// tier, budget tier, or governor state reaches it.
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
+import { OVERLAY_CELL } from '../src/render/ability_vfx/fx_textures';
 import type { AbilityVfxDeps, AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
-import { STUN_STAR_COUNT, wornStunRemaining } from '../src/render/ability_vfx_core';
+import {
+  abilityVfxColor,
+  MAX_STUN_STAR_BANDS,
+  STUN_STAR_ALPHA_FLOOR,
+  STUN_STAR_COLOR,
+  STUN_STAR_COUNT,
+  stunStarAccentColor,
+  wornStunIndex,
+} from '../src/render/ability_vfx_core';
 import { ABILITY_VFX_SPECS } from '../src/render/ability_vfx_specs';
+import { bareClient } from './helpers/bare_client';
 
 function installCanvasStub(): void {
   const noop = () => {};
@@ -49,10 +66,15 @@ afterEach(() => {
 });
 
 interface FxProbe {
-  stunStars: Map<number, { remaining: number; stamp: number }>;
-  overlay: { count: number; alpha: Float32Array };
+  stunStars: Map<number, { remaining: number; color: number; stamp: number }>;
+  overlay: { count: number; alpha: Float32Array; cell: Float32Array };
+  sequencer: {
+    slots: { active: boolean; targetId: number; ccStars: number; impactDone: boolean }[];
+  };
 }
 
+// The anchor spreads entities along x by id so the nearest-camera selection
+// has real distances to rank (camera sits at the origin looking down -z).
 function makeFx(): { fx: AbilityVfxFx; probe: FxProbe } {
   installCanvasStub();
   const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
@@ -60,7 +82,7 @@ function makeFx(): { fx: AbilityVfxFx; probe: FxProbe } {
   const fx = new AbilityVfxFx(
     new THREE.Scene(),
     camera,
-    () => new THREE.Vector3(0, 1.8, -5),
+    (id: number) => new THREE.Vector3(id, 1.8, -5),
     () => 0,
   );
   return { fx, probe: fx as unknown as FxProbe };
@@ -103,67 +125,101 @@ function makePainter() {
 function ent(
   auras: { id: string; kind?: string; remaining?: number }[],
   id = 7,
+  dead?: boolean,
 ): AbilityVfxEntityState {
-  return { id, castingAbility: null, castRemaining: 0, castTotal: 0, auras };
+  return { id, castingAbility: null, castRemaining: 0, castTotal: 0, auras, dead };
 }
 
-describe('wornStunRemaining (pure core)', () => {
-  it('returns 0 when no aura is a stun, whatever the ids look like', () => {
-    expect(wornStunRemaining([])).toBe(0);
+// Indices of the frame's star-cell overlay sprites orbiting the given
+// entity's head (a hand-cooked sequencer slot also draws other transients,
+// including stray stars at its own impact point; the handoff pins care about
+// the band around the victim). The test anchor puts entity id at x = id.
+function bandStarIndices(probe: FxProbe, entityId: number): number[] {
+  const pos = (probe.overlay as unknown as { pos: Float32Array }).pos;
+  const out: number[] = [];
+  for (let i = 0; i < probe.overlay.count; i++) {
+    if (probe.overlay.cell[i] === OVERLAY_CELL.star && Math.abs(pos[i * 3] - entityId) <= 0.5) {
+      out.push(i);
+    }
+  }
+  return out;
+}
+
+describe('wornStunIndex (pure core)', () => {
+  it('returns -1 when no aura is a stun, whatever the ids look like', () => {
+    expect(wornStunIndex([])).toBe(-1);
     expect(
-      wornStunRemaining([
+      wornStunIndex([
         { kind: 'slow', remaining: 4 },
         { kind: 'root', remaining: 2 },
         { id: 'storm_bolt_stun' } as { kind?: string; remaining?: number },
       ]),
-    ).toBe(0);
+    ).toBe(-1);
   });
 
-  it('returns the longest remaining across worn stun auras', () => {
+  it('returns the index of the longest-remaining worn stun aura', () => {
     expect(
-      wornStunRemaining([
+      wornStunIndex([
         { kind: 'stun', remaining: 1.5 },
         { kind: 'buff', remaining: 300 },
         { kind: 'stun', remaining: 2.75 },
       ]),
-    ).toBe(2.75);
+    ).toBe(2);
   });
 
-  it('treats a stun with no remaining as fully live (opaque alpha)', () => {
-    expect(wornStunRemaining([{ kind: 'stun' }])).toBe(1);
+  it('treats a stun with no remaining as 1s live, and one at exactly 0 as expired', () => {
+    expect(wornStunIndex([{ kind: 'stun' }])).toBe(0);
+    expect(wornStunIndex([{ kind: 'stun', remaining: 0 }])).toBe(-1);
   });
 });
 
 describe('painter feeds the stun tell from the aura KIND, not the spec table', () => {
-  it('holds stars for a stun aura whose id has no vfx spec (a mob stomp)', () => {
+  it('holds gold stars for a stun aura whose id has no vfx spec (a mob stomp)', () => {
     const { painter, fx } = makePainter();
     const auraId = 'war_stomp_stun';
     expect(ABILITY_VFX_SPECS[auraId]).toBeUndefined();
 
     painter.syncEntity(ent([{ id: auraId, kind: 'stun', remaining: 2.5 }]));
 
-    expect(fx.holdStunStars).toHaveBeenCalledWith(7, 2.5);
+    expect(fx.holdStunStars).toHaveBeenCalledWith(7, 2.5, STUN_STAR_COLOR);
   });
 
-  it('holds stars for a spec-suffixed player stun too, every frame it is worn', () => {
+  it('holds the sequencer-matched accent for a spec-suffixed player stun, every frame', () => {
     const { painter, fx } = makePainter();
+    const spec = ABILITY_VFX_SPECS.storm_bolt;
+    expect(spec).toBeDefined();
     const e = ent([{ id: 'storm_bolt_stun', kind: 'stun', remaining: 3 }]);
 
     painter.syncEntity(e);
     painter.syncEntity(e);
 
     expect(fx.holdStunStars).toHaveBeenCalledTimes(2);
-    expect(fx.holdStunStars).toHaveBeenLastCalledWith(7, 3);
+    expect(fx.holdStunStars).toHaveBeenLastCalledWith(
+      7,
+      3,
+      stunStarAccentColor(abilityVfxColor(spec)),
+    );
   });
 
-  it('holds nothing for non-stun debuffs or buffs', () => {
+  it('holds nothing for non-stun debuffs, buffs, or an expired stun', () => {
     const { painter, fx } = makePainter();
 
     painter.syncEntity(
       ent([
         { id: 'hamstring_slow', kind: 'slow', remaining: 8 },
         { id: 'arcane_intellect', kind: 'buff', remaining: 1800 },
+        { id: 'storm_bolt_stun', kind: 'stun', remaining: 0 },
       ]),
+    );
+
+    expect(fx.holdStunStars).not.toHaveBeenCalled();
+  });
+
+  it('holds nothing on a dead body, even under a death-surviving stun aura', () => {
+    const { painter, fx } = makePainter();
+
+    painter.syncEntity(
+      ent([{ id: 'nythraxis_transition_stun', kind: 'stun', remaining: 9 }], 7, true),
     );
 
     expect(fx.holdStunStars).not.toHaveBeenCalled();
@@ -190,13 +246,87 @@ describe('fx engine draws and sweeps the held star band', () => {
     for (let k = 0; k < STUN_STAR_COUNT; k++) expect(probe.overlay.alpha[k]).toBeCloseTo(0.5);
   });
 
-  it('clamps alpha to 1 while more than a second remains', () => {
+  it('clamps alpha to 1 above a second remaining and to the floor near expiry', () => {
     const { fx, probe } = makeFx();
 
     fx.holdStunStars(7, 3);
     fx.update(0.05);
-
     expect(probe.overlay.alpha[0]).toBe(1);
+
+    fx.holdStunStars(7, 0.05);
+    fx.update(0.05);
+    expect(probe.overlay.alpha[0]).toBeCloseTo(STUN_STAR_ALPHA_FLOOR);
+  });
+
+  it('occupies the FIRST overlay slots, ahead of a windup fed in the same frame', () => {
+    const { fx, probe } = makeFx();
+
+    fx.windup(3, 0xff0000, 0.5);
+    fx.holdStunStars(7, 3);
+    fx.update(0.05);
+
+    expect(probe.overlay.count).toBeGreaterThan(STUN_STAR_COUNT);
+    for (let k = 0; k < STUN_STAR_COUNT; k++) {
+      expect(probe.overlay.cell[k]).toBe(OVERLAY_CELL.star);
+      expect(probe.overlay.alpha[k]).toBe(1);
+    }
+  });
+
+  it('ignores the quality tier entirely: tier 0 sheds nothing from the tell', () => {
+    const { fx, probe } = makeFx();
+    fx.setQuality(0);
+
+    fx.holdStunStars(7, 3);
+    fx.update(0.05);
+
+    expect(probe.overlay.count).toBe(STUN_STAR_COUNT);
+    expect(probe.overlay.alpha[0]).toBe(1);
+  });
+
+  it('caps a mass stun at the MAX_STUN_STAR_BANDS nearest entities', () => {
+    const { fx, probe } = makeFx();
+
+    // Anchor x = id, camera at origin: lower ids are nearer.
+    for (let id = 1; id <= MAX_STUN_STAR_BANDS + 6; id++) fx.holdStunStars(id, 3);
+    fx.update(0.05);
+
+    expect(probe.overlay.count).toBe(MAX_STUN_STAR_BANDS * STUN_STAR_COUNT);
+    // Every held entry survives the cap; only the draw is bounded.
+    expect(probe.stunStars.size).toBe(MAX_STUN_STAR_BANDS + 6);
+  });
+
+  it('the held band OWNS the read over a live cast-moment ccStars slot: 4 sprites, full alpha, never 8', () => {
+    const { fx, probe } = makeFx();
+    // Hand-cook an otherwise-inert live sequence slot mid-ccStars-tail for
+    // the same victim (all one-shot phases done; only the star branch runs).
+    const slot = probe.sequencer.slots[0];
+    slot.active = true;
+    slot.targetId = 7;
+    slot.ccStars = 0.2;
+    slot.impactDone = true;
+
+    fx.holdStunStars(7, 3);
+    fx.update(0.05);
+
+    // One band, not two, and the HELD band's full alpha, not the sequencer
+    // tail's 0.2: the dip where the cast band's fade hid the stun tell is the
+    // regression this pins.
+    const stars = bandStarIndices(probe, 7);
+    expect(stars).toHaveLength(STUN_STAR_COUNT);
+    for (const i of stars) expect(probe.overlay.alpha[i]).toBe(1);
+  });
+
+  it('the cast-moment ccStars still draw alone when no aura band is held (strike flourish)', () => {
+    const { fx, probe } = makeFx();
+    const slot = probe.sequencer.slots[0];
+    slot.active = true;
+    slot.targetId = 7;
+    slot.ccStars = 1.2;
+    slot.impactDone = true;
+
+    fx.update(0.05);
+
+    expect(bandStarIndices(probe, 7)).toHaveLength(STUN_STAR_COUNT);
   });
 
   it('sweeps the band the first frame the feed stops', () => {
@@ -216,12 +346,68 @@ describe('fx engine draws and sweeps the held star band', () => {
     const { fx, probe } = makeFx();
     fx.holdStunStars(7, 3);
     fx.holdStunStars(8, 3);
+    fx.update(0.05);
+    expect(probe.overlay.count).toBe(2 * STUN_STAR_COUNT);
 
+    fx.holdStunStars(7, 3);
+    fx.holdStunStars(8, 3);
     fx.sleepEntity(7);
     expect(probe.stunStars.has(7)).toBe(false);
     expect(probe.stunStars.has(8)).toBe(true);
 
     fx.clear();
     expect(probe.stunStars.size).toBe(0);
+  });
+});
+
+describe('online mirror parity', () => {
+  it('feeds the band from a wire-decoded stun aura on a ClientWorld entity', () => {
+    const client = bareClient(1);
+    const internals = client as unknown as { applySnapshot(snapshot: unknown): void };
+    internals.applySnapshot({
+      t: 'snap',
+      self: { id: 1, k: 'player', tid: 'warrior', nm: 'Thorgar', lv: 12, x: 0, y: 0, z: 0, f: 0 },
+      ents: [
+        {
+          id: 9,
+          k: 'mob',
+          tid: 'wild_boar',
+          nm: 'Wild Boar',
+          lv: 2,
+          x: 5,
+          y: 0,
+          z: 5,
+          f: 0,
+          hp: 100,
+          mhp: 100,
+          auras: [{ id: 'storm_bolt_stun', name: 'Storm Bolt', kind: 'stun', rem: 2.5, dur: 3 }],
+        },
+      ],
+    });
+    const mirrored = client.entities.get(9);
+    expect(mirrored).toBeDefined();
+    expect(mirrored?.auras[0]?.kind).toBe('stun');
+
+    const { painter, fx } = makePainter();
+    painter.syncEntity(mirrored as unknown as AbilityVfxEntityState);
+
+    expect(fx.holdStunStars).toHaveBeenCalledTimes(1);
+    const [id, remaining] = (fx.holdStunStars as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(id).toBe(9);
+    expect(remaining).toBeCloseTo(2.5, 1);
+  });
+});
+
+describe('sequencer handoff surface', () => {
+  it('heldStunStars reports a band fed this frame, for that entity only', () => {
+    const { fx } = makeFx();
+
+    fx.holdStunStars(7, 3);
+    expect(fx.heldStunStars(7)).toBe(true);
+    expect(fx.heldStunStars(8)).toBe(false);
+
+    // After the frame advances without a re-feed the claim lapses.
+    fx.update(0.05);
+    expect(fx.heldStunStars(7)).toBe(false);
   });
 });

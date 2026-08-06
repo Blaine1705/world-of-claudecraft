@@ -567,10 +567,11 @@ export const TARGETS = [
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
-      // Stage: level to the Storm Bolt learn level, stand a durable mob 7 yd
-      // in front of the player (pumped hp so the bolt cannot kill it: the shot
-      // needs the mob ALIVE and stunned), and arm the ability on slot 1. The
-      // stun itself is applied by the real cast click below, never injected.
+      // Stage: level to the Gavel rank 2 learn level, stand a durable mob in
+      // front of the player (pumped hp so stray aggro damage cannot kill it:
+      // the shot needs the mob ALIVE and stunned), and arm the ability on
+      // slot 1. The stun itself is applied by the real cast click below,
+      // never injected.
       const staged = await page.evaluate((shot) => {
         // The entry overlays can race the shared dismissal on a cold profile;
         // clear them here too (the bags-target idiom) so they cannot sit over

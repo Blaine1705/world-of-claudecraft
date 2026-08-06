@@ -151,6 +151,12 @@ it, so the boundary cannot creep back in as decoration.
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/ability_vfx_stun_stars.test.ts`: the overhead stunned-star band (the "why can't I act"
+  tell, keyed off aura kind so every stun source reads) occupies the FIRST overlay slots, draws
+  identically at vfx quality 0, holds an alpha floor for the aura's whole life, and is bounded
+  by a nearest-camera band cap instead of a tier shed; the only pinned skips are a dead body,
+  a frustum-culled non-actionable rig, and the cast-moment sequence that already draws the
+  same band.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 
