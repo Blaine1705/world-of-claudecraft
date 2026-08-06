@@ -405,10 +405,15 @@ happened.
   five roving windows).
 - Validation: npx tsc --noEmit clean throughout; targeted battery 13 files
   512 tests green; behavior+view+window+content 369 green post-fix-round;
-  npm run ci:changed exit 0; node scripts/gate_select.mjs fails ONLY at i18n
-  freshness on the uncommitted tree (regen vs committed copies), expected to
-  pass once the catalog and bundles land in the same commit set; full
-  gate_select re-run after committing is the Phase 13 QA gate's first step.
+  npm run ci:changed exit 0. Pre-commit gate_select failed only at i18n
+  freshness (regen vs committed copies, by design on an uncommitted
+  catalog+bundle change). The post-commit full-suite run then caught ONE real
+  item in 31838 tests: the new lastAnnounced field is a repaint memo, and
+  tests/language_fanout_registry.test.ts demands the language question
+  answered for every memo a classified module carries; registered with the
+  rationale (the fan-out render is argument-less, the player-driven arm, so
+  it always rewrites the region in the new language) in e3b1802d10. Final
+  node scripts/gate_select.mjs on the finished tree: PASS, all 8 steps green.
   Screenshots committed under docs/screenshots/reliquary-window-information/
   (before/after, desktop + mobile landscape; the after page shot shows the
   live source line "Drops from Sanctum Scaleguard in Gravewyrm Sanctum").
