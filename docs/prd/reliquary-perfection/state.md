@@ -1,6 +1,6 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 10 complete; next: 10 QA. Update this line as phases complete.
+Current phase: 11 complete; next: 11 QA. Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -80,7 +80,9 @@ Current phase: 10 complete; next: 10 QA. Update this line as phases complete.
 - Phase 10: reliquaryUnlock gained retro?: boolean (emitted only when true; client-only
   presentation flag, self-scoped event, no server fan-out exists for it). New i18n key
   hudChrome.reliquary.retroSummary (English catalog + the five non-Latin M16 fills;
-  ja uses the full-width colon). Titles page is 33 relics (hidden deeds excluded
+  ja uses the full-width colon; SUPERSEDED in Phase 11 by the
+  hudChrome.plurals.reliquaryRetroSummary base, the ja colon note now lives on its
+  four leaves). Titles page is 33 relics (hidden deeds excluded
   structurally); derived totals are catalog 212 / character-scoped 183; NO literal
   total pins exist anywhere, the suites derive them (the phase's cascade step was a
   no-op, recorded so later phases do not hunt). markItemDiscovered gained trailing
@@ -123,7 +125,70 @@ Current phase: 10 complete; next: 10 QA. Update this line as phases complete.
   the safer shape); a spectator session receives the spectated character's retro
   summary (pre-existing pid routing, near-unreachable, shared with deeds); every
   masterwork proc now dirties the visited deed key (bounded by the proc rate).
-- Phase 11: (pending)
+- Phase 11: Page-name localization channel: src/ui/reliquary_i18n.ts (deed_i18n clone:
+  live getLanguage() resolution, lazy per-locale chunks, coalesced loader, pseudo-locale
+  port, manifest) + src/ui/reliquary_i18n.locales/{ja_JP,ko_KR,ru_RU,zh_CN,zh_TW}.ts
+  with all 28 page names filled. reliquaryPageName(pageId) falls back overlay -> catalog
+  English -> raw id; reliquaryPageDesc (overlay -> catalog desc -> '') ships for
+  Phase 13 with zero call sites. All four window render sites and both hud
+  toast/banner interpolations resolve at paint time from pageId; view models keep raw
+  English name fields (doc comments say never render directly; a painter-wide pin
+  allows exactly one sanctioned .name read, the weapon-skin one). main.ts wiring
+  mirrors the three deed hook sites (boot pin in tests/ios_entry_memory.test.ts is now
+  a reflow-proof regex; the changeLanguage three-loader block is pinned in
+  tests/language_fanout_registry.test.ts). NOTE for future tier work: the release-tier
+  suite list is pinned in FOUR places (gate_steps.mjs, ci.yml, the literal array in
+  tests/release_i18n_tier_coverage.test.ts, and any suite's own runIf); the fix round
+  made the chunk NAME coverage unconditional at PR tier, so tests/reliquary_i18n.test.ts
+  reads no tier flag and is deliberately NOT in the tier lists; a future tier-sensitive
+  desc arm must re-add it to all three. Translation anchors: dungeon/delve/mob and
+  itemSet entity names verbatim (glossary dungeonNames rule); heroic prefix reuses the
+  deed dgn_*_heroic convention verbatim (ja/ko/ru ASCII colon, zh full-width); the two
+  Nythraxis pages trim the arena noun off the entity name (zh anchors the committed
+  raid noun); Mounts/Titles reuse hudChrome.mounts.title and deeds.titlesSection;
+  Weapon Skins had NO committed key anywhere and was composed from the shipped Armory
+  nouns (ja 武器スキン, ko 무기 스킨, ru Облики оружия, zh 武器外观/武器外觀); the three
+  professions pages are anchored coinages (markFind masterwork/specimen nouns, guide
+  rareHeading). pageStubNote is deleted end to end (catalog, five fills, negative pin,
+  and ONLY the two comma-shared selector lines in components.css). Shelf terminology
+  locked in scripts/i18n_glossary.json (reliquaryShelves row): Professions = the
+  professions window title (hudChrome.professions.title), a recorded deviation from
+  the phase parenthetical preferring guide.nav.professions, which would have broken
+  existing ko/ru agreement (only the ja wiki shelf moved, 職業 -> 専門技能); Horizons =
+  the metaphorical wiki reading (window nav moved in ja 地平, ko 지평, zh_CN 远景,
+  zh_TW 遠景; ru untouched on both surfaces). Rider done: both retro summaries render
+  via tPlural bases hudChrome.plurals.reliquaryRetroSummary/deedsRetroSummary, flat
+  keys retired; the five non-Latin locales carry ALL FOUR leaves (the M16 guard forbids
+  byte-identical wordy English in non-Latin resolved values, so the rider's
+  leave-.one-pending applies only to Latin locales; the ru sentences are
+  number-invariant colon-genitive forms, identical x4 is correct, mirroring
+  secondsRemaining); the 13 Latin deeds locales carry few/many/other with .one pending
+  for the Phase 22 release fill (pending.ts: 75 rows = 15 locales x (deeds .one + four
+  reliquary leaves)). Both emission pins select on the NUMERIC argument (a
+  formatted-string selection argument would collapse every locale onto .other).
+  Loading tip reworded chord-free (no tip may name a keybind; the rotation has no
+  interpolation seam) with its five non-Latin fills re-translated in the same change.
+  Nav rail count renders through progressText. ACCEPTED divergence: the wiki keeps
+  English page names (guide.ts policy comment updated); localization is window-side
+  only. OBSERVED pre-existing inconsistencies, deliberately untouched (maintainer/QA
+  call): ko ships two Nythraxis transliterations (니트락시스 overlay vs 나이트락시스
+  deed/mob table), ja one stray ニスラクシス quest objective, ru Олдрен vs Алдрен and
+  Торнпика vs Терновых высот; hudChrome.raidLockout.heroicName diverges from the deed
+  heroic prefix in ja (ヒロイック: ASCII no-space) and zh_TW (ASCII colon);
+  guide.nav.professions still uses a third term in ja/ko/ru (outside the phase's
+  alignment surface list). Page descs and Latin page-name chunks = Phase 22 worklist.
+  ja screenshot spot-check deferred to Phase 11 QA (the behavioral builder assertion
+  in tests/reliquary_i18n.test.ts covers the acceptance criterion). Review round:
+  frontend-seam + qa-checklist + test-coverage-auditor, zero behavioral blocking; one
+  BLOCKING test gap (the hud reliquaryPageName routing was unpinned) and every
+  should-fix/nit applied in the consolidated fix round (commit 5d83778ba8, 21 items,
+  four mutation proofs), which also extracted the twice-copied pseudo-locale port
+  into src/ui/i18n_pseudo_port.ts (shared by deed_i18n and reliquary_i18n, total
+  drift pin over every en leaf vs the committed en_XA). DECLINED findings, with
+  rulings: seeding the Latin deedsRetroSummary.one rows (conflicts with the Phase 10
+  QA rider; see the OPEN item), deleting the unreachable few/many overlay rows (the
+  shipped house style fills all four leaves, secondsRemaining precedent), and
+  deduping the 28-page pin (it is the fill tripwire, now commented as such).
 - Phase 12: (pending)
 - Phase 13: (pending)
 - Phase 14: (pending)
@@ -159,9 +224,21 @@ Current phase: 10 complete; next: 10 QA. Update this line as phases complete.
 - i18n release fill: all reliquary keys pending in the 15 Latin locales; exact worklist
   in the Phase 22 record. Locale overlays for ja/ko/ru/zh_CN/zh_TW already carry
   contributor-authored fills (correct M16 mechanics, flagged for maintainer review).
-- Wiki shelf-name glossary conflict (ja/ko/zh_CN/zh_TW translate shelves differently in
-  guide.* vs hudChrome.reliquary.nav*): Phase 11 picks one term per locale and aligns
-  both, extending the i18n glossary.
+  Phase 11 adds to that worklist: Latin-locale reliquary_i18n page-name chunks, ALL
+  page desc fills (every locale; the manifest carries desc rows, excluded from the
+  coverage arm until Phase 13 renders them), the Latin deedsRetroSummary.one
+  singulars, and the Latin reliquaryRetroSummary leaves. KNOWN BRANCH BEHAVIOR,
+  deliberate: the pending Latin deedsRetroSummary.one rows render ENGLISH at exactly
+  count 1 until the release fill, because the dense resolved table English-fills
+  pending leaves and defeats tPlural's .other fallback; the Phase 10 QA rider ruled
+  .one stays pending so the release fill authors true singulars (seeding the plural
+  sentence would drop the rows off the pending worklist forever), and the release-tier
+  gate hard-fails on pending so it cannot ship. The ru retro plural leaves (the same
+  number-invariant colon-genitive sentence x4) are flagged for a native-speaker pass
+  at release fill.
+- RESOLVED (Phase 11): the wiki shelf-name glossary conflict. One term per locale
+  locked in scripts/i18n_glossary.json (reliquaryShelves row); see the Phase 11
+  surfaces entry for the deviation rationale on Professions.
 - samplePlayerMeta goldens show "reliquary": {"firstFind": {}}: that is the LIVE meta
   sample, not CharacterState save bloat. Do not "fix" it.
 - pr_screenshots cold-vite flake: rerun on a warm dev server. DOM check is not a frame

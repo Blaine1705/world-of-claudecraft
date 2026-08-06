@@ -6,7 +6,7 @@
 |---|---|---|---|
 | 10 Sim correctness close-out | complete | 2026-08-05 | 2026-08-05 |
 | 10 QA | complete | 2026-08-05 | 2026-08-05 |
-| 11 Page-name localization + i18n hygiene | not started | | |
+| 11 Page-name localization + i18n hygiene | complete | 2026-08-05 | 2026-08-05 |
 | 11 QA | not started | | |
 | 12 Test integrity + catalog pins + records | not started | | |
 | 12 QA | not started | | |
@@ -102,3 +102,40 @@ happened.
   ownedMounts stays strict; four no-action observations.
 - Rider filed in phase-11-page-i18n.md: plural forms for BOTH retro summaries
   (reliquary and deeds) via tPlural, moved together.
+
+### Phase 11: Page-name localization + i18n hygiene (2026-08-05)
+- All acceptance criteria met. Every Reliquary page name (window shelf/nearly/detail
+  plus aria, hud illuminate toasts and banners) resolves through the new
+  src/ui/reliquary_i18n.ts channel (deed_i18n clone, lazy per-locale chunks, pseudo
+  port, manifest), with all 28 names filled in ja_JP/ko_KR/ru_RU/zh_CN/zh_TW anchored
+  to existing entity/itemSet/deed translations (details and deviation rulings in
+  state.md). pageStubNote is gone end to end; shelf terminology is aligned and locked
+  in the glossary; nav counts use progressText; the loading tip names no chord; both
+  retro summaries render through tPlural with count-correct English.
+- The catalog holds 28 pages (the phase file's "27 after Phase 10" line was stale;
+  its own title line said 28). The i18n baseline memory's sha256 re-mint step is
+  retired: regeneration via npm run i18n:gen and committing the slices is the whole
+  obligation.
+- Review dispatch: frontend-seam-reviewer, qa-checklist, test-coverage-auditor
+  (named by the QA gate), plus a fresh reviewer over the fix round itself. Zero
+  behavioral blocking across all three; the one BLOCKING was a coverage gap (the hud
+  reliquaryPageName routing had no pin). All findings applied in the consolidated
+  fix round (5d83778ba8, 21 items, mutation-proven); three declined with recorded
+  rulings in state.md (Latin .one seeding vs the Phase 10 QA rider, unreachable
+  few/many rows, the 28-pin dedupe). The fresh review of the fix round found 0
+  blocking (extraction proven behavior-preserving and PROD-tree-shaken by a real
+  esbuild bundle; tier delisting consistent three ways with no fourth list) and 2
+  should-fix pin gaps plus nits, applied in the tightening commit that follows it
+  (changeLanguage await-precedes-flip ordering, two-sink sentinel occurrence
+  floors, widened chord guard, dialect-residency and tier-scan comment cautions).
+- Validation: npx tsc clean; 23-suite battery green (627 passed) before the fix
+  round and the 17-suite fix-round battery green after (407 passed); ci:changed
+  clean; release-tier arms green for the new suites (known mid-cycle tier reds in
+  the deed arm and pending set are inherited, not this phase).
+- Deferred (recorded, do not re-raise as new findings): ja screenshot spot-check to
+  Phase 11 QA (the sentinel test covers the criterion behaviorally; the pr-screenshots
+  requirement applies at the PR); desc rendering and its fills to Phase 13/22;
+  Latin page-name chunks and plural .one singulars to the Phase 22 release fill;
+  the observed pre-existing terminology splits (ko/ja/ru Nythraxis and NPC
+  transliterations, raidLockout heroic prefix, guide.nav.professions third term) to
+  a maintainer call, recorded in state.md.
