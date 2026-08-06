@@ -5321,6 +5321,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': '东南',
   'hudChrome.compass.SW': '西南',
   'hudChrome.compass.W': '西',
+  'hudChrome.emoteEditor.close': '关闭表情',
   'hudChrome.emoteEditor.done': '完成',
   'hudChrome.emoteEditor.title': '表情',
   'hudChrome.emotes.bow': '鞠躬',

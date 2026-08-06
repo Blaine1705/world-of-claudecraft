@@ -391,7 +391,8 @@ export const ko_KR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "감정 표현",
-      "done": "완료"
+      "done": "완료",
+      "close": "감정 표현 닫기"
     },
     "dailyRewards": {
       "title": "일일 보상",

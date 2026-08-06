@@ -391,7 +391,8 @@ export const tr_TR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "İfadeler",
-      "done": "Tamam"
+      "done": "Tamam",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Günlük Ödüller",
