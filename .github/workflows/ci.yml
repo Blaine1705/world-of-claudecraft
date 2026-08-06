@@ -302,6 +302,12 @@ jobs:
     # why "Detect code path changes" must itself be a required check.
     needs: changes
     if: needs.changes.outputs.code != 'false'
+    # Fail fast on the checkout-stall class (rationale and evidence on the
+    # pr-gate bound): this job's healthy worst case is 2.4 minutes plus a
+    # cold Playwright Chromium download on a cache miss, and its one stalled
+    # run sat 17.5 minutes in checkout inside an 18.4 minute wall
+    # (run 31107474546).
+    timeout-minutes: 10
     runs-on: ubuntu-latest
 
     steps:
@@ -361,6 +367,17 @@ jobs:
     # release-to-main exclusion is a pull_request-arm concern and cannot match).
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    # Fail fast on the runner-side checkout-stall class instead of burning
+    # tail: on 2026-08-06 thirteen shard, lane, and browser jobs across seven
+    # runs sat 9.6 to 24.4 minutes inside actions/checkout before completing
+    # (healthy checkout is under 3 minutes; the worst stalled job wall was
+    # 32.8 minutes), and the stall, not any test, set every one of those
+    # runs' tails. Sized from the measured healthy worst case plus margin:
+    # the slowest healthy shard observed is 13.6 minutes (the Phase 2
+    # content-only selective drill, PR #2991), so 20 kills only stalled
+    # jobs, which get rerun on a fresh runner instead of holding the tail.
+    # The evidence table lives in the packet's detect-wedge postmortem note.
+    timeout-minutes: 20
     runs-on: ubuntu-latest
 
     # fail-fast stays off: shards pass or fail independently, so one red shard
@@ -486,9 +503,12 @@ jobs:
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # The lane concentrates the four slowest suites in one required job with
     # no sibling shard to report around it, so a hang would otherwise hold a
-    # required check for GitHub's 6 hour default. Generous against the
-    # measured ~10 minute worst case.
-    timeout-minutes: 30
+    # required check for GitHub's 6 hour default. Sized from the measured
+    # healthy worst case plus margin, like the shard matrices (rationale and
+    # the checkout-stall evidence on the pr-gate bound): the lane's healthy
+    # worst case is 8.1 minutes, and its one stalled run sat 15.6 minutes in
+    # checkout inside a 23.3 minute wall (run 31105262161).
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     steps:
@@ -621,6 +641,12 @@ jobs:
     # the label is what an operator reads in the checks list to tell the two reds apart.
     name: Release gate (tests)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
+    # Same checkout-stall bound as pr-gate (rationale and evidence there).
+    # This matrix keeps the long sims in-shard by design, and its healthy
+    # worst case is the 11.9 minute pre-lane baseline tail; 20 preserves the
+    # same margin. The nightly workflow deliberately keeps its own generous
+    # bounds and is untouched.
+    timeout-minutes: 20
     runs-on: ubuntu-latest
 
     # No I18N_RELEASE_TIER here BY DESIGN (D8 revised, issue #2820). This job runs

@@ -676,6 +676,39 @@ describe('CI workflow parity', () => {
     }
   });
 
+  it('bounds the test and browser jobs against the runner-side checkout-stall class', () => {
+    // Phase 6 of the CI/CD performance packet: on 2026-08-06 thirteen shard,
+    // lane, and browser jobs across seven runs sat 9.6 to 24.4 minutes inside
+    // actions/checkout before completing (runner-pool-side; healthy checkout
+    // is under 3 minutes; the worst stalled job wall was 32.8 minutes), and
+    // the stall, not any test, set those runs' tails. Each bound is sized
+    // from that job's measured healthy worst case plus margin (the sizing
+    // rationale sits on each ci.yml bound; the evidence table lives in the
+    // packet's detect-wedge postmortem note), so a stalled job dies and gets
+    // rerun on a fresh runner instead of holding a required check. Exact
+    // values, not a floor: resizing a bound is a conscious, measured decision
+    // (the full-core lane revert is the packet's precedent for what happens
+    // to unmeasured resizes). Exactly one job-level line per job, so a
+    // duplicate cannot shadow the pinned one; and job-level, never
+    // step-level, because a step bound leaves the rest of the job free to
+    // hang toward GitHub's 6 hour default.
+    const bounds = [
+      ['pr-gate', 20],
+      ['release-gate', 20],
+      ['pr-long-sims', 15],
+      ['browser-gate', 10],
+    ] as const;
+    for (const [name, minutes] of bounds) {
+      const job = jobSource(name);
+      const jobLevel = job.match(/^ {4}timeout-minutes: \d+$/gm) ?? [];
+      expect(jobLevel).toEqual([`    timeout-minutes: ${minutes}`]);
+      expect(job).not.toMatch(/\n {8}timeout-minutes:/);
+    }
+    // The changes job keeps its own single-digit bound (pinned with the
+    // classifier assertions); the nightly workflow's deliberately generous
+    // bounds are pinned in tests/nightly_workflow.test.ts and stay untouched.
+  });
+
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {
     const prGate = jobSource('pr-gate');
     const prChecks = jobSource('pr-checks');
