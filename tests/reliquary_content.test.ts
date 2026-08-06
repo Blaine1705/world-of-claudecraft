@@ -36,7 +36,7 @@ import { DELVES, DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
 import type { LootTier } from '../src/sim/lockpick';
 import { catalogCharacterCompletion, catalogRelicCompletion } from '../src/sim/reliquary';
 import { Rng } from '../src/sim/rng';
-import { DEED_STAT_KEYS, type PlayerClass } from '../src/sim/types';
+import { DEED_STAT_KEYS, type ItemDef, type PlayerClass } from '../src/sim/types';
 
 const CONQUEROR_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'conquerors');
 const PROFESSION_PAGES = RELIQUARY_PAGES.filter((p) => p.shelf === 'professions');
@@ -55,7 +55,21 @@ function isMountReinsId(itemId: string): boolean {
   return itemId.startsWith('reins_');
 }
 
-const RARE_PLUS_QUALITIES = new Set(['rare', 'epic', 'legendary']);
+// Classifies EVERY live quality (`satisfies` pins the union): a new ItemDef
+// quality tier fails tsc here until the curator sorts it museum-in or out.
+const RARE_PLUS_BY_QUALITY = {
+  poor: false,
+  common: false,
+  uncommon: false,
+  rare: true,
+  epic: true,
+  legendary: true,
+} satisfies Record<NonNullable<ItemDef['quality']>, boolean>;
+const RARE_PLUS_QUALITIES = new Set(
+  Object.entries(RARE_PLUS_BY_QUALITY)
+    .filter(([, rarePlus]) => rarePlus)
+    .map(([quality]) => quality),
+);
 
 /** Rare-or-better by live ITEMS quality (missing or unknown ids never are). */
 function isRarePlus(itemId: string): boolean {
@@ -64,40 +78,78 @@ function isRarePlus(itemId: string): boolean {
 }
 
 /**
- * Rare+ drop ids from the mobs a dungeon actually spawns. The seam: DUNGEONS
- * (data.ts merge of DUNGEON_DEFS + TEMPLE_DUNGEON_DEFS + WILDHEART_DUNGEON_DEFS)
- * links to its mobs through DungeonDef.spawns[].mobId, and loot hangs off
- * MobTemplate.loot (src/sim/types.ts), never the DungeonDef itself. Filler
- * falls out by live ITEMS quality, not hand-listing.
+ * Every mob a dungeon can field: DungeonDef.spawns[].mobId plus each reached
+ * mob's boss-summoned adds (MobTemplate.summonAdds), followed recursively
+ * with a visited set so chained summons stay bounded. Summoned adds drop
+ * through the same MobTemplate.loot seam as spawned mobs, so the museum
+ * derivations below must reach them too.
  */
-function dungeonRarePlusLootIds(dungeonId: string): string[] {
+function dungeonMobIds(dungeonId: string): string[] {
   const dungeon = DUNGEONS[dungeonId];
   expect(dungeon, dungeonId).toBeDefined();
+  const visited = new Set<string>();
+  const queue = dungeon.spawns.map((s) => s.mobId);
+  while (queue.length > 0) {
+    const mobId = queue.pop();
+    if (mobId === undefined || visited.has(mobId)) continue;
+    visited.add(mobId);
+    const mob = MOBS[mobId];
+    expect(mob, `${dungeonId} reaches unknown mob ${mobId}`).toBeDefined();
+    if (mob?.summonAdds) queue.push(mob.summonAdds.mobId);
+  }
+  return [...visited];
+}
+
+/** Item ids a dungeon's ground objects (DungeonDef.objects) yield on
+ *  interaction; templateId rows are door/exit portals, never loot. */
+function dungeonObjectItemIds(dungeonId: string): string[] {
+  const objects = DUNGEONS[dungeonId].objects ?? [];
+  return objects.filter((o) => o.templateId === undefined && o.itemId !== '').map((o) => o.itemId);
+}
+
+/**
+ * Rare+ drop ids a dungeon can actually yield. The seam: DUNGEONS (data.ts
+ * merge of DUNGEON_DEFS + TEMPLE_DUNGEON_DEFS + WILDHEART_DUNGEON_DEFS)
+ * reaches its mobs through dungeonMobIds (spawns plus summoned adds), loot
+ * hangs off MobTemplate.loot (src/sim/types.ts), never the DungeonDef itself,
+ * and ground objects contribute their interaction yield. Filler falls out by
+ * live ITEMS quality, not hand-listing.
+ */
+function dungeonRarePlusLootIds(dungeonId: string): string[] {
   const ids = new Set<string>();
-  for (const spawn of dungeon.spawns) {
-    const mob = MOBS[spawn.mobId];
-    expect(mob, `${dungeonId} spawns unknown mob ${spawn.mobId}`).toBeDefined();
-    for (const entry of mob.loot) {
+  for (const mobId of dungeonMobIds(dungeonId)) {
+    for (const entry of MOBS[mobId]?.loot ?? []) {
       if (entry.itemId !== undefined && isRarePlus(entry.itemId)) ids.add(entry.itemId);
     }
+  }
+  for (const itemId of dungeonObjectItemIds(dungeonId)) {
+    if (isRarePlus(itemId)) ids.add(itemId);
   }
   return [...ids].sort();
 }
 
-/** Every item id a dungeon's spawned mobs can drop, any quality. */
+/** Every item id a dungeon's mobs (summoned adds included) or ground objects
+ *  can yield, any quality. */
 function dungeonLootIdsAnyQuality(dungeonId: string): Set<string> {
   const ids = new Set<string>();
-  for (const spawn of DUNGEONS[dungeonId].spawns) {
-    for (const entry of MOBS[spawn.mobId]?.loot ?? []) {
+  for (const mobId of dungeonMobIds(dungeonId)) {
+    for (const entry of MOBS[mobId]?.loot ?? []) {
       if (entry.itemId !== undefined) ids.add(entry.itemId);
     }
   }
+  for (const itemId of dungeonObjectItemIds(dungeonId)) ids.add(itemId);
   return ids;
 }
 
 /**
- * Rng whose chance() answers follow a fixed script (both delve chest functions
- * draw at most two chance() rolls per call, so 2-bool scripts cover every arm).
+ * Rng whose chance() answers follow a fixed script and whose every OTHER draw
+ * fails loudly. Both delve chest functions draw at most two chance() rolls
+ * per call and nothing else; this class ENFORCES that premise instead of
+ * assuming it: a chance() past the script end throws (a third draw can never
+ * silently read as false), and any non-chance draw (range/int/pick) funnels
+ * through next(), where the observer seam (src/sim/rng.ts setObserver) throws
+ * before the call could fall through to the real seeded stream and let the
+ * enumeration silently under-derive a page.
  */
 class ScriptedRng extends Rng {
   private readonly script: readonly boolean[];
@@ -105,9 +157,17 @@ class ScriptedRng extends Rng {
   constructor(script: readonly boolean[]) {
     super(1);
     this.script = script;
+    this.setObserver(() => {
+      throw new Error('ScriptedRng: non-chance rng draw (range/int/pick) in a chest function');
+    });
   }
   override chance(_p: number): boolean {
-    const answer = this.script[this.cursor] ?? false;
+    const answer = this.script[this.cursor];
+    if (answer === undefined) {
+      throw new Error(
+        `ScriptedRng: chance() draw ${this.cursor + 1} runs past the ${this.script.length}-draw script`,
+      );
+    }
     this.cursor += 1;
     return answer;
   }
@@ -127,13 +187,20 @@ type ChestFn = (
   bountiful?: boolean,
 ) => { itemId: string; count: number }[];
 
+// Keys typed against the live union: a new LootTier fails tsc here until the
+// enumeration below covers it.
+const LOOT_TIERS = Object.keys({
+  premium: true,
+  medium: true,
+  low: true,
+} satisfies Record<LootTier, true>) as LootTier[];
+
 /** All item ids a delve chest function can emit, enumerated behaviorally over
  *  every tier, class, bountiful arm, and chance-draw script. */
 function reachableChestItemIds(chest: ChestFn): Set<string> {
   const ids = new Set<string>();
-  const tiers: LootTier[] = ['premium', 'medium', 'low'];
   const classes = Object.keys(CLASSES) as PlayerClass[];
-  for (const tier of tiers) {
+  for (const tier of LOOT_TIERS) {
     for (const cls of classes) {
       for (const bountiful of [false, true]) {
         for (const script of CHANCE_SCRIPTS) {
@@ -158,6 +225,17 @@ function delveRarePlusIds(chest: ChestFn, delveId: string): string[] {
   return [...ids].filter((id) => isRarePlus(id) && ITEMS[id]?.kind !== 'tool').sort();
 }
 
+/**
+ * Delve to chest-function pairing plus each delve's snug vacuity floor
+ * (literal floors: update when catalog content lands). The delve equality
+ * test iterates ALL of Object.keys(DELVES) through this map, so a new delve
+ * reds there until it is wired here.
+ */
+const CHEST_FN_BY_DELVE: Record<string, { chest: ChestFn; floor: number }> = {
+  collapsed_reliquary: { chest: delveChestItemsForTier, floor: 2 },
+  drowned_litany: { chest: drownedLitanyChestItemsForTier, floor: 8 },
+};
+
 describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
     expect(CONQUEROR_PAGES.length).toBe(22);
@@ -178,8 +256,14 @@ describe('Reliquary Conqueror catalog structure', () => {
   });
 
   it('pins the catalog totals through the production completion math', () => {
-    // Full-ownership fixture drives the real completion functions, so both the
-    // de-dupe (unique relics across pages) and every ownership arm stay live.
+    // Full-ownership fixture through the real completion functions. Scope:
+    // this pin covers catalog CONTENT drift (the de-duped relic totals) and
+    // the total math, including the character-side skin subtraction. It does
+    // NOT see per-surface wiring: one shared allOwned lookup answers all five
+    // surfaces, so a crossed surface lookup would count identically here. The
+    // per-surface arms are pinned in tests/reliquary_state.test.ts
+    // ('pageCompletion owns mounts / skins / titles from live seams only' and
+    // 'catalogRelicCompletion counts Horizons fills for Overview totals').
     const allOwned = { has: () => true };
     const full = catalogRelicCompletion({
       itemsDiscovered: allOwned,
@@ -431,10 +515,10 @@ describe('Reliquary set pages pin against col_set_* deeds', () => {
       expect(deed.trigger.kind, deedId).toBe('collectItems');
       if (!page || deed.trigger.kind !== 'collectItems') continue;
       const deedItems = [...deed.trigger.itemIds].sort();
+      // Load-bearing pin: page == deed. A members == deed restatement adds
+      // nothing: the page is BUILT from RELIQUARY_SET_MEMBERS
+      // (content/reliquary.ts) and the next test pins page == members.
       expect(itemRelicIds(page).sort(), deedId).toEqual(deedItems);
-      const members = RELIQUARY_SET_MEMBERS[setKey as keyof typeof RELIQUARY_SET_MEMBERS];
-      expect(members, `RELIQUARY_SET_MEMBERS.${setKey}`).toBeDefined();
-      if (members) expect([...members].sort(), setKey).toEqual(deedItems);
     }
     // Bidirectional: every authored set key has its live col_set_* deed.
     for (const setKey of Object.keys(RELIQUARY_SET_MEMBERS)) {
@@ -523,36 +607,45 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
     expect(itemRelicIds(page)).not.toContain('inert_storm_shard');
   });
 
-  it('Collapsed Reliquary page equals the live rare+ chest and Marks-stock ids', () => {
-    // EQUALITY regime: the page lists every rare+ Collapsed Reliquary reward
-    // (the two heroic-gated signature rares, reachable from both the lockpick
-    // chest function and the Marks vendor stock).
+  it('every delve page equals its live rare+ chest and Marks-stock ids', () => {
+    // EQUALITY regime, table-driven: the loop walks ALL live DELVES through
+    // CHEST_FN_BY_DELVE, so a new delve reds here until it is wired to its
+    // chest function and its page lists exactly the derived rare+ set.
+    for (const delveId of Object.keys(DELVES)) {
+      const wired = CHEST_FN_BY_DELVE[delveId];
+      expect(wired, `CHEST_FN_BY_DELVE has no entry for delve ${delveId}`).toBeDefined();
+      if (!wired) continue;
+      const page = RELIQUARY_PAGES.find(
+        (p) => p.clearSource?.kind === 'delve' && p.clearSource.delveId === delveId,
+      );
+      expect(page, `no Reliquary page clears delve ${delveId}`).toBeDefined();
+      if (!page) continue;
+      const derived = delveRarePlusIds(wired.chest, delveId);
+      expect(derived.length, `${delveId} vacuity floor`).toBeGreaterThanOrEqual(wired.floor);
+      expect(itemRelicIds(page).sort(), page.id).toEqual(derived);
+    }
+  });
+
+  it('Collapsed Reliquary: Marks stock is live and chest staples stay off', () => {
+    // The two heroic-gated signature rares reach the page from both the
+    // lockpick chest function and the Marks vendor stock (equality above);
+    // this arm proves the stock half is really populated today.
     expect(DELVE_SHOPS.collapsed_reliquary.length).toBeGreaterThan(0);
-    const derived = delveRarePlusIds(delveChestItemsForTier, 'collapsed_reliquary');
-    // Literal: update when catalog content lands (snug vacuity floor).
-    expect(derived.length).toBeGreaterThanOrEqual(2);
-    expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_collapsed_reliquary).sort()).toEqual(
-      derived,
-    );
     // Uncommon chest staples stay off the unique grid (quality filter).
     expect(isCataloguedRelicItem('reliquary_plate_chest')).toBe(false);
   });
 
-  it('Drowned Litany page equals the live rite pools plus non-tool Marks rares', () => {
-    // EQUALITY regime after one data-driven exclusion: crafted gathering tools
-    // (ItemDef.kind 'tool') on the Marks counter are profession-ladder rows,
-    // not Litany spoils, so delveRarePlusIds filters them by kind.
-    const derived = delveRarePlusIds(drownedLitanyChestItemsForTier, 'drowned_litany');
-    // Literal: update when catalog content lands (snug vacuity floor).
-    expect(derived.length).toBeGreaterThanOrEqual(8);
-    const litany = itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_drowned_litany);
-    expect([...litany].sort()).toEqual(derived);
-    // Exclusion arm liveness: the shop really stocks rare+ tools today.
+  it('Drowned Litany: tool exclusion stays live and near-misses stay off', () => {
+    // The equality above holds after one data-driven exclusion: crafted
+    // gathering tools (ItemDef.kind 'tool') on the Marks counter are
+    // profession-ladder rows, not Litany spoils, so delveRarePlusIds filters
+    // them by kind. This arm proves the shop really stocks rare+ tools today.
     expect(
       DELVE_SHOPS.drowned_litany.some(
         (e) => ITEMS[e.itemId]?.kind === 'tool' && isRarePlus(e.itemId),
       ),
     ).toBe(true);
+    const litany = itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_drowned_litany);
     // Common delve greens stay off the unique grid.
     expect(litany).not.toContain('siltguard_helm');
     // Known near-miss: nhalias_dirgeblade drops from the OPEN-WORLD zone2
@@ -561,20 +654,22 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
   });
 });
 
-describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
-  // EQUALITY regime for all five: each page lists exactly the union of its
-  // dungeon's spawned mobs' rare+ drops (see dungeonRarePlusLootIds for the
-  // DungeonDef.spawns[].mobId -> MobTemplate.loot seam). Heroic-only epics
-  // live on the heroic pages via HEROIC_BOSS_LOOT, pinned above. Floors are
-  // snug vacuity guards. Literal: update when catalog content lands.
-  const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
-    sunken_bastion: { pageId: 'conquerors_sunken_bastion', floor: 8 },
-    drowned_temple: { pageId: 'conquerors_drowned_temple', floor: 5 },
-    gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 31 },
-    wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
-    nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
-  };
+// EQUALITY regime for all five: each page lists exactly the union of its
+// dungeon's reachable rare+ drops (spawned mobs, their summoned adds, and
+// ground-object yields; see dungeonRarePlusLootIds for the seam). Heroic-only
+// epics live on the heroic pages via HEROIC_BOSS_LOOT, pinned in their own
+// describe. Floors are snug vacuity guards. Literal: update when catalog
+// content lands. Module scope so the growth sweep can assert this map plus
+// hollow_crypt covers every dungeon that has rare+ loot.
+const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
+  sunken_bastion: { pageId: 'conquerors_sunken_bastion', floor: 8 },
+  drowned_temple: { pageId: 'conquerors_drowned_temple', floor: 5 },
+  gravewyrm_sanctum: { pageId: 'conquerors_gravewyrm_sanctum', floor: 31 },
+  wildheart_basin: { pageId: 'conquerors_wildheart_basin', floor: 4 },
+  nythraxis_boss_arena: { pageId: 'conquerors_nythraxis', floor: 16 },
+};
 
+describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
   it('normal dungeon and raid pages equal their live rare+ mob drops', () => {
     for (const [dungeonId, { pageId, floor }] of Object.entries(EQUALITY_PAGES)) {
       const derived = dungeonRarePlusLootIds(dungeonId);
@@ -625,6 +720,14 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     );
     // Literal: update when catalog content lands (snug vacuity floor).
     expect(withRarePlus.length).toBeGreaterThanOrEqual(6);
+    // Contents-pin completeness: a dungeon with rare+ loot must sit under an
+    // equality regime, EQUALITY_PAGES (exact pin), hollow_crypt's curated
+    // subset test, or an explicit EXCLUDED_DUNGEONS opt-out; a NEW rare+
+    // dungeon reds here until the curator picks one, so its page can never
+    // pass on mere existence without a contents pin.
+    expect([...withRarePlus].sort()).toEqual(
+      [...Object.keys(EQUALITY_PAGES), 'hollow_crypt', ...Object.keys(EXCLUDED_DUNGEONS)].sort(),
+    );
     for (const dungeonId of withRarePlus) {
       if (EXCLUDED_DUNGEONS[dungeonId] !== undefined) continue;
       expect(

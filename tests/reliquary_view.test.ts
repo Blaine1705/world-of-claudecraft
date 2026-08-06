@@ -4,10 +4,12 @@
 // unlock/Illumination plan, and the refresh signature (ownershipDigest too).
 import { describe, expect, it } from 'vitest';
 import type { ReliquaryPageDef } from '../src/sim/content/reliquary';
+import { CURATOR_RANK_DEFS } from '../src/sim/reliquary';
 import {
   buildReliquaryPageCells,
   buildReliquaryUnlockPlan,
   buildReliquaryView,
+  CURATOR_RANK_NAME_KEYS,
   curatorRankNameKey,
   isReliquaryNavId,
   RELIQUARY_NAV,
@@ -110,6 +112,12 @@ describe('curatorRankNameKey', () => {
   it('falls back to the generic rank key on both out-of-range ends', () => {
     expect(curatorRankNameKey(0)).toBe('hudChrome.reliquary.curatorRank');
     expect(curatorRankNameKey(6)).toBe('hudChrome.reliquary.curatorRank');
+  });
+
+  it('authors exactly one name key per live sim Curator rank', () => {
+    // Cross-source pin: a new CURATOR_RANK_DEFS entry stays red here until a
+    // matching curatorRankName chrome key is authored (no silent generic fall).
+    expect(CURATOR_RANK_NAME_KEYS).toHaveLength(CURATOR_RANK_DEFS.length);
   });
 });
 

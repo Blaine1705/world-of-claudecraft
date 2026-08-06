@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { RELIQUARY_HORIZON_MOUNTS, RELIQUARY_HORIZON_TITLES } from '../src/sim/content/reliquary';
 import { catalogCharacterCompletion, catalogRelicCompletion } from '../src/sim/reliquary';
 import {
   buildReliquarySheetModel,
@@ -59,10 +60,22 @@ describe('buildReliquarySheetModel', () => {
     expect(withMark.owned).toBe(base.owned + 1);
   });
 
+  it('counts a catalogued Horizons mount from the ownedMounts seam', () => {
+    // Membership pin: valorsteed must stay a live horizons_mounts relic
+    // (RELIQUARY_HORIZON_MOUNTS), so catalog churn fails loudly right here.
+    expect(RELIQUARY_HORIZON_MOUNTS).toContain('valorsteed');
+    const base = buildReliquarySheetModel(world());
+    const withMount = buildReliquarySheetModel(world({ mounts: ['valorsteed'] }));
+    expect(withMount.owned).toBe(base.owned + 1);
+    expect(withMount.total).toBe(base.total);
+  });
+
   it('counts catalogued titles from a ClientWorld-shaped deedsEarned Map, matching a Set', () => {
-    // Real title-relic deed ids from the live horizons_titles page
-    // (RELIQUARY_HORIZON_TITLES in src/sim/content/reliquary.ts). If either id
-    // ever left the catalog, the owned pin below would go red, not silent.
+    // Real title-relic deed ids from the live horizons_titles page. Membership
+    // is pinned explicitly so catalog churn fails loudly at this assertion,
+    // not indirectly through the owned count below.
+    expect(RELIQUARY_HORIZON_TITLES).toContain('prog_veteran');
+    expect(RELIQUARY_HORIZON_TITLES).toContain('dgn_korzul_flawless');
     const asMap = buildReliquarySheetModel(
       world({
         deeds: new Map<string, string>([

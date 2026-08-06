@@ -106,6 +106,13 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
   // 100 owned relics, so a live catalog below that means the derivation died.
   const catalogTotal = catalogCharacterCompletion({ itemsDiscovered: new Set() }).total;
 
+  it('pins the interpolated total to the live-catalog literal', () => {
+    // catalogTotal comes from the same catalogCharacterCompletion the page
+    // calls, so the pair assertions below would follow a drifted derivation;
+    // the literal anchors them. Literal: update when catalog content lands.
+    expect(catalogTotal).toBe(187);
+  });
+
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {
     expect(catalogTotal).toBeGreaterThan(100);
     // Two catalogued discoveries: owned 2, past the rank 1 threshold (1 owned).

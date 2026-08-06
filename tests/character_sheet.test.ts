@@ -9,9 +9,9 @@ import {
 import type { CharacterRow } from '../server/db';
 import { DEEDS } from '../src/sim/content/deeds';
 import { talentsFor } from '../src/sim/content/talents';
-import { zoneAt } from '../src/sim/data';
+import { ITEMS, zoneAt } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
-import { catalogCharacterCompletion } from '../src/sim/reliquary';
+import { catalogCharacterCompletion, RELIQUARY_PAGES } from '../src/sim/reliquary';
 import type { CharacterState } from '../src/sim/sim';
 import { type PlayerClass, virtualLevel } from '../src/sim/types';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
@@ -259,6 +259,47 @@ describe('characterSheet: reliquary completion pair + rank', () => {
       }),
     );
     expect(withMark.owned).toBe(base.owned + 1);
+  });
+
+  it('scores a bank reins mount through sheetReliquaryFromState', () => {
+    // Fixture-guard the exemplar against the live tables: the reins item is a
+    // real mount item whose mount key fills a catalogued mount relic slot.
+    const reinsDef = ITEMS.reins_valorsteed;
+    if (reinsDef.kind !== 'mount') throw new Error('reins_valorsteed mount fixture missing');
+    const cataloguedMountIds = RELIQUARY_PAGES.flatMap((page) =>
+      page.relics.flatMap((relic) => (relic.kind === 'mount' ? [relic.mountId] : [])),
+    );
+    expect(cataloguedMountIds).toContain(reinsDef.mount);
+    // Delta against the same fixture without the reins: dropping the
+    // ownedMounts wiring from the sheet opts reds exactly this test.
+    const base = sheetReliquaryFromState(makeState());
+    const withReins = sheetReliquaryFromState(
+      makeState({
+        bank: {
+          inventory: [{ itemId: 'reins_valorsteed', count: 1 }],
+          purchasedSlots: 0,
+          bonusSlots: 0,
+        },
+      }),
+    );
+    expect(withReins.owned).toBe(base.owned + 1);
+  });
+
+  it('scores an earned title deed through sheetReliquaryFromState', () => {
+    // Fixture-guard the exemplar against the live tables: prog_veteran is a
+    // real title-reward deed filling a catalogued title relic slot.
+    expect(DEEDS.prog_veteran.reward?.kind).toBe('title');
+    const cataloguedTitleDeedIds = RELIQUARY_PAGES.flatMap((page) =>
+      page.relics.flatMap((relic) => (relic.kind === 'title' ? [relic.deedId] : [])),
+    );
+    expect(cataloguedTitleDeedIds).toContain('prog_veteran');
+    // Delta against the same fixture without the deed: dropping the
+    // deedsEarned wiring from the sheet opts reds exactly this test.
+    const base = sheetReliquaryFromState(makeState());
+    const withTitleDeed = sheetReliquaryFromState(
+      makeState({ deeds: { prog_veteran: '2026-07-08' } }),
+    );
+    expect(withTitleDeed.owned).toBe(base.owned + 1);
   });
 
   it('owner and public share the same reliquary numbers for the same blob', () => {
