@@ -153,7 +153,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "3717936d",
+      "state": "24483509",
       "events": "0e7303b4",
       "rng": {
         "draws": 2,
@@ -283,7 +283,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.136687,
+          "fallStartY": -2.134597,
           "fiveSecondRule": 101.55,
           "hp": 100,
           "id": 959,
@@ -299,7 +299,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 36,
-            "y": -2.136687,
+            "y": -2.134597,
             "z": 350
           },
           "potionCooldownUntil": -1,
@@ -518,7 +518,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "04cff3c4",
+      "state": "ca080eab",
       "events": "459b8e0e",
       "rng": {
         "draws": 6,
@@ -664,7 +664,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.962996,
+          "fallStartY": -2.247485,
           "fiveSecondRule": 106.85,
           "hp": 100,
           "id": 959,
@@ -679,9 +679,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 34,
-            "y": -2.962996,
-            "z": 406
+            "x": 23,
+            "y": -2.247485,
+            "z": 416
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
@@ -712,7 +712,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "ac46df9b",
+      "state": "c9596a74",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -858,7 +858,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.962996,
+          "fallStartY": -2.247485,
           "fiveSecondRule": 106.95,
           "hp": 100,
           "id": 959,
@@ -873,9 +873,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 34,
-            "y": -2.962996,
-            "z": 406
+            "x": 23,
+            "y": -2.247485,
+            "z": 416
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",

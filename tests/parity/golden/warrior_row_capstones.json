@@ -9,8 +9,8 @@
     "victory rush on-kill window + selfHealPctMax",
     "bladestorm self-centered channel ticks"
   ],
-  "draws": 856,
-  "drawDigest": "8644f66c",
+  "draws": 860,
+  "drawDigest": "abab1907",
   "frames": [
     {
       "tick": 0,
@@ -151,7 +151,7 @@
       "tick": 4,
       "time": 0.2,
       "nextId": 966,
-      "state": "f884c9ea",
+      "state": "7c39da74",
       "events": "7e063e0c",
       "rng": {
         "draws": 0,
@@ -162,7 +162,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 966,
-      "state": "ab3ca35c",
+      "state": "12218214",
       "events": "ae640aec",
       "rng": {
         "draws": 6,
@@ -173,7 +173,7 @@
       "tick": 8,
       "time": 0.4,
       "nextId": 966,
-      "state": "921f1667",
+      "state": "f08be97b",
       "events": "512d8479",
       "rng": {
         "draws": 6,
@@ -328,7 +328,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "facing": 1.570796,
-          "fallStartY": -3.881524,
+          "fallStartY": -3.693123,
           "fiveSecondRule": 99.4,
           "hp": 49990,
           "id": 959,
@@ -345,7 +345,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -34.383231,
-            "y": -3.881524,
+            "y": -3.693123,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
@@ -392,7 +392,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -401,7 +401,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "level": 8,
@@ -413,13 +413,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -457,7 +457,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -466,7 +466,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.383231,
-            "y": -3.220477,
+            "y": -3.044477,
             "z": 79.20594
           },
           "level": 8,
@@ -478,13 +478,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -22.383231,
-            "y": -3.220477,
+            "y": -3.044477,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -19.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -510,7 +510,7 @@
       "tick": 12,
       "time": 0.6,
       "nextId": 966,
-      "state": "d223705e",
+      "state": "6c00dd68",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -521,7 +521,7 @@
       "tick": 16,
       "time": 0.8,
       "nextId": 966,
-      "state": "501ce006",
+      "state": "966243aa",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -532,7 +532,7 @@
       "tick": 16,
       "time": 0.8,
       "nextId": 966,
-      "state": "6ac8215d",
+      "state": "2409f0c1",
       "events": "593737ad",
       "rng": {
         "draws": 9,
@@ -691,7 +691,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "facing": 1.570796,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 99.8,
           "gcdRemaining": 1.5,
           "hp": 49990,
@@ -709,7 +709,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -25.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
@@ -768,7 +768,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -777,7 +777,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "level": 8,
@@ -789,13 +789,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -846,7 +846,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -855,7 +855,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.383231,
-            "y": -3.220477,
+            "y": -3.044477,
             "z": 79.20594
           },
           "level": 8,
@@ -867,13 +867,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -22.383231,
-            "y": -3.220477,
+            "y": -3.044477,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -19.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -899,7 +899,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 966,
-      "state": "b0d55626",
+      "state": "7f057e21",
       "events": "6f094170",
       "rng": {
         "draws": 10,
@@ -910,7 +910,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 966,
-      "state": "c759630e",
+      "state": "f04b4047",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -921,7 +921,7 @@
       "tick": 24,
       "time": 1.2,
       "nextId": 968,
-      "state": "916ef3fa",
+      "state": "02048975",
       "events": "f699d806",
       "rng": {
         "draws": 19,
@@ -1078,7 +1078,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "facing": 1.570796,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 100.2,
           "gcdRemaining": 1.5,
           "hp": 657,
@@ -1096,7 +1096,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -25.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
@@ -1159,7 +1159,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.019443,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -1168,7 +1168,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "level": 8,
@@ -1180,13 +1180,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -21.032925,
-            "y": -3.21936,
+            "y": -3.04367,
             "z": 80.15933
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -1248,7 +1248,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.71703,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -1257,7 +1257,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.383231,
-            "y": -3.220477,
+            "y": -3.044477,
             "z": 79.20594
           },
           "level": 8,
@@ -1269,13 +1269,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -20.582656,
-            "y": -3.21621,
+            "y": -3.041544,
             "z": 78.940743
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -19.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -1303,7 +1303,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 966,
@@ -1311,7 +1311,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "level": 2,
@@ -1336,14 +1336,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 60,
           "spawnPos": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "stats": {
@@ -1364,7 +1364,7 @@
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8970,
@@ -1373,7 +1373,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "level": 8,
@@ -1385,13 +1385,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "stats": {
@@ -1417,7 +1417,7 @@
       "tick": 28,
       "time": 1.4,
       "nextId": 968,
-      "state": "ad5ab1ee",
+      "state": "c34600e5",
       "events": "f9c17a10",
       "rng": {
         "draws": 22,
@@ -1428,7 +1428,7 @@
       "tick": 32,
       "time": 1.6,
       "nextId": 968,
-      "state": "df013e1e",
+      "state": "5c6a86b5",
       "events": "741638a5",
       "rng": {
         "draws": 22,
@@ -1439,7 +1439,7 @@
       "tick": 36,
       "time": 1.8,
       "nextId": 968,
-      "state": "7b29b2fb",
+      "state": "14da13cb",
       "events": "741638a5",
       "rng": {
         "draws": 22,
@@ -1450,7 +1450,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 968,
-      "state": "98212ef8",
+      "state": "2deff07f",
       "events": "741638a5",
       "rng": {
         "draws": 22,
@@ -1461,7 +1461,7 @@
       "tick": 44,
       "time": 2.2,
       "nextId": 968,
-      "state": "449b8ced",
+      "state": "aafdaaad",
       "events": "1a9c6a57",
       "rng": {
         "draws": 49,
@@ -1472,7 +1472,7 @@
       "tick": 48,
       "time": 2.4,
       "nextId": 968,
-      "state": "16410104",
+      "state": "68ff4c75",
       "events": "741638a5",
       "rng": {
         "draws": 85,
@@ -1483,7 +1483,7 @@
       "tick": 52,
       "time": 2.6,
       "nextId": 968,
-      "state": "d2ecd1bb",
+      "state": "22aa17d9",
       "events": "741638a5",
       "rng": {
         "draws": 111,
@@ -1494,7 +1494,7 @@
       "tick": 56,
       "time": 2.8,
       "nextId": 968,
-      "state": "2981da0e",
+      "state": "afef423e",
       "events": "741638a5",
       "rng": {
         "draws": 135,
@@ -1505,7 +1505,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "03f684d2",
+      "state": "047e2487",
       "events": "741638a5",
       "rng": {
         "draws": 163,
@@ -1516,7 +1516,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 968,
-      "state": "da45e836",
+      "state": "92a04afb",
       "events": "aa68b095",
       "rng": {
         "draws": 213,
@@ -1527,7 +1527,7 @@
       "tick": 68,
       "time": 3.4,
       "nextId": 968,
-      "state": "41025134",
+      "state": "706e0582",
       "events": "e39776d9",
       "rng": {
         "draws": 248,
@@ -1538,7 +1538,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 968,
-      "state": "ac6f7369",
+      "state": "62f072d6",
       "events": "741638a5",
       "rng": {
         "draws": 274,
@@ -1549,7 +1549,7 @@
       "tick": 76,
       "time": 3.8,
       "nextId": 968,
-      "state": "17d13dca",
+      "state": "3b52a794",
       "events": "741638a5",
       "rng": {
         "draws": 311,
@@ -1560,7 +1560,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 968,
-      "state": "0a216090",
+      "state": "b52ea390",
       "events": "741638a5",
       "rng": {
         "draws": 344,
@@ -1571,7 +1571,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 968,
-      "state": "31ac4b38",
+      "state": "d8aa6002",
       "events": "1a9c6a57",
       "rng": {
         "draws": 369,
@@ -1582,7 +1582,7 @@
       "tick": 88,
       "time": 4.4,
       "nextId": 968,
-      "state": "527fc8d0",
+      "state": "5fd65b7d",
       "events": "741638a5",
       "rng": {
         "draws": 406,
@@ -1593,7 +1593,7 @@
       "tick": 92,
       "time": 4.6,
       "nextId": 968,
-      "state": "4d85f81b",
+      "state": "bcd09a29",
       "events": "741638a5",
       "rng": {
         "draws": 463,
@@ -1604,7 +1604,7 @@
       "tick": 96,
       "time": 4.8,
       "nextId": 968,
-      "state": "b9d280fe",
+      "state": "faf1344a",
       "events": "741638a5",
       "rng": {
         "draws": 504,
@@ -1615,88 +1615,88 @@
       "tick": 100,
       "time": 5,
       "nextId": 968,
-      "state": "425a13f7",
+      "state": "cf60a246",
       "events": "741638a5",
       "rng": {
-        "draws": 550,
-        "digest": "f6ec0dca"
+        "draws": 549,
+        "digest": "a3b3fe64"
       }
     },
     {
       "tick": 104,
       "time": 5.2,
       "nextId": 968,
-      "state": "c5f7ea59",
+      "state": "8940ed0f",
       "events": "907e563b",
       "rng": {
-        "draws": 585,
-        "digest": "7c0628d6"
+        "draws": 584,
+        "digest": "c6e0187b"
       }
     },
     {
       "tick": 108,
       "time": 5.4,
       "nextId": 968,
-      "state": "6d90fefd",
-      "events": "a275033e",
+      "state": "6465bc02",
+      "events": "e917cef1",
       "rng": {
-        "draws": 621,
-        "digest": "f8713819"
+        "draws": 623,
+        "digest": "a73a941e"
       }
     },
     {
       "tick": 112,
       "time": 5.6,
       "nextId": 968,
-      "state": "e7717bac",
+      "state": "5b55bc48",
       "events": "741638a5",
       "rng": {
-        "draws": 664,
-        "digest": "16ff1729"
+        "draws": 666,
+        "digest": "3248be7c"
       }
     },
     {
       "tick": 116,
       "time": 5.8,
       "nextId": 968,
-      "state": "ab6331aa",
+      "state": "8abcf72e",
       "events": "741638a5",
       "rng": {
-        "draws": 722,
-        "digest": "3eeb17b2"
+        "draws": 725,
+        "digest": "b51acf19"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 968,
-      "state": "e4f29f80",
+      "state": "666698d2",
       "events": "741638a5",
       "rng": {
-        "draws": 760,
-        "digest": "25925f65"
+        "draws": 766,
+        "digest": "44911d79"
       }
     },
     {
       "tick": 124,
       "time": 6.2,
       "nextId": 968,
-      "state": "59112a68",
+      "state": "2523f94c",
       "events": "741638a5",
       "rng": {
-        "draws": 810,
-        "digest": "3725deb8"
+        "draws": 816,
+        "digest": "b7958c87"
       }
     },
     {
       "tick": 124,
       "time": 6.2,
       "nextId": 968,
-      "state": "59112a68",
+      "state": "2523f94c",
       "events": "741638a5",
       "rng": {
-        "draws": 810,
-        "digest": "3725deb8"
+        "draws": 816,
+        "digest": "b7958c87"
       },
       "label": "bladestorm-done",
       "players": [
@@ -1718,7 +1718,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 1183,
-            "damageTaken": 30,
+            "damageTaken": 39,
             "kills": 1
           },
           "craftSkills": {},
@@ -1841,7 +1841,7 @@
           "channelTickEvery": 1,
           "channelTickTimer": 1,
           "chargeTimeLeft": 2.55,
-          "combatTimer": 1.05,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -1861,9 +1861,9 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "facing": 1.570796,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 105.2,
-          "hp": 637,
+          "hp": 628,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -1878,11 +1878,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -25.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
-          "resource": 77.75,
+          "resource": 78.9875,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1940,7 +1940,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.019443,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -1949,7 +1949,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "level": 8,
@@ -1961,13 +1961,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -1.654106,
-            "y": -3.068455,
+            "y": -2.905542,
             "z": 92.076706
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -2020,7 +2020,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.71703,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -2029,7 +2029,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.383231,
-            "y": -3.220477,
+            "y": -3.044477,
             "z": 79.20594
           },
           "level": 8,
@@ -2041,13 +2041,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 1.924532,
-            "y": -2.658079,
+            "y": -2.655169,
             "z": 75.62578
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -19.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -2075,7 +2075,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 966,
@@ -2083,7 +2083,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "level": 2,
@@ -2108,14 +2108,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 55,
           "spawnPos": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "stats": {
@@ -2132,13 +2132,13 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.05,
+          "combatTimer": 0.95,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8871,
@@ -2147,7 +2147,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "level": 8,
@@ -2159,13 +2159,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "stats": {
@@ -2192,22 +2192,22 @@
       "tick": 128,
       "time": 6.4,
       "nextId": 968,
-      "state": "c6a29b2a",
+      "state": "88aa192e",
       "events": "741638a5",
       "rng": {
-        "draws": 856,
-        "digest": "8644f66c"
+        "draws": 860,
+        "digest": "abab1907"
       }
     },
     {
       "tick": 128,
       "time": 6.4,
       "nextId": 968,
-      "state": "c6a29b2a",
+      "state": "88aa192e",
       "events": "741638a5",
       "rng": {
-        "draws": 856,
-        "digest": "8644f66c"
+        "draws": 860,
+        "digest": "abab1907"
       },
       "label": "final",
       "players": [
@@ -2229,7 +2229,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 1183,
-            "damageTaken": 30,
+            "damageTaken": 39,
             "kills": 1
           },
           "craftSkills": {},
@@ -2352,7 +2352,7 @@
           "channelTickEvery": 1,
           "channelTickTimer": 1,
           "chargeTimeLeft": 2.55,
-          "combatTimer": 1.25,
+          "combatTimer": 1.15,
           "comboUntil": -1,
           "cooldowns": [
             [
@@ -2372,9 +2372,9 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0695,
           "facing": 1.570796,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 105.4,
-          "hp": 637,
+          "hp": 628,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -2389,11 +2389,11 @@
           "petMode": "defensive",
           "pos": {
             "x": -25.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
-          "resource": 77.75,
+          "resource": 78.9875,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2451,7 +2451,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.019443,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -2460,7 +2460,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "level": 8,
@@ -2472,13 +2472,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -0.878953,
-            "y": -3.086883,
+            "y": -2.916995,
             "z": 92.553401
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -22.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -2531,7 +2531,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": 1.71703,
-          "fallStartY": -3.220473,
+          "fallStartY": -3.044473,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
@@ -2540,7 +2540,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -22.383231,
-            "y": -3.220477,
+            "y": -3.044477,
             "z": 79.20594
           },
           "level": 8,
@@ -2552,13 +2552,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 2.82482,
-            "y": -2.651646,
+            "y": -2.650766,
             "z": 75.493181
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -19.583231,
-            "y": -3.220473,
+            "y": -3.044473,
             "z": 79.20594
           },
           "stats": {
@@ -2586,7 +2586,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 99,
           "hostile": true,
           "id": 966,
@@ -2594,7 +2594,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "level": 2,
@@ -2619,14 +2619,14 @@
           "petMode": "defensive",
           "pos": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "respawnTimer": 54.8,
           "spawnPos": {
             "x": -23.583231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "stats": {
@@ -2643,13 +2643,13 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.25,
+          "combatTimer": 1.15,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
           "facing": -1.570796,
-          "fallStartY": -3.220409,
+          "fallStartY": -3.044409,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8871,
@@ -2658,7 +2658,7 @@
           "kind": "mob",
           "leashAnchor": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "level": 8,
@@ -2670,13 +2670,13 @@
           "petMode": "defensive",
           "pos": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": -23.083231,
-            "y": -3.220409,
+            "y": -3.044409,
             "z": 79.20594
           },
           "stats": {

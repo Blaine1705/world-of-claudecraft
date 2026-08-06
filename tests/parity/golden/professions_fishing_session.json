@@ -153,7 +153,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "454fb187",
+      "state": "36805d53",
       "events": "9988cb27",
       "rng": {
         "draws": 1,
@@ -248,7 +248,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.981028,
+          "fallStartY": -2.902683,
           "fishBiteAtTick": 86,
           "fishCastZoneId": "eastbrook_vale",
           "fiveSecondRule": 99,
@@ -266,7 +266,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -92,
-            "y": -2.981028,
+            "y": -2.902683,
             "z": 56
           },
           "potionCooldownUntil": -1,
@@ -298,7 +298,7 @@
       "tick": 86,
       "time": 4.3,
       "nextId": 964,
-      "state": "ab0748d8",
+      "state": "83723818",
       "events": "affa4108",
       "rng": {
         "draws": 1,
@@ -393,7 +393,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.981028,
+          "fallStartY": -2.902683,
           "fishCastZoneId": "eastbrook_vale",
           "fishReelDeadlineTick": 136,
           "fiveSecondRule": 103.3,
@@ -411,7 +411,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -92,
-            "y": -2.981028,
+            "y": -2.902683,
             "z": 56
           },
           "potionCooldownUntil": -1,
@@ -443,7 +443,7 @@
       "tick": 86,
       "time": 4.3,
       "nextId": 964,
-      "state": "31ab9692",
+      "state": "bbca2d02",
       "events": "e279fb5a",
       "rng": {
         "draws": 2,
@@ -550,7 +550,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.981028,
+          "fallStartY": -2.902683,
           "fiveSecondRule": 103.3,
           "hp": 100,
           "id": 959,
@@ -566,7 +566,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -92,
-            "y": -2.981028,
+            "y": -2.902683,
             "z": 56
           },
           "potionCooldownUntil": -1,
@@ -598,7 +598,7 @@
       "tick": 94,
       "time": 4.7,
       "nextId": 964,
-      "state": "fa592d86",
+      "state": "0590cb72",
       "events": "943b953c",
       "rng": {
         "draws": 3,
@@ -714,7 +714,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": -2.981028,
+          "fallStartY": -2.902683,
           "fishBiteAtTick": 219,
           "fishCastZoneId": "eastbrook_vale",
           "fiveSecondRule": 103.7,
@@ -732,7 +732,7 @@
           "petMode": "defensive",
           "pos": {
             "x": -92,
-            "y": -2.981028,
+            "y": -2.902683,
             "z": 56
           },
           "potionCooldownUntil": -1,

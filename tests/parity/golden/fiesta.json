@@ -77,8 +77,8 @@
       "state": "970920fe",
       "events": "ada54ef3",
       "rng": {
-        "draws": 789,
-        "digest": "6d5cd93a"
+        "draws": 790,
+        "digest": "f686e38a"
       }
     },
     {
@@ -88,8 +88,8 @@
       "state": "ea3bf725",
       "events": "741638a5",
       "rng": {
-        "draws": 1076,
-        "digest": "188634c1"
+        "draws": 1080,
+        "digest": "06a5d501"
       }
     },
     {
