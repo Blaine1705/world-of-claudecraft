@@ -2517,7 +2517,7 @@ export const ko_KR: EnTranslations = {
         },
         "delveDay": {
           "title": "탐굴의 날",
-          "note": "할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물고에 도전하기 좋은 날."
+          "note": "할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물실에 도전하기 좋은 날."
         },
         "moongateCommunion": {
           "title": "달문 집회",

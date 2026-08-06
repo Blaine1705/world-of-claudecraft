@@ -480,7 +480,7 @@ jobs:
   # under the flag run here, so this job answers exactly one question: has the
   # 21-locale fill been done? It is EXPECTED to be red for most of a cycle, and that
   # is the point: it is red on its own name, next to a release-gate that stays green
-  # unless code is genuinely broken. Unsharded and seconds long (five files), so it
+  # unless code is genuinely broken. Unsharded and seconds long (six files), so it
   # costs a runner slot, not runner minutes. The file list is pinned three ways
   # (this command, I18N_RELEASE_TIER_SUITES in scripts/lib/gate_steps.mjs, and a scan
   # of tests/ for readers of the flag) by tests/release_i18n_tier_coverage.test.ts,

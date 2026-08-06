@@ -63,8 +63,11 @@
         "hudChrome.mobile.reliquary",
         "hudChrome.reliquary.charCompletionLabel",
         "hudChrome.reliquary.charOpen",
+        "hudChrome.plurals.reliquaryRetroSummary.*",
+        "loading.tips.reliquary",
         "guide.nav.reliquary",
-        "guide.controls.reliquary"
+        "guide.controls.reliquary",
+        "guide.reliquaryPage.*"
       ]
     },
     "reliquaryShelves": {

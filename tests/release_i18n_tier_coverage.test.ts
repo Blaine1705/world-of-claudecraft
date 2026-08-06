@@ -55,7 +55,7 @@ describe('release-tier i18n job covers every tier-sensitive suite', () => {
   it('scans a non-empty set (a scan that finds nothing would pass everything)', () => {
     // Vacuity floor: if the scan silently stopped matching, every equality below
     // would hold trivially over two empty lists.
-    expect(suitesReadingTierFlag().length).toBeGreaterThanOrEqual(5);
+    expect(suitesReadingTierFlag().length).toBeGreaterThanOrEqual(6);
   });
 
   it('matches the shared list the local gate runs', () => {
@@ -97,7 +97,7 @@ describe('the tier flag lives in exactly one job', () => {
       WORKFLOW.indexOf('  release-checks:'),
     );
     expect(releaseI18n).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
-    // Unsharded on purpose: five files, seconds long. A matrix here would be cost
+    // Unsharded on purpose: six files, seconds long. A matrix here would be cost
     // with no benefit, and would reintroduce per-shard tier confusion.
     expect(releaseI18n).not.toContain('matrix:');
   });

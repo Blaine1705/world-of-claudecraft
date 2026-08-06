@@ -169,6 +169,7 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
       setLanguage('ru_RU');
       expect(reliquaryPageName('conquerors_set_deathlord')).toBe('Боевой доспех Владыки Кургана');
       expect(reliquaryPageName('conquerors_nythraxis')).toBe('Рейд Нитраксиса');
+      expect(reliquaryPageName('conquerors_nythraxis_heroic')).toBe('Героизм: Рейд Нитраксиса');
       setLanguage('zh_TW');
       expect(reliquaryPageName('conquerors_hollow_crypt_heroic')).toBe('英雄：空洞墓穴');
       setLanguage('ko_KR');
@@ -207,7 +208,7 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
     // tripwires. A drift here means the museum page and the content it
     // collects disagree inside the same client. The two Nythraxis raid pages
     // deliberately trim the arena noun off the entity name (state.md Phase 11
-    // anchors) and are pinned literally in the spot-check test instead.
+    // anchors); the spot-check test pins both literally for ru_RU.
     const NYTHRAXIS_DEVIATION = new Set(['conquerors_nythraxis', 'conquerors_nythraxis_heroic']);
     const HEROIC_PREFIX: Record<string, string> = {
       ja_JP: '英雄: ',

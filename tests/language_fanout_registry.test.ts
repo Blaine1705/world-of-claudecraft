@@ -439,7 +439,7 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
     expect(end, 'changeLanguage body did not close').toBeGreaterThan(start);
     const body = main.slice(start, end);
     expect(body).toMatch(
-      /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\(ensure\) => ensure\(selected\)\),?\s*\]\);/,
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\s*\(ensure\)\s*=>\s*ensure\(selected\),?\s*\),?\s*\]\);/,
     );
     // The await must PRECEDE the flip: hoisting setLanguage above it would
     // repaint the picked locale with the previous locale's resident chunks.
@@ -461,6 +461,9 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
       ]);
     expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(ensureDeedLocalesLoaded);
     expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(reliquary.ensureReliquaryLocalesLoaded);
+    // Distinctness: a channel re-exporting the other's ensure would satisfy
+    // both toContain rows and the length while loading only one table.
+    expect(ensureDeedLocalesLoaded).not.toBe(reliquary.ensureReliquaryLocalesLoaded);
     // Snug: exactly the two shipped channels today, so an accidental duplicate
     // (double fetch per flip) or a silent drop both fail.
     expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toHaveLength(2);

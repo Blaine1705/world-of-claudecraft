@@ -8558,7 +8558,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '낚시꾼들이 호숫가에 늘어섭니다. 낚싯대를 들고 이야기꽃을 피우세요.',
   'hudChrome.calendar.events.delveDay.title': '탐굴의 날',
   'hudChrome.calendar.events.delveDay.note':
-    '할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물고에 도전하기 좋은 날.',
+    '할벤 수사가 지도에 표시를 남겼습니다. 무너진 성물실에 도전하기 좋은 날.',
   'hudChrome.calendar.events.moongateCommunion.title': '달문 집회',
   'hudChrome.calendar.events.moongateCommunion.note':
     '보름의 달 아래 순례자들이 사원의 달문에 모입니다.',
