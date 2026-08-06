@@ -10371,7 +10371,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.navOverview': '개요',
   'hudChrome.reliquary.navConquerors': '정복자',
   'hudChrome.reliquary.navProfessions': '전문 기술',
-  'hudChrome.reliquary.navHorizons': '지평선',
+  'hudChrome.reliquary.navHorizons': '지평',
   'hudChrome.reliquary.navCountAria': '{shelf}: 성물 {owned}/{total} 채움',
   'hudChrome.reliquary.overviewEmpty': '던전, 공격대, 심층에서 고유 성물을 모아 성물고를 채우세요.',
   'hudChrome.reliquary.shelfEmpty': '이 선반에는 아직 페이지가 없습니다.',

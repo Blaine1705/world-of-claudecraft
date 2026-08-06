@@ -9902,7 +9902,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.navOverview': '總覽',
   'hudChrome.reliquary.navConquerors': '征服者',
   'hudChrome.reliquary.navProfessions': '專業',
-  'hudChrome.reliquary.navHorizons': '地平線',
+  'hudChrome.reliquary.navHorizons': '遠景',
   'hudChrome.reliquary.navCountAria': '{shelf}：已填入 {owned}/{total} 件聖物',
   'hudChrome.reliquary.overviewEmpty': '從地城、團隊副本與探秘中收集獨特聖物，充實聖物庫。',
   'hudChrome.reliquary.shelfEmpty': '此書架尚無頁面。',

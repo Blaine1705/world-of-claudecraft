@@ -5918,7 +5918,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '個人の初発見履歴、クリア数、所持／未所持の状態はゲームクライアントに残ります。ウィキはプレイヤーのコレクションを公開しません。',
   'guide.reliquaryPage.shelfHeading': '{label}（{count}）',
   'guide.reliquaryPage.shelf.conquerors': '征服者',
-  'guide.reliquaryPage.shelf.professions': '職業',
+  'guide.reliquaryPage.shelf.professions': '専門技能',
   'guide.reliquaryPage.shelf.horizons': '地平',
   'guide.nav.delves': 'デルヴ',
   'guide.nav.dungeons': 'ダンジョンとレイド',
@@ -10382,7 +10382,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.navOverview': '概要',
   'hudChrome.reliquary.navConquerors': '征服者',
   'hudChrome.reliquary.navProfessions': '専門技能',
-  'hudChrome.reliquary.navHorizons': '地平線',
+  'hudChrome.reliquary.navHorizons': '地平',
   'hudChrome.reliquary.navCountAria': '{shelf}：聖遺物 {owned}/{total} 埋め済み',
   'hudChrome.reliquary.overviewEmpty':
     'ダンジョン、レイド、深層探索で固有の聖遺物を集め、聖遺物庫を満たしましょう。',

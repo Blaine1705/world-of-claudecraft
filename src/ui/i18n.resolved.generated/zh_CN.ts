@@ -3172,7 +3172,7 @@ export const zh_CN: EnTranslations = {
       "navOverview": "总览",
       "navConquerors": "征服者",
       "navProfessions": "专业",
-      "navHorizons": "地平线",
+      "navHorizons": "远景",
       "navCountAria": "{shelf}：已填入 {owned}/{total} 件圣物",
       "overviewEmpty": "从地下城、团队副本与探秘中收集独特圣物，充实圣物库。",
       "shelfEmpty": "此书架尚无页面。",

@@ -9900,7 +9900,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.navOverview': '总览',
   'hudChrome.reliquary.navConquerors': '征服者',
   'hudChrome.reliquary.navProfessions': '专业',
-  'hudChrome.reliquary.navHorizons': '地平线',
+  'hudChrome.reliquary.navHorizons': '远景',
   'hudChrome.reliquary.navCountAria': '{shelf}：已填入 {owned}/{total} 件圣物',
   'hudChrome.reliquary.overviewEmpty': '从地下城、团队副本与探秘中收集独特圣物，充实圣物库。',
   'hudChrome.reliquary.shelfEmpty': '此书架尚无页面。',

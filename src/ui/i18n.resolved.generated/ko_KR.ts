@@ -3172,7 +3172,7 @@ export const ko_KR: EnTranslations = {
       "navOverview": "개요",
       "navConquerors": "정복자",
       "navProfessions": "전문 기술",
-      "navHorizons": "지평선",
+      "navHorizons": "지평",
       "navCountAria": "{shelf}: 성물 {owned}/{total} 채움",
       "overviewEmpty": "던전, 공격대, 심층에서 고유 성물을 모아 성물고를 채우세요.",
       "shelfEmpty": "이 선반에는 아직 페이지가 없습니다.",

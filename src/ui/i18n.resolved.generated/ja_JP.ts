@@ -3172,7 +3172,7 @@ export const ja_JP: EnTranslations = {
       "navOverview": "概要",
       "navConquerors": "征服者",
       "navProfessions": "専門技能",
-      "navHorizons": "地平線",
+      "navHorizons": "地平",
       "navCountAria": "{shelf}：聖遺物 {owned}/{total} 埋め済み",
       "overviewEmpty": "ダンジョン、レイド、深層探索で固有の聖遺物を集め、聖遺物庫を満たしましょう。",
       "shelfEmpty": "この棚にはまだページがありません。",
@@ -4312,7 +4312,7 @@ export const ja_JP: EnTranslations = {
       "shelfHeading": "{label}（{count}）",
       "shelf": {
         "conquerors": "征服者",
-        "professions": "職業",
+        "professions": "専門技能",
         "horizons": "地平"
       }
     },
