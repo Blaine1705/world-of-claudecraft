@@ -4552,6 +4552,20 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // the deed_cat_chronicle crest until their commissioned art lands.
   'chr_drakemaw_broodlord',
   'chr_maw_matriarch',
+  // Rift coverage (procedural infinite-dungeon system, v0.35): both are 'dungeon', so both
+  // fall back to the deed_cat_dungeon crest until their commissioned art lands.
+  'dgn_rift',
+  'dgn_rift_s_rank',
+  // The seven per-craft rare-tier profession deeds (issue #2055): all
+  // 'progression', so all fall back to the deed_cat_progression crest until
+  // their commissioned art lands.
+  'prog_engineering_rare',
+  'prog_alchemy_rare',
+  'prog_cooking_rare',
+  'prog_leatherworking_rare',
+  'prog_tailoring_rare',
+  'prog_weaponcrafting_rare',
+  'prog_armorcrafting_rare',
   // The remaining starter-tier zone chronicle pairs (frostveil, amberfall, nightbloom,
   // wraithwood, palmreach, evergarden): all 'chronicle', so all fall back to the
   // deed_cat_chronicle crest until their commissioned art lands.
@@ -4567,20 +4581,6 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'chr_palmreach_first_cast',
   'chr_evergarden_gatherer',
   'chr_evergarden_first_cast',
-  // Rift coverage (procedural infinite-dungeon system, v0.35): both are 'dungeon', so both
-  // fall back to the deed_cat_dungeon crest until their commissioned art lands.
-  'dgn_rift',
-  'dgn_rift_s_rank',
-  // The seven per-craft rare-tier profession deeds (issue #2055): all
-  // 'progression', so all fall back to the deed_cat_progression crest until
-  // their commissioned art lands.
-  'prog_engineering_rare',
-  'prog_alchemy_rare',
-  'prog_cooking_rare',
-  'prog_leatherworking_rare',
-  'prog_tailoring_rare',
-  'prog_weaponcrafting_rare',
-  'prog_armorcrafting_rare',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

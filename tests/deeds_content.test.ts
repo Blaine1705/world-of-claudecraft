@@ -157,8 +157,24 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // shipped capstone the first reckoning never credited.
       'chr_drakemaw_broodlord',
       'chr_maw_matriarch',
+      // Rift coverage (procedural infinite-dungeon system, no fixed
+      // dungeonId to key a dungeonClears trigger against).
+      'dgn_rift',
+      'dgn_rift_s_rank',
+      // Basic universal profession deeds (issue #2055): per-craft rare-tier
+      // milestones, appended after the Rift coverage block above (the
+      // rebase onto the release base put the Rift pair first).
+      'prog_engineering_rare',
+      'prog_alchemy_rare',
+      'prog_cooking_rare',
+      'prog_leatherworking_rare',
+      'prog_tailoring_rare',
+      'prog_weaponcrafting_rare',
+      'prog_armorcrafting_rare',
       // The remaining starter-tier zones pick up the same chronicle pair
-      // (Drakelands is covered by the brood rework pair above).
+      // (drakelands already covered above by the brood rework), appended
+      // after the profession-rare block above (the release base merge put
+      // that block first).
       'chr_frostveil_gatherer',
       'chr_frostveil_first_cast',
       'chr_amberfall_gatherer',
@@ -171,20 +187,6 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'chr_palmreach_first_cast',
       'chr_evergarden_gatherer',
       'chr_evergarden_first_cast',
-      // Rift coverage (procedural infinite-dungeon system, no fixed
-      // dungeonId to key a dungeonClears trigger against).
-      'dgn_rift',
-      'dgn_rift_s_rank',
-      // Basic universal profession deeds (issue #2055): per-craft rare-tier
-      // milestones, appended after the release branch's starter-zone
-      // chronicle pairs and Rift pair to preserve append-only order.
-      'prog_engineering_rare',
-      'prog_alchemy_rare',
-      'prog_cooking_rare',
-      'prog_leatherworking_rare',
-      'prog_tailoring_rare',
-      'prog_weaponcrafting_rare',
-      'prog_armorcrafting_rare',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -494,19 +496,19 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // standing broodlord rares) and chr_maw_matriarch (quest-trigger credit for
   // the shipped Cindraleth capstone). Both parents appended only, so no
   // shipped trigger or renown changed on either side.
-  // Re-baselined for the remaining bottom-map chronicle pairs: twelve more
-  // appended deeds, the gatherer and first-cast pair for frostveil,
-  // amberfall, nightbloom, wraithwood, palmreach, and evergarden
-  // (Drakelands is covered by the brood rework pair above). No shipped trigger
-  // or renown changed.
   // Re-baselined at the v0.35.0 base merge, which unions the brood pair with
   // the four Thornhollow Fields battleground deeds. No shipped trigger or
   // renown changed on either side.
-  // Re-baselined for issue #2055 (basic universal profession deeds): seven
-  // appended per-craft rare-tier milestones, and for Rift coverage
-  // (dgn_rift, dgn_rift_s_rank), appended after the release branch's
-  // starter-zone chronicle pairs. No shipped trigger or renown changed.
-  const FROZEN_CATALOG_SHA256 = '438134afb50e9a2e15d6cd7acb713f8ed1290e02a68a961f7b6464462f1ed89f';
+  // Re-baselined for Rift coverage (dgn_rift, dgn_rift_s_rank) plus issue #2055
+  // (basic universal profession deeds: prog_engineering_rare through
+  // prog_armorcrafting_rare), which both append after the Drakelands brood
+  // rework block above. Re-baselined again immediately after for the
+  // remaining bottom-map chronicle pairs: twelve more appended deeds after the
+  // profession-rare block, the gatherer and first-cast pair for frostveil,
+  // amberfall, nightbloom, wraithwood, palmreach, and evergarden (drakelands
+  // already covered by the brood rework above). No shipped trigger or renown
+  // changed on either side.
+  const FROZEN_CATALOG_SHA256 = 'edaa9bd88929ab1cb7c586e162577c41f2f52240d615ecbd4d308e5daec95a25';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -695,12 +697,12 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the final profession
-    // rare deed closes the tail, and either moving would signal a reorder
+    // literals: prog_first_steps opens the catalog and the evergarden
+    // first-cast closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_armorcrafting_rare');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('chr_evergarden_first_cast');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {
