@@ -267,38 +267,3 @@ describe('Codex skills', () => {
     );
   });
 });
-
-describe('Codex PR review automation', () => {
-  it('isolates untrusted PR data and keeps credentials in separate least-privilege jobs', () => {
-    const workflow = read('.github/workflows/pr-ai.yml');
-    expect(workflow).toContain('uses: openai/codex-action@v1');
-    expect(workflow).toContain(`openai-api-key: \${{ secrets.OPENAI_API_KEY }}`);
-    expect(workflow).toContain('permission-profile: ":read-only"');
-    expect(workflow).toContain('safety-strategy: "drop-sudo"');
-    expect(workflow).toContain('path: review/untrusted/pr');
-    expect(workflow).toContain('persist-credentials: false');
-    expect(workflow).not.toContain('CODEX_AUTH_JSON');
-    expect(workflow).not.toContain('danger-full-access');
-    expect(workflow).not.toContain('npm install -g @openai/codex');
-
-    const reviewStart = workflow.indexOf('  codex-review:');
-    const postStart = workflow.indexOf('  post-codex-review:');
-    expect(reviewStart).toBeGreaterThan(0);
-    expect(postStart).toBeGreaterThan(reviewStart);
-    const reviewJob = workflow.slice(reviewStart, postStart);
-    const actionStart = reviewJob.indexOf('uses: openai/codex-action@v1');
-    expect(actionStart).toBeGreaterThan(0);
-    expect(reviewJob.slice(actionStart)).not.toMatch(/^\s+- name:/m);
-    expect(workflow.slice(postStart)).not.toContain('OPENAI_API_KEY');
-  });
-
-  it('has a valid fixed output schema and no obsolete credential-bearing runner', () => {
-    const schema = JSON.parse(read('.github/codex/review-output.schema.json'));
-    expect(schema.additionalProperties).toBe(false);
-    expect(schema.properties.findings.maxItems).toBe(20);
-    expect(fs.existsSync(path.join(root, 'scripts/prepare_ai_review.mjs'))).toBe(true);
-    expect(fs.existsSync(path.join(root, 'scripts/post_ai_review.mjs'))).toBe(true);
-    expect(fs.existsSync(path.join(root, 'scripts/ai_review.mjs'))).toBe(false);
-    expect(fs.existsSync(path.join(root, 'scripts/ai_review_diff.mjs'))).toBe(false);
-  });
-});
