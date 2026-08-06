@@ -140,6 +140,11 @@ describe('nightly gate workflow', () => {
     // vitest transform cache the PR-tier shard jobs persist (Phase 4), so a
     // cache-layer bug can never hide from it.
     expect(workflow).not.toContain('.experimental-vitest-cache');
+    // Retry-free by design too (Phase 6): the nightly must never run the
+    // PR tier's selection-aware entry or its known-flake retry runner; a
+    // nightly teardown-rpc red stays red, per docs/qa-gate.md.
+    expect(workflow).not.toContain('ci_shard_test');
+    expect(workflow).not.toContain('ci_leg_runner');
   });
 
   it('mirrors the serialized release checks from ci.yml and the browser lane', () => {
