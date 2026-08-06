@@ -724,6 +724,14 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
 
+  async accountForCharacter(realm: string, characterId: number): Promise<number | null> {
+    const res = await this.pool.query(
+      'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
+      [characterId, realm],
+    );
+    return res.rows[0]?.account_id ?? null;
+  }
+
   async reopenDirectedOffer(realm: string, id: number): Promise<void> {
     // listing_id IS NULL is the safety: an offer that genuinely became a listing
     // must never be reopened, or the item could be escrowed a second time.

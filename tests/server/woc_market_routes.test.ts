@@ -463,7 +463,7 @@ describe('the :id parameter', () => {
 describe('the route table shape', () => {
   it('gates every route behind a guard, and every mutation behind a limiter too', () => {
     const api = routes.filter((r) => r.surface === 'api');
-    expect(api).toHaveLength(19);
+    expect(api).toHaveLength(20);
     for (const route of api) {
       expect(route.middleware?.length ?? 0, `${route.method} ${route.path}`).toBeGreaterThan(0);
     }
@@ -490,7 +490,7 @@ describe('the route table shape', () => {
     // a deliberately public one (anyone may bid on anyone's listing) needs the
     // publicRead marker. Neither means the route is silently unguarded.
     const idRoutes = routes.filter((r) => r.surface === 'api' && r.path.includes('/:'));
-    expect(idRoutes).toHaveLength(12);
+    expect(idRoutes).toHaveLength(13);
     for (const route of idRoutes) {
       const meta = route.meta as { requireOwned?: unknown; publicRead?: boolean } | undefined;
       expect(

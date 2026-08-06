@@ -307,6 +307,11 @@ export class FakeWocMarketDb implements WocMarketDb {
     return row;
   }
 
+  async accountForCharacter(realm: string, characterId: number): Promise<number | null> {
+    const c = this.characters.find((x) => x.characterId === characterId && x.realm === realm);
+    return c ? c.accountId : null;
+  }
+
   async reopenDirectedOffer(realm: string, id: number): Promise<void> {
     const row = this.offers.get(id);
     if (row && row.realm === realm && row.status === 'accepted' && row.listingId === null) {

@@ -682,7 +682,7 @@ async function createOfferHandler(ctx: Ctx): Promise<void> {
       itemId: stringField(body.itemId, 128),
       ...(expectInstance === undefined ? {} : { expectInstance }),
     },
-    buyerAccount: intField(body.buyerAccount, 1, 2_147_483_647),
+    buyerCharacterId: intField(body.buyerCharacterId, 1, Number.MAX_SAFE_INTEGER),
     usdCents: intField(body.usdCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),
   });
   if (!out.ok) throwRefusal(out.reason);
@@ -707,6 +707,12 @@ async function withdrawOfferHandler(ctx: Ctx): Promise<void> {
   json(ctx.res, 200, { ok: true });
 }
 
+async function tradePartnerHandler(ctx: Ctx): Promise<void> {
+  const partner = await useService().tradePartner(ctxAccountId(ctx), idParam(ctx));
+  if (!partner) throw new HttpError(404, 'woc_market.not_found');
+  json(ctx.res, 200, { partner });
+}
+
 async function listOffersHandler(ctx: Ctx): Promise<void> {
   const viewer = ctxAccountId(ctx);
   const offers = await useService().directedOffers(viewer);
@@ -720,6 +726,16 @@ export const routes: RouteDef[] = [
     surface: 'api',
     middleware: [activeAccount, rateLimit(WOC_MARKET_READ_POLICY)],
     handler: listOffersHandler,
+  },
+  {
+    // Can this character be paid in $WOC? Asked by the trade window before it
+    // offers the arm. NO_OWNER because the subject is another player by design.
+    method: 'GET',
+    path: '/api/woc-market/trade-partner/:id',
+    surface: 'api',
+    middleware: [activeAccount, rateLimit(WOC_MARKET_READ_POLICY)],
+    meta: NO_OWNER,
+    handler: tradePartnerHandler,
   },
   {
     method: 'POST',

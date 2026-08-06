@@ -160,6 +160,8 @@ const BUYER_C = 4;
 const WALLET_TWIN = 5; // a second account sharing the seller's payout wallet
 
 const SELLER_CHAR = 11;
+/** A second character on the SELLER account: an alt is still yourself. */
+const SELLER_ALT_CHAR = 12;
 const CHAR_A = 21;
 const CHAR_B = 31;
 const CHAR_C = 41;
@@ -189,6 +191,7 @@ function makeHarness(): Harness {
     now,
     characters: [
       { characterId: SELLER_CHAR, accountId: SELLER, name: 'Selara', realm: REALM },
+      { characterId: SELLER_ALT_CHAR, accountId: SELLER, name: 'Selara Alt', realm: REALM },
       { characterId: CHAR_A, accountId: BUYER_A, name: 'Aldan', realm: REALM },
       { characterId: CHAR_B, accountId: BUYER_B, name: 'Brint', realm: REALM },
       { characterId: CHAR_C, accountId: BUYER_C, name: 'Corvo', realm: REALM },
@@ -1909,7 +1912,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     account: SELLER,
     characterId: SELLER_CHAR,
     itemRef: { index: 0, itemId: EPIC_ITEM },
-    buyerAccount: BUYER_A,
+    buyerCharacterId: CHAR_A,
     usdCents: 5000,
     ...over,
   });
@@ -1936,7 +1939,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
 
   it('refuses an offer addressed to yourself', async () => {
     const h = stocked();
-    const res = await h.service.createDirectedOffer(offerArgs({ buyerAccount: SELLER }));
+    const res = await h.service.createDirectedOffer(offerArgs({ buyerCharacterId: SELLER_CHAR }));
     expect(res).toEqual({ ok: false, reason: 'self_offer' });
   });
 
@@ -2039,5 +2042,155 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     });
     // Neither verb touches custody.
     expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
+  });
+});
+
+describe('a directed sale carries the consequences of the rail it rides', () => {
+  function stocked(): Harness {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [
+      { itemId: EPIC_ITEM, count: 1 },
+      { itemId: EPIC_ITEM, count: 1 },
+    ]);
+    return h;
+  }
+
+  /** Offer -> accept -> the buyer holds a live settlement they must pay. */
+  async function acceptedOffer(h: Harness): Promise<WocListingRow> {
+    const offer = await h.service.createDirectedOffer({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      buyerCharacterId: CHAR_A,
+      usdCents: 5000,
+    });
+    if (!offer.ok) throw new Error('offer refused');
+    const accepted = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    if (!accepted.ok) throw new Error('accept refused');
+    return accepted.listing;
+  }
+
+  it('strikes a buyer who accepts and then never pays', async () => {
+    // The requester's rule: strikes apply to p2p non-payment once both parties
+    // have accepted. Acceptance is exactly when the seller's item left their
+    // bags, so walking away has a cost to a specific person. There is no bond on
+    // a directed sale, which makes the strike the only consequence available.
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    const bought = await h.service.buyNow({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: listing.id,
+      acceptTerms: true,
+    });
+    expect(bought.ok, 'the designated buyer can buy').toBe(true);
+    expect(await h.db.strikeInfo(BUYER_A), 'no strike before the window lapses').toBeNull();
+
+    const settlement = await liveSettlement(h, listing.id);
+    h.setNow(settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+
+    expect(await h.db.strikeInfo(BUYER_A)).toMatchObject({
+      accountId: BUYER_A,
+      strikes: 1,
+    });
+  });
+
+  it('does NOT strike an abandoned PUBLIC buy-now', async () => {
+    // The other arm, and the reason the strike is keyed on the directed field
+    // rather than on "was this a buy-now": a public buy-now buyer committed to
+    // nothing, and the listing simply resumes for the next person.
+    const h = stocked();
+    const open = await listEpic(h, {
+      format: 'buy_now',
+      startCents: 2000,
+      reserveCents: null,
+      buyNowCents: 5000,
+    });
+    const bought = await h.service.buyNow({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      listingId: open.id,
+      acceptTerms: true,
+    });
+    expect(bought.ok).toBe(true);
+    const settlement = await liveSettlement(h, open.id);
+    h.setNow(settlement.deadlineAtMs + 1);
+    await h.service.sweepPass();
+    expect(await h.db.strikeInfo(BUYER_A), 'a public buy-now costs no strike').toBeNull();
+  });
+
+  it('lands a completed directed sale in the PUBLIC sales history, named on both sides', async () => {
+    // The requester asked for public history covering every p2p $WOC trade. It
+    // needs no special casing, but "needs none" is worth proving rather than
+    // assuming: the row must actually be there, with both player names.
+    const h = stocked();
+    const listing = await acceptedOffer(h);
+    unwrap(
+      await h.service.buyNow({
+        account: BUYER_A,
+        characterId: CHAR_A,
+        listingId: listing.id,
+        acceptTerms: true,
+      }),
+      'buyNow',
+    );
+    const settlement = await liveSettlement(h, listing.id);
+    unwrap(await h.service.settlementQuote(BUYER_A, settlement.id), 'settlementQuote');
+    unwrap(
+      await h.service.confirmSettlement(BUYER_A, settlement.id, 'sig-directed'),
+      'confirmSettlement',
+    );
+    await h.service.sweepPass();
+
+    const sales = await h.service.salesHistory(EPIC_ITEM, 20);
+    const mine = sales.filter((s) => s.listingId === listing.id);
+    expect(mine, 'the directed sale is publicly recorded').toHaveLength(1);
+    expect(mine[0].priceCents).toBe(5000);
+    expect(mine[0].sellerName).toBeTruthy();
+    expect(mine[0].buyerName).toBeTruthy();
+  });
+});
+
+describe('the trade window asks whether a counterparty can be paid in $WOC', () => {
+  it('reports a linked player as payable, by character and with no account id', async () => {
+    const h = makeHarness();
+    const partner = await h.service.tradePartner(SELLER, CHAR_A);
+    expect(partner).toEqual({ characterId: CHAR_A, name: 'Aldan', walletVerified: true });
+    // The response shape is the contract: leaking an account id here would put
+    // one on the wire for every player you open a trade with.
+    expect(Object.keys(partner ?? {}).sort()).toEqual(['characterId', 'name', 'walletVerified']);
+  });
+
+  it('reports an unlinked player as not payable, which is what drives the copy', async () => {
+    const h = makeHarness();
+    h.wallets.delete(BUYER_A);
+    expect((await h.service.tradePartner(SELLER, CHAR_A))?.walletVerified).toBe(false);
+  });
+
+  it('reports YOUR OWN character as not payable', async () => {
+    // So the window never offers an arm that createDirectedOffer would refuse.
+    const h = makeHarness();
+    expect((await h.service.tradePartner(SELLER, SELLER_CHAR))?.walletVerified).toBe(false);
+  });
+
+  it('reads as absent for a character that is not on this realm', async () => {
+    const h = makeHarness();
+    expect(await h.service.tradePartner(SELLER, 999_999)).toBeNull();
+  });
+
+  it('refuses an offer to another character of your OWN account', async () => {
+    // Same account, different character: an alt is still yourself, and the
+    // check must be on the resolved ACCOUNT rather than the character id.
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const res = await h.service.createDirectedOffer({
+      account: SELLER,
+      characterId: SELLER_CHAR,
+      itemRef: { index: 0, itemId: EPIC_ITEM },
+      buyerCharacterId: SELLER_ALT_CHAR,
+      usdCents: 5000,
+    });
+    expect(res).toEqual({ ok: false, reason: 'self_offer' });
   });
 });

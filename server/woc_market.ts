@@ -270,6 +270,14 @@ export interface WocMarketDb {
   /** Expire pending offers past their TTL. Returns how many were expired. */
   expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number>;
   /**
+   * The account owning a character on this realm, or null.
+   *
+   * A directed offer names its counterparty by CHARACTER, because that is what
+   * the trade window knows and what a player can see. Resolving to an account
+   * happens here so no account id ever crosses the wire in either direction.
+   */
+  accountForCharacter(realm: string, characterId: number): Promise<number | null>;
+  /**
    * Put an 'accepted' offer back to pending after its escrow failed.
    *
    * The compensating half of the claim-then-escrow ordering: the status flip has
@@ -839,24 +847,34 @@ export class WocMarketService {
     account: number;
     characterId: number;
     itemRef: ExtractRef;
-    buyerAccount: number;
+    /** The counterparty's CHARACTER, as the trade window knows them. Resolved
+     *  to an account here so no account id crosses the wire. */
+    buyerCharacterId: number;
     usdCents: number;
   }): Promise<{ ok: true; offer: WocDirectedOfferRow } | Refused> {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
-    if (args.buyerAccount === args.account) return refuse('self_offer');
+    const buyerAccount = await this.deps.db.accountForCharacter(
+      this.cfg.realm,
+      args.buyerCharacterId,
+    );
+    if (buyerAccount === null) return refuse('character_invalid');
+    // Same ACCOUNT, not same character: an alt is still yourself, and offering
+    // between your own characters would be a fee-free self-deal that still
+    // consumed escrow and settlement machinery.
+    if (buyerAccount === args.account) return refuse('self_offer');
     const wallet = await this.deps.verifiedWallet(args.account);
     if (!wallet) return refuse('wallet_required');
     // The recipient's wallet is checked HERE rather than at acceptance, because
     // this is the refusal the seller's trade window turns into "the recipient
     // must connect a wallet before they can accept $WOC". Re-checked at
     // acceptance anyway, since a wallet can be unlinked in between.
-    if (!(await this.deps.verifiedWallet(args.buyerAccount))) {
+    if (!(await this.deps.verifiedWallet(buyerAccount))) {
       return refuse('recipient_wallet_required');
     }
     // Validate the params acceptance WILL use, not a looser approximation, so an
     // offer can never be created that its own acceptance would refuse.
-    const params = validListingParams(this.directedParams(args.usdCents, args.buyerAccount));
+    const params = validListingParams(this.directedParams(args.usdCents, buyerAccount));
     if (!params.ok) return refuse(params.reason);
     const eligible = listingEligibility(
       ITEMS[args.itemRef.itemId],
@@ -873,14 +891,18 @@ export class WocMarketService {
     // deliveryTarget doubles as the recipient check: it resolves any character
     // the buyer holds ON THIS REALM, so an account with none refuses here rather
     // than at acceptance, when the seller has already agreed a price.
-    const buyer = await this.deps.db.deliveryTarget(this.cfg.realm, args.buyerAccount, 0);
+    const buyer = await this.deps.db.deliveryTarget(
+      this.cfg.realm,
+      buyerAccount,
+      args.buyerCharacterId,
+    );
     if (!buyer) return refuse('not_found');
     const offer = await this.deps.db.insertDirectedOffer({
       realm: this.cfg.realm,
       sellerAccount: args.account,
       sellerCharacter: args.characterId,
       sellerName: seller.name,
-      buyerAccount: args.buyerAccount,
+      buyerAccount,
       buyerName: buyer.name,
       itemRef: args.itemRef,
       itemId: args.itemRef.itemId,
@@ -949,6 +971,38 @@ export class WocMarketService {
     const to = action === 'decline' ? 'declined' : 'withdrawn';
     const done = await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, to);
     return done ? { ok: true } : refuse('not_pending');
+  }
+
+  /**
+   * Can this character be paid in $WOC?
+   *
+   * The trade window asks before offering the $WOC arm, so it can show "they
+   * must connect a wallet" instead of a refusal after the fact. It answers for a
+   * CHARACTER and returns no account id, and it exposes nothing new: holder-tier
+   * flair already broadcasts per entity, so whether a player has a linked wallet
+   * is visible on their nameplate today.
+   *
+   * Deliberately NOT a member of TradeInfo. That shape is built by the sim,
+   * which sits inside the token firewall and may not know a wallet exists; this
+   * rides beside it as server-fed data instead.
+   */
+  async tradePartner(
+    viewerAccount: number,
+    characterId: number,
+  ): Promise<{ characterId: number; name: string; walletVerified: boolean } | null> {
+    if (!this.cfg.enabled) return null;
+    const account = await this.deps.db.accountForCharacter(this.cfg.realm, characterId);
+    if (account === null) return null;
+    const target = await this.deps.db.deliveryTarget(this.cfg.realm, account, characterId);
+    if (!target) return null;
+    return {
+      characterId,
+      name: target.name,
+      // Your own characters read as not payable, so the window never offers a
+      // self-deal it would refuse at creation.
+      walletVerified:
+        account !== viewerAccount && (await this.deps.verifiedWallet(account)) !== null,
+    };
   }
 
   /** Pending offers this account may act on, both directions. */
@@ -1429,8 +1483,28 @@ export class WocMarketService {
           suspension > 0 ? nowMs + suspension : null,
         );
       } else {
-        // An abandoned buy-now: unlock and resume the auction untouched.
+        // An abandoned buy-now. On a PUBLIC listing that costs nobody anything:
+        // the buyer committed to nothing, the lock clears and the listing simply
+        // resumes for the next person, so no strike is warranted.
+        //
+        // A DIRECTED sale is the opposite case and takes one. Its buyer accepted
+        // a named offer, and that acceptance is what pulled a specific player's
+        // item out of their bags into escrow; walking away leaves that seller
+        // holding an unsellable listing they have to notice and cancel. This is
+        // the requester's rule that strikes apply to p2p non-payment once both
+        // parties have accepted, and acceptance is exactly the moment escrow
+        // happened. There is no bond to forfeit here (a directed sale carries
+        // none), so the strike is the only consequence available.
         await this.deps.db.clearBuyNowLock(listing.id);
+        if (listing.directedBuyerAccount !== null) {
+          const strikes = await this.deps.db.strikeInfo(settlement.buyerAccount);
+          const count = (strikes?.strikes ?? 0) + 1;
+          const suspension = strikeSuspensionMs(count);
+          await this.deps.db.addStrike(
+            settlement.buyerAccount,
+            suspension > 0 ? nowMs + suspension : null,
+          );
+        }
         continue;
       }
       // Cascade to the next eligible bidder when the seller opted in.
