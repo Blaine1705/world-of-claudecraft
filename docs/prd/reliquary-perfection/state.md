@@ -357,27 +357,25 @@ Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
   recorded-ruling comment; decide before Phase 17 ships obtain counts. Phase 13
   widened the blast radius knowingly: the owned-cell aria-label now mirrors the
   tooltip's firstFindClears line, so the ruling's outcome changes both surfaces.
-- RULING OPEN (Phase 13 source hints): 59 of 242 relic slots carry NO source
-  hint, pinned bidirectionally in SOURCE_PENDING_RULING
-  (tests/reliquary_content.test.ts) with per-page evidence comments. Roughly
-  two thirds are NOT ambiguous: their source is precisely known but has no
-  representable kind in the boss|zone|profession|deed|vendor vocabulary.
-  Decide (before Phase 21 grows the catalog and before the Phase 22 fill
-  translates the sourceLine keys): (a) add kinds, e.g. 'delve' (the chest
-  routes + the Drowned Litany rite rows), 'rift' (the four heroic reins also
-  on Rift progression), 'quest' (reins_valorsteed), 'store' (all 29 weapon
-  skins, Claudium account storefront); (b) an authored-primary override for
-  the 6 Gravewyrm two-table drops (tied or near-tied drop rates, per-run
-  expectation does not settle it) and the corpse-harvest 6 (no gathering
-  profession owns corpse harvest) plus masterwork:first (any of five crafts);
-  or (c) leave them lineless. Also from review: the two rare-sourced set
-  members (deathlord_sabatons, necromancers_legwraps) render "Drops from
-  {rare}" with no place; a boss-plus-zone arm (or zone data on the hint)
-  would name where the rare roams; reins_drakemaw_raptor has NO acquisition
-  path at all (content gap, owner call dated 2026-08-04); the 'zone' kind
-  ships with zero producers, HELD deliberately pending this ruling (its
-  sourceZone key will be translated at the release fill regardless, a
-  deliberate cost recorded here).
+- RULING SETTLED (Phase 13 source hints, maintainer 2026-08-06): do what is
+  best for the feature at collection-log fidelity (the OSRS collection log /
+  WoW appearance panel standard: an uncollected silhouette lists EVERY real
+  way to get it). Decision: extend the vocabulary with 'delve', 'rift',
+  'quest', 'store', and 'activity'; support MULTIPLE hints per relic (the 6
+  Gravewyrm two-table drops carry both bosses; the heroic reins carry their
+  bosses plus rift progression; the shop-and-chest delve items carry delve
+  plus vendor); corpse harvest and masterwork:first become 'activity' rows
+  against a pinned activity table; all 29 weapon skins become 'store'; the
+  two open-world rare set members gain a 'zone' hint alongside their boss
+  hint so the line names where the rare roams (giving the held 'zone' arm its
+  first producers). SOURCE_PENDING_RULING shrinks to exactly
+  reins_drakemaw_raptor (NO acquisition path in content, owner call dated
+  2026-08-04) and reins_terrorspark_groundshaker (dev-grant only), both
+  owner decisions outside this packet. Implementation is
+  phase-13b-source-coverage.md (runs after the Phase 13 QA push, before
+  Phase 21 grows the catalog and before the Phase 22 fill translates the
+  sourceLine keys); per-kind truth pins against the live award paths are part
+  of the phase, mutation verified.
 - Rider (Phase 12 arch review): three delve-clear readers hand-roll the sum with
   different validation (shop gate prefix-sums unguarded, deeds delveClearCount also
   accepts a bare delveId key and sums raw values, the reliquary arm is strict and

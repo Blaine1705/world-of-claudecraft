@@ -91,6 +91,7 @@ sim/server stay language-agnostic with matcher rules in the same change.
 | 11 | Page-name localization + i18n hygiene | M | no |
 | 12 | Test integrity + catalog pins + record corrections | L | YES |
 | 13 | Window structure + information UX | L | no |
+| 13b | Complete source coverage (the collection-log answer) | M | no |
 | 14 | Overview flagship + Illumination celebration | M | no |
 | 15 | Deep links, clickable chat, tracker, guide search | M | no |
 | 16 | Art: launcher icon + owned cell art | M | no |
@@ -111,6 +112,8 @@ are reminders, not the opt-in.
 
 Dependency notes: 11 before 13 and 14 (they render new localized text through the Phase
 11 channel). 19 before 20 (inspect shows the active border). 12 any time after 10 (it
-pins Phase 10 behavior too). 16 after 13 (cell art slots into the reworked cells). The
-rest are order-flexible but run them in sequence anyway; each phase's release sync keeps
-the base fresh.
+pins Phase 10 behavior too). 16 after 13 (cell art slots into the reworked cells). 13b
+after the Phase 13 QA push and before 21 and 22 (it stabilizes the source vocabulary
+Phase 21 authors against, and the Phase 22 fill translates its sourceLine keys; it
+executes the settled source ruling in state.md). The rest are order-flexible but run
+them in sequence anyway; each phase's release sync keeps the base fresh.
