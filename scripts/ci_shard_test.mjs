@@ -184,15 +184,21 @@ if (planOnly) {
   // Windows is --plan-only (spawns nothing) per docs/qa-gate.md.
   const result = await runLegsWithFlakeRetry({ legs: plan.legs, cwd: repoRoot });
   if (!result.ok) {
-    process.exit(result.status);
+    // exitCode, never process.exit(): the legs' output is piped through this
+    // process now, and a forced exit discards whatever is still queued on
+    // the async stdout pipe (measured: everything past one 64 KB pipe
+    // buffer), which would truncate exactly the failing-shard log a human
+    // needs. Setting exitCode lets the event loop drain and then exit.
+    process.exitCode = result.status;
+  } else {
+    console.log(
+      `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on ${
+        lane ? 'the long-sims lane' : `shard ${shard.index}/${shard.total}`
+      }${
+        result.retriedLegNames.length > 0
+          ? ` (known-flake retry used on: ${result.retriedLegNames.join(', ')})`
+          : ''
+      }`,
+    );
   }
-  console.log(
-    `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on ${
-      lane ? 'the long-sims lane' : `shard ${shard.index}/${shard.total}`
-    }${
-      result.retriedLegNames.length > 0
-        ? ` (known-flake retry used on: ${result.retriedLegNames.join(', ')})`
-        : ''
-    }`,
-  );
 }

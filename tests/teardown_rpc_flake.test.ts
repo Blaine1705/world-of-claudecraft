@@ -15,54 +15,90 @@ const ESC = String.fromCharCode(27);
 const dim = (s: string) => `${ESC}[2m${s}${ESC}[22m`;
 const green = (s: string) => `${ESC}[1m${ESC}[32m${s}${ESC}[39m${ESC}[22m`;
 
-const RPC_BANNER =
-  'Unhandled Rejection\n' +
-  `EnvironmentTeardownError: [vitest-worker]: ${TEARDOWN_RPC_MESSAGE}\n` +
-  '    at Object.onCancel (node_modules/.pnpm/vitest@4.1.10/node_modules/vitest/dist/worker.js:105:11)\n';
-
-function summary(filesBuckets: string, testsBuckets: string): string {
-  return ` Test Files  ${filesBuckets}\n      Tests  ${testsBuckets}\n   Start at  13:24:33\n   Duration  431.92s (transform 31.1s, setup 46.2s, import 116.4s)\n`;
+function rpcBanner(count = 1): string {
+  return (
+    `Vitest caught ${count} unhandled error${count === 1 ? '' : 's'} during the test run.\n` +
+    `Unhandled Rejection\nEnvironmentTeardownError: [vitest-worker]: ${TEARDOWN_RPC_MESSAGE}\n    at Object.onCancel (node_modules/.pnpm/vitest@4.1.10/node_modules/vitest/dist/worker.js:105:11)\n`.repeat(
+      count,
+    )
+  );
 }
 
-const FLAKE_TAIL = `${summary('272 passed (272)', '3312 passed (3312)')}\n${RPC_BANNER}\n  Errors  1 error\n`;
+function summary(filesBuckets: string, testsBuckets: string, errorsBuckets: string): string {
+  return (
+    ` Test Files  ${filesBuckets}\n      Tests  ${testsBuckets}\n     Errors  ${errorsBuckets}\n` +
+    '   Start at  13:24:33\n   Duration  431.92s (transform 31.1s, setup 46.2s, import 116.4s)\n'
+  );
+}
+
+// Real vitest order: the failure/unhandled banner prints BEFORE the summary
+// lines (reportSummary calls printErrorsSummary first, then
+// reportTestSummary), so the canonical fixture keeps that shape.
+const FLAKE_TAIL = `${rpcBanner(1)}\n${summary('272 passed (272)', '3312 passed (3312)', '1 error')}`;
 
 describe('isTeardownRpcFlake', () => {
-  it('matches the exact recorded signature: all passed, exit 1, the rpc message', () => {
+  it('matches the exact recorded signature: all passed, exit 1, the rpc message, in real vitest order', () => {
     expect(isTeardownRpcFlake({ status: 1, tail: FLAKE_TAIL })).toBe(true);
   });
 
-  it('matches through ANSI color wrapping and CRLF, the shapes CI logs really have', () => {
+  it('matches independent of banner-vs-summary order (the classifier is deliberately order-agnostic)', () => {
+    const bannerLast = `${summary('272 passed (272)', '3312 passed (3312)', '1 error')}\n${rpcBanner(1)}`;
+    expect(isTeardownRpcFlake({ status: 1, tail: bannerLast })).toBe(true);
+  });
+
+  it('matches through ANSI color wrapping and CRLF, the shapes CI logs can carry', () => {
     const colored =
+      `${rpcBanner(1).replace(/\n/g, '\r\n')}\r\n` +
       `${dim(' Test Files ')} ${green('272 passed')} ${dim('(272)')}\r\n` +
       `${dim('      Tests ')} ${green('3312 passed')} ${dim('(3312)')}\r\n` +
-      `\r\n${RPC_BANNER.replace(/\n/g, '\r\n')}`;
+      `${dim('     Errors ')} ${green('1 error')}\r\n`;
     expect(isTeardownRpcFlake({ status: 1, tail: colored })).toBe(true);
   });
 
   it('allows skipped and todo buckets: the full suite carries DB-gated skips', () => {
-    const tail = `${summary('272 passed (272)', '3302 passed | 10 skipped (3312)')}\n${RPC_BANNER}`;
+    const tail = `${rpcBanner(1)}\n${summary('272 passed (272)', '3302 passed | 10 skipped (3312)', '1 error')}`;
     expect(isTeardownRpcFlake({ status: 1, tail })).toBe(true);
   });
 
+  it('matches a multi-worker flake: N teardown-rpc occurrences explaining N errors', () => {
+    const tail = `${rpcBanner(2)}\n${summary('272 passed (272)', '3312 passed (3312)', '2 errors')}`;
+    expect(isTeardownRpcFlake({ status: 1, tail })).toBe(true);
+  });
+
+  it('never retries a run whose error count the flake does not fully explain', () => {
+    // One teardown-rpc occurrence but TWO counted errors: the second is a
+    // genuine unhandled error riding the same run, so no retry.
+    const mixed = `${rpcBanner(1)}TypeError: boom in afterAll\n${summary('272 passed (272)', '3312 passed (3312)', '2 errors')}`;
+    expect(isTeardownRpcFlake({ status: 1, tail: mixed })).toBe(false);
+    // No Errors line at all (or truncated away): fail closed.
+    const noErrorsLine =
+      `${rpcBanner(1)}\n Test Files  272 passed (272)\n      Tests  3312 passed (3312)\n` +
+      '   Start at  13:24:33\n';
+    expect(isTeardownRpcFlake({ status: 1, tail: noErrorsLine })).toBe(false);
+    // A malformed count never parses into a match.
+    const malformed = `${rpcBanner(1)}\n${summary('272 passed (272)', '3312 passed (3312)', 'some errors')}`;
+    expect(isTeardownRpcFlake({ status: 1, tail: malformed })).toBe(false);
+  });
+
   it('never matches when any test failed, in either summary line', () => {
-    const failedTests = `${summary('272 passed (272)', '1 failed | 3311 passed (3312)')}\n${RPC_BANNER}`;
+    const failedTests = `${rpcBanner(1)}\n${summary('272 passed (272)', '1 failed | 3311 passed (3312)', '1 error')}`;
     expect(isTeardownRpcFlake({ status: 1, tail: failedTests })).toBe(false);
-    const failedFiles = `${summary('1 failed | 271 passed (272)', '3312 passed (3312)')}\n${RPC_BANNER}`;
+    const failedFiles = `${rpcBanner(1)}\n${summary('1 failed | 271 passed (272)', '3312 passed (3312)', '1 error')}`;
     expect(isTeardownRpcFlake({ status: 1, tail: failedFiles })).toBe(false);
   });
 
-  it('never matches without BOTH summary lines in the tail', () => {
-    const filesOnly = ` Test Files  272 passed (272)\n${RPC_BANNER}`;
+  it('never matches without BOTH pass-summary lines in the tail', () => {
+    const filesOnly = `${rpcBanner(1)}\n Test Files  272 passed (272)\n     Errors  1 error\n`;
     expect(isTeardownRpcFlake({ status: 1, tail: filesOnly })).toBe(false);
-    const testsOnly = `      Tests  3312 passed (3312)\n${RPC_BANNER}`;
+    const testsOnly = `${rpcBanner(1)}\n      Tests  3312 passed (3312)\n     Errors  1 error\n`;
     expect(isTeardownRpcFlake({ status: 1, tail: testsOnly })).toBe(false);
-    expect(isTeardownRpcFlake({ status: 1, tail: RPC_BANNER })).toBe(false);
+    expect(isTeardownRpcFlake({ status: 1, tail: rpcBanner(1) })).toBe(false);
   });
 
   it('requires the exact rpc message: a different pending rpc never retries', () => {
-    const otherRpc = FLAKE_TAIL.replace('onUserConsoleLog', 'onTaskUpdate');
+    const otherRpc = FLAKE_TAIL.replace(/onUserConsoleLog/g, 'onTaskUpdate');
     expect(isTeardownRpcFlake({ status: 1, tail: otherRpc })).toBe(false);
-    const otherError = FLAKE_TAIL.replace('EnvironmentTeardownError', 'SomeOtherTeardownError');
+    const otherError = FLAKE_TAIL.replace(/EnvironmentTeardownError/g, 'SomeOtherTeardownError');
     expect(isTeardownRpcFlake({ status: 1, tail: otherError })).toBe(false);
   });
 
@@ -78,13 +114,13 @@ describe('isTeardownRpcFlake', () => {
   });
 
   it('judges the FINAL summary when a tail somehow holds two', () => {
-    const twoSummaries =
-      `${summary('1 failed | 271 passed (272)', '1 failed | 3311 passed (3312)')}\n` +
-      `${summary('272 passed (272)', '3312 passed (3312)')}\n${RPC_BANNER}`;
-    expect(isTeardownRpcFlake({ status: 1, tail: twoSummaries })).toBe(true);
+    const passesLast =
+      `${rpcBanner(1)}\n${summary('1 failed | 271 passed (272)', '1 failed | 3311 passed (3312)', '1 error')}\n` +
+      summary('272 passed (272)', '3312 passed (3312)', '1 error');
+    expect(isTeardownRpcFlake({ status: 1, tail: passesLast })).toBe(true);
     const failsLast =
-      `${summary('272 passed (272)', '3312 passed (3312)')}\n` +
-      `${summary('1 failed | 271 passed (272)', '1 failed | 3311 passed (3312)')}\n${RPC_BANNER}`;
+      `${rpcBanner(1)}\n${summary('272 passed (272)', '3312 passed (3312)', '1 error')}\n` +
+      summary('1 failed | 271 passed (272)', '1 failed | 3311 passed (3312)', '1 error');
     expect(isTeardownRpcFlake({ status: 1, tail: failsLast })).toBe(false);
   });
 

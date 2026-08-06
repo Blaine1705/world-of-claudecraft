@@ -14,10 +14,22 @@
 //
 // Deliberately narrow, each arm pinned by tests/teardown_rpc_flake.test.ts:
 // exit status must be exactly 1 (a signal kill or any other code never
-// matches); BOTH final summary lines must be present in the captured tail and
-// show only passing buckets (skipped and todo are fine, any `failed` bucket
-// disqualifies); and the exact quoted RPC message must be present. Anything
-// else fails the job exactly as it always did.
+// matches); BOTH final summary lines must be present in the captured tail
+// and show only passing buckets (skipped and todo are fine, any `failed`
+// bucket disqualifies); the exact quoted RPC message must be present; and
+// the summary's `Errors N error(s)` count must EQUAL the number of
+// teardown-rpc occurrences in the tail, so a run carrying any other
+// unhandled error beside the flake never retries (multiple workers can hit
+// the same race, so the count is compared, never pinned to one; a truncated
+// tail under-counts occurrences and therefore fails closed). Anything else
+// fails the job exactly as it always did.
+//
+// Honesty note on what this predicate is: a narrowing filter, not an
+// integrity boundary. Test output is not trusted input (a test already
+// executes arbitrary code in the job), so a forged tail is conceivable; the
+// property that actually holds is the retry POLICY in ci_leg_runner.mjs (at
+// most one rerun of the same leg per job, always logged). Do not relax this
+// classifier on the theory that the summary parse proves anything.
 
 /**
  * Rolling-tail size the leg runner keeps for classification. The vitest
@@ -30,18 +42,18 @@ export const TEARDOWN_RPC_TAIL_BYTES = 256 * 1024;
 /** The exact unhandled-rejection message of the known flake. */
 export const TEARDOWN_RPC_MESSAGE = 'Closing rpc while "onUserConsoleLog" was pending';
 
-// vitest colors its CI output (tinyrainbow enables ANSI inside GitHub
-// Actions), so the summary labels and buckets arrive wrapped in escape
-// sequences; strip them before matching. The escape byte is spelled via
-// fromCharCode because a control character in a regex literal trips the
-// suspicious-regex lint, and biome auto-rewrites a plain-string constructor
-// back into that literal.
+// CI logs can carry ANSI escape sequences around the summary labels and
+// buckets; strip them defensively before matching (harmless when absent).
+// The escape byte is spelled via fromCharCode because a control character in
+// a regex literal trips the suspicious-regex lint, and biome auto-rewrites a
+// plain-string constructor back into that literal.
 const ANSI_RE = new RegExp(`${String.fromCharCode(27)}\\[[0-9;]*m`, 'g');
 
 /**
- * Final occurrence of a summary line for the given label ("Test Files" or
- * "Tests"), or null when the tail holds none. Last occurrence wins so a tail
- * that somehow holds two summaries is judged on the final one.
+ * Final occurrence of a summary line for the given label ("Test Files",
+ * "Tests", or "Errors"), or null when the tail holds none. Last occurrence
+ * wins so a tail that somehow holds two summaries is judged on the final
+ * one.
  *
  * @param {string} text
  * @param {string} label
@@ -69,9 +81,25 @@ function isAllPassing(buckets) {
 }
 
 /**
+ * @param {string} text
+ * @param {string} needle
+ * @returns {number}
+ */
+function countOccurrences(text, needle) {
+  let count = 0;
+  let index = text.indexOf(needle);
+  while (index !== -1) {
+    count += 1;
+    index = text.indexOf(needle, index + needle.length);
+  }
+  return count;
+}
+
+/**
  * True exactly when a finished leg matches the teardown-rpc flake signature:
- * exit code 1, both summary lines all-passing, and the exact RPC message in
- * the tail. This is the only predicate the leg runner may retry on.
+ * exit code 1, both summary lines all-passing, the exact RPC message in the
+ * tail, and every counted unhandled error accounted for by that message.
+ * This is the only predicate the leg runner may retry on.
  *
  * @param {{ status: number | null, tail: string }} result
  * @returns {boolean}
@@ -81,9 +109,20 @@ export function isTeardownRpcFlake({ status, tail }) {
   if (typeof tail !== 'string' || tail === '') return false;
   const text = tail.replace(ANSI_RE, '').replace(/\r/g, '');
   if (!text.includes('EnvironmentTeardownError')) return false;
-  if (!text.includes(TEARDOWN_RPC_MESSAGE)) return false;
+  const occurrences = countOccurrences(text, TEARDOWN_RPC_MESSAGE);
+  if (occurrences < 1) return false;
   const files = lastSummaryBuckets(text, 'Test Files');
   const tests = lastSummaryBuckets(text, 'Tests');
   if (files === null || tests === null) return false;
-  return isAllPassing(files) && isAllPassing(tests);
+  if (!isAllPassing(files) || !isAllPassing(tests)) return false;
+  // The whole exit-1 reason must be the flake: the summary's error count has
+  // to be fully explained by teardown-rpc occurrences. A run that also
+  // carries a genuine unhandled error (count higher than occurrences), or a
+  // truncated tail (occurrences higher than the count says, or no Errors
+  // line at all), never retries.
+  const errors = lastSummaryBuckets(text, 'Errors');
+  if (errors === null) return false;
+  const errorCount = errors.match(/^(\d+) errors?\b/);
+  if (!errorCount) return false;
+  return Number(errorCount[1]) === occurrences;
 }

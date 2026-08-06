@@ -1,5 +1,3 @@
-import type { spawn } from 'node:child_process';
-
 export interface CiLeg {
   name: string;
   cmd: string;
@@ -9,7 +7,10 @@ export interface CiLeg {
 export interface LegResult {
   status: number | null;
   tail: string;
+  spawnError?: Error;
 }
+
+export const DEFAULT_DRAIN_DEADLINE_MS: number;
 
 export function formatLegHeader(leg: CiLeg): string;
 
@@ -17,10 +18,11 @@ export function runLeg(opts: {
   cmd: string;
   args: string[];
   cwd: string;
-  spawnImpl?: typeof spawn;
-  out?: { write: (chunk: Buffer) => unknown };
-  err?: { write: (chunk: Buffer) => unknown };
+  out?: { write: (chunk: Buffer) => boolean };
+  err?: { write: (chunk: Buffer) => boolean };
+  log?: (line: string) => unknown;
   tailBytes?: number;
+  drainDeadlineMs?: number;
 }): Promise<LegResult>;
 
 export function runLegsWithFlakeRetry(opts: {
@@ -28,5 +30,6 @@ export function runLegsWithFlakeRetry(opts: {
   cwd: string;
   log?: (line: string) => unknown;
   error?: (line: string) => unknown;
+  annotate?: (line: string) => unknown;
   runLegImpl?: typeof runLeg;
 }): Promise<{ ok: boolean; status: number; retriedLegNames: string[] }>;
