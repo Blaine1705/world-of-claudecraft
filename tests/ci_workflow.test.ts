@@ -303,10 +303,11 @@ describe('CI workflow parity', () => {
 
   it('runs the release tier against a release-to-main pull request merge result', () => {
     const prGate = jobSource('pr-gate');
+    const prLongSims = jobSource('pr-long-sims');
     const prChecks = jobSource('pr-checks');
     const releaseGate = jobSource('release-gate');
     const releaseChecks = jobSource('release-checks');
-    for (const job of [prGate, prChecks]) {
+    for (const job of [prGate, prLongSims, prChecks]) {
       // Exact composed if: event routing AND code path filter (D10). Dropping
       // either arm breaks release-to-main exclusion or docs-only skip.
       const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
@@ -343,13 +344,18 @@ describe('CI workflow parity', () => {
 
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {
     const prGate = jobSource('pr-gate');
+    const prLongSims = jobSource('pr-long-sims');
     const prChecks = jobSource('pr-checks');
-    // Parallel means no needs edge between the pair. Both may need `changes`
-    // for the path filter; neither may wait on the other (would re-serialize).
+    // Parallel means no needs edge between the trio. Each may need `changes`
+    // for the path filter; none may wait on another (would re-serialize).
     expect(prGate).toMatch(/^\s{4}needs: changes\s*$/m);
+    expect(prLongSims).toMatch(/^\s{4}needs: changes\s*$/m);
     expect(prChecks).toMatch(/^\s{4}needs: changes\s*$/m);
     expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-checks/);
     expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-gate/);
+    expect(prLongSims).not.toMatch(/needs:\s*\[?[^\n]*pr-(gate|checks)/);
+    expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
+    expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     // Phase 2: pr-gate's test step runs through the selection-aware shard
     // runner; the runner itself spawns `npm test` (pretest preserved), which
     // tests/ci_shard_plan.test.ts pins behaviorally.
@@ -624,6 +630,7 @@ describe('CI workflow parity', () => {
     const requiredCheckNames = [
       'Detect code path changes',
       'PR gate (English-only legal)',
+      'PR gate (long sims)',
       'PR checks (freshness, typecheck, builds)',
       'Format + lint (Biome, changed files)',
       'Browser regressions (Chromium)',
@@ -650,6 +657,7 @@ describe('CI workflow parity', () => {
     const docRequiredNameForms = [
       '`Detect code path changes`',
       `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
+      '`PR gate (long sims)`',
       '`PR checks (freshness, typecheck, builds)`',
       '`Format + lint (Biome, changed files)`',
       '`Browser regressions (Chromium)`',
@@ -707,10 +715,35 @@ describe('CI workflow parity', () => {
           String.raw` {8}run: node scripts/ci_shard_test\.mjs --shard=\$\{\{ matrix\.shard \}\}/${SHARD_N}\n`,
       ),
     );
-    expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(1);
+    // Exactly two entry invocations: the shard matrix and the long-sims lane.
+    expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(2);
+    // The lane job mirrors the shard step's hardened relay (env block, never
+    // run-line interpolation) and runs the entry in lane mode: unsharded, no
+    // matrix, one job that owns the CI_LONG_SUITES files every shard leg
+    // excludes. Same anchored name-to-env-to-run shape as the shard pin.
+    const prLongSims = jobSource('pr-long-sims');
+    expect(prLongSims).toMatch(
+      new RegExp(
+        String.raw`- name: Run tests \(PR tier, long-sims lane\)\n` +
+          String.raw` {8}env:\n` +
+          String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
+          String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
+          String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
+          String.raw` {8}run: node scripts/ci_shard_test\.mjs --lane=long-sims\n`,
+      ),
+    );
+    expect(prLongSims).not.toContain('strategy:');
+    expect(prLongSims).not.toContain('matrix:');
+    expect(prLongSims).not.toContain('--shard=');
+    // Checkout, setup-pnpm, setup-node, pnpm install, and the lane run.
+    expect(prLongSims.match(/\n {6}- name: /g)).toHaveLength(5);
     for (const job of [releaseGate, releaseChecks, jobSource('release-i18n')]) {
       expect(job).not.toContain('ci_shard_test.mjs');
       expect(job).not.toContain('TEST_MODE');
+      // The lane split is PR-tier only: a release job must never exclude the
+      // long sims (release pushes keep the whole suite in their 8 shards).
+      expect(job).not.toContain('long-sims');
+      expect(job).not.toContain('--exclude');
     }
     // The half-cores worker bound moved from pr-gate's run line into the shard
     // runner. Derive the expected expression FROM halfCoreCap (the release-gate

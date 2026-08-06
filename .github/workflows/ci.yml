@@ -52,6 +52,15 @@ concurrency:
 #                 (each shard executes a partition of the test files), so the
 #                 job's wall time is the slowest shard, not the whole suite.
 #
+#   pr-long-sims  the long-sims lane (Phase 4 of the CI/CD performance packet):
+#                 the CI_LONG_SUITES rotation sims (scripts/lib/ci_shard_plan.mjs)
+#                 each cost 90+ seconds inside a shard and were setting the
+#                 slowest shard's wall clock, so this job runs them alone while
+#                 every pr-gate shard leg excludes them. Same triggers and
+#                 filters as pr-gate; the union of the nine PR-tier test jobs is
+#                 exactly the old 8-shard suite in every mode combination
+#                 (pinned by tests/ci_shard_plan.test.ts).
+#
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
 #                 summary, malware gate, game/admin typecheck, env/server/bot/client
 #                 builds), parallel with pr-gate. Same triggers as pr-gate.
@@ -79,8 +88,8 @@ concurrency:
 #
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
 # code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any other
-# always-on cheap jobs) but skip pr-gate, pr-checks, and browser-gate. Any touch
-# of the code path set forces the full PR tier. push to main/dev-*,
+# always-on cheap jobs) but skip pr-gate, pr-long-sims, pr-checks, and
+# browser-gate. Any touch of the code path set forces the full PR tier. push to main/dev-*,
 # workflow_dispatch, and merge_group queue runs always report code=true (full
 # PR tier when unsure).
 # Release/** pushes and release-to-main PRs never consult the filter:
@@ -97,7 +106,8 @@ concurrency:
 # nightly workflow: those are the unconditional full-suite backstops.
 #
 # Merge queue runs: a merge_group event routes through the PR-tier jobs
-# (changes, lint, pr-gate, pr-checks, browser-gate). The changes job treats
+# (changes, lint, pr-gate, pr-long-sims, pr-checks, browser-gate). The changes
+# job treats
 # every non-PR event as code=true and test_mode=full, so the queue always runs
 # the FULL suite on the exact merge result it is about to make the branch tip.
 # That is deliberate, not an optimization target: the queue is the last
@@ -397,6 +407,55 @@ jobs:
           TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
           CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
         run: node scripts/ci_shard_test.mjs --shard=${{ matrix.shard }}/8
+
+  # The long-sims lane (Phase 4 of the CI/CD performance packet). Runs the
+  # CI_LONG_SUITES files (scripts/lib/ci_shard_plan.mjs) that every pr-gate
+  # shard leg excludes: each costs 90+ seconds inside a shard, and together
+  # they were setting the slowest shard's wall clock. Same event routing and
+  # code path filter as pr-gate, so it reports (or docs-only-skips) on every
+  # pull_request AND merge_group run, which is the bar docs/merge-queue.md
+  # sets for a REQUIRED check; this job is required (it carries coverage the
+  # shards deliberately exclude), so its display name is load-bearing three
+  # ways (ruleset, tests/ci_workflow.test.ts, docs/merge-queue.md). In
+  # selective mode the lane runs only the lane files the floor or the diff
+  # would have carried; in full mode and on any unprovable input it runs all
+  # of them, mirroring the shard planner's fail-closed ladder so the
+  # shards-plus-lane union is always the whole suite. release-gate is
+  # deliberately NOT lane-split: release/** pushes keep the full suite in
+  # their 8 shards.
+  pr-long-sims:
+    name: PR gate (long sims)
+    needs: changes
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Same selection relay as the shard step (env, never run-line
+      # interpolation); the lane entry spawns `npm test` itself, so pretest
+      # regenerates the i18n artifacts here exactly as in every shard.
+      - name: Run tests (PR tier, long-sims lane)
+        env:
+          TEST_MODE: ${{ needs.changes.outputs.test_mode }}
+          TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
+          CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
+        run: node scripts/ci_shard_test.mjs --lane=long-sims
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved

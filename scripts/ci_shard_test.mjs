@@ -2,11 +2,13 @@
 // Phase 2 of the CI/CD performance packet (docs/qa-gate.md, "Selective PR-tier CI").
 //
 // Reads the selection decision the `changes` job relayed (TEST_MODE,
-// TEST_MODE_REASON, CHANGED_FILES) plus this shard's `--shard=i/N` argv, builds
-// the legs through the pure planner (lib/ci_shard_plan.mjs), prints the whole
-// decision so a suspicious green can be audited from the job log alone, and
-// runs the legs. Fail closed everywhere: any unreadable input runs the full
-// suite, which is byte-identical to the pre-selection step.
+// TEST_MODE_REASON, CHANGED_FILES) plus this job's `--shard=i/N` (or
+// `--lane=long-sims`) argv, builds the legs through the pure planner
+// (lib/ci_shard_plan.mjs), prints the whole decision so a suspicious green can
+// be audited from the job log alone, and runs the legs. Fail closed
+// everywhere: any unreadable input runs this job's full half, the shard's
+// suite-minus-lane or the lane's whole CI_LONG_SUITES list, whose union is
+// exactly the pre-selection full suite.
 //
 // Selection applies to PR-tier CI only: release-gate keeps its unconditional
 // `npm test -- --shard=i/N` run line and never runs this script, and the
@@ -16,17 +18,25 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildShardPlan, parseShardArg } from './lib/ci_shard_plan.mjs';
+import { buildLanePlan, buildShardPlan, parseShardArg } from './lib/ci_shard_plan.mjs';
 import { collectSuiteVisibility } from './lib/gate_discovery.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+const usage =
+  '[ci-shard] usage: node scripts/ci_shard_test.mjs (--shard=<i>/<N> | --lane=long-sims) [--plan-only]';
+
 const argv = process.argv.slice(2);
 const shard = parseShardArg(argv);
-if (!shard) {
-  // The shard spec comes from the workflow matrix, so a malformed one is a
+// The long-sims lane ("PR gate (long sims)"): the one job that runs the
+// CI_LONG_SUITES files the shard legs exclude. Exact literal only; any other
+// --lane value is a wiring bug, same doctrine as a malformed shard spec.
+const laneArg = argv.find((a) => a.startsWith('--lane='));
+const lane = laneArg === '--lane=long-sims';
+if ((laneArg && !lane) || (lane && shard) || (!lane && !shard)) {
+  // The spec comes from the workflow, so a malformed or ambiguous one is a
   // wiring bug: fail loud, never guess a partition.
-  console.error('[ci-shard] usage: node scripts/ci_shard_test.mjs --shard=<i>/<N> [--plan-only]');
+  console.error(usage);
   process.exit(1);
 }
 // Audit mode: print the whole decision and the exact leg commands without
@@ -72,17 +82,31 @@ const { testFiles, alwaysRun, counts } = collectSuiteVisibility({
   sep: path.sep,
 });
 
-const plan = buildShardPlan({
-  mode,
-  changedPaths: changedPaths ?? undefined,
-  alwaysRun,
-  testFiles,
-  shard,
-  workers,
-  exists: (p) => existsSync(path.join(repoRoot, p)),
-});
+const exists = (p) => existsSync(path.join(repoRoot, p));
+const plan = lane
+  ? buildLanePlan({
+      mode,
+      changedPaths: changedPaths ?? undefined,
+      alwaysRun,
+      testFiles,
+      workers,
+      exists,
+    })
+  : buildShardPlan({
+      mode,
+      changedPaths: changedPaths ?? undefined,
+      alwaysRun,
+      testFiles,
+      shard,
+      workers,
+      exists,
+    });
 
-console.log(`[ci-shard] shard ${shard.index}/${shard.total}, workers=${workers}`);
+console.log(
+  lane
+    ? `[ci-shard] long-sims lane, workers=${workers}`
+    : `[ci-shard] shard ${shard.index}/${shard.total}, workers=${workers}`,
+);
 console.log(
   `[ci-shard] changes-job decision: mode=${mode || '(unset)'}${modeReason ? ` (${modeReason})` : ''}`,
 );
@@ -91,19 +115,43 @@ console.log(
     `${counts.blind} blind, ${counts.partial} partial); always-run floor ${alwaysRun.length}`,
 );
 console.log(`[ci-shard] plan: mode=${plan.mode} (${plan.reason})`);
-if (plan.mode === 'selective') {
+if (lane) {
+  // The lane's own audit trail: which files this job owns, or why it owns
+  // none. Zero legs is a valid selective outcome and must exit green WITHOUT
+  // spawning (an argument-less `npm test` would run the entire suite).
   console.log(
-    `[ci-shard] runs: ${plan.floorCount} floor file(s) sharded ${shard.total} ways, plus ` +
-      `vitest related over ${plan.relatedCount} changed source(s)`,
+    plan.laneFiles.length > 0
+      ? `[ci-shard] lane runs: ${plan.laneFiles.join(', ')}`
+      : '[ci-shard] lane runs: nothing (no lane file on the floor or changed; ' +
+          'the shard legs cover the rest, and the release/** push run and the ' +
+          'nightly gate run the full suite, docs/qa-gate.md)',
   );
-  // Honest accounting: the related leg covers an unknown further share of the
-  // outside-floor files (it can only be known by running vitest), so this line
-  // must never read as "N files were skipped".
-  console.log(
-    `[ci-shard] outside the floor: ${plan.outsideFloorCount} graph-visible test file(s); ` +
-      'the related leg covers the share of those reachable from the changed sources. ' +
-      'Backstops: the release/** push run and the nightly gate run the full suite (docs/qa-gate.md).',
-  );
+} else {
+  if (plan.laneExcluded.length > 0) {
+    // Shard-side half of the lane accounting: these files are excluded from
+    // every leg below and owned by the "PR gate (long sims)" job in this run.
+    console.log(
+      `[ci-shard] long-sims lane: ${plan.laneExcluded.length} suite(s) excluded from this ` +
+        'shard and owned by the "PR gate (long sims)" job',
+    );
+  }
+  if (plan.mode === 'selective') {
+    console.log(
+      `[ci-shard] runs: ${plan.floorCount} floor file(s) sharded ${shard.total} ways` +
+        (plan.laneFloorCount > 0
+          ? ` (${plan.laneFloorCount} more floor file(s) ride the long-sims lane)`
+          : '') +
+        `, plus vitest related over ${plan.relatedCount} changed source(s)`,
+    );
+    // Honest accounting: the related leg covers an unknown further share of the
+    // outside-floor files (it can only be known by running vitest), so this line
+    // must never read as "N files were skipped".
+    console.log(
+      `[ci-shard] outside the floor: ${plan.outsideFloorCount} graph-visible test file(s); ` +
+        'the related leg covers the share of those reachable from the changed sources. ' +
+        'Backstops: the release/** push run and the nightly gate run the full suite (docs/qa-gate.md).',
+    );
+  }
 }
 
 for (const { name, cmd, args } of plan.legs) {
@@ -126,6 +174,8 @@ if (planOnly) {
   console.log(`\n[ci-shard] plan-only: ${plan.legs.length} leg(s) printed, nothing spawned`);
 } else {
   console.log(
-    `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on shard ${shard.index}/${shard.total}`,
+    `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on ${
+      lane ? 'the long-sims lane' : `shard ${shard.index}/${shard.total}`
+    }`,
   );
 }

@@ -5,9 +5,12 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   buildFloor,
+  buildLanePlan,
   buildShardPlan,
   CI_GUARD_PREFIXES,
   CI_GUARD_SUITES,
+  CI_LONG_SUITES,
+  collectedLaneFiles,
   FLOOR_SANITY_MIN,
   parseShardArg,
 } from '../scripts/lib/ci_shard_plan.mjs';
@@ -115,7 +118,10 @@ describe('the floor union', () => {
   });
 });
 
-describe('buildShardPlan: full mode is byte-identical to the old step', () => {
+describe('buildShardPlan: full mode replays the old step minus the lane', () => {
+  // The base fixture collects NO lane file, so these legs carry no --exclude
+  // and match the pre-lane step exactly; the lane-aware shapes are pinned in
+  // the long-sims lane describe below.
   it.each([
     ['full', 'mode=full from the changes job'],
     ['', 'unrecognized mode'],
@@ -224,6 +230,203 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
   });
 });
 
+describe('the long-sims lane (Phase 4)', () => {
+  // A fixture that COLLECTS two lane files, one of them floor-classified
+  // (mirroring the real tree, where tests/battleground.test.ts is blind and
+  // the other lane files are graph-visible).
+  const LANE_BLIND = 'tests/battleground.test.ts';
+  const LANE_GRAPH = 'tests/chronomancy_balance.test.ts';
+  const LANE_BASE = {
+    ...BASE,
+    alwaysRun: [...ALWAYS, LANE_BLIND],
+    testFiles: [...COLLECTED, LANE_BLIND, LANE_GRAPH],
+  };
+
+  it('pins the lane membership list and the 90 second threshold doctrine', () => {
+    // Literal list: a rename or removal must be a conscious decision here AND
+    // in the measured record (docs/prd/ci-cd-performance/ phase notes), never
+    // a refactor side effect.
+    expect([...CI_LONG_SUITES]).toEqual([
+      'tests/audit_conservation_property.test.ts',
+      'tests/battleground.test.ts',
+      'tests/chronomancy_balance.test.ts',
+      'tests/eastbrook_gameplay_integration.test.ts',
+    ]);
+    // No lane file may be an invariant guard: guards must ride every
+    // selective shard's floor leg, and the lane would pull them out of it.
+    for (const f of CI_LONG_SUITES) {
+      expect(CI_GUARD_SUITES).not.toContain(f);
+      for (const prefix of CI_GUARD_PREFIXES) expect(f.startsWith(prefix)).toBe(false);
+    }
+  });
+
+  it('resolves every lane file against the REAL collected suite', () => {
+    // A deleted or renamed lane file must fail here loudly; collectedLaneFiles
+    // filtering it out silently is the fail-safe RUNTIME behavior, not the
+    // maintained state.
+    const { testFiles } = collectSuiteVisibility({
+      root: REPO_ROOT,
+      readdirSync,
+      readFileSync,
+      join: path.join,
+      relative: path.relative,
+      sep: path.sep,
+    });
+    const collected = new Set(testFiles);
+    for (const f of CI_LONG_SUITES) expect(collected.has(f), f).toBe(true);
+  });
+
+  it('collectedLaneFiles keeps only collected, existing lane files', () => {
+    expect(collectedLaneFiles({ testFiles: LANE_BASE.testFiles, exists: () => true })).toEqual([
+      LANE_BLIND,
+      LANE_GRAPH,
+    ]);
+    expect(collectedLaneFiles({ testFiles: COLLECTED, exists: () => true })).toEqual([]);
+    expect(
+      collectedLaneFiles({ testFiles: LANE_BASE.testFiles, exists: (p) => p !== LANE_GRAPH }),
+    ).toEqual([LANE_BLIND]);
+  });
+
+  it('full mode excludes exactly the collected lane files from the shard leg', () => {
+    const plan = buildShardPlan({ ...LANE_BASE, mode: 'full' });
+    expect(plan.mode).toBe('full');
+    expect(plan.laneExcluded).toEqual([LANE_BLIND, LANE_GRAPH]);
+    expect(plan.legs).toEqual([
+      {
+        name: 'npm test (full suite minus the 2-file long-sims lane, shard 3/8)',
+        cmd: 'npm',
+        args: [
+          'test',
+          '--',
+          '--shard=3/8',
+          '--maxWorkers=2',
+          `--exclude=${LANE_BLIND}`,
+          `--exclude=${LANE_GRAPH}`,
+        ],
+      },
+    ]);
+  });
+
+  it('every fail-closed fallback keeps the lane exclusions (the lane owns those files)', () => {
+    for (const overrides of [
+      { changedPaths: undefined as unknown as string[] },
+      { changedPaths: ['--config=evil'] },
+      { changedPaths: ['package.json'] },
+      { alwaysRun: ['tests/architecture.test.ts'] },
+    ]) {
+      const plan = buildShardPlan({ ...LANE_BASE, ...overrides });
+      expect(plan.mode).toBe('full');
+      expect(plan.legs[0].args).toContain(`--exclude=${LANE_BLIND}`);
+      expect(plan.legs[0].args).toContain(`--exclude=${LANE_GRAPH}`);
+    }
+  });
+
+  it('selective mode moves floor lane files to the lane and leaves related unfiltered', () => {
+    const plan = buildShardPlan({ ...LANE_BASE });
+    expect(plan.mode).toBe('selective');
+    const [floorLeg, relatedLeg] = plan.legs;
+    expect(floorLeg.args).not.toContain(LANE_BLIND);
+    expect(floorLeg.args).not.toContain(LANE_GRAPH);
+    expect(plan.laneFloorCount).toBe(1);
+    // floorCount reports what THIS leg runs; the lane-handled member is
+    // accounted separately, and outsideFloorCount still uses the whole floor.
+    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25 + 1 - 1);
+    expect(relatedLeg.args).not.toContain('--exclude=' + LANE_BLIND);
+    expect(relatedLeg.args.join(' ')).not.toContain('--exclude');
+  });
+
+  it('a changed lane test rides the lane, not the floor leg', () => {
+    const plan = buildShardPlan({ ...LANE_BASE, changedPaths: [LANE_GRAPH] });
+    expect(plan.mode).toBe('selective');
+    expect(plan.legs[0].args).not.toContain(LANE_GRAPH);
+    expect(plan.laneFloorCount).toBe(2);
+    const lanePlan = buildLanePlan({ ...LANE_BASE, changedPaths: [LANE_GRAPH] });
+    expect(lanePlan.laneFiles).toEqual([LANE_BLIND, LANE_GRAPH]);
+  });
+
+  it('lane full mode runs every collected lane file through npm test', () => {
+    for (const mode of ['full', '', 'garbage']) {
+      const plan = buildLanePlan({ ...LANE_BASE, mode });
+      expect(plan.mode).toBe('full');
+      expect(plan.laneFiles).toEqual([LANE_BLIND, LANE_GRAPH]);
+      expect(plan.legs).toEqual([
+        {
+          name: 'npm test (long-sims lane, 2 file(s))',
+          cmd: 'npm',
+          args: ['test', '--', LANE_BLIND, LANE_GRAPH, '--maxWorkers=2'],
+        },
+      ]);
+    }
+  });
+
+  it('lane fail-closed fallbacks mirror the shard ladder input for input', () => {
+    for (const overrides of [
+      { changedPaths: undefined as unknown as string[] },
+      { changedPaths: ['--config=evil'] },
+      { changedPaths: ['package.json'] },
+      { alwaysRun: ['tests/architecture.test.ts'] },
+      { testFiles: LANE_BASE.testFiles.filter((f) => f !== 'tests/world_api_parity.test.ts') },
+    ]) {
+      const shardPlan = buildShardPlan({ ...LANE_BASE, ...overrides });
+      const lanePlan = buildLanePlan({ ...LANE_BASE, ...overrides });
+      expect(shardPlan.mode).toBe('full');
+      expect(lanePlan.mode).toBe('full');
+      // The union invariant under every fallback: the shard leg excludes
+      // exactly what the lane runs.
+      expect(
+        shardPlan.legs[0].args.filter((a) => a.startsWith('--exclude=')).map((a) => a.slice(10)),
+      ).toEqual(lanePlan.laneFiles);
+    }
+  });
+
+  it('lane selective mode runs only floor or changed lane files, zero legs when none', () => {
+    const plan = buildLanePlan({ ...LANE_BASE });
+    expect(plan.mode).toBe('selective');
+    expect(plan.laneFiles).toEqual([LANE_BLIND]);
+    expect(plan.legs).toEqual([
+      {
+        name: 'npm test (long-sims lane, 1 file(s))',
+        cmd: 'npm',
+        args: ['test', '--', LANE_BLIND, '--maxWorkers=2'],
+      },
+    ]);
+    // No collected lane file on the floor: a zero-leg plan, NEVER an
+    // argument-less npm test (which would run the entire suite).
+    const none = buildLanePlan({
+      ...LANE_BASE,
+      alwaysRun: ALWAYS,
+      testFiles: [...COLLECTED, LANE_GRAPH],
+    });
+    expect(none.mode).toBe('selective');
+    expect(none.laneFiles).toEqual([]);
+    expect(none.legs).toEqual([]);
+  });
+
+  it('shards plus lane partition the collected suite in both modes', () => {
+    // Full mode: the lane runs exactly the files the shard legs exclude, and
+    // everything else stays in the sharded collection.
+    const shardFull = buildShardPlan({ ...LANE_BASE, mode: 'full' });
+    const laneFull = buildLanePlan({ ...LANE_BASE, mode: 'full' });
+    expect(
+      shardFull.legs[0].args.filter((a) => a.startsWith('--exclude=')).map((a) => a.slice(10)),
+    ).toEqual(laneFull.laneFiles);
+    // Selective mode: the floor leg plus the lane files re-cover the whole
+    // floor with no overlap and no loss.
+    const shardSel = buildShardPlan({ ...LANE_BASE });
+    const laneSel = buildLanePlan({ ...LANE_BASE });
+    const floorLegFiles = shardSel.legs[0].args.filter(
+      (a) => a.startsWith('tests/') || a.startsWith('src/'),
+    );
+    const { floor } = buildFloor({
+      alwaysRun: LANE_BASE.alwaysRun,
+      testFiles: LANE_BASE.testFiles,
+      changedTestFiles: [],
+    });
+    expect([...floorLegFiles, ...laneSel.laneFiles].sort()).toEqual([...floor].sort());
+    expect(floorLegFiles).not.toContain(LANE_BLIND);
+  });
+});
+
 // The entry is the wiring between the workflow env and the planner; it runs
 // for real here in --plan-only mode (prints every decision and leg, spawns
 // nothing), so a fail-open hole in the env parsing or the planner hookup
@@ -271,6 +474,55 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(bad.log).toContain('usage:');
     const malformed = await runEntry(['--shard=9/8'], {});
     expect(malformed.exitCode).toBe(1);
+  });
+
+  it('fails loud on an unknown lane or an ambiguous lane-plus-shard spec', async () => {
+    const unknown = await runEntry(['--lane=bogus', '--plan-only'], {});
+    expect(unknown.exitCode).toBe(1);
+    expect(unknown.log).toContain('usage:');
+    const ambiguous = await runEntry(['--lane=long-sims', '--shard=1/8', '--plan-only'], {});
+    expect(ambiguous.exitCode).toBe(1);
+  });
+
+  it('lane mode owns every CI_LONG_SUITES file when the changes job says full', async () => {
+    const run = await runEntry(['--lane=long-sims', '--plan-only'], {
+      TEST_MODE: 'full',
+      TEST_MODE_REASON: 'broad or unclassified change ("pnpm-lock.yaml"): full suite',
+      CHANGED_FILES: '[]',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('plan: mode=full (mode=full from the changes job)');
+    for (const f of CI_LONG_SUITES) expect(run.log).toContain(f);
+    expect(run.log).toContain('npm test -- tests/audit_conservation_property.test.ts');
+    expect(run.log).not.toContain('--shard=');
+  });
+
+  it('lane selective mode runs only the floor lane member for a leaf UI diff', async () => {
+    // Real-tree expectation: tests/battleground.test.ts classifies
+    // blind/partial (floor) today and the other lane files are graph-visible,
+    // so a UI-only diff's lane is exactly the one floor member. If a lane
+    // file's classification changes, this pin fails and the lane cost model
+    // must be re-decided consciously (see the phase notes).
+    const run = await runEntry(['--lane=long-sims', '--plan-only'], {
+      TEST_MODE: 'selective',
+      TEST_MODE_REASON: 'selective: 1 changed source file(s)',
+      CHANGED_FILES: '["src/ui/unit_portrait.ts"]',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('plan: mode=selective');
+    expect(run.log).toContain('lane runs: tests/battleground.test.ts');
+    expect(run.log).not.toContain('tests/chronomancy_balance.test.ts');
+  });
+
+  it('shard mode passes the lane exclusions through to the real leg argv', async () => {
+    const run = await runEntry(['--shard=2/8', '--plan-only'], {
+      TEST_MODE: 'full',
+      TEST_MODE_REASON: 'broad or unclassified change ("pnpm-lock.yaml"): full suite',
+      CHANGED_FILES: '[]',
+    });
+    expect(run.exitCode).toBe(0);
+    for (const f of CI_LONG_SUITES) expect(run.log).toContain(`--exclude=${f}`);
+    expect(run.log).toContain('owned by the "PR gate (long sims)" job');
   });
 
   it('plans the full suite when the mode env is missing (fail closed)', async () => {
