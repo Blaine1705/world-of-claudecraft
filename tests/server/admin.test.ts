@@ -2257,6 +2257,49 @@ describe('migrated write handlers + side effects (QA gate parity coverage)', () 
     expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
     expect(ignoreReport).toHaveBeenCalledWith(5, ADMIN_ACCOUNT_ID, 'duplicate');
   });
+
+  it('a successful bug-report resolve resolves ok:true, passing status + the note from the body', async () => {
+    const resolveBugReport = vi.fn(async () => true);
+    authedAdminDb({ resolveBugReport });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/resolve', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { note: 'fixed in 0.34.1' },
+    });
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(resolveBugReport).toHaveBeenCalledWith(
+      5,
+      ADMIN_ACCOUNT_ID,
+      'resolved',
+      'fixed in 0.34.1',
+    );
+  });
+
+  it('a successful bug-report dismiss resolves ok:true, passing status + the note from the body', async () => {
+    const resolveBugReport = vi.fn(async () => true);
+    authedAdminDb({ resolveBugReport });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/dismiss', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: {},
+    });
+    expect(r.body).toEqual({ success: true, data: { ok: true }, error: null });
+    expect(resolveBugReport).toHaveBeenCalledWith(5, ADMIN_ACCOUNT_ID, 'dismissed', undefined);
+  });
+
+  it('404s a bug-report resolve for a report that is not open', async () => {
+    authedAdminDb({ resolveBugReport: async () => false });
+    installAdminRuntime();
+    const r = await runRoute('POST', '/admin/api/bug-reports/:id/resolve', {
+      headers: { authorization: BEARER },
+      params: { id: '5' },
+      body: { note: 'already handled' },
+    });
+    expect(r.status).toBe(404);
+    expect(r.body).toEqual({ success: false, data: null, error: 'open bug report not found' });
+  });
 });
 
 // ---------------------------------------------------------------------------
