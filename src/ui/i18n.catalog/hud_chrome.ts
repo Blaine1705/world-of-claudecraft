@@ -227,19 +227,19 @@ export const hudChromeStrings = {
         'The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when the buyer pays.',
       feeLine: 'Exchange fee {fee}',
       netLine: 'You receive {net}',
-      sendOffer: 'Send $WOC offer',
+      sendOffer: 'Offer $WOC',
       offerSent: 'Offer sent. It expires in 10 minutes unless {name} accepts.',
+      incomingAccept: '{name} offers {price} for your items.',
       notInstant:
         'A $WOC sale is not instant. Your item moves into escrow when they accept, and reaches them once payment is verified.',
       blockDisabled: 'The $WOC Exchange is not available on this realm.',
       blockNoWallet: 'Link and verify a wallet to sell items for $WOC.',
       blockPartnerUnknown: 'Checking whether that player can accept $WOC...',
       blockRecipientNoWallet: 'That player must connect a wallet to accept $WOC payments.',
-      // You are the SELLER in a $WOC deal: you stage the item and name the
-      // price, and the other player pays. These say so, rather than leaving a
-      // disabled button unexplained.
-      hintStageItem: 'Add the item you want to sell to your side of the trade.',
-      hintNoEligible: 'None of your staged items can be sold for $WOC.',
+      // Offering $WOC means you are BUYING: items go one way, $WOC the other.
+      // These say so, rather than leaving a disabled button unexplained.
+      hintClearYourItems: 'Remove your own items: a $WOC offer buys what they are selling.',
+      hintAwaitTheirItems: 'Waiting for them to offer something that can be sold for $WOC.',
       hintEnterPrice: 'Enter a price in USD.',
       hintGoldOffered: 'Remove your gold offer first: a trade is gold or $WOC, not both.',
       ineligibleNote: '{count} staged item(s) cannot be sold for $WOC.',

@@ -49,7 +49,8 @@ function input(over: Partial<Parameters<typeof buildWocTradeModel>[0]> = {}) {
     selfWalletVerified: true,
     partner: PARTNER,
     partnerResolved: true,
-    staged: [slot(EPIC.id)],
+    staged: [],
+    theirStaged: [slot(EPIC.id)],
     items: TABLE,
     mode: 'woc' as const,
     usdCents: 5000,
@@ -191,19 +192,25 @@ describe('a disabled send button always says WHY', () => {
   // no message anywhere. A seller saw a working price field, typed a price, and
   // got a button that did nothing and explained nothing. Every reason send is
   // withheld must name itself.
-  it('prompts for an item when your own side is empty', () => {
-    const m = buildWocTradeModel(input({ staged: [] }));
+  it('tells you to clear your own items, because offering $WOC means buying', () => {
+    const m = buildWocTradeModel(input({ staged: [slot(EPIC.id)] }));
     expect(m.canSend).toBe(false);
-    expect(m.sendHint).toBe('hudChrome.trade.woc.hintStageItem');
-    // And the form stays up: this is a prompt, not an unavailable arm.
-    expect(m.block, 'an empty side is the starting state, not an error').toBeNull();
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintClearYourItems');
+    expect(m.block, 'this is a prompt, not an unavailable arm').toBeNull();
   });
 
-  it('names the ineligible case rather than hiding the form', () => {
-    const m = buildWocTradeModel(input({ staged: [slot(QUEST.id)] }));
+  it('waits for THEM to stage something eligible', () => {
+    const m = buildWocTradeModel(input({ theirStaged: [slot(QUEST.id)] }));
     expect(m.canSend).toBe(false);
-    expect(m.sendHint).toBe('hudChrome.trade.woc.hintNoEligible');
-    expect(m.block, 'staged-but-ineligible must not hide the price field').toBeNull();
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintAwaitTheirItems');
+    expect(m.block, 'an empty other side must not hide the price field').toBeNull();
+  });
+
+  it('disables the $WOC tab entirely while you hold items', () => {
+    // Holding items means you are the SELLER here, so the tab is not yours to
+    // use: the requester's rule that the button is disabled once you offer one.
+    expect(buildWocTradeModel(input({ staged: [slot(EPIC.id)] })).wocDisabled).toBe(true);
+    expect(buildWocTradeModel(input()).wocDisabled).toBe(false);
   });
 
   it('names the missing price', () => {
@@ -224,10 +231,10 @@ describe('a disabled send button always says WHY', () => {
     expect(m.sendHint).toBeNull();
   });
 
-  it('reports the item prompt before the price prompt', () => {
-    // Ordering is the order a seller does the work: pick the item, then price it.
-    expect(buildWocTradeModel(input({ staged: [], usdCents: null })).sendHint).toBe(
-      'hudChrome.trade.woc.hintStageItem',
+  it('reports your own items before the price prompt', () => {
+    // Ordering is the order a buyer hits them: clear your side, then price.
+    expect(buildWocTradeModel(input({ staged: [slot(EPIC.id)], usdCents: null })).sendHint).toBe(
+      'hudChrome.trade.woc.hintClearYourItems',
     );
   });
 });
@@ -241,12 +248,12 @@ describe('sending is gated on a real, positive price', () => {
     expect(buildWocTradeModel(input({ usdCents })).canSend).toBe(false);
   });
 
-  it('refuses to send with nothing eligible staged', () => {
-    expect(buildWocTradeModel(input({ staged: [slot(QUEST.id)] })).canSend).toBe(false);
+  it('refuses to send when they have staged nothing eligible', () => {
+    expect(buildWocTradeModel(input({ theirStaged: [slot(QUEST.id)] })).canSend).toBe(false);
   });
 
   it('separates eligible from ineligible so the window can say which', () => {
-    const m = buildWocTradeModel(input({ staged: [slot(EPIC.id), slot(QUEST.id)] }));
+    const m = buildWocTradeModel(input({ theirStaged: [slot(EPIC.id), slot(QUEST.id)] }));
     expect(m.eligible.map((s) => s.itemId)).toEqual([EPIC.id]);
     expect(m.ineligible.map((s) => s.itemId)).toEqual([QUEST.id]);
     expect(m.canSend, 'a partly-eligible stage can still send the eligible part').toBe(true);

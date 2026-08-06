@@ -105,9 +105,10 @@ export interface WocDirectedOfferRow {
   sellerName: string;
   buyerAccount: number;
   buyerName: string;
-  /** The referenced copy, re-validated at acceptance (never held before it). */
-  itemRef: ExtractRef;
-  itemId: string;
+  /** The copy the SELLER named when accepting, or null while the offer is still
+   *  just a price. The buyer opens the deal, so the item is unknown until then. */
+  itemRef: ExtractRef | null;
+  itemId: string | null;
   usdCents: number;
   status: WocDirectedOfferStatus;
   listingId: number | null;
@@ -245,8 +246,6 @@ export interface WocMarketDb {
     sellerName: string;
     buyerAccount: number;
     buyerName: string;
-    itemRef: ExtractRef;
-    itemId: string;
     usdCents: number;
     expiresAtMs: number;
   }): Promise<WocDirectedOfferRow>;
@@ -844,62 +843,57 @@ export class WocMarketService {
   }
 
   /**
-   * The seller proposes a p2p sale. Nothing is escrowed yet: acceptance is what
-   * takes the item, so a stream of offers cannot lock a chosen player's goods.
+   * The BUYER proposes a p2p purchase: a price, named to one player, with no
+   * item yet. The seller answers by staging goods and accepting.
+   *
+   * Nothing is escrowed here, so a stream of offers cannot lock anyone's goods;
+   * acceptance is what takes the item.
    */
   async createDirectedOffer(args: {
     account: number;
     characterId: number;
-    itemRef: ExtractRef;
     /** The counterparty's character NAME, the one handle the trade window has.
      *  Resolved here so no account id crosses the wire. */
-    buyerCharacterName: string;
+    sellerCharacterName: string;
     usdCents: number;
   }): Promise<{ ok: true; offer: WocDirectedOfferRow } | Refused> {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
-    const buyer = await this.deps.db.characterByName(this.cfg.realm, args.buyerCharacterName);
-    if (!buyer) return refuse('character_invalid');
-    const buyerAccount = buyer.accountId;
-    // Same ACCOUNT, not same character: an alt is still yourself, and offering
+    const seller = await this.deps.db.characterByName(this.cfg.realm, args.sellerCharacterName);
+    if (!seller) return refuse('character_invalid');
+    const sellerAccount = seller.accountId;
+    // Same ACCOUNT, not same character: an alt is still yourself, and dealing
     // between your own characters would be a fee-free self-deal that still
     // consumed escrow and settlement machinery.
-    if (buyerAccount === args.account) return refuse('self_offer');
-    const wallet = await this.deps.verifiedWallet(args.account);
-    if (!wallet) return refuse('wallet_required');
-    // The recipient's wallet is checked HERE rather than at acceptance, because
-    // this is the refusal the seller's trade window turns into "the recipient
-    // must connect a wallet before they can accept $WOC". Re-checked at
-    // acceptance anyway, since a wallet can be unlinked in between.
-    if (!(await this.deps.verifiedWallet(buyerAccount))) {
+    if (sellerAccount === args.account) return refuse('self_offer');
+    // The BUYER's wallet: they are the one about to pay.
+    if (!(await this.deps.verifiedWallet(args.account))) return refuse('wallet_required');
+    // The SELLER's wallet: they cannot be PAID in $WOC without one. This is the
+    // refusal the buyer's trade window turns into "that player must connect a
+    // wallet". Re-checked at acceptance, since a wallet can be unlinked between.
+    if (!(await this.deps.verifiedWallet(sellerAccount))) {
       return refuse('recipient_wallet_required');
     }
     // Validate the params acceptance WILL use, not a looser approximation, so an
-    // offer can never be created that its own acceptance would refuse.
-    const params = validListingParams(this.directedParams(args.usdCents, buyerAccount));
+    // offer can never be created that its own acceptance would refuse. The ITEM
+    // is not checked here because there is not one yet: eligibility is the
+    // seller's to satisfy when they stage goods and accept.
+    const params = validListingParams(this.directedParams(args.usdCents, args.account));
     if (!params.ok) return refuse(params.reason);
-    const eligible = listingEligibility(
-      ITEMS[args.itemRef.itemId],
-      args.itemRef.expectInstance ?? undefined,
-      this.cfg.policy,
-    );
-    if (!eligible.ok) return refuse(eligible.reason);
-    const seller = await this.deps.db.deliveryTarget(
+    const buyer = await this.deps.db.deliveryTarget(
       this.cfg.realm,
       args.account,
       args.characterId,
     );
-    if (!seller || seller.characterId !== args.characterId) return refuse('character_invalid');
+    if (!buyer || buyer.characterId !== args.characterId) return refuse('character_invalid');
 
     const offer = await this.deps.db.insertDirectedOffer({
       realm: this.cfg.realm,
-      sellerAccount: args.account,
-      sellerCharacter: args.characterId,
+      sellerAccount,
+      sellerCharacter: seller.characterId,
       sellerName: seller.name,
-      buyerAccount,
+      buyerAccount: args.account,
       buyerName: buyer.name,
-      itemRef: args.itemRef,
-      itemId: args.itemRef.itemId,
       usdCents: args.usdCents,
       expiresAtMs: this.now() + WOC_MARKET_DIRECTED_OFFER_TTL_SECONDS * 1000,
     });
@@ -907,36 +901,50 @@ export class WocMarketService {
   }
 
   /**
-   * The named buyer agrees. This is the moment the deal exists: the offer flips
-   * to accepted and the item leaves the seller's bags into custody escrow.
+   * The named SELLER agrees, and names the copy they are parting with.
+   *
+   * This is the moment the deal exists: the offer flips to accepted and the item
+   * leaves the seller's bags into custody escrow. The item arrives HERE rather
+   * than at offer time because the buyer opened the deal with a price alone.
    *
    * The status flip happens FIRST and is a compare-and-set, so a double-click
-   * cannot extract two copies: the second call finds the offer no longer
-   * pending and never reaches createListing. If the listing then fails (the
-   * copy moved, the seller went offline), the offer is put back to pending so
-   * the buyer can retry inside the TTL rather than losing the deal to a
-   * transient refusal.
+   * cannot extract two copies: the second call finds the offer no longer pending
+   * and never reaches createListing. If the listing then fails (the copy moved,
+   * the seller went offline), the offer is put back to pending so it can be
+   * retried inside the TTL rather than lost to a transient refusal.
    */
   async acceptDirectedOffer(
     account: number,
     offerId: number,
+    itemRef: ExtractRef,
+    characterId: number,
   ): Promise<{ ok: true; listing: WocListingRow } | Refused> {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(account));
     if (gate) return gate;
     const offer = await this.deps.db.directedOfferById(this.cfg.realm, offerId);
     // not_found for a stranger, matching the directed-listing convention: an id
     // prober must not learn that someone else's private offer exists.
-    if (!offer || offer.buyerAccount !== account) return refuse('not_found');
+    if (!offer || offer.sellerAccount !== account) return refuse('not_found');
     if (offer.status !== 'pending') return refuse('not_pending');
     if (offer.expiresAtMs <= this.now()) return refuse('offer_expired');
+    // The seller is about to be PAID in $WOC, so they need a wallet too.
     if (!(await this.deps.verifiedWallet(account))) return refuse('wallet_required');
+    // Eligibility is checked here, where the item finally exists. The server
+    // owns this decision: the client pre-filters the picker, but a stale bundle
+    // must never be able to sell something the policy refuses.
+    const eligible = listingEligibility(
+      ITEMS[itemRef.itemId],
+      itemRef.expectInstance ?? undefined,
+      this.cfg.policy,
+    );
+    if (!eligible.ok) return refuse(eligible.reason);
 
     const claimed = await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, 'accepted');
     if (!claimed) return refuse('not_pending');
     const created = await this.createListing({
       account: offer.sellerAccount,
-      characterId: offer.sellerCharacter,
-      itemRef: offer.itemRef,
+      characterId,
+      itemRef,
       params: this.directedParams(offer.usdCents, offer.buyerAccount),
     });
     if (!created.ok) {
@@ -949,8 +957,8 @@ export class WocMarketService {
     return { ok: true, listing: created.listing };
   }
 
-  /** The buyer says no, or the seller pulls it. Nothing was escrowed, so this
-   *  is a status flip and nothing else. */
+  /** The seller says no, or the buyer pulls their offer. Nothing was escrowed,
+   *  so this is a status flip and nothing else. */
   async resolveDirectedOffer(
     account: number,
     offerId: number,
@@ -959,7 +967,7 @@ export class WocMarketService {
     if (!this.cfg.enabled) return refuse('disabled');
     const offer = await this.deps.db.directedOfferById(this.cfg.realm, offerId);
     if (!offer) return refuse('not_found');
-    const actor = action === 'decline' ? offer.buyerAccount : offer.sellerAccount;
+    const actor = action === 'decline' ? offer.sellerAccount : offer.buyerAccount;
     if (actor !== account) return refuse('not_found');
     if (offer.status !== 'pending') return refuse('not_pending');
     const to = action === 'decline' ? 'declined' : 'withdrawn';

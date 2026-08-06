@@ -28,6 +28,7 @@ import {
 
 export interface WocTradePanelDeps {
   staged: readonly InvSlot[];
+  theirStaged: readonly InvSlot[];
   goldCopper: number;
   items: Readonly<Record<string, ItemDef>>;
   marketEnabled: boolean;
@@ -56,6 +57,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     partner: deps.partner,
     partnerResolved: deps.partnerResolved,
     staged: deps.staged,
+    theirStaged: deps.theirStaged,
     items: deps.items,
     mode: deps.mode,
     usdCents: deps.usdCents,

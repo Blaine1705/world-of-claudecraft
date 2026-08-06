@@ -1908,14 +1908,17 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     ]);
     return h;
   }
+  // BUYER_A opens the deal by naming a price to the seller; SELLER accepts by
+  // staging a copy. The buyer holds no items in a $WOC deal.
   const offerArgs = (over: Record<string, unknown> = {}) => ({
-    account: SELLER,
-    characterId: SELLER_CHAR,
-    itemRef: { index: 0, itemId: EPIC_ITEM },
-    buyerCharacterName: 'Aldan',
+    account: BUYER_A,
+    characterId: CHAR_A,
+    sellerCharacterName: 'Selara',
     usdCents: 5000,
     ...over,
   });
+  const acceptWith = (h: Harness, id: number) =>
+    h.service.acceptDirectedOffer(SELLER, id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR);
 
   it('escrows NOTHING at offer time: the seller keeps the item until acceptance', async () => {
     // This is the whole reason an offer is not a listing. If proposing escrowed,
@@ -1928,18 +1931,30 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     expect(bagsOf(h, SELLER_CHAR)).toHaveLength(before);
   });
 
-  it('refuses when the named recipient has no verified wallet', async () => {
-    // The refusal the seller's window turns into "that player must connect a
-    // wallet", so it must be its own reason and not a generic wallet_required.
+  it('refuses when the SELLER has no wallet to be paid into', async () => {
+    // The refusal the buyer's window turns into "that player must connect a
+    // wallet", so it must be its own reason and not a generic wallet_required
+    // (which means YOUR wallet and is actionable by a different person).
+    const h = stocked();
+    h.wallets.delete(SELLER);
+    expect(await h.service.createDirectedOffer(offerArgs())).toEqual({
+      ok: false,
+      reason: 'recipient_wallet_required',
+    });
+  });
+
+  it('refuses when the BUYER has no wallet to pay from', async () => {
     const h = stocked();
     h.wallets.delete(BUYER_A);
-    const res = await h.service.createDirectedOffer(offerArgs());
-    expect(res).toEqual({ ok: false, reason: 'recipient_wallet_required' });
+    expect(await h.service.createDirectedOffer(offerArgs())).toEqual({
+      ok: false,
+      reason: 'wallet_required',
+    });
   });
 
   it('refuses an offer addressed to yourself', async () => {
     const h = stocked();
-    const res = await h.service.createDirectedOffer(offerArgs({ buyerCharacterName: 'Selara' }));
+    const res = await h.service.createDirectedOffer(offerArgs({ sellerCharacterName: 'Aldan' }));
     expect(res).toEqual({ ok: false, reason: 'self_offer' });
   });
 
@@ -1948,7 +1963,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
     const before = bagsOf(h, SELLER_CHAR).length;
-    const accepted = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    const accepted = await acceptWith(h, offer.offer.id);
     if (!accepted.ok) throw new Error(`accept refused: ${(accepted as { reason: string }).reason}`);
     expect(bagsOf(h, SELLER_CHAR), 'the copy left the bags').toHaveLength(before - 1);
     expect(accepted.listing.directedBuyerAccount).toBe(BUYER_A);
@@ -1961,7 +1976,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const h = stocked();
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
-    const res = await h.service.acceptDirectedOffer(BUYER_B, offer.offer.id);
+    const res = await h.service.acceptDirectedOffer(BUYER_B, offer.offer.id, { index: 0, itemId: EPIC_ITEM }, CHAR_B);
     expect(res).toEqual({ ok: false, reason: 'not_found' });
     expect(bagsOf(h, SELLER_CHAR), 'a refused accept escrows nothing').toHaveLength(2);
   });
@@ -1977,8 +1992,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
     const [first, second] = await Promise.all([
-      h.service.acceptDirectedOffer(BUYER_A, offer.offer.id),
-      h.service.acceptDirectedOffer(BUYER_A, offer.offer.id),
+      acceptWith(h, offer.offer.id),
+      acceptWith(h, offer.offer.id),
     ]);
     expect([first.ok, second.ok].filter(Boolean), 'exactly one accept wins').toHaveLength(1);
     expect(bagsOf(h, SELLER_CHAR), 'exactly one copy escrowed').toHaveLength(1);
@@ -1988,8 +2003,8 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const h = stocked();
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
-    expect((await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id)).ok).toBe(true);
-    expect(await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id)).toEqual({
+    expect((await acceptWith(h, offer.offer.id)).ok).toBe(true);
+    expect(await acceptWith(h, offer.offer.id)).toEqual({
       ok: false,
       reason: 'not_pending',
     });
@@ -2002,11 +2017,11 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
     h.db.failNextEscrow = 'lease_lost';
-    const failed = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    const failed = await acceptWith(h, offer.offer.id);
     expect(failed.ok).toBe(false);
     expect(bagsOf(h, SELLER_CHAR), 'the copy came back').toHaveLength(2);
     // Still pending, so the buyer can simply try again.
-    const retried = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    const retried = await acceptWith(h, offer.offer.id);
     expect(retried.ok, 'the reopened offer accepts on retry').toBe(true);
   });
 
@@ -2015,31 +2030,31 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
     h.setNow(offer.offer.expiresAtMs);
-    const res = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    const res = await acceptWith(h, offer.offer.id);
     expect(res).toEqual({ ok: false, reason: 'offer_expired' });
     expect(bagsOf(h, SELLER_CHAR)).toHaveLength(2);
   });
 
-  it('lets the buyer decline and the seller withdraw, but not the reverse', async () => {
+  it('lets the seller decline and the buyer withdraw, but not the reverse', async () => {
     const h = stocked();
     const a = await h.service.createDirectedOffer(offerArgs());
-    const b = await h.service.createDirectedOffer(
-      offerArgs({ itemRef: { index: 1, itemId: EPIC_ITEM } }),
-    );
+    const b = await h.service.createDirectedOffer(offerArgs({ usdCents: 6000 }));
     if (!a.ok || !b.ok) throw new Error('offer refused');
-    // Wrong actor for each verb reads as not_found, same anti-enumeration shape.
-    expect(await h.service.resolveDirectedOffer(SELLER, a.offer.id, 'decline')).toEqual({
-      ok: false,
-      reason: 'not_found',
-    });
-    expect(await h.service.resolveDirectedOffer(BUYER_A, b.offer.id, 'withdraw')).toEqual({
-      ok: false,
-      reason: 'not_found',
-    });
+    // The verbs belong to opposite sides: the SELLER declines an offer made to
+    // them, the BUYER withdraws one they made. Using the other side's verb reads
+    // as not_found, the same anti-enumeration shape as everything else here.
     expect(await h.service.resolveDirectedOffer(BUYER_A, a.offer.id, 'decline')).toEqual({
-      ok: true,
+      ok: false,
+      reason: 'not_found',
     });
     expect(await h.service.resolveDirectedOffer(SELLER, b.offer.id, 'withdraw')).toEqual({
+      ok: false,
+      reason: 'not_found',
+    });
+    expect(await h.service.resolveDirectedOffer(SELLER, a.offer.id, 'decline')).toEqual({
+      ok: true,
+    });
+    expect(await h.service.resolveDirectedOffer(BUYER_A, b.offer.id, 'withdraw')).toEqual({
       ok: true,
     });
     // Neither verb touches custody.
@@ -2057,17 +2072,21 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
     return h;
   }
 
-  /** Offer -> accept -> the buyer holds a live settlement they must pay. */
+  /** Buyer offers -> seller accepts with an item -> the buyer owes payment. */
   async function acceptedOffer(h: Harness): Promise<WocListingRow> {
     const offer = await h.service.createDirectedOffer({
-      account: SELLER,
-      characterId: SELLER_CHAR,
-      itemRef: { index: 0, itemId: EPIC_ITEM },
-      buyerCharacterName: 'Aldan',
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
       usdCents: 5000,
     });
     if (!offer.ok) throw new Error('offer refused');
-    const accepted = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id);
+    const accepted = await h.service.acceptDirectedOffer(
+      SELLER,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
     if (!accepted.ok) throw new Error('accept refused');
     return accepted.listing;
   }
@@ -2189,8 +2208,7 @@ describe('the trade window asks whether a counterparty can be paid in $WOC', () 
     const res = await h.service.createDirectedOffer({
       account: SELLER,
       characterId: SELLER_CHAR,
-      itemRef: { index: 0, itemId: EPIC_ITEM },
-      buyerCharacterName: 'Selara Alt',
+      sellerCharacterName: 'Selara Alt',
       usdCents: 5000,
     });
     expect(res).toEqual({ ok: false, reason: 'self_offer' });

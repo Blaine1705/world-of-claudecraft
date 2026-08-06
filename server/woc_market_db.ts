@@ -249,17 +249,22 @@ CREATE TABLE IF NOT EXISTS woc_market_terms (
   accepted_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- A directed OFFER: the seller's proposed p2p sale, before the buyer agrees.
+-- A directed OFFER: the BUYER's proposed p2p purchase, before the seller agrees.
+--
+-- The buyer opens the deal by naming a price in the trade window, exactly the
+-- way they would push gold across, and the seller answers by staging the goods.
+-- So the offer carries a price and NO item: item_ref and item_id stay null
+-- until acceptance, when the seller names the copy they are parting with.
 --
 -- This precedes the listing rather than being one, because escrow happens at
--- mutual acceptance (docs/prd/woc/p2p-woc-trade.md): escrowing at offer time
--- would let anyone lock a chosen player's item by proposing deals they never
--- intend to complete. Accepting is what creates the directed listing and takes
--- the item into custody, and from there the ordinary buy-now settlement runs.
+-- mutual acceptance (docs/prd/woc/p2p-woc-trade.md): escrowing earlier would
+-- let anyone lock a chosen player's goods by proposing deals they never intend
+-- to complete. Accepting is what creates the directed listing and takes the
+-- item into custody, and from there the ordinary buy-now settlement runs.
 --
--- The item is referenced, NOT held: item_ref carries the same {index, itemId,
--- expectInstance} an extraction takes, so acceptance re-validates against the
--- live bags and a copy that moved in the meantime refuses as a stale copy.
+-- The item is REFERENCED, not held: item_ref carries the same {index, itemId,
+-- expectInstance} an extraction takes, captured at acceptance and validated in
+-- the same call, so a copy that moved refuses as a stale copy.
 CREATE TABLE IF NOT EXISTS woc_market_directed_offers (
   id BIGSERIAL PRIMARY KEY,
   realm TEXT NOT NULL,
@@ -269,8 +274,9 @@ CREATE TABLE IF NOT EXISTS woc_market_directed_offers (
   seller_name TEXT NOT NULL,
   buyer_account INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
   buyer_name TEXT NOT NULL,
-  item_ref JSONB NOT NULL CHECK (jsonb_typeof(item_ref) = 'object'),
-  item_id TEXT NOT NULL,
+  -- Null until the seller accepts and names the copy (see the header).
+  item_ref JSONB CHECK (item_ref IS NULL OR jsonb_typeof(item_ref) = 'object'),
+  item_id TEXT,
   usd_cents INT NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending', 'accepted', 'declined', 'withdrawn', 'expired')),
@@ -296,6 +302,11 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_due
 CREATE INDEX IF NOT EXISTS woc_market_offers_resolved_updated
   ON woc_market_directed_offers(updated_at)
   WHERE status <> 'pending';
+-- The offer inverted after the table first shipped (the buyer now opens the
+-- deal, so the item is unknown until acceptance). Dropping the NOT NULL is
+-- additive and idempotent; a pre-existing row keeps its item.
+ALTER TABLE woc_market_directed_offers ALTER COLUMN item_ref DROP NOT NULL;
+ALTER TABLE woc_market_directed_offers ALTER COLUMN item_id DROP NOT NULL;
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
@@ -372,8 +383,8 @@ function toOffer(row: Row): WocDirectedOfferRow {
     sellerName: row.seller_name,
     buyerAccount: row.buyer_account,
     buyerName: row.buyer_name,
-    itemRef: row.item_ref as ExtractRef,
-    itemId: row.item_id,
+    itemRef: (row.item_ref ?? null) as ExtractRef | null,
+    itemId: row.item_id ?? null,
     usdCents: row.usd_cents,
     status: row.status as WocDirectedOfferStatus,
     listingId: row.listing_id === null ? null : Number(row.listing_id),
@@ -653,16 +664,14 @@ export class PgWocMarketDb implements WocMarketDb {
     sellerName: string;
     buyerAccount: number;
     buyerName: string;
-    itemRef: ExtractRef;
-    itemId: string;
     usdCents: number;
     expiresAtMs: number;
   }): Promise<WocDirectedOfferRow> {
     const res = await this.pool.query(
       `INSERT INTO woc_market_directed_offers (
          realm, seller_account, seller_character, seller_name,
-         buyer_account, buyer_name, item_ref, item_id, usd_cents, expires_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, to_timestamp($10 / 1000.0))
+         buyer_account, buyer_name, usd_cents, expires_at
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, to_timestamp($8 / 1000.0))
        RETURNING ${OFFER_COLS}`,
       [
         offer.realm,
@@ -671,8 +680,6 @@ export class PgWocMarketDb implements WocMarketDb {
         offer.sellerName,
         offer.buyerAccount,
         offer.buyerName,
-        JSON.stringify(offer.itemRef),
-        offer.itemId,
         offer.usdCents,
         offer.expiresAtMs,
       ],

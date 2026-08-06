@@ -51,8 +51,8 @@ export type WocArmBlock =
  * button, and had nothing to act on.
  */
 export type WocSendHint =
-  | 'stage_item' // your own side is empty (you are the one selling)
-  | 'no_eligible' // you staged something, but none of it may be sold for $WOC
+  | 'clear_your_items' // you are BUYING, so your own side must be empty
+  | 'await_their_items' // they have staged nothing eligible to buy yet
   | 'enter_price'
   | 'gold_offered';
 
@@ -60,8 +60,11 @@ export interface WocTradeInput {
   marketEnabled: boolean;
   selfWalletVerified: boolean;
   partner: WocTradePartner | null;
-  /** The items the seller has staged in the trade window. */
+  /** YOUR own staged items. Offering $WOC means buying, so this must be empty:
+   *  items go one way and $WOC the other. */
   staged: readonly InvSlot[];
+  /** What the OTHER player has staged, which is what you are paying for. */
+  theirStaged: readonly InvSlot[];
   items: Readonly<Record<string, ItemDef>>;
   mode: WocTradeMode;
   /** The USD the seller typed, in cents. Null when the field is empty. */
@@ -115,8 +118,8 @@ const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
 };
 
 const SEND_HINT_KEYS: Record<WocSendHint, TranslationKey> = {
-  stage_item: 'hudChrome.trade.woc.hintStageItem',
-  no_eligible: 'hudChrome.trade.woc.hintNoEligible',
+  clear_your_items: 'hudChrome.trade.woc.hintClearYourItems',
+  await_their_items: 'hudChrome.trade.woc.hintAwaitTheirItems',
   enter_price: 'hudChrome.trade.woc.hintEnterPrice',
   gold_offered: 'hudChrome.trade.woc.hintGoldOffered',
 };
@@ -142,8 +145,9 @@ export function wocTradableSlot(slot: InvSlot, items: Readonly<Record<string, It
 
 /** The trade window's $WOC arm, as a function of its inputs. */
 export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
-  const eligible = input.staged.filter((s) => wocTradableSlot(s, input.items));
-  const ineligible = input.staged.filter((s) => !wocTradableSlot(s, input.items));
+  // Eligibility is about what you are BUYING, so it reads the other side.
+  const eligible = input.theirStaged.filter((s) => wocTradableSlot(s, input.items));
+  const ineligible = input.theirStaged.filter((s) => !wocTradableSlot(s, input.items));
 
   // Order matters, and it is "what can this player act on". A missing exchange
   // is nobody's fault; your own wallet is yours to fix; theirs is the message
@@ -167,12 +171,14 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
 
   // Ordered the way a seller does the work: pick the item, then price it. Gold
   // comes first because it makes the whole arm unusable rather than incomplete.
+  // Ordered the way a buyer hits them: clear your own side, wait for goods, then
+  // price them. Gold comes first because it makes the arm unusable outright.
   const hint: WocSendHint | null = input.goldOffered
     ? 'gold_offered'
-    : input.staged.length === 0
-      ? 'stage_item'
+    : input.staged.length > 0
+      ? 'clear_your_items'
       : eligible.length === 0
-        ? 'no_eligible'
+        ? 'await_their_items'
         : input.usdCents === null || input.usdCents <= 0
           ? 'enter_price'
           : null;
@@ -191,7 +197,10 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // guarantee is elsewhere and stronger: a $WOC deal is a directed listing,
     // which has no copper field at all, so no reachable state carries both.
     goldDisabled: wocMode,
-    wocDisabled: !offerable || input.goldOffered,
+    // Holding items means you are the SELLER in this trade, so the $WOC tab is
+    // not yours to use: the requester's rule that the button is disabled once
+    // you have an item offered.
+    wocDisabled: !offerable || input.goldOffered || input.staged.length > 0,
     tokens: wocMode ? input.tokens : null,
     split: wocMode ? input.split : null,
     canSend: wocMode && hint === null,

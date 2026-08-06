@@ -13087,7 +13087,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '$WOC 금액은 미리 보기이며 고정 가격이 아닙니다. 정확한 수량은 구매자가 결제할 때 새 견적으로 정해집니다.',
   'hudChrome.trade.woc.feeLine': '거래소 수수료 {fee}',
   'hudChrome.trade.woc.netLine': '받는 금액 {net}',
-  'hudChrome.trade.woc.sendOffer': '$WOC 제안 보내기',
   'hudChrome.trade.woc.offerSent':
     '제안을 보냈습니다. {name} 님이 수락하지 않으면 10분 후 만료됩니다.',
   'hudChrome.trade.woc.notInstant':
@@ -13097,8 +13096,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.blockPartnerUnknown': '해당 플레이어가 $WOC를 받을 수 있는지 확인하는 중…',
   'hudChrome.trade.woc.blockRecipientNoWallet':
     '해당 플레이어가 $WOC 결제를 받으려면 지갑을 연결해야 합니다.',
-  'hudChrome.trade.woc.hintStageItem': '판매할 아이템을 내 거래창에 올려주세요.',
-  'hudChrome.trade.woc.hintNoEligible': '내가 올린 아이템 중 $WOC로 판매할 수 있는 것이 없습니다.',
+  'hudChrome.trade.woc.hintClearYourItems': '내 아이템을 내려주세요. $WOC 제안은 상대가 파는 물건을 사는 것입니다.',
+  'hudChrome.trade.woc.hintAwaitTheirItems': '상대가 $WOC로 판매 가능한 물건을 올리기를 기다리는 중입니다.',
+  'hudChrome.trade.woc.sendOffer': '$WOC 제안',
+  'hudChrome.trade.woc.incomingAccept': '{name} 님이 당신의 아이템에 {price}을(를) 제안했습니다.',
   'hudChrome.trade.woc.hintEnterPrice': 'USD 가격을 입력하세요.',
   'hudChrome.trade.woc.hintGoldOffered': '먼저 골드 제안을 취소하세요. 거래는 골드 또는 $WOC 중 하나만 가능합니다.',
   'hudChrome.trade.woc.ineligibleNote': '올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.',

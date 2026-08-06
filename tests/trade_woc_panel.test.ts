@@ -7,6 +7,7 @@
 // the price input, so a seller's caret survives every estimate that lands while
 // they are still typing.
 
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import {
@@ -28,7 +29,8 @@ const slot = (id: string): InvSlot => ({ itemId: id, count: 1 });
 
 function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
   return {
-    staged: [slot(EPIC.id)],
+    staged: [],
+    theirStaged: [slot(EPIC.id)],
     goldCopper: 0,
     items: TABLE,
     marketEnabled: true,
@@ -195,12 +197,35 @@ describe('what the arm reports back', () => {
 describe('a disabled send button carries its reason in the DOM', () => {
   it('renders the hint beside the button and clears it when sendable', () => {
     // The shipped defect: an empty side gave a dead button and no text at all.
-    const blocked = paint(deps({ staged: [] }));
+    const blocked = paint(deps({ staged: [slot(EPIC.id)] }));
     expect(blocked.querySelector<HTMLButtonElement>('[data-woc-send]')?.disabled).toBe(true);
     expect(blocked.querySelector('[data-woc-hint]')?.textContent ?? '').not.toBe('');
 
     const ready = paint(deps());
     expect(ready.querySelector<HTMLButtonElement>('[data-woc-send]')?.disabled).toBe(false);
     expect(ready.querySelector('[data-woc-hint]')?.textContent).toBe('');
+  });
+});
+
+describe('the trade window actually applies the gold lock', () => {
+  // The view core decides goldDisabled, but the coin inputs live in hud.ts's own
+  // render string, which no behavioural test drives. That gap shipped the bug
+  // this pins: goldDisabled was computed and never used, so entering $WOC mode
+  // left the gold fields live. A source pin is weaker than driving the DOM, and
+  // it is what the coordinator's shape allows; it catches deletion, which is how
+  // the defect actually occurred.
+  const HUD = readFileSync('src/ui/hud.ts', 'utf8');
+
+  it('derives the attribute from the model, not a constant', () => {
+    expect(HUD).toContain("wocModel.goldDisabled ? ' disabled' : ''");
+  });
+
+  it('applies it to ALL THREE coin inputs', () => {
+    // One missed field is a full hole: a seller could still type silver.
+    for (const coin of ['g', 's', 'c']) {
+      expect(HUD, `#trade-${coin} must honour the lock`).toContain(
+        `id="trade-${coin}"\${goldAttr}`,
+      );
+    }
   });
 });

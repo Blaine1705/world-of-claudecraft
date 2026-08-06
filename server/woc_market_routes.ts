@@ -672,17 +672,13 @@ function offerView(offer: WocDirectedOfferRow, viewer: number | null) {
 }
 
 async function createOfferHandler(ctx: Ctx): Promise<void> {
+  // The BUYER opens the deal: a price named to one seller, with no item. The
+  // goods arrive when that seller accepts.
   const body = bodyOf(ctx);
-  const expectInstance = optionalInstance(body.expectInstance);
   const out = await useService().createDirectedOffer({
     account: ctxAccountId(ctx),
     characterId: intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
-    itemRef: {
-      index: intField(body.itemIndex, 0, 10_000),
-      itemId: stringField(body.itemId, 128),
-      ...(expectInstance === undefined ? {} : { expectInstance }),
-    },
-    buyerCharacterName: stringField(body.buyerCharacterName, 64),
+    sellerCharacterName: stringField(body.sellerCharacterName, 64),
     usdCents: intField(body.usdCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),
   });
   if (!out.ok) throwRefusal(out.reason);
@@ -690,7 +686,19 @@ async function createOfferHandler(ctx: Ctx): Promise<void> {
 }
 
 async function acceptOfferHandler(ctx: Ctx): Promise<void> {
-  const out = await useService().acceptDirectedOffer(ctxAccountId(ctx), idParam(ctx));
+  // The SELLER accepts, naming the copy they are parting with.
+  const body = bodyOf(ctx);
+  const expectInstance = optionalInstance(body.expectInstance);
+  const out = await useService().acceptDirectedOffer(
+    ctxAccountId(ctx),
+    idParam(ctx),
+    {
+      index: intField(body.itemIndex, 0, 10_000),
+      itemId: stringField(body.itemId, 128),
+      ...(expectInstance === undefined ? {} : { expectInstance }),
+    },
+    intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
+  );
   if (!out.ok) throwRefusal(out.reason);
   json(ctx.res, 200, { listing: listingView(out.listing, ctxAccountId(ctx)) });
 }

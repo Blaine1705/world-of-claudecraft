@@ -18776,6 +18776,7 @@ export class Hud {
   private wocTradeDeps(otherName: string): WocTradePanelDeps {
     return {
       staged: this.stagedTrade.items,
+      theirStaged: this.sim.tradeInfo?.theirOffer.items ?? [],
       goldCopper: this.stagedTrade.copper,
       items: ITEMS,
       marketEnabled: this.wocMarketHooks !== null,
@@ -18827,14 +18828,12 @@ export class Hud {
   private async sendWocTradeOffer(otherName: string): Promise<void> {
     const hooks = this.wocMarketHooks;
     const model = wocTradeModelFrom(this.wocTradeDeps(otherName));
-    const first = model.eligible[0];
-    if (!hooks || !model.canSend || !first || this.wocTradeUsdCents === null) return;
-    const index = this.stagedTrade.items.indexOf(first);
+    if (!hooks || !model.canSend || this.wocTradeUsdCents === null) return;
+    // The buyer names a price to one seller; the goods arrive when that seller
+    // accepts, so nothing about the item travels here.
     const res = await hooks.client.createOffer({
       characterId: hooks.characterId() ?? 0,
-      itemIndex: index < 0 ? 0 : index,
-      itemId: first.itemId,
-      buyerCharacterName: otherName,
+      sellerCharacterName: otherName,
       usdCents: this.wocTradeUsdCents,
     });
     if (res.ok) {

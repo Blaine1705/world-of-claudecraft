@@ -89,7 +89,7 @@ export interface WocOfferView {
   id: number;
   sellerName: string;
   buyerName: string;
-  itemId: string;
+  itemId: string | null;
   usdCents: number;
   status: 'pending' | 'accepted' | 'declined' | 'withdrawn' | 'expired';
   listingId: number | null;
@@ -299,23 +299,25 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
+  /** The BUYER opens the deal: a price named to one seller, no item. */
   async createOffer(req: {
     characterId: number;
-    itemIndex: number;
-    itemId: string;
-    expectInstance?: unknown;
-    buyerCharacterName: string;
+    sellerCharacterName: string;
     usdCents: number;
   }): Promise<{ ok: true; offer: WocOfferView } | WocMarketFail> {
     const out = await this.request<{ offer: WocOfferView }>('POST', '/api/woc-market/offers', req);
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
-  async acceptOffer(id: number): Promise<{ ok: true; listing: WocListingView } | WocMarketFail> {
+  /** The SELLER accepts, naming the copy they are parting with. */
+  async acceptOffer(
+    id: number,
+    req: { characterId: number; itemIndex: number; itemId: string; expectInstance?: unknown },
+  ): Promise<{ ok: true; listing: WocListingView } | WocMarketFail> {
     const out = await this.request<{ listing: WocListingView }>(
       'POST',
       `/api/woc-market/offers/${Math.floor(id)}/accept`,
-      {},
+      req,
     );
     return out.ok ? { ok: true, ...out.data } : out;
   }
