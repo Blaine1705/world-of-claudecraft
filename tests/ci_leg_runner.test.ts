@@ -226,12 +226,17 @@ describe('runLeg (real subprocess)', () => {
       // Enough stdout to overflow the small tail budget below, then the
       // signature artifacts at the very end, split across the two streams
       // like a real vitest run (summary on stdout, rejection on stderr).
+      // exitCode, never process.exit(): on a loaded machine the 64 KB burst
+      // is still queued on the child's async stdout pipe, and a forced exit
+      // drops the summary write behind it, exactly the truncation defect the
+      // entry itself was fixed for (this fixture flaked that way once under
+      // a full gate before the change).
       "process.stdout.write('x'.repeat(64 * 1024));" +
       "process.stdout.write('\\n Test Files  2 passed (2)\\n      Tests  5 passed (5)\\n');" +
       "process.stderr.write('EnvironmentTeardownError: [vitest-worker]: " +
       'Closing rpc while "onUserConsoleLog" was pending' +
       "\\n');" +
-      'process.exit(1);';
+      'process.exitCode = 1;';
     const result = await runLeg({
       cmd: process.execPath,
       args: ['-e', script],
