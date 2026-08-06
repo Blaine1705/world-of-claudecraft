@@ -366,6 +366,7 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
           animations: [
             '2H_Ranged_Shoot',
             'Hunter_Shot_LongDraw',
+            'Hunter_Melee_Gut',
             'Bow_Draw_Shot',
             'Idle',
             'Walk',
@@ -407,6 +408,13 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     visual.setWeaponSkin('winterbite');
     visual.playAttack('aimed_shot');
     expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Bow_Draw_Shot');
+
+    // A melee ability (range 0) keeps its bespoke Hunter_Melee_* swing even
+    // with the same bow skin displayed: the bow substitution is a RANGED-only
+    // precedence, since a displayed bow never changes how a melee hit is
+    // thrown (second review round on PR #2958).
+    visual.playAttack('raptor_strike');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Melee_Gut');
   });
 });
 

@@ -997,13 +997,18 @@ export class CharacterVisual {
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
     const skinAttack = weaponSkinAttackClips(this.weaponSkinId);
-    // A displayed bow skin substitutes Bow_Draw_Shot for EVERY hunter attack,
-    // including per-ability overrides: the crossbow-shoulder ability poses
-    // (Hunter_Shot_Snap etc.) are authored for the class's authored crossbow
-    // and would look backwards with a bow visibly drawn. Check the skin
-    // substitution before any attackByAbility override (tests/weapon_skins.test.ts).
-    const override =
-      !skinAttack && abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
+    // A displayed bow skin substitutes Bow_Draw_Shot for the hunter's RANGED
+    // attacks, including the ranged per-ability overrides: the crossbow-
+    // shoulder ability poses (Hunter_Shot_Snap etc.) are authored for the
+    // class's authored crossbow and would look backwards with a bow visibly
+    // drawn. It must NOT substitute for melee abilities (raptor_strike,
+    // mongoose_bite, wing_clip): those play a bespoke Hunter_Melee_* swing
+    // regardless of a displayed bow, since a bow skin never changes how a
+    // melee hit is thrown. Melee overrides are identified by their
+    // Hunter_Melee_ clip-name convention (tests/weapon_skins.test.ts).
+    const rawOverride = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
+    const overrideIsMelee = rawOverride?.startsWith('Hunter_Melee_') ?? false;
+    const override = !skinAttack || overrideIsMelee ? rawOverride : undefined;
     if (override && this.action(override)) {
       this.playOneShot(override, this.def.attackTimeScale ?? 1.3);
       return;
