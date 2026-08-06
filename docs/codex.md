@@ -133,7 +133,7 @@ policy need justifies them.
 Useful validation:
 
 ```sh
-npx vitest run tests/codex_setup.test.ts tests/ai_review.test.ts tests/malware_scan.test.ts
+npx vitest run tests/codex_setup.test.ts tests/malware_scan.test.ts
 npx tsc --noEmit
 npm run gate
 ```
