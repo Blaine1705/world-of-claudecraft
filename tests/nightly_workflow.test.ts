@@ -137,8 +137,9 @@ describe('nightly gate workflow', () => {
     expect(workflow).not.toContain('I18N_RELEASE_TIER');
     // Uncached by design, and pinned because docs/qa-gate.md says so out
     // loud: the nightly is the one full replay that never restores the
-    // vitest transform cache the PR-tier shard jobs persist (Phase 4), so a
-    // cache-layer bug can never hide from it.
+    // vitest transform cache the PR-tier test jobs persist (Phase 4, plus
+    // the long-sims lane since Phase 6), so a cache-layer bug can never
+    // hide from it.
     expect(workflow).not.toContain('.experimental-vitest-cache');
   });
 
