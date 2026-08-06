@@ -486,6 +486,10 @@ export interface WocQuoteIntent {
   reference: string | null;
   /** The full transfer the buyer signs (service-built transaction). */
   transactionBase64: string | null;
+  /** Whether the buyer must sign it. False only under the service's dev chain,
+   *  whose stand-in transaction no wallet can sign. Defaults TRUE on anything
+   *  the service does not say, so a missing field can never skip a signature. */
+  signatureRequired: boolean;
   amount: WocQuoteLeg | null;
   seller: WocQuoteLeg | null;
   burn: WocQuoteLeg | null;

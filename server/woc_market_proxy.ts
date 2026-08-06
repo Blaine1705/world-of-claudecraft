@@ -118,6 +118,7 @@ const QUOTE_UNAVAILABLE: WocQuoteIntent = {
   burn: null,
   treasury: null,
   expiresAtMs: null,
+  signatureRequired: true,
   reason: 'service_unavailable',
 };
 
@@ -141,6 +142,7 @@ interface WireEstimate {
 }
 interface WireQuote {
   ok?: boolean;
+  signatureRequired?: boolean;
   reference?: string | null;
   transactionBase64?: string | null;
   amount?: WireLeg | null;
@@ -199,6 +201,9 @@ function toQuote(wire: WireQuote | null): WocQuoteIntent {
     ok: true,
     reference: wire.reference ?? null,
     transactionBase64: wire.transactionBase64 ?? null,
+    // Fail SAFE: anything other than an explicit false means sign it. A service
+    // that omits the field is not saying "no signature needed".
+    signatureRequired: wire.signatureRequired !== false,
     amount: leg(wire.amount),
     seller: leg(wire.seller),
     burn: leg(wire.burn),
@@ -371,6 +376,8 @@ export function createDevWocMarketEconomy(now: () => number = Date.now): WocMark
       ok: true,
       reference,
       transactionBase64: Buffer.from(`dev-tx:${reference}:${usdCents}`).toString('base64'),
+      // The in-memory dev economy has no chain and no signable transaction.
+      signatureRequired: false,
       amount,
       seller: split ? devLeg(Math.floor((usdCents * 90) / 100), price) : null,
       burn: split ? devLeg(Math.floor((usdCents * 3) / 100), price) : null,

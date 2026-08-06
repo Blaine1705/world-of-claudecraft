@@ -18970,17 +18970,26 @@ export class Hud {
         );
         return;
       }
-      this.log(t('hudChrome.trade.woc.paying'), '#ffd100');
       let signature: string;
-      try {
-        signature = await hooks.signAndSendTransactionBase64(quoted.quote.transactionBase64);
-      } catch (err) {
-        // The wallet bridge throws player-facing text already.
-        this.log(
-          err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.loadFailed'),
-          '#ff6b6b',
-        );
-        return;
+      if (quoted.quote.signatureRequired === false) {
+        // The service's dev chain: its stand-in transaction is not signable by
+        // any wallet, and its verifier matches on the built memo rather than on
+        // signature bytes. Handing it to a real wallet threw at atob() before
+        // the wallet could even reject it. Explicit permission only, so an
+        // absent flag still goes through the wallet.
+        signature = `devsig:${quoted.quote.reference ?? ''}`;
+      } else {
+        this.log(t('hudChrome.trade.woc.paying'), '#ffd100');
+        try {
+          signature = await hooks.signAndSendTransactionBase64(quoted.quote.transactionBase64);
+        } catch (err) {
+          // The wallet bridge throws player-facing text already.
+          this.log(
+            err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.loadFailed'),
+            '#ff6b6b',
+          );
+          return;
+        }
       }
       const done = await hooks.client.confirmSettlement(bought.settlement.id, signature);
       if (!done.ok) {
@@ -19188,7 +19197,7 @@ export class Hud {
             <h4>${esc(t('hud.trade.yourOffer'))}</h4>
             <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
             <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>${wocMoneyMine}
-              <span class="trade-coins">
+              <span class="trade-coins"${wocMoneyMine ? ' hidden' : ''}>
                 <input class="coininput" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
                 <input class="coininput" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
                 <input class="coininput" id="trade-c"${goldAttr} type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>

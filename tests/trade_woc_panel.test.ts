@@ -409,3 +409,21 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     expect(HUD).toContain('wocModel.pendingOffer.sellerAccepted');
   });
 });
+
+describe('the wallet is skipped only on explicit server permission', () => {
+  const HUD = readFileSync('src/ui/hud.ts', 'utf8');
+
+  it('requires an explicit false, so an absent flag still signs', () => {
+    // Fail-safe direction: a service that omits the field is not saying "no
+    // signature needed". A truthiness check here would skip signing whenever
+    // the field were missing, which is the one mistake that must not happen.
+    expect(HUD).toContain('quoted.quote.signatureRequired === false');
+    expect(HUD).not.toContain('!quoted.quote.signatureRequired');
+  });
+
+  it('hides the coin inputs when a $WOC amount takes the Money row', () => {
+    // Gold and $WOC are mutually exclusive, so the fields are removed rather
+    // than left greyed beside an amount in another currency.
+    expect(HUD).toContain('class="trade-coins"${wocMoneyMine');
+  });
+});

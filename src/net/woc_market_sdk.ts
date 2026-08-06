@@ -103,6 +103,10 @@ export interface WocOfferView {
 }
 
 export interface WocQuoteView {
+  /** False only when the server says no wallet signature is possible (its dev
+   *  chain). Absent is treated as TRUE by the client: a missing field must
+   *  never be read as permission to skip signing. */
+  signatureRequired?: boolean;
   reference: string | null;
   transactionBase64: string | null;
   amount: WocQuoteLegView | null;
