@@ -721,6 +721,11 @@ export class PgWocMarketDb implements WocMarketDb {
         WHERE o.realm = $1
           AND o.status IN ('pending', 'accepted')
           AND (o.buyer_account = $2 OR o.seller_account = $2)
+          -- A finished sale is history, not a live deal. Without this a
+          -- completed offer stays in both trade windows forever, showing "Paid"
+          -- and blocking the pair from starting a fresh one: the arm believes a
+          -- deal is already standing. The listing closing is what ends it.
+          AND (o.listing_id IS NULL OR l.status <> 'closed')
         ORDER BY o.created_at DESC LIMIT 50`,
       [realm, account],
     );

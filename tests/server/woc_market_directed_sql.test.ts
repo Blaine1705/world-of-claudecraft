@@ -111,11 +111,22 @@ describe('the listing-id stamp is reachable on an already-accepted offer', () =>
     // The stamp arm must not weaken the claim: it changes no status and refuses
     // once a listing is present, so it can never resurrect a resolved offer.
     const { pool, sql } = recordingPool();
-    return new PgWocMarketDb(pool)
-      .resolveDirectedOffer(REALM, 3, 'declined')
-      .then(() => {
-        const [text] = sql();
-        expect(text).toContain("status = 'pending'");
-      });
+    return new PgWocMarketDb(pool).resolveDirectedOffer(REALM, 3, 'declined').then(() => {
+      const [text] = sql();
+      expect(text).toContain("status = 'pending'");
+    });
+  });
+});
+
+describe('a finished sale stops being a live offer', () => {
+  it('excludes offers whose listing has closed', async () => {
+    // Otherwise a completed deal stays in both trade windows forever, showing
+    // "Paid" and blocking the same two players from starting a fresh one.
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).directedOffersForAccount(REALM, 7);
+    const [text] = sql();
+    expect(text).toContain("l.status <> 'closed'");
+    // And an offer with no listing yet (still under review) must survive it.
+    expect(text).toContain('o.listing_id IS NULL');
   });
 });
