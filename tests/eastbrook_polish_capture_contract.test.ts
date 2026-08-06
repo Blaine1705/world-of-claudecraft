@@ -380,10 +380,12 @@ describe('Eastbrook polish capture contract', () => {
       // src/render/renderer.ts (battleground occluder fade and ward state),
       // the renderer-integration leaf, so the composite re-mints. Re-derive
       // whenever renderer.ts changes.
-      // Re-pinned for the integrated v0.35 renderer on AAA-enhancements. The
-      // renderer-integration leaf changed, so the composite was regenerated via
+      // Re-pinned for the merge of release/v0.35.0 into AAA-enhancements: both
+      // sides moved the renderer-integration leaf (this branch's integrated v0.35
+      // renderer; the release's bounded ground-object reuse pool), so the merged
+      // tree mints a composite matching neither parent. Regenerated via
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: '86b98448f7986b5afc8737ca8aa0cb4588511ff4ca99f890fde31bfa0f15d1bd',
+      fingerprint: 'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9',
       components: {
         captureContract: {
           id: 'polish-v2',

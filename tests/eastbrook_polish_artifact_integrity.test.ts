@@ -608,6 +608,12 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
 }
 
+// FROZEN, and no longer equal to the live town fingerprint: this is the identity of
+// the tree the v2 polish captures were taken against, not a mirror of the current
+// one. It first diverged when a lockfile-only dependency bump re-minted the town
+// fingerprint to aa0df220..., which moved the live value without retaking a single
+// screenshot. Do NOT sweep this to the live value along with the neighbouring
+// literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
@@ -631,10 +637,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // Re-pinned for the integrated v0.35 renderer on AAA-enhancements. The accepted
 // captures are unchanged; only the rendererIntegration leaf, composite, and the
 // metadata file's second-order digest are re-minted on this branch.
+// Re-pinned again for the merge of release/v0.35.0 into AAA-enhancements: both
+// sides moved the rendererIntegration leaf (this branch's integrated v0.35
+// renderer; the release's bounded ground-object reuse pool), so the merged tree
+// mints literals matching neither parent. Captures adopted verbatim from the
+// release tip; swept by remint_polish_provenance.mjs on the merged tree.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'c463e5d447ae23dd0216698bc727ce93bcc9a85b3042938ae8695b5f1e527df4';
+  'dcf57f6d70ee1c8b472f8d1114d129005c2f0d051db925b8cfe506ad1f0b8c03';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '86b98448f7986b5afc8737ca8aa0cb4588511ff4ca99f890fde31bfa0f15d1bd';
+  'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1505,7 +1516,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
     // recomputed by remint_polish_provenance.mjs.
     expect(fingerprint.digest('hex')).toBe(
-      'cac6fe0ace503a359c9390f97a898ce6177f7b39676f8145a97211717f3cb389',
+      '4fd9c844d07805ba75c6749ae76ee139838d5f3f389fe2b20266671f7afb4cd0',
     );
   });
 
