@@ -5193,6 +5193,8 @@ export class Hud {
   private wocTradeTokens: number | null = null;
   private wocTradeSplit: WocTradeSplit | null = null;
   private wocTradePartner: WocTradePartner | null = null;
+  /** Whether the lookup has ANSWERED, which null alone cannot express. */
+  private wocTradePartnerResolved = false;
   /** The name the partner lookup was issued for, so it runs once per trade. */
   private wocTradePartnerFor = '';
   private wocTradeEstimateTimer: number | null = null;
@@ -18779,6 +18781,7 @@ export class Hud {
       marketEnabled: this.wocMarketHooks !== null,
       selfWalletVerified: this.wocMarketHooks?.walletLinked() === true,
       partner: this.wocTradePartner,
+      partnerResolved: this.wocTradePartnerResolved,
       mode: this.wocTradeMode,
       usdCents: this.wocTradeUsdCents,
       tokens: this.wocTradeTokens,
@@ -18851,6 +18854,7 @@ export class Hud {
         this.tradeWasOpen = false;
         this.stagedTrade = { items: [], copper: 0 };
         this.wocTradePartner = null;
+        this.wocTradePartnerResolved = false;
         this.wocTradePartnerFor = '';
         this.lastTradeSig = '';
         if ($('#bags').style.display !== 'none') this.renderBags();
@@ -18876,6 +18880,7 @@ export class Hud {
       void this.wocMarketHooks.client.tradePartner(name).then((partner) => {
         if (this.wocTradePartnerFor !== name) return; // the trade moved on
         this.wocTradePartner = partner;
+        this.wocTradePartnerResolved = true;
         this.lastTradeSig = ''; // one repaint, to show the arm or its reason
       });
     }

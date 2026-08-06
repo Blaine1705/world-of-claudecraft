@@ -497,6 +497,7 @@ export const ko_KR: EnTranslations = {
         "notInstant": "$WOC 거래는 즉시 완료되지 않습니다. 상대가 수락하면 아이템이 에스크로로 이동하며, 결제가 확인되면 전달됩니다.",
         "blockDisabled": "이 서버에서는 $WOC 거래소를 사용할 수 없습니다.",
         "blockNoWallet": "$WOC로 아이템을 판매하려면 지갑을 연결하고 인증하세요.",
+        "blockPartnerUnknown": "해당 플레이어가 $WOC를 받을 수 있는지 확인하는 중…",
         "blockRecipientNoWallet": "해당 플레이어가 $WOC 결제를 받으려면 지갑을 연결해야 합니다.",
         "blockNoEligibleItems": "올려둔 아이템 중 $WOC로 판매할 수 있는 것이 없습니다.",
         "ineligibleNote": "올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.",

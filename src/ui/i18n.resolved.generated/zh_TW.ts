@@ -497,6 +497,7 @@ export const zh_TW: EnTranslations = {
         "notInstant": "$WOC 交易並非即時完成。對方接受後你的物品將進入託管，付款驗證通過後送達對方。",
         "blockDisabled": "本伺服器未提供 $WOC 交易所。",
         "blockNoWallet": "請先綁定並驗證錢包，才能出售物品換取 $WOC。",
+        "blockPartnerUnknown": "正在檢查該玩家能否接受 $WOC…",
         "blockRecipientNoWallet": "該玩家必須先連結錢包，才能接受 $WOC 付款。",
         "blockNoEligibleItems": "暫存的物品均無法出售換取 $WOC。",
         "ineligibleNote": "有 {count} 件暫存物品無法出售換取 $WOC。",

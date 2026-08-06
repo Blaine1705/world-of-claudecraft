@@ -34,6 +34,7 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     marketEnabled: true,
     selfWalletVerified: true,
     partner: { name: 'Aldan', walletVerified: true },
+    partnerResolved: true,
     mode: 'woc',
     usdCents: 5000,
     tokens: 1234.5,

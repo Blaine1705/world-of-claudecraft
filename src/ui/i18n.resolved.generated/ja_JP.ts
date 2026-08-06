@@ -497,6 +497,7 @@ export const ja_JP: EnTranslations = {
         "notInstant": "$WOC の取引は即時ではありません。相手が承諾するとアイテムはエスクローに移り、支払いが確認され次第、相手に届きます。",
         "blockDisabled": "このレルムでは $WOC 取引所を利用できません。",
         "blockNoWallet": "$WOC でアイテムを売却するには、ウォレットを連携して認証してください。",
+        "blockPartnerUnknown": "そのプレイヤーが $WOC を受け取れるか確認しています…",
         "blockRecipientNoWallet": "そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。",
         "blockNoEligibleItems": "セットしたアイテムはいずれも $WOC で売却できません。",
         "ineligibleNote": "セットしたアイテムのうち {count} 個は $WOC で売却できません。",

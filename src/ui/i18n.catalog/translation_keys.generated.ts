@@ -9703,6 +9703,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.trade.woc.blockDisabled'
   | 'hudChrome.trade.woc.blockNoEligibleItems'
   | 'hudChrome.trade.woc.blockNoWallet'
+  | 'hudChrome.trade.woc.blockPartnerUnknown'
   | 'hudChrome.trade.woc.blockRecipientNoWallet'
   | 'hudChrome.trade.woc.decline'
   | 'hudChrome.trade.woc.equivalent'

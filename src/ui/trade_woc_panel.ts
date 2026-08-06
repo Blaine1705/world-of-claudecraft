@@ -33,6 +33,7 @@ export interface WocTradePanelDeps {
   marketEnabled: boolean;
   selfWalletVerified: boolean;
   partner: WocTradePartner | null;
+  partnerResolved: boolean;
   mode: 'gold' | 'woc';
   usdCents: number | null;
   tokens: number | null;
@@ -53,6 +54,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     marketEnabled: deps.marketEnabled,
     selfWalletVerified: deps.selfWalletVerified,
     partner: deps.partner,
+    partnerResolved: deps.partnerResolved,
     staged: deps.staged,
     items: deps.items,
     mode: deps.mode,

@@ -48,6 +48,7 @@ function input(over: Partial<Parameters<typeof buildWocTradeModel>[0]> = {}) {
     marketEnabled: true,
     selfWalletVerified: true,
     partner: PARTNER,
+    partnerResolved: true,
     staged: [slot(EPIC.id)],
     items: TABLE,
     mode: 'woc' as const,
@@ -106,8 +107,20 @@ describe('what blocks the arm, and in what order', () => {
     expect(m.blockKey).toBe('hudChrome.trade.woc.blockRecipientNoWallet');
   });
 
-  it('treats an unknown partner as unable to be paid', () => {
-    expect(buildWocTradeModel(input({ partner: null })).block).toBe('recipient_no_wallet');
+  it('does NOT accuse the other player when the lookup has not answered', () => {
+    // The bug this pins: `partner === null` means "we do not know yet" (the
+    // request is in flight, or it failed, or the server is older than this
+    // client). Rendering that as "they must connect a wallet" tells a player
+    // something false about someone else and sends them to fix a wallet that is
+    // already fine. It happened in real testing against a stale server.
+    const m = buildWocTradeModel(input({ partner: null, partnerResolved: false }));
+    expect(m.block).toBe('partner_unknown');
+    expect(m.blockKey).toBe('hudChrome.trade.woc.blockPartnerUnknown');
+  });
+
+  it('accuses only on a definite answer of no wallet', () => {
+    const m = buildWocTradeModel(input({ partner: { ...PARTNER, walletVerified: false } }));
+    expect(m.block).toBe('recipient_no_wallet');
   });
 
   it('reports no eligible items only once something is staged', () => {

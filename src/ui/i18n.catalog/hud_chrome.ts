@@ -233,6 +233,7 @@ export const hudChromeStrings = {
         'A $WOC sale is not instant. Your item moves into escrow when they accept, and reaches them once payment is verified.',
       blockDisabled: 'The $WOC Exchange is not available on this realm.',
       blockNoWallet: 'Link and verify a wallet to sell items for $WOC.',
+      blockPartnerUnknown: 'Checking whether that player can accept $WOC...',
       blockRecipientNoWallet: 'That player must connect a wallet to accept $WOC payments.',
       blockNoEligibleItems: 'None of the staged items can be sold for $WOC.',
       ineligibleNote: '{count} staged item(s) cannot be sold for $WOC.',

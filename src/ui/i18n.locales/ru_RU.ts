@@ -13255,6 +13255,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.notInstant': 'Сделка в $WOC не мгновенная. Ваш предмет уходит на депонирование, когда её принимают, и попадает к получателю после подтверждения оплаты.',
   'hudChrome.trade.woc.blockDisabled': 'Биржа $WOC недоступна на этом мире.',
   'hudChrome.trade.woc.blockNoWallet': 'Подключите и подтвердите кошелёк, чтобы продавать предметы за $WOC.',
+  'hudChrome.trade.woc.blockPartnerUnknown': 'Проверяем, может ли этот игрок принять $WOC…',
   'hudChrome.trade.woc.blockRecipientNoWallet': 'Этот игрок должен подключить кошелёк, чтобы принимать платежи в $WOC.',
   'hudChrome.trade.woc.blockNoEligibleItems': 'Ни один из выставленных предметов нельзя продать за $WOC.',
   'hudChrome.trade.woc.ineligibleNote': 'Предметов, которые нельзя продать за $WOC: {count}.',

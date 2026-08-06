@@ -13094,6 +13094,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.blockDisabled': 'このレルムでは $WOC 取引所を利用できません。',
   'hudChrome.trade.woc.blockNoWallet':
     '$WOC でアイテムを売却するには、ウォレットを連携して認証してください。',
+  'hudChrome.trade.woc.blockPartnerUnknown': 'そのプレイヤーが $WOC を受け取れるか確認しています…',
   'hudChrome.trade.woc.blockRecipientNoWallet':
     'そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。',
   'hudChrome.trade.woc.blockNoEligibleItems':

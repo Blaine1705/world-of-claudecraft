@@ -12839,6 +12839,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '$WOC 交易并非即时完成。对方接受后你的物品将进入托管，付款验证通过后送达对方。',
   'hudChrome.trade.woc.blockDisabled': '本服务器未提供 $WOC 交易所。',
   'hudChrome.trade.woc.blockNoWallet': '请先绑定并验证钱包，才能出售物品换取 $WOC。',
+  'hudChrome.trade.woc.blockPartnerUnknown': '正在检查该玩家能否接受 $WOC…',
   'hudChrome.trade.woc.blockRecipientNoWallet': '该玩家必须先连接钱包，才能接受 $WOC 付款。',
   'hudChrome.trade.woc.blockNoEligibleItems': '暂存的物品均无法出售换取 $WOC。',
   'hudChrome.trade.woc.ineligibleNote': '有 {count} 件暂存物品无法出售换取 $WOC。',

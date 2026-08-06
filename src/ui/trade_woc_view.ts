@@ -38,7 +38,8 @@ export type WocTradeMode = 'gold' | 'woc';
 export type WocArmBlock =
   | 'market_disabled' // the realm has no exchange
   | 'no_wallet' // YOUR wallet is not linked
-  | 'recipient_no_wallet' // theirs is not
+  | 'partner_unknown' // we have not learned whether THEY can be paid
+  | 'recipient_no_wallet' // we have, and they cannot
   | 'no_eligible_items'; // nothing staged that may be sold for $WOC
 
 export interface WocTradeInput {
@@ -56,6 +57,15 @@ export interface WocTradeInput {
   split: WocTradeSplit | null;
   /** True once the seller's gold offer is non-zero. */
   goldOffered: boolean;
+  /**
+   * Whether the counterparty lookup has produced an answer yet.
+   *
+   * Separate from `partner` being non-null on purpose. A null partner is
+   * ambiguous: it is both "still asking" and "asked, and there is no such
+   * character". Only the caller knows which, so it tells us, and an
+   * unanswered lookup never accuses the other player of anything.
+   */
+  partnerResolved: boolean;
 }
 
 export interface WocTradeModel {
@@ -84,6 +94,7 @@ export interface WocTradeModel {
 const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
   market_disabled: 'hudChrome.trade.woc.blockDisabled',
   no_wallet: 'hudChrome.trade.woc.blockNoWallet',
+  partner_unknown: 'hudChrome.trade.woc.blockPartnerUnknown',
   recipient_no_wallet: 'hudChrome.trade.woc.blockRecipientNoWallet',
   no_eligible_items: 'hudChrome.trade.woc.blockNoEligibleItems',
 };
@@ -120,11 +131,16 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     ? 'market_disabled'
     : !input.selfWalletVerified
       ? 'no_wallet'
-      : !input.partner?.walletVerified
-        ? 'recipient_no_wallet'
-        : eligible.length === 0 && input.staged.length > 0
-          ? 'no_eligible_items'
-          : null;
+      : // "We have not been told yet" is its OWN state, ahead of the accusation.
+        // Collapsing the two says something false about the other player on any
+        // slow, failed, or unsupported lookup.
+        !input.partnerResolved
+        ? 'partner_unknown'
+        : !input.partner?.walletVerified
+          ? 'recipient_no_wallet'
+          : eligible.length === 0 && input.staged.length > 0
+            ? 'no_eligible_items'
+            : null;
 
   const offerable = block === null;
   const wocMode = offerable && input.mode === 'woc';
