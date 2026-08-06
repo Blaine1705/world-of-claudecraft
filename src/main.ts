@@ -399,8 +399,7 @@ import {
   shouldDisconnectUnverifiedWallet,
 } from './ui/wallet_balance';
 import { buildWalletConnectionView } from './ui/wallet_connection_view';
-import { formatXp } from './ui/xp_bar';
-import type { IWorld, LeaderboardEntry } from './world_api';
+import type { IWorld } from './world_api';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -2666,7 +2665,7 @@ async function startGame(
     activateProfile: (target) =>
       activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
     resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
-    buildRenderer: (target, recycled) => {
+    buildRenderer: (_target, recycled) => {
       const next = new Renderer(world, recycled.canvas, nameplates, {
         context: recycled.context,
         initializeGfx: false,
@@ -4712,7 +4711,12 @@ async function startGame(
           applyMouseCamera: (enabled) => applySetting('mouseCamera', enabled),
           isBlocked: () => intro !== null,
         });
-        (window as any).__game = {
+        (
+          window as Window &
+            typeof globalThis & {
+              __game?: Record<string, unknown>;
+            }
+        ).__game = {
           sim: world,
           world,
           renderer,
@@ -7944,7 +7948,7 @@ async function refreshGithubLinkStatus(): Promise<void> {
   } catch (err) {
     console.error('[github] could not load status', err);
   }
-  if (!status || status.enabled !== true) {
+  if (status?.enabled !== true) {
     group.hidden = true;
     return;
   }

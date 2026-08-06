@@ -3,6 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 
 // The priest/shaman/paladin row redesign (docs/design/choice-row-quality-pass.md):
 // each proc-engine primitive proven end to end through the live content that
@@ -223,7 +224,7 @@ describe('shaman redesign', () => {
     const after = cds.get('earth_shock') ?? 0;
     // Natural decay over N ticks plus the 0.5 sec shave per landed swing.
     expect(mob.dead).toBe(false);
-    expect(before! - after).toBeGreaterThan(0.5);
+    expect(expectDefined(before) - after).toBeGreaterThan(0.5);
   });
 
   it('Undertow Promise: every 3rd Mending Waters leaves an emergency heal echo', () => {
@@ -279,7 +280,7 @@ describe('paladin redesign', () => {
       }
     }
     expect(swings).toBeGreaterThan(0);
-    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(before! - 0.5);
+    expect(p.cooldowns.get('judgement') ?? 0).toBeLessThan(expectDefined(before) - 0.5);
   });
 
   it('Deathless Ardor: a killing blow leaves 1 health, once per 180 sec', () => {

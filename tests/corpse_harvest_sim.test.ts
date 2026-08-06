@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { expectDefined } from './helpers/defined';
 
 // Mock the db layer so no Postgres is needed; only the wire encode/decode and
 // broadcast paths are under test (wireEntity round-trips plus a real GameServer
@@ -22,9 +23,8 @@ vi.mock('../server/db', () => ({
   })),
 }));
 
-import { GameServer, wireEntity } from '../server/game';
+import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
-import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import {
   HARVEST_COMPONENT_ITEMS,
@@ -48,7 +48,7 @@ import {
 import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity, WorldContent } from '../src/sim/types';
+import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
@@ -64,6 +64,60 @@ type SimInternals = {
   entities: Map<number, Entity>;
   players: Map<number, PlayerMeta>;
 };
+
+type SnapshotClient = {
+  applySnapshot(snap: unknown): void;
+};
+
+type WireClient = {
+  ws: { readyState: number; send(payload: string): void };
+};
+
+type ServerHarness = {
+  dispatchMessage(session: ClientSession, msg: unknown, raw: string, receivedAtMs: number): void;
+  routeEvents(events: SimEvent[]): void;
+};
+
+type WireEntityRecord = {
+  id?: number;
+  hcb?: number;
+  ffa?: number;
+  nm?: unknown;
+};
+
+type SnapFrame = {
+  ents: WireEntityRecord[];
+};
+
+type EventsFrame = {
+  t: 'events';
+  list: SimEvent[];
+};
+
+function clientMirror(client: ReturnType<typeof bareClient>): SnapshotClient {
+  return client as unknown as SnapshotClient;
+}
+
+function wireClient(client: ReturnType<typeof bareClient>): WireClient {
+  return client as unknown as WireClient;
+}
+
+function serverHarness(server: GameServer): ServerHarness {
+  return server as unknown as ServerHarness;
+}
+
+function asSnapFrame(snap: unknown): SnapFrame {
+  return snap as SnapFrame;
+}
+
+function isEventsFrame(frame: unknown): frame is EventsFrame {
+  return (
+    typeof frame === 'object' &&
+    frame !== null &&
+    (frame as { t?: unknown }).t === 'events' &&
+    Array.isArray((frame as { list?: unknown }).list)
+  );
+}
 
 // Harvest tests preserve the built-in spawn tables because their seed pins
 // include constructor RNG draws. Roads are unrelated and would rebuild the
@@ -87,7 +141,7 @@ function setup(seed = 11) {
   sim.tick();
 
   for (const pid of [a, b]) {
-    const e = internals.entities.get(pid)!;
+    const e = expectDefined(internals.entities.get(pid));
     e.pos = { x: 0, y: 0, z: 0 };
     e.prevPos = { x: 0, y: 0, z: 0 };
   }
@@ -107,7 +161,7 @@ function setup(seed = 11) {
 // Fill every free slot with distinct 1-per-slot gear so the next add has
 // nowhere to go (same idiom as tests/bags.test.ts fillBags, per-player).
 function fillBags(sim: Sim, internals: SimInternals, pid: number): void {
-  const m = internals.players.get(pid)!;
+  const m = expectDefined(internals.players.get(pid));
   const cap = bagCapacity(m.bags);
   const gearIds = Object.values(ITEMS)
     .filter((d) => d.kind === 'weapon' || d.kind === 'armor')
@@ -153,7 +207,7 @@ function harvestCommand(
   corpse.corpseTimer = 9999;
   corpse.respawnTimer = 9999;
   internals.entities.set(corpse.id, corpse);
-  if (opts.townFocus) internals.players.get(a)!.townFocus = { ...opts.townFocus };
+  if (opts.townFocus) expectDefined(internals.players.get(a)).townFocus = { ...opts.townFocus };
   opts.arrange?.(rig, corpse);
   sim.drainEvents();
   const before = structuredClone(mustPlayer(internals, a).inventory);
@@ -294,7 +348,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
 
   it('a dead player cannot harvest and does not consume the claim', () => {
     const { sim, internals, mob, a, b } = setup();
-    const alpha = internals.entities.get(a)!;
+    const alpha = expectDefined(internals.entities.get(a));
     alpha.dead = true;
     sim.drainEvents();
     sim.harvestCorpse(mob.id, undefined, a);
@@ -334,7 +388,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
     // is what decides, not a second component needing a free slot.
     const { sim, internals, mob, a, b } = setup();
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     // Convert one gear slot into a rough_hide stack with room for exactly 1.
     m.inventory[0] = { itemId: 'rough_hide', count: stackSizeOf(ITEMS.rough_hide) - 1 };
@@ -368,7 +422,7 @@ describe('corpse harvest: single-use, first-come (#1141)', () => {
       const { sim, internals, mob, a, b } = setup();
       const template = MOBS[UNMAPPED_TEMPLATE_ID];
       expect(template.componentTags).toEqual(UNMAPPED_TEMPLATE_TAGS);
-      for (const tag of template.componentTags!) {
+      for (const tag of expectDefined(template.componentTags)) {
         expect(HARVEST_COMPONENT_ITEMS[tag]).toBeUndefined();
       }
       const noYieldMob = createMob(7777, template, template.maxLevel, { x: 0, y: 0, z: 0 });
@@ -461,7 +515,7 @@ describe('signed Pristine specimens (#1145)', () => {
     sim.harvestCorpse(mob.id, ['hide'], a);
     // The signed jackpot landed signed: no downgrade notice fires.
     expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toHaveLength(0);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     // The regular component grants plain (fungible, unsigned), at its rolled
     // tier quantity: the specimen is now the signed jackpot, not the hide.
     const plain = meta.inventory.find((s) => s.itemId === 'rough_hide');
@@ -479,7 +533,7 @@ describe('signed Pristine specimens (#1145)', () => {
   it('a below-rare harvest grants a plain stack at its tier quantity and NO specimen (seed 3)', () => {
     const { sim, internals, a, mob } = setup(3);
     sim.harvestCorpse(mob.id, ['hide'], a);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     const slot = meta.inventory.find((s) => s.itemId === 'rough_hide');
     expect(slot).toBeDefined();
     expect(slot?.instance).toBeUndefined();
@@ -497,7 +551,7 @@ describe('signed Pristine specimens (#1145)', () => {
   it('a specimen-less family (fang) keeps the signed-component behavior at rare-or-better (seed 23)', () => {
     const { sim, internals, a, mob } = setup(30);
     sim.harvestCorpse(mob.id, ['fang'], a);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     const slot = meta.inventory.find((s) => s.itemId === 'wolf_fang');
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
@@ -516,7 +570,7 @@ describe('signed Pristine specimens (#1145)', () => {
     // roll, so the fixed grant must land as one signed stack at the full
     // rolled count, not a single unit.
     const { sim, internals, a, mob } = setup(31);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     // A fresh character's starting kit leaves the bags nearly empty (roomy,
     // not necessarily zero items): plenty of free slots for a 3-unit roll.
     expect(bagCapacity(meta.bags) - meta.inventory.length).toBeGreaterThan(3);
@@ -562,7 +616,7 @@ describe('signed Pristine specimens (#1145)', () => {
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
       sim.harvestCorpse(corpse.id, [f.focus], a);
-      const meta = internals.players.get(a)!;
+      const meta = expectDefined(internals.players.get(a));
       const plain = meta.inventory.find((s) => s.itemId === f.plain);
       expect(plain, `${f.focus} plain`).toBeDefined();
       expect(plain?.instance, `${f.focus} plain stays unsigned`).toBeUndefined();
@@ -582,7 +636,7 @@ describe('signed Pristine specimens (#1145)', () => {
     corpse.respawnTimer = 9999;
     internals.entities.set(corpse.id, corpse);
     sim.harvestCorpse(corpse.id, ['cloth'], a);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     const slot = meta.inventory.find((s) => s.itemId === 'homespun_cloth');
     expect(slot).toBeDefined();
     expect(slot?.instance?.signer).toBe('Alpha');
@@ -601,7 +655,7 @@ describe('signed Pristine specimens (#1145)', () => {
     // specimen arm.
     const { sim, internals, a, mob } = setup(30);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(cap);
@@ -628,7 +682,7 @@ describe('signed Pristine specimens (#1145)', () => {
     // overflowing, and the plain component still arrives.
     const { sim, internals, a, mob } = setup(30);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
     expect(m.inventory.length).toBe(cap);
@@ -659,13 +713,13 @@ describe('signed Pristine specimens (#1145)', () => {
     const seed = 23;
     const probe = setup(seed);
     probe.sim.harvestCorpse(probe.mob.id, undefined, probe.a);
-    const pm = probe.internals.players.get(probe.a)!;
+    const pm = expectDefined(probe.internals.players.get(probe.a));
     expect(pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)).toBe(true);
     expect(pm.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(true);
 
     const { sim, internals, a, mob } = setup(seed);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     m.inventory[1] = { itemId: 'rough_hide', count: 1 };
@@ -726,7 +780,7 @@ describe('two-specimen-family harvest capacity contract', () => {
     const { sim, internals, a } = setup(6);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory.length = cap - 4; // four free slots, no hide/tusk/meat stacks
     sim.harvestCorpse(boar.id, undefined, a);
@@ -751,7 +805,7 @@ describe('two-specimen-family harvest capacity contract', () => {
     const { sim, internals, a } = setup(6);
     const boar = addBoarCorpse(internals);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory.length = cap - 3; // exactly the three reserved plain-stack slots
     sim.harvestCorpse(boar.id, undefined, a);
@@ -800,11 +854,11 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     for (let seed = 1; seed <= 200; seed++) {
       const probe = setup(seed);
       probe.sim.harvestCorpse(probe.mob.id, ['fang'], probe.a);
-      const pm = probe.internals.players.get(probe.a)!;
+      const pm = expectDefined(probe.internals.players.get(probe.a));
       if (!pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)) continue;
       const { sim, internals, a, mob } = setup(seed);
       fillBags(sim, internals, a);
-      const m = internals.players.get(a)!;
+      const m = expectDefined(internals.players.get(a));
       const cap = bagCapacity(m.bags);
       m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
       expect(m.inventory.length).toBe(cap);
@@ -831,7 +885,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     // far more than the 3-unit roll).
     const { sim, internals, a, mob } = setup(31);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     m.inventory[1] = { itemId: 'wolf_fang', count: 3, instance: { signer: 'Alpha' } };
@@ -859,7 +913,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     // plain stack, and emit the mark-lost downgrade, never overflow.
     const { sim, internals, a, mob } = setup(30);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     const stack = stackSizeOf(ITEMS.wolf_fang);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
@@ -885,7 +939,7 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     // (the pre-merge contract truncated it outright, lost: 'find').
     const { sim, internals, a, mob } = setup(30);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     m.inventory[0] = { itemId: 'rough_hide', count: 1 };
     m.inventory[1] = { itemId: 'pristine_hide', count: 2, instance: { signer: 'Alpha' } };
@@ -953,7 +1007,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
 
     const full = setup(31);
     fillBags(full.sim, full.internals, full.a);
-    const m = full.internals.players.get(full.a)!;
+    const m = expectDefined(full.internals.players.get(full.a));
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
     expect(m.inventory.length).toBe(bagCapacity(m.bags));
     full.sim.harvestCorpse(full.mob.id, ['fang'], full.a);
@@ -972,7 +1026,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // not three: the counted grant must not cost the player bag space that a
     // plain grant of the same size would not.
     const { sim, internals, a, mob } = setup(31);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const before = m.inventory.length;
     sim.drainEvents();
     sim.harvestCorpse(mob.id, ['fang'], a);
@@ -1031,7 +1085,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // below.
     const { sim, internals, a, mob } = setup(31);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     const stack = stackSizeOf(ITEMS.wolf_fang);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
@@ -1057,7 +1111,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // signatures they earned, which no other case in the suite can see.
     const { sim, internals, a, mob } = setup(31);
     fillBags(sim, internals, a);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     const stack = stackSizeOf(ITEMS.wolf_fang);
     m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
@@ -1088,7 +1142,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // WOULD have saved the jackpot and the trade is still taken.
     const stack = stackSizeOf(ITEMS.wolf_fang);
     const { sim, internals, a, mob } = setup(50);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     // Exactly ONE free slot, and a same-signer fang stack one unit short of
     // the roll, so the signed grant merges what it can and spills.
@@ -1122,7 +1176,7 @@ describe('a signed specimen-less grant carries its rolled quantity (#2473)', () 
     // the losing side too, so the trade cannot be mistaken for an oversight.
     const stack = stackSizeOf(ITEMS.wolf_fang);
     const { sim, internals, a, mob } = setup(50);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     const cap = bagCapacity(m.bags);
     fillBags(sim, internals, a);
     m.inventory[0] = { itemId: 'rough_hide', count: 14 };
@@ -1310,7 +1364,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
     expect(result[0].yields.find((y) => y.itemId === 'rough_hide')?.qty).toBe(4);
     expect(sim.countItem('rough_hide', a)).toBe(4);
     expect(sim.countItem('pristine_hide', a)).toBe(1);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     expect(meta.inventory.filter((s) => s.itemId === 'pristine_hide')).toHaveLength(1);
     // Nothing from the tags the caller never named.
     expect(sim.countItem('game_meat', a)).toBe(0);
@@ -1399,7 +1453,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       corpse.corpseTimer = 9999;
       corpse.respawnTimer = 9999;
       internals.entities.set(corpse.id, corpse);
-      const m = internals.players.get(a)!;
+      const m = expectDefined(internals.players.get(a));
       fillBags(sim, internals, a);
       // Zero free slots, and stack room for exactly one family's top roll.
       m.inventory[0] = { itemId: 'rough_hide', count: stack - 6 };
@@ -1449,7 +1503,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       {
         label: 'too far away',
         arrange: ({ internals, a, mob }) => {
-          internals.entities.get(a)!.pos = { x: 500, y: 0, z: 0 };
+          expectDefined(internals.entities.get(a)).pos = { x: 500, y: 0, z: 0 };
           return mob.id;
         },
       },
@@ -1463,7 +1517,7 @@ describe('a repeated component tag harvests the family once (#2474)', () => {
       {
         label: 'the harvester is dead',
         arrange: ({ internals, a, mob }) => {
-          internals.entities.get(a)!.dead = true;
+          expectDefined(internals.entities.get(a)).dead = true;
           return mob.id;
         },
       },
@@ -1828,7 +1882,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
   // since a second family (wolf_fang) needs a free slot and there is none.
   const gateRig = (components: string[], room: number) => {
     const { sim, internals, a, mob } = setup(31);
-    const m = internals.players.get(a)!;
+    const m = expectDefined(internals.players.get(a));
     fillBags(sim, internals, a);
     m.inventory[0] = { itemId: 'rough_hide', count: HIDE_STACK - room };
     sim.drainEvents();
@@ -1947,7 +2001,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       {
         label: 'too far away',
         arrange: ({ internals, a, mob }) => {
-          internals.entities.get(a)!.pos = { x: 500, y: 0, z: 0 };
+          expectDefined(internals.entities.get(a)).pos = { x: 500, y: 0, z: 0 };
           return mob.id;
         },
       },
@@ -1962,7 +2016,7 @@ describe('an invalid component tag is ignored entirely (#2504)', () => {
       {
         label: 'the harvester is dead',
         arrange: ({ internals, a, mob }) => {
-          internals.entities.get(a)!.dead = true;
+          expectDefined(internals.entities.get(a)).dead = true;
           return mob.id;
         },
       },
@@ -2115,7 +2169,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     const internals = sim as unknown as SimInternals;
     const a = sim.addPlayer('warrior', 'Alpha');
     sim.tick();
-    const e = internals.entities.get(a)!;
+    const e = expectDefined(internals.entities.get(a));
     e.pos = { x: 0, y: 0, z: 0 };
     e.prevPos = { x: 0, y: 0, z: 0 };
     const template = MOBS[templateId];
@@ -2176,7 +2230,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
 
   it('bare hands still earn the signed specimen on real content: tier-1 families never gate (seed 23)', () => {
     const { sim, internals, a, mob } = setup(30);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     // Genuinely bare-handed: the starting kit resolves to the tier-1 floor.
     expect(bestOwnedAnyGatherToolTier(meta.inventory, ITEMS)).toBe(1);
     sim.drainEvents();
@@ -2229,7 +2283,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // jackpot, no signed instance anywhere.
     expect(sim.countItem('rough_hide', a)).toBe(basePlain);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     expect(meta.inventory.some((s) => s.itemId === 'rough_hide' && s.instance)).toBe(false);
     // Event shape pin: surface corpse carries NO professionId (the contract:
     // professionId is present exactly when surface === 'node').
@@ -2246,7 +2300,8 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     sim.addItem('mithril_mining_pick', 1, a); // any-profession owned-best covers tier 2
     // The tier-3 pick must wield (R22): the corpse arm scans the wield-aware
     // any-profession best, so an unearned pick would contribute nothing.
-    internals.players.get(a)!.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY;
+    expectDefined(internals.players.get(a)).gatheringProficiency.mining =
+      TIER3_TOOL_WIELD_PROFICIENCY;
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
@@ -2260,7 +2315,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // Same two draws as the bare-handed arms: the success branch adds none.
     expect(draws).toBe(2);
     expect(sim.drainEvents().some((e) => e.type === 'gatherDenied')).toBe(false);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe('Alpha');
     expect(sim.countItem('rough_hide', a)).toBe(6);
@@ -2276,7 +2331,8 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // would work the family.
     const { sim, internals, a, mob } = soloRig(15);
     sim.addItem('mithril_mining_pick', 1, a);
-    internals.players.get(a)!.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY - 1;
+    expectDefined(internals.players.get(a)).gatheringProficiency.mining =
+      TIER3_TOOL_WIELD_PROFICIENCY - 1;
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
@@ -2294,7 +2350,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // the bags: plain quantity, no jackpot, no signature, corpse still spent.
     expect(sim.countItem('pristine_hide', a)).toBe(0);
     expect(sim.countItem('rough_hide', a)).toBe(6);
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     expect(meta.inventory.some((s) => s.instance?.signer)).toBe(false);
     expect(mob.harvestClaimedBy).toBe(a);
     // The R22 wield split: one event, carrying the pick's OWN requirement
@@ -2322,7 +2378,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     // quest-camp pass (#2887) shifted it once more.
     const base = soloRig(23);
     base.sim.harvestCorpse(base.mob.id, undefined, base.a);
-    const baseMeta = base.internals.players.get(base.a)!;
+    const baseMeta = expectDefined(base.internals.players.get(base.a));
     expect(base.sim.countItem('pristine_hide', base.a)).toBe(1);
     expect(
       baseMeta.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer === 'Alpha'),
@@ -2338,7 +2394,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     const denied = sim.drainEvents().filter((e) => e.type === 'gatherDenied');
     expect(denied).toEqual([{ type: 'gatherDenied', pid: a, surface: 'corpse', requiredTier: 2 }]);
     // Both families downgraded: plain yields land, nothing is signed.
-    const meta = internals.players.get(a)!;
+    const meta = expectDefined(internals.players.get(a));
     expect(sim.countItem('rough_hide', a)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('wolf_fang', a)).toBeGreaterThanOrEqual(1);
     expect(sim.countItem('pristine_hide', a)).toBe(0);
@@ -2393,8 +2449,8 @@ describe('corpse harvest claim over the wire (online picker parity)', () => {
 
     // Bravo's client sees Alpha's claim mirrored, and the picker refuses it.
     const client = bareClient(b);
-    (client as any).applySnapshot({ t: 'snap', ents: [w] });
-    const mirrored = client.entities.get(mob.id)!;
+    clientMirror(client).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = expectDefined(client.entities.get(mob.id));
     expect(mirrored.harvestClaimedBy).toBe(a);
     expect(corpseLootAvailability(mirrored, b).harvestable).toBe(false);
   });
@@ -2406,8 +2462,8 @@ describe('corpse harvest claim over the wire (online picker parity)', () => {
     expect(w).not.toHaveProperty('hcb');
 
     const client = bareClient(b);
-    (client as any).applySnapshot({ t: 'snap', ents: [w] });
-    const mirrored = client.entities.get(mob.id)!;
+    clientMirror(client).applySnapshot({ t: 'snap', ents: [w] });
+    const mirrored = expectDefined(client.entities.get(mob.id));
     expect(mirrored.harvestClaimedBy).toBeNull();
     expect(corpseLootAvailability(mirrored, b).harvestable).toBe(true);
   });
@@ -2428,7 +2484,7 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     const sb = joinServer(server, fcB, 82, 'Bravo');
     const internals = server.sim as unknown as SimInternals;
     for (const pid of [sa.pid, sb.pid]) {
-      const e = internals.entities.get(pid)!;
+      const e = expectDefined(internals.entities.get(pid));
       e.pos = { x: 0, y: 0, z: 0 };
       e.prevPos = { x: 0, y: 0, z: 0 };
     }
@@ -2455,8 +2511,8 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     // First sight: Bravo's client mirrors the unclaimed corpse via a full record.
     broadcast(server);
     const client = bareClient(sb.pid);
-    (client as any).applySnapshot(lastSnap(fcB.sent));
-    const first = client.entities.get(mob.id)!;
+    clientMirror(client).applySnapshot(lastSnap(fcB.sent));
+    const first = expectDefined(client.entities.get(mob.id));
     expect(first.harvestClaimedBy).toBeNull();
     expect(corpseLootAvailability(first, sb.pid).harvestable).toBe(true);
 
@@ -2467,13 +2523,13 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     expect(mob.harvestClaimedBy).toBe(sa.pid);
     server.sim.tick(); // advance past the first broadcast's tick so the update is due
     broadcast(server);
-    const snap = lastSnap(fcB.sent);
-    const rec = snap.ents.find((e: any) => e.id === mob.id);
+    const snap = asSnapFrame(lastSnap(fcB.sent));
+    const rec = expectDefined(snap.ents.find((e) => e.id === mob.id));
     expect(rec.hcb).toBe(sa.pid);
     expect(rec).not.toHaveProperty('nm'); // lite record: no identity resend
 
-    (client as any).applySnapshot(snap);
-    const mirrored = client.entities.get(mob.id)!;
+    clientMirror(client).applySnapshot(snap);
+    const mirrored = expectDefined(client.entities.get(mob.id));
     expect(mirrored.harvestClaimedBy).toBe(sa.pid);
     expect(corpseLootAvailability(mirrored, sb.pid).harvestable).toBe(false);
   });
@@ -2483,27 +2539,27 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
 
     broadcast(server);
     const client = bareClient(sb.pid);
-    (client as any).applySnapshot(lastSnap(fcB.sent));
+    clientMirror(client).applySnapshot(lastSnap(fcB.sent));
     expect(client.entities.get(mob.id)?.harvestClaimedBy).toBeNull();
 
     // Bravo walks far out of interest range; the server evicts the corpse from
     // this session's sent set, and the claim lands while it is out of view.
-    const bEnt = internals.entities.get(sb.pid)!;
+    const bEnt = expectDefined(internals.entities.get(sb.pid));
     const walkTo = (x: number) => {
       bEnt.pos = { x, y: 0, z: 0 };
       bEnt.prevPos = { x, y: 0, z: 0 };
       server.sim.tick(); // re-index the interest grid at the new position
       broadcast(server);
-      (client as any).applySnapshot(lastSnap(fcB.sent));
+      clientMirror(client).applySnapshot(lastSnap(fcB.sent));
     };
     walkTo(5000);
     server.sim.harvestCorpse(mob.id, undefined, sa.pid);
     broadcast(server);
-    (client as any).applySnapshot(lastSnap(fcB.sent));
+    clientMirror(client).applySnapshot(lastSnap(fcB.sent));
 
     // Re-entry: the fresh full record carries the claim made out of view.
     walkTo(0);
-    const back = client.entities.get(mob.id)!;
+    const back = expectDefined(client.entities.get(mob.id));
     expect(back.harvestClaimedBy).toBe(sa.pid);
     expect(corpseLootAvailability(back, sb.pid).harvestable).toBe(false);
 
@@ -2513,7 +2569,7 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     walkTo(5000);
     mob.harvestClaimedBy = null;
     walkTo(0);
-    const cleared = client.entities.get(mob.id)!;
+    const cleared = expectDefined(client.entities.get(mob.id));
     expect(cleared.harvestClaimedBy).toBeNull();
     expect(corpseLootAvailability(cleared, sb.pid).harvestable).toBe(true);
   });
@@ -2531,8 +2587,8 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
 
     broadcast(server);
     const client = bareClient(sb.pid);
-    (client as any).applySnapshot(lastSnap(fcB.sent));
-    const locked = client.entities.get(mob.id)!;
+    clientMirror(client).applySnapshot(lastSnap(fcB.sent));
+    const locked = expectDefined(client.entities.get(mob.id));
     expect(locked.lootFfaTimer).toBe(Infinity);
     expect(corpseLootAvailability(locked, sb.pid).canOpen).toBe(false);
 
@@ -2541,13 +2597,13 @@ describe('corpse harvest claim over the live broadcast (delta + interest scope)'
     mob.lootFfaTimer = 0;
     server.sim.tick();
     broadcast(server);
-    const snap = lastSnap(fcB.sent);
-    const rec = snap.ents.find((e: any) => e.id === mob.id);
+    const snap = asSnapFrame(lastSnap(fcB.sent));
+    const rec = expectDefined(snap.ents.find((e) => e.id === mob.id));
     expect(rec.ffa).toBe(1);
     expect(rec).not.toHaveProperty('nm'); // lite record: no identity resend
 
-    (client as any).applySnapshot(snap);
-    const lapsed = client.entities.get(mob.id)!;
+    clientMirror(client).applySnapshot(snap);
+    const lapsed = expectDefined(client.entities.get(mob.id));
     expect(corpseLootAvailability(lapsed, sb.pid).canOpen).toBe(true);
     expect(corpseLootAvailability(lapsed, sb.pid).hasLoot).toBe(true);
   });
@@ -2571,7 +2627,7 @@ describe('harvestCorpse omitted components over the wire', () => {
   function clientRaw(id: number, components?: string[]): string {
     const sent: string[] = [];
     const client = bareClient(1);
-    (client as any).ws = { readyState: 1, send: (payload: string) => sent.push(payload) };
+    wireClient(client).ws = { readyState: 1, send: (payload: string) => sent.push(payload) };
     client.harvestCorpse(id, components);
     expect(sent).toHaveLength(1);
     return sent[0];
@@ -2582,7 +2638,7 @@ describe('harvestCorpse omitted components over the wire', () => {
     const raw = clientRaw(4242);
     expect(raw).not.toContain('components');
     const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(spy).toHaveBeenCalledWith(4242, undefined, session.pid);
   });
 
@@ -2590,7 +2646,7 @@ describe('harvestCorpse omitted components over the wire', () => {
     const { server, session } = wireSetup();
     const raw = clientRaw(4242, ['hide']);
     const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(spy).toHaveBeenCalledWith(4242, ['hide'], session.pid);
   });
 });
@@ -2616,7 +2672,7 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
     const fc = fakeWs();
     const session = joinServer(server, fc, 93, 'Alpha');
     const internals = server.sim as unknown as SimInternals;
-    const self = internals.entities.get(session.pid)!;
+    const self = expectDefined(internals.entities.get(session.pid));
     self.pos = { x: 0, y: 0, z: 0 };
     self.prevPos = { x: 0, y: 0, z: 0 };
     // wild_boar tags hide/tusk/meat: three tags, so a two-entry pick stays
@@ -2642,7 +2698,7 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
     rng.setObserver(() => {
       draws++;
     });
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     rng.setObserver(null);
     return {
       raw,
@@ -2689,7 +2745,7 @@ describe('a repeated component tag over the wire, through a real GameServer (#24
       components: ['hide', 'hide'],
     });
     const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(spy).toHaveBeenCalledWith(4242, ['hide', 'hide'], session.pid);
   });
 });
@@ -2710,7 +2766,7 @@ describe('an invalid component tag over the wire, through a real GameServer (#25
     const fc = fakeWs();
     const session = joinServer(server, fc, 95, 'Alpha');
     const internals = server.sim as unknown as SimInternals;
-    const self = internals.entities.get(session.pid)!;
+    const self = expectDefined(internals.entities.get(session.pid));
     self.pos = { x: 0, y: 0, z: 0 };
     self.prevPos = { x: 0, y: 0, z: 0 };
     // forest_wolf tags hide/fang: two tags, so a two-entry pick CLEARS
@@ -2737,7 +2793,7 @@ describe('an invalid component tag over the wire, through a real GameServer (#25
     rng.setObserver(() => {
       draws++;
     });
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     rng.setObserver(null);
     return {
       raw,
@@ -2796,7 +2852,7 @@ describe('an invalid component tag over the wire, through a real GameServer (#25
       components: ['hide', 'not_a_real_tag'],
     });
     const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(spy).toHaveBeenCalledWith(4242, ['hide', 'not_a_real_tag'], session.pid);
   });
 });
@@ -2920,7 +2976,7 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
       'wildheart_hexcaller',
     ]);
     for (const [id, m] of mixed) {
-      const tags = m.componentTags!;
+      const tags = expectDefined(m.componentTags);
       const unmapped = tags.filter((t) => !HARVEST_COMPONENT_ITEMS[t]);
       const mapped = tags.filter((t) => HARVEST_COMPONENT_ITEMS[t]);
       // Each unmapped family alone, then all of them together: on
@@ -3277,7 +3333,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // two answers (the range and the claim are not the reason it will never
     // work) and is what an untagged corpse has always said.
     const far = harvest2513(undefined, 5, undefined, (rig) => {
-      rig.internals.entities.get(rig.a)!.pos = { x: 500, y: 0, z: 0 };
+      expectDefined(rig.internals.entities.get(rig.a)).pos = { x: 500, y: 0, z: 0 };
     });
     expect(far.errors).toEqual([NOT_HARVESTABLE]);
     expect(far.draws).toBe(0);
@@ -3290,7 +3346,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // their own message, so this is precedence on one template and not the
     // corpse gate swallowing the others.
     const farWolf = harvestAt('forest_wolf', undefined, 5, undefined, (rig) => {
-      rig.internals.entities.get(rig.a)!.pos = { x: 500, y: 0, z: 0 };
+      expectDefined(rig.internals.entities.get(rig.a)).pos = { x: 500, y: 0, z: 0 };
     });
     expect(farWolf.errors).toEqual(['Too far away.']);
     const claimedWolf = harvestAt('forest_wolf', undefined, 5, undefined, (rig, corpse) => {
@@ -3719,7 +3775,7 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
       components: ['claw'],
     });
     const spy = vi.spyOn(server.sim, 'harvestCorpse').mockImplementation(() => {});
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(spy).toHaveBeenCalledWith(4242, ['claw'], session.pid);
   });
 
@@ -3734,7 +3790,7 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
     const bystander = joinServer(server, bystanderFc, 198, 'Bravo');
     const internals = server.sim as unknown as SimInternals;
     for (const pid of [session.pid, bystander.pid]) {
-      const e = internals.entities.get(pid)!;
+      const e = expectDefined(internals.entities.get(pid));
       e.pos = { x: 0, y: 0, z: 0 };
       e.prevPos = { x: 0, y: 0, z: 0 };
     }
@@ -3752,7 +3808,7 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
     // frame as a protocol anomaly and this test would pass on an untouched
     // corpse for the wrong reason.
     const raw = JSON.stringify({ t: 'cmd', cmd: 'harvestCorpse', id: mobId, components: ['horn'] });
-    (server as any).dispatchMessage(session, JSON.parse(raw), raw, 0);
+    serverHarness(server).dispatchMessage(session, JSON.parse(raw), raw, 0);
     expect(mob.harvestClaimedBy).toBeNull();
     expect(server.sim.countItem('rough_hide', session.pid)).toBe(0);
     // The refusal really rides the wire, to the harvester alone. A gate that
@@ -3761,11 +3817,11 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
     // gate that stamped the wrong pid would broadcast it to the bystander.
     // routeEvents is the real fan-out the tick loop drives; the events frame
     // is `{t:'events', list:[...]}`, separate from the snapshot frame.
-    (server as any).routeEvents(server.sim.drainEvents());
-    const errorsFor = (sent: any[]) =>
+    serverHarness(server).routeEvents(server.sim.drainEvents());
+    const errorsFor = (sent: unknown[]) =>
       sent
-        .filter((frame) => frame.t === 'events')
-        .flatMap((frame) => frame.list as any[])
+        .filter(isEventsFrame)
+        .flatMap((frame) => frame.list)
         .filter((e) => e.type === 'error')
         .map((e) => e.text);
     expect(errorsFor(fc.sent)).toEqual(['Nothing you selected can be harvested from that corpse.']);
@@ -3775,7 +3831,7 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
     const ok = new GameServer();
     const okSession = joinServer(ok, fakeWs(), 99, 'Alpha');
     const okInternals = ok.sim as unknown as SimInternals;
-    const okSelf = okInternals.entities.get(okSession.pid)!;
+    const okSelf = expectDefined(okInternals.entities.get(okSession.pid));
     okSelf.pos = { x: 0, y: 0, z: 0 };
     okSelf.prevPos = { x: 0, y: 0, z: 0 };
     const okMobId = Math.max(...okInternals.entities.keys()) + 1;
@@ -3791,7 +3847,7 @@ describe('an unmapped-only pick over the wire, through a real GameServer (#2509)
       id: okMobId,
       components: ['hide'],
     });
-    (ok as any).dispatchMessage(okSession, JSON.parse(okRaw), okRaw, 0);
+    serverHarness(ok).dispatchMessage(okSession, JSON.parse(okRaw), okRaw, 0);
     expect(okMob.harvestClaimedBy).toBe(okSession.pid);
     expect(ok.sim.countItem('rough_hide', okSession.pid)).toBeGreaterThan(0);
   });

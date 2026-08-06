@@ -20,6 +20,7 @@ import {
   WATER_LEVEL,
   waterLevelAt,
 } from '../src/sim/world';
+import { expectDefined } from './helpers/defined';
 
 // The production seed: the report is seed-pinned world geometry.
 const SEED = 20061;
@@ -42,9 +43,11 @@ function makeWalker(spot: { x: number; z: number }) {
   const sim = new Sim({ seed: SEED, playerClass: 'warrior', autoEquip: true });
   sim.setPlayerLevel(20);
   const p = sim.player;
-  const meta = (
-    sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }
-  ).players.get((sim as unknown as { playerId: number }).playerId)!;
+  const meta = expectDefined(
+    (sim as unknown as { players: Map<number, { moveInput: { forward: boolean } }> }).players.get(
+      (sim as unknown as { playerId: number }).playerId,
+    ),
+  );
   p.pos.x = spot.x;
   p.pos.z = spot.z;
   p.pos.y = groundHeight(spot.x, spot.z, SEED) + 0.05;

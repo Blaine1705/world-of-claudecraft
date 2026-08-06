@@ -3604,7 +3604,7 @@ export function buildFoliage(seed: number, webgl?: THREE.WebGLRenderer): Foliage
       eyeX: number,
       eyeY: number,
       eyeZ: number,
-      fogNear: number,
+      _fogNear: number,
       fogFar: number,
       atmosFogNear: number,
       atmosFogFar: number,

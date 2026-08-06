@@ -18,6 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 import { placePlayerInOpenField } from './helpers/open_field';
 
 type Spec = 'arcane' | 'fire' | 'frost';
@@ -53,7 +54,7 @@ function addDummy(sim: Sim, dist = 6): Entity {
 function addAlly(sim: Sim): Entity {
   const p = sim.player;
   const id = sim.addPlayer('warrior', 'Tanque');
-  const ally = sim.entities.get(id)!;
+  const ally = expectDefined(sim.entities.get(id));
   ally.pos.x = p.pos.x + 4;
   ally.pos.z = p.pos.z;
   ally.maxHp = 1_000_000; // large: Echo heals never clamp (raw throughput)
@@ -343,7 +344,7 @@ function cascadeAoeHeal(enemyCount: number): CascadeMeasure {
   const allyIds: number[] = [];
   for (let i = 0; i < 5; i++) {
     const id = sim.addPlayer('warrior', `Ally${i}`);
-    const a = sim.entities.get(id)!;
+    const a = expectDefined(sim.entities.get(id));
     a.pos.x = p.pos.x + 1 + i * 0.4; // tight cluster (party invites need proximity)
     a.pos.z = p.pos.z;
     a.maxHp = 1_000_000;
@@ -359,7 +360,9 @@ function cascadeAoeHeal(enemyCount: number): CascadeMeasure {
   sim.castAbility('temporal_cascade');
   tickUntilFree(sim, p); // let the 2s cast finish and the marks land
   const marks = allyIds.filter((id) =>
-    sim.entities.get(id)!.auras.some((a) => a.id === 'temporal_echo' && a.sourceId === p.id),
+    expectDefined(sim.entities.get(id)).auras.some(
+      (a) => a.id === 'temporal_echo' && a.sourceId === p.id,
+    ),
   ).length;
   // Cluster the enemies inside Arcane Explosion's self-centered radius (10 yd).
   for (let k = 0; k < enemyCount; k++) {
@@ -378,7 +381,7 @@ function cascadeAoeHeal(enemyCount: number): CascadeMeasure {
   sim.castAbility('arcane_explosion');
   let heal = 0;
   for (let i = 0; i < 12; i++) {
-    for (const id of allyIds) sim.entities.get(id)!.hp = 1;
+    for (const id of allyIds) expectDefined(sim.entities.get(id)).hp = 1;
     for (const e of sim.tick()) {
       if (
         e.type === 'heal2' &&

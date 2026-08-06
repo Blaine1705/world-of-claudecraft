@@ -424,12 +424,16 @@ describe('CI workflow parity', () => {
     const changes = jobSource('changes');
     expect(changes).toContain('id: filter');
     expect(changes).toContain('outputs:');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('code: ${{ steps.filter.outputs.code }}');
     // Phase 2: the selection decision rides the same job's outputs, from the
     // same single classifier step, so the two decisions cannot come from
     // different listing snapshots.
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('test_mode: ${{ steps.filter.outputs.test_mode }}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('test_mode_reason: ${{ steps.filter.outputs.test_mode_reason }}');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('changed_files: ${{ steps.filter.outputs.changed_files }}');
     // Anchored, not toContain: a YAML-commented-out step keeps the substring
     // but loses the indented shape, and this one line is the whole classifier.
@@ -454,6 +458,7 @@ describe('CI workflow parity', () => {
     expect(changes).toMatch(/\n {4}timeout-minutes: [1-9]\n/);
     // The API call authenticates with the workflow token via env (never
     // secrets.* and never string-interpolated into the run line).
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal GitHub Actions expression syntax.
     expect(changes).toContain('GITHUB_TOKEN: ${{ github.token }}');
     // changes must always run (no job-level if). Gating it to pull_request only
     // would leave needs.changes dependents skipped on push to main/dev.
@@ -464,6 +469,7 @@ describe('CI workflow parity', () => {
     expect(detectEntry).toContain("from './lib/ci_change_classify.mjs'");
     expect(detectEntry).toContain('detectCode');
     expect(detectEntry).toContain('GITHUB_OUTPUT');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal script output syntax.
     expect(detectEntry).toContain('code=${code}');
     // Phase 2 wiring: the entry derives the test mode from the SAME listing
     // (lib/ci_test_select.mjs) and writes all three selection outputs; the
@@ -471,6 +477,7 @@ describe('CI workflow parity', () => {
     // tests/ci_change_classify.test.ts.
     expect(detectEntry).toContain("from './lib/ci_test_select.mjs'");
     expect(detectEntry).toContain('decideTestMode');
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: this pins literal script output syntax.
     expect(detectEntry).toContain('test_mode=${modeDecision.mode}');
     expect(detectEntry).toContain('changed_files=${JSON.stringify(');
     for (const [, sample] of CODE_PATH_SAMPLES) {
