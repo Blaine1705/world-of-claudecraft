@@ -281,6 +281,22 @@ const WOLF_BAKED: ClipMap = {
   jump: 'Fall',
 };
 
+// Greyjaw's own attack (scripts/build_greyjaw_anims.mjs, issue #2889 round
+// 2): greyjaw.glb is a much richer, dedicated 48-node rig (not shared with
+// mob_wolf's separate wolf_basic.glb) that ships unused bonus donor clips
+// (Bark, Howl, "Idle Alert", Sneak) specific to this named rare; this
+// blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
+// more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
+// form_cat) still plays. WOLF_BAKED itself is untouched: both still read it,
+// and changing the shared base would change player druid/shaman form combat
+// feel, out of scope here. greyjaw already ships and wires BOTH
+// Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
+// hit-variety work is needed here: this override is attack-only.
+const GREYJAW_WOLF: ClipMap = {
+  ...WOLF_BAKED,
+  attack: ['Greyjaw_Attack'],
+};
+
 // Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
 // authored as IK foot paths, so walkRef/runRef below are MEASURED off the clips
 // rather than guessed). Jump/Land are a pair: `land` opts the rig into the held
@@ -1156,7 +1172,11 @@ export const VISUALS: Record<string, VisualDef> = {
     // rare ~2.75 in-world vs the 1.6 pack wolf).
     url: `${CREATURES}/greyjaw.glb`,
     height: 2.2,
-    clips: WOLF_BAKED,
+    clips: GREYJAW_WOLF,
+    // Greyjaw_Attack clip donor (scripts/build_greyjaw_anims.mjs): mesh-free,
+    // baked off this same rig's own poses (a howl-then-pounce, distinct from
+    // the plain Attack every other WOLF_BAKED user still plays).
+    animUrls: [`${CREATURES}/greyjaw_ability_anims.glb`],
   },
   mob_boar: {
     url: `${CREATURES}/wild_boar.glb`,
