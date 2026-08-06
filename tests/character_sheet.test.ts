@@ -14,6 +14,7 @@ import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { catalogCharacterCompletion } from '../src/sim/reliquary';
 import type { CharacterState } from '../src/sim/sim';
 import { type PlayerClass, virtualLevel } from '../src/sim/types';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
 
 function makeState(over: Partial<CharacterState> = {}): CharacterState {
   return {
@@ -274,8 +275,29 @@ describe('characterSheet: reliquary completion pair + rank', () => {
   it('sheetCuratorRankText returns English names for ranks 1 to 5 and null otherwise', () => {
     expect(sheetCuratorRankText(0)).toBeNull();
     expect(sheetCuratorRankText(1)).toBe('Apprentice Curator');
+    expect(sheetCuratorRankText(2)).toBe('Spoilskeeper');
+    expect(sheetCuratorRankText(3)).toBe('Master Curator');
+    expect(sheetCuratorRankText(4)).toBe('Grand Curator');
     expect(sheetCuratorRankText(5)).toBe('Eternal Curator');
+    expect(sheetCuratorRankText(6)).toBeNull();
     expect(sheetCuratorRankText(99)).toBeNull();
+  });
+
+  it('server rank names match the client hudChrome catalog rank names', () => {
+    // The server's English list and the client i18n catalog are maintained as
+    // two independent sources, so this is a real drift pin: a rename on either
+    // side alone turns it red. The literal pins above stay alongside it so a
+    // synchronized rename of both sides still shows up in review.
+    const clientRankNames = [
+      hudChromeStrings.reliquary.curatorRankName1,
+      hudChromeStrings.reliquary.curatorRankName2,
+      hudChromeStrings.reliquary.curatorRankName3,
+      hudChromeStrings.reliquary.curatorRankName4,
+      hudChromeStrings.reliquary.curatorRankName5,
+    ];
+    for (let rank = 1; rank <= 5; rank++) {
+      expect(sheetCuratorRankText(rank), `curator rank ${rank}`).toBe(clientRankNames[rank - 1]);
+    }
   });
 });
 

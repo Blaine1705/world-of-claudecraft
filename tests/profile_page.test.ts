@@ -1,10 +1,14 @@
-// The /c/<name> SSR profile page's Book of Deeds title line. Drives the REAL
-// handleProfilePage with the db layer mocked (the social_frames partial-mock
-// pattern): a titled character renders the English title under the <h1>, an
-// untitled or stale-titled one renders no line at all, and the page never
-// leaks the raw deed id. English is correct here BY DESIGN (the page is
-// lang="en" throughout); every localized surface resolves ids client-side.
+// The /c/<name> SSR profile page's Book of Deeds title line plus the Reliquary
+// pair and Curator rank lines. Drives the REAL handleProfilePage with the db
+// layer mocked (the social_frames partial-mock pattern): a titled character
+// renders the English title under the <h1>, an untitled or stale-titled one
+// renders no line at all, and the page never leaks the raw deed id. The
+// Reliquary block always renders both the owned/total pair and the Curator
+// line (rank 0 gets the explicit Unranked fallback, never a hidden slot).
+// English is correct here BY DESIGN (the page is lang="en" throughout); every
+// localized surface resolves ids client-side.
 import { describe, expect, it, vi } from 'vitest';
+import { catalogCharacterCompletion } from '../src/sim/reliquary';
 
 const mockGetCharacterById = vi.fn();
 
@@ -93,5 +97,32 @@ describe('profile page Book of Deeds title line', () => {
       activeTitle: 'hid_saul_footnote',
     });
     expect(html).toContain('<p class="deed-title">the Footnote</p>');
+  });
+});
+
+describe('profile page Reliquary pair + Curator rank lines', () => {
+  // The character-scoped total comes from the LIVE catalog (src/sim/reliquary),
+  // never from the page code under test. Vacuity floor: Curator rank 5 sits at
+  // 100 owned relics, so a live catalog below that means the derivation died.
+  const catalogTotal = catalogCharacterCompletion({ itemsDiscovered: new Set() }).total;
+
+  it('renders the owned/total pair and the English rank name for a ranked character', async () => {
+    expect(catalogTotal).toBeGreaterThan(100);
+    // Two catalogued discoveries: owned 2, past the rank 1 threshold (1 owned).
+    const html = await renderProfile({
+      level: 12,
+      deedStats: { itemsDiscovered: ['boundstone_helm', 'cryptbone_helm'] },
+    });
+    expect(html).toContain(`<li>Reliquary: <strong>2/${catalogTotal}</strong></li>`);
+    expect(html).toContain('<li>Curator: <strong>Apprentice Curator</strong></li>');
+    expect(html).not.toContain('Unranked');
+  });
+
+  it('renders the zero pair and the Unranked fallback for a fresh character', async () => {
+    const html = await renderProfile({ level: 12 });
+    expect(html).toContain(`<li>Reliquary: <strong>0/${catalogTotal}</strong></li>`);
+    // Rank 0 renders the explicit fallback line; the <li> never disappears.
+    expect(html).toContain('<li>Curator: <strong>Unranked</strong></li>');
+    expect(html).not.toContain('Apprentice Curator');
   });
 });

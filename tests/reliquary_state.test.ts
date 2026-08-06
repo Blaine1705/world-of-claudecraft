@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
+import { recipeById } from '../src/sim/content/recipes';
 import {
   isCataloguedRelicItem,
   RELIQUARY_MARK_IDS,
@@ -39,6 +40,7 @@ import {
   syncReliquaryMarksFromVisited,
 } from '../src/sim/reliquary';
 import { type CharacterState, Sim } from '../src/sim/sim';
+import { runCraft } from './helpers/enchant_family_cast';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -225,6 +227,55 @@ describe('Reliquary serialize / restore round-trip', () => {
     expect(m2.reliquary.firstFind.not_a_real_relic).toBeUndefined();
     expect(m2.reliquary.marks.size).toBe(0);
     expect(m2.reliquary.recent).toEqual([CATALOGUE_RELIC]);
+  });
+
+  it('restore sanitizes clears and pageId per FIELD on catalogued entries', () => {
+    // Every id here is catalogued, so the field guards are actually reached
+    // (an uncatalogued id is dropped before either filter runs). Snug floor:
+    // the slice must fill all six fixtures.
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ].slice(0, 6);
+    expect(ids.length).toBe(6);
+    const [negative, infinite, notANumber, fractional, bogusPage, foreignPage] = ids;
+    const validPageId = RELIQUARY_ITEM_TO_PAGES.get(negative)![0];
+    // A real page that never lists foreignPage: acceptance must be
+    // RELIQUARY_PAGES_BY_ID membership only, not an item-to-page relation.
+    const unrelatedPageId = 'horizons_titles';
+    expect(RELIQUARY_PAGES_BY_ID[unrelatedPageId]).toBeDefined();
+    expect(RELIQUARY_ITEM_TO_PAGES.get(foreignPage)).not.toContain(unrelatedPageId);
+
+    const restored = restoreReliquaryState({
+      firstFind: {
+        [negative]: { clears: -3, pageId: validPageId },
+        [infinite]: { clears: Number.POSITIVE_INFINITY },
+        [notANumber]: { clears: Number.NaN },
+        [fractional]: { clears: 2.7 },
+        [bogusPage]: { pageId: 'nope' },
+        [foreignPage]: { pageId: unrelatedPageId },
+      },
+    });
+
+    // Every catalogued ENTRY survives; only the offending field is dropped.
+    expect(Object.keys(restored.firstFind).sort()).toEqual([...ids].sort());
+    // Negative clears are dropped outright (absent key, never clamped to 0),
+    // while the valid pageId on the same entry still lands.
+    expect(Object.hasOwn(restored.firstFind[negative], 'clears')).toBe(false);
+    expect(restored.firstFind[negative].pageId).toBe(validPageId);
+    // Non-finite clears (Infinity, NaN) are dropped the same way.
+    expect(Object.hasOwn(restored.firstFind[infinite], 'clears')).toBe(false);
+    expect(Object.hasOwn(restored.firstFind[notANumber], 'clears')).toBe(false);
+    // Fractional clears floor (2.7 lands as 2), matching the live stamp path.
+    expect(restored.firstFind[fractional]).toEqual({ clears: 2 });
+    // A pageId outside RELIQUARY_PAGES_BY_ID is dropped; the entry survives.
+    expect(Object.hasOwn(restored.firstFind[bogusPage], 'pageId')).toBe(false);
+    // Membership is the WHOLE rule: a real page that never lists the item is
+    // kept (diagnostic field; restore does not re-derive the relation).
+    expect(restored.firstFind[foreignPage].pageId).toBe(unrelatedPageId);
   });
 });
 
@@ -528,14 +579,77 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(mTitle.renown).toBe(renownBeforeTitle + (DEEDS.prog_veteran.renown ?? 0));
   });
 
+  it('a live masterwork proc writes masterwork:first and the per-craft mark (real craft path)', () => {
+    // Seed 151: the recorded signed-reagent hunt window shared with
+    // tests/professions_masterwork.test.ts (bounded scan from seed 1; the
+    // single output-side proc draw lands in [0.03, 0.05), so one self-signed
+    // reagent's 2 percent term lifts the vestments roll to 0.05 and the
+    // craft procs deterministically). Re-hunt there and re-record here
+    // together whenever a content commit shifts the construction-time draw
+    // sequence; spares on record: 186, 241, 259, and 287.
+    const SEED = 151;
+    // Premise anchors from live content: the derived per-craft id this
+    // recipe produces, and its catalog membership (an uncatalogued id can
+    // never land in marks, so the derived-arm assertions below would be
+    // vacuous without it).
+    expect(recipeById('recipe_eastbrook_ritual_vestments')!.professionId).toBe('tailoring');
+    expect(RELIQUARY_MARK_IDS.has('masterwork:tailoring')).toBe(true);
+
+    const sim = makeSim(SEED);
+    const { meta } = primary(sim);
+    const pid = sim.playerId;
+    sim.addItemInstance('linen_scrap', { signer: meta.name }, pid);
+    sim.addItem('linen_scrap', 1, pid);
+    sim.addItem('spider_leg', 1, pid);
+    sim.addItem('homespun_cloth', 3, pid);
+    sim.addItem('spool_of_thread', 5, pid);
+    expect(meta.reliquary.marks.size).toBe(0);
+    runCraft(sim, 'recipe_eastbrook_ritual_vestments', false, pid);
+    expect(sim.lastCraftResult?.ok).toBe(true);
+    // The hunted window held: the proc fired (a draw-order shift that
+    // collapses the window fails HERE, not in the mark assertions below).
+    expect(sim.lastCraftResult?.masterwork).toBe(true);
+    // Both marks land through the live write path (nothing here hand-sets
+    // reliquary state): the ungated first-proc trophy and the catalog-gated
+    // per-craft one, in production write order on the recent ring.
+    expect([...meta.reliquary.marks].sort()).toEqual([MASTERWORK_FIRST, 'masterwork:tailoring']);
+    expect(meta.reliquary.recent).toEqual([MASTERWORK_FIRST, 'masterwork:tailoring']);
+    // The visit ledger rides beside each mark on the same proc arm (the
+    // durable proof the proc happened; join-time retro-fill reads it).
+    expect(meta.deedStats.visited.has(MASTERWORK_FIRST)).toBe(true);
+    expect(meta.deedStats.visited.has('masterwork:tailoring')).toBe(true);
+
+    // Control at the SAME seed and stream position, no signed copy held: the
+    // identical draw sits above the 3 percent base and misses, and a miss
+    // writes NO mark or visit, so the writes provably sit on the proc arm,
+    // not on every successful craft.
+    const control = makeSim(SEED);
+    const mControl = primary(control).meta;
+    const cid = control.playerId;
+    for (let i = 0; i < 3; i++) control.addItem('linen_scrap', 1, cid);
+    control.addItem('spider_leg', 1, cid);
+    control.addItem('homespun_cloth', 3, cid);
+    control.addItem('spool_of_thread', 5, cid);
+    runCraft(control, 'recipe_eastbrook_ritual_vestments', false, cid);
+    expect(control.lastCraftResult?.ok).toBe(true);
+    expect(control.lastCraftResult?.masterwork).toBeUndefined();
+    expect(mControl.reliquary.marks.size).toBe(0);
+    expect(mControl.deedStats.visited.has(MASTERWORK_FIRST)).toBe(false);
+    expect(mControl.deedStats.visited.has('masterwork:tailoring')).toBe(false);
+  });
+
   it('craft and gather call sites note catalog marks only (source pins)', () => {
     // Full-line // comments are stripped so a line-commented arm cannot
     // satisfy the literal-order pin (a /* */ block or a trailing comment
-    // still could). The parity golden (professions_craft.json)
-    // backstops the semantics the regex cannot see: it embeds the masterwork
-    // visited ids in pinned state hashes and snapshots plain crafts before
-    // the proc, so deleting the writes or hoisting them out of the proc arm
-    // reds the golden even if a doctored source still matches here.
+    // still could). The behavioral proc test above drives the REAL craft
+    // path, so the writes and their proc-arm placement are pinned by
+    // behavior (the parity golden professions_craft.json backstops them
+    // too, embedding the masterwork visited ids in pinned state hashes).
+    // The load this regex still carries is the isCataloguedRelicMark gate
+    // on the derived visit write, which no behavioral case can reach while
+    // every masterwork-capable craft has an authored mark (only equippable
+    // outputs can proc, and all four shipping professions with equippable
+    // recipes sit in RELIQUARY_PROFESSION_MARKS.masterworkByCraft).
     const craftSrc = fs
       .readFileSync(path.join(__dirname, '../src/sim/professions/crafting.ts'), 'utf8')
       .split('\n')
@@ -576,39 +690,37 @@ describe('Reliquary profession marks (Phase 7)', () => {
 });
 
 describe('Reliquary recent ring cap', () => {
-  it('drops oldest when the recent buffer exceeds the cap', () => {
+  it('drops the oldest finds once distinct catalogued finds exceed the cap', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
-    // Force-push many ids through the note path by stamping catalogued finds
-    // via a temporary firstFind clear (noteRelicItemFind short-circuits when
-    // present). Use direct recent mutation after one real find to pin the cap
-    // helper without inventing fake catalog pages.
-    markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
-    expect(meta.reliquary.recent.length).toBe(1);
+    // Literal: the shipped ring cap is 12; a drifted constant must fail here
+    // instead of silently re-deriving every expectation below.
+    expect(RELIQUARY_RECENT_CAP).toBe(12);
 
-    // Drive the ring through noteRelicItemFind after clearing firstFind so
-    // each push is accepted (simulates many distinct catalogued finds).
-    for (let i = 0; i < RELIQUARY_RECENT_CAP + 3; i++) {
-      const fakeId = CATALOGUE_RELIC; // same id: re-note is no-op
-      delete meta.reliquary.firstFind[fakeId];
-      // Push via onItemDiscovered which re-notes and re-pushes.
-      noteRelicItemFind(meta, fakeId);
-    }
-    // Same id only: ring stays length 1 (de-dupe moves to end).
-    expect(meta.reliquary.recent).toEqual([CATALOGUE_RELIC]);
+    // Distinct catalogued item ids straight from the live catalog, so content
+    // churn cannot rot the fixture. Snug floor: the slice must actually fill.
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ].slice(0, RELIQUARY_RECENT_CAP + 3);
+    expect(ids.length).toBe(RELIQUARY_RECENT_CAP + 3);
 
-    // Direct ring push path: fill past the cap with synthetic recent entries
-    // that serialize would filter, to pin the cap constant behavior on state.
-    meta.reliquary.recent = [];
-    for (let i = 0; i < RELIQUARY_RECENT_CAP + 5; i++) {
-      meta.reliquary.recent.push(`synth_${i}`);
-      while (meta.reliquary.recent.length > RELIQUARY_RECENT_CAP) meta.reliquary.recent.shift();
+    // The REAL write path (markItemDiscovered's hook), one find per id.
+    for (const id of ids) {
+      expect(noteRelicItemFind(meta, id)).toBe(true);
     }
+
+    // Exactly the cap survives: the oldest three finds are evicted, relative
+    // order is preserved, and the newest find sits at the tail.
     expect(meta.reliquary.recent.length).toBe(RELIQUARY_RECENT_CAP);
-    expect(meta.reliquary.recent[0]).toBe('synth_5');
-    expect(meta.reliquary.recent[RELIQUARY_RECENT_CAP - 1]).toBe(
-      `synth_${RELIQUARY_RECENT_CAP + 4}`,
-    );
+    expect(meta.reliquary.recent).toEqual(ids.slice(3));
+    for (const evicted of ids.slice(0, 3)) {
+      expect(meta.reliquary.recent).not.toContain(evicted);
+    }
+    expect(meta.reliquary.recent.at(-1)).toBe(ids.at(-1));
   });
 
   // The ring pushes at the tail and drops the head, so index 0 is the OLDEST
@@ -675,6 +787,27 @@ describe('Reliquary recent ring cap', () => {
       RELIQUARY_RECENT_CAP + 4,
     );
     expect(restoreReliquaryState({ recent: many.flatMap((id) => [id, id]) }).recent).toEqual(
+      many.slice(-RELIQUARY_RECENT_CAP),
+    );
+  });
+
+  it('restore truncates an over-cap all-distinct recent blob to the newest cap entries', () => {
+    const ids = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ];
+    const many = ids.slice(0, RELIQUARY_RECENT_CAP + 3);
+    expect(many.length, 'the catalog must supply more item ids than the cap').toBe(
+      RELIQUARY_RECENT_CAP + 3,
+    );
+    // No duplicates in the blob, so this pins the truncation arm alone: the
+    // restore walk is newest-first and stops at the cap, which keeps the
+    // NEWEST twelve (the head, the oldest side, is what gets cut) in their
+    // original relative order.
+    expect(restoreReliquaryState({ recent: many }).recent).toEqual(
       many.slice(-RELIQUARY_RECENT_CAP),
     );
   });
@@ -917,6 +1050,77 @@ describe('Reliquary pure completion + curator rank', () => {
     meta.deedStats.counters.thunzharrKills = 5;
     expect(clearCountForSource(meta, { kind: 'deed_stat', stat: 'thunzharrKills' })).toBe(5);
     expect(clearCountForSource(meta, { kind: 'deed_stat', stat: 'not_a_real_stat' })).toBe(0);
+  });
+
+  it('delve pages read floored delveClears through the public page readout', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // Live content pin: the page really rides the delve arm.
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_collapsed_reliquary?.clearSource).toEqual({
+      kind: 'delve',
+      delveId: 'collapsed_reliquary',
+    });
+    expect(sim.reliquaryPageClearCount('conquerors_collapsed_reliquary')).toBe(0);
+    meta.delveClears.collapsed_reliquary = 7.9;
+    expect(sim.reliquaryPageClearCount('conquerors_collapsed_reliquary')).toBe(7);
+  });
+
+  it('a heroic-only dungeonClears key never leaks into the normal page readout', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt?.clearSource).toEqual({
+      kind: 'dungeon',
+      dungeonId: 'hollow_crypt',
+      difficulty: 'normal',
+    });
+    // ONLY the heroic key exists; the bare normal key stays absent.
+    meta.deedStats.dungeonClears['hollow_crypt:heroic'] = 4;
+    expect(meta.deedStats.dungeonClears.hollow_crypt).toBeUndefined();
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(0);
+    // The heroic page still reads the same key, so the zero above is the
+    // difficulty filter at work, never a dead key.
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt_heroic')).toBe(4);
+  });
+
+  it('illumination scans past an incomplete first page to the completing page', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // deathlord_warplate sits on two pages and table order puts the (large)
+    // Gravewyrm Sanctum page BEFORE the four-slot set page, so the set page
+    // can complete while the first pageIds entry stays incomplete.
+    const ITEM = 'deathlord_warplate';
+    const COMPLETING_PAGE = 'conquerors_set_deathlord';
+    const pageIds = RELIQUARY_ITEM_TO_PAGES.get(ITEM);
+    expect(pageIds, 'the set member must stay catalogued').toBeDefined();
+    const completingIdx = pageIds!.indexOf(COMPLETING_PAGE);
+    expect(completingIdx, 'the completing page must not be first in pageIds').toBeGreaterThan(0);
+    const setPage = RELIQUARY_PAGES_BY_ID[COMPLETING_PAGE];
+
+    // Own every OTHER set member first, through the real discover path.
+    for (const relic of setPage.relics) {
+      if (relic.kind === 'item' && relic.itemId !== ITEM) {
+        markItemDiscovered(sim.ctx, meta, relic.itemId);
+      }
+    }
+    sim.drainEvents();
+
+    markItemDiscovered(sim.ctx, meta, ITEM);
+    // The fill completes ONLY the set page: every pageIds entry ahead of it
+    // stays incomplete, so the emit has to scan past them.
+    const ownership = characterReliquaryOwnership(meta);
+    for (const pageId of pageIds!.slice(0, completingIdx)) {
+      expect(
+        pageCompletion(RELIQUARY_PAGES_BY_ID[pageId], ownership).complete,
+        `${pageId} must stay incomplete for the scan to matter`,
+      ).toBe(false);
+    }
+    expect(pageCompletion(setPage, ownership).complete).toBe(true);
+
+    const unlock = sim.drainEvents().find((e) => e.type === 'reliquaryUnlock' && e.itemId === ITEM);
+    expect(unlock).toBeDefined();
+    expect(unlock && unlock.type === 'reliquaryUnlock' && unlock.illuminatedPageId).toBe(
+      COMPLETING_PAGE,
+    );
   });
 });
 

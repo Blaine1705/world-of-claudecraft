@@ -1,13 +1,14 @@
 // Unit tests for The Reliquary pure view-core (src/ui/reliquary_view.ts):
-// empty state, progress totals, curator rank, recent newest-first, nearly-
-// complete ranking, shelf nav counts, page grids, unlock/Illumination plan,
-// and the refresh signature (including ownershipDigest).
+// empty state, progress totals, curator rank (including rank name keys),
+// recent newest-first, nearly-complete ranking, shelf nav counts, page grids,
+// unlock/Illumination plan, and the refresh signature (ownershipDigest too).
 import { describe, expect, it } from 'vitest';
 import type { ReliquaryPageDef } from '../src/sim/content/reliquary';
 import {
   buildReliquaryPageCells,
   buildReliquaryUnlockPlan,
   buildReliquaryView,
+  curatorRankNameKey,
   isReliquaryNavId,
   RELIQUARY_NAV,
   RELIQUARY_NEARLY_MAX,
@@ -94,6 +95,21 @@ describe('reliquaryMarkFindKey', () => {
     expect(reliquaryMarkFindKey('masterwork:first')).toBe(
       'hudChrome.reliquary.markFind.masterwork_first',
     );
+  });
+});
+
+describe('curatorRankNameKey', () => {
+  it('maps ranks 1 through 5 to their exact named chrome keys', () => {
+    expect(curatorRankNameKey(1)).toBe('hudChrome.reliquary.curatorRankName1');
+    expect(curatorRankNameKey(2)).toBe('hudChrome.reliquary.curatorRankName2');
+    expect(curatorRankNameKey(3)).toBe('hudChrome.reliquary.curatorRankName3');
+    expect(curatorRankNameKey(4)).toBe('hudChrome.reliquary.curatorRankName4');
+    expect(curatorRankNameKey(5)).toBe('hudChrome.reliquary.curatorRankName5');
+  });
+
+  it('falls back to the generic rank key on both out-of-range ends', () => {
+    expect(curatorRankNameKey(0)).toBe('hudChrome.reliquary.curatorRank');
+    expect(curatorRankNameKey(6)).toBe('hudChrome.reliquary.curatorRank');
   });
 });
 
