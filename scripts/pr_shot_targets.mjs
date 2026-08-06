@@ -660,7 +660,8 @@ export const TARGETS = [
         for (let poll = 0; poll < 24 && !stunApplied; poll++) {
           await wait(200);
           stunApplied = await page.evaluate(
-            (mobId) => !!window.__game?.sim?.entities?.get(mobId)?.auras.some((a) => a.kind === 'stun'),
+            (mobId) =>
+              !!window.__game?.sim?.entities?.get(mobId)?.auras.some((a) => a.kind === 'stun'),
             staged.mobId,
           );
         }

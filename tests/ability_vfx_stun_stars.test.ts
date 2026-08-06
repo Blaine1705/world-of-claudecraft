@@ -9,8 +9,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import type { AbilityVfxDeps, AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
-import { ABILITY_VFX_SPECS } from '../src/render/ability_vfx_specs';
 import { STUN_STAR_COUNT, wornStunRemaining } from '../src/render/ability_vfx_core';
+import { ABILITY_VFX_SPECS } from '../src/render/ability_vfx_specs';
 
 function installCanvasStub(): void {
   const noop = () => {};
