@@ -16,8 +16,17 @@ const EYE_DURATION = 3600;
 const ACCOMPLICE_INTERVAL = 2;
 const MALEDICT_GAZE_INTERVAL = 2.5;
 const POSSESSED_MALEDICT_GAZE_INTERVAL = 1.25;
+// The doom-100 payoff against players and bosses. 1.2 shipped with the rework
+// and made capped Sentences the bulk of the spec's boss lead; 1.05 keeps the
+// overcap identity (a capped Sentence still hits hardest) at tuned size.
+const SENTENCE_DOOM_CAPPED_BONUS_MULT = 1.05;
 const MALEDICT_GAZE_RANGE = 30;
 const ENEMY_ACTION_GAIN = 2;
+// Rate cap on the enemy-action doom stream: one gain per eye per second. On the
+// single-target bench the enemy never acts, so this moves nothing there; live, a
+// boss's flurry of damage events (melee, mechanics, dot ticks) otherwise streams
+// doom far above what the tuning study measured.
+const ENEMY_ACTION_GAIN_ICD = 1;
 const DRAIN_TICK_GAIN = 2;
 const DRAIN_COMPLETION_GAIN = 3;
 const FATE_THREAD_DOOM_PER_TICK = 1;
@@ -722,7 +731,7 @@ export function resolveSentence(
   const normalMob =
     target.kind === 'mob' && !MOBS[target.templateId]?.boss && !MOBS[target.templateId]?.elite;
   if (doom >= 100 && (target.kind === 'player' || MOBS[target.templateId]?.boss)) {
-    primaryDamage = Math.round(primaryDamage * 1.2);
+    primaryDamage = Math.round(primaryDamage * SENTENCE_DOOM_CAPPED_BONUS_MULT);
   }
   if (doom >= 100 && normalMob && target.maxHp > 0 && target.hp / target.maxHp < 0.2) {
     primaryDamage = target.hp;
@@ -1008,8 +1017,10 @@ export function onAfflictionDamage(
 
   for (const eye of source.auras) {
     if (eye.kind !== 'affliction_eye' && eye.kind !== 'affliction_eye_secondary') continue;
+    if ((eye.actionGainLockout ?? 0) > ctx.time) continue;
     const warlock = ctx.entities.get(eye.sourceId);
     if (warlock) {
+      eye.actionGainLockout = ctx.time + ENEMY_ACTION_GAIN_ICD;
       gainDoom(ctx, warlock, eyeGeneration(eye, ENEMY_ACTION_GAIN, warlock));
     }
   }

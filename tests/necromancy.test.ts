@@ -192,7 +192,9 @@ describe('Necromancy Warlock', () => {
     expect(ABILITIES.army_of_the_dead.description).toContain(
       'temporary Skeletal Warrior, Bone Mage, and Gravewing',
     );
-    expect(ABILITIES.army_of_the_dead.description).toContain('in addition to your chosen');
+    expect(ABILITIES.army_of_the_dead.description).toContain(
+      'filling the ranks your standing Dominion servants leave empty',
+    );
     expect(ABILITIES.sacrifice_undead.description).toContain('Dominion servant');
   });
 
@@ -266,7 +268,7 @@ describe('Necromancy Warlock', () => {
           rank: 3,
           level: 20,
           cost: 65,
-          effects: [{ type: 'directDamage', min: 74, max: 88 }],
+          effects: [{ type: 'directDamage', min: 85, max: 101 }],
         },
       ],
     });
@@ -295,7 +297,7 @@ describe('Necromancy Warlock', () => {
       level: 20,
       cost: 55,
       effects: [
-        { type: 'directDamage', min: 54, max: 66 },
+        { type: 'directDamage', min: 66, max: 80 },
         { type: 'gainSoulFragments', amount: 1 },
       ],
     });
@@ -676,6 +678,26 @@ describe('Necromancy Warlock', () => {
         ]),
       );
     }
+  });
+
+  it('Army of the Dead fills only the missing archetypes, never duplicating a standing servant', () => {
+    const sim = makeNecromancer();
+    addTarget(sim);
+    addSoulFragments(sim.ctx, sim.player, 5);
+    finishCast(sim, 'raise_gravewing');
+    const living = (templateId: string) =>
+      [...sim.entities.values()].filter((e) => e.templateId === templateId && !e.dead).length;
+    expect(living('necromancy_gravewing')).toBe(1);
+
+    addSoulFragments(sim.ctx, sim.player, 5);
+    sim.player.resource = sim.player.maxResource;
+    finishCast(sim, 'army_of_the_dead');
+
+    // The duplicate gate: the standing Gravewing is NOT doubled; the missing
+    // warrior and bone mage archetypes join it instead.
+    expect(living('necromancy_gravewing')).toBe(1);
+    expect(living('necromancy_skeletal_warrior')).toBe(1);
+    expect(living('necromancy_bone_mage')).toBe(1);
   });
 
   it('refuses Reaping Command without undead before spending mana or fragments', () => {
@@ -1588,7 +1610,7 @@ describe('Necromancy Warlock', () => {
     });
   });
 
-  it('Army of the Dead preserves a full Dominion and always adds a complete temporary wave', () => {
+  it('Army of the Dead preserves a full Dominion and fills only the missing archetype', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     addSoulFragments(sim.ctx, sim.player, 5);
@@ -1600,16 +1622,14 @@ describe('Necromancy Warlock', () => {
 
     finishCast(sim, 'army_of_the_dead');
 
+    // The duplicate gate: with a warrior and bone mage standing, the portal
+    // raises ONLY the missing Gravewing; the standing pair is never doubled.
     const duringArmy = ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard');
     const temporary = duringArmy.filter((servant) => servant.despawnTimer !== undefined);
-    expect(temporary.map((servant) => servant.templateId)).toEqual([
-      'necromancy_skeletal_warrior',
-      'necromancy_bone_mage',
-      'necromancy_gravewing',
-    ]);
+    expect(temporary.map((servant) => servant.templateId)).toEqual(['necromancy_gravewing']);
     expect(dominionIds.every((id) => sim.entities.has(id))).toBe(true);
     expect(temporary.every((servant) => servant.despawnTimer === 20)).toBe(true);
-    expect(duringArmy).toHaveLength(5);
+    expect(duringArmy).toHaveLength(3);
 
     for (let tick = 0; tick < 20 * 21; tick++) sim.tick();
     expect(
@@ -1620,7 +1640,7 @@ describe('Necromancy Warlock', () => {
     expect(dominionIds.every((id) => sim.entities.has(id))).toBe(true);
   });
 
-  it('Army of the Dead adds all three temporary archetypes around one chosen servant', () => {
+  it('Army of the Dead raises the two missing archetypes around one chosen servant', () => {
     const sim = makeNecromancer();
     addTarget(sim);
     addSoulFragments(sim.ctx, sim.player, 2);
@@ -1632,12 +1652,13 @@ describe('Necromancy Warlock', () => {
 
     finishCast(sim, 'army_of_the_dead');
 
+    // The chosen Gravewing stays the ONLY Gravewing; the portal supplies the
+    // warrior and bone mage it was missing.
     const army = ownedUndead(sim).filter((servant) => servant.templateId !== 'graveguard');
     const temporary = army.filter((servant) => servant.despawnTimer !== undefined);
     expect(temporary.map((servant) => servant.templateId)).toEqual([
       'necromancy_skeletal_warrior',
       'necromancy_bone_mage',
-      'necromancy_gravewing',
     ]);
     expect(chosen.despawnTimer).toBeUndefined();
     expect(temporary.every((servant) => servant.despawnTimer === 20)).toBe(true);

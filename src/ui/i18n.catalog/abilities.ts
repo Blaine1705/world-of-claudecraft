@@ -1878,7 +1878,7 @@ const classAbilityNamesEn = {
       [
         'army_of_the_dead',
         'Army of the Dead',
-        'Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec in addition to your chosen Dominion servants.',
+        'Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty.',
       ],
       [
         'metamorphosis',

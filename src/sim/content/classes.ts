@@ -5245,7 +5245,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         cost: 60,
         effects: [
           { type: 'directDamage', min: 106, max: 106 },
-          { type: 'dot', total: 168, duration: 15, interval: 3 },
+          { type: 'dot', total: 136, duration: 15, interval: 3 },
         ],
       },
     ],
@@ -5394,7 +5394,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 3,
         level: 20,
         cost: 65,
-        effects: [{ type: 'directDamage', min: 74, max: 88 }],
+        effects: [{ type: 'directDamage', min: 85, max: 101 }],
       },
     ],
     description:
@@ -5694,7 +5694,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 55,
         effects: [
-          { type: 'directDamage', min: 54, max: 66 },
+          { type: 'directDamage', min: 66, max: 80 },
           { type: 'gainSoulFragments', amount: 1 },
         ],
       },
@@ -5925,7 +5925,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'armyOfDead', duration: 20 }],
     description:
-      'Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec in addition to your chosen Dominion servants.',
+      'Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty.',
   },
 
   // ====================== DRUID ======================
@@ -7442,12 +7442,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
     learnLevel: 10,
     cost: 40,
     castTime: 0,
-    cooldown: 12,
+    cooldown: 18,
     maxCharges: 2,
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 151, max: 179 }],
+    effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 140, max: 165 }],
     description:
       'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)',
   },

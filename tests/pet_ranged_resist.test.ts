@@ -96,6 +96,9 @@ describe('pet ranged bolt spell resist', () => {
     expect(dmg[0].sourceId).toBe(imp.id);
     expect(dmg[0].school).toBe('fire');
     expect(dmg[0].crit).toBe(false);
+    // The resist keeps the bolt's display label (this branch names the
+    // Emberkin's bolt), never a hardcoded or blank one.
+    expect(dmg[0].ability).toBe('Felbolt');
     expect(rolled[0]).toBeCloseTo(spellHitChance(imp.level, 60), 6);
     // Draw economy: a resisted bolt consumes exactly the one resist draw and
     // skips the crit and damage-range draws (the parity digest pins the stream
