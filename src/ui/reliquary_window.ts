@@ -132,6 +132,10 @@ export class ReliquaryWindow {
   // The open render must stay silent by DESIGN, not by the accident of the
   // root still being display:none when it writes (see announceResults).
   private suppressAnnounceOnce = false;
+  // True while a CJK IME composition is assembling in the search field. The
+  // slow band holds its repaint off (refreshIfChanged) so an innerHTML wipe
+  // cannot rip the composition session out from under the player.
+  private composing = false;
 
   constructor(private readonly deps: ReliquaryWindowDeps) {}
 
@@ -189,6 +193,10 @@ export class ReliquaryWindow {
   /** Slow-band refresh: repaint only when the compact signature moves. */
   refreshIfChanged(): void {
     if (!this.opened) return;
+    // A world repaint mid-composition would wipe the field and destroy the
+    // IME session; hold the band off until the composition commits (the next
+    // band picks the change up).
+    if (this.composing) return;
     const input = this.buildInput();
     const sig = this.sigFromInput(input);
     if (sig === this.lastSig) return;
@@ -198,6 +206,11 @@ export class ReliquaryWindow {
   render(prebuilt?: ReliquaryViewInput, prebuiltSig?: string): void {
     const el = this.deps.root();
     if (!this.opened) return;
+    // Any full rebuild destroys an in-flight composition along with the old
+    // field, whose compositionend will never fire on the fresh one: reset
+    // the flag here so a render() from outside wire() (the language fan-out)
+    // cannot wedge the slow band's composition hold open forever.
+    this.composing = false;
     const focusKey = captureFocusKey(el);
     const hadFocus = focusedWithin(el) !== null;
     // innerHTML wipes the search field, and the shared data-focus-key restore
@@ -291,7 +304,11 @@ export class ReliquaryWindow {
     model: ReliquaryViewModel,
     worldDriven: boolean,
   ): void {
-    const narrowed = model.pageDetail ? model.pageDetail.filtered : model.filtered;
+    // Overview never paints a grid even if a pageId lingers in state, so the
+    // strips answer for the painted surface there (defense in depth: no
+    // current caller reaches Overview with a page selected).
+    const narrowed =
+      model.nav !== 'overview' && model.pageDetail ? model.pageDetail.filtered : model.filtered;
     if (this.suppressAnnounceOnce) {
       this.suppressAnnounceOnce = false;
       this.lastAnnounced = narrowed
@@ -326,13 +343,12 @@ export class ReliquaryWindow {
     live.textContent = this.liveReannounce.mark(text);
   }
 
-  /** The one definition of what a narrowed surface counts. */
+  /** The one definition of what a narrowed surface counts. Overview counts
+   *  its strips even if a pageId lingers unpainted in state (same defense as
+   *  the narrowed gate above). */
   private announceCount(model: ReliquaryViewModel): number {
-    return model.pageDetail
-      ? model.pageDetail.cells.length
-      : model.nav === 'overview'
-        ? model.recent.length + model.nearly.length
-        : model.shelfPages.length;
+    if (model.nav === 'overview') return model.recent.length + model.nearly.length;
+    return model.pageDetail ? model.pageDetail.cells.length : model.shelfPages.length;
   }
 
   /** Point the roving tab stop at the grid cell the focus-key restore landed
@@ -518,10 +534,10 @@ export class ReliquaryWindow {
 
   private recentStripHtml(recent: readonly ReliquaryRecentFindModel[]): string {
     if (recent.length === 0) return '';
-    // No title="" here: the invariant bans native title tooltips. A chip whose
-    // name is CSS-truncated still reads in full through data-recent-name, which
-    // wire() hands the shared HUD tooltip, and the chip carries the whole name
-    // as its own accessible text either way.
+    // No title="" here: the invariant bans native title tooltips. The name
+    // wraps fully visible inside the chip (nothing truncates; the CSS pin
+    // bans it), and data-recent-name feeds the shared HUD tooltip in wire()
+    // as a pointer-hover nicety that repeats the visible text.
     const chips = recent
       .map((r) => {
         const name = reliquaryRelicDisplayName(r.kind, r.id);
@@ -829,11 +845,21 @@ export class ReliquaryWindow {
     });
     const search = el.querySelector<HTMLInputElement>('.reliquary-search');
     const applySearch = (): void => {
-      this.search = search?.value ?? '';
+      const value = search?.value ?? '';
+      // Equality guard IN the applier: at the end of a composition BOTH
+      // compositionend and a final input event (isComposing false) arrive,
+      // in either order by host. Whichever lands second must be a no-op, or
+      // the second rebuild toggles the reannounce marker and the reader
+      // hears the count twice.
+      if (this.search === value) return;
+      this.search = value;
       // A narrowed grid renumbers, so the roving cursor goes back to the front.
       this.gridIndex = 0;
       this.render();
     };
+    search?.addEventListener('compositionstart', () => {
+      this.composing = true;
+    });
     search?.addEventListener('input', (e) => {
       // Mid-composition input events (a CJK IME assembling a candidate) must
       // not rebuild: innerHTML would destroy the composition session under the
@@ -845,7 +871,7 @@ export class ReliquaryWindow {
       applySearch();
     });
     search?.addEventListener('compositionend', () => {
-      if (this.search === search.value) return;
+      this.composing = false;
       applySearch();
     });
     for (const btn of el.querySelectorAll<HTMLElement>('[data-nav]')) {
@@ -890,8 +916,9 @@ export class ReliquaryWindow {
       audio.click();
       this.render();
     });
-    // Recent chips: the full name through the shared HUD tooltip, so a chip the
-    // CSS truncates is still readable without a native title attribute.
+    // Recent chips: the shared HUD tooltip repeats the chip's fully visible
+    // wrapped name near the pointer (a hover nicety, never the only route to
+    // the text; nothing truncates).
     for (const chip of el.querySelectorAll<HTMLElement>('[data-recent-name]')) {
       const name = chip.dataset.recentName ?? '';
       if (name === '') continue;

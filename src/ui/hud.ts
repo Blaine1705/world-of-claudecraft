@@ -13279,14 +13279,17 @@ export class Hud {
       this.combatAnnouncer.push(bannerText, performance.now());
     }
     if (plan.playSound) audio.achievement();
-    // Force an immediate open-window refresh so silhouette grids fill live
-    // (the slow band would catch it too; immediate paint feels better).
-    // refreshIfChanged, NOT bare render(): an unlock always moves the
-    // ownership digest so it still repaints now, and the prebuilt-input path
+    // Immediate open-window refresh so silhouette grids fill live.
+    // refreshIfChanged, NOT bare render(): the prebuilt-input path
     // classifies the repaint as world-driven, which keeps the live region
-    // silent when the announced count did not change. A bare render() here
-    // reads as player-driven and re-announces a count the player never asked
-    // about (the Phase 13 QA regression).
+    // silent when the announced count did not change; a bare render() reads
+    // as player-driven and re-announces a count the player never asked
+    // about (the Phase 13 QA regression). Offline the ownership digest
+    // moves in the same tick, so this paints immediately. Online the event
+    // frame can precede the heavy snapshot that moves the mirror, in which
+    // case this call elides and the grid converges when that snapshot lands
+    // plus the slow band (the old bare render() painted the same stale
+    // mirror, just noisily).
     if (plan.refreshWindow && this.reliquaryWindow.isOpen) {
       this.reliquaryWindow.refreshIfChanged();
     }

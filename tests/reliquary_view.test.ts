@@ -1195,6 +1195,78 @@ describe('model.filtered reports a real narrowing, never mere needle presence', 
     expect(buildReliquaryView(overview('alpha')).filtered).toBe(true);
   });
 
+  it('overview: the recent arm alone decides when only the chips narrow', () => {
+    // Ghost ids resolve kind 'unknown' (absent from ownership and catalog),
+    // so their search text comes from the unknown resolver arm. The page
+    // text carries the needle for EVERY page, so the nearly strip stays
+    // whole and only the chip narrowing can set the flag.
+    const model = buildReliquaryView(
+      input({
+        pages: twoPages,
+        nav: 'overview',
+        recent: ['ghost_a', 'ghost_b'],
+        itemsDiscovered: ownedSet(...ownedFirst('alpha_page', 1), ...ownedFirst('beta_page', 1)),
+        search: 'chipneedle',
+        pageSearchText: (id) => `${id} chipneedle`,
+        relicSearchText: (kind, id) =>
+          kind === 'unknown' && id === 'ghost_a' ? 'chipneedle hit' : id,
+      }),
+    );
+    expect(model.recent.map((r) => r.id)).toEqual(['ghost_a']);
+    expect(model.nearly.map((n) => n.pageId).sort()).toEqual(['alpha_page', 'beta_page']);
+    expect(model.filtered).toBe(true);
+  });
+
+  it('overview: the nearly arm alone decides when only the page rows narrow', () => {
+    // Both chips match the needle; only one page does (by its own text or a
+    // contained relic), so the nearly strip is the only narrowed surface.
+    const model = buildReliquaryView(
+      input({
+        pages: twoPages,
+        nav: 'overview',
+        recent: ['ghost_a', 'ghost_b'],
+        itemsDiscovered: ownedSet(...ownedFirst('alpha_page', 1), ...ownedFirst('beta_page', 1)),
+        search: 'alpha',
+        pageSearchText: (id) => id,
+        relicSearchText: (kind, id) => (kind === 'unknown' ? 'alpha ghost' : id),
+      }),
+    );
+    expect(model.recent.map((r) => r.id)).toEqual(['ghost_b', 'ghost_a']);
+    expect(model.nearly.map((n) => n.pageId)).toEqual(['alpha_page']);
+    expect(model.filtered).toBe(true);
+  });
+
+  it('overview: an equal-length nearly swap still reads as narrowed (identity, not count)', () => {
+    // Six qualifiers: five remaining-1 pages and the remaining-3 target that
+    // ranks sixth. A needle matching all but close_0 keeps the strip at five
+    // rows while swapping close_0 out for the target: the flag must come
+    // from row identity, not list length.
+    const pages = [
+      ...Array.from({ length: 5 }, (_, i) => sizedPage(`close_${i}`, 2)),
+      sizedPage('deep_target', 6),
+    ];
+    const discovered = ownedSet(
+      ...pages.slice(0, 5).flatMap((p) => ownedFirst(p.id, 1)),
+      ...ownedFirst('deep_target', 3),
+    );
+    const unsearched = buildReliquaryView(
+      input({ pages, nav: 'overview', itemsDiscovered: discovered }),
+    );
+    expect(unsearched.nearly.map((n) => n.pageId)).not.toContain('deep_target');
+    const model = buildReliquaryView(
+      input({
+        pages,
+        nav: 'overview',
+        itemsDiscovered: discovered,
+        search: 'findme',
+        pageSearchText: (id) => (id === 'close_0' ? 'nomatch' : `${id} findme`),
+      }),
+    );
+    expect(model.nearly).toHaveLength(5);
+    expect(model.nearly.map((n) => n.pageId)).toContain('deep_target');
+    expect(model.filtered).toBe(true);
+  });
+
   it('stays false when no resolver is injected, whatever the needle', () => {
     const model = buildReliquaryView(
       input({ pages: twoPages, nav: 'conquerors', search: 'anything' }),

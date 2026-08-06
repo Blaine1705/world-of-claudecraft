@@ -211,14 +211,24 @@ describe('painter hygiene', () => {
     expect(painter).toContain('data-recent-name');
     expect(painter).toMatch(/data-recent-name[\s\S]*?attachTooltip/);
     // The chip must NOT truncate: it is a non-interactive span, so a hover
-    // tooltip is the only way past an ellipsis and a sighted keyboard player
-    // has no pointer to fire it with. The name wraps inside the width cap
-    // instead (nothing hidden), and the tooltip stays as a pointer nicety.
-    const recentNameRule = sectionCss('reliquary').match(/\.reliquary-recent-name \{[^}]*\}/)?.[0];
-    expect(recentNameRule, '.reliquary-recent-name rule').toBeTruthy();
-    expect(recentNameRule).toContain('max-width: 160px;');
-    expect(recentNameRule).not.toContain('text-overflow');
-    expect(recentNameRule).not.toContain('white-space: nowrap');
+    // tooltip is the only way past an ellipsis or a clip, and a sighted
+    // keyboard player has no pointer to fire it with. The name wraps inside
+    // the width cap instead (nothing hidden; overflow-wrap covers the
+    // unbreakable-compound case), and the tooltip stays a pointer nicety.
+    // EVERY .reliquary-recent-name rule in both stylesheets is swept, so a
+    // truncation cannot come back through a later rule, a media query, or
+    // the mobile sheet (cascade blindness).
+    const recentNameRules = [components, hudMobile].flatMap((sheet) => [
+      ...sheet.matchAll(/\.reliquary-recent-name[^{}]*\{[^}]*\}/g),
+    ]);
+    expect(recentNameRules.length).toBeGreaterThanOrEqual(1);
+    for (const [rule] of recentNameRules) {
+      expect(rule).not.toContain('text-overflow');
+      expect(rule).not.toContain('white-space: nowrap');
+      expect(rule).not.toContain('overflow: hidden');
+    }
+    expect(recentNameRules.some(([rule]) => rule.includes('max-width: 160px'))).toBe(true);
+    expect(recentNameRules.some(([rule]) => rule.includes('overflow-wrap: anywhere'))).toBe(true);
   });
 
   it('gives the page list real list semantics (ul/li, not bare buttons)', () => {
@@ -393,16 +403,22 @@ describe('painter hygiene', () => {
     // surface asks the model's own answer for THIS paint: the grid through
     // pageDetail.filtered, shelf and Overview through model.filtered (a
     // needle that matches everything narrows nothing and stays silent).
-    expect(code).toContain(
-      'const narrowed = model.pageDetail ? model.pageDetail.filtered : model.filtered',
+    // Whitespace-tolerant: the ternary wraps under the formatter. The nav
+    // guard keeps a lingering unpainted pageId from answering for Overview.
+    expect(code).toMatch(
+      /const narrowed =\s*model\.nav !== 'overview' && model\.pageDetail \? model\.pageDetail\.filtered : model\.filtered/,
     );
     expect(code).not.toMatch(/this\.ownedFilter === 'all'\) return/);
     // The render that OPENS the window never announces: a persisted chip or
     // page is state the player left behind, not a narrowing they performed.
+    // The assignment is asserted INSIDE open()'s own body (sliced to its
+    // closing brace), not merely somewhere after its signature.
     expect(code).toContain('if (this.suppressAnnounceOnce)');
-    expect(code).toMatch(
-      /open\(nav\?: ReliquaryNavId\): void \{[\s\S]*?this\.suppressAnnounceOnce = true/,
-    );
+    const openBody = code.match(
+      /\n {2}open\(nav\?: ReliquaryNavId\): void \{[\s\S]*?\n {2}\}/,
+    )?.[0];
+    expect(openBody, 'open() body').toBeTruthy();
+    expect(openBody).toContain('this.suppressAnnounceOnce = true');
     // Not narrowed means the region is emptied AND the marker forgotten, or
     // re-narrowing to the same count later would stay silent.
     expect(code).toMatch(/if \(!narrowed\) \{[\s\S]*?live\.textContent = ''/);

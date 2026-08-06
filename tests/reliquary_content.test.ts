@@ -1170,18 +1170,20 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The first six each sit on two or more comparable live routes with no
-  // primary: a trash family (sanctum_boneguard / sanctum_drakonid, 9 spawns
-  // each) and a mid-boss or Korzul (1 spawn each) at chances close enough that
-  // neither the per-kill rate nor the per-run expectation settles it, PLUS a
-  // crafting recipe for boundstone_helm (recipe_ironbound_warplate_helm) and
-  // gravewyrm_gauntlets (recipe_forgeguard_bulwark_gauntlets), and a
-  // guaranteed q_velkhar class reward for staff_of_velkhar (mage) and
-  // shadowmeld_tunic (rogue). wyrmcult_grand_robe is pending for a sharper
-  // reason: its two live routes name two DIFFERENT mobs (the guaranteed mage
-  // reward of q_gravewyrm, whose kill objective is korzul_the_gravewyrm, vs a
-  // korgath_bonus loot row at 0.1), so crediting either one alone would send
-  // half its finders to the wrong door.
+  // boundstone_helm, boundstone_girdle, gravewyrm_mantle, gravewyrm_gauntlets,
+  // staff_of_velkhar, and shadowmeld_tunic each sit on two or more comparable
+  // live routes with no primary: a trash family (sanctum_boneguard /
+  // sanctum_drakonid, 9 spawns each) and a mid-boss or Korzul (1 spawn each)
+  // at chances close enough that neither the per-kill rate nor the per-run
+  // expectation settles it, PLUS a crafting recipe for boundstone_helm
+  // (recipe_ironbound_warplate_helm) and gravewyrm_gauntlets
+  // (recipe_forgeguard_bulwark_gauntlets), and a guaranteed q_velkhar class
+  // reward for staff_of_velkhar (mage) and shadowmeld_tunic (rogue).
+  // wyrmcult_grand_robe is pending for a sharper reason: its two live routes
+  // name two DIFFERENT mobs (the guaranteed mage reward of q_gravewyrm, whose
+  // kill objective is korzul_the_gravewyrm, vs a korgath_bonus loot row at
+  // 0.1), so crediting either one alone would send half its finders to the
+  // wrong door.
   conquerors_gravewyrm_sanctum: [
     'boundstone_helm',
     'boundstone_girdle',
@@ -1231,6 +1233,23 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   horizons_mounts: RELIQUARY_HORIZON_MOUNTS,
   horizons_weapon_skins: RELIQUARY_HORIZON_WEAPON_SKINS,
 };
+
+/**
+ * The difficulty-aware boss-route standard: a dungeon page that names a
+ * difficulty must find the credited drop on THAT difficulty's table (a
+ * normal-page relic that only drops on heroic, or vice versa, is a wrong
+ * credit even though the union would pass it); non-dungeon pages and
+ * difficulty-less or 'any' pages span both tables by design.
+ */
+function bossRouteSatisfies(
+  difficulty: 'normal' | 'heroic' | 'any' | undefined,
+  fromLoot: boolean,
+  fromHeroic: boolean,
+): boolean {
+  if (difficulty === 'heroic') return fromHeroic;
+  if (difficulty === 'normal') return fromLoot;
+  return fromLoot || fromHeroic;
+}
 
 /** `pageId:slotId` keys, the shape the sweeps below test membership against. */
 const PENDING_KEYS = new Set<string>(
@@ -1366,6 +1385,12 @@ describe('Reliquary source hints resolve against live content', () => {
       false,
     );
     expect(sourceIdResolves({ sourceKind: 'deed', sourceId: 'mining' })).toBe(false);
+    // Prototype-key guard: the hasOwn arms exist for exactly this. A bare
+    // index would find Object.prototype.constructor on every Record table
+    // and validate an id production's ownEntry ladder refuses to render.
+    expect(sourceIdResolves({ sourceKind: 'boss', sourceId: 'constructor' })).toBe(false);
+    expect(sourceIdResolves({ sourceKind: 'vendor', sourceId: 'constructor' })).toBe(false);
+    expect(sourceIdResolves({ sourceKind: 'deed', sourceId: 'constructor' })).toBe(false);
   });
 
   it('every boss hint names a mob whose live loot really carries the relic', () => {
@@ -1385,20 +1410,9 @@ describe('Reliquary source hints resolve against live content', () => {
       const fromLoot = (MOBS[hint.sourceId]?.loot ?? []).some((e) => e.itemId === slotId);
       const heroic = HEROIC_BOSS_LOOT[hint.sourceId as keyof typeof HEROIC_BOSS_LOOT] ?? [];
       const fromHeroic = heroic.some((e) => e.itemId === slotId);
-      // A dungeon page that names a difficulty must find the credited drop on
-      // THAT difficulty's table: a normal-page relic that only drops on heroic
-      // (or vice versa) is a wrong credit even though the union would pass it.
-      // Non-dungeon pages (sets, professions) and difficulty-less or 'any'
-      // pages span both tables by design.
       const clear = page.clearSource;
       const difficulty = clear?.kind === 'dungeon' ? clear.difficulty : undefined;
-      const passes =
-        difficulty === 'heroic'
-          ? fromHeroic
-          : difficulty === 'normal'
-            ? fromLoot
-            : fromLoot || fromHeroic;
-      if (!passes) {
+      if (!bossRouteSatisfies(difficulty, fromLoot, fromHeroic)) {
         offenders.push(`${page.id}:${slotId} credits ${hint.sourceId}, which never drops it`);
       }
     }
@@ -1407,6 +1421,20 @@ describe('Reliquary source hints resolve against live content', () => {
     // matching the authored boss coverage; update deliberately with the
     // authoring, same regime as the totals pins above.
     expect(checked).toBeGreaterThanOrEqual(136);
+  });
+
+  it('bossRouteSatisfies rejects a wrong-difficulty credit per arm', () => {
+    // No live slot currently fails strict-while-passing-union (zero items sit
+    // on both tables), so the data-driven walk above cannot prove the
+    // tightening. These synthetic cases pin the predicate itself: one
+    // negative per typed difficulty, the positives, and the union arms.
+    expect(bossRouteSatisfies('normal', false, true)).toBe(false);
+    expect(bossRouteSatisfies('heroic', true, false)).toBe(false);
+    expect(bossRouteSatisfies('normal', true, false)).toBe(true);
+    expect(bossRouteSatisfies('heroic', false, true)).toBe(true);
+    expect(bossRouteSatisfies('any', true, false)).toBe(true);
+    expect(bossRouteSatisfies(undefined, false, true)).toBe(true);
+    expect(bossRouteSatisfies(undefined, false, false)).toBe(false);
   });
 
   it('every vendor hint names an NPC whose live stock really sells the relic', () => {
@@ -1554,6 +1582,12 @@ describe('Reliquary source hint coverage', () => {
     // growing either list means re-affirming the page-wide ruling here.
     expect(SOURCE_PENDING_RULING.horizons_mounts).toHaveLength(9);
     expect(SOURCE_PENDING_RULING.horizons_weapon_skins).toHaveLength(29);
+    // And the derivation itself: these rows must BE the catalog lists (same
+    // array object), or a rewrite that copies ids in would keep the length
+    // pins green while quietly decoupling the auto-enrolment the comment
+    // above promises.
+    expect(SOURCE_PENDING_RULING.horizons_mounts).toBe(RELIQUARY_HORIZON_MOUNTS);
+    expect(SOURCE_PENDING_RULING.horizons_weapon_skins).toBe(RELIQUARY_HORIZON_WEAPON_SKINS);
   });
 
   it('multi-source pages give every item relic its OWN hint (no inherited stragglers)', () => {
@@ -1625,12 +1659,31 @@ describe('Reliquary source hint coverage', () => {
     // while another comparable route exists unacknowledged sends a player
     // confidently to the wrong door, and the per-route truth pins above cannot
     // see it (they only ask whether the CREDITED source awards the relic, never
-    // whether something else also does). This walks every live award path for
-    // every hinted item slot: mob loot, heroic boss loot, delve shop stock, NPC
-    // vendor stock, guaranteed quest class rewards, and crafting recipes. A
-    // route is acknowledged when the hint names it, when a quest's own kill
-    // objective targets the credited mob (the quest is the same door), or when
-    // the curated dominated-rate table below carries it. Anything else reds.
+    // whether something else also does). This walks six award-path families
+    // for every hinted item slot: mob loot, heroic boss loot, delve shop
+    // stock, NPC vendor stock, guaranteed quest class rewards, and crafting
+    // recipes. A route is acknowledged when the hint names it (the credited
+    // mob, vendor, or crafting profession), when a quest's own kill objective
+    // targets the credited mob (the quest is the same door), or when the
+    // curated dominated-rate table below carries it. Anything else reds.
+    //
+    // KNOWN EXCLUSIONS, named so the omissions are decisions, not oversights:
+    // - The Rift clear payout (addRiftClearGearLoot pulls a guaranteed item
+    //   from riftNormalClearPool / riftHeroicClearPool, which overlap about 72
+    //   of the hinted slots at 1-in-35-ish per clear). Whether five-man gear
+    //   should list "or any Rift clear" is exactly the settled 13b source
+    //   ruling's 'rift' kind, a maintainer content decision this QA must not
+    //   pre-empt: Phase 13b rules on it and this sweep grows a rift arm with
+    //   whatever it decides.
+    // - Procedural delve chest pools (delveChestItemsForTier,
+    //   drownedLitanyChestItemsForTier) and HEROIC_VENDOR_STOCK: zero hinted
+    //   relics appear in any of them today (verified); every chest-awarded
+    //   relic sits in SOURCE_PENDING_RULING. A hint on one would need this
+    //   sweep to grow that arm first.
+    // - The heroic variant swap (loot_roll.ts turns a base drop into its
+    //   heroic_<base> variant): heroic variants are deliberately not
+    //   catalogued (see the header of this catalog), so no hinted slot can be
+    //   one.
     const lootMobsByItem = new Map<string, string[]>();
     for (const [mobId, mob] of Object.entries(MOBS)) {
       for (const row of mob.loot ?? []) {
@@ -1671,13 +1724,17 @@ describe('Reliquary source hint coverage', () => {
         questsByItem.set(itemId, [...(questsByItem.get(itemId) ?? []), { questId, killTargets }]);
       }
     }
-    const recipesByItem = new Map<string, string[]>();
+    const recipesByItem = new Map<string, { id: string; professionId: string }[]>();
     for (const recipe of ALL_RECIPES) {
       recipesByItem.set(recipe.resultItemId, [
         ...(recipesByItem.get(recipe.resultItemId) ?? []),
-        recipe.id,
+        { id: recipe.id, professionId: recipe.professionId },
       ]);
     }
+    // The recipe map must be live even though no HINTED relic has a recipe
+    // today (the two crafted relics are pending): a renamed resultItemId
+    // would otherwise silently empty this whole family.
+    expect(recipesByItem.size).toBeGreaterThan(0);
 
     // Curated dominated-route exceptions, keyed page:slot:route. Both are the
     // SET_MEMBER_SOURCES rate ruling (rare at 0.25 vs trash at 0.001, a 250 to
@@ -1689,13 +1746,17 @@ describe('Reliquary source hint coverage', () => {
     ]);
     const consumed = new Set<string>();
     const offenders: string[] = [];
-    let checkedRoutes = 0;
+    const routesByFamily = { mob: 0, heroic: 0, vendor: 0, quest: 0, recipe: 0 };
     for (const { page, relic, slotId } of RELIC_SLOTS) {
       if (relic.kind !== 'item') continue;
       const hint = reliquaryRelicSource(page, relic);
       if (!hint) continue;
-      const judge = (routeKey: string, acknowledged: boolean): void => {
-        checkedRoutes += 1;
+      const judge = (
+        family: keyof typeof routesByFamily,
+        routeKey: string,
+        acknowledged: boolean,
+      ): void => {
+        routesByFamily[family] += 1;
         if (acknowledged) return;
         const exception = `${page.id}:${slotId}:${routeKey}`;
         if (ACKNOWLEDGED_SECONDARY_ROUTES.has(exception)) {
@@ -1707,46 +1768,67 @@ describe('Reliquary source hint coverage', () => {
         );
       };
       for (const mobId of lootMobsByItem.get(slotId) ?? []) {
-        judge(`mob:${mobId}`, hint.sourceKind === 'boss' && hint.sourceId === mobId);
+        judge('mob', `mob:${mobId}`, hint.sourceKind === 'boss' && hint.sourceId === mobId);
       }
       for (const mobId of heroicMobsByItem.get(slotId) ?? []) {
-        judge(`heroic:${mobId}`, hint.sourceKind === 'boss' && hint.sourceId === mobId);
+        judge('heroic', `heroic:${mobId}`, hint.sourceKind === 'boss' && hint.sourceId === mobId);
       }
       for (const npcId of vendorsByItem.get(slotId) ?? []) {
-        judge(`vendor:${npcId}`, hint.sourceKind === 'vendor' && hint.sourceId === npcId);
+        judge('vendor', `vendor:${npcId}`, hint.sourceKind === 'vendor' && hint.sourceId === npcId);
       }
       for (const q of questsByItem.get(slotId) ?? []) {
         judge(
+          'quest',
           `quest:${q.questId}`,
           hint.sourceKind === 'boss' && q.killTargets.includes(hint.sourceId),
         );
       }
-      for (const recipeId of recipesByItem.get(slotId) ?? []) {
-        judge(`recipe:${recipeId}`, false);
+      for (const r of recipesByItem.get(slotId) ?? []) {
+        // A crafted relic credited to its own crafting profession is the one
+        // acknowledged recipe shape (none exists today; Phase 13b may author
+        // the first). Any other hint kind leaves the recipe a competing door.
+        judge(
+          'recipe',
+          `recipe:${r.id}`,
+          hint.sourceKind === 'profession' && hint.sourceId === r.professionId,
+        );
       }
     }
     expect(offenders).toEqual([]);
     // Both directions: an exception the sweep no longer consumes is stale.
     expect([...ACKNOWLEDGED_SECONDARY_ROUTES].filter((k) => !consumed.has(k))).toEqual([]);
-    // Vacuity floor: every hinted item slot has at least its credited route
-    // when the credit is a loot or stock table, so the sweep must have judged
-    // a large share of the catalog. Literal; update with the authoring.
-    expect(checkedRoutes).toBeGreaterThanOrEqual(150);
+    // Vacuity floors PER FAMILY, exact to today's catalog (the file's usual
+    // regime; update deliberately with the authoring). One total would let
+    // the small families vanish inside the mob count's margin: the quest arm
+    // is 4 routes and it is the arm that caught wyrmcult_grand_robe.
+    expect(routesByFamily.mob).toBeGreaterThanOrEqual(133);
+    expect(routesByFamily.heroic).toBeGreaterThanOrEqual(37);
+    expect(routesByFamily.vendor).toBeGreaterThanOrEqual(2);
+    expect(routesByFamily.quest).toBeGreaterThanOrEqual(4);
+    // Recipe: zero JUDGED routes is today's true count (both crafted relics
+    // are pending, so their slots never reach the judge); the map-liveness
+    // assertion above is this family's floor.
+    const checkedRoutes = Object.values(routesByFamily).reduce((a, b) => a + b, 0);
+    expect(checkedRoutes).toBeGreaterThanOrEqual(176);
   });
 
-  it('boss and vendor hints live only on item and mark slots today', () => {
+  it('only deed hints leave the item and mark slots today (all other kinds are pinned there)', () => {
     // The loot and stock truth pins above early-return on every other relic
-    // kind, so a boss or vendor hint on a mount, weapon skin, or title would
-    // land UNPINNED. Zero such hints exist today; when Phase 13b authors mount
+    // kind, so ANY non-deed hint on a mount, weapon skin, or title would land
+    // UNPINNED. Zero such hints exist today; when Phase 13b authors mount
     // sources this pin reds and forces the truth sweeps to grow an arm first.
     const offenders: string[] = [];
+    let examined = 0;
     for (const { page, relic, slotId } of RELIC_SLOTS) {
       if (relic.kind === 'item' || relic.kind === 'mark') continue;
+      examined += 1;
       const hint = reliquaryRelicSource(page, relic);
       if (hint === null || hint.sourceKind === 'deed') continue;
       offenders.push(`${page.id}:${slotId} carries an unpinned ${hint.sourceKind} hint`);
     }
     expect(offenders).toEqual([]);
+    // Vacuity floor: 33 titles + 9 mounts + 29 skins today.
+    expect(examined).toBeGreaterThanOrEqual(71);
   });
 
   it('every authored sourceDefault is inherited by at least one relic', () => {

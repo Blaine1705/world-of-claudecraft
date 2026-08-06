@@ -2,6 +2,8 @@
 // visual changes, and only the sections they touch" policy, kept pure so it needs no
 // browser. The .mjs script has no TS/browser imports at module load, so vitest can import
 // it directly.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error - plain Node ESM script, no types
 import { classifyDiff, diffChangedPaths, resolveTargets } from '../scripts/pr_shot_targets.mjs';
@@ -225,6 +227,15 @@ describe('classifyDiff', () => {
     // visual by prefix, so only the discriminating pair proves the flag.
     expect(classifyDiff(['docs/qa-gate.md']).isVisual).toBe(false);
     expect(plan.isVisual).toBe(true);
+    // Cross-file contract for the reliquary-page cell picker: the script
+    // selects on the data marker the painter stamps (never English aria
+    // text), so both ends must spell the same attribute or the capture
+    // silently degrades to the fallback cell. The painter side is pinned
+    // behaviorally in tests/reliquary_window_behavior.test.ts.
+    const script = readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8');
+    expect(script).toContain("hasAttribute('data-cell-source')");
+    const painterSrc = readFileSync(join(__dirname, '../src/ui/reliquary_window.ts'), 'utf8');
+    expect(painterSrc).toContain('data-cell-source="1"');
     const keys = plan.specific.map((t: { key: string }) => t.key);
     expect(keys).toContain('reliquary-window');
     expect(keys).toContain('reliquary-page');

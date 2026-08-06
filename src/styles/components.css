@@ -8039,9 +8039,13 @@
   /* A long relic name wraps inside its chip instead of truncating: an
      ellipsis would hide the tail from sighted keyboard players, because the
      chip is a non-interactive span the shared hover tooltip (wire()) cannot
-     reach without a pointer. The cap only bounds the line length. */
+     reach without a pointer. The cap only bounds the line length, and
+     overflow-wrap keeps that true for an unbreakable compound (German or
+     Finnish single-word names), which would otherwise spill past the
+     chip border. */
   .reliquary-recent-name {
     max-width: 160px;
+    overflow-wrap: anywhere;
   }
   .reliquary-nearly-row,
   .reliquary-page-row,

@@ -23,7 +23,11 @@
 // instead of quietly making the test vacuous.
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
+import {
+  RELIQUARY_PAGES,
+  RELIQUARY_PAGES_BY_ID,
+  reliquaryRelicSource,
+} from '../src/sim/content/reliquary';
 import { ITEMS } from '../src/sim/data';
 import { esc } from '../src/ui/esc';
 import { formatNumber, getLanguage, languageTag, t, tPlural } from '../src/ui/i18n';
@@ -1177,6 +1181,54 @@ describe('ReliquaryWindow: search filtering', () => {
     expect(searchField(rig.el)).not.toBe(field);
     expect(pageIds(rig.el)).toEqual([]);
     expect(searchField(rig.el).value).toBe('zzz');
+  });
+
+  it('treats the trailing event after a composition commit as a no-op, in either order', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const field = searchField(rig.el);
+    field.focus();
+    field.value = 'zzz';
+    // Order B host: the final input (isComposing false) lands FIRST and
+    // applies the needle...
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    const rebuilt = searchField(rig.el);
+    expect(rebuilt).not.toBe(field);
+    const announced = liveRegion(rig.el)?.textContent ?? '';
+    expect(announced).not.toBe('');
+    // ...then compositionend fires on the old field with the same committed
+    // value. The applier's equality guard must swallow it: a second rebuild
+    // would toggle the reannounce marker and the reader would hear the count
+    // twice for one commit.
+    field.dispatchEvent(new Event('compositionend', { bubbles: true }));
+    expect(searchField(rig.el)).toBe(rebuilt);
+    expect(liveRegion(rig.el)?.textContent).toBe(announced);
+  });
+
+  it('stamps data-cell-source on exactly the cells that carry a source plan', () => {
+    // The PR shot picker selects on this attribute (scripts/pr_shot_targets),
+    // so both directions matter: present wherever a plan resolves, absent
+    // wherever the relic is pending. The Sanctum page ships both kinds.
+    const sanctumId = 'conquerors_gravewyrm_sanctum';
+    const page = RELIQUARY_PAGES_BY_ID[sanctumId];
+    expect(page, 'content premise: the sanctum page exists').toBeTruthy();
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    click(rig.el, `[data-page="${sanctumId}"]`);
+    const grid = cells(rig.el);
+    expect(grid.length).toBeGreaterThan(0);
+    let withSource = 0;
+    let withoutSource = 0;
+    for (const node of grid) {
+      const relic = page?.relics.find((r) => r.kind === 'item' && r.itemId === node.dataset.cellId);
+      expect(relic, `catalog premise: ${node.dataset.cellId}`).toBeTruthy();
+      const hint = relic ? reliquaryRelicSource(page, relic) : null;
+      const plan = reliquarySourceLinePlan(hint ?? undefined, page?.clearSource);
+      if (plan !== null) withSource += 1;
+      else withoutSource += 1;
+      expect(node.hasAttribute('data-cell-source'), `${node.dataset.cellId}`).toBe(plan !== null);
+    }
+    // Premise: the page really exercises both arms.
+    expect(withSource).toBeGreaterThan(0);
+    expect(withoutSource).toBeGreaterThan(0);
   });
 
   it('never announces on the render that opens the window, even with a sticky chip', () => {

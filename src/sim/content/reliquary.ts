@@ -550,10 +550,11 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     name: 'Gravewyrm Sanctum',
     desc: 'Rare and epic spoils from the Sanctum bosses and Korzul the Gravewyrm.',
     clearSource: { kind: 'dungeon', dungeonId: 'gravewyrm_sanctum', difficulty: 'normal' },
-    // FIVE live sources drop this page's relics (sanctum_boneguard and
+    // FIVE live LOOT TABLES drop this page's relics (sanctum_boneguard and
     // sanctum_drakonid trash plus the three bosses), of which FOUR are authored
-    // as hints here. sanctum_boneguard is absent on purpose: the only two ids
-    // it drops, boundstone_helm and boundstone_girdle, are among the seven rows
+    // as hints here; recipes and quests add further non-loot routes below.
+    // sanctum_boneguard is absent on purpose: the only two relic ids it
+    // drops, boundstone_helm and boundstone_girdle, are among the seven rows
     // left un-hinted below, so it never wins a slot outright.
     //
     // Six of those seven sit on TWO OR MORE comparable live routes with no
