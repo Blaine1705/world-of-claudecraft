@@ -305,3 +305,113 @@ happened.
   gate run; CI babysat per the plan (AI-assist checks never gate; CANCELLED
   counts as failure). NEXT: Phase 13 (window structure + information UX, plain
   xhigh per the plan, not an ultracode phase).
+
+## Phase 13: Window structure + information UX (2026-08-06)
+
+- Pre-flight: tree clean at abeafbe99c; origin/release/v0.35.0 (50c78b3e61)
+  was already an ancestor of HEAD, so no sync merge was owed and no
+  release-merge-audit applied. BEFORE screenshots captured first (the
+  pre-change tree), including a new reliquary-page detail target added to
+  scripts/pr_shot_targets.mjs for the purpose (Phase 22's recapture needs it).
+- Source hints (sim content, data-only): ReliquarySourceKind
+  ('boss'|'zone'|'profession'|'deed'|'vendor'), ReliquarySourceHint
+  {sourceKind, sourceId}, source? on all five relic-def arms, sourceDefault?
+  on ReliquaryPageDef, and ONE exported resolver reliquaryRelicSource(page,
+  relic) that the client (reliquary_view) calls, so exactly one precedence
+  implementation exists. 183 of 242 slots resolve (137 boss, 33 deed, 11
+  profession, 2 vendor); sourceDefault on the true single-source pages
+  (hollow_crypt, nythraxis, thunzharr, the six heroics), per-relic on the four
+  multi-boss dungeon pages, all SEVEN set pages (the packet docs said six),
+  the three professions pages, and horizons_titles. 59 slots are pinned in
+  SOURCE_PENDING_RULING pending a maintainer ruling (see state.md OPEN items):
+  most are precisely-known sources with no representable kind (delve chests,
+  the Drowned Litany rite, Rift progression, quest/vendor mounts, the Claudium
+  store), plus 6 genuinely two-table Gravewyrm drops, 6 corpse-harvest
+  specimens no gathering profession owns, and masterwork:first.
+- Content-truth pins: every authored sourceId resolves against its kind's
+  live table (MOBS membership, not rank flags: the credited mid-bosses are
+  elite-only); boss hints walk into MOBS[].loot / HEROIC_BOSS_LOOT (137
+  rows, 0 defects); vendor hints into DELVE_SHOPS via the board NPC;
+  profession hints DERIVED from NODE_HARVEST_TABLE / NODE_MATERIAL_TABLE /
+  MATERIAL_GRADES / gatherRareEventFlavor (0 defects); pending list pinned
+  bidirectionally with page-scoped pageId:slotId keys; cross-page agreement
+  for set members; multi-source pages pinned by a literal 28-page
+  distinct-count map. 13 content mutations executed red-then-restored.
+- Window UX: missing-cell tooltips AND aria labels carry a localized source
+  line (tEntity/zone/dungeon/deed channels; hudChrome.reliquary.sourceLine*
+  family); page descs render under the page header (reliquaryPageDesc's first
+  production call site) and as the shelf-row second line (CSS-truncated);
+  the shelf list is a real ul/li (professions pattern); the relic grid is ONE
+  roving tab stop (rovingTarget 'both', Home/End, wrap) with an SR-only usage
+  hint and aria-keyshortcuts stamped per cell; a persistent polite live
+  region announces narrowing results (ReannounceMarker, count-neutral plural,
+  gated on what the painted surface narrowed, world-driven repaints with an
+  unchanged count never re-announce); deeds-parity search (locale-folded via
+  toLocaleLowerCase(languageTag), matches page name + desc + contained relic
+  names on every page-listing surface) plus owned/missing chips (sticky for
+  the session; search is per-visit, the bank PR 2838 policy); caret survives
+  rebuilds; the recent-strip title= attr is gone (tooltip + data-recent-name).
+- One display-name ladder: NEW src/ui/reliquary_labels.ts
+  (mount_labels/armory_labels family) owns reliquaryRelicDisplayName /
+  reliquaryRelicSearchText / reliquarySourceLineText; all four former ladder
+  sites (cellDisplayName, findDisplayName, both hud.ts handleReliquaryUnlocks
+  ladders) route through it; the humanized id.replace fallback is GONE
+  everywhere (terminal arm is hudChrome.reliquary.unknownRelic); every arm is
+  membership-guarded so a stale id can never render as raw text; the painter's
+  .name-read pin is now ZERO (was 1). hud.ts net -15 lines including the dead
+  reliquaryWindowOpen getter (was at :15287, not the packet's stale :15253).
+- Nearly-complete rule: remaining <= RELIQUARY_NEARLY_MAX_REMAINING (3) OR
+  fraction >= RELIQUARY_NEARLY_MIN_FRACTION (0.6), both inclusive, owned >= 1
+  floor kept, sort and slice(5) unchanged; a 1/31 page no longer qualifies
+  (visible in the before/after screenshots).
+- CSS: the four never-defined pseudo-tokens are gone (deeds-style literals;
+  the inset kept its two per-role values matching deeds; themeCssVars debt
+  recorded in the section banner); .reliquary-count got a real rule; the
+  inert cell cursor is gone and cells got an honest hover; search field 16px
+  iOS floor + 40px mobile min-height (.bag-search precedent); chips 40x40.
+- i18n: 18 new hudChrome.reliquary.* keys + the reliquarySearchResults plural
+  base (registered in the pinned plural-base list), English + all five
+  non-Latin fills in the same change (M16; ru plurals three distinct forms);
+  i18n bundles regenerated via npm run i18n:gen (deterministic, verified
+  byte-identical on a second run; rides the same commits as the catalog).
+- Tests: tests/reliquary_window_behavior.test.ts NEW (10 describes, 60+
+  cases, happy-dom, live catalog, 31/31 seeded mutants caught by a
+  scratch-dir harness that proves tests ran); reliquary_view.test.ts +~450
+  (nearly boundaries, source-line arms, search/filter incl. tr_TR casefold
+  and localized-name injection, resolver arms incl. prototype keys);
+  reliquary_window.test.ts +~380 source pins (zero .name, no toLowerCase, no
+  dynamic t() casts, roving pin, sliced sig scrapes, value-level fill pins);
+  reliquary_content.test.ts 59 -> 63; two axe-suite entries added to
+  tests/browser/a11y.browser.test.ts (not run locally; CI/browser-suite
+  scope).
+- Reviews (all read-only, coverage-prompted, every finding applied or
+  recorded): mid-state frontend-seam (8 SF + 11 N), architecture-reviewer on
+  sim (0 blocking, 3 SF + 5 NTH; independently verified all 137 boss hints
+  against live loot), test-coverage-auditor (1 blocking: the unpinned
+  haystack casefold, closed; 6 SF incl. the filterEmpty copy defect and the
+  profession truth gap, all closed), final fresh frontend-seam (1 blocking:
+  biome format on the new shot target, closed; live-region cluster closed),
+  qa-checklist (NOT READY verdict whose six items were all closed), and a
+  fix-round verifier (8/9 fixes correct; its 1 regression finding, the
+  world-driven re-announce, closed with a behavioral pin; its nearly-strip
+  asymmetry ruling applied as deep match on Overview too).
+- Deliberate skips, recorded not silent: deed/reliquary search+chip CSS
+  duplication stays at copy #2 (rule of three); role=group + aria-pressed
+  chips stay (deeds consistency); no search debounce and per-cell keydown
+  stay (deeds parity, cold path); .deed-search mobile floor untouched
+  (cross-window scope); gridIndex not written back during paint;
+  -webkit-search-cancel-button styling; GRID_HINT_ID single-instance seam;
+  row-wise arrow movement + arrows-reach-avatar (pre-existing across all
+  five roving windows).
+- Validation: npx tsc --noEmit clean throughout; targeted battery 13 files
+  512 tests green; behavior+view+window+content 369 green post-fix-round;
+  npm run ci:changed exit 0; node scripts/gate_select.mjs fails ONLY at i18n
+  freshness on the uncommitted tree (regen vs committed copies), expected to
+  pass once the catalog and bundles land in the same commit set; full
+  gate_select re-run after committing is the Phase 13 QA gate's first step.
+  Screenshots committed under docs/screenshots/reliquary-window-information/
+  (before/after, desktop + mobile landscape; the after page shot shows the
+  live source line "Drops from Sanctum Scaleguard in Gravewyrm Sanctum").
+- Commits stay LOCAL per the plan; push happens after Phase 13 QA passes.
+  NEXT: Phase 13 QA (docs/prd/reliquary-perfection/phase-13-qa.md, ultracode,
+  fresh session).

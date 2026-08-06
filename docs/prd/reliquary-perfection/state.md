@@ -288,7 +288,30 @@ Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
   blast-radius suites green. Stopping rules: NO uncatalogued rare+ instance drop
   remains beyond the three added (proven by the equality regime); the 51 open-world
   and Rift rare+ items are Phase 21 scope.
-- Phase 13: (pending)
+- Phase 13: BUILT (2026-08-06, local, unpushed; QA next). Source hints:
+  ReliquarySourceHint {sourceKind: 'boss'|'zone'|'profession'|'deed'|'vendor',
+  sourceId} on every relic-def arm + ReliquaryPageDef.sourceDefault + the ONE
+  resolver reliquaryRelicSource(page, relic) the view calls; 183/242 slots
+  resolve, 59 pinned in SOURCE_PENDING_RULING (see OPEN items). Truth pins on
+  all three authored arms (boss loot, vendor stock, derived professions).
+  Window: source lines in missing-cell tooltip AND aria, page descs rendered
+  (reliquaryPageDesc's first production consumers: page header + shelf-row
+  second line), ul/li shelf list, roving grid tab stop (per-cell
+  aria-keyshortcuts + SR hint), persistent polite live region
+  (ReannounceMarker, surface-gated, world-repaint-silent), deeds-parity
+  search (locale-folded, name + desc + contained relic names on every
+  page-listing surface) + owned/missing chips (chips sticky, search
+  per-visit per the bank policy). One display-name ladder in NEW
+  src/ui/reliquary_labels.ts (all four former sites routed, humanized
+  fallback gone, every arm membership-guarded, painter .name pin now 0).
+  Nearly-complete: remaining <= 3 OR fraction >= 0.6 (inclusive), owned >= 1
+  kept (RELIQUARY_NEARLY_MAX_REMAINING / RELIQUARY_NEARLY_MIN_FRACTION).
+  CSS: pseudo-tokens removed (deeds literals, themeCssVars debt in the
+  banner), .reliquary-count real rule, honest cursor/hover, mobile floors.
+  i18n: 18 keys + reliquarySearchResults plural base, five non-Latin fills
+  in-change (M16), bundles regenerated. New behavioral suite
+  tests/reliquary_window_behavior.test.ts (31/31 mutants). Six reviews, every
+  finding applied or recorded in progress.md.
 - Phase 14: (pending)
 - Phase 15: (pending)
 - Phase 16: (pending)
@@ -331,7 +354,30 @@ Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
   clear meter reads 0 (trade, auction, mail) stamps clears: 0 and renders "first
   found on clear 0". Absent (provenance unknown, matching the retro doctrine) may be
   righter. Current behavior is pinned in tests/reliquary_state.test.ts with a
-  recorded-ruling comment; decide before Phase 17 ships obtain counts.
+  recorded-ruling comment; decide before Phase 17 ships obtain counts. Phase 13
+  widened the blast radius knowingly: the owned-cell aria-label now mirrors the
+  tooltip's firstFindClears line, so the ruling's outcome changes both surfaces.
+- RULING OPEN (Phase 13 source hints): 59 of 242 relic slots carry NO source
+  hint, pinned bidirectionally in SOURCE_PENDING_RULING
+  (tests/reliquary_content.test.ts) with per-page evidence comments. Roughly
+  two thirds are NOT ambiguous: their source is precisely known but has no
+  representable kind in the boss|zone|profession|deed|vendor vocabulary.
+  Decide (before Phase 21 grows the catalog and before the Phase 22 fill
+  translates the sourceLine keys): (a) add kinds, e.g. 'delve' (the chest
+  routes + the Drowned Litany rite rows), 'rift' (the four heroic reins also
+  on Rift progression), 'quest' (reins_valorsteed), 'store' (all 29 weapon
+  skins, Claudium account storefront); (b) an authored-primary override for
+  the 6 Gravewyrm two-table drops (tied or near-tied drop rates, per-run
+  expectation does not settle it) and the corpse-harvest 6 (no gathering
+  profession owns corpse harvest) plus masterwork:first (any of five crafts);
+  or (c) leave them lineless. Also from review: the two rare-sourced set
+  members (deathlord_sabatons, necromancers_legwraps) render "Drops from
+  {rare}" with no place; a boss-plus-zone arm (or zone data on the hint)
+  would name where the rare roams; reins_drakemaw_raptor has NO acquisition
+  path at all (content gap, owner call dated 2026-08-04); the 'zone' kind
+  ships with zero producers, HELD deliberately pending this ruling (its
+  sourceZone key will be translated at the release fill regardless, a
+  deliberate cost recorded here).
 - Rider (Phase 12 arch review): three delve-clear readers hand-roll the sum with
   different validation (shop gate prefix-sums unguarded, deeds delveClearCount also
   accepts a bare delveId key and sums raw values, the reliquary arm is strict and
@@ -366,8 +412,12 @@ Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
   in the Phase 22 record. Locale overlays for ja/ko/ru/zh_CN/zh_TW already carry
   contributor-authored fills (correct M16 mechanics, flagged for maintainer review).
   Phase 11 adds to that worklist: Latin-locale reliquary_i18n page-name chunks, ALL
-  page desc fills (every locale; the manifest carries desc rows, excluded from the
-  coverage arm until Phase 13 renders them), the Latin deedsRetroSummary.one
+  page desc fills (every locale; the manifest carries desc rows; Phase 13 NOW
+  RENDERS descs, so the exclusion's stated condition has expired: the coverage
+  arm at tests/reliquary_i18n.test.ts, the 'covers every manifest NAME row'
+  test, widens to desc rows WITH the five non-Latin desc fills at the Phase 22
+  release fill, not before, or the PR-tier suite reds; until then English desc
+  fallback ships to every locale by design), the Latin deedsRetroSummary.one
   singulars, and the Latin reliquaryRetroSummary leaves. KNOWN BRANCH BEHAVIOR,
   deliberate: the pending Latin deedsRetroSummary.one rows render ENGLISH at exactly
   count 1 until the release fill, because the dense resolved table English-fills
