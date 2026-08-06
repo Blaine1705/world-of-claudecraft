@@ -5815,7 +5815,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': '鎖定目標與戰鬥',
   'guide.controls.groupInterface': '介面',
   'guide.controls.controllerBody':
-    '手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角。',
+    '手把同樣可用，且預設即開啟手把支援。左搖桿負責移動，右搖桿控制鏡頭，正面按鍵與肩鍵則涵蓋你的技能、跳躍與互動。開啟像是背包這樣的視窗會喚出畫面上的指標，而遊戲選單則可用十字鍵與正面按鍵直接操作。你可以在選項中的手把設定裡重新配置按鍵，並調整搖桿盲區、鏡頭速度、震動以及反轉視角，也可以將某個按鍵綁定為拉近或拉遠鏡頭（預設未綁定）。',
   'guide.controls.controllerHeading': '使用手把時',
   'guide.controls.cycleFriendly': '切換友方目標',
   'guide.controls.gameMenu': '開啟遊戲選單與設定',

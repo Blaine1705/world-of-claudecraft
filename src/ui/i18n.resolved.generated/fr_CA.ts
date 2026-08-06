@@ -1348,6 +1348,8 @@ export const fr_CA: EnTranslations = {
       "buttons": "Disposition des boutons",
       "resetButtons": "Réinitialiser la disposition des boutons",
       "menuAction": "Menu du jeu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Le stick gauche déplace, le droit oriente la caméra. Ouvrez une fenêtre pour utiliser le pointeur à l'écran."
     },
     "perf": {
