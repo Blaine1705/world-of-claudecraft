@@ -3988,6 +3988,10 @@
       margin: 0 0 2px;
       font-size: 10px;
     }
+    body.mobile-touch #bank-window .gbank-readonly-note {
+      margin: 0 0 2px;
+      font-size: 10px;
+    }
     body.mobile-touch #bank-window .gbank-buy-note {
       font-size: 10px;
     }

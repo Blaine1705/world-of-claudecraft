@@ -55,7 +55,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Laddar gillesbankens logg...',
   'hudChrome.bank.logNote': 'De {count} senaste händelserna i gillesbanken.',
   'hudChrome.bank.logOpenBank': '{actor} öppnade gillesbanken för {amount}',
-  'hudChrome.bank.logRefused': 'Endast gillesofficerare kan läsa gillesbankens logg.',
   'hudChrome.bank.logWithdrawItem': '{actor} tog ut {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} tog ut {amount}',
   'hudChrome.bank.personalTab': 'Personligt',
