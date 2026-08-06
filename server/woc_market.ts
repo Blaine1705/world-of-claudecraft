@@ -592,6 +592,8 @@ const SWEEP_BATCH = 25;
  *  it. An arm returning a FULL batch is the "backlog is not draining" signal. */
 export interface WocSweepPassStats {
   lapsedBids: number;
+  /** Directed p2p offers that timed out unanswered. */
+  expiredOffers: number;
   reclaimed: number;
   closed: number;
   expired: number;
@@ -1374,6 +1376,15 @@ export class WocMarketService {
       lapsedBids: await this.deps.db.lapsePendingBids(
         this.cfg.realm,
         nowMs - WOC_MARKET_BOND_PENDING_TTL_SECONDS * 1000,
+        SWEEP_BATCH,
+      ),
+      // Directed offers escrow nothing, so an unanswered one costs no custody.
+      // It still has to expire: left pending it stays visible in both players'
+      // trade windows as a deal that can never be accepted, and the retention
+      // prune only reaches resolved rows, so the table would grow forever.
+      expiredOffers: await this.deps.db.expireDueDirectedOffers(
+        this.cfg.realm,
+        nowMs,
         SWEEP_BATCH,
       ),
       reclaimed: await this.reclaimStrandedListings(nowMs),

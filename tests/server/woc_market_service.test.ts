@@ -2214,3 +2214,52 @@ describe('the trade window asks whether a counterparty can be paid in $WOC', () 
     expect(res).toEqual({ ok: false, reason: 'self_offer' });
   });
 });
+
+describe('the sweep expires unanswered directed offers', () => {
+  // The gap this pins: expireDueDirectedOffers existed and nothing called it, so
+  // a pending offer never resolved. It escrows nothing, but it stayed visible in
+  // both players' trade windows as a deal that could never be accepted, and the
+  // retention prune only reaches resolved rows, so the table grew without bound.
+  it('flips a lapsed offer to expired, and leaves a live one alone', async () => {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const made = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 5000,
+    });
+    if (!made.ok) throw new Error('offer refused');
+
+    // Still inside the window: the sweep must not touch it.
+    await h.service.sweepPass();
+    expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('pending');
+
+    h.setNow(made.offer.expiresAtMs + 1);
+    const stats = await h.service.sweepPass();
+    expect(stats?.expiredOffers).toBe(1);
+    expect((await h.db.directedOfferById(REALM, made.offer.id))?.status).toBe('expired');
+  });
+
+  it('refuses acceptance of an expired offer without escrowing', async () => {
+    const h = makeHarness();
+    h.custody.bags.set(SELLER_CHAR, [{ itemId: EPIC_ITEM, count: 1 }]);
+    const made = await h.service.createDirectedOffer({
+      account: BUYER_A,
+      characterId: CHAR_A,
+      sellerCharacterName: 'Selara',
+      usdCents: 5000,
+    });
+    if (!made.ok) throw new Error('offer refused');
+    h.setNow(made.offer.expiresAtMs + 1);
+    await h.service.sweepPass();
+    const res = await h.service.acceptDirectedOffer(
+      SELLER,
+      made.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      SELLER_CHAR,
+    );
+    expect(res.ok).toBe(false);
+    expect(bagsOf(h, SELLER_CHAR), 'nothing may leave the bags').toHaveLength(1);
+  });
+});
