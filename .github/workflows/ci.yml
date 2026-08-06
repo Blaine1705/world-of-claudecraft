@@ -162,8 +162,13 @@ jobs:
     name: Detect code path changes
     runs-on: ubuntu-latest
     # Every PR-tier job waits on this one, so a wedged runner must fail fast
-    # and be retried, never hang for an hour and a half.
-    timeout-minutes: 5
+    # and be retried, never hang for an hour and a half. 8, not 5: the
+    # Phase 6 replay found a healthy 4.42 minute run on this serial critical
+    # path (run 31117143257 attempt 1, carrying a 4.00 minute runner setup
+    # spike, which counts inside the bound), an 88 percent fill of the old
+    # bound where a false kill costs a whole re-run; still single-digit per
+    # the Phase 1 acceptance.
+    timeout-minutes: 8
     # Job-scoped read-only widen: once workflow-level permissions are declared,
     # unlisted scopes are none, and the PR files endpoint needs
     # pull-requests: read. Nothing here may ever be a write scope.
@@ -378,13 +383,15 @@ jobs:
     # the slowest healthy GREEN shard observed is 13.6 minutes (the Phase 2
     # content-only selective drill, PR #2991) and the slowest healthy RED
     # one 18.6 minutes (run 31067745370, a 17.8 minute failing test step),
-    # so 20 kills only stalled jobs. A 24 hour replay of 2549 jobs found
-    # zero healthy jobs over their bound, and 21 stalled-but-green jobs
-    # these bounds convert into reds needing a manual failed-jobs rerun:
-    # the buy is bounding the unbounded worst case (the pre-Phase-1 90
-    # minute wedges) and making stalls visible as failures for the runner
-    # escalation, not the average tail. Full evidence: the packet's internal
-    # detect-wedge postmortem note (docs/prd/ci-cd-performance/).
+    # so 20 kills only stalled jobs. Two independent 24 hour replays (the
+    # review's and its verifier's, different windows and counting bases)
+    # both found ZERO healthy jobs over their bound, and 21 to 31
+    # stalled-but-green jobs per day these bounds convert into reds needing
+    # a manual failed-jobs rerun: the buy is bounding the unbounded worst
+    # case (the pre-Phase-1 90 minute wedges) and making stalls visible as
+    # failures for the runner escalation, not the average tail. Full
+    # evidence: the packet's internal detect-wedge postmortem note
+    # (docs/prd/ci-cd-performance/).
     timeout-minutes: 20
     runs-on: ubuntu-latest
 
@@ -513,12 +520,13 @@ jobs:
     # no sibling shard to report around it, so a hang would otherwise hold a
     # required check for GitHub's 6 hour default. 20 matches the shard
     # matrices (rationale and the checkout-stall evidence on the pr-gate
-    # bound): the lane's own healthy worst case is 8.1 minutes, but the
-    # sample is thin (the job is days old), the chronomancy sweep inside it
-    # is the suite whose budget was raised for loaded runners, and a bound
-    # below 20 cannot lower the run tail anyway while pr-gate holds 20 in
-    # the same run. Its one stalled run sat 15.6 minutes in checkout inside
-    # a 23.3 minute wall (run 31105262161).
+    # bound): the lane's healthy worst cases are 8.1 minutes GREEN and 10.7
+    # minutes RED (run 31118669058), the sample is thin (the job is days
+    # old), the chronomancy sweep inside it is the suite whose budget was
+    # raised for loaded runners, and a bound below 20 cannot lower the run
+    # tail anyway while pr-gate holds 20 in the same run. Its one stalled
+    # run sat 15.6 minutes in checkout inside a 23.3 minute wall
+    # (run 31105262161).
     timeout-minutes: 20
     runs-on: ubuntu-latest
 

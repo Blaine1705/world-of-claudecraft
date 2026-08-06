@@ -62,9 +62,13 @@ the Checks tab (filter by event: merge_group).
 5. A job that failed with "exceeded the maximum execution time of N minutes"
    hit its checkout-stall bound (the test and browser jobs carry job-level
    timeout-minutes sized from measured healthy worst cases; the stall class
-   is runner-side, 10 to 25 minutes inside actions/checkout). That is a
-   rerun, not a code investigation: re-run the failed jobs and re-queue. If
-   the SAME job times out twice on healthy-looking logs, treat it as a real
+   is runner-side, 9.6 to 24.4 minutes inside actions/checkout in the
+   measured window). First open the killed job's log: if a test step was
+   already failing or still running near the bound, treat it as a real
+   failure or a real slowdown, not a stall (a genuinely red shard on a
+   runner with a setup spike can die AS a timeout). Otherwise it is a rerun,
+   not a code investigation: re-run the failed jobs and re-queue. If the
+   SAME job times out twice on healthy-looking logs, treat it as a real
    slowdown and investigate before resizing any bound.
 
 ## The required-check contract

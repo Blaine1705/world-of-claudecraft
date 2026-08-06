@@ -698,20 +698,25 @@ describe('CI workflow parity', () => {
       ['pr-long-sims', 20],
       ['browser-gate', 10],
     ] as const;
-    for (const [name, minutes] of bounds) {
-      const job = jobSource(name);
-      const jobLevel = job.match(/^ {4}timeout-minutes: \d+$/gm) ?? [];
-      expect(jobLevel).toEqual([`    timeout-minutes: ${minutes}`]);
-      // The step-level negative runs over the full index-based job span
-      // (this job key to the next), not the comment-terminated jobSource
-      // slice, so a stray top-level comment inside a job body cannot hide a
-      // step bound from it.
-      const start = workflow.indexOf(`\n  ${name}:\n`);
+    // Both the positive and the negatives run over the full index-based job
+    // span (this job key to the next), never the comment-terminated
+    // jobSource slice, so a stray top-level comment inside a job body can
+    // hide neither a duplicate job-level bound nor a step bound (the fix
+    // round's verifier proved the jobSource form evadable both ways).
+    const jobSpan = (name: string) => {
+      const start = workflow.indexOf(`\n  ${name}:`);
       expect(start).toBeGreaterThanOrEqual(0);
       const rest = workflow.slice(start + 1);
-      const nextJob = rest.search(/\n {2}[A-Za-z][A-Za-z0-9_-]*:\n/);
-      const span = nextJob === -1 ? rest : rest.slice(0, nextJob);
+      const next = rest.search(/\n {2}[A-Za-z][A-Za-z0-9_-]*:[ \t]*(?:#[^\n]*)?\n/);
+      return next === -1 ? rest : rest.slice(0, next);
+    };
+    for (const [name, minutes] of bounds) {
+      const span = jobSpan(name);
+      const jobLevel = span.match(/^ {4}timeout-minutes: \d+$/gm) ?? [];
+      expect(jobLevel).toEqual([`    timeout-minutes: ${minutes}`]);
       expect(span).not.toMatch(/\n {8}timeout-minutes:/);
+      // A step bound can also legally sit as the FIRST key of a step item.
+      expect(span).not.toMatch(/\n {6}- timeout-minutes:/);
     }
     // Completeness: every ci.yml job is either in the bounds table above,
     // the separately-bounded changes job (its single-digit bound has its own
@@ -720,9 +725,11 @@ describe('CI workflow parity', () => {
     // Phase 6's measured pass, and bounding them is a recorded follow-up in
     // the packet's postmortem note, not an accident. A new job therefore
     // cannot arrive silently unbounded, and moving a job between the lists
-    // is a conscious edit here. The nightly workflow's deliberately
-    // generous bounds have their own presence pins in
-    // tests/nightly_workflow.test.ts and stay untouched.
+    // is a conscious edit here. The key regex tolerates a trailing comment
+    // or space after the colon, both valid YAML that would otherwise make an
+    // eleventh job invisible. The nightly workflow's deliberately generous
+    // bounds have their own presence pins in tests/nightly_workflow.test.ts
+    // and stay untouched.
     const UNBOUNDED_BY_DESIGN = [
       'release-version-gate',
       'lint',
@@ -731,12 +738,28 @@ describe('CI workflow parity', () => {
       'release-checks',
     ] as const;
     const jobsSection = workflow.slice(workflow.indexOf('\njobs:'));
-    const jobKeys = [...jobsSection.matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):\n/g)].map(
-      (m) => m[1],
-    );
+    const jobKeys = [
+      ...jobsSection.matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):[ \t]*(?:#[^\n]*)?\n/g),
+    ].map((m) => m[1]);
     expect([...jobKeys].sort()).toEqual(
       [...bounds.map(([name]) => name), 'changes', ...UNBOUNDED_BY_DESIGN].sort(),
     );
+    // Two-way: a job on the unbounded list must actually BE unbounded, so
+    // the list is an assertion, not documentation that can rot.
+    for (const name of UNBOUNDED_BY_DESIGN) {
+      expect(jobSpan(name).match(/^ {4}timeout-minutes: \d+$/gm) ?? []).toEqual([]);
+    }
+    // The operator triage for a timeout kill is part of the contract: the
+    // doc must keep the rejection signature, route it to a rerun, and tell
+    // the operator to check for a failing test step first (a genuinely red
+    // shard on a runner with a setup spike can die AS a timeout).
+    const mergeQueueTriage = readFileSync(
+      new URL('../docs/merge-queue.md', import.meta.url),
+      'utf8',
+    );
+    expect(mergeQueueTriage).toContain('exceeded the maximum execution time');
+    expect(mergeQueueTriage).toContain('checkout-stall bound');
+    expect(mergeQueueTriage).toContain('failing or still running');
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {
