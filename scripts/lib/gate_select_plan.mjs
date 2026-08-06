@@ -174,9 +174,11 @@ export function classifySelectPaths(paths) {
       broadConfigs.push(p);
       continue;
     }
-    // Freshness-guarded generated i18n artifacts: inert for `related` (their
-    // driving sources classify normally), own bucket so every consumer of this
-    // classification can apply its deletion guard and audit line.
+    // Freshness-guarded generated i18n artifacts: own bucket so every
+    // consumer of this classification can apply its deletion guard and audit
+    // line, and so the plan builders can FEED the paths to `vitest related`
+    // as graph nodes (see the header above: the consumers hang off the
+    // artifact side of the import graph) without letting them widen the run.
     if (isGeneratedI18nArtifactPath(p)) {
       generatedI18n.push(p);
       continue;

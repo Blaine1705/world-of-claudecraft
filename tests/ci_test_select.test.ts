@@ -218,13 +218,15 @@ describe('decideTestMode: incident replay stays covered', () => {
   });
 });
 
-// Generated i18n artifacts (docs/qa-gate.md, "Selective PR-tier CI"): inert to
-// selection because pr-checks reruns i18n:gen and diffs EXACTLY these paths on
-// every code PR in every mode (tests/ci_workflow.test.ts pins the coupling),
-// their driving sources classify as ordinary related sources, and their
-// out-of-graph consumers ride the floor (the generated-i18n visibility
-// pattern). Deletions stay unprovable: the freshness diff cannot flag a
-// deleted-then-regenerated file, so `removed`/`renamed` widens.
+// Generated i18n artifacts (docs/qa-gate.md, "Selective PR-tier CI"): they
+// never WIDEN the run because pr-checks reruns i18n:gen and diffs EXACTLY
+// these paths on every code PR in every mode (tests/ci_workflow.test.ts pins
+// the coupling), and they are never DROPPED from selection either: the shard
+// plan feeds them to `vitest related` as graph nodes, because their consumer
+// suites hang off the artifact side of the import graph (the catalog/overlay
+// driving sources are type-erased build inputs). Deletions stay unprovable:
+// the freshness diff cannot flag a deleted-then-regenerated file, so
+// `removed`/`renamed` widens.
 describe('decideTestMode: generated i18n artifacts', () => {
   it.each([
     ['src/ui/i18n.resolved.generated/de_DE.ts'],

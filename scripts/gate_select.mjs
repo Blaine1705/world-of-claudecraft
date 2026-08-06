@@ -178,7 +178,10 @@ if (plan.mode === 'full') {
   const relatedArgs = buildRelatedArgs({ sources: plan.relatedSources, workers });
   if (relatedArgs) {
     vitestSteps.push({
-      name: `vitest (related to ${plan.relatedSources.length} changed source file(s))`,
+      // "path(s)", not "changed source file(s)": the list is the union of
+      // changed sources AND fed-through generated i18n artifacts, and the
+      // plan.reason line above counts those separately.
+      name: `vitest (related over ${plan.relatedSources.length} path(s))`,
       cmd: 'npx',
       args: ['--no-install', 'vitest', ...relatedArgs],
     });

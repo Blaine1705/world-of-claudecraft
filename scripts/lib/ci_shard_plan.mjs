@@ -316,7 +316,10 @@ export function buildShardPlan({
     // here (duplicate work, never a gap), exactly the overlap contract the two
     // selective legs already have with each other.
     legs.push({
-      name: `vitest related (${liveSources.length} changed source file(s), shard ${shard.index}/${shard.total})`,
+      // "path(s)", not "changed source file(s)": liveSources is the union of
+      // changed sources and fed-through generated i18n artifacts; the mode
+      // reason carries the split counts.
+      name: `vitest related (${liveSources.length} path(s), shard ${shard.index}/${shard.total})`,
       cmd: 'npx',
       args: [
         '--no-install',

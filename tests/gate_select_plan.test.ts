@@ -115,8 +115,10 @@ const raw = readFileSync('docs/x.md', 'utf8');`);
 
   it('floors a suite that imports or path-references the generated i18n artifacts', () => {
     // Import specifier form (relative, extensionless) and fs-path string form
-    // both fire: the artifacts are outside the modeled graph (inert to the
-    // planner), so any consumer must ride the floor.
+    // both fire. This is the BELT over the related-leg pass-through (the
+    // artifacts are INSIDE the module graph and feed `related` directly): a
+    // direct artifact-naming consumer keeps running even on diffs that carry
+    // no artifact at all.
     for (const text of [
       `import { en } from '../src/ui/i18n.resolved.generated/en';`,
       `const p = 'src/admin/i18n.resolved.generated/de_DE.ts';`,
@@ -209,6 +211,9 @@ describe('selective gate planning', () => {
     expect(plan.mode).toBe('selective');
     expect(plan.relatedSources).toEqual([]);
     expect(plan.alwaysRunFiles).toEqual(ALWAYS);
+    // Exact-string pin: this arm's audit line lost its verbatim assertion when
+    // the artifact-only case moved to the fed-to-related arm.
+    expect(plan.reason).toBe('no code or test changes: always-run set only');
   });
 
   // Declaration files are type-only and check:types runs in full regardless, so
