@@ -100,6 +100,13 @@ describe('isTeardownRpcFlake', () => {
     expect(isTeardownRpcFlake({ status: 1, tail: otherRpc })).toBe(false);
     const otherError = FLAKE_TAIL.replace(/EnvironmentTeardownError/g, 'SomeOtherTeardownError');
     expect(isTeardownRpcFlake({ status: 1, tail: otherError })).toBe(false);
+    // The at-least-one arm must hold on its own: a zero-error summary with
+    // the error NAME present but the exact message absent would satisfy the
+    // count equality (0 equals 0) if the occurrences floor were dropped.
+    const zeroCounted =
+      'EnvironmentTeardownError: [vitest-worker]: Closing rpc while "onOther" was pending\n' +
+      summary('272 passed (272)', '3312 passed (3312)', '0 errors');
+    expect(isTeardownRpcFlake({ status: 1, tail: zeroCounted })).toBe(false);
   });
 
   it('requires exit status exactly 1: exit 0, other codes, and signal kills never match', () => {

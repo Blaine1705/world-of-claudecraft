@@ -281,6 +281,44 @@ describe('runLeg (real subprocess)', () => {
     expect(result.spawnError).toBeInstanceOf(Error);
   });
 
+  it('applies backpressure: the parent buffer stays bounded while the sink withholds drain', async () => {
+    // Deterministic pin on the pause/resume pair: the max observed
+    // writableLength over the whole run is timing-robust (a slow child just
+    // takes longer; the poller keeps sampling until close). Without the
+    // pause, incoming chunks pile into the sink's buffer while its write
+    // callbacks are withheld and the max climbs toward the full burst.
+    const { Writable } = await import('node:stream');
+    const pending: Array<() => void> = [];
+    let received = 0;
+    let maxBuffered = 0;
+    const sink = new Writable({
+      highWaterMark: 1,
+      write(chunk: Buffer, _enc, cb) {
+        received += chunk.length;
+        pending.push(cb as () => void);
+      },
+    });
+    const sample = setInterval(() => {
+      maxBuffered = Math.max(maxBuffered, sink.writableLength);
+      const cbs = pending.splice(0);
+      for (const cb of cbs) cb();
+    }, 20);
+    const result = await runLeg({
+      cmd: process.execPath,
+      args: ['-e', "process.stdout.write('y'.repeat(256 * 1024)); process.exitCode = 3;"],
+      cwd: process.cwd(),
+      out: sink,
+      err: new PassThrough(),
+    });
+    clearInterval(sample);
+    for (const cb of pending.splice(0)) cb();
+    expect(result.status).toBe(3);
+    expect(received).toBe(256 * 1024);
+    // With the pause in place the parent-side buffer never approaches the
+    // full burst; without it, it climbs past this bound regardless of load.
+    expect(maxBuffered).toBeLessThan(150 * 1024);
+  });
+
   it('proceeds after the drain deadline when a leaked child holds the stdio pipes open', async () => {
     // The child exits immediately but leaves a detached grandchild holding
     // the inherited stdout pipe for 8 seconds. Without the deadline, close
@@ -308,6 +346,58 @@ describe('runLeg (real subprocess)', () => {
     expect(result.tail).toContain('leg done');
     expect(notes.lines.some((l) => l.includes('stdio stayed open'))).toBe(true);
   });
+
+  it('preserves a NONZERO exit code through the drain-deadline path', async () => {
+    // The verifier proved finish(0) survivable when the only deadline case
+    // exited 0: that mutant is exactly "a failing leg whose grandchild holds
+    // the pipes reports green".
+    const script =
+      "const { spawn } = require('node:child_process');" +
+      "spawn(process.execPath, ['-e', 'setTimeout(() => {}, 8000)'], " +
+      "{ stdio: ['ignore', 'inherit', 'inherit'], detached: true }).unref();" +
+      'process.exitCode = 7;';
+    const result = await runLeg({
+      cmd: process.execPath,
+      args: ['-e', script],
+      cwd: process.cwd(),
+      out: new PassThrough(),
+      err: new PassThrough(),
+      log: () => {},
+      drainDeadlineMs: 500,
+    });
+    expect(result.status).toBe(7);
+  });
+
+  it('lets the whole PROCESS exit past a leaked grandchild, not just the promise', async () => {
+    // Resolving alone was measured insufficient (the job sat 8 more seconds
+    // on the grandchild's pipe handles); the deadline now unrefs them. A
+    // real driver process proves the property end to end: it must exit on
+    // its own, promptly, with the leg's code relayed.
+    const { execFile } = await import('node:child_process');
+    const { mkdtemp, writeFile: writeTmp } = await import('node:fs/promises');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const dir = await mkdtemp(join(tmpdir(), 'ci-leg-runner-'));
+    const runnerUrl = new URL('../scripts/lib/ci_leg_runner.mjs', import.meta.url).href;
+    const driver =
+      `import { runLeg } from ${JSON.stringify(runnerUrl)};\n` +
+      "const leak = \"const {spawn}=require('node:child_process');" +
+      "spawn(process.execPath,['-e','setTimeout(()=>{},8000)']," +
+      "{stdio:['ignore','inherit','inherit'],detached:true}).unref();process.exitCode=0;\";\n" +
+      'const r = await runLeg({ cmd: process.execPath, args: ["-e", leak], cwd: process.cwd(), ' +
+      'out: { write: () => true }, err: { write: () => true }, log: () => {}, drainDeadlineMs: 400 });\n' +
+      'process.exitCode = r.status === 0 ? 42 : 43;\n';
+    const driverPath = join(dir, 'driver.mjs');
+    await writeTmp(driverPath, driver);
+    const code = await new Promise<number | null>((resolve) => {
+      execFile(process.execPath, [driverPath], { timeout: 6_000, killSignal: 'SIGKILL' }, (error) =>
+        resolve(error ? ((error as { code?: number }).code ?? null) : 0),
+      );
+    });
+    // 42 relayed through a clean self-exit; a hang would be SIGKILLed by the
+    // 6 second harness timeout and land here as null.
+    expect(code).toBe(42);
+  });
 });
 
 describe('entry wiring', () => {
@@ -328,5 +418,10 @@ describe('entry wiring', () => {
     // failing-shard log (measured: everything past one 64 KB pipe buffer).
     expect(code).toContain('process.exitCode = result.status');
     expect(code).not.toContain('process.exit(result.status)');
+    // And the PASS line must live in the ELSE of that check: moved out, it
+    // would print PASS on a failing shard.
+    expect(code).toMatch(
+      /if \(!result\.ok\) \{\s*process\.exitCode = result\.status;\s*\} else \{[\s\S]{0,600}?\[ci-shard\] PASS/,
+    );
   });
 });

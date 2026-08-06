@@ -28,8 +28,11 @@ import { isTeardownRpcFlake, TEARDOWN_RPC_TAIL_BYTES } from './teardown_rpc_flak
  * Normally close follows exit within milliseconds; a leaked grandchild that
  * inherited the leg's pipes (a stray server or watcher) would otherwise hold
  * this promise, and with it a required check, indefinitely. After the
- * deadline the runner proceeds with the tail it has; the mirror listeners
- * stay attached, so any late output still reaches the log.
+ * deadline the runner resolves with the tail it has AND unrefs the pipe
+ * handles, so the process itself can exit too (resolving alone was not
+ * enough: the fix-round verifier measured the job still waiting 8 seconds
+ * for the grandchild to let go). The mirror listeners stay attached, so any
+ * late output still reaches the log while the event loop lives.
  */
 export const DEFAULT_DRAIN_DEADLINE_MS = 10_000;
 
@@ -122,6 +125,12 @@ export function runLeg({
             `${drainDeadlineMs} ms (a spawned process may still hold the pipes); ` +
             'continuing with the output captured so far',
         );
+        // Unref the pipe handles so the PROCESS can exit as well as the
+        // promise: the entry finishes via exitCode (never a forced exit),
+        // so a still-referenced pipe held by a grandchild would keep the
+        // job alive to its workflow timeout even after this resolve.
+        child.stdout?.unref?.();
+        child.stderr?.unref?.();
         finish(code);
       }, drainDeadlineMs);
       drainTimer.unref?.();
@@ -160,7 +169,9 @@ export async function runLegsWithFlakeRetry({
   const retriedLegNames = [];
   for (const leg of legs) {
     log(formatLegHeader(leg));
-    let res = await runLegImpl({ cmd: leg.cmd, args: leg.args, cwd });
+    // log is forwarded so the drain-deadline note follows the same sink as
+    // every other audit line instead of bypassing an injected one.
+    let res = await runLegImpl({ cmd: leg.cmd, args: leg.args, cwd, log });
     if (res.status !== 0 && !res.spawnError && flakeRetryBudget > 0 && isTeardownRpcFlake(res)) {
       flakeRetryBudget -= 1;
       retriedLegNames.push(leg.name);
@@ -175,7 +186,7 @@ export async function runLegsWithFlakeRetry({
           'signature (all tests passed, exit 1 in teardown) and was retried once; see the ' +
           'job log for the banner',
       );
-      res = await runLegImpl({ cmd: leg.cmd, args: leg.args, cwd });
+      res = await runLegImpl({ cmd: leg.cmd, args: leg.args, cwd, log });
     }
     if (res.status !== 0) {
       if (res.spawnError) {
