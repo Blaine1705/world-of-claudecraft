@@ -588,12 +588,9 @@ import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { reliquaryPageName } from './reliquary_i18n';
+import { reliquaryRelicDisplayName } from './reliquary_labels';
 import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
-import {
-  buildReliquaryUnlockPlan,
-  type ReliquaryUnlockEventModel,
-  reliquaryMarkFindKey,
-} from './reliquary_view';
+import { buildReliquaryUnlockPlan, type ReliquaryUnlockEventModel } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
@@ -13236,14 +13233,11 @@ export class Hud {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const plan = buildReliquaryUnlockPlan(events, reducedMotion);
     for (const log of plan.logs) {
-      const name =
-        log.kind === 'item' && ITEMS[log.id]
-          ? itemDisplayName(ITEMS[log.id])
-          : log.kind === 'mark'
-            ? t(reliquaryMarkFindKey(log.id) as TranslationKey)
-            : log.id.includes(':')
-              ? log.id.slice(log.id.lastIndexOf(':') + 1).replace(/_/g, ' ')
-              : log.id.replace(/_/g, ' ');
+      // One shared resolver for chat, banner, and every window surface: the two
+      // ladders here each carried their own humanized fallback, and only one of
+      // them stripped a colon namespace, so `mount:swift_gryphon` printed
+      // differently in the log than on the banner for the same unlock.
+      const name = reliquaryRelicDisplayName(log.kind, log.id);
       this.log(t('hudChrome.reliquary.unlockToast', { name }), '#ffd100');
     }
     // Durable Illumination log survives even when rank-up claims the banner slot.
@@ -13273,12 +13267,7 @@ export class Hud {
         this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
       } else {
         const relic = banner.relic;
-        const name =
-          relic.kind === 'item' && ITEMS[relic.id]
-            ? itemDisplayName(ITEMS[relic.id])
-            : relic.kind === 'mark'
-              ? t(reliquaryMarkFindKey(relic.id) as TranslationKey)
-              : relic.id.replace(/_/g, ' ');
+        const name = reliquaryRelicDisplayName(relic.kind, relic.id);
         bannerText = t('hudChrome.reliquary.unlockToast', { name });
       }
       this.showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion);
@@ -15282,10 +15271,6 @@ export class Hud {
 
   toggleReliquary(): void {
     this.reliquaryWindow.toggle();
-  }
-
-  get reliquaryWindowOpen(): boolean {
-    return this.reliquaryWindow.isOpen;
   }
 
   // Repaint the deed tracker from the live facet: the slow band, a watch
