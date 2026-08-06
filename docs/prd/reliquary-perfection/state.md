@@ -1,6 +1,6 @@
 # State: Reliquary Perfection Packet
 
-Current phase: 11 complete; next: 11 QA. Update this line as phases complete.
+Current phase: 12 complete; next: 12 QA. Update this line as phases complete.
 
 ## Locked decisions (record once, reference forever)
 - Hidden deeds are OUT of the Reliquary catalog entirely (maintainer, 2026-08-05).
@@ -85,7 +85,9 @@ Current phase: 11 complete; next: 11 QA. Update this line as phases complete.
   four leaves). Titles page is 33 relics (hidden deeds excluded
   structurally); derived totals are catalog 212 / character-scoped 183; NO literal
   total pins exist anywhere, the suites derive them (the phase's cascade step was a
-  no-op, recorded so later phases do not hunt). markItemDiscovered gained trailing
+  no-op, recorded so later phases do not hunt; SUPERSEDED in Phase 12: three omitted
+  instance drops added, totals now 216 / 187 and literal-pinned in
+  tests/reliquary_content.test.ts). markItemDiscovered gained trailing
   opts {retro?: boolean} (module function only; the SimContext seam signature
   deliberately does NOT carry it). The masterwork visited namespace is registered;
   per-craft visits are gated on isCataloguedRelicMark. restoreReliquaryState recent
@@ -227,7 +229,65 @@ Current phase: 11 complete; next: 11 QA. Update this line as phases complete.
   strings use four different reliquary nouns (성물실/유물함/성물함/유물).
   Phase 22 step recorded: extend the sweep's BUNDLES map when Latin chunks land
   (the sweep trips on 'has no resolved bundle' otherwise).
-- Phase 12: (pending)
+- Phase 12 (2026-08-06): Test integrity + catalog pins + record corrections. Release
+  sync fb6e012255 (CI-only incoming, merge-queue PR 3016, no conflicts). Catalog: the
+  three omitted instance drops added at their page tails (gravewyrm_bone_quiver to
+  gravewyrm_sanctum, direfang_quiver to nythraxis, selthes_seastriders to
+  drowned_temple); totals moved 213 to 216 catalog-wide and 184 to 187
+  character-scoped, both derived from the live module before pinning; guide
+  regenerated; the drowned_temple desc reworded to name both sources (live-name
+  pinned; adds one desc to the Phase 22 fill worklist). tests/reliquary_content.test.ts
+  now DERIVES every page from live tables: dungeons via DungeonDef.spawns[].mobId to
+  MOBS loot plus recursive summonAdds and ground-object yields (both arms
+  reached-pinned as the only routes), delves via behavioral chest enumeration
+  (ScriptedRng fails closed: past-script draws and any non-chance draw THROW) plus
+  DELVE_SHOPS Marks stock with a kind-tool exclusion, Thunzharr via the zone3 roll
+  groups, sets via a DEEDS-derived col_set_* sweep (three leveling kits excluded,
+  asserted real and page-less), plus growth sweeps: rare+ dungeon set equals the
+  equality-map keys exactly, CHEST_FN_BY_DELVE bidirectional over DELVES, worldBoss
+  mobs paged, totals 216/187 pinned through production completion math.
+  tests/reliquary_state.test.ts: real ring-cap test through noteRelicItemFind (literal
+  12; the inline ring re-implementation is DELETED), restore truncation keeps the
+  newest 12, per-field sanitizer negatives on catalogued ids (clears junk dropped,
+  fractional floored, bogus pageId dropped entry-survives, membership-only acceptance),
+  illumination scans past an incomplete first page (deathlord_warplate second-page
+  completion), masterwork proc behavioral test (shared seed-151 window with
+  professions_masterwork, same-seed no-proc control), interleaved item+mark ring test.
+  Server/UI: profile /c/ pins for the Reliquary pair and Curator lines; the phase
+  item's "hides rank line when unranked" contradicted reality, the server ALWAYS
+  renders the line with an Unranked fallback, pinned as-is (no behavior change); all
+  five CURATOR_RANK_ENGLISH names literal-pinned AND cross-pinned against the client
+  hud_chrome catalog (direct data-only import); per-dimension ownership deltas
+  (items, marks, bag reins, bank reins, title deeds server-side; mounts seam
+  client-side; totals pinned unchanged); curatorRankNameKey fallbacks on both
+  out-of-range ends plus a rank-def count cross-pin; sheet view gained the
+  ClientWorld Map-shaped deedsEarned arm. Record corrections: the ONE surviving
+  false attribution (professions_fishing :1316) corrected with git provenance
+  (3c0931fcdf introduced it, true-up 58bf16476d missed the block, the real cause is
+  the Galecrest #2887 stream shift inherited via sync 90cee587f8, release-side hunt
+  seed 5 in 4c2b43f8f7); every other target verified already correct. The phase
+  file's corpse_harvest "60s timeout" premise is FALSE (no such timeout ever existed,
+  git log -S proven; the :795 seed-probe loop is the idiom, suite 27.6s). Frostveil
+  confirmed moot (strict contract live, no breath comment exists).
+  BUG FOUND AND FIXED (QA round, test-first): the delve arm of clearCountForSource
+  read meta.delveClears[delveId], a key NO writer produces (grantDelveClearTo writes
+  delveId:tierId), so delve page clears and delve first-find provenance were
+  permanently 0 on every host; the committed delve test had pinned the dead read.
+  Red proof (999 vs 9), then the minimal fix: prefix-sum the tiered keys like
+  delveShopGateUnlocked, flooring each finite positive entry; a cross-module test
+  drives ONE real clear through grantDelveClearTo and holds all three readers (shop
+  gate, deeds trigger, reliquary readout) to the same count. Architecture review:
+  SHIP (no rng draw-order, tick-phase, purity, or host-identity impact; the deeds
+  bare-key divergence judged acceptable-and-pinned). Reviews: qa-checklist READY
+  (0 blocking), test-coverage-auditor 1 blocking (the dead delve read) plus
+  should-fixes, fix round fresh-reviewed (0 blocking) and its batch applied,
+  architecture SHIP; every finding applied or ruled. Mutation proof: 40/40
+  agent-authored mutations executed red-then-restored across three batteries
+  (cp-restore, patch-applied and tests-ran proven, green final baselines).
+  Validation: tsc, ci:changed, guide freshness, 17-suite sweep 1161 green, sim
+  blast-radius suites green. Stopping rules: NO uncatalogued rare+ instance drop
+  remains beyond the three added (proven by the equality regime); the 51 open-world
+  and Rift rare+ items are Phase 21 scope.
 - Phase 13: (pending)
 - Phase 14: (pending)
 - Phase 15: (pending)
@@ -258,7 +318,37 @@ Current phase: 11 complete; next: 11 QA. Update this line as phases complete.
   inline seed prose), corpse_harvest_sim (quantity history), whirlwind_echo (old
   default 31337 named). Evidence the Reliquary branch adds no world-gen draws: at the
   same seeds both sides recorded identical values (gathering_rhythm 89/80/72,
-  corpse_harvest quantity 4, whirlwind 31338 valid on both).
+  corpse_harvest quantity 4, whirlwind 31338 valid on both). Phase 12 verified all
+  six targets and found ONE missed block (professions_fishing :1316 still carried the
+  banned wording; the true-up 58bf16476d fixed the file's other three comments but
+  not this one); corrected in 314187312e with full git provenance.
+- Seed-set divergence caveat (Phase 12): professions_fishing now carries the branch's
+  own hunt (seed 1, default 2) while release/v0.35.0 carries its independent hunt of
+  the same Galecrest shift (seed 5, default 467) for the SAME suite. Whichever side
+  wins the next release merge, re-verify that suite rather than rubber-stamping the
+  conflict resolution.
+- RULING OPEN (Phase 12 arch review): a catalogued relic acquired while its page
+  clear meter reads 0 (trade, auction, mail) stamps clears: 0 and renders "first
+  found on clear 0". Absent (provenance unknown, matching the retro doctrine) may be
+  righter. Current behavior is pinned in tests/reliquary_state.test.ts with a
+  recorded-ruling comment; decide before Phase 17 ships obtain counts.
+- Rider (Phase 12 arch review): three delve-clear readers hand-roll the sum with
+  different validation (shop gate prefix-sums unguarded, deeds delveClearCount also
+  accepts a bare delveId key and sums raw values, the reliquary arm is strict and
+  floored). Agreement on the production key shape is pinned by the cross-module
+  grantDelveClearTo test; the follow-up shape is a shared delveClearTotal helper or
+  restore-time normalization (sim.ts restores delveClears with zero validation), plus
+  a finite guard in deeds.ts delveClearCount (offline-sandbox exposure only). Not
+  this packet.
+- Release-notes rider (Phase 22 records close-out): players who had completed the
+  Drowned Temple, Gravewyrm Sanctum, or Nythraxis pages see them revert to
+  incomplete until they find the newly catalogued relic. Nothing persistent is lost
+  (ranks key off owned counts, deeds and borders do not key off page completion);
+  inherent to catalog growth and will repeat at Phase 21 scale.
+- Phase 21 input (Phase 12 sweep): 51 uncatalogued rare+ items exist repo-wide and
+  ALL are open-world or Rift sources (mogger, captain_verlan, old_cragmaw,
+  voskar_emberwing, the rift_* family, zone2 sister_nhalia, etc.); instance coverage
+  is complete and equality-pinned, so Phase 21 owns any inclusion decisions.
 - i18n release fill: all reliquary keys pending in the 15 Latin locales; exact worklist
   in the Phase 22 record. Locale overlays for ja/ko/ru/zh_CN/zh_TW already carry
   contributor-authored fills (correct M16 mechanics, flagged for maintainer review).

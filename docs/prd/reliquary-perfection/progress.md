@@ -7,8 +7,8 @@
 | 10 Sim correctness close-out | complete | 2026-08-05 | 2026-08-05 |
 | 10 QA | complete | 2026-08-05 | 2026-08-05 |
 | 11 Page-name localization + i18n hygiene | complete | 2026-08-05 | 2026-08-05 |
-| 11 QA | not started | | |
-| 12 Test integrity + catalog pins + records | not started | | |
+| 11 QA | complete | 2026-08-06 | 2026-08-06 |
+| 12 Test integrity + catalog pins + records | complete | 2026-08-06 | 2026-08-06 |
 | 12 QA | not started | | |
 | 13 Window structure + information UX | not started | | |
 | 13 QA | not started | | |
@@ -196,3 +196,43 @@ happened.
   the three inherited reds recorded above. Full gate re-run green (the one browser
   regression failure was a dynamic-import cold-start flake, 16/16 files green
   standalone; typecheck and all builds green).
+
+## Phase 12: Test integrity + catalog pins + record corrections (2026-08-06)
+
+- Ultracode implementation phase per the plan. Release sync fb6e012255 (CI-only
+  incoming: merge-queue PR 3016; no conflicts, incoming CI suites green at the
+  merged tip). Commits: 4dc750388a (three drops + guide regen), 05753664a6
+  (content-test derivations + growth sweeps + totals), bf42fa5b80 (state, server,
+  and UI pins), 314187312e (record correction), then the review fix round
+  688de2e2e8 (delve-clears sim fix, test-first), edccbd0cef (coverage gaps),
+  7bd8f7fb70 (desc reword), 871d292ab2 (final review batch).
+- Catalog: gravewyrm_bone_quiver, direfang_quiver, selthes_seastriders were the
+  ONLY uncatalogued rare+ instance drops (proven exhaustive by the new equality
+  regime); totals 213 to 216 and 184 to 187, literal-pinned through the
+  production completion math. The phase file's 215/186 arithmetic was stale as
+  the runner prompt warned; everything was derived from the live table.
+- Found and fixed (test-first, from the coverage audit's one BLOCKING finding):
+  the delve arm of clearCountForSource read a delveClears key no writer
+  produces, so delve page clears and delve first-find provenance were
+  permanently 0 on every host; the fix prefix-sums the tiered keys like
+  delveShopGateUnlocked, and a cross-module test drives a real clear through
+  grantDelveClearTo holding all three readers to one count.
+- Phase-file corrections discovered in execution: items 11 and 12 were mostly
+  moot (the Phase 10 sync had already corrected all but ONE comment block;
+  frostveil was already resolved release-side with the strict contract live;
+  the corpse_harvest 60s timeout never existed, proven via git log -S). The
+  "hides rank line when unranked" expectation in item 9 contradicts the server,
+  which always renders an Unranked fallback; reality pinned, no behavior change.
+- Reviews: qa-checklist READY (0 blocking, 2 should-fix); test-coverage-auditor
+  1 blocking + 4 should-fix + 8 notes; fix round fresh-reviewed (0 blocking,
+  3 should-fix, 4 notes) and its batch applied; architecture-reviewer SHIP
+  (0 blocking, the delve-reader divergence judged acceptable-and-pinned). Every
+  finding across all four reports applied or explicitly ruled in state.md.
+- Mutation proof: 40/40 executed red-then-restored across three batteries
+  (23 + 11 + 6), each run proving the patch applied and tests actually ran,
+  with green final baselines and a clean tree after every battery.
+- Validation: npx tsc --noEmit clean throughout; npm run ci:changed exit 0;
+  guide freshness green post-commit; 17-suite sweep 1161 passed / 4 known
+  skips; sim blast-radius suites (architecture, parity, wire, snapshots,
+  delves, delve_shop, deeds) all green after the sim fix.
+- Commits stay LOCAL per the plan; push happens after Phase 12 QA passes.
