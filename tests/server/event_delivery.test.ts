@@ -9,7 +9,10 @@ import { describe, expect, it } from 'vitest';
 import { shouldDeliverCombatEventToViewer } from '../../server/event_delivery';
 import type { SimEvent } from '../../src/sim/types';
 
-// pids 1 and 2 are players; 3 is 1's pet, 8 is a stranger's pet, 50 is a mob.
+// The cast, by entity id. 1 and 2 are the party players; 3 is 1's pet. 7 is a
+// stranger, outside the party, and 8 is 7's pet: that pair is what proves the
+// filter still hides an uninvolved fight rather than delivering everything. 50
+// is a mob, owned by nobody.
 const OWNERS = new Map<number, number>([
   [3, 1],
   [8, 7],
@@ -55,6 +58,8 @@ describe('combat event delivery', () => {
   });
 
   it('treats a pet heal the same way', () => {
+    // 1's pet heals 1; then the stranger's pet (8) heals its own owner (7),
+    // where BOTH sides resolve to 7 and neither is the viewer.
     expect(shouldDeliverCombatEventToViewer(heal(3, 1), 1, null, ownerOf)).toBe(true);
     expect(shouldDeliverCombatEventToViewer(heal(8, 7), 1, null, ownerOf)).toBe(false);
   });
