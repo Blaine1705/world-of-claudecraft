@@ -13,7 +13,9 @@
 // plus-manifest-source contract test pattern (tests/anim_pipeline_batch1.test.ts).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import type { AbilityVfxDeps } from '../src/render/ability_vfx/painter';
+import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import { ABILITIES } from '../src/sim/data';
 
 const ROOT = join(__dirname, '..');
@@ -142,6 +144,82 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
         undefined,
       );
     }
+  });
+});
+
+describe('heroic_leap and piercing_howl reach triggerAttack through the real selfCast gate', () => {
+  // Regression for the CHANGES_REQUESTED review on PR #2964: both ids are
+  // untargeted (targetId === sourceId), full-spec archetypes 'dash' and
+  // 'shout' respectively, with no castFx of their own. Before this fix, the
+  // selfCast gate in handleSpellfx only claimed ceremonial archetypes
+  // (buff/summon/cc/heal/spirit) or TARGETED strike/cc/burst/shout utility,
+  // so both fell through unclaimed and triggerAttack was never called, i.e.
+  // no attackByAbility gesture ever played (heroic_leap's leap, piercing_howl's
+  // Spellcast_Raise).
+  function makePainter() {
+    const triggerAttack = vi.fn();
+    const deps = {
+      vfx: {
+        shoutwave: vi.fn(),
+        nova: vi.fn(),
+        tick: vi.fn(),
+        projectile: vi.fn(),
+        lightningProjectile: vi.fn(),
+        burst: vi.fn(),
+        buffSwirl: vi.fn(),
+        beam: vi.fn(),
+      },
+      fx: {
+        setDelegates: vi.fn(),
+        warmSpiritsForClass: vi.fn(),
+        windup: vi.fn().mockReturnValue(false),
+        holdShell: vi.fn(),
+        holdGroundAura: vi.fn().mockReturnValue(true),
+        orbit: vi.fn().mockReturnValue(true),
+        bodyGlow: vi.fn(),
+        sleepEntity: vi.fn(),
+        update: vi.fn(),
+        sequenceInstant: vi.fn(),
+      },
+      anchor: () => ({ x: 0, y: 0, z: 0 }),
+      spawnAoeRing: vi.fn(),
+      triggerAttack,
+      hasGestureClip: () => true,
+    } as unknown as AbilityVfxDeps;
+    const painter = new AbilityVfx(deps, () => 0);
+    return { painter, triggerAttack };
+  }
+
+  it('claims heroic_leap selfCast and triggers its attack clip', () => {
+    const { painter, triggerAttack } = makePainter();
+
+    const claimed = painter.handleSpellfx({
+      type: 'spellfx',
+      sourceId: 1,
+      targetId: 1,
+      school: 'physical',
+      fx: 'selfCast',
+      ability: 'heroic_leap',
+    } as never);
+
+    expect(claimed).toBe(true);
+    expect(triggerAttack).toHaveBeenCalledWith(1, 'heroic_leap');
+  });
+
+  it('claims piercing_howl selfCast and triggers its attack clip', () => {
+    const { painter, triggerAttack } = makePainter();
+
+    const claimed = painter.handleSpellfx({
+      type: 'spellfx',
+      sourceId: 3,
+      targetId: 3,
+      school: 'physical',
+      fx: 'selfCast',
+      ability: 'piercing_howl',
+    } as never);
+
+    expect(claimed).toBe(true);
+    expect(triggerAttack).toHaveBeenCalledWith(3, 'piercing_howl');
   });
 });
 
