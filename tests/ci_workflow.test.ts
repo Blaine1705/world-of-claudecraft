@@ -697,12 +697,19 @@ describe('CI workflow parity', () => {
       ['release-gate', 20],
       ['pr-long-sims', 20],
       ['browser-gate', 10],
+      // 8 is a measured decision like the rest (healthy worst 4.42 min, all
+      // observed stalls over 8), so it is pinned exactly here beside the
+      // single-digit shape check the classifier test keeps.
+      ['changes', 8],
     ] as const;
     // Both the positive and the negatives run over the full index-based job
     // span (this job key to the next), never the comment-terminated
     // jobSource slice, so a stray top-level comment inside a job body can
     // hide neither a duplicate job-level bound nor a step bound (the fix
     // round's verifier proved the jobSource form evadable both ways).
+    // Deliberate consequence: a span INCLUDES the 2-space comment block that
+    // documents the NEXT job, so only indentation-anchored patterns belong
+    // on spans; a bare not.toContain would trip on a neighbour's comment.
     const jobSpan = (name: string) => {
       const start = workflow.indexOf(`\n  ${name}:`);
       expect(start).toBeGreaterThanOrEqual(0);
@@ -718,10 +725,8 @@ describe('CI workflow parity', () => {
       // A step bound can also legally sit as the FIRST key of a step item.
       expect(span).not.toMatch(/\n {6}- timeout-minutes:/);
     }
-    // Completeness: every ci.yml job is either in the bounds table above,
-    // the separately-bounded changes job (its single-digit bound has its own
-    // pin beside the classifier assertions), or the named
-    // unbounded-by-design list: the checks and release lanes sit outside
+    // Completeness: every ci.yml job is either in the bounds table above or
+    // the named unbounded-by-design list: the checks and release lanes sit outside
     // Phase 6's measured pass, and bounding them is a recorded follow-up in
     // the packet's postmortem note, not an accident. A new job therefore
     // cannot arrive silently unbounded, and moving a job between the lists
@@ -742,7 +747,7 @@ describe('CI workflow parity', () => {
       ...jobsSection.matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):[ \t]*(?:#[^\n]*)?\n/g),
     ].map((m) => m[1]);
     expect([...jobKeys].sort()).toEqual(
-      [...bounds.map(([name]) => name), 'changes', ...UNBOUNDED_BY_DESIGN].sort(),
+      [...bounds.map(([name]) => name), ...UNBOUNDED_BY_DESIGN].sort(),
     );
     // Two-way: a job on the unbounded list must actually BE unbounded, so
     // the list is an assertion, not documentation that can rot.
@@ -760,6 +765,9 @@ describe('CI workflow parity', () => {
     expect(mergeQueueTriage).toContain('exceeded the maximum execution time');
     expect(mergeQueueTriage).toContain('checkout-stall bound');
     expect(mergeQueueTriage).toContain('failing or still running');
+    // The routing is the entry's operational point: a timeout kill goes to
+    // a rerun, never straight to a code investigation.
+    expect(mergeQueueTriage).toContain('re-run the failed jobs and re-queue');
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {

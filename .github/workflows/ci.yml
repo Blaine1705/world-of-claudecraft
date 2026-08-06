@@ -390,8 +390,9 @@ jobs:
     # a manual failed-jobs rerun: the buy is bounding the unbounded worst
     # case (the pre-Phase-1 90 minute wedges) and making stalls visible as
     # failures for the runner escalation, not the average tail. Full
-    # evidence: the packet's internal detect-wedge postmortem note
-    # (docs/prd/ci-cd-performance/).
+    # evidence: the CI/CD performance packet's detect-wedge postmortem note
+    # (an internal, untracked packet record; the run ids above are the
+    # in-repo anchors).
     timeout-minutes: 20
     runs-on: ubuntu-latest
 
