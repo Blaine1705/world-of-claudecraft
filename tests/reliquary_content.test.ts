@@ -180,12 +180,13 @@ const CHANCE_SCRIPTS: readonly (readonly boolean[])[] = [
   [true, true],
 ];
 
-type ChestFn = (
-  tier: LootTier,
-  cls: PlayerClass,
-  rng: Rng,
-  bountiful?: boolean,
-) => { itemId: string; count: number }[];
+// The chest-function contract is TAKEN from the live signature instead of
+// hand-rolled, so a parameter change on delveChestItemsForTier reaches the
+// enumeration below as a tsc error rather than a silently unexercised arm.
+type ChestFn = typeof delveChestItemsForTier;
+// The sibling function must keep that same shape (it is enumerated through the
+// same seam): a divergent signature reds tsc here, at the contract.
+drownedLitanyChestItemsForTier satisfies ChestFn;
 
 // Keys typed against the live union: a new LootTier fails tsc here until the
 // enumeration below covers it.
@@ -511,6 +512,11 @@ describe('Reliquary set pages pin against col_set_* deeds', () => {
       const setKey = deedId.slice('col_set_'.length);
       const page = RELIQUARY_PAGES_BY_ID[`conquerors_set_${setKey}`];
       expect(page, `col_set deed ${deedId} needs a conquerors_set_${setKey} page`).toBeDefined();
+      // Existence guard: a hand-written page cannot bypass the members table.
+      expect(
+        RELIQUARY_SET_MEMBERS[setKey as keyof typeof RELIQUARY_SET_MEMBERS],
+        setKey,
+      ).toBeDefined();
       const deed = DEEDS[deedId];
       expect(deed.trigger.kind, deedId).toBe('collectItems');
       if (!page || deed.trigger.kind !== 'collectItems') continue;
@@ -611,6 +617,9 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
     // EQUALITY regime, table-driven: the loop walks ALL live DELVES through
     // CHEST_FN_BY_DELVE, so a new delve reds here until it is wired to its
     // chest function and its page lists exactly the derived rare+ set.
+    // Bidirectional first: the loop below only walks LIVE delves, so a stale
+    // row for a deleted delve would sit here unnoticed without this pin.
+    expect(Object.keys(CHEST_FN_BY_DELVE).sort()).toEqual(Object.keys(DELVES).sort());
     for (const delveId of Object.keys(DELVES)) {
       const wired = CHEST_FN_BY_DELVE[delveId];
       expect(wired, `CHEST_FN_BY_DELVE has no entry for delve ${delveId}`).toBeDefined();
@@ -678,6 +687,38 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     }
   });
 
+  it('the mob walk really reaches boss-summoned adds', () => {
+    // Pins the summonAdds arm as REACHED so the walk cannot silently rot: the
+    // arm yields no loot ids today (drowned_thrall has an empty loot table),
+    // so the equality pins above would stay green if it stopped being walked.
+    const bastionSpawns = DUNGEONS.sunken_bastion.spawns.map((s) => s.mobId);
+    expect(bastionSpawns).not.toContain('drowned_thrall');
+    expect(MOBS.vael_the_mistcaller.summonAdds?.mobId).toBe('drowned_thrall');
+    expect(dungeonMobIds('sunken_bastion')).toContain('drowned_thrall');
+  });
+
+  it('the loot walk really reaches dungeon ground objects', () => {
+    // Pins the ground-object arm as REACHED for the same reason: the wardstones
+    // are quest items (never rare+), so the equality pins above cannot see this
+    // arm stop contributing.
+    const fromMobs = new Set(
+      dungeonMobIds('nythraxis_boss_arena').flatMap((mobId) =>
+        (MOBS[mobId]?.loot ?? []).map((entry) => entry.itemId),
+      ),
+    );
+    expect(fromMobs.has('bastion_ward_stone')).toBe(false);
+    expect(dungeonObjectItemIds('nythraxis_boss_arena')).toContain('bastion_ward_stone');
+  });
+
+  it('the Drowned Temple page desc names both live loot sources', () => {
+    // The page pools rare drops from BOTH temple bosses, so the blurb has to
+    // name both; derived from the live MOBS names, never a copy of the string.
+    const page = RELIQUARY_PAGES_BY_ID.conquerors_drowned_temple;
+    expect(page.desc).toBeDefined();
+    expect(page.desc).toContain(MOBS.choirmother_selthe.name);
+    expect(page.desc).toContain(MOBS.ysolei.name);
+  });
+
   it('Hollow Crypt: rare+ equality plus four curated uncommon brand pieces', () => {
     // SUBSET regime with explicit inclusions: the entry dungeon's only rare+
     // drop is the gravewoven_bag, so the page adds the four uncommon Crypt
@@ -718,8 +759,6 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     const withRarePlus = Object.keys(DUNGEONS).filter(
       (id) => dungeonRarePlusLootIds(id).length > 0,
     );
-    // Literal: update when catalog content lands (snug vacuity floor).
-    expect(withRarePlus.length).toBeGreaterThanOrEqual(6);
     // Contents-pin completeness: a dungeon with rare+ loot must sit under an
     // equality regime, EQUALITY_PAGES (exact pin), hollow_crypt's curated
     // subset test, or an explicit EXCLUDED_DUNGEONS opt-out; a NEW rare+

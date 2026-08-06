@@ -259,6 +259,7 @@ describe('characterSheet: reliquary completion pair + rank', () => {
       }),
     );
     expect(withMark.owned).toBe(base.owned + 1);
+    expect(withMark.total).toBe(base.total);
   });
 
   it('scores a bank reins mount through sheetReliquaryFromState', () => {
@@ -283,6 +284,26 @@ describe('characterSheet: reliquary completion pair + rank', () => {
       }),
     );
     expect(withReins.owned).toBe(base.owned + 1);
+    // Ownership moves, the catalog size does not.
+    expect(withReins.total).toBe(base.total);
+  });
+
+  it('scores a bag reins mount through sheetReliquaryFromState', () => {
+    // The sheet unions bags AND bank before reading mounts; the bank sibling
+    // above covers one arm, this covers the other, so dropping either half of
+    // the union reds exactly one of the two.
+    const reinsDef = ITEMS.reins_valorsteed;
+    if (reinsDef.kind !== 'mount') throw new Error('reins_valorsteed mount fixture missing');
+    const cataloguedMountIds = RELIQUARY_PAGES.flatMap((page) =>
+      page.relics.flatMap((relic) => (relic.kind === 'mount' ? [relic.mountId] : [])),
+    );
+    expect(cataloguedMountIds).toContain(reinsDef.mount);
+    const base = sheetReliquaryFromState(makeState());
+    const withReins = sheetReliquaryFromState(
+      makeState({ inventory: [{ itemId: 'reins_valorsteed', count: 1 }] }),
+    );
+    expect(withReins.owned).toBe(base.owned + 1);
+    expect(withReins.total).toBe(base.total);
   });
 
   it('scores an earned title deed through sheetReliquaryFromState', () => {
@@ -300,6 +321,8 @@ describe('characterSheet: reliquary completion pair + rank', () => {
       makeState({ deeds: { prog_veteran: '2026-07-08' } }),
     );
     expect(withTitleDeed.owned).toBe(base.owned + 1);
+    // Ownership moves, the catalog size does not.
+    expect(withTitleDeed.total).toBe(base.total);
   });
 
   it('owner and public share the same reliquary numbers for the same blob', () => {

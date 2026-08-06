@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
+import { delveShopGateUnlocked } from '../src/sim/content/delves/shop';
 import { recipeById } from '../src/sim/content/recipes';
 import {
   isCataloguedRelicItem,
@@ -12,7 +13,9 @@ import {
   RELIQUARY_PAGES,
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
-import { grantDeed, markItemDiscovered } from '../src/sim/deeds';
+import { DELVES } from '../src/sim/data';
+import { checkDeedTrigger, grantDeed, markItemDiscovered } from '../src/sim/deeds';
+import { grantDelveClearTo } from '../src/sim/delves/runs';
 import {
   CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
@@ -107,6 +110,30 @@ describe('Reliquary first discover of a catalogued relic', () => {
       pageId: 'conquerors_hollow_crypt',
     });
     expect(meta.reliquary.recent).toEqual([CATALOGUE_RELIC]);
+  });
+
+  it('stamps clears 0 when the crediting page clear meter reads zero', () => {
+    // Recorded behavior, ruling open (Phase 12 arch review): absent might be
+    // righter for source-less acquisitions (trade / auction house), where the
+    // zero says nothing about provenance; see the packet state.md OPEN items.
+    // Today the live find stamps clears: 0, which the window renders as
+    // "first found on clear 0". Driven through the real discover path.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt.clearSource).toEqual({
+      kind: 'dungeon',
+      dungeonId: 'hollow_crypt',
+      difficulty: 'normal',
+    });
+    expect(meta.deedStats.dungeonClears.hollow_crypt).toBeUndefined();
+
+    markItemDiscovered(sim.ctx, meta, CATALOGUE_RELIC);
+    // toEqual, not a key probe: a sparse entry (no clears key) fails here, so
+    // this reds the day the ruling lands and the behavior changes.
+    expect(meta.reliquary.firstFind[CATALOGUE_RELIC]).toEqual({
+      clears: 0,
+      pageId: 'conquerors_hollow_crypt',
+    });
   });
 
   it('onItemDiscovered alone does not dual-write itemsDiscovered', () => {
@@ -1122,6 +1149,42 @@ describe('Reliquary pure completion + curator rank', () => {
     // tiered keys) and stays unread, matching delveShopGateUnlocked.
     meta.delveClears.collapsed_reliquary = 999;
     expect(sim.reliquaryPageClearCount('conquerors_collapsed_reliquary')).toBe(9);
+  });
+
+  it('every delve-clears reader agrees on one clear driven through the real writer', () => {
+    // Three modules sum meta.delveClears under three different key rules: the
+    // shop gate (content/delves/shop.ts) and the Reliquary read (reliquary.ts)
+    // sum the `${delveId}:` prefix, while the deed counter (deeds.ts) matches
+    // the head segment and so would also count a bare `${delveId}` key. The
+    // shared key SHAPE is what keeps them in agreement, and nothing pinned it,
+    // so the write here goes through the one production writer,
+    // grantDelveClearTo (src/sim/delves/runs.ts), reached from a real run:
+    // change the writer's clearKey and every reader below is re-scored.
+    const sim = makeSim();
+    const { meta, e } = primary(sim);
+    const DELVE_ID = 'collapsed_reliquary';
+    sim.setPlayerLevel(DELVES[DELVE_ID].minLevel);
+    sim.enterDelve(DELVE_ID, 'normal');
+    const run = sim.delveRunForPlayer(sim.playerId);
+    expect(run, 'a real delve run to grant the clear on').not.toBeNull();
+    if (!run) return;
+    grantDelveClearTo(sim.ctx, run, DELVES[DELVE_ID], meta, sim.playerId);
+    const clears = sim.delveClearsFor(sim.playerId);
+    expect(clears[`${DELVE_ID}:normal`]).toBe(1);
+
+    // Reader 1: the Reliquary page readout (public seam plus the pure read).
+    expect(sim.reliquaryPageClearCount('conquerors_collapsed_reliquary')).toBe(1);
+    expect(clearCountForSource(meta, { kind: 'delve', delveId: DELVE_ID })).toBe(1);
+    // Reader 2: the shop gate, bracketed to exactly one clear.
+    expect(delveShopGateUnlocked(clears, DELVE_ID, 'clears:1')).toBe(true);
+    expect(delveShopGateUnlocked(clears, DELVE_ID, 'clears:2')).toBe(false);
+    // Reader 3: the deed counter, same bracket through the live trigger shape.
+    expect(checkDeedTrigger(meta, e, { kind: 'delveClears', delveId: DELVE_ID, count: 1 })).toBe(
+      true,
+    );
+    expect(checkDeedTrigger(meta, e, { kind: 'delveClears', delveId: DELVE_ID, count: 2 })).toBe(
+      false,
+    );
   });
 
   it('a heroic-only dungeonClears key never leaks into the normal page readout', () => {

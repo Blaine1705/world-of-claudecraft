@@ -3,6 +3,10 @@
 // value `next()` produces, in draw order. Every other method (`range`, `int`,
 // `chance`, `pick`) funnels through `next()`, so it sees those too. Pure
 // bookkeeping: it MUST NOT draw rng or branch simulation behavior.
+// One deliberate exception, and it is a contract on the CALL SITE: a test may
+// throw from its observer as a fail-closed guard (tests/reliquary_content.test.ts
+// ScriptedRng throws on any unscripted draw), so `next()` must never swallow
+// observer exceptions.
 export type RngObserver = (value: number) => void;
 
 // Deterministic seeded RNG (mulberry32) — all sim randomness must flow through this.
