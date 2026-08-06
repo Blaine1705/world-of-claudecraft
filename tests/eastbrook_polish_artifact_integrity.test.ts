@@ -6,6 +6,9 @@ import { describe, expect, it } from 'vitest';
 const captureContract =
   // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
   await import('../scripts/assets/eastbrook_grand_armoury/capture_contract.mjs');
+const { REMINT_COMMAND } = await import(
+  '../scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs'
+);
 const {
   assertTownArmouryIdentity,
   assertTownAttributionTargetState,
@@ -936,8 +939,16 @@ describe('Eastbrook polish committed capture artifacts', () => {
   });
 
   it('pins the historical metadata authority independently', () => {
-    expect(sha256File(ACCEPTED_POLISH_V2_METADATA_PATH)).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
-    expect(ACCEPTED_POLISH_V2_PROVENANCE.fingerprint).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
+    // On a legitimate re-mint both literals move together with the capture
+    // contract's composite pin; the remint tool prints all three.
+    expect(
+      sha256File(ACCEPTED_POLISH_V2_METADATA_PATH),
+      `the accepted metadata authority moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND}`,
+    ).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
+    expect(
+      ACCEPTED_POLISH_V2_PROVENANCE.fingerprint,
+      `the sealed composite fingerprint moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND}`,
+    ).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
   });
 
   // The frozen polish-v2 evidence intentionally predates the bank rebuild: it
@@ -1515,9 +1526,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // matched the merged tree, and no capture was retaken here.
     // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
     // recomputed by remint_polish_provenance.mjs.
-    expect(fingerprint.digest('hex')).toBe(
-      '4fd9c844d07805ba75c6749ae76ee139838d5f3f389fe2b20266671f7afb4cd0',
-    );
+    expect(
+      fingerprint.digest('hex'),
+      `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
+    ).toBe('4fd9c844d07805ba75c6749ae76ee139838d5f3f389fe2b20266671f7afb4cd0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
