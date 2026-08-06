@@ -695,18 +695,48 @@ describe('CI workflow parity', () => {
     const bounds = [
       ['pr-gate', 20],
       ['release-gate', 20],
-      ['pr-long-sims', 15],
+      ['pr-long-sims', 20],
       ['browser-gate', 10],
     ] as const;
     for (const [name, minutes] of bounds) {
       const job = jobSource(name);
       const jobLevel = job.match(/^ {4}timeout-minutes: \d+$/gm) ?? [];
       expect(jobLevel).toEqual([`    timeout-minutes: ${minutes}`]);
-      expect(job).not.toMatch(/\n {8}timeout-minutes:/);
+      // The step-level negative runs over the full index-based job span
+      // (this job key to the next), not the comment-terminated jobSource
+      // slice, so a stray top-level comment inside a job body cannot hide a
+      // step bound from it.
+      const start = workflow.indexOf(`\n  ${name}:\n`);
+      expect(start).toBeGreaterThanOrEqual(0);
+      const rest = workflow.slice(start + 1);
+      const nextJob = rest.search(/\n {2}[A-Za-z][A-Za-z0-9_-]*:\n/);
+      const span = nextJob === -1 ? rest : rest.slice(0, nextJob);
+      expect(span).not.toMatch(/\n {8}timeout-minutes:/);
     }
-    // The changes job keeps its own single-digit bound (pinned with the
-    // classifier assertions); the nightly workflow's deliberately generous
-    // bounds are pinned in tests/nightly_workflow.test.ts and stay untouched.
+    // Completeness: every ci.yml job is either in the bounds table above,
+    // the separately-bounded changes job (its single-digit bound has its own
+    // pin beside the classifier assertions), or the named
+    // unbounded-by-design list: the checks and release lanes sit outside
+    // Phase 6's measured pass, and bounding them is a recorded follow-up in
+    // the packet's postmortem note, not an accident. A new job therefore
+    // cannot arrive silently unbounded, and moving a job between the lists
+    // is a conscious edit here. The nightly workflow's deliberately
+    // generous bounds have their own presence pins in
+    // tests/nightly_workflow.test.ts and stay untouched.
+    const UNBOUNDED_BY_DESIGN = [
+      'release-version-gate',
+      'lint',
+      'pr-checks',
+      'release-i18n',
+      'release-checks',
+    ] as const;
+    const jobsSection = workflow.slice(workflow.indexOf('\njobs:'));
+    const jobKeys = [...jobsSection.matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):\n/g)].map(
+      (m) => m[1],
+    );
+    expect([...jobKeys].sort()).toEqual(
+      [...bounds.map(([name]) => name), 'changes', ...UNBOUNDED_BY_DESIGN].sort(),
+    );
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {

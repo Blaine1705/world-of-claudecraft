@@ -59,6 +59,13 @@ the Checks tab (filter by event: merge_group).
    branch, fix, push, re-queue.
 4. A flake verdict needs a clean rerun, not a shrug: re-run the failed job; if
    it greens, re-queue. Judge red CI by clean-runner reruns.
+5. A job that failed with "exceeded the maximum execution time of N minutes"
+   hit its checkout-stall bound (the test and browser jobs carry job-level
+   timeout-minutes sized from measured healthy worst cases; the stall class
+   is runner-side, 10 to 25 minutes inside actions/checkout). That is a
+   rerun, not a code investigation: re-run the failed jobs and re-queue. If
+   the SAME job times out twice on healthy-looking logs, treat it as a real
+   slowdown and investigate before resizing any bound.
 
 ## The required-check contract
 

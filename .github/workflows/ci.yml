@@ -303,9 +303,11 @@ jobs:
     needs: changes
     if: needs.changes.outputs.code != 'false'
     # Fail fast on the checkout-stall class (rationale and evidence on the
-    # pr-gate bound): this job's healthy worst case is 2.4 minutes plus a
-    # cold Playwright Chromium download on a cache miss, and its one stalled
-    # run sat 17.5 minutes in checkout inside an 18.4 minute wall
+    # pr-gate bound): the slowest healthy wall observed in the 24 hour
+    # replay is 3.73 minutes (run 31053693012), and that sample already
+    # contains the slowest observed cold Playwright Chromium install (2.33
+    # minutes), so 10 keeps a 2.7x margin over a cold-cache day. Its one
+    # stalled run sat 17.5 minutes in checkout inside an 18.4 minute wall
     # (run 31107474546).
     timeout-minutes: 10
     runs-on: ubuntu-latest
@@ -370,13 +372,19 @@ jobs:
     # Fail fast on the runner-side checkout-stall class instead of burning
     # tail: on 2026-08-06 thirteen shard, lane, and browser jobs across seven
     # runs sat 9.6 to 24.4 minutes inside actions/checkout before completing
-    # (healthy checkout is under 3 minutes; the worst stalled job wall was
-    # 32.8 minutes), and the stall, not any test, set every one of those
+    # (healthy checkout is under 3 minutes; worst stalled wall 32.8 minutes,
+    # run 31111919431 attempt 1), and the stall, not any test, set those
     # runs' tails. Sized from the measured healthy worst case plus margin:
-    # the slowest healthy shard observed is 13.6 minutes (the Phase 2
-    # content-only selective drill, PR #2991), so 20 kills only stalled
-    # jobs, which get rerun on a fresh runner instead of holding the tail.
-    # The evidence table lives in the packet's detect-wedge postmortem note.
+    # the slowest healthy GREEN shard observed is 13.6 minutes (the Phase 2
+    # content-only selective drill, PR #2991) and the slowest healthy RED
+    # one 18.6 minutes (run 31067745370, a 17.8 minute failing test step),
+    # so 20 kills only stalled jobs. A 24 hour replay of 2549 jobs found
+    # zero healthy jobs over their bound, and 21 stalled-but-green jobs
+    # these bounds convert into reds needing a manual failed-jobs rerun:
+    # the buy is bounding the unbounded worst case (the pre-Phase-1 90
+    # minute wedges) and making stalls visible as failures for the runner
+    # escalation, not the average tail. Full evidence: the packet's internal
+    # detect-wedge postmortem note (docs/prd/ci-cd-performance/).
     timeout-minutes: 20
     runs-on: ubuntu-latest
 
@@ -503,12 +511,15 @@ jobs:
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     # The lane concentrates the four slowest suites in one required job with
     # no sibling shard to report around it, so a hang would otherwise hold a
-    # required check for GitHub's 6 hour default. Sized from the measured
-    # healthy worst case plus margin, like the shard matrices (rationale and
-    # the checkout-stall evidence on the pr-gate bound): the lane's healthy
-    # worst case is 8.1 minutes, and its one stalled run sat 15.6 minutes in
-    # checkout inside a 23.3 minute wall (run 31105262161).
-    timeout-minutes: 15
+    # required check for GitHub's 6 hour default. 20 matches the shard
+    # matrices (rationale and the checkout-stall evidence on the pr-gate
+    # bound): the lane's own healthy worst case is 8.1 minutes, but the
+    # sample is thin (the job is days old), the chronomancy sweep inside it
+    # is the suite whose budget was raised for loaded runners, and a bound
+    # below 20 cannot lower the run tail anyway while pr-gate holds 20 in
+    # the same run. Its one stalled run sat 15.6 minutes in checkout inside
+    # a 23.3 minute wall (run 31105262161).
+    timeout-minutes: 20
     runs-on: ubuntu-latest
 
     steps:
@@ -642,9 +653,11 @@ jobs:
     name: Release gate (tests)
     if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))
     # Same checkout-stall bound as pr-gate (rationale and evidence there).
-    # This matrix keeps the long sims in-shard by design, and its healthy
-    # worst case is the 11.9 minute pre-lane baseline tail; 20 preserves the
-    # same margin. The nightly workflow deliberately keeps its own generous
+    # This matrix keeps the long sims in-shard by design; its slowest
+    # healthy shard observed is 14.63 minutes (run 31117143257, a sample
+    # that also carried a 4.68 minute runner "Set up job" spike, a
+    # component that counts inside the bound), so 20 keeps a 5 minute
+    # margin. The nightly workflow deliberately keeps its own generous
     # bounds and is untouched.
     timeout-minutes: 20
     runs-on: ubuntu-latest
