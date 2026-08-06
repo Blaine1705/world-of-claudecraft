@@ -4981,6 +4981,236 @@ export const TARGETS = [
     },
   },
   {
+    key: 'warfare-tier',
+    label: 'WARFARE honor tier: the sectioned shop, the Highwatch quartermaster, the sheet line',
+    when: [
+      'ui/hud/vendor/warfare_vendor',
+      'sim/content/pvp_honor',
+      'sim/pvp/power',
+      'content/zone3',
+    ],
+    // Three scenes behind one entry, because they are three views of ONE change
+    // and each has to be shot the same way on both trees for the pair to mean
+    // anything. `scene` selects the recipe, the battleground target's precedent.
+    //
+    //   shop          FURY in Eastbrook, the vendor both trees carry, so the
+    //                 before (flat #vendor-window grid) and the after (sectioned
+    //                 #warfare-window) are the same NPC and the same stock.
+    //   quartermaster Warmarshal Draven Kole in Highwatch. He does not exist on
+    //                 the base tree, so the recipe frames the AUTHORED POINT
+    //                 rather than the entity: the before frame is the same
+    //                 corner of the hub with nobody in it.
+    //   sheet         The character sheet with a complete 11-slot WARFARE kit
+    //                 worn, which is where the Warfare rating line moved (the
+    //                 0.20 caps went to 0.30 and a full kit now reaches them).
+    variants: [
+      { key: 'shop-desktop', scene: 'shop', charClass: 'warrior', charName: 'Warbrand' },
+      {
+        key: 'shop-mobile',
+        scene: 'shop',
+        charClass: 'warrior',
+        charName: 'Warbrand',
+        mobile: true,
+      },
+      {
+        key: 'quartermaster-desktop',
+        scene: 'quartermaster',
+        charClass: 'warrior',
+        charName: 'Warbrand',
+      },
+      { key: 'char-sheet-desktop', scene: 'sheet', charClass: 'warrior', charName: 'Warbrand' },
+    ],
+    async capture(page, variant) {
+      // The overlays that can outlive entry, the vendor-tool-gate sweep. No
+      // Escape: that OPENS the game menu over the frame.
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+
+      if (variant.scene === 'shop') {
+        // One evaluate for state, teleport and open: the HUD closes an honor
+        // shop once the player is out of range of the merchant (the
+        // openWarfareVendorNpcId proximity check mirrors openVendorNpcId), so
+        // the move and the open must land against the same ticking frame.
+        //
+        // The open is FEATURE-DETECTED rather than branched on a flag: the base
+        // tree has no openWarfareVendor at all, and falling back to openVendor
+        // at the same NPC is what makes this a like-for-like pair instead of
+        // two unrelated frames.
+        const setup = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return { ok: false, reason: 'no sim' };
+          const fury = [...sim.entities.values()].find((e) => e.templateId === 'fury');
+          if (!fury) return { ok: false, reason: 'no fury entity' };
+          const p = sim.player;
+          if (!p?.pos) return { ok: false, reason: 'no player' };
+          const meta = sim.players.get(sim.primaryId);
+          if (!meta) return { ok: false, reason: 'no primary player meta' };
+          // Honor well past the dearest tile so every price reads affordable
+          // and the disabled state cannot be mistaken for the owned marker.
+          meta.honor = 250000;
+          // The tier is level 20, so raise the player before equipping or the
+          // equip silently refuses and no tile can read as owned.
+          try {
+            sim.setPlayerLevel?.(20);
+          } catch {}
+          // Part of ONE family owned, and worn: the owned marks, the live
+          // 2-piece bonus and the "N more" progress line all need a viewer who
+          // is part way through a set, never an empty or a finished one.
+          for (const id of [
+            'furyforged_warhelm',
+            'furyforged_warspaulders',
+            'furyforged_warplate',
+          ]) {
+            try {
+              sim.addItem(id, 1);
+              sim.equipItem(id);
+            } catch {}
+          }
+          p.pos.x = fury.pos.x + 2;
+          p.pos.z = fury.pos.z;
+          p.prevPos = { ...p.pos };
+          // Force both windows hidden first so the size poll cannot pass on a
+          // window left up by an earlier target (the market recipe's precedent).
+          for (const sel of ['#vendor-window', '#warfare-window']) {
+            const el = document.querySelector(sel);
+            if (el) el.style.display = 'none';
+          }
+          if (typeof game.hud.openWarfareVendor === 'function') {
+            game.hud.openWarfareVendor(fury.id);
+            return { ok: true, sectioned: true };
+          }
+          game.hud.openVendor(fury.id);
+          return { ok: true, sectioned: false };
+        });
+        if (!setup.ok) throw new Error(`warfare shop setup failed: ${setup.reason}`);
+        const sel = setup.sectioned ? '#warfare-window' : '#vendor-window';
+        if (!(await pollForSize(page, sel))) throw new Error(`${sel} did not open`);
+        await wait(400);
+        // Verify the frame carries what the shot claims, on the AFTER side only:
+        // on the base tree there is no sectioned window at all, and the flat
+        // grid is the correct before frame.
+        if (setup.sectioned) {
+          const shape = await page.evaluate(() => ({
+            sections: document.querySelectorAll('#warfare-window .vendor-section-title').length,
+            progress: document.querySelectorAll('#warfare-window .warfare-set-progress').length,
+            bonuses: document.querySelectorAll('#warfare-window .warfare-set-bonus').length,
+            owned: document.querySelectorAll('#warfare-window .vendor-item.warfare-owned').length,
+            balance: Boolean(document.querySelector('#warfare-window .warfare-balance')),
+          }));
+          if (shape.sections < 4) {
+            throw new Error(`expected the four armor sections at least, saw ${shape.sections}`);
+          }
+          if (shape.progress === 0) throw new Error('no set carries the owned-count progress line');
+          if (shape.bonuses === 0) throw new Error('no set carries a bonus tier line');
+          if (shape.owned === 0) throw new Error('no tile is marked owned');
+          if (!shape.balance) throw new Error('the shop shows no honor balance');
+        }
+        // The Ravenpost mail toast lands a few seconds into every offline
+        // session and can straddle the capture.
+        await page.evaluate(() => {
+          const banner = document.querySelector('#banner');
+          if (banner) banner.style.display = 'none';
+        });
+        return { clip: sel };
+      }
+
+      if (variant.scene === 'quartermaster') {
+        // Frame the authored POINT (content/zone3.ts warmarshal_draven_kole),
+        // never the entity: he is new on this branch, and a recipe that resolved
+        // the entity would simply fail on the base tree instead of producing the
+        // before frame that shows the same corner of Highwatch empty.
+        const framed = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          const p = sim?.player;
+          if (!game || !sim || !p?.pos) return { ok: false, reason: 'offline world unavailable' };
+          const spot = { x: -11, z: 669 };
+          // Stand off the spot along the camera axis so the chase camera looks
+          // past the player straight at it (the quest-marker target's
+          // placement), pulled in from the 12yd default so the NPC reads at
+          // PR-thumbnail size. The extra step SIDEWAYS is this scene's own
+          // correction: dead on the axis the player model stands directly in
+          // front of the NPC and occludes exactly the thing under review.
+          const yaw = game.input.camYaw;
+          p.pos.x = spot.x - Math.sin(yaw) * 4.5 + Math.cos(yaw) * 2.2;
+          p.pos.z = spot.z - Math.cos(yaw) * 4.5 - Math.sin(yaw) * 2.2;
+          p.prevPos = { ...p.pos };
+          game.input.camDist = 7;
+          const npc = [...sim.entities.values()].find(
+            (e) => e.templateId === 'warmarshal_draven_kole',
+          );
+          return { ok: true, present: Boolean(npc) };
+        });
+        if (!framed.ok) throw new Error(`quartermaster framing failed: ${framed.reason}`);
+        // The teleport crosses two zones, so give the renderer time to stream
+        // the hub in and the camera time to settle behind the player.
+        await wait(2500);
+        // The zone crossing fires the subzone plate over the middle of the
+        // frame, on its own hold timer, and the Ravenpost mail toast lands a
+        // few seconds into every offline session: both would sit on top of the
+        // NPC under review.
+        await page.evaluate(() => {
+          for (const sel of ['#banner', '#subzone-banner']) {
+            const el = document.querySelector(sel);
+            if (el) el.style.display = 'none';
+          }
+        });
+        return {};
+      }
+
+      // scene 'sheet': a complete 11-slot WARFARE kit worn, which is the only
+      // state in which the sheet's Warfare line reads the tier's new ceiling.
+      // Warrior on purpose: the plate family and the two-hander are the one kit
+      // a single class can wear end to end.
+      const kitted = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        try {
+          sim.setPlayerLevel?.(20);
+        } catch {}
+        const kit = [
+          'furyforged_warhelm',
+          'furyforged_warspaulders',
+          'furyforged_warplate',
+          'furyforged_girdle',
+          'furyforged_legguards',
+          'furyforged_gauntlets',
+          'furyforged_sabatons',
+          'final_argument_greatblade',
+          'final_oath_medallion',
+          'iron_vow_band',
+          'unbroken_circle',
+        ];
+        for (const id of kit) {
+          try {
+            sim.addItem(id, 1);
+            sim.equipItem(id);
+          } catch {}
+        }
+        const meta = sim.players.get(sim.primaryId);
+        const worn = Object.values(meta?.equipment ?? {}).filter((id) => kit.includes(id)).length;
+        const el = document.querySelector('#char-window');
+        if (el) el.style.display = 'none';
+        game?.hud?.toggleChar?.();
+        return { ok: true, worn };
+      });
+      if (!kitted.ok) throw new Error(`warfare kit setup failed: ${kitted.reason}`);
+      if (kitted.worn < 11) {
+        throw new Error(`only ${kitted.worn} of the 11 WARFARE pieces equipped`);
+      }
+      if (!(await pollForSize(page, '#char-window'))) throw new Error('char window did not open');
+      await wait(500);
+      return { clip: '#char-window' };
+    },
+  },
+  {
     key: 'train-window',
     label: 'Train view: station-master recipe training ladder',
     when: ['ui/hud/vendor/train_view', 'ui/hud/vendor/train_window'],
