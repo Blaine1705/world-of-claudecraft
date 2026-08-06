@@ -444,12 +444,26 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
       const { sim, p, meta } = makeWalker({ x: 395, z });
       pushToward(sim, p, meta, { x: 404, z }, 20 * 3); // press east into the face
       const pinnedX = p.pos.x;
+      const pinnedZ = p.pos.z;
       expect(pinnedX, `refused the sheer west face at z=${z}`).toBeLessThan(CASTLE.ward.x0);
-      pushToward(sim, p, meta, { x: 384, z }, 20 * 3); // now try to walk back west
+      // Walk back off the edge. At z=2015 the great hall stands in the bailey
+      // just west of the face (hexrTownhall at 390, 2016, colliding as the
+      // rectangle it is drawn as), so due west is honest stone, not a freeze:
+      // the escape there rounds the hall through the alley between its east
+      // face and the terrace, which the walkable-alley sweep below keeps open.
+      const escape = z === 2015 ? { x: 384, z: 2004 } : { x: 384, z };
+      pushToward(sim, p, meta, escape, 20 * 3);
       expect(
-        pinnedX - p.pos.x,
+        Math.hypot(pinnedX - p.pos.x, pinnedZ - p.pos.z),
         `walks back off the west edge instead of freezing at z=${z}`,
       ).toBeGreaterThan(3);
+    }
+    // The alley between the great hall's east face and the terrace riser is a
+    // real lane, not a wedge: a body standing in it walks its full length.
+    {
+      const { sim, p, meta } = makeWalker({ x: 396.4, z: 2013 });
+      pushToward(sim, p, meta, { x: 396.4, z: 2022.5 }, 20 * 6);
+      expect(p.pos.z, 'the hall-terrace alley carries through').toBeGreaterThan(2020);
     }
   });
 });
