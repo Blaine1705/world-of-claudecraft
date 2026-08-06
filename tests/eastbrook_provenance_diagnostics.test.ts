@@ -255,6 +255,22 @@ describe('formatPolishProvenanceMismatch', () => {
     expect(unavailable).toContain('git status unavailable');
   });
 
+  it('renders an object-valued leaf as JSON, never [object Object]', () => {
+    // Reachable when a leaf changes SHAPE (scalar on the sealed side, object
+    // on the computed side); the audit proved plain interpolation survivable
+    // because every other case has scalars on both sides.
+    const message = formatPolishProvenanceMismatch({
+      pinnedFingerprint,
+      computed: {
+        fingerprint: computed.fingerprint,
+        components: { runtimeRender: { renderer: { path: 'src/render/renderer.ts' } } },
+      },
+      sealedComponents: { runtimeRender: { renderer: 'abc' } },
+    });
+    expect(message).toContain('{"path":"src/render/renderer.ts"}');
+    expect(message).not.toContain('[object Object]');
+  });
+
   it('flags a seal-consistent tree as a pin-only hand edit', () => {
     const message = formatPolishProvenanceMismatch({
       pinnedFingerprint,
@@ -356,5 +372,8 @@ describe('wiring', () => {
     expect(remint).toContain('gitDirtyStatusLines');
     expect(remint).toContain('collectPolishProvenanceInputPaths');
     expect(remint).toContain('POLISH_SEAL_PATH');
+    // Without this token the tool can silently re-inline the verdict logic,
+    // leaving formatMintInputStatus tested but unused.
+    expect(remint).toContain('formatMintInputStatus');
   });
 });
