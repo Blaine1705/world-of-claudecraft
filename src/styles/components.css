@@ -8036,14 +8036,12 @@
     border-radius: 8px;
     background: #171309;
   }
-  /* A long relic name would otherwise push its chip past the strip on a narrow
-     window. Truncation is why the chip carries the shared HUD tooltip (wire()):
-     the full name stays recoverable, without a native title attribute. */
+  /* A long relic name wraps inside its chip instead of truncating: an
+     ellipsis would hide the tail from sighted keyboard players, because the
+     chip is a non-interactive span the shared hover tooltip (wire()) cannot
+     reach without a pointer. The cap only bounds the line length. */
   .reliquary-recent-name {
     max-width: 160px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
   }
   .reliquary-nearly-row,
   .reliquary-page-row,

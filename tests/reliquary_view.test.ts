@@ -1095,9 +1095,12 @@ describe('nearly-complete qualification (either arm, both inclusive)', () => {
     );
     expect(model.nearly.map((n) => n.pageId)).toEqual(['ten']);
     expect(model.nearly[0].remaining).toBe(4);
-    // 5/10 is 0.5 with the same remaining-arm failure: just under, excluded.
+    // 5/9 is 0.5556 with the same remaining-arm failure: JUST under the 0.6
+    // line, excluded. A wider miss (0.5) would also survive a predicate that
+    // hardcoded any threshold in (0.43, 0.6]; this one only passes when the
+    // real constant carries the comparison.
     const under = buildReliquaryView(
-      input({ pages: [sizedPage('ten', 10)], itemsDiscovered: ownedSet(...ownedFirst('ten', 5)) }),
+      input({ pages: [sizedPage('nine', 9)], itemsDiscovered: ownedSet(...ownedFirst('nine', 5)) }),
     );
     expect(under.nearly).toEqual([]);
   });
@@ -1113,6 +1116,90 @@ describe('nearly-complete qualification (either arm, both inclusive)', () => {
       input({ pages: [sizedPage('two', 2)], itemsDiscovered: ownedSet(...ownedFirst('two', 2)) }),
     );
     expect(done.nearly).toEqual([]);
+  });
+});
+
+describe('nearly-complete search narrows before the ranking cap', () => {
+  // Six remaining-1 pages outrank a remaining-3 page, so the seventh
+  // qualifier is exactly the page the cap would hide.
+  const pages = [
+    ...Array.from({ length: 6 }, (_, i) => sizedPage(`close_${i}`, 2)),
+    sizedPage('deep_target', 6),
+  ];
+  const discovered = () =>
+    ownedSet(
+      ...pages.slice(0, 6).flatMap((p) => ownedFirst(p.id, 1)),
+      ...ownedFirst('deep_target', 3),
+    );
+
+  it('reaches a qualifying match that ranks below the top five', () => {
+    // Premise: with no needle the target is NOT on the capped strip, so the
+    // searched case below can only succeed by narrowing BEFORE the cap.
+    const unsearched = buildReliquaryView(
+      input({ pages, nav: 'overview', itemsDiscovered: discovered() }),
+    );
+    expect(unsearched.nearly).toHaveLength(5);
+    expect(unsearched.nearly.map((n) => n.pageId)).not.toContain('deep_target');
+    // The needle matches only the seventh-ranked page. Filtering the already
+    // capped strip would paint "no results" for a page the shelf search
+    // finds; the field's promise has to hold on Overview too.
+    const model = buildReliquaryView(
+      input({
+        pages,
+        nav: 'overview',
+        itemsDiscovered: discovered(),
+        search: 'deep_target',
+        pageSearchText: (id) => id,
+      }),
+    );
+    expect(model.nearly.map((n) => n.pageId)).toEqual(['deep_target']);
+  });
+});
+
+describe('model.filtered reports a real narrowing, never mere needle presence', () => {
+  const twoPages = [sizedPage('alpha_page', 2), sizedPage('beta_page', 2)];
+  const shelfInput = (search: string) =>
+    input({
+      pages: twoPages,
+      nav: 'conquerors',
+      itemsDiscovered: ownedSet(...ownedFirst('alpha_page', 1), ...ownedFirst('beta_page', 1)),
+      search,
+      pageSearchText: (id) => id,
+    });
+
+  it('shelf: false with no needle, false when everything matches, true when narrowed', () => {
+    expect(buildReliquaryView(shelfInput('')).filtered).toBe(false);
+    // 'page' matches both rows: nothing was narrowed, so announcing "2
+    // results" would be noise about a filter that did not filter.
+    expect(buildReliquaryView(shelfInput('page')).filtered).toBe(false);
+    expect(buildReliquaryView(shelfInput('alpha')).filtered).toBe(true);
+    // A needle matching nothing is the strongest narrowing of all.
+    expect(buildReliquaryView(shelfInput('zzz')).filtered).toBe(true);
+  });
+
+  it('overview: answers from the painted strips, either strip narrowing counts', () => {
+    const overview = (search: string) =>
+      input({
+        pages: twoPages,
+        nav: 'overview',
+        recent: ['alpha_page_0', 'beta_page_0'],
+        itemsDiscovered: ownedSet(...ownedFirst('alpha_page', 1), ...ownedFirst('beta_page', 1)),
+        search,
+        pageSearchText: (id) => id,
+        relicSearchText: (_kind, id) => id,
+      });
+    expect(buildReliquaryView(overview('')).filtered).toBe(false);
+    // Matches every chip and both nearly rows: nothing narrowed.
+    expect(buildReliquaryView(overview('page')).filtered).toBe(false);
+    // Narrows the recent strip (and the nearly strip with it).
+    expect(buildReliquaryView(overview('alpha')).filtered).toBe(true);
+  });
+
+  it('stays false when no resolver is injected, whatever the needle', () => {
+    const model = buildReliquaryView(
+      input({ pages: twoPages, nav: 'conquerors', search: 'anything' }),
+    );
+    expect(model.filtered).toBe(false);
   });
 });
 
@@ -1461,12 +1548,16 @@ describe('reliquaryRelicDisplayName (the one shared ladder)', () => {
     );
   });
 
-  it('casefolds with the LOCALE, so Turkish dotted/dotless I still matches', () => {
+  it('platform contract: locale-aware folding differs on Turkish I, and languageTag maps tr_TR', () => {
     // tr_TR ships. Invariant toLowerCase folds 'İ' (U+0130) to 'i̇' (i + combining
     // dot), which does NOT equal the 'i' a Turkish player types, so their own
     // keystrokes miss their own relic names. toLocaleLowerCase('tr') folds it to
-    // plain 'i'. This asserts the DIFFERENCE, so a silent revert to toLowerCase
-    // reds the pin rather than passing on a coincidence.
+    // plain 'i'. This asserts the PLATFORM difference plus the languageTag
+    // mapping; it cannot prove the module uses the locale fold, because no
+    // shipped English relic name contains a capital I, so a behavioral case
+    // could not tell the two folds apart. The guard on the module itself is
+    // the source pin in tests/reliquary_window.test.ts ("folds the HAYSTACK
+    // with the locale too"), which bans toLowerCase on the live path.
     const TURKISH_DOTTED = 'İZ';
     expect(TURKISH_DOTTED.toLocaleLowerCase('tr')).toBe('iz');
     expect(TURKISH_DOTTED.toLowerCase()).not.toBe('iz');

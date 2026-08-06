@@ -13279,10 +13279,16 @@ export class Hud {
       this.combatAnnouncer.push(bannerText, performance.now());
     }
     if (plan.playSound) audio.achievement();
-    // Force open-window rebuild so silhouette grids fill live (signature would
-    // also catch it on the slow band; immediate paint feels better).
+    // Force an immediate open-window refresh so silhouette grids fill live
+    // (the slow band would catch it too; immediate paint feels better).
+    // refreshIfChanged, NOT bare render(): an unlock always moves the
+    // ownership digest so it still repaints now, and the prebuilt-input path
+    // classifies the repaint as world-driven, which keeps the live region
+    // silent when the announced count did not change. A bare render() here
+    // reads as player-driven and re-announces a count the player never asked
+    // about (the Phase 13 QA regression).
     if (plan.refreshWindow && this.reliquaryWindow.isOpen) {
-      this.reliquaryWindow.render();
+      this.reliquaryWindow.refreshIfChanged();
     }
     // On-join catch-up: one localized summary line, the same treatment the
     // Book of Deeds gives its retro pass. No banner, no audio, and no forced

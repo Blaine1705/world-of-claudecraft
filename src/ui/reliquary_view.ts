@@ -293,6 +293,14 @@ export interface ReliquaryViewModel {
   activePage: ReliquaryShelfPageModel | null;
   /** Full page grid when a page is selected; null otherwise. */
   pageDetail: ReliquaryPageDetailModel | null;
+  /**
+   * Did the needle actually narrow the painted NON-GRID surface this build
+   * (Overview strips or the shelf list)? False when no needle is live and
+   * false when a needle matches everything, so announce gating can key on a
+   * real narrowing instead of on mere needle presence. The grid answers for
+   * itself through pageDetail.filtered.
+   */
+  filtered: boolean;
 }
 
 function ownershipOpts(input: ReliquaryViewInput) {
@@ -402,10 +410,12 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   const ownedFilter = input.ownedFilter ?? 'all';
 
   const recent: ReliquaryRecentFindModel[] = [];
+  let recentTotal = 0;
   // Newest-first for the strip (facet is oldest-first).
   for (let i = input.recent.length - 1; i >= 0; i--) {
     const id = input.recent[i];
     if (!id) continue;
+    recentTotal += 1;
     let kind: ReliquaryRecentFindModel['kind'] = 'unknown';
     if (input.marks.has(id)) kind = 'mark';
     else if (input.itemsDiscovered.has(id) || isCatalogItemId(input.pages, id)) kind = 'item';
@@ -427,13 +437,21 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
   // localized text to match against, so the lists stay whole rather than
   // filtering everything away.
   const canMatchPages = input.pageSearchText !== undefined || input.relicSearchText !== undefined;
+  const pagesById = new Map<string, ReliquaryPageDef>();
+  for (const page of input.pages) pagesById.set(page.id, page);
   const pageMatches = (pageId: string): boolean =>
     (input.pageSearchText?.(pageId) ?? '').includes(search) ||
-    pageHasRelicMatch(input, pageId, search);
+    pageHasRelicMatch(input, pagesById.get(pageId), search);
 
-  const allNearly = buildNearlyComplete(input.pages, opts);
-  const nearly =
-    search === '' || !canMatchPages ? allNearly : allNearly.filter((n) => pageMatches(n.pageId));
+  // The needle narrows the QUALIFYING set before the strip cap, never the
+  // capped strip: a match that ranks sixth by remaining-count must still be
+  // reachable from Overview search, exactly as it is from the shelf list.
+  const nearlyMatches = search === '' || !canMatchPages ? undefined : pageMatches;
+  const nearly = buildNearlyComplete(input.pages, opts, nearlyMatches);
+  // The strip a needle-less build would have painted, for the narrowing flag
+  // below. Only rebuilt while a needle is live (cold path, one keystroke).
+  const unfilteredNearly =
+    nearlyMatches === undefined ? nearly : buildNearlyComplete(input.pages, opts);
 
   const shelfTotals = new Map<ReliquaryShelfId, { owned: number; total: number }>();
   for (const shelf of ['conquerors', 'professions', 'horizons'] as const) {
@@ -477,12 +495,12 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     activePage = allShelfPages.find((p) => p.pageId === input.pageId) ?? null;
     if (activePage === null) {
       // Page selected but not on this shelf (or unknown): resolve from full catalog.
-      const page = input.pages.find((p) => p.id === input.pageId);
+      const page = pagesById.get(input.pageId);
       if (page) activePage = shelfPageModel(page, opts, input.clearCount);
     }
     if (activePage !== null) {
       const header = activePage;
-      const page = input.pages.find((p) => p.id === header.pageId);
+      const page = pagesById.get(header.pageId);
       if (page) {
         const cells = buildReliquaryPageCells(page, {
           ...opts,
@@ -507,6 +525,18 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     }
   }
 
+  // A real narrowing of the painted non-grid surface, not mere needle
+  // presence: a needle that matches everything narrows nothing.
+  const nearlyNarrowed =
+    nearly.length !== unfilteredNearly.length ||
+    nearly.some((n, i) => n.pageId !== unfilteredNearly[i]?.pageId);
+  const filtered =
+    search === '' || !canMatchPages
+      ? false
+      : input.nav === 'overview'
+        ? recent.length !== recentTotal || nearlyNarrowed
+        : shelfPages.length !== allShelfPages.length;
+
   return {
     nav: input.nav,
     pageId: input.pageId,
@@ -517,15 +547,20 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     shelfPages,
     activePage,
     pageDetail,
+    filtered,
   };
 }
 
-/** True when any relic slot on `pageId` matches the needle by its localized
- *  display name. Short-circuits on the first hit. */
-function pageHasRelicMatch(input: ReliquaryViewInput, pageId: string, search: string): boolean {
+/** True when any relic slot on the page matches the needle by its localized
+ *  display name. Short-circuits on the first hit. Takes the resolved page def
+ *  (callers hold a Map) so a per-keystroke sweep never re-scans the catalog. */
+function pageHasRelicMatch(
+  input: ReliquaryViewInput,
+  page: ReliquaryPageDef | undefined,
+  search: string,
+): boolean {
   const resolve = input.relicSearchText;
   if (resolve === undefined) return false;
-  const page = input.pages.find((p) => p.id === pageId);
   if (page === undefined) return false;
   for (const relic of page.relics) {
     if (resolve(relic.kind, relicSlotId(relic)).includes(search)) return true;
@@ -551,6 +586,7 @@ function buildNearlyComplete(
     weaponSkins?: { has(id: string): boolean };
     deedsEarned?: { has(id: string): boolean };
   },
+  matches?: (pageId: string) => boolean,
 ): ReliquaryNearlyPageModel[] {
   const candidates: ReliquaryNearlyPageModel[] = [];
   for (const page of pages) {
@@ -562,12 +598,15 @@ function buildNearlyComplete(
     if (remaining > RELIQUARY_NEARLY_MAX_REMAINING && fraction < RELIQUARY_NEARLY_MIN_FRACTION) {
       continue;
     }
+    // The needle narrows here, BEFORE the ranking cap, so a qualifying match
+    // that ranks below the cap is still reachable from Overview search.
+    if (matches !== undefined && !matches(page.id)) continue;
     candidates.push({
       pageId: page.id,
       name: page.name,
       owned: c.owned,
       total: c.total,
-      remaining: c.total - c.owned,
+      remaining,
     });
   }
   // Fewest remaining first, then highest owned fraction, then stable page id.

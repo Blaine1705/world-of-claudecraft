@@ -210,12 +210,15 @@ describe('painter hygiene', () => {
     expect(stripComments(painter)).not.toMatch(/\btitle="/);
     expect(painter).toContain('data-recent-name');
     expect(painter).toMatch(/data-recent-name[\s\S]*?attachTooltip/);
-    // The tooltip has to earn its place: the chip name truncates, so the full
-    // name genuinely needs somewhere to live. Without the ellipsis rule this
-    // would be a redundant hover surface over fully visible text.
-    expect(sectionCss('reliquary')).toMatch(
-      /\.reliquary-recent-name \{[^}]*text-overflow: ellipsis;[^}]*\}/,
-    );
+    // The chip must NOT truncate: it is a non-interactive span, so a hover
+    // tooltip is the only way past an ellipsis and a sighted keyboard player
+    // has no pointer to fire it with. The name wraps inside the width cap
+    // instead (nothing hidden), and the tooltip stays as a pointer nicety.
+    const recentNameRule = sectionCss('reliquary').match(/\.reliquary-recent-name \{[^}]*\}/)?.[0];
+    expect(recentNameRule, '.reliquary-recent-name rule').toBeTruthy();
+    expect(recentNameRule).toContain('max-width: 160px;');
+    expect(recentNameRule).not.toContain('text-overflow');
+    expect(recentNameRule).not.toContain('white-space: nowrap');
   });
 
   it('gives the page list real list semantics (ul/li, not bare buttons)', () => {
@@ -316,10 +319,13 @@ describe('painter hygiene', () => {
     // swap in "no relics match" for a shelf that is empty for another reason.
     const code = stripComments(painter);
     expect(code).toContain("return this.search.trim() !== ''");
-    // Four callers: the Overview empty line, the shelf empty line, the grid
-    // empty-state chooser, and the live-region gate. All must ask the same
-    // question, or two surfaces disagree about whether a search is running.
-    expect(code.match(/this\.searchActive\(\)/g)?.length).toBe(4);
+    // Three callers: the Overview empty line, the shelf empty line, and the
+    // grid empty-state chooser. All must ask the same question, or two
+    // surfaces disagree about whether a search is running. (The live-region
+    // gate deliberately does NOT ask it: it gates on the model's own
+    // narrowing answer, because a needle that matches everything narrows
+    // nothing; see the announce pin below.)
+    expect(code.match(/this\.searchActive\(\)/g)?.length).toBe(3);
     // No site may re-derive it inline and drift from the shared definition.
     expect(code).not.toMatch(/this\.search === ''/);
     expect(code).not.toMatch(/this\.search\.trim\(\) === ''/);
@@ -383,13 +389,20 @@ describe('painter hygiene', () => {
   it('announces on what the PAINTED surface narrowed, not the sticky chip', () => {
     const code = stripComments(painter);
     // ownedFilter survives a Back click, so gating on it would make every
-    // slow-band repaint of the shelf announce a count nothing narrowed. The
-    // grid asks the model's own answer for THIS paint; shelf/Overview ask only
-    // whether a needle is live.
+    // slow-band repaint of the shelf announce a count nothing narrowed. EVERY
+    // surface asks the model's own answer for THIS paint: the grid through
+    // pageDetail.filtered, shelf and Overview through model.filtered (a
+    // needle that matches everything narrows nothing and stays silent).
     expect(code).toContain(
-      'const narrowed = model.pageDetail ? model.pageDetail.filtered : this.searchActive()',
+      'const narrowed = model.pageDetail ? model.pageDetail.filtered : model.filtered',
     );
     expect(code).not.toMatch(/this\.ownedFilter === 'all'\) return/);
+    // The render that OPENS the window never announces: a persisted chip or
+    // page is state the player left behind, not a narrowing they performed.
+    expect(code).toContain('if (this.suppressAnnounceOnce)');
+    expect(code).toMatch(
+      /open\(nav\?: ReliquaryNavId\): void \{[\s\S]*?this\.suppressAnnounceOnce = true/,
+    );
     // Not narrowed means the region is emptied AND the marker forgotten, or
     // re-narrowing to the same count later would stay silent.
     expect(code).toMatch(/if \(!narrowed\) \{[\s\S]*?live\.textContent = ''/);
@@ -788,9 +801,16 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toContain('reliquaryPageName(banner.pageId)');
     expect(handler).toContain("showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion)");
     expect(handler).toContain('if (plan.playSound) audio.achievement()');
-    // Force open-window rebuild on unlock; membership still comes from mirrors.
+    // Force an immediate open-window refresh on unlock; membership still comes
+    // from mirrors. refreshIfChanged and NEVER bare render(): the prebuilt
+    // input path is what classifies the repaint as world-driven, so an unlock
+    // that leaves the announced count unchanged keeps the live region silent.
+    // A bare render() here reads as player-driven and re-announces "N
+    // results." for an event the player never asked about (the Phase 13 QA
+    // regression that motivated this pin).
     expect(handler).toContain('plan.refreshWindow && this.reliquaryWindow.isOpen');
-    expect(handler).toContain('this.reliquaryWindow.render()');
+    expect(handler).toContain('this.reliquaryWindow.refreshIfChanged()');
+    expect(handler).not.toContain('this.reliquaryWindow.render()');
     // Presentation-only: never write discovery / firstFind from the event.
     expect(handler).not.toMatch(/itemsDiscovered\.(add|has)/);
     expect(handler).not.toMatch(/reliquaryFirstFind\s*=/);

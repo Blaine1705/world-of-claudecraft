@@ -1069,6 +1069,9 @@ describe('ReliquaryWindow: search filtering', () => {
     const shown =
       rig.el.querySelectorAll('.reliquary-recent-item').length +
       rig.el.querySelectorAll('.reliquary-nearly-row').length;
+    // Premise: something survived, or this compares "0 results." to itself and
+    // proves nothing about the announced count.
+    expect(shown).toBeGreaterThan(0);
     expect(liveRegion(rig.el)?.textContent).toBe(
       tPlural('hudChrome.plurals.reliquarySearchResults', shown, { count: fmt(shown) }),
     );
@@ -1108,6 +1111,101 @@ describe('ReliquaryWindow: search filtering', () => {
     typeSearch(rig.el, needle);
     const chips = [...rig.el.querySelectorAll<HTMLElement>('.reliquary-recent-item')];
     expect(chips.map((c) => c.dataset.recentName)).toEqual([first]);
+  });
+
+  it('stays silent when the needle narrows nothing because every row matches', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const all = pageIds(rig.el);
+    // A one-letter needle every conquerors page text happens to contain. The
+    // premise assertion keeps this honest: if the catalog ever ships a page
+    // without an "e", the toEqual below reds and the needle gets re-chosen.
+    typeSearch(rig.el, 'e');
+    expect(pageIds(rig.el), 'content premise: the needle matches every page').toEqual(all);
+    // Nothing was narrowed, so announcing "N results." would be noise about a
+    // filter that did not filter.
+    expect(liveRegion(rig.el)?.textContent).toBe('');
+  });
+
+  it('keeps a shelf row alive on a relic-name match its page text cannot claim', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const needle = 'cryptbone';
+    // Premise: no conquerors page can claim the needle with its own text, so
+    // the row below can only survive through the deep relic match.
+    for (const id of pageIds(rig.el)) {
+      expect(
+        `${reliquaryPageName(id)} ${reliquaryPageDesc(id)}`.toLocaleLowerCase(TAG),
+        `content premise: ${id} page text does not contain the needle`,
+      ).not.toContain(needle);
+    }
+    typeSearch(rig.el, needle);
+    expect(pageIds(rig.el)).toContain('conquerors_hollow_crypt');
+  });
+
+  it('forgets the reannounce marker when the region clears, so a re-narrowing reads clean', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    typeSearch(rig.el, 'morthen');
+    const first = liveRegion(rig.el)?.textContent ?? '';
+    expect(first).not.toBe('');
+    // The clear branch must both empty the region and forget the marker.
+    typeSearch(rig.el, '');
+    expect(liveRegion(rig.el)?.textContent).toBe('');
+    // Re-narrowing to the same count must read as the CLEAN line: a marker
+    // that survived the clear would come back with a stray trailing U+00A0,
+    // which exact equality with the unmarked tPlural output catches.
+    typeSearch(rig.el, 'morthen');
+    const count = pageIds(rig.el).length;
+    expect(liveRegion(rig.el)?.textContent).toBe(
+      tPlural('hudChrome.plurals.reliquarySearchResults', count, { count: fmt(count) }),
+    );
+  });
+
+  it('defers the rebuild while an IME composition is assembling', () => {
+    const rig = makeWindow(baseState(), { nav: 'conquerors' });
+    const field = searchField(rig.el);
+    const all = pageIds(rig.el);
+    field.focus();
+    field.value = 'zzz';
+    // Mid-composition input: rebuilding here rips the IME's composition
+    // session out from under a CJK player on every intermediate candidate.
+    const composing = new Event('input', { bubbles: true });
+    Object.defineProperty(composing, 'isComposing', { value: true });
+    field.dispatchEvent(composing);
+    expect(searchField(rig.el), 'no rebuild while composing').toBe(field);
+    expect(pageIds(rig.el)).toEqual(all);
+    // compositionend commits the composed value through the normal path.
+    field.dispatchEvent(new Event('compositionend', { bubbles: true }));
+    expect(searchField(rig.el)).not.toBe(field);
+    expect(pageIds(rig.el)).toEqual([]);
+    expect(searchField(rig.el).value).toBe('zzz');
+  });
+
+  it('never announces on the render that opens the window, even with a sticky chip', () => {
+    const state = baseState();
+    state.itemsDiscovered.add(relicIds(PAGE_ID)[0] ?? '');
+    const rig = openPage(state);
+    click(rig.el, '[data-filter="owned"]');
+    expect(liveRegion(rig.el)?.textContent).not.toBe('');
+
+    // close() ends the visit: the region's state leaves with it.
+    rig.w.close();
+    expect(liveRegion(rig.el)?.textContent).toBe('');
+
+    // Reopening paints the same narrowed grid, but the narrowing is state the
+    // player left behind, not an action they just performed: announcing it
+    // would read out a count nobody asked for.
+    rig.w.open();
+    expect(must(rig.el, '[data-filter="owned"]').getAttribute('aria-pressed')).toBe('true');
+    expect(liveRegion(rig.el)?.textContent).toBe('');
+
+    // The silent open still latched the text: a world-driven repaint with the
+    // grid's count unchanged stays silent too.
+    state.itemsDiscovered.add(relicIds('conquerors_sunken_bastion')[0] ?? '');
+    rig.w.refreshIfChanged();
+    expect(liveRegion(rig.el)?.textContent).toBe('');
+
+    // And the next PLAYER narrowing announces normally.
+    click(rig.el, '[data-filter="missing"]');
+    expect(liveRegion(rig.el)?.textContent).not.toBe('');
   });
 });
 
@@ -1283,7 +1381,12 @@ describe('ReliquaryWindow: the roving grid tab stop', () => {
     expect(cells(rig.el)[1]).toBe(grid[1]);
   });
 
-  it('carries the tab stop onto the restored cell after a data-driven rebuild', () => {
+  it('keeps the tab stop with the focused cell across a data-driven rebuild', () => {
+    // Scope note: the cursor already sits on the End cell BEFORE the rebuild
+    // (the keydown wrote gridIndex), so this case proves the stop does not
+    // snap back to the front, not that syncGridRoving repointed it. The
+    // decisive syncGridRoving pin is the chip-reset restore above, where only
+    // the restore can move the cursor off 0.
     const rig = openPage(baseState());
     const grid = cells(rig.el);
     keydown(grid[0] as HTMLElement, 'End');
@@ -1318,10 +1421,11 @@ describe('ReliquaryWindow: the roving grid tab stop', () => {
     const after = document.activeElement as HTMLElement | null;
     expect(after?.hasAttribute('data-close')).toBe(true);
     // The grid keeps exactly one tab stop, and Close is not a grid cell: a
-    // fallback restore must not drag the roving cursor out of the grid.
+    // fallback restore must not drag the roving cursor out of the grid. The
+    // cursor stays clamped exactly where the player left it (index 1 of the
+    // renumbered grid), neither dragged to Close nor snapped to the front.
     expect(cells(rig.el)).toHaveLength(ids.length - 1);
-    expect(tabStopIndex(rig.el)).toBeGreaterThanOrEqual(0);
-    expect(after?.tabIndex).not.toBe(-1);
+    expect(tabStopIndex(rig.el)).toBe(1);
   });
 
   it('leaves the grid cursor alone when the restore lands on Close by choice', () => {

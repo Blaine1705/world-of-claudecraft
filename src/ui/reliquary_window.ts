@@ -129,6 +129,9 @@ export class ReliquaryWindow {
   // Forces a byte-different write when two keystrokes narrow to the SAME count,
   // so the region still re-reads (the shared DOM-free deterministic marker).
   private readonly liveReannounce = new ReannounceMarker();
+  // The open render must stay silent by DESIGN, not by the accident of the
+  // root still being display:none when it writes (see announceResults).
+  private suppressAnnounceOnce = false;
 
   constructor(private readonly deps: ReliquaryWindowDeps) {}
 
@@ -146,6 +149,7 @@ export class ReliquaryWindow {
     this.openerFocus = this.deps.captureFocus();
     this.opened = true;
     this.lastSig = '';
+    this.suppressAnnounceOnce = true;
     this.render();
     this.deps.root().style.display = 'flex';
     (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
@@ -163,6 +167,11 @@ export class ReliquaryWindow {
     // "where I was", not as a filter left switched on.
     this.search = '';
     this.gridIndex = 0;
+    // The region must not carry a stale announcement (or a pending reannounce
+    // toggle) into the next visit; the NODE persists, its state does not.
+    if (this.liveEl) this.liveEl.textContent = '';
+    this.lastAnnounced = '';
+    this.liveReannounce.reset();
     this.deps.hideTooltip();
     this.deps.restoreFocus(this.openerFocus);
     this.openerFocus = null;
@@ -264,10 +273,16 @@ export class ReliquaryWindow {
    * Announce how many items survived a narrowing, then keep quiet.
    *
    * The gate is what the PAINTED SURFACE actually narrowed, never the persisted
-   * chip: ownedFilter survives a Back click, so gating on it would make every
-   * slow-band repaint of the shelf announce a count that nothing narrowed. So
-   * the grid asks pageDetail.filtered (the model's own answer about this paint)
-   * and the shelf and Overview ask only whether a needle is live.
+   * chip or the mere presence of a needle: ownedFilter survives a Back click,
+   * and a needle that matches everything narrows nothing. Every surface asks
+   * the model's own answer about this paint: the grid through
+   * pageDetail.filtered, the shelf and Overview through model.filtered.
+   *
+   * The render that opens the window is exempt (suppressAnnounceOnce): a
+   * persisted chip or page is state the player left behind, not a narrowing
+   * they just performed, and announcing it at open would read out a count
+   * nobody asked for. The text still latches so the next world-driven repaint
+   * with the same count stays silent.
    *
    * Cold path only (called from render), never the per-frame band.
    */
@@ -276,7 +291,16 @@ export class ReliquaryWindow {
     model: ReliquaryViewModel,
     worldDriven: boolean,
   ): void {
-    const narrowed = model.pageDetail ? model.pageDetail.filtered : this.searchActive();
+    const narrowed = model.pageDetail ? model.pageDetail.filtered : model.filtered;
+    if (this.suppressAnnounceOnce) {
+      this.suppressAnnounceOnce = false;
+      this.lastAnnounced = narrowed
+        ? tPlural('hudChrome.plurals.reliquarySearchResults', this.announceCount(model), {
+            count: this.fmt(this.announceCount(model)),
+          })
+        : '';
+      return;
+    }
     if (!narrowed) {
       // Nothing is narrowed: clear the region and forget the last text, so
       // re-narrowing to the same count later still announces cleanly.
@@ -285,11 +309,7 @@ export class ReliquaryWindow {
       this.liveReannounce.reset();
       return;
     }
-    const count = model.pageDetail
-      ? model.pageDetail.cells.length
-      : model.nav === 'overview'
-        ? model.recent.length + model.nearly.length
-        : model.shelfPages.length;
+    const count = this.announceCount(model);
     // Raw count to tPlural (it is what Intl.PluralRules selects on); the
     // VISIBLE number is the locale-formatted override.
     const text = tPlural('hudChrome.plurals.reliquarySearchResults', count, {
@@ -306,6 +326,15 @@ export class ReliquaryWindow {
     live.textContent = this.liveReannounce.mark(text);
   }
 
+  /** The one definition of what a narrowed surface counts. */
+  private announceCount(model: ReliquaryViewModel): number {
+    return model.pageDetail
+      ? model.pageDetail.cells.length
+      : model.nav === 'overview'
+        ? model.recent.length + model.nearly.length
+        : model.shelfPages.length;
+  }
+
   /** Point the roving tab stop at the grid cell the focus-key restore landed
    *  on, then re-stamp every cell's tabindex. Matching on the captured key
    *  rather than the live activeElement keeps this painter free of direct
@@ -320,12 +349,14 @@ export class ReliquaryWindow {
     this.stampGridTabIndex(cells);
   }
 
-  /** Exactly one cell is tabbable; the rest are reachable only by Arrow keys. */
+  /** Exactly one cell is tabbable; the rest are reachable only by Arrow keys.
+   *  Write-elided: only the two cells whose stop actually moved are touched. */
   private stampGridTabIndex(cells: readonly HTMLElement[]): void {
     const active = Math.min(Math.max(this.gridIndex, 0), cells.length - 1);
     this.gridIndex = active;
     cells.forEach((node, i) => {
-      node.tabIndex = i === active ? 0 : -1;
+      const want = i === active ? 0 : -1;
+      if (node.tabIndex !== want) node.tabIndex = want;
     });
   }
 
@@ -675,6 +706,9 @@ export class ReliquaryWindow {
       // role="list" container is not, and the container never takes focus here.
       `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}" role="listitem" tabindex="${index === activeIndex ? '0' : '-1'}" ` +
       `data-cell-id="${esc(cell.id)}" data-cell-kind="${esc(cell.kind)}" data-cell-owned="${cell.owned ? '1' : '0'}" ` +
+      // data-cell-source marks cells with a resolvable source line so tooling
+      // (the PR shot picker) can find one without matching English aria text.
+      `${cell.sourcePlan !== undefined ? 'data-cell-source="1" ' : ''}` +
       `data-focus-key="${esc(`cell:${cell.kind}:${cell.id}`)}" ` +
       `aria-describedby="${GRID_HINT_ID}" aria-keyshortcuts="${GRID_KEY_SHORTCUTS}" ` +
       `aria-label="${esc(this.cellAria(cell, name))}">` +
@@ -794,11 +828,25 @@ export class ReliquaryWindow {
       audio.click();
     });
     const search = el.querySelector<HTMLInputElement>('.reliquary-search');
-    search?.addEventListener('input', () => {
-      this.search = search.value;
+    const applySearch = (): void => {
+      this.search = search?.value ?? '';
       // A narrowed grid renumbers, so the roving cursor goes back to the front.
       this.gridIndex = 0;
       this.render();
+    };
+    search?.addEventListener('input', (e) => {
+      // Mid-composition input events (a CJK IME assembling a candidate) must
+      // not rebuild: innerHTML would destroy the composition session under the
+      // player. The final input event after compositionend carries
+      // isComposing false and lands in applySearch normally; the
+      // compositionend listener below covers hosts that order those two the
+      // other way around.
+      if ((e as InputEvent).isComposing) return;
+      applySearch();
+    });
+    search?.addEventListener('compositionend', () => {
+      if (this.search === search.value) return;
+      applySearch();
     });
     for (const btn of el.querySelectorAll<HTMLElement>('[data-nav]')) {
       btn.addEventListener('click', () => {
