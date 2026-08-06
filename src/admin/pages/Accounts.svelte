@@ -30,14 +30,20 @@
   let sort = $state<AccountSort>('id');
   let dir = $state<'asc' | 'desc'>('desc');
   let searchTimer: ReturnType<typeof setTimeout> | null = null;
+  let requestEpoch = 0;
+  let disposed = false;
 
   async function refresh(): Promise<void> {
+    const epoch = ++requestEpoch;
     try {
       const params = new URLSearchParams({ page: String(page), search, sort, dir });
-      accounts = await apiGet<Paginated<AccountRow>>(`/admin/api/accounts?${params}`);
+      const next = await apiGet<Paginated<AccountRow>>(`/admin/api/accounts?${params}`);
+      if (disposed || epoch !== requestEpoch) return;
+      accounts = next;
       failed = false;
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (disposed || epoch !== requestEpoch || auth.handleAuthFailure(err)) return;
+      failed = true;
     }
   }
 
@@ -72,8 +78,10 @@
   }
 
   onMount(() => {
+    disposed = false;
     void refresh();
     return () => {
+      disposed = true;
       if (searchTimer) clearTimeout(searchTimer);
     };
   });

@@ -120,4 +120,43 @@ describe('Accounts page', () => {
       ),
     );
   });
+
+  it('ignores a stale response that resolves after a later sort request already won', async () => {
+    render(Accounts);
+    await screen.findByText('alice');
+
+    // The username/asc request stalls (simulating an in-flight response that outlives a
+    // later, faster request), while the following id/desc click resolves immediately.
+    let resolveUsername: ((value: typeof directory) => void) | undefined;
+    const stale = new Promise<typeof directory>((resolve) => {
+      resolveUsername = resolve;
+    });
+    vi.mocked(apiGet).mockImplementationOnce(() => stale as Promise<unknown>);
+
+    const usernameHeader = screen.getByRole('button', { name: t('accounts.colUsername') });
+    await fireEvent.click(usernameHeader);
+    await vi.waitFor(() =>
+      expect(vi.mocked(apiGet)).toHaveBeenCalledWith(
+        '/admin/api/accounts?page=1&search=&sort=username&dir=asc',
+      ),
+    );
+
+    const idHeader = screen.getByRole('button', { name: t('accounts.colId') });
+    await fireEvent.click(idHeader);
+    await vi.waitFor(() =>
+      expect(vi.mocked(apiGet)).toHaveBeenCalledWith(
+        '/admin/api/accounts?page=1&search=&sort=id&dir=desc',
+      ),
+    );
+    expect(idHeader.closest('th')).toHaveAttribute('aria-sort', 'descending');
+
+    // The stale username/asc request finally resolves after id/desc already won the race.
+    resolveUsername?.(directory);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // The header still reflects the winning (later) sort, not the stale response.
+    expect(idHeader.closest('th')).toHaveAttribute('aria-sort', 'descending');
+    expect(usernameHeader.closest('th')).toHaveAttribute('aria-sort', 'none');
+  });
 });
