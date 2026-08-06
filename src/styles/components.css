@@ -5928,14 +5928,6 @@
   /* A tier line, lit when the bonus is LIVE (the pieces are worn) and dim
      otherwise: the same information the item tooltip's .tt-set-bonus pair
      carries, restated here because that rule is scoped to #tooltip. */
-  .warfare-set-bonus {
-    color: var(--color-text-muted);
-    font-size: 11px;
-    padding: 1px 5px;
-  }
-  .warfare-set-bonus.active {
-    color: var(--color-text-success);
-  }
   /* The owned-count line: the piece progress plus what the NEXT unmet tier
      still wants. The single most motivating element in the window, so it takes
      the accent rather than the muted body color. */

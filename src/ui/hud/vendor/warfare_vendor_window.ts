@@ -12,6 +12,21 @@
 // (.vendor-section-title) and the honor price / balance classes
 // (.warfare-price / .warfare-balance) all already exist, so the shop reads as
 // the same window family. Only what SECTIONING genuinely needs is new.
+//
+// WHAT THIS WINDOW DELIBERATELY DOES NOT SHOW, so it does not get added back:
+// the set bonus text, and any owned-count or "N more for the next bonus" line.
+// Both were here and both were cut as more than a buy list needs to say. The
+// bonuses live in the ITEM TOOLTIP, where every raid tier set already shows them
+// through the shared itemSetBlock path, lit when a threshold is met and greyed
+// otherwise, so repeating all three per family here was duplicating a surface the
+// player already reads. What survives is what a purchase decision actually needs:
+// the family grouping, the price, and the per-tile Owned marker, which is not
+// progress narration but the only thing standing between a mis-tap and a second
+// copy of a soulbound piece that carries no refund and no sell value.
+//
+// The view core still exposes tiers / ownedPieces / totalPieces / nextTier. They
+// are honest data and a future caller may want them; this painter simply renders
+// none of it.
 
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, tEntity } from '../../entity_i18n';
@@ -53,29 +68,6 @@ function sectionTitleText(section: WarfareShopSection): string {
   return section.kind === 'jewelry'
     ? t('hudChrome.warfareShop.jewelry')
     : t('hudChrome.warfareShop.weapons');
-}
-
-/** The set section's bonus tiers, taking the same lit/dim treatment the item
- *  tooltip's set block gives them.
- *
- *  There is deliberately NO owned-count progress line. An earlier revision
- *  carried one ("3 of 7 pieces owned, 1 more for the 4-piece bonus"), which the
- *  owner cut as more than the window needs to say: the lit and dim tiers already
- *  show which bonuses are live, and the per-tile Owned marker still does the one
- *  job a count cannot, which is stopping a second purchase of a soulbound piece
- *  that is unrefundable. The view core keeps ownedPieces / totalPieces / nextTier
- *  because a caller may still want them; this painter simply does not render a
- *  sentence out of them. */
-function appendSetProgress(el: HTMLElement, section: WarfareShopSetSection): void {
-  for (const tier of section.tiers) {
-    const line = document.createElement('div');
-    line.className = tier.met ? 'warfare-set-bonus active' : 'warfare-set-bonus';
-    line.textContent = t('hudChrome.itemSet.bonusLine', {
-      pieces: count(tier.pieces),
-      bonus: tEntity({ kind: 'itemSet', id: section.setId, field: `bonus${tier.pieces}` }),
-    });
-    el.appendChild(line);
-  }
 }
 
 function appendOfferTile(
@@ -153,7 +145,6 @@ export function renderWarfareVendorWindow(
     heading.className = 'vendor-section-title';
     heading.textContent = sectionTitleText(section);
     el.appendChild(heading);
-    if (section.kind === 'set') appendSetProgress(el, section);
     const grid = document.createElement('div');
     grid.className = 'vendor-goods-grid';
     grid.dataset.grid = section.key;
