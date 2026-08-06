@@ -5,6 +5,20 @@
 // player and lets each close in and swing.
 //   BROWSER_PATH=... MODE=before node scripts/demon_attack_shot.mjs
 //   BROWSER_PATH=... MODE=after  node scripts/demon_attack_shot.mjs
+//
+// Framing (fix-round finding): the default chase camera sits directly
+// behind the player looking along its facing, so a mob placed straight
+// ahead along that same facing line renders almost entirely behind the
+// player's own body. Offsetting the mob to the player's side (not just
+// forward) AND rotating the camera to a 3/4 angle keeps the mob's full
+// silhouette in frame instead of hidden behind the player. setPlayerLevel
+// above also queues several deed-unlock celebration banners that land on
+// the HUD's single #banner slot in sequence, and an ambient banner (a
+// "new mail" notice, a zone name) can claim the same slot the instant an
+// older one is hidden: a one-shot opacity flip right before the screenshot
+// still raced a fresh arrival in testing. A permanent CSS override
+// (injected once, right after boot) keeps the slot invisible for the rest
+// of the session instead of chasing each new banner.
 import fs from 'node:fs';
 import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
@@ -25,6 +39,7 @@ async function shootOne(page, templateId, label) {
 
   await page.evaluate(() => {
     const sim = window.__game.sim;
+    const g = window.__game;
     const me = sim.player;
     let nearest = null;
     let best = Infinity;
@@ -37,14 +52,25 @@ async function shootOne(page, templateId, label) {
       }
     }
     if (nearest) {
+      const fwdX = Math.sin(me.facing);
+      const fwdZ = Math.cos(me.facing);
+      const rightX = Math.cos(me.facing);
+      const rightZ = -Math.sin(me.facing);
       nearest.pos = {
-        x: me.pos.x + Math.sin(me.facing) * 3,
+        x: me.pos.x + fwdX * 2.2 + rightX * 2.0,
         y: me.pos.y,
-        z: me.pos.z + Math.cos(me.facing) * 3,
+        z: me.pos.z + fwdZ * 2.2 + rightZ * 2.0,
       };
       sim.targetEntity(nearest.id);
       nearest.autoAttack = true;
       nearest.targetId = me.id;
+
+      // Rotate to a 3/4 view and pull in a touch so the mob's full body and
+      // its attack silhouette read clearly instead of sitting small and
+      // dead-center behind the player.
+      g.input.camYaw = me.facing - 0.85;
+      g.input.camPitch = 0.22;
+      g.input.camDist = 8.5;
     }
   });
   await sleep(1200);
@@ -74,6 +100,17 @@ const booted = await enterOfflineGame(page, { charClass: 'warlock', charName: 'M
 console.log('offline boot:', booted);
 await page.evaluate(() => document.querySelector('.gpu-notice-dismiss')?.click());
 await sleep(600);
+
+// Permanently suppress the HUD's single #banner slot: setPlayerLevel below
+// queues several deed-unlock celebration banners, and once one is hidden an
+// ambient banner (new mail, zone name) can claim the freed slot the very
+// next frame, so a one-shot hide right before the screenshot still raced a
+// fresh arrival. A standing CSS override needs no timing at all.
+await page.evaluate(() => {
+  const style = document.createElement('style');
+  style.textContent = '#banner { opacity: 0 !important; }';
+  document.head.appendChild(style);
+});
 
 await page.evaluate(() => {
   const sim = window.__game.sim;
