@@ -58,8 +58,13 @@ export function isFullSuiteTrigger(p) {
   const base = n.includes('/') ? n.slice(n.lastIndexOf('/') + 1) : n;
   if (FULL_SUITE_TRIGGER_RE.test(base)) return true;
   // Vitest setup/global-setup and the shared test helpers change behavior for
-  // every file that runs, so they can never be narrowed either.
+  // every file that runs, so they can never be narrowed either. NESTED helper
+  // and fixture directories too (tests/server/helpers/, tests/server/fixtures/):
+  // a fixture-only edit under a nested dir is a .json path that would otherwise
+  // classify inert while its consuming suite may be graph-visible, so the
+  // stale-expectation failure would be skipped (Phase 2 adversarial audit).
   if (n.startsWith('tests/helpers/') || n.startsWith('tests/fixtures/')) return true;
+  if (/^tests\/.+\/(helpers|fixtures)\//.test(n)) return true;
   if (/^tests\/(global_setup|jsdom_local_storage_setup)\.[cm]?ts$/.test(n)) return true;
   return false;
 }

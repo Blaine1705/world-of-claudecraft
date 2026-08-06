@@ -86,6 +86,10 @@ describe('the floor union', () => {
       'tests/world_api_parity.test.ts',
     ]);
     expect([...CI_GUARD_PREFIXES]).toEqual(['tests/parity/']);
+    // Literal, not self-relative: every other use of this constant in the file
+    // is derived from it, so without this line lowering it to 2 (making the
+    // classification-collapse fallback vacuous) would stay green.
+    expect(FLOOR_SANITY_MIN).toBe(300);
   });
 
   it('resolves every guard against the REAL collected suite', () => {
@@ -181,9 +185,13 @@ describe('buildShardPlan: selective mode', () => {
 
   it('reports what it runs and what it skips, for the job log', () => {
     const plan = buildShardPlan({ ...BASE });
-    expect(plan.floorCount).toBeGreaterThan(FLOOR_SANITY_MIN);
+    // Literals from the fixture, not the implementation's own formula: FILLER
+    // (320) + architecture + localization_fixes = 322 always-run, plus
+    // localization_coverage, world_api_parity, and the parity file via the
+    // guard union = 325; COLLECTED is 327, leaving exactly the two pure tests.
+    expect(plan.floorCount).toBe(325);
     expect(plan.relatedCount).toBe(1);
-    expect(plan.skippedCount).toBe(COLLECTED.length - (plan.floorCount ?? 0));
+    expect(plan.skippedCount).toBe(2);
   });
 });
 
@@ -191,6 +199,10 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
   it.each([
     ['missing changed list', { changedPaths: undefined as unknown as string[] }],
     ['unsafe relayed path', { changedPaths: ['--config=evil'] }],
+    [
+      'unsafe path that is not the first element',
+      { changedPaths: ['src/ui/hud.ts', '--config=evil'] },
+    ],
     ['control character in path', { changedPaths: ['a\nb.ts'] }],
     ['classification collapse', { alwaysRun: ['tests/architecture.test.ts'] }],
     ['broad path re-classified shard-side', { changedPaths: ['package.json'] }],
@@ -266,6 +278,24 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(run.log).toContain('plan: mode=full');
     expect(run.log).toContain('npm test -- --shard=2/8');
     expect(run.log).toContain('plan-only');
+  });
+
+  it('honors TEST_MODE=full from the changes job even with a parseable empty relay', async () => {
+    // The one case every fail-closed changes-job decision produces
+    // (TEST_MODE=full, CHANGED_FILES=[]), and the case that proves the entry
+    // actually READS the mode env: hardcoding mode='selective' in the entry
+    // would plan the floor legs here (an empty array parses fine) and skip
+    // 1600+ graph-visible files on exactly the highest-risk PRs.
+    const run = await runEntry(['--shard=4/8', '--plan-only'], {
+      TEST_MODE: 'full',
+      TEST_MODE_REASON: 'broad or unclassified change ("pnpm-lock.yaml"): full suite',
+      CHANGED_FILES: '[]',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('plan: mode=full (mode=full from the changes job)');
+    expect(run.log).toContain('npm test -- --shard=4/8');
+    expect(run.log).not.toContain('npm test (always-run floor');
+    expect(run.log).not.toContain('vitest related');
   });
 
   it('plans the two selective legs over the real tree and prints the audit trail', async () => {

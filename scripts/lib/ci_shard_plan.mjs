@@ -1,5 +1,5 @@
 // Pure per-shard planning for the PR-tier CI test step (scripts/ci_shard_test.mjs).
-// Phase 2 of the CI/CD performance packet (docs/prd/ci-cd-performance/plan.md).
+// Phase 2 of the CI/CD performance packet (docs/qa-gate.md, "Selective PR-tier CI").
 //
 // The `changes` job decides the MODE (lib/ci_test_select.mjs) and relays the
 // changed-path list; each pr-gate shard job then builds its own legs here:
@@ -53,7 +53,7 @@ export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
  * If the recomputed blind/partial floor ever collapses below this, the
  * classifier is broken and selection cannot be trusted; the plan falls back to
  * the full suite. Mirrors the >300 sanity floor tests/gate_select_plan.test.ts
- * pins over the real suite (528 today).
+ * pins over the real suite (well above 500 as of Phase 2).
  */
 export const FLOOR_SANITY_MIN = 300;
 

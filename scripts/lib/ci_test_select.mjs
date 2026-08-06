@@ -1,8 +1,8 @@
 // Pure test-mode decision for the ci.yml `changes` job: given the PR's file
 // listing (the same snapshot ci_change_classify.mjs classified), decide whether
 // the PR-tier shard matrix may run the SELECTIVE test plan or must run the FULL
-// suite. Phase 2 of the CI/CD performance packet
-// (docs/prd/ci-cd-performance/plan.md).
+// suite. Phase 2 of the CI/CD performance packet (docs/qa-gate.md,
+// "Selective PR-tier CI").
 //
 // The reference semantics are the local selective gate (scripts/gate_select.mjs
 // and docs/qa-gate.md): an always-run floor plus `vitest related` over the
@@ -18,7 +18,11 @@
 //   pipeline scripts  the selection pipeline runs the PR's own copy of these
 //                     too; a buggy edit could narrow its own test run. Locally
 //                     the same files are ordinary related-sources; in CI they
-//                     are the decision layer and get the full bar.
+//                     are the decision layer and get the full bar. Rot and
+//                     mistake guards, NOT an integrity boundary: an adversary
+//                     editing the pipeline edits this trigger with it, exactly
+//                     as they could edit ci.yml, and the actual containment for
+//                     fork PRs is the read-only token plus review.
 //   removals/renames  `vitest related <deleted path>` matches nothing, so a
 //                     test importing the deleted module is silently unselected.
 //                     Locally tsc catches the broken import for .ts suites; the
@@ -77,16 +81,27 @@ const KNOWN_FILE_STATUSES = Object.freeze([
 /**
  * The changed-path list is relayed changes-job -> shard jobs as one job output
  * mapped into one env var. A single env entry beyond the kernel's per-string
- * budget (MAX_ARG_STRLEN, 128 KiB on Linux) would make every shard's spawn
- * fail, so the handover refuses well below it and falls back to the full
- * suite instead.
+ * budget (MAX_ARG_STRLEN, 128 KiB of BYTES on Linux) would make every shard's
+ * spawn fail, so the handover refuses at half that, measured in UTF-8 BYTES
+ * (a code-unit count under-measures non-ASCII paths), and falls back to the
+ * full suite instead.
  */
 export const CHANGED_LIST_BUDGET = 65536;
+
+/** UTF-8 byte length, the unit MAX_ARG_STRLEN is defined in. */
+export function relayByteLength(s) {
+  return new TextEncoder().encode(s).length;
+}
 
 /** True for a path that is safe to relay and to place in a vitest argv. */
 export function isRelayablePath(p) {
   if (typeof p !== 'string' || p === '') return false;
   if (p.startsWith('-')) return false;
+  // Repo-relative only: the API listing cannot emit an absolute or escaping
+  // path, but this predicate is the named relay-safety bar and its consumer
+  // treats it as the whole validation, so it must not depend on the producer.
+  if (p.startsWith('/') || p === '..' || p.startsWith('../')) return false;
+  if (p.includes('/../') || p.endsWith('/..')) return false;
   // Control characters (newlines included) break the single-line GITHUB_OUTPUT
   // handover and can smuggle workflow commands into logs.
   for (let i = 0; i < p.length; i++) {
@@ -146,6 +161,12 @@ export function decideTestMode({ eventName, code, files }) {
     if (prev && (isPipelineFile(prev) || prev.startsWith('.github/'))) {
       return full(`selection pipeline rename (${JSON.stringify(prev)}): full suite`);
     }
+    // A rename whose source path is missing cannot be reasoned about: the
+    // removed-path rule below depends on that field, so its absence is
+    // unprovable, the same doctrine the status field gets.
+    if (status === 'renamed' && !prev) {
+      return full(`rename without a source path (${JSON.stringify(name)}): full suite`);
+    }
     // A removed or renamed source/test file breaks importers that `related`
     // can no longer reach through the deleted path (see header).
     const goneEnds = [];
@@ -159,7 +180,7 @@ export function decideTestMode({ eventName, code, files }) {
     changedPaths.push(name);
   }
 
-  if (JSON.stringify(changedPaths).length > CHANGED_LIST_BUDGET) {
+  if (relayByteLength(JSON.stringify(changedPaths)) > CHANGED_LIST_BUDGET) {
     return full(`changed-path list exceeds the relay budget (${files.length} files): full suite`);
   }
 

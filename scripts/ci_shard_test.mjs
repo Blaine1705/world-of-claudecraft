@@ -1,5 +1,5 @@
 // CI entry for the pr-gate shard matrix ("Run tests (PR tier, shard i of N)").
-// Phase 2 of the CI/CD performance packet (docs/prd/ci-cd-performance/plan.md).
+// Phase 2 of the CI/CD performance packet (docs/qa-gate.md, "Selective PR-tier CI").
 //
 // Reads the selection decision the `changes` job relayed (TEST_MODE,
 // TEST_MODE_REASON, CHANGED_FILES) plus this shard's `--shard=i/N` argv, builds
@@ -40,7 +40,12 @@ const planOnly = argv.includes('--plan-only');
 const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
 
 const mode = process.env.TEST_MODE ?? '';
-const modeReason = process.env.TEST_MODE_REASON ?? '';
+// Echoed into the log only. The producer already strips CR/LF; re-stripping
+// control characters here keeps the consumer's validation symmetric with the
+// path relay rather than trusting the producer.
+const modeReason = [...(process.env.TEST_MODE_REASON ?? '')]
+  .filter((ch) => ch.charCodeAt(0) >= 0x20 && ch.charCodeAt(0) !== 0x7f)
+  .join('');
 
 /** @type {string[] | null} */
 let changedPaths = null;
@@ -100,6 +105,12 @@ if (plan.mode === 'selective') {
 for (const { name, cmd, args } of plan.legs) {
   console.log(`\n[ci-shard] ${name}: ${cmd} ${args.join(' ')}`);
   if (planOnly) continue;
+  // No shell, deliberately: argv elements (which embed PR-controlled
+  // filenames) pass verbatim to execvp, and the floor leg's long file list is
+  // safe under the POSIX arg limits this ubuntu-only entry runs under. The
+  // win32 cmd.exe 8191-char ceiling that forces gate_select.mjs to chunk does
+  // not apply here; local reproduction on Windows is --plan-only (spawns
+  // nothing) per docs/qa-gate.md.
   const res = spawnSync(cmd, args, { stdio: 'inherit', cwd: repoRoot });
   if (res.status !== 0) {
     console.error(`\n[ci-shard] FAIL at "${name}" (exit ${res.status ?? 'killed'})`);

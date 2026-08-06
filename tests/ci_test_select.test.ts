@@ -3,6 +3,7 @@ import {
   CHANGED_LIST_BUDGET,
   decideTestMode,
   isRelayablePath,
+  relayByteLength,
   SELECTION_PIPELINE_FILES,
 } from '../scripts/lib/ci_test_select.mjs';
 
@@ -46,7 +47,7 @@ describe('decideTestMode: when selection is allowed at all', () => {
   });
 });
 
-// The acceptance list from the plan (docs/prd/ci-cd-performance/plan.md):
+// The packet's fall-back acceptance list (docs/qa-gate.md, "Selective PR-tier CI"):
 // lockfile, package.json, workflow files, vite/vitest/tsconfig, generated-file
 // regeneration, and the selection pipeline itself all run the full suite.
 describe('decideTestMode: fail-closed triggers', () => {
@@ -60,8 +61,11 @@ describe('decideTestMode: fail-closed triggers', () => {
     ['biome.json'],
     ['.npmrc'],
     ['tests/helpers/bare_client.ts'],
+    ['tests/server/helpers/fake_db.ts'],
+    ['tests/server/fixtures/main/golden.json'],
     ['tests/global_setup.ts'],
     ['src/ui/i18n.catalog/translation_keys.generated.ts'],
+    ['.browserslistrc'],
     ['some/unrecognized/thing.bin'],
   ])('%s runs the full suite via the shared planner buckets', (p) => {
     const d = decideTestMode({ ...PR, files: [mod('src/ui/hud.ts'), mod(p)] });
@@ -86,6 +90,36 @@ describe('decideTestMode: fail-closed triggers', () => {
     const d = decideTestMode({ ...PR, files: [mod('scripts/lib/ci_shard_plan.d.mts')] });
     expect(d.mode).toBe('full');
     expect(d.reason).toContain('selection pipeline change');
+  });
+
+  it('treats a rename AWAY from the pipeline or .github as unprovable too', () => {
+    // The new name is outside every trigger; only previous_filename carries
+    // the signal that the workflow-side file set changed.
+    const d = decideTestMode({
+      ...PR,
+      files: [
+        {
+          filename: 'docs/ci-notes.md',
+          previous_filename: '.github/workflows/ci.yml',
+          status: 'renamed',
+        },
+      ],
+    });
+    expect(d.mode).toBe('full');
+    expect(d.reason).toContain('selection pipeline rename');
+  });
+
+  it('refuses a renamed entry whose source path is missing', () => {
+    // The removed-path rule depends on previous_filename; its absence is
+    // unprovable, same doctrine as an unknown status.
+    for (const prev of [undefined, null, '']) {
+      const d = decideTestMode({
+        ...PR,
+        files: [{ filename: 'src/sim/rng2.ts', previous_filename: prev, status: 'renamed' }],
+      });
+      expect(d.mode).toBe('full');
+      expect(d.reason).toContain('rename without a source path');
+    }
   });
 
   it('refuses to narrow on a removed or renamed source/test path', () => {
@@ -147,9 +181,23 @@ describe('decideTestMode: fail-closed triggers', () => {
     expect(d.reason).toContain('relay budget');
     expect(d.changedPaths).toEqual([]);
   });
+
+  it('measures the relay budget in bytes, not UTF-16 code units', () => {
+    // MAX_ARG_STRLEN is a byte limit; a CJK-heavy listing can fit the
+    // code-unit count while exceeding it in UTF-8. One three-byte character
+    // per unit makes the difference decisive.
+    const cjkSeg = '世界'.repeat(16);
+    const files = Array.from({ length: 700 }, (_, i) => mod(`src/ui/${cjkSeg}_${i}.ts`));
+    const json = JSON.stringify(files.map((f) => f.filename));
+    expect(json.length).toBeLessThan(CHANGED_LIST_BUDGET);
+    expect(relayByteLength(json)).toBeGreaterThan(CHANGED_LIST_BUDGET);
+    const d = decideTestMode({ ...PR, files });
+    expect(d.mode).toBe('full');
+    expect(d.reason).toContain('relay budget');
+  });
 });
 
-// The incident replay (2026-08-05, docs/prd/ci-cd-performance/plan.md): a
+// The 2026-08-05 incident replay (docs/qa-gate.md, "Selective PR-tier CI"): a
 // content change that shifts world-gen draws must stay selectable, because
 // selection hands the content file to `vitest related`, whose import graph
 // reaches the seed-pinned suites through src/sim/content/data.ts; the guard
@@ -173,11 +221,19 @@ describe('isRelayablePath', () => {
     ['src/sim/sim.ts', true],
     ['docs/a.md', true],
     ['src/with space.ts', true],
+    ['src/..dots/a.ts', true],
     ['-rf', false],
     ['--config=evil', false],
     ['a\nb', false],
     ['a\tb', false],
     ['', false],
+    // Repo-relative only: the predicate is the named relay-safety bar and must
+    // not depend on the producer being the API listing.
+    ['/etc/passwd', false],
+    ['../outside.ts', false],
+    ['..', false],
+    ['src/../../outside.ts', false],
+    ['src/x/..', false],
   ])('%j -> %s', (p, expected) => {
     expect(isRelayablePath(p)).toBe(expected);
   });

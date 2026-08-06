@@ -72,7 +72,7 @@ concurrency:
 # release-gate, release-checks, and release-version-gate stay always-full
 # (no path skip on those jobs).
 #
-# Selective PR tier (Phase 2, docs/prd/ci-cd-performance/plan.md): the same
+# Selective PR tier (the CI/CD performance packet's Phase 2): the same
 # changes job also emits test_mode/changed_files from the same listing, and the
 # pr-gate shards run scripts/ci_shard_test.mjs, which either replays the full
 # `npm test -- --shard` step (mode=full, the fail-closed default for anything
@@ -133,7 +133,7 @@ jobs:
       pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
-      # Phase 2 selection decision (docs/prd/ci-cd-performance/plan.md): the
+      # Phase 2 selection decision (docs/qa-gate.md, "Selective PR-tier CI"): the
       # same fetched listing also decides whether pr-gate may run the selective
       # test plan. Fail closed: anything unprovable is test_mode=full, and full
       # mode is byte-identical to the pre-selection shard step. Release jobs
@@ -318,7 +318,7 @@ jobs:
       # matter which shard they hash into); the freshness diff lives in
       # pr-checks. Workers stay at half the runner's cores inside the script.
       #
-      # Phase 2 (docs/prd/ci-cd-performance/plan.md): the runner reads the
+      # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
       # changes job's selection decision. test_mode=full spawns exactly the old
       # step (`npm test -- --shard=i/8`); test_mode=selective runs the
       # always-run floor (blind/partial tests + invariant guard suites + changed

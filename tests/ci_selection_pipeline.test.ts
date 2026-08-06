@@ -30,13 +30,15 @@ function importClosure(entries: string[]): string[] {
     // dynamic-import ban nor register a phantom import edge.
     const code = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
     // Static ESM imports only: the pipeline scripts are plain .mjs with no
-    // dynamic imports, and the assertion below keeps that true.
-    for (const m of code.matchAll(/from\s*['"](\.[^'"]+)['"]/g)) {
+    // dynamic imports, and the assertion below keeps that true. Both specifier
+    // forms count: `from './x.mjs'` AND the bare side-effect `import './x.mjs'`,
+    // which a from-only match would let join the pipeline unseen.
+    for (const m of code.matchAll(/(?:from\s*|\bimport\s+)['"](\.[^'"]+)['"]/g)) {
       const resolved = path.join(path.dirname(rel), m[1]).split(path.sep).join('/');
       queue.push(resolved);
     }
     expect(code, `${rel} must not import dynamically (the closure walk would miss it)`).not.toMatch(
-      /await\s+import\s*\(/,
+      /\bimport\s*\(/,
     );
   }
   return [...seen].sort();

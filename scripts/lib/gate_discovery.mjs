@@ -119,10 +119,14 @@ export function collectSuiteVisibility(io) {
   const fsHelpers = FS_HELPER_DIRS.flatMap((dir) => {
     const full = join(root, dir);
     try {
+      // .ts AND .mjs/.js: a JS helper in these dirs delegates fs just as well,
+      // and a .ts-only filter would silently never scan it.
       return readdirSync(full, { withFileTypes: true })
-        .filter((e) => e.isFile() && /\.[cm]?ts$/.test(e.name) && !/\.(test|spec)\./.test(e.name))
+        .filter(
+          (e) => e.isFile() && /\.[cm]?[jt]s$/.test(e.name) && !/\.(test|spec)\./.test(e.name),
+        )
         .filter((e) => HELPER_FS_PATTERN.test(readFileSync(join(full, e.name), 'utf8')))
-        .map((e) => `${dir}/${e.name.replace(/\.[cm]?ts$/, '')}`);
+        .map((e) => `${dir}/${e.name.replace(/\.[cm]?[jt]s$/, '')}`);
     } catch {
       return [];
     }

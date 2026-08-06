@@ -353,20 +353,26 @@ describe('detectCode (fail closed end to end)', () => {
   });
 
   it('returns no files on any fail-closed path, so the mode decision cannot trust them', async () => {
-    // Absence of `files` is the contract: every code=true-by-doubt return above
-    // (non-PR event, missing context, API failure, empty listing, count
-    // mismatch) proves nothing about the diff, and a mode decision reading a
-    // partial listing would narrow the run on unproven data.
+    // Absence of `files` is the contract: every code=true-by-doubt return
+    // (non-PR event, missing PR context, missing token, API failure, empty
+    // listing, count mismatch) proves nothing about the diff, and a mode
+    // decision reading a partial listing would narrow the run on unproven
+    // data. One assertion per named arm.
     const rejecting = (async () => {
       throw new Error('ECONNRESET');
     }) as unknown as typeof fetch;
     expect(
       await detectCode({ ...BASE, eventName: 'push', fetchImpl: neverFetch }),
     ).not.toHaveProperty('files');
+    expect(
+      await detectCode({ ...BASE, prNumber: Number.NaN, fetchImpl: neverFetch }),
+    ).not.toHaveProperty('files');
     expect(await detectCode({ ...BASE, token: '', fetchImpl: neverFetch })).not.toHaveProperty(
       'files',
     );
     expect(await detectCode({ ...BASE, fetchImpl: rejecting })).not.toHaveProperty('files');
+    const { impl: empty } = pagedFetch([]);
+    expect(await detectCode({ ...BASE, fetchImpl: empty })).not.toHaveProperty('files');
     const { impl } = pagedFetch([{ filename: 'docs/a.md' }]);
     expect(await detectCode({ ...BASE, reportedCount: 5, fetchImpl: impl })).not.toHaveProperty(
       'files',

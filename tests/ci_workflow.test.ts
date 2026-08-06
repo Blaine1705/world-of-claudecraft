@@ -8,6 +8,7 @@ const detectEntry = readFileSync(
   new URL('../scripts/detect_code_changes.mjs', import.meta.url),
   'utf8',
 );
+const ciShardEntry = readFileSync(new URL('../scripts/ci_shard_test.mjs', import.meta.url), 'utf8');
 const packageJson = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 ) as { packageManager?: string };
@@ -558,6 +559,16 @@ describe('CI workflow parity', () => {
       expect(job).not.toContain('ci_shard_test.mjs');
       expect(job).not.toContain('TEST_MODE');
     }
+    // The half-cores worker bound moved from pr-gate's run line into the shard
+    // runner. Derive the expected expression FROM halfCoreCap (the release-gate
+    // pin) so the two forms cannot drift apart: same formula, minus the shell
+    // wrapper and with the runner's `os` import in place of require().
+    const capExpression = halfCoreCap
+      .replace(/^--maxWorkers="\$\(node -p '/, '')
+      .replace(/'\)"$/, '')
+      .replace('require("node:os")', 'os');
+    expect(capExpression).toBe('Math.max(1, Math.floor(os.availableParallelism() / 2))');
+    expect(ciShardEntry).toContain(capExpression);
     // Legacy N=4 run lines must not remain once SHARD_N has moved on.
     // String(SHARD_N) comparison avoids tsc folding a constant always-true arm.
     if (String(SHARD_N) !== '4') {

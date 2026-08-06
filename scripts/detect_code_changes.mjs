@@ -1,8 +1,8 @@
 // CI entry for the ci.yml `changes` job ("Detect code path changes"): decide
 // whether the run touches the code path set and write the `code` step output,
 // plus the PR-tier selection decision (`test_mode`, `test_mode_reason`,
-// `changed_files`) the pr-gate shards consume (Phase 2,
-// docs/prd/ci-cd-performance/plan.md). The changed-file list comes from the
+// `changed_files`) the pr-gate shards consume (the CI/CD performance packet's
+// Phase 2; model and audit contract: docs/qa-gate.md, "Selective PR-tier CI"). The changed-file list comes from the
 // GitHub pull request files endpoint, so the job needs no git history at all;
 // both decisions are derived from the SAME fetched listing so they cannot
 // disagree about the diff. The decision logic lives in
@@ -44,8 +44,21 @@ const { code, reason, files } = await detectCode({
 console.log(`[detect_code_changes] ${reason}`);
 
 // The selection decision reuses the SAME listing snapshot; when detectCode
-// failed closed it returns no files and the mode falls back to full.
-const modeDecision = decideTestMode({ eventName, code, files });
+// failed closed it returns no files and the mode falls back to full. Wrapped
+// like detectCode's own body: an unexpected throw here would fail the whole
+// changes job, and its dependents SKIP rather than run full, which is the one
+// wrong direction this file has. Any error is a full-suite decision instead.
+let modeDecision;
+try {
+  modeDecision = decideTestMode({ eventName, code, files });
+} catch (err) {
+  const detail = JSON.stringify(err instanceof Error ? err.message : String(err));
+  modeDecision = {
+    mode: 'full',
+    reason: `test-mode decision failed (${detail}): full suite`,
+    changedPaths: [],
+  };
+}
 // Values written to GITHUB_OUTPUT are one line each by construction (embedded
 // filenames are JSON-escaped, the path list is JSON); this strip is the
 // belt-and-suspenders against a future reason string smuggling a newline in.
