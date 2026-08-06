@@ -74,9 +74,15 @@ describe('options_window: staged graphics apply', () => {
     expect(painter).toContain('this.graphicsChoiceBinding(hooks)');
     expect(painter).toContain('if (!GRAPHICS_REBUILD_KEY_SET.has(key))');
     expect(painter).toContain('hooks.onSettingChange(key, value);');
-    expect(painter).toContain(
-      'this.graphicsDraft = copyGraphicsDraft({ ...draft, [key]: value });',
-    );
+    // Staging routes through the pure rule (a dial edit under a fixed preset
+    // switches the draft to the seeded Advanced mix; the applied snapshot lets
+    // an Advanced round-trip restore an applied mix; a same-value tap no-ops);
+    // display values come from the matching pure projection so the dials
+    // always describe the active mix.
+    expect(painter).toContain('stageGraphicsDraftChange(');
+    expect(painter).toContain('this.graphicsApplied,');
+    expect(painter).toContain('if (staged === draft) return;');
+    expect(painter).toContain('graphicsDisplaySnapshot(this.ensureGraphicsDraft(hooks))');
   });
 
   it('discards an unapplied draft on close and ignores stale async settlement', () => {
@@ -90,10 +96,15 @@ describe('options_window: staged graphics apply', () => {
     expect(painter).toContain('if (generation !== this.graphicsApplyGeneration) return;');
   });
 
-  it('tracks raw dirty state and delegates effective no-op detection to applyGraphics', () => {
-    expect(painter).toContain(
-      'graphicsDraftDirty(GRAPHICS_REBUILD_KEYS, this.graphicsDraft, this.graphicsApplied)',
-    );
+  it('tracks dirty state over display projections and delegates no-op detection to applyGraphics', () => {
+    // Dirty compares what the panel RENDERS, not the stored drafts: dial
+    // residue left by an abandoned Advanced detour must not arm Apply when the
+    // panel is pixel-identical to the applied state.
+    const dirty = painter.slice(painter.indexOf('private graphicsDirty(): boolean {'));
+    const dirtyBody = dirty.slice(0, dirty.indexOf('\n  }\n'));
+    expect(dirtyBody).toContain('graphicsDraftDirty(');
+    expect(dirtyBody).toContain('graphicsDisplaySnapshot(this.graphicsDraft)');
+    expect(dirtyBody).toContain('graphicsDisplaySnapshot(this.graphicsApplied)');
     const apply = painter.slice(painter.indexOf('private applyGraphicsDraft(): void {'));
     const body = apply.slice(0, apply.indexOf('\n  }\n'));
     expect(body).toContain('hooks.applyGraphics(submitted)');
@@ -113,7 +124,7 @@ describe('options_window: staged graphics apply', () => {
 
   it('has no normal reload prompt and allows location.reload only in the fatal outcome arm', () => {
     const graphics = painter.slice(
-      painter.indexOf('private graphicsApplyRegion(): HTMLElement {'),
+      painter.indexOf('private graphicsFooter('),
       painter.indexOf('private renderAudio(): void {'),
     );
     expect(graphics).not.toContain("t('hud.options.graphicsReloadNote')");
@@ -148,10 +159,10 @@ describe('options_window: WCAG 2.2 AA', () => {
 
   it('announces graphics progress and outcomes, and disables edits while busy or fatal', () => {
     const graphics = painter.slice(
-      painter.indexOf('private graphicsApplyRegion(): HTMLElement {'),
+      painter.indexOf('private graphicsFooter('),
       painter.indexOf('private renderAudio(): void {'),
     );
-    expect(graphics).toContain("region.setAttribute('aria-busy', String(this.graphicsBusy))");
+    expect(graphics).toContain("footer.setAttribute('aria-busy', String(this.graphicsBusy))");
     expect(graphics).toContain("status.setAttribute('role', alert ? 'alert' : 'status')");
     expect(graphics).toContain('action.disabled = this.graphicsBusy || !this.graphicsDirty()');
     expect(graphics).toContain('body.inert = unavailable;');
@@ -161,11 +172,11 @@ describe('options_window: WCAG 2.2 AA', () => {
     expect(painter).toContain('this.deps.focusFirstInteractive(this.deps.root())');
   });
 
-  it('keeps a stable, touch-friendly apply region without motion', () => {
-    expect(componentsCss).toMatch(/\.graphics-apply \{[\s\S]*min-height: 40px;/);
+  it('keeps a stable, touch-friendly inline action row without motion', () => {
+    expect(componentsCss).toMatch(/\.gfx-footer \{[\s\S]*min-height: 40px;/);
     expect(componentsCss).toMatch(/\.graphics-apply-status \{[\s\S]*min-height: 1\.4em;/);
     expect(mobileCss).toMatch(/body\.mobile-touch \.graphics-apply-btn \{[\s\S]*min-height: 40px;/);
-    const rule = componentsCss.match(/\.graphics-apply \{([\s\S]*?)\n {2}\}/)?.[1] ?? '';
+    const rule = componentsCss.match(/\.gfx-footer \{([\s\S]*?)\n {2}\}/)?.[1] ?? '';
     expect(rule).not.toContain('transition');
     expect(rule).not.toContain('animation');
   });
@@ -476,12 +487,13 @@ describe('options_window: title-bar back control', () => {
     expect(painter).toContain(
       "el.querySelector('[data-back]')?.addEventListener('click', () => this.goBack());",
     );
-    // the three footer Back buttons (the shared settingsViewFooter, which
-    // Graphics/Audio/Controller/Interface all now feed into; bug report;
-    // keybinds) reuse the same path (no inline copies left)
+    // the four footer Back buttons (the shared settingsViewFooter, which
+    // Audio/Controller/Interface feed into; the graphics inline action row,
+    // which replaces it for that view; bug report; keybinds) reuse the same
+    // path (no inline copies left)
     expect(
       painter.match(/back\.addEventListener\('click', \(\) => this\.goBack\(\)\);/g),
-    ).toHaveLength(3);
+    ).toHaveLength(4);
     // the click-then-flip-to-main sequence lives ONLY in goBack itself; a stray
     // inline copy in some handler would push this count past 1
     expect(painter.match(/audio\.click\(\);\s*this\.view = 'main';/g) ?? []).toHaveLength(1);
@@ -614,14 +626,56 @@ describe('options_window: Reset to Defaults is scoped per sub-view (#2341)', () 
     },
   );
 
-  it('renderGraphics passes its controls into the staged reset footer', () => {
+  it('renderGraphics passes its flattened section controls into the inline action row', () => {
     const start = painter.indexOf('private renderGraphics(): void {');
     const rest = painter.slice(start);
     const body = rest.slice(0, rest.indexOf('\n  }\n'));
-    expect(body).toContain('buildGraphicsControls');
-    expect(body).toContain('this.settingsViewFooter(');
-    expect(body).toContain('controls,');
-    expect(body).toContain('this.resetGraphicsDraft(optionsHooks, keys)');
+    expect(body).toContain('buildGraphicsSections');
+    // The SAME section objects feed the cards and (flattened) the footer, so
+    // the layout and the reset-key scope can never disagree.
+    expect(body).toContain('const controls = flattenGraphicsSections(sections);');
+    expect(body).toContain('this.graphicsFooter(controls, unavailable)');
+    // The generic footer is replaced, so the title-bar close is wired here.
+    expect(body).toContain("el.querySelector('[data-close]')");
+    // The footer's Reset stays scoped to exactly this view's keys.
+    expect(painter).toContain(
+      'this.resetGraphicsDraft(hooks, optionsControlKeys(controls) as (keyof GameSettings)[]);',
+    );
+  });
+
+  it('renderGraphics builds the wide two-column card layout and render() clears it', () => {
+    const start = painter.indexOf('private renderGraphics(): void {');
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    // The card grid: the wide window class, two columns, a shared-family card
+    // per section (settingsCard carries the role="group" naming), each card
+    // landing in its declared column with a set-rows body.
+    expect(body).toContain("el.classList.add('gfx-wide');");
+    expect(body).toContain("body.className = 'gfx-cols';");
+    expect(body).toContain("col.className = 'gfx-col';");
+    expect(body).toContain(
+      "const host = section.column === 'full' ? body : columns[section.column - 1];",
+    );
+    expect(body).toContain('const card = settingsCard(host, t(section.titleKey), {');
+    expect(body).toContain(
+      "className: section.column === 'full' ? 'gfx-card gfx-card-wide' : 'gfx-card',",
+    );
+    expect(body).toContain("rows.className = 'set-rows';");
+    // The dispatcher clears the wide class when the view moves elsewhere, the
+    // same lifecycle the kb/perf/aura wide classes follow.
+    expect(painter).toContain("if (this.view !== 'graphics') el.classList.remove('gfx-wide');");
+  });
+
+  it('renderGraphics carries keyboard focus across its own rebuild', () => {
+    const start = painter.indexOf('private renderGraphics(): void {');
+    const rest = painter.slice(start);
+    const body = rest.slice(0, rest.indexOf('\n  }\n'));
+    // Every dial click re-renders the panel, destroying the clicked button;
+    // the shared focus_restore seam finds its rebuilt equivalent (the choice
+    // buttons stamp data-focus-key as `${key}:${value}`).
+    expect(body).toContain('const focusKey = captureFocusKey(el);');
+    expect(body).toContain('restoreFirstEnabled([');
+    expect(painter).toContain('btn.dataset.focusKey = `${key}:${option.value}`;');
   });
 
   // Interface (~40 settings across its four tabs) used to build a panel-title
