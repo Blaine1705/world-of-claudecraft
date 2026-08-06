@@ -13,6 +13,7 @@
 // the whole point of the window.
 
 import type { ItemDef, ItemSet } from '../../../sim/types';
+import type { IWorld } from '../../../world_api';
 
 /** The four WARFARE armor families, in the order the shop lists them. Any set
  *  the stock carries that is NOT named here still gets a section, appended in
@@ -109,7 +110,8 @@ export interface WarfareShopView {
 
 export interface WarfareShopViewer {
   honor: number;
-  /** Item ids the viewer wears OR carries in a bag. */
+  /** Item ids the viewer wears OR carries in a bag. See warfareShopViewer below
+   *  for what "owns" deliberately does NOT cover (the bank). */
   ownedItemIds: ReadonlySet<string>;
   /** Item ids the viewer currently wears. */
   equippedItemIds: ReadonlySet<string>;
@@ -117,6 +119,38 @@ export interface WarfareShopViewer {
    *  row here falls back to the distinct slots this shop actually sells, so the
    *  denominator is never zero and never invented. */
   setMemberCounts?: Readonly<Record<string, number>>;
+}
+
+/** The `IWorld` reads the viewer derivation needs, as a Pick rather than the
+ *  whole seam: the derivation stays drivable from a Sim-shaped and a
+ *  ClientWorld-mirror-shaped stub alike, which is the exact place those two
+ *  could quietly diverge. */
+export type WarfareShopWorld = Pick<IWorld, 'honor' | 'inventory' | 'equipment'>;
+
+/**
+ * Derive the shop viewer from the world seam: the honor balance, the item ids
+ * currently WORN (what the set bonuses key on), and the ids worn or carried
+ * (what "already bought this" means for the owned marks and the progress line).
+ * Both reads go through `IWorld`, so the numbers resolve identically offline
+ * and online.
+ *
+ * KNOWN LIMITATION, and deliberate: "owned" covers equipment plus the CARRIED
+ * inventory only. A piece parked in the BANK therefore reads as unowned, loses
+ * its Owned marker, and is missing from the owned-count line, which can invite
+ * a duplicate purchase of an unrefundable honor item. This is a platform
+ * constraint rather than a fixable read: `IWorldBank.bankInfo` is null away
+ * from a banker, so bank contents are simply not observable from the shop.
+ * Pinned by tests/warfare_vendor_view.test.ts so the next reader does not
+ * assume bank coverage.
+ */
+export function warfareShopViewer(
+  world: WarfareShopWorld,
+): Pick<WarfareShopViewer, 'honor' | 'ownedItemIds' | 'equippedItemIds'> {
+  const equippedItemIds = new Set(
+    Object.values(world.equipment).filter((id): id is string => !!id),
+  );
+  const ownedItemIds = new Set([...equippedItemIds, ...world.inventory.map((slot) => slot.itemId)]);
+  return { honor: world.honor, ownedItemIds, equippedItemIds };
 }
 
 function offerFor(itemId: string, item: ItemDef, viewer: WarfareShopViewer): WarfareShopOffer {

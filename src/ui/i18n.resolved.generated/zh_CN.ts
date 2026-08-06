@@ -1510,12 +1510,13 @@ export const zh_CN: EnTranslations = {
       }
     },
     "warfareShop": {
+      "gossipOption": "浏览战争套装",
+      "gossipOptionAria": "浏览 {name} 提供的战争套装商店",
       "jewelry": "饰品",
       "weapons": "武器",
       "owned": "已拥有",
-      "ownedCount": "已拥有 {total} 件中的 {owned} 件。",
-      "nextBonus": "再获得 {remaining} 件即可激活 {pieces} 件套奖励。",
-      "setComplete": "你已拥有全部部件。",
+      "ownedCountNext": "已拥有 {total} 件中的 {owned} 件。再获得 {remaining} 件即可激活 {pieces} 件套奖励。",
+      "ownedCountComplete": "已拥有 {total} 件中的 {owned} 件。你已拥有全部部件。",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
       "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。"

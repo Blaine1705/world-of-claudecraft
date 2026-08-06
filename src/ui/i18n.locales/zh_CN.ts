@@ -832,12 +832,15 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '击杀',
   'hudChrome.warfare.floatReasons.assist': '助攻',
   'hudChrome.warfare.floatReasons.firstWin': '首胜',
+  'hudChrome.warfareShop.gossipOption': '浏览战争套装',
+  'hudChrome.warfareShop.gossipOptionAria': '浏览 {name} 提供的战争套装商店',
   'hudChrome.warfareShop.jewelry': '饰品',
   'hudChrome.warfareShop.weapons': '武器',
   'hudChrome.warfareShop.owned': '已拥有',
-  'hudChrome.warfareShop.ownedCount': '已拥有 {total} 件中的 {owned} 件。',
-  'hudChrome.warfareShop.nextBonus': '再获得 {remaining} 件即可激活 {pieces} 件套奖励。',
-  'hudChrome.warfareShop.setComplete': '你已拥有全部部件。',
+  'hudChrome.warfareShop.ownedCountNext':
+    '已拥有 {total} 件中的 {owned} 件。再获得 {remaining} 件即可激活 {pieces} 件套奖励。',
+  'hudChrome.warfareShop.ownedCountComplete':
+    '已拥有 {total} 件中的 {owned} 件。你已拥有全部部件。',
   'hudChrome.warfareShop.buyOwnedAria': '以 {honor} 购买 {item}，已拥有',
   'hudChrome.warfareShop.buyConfirmBody': '用 {honor} 购买 {item}？荣誉购买后无法退款。',
   'hudChrome.keybinds.bgFlag': '战场夺旗动作',

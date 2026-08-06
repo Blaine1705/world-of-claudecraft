@@ -1547,15 +1547,25 @@ export const hudChromeStrings = {
   // are all reused from hudChrome.warfare, hudChrome.itemSet, itemUi.vendor and
   // heroicShop rather than duplicated.
   warfareShop: {
+    // The gossip row that opens this window. A flagged NPC keeps its ordinary
+    // goods row too (selling and buyback still have to be reachable), so this
+    // row carries its OWN label and accessible name rather than a second
+    // "Browse Goods" the player cannot tell apart.
+    gossipOption: 'Browse Warfare Sets',
+    gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
     // Marks a piece the viewer already wears or carries. The tile still sells.
     owned: 'Owned',
-    ownedCount: '{owned} of {total} pieces owned.',
-    // Read against the NEXT unmet tier, never a bare fraction of the full set:
-    // "2 more for the 7-piece bonus" is the line that motivates the purchase.
-    nextBonus: '{remaining} more for the {pieces}-piece bonus.',
-    setComplete: 'You own every piece.',
+    // The owned-count line, as ONE key per arm rather than a count sentence
+    // joined to a tier sentence with a hard-coded space: a translator has to be
+    // able to reorder the two clauses, and the ASCII separator is wrong for
+    // ja_JP and zh_*. The second clause reads against the NEXT unmet tier, never
+    // a bare fraction of the full set ("2 more for the 7-piece bonus" is the
+    // line that motivates the purchase).
+    ownedCountNext:
+      '{owned} of {total} pieces owned. {remaining} more for the {pieces}-piece bonus.',
+    ownedCountComplete: '{owned} of {total} pieces owned. You own every piece.',
     buyAria: 'Buy {item} for {honor}',
     buyOwnedAria: 'Buy {item} for {honor}, already owned',
     // Honor purchases record no buyback, so a mis-tap is unrefundable: the

@@ -72,16 +72,19 @@ function appendSetProgress(el: HTMLElement, section: WarfareShopSetSection): voi
   }
   const progress = document.createElement('div');
   progress.className = 'warfare-set-progress';
-  const owned = t('hudChrome.warfareShop.ownedCount', {
-    owned: count(section.ownedPieces),
-    total: count(section.totalPieces),
-  });
+  // ONE t() call per arm, never a count sentence joined to a tier sentence: a
+  // translator has to be free to reorder the clauses, and the ASCII space that
+  // joined them is wrong for ja_JP and zh_*.
+  const owned = count(section.ownedPieces);
+  const total = count(section.totalPieces);
   progress.textContent = section.nextTier
-    ? `${owned} ${t('hudChrome.warfareShop.nextBonus', {
+    ? t('hudChrome.warfareShop.ownedCountNext', {
+        owned,
+        total,
         remaining: count(section.nextTier.remaining),
         pieces: count(section.nextTier.pieces),
-      })}`
-    : `${owned} ${t('hudChrome.warfareShop.setComplete')}`;
+      })
+    : t('hudChrome.warfareShop.ownedCountComplete', { owned, total });
   el.appendChild(progress);
 }
 

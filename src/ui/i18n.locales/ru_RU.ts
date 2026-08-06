@@ -860,12 +860,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': 'Убийство',
   'hudChrome.warfare.floatReasons.assist': 'Помощь',
   'hudChrome.warfare.floatReasons.firstWin': 'Первая победа',
+  'hudChrome.warfareShop.gossipOption': 'Просмотреть комплекты Боевой мощи',
+  'hudChrome.warfareShop.gossipOptionAria': 'Просмотреть магазин комплектов Боевой мощи у {name}',
   'hudChrome.warfareShop.jewelry': 'Украшения',
   'hudChrome.warfareShop.weapons': 'Оружие',
   'hudChrome.warfareShop.owned': 'Получено',
-  'hudChrome.warfareShop.ownedCount': 'Получено предметов: {owned} из {total}.',
-  'hudChrome.warfareShop.nextBonus': 'Ещё {remaining} до бонуса за {pieces} предметов.',
-  'hudChrome.warfareShop.setComplete': 'У вас есть все предметы комплекта.',
+  'hudChrome.warfareShop.ownedCountNext':
+    'Получено предметов: {owned} из {total}. Ещё {remaining} до бонуса за {pieces} предметов.',
+  'hudChrome.warfareShop.ownedCountComplete':
+    'Получено предметов: {owned} из {total}. У вас есть все предметы комплекта.',
   'hudChrome.warfareShop.buyOwnedAria': 'Купить {item} за {honor}, уже получено',
   'hudChrome.warfareShop.buyConfirmBody':
     'Купить {item} за {honor}? Покупки за честь не подлежат возврату.',

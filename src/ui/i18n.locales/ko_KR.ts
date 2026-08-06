@@ -858,12 +858,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '처치',
   'hudChrome.warfare.floatReasons.assist': '도움',
   'hudChrome.warfare.floatReasons.firstWin': '첫 승리',
+  'hudChrome.warfareShop.gossipOption': '워페어 세트 둘러보기',
+  'hudChrome.warfareShop.gossipOptionAria': '{name}이(가) 운영하는 워페어 세트 상점 둘러보기',
   'hudChrome.warfareShop.jewelry': '장신구',
   'hudChrome.warfareShop.weapons': '무기',
   'hudChrome.warfareShop.owned': '보유 중',
-  'hudChrome.warfareShop.ownedCount': '{total}개 중 {owned}개를 보유 중입니다.',
-  'hudChrome.warfareShop.nextBonus': '{pieces}개 세트 효과까지 {remaining}개 남았습니다.',
-  'hudChrome.warfareShop.setComplete': '모든 부위를 보유하고 있습니다.',
+  'hudChrome.warfareShop.ownedCountNext':
+    '{total}개 중 {owned}개를 보유 중입니다. {pieces}개 세트 효과까지 {remaining}개 남았습니다.',
+  'hudChrome.warfareShop.ownedCountComplete':
+    '{total}개 중 {owned}개를 보유 중입니다. 모든 부위를 보유하고 있습니다.',
   'hudChrome.warfareShop.buyOwnedAria': '{honor}에 {item} 구매, 이미 보유 중',
   'hudChrome.warfareShop.buyConfirmBody':
     '{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다.',

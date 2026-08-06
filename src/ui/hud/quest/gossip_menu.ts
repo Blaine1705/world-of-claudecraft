@@ -15,10 +15,11 @@ export interface GossipMenuContent {
   hasVendor: boolean;
   hasMarket: boolean;
   hasHeroicVendor: boolean;
-  /** The WARFARE quartermaster's sectioned honor shop (#warfare-window). It
-   *  REPLACES the generic goods row rather than sitting beside it, so without
-   *  its own field here the menu would read as empty for that NPC and close
-   *  itself the moment the player opened it. */
+  /** The WARFARE quartermaster's sectioned honor shop (#warfare-window). It sits
+   *  BESIDE the generic goods row rather than replacing it (a flagged NPC still
+   *  sells and buys back through the ordinary vendor window), so it needs its
+   *  own field here: a flagged NPC with an empty `vendorItems` list would
+   *  otherwise read as an empty menu and close itself the moment it opened. */
   hasWarfareVendor: boolean;
   hasDelveBoard: boolean;
   hasVcup: boolean;

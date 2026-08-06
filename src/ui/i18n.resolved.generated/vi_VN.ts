@@ -1510,12 +1510,13 @@ export const vi_VN: EnTranslations = {
       }
     },
     "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
       "jewelry": "Jewelry",
       "weapons": "Weapons",
       "owned": "Owned",
-      "ownedCount": "{owned} of {total} pieces owned.",
-      "nextBonus": "{remaining} more for the {pieces}-piece bonus.",
-      "setComplete": "You own every piece.",
+      "ownedCountNext": "{owned} of {total} pieces owned. {remaining} more for the {pieces}-piece bonus.",
+      "ownedCountComplete": "{owned} of {total} pieces owned. You own every piece.",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "Buy {item} for {honor}, already owned",
       "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."

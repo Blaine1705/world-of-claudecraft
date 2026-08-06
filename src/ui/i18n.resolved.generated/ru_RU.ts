@@ -1510,12 +1510,13 @@ export const ru_RU: EnTranslations = {
       }
     },
     "warfareShop": {
+      "gossipOption": "Просмотреть комплекты Боевой мощи",
+      "gossipOptionAria": "Просмотреть магазин комплектов Боевой мощи у {name}",
       "jewelry": "Украшения",
       "weapons": "Оружие",
       "owned": "Получено",
-      "ownedCount": "Получено предметов: {owned} из {total}.",
-      "nextBonus": "Ещё {remaining} до бонуса за {pieces} предметов.",
-      "setComplete": "У вас есть все предметы комплекта.",
+      "ownedCountNext": "Получено предметов: {owned} из {total}. Ещё {remaining} до бонуса за {pieces} предметов.",
+      "ownedCountComplete": "Получено предметов: {owned} из {total}. У вас есть все предметы комплекта.",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "Купить {item} за {honor}, уже получено",
       "buyConfirmBody": "Купить {item} за {honor}? Покупки за честь не подлежат возврату."

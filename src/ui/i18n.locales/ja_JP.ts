@@ -860,13 +860,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '撃破',
   'hudChrome.warfare.floatReasons.assist': 'アシスト',
   'hudChrome.warfare.floatReasons.firstWin': '初勝利',
+  'hudChrome.warfareShop.gossipOption': 'ウォーフェアセットを見る',
+  'hudChrome.warfareShop.gossipOptionAria': '{name}のウォーフェアセット商店を見る',
   'hudChrome.warfareShop.jewelry': 'アクセサリー',
   'hudChrome.warfareShop.weapons': '武器',
   'hudChrome.warfareShop.owned': '所有済み',
-  'hudChrome.warfareShop.ownedCount': '{total}個中{owned}個を所有しています。',
-  'hudChrome.warfareShop.nextBonus':
-    'あと{remaining}個で{pieces}個セットボーナスが有効になります。',
-  'hudChrome.warfareShop.setComplete': 'すべての部位を所有しています。',
+  'hudChrome.warfareShop.ownedCountNext':
+    '{total}個中{owned}個を所有しています。あと{remaining}個で{pieces}個セットボーナスが有効になります。',
+  'hudChrome.warfareShop.ownedCountComplete':
+    '{total}個中{owned}個を所有しています。すべての部位を所有しています。',
   'hudChrome.warfareShop.buyOwnedAria': '{item}を{honor}で購入、所有済み',
   'hudChrome.warfareShop.buyConfirmBody':
     '{item}を{honor}で購入しますか？名誉での購入は返金できません。',

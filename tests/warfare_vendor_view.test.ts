@@ -11,7 +11,8 @@ import { describe, expect, it } from 'vitest';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { FURY_STOCK } from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
-import type { ItemDef, ItemSet } from '../src/sim/types';
+import { Sim } from '../src/sim/sim';
+import type { InvSlot, ItemDef, ItemSet } from '../src/sim/types';
 import {
   buildWarfareVendorView,
   isWarfareVendorNpc,
@@ -20,7 +21,10 @@ import {
   WARFARE_SHOP_WEAPONS_KEY,
   type WarfareShopSetSection,
   type WarfareShopViewer,
+  type WarfareShopWorld,
+  warfareShopViewer,
 } from '../src/ui/hud/vendor/warfare_vendor_view';
+import { bareClient } from './helpers/bare_client';
 
 const SET_A = 'fixture_set_a';
 const SET_B = 'fixture_set_b';
@@ -340,6 +344,116 @@ describe('buildWarfareVendorView: owned marks and set progress', () => {
       SET_A,
     );
     expect(section.tiers.map((tier) => tier.pieces)).toEqual([2]);
+  });
+});
+
+describe('warfareShopViewer: the IWorld derivation, identical in both worlds', () => {
+  // Round-2 review finding: this derivation used to live in hud.ts, untested,
+  // and it is exactly where the offline Sim and the online ClientWorld mirror
+  // shapes could diverge. Driven here against BOTH shapes with the same data.
+  const CHEST = `${SET_A}_chest`;
+  const HELM = `${SET_A}_helmet`;
+  const POTION = 'minor_healing_potion';
+
+  function simWorld(): WarfareShopWorld {
+    const sim = new Sim({ seed: 7, playerClass: 'warrior', autoEquip: false });
+    // All three reads are GETTERS projecting off the primary PlayerMeta (which
+    // is private, and is NOT the player Entity), so the fixture writes that
+    // record: writing the Entity would leave every projection at its default.
+    const internals = sim as unknown as {
+      primaryId: number;
+      players: Map<
+        number,
+        {
+          honor: number;
+          inventory: InvSlot[];
+          equipment: Record<string, string | undefined>;
+        }
+      >;
+    };
+    const primary = internals.players.get(internals.primaryId);
+    if (!primary) throw new Error('primary player meta missing');
+    primary.honor = 4321;
+    primary.equipment = { chest: CHEST };
+    primary.inventory = [
+      { itemId: HELM, count: 1 },
+      { itemId: POTION, count: 5 },
+    ];
+    return sim;
+  }
+
+  function clientWorld(): WarfareShopWorld {
+    const client = bareClient(1);
+    client.honor = 4321;
+    client.equipment = { chest: CHEST };
+    client.inventory = [
+      { itemId: HELM, count: 1 },
+      { itemId: POTION, count: 5 },
+    ];
+    return client;
+  }
+
+  it('reads the balance, the WORN ids and the worn-or-carried ids off the seam', () => {
+    for (const [label, world] of [
+      ['Sim', simWorld()],
+      ['ClientWorld', clientWorld()],
+    ] as const) {
+      const viewerModel = warfareShopViewer(world);
+      expect(viewerModel.honor, label).toBe(4321);
+      expect([...viewerModel.equippedItemIds].sort(), label).toEqual([CHEST]);
+      expect([...viewerModel.ownedItemIds].sort(), label).toEqual([CHEST, HELM, POTION].sort());
+    }
+  });
+
+  it('produces the SAME viewer from the Sim and the ClientWorld mirror', () => {
+    const fromSim = warfareShopViewer(simWorld());
+    const fromClient = warfareShopViewer(clientWorld());
+    expect(fromClient.honor).toBe(fromSim.honor);
+    expect([...fromClient.equippedItemIds].sort()).toEqual([...fromSim.equippedItemIds].sort());
+    expect([...fromClient.ownedItemIds].sort()).toEqual([...fromSim.ownedItemIds].sort());
+  });
+
+  it('drops the empty equipment slots rather than counting them as worn ids', () => {
+    const client = bareClient(2);
+    client.honor = 0;
+    client.equipment = { chest: CHEST, legs: undefined, helmet: '' };
+    client.inventory = [];
+    const viewerModel = warfareShopViewer(client);
+    expect([...viewerModel.equippedItemIds]).toEqual([CHEST]);
+    expect([...viewerModel.ownedItemIds]).toEqual([CHEST]);
+  });
+
+  it('floors nothing and reports the raw honor: the balance floor is the view builder', () => {
+    const client = bareClient(3);
+    client.honor = 12.5;
+    expect(warfareShopViewer(client).honor).toBe(12.5);
+    expect(
+      buildWarfareVendorView([], {}, {}, { ...warfareShopViewer(client), setMemberCounts: {} })
+        .balance,
+    ).toBe(12);
+  });
+
+  it('does NOT see the bank: a stored piece reads as unowned (documented limitation)', () => {
+    // IWorldBank.bankInfo is null away from a banker, so the shop genuinely
+    // cannot observe stored gear. The consequence is a real one and is pinned
+    // here so the next reader does not assume bank coverage: a piece parked in
+    // the bank loses its Owned marker AND is missing from the owned-count line,
+    // which can invite a duplicate purchase of an unrefundable honor item.
+    const banked = bareClient(4);
+    banked.honor = 1000;
+    // Worn: nothing. Carried: nothing. The player owns the chest, in the bank.
+    banked.equipment = {};
+    banked.inventory = [];
+    const viewerModel = warfareShopViewer(banked);
+    expect(viewerModel.ownedItemIds.has(CHEST)).toBe(false);
+
+    const { stock, items, sets } = fixture();
+    const section = setSection(buildWarfareVendorView(stock, items, sets, viewerModel), SET_A);
+    expect(section.offers.find((o) => o.itemId === CHEST)?.owned).toBe(false);
+    expect(section.ownedPieces).toBe(0);
+    // The progress line therefore UNDERCOUNTS by the banked piece: it asks for
+    // two more when the player is one purchase away from the 2-piece tier.
+    expect(section.nextTier).toEqual({ pieces: 2, remaining: 2 });
   });
 });
 

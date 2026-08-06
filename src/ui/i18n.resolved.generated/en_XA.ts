@@ -1510,12 +1510,13 @@ export const en_XA: EnTranslations = {
       }
     },
     "warfareShop": {
+      "gossipOption": "[Ɓŕóŵšé Ŵáŕƒáŕé Šéţš]",
+      "gossipOptionAria": "[Ɓŕóŵšé ţĥé Ŵáŕƒáŕé šéţ šĥóþ óƒƒéŕéð ƀý {name}]",
       "jewelry": "[Ĵéŵéļŕý]",
       "weapons": "[Ŵéáþóñš]",
       "owned": "[Óŵñéð]",
-      "ownedCount": "[{owned} óƒ {total} þíéçéš óŵñéð.]",
-      "nextBonus": "[{remaining} ɱóŕé ƒóŕ ţĥé {pieces}-þíéçé ƀóñúš.]",
-      "setComplete": "[Ýóú óŵñ éʋéŕý þíéçé.]",
+      "ownedCountNext": "[{owned} óƒ {total} þíéçéš óŵñéð. {remaining} ɱóŕé ƒóŕ ţĥé {pieces}-þíéçé ƀóñúš.]",
+      "ownedCountComplete": "[{owned} óƒ {total} þíéçéš óŵñéð. Ýóú óŵñ éʋéŕý þíéçé.]",
       "buyAria": "[Ɓúý {item} ƒóŕ {honor}]",
       "buyOwnedAria": "[Ɓúý {item} ƒóŕ {honor}, áļŕéáðý óŵñéð]",
       "buyConfirmBody": "[Ɓúý {item} ƒóŕ {honor}? Ĥóñóŕ þúŕçĥášéš çáññóţ ƀé ŕéƒúñðéð.]"

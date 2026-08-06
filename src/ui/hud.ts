@@ -439,7 +439,7 @@ import {
   type VendorMultiple,
 } from './hud/vendor/vendor_view';
 import { renderVendorWindow } from './hud/vendor/vendor_window';
-import { buildWarfareVendorView } from './hud/vendor/warfare_vendor_view';
+import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_vendor_view';
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import {
   formatMoney as formatLocalizedMoney,
@@ -1561,6 +1561,13 @@ export class Hud {
   // (#warfare-window), NOT a third tenant of the shared #vendor-window
   // container: the sectioned layout is structurally different and wider.
   private openWarfareVendorNpcId: number | null = null;
+  // A STANDALONE trapping window (the train / unbind / crafting shape), NOT the
+  // vendor's non-trapping arrangement: that exception exists only because
+  // #vendor-window pairs with the #bags companion and a trap would fight it.
+  // The honor shop has no bags companion (its stock is soulbound with no sell
+  // value), and a flagged NPC still offers the ordinary goods row for the
+  // bags-paired window, so trapping Tab here costs nothing.
+  private readonly warfareWindowFocus = this.windowFocus('#warfare-window');
   private warfareVendorOpenerFocus: HTMLElement | null = null;
   // The show-jumping race: a slim, non-interactive bottom strip painted from the
   // authoritative world.mountRaceView() (never a cached copy). hud.ts keeps only
@@ -11733,6 +11740,12 @@ export class Hud {
           // A Heroic Marks purchase rides the same 'vendor' event; refresh the
           // shop so the balance and per-offer affordability update after a buy.
           if (this.openHeroicVendorNpcId !== null) this.renderHeroicVendor();
+          // An Honor purchase rides the same 'vendor' event, and OFFLINE nothing
+          // else repaints this window (onInventoryChanged fires only from bank
+          // ops and the online net path), so without this arm the balance, the
+          // per-offer affordability, the Owned marks and the owned-count line
+          // all stayed stale until a close and reopen.
+          if (this.openWarfareVendorNpcId !== null) this.renderWarfareVendor();
           // A delve Marks purchase rides the same 'vendor' event; refresh the shop
           // tab so the balance and per-offer affordability update after a buy.
           if (this.delveBoard.isOpen) this.renderDelveBoard();
@@ -14474,33 +14487,27 @@ export class Hud {
   // routing here, so the still-live element has to be handed in.
   openWarfareVendor(npcId: number, opener?: HTMLElement | null): void {
     this.closeOtherWindows('#warfare-window');
-    this.warfareVendorOpenerFocus =
-      opener !== undefined ? opener : this.focusManager.activeFocusable();
     this.openWarfareVendorNpcId = npcId;
     this.renderWarfareVendor();
+    // Install the standalone Tab trap (train / unbind / crafting shape) and take
+    // its capture as the opener, EXCEPT on the gossip route, which hides
+    // #quest-dialog before calling and therefore hands its own opener in.
+    const captured = this.warfareWindowFocus.captureFocus();
+    this.warfareVendorOpenerFocus = opener !== undefined ? opener : captured;
   }
 
   private renderWarfareVendor(): void {
     if (this.openWarfareVendorNpcId === null) return;
     const npc = this.sim.entities.get(this.openWarfareVendorNpcId);
     if (!npc) return;
-    // Both read through IWorld, so the owned marks and the piece counts resolve
-    // identically offline and online (equipment is what the set bonuses key on;
-    // bags plus equipment is what "already bought this" means).
-    const equippedItemIds = new Set(
-      Object.values(this.sim.equipment).filter((id): id is string => !!id),
-    );
-    const ownedItemIds = new Set([
-      ...equippedItemIds,
-      ...this.sim.inventory.map((slot) => slot.itemId),
-    ]);
     renderWarfareVendorWindow(
       $('#warfare-window'),
       entityDisplayName(npc),
+      // The honor balance, the worn ids and the worn-or-carried ids are derived
+      // in the pure core (warfareShopViewer), which reads only IWorld and is
+      // driven against both world shapes by tests/warfare_vendor_view.test.ts.
       buildWarfareVendorView(npc.vendorItems, ITEMS, ITEM_SETS, {
-        honor: this.sim.honor,
-        ownedItemIds,
-        equippedItemIds,
+        ...warfareShopViewer(this.sim),
         setMemberCounts: itemSetMemberCounts(),
       }),
       {
@@ -14517,8 +14524,9 @@ export class Hud {
     $('#warfare-window').style.display = 'none';
     this.openWarfareVendorNpcId = null;
     this.hideTooltip();
-    // Return focus to the opener (WCAG 2.4.3); mirrors closeHeroicVendor.
-    this.focusManager.restore(this.warfareVendorOpenerFocus);
+    // Release the Tab trap and return focus to the opener (WCAG 2.4.3); mirrors
+    // closeTrain / closeUnbind, the standalone trapping-window family.
+    this.warfareWindowFocus.restoreFocus(this.warfareVendorOpenerFocus);
     this.warfareVendorOpenerFocus = null;
   }
 
@@ -14528,6 +14536,10 @@ export class Hud {
   private requestWarfarePurchase(npcId: number, itemId: string): void {
     const item = ITEMS[itemId];
     if (!item) return;
+    // COUPLING: the title / accept / cancel labels are BORROWED from the Heroic
+    // Marks shop because they are currency-neutral today. Specializing any of
+    // the three heroicShop.buyConfirm* values for Marks would silently retitle
+    // this Honor dialog; mint warfareShop.* replacements here if that happens.
     this.confirmDialog(
       t('heroicShop.buyConfirmTitle'),
       t('hudChrome.warfareShop.buyConfirmBody', {

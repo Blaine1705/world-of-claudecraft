@@ -338,11 +338,14 @@ export class QuestDialogController {
         ),
       )
       .map((progress) => progress.questId);
-    // The WARFARE quartermaster REPLACES the generic goods row with its own
-    // sectioned window (gated on the NpcDef flag, never a hard-coded id), so the
-    // two never sit side by side wearing the same "Browse Goods" label.
+    // The WARFARE quartermaster ADDS its sectioned window (gated on the NpcDef
+    // flag, never a hard-coded id) BESIDE the generic goods row rather than
+    // replacing it: FURY shipped with a goods row, and suppressing it took
+    // selling and buyback away at an NPC that already had them. The two rows
+    // carry different labels and different accessible names, which is what the
+    // suppression was really there to avoid.
     const hasWarfareVendor = isWarfareVendorNpc(definition);
-    const hasVendor = npc.vendorItems.length > 0 && !hasWarfareVendor;
+    const hasVendor = npc.vendorItems.length > 0;
     // Station master (Professions 2.0): the resident master of a
     // crafting station (stations content masterNpcId) offers recipe training.
     const hasTraining = isStationMasterNpc(npc.templateId, world.stationPlacements);
@@ -451,7 +454,9 @@ export class QuestDialogController {
       html += `<button type="button" class="qd-list-item" data-heroic-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
     }
     if (hasWarfareVendor) {
-      html += `<button type="button" class="qd-list-item" data-warfare-shop="1" aria-label="${esc(t('questUi.dialog.browseGoodsAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('questUi.dialog.browseGoods'))}</button>`;
+      // Its OWN label and accessible name: this row sits beside the generic
+      // goods row above at a flagged NPC, so it can never reuse "Browse Goods".
+      html += `<button type="button" class="qd-list-item" data-warfare-shop="1" aria-label="${esc(t('hudChrome.warfareShop.gossipOptionAria', { name: npcName }))}"><span class="quest-complete">$</span> ${esc(t('hudChrome.warfareShop.gossipOption'))}</button>`;
     }
     if (hasDelveBoard) {
       const delve = Object.values(DELVES).find((entry) => entry.boardNpcId === npc.templateId);
