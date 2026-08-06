@@ -189,6 +189,44 @@ Current phase: 11 complete; next: 11 QA. Update this line as phases complete.
   QA rider; see the OPEN item), deleting the unreachable few/many overlay rows (the
   shipped house style fills all four leaves, secondsRemaining precedent), and
   deduping the 28-page pin (it is the fill tripwire, now commented as such).
+- Phase 11 QA (2026-08-06): release sync 0ed5a09b97 (deed union 263 deeds / 3060
+  Renown, hash re-baselined; corpse fixtures to the release side; 21 both-side parity
+  goldens re-minted from the merged tree; regen). Merge-drift fixes: pristine_claw
+  appended to RELIQUARY_PROFESSION_SPECIMEN_ITEMS with a bidirectional pin against
+  HARVEST_COMPONENT_SPECIMENS; guide.controls.reliquary row (Shift+X) with five
+  non-Latin fills and a guide pin. QA fixes: makeLazyLocaleChannel extraction
+  (src/ui/lazy_locale_channel.ts) with the CONTENT_LOCALE_CHANNEL_ENSURERS registry
+  (src/ui/locale_channels.ts) replacing the three literal loader blocks in main.ts
+  (identity membership + distinctness pinned); all-locale chord guard with localized
+  modifier spellings; derived entity-anchor sweep (19 pages x 5 locales, snug floor
+  95, Nythraxis pair excluded and pinned literally in ru); shipped-glossary
+  keyPattern validation; release-tier 18-locale full-manifest arm in
+  reliquary_i18n.test.ts registered in gate_steps/ci.yml/the tier pin (DELIBERATELY
+  red at I18N_RELEASE_TIER=1 until the Phase 22 fill, deed-sibling shape; expect one
+  extra red file on release/v0.35.0's own release-i18n run after merge); ko feature
+  name unified on 성물고 (compact CJK cognate; glossary reliquaryName row; per-locale
+  one-term guard; the ko Delve Day note names the delve 무너진 성물실, NOT the
+  feature term); esc() on focus-key/data-nav attributes; Object.hasOwn prototype-key
+  guards in both channels with fallback rows; .name scrape trailing-comment strip.
+  RULINGS: hud toast/banner arms stay source-scrape-pinned (mutation-proven: both
+  arms redden when reverted, and a resolver passthrough reddens 5 sentinel tests);
+  HEROIC_PREFIX stays a hand literal (it IS the recorded per-locale convention);
+  localeEntry stays bare-indexed (unreachable by ordering, proto rows pin the
+  resolver path); guide.reliquaryPage.howBody keeps 'default Shift+X' (a wiki
+  reference stating the default, outside the tips rationale); commit 6647fc383f's
+  claw/tusk phrasing quotes the release PR title (claw is the only specimen family).
+  INHERITED reds, not this branch: 3 full-suite failures (loot_window_controller x2,
+  material_profession_affinity sharp_claw) reproduce exactly at the release tip
+  303be34548 (PR 2905 landed without updating those suites); release-owned.
+  Release-fill native-pass notes (join the ru retro note): ja colon conventions
+  split (deed dungeon-heroics ASCII vs delve-heroics full-width; deedsRetroSummary
+  ASCII vs reliquaryRetroSummary full-width); cs/pl plural few leaves carry the
+  one-size genitive sentence; ko term confirmation (성물고); error.uniqueEquipped
+  (release-side sim_i18n) has no locale fills; ja POI duplicate
+  entities.zones.eastbrook_vale.pois.8.label renders the index-9 value; ko delve
+  strings use four different reliquary nouns (성물실/유물함/성물함/유물).
+  Phase 22 step recorded: extend the sweep's BUNDLES map when Latin chunks land
+  (the sweep trips on 'has no resolved bundle' otherwise).
 - Phase 12: (pending)
 - Phase 13: (pending)
 - Phase 14: (pending)

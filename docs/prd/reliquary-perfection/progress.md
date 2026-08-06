@@ -139,3 +139,54 @@ happened.
   the observed pre-existing terminology splits (ko/ja/ru Nythraxis and NPC
   transliterations, raidLockout heroic prefix, guide.nav.professions third term) to
   a maintainer call, recorded in state.md.
+
+### Phase 11 QA (2026-08-06)
+- Verdict: PASS-WITH-FOLLOWUPS (follow-ups are the release-fill native-pass notes,
+  the deliberate release-tier red, and the Phase 22 BUNDLES step, all in state.md;
+  nothing blocks the push). Closes by pushing this commit set to
+  origin/feature/reliquary (PR 2976).
+- Release sync 0ed5a09b97 (28 commits): deed catalog union resolved append-only
+  (release chronicle block first, Curator ranks re-appended at the tail; count,
+  renown, category, tail, and sha256 pins recomputed for the 263-deed / 3060-Renown
+  union), corpse-harvest fixtures took the release side (claw/tusk supersede the
+  branch's older seed re-pins; suites green unchanged), the 21 both-side-minted
+  parity goldens re-minted from the merged tree (UPDATE_PARITY=1 touched exactly
+  those 21), pending.ts and guide content regenerated. release-merge-audit (5
+  slices): two branch-owned drifts found, fixed this round (pristine_claw specimen
+  slot; the reliquary keybind missing from the guide controls reference); three
+  release-internal notes recorded with no action (error.uniqueEquipped fills ride
+  the release fill; the corpse_harvest_sim db mock covers 11 of 26 game.ts db
+  imports, latent only; the mob_component_tags census complement is
+  self-referential).
+- Audit shape: Explore context load; ultracode workflow (correctness sweep,
+  i18n-trap agent over the trap memories); frontend-seam-reviewer and qa-checklist
+  dispatched fresh; serial main-loop mutation pass; fresh-agent review of the fix
+  round; second mutation pass over the new pins.
+- Mutation evidence: 4/4 phase pins decisive (window shelf-row render, both hud
+  source-scrape arms, resolver passthrough reddened 5 tests) and 3/3 fix-round pins
+  decisive (registry identity drop, specimen bidirectional drop, ja anchor break);
+  green baselines proven before and after every run.
+- Found and fixed: 0 blocking. Should-fix set: the lazy-loader third copy
+  (extracted to makeLazyLocaleChannel + the CONTENT_LOCALE_CHANNEL_ENSURERS
+  registry), the en-only chord guard (now every locale plus localized modifier
+  spellings), the spot-check-only entity anchors (now a derived 95-cell sweep), the
+  unvalidated shipped glossary (keyPatterns pinned to the live key union), the
+  missing release-tier bar for the Latin page-name fill (18-locale full-manifest
+  runIf arm, registered three ways, deliberately red at release tier until Phase
+  22), and the ko feature-name split (unified on 성물고 with a glossary row and a
+  per-locale one-term guard). Applied nits: esc() on focus-key attributes,
+  prototype-key hasOwn guards in both channels, scrape and regex-pin hardening,
+  jsdoc truth-ups. The fresh review of the fix round then found 2 should-fix (the
+  ko Delve Day note pointing at the museum instead of the delve; glossary patterns
+  under-covering their own note) and 8 nits; applied in 064292546a with rulings for
+  the rest recorded in state.md.
+- Validation: npx tsc clean; ci:changed clean; full vitest 30983 passed with
+  exactly 3 failures proven INHERITED (they reproduce at the release tip
+  303be34548: PR 2905 landed without updating loot_window_controller and
+  material_profession_affinity; release-owned, not this branch); malware scan,
+  i18n freshness, and the full five-entry build all green; targeted batteries
+  green across every touched suite.
+- ja_JP screenshot spot-check (deferred criterion 1): PASS. Before/after desktop
+  and mobile committed under docs/screenshots/reliquary-page-i18n (before shows
+  English page names inside a Japanese window at the phase base; after is fully
+  localized and reflects the pristine_claw append at 3/213).
