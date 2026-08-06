@@ -339,7 +339,11 @@ describe('CI workflow parity', () => {
     expect(prChecks).toMatch(/^\s{4}needs: changes\s*$/m);
     expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-checks/);
     expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-gate/);
-    expect(prGate).toContain('run: npm test');
+    // Phase 2: pr-gate's test step runs through the selection-aware shard
+    // runner; the runner itself spawns `npm test` (pretest preserved), which
+    // tests/ci_shard_plan.test.ts pins behaviorally.
+    expect(prGate).toContain('run: node scripts/ci_shard_test.mjs');
+    expect(prGate).not.toContain('run: npm test');
     expect(prChecks).not.toContain('run: npm test');
     for (const step of CHECK_RUN_STEPS) {
       // Anchored to the start of a step line, so a YAML-commented-out step
@@ -410,6 +414,12 @@ describe('CI workflow parity', () => {
     expect(changes).toContain('id: filter');
     expect(changes).toContain('outputs:');
     expect(changes).toContain('code: ${{ steps.filter.outputs.code }}');
+    // Phase 2: the selection decision rides the same job's outputs, from the
+    // same single classifier step, so the two decisions cannot come from
+    // different listing snapshots.
+    expect(changes).toContain('test_mode: ${{ steps.filter.outputs.test_mode }}');
+    expect(changes).toContain('test_mode_reason: ${{ steps.filter.outputs.test_mode_reason }}');
+    expect(changes).toContain('changed_files: ${{ steps.filter.outputs.changed_files }}');
     // Anchored, not toContain: a YAML-commented-out step keeps the substring
     // but loses the indented shape, and this one line is the whole classifier.
     expect(changes).toMatch(/\n {8}run: node scripts\/detect_code_changes\.mjs\n/);
@@ -444,6 +454,14 @@ describe('CI workflow parity', () => {
     expect(detectEntry).toContain('detectCode');
     expect(detectEntry).toContain('GITHUB_OUTPUT');
     expect(detectEntry).toContain('code=${code}');
+    // Phase 2 wiring: the entry derives the test mode from the SAME listing
+    // (lib/ci_test_select.mjs) and writes all three selection outputs; the
+    // exact output shape is pinned end to end by the subprocess tests in
+    // tests/ci_change_classify.test.ts.
+    expect(detectEntry).toContain("from './lib/ci_test_select.mjs'");
+    expect(detectEntry).toContain('decideTestMode');
+    expect(detectEntry).toContain('test_mode=${modeDecision.mode}');
+    expect(detectEntry).toContain('changed_files=${JSON.stringify(');
     for (const [, sample] of CODE_PATH_SAMPLES) {
       expect(isCodePath(sample)).toBe(true);
     }
@@ -495,12 +513,15 @@ describe('CI workflow parity', () => {
     const prChecks = jobSource('pr-checks');
     const releaseGate = jobSource('release-gate');
     const releaseChecks = jobSource('release-checks');
-    // Both test jobs fan the ONE suite across the same N-shard matrix. The run
-    // line stays `npm test` (whose pretest regenerates the i18n artifacts in
-    // every shard: the S3 guard, guide freshness, and the git-subprocess suites
-    // need them regardless of which shard they hash into), never a bare vitest
-    // invocation. fail-fast stays off so shards pass or fail independently and
-    // a red run always reports the whole suite.
+    // Both test jobs fan the ONE suite across the same N-shard matrix.
+    // release-gate keeps the raw `npm test -- --shard` run line (selection
+    // never touches a release ref); pr-gate runs the same suite through the
+    // selection-aware shard runner, which spawns `npm test` itself so pretest
+    // still regenerates the i18n artifacts in every shard (the S3 guard, guide
+    // freshness, and the git-subprocess suites need them regardless of which
+    // shard they hash into). Never a bare vitest invocation in the workflow.
+    // fail-fast stays off so shards pass or fail independently and a red run
+    // always reports the whole suite.
     const halfCoreCap =
       '--maxWorkers="$(node -p \'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))\')"';
     const shardMatrixLine = `shard: [${SHARD_MATRIX}]`;
@@ -509,14 +530,34 @@ describe('CI workflow parity', () => {
       expect(job).toContain('strategy:');
       expect(job).toContain('fail-fast: false');
       expect(job).toContain(shardMatrixLine);
-      expect(job).toContain(shardRunPrefix);
-      expect(job).toContain(halfCoreCap);
     }
+    expect(releaseGate).toContain(shardRunPrefix);
+    expect(releaseGate).toContain(halfCoreCap);
     const shardRunRe = new RegExp(
       String.raw`run: npm test -- --shard=\$\{\{ matrix\.shard \}\}\/${SHARD_N}`,
       'g',
     );
-    expect(workflow.match(shardRunRe)).toHaveLength(2);
+    expect(workflow.match(shardRunRe)).toHaveLength(1);
+    // Phase 2 pin, anchored name-to-env-to-run adjacency: the selection inputs
+    // ride an env block (a `run:`-line interpolation of PR-controlled filenames
+    // would be a workflow-injection surface), the run line is the shard runner
+    // with the matrix shard spec, and a YAML-commented-out step cannot satisfy
+    // the shape. Release jobs must never pick this line up.
+    expect(prGate).toMatch(
+      new RegExp(
+        String.raw`- name: Run tests \(PR tier, shard \$\{\{ matrix\.shard \}\} of ${SHARD_N}\)\n` +
+          String.raw` {8}env:\n` +
+          String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
+          String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
+          String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
+          String.raw` {8}run: node scripts/ci_shard_test\.mjs --shard=\$\{\{ matrix\.shard \}\}/${SHARD_N}\n`,
+      ),
+    );
+    expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(1);
+    for (const job of [releaseGate, releaseChecks, jobSource('release-i18n')]) {
+      expect(job).not.toContain('ci_shard_test.mjs');
+      expect(job).not.toContain('TEST_MODE');
+    }
     // Legacy N=4 run lines must not remain once SHARD_N has moved on.
     // String(SHARD_N) comparison avoids tsc folding a constant always-true arm.
     if (String(SHARD_N) !== '4') {
