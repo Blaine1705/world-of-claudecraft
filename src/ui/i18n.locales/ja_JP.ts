@@ -2539,6 +2539,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.questRules': '売却、銀行預け入れ、取引はできません。',
   'itemUi.tooltip.questOrphaned': '進行中のクエストでは必要ありません。',
   'itemUi.tooltip.classes': 'クラス: {classes}',
+  'itemUi.tooltip.maxStack': 'スタック上限: {count}',
   'itemUi.tooltip.sellPrice': '売却価格: {money}',
   'itemUi.tooltip.clickBuy': 'クリックして購入',
   'itemUi.tooltip.clickSell': 'クリックして売却',

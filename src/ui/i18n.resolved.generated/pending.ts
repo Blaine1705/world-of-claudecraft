@@ -1525,8 +1525,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle",
-    "itemUi.tooltip.maxStack"
+    "hudChrome.pvp.launcherTitle"
   ],
   "zh_TW": [
     "hudChrome.bg.clock",
@@ -1537,8 +1536,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle",
-    "itemUi.tooltip.maxStack"
+    "hudChrome.pvp.launcherTitle"
   ],
   "ko_KR": [
     "hudChrome.bg.clock",
@@ -1549,8 +1547,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle",
-    "itemUi.tooltip.maxStack"
+    "hudChrome.pvp.launcherTitle"
   ],
   "ja_JP": [
     "hudChrome.bg.clock",
@@ -1561,8 +1558,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle",
-    "itemUi.tooltip.maxStack"
+    "hudChrome.pvp.launcherTitle"
   ],
   "pt_BR": [
     "abilityUi.cast.crafting",
@@ -1824,8 +1820,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle",
-    "itemUi.tooltip.maxStack"
+    "hudChrome.pvp.launcherTitle"
   ],
   "cs_CZ": [
     "abilityUi.cast.crafting",

@@ -7411,7 +7411,7 @@ export const ko_KR: EnTranslations = {
       "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",
       "questOrphaned": "진행 중인 퀘스트에 필요하지 않습니다.",
       "classes": "직업: {classes}",
-      "maxStack": "Max stack: {count}",
+      "maxStack": "최대 중첩: {count}",
       "sellPrice": "판매 가격: {money}",
       "clickBuy": "클릭하여 구매",
       "clickSell": "클릭하여 판매",

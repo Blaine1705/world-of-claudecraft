@@ -7411,7 +7411,7 @@ export const ru_RU: EnTranslations = {
       "questRules": "Нельзя продать, положить в банк или обменять.",
       "questOrphaned": "Не нужен ни для одного активного задания.",
       "classes": "Классы: {classes}",
-      "maxStack": "Max stack: {count}",
+      "maxStack": "Максимум в стопке: {count}",
       "sellPrice": "Цена продажи: {money}",
       "clickBuy": "Нажмите, чтобы купить",
       "clickSell": "Нажмите, чтобы продать",

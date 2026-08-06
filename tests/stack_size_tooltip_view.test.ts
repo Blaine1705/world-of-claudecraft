@@ -25,9 +25,10 @@ describe('stackSizeTooltipLine', () => {
     const consumables = Object.values(ITEMS).filter(
       (def) => def.kind === 'potion' || def.kind === 'elixir',
     );
-    // Vendor ladder (3 healing + 3 mana) plus the crafted alchemy ladder
-    // (6 draughts, 3 elixirs) and the bear combo elixir.
-    expect(consumables.length).toBeGreaterThanOrEqual(13);
+    // 16 at authoring time (the vendor ladders, the crafted alchemy ladder,
+    // and the combo elixirs); a floor rather than an exact pin so new potion
+    // content does not break an unrelated tooltip sweep.
+    expect(consumables.length).toBeGreaterThanOrEqual(16);
     for (const def of consumables) {
       expect(stackSizeTooltipLine(def), `${def.id} must state its stack cap`).toBe(
         '<div class="tt-sub">Max stack: 20</div>',
@@ -35,12 +36,26 @@ describe('stackSizeTooltipLine', () => {
     }
   });
 
-  it('renders nothing for every 1-per-slot kind (weapon, armor, bag, tool)', () => {
-    for (const id of ['worn_sword', 'recruit_tunic', 'silkspun_satchel', 'riding_training']) {
+  it('renders nothing for every 1-per-slot kind (weapon, armor, held_offhand, bag, tool)', () => {
+    for (const id of [
+      'worn_sword',
+      'recruit_tunic',
+      'valefire_lantern',
+      'silkspun_satchel',
+      'riding_training',
+    ]) {
       const def = ITEMS[id];
       expect(def, `${id} must exist`).toBeDefined();
       expect(stackSizeOf(def), `${id} must be 1-per-slot`).toBe(1);
       expect(stackSizeTooltipLine(def), `${id} must render no line`).toBe('');
+    }
+  });
+
+  it('renders nothing for mount reins, whose bag stacking is a non-fact to a collector', () => {
+    const mounts = Object.values(ITEMS).filter((def) => def.kind === 'mount');
+    expect(mounts.length).toBeGreaterThanOrEqual(1);
+    for (const def of mounts) {
+      expect(stackSizeTooltipLine(def), `${def.id} must render no line`).toBe('');
     }
   });
 

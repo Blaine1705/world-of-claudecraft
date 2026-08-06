@@ -17,6 +17,12 @@ import { formatNumber, t } from './i18n';
 
 /** The "Max stack: N" sub-line for a stackable item, or '' for a 1-per-slot one. */
 export function stackSizeTooltipLine(item: ItemDef): string {
+  // Mount reins technically ride the consumable stack default in the bags,
+  // but owning the reins IS owning the mount: a second copy is pure waste
+  // (noVendorSell, and the bulk-buy path refuses them), so advertising a
+  // 20-per-slot cap would teach hoarding a collectible. Suppressed, like the
+  // 1-per-slot kinds below.
+  if (item.kind === 'mount') return '';
   const size = stackSizeOf(item);
   if (size <= 1) return '';
   const text = t('itemUi.tooltip.maxStack', {
