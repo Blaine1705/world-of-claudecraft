@@ -190,3 +190,9 @@ happened.
   and mobile committed under docs/screenshots/reliquary-page-i18n (before shows
   English page names inside a Japanese window at the phase base; after is fully
   localized and reflects the pristine_claw append at 3/213).
+- Second base sync before push (575b5ceb88): the AAA-enhancements landing (PR 2947)
+  moved the base again; 29 both-side parity goldens plus pet_ai re-minted from the
+  merged tree, pending.ts regenerated, and the 3015 claw/tusk craft consumers clear
+  the three inherited reds recorded above. Full gate re-run green (the one browser
+  regression failure was a dynamic-import cold-start flake, 16/16 files green
+  standalone; typecheck and all builds green).
