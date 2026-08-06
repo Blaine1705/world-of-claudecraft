@@ -4989,7 +4989,7 @@ export const TARGETS = [
       'sim/pvp/power',
       'content/zone3',
     ],
-    // Three scenes behind one entry, because they are three views of ONE change
+    // Four scenes behind one entry, because they are four views of ONE change
     // and each has to be shot the same way on both trees for the pair to mean
     // anything. `scene` selects the recipe, the battleground target's precedent.
     //
@@ -5003,6 +5003,11 @@ export const TARGETS = [
     //   sheet         The character sheet with a complete 11-slot WARFARE kit
     //                 worn, which is where the Warfare rating line moved (the
     //                 0.20 caps went to 0.30 and a full kit now reaches them).
+    //   tooltip       A WARFARE armor piece hovered in the bag while a PARTIAL
+    //                 kit is worn, so the tooltip's set block shows a lit tier
+    //                 beside two dim ones. AFTER only, and honestly so: the base
+    //                 tree tags no WARFARE item with a set, so there is no set
+    //                 block to shoot on that side at all.
     variants: [
       { key: 'shop-desktop', scene: 'shop', charClass: 'warrior', charName: 'Warbrand' },
       {
@@ -5019,6 +5024,12 @@ export const TARGETS = [
         charName: 'Warbrand',
       },
       { key: 'char-sheet-desktop', scene: 'sheet', charClass: 'warrior', charName: 'Warbrand' },
+      {
+        key: 'item-tooltip-set-bonuses-desktop',
+        scene: 'tooltip',
+        charClass: 'warrior',
+        charName: 'Warbrand',
+      },
     ],
     async capture(page, variant) {
       // The overlays that can outlive entry, the vendor-tool-gate sweep. No
@@ -5106,7 +5117,14 @@ export const TARGETS = [
           if (shape.sections < 4) {
             throw new Error(`expected the four armor sections at least, saw ${shape.sections}`);
           }
-          if (shape.progress === 0) throw new Error('no set carries the owned-count progress line');
+          // The owned-count sentence was CUT from the window (the lit and dim
+          // tier rows plus the per-tile Owned marker already carry it), so the
+          // frame is only honest when nothing renders it. Asserted as an
+          // absence rather than dropped, or a re-added line would slip back
+          // into the shot unnoticed.
+          if (shape.progress > 0) {
+            throw new Error('the owned-count progress line is still rendered');
+          }
           if (shape.bonuses === 0) throw new Error('no set carries a bonus tier line');
           if (shape.owned === 0) throw new Error('no tile is marked owned');
           if (!shape.balance) throw new Error('the shop shows no honor balance');
@@ -5162,6 +5180,93 @@ export const TARGETS = [
           }
         });
         return {};
+      }
+
+      if (variant.scene === 'tooltip') {
+        // The item tooltip's set block, which is the surface the shop's
+        // owned-count sentence was cut in favor of. A PARTIAL kit is the whole
+        // point of the frame: three pieces worn lights the 2-piece tier and
+        // leaves the 4- and 7-piece tiers dim, so one shot carries both
+        // treatments. A complete kit would light every row and prove nothing.
+        //
+        // The HOVERED piece is deliberately not one of the worn three: it sits
+        // in the bag, so the hover runs the real bag tooltip path and the
+        // header's count stays the honest worn count.
+        const staged = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim) return { ok: false, reason: 'no sim' };
+          // The tier is level 20, so raise the player before equipping or the
+          // equip silently refuses and no tier can read as met.
+          try {
+            sim.setPlayerLevel?.(20);
+          } catch {}
+          for (const id of ['furyforged_warhelm', 'furyforged_warspaulders', 'furyforged_girdle']) {
+            try {
+              sim.addItem(id, 1);
+              sim.equipItem(id);
+            } catch {}
+          }
+          try {
+            sim.addItem('furyforged_warplate', 1);
+          } catch {}
+          const meta = sim.players.get(sim.primaryId);
+          const worn = Object.values(meta?.equipment ?? {}).filter((id) =>
+            String(id).startsWith('furyforged_'),
+          ).length;
+          const el = document.querySelector('#bags');
+          if (el) el.style.display = 'none';
+          game?.hud?.toggleBags?.();
+          return { ok: true, worn };
+        });
+        if (!staged.ok) throw new Error(`warfare tooltip setup failed: ${staged.reason}`);
+        if (staged.worn !== 3) {
+          throw new Error(`expected the partial 3-piece kit, saw ${staged.worn} worn`);
+        }
+        // toggleBags tracks logical open state, so a page where the bags are
+        // already logically open needs a second toggle to reopen (the
+        // masterwork-tooltip target's precedent).
+        let open = await pollForSize(page, '#bags');
+        if (!open) {
+          await page.evaluate(() => window.__game?.hud?.toggleBags?.());
+          open = await pollForSize(page, '#bags');
+        }
+        if (!open) throw new Error('the bags window did not open');
+        await page.evaluate(() => {
+          document.querySelector('.camera-prompt-confirm')?.click();
+          // The Ravenpost mail toast lands a few seconds into every offline
+          // session and can straddle the capture.
+          const banner = document.querySelector('#banner');
+          if (banner) banner.style.display = 'none';
+          // Real focus fires attachTooltip's focusin arm (the keyboard-nav
+          // path), a sturdier trigger than a synthetic mouseenter in headless.
+          const cell = Array.from(document.querySelectorAll('#bags button')).find((b) =>
+            b.getAttribute('aria-label')?.includes('Furyforged Warplate'),
+          );
+          cell?.scrollIntoView({ block: 'center' });
+          cell?.focus();
+        });
+        if (!(await pollForSize(page, '#tooltip'))) {
+          throw new Error('the item tooltip never appeared through the hover path');
+        }
+        await wait(300);
+        // Verify the frame carries exactly what the shot claims: the set
+        // header, the three tiers, and ONE of them lit. No contrast, no shot.
+        const block = await page.evaluate(() => {
+          const tip = document.querySelector('#tooltip');
+          const rows = [...(tip?.querySelectorAll('.tt-set-bonus') ?? [])];
+          return {
+            header: tip?.querySelector('.tt-set-name')?.textContent ?? '',
+            rows: rows.length,
+            lit: rows.filter((r) => r.classList.contains('active')).length,
+          };
+        });
+        if (!block.header) throw new Error('the tooltip carries no set-name header');
+        if (block.rows !== 3) {
+          throw new Error(`expected the 2, 4 and 7 piece tiers, saw ${block.rows} rows`);
+        }
+        if (block.lit !== 1) throw new Error(`expected one lit tier, saw ${block.lit}`);
+        return { clip: '#tooltip' };
       }
 
       // scene 'sheet': a complete 11-slot WARFARE kit worn, which is the only
