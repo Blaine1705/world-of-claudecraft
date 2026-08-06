@@ -37,8 +37,14 @@ export {
   pvpDamageMultiplier,
   pvpFractionsFromRatings,
 } from './power';
-export {
-  spawnWarfareQuartermaster,
-  WARFARE_QUARTERMASTER_ENTITY_ID,
-  WARFARE_QUARTERMASTER_NPC_ID,
-} from './warfare_quartermaster';
+// warfare_quartermaster.ts is DELIBERATELY not re-exported here. It needs
+// createNpc from '../entity' at runtime, and entity.ts imports this barrel for
+// pvpFractionsFromRatings, so re-exporting it would close a value-level ESM
+// cycle (entity -> pvp/index -> warfare_quartermaster -> entity). That happens
+// to work today only because createNpc is called function-scoped; the day
+// anything in the directory reaches for it at module scope it breaks at import
+// time with an unhelpful error. Every other pvp import was type-only, so this
+// is the one module that would make a leaf directory cycle-fragile.
+//
+// Its single consumer is the Sim coordinator during world init, so it is not
+// public API in any meaningful sense: import it by path.

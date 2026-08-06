@@ -1,5 +1,5 @@
 // Warmarshal Draven Kole, the Highwatch WARFARE quartermaster (phase 4 of the
-// WARFARE tier refactor, docs/warfare-refactor/04-vendor-and-shop.md).
+// WARFARE tier refactor).
 //
 // Three things can go wrong with this NPC and none of them is visible in a diff:
 // he can perturb the deterministic world build (the whole reason for the
@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
 import { STATIONS } from '../src/sim/content/professions';
-import { FURY_ENTITY_ID, FURY_NPC_ID, FURY_STOCK } from '../src/sim/content/pvp_honor';
+import { FURY_ENTITY_ID, FURY_NPC, FURY_NPC_ID, FURY_STOCK } from '../src/sim/content/pvp_honor';
 import { ZONE3_NPCS, ZONE3_ZONE } from '../src/sim/content/zone3';
 import { BUILTIN_WORLD, ITEMS, NPCS, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { GRAVE_COUNT, GRAVE_RADIUS, graveOffset } from '../src/sim/prop_layout';
@@ -19,7 +19,7 @@ import {
   spawnWarfareQuartermaster,
   WARFARE_QUARTERMASTER_ENTITY_ID,
   WARFARE_QUARTERMASTER_NPC_ID,
-} from '../src/sim/pvp';
+} from '../src/sim/pvp/warfare_quartermaster';
 import { Sim } from '../src/sim/sim';
 import { VALE_CUP_BRAM_ID } from '../src/sim/social/vale_cup';
 import { townPropPlacements } from '../src/sim/town_props';
@@ -54,11 +54,25 @@ describe('Warmarshal Draven Kole: the definition', () => {
     expect(FURY_STOCK.length).toBeGreaterThan(0);
   });
 
-  it('is an honor vendor purely by virtue of its priced stock, with no flag', () => {
+  it('carries the warfareVendor flag on BOTH placements, so the shop is not Highwatch-only', () => {
+    // The flag routes the sectioned shop WINDOW (isWarfareVendorNpc). Without it
+    // an NPC silently falls back to the flat vendor grid, which still sells the
+    // whole stock for honor, so a dropped flag is invisible except as a worse
+    // window. FURY is the Eastbrook mirror of the identical stock and must
+    // present identically; nothing else asserted either flag.
+    expect(KOLE.warfareVendor, 'Warmarshal Draven Kole').toBe(true);
+    expect(FURY_NPC.warfareVendor, 'FURY, the Eastbrook mirror').toBe(true);
+    // And the two really do sell the same list, not a copy that can drift.
+    expect(KOLE.vendorItems).toEqual(FURY_NPC.vendorItems);
+    expect(KOLE.vendorItems).toEqual([...FURY_STOCK]);
+  });
+
+  it('is an honor vendor purely by virtue of its priced stock, not by a flag', () => {
     // There is no honor-vendor flag: the buy path, range gate, balance debit and
     // gossip row are all generic over a non-empty vendorItems whose entries carry
-    // priceHonor. Pin that, and pin that he did NOT pick up the id-keyed heroic
-    // vendor flag by accident.
+    // priceHonor. The warfareVendor flag above is a WINDOW routing hint only and
+    // is never read by the purchase path. Pin that, and pin that he did NOT pick
+    // up the id-keyed heroic vendor flag by accident.
     expect(KOLE.heroicVendor).toBeUndefined();
     expect(KOLE.market).toBeUndefined();
     expect(KOLE.banker).toBeUndefined();

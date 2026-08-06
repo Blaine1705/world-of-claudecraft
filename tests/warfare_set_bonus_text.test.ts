@@ -1,11 +1,12 @@
 // The 7-piece set bonus TEXT, end to end.
 //
-// docs/warfare-refactor/05-verification.md records that this has "no automated
-// backstop: the i18n coverage guard only validates registered fields". That was
-// true of the shape it was written against. The defect it was worried about is
-// real and specific: every shipped set used 2/3/4 piece tiers, and three separate
-// places hard coded that assumption behind a ternary chain ending in 'bonus4', so
-// a 7-piece tier RENDERED THE WRONG TEXT rather than failing. Generalizing the
+// This exists because the i18n coverage guard could not catch the defect that
+// mattered. That guard validates that a REGISTERED field exists and is
+// translated; it cannot tell you which field a tier resolves to. Every shipped
+// set used 2/3/4 piece tiers, and three separate places hard coded that
+// assumption behind a ternary chain ending in 'bonus4' (the entity-i18n
+// resolver, the catalog builder, and the hud tooltip), so the WARFARE families'
+// 7-piece tier RENDERED THE WRONG TEXT rather than failing. Generalizing the
 // field to bonus${pieces} fixed the mechanism; this file is the backstop, so the
 // ternary chain cannot grow back.
 //

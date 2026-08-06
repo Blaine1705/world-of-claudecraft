@@ -176,13 +176,18 @@ describe('gear-plus-set WARFARE rating clamps exactly once', () => {
 });
 
 describe('the crowd-control duration hook', () => {
+  // EVERY member of CrowdControlDrCategory. Exhaustiveness is the point of this
+  // sweep, so the list is pinned against the union below rather than hand-kept:
+  // a new category added to types.ts without a case here would otherwise ship
+  // unreduced and silently green.
   const CATEGORIES: CrowdControlDrCategory[] = [
+    'root',
+    'polymorph',
+    'fear',
+    'lockout',
     'openerStun',
     'controlledStun',
-    'fear',
-    'polymorph',
-    'root',
-    'lockout',
+    'randomStun',
   ];
 
   function duelists(): { sim: Sim; source: Entity; target: Entity } {
@@ -205,6 +210,22 @@ describe('the crowd-control duration hook', () => {
         ) => number | null;
       }
     ).diminishedCrowdControlDuration(source, target, cat, dur);
+
+  it('sweeps every crowd-control category the union declares', () => {
+    // A compile-time exhaustiveness check would be erased at runtime, so pin the
+    // list against the type's own members by construction: every key here must be
+    // assignable, and the count must match what types.ts declares.
+    const declared: Record<CrowdControlDrCategory, true> = {
+      root: true,
+      polymorph: true,
+      fear: true,
+      lockout: true,
+      openerStun: true,
+      controlledStun: true,
+      randomStun: true,
+    };
+    expect([...CATEGORIES].sort()).toEqual(Object.keys(declared).sort());
+  });
 
   it.each(CATEGORIES)('reduces %s duration, not just the generic ladder exit', (category) => {
     const { sim, source, target } = duelists();

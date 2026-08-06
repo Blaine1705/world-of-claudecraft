@@ -460,6 +460,11 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
+// By path, not through the pvp barrel: see the comment in src/sim/pvp/index.ts.
+import {
+  spawnWarfareQuartermaster,
+  WARFARE_QUARTERMASTER_NPC_ID,
+} from './pvp/warfare_quartermaster';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
@@ -2365,10 +2370,10 @@ export class Sim {
     // Warmarshal Draven Kole in Highwatch: the same reserved-id, rng-free
     // treatment as Bram and FURY above. See src/sim/pvp/warfare_quartermaster.ts.
     {
-      const kole = worldContent.npcs[honorMod.WARFARE_QUARTERMASTER_NPC_ID];
+      const kole = worldContent.npcs[WARFARE_QUARTERMASTER_NPC_ID];
       if (kole) {
         const safe = this.findSafePos(kole.pos.x, kole.pos.z, waterLevel() + 0.6);
-        honorMod.spawnWarfareQuartermaster(this.ctx, kole, safe);
+        spawnWarfareQuartermaster(this.ctx, kole, safe);
       }
     }
 

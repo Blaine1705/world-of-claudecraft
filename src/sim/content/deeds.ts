@@ -2667,9 +2667,14 @@ export const DEEDS: Record<string, DeedDef> = {
   // shipped is credited by the join-time retro pass. Rank names follow the
   // classic-era PvP ladder and lead up to Warmarshal Draven Kole, so the
   // quartermaster reads as the top of the chain of command being climbed.
-  // Thresholds derive from the honor-income model in
-  // docs/warfare-refactor/02-gear-and-sets.md section 2.5 (about 900 honor
-  // per committed day): roughly 11, 44, and 167 committed days.
+  // Thresholds derive from a modelled ~900 honor per committed day of
+  // Thornhollow Fields (result honor plus the uncapped per-kill drip, after the
+  // per-opponent daily decay in src/sim/pvp/honor.ts), so roughly 11, 44 and 167
+  // committed days. Sergeant deliberately lands a little AFTER the 7,550-honor
+  // complete kit, so the first title rewards finishing the gear grind rather than
+  // being a step along it. The thresholds are the tunable here; the income
+  // assumption they rest on is written down so they can be moved with evidence
+  // rather than by feel.
   pvp_honor_sergeant: {
     id: 'pvp_honor_sergeant',
     name: 'Sergeant',

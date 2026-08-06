@@ -1,5 +1,5 @@
 // Phase 3 of the WARFARE tier refactor: the lifetimeHonor deed meter and the
-// three rank titles it grants (docs/warfare-refactor/03-prestige-and-titles.md).
+// three rank titles it grants.
 //
 // The two properties that matter, and the reason this file exists rather than a
 // few more rows in tests/deeds_content.test.ts (which pins the catalog, not the
@@ -20,7 +20,7 @@ import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { ITEMS } from '../src/sim/data';
 import { deedIdsForDirtyKey, METER_DIRTY_KEYS, narrowKeysForTrigger } from '../src/sim/deeds';
 import * as items from '../src/sim/items';
-import { grantHonor } from '../src/sim/pvp/honor';
+import { awardBattlegroundKillHonor, grantHonor } from '../src/sim/pvp/honor';
 import type { CharacterState, PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -159,6 +159,35 @@ describe('the lifetimeHonor meter declares no narrow dirty key', () => {
     const sim = world();
     const { pid, meta } = atQuartermaster(sim);
     grantHonor(ctxOf(sim), meta, LADDER[0].amount, 'arena_win');
+    ctxOf(sim).markDeedsDirty(pid);
+    const events = sim.tick();
+    expect(meta.deedsEarned.has(LADDER[0].id)).toBe(true);
+    expect(unlockEvents(events).map((e) => e.deedId)).toContain(LADDER[0].id);
+  });
+
+  it('defers a rank crossed by the MID-MATCH drip until the next full pass', () => {
+    // The honest half, which the cases above mask by marking dirty themselves.
+    // The three RESULT sites mark a full pass, but the per-kill and per-assist
+    // drip does not, so a threshold crossed by a killing blow lands at the end of
+    // the match rather than on that tick. Pinned rather than fixed: adding a mark
+    // to the per-kill path would put deed work on a combat hot path to make a
+    // cosmetic title appear a few minutes sooner. If that trade is ever revisited,
+    // this test is the one that should change, deliberately.
+    const sim = world();
+    const { pid, meta } = atQuartermaster(sim);
+    grantHonor(ctxOf(sim), meta, LADDER[0].amount - 1, 'arena_win');
+    ctxOf(sim).markDeedsDirty(pid);
+    sim.tick();
+    expect(meta.deedsEarned.has(LADDER[0].id), 'not yet at the threshold').toBe(false);
+
+    // Cross it through the drip, which marks nothing.
+    const kills = new Map<string, number>();
+    awardBattlegroundKillHonor(ctxOf(sim), meta, 999, kills);
+    expect(meta.lifetimeHonor).toBeGreaterThanOrEqual(LADDER[0].amount);
+    sim.tick();
+    expect(meta.deedsEarned.has(LADDER[0].id), 'the drip alone does not grant').toBe(false);
+
+    // The next full pass, which any result award requests, lands it.
     ctxOf(sim).markDeedsDirty(pid);
     const events = sim.tick();
     expect(meta.deedsEarned.has(LADDER[0].id)).toBe(true);

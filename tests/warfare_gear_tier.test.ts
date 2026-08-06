@@ -460,3 +460,74 @@ describe('the seven-of-seven capstone closes the hybrid build', () => {
     }
   });
 });
+
+describe('the WARFARE capstone signature procs', () => {
+  // The auditor's gap: the negatives (a set effect carries no flat stats) were
+  // pinned, but nothing pinned the POSITIVE arm, that a complete kit actually
+  // puts a signature on the wearer, nor the magnitudes, ids, aura kinds or the
+  // pvpOnly flag that makes them inert in PvE.
+  const SIGNATURES: Record<string, { id: string; trigger: string; aura: string }> = {
+    warfare_furyforged: { id: 'set_warfare_unbroken_oath', trigger: 'kill', aura: 'absorb' },
+    warfare_ashstalker: { id: 'set_warfare_ashen_step', trigger: 'kill', aura: 'buff_speed' },
+    warfare_stormbound: { id: 'set_warfare_emberward', trigger: 'spellCast', aura: 'absorb' },
+    warfare_cinderweave: { id: 'set_warfare_emberward', trigger: 'spellCast', aura: 'absorb' },
+  };
+
+  it('puts exactly one signature on the 7-piece tier of every family, and none below it', () => {
+    for (const [setId, expected] of Object.entries(SIGNATURES)) {
+      const set = ITEM_SETS[setId];
+      expect(set, setId).toBeDefined();
+      for (const tier of set.bonuses) {
+        const proc = tier.effect.proc;
+        if (tier.pieces === 7) {
+          expect(proc, `${setId} capstone must carry a signature`).toBeDefined();
+          expect(proc?.id, setId).toBe(expected.id);
+          expect(proc?.trigger, setId).toBe(expected.trigger);
+          expect(proc?.aura, setId).toBe(expected.aura);
+          // The whole reason these are safe in PvE.
+          expect(proc?.pvpOnly, `${setId} signature must be PvP gated`).toBe(true);
+        } else {
+          expect(proc, `${setId} ${tier.pieces}-piece must carry no proc`).toBeUndefined();
+        }
+      }
+    }
+  });
+
+  it('pins each signature magnitude, so a retune cannot drift silently', () => {
+    const oath = ITEM_SETS.warfare_furyforged.bonuses.find((b) => b.pieces === 7)?.effect.proc;
+    expect([oath?.value, oath?.duration, oath?.chance]).toEqual([200, 10, 1]);
+    const step = ITEM_SETS.warfare_ashstalker.bonuses.find((b) => b.pieces === 7)?.effect.proc;
+    expect([step?.value, step?.duration, step?.chance]).toEqual([1.4, 6, 1]);
+    const ward = ITEM_SETS.warfare_stormbound.bonuses.find((b) => b.pieces === 7)?.effect.proc;
+    expect([ward?.value, ward?.duration, ward?.chance, ward?.icd]).toEqual([120, 8, 0.15, 20]);
+  });
+
+  it('actually reaches the wearer: a complete kit carries its signature in setProcs', () => {
+    // The positive arm. recalcPlayerStats is the only place setProcs is derived,
+    // so this is the end-to-end proof that the capstone tier is reachable at all.
+    // Every family, not just one: each has its own signature and its own armor
+    // type, so a wrong set tag on any single family would hide here.
+    for (const profile of PROFILES) {
+      const player = geared(profile.cls, kitFor(profile));
+      const ids = player.setProcs.map((proc) => proc.id);
+      expect(ids, `${profile.name}: the capstone signature must be live`).toContain(
+        SIGNATURES[profile.setId].id,
+      );
+      expect(
+        player.setProcs.every((proc) => proc.pvpOnly === true),
+        `${profile.name}: every live set proc must be PvP gated`,
+      ).toBe(true);
+    }
+  });
+
+  it('does NOT reach a wearer one piece short of the capstone', () => {
+    for (const profile of PROFILES) {
+      // The same kit with the chest swapped for a same-slot PvE epic: six of seven.
+      const player = geared(profile.cls, kitFor(profile, profile.pveChest));
+      expect(
+        player.setProcs.map((proc) => proc.id),
+        `${profile.name}: six of seven must forfeit the signature`,
+      ).not.toContain(SIGNATURES[profile.setId].id);
+    }
+  });
+});

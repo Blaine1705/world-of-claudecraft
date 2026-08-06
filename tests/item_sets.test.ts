@@ -145,7 +145,8 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       // single 3-piece tier. The four WARFARE families are 2/4/7: seven because
       // at six the seventh armor slot had one right answer (abandon the chest,
       // the priciest piece with the best PvE replacement) and measured strictly
-      // better than the intended build. See docs/warfare-refactor/00-analysis.md.
+      // better than the intended build (4,200 honor and 0.89x against the full
+      // kit's 5,400 and 1.03x). tests/warfare_balance_harness.test.ts guards it.
       const expected = set.id.startsWith('warfare_')
         ? '2,4,7'
         : pieces.length === 1

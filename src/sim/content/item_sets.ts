@@ -47,8 +47,14 @@ export const SET_HIT_4PC_RATING = 60; // -> +6% hit at 10 rating = 1%
 // Breakpoints are 2, 4 and 7 of the seven armor pieces. Seven, not six: with the
 // capstone at six the seventh armor slot had one right answer, which was to
 // abandon the chest (the most expensive piece with the best PvE replacement) and
-// the cheaper hybrid build beat the full kit outright. See
-// docs/warfare-refactor/00-analysis.md, "Where the rating lives".
+// the cheaper hybrid build beat the full kit outright. Measured against a
+// tier-1-plus-tier-2 reference warrior: 6 armor pieces plus a raid chest, a raid
+// weapon and badge jewelry cost 4,200 honor and landed 0.89x, against 5,400 honor
+// and 1.03x for the full kit, so the cheaper build won. At 7 of 7 the same build
+// forfeits both the 22-rating chest AND the 80/80 capstone and lands clearly
+// worse, which is what a non-choice should look like.
+// tests/warfare_balance_harness.test.ts re-measures this against the shipped
+// numbers and is the guard that keeps it true.
 export const WARFARE_SET_2PC_DEFENSE_RATING = 40;
 export const WARFARE_SET_4PC_OFFENSE_RATING = 40;
 // 0..1 fraction removed from the duration of crowd control cast on the wearer by
