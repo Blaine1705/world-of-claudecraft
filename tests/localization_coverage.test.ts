@@ -71,6 +71,7 @@ import {
   zh_CN,
   zh_TW,
 } from '../src/ui/i18n';
+import { ensureReliquaryLocalesLoaded } from '../src/ui/reliquary_i18n';
 import {
   hasTalentTitleOverride,
   renderTalentManifestEntry,
@@ -123,6 +124,7 @@ describe('i18n Localization Key Coverage', () => {
       supportedLanguages.flatMap((lang) => [
         ensureLocaleLoaded(lang),
         ensureDeedLocalesLoaded(lang),
+        ensureReliquaryLocalesLoaded(lang),
       ]),
     );
   });

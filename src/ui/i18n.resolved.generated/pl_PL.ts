@@ -6400,7 +6400,7 @@ export const pl_PL: EnTranslations = {
       "professions": "Wskazówka: profesje zbierackie i rzemieślnicze można szkolić równolegle z klasą bojową.",
       "loadouts": "Wskazówka: zapisz więcej niż jeden zestaw talentów, aby przełączać się między konfiguracjami bez ponownego wydawania punktów.",
       "pvp": "Wskazówka: wyzwij innego gracza na przyjazny pojedynek lub dołącz do kolejki na arenę Popielnego Koloseum, aby przetestować swoją konfigurację.",
-      "reliquary": "Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X."
+      "reliquary": "Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf."
     }
   },
   "errors": {

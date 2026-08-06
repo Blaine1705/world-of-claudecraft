@@ -6400,7 +6400,7 @@ export const nl_NL: EnTranslations = {
       "professions": "Tip: verzamel- en ambachtsberoepen kunnen naast je gevechtsklasse worden geleerd.",
       "loadouts": "Tip: sla meer dan één talentuitrusting op om tussen builds te wisselen zonder punten dubbel uit te geven.",
       "pvp": "Tip: daag een andere speler uit voor een vriendschappelijk duel, of sluit je aan bij de wachtrij voor de arena van het Asgrauwe Colosseum om je build te testen.",
-      "reliquary": "Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X."
+      "reliquary": "Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf."
     }
   },
   "errors": {

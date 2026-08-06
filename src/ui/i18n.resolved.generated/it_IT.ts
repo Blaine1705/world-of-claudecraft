@@ -6400,7 +6400,7 @@ export const it_IT: EnTranslations = {
       "professions": "Suggerimento: puoi apprendere le professioni di raccolta e creazione insieme alla tua classe di combattimento.",
       "loadouts": "Suggerimento: salva più configurazioni dei talenti per passare da una build all’altra senza spendere i punti due volte.",
       "pvp": "Suggerimento: sfida un altro giocatore a un duello amichevole oppure mettiti in coda per l’arena del Colosseo Cinereo per mettere alla prova la tua build.",
-      "reliquary": "Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X."
+      "reliquary": "Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf."
     }
   },
   "errors": {

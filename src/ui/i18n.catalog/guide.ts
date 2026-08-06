@@ -1282,7 +1282,10 @@ export const guideStrings = {
   // The Reliquary (collection trophy hall) page. Spoiler-safe: shelves, page
   // names, and relic display names only. No personal progress, clear counts,
   // or drop sources. Page and relic names are English proper nouns baked from
-  // the sim and rendered as raw text, not from these keys.
+  // the sim and rendered as raw text, not from these keys. The game window
+  // localizes page names through src/ui/reliquary_i18n.ts while the wiki keeps
+  // the English proper nouns, an accepted divergence (the wiki is a
+  // spoiler-safe reference, not a localized surface).
   reliquaryPage: {
     intro:
       'The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.',

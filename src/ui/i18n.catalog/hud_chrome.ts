@@ -4041,8 +4041,9 @@ export const hudChromeStrings = {
     // The on-join back-credit pass: one line for the whole seed, never a toast
     // per relic (mirrors hudChrome.deeds.retroSummary).
     retroSummary: 'Your reliquary catches up: {count} relics catalogued.',
-    // Phase 7: profession mark find labels (player-visible chrome; catalog page
-    // names may stay English content until a later re-localize pass).
+    // Phase 7: profession mark find labels (player-visible chrome). Catalog page
+    // names are NOT keys here: they resolve from the page id through
+    // src/ui/reliquary_i18n.ts, the deed_i18n entity-style channel.
     markFind: {
       masterwork_first: 'First Masterwork',
       masterwork_weaponcrafting: 'Weaponcrafting Masterwork',

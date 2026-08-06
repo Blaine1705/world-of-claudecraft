@@ -6400,7 +6400,7 @@ export const pt_BR: EnTranslations = {
       "professions": "Dica: profissões de coleta e criação podem ser aprendidas junto com sua classe de combate.",
       "loadouts": "Dica: salve mais de uma configuração de talentos para alternar entre builds sem gastar os pontos duas vezes.",
       "pvp": "Dica: desafie outro jogador para um duelo amistoso ou entre na fila da arena do Coliseu Cinzento para testar sua build.",
-      "reliquary": "Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X."
+      "reliquary": "Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf."
     }
   },
   "errors": {

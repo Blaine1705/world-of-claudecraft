@@ -538,6 +538,15 @@ same file), and each module's header carries its own contract.
   `talent_i18n.ts` entity-style pattern; per-base-locale release-fill chunks under
   `deed_i18n.locales/` fetched lazily via `DEED_LOCALE_LOADERS`);
   `deeds_leaderboard_view.ts` is the Renown-board tab's pure core.
+- **reliquary_view.ts** / **reliquary_window.ts** (+ **reliquary_i18n.ts**,
+  **reliquary_i18n.locales/**, **reliquary_sheet_view.ts**): The Reliquary collection
+  window, the Book of Deeds family exactly. The DOM-free core builds the shelf/page/grid
+  models and the drain-batched unlock plan; the painter is a cold, event-driven window off
+  a refresh signature. `reliquary_i18n.ts` re-localizes page names and descriptions from
+  the page id (the same `deed_i18n.ts` channel shape, per-base-locale chunks under
+  `reliquary_i18n.locales/` fetched lazily via `RELIQUARY_LOCALE_LOADERS`), so a view
+  model's `name` field is raw catalog English that no render site may print: resolve
+  through `reliquaryPageName(pageId)` at paint time.
 - **bank_filter.ts** (with **bank_view.ts** / **bank_window.ts**): the bank search/sort
   preserves live `slotIndex` values verbatim, so a filtered row still names the exact wire
   argument for deposit/withdraw.

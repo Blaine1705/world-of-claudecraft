@@ -374,6 +374,7 @@ import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overla
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
+import { ensureReliquaryLocalesLoaded } from './ui/reliquary_i18n';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshStartSkinPickerPortraits } from './ui/start_skin_picker_portraits';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
@@ -1237,15 +1238,20 @@ async function startGame(
   // now reads as checkpoint=assets-await instead of masquerading as a scene-build
   // death (start() stamps scene-build-start; the real one is re-stamped below).
   entryDiagnostics.checkpoint('assets-await', baseEntryDiagnostics());
-  // Lazy locale flip: fetch the active locale's chunk (plus the deed locale chunk the HUD's
-  // deed surfaces read) and make both resident before the HUD renders (mountGameUi ->
+  // Lazy locale flip: fetch the active locale's chunk (plus the deed and reliquary locale
+  // chunks the HUD's deed and collection surfaces read) and make them all resident before
+  // the HUD renders (mountGameUi ->
   // translatePage fans out hundreds of t() calls). It sits behind the loading screen (already
   // painted above), so a stored non-en visitor never sees an English flash. This is now a
   // REAL per-locale network request, so guard it: startGame is void-invoked (see the call
   // sites) with no .catch, and English is always resident, so a failed fetch must fall back
   // to English and keep booting rather than reject unhandled.
   try {
-    await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);
+    await Promise.all([
+      ensureLocaleLoaded(getLanguage()),
+      ensureDeedLocalesLoaded(getLanguage()),
+      ensureReliquaryLocalesLoaded(getLanguage()),
+    ]);
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
   }
@@ -6818,7 +6824,11 @@ async function changeLanguage(
 ): Promise<boolean> {
   onStatus?.(t('settings.languageLoading'));
   try {
-    await Promise.all([ensureLocaleLoaded(selected), ensureDeedLocalesLoaded(selected)]);
+    await Promise.all([
+      ensureLocaleLoaded(selected),
+      ensureDeedLocalesLoaded(selected),
+      ensureReliquaryLocalesLoaded(selected),
+    ]);
   } catch {
     // A locale chunk failed to load. Keep the already-resident locale and tell the user.
     onStatus?.(t('settings.languageLoadFailed'));
@@ -8794,6 +8804,9 @@ function wireStartScreens(): void {
   // parallel so entering the world does not pay the fetch. The rejection is swallowed: the
   // startGame await re-runs the load (in-flight cleared on reject) and owns the fallback.
   void ensureDeedLocalesLoaded(bootLang).catch(() => {});
+  // The reliquary page-name chunk renders no homepage text either; same warm,
+  // same swallowed rejection (startGame's await owns the fallback).
+  void ensureReliquaryLocalesLoaded(bootLang).catch(() => {});
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();

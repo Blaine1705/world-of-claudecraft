@@ -6400,7 +6400,7 @@ export const zh_CN: EnTranslations = {
       "professions": "提示：采集与制造类生活技能可以与你的战斗职业同时培养。",
       "loadouts": "提示：保存多套天赋配置，即可在不同 build 间切换而无需重新分配天赋点。",
       "pvp": "提示：向其他玩家发起友谊决斗，或报名灰烬竞技场，来检验你的 build。",
-      "reliquary": "提示：圣物库记录你收集的独特战利品。默认按 Shift+X 打开。"
+      "reliquary": "提示：圣物库逐架记录你收集的独特战利品。"
     }
   },
   "errors": {

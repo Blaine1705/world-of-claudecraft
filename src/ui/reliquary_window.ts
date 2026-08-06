@@ -27,6 +27,7 @@ import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_res
 import { formatNumber, type TranslationKey, t } from './i18n';
 import { mountDisplayName } from './mount_labels';
 import type { PainterHostPresentation } from './painter_host';
+import { reliquaryPageName } from './reliquary_i18n';
 import {
   buildReliquaryView,
   CURATOR_RANK_NAME_KEYS,
@@ -247,7 +248,12 @@ export class ReliquaryWindow {
         const count =
           s.id === 'overview'
             ? ''
-            : `<span class="reliquary-nav-count">${esc(`${this.fmt(s.owned)}/${this.fmt(s.total)}`)}</span>`;
+            : `<span class="reliquary-nav-count">${esc(
+                t('hudChrome.reliquary.progressText', {
+                  owned: this.fmt(s.owned),
+                  total: this.fmt(s.total),
+                }),
+              )}</span>`;
         const aria =
           s.id === 'overview'
             ? label
@@ -309,15 +315,18 @@ export class ReliquaryWindow {
           owned: this.fmt(n.owned),
           total: this.fmt(n.total),
         });
+        // Page names resolve from the id at paint time (reliquary_i18n), never
+        // from the model's raw catalog English.
+        const name = reliquaryPageName(n.pageId);
         return (
           `<button type="button" class="reliquary-nearly-row" data-page="${esc(n.pageId)}" data-focus-key="nearly:${n.pageId}" aria-label="${esc(
             t('hudChrome.reliquary.nearlyJumpAria', {
-              name: n.name,
+              name,
               owned: this.fmt(n.owned),
               total: this.fmt(n.total),
             }),
           )}">` +
-          `<span class="reliquary-nearly-name">${esc(n.name)}</span>` +
+          `<span class="reliquary-nearly-name">${esc(name)}</span>` +
           `<span class="reliquary-progress-text">${esc(progress)}</span></button>`
         );
       })
@@ -349,7 +358,7 @@ export class ReliquaryWindow {
           : '';
         return (
           `<button type="button" class="reliquary-page-row" data-page="${esc(page.pageId)}" data-focus-key="page:${page.pageId}">` +
-          `<span class="reliquary-page-name">${esc(page.name)}</span>` +
+          `<span class="reliquary-page-name">${esc(reliquaryPageName(page.pageId))}</span>` +
           `<span class="reliquary-page-meta">` +
           `<span class="reliquary-progress-text">${esc(progress)}</span>${clears}${done}` +
           `</span></button>`
@@ -364,6 +373,9 @@ export class ReliquaryWindow {
       owned: this.fmt(page.owned),
       total: this.fmt(page.total),
     });
+    // Page names resolve from the id at paint time (reliquary_i18n), never from
+    // the model's raw catalog English.
+    const pageName = reliquaryPageName(page.pageId);
     const pct = page.total > 0 ? Math.round((page.owned / page.total) * 100) : 0;
     const clears =
       page.clears !== undefined
@@ -378,12 +390,12 @@ export class ReliquaryWindow {
     const grid =
       page.cells.length === 0
         ? `<p class="reliquary-empty">${esc(t('hudChrome.reliquary.shelfEmpty'))}</p>`
-        : `<div class="reliquary-grid" role="list" aria-label="${esc(t('hudChrome.reliquary.gridAria', { name: page.name }))}">${page.cells.map((c) => this.cellHtml(c)).join('')}</div>`;
+        : `<div class="reliquary-grid" role="list" aria-label="${esc(t('hudChrome.reliquary.gridAria', { name: pageName }))}">${page.cells.map((c) => this.cellHtml(c)).join('')}</div>`;
     return (
       `<section class="reliquary-page-detail${page.illuminated ? ' is-illuminated' : ''}${page.accountScoped ? ' is-account-scoped' : ''}">` +
       `<button type="button" class="reliquary-back" data-back data-focus-key="back">${esc(t('hudChrome.reliquary.backToShelf'))}</button>` +
       `<header class="reliquary-page-header">` +
-      `<h3 class="reliquary-page-title">${esc(page.name)}</h3>${done}` +
+      `<h3 class="reliquary-page-title">${esc(pageName)}</h3>${done}` +
       `</header>` +
       accountScope +
       `<div class="reliquary-page-progress-row" role="img" aria-label="${esc(

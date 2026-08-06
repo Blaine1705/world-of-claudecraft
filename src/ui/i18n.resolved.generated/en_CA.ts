@@ -6400,7 +6400,7 @@ export const en_CA: EnTranslations = {
       "professions": "Tip: gathering and crafting professions can be trained alongside your combat class.",
       "loadouts": "Tip: save more than one talent loadout to swap between builds without spending points twice.",
       "pvp": "Tip: challenge another player to a friendly duel, or queue for the Ashen Coliseum arena, to test your build.",
-      "reliquary": "Tip: The Reliquary tracks unique spoils you collect. Open it with Shift+X."
+      "reliquary": "Tip: the Reliquary tracks the unique spoils you collect, shelf by shelf."
     }
   },
   "errors": {

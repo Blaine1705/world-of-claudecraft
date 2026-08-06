@@ -31,7 +31,13 @@ describe('entry probe covers the await window', () => {
     const startAt = mainSource.indexOf("entryDiagnostics.start(settings.get('graphicsPreset'));");
     const awaitCheckpointAt = mainSource.indexOf("entryDiagnostics.checkpoint('assets-await'");
     const localeAwaitAt = mainSource.indexOf(
-      'await Promise.all([ensureLocaleLoaded(getLanguage()), ensureDeedLocalesLoaded(getLanguage())]);',
+      [
+        'await Promise.all([',
+        '      ensureLocaleLoaded(getLanguage()),',
+        '      ensureDeedLocalesLoaded(getLanguage()),',
+        '      ensureReliquaryLocalesLoaded(getLanguage()),',
+        '    ]);',
+      ].join('\n'),
     );
     const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
     const sceneRestampAt = mainSource.indexOf("entryDiagnostics.checkpoint('scene-build-start'");

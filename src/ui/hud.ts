@@ -41,7 +41,6 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
-import { RELIQUARY_PAGES } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
 import { resolveActiveWeaponSkin } from '../sim/content/weapon_skin_rules';
 import type { ZoneDef } from '../sim/data';
@@ -588,6 +587,7 @@ import { questMarkerTooltipTag } from './quest_marker_tags';
 import { questProgressEventText } from './quest_progress_text';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { reliquaryPageName } from './reliquary_i18n';
 import { buildReliquarySheetModel, reliquarySheetProgressionHtml } from './reliquary_sheet_view';
 import {
   buildReliquaryUnlockPlan,
@@ -13230,8 +13230,7 @@ export class Hud {
     }
     // Durable Illumination log survives even when rank-up claims the banner slot.
     if (plan.illuminatedPageId && plan.banner?.kind !== 'illuminate') {
-      const page = RELIQUARY_PAGES.find((p) => p.id === plan.illuminatedPageId);
-      const pageName = page?.name ?? plan.illuminatedPageId;
+      const pageName = reliquaryPageName(plan.illuminatedPageId);
       this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
     }
     if (plan.banner) {
@@ -13251,8 +13250,7 @@ export class Hud {
           '#ffd100',
         );
       } else if (banner.kind === 'illuminate') {
-        const page = RELIQUARY_PAGES.find((p) => p.id === banner.pageId);
-        const pageName = page?.name ?? banner.pageId;
+        const pageName = reliquaryPageName(banner.pageId);
         bannerText = t('hudChrome.reliquary.illuminateBanner', { name: pageName });
         this.log(t('hudChrome.reliquary.illuminateToast', { name: pageName }), '#ffd100');
       } else {

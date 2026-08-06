@@ -9520,7 +9520,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.tips.pvp':
     'Совет: вызовите другого игрока на дружескую дуэль или встаньте в очередь на арену Пепельного Колизея, чтобы испытать свой билд.',
   'loading.tips.reliquary':
-    'Подсказка: Реликварий хранит уникальные трофеи. Откройте его по Shift+X.',
+    'Подсказка: Реликварий хранит собранные вами уникальные трофеи, полка за полкой.',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': 'Сесть / Спешиться',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.

@@ -115,7 +115,8 @@ export interface ReliquaryRecentFindModel {
 
 export interface ReliquaryNearlyPageModel {
   pageId: string;
-  /** English content name from the catalog (client may re-localize later). */
+  /** Raw catalog English. Never render it directly: resolve the display name
+   *  from pageId through reliquaryPageName (src/ui/reliquary_i18n.ts). */
   name: string;
   owned: number;
   total: number;
@@ -124,6 +125,8 @@ export interface ReliquaryNearlyPageModel {
 
 export interface ReliquaryShelfPageModel {
   pageId: string;
+  /** Raw catalog English. Never render it directly: resolve the display name
+   *  from pageId through reliquaryPageName (src/ui/reliquary_i18n.ts). */
   name: string;
   shelf: ReliquaryShelfId;
   owned: number;
