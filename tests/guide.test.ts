@@ -1040,14 +1040,45 @@ describe('Guide deeds cross-page surfaces', () => {
   it('never leaks the Wildheart Basin boss name in a translated locale either', async () => {
     // Follow-up regression pin (review on PR #2903): the first fix only reworded the
     // English catalog value plus the eager en/en_CA/en_XA bundles, leaving every
-    // translated overlay still naming the boss. Drive a non-English locale, the same
-    // way a real translated visitor would (ensureLocaleLoaded before render), and check
-    // the same personal-name segment the English pin above checks.
+    // translated overlay still naming the boss. Drive every translated locale that
+    // carries this key, the same way a real translated visitor would
+    // (ensureLocaleLoaded before render), and check for that LOCALE's own personal-name
+    // form, not just the English "Zulgar": a second review round on this PR found the
+    // first version of this test only covered 6 of the 17 fixed overlays and compared
+    // every locale against the English name, so a translated overlay that leaked the
+    // localized form (zh_CN "祖尔加", zh_TW "祖爾加", ja_JP "ズルガー", ko_KR "줄가르",
+    // or the Cyrillic ru_RU "Зулгар") would have passed silently. The Latin-script
+    // locales below (including inflected forms like cs_CZ "Zulgarovi" and pl_PL
+    // "Zulgarowi") all still contain the "Zulgar" substring, so one shared check
+    // covers them; the four non-Latin scripts get their own literal.
     const wildheartBoss = Object.values(MOBS).find((m) => m.id === 'wildheart_high_priest');
     expect(wildheartBoss, 'wildheart_high_priest mob missing from content').toBeTruthy();
     const personalName = (wildheartBoss?.name ?? '').split(',')[0];
-    const locales: SupportedLanguage[] = ['es', 'fr_FR', 'de_DE', 'zh_CN', 'ja_JP', 'ko_KR'];
-    for (const locale of locales) {
+    expect(personalName).toBe('Zulgar');
+    const forbiddenByLocale: Partial<Record<SupportedLanguage, string>> = {
+      cs_CZ: personalName,
+      da_DK: personalName,
+      de_DE: personalName,
+      es: personalName,
+      fr_FR: personalName,
+      id_ID: personalName,
+      it_IT: personalName,
+      nl_NL: personalName,
+      pl_PL: personalName,
+      pt_BR: personalName,
+      ru_RU: 'Зулгар',
+      sv_SE: personalName,
+      tr_TR: personalName,
+      vi_VN: personalName,
+      ja_JP: 'ズルガー',
+      ko_KR: '줄가르',
+      zh_CN: '祖尔加',
+      zh_TW: '祖爾加',
+    };
+    for (const [locale, forbidden] of Object.entries(forbiddenByLocale) as [
+      SupportedLanguage,
+      string,
+    ][]) {
       await ensureLocaleLoaded(locale);
       setLanguage(locale);
       const html = dungeonsPage.render({
@@ -1056,8 +1087,8 @@ describe('Guide deeds cross-page surfaces', () => {
         titleKey: 'guide.nav.dungeons',
       });
       expect(
-        html.includes(personalName),
-        `boss personal name "${personalName}" leaked into the ${locale} dungeons page`,
+        html.includes(forbidden),
+        `boss personal name "${forbidden}" leaked into the ${locale} dungeons page`,
       ).toBe(false);
     }
     setLanguage('en');
