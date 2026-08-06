@@ -300,7 +300,6 @@ import { loadCharselectNews } from './ui/charselect_news';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
 import { claudiumBalanceAddress, currentWocDiscountBps } from './ui/claudium_view';
-import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
 import {
@@ -361,6 +360,7 @@ import {
   stopSlowConnectionWatch,
 } from './ui/loading_slow_hint';
 import { createLoadingTipRotation, type LoadingTipRotation } from './ui/loading_tips';
+import { CONTENT_LOCALE_CHANNEL_ENSURERS } from './ui/locale_channels';
 import { applyMinimapOrnamentVars } from './ui/minimap_gilded_ornament';
 import { showMobileWalletLauncher } from './ui/mobile_wallet_launcher';
 import { mobileMountAction } from './ui/mount_quick_summon';
@@ -374,7 +374,6 @@ import { type PerfOverlayConfig, PerfOverlayConfigStore } from './ui/perf_overla
 import { buildPerfOverlayView, FrameMeter } from './ui/perf_overlay_model';
 import { hydratePortraits, portraitChipHtml } from './ui/portrait_chip';
 import { hideReconnectOverlay, showReconnectOverlay } from './ui/reconnect_overlay';
-import { ensureReliquaryLocalesLoaded } from './ui/reliquary_i18n';
 import { createSpectateBadge } from './ui/spectate_badge';
 import { refreshStartSkinPickerPortraits } from './ui/start_skin_picker_portraits';
 import { refreshSteamLinkStatus, wireSteamLink } from './ui/steam_link';
@@ -1249,8 +1248,7 @@ async function startGame(
   try {
     await Promise.all([
       ensureLocaleLoaded(getLanguage()),
-      ensureDeedLocalesLoaded(getLanguage()),
-      ensureReliquaryLocalesLoaded(getLanguage()),
+      ...CONTENT_LOCALE_CHANNEL_ENSURERS.map((ensure) => ensure(getLanguage())),
     ]);
   } catch {
     // Soft fallback: English is statically resident; boot in English (the picker can retry).
@@ -6826,8 +6824,7 @@ async function changeLanguage(
   try {
     await Promise.all([
       ensureLocaleLoaded(selected),
-      ensureDeedLocalesLoaded(selected),
-      ensureReliquaryLocalesLoaded(selected),
+      ...CONTENT_LOCALE_CHANNEL_ENSURERS.map((ensure) => ensure(selected)),
     ]);
   } catch {
     // A locale chunk failed to load. Keep the already-resident locale and tell the user.
@@ -8800,13 +8797,12 @@ function wireStartScreens(): void {
     }
   };
   void ensureLocaleLoaded(bootLang).then(revealLocalized, revealLocalized);
-  // The deed locale chunk renders no homepage text, so it never gates the reveal; warm it in
-  // parallel so entering the world does not pay the fetch. The rejection is swallowed: the
-  // startGame await re-runs the load (in-flight cleared on reject) and owns the fallback.
-  void ensureDeedLocalesLoaded(bootLang).catch(() => {});
-  // The reliquary page-name chunk renders no homepage text either; same warm,
-  // same swallowed rejection (startGame's await owns the fallback).
-  void ensureReliquaryLocalesLoaded(bootLang).catch(() => {});
+  // The content-channel chunks (deed names, reliquary page names) render no
+  // homepage text, so they never gate the reveal; warm them in parallel so
+  // entering the world does not pay the fetch. Each rejection is swallowed:
+  // the startGame await re-runs the load (in-flight cleared on reject) and
+  // owns the fallback.
+  for (const ensure of CONTENT_LOCALE_CHANNEL_ENSURERS) void ensure(bootLang).catch(() => {});
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();

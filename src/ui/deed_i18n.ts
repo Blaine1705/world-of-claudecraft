@@ -10,6 +10,7 @@
 import { DEEDS } from '../sim/content/deeds';
 import { getLanguage, type SupportedLanguage, t } from './i18n';
 import { maybePseudoString, pseudoLocaleString } from './i18n_pseudo_port';
+import { makeLazyLocaleChannel } from './lazy_locale_channel';
 
 export type DeedTranslationField = 'name' | 'desc' | 'title';
 
@@ -28,8 +29,9 @@ export type DeedLocaleTable = Record<string, DeedLocaleEntry>;
 // mirroring the i18n.ts LOCALE_LOADERS model: the eager renderer bundle (hud.ts,
 // render/nameplate_painter.ts) carries zero deed locale bytes for a
 // default-English player, and a non-en visitor fetches ONLY their own locale's
-// chunk (a de_DE reader never downloads the other seventeen). `residentDeedLocales`
-// holds the assembled table per LANGUAGE once that locale's chunk resolves: es_ES
+// chunk (a de_DE reader never downloads the other seventeen). The shared
+// content-channel factory (lazy_locale_channel.ts) holds the assembled table
+// per LANGUAGE once that locale's chunk resolves: es_ES
 // and fr_CA ride their base locale's chunk (es, fr_FR) with a small delve-
 // vocabulary override layered on (the talent_i18n localeText dialect model) under
 // the few entries whose vocabulary genuinely diverges; en and en_CA resolve to the
@@ -96,47 +98,22 @@ const DEED_DIALECT_BASE: Partial<Record<SupportedLanguage, DeedBaseLocale>> = {
   fr_CA: 'fr_FR',
 };
 
-// The assembled deed table per LANGUAGE (es and es_ES tracked separately), each
-// resident once its own chunk resolves. Absent until then: a non-en read falls
-// back to the authored English (the documented absent-table behavior).
-const residentDeedLocales: Partial<Record<SupportedLanguage, DeedLocaleTable>> = {};
-// One coalesced in-flight promise PER LANGUAGE, cleared on reject so a failed
-// fetch of one locale leaves a retry possible and never blocks another locale.
-const inflightDeedLocales = new Map<SupportedLanguage, Promise<void>>();
+// Residency, per-language in-flight coalescing, the dialect override merge,
+// and the shape-tolerant chunk read all live in the shared content-channel
+// factory (lazy_locale_channel.ts, the one copy the reliquary channel uses
+// too).
+const deedChannel = makeLazyLocaleChannel<DeedLocaleTable>({
+  loaders: DEED_LOCALE_LOADERS,
+  dialectBase: DEED_DIALECT_BASE,
+});
 
-/** Make the deed locale table resident for `lang` (a no-op for en / en_CA and
- *  once resident). Callers await it beside ensureLocaleLoaded (bootstrap /
- *  picker); every lookup in this module stays synchronous and falls back to the
- *  authored English until it resolves. Fetches ONLY `lang`'s chunk (a dialect
- *  rides its base locale's chunk). Rejects on a failed chunk fetch (the caller
- *  owns the UI, English keeps rendering) and clears the in-flight slot so a
- *  retry can start a fresh import. */
-export async function ensureDeedLocalesLoaded(lang: SupportedLanguage): Promise<void> {
-  if (lang === 'en' || lang === 'en_CA') return;
-  if (residentDeedLocales[lang]) return;
-  const existing = inflightDeedLocales.get(lang);
-  if (existing) return existing;
-  const dialectBase = DEED_DIALECT_BASE[lang];
-  const base = dialectBase ?? (lang as DeedBaseLocale);
-  const loader = DEED_LOCALE_LOADERS[base];
-  if (!loader) return; // no chunk for this code (unknown): resident no-op
-  const task = loader()
-    .then((mod) => {
-      // Shape-tolerant read (the ensureLocaleLoaded gotcha): a production chunk
-      // may expose the module under `default` while raw vitest resolves the
-      // SOURCE .ts with named exports only.
-      const m = (mod as { default?: DeedLocaleModule }).default ?? mod;
-      const override = dialectBase ? m.dialects?.[lang] : undefined;
-      residentDeedLocales[lang] = override ? { ...m.table, ...override } : m.table;
-      inflightDeedLocales.delete(lang);
-    })
-    .catch((err) => {
-      inflightDeedLocales.delete(lang);
-      throw err;
-    });
-  inflightDeedLocales.set(lang, task);
-  return task;
-}
+/** Make the deed locale table resident for `lang`; see LazyLocaleChannel.ensure
+ *  for the full contract (no-op for en / en_CA and once resident; rejects on a
+ *  failed fetch with the in-flight slot cleared so a retry can start fresh, and
+ *  the caller decides the UI: boot falls back to English and keeps going, the
+ *  language picker keeps the active locale and reports the failure). */
+export const ensureDeedLocalesLoaded: (lang: SupportedLanguage) => Promise<void> =
+  deedChannel.ensure;
 
 // --- en_XA dev pseudo-locale port ---------------------------------------------
 //
@@ -158,19 +135,26 @@ export const pseudoDeedString = pseudoLocaleString;
 function localeEntry(id: string): DeedLocaleEntry | undefined {
   const lang = getLanguage();
   if (lang === 'en' || lang === 'en_CA') return undefined;
-  return residentDeedLocales[lang]?.[id];
+  return deedChannel.get(lang)?.[id];
 }
 
 /** Localized deed name; the raw id for a catalog-unknown id (content drift). */
+// DEEDS is a plain object, so a bare index with a prototype key ('__proto__',
+// 'constructor') resolves truthy and would break the raw-id fallback contract
+// below for a hostile or drifted id.
+function deedDef(id: string): (typeof DEEDS)[string] | undefined {
+  return Object.hasOwn(DEEDS, id) ? DEEDS[id] : undefined;
+}
+
 export function deedName(id: string): string {
-  const def = DEEDS[id];
+  const def = deedDef(id);
   if (!def) return id;
   return maybePseudoString(localeEntry(id)?.name ?? def.name);
 }
 
 /** Localized deed description; '' for a catalog-unknown id. */
 export function deedDesc(id: string): string {
-  const def = DEEDS[id];
+  const def = deedDef(id);
   if (!def) return '';
   return maybePseudoString(localeEntry(id)?.desc ?? def.desc);
 }
@@ -178,7 +162,7 @@ export function deedDesc(id: string): string {
 /** The localized display title for a title-reward deed; '' when the deed is
  *  unknown or carries no title reward (callers hide the surface entirely). */
 export function deedTitleText(id: string): string {
-  const def = DEEDS[id];
+  const def = deedDef(id);
   if (!def || def.reward?.kind !== 'title') return '';
   return maybePseudoString(localeEntry(id)?.title ?? def.reward.text);
 }

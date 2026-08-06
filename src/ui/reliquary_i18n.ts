@@ -16,6 +16,7 @@
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { getLanguage, type SupportedLanguage } from './i18n';
 import { maybePseudoString, pseudoLocaleString } from './i18n_pseudo_port';
+import { makeLazyLocaleChannel } from './lazy_locale_channel';
 
 export type ReliquaryTranslationField = 'name' | 'desc';
 
@@ -91,48 +92,22 @@ const RELIQUARY_DIALECT_BASE: Partial<Record<SupportedLanguage, ReliquaryBaseLoc
   fr_CA: 'fr_FR',
 };
 
-// The assembled reliquary table per LANGUAGE, each resident once its own chunk
-// resolves. Absent until then: a non-en read falls back to the authored English
-// (the documented absent-table behavior).
-const residentReliquaryLocales: Partial<Record<SupportedLanguage, ReliquaryLocaleTable>> = {};
-// One coalesced in-flight promise PER LANGUAGE, cleared on reject so a failed
-// fetch of one locale leaves a retry possible and never blocks another locale.
-const inflightReliquaryLocales = new Map<SupportedLanguage, Promise<void>>();
+// Residency, per-language in-flight coalescing, the dialect override merge,
+// and the shape-tolerant chunk read all live in the shared content-channel
+// factory (lazy_locale_channel.ts, the one copy the deed channel uses too).
+const reliquaryChannel = makeLazyLocaleChannel<ReliquaryLocaleTable>({
+  loaders: RELIQUARY_LOCALE_LOADERS,
+  dialectBase: RELIQUARY_DIALECT_BASE,
+});
 
-/** Make the reliquary locale table resident for `lang` (a no-op for en / en_CA,
- *  once resident, and for a locale with no chunk yet). Callers await it beside
- *  ensureLocaleLoaded (bootstrap / picker); every lookup in this module stays
- *  synchronous and falls back to the authored English until it resolves.
- *  Fetches ONLY `lang`'s chunk (a dialect rides its base locale's chunk).
- *  Rejects on a failed chunk fetch (the caller owns the UI, English keeps
- *  rendering) and clears the in-flight slot so a retry can start a fresh
- *  import. */
-export async function ensureReliquaryLocalesLoaded(lang: SupportedLanguage): Promise<void> {
-  if (lang === 'en' || lang === 'en_CA') return;
-  if (residentReliquaryLocales[lang]) return;
-  const existing = inflightReliquaryLocales.get(lang);
-  if (existing) return existing;
-  const dialectBase = RELIQUARY_DIALECT_BASE[lang];
-  const base = dialectBase ?? (lang as ReliquaryBaseLocale);
-  const loader = RELIQUARY_LOCALE_LOADERS[base];
-  if (!loader) return; // no chunk for this locale yet (release fill): resident no-op
-  const task = loader()
-    .then((mod) => {
-      // Shape-tolerant read (the ensureLocaleLoaded gotcha): a production chunk
-      // may expose the module under `default` while raw vitest resolves the
-      // SOURCE .ts with named exports only.
-      const m = (mod as { default?: ReliquaryLocaleModule }).default ?? mod;
-      const override = dialectBase ? m.dialects?.[lang] : undefined;
-      residentReliquaryLocales[lang] = override ? { ...m.table, ...override } : m.table;
-      inflightReliquaryLocales.delete(lang);
-    })
-    .catch((err) => {
-      inflightReliquaryLocales.delete(lang);
-      throw err;
-    });
-  inflightReliquaryLocales.set(lang, task);
-  return task;
-}
+/** Make the reliquary locale table resident for `lang`; see
+ *  LazyLocaleChannel.ensure for the full contract (no-op for en / en_CA, once
+ *  resident, and for a locale with no chunk; rejects on a failed fetch with
+ *  the in-flight slot cleared so a retry can start fresh, and the caller
+ *  decides the UI: boot falls back to English and keeps going, the language
+ *  picker keeps the active locale and reports the failure). */
+export const ensureReliquaryLocalesLoaded: (lang: SupportedLanguage) => Promise<void> =
+  reliquaryChannel.ensure;
 
 // --- en_XA dev pseudo-locale port ---------------------------------------------
 //
@@ -154,13 +129,20 @@ export const pseudoReliquaryString = pseudoLocaleString;
 function localeEntry(pageId: string): ReliquaryLocaleEntry | undefined {
   const lang = getLanguage();
   if (lang === 'en' || lang === 'en_CA') return undefined;
-  return residentReliquaryLocales[lang]?.[pageId];
+  return reliquaryChannel.get(lang)?.[pageId];
+}
+
+// RELIQUARY_PAGES_BY_ID is a plain object, so a bare index with a prototype
+// key ('__proto__', 'constructor') resolves truthy and would break the raw-id
+// fallback contract below for a hostile or drifted wire id.
+function pageDef(pageId: string): (typeof RELIQUARY_PAGES_BY_ID)[string] | undefined {
+  return Object.hasOwn(RELIQUARY_PAGES_BY_ID, pageId) ? RELIQUARY_PAGES_BY_ID[pageId] : undefined;
 }
 
 /** Localized page name; the raw page id for a catalog-unknown id (content
  *  drift), which is what every render site wants for an id it cannot place. */
 export function reliquaryPageName(pageId: string): string {
-  const def = RELIQUARY_PAGES_BY_ID[pageId];
+  const def = pageDef(pageId);
   if (!def) return pageId;
   return maybePseudoString(localeEntry(pageId)?.name ?? def.name);
 }
@@ -168,7 +150,7 @@ export function reliquaryPageName(pageId: string): string {
 /** Localized page description; '' for a catalog-unknown id or a page that
  *  authors no blurb (callers hide the surface entirely). */
 export function reliquaryPageDesc(pageId: string): string {
-  const def = RELIQUARY_PAGES_BY_ID[pageId];
+  const def = pageDef(pageId);
   if (!def) return '';
   return maybePseudoString(localeEntry(pageId)?.desc ?? def.desc ?? '');
 }

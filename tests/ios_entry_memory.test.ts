@@ -36,7 +36,7 @@ describe('entry probe covers the await window', () => {
     // indentation literal, so a biome reformat does not read as a dropped
     // loader, while dropping one really does fail.
     const localeAwaitAt = mainSource.search(
-      /await Promise\.all\(\[\s*ensureLocaleLoaded\(getLanguage\(\)\),\s*ensureDeedLocalesLoaded\(getLanguage\(\)\),\s*ensureReliquaryLocalesLoaded\(getLanguage\(\)\),?\s*\]\);/,
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(getLanguage\(\)\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\(ensure\) => ensure\(getLanguage\(\)\)\),?\s*\]\);/,
     );
     const assetsAwaitAt = mainSource.indexOf('await assetsReady(');
     const sceneRestampAt = mainSource.indexOf("entryDiagnostics.checkpoint('scene-build-start'");

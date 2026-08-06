@@ -424,12 +424,14 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
 
   it('loads all three locale-chunk families before it flips the language', () => {
     // This registry is about REPAINT, and a repaint cannot show bytes that are
-    // not resident: `changeLanguage` must await the catalog chunk, the deed
-    // name/desc/title chunk AND the Reliquary page-name chunk before
-    // setLanguage, or the fan-out repaints the picked locale with the previous
-    // one's page and deed names. Nothing in half 1 or half 2 covers chunk
-    // loading, so a dropped loader would leave every other pin here green.
-    // Matched by regex over the function body so a reflow cannot break it.
+    // not resident: `changeLanguage` must await the catalog chunk AND every
+    // content channel (deed names, reliquary page names) before setLanguage,
+    // or the fan-out repaints the picked locale with the previous one's page
+    // and deed names. Nothing in half 1 or half 2 covers chunk loading, so a
+    // dropped loader would leave every other pin here green. The content
+    // channels ride CONTENT_LOCALE_CHANNEL_ENSURERS; the membership pin below
+    // holds that list, and this regex holds the await shape. Matched by regex
+    // over the function body so a reflow cannot break it.
     const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
     const start = main.indexOf('async function changeLanguage(');
     expect(start, 'changeLanguage was renamed or removed').toBeGreaterThan(-1);
@@ -437,12 +439,31 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
     expect(end, 'changeLanguage body did not close').toBeGreaterThan(start);
     const body = main.slice(start, end);
     expect(body).toMatch(
-      /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*ensureDeedLocalesLoaded\(selected\),\s*ensureReliquaryLocalesLoaded\(selected\),?\s*\]\);/,
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*\.\.\.CONTENT_LOCALE_CHANNEL_ENSURERS\.map\(\(ensure\) => ensure\(selected\)\),?\s*\]\);/,
     );
     // The await must PRECEDE the flip: hoisting setLanguage above it would
     // repaint the picked locale with the previous locale's resident chunks.
     // indexOf on a missing flip returns -1, which fails the comparison loudly.
     expect(body.indexOf('await Promise.all([')).toBeLessThan(body.indexOf('setLanguage(selected)'));
+  });
+
+  it('registers both content channels in CONTENT_LOCALE_CHANNEL_ENSURERS, by identity', async () => {
+    // The await-shape regex above proves main.ts drains the registry; this pin
+    // proves the registry actually CONTAINS every content channel, so removing
+    // one from the list (which would quietly stop its chunk loading at all
+    // three main.ts sites) reds here. Identity, not name: a re-export of the
+    // wrong function would pass a name check.
+    const [{ CONTENT_LOCALE_CHANNEL_ENSURERS }, { ensureDeedLocalesLoaded }, reliquary] =
+      await Promise.all([
+        import('../src/ui/locale_channels'),
+        import('../src/ui/deed_i18n'),
+        import('../src/ui/reliquary_i18n'),
+      ]);
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(ensureDeedLocalesLoaded);
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toContain(reliquary.ensureReliquaryLocalesLoaded);
+    // Snug: exactly the two shipped channels today, so an accidental duplicate
+    // (double fetch per flip) or a silent drop both fail.
+    expect(CONTENT_LOCALE_CHANNEL_ENSURERS).toHaveLength(2);
   });
 
   it('wires the fan-out to the woc:languagechange event exactly once', () => {
