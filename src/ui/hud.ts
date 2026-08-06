@@ -18923,6 +18923,11 @@ export class Hud {
     // change re-threw straight into the band (aborting the callers after
     // this one) and every other frame skipped the repaint entirely.
     try {
+      // The $WOC arm's model also decides whether the GOLD fields are live: the
+      // two currencies are mutually exclusive, so entering $WOC mode must grey
+      // gold out rather than leaving a field that silently invalidates the deal.
+      const wocModel = wocTradeModelFrom(this.wocTradeDeps(info.otherName));
+      const goldAttr = wocModel.goldDisabled ? ' disabled' : '';
       const itemRow = (s: InvSlot, mine: boolean) => {
         // Stale-client guard (R34): the other side's offer is server truth and
         // can carry an id this bundle predates; buildTradeItemRow keeps the raw
@@ -18943,9 +18948,9 @@ export class Hud {
             <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
             <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>
               <span class="trade-coins">
-                <input class="coininput" id="trade-g" type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
-                <input class="coininput" id="trade-s" type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
-                <input class="coininput" id="trade-c" type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
+                <input class="coininput" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
+                <input class="coininput" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
+                <input class="coininput" id="trade-c"${goldAttr} type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
               </span>
             </div>
           </div>
@@ -18956,7 +18961,7 @@ export class Hud {
           </div>
         </div>
         <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>
-        ${wocTradeArmHtml(wocTradeModelFrom(this.wocTradeDeps(info.otherName)), this.wocTradeUsdCents)}`;
+        ${wocTradeArmHtml(wocModel, this.wocTradeUsdCents)}`;
       const acceptBtn = document.createElement('button');
       acceptBtn.className = 'btn';
       acceptBtn.textContent = info.myAccepted ? t('hud.trade.waiting') : t('hud.trade.accept');

@@ -7476,6 +7476,11 @@
     padding-top: 10px;
     border-top: 1px solid var(--border);
   }
+  /* A disabled coin field must READ as disabled, not merely refuse input. */
+  .trade-money .coininput:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
   .trade-woc-modes {
     display: flex;
     gap: 6px;
