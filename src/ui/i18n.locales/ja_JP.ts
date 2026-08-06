@@ -13096,13 +13096,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.blockPartnerUnknown': 'そのプレイヤーが $WOC を受け取れるか確認しています…',
   'hudChrome.trade.woc.blockRecipientNoWallet':
     'そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。',
-  'hudChrome.trade.woc.hintClearYourItems': '自分のアイテムを外してください。$WOC の提示は相手の出品を買うためのものです。',
+  'hudChrome.trade.woc.hintClearYourItems':
+    '自分のアイテムを外してください。$WOC の提示は相手の出品を買うためのものです。',
   'hudChrome.trade.woc.hintAwaitTheirItems': '$WOC で売却できるものを相手が出すのを待っています。',
   'hudChrome.trade.woc.sendOffer': '$WOC を提示',
   'hudChrome.trade.woc.incomingAccept': '{name} があなたのアイテムに {price} を提示しています。',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '承諾する前に、売却するアイテムを入れてください。',
   'hudChrome.trade.woc.hintEnterPrice': 'USD で価格を入力してください。',
-  'hudChrome.trade.woc.hintGoldOffered': '先にゴールドの提示を取り消してください。取引はゴールドか $WOC のどちらか一方です。',
+  'hudChrome.trade.woc.hintGoldOffered':
+    '先にゴールドの提示を取り消してください。取引はゴールドか $WOC のどちらか一方です。',
   'hudChrome.trade.woc.ineligibleNote':
     'セットしたアイテムのうち {count} 個は $WOC で売却できません。',
   'hudChrome.trade.woc.incomingTitle': '{name} からの $WOC オファー',
@@ -13116,7 +13118,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.paying': 'ウォレットで支払いを承認してください…',
   'hudChrome.trade.woc.settled': '支払い完了。アイテムはメールで届きます。',
   'hudChrome.trade.woc.accept': 'オファーを承諾',
-  'hudChrome.trade.woc.accepted': 'オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。',
+  'hudChrome.trade.woc.accepted':
+    'オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。',
   'hudChrome.trade.woc.decline': '辞退する',
   'hudChrome.trade.woc.withdraw': 'オファーを取り下げる',
 };

@@ -900,11 +900,7 @@ export class WocMarketService {
     // seller's to satisfy when they stage goods and accept.
     const params = validListingParams(this.directedParams(args.usdCents, args.account));
     if (!params.ok) return refuse(params.reason);
-    const buyer = await this.deps.db.deliveryTarget(
-      this.cfg.realm,
-      args.account,
-      args.characterId,
-    );
+    const buyer = await this.deps.db.deliveryTarget(this.cfg.realm, args.account, args.characterId);
     if (!buyer || buyer.characterId !== args.characterId) return refuse('character_invalid');
 
     const offer = await this.deps.db.insertDirectedOffer({
@@ -1416,11 +1412,7 @@ export class WocMarketService {
       // It still has to expire: left pending it stays visible in both players'
       // trade windows as a deal that can never be accepted, and the retention
       // prune only reaches resolved rows, so the table would grow forever.
-      expiredOffers: await this.deps.db.expireDueDirectedOffers(
-        this.cfg.realm,
-        nowMs,
-        SWEEP_BATCH,
-      ),
+      expiredOffers: await this.deps.db.expireDueDirectedOffers(this.cfg.realm, nowMs, SWEEP_BATCH),
       reclaimed: await this.reclaimStrandedListings(nowMs),
       closed: await this.closeDueAuctions(nowMs),
       expired: await this.expireOverdueSettlements(nowMs),

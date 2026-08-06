@@ -2032,10 +2032,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
         ? await sellerAccepts(h, offer.offer.id)
         : await buyerAccepts(h, offer.offer.id);
       expect(first.ok, `first accept (sellerFirst=${sellerFirst})`).toBe(true);
-      expect(
-        (first as { listing: unknown }).listing,
-        'one side alone escrows nothing',
-      ).toBeNull();
+      expect((first as { listing: unknown }).listing, 'one side alone escrows nothing').toBeNull();
       expect(bagsOf(h, SELLER_CHAR)).toHaveLength(before);
 
       const second = sellerFirst

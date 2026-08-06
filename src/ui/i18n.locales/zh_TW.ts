@@ -12846,13 +12846,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.blockNoWallet': '請先綁定並驗證錢包，才能出售物品換取 $WOC。',
   'hudChrome.trade.woc.blockPartnerUnknown': '正在檢查該玩家能否接受 $WOC…',
   'hudChrome.trade.woc.blockRecipientNoWallet': '該玩家必須先連結錢包，才能接受 $WOC 付款。',
-  'hudChrome.trade.woc.hintClearYourItems': '請先移出你自己的物品：$WOC 報價用於購買對方出售的物品。',
+  'hudChrome.trade.woc.hintClearYourItems':
+    '請先移出你自己的物品：$WOC 報價用於購買對方出售的物品。',
   'hudChrome.trade.woc.hintAwaitTheirItems': '正在等待對方拿出可用 $WOC 出售的物品。',
   'hudChrome.trade.woc.sendOffer': '出價 $WOC',
   'hudChrome.trade.woc.incomingAccept': '{name} 出價 {price} 購買你的物品。',
   'hudChrome.trade.woc.hintAcceptNeedsItem': '接受前請先放入你要出售的物品。',
   'hudChrome.trade.woc.hintEnterPrice': '請輸入美元價格。',
-  'hudChrome.trade.woc.hintGoldOffered': '請先移除你的金幣報價：一筆交易只能用金幣或 $WOC，不能兼有。',
+  'hudChrome.trade.woc.hintGoldOffered':
+    '請先移除你的金幣報價：一筆交易只能用金幣或 $WOC，不能兼有。',
   'hudChrome.trade.woc.ineligibleNote': '有 {count} 件暫存物品無法出售換取 $WOC。',
   'hudChrome.trade.woc.incomingTitle': '來自 {name} 的 $WOC 報價',
   'hudChrome.trade.woc.incomingBody': '{name} 提出以 {price} 將 {item} 出售給你。',
