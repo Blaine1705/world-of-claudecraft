@@ -1220,6 +1220,7 @@ function blankEntity(id: number): Entity {
     petOwnerHpBonus: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    ccDurationReduction: 0,
     pos: { x: 0, y: 0, z: 0 },
     prevPos: { x: 0, y: 0, z: 0 },
     facing: 0,

@@ -6784,7 +6784,40 @@ export class Sim {
     return moved;
   }
 
+  /**
+   * The one funnel every PLAYER-sourced crowd-control application passes
+   * through: the diminishing-returns ladder, then the item-set duration
+   * reduction on top of it.
+   *
+   * The two are layered rather than fused because they are separate mechanisms.
+   * The ladder has five distinct exits inside its hostile branch and they do not
+   * all want the same treatment: stuns take an early return that exempts them
+   * from the ladder (a deliberate balance pass, see the comment at that site) but
+   * NOT from the set reduction, and a DR-immune target returns null, which means
+   * "apply nothing" and must pass through untouched rather than being multiplied.
+   * Applying the reduction at the generic ladder exit alone would silently miss
+   * stuns, which is the category the bonus most exists for, so it is applied here
+   * once, over whatever the ladder decided.
+   *
+   * The player/hostile gate is duplicated from the inner function on purpose: it
+   * is three cheap reads, it leaves the ladder's shape byte-identical to what
+   * shipped, and it makes the PvE-untouched property readable at one glance.
+   */
   private diminishedCrowdControlDuration(
+    source: Entity,
+    target: Entity,
+    category: CrowdControlDrCategory,
+    duration: number,
+  ): number | null {
+    const base = this.crowdControlDurationAfterDr(source, target, category, duration);
+    if (base === null) return null; // already DR-immune: apply nothing at all
+    if (source.kind !== 'player' || target.kind !== 'player') return base;
+    if (!this.isHostileTo(source, target)) return base;
+    const reduction = target.ccDurationReduction ?? 0;
+    return reduction > 0 ? base * (1 - reduction) : base;
+  }
+
+  private crowdControlDurationAfterDr(
     source: Entity,
     target: Entity,
     category: CrowdControlDrCategory,

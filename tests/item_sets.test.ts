@@ -59,6 +59,9 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       hitRating: 0,
       castPushbackReduction: 0,
       knockbackResistance: 0,
+      pvpOffenseRating: 0,
+      pvpDefenseRating: 0,
+      ccDurationReduction: 0,
       procs: [],
     });
   });

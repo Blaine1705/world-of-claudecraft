@@ -836,6 +836,12 @@ export interface SetProc {
   // Target-applied procs (the stacking bleeds): 'target' lands the aura on the
   // struck enemy instead of the wearer. Defaults to the wearer.
   applyTo?: 'self' | 'target';
+  // WARFARE gating: when true the proc only fires when source and target are
+  // both players and hostile to each other, so the bonus contributes exactly
+  // nothing in PvE. Checked in combat/set_procs.ts BEFORE the chance roll, so a
+  // gated proc draws no rng outside hostile player-versus-player combat and a
+  // PvE run stays byte-identical.
+  pvpOnly?: true;
   tickInterval?: number; // dot/hot tick cadence, seconds
   // Stacking cap: reapplication adds a stack (magnitude scales linearly with
   // the count) and refreshes the duration.
@@ -861,6 +867,24 @@ export interface SetBonusEffect {
   hitRating?: number; // hit rating (converted to % in recalcPlayerStats): less miss/resist
   castPushbackReduction?: number; // 0..1: fraction of damage cast-pushback removed (1 = immune)
   knockbackResistance?: number; // 0..1: fraction of on-hit knockback distance resisted (1 = immune)
+  // WARFARE ratings granted by the set, in the same units as an item's
+  // pvpOffenseRating/pvpDefenseRating. They are added to the gear totals in
+  // recalcPlayerStats BEFORE the single pvpFractionsFromRatings call, so the
+  // combined value clamps at the cap exactly once. Both are inert outside
+  // hostile player-versus-player combat because of where they are consumed:
+  // pvp/power.ts reads the derived fractions only on the hostile-player damage
+  // path, so they contribute nothing to PvE, friendly, pet, or mob damage.
+  pvpOffenseRating?: number;
+  pvpDefenseRating?: number;
+  // 0..1: fraction removed from the duration of crowd control cast on the
+  // wearer BY A HOSTILE PLAYER. Max-combines across met tiers rather than
+  // summing, so two sources can never stack into immunity. Applied in
+  // Sim.diminishedCrowdControlDuration, which is the player-sourced funnel, so
+  // this is inert against mob and encounter control. (Crowd control applied by
+  // a player's PET is entity kind 'mob' and takes the same non-player early
+  // return, so it is not reduced either: tier text must say "cast on you by
+  // hostile players" rather than "from hostile players".)
+  ccDurationReduction?: number;
   proc?: SetProc;
 }
 
@@ -3448,6 +3472,10 @@ export interface Entity extends ClientMirroredEntityFields {
   blockValue: number; // flat physical damage prevented by a successful block
   castPushbackReduction: number; // 0..1: damage cast-pushback removed by item-set bonuses (1 = immune)
   knockbackResistance: number; // 0..1: on-hit knockback distance resisted by item-set bonuses (1 = immune)
+  // 0..1: duration removed from crowd control cast on this entity by a hostile
+  // PLAYER, from item-set bonuses (1 = immune). Read only by
+  // Sim.diminishedCrowdControlDuration, so mob and encounter control is unaffected.
+  ccDurationReduction: number;
   moveSpeed: number;
   hostile: boolean;
   // combat

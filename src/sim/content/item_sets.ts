@@ -293,6 +293,9 @@ export interface AggregatedSetEffect {
   hitRating: number;
   castPushbackReduction: number;
   knockbackResistance: number;
+  pvpOffenseRating: number;
+  pvpDefenseRating: number;
+  ccDurationReduction: number;
   procs: SetProc[];
 }
 
@@ -312,14 +315,17 @@ function zeroEffect(): AggregatedSetEffect {
     hitRating: 0,
     castPushbackReduction: 0,
     knockbackResistance: 0,
+    pvpOffenseRating: 0,
+    pvpDefenseRating: 0,
+    ccDurationReduction: 0,
     procs: [],
   };
 }
 
 // Resolve equipped set-piece counts (setId -> count) into the summed bonus.
-// Stat/AP/crit effects add across every met tier; pushback and knockback
-// resistance max-combine rather than summing past 1. Pure and host-agnostic so
-// a Vitest can drive it directly.
+// Stat/AP/crit effects and the WARFARE ratings add across every met tier;
+// pushback, knockback and crowd-control-duration resistance max-combine rather
+// than summing past 1. Pure and host-agnostic so a Vitest can drive it directly.
 export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetEffect {
   const out = zeroEffect();
   for (const [setId, count] of counts) {
@@ -340,6 +346,16 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
       out.haste += e.haste ?? 0;
       out.hasteRating += e.hasteRating ?? 0;
       out.hitRating += e.hitRating ?? 0;
+      // WARFARE ratings SUM across met tiers, like critRating and hasteRating.
+      // The cap is applied once, downstream, on the combined gear-plus-set total.
+      out.pvpOffenseRating += e.pvpOffenseRating ?? 0;
+      out.pvpDefenseRating += e.pvpDefenseRating ?? 0;
+      // Crowd-control reduction MAX-combines rather than summing, following
+      // castPushbackReduction and knockbackResistance below: two sources must
+      // never stack into immunity.
+      if (e.ccDurationReduction != null) {
+        out.ccDurationReduction = Math.max(out.ccDurationReduction, e.ccDurationReduction);
+      }
       if (e.castPushbackReduction != null) {
         out.castPushbackReduction = Math.max(out.castPushbackReduction, e.castPushbackReduction);
       }
@@ -351,5 +367,6 @@ export function aggregateSetBonuses(counts: Map<string, number>): AggregatedSetE
   }
   out.castPushbackReduction = Math.min(1, Math.max(0, out.castPushbackReduction));
   out.knockbackResistance = Math.min(1, Math.max(0, out.knockbackResistance));
+  out.ccDurationReduction = Math.min(1, Math.max(0, out.ccDurationReduction));
   return out;
 }
