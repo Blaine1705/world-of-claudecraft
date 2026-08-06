@@ -1192,9 +1192,12 @@ export const GATHER_NODES: GatherNodeDef[] = [
     // again at the release/v0.34.0 merge: open-sea swim made the Wickharbor
     // cove real water, the ridge-foot spot sat at swim depth with no
     // standable ground in harvest reach, so the patch stepped west onto the
-    // cove rim, still 31yd from its pair (its sea-plane exemption retired
-    // with the move).
-    pos: { x: 435, z: 400 },
+    // cove rim at (435,400), which put it 31.4yd from its pair, inside the
+    // 27 to 32 identical-partition band the quest-target cluster pin keeps
+    // empty. Stepped up the rim to hold the pair gap at 35.0yd, back outside
+    // the band with real margin and clear of the crag's reach (its sea-plane
+    // exemption stays retired).
+    pos: { x: 436, z: 394 },
     level: 20,
     tier: 1,
   },

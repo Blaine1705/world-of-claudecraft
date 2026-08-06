@@ -74,6 +74,8 @@ export interface StreetlampPlanOptions {
   /** the clearance band: a post must sit this far off the PAINTED road centre */
   clearMin?: number;
   clearMax?: number;
+  /** minimum distance from every raw authored road chord after painted-road correction */
+  authoredClearMin?: number;
   /** yards per correction step while nudging a post into the band */
   nudgeStep?: number;
   /** correction steps before a spot is abandoned (junctions, switchbacks) */
@@ -113,6 +115,30 @@ export const LAMP_LIGHT_AXIS_MIN = 0.15;
  *  Wide enough that the meander noise in the probe does not dominate the slope,
  *  short enough to stay inside the clearance band it is measured from. */
 const FACING_PROBE_STEP = 0.5;
+
+/** Distance to the nearest raw authored road chord. The painted-road probe may
+ *  nudge a post across another connector, so both representations need their
+ *  own clearance contract. */
+function authoredRoadDistance(
+  roads: readonly (readonly { x: number; z: number }[])[],
+  x: number,
+  z: number,
+): number {
+  let best = Infinity;
+  for (const road of roads) {
+    for (let i = 0; i + 1 < road.length; i++) {
+      const a = road[i];
+      const b = road[i + 1];
+      const abx = b.x - a.x;
+      const abz = b.z - a.z;
+      const lenSq = abx * abx + abz * abz;
+      const t =
+        lenSq > 0 ? Math.max(0, Math.min(1, ((x - a.x) * abx + (z - a.z) * abz) / lenSq)) : 0;
+      best = Math.min(best, Math.hypot(x - a.x - abx * t, z - a.z - abz * t));
+    }
+  }
+  return best;
+}
 
 /**
  * The yaw to instance a fixture at, so its lit end hangs over the road.
@@ -168,6 +194,7 @@ export function planStreetlamps(
   const offset = options.offset ?? DEFAULTS.offset;
   const clearMin = options.clearMin ?? DEFAULTS.clearMin;
   const clearMax = options.clearMax ?? DEFAULTS.clearMax;
+  const authoredClearMin = options.authoredClearMin ?? 0;
   const nudgeStep = options.nudgeStep ?? DEFAULTS.nudgeStep;
   const maxNudges = options.maxNudges ?? DEFAULTS.maxNudges;
   const minSeparation = options.minSeparation ?? DEFAULTS.minSeparation;
@@ -286,6 +313,7 @@ export function planStreetlamps(
           nudges++;
         }
         if (clear < clearMin || clear > clearMax) continue;
+        if (authoredClearMin > 0 && authoredRoadDistance(roads, x, z) < authoredClearMin) continue;
         if (tooClose(x, z)) continue;
         const y = probes.groundAt(x, z);
         if (y < minGroundY) continue;

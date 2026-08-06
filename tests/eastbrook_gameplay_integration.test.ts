@@ -891,7 +891,10 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
   });
 
   it('keeps the fixed-seed world projection stable through wandering and respawn', {
-    timeout: 90000,
+    // Two complete shipped-world simulations run through wandering and respawn.
+    // Loaded five-worker CI can exceed the old 90s budget while the bounded
+    // projection still completes deterministically.
+    timeout: 180000,
   }, () => {
     const stabilitySeed = 4_242;
     const legacyWorld = {

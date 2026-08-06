@@ -13,7 +13,7 @@ import {
   streetlampPlacements,
   supportHeightAt,
 } from '../src/sim/colliders';
-import { getActiveWorldContent } from '../src/sim/data';
+import { BUILTIN_WORLD, getActiveWorldContent } from '../src/sim/data';
 import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import type { PlacedStreetlamp } from '../src/sim/streetlamp_layout';
 import {
@@ -75,6 +75,28 @@ function sceneryLamps(): PlacedStreetlamp[] {
 function solidLamps(): PlacedStreetlamp[] {
   const scenery = new Set(sceneryLamps());
   return streetlampPlacements(SEED).filter((lamp) => !scenery.has(lamp));
+}
+
+/** Independent distance from a point to the shipped raw authored road chords. */
+function rawAuthoredRoadDistance(x: number, z: number): number {
+  let nearest = Infinity;
+  for (const road of BUILTIN_WORLD.roads) {
+    for (let i = 0; i + 1 < road.length; i++) {
+      const a = road[i];
+      const b = road[i + 1];
+      const dx = b.x - a.x;
+      const dz = b.z - a.z;
+      const lengthSq = dx * dx + dz * dz;
+      const projection = lengthSq > 0 ? ((x - a.x) * dx + (z - a.z) * dz) / lengthSq : 0;
+      if (projection <= 0) nearest = Math.min(nearest, Math.hypot(x - a.x, z - a.z));
+      else if (projection >= 1) nearest = Math.min(nearest, Math.hypot(x - b.x, z - b.z));
+      else {
+        const cross = Math.abs(dx * (a.z - z) - (a.x - x) * dz);
+        nearest = Math.min(nearest, cross / Math.sqrt(lengthSq));
+      }
+    }
+  }
+  return nearest;
 }
 
 describe('streetlamp colliders (you cannot walk into a lamp post)', () => {
@@ -234,39 +256,34 @@ describe('streetlamp colliders (you cannot walk into a lamp post)', () => {
     expect(matched).toBeGreaterThan(5);
   });
 
-  it('leaves the road itself walkable', () => {
+  it('keeps every lamp collider clear of the painted road', () => {
     // The posts stand in a 3.0 to 5.6 yard clearance band beside the painted
     // track, and the widest of them is ~1.08. If a collider ever grew enough to
     // reach the road centre, every lamp on the network would narrow the road it
     // is supposed to light, which is the regression this pins.
     const widest = Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS));
     expect(widest + PLAYER_BODY_RADIUS).toBeLessThan(3.0);
-    // Not just the arithmetic: walk the nearest point of the painted road to
-    // each sampled lamp and check nothing pushes the body off it.
-    for (const lamp of solidLamps().filter((_, i) => i % 13 === 0)) {
+    // Bind that arithmetic to every shipped site without conflating a nearby
+    // building or prop collider with the lamp this test owns.
+    for (const lamp of solidLamps()) {
       const clear = roadDistance(lamp.x, lamp.z);
-      expect(clear).toBeGreaterThan(STREETLAMP_COLLIDER_RADIUS[lamp.style]);
-      // Step from the lamp toward the road until the probe says we are on the
-      // track, then stand there: a lamp reaching the road would push us off.
-      const toRoad = clear;
-      const onRoad = {
-        x: lamp.x + (lamp.x - lamp.x || 0),
-        z: lamp.z,
-      };
-      // The road centre lies `clear` yards away along the downhill of the
-      // roadDistance field; a central difference finds that direction.
-      const step = 0.5;
-      const gx = roadDistance(lamp.x + step, lamp.z) - roadDistance(lamp.x - step, lamp.z);
-      const gz = roadDistance(lamp.x, lamp.z + step) - roadDistance(lamp.x, lamp.z - step);
-      const len = Math.hypot(gx, gz);
-      if (len < 1e-6) continue;
-      onRoad.x = lamp.x - (gx / len) * toRoad;
-      onRoad.z = lamp.z - (gz / len) * toRoad;
       expect(
-        pushedOut(onRoad.x, onRoad.z),
-        `road beside the ${lamp.style} at ${lamp.x},${lamp.z}`,
-      ).toBe(false);
+        clear,
+        `painted-road clearance for the ${lamp.style} at ${lamp.x},${lamp.z}`,
+      ).toBeGreaterThan(STREETLAMP_COLLIDER_RADIUS[lamp.style] + PLAYER_BODY_RADIUS);
     }
+  });
+
+  it('keeps every shipped lamp collider clear of every raw authored road chord', () => {
+    const collisions: string[] = [];
+    for (const lamp of solidLamps()) {
+      const required = STREETLAMP_COLLIDER_RADIUS[lamp.style] + PLAYER_BODY_RADIUS;
+      const clear = rawAuthoredRoadDistance(lamp.x, lamp.z);
+      if (clear <= required) {
+        collisions.push(`${lamp.style} @ ${lamp.x},${lamp.z}: ${clear} <= ${required}`);
+      }
+    }
+    expect(collisions).toEqual([]);
   });
 
   it('keeps a lamp sharing an NPC spot as scenery, mesh and all', () => {

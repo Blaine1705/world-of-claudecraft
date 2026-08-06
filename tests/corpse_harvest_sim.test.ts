@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 // Mock the db layer so no Postgres is needed; only the wire encode/decode and
 // broadcast paths are under test (wireEntity round-trips plus a real GameServer
@@ -32,7 +32,7 @@ import {
   MONSTER_MATERIAL_TIERS,
   monsterMaterialTierFor,
 } from '../src/sim/content/professions';
-import { ITEMS, MOBS } from '../src/sim/data';
+import { BUILTIN_WORLD, ITEMS, MOBS, setActiveWorldContent } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   forfeitsEveryMappedYield,
@@ -48,7 +48,7 @@ import {
 import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import type { Entity, WorldContent } from '../src/sim/types';
 import { corpseHarvestView } from '../src/ui/hud/loot/corpse_harvest_view';
 import { bareClient, broadcast, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
 
@@ -65,6 +65,14 @@ type SimInternals = {
   players: Map<number, PlayerMeta>;
 };
 
+// Harvest tests preserve the built-in spawn tables because their seed pins
+// include constructor RNG draws. Roads are unrelated and would rebuild the
+// full solid streetlamp network for every fresh-seed probe.
+const CORPSE_TEST_WORLD: WorldContent = { ...BUILTIN_WORLD, roads: [] };
+
+beforeAll(() => setActiveWorldContent(CORPSE_TEST_WORLD));
+afterAll(() => setActiveWorldContent(null));
+
 function mustPlayer(internals: SimInternals, pid: number): PlayerMeta {
   const meta = internals.players.get(pid);
   if (!meta) throw new Error(`missing player ${pid}`);
@@ -72,7 +80,7 @@ function mustPlayer(internals: SimInternals, pid: number): PlayerMeta {
 }
 
 function setup(seed = 11) {
-  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: CORPSE_TEST_WORLD });
   const internals = sim as unknown as SimInternals;
   const a = sim.addPlayer('warrior', 'Alpha');
   const b = sim.addPlayer('warrior', 'Bravo');
@@ -611,42 +619,37 @@ describe('signed Pristine specimens (#1145)', () => {
     // command: the fang signature falls back to the plain top-up (loop one,
     // 'mark') and the hide jackpot truncates (loop two, 'find'). Exactly one
     // event may fire, and the first loop runs first, so it reports 'mark'.
-    // The qualifying seed is hunted with a probe run (roomy bags: both signed
-    // grants land as instances, proving both rolls signable), then asserted
-    // on a FRESH same-seed world: the rarity draws are inventory-independent
-    // (pinned by the grant-order contract above), so the same seed reproduces
-    // the same rolls against the full bags.
-    for (let seed = 1; seed <= 200; seed++) {
-      const probe = setup(seed);
-      probe.sim.harvestCorpse(probe.mob.id, undefined, probe.a);
-      const pm = probe.internals.players.get(probe.a)!;
-      const fangSigned = pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer);
-      const hideJackpot = pm.inventory.some((s) => s.itemId === 'pristine_hide');
-      if (!fangSigned || !hideJackpot) continue;
-      const { sim, internals, a, mob } = setup(seed);
-      fillBags(sim, internals, a);
-      const m = internals.players.get(a)!;
-      const cap = bagCapacity(m.bags);
-      m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
-      m.inventory[1] = { itemId: 'rough_hide', count: 1 };
-      expect(m.inventory.length).toBe(cap);
-      sim.drainEvents();
-      sim.harvestCorpse(mob.id, undefined, a);
-      expect(mob.harvestClaimedBy).toBe(a);
-      expect(m.inventory.length).toBeLessThanOrEqual(cap);
-      // Both downgrades happened: no signed fang, no jackpot, both plain
-      // stacks absorbed their yields.
-      expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
-      expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
-      expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
-      expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
-      // ... but exactly ONE event fired, reporting the first-loop mark loss.
-      expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
-        { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
-      ]);
-      return;
-    }
-    throw new Error('no seed with both fang and hide signable within 200');
+    // Seed 50 is the first qualifying built-in-world stream. The roomy probe
+    // keeps the pin honest: both special grants must still be signable before
+    // the fresh same-seed full-bag run exercises their downgrade paths.
+    const seed = 50;
+    const probe = setup(seed);
+    probe.sim.harvestCorpse(probe.mob.id, undefined, probe.a);
+    const pm = probe.internals.players.get(probe.a)!;
+    expect(pm.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance?.signer)).toBe(true);
+    expect(pm.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(true);
+
+    const { sim, internals, a, mob } = setup(seed);
+    fillBags(sim, internals, a);
+    const m = internals.players.get(a)!;
+    const cap = bagCapacity(m.bags);
+    m.inventory[0] = { itemId: 'wolf_fang', count: 1 };
+    m.inventory[1] = { itemId: 'rough_hide', count: 1 };
+    expect(m.inventory.length).toBe(cap);
+    sim.drainEvents();
+    sim.harvestCorpse(mob.id, undefined, a);
+    expect(mob.harvestClaimedBy).toBe(a);
+    expect(m.inventory.length).toBeLessThanOrEqual(cap);
+    // Both downgrades happened: no signed fang, no jackpot, both plain
+    // stacks absorbed their yields.
+    expect(m.inventory.some((s) => s.itemId === 'wolf_fang' && s.instance)).toBe(false);
+    expect(m.inventory.some((s) => s.itemId === 'pristine_hide')).toBe(false);
+    expect(sim.countItem('wolf_fang', a)).toBeGreaterThan(1);
+    expect(sim.countItem('rough_hide', a)).toBeGreaterThan(1);
+    // ... but exactly ONE event fired, reporting the first-loop mark loss.
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDowngrade')).toEqual([
+      { type: 'gatherDowngrade', pid: a, surface: 'corpse', lost: 'mark' },
+    ]);
   });
 });
 
@@ -2035,7 +2038,7 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
   // seeds below were hunted against exactly this construction order, and the
   // second addPlayer would shift the world's draw positions.
   function soloRig(seed: number, templateId = 'forest_wolf') {
-    const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: CORPSE_TEST_WORLD });
     const internals = sim as unknown as SimInternals;
     const a = sim.addPlayer('warrior', 'Alpha');
     sim.tick();

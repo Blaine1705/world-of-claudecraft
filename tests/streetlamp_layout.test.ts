@@ -206,6 +206,27 @@ describe('planStreetlamps: the clearance band against the painted road', () => {
     const plan = planStreetlamps(STRAIGHT, [], openGround(STRAIGHT, { roadClear: () => 0 }));
     expect(plan.sites).toHaveLength(0);
   });
+
+  it('rejects a painted-road correction that crowds an authored connector', () => {
+    // The paint has swung 4.5yd east of the raw chord. Correcting posts on its
+    // west side can otherwise pull them back across the authored connector.
+    const shifted = (x: number, z: number) => chordDistance(STRAIGHT, x - 4.5, z);
+    const probes = openGround(STRAIGHT, { roadClear: shifted });
+    const unguarded = planStreetlamps(STRAIGHT, [], probes, { maxNudges: 10 });
+    const guarded = planStreetlamps(STRAIGHT, [], probes, {
+      authoredClearMin: 1.88,
+      maxNudges: 10,
+    });
+
+    expect(unguarded.sites.some((site) => chordDistance(STRAIGHT, site.x, site.z) < 1.88)).toBe(
+      true,
+    );
+    expect(guarded.sites.length).toBeGreaterThan(0);
+    expect(guarded.sites.length).toBeLessThan(unguarded.sites.length);
+    for (const site of guarded.sites) {
+      expect(chordDistance(STRAIGHT, site.x, site.z)).toBeGreaterThanOrEqual(1.88);
+    }
+  });
 });
 
 describe('planStreetlamps: which way a lamp faces', () => {

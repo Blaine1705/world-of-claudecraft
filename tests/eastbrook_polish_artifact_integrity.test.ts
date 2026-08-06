@@ -628,14 +628,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // at the same captured view, and only its swept provenance bytes follow the
 // merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-// Re-pinned again for the mobile-disconnect fix: src/render/renderer.ts gains the
-// bounded ground-object reuse pool (storePooledObject/takePooledObject cap), the
-// rendererIntegration leaf, so the composite (and the metadata file's second-order
-// digest that embeds it) re-mint once more.
+// Re-pinned for the integrated v0.35 renderer on AAA-enhancements. The accepted
+// captures are unchanged; only the rendererIntegration leaf, composite, and the
+// metadata file's second-order digest are re-minted on this branch.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '90d5ab49680e3e2bf8be49f35acdc0d964275a51a337715fc57497acfeaf95a6';
+  'c463e5d447ae23dd0216698bc727ce93bcc9a85b3042938ae8695b5f1e527df4';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '628f66e2ba22fb456ca64603dfee7311bf766ee5d9ebe71d5e2b2109b01f1d3b';
+  '86b98448f7986b5afc8737ca8aa0cb4588511ff4ca99f890fde31bfa0f15d1bd';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1503,10 +1502,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
-    // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
-    // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
+    // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
+    // recomputed by remint_polish_provenance.mjs.
     expect(fingerprint.digest('hex')).toBe(
-      'd26892a5c5ea31b30370b477a5eb610a21b1267e7556b1efcdb6a6b96beb9d62',
+      'cac6fe0ace503a359c9390f97a898ce6177f7b39676f8145a97211717f3cb389',
     );
   });
 

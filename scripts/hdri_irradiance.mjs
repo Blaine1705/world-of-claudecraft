@@ -19,8 +19,9 @@
 //   node scripts/hdri_irradiance.mjs
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const DIR = path.join(path.dirname(new URL(import.meta.url).pathname), '..', 'public', 'env');
+const DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'public', 'env');
 
 /** Minimal Radiance .hdr (RGBE) reader: header, then RLE or flat scanlines. */
 function readHdr(buf) {

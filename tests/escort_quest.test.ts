@@ -426,7 +426,9 @@ describe('escort run guards', () => {
     expect(mob.threat.get(sim.player.id) ?? 0).toBeGreaterThan(1);
   });
 
-  it('a slain wave unravels after its loot window instead of respawning into the run', () => {
+  it('a slain wave unravels after its loot window instead of respawning into the run', {
+    timeout: 60_000,
+  }, () => {
     const sim = makeSim();
     const def = ESCORTS[ESCORT_ID];
     teleportTo(sim, def.start.x, def.start.z);

@@ -1532,6 +1532,9 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
       roadClear: roadDistance,
       areaAt: (x, z) => lampAreaAt(x, z, content.zones),
     },
+    {
+      authoredClearMin: MAX_BODY_RADIUS + Math.max(...Object.values(STREETLAMP_COLLIDER_RADIUS)),
+    },
   );
   return styleStreetlampSites(plan.sites, content.zones);
 }
