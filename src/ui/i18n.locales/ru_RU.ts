@@ -1147,6 +1147,26 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.graphicsFatal': 'Не удалось восстановить графику. Перезагрузите игру, чтобы продолжить.',
   'hudChrome.options.graphicsReload': 'Перезагрузить игру',
   'hudChrome.options.graphicsDraftChanged': 'Изменения графики готовы к применению.',
+  'hudChrome.options.gfxSectionQuality': 'Качество',
+  'hudChrome.options.gfxSectionWorld': 'Детализация мира',
+  'hudChrome.options.gfxSectionLighting': 'Освещение и эффекты',
+  'hudChrome.options.gfxViewDistance': 'Дальность обзора',
+  'hudChrome.options.gfxWaterQuality': 'Качество воды',
+  'hudChrome.options.gfxCharacterDetail': 'Детализация персонажей',
+  'hudChrome.options.gfxAmbientOcclusion': 'Затенение окружения',
+  'hudChrome.options.gfxBloom': 'Свечение',
+  'hudChrome.options.gfxAntiAliasing': 'Сглаживание',
+  'hudChrome.options.gfxDynamicLights': 'Динамические источники света',
+  'hudChrome.options.gfxParticleEffects': 'Эффекты частиц',
+  'hudChrome.options.gfxHalf': 'Наполовину',
+  'hudChrome.options.gfxEffectsNote':
+    'Затенение окружения, свечение и сглаживание работают через цепочку постобработки: при низком уровне «Эффекты и освещение» цепочка отключена, и эти настройки не действуют.',
+  'hudChrome.options.gfxSectionCamera': 'Камера',
+  'hudChrome.options.gfxSectionDisplay': 'Экран',
+  'hudChrome.options.gfxSectionSystem': 'Система',
+  'hudChrome.options.gfxSectionTouch': 'Сенсорное управление',
+  'hudChrome.options.gfxCustomNote':
+    'Изменение любого регулятора переключает пресет качества на «Расширенное»: собственный набор на основе базы «Высокое», начинающийся с уровней, показанных для текущего пресета.',
   'hudChrome.options.footstepSounds': 'Звуки шагов',
   'hudChrome.options.interfaceSounds': 'Звуки интерфейса и откликов',
   'hudChrome.options.clickFeedback': 'Метка клика',
@@ -2564,6 +2584,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Использование: мгновенно восстанавливает {amount} здоровья. Можно использовать в бою. Восстановление 1 мин.',
   'itemUi.tooltip.useManaPotion':
     'Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.',
+  'itemUi.tooltip.useElixir':
+    'Использование: повышает {stat} на {value} в течение {minutes} мин. Можно использовать в бою.',
+  'itemUi.tooltip.useElixirAura':
+    'Использование: дает эффект "{aura}" на {minutes} мин. Можно использовать в бою.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',

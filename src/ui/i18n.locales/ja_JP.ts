@@ -1138,6 +1138,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。',
   'hudChrome.options.graphicsReload': 'ゲームを再読み込み',
   'hudChrome.options.graphicsDraftChanged': 'グラフィックの変更を適用できます。',
+  'hudChrome.options.gfxSectionQuality': '画質',
+  'hudChrome.options.gfxSectionWorld': 'ワールド詳細',
+  'hudChrome.options.gfxSectionLighting': 'ライティングとエフェクト',
+  'hudChrome.options.gfxViewDistance': '描画距離',
+  'hudChrome.options.gfxWaterQuality': '水面品質',
+  'hudChrome.options.gfxCharacterDetail': 'キャラクター詳細',
+  'hudChrome.options.gfxAmbientOcclusion': 'アンビエントオクルージョン',
+  'hudChrome.options.gfxBloom': 'ブルーム',
+  'hudChrome.options.gfxAntiAliasing': 'アンチエイリアス',
+  'hudChrome.options.gfxDynamicLights': '動的ライト',
+  'hudChrome.options.gfxParticleEffects': 'パーティクル効果',
+  'hudChrome.options.gfxHalf': '半分',
+  'hudChrome.options.gfxEffectsNote':
+    'アンビエントオクルージョン、ブルーム、アンチエイリアスはポストプロセスチェーンに依存します。「エフェクトとライティング」が低の場合、チェーンが無効になりこれらの設定は効果がありません。',
+  'hudChrome.options.gfxSectionCamera': 'カメラ',
+  'hudChrome.options.gfxSectionDisplay': '表示',
+  'hudChrome.options.gfxSectionSystem': 'システム',
+  'hudChrome.options.gfxSectionTouch': 'タッチ操作',
+  'hudChrome.options.gfxCustomNote':
+    'ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
@@ -2542,6 +2562,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。',
   'itemUi.tooltip.useManaPotion':
     '使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。',
+  'itemUi.tooltip.useElixir':
+    '使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。',
+  'itemUi.tooltip.useElixirAura':
+    '使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',

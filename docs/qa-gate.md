@@ -13,6 +13,8 @@ Codex have different entry points and share the same deterministic scripts and c
 | Day-loop fast path | `npm run gate:fast` through `scripts/gate_fast.mjs` | While iterating (agents and mid/low-tier machines) | No (local only; not merge) |
 | **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
+| Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (PR checks) |
+| Merge queue | ci.yml on the `merge_group` event: the full PR tier over the exact merge result about to become the branch tip (see `docs/merge-queue.md`, including rollout status: `release/**` first, `main` at the next release-to-main merge) | Every queued merge into a queue-protected branch | Yes (required checks on the merge group) |
 | Nightly full gate | `.github/workflows/nightly.yml`: full suite + checks + browser over the tips of main and the active `release/**` branch | Scheduled nightly (04:47 UTC) | No (alerting: files and closes one tracking issue) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
@@ -78,7 +80,14 @@ is dirty (same reason `gate:fast` skips those paths for related expansion). Pref
 `test:related` with explicit sources, or `gate:fast`, for day-to-day work. Vitest
 `experimental.fsModuleCache` is on in `vite.config.ts` so warm re-runs reuse module
 transforms under `node_modules/.experimental-vitest-cache` (clear with
-`npx vitest --clearCache` if a warm run looks wrong). Most DOM-environment unit
+`npx vitest --clearCache` if a warm run looks wrong). The same store is persisted
+across CI runs since Phase 4 of the CI/CD performance packet: the pr-gate and
+release-gate shard jobs carry an `actions/cache` step for it, keyed per shard, and the
+long-sims lane job carries the same step keyed per lane (Phase 6, the recorded Phase 4
+rider), all over the node_modules-layout inputs (lockfile, vite config, `.npmrc`,
+`package.json`), with the design constraints written on the pr-gate copy of the step in
+`.github/workflows/ci.yml` and pinned by `tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
+uncached full replay. Most DOM-environment unit
 tests use `// @vitest-environment happy-dom`; a short exception list still pins
 `jsdom` where happy-dom API gaps bite (see `docs/local-gate-perf/baselines.md`
 Phase 5). Default environment remains `node`.
@@ -165,11 +174,104 @@ surface where an escape could hide, and it is what to actually study.
 
 **What it still cannot prove, and why that is acceptable.** The out-of-graph pattern list is
 a floor, not a proof, so this path is empirically complete rather than provably complete.
-The backstop is CI: `.github/workflows/ci.yml` runs the FULL suite (8-shard matrix) on every
-`pull_request` AND on every push to `main` / `release/**`, and the scheduled nightly full
-gate (next section) re-proves the tips daily with same-day alerting. A local selection miss
-therefore costs feedback latency, not correctness, because the full suite still runs on the
-PR before it merges. That is what makes this safe as the local bar.
+The backstops are the runs that stay unconditionally full: `.github/workflows/ci.yml` runs
+the FULL suite on every push to `main` / `release/**` (release pushes as the plain 8-shard
+matrix; main/dev pushes through the PR tier's shards-plus-long-sims-lane layout, full
+mode, since selection applies to pull requests only, next section), and the scheduled
+nightly full gate re-proves the tips daily with same-day alerting. A selection miss
+therefore surfaces at merge-to-release time or the same night, never later, and the
+release branch is the safety net the packet designed it to be.
+
+### Selective PR-tier CI (`ci_shard_test.mjs`)
+
+Since Phase 2 of the CI/CD performance packet, the
+`pull_request` tier of `.github/workflows/ci.yml` runs the SAME selection semantics as
+`gate:select`, sharded 8 ways. The `changes` job derives a `test_mode` from the same
+API-fetched file listing that decides `code` (`scripts/lib/ci_test_select.mjs`), and each
+`pr-gate` shard builds its legs through `scripts/lib/ci_shard_plan.mjs` via
+`scripts/ci_shard_test.mjs`: in full mode, the old `npm test -- --shard=i/8` step minus
+the long-sims lane files (below); in selective mode, the always-run floor plus
+`vitest related` over the changed sources, both sharded.
+
+**The long-sims lane** (Phase 4). The `CI_LONG_SUITES` files
+(`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90 seconds inside a full-mode
+shard, the chronomancy balance sweep among them) run in the dedicated
+`PR gate (long sims)` job (`node scripts/ci_shard_test.mjs --lane=long-sims`), and every
+shard leg excludes them, so a single multi-minute file no longer sets the slowest shard's
+wall clock. Completeness is a pinned invariant, not an intention: the lane fails closed to
+its whole file list on exactly the inputs that make a shard fail closed to full, the
+shard legs exclude exactly the files the lane owns, and in selective mode the lane runs
+just the lane files the floor or the PR's diff would have carried (the related legs stay
+unfiltered, so a reached lane file re-runs there: duplicate work, never a gap). Mode for
+mode, the nine PR-tier test jobs together therefore run exactly what the pre-lane
+8-shard layout would have run (`tests/ci_shard_plan.test.ts` pins the partition;
+selective mode still skips the outside-floor remainder by design, exactly as before the
+lane). The latency win is concentrated in FULL mode: three of the four lane files are
+graph-visible, so on a sim-heavy selective PR the `related` legs pull them back into a
+shard exactly as they did before the lane, and only the blind member (plus any lane
+test the PR itself changed) rides the lane.
+The lane reproduces locally with
+`node scripts/ci_shard_test.mjs --lane=long-sims --plan-only`, printing the same
+`[ci-shard]` audit lines as the shards. `release-gate` is deliberately not lane-split:
+`release/**` pushes keep the full suite in their 8 shards; a push to `main` or `dev-*`
+runs the PR tier, so it gets the shards-plus-lane layout.
+
+The CI floor is a superset of the local one: every blind/partial test (recomputed in the
+PR's own tree via the shared `collectSuiteVisibility`), PLUS the invariant guard suites by
+name (`tests/architecture.test.ts`, the localization guards, `tests/world_api_parity.test.ts`,
+and everything under `tests/parity/`), PLUS every test file the PR changed. CI also widens
+on triggers the local gate does not need: any `.github/` path, the selection pipeline's own
+scripts (a PR runs its own copy of them), any removed or renamed source/test path (a
+deleted module's importers are invisible to `related`), and any listing it cannot relay or
+read safely. Selection never applies off `pull_request` events: a merge-queue run
+(`merge_group`) always takes `test_mode=full` (the queue is the last pre-merge bar),
+`release-gate` keeps the unconditional full 8-shard run line, and the nightly gate
+re-proves the tips daily.
+
+Every decision prints in the job log (`[detect_code_changes]` in the changes job,
+`[ci-shard]` in each shard: mode, reason, floor size, related sources, and the
+outside-floor count), so a suspicious green is auditable at a glance. To reproduce a CI
+decision locally: `TEST_MODE=... CHANGED_FILES='[...]' node scripts/ci_shard_test.mjs
+--shard=1/8 --plan-only` (`--plan-only` spawns nothing, so it works on any platform;
+the real run path is POSIX-only by design). Pins: `tests/ci_test_select.test.ts`,
+`tests/ci_shard_plan.test.ts`, `tests/ci_selection_pipeline.test.ts` (the trigger list
+matches the pipeline's real import closure), and the workflow shape in
+`tests/ci_workflow.test.ts`.
+
+What the selective PR tier still cannot prove: the merge-result INTERACTION between
+the PR's diff and base commits that landed after the PR's merge base. The shards check
+out the merge ref (the PR merged onto the current base tip), but selection derives
+from the PR's own changed files, so a test that only fails in the combination of a PR
+change and a newer base change is outside both the floor and the related set. On the
+queue-protected branches (`main` and `release/**`, see `docs/merge-queue.md`) the merge
+queue closes this pre-merge: every queued PR is retested with the FULL suite on the
+exact merge result against the current tip before it may land. The full-suite run on
+every `release/**` push still re-proves the landed tip, and the nightly re-proves it
+daily.
+
+**Known-flake handling** (Phase 6). The shard and lane legs run through
+`scripts/lib/ci_leg_runner.mjs`, which streams each leg's output through with
+backpressure while keeping a bounded tail, and applies the ONE sanctioned automatic
+retry: a leg that exits 1 while its vitest summary shows every test passed, carries the
+exact unhandled `EnvironmentTeardownError: [vitest-worker]: Closing rpc while
+"onUserConsoleLog" was pending` message (the worker-teardown console-log race, first
+recorded 2026-08-05), and whose summary `Errors` count is fully explained by teardown-rpc
+occurrences (so a run also carrying any OTHER unhandled error never retries) is rerun
+once, with a loud `[ci-shard] known-flake retry` banner in the job log, a GitHub warning
+annotation on the run, and a `(known-flake retry used on: ...)` suffix on the PASS line,
+so a green that used the retry is auditable at a glance. At most ONE retry per job,
+shared across all its legs. Any failed test, any other exit code, a signal kill, a spawn
+error, or any unexplained unhandled error fails the job exactly as before: the packet's
+non-goals forbid a blanket retry because retries hide real regressions. Be precise about
+what the guarantee is: test output is not a trust boundary (a test already executes
+arbitrary code in the job), so the summary parse is a narrowing filter, not integrity;
+the property that holds is the policy itself, at most one rerun of the same leg per job,
+always visible in the log. Classifier and policy live in
+`scripts/lib/teardown_rpc_flake.mjs` and `scripts/lib/ci_leg_runner.mjs`, pinned by
+`tests/teardown_rpc_flake.test.ts` and `tests/ci_leg_runner.test.ts`. `release-gate`,
+the nightly, and the local gate carry NO auto-retry: there a teardown-rpc red stays red
+and the remedy remains a manual rerun of the red shard
+(`gh run rerun <run-id> --failed`).
 
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
