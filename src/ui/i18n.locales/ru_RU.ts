@@ -9411,8 +9411,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.raise_fallen': 'Поднятие павших (периодические волны прислужников)',
   'hudChrome.finder.mech.soul_rend': 'Разрыв души (отмеченным разойтись и получать лечение)',
   'hudChrome.finder.mech.deathless_rage': 'Бессмертная ярость (прерывается у охранных камней)',
-  'hudChrome.finder.mech.dread_curse':
-    'Проклятие ужаса (только героический режим, суммируемый эффект для смены танков)',
   'hudChrome.finder.mech.wardstones': 'Охранные камни (смена фазы)',
   'hudChrome.finder.mech.dread_curse':
     'Проклятие ужаса (только на героическом, накапливающийся дебафф смены танка)',
