@@ -429,6 +429,19 @@ const WILDHEART_HEXCALLER: ClipMap = {
   cast: 'Wildheart_Hexcaller_Attack',
 };
 
+// Zulgar, Voice of the Basin's own attack/cast (scripts/build_wildheart_high_priest_anims.mjs,
+// issue #2889 round 2): TRIPO_BIPED_FULL_RIG's Attack and Cast are shared by reference
+// across all 5 Wildheart Basin mobs. This clip is baked off wildheart_high_priest.glb's
+// own donor poses (a climactic Cast hold into Jump's own pose repurposed as a downward
+// slam/roar release), so only mob_wildheart_high_priest gets it; the other 4 Wildheart
+// mobs are untouched. Wired into both attack and cast; deliberately the longest and most
+// dramatic of the five, befitting the dungeon boss.
+const WILDHEART_HIGH_PRIEST: ClipMap = {
+  ...TRIPO_BIPED_FULL_RIG,
+  attack: ['Wildheart_High_Priest_Attack'],
+  cast: 'Wildheart_High_Priest_Attack',
+};
+
 // 2023 enemy rig (goblin/giant)
 const ENEMY7: ClipMap = {
   idle: 'Idle',
@@ -1813,7 +1826,11 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/wildheart_high_priest.glb`,
     height: 3.2,
     yaw: -Math.PI / 2,
-    clips: TRIPO_BIPED_FULL_RIG,
+    clips: WILDHEART_HIGH_PRIEST,
+    // Wildheart_High_Priest_Attack clip donor
+    // (scripts/build_wildheart_high_priest_anims.mjs): mesh-free, baked off this same
+    // rig's own poses.
+    animUrls: [`${CREATURES}/wildheart_high_priest_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.03,
   },
