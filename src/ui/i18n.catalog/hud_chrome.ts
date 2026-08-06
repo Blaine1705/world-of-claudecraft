@@ -235,7 +235,13 @@ export const hudChromeStrings = {
       blockNoWallet: 'Link and verify a wallet to sell items for $WOC.',
       blockPartnerUnknown: 'Checking whether that player can accept $WOC...',
       blockRecipientNoWallet: 'That player must connect a wallet to accept $WOC payments.',
-      blockNoEligibleItems: 'None of the staged items can be sold for $WOC.',
+      // You are the SELLER in a $WOC deal: you stage the item and name the
+      // price, and the other player pays. These say so, rather than leaving a
+      // disabled button unexplained.
+      hintStageItem: 'Add the item you want to sell to your side of the trade.',
+      hintNoEligible: 'None of your staged items can be sold for $WOC.',
+      hintEnterPrice: 'Enter a price in USD.',
+      hintGoldOffered: 'Remove your gold offer first: a trade is gold or $WOC, not both.',
       ineligibleNote: '{count} staged item(s) cannot be sold for $WOC.',
       incomingTitle: '$WOC offer from {name}',
       incomingBody: '{name} offers to sell you {item} for {price}.',

@@ -39,8 +39,22 @@ export type WocArmBlock =
   | 'market_disabled' // the realm has no exchange
   | 'no_wallet' // YOUR wallet is not linked
   | 'partner_unknown' // we have not learned whether THEY can be paid
-  | 'recipient_no_wallet' // we have, and they cannot
-  | 'no_eligible_items'; // nothing staged that may be sold for $WOC
+  | 'recipient_no_wallet'; // we have, and they cannot
+
+/**
+ * Why "Send offer" is withheld, when the arm itself is usable.
+ *
+ * Distinct from WocArmBlock, which means $WOC is unavailable and hides the
+ * form. These are about the CONTENTS of the offer being incomplete, so the form
+ * stays up and the hint says what is missing. A disabled button with no reason
+ * is the defect this exists to prevent: a seller typed a price, got a dead
+ * button, and had nothing to act on.
+ */
+export type WocSendHint =
+  | 'stage_item' // your own side is empty (you are the one selling)
+  | 'no_eligible' // you staged something, but none of it may be sold for $WOC
+  | 'enter_price'
+  | 'gold_offered';
 
 export interface WocTradeInput {
   marketEnabled: boolean;
@@ -89,6 +103,8 @@ export interface WocTradeModel {
   split: WocTradeSplit | null;
   /** Whether "Send offer" may be pressed. */
   canSend: boolean;
+  /** The i18n key explaining why it may not, or null when it may. */
+  sendHint: TranslationKey | null;
 }
 
 const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
@@ -96,7 +112,13 @@ const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
   no_wallet: 'hudChrome.trade.woc.blockNoWallet',
   partner_unknown: 'hudChrome.trade.woc.blockPartnerUnknown',
   recipient_no_wallet: 'hudChrome.trade.woc.blockRecipientNoWallet',
-  no_eligible_items: 'hudChrome.trade.woc.blockNoEligibleItems',
+};
+
+const SEND_HINT_KEYS: Record<WocSendHint, TranslationKey> = {
+  stage_item: 'hudChrome.trade.woc.hintStageItem',
+  no_eligible: 'hudChrome.trade.woc.hintNoEligible',
+  enter_price: 'hudChrome.trade.woc.hintEnterPrice',
+  gold_offered: 'hudChrome.trade.woc.hintGoldOffered',
 };
 
 /**
@@ -138,12 +160,22 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
         ? 'partner_unknown'
         : !input.partner?.walletVerified
           ? 'recipient_no_wallet'
-          : eligible.length === 0 && input.staged.length > 0
-            ? 'no_eligible_items'
-            : null;
+          : null;
 
   const offerable = block === null;
   const wocMode = offerable && input.mode === 'woc';
+
+  // Ordered the way a seller does the work: pick the item, then price it. Gold
+  // comes first because it makes the whole arm unusable rather than incomplete.
+  const hint: WocSendHint | null = input.goldOffered
+    ? 'gold_offered'
+    : input.staged.length === 0
+      ? 'stage_item'
+      : eligible.length === 0
+        ? 'no_eligible'
+        : input.usdCents === null || input.usdCents <= 0
+          ? 'enter_price'
+          : null;
 
   return {
     // The arm stays VISIBLE while blocked: hiding it would leave a player who
@@ -162,11 +194,7 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     wocDisabled: !offerable || input.goldOffered,
     tokens: wocMode ? input.tokens : null,
     split: wocMode ? input.split : null,
-    canSend:
-      wocMode &&
-      eligible.length > 0 &&
-      input.usdCents !== null &&
-      input.usdCents > 0 &&
-      !input.goldOffered,
+    canSend: wocMode && hint === null,
+    sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
   };
 }

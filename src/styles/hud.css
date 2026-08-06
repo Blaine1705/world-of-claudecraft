@@ -7504,6 +7504,7 @@
      stay legible rather than being dimmed to hint size. */
   .trade-woc-warn,
   .trade-woc-note,
+  .trade-woc-hint,
   .trade-woc-block {
     margin: 0;
     font-size: 11px;
@@ -7516,7 +7517,8 @@
   .trade-woc-equiv:empty,
   .trade-woc-fee:empty,
   .trade-woc-net:empty,
-  .trade-woc-note:empty {
+  .trade-woc-note:empty,
+  .trade-woc-hint:empty {
     display: none;
   }
 

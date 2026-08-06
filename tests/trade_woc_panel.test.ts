@@ -191,3 +191,16 @@ describe('what the arm reports back', () => {
     expect(d.onSendOffer).toHaveBeenCalled();
   });
 });
+
+describe('a disabled send button carries its reason in the DOM', () => {
+  it('renders the hint beside the button and clears it when sendable', () => {
+    // The shipped defect: an empty side gave a dead button and no text at all.
+    const blocked = paint(deps({ staged: [] }));
+    expect(blocked.querySelector<HTMLButtonElement>('[data-woc-send]')?.disabled).toBe(true);
+    expect(blocked.querySelector('[data-woc-hint]')?.textContent ?? '').not.toBe('');
+
+    const ready = paint(deps());
+    expect(ready.querySelector<HTMLButtonElement>('[data-woc-send]')?.disabled).toBe(false);
+    expect(ready.querySelector('[data-woc-hint]')?.textContent).toBe('');
+  });
+});

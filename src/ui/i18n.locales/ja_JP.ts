@@ -13097,8 +13097,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.blockPartnerUnknown': 'そのプレイヤーが $WOC を受け取れるか確認しています…',
   'hudChrome.trade.woc.blockRecipientNoWallet':
     'そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。',
-  'hudChrome.trade.woc.blockNoEligibleItems':
-    'セットしたアイテムはいずれも $WOC で売却できません。',
+  'hudChrome.trade.woc.hintStageItem': '売りたいアイテムを自分側の取引欄に入れてください。',
+  'hudChrome.trade.woc.hintNoEligible': '自分がセットしたアイテムはいずれも $WOC で売却できません。',
+  'hudChrome.trade.woc.hintEnterPrice': 'USD で価格を入力してください。',
+  'hudChrome.trade.woc.hintGoldOffered': '先にゴールドの提示を取り消してください。取引はゴールドか $WOC のどちらか一方です。',
   'hudChrome.trade.woc.ineligibleNote':
     'セットしたアイテムのうち {count} 個は $WOC で売却できません。',
   'hudChrome.trade.woc.incomingTitle': '{name} からの $WOC オファー',

@@ -93,6 +93,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
     <button type="button" class="btn trade-woc-send" data-woc-send>${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
+    <p class="trade-woc-hint" data-woc-hint></p>
   </div>`;
 }
 
@@ -141,6 +142,9 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
           count: formatNumber(model.ineligible.length, { maximumFractionDigits: 0 }),
         }),
   );
+  // A disabled button always says why: the hint rides beside it and clears the
+  // moment the offer becomes sendable.
+  setText('[data-woc-hint]', model.sendHint === null ? '' : t(model.sendHint));
   const send = root.querySelector<HTMLButtonElement>('[data-woc-send]');
   if (send && send.disabled !== !model.canSend) send.disabled = !model.canSend;
 }

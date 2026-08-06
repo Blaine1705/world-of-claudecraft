@@ -123,12 +123,6 @@ describe('what blocks the arm, and in what order', () => {
     expect(m.block).toBe('recipient_no_wallet');
   });
 
-  it('reports no eligible items only once something is staged', () => {
-    expect(buildWocTradeModel(input({ staged: [slot(QUEST.id)] })).block).toBe('no_eligible_items');
-    // An empty trade window is not an error, it is the starting state.
-    expect(buildWocTradeModel(input({ staged: [] })).block).toBeNull();
-  });
-
   it('keeps the arm VISIBLE while blocked, so the reason can be shown', () => {
     // Hiding it would leave a player who expected to trade for $WOC with no
     // explanation, which is exactly the case the recipient copy exists for.
@@ -189,6 +183,52 @@ describe('economic values are passthroughs, never derived here', () => {
     const m = buildWocTradeModel(input({ mode: 'gold' }));
     expect(m.tokens).toBeNull();
     expect(m.split).toBeNull();
+  });
+});
+
+describe('a disabled send button always says WHY', () => {
+  // The defect this pins: with nothing staged the button was simply dead, with
+  // no message anywhere. A seller saw a working price field, typed a price, and
+  // got a button that did nothing and explained nothing. Every reason send is
+  // withheld must name itself.
+  it('prompts for an item when your own side is empty', () => {
+    const m = buildWocTradeModel(input({ staged: [] }));
+    expect(m.canSend).toBe(false);
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintStageItem');
+    // And the form stays up: this is a prompt, not an unavailable arm.
+    expect(m.block, 'an empty side is the starting state, not an error').toBeNull();
+  });
+
+  it('names the ineligible case rather than hiding the form', () => {
+    const m = buildWocTradeModel(input({ staged: [slot(QUEST.id)] }));
+    expect(m.canSend).toBe(false);
+    expect(m.sendHint).toBe('hudChrome.trade.woc.hintNoEligible');
+    expect(m.block, 'staged-but-ineligible must not hide the price field').toBeNull();
+  });
+
+  it('names the missing price', () => {
+    expect(buildWocTradeModel(input({ usdCents: null })).sendHint).toBe(
+      'hudChrome.trade.woc.hintEnterPrice',
+    );
+  });
+
+  it('names the gold conflict', () => {
+    expect(buildWocTradeModel(input({ goldOffered: true })).sendHint).toBe(
+      'hudChrome.trade.woc.hintGoldOffered',
+    );
+  });
+
+  it('has NO hint when the offer is actually sendable', () => {
+    const m = buildWocTradeModel(input());
+    expect(m.canSend).toBe(true);
+    expect(m.sendHint).toBeNull();
+  });
+
+  it('reports the item prompt before the price prompt', () => {
+    // Ordering is the order a seller does the work: pick the item, then price it.
+    expect(buildWocTradeModel(input({ staged: [], usdCents: null })).sendHint).toBe(
+      'hudChrome.trade.woc.hintStageItem',
+    );
   });
 });
 
