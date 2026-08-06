@@ -456,7 +456,12 @@ jobs:
       # ref), roughly 1 GB across the two long-lived producer scopes (main
       # plus the release branch) beside the pnpm store, Playwright, and tsc
       # caches. If hot-entry eviction is ever observed, the lever is
-      # restricting this step's save to push events, never restore-keys.
+      # restricting this step's save to push events, never restore-keys
+      # (though note the long-sims lane leans on PR-scope saves, so that
+      # lever costs the lane most of its benefit). Scope arithmetic after
+      # the lane copy landed: a pr-gate-tier producer scope (main, dev-*)
+      # holds 9 entries (8 shard + 1 lane); the release scope stays at 8
+      # (release-gate is deliberately not lane-split).
       # Producers beyond release-gate: pr-gate's own main and dev-* push runs
       # seed those branches' scopes the same way.
       # Per-shard keys: in full mode each shard transforms
@@ -548,6 +553,31 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Same vitest transform cache as the shard matrices (the Phase 4 rider:
+      # whichever of the cache step and the lane landed second gains the
+      # other). The full rationale (staleness vs tamper safety, layout-pinned
+      # key, no restore-keys, save-on-miss-only, measured sizes) sits on the
+      # pr-gate copy of this step. This job has no shard matrix, so the key
+      # carries a lane segment where the matrices carry shard${{ matrix.shard }}:
+      # a bare matrix.shard would render empty here, and the lane's store (in
+      # full mode, the four CI_LONG_SUITES import closures; in selective mode
+      # only the floor/changed members, so a PR-scope save can be a thin
+      # store that save-on-miss never refreshes within that key) only
+      # partially resembles any one shard's, so it earns its own entry
+      # instead of borrowing shard keys. Producer reality for this key:
+      # release-gate is deliberately not lane-split, so release/** push runs
+      # never save a lane entry into the base-branch scope; main's entry
+      # (seeded by this job's own main and dev-* push runs) only hits while
+      # the release branch's four key inputs still hash like main's, which
+      # they do not whenever main trails the release lockfile (true today),
+      # so for release-based PRs most warm hits come from later runs of the
+      # SAME PR restoring the first run's save into the PR's own scope.
+      - name: Cache vitest transform cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.experimental-vitest-cache
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # Same selection relay as the shard step (env, never run-line
       # interpolation); the lane entry spawns `npm test` itself, so pretest
