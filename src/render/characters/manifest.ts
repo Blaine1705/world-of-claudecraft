@@ -493,7 +493,7 @@ const ENEMY_BITE: ClipMap = {
   walk: 'Walk',
   run: 'Walk',
   attack: ['Bite_Front'],
-  hit: ['HitRecieve'],
+  hit: ['HitRecieve', 'HitRecieve_Dazed'],
   death: 'Death',
 };
 
@@ -1992,6 +1992,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the Hollow's wandering bosses: two more rigs no other zone uses
   mob_crab: {
     url: `${CREATURES}/crabenemy.glb`,
+    animUrls: [`${CREATURES}/crabenemy_hit_variety_anims.glb`],
     height: 1.7,
     clips: CRAB_ENEMY_BITE,
     // Crab_Attack clip donor (scripts/build_crab_anims.mjs): mesh-free,
@@ -2018,6 +2019,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // mossy treant: the shaggy yeti under a bark-green entity wash
   mob_treant: {
     url: `${CREATURES}/yeti.glb`,
+    animUrls: [`${CREATURES}/yeti_hit_variety_anims.glb`],
     height: 2.6,
     clips: ENEMY_BITE,
     tint: 'entity',
