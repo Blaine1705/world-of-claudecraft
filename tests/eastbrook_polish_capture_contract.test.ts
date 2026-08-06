@@ -385,7 +385,13 @@ describe('Eastbrook polish capture contract', () => {
       // renderer; the release's bounded ground-object reuse pool), so the merged
       // tree mints a composite matching neither parent. Regenerated via
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: 'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9',
+      // Re-pinned for the ability VFX first-use fix rebased onto release/v0.35.0:
+      // it moves two runtimeRender leaves of this composite, src/render/renderer.ts
+      // (idle-slot spirit puppet builds, resumable ability warm-up) and
+      // src/render/prewarm_policy.ts, so the composite re-mints. No Eastbrook
+      // capture was retaken and no GLB or pipeline input changed. Regenerated via
+      // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
+      fingerprint: '6f8df557520fb299864269a31435143500b315523f8301c183faf227d4491559',
       components: {
         captureContract: {
           id: 'polish-v2',
