@@ -84,12 +84,7 @@ import { configureAuthRuntime } from './auth_routes';
 import { computeBankBonus } from './bank_entitlements';
 import { bankLedgerIdle } from './bank_ledger';
 import { configureBattlegroundRuntime, readBgLeaderboard } from './battleground';
-import {
-  BUG_DESCRIPTION_MAX,
-  BugReportRateLimitError,
-  createBugReport,
-  pruneBugReportsBatch,
-} from './bug_report_db';
+import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from './bug_report_db';
 import { createCachedRead } from './cached_read';
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import {
@@ -98,7 +93,6 @@ import {
   purgeDeletedCharacterWorldState,
   rekeyReclaimedCharacterWorldState,
 } from './characters';
-import { pruneChatViolationsBatch } from './chat_filter_db';
 import {
   claudiumPreAuthMutationRateLimited,
   configureClaudiumRuntime,
@@ -275,7 +269,6 @@ import {
   cleanReportReason,
   createPlayerReport,
   createSuspiciousRegistrationReport,
-  prunePlayerReportsBatch,
   setOnAccountModerated,
 } from './moderation_db';
 import { createNativeAttestationChallenge } from './native_attestation';
@@ -3298,25 +3291,6 @@ export async function startServer(): Promise<http.Server> {
       {
         name: 'email_log',
         pruneBatch: (n) => pruneEmailLogBatch(config.emailLogRetentionDays, n),
-      },
-      {
-        // Only RESOLVED reports age out; moderationQueue and
-        // moderationReportsForAccount only ever surface status = 'open' rows,
-        // so pruning is safe (see prunePlayerReportsBatch).
-        name: 'player_reports',
-        pruneBatch: (n) => prunePlayerReportsBatch(config.playerReportRetentionDays, n),
-      },
-      {
-        // Every row can carry a screenshot up to ~900 KB (bug_report_db.ts
-        // BUG_SCREENSHOT_MAX), the fastest-growing of the report tables.
-        name: 'bug_reports',
-        pruneBatch: (n) => pruneBugReportsBatch(config.bugReportRetentionDays, n),
-      },
-      {
-        // The hard-word incident log; its only reader is already
-        // LIMIT-bounded per account (chatModerationForAccount).
-        name: 'chat_violations',
-        pruneBatch: (n) => pruneChatViolationsBatch(config.chatViolationRetentionDays, n),
       },
     ],
     // The fold precondition makes sample pruning lossless; skip the whole group

@@ -408,34 +408,6 @@ export async function ignoreReport(
   return (res.rowCount ?? 0) > 0;
 }
 
-// Batched retention prune for player_reports (the retention-sweep primitive,
-// mirrors pruneUnstuckReportsBatch in unstuck_db.ts). An open report is NEVER
-// touched no matter how old: moderationQueue and moderationReportsForAccount
-// above both read WHERE status = 'open' exclusively, so a report the queue
-// still surfaces would silently vanish from the admin view if the age cutoff
-// alone governed the delete. Only a resolved report ('ignored' or 'actioned')
-// ages out. retentionDays <= 0 keeps rows forever (the safe default for a
-// destructive delete); the interval floors to one whole day so a sub-day
-// setting can never reach today's rows.
-export async function prunePlayerReportsBatch(
-  retentionDays: number,
-  batchSize: number,
-): Promise<number> {
-  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
-  const days = Math.max(1, Math.floor(retentionDays));
-  const res = await pool.query(
-    `DELETE FROM player_reports
-      WHERE id IN (
-        SELECT id FROM player_reports
-         WHERE status != 'open'
-           AND created_at < now() - ($1::int * INTERVAL '1 day')
-         ORDER BY created_at ASC, id ASC
-         LIMIT $2)`,
-    [days, Math.max(1, Math.floor(batchSize))],
-  );
-  return res.rowCount ?? 0;
-}
-
 // Fired after every SUCCESSFUL moderateAccount commit, of ANY action kind,
 // and after the daily-rewards ban writes below (setDailyRewardsBan /
 // setDailyRewardsIpBan, whose tables feed the daily_reward_excluded_accounts

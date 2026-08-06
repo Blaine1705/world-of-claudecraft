@@ -25,11 +25,9 @@ const SCREENSHOT_DATA_URL = /^data:image\/(?:jpeg|png|webp);base64,/;
 // Server-side screenshot gate: a base64 raster image data URL within the size cap.
 // Enforced here (not just at the route) so every insert path is protected.
 export function isStorableScreenshot(value: unknown): value is string {
-  return (
-    typeof value === 'string' &&
-    value.length <= BUG_SCREENSHOT_MAX &&
-    SCREENSHOT_DATA_URL.test(value)
-  );
+  return typeof value === 'string'
+    && value.length <= BUG_SCREENSHOT_MAX
+    && SCREENSHOT_DATA_URL.test(value);
 }
 
 // Bounded, fixed-shape view of the client metadata. Mirrors BugReportMeta in
@@ -56,8 +54,7 @@ function metaNum(value: unknown): number {
 
 export function clampBugReportMeta(value: unknown): BugReportMeta {
   const m = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
-  const vp =
-    m.viewport && typeof m.viewport === 'object' ? (m.viewport as Record<string, unknown>) : {};
+  const vp = m.viewport && typeof m.viewport === 'object' ? (m.viewport as Record<string, unknown>) : {};
   return {
     build: metaStr(m.build),
     userAgent: metaStr(m.userAgent),
@@ -150,10 +147,7 @@ export async function createBugReport(
   return { id: Number(res.rows[0].id), screenshotStored: screenshot !== null };
 }
 
-export async function listBugReports(
-  limit = 100,
-  offset = 0,
-): Promise<{ rows: BugReportRow[]; total: number }> {
+export async function listBugReports(limit = 100, offset = 0): Promise<{ rows: BugReportRow[]; total: number }> {
   const capped = Math.max(1, Math.min(200, Math.floor(limit)));
   const off = Math.max(0, Math.floor(offset));
   const res = await pool.query(
@@ -176,33 +170,6 @@ export async function listBugReports(
 // null when the report has none or does not exist.
 export async function getBugReportScreenshot(id: number): Promise<string | null> {
   if (!Number.isFinite(id)) return null;
-  const res = await pool.query(`SELECT screenshot FROM bug_reports WHERE id = $1`, [
-    Math.floor(id),
-  ]);
+  const res = await pool.query(`SELECT screenshot FROM bug_reports WHERE id = $1`, [Math.floor(id)]);
   return res.rows[0]?.screenshot ?? null;
-}
-
-// Batched retention prune for bug_reports (the retention-sweep primitive,
-// mirrors pruneUnstuckReportsBatch in unstuck_db.ts). Every row can carry a
-// screenshot up to BUG_SCREENSHOT_MAX (~900 KB), so this table grows without
-// bound the fastest of the report tables; listBugReports pages the admin view
-// (limit/offset) regardless of age or status, so pruning oldest-first never
-// invalidates a still-reachable page. retentionDays <= 0 keeps rows forever
-// (the safe default); the interval floors to one whole day.
-export async function pruneBugReportsBatch(
-  retentionDays: number,
-  batchSize: number,
-): Promise<number> {
-  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
-  const days = Math.max(1, Math.floor(retentionDays));
-  const res = await pool.query(
-    `DELETE FROM bug_reports
-      WHERE id IN (
-        SELECT id FROM bug_reports
-         WHERE created_at < now() - ($1::int * INTERVAL '1 day')
-         ORDER BY created_at ASC, id ASC
-         LIMIT $2)`,
-    [days, Math.max(1, Math.floor(batchSize))],
-  );
-  return res.rowCount ?? 0;
 }
