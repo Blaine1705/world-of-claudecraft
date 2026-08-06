@@ -367,4 +367,7 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildRenamed':
     'Tu hermandad ha sido renombrada a {name} por el equipo de moderación.',
   'hudChrome.options.hideUnusedActionSlots': 'Ocultar casillas de acción sin usar',
+  'error.uniqueEquipped': 'Solo puedes equiparte uno de esos.',
+  'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
+  'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
 };

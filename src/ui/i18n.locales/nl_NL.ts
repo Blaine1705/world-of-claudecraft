@@ -11225,4 +11225,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Tabblad {channel} herschikken: sleep het, of gebruik Alt+Links en Alt+Rechts',
   'itemUi.vendor.buyStack': 'Koop {count}',
   'itemUi.vendor.buyStackAria': 'Koop {count} {item} voor {price}',
+  'error.uniqueEquipped': 'Je kunt er maar één van dat type uitrusten.',
+  'error.townFocusCannotAfford': 'Je kunt die focus-herschikking niet betalen.',
+  'log.townFocusRespecComplete': 'Je focus-herschikking is voltooid.',
 };

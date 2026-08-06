@@ -11120,4 +11120,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     '{channel} sekmesini yeniden sırala: sürükleyin veya Alt+Sol ve Alt+Sağ tuşlarını kullanın',
   'itemUi.vendor.buyStack': '{count} adet satın al',
   'itemUi.vendor.buyStackAria': '{item} eşyasından {count} adet, {price} karşılığında satın al',
+  'error.uniqueEquipped': 'Bunlardan yalnızca birini kuşanabilirsin.',
+  'error.townFocusCannotAfford': 'Bu odak yeniden dağıtımını karşılayamazsın.',
+  'log.townFocusRespecComplete': 'Odak yeniden dağıtımın tamamlandı.',
 };

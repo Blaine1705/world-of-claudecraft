@@ -15083,5 +15083,12 @@ export const ru_RU: EnTranslations = {
     "delveRiteShrineSkullInteract": "Святилище черепа: нажмите F, чтобы коснуться",
     "mailboxName": "Почтовый ящик",
     "noticeboardName": "Доска объявлений"
+  },
+  "error": {
+    "uniqueEquipped": "Можно экипировать только один такой предмет.",
+    "townFocusCannotAfford": "Вам не хватает средств на эту смену фокуса."
+  },
+  "log": {
+    "townFocusRespecComplete": "Смена фокуса завершена."
   }
 };

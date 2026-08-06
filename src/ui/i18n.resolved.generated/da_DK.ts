@@ -15083,5 +15083,12 @@ export const da_DK: EnTranslations = {
     "delveRiteShrineSkullInteract": "Kranieskrin: Tryk på F for at røre det",
     "mailboxName": "Postkasse",
     "noticeboardName": "Opslagstavle"
+  },
+  "error": {
+    "uniqueEquipped": "Du kan kun udstyre én af den slags.",
+    "townFocusCannotAfford": "Du har ikke råd til den fokusomlægning."
+  },
+  "log": {
+    "townFocusRespecComplete": "Din fokusomlægning er fuldført."
   }
 };

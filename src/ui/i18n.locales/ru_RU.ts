@@ -11408,4 +11408,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': 'Распыление, наложение чар и разбор: применение {seconds} с',
   'guide.profPages.econ.castPaceRecharge': 'Перезарядка эффекта инструмента: применение {seconds} с',
   'guide.profPages.econ.castPaceBatch': 'Партия: до {count} за один заказ, каждое изделие со своим применением',
+  'error.uniqueEquipped': 'Можно экипировать только один такой предмет.',
+  'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
+  'log.townFocusRespecComplete': 'Смена фокуса завершена.',
 };

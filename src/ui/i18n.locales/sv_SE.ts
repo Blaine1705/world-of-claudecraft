@@ -11107,4 +11107,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ordna om fliken {channel}: dra den, eller använd Alt+vänster och Alt+höger',
   'itemUi.vendor.buyStack': 'Köp {count}',
   'itemUi.vendor.buyStackAria': 'Köp {count} {item} för {price}',
+  'error.uniqueEquipped': 'Du kan bara utrusta en sådan.',
+  'error.townFocusCannotAfford': 'Du har inte råd med den fokusomläggningen.',
+  'log.townFocusRespecComplete': 'Din fokusomläggning är klar.',
 };

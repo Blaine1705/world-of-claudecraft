@@ -15083,5 +15083,12 @@ export const pt_BR: EnTranslations = {
     "delveRiteShrineSkullInteract": "Santuário da Caveira: Pressione F para tocá-lo",
     "mailboxName": "Caixa de correio",
     "noticeboardName": "Quadro de Avisos"
+  },
+  "error": {
+    "uniqueEquipped": "Você só pode equipar um desses.",
+    "townFocusCannotAfford": "Você não pode pagar essa redefinição de foco."
+  },
+  "log": {
+    "townFocusRespecComplete": "Sua redefinição de foco foi concluída."
   }
 };

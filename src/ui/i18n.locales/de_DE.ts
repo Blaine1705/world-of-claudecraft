@@ -11323,4 +11323,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Reiter {channel} neu anordnen: ziehen Sie ihn, oder verwenden Sie Alt+Links und Alt+Rechts',
   'itemUi.vendor.buyStack': '{count} kaufen',
   'itemUi.vendor.buyStackAria': '{count} {item} für {price} kaufen',
+  'error.uniqueEquipped': 'Du kannst davon nur eins ausrüsten.',
+  'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
+  'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
 };

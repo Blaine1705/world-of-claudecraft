@@ -15083,5 +15083,12 @@ export const fr_CA: EnTranslations = {
     "delveRiteShrineSkullInteract": "Autel du crâne : appuyez sur F pour le toucher",
     "mailboxName": "Boîte aux lettres",
     "noticeboardName": "Panneau d'affichage"
+  },
+  "error": {
+    "uniqueEquipped": "Vous ne pouvez en équiper qu’un seul de ce type.",
+    "townFocusCannotAfford": "Vous n'avez pas les moyens de cette respécialisation de focus."
+  },
+  "log": {
+    "townFocusRespecComplete": "Votre respécialisation de focus est terminée."
   }
 };

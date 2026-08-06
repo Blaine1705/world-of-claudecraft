@@ -11377,4 +11377,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Réorganiser l'onglet {channel} : faites-le glisser, ou utilisez Alt+Gauche et Alt+Droite",
   'itemUi.vendor.buyStack': 'Acheter {count}',
   'itemUi.vendor.buyStackAria': 'Acheter {count} {item} pour {price}',
+  'error.uniqueEquipped': 'Vous ne pouvez en équiper qu’un seul de ce type.',
+  'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
+  'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
 };

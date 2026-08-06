@@ -11238,4 +11238,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Reordenar a aba {channel}: arraste-a, ou use Alt+Esquerda e Alt+Direita',
   'itemUi.vendor.buyStack': 'Comprar {count}',
   'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
+  'error.uniqueEquipped': 'Você só pode equipar um desses.',
+  'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
+  'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
 };

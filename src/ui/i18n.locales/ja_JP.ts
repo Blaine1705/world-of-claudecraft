@@ -11240,4 +11240,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '分解・付魔・解体: 詠唱 {seconds} 秒',
   'guide.profPages.econ.castPaceRecharge': '道具効果の充填: 詠唱 {seconds} 秒',
   'guide.profPages.econ.castPaceBatch': 'まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱',
+  'error.uniqueEquipped': 'その種類は1つだけ装備できます。',
+  'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
+  'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
 };

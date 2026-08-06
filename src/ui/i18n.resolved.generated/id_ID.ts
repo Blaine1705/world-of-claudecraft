@@ -15083,5 +15083,12 @@ export const id_ID: EnTranslations = {
     "delveRiteShrineSkullInteract": "Altar Tengkorak: Tekan F untuk menyentuhnya",
     "mailboxName": "Kotak Surat",
     "noticeboardName": "Papan Pengumuman"
+  },
+  "error": {
+    "uniqueEquipped": "Anda hanya dapat memakai satu benda seperti itu.",
+    "townFocusCannotAfford": "Anda tidak mampu membayar pengaturan ulang fokus itu."
+  },
+  "log": {
+    "townFocusRespecComplete": "Pengaturan ulang fokus Anda selesai."
   }
 };

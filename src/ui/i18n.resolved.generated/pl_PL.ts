@@ -15083,5 +15083,12 @@ export const pl_PL: EnTranslations = {
     "delveRiteShrineSkullInteract": "Kapliczka Czaszki: Naciśnij F, aby jej dotknąć",
     "mailboxName": "Skrzynka pocztowa",
     "noticeboardName": "Tablica ogłoszeń"
+  },
+  "error": {
+    "uniqueEquipped": "Możesz założyć tylko jeden taki przedmiot.",
+    "townFocusCannotAfford": "Nie stać cię na tę zmianę skupienia."
+  },
+  "log": {
+    "townFocusRespecComplete": "Zmiana skupienia została ukończona."
   }
 };

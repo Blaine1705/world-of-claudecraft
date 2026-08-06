@@ -15083,5 +15083,12 @@ export const es_ES: EnTranslations = {
     "delveRiteShrineSkullInteract": "Santuario de la Calavera: pulsa F para tocarlo",
     "mailboxName": "Buzón",
     "noticeboardName": "Tablón de anuncios"
+  },
+  "error": {
+    "uniqueEquipped": "Solo puedes equiparte uno de esos.",
+    "townFocusCannotAfford": "No puedes pagar ese reajuste de enfoque."
+  },
+  "log": {
+    "townFocusRespecComplete": "Tu reajuste de enfoque se ha completado."
   }
 };

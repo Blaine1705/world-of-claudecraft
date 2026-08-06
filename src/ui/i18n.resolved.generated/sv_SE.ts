@@ -15083,5 +15083,12 @@ export const sv_SE: EnTranslations = {
     "delveRiteShrineSkullInteract": "Skallhelgedom: Tryck på F för att röra vid den",
     "mailboxName": "Brevlåda",
     "noticeboardName": "Anslagstavla"
+  },
+  "error": {
+    "uniqueEquipped": "Du kan bara utrusta en sådan.",
+    "townFocusCannotAfford": "Du har inte råd med den fokusomläggningen."
+  },
+  "log": {
+    "townFocusRespecComplete": "Din fokusomläggning är klar."
   }
 };

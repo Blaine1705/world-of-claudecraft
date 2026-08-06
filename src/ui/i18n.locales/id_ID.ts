@@ -11229,4 +11229,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Atur ulang tab {channel}: seret, atau gunakan Alt+Kiri dan Alt+Kanan',
   'itemUi.vendor.buyStack': 'Beli {count}',
   'itemUi.vendor.buyStackAria': 'Beli {count} {item} seharga {price}',
+  'error.uniqueEquipped': 'Anda hanya dapat memakai satu benda seperti itu.',
+  'error.townFocusCannotAfford': 'Anda tidak mampu membayar pengaturan ulang fokus itu.',
+  'log.townFocusRespecComplete': 'Pengaturan ulang fokus Anda selesai.',
 };
