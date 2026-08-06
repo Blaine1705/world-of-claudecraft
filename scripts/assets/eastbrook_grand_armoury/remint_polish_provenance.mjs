@@ -48,6 +48,9 @@ const mailbox = await import(
 const notice = await import(
   new URL('scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs', rootUrl)
 );
+const diagnostics = await import(
+  new URL('scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs', rootUrl)
+);
 
 const { deriveEastbrookPolishCompositeProvenance, EASTBROOK_POLISH_PROVENANCE_INPUTS: INPUTS } =
   contract;
@@ -116,7 +119,7 @@ for (const fileName of accepted) {
 }
 
 const metadataAuthoritySha = createHash('sha256')
-  .update(await readFile(new URL(`${POLISH_ROOT}/metadata/after-desktop-ultra.json`, rootUrl)))
+  .update(await readFile(new URL(diagnostics.POLISH_SEAL_PATH, rootUrl)))
   .digest('hex');
 
 console.log('composite fingerprint (pin in eastbrook_polish_capture_contract.test.ts,');
@@ -129,13 +132,13 @@ console.log(
   'second-order performance digest (pin in eastbrook_polish_artifact_integrity.test.ts):',
 );
 console.log(`  ${secondOrder.digest('hex')}`);
+console.log('do NOT touch ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT in that same test:');
+console.log('it is the FROZEN identity of the tree the captures were taken against, and');
+console.log('it moves only if the captures themselves are retaken.');
 
 // The stale-mint tripwire: name every fingerprinted input that differs from
 // HEAD right now. Minting over dirty inputs is legitimate ONLY when exactly
 // these bytes ship in the same commit as the new pins.
-const diagnostics = await import(
-  new URL('scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs', rootUrl)
-);
 const inputPaths = diagnostics.collectPolishProvenanceInputPaths({
   inputs: INPUTS,
   sourceFileLists: [
@@ -145,17 +148,6 @@ const inputPaths = diagnostics.collectPolishProvenanceInputPaths({
   ],
 });
 const dirty = diagnostics.gitDirtyStatusLines({ repoRoot, paths: inputPaths });
-if (dirty === null) {
-  console.log('git status unavailable: could not check the fingerprinted inputs for');
-  console.log('uncommitted edits; verify by hand before committing the new pins.');
-} else if (dirty.length > 0) {
-  console.log('WARNING: fingerprinted inputs differ from HEAD in this working tree:');
-  for (const line of dirty) console.log(`  ${line}`);
-  console.log('This mint seals THESE bytes. Commit exactly these bytes with the new pins,');
-  console.log('and RE-RUN this tool if any of them moves again before the commit (the');
-  console.log('2026-08-05 craft-cast pin went stale exactly that way: renderer.ts moved');
-  console.log('after the mint).');
-} else {
-  console.log('every fingerprinted input matches HEAD: this mint reproduces on any checkout');
-  console.log('of the committed tree.');
+for (const line of diagnostics.formatMintInputStatus(dirty)) {
+  console.log(line);
 }

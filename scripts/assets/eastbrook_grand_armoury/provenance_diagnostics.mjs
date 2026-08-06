@@ -18,10 +18,20 @@
 // now (the stale-mint hazard), and the exact one-step remint command.
 
 import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 /** The one-step re-mint the failure messages point at. */
 export const REMINT_COMMAND =
   'node scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs';
+
+/**
+ * The committed evidence seal the diagnostics diff against, one constant so
+ * the failing test, the remint tool, and the unit suite cannot drift onto
+ * three different paths.
+ */
+export const POLISH_SEAL_PATH =
+  'docs/screenshots/eastbrook-vale-rebuild/polish/metadata/after-desktop-ultra.json';
 
 /**
  * Leaf-by-leaf diff of two provenance component trees (the sealed one from
@@ -50,6 +60,19 @@ export function diffProvenanceComponents(sealed, computed) {
         });
       }
     }
+    // Symmetric arm: a leaf that exists only on the COMPUTED side (the
+    // composite gained an input, or a schema bump added a branch) must be
+    // named too; a one-directional walk would report zero diffs and the
+    // formatter would then wrongly blame a hand-edited pin.
+    for (const key of Object.keys(b ?? {})) {
+      if (a !== null && a !== undefined && Object.hasOwn(a, key)) continue;
+      const computedValue = b[key];
+      if (computedValue !== null && typeof computedValue === 'object') {
+        walk({}, computedValue, `${prefix}${key}.`);
+      } else {
+        diffs.push({ key: `${prefix}${key}`, sealed: null, computed: computedValue ?? null });
+      }
+    }
   };
   walk(sealed, computed, '');
   return diffs;
@@ -70,7 +93,10 @@ export function diffProvenanceComponents(sealed, computed) {
 export function collectPolishProvenanceInputPaths({ inputs, sourceFileLists = [] }) {
   const paths = new Set();
   for (const [key, value] of Object.entries(inputs)) {
-    if (key === 'captureContract') continue;
+    // captureContract is a contract id, not a path; the shape guard backs
+    // the name up so a future non-path entry cannot slip into the git
+    // pathspecs (every real input carries a slash or an extension dot).
+    if (key === 'captureContract' || !/[/.]/.test(value)) continue;
     paths.add(value);
   }
   for (const list of sourceFileLists) {
@@ -93,15 +119,42 @@ export function collectPolishProvenanceInputPaths({ inputs, sourceFileLists = []
  */
 export function gitDirtyStatusLines({ repoRoot, paths, runGit = defaultRunGit }) {
   try {
-    const output = runGit(['status', '--porcelain', '--', ...paths], repoRoot);
+    // --no-optional-locks (a global option, so it precedes the subcommand)
+    // keeps the status read strictly a read: without it git refreshes
+    // .git/index stat data, which both mutates repo state from a test
+    // process and contends with any concurrent git in a sibling worktree.
+    const output = runGit(
+      ['--no-optional-locks', 'status', '--porcelain', '--', ...paths],
+      repoRoot,
+    );
     return output.split('\n').filter((line) => line.length > 0);
   } catch {
     return null;
   }
 }
 
-function defaultRunGit(args, cwd) {
-  return execFileSync('git', args, { cwd, encoding: 'utf8' });
+/**
+ * The real git runner, exported (with an injectable exec) so its hardening
+ * options are pinnable: bounded and quiet, because this runs on the
+ * synchronous path of a vitest worker, where a blocked git (index.lock
+ * contention, a stalled filesystem) would freeze the event loop past every
+ * test timeout and lose the diagnostic entirely; the deadline lands it in
+ * the null arm instead. stderr is dropped so a fatal from an unusual
+ * checkout cannot muddy the failure log the caller is about to print.
+ *
+ * @param {string[]} args
+ * @param {string} cwd
+ * @param {typeof execFileSync} execImpl
+ * @returns {string}
+ */
+export function defaultRunGit(args, cwd, execImpl = execFileSync) {
+  return execImpl('git', args, {
+    cwd,
+    encoding: 'utf8',
+    timeout: 10_000,
+    killSignal: 'SIGKILL',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  });
 }
 
 /**
@@ -138,12 +191,14 @@ export function formatPolishProvenanceMismatch({
         '  (the seals and the pin move together in a re-mint, so suspect a hand edit).',
       );
     } else {
+      const show = (value) =>
+        value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value);
       lines.push('  inputs that moved (leaves differing from the committed evidence seals):');
       for (const diff of diffs) {
         lines.push(
           `    ${diff.key}`,
-          `      sealed:   ${diff.sealed}`,
-          `      computed: ${diff.computed}`,
+          `      sealed:   ${show(diff.sealed)}`,
+          `      computed: ${show(diff.computed)}`,
         );
       }
     }
@@ -170,4 +225,91 @@ export function formatPolishProvenanceMismatch({
     `    ${REMINT_COMMAND}`,
   );
   return lines.join('\n');
+}
+
+/**
+ * The mint-time input-status verdict the remint tool prints, extracted here
+ * so its three arms (dirty, clean, git-unavailable) are unit-tested instead
+ * of living as inline console logic only a source-text pin could see.
+ *
+ * @param {string[] | null} dirtyStatusLines
+ * @returns {string[]}
+ */
+export function formatMintInputStatus(dirtyStatusLines) {
+  if (dirtyStatusLines === null) {
+    return [
+      'git status unavailable: could not check the fingerprinted inputs for',
+      'uncommitted edits; verify by hand before committing the new pins.',
+    ];
+  }
+  if (dirtyStatusLines.length > 0) {
+    return [
+      'WARNING: fingerprinted inputs differ from HEAD in this working tree:',
+      ...dirtyStatusLines.map((line) => `  ${line}`),
+      'This mint seals THESE bytes. Commit exactly these bytes with the new pins,',
+      'and RE-RUN this tool if any of them moves again before the commit (the',
+      '2026-08-05 craft-cast pin went stale exactly that way: renderer.ts moved',
+      'after the mint).',
+    ];
+  }
+  return [
+    'every fingerprinted input matches HEAD: this mint reproduces on any checkout',
+    'of the committed tree.',
+  ];
+}
+
+function defaultReadSeal(absolutePath) {
+  return JSON.parse(readFileSync(absolutePath, 'utf8'));
+}
+
+/**
+ * The whole failure-branch composition in one tested place: read the
+ * committed seal (fail-soft to the no-seal arm), collect the fingerprinted
+ * input paths, take the git dirty verdict, and format the report. The
+ * capture-contract suite calls exactly this on a pin mismatch, so the glue
+ * that only ever executes when a pin is already stale is unit-testable with
+ * injected seal-reader and git.
+ *
+ * @param {{
+ *   pinnedFingerprint: string,
+ *   computed: { fingerprint: string, components: Record<string, unknown> },
+ *   repoRoot: string,
+ *   inputs: Record<string, string>,
+ *   sourceFileLists?: ReadonlyArray<readonly string[]>,
+ *   readSeal?: (absolutePath: string) => unknown,
+ *   runGit?: (args: string[], cwd: string) => string,
+ * }} opts
+ * @returns {string}
+ */
+export function buildPolishProvenanceMismatchReport({
+  pinnedFingerprint,
+  computed,
+  repoRoot,
+  inputs,
+  sourceFileLists = [],
+  readSeal = defaultReadSeal,
+  runGit,
+}) {
+  // A missing or malformed seal must degrade to the no-seal arm, never
+  // replace the diagnostic with a bare filesystem error on the one path
+  // where the message matters.
+  let sealedComponents = null;
+  try {
+    const seal = readSeal(path.join(repoRoot, POLISH_SEAL_PATH));
+    sealedComponents = seal?.polishProvenance?.components ?? null;
+  } catch {
+    sealedComponents = null;
+  }
+  const inputPaths = collectPolishProvenanceInputPaths({ inputs, sourceFileLists });
+  const dirtyStatusLines = gitDirtyStatusLines({
+    repoRoot,
+    paths: inputPaths,
+    ...(runGit ? { runGit } : {}),
+  });
+  return formatPolishProvenanceMismatch({
+    pinnedFingerprint,
+    computed,
+    sealedComponents,
+    dirtyStatusLines,
+  });
 }

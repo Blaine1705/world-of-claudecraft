@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 const captureContract =
   // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
   await import('../scripts/assets/eastbrook_grand_armoury/capture_contract.mjs');
-const { REMINT_COMMAND } = await import(
+const { POLISH_SEAL_PATH, REMINT_COMMAND } = await import(
   '../scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs'
 );
 const {
@@ -619,10 +619,10 @@ function readJsonFile<T>(filePath: string): T {
 // literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
-const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
-  POLISH_ROOT,
-  'metadata/after-desktop-ultra.json',
-);
+// Derived from the diagnostics module's one seal-path constant, so this
+// pin, the failure diagnostics, and the remint tool's printed metadata
+// authority sha can never silently point at three different files.
+const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-pinned for the merge of release/v0.34.0 into this branch. Every
 // rendererIntegration move on both sides now stacks on src/render/renderer.ts:
 // from the release, PR #2720's Eastbrook fence-removal layout evidence, the live

@@ -43,18 +43,24 @@ interface AttributionTargetFixture {
 }
 
 // The live composite pin. Mint history (kept from the previous in-place
-// comments): re-pinned across the pnpm-lock migration, PR #2720's
+// comments): re-pinned across the pnpm-lock migration (which moved the
+// three GLB *SourceFingerprint leaves, since the lockfile is a hashed input
+// of every GLB source fingerprint), and then across PR #2720's
 // fence-removal layout evidence, the v0.34.0 Bear Form rig (#2842), the live
 // graphics rebuild (#2799), far-field impostors and fog-free vista (#2793),
 // brood shout/flourish wiring, the worldObjectBurning fire-burst cue, the
 // Thornhollow renderer sync, and the release/v0.35.0 into AAA-enhancements
-// merge; every one of those moved a runtimeRender leaf (usually
-// src/render/renderer.ts) and re-minted the composite with
+// merge, each of which moved a runtimeRender leaf (usually
+// src/render/renderer.ts); every mint used
 // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-// Re-derive whenever renderer.ts changes. On a mismatch the test prints the
-// full diagnostics (moved leaves, dirty-input verdict, the one-step remint
-// command) instead of a raw object diff; see provenance_diagnostics.mjs for
-// the 2026-08-05 stale-mint root cause this legibility exists to prevent.
+// Across all of those mints no GLB pipeline input or geometry value changed
+// and no capture was retaken here: Eastbrook itself is untouched, and the
+// one capture retake (by the release) was adopted verbatim with its swept
+// metadata and performance JSONs. Re-derive whenever renderer.ts changes.
+// On a mismatch the test prints the full diagnostics (moved leaves,
+// dirty-input verdict, the one-step remint command) instead of a raw object
+// diff; see provenance_diagnostics.mjs for the 2026-08-05 stale-mint root
+// cause this legibility exists to prevent.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9';
 
@@ -382,32 +388,21 @@ describe('Eastbrook polish capture contract', () => {
         import('../scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs'),
         import('node:url'),
       ]);
-      const seal = JSON.parse(
-        await readFile(
-          new URL(
-            'docs/screenshots/eastbrook-vale-rebuild/polish/metadata/after-desktop-ultra.json',
-            repoRoot,
-          ),
-          'utf8',
-        ),
-      );
-      const inputPaths = diagnostics.collectPolishProvenanceInputPaths({
-        inputs: EASTBROOK_POLISH_PROVENANCE_INPUTS,
-        sourceFileLists: [
-          townFingerprint.EASTBROOK_TOWN_SOURCE_FILES,
-          mailboxFingerprint.EASTBROOK_MAILBOX_SOURCE_FILES,
-          noticeboardFingerprint.EASTBROOK_NOTICEBOARD_SOURCE_FILES,
-        ],
-      });
+      // The whole composition (seal read, path collection, git verdict,
+      // formatting) lives in the builder so the glue that only ever runs
+      // when a pin is already stale stays unit-tested with injected
+      // seal-reader and git (tests/eastbrook_provenance_diagnostics.test.ts).
       expect.fail(
-        diagnostics.formatPolishProvenanceMismatch({
+        diagnostics.buildPolishProvenanceMismatchReport({
           pinnedFingerprint: PINNED_POLISH_COMPOSITE_FINGERPRINT,
           computed: provenance,
-          sealedComponents: seal.polishProvenance?.components ?? null,
-          dirtyStatusLines: diagnostics.gitDirtyStatusLines({
-            repoRoot: fileURLToPath(repoRoot),
-            paths: inputPaths,
-          }),
+          repoRoot: fileURLToPath(repoRoot),
+          inputs: EASTBROOK_POLISH_PROVENANCE_INPUTS,
+          sourceFileLists: [
+            townFingerprint.EASTBROOK_TOWN_SOURCE_FILES,
+            mailboxFingerprint.EASTBROOK_MAILBOX_SOURCE_FILES,
+            noticeboardFingerprint.EASTBROOK_NOTICEBOARD_SOURCE_FILES,
+          ],
         }),
       );
     }
