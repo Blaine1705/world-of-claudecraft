@@ -31,7 +31,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "4d3fdeea",
+      "state": "0237849c",
       "events": "3b7fb98a",
       "rng": {
         "draws": 5,
@@ -60,7 +60,6 @@
             "xpGained": 84
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 1096,
@@ -411,7 +410,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "2b0dc7aa",
+      "state": "4d977f1a",
       "events": "640dd8c6",
       "rng": {
         "draws": 8,
@@ -440,7 +439,6 @@
             "xpGained": 198
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 2293,
@@ -851,7 +849,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "4ae257c2",
+      "state": "d5bce1b2",
       "events": "62c2b0f9",
       "rng": {
         "draws": 9,
@@ -881,7 +879,6 @@
             "xpGained": 198
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 2293,
@@ -1293,7 +1290,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "82c0734d",
+      "state": "e82b062f",
       "events": "eb7d7808",
       "rng": {
         "draws": 15,
@@ -1323,7 +1320,6 @@
             "xpGained": 282
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 3389,
@@ -1778,7 +1774,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "752c8886",
+      "state": "30f105d6",
       "events": "db94afe1",
       "rng": {
         "draws": 20,
@@ -1808,7 +1804,6 @@
             "xpGained": 366
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 4485,
@@ -2322,7 +2317,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "752c8886",
+      "state": "30f105d6",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -2352,7 +2347,6 @@
             "xpGained": 366
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 4485,

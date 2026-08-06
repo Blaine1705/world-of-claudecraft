@@ -32,7 +32,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "42209b05",
+      "state": "21b66587",
       "events": "005eed67",
       "rng": {
         "draws": 5,
@@ -59,7 +59,6 @@
             "damageTaken": 53
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -114,7 +113,6 @@
             "damageTaken": 14
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -320,7 +318,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "960d2e00",
+      "state": "3f7fc598",
       "events": "3d0e3fbb",
       "rng": {
         "draws": 10,
@@ -347,7 +345,6 @@
             "damageTaken": 183
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -402,7 +399,6 @@
             "damageTaken": 44
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -672,7 +668,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "eae9bbb9",
+      "state": "460db123",
       "events": "a03bbf3d",
       "rng": {
         "draws": 15,
@@ -699,7 +695,6 @@
             "damageTaken": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -754,7 +749,6 @@
             "damageTaken": 65
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1080,7 +1074,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "29513fe9",
+      "state": "2df4cb93",
       "events": "741638a5",
       "rng": {
         "draws": 17,
@@ -1107,7 +1101,6 @@
             "damageTaken": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1162,7 +1155,6 @@
             "damageTaken": 65
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1536,7 +1528,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 970,
-      "state": "2c8c5338",
+      "state": "0ce06d52",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -1563,7 +1555,6 @@
             "damageTaken": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1618,7 +1609,6 @@
             "damageTaken": 65
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2035,7 +2025,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "b832f534",
+      "state": "9cd00bae",
       "events": "83c741bb",
       "rng": {
         "draws": 18,
@@ -2062,7 +2052,6 @@
             "damageTaken": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2117,7 +2106,6 @@
             "damageTaken": 65
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2579,7 +2567,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "e0ab975f",
+      "state": "e2d9cbd9",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -2606,7 +2594,6 @@
             "damageTaken": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2661,7 +2648,6 @@
             "damageTaken": 65
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -3124,7 +3110,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "e0ab975f",
+      "state": "e2d9cbd9",
       "events": "741638a5",
       "rng": {
         "draws": 18,
@@ -3151,7 +3137,6 @@
             "damageTaken": 207
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -3206,7 +3191,6 @@
             "damageTaken": 65
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},

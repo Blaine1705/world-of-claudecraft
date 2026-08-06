@@ -7713,7 +7713,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': 'Крафт',
   'hudChrome.crafting.dialogOptionAria': 'Открыть окно крафта: {craft}',
   'hudChrome.crafting.close': 'Закрыть крафт',
-  'hudChrome.crafting.craft': 'Создать',
   'hudChrome.crafting.reagentsNeeded': 'Требуется:',
   'hudChrome.crafting.empty': 'Известных рецептов пока нет.',
   'hudChrome.crafting.resultAria': 'Создать {name}',
@@ -7909,7 +7908,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.layers.blocker': 'Невидимые стены',
   'editor.status.blockerCapReached':
     'Достигнут предел невидимых стен ({max}). Новая стена не добавлена.',
-  'editor.status.campCapReached': 'Достигнут предел лагерей ({max}). Новый лагерь не добавлен.',
   'editor.help.tool.blocker': 'Рисует невидимые стены, которые блокируют движение в тестовой игре.',
   'editor.inspector.label': 'Параметры инструмента',
   'editor.brush.title': 'Кисть',
@@ -8071,6 +8069,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'editor.openDrawer.prev': 'Предыдущая страница',
   'editor.openDrawer.next': 'Следующая страница',
   'editor.openDrawer.page': 'Страница {page}',
+  'editor.status.campCapReached': 'Достигнут предел лагерей ({max}). Новый лагерь не добавлен.',
   'editor.status.savedLocal': 'Карта «{name}» сохранена в этом браузере.',
   'editor.status.savedServer': 'Карта «{name}» сохранена на сервере (v{version}).',
   'editor.status.savedLocalOnly':
@@ -8703,6 +8702,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': 'Вы выуживаете: {name}',
   'hudChrome.gathering.biteLine': 'Что-то клюнуло!',
   'hudChrome.gathering.gotAwayLine': 'Добыча сорвалась.',
+  'hudChrome.gathering.earlyReelLine': 'Вы подсекли слишком рано. Рыба ещё не клюнула.',
   'hudChrome.gathering.nodeName.ore': 'Рудная жила',
   'hudChrome.gathering.nodeName.wood': 'Древостой',
   'hudChrome.gathering.nodeName.herb': 'Заросли трав',
@@ -8817,8 +8817,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': 'ПОРАЖЕНИЕ! Ваша Yumi пала.',
   'hudChrome.crafting.comboRequirementUnmet':
     'У вас нет обоих требуемых ремесел нужного уровня для этого рецепта.',
-  'hudChrome.crafting.throttled':
-    'Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.crafting.recipeNotLearned': 'Вы еще не изучили этот рецепт.',
   'hudChrome.crafting.noBagSpace': 'В сумках нет места для созданного предмета.',
   // Professions 2.0 (M16 non-Latin fills).
@@ -10589,12 +10587,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': 'У вас нет этого предмета.',
   'hudChrome.enchanting.notDisenchantable': 'Это нельзя распылить.',
   'hudChrome.enchanting.notSalvageable': 'Это нельзя разобрать.',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Вы распыляете слишком быстро. Подождите немного и попробуйте снова.',
-  'hudChrome.enchanting.salvageThrottled':
-    'Вы разбираете слишком быстро. Подождите немного и попробуйте снова.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Вы зачаровываете слишком быстро. Подождите немного и попробуйте снова.',
   'hudChrome.enchanting.enchantWrongSlot': 'Эти чары нельзя наложить на этот предмет.',
   'hudChrome.enchanting.enchantUnknown': 'Таких чар не существует.',
   'hudChrome.enchanting.enchantInsufficient': 'У вас нет материалов для этих чар.',
@@ -11016,6 +11008,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': 'Поклевка и подсечка',
   'guide.profPages.fish.biteBody':
     'Поклевка приходит через {min}-{max} секунд после заброса (хорошее удилище срезает до {rod} секунд ожидания), окно подсечки длится {reel} секунды плюс {reelRod} за каждую ступень удилища выше первой, а сессия не дольше {cap} секунд.',
+  'guide.profPages.fish.earlyReelNote':
+    'Предостережение нетерпеливым: нажмите на удочку до поклевки, и вы вытянете пустую леску, а заброс закончится (короткая передышка сразу после заброса прощает случайное двойное нажатие). Терпение и есть вся рыбалка: дождитесь поклевки, потом подсекайте.',
   'guide.profPages.fish.scheduleHeading': 'Рост мастерства',
   'guide.profPages.fish.scheduleNote':
     'Рост в рыбной ловле идет по жесткой шкале мастерства, а хлам с {cutoff} и дальше не учит ничему.',
@@ -11062,9 +11056,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': 'Подписанные работы',
   'guide.profPages.econ.provenanceBody':
     'Изделия и находки редкого качества и выше несут подпись мастера, и одинаково подписанные вещи по-прежнему складываются в стопки.',
-  'guide.profPages.econ.throttleHeading': 'Ограничение действий',
-  'guide.profPages.econ.throttleBody':
-    'Создание, распыление, наложение чар и утилизация делят одно ограничение: не более {actions} действий за {seconds} секунд.',
   'guide.profPages.econ.doctrineHeading': 'Игроки торгуют с игроками',
   'guide.profPages.econ.doctrineBody':
     'Сила созданных вещей всегда ниже рейдового порога, а перечисленные пошлины гонят товары в обмен между игроками, а не по кругу торговцев.',
@@ -11348,4 +11339,39 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'Эфирный натиск',
   'itemUi.vendor.buyStack': 'Купить {count}',
   'itemUi.vendor.buyStackAria': 'Купить {count} {item} за {price}',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': 'Изготовление',
+  'abilityUi.cast.disenchanting': 'Распыление',
+  'abilityUi.cast.enchanting_apply': 'Наложение чар',
+  'abilityUi.cast.salvaging': 'Разбор',
+  'abilityUi.cast.tool_recharge': 'Перезарядка',
+  'hudChrome.crafting.crafting': 'Изготовление',
+  'hudChrome.crafting.create': 'Создать',
+  'hudChrome.crafting.createAll': 'Создать всё',
+  'hudChrome.crafting.createAllAria': 'Создать максимальное число копий этого рецепта из имеющихся материалов',
+  'hudChrome.crafting.qtyRowAria': 'Количество',
+  'hudChrome.crafting.qtyDecreaseAria': 'Уменьшить количество (сейчас {count})',
+  'hudChrome.crafting.qtyIncreaseAria': 'Увеличить количество (сейчас {count})',
+  'hudChrome.crafting.qtyValueAria': 'Количество, {count}',
+  'hudChrome.crafting.batchRemaining': 'Осталось {remaining} из {total}',
+  'hudChrome.crafting.batchRemainingAria': 'Осталось {remaining} из {total} созданий',
+  'hudChrome.crafting.durationAria': 'Время применения: {seconds} с',
+  'hudChrome.crafting.progressAria': 'Прогресс изготовления',
+  'hudChrome.crafting.announceStart': 'Изготавливается: {name}',
+  'hudChrome.crafting.announceComplete': 'Изготовлено: {name}',
+  'hudChrome.crafting.announceCancel': 'Изготовление отменено',
+  'hudChrome.crafting.busy': 'Вы заняты.',
+  'hudChrome.enchanting.disenchantBusy': 'Вы заняты.',
+  'hudChrome.enchanting.salvageBusy': 'Вы заняты.',
+  'hudChrome.enchanting.enchantBusy': 'Вы заняты.',
+  'guide.profPages.econ.castPaceHeading': 'Время применения и золотой сток',
+  'guide.profPages.econ.castPaceBody': 'Действия профессий занимают реальное время: простые полевые рецепты занимают чуть меньше двух секунд, высокие ступени лестницы несколько секунд, а распыление, наложение чар, разбор и перезарядка эффектов инструментов имеют короткую фиксированную длительность. Отмена посреди применения ничего не тратит. За каждое успешное изготовление также взимается медный сбор, пропорциональный бюджету предмета. Вместе с материалами, станками и потолками навыка этот темп удерживает рынок без отдельной квоты действий. Точные длительности по диапазонам навыка перечислены ниже.',
+  'guide.profPages.econ.castPaceField': 'Полевые рецепты (без требования к навыку): применение {seconds} с',
+  'guide.profPages.econ.castPaceSkill25': 'Рецепты до навыка 25: применение {seconds} с',
+  'guide.profPages.econ.castPaceSkill50': 'Рецепты до навыка 50: применение {seconds} с',
+  'guide.profPages.econ.castPaceSkill75': 'Рецепты до навыка 75: применение {seconds} с',
+  'guide.profPages.econ.castPaceCombo': 'Вершина лестницы и комбинированные рецепты: применение {seconds} с',
+  'guide.profPages.econ.castPaceEnchantFamily': 'Распыление, наложение чар и разбор: применение {seconds} с',
+  'guide.profPages.econ.castPaceRecharge': 'Перезарядка эффекта инструмента: применение {seconds} с',
+  'guide.profPages.econ.castPaceBatch': 'Партия: до {count} за один заказ, каждое изделие со своим применением',
 };
