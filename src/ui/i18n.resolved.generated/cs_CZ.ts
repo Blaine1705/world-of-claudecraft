@@ -1641,6 +1641,18 @@ export const cs_CZ: EnTranslations = {
         "few": "Kdo: {count} hráči odpovídají hledání \"{query}\" na {realm}.",
         "many": "Kdo: {count} hráče odpovídá hledání \"{query}\" na {realm}.",
         "other": "Kdo: {count} hráčů odpovídá hledání \"{query}\" na {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Tvoje kronika se dopisuje: zaznamenáno {count} skutků.",
+        "many": "Tvoje kronika se dopisuje: zaznamenáno {count} skutků.",
+        "other": "Tvoje kronika se dopisuje: zaznamenáno {count} skutků."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const cs_CZ: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const cs_CZ: EnTranslations = {
       "titlesEmpty": "Vykonej skutek nesoucí titul a tato police se odemkne.",
       "unlockedBanner": "Skutek vykonán: {name}",
       "unlockedTitleHint": "Získán nový titul: {title}. Zvol si ho v Knize skutků.",
-      "retroSummary": "Tvoje kronika se dopisuje: zaznamenáno {count} skutků.",
       "broadcastLine": "{name} završuje skutek: {deed}",
       "rarityLine": "Vykonalo jej {percent} dobrodruhů",
       "trackerLabel": "Skutky",

@@ -8415,7 +8415,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Seneste:',
   'hudChrome.deeds.renownChip': '{renown} Hæder',
   'hudChrome.deeds.renownLabel': 'Hæder',
-  'hudChrome.deeds.retroSummary': 'Din krønike er ført ajour: {count} bedrifter nedskrevet.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Din krønike er ført ajour: {count} bedrifter nedskrevet.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Din krønike er ført ajour: {count} bedrifter nedskrevet.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Din krønike er ført ajour: {count} bedrifter nedskrevet.',
   'hudChrome.deeds.searchAria': 'Søg efter bedrifter på navn',
   'hudChrome.deeds.searchPlaceholder': 'Søg i bedrifter',
   'hudChrome.deeds.title': 'Bedrifternes Bog',

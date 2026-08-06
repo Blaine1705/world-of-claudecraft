@@ -234,10 +234,12 @@ describe('i18n CLDR pluralization', () => {
   it('declares the expected plural bases with all four CLDR categories in en', () => {
     expect(bases.sort()).toEqual([
       'characterCount',
+      'deedsRetroSummary',
       'finderPartySize',
       'guildMembers',
       'playersMatching',
       'playersOnline',
+      'reliquaryRetroSummary',
       'secondsRemaining',
     ]);
     for (const base of bases) {
@@ -279,5 +281,26 @@ describe('i18n CLDR pluralization', () => {
     setLanguage('en');
     expect(tPlural('hudChrome.plurals.characterCount', 1)).toBe('1 character');
     expect(tPlural('hudChrome.plurals.characterCount', 7)).toBe('7 characters');
+  });
+
+  // The on-join catch-up summaries (hud.ts handleReliquaryUnlocks /
+  // handleDeedUnlocks) used to be flat keys with a hardcoded plural, so a
+  // single back-credited relic or deed read "1 relics catalogued" / "1 deeds
+  // recorded". Both sentences are pinned whole at count 1 and count 5 so a
+  // dropped `one` leaf, or a leaf reworded back to the plural noun, fails here.
+  it('tPlural renders singular retro catch-up summaries at count 1 (both sibling bases)', () => {
+    setLanguage('en');
+    expect(tPlural('hudChrome.plurals.reliquaryRetroSummary', 1)).toBe(
+      'Your reliquary catches up: 1 relic catalogued.',
+    );
+    expect(tPlural('hudChrome.plurals.reliquaryRetroSummary', 5)).toBe(
+      'Your reliquary catches up: 5 relics catalogued.',
+    );
+    expect(tPlural('hudChrome.plurals.deedsRetroSummary', 1)).toBe(
+      'Your chronicle catches up: 1 deed recorded.',
+    );
+    expect(tPlural('hudChrome.plurals.deedsRetroSummary', 5)).toBe(
+      'Your chronicle catches up: 5 deeds recorded.',
+    );
   });
 });

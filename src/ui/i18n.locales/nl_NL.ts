@@ -8518,7 +8518,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Recent:',
   'hudChrome.deeds.renownChip': '{renown} Roem',
   'hudChrome.deeds.renownLabel': 'Roem',
-  'hudChrome.deeds.retroSummary': 'Je kroniek is bijgewerkt: {count} daden opgetekend.',
+  'hudChrome.plurals.deedsRetroSummary.few': 'Je kroniek is bijgewerkt: {count} daden opgetekend.',
+  'hudChrome.plurals.deedsRetroSummary.many': 'Je kroniek is bijgewerkt: {count} daden opgetekend.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Je kroniek is bijgewerkt: {count} daden opgetekend.',
   'hudChrome.deeds.searchAria': 'Zoek daden op naam',
   'hudChrome.deeds.searchPlaceholder': 'Daden zoeken',
   'hudChrome.deeds.title': 'Boek der Daden',

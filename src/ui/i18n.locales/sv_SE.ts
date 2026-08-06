@@ -8360,7 +8360,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Nyligen:',
   'hudChrome.deeds.renownChip': '{renown} ryktbarhet',
   'hudChrome.deeds.renownLabel': 'Ryktbarhet',
-  'hudChrome.deeds.retroSummary': 'Din krönika kommer ikapp: {count} bedrifter nedtecknade.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Din krönika kommer ikapp: {count} bedrifter nedtecknade.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Din krönika kommer ikapp: {count} bedrifter nedtecknade.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Din krönika kommer ikapp: {count} bedrifter nedtecknade.',
   'hudChrome.deeds.searchAria': 'Sök bedrifter efter namn',
   'hudChrome.deeds.searchPlaceholder': 'Sök bedrifter',
   'hudChrome.deeds.title': 'Bedrifternas bok',

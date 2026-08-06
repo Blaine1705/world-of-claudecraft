@@ -1641,6 +1641,18 @@ export const fr_FR: EnTranslations = {
         "few": "Qui : {count} joueurs correspondant à \"{query}\" sur {realm}.",
         "many": "Qui : {count} joueurs correspondant à \"{query}\" sur {realm}.",
         "other": "Qui : {count} joueurs correspondant à \"{query}\" sur {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Votre chronique rattrape son retard: {count} hauts faits consignés.",
+        "many": "Votre chronique rattrape son retard: {count} hauts faits consignés.",
+        "other": "Votre chronique rattrape son retard: {count} hauts faits consignés."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const fr_FR: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const fr_FR: EnTranslations = {
       "titlesEmpty": "Obtenez un haut fait qui confère un titre pour débloquer cette étagère.",
       "unlockedBanner": "Haut fait accompli: {name}",
       "unlockedTitleHint": "Nouveau titre obtenu: {title}. Choisissez-le dans le Livre des hauts faits.",
-      "retroSummary": "Votre chronique rattrape son retard: {count} hauts faits consignés.",
       "broadcastLine": "{name} a accompli un haut fait: {deed}",
       "rarityLine": "Obtenu par {percent} des aventuriers",
       "trackerLabel": "Hauts faits",

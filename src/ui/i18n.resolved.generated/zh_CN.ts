@@ -1641,6 +1641,18 @@ export const zh_CN: EnTranslations = {
         "few": "查询：{realm}上有{count}名玩家匹配“{query}”。",
         "many": "查询：{realm}上有{count}名玩家匹配“{query}”。",
         "other": "查询：{realm}上有{count}名玩家匹配“{query}”。"
+      },
+      "reliquaryRetroSummary": {
+        "one": "你的圣物库已更新：补录 {count} 件圣物。",
+        "few": "你的圣物库已更新：补录 {count} 件圣物。",
+        "many": "你的圣物库已更新：补录 {count} 件圣物。",
+        "other": "你的圣物库已更新：补录 {count} 件圣物。"
+      },
+      "deedsRetroSummary": {
+        "one": "你的编年史已更新：补录 {count} 项功绩。",
+        "few": "你的编年史已更新：补录 {count} 项功绩。",
+        "many": "你的编年史已更新：补录 {count} 项功绩。",
+        "other": "你的编年史已更新：补录 {count} 项功绩。"
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const zh_CN: EnTranslations = {
       "unlockToast": "圣物已收录：{name}",
       "illuminateBanner": "页面已点亮：{name}",
       "illuminateToast": "{name} 上的每一件圣物均已填满。",
-      "retroSummary": "你的圣物库已更新：补录 {count} 件圣物。",
       "markFind": {
         "masterwork_first": "首件杰作",
         "masterwork_weaponcrafting": "武器锻造杰作",
@@ -3256,7 +3267,6 @@ export const zh_CN: EnTranslations = {
       "titlesEmpty": "获得带头衔的功绩后即可解锁此栏。",
       "unlockedBanner": "达成功绩：{name}",
       "unlockedTitleHint": "获得新头衔：{title}。可在功绩之书中选用。",
-      "retroSummary": "你的编年史已更新：补录 {count} 项功绩。",
       "broadcastLine": "{name} 达成了功绩：{deed}",
       "rarityLine": "{percent} 的冒险者已达成",
       "trackerLabel": "功绩",

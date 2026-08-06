@@ -1641,6 +1641,18 @@ export const vi_VN: EnTranslations = {
         "few": "Ai: {count} người chơi khớp \"{query}\" trên {realm}.",
         "many": "Ai: {count} người chơi khớp \"{query}\" trên {realm}.",
         "other": "Ai: {count} người chơi khớp \"{query}\" trên {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.",
+        "many": "Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.",
+        "other": "Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const vi_VN: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const vi_VN: EnTranslations = {
       "titlesEmpty": "Hãy lập một kỳ công có thưởng danh hiệu để mở ngăn sách này.",
       "unlockedBanner": "Đã lập kỳ công: {name}",
       "unlockedTitleHint": "Đã nhận danh hiệu mới: {title}. Hãy chọn nó trong Sách Kỳ Công.",
-      "retroSummary": "Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.",
       "broadcastLine": "{name} vừa lập một kỳ công: {deed}",
       "rarityLine": "Đã có {percent} nhà phiêu lưu lập được",
       "trackerLabel": "Kỳ Công",

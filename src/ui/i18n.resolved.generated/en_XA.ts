@@ -1641,6 +1641,18 @@ export const en_XA: EnTranslations = {
         "few": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
         "many": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]",
         "other": "[Ŵĥó: {count} þļáýéŕš ɱáţçĥíñĝ \"{query}\" óñ {realm}.]"
+      },
+      "reliquaryRetroSummary": {
+        "one": "[Ýóúŕ ŕéļíɋúáŕý çáţçĥéš úþ: {count} ŕéļíç çáţáļóĝúéð.]",
+        "few": "[Ýóúŕ ŕéļíɋúáŕý çáţçĥéš úþ: {count} ŕéļíçš çáţáļóĝúéð.]",
+        "many": "[Ýóúŕ ŕéļíɋúáŕý çáţçĥéš úþ: {count} ŕéļíçš çáţáļóĝúéð.]",
+        "other": "[Ýóúŕ ŕéļíɋúáŕý çáţçĥéš úþ: {count} ŕéļíçš çáţáļóĝúéð.]"
+      },
+      "deedsRetroSummary": {
+        "one": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééð ŕéçóŕðéð.]",
+        "few": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééðš ŕéçóŕðéð.]",
+        "many": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééðš ŕéçóŕðéð.]",
+        "other": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééðš ŕéçóŕðéð.]"
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const en_XA: EnTranslations = {
       "unlockToast": "[Ŕéļíç çáţáļóĝúéð: {name}]",
       "illuminateBanner": "[Þáĝé íļļúɱíñáţéð: {name}]",
       "illuminateToast": "[Éʋéŕý ŕéļíç óñ {name} íš ƒíļļéð.]",
-      "retroSummary": "[Ýóúŕ ŕéļíɋúáŕý çáţçĥéš úþ: {count} ŕéļíçš çáţáļóĝúéð.]",
       "markFind": {
         "masterwork_first": "[Ƒíŕšţ Ɱášţéŕŵóŕķ]",
         "masterwork_weaponcrafting": "[Ŵéáþóñçŕáƒţíñĝ Ɱášţéŕŵóŕķ]",
@@ -3256,7 +3267,6 @@ export const en_XA: EnTranslations = {
       "titlesEmpty": "[Éáŕñ á ţíţļé-ƀéáŕíñĝ ðééð ţó úñļóçķ ţĥíš šĥéļƒ.]",
       "unlockedBanner": "[Ðééð áççóɱþļíšĥéð: {name}]",
       "unlockedTitleHint": "[Ñéŵ ţíţļé éáŕñéð: {title}. Çĥóóšé íţ íñ ţĥé Ɓóóķ óƒ Ðééðš.]",
-      "retroSummary": "[Ýóúŕ çĥŕóñíçļé çáţçĥéš úþ: {count} ðééðš ŕéçóŕðéð.]",
       "broadcastLine": "[{name} ĥáš áççóɱþļíšĥéð á ðééð: {deed}]",
       "rarityLine": "[Éáŕñéð ƀý {percent} óƒ áðʋéñţúŕéŕš]",
       "trackerLabel": "[Ðééðš]",

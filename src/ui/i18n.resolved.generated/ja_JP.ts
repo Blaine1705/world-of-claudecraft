@@ -1641,6 +1641,18 @@ export const ja_JP: EnTranslations = {
         "few": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。",
         "many": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。",
         "other": "Who：{realm}で「{query}」に一致するプレイヤーが{count}人います。"
+      },
+      "reliquaryRetroSummary": {
+        "one": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
+        "few": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
+        "many": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
+        "other": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。"
+      },
+      "deedsRetroSummary": {
+        "one": "年代記が追いつきました: {count} 件の功績を記録。",
+        "few": "年代記が追いつきました: {count} 件の功績を記録。",
+        "many": "年代記が追いつきました: {count} 件の功績を記録。",
+        "other": "年代記が追いつきました: {count} 件の功績を記録。"
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const ja_JP: EnTranslations = {
       "unlockToast": "聖遺物を収蔵：{name}",
       "illuminateBanner": "ページが照耀されました：{name}",
       "illuminateToast": "{name} の聖遺物がすべて埋まりました。",
-      "retroSummary": "聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。",
       "markFind": {
         "masterwork_first": "初めての名作",
         "masterwork_weaponcrafting": "武器製作の名作",
@@ -3256,7 +3267,6 @@ export const ja_JP: EnTranslations = {
       "titlesEmpty": "称号付きの功績を獲得するとこの棚が解放されます。",
       "unlockedBanner": "功績達成: {name}",
       "unlockedTitleHint": "新しい称号を獲得: {title}。功績の書で選択できます。",
-      "retroSummary": "年代記が追いつきました: {count} 件の功績を記録。",
       "broadcastLine": "{name}が功績「{deed}」を達成しました",
       "rarityLine": "冒険者の{percent}が達成",
       "trackerLabel": "功績",

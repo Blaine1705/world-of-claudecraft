@@ -1641,6 +1641,18 @@ export const tr_TR: EnTranslations = {
         "few": "Kim: {realm} sunucusunda \"{query}\" ile eşleşen {count} oyuncu.",
         "many": "Kim: {realm} sunucusunda \"{query}\" ile eşleşen {count} oyuncu.",
         "other": "Kim: {realm} sunucusunda \"{query}\" ile eşleşen {count} oyuncu."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.",
+        "many": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.",
+        "other": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const tr_TR: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const tr_TR: EnTranslations = {
       "titlesEmpty": "Bu rafın kilidini açmak için unvan kazandıran bir yiğitliğe imza at.",
       "unlockedBanner": "Yiğitlik kazanıldı: {name}",
       "unlockedTitleHint": "Yeni unvan kazanıldı: {title}. Yiğitlikler Kitabı'ndan seçebilirsin.",
-      "retroSummary": "Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.",
       "broadcastLine": "{name} bir yiğitliğe imza attı: {deed}",
       "rarityLine": "Maceracıların {percent} kadarı kazandı",
       "trackerLabel": "Yiğitlikler",

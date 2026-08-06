@@ -9332,7 +9332,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.titlesEmpty': '称号付きの功績を獲得するとこの棚が解放されます。',
   'hudChrome.deeds.unlockedBanner': '功績達成: {name}',
   'hudChrome.deeds.unlockedTitleHint': '新しい称号を獲得: {title}。功績の書で選択できます。',
-  'hudChrome.deeds.retroSummary': '年代記が追いつきました: {count} 件の功績を記録。',
+  'hudChrome.plurals.deedsRetroSummary.one': '年代記が追いつきました: {count} 件の功績を記録。',
+  'hudChrome.plurals.deedsRetroSummary.few': '年代記が追いつきました: {count} 件の功績を記録。',
+  'hudChrome.plurals.deedsRetroSummary.many': '年代記が追いつきました: {count} 件の功績を記録。',
+  'hudChrome.plurals.deedsRetroSummary.other': '年代記が追いつきました: {count} 件の功績を記録。',
   'hudChrome.deeds.broadcastLine': '{name}が功績「{deed}」を達成しました',
   'hudChrome.deeds.rarityLine': '冒険者の{percent}が達成',
   'hudChrome.deeds.trackerLabel': '功績',
@@ -10400,7 +10403,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': '聖遺物を収蔵：{name}',
   'hudChrome.reliquary.illuminateBanner': 'ページが照耀されました：{name}',
   'hudChrome.reliquary.illuminateToast': '{name} の聖遺物がすべて埋まりました。',
-  'hudChrome.reliquary.retroSummary': '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
+  'hudChrome.plurals.reliquaryRetroSummary.one':
+    '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
+  'hudChrome.plurals.reliquaryRetroSummary.few':
+    '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
+  'hudChrome.plurals.reliquaryRetroSummary.many':
+    '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
+  'hudChrome.plurals.reliquaryRetroSummary.other':
+    '聖遺物庫が追いつきました：{count} 件の聖遺物を収蔵。',
   'hudChrome.reliquary.curatorRankName1': '見習いキュレーター',
   'hudChrome.reliquary.curatorRankName2': '戦利品の守り手',
   'hudChrome.reliquary.curatorRankName3': 'マスターキュレーター',

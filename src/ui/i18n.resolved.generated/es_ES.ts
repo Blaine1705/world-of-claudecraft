@@ -1641,6 +1641,18 @@ export const es_ES: EnTranslations = {
         "few": "Quién: {count} jugadores que coinciden con \"{query}\" en {realm}.",
         "many": "Quién: {count} jugadores que coinciden con \"{query}\" en {realm}.",
         "other": "Quién: {count} jugadores que coinciden con \"{query}\" en {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Tu crónica se pone al día: {count} gestas registradas.",
+        "many": "Tu crónica se pone al día: {count} gestas registradas.",
+        "other": "Tu crónica se pone al día: {count} gestas registradas."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const es_ES: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const es_ES: EnTranslations = {
       "titlesEmpty": "Consigue una gesta que otorgue título para desbloquear este estante.",
       "unlockedBanner": "Gesta lograda: {name}",
       "unlockedTitleHint": "Nuevo título conseguido: {title}. Elígelo en el Libro de Gestas.",
-      "retroSummary": "Tu crónica se pone al día: {count} gestas registradas.",
       "broadcastLine": "{name} ha logrado una gesta: {deed}",
       "rarityLine": "Conseguida por el {percent} de los aventureros",
       "trackerLabel": "Gestas",

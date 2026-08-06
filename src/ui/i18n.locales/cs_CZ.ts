@@ -9146,7 +9146,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Nedávné:',
   'hudChrome.deeds.renownChip': 'Věhlas: {renown}',
   'hudChrome.deeds.renownLabel': 'Věhlas',
-  'hudChrome.deeds.retroSummary': 'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Tvoje kronika se dopisuje: zaznamenáno {count} skutků.',
   'hudChrome.deeds.searchAria': 'Hledat skutky podle názvu',
   'hudChrome.deeds.searchPlaceholder': 'Hledat skutky',
   'hudChrome.deeds.title': 'Kniha skutků',

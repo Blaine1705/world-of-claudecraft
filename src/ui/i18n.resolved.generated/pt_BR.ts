@@ -1641,6 +1641,18 @@ export const pt_BR: EnTranslations = {
         "few": "Quem: {count} jogadores correspondentes a \"{query}\" em {realm}.",
         "many": "Quem: {count} jogadores correspondentes a \"{query}\" em {realm}.",
         "other": "Quem: {count} jogadores correspondentes a \"{query}\" em {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Sua crônica se põe em dia: {count} feitos registrados.",
+        "many": "Sua crônica se põe em dia: {count} feitos registrados.",
+        "other": "Sua crônica se põe em dia: {count} feitos registrados."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const pt_BR: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const pt_BR: EnTranslations = {
       "titlesEmpty": "Conquiste um feito que conceda um título para desbloquear esta prateleira.",
       "unlockedBanner": "Feito realizado: {name}",
       "unlockedTitleHint": "Novo título conquistado: {title}. Escolha-o no Livro dos Feitos.",
-      "retroSummary": "Sua crônica se põe em dia: {count} feitos registrados.",
       "broadcastLine": "{name} realizou um feito: {deed}",
       "rarityLine": "Conquistado por {percent} dos aventureiros",
       "trackerLabel": "Feitos",

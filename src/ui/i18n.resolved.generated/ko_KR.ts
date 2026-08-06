@@ -1641,6 +1641,18 @@ export const ko_KR: EnTranslations = {
         "few": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
         "many": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명.",
         "other": "Who: {realm}에서 \"{query}\"와 일치하는 플레이어 {count}명."
+      },
+      "reliquaryRetroSummary": {
+        "one": "성물고가 따라잡았습니다: 성물 {count}개 수록.",
+        "few": "성물고가 따라잡았습니다: 성물 {count}개 수록.",
+        "many": "성물고가 따라잡았습니다: 성물 {count}개 수록.",
+        "other": "성물고가 따라잡았습니다: 성물 {count}개 수록."
+      },
+      "deedsRetroSummary": {
+        "one": "연대기가 따라잡았습니다: 업적 {count}개 기록.",
+        "few": "연대기가 따라잡았습니다: 업적 {count}개 기록.",
+        "many": "연대기가 따라잡았습니다: 업적 {count}개 기록.",
+        "other": "연대기가 따라잡았습니다: 업적 {count}개 기록."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const ko_KR: EnTranslations = {
       "unlockToast": "성물 수록: {name}",
       "illuminateBanner": "페이지 조명됨: {name}",
       "illuminateToast": "{name}의 모든 성물이 채워졌습니다.",
-      "retroSummary": "성물고가 따라잡았습니다: 성물 {count}개 수록.",
       "markFind": {
         "masterwork_first": "첫 명작",
         "masterwork_weaponcrafting": "무기제작 명작",
@@ -3256,7 +3267,6 @@ export const ko_KR: EnTranslations = {
       "titlesEmpty": "칭호가 걸린 업적을 획득하면 이 선반이 열립니다.",
       "unlockedBanner": "업적 달성: {name}",
       "unlockedTitleHint": "새 칭호 획득: {title}. 업적의 서에서 선택할 수 있습니다.",
-      "retroSummary": "연대기가 따라잡았습니다: 업적 {count}개 기록.",
       "broadcastLine": "{name} 님이 업적을 달성했습니다: {deed}",
       "rarityLine": "모험가 중 {percent} 달성",
       "trackerLabel": "업적",

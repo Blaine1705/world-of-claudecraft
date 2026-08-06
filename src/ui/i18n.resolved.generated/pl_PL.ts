@@ -1641,6 +1641,18 @@ export const pl_PL: EnTranslations = {
         "few": "Kto: {count} graczy pasujących do \"{query}\" na {realm}.",
         "many": "Kto: {count} graczy pasujących do \"{query}\" na {realm}.",
         "other": "Kto: {count} gracza pasujących do \"{query}\" na {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Twoja kronika nadrabia zaległości: zapisano {count} czynów.",
+        "many": "Twoja kronika nadrabia zaległości: zapisano {count} czynów.",
+        "other": "Twoja kronika nadrabia zaległości: zapisano {count} czynów."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const pl_PL: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const pl_PL: EnTranslations = {
       "titlesEmpty": "Zdobądź czyn nagradzany tytułem, aby odsłonić tę półkę.",
       "unlockedBanner": "Czyn dokonany: {name}",
       "unlockedTitleHint": "Zdobyto nowy tytuł: {title}. Wybierz go w Księdze Czynów.",
-      "retroSummary": "Twoja kronika nadrabia zaległości: zapisano {count} czynów.",
       "broadcastLine": "{name} dokonuje czynu: {deed}",
       "rarityLine": "Zdobyty przez {percent} poszukiwaczy przygód",
       "trackerLabel": "Czyny",

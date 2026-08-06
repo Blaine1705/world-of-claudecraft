@@ -1723,6 +1723,22 @@ export const hudChromeStrings = {
       many: 'Who: {count} players matching "{query}" on {realm}.',
       other: 'Who: {count} players matching "{query}" on {realm}.',
     },
+    // The on-join back-credit pass, one line for the whole seed rather than a
+    // toast per relic or per deed. The reliquary and deeds summaries are
+    // siblings and always move together; both went CLDR here so count 1 reads
+    // "1 relic" / "1 deed" instead of the old hardcoded plural.
+    reliquaryRetroSummary: {
+      one: 'Your reliquary catches up: {count} relic catalogued.',
+      few: 'Your reliquary catches up: {count} relics catalogued.',
+      many: 'Your reliquary catches up: {count} relics catalogued.',
+      other: 'Your reliquary catches up: {count} relics catalogued.',
+    },
+    deedsRetroSummary: {
+      one: 'Your chronicle catches up: {count} deed recorded.',
+      few: 'Your chronicle catches up: {count} deeds recorded.',
+      many: 'Your chronicle catches up: {count} deeds recorded.',
+      other: 'Your chronicle catches up: {count} deeds recorded.',
+    },
   },
   // "Report a Bug" options sub-view (online only). Captures realm/character/
   // position/screenshot plus a free-text description and posts to the server.
@@ -4036,9 +4052,6 @@ export const hudChromeStrings = {
     unlockToast: 'Relic catalogued: {name}',
     illuminateBanner: 'Page illuminated: {name}',
     illuminateToast: 'Every relic on {name} is filled.',
-    // The on-join back-credit pass: one line for the whole seed, never a toast
-    // per relic (mirrors hudChrome.deeds.retroSummary).
-    retroSummary: 'Your reliquary catches up: {count} relics catalogued.',
     // Phase 7: profession mark find labels (player-visible chrome). Catalog page
     // names are NOT keys here: they resolve from the page id through
     // src/ui/reliquary_i18n.ts, the deed_i18n entity-style channel.
@@ -4110,7 +4123,6 @@ export const hudChromeStrings = {
     titlesEmpty: 'Earn a title-bearing deed to unlock this shelf.',
     unlockedBanner: 'Deed accomplished: {name}',
     unlockedTitleHint: 'New title earned: {title}. Choose it in the Book of Deeds.',
-    retroSummary: 'Your chronicle catches up: {count} deeds recorded.',
     broadcastLine: '{name} has accomplished a deed: {deed}',
     rarityLine: 'Earned by {percent} of adventurers',
     trackerLabel: 'Deeds',

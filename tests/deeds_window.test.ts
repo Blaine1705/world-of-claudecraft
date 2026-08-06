@@ -165,9 +165,16 @@ describe('hud wiring', () => {
     // count only ever feeds the one localized summary log line.
     expect(body).toContain('if (plan.bannerId !== null)');
     expect(body).toContain('if (plan.playSound) audio.achievement();');
+    // The RAW plan.retroCount is the second argument on purpose: it is what
+    // tPlural feeds Intl.PluralRules, so pinning it stops a refactor from
+    // passing the pre-formatted string and collapsing every locale onto the
+    // .other leaf ("1 deeds recorded" again).
     expect(body).toMatch(
-      /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.deeds\.retroSummary'/,
+      /if \(plan\.retroCount > 0\) \{\s*const retroText = tPlural\(\s*'hudChrome\.plurals\.deedsRetroSummary',\s*plan\.retroCount,/,
     );
+    // The display override: the visible number stays locale-formatted through
+    // formatNumber even though the selection arg above is the raw count.
+    expect(body).toContain('count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 })');
     expect(body.match(/showCelebrationBanner/g)?.length).toBe(1);
     expect(body.match(/audio\.achievement/g)?.length).toBe(1);
   });

@@ -1641,6 +1641,18 @@ export const nl_NL: EnTranslations = {
         "few": "Wie: {count} spelers die overeenkomen met \"{query}\" op {realm}.",
         "many": "Wie: {count} spelers die overeenkomen met \"{query}\" op {realm}.",
         "other": "Wie: {count} spelers die overeenkomen met \"{query}\" op {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Je kroniek is bijgewerkt: {count} daden opgetekend.",
+        "many": "Je kroniek is bijgewerkt: {count} daden opgetekend.",
+        "other": "Je kroniek is bijgewerkt: {count} daden opgetekend."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const nl_NL: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const nl_NL: EnTranslations = {
       "titlesEmpty": "Behaal een daad die een titel schenkt om deze plank te ontgrendelen.",
       "unlockedBanner": "Daad volbracht: {name}",
       "unlockedTitleHint": "Nieuwe titel behaald: {title}. Kies hem in het Boek der Daden.",
-      "retroSummary": "Je kroniek is bijgewerkt: {count} daden opgetekend.",
       "broadcastLine": "{name} heeft een daad volbracht: {deed}",
       "rarityLine": "Behaald door {percent} van de avonturiers",
       "trackerLabel": "Daden",

@@ -9076,7 +9076,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'En son:',
   'hudChrome.deeds.renownChip': '{renown} Ün',
   'hudChrome.deeds.renownLabel': 'Ün',
-  'hudChrome.deeds.retroSummary': 'Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Vakayinamen arayı kapattı: {count} yiğitlik kaydedildi.',
   'hudChrome.deeds.searchAria': 'Yiğitlikleri adına göre ara',
   'hudChrome.deeds.searchPlaceholder': 'Yiğitlik ara',
   'hudChrome.deeds.title': 'Yiğitlikler Kitabı',

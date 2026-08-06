@@ -1641,6 +1641,18 @@ export const de_DE: EnTranslations = {
         "few": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
         "many": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}.",
         "other": "Wer: {count} Spieler, die auf \"{query}\" passen, auf {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Deine Chronik holt auf: {count} Taten verzeichnet.",
+        "many": "Deine Chronik holt auf: {count} Taten verzeichnet.",
+        "other": "Deine Chronik holt auf: {count} Taten verzeichnet."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const de_DE: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const de_DE: EnTranslations = {
       "titlesEmpty": "Erringe eine Tat, die einen Titel verleiht, um dieses Regal freizuschalten.",
       "unlockedBanner": "Tat vollbracht: {name}",
       "unlockedTitleHint": "Neuer Titel errungen: {title}. Wähle ihn im Buch der Taten.",
-      "retroSummary": "Deine Chronik holt auf: {count} Taten verzeichnet.",
       "broadcastLine": "{name} hat eine Tat vollbracht: {deed}",
       "rarityLine": "Errungen von {percent} der Abenteurer",
       "trackerLabel": "Taten",

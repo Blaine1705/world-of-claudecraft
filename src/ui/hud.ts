@@ -13276,7 +13276,7 @@ export class Hud {
     // Book of Deeds gives its retro pass. No banner, no audio, and no forced
     // window rebuild (the slow-band signature picks the new fills up).
     if (plan.retroCount > 0) {
-      const retroText = t('hudChrome.reliquary.retroSummary', {
+      const retroText = tPlural('hudChrome.plurals.reliquaryRetroSummary', plan.retroCount, {
         count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
       });
       this.log(retroText, '#ffd100');
@@ -13327,7 +13327,7 @@ export class Hud {
     }
     if (plan.playSound) audio.achievement();
     if (plan.retroCount > 0) {
-      const retroText = t('hudChrome.deeds.retroSummary', {
+      const retroText = tPlural('hudChrome.plurals.deedsRetroSummary', plan.retroCount, {
         count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 }),
       });
       this.log(retroText, '#ffd100');

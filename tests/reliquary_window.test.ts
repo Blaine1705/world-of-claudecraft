@@ -284,10 +284,16 @@ describe('entry HTML and i18n chrome', () => {
     // One regex, so the guard and its body cannot drift apart: two independent
     // toContain calls would still pass with the summary line moved outside the
     // count check, which puts a toast per seeded relic back in a veteran's
-    // chat pane.
+    // chat pane. The RAW plan.retroCount is the second argument on purpose: it
+    // is what tPlural feeds Intl.PluralRules, so pinning it stops a refactor
+    // from passing the pre-formatted string and collapsing every locale onto
+    // the .other leaf ("1 relics catalogued" again).
     expect(handler).toMatch(
-      /if \(plan\.retroCount > 0\) \{\s*const retroText = t\('hudChrome\.reliquary\.retroSummary'/,
+      /if \(plan\.retroCount > 0\) \{\s*const retroText = tPlural\(\s*'hudChrome\.plurals\.reliquaryRetroSummary',\s*plan\.retroCount,/,
     );
+    // The display override: the visible number stays locale-formatted through
+    // formatNumber even though the selection arg above is the raw count.
+    expect(handler).toContain('count: formatNumber(plan.retroCount, { maximumFractionDigits: 0 })');
     // The regex above proves the line is BUILT; these prove it is DELIVERED.
     // handler is already the reliquary body sliced before handleDeedUnlocks,
     // so the deeds sibling's identical pushes cannot satisfy them. Without

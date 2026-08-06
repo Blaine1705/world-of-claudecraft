@@ -1641,6 +1641,18 @@ export const id_ID: EnTranslations = {
         "few": "Siapa: {count} pemain yang cocok dengan \"{query}\" di {realm}.",
         "many": "Siapa: {count} pemain yang cocok dengan \"{query}\" di {realm}.",
         "other": "Siapa: {count} pemain yang cocok dengan \"{query}\" di {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Kronikmu telah menyusul: {count} jasa tercatat.",
+        "many": "Kronikmu telah menyusul: {count} jasa tercatat.",
+        "other": "Kronikmu telah menyusul: {count} jasa tercatat."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const id_ID: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const id_ID: EnTranslations = {
       "titlesEmpty": "Raih jasa yang menganugerahkan gelar untuk membuka rak ini.",
       "unlockedBanner": "Jasa terukir: {name}",
       "unlockedTitleHint": "Gelar baru diraih: {title}. Pilih di Kitab Jasa.",
-      "retroSummary": "Kronikmu telah menyusul: {count} jasa tercatat.",
       "broadcastLine": "{name} telah mengukir jasa: {deed}",
       "rarityLine": "Diraih oleh {percent} petualang",
       "trackerLabel": "Jasa",

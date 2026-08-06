@@ -8578,7 +8578,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Ostatnie:',
   'hudChrome.deeds.renownChip': '{renown} Renomy',
   'hudChrome.deeds.renownLabel': 'Renoma',
-  'hudChrome.deeds.retroSummary': 'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Twoja kronika nadrabia zaległości: zapisano {count} czynów.',
   'hudChrome.deeds.searchAria': 'Szukaj czynów po nazwie',
   'hudChrome.deeds.searchPlaceholder': 'Szukaj czynów',
   'hudChrome.deeds.title': 'Księga Czynów',

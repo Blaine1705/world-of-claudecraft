@@ -1641,6 +1641,18 @@ export const en: EnTranslations = {
         "few": "Who: {count} players matching \"{query}\" on {realm}.",
         "many": "Who: {count} players matching \"{query}\" on {realm}.",
         "other": "Who: {count} players matching \"{query}\" on {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Your chronicle catches up: {count} deeds recorded.",
+        "many": "Your chronicle catches up: {count} deeds recorded.",
+        "other": "Your chronicle catches up: {count} deeds recorded."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const en: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const en: EnTranslations = {
       "titlesEmpty": "Earn a title-bearing deed to unlock this shelf.",
       "unlockedBanner": "Deed accomplished: {name}",
       "unlockedTitleHint": "New title earned: {title}. Choose it in the Book of Deeds.",
-      "retroSummary": "Your chronicle catches up: {count} deeds recorded.",
       "broadcastLine": "{name} has accomplished a deed: {deed}",
       "rarityLine": "Earned by {percent} of adventurers",
       "trackerLabel": "Deeds",

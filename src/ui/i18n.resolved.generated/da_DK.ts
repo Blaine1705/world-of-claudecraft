@@ -1641,6 +1641,18 @@ export const da_DK: EnTranslations = {
         "few": "Hvem: {count} spillere, der matcher \"{query}\" på {realm}.",
         "many": "Hvem: {count} spillere, der matcher \"{query}\" på {realm}.",
         "other": "Hvem: {count} spillere, der matcher \"{query}\" på {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Din krønike er ført ajour: {count} bedrifter nedskrevet.",
+        "many": "Din krønike er ført ajour: {count} bedrifter nedskrevet.",
+        "other": "Din krønike er ført ajour: {count} bedrifter nedskrevet."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const da_DK: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const da_DK: EnTranslations = {
       "titlesEmpty": "Opnå en bedrift, der skænker en titel, for at låse denne hylde op.",
       "unlockedBanner": "Bedrift fuldbragt: {name}",
       "unlockedTitleHint": "Ny titel opnået: {title}. Vælg den i Bedrifternes Bog.",
-      "retroSummary": "Din krønike er ført ajour: {count} bedrifter nedskrevet.",
       "broadcastLine": "{name} har fuldbragt en bedrift: {deed}",
       "rarityLine": "Opnået af {percent} af eventyrerne",
       "trackerLabel": "Bedrifter",

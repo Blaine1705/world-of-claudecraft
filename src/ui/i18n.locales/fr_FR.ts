@@ -9197,7 +9197,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Récents:',
   'hudChrome.deeds.renownChip': '{renown} de Renommée',
   'hudChrome.deeds.renownLabel': 'Renommée',
-  'hudChrome.deeds.retroSummary':
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Votre chronique rattrape son retard: {count} hauts faits consignés.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Votre chronique rattrape son retard: {count} hauts faits consignés.',
+  'hudChrome.plurals.deedsRetroSummary.other':
     'Votre chronique rattrape son retard: {count} hauts faits consignés.',
   'hudChrome.deeds.searchAria': 'Rechercher des hauts faits par nom',
   'hudChrome.deeds.searchPlaceholder': 'Rechercher un haut fait',

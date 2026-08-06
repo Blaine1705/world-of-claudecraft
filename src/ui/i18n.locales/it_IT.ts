@@ -8741,7 +8741,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Recenti:',
   'hudChrome.deeds.renownChip': '{renown} Fama',
   'hudChrome.deeds.renownLabel': 'Fama',
-  'hudChrome.deeds.retroSummary': 'La tua cronaca si mette in pari: {count} imprese registrate.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'La tua cronaca si mette in pari: {count} imprese registrate.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'La tua cronaca si mette in pari: {count} imprese registrate.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'La tua cronaca si mette in pari: {count} imprese registrate.',
   'hudChrome.deeds.searchAria': 'Cerca le imprese per nome',
   'hudChrome.deeds.searchPlaceholder': 'Cerca imprese',
   'hudChrome.deeds.title': 'Libro delle Imprese',

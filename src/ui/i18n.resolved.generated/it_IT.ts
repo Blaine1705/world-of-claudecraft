@@ -1641,6 +1641,18 @@ export const it_IT: EnTranslations = {
         "few": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
         "many": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}.",
         "other": "Chi: {count} giocatori corrispondenti a \"{query}\" su {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "La tua cronaca si mette in pari: {count} imprese registrate.",
+        "many": "La tua cronaca si mette in pari: {count} imprese registrate.",
+        "other": "La tua cronaca si mette in pari: {count} imprese registrate."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const it_IT: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const it_IT: EnTranslations = {
       "titlesEmpty": "Ottieni un'impresa che conferisce un titolo per sbloccare questo scaffale.",
       "unlockedBanner": "Impresa compiuta: {name}",
       "unlockedTitleHint": "Nuovo titolo ottenuto: {title}. Sceglilo nel Libro delle Imprese.",
-      "retroSummary": "La tua cronaca si mette in pari: {count} imprese registrate.",
       "broadcastLine": "{name} ha compiuto un'impresa: {deed}",
       "rarityLine": "Ottenuta dal {percent} degli avventurieri",
       "trackerLabel": "Imprese",

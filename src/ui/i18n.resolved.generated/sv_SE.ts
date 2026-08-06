@@ -1641,6 +1641,18 @@ export const sv_SE: EnTranslations = {
         "few": "Vilka: {count} spelare matchar \"{query}\" på {realm}.",
         "many": "Vilka: {count} spelare matchar \"{query}\" på {realm}.",
         "other": "Vilka: {count} spelare matchar \"{query}\" på {realm}."
+      },
+      "reliquaryRetroSummary": {
+        "one": "Your reliquary catches up: {count} relic catalogued.",
+        "few": "Your reliquary catches up: {count} relics catalogued.",
+        "many": "Your reliquary catches up: {count} relics catalogued.",
+        "other": "Your reliquary catches up: {count} relics catalogued."
+      },
+      "deedsRetroSummary": {
+        "one": "Your chronicle catches up: {count} deed recorded.",
+        "few": "Din krönika kommer ikapp: {count} bedrifter nedtecknade.",
+        "many": "Din krönika kommer ikapp: {count} bedrifter nedtecknade.",
+        "other": "Din krönika kommer ikapp: {count} bedrifter nedtecknade."
       }
     },
     "bugReport": {
@@ -3189,7 +3201,6 @@ export const sv_SE: EnTranslations = {
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
-      "retroSummary": "Your reliquary catches up: {count} relics catalogued.",
       "markFind": {
         "masterwork_first": "First Masterwork",
         "masterwork_weaponcrafting": "Weaponcrafting Masterwork",
@@ -3256,7 +3267,6 @@ export const sv_SE: EnTranslations = {
       "titlesEmpty": "Fullborda en bedrift som skänker en titel för att låsa upp den här hyllan.",
       "unlockedBanner": "Bedrift fullbordad: {name}",
       "unlockedTitleHint": "Ny titel förtjänad: {title}. Välj den i Bedrifternas bok.",
-      "retroSummary": "Din krönika kommer ikapp: {count} bedrifter nedtecknade.",
       "broadcastLine": "{name} har fullbordat en bedrift: {deed}",
       "rarityLine": "Fullbordad av {percent} av äventyrarna",
       "trackerLabel": "Bedrifter",
