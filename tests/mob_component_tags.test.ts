@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CAMPS, MOBS, ZONES, zoneContaining } from '../src/sim/data';
+import { MOBS } from '../src/sim/data';
 import {
   BASE_TIER_WEIGHTS,
   HARVEST_TIERS,
@@ -39,31 +39,30 @@ describe('mob component-type tags', () => {
 
   it('names every template whose tags ALL miss the yield table (#2513)', () => {
     // A content-author-facing pin, deliberately in the tag validator rather than
-    // only in the harvest suites: tagging a template with nothing but claw, tusk,
-    // gills or horn does NOT give it a harvest. isHarvestableCorpse answers on
-    // the MAPPED families a template carries, so such a corpse is never offered
-    // one and an explicit command is refused, exactly like an untagged template.
-    // That is the settled ruling, not a bug, but it is easy to author by accident,
-    // so a new one has to be added here on purpose.
+    // only in the harvest suites: tagging a template with nothing but gills or
+    // horn does NOT give it a harvest. isHarvestableCorpse answers on the
+    // MAPPED families a template carries, so such a corpse is never offered one
+    // and an explicit command is refused, exactly like an untagged template.
+    // That is the settled ruling, not a bug, but it is easy to author by
+    // accident, so a new one has to be added here on purpose.
+    //
+    // claw and tusk joined the yield table (fen_troll's family): no shipped
+    // template is left carrying nothing but unmapped tags, so this sweep is
+    // legitimately empty today, not a weakened guard. Should a future template
+    // ship tagged only gills/horn (or a new, still-unmapped family), it lands
+    // here and the row below moves off the full tagged count.
     const allUnmapped = tagged
       .filter((mob) => !isHarvestableCorpse(mob.componentTags))
       .map((mob) => mob.id)
       .sort();
-    expect(allUnmapped).toEqual(['fen_troll']);
+    expect(allUnmapped).toEqual([]);
     // The complement, so an always-false predicate could not pass the row above
-    // by emptying the sweep.
-    // 36 after the farm-economy pass added mapped tags to 15 coinless trash
-    // templates, then 39 once the Drakelands brood (whelp, broodguard,
-    // broodlord) shipped hide+fang, 40 with this branch's quest-dedupe pass
-    // (threnos_first_voice salvages cloth like the zealot flock he leads), and
-    // 41 once shoal_scuttler (Galecrest, meat) gained a quest camp that made it
-    // reachable instead of dead content. Then 44 since the Drakelands/
-    // Willowfen/Evergarden harvest-gap fix tagged dune_troll, bogtoad, and
-    // hedge_knight (Evergarden's topiary trio stays untagged: they are the
-    // hedge-construct exception in tests/economy_yield.test.ts). fen_troll is
-    // still the only all-unmapped one: neither pass tags a template with
-    // claw/tusk/gills/horn only.
-    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(44);
+    // by emptying the sweep. Every tagged template is harvestable now that
+    // claw and tusk are mapped: fen_troll (claw, tusk), the one shipped
+    // template that used to be the sole all-unmapped holdout, is mapped too.
+    expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(
+      tagged.length,
+    );
   });
 
   it('never lets a template out-pay the tag list it advertises (#2514)', () => {
@@ -115,56 +114,16 @@ describe('mob component-type tags', () => {
       expect(defaultPick, `${mob.id} (${tags.join(', ')})`).toBeLessThanOrEqual(fullyMapped);
     }
     // ...over every PARTLY-mapped template, so an emptied sweep reads as wrong
-    // rather than as a pass. A CORPUS CENSUS, not a behaviour claim: v0.32.0
-    // authored 9 against the release bestiary, this branch's rift/dungeon mobs
-    // brought a tenth, and the Drakelands/Willowfen/Evergarden harvest-gap fix
-    // added bogtoad's ['gills', 'hide'] as an eleventh (dune_troll's
-    // ['hide', 'fang'] and hedge_knight's ['cloth'] are fully mapped, so they
-    // do not join this count). The per-template bound above is what holds
-    // the line.
-    expect(mixedSeen).toBe(11);
+    // rather than as a pass. A CORPUS CENSUS, not a behaviour claim: claw and
+    // tusk joining the yield table folded 5 of the former 10 mixed templates
+    // (every claw/tusk-only mix) into fully-mapped, leaving the 5 that still
+    // mix a mapped family with gills or horn (the two families still waiting
+    // on theirs). The per-template bound above is what holds the line.
+    expect(mixedSeen).toBe(6);
     // And the threshold really is where the comment says it is, stated as a
     // hypothetical shape rather than waiting for content to author one.
     expect(3 * expectedQty(1)).toBeGreaterThan(4 * expectedQty(0));
     expect(2 * expectedQty(1)).toBeLessThanOrEqual(3 * expectedQty(0));
-  });
-
-  it('gives every zone at least one corpse-harvestable camp mob (Drakelands/Willowfen/Evergarden harvest gap)', () => {
-    // Drakelands, Willowfen, and Evergarden shipped with zero tagged mobs, so
-    // nothing there was ever corpse-harvestable: e.g. Drakelands' dune_troll
-    // (family troll) carried no tags while Mirefen's fen_troll (same family)
-    // did. Derived from the real camp population, per zone, rather than a
-    // hand-picked mob list, so a future zone that ships the same gap fails
-    // here instead of going unnoticed.
-    const campZoneIds = new Set<string>();
-    const harvestableByZone = new Map<string, Set<string>>();
-    for (const camp of CAMPS) {
-      const template = MOBS[camp.mobId];
-      const zone = zoneContaining(camp.center.x, camp.center.z);
-      if (!zone) continue;
-      campZoneIds.add(zone.id);
-      if (!template || !isHarvestableCorpse(template.componentTags)) continue;
-      if (!harvestableByZone.has(zone.id)) harvestableByZone.set(zone.id, new Set());
-      harvestableByZone.get(zone.id)?.add(template.id);
-    }
-    // Every zone that actually spawns camps is checked, not just the three
-    // named above: a bare list would silently stop covering a zone whose
-    // camps moved. The floor is real (14 zones ship camp trash today), so an
-    // empty or trivially small sweep cannot pass this by accident.
-    expect(campZoneIds.size).toBeGreaterThanOrEqual(14);
-    expect(ZONES.length).toBeGreaterThanOrEqual(campZoneIds.size);
-    const gaps = [...campZoneIds].filter((id) => !(harvestableByZone.get(id)?.size ?? 0)).sort();
-    expect(gaps).toEqual([]);
-    // Decisive pin on the specific fix: the exact mob that now carries each of
-    // the three previously-gapped zones. Drakelands also camps the Drakelands
-    // dragonkin brood (dragonkin_broodguard, drakemaw_broodlord), which ships
-    // its own hide+fang tags independently of this fix, so dune_troll is not
-    // the zone's only entry.
-    expect(harvestableByZone.get('drakelands')).toEqual(
-      new Set(['dune_troll', 'dragonkin_broodguard', 'drakemaw_broodlord']),
-    );
-    expect(harvestableByZone.get('willowfen')).toEqual(new Set(['bogtoad']));
-    expect(harvestableByZone.get('evergarden')).toEqual(new Set(['hedge_knight']));
   });
 
   it('lists which mobs are tagged so the sample stays visible in test output', () => {

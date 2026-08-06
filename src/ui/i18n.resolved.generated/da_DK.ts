@@ -1278,6 +1278,24 @@ export const da_DK: EnTranslations = {
       "graphicsFatal": "Gendannelse af grafik mislykkedes. Genindlæs spillet for at fortsætte.",
       "graphicsReload": "Genindlæs spillet",
       "graphicsDraftChanged": "Grafikændringer er klar til at blive anvendt.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Grænsefladetilstand",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Skrivebord",
@@ -10327,6 +10345,15 @@ export const da_DK: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "Direfang-Kogger"
+      },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Fremmanet kildevand"

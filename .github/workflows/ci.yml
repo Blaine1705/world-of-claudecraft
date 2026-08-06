@@ -2,6 +2,12 @@ name: CI
 
 on:
   pull_request:
+  # The merge queue on main and release/** tests each candidate merge result on
+  # a merge_group event. This trigger is load-bearing: without it the required
+  # checks never report on queue runs and every queued PR stalls until the
+  # queue's status-check timeout rejects it. Queue settings live in the repo's
+  # rulesets (not in git); docs/merge-queue.md is the operator note.
+  merge_group:
   push:
     branches:
       - main
@@ -17,6 +23,14 @@ permissions:
 # isolated from ordinary PR traffic and cannot cancel each other (D4).
 # cancel-in-progress is true for every event in this group; release isolation
 # comes from the event_name segment, not from disabling cancel on push.
+# merge_group runs key on github.ref, which is the queue's own
+# gh-readonly-queue/<branch>/pr-<n>-<sha> ref: unique per live merge group, so
+# cancel-in-progress cannot cross-cancel two live groups (the queue dissolves a
+# group before any ref could be reused), and the event_name segment keeps queue
+# runs from ever colliding with PR or push runs. The flip side of unique refs:
+# a dissolved group's superseded run is never cancelled by this group either;
+# that cleanup is GitHub's, so the trade costs at most idle runner minutes,
+# never a live group's required checks.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -66,11 +80,33 @@ concurrency:
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
 # code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any other
 # always-on cheap jobs) but skip pr-gate, pr-checks, and browser-gate. Any touch
-# of the code path set forces the full PR tier. push to main/dev-* and
-# workflow_dispatch always report code=true (full PR tier when unsure).
+# of the code path set forces the full PR tier. push to main/dev-*,
+# workflow_dispatch, and merge_group queue runs always report code=true (full
+# PR tier when unsure).
 # Release/** pushes and release-to-main PRs never consult the filter:
 # release-gate, release-checks, and release-version-gate stay always-full
 # (no path skip on those jobs).
+#
+# Selective PR tier (the CI/CD performance packet's Phase 2): the same
+# changes job also emits test_mode/changed_files from the same listing, and the
+# pr-gate shards run scripts/ci_shard_test.mjs, which either replays the full
+# `npm test -- --shard` step (mode=full, the fail-closed default for anything
+# unprovable) or runs the always-run floor + `vitest related`, sharded. The
+# reference semantics and the audit contract live in docs/qa-gate.md
+# ("Selective PR-tier CI"). Selection NEVER applies to release-gate or the
+# nightly workflow: those are the unconditional full-suite backstops.
+#
+# Merge queue runs: a merge_group event routes through the PR-tier jobs
+# (changes, lint, pr-gate, pr-checks, browser-gate). The changes job treats
+# every non-PR event as code=true and test_mode=full, so the queue always runs
+# the FULL suite on the exact merge result it is about to make the branch tip.
+# That is deliberate, not an optimization target: the queue is the last
+# pre-merge bar, and selection never applies to it. This also covers a queued
+# release-to-main PR (the pull_request-only exclusions below cannot match a
+# merge_group event, so the full PR tier runs on its merge group too). The
+# release lanes' if arms match pull_request and push only, so they stay off
+# queue runs; the release/** push that fires after the queue merges remains
+# the unconditional full-suite backstop on the real tip.
 
 jobs:
   release-version-gate:
@@ -124,6 +160,14 @@ jobs:
       pull-requests: read
     outputs:
       code: ${{ steps.filter.outputs.code }}
+      # Phase 2 selection decision (docs/qa-gate.md, "Selective PR-tier CI"): the
+      # same fetched listing also decides whether pr-gate may run the selective
+      # test plan. Fail closed: anything unprovable is test_mode=full, and full
+      # mode is byte-identical to the pre-selection shard step. Release jobs
+      # never read these.
+      test_mode: ${{ steps.filter.outputs.test_mode }}
+      test_mode_reason: ${{ steps.filter.outputs.test_mode_reason }}
+      changed_files: ${{ steps.filter.outputs.changed_files }}
     steps:
       - name: Check out classifier script
         uses: actions/checkout@v6
@@ -179,12 +223,41 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           BASE_REF: ${{ github.base_ref }}
           BEFORE_SHA: ${{ github.event.before }}
+          MERGE_GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+          MERGE_GROUP_BASE_REF: ${{ github.event.merge_group.base_ref }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           zeros='0000000000000000000000000000000000000000'
           if [ "$EVENT_NAME" = "pull_request" ]; then
             git fetch --no-tags --depth=1 origin "$BASE_REF"
             echo "ref=origin/$BASE_REF" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT_NAME" = "merge_group" ]; then
+            # A queue run diffs the merge group against the target-branch tip it
+            # was built on, and a merge_group event must NEVER fall through to
+            # the default-branch arm: that would diff a release/** group against
+            # main and drag the whole release delta (including the
+            # intentionally-red whole-repo debt) into biome. So this arm keys on
+            # the event alone, and anything unusable about the SHA lands in the
+            # fallback below, never outside the arm. The shape guard only
+            # selects the SHA path (grep matches per line; the backstop for a
+            # malformed value is the fetch itself, since nothing is written to
+            # GITHUB_OUTPUT unless its fetch succeeded).
+            if printf '%s' "$MERGE_GROUP_BASE_SHA" | grep -qE '^[0-9a-f]{40}$' \
+              && git fetch --no-tags --depth=1 origin "$MERGE_GROUP_BASE_SHA"; then
+              echo "ref=$MERGE_GROUP_BASE_SHA" >> "$GITHUB_OUTPUT"
+            else
+              # Malformed or unreachable base SHA (a dissolved predecessor
+              # group, a transient fetch failure): fall back to the live
+              # target-branch tip, still never the default branch, so one flaky
+              # fetch cannot eject a good PR from the queue. An empty base ref
+              # has no safe fallback at all: the bare [ -n ] test fails the
+              # step loudly (fetching "" would quietly succeed and write a
+              # broken ref=origin/ output instead).
+              base_branch="${MERGE_GROUP_BASE_REF#refs/heads/}"
+              [ -n "$base_branch" ]
+              git fetch --no-tags --depth=1 origin "$base_branch"
+              echo "ref=origin/$base_branch" >> "$GITHUB_OUTPUT"
+            fi
           elif [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "$zeros" ]; then
             # Shallow checkout is tip-only; fetch the pre-push tip alone.
             if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
@@ -208,8 +281,15 @@ jobs:
     name: Browser regressions (Chromium)
     # Skip on confirmed docs-only PRs (no browser tests/code touched). Non-PR
     # and code PRs keep the job (changes.code defaults true off PR events).
+    # != 'false', not == 'true': only an explicit docs-only verdict may skip.
+    # A missing or empty output must run the job, matching the classifier's own
+    # fail-closed doctrine; == 'true' is the one place doubt would fail toward
+    # SKIP, and under the merge queue a skipped required check reads satisfied.
+    # This covers a green-but-empty output only: a FAILED changes job still
+    # skips dependents through needs regardless of this expression, which is
+    # why "Detect code path changes" must itself be a required check.
     needs: changes
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.code != 'false'
     runs-on: ubuntu-latest
 
     steps:
@@ -265,8 +345,10 @@ jobs:
     # Compose release-to-main exclusion with the code path filter (D10). Do not
     # drop either arm: release-to-main must still select release-*, and docs-only
     # PRs must skip this matrix. needs.changes only; no needs edge to pr-checks.
+    # merge_group always lands here (the queue bar is the full PR tier; the
+    # release-to-main exclusion is a pull_request-arm concern and cannot match).
     needs: changes
-    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch') && needs.changes.outputs.code == 'true'
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     runs-on: ubuntu-latest
 
     # fail-fast stays off: shards pass or fail independently, so one red shard
@@ -295,15 +377,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
-      # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
-      # suites need the generated artifacts no matter which shard the balanced
-      # sequencer assigns them to), so this job needs no explicit i18n:gen step;
-      # the freshness diff lives in pr-checks.
-      # Full Sim suites are CPU-heavy. Keep each shard at half the runner's
-      # available cores, matching the bounded local gate.
+      # The shard runner spawns `npm test` itself, so pretest still regenerates
+      # the i18n artifacts in EVERY shard BY DESIGN (the S3 guard, guide
+      # freshness, and the git-subprocess suites need the generated artifacts no
+      # matter which shard they hash into); the freshness diff lives in
+      # pr-checks. Workers stay at half the runner's cores inside the script.
+      #
+      # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
+      # changes job's selection decision. test_mode=full spawns exactly the old
+      # step (`npm test -- --shard=i/8`); test_mode=selective runs the
+      # always-run floor (blind/partial tests + invariant guard suites + changed
+      # tests, recomputed in this tree) plus `vitest related` over the changed
+      # sources, both sharded. Decisions and skip counts print in the job log.
+      # Release-gate below keeps the unconditional full run line; the nightly
+      # workflow re-proves the full suite daily (docs/qa-gate.md).
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
-        run: npm test -- --shard=${{ matrix.shard }}/8 --maxWorkers="$(node -p 'Math.max(1, Math.floor(require("node:os").availableParallelism() / 2))')"
+        env:
+          TEST_MODE: ${{ needs.changes.outputs.test_mode }}
+          TEST_MODE_REASON: ${{ needs.changes.outputs.test_mode_reason }}
+          CHANGED_FILES: ${{ needs.changes.outputs.changed_files }}
+        run: node scripts/ci_shard_test.mjs --shard=${{ matrix.shard }}/8
 
   # Runs in parallel with pr-gate: same if-condition, no needs edge in either
   # direction. The default pull_request merge-ref checkout MUST be preserved
@@ -313,8 +406,10 @@ jobs:
     name: PR checks (freshness, typecheck, builds)
     # Same composition as pr-gate: release exclusion + code path filter. Skipped
     # entirely on docs-only PRs (malware/typecheck/builds are code-path gates).
+    # merge_group lands here too: the queue re-proves freshness, typecheck, and
+    # every build on the merge result, not just the PR head.
     needs: changes
-    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch') && needs.changes.outputs.code == 'true'
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     runs-on: ubuntu-latest
 
     steps:

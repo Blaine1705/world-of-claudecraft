@@ -1278,6 +1278,24 @@ export const ko_KR: EnTranslations = {
       "graphicsFatal": "그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.",
       "graphicsReload": "게임 다시 불러오기",
       "graphicsDraftChanged": "그래픽 변경 사항을 적용할 수 있습니다.",
+      "gfxSectionQuality": "품질",
+      "gfxSectionWorld": "세계 디테일",
+      "gfxSectionLighting": "조명 및 효과",
+      "gfxSectionCamera": "카메라",
+      "gfxSectionDisplay": "디스플레이",
+      "gfxSectionSystem": "시스템",
+      "gfxSectionTouch": "터치 조작",
+      "gfxViewDistance": "시야 거리",
+      "gfxWaterQuality": "수면 품질",
+      "gfxCharacterDetail": "캐릭터 디테일",
+      "gfxAmbientOcclusion": "주변광 차폐",
+      "gfxBloom": "블룸",
+      "gfxAntiAliasing": "안티앨리어싱",
+      "gfxDynamicLights": "동적 광원",
+      "gfxParticleEffects": "입자 효과",
+      "gfxHalf": "절반",
+      "gfxCustomNote": "다이얼을 조정하면 품질 프리셋이 고급으로 전환됩니다. \"높음\" 품질 기반 위에 현재 프리셋에 표시된 수준에서 시작하는 사용자 지정 조합입니다.",
+      "gfxEffectsNote": "주변광 차폐, 블룸, 안티앨리어싱은 후처리 체인에 의존합니다. 효과 및 조명이 낮음이면 체인이 꺼져 이 옵션들은 효과가 없습니다.",
       "interfaceMode": "인터페이스 모드",
       "interfaceModeAuto": "자동",
       "interfaceModeDesktop": "데스크톱",
@@ -10327,6 +10345,15 @@ export const ko_KR: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "흉포송곳니 화살통"
+      },
+      "sharp_claw": {
+        "name": "날카로운 발톱"
+      },
+      "curved_tusk": {
+        "name": "휘어진 엄니"
+      },
+      "pristine_claw": {
+        "name": "온전한 발톱"
       },
       "conjured_water4": {
         "name": "창조된 샘물"

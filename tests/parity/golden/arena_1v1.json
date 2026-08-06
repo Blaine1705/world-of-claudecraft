@@ -8,8 +8,8 @@
     "multi-player PlayerMeta sampling",
     "classes:warrior,mage"
   ],
-  "draws": 983,
-  "drawDigest": "21b9b805",
+  "draws": 982,
+  "drawDigest": "9ce472c2",
   "frames": [
     {
       "tick": 0,
@@ -76,8 +76,8 @@
       "state": "828b7157",
       "events": "ecea5c10",
       "rng": {
-        "draws": 788,
-        "digest": "4d50defd"
+        "draws": 787,
+        "digest": "22f85826"
       }
     },
     {
@@ -87,8 +87,8 @@
       "state": "de874edc",
       "events": "741638a5",
       "rng": {
-        "draws": 983,
-        "digest": "21b9b805"
+        "draws": 982,
+        "digest": "9ce472c2"
       },
       "label": "final",
       "players": [
