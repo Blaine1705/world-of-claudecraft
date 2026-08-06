@@ -390,7 +390,9 @@ describe('Eastbrook polish capture contract', () => {
       // moves src/render/renderer.ts plus src/render/prewarm_policy.ts. Those
       // runtimeRender leaves re-mint the composite. No Eastbrook input, geometry
       // value, or capture moved.
-      fingerprint: '30275db8fa0c580c9624088336f5609b75491a48e62a562f12b54652d85fc7ec',
+      // Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved
+      // back while PR #2982's prewarm policy remains in the release.
+      fingerprint: '5b297a49a72ed500537f7a92683051b6fc219264a8b36ae204eb62bc64d6f672',
       components: {
         captureContract: {
           id: 'polish-v2',

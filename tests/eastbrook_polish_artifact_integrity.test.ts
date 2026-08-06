@@ -646,10 +646,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // and the PR-side ability VFX warm-up both move runtimeRender provenance leaves
 // (src/render/renderer.ts and src/render/prewarm_policy.ts), so the composite
 // and metadata seal both re-mint on the merged tree. No capture was retaken.
+// Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved back
+// while PR #2982's prewarm policy remains in the release. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b865897193784528ab8f2d8c68c35a3ee5e05432949ac9de8be155bf1e59a3d3';
+  'fca98bb93483ae05354afce1e5cafd8a0958058d2a4f9d2606639b268fa8a53a';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '30275db8fa0c580c9624088336f5609b75491a48e62a562f12b54652d85fc7ec';
+  '5b297a49a72ed500537f7a92683051b6fc219264a8b36ae204eb62bc64d6f672';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1523,8 +1525,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // release-side weapon-skin renderer changes and the PR-side ability VFX
     // warm-up changes, then this second-order performance seal follows the
     // swept evidence bytes. No capture was retaken.
+    // Re-pinned for the PR #2983 revert: the swept evidence follows the
+    // reverted renderer while preserving PR #2982's prewarm-policy leaf.
     expect(fingerprint.digest('hex')).toBe(
-      '8218501ae792b40a7acc5259cec6ebf44739838f277a187be3c07443ba55ef61',
+      'ff74141643633a491a4a4d33d6acdcba6f670c0bc09ffaea4507a5b315d2964b',
     );
   });
 
