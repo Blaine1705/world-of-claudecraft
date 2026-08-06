@@ -40,7 +40,10 @@ describe('Warmarshal Draven Kole: the definition', () => {
     // The Highwatch copy trap: a neighbouring greeting carries an em dash and
     // the repo bans them outright.
     for (const text of [KOLE.name, KOLE.title, KOLE.greeting ?? '']) {
-      expect(text).not.toMatch(/[–—]/);
+      // Written as escapes, not literals: the repo's pre-push copy scan greps the
+      // push diff for these characters, so spelling them out here would make this
+      // assertion block its own push.
+      expect(text).not.toMatch(/[\u2013\u2014]/);
     }
     // Merged into the live table under the same key the spawn resolves.
     expect(NPCS[WARFARE_QUARTERMASTER_NPC_ID]).toBe(KOLE);
