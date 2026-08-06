@@ -12,7 +12,6 @@
 // (the compensation/restore paths), and `escrowSaves` records every character
 // save the escrow edge received.
 
-import type { ExtractRef } from '../../../src/sim/inventory_extract';
 import type {
   CharacterSaveArgs,
   NewWocListing,
@@ -30,6 +29,7 @@ import type {
 } from '../../../server/woc_market';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import { WOC_MARKET_MAX_ACTIVE_LISTINGS } from '../../../server/woc_market_rules';
+import type { ExtractRef } from '../../../src/sim/inventory_extract';
 
 export interface FakeWocMarketCharacter {
   characterId: number;
@@ -149,10 +149,7 @@ export class FakeWocMarketDb implements WocMarketDb {
       }
     }
     // Public-listing-only in both directions, mirroring the real transaction.
-    if (
-      listing.params.directedBuyerAccount === null &&
-      active >= WOC_MARKET_MAX_ACTIVE_LISTINGS
-    ) {
+    if (listing.params.directedBuyerAccount === null && active >= WOC_MARKET_MAX_ACTIVE_LISTINGS) {
       return { ok: false, reason: 'cap_reached' };
     }
     const id = this.nextListingId++;
@@ -270,10 +267,7 @@ export class FakeWocMarketDb implements WocMarketDb {
     return row && row.realm === realm ? row : null;
   }
 
-  async directedOffersForAccount(
-    realm: string,
-    account: number,
-  ): Promise<WocDirectedOfferRow[]> {
+  async directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]> {
     return [...this.offers.values()].filter(
       (o) =>
         o.realm === realm &&

@@ -10,8 +10,8 @@
 // one named account and must never enter a public result set), so it is pinned to a
 // literal rather than a shape.
 
-import { describe, expect, it, vi } from 'vitest';
 import type { Pool } from 'pg';
+import { describe, expect, it, vi } from 'vitest';
 import { PgWocMarketDb } from '../../server/woc_market_db';
 
 const REALM = 'Claudemoon';
@@ -82,9 +82,7 @@ describe('the schema carries the directed column additively', () => {
     // exist, so a column introduced only inside CREATE TABLE IF NOT EXISTS would
     // never appear on a deployed realm and every directed query would error.
     const { WOC_MARKET_SCHEMA } = await import('../../server/woc_market_db');
-    expect(WOC_MARKET_SCHEMA).toContain(
-      'ADD COLUMN IF NOT EXISTS directed_buyer_account',
-    );
+    expect(WOC_MARKET_SCHEMA).toContain('ADD COLUMN IF NOT EXISTS directed_buyer_account');
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_listings_directed_buyer');
   });
 });

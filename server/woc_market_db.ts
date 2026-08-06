@@ -10,8 +10,8 @@
 // Money is INTEGER USD CENTS end to end. Item snapshots are JSONB InvSlot
 // copies (the escrow-by-removal custody model in docs/prd/woc/marketplace.md).
 
-import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { Pool, PoolClient } from 'pg';
+import type { ExtractRef } from '../src/sim/inventory_extract';
 import type { InvSlot } from '../src/sim/types';
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveCharacterStateOnClient } from './db';
 import type {
@@ -688,10 +688,7 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
 
-  async directedOffersForAccount(
-    realm: string,
-    account: number,
-  ): Promise<WocDirectedOfferRow[]> {
+  async directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]> {
     // Both partial indexes cover one arm each; the UNION keeps them usable
     // rather than OR-ing them into a seq scan (the DAILY_REWARD view precedent).
     const res = await this.pool.query(

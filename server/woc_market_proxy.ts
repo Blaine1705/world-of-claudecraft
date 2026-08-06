@@ -175,10 +175,7 @@ function leg(value: WireLeg | null | undefined): { base: string; tokens: number 
  * they will receive, and a split that does not reconcile is not a rounding
  * disagreement, it is a different sale. Fail closed and the UI omits the line.
  */
-function estimateSplit(
-  value: WireEstimate['split'],
-  usdCents: number,
-): WocEstimateSplit | null {
+function estimateSplit(value: WireEstimate['split'], usdCents: number): WocEstimateSplit | null {
   if (!value) return null;
   const { sellerCents, burnCents, treasuryCents } = value;
   const legs = [sellerCents, burnCents, treasuryCents];
