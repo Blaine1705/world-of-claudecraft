@@ -321,6 +321,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/giant.glb": "/media/models/creatures/giant.9adbb2233f87.glb",
   "models/creatures/gleamstag.glb": "/media/models/creatures/gleamstag.2f322594a5ca.glb",
   "models/creatures/glimmerwisp.glb": "/media/models/creatures/glimmerwisp.25010f4fcd2a.glb",
+  "models/creatures/glub_ability_anims.glb": "/media/models/creatures/glub_ability_anims.804715a225ff.glb",
   "models/creatures/glubevolved.glb": "/media/models/creatures/glubevolved.abc8396f38bf.glb",
   "models/creatures/goblin.glb": "/media/models/creatures/goblin.a128051c0b50.glb",
   "models/creatures/golelingevolved.glb": "/media/models/creatures/golelingevolved.156f4c2dcf93.glb",
