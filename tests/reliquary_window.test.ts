@@ -10,8 +10,18 @@ import { RELIQUARY_MARK_IDS } from '../src/sim/content/reliquary';
 
 const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8');
 
+// Blank out whole-line and trailing line comments, so prose that quotes a
+// banned pattern cannot false-red (or false-green) a source pin.
+const stripComments = (src: string): string =>
+  src
+    .split('\n')
+    .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
+    .map((line) => line.replace(/\s\/\/.*$/, ''))
+    .join('\n');
+
 const painter = read('../src/ui/reliquary_window.ts');
 const view = read('../src/ui/reliquary_view.ts');
+const labels = read('../src/ui/reliquary_labels.ts');
 const hud = read('../src/ui/hud.ts');
 const mainSrc = read('../src/main.ts');
 const inputSrc = read('../src/game/input.ts');
@@ -25,6 +35,17 @@ const architecture = read('./architecture.test.ts');
 const indexHtml = read('../index.html');
 const playHtml = read('../play.html');
 
+// One ten-dash section of components.css, so a CSS pin cannot be satisfied by
+// an identical declaration in some other window's section.
+function sectionCss(name: string): string {
+  const banner = `/* ---------- ${name} ---------- */`;
+  const start = components.indexOf(banner);
+  expect(start, `${banner} banner`).toBeGreaterThanOrEqual(0);
+  const next = components.indexOf('/* ----------', start + banner.length);
+  expect(next, `section after ${name}`).toBeGreaterThan(start);
+  return components.slice(start, next);
+}
+
 describe('painter hygiene', () => {
   it('keeps hex/px literals out of the painter TS (tokens and classes only)', () => {
     // Allow the #reliquary-window comment/id reference; ban free-standing hex colors.
@@ -33,13 +54,15 @@ describe('painter hygiene', () => {
   });
 
   it('contains no em/en dashes', () => {
-    for (const src of [painter, view]) {
+    for (const src of [painter, view, labels]) {
       expect(src).not.toMatch(/\u2014|\u2013/);
     }
   });
 
   it('reads neither the FPS governor nor the graphics tier (fairness)', () => {
-    for (const src of [painter, view]) {
+    // Source lines, page blurbs, clear counts, and owned/missing state are all
+    // information a player acts on, so no preset may thin any of them.
+    for (const src of [painter, view, labels]) {
       expect(src).not.toMatch(/governor/);
       expect(src).not.toMatch(/ui_effects_profile|fxTier|data-fx-level/);
     }
@@ -86,18 +109,17 @@ describe('painter hygiene', () => {
     expect(code).toContain('deedsEarned: world.deedsEarned');
   });
 
-  it('paints profession mark cells with quality silhouettes and markFind labels', () => {
-    // Masterwork marks read epic; rare field notes read rare. Labels resolve
-    // through reliquaryMarkFindKey so chrome stays on t() keys.
+  it('paints profession mark cells with quality silhouettes', () => {
+    // Masterwork marks read epic; rare field notes read rare. The mark LABEL
+    // ladder moved to reliquary_labels.ts (pinned in its own describe below);
+    // the quality silhouette is still the painter's call.
     expect(painter).toContain("cell.id.startsWith('masterwork:')");
     expect(painter).toContain("return 'epic'");
     expect(painter).toContain("cell.id.startsWith('gather_event:')");
     expect(painter).toContain("return 'rare'");
-    expect(painter).toContain('reliquaryMarkFindKey');
-    expect(painter).toMatch(/cell\.kind === 'mark'[\s\S]*?reliquaryMarkFindKey/);
   });
 
-  it('labels account-scoped weapon skins and resolves Horizons display names', () => {
+  it('labels account-scoped weapon skins', () => {
     // Account-scope chrome (never reimplements equip/summon).
     const code = painter
       .split('\n')
@@ -106,11 +128,6 @@ describe('painter hygiene', () => {
     expect(code).toMatch(/page\.accountScoped[\s\S]*?accountScopeNote/);
     expect(code).toMatch(/cell\.kind === 'weapon_skin'[\s\S]*?accountScopeBadge/);
     expect(code).toContain('data-account-scope');
-    // Prefer existing mount / armory / deed title helpers (family reuse).
-    expect(painter).toContain("from './mount_labels'");
-    expect(painter).toContain('mountDisplayName');
-    expect(painter).toContain('localizeWeaponSkin');
-    expect(painter).toContain('deedTitleText');
     expect(components).toContain('.reliquary-account-scope');
   });
 
@@ -129,23 +146,20 @@ describe('painter hygiene', () => {
     expect(rail).toContain('reliquary-nav-count');
   });
 
-  it('reads no page-model name: every page name resolves from its id', () => {
+  it('reads no name property at all: every display name resolves from its id', () => {
     // The pure view model keeps `name` as raw catalog English (the id-stable
     // sort/debug field), so ANY `.name` property read in the painter is a
-    // candidate untranslated render. Page names must go through
-    // reliquaryPageName(pageId); the single sanctioned `.name` read is the
-    // weapon-skin label from the shared armory helper, which localizes itself.
-    // Comments (line and jsdoc) are stripped so prose cannot pad the count;
-    // trailing line comments are cut too so an unrelated `// ... .name` note
-    // on a code line cannot red the pin.
-    const code = painter
-      .split('\n')
-      .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
-      .map((line) => line.replace(/\s\/\/.*$/, ''))
-      .join('\n');
-    expect(code.match(/\.name\b/g)?.length).toBe(1);
-    expect(code).toContain('localizeWeaponSkin(def).name');
+    // candidate untranslated render. Phase 13 moved the last sanctioned one
+    // (the weapon-skin label) into reliquary_labels.ts with the rest of the
+    // display-name ladder, so the painter's count is now ZERO, not one: page
+    // names go through reliquaryPageName(pageId) and relic names through
+    // reliquaryRelicDisplayName(kind, id). Comments (line and jsdoc) are
+    // stripped so prose cannot pad the count; trailing line comments are cut
+    // too so an unrelated `// ... .name` note on a code line cannot red it.
+    const code = stripComments(painter);
+    expect(code.match(/\.name\b/g) ?? []).toEqual([]);
     expect(code).toContain('reliquaryPageName(');
+    expect(code).toContain('reliquaryRelicDisplayName(');
   });
 
   it('wires host completion helpers with Horizons ownership surfaces (Sim + ClientWorld)', () => {
@@ -164,6 +178,243 @@ describe('painter hygiene', () => {
     }
   });
 
+  it('shows the source line on missing cells only, in tooltip AND label', () => {
+    const code = stripComments(painter);
+    // Tooltip: under the status line, gated on the cell being MISSING (an owned
+    // item relic returns the full item tooltip and needs no hunting directions).
+    expect(code).toMatch(
+      /if \(!cell\.owned\) \{[\s\S]*?reliquarySourceLineText\(cell\.sourcePlan\)/,
+    );
+    // Label: the same text, so keyboard and screen-reader users get what hover
+    // gets. Without this the source line would be a mouse-only affordance.
+    expect(code).toContain("t('hudChrome.reliquary.cellMissingSourceAria', { name, source })");
+    expect(code).toContain("t('hudChrome.reliquary.cellOwnedClearsAria'");
+    // An un-authored source renders nothing rather than an empty sentence.
+    expect(code).toMatch(/source === ''\s*\?\s*t\('hudChrome\.reliquary\.cellMissingAria'/);
+  });
+
+  it('renders the authored page blurb on the header and the shelf row', () => {
+    const code = stripComments(painter);
+    expect(code).toContain('reliquaryPageDesc(page.pageId)');
+    expect(code).toContain('reliquary-page-desc');
+    expect(code).toContain('reliquary-page-sub');
+    // The shelf sub-line truncates in CSS, never through a title attribute.
+    expect(components).toContain('.reliquary-page-sub');
+    expect(components).toMatch(/\.reliquary-page-sub \{[^}]*text-overflow: ellipsis;[^}]*\}/);
+  });
+
+  it('never uses a native title attribute for a tooltip', () => {
+    // The recent chip carried the only title="" in this painter; the shared HUD
+    // tooltip replaced it (a native tooltip is untranslatable chrome the HUD
+    // cannot style, position, or dismiss on touch).
+    expect(stripComments(painter)).not.toMatch(/\btitle="/);
+    expect(painter).toContain('data-recent-name');
+    expect(painter).toMatch(/data-recent-name[\s\S]*?attachTooltip/);
+    // The tooltip has to earn its place: the chip name truncates, so the full
+    // name genuinely needs somewhere to live. Without the ellipsis rule this
+    // would be a redundant hover surface over fully visible text.
+    expect(sectionCss('reliquary')).toMatch(
+      /\.reliquary-recent-name \{[^}]*text-overflow: ellipsis;[^}]*\}/,
+    );
+  });
+
+  it('gives the page list real list semantics (ul/li, not bare buttons)', () => {
+    // role="list" on a container whose children are bare <button>s announces an
+    // empty list. The row stays a button INSIDE its own <li>.
+    expect(painter).toMatch(/<ul class="reliquary-page-list" role="list"/);
+    expect(painter).toContain('<li class="reliquary-page-item">');
+    expect(painter).toMatch(/<li class="reliquary-page-item">[\s\S]*?class="reliquary-page-row"/);
+    // list-style: none drops list semantics in Safari VoiceOver; the explicit
+    // role above is the counterweight and must not be dropped with the ul.
+    expect(components).toMatch(/\.reliquary-page-list \{[^}]*list-style: none;[^}]*\}/);
+  });
+
+  it('roves the grid with one tab stop through the shared roving core', () => {
+    const code = stripComments(painter);
+    expect(code).toContain("from './roving_index'");
+    // 'both' is the 2D-grid orientation (Arrow Up/Down as well as Left/Right).
+    expect(code).toContain("rovingTarget(ke.key, i, cells.length, 'both')");
+    // Exactly one cell is tabbable; the roving move updates tabindex and focus.
+    expect(code).toMatch(/tabindex="\$\{index === activeIndex \? '0' : '-1'\}"/);
+    expect(code).toContain('this.stampGridTabIndex(cells)');
+    expect(code).toContain('cells[next]?.focus()');
+    // A rebuild that restores focus to a cell must move the tab stop with it,
+    // or the restored cell would be focused while a different cell is the only
+    // tab stop.
+    // Every arm that repaints a DIFFERENT set of cells resets the cursor, not
+    // just the chip: a stale index would leave the tab stop pointing at a slot
+    // that no longer holds the relic the player was standing on. wire() has
+    // four such arms (nav, filter, page, back) plus the search input.
+    expect(code.match(/this\.gridIndex = 0;/g)?.length).toBe(6);
+    for (const arm of [
+      /dataset\.nav[\s\S]*?this\.gridIndex = 0;/,
+      /dataset\.filter[\s\S]*?this\.gridIndex = 0;/,
+      /dataset\.page[\s\S]*?this\.gridIndex = 0;/,
+      /\[data-back\][\s\S]*?this\.gridIndex = 0;/,
+    ]) {
+      expect(code, String(arm)).toMatch(arm);
+    }
+    expect(code).toContain('this.syncGridRoving(el, focusKey)');
+    // It matches the CAPTURED key, not the live activeElement: this painter
+    // reaches for no browser global (the src/ui classification sweep), and a
+    // Close-button fallback restore must not drag the grid cursor with it.
+    expect(code).toContain("focusKey.startsWith('cell:')");
+    expect(code).not.toMatch(/\bdocument\s*[.[]/);
+  });
+
+  it('threads search and the ownership filter through the pure core and the signature', () => {
+    const code = stripComments(painter);
+    expect(code).toContain('search: this.search.trim().toLocaleLowerCase(tag)');
+    expect(code).toContain('ownedFilter: this.ownedFilter');
+    // Filtering happens in the pure core against LOCALIZED text the painter
+    // injects: a player searches the names their client shows them.
+    expect(code).toContain(
+      'relicSearchText: (kind, id) => reliquaryRelicSearchText(kind, id, tag)',
+    );
+    // Page text is name PLUS blurb, because the shelf row renders the blurb.
+    expect(code).toMatch(
+      /pageSearchText: \(pageId\) =>\s*`\$\{reliquaryPageName\(pageId\)\} \$\{reliquaryPageDesc\(pageId\)\}`\.toLocaleLowerCase\(tag\)/,
+    );
+    // One tag, derived from the live language, folding BOTH sides. Invariant
+    // toLowerCase anywhere in this painter breaks Turkish dotted/dotless I.
+    expect(code).toContain('const tag = languageTag(getLanguage())');
+    expect(code).not.toMatch(/\.toLowerCase\(\)/);
+    // Both are signature dimensions, or a keystroke would not repaint. Scoped
+    // to the sigFromInput BODY: an unbounded [\s\S]*? span would happily match
+    // a `search:` from buildInput above and a closing brace far below, so the
+    // pin would pass with the dimension deleted from the sig call.
+    const sigBody = code.match(/private sigFromInput\([\s\S]*?\n {2}\}/)?.[0];
+    expect(sigBody, 'sigFromInput body').toBeTruthy();
+    expect(sigBody).toContain('search: input.search');
+    expect(sigBody).toContain('ownedFilter: input.ownedFilter');
+    // The chip value is re-validated before the cast (the DOM is untrusted).
+    expect(code).toContain('isReliquaryOwnedFilter(filter) ? filter : ');
+    expect(code).toContain('aria-pressed');
+    expect(code).toContain('role="group"');
+    // The caret survives the innerHTML rebuild, or typing jumps to the end.
+    expect(code).toContain('fresh.setSelectionRange(caret.start, caret.end)');
+  });
+
+  it('builds every t() key from a literal, never a template plus a cast', () => {
+    // A `t(\`hudChrome.reliquary.${x}\` as TranslationKey)` compiles whatever
+    // the catalog says, so renaming a leaf stays green in tsc and throws at
+    // runtime the first time that branch paints. The generated key union only
+    // works if every key is a compile-time literal.
+    // \b before the t, or the pattern also matches `byKey.set(`...${...}`)`:
+    // "set(" ends in "t(" and there is no word boundary inside it.
+    const code = stripComments(painter);
+    expect(code).not.toMatch(/\bt\(`[^`]*\$\{/);
+    expect(code).not.toMatch(/as TranslationKey\)/);
+    expect(code).toContain("t('hudChrome.reliquary.searchEmpty')");
+    expect(code).toContain("t('hudChrome.reliquary.overviewEmpty')");
+    expect(code).toContain("t('hudChrome.reliquary.shelfEmpty')");
+  });
+
+  it('decides "search is active" one way, on the TRIMMED needle', () => {
+    // buildInput trims before filtering, so a whitespace-only needle filters
+    // nothing. A site testing the untrimmed field would call that active and
+    // swap in "no relics match" for a shelf that is empty for another reason.
+    const code = stripComments(painter);
+    expect(code).toContain("return this.search.trim() !== ''");
+    // Four callers: the Overview empty line, the shelf empty line, the grid
+    // empty-state chooser, and the live-region gate. All must ask the same
+    // question, or two surfaces disagree about whether a search is running.
+    expect(code.match(/this\.searchActive\(\)/g)?.length).toBe(4);
+    // No site may re-derive it inline and drift from the shared definition.
+    expect(code).not.toMatch(/this\.search === ''/);
+    expect(code).not.toMatch(/this\.search\.trim\(\) === ''/);
+  });
+
+  it('resets the search per visit but keeps the chip and place for the session', () => {
+    const code = stripComments(painter);
+    const closeBody = code.match(/\n {2}close\(\): void \{[\s\S]*?\n {2}\}/)?.[0];
+    expect(closeBody, 'close() body').toBeTruthy();
+    // A needle left from last visit would silently hide most of the catalog on
+    // the next open, with the reason off-screen until the player looks up.
+    expect(closeBody).toContain("this.search = ''");
+    expect(closeBody).toContain('this.gridIndex = 0');
+    // The other half: shelf, open page, and the ownership chip read as "where I
+    // was", so they stay put (the deeds policy). Resetting them here would be
+    // just as wrong in the other direction.
+    expect(closeBody).not.toContain('this.ownedFilter =');
+    expect(closeBody).not.toContain('this.nav =');
+    expect(closeBody).not.toContain('this.pageId =');
+  });
+
+  it('describes the roving grid on the CELLS, where a description is announced', () => {
+    const code = stripComments(painter);
+    // role="list" is not a composite role, so nothing announces the arrow-key
+    // model on its own. The role stays honest (no rows, no selection) and the
+    // affordance is described instead. The description rides the CELL, not the
+    // grid: aria-describedby on the focused element is reliably announced, on a
+    // container that never takes focus it is not.
+    const cellHtml = code.match(/private cellHtml\([\s\S]*?\n {2}(?:private|\/\*\*)/)?.[0];
+    expect(cellHtml, 'cellHtml body').toBeTruthy();
+    expect(cellHtml).toContain('aria-describedby="${GRID_HINT_ID}"');
+    expect(cellHtml).toContain('aria-keyshortcuts="${GRID_KEY_SHORTCUTS}"');
+    // The hint span still ships with the grid (it is what describedby targets).
+    expect(code).toContain("t('hudChrome.reliquary.gridKeyboardHint')");
+    expect(code).toContain(`id="\${GRID_HINT_ID}"`);
+    // aria-keyshortcuts takes key VALUES, never localized prose, and must name
+    // exactly the keys roving_index owns for orientation 'both'.
+    expect(code).toContain("'ArrowLeft ArrowRight ArrowUp ArrowDown Home End'");
+  });
+
+  it('keeps the live region OUT of the rebuilt markup and re-appends the same node', () => {
+    const code = stripComments(painter);
+    // The load-bearing contract: a live region must be registered with the AT
+    // BEFORE its text changes. Minting it inside the innerHTML string means a
+    // brand-new node is created and mutated in one task, which does not reliably
+    // announce (the #crafting-live precedent says the same). So the node is
+    // class-held, created from the ROOT's document (never the `document`
+    // global, which this painter must not touch), and re-appended each paint.
+    expect(code).not.toMatch(/data-reliquary-live[^\n]*aria-live/);
+    expect(code).toContain("el.ownerDocument.createElement('span')");
+    expect(code).toContain('const live = this.ensureLiveRegion(el)');
+    expect(code).toContain('el.append(live)');
+    expect(code).not.toMatch(/\bdocument\s*[.[]/);
+    // Two keystrokes narrowing to the SAME count must still re-read, which an
+    // unchanged textContent will not do.
+    expect(code).toContain("from './live_region_reannounce'");
+    expect(code).toContain('this.liveReannounce.mark(text)');
+    expect(code).toContain('this.liveReannounce.reset()');
+  });
+
+  it('announces on what the PAINTED surface narrowed, not the sticky chip', () => {
+    const code = stripComments(painter);
+    // ownedFilter survives a Back click, so gating on it would make every
+    // slow-band repaint of the shelf announce a count nothing narrowed. The
+    // grid asks the model's own answer for THIS paint; shelf/Overview ask only
+    // whether a needle is live.
+    expect(code).toContain(
+      'const narrowed = model.pageDetail ? model.pageDetail.filtered : this.searchActive()',
+    );
+    expect(code).not.toMatch(/this\.ownedFilter === 'all'\) return/);
+    // Not narrowed means the region is emptied AND the marker forgotten, or
+    // re-narrowing to the same count later would stay silent.
+    expect(code).toMatch(/if \(!narrowed\) \{[\s\S]*?live\.textContent = ''/);
+    // Raw count to tPlural (Intl.PluralRules selects on it), formatted number
+    // for display: passing the formatted string as the selector collapses every
+    // locale onto the .other leaf.
+    expect(code).toMatch(
+      /tPlural\('hudChrome\.plurals\.reliquarySearchResults', count, \{\s*count: this\.fmt\(count\),/,
+    );
+  });
+
+  it('picks the empty-state copy by cause: search, then filter, then genuinely empty', () => {
+    const code = stripComments(painter);
+    // Clicking Catalogued with nothing typed must not blame a search the
+    // player never made: that sends them hunting for a search box to clear.
+    const body = code.match(/private emptyGridText\([\s\S]*?\n {2}\}/)?.[0];
+    expect(body, 'emptyGridText body').toBeTruthy();
+    expect(body).toMatch(
+      /if \(this\.searchActive\(\)\) return t\('hudChrome\.reliquary\.searchEmpty'\)/,
+    );
+    expect(body).toMatch(/filtered \|\| this\.ownedFilter !== 'all'[\s\S]*?filterEmpty/);
+    expect(body).toContain("return t('hudChrome.reliquary.shelfEmpty')");
+    expect(chrome).toContain("filterEmpty: 'No relics match this filter.'");
+  });
+
   it('preserves scroll and restores focus across rebuilds', () => {
     expect(painter).toContain("el.querySelector('.reliquary-scroll')?.scrollTop");
     expect(painter).toContain('captureFocusKey');
@@ -173,6 +424,179 @@ describe('painter hygiene', () => {
   it('never imports Hud and never hardcodes the window id in the painter class surface', () => {
     expect(painter).not.toMatch(/from ['"]\.\/hud['"]/);
     expect(painter).toContain('root(): HTMLElement');
+  });
+});
+
+describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
+  it('holds every relic-kind arm and reuses the existing name helpers', () => {
+    // Family reuse: no bespoke key tables here, the shared mount / armory /
+    // deed-title / item helpers each window already uses.
+    expect(labels).toContain("from './mount_labels'");
+    // NOT toContain('mountDisplayName'): that string now appears only in this
+    // module's PROSE (the comment explaining why the shared helper is not used),
+    // so the old pin was comment-satisfied and stayed green with the mount arm
+    // deleted. Pin the guard that actually resolves a mount, on stripped code.
+    expect(stripComments(labels)).toContain('Object.hasOwn(MOUNT_NAME_KEYS, id)');
+    expect(stripComments(labels)).toContain('t(MOUNT_NAME_KEYS[id])');
+    expect(labels).toContain('localizeWeaponSkin');
+    expect(labels).toContain('deedTitleText');
+    expect(labels).toContain('itemDisplayName');
+    expect(labels).toMatch(/kind === 'mark'[\s\S]*?reliquaryMarkFindKey/);
+    // The recent ring's wire-shaped 'unknown' kind still resolves as an item.
+    expect(labels).toMatch(/kind === 'item' \|\| kind === 'unknown'/);
+  });
+
+  it('never humanizes an id and falls back to authored copy instead', () => {
+    // The defect this module was extracted to kill: four separate ladders each
+    // ending in `bare.replace(/_/g, ' ')`, which shipped a raw id as player
+    // text (and a DIFFERENT raw id per site for a namespaced id). The only
+    // sanctioned terminal is the authored unknownRelic key.
+    const code = stripComments(labels);
+    expect(code).not.toMatch(/replace\(\/_\/g/);
+    expect(code).not.toMatch(/lastIndexOf\(':'\)/);
+    expect(code).toContain("t('hudChrome.reliquary.unknownRelic')");
+    expect(chrome).toContain("unknownRelic: 'Unrecorded relic'");
+  });
+
+  it('folds the HAYSTACK with the locale too, not just the needle', () => {
+    // The painter pin covers the needle only. Reverting THIS module's fold to
+    // plain toLowerCase left every other test in the repo green while breaking
+    // Turkish search, because the behavioral cases all run under en. Both sides
+    // of the comparison have to fold the same way for the match to hold.
+    const code = stripComments(labels);
+    expect(code).not.toMatch(/\.toLowerCase\(\)/);
+    expect(code).toContain('toLocaleLowerCase(tag)');
+  });
+
+  it('confines its one name-property read to the self-localizing armory helper', () => {
+    // The painter's `.name` budget is zero; this module inherits the single
+    // sanctioned read, and it must stay that one. localizeWeaponSkin returns
+    // an already-localized record, unlike a raw catalog def whose .name is
+    // English.
+    const code = stripComments(labels);
+    expect(code.match(/\.name\b/g) ?? []).toEqual(['.name']);
+    expect(code).toContain('localizeWeaponSkin(def).name');
+  });
+
+  it('reads every Record through ownEntry (prototype-key ids off the wire)', () => {
+    const code = stripComments(labels);
+    expect(code).toContain('ownEntry(ITEMS, id)');
+    expect(code).toContain('ownEntry(WEAPON_SKINS, id)');
+    // A bare index would resolve 'constructor' to a Function and render it.
+    expect(code).not.toMatch(/\b(?:ITEMS|WEAPON_SKINS)\[/);
+  });
+
+  it('membership-guards EVERY source-line arm before it localizes', () => {
+    // tEntity / dungeonDisplayName / zoneDisplayName / deedName all answer the
+    // RAW ID for an id they cannot place (the R34 wire contract). Right for a
+    // quest log, wrong here: the id gets spliced into prose and reads as
+    // content. Every arm must check membership first and drop the line on a
+    // miss, so a renamed or removed content id can never surface as text.
+    const code = stripComments(labels);
+    expect(code).toContain('ownEntry(MOBS, mobId)');
+    expect(code).toContain('ownEntry(NPCS, npcId)');
+    expect(code).toContain('ownEntry(DUNGEONS, dungeonId)');
+    expect(code).toContain('ownEntry(DEEDS, deedId)');
+    expect(code).toContain('ZONE_IDS.has(zoneId)');
+    // The two-name arm needs BOTH halves or nothing: one raw id inside real
+    // prose is worse than no line.
+    expect(code).toMatch(/if \(boss === null \|\| dungeon === null\) return ''/);
+  });
+
+  it('composes each source-line arm through a t() key with named entity lookups', () => {
+    expect(labels).toContain("t('hudChrome.reliquary.sourceBossDungeon'");
+    expect(labels).toContain("t('hudChrome.reliquary.sourceBoss'");
+    expect(labels).toContain("t('hudChrome.reliquary.sourceZone'");
+    expect(labels).toContain("t('hudChrome.reliquary.sourceProfession'");
+    expect(labels).toContain("t('hudChrome.reliquary.sourceDeed'");
+    expect(labels).toContain("t('hudChrome.reliquary.sourceVendor'");
+    // Entity names come from the shared channels, never a raw content field.
+    const code = stripComments(labels);
+    expect(code).toContain("tEntity({ kind: 'mob', id: mobId, field: 'name' })");
+    expect(code).toContain('dungeonDisplayName(dungeonId)');
+    expect(code).toContain('zoneDisplayName(zoneId)');
+    expect(code).toContain('deedName(deedId)');
+    expect(code).toContain("tEntity({ kind: 'npc', id: npcId, field: 'name' })");
+  });
+
+  it('stays i18n-free in the pure core: the ARM choice is the core, the TEXT is here', () => {
+    // reliquary_view.ts is a registered UI pure core whose header promises
+    // DOM/Three/i18n-free. The source-line SPLIT is what keeps that true, so a
+    // future edit must not move t() or an entity channel back into it.
+    expect(view).toContain('export function reliquarySourceLinePlan');
+    expect(view).not.toMatch(/from '\.\/(?:entity_i18n|deed_i18n|reliquary_i18n|mount_labels)'/);
+    expect(view).not.toMatch(/^import \{[^}]*\bt\b[^}]*\} from '\.\/i18n'/m);
+    expect(labels).toContain("from './reliquary_view'");
+  });
+
+  it('authors the Phase 13 English keys and fills all five non-Latin locales', () => {
+    const NEW_KEYS = [
+      'unknownRelic',
+      'sourceBossDungeon',
+      'sourceBoss',
+      'sourceZone',
+      'sourceProfession',
+      'sourceDeed',
+      'sourceVendor',
+      'cellMissingSourceAria',
+      'cellOwnedClearsAria',
+      'searchPlaceholder',
+      'searchAria',
+      'searchEmpty',
+      'filterGroupAria',
+      'filterAll',
+      'filterOwned',
+      'filterMissing',
+      'filterEmpty',
+      'gridKeyboardHint',
+    ];
+    for (const key of NEW_KEYS) {
+      expect(chrome, key).toContain(`${key}:`);
+    }
+    // M16: a wordy new English value needs its non-Latin fills in the SAME
+    // change. i18n_completeness only sees a leak once en and the locale are
+    // byte-identical; this pin fails on an omitted row directly.
+    // The result-count announcement is CLDR-plural, so it is four leaves, and
+    // ru genuinely needs one/few/many apart (1 реликвия / 2 реликвии / 5
+    // реликвий). A single .other fill would read wrong for most counts.
+    const PLURAL_LEAVES = ['one', 'few', 'many', 'other'];
+    // Count-neutral noun: this one line serves the grid (relics), the shelf
+    // (pages), and Overview (mixed entries), so naming any noun is wrong twice.
+    for (const leaf of PLURAL_LEAVES) {
+      expect(chrome, leaf).toMatch(new RegExp(`${leaf}: '\\{count\\} results?\\.'`));
+    }
+    // Reads a fill's VALUE, tolerating the line break biome inserts when a long
+    // value wraps onto its own line. Key presence alone would pass on an empty
+    // string, which is exactly what a half-finished fill leaves behind.
+    const fillValue = (table: string, key: string): string | undefined =>
+      table.match(new RegExp(`'${key.replace(/\./g, '\\.')}':\\s*\\n?\\s*'([^']*)'`))?.[1];
+    for (const locale of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']) {
+      const table = read(`../src/ui/i18n.locales/${locale}.ts`);
+      for (const key of NEW_KEYS) {
+        const value = fillValue(table, `hudChrome.reliquary.${key}`);
+        expect(typeof value, `${locale} ${key} missing`).toBe('string');
+        expect(value?.trim(), `${locale} ${key} empty`).not.toBe('');
+      }
+      for (const leaf of PLURAL_LEAVES) {
+        const value = fillValue(table, `hudChrome.plurals.reliquarySearchResults.${leaf}`);
+        expect(typeof value, `${locale} plural ${leaf} missing`).toBe('string');
+        expect(value?.trim(), `${locale} plural ${leaf} empty`).not.toBe('');
+      }
+    }
+    // Russian must not collapse its three count forms onto one string. Assert
+    // each capture is a real string FIRST: a rewrap that broke the regex would
+    // otherwise yield three undefineds, whose Set size is 1... and if the
+    // distinctness check were the only assertion, three undefineds would look
+    // like a failure for the wrong reason (or, with two forms, silently pass).
+    const ru = read('../src/ui/i18n.locales/ru_RU.ts');
+    const ruForms = PLURAL_LEAVES.slice(0, 3).map((leaf) =>
+      fillValue(ru, `hudChrome.plurals.reliquarySearchResults.${leaf}`),
+    );
+    for (const [i, form] of ruForms.entries()) {
+      expect(typeof form, `ru ${PLURAL_LEAVES[i]} did not parse`).toBe('string');
+      expect(form?.trim(), `ru ${PLURAL_LEAVES[i]} empty`).not.toBe('');
+    }
+    expect(new Set(ruForms).size, `ru one/few/many were ${JSON.stringify(ruForms)}`).toBe(3);
   });
 });
 
@@ -309,8 +733,16 @@ describe('entry HTML and i18n chrome', () => {
     expect(handler).toContain("t('hudChrome.reliquary.illuminateBanner'");
     expect(handler).toContain("t('hudChrome.reliquary.illuminateToast'");
     expect(handler).toContain("t('hudChrome.reliquary.rankUpBanner'");
-    // Phase 7: mark unlocks resolve display names via markFind keys.
-    expect(handler).toContain('reliquaryMarkFindKey');
+    // Phase 13: BOTH unlock ladders (the per-log chat line and the celebration
+    // banner) resolve through the one shared resolver. Two calls exactly, so a
+    // future edit cannot quietly reintroduce a second inline ladder beside it.
+    expect(handler?.match(/reliquaryRelicDisplayName\(/g)?.length).toBe(2);
+    // The humanized fallback each ladder used to carry is what made
+    // `mount:swift_gryphon` print differently in the log than on the banner.
+    // Neither the namespace strip nor the underscore-to-space surgery may
+    // return: with them gone, the two sites cannot drift apart again.
+    expect(handler).not.toMatch(/replace\(\/_\/g/);
+    expect(handler).not.toMatch(/lastIndexOf\(':'\)/);
     expect(handler).toContain("t('hudChrome.reliquary.rankUpToast'");
     expect(handler).toContain("banner.kind === 'rankUp'");
     // On-join catch-up: one localized summary line off plan.retroCount, the
@@ -410,6 +842,87 @@ describe('styles and architecture registration', () => {
     expect(hudMobile).toContain('body.mobile-touch #reliquary-window');
     expect(hudMobile).toContain('env(safe-area-inset-left)');
     expect(hudMobile).toContain('body.mobile-touch #reliquary-window .reliquary-grid');
+  });
+
+  it('names no undefined pseudo-token in the reliquary section', () => {
+    // These four names were defined in NO stylesheet and in NO themeCssVars
+    // emit, so every var(--x, literal) painted its fallback and the section
+    // shipped one name (--color-surface-inset) carrying two different values.
+    // var(--x, literal) is migration debt per DESIGN.md; an undefined name is
+    // worse, because it reads like a themeable token and can never be themed.
+    const reliquaryCss = sectionCss('reliquary');
+    for (const dead of [
+      '--color-surface-inset',
+      '--color-surface-hover',
+      '--color-border-active',
+      '--color-surface-active-top',
+    ]) {
+      expect(reliquaryCss, dead).not.toContain(`var(${dead}`);
+    }
+    // Whole-repo check, so the fix cannot be "move them somewhere else": a
+    // name may come back only once something actually DEFINES it.
+    const definesToken = (name: string) =>
+      new RegExp(`^\\s*${name}\\s*:`, 'm').test(read('../src/styles/tokens.css')) ||
+      read('../src/ui/theme.ts').includes(`'${name}'`);
+    for (const dead of [
+      '--color-surface-inset',
+      '--color-surface-hover',
+      '--color-border-active',
+      '--color-surface-active-top',
+    ]) {
+      if (components.includes(`var(${dead}`)) {
+        expect(definesToken(dead), `${dead} is consumed but defined nowhere`).toBe(true);
+      }
+    }
+    // Semantic colours still come from real tokens (the focus ring above all).
+    expect(reliquaryCss).toContain('var(--color-border-focus)');
+    expect(reliquaryCss).toContain('var(--color-border-showcase)');
+  });
+
+  it('tells no cursor lie: only elements with a handler get the pointer', () => {
+    const reliquaryCss = sectionCss('reliquary');
+    // A grid cell is focusable and hoverable but has NO click handler; the
+    // pointer cursor promised an action that does not exist.
+    const cellRule = reliquaryCss.match(/\n {2}\.reliquary-cell \{[^}]*\}/)?.[0];
+    expect(cellRule, '.reliquary-cell rule').toBeTruthy();
+    expect(cellRule).not.toContain('cursor:');
+    expect(stripComments(painter)).not.toMatch(
+      /reliquary-cell[\s\S]{0,400}?addEventListener\('click'/,
+    );
+    // Hover still reads (it opens the tooltip), so it gets a keyline, and no
+    // transform: a scale on hover/focus is banned in this family.
+    expect(reliquaryCss).toContain('.reliquary-cell:hover');
+    expect(reliquaryCss).not.toMatch(/:(?:hover|focus-visible) \{[^}]*transform:/);
+    // Everything that IS clickable keeps its pointer and a hover state.
+    for (const clickable of ['.reliquary-nav', '.reliquary-page-row', '.reliquary-filter-chip']) {
+      expect(reliquaryCss, clickable).toContain(`${clickable}:hover`);
+    }
+  });
+
+  it('styles the header count as a demoted readout and the search at the iOS floor', () => {
+    const reliquaryCss = sectionCss('reliquary');
+    // .reliquary-count is emitted by the painter and previously had NO rule at
+    // all, so the owned/total pair inherited the summary's title styling and
+    // competed with the window title.
+    expect(painter).toContain('class="reliquary-count"');
+    const countRule = reliquaryCss.match(/\.reliquary-count \{[^}]*\}/)?.[0];
+    expect(countRule, '.reliquary-count rule').toBeTruthy();
+    expect(countRule).toContain('font-size: 11px');
+    expect(countRule).toContain('var(--color-text-muted)');
+    // A sub-16px search input makes iOS Safari zoom the window on focus.
+    const searchRule = reliquaryCss.match(/\.reliquary-search \{[^}]*\}/)?.[0];
+    expect(searchRule, '.reliquary-search rule').toBeTruthy();
+    expect(searchRule).toContain('font-size: 16px');
+    // Touch floors survive for every new interactive control.
+    expect(reliquaryCss).toMatch(
+      /body\.mobile-touch \.reliquary-filter-chip \{[^}]*min-height: 40px;[^}]*\}/,
+    );
+    // The chip row sits in a flex COLUMN (.reliquary-page-detail); without
+    // flex: none it shrinks under pressure, the way its deeds twin does not.
+    const bar = reliquaryCss.match(/\.reliquary-filterbar \{[^}]*\}/)?.[0];
+    expect(bar, '.reliquary-filterbar rule').toBeTruthy();
+    expect(bar).toContain('flex: none');
+    expect(bar).toContain('padding-top: 6px');
   });
 
   it('registers the pure core in UI_PURE_CORES', () => {

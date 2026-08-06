@@ -1762,6 +1762,17 @@ export const hudChromeStrings = {
       many: 'Your reliquary catches up: {count} relics catalogued.',
       other: 'Your reliquary catches up: {count} relics catalogued.',
     },
+    // Reliquary search / filter result count, announced through the window's
+    // SR-only live region (the narrowed list itself is a silent paragraph swap).
+    // Count-neutral on purpose: this one line serves the page grid (relics), the
+    // shelf list (pages), and Overview (recent finds plus nearly-complete rows),
+    // so naming any single noun would be wrong on two of the three surfaces.
+    reliquarySearchResults: {
+      one: '{count} result.',
+      few: '{count} results.',
+      many: '{count} results.',
+      other: '{count} results.',
+    },
     deedsRetroSummary: {
       one: 'Your chronicle catches up: {count} deed recorded.',
       few: 'Your chronicle catches up: {count} deeds recorded.',
@@ -4100,6 +4111,33 @@ export const hudChromeStrings = {
     // Phase 8: Horizons account-scope chrome for weapon skins (account cosmetics).
     accountScopeBadge: 'Account',
     accountScopeNote: 'Account collection: unlocked across every character on this account.',
+    // Phase 13: one display-name ladder (no humanized ids), authored source
+    // lines for missing relics, page blurbs, and the search / ownership filter.
+    unknownRelic: 'Unrecorded relic',
+    sourceBossDungeon: 'Drops from {boss} in {dungeon}',
+    sourceBoss: 'Drops from {boss}',
+    sourceZone: 'Found in {zone}',
+    sourceProfession: 'Earned through {profession}',
+    sourceDeed: 'Awarded by the deed {deed}',
+    sourceVendor: 'Sold by {vendor}',
+    // Missing cells fold the source line into the label so a keyboard or screen
+    // reader user gets everything a hover tooltip shows; owned cells fold in the
+    // first-find clear number on the same rule.
+    cellMissingSourceAria: '{name}, not yet found, {source}',
+    cellOwnedClearsAria: '{name}, catalogued, first found on clear {count}',
+    searchPlaceholder: 'Search relics',
+    searchAria: 'Search The Reliquary by name',
+    searchEmpty: 'No relics match that search.',
+    // Distinct from searchEmpty: clicking Catalogued with nothing typed must not
+    // blame a search the player never made.
+    filterEmpty: 'No relics match this filter.',
+    filterGroupAria: 'Filter relics by whether you have found them',
+    // SR-only description on the relic grid: roving tabindex leaves one tab
+    // stop, and list/listitem announces no keyboard model of its own.
+    gridKeyboardHint: 'Use the arrow keys to move between relics, Home and End for the ends.',
+    filterAll: 'All',
+    filterOwned: 'Catalogued',
+    filterMissing: 'Missing',
     // Phase 9: character sheet labeled completion pair + Curator rank.
     charCompletionLabel: 'Reliquary',
     charCompletion: '{owned}/{total}',

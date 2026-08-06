@@ -3206,6 +3206,7 @@ export const TARGETS = [
     when: [
       'ui/reliquary_view',
       'ui/reliquary_window',
+      'ui/reliquary_labels',
       'ui/reliquary_sheet_view',
       'sim/content/reliquary',
       'sim/reliquary',
@@ -3227,6 +3228,64 @@ export const TARGETS = [
       });
       const opened = await pollForSize(page, '#reliquary-window');
       if (!opened) throw new Error('reliquary window did not open');
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'reliquary-page',
+    label: 'The Reliquary: multi-boss page detail with a focused missing cell',
+    when: [
+      'ui/reliquary_view',
+      'ui/reliquary_window',
+      'ui/reliquary_labels',
+      'sim/content/reliquary',
+      'sim/reliquary',
+    ],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        // Same seed set as the overview target so the page shows a mix of
+        // catalogued and missing cells.
+        const game = window.__game;
+        const sim = game?.sim;
+        if (sim?.primary?.deedStats?.itemsDiscovered) {
+          for (const id of ['cryptbone_helm', 'boundstone_helm', 'cryptbone_pauldrons']) {
+            sim.primary.deedStats.itemsDiscovered.add(id);
+          }
+        }
+        game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="conquerors"]')?.click();
+        win?.querySelector('[data-page="conquerors_gravewyrm_sanctum"]')?.click();
+      });
+      await wait(200);
+      await page.evaluate(() => {
+        // Prefer a missing cell that actually HAS an authored source, so the
+        // capture shows the Phase 13 source line rather than a relic still on
+        // the pending-ruling list (which paints the plain missing tooltip and
+        // makes the screenshot look like the feature did not land). The aria
+        // label carries the same sentence the tooltip does, so it is the
+        // cheapest thing to select on. Falls back to the first missing cell.
+        const missing = [
+          ...document.querySelectorAll('#reliquary-window .reliquary-cell[data-cell-owned="0"]'),
+        ];
+        const cell =
+          missing.find((node) => (node.getAttribute('aria-label') ?? '').includes('Drops from')) ??
+          missing[0];
+        if (cell) {
+          // attachTooltip binds mouseenter/focusin (never pointerenter); focus
+          // is the sturdier trigger here since no synthetic pointerdown has set
+          // pointerFocusPending.
+          cell.focus?.();
+        }
+      });
+      await wait(300);
       return { clip: '#reliquary-window' };
     },
   },

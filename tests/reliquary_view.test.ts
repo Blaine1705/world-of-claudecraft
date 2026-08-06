@@ -3,8 +3,25 @@
 // recent newest-first, nearly-complete ranking, shelf nav counts, page grids,
 // unlock/Illumination plan, and the refresh signature (ownershipDigest too).
 import { describe, expect, it } from 'vitest';
-import type { ReliquaryPageDef } from '../src/sim/content/reliquary';
+import { DEEDS } from '../src/sim/content/deeds';
+import { MOUNTS } from '../src/sim/content/mounts';
+import type { ReliquaryPageDef, ReliquaryRelicDef } from '../src/sim/content/reliquary';
+import {
+  RELIQUARY_HORIZON_MOUNTS,
+  RELIQUARY_MARK_IDS,
+  RELIQUARY_PAGES,
+} from '../src/sim/content/reliquary';
+import { DUNGEONS, ZONES } from '../src/sim/data';
 import { CURATOR_RANK_DEFS } from '../src/sim/reliquary';
+import { deedName } from '../src/ui/deed_i18n';
+import { dungeonDisplayName, tEntity, zoneDisplayName } from '../src/ui/entity_i18n';
+import { languageTag } from '../src/ui/i18n';
+import { MOUNT_NAME_KEYS } from '../src/ui/mount_labels';
+import {
+  reliquaryRelicDisplayName,
+  reliquaryRelicSearchText,
+  reliquarySourceLineText,
+} from '../src/ui/reliquary_labels';
 import {
   buildReliquaryPageCells,
   buildReliquaryUnlockPlan,
@@ -14,11 +31,14 @@ import {
   isReliquaryNavId,
   RELIQUARY_NAV,
   RELIQUARY_NEARLY_MAX,
+  RELIQUARY_NEARLY_MAX_REMAINING,
+  RELIQUARY_NEARLY_MIN_FRACTION,
   type ReliquaryViewInput,
   reliquaryMarkFindKey,
   reliquaryOwnershipDigest,
   reliquaryRecentSig,
   reliquaryRefreshSig,
+  reliquarySourceLinePlan,
 } from '../src/ui/reliquary_view';
 
 // ---------------------------------------------------------------------------
@@ -75,6 +95,22 @@ const TEST_PAGES: ReliquaryPageDef[] = [
 
 function ownedSet(...ids: string[]): Set<string> {
   return new Set(ids);
+}
+
+/** The slot id carried by any relic arm (mirrors the core's relicSlotId). */
+function relicId(relic: ReliquaryRelicDef): string {
+  switch (relic.kind) {
+    case 'item':
+      return relic.itemId;
+    case 'mark':
+      return relic.markId;
+    case 'mount':
+      return relic.mountId;
+    case 'weapon_skin':
+      return relic.skinId;
+    case 'title':
+      return relic.deedId;
+  }
 }
 
 function input(partial: Partial<ReliquaryViewInput> = {}): ReliquaryViewInput {
@@ -973,6 +1009,11 @@ describe('reliquaryRefreshSig', () => {
     expect(reliquaryRefreshSig({ ...base, marksSize: 1 })).not.toBe(baseSig);
     expect(reliquaryRefreshSig({ ...base, clearsDigest: 1 })).not.toBe(baseSig);
     expect(reliquaryRefreshSig({ ...base, ownershipDigest: 1 })).not.toBe(baseSig);
+    // The two Phase 13 dimensions. Pinning only that the painter PASSES them
+    // (the window suite does) leaves deleting `parts.search ?? ''` from the
+    // join green in both suites, which silently stops a keystroke repainting.
+    expect(reliquaryRefreshSig({ ...base, search: 'a' })).not.toBe(baseSig);
+    expect(reliquaryRefreshSig({ ...base, ownedFilter: 'owned' })).not.toBe(baseSig);
   });
 
   it('reliquaryOwnershipDigest moves on discovered size, firstFind, or pageOwned', () => {
@@ -989,6 +1030,552 @@ describe('reliquaryRefreshSig', () => {
     expect(reliquaryRecentSig(['a', 'b'])).toBe('a\u0001b');
     expect(reliquaryRecentSig(['a', 'b'])).not.toBe(reliquaryRecentSig(['b', 'a']));
     expect(reliquaryRecentSig([])).toBe('');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Phase 13: nearly-complete predicate, source-line arms, search + filter
+// ---------------------------------------------------------------------------
+
+/** N-slot conqueror page with the first `owned` relics discovered. */
+function sizedPage(id: string, total: number): ReliquaryPageDef {
+  return {
+    id,
+    shelf: 'conquerors',
+    name: id,
+    relics: Array.from({ length: total }, (_, i) => ({
+      kind: 'item' as const,
+      itemId: `${id}_${i}`,
+    })),
+  };
+}
+
+function ownedFirst(id: string, owned: number): string[] {
+  return Array.from({ length: owned }, (_, i) => `${id}_${i}`);
+}
+
+describe('nearly-complete qualification (either arm, both inclusive)', () => {
+  it('excludes a barely-started large page that the owned >= 1 floor alone let in', () => {
+    // The defect: 1/30 is remaining 29 and fraction 0.03, yet it qualified and
+    // could outrank a genuinely close page just by having any progress at all.
+    const page = sizedPage('big', 30);
+    const model = buildReliquaryView(
+      input({ pages: [page], itemsDiscovered: ownedSet(...ownedFirst('big', 1)) }),
+    );
+    expect(model.nearly).toEqual([]);
+  });
+
+  it('qualifies at exactly RELIQUARY_NEARLY_MAX_REMAINING remaining (inclusive)', () => {
+    expect(RELIQUARY_NEARLY_MAX_REMAINING).toBe(3);
+    // 27/30: remaining exactly 3, and fraction 0.9 also passes, so narrow the
+    // case to the remaining arm alone with a page whose fraction FAILS.
+    // 3/6 is remaining 3 (passes) at fraction 0.5 (fails the 0.6 arm).
+    const page = sizedPage('six', 6);
+    const model = buildReliquaryView(
+      input({ pages: [page], itemsDiscovered: ownedSet(...ownedFirst('six', 3)) }),
+    );
+    expect(model.nearly.map((n) => n.pageId)).toEqual(['six']);
+    expect(model.nearly[0].remaining).toBe(3);
+    // One relic further from done on the same-size page fails BOTH arms.
+    const justOver = buildReliquaryView(
+      input({
+        pages: [sizedPage('seven', 7)],
+        itemsDiscovered: ownedSet(...ownedFirst('seven', 3)),
+      }),
+    );
+    expect(justOver.nearly).toEqual([]);
+  });
+
+  it('qualifies at exactly RELIQUARY_NEARLY_MIN_FRACTION full (inclusive)', () => {
+    expect(RELIQUARY_NEARLY_MIN_FRACTION).toBe(0.6);
+    // 6/10: fraction exactly 0.6 (passes) at remaining 4, which FAILS the
+    // remaining arm, so only the fraction arm can be carrying this case.
+    const model = buildReliquaryView(
+      input({ pages: [sizedPage('ten', 10)], itemsDiscovered: ownedSet(...ownedFirst('ten', 6)) }),
+    );
+    expect(model.nearly.map((n) => n.pageId)).toEqual(['ten']);
+    expect(model.nearly[0].remaining).toBe(4);
+    // 5/10 is 0.5 with the same remaining-arm failure: just under, excluded.
+    const under = buildReliquaryView(
+      input({ pages: [sizedPage('ten', 10)], itemsDiscovered: ownedSet(...ownedFirst('ten', 5)) }),
+    );
+    expect(under.nearly).toEqual([]);
+  });
+
+  it('still excludes zero-owned and complete pages regardless of either arm', () => {
+    // A 0/2 page passes the remaining arm (2 <= 3) but owns nothing: the
+    // MIN_OWNED floor is what keeps an untouched page off the strip.
+    const zero = buildReliquaryView(
+      input({ pages: [sizedPage('two', 2)], itemsDiscovered: ownedSet() }),
+    );
+    expect(zero.nearly).toEqual([]);
+    const done = buildReliquaryView(
+      input({ pages: [sizedPage('two', 2)], itemsDiscovered: ownedSet(...ownedFirst('two', 2)) }),
+    );
+    expect(done.nearly).toEqual([]);
+  });
+});
+
+describe('reliquarySourceLinePlan', () => {
+  it('names the dungeon too when the page clear meter reads one', () => {
+    expect(
+      reliquarySourceLinePlan(
+        { sourceKind: 'boss', sourceId: 'korzul' },
+        { kind: 'dungeon', dungeonId: 'crypt' },
+      ),
+    ).toEqual({ kind: 'bossDungeon', bossId: 'korzul', dungeonId: 'crypt' });
+  });
+
+  it('names the boss alone for every non-dungeon clear source', () => {
+    // A raid / world boss / delve page has no dungeon to name; inventing one
+    // would send a player to the wrong place.
+    for (const clearSource of [
+      undefined,
+      { kind: 'none' } as const,
+      { kind: 'delve', delveId: 'sunken' } as const,
+      { kind: 'deed_stat', stat: 'thunzharrKills' } as const,
+    ]) {
+      expect(
+        reliquarySourceLinePlan({ sourceKind: 'boss', sourceId: 'thunzharr' }, clearSource),
+      ).toEqual({ kind: 'boss', bossId: 'thunzharr' });
+    }
+  });
+
+  it('maps every other hint kind to its own arm', () => {
+    const dungeon = { kind: 'dungeon', dungeonId: 'crypt' } as const;
+    // The dungeon clear source is passed on each so the pin proves it is read
+    // ONLY by the boss arm and never leaks into the others.
+    expect(reliquarySourceLinePlan({ sourceKind: 'zone', sourceId: 'eastbrook' }, dungeon)).toEqual(
+      {
+        kind: 'zone',
+        zoneId: 'eastbrook',
+      },
+    );
+    expect(
+      reliquarySourceLinePlan({ sourceKind: 'profession', sourceId: 'mining' }, dungeon),
+    ).toEqual({
+      kind: 'profession',
+      professionId: 'mining',
+    });
+    expect(reliquarySourceLinePlan({ sourceKind: 'deed', sourceId: 'col_set_x' }, dungeon)).toEqual(
+      {
+        kind: 'deed',
+        deedId: 'col_set_x',
+      },
+    );
+    expect(
+      reliquarySourceLinePlan({ sourceKind: 'vendor', sourceId: 'heroic_quartermaster' }, dungeon),
+    ).toEqual({ kind: 'vendor', npcId: 'heroic_quartermaster' });
+  });
+
+  it('answers null with no hint (an un-authored source renders no line)', () => {
+    expect(reliquarySourceLinePlan(undefined, { kind: 'dungeon', dungeonId: 'crypt' })).toBeNull();
+  });
+});
+
+describe('grid cell source plans', () => {
+  const page: ReliquaryPageDef = {
+    id: 'src_page',
+    shelf: 'conquerors',
+    name: 'Source Page',
+    clearSource: { kind: 'dungeon', dungeonId: 'crypt' },
+    sourceDefault: { sourceKind: 'boss', sourceId: 'page_default_boss' },
+    relics: [
+      { kind: 'item', itemId: 'own_hint', source: { sourceKind: 'vendor', sourceId: 'vex' } },
+      { kind: 'item', itemId: 'inherits' },
+    ],
+  };
+
+  it('prefers the slot hint and falls back to the page default', () => {
+    const cells = buildReliquaryPageCells(page, { itemsDiscovered: ownedSet() });
+    expect(cells[0].sourcePlan).toEqual({ kind: 'vendor', npcId: 'vex' });
+    expect(cells[1].sourcePlan).toEqual({
+      kind: 'bossDungeon',
+      bossId: 'page_default_boss',
+      dungeonId: 'crypt',
+    });
+  });
+
+  it('resolves the default off the INJECTED page, not a live catalog lookup', () => {
+    // A synthetic page reusing a live page id must still read its own
+    // sourceDefault; resolving by id would silently answer with live content.
+    const shadow: ReliquaryPageDef = {
+      ...page,
+      id: 'dungeon_hollow_crypt',
+      sourceDefault: { sourceKind: 'zone', sourceId: 'synthetic_zone' },
+      clearSource: undefined,
+      relics: [{ kind: 'item', itemId: 'inherits' }],
+    };
+    const cells = buildReliquaryPageCells(shadow, { itemsDiscovered: ownedSet() });
+    expect(cells[0].sourcePlan).toEqual({ kind: 'zone', zoneId: 'synthetic_zone' });
+  });
+
+  it('omits the plan entirely for an un-hinted relic on an un-hinted page', () => {
+    const bare = buildReliquaryPageCells(sizedPage('bare', 1), { itemsDiscovered: ownedSet() });
+    expect(bare[0].sourcePlan).toBeUndefined();
+  });
+});
+
+describe('search and ownership filter', () => {
+  const page: ReliquaryPageDef = {
+    id: 'filter_page',
+    shelf: 'conquerors',
+    name: 'Filter Page',
+    relics: [
+      { kind: 'item', itemId: 'gilded_crown' },
+      { kind: 'item', itemId: 'rusty_spoon' },
+      { kind: 'item', itemId: 'gilded_ring' },
+    ],
+  };
+  // Localized display text, deliberately UNLIKE the raw ids: a filter matching
+  // the ids would pass every id-based assertion and still fail a real player.
+  const NAMES: Record<string, string> = {
+    gilded_crown: 'couronne doree',
+    rusty_spoon: 'cuillere rouillee',
+    gilded_ring: 'anneau dore',
+  };
+  const filterInput = (partial: Partial<ReliquaryViewInput> = {}) =>
+    input({
+      pages: [page],
+      nav: 'conquerors',
+      pageId: 'filter_page',
+      itemsDiscovered: ownedSet('gilded_crown'),
+      relicSearchText: (_kind, id) => (NAMES[id] ?? '').toLowerCase(),
+      pageSearchText: () => 'page filtree',
+      ...partial,
+    });
+
+  it('matches the LOCALIZED display name, not the raw catalog id', () => {
+    const localized = buildReliquaryView(filterInput({ search: 'dore' }));
+    expect(localized.pageDetail?.cells.map((c) => c.id)).toEqual(['gilded_crown', 'gilded_ring']);
+    // The English id substring must NOT match: the filter never sees ids.
+    const byId = buildReliquaryView(filterInput({ search: 'gilded' }));
+    expect(byId.pageDetail?.cells).toEqual([]);
+    expect(byId.pageDetail?.filtered).toBe(true);
+  });
+
+  it('filters grid cells by ownership on each chip', () => {
+    const owned = buildReliquaryView(filterInput({ ownedFilter: 'owned' }));
+    expect(owned.pageDetail?.cells.map((c) => c.id)).toEqual(['gilded_crown']);
+    const missing = buildReliquaryView(filterInput({ ownedFilter: 'missing' }));
+    expect(missing.pageDetail?.cells.map((c) => c.id)).toEqual(['rusty_spoon', 'gilded_ring']);
+    const all = buildReliquaryView(filterInput({ ownedFilter: 'all' }));
+    expect(all.pageDetail?.cells).toHaveLength(3);
+    expect(all.pageDetail?.filtered).toBe(false);
+  });
+
+  it('intersects search with the ownership chip', () => {
+    const both = buildReliquaryView(filterInput({ search: 'dore', ownedFilter: 'missing' }));
+    expect(both.pageDetail?.cells.map((c) => c.id)).toEqual(['gilded_ring']);
+  });
+
+  it('never lets a filter move the header completion meter', () => {
+    // owned/total describe the PAGE, not the visible subset: a "missing" chip
+    // that reported 0/3 filled would read as lost progress.
+    const filtered = buildReliquaryView(filterInput({ ownedFilter: 'missing' }));
+    expect(filtered.pageDetail?.owned).toBe(1);
+    expect(filtered.pageDetail?.total).toBe(3);
+  });
+
+  it('narrows the shelf list by localized page name but still opens the active page', () => {
+    const hit = buildReliquaryView(filterInput({ pageId: null, search: 'filtree' }));
+    expect(hit.shelfPages.map((p) => p.pageId)).toEqual(['filter_page']);
+    const miss = buildReliquaryView(filterInput({ pageId: null, search: 'zzz' }));
+    expect(miss.shelfPages).toEqual([]);
+    // A search that excludes the open page's NAME must not blank its grid: the
+    // player is reading that page, and the shelf list is behind it.
+    const openAnyway = buildReliquaryView(filterInput({ search: 'zzz' }));
+    expect(openAnyway.shelfPages).toEqual([]);
+    expect(openAnyway.pageDetail?.pageId).toBe('filter_page');
+  });
+
+  it('narrows the Overview strips too, so the field is never an inert control', () => {
+    const overview = (partial: Partial<ReliquaryViewInput> = {}) =>
+      input({
+        pages: [page],
+        nav: 'overview',
+        recent: ['gilded_crown', 'rusty_spoon'],
+        itemsDiscovered: ownedSet('gilded_crown', 'rusty_spoon'),
+        relicSearchText: (_kind, id) => (NAMES[id] ?? '').toLowerCase(),
+        pageSearchText: () => 'page filtree',
+        ...partial,
+      });
+    // Recent finds: matched by localized name, newest-first order preserved.
+    expect(buildReliquaryView(overview()).recent.map((r) => r.id)).toEqual([
+      'rusty_spoon',
+      'gilded_crown',
+    ]);
+    expect(buildReliquaryView(overview({ search: 'couronne' })).recent.map((r) => r.id)).toEqual([
+      'gilded_crown',
+    ]);
+    // Nearly-complete rows: matched by localized PAGE name, and by a contained
+    // relic's name too, the same deep match the shelf list gets. Without it a
+    // relic-name needle on Overview showed the recent chip for a relic while
+    // hiding the page that holds it, an asymmetry a player reads as "not in
+    // the catalog".
+    const nearlyHit = buildReliquaryView(overview({ search: 'filtree' }));
+    expect(nearlyHit.nearly.map((n) => n.pageId)).toEqual(['filter_page']);
+    const nearlyDeep = buildReliquaryView(overview({ search: 'couronne' }));
+    expect(nearlyDeep.nearly.map((n) => n.pageId)).toEqual(['filter_page']);
+    // And a search matching nothing empties both, which is what lets the
+    // painter swap the overview blurb for the no-results line.
+    const none = buildReliquaryView(overview({ search: 'zzz' }));
+    expect(none.recent).toEqual([]);
+    expect(none.nearly).toEqual([]);
+  });
+
+  it('keeps a shelf row whose RELIC matches, even when the page text does not', () => {
+    // "Search relics" has to be true from the shelf too, or typing a relic name
+    // there returns nothing and the player concludes the relic is not in the
+    // catalog. Premise first: the needle must NOT match the page's own text,
+    // so the row can only survive via its relics.
+    const pageText = 'page filtree';
+    const needle = 'couronne';
+    expect(pageText).not.toContain(needle);
+    const deep = buildReliquaryView(filterInput({ pageId: null, search: needle }));
+    expect(deep.shelfPages.map((p) => p.pageId)).toEqual(['filter_page']);
+    // And a needle matching neither the page text nor any relic still drops it.
+    const miss = buildReliquaryView(filterInput({ pageId: null, search: 'zzz' }));
+    expect(miss.shelfPages).toEqual([]);
+  });
+
+  it('leaves everything unfiltered when no search text resolver is injected', () => {
+    const model = buildReliquaryView(
+      input({ pages: [page], nav: 'conquerors', pageId: 'filter_page', search: 'anything' }),
+    );
+    expect(model.shelfPages.map((p) => p.pageId)).toEqual(['filter_page']);
+    expect(model.pageDetail?.cells).toHaveLength(3);
+  });
+});
+
+describe('reliquaryRelicDisplayName (the one shared ladder)', () => {
+  it('names a real relic of every catalog kind through its own channel', () => {
+    // Ids come off the LIVE catalog, so a content rename cannot rot this pin
+    // into asserting nothing. Each name must be real text, never the id back.
+    const kinds: ReliquaryRelicDef['kind'][] = ['item', 'mark', 'mount', 'weapon_skin', 'title'];
+    for (const kind of kinds) {
+      const relic = RELIQUARY_PAGES.flatMap((p) => p.relics).find((r) => r.kind === kind);
+      expect(relic, `a live ${kind} relic`).toBeTruthy();
+      if (!relic) continue;
+      const id = relicId(relic);
+      const name = reliquaryRelicDisplayName(kind, id);
+      expect(name, `${kind} ${id}`).not.toBe('');
+      expect(name, `${kind} ${id}`).not.toBe(id);
+      // The humanized fallback is what an id-shaped name would look like.
+      expect(name, `${kind} ${id}`).not.toBe(id.replace(/_/g, ' '));
+      expect(name, `${kind} ${id}`).not.toBe('Unrecorded relic');
+    }
+  });
+
+  it("resolves the recent ring's wire-shaped 'unknown' kind as an item", () => {
+    const itemRelic = RELIQUARY_PAGES.flatMap((p) => p.relics).find((r) => r.kind === 'item');
+    expect(itemRelic).toBeTruthy();
+    if (!itemRelic) return;
+    const id = relicId(itemRelic);
+    expect(reliquaryRelicDisplayName('unknown', id)).toBe(reliquaryRelicDisplayName('item', id));
+  });
+
+  it('renders authored copy for a namespaced id no table can place (the drift case)', () => {
+    // THE bug this ladder replaced: hud.ts's chat site stripped the colon
+    // namespace and spaced the underscores ("swift gryphon"), while its banner
+    // site skipped the strip and only spaced ("mount:swift gryphon"), so ONE
+    // unlock printed two different names. Both now land here, and neither can
+    // produce an id-derived string at all.
+    const drifted = reliquaryRelicDisplayName('item', 'mount:swift_gryphon');
+    expect(drifted).toBe('Unrecorded relic');
+    expect(drifted).not.toContain('swift');
+    expect(drifted).not.toContain(':');
+    expect(drifted).not.toContain('_');
+    // Same for a bare-underscore id and for a prototype key off the wire (a
+    // raw ITEMS['constructor'] would resolve a Function, not undefined).
+    expect(reliquaryRelicDisplayName('item', 'not_a_real_relic_id')).toBe('Unrecorded relic');
+    expect(reliquaryRelicDisplayName('item', 'constructor')).toBe('Unrecorded relic');
+    expect(reliquaryRelicDisplayName('unknown', '__proto__')).toBe('Unrecorded relic');
+  });
+
+  it('falls to the authored copy for an unmapped MOUNT rather than raw English', () => {
+    // mountDisplayName, the shared helper, answers MOUNTS[id].name (raw catalog
+    // ENGLISH) and then the raw id. Both would sail past a not.toBe(id) pin
+    // while shipping untranslated text, so this asserts the authored copy
+    // exactly. Membership is MOUNT_NAME_KEYS, not MOUNTS.
+    expect(reliquaryRelicDisplayName('mount', 'not_a_mount_id')).toBe('Unrecorded relic');
+    // A real MOUNTS row with no name key must ALSO fall through: this is the
+    // case that separates "guarded on MOUNT_NAME_KEYS" from "guarded on MOUNTS".
+    const unkeyed = Object.keys(MOUNTS).find((id) => !Object.hasOwn(MOUNT_NAME_KEYS, id));
+    if (unkeyed !== undefined) {
+      expect(reliquaryRelicDisplayName('mount', unkeyed), unkeyed).toBe('Unrecorded relic');
+    }
+    // Every catalogued Horizons mount still resolves to real text.
+    for (const id of RELIQUARY_HORIZON_MOUNTS) {
+      const name = reliquaryRelicDisplayName('mount', id);
+      expect(name, id).not.toBe('Unrecorded relic');
+      expect(name, id).not.toBe(id);
+    }
+  });
+
+  it('falls to the authored copy for an unresolvable WEAPON SKIN or TITLE', () => {
+    // The two remaining guarded arms. localizeWeaponSkin THROWS on an id
+    // outside the armory key table, so the WEAPON_SKINS membership check is
+    // what keeps an unknown skin from taking down the render; deedTitleText
+    // answers '' for a deed with no title reward, which would otherwise paint
+    // an empty cell label.
+    expect(reliquaryRelicDisplayName('weapon_skin', 'not_a_skin_id')).toBe('Unrecorded relic');
+    expect(() => reliquaryRelicDisplayName('weapon_skin', 'constructor')).not.toThrow();
+    expect(reliquaryRelicDisplayName('title', 'not_a_deed_id')).toBe('Unrecorded relic');
+    // A REAL deed that grants no title still has no name to show here.
+    const titleless = Object.values(DEEDS).find((d) => d.reward?.kind !== 'title');
+    if (titleless) {
+      expect(reliquaryRelicDisplayName('title', titleless.id), titleless.id).toBe(
+        'Unrecorded relic',
+      );
+    }
+  });
+
+  it('falls to the authored copy for a wire-sourced MARK the catalog cannot name', () => {
+    // reliquaryMarks is a server-mirrored set, so a client older than the
+    // server sees marks with no markFind leaf. t() on an untracked key throws
+    // off a release build, and the search filter resolves every relic per
+    // keystroke, so this would take down the whole render, not one chip.
+    expect(reliquaryRelicDisplayName('mark', 'gather_event:not_yet_shipped')).toBe(
+      'Unrecorded relic',
+    );
+    expect(reliquaryRelicDisplayName('mark', 'masterwork:from_a_newer_server')).toBe(
+      'Unrecorded relic',
+    );
+    // Resolving it must not throw either (the release-build arm renders the raw
+    // key string instead, which is the same defect wearing a different coat).
+    expect(() => reliquaryRelicDisplayName('mark', 'totally:unknown')).not.toThrow();
+    expect(reliquaryRelicDisplayName('mark', 'totally:unknown')).not.toContain('hudChrome');
+    // Every catalogued mark still resolves to real text.
+    for (const markId of RELIQUARY_MARK_IDS) {
+      expect(reliquaryRelicDisplayName('mark', markId), markId).not.toBe('Unrecorded relic');
+    }
+  });
+
+  it('casefolds for search without changing which name is matched', () => {
+    const itemRelic = RELIQUARY_PAGES.flatMap((p) => p.relics).find((r) => r.kind === 'item');
+    if (!itemRelic) return;
+    const id = relicId(itemRelic);
+    expect(reliquaryRelicSearchText('item', id, 'en-US')).toBe(
+      reliquaryRelicDisplayName('item', id).toLocaleLowerCase('en-US'),
+    );
+  });
+
+  it('casefolds with the LOCALE, so Turkish dotted/dotless I still matches', () => {
+    // tr_TR ships. Invariant toLowerCase folds 'İ' (U+0130) to 'i̇' (i + combining
+    // dot), which does NOT equal the 'i' a Turkish player types, so their own
+    // keystrokes miss their own relic names. toLocaleLowerCase('tr') folds it to
+    // plain 'i'. This asserts the DIFFERENCE, so a silent revert to toLowerCase
+    // reds the pin rather than passing on a coincidence.
+    const TURKISH_DOTTED = 'İZ';
+    expect(TURKISH_DOTTED.toLocaleLowerCase('tr')).toBe('iz');
+    expect(TURKISH_DOTTED.toLowerCase()).not.toBe('iz');
+    // The helper must follow the tag it is handed, both directions.
+    const folded = (tag: string) => TURKISH_DOTTED.toLocaleLowerCase(tag);
+    expect(folded('tr')).not.toBe(folded('en-US'));
+    // And the painter must hand a real tag down: languageTag maps the shipped
+    // locale id to the BCP 47 tag Intl consumes.
+    expect(languageTag('tr_TR')).toBe('tr-TR');
+    expect(TURKISH_DOTTED.toLocaleLowerCase(languageTag('tr_TR'))).toBe('iz');
+  });
+});
+
+describe('reliquarySourceLineText', () => {
+  it('names boss and dungeon on the dungeon arm, boss alone otherwise', () => {
+    const boss = tEntity({ kind: 'mob', id: 'korzul_the_gravewyrm', field: 'name' });
+    const dungeonId = Object.keys(DUNGEONS)[0];
+    const dungeon = dungeonDisplayName(dungeonId);
+    const both = reliquarySourceLineText({
+      kind: 'bossDungeon',
+      bossId: 'korzul_the_gravewyrm',
+      dungeonId,
+    });
+    expect(both).toBe(`Drops from ${boss} in ${dungeon}`);
+    const alone = reliquarySourceLineText({ kind: 'boss', bossId: 'korzul_the_gravewyrm' });
+    expect(alone).toBe(`Drops from ${boss}`);
+    // The boss-only arm must not smuggle a place in.
+    expect(alone).not.toContain(dungeon);
+  });
+
+  it('composes the zone, deed, and vendor arms from their own channels', () => {
+    expect(reliquarySourceLineText({ kind: 'zone', zoneId: ZONES[0].id })).toBe(
+      `Found in ${zoneDisplayName(ZONES[0].id)}`,
+    );
+    expect(reliquarySourceLineText({ kind: 'vendor', npcId: 'heroic_quartermaster' })).toBe(
+      `Sold by ${tEntity({ kind: 'npc', id: 'heroic_quartermaster', field: 'name' })}`,
+    );
+    const deedId = 'col_set_deathlord';
+    expect(reliquarySourceLineText({ kind: 'deed', deedId })).toBe(
+      `Awarded by the deed ${deedName(deedId)}`,
+    );
+  });
+
+  it('names a craft and a gathering profession, and stays silent off both tables', () => {
+    expect(reliquarySourceLineText({ kind: 'profession', professionId: 'weaponcrafting' })).toBe(
+      'Earned through Weaponcrafting',
+    );
+    expect(reliquarySourceLineText({ kind: 'profession', professionId: 'mining' })).toBe(
+      'Earned through Mining',
+    );
+    // An id on neither table has no honest name, so there is no line at all
+    // rather than "Earned through " with a hole in it.
+    expect(reliquarySourceLineText({ kind: 'profession', professionId: 'basketweaving' })).toBe('');
+    // A prototype key is the case a plain "undefined?" check misses: the craft
+    // table is indexed bare, so 'constructor' resolves a truthy Function that
+    // would otherwise be handed to t() as if it were a key.
+    for (const proto of ['constructor', '__proto__', 'toString', 'hasOwnProperty']) {
+      expect(reliquarySourceLineText({ kind: 'profession', professionId: proto }), proto).toBe('');
+    }
+  });
+
+  it('renders nothing when the catalog authors no hint', () => {
+    expect(reliquarySourceLineText(undefined)).toBe('');
+  });
+
+  it('drops the whole line rather than splice a raw id into prose (every arm)', () => {
+    // The entity channels answer the RAW ID for an id they cannot place (the
+    // R34 wire contract), so an un-guarded arm would render
+    // "Drops from gorne_the_dread in blackrock_hollow" as if it were content.
+    // One fabricated id per arm, each asserting the line vanishes entirely.
+    expect(reliquarySourceLineText({ kind: 'boss', bossId: 'gorne_the_dread' })).toBe('');
+    expect(reliquarySourceLineText({ kind: 'zone', zoneId: 'blackrock_hollow' })).toBe('');
+    expect(reliquarySourceLineText({ kind: 'deed', deedId: 'col_no_such_deed' })).toBe('');
+    expect(reliquarySourceLineText({ kind: 'vendor', npcId: 'merchant_nobody' })).toBe('');
+    // The two-name arm: EITHER half missing drops the line, so a real boss
+    // cannot smuggle a raw dungeon id in beside it (or the reverse).
+    const realBoss = 'korzul_the_gravewyrm';
+    const realDungeon = Object.keys(DUNGEONS)[0];
+    expect(
+      reliquarySourceLineText({
+        kind: 'bossDungeon',
+        bossId: realBoss,
+        dungeonId: 'blackrock_hollow',
+      }),
+    ).toBe('');
+    expect(
+      reliquarySourceLineText({
+        kind: 'bossDungeon',
+        bossId: 'gorne_the_dread',
+        dungeonId: realDungeon,
+      }),
+    ).toBe('');
+    // Premise check: with BOTH real, the same call does produce a line, so the
+    // assertions above are testing the guard and not a broken composer.
+    expect(
+      reliquarySourceLineText({ kind: 'bossDungeon', bossId: realBoss, dungeonId: realDungeon }),
+    ).not.toBe('');
+  });
+
+  it('resolves every source hint the live catalog actually authors', () => {
+    // The other direction: the guards must not be so tight that real authored
+    // content goes silent. Every hint in RELIQUARY_PAGES has to produce text.
+    for (const page of RELIQUARY_PAGES) {
+      for (const relic of page.relics) {
+        const plan = reliquarySourceLinePlan(relic.source ?? page.sourceDefault, page.clearSource);
+        if (plan === null) continue;
+        expect(reliquarySourceLineText(plan), `${page.id} ${JSON.stringify(plan)}`).not.toBe('');
+      }
+    }
   });
 });
 

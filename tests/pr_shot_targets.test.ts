@@ -215,6 +215,22 @@ describe('classifyDiff', () => {
     }
   });
 
+  it('routes the shared Reliquary label module to both Reliquary targets', () => {
+    // reliquary_labels.ts resolves every relic display name AND the missing-cell
+    // source line, so it changes what BOTH captures show: the Overview recent
+    // chips and the page grid's cells, tooltips, and labels. Without it in the
+    // when lists a source-line or display-name change ships with no screenshot.
+    const plan = classifyDiff(['src/ui/reliquary_labels.ts']);
+    expect(plan.isVisual).toBe(true);
+    const keys = plan.specific.map((t: { key: string }) => t.key);
+    expect(keys).toContain('reliquary-window');
+    expect(keys).toContain('reliquary-page');
+    for (const key of ['reliquary-window', 'reliquary-page']) {
+      const target = plan.specific.find((candidate: { key: string }) => candidate.key === key);
+      expect(target?.variants, key).toEqual([{ key: 'desktop' }, { key: 'mobile', mobile: true }]);
+    }
+  });
+
   it('maps a deed catalog copy change to the Book of Deeds target (#2767)', () => {
     const plan = classifyDiff(['src/sim/content/deeds.ts']);
     expect(plan.isVisual).toBe(true);

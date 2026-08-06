@@ -6,11 +6,23 @@
 // Phase 5: page grids (owned art vs silhouette), unlock/Illumination plan, and
 // grid-relevant refresh signature dimensions. Phase 6: Curator rank names,
 // seal chrome, and rank-up celebration plan.
+//
+// Phase 13: the nearly-complete predicate (either arm, both inclusive), the
+// source-line ARM choice (reliquarySourceLinePlan, ids only), and the search /
+// ownership filter. The i18n-free contract in the first line still holds and is
+// load-bearing: this core decides WHICH source arm and WHICH cells survive a
+// filter, while every localized string stays one layer out. Filtering therefore
+// matches on display text the painter injects (pageSearchText / relicSearchText,
+// the deeds_view searchText idiom), never on the raw catalog English the models
+// carry, so a player searches the names their own client shows them.
 
-import type {
-  ReliquaryPageDef,
-  ReliquaryRelicDef,
-  ReliquaryShelfId,
+import {
+  type ReliquaryClearSource,
+  type ReliquaryPageDef,
+  type ReliquaryRelicDef,
+  type ReliquaryShelfId,
+  type ReliquarySourceHint,
+  reliquaryRelicSource,
 } from '../sim/content/reliquary';
 import {
   catalogRankOwned,
@@ -55,6 +67,75 @@ export function reliquaryMarkFindKey(markId: string): string {
 /** How incomplete a page must be (and how full) to appear in nearly-complete. */
 export const RELIQUARY_NEARLY_MIN_OWNED = 1;
 export const RELIQUARY_NEARLY_MAX = 5;
+/**
+ * "Nearly complete" qualifies on EITHER arm, both boundaries INCLUSIVE: a page
+ * within RELIQUARY_NEARLY_MAX_REMAINING relics of Illumination, or one already
+ * at least RELIQUARY_NEARLY_MIN_FRACTION full. One relic into a thirty-slot
+ * raid shelf is a chase, not a nearly-done page, and the owned >= 1 floor alone
+ * used to promote it over a genuinely close page whenever the close one was
+ * larger.
+ */
+export const RELIQUARY_NEARLY_MAX_REMAINING = 3;
+export const RELIQUARY_NEARLY_MIN_FRACTION = 0.6;
+
+/**
+ * Catalog relic kinds plus the recent-ring 'unknown', the kind an id-only wire
+ * find carries before the catalog places it. Declared HERE rather than in
+ * reliquary_labels.ts so the search-text callback below can name it without the
+ * core importing the localizer (labels imports this module, never the reverse).
+ */
+export type ReliquaryRelicNameKind = ReliquaryRelicDef['kind'] | 'unknown';
+
+/** Grid ownership filter (the DeedsFilter shape scoped to relic cells). */
+export const RELIQUARY_OWNED_FILTERS = ['all', 'owned', 'missing'] as const;
+export type ReliquaryOwnedFilter = (typeof RELIQUARY_OWNED_FILTERS)[number];
+
+/** True when a string is a known grid ownership filter (click-handler guard). */
+export function isReliquaryOwnedFilter(value: string): value is ReliquaryOwnedFilter {
+  return (RELIQUARY_OWNED_FILTERS as readonly string[]).includes(value);
+}
+
+/**
+ * Where a relic comes from, resolved to ids only: the pure half of the source
+ * line. The localized half (mob/dungeon/zone/npc/deed/craft names plus the
+ * sentence key) lives in reliquary_labels.ts, so this core stays i18n-free and
+ * a Vitest can assert WHICH arm a hint selects without a language loaded.
+ */
+export type ReliquarySourceLinePlan =
+  | { kind: 'bossDungeon'; bossId: string; dungeonId: string }
+  | { kind: 'boss'; bossId: string }
+  | { kind: 'zone'; zoneId: string }
+  | { kind: 'profession'; professionId: string }
+  | { kind: 'deed'; deedId: string }
+  | { kind: 'vendor'; npcId: string };
+
+/**
+ * Pick the source-line arm for one relic hint. A boss hint on a page whose
+ * clear meter reads a dungeon names both ("in {dungeon}"); a boss on a raid or
+ * world-boss page (delve / deed_stat / none / no clear source) names the boss
+ * alone rather than inventing a place. No hint means no line at all: an
+ * un-authored source renders nothing, never a guess.
+ */
+export function reliquarySourceLinePlan(
+  hint: ReliquarySourceHint | undefined,
+  clearSource: ReliquaryClearSource | undefined,
+): ReliquarySourceLinePlan | null {
+  if (hint === undefined) return null;
+  switch (hint.sourceKind) {
+    case 'boss':
+      return clearSource?.kind === 'dungeon'
+        ? { kind: 'bossDungeon', bossId: hint.sourceId, dungeonId: clearSource.dungeonId }
+        : { kind: 'boss', bossId: hint.sourceId };
+    case 'zone':
+      return { kind: 'zone', zoneId: hint.sourceId };
+    case 'profession':
+      return { kind: 'profession', professionId: hint.sourceId };
+    case 'deed':
+      return { kind: 'deed', deedId: hint.sourceId };
+    case 'vendor':
+      return { kind: 'vendor', npcId: hint.sourceId };
+  }
+}
 
 /** Sparse first-find meta (mirrors IWorld.reliquaryFirstFind). */
 export type ReliquaryFirstFindLookup = Readonly<
@@ -91,6 +172,26 @@ export interface ReliquaryViewInput {
   weaponSkins?: { has(id: string): boolean };
   /** Title ownership via deeds earned (deeds with title rewards only). */
   deedsEarned?: { has(id: string): boolean };
+  /**
+   * Lowercased search needle; '' (or absent) means no search. Matching runs
+   * against the LOCALIZED display text the painter injects below, never the
+   * raw catalog English on the models: a player searching in their own
+   * language must hit the names they can actually read.
+   */
+  search?: string;
+  /** Grid ownership filter. Absent behaves as 'all'. */
+  ownedFilter?: ReliquaryOwnedFilter;
+  /**
+   * Localized, pre-lowercased searchable text for a page (the deeds_view
+   * `searchText(id)` idiom). Page lists filter when either resolver is
+   * injected (rows also survive on a contained relic's name); with neither
+   * injected they stay whole.
+   */
+  pageSearchText?: (pageId: string) => string;
+  /** Localized, pre-casefolded searchable text for one relic slot. Takes the
+   *  wire-shaped 'unknown' too, so the recent strip filters on exactly the kind
+   *  it renders with rather than coercing first. */
+  relicSearchText?: (kind: ReliquaryRelicNameKind, id: string) => string;
 }
 
 export interface ReliquaryProgressModel {
@@ -149,11 +250,20 @@ export interface ReliquaryGridCellModel {
    * firstFind meta. Undefined for retro ownership, non-item relics, or missing.
    */
   firstFindClears?: number;
+  /**
+   * Where this relic comes from, ids only (reliquarySourceLinePlan). Undefined
+   * when the catalog authors no hint for the slot and none for the page.
+   */
+  sourcePlan?: ReliquarySourceLinePlan;
 }
 
 /** Full page view: header progress plus ordered grid cells. */
 export interface ReliquaryPageDetailModel extends ReliquaryShelfPageModel {
+  /** Grid cells AFTER search / ownership filtering. owned and total above stay
+   *  the page's true completion, so the header meter never lies under a filter. */
   cells: ReliquaryGridCellModel[];
+  /** True when a search or ownership filter narrowed the grid this paint. */
+  filtered: boolean;
   /** Alias of complete for Illumination chrome (first-time celebration is event-driven). */
   illuminated: boolean;
   /**
@@ -254,6 +364,15 @@ export function buildReliquaryPageCells(
       owned,
       index: i,
     };
+    // Slot hint first, then the page default, through the ONE implementation of
+    // that precedence (reliquaryRelicSource). It takes the INJECTED page def,
+    // never a catalog lookup by id, so a synthetic test page resolves its own
+    // sourceDefault instead of a live RELIQUARY_PAGES row that shares its id.
+    const plan = reliquarySourceLinePlan(
+      reliquaryRelicSource(page, relic) ?? undefined,
+      page.clearSource,
+    );
+    if (plan !== null) cell.sourcePlan = plan;
     if (owned && relic.kind === 'item') {
       const clears = opts.firstFind?.[id]?.clears;
       if (clears !== undefined) cell.firstFindClears = clears;
@@ -279,6 +398,9 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     curatorSealId: curatorSealIdForRank(curatorRank),
   };
 
+  const search = input.search ?? '';
+  const ownedFilter = input.ownedFilter ?? 'all';
+
   const recent: ReliquaryRecentFindModel[] = [];
   // Newest-first for the strip (facet is oldest-first).
   for (let i = input.recent.length - 1; i >= 0; i--) {
@@ -287,10 +409,31 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     let kind: ReliquaryRecentFindModel['kind'] = 'unknown';
     if (input.marks.has(id)) kind = 'mark';
     else if (input.itemsDiscovered.has(id) || isCatalogItemId(input.pages, id)) kind = 'item';
+    // The Overview strips narrow with the search too: a search field that is
+    // visible on a shelf but inert on Overview is the same broken promise as a
+    // pointer cursor on something that does not click.
+    if (search !== '' && input.relicSearchText !== undefined) {
+      // The real kind, the same one the chip renders with: coercing 'unknown'
+      // to 'item' here would silently disagree with the label if those two
+      // resolver arms ever stop being identical.
+      if (!input.relicSearchText(kind, id).includes(search)) continue;
+    }
     recent.push({ id, kind });
   }
 
-  const nearly = buildNearlyComplete(input.pages, opts);
+  // Page rows (nearly strip and shelf list alike) survive on their own text OR
+  // on any relic inside them, so the field's "Search relics" promise holds on
+  // every surface that lists pages. With NEITHER resolver injected there is no
+  // localized text to match against, so the lists stay whole rather than
+  // filtering everything away.
+  const canMatchPages = input.pageSearchText !== undefined || input.relicSearchText !== undefined;
+  const pageMatches = (pageId: string): boolean =>
+    (input.pageSearchText?.(pageId) ?? '').includes(search) ||
+    pageHasRelicMatch(input, pageId, search);
+
+  const allNearly = buildNearlyComplete(input.pages, opts);
+  const nearly =
+    search === '' || !canMatchPages ? allNearly : allNearly.filter((n) => pageMatches(n.pageId));
 
   const shelfTotals = new Map<ReliquaryShelfId, { owned: number; total: number }>();
   for (const shelf of ['conquerors', 'professions', 'horizons'] as const) {
@@ -310,18 +453,28 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     return { id, owned: t.owned, total: t.total };
   });
 
-  const shelfPages: ReliquaryShelfPageModel[] = [];
+  // Every page on the shelf, before the search narrows the visible list: the
+  // open page must still resolve its header and grid while a search that
+  // excludes its name is active.
+  const allShelfPages: ReliquaryShelfPageModel[] = [];
   if (input.nav !== 'overview') {
     for (const page of input.pages) {
       if (!pageIsShelf(page, input.nav)) continue;
-      shelfPages.push(shelfPageModel(page, opts, input.clearCount));
+      allShelfPages.push(shelfPageModel(page, opts, input.clearCount));
     }
   }
+  // Typing a relic name from the shelf shows you which page holds it instead
+  // of an empty list (see pageMatches above). Cold path (one keystroke, not
+  // per frame).
+  const shelfPages =
+    search === '' || !canMatchPages
+      ? allShelfPages
+      : allShelfPages.filter((p) => pageMatches(p.pageId));
 
   let activePage: ReliquaryShelfPageModel | null = null;
   let pageDetail: ReliquaryPageDetailModel | null = null;
   if (input.pageId !== null) {
-    activePage = shelfPages.find((p) => p.pageId === input.pageId) ?? null;
+    activePage = allShelfPages.find((p) => p.pageId === input.pageId) ?? null;
     if (activePage === null) {
       // Page selected but not on this shelf (or unknown): resolve from full catalog.
       const page = input.pages.find((p) => p.id === input.pageId);
@@ -335,9 +488,17 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
           ...opts,
           firstFind: input.firstFind,
         });
+        const visible = cells.filter(
+          (cell) =>
+            (ownedFilter === 'all' || (ownedFilter === 'owned' ? cell.owned : !cell.owned)) &&
+            (search === '' ||
+              input.relicSearchText === undefined ||
+              input.relicSearchText(cell.kind, cell.id).includes(search)),
+        );
         pageDetail = {
           ...header,
-          cells,
+          cells: visible,
+          filtered: visible.length !== cells.length,
           illuminated: header.complete,
           // Weapon skins are account cosmetics; label the scope in the cold UI.
           accountScoped: page.relics.some((r) => r.kind === 'weapon_skin'),
@@ -357,6 +518,19 @@ export function buildReliquaryView(input: ReliquaryViewInput): ReliquaryViewMode
     activePage,
     pageDetail,
   };
+}
+
+/** True when any relic slot on `pageId` matches the needle by its localized
+ *  display name. Short-circuits on the first hit. */
+function pageHasRelicMatch(input: ReliquaryViewInput, pageId: string, search: string): boolean {
+  const resolve = input.relicSearchText;
+  if (resolve === undefined) return false;
+  const page = input.pages.find((p) => p.id === pageId);
+  if (page === undefined) return false;
+  for (const relic of page.relics) {
+    if (resolve(relic.kind, relicSlotId(relic)).includes(search)) return true;
+  }
+  return false;
 }
 
 function isCatalogItemId(pages: readonly ReliquaryPageDef[], id: string): boolean {
@@ -383,6 +557,11 @@ function buildNearlyComplete(
     const c = pageCompletion(page, opts);
     if (c.total <= 0 || c.complete) continue;
     if (c.owned < RELIQUARY_NEARLY_MIN_OWNED) continue;
+    const remaining = c.total - c.owned;
+    const fraction = c.owned / c.total;
+    if (remaining > RELIQUARY_NEARLY_MAX_REMAINING && fraction < RELIQUARY_NEARLY_MIN_FRACTION) {
+      continue;
+    }
     candidates.push({
       pageId: page.id,
       name: page.name,
@@ -545,6 +724,10 @@ export interface ReliquaryRefreshSigParts {
    * fill (discovered size + firstFind key count + active page owned).
    */
   ownershipDigest?: number;
+  /** Live search needle, so a keystroke repaints the narrowed list. */
+  search?: string;
+  /** Live grid ownership filter, so a chip click repaints the grid. */
+  ownedFilter?: ReliquaryOwnedFilter;
 }
 
 /** Compact repaint signature. Equal parts elide the rebuild. */
@@ -559,6 +742,8 @@ export function reliquaryRefreshSig(parts: ReliquaryRefreshSigParts): string {
     parts.pageId,
     parts.clearsDigest ?? 0,
     parts.ownershipDigest ?? 0,
+    parts.search ?? '',
+    parts.ownedFilter ?? 'all',
   ]);
 }
 

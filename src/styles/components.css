@@ -7810,8 +7810,18 @@
      deliberate literals shared with the char-window showcase family. */
   /* ---------- reliquary ---------- */
   /* The Reliquary: cold collection browser (summary strip, shelf rail,
-     Overview recent/nearly, shelf page stubs). Progress bars are build-time
-     writes; no per-frame rebuild. Tokens only (no raw hex for focus rings). */
+     Overview recent/nearly, shelf page rows, page grids, search + filter).
+     Progress bars are build-time writes; no per-frame rebuild. Semantic colours
+     come from tokens (--gold, --color-border-showcase, --color-border-focus);
+     the focus ring is always token-drawn and never transitioned off.
+     Surface fills are plain literals shared with the Book of Deeds section
+     (its .deed-bar / chip / .deeds-cat treatments), NOT var(--x, literal)
+     pseudo-tokens: --color-surface-inset, --color-surface-hover,
+     --color-border-active, and --color-surface-active-top were never defined
+     anywhere, so the fallback always painted, and the "inset" name carried two
+     different values in this one section. Recorded debt: these interaction
+     surfaces want real per-preset values out of themeCssVars (src/ui/theme.ts),
+     not new static tokens, so they stay literals until that family lands. */
   #reliquary-window {
     width: 720px;
     max-height: calc(var(--app-vh, 100vh) * 0.82 / var(--window-scale) - 24px);
@@ -7826,6 +7836,28 @@
   #reliquary-window .panel-title > span {
     flex: 1 1 auto;
     min-width: 0;
+  }
+  /* 16px is an iOS floor, not a taste call: a smaller font-size makes Safari
+     zoom the whole window on focus (the .deed-search contract). */
+  .reliquary-search {
+    flex: 0 1 190px;
+    min-width: 100px;
+    font-family: var(--ui-font);
+    font-size: 16px;
+    padding: 3px 7px;
+    border-radius: 4px;
+    border: 1px solid #5a4a2e;
+    background: #14110b;
+    color: inherit;
+  }
+  .reliquary-search:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  /* The 16px font-size above is the iOS anti-zoom floor, not a touch target.
+     The .bag-search precedent settles the height in-family. */
+  body.mobile-touch .reliquary-search {
+    min-height: 40px;
   }
   .reliquary-summary {
     flex: none;
@@ -7845,6 +7877,14 @@
     align-items: center;
     gap: 6px;
   }
+  /* The owned/total pair is a readout under the window title, not a second
+     title: demote it below the summary's own size and off the gold. */
+  .reliquary-count {
+    font-family: var(--ui-font);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--color-text-muted);
+  }
   /* Phase 6: Curator rank seal chrome (cosmetic only; no combat info). */
   .reliquary-rank-seal {
     display: none;
@@ -7852,8 +7892,8 @@
     height: 12px;
     border-radius: 50%;
     border: 1px solid var(--color-border-showcase);
-    background: var(--color-surface-inset, #14110b);
-    box-shadow: inset 0 0 0 2px var(--color-surface-hover, #1c1812);
+    background: #14110b;
+    box-shadow: inset 0 0 0 2px #1c1812;
     flex: none;
   }
   .reliquary-summary.has-seal .reliquary-rank-seal {
@@ -7861,7 +7901,7 @@
   }
   .reliquary-summary[data-seal="apprentice"] .reliquary-rank-seal {
     border-color: var(--gold-dim);
-    background: linear-gradient(to bottom, var(--gold-dim), var(--color-surface-inset, #14110b));
+    background: linear-gradient(to bottom, var(--gold-dim), #14110b);
   }
   .reliquary-summary[data-seal="keeper"] .reliquary-rank-seal {
     border-color: var(--gold);
@@ -7904,7 +7944,7 @@
     height: 8px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 4px;
-    background: var(--color-surface-inset, #14110b);
+    background: #14110b;
     overflow: hidden;
     vertical-align: middle;
   }
@@ -7944,16 +7984,12 @@
   }
   .reliquary-nav:hover {
     color: var(--gold);
-    background: var(--color-surface-hover, #1c1812);
+    background: #1c1812;
   }
   .reliquary-nav.active {
     color: var(--gold);
-    border-color: var(--color-border-active, #6a5320);
-    background: linear-gradient(
-      to bottom,
-      var(--color-surface-active-top, #2a220f),
-      var(--color-surface-hover, #1c1812)
-    );
+    border-color: #6a5320;
+    background: linear-gradient(to bottom, #2a220f, #1c1812);
   }
   .reliquary-nav:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -7994,10 +8030,20 @@
   .reliquary-recent-item {
     display: inline-flex;
     align-items: center;
+    max-width: 100%;
     padding: 3px 8px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 8px;
-    background: var(--color-surface-inset, #171309);
+    background: #171309;
+  }
+  /* A long relic name would otherwise push its chip past the strip on a narrow
+     window. Truncation is why the chip carries the shared HUD tooltip (wire()):
+     the full name stays recoverable, without a native title attribute. */
+  .reliquary-recent-name {
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .reliquary-nearly-row,
   .reliquary-page-row,
@@ -8011,7 +8057,7 @@
     padding: 6px 10px;
     border-radius: 6px;
     border: 1px solid var(--color-border-showcase);
-    background: var(--color-surface-inset, #171309);
+    background: #171309;
     color: var(--gold-dim);
     cursor: var(--cursor-point);
     min-height: 32px;
@@ -8044,18 +8090,86 @@
     color: var(--gold);
     letter-spacing: 0.04em;
   }
+  /* A real ul/li list (the .prof-list structure). role="list" is kept on the
+     element as well: Safari VoiceOver drops list semantics once list-style is
+     none, which is exactly what this rule sets. */
   .reliquary-page-list {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .reliquary-page-item {
+    display: flex;
   }
   .reliquary-page-row {
     width: 100%;
     justify-content: space-between;
   }
+  .reliquary-page-main {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
   .reliquary-page-name {
     color: var(--gold);
     font-family: var(--title-font);
+  }
+  /* Second line: the authored page blurb. The shared row-subtitle truncation
+     idiom (.soc-sub / .mail-row-sender), so a long blurb ellipsizes inside its
+     min-width: 0 column instead of stretching the row. No title attribute. */
+  .reliquary-page-sub {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .reliquary-page-desc {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+  /* flex: none matches the .deeds-filterbar twin: inside the page-detail flex
+     column the chip row would otherwise shrink under pressure. */
+  .reliquary-filterbar {
+    flex: none;
+    display: flex;
+    gap: 6px;
+    padding-top: 6px;
+    flex-wrap: wrap;
+  }
+  .reliquary-filter-chip {
+    font-family: var(--ui-font);
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    border: 1px solid #56472a;
+    background: #1d1810;
+    color: #d8c489;
+    cursor: var(--cursor-point);
+    min-height: 24px;
+  }
+  .reliquary-filter-chip:hover {
+    color: var(--gold);
+  }
+  .reliquary-filter-chip.active {
+    border-color: #b8902a;
+    color: #ffe27a;
+    background: #2a210c;
+  }
+  .reliquary-filter-chip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 1px;
+  }
+  body.mobile-touch .reliquary-filter-chip {
+    min-width: 40px;
+    min-height: 40px;
   }
   .reliquary-page-meta {
     display: inline-flex;
@@ -8122,9 +8236,15 @@
     min-height: 48px;
     border: 1px solid var(--color-border-showcase);
     border-radius: 6px;
-    background: var(--color-surface-inset, #171309);
-    cursor: var(--cursor-point);
+    background: #171309;
     outline: none;
+  }
+  /* No cursor: var(--cursor-point) here. A cell has no click handler; the
+     pointer affordance promised an action that does not exist. Hover still
+     reads (it opens the relic tooltip), so it gets an honest keyline instead,
+     matching the row family's hover treatment. No transform on hover/focus. */
+  .reliquary-cell:hover {
+    border-color: var(--gold-dim);
   }
   .reliquary-cell:focus-visible {
     outline: 2px solid var(--color-border-focus);
@@ -8144,7 +8264,7 @@
     object-fit: contain;
   }
   .reliquary-cell--owned {
-    box-shadow: inset 0 0 0 1px var(--color-border-active, #6a5320);
+    box-shadow: inset 0 0 0 1px #6a5320;
   }
   .reliquary-cell--missing {
     opacity: 0.72;
