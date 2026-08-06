@@ -371,7 +371,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     player.pos.x = fury.pos.x;
     player.pos.z = fury.pos.z;
     meta.inventory.length = 0;
-    meta.honor = 1_000;
+    meta.honor = 1_400;
     meta.lifetimeHonor = 2_000;
 
     items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
@@ -391,7 +391,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     player.pos.x = fury.pos.x;
     player.pos.z = fury.pos.z;
     meta.inventory.length = 0;
-    meta.honor = 1_600;
+    meta.honor = 2_400;
 
     items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
     items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid);
@@ -535,7 +535,7 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
     items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid, { bulk: true });
 
     expect(sim.countItem('final_argument_greatblade', pid)).toBe(1);
-    expect(meta.honor).toBe(10_000 - 800);
+    expect(meta.honor).toBe(10_000 - 1_200);
   });
 
   it('buyItem bulk purchase force-1s a soulbound copper-priced stackable, matching the count path (Q23)', () => {
@@ -846,9 +846,9 @@ describe('items vendor: buy / sell / sellAllJunk / buyBack', () => {
 
     items.buyItem(ctxOf(sim), fury.id, 'final_argument_greatblade', pid, { count: 5 });
 
-    // One purchase, one per-purchase honor debit: never 5 x 800.
+    // One purchase, one per-purchase honor debit: never 5 x 1,200.
     expect(sim.countItem('final_argument_greatblade', pid)).toBe(1);
-    expect(meta.honor).toBe(10_000 - 800);
+    expect(meta.honor).toBe(10_000 - 1_200);
   });
 
   it('buyItem count on a dual-price row is forced to one purchase charging both currencies once', () => {

@@ -1509,6 +1509,17 @@ export const zh_CN: EnTranslations = {
         "firstWin": "首胜"
       }
     },
+    "warfareShop": {
+      "jewelry": "饰品",
+      "weapons": "武器",
+      "owned": "已拥有",
+      "ownedCount": "已拥有 {total} 件中的 {owned} 件。",
+      "nextBonus": "再获得 {remaining} 件即可激活 {pieces} 件套奖励。",
+      "setComplete": "你已拥有全部部件。",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
+      "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。"
+    },
     "charSheet": {
       "offense": "攻击",
       "defense": "防御"
@@ -11902,6 +11913,11 @@ export const zh_CN: EnTranslations = {
         "title": "荣誉军需官",
         "greeting": "战场黄沙铭记每一场胜利。愿你妥善运用这份荣誉。"
       },
+      "warmarshal_draven_kole": {
+        "name": "战帅德拉文·科尔",
+        "title": "战争军备库总管",
+        "greeting": "我只收荣誉这一种货币，战争军备库由我看守。在战场上挣得你的军阶，我便为你披上迎接下一战的甲胄。"
+      },
       "loremaster_caddis": {
         "name": "凯迪斯博学者",
         "title": "博学者",
@@ -15033,6 +15049,30 @@ export const zh_CN: EnTranslations = {
       "vale_arcanist": {
         "name": "谷地秘法师法衣",
         "bonus3": "攻击速度和施法速度提高 15%。"
+      },
+      "warfare_ashstalker": {
+        "name": "灰烬追猎者装备",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“灰烬疾行”，使移动速度提高 40%，持续 6 秒。"
+      },
+      "warfare_cinderweave": {
+        "name": "烬织法衣",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+      },
+      "warfare_furyforged": {
+        "name": "怒铸战装",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。击杀敌对玩家会触发“不破誓约”，吸收 200 点伤害，持续 10 秒。"
+      },
+      "warfare_stormbound": {
+        "name": "缚雷法衣",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

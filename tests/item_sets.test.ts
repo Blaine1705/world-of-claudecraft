@@ -142,8 +142,15 @@ describe('aggregateSetBonuses (pure resolver)', () => {
       const pieces = set.bonuses.map((b) => b.pieces);
       // every epic (raid/dungeon) family carries 2-, 3-, and 4-piece tiers (the
       // 4-piece is a proc); the leveling haste kits deliberately carry the
-      // single 3-piece tier.
-      const expected = pieces.length === 1 ? '3' : '2,3,4';
+      // single 3-piece tier. The four WARFARE families are 2/4/7: seven because
+      // at six the seventh armor slot had one right answer (abandon the chest,
+      // the priciest piece with the best PvE replacement) and measured strictly
+      // better than the intended build. See docs/warfare-refactor/00-analysis.md.
+      const expected = set.id.startsWith('warfare_')
+        ? '2,4,7'
+        : pieces.length === 1
+          ? '3'
+          : '2,3,4';
       expect([pieces.join(','), set.id]).toEqual([expected, set.id]);
     }
   });

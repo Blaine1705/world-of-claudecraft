@@ -15,6 +15,11 @@ export interface GossipMenuContent {
   hasVendor: boolean;
   hasMarket: boolean;
   hasHeroicVendor: boolean;
+  /** The WARFARE quartermaster's sectioned honor shop (#warfare-window). It
+   *  REPLACES the generic goods row rather than sitting beside it, so without
+   *  its own field here the menu would read as empty for that NPC and close
+   *  itself the moment the player opened it. */
+  hasWarfareVendor: boolean;
   hasDelveBoard: boolean;
   hasVcup: boolean;
   hasCardMaster: boolean;
@@ -28,6 +33,7 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasVendor &&
     !content.hasMarket &&
     !content.hasHeroicVendor &&
+    !content.hasWarfareVendor &&
     !content.hasDelveBoard &&
     !content.hasVcup &&
     !content.hasCardMaster &&

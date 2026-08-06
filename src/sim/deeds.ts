@@ -637,6 +637,11 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   arenaRankedWins: [],
   bgWins: [],
   bgCaptures: [],
+  // Honor is mutated only through grantHonor, at award sites that already
+  // request a FULL deed pass, so no narrow mark ever names it: the meter reads
+  // PlayerMeta.lifetimeHonor, never a deedStats ledger, which is exactly the
+  // condition the guard test instruments for.
+  lifetimeHonor: [],
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
@@ -744,6 +749,9 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   arenaRankedWins: (m) => m.arenaWins + m.arena2v2Wins,
   bgWins: (m) => m.bgWins,
   bgCaptures: (m) => m.bgCaptures,
+  // LIFETIME honor, never the spendable balance: a rank once earned survives
+  // every purchase at the WARFARE quartermaster.
+  lifetimeHonor: (m) => m.lifetimeHonor,
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,

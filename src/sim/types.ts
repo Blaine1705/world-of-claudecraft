@@ -2689,6 +2689,13 @@ export interface NpcDef {
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;
+  // A WARFARE quartermaster: talking to this NPC opens the set-divided honor
+  // shop instead of the flat vendor grid. A FLAG rather than a hard-keyed NPC id
+  // deliberately, so a second placement needs no constant widened: the Heroic
+  // Quartermaster is keyed to one id and that is the mistake not repeated here.
+  // Purchasing itself stays emergent from the stock carrying priceHonor, so an
+  // unflagged honor vendor still sells its stock through the ordinary grid.
+  warfareVendor?: boolean;
   // The Card Master: talking to this NPC joins/leaves the Card Duel minigame
   // queue (src/sim/social/card_duel.ts) instead of any vendor/bank flow.
   cardMaster?: boolean;
@@ -5680,7 +5687,13 @@ export const EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS = Object.freeze({
 } as const);
 export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
-// and the reserved 1_000_000_000/1_000_000_001 singleton NPC ids.
+// and the reserved 1_000_000_000/1_000_000_001/1_000_000_002 singleton NPC ids
+// (the Vale Cup groundskeeper, FURY in Eastbrook, and Warmarshal Draven Kole in
+// Highwatch). A singleton NPC takes a reserved id AND `dynamic: true` so the
+// generic world-init loop skips it: that loop allocates ids by iterating the
+// merged NPC table in insertion order, so a plain insertion would shift the id
+// of every NPC, camp mob and object created after it, which the parity goldens
+// pin per frame.
 export const STATIC_WORLD_SERVICE_ENTITY_ID_MIN = 2_000_000_001;
 
 /** The one static, interactable noticeboard contract supported by every host. */
@@ -6159,7 +6172,10 @@ export type DeedMeterId =
   | 'delveLoreCount'
   | 'companionRankBest'
   | 'itemsDiscoveredCount'
-  | 'poorItemsDiscoveredCount';
+  | 'poorItemsDiscoveredCount'
+  // Career Honor earned, never spent: PlayerMeta.lifetimeHonor is monotonic, so
+  // spending at the WARFARE quartermaster can never cost a rank title.
+  | 'lifetimeHonor';
 
 // Boolean predicates over already-persisted state (see the flag table in
 // deeds.ts). Like meters, they retro-grant on load.

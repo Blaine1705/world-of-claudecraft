@@ -37,3 +37,8 @@ export {
   pvpDamageMultiplier,
   pvpFractionsFromRatings,
 } from './power';
+export {
+  spawnWarfareQuartermaster,
+  WARFARE_QUARTERMASTER_ENTITY_ID,
+  WARFARE_QUARTERMASTER_NPC_ID,
+} from './warfare_quartermaster';

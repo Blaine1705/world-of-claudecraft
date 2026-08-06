@@ -9,6 +9,12 @@
 // weapon-crit-triggered for the plate and leather archetypes, spell-cast-
 // triggered for the caster archetypes, resolved by combat/set_procs.ts.
 //
+// The four WARFARE honor families FURY sells (content/pvp_honor.ts) are the one
+// exception to every sentence around this one: they break at 2, 4 and 7 pieces
+// rather than 2, 3 and 4, and they are paid entirely in WARFARE rating and
+// PvP-gated effects rather than in stats, so they contribute exactly zero in
+// PvE. See the WARFARE block below and docs/design/warfare.md.
+//
 // Bonuses are keyed by archetype: the plate (Strength) families get attack
 // power then Strength/Stamina; the leather (Agility) families get attack power
 // then Agility/crit; the cloth (caster) families get full spell-pushback
@@ -34,6 +40,37 @@ export const SET_CRIT_3PC_RATING = 20; // -> +1% crit at 20 rating = 1%
 // the set is worth chasing for Heroic (+3 above-level), where the bleed alone was not.
 export const SET_HIT_4PC_RATING = 60; // -> +6% hit at 10 rating = 1%
 
+// The WARFARE honor sets (content/pvp_honor.ts). Every tier is paid in WARFARE
+// rating or in a PvP-gated effect and never in flat stats, which is what makes
+// "honor gear is never better than raid gear in a raid" structural rather than a
+// tuning argument: the whole set contributes exactly zero in PvE.
+// Breakpoints are 2, 4 and 7 of the seven armor pieces. Seven, not six: with the
+// capstone at six the seventh armor slot had one right answer, which was to
+// abandon the chest (the most expensive piece with the best PvE replacement) and
+// the cheaper hybrid build beat the full kit outright. See
+// docs/warfare-refactor/00-analysis.md, "Where the rating lives".
+export const WARFARE_SET_2PC_DEFENSE_RATING = 40;
+export const WARFARE_SET_4PC_OFFENSE_RATING = 40;
+// 0..1 fraction removed from the duration of crowd control cast on the wearer by
+// a hostile PLAYER. Max-combines rather than summing (see the resolver).
+export const WARFARE_SET_4PC_CC_REDUCTION = 0.15;
+// The capstone grants this to BOTH sides. A complete 11-slot kit carries 182 of
+// each rating on its own; 182 + 40 + 80 = 302, which clamps to the 0.30 cap with
+// two points of rounding slack.
+export const WARFARE_SET_7PC_RATING = 80;
+// Signature magnitudes. The two absorb wards sit near a level-20 rank-3 mage
+// barrier so a capstone signature is a real but not decisive swing.
+export const WARFARE_KILL_ABSORB = 200;
+export const WARFARE_KILL_ABSORB_DURATION = 10;
+// buff_speed carries a 1+fraction multiplier (1.4 = +40% movement speed). Tuned
+// for Thornhollow Fields, which is a capture-the-flag mode.
+export const WARFARE_KILL_SPEED_MULT = 1.4;
+export const WARFARE_KILL_SPEED_DURATION = 6;
+export const WARFARE_CAST_ABSORB = 120;
+export const WARFARE_CAST_ABSORB_DURATION = 8;
+export const WARFARE_CAST_ABSORB_CHANCE = 0.15;
+export const WARFARE_CAST_ABSORB_ICD = 20;
+
 // Set ids. Tier-1 families drop from the Gravewyrm Sanctum; tier-2 from the
 // Nythraxis raid. The string is also the `set` tag on each member item.
 export const SET_DEATHLORD = 'deathlord'; // t1 plate, Strength
@@ -48,6 +85,13 @@ export const SET_STORMCALLERS = 'stormcallers'; // t2 cloth (shaman), caster
 export const SET_VALE_ARCANIST = 'vale_arcanist'; // cloth, caster
 export const SET_BOUNDSTONE_VANGUARD = 'boundstone_vanguard'; // mail, melee
 export const SET_GREYJAW_STALKER = 'greyjaw_stalker'; // leather, marksman
+// WARFARE honor sets: the four armor families FURY sells (content/pvp_honor.ts),
+// seven armor pieces each. Neck, rings and weapons carry no set tag because they
+// are shared across role profiles.
+export const SET_WARFARE_FURYFORGED = 'warfare_furyforged'; // mail, Strength
+export const SET_WARFARE_STORMBOUND = 'warfare_stormbound'; // mail, caster
+export const SET_WARFARE_ASHSTALKER = 'warfare_ashstalker'; // leather, Agility
+export const SET_WARFARE_CINDERWEAVE = 'warfare_cinderweave'; // cloth, caster
 
 // Archetype bonus tiers. Tiers stack (a 3-piece set grants both the 2- and
 // 3-piece bonuses); cast pushback reduction and knockback resistance
@@ -231,6 +275,74 @@ const HASTE_KIT_BONUSES: SetBonusTier[] = [
   },
 ];
 
+// The three WARFARE capstone signatures. All are pvpOnly, so combat/set_procs.ts
+// refuses them (before the chance roll, so they draw no rng) outside hostile
+// player-versus-player combat and they are inert in PvE by construction.
+const WARFARE_UNBROKEN_OATH: SetProc = {
+  id: 'set_warfare_unbroken_oath',
+  name: 'Unbroken Oath',
+  trigger: 'kill',
+  chance: 1,
+  aura: 'absorb',
+  value: WARFARE_KILL_ABSORB,
+  duration: WARFARE_KILL_ABSORB_DURATION,
+  pvpOnly: true,
+};
+const WARFARE_ASHEN_STEP: SetProc = {
+  id: 'set_warfare_ashen_step',
+  name: 'Ashen Step',
+  trigger: 'kill',
+  chance: 1,
+  aura: 'buff_speed',
+  value: WARFARE_KILL_SPEED_MULT,
+  duration: WARFARE_KILL_SPEED_DURATION,
+  pvpOnly: true,
+};
+const WARFARE_EMBERWARD: SetProc = {
+  id: 'set_warfare_emberward',
+  name: 'Emberward',
+  trigger: 'spellCast',
+  chance: WARFARE_CAST_ABSORB_CHANCE,
+  aura: 'absorb',
+  value: WARFARE_CAST_ABSORB,
+  duration: WARFARE_CAST_ABSORB_DURATION,
+  icd: WARFARE_CAST_ABSORB_ICD,
+  pvpOnly: true,
+};
+
+// The 2- and 4-piece tiers are identical across all four families; only the
+// capstone signature differs. The 4-piece wording says crowd control "cast on
+// you by hostile players" rather than "from hostile players" on purpose: control
+// applied by a player's PET is entity kind 'mob' and takes the non-hostile-pair
+// early return in Sim.diminishedCrowdControlDuration, so it is not reduced and
+// the looser wording would be false.
+function warfareBonuses(signature: SetProc, capstoneText: string): SetBonusTier[] {
+  return [
+    {
+      pieces: 2,
+      effect: { pvpDefenseRating: WARFARE_SET_2PC_DEFENSE_RATING },
+      text: 'Increases WARFARE Defense Rating by 40.',
+    },
+    {
+      pieces: 4,
+      effect: {
+        pvpOffenseRating: WARFARE_SET_4PC_OFFENSE_RATING,
+        ccDurationReduction: WARFARE_SET_4PC_CC_REDUCTION,
+      },
+      text: 'Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.',
+    },
+    {
+      pieces: 7,
+      effect: {
+        pvpOffenseRating: WARFARE_SET_7PC_RATING,
+        pvpDefenseRating: WARFARE_SET_7PC_RATING,
+        proc: signature,
+      },
+      text: capstoneText,
+    },
+  ];
+}
+
 export const ITEM_SETS: Record<string, ItemSet> = {
   [SET_DEATHLORD]: {
     id: SET_DEATHLORD,
@@ -273,6 +385,38 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     id: SET_GREYJAW_STALKER,
     name: "Greyjaw Stalker's Kit",
     bonuses: HASTE_KIT_BONUSES,
+  },
+  [SET_WARFARE_FURYFORGED]: {
+    id: SET_WARFARE_FURYFORGED,
+    name: 'Furyforged Battlegear',
+    bonuses: warfareBonuses(
+      WARFARE_UNBROKEN_OATH,
+      'Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec.',
+    ),
+  },
+  [SET_WARFARE_STORMBOUND]: {
+    id: SET_WARFARE_STORMBOUND,
+    name: 'Stormbound Vestments',
+    bonuses: warfareBonuses(
+      WARFARE_EMBERWARD,
+      'Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
+    ),
+  },
+  [SET_WARFARE_ASHSTALKER]: {
+    id: SET_WARFARE_ASHSTALKER,
+    name: 'Ashstalker Kit',
+    bonuses: warfareBonuses(
+      WARFARE_ASHEN_STEP,
+      'Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec.',
+    ),
+  },
+  [SET_WARFARE_CINDERWEAVE]: {
+    id: SET_WARFARE_CINDERWEAVE,
+    name: 'Cinderweave Regalia',
+    bonuses: warfareBonuses(
+      WARFARE_EMBERWARD,
+      'Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
+    ),
   },
 };
 

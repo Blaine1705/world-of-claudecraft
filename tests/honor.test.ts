@@ -442,6 +442,7 @@ describe('WARFARE damage', () => {
     sim.duels.set(targetPid, sim.duels.get(sourcePid)!);
 
     (sim as any).dealDamage(source, target, 100, false, 'arcane', null, 'hit');
-    expect(target.hp).toBe(904);
+    // 100 x (1 + 0.30) x (1 - 0.30) = 91 at the raised WARFARE caps.
+    expect(target.hp).toBe(909);
   });
 });

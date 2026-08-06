@@ -95,6 +95,7 @@ function harness(
   const openChronicles = vi.fn();
   const openVendor = vi.fn();
   const openHeroicVendor = vi.fn();
+  const openWarfareVendor = vi.fn();
   const openMarket = vi.fn();
   const openDelveBoard = vi.fn();
   const openValeCup = vi.fn();
@@ -131,6 +132,7 @@ function harness(
     openChronicles,
     openVendor,
     openHeroicVendor,
+    openWarfareVendor,
     openMarket,
     openDelveBoard,
     openValeCup,
@@ -162,6 +164,7 @@ function harness(
     openChronicles,
     openVendor,
     openHeroicVendor,
+    openWarfareVendor,
     openMarket,
     openDelveBoard,
     openValeCup,

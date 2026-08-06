@@ -5902,6 +5902,61 @@
     padding-top: 6px;
   }
 
+  /* ---------- WARFARE quartermaster shop ---------- */
+  /* The honor shop (#warfare-window, warfare_vendor_window.ts) is the vendor
+     family one sectioning level down: it reuses .vendor-goods-grid, .vendor-item,
+     .vi-name/.vi-sub/.vi-price, .vendor-section-title and the .warfare-price /
+     .warfare-balance honor classes verbatim, so only what SECTIONING needs is
+     authored here. It is its own window rather than a second tenant of
+     #vendor-window because the layout is structurally different (six sections,
+     each with its own bonus preview) and wider than the goods grid.
+
+     Width follows the same shape #vendor-window uses, one step wider at the cap
+     because six sections of tiles need the columns; it carries no #bags
+     companion, so the bags left-edge algebra that binds the vendor window does
+     not apply and the cap is a plain viewport fraction. */
+  #warfare-window {
+    width: max(400px, min(900px, calc(0.62 * (var(--app-vw, 100vw) / var(--window-scale)))));
+    max-height: 78vh;
+    overflow-y: auto;
+  }
+  /* A tier line, lit when the bonus is LIVE (the pieces are worn) and dim
+     otherwise: the same information the item tooltip's .tt-set-bonus pair
+     carries, restated here because that rule is scoped to #tooltip. */
+  .warfare-set-bonus {
+    color: var(--color-text-muted);
+    font-size: 11px;
+    padding: 1px 5px;
+  }
+  .warfare-set-bonus.active {
+    color: var(--color-text-success);
+  }
+  /* The owned-count line: the piece progress plus what the NEXT unmet tier
+     still wants. The single most motivating element in the window, so it takes
+     the accent rather than the muted body color. */
+  .warfare-set-progress {
+    color: var(--color-accent);
+    font-family: var(--title-font);
+    font-size: 11.5px;
+    padding: 3px 5px 5px;
+  }
+  /* An unaffordable honor price tints like an unsatisfied cost everywhere else
+     in the language. Restated at the .warfare-price specificity because the
+     gold honor color would otherwise outrank the .vi-price.unaffordable rule
+     on the inner span. */
+  .vendor-item .vi-price .warfare-price.unaffordable {
+    color: var(--color-text-error);
+  }
+  /* A piece the viewer already wears or carries. The tile still sells (a second
+     copy is a legitimate purchase), so this is a marker beside the .vi-sub
+     "Owned" line, never a refusal. */
+  .vendor-item.warfare-owned {
+    border-left: 2px solid var(--gold);
+  }
+  .vendor-item.warfare-owned .vi-sub {
+    color: var(--gold);
+  }
+
   /* ---------- profession first-tier tutorial ---------- */
   /* The once-ever explainer modal (profession_tutorial_window.ts), reusing the
      confirm-dialog modal family (.window.panel shell, .cd-body/.cd-actions). A

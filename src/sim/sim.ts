@@ -2362,6 +2362,16 @@ export class Sim {
       }
     }
 
+    // Warmarshal Draven Kole in Highwatch: the same reserved-id, rng-free
+    // treatment as Bram and FURY above. See src/sim/pvp/warfare_quartermaster.ts.
+    {
+      const kole = worldContent.npcs[honorMod.WARFARE_QUARTERMASTER_NPC_ID];
+      if (kole) {
+        const safe = this.findSafePos(kole.pos.x, kole.pos.z, waterLevel() + 0.6);
+        honorMod.spawnWarfareQuartermaster(this.ctx, kole, safe);
+      }
+    }
+
     for (const delve of DELVE_LIST) {
       for (let i = 0; i < DELVE_SLOT_COUNT; i++) {
         const origin = delveOrigin(delve.index, i);

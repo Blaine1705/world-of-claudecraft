@@ -858,6 +858,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '처치',
   'hudChrome.warfare.floatReasons.assist': '도움',
   'hudChrome.warfare.floatReasons.firstWin': '첫 승리',
+  'hudChrome.warfareShop.jewelry': '장신구',
+  'hudChrome.warfareShop.weapons': '무기',
+  'hudChrome.warfareShop.owned': '보유 중',
+  'hudChrome.warfareShop.ownedCount': '{total}개 중 {owned}개를 보유 중입니다.',
+  'hudChrome.warfareShop.nextBonus': '{pieces}개 세트 효과까지 {remaining}개 남았습니다.',
+  'hudChrome.warfareShop.setComplete': '모든 부위를 보유하고 있습니다.',
+  'hudChrome.warfareShop.buyOwnedAria': '{honor}에 {item} 구매, 이미 보유 중',
+  'hudChrome.warfareShop.buyConfirmBody':
+    '{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다.',
   'hudChrome.keybinds.bgFlag': '전장 깃발 행동',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '쏜할로우 평원',
@@ -7453,6 +7462,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.vale_arcanist.name': '계곡 비전술사의 예복',
   'entities.itemSets.vale_arcanist.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
+  'entities.itemSets.warfare_ashstalker.name': '잿빛추적자의 장비',
+  'entities.itemSets.warfare_ashstalker.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 "잿빛 질주"가 발동하여 6초 동안 이동 속도가 40% 증가합니다.',
+  'entities.itemSets.warfare_cinderweave.name': '잿불직물 의복',
+  'entities.itemSets.warfare_cinderweave.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 "잿불 수호"가 발동하여 8초 동안 120의 피해를 흡수합니다.',
+  'entities.itemSets.warfare_furyforged.name': '분노벼림 전투장비',
+  'entities.itemSets.warfare_furyforged.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 "꺾이지 않는 맹세"가 발동하여 10초 동안 200의 피해를 흡수합니다.',
+  'entities.itemSets.warfare_stormbound.name': '폭풍결속 의복',
+  'entities.itemSets.warfare_stormbound.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 "잿불 수호"가 발동하여 8초 동안 120의 피해를 흡수합니다.',
   'entities.itemSets.wyrmshadow.name': '밤송곳니 의복',
   'entities.itemSets.wyrmshadow.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
@@ -9006,6 +9039,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.name': '퓨리',
   'entities.npcs.fury.title': '명예 병참장교',
   'entities.npcs.fury.greeting': '전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라.',
+  'entities.npcs.warmarshal_draven_kole.name': '전쟁원수 드레이븐 콜',
+  'entities.npcs.warmarshal_draven_kole.title': '워페어 보급창 관리관',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    '내가 받는 화폐는 명예뿐이며, 워페어 보급창은 내가 지킨다. 전장에서 계급을 얻어라. 다음 전투를 위해 갑주를 갖춰 주겠다.',
   'guide.economy.bankBody':
     '모든 거점 마을에는 이 땅의 은행 상회인 도금 금고의 지점이 있습니다. 그곳의 출납관에게 말을 걸면 자신의 금고가 열립니다. 가방과는 별개인 개인 보관 공간으로, 캐릭터가 평생 유지합니다. 맡겨 둔 물건은 다음에 어느 지점을 찾아가도 안전하게 기다리고 있습니다.',
   'guide.economy.bankHow':

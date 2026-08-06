@@ -860,6 +860,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': 'Убийство',
   'hudChrome.warfare.floatReasons.assist': 'Помощь',
   'hudChrome.warfare.floatReasons.firstWin': 'Первая победа',
+  'hudChrome.warfareShop.jewelry': 'Украшения',
+  'hudChrome.warfareShop.weapons': 'Оружие',
+  'hudChrome.warfareShop.owned': 'Получено',
+  'hudChrome.warfareShop.ownedCount': 'Получено предметов: {owned} из {total}.',
+  'hudChrome.warfareShop.nextBonus': 'Ещё {remaining} до бонуса за {pieces} предметов.',
+  'hudChrome.warfareShop.setComplete': 'У вас есть все предметы комплекта.',
+  'hudChrome.warfareShop.buyOwnedAria': 'Купить {item} за {honor}, уже получено',
+  'hudChrome.warfareShop.buyConfirmBody':
+    'Купить {item} за {honor}? Покупки за честь не подлежат возврату.',
   'hudChrome.keybinds.bgFlag': 'Действие с флагом',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': 'Терновая Лощина',
@@ -7570,6 +7579,30 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.vale_arcanist.name': 'Регалии арканиста Долины',
   'entities.itemSets.vale_arcanist.bonus3':
     'Скорость атаки и произнесения заклинаний повышается на 15%.',
+  'entities.itemSets.warfare_ashstalker.name': 'Снаряжение пепельного ловчего',
+  'entities.itemSets.warfare_ashstalker.bonus2': 'Рейтинг защиты Боевой мощи повышается на 40.',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    'Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    'Рейтинг атаки и защиты Боевой мощи повышается на 80. Убийство враждебного игрока дарует «Пепельный шаг», повышающий скорость передвижения на 40% на 6 сек.',
+  'entities.itemSets.warfare_cinderweave.name': 'Регалии Тлеющего плетения',
+  'entities.itemSets.warfare_cinderweave.bonus2': 'Рейтинг защиты Боевой мощи повышается на 40.',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    'Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    'Рейтинг атаки и защиты Боевой мощи повышается на 80. Ваши заклинания с вероятностью 15% даруют «Тлеющий оберег», поглощающий 120 ед. урона в течение 8 сек.',
+  'entities.itemSets.warfare_furyforged.name': 'Яростнокованый боевой доспех',
+  'entities.itemSets.warfare_furyforged.bonus2': 'Рейтинг защиты Боевой мощи повышается на 40.',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    'Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    'Рейтинг атаки и защиты Боевой мощи повышается на 80. Убийство враждебного игрока дарует «Нерушимую клятву», поглощающую 200 ед. урона в течение 10 сек.',
+  'entities.itemSets.warfare_stormbound.name': 'Одеяние Уз Бури',
+  'entities.itemSets.warfare_stormbound.bonus2': 'Рейтинг защиты Боевой мощи повышается на 40.',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    'Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    'Рейтинг атаки и защиты Боевой мощи повышается на 80. Ваши заклинания с вероятностью 15% даруют «Тлеющий оберег», поглощающий 120 ед. урона в течение 8 сек.',
   'entities.itemSets.wyrmshadow.name': 'Облачение Ночного Клыка',
   'entities.itemSets.wyrmshadow.bonus2': 'Сила атаки повышается на 40.',
   'entities.itemSets.wyrmshadow.bonus3':
@@ -9161,6 +9194,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.title': 'Интендант чести',
   'entities.npcs.fury.greeting':
     'Пески поля боя помнят каждую победу. Распорядись своей честью достойно.',
+  'entities.npcs.warmarshal_draven_kole.name': 'Военный маршал Дравен Коул',
+  'entities.npcs.warmarshal_draven_kole.title': 'Хранитель складов Боевой мощи',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    'Я принимаю только одну монету, честь, и склады Боевой мощи под моей охраной. Заслужи звание в бою, и я снаряжу тебя для следующего.',
   'guide.economy.bankBody':
     'В каждом узловом городе есть отделение Золочёного сундука, банкирского дома этих земель. Поговорите с казначеем, и он откроет ваше хранилище: личный запас места помимо сумок, который остаётся за персонажем навсегда. Всё, что вы оставили, будет спокойно ждать вас в любом отделении.',
   'guide.economy.bankHow':

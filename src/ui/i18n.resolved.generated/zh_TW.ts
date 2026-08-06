@@ -1509,6 +1509,17 @@ export const zh_TW: EnTranslations = {
         "firstWin": "首勝"
       }
     },
+    "warfareShop": {
+      "jewelry": "飾品",
+      "weapons": "武器",
+      "owned": "已擁有",
+      "ownedCount": "已擁有 {total} 件中的 {owned} 件。",
+      "nextBonus": "再取得 {remaining} 件即可啟用 {pieces} 件套裝效果。",
+      "setComplete": "你已擁有全部部件。",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
+      "buyConfirmBody": "用 {honor} 購買 {item}？榮譽購買後無法退款。"
+    },
     "charSheet": {
       "offense": "攻擊",
       "defense": "防禦"
@@ -11902,6 +11913,11 @@ export const zh_TW: EnTranslations = {
         "title": "榮譽軍需官",
         "greeting": "戰場黃沙銘記每一場勝利。願你妥善運用這份榮譽。"
       },
+      "warmarshal_draven_kole": {
+        "name": "戰帥德拉文·科爾",
+        "title": "戰爭軍備庫總管",
+        "greeting": "我只收榮譽這一種貨幣，戰爭軍備庫由我看守。在戰場上掙得你的軍階，我便為你披上迎接下一戰的甲冑。"
+      },
       "loremaster_caddis": {
         "name": "凱迪斯博學者",
         "title": "博學者",
@@ -15033,6 +15049,30 @@ export const zh_TW: EnTranslations = {
       "vale_arcanist": {
         "name": "谷地秘法師法衣",
         "bonus3": "攻擊速度和施法速度提高 15%。"
+      },
+      "warfare_ashstalker": {
+        "name": "灰燼追獵者裝備",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「灰燼疾行」，使移動速度提高 40%，持續 6 秒。"
+      },
+      "warfare_cinderweave": {
+        "name": "燼織法衣",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。"
+      },
+      "warfare_furyforged": {
+        "name": "怒鑄戰裝",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。擊殺敵對玩家會觸發「不破誓約」，吸收 200 點傷害，持續 10 秒。"
+      },
+      "warfare_stormbound": {
+        "name": "縛雷法衣",
+        "bonus2": "戰爭防禦等級提高 40 點。",
+        "bonus4": "戰爭攻擊等級提高 40 點，敵對玩家對你施放的群體控制效果持續時間縮短 15%。",
+        "bonus7": "戰爭攻擊等級和防禦等級提高 80 點。你的法術有 15% 的機率觸發「餘燼護壁」，吸收 120 點傷害，持續 8 秒。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

@@ -46,11 +46,27 @@ const WARFARE_KIT: Partial<Record<EquipSlot, string>> = {
   ring2: 'unbroken_circle',
 };
 
-const taggedItems: string[] = [];
+// Phase 2 gave these pieces a REAL set tag (warfare_furyforged), so both helpers
+// below have to save and restore it rather than deleting unconditionally: an
+// unconditional delete would strip the shipped tag for the rest of the file and
+// quietly change what every later case measures.
+const savedSetTags = new Map<string, string | undefined>();
+function rememberTag(id: string): void {
+  if (!savedSetTags.has(id)) savedSetTags.set(id, (ITEMS[id] as { set?: string }).set);
+}
+
 function tagArmorWithProbeSet(): void {
   for (const id of WARFARE_ARMOR) {
+    rememberTag(id);
     (ITEMS[id] as { set?: string }).set = PROBE_SET;
-    taggedItems.push(id);
+  }
+}
+
+/** Measure the gear WITHOUT its shipped set, so a case about gear alone is about gear alone. */
+function untagShippedSet(): void {
+  for (const id of WARFARE_ARMOR) {
+    rememberTag(id);
+    delete (ITEMS[id] as { set?: string }).set;
   }
 }
 
@@ -63,8 +79,11 @@ function geared(equipment: Partial<Record<EquipSlot, string>>): Entity {
 
 afterEach(() => {
   delete ITEM_SETS[PROBE_SET];
-  for (const id of taggedItems) delete (ITEMS[id] as { set?: string }).set;
-  taggedItems.length = 0;
+  for (const [id, tag] of savedSetTags) {
+    if (tag === undefined) delete (ITEMS[id] as { set?: string }).set;
+    else (ITEMS[id] as { set?: string }).set = tag;
+  }
+  savedSetTags.clear();
   vi.restoreAllMocks();
 });
 
@@ -111,13 +130,17 @@ describe('WARFARE set-bonus aggregation', () => {
 
 describe('gear-plus-set WARFARE rating clamps exactly once', () => {
   it('caps the combined total instead of capping each source separately', () => {
-    // Gear alone is under the cap.
+    // Gear alone is under the cap, measured without the shipped set so this case
+    // is about the gear-versus-set seam rather than about phase 2's own capstone.
+    untagShippedSet();
     const gearOnly = geared(WARFARE_KIT);
     expect(gearOnly.stats.pvpOffense).toBeLessThan(PVP_OFFENSE_CAP);
     expect(gearOnly.stats.pvpDefense).toBeLessThan(PVP_DEFENSE_CAP);
 
     // A set contribution that is ALSO under the cap on its own.
-    const SET_RATING = 100;
+    // Large enough that gear (182) plus set clears the 0.30 cap, small enough
+    // that the set alone does not: that pairing is what makes the case decisive.
+    const SET_RATING = 200;
     expect(pvpFractionsFromRatings(SET_RATING, SET_RATING).offense).toBeLessThan(PVP_OFFENSE_CAP);
 
     injectSet([
@@ -132,16 +155,17 @@ describe('gear-plus-set WARFARE rating clamps exactly once', () => {
 
     // Together they exceed the cap, so the resolved fraction must BE the cap.
     // An implementation that resolved the set separately and added the two
-    // fractions would land on gearOnly + 0.10 here, which is above the cap and
+    // fractions would land on gearOnly + 0.20 here, which is above the cap and
     // would disagree with the character sheet. That is the regression this pins.
     expect(combined.stats.pvpOffense).toBe(PVP_OFFENSE_CAP);
     expect(combined.stats.pvpDefense).toBe(PVP_DEFENSE_CAP);
-    expect(combined.stats.pvpOffense).not.toBe(gearOnly.stats.pvpOffense + 0.1);
+    expect(combined.stats.pvpOffense).not.toBe(gearOnly.stats.pvpOffense + 0.2);
   });
 
   it('adds the set rating below the cap without clamping it away', () => {
     // The same seam under the cap: a small set bonus must actually raise the
     // fraction, so "clamps once" is not silently "ignores the set".
+    untagShippedSet();
     const gearOnly = geared(WARFARE_KIT);
     injectSet([{ pieces: 7, effect: { pvpOffenseRating: 10 }, text: '' }]);
     tagArmorWithProbeSet();

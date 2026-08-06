@@ -1540,6 +1540,29 @@ export const hudChromeStrings = {
       firstWin: 'First Win',
     },
   },
+  // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
+  // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
+  // live here: the honor price, the honor balance, the set-bonus tier line, the
+  // panel title, the close label and the confirm dialog's title/accept/cancel
+  // are all reused from hudChrome.warfare, hudChrome.itemSet, itemUi.vendor and
+  // heroicShop rather than duplicated.
+  warfareShop: {
+    jewelry: 'Jewelry',
+    weapons: 'Weapons',
+    // Marks a piece the viewer already wears or carries. The tile still sells.
+    owned: 'Owned',
+    ownedCount: '{owned} of {total} pieces owned.',
+    // Read against the NEXT unmet tier, never a bare fraction of the full set:
+    // "2 more for the 7-piece bonus" is the line that motivates the purchase.
+    nextBonus: '{remaining} more for the {pieces}-piece bonus.',
+    setComplete: 'You own every piece.',
+    buyAria: 'Buy {item} for {honor}',
+    buyOwnedAria: 'Buy {item} for {honor}, already owned',
+    // Honor purchases record no buyback, so a mis-tap is unrefundable: the
+    // confirm gate matches the Heroic Marks shop's, whose title, accept and
+    // cancel labels are currency-neutral and reused verbatim.
+    buyConfirmBody: 'Buy {item} for {honor}? Honor purchases cannot be refunded.',
+  },
   // Character sheet showcase layout: the two titled stat-panel headings under the
   // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the
   // statInfo.names.* labels below; only these two group headings are new here.

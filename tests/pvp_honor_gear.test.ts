@@ -4,7 +4,9 @@ import {
   FURY_NPC,
   FURY_STOCK,
   WARFARE_ITEMS,
+  WARFARE_JEWELRY_STAT_FRACTION,
   WARFARE_SOURCE_LEVEL,
+  WARFARE_STAT_FRACTION,
 } from '../src/sim/content/pvp_honor';
 import { ITEMS, NPCS } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
@@ -22,16 +24,16 @@ import { pvpFractionsFromRatings } from '../src/sim/pvp';
 import type { EquipSlot, PlayerClass } from '../src/sim/types';
 
 const SLOT_PRICES: Record<string, number> = {
-  mainhand: 800,
-  helmet: 500,
-  neck: 225,
-  shoulder: 400,
-  chest: 700,
-  waist: 250,
-  legs: 600,
-  gloves: 300,
-  feet: 300,
-  ring: 150,
+  mainhand: 1_200,
+  helmet: 900,
+  neck: 400,
+  shoulder: 700,
+  chest: 1_200,
+  waist: 450,
+  legs: 1_050,
+  gloves: 550,
+  feet: 550,
+  ring: 275,
 };
 
 const SUPPORTED_ITEM_SLOTS = [
@@ -183,7 +185,7 @@ describe('FURY WARFARE stock', () => {
 });
 
 describe('FURY WARFARE item budgets', () => {
-  it('makes every offer a soulbound, honor-priced item-level-28 epic with full WARFARE', () => {
+  it('makes every offer a soulbound, honor-priced item-level-31 epic with full WARFARE', () => {
     for (const id of FURY_STOCK) {
       const item = ITEMS[id];
       const budget = expectedStatBudget(item) ?? 0;
@@ -194,13 +196,20 @@ describe('FURY WARFARE item budgets', () => {
       expect(item.sellValue, id).toBe(0);
       expect(item.buyValue, id).toBeUndefined();
       expect(itemSourceLevel(id), id).toBe(WARFARE_SOURCE_LEVEL);
-      expect(itemLevel(item), id).toBe(28);
-      // WARFARE gear weights its stat budget toward warfare: primary stats are 60%
-      // of the slot budget (the rest is expressed as the full WARFARE rating), so a
-      // PvP piece is a PvP-first, stat-light kit that never out-stats same-tier PvE
-      // gear. Armor mitigation and weapon DPS (the slot's inherent baseline) are kept.
-      expect(primaryStatSum(item), id).toBe(Math.round(budget * 0.6));
-      // Every piece's WARFARE ratings still mirror its FULL slot budget (drives 16.8%).
+      expect(itemLevel(item), id).toBe(31);
+      // WARFARE gear carries a deliberate primary-stat DISCOUNT against a same-slot
+      // PvE epic: 90% of the slot budget on armor and weapons, 75% on jewelry. The
+      // jewelry fraction is lower on purpose, to keep the badge-jewelry guard below
+      // green (a ring at 0.90 would reach 12 points against the badge ring's 11).
+      // Armor mitigation and weapon DPS (the slot's inherent baseline) are kept.
+      const statFraction =
+        item.slot === 'neck' || item.slot === 'ring'
+          ? WARFARE_JEWELRY_STAT_FRACTION
+          : WARFARE_STAT_FRACTION;
+      expect(primaryStatSum(item), id).toBe(Math.round(budget * statFraction));
+      // Every piece's WARFARE ratings still mirror its FULL slot budget (drives 18.2%).
+      // This pair is deliberately NOT rewritten as a fraction multiplication: the
+      // rating fraction is 1.0 and unchanged, so a diff here means it drifted.
       expect(item.pvpOffenseRating, id).toBe(budget);
       expect(item.pvpDefenseRating, id).toBe(budget);
       expect(item.priceHonor, id).toBe(SLOT_PRICES[item.slot ?? '']);
@@ -226,8 +235,8 @@ describe('FURY WARFARE item budgets', () => {
     }
   });
 
-  it('puts all three weapons on the item-level-28 DPS curve', () => {
-    const target = weaponDpsBudget(28);
+  it('puts all three weapons on the item-level-31 DPS curve', () => {
+    const target = weaponDpsBudget(31);
     for (const id of ['final_argument_greatblade', 'first_blood_razor', 'emberglass_warstaff']) {
       const weapon = ITEMS[id].weapon;
       expect(weapon, id).toBeDefined();
@@ -237,18 +246,23 @@ describe('FURY WARFARE item budgets', () => {
     }
   });
 
-  it('derives 16.8 percent offense and defense by equipping a complete profile', () => {
+  it('reaches the 30 percent capstone for EVERY complete family profile', () => {
+    // This file owns the four role profiles, so it is the only place the claim is
+    // made across all of them: mail Strength, mail caster, leather Agility and
+    // cloth. tests/warfare_gear_tier.test.ts pins the rating arithmetic itself
+    // (182 base, 222 at four pieces, 302 clamped to 0.30) against one kit; this
+    // asserts no family was left short a piece, a wrong set tag, or a slot gap.
     for (const profile of PROFILES) {
       const player = createPlayer(1, profile.classes[0], { x: 0, y: 0, z: 0 }, profile.name);
       player.level = 20;
       recalcPlayerStats(player, profile.classes[0], equipmentForProfile(profile), undefined, {});
-      expect(player.stats.pvpOffense, `${profile.name} offense`).toBeCloseTo(0.168, 10);
-      expect(player.stats.pvpDefense, `${profile.name} defense`).toBeCloseTo(0.168, 10);
+      expect(player.stats.pvpOffense, `${profile.name} offense`).toBeCloseTo(0.3, 10);
+      expect(player.stats.pvpDefense, `${profile.name} defense`).toBeCloseTo(0.3, 10);
     }
   });
 
   it('clamps independently tunable offense and defense rating curves', () => {
-    expect(pvpFractionsFromRatings(10_000, 10_000)).toEqual({ offense: 0.2, defense: 0.2 });
+    expect(pvpFractionsFromRatings(10_000, 10_000)).toEqual({ offense: 0.3, defense: 0.3 });
     expect(pvpFractionsFromRatings(10_000, 10_000, { offense: 0.07, defense: 0.13 })).toEqual({
       offense: 0.07,
       defense: 0.13,
