@@ -20,7 +20,7 @@ import {
   DAWNHOLD_WALL_LEDGES,
 } from '../sim/dawnhold_layout';
 import { loadGltf } from './assets/loader';
-import { registerPreload } from './assets/preload';
+import { registerDeferredPreload } from './assets/preload';
 import {
   castlePavingMat,
   castleStoneBox,
@@ -51,7 +51,7 @@ type DawnholdKey = (typeof DAWNHOLD_KEYS)[number];
 
 const scenes: Partial<Record<DawnholdKey, THREE.Group>> = {};
 for (const key of DAWNHOLD_KEYS) {
-  registerPreload(
+  registerDeferredPreload(() =>
     loadGltf(PROP_ASSET_DEFS[key].url).then((gltf) => {
       scenes[key] = gltf.scene;
     }),
