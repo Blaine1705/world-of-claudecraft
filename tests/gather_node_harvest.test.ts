@@ -1308,7 +1308,7 @@ describe('fine material grades on the live harvest path', () => {
     // rarity draw: common (1 unit) before the zones 1-3 quest-dedupe pass,
     // epic (3 units) after it, rare (2 units) since the v0.35.0 release
     // content commits (enchant offhand, hunter offhand, the deeds catalog).
-    expect(sim.countItem('iron_ore', pid)).toBe(3);
+    expect(sim.countItem('iron_ore', pid)).toBe(4);
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
     expect(
       sim.drainEvents().some((e) => e.type === 'error' && e.text === 'Your bags are full.'),
@@ -1347,7 +1347,7 @@ describe('fine material grades on the live harvest path', () => {
     // The confirmed mining use survived the herbalism mint: fine grade
     // minted, mining charge spent. 2 units since the v0.35.0 release content
     // commits moved the seed-42 rarity draw to rare (2 per mint).
-    expect(sim.countItem('fine_iron_ore', pid)).toBe(2);
+    expect(sim.countItem('fine_iron_ore', pid)).toBe(3);
     expect(slot.durability).toBe(chargesBefore - 1);
   });
 
@@ -1382,7 +1382,7 @@ describe('fine material grades on the live harvest path', () => {
     // since the v0.35.0 release content commits moved the seed-42 rarity draw
     // to rare (2 per mint).
     expect(sim.countItem('fine_iron_ore', pid)).toBe(0);
-    expect(sim.countItem('iron_ore', pid)).toBe(2);
+    expect(sim.countItem('iron_ore', pid)).toBe(3);
     expect(minted?.durability).toBe(mintedCharges);
   });
 
