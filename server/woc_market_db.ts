@@ -307,6 +307,12 @@ CREATE INDEX IF NOT EXISTS woc_market_offers_resolved_updated
 -- additive and idempotent; a pre-existing row keeps its item.
 ALTER TABLE woc_market_directed_offers ALTER COLUMN item_ref DROP NOT NULL;
 ALTER TABLE woc_market_directed_offers ALTER COLUMN item_id DROP NOT NULL;
+-- Both sides accept through the trade window's ordinary Accept button, so the
+-- offer tracks each side's agreement and only the LAST one escrows. Additive.
+ALTER TABLE woc_market_directed_offers
+  ADD COLUMN IF NOT EXISTS buyer_accepted BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE woc_market_directed_offers
+  ADD COLUMN IF NOT EXISTS seller_accepted BOOLEAN NOT NULL DEFAULT false;
 `;
 
 /** Lock-wait ceiling for the escrow transaction's accounts row. Short on
@@ -322,7 +328,8 @@ const LISTING_COLS =
 
 const OFFER_COLS =
   'id, realm, seller_account, seller_character, seller_name, buyer_account, buyer_name, ' +
-  'item_ref, item_id, usd_cents, status, listing_id, created_at, expires_at';
+  'item_ref, item_id, usd_cents, status, listing_id, created_at, expires_at, ' +
+  'buyer_accepted, seller_accepted';
 
 const BID_COLS =
   'id, listing_id, account, character_id, character_name, wallet, amount_cents, status, ' +
@@ -390,6 +397,8 @@ function toOffer(row: Row): WocDirectedOfferRow {
     listingId: row.listing_id === null ? null : Number(row.listing_id),
     createdAtMs: ms(row.created_at),
     expiresAtMs: ms(row.expires_at),
+    buyerAccepted: row.buyer_accepted === true,
+    sellerAccepted: row.seller_accepted === true,
   };
 }
 
@@ -741,6 +750,33 @@ export class PgWocMarketDb implements WocMarketDb {
     );
     const row = res.rows[0];
     return row ? { characterId: row.id, accountId: row.account_id, name: row.name } : null;
+  }
+
+  /**
+   * Record one side's acceptance, and the seller's chosen copy with it.
+   *
+   * Returns the row AFTER the write, so the caller can see whether that
+   * acceptance was the second one. Narrowed to pending, so a resolved offer
+   * cannot gain an acceptance.
+   */
+  async acceptDirectedOfferSide(
+    realm: string,
+    id: number,
+    side: 'buyer' | 'seller',
+    itemRef: ExtractRef | null,
+  ): Promise<WocDirectedOfferRow | null> {
+    const col = side === 'buyer' ? 'buyer_accepted' : 'seller_accepted';
+    const res = await this.pool.query(
+      `UPDATE woc_market_directed_offers
+          SET ${col} = true,
+              item_ref = COALESCE($3::jsonb, item_ref),
+              item_id = COALESCE($4, item_id),
+              updated_at = now()
+        WHERE realm = $1 AND id = $2 AND status = 'pending'
+        RETURNING ${OFFER_COLS}`,
+      [realm, id, itemRef === null ? null : JSON.stringify(itemRef), itemRef?.itemId ?? null],
+    );
+    return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
 
   async reopenDirectedOffer(realm: string, id: number): Promise<void> {

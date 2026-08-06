@@ -13107,6 +13107,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.incomingTitle': '{name} 님의 $WOC 제안',
   'hudChrome.trade.woc.incomingBody':
     '{name} 님이 {item}을(를) {price}에 판매하겠다고 제안했습니다.',
+  'hudChrome.trade.woc.moneyUsd': '{usd} USD',
+  'hudChrome.trade.woc.moneyTokens': '(약 {tokens} $WOC)',
+  'hudChrome.trade.woc.waitingOther': '제안을 수락했습니다. 상대의 수락을 기다리는 중입니다.',
   'hudChrome.trade.woc.accept': '제안 수락',
   'hudChrome.trade.woc.accepted': '제안을 수락했습니다. 결제가 확인될 때까지 아이템이 보관됩니다.',
   'hudChrome.trade.woc.decline': '거절',

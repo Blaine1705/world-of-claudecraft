@@ -16,6 +16,7 @@ import {
   wireWocTradeArm,
   wocTradeArmHtml,
   wocTradeModelFrom,
+  wocTradeMoneyText,
 } from '../src/ui/trade_woc_panel';
 
 const EPIC: ItemDef = {
@@ -236,13 +237,23 @@ describe('the trade window actually applies the gold lock', () => {
 describe('a standing offer becomes a REVIEW surface for both sides', () => {
   const offer = { id: 7, usdCents: 100, tokens: 7812.5, role: 'buyer' as const };
 
-  it('shows the agreed price, and the token figure the server quoted', () => {
-    // Both sides read the same numbers: the USD they agreed, and the tokens as
-    // quoted once, so neither player sees a different figure from the other.
-    const root = paint(deps({ pendingOffer: offer }));
-    const text = root.querySelector('.trade-woc-offer')?.textContent ?? '';
-    expect(text).toContain('1.00');
+  it('renders the agreed price for the Money row, in the asked-for shape', () => {
+    // "$1.00 USD (~ 7,812.5 $WOC)". The tilde is load-bearing: the token figure
+    // is a preview, and the exact number is set by a fresh quote at payment.
+    const text = wocTradeMoneyText(offer);
+    expect(text).toContain('$1.00 USD');
     expect(text).toContain('7,812.5');
+    expect(text).toContain('~');
+  });
+
+  it('falls back to the USD alone when no quote is available', () => {
+    const text = wocTradeMoneyText({ ...offer, tokens: null });
+    expect(text).toContain('$1.00 USD');
+    expect(text).not.toContain('~');
+  });
+
+  it('renders nothing for the Money row when no offer stands', () => {
+    expect(wocTradeMoneyText(null)).toBe('');
   });
 
   it('replaces the price form: you cannot stack a second offer on the first', () => {
@@ -254,38 +265,29 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
   it('gives the BUYER withdraw and no accept', () => {
     const root = paint(deps({ pendingOffer: offer }));
     expect(root.querySelector('[data-woc-cancel]')).toBeTruthy();
-    expect(root.querySelector('[data-woc-accept]'), 'a buyer must not accept their own offer').toBeNull();
+    expect(
+      root.querySelector('[data-woc-accept]'),
+      'a buyer must not accept their own offer',
+    ).toBeNull();
   });
 
-  it('gives the SELLER accept and no withdraw', () => {
-    const root = paint(
-      deps({ pendingOffer: { ...offer, role: 'seller' }, staged: [slot(EPIC.id)] }),
-    );
-    expect(root.querySelector<HTMLButtonElement>('[data-woc-accept]')?.disabled).toBe(false);
-    expect(root.querySelector('[data-woc-cancel]')).toBeNull();
+  it("adds NO accept button of its own: the window's Accept does the agreeing", () => {
+    // A second accept control beside the trade window's own would be two ways to
+    // say the same thing, and only one of them would drive the sim's state.
+    for (const role of ['buyer', 'seller'] as const) {
+      const root = paint(deps({ pendingOffer: { ...offer, role }, staged: [slot(EPIC.id)] }));
+      expect(root.querySelector('[data-woc-accept]'), role).toBeNull();
+    }
   });
 
-  it("disables the seller's accept until they stage something eligible, and says why", () => {
-    // Acceptance is what escrows the goods, so there must be goods.
+  it('still tells the seller when they have nothing staged to accept with', () => {
     const root = paint(deps({ pendingOffer: { ...offer, role: 'seller' }, staged: [] }));
-    expect(root.querySelector<HTMLButtonElement>('[data-woc-accept]')?.disabled).toBe(true);
     expect(root.querySelector('[data-woc-hint]')?.textContent ?? '').not.toBe('');
   });
 
-  it('reports accept and withdraw presses', () => {
-    const seller = deps({ pendingOffer: { ...offer, role: 'seller' }, staged: [slot(EPIC.id)] });
-    paint(seller).querySelector<HTMLElement>('[data-woc-accept]')?.click();
-    expect(seller.onAcceptOffer).toHaveBeenCalled();
-
+  it('reports a withdraw press', () => {
     const buyer = deps({ pendingOffer: offer });
     paint(buyer).querySelector<HTMLElement>('[data-woc-cancel]')?.click();
     expect(buyer.onCancelOffer).toHaveBeenCalled();
-  });
-
-  it('omits the token figure rather than guessing when the quote is unavailable', () => {
-    const root = paint(deps({ pendingOffer: { ...offer, tokens: null } }));
-    const text = root.querySelector('.trade-woc-offer')?.textContent ?? '';
-    expect(text).toContain('1.00');
-    expect(text).not.toContain('(');
   });
 });

@@ -114,6 +114,10 @@ export interface WocDirectedOfferRow {
   listingId: number | null;
   createdAtMs: number;
   expiresAtMs: number;
+  /** Each side agrees through the trade window's ordinary Accept button; the
+   *  SECOND acceptance is what escrows. */
+  buyerAccepted: boolean;
+  sellerAccepted: boolean;
 }
 
 export type WocBondState =
@@ -290,6 +294,12 @@ export interface WocMarketDb {
    * players still believe it is live. Narrowed to 'accepted' with no listing, so
    * it can never resurrect an offer that really did become a listing.
    */
+  acceptDirectedOfferSide(
+    realm: string,
+    id: number,
+    side: 'buyer' | 'seller',
+    itemRef: ExtractRef | null,
+  ): Promise<WocDirectedOfferRow | null>;
   reopenDirectedOffer(realm: string, id: number): Promise<void>;
   /** Cancel iff still active with no pending/active bid. Returns the row for
    *  the return flight. */
@@ -903,51 +913,67 @@ export class WocMarketService {
   }
 
   /**
-   * The named SELLER agrees, and names the copy they are parting with.
+   * One side agrees, through the trade window's ordinary Accept button.
    *
-   * This is the moment the deal exists: the offer flips to accepted and the item
-   * leaves the seller's bags into custody escrow. The item arrives HERE rather
-   * than at offer time because the buyer opened the deal with a price alone.
+   * Both sides must accept, exactly as a gold trade requires, and the SECOND
+   * acceptance is what escrows: the seller's copy leaves their bags and the
+   * directed listing is created. Order does not matter, so whoever presses last
+   * triggers it.
    *
-   * The status flip happens FIRST and is a compare-and-set, so a double-click
-   * cannot extract two copies: the second call finds the offer no longer pending
-   * and never reaches createListing. If the listing then fails (the copy moved,
-   * the seller went offline), the offer is put back to pending so it can be
-   * retried inside the TTL rather than lost to a transient refusal.
+   * This never routes through the sim's own confirm. That confirm performs the
+   * atomic swap the instant both sides accept, and a $WOC deal carries no gold
+   * and no buyer items, so it would hand the goods over for nothing. Agreement
+   * is tracked here instead, on the offer, and the sim trade is left alone.
    */
   async acceptDirectedOffer(
     account: number,
     offerId: number,
-    itemRef: ExtractRef,
+    itemRef: ExtractRef | null,
     characterId: number,
-  ): Promise<{ ok: true; listing: WocListingRow } | Refused> {
+  ): Promise<{ ok: true; listing: WocListingRow | null } | Refused> {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(account));
     if (gate) return gate;
     const offer = await this.deps.db.directedOfferById(this.cfg.realm, offerId);
-    // not_found for a stranger, matching the directed-listing convention: an id
-    // prober must not learn that someone else's private offer exists.
-    if (!offer || offer.sellerAccount !== account) return refuse('not_found');
+    if (!offer) return refuse('not_found');
+    const side =
+      offer.sellerAccount === account ? 'seller' : offer.buyerAccount === account ? 'buyer' : null;
+    // not_found for a stranger, matching the directed-listing convention.
+    if (side === null) return refuse('not_found');
     if (offer.status !== 'pending') return refuse('not_pending');
     if (offer.expiresAtMs <= this.now()) return refuse('offer_expired');
-    // The seller is about to be PAID in $WOC, so they need a wallet too.
     if (!(await this.deps.verifiedWallet(account))) return refuse('wallet_required');
-    // Eligibility is checked here, where the item finally exists. The server
-    // owns this decision: the client pre-filters the picker, but a stale bundle
-    // must never be able to sell something the policy refuses.
-    const eligible = listingEligibility(
-      ITEMS[itemRef.itemId],
-      itemRef.expectInstance ?? undefined,
-      this.cfg.policy,
-    );
-    if (!eligible.ok) return refuse(eligible.reason);
+    // The seller's acceptance carries the goods, because acceptance is the only
+    // moment they are known; the buyer brings only money.
+    if (side === 'seller') {
+      if (!itemRef) return refuse('character_invalid');
+      const eligible = listingEligibility(
+        ITEMS[itemRef.itemId],
+        itemRef.expectInstance ?? undefined,
+        this.cfg.policy,
+      );
+      if (!eligible.ok) return refuse(eligible.reason);
+    }
 
+    const after = await this.deps.db.acceptDirectedOfferSide(
+      this.cfg.realm,
+      offerId,
+      side,
+      side === 'seller' ? itemRef : null,
+    );
+    if (!after) return refuse('not_pending');
+    // Still waiting on the other side: agreed, nothing moved.
+    if (!after.buyerAccepted || !after.sellerAccepted) return { ok: true, listing: null };
+    if (!after.itemRef) return refuse('character_invalid');
+
+    // Both agreed. Claim the offer BEFORE escrowing, so two simultaneous second
+    // acceptances cannot both reach createListing and extract two copies.
     const claimed = await this.deps.db.resolveDirectedOffer(this.cfg.realm, offerId, 'accepted');
     if (!claimed) return refuse('not_pending');
     const created = await this.createListing({
-      account: offer.sellerAccount,
-      characterId,
-      itemRef,
-      params: this.directedParams(offer.usdCents, offer.buyerAccount),
+      account: after.sellerAccount,
+      characterId: side === 'seller' ? characterId : after.sellerCharacter,
+      itemRef: after.itemRef,
+      params: this.directedParams(after.usdCents, after.buyerAccount),
     });
     if (!created.ok) {
       await this.deps.db.reopenDirectedOffer(this.cfg.realm, offerId);

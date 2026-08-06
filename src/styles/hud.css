@@ -7481,6 +7481,11 @@
     opacity: 0.45;
     cursor: not-allowed;
   }
+  /* The standing offer, read in the Money row in place of that side's gold. */
+  .trade-money .trade-woc-money {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
   .trade-woc-modes {
     display: flex;
     gap: 6px;

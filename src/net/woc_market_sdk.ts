@@ -309,12 +309,13 @@ export class WocMarketClient {
     return out.ok ? { ok: true, ...out.data } : out;
   }
 
-  /** The SELLER accepts, naming the copy they are parting with. */
+  /** Either side accepts. The SELLER names the copy; the buyer sends no item.
+   *  A null listing means "agreed, waiting on the other side". */
   async acceptOffer(
     id: number,
-    req: { characterId: number; itemIndex: number; itemId: string; expectInstance?: unknown },
-  ): Promise<{ ok: true; listing: WocListingView } | WocMarketFail> {
-    const out = await this.request<{ listing: WocListingView }>(
+    req: { characterId: number; itemIndex?: number; itemId?: string; expectInstance?: unknown },
+  ): Promise<{ ok: true; listing: WocListingView | null } | WocMarketFail> {
+    const out = await this.request<{ listing: WocListingView | null }>(
       'POST',
       `/api/woc-market/offers/${Math.floor(id)}/accept`,
       req,

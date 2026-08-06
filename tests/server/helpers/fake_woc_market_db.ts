@@ -254,9 +254,13 @@ export class FakeWocMarketDb implements WocMarketDb {
     const row: WocDirectedOfferRow = {
       id: this.nextOfferId++,
       ...offer,
+      itemRef: null,
+      itemId: null,
       status: 'pending',
       listingId: null,
       createdAtMs: 0,
+      buyerAccepted: false,
+      sellerAccepted: false,
     };
     this.offers.set(row.id, row);
     return row;
@@ -307,6 +311,25 @@ export class FakeWocMarketDb implements WocMarketDb {
   ): Promise<{ characterId: number; accountId: number; name: string } | null> {
     const c = this.characters.find((x) => x.name === name && x.realm === realm);
     return c ? { characterId: c.characterId, accountId: c.accountId, name: c.name } : null;
+  }
+
+  async acceptDirectedOfferSide(
+    realm: string,
+    id: number,
+    side: 'buyer' | 'seller',
+    itemRef: ExtractRef | null,
+  ): Promise<WocDirectedOfferRow | null> {
+    const row = this.offers.get(id);
+    // Narrowed to pending, mirroring the real UPDATE: a resolved offer cannot
+    // gain an acceptance, which is what stops a late click reviving one.
+    if (!row || row.realm !== realm || row.status !== 'pending') return null;
+    if (side === 'buyer') row.buyerAccepted = true;
+    else row.sellerAccepted = true;
+    if (itemRef !== null) {
+      row.itemRef = itemRef;
+      row.itemId = itemRef.itemId;
+    }
+    return { ...row };
   }
 
   async reopenDirectedOffer(realm: string, id: number): Promise<void> {

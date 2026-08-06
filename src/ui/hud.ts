@@ -743,6 +743,7 @@ import {
   wireWocTradeArm,
   wocTradeArmHtml,
   wocTradeModelFrom,
+  wocTradeMoneyText,
 } from './trade_woc_panel';
 import {
   type WocPendingOffer,
@@ -18829,8 +18830,7 @@ export class Hud {
       if (!res.ok || this.sim.tradeInfo?.otherName !== otherName) return;
       const mine = res.offers.find(
         (o) =>
-          o.status === 'pending' &&
-          (o.role === 'buyer' ? o.sellerName : o.buyerName) === otherName,
+          o.status === 'pending' && (o.role === 'buyer' ? o.sellerName : o.buyerName) === otherName,
       );
       if (!mine) {
         if (this.wocTradeOffer !== null) {
@@ -18857,23 +18857,39 @@ export class Hud {
     const hooks = this.wocMarketHooks;
     const offer = this.wocTradeOffer;
     if (!hooks || !offer) return;
-    // The seller's own staged copy is what escrows: acceptance is the moment the
-    // goods leave the bags, so the item is named here rather than at offer time.
-    const first = this.stagedTrade.items.find((sl) => wocTradableSlot(sl, ITEMS));
-    if (!first) return;
+    // The seller's staged copy is what escrows; the buyer brings only money, so
+    // they send no item at all.
+    const first =
+      offer.role === 'seller'
+        ? this.stagedTrade.items.find((sl) => wocTradableSlot(sl, ITEMS))
+        : undefined;
+    if (offer.role === 'seller' && !first) {
+      this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');
+      return;
+    }
     const res = await hooks.client.acceptOffer(offer.id, {
       characterId: hooks.characterId() ?? 0,
-      itemIndex: Math.max(0, this.stagedTrade.items.indexOf(first)),
-      itemId: first.itemId,
-      ...(first.instance === undefined ? {} : { expectInstance: first.instance }),
+      ...(first === undefined
+        ? {}
+        : {
+            itemIndex: Math.max(0, this.stagedTrade.items.indexOf(first)),
+            itemId: first.itemId,
+            ...(first.instance === undefined ? {} : { expectInstance: first.instance }),
+          }),
     });
-    if (res.ok) {
-      this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
-      this.wocTradeOffer = null;
-      this.sim.tradeCancel();
-    } else {
+    if (!res.ok) {
       this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+      return;
     }
+    if (res.listing === null) {
+      // Agreed; the other side has not yet. Nothing has moved.
+      this.log(t('hudChrome.trade.woc.waitingOther'), '#ffd100');
+      this.lastTradeSig = '';
+      return;
+    }
+    this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
+    this.wocTradeOffer = null;
+    this.sim.tradeCancel();
   }
 
   private async cancelWocTradeOffer(action: 'decline' | 'withdraw'): Promise<void> {
@@ -19035,6 +19051,18 @@ export class Hud {
       // gold out rather than leaving a field that silently invalidates the deal.
       const wocModel = wocTradeModelFrom(this.wocTradeDeps(info.otherName));
       const goldAttr = wocModel.goldDisabled ? ' disabled' : '';
+      // The standing $WOC offer reads in the MONEY row of whichever side owes
+      // it, in the currency the two players agreed plus the quoted tokens. It
+      // replaces that side's gold, because the two are mutually exclusive.
+      const wocMoneyText = wocTradeMoneyText(wocModel.pendingOffer);
+      const wocMoneyMine =
+        wocModel.pendingOffer?.role === 'buyer' && wocMoneyText !== ''
+          ? `<span class="trade-woc-money">${esc(wocMoneyText)}</span>`
+          : '';
+      const wocMoneyTheirs =
+        wocModel.pendingOffer?.role === 'seller' && wocMoneyText !== ''
+          ? `<span class="trade-woc-money">${esc(wocMoneyText)}</span>`
+          : '';
       const itemRow = (s: InvSlot, mine: boolean) => {
         // Stale-client guard (R34): the other side's offer is server truth and
         // can carry an id this bundle predates; buildTradeItemRow keeps the raw
@@ -19053,7 +19081,7 @@ export class Hud {
           <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
             <h4>${esc(t('hud.trade.yourOffer'))}</h4>
             <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
-            <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>
+            <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>${wocMoneyMine}
               <span class="trade-coins">
                 <input class="coininput" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
                 <input class="coininput" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
@@ -19064,7 +19092,7 @@ export class Hud {
           <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
             <h4>${esc(t('hud.trade.theirOffer', { name: info.otherName }))}</h4>
             <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
-            <div class="trade-money">${esc(t('hud.trade.money'))}: <span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span></div>
+            <div class="trade-money">${esc(t('hud.trade.money'))}: ${wocMoneyTheirs || `<span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span>`}</div>
           </div>
         </div>
         <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>
@@ -19073,7 +19101,18 @@ export class Hud {
       acceptBtn.className = 'btn';
       acceptBtn.textContent = info.myAccepted ? t('hud.trade.waiting') : t('hud.trade.accept');
       acceptBtn.disabled = info.myAccepted;
-      acceptBtn.addEventListener('click', () => this.sim.tradeConfirm());
+      acceptBtn.addEventListener('click', () => {
+        // With a $WOC offer standing, the sim's confirm must NEVER run: it swaps
+        // atomically the moment both sides accept, and this deal carries no gold
+        // and no buyer items, so it would hand the goods over for nothing.
+        // Agreement is recorded on the offer instead, and the second acceptance
+        // is what escrows.
+        if (this.wocTradeOffer !== null) {
+          void this.acceptWocTradeOffer();
+          return;
+        }
+        this.sim.tradeConfirm();
+      });
       const cancelBtn = document.createElement('button');
       cancelBtn.className = 'btn';
       cancelBtn.textContent = t('hud.trade.cancel');

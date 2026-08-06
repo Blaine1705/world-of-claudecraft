@@ -13108,6 +13108,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.incomingTitle': '{name} からの $WOC オファー',
   'hudChrome.trade.woc.incomingBody':
     '{name} が {item} を {price} であなたに売却すると提案しています。',
+  'hudChrome.trade.woc.moneyUsd': '{usd} USD',
+  'hudChrome.trade.woc.moneyTokens': '(約 {tokens} $WOC)',
+  'hudChrome.trade.woc.waitingOther': 'オファーを承諾しました。相手の承諾を待っています。',
   'hudChrome.trade.woc.accept': 'オファーを承諾',
   'hudChrome.trade.woc.accepted': 'オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。',
   'hudChrome.trade.woc.decline': '辞退する',

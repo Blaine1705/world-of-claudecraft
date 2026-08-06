@@ -1917,8 +1917,18 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     usdCents: 5000,
     ...over,
   });
-  const acceptWith = (h: Harness, id: number) =>
+  /** The seller's half: names the copy. */
+  const sellerAccepts = (h: Harness, id: number) =>
     h.service.acceptDirectedOffer(SELLER, id, { index: 0, itemId: EPIC_ITEM }, SELLER_CHAR);
+  /** The buyer's half: money only, no item. */
+  const buyerAccepts = (h: Harness, id: number) =>
+    h.service.acceptDirectedOffer(BUYER_A, id, null, CHAR_A);
+  /** Both, buyer first, so the SELLER's is the one that escrows. */
+  const acceptWith = async (h: Harness, id: number) => {
+    const first = await buyerAccepts(h, id);
+    if (!first.ok) return first;
+    return sellerAccepts(h, id);
+  };
 
   it('escrows NOTHING at offer time: the seller keeps the item until acceptance', async () => {
     // This is the whole reason an offer is not a listing. If proposing escrowed,
@@ -1966,17 +1976,22 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const accepted = await acceptWith(h, offer.offer.id);
     if (!accepted.ok) throw new Error(`accept refused: ${(accepted as { reason: string }).reason}`);
     expect(bagsOf(h, SELLER_CHAR), 'the copy left the bags').toHaveLength(before - 1);
-    expect(accepted.listing.directedBuyerAccount).toBe(BUYER_A);
+    expect(accepted.listing?.directedBuyerAccount).toBe(BUYER_A);
     // One agreed price, carried onto both price fields.
-    expect(accepted.listing.buyNowCents).toBe(5000);
-    expect(accepted.listing.startCents).toBe(5000);
+    expect(accepted.listing?.buyNowCents).toBe(5000);
+    expect(accepted.listing?.startCents).toBe(5000);
   });
 
   it('refuses acceptance by anyone but the named buyer, as not_found', async () => {
     const h = stocked();
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
-    const res = await h.service.acceptDirectedOffer(BUYER_B, offer.offer.id, { index: 0, itemId: EPIC_ITEM }, CHAR_B);
+    const res = await h.service.acceptDirectedOffer(
+      BUYER_B,
+      offer.offer.id,
+      { index: 0, itemId: EPIC_ITEM },
+      CHAR_B,
+    );
     expect(res).toEqual({ ok: false, reason: 'not_found' });
     expect(bagsOf(h, SELLER_CHAR), 'a refused accept escrows nothing').toHaveLength(2);
   });
@@ -1991,12 +2006,55 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const h = stocked();
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
+    await buyerAccepts(h, offer.offer.id);
     const [first, second] = await Promise.all([
-      acceptWith(h, offer.offer.id),
-      acceptWith(h, offer.offer.id),
+      sellerAccepts(h, offer.offer.id),
+      sellerAccepts(h, offer.offer.id),
     ]);
-    expect([first.ok, second.ok].filter(Boolean), 'exactly one accept wins').toHaveLength(1);
+    // Exactly one produces a LISTING: the other loses the compare-and-set. Both
+    // may report ok, which is why the assertion is on the escrow, not the flag.
+    const listings = [first, second].filter((r) => r.ok && r.listing !== null);
+    expect(listings, 'exactly one accept may escrow').toHaveLength(1);
     expect(bagsOf(h, SELLER_CHAR), 'exactly one copy escrowed').toHaveLength(1);
+  });
+
+  it('escrows on the SECOND acceptance, never the first, from either order', async () => {
+    // Both sides agree through the trade window's ordinary Accept, so one side
+    // alone must move nothing. Order must not matter: whoever presses last is
+    // the one that escrows.
+    for (const sellerFirst of [false, true]) {
+      const h = stocked();
+      const offer = await h.service.createDirectedOffer(offerArgs());
+      if (!offer.ok) throw new Error('offer refused');
+      const before = bagsOf(h, SELLER_CHAR).length;
+
+      const first = sellerFirst
+        ? await sellerAccepts(h, offer.offer.id)
+        : await buyerAccepts(h, offer.offer.id);
+      expect(first.ok, `first accept (sellerFirst=${sellerFirst})`).toBe(true);
+      expect(
+        (first as { listing: unknown }).listing,
+        'one side alone escrows nothing',
+      ).toBeNull();
+      expect(bagsOf(h, SELLER_CHAR)).toHaveLength(before);
+
+      const second = sellerFirst
+        ? await buyerAccepts(h, offer.offer.id)
+        : await sellerAccepts(h, offer.offer.id);
+      expect(second.ok).toBe(true);
+      expect((second as { listing: unknown }).listing, 'the second escrows').not.toBeNull();
+      expect(bagsOf(h, SELLER_CHAR)).toHaveLength(before - 1);
+    }
+  });
+
+  it('refuses a seller acceptance that names no item', async () => {
+    // The seller's acceptance is the only place the goods are named, so an
+    // itemless one would agree to sell nothing.
+    const h = stocked();
+    const offer = await h.service.createDirectedOffer(offerArgs());
+    if (!offer.ok) throw new Error('offer refused');
+    const res = await h.service.acceptDirectedOffer(SELLER, offer.offer.id, null, SELLER_CHAR);
+    expect(res.ok).toBe(false);
   });
 
   it('a sequential second accept is also refused', async () => {
@@ -2017,11 +2075,12 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     const offer = await h.service.createDirectedOffer(offerArgs());
     if (!offer.ok) throw new Error('offer refused');
     h.db.failNextEscrow = 'lease_lost';
-    const failed = await acceptWith(h, offer.offer.id);
+    await buyerAccepts(h, offer.offer.id);
+    const failed = await sellerAccepts(h, offer.offer.id);
     expect(failed.ok).toBe(false);
     expect(bagsOf(h, SELLER_CHAR), 'the copy came back').toHaveLength(2);
     // Still pending, so the buyer can simply try again.
-    const retried = await acceptWith(h, offer.offer.id);
+    const retried = await sellerAccepts(h, offer.offer.id);
     expect(retried.ok, 'the reopened offer accepts on retry').toBe(true);
   });
 
@@ -2081,13 +2140,15 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
       usdCents: 5000,
     });
     if (!offer.ok) throw new Error('offer refused');
+    const first = await h.service.acceptDirectedOffer(BUYER_A, offer.offer.id, null, CHAR_A);
+    if (!first.ok) throw new Error('buyer accept refused');
     const accepted = await h.service.acceptDirectedOffer(
       SELLER,
       offer.offer.id,
       { index: 0, itemId: EPIC_ITEM },
       SELLER_CHAR,
     );
-    if (!accepted.ok) throw new Error('accept refused');
+    if (!accepted.ok || accepted.listing === null) throw new Error('seller accept refused');
     return accepted.listing;
   }
 

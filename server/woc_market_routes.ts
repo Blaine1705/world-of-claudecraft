@@ -686,21 +686,30 @@ async function createOfferHandler(ctx: Ctx): Promise<void> {
 }
 
 async function acceptOfferHandler(ctx: Ctx): Promise<void> {
-  // The SELLER accepts, naming the copy they are parting with.
+  // Either side may accept. The SELLER names the copy they are parting with;
+  // the buyer sends no item, because they bring only money.
   const body = bodyOf(ctx);
   const expectInstance = optionalInstance(body.expectInstance);
+  const hasItem = typeof body.itemId === 'string' && body.itemId !== '';
+  const viewer = ctxAccountId(ctx);
   const out = await useService().acceptDirectedOffer(
-    ctxAccountId(ctx),
+    viewer,
     idParam(ctx),
-    {
-      index: intField(body.itemIndex, 0, 10_000),
-      itemId: stringField(body.itemId, 128),
-      ...(expectInstance === undefined ? {} : { expectInstance }),
-    },
+    hasItem
+      ? {
+          index: intField(body.itemIndex, 0, 10_000),
+          itemId: stringField(body.itemId, 128),
+          ...(expectInstance === undefined ? {} : { expectInstance }),
+        }
+      : null,
     intField(body.characterId, 1, Number.MAX_SAFE_INTEGER),
   );
   if (!out.ok) throwRefusal(out.reason);
-  json(ctx.res, 200, { listing: listingView(out.listing, ctxAccountId(ctx)) });
+  // A null listing means "agreed, still waiting on the other side": the deal is
+  // live but nothing has escrowed, and the client must not treat it as done.
+  json(ctx.res, 200, {
+    listing: out.listing === null ? null : listingView(out.listing, viewer),
+  });
 }
 
 async function declineOfferHandler(ctx: Ctx): Promise<void> {

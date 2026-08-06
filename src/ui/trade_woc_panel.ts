@@ -54,6 +54,24 @@ function usd(cents: number): string {
   return `$${formatNumber(cents / 100, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
+/**
+ * The standing offer as it reads in the trade window's Money row.
+ *
+ * "$1.00 USD (~ 7,812.5 $WOC)": the currency the two players agreed in, with
+ * the server-quoted token figure beside it. The tilde is doing real work, since
+ * the token amount is a preview and the exact number is set by a fresh quote at
+ * payment time. Empty string when there is no offer, so the caller can fall
+ * back to gold without a branch on null.
+ */
+export function wocTradeMoneyText(offer: WocPendingOffer | null): string {
+  if (offer === null) return '';
+  const price = t('hudChrome.trade.woc.moneyUsd', { usd: usd(offer.usdCents) });
+  if (offer.tokens === null) return price;
+  return `${price} ${t('hudChrome.trade.woc.moneyTokens', {
+    tokens: formatNumber(offer.tokens, { maximumFractionDigits: 4 }),
+  })}`;
+}
+
 export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
   return buildWocTradeModel({
     marketEnabled: deps.marketEnabled,
@@ -92,20 +110,14 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     // Both sides read the SAME price, in the currency they agreed it in, with
     // the token figure as the server quoted it. The seller gets Accept; the
     // buyer gets Withdraw. Neither is offered an action that is not theirs.
-    const tokens =
-      o.tokens === null
-        ? ''
-        : ` <span class="trade-woc-tokens">(${esc(
-            t('hudChrome.trade.woc.equivalent', {
-              tokens: formatNumber(o.tokens, { maximumFractionDigits: 4 }),
-            }),
-          )})</span>`;
+    // No Accept button of its own: agreement rides the trade window's existing
+    // Accept, on both sides, exactly as a gold trade does. The only action here
+    // is the buyer's withdraw, which has no equivalent in the window's chrome.
     const action =
-      o.role === 'seller'
-        ? `<button type="button" class="btn trade-woc-accept" data-woc-accept${model.canAccept ? '' : ' disabled'}>${esc(t('hudChrome.trade.woc.accept'))}</button>`
-        : `<button type="button" class="btn trade-woc-cancel" data-woc-cancel>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`;
+      o.role === 'buyer'
+        ? `<button type="button" class="btn trade-woc-cancel" data-woc-cancel>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
+        : '';
     return `<div class="trade-woc-arm">${modeTabs}
-      <p class="trade-woc-offer"><strong>${esc(usd(o.usdCents))}</strong>${tokens}</p>
       <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
       ${action}
       <p class="trade-woc-hint" data-woc-hint></p>
