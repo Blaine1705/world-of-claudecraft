@@ -2554,6 +2554,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': '沒有待領取內容。銷售收益和過期上架會在這裡領取。',
   'itemUi.market.collectNote': '商人為你保管的收益和退回貨物。',
   'itemUi.market.saleProceeds': '銷售收益',
+  'itemUi.market.saleOlder': '另有 {count} 筆較早的交易，已計入總額。',
   'itemUi.market.collectAll': '全部領取',
   'itemUi.logs.listedItem': '已將 {item} 以 {money} 上架到世界市場。',
   'itemUi.logs.sellerSold': '{buyer} 以 {money} 買走了你的 {item}。向商人領取 {proceeds}。',

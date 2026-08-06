@@ -11761,6 +11761,34 @@
     gap: 8px;
     align-items: center;
   }
+  /* The sale ledger under the proceeds line: what sold, to whom, for how much.
+     Indented and dimmer than a .mkt-collect row because it itemizes the purse
+     above rather than naming another thing to pick up. */
+  .mkt-sale-list {
+    margin: -4px 0 8px 12px;
+  }
+  .mkt-sale {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 8px;
+    border-left: 2px solid var(--border);
+    margin-bottom: 4px;
+  }
+  .mkt-sale-name {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mkt-sale-buyer,
+  .mkt-sale-more {
+    font-size: 0.85em;
+    opacity: 0.7;
+  }
+  .mkt-sale-more {
+    padding: 4px 8px;
+  }
   #map-canvas {
     /* Authored display size matching the 560x560 backing store (index.html /
        play.html). Without a CSS length the canvas box is a replaced intrinsic size,

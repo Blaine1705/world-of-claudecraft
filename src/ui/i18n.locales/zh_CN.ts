@@ -2552,6 +2552,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.collectEmpty': '没有待领取内容。销售收益和过期上架会在这里领取。',
   'itemUi.market.collectNote': '商人为你保管的收益和退回货物。',
   'itemUi.market.saleProceeds': '销售收益',
+  'itemUi.market.saleOlder': '另有 {count} 笔较早的交易，已计入总额。',
   'itemUi.market.collectAll': '全部领取',
   'itemUi.logs.listedItem': '已将 {item} 以 {money} 上架到世界市场。',
   'itemUi.logs.sellerSold': '{buyer} 以 {money} 买走了你的 {item}。向商人领取 {proceeds}。',

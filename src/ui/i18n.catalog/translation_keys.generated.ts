@@ -8631,6 +8631,8 @@ export type TranslationKeyFlat =
   | 'itemUi.market.rarityUncommon'
   | 'itemUi.market.reclaim'
   | 'itemUi.market.reclaimAria'
+  | 'itemUi.market.saleBuyer'
+  | 'itemUi.market.saleOlder'
   | 'itemUi.market.saleProceeds'
   | 'itemUi.market.searchAria'
   | 'itemUi.market.searchPlaceholder'
