@@ -14,8 +14,8 @@
 //
 // DOM/Three-free (registered in tests/architecture.test.ts UI_PURE_CORES).
 
-import type { InvSlot, ItemDef } from '../sim/types';
 import { exchangeHardLock, exchangeItemCategory } from '../sim/exchange_eligibility';
+import type { InvSlot, ItemDef } from '../sim/types';
 
 /** What the window knows about the other side, fed by the server (never by the
  *  sim, which sits inside the token firewall and knows nothing about wallets). */

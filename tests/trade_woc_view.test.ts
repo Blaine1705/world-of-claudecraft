@@ -11,9 +11,9 @@
 //     the settlement by a cent.
 
 import { describe, expect, it } from 'vitest';
+import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { buildWocTradeModel, wocTradableSlot } from '../src/ui/trade_woc_view';
-import { ITEMS } from '../src/sim/data';
 
 const PARTNER = { characterId: 21, name: 'Aldan', walletVerified: true };
 
@@ -111,9 +111,7 @@ describe('what blocks the arm, and in what order', () => {
   });
 
   it('reports no eligible items only once something is staged', () => {
-    expect(buildWocTradeModel(input({ staged: [slot(QUEST.id)] })).block).toBe(
-      'no_eligible_items',
-    );
+    expect(buildWocTradeModel(input({ staged: [slot(QUEST.id)] })).block).toBe('no_eligible_items');
     // An empty trade window is not an error, it is the starting state.
     expect(buildWocTradeModel(input({ staged: [] })).block).toBeNull();
   });
