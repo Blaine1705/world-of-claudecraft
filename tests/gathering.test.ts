@@ -268,18 +268,19 @@ describe('isHarvestableCorpse', () => {
     // dragonkin brood (the broodguard, the whelp and the broodlord are skinnable
     // scaled hide like every other dragonkin corpse; the egg clutch is NOT, a
     // 1 HP shell yields nothing at all), then 40 with this branch's quest-dedupe
-    // pass, whose threnos_first_voice ships a mapped cloth tag. Then 43 with the
-    // Drakelands/Willowfen/Evergarden harvest-gap fix, which tagged dune_troll,
-    // bogtoad, and hedge_knight, and 44 with the Galecrest scuttler reachability
-    // fix.
+    // pass, whose threnos_first_voice ships a mapped cloth tag, then 41 with
+    // shoal_scuttler (Galecrest, meat) once its quest camps made it a reachable
+    // trash beast instead of dead content, then 44 with the Drakelands/
+    // Willowfen/Evergarden harvest-gap fix, which tagged dune_troll, bogtoad,
+    // and hedge_knight.
     expect(included).toHaveLength(44);
-    // ...and the untagged templates are counted rather than assumed: 185 of them
-    // ship, all excluded before this change and all excluded after it, which is
-    // the path fen_troll now joins instead of getting one of its own. (184 before
+    // ...and the untagged templates are counted rather than assumed: all
+    // excluded before this change and all excluded after it, which is the
+    // path fen_troll now joins instead of getting one of its own. (184 before
     // this merge, plus the untagged dragonkin egg from the brood and the four
-    // untagged camp mobs the quest-dedupe pass added, minus the three templates
-    // the harvest-gap fix moves into `included` above and the later Galecrest
-    // corpus movements.)
+    // untagged camp mobs the quest-dedupe pass added, minus shoal_scuttler once
+    // it gained a mapped tag, minus the three templates the harvest-gap fix
+    // moves into `included` above.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
     expect(untagged).toHaveLength(185);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);

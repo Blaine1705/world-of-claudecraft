@@ -54,14 +54,15 @@ describe('mob component-type tags', () => {
     // by emptying the sweep.
     // 36 after the farm-economy pass added mapped tags to 15 coinless trash
     // templates, then 39 once the Drakelands brood (whelp, broodguard,
-    // broodlord) shipped hide+fang, and 40 with this branch's quest-dedupe pass
-    // (threnos_first_voice salvages cloth like the zealot flock he leads).
-    // Then 43 since the Drakelands/Willowfen/Evergarden harvest-gap fix tagged
-    // dune_troll, bogtoad, and hedge_knight (Evergarden's topiary trio stays
-    // untagged: they are the hedge-construct exception in
-    // tests/economy_yield.test.ts), and 44 with the Galecrest scuttler
-    // reachability fix. fen_troll is still the only all-unmapped one: neither
-    // pass tags a template with claw/tusk/gills/horn only.
+    // broodlord) shipped hide+fang, 40 with this branch's quest-dedupe pass
+    // (threnos_first_voice salvages cloth like the zealot flock he leads), and
+    // 41 once shoal_scuttler (Galecrest, meat) gained a quest camp that made it
+    // reachable instead of dead content. Then 44 since the Drakelands/
+    // Willowfen/Evergarden harvest-gap fix tagged dune_troll, bogtoad, and
+    // hedge_knight (Evergarden's topiary trio stays untagged: they are the
+    // hedge-construct exception in tests/economy_yield.test.ts). fen_troll is
+    // still the only all-unmapped one: neither pass tags a template with
+    // claw/tusk/gills/horn only.
     expect(tagged.filter((mob) => isHarvestableCorpse(mob.componentTags))).toHaveLength(44);
   });
 
@@ -154,11 +155,13 @@ describe('mob component-type tags', () => {
     expect(ZONES.length).toBeGreaterThanOrEqual(campZoneIds.size);
     const gaps = [...campZoneIds].filter((id) => !(harvestableByZone.get(id)?.size ?? 0)).sort();
     expect(gaps).toEqual([]);
-    // Decisive pin on the specific fix: the exact mobs that now carry each of
-    // the three previously-gapped zones, alongside the already-tagged Drakelands
-    // brood corpses from the release branch.
+    // Decisive pin on the specific fix: the exact mob that now carries each of
+    // the three previously-gapped zones. Drakelands also camps the Drakelands
+    // dragonkin brood (dragonkin_broodguard, drakemaw_broodlord), which ships
+    // its own hide+fang tags independently of this fix, so dune_troll is not
+    // the zone's only entry.
     expect(harvestableByZone.get('drakelands')).toEqual(
-      new Set(['dragonkin_broodguard', 'drakemaw_broodlord', 'dune_troll']),
+      new Set(['dune_troll', 'dragonkin_broodguard', 'drakemaw_broodlord']),
     );
     expect(harvestableByZone.get('willowfen')).toEqual(new Set(['bogtoad']));
     expect(harvestableByZone.get('evergarden')).toEqual(new Set(['hedge_knight']));

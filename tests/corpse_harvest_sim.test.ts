@@ -3263,11 +3263,14 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // (2 mapped families means no selection can forfeit every yield) and none
     // to refused, exactly +12/+0. Then 164 to 166 with this branch's zones 1-3
     // quest-dedupe pass, whose tagged threnos_first_voice adds its two subsets.
-    // The Drakelands/Willowfen/Evergarden harvest-gap fix and the Galecrest
-    // quest beasts layer on top of that 166/16: dune_troll (4 submasks),
-    // bogtoad (4 submasks, one of them the all-unmapped ['gills'] refusal),
-    // hedge_knight (2 submasks), and the later quest targets leave the merged
-    // corpus at 177 spent and 17 refused.
+    // Then 166 to 168 with the Galecrest quest-camp pass (#2887), which gave
+    // the newly reachable shoal_scuttler the meat tag its tide_scuttler twin
+    // already carried: one mapped family, so both of its subsets spend and
+    // neither can forfeit every yield, exactly +2/+0. The Drakelands/
+    // Willowfen/Evergarden harvest-gap fix layers on top of that 168/16,
+    // adding dune_troll (4 submasks), bogtoad (4 submasks, one of them the
+    // all-unmapped ['gills'] refusal), and hedge_knight (2 submasks), so
+    // spent rises to 177 and refused to 17.
     expect(spent).toBe(177);
     expect(refused).toBe(17);
     expect(spent + refused).toBe(194);
@@ -3360,9 +3363,12 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
     // here while unmappedOffered above stays put, since neither tag is unmapped.
     // Then 235 to 237 with this branch's quest-dedupe pass: the tagged
     // threnos_first_voice adds one cloth extraction on each of its two subsets.
-    // 237 to 248 with the Drakelands/Willowfen/Evergarden harvest-gap fix
+    // Then 237 to 239 with the Galecrest quest-camp pass (#2887): the newly
+    // tagged shoal_scuttler extracts its one meat family on each of its two
+    // subsets, and unmappedOffered above stays put because meat is mapped.
+    // 239 to 250 with the Drakelands/Willowfen/Evergarden harvest-gap fix
     // (dune_troll, bogtoad, and hedge_knight add mapped-family submasks of
-    // their own), then to 250 with the later Galecrest quest beasts.
+    // their own).
     expect(extracted).toBe(250);
   });
 
