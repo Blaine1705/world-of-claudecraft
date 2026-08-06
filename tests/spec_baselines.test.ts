@@ -9,6 +9,7 @@ import {
   type TalentAllocation,
   type TalentModifiers,
 } from '../src/sim/content/talents';
+import { Sim } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 
 type NumericRecord = Record<string, number>;
@@ -36,21 +37,25 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
     stats: { agi: 3, crit: 0.03, dodge: 0.12 },
     global: { meleeDmgPct: 0.06 },
   },
+  // v0.34 rogue base re-band (spec_baselines.ts): the BiS-epic floor lift that
+  // ships with the Thronebane hand fix. apPct/crit carry the auto-attack heavy
+  // kit; meleeDmgPct tops up the builder and finisher share.
   'rogue/assassination': {
-    stats: { crit: 0.03 },
-    global: { meleeDmgPct: 0.08 },
+    stats: { crit: 0.12, apPct: 0.5 },
+    global: { meleeDmgPct: 0.34 },
     abilities: {
       sinister_strike: { costPct: -0.16 },
       eviscerate: { dmgPct: 0.32 },
     },
   },
   'rogue/combat': {
-    stats: { ap: 24, crit: 0.03 },
-    global: { meleeDmgPct: 0.08 },
+    stats: { ap: 24, crit: 0.14, apPct: 0.55 },
+    global: { meleeDmgPct: 0.36 },
     abilities: { sinister_strike: { dmgPct: 0.2, costPct: -0.16 } },
   },
   'rogue/subtlety': {
-    stats: { agi: 7, crit: 0.03, dodge: 0.05 },
+    stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.35 },
+    global: { meleeDmgPct: 0.24 },
     abilities: {
       stealth: { cooldownPct: -0.7 },
       backstab: { dmgPct: 0.16 },
@@ -319,6 +324,26 @@ describe('v0.28 passive restoration hotfix', () => {
     }
     for (const spec of ['fire', 'frost', 'arcane']) {
       expect(baselineSnapshot('mage', spec, 20), `mage/${spec}`).toEqual({});
+    }
+  });
+
+  it('re-bands every rogue spec onto a large Attack Power floor (v0.34)', () => {
+    // The base re-band leans on apPct/crit to lift the auto-attack heavy kit.
+    // Assert it lands end to end: a specced rogue's resolved Attack Power must be
+    // well above a spec-less rogue on identical (empty) gear, which only the
+    // baseline apPct + flat AP can produce. Deterministic (no rng draw).
+    const apFor = (spec: string | null): number => {
+      const sim = new Sim({ seed: 1, playerClass: 'rogue', autoEquip: false });
+      sim.setPlayerLevel(20);
+      if (spec) expect(sim.setSpec(spec)).toBe(true);
+      sim.tick();
+      return sim.player.attackPower;
+    };
+    const bare = apFor(null);
+    for (const spec of ['assassination', 'combat', 'subtlety']) {
+      // apPct is 0.35 to 0.55 across the specs, plus crit/flat AP; every one clears
+      // a 1.3x AP floor over the spec-less rogue. A dropped apPct wiring fails here.
+      expect(apFor(spec), spec).toBeGreaterThan(bare * 1.3);
     }
   });
 
