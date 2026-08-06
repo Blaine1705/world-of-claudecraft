@@ -3332,15 +3332,15 @@ export const TARGETS = [
         // Prefer a missing cell that actually HAS an authored source, so the
         // capture shows the Phase 13 source line rather than a relic still on
         // the pending-ruling list (which paints the plain missing tooltip and
-        // makes the screenshot look like the feature did not land). The aria
-        // label carries the same sentence the tooltip does, so it is the
-        // cheapest thing to select on. Falls back to the first missing cell.
+        // makes the screenshot look like the feature did not land). The
+        // painter stamps data-cell-source on exactly those cells; selecting on
+        // it survives copy rewords and non-English capture locales, where the
+        // old aria-text match ('Drops from') silently degraded to the
+        // fallback. Falls back to the first missing cell.
         const missing = [
           ...document.querySelectorAll('#reliquary-window .reliquary-cell[data-cell-owned="0"]'),
         ];
-        const cell =
-          missing.find((node) => (node.getAttribute('aria-label') ?? '').includes('Drops from')) ??
-          missing[0];
+        const cell = missing.find((node) => node.hasAttribute('data-cell-source')) ?? missing[0];
         if (cell) {
           // attachTooltip binds mouseenter/focusin (never pointerenter); focus
           // is the sturdier trigger here since no synthetic pointerdown has set

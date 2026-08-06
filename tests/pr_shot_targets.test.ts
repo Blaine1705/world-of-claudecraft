@@ -221,6 +221,9 @@ describe('classifyDiff', () => {
     // chips and the page grid's cells, tooltips, and labels. Without it in the
     // when lists a source-line or display-name change ships with no screenshot.
     const plan = classifyDiff(['src/ui/reliquary_labels.ts']);
+    // The negative keeps isVisual meaningful here: every src/ui path is
+    // visual by prefix, so only the discriminating pair proves the flag.
+    expect(classifyDiff(['docs/qa-gate.md']).isVisual).toBe(false);
     expect(plan.isVisual).toBe(true);
     const keys = plan.specific.map((t: { key: string }) => t.key);
     expect(keys).toContain('reliquary-window');
