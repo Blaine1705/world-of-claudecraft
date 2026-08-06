@@ -351,6 +351,25 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     expect(weaponSkinOrientPin(null)).toBeNull();
   });
 
+  it('a live skin swap mid-cast re-selects the cast action', () => {
+    // The cast pose depends on the displayed skin, but the base action is only
+    // re-selected on a base-state EDGE, and applying a skin does not edge the
+    // state. Without an explicit re-drive the rig keeps Spellcasting after a
+    // bow is equipped mid-cast (or keeps the draw after it is removed) for the
+    // rest of that cast. Reported by review on PR 2950.
+    const src = readFileSync(join(ROOT, 'src/render/characters/visual.ts'), 'utf8');
+    const fn = src.slice(
+      src.indexOf('setWeaponSkin(weaponSkinId: string | null)'),
+      src.indexOf('private reattachHeldWeapon('),
+    );
+    expect(fn).toContain("this.baseState === 'cast'");
+    expect(fn).toContain('this.baseAction()');
+    // Guarded so it cannot fight a clamped one-shot or the death pose, both of
+    // which own the rig outright (the zero-weight rules in this directory).
+    expect(fn).toContain('!this.currentIsOneShot');
+    expect(fn).toContain('!this.deadLock');
+  });
+
   it('a drawn bow holds its draw while CASTING, instead of the caster gesture', async () => {
     const { weaponSkinCastClip, weaponSkinHandling, SKIN_ATTACK_CLIP_NAMES } = await import(
       '../src/render/characters/skin_attack'
