@@ -1313,8 +1313,10 @@ describe('landed-catch grant flags (pin 11)', () => {
 
 describe('fishing deeds through the extracted module path (pin 9)', () => {
   it('a landed real fish via completeFishing still marks fish:<zone>', () => {
-    // Seed 1, re-hunted after Reliquary feature-branch world-gen draw-order
-    // shift: the first cast lands a real fish (ZONE_FISH filter ignores junk).
+    // Seed 1, re-hunted after the Galecrest quest-camp stream shift (#2887)
+    // inherited from the release base (the release-side hunt of the same
+    // shift landed on seed 5): the first cast lands a real fish (ZONE_FISH
+    // filter ignores junk).
     const sim = makeSim(1);
     const meta = sim.meta(sim.playerId)!;
     expect(meta.deedStats.visited.has('fish:eastbrook_vale')).toBe(false);
