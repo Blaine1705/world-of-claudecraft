@@ -676,6 +676,100 @@ describe('CI workflow parity', () => {
     }
   });
 
+  it('bounds the test and browser jobs against the runner-side checkout-stall class', () => {
+    // Phase 6 of the CI/CD performance packet: on 2026-08-06 thirteen shard,
+    // lane, and browser jobs across seven runs sat 9.6 to 24.4 minutes inside
+    // actions/checkout before completing (runner-pool-side; healthy checkout
+    // is under 3 minutes; the worst stalled job wall was 32.8 minutes), and
+    // the stall, not any test, set those runs' tails. Each bound is sized
+    // from that job's measured healthy worst case plus margin (the sizing
+    // rationale sits on each ci.yml bound; the evidence table lives in the
+    // packet's detect-wedge postmortem note), so a stalled job dies and gets
+    // rerun on a fresh runner instead of holding a required check. Exact
+    // values, not a floor: resizing a bound is a conscious, measured decision
+    // (the full-core lane revert is the packet's precedent for what happens
+    // to unmeasured resizes). Exactly one job-level line per job, so a
+    // duplicate cannot shadow the pinned one; and job-level, never
+    // step-level, because a step bound leaves the rest of the job free to
+    // hang toward GitHub's 6 hour default.
+    const bounds = [
+      ['pr-gate', 20],
+      ['release-gate', 20],
+      ['pr-long-sims', 20],
+      ['browser-gate', 10],
+      // 8 is a measured decision like the rest (healthy worst 4.42 min, all
+      // observed stalls over 8), so it is pinned exactly here beside the
+      // single-digit shape check the classifier test keeps.
+      ['changes', 8],
+    ] as const;
+    // Both the positive and the negatives run over the full index-based job
+    // span (this job key to the next), never the comment-terminated
+    // jobSource slice, so a stray top-level comment inside a job body can
+    // hide neither a duplicate job-level bound nor a step bound (the fix
+    // round's verifier proved the jobSource form evadable both ways).
+    // Deliberate consequence: a span INCLUDES the 2-space comment block that
+    // documents the NEXT job, so only indentation-anchored patterns belong
+    // on spans; a bare not.toContain would trip on a neighbour's comment.
+    const jobSpan = (name: string) => {
+      const start = workflow.indexOf(`\n  ${name}:`);
+      expect(start).toBeGreaterThanOrEqual(0);
+      const rest = workflow.slice(start + 1);
+      const next = rest.search(/\n {2}[A-Za-z][A-Za-z0-9_-]*:[ \t]*(?:#[^\n]*)?\n/);
+      return next === -1 ? rest : rest.slice(0, next);
+    };
+    for (const [name, minutes] of bounds) {
+      const span = jobSpan(name);
+      const jobLevel = span.match(/^ {4}timeout-minutes: \d+$/gm) ?? [];
+      expect(jobLevel).toEqual([`    timeout-minutes: ${minutes}`]);
+      expect(span).not.toMatch(/\n {8}timeout-minutes:/);
+      // A step bound can also legally sit as the FIRST key of a step item.
+      expect(span).not.toMatch(/\n {6}- timeout-minutes:/);
+    }
+    // Completeness: every ci.yml job is either in the bounds table above or
+    // the named unbounded-by-design list: the checks and release lanes sit outside
+    // Phase 6's measured pass, and bounding them is a recorded follow-up in
+    // the packet's postmortem note, not an accident. A new job therefore
+    // cannot arrive silently unbounded, and moving a job between the lists
+    // is a conscious edit here. The key regex tolerates a trailing comment
+    // or space after the colon, both valid YAML that would otherwise make an
+    // eleventh job invisible. The nightly workflow's deliberately generous
+    // bounds have their own presence pins in tests/nightly_workflow.test.ts
+    // and stay untouched.
+    const UNBOUNDED_BY_DESIGN = [
+      'release-version-gate',
+      'lint',
+      'pr-checks',
+      'release-i18n',
+      'release-checks',
+    ] as const;
+    const jobsSection = workflow.slice(workflow.indexOf('\njobs:'));
+    const jobKeys = [
+      ...jobsSection.matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):[ \t]*(?:#[^\n]*)?\n/g),
+    ].map((m) => m[1]);
+    expect([...jobKeys].sort()).toEqual(
+      [...bounds.map(([name]) => name), ...UNBOUNDED_BY_DESIGN].sort(),
+    );
+    // Two-way: a job on the unbounded list must actually BE unbounded, so
+    // the list is an assertion, not documentation that can rot.
+    for (const name of UNBOUNDED_BY_DESIGN) {
+      expect(jobSpan(name).match(/^ {4}timeout-minutes: \d+$/gm) ?? []).toEqual([]);
+    }
+    // The operator triage for a timeout kill is part of the contract: the
+    // doc must keep the rejection signature, route it to a rerun, and tell
+    // the operator to check for a failing test step first (a genuinely red
+    // shard on a runner with a setup spike can die AS a timeout).
+    const mergeQueueTriage = readFileSync(
+      new URL('../docs/merge-queue.md', import.meta.url),
+      'utf8',
+    );
+    expect(mergeQueueTriage).toContain('exceeded the maximum execution time');
+    expect(mergeQueueTriage).toContain('checkout-stall bound');
+    expect(mergeQueueTriage).toContain('failing or still running');
+    // The routing is the entry's operational point: a timeout kill goes to
+    // a rerun, never straight to a code investigation.
+    expect(mergeQueueTriage).toContain('re-run the failed jobs and re-queue');
+  });
+
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {
     const prGate = jobSource('pr-gate');
     const prChecks = jobSource('pr-checks');
