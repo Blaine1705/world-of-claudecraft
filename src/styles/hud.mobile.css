@@ -2700,20 +2700,14 @@
     padding: 10px;
   }
   body.mobile-touch .dr-spin-stage {
-    width: min(
-      360px,
-      calc(var(--app-vw, 100vw) - 24px),
-      calc(var(--app-vh, 100dvh) - 24px)
-    );
+    width: min(360px, calc(var(--app-vw, 100vw) - 24px), calc(var(--app-vh, 100dvh) - 24px));
   }
   body.mobile-touch .dr-spin-wheel-big {
     width: 300px;
     max-width: 84%;
   }
   body.mobile-touch .dr-spin-wheel-big span {
-    transform:
-      rotate(calc(var(--i) * 45deg + 22.5deg))
-      translateY(-106px)
+    transform: rotate(calc(var(--i) * 45deg + 22.5deg)) translateY(-106px)
       rotate(calc(var(--i) * -45deg - 22.5deg));
   }
   body.mobile-touch .dr-spin-result {
