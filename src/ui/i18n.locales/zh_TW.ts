@@ -8851,7 +8851,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.raise_fallen': '亡者復生（週期性召喚小怪）',
   'hudChrome.finder.mech.soul_rend': '靈魂撕裂（被標記者需分散並接受治療）',
   'hudChrome.finder.mech.deathless_rage': '不死之怒（需在護符石處打斷）',
-  'hudChrome.finder.mech.dread_curse': '恐懼詛咒（僅英雄，疊加換坦減益）',
   'hudChrome.finder.mech.wardstones': '護符石引導（階段轉換）',
   'hudChrome.finder.mech.dread_curse': '恐懼詛咒（僅英雄難度，累加坦克輪換減益）',
   'hudChrome.steam.link': '連結 Steam',
