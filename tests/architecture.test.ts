@@ -257,6 +257,7 @@ const UI_PURE_CORES = [
   'src/ui/disenchant_yield_view.ts',
   'src/ui/material_hint_view.ts',
   'src/ui/material_profession_hint_view.ts',
+  'src/ui/elixir_tooltip_view.ts',
   'src/ui/craft_name_view.ts',
   'src/ui/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',

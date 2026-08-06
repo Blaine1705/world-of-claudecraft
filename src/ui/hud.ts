@@ -248,6 +248,7 @@ import { discordStatusDisplayName } from './discord_tier';
 import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
+import { elixirTooltipLines } from './elixir_tooltip_view';
 import { emoteIconUrl } from './emote_icons';
 import {
   applyEnchantResultToast,
@@ -5655,6 +5656,10 @@ export class Hud {
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useHealingPotion', { amount: itemNumber(item.potionHp) }))}</div>`;
     if (item.potionMana)
       html += `<div class="tt-desc">${esc(t('itemUi.tooltip.useManaPotion', { amount: itemNumber(item.potionMana) }))}</div>`;
+    // Battle elixirs: the temporary stat-buff quaffing grants (sim/items.ts
+    // useItem), from the pure sibling view so bags, bank, crafting, vendor,
+    // and market all state what the elixir does.
+    html += elixirTooltipLines(item);
     // Quest story block (related quest, progress, rules, orphaned). Replaces the
     // old plain "Quest Item" desc that doubled the kind line.
     if (questModel) html += this.questItemTooltipStoryHtml(questModel);

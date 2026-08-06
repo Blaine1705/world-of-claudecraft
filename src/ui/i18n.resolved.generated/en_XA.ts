@@ -7404,6 +7404,8 @@ export const en_XA: EnTranslations = {
       "stat": "[+{value} {stat}]",
       "useFood": "[Úšé: Ŕéšţóŕéš {amount} ĥéáļţĥ óʋéŕ {seconds} šéç. Ɱúšţ ŕéɱáíñ šéáţéð ŵĥíļé éáţíñĝ.]",
       "useDrink": "[Úšé: Ŕéšţóŕéš {amount} ɱáñá óʋéŕ {seconds} šéç. Ɱúšţ ŕéɱáíñ šéáţéð ŵĥíļé ðŕíñķíñĝ.]",
+      "useElixir": "[Úšé: Íñçŕéášéš ýóúŕ {stat} ƀý {value} ƒóŕ {minutes} ɱíñ. Úšáƀļé íñ çóɱƀáţ.]",
+      "useElixirAura": "[Úšé: Ĝŕáñţš {aura} ƒóŕ {minutes} ɱíñ. Úšáƀļé íñ çóɱƀáţ.]",
       "questItem": "[Ɋúéšţ Íţéɱ]",
       "questRelated": "[Ɋúéšţ: {quest}]",
       "questRules": "[Çáññóţ ƀé šóļð, ƀáñķéð, óŕ ţŕáðéð.]",

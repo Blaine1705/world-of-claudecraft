@@ -2554,6 +2554,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。',
   'itemUi.tooltip.useManaPotion':
     '使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。',
+  'itemUi.tooltip.useElixir':
+    '使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。',
+  'itemUi.tooltip.useElixirAura':
+    '使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',

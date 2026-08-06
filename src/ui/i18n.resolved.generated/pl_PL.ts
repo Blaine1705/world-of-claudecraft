@@ -7404,6 +7404,8 @@ export const pl_PL: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Użycie: Przywraca {amount} zdrowia w ciągu {seconds} s. Podczas jedzenia musisz pozostać w pozycji siedzącej.",
       "useDrink": "Użycie: Przywraca {amount} many w ciągu {seconds} s. Podczas picia musisz pozostać w pozycji siedzącej.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Przedmiot zadania",
       "questRelated": "Zadanie: {quest}",
       "questRules": "Nie można go sprzedać, zdeponować w banku ani wymienić.",
