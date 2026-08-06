@@ -2537,7 +2537,6 @@ function applyBulwarkPad(x: number, z: number, h: number): number {
   return h + (bulwarkPadTarget() - h) * w;
 }
 
-
 // The pad's northeast apron meets the Last Spring pool, and the pad yields to
 // the pool over castlePadWeight's own ring: the bailey's level floor ends on an
 // arc about 16yd out from the pool center and the ground then falls to the pool
