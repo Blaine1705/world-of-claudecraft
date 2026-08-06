@@ -5998,6 +5998,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "item",
+        "name": "Pristine Claw"
+      },
+      {
+        "kind": "item",
         "name": "Fine Osmium Ore"
       },
       {

@@ -195,12 +195,19 @@ export const RELIQUARY_PROFESSION_MARKS = {
   ],
 } as const;
 
-/** Apex fine-grade materials (key signed-field trophies via itemsDiscovered). */
+/**
+ * Apex fine-grade materials (key signed-field trophies via itemsDiscovered).
+ * The corpse block mirrors HARVEST_COMPONENT_SPECIMENS values (pinned
+ * bidirectionally in tests/reliquary_content.test.ts so a new harvest family
+ * cannot land without its Reliquary slot); the fine_* trio are the gathering
+ * jackpots.
+ */
 export const RELIQUARY_PROFESSION_SPECIMEN_ITEMS = [
   'pristine_hide',
   'pristine_silk',
   'pristine_venom_gland',
   'prime_cut',
+  'pristine_claw',
   'fine_thorium_ore',
   'fine_elderwood_log',
   'fine_sunpetal_herb',

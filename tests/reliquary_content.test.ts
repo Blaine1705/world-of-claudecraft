@@ -7,7 +7,7 @@ import { CLASSES } from '../src/sim/content/classes';
 import { DEED_ORDER, DEEDS } from '../src/sim/content/deeds';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
-import { CRAFT_RING } from '../src/sim/content/professions';
+import { CRAFT_RING, HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
@@ -428,6 +428,7 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'pristine_silk',
       'pristine_venom_gland',
       'prime_cut',
+      'pristine_claw',
       'fine_thorium_ore',
       'fine_elderwood_log',
       'fine_sunpetal_herb',
@@ -436,6 +437,18 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     for (const id of itemRelicIds(page)) {
       expect(ITEMS[id], id).toBeDefined();
       expect(isCataloguedRelicItem(id)).toBe(true);
+    }
+  });
+
+  it('every corpse-harvest specimen family has its slot on the specimen page', () => {
+    // Bidirectional guard against concurrent-content drift: PR 2905 added the
+    // claw family on the release side while this branch curated the page, and
+    // the literal pin above alone could not red on the union. A new
+    // HARVEST_COMPONENT_SPECIMENS family now fails here until its jackpot item
+    // is added to RELIQUARY_PROFESSION_SPECIMEN_ITEMS.
+    const specimenIds = new Set<string>(RELIQUARY_PROFESSION_SPECIMEN_ITEMS);
+    for (const [family, itemId] of Object.entries(HARVEST_COMPONENT_SPECIMENS)) {
+      expect(specimenIds.has(itemId), `harvest family '${family}' (${itemId})`).toBe(true);
     }
   });
 
