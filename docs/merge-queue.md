@@ -11,6 +11,12 @@ the ci.yml merge_group trigger lands there; `main` joins at the next
 release-to-main merge, which is what carries that trigger onto main (enabling
 the queue on a branch whose ci.yml lacks the trigger stalls every queued PR).
 Until a branch is covered by the ruleset, its merge button is unchanged.
+The same sequencing applies to every NEW required name after that: add a
+check's context to the ruleset only AFTER the PR introducing the job has
+merged into the target branch (`PR gate (long sims)` is the first case), and
+expect open PRs whose heads predate the job to need a base re-merge before
+they can queue, since a required context that never reports blocks the merge
+forever.
 
 Why: on 2026-08-05 two merges landed on an already-red release tip, every open
 PR inherited 67 broken tests, and repair took a day of close/reopen churn. The

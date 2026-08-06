@@ -368,7 +368,13 @@ describe('CI workflow parity', () => {
       // survives the comment, the anchored form does not.
       expect(prChecks).toMatch(new RegExp(`\\n {8}${step.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
       expect(prGate).not.toContain(step);
+      expect(prLongSims).not.toContain(step);
     }
+    // The lane job is tests-only through the shard runner, like pr-gate: a
+    // raw `npm test` or a check step substituted into it would run the whole
+    // suite (or a check) on every PR under the lane's name.
+    expect(prLongSims).not.toContain('run: npm test');
+    expect(prLongSims).not.toContain('Cache tsc incremental buildinfo');
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.

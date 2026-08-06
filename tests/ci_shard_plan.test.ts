@@ -242,7 +242,7 @@ describe('the long-sims lane (Phase 4)', () => {
     testFiles: [...COLLECTED, LANE_BLIND, LANE_GRAPH],
   };
 
-  it('pins the lane membership list and the 90 second threshold doctrine', () => {
+  it('pins the lane membership list as a literal', () => {
     // Literal list: a rename or removal must be a conscious decision here AND
     // in the measured record (docs/prd/ci-cd-performance/ phase notes), never
     // a refactor side effect.
@@ -328,9 +328,11 @@ describe('the long-sims lane (Phase 4)', () => {
     expect(floorLeg.args).not.toContain(LANE_BLIND);
     expect(floorLeg.args).not.toContain(LANE_GRAPH);
     expect(plan.laneFloorCount).toBe(1);
-    // floorCount reports what THIS leg runs; the lane-handled member is
-    // accounted separately, and outsideFloorCount still uses the whole floor.
-    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25 + 1 - 1);
+    // floorCount reports what THIS leg runs. The fixture's whole floor is the
+    // base fixture's FLOOR_SANITY_MIN + 25 plus LANE_BLIND (added to
+    // alwaysRun above); the one lane member then moves to the lane, so the
+    // leg is back at the base figure.
+    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25);
     expect(relatedLeg.args).not.toContain('--exclude=' + LANE_BLIND);
     expect(relatedLeg.args.join(' ')).not.toContain('--exclude');
   });
@@ -371,12 +373,39 @@ describe('the long-sims lane (Phase 4)', () => {
       const lanePlan = buildLanePlan({ ...LANE_BASE, ...overrides });
       expect(shardPlan.mode).toBe('full');
       expect(lanePlan.mode).toBe('full');
+      // The REASON must mirror too, not just the decision: the lane's log is
+      // part of the audit trail, and a lane that claims "mode=full from the
+      // changes job" while it actually fell back on an unsafe relay would be
+      // a false statement in exactly the line reviewers are told to read.
+      expect(lanePlan.reason).toBe(shardPlan.reason);
       // The union invariant under every fallback: the shard leg excludes
       // exactly what the lane runs.
       expect(
         shardPlan.legs[0].args.filter((a) => a.startsWith('--exclude=')).map((a) => a.slice(10)),
       ).toEqual(lanePlan.laneFiles);
     }
+  });
+
+  it('a lane file the walker cannot see stays inside the shards, end to end', () => {
+    // The documented fail-safe direction (collectedLaneFiles' comment): a
+    // lane file present in alwaysRun but ABSENT from the collected set is
+    // neither excluded from the shard legs nor run by the lane, so it stays
+    // wherever the pre-lane layout had it (the floor leg here). Coverage
+    // keeps, latency loses.
+    const uncollected = {
+      ...LANE_BASE,
+      alwaysRun: [...ALWAYS, LANE_BLIND],
+      testFiles: [...COLLECTED, LANE_GRAPH],
+    };
+    const shardPlan = buildShardPlan({ ...uncollected });
+    expect(shardPlan.mode).toBe('selective');
+    expect(shardPlan.legs[0].args).toContain(LANE_BLIND);
+    expect(shardPlan.legs[0].args.some((a) => a === `--exclude=${LANE_BLIND}`)).toBe(false);
+    const lanePlan = buildLanePlan({ ...uncollected });
+    expect(lanePlan.laneFiles).toEqual([]);
+    const shardFull = buildShardPlan({ ...uncollected, mode: 'full' });
+    expect(shardFull.legs[0].args).not.toContain(`--exclude=${LANE_BLIND}`);
+    expect(shardFull.legs[0].args).toContain(`--exclude=${LANE_GRAPH}`);
   });
 
   it('lane selective mode runs only floor or changed lane files, zero legs when none', () => {
@@ -482,6 +511,14 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(unknown.log).toContain('usage:');
     const ambiguous = await runEntry(['--lane=long-sims', '--shard=1/8', '--plan-only'], {});
     expect(ambiguous.exitCode).toBe(1);
+    // A MALFORMED shard token beside the lane must also fail: parseShardArg
+    // returns null for it, so a parsed-value check would silently run the
+    // lane and ignore the token, guessing a partition.
+    const malformedBeside = await runEntry(['--lane=long-sims', '--shard=0/8', '--plan-only'], {});
+    expect(malformedBeside.exitCode).toBe(1);
+    // Duplicate lane flags are a wiring bug too, whatever their values.
+    const duplicated = await runEntry(['--lane=long-sims', '--lane=long-sims', '--plan-only'], {});
+    expect(duplicated.exitCode).toBe(1);
   });
 
   it('lane mode owns every CI_LONG_SUITES file when the changes job says full', async () => {
@@ -509,10 +546,64 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
       CHANGED_FILES: '["src/ui/unit_portrait.ts"]',
     });
     expect(run.exitCode).toBe(0);
-    expect(run.log).toContain('plan: mode=selective');
+    // The exact reason line closes BOTH directions and the cardinality at
+    // once: "1 of 4" fails if any second lane file joins (whatever its sort
+    // position) and if the list total drifts.
+    expect(run.log).toContain(
+      'plan: mode=selective (selective: 1 of 4 lane file(s) on the floor or changed)',
+    );
     expect(run.log).toContain('lane runs: tests/battleground.test.ts');
     expect(run.log).not.toContain('tests/chronomancy_balance.test.ts');
   });
+
+  it('vitest honors exact-path --exclude flags additively (the one external assumption)', async () => {
+    // The whole lane rests on `--exclude=<exact relative path>` removing that
+    // file and ONLY that file, while the config-level excludes stay in force.
+    // If a vitest bump changed either semantic, the lane files would run in
+    // both halves (duplicate work, never a gap) and the perf win would vanish
+    // silently; this spawn makes that loud. `vitest list --filesOnly` prints
+    // the collected set without running anything.
+    const child = spawn(
+      'npx',
+      [
+        '--no-install',
+        'vitest',
+        'list',
+        '--filesOnly',
+        `--exclude=${'tests/battleground.test.ts'}`,
+      ],
+      { cwd: repoRoot, env: { ...process.env } },
+    );
+    let out = '';
+    child.stdout.on('data', (chunk) => {
+      out += String(chunk);
+    });
+    child.stderr.on('data', (chunk) => {
+      out += String(chunk);
+    });
+    const exitCode = await new Promise<number | null>((resolve, reject) => {
+      const killer = setTimeout(() => {
+        child.kill('SIGKILL');
+        reject(new Error(`vitest list did not exit within 120s; output:\n${out.slice(0, 4000)}`));
+      }, 120_000);
+      killer.unref();
+      child.on('error', reject);
+      child.on('close', (code) => {
+        clearTimeout(killer);
+        resolve(code);
+      });
+    });
+    expect(exitCode).toBe(0);
+    const files = out.split('\n').map((l) => l.trim());
+    // Exact, not glob-broadened: the excluded file is gone, its many
+    // same-prefix siblings survive.
+    expect(files.some((f) => f.endsWith('tests/battleground.test.ts'))).toBe(false);
+    expect(files.some((f) => f.endsWith('tests/battleground_band.test.ts'))).toBe(true);
+    expect(files.some((f) => f.endsWith('tests/battleground_hud.test.ts'))).toBe(true);
+    // Additive to the config excludes, never replacing them.
+    expect(files.some((f) => f.includes('tests/browser/'))).toBe(false);
+    expect(files.some((f) => f.includes('node_modules/'))).toBe(false);
+  }, 130_000);
 
   it('shard mode passes the lane exclusions through to the real leg argv', async () => {
     const run = await runEntry(['--shard=2/8', '--plan-only'], {

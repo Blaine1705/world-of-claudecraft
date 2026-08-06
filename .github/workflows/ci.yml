@@ -57,9 +57,9 @@ concurrency:
 #                 each cost 90+ seconds inside a shard and were setting the
 #                 slowest shard's wall clock, so this job runs them alone while
 #                 every pr-gate shard leg excludes them. Same triggers and
-#                 filters as pr-gate; the union of the nine PR-tier test jobs is
-#                 exactly the old 8-shard suite in every mode combination
-#                 (pinned by tests/ci_shard_plan.test.ts).
+#                 filters as pr-gate; mode for mode, the nine PR-tier test jobs
+#                 together run exactly what the pre-lane 8-shard layout would
+#                 have run (pinned by tests/ci_shard_plan.test.ts).
 #
 #   pr-checks     the PR tier's serialized checks (i18n freshness + coverage
 #                 summary, malware gate, game/admin typecheck, env/server/bot/client
@@ -87,29 +87,31 @@ concurrency:
 # builds live in release-checks.
 #
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
-# code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any other
-# always-on cheap jobs) but skip pr-gate, pr-long-sims, pr-checks, and
-# browser-gate. Any touch of the code path set forces the full PR tier. push to main/dev-*,
-# workflow_dispatch, and merge_group queue runs always report code=true (full
-# PR tier when unsure).
+# code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any
+# other always-on cheap jobs) but skip pr-gate, pr-long-sims, pr-checks, and
+# browser-gate. Any touch of the code path set forces the full PR tier. push
+# to main/dev-*, workflow_dispatch, and merge_group queue runs always report
+# code=true (full PR tier when unsure).
 # Release/** pushes and release-to-main PRs never consult the filter:
 # release-gate, release-checks, and release-version-gate stay always-full
 # (no path skip on those jobs).
 #
 # Selective PR tier (the CI/CD performance packet's Phase 2): the same
-# changes job also emits test_mode/changed_files from the same listing, and the
-# pr-gate shards run scripts/ci_shard_test.mjs, which either replays the full
-# `npm test -- --shard` step (mode=full, the fail-closed default for anything
-# unprovable) or runs the always-run floor + `vitest related`, sharded. The
-# reference semantics and the audit contract live in docs/qa-gate.md
-# ("Selective PR-tier CI"). Selection NEVER applies to release-gate or the
-# nightly workflow: those are the unconditional full-suite backstops.
+# changes job also emits test_mode/changed_files from the same listing, and
+# the pr-gate shards run scripts/ci_shard_test.mjs, which either replays the
+# pre-selection `npm test -- --shard` step minus the long-sims lane files
+# (mode=full, the fail-closed default for anything unprovable; the lane job
+# runs those files in the same run) or runs the always-run floor +
+# `vitest related`, sharded. The reference semantics and the audit contract
+# live in docs/qa-gate.md ("Selective PR-tier CI"). Selection NEVER applies
+# to release-gate or the nightly workflow: those are the unconditional
+# full-suite backstops.
 #
 # Merge queue runs: a merge_group event routes through the PR-tier jobs
-# (changes, lint, pr-gate, pr-long-sims, pr-checks, browser-gate). The changes
-# job treats
-# every non-PR event as code=true and test_mode=full, so the queue always runs
-# the FULL suite on the exact merge result it is about to make the branch tip.
+# (changes, lint, pr-gate, pr-long-sims, pr-checks, browser-gate). The
+# changes job treats every non-PR event as code=true and test_mode=full, so
+# the queue always runs the FULL suite on the exact merge result it is about
+# to make the branch tip.
 # That is deliberate, not an optimization target: the queue is the last
 # pre-merge bar, and selection never applies to it. This also covers a queued
 # release-to-main PR (the pull_request-only exclusions below cannot match a
@@ -172,9 +174,9 @@ jobs:
       code: ${{ steps.filter.outputs.code }}
       # Phase 2 selection decision (docs/qa-gate.md, "Selective PR-tier CI"): the
       # same fetched listing also decides whether pr-gate may run the selective
-      # test plan. Fail closed: anything unprovable is test_mode=full, and full
-      # mode is byte-identical to the pre-selection shard step. Release jobs
-      # never read these.
+      # test plan. Fail closed: anything unprovable is test_mode=full, which
+      # runs the pre-selection shard step minus the long-sims lane files (the
+      # lane job runs those in the same run). Release jobs never read these.
       test_mode: ${{ steps.filter.outputs.test_mode }}
       test_mode_reason: ${{ steps.filter.outputs.test_mode_reason }}
       changed_files: ${{ steps.filter.outputs.changed_files }}
@@ -394,11 +396,13 @@ jobs:
       # pr-checks. Workers stay at half the runner's cores inside the script.
       #
       # Phase 2 (docs/qa-gate.md, "Selective PR-tier CI"): the runner reads the
-      # changes job's selection decision. test_mode=full spawns exactly the old
-      # step (`npm test -- --shard=i/8`); test_mode=selective runs the
-      # always-run floor (blind/partial tests + invariant guard suites + changed
-      # tests, recomputed in this tree) plus `vitest related` over the changed
-      # sources, both sharded. Decisions and skip counts print in the job log.
+      # changes job's selection decision. test_mode=full spawns the old step
+      # (`npm test -- --shard=i/8`) minus the long-sims lane files, which the
+      # pr-long-sims job runs in this same run (Phase 4); test_mode=selective
+      # runs the always-run floor (blind/partial tests + invariant guard
+      # suites + changed tests, recomputed in this tree, minus the lane's
+      # floor members) plus `vitest related` over the changed sources, both
+      # sharded. Decisions and skip counts print in the job log.
       # Release-gate below keeps the unconditional full run line; the nightly
       # workflow re-proves the full suite daily (docs/qa-gate.md).
       - name: Run tests (PR tier, shard ${{ matrix.shard }} of 8)
@@ -419,14 +423,19 @@ jobs:
   # ways (ruleset, tests/ci_workflow.test.ts, docs/merge-queue.md). In
   # selective mode the lane runs only the lane files the floor or the diff
   # would have carried; in full mode and on any unprovable input it runs all
-  # of them, mirroring the shard planner's fail-closed ladder so the
-  # shards-plus-lane union is always the whole suite. release-gate is
-  # deliberately NOT lane-split: release/** pushes keep the full suite in
-  # their 8 shards.
+  # of them, mirroring the shard planner's fail-closed ladder, so mode for
+  # mode the shards plus the lane run exactly what the pre-lane shard plan
+  # would have run. release-gate is deliberately NOT lane-split: release/**
+  # pushes keep the full suite in their 8 shards.
   pr-long-sims:
     name: PR gate (long sims)
     needs: changes
     if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
+    # The lane concentrates the four slowest suites in one required job with
+    # no sibling shard to report around it, so a hang would otherwise hold a
+    # required check for GitHub's 6 hour default. Generous against the
+    # measured ~10 minute worst case.
+    timeout-minutes: 30
     runs-on: ubuntu-latest
 
     steps:

@@ -20,9 +20,11 @@
 //   lane        the "PR gate (long sims)" job (buildLanePlan): the collected
 //               CI_LONG_SUITES files, all of them in full mode and on any
 //               unprovable input, only the floor/changed members in selective
-//               mode. Both sides fail closed toward their own half, so the
-//               shards-plus-lane union covers every collected file in every
-//               mode combination.
+//               mode. Both sides fail closed toward their own half, so mode
+//               for mode the shards plus the lane run exactly what the
+//               pre-lane shard plan would have run (selective mode still
+//               skips the outside-floor remainder by design; the audit lines
+//               and docs/qa-gate.md carry that accounting).
 //
 // THE FLOOR. Selection's failure mode is silent (a skipped test does not
 // error), so the floor is a union of three sets, each guarding a different way
@@ -68,9 +70,11 @@ export const CI_GUARD_PREFIXES = Object.freeze(['tests/parity/']);
  * the 90 second threshold inside a full-mode CI shard, and the next-longest
  * file stays sharded (2026-08-06 full-mode run: these four measured 249.5 s,
  * 143.9 s, 142.3 s, and 94.7 s in-shard; the next longest,
- * tests/corpse_harvest_sim.test.ts at 69.8 s, stays). Remeasure from shard
- * logs when a suite's cost changes materially; the phase notes in
- * docs/prd/ci-cd-performance/ carry the numbers.
+ * tests/corpse_harvest_sim.test.ts at 69.8 s, stays). Membership is also
+ * one-directional by nature: nothing automatic promotes a newly slowed suite
+ * into this list, so when a shard's wall clock grows, remeasure from the
+ * shard logs and re-decide the list (the committed contract and the audit
+ * lines live in docs/qa-gate.md, "The long-sims lane").
  *
  * release-gate is deliberately NOT lane-split: release/** pushes keep the
  * whole suite in their 8 shards, so the post-merge backstop is untouched.

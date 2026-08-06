@@ -29,13 +29,15 @@ const usage =
 const argv = process.argv.slice(2);
 const shard = parseShardArg(argv);
 // The long-sims lane ("PR gate (long sims)"): the one job that runs the
-// CI_LONG_SUITES files the shard legs exclude. Exact literal only; any other
-// --lane value is a wiring bug, same doctrine as a malformed shard spec.
-const laneArg = argv.find((a) => a.startsWith('--lane='));
-const lane = laneArg === '--lane=long-sims';
-if ((laneArg && !lane) || (lane && shard) || (!lane && !shard)) {
-  // The spec comes from the workflow, so a malformed or ambiguous one is a
-  // wiring bug: fail loud, never guess a partition.
+// CI_LONG_SUITES files the shard legs exclude. Exactly one --lane flag with
+// the exact literal; any other value, a duplicate, or ANY --shard token
+// beside it (even a malformed one parseShardArg rejects) is a wiring bug,
+// same doctrine as a malformed shard spec: fail loud, never guess a
+// partition.
+const laneArgs = argv.filter((a) => a.startsWith('--lane='));
+const lane = laneArgs.length === 1 && laneArgs[0] === '--lane=long-sims';
+const hasShardToken = argv.some((a) => a.startsWith('--shard='));
+if ((laneArgs.length > 0 && !lane) || (lane && hasShardToken) || (!lane && !shard)) {
   console.error(usage);
   process.exit(1);
 }
@@ -46,8 +48,15 @@ if ((laneArg && !lane) || (lane && shard) || (!lane && !shard)) {
 // so it can never quietly turn the real shard step into a no-op.
 const planOnly = argv.includes('--plan-only');
 
-// Same worker bound as the run line this replaces: half the runner's cores.
-const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
+// Shards keep the half-cores bound of the run line this replaces: eight of
+// them share the runner pool and the bound is the documented contention
+// policy. The lane is the sole tenant of its runner and carries at most four
+// single-threaded sim files, so it uses every core: the whole point of the
+// lane is the tail, and half-cores would idle half the machine while the
+// slowest file sets the wall clock.
+const workers = lane
+  ? Math.max(1, os.availableParallelism())
+  : Math.max(1, Math.floor(os.availableParallelism() / 2));
 
 const mode = process.env.TEST_MODE ?? '';
 // Echoed into the log only. The producer already strips CR/LF; re-stripping
