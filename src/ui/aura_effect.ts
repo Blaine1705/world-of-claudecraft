@@ -96,6 +96,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.forbiddenReflectionLock` };
     }
   }
+  // Thornhollow Fields' carried-flag buff. Unlike every other row here it does not
+  // describe a stat: it names the AFFORDANCE, because right-click-to-drop is
+  // otherwise undiscoverable and this hover is the only surface that can teach it.
+  if (a.id === 'bg_carried_flag' && a.kind === 'flag_carried') {
+    return { key: `${KEY}.carriedFlag`, nums: {} };
+  }
   switch (a.kind) {
     case 'dot':
       return {
@@ -533,6 +539,11 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       return { key: `${KEY}.damageReduction`, nums: { pct: pctFromFrac(a.value) } };
     case 'buff_dr_phys':
       return { key: `${KEY}.physicalReduction`, nums: { pct: pctFromFrac(a.value) } };
+
+    case 'flag_carried':
+      // The bg_carried_flag arm above already returned for the real carried
+      // flag; any other flag_carried aura has no stat line to describe.
+      return null;
 
     default:
       a.kind satisfies never;
