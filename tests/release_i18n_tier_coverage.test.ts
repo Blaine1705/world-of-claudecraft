@@ -75,7 +75,6 @@ describe('release-tier i18n job covers every tier-sensitive suite', () => {
       'tests/i18n_t_behavior.test.ts',
       'tests/localization_coverage.test.ts',
       'tests/localization_fixes.test.ts',
-      'tests/reliquary_i18n.test.ts',
     ]);
   });
 });

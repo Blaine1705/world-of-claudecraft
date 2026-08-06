@@ -9046,9 +9046,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.recentLabel': 'Gần đây:',
   'hudChrome.deeds.renownChip': '{renown} Danh Vọng',
   'hudChrome.deeds.renownLabel': 'Danh Vọng',
-  'hudChrome.plurals.deedsRetroSummary.few': 'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
-  'hudChrome.plurals.deedsRetroSummary.many': 'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
-  'hudChrome.plurals.deedsRetroSummary.other': 'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Biên niên sử của bạn vừa bắt kịp: đã ghi lại {count} kỳ công.',
   'hudChrome.deeds.searchAria': 'Tìm kỳ công theo tên',
   'hudChrome.deeds.searchPlaceholder': 'Tìm kỳ công',
   'hudChrome.deeds.title': 'Sách Kỳ Công',

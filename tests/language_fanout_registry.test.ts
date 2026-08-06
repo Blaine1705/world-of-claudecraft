@@ -422,6 +422,24 @@ describe('language fan-out: half 1, the arms of refreshLocalizedDynamicUi', () =
     expect(main).toContain('async function changeLanguage(');
   });
 
+  it('loads all three locale-chunk families before it flips the language', () => {
+    // This registry is about REPAINT, and a repaint cannot show bytes that are
+    // not resident: `changeLanguage` must await the catalog chunk, the deed
+    // name/desc/title chunk AND the Reliquary page-name chunk before
+    // setLanguage, or the fan-out repaints the picked locale with the previous
+    // one's page and deed names. Nothing in half 1 or half 2 covers chunk
+    // loading, so a dropped loader would leave every other pin here green.
+    // Matched by regex over the function body so a reflow cannot break it.
+    const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
+    const start = main.indexOf('async function changeLanguage(');
+    expect(start, 'changeLanguage was renamed or removed').toBeGreaterThan(-1);
+    const end = main.indexOf('\n}\n', start);
+    expect(end, 'changeLanguage body did not close').toBeGreaterThan(start);
+    expect(main.slice(start, end)).toMatch(
+      /await Promise\.all\(\[\s*ensureLocaleLoaded\(selected\),\s*ensureDeedLocalesLoaded\(selected\),\s*ensureReliquaryLocalesLoaded\(selected\),?\s*\]\);/,
+    );
+  });
+
   it('wires the fan-out to the woc:languagechange event exactly once', () => {
     const wiring = stripComments(hudSource).match(
       /document\.addEventListener\('woc:languagechange'/g,

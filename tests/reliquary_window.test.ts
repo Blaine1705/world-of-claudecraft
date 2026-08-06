@@ -114,6 +114,37 @@ describe('painter hygiene', () => {
     expect(components).toContain('.reliquary-account-scope');
   });
 
+  it('paints the rail count through the progressText key (never a hand-built ratio)', () => {
+    // Every owned/total readout in this window shares one key. A hand-built
+    // "{owned}/{total}" in the rail would ship an unlocalized separator and no
+    // other pin in this file would see it.
+    expect(painter).toContain("t('hudChrome.reliquary.progressText'");
+    const rail = painter
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n')
+      .match(/private railHtml\([\s\S]*?\n {2}private contentHtml/)?.[0];
+    expect(rail, 'railHtml body').toBeTruthy();
+    expect(rail).toContain("t('hudChrome.reliquary.progressText'");
+    expect(rail).toContain('reliquary-nav-count');
+  });
+
+  it('reads no page-model name: every page name resolves from its id', () => {
+    // The pure view model keeps `name` as raw catalog English (the id-stable
+    // sort/debug field), so ANY `.name` property read in the painter is a
+    // candidate untranslated render. Page names must go through
+    // reliquaryPageName(pageId); the single sanctioned `.name` read is the
+    // weapon-skin label from the shared armory helper, which localizes itself.
+    // Comments (line and jsdoc) are stripped so prose cannot pad the count.
+    const code = painter
+      .split('\n')
+      .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
+      .join('\n');
+    expect(code.match(/\.name\b/g)?.length).toBe(1);
+    expect(code).toContain('localizeWeaponSkin(def).name');
+    expect(code).toContain('reliquaryPageName(');
+  });
+
   it('wires host completion helpers with Horizons ownership surfaces (Sim + ClientWorld)', () => {
     const simSrc = read('../src/sim/sim.ts');
     const onlineSrc = read('../src/net/online.ts');
@@ -313,6 +344,13 @@ describe('entry HTML and i18n chrome', () => {
     expect(painter).toMatch(/export\s*\{[^}]*curatorRankNameKey/);
     // Illumination log still fires when rank-up owns the banner slot.
     expect(handler).toContain('plan.illuminatedPageId');
+    // Both page-name surfaces resolve the LOCALIZED name from the id: the
+    // durable illumination log (which fires when rank-up owns the banner) and
+    // the illuminate banner itself. Reading a name off the event or the view
+    // model instead would print catalog English inside a localized client, and
+    // nothing else in this suite would notice.
+    expect(handler).toContain('reliquaryPageName(plan.illuminatedPageId)');
+    expect(handler).toContain('reliquaryPageName(banner.pageId)');
     expect(handler).toContain("showCelebrationBanner(bannerText, 'deed', 'deed', plan.motion)");
     expect(handler).toContain('if (plan.playSound) audio.achievement()');
     // Force open-window rebuild on unlock; membership still comes from mirrors.

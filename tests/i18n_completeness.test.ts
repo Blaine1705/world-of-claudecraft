@@ -217,6 +217,69 @@ describe('i18n whole-catalog completeness', () => {
       `untranslated English leaked into non-Latin player surfaces:\n${leaks.join('\n')}`,
     ).toEqual([]);
   });
+
+  // Phase 11 glossary decision (scripts/i18n_glossary.json, the reliquaryShelves
+  // row): the three shelf names must read the same on both surfaces that name
+  // them, the in-game window rail and the wiki Reliquary page, and Professions is
+  // additionally locked to the professions window title so one client never calls
+  // the same shelf two things. English alignment is trivially true; the drift risk
+  // is a translator filling one surface and not the other, so this sweeps EVERY
+  // supported locale.
+  it('names the three Reliquary shelves identically in the window and the wiki', () => {
+    const navProfessions = 'hudChrome.reliquary.navProfessions';
+    const professionsTitle = 'hudChrome.professions.title';
+    const drift: string[] = [];
+    for (const lang of supportedLanguages) {
+      const flat = flatten(TABLES[lang]);
+      for (const shelf of ['conquerors', 'professions', 'horizons'] as const) {
+        const nav = `hudChrome.reliquary.nav${shelf[0].toUpperCase()}${shelf.slice(1)}`;
+        const wiki = `guide.reliquaryPage.shelf.${shelf}`;
+        // Both keys must EXIST: a renamed key would otherwise compare
+        // undefined to undefined and pass.
+        if (typeof flat[nav] !== 'string') drift.push(`${lang} missing ${nav}`);
+        if (typeof flat[wiki] !== 'string') drift.push(`${lang} missing ${wiki}`);
+        if (flat[nav] !== flat[wiki]) {
+          drift.push(`${lang} ${shelf}: window "${flat[nav]}" vs wiki "${flat[wiki]}"`);
+        }
+      }
+      // The canonical anchor: the Professions shelf IS the Professions window.
+      // The Latin locales are release fill, so their shelf keys still render the
+      // English source; the anchor binds for a locale once that fill lands (and
+      // the release-tier gate is what forces it to land at all).
+      const shelfFilled = lang === 'en' || flat[navProfessions] !== enFlat[navProfessions];
+      if (shelfFilled && flat[navProfessions] !== flat[professionsTitle]) {
+        drift.push(
+          `${lang} professions: shelf "${flat[navProfessions]}" vs window title "${flat[professionsTitle]}"`,
+        );
+      }
+    }
+    expect(drift, drift.join('\n')).toEqual([]);
+
+    // Floor: the five non-Latin locales shipped the aligned fill in Phase 11, so
+    // the anchor above must actually have bound for each of them. Without this,
+    // dropping a shelf fill back to English would make the anchor skip silently.
+    for (const lang of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW'] as SupportedLanguage[]) {
+      const flat = flatten(TABLES[lang]);
+      expect(flat[navProfessions], `${lang} shelf fill`).not.toBe(enFlat[navProfessions]);
+      expect(flat[navProfessions], `${lang} professions anchor`).toBe(flat[professionsTitle]);
+    }
+  });
+
+  // The loading-tips rotation renders through a bare t(key) with NO values, so a
+  // tip that spells out a chord goes stale the moment a player rebinds it (and
+  // there is no seam to interpolate the live bind). Sweep the whole en tip set,
+  // not just the one tip that used to name Shift+X.
+  it('names no keybind chord in any loading tip', () => {
+    const tips = Object.entries(enFlat).filter(([key]) => key.startsWith('loading.tips.'));
+    expect(tips.length, 'the loading tips rotation is empty').toBeGreaterThan(5);
+    const chord = /(Shift|Ctrl|Alt)\+/;
+    const named = tips.filter(([, value]) => chord.test(value)).map(([key]) => key);
+    expect(chord.test('press Shift+X'), 'the chord guard itself must trip').toBe(true);
+    expect(
+      named,
+      `loading tips must not name a live keybind (no interpolation seam): ${named.join(', ')}`,
+    ).toEqual([]);
+  });
 });
 
 describe('i18n CLDR pluralization', () => {

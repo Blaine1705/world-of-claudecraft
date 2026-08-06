@@ -8,7 +8,8 @@
 // English (clean English is preferable to a broken guess).
 
 import { DEEDS } from '../sim/content/deeds';
-import { getLanguage, isPseudoActive, type SupportedLanguage, t } from './i18n';
+import { getLanguage, type SupportedLanguage, t } from './i18n';
+import { maybePseudoString, pseudoLocaleString } from './i18n_pseudo_port';
 
 export type DeedTranslationField = 'name' | 'desc' | 'title';
 
@@ -143,94 +144,16 @@ export async function ensureDeedLocalesLoaded(lang: SupportedLanguage): Promise<
 // (localeEntry returns undefined for 'en'), so the tableFor pseudo swap never
 // reaches it: under ?lang=en_XA a deed would render plain English inside
 // pseudolocalized chrome, hiding the very literals the pseudo-locale exists to
-// expose. maybePseudo folds it through a faithful port of the generator's
-// transform (scripts/i18n_pseudo.mjs) so the accent-push+bracket form matches
-// the committed en_XA table byte for byte (pinned in tests). The whole path sits
-// behind the `!import.meta.env.PROD` gate below, so a release build statically
-// drops the port and its map.
+// expose. maybePseudoString folds it through the SHARED port of the generator's
+// transform (i18n_pseudo_port.ts), the one copy the Reliquary page-name channel
+// folds through too, held byte-identical to the committed en_XA table by the
+// total drift pin in tests/i18n_pseudo_port.test.ts. The port's own
+// `!import.meta.env.PROD` gate keeps its map and transform statically dead in a
+// release build.
 
-// 1:1 accent-push map for the 52 ASCII letters (copied from
-// scripts/i18n_pseudo.mjs; the two must stay identical, guarded by the drift pin
-// in the deed pseudo test).
-const PSEUDO_ACCENT_MAP: Record<string, string> = {
-  a: 'á',
-  b: 'ƀ',
-  c: 'ç',
-  d: 'ð',
-  e: 'é',
-  f: 'ƒ',
-  g: 'ĝ',
-  h: 'ĥ',
-  i: 'í',
-  j: 'ĵ',
-  k: 'ķ',
-  l: 'ļ',
-  m: 'ɱ',
-  n: 'ñ',
-  o: 'ó',
-  p: 'þ',
-  q: 'ɋ',
-  r: 'ŕ',
-  s: 'š',
-  t: 'ţ',
-  u: 'ú',
-  v: 'ʋ',
-  w: 'ŵ',
-  x: 'ẋ',
-  y: 'ý',
-  z: 'ž',
-  A: 'Á',
-  B: 'Ɓ',
-  C: 'Ç',
-  D: 'Ð',
-  E: 'É',
-  F: 'Ƒ',
-  G: 'Ĝ',
-  H: 'Ĥ',
-  I: 'Í',
-  J: 'Ĵ',
-  K: 'Ķ',
-  L: 'Ļ',
-  M: 'Ɱ',
-  N: 'Ñ',
-  O: 'Ó',
-  P: 'Þ',
-  Q: 'Ɋ',
-  R: 'Ŕ',
-  S: 'Š',
-  T: 'Ţ',
-  U: 'Ú',
-  V: 'Ʋ',
-  W: 'Ŵ',
-  X: 'Ẋ',
-  Y: 'Ý',
-  Z: 'Ž',
-};
-
-function pseudoAccentPush(text: string): string {
-  let out = '';
-  for (const ch of text) out += PSEUDO_ACCENT_MAP[ch] ?? ch;
-  return out;
-}
-
-/** Accent-push the literal text of `s`, preserving every {token} exactly, then
- *  bracket the whole leaf. A faithful port of scripts/i18n_pseudo.mjs's
- *  pseudoString; exported only for the drift pin that compares it to the
- *  generated en_XA table. */
-export function pseudoDeedString(s: string): string {
-  const transformed = s
-    .split(/(\{[^}]*\})/g)
-    .map((part) => (part.startsWith('{') && part.endsWith('}') ? part : pseudoAccentPush(part)))
-    .join('');
-  return `[${transformed}]`;
-}
-
-// Fold a resolved deed English string under the dev pseudo-locale, else return it
-// untouched. The `!import.meta.env.PROD` prefix makes the whole branch statically
-// dead in a release build, so the port above tree-shakes away.
-function maybePseudo(s: string): string {
-  return !import.meta.env.PROD && isPseudoActive() ? pseudoDeedString(s) : s;
-}
+/** The shared en_XA port under the deed channel's historical name; exported only
+ *  for the drift pins that compare it to the generated en_XA table. */
+export const pseudoDeedString = pseudoLocaleString;
 
 function localeEntry(id: string): DeedLocaleEntry | undefined {
   const lang = getLanguage();
@@ -242,14 +165,14 @@ function localeEntry(id: string): DeedLocaleEntry | undefined {
 export function deedName(id: string): string {
   const def = DEEDS[id];
   if (!def) return id;
-  return maybePseudo(localeEntry(id)?.name ?? def.name);
+  return maybePseudoString(localeEntry(id)?.name ?? def.name);
 }
 
 /** Localized deed description; '' for a catalog-unknown id. */
 export function deedDesc(id: string): string {
   const def = DEEDS[id];
   if (!def) return '';
-  return maybePseudo(localeEntry(id)?.desc ?? def.desc);
+  return maybePseudoString(localeEntry(id)?.desc ?? def.desc);
 }
 
 /** The localized display title for a title-reward deed; '' when the deed is
@@ -257,7 +180,7 @@ export function deedDesc(id: string): string {
 export function deedTitleText(id: string): string {
   const def = DEEDS[id];
   if (!def || def.reward?.kind !== 'title') return '';
-  return maybePseudo(localeEntry(id)?.title ?? def.reward.text);
+  return maybePseudoString(localeEntry(id)?.title ?? def.reward.text);
 }
 
 /** The guild-chat news template for another player's marquee unlock with the

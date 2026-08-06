@@ -4,11 +4,13 @@
 // surface un-keyed literals: every catalog leaf is accent-pushed and bracketed.
 // Reliquary page names/descs resolve their English from the sim content table,
 // OUTSIDE the i18n catalog, so the tableFor pseudo swap misses them;
-// reliquary_i18n folds them at render time through a port of the generator's
-// transform (scripts/i18n_pseudo.mjs). This pins the fold on/off behavior and
-// the drift pin that the port cannot silently diverge from the generator. jsdom
-// is needed so the i18n init reads the URL, and a fresh import per active case
-// picks up the pseudo flag.
+// reliquary_i18n folds them at render time through the shared port of the
+// generator's transform (src/ui/i18n_pseudo_port.ts, a copy of
+// scripts/i18n_pseudo.mjs). This suite pins the fold on/off behavior for THIS
+// channel; the port's total drift pin against the committed en_XA table lives in
+// tests/i18n_pseudo_port.test.ts. A DOM (the happy-dom pragma above) is needed so
+// the i18n init reads the URL, and a fresh import per active case picks up the
+// pseudo flag.
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
@@ -42,6 +44,16 @@ describe('reliquary pseudo-locale port', () => {
     // meta.builtOn = "Built {date}"; the committed en_XA table is the generator's
     // output for the same leaf, so a drift from scripts/i18n_pseudo.mjs reds here.
     expect(pseudoReliquaryString(en.meta.builtOn)).toBe(en_XA.meta.builtOn);
+  });
+
+  it('folds a real page name to a pinned literal (no self-comparison)', () => {
+    // The assertions above compare the port against itself or against a catalog
+    // leaf; this one states the expected transform of a page name outright, so an
+    // accent-map or bracket change is decisive for the strings this channel
+    // actually renders. Both sides are literals, computed once from the map. The
+    // input is the authored English of conquerors_hollow_crypt (pinned as such in
+    // tests/reliquary_i18n.test.ts).
+    expect(pseudoReliquaryString('The Hollow Crypt')).toBe('[Ţĥé Ĥóļļóŵ Çŕýþţ]');
   });
 });
 

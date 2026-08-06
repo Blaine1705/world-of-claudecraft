@@ -14,7 +14,8 @@
 // then they render the authored English through the fallback above.
 
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
-import { getLanguage, isPseudoActive, type SupportedLanguage } from './i18n';
+import { getLanguage, type SupportedLanguage } from './i18n';
+import { maybePseudoString, pseudoLocaleString } from './i18n_pseudo_port';
 
 export type ReliquaryTranslationField = 'name' | 'desc';
 
@@ -139,94 +140,16 @@ export async function ensureReliquaryLocalesLoaded(lang: SupportedLanguage): Pro
 // catalog (localeEntry returns undefined for 'en'), so the tableFor pseudo swap
 // never reaches it: under ?lang=en_XA a page name would render plain English
 // inside pseudolocalized chrome, hiding the very literals the pseudo-locale
-// exists to expose. maybePseudo folds it through a faithful port of the
-// generator's transform (scripts/i18n_pseudo.mjs) so the accent-push+bracket
-// form matches the committed en_XA table byte for byte (pinned in tests). The
-// whole path sits behind the `!import.meta.env.PROD` gate below, so a release
-// build statically drops the port and its map.
+// exists to expose. maybePseudoString folds it through the SHARED port of the
+// generator's transform (i18n_pseudo_port.ts), the one copy the deed channel
+// folds through too, held byte-identical to the committed en_XA table by the
+// total drift pin in tests/i18n_pseudo_port.test.ts. The port's own
+// `!import.meta.env.PROD` gate keeps its map and transform statically dead in a
+// release build.
 
-// 1:1 accent-push map for the 52 ASCII letters (copied from
-// scripts/i18n_pseudo.mjs; the two must stay identical, guarded by the drift pin
-// in the reliquary pseudo test).
-const PSEUDO_ACCENT_MAP: Record<string, string> = {
-  a: 'á',
-  b: 'ƀ',
-  c: 'ç',
-  d: 'ð',
-  e: 'é',
-  f: 'ƒ',
-  g: 'ĝ',
-  h: 'ĥ',
-  i: 'í',
-  j: 'ĵ',
-  k: 'ķ',
-  l: 'ļ',
-  m: 'ɱ',
-  n: 'ñ',
-  o: 'ó',
-  p: 'þ',
-  q: 'ɋ',
-  r: 'ŕ',
-  s: 'š',
-  t: 'ţ',
-  u: 'ú',
-  v: 'ʋ',
-  w: 'ŵ',
-  x: 'ẋ',
-  y: 'ý',
-  z: 'ž',
-  A: 'Á',
-  B: 'Ɓ',
-  C: 'Ç',
-  D: 'Ð',
-  E: 'É',
-  F: 'Ƒ',
-  G: 'Ĝ',
-  H: 'Ĥ',
-  I: 'Í',
-  J: 'Ĵ',
-  K: 'Ķ',
-  L: 'Ļ',
-  M: 'Ɱ',
-  N: 'Ñ',
-  O: 'Ó',
-  P: 'Þ',
-  Q: 'Ɋ',
-  R: 'Ŕ',
-  S: 'Š',
-  T: 'Ţ',
-  U: 'Ú',
-  V: 'Ʋ',
-  W: 'Ŵ',
-  X: 'Ẋ',
-  Y: 'Ý',
-  Z: 'Ž',
-};
-
-function pseudoAccentPush(text: string): string {
-  let out = '';
-  for (const ch of text) out += PSEUDO_ACCENT_MAP[ch] ?? ch;
-  return out;
-}
-
-/** Accent-push the literal text of `s`, preserving every {token} exactly, then
- *  bracket the whole leaf. A faithful port of scripts/i18n_pseudo.mjs's
- *  pseudoString; exported only for the drift pin that compares it to the
- *  generated en_XA table. */
-export function pseudoReliquaryString(s: string): string {
-  const transformed = s
-    .split(/(\{[^}]*\})/g)
-    .map((part) => (part.startsWith('{') && part.endsWith('}') ? part : pseudoAccentPush(part)))
-    .join('');
-  return `[${transformed}]`;
-}
-
-// Fold a resolved reliquary English string under the dev pseudo-locale, else
-// return it untouched. The `!import.meta.env.PROD` prefix makes the whole branch
-// statically dead in a release build, so the port above tree-shakes away.
-function maybePseudo(s: string): string {
-  return !import.meta.env.PROD && isPseudoActive() ? pseudoReliquaryString(s) : s;
-}
+/** The shared en_XA port under the Reliquary channel's name; exported only for
+ *  the drift pins that compare it to the generated en_XA table. */
+export const pseudoReliquaryString = pseudoLocaleString;
 
 function localeEntry(pageId: string): ReliquaryLocaleEntry | undefined {
   const lang = getLanguage();
@@ -239,7 +162,7 @@ function localeEntry(pageId: string): ReliquaryLocaleEntry | undefined {
 export function reliquaryPageName(pageId: string): string {
   const def = RELIQUARY_PAGES_BY_ID[pageId];
   if (!def) return pageId;
-  return maybePseudo(localeEntry(pageId)?.name ?? def.name);
+  return maybePseudoString(localeEntry(pageId)?.name ?? def.name);
 }
 
 /** Localized page description; '' for a catalog-unknown id or a page that
@@ -247,7 +170,7 @@ export function reliquaryPageName(pageId: string): string {
 export function reliquaryPageDesc(pageId: string): string {
   const def = RELIQUARY_PAGES_BY_ID[pageId];
   if (!def) return '';
-  return maybePseudo(localeEntry(pageId)?.desc ?? def.desc ?? '');
+  return maybePseudoString(localeEntry(pageId)?.desc ?? def.desc ?? '');
 }
 
 export interface ReliquaryTranslationManifestEntry {

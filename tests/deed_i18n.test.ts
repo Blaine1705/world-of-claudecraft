@@ -206,6 +206,11 @@ describe('deed locale chunks (the per-base-locale release fill)', () => {
   it('keeps every value free of em/en dashes and emoji (these files sit outside the overlay copy-scan exemption)', () => {
     const forbidden =
       /[\u{2013}\u{2014}\u{2015}]|[\u{1F000}-\u{1FAFF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{2600}-\u{27BF}]|\u{FE0F}/u;
+    // Prove the guard trips: a regex typo would otherwise make every assertion
+    // below pass vacuously. Escape form on purpose, so this file stays clean
+    // under the repo copy scan that the regex itself enforces.
+    expect(forbidden.test('a\u2014b')).toBe(true);
+    expect(forbidden.test('a-b')).toBe(false);
     for (const lang of tableLocales()) {
       for (const [id, entry] of Object.entries(tables[lang])) {
         for (const field of ['name', 'desc', 'title'] as const) {
@@ -251,6 +256,11 @@ describe('deed locale chunks (the per-base-locale release fill)', () => {
   it('dialect overrides carry only real catalog ids and obey the same copy rules', () => {
     const forbidden =
       /[\u{2013}\u{2014}\u{2015}]|[\u{1F000}-\u{1FAFF}]|[\u{1F1E6}-\u{1F1FF}]|[\u{2600}-\u{27BF}]|\u{FE0F}/u;
+    // Prove the guard trips: a regex typo would otherwise make every assertion
+    // below pass vacuously. Escape form on purpose, so this file stays clean
+    // under the repo copy scan that the regex itself enforces.
+    expect(forbidden.test('a\u2014b')).toBe(true);
+    expect(forbidden.test('a-b')).toBe(false);
     for (const [dialect, table] of Object.entries(overrides)) {
       const base = dialect === 'es_ES' ? tables.es : tables.fr_FR;
       for (const [id, entry] of Object.entries(table)) {

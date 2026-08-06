@@ -160,7 +160,10 @@ describe('hud wiring', () => {
     const end = hud.indexOf('log(text: string', start);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
-    const body = hud.slice(start, end);
+    // Comment-stripped (the reliquary sibling's idiom, and this file's own
+    // level-up arm): the arm carries prose about tPlural and formatNumber right
+    // above the code, which would otherwise satisfy the pins below on its own.
+    const body = stripLineComments(hud.slice(start, end));
     // Banner and audio are gated on the PLAN's fresh-unlock fields; the retro
     // count only ever feeds the one localized summary log line.
     expect(body).toContain('if (plan.bannerId !== null)');

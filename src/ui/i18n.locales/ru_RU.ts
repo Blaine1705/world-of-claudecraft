@@ -9476,10 +9476,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.deeds.titlesEmpty': 'Получите деяние со званием, чтобы открыть эту полку.',
   'hudChrome.deeds.unlockedBanner': 'Деяние совершено: {name}',
   'hudChrome.deeds.unlockedTitleHint': 'Новое звание: {title}. Выберите его в Книге деяний.',
-  'hudChrome.plurals.deedsRetroSummary.one': 'Летопись наверстала упущенное: записано деяний: {count}.',
-  'hudChrome.plurals.deedsRetroSummary.few': 'Летопись наверстала упущенное: записано деяний: {count}.',
-  'hudChrome.plurals.deedsRetroSummary.many': 'Летопись наверстала упущенное: записано деяний: {count}.',
-  'hudChrome.plurals.deedsRetroSummary.other': 'Летопись наверстала упущенное: записано деяний: {count}.',
+  'hudChrome.plurals.deedsRetroSummary.one':
+    'Летопись наверстала упущенное: записано деяний: {count}.',
+  'hudChrome.plurals.deedsRetroSummary.few':
+    'Летопись наверстала упущенное: записано деяний: {count}.',
+  'hudChrome.plurals.deedsRetroSummary.many':
+    'Летопись наверстала упущенное: записано деяний: {count}.',
+  'hudChrome.plurals.deedsRetroSummary.other':
+    'Летопись наверстала упущенное: записано деяний: {count}.',
   'hudChrome.deeds.broadcastLine': '{name} совершает деяние: {deed}',
   'hudChrome.deeds.rarityLine': 'Совершили {percent} искателей приключений',
   'hudChrome.deeds.trackerLabel': 'Деяния',
@@ -10566,10 +10570,14 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.unlockToast': 'Реликвия каталогизирована: {name}',
   'hudChrome.reliquary.illuminateBanner': 'Страница озарена: {name}',
   'hudChrome.reliquary.illuminateToast': 'Все реликвии на странице {name} заполнены.',
-  'hudChrome.plurals.reliquaryRetroSummary.one': 'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
-  'hudChrome.plurals.reliquaryRetroSummary.few': 'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
-  'hudChrome.plurals.reliquaryRetroSummary.many': 'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
-  'hudChrome.plurals.reliquaryRetroSummary.other': 'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
+  'hudChrome.plurals.reliquaryRetroSummary.one':
+    'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
+  'hudChrome.plurals.reliquaryRetroSummary.few':
+    'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
+  'hudChrome.plurals.reliquaryRetroSummary.many':
+    'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
+  'hudChrome.plurals.reliquaryRetroSummary.other':
+    'Реликварий наверстал упущенное: каталогизировано реликвий: {count}.',
   'hudChrome.reliquary.curatorRankName1': 'Ученик хранителя',
   'hudChrome.reliquary.curatorRankName2': 'Хранитель трофеев',
   'hudChrome.reliquary.curatorRankName3': 'Мастер-хранитель',

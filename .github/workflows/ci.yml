@@ -486,7 +486,7 @@ jobs:
       # `npm test` regenerates the i18n artifacts itself (pretest), which these
       # suites read.
       - name: Run i18n release-tier suites (21-locale + empty-pending)
-        run: npm test -- tests/deed_i18n.test.ts tests/i18n_status_registry.test.ts tests/i18n_t_behavior.test.ts tests/localization_coverage.test.ts tests/localization_fixes.test.ts tests/reliquary_i18n.test.ts
+        run: npm test -- tests/deed_i18n.test.ts tests/i18n_status_registry.test.ts tests/i18n_t_behavior.test.ts tests/localization_coverage.test.ts tests/localization_fixes.test.ts
 
   # Runs in parallel with release-gate: same if-condition, no needs edge in
   # either direction. Does not set I18N_RELEASE_TIER; the checks here do not
