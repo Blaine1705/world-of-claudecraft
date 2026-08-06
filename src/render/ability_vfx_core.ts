@@ -353,6 +353,40 @@ export function planImpact(
 //   re-hits share a flat ACCENT_CAP per rolling second (admitAccent) and never
 //   consume a cast slot, so a normal rotation of casts + its own hits + autos
 //   stays tier 0 indefinitely.
+// The persistent stunned-star tell: any worn `kind: 'stun'` aura circles a
+// star band over the victim's head for the aura's whole life. Keyed off the
+// aura KIND, never the spec table, so every stun source (player abilities,
+// mob stomps, traps) reads without authoring a spec. Geometry mirrors the
+// sequencer's cast-moment ccStars band exactly (count/radius/lift/rate share
+// the same time base with zero phase), so the impact stars hand off to this
+// held band seamlessly. A stun is actionable information (the PvP "why can't
+// I act" read), so the painter feeds it outside the cast budget and no
+// quality tier sheds it.
+export const STUN_STAR_COUNT = 4;
+export const STUN_STAR_RADIUS = 0.45;
+export const STUN_STAR_LIFT = 0.55;
+export const STUN_STAR_RATE = 2.4;
+export const STUN_STAR_SIZE = 0.2;
+export const STUN_STAR_BRIGHTNESS = 2.2;
+export const STUN_STAR_COLOR = 0xffd75e;
+
+// Longest remaining time across the entity's worn stun auras, 0 when none.
+// The painter's per-frame aura scan feeds it to the fx engine, whose star
+// alpha is min(1, remaining) (the ccStars fade idiom: full read for the
+// stun's life, fading over its final second). remaining is optional on the
+// slice; a stun aura carrying none stays fully opaque.
+export function wornStunRemaining(auras: readonly { kind?: string; remaining?: number }[]): number {
+  let max = 0;
+  for (let i = 0; i < auras.length; i++) {
+    const a = auras[i];
+    if (a.kind === 'stun') {
+      const rem = a.remaining ?? 1;
+      if (rem > max) max = rem;
+    }
+  }
+  return max;
+}
+
 // Fixed-size ring buffers of timestamps: zero allocation in steady state (one
 // small window object is allocated the first time a caster is seen, then
 // reused; stale casters are pruned in place once the map grows).

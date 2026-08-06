@@ -3,6 +3,13 @@ import {
   type AbilityVfxBuffSpec,
   type AbilityVfxFullSpec,
   abilityHexColor,
+  STUN_STAR_BRIGHTNESS,
+  STUN_STAR_COLOR,
+  STUN_STAR_COUNT,
+  STUN_STAR_LIFT,
+  STUN_STAR_RADIUS,
+  STUN_STAR_RATE,
+  STUN_STAR_SIZE,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
 import { type DecalStyle, GroundDecals } from './decals';
@@ -294,6 +301,9 @@ export class AbilityVfxFx implements SequencerHost {
   private windups = new Map<number, WindupState>();
   private orbits = new Map<number, OrbitBand[]>();
   private orbitBandCount = 0;
+  // Persistent stunned-star bands (holdStunStars), one entry per stunned
+  // entity, frame-stamp swept exactly like windups/orbits.
+  private stunStars = new Map<number, { remaining: number; stamp: number }>();
   private time = 0;
   private frame = 0;
   private qualityLevel = 1;
@@ -909,6 +919,7 @@ export class AbilityVfxFx implements SequencerHost {
   // in the painter, while scarce render pools are released immediately so an
   // offscreen actor consumes no overlay, shell, ground-aura, or glow work.
   sleepEntity(entityId: number): void {
+    this.stunStars.delete(entityId);
     this.windups.delete(entityId);
     const bands = this.orbits.get(entityId);
     if (bands) {
@@ -1332,6 +1343,22 @@ export class AbilityVfxFx implements SequencerHost {
     return true;
   }
 
+  // Holds the persistent stunned-star band over the entity's head while a
+  // worn `kind: 'stun'` aura lives: the painter re-feeds it every frame from
+  // its aura scan, and the update sweep drops it the frame the feed stops
+  // (aura faded, entity left interest), so there is no teardown bookkeeping.
+  // remaining drives the fade over the stun's final second.
+  holdStunStars(entityId: number, remaining: number): void {
+    let s = this.stunStars.get(entityId);
+    if (!s) {
+      s = { remaining, stamp: this.frame };
+      this.stunStars.set(entityId, s);
+      return;
+    }
+    s.remaining = remaining;
+    s.stamp = this.frame;
+  }
+
   // ---- frame advance ------------------------------------------------------
 
   update(dt: number): void {
@@ -1362,6 +1389,33 @@ export class AbilityVfxFx implements SequencerHost {
     this.groundAuras.update(dt, this.time, this.frame, this.anchor, this.groundY);
     this.spirits.update(dt);
     this.overlay.beginFrame();
+    // The stunned-star bands draw FIRST in the frame's overlay batch: the
+    // stun tell is actionable information, so capacity contention with
+    // decorative sprites must never be able to drop it. Same angle base as
+    // the sequencer's cast-moment ccStars (time * rate, zero phase), so the
+    // impact stars and this held band coincide sprite for sprite.
+    for (const [id, s] of this.stunStars) {
+      if (s.stamp !== this.frame) {
+        this.stunStars.delete(id);
+        continue;
+      }
+      const head = this.anchorOf(id, 1.0);
+      if (!head) continue;
+      const alpha = Math.min(1, s.remaining);
+      for (let k = 0; k < STUN_STAR_COUNT; k++) {
+        const a = this.time * STUN_STAR_RATE + (k / STUN_STAR_COUNT) * Math.PI * 2;
+        this.overlay.push(
+          head.x + Math.cos(a) * STUN_STAR_RADIUS,
+          head.y + STUN_STAR_LIFT,
+          head.z + Math.sin(a) * STUN_STAR_RADIUS,
+          STUN_STAR_COLOR,
+          STUN_STAR_SIZE,
+          OVERLAY_CELL.star,
+          alpha,
+          STUN_STAR_BRIGHTNESS,
+        );
+      }
+    }
     // styled bolt heads ride this frame's overlay batch (positions were just
     // advanced by ribbons.update above)
     this.ribbons.drawHeads(this.time, this.headSink);
@@ -1428,6 +1482,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.windups.clear();
     this.orbits.clear();
     this.orbitBandCount = 0;
+    this.stunStars.clear();
     for (const s of this.screenFxQueue) s.active = false;
   }
 

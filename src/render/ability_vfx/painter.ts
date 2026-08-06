@@ -17,6 +17,7 @@ import {
   localCasterTier,
   planCast,
   planImpact,
+  wornStunRemaining,
 } from '../ability_vfx_core';
 import { ABILITY_VFX_FULL_SPECS } from '../ability_vfx_full_specs';
 import { holdsBuffVfxWhileWorn } from '../ability_vfx_longbuff_core';
@@ -180,8 +181,10 @@ export interface AbilityVfxEntityState {
   castTotal: number;
   // breakThreshold rides along for the Lingering Dread fear alias (present on
   // the offline sim's live Aura objects; mirrored online as a presence-only 1
-  // via the aura wire's bt flag).
-  auras: readonly { id: string; breakThreshold?: number }[];
+  // via the aura wire's bt flag). kind/remaining feed the stunned-star tell
+  // (both live on the offline Aura and on the online mirror via the aura
+  // wire's kind/rem); optional so tests can omit them.
+  auras: readonly { id: string; kind?: string; remaining?: number; breakThreshold?: number }[];
   kind?: string;
   templateId?: string;
   // On-next-swing queue (heroic-strike style ability id while armed). Present
@@ -1315,6 +1318,15 @@ export class AbilityVfx {
       }
       bands++;
     }
+    // The stunned-star tell: ANY worn stun aura circles a star band over the
+    // victim's head for the aura's whole life. Matched by aura KIND, never
+    // the spec table, so every stun source reads (mob stomps and traps
+    // included) and it works online for any victim in interest range, exactly
+    // like the bands above. Actionable information: it rides outside the cast
+    // budget, every quality tier keeps it, and the fx engine sweeps it the
+    // frame the aura fades.
+    const stunRemaining = wornStunRemaining(e.auras);
+    if (stunRemaining > 0) fx.holdStunStars(e.id, stunRemaining);
     // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
     // flag is armed, the queued ability's authored orbit rides the caster as
     // the empowerment tell - Reaver Strike's hot amber weaponGlow ember that
