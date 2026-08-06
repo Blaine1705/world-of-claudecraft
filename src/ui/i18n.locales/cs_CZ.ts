@@ -11035,7 +11035,4 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Přeuspořádat kartu {channel}: přetáhněte ji, nebo použijte Alt+vlevo a Alt+vpravo',
   'itemUi.vendor.buyStack': 'Koupit {count}',
   'itemUi.vendor.buyStackAria': 'Koupit {count} {item} za {price}',
-  'error.uniqueEquipped': 'Můžete mít vybavený jen jeden takový předmět.',
-  'error.townFocusCannotAfford': 'Tuto změnu zaměření si nemůžete dovolit.',
-  'log.townFocusRespecComplete': 'Změna zaměření je dokončena.',
 };

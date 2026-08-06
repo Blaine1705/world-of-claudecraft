@@ -15083,12 +15083,5 @@ export const ko_KR: EnTranslations = {
     "delveRiteShrineSkullInteract": "해골 제단: F를 눌러 만지기",
     "mailboxName": "우편함",
     "noticeboardName": "게시판"
-  },
-  "error": {
-    "uniqueEquipped": "그런 것은 하나만 장착할 수 있습니다.",
-    "townFocusCannotAfford": "해당 집중 재설정 비용을 감당할 수 없습니다."
-  },
-  "log": {
-    "townFocusRespecComplete": "집중 재설정이 완료되었습니다."
   }
 };

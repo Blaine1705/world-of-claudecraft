@@ -15083,12 +15083,5 @@ export const de_DE: EnTranslations = {
     "delveRiteShrineSkullInteract": "Schädelschrein: Drücke F, um ihn zu berühren",
     "mailboxName": "Briefkasten",
     "noticeboardName": "Anschlagtafel"
-  },
-  "error": {
-    "uniqueEquipped": "Du kannst davon nur eins ausrüsten.",
-    "townFocusCannotAfford": "Du kannst dir diese Fokus-Neuverteilung nicht leisten."
-  },
-  "log": {
-    "townFocusRespecComplete": "Deine Fokus-Neuverteilung ist abgeschlossen."
   }
 };

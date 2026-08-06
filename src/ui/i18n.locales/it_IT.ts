@@ -11292,7 +11292,4 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Riordina la scheda {channel}: trascinala, oppure usa Alt+Sinistra e Alt+Destra',
   'itemUi.vendor.buyStack': 'Compra {count}',
   'itemUi.vendor.buyStackAria': 'Compra {count} {item} per {price}',
-  'error.uniqueEquipped': 'Puoi equipaggiarne solo uno di quel tipo.',
-  'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
-  'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
 };

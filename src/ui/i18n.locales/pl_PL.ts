@@ -11171,7 +11171,4 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zmień kolejność karty {channel}: przeciągnij ją lub użyj Alt+Lewo i Alt+Prawo',
   'itemUi.vendor.buyStack': 'Kup {count}',
   'itemUi.vendor.buyStackAria': 'Kup {count} {item} za {price}',
-  'error.uniqueEquipped': 'Możesz założyć tylko jeden taki przedmiot.',
-  'error.townFocusCannotAfford': 'Nie stać cię na tę zmianę skupienia.',
-  'log.townFocusRespecComplete': 'Zmiana skupienia została ukończona.',
 };

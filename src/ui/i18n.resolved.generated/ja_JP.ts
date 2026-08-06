@@ -15083,12 +15083,5 @@ export const ja_JP: EnTranslations = {
     "delveRiteShrineSkullInteract": "髑髏の祠：Fで触れる",
     "mailboxName": "メールボックス",
     "noticeboardName": "掲示板"
-  },
-  "error": {
-    "uniqueEquipped": "その種類は1つだけ装備できます。",
-    "townFocusCannotAfford": "そのフォーカス再設定を支払えません。"
-  },
-  "log": {
-    "townFocusRespecComplete": "フォーカス再設定が完了しました。"
   }
 };

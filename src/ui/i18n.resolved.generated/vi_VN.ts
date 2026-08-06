@@ -15083,12 +15083,5 @@ export const vi_VN: EnTranslations = {
     "delveRiteShrineSkullInteract": "Miếu Đầu Lâu: Nhấn F để chạm vào",
     "mailboxName": "Hòm Thư",
     "noticeboardName": "Bảng Thông Báo"
-  },
-  "error": {
-    "uniqueEquipped": "Bạn chỉ có thể trang bị một món như vậy.",
-    "townFocusCannotAfford": "Bạn không đủ tiền để đặt lại tiêu điểm đó."
-  },
-  "log": {
-    "townFocusRespecComplete": "Việc đặt lại tiêu điểm của bạn đã hoàn tất."
   }
 };

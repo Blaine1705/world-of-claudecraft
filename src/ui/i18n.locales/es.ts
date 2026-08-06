@@ -11302,7 +11302,4 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Reordenar la pestaña {channel}: arrástrala, o usa Alt+Izquierda y Alt+Derecha',
   'itemUi.vendor.buyStack': 'Comprar {count}',
   'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
-  'error.uniqueEquipped': 'Solo puedes equiparte uno de esos.',
-  'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
-  'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
 };

@@ -15083,12 +15083,5 @@ export const it_IT: EnTranslations = {
     "delveRiteShrineSkullInteract": "Santuario del Teschio: premi F per toccarlo",
     "mailboxName": "Cassetta postale",
     "noticeboardName": "Bacheca degli annunci"
-  },
-  "error": {
-    "uniqueEquipped": "Puoi equipaggiarne solo uno di quel tipo.",
-    "townFocusCannotAfford": "Non puoi permetterti quella rispecializzazione del focus."
-  },
-  "log": {
-    "townFocusRespecComplete": "La tua rispecializzazione del focus è completata."
   }
 };

@@ -11229,7 +11229,4 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '마력 추출·마법부여·분해: {seconds}초 시전',
   'guide.profPages.econ.castPaceRecharge': '도구 효과 충전: {seconds}초 시전',
   'guide.profPages.econ.castPaceBatch': '일괄 제작: 한 번에 최대 {count}개, 각각 시전',
-  'error.uniqueEquipped': '그런 것은 하나만 장착할 수 있습니다.',
-  'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
-  'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
 };

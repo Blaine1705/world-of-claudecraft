@@ -11058,7 +11058,4 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Sắp xếp lại tab {channel}: kéo nó, hoặc dùng Alt+Trái và Alt+Phải',
   'itemUi.vendor.buyStack': 'Mua {count}',
   'itemUi.vendor.buyStackAria': 'Mua {count} {item} với giá {price}',
-  'error.uniqueEquipped': 'Bạn chỉ có thể trang bị một món như vậy.',
-  'error.townFocusCannotAfford': 'Bạn không đủ tiền để đặt lại tiêu điểm đó.',
-  'log.townFocusRespecComplete': 'Việc đặt lại tiêu điểm của bạn đã hoàn tất.',
 };

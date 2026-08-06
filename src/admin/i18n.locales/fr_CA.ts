@@ -531,7 +531,7 @@ export const fr_CA: Record<string, string> = {
   'moderationHistory.actionSpectate': 'Observer',
   'moderationHistory.actionUnspectate': 'Arrêter d’observer',
   'error.bugReportNotFound': 'rapport de bogue ouvert introuvable',
-  'bugReports.colActions': 'Actions',
+  'bugReports.colActions': 'Opérations',
   'bugReports.resolve': 'Résoudre',
   'bugReports.dismiss': 'Rejeter',
   'bugReports.confirmResolve': 'Résoudre ce rapport de bogue?',

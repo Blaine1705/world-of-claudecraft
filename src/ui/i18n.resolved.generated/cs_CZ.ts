@@ -15083,12 +15083,5 @@ export const cs_CZ: EnTranslations = {
     "delveRiteShrineSkullInteract": "Lebková svatyně: stiskni F a dotkni se jí",
     "mailboxName": "Poštovní schránka",
     "noticeboardName": "Vývěska"
-  },
-  "error": {
-    "uniqueEquipped": "Můžete mít vybavený jen jeden takový předmět.",
-    "townFocusCannotAfford": "Tuto změnu zaměření si nemůžete dovolit."
-  },
-  "log": {
-    "townFocusRespecComplete": "Změna zaměření je dokončena."
   }
 };

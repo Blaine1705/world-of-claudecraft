@@ -15083,12 +15083,5 @@ export const zh_TW: EnTranslations = {
     "delveRiteShrineSkullInteract": "骷髏神龕：按 F 觸碰",
     "mailboxName": "郵箱",
     "noticeboardName": "告示板"
-  },
-  "error": {
-    "uniqueEquipped": "你只能裝備一個此類物品。",
-    "townFocusCannotAfford": "你負擔不起這次專注重置。"
-  },
-  "log": {
-    "townFocusRespecComplete": "你的專注重置已完成。"
   }
 };

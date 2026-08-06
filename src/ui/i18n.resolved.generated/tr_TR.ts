@@ -15083,12 +15083,5 @@ export const tr_TR: EnTranslations = {
     "delveRiteShrineSkullInteract": "Kafatası Sunağı: Dokunmak için F'ye bas",
     "mailboxName": "Posta Kutusu",
     "noticeboardName": "İlan Tahtası"
-  },
-  "error": {
-    "uniqueEquipped": "Bunlardan yalnızca birini kuşanabilirsin.",
-    "townFocusCannotAfford": "Bu odak yeniden dağıtımını karşılayamazsın."
-  },
-  "log": {
-    "townFocusRespecComplete": "Odak yeniden dağıtımın tamamlandı."
   }
 };

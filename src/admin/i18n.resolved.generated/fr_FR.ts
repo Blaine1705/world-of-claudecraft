@@ -788,7 +788,7 @@ export const fr_FR: AdminTranslations = {
   "bugReports.colStatus": "Statut",
   "bugReports.colMeta": "Détails",
   "bugReports.colScreenshot": "Capture d'écran",
-  "bugReports.colActions": "Actions",
+  "bugReports.colActions": "Opérations",
   "bugReports.screenshotAlt": "Capture d'écran du rapport de bug",
   "bugReports.noScreenshot": "aucune",
   "bugReports.viewScreenshot": "Voir",

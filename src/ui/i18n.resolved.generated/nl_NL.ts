@@ -15083,12 +15083,5 @@ export const nl_NL: EnTranslations = {
     "delveRiteShrineSkullInteract": "Schedelschrijn: druk op F om het aan te raken",
     "mailboxName": "Brievenbus",
     "noticeboardName": "Mededelingenbord"
-  },
-  "error": {
-    "uniqueEquipped": "Je kunt er maar één van dat type uitrusten.",
-    "townFocusCannotAfford": "Je kunt die focus-herschikking niet betalen."
-  },
-  "log": {
-    "townFocusRespecComplete": "Je focus-herschikking is voltooid."
   }
 };

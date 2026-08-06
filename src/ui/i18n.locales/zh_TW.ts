@@ -10737,7 +10737,4 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '分解、附魔與拆解：施放 {seconds} 秒',
   'guide.profPages.econ.castPaceRecharge': '工具效果充能：施放 {seconds} 秒',
   'guide.profPages.econ.castPaceBatch': '批量製作：單次最多 {count} 件，逐件施放',
-  'error.uniqueEquipped': '你只能裝備一個此類物品。',
-  'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
-  'log.townFocusRespecComplete': '你的專注重置已完成。',
 };

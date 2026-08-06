@@ -11085,7 +11085,4 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Omorganiser fanen {channel}: træk den, eller brug Alt+venstre og Alt+højre',
   'itemUi.vendor.buyStack': 'Køb {count}',
   'itemUi.vendor.buyStackAria': 'Køb {count} {item} for {price}',
-  'error.uniqueEquipped': 'Du kan kun udstyre én af den slags.',
-  'error.townFocusCannotAfford': 'Du har ikke råd til den fokusomlægning.',
-  'log.townFocusRespecComplete': 'Din fokusomlægning er fuldført.',
 };
