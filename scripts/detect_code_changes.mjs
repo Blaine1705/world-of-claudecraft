@@ -1,8 +1,9 @@
 // CI entry for the ci.yml `changes` job ("Detect code path changes"): decide
 // whether the run touches the code path set and write the `code` step output,
-// plus the PR-tier selection decision (`test_mode`, `test_mode_reason`,
-// `changed_files`) the pr-gate shards consume (the CI/CD performance packet's
-// Phase 2; model and audit contract: docs/qa-gate.md, "Selective PR-tier CI"). The changed-file list comes from the
+// plus the PR-tier selection decision (`test_mode`,
+// `test_mode_reason`, `changed_files`) the pr-gate shards consume (the CI/CD
+// performance packet's Phase 2; model and audit contract: docs/qa-gate.md,
+// "Selective PR-tier CI"). The changed-file list comes from the
 // GitHub pull request files endpoint, so the job needs no git history at all;
 // both decisions are derived from the SAME fetched listing so they cannot
 // disagree about the diff. The decision logic lives in

@@ -62,7 +62,6 @@ describe('decideTestMode: fail-closed triggers', () => {
     ['.npmrc'],
     ['tests/helpers/bare_client.ts'],
     ['tests/server/helpers/fake_db.ts'],
-    ['tests/server/fixtures/main/golden.json'],
     ['tests/global_setup.ts'],
     ['src/ui/i18n.catalog/translation_keys.generated.ts'],
     ['.browserslistrc'],

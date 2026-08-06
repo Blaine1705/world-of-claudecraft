@@ -90,6 +90,11 @@ export const FS_HELPER_DIRS = Object.freeze([
   'tests/helpers',
   'tests/server/helpers',
   'tests/util',
+  // The parity harness: run_scenarios.ts reads the goldens off disk, and every
+  // parity suite delegates through it. Without this entry a golden-only diff
+  // left 11 of the 12 parity files unselected by the LOCAL merge bar (CI was
+  // already safe via CI_GUARD_PREFIXES).
+  'tests/parity',
 ]);
 
 /**
@@ -130,7 +135,10 @@ export function buildHelperImportPattern(helperPaths) {
   ].filter(Boolean);
   if (names.length === 0) return null;
   const alt = names.map((n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-  return new RegExp(`from\\s*['"][^'"]*\\/(?:${alt})['"]`);
+  // Optional extension tail: an ESM .mjs/.js helper must be imported WITH its
+  // extension, and a name-must-end-the-specifier match would discover such a
+  // helper and then never match its importers.
+  return new RegExp(`from\\s*['"][^'"]*\\/(?:${alt})(?:\\.[cm]?[jt]s)?['"]`);
 }
 
 /** Static imports from the product source trees the graph DOES model. */

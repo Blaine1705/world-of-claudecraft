@@ -174,7 +174,7 @@ night, never later, and the release branch is the safety net the packet designed
 
 ### Selective PR-tier CI (`ci_shard_test.mjs`)
 
-Since Phase 2 of the CI/CD performance packet (a maintainer-internal packet), the
+Since Phase 2 of the CI/CD performance packet, the
 `pull_request` tier of `.github/workflows/ci.yml` runs the SAME selection semantics as
 `gate:select`, sharded 8 ways. The `changes` job derives a `test_mode` from the same
 API-fetched file listing that decides `code` (`scripts/lib/ci_test_select.mjs`), and each

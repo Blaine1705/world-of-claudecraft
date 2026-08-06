@@ -185,11 +185,12 @@ describe('buildShardPlan: selective mode', () => {
 
   it('reports what it runs and what it skips, for the job log', () => {
     const plan = buildShardPlan({ ...BASE });
-    // Literals from the fixture, not the implementation's own formula: FILLER
-    // (320) + architecture + localization_fixes = 322 always-run, plus
-    // localization_coverage, world_api_parity, and the parity file via the
-    // guard union = 325; COLLECTED is 327, leaving exactly the two pure tests.
-    expect(plan.floorCount).toBe(325);
+    // Derived from the fixture, not the implementation's own formula: FILLER
+    // (FLOOR_SANITY_MIN + 20) + architecture + localization_fixes always-run,
+    // plus localization_coverage, world_api_parity, and the parity file via
+    // the guard union = FLOOR_SANITY_MIN + 25; COLLECTED holds two more pure
+    // tests, which are exactly the outside-floor remainder.
+    expect(plan.floorCount).toBe(FLOOR_SANITY_MIN + 25);
     expect(plan.relatedCount).toBe(1);
     expect(plan.outsideFloorCount).toBe(2);
   });
@@ -328,5 +329,19 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(run.exitCode).toBe(0);
     expect(run.log).toContain('plan: mode=full');
     expect(run.log).toContain('npm test -- --shard=1/8');
+  });
+
+  it('strips control characters from the relayed reason before echoing it', async () => {
+    // The reason is log-only, but the consumer must not trust the producer's
+    // strip: a newline smuggled through the env could otherwise start a fresh
+    // log line (where `::` workflow commands are parsed).
+    const run = await runEntry(['--shard=1/8', '--plan-only'], {
+      TEST_MODE: 'full',
+      TEST_MODE_REASON: 'line-one\n::error::line-two',
+      CHANGED_FILES: '[]',
+    });
+    expect(run.exitCode).toBe(0);
+    expect(run.log).toContain('(line-one::error::line-two)');
+    expect(run.log).not.toMatch(/^::error::/m);
   });
 });
