@@ -8510,7 +8510,7 @@ export const pt_BR: EnTranslations = {
       },
       "army_of_the_dead": {
         "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec in addition to your chosen Dominion servants."
+        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
       },
       "metamorphosis": {
         "name": "Metamorfose",

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import {
   AFFLICTION_DOOM_DURATION,
@@ -826,8 +827,15 @@ describe('Affliction Warlock', () => {
     // projectiles rule (cancelPendingProjectilesFrom) the bolt fizzles at the
     // respec and nothing lands; standalone, the bolt still lands for damage.
     // The INVARIANT both arms share, and the point of this test, is below:
-    // no Affliction state is ever rebuilt off-spec.
+    // no Affliction state is ever rebuilt off-spec. The arm taken is pinned
+    // to the composition's actual code (a source scan, the repo's guard
+    // idiom), so this cannot silently self-fulfill either way.
     const canceledAtRespec = ctx(sim).pendingProjectiles.length === 0;
+    const talentsSource = readFileSync(
+      new URL('../src/sim/progression/talents.ts', import.meta.url),
+      'utf8',
+    );
+    expect(canceledAtRespec).toBe(talentsSource.includes('cancelPendingProjectilesFrom('));
     for (let tick = 0; tick < 200 && ctx(sim).pendingProjectiles.length > 0; tick++) sim.tick();
     if (canceledAtRespec) expect(target.hp).toBe(hpBefore);
     else expect(target.hp).toBeLessThan(hpBefore);
