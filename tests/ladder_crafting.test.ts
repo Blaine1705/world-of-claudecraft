@@ -8,12 +8,12 @@
 // tests/recipe_economy.test.ts; this file is the execution arm.
 import { describe, expect, it } from 'vitest';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
-import type { InvSlot } from '../src/sim/types';
 import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
 import { LADDER_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, STATIONS } from '../src/sim/data';
 import { stationsOfType } from '../src/sim/professions/stations';
 import { Sim } from '../src/sim/sim';
+import type { InvSlot } from '../src/sim/types';
 import { runCraft } from './helpers/enchant_family_cast';
 
 const SPECIMEN_IDS = new Set(Object.values(HARVEST_COMPONENT_SPECIMENS));

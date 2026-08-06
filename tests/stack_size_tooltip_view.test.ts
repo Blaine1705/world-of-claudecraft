@@ -85,9 +85,7 @@ describe('stackSizeTooltipLine', () => {
     // while every kind-default probe stays green.
     expect(ITEMS.heroic_mark.kind).toBe('tool');
     expect(ITEMS.heroic_mark.stackSize).toBe(20);
-    expect(stackSizeTooltipLine(ITEMS.heroic_mark)).toBe(
-      '<div class="tt-sub">Max stack: 20</div>',
-    );
+    expect(stackSizeTooltipLine(ITEMS.heroic_mark)).toBe('<div class="tt-sub">Max stack: 20</div>');
   });
 
   it('renders nothing for mount reins even though their bag cap is really 20', () => {
