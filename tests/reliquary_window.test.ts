@@ -73,12 +73,6 @@ describe('painter hygiene', () => {
     // Class names are composed as reliquary-cell-- + owned|missing.
     expect(painter).toContain('reliquary-cell--');
     expect(painter).toMatch(/stateClass = cell\.owned \? 'owned' : 'missing'/);
-    // Active page path must not still ship the Phase 4 stub-only note.
-    const pageDetailFn = painter.match(
-      /private pageDetailHtml\([\s\S]*?\n {2}private [a-zA-Z]/,
-    )?.[0];
-    expect(pageDetailFn, 'pageDetailHtml present').toBeTruthy();
-    expect(pageDetailFn).not.toContain('pageStubNote');
     expect(painter).toContain('attachTooltip');
     // Live firstFind meta must feed the pure model (owned-cell clear# tooltips).
     expect(code).toContain('firstFind: world.reliquaryFirstFind');

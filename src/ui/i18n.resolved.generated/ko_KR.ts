@@ -3179,7 +3179,6 @@ export const ko_KR: EnTranslations = {
       "pageComplete": "조명됨",
       "clearsLabel": "클리어 {count}회",
       "backToShelf": "선반으로 돌아가기",
-      "pageStubNote": "전체 성물 격자는 이후 업데이트에서 제공됩니다. 위 진행도는 이미 반영됩니다.",
       "gridAria": "{name}의 성물",
       "pageProgressAria": "페이지 진행도: 성물 {owned}/{total} 채움",
       "cellOwnedAria": "{name}, 수록됨",

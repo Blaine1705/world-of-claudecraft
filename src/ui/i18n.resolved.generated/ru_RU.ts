@@ -3179,7 +3179,6 @@ export const ru_RU: EnTranslations = {
       "pageComplete": "Озарено",
       "clearsLabel": "Прохождений: {count}",
       "backToShelf": "Назад к полке",
-      "pageStubNote": "Полная сетка реликвий появится в следующем обновлении. Прогресс выше уже актуален.",
       "gridAria": "Реликвии на странице {name}",
       "pageProgressAria": "Прогресс страницы: {owned} из {total} реликвий",
       "cellOwnedAria": "{name}, каталогизировано",

@@ -3179,7 +3179,6 @@ export const en_CA: EnTranslations = {
       "pageComplete": "Illuminated",
       "clearsLabel": "{count} clears",
       "backToShelf": "Back to shelf",
-      "pageStubNote": "The full relic grid arrives in a later update. Progress above is live.",
       "gridAria": "Relics on {name}",
       "pageProgressAria": "Page progress: {owned} of {total} relics filled",
       "cellOwnedAria": "{name}, catalogued",

@@ -8063,7 +8063,6 @@
     gap: 8px;
     flex-wrap: wrap;
   }
-  .reliquary-page-stub,
   .reliquary-page-detail {
     display: flex;
     flex-direction: column;
@@ -8094,7 +8093,6 @@
   }
   .reliquary-page-progress,
   .reliquary-page-clears,
-  .reliquary-page-stub-note,
   .reliquary-account-scope {
     margin: 0;
     font-size: 13px;

@@ -9909,7 +9909,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pageComplete': '已點亮',
   'hudChrome.reliquary.clearsLabel': '{count} 次通關',
   'hudChrome.reliquary.backToShelf': '返回書架',
-  'hudChrome.reliquary.pageStubNote': '完整聖物網格將在後續更新中到來。上方進度已生效。',
   'hudChrome.reliquary.gridAria': '{name} 的聖物',
   'hudChrome.reliquary.pageProgressAria': '頁面進度：已填入 {owned}/{total} 件聖物',
   'hudChrome.reliquary.cellOwnedAria': '{name}，已收錄',

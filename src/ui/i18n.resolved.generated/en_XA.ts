@@ -3179,7 +3179,6 @@ export const en_XA: EnTranslations = {
       "pageComplete": "[Íļļúɱíñáţéð]",
       "clearsLabel": "[{count} çļéáŕš]",
       "backToShelf": "[Ɓáçķ ţó šĥéļƒ]",
-      "pageStubNote": "[Ţĥé ƒúļļ ŕéļíç ĝŕíð áŕŕíʋéš íñ á ļáţéŕ úþðáţé. Þŕóĝŕéšš áƀóʋé íš ļíʋé.]",
       "gridAria": "[Ŕéļíçš óñ {name}]",
       "pageProgressAria": "[Þáĝé þŕóĝŕéšš: {owned} óƒ {total} ŕéļíçš ƒíļļéð]",
       "cellOwnedAria": "[{name}, çáţáļóĝúéð]",

@@ -10390,8 +10390,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pageComplete': '照耀済み',
   'hudChrome.reliquary.clearsLabel': 'クリア {count} 回',
   'hudChrome.reliquary.backToShelf': '棚に戻る',
-  'hudChrome.reliquary.pageStubNote':
-    '完全な聖遺物グリッドは今後の更新で追加されます。上の進捗は反映済みです。',
   'hudChrome.reliquary.gridAria': '{name} の聖遺物',
   'hudChrome.reliquary.pageProgressAria': 'ページ進捗：聖遺物 {owned}/{total} 埋め済み',
   'hudChrome.reliquary.cellOwnedAria': '{name}、収蔵済み',

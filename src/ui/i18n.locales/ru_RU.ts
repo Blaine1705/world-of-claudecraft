@@ -10553,8 +10553,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pageComplete': 'Озарено',
   'hudChrome.reliquary.clearsLabel': 'Прохождений: {count}',
   'hudChrome.reliquary.backToShelf': 'Назад к полке',
-  'hudChrome.reliquary.pageStubNote':
-    'Полная сетка реликвий появится в следующем обновлении. Прогресс выше уже актуален.',
   'hudChrome.reliquary.gridAria': 'Реликвии на странице {name}',
   'hudChrome.reliquary.pageProgressAria': 'Прогресс страницы: {owned} из {total} реликвий',
   'hudChrome.reliquary.cellOwnedAria': '{name}, каталогизировано',

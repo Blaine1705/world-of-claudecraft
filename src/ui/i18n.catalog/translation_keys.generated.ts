@@ -8012,7 +8012,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.ownedTooltipStatus'
   | 'hudChrome.reliquary.pageComplete'
   | 'hudChrome.reliquary.pageProgressAria'
-  | 'hudChrome.reliquary.pageStubNote'
   | 'hudChrome.reliquary.progressText'
   | 'hudChrome.reliquary.rankUpBanner'
   | 'hudChrome.reliquary.rankUpToast'
