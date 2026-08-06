@@ -93,6 +93,9 @@ const itemStringsEn = {
       questRules: 'Cannot be sold, banked, or traded.',
       questOrphaned: 'Not needed for any active quest.',
       classes: 'Classes: {classes}',
+      // Stackable per-slot cap (stack_size_tooltip_view.ts); unstackable
+      // kinds render no line at all rather than "Max stack: 1".
+      maxStack: 'Max stack: {count}',
       sellPrice: 'Sell price: {money}',
       clickBuy: 'Click to buy',
       clickSell: 'Click to sell',

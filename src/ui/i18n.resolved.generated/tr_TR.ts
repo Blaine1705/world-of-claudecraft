@@ -7411,6 +7411,7 @@ export const tr_TR: EnTranslations = {
       "questRules": "Satılamaz, bankaya konulamaz veya takas edilemez.",
       "questOrphaned": "Aktif hiçbir görev için gerekli değil.",
       "classes": "Sınıflar: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Satış fiyatı: {money}",
       "clickBuy": "Satın almak için tıkla",
       "clickSell": "Satmak için tıkla",

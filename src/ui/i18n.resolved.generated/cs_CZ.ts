@@ -7411,6 +7411,7 @@ export const cs_CZ: EnTranslations = {
       "questRules": "Nelze prodat, uložit do banky ani směnit.",
       "questOrphaned": "Není potřeba pro žádný aktivní úkol.",
       "classes": "Třídy: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Prodejní cena: {money}",
       "clickBuy": "Kliknutím koupíš",
       "clickSell": "Kliknutím prodáš",

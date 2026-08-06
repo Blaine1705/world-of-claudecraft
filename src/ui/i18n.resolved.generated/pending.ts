@@ -256,6 +256,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -506,6 +507,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -756,6 +758,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1006,6 +1009,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1257,6 +1261,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1507,6 +1512,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1519,7 +1525,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.tooltip.maxStack"
   ],
   "zh_TW": [
     "hudChrome.bg.clock",
@@ -1530,7 +1537,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.tooltip.maxStack"
   ],
   "ko_KR": [
     "hudChrome.bg.clock",
@@ -1541,7 +1549,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.tooltip.maxStack"
   ],
   "ja_JP": [
     "hudChrome.bg.clock",
@@ -1552,7 +1561,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.tooltip.maxStack"
   ],
   "pt_BR": [
     "abilityUi.cast.crafting",
@@ -1801,6 +1811,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1813,7 +1824,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mobTooltip.boss",
     "hudChrome.pvp.bracket1v1",
     "hudChrome.pvp.bracket2v2",
-    "hudChrome.pvp.launcherTitle"
+    "hudChrome.pvp.launcherTitle",
+    "itemUi.tooltip.maxStack"
   ],
   "cs_CZ": [
     "abilityUi.cast.crafting",
@@ -2062,6 +2074,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -2312,6 +2325,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -2562,6 +2576,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -2812,6 +2827,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3062,6 +3078,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3312,6 +3329,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3562,6 +3580,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3812,6 +3831,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundFirstWin",
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ]
