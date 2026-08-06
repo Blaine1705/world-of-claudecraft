@@ -62,9 +62,10 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   satisfied. Requiring the job that decides closes that hole for a classifier
   FAILURE. The residual is inherent to CI-config-in-repo: a queue run executes
   the queued tree's own copy of ci.yml and the classifier, so an honest
-  mistake there is caught only because `.github/` and `scripts/` are
-  themselves code paths (always `code=true`, always full suite); a hostile
-  edit is a review problem, not something protection can solve.
+  mistake there is caught only because the workflow files
+  (`.github/workflows/`) and the selection pipeline's own scripts are
+  themselves fail-closed triggers (always `code=true`, always full mode); a
+  hostile edit is a review problem, not something protection can solve.
 - `PR gate (English-only legal) (1)` through `(8)`: the sharded test suite.
 - `PR checks (freshness, typecheck, builds)`.
 - `Format + lint (Biome, changed files)`: deterministic, diff-scoped, minutes

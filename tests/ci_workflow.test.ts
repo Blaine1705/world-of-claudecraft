@@ -86,6 +86,8 @@ const PR_TIER_EVENT_FRAGMENT =
 // may skip the tier. A missing or empty output runs it, matching the
 // classifier's fail-closed doctrine; under the merge queue a skipped required
 // check reads satisfied, so failing toward SKIP would be the wrong direction.
+// (Covers green-but-empty output only: a FAILED changes job skips dependents
+// via needs regardless, which requiring "Detect code path changes" closes.)
 const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code != 'false'`;
 
 // Minimum code path set the changes job must classify as code=true (D10).
@@ -521,11 +523,11 @@ describe('CI workflow parity', () => {
     // The merge queue on main and release/** tests each candidate merge result
     // on a merge_group event. The trigger is load-bearing: required checks that
     // never report stall every queued PR until the queue's status-check timeout
-    // rejects it. Anchored to a top-level on: key (comments and other trigger
-    // lines allowed before it) so a commented-out trigger or one nested under
-    // another event cannot satisfy the pin; key order is deliberately not
-    // pinned.
-    expect(workflow).toMatch(/\non:\n(?:[ \t]+[^\n]*\n)*? {2}merge_group:\n/);
+    // rejects it. Anchored to a top-level on: key (comments, blank lines, and
+    // other trigger lines allowed before it) so a commented-out trigger or one
+    // nested under another event cannot satisfy the pin; key order is
+    // deliberately not pinned.
+    expect(workflow).toMatch(/\non:\n(?:(?:[ \t]+[^\n]*)?\n)*? {2}merge_group:\n/);
 
     // The queue always runs the FULL suite on the merge result: the changes job
     // has no job-level if (pinned elsewhere), and the selector refuses every
@@ -558,10 +560,11 @@ describe('CI workflow parity', () => {
     // into biome and rejecting every queued release PR. Both env lines are
     // pinned INSIDE the Determine-base-ref step's env block (a raw substring
     // would stay green commented-out or moved to the wrong step), and the
-    // shell arm's shape is pinned elif-to-fetch-to-echo with only comment
-    // lines allowed between.
+    // whole shell arm is ONE regex, elif through fi, so no line of it can be
+    // deleted, reordered, or parked as dead code elsewhere in the step; only
+    // comment and blank lines are allowed at the two comment sites.
     const lint = jobSource('lint');
-    const baseRefEnvBlock = String.raw`\n {6}- name: Determine base ref\n {8}id: base\n {8}env:\n(?: {10}[A-Z_]+: [^\n]*\n)*?`;
+    const baseRefEnvBlock = String.raw`\n {6}- name: Determine base ref\n {8}id: base\n {8}env:\n(?:(?: {10}[A-Z_]+: [^\n]*| {10}#[^\n]*)?\n)*?`;
     expect(lint).toMatch(
       new RegExp(
         `${baseRefEnvBlock} {10}MERGE_GROUP_BASE_SHA: \\$\\{\\{ github\\.event\\.merge_group\\.base_sha \\}\\}\n`,
@@ -572,13 +575,28 @@ describe('CI workflow parity', () => {
         `${baseRefEnvBlock} {10}MERGE_GROUP_BASE_REF: \\$\\{\\{ github\\.event\\.merge_group\\.base_ref \\}\\}\n`,
       ),
     );
+    // The arm enters on the EVENT alone: a malformed base SHA must land in the
+    // in-arm fallback, never fall through to the default-branch arm (the
+    // pre-fix disaster path). The [ -n ] line is the loud guard for an empty
+    // base ref (fetching "" quietly succeeds and would write a broken
+    // ref=origin/ output).
+    const comment12 = String.raw`(?:(?: {12}#[^\n]*)?\n)*?`;
+    const comment14 = String.raw`(?:(?: {14}#[^\n]*)?\n)*?`;
     expect(lint).toMatch(
-      /elif \[ "\$EVENT_NAME" = "merge_group" \] && printf '%s' "\$MERGE_GROUP_BASE_SHA" \| grep -qE '\^\[0-9a-f\]\{40\}\$'; then\n(?: {12}#[^\n]*\n)* {12}if git fetch --no-tags --depth=1 origin "\$MERGE_GROUP_BASE_SHA"; then\n {14}echo "ref=\$MERGE_GROUP_BASE_SHA" >> "\$GITHUB_OUTPUT"\n/,
-    );
-    // The unreachable-SHA fallback diffs against the live target-branch tip
-    // (never the default branch), so one flaky fetch cannot eject a good PR.
-    expect(lint).toMatch(
-      /base_branch="\$\{MERGE_GROUP_BASE_REF#refs\/heads\/\}"\n {14}git fetch --no-tags --depth=1 origin "\$base_branch"\n {14}echo "ref=origin\/\$base_branch" >> "\$GITHUB_OUTPUT"\n/,
+      new RegExp(
+        String.raw`elif \[ "\$EVENT_NAME" = "merge_group" \]; then\n` +
+          comment12 +
+          String.raw` {12}if printf '%s' "\$MERGE_GROUP_BASE_SHA" \| grep -qE '\^\[0-9a-f\]\{40\}\$' \\\n` +
+          String.raw` {14}&& git fetch --no-tags --depth=1 origin "\$MERGE_GROUP_BASE_SHA"; then\n` +
+          String.raw` {14}echo "ref=\$MERGE_GROUP_BASE_SHA" >> "\$GITHUB_OUTPUT"\n` +
+          String.raw` {12}else\n` +
+          comment14 +
+          String.raw` {14}base_branch="\$\{MERGE_GROUP_BASE_REF#refs/heads/\}"\n` +
+          String.raw` {14}\[ -n "\$base_branch" \]\n` +
+          String.raw` {14}git fetch --no-tags --depth=1 origin "\$base_branch"\n` +
+          String.raw` {14}echo "ref=origin/\$base_branch" >> "\$GITHUB_OUTPUT"\n` +
+          String.raw` {12}fi\n`,
+      ),
     );
 
     // Release lanes stay off queue runs: their if arms match pull_request and
@@ -619,7 +637,16 @@ describe('CI workflow parity', () => {
     // bare names for the unsharded jobs, and the matrix-suffixed range for the
     // sharded gate. The range must track SHARD_N, or a future shard-count
     // change silently leaves the extra shards un-required in a ruleset nobody
-    // can diff in git.
+    // can diff in git. The doc is sliced at its "Never require these" heading:
+    // each required name must sit in the REQUIRED half, and none may appear in
+    // the never-require list, so quietly moving a check between the two lists
+    // fails here rather than reading as a contract change nobody pinned.
+    const neverIdx = mergeQueueDoc.indexOf('Never require these');
+    expect(neverIdx).toBeGreaterThan(0);
+    const requiredHalf = mergeQueueDoc.slice(0, neverIdx);
+    const neverSectionEnd = mergeQueueDoc.indexOf('\n## ', neverIdx);
+    expect(neverSectionEnd).toBeGreaterThan(neverIdx);
+    const neverSection = mergeQueueDoc.slice(neverIdx, neverSectionEnd);
     const docRequiredNameForms = [
       '`Detect code path changes`',
       `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
@@ -628,12 +655,11 @@ describe('CI workflow parity', () => {
       '`Browser regressions (Chromium)`',
     ] as const;
     for (const form of docRequiredNameForms) {
-      expect(mergeQueueDoc).toContain(form);
+      expect(requiredHalf).toContain(form);
     }
-    // The doc must never list a release lane or the path-filtered audit as
-    // required: the release lanes are legitimately red mid-cycle, and a
-    // required check whose workflow never reports deadlocks the queue.
-    expect(mergeQueueDoc).toContain('Never require these');
+    for (const name of requiredCheckNames) {
+      expect(neverSection).not.toContain(`\`${name}\``);
+    }
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {

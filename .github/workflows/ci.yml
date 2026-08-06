@@ -27,7 +27,10 @@ permissions:
 # gh-readonly-queue/<branch>/pr-<n>-<sha> ref: unique per live merge group, so
 # cancel-in-progress cannot cross-cancel two live groups (the queue dissolves a
 # group before any ref could be reused), and the event_name segment keeps queue
-# runs from ever colliding with PR or push runs.
+# runs from ever colliding with PR or push runs. The flip side of unique refs:
+# a dissolved group's superseded run is never cancelled by this group either;
+# that cleanup is GitHub's, so the trade costs at most idle runner minutes,
+# never a live group's required checks.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -228,21 +231,30 @@ jobs:
           if [ "$EVENT_NAME" = "pull_request" ]; then
             git fetch --no-tags --depth=1 origin "$BASE_REF"
             echo "ref=origin/$BASE_REF" >> "$GITHUB_OUTPUT"
-          elif [ "$EVENT_NAME" = "merge_group" ] && printf '%s' "$MERGE_GROUP_BASE_SHA" | grep -qE '^[0-9a-f]{40}$'; then
+          elif [ "$EVENT_NAME" = "merge_group" ]; then
             # A queue run diffs the merge group against the target-branch tip it
-            # was built on. Falling through to the default-branch arm would diff
-            # a release/** group against main and drag the whole release delta
-            # (including the intentionally-red whole-repo debt) into biome. The
-            # shape guard keeps anything but a bare hex SHA out of GITHUB_OUTPUT
-            # (same belt-and-suspenders standard as detect_code_changes.mjs).
-            if git fetch --no-tags --depth=1 origin "$MERGE_GROUP_BASE_SHA"; then
+            # was built on, and a merge_group event must NEVER fall through to
+            # the default-branch arm: that would diff a release/** group against
+            # main and drag the whole release delta (including the
+            # intentionally-red whole-repo debt) into biome. So this arm keys on
+            # the event alone, and anything unusable about the SHA lands in the
+            # fallback below, never outside the arm. The shape guard only
+            # selects the SHA path (grep matches per line; the backstop for a
+            # malformed value is the fetch itself, since nothing is written to
+            # GITHUB_OUTPUT unless its fetch succeeded).
+            if printf '%s' "$MERGE_GROUP_BASE_SHA" | grep -qE '^[0-9a-f]{40}$' \
+              && git fetch --no-tags --depth=1 origin "$MERGE_GROUP_BASE_SHA"; then
               echo "ref=$MERGE_GROUP_BASE_SHA" >> "$GITHUB_OUTPUT"
             else
-              # Unreachable base SHA (a dissolved predecessor group, or a
-              # transient fetch failure): fall back to the live target-branch
-              # tip, still never the default branch, so one flaky fetch cannot
-              # eject a good PR from the queue with a red required check.
+              # Malformed or unreachable base SHA (a dissolved predecessor
+              # group, a transient fetch failure): fall back to the live
+              # target-branch tip, still never the default branch, so one flaky
+              # fetch cannot eject a good PR from the queue. An empty base ref
+              # has no safe fallback at all: the bare [ -n ] test fails the
+              # step loudly (fetching "" would quietly succeed and write a
+              # broken ref=origin/ output instead).
               base_branch="${MERGE_GROUP_BASE_REF#refs/heads/}"
+              [ -n "$base_branch" ]
               git fetch --no-tags --depth=1 origin "$base_branch"
               echo "ref=origin/$base_branch" >> "$GITHUB_OUTPUT"
             fi
@@ -273,6 +285,9 @@ jobs:
     # A missing or empty output must run the job, matching the classifier's own
     # fail-closed doctrine; == 'true' is the one place doubt would fail toward
     # SKIP, and under the merge queue a skipped required check reads satisfied.
+    # This covers a green-but-empty output only: a FAILED changes job still
+    # skips dependents through needs regardless of this expression, which is
+    # why "Detect code path changes" must itself be a required check.
     needs: changes
     if: needs.changes.outputs.code != 'false'
     runs-on: ubuntu-latest
