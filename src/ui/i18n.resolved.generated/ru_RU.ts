@@ -10320,6 +10320,15 @@ export const ru_RU: EnTranslations = {
       "direfang_quiver": {
         "name": "Колчан Лютого Клыка"
       },
+      "sharp_claw": {
+        "name": "Острый коготь"
+      },
+      "curved_tusk": {
+        "name": "Изогнутый клык"
+      },
+      "pristine_claw": {
+        "name": "Безупречный коготь"
+      },
       "conjured_water4": {
         "name": "Сотворённая родниковая вода"
       },

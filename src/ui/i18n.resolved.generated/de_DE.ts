@@ -10320,6 +10320,15 @@ export const de_DE: EnTranslations = {
       "direfang_quiver": {
         "name": "Direfang-Köcher"
       },
+      "sharp_claw": {
+        "name": "Sharp Claw"
+      },
+      "curved_tusk": {
+        "name": "Curved Tusk"
+      },
+      "pristine_claw": {
+        "name": "Pristine Claw"
+      },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
       },
