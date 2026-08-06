@@ -485,7 +485,7 @@ export function petRangedAttack(
         amount: 0,
         crit: false,
         school: ranged.school,
-        ability: null,
+        ability: ranged.name ?? null,
         kind: 'resist',
       });
       ctx.enterCombat(src, tgt);

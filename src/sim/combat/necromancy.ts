@@ -7,6 +7,7 @@ import { clearThreat } from '../threat';
 import { type AbilityDef, armorReduction, type Entity } from '../types';
 import {
   dominionSummonBlock,
+  missingDominionTemplates,
   NECROMANCY_DOMINION_CAP,
   selectCorpseExplosionServant,
 } from './necromancy_dominion';
@@ -951,7 +952,13 @@ export function raiseArmyOfDead(ctx: SimContext, owner: Entity, duration: number
     ['necromancy_bone_mage', 0],
     ['necromancy_gravewing', 1.15],
   ] as const;
+  // The duplicate gate: the Army fills only the archetypes the warlock is NOT
+  // already fielding. Without it a standing Gravewing/Bone Mage is doubled for
+  // the Army window, which is both the strongest burst outlier (a second full
+  // Gravewing) and visually two identical servants on screen.
+  const missing = new Set(missingDominionTemplates(ownedNecromancyUndead(ctx, owner.id)));
   for (const [templateId, lateral] of formation) {
+    if (!missing.has(templateId)) continue;
     summonUndead(
       ctx,
       owner,

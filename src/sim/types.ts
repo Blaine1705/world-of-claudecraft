@@ -572,6 +572,9 @@ export interface Aura {
   damageAccrued?: number;
   stacks?: number; // sunder armor: applications stack up to the effect's cap
   charges?: number; // thorns: remaining reflect charges (Lightning Shield); undefined => unlimited
+  // affliction_eye: sim-time until the enemy-action doom stream may grant again
+  // (combat/affliction.ts onAfflictionDamage). Sim-internal bookkeeping only.
+  actionGainLockout?: number;
   icd?: number; // thorns: internal-cooldown remaining, seconds (counts down each tick)
   icdMax?: number; // thorns: configured internal cooldown, seconds (re-armed on each reflect)
   // Talent-proc empowerment auras (next_cast_free/instant/cheap): which ability

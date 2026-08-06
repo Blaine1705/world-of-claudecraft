@@ -235,7 +235,7 @@ describe('destruction progression', () => {
       castTime: 2.5,
       cooldown: 0,
       ruinCost: 3,
-      effects: [{ type: 'directDamage', min: 358, max: 437 }],
+      effects: [{ type: 'directDamage', min: 290, max: 355 }],
     });
     expect(ABILITIES.shadow_bolt.effects).toEqual([{ type: 'directDamage', min: 36, max: 50 }]);
     expect(ABILITIES.shadow_bolt.ranks?.map((rank) => rank.effects)).toEqual([
@@ -254,12 +254,12 @@ describe('destruction progression', () => {
       ],
       [
         { type: 'directDamage', min: 106, max: 106 },
-        { type: 'dot', total: 168, duration: 15, interval: 3 },
+        { type: 'dot', total: 136, duration: 15, interval: 3 },
       ],
     ]);
     expect(ABILITIES.conflagrate.effects).toEqual([
       { type: 'destructionConflagrate' },
-      { type: 'directDamage', min: 151, max: 179 },
+      { type: 'directDamage', min: 140, max: 165 },
     ]);
     expect(ABILITIES.summon_infernal).toMatchObject({
       castTime: 0,
@@ -416,7 +416,7 @@ describe('Ruin engine and Desolation', () => {
     expect(p.abilityCharges?.conflagrate?.maxCharges).toBe(2);
   });
 
-  it('Conflagrate spends two stored charges, rejects a third, and restores one after 12 seconds', () => {
+  it('Conflagrate spends two stored charges, rejects a third, and restores one after 18 seconds', () => {
     const { sim, p } = destructionAt();
     const mob = addDummy(sim, 9709);
     sim.targetEntity(mob.id);
@@ -437,6 +437,10 @@ describe('Ruin engine and Desolation', () => {
     expect(p.abilityCharges?.conflagrate?.charges).toBe(0);
 
     collect(sim, 11);
+    expect(p.abilityCharges?.conflagrate?.charges).toBe(0);
+    // The two charges recharge in parallel from their own spend instants
+    // (t=0 and t=0.5), so 18.2s after the first spend exactly one is back.
+    collect(sim, 6.2);
     expect(p.abilityCharges?.conflagrate?.charges).toBe(1);
     const pact = mob.auras.find((aura) => aura.id === 'immolate');
     if (!pact) {

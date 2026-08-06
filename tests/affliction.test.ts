@@ -11,6 +11,7 @@ import {
   gainDoom,
   JUDGMENT_SENTENCE_DAMAGE_MULT,
   maledictGazeDamage,
+  onAfflictionDamage,
   possessedSentenceEchoMultiplier,
   resolveNeedleOfFate,
   resolveSentence,
@@ -172,6 +173,31 @@ describe('Affliction Warlock', () => {
         { rank: 3, level: 20, cost: 45 },
       ],
     });
+  });
+
+  it('rate-caps the enemy-action doom stream to one gain per eye per second', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim);
+    finishCast(sim, 'evil_eye', target);
+    expect(eye(target, sim.player.id)).toBe(true);
+    const doom = () =>
+      sim.player.auras.find((aura) => aura.kind === 'affliction_doom')?.stacks ?? 0;
+
+    // Act: the marked enemy deals damage twice at the same instant.
+    onAfflictionDamage(ctx(sim), target, sim.player, 10);
+    const afterFirst = doom();
+    expect(afterFirst).toBeGreaterThan(0);
+    onAfflictionDamage(ctx(sim), target, sim.player, 10);
+
+    // Assert: the second same-second event is inside the lockout and grants nothing.
+    expect(doom()).toBe(afterFirst);
+
+    // A second later the stream flows again (delta-based: other doom arms may
+    // trickle during the ticks, so compare around the third event only).
+    for (let i = 0; i < 21; i++) sim.tick();
+    const beforeThird = doom();
+    onAfflictionDamage(ctx(sim), target, sim.player, 10);
+    expect(doom()).toBeGreaterThan(beforeThird);
   });
 
   it('pins the level-20 Needle and Maledict Gaze damage floor', () => {
@@ -780,7 +806,7 @@ describe('Affliction Warlock', () => {
     expect(doomValue(sim.player)).toBe(AFFLICTION_EYE_DEATH_GAIN + 7);
   });
 
-  it('does not rebuild Affliction state when an in-flight Needle lands after leaving the spec', () => {
+  it('never rebuilds Affliction state from an in-flight Needle after leaving the spec', () => {
     const sim = makeAffliction();
     const target = addTarget(sim, 19);
     sim.targetEntity(target.id);
@@ -791,10 +817,20 @@ describe('Affliction Warlock', () => {
     while (sim.player.castingAbility) sim.tick();
     expect(ctx(sim).pendingProjectiles.length).toBeGreaterThan(0);
     expect(sim.setSpec(null)).toBe(true);
+    // setSpec recalcs stats and drops the harness's never-resist hitBonus;
+    // restore it so a surviving bolt cannot resist (this test is about the
+    // state rebuild, not the impact roll).
+    sim.player.hitBonus = 1;
 
+    // Composition-dependent arm: on a line that carries the respec-cancels-
+    // projectiles rule (cancelPendingProjectilesFrom) the bolt fizzles at the
+    // respec and nothing lands; standalone, the bolt still lands for damage.
+    // The INVARIANT both arms share, and the point of this test, is below:
+    // no Affliction state is ever rebuilt off-spec.
+    const canceledAtRespec = ctx(sim).pendingProjectiles.length === 0;
     for (let tick = 0; tick < 200 && ctx(sim).pendingProjectiles.length > 0; tick++) sim.tick();
-
-    expect(target.hp).toBeLessThan(hpBefore);
+    if (canceledAtRespec) expect(target.hp).toBe(hpBefore);
+    else expect(target.hp).toBeLessThan(hpBefore);
     expect(eye(target, sim.playerId)).toBe(false);
     expect(fateThreads(target, sim.playerId)).toBe(0);
     expect(doomValue(sim.player)).toBe(0);
@@ -1504,7 +1540,7 @@ describe('Affliction Warlock', () => {
             event.type === 'damage' && event.targetId === boss.id && event.ability === 'Sentence',
         )
         .reduce((sum, event) => sum + (event.type === 'damage' ? event.amount : 0), 0),
-    ).toBe(799);
+    ).toBe(699);
     expect(boss.hp).toBeLessThan(bossHp);
     expect(bossNearbyHp - bossNearby.hp).toBe(233);
 
