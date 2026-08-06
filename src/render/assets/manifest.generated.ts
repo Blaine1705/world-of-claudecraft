@@ -342,7 +342,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/creatures/stone_cantor.glb": "/media/models/creatures/stone_cantor.a207f7ae80be.glb",
   "models/creatures/tolling_bell.glb": "/media/models/creatures/tolling_bell.c16b6309fb51.glb",
   "models/creatures/training_dummy.glb": "/media/models/creatures/training_dummy.e29aa3fb8ea7.glb",
-  "models/creatures/treant_ability_anims.glb": "/media/models/creatures/treant_ability_anims.99774af51fd3.glb",
+  "models/creatures/treant_ability_anims.glb": "/media/models/creatures/treant_ability_anims.6d81c3efd4d4.glb",
   "models/creatures/tribal.glb": "/media/models/creatures/tribal.36f1f0f698db.glb",
   "models/creatures/troll_ability_anims.glb": "/media/models/creatures/troll_ability_anims.95293af97655.glb",
   "models/creatures/veiled_doe.glb": "/media/models/creatures/veiled_doe.ee0dd9450b96.glb",

@@ -82,7 +82,13 @@ const P_all = mergePoses(
   P_swaySettle,
 );
 
-const timeline = [[0, (k) => poseValue(P_idleRest, k, P_idleHold)]];
+// Fall back to P_all (not P_idleHold): P_idleRest and P_idleHold are both
+// sampled from the Idle clip alone, which animates only 2 of the 4 candidate
+// channels (Head|translation, Head3|rotation). Head|rotation (Bite_Front's
+// downward lean, the actual slam) and Head2|rotation (Dance's sway) are
+// absent from both, so poseValue would return null for this first keyframe
+// and bakeClip silently drops those channels from the baked clip entirely.
+const timeline = [[0, (k) => poseValue(P_idleRest, k, P_all)]];
 pushPoseRamp(timeline, {
   fromTime: 0,
   toTime: 0.6,
