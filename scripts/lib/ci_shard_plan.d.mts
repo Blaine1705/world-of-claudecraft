@@ -30,5 +30,5 @@ export function buildShardPlan(opts: {
   legs: ShardLeg[];
   floorCount?: number;
   relatedCount?: number;
-  skippedCount?: number;
+  outsideFloorCount?: number;
 };

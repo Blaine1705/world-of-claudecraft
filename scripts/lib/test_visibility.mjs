@@ -110,6 +110,10 @@ export const HELPER_FS_PATTERN =
  * shared fakes via the `index.ts` barrel, and a barrel hop must not hide an
  * fs-touching helper (tests/server/helpers/golden.ts re-exported by
  * `export * from './golden'` was invisible to the basename-only match).
+ * Deliberately BROAD: once a dir name like `helpers` or `util` joins the
+ * alternation, ANY import ending in that segment matches, including ones
+ * outside the helper dirs. Over-matching adds a file to the floor; the
+ * opposite direction silently un-floors a delegating test.
  *
  * @param {string[]} helperPaths repo-relative, extension stripped
  * @returns {RegExp | null}

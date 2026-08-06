@@ -123,7 +123,7 @@ export function buildFloor({ alwaysRun, testFiles, changedTestFiles }) {
  *   workers: number,
  *   exists: (p: string) => boolean,
  * }} opts
- * @returns {{ mode: 'full' | 'selective', reason: string, legs: ShardLeg[], floorCount?: number, relatedCount?: number, skippedCount?: number }}
+ * @returns {{ mode: 'full' | 'selective', reason: string, legs: ShardLeg[], floorCount?: number, relatedCount?: number, outsideFloorCount?: number }}
  */
 export function buildShardPlan({
   mode,
@@ -224,6 +224,6 @@ export function buildShardPlan({
     legs,
     floorCount: floor.length,
     relatedCount: liveSources.length,
-    skippedCount: Math.max(0, (testFiles?.length ?? 0) - floor.length),
+    outsideFloorCount: Math.max(0, (testFiles?.length ?? 0) - floor.length),
   };
 }

@@ -96,8 +96,12 @@ if (plan.mode === 'selective') {
     `[ci-shard] runs: ${plan.floorCount} floor file(s) sharded ${shard.total} ways, plus ` +
       `vitest related over ${plan.relatedCount} changed source(s)`,
   );
+  // Honest accounting: the related leg covers an unknown further share of the
+  // outside-floor files (it can only be known by running vitest), so this line
+  // must never read as "N files were skipped".
   console.log(
-    `[ci-shard] skips: ${plan.skippedCount} graph-visible test file(s) unrelated to this diff. ` +
+    `[ci-shard] outside the floor: ${plan.outsideFloorCount} graph-visible test file(s); ` +
+      'the related leg covers the share of those reachable from the changed sources. ' +
       'Backstops: the release/** push run and the nightly gate run the full suite (docs/qa-gate.md).',
   );
 }

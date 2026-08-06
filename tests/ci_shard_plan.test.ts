@@ -191,7 +191,7 @@ describe('buildShardPlan: selective mode', () => {
     // guard union = 325; COLLECTED is 327, leaving exactly the two pure tests.
     expect(plan.floorCount).toBe(325);
     expect(plan.relatedCount).toBe(1);
-    expect(plan.skippedCount).toBe(2);
+    expect(plan.outsideFloorCount).toBe(2);
   });
 });
 
@@ -311,9 +311,12 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     expect(run.log).toContain('vitest related');
     expect(run.log).toContain('src/ui/unit_portrait.ts');
     expect(run.log).toContain('--shard=5/8');
-    // The skip line is the audit trail the plan requires: what was skipped and
-    // which backstops still run everything.
-    expect(run.log).toMatch(/skips: \d+ graph-visible test file\(s\)/);
+    // The outside-floor line is the audit trail the plan requires. Its wording
+    // must never claim N files were "skipped": the related leg covers an
+    // unknown further share of them, so an overstated skip count would
+    // undercut the very log this design tells reviewers to audit.
+    expect(run.log).toMatch(/outside the floor: \d+ graph-visible test file\(s\)/);
+    expect(run.log).not.toContain('skips:');
     expect(run.log).toContain('nightly');
   });
 

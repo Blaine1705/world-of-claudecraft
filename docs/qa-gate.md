@@ -194,13 +194,23 @@ read safely. Selection never applies off `pull_request` events: `release-gate` k
 unconditional full 8-shard run line, and the nightly gate re-proves the tips daily.
 
 Every decision prints in the job log (`[detect_code_changes]` in the changes job,
-`[ci-shard]` in each shard: mode, reason, floor size, related sources, and the skipped
-count), so a suspicious green is auditable at a glance. To reproduce a CI decision
-locally: `TEST_MODE=... CHANGED_FILES='[...]' node scripts/ci_shard_test.mjs
---shard=1/8 --plan-only`. Pins: `tests/ci_test_select.test.ts`,
+`[ci-shard]` in each shard: mode, reason, floor size, related sources, and the
+outside-floor count), so a suspicious green is auditable at a glance. To reproduce a CI
+decision locally: `TEST_MODE=... CHANGED_FILES='[...]' node scripts/ci_shard_test.mjs
+--shard=1/8 --plan-only` (`--plan-only` spawns nothing, so it works on any platform;
+the real run path is POSIX-only by design). Pins: `tests/ci_test_select.test.ts`,
 `tests/ci_shard_plan.test.ts`, `tests/ci_selection_pipeline.test.ts` (the trigger list
 matches the pipeline's real import closure), and the workflow shape in
 `tests/ci_workflow.test.ts`.
+
+What the selective PR tier still cannot prove: the merge-result INTERACTION between
+the PR's diff and base commits that landed after the PR's merge base. The shards check
+out the merge ref (the PR merged onto the current base tip), but selection derives
+from the PR's own changed files, so a test that only fails in the combination of a PR
+change and a newer base change is outside both the floor and the related set. The
+full-suite run on every `release/**` push re-proves each merged result at merge time,
+and the nightly re-proves the tip daily; a PR wanting the combination proven pre-merge
+can re-merge its base (the moving-base workflow this repo already uses).
 
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
