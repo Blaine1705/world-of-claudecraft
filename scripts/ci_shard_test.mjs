@@ -5,7 +5,10 @@
 // TEST_MODE_REASON, CHANGED_FILES) plus this job's `--shard=i/N` (or
 // `--lane=long-sims`) argv, builds the legs through the pure planner
 // (lib/ci_shard_plan.mjs), prints the whole decision so a suspicious green can
-// be audited from the job log alone, and runs the legs. Fail closed
+// be audited from the job log alone, and runs the legs through the leg
+// runner (lib/ci_leg_runner.mjs), which carries the ONE sanctioned
+// known-flake retry: the exact teardown-rpc signature, every test passed but
+// exit 1 (Phase 6; docs/qa-gate.md, "Known-flake handling"). Fail closed
 // everywhere: any unreadable input runs this job's full half, the shard's
 // suite-minus-lane or the lane's whole CI_LONG_SUITES list, whose union is
 // exactly the pre-selection full suite.
@@ -13,11 +16,11 @@
 // Selection applies to PR-tier CI only: release-gate keeps its unconditional
 // `npm test -- --shard=i/N` run line and never runs this script, and the
 // nightly workflow re-proves the full suite on the tips daily (docs/qa-gate.md).
-import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { formatLegHeader, runLegsWithFlakeRetry } from './lib/ci_leg_runner.mjs';
 import { buildLanePlan, buildShardPlan, parseShardArg } from './lib/ci_shard_plan.mjs';
 import { collectSuiteVisibility } from './lib/gate_discovery.mjs';
 
@@ -163,28 +166,33 @@ if (lane) {
   }
 }
 
-for (const { name, cmd, args } of plan.legs) {
-  console.log(`\n[ci-shard] ${name}: ${cmd} ${args.join(' ')}`);
-  if (planOnly) continue;
-  // No shell, deliberately: argv elements (which embed PR-controlled
-  // filenames) pass verbatim to execvp, and the floor leg's long file list is
-  // safe under the POSIX arg limits this ubuntu-only entry runs under. The
-  // win32 cmd.exe 8191-char ceiling that forces gate_select.mjs to chunk does
-  // not apply here; local reproduction on Windows is --plan-only (spawns
-  // nothing) per docs/qa-gate.md.
-  const res = spawnSync(cmd, args, { stdio: 'inherit', cwd: repoRoot });
-  if (res.status !== 0) {
-    console.error(`\n[ci-shard] FAIL at "${name}" (exit ${res.status ?? 'killed'})`);
-    process.exit(res.status ?? 1);
-  }
-}
-
 if (planOnly) {
+  for (const leg of plan.legs) {
+    console.log(formatLegHeader(leg));
+  }
   console.log(`\n[ci-shard] plan-only: ${plan.legs.length} leg(s) printed, nothing spawned`);
 } else {
+  // The leg runner (lib/ci_leg_runner.mjs) streams each leg's output through
+  // unchanged, keeps a bounded tail, and applies the ONE sanctioned
+  // known-flake retry: a leg that exits 1 with the exact teardown-rpc
+  // signature (every test passed) reruns once, loudly; nothing else ever
+  // retries. Spawning stays shell-less there: argv elements (which embed
+  // PR-controlled filenames) pass verbatim to execvp, and the floor leg's
+  // long file list is safe under the POSIX arg limits this ubuntu-only entry
+  // runs under. The win32 cmd.exe 8191-char ceiling that forces
+  // gate_select.mjs to chunk does not apply here; local reproduction on
+  // Windows is --plan-only (spawns nothing) per docs/qa-gate.md.
+  const result = await runLegsWithFlakeRetry({ legs: plan.legs, cwd: repoRoot });
+  if (!result.ok) {
+    process.exit(result.status);
+  }
   console.log(
     `\n[ci-shard] PASS: ${plan.legs.length} leg(s) green on ${
       lane ? 'the long-sims lane' : `shard ${shard.index}/${shard.total}`
+    }${
+      result.retriedLegNames.length > 0
+        ? ` (known-flake retry used on: ${result.retriedLegNames.join(', ')})`
+        : ''
     }`,
   );
 }

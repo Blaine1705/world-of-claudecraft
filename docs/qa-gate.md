@@ -248,6 +248,23 @@ exact merge result against the current tip before it may land. The full-suite ru
 every `release/**` push still re-proves the landed tip, and the nightly re-proves it
 daily.
 
+**Known-flake handling** (Phase 6). The shard and lane legs run through
+`scripts/lib/ci_leg_runner.mjs`, which streams each leg's output through unchanged while
+keeping a bounded tail, and applies the ONE sanctioned automatic retry: a leg that exits 1
+while its vitest summary shows every test passed AND the exact unhandled
+`EnvironmentTeardownError: [vitest-worker]: Closing rpc while "onUserConsoleLog" was
+pending` message (the worker-teardown console-log race, first recorded 2026-08-05) is
+rerun once, with a loud `[ci-shard] known-flake retry` banner in the job log and a
+`(known-flake retry used on: ...)` suffix on the PASS line, so a green that used the
+retry is auditable at a glance. At most ONE retry per job, shared across all its legs.
+Any failed test, any other exit code, a signal kill, or any other unhandled error fails
+the job exactly as before: the packet's non-goals forbid a blanket retry because retries
+hide real regressions. Classifier and policy live in `scripts/lib/teardown_rpc_flake.mjs`
+and `scripts/lib/ci_leg_runner.mjs`, pinned by `tests/teardown_rpc_flake.test.ts` and
+`tests/ci_leg_runner.test.ts`. `release-gate`, the nightly, and the local gate carry NO
+auto-retry: there a teardown-rpc red stays red and the remedy remains a manual rerun of
+the red shard (`gh run rerun <run-id> --failed`).
+
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
 of those (`Math.random` and the asset deletion) `vitest related` selected **nothing** and
