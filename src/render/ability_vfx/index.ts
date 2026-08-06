@@ -14,9 +14,3 @@ export {
   type AbilityVfxSpellfxEvent,
   type AbilityVfxStat,
 } from './painter';
-export {
-  type AbilityVfxCompileTarget,
-  type AbilityVfxPrewarmTextureStep,
-  abilityVfxTexturePrewarmSteps,
-  collectAbilityVfxCompileTargets,
-} from './prewarm';
