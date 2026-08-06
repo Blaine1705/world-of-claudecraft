@@ -2533,6 +2533,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '사용: 즉시 생명력을 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.',
   'itemUi.tooltip.useManaPotion':
     '사용: 즉시 마나를 {amount} 회복합니다. 전투 중 사용 가능. 재사용 대기시간 1분.',
+  'itemUi.tooltip.useElixir':
+    '사용: {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.',
+  'itemUi.tooltip.useElixirAura':
+    '사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.',
   'itemUi.tooltip.clickUseInstant': '클릭하여 전투 중 즉시 사용',
   'itemUi.tooltip.clickUse': '클릭하여 사용',
   'itemUi.tooltip.clickBuyback': '클릭하여 되사기',

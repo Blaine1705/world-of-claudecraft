@@ -7404,6 +7404,8 @@ export const nl_NL: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Gebruik: Herstelt {amount} levenskracht over {seconds} sec. Je moet blijven zitten tijdens het eten.",
       "useDrink": "Gebruik: Herstelt {amount} mana over {seconds} sec. Je moet blijven zitten tijdens het drinken.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Questvoorwerp",
       "questRelated": "Quest: {quest}",
       "questRules": "Kan niet worden verkocht, in de bank gezet of geruild.",
