@@ -385,7 +385,7 @@ describe('Eastbrook polish capture contract', () => {
       // renderer; the release's bounded ground-object reuse pool), so the merged
       // tree mints a composite matching neither parent. Regenerated via
       // scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-      fingerprint: 'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9',
+      fingerprint: 'a95c7cba45c01d6d1d48f8a74a7d358c39b3fd71cf65003e4fcf7a727b44786a',
       components: {
         captureContract: {
           id: 'polish-v2',
