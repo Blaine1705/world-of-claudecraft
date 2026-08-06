@@ -43,6 +43,7 @@ import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
+import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import type { ResolvedAbility } from '../sim/sim';
@@ -3807,8 +3808,8 @@ export class ClientWorld implements IWorld {
   harvestCorpse(id: number, components?: string[]): void {
     this.cmd({ cmd: 'harvestCorpse', id, components });
   }
-  setTownFocus(allocation: Record<string, number>): void {
-    this.cmd({ cmd: 'set_town_focus', allocation });
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void {
+    this.cmd({ cmd: 'set_town_focus', allocation, tier });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {

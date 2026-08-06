@@ -1805,7 +1805,13 @@ export const nl_NL: EnTranslations = {
       "saveButton": "Focus opslaan",
       "notInTownHint": "Je moet in de stad zijn om je focus in te stellen.",
       "increaseAria": "Vergroot de focus op {component}",
-      "decreaseAria": "Verminder de focus op {component}"
+      "decreaseAria": "Verminder de focus op {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Bevorderen tot leider",

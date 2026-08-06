@@ -1805,7 +1805,13 @@ export const es: EnTranslations = {
       "saveButton": "Guardar enfoque",
       "notInTownHint": "Debes estar en el pueblo para fijar tu enfoque.",
       "increaseAria": "Aumentar el enfoque en {component}",
-      "decreaseAria": "Reducir el enfoque en {component}"
+      "decreaseAria": "Reducir el enfoque en {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promover a líder",

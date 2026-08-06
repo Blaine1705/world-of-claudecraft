@@ -1805,7 +1805,13 @@ export const da_DK: EnTranslations = {
       "saveButton": "Gem fokus",
       "notInTownHint": "Du skal være i byen for at sætte dit fokus.",
       "increaseAria": "Øg fokus på {component}",
-      "decreaseAria": "Sænk fokus på {component}"
+      "decreaseAria": "Sænk fokus på {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Forfrem til leder",

@@ -1805,7 +1805,13 @@ export const ru_RU: EnTranslations = {
       "saveButton": "Сохранить фокус",
       "notInTownHint": "Чтобы задать фокус, нужно находиться в городе.",
       "increaseAria": "Увеличить фокус на {component}",
-      "decreaseAria": "Уменьшить фокус на {component}"
+      "decreaseAria": "Уменьшить фокус на {component}",
+      "respecTierLabel": "Скорость перераспределения",
+      "respecTierTimeOption": "Бесплатно (не торопясь)",
+      "respecTierPartialOption": "Быстрее (небольшая плата)",
+      "respecTierInstantOption": "Мгновенно (полная плата)",
+      "respecCostFree": "Бесплатно",
+      "respecCostLine": "Стоит {coin} и {materials}"
     },
     "party": {
       "promoteLeader": "Назначить лидером",

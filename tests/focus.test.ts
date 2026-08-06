@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
-import { ZONES } from '../src/sim/data';
+import { ITEMS, ZONES } from '../src/sim/data';
 import {
   applyFocusBonus,
   applyFocusTierBonus,
@@ -11,6 +11,7 @@ import {
   isTownFocusComponent,
   normalizeTownFocusOnLoad,
   POINTS_PER_TIER_BONUS,
+  RESPEC_MATERIAL_ITEM_ID,
   RESPEC_TIER_CONFIG,
   setTownFocus,
   TOWN_FOCUS_COMPONENTS,
@@ -407,5 +408,21 @@ describe('computeRespecCost (#1144): three payment tiers for the same reallocati
     const previous = { hide: 5, fang: 0 };
     const cost = computeRespecCost(previous, { hide: 0, fang: 5 }, 'time');
     expect(cost.durationMs).toBe(10 * RESPEC_TIER_CONFIG.time.durationMsPerPoint);
+  });
+});
+
+// #1144: RESPEC_MATERIAL_ITEM_ID names the real item Sim.setTownFocus charges
+// (the previously zero-caller cost model's SECOND unwired half; the tier
+// numbers had a test, but nothing named what "materials" actually spent). A
+// referential-integrity pin, not a magnitude one: a rename or retirement of
+// the underlying item id would otherwise only surface as a runtime no-op
+// charge (countItem/removeItem on a dangling id silently read/remove zero).
+describe('RESPEC_MATERIAL_ITEM_ID (#1144): the item the materials cost spends', () => {
+  it('names a real, shipped item', () => {
+    expect(ITEMS[RESPEC_MATERIAL_ITEM_ID]).toBeDefined();
+  });
+
+  it('is the arcane_dust generic professions material sink, not a bespoke reagent', () => {
+    expect(RESPEC_MATERIAL_ITEM_ID).toBe('arcane_dust');
   });
 });

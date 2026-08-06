@@ -61,6 +61,7 @@ import {
   partyFrameRole,
 } from '../src/sim/party_frame_info';
 import { effectiveFishingBand } from '../src/sim/professions/fishing';
+import { RESPEC_TIER_CONFIG, type RespecPaymentTier } from '../src/sim/professions/focus';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
@@ -6174,7 +6175,16 @@ export class GameServer {
           for (const [k, v] of Object.entries(msg.allocation as Record<string, unknown>)) {
             if (typeof v === 'number') allocation[k] = v;
           }
-          sim.setTownFocus(allocation, pid);
+          // #1144: the payment tier picks which RESPEC_TIER_CONFIG row prices
+          // the re-spec. Untrusted input, so it is checked against the real
+          // config keys rather than cast; a missing/malformed tier (an older
+          // client, or a hand-crafted frame) falls back to 'time', the free
+          // tier, so it never charges a client that never chose a tier.
+          const tier: RespecPaymentTier =
+            typeof msg.tier === 'string' && Object.hasOwn(RESPEC_TIER_CONFIG, msg.tier)
+              ? (msg.tier as RespecPaymentTier)
+              : 'time';
+          sim.setTownFocus(allocation, tier, pid);
         }
         break;
       case 'lootRoll':

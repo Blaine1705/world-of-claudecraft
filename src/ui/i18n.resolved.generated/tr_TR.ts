@@ -1805,7 +1805,13 @@ export const tr_TR: EnTranslations = {
       "saveButton": "Odağı Kaydet",
       "notInTownHint": "Odağını ayarlamak için kasabada olmalısın.",
       "increaseAria": "{component} odağını artır",
-      "decreaseAria": "{component} odağını azalt"
+      "decreaseAria": "{component} odağını azalt",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Lider Yap",

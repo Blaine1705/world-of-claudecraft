@@ -1805,7 +1805,13 @@ export const cs_CZ: EnTranslations = {
       "saveButton": "Uložit zaměření",
       "notInTownHint": "Zaměření lze nastavit jen ve městě.",
       "increaseAria": "Zvýšit zaměření na {component}",
-      "decreaseAria": "Snížit zaměření na {component}"
+      "decreaseAria": "Snížit zaměření na {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Povýšit na vůdce",

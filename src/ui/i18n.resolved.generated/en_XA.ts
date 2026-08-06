@@ -1805,7 +1805,13 @@ export const en_XA: EnTranslations = {
       "saveButton": "[Šáʋé Ƒóçúš]",
       "notInTownHint": "[Ýóú ɱúšţ ƀé íñ ţóŵñ ţó šéţ ýóúŕ ƒóçúš.]",
       "increaseAria": "[Íñçŕéášé ƒóçúš óñ {component}]",
-      "decreaseAria": "[Ðéçŕéášé ƒóçúš óñ {component}]"
+      "decreaseAria": "[Ðéçŕéášé ƒóçúš óñ {component}]",
+      "respecTierLabel": "[Ŕé-šþéç šþééð]",
+      "respecTierTimeOption": "[Ƒŕéé (ţáķé ýóúŕ ţíɱé)]",
+      "respecTierPartialOption": "[Ƒášţéŕ (šɱáļļ çóšţ)]",
+      "respecTierInstantOption": "[Íñšţáñţ (ƒúļļ çóšţ)]",
+      "respecCostFree": "[Ƒŕéé]",
+      "respecCostLine": "[Çóšţš {coin} áñð {materials}]"
     },
     "party": {
       "promoteLeader": "[Þŕóɱóţé ţó Ļéáðéŕ]",

@@ -1805,7 +1805,13 @@ export const pt_BR: EnTranslations = {
       "saveButton": "Salvar Foco",
       "notInTownHint": "Você precisa estar na cidade para definir seu foco.",
       "increaseAria": "Aumentar o foco em {component}",
-      "decreaseAria": "Diminuir o foco em {component}"
+      "decreaseAria": "Diminuir o foco em {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promover a Líder",

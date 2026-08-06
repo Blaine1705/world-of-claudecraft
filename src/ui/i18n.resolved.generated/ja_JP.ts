@@ -1805,7 +1805,13 @@ export const ja_JP: EnTranslations = {
       "saveButton": "フォーカスを保存",
       "notInTownHint": "フォーカスを設定するには町にいる必要があります。",
       "increaseAria": "{component}へのフォーカスを増やす",
-      "decreaseAria": "{component}へのフォーカスを減らす"
+      "decreaseAria": "{component}へのフォーカスを減らす",
+      "respecTierLabel": "再割り振りの速さ",
+      "respecTierTimeOption": "無料（時間をかける）",
+      "respecTierPartialOption": "速い（少額の費用）",
+      "respecTierInstantOption": "即時（全額費用）",
+      "respecCostFree": "無料",
+      "respecCostLine": "{coin}と{materials}がかかります"
     },
     "party": {
       "promoteLeader": "パーティリーダーに指定",
