@@ -378,6 +378,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
       'moonshroud_breastplate',
       'moonshroud_robe',
       'moonshroud_tunic',
+      'selthes_seastriders',
     ),
   },
   {
@@ -427,6 +428,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
       'wildgrowth_leggings',
       'grovewardens_grips',
       'verdant_walkers',
+      'gravewyrm_bone_quiver',
     ),
   },
   {
@@ -481,6 +483,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
       'soulflame_mantle',
       'stormcallers_crown',
       'stormcallers_spaulders',
+      'direfang_quiver',
     ),
   },
   {

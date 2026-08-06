@@ -5323,6 +5323,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Moonwrack Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Selthe's Sea-Striders"
       }
     ]
   },
@@ -5485,6 +5489,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Verdant Walkers"
+      },
+      {
+        "kind": "item",
+        "name": "Gravewyrm Bone Quiver"
       }
     ]
   },
@@ -5641,6 +5649,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Galecall Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Direfang Quiver"
       }
     ]
   },
