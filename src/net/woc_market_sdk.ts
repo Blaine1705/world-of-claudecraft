@@ -80,7 +80,6 @@ export interface WocEstimateView {
 
 /** Whether a character can be paid in $WOC, for the trade window's arm. */
 export interface WocTradePartnerView {
-  characterId: number;
   name: string;
   walletVerified: boolean;
 }
@@ -287,10 +286,10 @@ export class WocMarketClient {
 
   /** Can this character be paid in $WOC? Null when there is no such character
    *  on the realm, which the window treats the same as "cannot be paid". */
-  async tradePartner(characterId: number): Promise<WocTradePartnerView | null> {
+  async tradePartner(characterName: string): Promise<WocTradePartnerView | null> {
     const out = await this.request<{ partner: WocTradePartnerView }>(
       'GET',
-      `/api/woc-market/trade-partner/${Math.floor(characterId)}`,
+      `/api/woc-market/trade-partner?name=${encodeURIComponent(characterName)}`,
     );
     return out.ok ? out.data.partner : null;
   }
@@ -305,7 +304,7 @@ export class WocMarketClient {
     itemIndex: number;
     itemId: string;
     expectInstance?: unknown;
-    buyerCharacterId: number;
+    buyerCharacterName: string;
     usdCents: number;
   }): Promise<{ ok: true; offer: WocOfferView } | WocMarketFail> {
     const out = await this.request<{ offer: WocOfferView }>('POST', '/api/woc-market/offers', req);

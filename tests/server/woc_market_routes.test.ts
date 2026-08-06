@@ -490,7 +490,7 @@ describe('the route table shape', () => {
     // a deliberately public one (anyone may bid on anyone's listing) needs the
     // publicRead marker. Neither means the route is silently unguarded.
     const idRoutes = routes.filter((r) => r.surface === 'api' && r.path.includes('/:'));
-    expect(idRoutes).toHaveLength(13);
+    expect(idRoutes).toHaveLength(12);
     for (const route of idRoutes) {
       const meta = route.meta as { requireOwned?: unknown; publicRead?: boolean } | undefined;
       expect(

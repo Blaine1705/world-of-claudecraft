@@ -16,11 +16,11 @@
 
 import { exchangeHardLock, exchangeItemCategory } from '../sim/exchange_eligibility';
 import type { InvSlot, ItemDef } from '../sim/types';
+import type { TranslationKey } from './i18n.catalog';
 
 /** What the window knows about the other side, fed by the server (never by the
  *  sim, which sits inside the token firewall and knows nothing about wallets). */
 export interface WocTradePartner {
-  characterId: number;
   name: string;
   walletVerified: boolean;
 }
@@ -63,8 +63,9 @@ export interface WocTradeModel {
   armVisible: boolean;
   /** Why it is unavailable, when it is not offerable. Null means offerable. */
   block: WocArmBlock | null;
-  /** The i18n key for the block message, or null. */
-  blockKey: string | null;
+  /** The i18n key for the block message, or null. Typed, not a bare
+   *  string, so the painter renders it through t() with no cast. */
+  blockKey: TranslationKey | null;
   mode: WocTradeMode;
   /** Staged items that may legally be sold for $WOC. */
   eligible: readonly InvSlot[];
@@ -80,7 +81,7 @@ export interface WocTradeModel {
   canSend: boolean;
 }
 
-const BLOCK_KEYS: Record<WocArmBlock, string> = {
+const BLOCK_KEYS: Record<WocArmBlock, TranslationKey> = {
   market_disabled: 'hudChrome.trade.woc.blockDisabled',
   no_wallet: 'hudChrome.trade.woc.blockNoWallet',
   recipient_no_wallet: 'hudChrome.trade.woc.blockRecipientNoWallet',

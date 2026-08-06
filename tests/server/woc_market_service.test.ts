@@ -1912,7 +1912,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
     account: SELLER,
     characterId: SELLER_CHAR,
     itemRef: { index: 0, itemId: EPIC_ITEM },
-    buyerCharacterId: CHAR_A,
+    buyerCharacterName: 'Aldan',
     usdCents: 5000,
     ...over,
   });
@@ -1939,7 +1939,7 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
 
   it('refuses an offer addressed to yourself', async () => {
     const h = stocked();
-    const res = await h.service.createDirectedOffer(offerArgs({ buyerCharacterId: SELLER_CHAR }));
+    const res = await h.service.createDirectedOffer(offerArgs({ buyerCharacterName: 'Selara' }));
     expect(res).toEqual({ ok: false, reason: 'self_offer' });
   });
 
@@ -2063,7 +2063,7 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
-      buyerCharacterId: CHAR_A,
+      buyerCharacterName: 'Aldan',
       usdCents: 5000,
     });
     if (!offer.ok) throw new Error('offer refused');
@@ -2157,28 +2157,28 @@ describe('a directed sale carries the consequences of the rail it rides', () => 
 describe('the trade window asks whether a counterparty can be paid in $WOC', () => {
   it('reports a linked player as payable, by character and with no account id', async () => {
     const h = makeHarness();
-    const partner = await h.service.tradePartner(SELLER, CHAR_A);
-    expect(partner).toEqual({ characterId: CHAR_A, name: 'Aldan', walletVerified: true });
+    const partner = await h.service.tradePartner(SELLER, 'Aldan');
+    expect(partner).toEqual({ name: 'Aldan', walletVerified: true });
     // The response shape is the contract: leaking an account id here would put
     // one on the wire for every player you open a trade with.
-    expect(Object.keys(partner ?? {}).sort()).toEqual(['characterId', 'name', 'walletVerified']);
+    expect(Object.keys(partner ?? {}).sort()).toEqual(['name', 'walletVerified']);
   });
 
   it('reports an unlinked player as not payable, which is what drives the copy', async () => {
     const h = makeHarness();
     h.wallets.delete(BUYER_A);
-    expect((await h.service.tradePartner(SELLER, CHAR_A))?.walletVerified).toBe(false);
+    expect((await h.service.tradePartner(SELLER, 'Aldan'))?.walletVerified).toBe(false);
   });
 
   it('reports YOUR OWN character as not payable', async () => {
     // So the window never offers an arm that createDirectedOffer would refuse.
     const h = makeHarness();
-    expect((await h.service.tradePartner(SELLER, SELLER_CHAR))?.walletVerified).toBe(false);
+    expect((await h.service.tradePartner(SELLER, 'Selara'))?.walletVerified).toBe(false);
   });
 
   it('reads as absent for a character that is not on this realm', async () => {
     const h = makeHarness();
-    expect(await h.service.tradePartner(SELLER, 999_999)).toBeNull();
+    expect(await h.service.tradePartner(SELLER, 'Nobody')).toBeNull();
   });
 
   it('refuses an offer to another character of your OWN account', async () => {
@@ -2190,7 +2190,7 @@ describe('the trade window asks whether a counterparty can be paid in $WOC', () 
       account: SELLER,
       characterId: SELLER_CHAR,
       itemRef: { index: 0, itemId: EPIC_ITEM },
-      buyerCharacterId: SELLER_ALT_CHAR,
+      buyerCharacterName: 'Selara Alt',
       usdCents: 5000,
     });
     expect(res).toEqual({ ok: false, reason: 'self_offer' });

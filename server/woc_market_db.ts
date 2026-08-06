@@ -721,12 +721,19 @@ export class PgWocMarketDb implements WocMarketDb {
     return res.rows[0] ? toOffer(res.rows[0]) : null;
   }
 
-  async accountForCharacter(realm: string, characterId: number): Promise<number | null> {
+  async characterByName(
+    realm: string,
+    name: string,
+  ): Promise<{ characterId: number; accountId: number; name: string } | null> {
+    // Exact match on the UNIQUE name column, realm-scoped like every other read
+    // here. Not case-insensitive: the client passes back the name the server
+    // itself sent on the trade, so a fold would only widen what resolves.
     const res = await this.pool.query(
-      'SELECT account_id FROM characters WHERE id = $1 AND realm = $2',
-      [characterId, realm],
+      'SELECT id, account_id, name FROM characters WHERE name = $1 AND realm = $2',
+      [name, realm],
     );
-    return res.rows[0]?.account_id ?? null;
+    const row = res.rows[0];
+    return row ? { characterId: row.id, accountId: row.account_id, name: row.name } : null;
   }
 
   async reopenDirectedOffer(realm: string, id: number): Promise<void> {

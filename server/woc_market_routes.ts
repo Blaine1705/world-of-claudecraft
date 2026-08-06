@@ -682,7 +682,7 @@ async function createOfferHandler(ctx: Ctx): Promise<void> {
       itemId: stringField(body.itemId, 128),
       ...(expectInstance === undefined ? {} : { expectInstance }),
     },
-    buyerCharacterId: intField(body.buyerCharacterId, 1, Number.MAX_SAFE_INTEGER),
+    buyerCharacterName: stringField(body.buyerCharacterName, 64),
     usdCents: intField(body.usdCents, WOC_MARKET_MIN_PRICE_CENTS, WOC_MARKET_MAX_PRICE_CENTS),
   });
   if (!out.ok) throwRefusal(out.reason);
@@ -708,7 +708,8 @@ async function withdrawOfferHandler(ctx: Ctx): Promise<void> {
 }
 
 async function tradePartnerHandler(ctx: Ctx): Promise<void> {
-  const partner = await useService().tradePartner(ctxAccountId(ctx), idParam(ctx));
+  const name = new URL(ctx.req.url ?? '', 'http://x').searchParams.get('name') ?? '';
+  const partner = await useService().tradePartner(ctxAccountId(ctx), stringField(name, 64));
   if (!partner) throw new HttpError(404, 'woc_market.not_found');
   json(ctx.res, 200, { partner });
 }
@@ -729,12 +730,13 @@ export const routes: RouteDef[] = [
   },
   {
     // Can this character be paid in $WOC? Asked by the trade window before it
-    // offers the arm. NO_OWNER because the subject is another player by design.
+    // offers the arm. The subject is another player BY DESIGN, so there is no
+    // owner to load; the name rides a query param rather than a path segment
+    // because a character name is not an id and may contain spaces.
     method: 'GET',
-    path: '/api/woc-market/trade-partner/:id',
+    path: '/api/woc-market/trade-partner',
     surface: 'api',
     middleware: [activeAccount, rateLimit(WOC_MARKET_READ_POLICY)],
-    meta: NO_OWNER,
     handler: tradePartnerHandler,
   },
   {

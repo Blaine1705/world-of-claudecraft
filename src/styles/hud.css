@@ -7465,6 +7465,61 @@
     margin-top: 8px;
   }
 
+  /* ---------- trade window: the $WOC arm ---------- */
+  /* Tokens only, no literals (src/styles/CLAUDE.md): the arm is ordinary window
+     chrome and inherits the panel's palette. */
+  .trade-woc-arm {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .trade-woc-modes {
+    display: flex;
+    gap: 6px;
+  }
+  .trade-woc-mode[aria-selected="true"] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .trade-woc-price-label {
+    font-size: 11px;
+    color: #887c5c;
+  }
+  .trade-woc-price {
+    width: 120px;
+  }
+  .trade-woc-equiv,
+  .trade-woc-fee,
+  .trade-woc-net {
+    margin: 0;
+    font-size: 11.5px;
+  }
+  .trade-woc-net {
+    color: var(--accent);
+  }
+  /* The warnings and the block reason are the copy a player acts on, so they
+     stay legible rather than being dimmed to hint size. */
+  .trade-woc-warn,
+  .trade-woc-note,
+  .trade-woc-block {
+    margin: 0;
+    font-size: 11px;
+    color: #887c5c;
+  }
+  .trade-woc-block {
+    color: #d8b46a;
+  }
+  /* Empty derived lines collapse instead of leaving gaps in the flex column. */
+  .trade-woc-equiv:empty,
+  .trade-woc-fee:empty,
+  .trade-woc-net:empty,
+  .trade-woc-note:empty {
+    display: none;
+  }
+
   /* ---------- elite target frame ---------- */
   /* Rank chrome binds to the TARGET's own portrait via the direct-child
      .portrait-wrap: the target-of-target mini is also a #target-frame

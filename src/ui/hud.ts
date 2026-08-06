@@ -161,6 +161,7 @@ import {
   abilityTemporalHourglassValues,
 } from './ability_damage';
 import { abilityDisplayName, abilityDisplayNameFromSource } from './ability_display_name';
+import { userFacingApiError } from './api_error_i18n';
 import { ArenaWindow } from './arena_window';
 import { auraDisplayNameForHud, auraDisplayNameFromSource } from './aura_display_name';
 import {
@@ -735,6 +736,15 @@ import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from './trade_view';
+import {
+  refreshWocTradeArm,
+  restoreWocTradeFocus,
+  type WocTradePanelDeps,
+  wireWocTradeArm,
+  wocTradeArmHtml,
+  wocTradeModelFrom,
+} from './trade_woc_panel';
+import type { WocTradePartner, WocTradeSplit } from './trade_woc_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -5172,6 +5182,22 @@ export class Hud {
   // launcher button stays hidden until then, so Steam/Electron/Capacitor and
   // offline play never see the surface.
   private wocMarketHooks: WocMarketHooks | null = null;
+
+  // The trade window's $WOC arm (docs/prd/woc/p2p-woc-trade.md). Held here
+  // because the window rebuilds its subtree wholesale, so the seller's mode and
+  // typed price must outlive a repaint. usdCents deliberately does NOT enter
+  // lastTradeSig: a rebuild per keystroke would destroy the input under the
+  // caret, so price edits refresh only the derived lines in place.
+  private wocTradeMode: 'gold' | 'woc' = 'gold';
+  private wocTradeUsdCents: number | null = null;
+  private wocTradeTokens: number | null = null;
+  private wocTradeSplit: WocTradeSplit | null = null;
+  private wocTradePartner: WocTradePartner | null = null;
+  /** The name the partner lookup was issued for, so it runs once per trade. */
+  private wocTradePartnerFor = '';
+  private wocTradeEstimateTimer: number | null = null;
+  /** Guards a late estimate from overwriting a newer one (last write wins). */
+  private wocTradeEstimateSeq = 0;
   private readonly wocMarketWindow = new WocMarketWindow({
     root: () => $('#woc-market-window'),
     attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -18744,6 +18770,78 @@ export class Hud {
     this.sim.tradeSetOffer(this.stagedTrade.items, this.stagedTrade.copper);
   }
 
+  /** The arm's deps for the CURRENT trade. Rebuilt per paint; holds no state. */
+  private wocTradeDeps(otherName: string): WocTradePanelDeps {
+    return {
+      staged: this.stagedTrade.items,
+      goldCopper: this.stagedTrade.copper,
+      items: ITEMS,
+      marketEnabled: this.wocMarketHooks !== null,
+      selfWalletVerified: this.wocMarketHooks?.walletLinked() === true,
+      partner: this.wocTradePartner,
+      mode: this.wocTradeMode,
+      usdCents: this.wocTradeUsdCents,
+      tokens: this.wocTradeTokens,
+      split: this.wocTradeSplit,
+      onModeChange: (mode) => {
+        this.wocTradeMode = mode;
+        this.lastTradeSig = '';
+      },
+      onPriceInput: (cents) => this.onWocTradePrice(cents),
+      onSendOffer: () => void this.sendWocTradeOffer(otherName),
+    };
+  }
+
+  /** Debounced: one estimate per pause in typing, not one per keystroke. */
+  private onWocTradePrice(cents: number | null): void {
+    this.wocTradeUsdCents = cents;
+    if (this.wocTradeEstimateTimer !== null) window.clearTimeout(this.wocTradeEstimateTimer);
+    if (cents === null || cents <= 0) {
+      this.wocTradeTokens = null;
+      this.wocTradeSplit = null;
+      this.refreshWocTradeArm();
+      return;
+    }
+    const seq = ++this.wocTradeEstimateSeq;
+    this.wocTradeEstimateTimer = window.setTimeout(() => {
+      void this.wocMarketHooks?.client.estimate(cents).then((est) => {
+        // A slower earlier request must never clobber a newer answer.
+        if (seq !== this.wocTradeEstimateSeq) return;
+        this.wocTradeTokens = est?.amount?.tokens ?? null;
+        this.wocTradeSplit = est?.split ?? null;
+        this.refreshWocTradeArm();
+      });
+    }, 350);
+    this.refreshWocTradeArm();
+  }
+
+  private refreshWocTradeArm(): void {
+    const info = this.sim.tradeInfo;
+    if (!info) return;
+    refreshWocTradeArm($('#trade-window'), wocTradeModelFrom(this.wocTradeDeps(info.otherName)));
+  }
+
+  private async sendWocTradeOffer(otherName: string): Promise<void> {
+    const hooks = this.wocMarketHooks;
+    const model = wocTradeModelFrom(this.wocTradeDeps(otherName));
+    const first = model.eligible[0];
+    if (!hooks || !model.canSend || !first || this.wocTradeUsdCents === null) return;
+    const index = this.stagedTrade.items.indexOf(first);
+    const res = await hooks.client.createOffer({
+      characterId: hooks.characterId() ?? 0,
+      itemIndex: index < 0 ? 0 : index,
+      itemId: first.itemId,
+      buyerCharacterName: otherName,
+      usdCents: this.wocTradeUsdCents,
+    });
+    if (res.ok) {
+      this.log(t('hudChrome.trade.woc.offerSent', { name: otherName }), '#7fdc4f');
+      this.sim.tradeCancel();
+    } else {
+      this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+    }
+  }
+
   private updateTradeWindow(): void {
     const el = $('#trade-window');
     const info = this.sim.tradeInfo;
@@ -18752,6 +18850,8 @@ export class Hud {
         el.style.display = 'none';
         this.tradeWasOpen = false;
         this.stagedTrade = { items: [], copper: 0 };
+        this.wocTradePartner = null;
+        this.wocTradePartnerFor = '';
         this.lastTradeSig = '';
         if ($('#bags').style.display !== 'none') this.renderBags();
       }
@@ -18760,8 +18860,24 @@ export class Hud {
     if (!this.tradeWasOpen) {
       this.tradeWasOpen = true;
       this.stagedTrade = { items: [], copper: 0 };
+      this.wocTradeMode = 'gold';
+      this.wocTradeUsdCents = null;
+      this.wocTradeTokens = null;
+      this.wocTradeSplit = null;
       this.renderBags();
       $('#bags').style.display = 'flex';
+    }
+    // Once per counterparty: whether they can be paid in $WOC is server data the
+    // sim cannot know (src/sim/social/trade.ts is inside the token firewall), so
+    // it rides beside TradeInfo rather than on it.
+    if (this.wocMarketHooks !== null && this.wocTradePartnerFor !== info.otherName) {
+      this.wocTradePartnerFor = info.otherName;
+      const name = info.otherName;
+      void this.wocMarketHooks.client.tradePartner(name).then((partner) => {
+        if (this.wocTradePartnerFor !== name) return; // the trade moved on
+        this.wocTradePartner = partner;
+        this.lastTradeSig = ''; // one repaint, to show the arm or its reason
+      });
     }
     const sig = JSON.stringify([
       info.myOffer,
@@ -18769,8 +18885,18 @@ export class Hud {
       info.myAccepted,
       info.theirAccepted,
       this.stagedTrade,
+      // The arm's structural state. usdCents is deliberately ABSENT: including
+      // it would rebuild the subtree on every keystroke and destroy the input
+      // under the caret. Price edits refresh the derived lines in place.
+      this.wocTradeMode,
+      this.wocTradePartner,
     ]);
     if (sig === this.lastTradeSig) return;
+    // The rebuild below replaces the whole subtree, so a seller typing a $WOC
+    // price loses the caret when the OTHER side changes their offer (which moves
+    // the signature). Carry the focused control's identity across, the same way
+    // every other rebuilding painter does.
+    const keptFocusKey = captureFocusKey(el);
     // Visible BEFORE the render body: the panel's CSS default is
     // display:none, and a throw on the FIRST paint used to leave a live
     // trade with no panel at all (no Accept, no Cancel). A partial paint
@@ -18824,7 +18950,8 @@ export class Hud {
             <div class="trade-money">${esc(t('hud.trade.money'))}: <span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span></div>
           </div>
         </div>
-        <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>`;
+        <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>
+        ${wocTradeArmHtml(wocTradeModelFrom(this.wocTradeDeps(info.otherName)), this.wocTradeUsdCents)}`;
       const acceptBtn = document.createElement('button');
       acceptBtn.className = 'btn';
       acceptBtn.textContent = info.myAccepted ? t('hud.trade.waiting') : t('hud.trade.accept');
@@ -18836,6 +18963,9 @@ export class Hud {
       cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
       el.append(acceptBtn, cancelBtn);
       el.querySelector('[data-close]')?.addEventListener('click', () => this.sim.tradeCancel());
+      wireWocTradeArm(el, this.wocTradeDeps(info.otherName));
+      refreshWocTradeArm(el, wocTradeModelFrom(this.wocTradeDeps(info.otherName)));
+      restoreWocTradeFocus(el, keptFocusKey);
       el.querySelectorAll('.trade-item.mine').forEach((row) => {
         row.addEventListener('click', () => {
           const itemId = (row as HTMLElement).dataset.item ?? '';

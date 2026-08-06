@@ -15,7 +15,7 @@ import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { buildWocTradeModel, wocTradableSlot } from '../src/ui/trade_woc_view';
 
-const PARTNER = { characterId: 21, name: 'Aldan', walletVerified: true };
+const PARTNER = { name: 'Aldan', walletVerified: true };
 
 /** A minimal item table: one epic weapon, one quest item, one plain junk item. */
 const EPIC: ItemDef = {

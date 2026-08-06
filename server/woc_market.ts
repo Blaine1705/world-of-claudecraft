@@ -270,13 +270,18 @@ export interface WocMarketDb {
   /** Expire pending offers past their TTL. Returns how many were expired. */
   expireDueDirectedOffers(realm: string, nowMs: number, limit: number): Promise<number>;
   /**
-   * The account owning a character on this realm, or null.
+   * Resolve a character NAME to its character and owning account, or null.
    *
-   * A directed offer names its counterparty by CHARACTER, because that is what
-   * the trade window knows and what a player can see. Resolving to an account
-   * happens here so no account id ever crosses the wire in either direction.
+   * A directed offer names its counterparty by NAME, because that is the only
+   * stable handle the trade window has: TradeInfo carries a sim entity id
+   * (`otherPid`), which is not a character id, plus the display name.
+   * `characters.name` is globally UNIQUE, so the name identifies exactly one
+   * character, and resolving here means no account id ever crosses the wire.
    */
-  accountForCharacter(realm: string, characterId: number): Promise<number | null>;
+  characterByName(
+    realm: string,
+    name: string,
+  ): Promise<{ characterId: number; accountId: number; name: string } | null>;
   /**
    * Put an 'accepted' offer back to pending after its escrow failed.
    *
@@ -846,18 +851,16 @@ export class WocMarketService {
     account: number;
     characterId: number;
     itemRef: ExtractRef;
-    /** The counterparty's CHARACTER, as the trade window knows them. Resolved
-     *  to an account here so no account id crosses the wire. */
-    buyerCharacterId: number;
+    /** The counterparty's character NAME, the one handle the trade window has.
+     *  Resolved here so no account id crosses the wire. */
+    buyerCharacterName: string;
     usdCents: number;
   }): Promise<{ ok: true; offer: WocDirectedOfferRow } | Refused> {
     const gate = (await this.guardEnabledHealthy()) ?? (await this.guardSuspended(args.account));
     if (gate) return gate;
-    const buyerAccount = await this.deps.db.accountForCharacter(
-      this.cfg.realm,
-      args.buyerCharacterId,
-    );
-    if (buyerAccount === null) return refuse('character_invalid');
+    const buyer = await this.deps.db.characterByName(this.cfg.realm, args.buyerCharacterName);
+    if (!buyer) return refuse('character_invalid');
+    const buyerAccount = buyer.accountId;
     // Same ACCOUNT, not same character: an alt is still yourself, and offering
     // between your own characters would be a fee-free self-deal that still
     // consumed escrow and settlement machinery.
@@ -887,15 +890,7 @@ export class WocMarketService {
       args.characterId,
     );
     if (!seller || seller.characterId !== args.characterId) return refuse('character_invalid');
-    // deliveryTarget doubles as the recipient check: it resolves any character
-    // the buyer holds ON THIS REALM, so an account with none refuses here rather
-    // than at acceptance, when the seller has already agreed a price.
-    const buyer = await this.deps.db.deliveryTarget(
-      this.cfg.realm,
-      buyerAccount,
-      args.buyerCharacterId,
-    );
-    if (!buyer) return refuse('not_found');
+
     const offer = await this.deps.db.insertDirectedOffer({
       realm: this.cfg.realm,
       sellerAccount: args.account,
@@ -987,15 +982,13 @@ export class WocMarketService {
    */
   async tradePartner(
     viewerAccount: number,
-    characterId: number,
-  ): Promise<{ characterId: number; name: string; walletVerified: boolean } | null> {
+    characterName: string,
+  ): Promise<{ name: string; walletVerified: boolean } | null> {
     if (!this.cfg.enabled) return null;
-    const account = await this.deps.db.accountForCharacter(this.cfg.realm, characterId);
-    if (account === null) return null;
-    const target = await this.deps.db.deliveryTarget(this.cfg.realm, account, characterId);
+    const target = await this.deps.db.characterByName(this.cfg.realm, characterName);
     if (!target) return null;
+    const account = target.accountId;
     return {
-      characterId,
       name: target.name,
       // Your own characters read as not payable, so the window never offers a
       // self-deal it would refuse at creation.
