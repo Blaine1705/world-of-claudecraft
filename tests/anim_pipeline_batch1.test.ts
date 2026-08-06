@@ -99,13 +99,16 @@ describe('elemental family bespoke attack (issue #2889 batch 1)', () => {
     const floatingConstBlock = manifestBlock('const FLOATING: ClipMap = {', '};');
     expect(floatingConstBlock).toContain("attack: ['Headbutt', 'Punch']");
 
-    // Every other VisualDef still pointing at the shared constant is untouched
-    // by THIS migration. The exact count also reflects any other family this
-    // same batched initiative (issue #2889) has since migrated off FLOATING
-    // in this branch (see tests/anim_pipeline_warlock_nightkin.test.ts for
-    // the nightkin migration), so this pin tracks this branch's own state,
-    // not a repo-wide invariant other batches must hold to.
+    // Every other VisualDef still pointing at the shared constant is untouched.
+    // Not pinned to an exact remaining count: issue #2889 is a multi-PR
+    // initiative and later batches migrate OTHER FLOATING families off the
+    // shared constant too (see the nightkin and mob_choir_thrall migrations),
+    // so the total drifts batch over batch. This only needs to confirm
+    // mob_elemental's own migration didn't wipe out every other user, and
+    // that a family no batch has touched yet stays put.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: FLOATING,/g)].length;
-    expect(remaining).toBe(7);
+    expect(remaining).toBeGreaterThan(0);
+    const demonFlyingBlock = manifestBlock('mob_demon_flying: {', 'mob_alpaca: {');
+    expect(demonFlyingBlock).toContain('clips: FLOATING,');
   });
 });
