@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import { elixirTooltipLines } from '../src/ui/elixir_tooltip_view';
+import { formatNumber } from '../src/ui/i18n';
 
 describe('elixirTooltipLines', () => {
   it('elixir of the boar states its stamina buff, duration, and combat use', () => {
@@ -27,8 +28,15 @@ describe('elixirTooltipLines', () => {
       expect(def.elixir, `${def.id} must carry an elixir effect record`).toBeDefined();
       const html = elixirTooltipLines(def);
       expect(html, `${def.id} must render a use line`).toContain('Use:');
-      expect(html).toContain(`by ${def.elixir!.value} `);
-      expect(html).toContain(`for ${def.elixir!.duration / 60} min`);
+      // Expected fragments built with the same formatter the view uses, so a
+      // future large value or non-round duration cannot red this sweep for a
+      // grouping or rounding reason instead of a real one.
+      expect(html).toContain(
+        `by ${formatNumber(def.elixir!.value, { maximumFractionDigits: 0 })} `,
+      );
+      expect(html).toContain(
+        `for ${formatNumber(def.elixir!.duration / 60, { maximumFractionDigits: 1 })} min`,
+      );
     }
   });
 

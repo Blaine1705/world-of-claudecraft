@@ -36,7 +36,11 @@ export function elixirTooltipLines(item: ItemDef): string {
         value: formatNumber(elx.value, { maximumFractionDigits: 0 }),
         minutes,
       })
-    : t('itemUi.tooltip.useElixirAura', {
+    : // The fallback localizes through the buff bar's own matcher, which
+      // returns the RAW ENGLISH aura name when no AURA_NAME_KEY row exists:
+      // a new unmapped-kind elixir needs its aura's sim_i18n entry in the
+      // same change or this line ships English inside a localized sentence.
+      t('itemUi.tooltip.useElixirAura', {
         aura: auraDisplayNameFromSource(elx.aura),
         minutes,
       });
