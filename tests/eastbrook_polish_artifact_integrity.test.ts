@@ -642,14 +642,14 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // renderer; the release's bounded ground-object reuse pool), so the merged tree
 // mints literals matching neither parent. Captures adopted verbatim from the
 // release tip; swept by remint_polish_provenance.mjs on the merged tree.
-// Re-pinned once more for the weapon-skin VFX connection-freeze fix: the
-// budgeted apply queue and the vfx.weapon-skins prewarm entry move
-// src/render/renderer.ts, the rendererIntegration leaf, so the composite and the
-// metadata seal that embeds it both re-mint (remint_polish_provenance.mjs).
+// Re-pinned for the PR #2982 merge: the release-side weapon-skin apply queue
+// and the PR-side ability VFX warm-up both move runtimeRender provenance leaves
+// (src/render/renderer.ts and src/render/prewarm_policy.ts), so the composite
+// and metadata seal both re-mint on the merged tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'dd91f029a5e2889d773ab3f38bde8d22ed7c14ad1be1b4b36250241407037537';
+  'b865897193784528ab8f2d8c68c35a3ee5e05432949ac9de8be155bf1e59a3d3';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'd73a3d01575ab0f2a1c47ccae05bf9b7e36ef7d435284963bdcd6bad7308110d';
+  '30275db8fa0c580c9624088336f5609b75491a48e62a562f12b54652d85fc7ec';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1519,11 +1519,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // matched the merged tree, and no capture was retaken here.
     // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
     // recomputed by remint_polish_provenance.mjs.
-    // Re-pinned once more for the weapon-skin VFX connection-freeze fix's
-    // src/render/renderer.ts change (budgeted apply queue plus the
-    // vfx.weapon-skins prewarm entry), same script, no capture retaken.
+    // Re-pinned for the PR #2982 merge: the first-order composite follows the
+    // release-side weapon-skin renderer changes and the PR-side ability VFX
+    // warm-up changes, then this second-order performance seal follows the
+    // swept evidence bytes. No capture was retaken.
     expect(fingerprint.digest('hex')).toBe(
-      'be94b66921ec7297b14fd934e2509c618def51bbd06b780c6aa2c7ee6607c168',
+      '8218501ae792b40a7acc5259cec6ebf44739838f277a187be3c07443ba55ef61',
     );
   });
 
