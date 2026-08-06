@@ -43,7 +43,7 @@ function abilityEffects(id: string) {
 }
 
 describe('warlock low-level sustained damage tuning', () => {
-  it('keeps the temporary undead army near thirty-two raw DPS at level 20', () => {
+  it('keeps the temporary undead army near thirty-six raw DPS at level 20', () => {
     const ids = [
       'necromancy_skeletal_warrior',
       'necromancy_bone_mage',
@@ -57,8 +57,11 @@ describe('warlock low-level sustained damage tuning', () => {
     const graveguardDps =
       (graveguard.dmgBase + graveguard.dmgPerLevel * 19) / graveguard.attackSpeed;
 
-    expect(armyDps).toBeGreaterThan(30);
-    expect(armyDps).toBeLessThan(35);
+    // The sub-200 re-spread lifted the warrior (0.85) and bone mage (0.95)
+    // per-level rates to buy back what the Army duplicate gate removed, so the
+    // raw temporary-army budget sits near thirty-six now.
+    expect(armyDps).toBeGreaterThan(33);
+    expect(armyDps).toBeLessThan(39);
     expect(graveguardDps).toBeCloseTo(13.9, 1);
   });
 

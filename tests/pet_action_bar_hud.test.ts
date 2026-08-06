@@ -47,7 +47,7 @@ interface PetBarHarness {
   peekGuard: { consume(): boolean };
   attachTooltip(): void;
   hideTooltip(): void;
-  renderPetBar(): void;
+  renderPetBar(pet: unknown): void;
 }
 
 function pointerEvent(type: string): Event {
@@ -120,7 +120,7 @@ afterEach(() => {
 describe('Hud Warlock pet signature bar', () => {
   it('shows Emberkin Felbolt as a damage active and never gives Emberkin Taunt', () => {
     const hud = makeHud('emberkin');
-    hud.renderPetBar();
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
     const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
     expect(felbolt).not.toBeNull();
@@ -155,7 +155,7 @@ describe('Hud Warlock pet signature bar', () => {
     vi.useFakeTimers();
     document.body.classList.add('mobile-touch');
     const hud = makeHud('gloomshade');
-    hud.renderPetBar();
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
     const chain = document.querySelector<HTMLButtonElement>('[title="Abyssal Chain"]');
     expect(chain).not.toBeNull();
@@ -171,7 +171,7 @@ describe('Hud Warlock pet signature bar', () => {
 
   it('renders cooldown as inert and toggles an initially disabled autocast on', () => {
     const hud = makeHud('emberkin', true, { petSkillTimer: 7.2, petAutoSkill: false });
-    hud.renderPetBar();
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
     const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
     expect(felbolt?.classList.contains('cooldown')).toBe(true);
@@ -189,27 +189,27 @@ describe('Hud Warlock pet signature bar', () => {
 
   it('fails closed and hides signature buttons without negotiated server support', () => {
     const emberkin = makeHud('emberkin', false);
-    emberkin.renderPetBar();
+    emberkin.renderPetBar(emberkin.sim.entities.get(2) ?? null);
     expect(document.querySelector('[title="Felbolt"]')).toBeNull();
     expect(document.querySelector('[title="Taunt"]')).toBeNull();
 
     document.body.innerHTML = '<div id="petbar"></div>';
     const gloomshade = makeHud('gloomshade', false);
-    gloomshade.renderPetBar();
+    gloomshade.renderPetBar(gloomshade.sim.entities.get(2) ?? null);
     expect(document.querySelector('[title="Abyssal Chain"]')).toBeNull();
     expect(document.querySelector('[title="Taunt"]')).not.toBeNull();
   });
 
   it('restores the same action focus across a cooldown repaint', () => {
     const hud = makeHud('emberkin');
-    hud.renderPetBar();
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
     const first = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
     first?.focus();
 
     const pet = hud.sim.entities.get(2);
     if (!pet) throw new Error('Missing pet fixture.');
     pet.petSkillTimer = 7.2;
-    hud.renderPetBar();
+    hud.renderPetBar(hud.sim.entities.get(2) ?? null);
 
     const replacement = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
     expect(document.activeElement).toBe(replacement);
