@@ -11,164 +11,84 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "es_ES": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "fr_FR": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "fr_CA": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "en_CA": [],
   "it_IT": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "de_DE": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "zh_CN": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "zh_TW": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "ko_KR": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "ja_JP": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "pt_BR": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "ru_RU": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "cs_CZ": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "nl_NL": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "pl_PL": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "id_ID": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "tr_TR": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "sv_SE": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "vi_VN": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ],
   "da_DK": [
-    "charts.loadFailed",
     "moderationHistory.actionSpectate",
-    "moderationHistory.actionUnspectate",
-    "stats.loadFailed",
-    "tickPerf.loadFailed",
-    "usage.loadFailed"
+    "moderationHistory.actionUnspectate"
   ]
 };
