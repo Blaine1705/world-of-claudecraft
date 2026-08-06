@@ -82,10 +82,11 @@ is dirty (same reason `gate:fast` skips those paths for related expansion). Pref
 transforms under `node_modules/.experimental-vitest-cache` (clear with
 `npx vitest --clearCache` if a warm run looks wrong). The same store is persisted
 across CI runs since Phase 4 of the CI/CD performance packet: the pr-gate and
-release-gate shard jobs carry an `actions/cache` step for it, keyed per shard on the
-node_modules-layout inputs (lockfile, vite config, `.npmrc`, `package.json`), with the
-design constraints written on the step in `.github/workflows/ci.yml` and pinned by
-`tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
+release-gate shard jobs carry an `actions/cache` step for it, keyed per shard, and the
+long-sims lane job carries the same step keyed per lane (Phase 6, the recorded Phase 4
+rider), all over the node_modules-layout inputs (lockfile, vite config, `.npmrc`,
+`package.json`), with the design constraints written on the pr-gate copy of the step in
+`.github/workflows/ci.yml` and pinned by `tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
 uncached full replay. Most DOM-environment unit
 tests use `// @vitest-environment happy-dom`; a short exception list still pins
 `jsdom` where happy-dom API gaps bite (see `docs/local-gate-perf/baselines.md`
@@ -247,6 +248,30 @@ queue closes this pre-merge: every queued PR is retested with the FULL suite on 
 exact merge result against the current tip before it may land. The full-suite run on
 every `release/**` push still re-proves the landed tip, and the nightly re-proves it
 daily.
+
+**Known-flake handling** (Phase 6). The shard and lane legs run through
+`scripts/lib/ci_leg_runner.mjs`, which streams each leg's output through with
+backpressure while keeping a bounded tail, and applies the ONE sanctioned automatic
+retry: a leg that exits 1 while its vitest summary shows every test passed, carries the
+exact unhandled `EnvironmentTeardownError: [vitest-worker]: Closing rpc while
+"onUserConsoleLog" was pending` message (the worker-teardown console-log race, first
+recorded 2026-08-05), and whose summary `Errors` count is fully explained by teardown-rpc
+occurrences (so a run also carrying any OTHER unhandled error never retries) is rerun
+once, with a loud `[ci-shard] known-flake retry` banner in the job log, a GitHub warning
+annotation on the run, and a `(known-flake retry used on: ...)` suffix on the PASS line,
+so a green that used the retry is auditable at a glance. At most ONE retry per job,
+shared across all its legs. Any failed test, any other exit code, a signal kill, a spawn
+error, or any unexplained unhandled error fails the job exactly as before: the packet's
+non-goals forbid a blanket retry because retries hide real regressions. Be precise about
+what the guarantee is: test output is not a trust boundary (a test already executes
+arbitrary code in the job), so the summary parse is a narrowing filter, not integrity;
+the property that holds is the policy itself, at most one rerun of the same leg per job,
+always visible in the log. Classifier and policy live in
+`scripts/lib/teardown_rpc_flake.mjs` and `scripts/lib/ci_leg_runner.mjs`, pinned by
+`tests/teardown_rpc_flake.test.ts` and `tests/ci_leg_runner.test.ts`. `release-gate`,
+the nightly, and the local gate carry NO auto-retry: there a teardown-rpc red stays red
+and the remedy remains a manual rerun of the red shard
+(`gh run rerun <run-id> --failed`).
 
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two

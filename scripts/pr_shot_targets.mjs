@@ -1206,6 +1206,69 @@ export const TARGETS = [
     },
   },
   {
+    key: 'elixir-use-tooltip',
+    label: 'Elixir of the Boar tooltip with its Use line',
+    when: ['ui/elixir_tooltip_view'],
+    // Desktop only, the material-usedby-tooltip rationale: the synthetic
+    // hover path does not raise #tooltip on the touch layout, and the
+    // tooltip content is byte-identical on mobile.
+    async capture(page) {
+      // Same SwiftShader boot patience as the material-usedby recipe: wait
+      // for the boot hook, then clear the overlays a late boot re-raises.
+      await page.waitForFunction(() => window.__game?.sim?.player, { timeout: 90000 });
+      await dismissEntryOverlays(page);
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        // The boar elixir is the reported item; the serpent rung beside it
+        // shows the ladder's top numbers on the same shot.
+        for (const id of ['elixir_of_the_boar', 'elixir_of_the_serpent']) {
+          try {
+            sim?.addItem(id, 1);
+          } catch {}
+        }
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await pollForSize(page, '#bags');
+      // Hover the boar elixir through the REAL pointer path so the tooltip
+      // is the one a player sees, not a hand-built string.
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          const aria = c.getAttribute?.('aria-label') ?? '';
+          return (
+            (bg && bg.includes('elixir_of_the_boar')) ||
+            (img && img.getAttribute('src')?.includes('elixir_of_the_boar')) ||
+            aria.startsWith('Elixir of the Boar')
+          );
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'fishing-zone-denial',
     label: 'Casting into Thornpeak water with a rod the water does not take',
     when: ['professions/fishing', 'fishing_zones', 'gathering_view'],

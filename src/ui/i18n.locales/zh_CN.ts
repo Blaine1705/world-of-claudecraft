@@ -2442,6 +2442,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'itemUi.tooltip.useFishing': '使用：在附近水域钓鱼。',
   'itemUi.tooltip.useHealingPotion': '使用：立即恢复 {amount} 点生命值。战斗中可用。1 分钟冷却。',
   'itemUi.tooltip.useManaPotion': '使用：立即恢复 {amount} 点法力值。战斗中可用。1 分钟冷却。',
+  'itemUi.tooltip.useElixir':
+    '使用：使你的{stat}提高 {value} 点，持续 {minutes} 分钟。战斗中可用。',
+  'itemUi.tooltip.useElixirAura': '使用：获得{aura}效果，持续 {minutes} 分钟。战斗中可用。',
   'itemUi.tooltip.clickUseInstant': '点击在战斗中立即使用',
   'itemUi.tooltip.clickUse': '点击使用',
   'itemUi.tooltip.clickBuyback': '点击回购',

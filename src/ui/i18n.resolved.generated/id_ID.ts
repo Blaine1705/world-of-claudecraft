@@ -7517,6 +7517,8 @@ export const id_ID: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Pakai: Memulihkan {amount} nyawa selama {seconds} detik. Harus tetap duduk selama makan.",
       "useDrink": "Pakai: Memulihkan {amount} mana selama {seconds} detik. Harus tetap duduk selama minum.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Barang Misi",
       "questRelated": "Misi: {quest}",
       "questRules": "Tidak dapat dijual, disimpan di bank, atau ditukar.",

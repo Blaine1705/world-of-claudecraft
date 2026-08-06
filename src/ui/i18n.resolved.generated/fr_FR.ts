@@ -7517,6 +7517,8 @@ export const fr_FR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Utiliser : rend {amount} points de vie en {seconds} s. Vous devez rester assis en mangeant.",
       "useDrink": "Utiliser : rend {amount} points de mana en {seconds} s. Vous devez rester assis en buvant.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Objet de quête",
       "questRelated": "Quête : {quest}",
       "questRules": "Ne peut être vendu, mis en banque, ni échangé.",

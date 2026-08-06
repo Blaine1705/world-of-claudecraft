@@ -7517,6 +7517,8 @@ export const tr_TR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Kullanım: {seconds} saniyede {amount} can yeniler. Yerken oturur kalmalısın.",
       "useDrink": "Kullanım: {seconds} saniyede {amount} mana yeniler. İçerken oturur kalmalısın.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Görev Eşyası",
       "questRelated": "Görev: {quest}",
       "questRules": "Satılamaz, bankaya konulamaz veya takas edilemez.",
