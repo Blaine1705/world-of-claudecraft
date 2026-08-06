@@ -391,7 +391,8 @@ export const zh_CN: EnTranslations = {
     },
     "emoteEditor": {
       "title": "表情",
-      "done": "完成"
+      "done": "完成",
+      "close": "关闭表情"
     },
     "dailyRewards": {
       "title": "每日奖励",
@@ -1348,6 +1349,8 @@ export const zh_CN: EnTranslations = {
       "buttons": "按键布局",
       "resetButtons": "重置按键布局",
       "menuAction": "游戏菜单",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左摇杆移动，右摇杆控制镜头。打开窗口即可使用屏幕指针。"
     },
     "perf": {
@@ -1576,6 +1579,7 @@ export const zh_CN: EnTranslations = {
     },
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "灵魂绑定",
+    "itemUniqueEquipped": "装备唯一",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -2552,6 +2556,7 @@ export const zh_CN: EnTranslations = {
       "catchLine": "你钓上了：{name}",
       "biteLine": "有东西上钩了！",
       "gotAwayLine": "它跑掉了。",
+      "earlyReelLine": "收线太早了，还没有鱼上钩。",
       "nodeName": {
         "ore": "矿脉",
         "wood": "林木",
@@ -2778,7 +2783,22 @@ export const zh_CN: EnTranslations = {
       "close": "关闭制作",
       "dialogOption": "制作",
       "dialogOptionAria": "打开{craft}制作窗口",
-      "craft": "制作",
+      "crafting": "制作中",
+      "create": "制作",
+      "createAll": "全部制作",
+      "createAllAria": "按当前材料可制作的最大数量制作该配方",
+      "qtyRowAria": "制作数量",
+      "qtyDecreaseAria": "减少制作数量（当前 {count}）",
+      "qtyIncreaseAria": "增加制作数量（当前 {count}）",
+      "qtyValueAria": "制作数量，{count}",
+      "batchRemaining": "剩余 {remaining}/{total}",
+      "batchRemainingAria": "还剩 {remaining} 个，共 {total} 个",
+      "durationChip": "{seconds}s",
+      "durationAria": "施放时间：{seconds} 秒",
+      "progressAria": "制作进度",
+      "announceStart": "正在制作 {name}",
+      "announceComplete": "已完成制作 {name}",
+      "announceCancel": "制作已取消",
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 个优质品级）",
@@ -2838,7 +2858,7 @@ export const zh_CN: EnTranslations = {
         "loom": "织机",
         "toolworks": "工坊"
       },
-      "throttled": "你制作得太快了，请稍等片刻后再试。",
+      "busy": "你正忙着。",
       "recipeNotLearned": "你还没有学会这个配方。",
       "noBagSpace": "背包空间不足，无法存放制作的物品。",
       "skillReqLine": "需要{craft} {skill}",
@@ -2893,9 +2913,9 @@ export const zh_CN: EnTranslations = {
       "notHeld": "你没有那件物品。",
       "notDisenchantable": "你无法分解那件物品。",
       "notSalvageable": "你无法拆解那件物品。",
-      "disenchantThrottled": "你分解得太快了，请稍等片刻后再试。",
-      "salvageThrottled": "你拆解得太快了，请稍等片刻后再试。",
-      "enchantThrottled": "你附魔得太快了，请稍等片刻后再试。",
+      "disenchantBusy": "你正忙着。",
+      "salvageBusy": "你正忙着。",
+      "enchantBusy": "你正忙着。",
       "enchantWrongSlot": "该附魔无法施加于那件物品。",
       "enchantUnknown": "该附魔不存在。",
       "enchantInsufficient": "你没有该附魔所需的材料。",
@@ -3130,7 +3150,8 @@ export const zh_CN: EnTranslations = {
         "raise_fallen": "亡者复生（周期性召唤小怪）",
         "soul_rend": "灵魂撕裂（被标记者需分散并接受治疗）",
         "deathless_rage": "不死之怒（需在护符石处打断）",
-        "wardstones": "护符石引导（阶段转换）"
+        "wardstones": "护符石引导（阶段转换）",
+        "dread_curse": "恐惧诅咒（仅英雄难度，累加坦克轮换减益）"
       }
     },
     "deeds": {
@@ -3538,16 +3559,21 @@ export const zh_CN: EnTranslations = {
       "groupInterface": "界面",
       "groupCamera": "镜头",
       "talents": "天赋",
+      "professions": "专业",
       "arena": "竞技场",
       "leaderboard": "排行榜",
       "deeds": "功绩之书",
+      "sheathe": "收起/拔出武器",
       "crafting": "制作",
       "valeCup": "溪谷杯",
+      "mount": "骑乘 / 下骑",
       "calendar": "活动日历",
+      "dungeonFinder": "地下城查找器",
       "discord": "Discord",
       "abilities": "使用动作条技能（数字键行；第二条动作条位于小键盘）",
       "targetFriendly": "选中最近的友方",
       "cycleFriendly": "循环选择友方目标",
+      "targetAuras": "目标增益和减益效果",
       "gameMenu": "打开游戏菜单与选项",
       "bothMouse": "鼠标左右键",
       "runForward": "向前奔跑",
@@ -3558,7 +3584,7 @@ export const zh_CN: EnTranslations = {
       "mobileHeading": "移动端操作",
       "mobileBody": "在手机和平板上会自动出现触控操作：左侧是移动摇杆，在其他任意位置拖动即可环顾四周，用两根手指捏合可缩放镜头，屏幕上还有用于使用技能和打开菜单的按钮。左上角的一个小箭头可以显示或隐藏菜单按钮，那里的“更多”按钮则收纳着你其余的窗口。",
       "controllerHeading": "使用手柄",
-      "controllerBody": "手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角。"
+      "controllerBody": "手柄同样可用，且默认开启手柄支持。左摇杆控制移动，右摇杆控制镜头，正面按键与肩部按键则负责你的技能、跳跃和互动。打开像背包这样的窗口即可调出屏幕指针，而游戏菜单则可用方向键和正面按键直接操作。你可以在选项的手柄设置中重新映射按键，并调整摇杆死区、镜头速度、震动以及反转视角，还可以将一个按键绑定为拉近或拉远镜头（默认未绑定）。"
     },
     "settingsPage": {
       "heading": "设置和性能",
@@ -4299,6 +4325,8 @@ export const zh_CN: EnTranslations = {
       "sourcesBody": "早期的升级大多来自任务奖励，所以与其刷怪，不如完成任务更划算。敌人被击败时会掉落装备，城镇里的商人贩售扎实的基础货色，制作者能把采集来的材料打造成可穿戴的装备，玩家市场则让你能从其他冒险者那里买东西。而在山顶，两种特殊货币能买到别处绝无仅有的装备：探秘看守人处的探秘印记，以及英雄军需官处的英雄徽记。",
       "soulboundTitle": "灵魂绑定：唯你独有",
       "soulboundBody": "许多珍贵的装备都是灵魂绑定的，从你获得的那一刻起便与你的角色绑定。灵魂绑定的物品无法交易、无法邮寄、无法卖给商人，也无法在市场上挂单；它如今是你故事的一部分，无人能替你携带。",
+      "uniqueTitle": "装备唯一：同一件传说只能穿一件",
+      "uniqueBody": "传说物品是装备唯一的：你的角色同一时间只能穿戴某件传说物品的一份，其英雄版本也算作同一件物品。第二份可以放在背包、银行或市场里，但试图同时穿戴两份会被拒绝。物品提示上还带有金色的\"装备唯一\"标签，让你在围绕两件传说规划配装之前就能看到这条规则。",
       "setsTitle": "套装与套装效果",
       "setsBody": "有些护甲成套出现，数件装备在外观与战斗风格上浑然一体。同时穿戴足够多的同套部件，套装便会苏醒，在每件单品自身属性之外额外授予加成，而你穿的部件越多，加成就越强。少数这样的套系会在你升级途中作为珍贵掉落现身；其中最了不起的那些则来自接近等级上限的最高难度组队内容，因此凑齐一整套是经典的终局目标。",
       "consumablesTitle": "消耗品",
@@ -4555,6 +4583,7 @@ export const zh_CN: EnTranslations = {
         "startBody": "一根Simple Fishing Pole在Eastbrook的Fisherman Brandt处只卖20铜（他在镇东缘望着Mirror Lake）；Tinker Gizzel、Fenbridge的Provisioner Hale和Highwatch的Quartermaster Bree也有存货。面向前方约24码内足够深的水面使用鱼竿即可抛竿。战斗中、游泳时或死亡时无法抛竿：站在岸上钓才是正途，任何区域的可钓水域都行。",
         "biteHeading": "咬钩与收线",
         "biteBody": "抛竿后{min}到{max}秒之间鱼会咬钩（更好的鱼竿最多缩短{rod}秒等待），收线窗口持续{reel}秒、鱼竿每高一阶再加{reelRod}秒，单次垂钓最长{cap}秒。",
+        "earlyReelNote": "心急的钓手注意：鱼咬钩之前再按鱼竿，只会收回空线并结束这次垂钓（抛竿后的短暂宽限会原谅误触的连点）。耐心就是钓鱼的全部：等咬钩，再收线。",
         "scheduleHeading": "熟练度成长",
         "scheduleNote": "钓鱼成长按熟练度遵循固定档位，且从{cutoff}起，钓上杂物不再有任何成长。",
         "colProficiency": "熟练度",
@@ -4603,8 +4632,16 @@ export const zh_CN: EnTranslations = {
         "provenanceBody": "精良及以上的成品与发现都带有制作者的署名，而署名完全相同的物品仍可堆叠。",
         "collectorsHeading": "收藏家、战利品与故事的价格",
         "collectorsBody": "商人看不见出处：署名物品卖给NPC只值普通价，签名的溢价只存在于玩家之间。名家署名的横财矿石、一块Prime Cut、一柄署着已退隐工匠之名的杰作之刃，价格全凭记忆开价。功业之书里的Pristine Vein、Ancient Heartwood、Moonlit Bloom、A Perfect Specimen与Glimmer of Hope都是零声望的收藏印记，只为证明那一刻发生在你身上。出处不买属性也不赢战斗，它是这游戏里美好日子的存根。",
-        "throttleHeading": "操作限频",
-        "throttleBody": "制作、分解、附魔与回收共用一个限频：每{seconds}秒最多{actions}次操作。",
+        "castPaceHeading": "读条时间与金币消耗",
+        "castPaceBody": "专业动作需要真实读条时间：简单的野外配方不到两秒，高阶阶梯配方则需要数秒；分解、附魔、拆解与工具效果充能各自有固定的短读条。中途取消不会损失材料。每次成功制作还会按物品预算支付铜币费用。加上材料、工作台与技能上限，这种节奏在不设额外动作配额的情况下，也能让市场保持健康。各技能区间的精确读条时间见下表。",
+        "castPaceField": "无技能要求的野外配方：施放 {seconds} 秒",
+        "castPaceSkill25": "技能25以下配方：施放 {seconds} 秒",
+        "castPaceSkill50": "技能50以下配方：施放 {seconds} 秒",
+        "castPaceSkill75": "技能75以下配方：施放 {seconds} 秒",
+        "castPaceCombo": "顶级与组合配方：施放 {seconds} 秒",
+        "castPaceEnchantFamily": "分解、附魔与拆解：施放 {seconds} 秒",
+        "castPaceRecharge": "工具效果充能：施放 {seconds} 秒",
+        "castPaceBatch": "批量制作：单次最多 {count} 件，逐件施放",
         "doctrineHeading": "玩家与玩家交易",
         "doctrineBody": "制作装备的强度始终低于团队副本的底线，而上述费用会把货物推向玩家之间的交易，而非商店循环。"
       },
@@ -7177,6 +7214,11 @@ export const zh_CN: EnTranslations = {
     "cast": {
       "fishing": "钓鱼",
       "gathering": "采集",
+      "crafting": "制作",
+      "disenchanting": "分解",
+      "enchanting_apply": "附魔",
+      "salvaging": "拆解",
+      "tool_recharge": "充能",
       "demonHeal": "恶魔治疗",
       "thunzharrStormcall": "风暴召唤",
       "rift_frost_execution": "冰川之墓",
@@ -10277,6 +10319,15 @@ export const zh_CN: EnTranslations = {
       },
       "direfang_quiver": {
         "name": "恐牙箭袋"
+      },
+      "sharp_claw": {
+        "name": "锋利的爪"
+      },
+      "curved_tusk": {
+        "name": "弯曲的獠牙"
+      },
+      "pristine_claw": {
+        "name": "完美的爪"
       },
       "conjured_water4": {
         "name": "魔法泉水"

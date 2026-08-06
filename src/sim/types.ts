@@ -123,6 +123,20 @@ export const FISHING_SESSION_CAP_SEC = 15;
 // The gather-cast sentinel riding castingAbility (Professions 2.0),
 // beside FISHING_CAST_ID above: an activity marker, never an ability id.
 export const GATHER_CAST_ID = 'gathering';
+// The craft-cast sentinel (Craft Cast System Phase 1): same activity-marker
+// shape as gather/fishing, never an ability id. Membership in isNonSpellCast
+// is load-bearing (cancel, damage cancel, item-use block, session_teardown).
+export const CRAFT_CAST_ID = 'crafting';
+// Enchant-family cast sentinels (Craft Cast System Phase 4): same
+// activity-marker shape as craft/gather/fishing. Separate ids keep cast-bar
+// labels and audio routing clean (gather vs fishing precedent).
+export const DISENCHANT_CAST_ID = 'disenchanting';
+export const ENCHANT_CAST_ID = 'enchanting_apply';
+export const SALVAGE_CAST_ID = 'salvaging';
+// Tool-effect recharge cast sentinel (Craft Cast System Phase 5): same
+// activity-marker shape as craft/enchant-family. Separate id keeps cast-bar
+// labels and audio routing clean.
+export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -131,7 +145,15 @@ export const GATHER_CAST_ID = 'gathering';
 // a member: its channel keeps its own per-site behavior, folded in explicitly
 // only where that behavior is already byte-identical (see the call sites).
 export function isNonSpellCast(castId: string | null): boolean {
-  return castId === FISHING_CAST_ID || castId === GATHER_CAST_ID;
+  return (
+    castId === FISHING_CAST_ID ||
+    castId === GATHER_CAST_ID ||
+    castId === CRAFT_CAST_ID ||
+    castId === DISENCHANT_CAST_ID ||
+    castId === ENCHANT_CAST_ID ||
+    castId === SALVAGE_CAST_ID ||
+    castId === TOOL_RECHARGE_CAST_ID
+  );
 }
 // Seconds an empty instance idles before it resets. Shared by the dungeon instance
 // reaper (instances/dungeons.ts) and the delve reaper (sim.ts). NYTHRAXIS_BOSS_ID
@@ -3495,6 +3517,75 @@ export interface Entity extends ClientMirroredEntityFields {
    * inert (false) at rest.
    */
   gatherCastEffectConfirmed: boolean;
+  /**
+   * Recipe id a running craft cast resolves against at completion ('' = none).
+   * Transient, never wired, never persisted. Cleared on every cast end path
+   * (complete, cancelCast, death) with unconditional inert writes.
+   */
+  craftCastRecipeId: string;
+  /**
+   * Commission opt-in captured at craft-cast start (Maker's Bond). Read once
+   * by completeCraftCast so a mid-cast UI toggle cannot change the resolve.
+   * Inert (false) at rest.
+   */
+  craftCastCommission: boolean;
+  /**
+   * Batch crafts remaining including the in-flight cast (Phase 1 always 1
+   * while casting; 0 when idle). Phase 3 drives auto-repeat off this field.
+   */
+  craftCastBatchRemaining: number;
+  /**
+   * Batch size captured at batch start for UI progress (Phase 1 always 1
+   * while casting; 0 when idle).
+   */
+  craftCastBatchTotal: number;
+  /**
+   * Item id a running enchant-family cast (disenchant / apply / salvage)
+   * resolves against ('' = none). Transient, never wired, never persisted.
+   * Shared session bag for the three cast ids; only one non-spell cast runs.
+   */
+  enchantCastItemId: string;
+  /**
+   * Optional bag slot for a disenchant cast, stored 1-BASED (slotIndex + 1);
+   * 0 = not pin-selected. The 1-based encoding keeps the resting value 0 so
+   * the parity sampler's default-omission drops it (a -1 rest value re-hashed
+   * every golden). Encode/decode live only in beginEnchantFamilyCast /
+   * clearEnchantCastSession. Read once at complete; cleared with the rest of
+   * the enchant session.
+   */
+  enchantCastBagSlot: number;
+  /**
+   * Enchant id for an apply-enchant cast ('' when the live cast is
+   * disenchant or salvage). Captured at start so a mid-cast UI change
+   * cannot retarget the resolve.
+   */
+  enchantCastEnchantId: string;
+  /**
+   * Worn equipment slot for an apply-enchant cast ('' = bagged arm).
+   * Same capture discipline as craftCastCommission.
+   */
+  enchantCastEquipSlot: string;
+  /**
+   * confirmReplace consent for an apply-enchant cast (#2415). Captured at
+   * start; inert (false) at rest and on disenchant/salvage casts.
+   */
+  enchantCastConfirmReplace: boolean;
+  /**
+   * Mid-cast target identity pin ('' = none). For a pin-selected disenchant
+   * cast: the canonical fingerprint of the selected copy (itemId + instance
+   * payload + craftedRecipeId), so a mid-cast bag splice cannot redirect the
+   * destroy onto a different copy of the same item id. For an apply-enchant
+   * cast with confirmReplace: the enchant id the consent was given against,
+   * so a mid-cast copy swap cannot spend the consent on a different enchant.
+   * Transient, never wired, never persisted; cleared on every cast end path.
+   */
+  enchantCastTargetPin: string;
+  /**
+   * Gathering profession id a running tool-recharge cast fills ('' = none).
+   * Transient, never wired, never persisted. Cleared on complete, cancelCast,
+   * death, and arena/fiesta with unconditional inert writes.
+   */
+  toolRechargeCastProfessionId: string;
   /** Hidden seeded sim tick the fishing bite fires on (0 = no pending bite). */
   fishBiteAtTick: number;
   /** Sim-tick deadline for the fishing reel re-press (0 = window not armed). */
@@ -4306,7 +4397,30 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
-  | { type: 'aura'; targetId: number; name: string; gained: boolean; auraKind?: AuraKind }
+  | {
+      type: 'aura';
+      targetId: number;
+      name: string;
+      gained: boolean;
+      auraKind?: AuraKind;
+      // Attribution the Aura object always had but the event used to drop
+      // (parse fidelity 7.2): the caster's entity id, the stable aura/ability
+      // id, and the stack count at application. Carried by the Sim.applyAura
+      // emit path (gained, refresh, and same-id brand-swap fades) and the
+      // stack-bump re-emit in effect_dispatch; the scattered gained AND fade
+      // sites elsewhere (mob_swing, Blood Frenzy, Pack Frenzy, pet buffs,
+      // empower_next, expiries, dispels, ...) still emit bare, and consumers
+      // must treat every field here as optional.
+      sourceId?: number;
+      abilityId?: string;
+      stacks?: number;
+      // True when a gained event displaced a same-id same-name aura already on
+      // the target (a re-application; no fade is emitted, and the aura moves
+      // to the end of the array exactly as a fresh application always has):
+      // parses and combat logs read this as SPELL_AURA_REFRESH rather than a
+      // fresh application.
+      refresh?: boolean;
+    }
   | {
       type: 'castStart';
       entityId: number;
@@ -4649,6 +4763,12 @@ export type SimEvent = { pid?: number } & (
       // same thing from amount === 0, since a genuine direct heal (applyHeal)
       // can also legitimately land at amount 0 (full HP, fully absorbed).
       cueOnly?: boolean;
+      // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
+      // when zero. Computed AFTER heal-absorb consumption, so absorbed and
+      // overheal never double-count the same lost healing. Set at every
+      // clamped heal2 emit site; a tick whose heal fully overheals still
+      // emits nothing (those sites gate on healed > 0, unchanged).
+      overheal?: number;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at
@@ -4876,6 +4996,7 @@ export type SimEvent = { pid?: number } & (
         | 'combo_requirement_unmet'
         | 'recipe_not_learned'
         | 'throttled'
+        | 'busy'
         | 'station_required'
         | 'no_bag_space';
     }
@@ -4899,7 +5020,13 @@ export type SimEvent = { pid?: number } & (
       count?: number;
       secondaryItemId?: string;
       secondaryCount?: number;
-      reason?: 'unknown_item' | 'not_disenchantable' | 'not_held' | 'throttled' | 'no_bag_space';
+      reason?:
+        | 'unknown_item'
+        | 'not_disenchantable'
+        | 'not_held'
+        | 'throttled'
+        | 'no_bag_space'
+        | 'busy';
     }
   | {
       type: 'enchantResult';
@@ -4917,7 +5044,8 @@ export type SimEvent = { pid?: number } & (
         // #2415: already-enchanted target without the confirmReplace flag,
         // and the identical-enchant-id re-apply denied on every arm.
         | 'already_enchanted'
-        | 'same_enchant';
+        | 'same_enchant'
+        | 'busy';
     }
   | {
       type: 'salvageResult';
@@ -4925,7 +5053,13 @@ export type SimEvent = { pid?: number } & (
       itemId: string;
       materialItemId?: string;
       count?: number;
-      reason?: 'unknown_item' | 'not_salvageable' | 'not_held' | 'throttled' | 'no_bag_space';
+      reason?:
+        | 'unknown_item'
+        | 'not_salvageable'
+        | 'not_held'
+        | 'throttled'
+        | 'no_bag_space'
+        | 'busy';
     }
   // Tool-effect action outcome (the acquisition craft): the one result event
   // for the slot_tool_effect and recharge_tool_effect commands, mirroring
@@ -4954,6 +5088,8 @@ export type SimEvent = { pid?: number } & (
         | 'already_full'
         | 'tool_capped'
         | 'insufficient_materials'
+        | 'busy'
+        // Historical: shared action throttle retired in Craft Cast System Phase 5.
         | 'throttled';
     }
   // Recipe-training outcome (Professions 2.0): mirrors
@@ -5338,6 +5474,16 @@ export type SimEvent = { pid?: number } & (
   // nothing but the ended cast; recast immediately. zoneId/band mirror
   // fishingResult, for the telemetry.
   | { type: 'fishingGotAway'; pid: number; zoneId: string; band: 0 | 1 | 2 }
+  // Fishing early reel (the spam-click fix): the angler re-pressed the pole
+  // BEFORE the bite, so the line came in empty and the session ended. Exists
+  // because a free pre-bite no-op made spam-pressing a guaranteed catch (one
+  // press always fell inside the armed reel window); ending the session is
+  // what makes the bite a reaction test again. Personal and text-free like
+  // fishingGotAway, and counted apart from it in the telemetry (a got-away
+  // is the game costing the player; an early reel is self-inflicted, and
+  // folding them would hide whether the anti-spam change burns real
+  // anglers). Costs nothing but the ended cast; recast immediately.
+  | { type: 'fishingEarlyReel'; pid: number; zoneId: string; band: 0 | 1 | 2 }
   // Fishing empty hook (Professions 2.0): the single table draw resolved
   // the itemId: null row (nothing was biting). Telemetry-only sibling of
   // fishingResult: the player feedback stays the existing localized log

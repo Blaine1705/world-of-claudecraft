@@ -3292,6 +3292,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': '울림 파편',
   'entities.items.gatherers_cache.name': '채집가의 주머니',
   'entities.items.artisans_eye.name': '장인의 눈',
+  'entities.items.sharp_claw.name': '날카로운 발톱',
+  'entities.items.curved_tusk.name': '휘어진 엄니',
+  'entities.items.pristine_claw.name': '온전한 발톱',
   'entities.items.linen_scrap.name': '아마포 조각',
   'entities.items.fen_muster_order.name': '펜브리지 소집 명령서',
   'entities.items.mire_prowler_pelt.name': '수렁 배회자 가죽',
@@ -5499,6 +5502,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': '남동',
   'hudChrome.compass.SW': '남서',
   'hudChrome.compass.W': '서',
+  'hudChrome.emoteEditor.close': '감정 표현 닫기',
   'hudChrome.emoteEditor.done': '완료',
   'hudChrome.emoteEditor.title': '감정 표현',
   'hudChrome.emotes.bow': '절',
@@ -6025,18 +6029,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': '대상 지정과 전투',
   'guide.controls.groupInterface': '인터페이스',
   'guide.controls.controllerBody':
-    '게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있습니다.',
+    '게임패드도 사용할 수 있으며, 컨트롤러 지원은 기본으로 켜져 있습니다. 왼쪽 스틱으로 이동하고, 오른쪽 스틱으로 카메라를 조준하며, 얼굴 버튼과 어깨 버튼으로 능력 사용, 점프, 상호작용을 처리합니다. 가방 같은 창을 열면 화면 포인터가 나타나고, 게임 메뉴는 방향 패드와 얼굴 버튼으로 곧바로 조작할 수 있습니다. 옵션의 컨트롤러 설정에서 버튼을 재배치하고 스틱 데드존, 카메라 속도, 진동, 시점 반전을 조정할 수 있으며, 버튼 하나를 카메라 확대/축소에 배정할 수도 있습니다(기본값은 미배정).',
   'guide.controls.controllerHeading': '컨트롤러에서',
   'guide.controls.cycleFriendly': '아군 대상 순환',
+  'guide.controls.targetAuras': '대상 강화 및 약화 효과',
   'guide.controls.gameMenu': '게임 메뉴와 옵션 열기',
   'guide.controls.groupCamera': '카메라',
   'guide.controls.talents': '특성',
+  'guide.controls.professions': '생산 전문직',
   'guide.controls.arena': '투기장',
   'guide.controls.leaderboard': '순위표',
   'guide.controls.deeds': '업적의 서',
+  'guide.controls.sheathe': '무기 넣기/빼기',
   'guide.controls.crafting': '제작',
   'guide.controls.valeCup': '베일 컵',
+  'guide.controls.mount': '탑승 / 하차',
   'guide.controls.calendar': '이벤트 달력',
+  'guide.controls.dungeonFinder': '던전 찾기',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities':
     '행동 단축바 능력 사용 (숫자 키 줄, 두 번째 단축바는 숫자 키패드에 있음)',
@@ -6727,6 +6736,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotsTitle': '착용할 수 있는 부위',
   'guide.gear.soulboundBody':
     '값진 장비 가운데 상당수는 귀속되어, 손에 넣는 순간부터 당신의 캐릭터에게 묶입니다. 귀속된 아이템은 거래하거나, 우편으로 보내거나, 상인에게 팔거나, 시장에 올릴 수 없습니다. 이제 그것은 당신 이야기의 일부이며, 누구도 대신 지녀 줄 수 없습니다.',
+  'guide.gear.uniqueTitle': '착용 시 고유: 같은 전설은 하나만',
+  'guide.gear.uniqueBody':
+    '전설 아이템은 착용 시 고유입니다. 캐릭터는 같은 전설 아이템을 동시에 하나만 착용할 수 있으며, 영웅 버전도 같은 아이템으로 취급됩니다. 두 번째 사본은 가방, 은행, 시장에 둘 수 있지만 둘을 동시에 착용하려 하면 거부됩니다. 툴팁에는 금색 "착용 시 고유" 표시가 있어 두 개를 중심으로 빌드를 계획하기 전에 이 규칙을 확인할 수 있습니다.',
   'guide.gear.soulboundTitle': '귀속: 오직 당신의 것',
   'guide.gear.sourcesBody':
     '초반 업그레이드 대부분은 퀘스트 보상이므로, 사냥을 반복하기보다 퀘스트를 끝내는 편이 이득입니다. 적은 처치하면 장비를 떨어뜨리고, 마을 상인은 든든한 기본 장비를 팔며, 제작자는 채집한 재료를 착용할 수 있는 장비로 바꾸고, 플레이어 시장에서는 다른 모험가에게서 살 수 있습니다. 그리고 성장의 정점에 이르면, 다른 어디에서도 구할 수 없는 장비를 파는 두 가지 증표 화폐가 기다립니다. 탐굴 증표는 탐굴 관리인에게, 영웅의 징표는 영웅 병참장교에게 씁니다.',
@@ -7447,6 +7459,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus4':
     '무기 치명타 적중 시 50% 확률로 "송곳니 질주"가 발동하여 공격 속도가 25% 증가합니다. 8초 동안 지속됩니다.',
   'hudChrome.itemSoulbound': '귀속',
+  'hudChrome.itemUniqueEquipped': '착용 시 고유',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '적중 시 확률 ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': '피해 주문 시 확률 ({chance}%): {effect}',
@@ -7584,7 +7597,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': '제작',
   'hudChrome.crafting.dialogOptionAria': '{craft} 제작 창 열기',
   'hudChrome.crafting.close': '제작 닫기',
-  'hudChrome.crafting.craft': '제작',
   'hudChrome.crafting.reagentsNeeded': '필요 재료:',
   'hudChrome.crafting.empty': '알려진 제작법이 없습니다.',
   'hudChrome.crafting.resultAria': '{name} 제작',
@@ -8545,6 +8557,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '{name}을(를) 낚아 올렸습니다',
   'hudChrome.gathering.biteLine': '무언가 미끼를 물었습니다!',
   'hudChrome.gathering.gotAwayLine': '놓쳐 버렸습니다.',
+  'hudChrome.gathering.earlyReelLine':
+    '너무 일찍 줄을 감았습니다. 아직 아무것도 미끼를 물지 않았습니다.',
   'hudChrome.gathering.nodeName.ore': '광맥',
   'hudChrome.gathering.nodeName.wood': '벌목 나무',
   'hudChrome.gathering.nodeName.herb': '약초 군락',
@@ -8664,7 +8678,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '패배! 아군 Yumi가 쓰러졌습니다.',
   'hudChrome.crafting.comboRequirementUnmet':
     '이 조합 제작법에 필요한 두 제작 기술의 숙련도에 도달하지 못했습니다.',
-  'hudChrome.crafting.throttled': '너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.crafting.recipeNotLearned': '아직 그 제작법을 배우지 않았습니다.',
   'hudChrome.crafting.noBagSpace': '가방에 제작한 아이템을 넣을 공간이 없습니다.',
   // Professions 2.0 (M16 non-Latin fills).
@@ -9244,6 +9257,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.soul_rend': '영혼 가르기(표식 대상은 산개 후 치유 필요)',
   'hudChrome.finder.mech.deathless_rage': '불사의 격노(수호석에서 저지)',
   'hudChrome.finder.mech.wardstones': '수호석 정신집중(단계 전환)',
+  'hudChrome.finder.mech.dread_curse': '공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)',
   'hudChrome.steam.link': 'Steam 연동',
   'hudChrome.steam.unlink': 'Steam 연동 해제',
   'hudChrome.steam.linked': 'Steam 계정 {id}에 연동됨',
@@ -10406,12 +10420,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': '해당 아이템을 가지고 있지 않습니다.',
   'hudChrome.enchanting.notDisenchantable': '해당 아이템은 마력을 추출할 수 없습니다.',
   'hudChrome.enchanting.notSalvageable': '해당 아이템은 분해할 수 없습니다.',
-  'hudChrome.enchanting.disenchantThrottled':
-    '너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.enchanting.salvageThrottled':
-    '너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.',
-  'hudChrome.enchanting.enchantThrottled':
-    '너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.',
   'hudChrome.enchanting.enchantWrongSlot': '그 마법부여는 해당 아이템에 적용할 수 없습니다.',
   'hudChrome.enchanting.enchantUnknown': '해당 마법부여가 존재하지 않습니다.',
   'hudChrome.enchanting.enchantInsufficient': '해당 마법부여에 필요한 재료가 없습니다.',
@@ -10831,6 +10839,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': '입질과 릴 감기',
   'guide.profPages.fish.biteBody':
     '던진 뒤 {min}에서 {max}초 사이에 입질이 온다(좋은 낚싯대는 기다림을 최대 {rod}초 줄인다). 릴 감기 시간은 {reel}초에 낚싯대 티어가 하나 오를 때마다 {reelRod}초가 더해지고, 한 번의 낚시는 최대 {cap}초다.',
+  'guide.profPages.fish.earlyReelNote':
+    '성급한 손끝을 위한 주의: 입질이 오기 전에 낚싯대를 다시 사용하면 빈 줄만 감아 올리고 낚시가 끝난다(던진 직후의 짧은 유예가 실수로 누른 연타는 용서해 준다). 낚시의 전부는 인내다. 입질을 기다렸다가 챔질하라.',
   'guide.profPages.fish.scheduleHeading': '숙련도 성장',
   'guide.profPages.fish.scheduleNote':
     '낚시 성장은 숙련도에 따른 고정 일정표를 따르며, {cutoff}부터는 잡동사니를 낚아도 아무것도 배우지 못한다.',
@@ -10874,9 +10884,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '서명된 작품',
   'guide.profPages.econ.provenanceBody':
     '희귀 이상의 제작품과 발견물에는 제작자의 서명이 남고, 서명이 완전히 같은 물건은 여전히 겹쳐 쌓인다.',
-  'guide.profPages.econ.throttleHeading': '행동 제한',
-  'guide.profPages.econ.throttleBody':
-    '제작, 마력 추출, 마법부여, 해체는 하나의 제한을 나눠 쓴다. {seconds}초당 최대 {actions}회다.',
   'guide.profPages.econ.doctrineHeading': '플레이어끼리의 거래',
   'guide.profPages.econ.doctrineBody':
     '제작 장비의 힘은 언제나 공격대 하한 아래에 머물고, 위의 비용들은 물건을 상점 순환이 아니라 플레이어 간 거래로 밀어낸다.',
@@ -11158,4 +11165,40 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': '에테르 쇄도',
   'itemUi.vendor.buyStack': '{count}개 구매',
   'itemUi.vendor.buyStackAria': '{price}에 {item} {count}개 구매',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '제작',
+  'abilityUi.cast.disenchanting': '마력 추출',
+  'abilityUi.cast.enchanting_apply': '마법부여',
+  'abilityUi.cast.salvaging': '분해',
+  'abilityUi.cast.tool_recharge': '충전',
+  'hudChrome.crafting.crafting': '제작 중',
+  'hudChrome.crafting.create': '제작',
+  'hudChrome.crafting.createAll': '모두 제작',
+  'hudChrome.crafting.createAllAria': '보유 재료로 만들 수 있는 최대 개수만큼 이 제작법을 만듭니다',
+  'hudChrome.crafting.qtyRowAria': '제작 수량',
+  'hudChrome.crafting.qtyDecreaseAria': '제작 수량 줄이기 (현재 {count})',
+  'hudChrome.crafting.qtyIncreaseAria': '제작 수량 늘리기 (현재 {count})',
+  'hudChrome.crafting.qtyValueAria': '제작 수량, {count}',
+  'hudChrome.crafting.batchRemaining': '남은 수 {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '{total}개 중 {remaining}개 남음',
+  'hudChrome.crafting.durationAria': '시전 시간: {seconds}초',
+  'hudChrome.crafting.progressAria': '제작 진행',
+  'hudChrome.crafting.announceStart': '{name} 제작 중',
+  'hudChrome.crafting.announceComplete': '{name} 제작 완료',
+  'hudChrome.crafting.announceCancel': '제작이 취소됨',
+  'hudChrome.crafting.busy': '지금은 바쁩니다.',
+  'hudChrome.enchanting.disenchantBusy': '지금은 바쁩니다.',
+  'hudChrome.enchanting.salvageBusy': '지금은 바쁩니다.',
+  'hudChrome.enchanting.enchantBusy': '지금은 바쁩니다.',
+  'guide.profPages.econ.castPaceHeading': '시전 시간과 골드 소모',
+  'guide.profPages.econ.castPaceBody':
+    '전문 기술 행동은 실제 시전 시간이 걸립니다. 간단한 야외 제작법은 2초 남짓, 상위 사다리 제작법은 몇 초, 마력 추출·마법부여·분해·도구 효과 충전은 각각 짧은 고정 시전입니다. 시전 중 취소해도 재료를 잃지 않습니다. 성공한 제작마다 아이템 예산에 비례한 구리 수수료도 지불합니다. 재료, 작업대, 숙련도 상한과 함께 이 속도는 별도의 행동 한도 없이도 시장을 건전하게 유지합니다. 숙련도 구간별 정확한 시전 시간은 아래에 있습니다.',
+  'guide.profPages.econ.castPaceField': '필드 제작법(숙련도 요구 없음): {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill25': '숙련도 25까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill50': '숙련도 50까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceSkill75': '숙련도 75까지의 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceCombo': '최상위 및 조합 제작법: {seconds}초 시전',
+  'guide.profPages.econ.castPaceEnchantFamily': '마력 추출·마법부여·분해: {seconds}초 시전',
+  'guide.profPages.econ.castPaceRecharge': '도구 효과 충전: {seconds}초 시전',
+  'guide.profPages.econ.castPaceBatch': '일괄 제작: 한 번에 최대 {count}개, 각각 시전',
 };
