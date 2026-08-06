@@ -1448,6 +1448,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Peliharaan: Serang',
   'hudChrome.keybinds.petDefensive': 'Peliharaan: Defensif',
   'hudChrome.keybinds.petStop': 'Peliharaan: Berhenti',
+  'hudChrome.keybinds.targetPet': 'Peliharaan: Bidik',
   'hudChrome.keybinds.petTaunt': 'Peliharaan: Ejek',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Kirim satu {item} lebih sedikit',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Kirim satu {item} lebih banyak',
@@ -7684,6 +7685,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grup {n}',
   'hudChrome.unitFrame.partyLabel': 'Kelompok Anda',
   'hudChrome.unitFrame.playerLabel': 'Pahlawan Anda',
+  'hudChrome.unitFrame.petLabel': 'Peliharaan Anda',
   'hudChrome.unitFrame.targetAnnounce': 'Tandai {name}',
   'hudChrome.unitFrame.targetLabel': 'Sasaran Anda',
   'hudChrome.widgets.clockTitle': 'Waktu lokal - klik untuk beralih 12/24 jam',
@@ -10168,6 +10170,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hud.combat.evaded': '{ability}-mu dihindari oleh {target}.',
   'hudChrome.options.mouseoverCast': 'Rapal Saat Menyorot Bingkai Kelompok',
   'hudChrome.options.showTargetOfTarget': 'Tampilkan Sasaran dari Sasaran',
+  'hudChrome.options.showPetFrame': 'Tampilkan Peliharaan Anda',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Sasaran dari Sasaran',
   'itemUi.market.rarityLegendary': 'Legendaris',
   'loading.reconnectingAttempt':

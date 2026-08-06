@@ -2493,6 +2493,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.partyGroup': 'Grupo {n}',
   'hudChrome.unitFrame.partyLabel': 'Tu grupo',
   'hudChrome.unitFrame.playerLabel': 'Tu personaje',
+  'hudChrome.unitFrame.petLabel': 'Tu mascota',
   'hudChrome.unitFrame.targetAnnounce': 'Objetivo: {name}',
   'hudChrome.unitFrame.targetLabel': 'Tu objetivo',
   'seo.officialLabel': 'Sitio web oficial de World of ClaudeCraft',
@@ -9345,6 +9346,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'Mascota: atacar',
   'hudChrome.keybinds.petDefensive': 'Mascota: defensiva',
   'hudChrome.keybinds.petStop': 'Mascota: detenerse',
+  'hudChrome.keybinds.targetPet': 'Mascota: seleccionar',
   'hudChrome.keybinds.petTaunt': 'Mascota: provocar',
   'hudChrome.mailbox.parcelQtyDecreaseAria': 'Enviar un {item} menos',
   'hudChrome.mailbox.parcelQtyIncreaseAria': 'Enviar un {item} más',
@@ -10269,6 +10271,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu probabilidad de parar por completo un ataque cuerpo a cuerpo frontal, sin recibir daño. Un golpe por la espalda no se puede parar.',
   'hudChrome.options.mouseoverCast': 'Lanzar al pasar el cursor sobre los marcos de grupo',
   'hudChrome.options.showTargetOfTarget': 'Mostrar el objetivo del objetivo',
+  'hudChrome.options.showPetFrame': 'Mostrar tu mascota',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Objetivo del objetivo',
   'itemUi.market.rarityLegendary': 'Legendario',
   'loading.reconnectingAttempt':

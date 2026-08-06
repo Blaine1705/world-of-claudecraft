@@ -325,6 +325,12 @@ export class PartyFramesPainter {
       // above; the group label needs the same treatment, from the live slot + last raid
       // flag, since a language switch does not flip partyFrameSignature).
       this.writers.setText(row.group, this.groupLabel(row.slot.member, this.lastRaid));
+      // The pet sliver's accessible name is the only text on it, and it is built
+      // through t() like the group label, so it needs the same arm. Routed through
+      // the SAME paintPet the sync path uses rather than re-emitting the label
+      // inline, so the two can never drift; every other write it makes is elided
+      // to a no-op here because only the language moved.
+      this.paintPet(row, row.slot.member);
     }
     for (const row of this.free) row.relocalize();
     // Re-emit the chip caption in the new language while it is shown (a language

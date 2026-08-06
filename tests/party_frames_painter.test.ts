@@ -878,3 +878,86 @@ describe('petRowHandlers: the pet sliver selects the pet, not the member', () =>
     expect(calls.pet).toEqual([90, 90]);
   });
 });
+
+// A language switch does NOT move partyFrameSignature (it digests data, not text), so
+// the Hud never re-syncs the party frames for one. Every piece of t()-built text on a
+// pooled row therefore needs an arm in relocalize(), and the pet sliver's accessible
+// name is the only text the sliver has: without this a screen-reader user keeps
+// hearing the pet's health in the previous language while the rest of the row
+// switches. Pinned here because no data-driven test can catch it: the fixture must
+// change the LANGUAGE and nothing else.
+describe('PartyFramesPainter.relocalize: the pet sliver label follows a language switch', () => {
+  // The facet RECORDS writes rather than mutating the fake DOM, so assert on the
+  // recorded setText targeting the sliver's label node, not on textContent (which
+  // stays empty here and would make every assertion vacuously pass).
+  type Node = { className?: unknown; childNodes: Node[] };
+  const findByClass = (root: Node, cls: string): Node | undefined => {
+    for (const c of root.childNodes ?? []) {
+      if (String(c.className ?? '').includes(cls)) return c;
+      const deep = findByClass(c, cls);
+      if (deep) return deep;
+    }
+    return undefined;
+  };
+
+  const setup = (withPet: boolean) => {
+    const facet = recordingFacet();
+    const container = fakeDoc.createElement('div');
+    let lang = 'en';
+    const painter = new PartyFramesPainter(
+      facet.writers,
+      container as unknown as HTMLElement,
+      {
+        classCss: () => 'var(--cls)',
+        onTarget: () => {},
+        onContextMenu: () => {},
+        onHover: () => {},
+        onTargetPet: () => {},
+        // Stands in for t(): same pet data, different language.
+        petLabel: (name: string, frac: number) => `${lang}:${name} ${Math.round(frac * 100)}%`,
+        chipLabel: () => 'Party',
+        onToggleCollapse: () => {},
+        partyAuras: auraDeps,
+      },
+      fakeDoc,
+    );
+    const m = withPet
+      ? member({ pid: 2, pet: { id: 90, name: 'Fang', hp: 20, maxHp: 40, dead: false } })
+      : member({ pid: 2 });
+    painter.sync([m], 1, false);
+    const labelEl = findByClass(container as unknown as Node, 'pfm-pet-label');
+    const labelWrites = () =>
+      facet.calls.filter((c) => c.m === 'setText' && c.el === labelEl).map((c) => c.args[0]);
+    return {
+      painter,
+      labelWrites,
+      setLang: (l: string) => {
+        lang = l;
+      },
+    };
+  };
+
+  it('paints the sliver label in the current language on the first sync', () => {
+    const { labelWrites } = setup(true);
+    expect(labelWrites()).toContain('en:Fang 50%');
+  });
+
+  it('re-emits the label on relocalize with NO party data change', () => {
+    const { painter, labelWrites, setLang } = setup(true);
+    const before = labelWrites().length;
+    setLang('de');
+    painter.relocalize();
+    const after = labelWrites();
+    expect(after.length).toBeGreaterThan(before);
+    expect(after[after.length - 1]).toBe('de:Fang 50%');
+  });
+
+  it('blanks rather than resurrects a label for a member with no pet', () => {
+    const { painter, labelWrites, setLang } = setup(false);
+    setLang('de');
+    painter.relocalize();
+    // Every write to a petless row's label must be the empty string: a stale pet
+    // name must never be announced by a row whose pet is gone.
+    expect(labelWrites().every((v) => v === '')).toBe(true);
+  });
+});
