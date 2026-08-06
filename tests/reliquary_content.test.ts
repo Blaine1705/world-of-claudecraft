@@ -12,7 +12,12 @@ import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers
 import { DELVE_SHOPS } from '../src/sim/content/delves/shop';
 import { HEROIC_BOSS_LOOT, NYTHRAXIS_RAID_BOSS_ID } from '../src/sim/content/heroic_loot';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
-import { CRAFT_RING, HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
+import {
+  CRAFT_RING,
+  craftById,
+  GATHERING_PROFESSIONS,
+  HARVEST_COMPONENT_SPECIMENS,
+} from '../src/sim/content/professions';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
@@ -30,10 +35,16 @@ import {
   RELIQUARY_PROFESSION_SPECIMEN_ITEMS,
   RELIQUARY_SET_MEMBERS,
   type ReliquaryPageDef,
+  type ReliquaryRelicDef,
+  type ReliquarySourceHint,
+  reliquaryRelicSource,
 } from '../src/sim/content/reliquary';
 import { WEAPON_SKIN_LIST, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
-import { DELVES, DUNGEONS, ITEMS, MOBS } from '../src/sim/data';
+import { DELVES, DUNGEONS, ITEMS, MOBS, NPCS, ZONES } from '../src/sim/data';
 import type { LootTier } from '../src/sim/lockpick';
+import { gatherRareEventFlavor } from '../src/sim/professions/gather_events';
+import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { catalogCharacterCompletion, catalogRelicCompletion } from '../src/sim/reliquary';
 import { Rng } from '../src/sim/rng';
 import { DEED_STAT_KEYS, type ItemDef, type PlayerClass } from '../src/sim/types';
@@ -1081,5 +1092,564 @@ describe('Reliquary vs character creation', () => {
         expect(isCataloguedRelicItem(itemId), `${classId} starter ${itemId}`).toBe(false);
       }
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Source hints: the catalog's answer to "where do I get this?"
+// ---------------------------------------------------------------------------
+
+/** The id a relic slot carries, whatever its kind. */
+function relicSlotId(relic: ReliquaryRelicDef): string {
+  switch (relic.kind) {
+    case 'item':
+      return relic.itemId;
+    case 'mark':
+      return relic.markId;
+    case 'mount':
+      return relic.mountId;
+    case 'weapon_skin':
+      return relic.skinId;
+    case 'title':
+      return relic.deedId;
+  }
+}
+
+const ZONE_IDS = new Set(ZONES.map((z) => z.id));
+const PROFESSION_SOURCE_IDS = new Set<string>([
+  ...Object.keys(GATHERING_PROFESSIONS),
+  ...CRAFT_RING.map((c) => c.id),
+]);
+
+/**
+ * Does an authored sourceId exist in the live table its kind names? The switch
+ * is exhaustive with no default, so a new ReliquarySourceKind fails tsc here
+ * until its id space is wired, rather than silently validating against nothing.
+ *
+ * Boss ids are checked by MOBS KEY MEMBERSHIP, never by rank flags: the catalog
+ * credits mid-bosses (knight_commander_olen, choirmother_selthe,
+ * korgath_the_bound, grand_necromancer_velkhar) that are elite without boss,
+ * and named rares (wildheart_beastmaster, ironvein_foreman, marrowlord_varkas),
+ * all of which a flag check would wrongly reject.
+ */
+function sourceIdResolves(hint: ReliquarySourceHint): boolean {
+  switch (hint.sourceKind) {
+    case 'boss':
+      return MOBS[hint.sourceId] !== undefined;
+    case 'vendor':
+      return NPCS[hint.sourceId] !== undefined;
+    case 'zone':
+      return ZONE_IDS.has(hint.sourceId);
+    case 'profession':
+      return PROFESSION_SOURCE_IDS.has(hint.sourceId);
+    case 'deed':
+      return DEEDS[hint.sourceId] !== undefined;
+  }
+}
+
+/** Every (page, relic) slot in table order, the shape most checks below walk. */
+const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
+  page.relics.map((relic) => ({ page, relic, slotId: relicSlotId(relic) })),
+);
+
+/**
+ * Relic SLOTS content does not name one source for, keyed by page so the
+ * exemption is per (page, relic) rather than per id. That scoping is
+ * load-bearing: several ids sit on two pages, and a bare id key would let one
+ * hinted on its boss page but bare on its set page (or the reverse) escape the
+ * coverage sweep on the strength of the other page's authoring.
+ *
+ * Every row is a deliberate, evidenced exclusion awaiting a MAINTAINER RULING,
+ * never an authoring gap: authoring any of them would mean inventing an answer
+ * the content does not support. The bidirectional pin below holds this table
+ * exactly equal to the un-hinted set, so a ruling that lands must delete its
+ * row here in the same change.
+ */
+const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
+  // Each drops from TWO live Gravewyrm Sanctum tables at once with no primary:
+  // a trash family (sanctum_boneguard / sanctum_drakonid, 9 spawns each) and a
+  // mid-boss or Korzul (1 spawn each), at chances close enough that neither the
+  // per-kill rate nor the per-run expectation settles it.
+  conquerors_gravewyrm_sanctum: [
+    'boundstone_helm',
+    'boundstone_girdle',
+    'gravewyrm_mantle',
+    'gravewyrm_gauntlets',
+    'staff_of_velkhar',
+    'shadowmeld_tunic',
+  ],
+  // Both rares reach the player from the lockpick chest AND Brother Halven's
+  // heroicClear Marks stock: two live routes with no primary.
+  conquerors_collapsed_reliquary: ['deacon_reliquary_helm', 'varric_shadow_cowl'],
+  // Rite reliquary chest only, which this vocabulary cannot name at all (it is
+  // opened by the Rite puzzle in src/sim/delves/drowned_litany_rite.ts, not a
+  // boss kill, so it is neither boss, vendor, nor zone). The page's other two
+  // relics are Marks-stock only and ARE hinted.
+  conquerors_drowned_litany: [
+    'nhalias_bell_maul',
+    'widow_silk_hood',
+    'nhalias_litany_rod',
+    'blackwater_vanguard_chest',
+    'siltstep_leggings',
+    'sunken_reliquary_hood',
+  ],
+  // The first lifetime masterwork fires on ANY of the five gear crafts, so no
+  // single profession id is its source.
+  professions_masterwork: [RELIQUARY_PROFESSION_MARKS.masterworkFirst],
+  // Corpse harvest belongs to no gathering profession (NODE_HARVEST_TABLE
+  // covers ore, wood, and herb nodes only), so its find mark and its jackpots
+  // have no profession id to name.
+  professions_field_notes: ['gather_event:perfect_specimen'],
+  professions_specimens: [
+    'pristine_hide',
+    'pristine_silk',
+    'pristine_venom_gland',
+    'prime_cut',
+    'pristine_claw',
+  ],
+  // Both Horizons rulings are PAGE-WIDE rather than per-id, so these two derive
+  // from the catalog lists instead of restating them: a new mount or skin joins
+  // the same open ruling rather than escaping it. Mounts: every one has several
+  // live routes at once (two or three HEROIC_BOSS_LOOT bosses plus Rift
+  // progression; vendor plus quest for valorsteed) or none at all
+  // (drakemaw_raptor has no acquisition path, terrorspark_groundshaker is
+  // dev-grant only). Skins: granted only by Claudium store purchases, an
+  // account storefront that is not a boss, zone, profession, deed, or NPC.
+  horizons_mounts: RELIQUARY_HORIZON_MOUNTS,
+  horizons_weapon_skins: RELIQUARY_HORIZON_WEAPON_SKINS,
+};
+
+/** `pageId:slotId` keys, the shape the sweeps below test membership against. */
+const PENDING_KEYS = new Set<string>(
+  Object.entries(SOURCE_PENDING_RULING).flatMap(([pageId, ids]) =>
+    ids.map((id) => `${pageId}:${id}`),
+  ),
+);
+
+function slotKey(pageId: string, slotId: string): string {
+  return `${pageId}:${slotId}`;
+}
+
+/** Distinct resolved sources per page. Literal and COMPLETE (all 28 pages), so
+ *  partial authoring cannot pass: a page that loses half its hints reds here
+ *  even while every surviving hint still validates. Update deliberately with
+ *  the authoring, the same regime as the totals pins above. */
+const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
+  conquerors_hollow_crypt: 1,
+  conquerors_hollow_crypt_heroic: 1,
+  conquerors_sunken_bastion: 2,
+  conquerors_sunken_bastion_heroic: 1,
+  conquerors_drowned_temple: 2,
+  conquerors_drowned_temple_heroic: 1,
+  conquerors_gravewyrm_sanctum: 4,
+  conquerors_gravewyrm_sanctum_heroic: 1,
+  conquerors_wildheart_basin: 2,
+  conquerors_wildheart_basin_heroic: 1,
+  conquerors_nythraxis: 1,
+  conquerors_nythraxis_heroic: 1,
+  conquerors_thunzharr: 1,
+  conquerors_collapsed_reliquary: 0,
+  conquerors_drowned_litany: 1,
+  conquerors_set_deathlord: 3,
+  conquerors_set_wyrmshadow: 3,
+  conquerors_set_necromancers: 3,
+  conquerors_set_crownforged: 2,
+  conquerors_set_nighttalon: 2,
+  conquerors_set_soulflame: 2,
+  conquerors_set_stormcallers: 2,
+  professions_masterwork: 5,
+  professions_field_notes: 3,
+  professions_specimens: 3,
+  horizons_mounts: 0,
+  horizons_weapon_skins: 0,
+  horizons_titles: 33,
+};
+
+/** Pages whose relics provably come from more than one source, so a page-level
+ *  default could never be right for them. Named literally (not derived from the
+ *  authoring) so under-authoring one of them cannot quietly pass. */
+const KNOWN_MULTI_SOURCE_PAGES = [
+  // The four dungeons whose relics span two or more of their own bosses.
+  'conquerors_sunken_bastion',
+  'conquerors_drowned_temple',
+  'conquerors_gravewyrm_sanctum',
+  'conquerors_wildheart_basin',
+  // All SEVEN set pages: members are gathered from across the world, which is
+  // the point of a set page (raid, world boss, Sanctum mid-bosses, and for
+  // deathlord / necromancers an open-world rare).
+  'conquerors_set_deathlord',
+  'conquerors_set_wyrmshadow',
+  'conquerors_set_necromancers',
+  'conquerors_set_crownforged',
+  'conquerors_set_nighttalon',
+  'conquerors_set_soulflame',
+  'conquerors_set_stormcallers',
+  // Professions pages span the professions they cover.
+  'professions_masterwork',
+  'professions_field_notes',
+  'professions_specimens',
+  // Horizons titles: one deed per title. The other two Horizons pages carry NO
+  // authored source at all (both are page-wide pending rulings), which is why
+  // they are absent here and pinned at 0 in EXPECTED_DISTINCT_SOURCES instead.
+  'horizons_titles',
+];
+
+function resolvedSourcesFor(pageId: string): ReliquarySourceHint[] {
+  const page = RELIQUARY_PAGES_BY_ID[pageId];
+  const out: ReliquarySourceHint[] = [];
+  for (const relic of page.relics) {
+    const hint = reliquaryRelicSource(page, relic);
+    if (hint) out.push(hint);
+  }
+  return out;
+}
+
+function distinctSourceKeys(pageId: string): Set<string> {
+  return new Set(resolvedSourcesFor(pageId).map((h) => `${h.sourceKind}:${h.sourceId}`));
+}
+
+describe('Reliquary source hints resolve against live content', () => {
+  it('every authored sourceId exists in the live table its kind names', () => {
+    const offenders: string[] = [];
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      const hint = reliquaryRelicSource(page, relic);
+      if (hint && !sourceIdResolves(hint)) {
+        offenders.push(`${page.id}:${slotId} -> ${hint.sourceKind}:${hint.sourceId}`);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('sourceIdResolves accepts live ids and rejects fabricated ones, per kind', () => {
+    // Every arm exercised in both directions, so none can rot into a vacuous
+    // `true`. The zone arm has no authored user in the catalog today (no relic
+    // is a plain world drop), and this is the only thing keeping it honest for
+    // the day one lands.
+    const live: ReliquarySourceHint[] = [
+      { sourceKind: 'boss', sourceId: 'korzul_the_gravewyrm' },
+      { sourceKind: 'vendor', sourceId: 'brother_halven_marsh' },
+      { sourceKind: 'zone', sourceId: ZONES[0].id },
+      { sourceKind: 'profession', sourceId: 'mining' },
+      { sourceKind: 'profession', sourceId: 'weaponcrafting' },
+      { sourceKind: 'deed', sourceId: 'col_seven_regalia' },
+    ];
+    for (const hint of live) {
+      expect(sourceIdResolves(hint), `${hint.sourceKind}:${hint.sourceId}`).toBe(true);
+    }
+    const fabricated: ReliquarySourceHint[] = [
+      { sourceKind: 'boss', sourceId: 'not_a_mob' },
+      { sourceKind: 'vendor', sourceId: 'not_an_npc' },
+      { sourceKind: 'zone', sourceId: 'not_a_zone' },
+      { sourceKind: 'profession', sourceId: 'not_a_profession' },
+      { sourceKind: 'deed', sourceId: 'not_a_deed' },
+    ];
+    for (const hint of fabricated) {
+      expect(sourceIdResolves(hint), `${hint.sourceKind}:${hint.sourceId}`).toBe(false);
+    }
+    // Cross-kind guard: a real id from the WRONG table must still be rejected,
+    // so the arms cannot be answering from one shared pool.
+    expect(sourceIdResolves({ sourceKind: 'boss', sourceId: 'brother_halven_marsh' })).toBe(false);
+    expect(sourceIdResolves({ sourceKind: 'vendor', sourceId: 'korzul_the_gravewyrm' })).toBe(
+      false,
+    );
+    expect(sourceIdResolves({ sourceKind: 'deed', sourceId: 'mining' })).toBe(false);
+  });
+
+  it('every boss hint names a mob whose live loot really carries the relic', () => {
+    // Existence is not truth: MOBS[sourceId] merely proves the id is a real
+    // mob, which a plausible-but-wrong boss would also satisfy. This walks the
+    // RESOLVED hint (inherited page defaults included, so the sourceDefault
+    // pages are covered too) back to the live loot row that has to justify it,
+    // through both award paths: the normal MobTemplate.loot table and the
+    // separate HEROIC_BOSS_LOOT table the heroic pages are built from.
+    const offenders: string[] = [];
+    let checked = 0;
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (relic.kind !== 'item' && relic.kind !== 'mark') continue;
+      const hint = reliquaryRelicSource(page, relic);
+      if (hint?.sourceKind !== 'boss') continue;
+      checked += 1;
+      const fromLoot = (MOBS[hint.sourceId]?.loot ?? []).some((e) => e.itemId === slotId);
+      const heroic = HEROIC_BOSS_LOOT[hint.sourceId as keyof typeof HEROIC_BOSS_LOOT] ?? [];
+      const fromHeroic = heroic.some((e) => e.itemId === slotId);
+      if (!fromLoot && !fromHeroic) {
+        offenders.push(`${page.id}:${slotId} credits ${hint.sourceId}, which never drops it`);
+      }
+    }
+    expect(offenders).toEqual([]);
+    // Vacuity floor: the sweep is worthless if it walked nothing. Literal,
+    // matching the authored boss coverage; update deliberately with the
+    // authoring, same regime as the totals pins above.
+    expect(checked).toBeGreaterThanOrEqual(137);
+  });
+
+  it('every vendor hint names an NPC whose live stock really sells the relic', () => {
+    // Same truth standard on the vendor arm. Stock is reached the way the game
+    // reaches it: a delve's board NPC fronts that delve's DELVE_SHOPS counter.
+    const stockByNpc = new Map<string, Set<string>>();
+    for (const [delveId, delve] of Object.entries(DELVES)) {
+      const stock = stockByNpc.get(delve.boardNpcId) ?? new Set<string>();
+      for (const entry of DELVE_SHOPS[delveId] ?? []) stock.add(entry.itemId);
+      stockByNpc.set(delve.boardNpcId, stock);
+    }
+    const offenders: string[] = [];
+    let checked = 0;
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (relic.kind !== 'item' && relic.kind !== 'mark') continue;
+      const hint = reliquaryRelicSource(page, relic);
+      if (hint?.sourceKind !== 'vendor') continue;
+      checked += 1;
+      if (!stockByNpc.get(hint.sourceId)?.has(slotId)) {
+        offenders.push(`${page.id}:${slotId} credits ${hint.sourceId}, whose stock lacks it`);
+      }
+    }
+    expect(offenders).toEqual([]);
+    // Vacuity floor: the two Drowned Litany Marks-stock rares.
+    expect(checked).toBeGreaterThanOrEqual(2);
+  });
+
+  it('every gathering profession hint names the profession that really awards it', () => {
+    // The third truth pin, matching the boss and vendor arms above. Membership
+    // in GATHERING_PROFESSIONS only proves the id is a real profession, which a
+    // SWAPPED pair (pristine_vein credited to herbalism, moonlit_bloom to
+    // mining) satisfies just as well. This derives the answer instead, walking
+    // each authored row back to the live tables the source comments name.
+    //
+    // Field notes: gatherRareEventFlavor maps the node type to the flavor, and
+    // NODE_HARVEST_TABLE maps that same node type to the profession that works
+    // it. Specimens: MATERIAL_GRADES maps a base material to its fine grade,
+    // and NODE_MATERIAL_TABLE says which node type yields that base material.
+    // Nothing below restates the authoring; both maps are built from live data.
+    const nodeTypes = Object.keys(NODE_HARVEST_TABLE) as (keyof typeof NODE_HARVEST_TABLE)[];
+    const expectedBySlotId = new Map<string, string>();
+    const conflicts: string[] = [];
+    const remember = (slotId: string, professionId: string) => {
+      const prior = expectedBySlotId.get(slotId);
+      if (prior !== undefined && prior !== professionId) {
+        conflicts.push(`${slotId} derives both ${prior} and ${professionId}`);
+      }
+      expectedBySlotId.set(slotId, professionId);
+    };
+    for (const nodeType of nodeTypes) {
+      const professionId = NODE_HARVEST_TABLE[nodeType].professionId;
+      remember(`gather_event:${gatherRareEventFlavor(nodeType)}`, professionId);
+      for (const zoneRow of Object.values(NODE_MATERIAL_TABLE[nodeType])) {
+        const fineItemId = MATERIAL_GRADES[zoneRow.itemId]?.fineItemId;
+        if (fineItemId !== undefined) remember(fineItemId, professionId);
+      }
+    }
+    // A slot deriving two professions would make the comparison below
+    // meaningless, so it fails here rather than silently picking the last one.
+    expect(conflicts).toEqual([]);
+    // Premise guard: the derivation really reached both families and every
+    // node type, so a table that stopped contributing cannot leave this test
+    // quietly comparing nothing.
+    expect(nodeTypes.length).toBe(3);
+    expect(expectedBySlotId.get('gather_event:pristine_vein')).toBeDefined();
+    expect(expectedBySlotId.get('fine_thorium_ore')).toBeDefined();
+
+    const offenders: string[] = [];
+    let checked = 0;
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      const hint = reliquaryRelicSource(page, relic);
+      if (hint?.sourceKind !== 'profession') continue;
+      // masterwork:<craft> rows are DERIVED from the mark id itself, so they
+      // cannot disagree with their own source by construction; the craftById
+      // test below is their pin. Everything else must be derivable here, and an
+      // unknown slot is an offender rather than a skip, so a new
+      // profession-hinted relic cannot escape this sweep by being unlisted.
+      if (slotId.startsWith('masterwork:')) continue;
+      checked += 1;
+      const expected = expectedBySlotId.get(slotId);
+      if (expected === undefined) {
+        offenders.push(`${page.id}:${slotId} has no live table deriving a profession`);
+      } else if (expected !== hint.sourceId) {
+        offenders.push(
+          `${page.id}:${slotId} credits ${hint.sourceId}, live tables say ${expected}`,
+        );
+      }
+    }
+    expect(offenders).toEqual([]);
+    // Vacuity floor: three field-note marks plus three fine-material jackpots.
+    expect(checked).toBeGreaterThanOrEqual(6);
+  });
+
+  it('authored craft professions resolve through the live craftById lookup', () => {
+    // The gathering ids are covered by the GATHERING_PROFESSIONS half of the
+    // set above; this walks the craft half through the real accessor the call
+    // sites use, which throws rather than answering undefined on a bad id.
+    const crafts = new Set(
+      RELIC_SLOTS.map(({ page, relic }) => reliquaryRelicSource(page, relic))
+        .filter((h): h is ReliquarySourceHint => h?.sourceKind === 'profession')
+        .map((h) => h.sourceId)
+        .filter((id) => !(id in GATHERING_PROFESSIONS)),
+    );
+    // Vacuity floor: the five gear crafts on the masterwork page.
+    expect(crafts.size).toBeGreaterThanOrEqual(5);
+    for (const craftId of crafts) {
+      expect(() => craftById(craftId), craftId).not.toThrow();
+      expect(craftById(craftId).id, craftId).toBe(craftId);
+    }
+  });
+});
+
+describe('Reliquary source hint coverage', () => {
+  it('every relic resolves to a source except the pinned pending rulings', () => {
+    const unhinted: string[] = [];
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (reliquaryRelicSource(page, relic) !== null) continue;
+      if (PENDING_KEYS.has(slotKey(page.id, slotId))) continue;
+      unhinted.push(`${page.id}:${slotId}`);
+    }
+    expect(unhinted).toEqual([]);
+  });
+
+  it('SOURCE_PENDING_RULING is exactly the un-hinted set (no stale exclusions)', () => {
+    // The other direction: an id that GAINS a hint must lose its pending row in
+    // the same change, so the exclusion list can never quietly outlive the
+    // ruling that retires it.
+    const actuallyUnhinted = new Set<string>();
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (reliquaryRelicSource(page, relic) === null)
+        actuallyUnhinted.add(slotKey(page.id, slotId));
+    }
+    expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
+    // Vacuity floor: this suite is worth nothing if almost everything is
+    // excluded. Literal: tighten as rulings land.
+    const hinted = RELIC_SLOTS.length - actuallyUnhinted.size;
+    expect(hinted).toBeGreaterThanOrEqual(180);
+  });
+
+  it('multi-source pages give every item relic its OWN hint (no inherited stragglers)', () => {
+    // A page whose relics really come from two or more sources must not lean on
+    // a page default for any of them: one inherited straggler would answer with
+    // a confidently wrong boss. Pending-ruling ids are exempt because they carry
+    // no hint at all, which is never wrong, only absent.
+    const offenders: string[] = [];
+    for (const page of RELIQUARY_PAGES) {
+      if (distinctSourceKeys(page.id).size < 2) continue;
+      for (const relic of page.relics) {
+        if (relic.kind !== 'item') continue;
+        const slotId = relicSlotId(relic);
+        if (PENDING_KEYS.has(slotKey(page.id, slotId))) continue;
+        if (relic.source === undefined) offenders.push(slotKey(page.id, slotId));
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('pins the distinct source count of every page', () => {
+    const derived: Record<string, number> = {};
+    for (const page of RELIQUARY_PAGES) derived[page.id] = distinctSourceKeys(page.id).size;
+    expect(derived).toEqual(EXPECTED_DISTINCT_SOURCES);
+  });
+
+  it('every known multi-source page really resolves to two or more sources', () => {
+    const offenders: string[] = [];
+    for (const pageId of KNOWN_MULTI_SOURCE_PAGES) {
+      expect(RELIQUARY_PAGES_BY_ID[pageId], pageId).toBeDefined();
+      const count = distinctSourceKeys(pageId).size;
+      if (count < 2) offenders.push(`${pageId} resolves to ${count} source(s)`);
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it('a relic listed on two pages answers with the same source on both', () => {
+    // Set members sit on both their boss page and their set page, authored in
+    // two different places (the page table and SET_MEMBER_SOURCES). Those two
+    // authorings must agree, or the same trophy would tell a player two
+    // different stories depending on which page they opened.
+    const byId = new Map<string, Map<string, string[]>>();
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      const hint = reliquaryRelicSource(page, relic);
+      if (!hint) continue;
+      const key = `${hint.sourceKind}:${hint.sourceId}`;
+      const seen = byId.get(slotId) ?? new Map<string, string[]>();
+      seen.set(key, [...(seen.get(key) ?? []), page.id]);
+      byId.set(slotId, seen);
+    }
+    const offenders: string[] = [];
+    for (const [slotId, seen] of byId) {
+      if (seen.size < 2) continue;
+      const detail = [...seen]
+        .map(([key, pages]) => `${key} on ${pages.sort().join('+')}`)
+        .sort()
+        .join(' vs ');
+      offenders.push(`${slotId}: ${detail}`);
+    }
+    expect(offenders).toEqual([]);
+    // Vacuity floor: the cross-page arm only checks something while shared
+    // relics exist. Every set member except the two open-world drops is one.
+    const shared = [...byId].filter(([id]) => (RELIQUARY_ITEM_TO_PAGES.get(id) ?? []).length > 1);
+    expect(shared.length).toBeGreaterThanOrEqual(26);
+  });
+});
+
+describe('reliquaryRelicSource precedence', () => {
+  it('prefers the relic hint over the page default', () => {
+    // Live pairing: the Sanctum page has no default and every hinted row owns
+    // its source, while the heroic page defaults for all of them.
+    const sanctum = RELIQUARY_PAGES_BY_ID.conquerors_gravewyrm_sanctum;
+    expect(sanctum.sourceDefault).toBeUndefined();
+    const korzulRelic = sanctum.relics.find(
+      (r) => r.kind === 'item' && r.itemId === 'fang_of_korzul',
+    );
+    expect(korzulRelic, 'fang_of_korzul').toBeDefined();
+    expect(reliquaryRelicSource(sanctum, korzulRelic!)).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'korzul_the_gravewyrm',
+    });
+    // A relic hint WINS over a page default that disagrees.
+    const defaulted = RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt;
+    expect(defaulted.sourceDefault).toEqual({ sourceKind: 'boss', sourceId: 'morthen' });
+    expect(
+      reliquaryRelicSource(defaulted, {
+        kind: 'item',
+        itemId: 'cryptbone_helm',
+        source: { sourceKind: 'boss', sourceId: 'ysolei' },
+      }),
+    ).toEqual({ sourceKind: 'boss', sourceId: 'ysolei' });
+  });
+
+  it('falls back to the page default, then to null', () => {
+    const bare: ReliquaryRelicDef = { kind: 'item', itemId: 'cryptbone_helm' };
+    expect(reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt, bare)).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'morthen',
+    });
+    // A page with no default answers null for an un-hinted relic.
+    expect(RELIQUARY_PAGES_BY_ID.horizons_mounts.sourceDefault).toBeUndefined();
+    expect(
+      reliquaryRelicSource(RELIQUARY_PAGES_BY_ID.horizons_mounts, {
+        kind: 'mount',
+        mountId: 'valorsteed',
+      }),
+    ).toBe(null);
+    // No page at all is null, never a throw: the resolver is a lookup the
+    // client calls per relic, not a validator.
+    expect(reliquaryRelicSource(undefined, bare)).toBe(null);
+  });
+
+  it('reads the default off the PASSED page, never a catalog lookup by id', () => {
+    // The reason the resolver takes a def rather than a page id. A synthetic
+    // page reusing a live catalog id must answer with its OWN default; an
+    // id-keyed lookup would silently hand back the live row's boss instead.
+    const shadow: ReliquaryPageDef = {
+      id: 'conquerors_hollow_crypt',
+      shelf: 'conquerors',
+      name: 'Synthetic shadow of a live page id',
+      sourceDefault: { sourceKind: 'zone', sourceId: 'synthetic_zone' },
+      relics: [{ kind: 'item', itemId: 'cryptbone_helm' }],
+    };
+    // Premise: the live page of that id really does default to a different
+    // source, so this test cannot pass by the two happening to agree.
+    expect(RELIQUARY_PAGES_BY_ID[shadow.id].sourceDefault).toEqual({
+      sourceKind: 'boss',
+      sourceId: 'morthen',
+    });
+    expect(reliquaryRelicSource(shadow, shadow.relics[0])).toEqual({
+      sourceKind: 'zone',
+      sourceId: 'synthetic_zone',
+    });
   });
 });
