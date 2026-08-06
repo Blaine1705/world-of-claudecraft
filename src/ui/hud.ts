@@ -5699,8 +5699,8 @@ export class Hud {
     html += instanceMakersMarkLine(instance, item.kind);
     // Stackables state their per-slot cap (sim/bags.ts stackSizeOf), so a
     // player holding a single potion learns more copies will share the slot;
-    // 1-per-slot kinds render nothing here.
-    html += stackSizeTooltipLine(item);
+    // 1-per-slot kinds, mounts, and charge-bearing payloads render nothing.
+    html += stackSizeTooltipLine(item, instance);
     // Gated on the SAME pair the vendor path refuses on (src/sim/items.ts
     // sellItem), never on sellValue alone: a def can carry a sellValue it will
     // never be paid, and advertising a price the server is about to deny is a

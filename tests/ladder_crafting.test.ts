@@ -8,6 +8,7 @@
 // tests/recipe_economy.test.ts; this file is the execution arm.
 import { describe, expect, it } from 'vitest';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
+import type { InvSlot } from '../src/sim/types';
 import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
 import { LADDER_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, STATIONS } from '../src/sim/data';
@@ -212,7 +213,10 @@ describe('crafted potions and elixirs stack', () => {
 
   it('every ladder potion and elixir stacks 20 per slot', () => {
     // 6 draughts + 3 elixirs (the alchemy ladder block in
-    // content/profession_items.ts).
+    // content/profession_items.ts). Exact on purpose, matching this file's
+    // own stance (the sweep above pins the ladder at exactly 54): the ladder
+    // is a closed authored set, so a new rung SHOULD announce itself here
+    // and get its stacking looked at.
     expect(consumableOutputs.length).toBe(9);
     for (const def of consumableOutputs) {
       expect(stackSizeOf(def), `${def.id} must stack to the consumable default`).toBe(20);
@@ -222,7 +226,7 @@ describe('crafted potions and elixirs stack', () => {
   it('crafting the same common potion twice merges into ONE plain stack', () => {
     const { sim, pid, meta, recipe } = craftTwice('recipe_silverleaf_healing_draught');
     expect(sim.countItem(recipe.resultItemId, pid)).toBe(2 * recipe.resultCount);
-    const slots = meta.inventory.filter((s: any) => s.itemId === recipe.resultItemId);
+    const slots = meta.inventory.filter((s: InvSlot) => s.itemId === recipe.resultItemId);
     // ONE slot is the decisive pin: a regression that marks common potion
     // outputs (an instance payload, a craftedRecipeId stamp) fragments the
     // second craft into its own slot and fails here.
@@ -233,18 +237,43 @@ describe('crafted potions and elixirs stack', () => {
     // A copy from any OTHER source (loot, trade, mail) is the same plain add
     // and must share the crafted stack.
     sim.addItem(recipe.resultItemId, 1, pid);
-    const after = meta.inventory.filter((s: any) => s.itemId === recipe.resultItemId);
+    const after = meta.inventory.filter((s: InvSlot) => s.itemId === recipe.resultItemId);
     expect(after.length).toBe(1);
     expect(after[0].count).toBe(2 * recipe.resultCount + 1);
+  });
+
+  it('a looted copy FIRST still shares the slot the next craft tops up', () => {
+    // The order a player actually hits most: hold a potion from loot or
+    // trade, then craft more. The craft path's own add must find the plain
+    // slot rather than opening a second one.
+    const sim = makeSim(11);
+    const pid = primaryOf(sim);
+    const meta = metaOf(sim, pid);
+    meta.copper = 10_000_000;
+    const recipe = LADDER_RECIPES.find((r) => r.id === 'recipe_silverleaf_healing_draught');
+    if (!recipe) throw new Error('expected recipe_silverleaf_healing_draught on the ladder');
+    meta.craftSkills[recipe.professionId] = recipe.skillReq;
+    meta.knownRecipes.add(recipe.id);
+    placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
+    sim.addItem(recipe.resultItemId, 1, pid);
+    meta.craftThrottle.count = 0;
+    for (const reagent of recipe.reagents) sim.addItem(reagent.itemId, reagent.count, pid);
+    runCraft(sim, recipe.id, false, pid);
+    expect(meta.lastCraftResult?.ok, meta.lastCraftResult?.reason).toBe(true);
+    const slots = meta.inventory.filter((s: InvSlot) => s.itemId === recipe.resultItemId);
+    expect(slots.length).toBe(1);
+    expect(slots[0].count).toBe(1 + recipe.resultCount);
   });
 
   it('crafting the same rare draught twice merges into ONE signed stack', () => {
     const { sim, pid, meta, recipe } = craftTwice('recipe_sunpetal_healing_draught');
     expect(ITEMS[recipe.resultItemId].quality).toBe('rare');
     expect(sim.countItem(recipe.resultItemId, pid)).toBe(2 * recipe.resultCount);
-    const slots = meta.inventory.filter((s: any) => s.itemId === recipe.resultItemId);
+    const slots = meta.inventory.filter((s: InvSlot) => s.itemId === recipe.resultItemId);
     // Both crafts mint the same {signer} payload, so the second one must top
-    // up the first craft's instanced slot, never sit beside it.
+    // up the first craft's instanced slot, never sit beside it. The literal
+    // name pin keeps the signer compare from being production-vs-production.
+    expect(meta.name).toBe('Adventurer');
     expect(slots.length).toBe(1);
     expect(slots[0].count).toBe(2 * recipe.resultCount);
     expect(slots[0].instance?.signer).toBe(meta.name);
