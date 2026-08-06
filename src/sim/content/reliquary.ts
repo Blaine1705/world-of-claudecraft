@@ -371,7 +371,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     id: 'conquerors_drowned_temple',
     shelf: 'conquerors',
     name: 'The Drowned Temple',
-    desc: 'Moonshroud spoils from Ysolei, Avatar of the Drowned Moon.',
+    desc: 'Rare spoils from Choirmother Selthe and Ysolei, Avatar of the Drowned Moon.',
     clearSource: { kind: 'dungeon', dungeonId: 'drowned_temple', difficulty: 'normal' },
     relics: items(
       'ysols_pearl_greaves',
