@@ -23,6 +23,11 @@ permissions:
 # isolated from ordinary PR traffic and cannot cancel each other (D4).
 # cancel-in-progress is true for every event in this group; release isolation
 # comes from the event_name segment, not from disabling cancel on push.
+# merge_group runs key on github.ref, which is the queue's own
+# gh-readonly-queue/<branch>/pr-<n>-<sha> ref: unique per live merge group, so
+# cancel-in-progress cannot cross-cancel two live groups (the queue dissolves a
+# group before any ref could be reused), and the event_name segment keeps queue
+# runs from ever colliding with PR or push runs.
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -216,19 +221,31 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
           BEFORE_SHA: ${{ github.event.before }}
           MERGE_GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}
+          MERGE_GROUP_BASE_REF: ${{ github.event.merge_group.base_ref }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
         run: |
           zeros='0000000000000000000000000000000000000000'
           if [ "$EVENT_NAME" = "pull_request" ]; then
             git fetch --no-tags --depth=1 origin "$BASE_REF"
             echo "ref=origin/$BASE_REF" >> "$GITHUB_OUTPUT"
-          elif [ "$EVENT_NAME" = "merge_group" ] && [ -n "$MERGE_GROUP_BASE_SHA" ]; then
+          elif [ "$EVENT_NAME" = "merge_group" ] && printf '%s' "$MERGE_GROUP_BASE_SHA" | grep -qE '^[0-9a-f]{40}$'; then
             # A queue run diffs the merge group against the target-branch tip it
             # was built on. Falling through to the default-branch arm would diff
             # a release/** group against main and drag the whole release delta
-            # (including the intentionally-red whole-repo debt) into biome.
-            git fetch --no-tags --depth=1 origin "$MERGE_GROUP_BASE_SHA"
-            echo "ref=$MERGE_GROUP_BASE_SHA" >> "$GITHUB_OUTPUT"
+            # (including the intentionally-red whole-repo debt) into biome. The
+            # shape guard keeps anything but a bare hex SHA out of GITHUB_OUTPUT
+            # (same belt-and-suspenders standard as detect_code_changes.mjs).
+            if git fetch --no-tags --depth=1 origin "$MERGE_GROUP_BASE_SHA"; then
+              echo "ref=$MERGE_GROUP_BASE_SHA" >> "$GITHUB_OUTPUT"
+            else
+              # Unreachable base SHA (a dissolved predecessor group, or a
+              # transient fetch failure): fall back to the live target-branch
+              # tip, still never the default branch, so one flaky fetch cannot
+              # eject a good PR from the queue with a red required check.
+              base_branch="${MERGE_GROUP_BASE_REF#refs/heads/}"
+              git fetch --no-tags --depth=1 origin "$base_branch"
+              echo "ref=origin/$base_branch" >> "$GITHUB_OUTPUT"
+            fi
           elif [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "$zeros" ]; then
             # Shallow checkout is tip-only; fetch the pre-push tip alone.
             if ! git cat-file -e "${BEFORE_SHA}^{commit}" 2>/dev/null; then
@@ -252,8 +269,12 @@ jobs:
     name: Browser regressions (Chromium)
     # Skip on confirmed docs-only PRs (no browser tests/code touched). Non-PR
     # and code PRs keep the job (changes.code defaults true off PR events).
+    # != 'false', not == 'true': only an explicit docs-only verdict may skip.
+    # A missing or empty output must run the job, matching the classifier's own
+    # fail-closed doctrine; == 'true' is the one place doubt would fail toward
+    # SKIP, and under the merge queue a skipped required check reads satisfied.
     needs: changes
-    if: needs.changes.outputs.code == 'true'
+    if: needs.changes.outputs.code != 'false'
     runs-on: ubuntu-latest
 
     steps:
@@ -312,7 +333,7 @@ jobs:
     # merge_group always lands here (the queue bar is the full PR tier; the
     # release-to-main exclusion is a pull_request-arm concern and cannot match).
     needs: changes
-    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code == 'true'
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     runs-on: ubuntu-latest
 
     # fail-fast stays off: shards pass or fail independently, so one red shard
@@ -373,7 +394,7 @@ jobs:
     # merge_group lands here too: the queue re-proves freshness, typecheck, and
     # every build on the merge result, not just the PR head.
     needs: changes
-    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code == 'true'
+    if: ((github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group') && needs.changes.outputs.code != 'false'
     runs-on: ubuntu-latest
 
     steps:

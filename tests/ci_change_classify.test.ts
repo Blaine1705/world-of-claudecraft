@@ -477,6 +477,22 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
     expect(run.log).toContain('non-PR event');
   });
 
+  it('writes code=true and test_mode=full to GITHUB_OUTPUT for a merge queue run', async () => {
+    // The merge_group event is the queue's own run over the candidate merge
+    // result; the queue is the last pre-merge bar, so the handover the shard
+    // jobs read must be the full-suite contract, end to end through the real
+    // entry, exactly as for push.
+    const run = await runEntry('merge-group', { GITHUB_EVENT_NAME: 'merge_group' });
+    expect(run.exitCode).toBe(0);
+    expect(run.output).toBe(
+      'code=true\n' +
+        'test_mode=full\n' +
+        'test_mode_reason=selection applies to pull requests only: full suite\n' +
+        'changed_files=[]\n',
+    );
+    expect(run.log).toContain('non-PR event');
+  });
+
   it('writes code=false and the selective handover for a docs-only PR through the real fetch path', async () => {
     const run = await runEntry('docs', {
       GITHUB_EVENT_NAME: 'pull_request',

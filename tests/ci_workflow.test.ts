@@ -82,7 +82,11 @@ const PR_TIER_EVENT_FRAGMENT =
 
 // Exact composed if for pr-gate and pr-checks after Phase 5 path filters (D10).
 // Extra parens around the event fragment keep || from binding past the && code arm.
-const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code == 'true'`;
+// The code arm is != 'false' (not == 'true'): only an explicit docs-only verdict
+// may skip the tier. A missing or empty output runs it, matching the
+// classifier's fail-closed doctrine; under the merge queue a skipped required
+// check reads satisfied, so failing toward SKIP would be the wrong direction.
+const PR_TIER_IF_LINE = `    if: (${PR_TIER_EVENT_FRAGMENT}) && needs.changes.outputs.code != 'false'`;
 
 // Minimum code path set the changes job must classify as code=true (D10).
 // Each row pairs the original inline-YAML glob with a representative path;
@@ -306,7 +310,7 @@ describe('CI workflow parity', () => {
       const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
       expect(ifLines).toEqual([PR_TIER_IF_LINE]);
       expect(job).toContain(PR_TIER_EVENT_FRAGMENT);
-      expect(job).toContain("needs.changes.outputs.code == 'true'");
+      expect(job).toContain("needs.changes.outputs.code != 'false'");
       expect(job).not.toContain('I18N_RELEASE_TIER');
     }
     // Both release jobs share the exact same job-level if line so they skip or
@@ -490,7 +494,7 @@ describe('CI workflow parity', () => {
     const browserGate = jobSource('browser-gate');
     expect(browserGate).toMatch(/^\s{4}needs: changes\s*$/m);
     const browserIf = browserGate.match(/^\s{4}if: .+$/gm) ?? [];
-    expect(browserIf).toEqual(["    if: needs.changes.outputs.code == 'true'"]);
+    expect(browserIf).toEqual(["    if: needs.changes.outputs.code != 'false'"]);
 
     // Aggregator only if branch protection cannot accept skipped checks. This
     // packet does not invent one without evidence (OPEN item 5: skipped release
@@ -517,20 +521,33 @@ describe('CI workflow parity', () => {
     // The merge queue on main and release/** tests each candidate merge result
     // on a merge_group event. The trigger is load-bearing: required checks that
     // never report stall every queued PR until the queue's status-check timeout
-    // rejects it. Anchored to the on: block shape (comments allowed between
-    // keys) so a commented-out trigger cannot satisfy the pin.
-    expect(workflow).toMatch(/\non:\n {2}pull_request:\n(?: {2}#[^\n]*\n)* {2}merge_group:\n/);
+    // rejects it. Anchored to a top-level on: key (comments and other trigger
+    // lines allowed before it) so a commented-out trigger or one nested under
+    // another event cannot satisfy the pin; key order is deliberately not
+    // pinned.
+    expect(workflow).toMatch(/\non:\n(?:[ \t]+[^\n]*\n)*? {2}merge_group:\n/);
 
     // The queue always runs the FULL suite on the merge result: the changes job
-    // has no job-level if (pinned elsewhere), and the selector treats every
-    // non-PR event as mode=full. Behavioral pin through the real module so a
-    // future merge_group special case in the selector fails here, next to the
-    // workflow trigger it would undermine.
-    expect(decideTestMode({ eventName: 'merge_group', code: true, files: [] }).mode).toBe('full');
+    // has no job-level if (pinned elsewhere), and the selector refuses every
+    // non-PR event. The file entry is what makes this decisive: with a real
+    // modified source in hand, only the event guard can force full (the same
+    // input under pull_request goes selective), so a future merge_group special
+    // case in the selector fails here, next to the workflow trigger it would
+    // undermine. The reason pin proves WHICH guard fired.
+    const queueDecision = decideTestMode({
+      eventName: 'merge_group',
+      code: true,
+      files: [{ filename: 'src/ui/hud.ts', status: 'modified' }],
+    });
+    expect(queueDecision.mode).toBe('full');
+    expect(queueDecision.reason).toBe('selection applies to pull requests only: full suite');
 
-    // pr-gate and pr-checks carry the merge_group arm (the exact composed if:
-    // line is pinned in the release-to-main test via PR_TIER_IF_LINE; this is
-    // the readable statement of intent).
+    // Deliberate tripwire on the constant, not a workflow pin: the workflow
+    // text itself is held to PR_TIER_IF_LINE by exact single-if-line equality
+    // in 'runs the release tier against a release-to-main pull request merge
+    // result' above. Editing the workflow AND the constant together to drop
+    // the queue arm still goes red here, forcing a conscious edit of this
+    // literal too.
     expect(PR_TIER_EVENT_FRAGMENT).toContain("github.event_name == 'merge_group'");
 
     // lint diffs a queue run against the target-branch tip the merge group was
@@ -538,11 +555,30 @@ describe('CI workflow parity', () => {
     // into the run line). Without this arm the step falls through to the
     // default-branch fallback and diffs a release/** group against main,
     // dragging the whole release delta (intentionally-red whole-repo debt)
-    // into biome and rejecting every queued release PR.
+    // into biome and rejecting every queued release PR. Both env lines are
+    // pinned INSIDE the Determine-base-ref step's env block (a raw substring
+    // would stay green commented-out or moved to the wrong step), and the
+    // shell arm's shape is pinned elif-to-fetch-to-echo with only comment
+    // lines allowed between.
     const lint = jobSource('lint');
-    expect(lint).toContain('MERGE_GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}');
+    const baseRefEnvBlock = String.raw`\n {6}- name: Determine base ref\n {8}id: base\n {8}env:\n(?: {10}[A-Z_]+: [^\n]*\n)*?`;
     expect(lint).toMatch(
-      /elif \[ "\$EVENT_NAME" = "merge_group" \] && \[ -n "\$MERGE_GROUP_BASE_SHA" \]; then\n(?: {12}#[^\n]*\n)* {12}git fetch --no-tags --depth=1 origin "\$MERGE_GROUP_BASE_SHA"\n {12}echo "ref=\$MERGE_GROUP_BASE_SHA" >> "\$GITHUB_OUTPUT"\n/,
+      new RegExp(
+        `${baseRefEnvBlock} {10}MERGE_GROUP_BASE_SHA: \\$\\{\\{ github\\.event\\.merge_group\\.base_sha \\}\\}\n`,
+      ),
+    );
+    expect(lint).toMatch(
+      new RegExp(
+        `${baseRefEnvBlock} {10}MERGE_GROUP_BASE_REF: \\$\\{\\{ github\\.event\\.merge_group\\.base_ref \\}\\}\n`,
+      ),
+    );
+    expect(lint).toMatch(
+      /elif \[ "\$EVENT_NAME" = "merge_group" \] && printf '%s' "\$MERGE_GROUP_BASE_SHA" \| grep -qE '\^\[0-9a-f\]\{40\}\$'; then\n(?: {12}#[^\n]*\n)* {12}if git fetch --no-tags --depth=1 origin "\$MERGE_GROUP_BASE_SHA"; then\n {14}echo "ref=\$MERGE_GROUP_BASE_SHA" >> "\$GITHUB_OUTPUT"\n/,
+    );
+    // The unreachable-SHA fallback diffs against the live target-branch tip
+    // (never the default branch), so one flaky fetch cannot eject a good PR.
+    expect(lint).toMatch(
+      /base_branch="\$\{MERGE_GROUP_BASE_REF#refs\/heads\/\}"\n {14}git fetch --no-tags --depth=1 origin "\$base_branch"\n {14}echo "ref=origin\/\$base_branch" >> "\$GITHUB_OUTPUT"\n/,
     );
 
     // Release lanes stay off queue runs: their if arms match pull_request and
@@ -557,6 +593,47 @@ describe('CI workflow parity', () => {
     ] as const) {
       expect(jobSource(name)).not.toContain('merge_group');
     }
+  });
+
+  it('pins the merge queue required-check names to ci.yml and docs/merge-queue.md', () => {
+    // Branch protection string-matches check DISPLAY names, and the ruleset
+    // lives outside git: renaming any of these jobs silently un-requires the
+    // check, or worse leaves a required name that never reports, which blocks
+    // every queued merge until the queue timeout. docs/merge-queue.md is the
+    // written contract, so the workflow name line and the doc must both carry
+    // each name exactly.
+    const mergeQueueDoc = readFileSync(new URL('../docs/merge-queue.md', import.meta.url), 'utf8');
+    const requiredCheckNames = [
+      'Detect code path changes',
+      'PR gate (English-only legal)',
+      'PR checks (freshness, typecheck, builds)',
+      'Format + lint (Biome, changed files)',
+      'Browser regressions (Chromium)',
+    ] as const;
+    for (const name of requiredCheckNames) {
+      // Anchored to the job-level name: line (4-space indent), so a
+      // commented-out or step-level `- name:` cannot satisfy it.
+      expect(workflow).toContain(`\n    name: ${name}\n`);
+    }
+    // The doc names each required check in the exact form protection sees it:
+    // bare names for the unsharded jobs, and the matrix-suffixed range for the
+    // sharded gate. The range must track SHARD_N, or a future shard-count
+    // change silently leaves the extra shards un-required in a ruleset nobody
+    // can diff in git.
+    const docRequiredNameForms = [
+      '`Detect code path changes`',
+      `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
+      '`PR checks (freshness, typecheck, builds)`',
+      '`Format + lint (Biome, changed files)`',
+      '`Browser regressions (Chromium)`',
+    ] as const;
+    for (const form of docRequiredNameForms) {
+      expect(mergeQueueDoc).toContain(form);
+    }
+    // The doc must never list a release lane or the path-filtered audit as
+    // required: the release lanes are legitimately red mid-cycle, and a
+    // required check whose workflow never reports deadlocks the queue.
+    expect(mergeQueueDoc).toContain('Never require these');
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {

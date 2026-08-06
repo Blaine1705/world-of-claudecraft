@@ -6,6 +6,12 @@ merge queue. Settings do not live in git; this note is the contract those
 settings implement, and the one place it is written down. If the ruleset and
 this note disagree, fix whichever one drifted.
 
+Rollout status: a repo admin applies the ruleset to `release/**` first, after
+the ci.yml merge_group trigger lands there; `main` joins at the next
+release-to-main merge, which is what carries that trigger onto main (enabling
+the queue on a branch whose ci.yml lacks the trigger stalls every queued PR).
+Until a branch is covered by the ruleset, its merge button is unchanged.
+
 Why: on 2026-08-05 two merges landed on an already-red release tip, every open
 PR inherited 67 broken tests, and repair took a day of close/reopen churn. The
 queue makes a green tip structural: nothing merges without the full suite
@@ -53,12 +59,20 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
 
 - `Detect code path changes`. Required itself, and load-bearing: when it fails,
   its dependents report skipped, and branch protection treats skipped as
-  satisfied. Requiring the job that decides is what closes that hole.
+  satisfied. Requiring the job that decides closes that hole for a classifier
+  FAILURE. The residual is inherent to CI-config-in-repo: a queue run executes
+  the queued tree's own copy of ci.yml and the classifier, so an honest
+  mistake there is caught only because `.github/` and `scripts/` are
+  themselves code paths (always `code=true`, always full suite); a hostile
+  edit is a review problem, not something protection can solve.
 - `PR gate (English-only legal) (1)` through `(8)`: the sharded test suite.
 - `PR checks (freshness, typecheck, builds)`.
 - `Format + lint (Biome, changed files)`: deterministic, diff-scoped, minutes
   long, and a red here is always a real defect in the changed files. On queue
-  runs it diffs against the merge group's own base tip, never against main.
+  runs it diffs against the merge group's base SHA, falling back to the live
+  target-branch tip if that SHA is unreachable, so a `release/**` queue run
+  never sweeps the release-vs-main delta (and its intentionally-red whole-repo
+  debt) into biome.
 - `Browser regressions (Chromium)`: the real-browser net for a browser game.
   It reports (or is skipped, which satisfies) on every PR and queue run.
 
@@ -78,11 +92,22 @@ The same rule generalizes: a check may only join the required list if ci.yml
 produces (or explicitly skips) it on every `pull_request` AND every
 `merge_group` run. Anything else deadlocks the queue. And required-check names
 are string-matched: renaming a CI job silently un-requires it, so treat the job
-names above as pinned (they are also pinned by `tests/ci_workflow.test.ts`).
+names above as pinned (`tests/ci_workflow.test.ts` holds each name to ci.yml
+and to this doc, including the shard-count suffix range).
+
+## Queueing a fork PR is the privileged step
+
+A merge group runs the QUEUED tree (base plus the PR's diff) in this
+repository's own context: repository secrets are resolvable there and no
+fork-approval prompt guards it, unlike the PR's own workflow runs. Queueing
+requires write access, so this is always a maintainer action: read the diff
+before queueing a fork PR, and treat any fork change under `.github/**` or
+`scripts/**` as needing a real review first.
 
 ## What did not change
 
-- Fork PRs still need maintainer approval before workflows run.
+- Fork PRs still need maintainer approval before their `pull_request` workflows
+  run; the new privileged step is queueing (see above).
 - The release-tier lanes still run on release refs and release-to-main PRs,
   visible but not required.
 - The `release/**` push run after each queue merge and the nightly gate
