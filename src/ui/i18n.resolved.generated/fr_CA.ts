@@ -3149,7 +3149,8 @@ export const fr_CA: EnTranslations = {
         "raise_fallen": "Relever les morts (vagues périodiques de renforts)",
         "soul_rend": "Déchirement de l'âme (les joueurs marqués doivent s'écarter et être soignés)",
         "deathless_rage": "Fureur immortelle (interrompue aux pierres de garde)",
-        "wardstones": "Canaux des pierres de garde (transition de phase)"
+        "wardstones": "Canaux des pierres de garde (transition de phase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

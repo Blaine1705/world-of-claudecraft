@@ -3149,7 +3149,8 @@ export const de_DE: EnTranslations = {
         "raise_fallen": "Gefallene erheben (periodische Verstarkungswellen)",
         "soul_rend": "Seelenzerfetzung (markierte Spieler mussen sich verteilen und geheilt werden)",
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
-        "wardstones": "Schutzstein-Kanale (Phasenubergang)"
+        "wardstones": "Schutzstein-Kanale (Phasenubergang)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
