@@ -46,6 +46,9 @@ function vespersPriest(): { sim: Sim; priest: Entity } {
   expect(sim.setSpec('shadow')).toBe(true);
   sim.tick();
   sim.player.resource = sim.player.maxResource;
+  // Never-resist harness (the makeAffliction idiom): the arrangement casts
+  // land regardless of where the shared draw order moves between merges.
+  sim.player.hitBonus = 1;
   return { sim, priest: sim.player };
 }
 

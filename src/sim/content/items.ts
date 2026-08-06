@@ -1112,7 +1112,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Restore less than sitting to eat/drink, the price you pay for not sitting (#103).
   //
   // Target fraction (#1608): each tier is sized against the LEAST tanky class for
-  // its resource (priest for potionHp, hunter for potionMana; see
+  // its resource (priest for potionHp, paladin for potionMana on this line; see
   // tests/consumables.test.ts) at BASE stats (no gear) at the TOP level of its
   // intended zone bracket (ZONE1/2/3_ZONE.levelRange[1] in content/zone{1,2,3}.ts:
   // 7/13/20), the hardest point in the bracket for the tier to still feel worth

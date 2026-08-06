@@ -14,6 +14,7 @@ import {
   updateCasting,
 } from '../src/sim/combat/casting_lifecycle';
 import { handleDeath } from '../src/sim/combat/damage';
+import { ABILITIES } from '../src/sim/content/classes';
 import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { BUILTIN_WORLD, LAKE, MOBS } from '../src/sim/data';
 import { clearNythraxisWardChannelCast } from '../src/sim/encounters/nythraxis';
@@ -283,13 +284,23 @@ describe('casting_lifecycle: auto-acquire on cast with no target (issue #2787)',
   });
 
   it('also auto-acquires for a dual-purpose (targetType "any") ability', () => {
+    // The generic 'any' acquire arm has no LIVE consumer on this line: the
+    // paladin overhaul retired holy_shock to legacy-hidden, and Unleash
+    // Weapon resolves its own target before this arm runs. Unhide the legacy
+    // exemplar for the pin (restored below) so the arm stays guarded for the
+    // next dual-purpose ability that ships.
     const { sim, p } = makeSim('paladin', 12);
-    sim.setSpec('holy'); // Holy Shock is the Holy spec's signature ability
-    const attacker = spawnAttacker(sim, p, 8);
-    expect(p.targetId).toBeNull();
+    ABILITIES.holy_shock.hiddenFromPlayer = false;
+    try {
+      sim.setSpec('holy');
+      const attacker = spawnAttacker(sim, p, 8);
+      expect(p.targetId).toBeNull();
 
-    castAbility(sim.ctx, 'holy_shock', p.id);
-    expect(p.targetId).toBe(attacker.id);
+      castAbility(sim.ctx, 'holy_shock', p.id);
+      expect(p.targetId).toBe(attacker.id);
+    } finally {
+      ABILITIES.holy_shock.hiddenFromPlayer = true;
+    }
     expect(p.castingAbility).toBeNull(); // holy_shock is instant (castTime 0)
   });
 
@@ -445,7 +456,7 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
     sim.drainEvents();
     castAbility(sim.ctx, 'mind_flay', p.id);
 
-    let events: any[] = [];
+    const events: any[] = [];
     for (let tick = 0; tick < 25; tick++) events.push(...sim.tick());
 
     expect(

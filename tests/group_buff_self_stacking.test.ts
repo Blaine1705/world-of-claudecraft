@@ -113,55 +113,12 @@ describe('Mass Barrier never stacks its shield with itself', () => {
   });
 });
 
-describe("Nature's Fury never stacks its spell-crit pulse with itself", () => {
-  it('two druids in the same party pulsing on a shared ally leave exactly one copy', () => {
-    const sim = new Sim({ seed: 2026, playerClass: 'druid', noPlayer: true }) as AnySim;
-    const a = sim.addPlayer('druid', 'DruidA');
-    const b = sim.addPlayer('druid', 'DruidB');
-    for (const pid of [a, b]) {
-      sim.setPlayerLevel(20, pid);
-      expect(
-        sim.applyTalents({ spec: null, rows: { 20: 'dru_r20_improved_hurricane' } }, pid),
-      ).toBe(true);
-    }
-    const entA = sim.entities.get(a) as Entity;
-    const entB = sim.entities.get(b) as Entity;
-    entB.pos = { ...entA.pos };
-    entB.prevPos = { ...entA.pos };
-    sim.partyInvite(b, a);
-    sim.partyAccept(b);
-
-    // Moonwing Form is the Balance signature (gated behind the balance spec);
-    // the talent under test only needs the form AURA, so apply it directly
-    // like tests/natures_fury.test.ts does, without spending a spec pick.
-    const applyAura = sim as unknown as { applyAura(t: Entity, a: Record<string, unknown>): void };
-    for (const [ent, sourceId] of [
-      [entA, a],
-      [entB, b],
-    ] as const) {
-      applyAura.applyAura(ent, {
-        id: 'moonkin_form',
-        name: 'Moonwing Form',
-        kind: 'form_moonkin',
-        remaining: 3600,
-        duration: 3600,
-        value: 0,
-        sourceId,
-        school: 'arcane',
-      });
-    }
-
-    // Nature's Fury pulses once a second, staggered by pid: run past a full
-    // cycle so both druids have pulsed onto each other at least once.
-    for (let i = 0; i < 40; i++) sim.tick();
-
-    for (const ent of [entA, entB]) {
-      const fury = ent.auras.filter((x) => x.id === 'natures_fury');
-      expect(fury, "one Nature's Fury copy").toHaveLength(1);
-      expect(fury[0].kind).toBe('buff_spellcrit');
-    }
-  });
-});
+// Nature's Fury dedupe (the second half of #2868): RETIRED on this line. The
+// druid overhaul repurposed dru_r20_improved_hurricane into Nature's Echo (an
+// engine mechanic) and no talent grants moonwingPartyCritPct here, so the
+// moonwing pulse is unreachable and its dedupe cannot be exercised. The Mass
+// Barrier half above remains the live pin; the aura_stacking natures_fury
+// entry stays as inert protection if a future talent revives the pulse.
 
 describe('every group buff is exhaustion-gated or source-independent', () => {
   it('replaces a Soulwell ward from another Warlock instead of stacking it', () => {
