@@ -653,8 +653,7 @@ export class WocMarketService {
     if (listing.directedBuyerAccount !== null) {
       const isParty =
         viewerAccount !== null &&
-        (viewerAccount === listing.directedBuyerAccount ||
-          viewerAccount === listing.sellerAccount);
+        (viewerAccount === listing.directedBuyerAccount || viewerAccount === listing.sellerAccount);
       if (!isParty) return null;
     }
     const estimateCents = listing.currentBidCents ?? listing.startCents;

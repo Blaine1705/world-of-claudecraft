@@ -12829,12 +12829,14 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '接下补位的席位是刻意不带风险的：你落入的是一份与你无关的比分，因此无论胜负，这场比赛都不会触动你的战场评分，中途离开也不欠任何代价。当一场比赛已接近尾声、新来者再也无法改变结果时，邀请也就不再发出，所以你绝不会被安置进别人的结局里。',
   'hudChrome.trade.woc.priceLabel': '价格（美元）',
   'hudChrome.trade.woc.equivalent': '按当前汇率约为 {tokens} $WOC',
-  'hudChrome.trade.woc.variableWarning': '$WOC 金额仅为预览，并非固定价格。买家付款时将以最新报价确定确切数量。',
+  'hudChrome.trade.woc.variableWarning':
+    '$WOC 金额仅为预览，并非固定价格。买家付款时将以最新报价确定确切数量。',
   'hudChrome.trade.woc.feeLine': '交易所手续费 {fee}',
   'hudChrome.trade.woc.netLine': '你将收到 {net}',
   'hudChrome.trade.woc.sendOffer': '发送 $WOC 报价',
   'hudChrome.trade.woc.offerSent': '报价已发送。若 {name} 未接受，将在 10 分钟后过期。',
-  'hudChrome.trade.woc.notInstant': '$WOC 交易并非即时完成。对方接受后你的物品将进入托管，付款验证通过后送达对方。',
+  'hudChrome.trade.woc.notInstant':
+    '$WOC 交易并非即时完成。对方接受后你的物品将进入托管，付款验证通过后送达对方。',
   'hudChrome.trade.woc.blockDisabled': '本服务器未提供 $WOC 交易所。',
   'hudChrome.trade.woc.blockNoWallet': '请先绑定并验证钱包，才能出售物品换取 $WOC。',
   'hudChrome.trade.woc.blockRecipientNoWallet': '该玩家必须先连接钱包，才能接受 $WOC 付款。',

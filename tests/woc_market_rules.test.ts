@@ -652,8 +652,8 @@ describe('a directed sale (the p2p trade agreed in the trade window)', () => {
       ok: false,
       reason: 'bad_buy_now',
     });
-    expect(
-      validListingParams(directed({ directedBuyerAccount: null, buyNowCents: 3000 })),
-    ).toEqual({ ok: true });
+    expect(validListingParams(directed({ directedBuyerAccount: null, buyNowCents: 3000 }))).toEqual(
+      { ok: true },
+    );
   });
 });

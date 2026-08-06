@@ -2023,7 +2023,9 @@ describe('directed p2p offers: propose, accept, and the escrow moment', () => {
   it('lets the buyer decline and the seller withdraw, but not the reverse', async () => {
     const h = stocked();
     const a = await h.service.createDirectedOffer(offerArgs());
-    const b = await h.service.createDirectedOffer(offerArgs({ itemRef: { index: 1, itemId: EPIC_ITEM } }));
+    const b = await h.service.createDirectedOffer(
+      offerArgs({ itemRef: { index: 1, itemId: EPIC_ITEM } }),
+    );
     if (!a.ok || !b.ok) throw new Error('offer refused');
     // Wrong actor for each verb reads as not_found, same anti-enumeration shape.
     expect(await h.service.resolveDirectedOffer(SELLER, a.offer.id, 'decline')).toEqual({

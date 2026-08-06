@@ -8563,9 +8563,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '価格情報が回復するまで取引所の取引は一時停止中です。オークションのカウントダウンは続行されます。',
   'apiError.woc_market.wallet_required':
     '取引所で取引する前に、ウォレットを連携して認証してください。',
-  'apiError.woc_market.recipient_wallet_required': 'そのプレイヤーが $WOC の支払いを受け取るには、先にウォレットを接続する必要があります。',
+  'apiError.woc_market.recipient_wallet_required':
+    'そのプレイヤーが $WOC の支払いを受け取るには、先にウォレットを接続する必要があります。',
   'apiError.woc_market.self_offer': '自分自身に $WOC のオファーを送ることはできません。',
-  'apiError.woc_market.offer_expired': 'その $WOC オファーは期限切れです。新しいものを依頼してください。',
+  'apiError.woc_market.offer_expired':
+    'その $WOC オファーは期限切れです。新しいものを依頼してください。',
   'apiError.woc_market.terms_required': '続行するには取引所の決済条件に同意してください。',
   'apiError.woc_market.totp_required':
     'この金額には二要素認証が必要です。アカウント設定で有効にしてからコードを入力してください。',
@@ -13080,19 +13082,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '補充の席は意図的に危険のないものになっています。あなたが飛び込むのは自分が関わっていない戦況なので、勝っても負けてもこの試合があなたの戦場レーティングに触れることはなく、途中で抜けても何も負いません。試合が終わりに近づき、来たところで結果を変えられない頃合いになると誘い自体が届かなくなるので、他人の幕引きに座らされることはありません。',
   'hudChrome.trade.woc.priceLabel': '価格（USD）',
   'hudChrome.trade.woc.equivalent': '現在のレートで約 {tokens} $WOC',
-  'hudChrome.trade.woc.variableWarning': '$WOC の金額はプレビューであり、固定価格ではありません。正確な数量は購入者の支払い時に最新の見積もりで決まります。',
+  'hudChrome.trade.woc.variableWarning':
+    '$WOC の金額はプレビューであり、固定価格ではありません。正確な数量は購入者の支払い時に最新の見積もりで決まります。',
   'hudChrome.trade.woc.feeLine': '取引所手数料 {fee}',
   'hudChrome.trade.woc.netLine': '受取額 {net}',
   'hudChrome.trade.woc.sendOffer': '$WOC オファーを送る',
-  'hudChrome.trade.woc.offerSent': 'オファーを送信しました。{name} が承諾しない場合、10 分で期限切れになります。',
-  'hudChrome.trade.woc.notInstant': '$WOC の取引は即時ではありません。相手が承諾するとアイテムはエスクローに移り、支払いが確認され次第、相手に届きます。',
+  'hudChrome.trade.woc.offerSent':
+    'オファーを送信しました。{name} が承諾しない場合、10 分で期限切れになります。',
+  'hudChrome.trade.woc.notInstant':
+    '$WOC の取引は即時ではありません。相手が承諾するとアイテムはエスクローに移り、支払いが確認され次第、相手に届きます。',
   'hudChrome.trade.woc.blockDisabled': 'このレルムでは $WOC 取引所を利用できません。',
-  'hudChrome.trade.woc.blockNoWallet': '$WOC でアイテムを売却するには、ウォレットを連携して認証してください。',
-  'hudChrome.trade.woc.blockRecipientNoWallet': 'そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。',
-  'hudChrome.trade.woc.blockNoEligibleItems': 'セットしたアイテムはいずれも $WOC で売却できません。',
-  'hudChrome.trade.woc.ineligibleNote': 'セットしたアイテムのうち {count} 個は $WOC で売却できません。',
+  'hudChrome.trade.woc.blockNoWallet':
+    '$WOC でアイテムを売却するには、ウォレットを連携して認証してください。',
+  'hudChrome.trade.woc.blockRecipientNoWallet':
+    'そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。',
+  'hudChrome.trade.woc.blockNoEligibleItems':
+    'セットしたアイテムはいずれも $WOC で売却できません。',
+  'hudChrome.trade.woc.ineligibleNote':
+    'セットしたアイテムのうち {count} 個は $WOC で売却できません。',
   'hudChrome.trade.woc.incomingTitle': '{name} からの $WOC オファー',
-  'hudChrome.trade.woc.incomingBody': '{name} が {item} を {price} であなたに売却すると提案しています。',
+  'hudChrome.trade.woc.incomingBody':
+    '{name} が {item} を {price} であなたに売却すると提案しています。',
   'hudChrome.trade.woc.accept': '承諾して支払う',
   'hudChrome.trade.woc.decline': '辞退する',
   'hudChrome.trade.woc.withdraw': 'オファーを取り下げる',
