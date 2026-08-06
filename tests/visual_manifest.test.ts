@@ -322,6 +322,14 @@ describe('character visual manifest', () => {
         for (const name of donorNames) names.add(name);
       }
       expect(names.size).toBeGreaterThan(0);
+      // A bespoke clip (e.g. mob_wildheart_ravager's Wildheart_Ravager_Attack) can live in a
+      // separate mesh-free animUrls donor GLB instead of the base rig, same pattern as
+      // player_mage/mob_elemental; the runtime merges both into one clip pool (assets.ts), so
+      // the existence check must too.
+      for (const animUrl of visual.animUrls ?? []) {
+        const donorNames = await glbAnimationNames(`public/${animUrl}`);
+        for (const name of donorNames) names.add(name);
+      }
       expect(
         [...new Set(expectedClipNames(visual.clips))].filter((name) => !names.has(name)),
         key,
