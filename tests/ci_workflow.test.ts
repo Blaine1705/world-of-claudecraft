@@ -831,14 +831,19 @@ describe('CI workflow parity', () => {
     // BLANK LINE THAT ENDS THE STEP: a YAML-commented-out copy cannot satisfy
     // it, and neither can a step neutered by an appended `if:` or any other
     // trailing key (the mutation that beat the pin's first draft).
-    const cacheStepRe =
-      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-shard\$\{\{ matrix\.shard \}\}-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n/;
+    // One shared prefix and hashFiles tail for every copy of the step, so
+    // the shard and lane regexes cannot drift apart: an edit to the key's
+    // input list either moves all three ci.yml key lines or goes red here.
+    const cacheStepPrefix = String.raw`- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-`;
+    const cacheKeyTail = String.raw`-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n`;
+    const cacheStepRe = new RegExp(
+      `${cacheStepPrefix}${String.raw`shard\$\{\{ matrix\.shard \}\}`}${cacheKeyTail}`,
+    );
     // The lane job (Phase 4 rider) carries the same step with a lane key
     // segment where the matrices carry shard${{ matrix.shard }}: the lane has
     // no matrix, so the shard expression would render empty there, and the
     // lane's store earns its own entry rather than borrowing a shard's.
-    const laneCacheStepRe =
-      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-lane-long-sims-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n/;
+    const laneCacheStepRe = new RegExp(`${cacheStepPrefix}lane-long-sims${cacheKeyTail}`);
     for (const [name, stepRe] of [
       ['pr-gate', cacheStepRe],
       ['release-gate', cacheStepRe],
