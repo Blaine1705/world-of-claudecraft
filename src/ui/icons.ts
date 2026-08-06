@@ -4571,8 +4571,9 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   // fall back to the deed_cat_dungeon crest until their commissioned art lands.
   'dgn_rift',
   'dgn_rift_s_rank',
-  // Basic universal profession rare-craft milestones. They are progression deeds
-  // and fall back to the deed_cat_progression crest until their commissioned art lands.
+  // The seven per-craft rare-tier profession deeds (issue #2055): all
+  // 'progression', so all fall back to the deed_cat_progression crest until
+  // their commissioned art lands.
   'prog_engineering_rare',
   'prog_alchemy_rare',
   'prog_cooking_rare',

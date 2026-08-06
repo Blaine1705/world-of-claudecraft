@@ -370,10 +370,12 @@ describe('Book of Deeds webp icons', () => {
     // Any live deeds awaiting art must land on their category base crest, which carries no
     // image URL and falls through to the procedural canvas path. The pending set is pinned
     // exhaustively (DEED_ART_PENDING, src/ui/icons.ts) and the two counts below are literal, so a
-    // third artless deed, a dropped webp, or a silent catalog append all red here. The twelve
-    // zone chronicle deeds added for frostveil/amberfall/nightbloom/wraithwood/palmreach/
-    // evergarden, the Rift pair, and the seven per-craft rare-tier profession deeds ship
-    // art-trailing per docs/design/deeds.md rule 6.
+    // third artless deed, a dropped webp, or a silent catalog append all red here. The Rift
+    // coverage pair (dgn_rift, dgn_rift_s_rank) ships artless per docs/design/deeds.md step 6
+    // ("art can trail the deed"), and the twelve zone chronicle deeds added for
+    // frostveil/amberfall/nightbloom/wraithwood/palmreach/evergarden ship art-trailing per the
+    // same rule; both join the pending set alongside the Thornhollow Fields battleground quartet,
+    // the Drakelands brood pair, and the seven per-craft rare-tier profession deeds (issue #2055).
     const artless = DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id));
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
