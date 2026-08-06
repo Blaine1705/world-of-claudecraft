@@ -55,11 +55,17 @@ function sectionTitleText(section: WarfareShopSection): string {
     : t('hudChrome.warfareShop.weapons');
 }
 
-/** The set section's bonus tiers plus its owned-count line: the single most
- *  motivating element on the screen, and the reason this window exists. The
- *  tier rows take the same lit/dim treatment the item tooltip's set block
- *  gives them, and the progress line reads against the NEXT unmet tier rather
- *  than a bare fraction of seven. */
+/** The set section's bonus tiers, taking the same lit/dim treatment the item
+ *  tooltip's set block gives them.
+ *
+ *  There is deliberately NO owned-count progress line. An earlier revision
+ *  carried one ("3 of 7 pieces owned, 1 more for the 4-piece bonus"), which the
+ *  owner cut as more than the window needs to say: the lit and dim tiers already
+ *  show which bonuses are live, and the per-tile Owned marker still does the one
+ *  job a count cannot, which is stopping a second purchase of a soulbound piece
+ *  that is unrefundable. The view core keeps ownedPieces / totalPieces / nextTier
+ *  because a caller may still want them; this painter simply does not render a
+ *  sentence out of them. */
 function appendSetProgress(el: HTMLElement, section: WarfareShopSetSection): void {
   for (const tier of section.tiers) {
     const line = document.createElement('div');
@@ -70,22 +76,6 @@ function appendSetProgress(el: HTMLElement, section: WarfareShopSetSection): voi
     });
     el.appendChild(line);
   }
-  const progress = document.createElement('div');
-  progress.className = 'warfare-set-progress';
-  // ONE t() call per arm, never a count sentence joined to a tier sentence: a
-  // translator has to be free to reorder the clauses, and the ASCII space that
-  // joined them is wrong for ja_JP and zh_*.
-  const owned = count(section.ownedPieces);
-  const total = count(section.totalPieces);
-  progress.textContent = section.nextTier
-    ? t('hudChrome.warfareShop.ownedCountNext', {
-        owned,
-        total,
-        remaining: count(section.nextTier.remaining),
-        pieces: count(section.nextTier.pieces),
-      })
-    : t('hudChrome.warfareShop.ownedCountComplete', { owned, total });
-  el.appendChild(progress);
 }
 
 function appendOfferTile(

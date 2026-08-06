@@ -1515,8 +1515,6 @@ export const ko_KR: EnTranslations = {
       "jewelry": "장신구",
       "weapons": "무기",
       "owned": "보유 중",
-      "ownedCountNext": "{total}개 중 {owned}개를 보유 중입니다. {pieces}개 세트 효과까지 {remaining}개 남았습니다.",
-      "ownedCountComplete": "{total}개 중 {owned}개를 보유 중입니다. 모든 부위를 보유하고 있습니다.",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
       "buyConfirmBody": "{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다."

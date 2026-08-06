@@ -8367,8 +8367,6 @@ export type TranslationKeyFlat =
   | 'hudChrome.warfareShop.gossipOptionAria'
   | 'hudChrome.warfareShop.jewelry'
   | 'hudChrome.warfareShop.owned'
-  | 'hudChrome.warfareShop.ownedCountComplete'
-  | 'hudChrome.warfareShop.ownedCountNext'
   | 'hudChrome.warfareShop.weapons'
   | 'hudChrome.widgets.clockTitle'
   | 'hudChrome.widgets.coordinates'

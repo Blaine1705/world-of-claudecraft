@@ -838,10 +838,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.jewelry': '飾品',
   'hudChrome.warfareShop.weapons': '武器',
   'hudChrome.warfareShop.owned': '已擁有',
-  'hudChrome.warfareShop.ownedCountNext':
-    '已擁有 {total} 件中的 {owned} 件。再取得 {remaining} 件即可啟用 {pieces} 件套裝效果。',
-  'hudChrome.warfareShop.ownedCountComplete':
-    '已擁有 {total} 件中的 {owned} 件。你已擁有全部部件。',
   'hudChrome.warfareShop.buyOwnedAria': '以 {honor} 購買 {item}，已擁有',
   'hudChrome.warfareShop.buyConfirmBody': '用 {honor} 購買 {item}？榮譽購買後無法退款。',
   'hudChrome.keybinds.bgFlag': '戰場奪旗動作',

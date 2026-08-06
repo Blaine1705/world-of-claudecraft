@@ -865,10 +865,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.jewelry': 'Украшения',
   'hudChrome.warfareShop.weapons': 'Оружие',
   'hudChrome.warfareShop.owned': 'Получено',
-  'hudChrome.warfareShop.ownedCountNext':
-    'Получено предметов: {owned} из {total}. Ещё {remaining} до бонуса за {pieces} предметов.',
-  'hudChrome.warfareShop.ownedCountComplete':
-    'Получено предметов: {owned} из {total}. У вас есть все предметы комплекта.',
   'hudChrome.warfareShop.buyOwnedAria': 'Купить {item} за {honor}, уже получено',
   'hudChrome.warfareShop.buyConfirmBody':
     'Купить {item} за {honor}? Покупки за честь не подлежат возврату.',

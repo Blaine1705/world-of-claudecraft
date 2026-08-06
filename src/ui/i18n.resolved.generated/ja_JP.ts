@@ -1515,8 +1515,6 @@ export const ja_JP: EnTranslations = {
       "jewelry": "アクセサリー",
       "weapons": "武器",
       "owned": "所有済み",
-      "ownedCountNext": "{total}個中{owned}個を所有しています。あと{remaining}個で{pieces}個セットボーナスが有効になります。",
-      "ownedCountComplete": "{total}個中{owned}個を所有しています。すべての部位を所有しています。",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "{item}を{honor}で購入、所有済み",
       "buyConfirmBody": "{item}を{honor}で購入しますか？名誉での購入は返金できません。"

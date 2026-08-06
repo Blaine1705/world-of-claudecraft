@@ -1515,8 +1515,6 @@ export const ru_RU: EnTranslations = {
       "jewelry": "Украшения",
       "weapons": "Оружие",
       "owned": "Получено",
-      "ownedCountNext": "Получено предметов: {owned} из {total}. Ещё {remaining} до бонуса за {pieces} предметов.",
-      "ownedCountComplete": "Получено предметов: {owned} из {total}. У вас есть все предметы комплекта.",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "Купить {item} за {honor}, уже получено",
       "buyConfirmBody": "Купить {item} за {honor}? Покупки за честь не подлежат возврату."

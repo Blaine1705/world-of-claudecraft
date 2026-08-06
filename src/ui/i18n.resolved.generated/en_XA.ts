@@ -1515,8 +1515,6 @@ export const en_XA: EnTranslations = {
       "jewelry": "[Ĵéŵéļŕý]",
       "weapons": "[Ŵéáþóñš]",
       "owned": "[Óŵñéð]",
-      "ownedCountNext": "[{owned} óƒ {total} þíéçéš óŵñéð. {remaining} ɱóŕé ƒóŕ ţĥé {pieces}-þíéçé ƀóñúš.]",
-      "ownedCountComplete": "[{owned} óƒ {total} þíéçéš óŵñéð. Ýóú óŵñ éʋéŕý þíéçé.]",
       "buyAria": "[Ɓúý {item} ƒóŕ {honor}]",
       "buyOwnedAria": "[Ɓúý {item} ƒóŕ {honor}, áļŕéáðý óŵñéð]",
       "buyConfirmBody": "[Ɓúý {item} ƒóŕ {honor}? Ĥóñóŕ þúŕçĥášéš çáññóţ ƀé ŕéƒúñðéð.]"

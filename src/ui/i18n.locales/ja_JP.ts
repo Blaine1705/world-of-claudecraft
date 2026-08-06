@@ -865,10 +865,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.jewelry': 'アクセサリー',
   'hudChrome.warfareShop.weapons': '武器',
   'hudChrome.warfareShop.owned': '所有済み',
-  'hudChrome.warfareShop.ownedCountNext':
-    '{total}個中{owned}個を所有しています。あと{remaining}個で{pieces}個セットボーナスが有効になります。',
-  'hudChrome.warfareShop.ownedCountComplete':
-    '{total}個中{owned}個を所有しています。すべての部位を所有しています。',
   'hudChrome.warfareShop.buyOwnedAria': '{item}を{honor}で購入、所有済み',
   'hudChrome.warfareShop.buyConfirmBody':
     '{item}を{honor}で購入しますか？名誉での購入は返金できません。',

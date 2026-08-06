@@ -264,8 +264,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "es_ES": [
@@ -523,8 +521,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "fr_FR": [
@@ -782,8 +778,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "fr_CA": [
@@ -1041,8 +1035,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "en_CA": [],
@@ -1301,8 +1293,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "de_DE": [
@@ -1560,8 +1550,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "zh_CN": [
@@ -1867,8 +1855,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "ru_RU": [
@@ -2138,8 +2124,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "nl_NL": [
@@ -2397,8 +2381,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "pl_PL": [
@@ -2656,8 +2638,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "id_ID": [
@@ -2915,8 +2895,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "tr_TR": [
@@ -3174,8 +3152,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "sv_SE": [
@@ -3433,8 +3409,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "vi_VN": [
@@ -3692,8 +3666,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ],
   "da_DK": [
@@ -3951,8 +3923,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfareShop.gossipOptionAria",
     "hudChrome.warfareShop.jewelry",
     "hudChrome.warfareShop.owned",
-    "hudChrome.warfareShop.ownedCountComplete",
-    "hudChrome.warfareShop.ownedCountNext",
     "hudChrome.warfareShop.weapons"
   ]
 };

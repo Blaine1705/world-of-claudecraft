@@ -1515,8 +1515,6 @@ export const vi_VN: EnTranslations = {
       "jewelry": "Jewelry",
       "weapons": "Weapons",
       "owned": "Owned",
-      "ownedCountNext": "{owned} of {total} pieces owned. {remaining} more for the {pieces}-piece bonus.",
-      "ownedCountComplete": "{owned} of {total} pieces owned. You own every piece.",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "Buy {item} for {honor}, already owned",
       "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."

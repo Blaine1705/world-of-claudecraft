@@ -1563,9 +1563,6 @@ export const hudChromeStrings = {
     // ja_JP and zh_*. The second clause reads against the NEXT unmet tier, never
     // a bare fraction of the full set ("2 more for the 7-piece bonus" is the
     // line that motivates the purchase).
-    ownedCountNext:
-      '{owned} of {total} pieces owned. {remaining} more for the {pieces}-piece bonus.',
-    ownedCountComplete: '{owned} of {total} pieces owned. You own every piece.',
     buyAria: 'Buy {item} for {honor}',
     buyOwnedAria: 'Buy {item} for {honor}, already owned',
     // Honor purchases record no buyback, so a mis-tap is unrefundable: the

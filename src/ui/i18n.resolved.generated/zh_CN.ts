@@ -1515,8 +1515,6 @@ export const zh_CN: EnTranslations = {
       "jewelry": "饰品",
       "weapons": "武器",
       "owned": "已拥有",
-      "ownedCountNext": "已拥有 {total} 件中的 {owned} 件。再获得 {remaining} 件即可激活 {pieces} 件套奖励。",
-      "ownedCountComplete": "已拥有 {total} 件中的 {owned} 件。你已拥有全部部件。",
       "buyAria": "Buy {item} for {honor}",
       "buyOwnedAria": "以 {honor} 购买 {item}，已拥有",
       "buyConfirmBody": "用 {honor} 购买 {item}？荣誉购买后无法退款。"

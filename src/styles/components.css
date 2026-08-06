@@ -5939,12 +5939,6 @@
   /* The owned-count line: the piece progress plus what the NEXT unmet tier
      still wants. The single most motivating element in the window, so it takes
      the accent rather than the muted body color. */
-  .warfare-set-progress {
-    color: var(--color-accent);
-    font-family: var(--title-font);
-    font-size: 11.5px;
-    padding: 3px 5px 5px;
-  }
   /* An unaffordable honor price tints like an unsatisfied cost everywhere else
      in the language. Restated at the .warfare-price specificity because the
      gold honor color would otherwise outrank the .vi-price.unaffordable rule
