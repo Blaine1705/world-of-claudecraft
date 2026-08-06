@@ -274,12 +274,17 @@ describe('retired CI reviewer stays retired', () => {
   // needs a fresh security design, so the absence is pinned the decisive way:
   // a scan of the whole workflow directory, not a hardcoded filename that a
   // renamed workflow would evade.
+  //
+  // The OPENAI_API_KEY arm is DELIBERATELY broader than the retirement: the
+  // secret's only legitimate consumers are server-side and local tooling env
+  // vars, never a workflow. If a future workflow legitimately needs it,
+  // narrow this assertion to the codex-action arm; do not delete the test.
   it('keeps every workflow free of the codex-action and its credential', () => {
     const dir = path.join(root, '.github/workflows');
     const files = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f));
     expect(files.length).toBeGreaterThan(0);
     for (const f of files) {
-      const text = read(path.join('.github/workflows', f));
+      const text = fs.readFileSync(path.join(dir, f), 'utf8');
       expect(text, f).not.toContain('openai/codex-action');
       expect(text, f).not.toContain('OPENAI_API_KEY');
     }
@@ -288,12 +293,18 @@ describe('retired CI reviewer stays retired', () => {
   it('keeps the retired reviewer files deleted', () => {
     for (const p of [
       '.github/codex',
+      'docs/ai-pr-bot.md',
       'scripts/prepare_ai_review.mjs',
+      'scripts/prepare_ai_review.d.mts',
       'scripts/post_ai_review.mjs',
+      'scripts/post_ai_review.d.mts',
       'scripts/redact_secrets.mjs',
+      'scripts/redact_secrets.d.mts',
       'scripts/gh_sticky_comment.mjs',
       'scripts/ai_review.mjs',
       'scripts/ai_review_diff.mjs',
+      'tests/ai_review.test.ts',
+      'tests/redact_secrets.test.ts',
     ]) {
       expect(fs.existsSync(path.join(root, p)), p).toBe(false);
     }
