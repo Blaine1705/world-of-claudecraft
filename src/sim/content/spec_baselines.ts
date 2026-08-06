@@ -70,22 +70,32 @@ export const SPEC_BASELINES: SpecBaselineTable = {
       global: { meleeDmgPct: 0.06 },
     },
   },
+  // v0.34 rogue base re-band: with the Thronebane hand fix removing the legendary
+  // the rogue kit was tuned around, all three specs collapsed to the bottom of the
+  // zero-legendary balance table (Combat 132, Assassination 139, Subtlety 147 at
+  // 60s, the class 45 DPS below the median: nythraxis-class-balance-monte-carlo.md).
+  // This lifts the BiS-epic (no-legendary) floor of each spec to ~200 DPS. The kit
+  // is auto-attack heavy (54 to 73% of damage on the competent rotation), so the
+  // lift leans on Attack Power (apPct) and crit, which scale the white swings the
+  // per-ability and meleeDmgPct rows never touch; meleeDmgPct tops up the builder
+  // and finisher share. The legendary itself is not touched here (separate PR).
   rogue: {
     assassination: {
-      stats: { crit: 0.03 },
-      global: { meleeDmgPct: 0.08 },
+      stats: { crit: 0.12, apPct: 0.5 },
+      global: { meleeDmgPct: 0.34 },
       ability: [
         { ability: 'sinister_strike', costPct: -0.16 },
         { ability: 'eviscerate', dmgPct: 0.32 },
       ],
     },
     combat: {
-      stats: { ap: 24, crit: 0.03 },
-      global: { meleeDmgPct: 0.08 },
+      stats: { ap: 24, crit: 0.14, apPct: 0.55 },
+      global: { meleeDmgPct: 0.36 },
       ability: [{ ability: 'sinister_strike', dmgPct: 0.2, costPct: -0.16 }],
     },
     subtlety: {
-      stats: { agi: 7, crit: 0.03, dodge: 0.05 },
+      stats: { agi: 7, crit: 0.1, dodge: 0.05, apPct: 0.35 },
+      global: { meleeDmgPct: 0.24 },
       ability: [
         { ability: 'stealth', cooldownPct: -0.7 },
         { ability: 'backstab', dmgPct: 0.16 },
