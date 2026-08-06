@@ -391,7 +391,8 @@ export const sv_SE: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Gester",
-      "done": "Klar"
+      "done": "Klar",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Dagliga belöningar",
@@ -912,6 +913,7 @@ export const sv_SE: EnTranslations = {
       "minutesSeconds": "{m} m {s} s",
       "seconds": "{s} s",
       "autoShowHint": "Rader visas automatiskt när din grupp gör skada eller helar, och detta segment stängs några sekunder efter att striden avslutas.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Övrigt ({count})",
@@ -951,6 +953,7 @@ export const sv_SE: EnTranslations = {
       "targetFriendlyNext": "Växla vänligt mål",
       "discord": "Discord",
       "valecup": "Dalcupen",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Slida/Ta fram vapen",
       "categoryPet": "Djur",
       "petAttack": "Djur: Anfall",
@@ -958,6 +961,7 @@ export const sv_SE: EnTranslations = {
       "petTaunt": "Djur: Provocera",
       "petDefensive": "Djur: Defensivt",
       "petAggressive": "Djur: Aggressivt",
+      "targetPet": "Pet: Mark",
       "mount": "Sitt upp / Stig av",
       "mouseHint": "Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen."
     },
@@ -1030,7 +1034,90 @@ export const sv_SE: EnTranslations = {
     },
     "pvp": {
       "launcherTitle": "PvP",
-      "mobileLabel": "PvP"
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "Dalcupen",
@@ -1191,6 +1278,24 @@ export const sv_SE: EnTranslations = {
       "graphicsFatal": "Grafikåterställningen misslyckades. Ladda om spelet för att fortsätta.",
       "graphicsReload": "Ladda om spelet",
       "graphicsDraftChanged": "Grafikändringarna är redo att tillämpas.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Gränssnittsläge",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Skrivbord",
@@ -1212,6 +1317,7 @@ export const sv_SE: EnTranslations = {
       "aurasOnPlayerFrame": "Förstärkningar på spelarramen",
       "highContrastBackground": "Bakgrund med hög kontrast",
       "startAttackOnAbility": "Automatisk attack vid förmågeanvändning",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Automatisk plundring i förbifarten",
       "groundReticle": "Markriktmedel",
       "mouseoverCast": "Kasta via muspekaren på gruppramarna",
@@ -1221,8 +1327,10 @@ export const sv_SE: EnTranslations = {
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",
@@ -1259,6 +1367,8 @@ export const sv_SE: EnTranslations = {
       "buttons": "Knapplayout",
       "resetButtons": "Återställ knapplayout",
       "menuAction": "Spelmeny",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Vänster spak rör sig, höger spak siktar. Öppna ett fönster för att använda skärmpekaren."
     },
     "perf": {
@@ -1397,13 +1507,24 @@ export const sv_SE: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Heder: {amount}",
       "honorFloat": "+{amount} Heder",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Du får {amount} Heder ({reason}).",
       "notEnoughHonor": "Inte tillräckligt med heder.",
       "reasons": {
         "arenaWin": "Arenaseger",
         "fiestaKill": "Fiesta-nedtagning",
         "fiestaComplete": "Fiesta avklarad",
-        "fiestaWin": "Fiesta-seger"
+        "fiestaWin": "Fiesta-seger",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1476,6 +1597,7 @@ export const sv_SE: EnTranslations = {
     },
     "itemHeroicTag": "[HEROISK]",
     "itemSoulbound": "Själabunden",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1701,7 +1823,13 @@ export const sv_SE: EnTranslations = {
       "saveButton": "Spara fokus",
       "notInTownHint": "Du måste vara i staden för att ställa in ditt fokus.",
       "increaseAria": "Öka fokus på {component}",
-      "decreaseAria": "Minska fokus på {component}"
+      "decreaseAria": "Minska fokus på {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Befordra till ledare",
@@ -1811,6 +1939,7 @@ export const sv_SE: EnTranslations = {
       "dmgDoneReduce": "Minskar orsakad skada med {pct}%",
       "heatingUp": "Ditt nästa på varandra följande kritiska Eld-byggarslag ger Het svit; ett icke-kritiskt byggarslag tar bort Värms upp",
       "elementalConvergencePrimed": "Din nästa besvärjelse från den andra elementarskolan ger Elementär konvergens",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Stridsställning: 10% mer raserigenerering",
       "berserkerStance": "Bärsärkaställning: kritiska träffar sker 3% oftare och slår 3% hårdare",
       "crit": "Ökar kritisk träffchans med {pct}%",
@@ -1946,7 +2075,9 @@ export const sv_SE: EnTranslations = {
       "levelFamily": "Nivå {level} {family}",
       "familyDemon": "Demon",
       "hostile": "Fientlig",
-      "friendly": "Vänlig"
+      "friendly": "Vänlig",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Flytta målramen",
@@ -1997,6 +2128,7 @@ export const sv_SE: EnTranslations = {
     "materialHint": {
       "fineGrade": "Fin kvalitet. Bruten ur en åder av full nivå med ett verktyg som rankar över materialet, och räknas som den vanliga versionen varhelst en sådan krävs.",
       "cookingCatch": "Ingrediens för matlagning. Måste tillagas innan den kan ätas.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Förtrollningsreagens. Fås genom avförtrollning av vanlig och ovanlig utrustning.",
       "arcaneEssence": "Förtrollningsreagens. Fås genom avförtrollning av sällsynt utrustning.",
       "arcaneShard": "Förtrollningsreagens. Fås genom avförtrollning av episk och legendarisk utrustning.",
@@ -2386,10 +2518,6 @@ export const sv_SE: EnTranslations = {
           "title": "Marknadsdag",
           "note": "Köpmannen väntar färska varor. En fin dag att botanisera på Världsmarknaden."
         },
-        "fiestaNight": {
-          "title": "Fiestanatt",
-          "note": "2v2-fiestans ring drar sin högljuddaste publik i kväll."
-        },
         "arenaClash": {
           "title": "Arenadrabbning",
           "note": "Duellanter flockas till Askgrå kolosseum. Ställ dig i kö och klättra på stegen."
@@ -2405,6 +2533,10 @@ export const sv_SE: EnTranslations = {
         "moongateCommunion": {
           "title": "Månportskommunion",
           "note": "Pilgrimer samlas vid templets månport under midmånadens måne."
+        },
+        "fiestaNight": {
+          "note": "2v2-fiestans ring drar sin högljuddaste publik i kväll.",
+          "title": "Fiestanatt"
         }
       }
     },
@@ -2452,6 +2584,7 @@ export const sv_SE: EnTranslations = {
       "catchLine": "Du drar in: {name}",
       "biteLine": "Något nappar på betet!",
       "gotAwayLine": "Det kom undan.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Malmåder",
         "wood": "Timmerbestånd",
@@ -2556,6 +2689,7 @@ export const sv_SE: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Förtrollning Vapen - Kraft",
       "enchant_weapon_intellect": "Förtrollning Vapen - Besvärjelsestyrka",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Förtrollning Hjälm - Uthållighet",
       "enchant_neck_spirit": "Förtrollning Halsband - Ande",
       "enchant_shoulder_agility": "Förtrollning Axelplåtar - Rörlighet",
@@ -2627,6 +2761,18 @@ export const sv_SE: EnTranslations = {
         "artisansEye": "Hantverkarens öga",
         "quickeningCharm": "Spänstamulett"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Montera {effect}",
       "toolEffectRechargeButton": "Ladda om",
       "toolEffectSlotted": "{effect} monterad på {profession}.",
@@ -2665,7 +2811,22 @@ export const sv_SE: EnTranslations = {
       "close": "Nära hantverk",
       "dialogOption": "Hantverk",
       "dialogOptionAria": "Öppna hantverksfönstret för {craft}",
-      "craft": "Hantverk",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Kräver:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(förbrukar {count} av fin kvalitet)",
@@ -2725,7 +2886,7 @@ export const sv_SE: EnTranslations = {
         "loom": "Vävstol",
         "toolworks": "Verktygsverkstad"
       },
-      "throttled": "Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.",
+      "busy": "You are busy.",
       "recipeNotLearned": "Du har inte lärt dig det receptet än.",
       "noBagSpace": "Du har inte plats för det tillverkade föremålet.",
       "skillReqLine": "Kräver {craft} {skill}",
@@ -2739,6 +2900,8 @@ export const sv_SE: EnTranslations = {
       "masterworkToast": "Mästerverk! {name}",
       "masterworkZoneLine": "{crafter} skapade ett mästerverk {name}!",
       "tierUpToast": "{craft} avancerat till nivå {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Dina händer lutar mot {archetype}. Dess inriktning väntar hos {master}.",
       "trendNudgeNoMaster": "Dina händer lutar mot {archetype}. Sök en hantverksmästare för att ta det upp.",
       "attunedZoneLine": "{name} har inriktats som {archetype}!",
@@ -2756,7 +2919,9 @@ export const sv_SE: EnTranslations = {
       "commissionToggle": "Beställningsstycke",
       "commissionToggleHint": "Binds till den första karaktären som tar emot det i en handel.",
       "commissionUnbound": "Beställningsstycke: binds till den första mottagaren",
-      "commissionBound": "Beställningsstycke: bundet till sin mottagare"
+      "commissionBound": "Beställningsstycke: bundet till sin mottagare",
+      "craft": "Hantverk",
+      "throttled": "Du tillverkar för snabbt. Vänta ett ögonblick och försök igen."
     },
     "itemMenu": {
       "use": "Använd",
@@ -2778,9 +2943,9 @@ export const sv_SE: EnTranslations = {
       "notHeld": "Du har inte det föremålet.",
       "notDisenchantable": "Du kan inte avförtrylla det.",
       "notSalvageable": "Du kan inte bärga det.",
-      "disenchantThrottled": "Du avförtrollar för snabbt. Vänta en stund och försök igen.",
-      "salvageThrottled": "Du bärgar för snabbt. Vänta en stund och försök igen.",
-      "enchantThrottled": "Du förtrollar för snabbt. Vänta en stund och försök igen.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "Den förtrollningen kan inte appliceras på det föremålet.",
       "enchantUnknown": "Den förtrollningen finns inte.",
       "enchantInsufficient": "Du har inte materialet för den förtrollningen.",
@@ -2821,7 +2986,10 @@ export const sv_SE: EnTranslations = {
       "replaceConfirmKeepsBond": "Uppdragsbindning",
       "replaceConfirmCost": "Kostnad: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Ersätt"
+      "replaceConfirmAccept": "Ersätt",
+      "disenchantThrottled": "Du avförtrollar för snabbt. Vänta en stund och försök igen.",
+      "enchantThrottled": "Du förtrollar för snabbt. Vänta en stund och försök igen.",
+      "salvageThrottled": "Du bärgar för snabbt. Vänta en stund och försök igen."
     },
     "training": {
       "title": "Utbildning: {name}",
@@ -2863,6 +3031,59 @@ export const sv_SE: EnTranslations = {
       "cannotAfford": "Du har inte råd med upplösningsavgiften.",
       "outOfRange": "Du måste vara vid en hantverksstation för att lösa upp.",
       "noSpace": "Du har inte plats för den obundna kopian."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Fängelsehålsletaren",
@@ -2962,7 +3183,8 @@ export const sv_SE: EnTranslations = {
         "raise_fallen": "Res de fallna (periodiska vågor av tillskott)",
         "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
-        "wardstones": "Väktarstenarnas kanaler (fasövergång)"
+        "wardstones": "Väktarstenarnas kanaler (fasövergång)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

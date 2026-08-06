@@ -391,7 +391,8 @@ export const zh_TW: EnTranslations = {
     },
     "emoteEditor": {
       "title": "表情",
-      "done": "完成"
+      "done": "完成",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "每日獎勵",
@@ -912,6 +913,7 @@ export const zh_TW: EnTranslations = {
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
       "autoShowHint": "一旦你的小隊造成傷害或治療，行數就會自動出現，此區段會在戰鬥結束幾秒後關閉。",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
@@ -951,6 +953,7 @@ export const zh_TW: EnTranslations = {
       "targetFriendlyNext": "切換友方目標",
       "discord": "Discord",
       "valecup": "溪谷盃",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "收起/拔出武器",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
@@ -958,6 +961,7 @@ export const zh_TW: EnTranslations = {
       "petTaunt": "寵物：嘲諷",
       "petDefensive": "寵物：防禦",
       "petAggressive": "寵物：攻擊性",
+      "targetPet": "Pet: Mark",
       "mount": "騎乘 / 下騎",
       "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。"
     },
@@ -1030,7 +1034,90 @@ export const zh_TW: EnTranslations = {
     },
     "pvp": {
       "launcherTitle": "PvP",
-      "mobileLabel": "PvP"
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "溪谷盃",
@@ -1191,6 +1278,24 @@ export const zh_TW: EnTranslations = {
       "graphicsFatal": "圖形復原失敗。請重新載入遊戲以繼續。",
       "graphicsReload": "重新載入遊戲",
       "graphicsDraftChanged": "圖形變更已準備好套用。",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "介面模式",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "桌面",
@@ -1212,6 +1317,7 @@ export const zh_TW: EnTranslations = {
       "aurasOnPlayerFrame": "增益顯示在玩家框",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
       "mouseoverCast": "對隊伍框架滑鼠指向施法",
@@ -1221,8 +1327,10 @@ export const zh_TW: EnTranslations = {
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
       "showThirdActionBar": "顯示第三動作列",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "鎖定動作列",
       "showTargetOfTarget": "顯示目標的目標",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
@@ -1259,6 +1367,8 @@ export const zh_TW: EnTranslations = {
       "buttons": "按鍵配置",
       "resetButtons": "重設按鍵配置",
       "menuAction": "遊戲選單",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "左搖桿移動，右搖桿控制鏡頭。開啟視窗即可使用螢幕指標。"
     },
     "perf": {
@@ -1397,13 +1507,24 @@ export const zh_TW: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "榮譽：{amount}",
       "honorFloat": "+{amount} 榮譽",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "你獲得了 {amount} 點榮譽（{reason}）。",
       "notEnoughHonor": "榮譽不足。",
       "reasons": {
         "arenaWin": "競技場勝利",
         "fiestaKill": "嘉年華擊倒",
         "fiestaComplete": "完成嘉年華",
-        "fiestaWin": "嘉年華勝利"
+        "fiestaWin": "嘉年華勝利",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1476,6 +1597,7 @@ export const zh_TW: EnTranslations = {
     },
     "itemHeroicTag": "[英雄]",
     "itemSoulbound": "靈魂綁定",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1701,7 +1823,13 @@ export const zh_TW: EnTranslations = {
       "saveButton": "儲存專注",
       "notInTownHint": "你必須在城鎮中才能設定專注。",
       "increaseAria": "增加對{component}的專注",
-      "decreaseAria": "減少對{component}的專注"
+      "decreaseAria": "減少對{component}的專注",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "提升為隊長",
@@ -1811,6 +1939,7 @@ export const zh_TW: EnTranslations = {
       "dmgDoneReduce": "造成的傷害降低 {pct}%",
       "heatingUp": "你的下一個火焰生成技能若連續造成致命一擊，會獲得熾熱連擊；未造成致命一擊則移除熱力迸發",
       "elementalConvergencePrimed": "你的下一個不同元素學派法術將觸發元素匯聚",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
       "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
       "crit": "暴擊機率提高 {pct}%",
@@ -1946,7 +2075,9 @@ export const zh_TW: EnTranslations = {
       "levelFamily": "等級 {level} {family}",
       "familyDemon": "惡魔",
       "hostile": "敵對",
-      "friendly": "友方"
+      "friendly": "友方",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "移動目標框",
@@ -1997,6 +2128,7 @@ export const zh_TW: EnTranslations = {
     "materialHint": {
       "fineGrade": "優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。",
       "cookingCatch": "烹飪材料。必須先烹飪後才能食用。",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "附魔材料。分解普通和優秀品質的裝備可得。",
       "arcaneEssence": "附魔材料。分解精良品質的裝備可得。",
       "arcaneShard": "附魔材料。分解史詩和傳說品質的裝備可得。",
@@ -2386,10 +2518,6 @@ export const zh_TW: EnTranslations = {
           "title": "集市日",
           "note": "商人正等著新貨。今天很適合逛逛世界市場。"
         },
-        "fiestaNight": {
-          "title": "狂歡之夜",
-          "note": "今晚 2v2 狂歡擂台的人氣最旺。"
-        },
         "arenaClash": {
           "title": "競技場之戰",
           "note": "決鬥者湧向灰燼鬥獸場。排隊開打，向天梯進發。"
@@ -2405,6 +2533,10 @@ export const zh_TW: EnTranslations = {
         "moongateCommunion": {
           "title": "月門共禱",
           "note": "朝聖者在月中之月下聚於神廟月門。"
+        },
+        "fiestaNight": {
+          "title": "狂歡之夜",
+          "note": "今晚 2v2 狂歡擂台的人氣最旺。"
         }
       }
     },
@@ -2452,6 +2584,7 @@ export const zh_TW: EnTranslations = {
       "catchLine": "你釣上了：{name}",
       "biteLine": "有東西上鉤了！",
       "gotAwayLine": "牠跑掉了。",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "礦脈",
         "wood": "林木",
@@ -2556,6 +2689,7 @@ export const zh_TW: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "附魔武器 - 威力",
       "enchant_weapon_intellect": "附魔武器 - 法術強度",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "附魔頭部 - 堅韌",
       "enchant_neck_spirit": "附魔頸部 - 精神",
       "enchant_shoulder_agility": "附魔肩部 - 敏捷",
@@ -2627,6 +2761,18 @@ export const zh_TW: EnTranslations = {
         "artisansEye": "匠人之眼",
         "quickeningCharm": "回春符"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "鑲嵌{effect}",
       "toolEffectRechargeButton": "充能",
       "toolEffectSlotted": "{effect}已鑲嵌到{profession}。",
@@ -2665,7 +2811,22 @@ export const zh_TW: EnTranslations = {
       "close": "關閉製作",
       "dialogOption": "製作",
       "dialogOptionAria": "開啟{craft}製作視窗",
-      "craft": "製作",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "需要:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 個優質品級）",
@@ -2725,7 +2886,7 @@ export const zh_TW: EnTranslations = {
         "loom": "織布機",
         "toolworks": "工坊"
       },
-      "throttled": "你製作得太快了，請稍等片刻後再試。",
+      "busy": "You are busy.",
       "recipeNotLearned": "你還沒有學會這個配方。",
       "noBagSpace": "背包空間不足，無法存放製作的物品。",
       "skillReqLine": "需要{craft} {skill}",
@@ -2739,6 +2900,8 @@ export const zh_TW: EnTranslations = {
       "masterworkToast": "傑作！{name}",
       "masterworkZoneLine": "{crafter}製作出了傑作{name}！",
       "tierUpToast": "{craft}提升至階級 {tier}！",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "你的雙手正傾向於{archetype}之道。其調諧任務在{master}處等候。",
       "trendNudgeNoMaster": "你的雙手正傾向於{archetype}之道。去尋找一位工藝大師來踏上此道吧。",
       "attunedZoneLine": "{name}已調諧為{archetype}！",
@@ -2756,7 +2919,9 @@ export const zh_TW: EnTranslations = {
       "commissionToggle": "委託製品",
       "commissionToggleHint": "將綁定給交易中第一個收到它的角色。",
       "commissionUnbound": "委託製品：將綁定給第一位收貨人",
-      "commissionBound": "委託製品：已綁定給收貨人"
+      "commissionBound": "委託製品：已綁定給收貨人",
+      "craft": "製作",
+      "throttled": "你製作得太快了，請稍等片刻後再試。"
     },
     "itemMenu": {
       "use": "使用",
@@ -2778,9 +2943,9 @@ export const zh_TW: EnTranslations = {
       "notHeld": "你沒有那件物品。",
       "notDisenchantable": "你無法分解那件物品。",
       "notSalvageable": "你無法拆解那件物品。",
-      "disenchantThrottled": "你分解得太快了。請稍候再試。",
-      "salvageThrottled": "你拆解得太快了。請稍候再試。",
-      "enchantThrottled": "你附魔得太快了。請稍候再試。",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "該附魔無法施加於那件物品。",
       "enchantUnknown": "該附魔不存在。",
       "enchantInsufficient": "你沒有該附魔所需的材料。",
@@ -2821,7 +2986,10 @@ export const zh_TW: EnTranslations = {
       "replaceConfirmKeepsBond": "委託綁定",
       "replaceConfirmCost": "費用：{cost}",
       "replaceConfirmCostItem": "{name} {count} 個",
-      "replaceConfirmAccept": "替換"
+      "replaceConfirmAccept": "替換",
+      "disenchantThrottled": "你分解得太快了。請稍候再試。",
+      "salvageThrottled": "你拆解得太快了。請稍候再試。",
+      "enchantThrottled": "你附魔得太快了。請稍候再試。"
     },
     "training": {
       "title": "訓練：{name}",
@@ -2863,6 +3031,59 @@ export const zh_TW: EnTranslations = {
       "cannotAfford": "你付不起解綁費用。",
       "outOfRange": "你必須站在對應的工作臺旁才能解綁。",
       "noSpace": "背包空間不足，無法存放解綁後的物品。"
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "地城搜尋器",
@@ -2962,7 +3183,8 @@ export const zh_TW: EnTranslations = {
         "raise_fallen": "亡者復生（週期性召喚小怪）",
         "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
         "deathless_rage": "不死之怒（需在護符石處打斷）",
-        "wardstones": "護符石引導（階段轉換）"
+        "wardstones": "護符石引導（階段轉換）",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

@@ -391,7 +391,8 @@ export const it_IT: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emote",
-      "done": "Fine"
+      "done": "Fine",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Ricompense giornaliere",
@@ -912,6 +913,7 @@ export const it_IT: EnTranslations = {
       "minutesSeconds": "{m}m {s}s",
       "seconds": "{s}s",
       "autoShowHint": "Le righe appaiono automaticamente non appena il tuo gruppo infligge danni o cura, e questo pannello si chiude qualche secondo dopo la fine del combattimento.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Altro ({count})",
@@ -951,6 +953,7 @@ export const it_IT: EnTranslations = {
       "targetFriendlyNext": "Scorri i bersagli amici",
       "discord": "Discord",
       "valecup": "Coppa della Valle",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Fodera/Sfodera Arma",
       "categoryPet": "Famiglio",
       "petAttack": "Famiglio: attacca",
@@ -958,6 +961,7 @@ export const it_IT: EnTranslations = {
       "petTaunt": "Famiglio: provoca",
       "petDefensive": "Famiglio: difensivo",
       "petAggressive": "Famiglio: aggressivo",
+      "targetPet": "Pet: Mark",
       "mount": "Monta / Smonta",
       "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo."
     },
@@ -1030,7 +1034,90 @@ export const it_IT: EnTranslations = {
     },
     "pvp": {
       "launcherTitle": "PvP",
-      "mobileLabel": "PvP"
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "La Coppa della Valle",
@@ -1191,6 +1278,24 @@ export const it_IT: EnTranslations = {
       "graphicsFatal": "Ripristino della grafica non riuscito. Ricarica il gioco per continuare.",
       "graphicsReload": "Ricarica il gioco",
       "graphicsDraftChanged": "Le modifiche alla grafica sono pronte per essere applicate.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Modalità interfaccia",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",
@@ -1212,6 +1317,7 @@ export const it_IT: EnTranslations = {
       "aurasOnPlayerFrame": "Buff sul riquadro del giocatore",
       "highContrastBackground": "Sfondo a contrasto elevato",
       "startAttackOnAbility": "Attacco automatico all'uso dell'abilita",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Raccolta automatica al passaggio",
       "groundReticle": "Reticolo di puntamento a terra",
       "mouseoverCast": "Lancio al passaggio del mouse sui riquadri del gruppo",
@@ -1221,8 +1327,10 @@ export const it_IT: EnTranslations = {
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
       "showThirdActionBar": "Mostra la terza barra delle azioni",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Mostra Pulsante Attacco",
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",
@@ -1259,6 +1367,8 @@ export const it_IT: EnTranslations = {
       "buttons": "Disposizione dei pulsanti",
       "resetButtons": "Ripristina disposizione dei pulsanti",
       "menuAction": "Menu di gioco",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Lo stick sinistro muove, quello destro orienta la telecamera. Apri una finestra per usare il puntatore a schermo."
     },
     "perf": {
@@ -1397,13 +1507,24 @@ export const it_IT: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Onore: {amount}",
       "honorFloat": "+{amount} Onore",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Ottieni {amount} Onore ({reason}).",
       "notEnoughHonor": "Onore insufficiente.",
       "reasons": {
         "arenaWin": "Vittoria nell'Arena",
         "fiestaKill": "Abbattimento della Fiesta",
         "fiestaComplete": "Fiesta completata",
-        "fiestaWin": "Vittoria nella Fiesta"
+        "fiestaWin": "Vittoria nella Fiesta",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1476,6 +1597,7 @@ export const it_IT: EnTranslations = {
     },
     "itemHeroicTag": "[EROICO]",
     "itemSoulbound": "Vincolato all’anima",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1701,7 +1823,13 @@ export const it_IT: EnTranslations = {
       "saveButton": "Salva priorità",
       "notInTownHint": "Devi essere in città per impostare la priorità.",
       "increaseAria": "Aumenta la priorità di {component}",
-      "decreaseAria": "Riduci la priorità di {component}"
+      "decreaseAria": "Riduci la priorità di {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Promuovi a Capo",
@@ -1811,6 +1939,7 @@ export const it_IT: EnTranslations = {
       "dmgDoneReduce": "Riduce i danni inflitti del {pct}%",
       "heatingUp": "Il prossimo colpo critico consecutivo con un costruttore del Fuoco concede Vampata; un costruttore non critico rimuove Surriscaldamento",
       "elementalConvergencePrimed": "Il prossimo incantesimo dall'altra scuola elementale concede Convergenza Elementale",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Posizione di Battaglia: 10% di generazione di rabbia in più",
       "berserkerStance": "Posizione del Berserker: colpi critici il 3% più frequenti e il 3% più potenti",
       "crit": "Aumenta la probabilità di colpo critico del {pct}%",
@@ -1946,7 +2075,9 @@ export const it_IT: EnTranslations = {
       "levelFamily": "{family} di livello {level}",
       "familyDemon": "Demone",
       "hostile": "Ostile",
-      "friendly": "Amichevole"
+      "friendly": "Amichevole",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Sposta il riquadro del bersaglio",
@@ -1997,6 +2128,7 @@ export const it_IT: EnTranslations = {
     "materialHint": {
       "fineGrade": "Grado pregiato. Raccolto da un filone di pieno livello con uno strumento di rango superiore al materiale, e vale come la versione ordinaria ovunque ne venga richiesta una.",
       "cookingCatch": "Ingrediente da cucina. Deve essere cucinato prima di essere mangiato.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento comune e non comune.",
       "arcaneEssence": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento raro.",
       "arcaneShard": "Reagente dell'incantamento. Si ottiene disincantando equipaggiamento epico e leggendario.",
@@ -2386,10 +2518,6 @@ export const it_IT: EnTranslations = {
           "title": "Giorno di Mercato",
           "note": "Il Mercante attende merce fresca. Un buon giorno per curiosare al Mercato Mondiale."
         },
-        "fiestaNight": {
-          "title": "Notte della Fiesta",
-          "note": "Stanotte il ring della Fiesta 2v2 richiama il suo pubblico più fragoroso."
-        },
         "arenaClash": {
           "title": "Scontro in Arena",
           "note": "I duellanti accorrono al Colosseo Cinereo. Mettiti in coda e scala la classifica."
@@ -2405,6 +2533,10 @@ export const it_IT: EnTranslations = {
         "moongateCommunion": {
           "title": "Comunione del Cancello Lunare",
           "note": "I pellegrini si radunano al cancello lunare del tempio sotto la luna di metà mese."
+        },
+        "fiestaNight": {
+          "note": "Stanotte il ring della Fiesta 2v2 richiama il suo pubblico più fragoroso.",
+          "title": "Notte della Fiesta"
         }
       }
     },
@@ -2452,6 +2584,7 @@ export const it_IT: EnTranslations = {
       "catchLine": "Riporti in superficie: {name}",
       "biteLine": "Qualcosa abbocca alla lenza!",
       "gotAwayLine": "E' fuggito.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Filone di minerale",
         "wood": "Boschetto di alberi",
@@ -2556,6 +2689,7 @@ export const it_IT: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Incanta Arma - Potenza",
       "enchant_weapon_intellect": "Incanta Arma - Potere Magico",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Incanta Elmo - Fortezza",
       "enchant_neck_spirit": "Incanta Collana - Spirito",
       "enchant_shoulder_agility": "Incanta Spalle - Agilita",
@@ -2627,6 +2761,18 @@ export const it_IT: EnTranslations = {
         "artisansEye": "Occhio dell'Artigiano",
         "quickeningCharm": "Amuleto di Ripresa"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Inserisci {effect}",
       "toolEffectRechargeButton": "Ricarica",
       "toolEffectSlotted": "Hai inserito {effect} su {profession}.",
@@ -2665,7 +2811,22 @@ export const it_IT: EnTranslations = {
       "close": "Chiudi la lavorazione",
       "dialogOption": "Fabbricazione",
       "dialogOptionAria": "Apri la finestra di fabbricazione per {craft}",
-      "craft": "Mestiere",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Richiede:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(usa {count} di grado pregiato)",
@@ -2725,7 +2886,7 @@ export const it_IT: EnTranslations = {
         "loom": "Telaio",
         "toolworks": "Officina degli attrezzi"
       },
-      "throttled": "Stai fabbricando troppo in fretta. Aspetta un momento e riprova.",
+      "busy": "You are busy.",
       "recipeNotLearned": "Non hai ancora imparato quella ricetta.",
       "noBagSpace": "Non hai spazio per l'oggetto realizzato.",
       "skillReqLine": "Richiede {craft} {skill}",
@@ -2739,6 +2900,8 @@ export const it_IT: EnTranslations = {
       "masterworkToast": "Capolavoro! {name}",
       "masterworkZoneLine": "{crafter} ha realizzato un capolavoro {name}!",
       "tierUpToast": "{craft} è avanzato al livello {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Le tue mani tendono verso {archetype}. La sua sintonizzazione attende con {master}.",
       "trendNudgeNoMaster": "Le tue mani tendono verso {archetype}. Cerca un maestro artigiano per intraprenderlo.",
       "attunedZoneLine": "{name} si e sintonizzato come {archetype}!",
@@ -2756,7 +2919,9 @@ export const it_IT: EnTranslations = {
       "commissionToggle": "Pezzo su commissione",
       "commissionToggleHint": "Si lega al primo personaggio che lo riceve in uno scambio.",
       "commissionUnbound": "Pezzo su commissione: si lega al primo destinatario",
-      "commissionBound": "Pezzo su commissione: legato al suo destinatario"
+      "commissionBound": "Pezzo su commissione: legato al suo destinatario",
+      "craft": "Mestiere",
+      "throttled": "Stai fabbricando troppo in fretta. Aspetta un momento e riprova."
     },
     "itemMenu": {
       "use": "Usa",
@@ -2778,9 +2943,9 @@ export const it_IT: EnTranslations = {
       "notHeld": "Non possiedi quell'oggetto.",
       "notDisenchantable": "Non puoi disincantare quello.",
       "notSalvageable": "Non puoi smantellare quello.",
-      "disenchantThrottled": "Stai disincantando troppo velocemente. Attendi un momento e riprova.",
-      "salvageThrottled": "Stai smantellando troppo velocemente. Attendi un momento e riprova.",
-      "enchantThrottled": "Stai incantando troppo velocemente. Attendi un momento e riprova.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "Quell'incantesimo non puo essere applicato a quell'oggetto.",
       "enchantUnknown": "Quell'incantesimo non esiste.",
       "enchantInsufficient": "Non hai i materiali per quell'incantesimo.",
@@ -2821,7 +2986,10 @@ export const it_IT: EnTranslations = {
       "replaceConfirmKeepsBond": "Vincolo di commissione",
       "replaceConfirmCost": "Costo: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Sostituisci"
+      "replaceConfirmAccept": "Sostituisci",
+      "disenchantThrottled": "Stai disincantando troppo velocemente. Attendi un momento e riprova.",
+      "enchantThrottled": "Stai incantando troppo velocemente. Attendi un momento e riprova.",
+      "salvageThrottled": "Stai smantellando troppo velocemente. Attendi un momento e riprova."
     },
     "training": {
       "title": "Formazione: {name}",
@@ -2863,6 +3031,59 @@ export const it_IT: EnTranslations = {
       "cannotAfford": "Non puoi permetterti la tariffa di scioglimento.",
       "outOfRange": "Devi essere a una stazione artigianale per sciogliere.",
       "noSpace": "Non hai spazio per la copia sciolta."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Cercatore di Dungeon",
@@ -2962,7 +3183,8 @@ export const it_IT: EnTranslations = {
         "raise_fallen": "Richiama i Caduti (ondate periodiche di rinforzi)",
         "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
-        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)"
+        "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

@@ -391,7 +391,8 @@ export const cs_CZ: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Emoty",
-      "done": "Hotovo"
+      "done": "Hotovo",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Denní odměny",
@@ -912,6 +913,7 @@ export const cs_CZ: EnTranslations = {
       "minutesSeconds": "{m} min {s} s",
       "seconds": "{s} s",
       "autoShowHint": "Řádky se zobrazí automaticky, jakmile tvoje skupina způsobí poškození nebo léčení, a tento segment se zavře několik sekund po skončení boje.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Ostatní ({count})",
@@ -951,6 +953,7 @@ export const cs_CZ: EnTranslations = {
       "targetFriendlyNext": "Procházet spojenecké cíle",
       "discord": "Discord",
       "valecup": "Pohár údolí",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Zasunout/Vytasit zbraň",
       "categoryPet": "Mazlíček",
       "petAttack": "Mazlíček: Útok",
@@ -958,6 +961,7 @@ export const cs_CZ: EnTranslations = {
       "petTaunt": "Mazlíček: Provokace",
       "petDefensive": "Mazlíček: Obranný",
       "petAggressive": "Mazlíček: Agresivní",
+      "targetPet": "Pet: Mark",
       "mount": "Nasednout / Sesednout",
       "mouseHint": "Fungují i tlačítka myši: při přiřazování stiskni prostřední tlačítko (M3) nebo boční tlačítko (M4, M5). Levá a pravá tlačítka zůstávají vyhrazena pro kameru, kliknutí k pohybu a klikání na věci ve světě."
     },
@@ -1030,7 +1034,90 @@ export const cs_CZ: EnTranslations = {
     },
     "pvp": {
       "launcherTitle": "PvP",
-      "mobileLabel": "PvP"
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "Pohár údolí",
@@ -1191,6 +1278,24 @@ export const cs_CZ: EnTranslations = {
       "graphicsFatal": "Obnova grafiky selhala. Pro pokračování hru znovu načti.",
       "graphicsReload": "Znovu načíst hru",
       "graphicsDraftChanged": "Změny grafiky jsou připravené k použití.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Režim rozhraní",
       "interfaceModeAuto": "Automaticky",
       "interfaceModeDesktop": "Desktop",
@@ -1212,6 +1317,7 @@ export const cs_CZ: EnTranslations = {
       "aurasOnPlayerFrame": "Buffy na rámu hráče",
       "highContrastBackground": "Vysoce kontrastní pozadí",
       "startAttackOnAbility": "Automatický útok při použití schopnosti",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Automatická kořist při průchodu",
       "groundReticle": "Zaměřovací kruh na zemi",
       "mouseoverCast": "Sesílání najetím myší na rámech skupiny",
@@ -1221,8 +1327,10 @@ export const cs_CZ: EnTranslations = {
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showThirdActionBar": "Zobrazit třetí panel akcí",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
@@ -1259,6 +1367,8 @@ export const cs_CZ: EnTranslations = {
       "buttons": "Rozložení tlačítek",
       "resetButtons": "Resetovat rozložení tlačítek",
       "menuAction": "Herní menu",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Levá páčka pohybuje, pravá páčka rozhlíží. Otevři okno pro použití ukazatele na obrazovce."
     },
     "perf": {
@@ -1397,13 +1507,24 @@ export const cs_CZ: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Čest: {amount}",
       "honorFloat": "+{amount} cti",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Získáváš {amount} cti ({reason}).",
       "notEnoughHonor": "Nemáš dost cti.",
       "reasons": {
         "arenaWin": "Vítězství v aréně",
         "fiestaKill": "Vyřazení ve Fiestě",
         "fiestaComplete": "Dokončení Fiesty",
-        "fiestaWin": "Vítězství ve Fiestě"
+        "fiestaWin": "Vítězství ve Fiestě",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1476,6 +1597,7 @@ export const cs_CZ: EnTranslations = {
     },
     "itemHeroicTag": "[HRDINSKÉ]",
     "itemSoulbound": "Vázáno na duši",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1701,7 +1823,13 @@ export const cs_CZ: EnTranslations = {
       "saveButton": "Uložit zaměření",
       "notInTownHint": "Zaměření lze nastavit jen ve městě.",
       "increaseAria": "Zvýšit zaměření na {component}",
-      "decreaseAria": "Snížit zaměření na {component}"
+      "decreaseAria": "Snížit zaměření na {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Povýšit na vůdce",
@@ -1811,6 +1939,7 @@ export const cs_CZ: EnTranslations = {
       "dmgDoneReduce": "Snižuje způsobené poškození o {pct} %",
       "heatingUp": "Tvůj příští po sobě jdoucí kritický zásah stavebního ohnivého kouzla udělí Žhavou sérii; nekritický stavební útok Rozehřívání odstraní",
       "elementalConvergencePrimed": "Tvoje příští kouzlo z jiné živlové školy udělí Živlovou konvergenci",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",
@@ -1946,7 +2075,9 @@ export const cs_CZ: EnTranslations = {
       "levelFamily": "Úroveň {level} {family}",
       "familyDemon": "Démon",
       "hostile": "Nepřátelský",
-      "friendly": "Přátelský"
+      "friendly": "Přátelský",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Přesunout rám cíle",
@@ -1997,6 +2128,7 @@ export const cs_CZ: EnTranslations = {
     "materialHint": {
       "fineGrade": "Jemná jakost. Sesbírána z naleziště plné úrovně nástrojem vyššího stupně, než je materiál, a počítá se jako běžná verze všude, kde je běžná verze potřeba.",
       "cookingCatch": "Kuchařská ingredience. Před snědením ji musíš uvařit.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Reagencie k okouzlení. Získává se rozzačarováním běžné a neobvyklé výbavy.",
       "arcaneEssence": "Reagencie k okouzlení. Získává se rozzačarováním vzácné výbavy.",
       "arcaneShard": "Reagencie k okouzlení. Získává se rozzačarováním epické a legendární výbavy.",
@@ -2386,10 +2518,6 @@ export const cs_CZ: EnTranslations = {
           "title": "Tržní den",
           "note": "Obchodník čeká čerstvé zásoby. Skvělý den pro procházení Světového trhu."
         },
-        "fiestaNight": {
-          "title": "Fiesta noc",
-          "note": "Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy."
-        },
         "arenaClash": {
           "title": "Střet v aréně",
           "note": "Duelisté míří do Popelavého kolosea. Zařaď se do fronty a stoupej v žebříčku."
@@ -2405,6 +2533,10 @@ export const cs_CZ: EnTranslations = {
         "moongateCommunion": {
           "title": "Společenství měsíční brány",
           "note": "Poutníci se scházejí u chrámové měsíční brány pod měsícem uprostřed měsíce."
+        },
+        "fiestaNight": {
+          "note": "Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy.",
+          "title": "Fiesta noc"
         }
       }
     },
@@ -2452,6 +2584,7 @@ export const cs_CZ: EnTranslations = {
       "catchLine": "Vytahuješ: {name}",
       "biteLine": "Něco zabralo!",
       "gotAwayLine": "Ta ti unikla.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Rudná žíla",
         "wood": "Kmen stromů",
@@ -2556,6 +2689,7 @@ export const cs_CZ: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Okouzlení zbraně - Moc",
       "enchant_weapon_intellect": "Okouzlení zbraně - Síla kouzel",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Okouzlení helmy - Pevnost",
       "enchant_neck_spirit": "Okouzlení náhrdelníku - Duch",
       "enchant_shoulder_agility": "Okouzlení nárameníků - Obratnost",
@@ -2627,6 +2761,18 @@ export const cs_CZ: EnTranslations = {
         "artisansEye": "Řemeslníkovo oko",
         "quickeningCharm": "Odpružení"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Vložit {effect}",
       "toolEffectRechargeButton": "Dobít",
       "toolEffectSlotted": "Efekt {effect} vložen do nástroje pro {profession}.",
@@ -2665,7 +2811,22 @@ export const cs_CZ: EnTranslations = {
       "close": "Zavřít výrobu",
       "dialogOption": "Výroba",
       "dialogOptionAria": "Otevřít okno výroby pro {craft}",
-      "craft": "Vyrobit",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Vyžaduje:",
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spotřebuje {count} jemné jakosti)",
@@ -2725,7 +2886,7 @@ export const cs_CZ: EnTranslations = {
         "loom": "Tkalcovský stav",
         "toolworks": "Nástrojárna"
       },
-      "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.",
+      "busy": "You are busy.",
       "recipeNotLearned": "Tento recept ses ještě nenaučil.",
       "noBagSpace": "Nemáš místo pro vyrobený předmět.",
       "skillReqLine": "Vyžaduje {craft} {skill}",
@@ -2739,6 +2900,8 @@ export const cs_CZ: EnTranslations = {
       "masterworkToast": "Mistrovské dílo! {name}",
       "masterworkZoneLine": "{crafter} vytvořil mistrovské dílo {name}!",
       "tierUpToast": "{craft} postoupilo do úrovně {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Tvoje ruce se klonívají k {archetype}. Jeho nalaďování tě čeká u {master}.",
       "trendNudgeNoMaster": "Tvoje ruce se klonívají k {archetype}. Vyhledej mistra řemesla a ujmi se ho.",
       "attunedZoneLine": "{name} se naladit jako {archetype}!",
@@ -2756,7 +2919,9 @@ export const cs_CZ: EnTranslations = {
       "commissionToggle": "Zakázkový předmět",
       "commissionToggleHint": "Váže se na první postavu, která ho přijme v obchodu.",
       "commissionUnbound": "Zakázkový předmět: váže se na prvního příjemce",
-      "commissionBound": "Zakázkový předmět: vázán na příjemce"
+      "commissionBound": "Zakázkový předmět: vázán na příjemce",
+      "craft": "Vyrobit",
+      "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu."
     },
     "itemMenu": {
       "use": "Použít",
@@ -2778,9 +2943,9 @@ export const cs_CZ: EnTranslations = {
       "notHeld": "Tento předmět nemáš.",
       "notDisenchantable": "Toto nelze rozzačarovat.",
       "notSalvageable": "Toto nelze rozebrat.",
-      "disenchantThrottled": "Rozzačaruješ příliš rychle. Chvíli počkej a zkus to znovu.",
-      "salvageThrottled": "Rozebíráš příliš rychle. Chvíli počkej a zkus to znovu.",
-      "enchantThrottled": "Okouzluješ příliš rychle. Chvíli počkej a zkus to znovu.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "Toto okouzlení nelze aplikovat na tento předmět.",
       "enchantUnknown": "Toto okouzlení neexistuje.",
       "enchantInsufficient": "Na toto okouzlení nemáš materiály.",
@@ -2821,7 +2986,10 @@ export const cs_CZ: EnTranslations = {
       "replaceConfirmKeepsBond": "Vazba zakázky",
       "replaceConfirmCost": "Cena: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Nahradit"
+      "replaceConfirmAccept": "Nahradit",
+      "disenchantThrottled": "Rozzačaruješ příliš rychle. Chvíli počkej a zkus to znovu.",
+      "enchantThrottled": "Okouzluješ příliš rychle. Chvíli počkej a zkus to znovu.",
+      "salvageThrottled": "Rozebíráš příliš rychle. Chvíli počkej a zkus to znovu."
     },
     "training": {
       "title": "Školení: {name}",
@@ -2863,6 +3031,59 @@ export const cs_CZ: EnTranslations = {
       "cannotAfford": "Na odpoutání nemáš dostatek prostředků.",
       "outOfRange": "Pro odpoutání musíš být u příslušného mistra.",
       "noSpace": "Nemáš místo pro odpoutaný předmět."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Hledač dungeonů",
@@ -2962,7 +3183,8 @@ export const cs_CZ: EnTranslations = {
         "raise_fallen": "Povstání padlých (periodické vlny přivolávek)",
         "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
-        "wardstones": "Kanály ochranných kamenů (přechod fáze)"
+        "wardstones": "Kanály ochranných kamenů (přechod fáze)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

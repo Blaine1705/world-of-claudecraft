@@ -391,7 +391,8 @@ export const vi_VN: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Biểu Cảm",
-      "done": "Xong"
+      "done": "Xong",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Phần Thưởng Hằng Ngày",
@@ -912,6 +913,7 @@ export const vi_VN: EnTranslations = {
       "minutesSeconds": "{m}p {s}g",
       "seconds": "{s}g",
       "autoShowHint": "Các hàng xuất hiện tự động sau khi nhóm của bạn gây sát thương hoặc hồi máu, và phần này đóng lại vài giây sau khi chiến đấu kết thúc.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Khác ({count})",
@@ -951,6 +953,7 @@ export const vi_VN: EnTranslations = {
       "targetFriendlyNext": "Luân Phiên Mục Tiêu Đồng Minh",
       "discord": "Discord",
       "valecup": "Cúp Thung Lũng",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Tra/Rút Vũ Khí",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
@@ -958,6 +961,7 @@ export const vi_VN: EnTranslations = {
       "petTaunt": "Thú Cưng: Khiêu Khích",
       "petDefensive": "Thú Cưng: Phòng Thủ",
       "petAggressive": "Thú Cưng: Hung Hăng",
+      "targetPet": "Pet: Mark",
       "mount": "Cưỡi Thú / Xuống Thú",
       "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới."
     },
@@ -1030,7 +1034,90 @@ export const vi_VN: EnTranslations = {
     },
     "pvp": {
       "launcherTitle": "PvP",
-      "mobileLabel": "PvP"
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "Cúp Thung Lũng",
@@ -1191,6 +1278,24 @@ export const vi_VN: EnTranslations = {
       "graphicsFatal": "Khôi phục đồ họa thất bại. Hãy tải lại trò chơi để tiếp tục.",
       "graphicsReload": "Tải Lại Trò Chơi",
       "graphicsDraftChanged": "Các thay đổi đồ họa đã sẵn sàng để áp dụng.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Chế Độ Giao Diện",
       "interfaceModeAuto": "Tự Động",
       "interfaceModeDesktop": "Máy Tính",
@@ -1212,6 +1317,7 @@ export const vi_VN: EnTranslations = {
       "aurasOnPlayerFrame": "Hiệu Ứng Có Lợi Trên Khung Người Chơi",
       "highContrastBackground": "Nền Tương Phản Cao",
       "startAttackOnAbility": "Tự Đánh Khi Dùng Kỹ Năng",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Tự Nhặt Đồ Khi Đi Ngang",
       "groundReticle": "Vòng ngắm mục tiêu mặt đất",
       "mouseoverCast": "Thi Triển Khi Rê Chuột Trên Khung Tổ Đội",
@@ -1221,8 +1327,10 @@ export const vi_VN: EnTranslations = {
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
       "showThirdActionBar": "Hiển thị thanh hành động thứ ba",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
@@ -1259,6 +1367,8 @@ export const vi_VN: EnTranslations = {
       "buttons": "Bố Cục Nút",
       "resetButtons": "Đặt Lại Bố Cục Nút",
       "menuAction": "Menu Trò Chơi",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Cần trái để di chuyển, cần phải để quan sát. Mở một cửa sổ để dùng con trỏ trên màn hình."
     },
     "perf": {
@@ -1397,13 +1507,24 @@ export const vi_VN: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Danh dự: {amount}",
       "honorFloat": "+{amount} Danh dự",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Bạn nhận được Danh dự {amount} ({reason}).",
       "notEnoughHonor": "Không đủ danh dự.",
       "reasons": {
         "arenaWin": "Chiến thắng đấu trường",
         "fiestaKill": "Hạ gục trong Fiesta",
         "fiestaComplete": "Fiesta đã hoàn thành",
-        "fiestaWin": "Chiến thắng Fiesta"
+        "fiestaWin": "Chiến thắng Fiesta",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1476,6 +1597,7 @@ export const vi_VN: EnTranslations = {
     },
     "itemHeroicTag": "[ANH HÙNG]",
     "itemSoulbound": "Ràng Buộc Linh Hồn",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1701,7 +1823,13 @@ export const vi_VN: EnTranslations = {
       "saveButton": "Lưu Trọng Tâm",
       "notInTownHint": "Bạn phải ở trong thị trấn để đặt trọng tâm.",
       "increaseAria": "Tăng trọng tâm cho {component}",
-      "decreaseAria": "Giảm trọng tâm cho {component}"
+      "decreaseAria": "Giảm trọng tâm cho {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Thăng Làm Đội Trưởng",
@@ -1811,6 +1939,7 @@ export const vi_VN: EnTranslations = {
       "dmgDoneReduce": "Giảm sát thương gây ra đi {pct}%",
       "heatingUp": "Cú chí mạng tiếp theo của kỹ năng xây dựng Lửa liên tiếp sẽ ban Hot Streak; cú không chí mạng sẽ xóa Đang Nóng Dần",
       "elementalConvergencePrimed": "Phép tiếp theo của bạn từ trường nguyên tố khác sẽ ban Hội Tụ Nguyên Tố",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Thế Công: tạo nộ khí nhiều hơn 10%",
       "berserkerStance": "Thế Cuồng Chiến: chí mạng thường xuyên hơn 3% và mạnh hơn 3%",
       "crit": "Tăng tỉ lệ chí mạng thêm {pct}%",
@@ -1946,7 +2075,9 @@ export const vi_VN: EnTranslations = {
       "levelFamily": "{family} cấp {level}",
       "familyDemon": "Ác Quỷ",
       "hostile": "Thù Địch",
-      "friendly": "Thân Thiện"
+      "friendly": "Thân Thiện",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Di chuyển khung mục tiêu",
@@ -1997,6 +2128,7 @@ export const vi_VN: EnTranslations = {
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
       "cookingCatch": "Nguyên liệu nấu ăn. Phải nấu chín trước khi ăn.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị phổ thông và khác thường.",
       "arcaneEssence": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị hiếm.",
       "arcaneShard": "Nguyên liệu pháp khắc. Nhận được khi hủy pháp khắc trang bị sử thi và huyền thoại.",
@@ -2386,10 +2518,6 @@ export const vi_VN: EnTranslations = {
           "title": "Ngày Họp Chợ",
           "note": "Thương Nhân chờ đợi hàng mới về. Một ngày lành để dạo Chợ Thế Giới."
         },
-        "fiestaNight": {
-          "title": "Đêm Fiesta",
-          "note": "Võ đài Fiesta 2v2 đón đám đông cuồng nhiệt nhất vào tối nay."
-        },
         "arenaClash": {
           "title": "Đại Chiến Đấu Trường",
           "note": "Các đấu sĩ đổ về Đấu Trường Tro Tàn. Hãy xếp hàng và leo bảng xếp hạng."
@@ -2405,6 +2533,10 @@ export const vi_VN: EnTranslations = {
         "moongateCommunion": {
           "title": "Hội Ngộ Nguyệt Môn",
           "note": "Khách hành hương tụ họp tại nguyệt môn của ngôi đền dưới ánh trăng giữa tháng."
+        },
+        "fiestaNight": {
+          "note": "Võ đài Fiesta 2v2 đón đám đông cuồng nhiệt nhất vào tối nay.",
+          "title": "Đêm Fiesta"
         }
       }
     },
@@ -2452,6 +2584,7 @@ export const vi_VN: EnTranslations = {
       "catchLine": "Bạn giật cần: {name}",
       "biteLine": "Có thứ gì đó cắn mồi!",
       "gotAwayLine": "Nó thoát mất rồi.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Mạch Quặng",
         "wood": "Bãi Gỗ",
@@ -2556,6 +2689,7 @@ export const vi_VN: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Pháp Khắc Vũ Khí - Dũng Mãnh",
       "enchant_weapon_intellect": "Pháp Khắc Vũ Khí - Sức Mạnh Phép Thuật",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Pháp Khắc Mũ Giáp - Kiên Cường",
       "enchant_neck_spirit": "Pháp Khắc Vòng Cổ - Tinh Thần",
       "enchant_shoulder_agility": "Pháp Khắc Giáp Vai - Nhanh Nhẹn",
@@ -2627,6 +2761,18 @@ export const vi_VN: EnTranslations = {
         "artisansEye": "Mắt Nghệ Nhân",
         "quickeningCharm": "Bùa Hồi Nhanh"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Gắn {effect}",
       "toolEffectRechargeButton": "Nạp Lại",
       "toolEffectSlotted": "Đã gắn {effect} cho {profession}.",
@@ -2665,7 +2811,22 @@ export const vi_VN: EnTranslations = {
       "close": "Đóng chế tạo",
       "dialogOption": "Chế Tác",
       "dialogOptionAria": "Mở cửa sổ chế tác cho {craft}",
-      "craft": "thủ công",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Yêu cầu:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(tiêu tốn {count} hảo hạng)",
@@ -2725,7 +2886,7 @@ export const vi_VN: EnTranslations = {
         "loom": "khung cửi",
         "toolworks": "Xưởng dụng cụ"
       },
-      "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại.",
+      "busy": "You are busy.",
       "recipeNotLearned": "Bạn chưa học công thức đó.",
       "noBagSpace": "Túi của bạn không còn chỗ cho vật phẩm vừa chế tạo.",
       "skillReqLine": "Yêu cầu {craft} {skill}",
@@ -2739,6 +2900,8 @@ export const vi_VN: EnTranslations = {
       "masterworkToast": "Tuyệt tác! {name}",
       "masterworkZoneLine": "{crafter} đã tạo ra một kiệt tác {name}!",
       "tierUpToast": "{craft} đã thăng cấp lên cấp {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Đôi bàn tay của bạn đang nghiêng về {archetype}. Sự thụ ngộ của nó đang chờ với {master}.",
       "trendNudgeNoMaster": "Đôi bàn tay của bạn đang nghiêng về {archetype}. Hãy tìm kiếm một bậc thầy thủ công để theo đuổi nó.",
       "attunedZoneLine": "{name} đã thụ ngộ là {archetype}!",
@@ -2756,7 +2919,9 @@ export const vi_VN: EnTranslations = {
       "commissionToggle": "Đồ ủy thác",
       "commissionToggleHint": "Ràng buộc với nhân vật đầu tiên nhận nó qua giao dịch.",
       "commissionUnbound": "Đồ ủy thác: ràng buộc với người nhận đầu tiên",
-      "commissionBound": "Đồ ủy thác: đã ràng buộc với người nhận"
+      "commissionBound": "Đồ ủy thác: đã ràng buộc với người nhận",
+      "craft": "thủ công",
+      "throttled": "Bạn đang chế tạo quá nhanh. Hãy chờ một lát rồi thử lại."
     },
     "itemMenu": {
       "use": "Sử Dụng",
@@ -2778,9 +2943,9 @@ export const vi_VN: EnTranslations = {
       "notHeld": "Bạn không có vật phẩm đó.",
       "notDisenchantable": "Bạn không thể hủy pháp khắc vật phẩm đó.",
       "notSalvageable": "Bạn không thể tháo dỡ vật phẩm đó.",
-      "disenchantThrottled": "Bạn đang hủy pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.",
-      "salvageThrottled": "Bạn đang tháo dỡ quá nhanh. Hãy đợi một lát rồi thử lại.",
-      "enchantThrottled": "Bạn đang pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "Phép khắc đó không thể áp dụng cho vật phẩm đó.",
       "enchantUnknown": "Phép khắc đó không tồn tại.",
       "enchantInsufficient": "Bạn không có đủ nguyên liệu cho phép khắc đó.",
@@ -2821,7 +2986,10 @@ export const vi_VN: EnTranslations = {
       "replaceConfirmKeepsBond": "Ràng buộc ủy thác",
       "replaceConfirmCost": "Chi phí: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Thay Thế"
+      "replaceConfirmAccept": "Thay Thế",
+      "disenchantThrottled": "Bạn đang hủy pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.",
+      "enchantThrottled": "Bạn đang pháp khắc quá nhanh. Hãy đợi một lát rồi thử lại.",
+      "salvageThrottled": "Bạn đang tháo dỡ quá nhanh. Hãy đợi một lát rồi thử lại."
     },
     "training": {
       "title": "Đào tạo: {name}",
@@ -2863,6 +3031,59 @@ export const vi_VN: EnTranslations = {
       "cannotAfford": "Bạn không đủ tiền để trả phí gỡ ràng buộc.",
       "outOfRange": "Bạn phải ở tại bàn chế tác để gỡ ràng buộc.",
       "noSpace": "Túi của bạn không còn chỗ cho bản đã gỡ ràng buộc."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Tìm Hầm Ngục",
@@ -2962,7 +3183,8 @@ export const vi_VN: EnTranslations = {
         "raise_fallen": "Triệu Hồi Tử Giả (các đợt quân tiếp viện theo chu kỳ)",
         "soul_rend": "Xé Hồn (người chơi bị đánh dấu phải tản ra và được hồi máu)",
         "deathless_rage": "Thịnh Nộ Bất Tử (bị gián đoạn tại các đá hộ mệnh)",
-        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)"
+        "wardstones": "Kênh đá hộ mệnh (chuyển giai đoạn)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

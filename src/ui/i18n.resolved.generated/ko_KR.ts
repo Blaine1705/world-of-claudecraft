@@ -391,7 +391,8 @@ export const ko_KR: EnTranslations = {
     },
     "emoteEditor": {
       "title": "감정 표현",
-      "done": "완료"
+      "done": "완료",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "일일 보상",
@@ -912,6 +913,7 @@ export const ko_KR: EnTranslations = {
       "minutesSeconds": "{m}분 {s}초",
       "seconds": "{s}초",
       "autoShowHint": "파티가 피해를 주거나 치유를 하면 행이 자동으로 나타나며, 전투가 끝난 후 몇 초 뒤에 이 구역이 닫힙니다.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "기타 ({count})",
@@ -951,6 +953,7 @@ export const ko_KR: EnTranslations = {
       "targetFriendlyNext": "아군 대상 순환",
       "discord": "Discord",
       "valecup": "베일 컵",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "무기 넣기/빼기",
       "categoryPet": "펫",
       "petAttack": "펫: 공격",
@@ -958,6 +961,7 @@ export const ko_KR: EnTranslations = {
       "petTaunt": "펫: 도발",
       "petDefensive": "펫: 방어",
       "petAggressive": "펫: 공격적",
+      "targetPet": "Pet: Mark",
       "mount": "탑승 / 하차",
       "mouseHint": "마우스 버튼도 사용할 수 있습니다. 지정하는 동안 가운데 버튼 (M3) 또는 엄지 버튼 (M4, M5) 을 누르세요. 왼쪽과 오른쪽 버튼은 카메라 조작, 클릭 이동, 월드 클릭용으로 예약되어 있습니다."
     },
@@ -1030,7 +1034,90 @@ export const ko_KR: EnTranslations = {
     },
     "pvp": {
       "launcherTitle": "PvP",
-      "mobileLabel": "PvP"
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "베일 컵",
@@ -1191,6 +1278,24 @@ export const ko_KR: EnTranslations = {
       "graphicsFatal": "그래픽 복구에 실패했습니다. 계속하려면 게임을 다시 불러오세요.",
       "graphicsReload": "게임 다시 불러오기",
       "graphicsDraftChanged": "그래픽 변경 사항을 적용할 수 있습니다.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "인터페이스 모드",
       "interfaceModeAuto": "자동",
       "interfaceModeDesktop": "데스크톱",
@@ -1212,6 +1317,7 @@ export const ko_KR: EnTranslations = {
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
       "mouseoverCast": "파티 창에서 마우스오버 시전",
@@ -1221,8 +1327,10 @@ export const ko_KR: EnTranslations = {
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
       "showThirdActionBar": "세 번째 액션 바 표시",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
@@ -1259,6 +1367,8 @@ export const ko_KR: EnTranslations = {
       "buttons": "버튼 배치",
       "resetButtons": "버튼 배치 초기화",
       "menuAction": "게임 메뉴",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "왼쪽 스틱으로 이동, 오른쪽 스틱으로 시점 조작. 창을 열면 화면 포인터를 사용할 수 있습니다."
     },
     "perf": {
@@ -1397,13 +1507,24 @@ export const ko_KR: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "명예: {amount}",
       "honorFloat": "명예 +{amount}",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "명예를 {amount} 획득했습니다({reason}).",
       "notEnoughHonor": "명예가 부족합니다.",
       "reasons": {
         "arenaWin": "투기장 승리",
         "fiestaKill": "피에스타 처치",
         "fiestaComplete": "피에스타 완료",
-        "fiestaWin": "피에스타 승리"
+        "fiestaWin": "피에스타 승리",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1476,6 +1597,7 @@ export const ko_KR: EnTranslations = {
     },
     "itemHeroicTag": "[영웅]",
     "itemSoulbound": "귀속",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1701,7 +1823,13 @@ export const ko_KR: EnTranslations = {
       "saveButton": "집중 저장",
       "notInTownHint": "집중을 설정하려면 마을에 있어야 합니다.",
       "increaseAria": "{component}에 대한 집중 증가",
-      "decreaseAria": "{component}에 대한 집중 감소"
+      "decreaseAria": "{component}에 대한 집중 감소",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "파티장으로 지정",
@@ -1811,6 +1939,7 @@ export const ko_KR: EnTranslations = {
       "dmgDoneReduce": "입히는 피해가 {pct}% 감소합니다",
       "heatingUp": "다음 화염 생성기가 연속으로 치명타를 적중하면 몰아치는 열기를 얻고, 치명타가 아니면 달아오름이 제거됩니다",
       "elementalConvergencePrimed": "다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "전투 태세: 분노 생성 10% 증가",
       "berserkerStance": "광전사 태세: 치명타 확률 3% 증가, 피해 3% 증가",
       "crit": "치명타 확률이 {pct}% 증가합니다",
@@ -1946,7 +2075,9 @@ export const ko_KR: EnTranslations = {
       "levelFamily": "{level}레벨 {family}",
       "familyDemon": "악마",
       "hostile": "적대",
-      "friendly": "아군"
+      "friendly": "아군",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "대상 프레임 이동",
@@ -1997,6 +2128,7 @@ export const ko_KR: EnTranslations = {
     "materialHint": {
       "fineGrade": "상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.",
       "cookingCatch": "요리 재료. 먹기 전에 먼저 요리해야 합니다.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "마법부여 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.",
       "arcaneEssence": "마법부여 재료. 희귀 장비의 마력을 추출해 얻습니다.",
       "arcaneShard": "마법부여 재료. 영웅과 전설 장비의 마력을 추출해 얻습니다.",
@@ -2386,10 +2518,6 @@ export const ko_KR: EnTranslations = {
           "title": "장날",
           "note": "상인이 새 물건을 기다립니다. 월드 마켓을 둘러보기 좋은 날."
         },
-        "fiestaNight": {
-          "title": "피에스타의 밤",
-          "note": "오늘 밤 2대2 피에스타 링이 가장 붐빕니다."
-        },
         "arenaClash": {
           "title": "투기장 격돌",
           "note": "결투사들이 잿빛 투기장으로 몰려듭니다. 대기열에 올라 순위를 노리세요."
@@ -2405,6 +2533,10 @@ export const ko_KR: EnTranslations = {
         "moongateCommunion": {
           "title": "달문 집회",
           "note": "보름의 달 아래 순례자들이 사원의 달문에 모입니다."
+        },
+        "fiestaNight": {
+          "title": "피에스타의 밤",
+          "note": "오늘 밤 2대2 피에스타 링이 가장 붐빕니다."
         }
       }
     },
@@ -2452,6 +2584,7 @@ export const ko_KR: EnTranslations = {
       "catchLine": "{name}을(를) 낚아 올렸습니다",
       "biteLine": "무언가 미끼를 물었습니다!",
       "gotAwayLine": "놓쳐 버렸습니다.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "광맥",
         "wood": "벌목 나무",
@@ -2556,6 +2689,7 @@ export const ko_KR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "무기 마법부여 - 위력",
       "enchant_weapon_intellect": "무기 마법부여 - 주문력",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "투구 마법부여 - 강건함",
       "enchant_neck_spirit": "목걸이 마법부여 - 정신력",
       "enchant_shoulder_agility": "어깨 마법부여 - 민첩성",
@@ -2627,6 +2761,18 @@ export const ko_KR: EnTranslations = {
         "artisansEye": "장인의 눈",
         "quickeningCharm": "회복의 부적"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "{effect} 장착",
       "toolEffectRechargeButton": "재충전",
       "toolEffectSlotted": "{effect}이(가) {profession}에 장착되었습니다.",
@@ -2665,7 +2811,22 @@ export const ko_KR: EnTranslations = {
       "close": "제작 닫기",
       "dialogOption": "제작",
       "dialogOptionAria": "{craft} 제작 창 열기",
-      "craft": "제작",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "필요 재료:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(상급 등급 {count}개 소모)",
@@ -2725,7 +2886,7 @@ export const ko_KR: EnTranslations = {
         "loom": "베틀",
         "toolworks": "공작소"
       },
-      "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요.",
+      "busy": "You are busy.",
       "recipeNotLearned": "아직 그 제작법을 배우지 않았습니다.",
       "noBagSpace": "가방에 제작한 아이템을 넣을 공간이 없습니다.",
       "skillReqLine": "{craft} {skill} 필요",
@@ -2739,6 +2900,8 @@ export const ko_KR: EnTranslations = {
       "masterworkToast": "걸작! {name}",
       "masterworkZoneLine": "{crafter}님이 걸작 {name}을(를) 제작했습니다!",
       "tierUpToast": "{craft} 티어 {tier} 달성!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 조율 임무는 {master}에게 있습니다.",
       "trendNudgeNoMaster": "당신의 솜씨가 {archetype} 쪽으로 기울고 있습니다. 그 길을 택하려면 공예 명인을 찾으세요.",
       "attunedZoneLine": "{name}님이 {archetype}(으)로 조율했습니다!",
@@ -2756,7 +2919,9 @@ export const ko_KR: EnTranslations = {
       "commissionToggle": "주문 제작품으로 제작",
       "commissionToggleHint": "거래로 처음 받는 캐릭터에게 귀속됩니다.",
       "commissionUnbound": "주문 제작품: 첫 수령인에게 귀속됩니다",
-      "commissionBound": "주문 제작품: 수령인에게 귀속되어 있습니다"
+      "commissionBound": "주문 제작품: 수령인에게 귀속되어 있습니다",
+      "craft": "제작",
+      "throttled": "너무 빨리 제작하고 있습니다. 잠시 후 다시 시도하세요."
     },
     "itemMenu": {
       "use": "사용",
@@ -2778,9 +2943,9 @@ export const ko_KR: EnTranslations = {
       "notHeld": "해당 아이템을 가지고 있지 않습니다.",
       "notDisenchantable": "해당 아이템은 마력을 추출할 수 없습니다.",
       "notSalvageable": "해당 아이템은 분해할 수 없습니다.",
-      "disenchantThrottled": "너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.",
-      "salvageThrottled": "너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.",
-      "enchantThrottled": "너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "그 마법부여는 해당 아이템에 적용할 수 없습니다.",
       "enchantUnknown": "해당 마법부여가 존재하지 않습니다.",
       "enchantInsufficient": "해당 마법부여에 필요한 재료가 없습니다.",
@@ -2821,7 +2986,10 @@ export const ko_KR: EnTranslations = {
       "replaceConfirmKeepsBond": "주문 제작품 귀속",
       "replaceConfirmCost": "비용: {cost}",
       "replaceConfirmCostItem": "{name} {count}개",
-      "replaceConfirmAccept": "대체"
+      "replaceConfirmAccept": "대체",
+      "disenchantThrottled": "너무 빠르게 마력을 추출하고 있습니다. 잠시 후 다시 시도하세요.",
+      "salvageThrottled": "너무 빠르게 분해하고 있습니다. 잠시 후 다시 시도하세요.",
+      "enchantThrottled": "너무 빠르게 마법부여하고 있습니다. 잠시 후 다시 시도하세요."
     },
     "training": {
       "title": "훈련: {name}",
@@ -2863,6 +3031,59 @@ export const ko_KR: EnTranslations = {
       "cannotAfford": "귀속 해제 수수료를 지불할 수 없습니다.",
       "outOfRange": "귀속을 해제하려면 작업대 옆에 있어야 합니다.",
       "noSpace": "가방에 귀속 해제한 아이템을 넣을 공간이 없습니다."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "던전 찾기",
@@ -2962,7 +3183,8 @@ export const ko_KR: EnTranslations = {
         "raise_fallen": "망자 소생(주기적 증원)",
         "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
         "deathless_rage": "불사의 격노(수호석에서 저지)",
-        "wardstones": "수호석 정신집중(단계 전환)"
+        "wardstones": "수호석 정신집중(단계 전환)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {

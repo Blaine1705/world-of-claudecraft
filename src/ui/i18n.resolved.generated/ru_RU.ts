@@ -391,7 +391,8 @@ export const ru_RU: EnTranslations = {
     },
     "emoteEditor": {
       "title": "Эмоции",
-      "done": "Готово"
+      "done": "Готово",
+      "close": "Close emotes"
     },
     "dailyRewards": {
       "title": "Ежедневные награды",
@@ -912,6 +913,7 @@ export const ru_RU: EnTranslations = {
       "minutesSeconds": "{m} мин {s} сек.",
       "seconds": "{s} сек.",
       "autoShowHint": "Строки появляются автоматически, как только ваша группа наносит урон или лечит, и этот раздел закрывается через несколько секунд после окончания боя.",
+      "threatFallback": "No live threat: showing damage to {name}",
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Прочее ({count})",
@@ -951,6 +953,7 @@ export const ru_RU: EnTranslations = {
       "targetFriendlyNext": "Следующий союзник",
       "discord": "Discord",
       "valecup": "Кубок Долины",
+      "bgFlag": "Battleground Flag Action",
       "sheathe": "Убрать/обнажить оружие",
       "categoryPet": "Питомец",
       "petAttack": "Питомец: атака",
@@ -958,6 +961,7 @@ export const ru_RU: EnTranslations = {
       "petTaunt": "Питомец: провокация",
       "petDefensive": "Питомец: защита",
       "petAggressive": "Питомец: агрессия",
+      "targetPet": "Pet: Mark",
       "mount": "Сесть / Спешиться",
       "mouseHint": "Кнопки мыши тоже работают: во время назначения нажмите среднюю кнопку (M3) или боковую (M4, M5). Левая и правая остаются зарезервированы для камеры, перемещения кликом и кликов по миру."
     },
@@ -1030,7 +1034,90 @@ export const ru_RU: EnTranslations = {
     },
     "pvp": {
       "launcherTitle": "PvP",
-      "mobileLabel": "PvP"
+      "mobileLabel": "PvP",
+      "bracket1v1": "1v1",
+      "bracket2v2": "2v2"
+    },
+    "bg": {
+      "title": "Thornhollow Fields",
+      "blurb": "Two ruined keeps face each other across a walled hollow in the shadow of Thornpeak: Crimson to the south, Azure to the north, and the older Ruin Courtyard between them that neither has ever held. Five a side, one banner each, and the first to carry three of theirs home takes the field.",
+      "modeTag": "5v5 Capture the Flag",
+      "offlineNote": "Thornhollow Fields is syncing. The queue opens once the realm answers.",
+      "ratingSummary": "Rating. {wins} wins / {losses} losses",
+      "careerCaptures": "Career captures: {count}",
+      "enterQueue": "Enter the Queue",
+      "enterQueueParty": "Enter the Queue (party of {count})",
+      "leaveQueue": "Leave Queue",
+      "searching": "Searching. {count}/{size} in queue.",
+      "queuedParty": "Party of {count}.",
+      "queueNote": "Two teams of five. Steal the enemy banner and run it to your keep. First to 3 captures wins. Group up to 5 and queue together; grab Sprint Runes and weave the cover to lose your pursuers.",
+      "matchInProgress": "Battle in progress. {crimson}:{azure}.",
+      "ladderAllTime": "Ladder. All-Time",
+      "noRanked": "No champions ranked yet. Be the first.",
+      "ladderOnline": "Ladder. Online Now",
+      "noChallengers": "No champions online right now. Be the first.",
+      "playerLevelClassTitle": "{name}. Level {level} {className}",
+      "playerClassTitle": "{name}. {className}",
+      "crimson": "Crimson",
+      "azure": "Azure",
+      "yourTeamTitle": "Your team",
+      "clock": "{minutes}:{seconds}",
+      "formUp": "Form up: {seconds}",
+      "firstTo": "First to {caps} captures",
+      "flagState": {
+        "home": "Flag at the keep",
+        "carried": "Flag stolen!",
+        "dropped": "Flag on the ground"
+      },
+      "respawnIn": "Next wave: respawning in {seconds}",
+      "resultVictory": "Victory!",
+      "resultDefeat": "Defeat",
+      "resultDraw": "Draw",
+      "leavingIn": "Leaving the battleground in {seconds}",
+      "killFeed": "{killer} felled {victim}",
+      "killFeedFallen": "{victim} has fallen",
+      "foundBanner": "Battle found. You fight for the {team}!",
+      "countdownBanner": "Thornhollow Fields begins in {seconds}",
+      "startBanner": "Capture the flag!",
+      "flagTakenLog": "{name} has taken the {team} flag!",
+      "flagDroppedLog": "The {team} flag was dropped.",
+      "flagReturnedLog": "The {team} flag was returned.",
+      "dropFlagConfirmTitle": "Drop the flag?",
+      "dropFlagConfirmBody": "You are carrying the enemy flag. Dropping it leaves it on the ground, where either team can reach it.",
+      "dropFlagConfirmAccept": "Drop the flag",
+      "boardToggleLabel": "Match scoreboard. Press Enter to pin the full board open.",
+      "levelRequirement": "You must reach level {level} to unlock queueing for this battleground.",
+      "board": {
+        "kills": "Kills",
+        "assists": "Assists",
+        "deaths": "Deaths",
+        "captures": "Captures"
+      },
+      "flagTakenBanner": "The {takers} have taken the {team} flag!",
+      "flagReturnedBanner": "The {team} flag was returned!",
+      "capturedTeamBanner": "The {takers} have captured the {team} flag! {crimson}:{azure}",
+      "capturedLog": "{name} captured the {team} flag. Score {crimson}:{azure}.",
+      "victoryBanner": "Victory! Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "defeatBanner": "Defeat. Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "drawBanner": "Thornhollow Fields draw {crimson}:{azure}. Rating {rating} ({delta})",
+      "endBannerDetail": "Thornhollow Fields {crimson}:{azure}. Rating {rating} ({delta})",
+      "endLog": "Thornhollow Fields ended {crimson}:{azure}. Rating {rating} ({delta}).",
+      "endedTimer": "Time expired",
+      "endedForfeit": "The match was forfeited",
+      "endedTimerLog": "The match clock ran out; the higher score took the field.",
+      "endedForfeitLog": "The match was forfeited.",
+      "firstWinBonusLine": "First win of the day: +{honor} Honor",
+      "firstWinBonusLog": "First win of the day: you gain {honor} bonus Honor.",
+      "timeWarningMinutes": "{minutes} minutes remain",
+      "timeWarningOneMinute": "One minute remains",
+      "timeWarningMinutesLog": "{minutes} minutes remain in the battle.",
+      "timeWarningOneMinuteLog": "One minute remains in the battle.",
+      "map": {
+        "crimsonKeep": "Crimson Keep",
+        "azureKeep": "Azure Keep",
+        "ruinCourtyard": "The Ruin Courtyard",
+        "graveyard": "Graveyard"
+      }
     },
     "vcup": {
       "title": "Кубок Долины",
@@ -1191,6 +1278,24 @@ export const ru_RU: EnTranslations = {
       "graphicsFatal": "Не удалось восстановить графику. Перезагрузите игру, чтобы продолжить.",
       "graphicsReload": "Перезагрузить игру",
       "graphicsDraftChanged": "Изменения графики готовы к применению.",
+      "gfxSectionQuality": "Quality",
+      "gfxSectionWorld": "World Detail",
+      "gfxSectionLighting": "Lighting & Effects",
+      "gfxSectionCamera": "Camera",
+      "gfxSectionDisplay": "Display",
+      "gfxSectionSystem": "System",
+      "gfxSectionTouch": "Touch Controls",
+      "gfxViewDistance": "View Distance",
+      "gfxWaterQuality": "Water Quality",
+      "gfxCharacterDetail": "Character Detail",
+      "gfxAmbientOcclusion": "Ambient Occlusion",
+      "gfxBloom": "Bloom",
+      "gfxAntiAliasing": "Anti-Aliasing",
+      "gfxDynamicLights": "Dynamic Lights",
+      "gfxParticleEffects": "Particle Effects",
+      "gfxHalf": "Half",
+      "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
+      "gfxEffectsNote": "Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.",
       "interfaceMode": "Режим интерфейса",
       "interfaceModeAuto": "Авто",
       "interfaceModeDesktop": "Компьютер",
@@ -1212,6 +1317,7 @@ export const ru_RU: EnTranslations = {
       "aurasOnPlayerFrame": "Баффы у рамки игрока",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
+      "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
       "walkByAutoloot": "Автосбор добычи при проходе",
       "groundReticle": "Прицел наземного наведения",
       "mouseoverCast": "Применение по наведению на рамки группы",
@@ -1221,8 +1327,10 @@ export const ru_RU: EnTranslations = {
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
       "showThirdActionBar": "Показывать третью панель действий",
+      "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
+      "showPetFrame": "Show Your Pet",
       "showAttackButton": "Показывать кнопку атаки",
       "showDailyRewardsChest": "Показывать сундук ежедневных наград",
       "mobileCameraJoystick": "Джойстик камеры",
@@ -1259,6 +1367,8 @@ export const ru_RU: EnTranslations = {
       "buttons": "Раскладка кнопок",
       "resetButtons": "Сбросить раскладку кнопок",
       "menuAction": "Игровое меню",
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
       "help": "Левый стик — движение, правый — камера. Откройте окно, чтобы использовать экранный указатель."
     },
     "perf": {
@@ -1397,13 +1507,24 @@ export const ru_RU: EnTranslations = {
       "dualPrice": "{money} + {honor}",
       "balance": "Честь: {amount}",
       "honorFloat": "+{amount} чести",
+      "honorFloatReason": "+{amount} Honor ({reason})",
       "honorGain": "Вы получаете {amount} очк. чести ({reason}).",
       "notEnoughHonor": "Недостаточно чести.",
       "reasons": {
         "arenaWin": "Победа на арене",
         "fiestaKill": "Устранение на Фиесте",
         "fiestaComplete": "Завершение Фиесты",
-        "fiestaWin": "Победа на Фиесте"
+        "fiestaWin": "Победа на Фиесте",
+        "battlegroundWin": "Thornhollow Fields victory",
+        "battlegroundFirstWin": "first Thornhollow Fields win today",
+        "battlegroundComplete": "Thornhollow Fields battle fought",
+        "battlegroundKill": "honorable kill",
+        "battlegroundAssist": "killing blow assisted"
+      },
+      "floatReasons": {
+        "kill": "Kill",
+        "assist": "Assist",
+        "firstWin": "First Win"
       }
     },
     "charSheet": {
@@ -1476,6 +1597,7 @@ export const ru_RU: EnTranslations = {
     },
     "itemHeroicTag": "[ГЕРОИЧЕСКИЙ]",
     "itemSoulbound": "Персональный",
+    "itemUniqueEquipped": "Unique-Equipped",
     "itemSet": {
       "header": "{name} ({have}/{total})",
       "bonusLine": "({pieces}) {bonus}"
@@ -1701,7 +1823,13 @@ export const ru_RU: EnTranslations = {
       "saveButton": "Сохранить фокус",
       "notInTownHint": "Чтобы задать фокус, нужно находиться в городе.",
       "increaseAria": "Увеличить фокус на {component}",
-      "decreaseAria": "Уменьшить фокус на {component}"
+      "decreaseAria": "Уменьшить фокус на {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Назначить лидером",
@@ -1811,6 +1939,7 @@ export const ru_RU: EnTranslations = {
       "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
       "heatingUp": "Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»",
       "elementalConvergencePrimed": "Следующее заклинание другой стихийной школы активирует Стихийное слияние",
+      "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
       "battleStance": "Боевая стойка: на 10% больше создания ярости",
       "berserkerStance": "Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее",
       "crit": "Повышает шанс критического удара на {pct}%",
@@ -1946,7 +2075,9 @@ export const ru_RU: EnTranslations = {
       "levelFamily": "Уровень {level} {family}",
       "familyDemon": "Демон",
       "hostile": "Враждебный",
-      "friendly": "Дружественный"
+      "friendly": "Дружественный",
+      "elite": "Elite",
+      "boss": "Boss"
     },
     "targetFrame": {
       "unlock": "Переместить рамку цели",
@@ -1997,6 +2128,7 @@ export const ru_RU: EnTranslations = {
     "materialHint": {
       "fineGrade": "Отборный сорт. Добывается на жиле полного уровня инструментом выше самого материала и засчитывается вместо обычной версии везде, где она требуется.",
       "cookingCatch": "Ингредиент для готовки. Сначала нужно приготовить.",
+      "usedBy": "Used by {crafts}.",
       "arcaneDust": "Реагент для наложения чар. Выпадает при распылении обычного и необычного снаряжения.",
       "arcaneEssence": "Реагент для наложения чар. Выпадает при распылении редкого снаряжения.",
       "arcaneShard": "Реагент для наложения чар. Выпадает при распылении эпического и легендарного снаряжения.",
@@ -2386,10 +2518,6 @@ export const ru_RU: EnTranslations = {
           "title": "Ярмарочный день",
           "note": "Торговец ждёт свежий товар. Отличный день, чтобы заглянуть на Мировой рынок."
         },
-        "fiestaNight": {
-          "title": "Ночь фиесты",
-          "note": "Сегодня ринг фиесты 2 на 2 собирает самые шумные толпы."
-        },
         "arenaClash": {
           "title": "Битва на арене",
           "note": "Дуэлянты стекаются в Пепельный Колизей. Вставайте в очередь и поднимайтесь по лестнице."
@@ -2405,6 +2533,10 @@ export const ru_RU: EnTranslations = {
         "moongateCommunion": {
           "title": "Единение у лунных врат",
           "note": "Паломники собираются у лунных врат храма под срединной луной."
+        },
+        "fiestaNight": {
+          "title": "Ночь фиесты",
+          "note": "Сегодня ринг фиесты 2 на 2 собирает самые шумные толпы."
         }
       }
     },
@@ -2452,6 +2584,7 @@ export const ru_RU: EnTranslations = {
       "catchLine": "Вы выуживаете: {name}",
       "biteLine": "Что-то клюнуло!",
       "gotAwayLine": "Добыча сорвалась.",
+      "earlyReelLine": "You reel in too soon. Nothing had taken the bait.",
       "nodeName": {
         "ore": "Рудная жила",
         "wood": "Древостой",
@@ -2556,6 +2689,7 @@ export const ru_RU: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Зачарование оружия - Мощь",
       "enchant_weapon_intellect": "Зачарование оружия - Сила заклинаний",
+      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
       "enchant_helmet_fortitude": "Зачарование шлема - Стойкость",
       "enchant_neck_spirit": "Зачарование ожерелья - Дух",
       "enchant_shoulder_agility": "Зачарование наплечников - Ловкость",
@@ -2627,6 +2761,18 @@ export const ru_RU: EnTranslations = {
         "artisansEye": "Глаз ремесленника",
         "quickeningCharm": "Оберег возрождения"
       },
+      "toolEffectTooltip": {
+        "kind": "Tool charm",
+        "bonus": {
+          "gatherersCache": "+1 yield per harvest while charged.",
+          "artisansEye": "Raises the harvest grade by 1 tool tier while charged.",
+          "quickeningCharm": "Shortens the node respawn timer it triggers."
+        },
+        "howToSlot": "Slot onto a mining, logging, or herbalism tool from the Professions window. Consumed when slotted.",
+        "charges": "Starts with {base} charges on a common tool (+{bonus} per rarity rung).",
+        "landOnly": "Does not slot on fishing rods.",
+        "openProfessions": "Open Professions to slot this onto a gathering tool."
+      },
       "toolEffectSlotButton": "Установить {effect}",
       "toolEffectRechargeButton": "Перезарядить",
       "toolEffectSlotted": "{effect} установлен: {profession}.",
@@ -2665,7 +2811,22 @@ export const ru_RU: EnTranslations = {
       "close": "Закрыть крафт",
       "dialogOption": "Крафт",
       "dialogOptionAria": "Открыть окно крафта: {craft}",
-      "craft": "Создать",
+      "crafting": "Crafting",
+      "create": "Create",
+      "createAll": "Create All",
+      "createAllAria": "Create the maximum number of this recipe from materials held",
+      "qtyRowAria": "Craft quantity",
+      "qtyDecreaseAria": "Decrease craft quantity, currently {count}",
+      "qtyIncreaseAria": "Increase craft quantity, currently {count}",
+      "qtyValueAria": "Craft quantity, {count}",
+      "batchRemaining": "{remaining} of {total} remaining",
+      "batchRemainingAria": "{remaining} of {total} crafts remaining",
+      "durationChip": "{seconds}s",
+      "durationAria": "Cast time: {seconds} seconds",
+      "progressAria": "Craft progress",
+      "announceStart": "Crafting {name}",
+      "announceComplete": "Finished crafting {name}",
+      "announceCancel": "Crafting cancelled",
       "reagentsNeeded": "Требуется:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(потратит отборный сорт: {count})",
@@ -2725,7 +2886,7 @@ export const ru_RU: EnTranslations = {
         "loom": "Ткацкий станок",
         "toolworks": "Мастерская"
       },
-      "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова.",
+      "busy": "You are busy.",
       "recipeNotLearned": "Вы еще не изучили этот рецепт.",
       "noBagSpace": "В сумках нет места для созданного предмета.",
       "skillReqLine": "Требуется {craft} {skill}",
@@ -2739,6 +2900,8 @@ export const ru_RU: EnTranslations = {
       "masterworkToast": "Шедевр! {name}",
       "masterworkZoneLine": "Шедевр от {crafter}: {name}!",
       "tierUpToast": "{craft}: достигнут ранг {tier}!",
+      "skillUpToast": "{skill} skill increased to {level}!",
+      "skillUpSubtext": "Skill increased to {level}!",
       "trendNudge": "Ваши руки склоняются к пути «{archetype}». Настройка на него ждёт у {master}.",
       "trendNudgeNoMaster": "Ваши руки склоняются к пути «{archetype}». Найдите мастера ремесла, чтобы встать на него.",
       "attunedZoneLine": "{name} настроился как «{archetype}»!",
@@ -2756,7 +2919,9 @@ export const ru_RU: EnTranslations = {
       "commissionToggle": "Изделие на заказ",
       "commissionToggleHint": "Привязывается к первому персонажу, получившему его при обмене.",
       "commissionUnbound": "Изделие на заказ: привяжется к первому получателю",
-      "commissionBound": "Изделие на заказ: привязано к получателю"
+      "commissionBound": "Изделие на заказ: привязано к получателю",
+      "craft": "Создать",
+      "throttled": "Вы создаете предметы слишком быстро. Подождите немного и попробуйте снова."
     },
     "itemMenu": {
       "use": "Использовать",
@@ -2778,9 +2943,9 @@ export const ru_RU: EnTranslations = {
       "notHeld": "У вас нет этого предмета.",
       "notDisenchantable": "Это нельзя распылить.",
       "notSalvageable": "Это нельзя разобрать.",
-      "disenchantThrottled": "Вы распыляете слишком быстро. Подождите немного и попробуйте снова.",
-      "salvageThrottled": "Вы разбираете слишком быстро. Подождите немного и попробуйте снова.",
-      "enchantThrottled": "Вы зачаровываете слишком быстро. Подождите немного и попробуйте снова.",
+      "disenchantBusy": "You are busy.",
+      "salvageBusy": "You are busy.",
+      "enchantBusy": "You are busy.",
       "enchantWrongSlot": "Эти чары нельзя наложить на этот предмет.",
       "enchantUnknown": "Таких чар не существует.",
       "enchantInsufficient": "У вас нет материалов для этих чар.",
@@ -2821,7 +2986,10 @@ export const ru_RU: EnTranslations = {
       "replaceConfirmKeepsBond": "Привязка изделия на заказ",
       "replaceConfirmCost": "Стоимость: {cost}",
       "replaceConfirmCostItem": "{name}: {count}",
-      "replaceConfirmAccept": "Заменить"
+      "replaceConfirmAccept": "Заменить",
+      "disenchantThrottled": "Вы распыляете слишком быстро. Подождите немного и попробуйте снова.",
+      "salvageThrottled": "Вы разбираете слишком быстро. Подождите немного и попробуйте снова.",
+      "enchantThrottled": "Вы зачаровываете слишком быстро. Подождите немного и попробуйте снова."
     },
     "training": {
       "title": "Обучение: {name}",
@@ -2863,6 +3031,59 @@ export const ru_RU: EnTranslations = {
       "cannotAfford": "Вам не хватает денег на снятие привязки.",
       "outOfRange": "Для снятия привязки нужно стоять у мастерской.",
       "noSpace": "В сумках нет места для предмета со снятой привязкой."
+    },
+    "commissionBoard": {
+      "title": "Commission Orders",
+      "close": "Close commission orders",
+      "openButton": "Orders",
+      "openButtonAria": "Open the commission order board",
+      "intro": "Commission a crafter to make you a piece, or take on someone else's order.",
+      "formTitle": "Open a Commission",
+      "recipeLabel": "Item",
+      "recipeEmpty": "You know no craftable equipment recipes yet.",
+      "scopeLabel": "Who can accept",
+      "scopeOpen": "Anyone (open board)",
+      "scopeCrafter": "A specific crafter",
+      "crafterNameLabel": "Crafter name",
+      "crafterNamePlaceholder": "Character name",
+      "openSubmit": "Post Order",
+      "sectionMine": "My Requests",
+      "sectionToCraft": "My Commissions",
+      "sectionBoard": "Open Board",
+      "boardEmpty": "No open orders right now.",
+      "mineEmpty": "You have not opened any commissions.",
+      "toCraftEmpty": "You are not crafting anyone's order right now.",
+      "rowFor": "{item} for {requester}",
+      "rowTargeted": "{item} for {requester} (for {crafter})",
+      "acceptedBy": "Accepted by {name}",
+      "statusOpen": "Open",
+      "statusAccepted": "Accepted",
+      "statusDelivered": "Delivered",
+      "statusCancelled": "Cancelled",
+      "statusExpired": "Expired",
+      "cancelButton": "Cancel",
+      "acceptButton": "Accept",
+      "deliverButton": "Deliver",
+      "deliverHint": "Craft the commissioned piece (with the commission toggle on), then come back here to deliver it.",
+      "opened": "You post a commission order for {item}.",
+      "cancelled": "You cancel the commission order for {item}.",
+      "accepted": "You accept the commission order for {item}.",
+      "delivered": "You deliver {item} to {name}.",
+      "denyUnknownRecipe": "That recipe does not exist.",
+      "denyNotCommissionEligible": "That recipe cannot be commissioned.",
+      "denyUnknownCrafter": "No character by that name is known.",
+      "denySelfCrafter": "You cannot commission yourself.",
+      "denyTooManyOpen": "You already have too many open commission orders.",
+      "denyUnknownOrder": "That commission order no longer exists.",
+      "denyOrderNotOpen": "That commission order is no longer open.",
+      "denySelfOrder": "You cannot accept your own commission order.",
+      "denyNotEligibleCrafter": "That commission order was posted for someone else.",
+      "denyNotYourOrder": "That is not your commission order.",
+      "denyOrderNotAccepted": "That commission order has not been accepted yet.",
+      "denyNotYourAcceptance": "You did not accept that commission order.",
+      "denyNotCrafted": "Craft the commissioned piece first (with the commission toggle on).",
+      "denyOutOfRange": "You must be near the requester to deliver a commission.",
+      "denyNoSpace": "The requester has no room in their bags."
     },
     "finder": {
       "title": "Поиск подземелий",
@@ -2962,7 +3183,8 @@ export const ru_RU: EnTranslations = {
         "raise_fallen": "Поднятие павших (периодические волны прислужников)",
         "soul_rend": "Разрыв души (отмеченным разойтись и получать лечение)",
         "deathless_rage": "Бессмертная ярость (прерывается у охранных камней)",
-        "wardstones": "Охранные камни (смена фазы)"
+        "wardstones": "Охранные камни (смена фазы)",
+        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
       }
     },
     "deeds": {
