@@ -259,16 +259,25 @@ describe('Reliquary serialize / restore round-trip', () => {
   it('restore sanitizes clears and pageId per FIELD on catalogued entries', () => {
     // Every id here is catalogued, so the field guards are actually reached
     // (an uncatalogued id is dropped before either filter runs). Snug floor:
-    // the slice must fill all six fixtures.
+    // the slice must fill all eight fixtures.
     const ids = [
       ...new Set(
         RELIQUARY_PAGES.flatMap((p) =>
           p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
         ),
       ),
-    ].slice(0, 6);
-    expect(ids.length).toBe(6);
-    const [negative, infinite, notANumber, fractional, bogusPage, foreignPage] = ids;
+    ].slice(0, 8);
+    expect(ids.length).toBe(8);
+    const [
+      negative,
+      infinite,
+      notANumber,
+      fractional,
+      bogusPage,
+      foreignPage,
+      stringClears,
+      nonObject,
+    ] = ids;
     const validPageId = RELIQUARY_ITEM_TO_PAGES.get(negative)![0];
     // A real page that never lists foreignPage: acceptance must be
     // RELIQUARY_PAGES_BY_ID membership only, not an item-to-page relation.
@@ -284,11 +293,20 @@ describe('Reliquary serialize / restore round-trip', () => {
         [fractional]: { clears: 2.7 },
         [bogusPage]: { pageId: 'nope' },
         [foreignPage]: { pageId: unrelatedPageId },
+        // A string clears fails the typeof gate outright (never coerced).
+        [stringClears]: { clears: '5' } as never,
+        // A non-object entry is dropped WHOLE (the entry guard), unlike every
+        // per-field case above, which keeps the entry and drops the field.
+        [nonObject]: 'junk' as never,
       },
     });
 
-    // Every catalogued ENTRY survives; only the offending field is dropped.
-    expect(Object.keys(restored.firstFind).sort()).toEqual([...ids].sort());
+    // Every catalogued OBJECT entry survives with only the offending field
+    // dropped; the non-object entry is dropped whole.
+    expect(Object.keys(restored.firstFind).sort()).toEqual(
+      ids.filter((id) => id !== nonObject).sort(),
+    );
+    expect(Object.hasOwn(restored.firstFind, nonObject)).toBe(false);
     // Negative clears are dropped outright (absent key, never clamped to 0),
     // while the valid pageId on the same entry still lands.
     expect(Object.hasOwn(restored.firstFind[negative], 'clears')).toBe(false);
@@ -303,6 +321,8 @@ describe('Reliquary serialize / restore round-trip', () => {
     // Membership is the WHOLE rule: a real page that never lists the item is
     // kept (diagnostic field; restore does not re-derive the relation).
     expect(restored.firstFind[foreignPage].pageId).toBe(unrelatedPageId);
+    // The string clears ('5') failed the typeof gate; the field is dropped.
+    expect(Object.hasOwn(restored.firstFind[stringClears], 'clears')).toBe(false);
   });
 });
 
@@ -646,10 +666,14 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(meta.deedStats.visited.has(MASTERWORK_FIRST)).toBe(true);
     expect(meta.deedStats.visited.has('masterwork:tailoring')).toBe(true);
 
-    // Control at the SAME seed and stream position, no signed copy held: the
-    // identical draw sits above the 3 percent base and misses, and a miss
-    // writes NO mark or visit, so the writes provably sit on the proc arm,
-    // not on every successful craft.
+    // Control at the SAME seed, no signed copy held: the roll sits above the
+    // 3 percent base and misses, and a miss writes NO mark or visit, so the
+    // writes provably sit on the proc arm, not on every successful craft.
+    // The control holds THREE plain scraps where the primary held two: the
+    // #1145 self-signed reduction discounts the signed arm's required count,
+    // so an unsigned control holding the primary's count is refused outright
+    // (insufficient_materials). Reagent parity between the arms is impossible
+    // by design; the load-bearing difference is the signature.
     const control = makeSim(SEED);
     const mControl = primary(control).meta;
     const cid = control.playerId;
@@ -696,19 +720,21 @@ describe('Reliquary profession marks (Phase 7)', () => {
     expect(craftSrc).toContain('masterwork:first');
     expect(craftSrc).toContain('masterwork:${craftId}');
 
-    const gatherSrc = fs.readFileSync(
-      path.join(__dirname, '../src/sim/professions/gather_events.ts'),
-      'utf8',
-    );
+    const gatherSrc = fs
+      .readFileSync(path.join(__dirname, '../src/sim/professions/gather_events.ts'), 'utf8')
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
     // announceGatherEvent writes visit then the Reliquary mark together.
     expect(gatherSrc).toMatch(
       /const visitMark = `gather_event:\$\{flavor\}`;[\s\S]*?ctx\.markVisited\(finder, visitMark\);[\s\S]*?noteReliquaryMark\(ctx, finder, visitMark\);/,
     );
 
-    const interactionSrc = fs.readFileSync(
-      path.join(__dirname, '../src/sim/interaction.ts'),
-      'utf8',
-    );
+    const interactionSrc = fs
+      .readFileSync(path.join(__dirname, '../src/sim/interaction.ts'), 'utf8')
+      .split('\n')
+      .filter((line) => !/^\s*\/\//.test(line))
+      .join('\n');
     // Perfect specimen land: deed visit + Reliquary mark on the same arm.
     expect(interactionSrc).toMatch(
       /ctx\.markVisited\(meta, 'gather_event:perfect_specimen'\);[\s\S]*?noteReliquaryMark\(ctx, meta, 'gather_event:perfect_specimen'\);/,
@@ -735,7 +761,9 @@ describe('Reliquary recent ring cap', () => {
     ].slice(0, RELIQUARY_RECENT_CAP + 3);
     expect(ids.length).toBe(RELIQUARY_RECENT_CAP + 3);
 
-    // The REAL write path (markItemDiscovered's hook), one find per id.
+    // One find per id through noteRelicItemFind, the write seam the
+    // markItemDiscovered hook calls (the interleave test below drives the
+    // full hook path for real).
     for (const id of ids) {
       expect(noteRelicItemFind(meta, id)).toBe(true);
     }
@@ -819,6 +847,9 @@ describe('Reliquary recent ring cap', () => {
   });
 
   it('restore truncates an over-cap all-distinct recent blob to the newest cap entries', () => {
+    // Literal: the shipped cap (12) re-pinned line-adjacent, so this test's
+    // slice arithmetic cannot self-agree with a drifted constant.
+    expect(RELIQUARY_RECENT_CAP).toBe(12);
     const ids = [
       ...new Set(
         RELIQUARY_PAGES.flatMap((p) =>

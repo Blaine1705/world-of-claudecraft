@@ -6,10 +6,14 @@
 // One deliberate exception, and it is a contract on the CALL SITE: a test may
 // throw from its observer as a fail-closed guard (tests/reliquary_content.test.ts
 // ScriptedRng throws on any unscripted draw), so `next()` must never swallow
-// observer exceptions.
+// observer exceptions. Such a throw is TERMINAL for this instance: `s` has
+// already advanced past a draw nobody consumed, so the only sound response is
+// to abort the run and discard the Rng (and any Sim over it). Catching and
+// continuing would branch behavior on the one input class the determinism
+// invariant exists to exclude. Propagation is pinned in tests/off_stream_rng.test.ts.
 export type RngObserver = (value: number) => void;
 
-// Deterministic seeded RNG (mulberry32) — all sim randomness must flow through this.
+// Deterministic seeded RNG (mulberry32): all sim randomness must flow through this.
 export class Rng {
   private s: number;
   // Default null: zero overhead and byte-identical output, so sim determinism is

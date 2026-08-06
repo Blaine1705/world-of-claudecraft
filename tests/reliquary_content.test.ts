@@ -400,7 +400,10 @@ describe('Reliquary clear sources map to live content', () => {
   });
 
   it('covers every live five-man / raid final boss dungeon with N+H pages', () => {
-    // Final-boss clear keys from deeds FINAL_BOSS_DUNGEONS (public surface: DUNGEONS).
+    // Hand copy of the module-private FINAL_BOSS_DUNGEONS list in
+    // src/sim/deeds.ts (documented there as PINNED as of v1: it never grows).
+    // Not derived: a new rare+ dungeon is caught by the growth sweep below,
+    // not by this list.
     const required = [
       'hollow_crypt',
       'sunken_bastion',
@@ -454,6 +457,10 @@ describe('Reliquary heroic gear pins against HEROIC_BOSS_LOOT', () => {
   };
 
   it('RELIQUARY_HEROIC_GEAR lists every non-mount HEROIC_BOSS_LOOT id', () => {
+    // Bidirectional first: the loop below walks live bosses, so a stale
+    // RELIQUARY_HEROIC_GEAR key for a removed boss would sit unnoticed as
+    // dead data without this pin.
+    expect(Object.keys(RELIQUARY_HEROIC_GEAR).sort()).toEqual(Object.keys(HEROIC_BOSS_LOOT).sort());
     for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
       const liveIds: string[] = [];
       for (const e of entries) {
@@ -497,7 +504,10 @@ describe('Reliquary set pages pin against col_set_* deeds', () => {
     'col_set_greyjaw_stalker',
   ];
 
-  it('every non-kit col_set_* deed maps to exactly one set page with matching members', () => {
+  // "One" page per deed is structural, not asserted here: the lookup is
+  // id-keyed through RELIQUARY_PAGES_BY_ID and global page-id uniqueness has
+  // its own pin in the catalog-structure describe.
+  it('every non-kit col_set_* deed maps to a set page with matching members', () => {
     const setDeedIds = Object.keys(DEEDS).filter((id) => id.startsWith('col_set_'));
     // Literal: update when catalog content lands (snug floor: 3 kits + 7 sets).
     expect(setDeedIds.length).toBeGreaterThanOrEqual(10);
@@ -584,8 +594,9 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
     const boss = MOBS.thunzharr_waking_peak;
     expect(boss).toBeDefined();
     expect(boss.worldBoss).toBe(true);
-    // The personal epics live in two exclusive roll groups (at most one gear
-    // drop per kill); the guaranteed storm trophy is groupless filler.
+    // The personal epics live in two roll groups, each drawing independently
+    // (at most one drop PER GROUP, so a kill can award up to two pieces);
+    // the guaranteed storm trophy is groupless filler.
     const groups = [
       ...new Set(boss.loot.map((e) => e.rollGroup).filter((g): g is string => g !== undefined)),
     ].sort();
@@ -638,8 +649,11 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
   it('Collapsed Reliquary: Marks stock is live and chest staples stay off', () => {
     // The two heroic-gated signature rares reach the page from both the
     // lockpick chest function and the Marks vendor stock (equality above);
-    // this arm proves the stock half is really populated today.
-    expect(DELVE_SHOPS.collapsed_reliquary.length).toBeGreaterThan(0);
+    // this arm proves the stock half really carries BOTH signature rares
+    // today, not merely that the shop is non-empty.
+    const stocked = DELVE_SHOPS.collapsed_reliquary.map((e) => e.itemId);
+    expect(stocked).toContain('deacon_reliquary_helm');
+    expect(stocked).toContain('varric_shadow_cowl');
     // Uncommon chest staples stay off the unique grid (quality filter).
     expect(isCataloguedRelicItem('reliquary_plate_chest')).toBe(false);
   });
@@ -708,6 +722,17 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     );
     expect(fromMobs.has('bastion_ward_stone')).toBe(false);
     expect(dungeonObjectItemIds('nythraxis_boss_arena')).toContain('bastion_ward_stone');
+    // Premise guard: the derivation skips templateId rows on the stated
+    // ground that portals never carry loot. Hold that premise for every live
+    // dungeon object, so a future portal-with-loot reds here instead of
+    // silently vanishing from the walk.
+    for (const [dungeonId, dungeon] of Object.entries(DUNGEONS)) {
+      for (const o of dungeon.objects ?? []) {
+        if (o.templateId !== undefined) {
+          expect(o.itemId ?? '', `${dungeonId} portal object carries loot the walk skips`).toBe('');
+        }
+      }
+    }
   });
 
   it('the Drowned Temple page desc names both live loot sources', () => {
@@ -717,6 +742,19 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     expect(page.desc).toBeDefined();
     expect(page.desc).toContain(MOBS.choirmother_selthe.name);
     expect(page.desc).toContain(MOBS.ysolei.name);
+  });
+
+  it('the Sanctum and Nythraxis page descs name their live final bosses', () => {
+    // Same staleness class the Drowned Temple reword fixed: these two pages
+    // also gained a relic this phase and their blurbs name a boss, so pin the
+    // names to the live MOBS entries (Hollow Crypt stays unpinned; its blurb
+    // uses the short "Morthen" form no live name matches).
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_gravewyrm_sanctum.desc).toContain(
+      MOBS.korzul_the_gravewyrm.name,
+    );
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_nythraxis.desc).toContain(
+      MOBS.nythraxis_scourge_of_thornpeak.name,
+    );
   });
 
   it('Hollow Crypt: rare+ equality plus four curated uncommon brand pieces', () => {
@@ -959,8 +997,10 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     for (const id of hiddenTitles) {
       expect(ids, id).not.toContain(id);
     }
-    // Border-only curator rank 5 is not a title relic.
-    expect(ids).not.toContain('col_reliquary_rank_5');
+    // Curator rank 5 stays border-only: this pins the REASON it can never
+    // enter the title list above (the equality would catch the entry itself,
+    // but only this reds if the deed's reward kind flips to a title).
+    expect(DEEDS.col_reliquary_rank_5.reward?.kind).toBe('border');
     expect(new Set(ids).size).toBe(ids.length);
   });
 

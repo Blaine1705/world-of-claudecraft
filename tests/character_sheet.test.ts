@@ -11,7 +11,11 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { talentsFor } from '../src/sim/content/talents';
 import { ITEMS, zoneAt } from '../src/sim/data';
 import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
-import { catalogCharacterCompletion, RELIQUARY_PAGES } from '../src/sim/reliquary';
+import {
+  CURATOR_RANK_DEFS,
+  catalogCharacterCompletion,
+  RELIQUARY_PAGES,
+} from '../src/sim/reliquary';
 import type { CharacterState } from '../src/sim/sim';
 import { type PlayerClass, virtualLevel } from '../src/sim/types';
 import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
@@ -345,6 +349,12 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     expect(sheetCuratorRankText(5)).toBe('Eternal Curator');
     expect(sheetCuratorRankText(6)).toBeNull();
     expect(sheetCuratorRankText(99)).toBeNull();
+    // Growth cross-pin against the live rank table: if a sixth rank ships in
+    // CURATOR_RANK_DEFS, the module-private English list must grow with it
+    // instead of silently rendering a rank-6 character as Unranked (the
+    // literal 6 above would keep passing through the `?? null` fallback).
+    expect(sheetCuratorRankText(CURATOR_RANK_DEFS.length)).not.toBeNull();
+    expect(sheetCuratorRankText(CURATOR_RANK_DEFS.length + 1)).toBeNull();
   });
 
   it('server rank names match the client hudChrome catalog rank names', () => {
