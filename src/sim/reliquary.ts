@@ -170,8 +170,19 @@ export function clearCountForSource(
 ): number | undefined {
   if (!source || source.kind === 'none') return undefined;
   if (source.kind === 'delve') {
-    const n = meta.delveClears[source.delveId];
-    return typeof n === 'number' && n > 0 ? Math.floor(n) : 0;
+    // The only writer is grantDelveClearTo (src/sim/delves/runs.ts), whose
+    // clearKey shape is `${delveId}:${tierId}`, so the lifetime count sums
+    // every tier under the delve prefix like delveShopGateUnlocked does.
+    // Each entry must be a finite number > 0 and is floored individually so
+    // a hand-edited blob cannot inflate or poison provenance.
+    const prefix = `${source.delveId}:`;
+    let total = 0;
+    for (const key in meta.delveClears) {
+      if (!key.startsWith(prefix)) continue;
+      const n = meta.delveClears[key];
+      if (typeof n === 'number' && Number.isFinite(n) && n > 0) total += Math.floor(n);
+    }
+    return total;
   }
   if (source.kind === 'deed_stat') {
     // Only authored DEED_STAT_KEYS are readable; unknown strings yield 0 so a

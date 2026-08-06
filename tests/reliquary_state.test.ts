@@ -811,6 +811,44 @@ describe('Reliquary recent ring cap', () => {
       many.slice(-RELIQUARY_RECENT_CAP),
     );
   });
+
+  it('interleaved item and mark writes share one capped ring in production order', () => {
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    // Both live write paths push the SAME ring: markItemDiscovered's hook for
+    // item finds and noteReliquaryMark for authored marks. Interleave them
+    // across the cap boundary so the cap provably applies to the union (never
+    // per kind) and the surviving order is the exact production write order.
+    const itemIds = [
+      ...new Set(
+        RELIQUARY_PAGES.flatMap((p) =>
+          p.relics.filter((r) => r.kind === 'item').map((r) => r.itemId),
+        ),
+      ),
+    ].slice(0, 8);
+    const markIds = [...RELIQUARY_MARK_IDS].slice(0, 7);
+    // Snug floors: 8 + 7 = cap + 3 writes, so three entries must evict.
+    expect(itemIds.length).toBe(8);
+    expect(markIds.length).toBe(7);
+    const writes: string[] = [];
+    for (let i = 0; i < itemIds.length; i++) {
+      markItemDiscovered(sim.ctx, meta, itemIds[i]);
+      writes.push(itemIds[i]);
+      if (i < markIds.length) {
+        expect(noteReliquaryMark(sim.ctx, meta, markIds[i])).toBe(true);
+        writes.push(markIds[i]);
+      }
+    }
+    expect(writes.length).toBe(RELIQUARY_RECENT_CAP + 3);
+    // Exactly the cap survives; the evicted head (item, mark, item) crosses
+    // both kinds, and the survivors keep the interleaved write order intact.
+    expect(meta.reliquary.recent.length).toBe(RELIQUARY_RECENT_CAP);
+    expect(meta.reliquary.recent).toEqual(writes.slice(3));
+    expect(meta.reliquary.recent.at(-1)).toBe(writes.at(-1));
+    for (const evicted of writes.slice(0, 3)) {
+      expect(meta.reliquary.recent).not.toContain(evicted);
+    }
+  });
 });
 
 describe('Reliquary pure completion + curator rank', () => {
@@ -981,7 +1019,9 @@ describe('Reliquary pure completion + curator rank', () => {
     meta.deedStats.dungeonClears.hollow_crypt = 999;
     meta.deedStats.dungeonClears['hollow_crypt:heroic'] = 999;
     meta.deedStats.counters.thunzharrKills = 999;
-    meta.delveClears = { ...meta.delveClears, collapsed_reliquary: 999 };
+    // The real writer's tiered key shape (runs.ts `${delveId}:${tierId}`), so
+    // the delve-clears meter is provably nonzero under the production reader.
+    meta.delveClears = { ...meta.delveClears, 'collapsed_reliquary:normal': 999 };
     expect(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned).toBe(0);
     expect(curatorRankFromOwned(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned)).toBe(
       0,
@@ -1061,8 +1101,27 @@ describe('Reliquary pure completion + curator rank', () => {
       delveId: 'collapsed_reliquary',
     });
     expect(sim.reliquaryPageClearCount('conquerors_collapsed_reliquary')).toBe(0);
-    meta.delveClears.collapsed_reliquary = 7.9;
-    expect(sim.reliquaryPageClearCount('conquerors_collapsed_reliquary')).toBe(7);
+    // The ONLY production writer is grantDelveClearTo (src/sim/delves/runs.ts),
+    // whose clearKey is `${delveId}:${tierId}`; the lifetime read must
+    // aggregate exactly like delveShopGateUnlocked's clears:N arm
+    // (src/sim/content/delves/shop.ts): sum every `${delveId}:` prefixed key,
+    // sibling delves excluded. On top of that prefix-sum the Reliquary read
+    // floors each entry and drops junk, so the expectation is
+    // floor(7.9) + floor(2.2) = 9, never floor(7.9 + 2.2) = 10.
+    meta.delveClears['collapsed_reliquary:normal'] = 7.9;
+    meta.delveClears['collapsed_reliquary:heroic'] = 2.2;
+    // Hand-edited junk under the prefix is guarded out per entry: a
+    // non-number never coerces, a negative never subtracts, a non-finite
+    // never poisons the total.
+    (meta.delveClears as Record<string, unknown>)['collapsed_reliquary:junk'] = 'oops';
+    meta.delveClears['collapsed_reliquary:negative'] = -5;
+    meta.delveClears['collapsed_reliquary:infinite'] = Number.POSITIVE_INFINITY;
+    // A sibling delve's clears never leak into this page.
+    meta.delveClears['drowned_litany:normal'] = 50;
+    // The bare-id shape has no production writer (runs.ts always writes
+    // tiered keys) and stays unread, matching delveShopGateUnlocked.
+    meta.delveClears.collapsed_reliquary = 999;
+    expect(sim.reliquaryPageClearCount('conquerors_collapsed_reliquary')).toBe(9);
   });
 
   it('a heroic-only dungeonClears key never leaks into the normal page readout', () => {
