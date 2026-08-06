@@ -283,6 +283,14 @@ describe('character visual manifest', () => {
       const doc = await io.read(`public/${visual.url}`);
       const animations = doc.getRoot().listAnimations();
       const names = new Set(animations.map((animation) => animation.getName()));
+      // A bespoke attack (e.g. mob_wildheart_stalker's Wildheart_Stalker_Attack,
+      // scripts/build_wildheart_stalker_anims.mjs) ships mesh-free in its own
+      // animUrls companion GLB, not the base rig GLB this test re-cuts; merge
+      // its clip names in too so the existence check below covers it.
+      for (const url of visual.animUrls ?? []) {
+        const animDoc = await io.read(`public/${url}`);
+        for (const animation of animDoc.getRoot().listAnimations()) names.add(animation.getName());
+      }
       expect(names.size).toBeGreaterThan(0);
       expect(
         [...new Set(expectedClipNames(visual.clips))].filter((name) => !names.has(name)),
