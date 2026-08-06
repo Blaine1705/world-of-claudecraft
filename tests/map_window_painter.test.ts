@@ -415,14 +415,15 @@ describe('map_window_painter: cadence + cached background preserved', () => {
   });
 
   it('wires the gather markers: store, clears, memo resets, and tooltip priority', () => {
-    // The overworld paint stores this paint's hit-test markers; the delve and
-    // continent branches clear them so no stale zone icon answers a tap.
+    // The overworld paint stores this paint's hit-test markers; the delve,
+    // continent, and walk-in castle branches clear them so no stale zone icon
+    // answers a tap.
     expect(hud).toContain('this.mapGatherNodes = result.gatherNodes;');
-    expect(hud.match(/this\.mapGatherNodes = \[\];/g)).toHaveLength(2);
-    // The gather-tip resolve memo resets beside every marker rebuild (two
+    expect(hud.match(/this\.mapGatherNodes = \[\];/g)).toHaveLength(4);
+    // The gather-tip resolve memo resets beside every marker rebuild (four
     // clears plus the overworld store), bounding its staleness at the same
     // mediumHud repaint that refreshes the painted icon.
-    expect(hud.match(/this\.mapGatherTipMemo = null;/g)).toHaveLength(3);
+    expect(hud.match(/this\.mapGatherTipMemo = null;/g)).toHaveLength(5);
     // Hover/tap priority inside showMapTipAt: quest-giver glyph on top, then
     // the gather node, then the quest-objective area.
     const glyphAt = hud.indexOf('npcMarkerAt(this.mapNpcMarkers');

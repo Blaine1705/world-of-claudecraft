@@ -10933,6 +10933,8 @@ export class Hud {
     if (dawnholdMapActive(this.sim)) {
       this.mapQuestAreas = [];
       this.mapNpcMarkers = [];
+      this.mapGatherNodes = [];
+      this.mapGatherTipMemo = null;
       const title = this.dawnholdMapPainter.paintWorldMap(ctx, this.sim, S);
       this.setText(summaryEl, t('hud.core.mapSummary', { zone: title }));
       return;
