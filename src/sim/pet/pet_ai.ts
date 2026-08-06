@@ -15,11 +15,15 @@
 // `Sim` method verbatim, with `this.X` rewritten to `ctx.X` (the SimContext seam) or
 // to a sibling function in this module. Statement order, branch order, the
 // `return`-vs-fallthrough early exits, and EVERY rng draw position (the imp-bolt
-// resist roll + crit roll + damage roll in petRangedAttack, plus any draws inside the shared
+// crit roll + damage roll in petRangedAttack, plus any draws inside the shared
 // mobSwing/dealDamage/moveToward/updateRangedPetAttack callees the dispatcher calls)
 // are preserved exactly so the parity gate's full-state trace AND rng draw-order log
 // stay byte-identical. The in-place Entity mutation is intentional (the refactor's
-// immutability waiver). The shared movement/combat entry points (updateRangedPetAttack,
+// immutability waiver). One DELIBERATE post-extraction behavior change rides on
+// top of the verbatim move: petRangedAttack now rolls isMobSpellResisted before
+// its crit roll (player pet bolts were resist-immune by omission, unlike every
+// other spell path), with the pet_ai parity golden re-minted for the extra draw
+// in the same PR; every other draw position is still the verbatim move. The shared movement/combat entry points (updateRangedPetAttack,
 // mobSwing, applyTaunt, moveToward), the pet-management helpers (syncPetAspect,
 // despawnPersistentPet), and the stat/predicate helpers (effectiveAttackPower,
 // isHostileTo, isStunned, isRooted, moveSpeedMult, swingIntervalMult, mobCanSwim,

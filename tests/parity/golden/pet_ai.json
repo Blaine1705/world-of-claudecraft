@@ -5,7 +5,7 @@
   "ticks": 180,
   "coverage": [
     "class:hunter (pet owner)",
-    "petRangedAttack imp-bolt arm (petRanged crit roll + AP-scaled fire damage)",
+    "petRangedAttack imp-bolt arm (petRanged resist roll + crit roll + AP-scaled fire damage)",
     "petPickTarget aggressive auto-pull",
     "updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)",
     "petFollow heel transition (pets return to a moved owner)"
