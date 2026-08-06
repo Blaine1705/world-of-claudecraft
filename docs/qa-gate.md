@@ -174,10 +174,12 @@ surface where an escape could hide, and it is what to actually study.
 **What it still cannot prove, and why that is acceptable.** The out-of-graph pattern list is
 a floor, not a proof, so this path is empirically complete rather than provably complete.
 The backstops are the runs that stay unconditionally full: `.github/workflows/ci.yml` runs
-the FULL suite (8-shard matrix) on every push to `main` / `release/**` (the PR tier is
-selective, next section), and the scheduled nightly full gate re-proves the tips daily with
-same-day alerting. A selection miss therefore surfaces at merge-to-release time or the same
-night, never later, and the release branch is the safety net the packet designed it to be.
+the FULL suite on every push to `main` / `release/**` (release pushes as the plain 8-shard
+matrix; main/dev pushes through the PR tier's shards-plus-long-sims-lane layout, full
+mode, since selection applies to pull requests only, next section), and the scheduled
+nightly full gate re-proves the tips daily with same-day alerting. A selection miss
+therefore surfaces at merge-to-release time or the same night, never later, and the
+release branch is the safety net the packet designed it to be.
 
 ### Selective PR-tier CI (`ci_shard_test.mjs`)
 
@@ -186,9 +188,32 @@ Since Phase 2 of the CI/CD performance packet, the
 `gate:select`, sharded 8 ways. The `changes` job derives a `test_mode` from the same
 API-fetched file listing that decides `code` (`scripts/lib/ci_test_select.mjs`), and each
 `pr-gate` shard builds its legs through `scripts/lib/ci_shard_plan.mjs` via
-`scripts/ci_shard_test.mjs`: in full mode, byte-identical to the old
-`npm test -- --shard=i/8`; in selective mode, the always-run floor plus `vitest related`
-over the changed sources, both sharded.
+`scripts/ci_shard_test.mjs`: in full mode, the old `npm test -- --shard=i/8` step minus
+the long-sims lane files (below); in selective mode, the always-run floor plus
+`vitest related` over the changed sources, both sharded.
+
+**The long-sims lane** (Phase 4). The `CI_LONG_SUITES` files
+(`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90 seconds inside a full-mode
+shard, the chronomancy balance sweep among them) run in the dedicated
+`PR gate (long sims)` job (`node scripts/ci_shard_test.mjs --lane=long-sims`), and every
+shard leg excludes them, so a single multi-minute file no longer sets the slowest shard's
+wall clock. Completeness is a pinned invariant, not an intention: the lane fails closed to
+its whole file list on exactly the inputs that make a shard fail closed to full, the
+shard legs exclude exactly the files the lane owns, and in selective mode the lane runs
+just the lane files the floor or the PR's diff would have carried (the related legs stay
+unfiltered, so a reached lane file re-runs there: duplicate work, never a gap). Mode for
+mode, the nine PR-tier test jobs together therefore run exactly what the pre-lane
+8-shard layout would have run (`tests/ci_shard_plan.test.ts` pins the partition;
+selective mode still skips the outside-floor remainder by design, exactly as before the
+lane). The latency win is concentrated in FULL mode: three of the four lane files are
+graph-visible, so on a sim-heavy selective PR the `related` legs pull them back into a
+shard exactly as they did before the lane, and only the blind member (plus any lane
+test the PR itself changed) rides the lane.
+The lane reproduces locally with
+`node scripts/ci_shard_test.mjs --lane=long-sims --plan-only`, printing the same
+`[ci-shard]` audit lines as the shards. `release-gate` is deliberately not lane-split:
+`release/**` pushes keep the full suite in their 8 shards; a push to `main` or `dev-*`
+runs the PR tier, so it gets the shards-plus-lane layout.
 
 The CI floor is a superset of the local one: every blind/partial test (recomputed in the
 PR's own tree via the shared `collectSuiteVisibility`), PLUS the invariant guard suites by
