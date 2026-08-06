@@ -347,6 +347,8 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     expect(sheetCuratorRankText(3)).toBe('Master Curator');
     expect(sheetCuratorRankText(4)).toBe('Grand Curator');
     expect(sheetCuratorRankText(5)).toBe('Eternal Curator');
+    // Literal 6 = today's out-of-range boundary; the derived pins below own
+    // growth, so on a sixth rank the literal (not the derived pair) updates.
     expect(sheetCuratorRankText(6)).toBeNull();
     expect(sheetCuratorRankText(99)).toBeNull();
     // Growth cross-pin against the live rank table: if a sixth rank ships in
@@ -369,7 +371,11 @@ describe('characterSheet: reliquary completion pair + rank', () => {
       hudChromeStrings.reliquary.curatorRankName4,
       hudChromeStrings.reliquary.curatorRankName5,
     ];
-    for (let rank = 1; rank <= 5; rank++) {
+    // Growth pin for the CLIENT side of the pair: a sixth rank in
+    // CURATOR_RANK_DEFS must grow this hand list (and so the catalog key it
+    // reads) before this test goes green again.
+    expect(clientRankNames.length).toBe(CURATOR_RANK_DEFS.length);
+    for (let rank = 1; rank <= CURATOR_RANK_DEFS.length; rank++) {
       expect(sheetCuratorRankText(rank), `curator rank ${rank}`).toBe(clientRankNames[rank - 1]);
     }
   });

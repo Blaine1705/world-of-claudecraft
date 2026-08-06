@@ -594,9 +594,10 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
     const boss = MOBS.thunzharr_waking_peak;
     expect(boss).toBeDefined();
     expect(boss.worldBoss).toBe(true);
-    // The personal epics live in two roll groups, each drawing independently
-    // (at most one drop PER GROUP, so a kill can award up to two pieces);
-    // the guaranteed storm trophy is groupless filler.
+    // Both epic roll groups are DRAWN every kill (draw-order parity), but
+    // rollWorldBossLoot's gearWon cap discards a second gear win, so a kill
+    // awards AT MOST ONE Tier-2 piece (src/sim/world_boss.ts); the
+    // guaranteed storm trophy is groupless filler and always drops.
     const groups = [
       ...new Set(boss.loot.map((e) => e.rollGroup).filter((g): g is string => g !== undefined)),
     ].sort();
@@ -650,10 +651,13 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
     // The two heroic-gated signature rares reach the page from both the
     // lockpick chest function and the Marks vendor stock (equality above);
     // this arm proves the stock half really carries BOTH signature rares
-    // today, not merely that the shop is non-empty.
-    const stocked = DELVE_SHOPS.collapsed_reliquary.map((e) => e.itemId);
-    expect(stocked).toContain('deacon_reliquary_helm');
-    expect(stocked).toContain('varric_shadow_cowl');
+    // today, not merely that the shop is non-empty, and that each row keeps
+    // its heroic gate (the adjective the comment leans on).
+    for (const itemId of ['deacon_reliquary_helm', 'varric_shadow_cowl']) {
+      const row = DELVE_SHOPS.collapsed_reliquary.find((e) => e.itemId === itemId);
+      expect(row, itemId).toBeDefined();
+      expect(row?.gate, itemId).toBe('heroicClear');
+    }
     // Uncommon chest staples stay off the unique grid (quality filter).
     expect(isCataloguedRelicItem('reliquary_plate_chest')).toBe(false);
   });
@@ -725,13 +729,16 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     // Premise guard: the derivation skips templateId rows on the stated
     // ground that portals never carry loot. Hold that premise for every live
     // dungeon object, so a future portal-with-loot reds here instead of
-    // silently vanishing from the walk.
-    for (const [dungeonId, dungeon] of Object.entries(DUNGEONS)) {
-      for (const o of dungeon.objects ?? []) {
-        if (o.templateId !== undefined) {
-          expect(o.itemId ?? '', `${dungeonId} portal object carries loot the walk skips`).toBe('');
-        }
-      }
+    // silently vanishing from the walk. Vacuity floor: at least one portal
+    // row must exist for the sweep to be checking anything.
+    const portalRows = Object.entries(DUNGEONS).flatMap(([dungeonId, dungeon]) =>
+      (dungeon.objects ?? [])
+        .filter((o) => o.templateId !== undefined)
+        .map((o) => ({ dungeonId, o })),
+    );
+    expect(portalRows.length).toBeGreaterThanOrEqual(1);
+    for (const { dungeonId, o } of portalRows) {
+      expect(o.itemId, `${dungeonId} portal object carries loot the walk skips`).toBe('');
     }
   });
 
@@ -744,17 +751,28 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     expect(page.desc).toContain(MOBS.ysolei.name);
   });
 
-  it('the Sanctum and Nythraxis page descs name their live final bosses', () => {
-    // Same staleness class the Drowned Temple reword fixed: these two pages
-    // also gained a relic this phase and their blurbs name a boss, so pin the
-    // names to the live MOBS entries (Hollow Crypt stays unpinned; its blurb
-    // uses the short "Morthen" form no live name matches).
-    expect(RELIQUARY_PAGES_BY_ID.conquerors_gravewyrm_sanctum.desc).toContain(
-      MOBS.korzul_the_gravewyrm.name,
-    );
-    expect(RELIQUARY_PAGES_BY_ID.conquerors_nythraxis.desc).toContain(
-      MOBS.nythraxis_scourge_of_thornpeak.name,
-    );
+  it('page descs that cite a full live boss name stay pinned to it', () => {
+    // Same staleness class the Drowned Temple reword fixed (a blurb crediting
+    // yesterday's boss list), swept over every page whose desc carries a FULL
+    // live mob name. Pages using a short form (Olen, Morthen, Ysolei alone,
+    // Zulgar alone, "Nythraxis" on the heroic page) are not pinnable against
+    // MOBS and stay curated prose.
+    const DESC_BOSSES: Record<string, string[]> = {
+      conquerors_sunken_bastion: ['vael_the_mistcaller'],
+      conquerors_sunken_bastion_heroic: ['vael_the_mistcaller'],
+      conquerors_gravewyrm_sanctum: ['korzul_the_gravewyrm'],
+      conquerors_gravewyrm_sanctum_heroic: ['korzul_the_gravewyrm'],
+      conquerors_wildheart_basin_heroic: ['wildheart_high_priest'],
+      conquerors_hollow_crypt_heroic: ['morthen'],
+      conquerors_nythraxis: ['nythraxis_scourge_of_thornpeak'],
+    };
+    for (const [pageId, mobIds] of Object.entries(DESC_BOSSES)) {
+      const page = RELIQUARY_PAGES_BY_ID[pageId];
+      expect(page, pageId).toBeDefined();
+      for (const mobId of mobIds) {
+        expect(page.desc, `${pageId} desc names ${mobId}`).toContain(MOBS[mobId].name);
+      }
+    }
   });
 
   it('Hollow Crypt: rare+ equality plus four curated uncommon brand pieces', () => {

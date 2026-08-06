@@ -51,7 +51,7 @@ export class Rng {
   }
 }
 
-// Stateless hash noise for terrain — deterministic from coordinates + seed.
+// Stateless hash noise for terrain: deterministic from coordinates + seed.
 export function hash2(x: number, y: number, seed: number): number {
   let h = seed >>> 0;
   h = Math.imul(h ^ (x * 374761393), 668265263);

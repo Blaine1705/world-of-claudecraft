@@ -245,8 +245,13 @@ describe('rng observer exceptions propagate (the fail-closed contract)', () => {
       throw new Error('fail closed');
     });
     expect(() => rng.next()).toThrow('fail closed');
-    // The funneled methods inherit the propagation (chance covers the funnel).
+    // Every funneled method inherits the propagation. range/int/pick are the
+    // arms ScriptedRng actually depends on (it overrides chance() away from
+    // next(), so its observer only ever fires through these three).
     expect(() => rng.chance(0.5)).toThrow('fail closed');
+    expect(() => rng.range(0, 1)).toThrow('fail closed');
+    expect(() => rng.int(0, 1)).toThrow('fail closed');
+    expect(() => rng.pick([1, 2])).toThrow('fail closed');
     // Clearing the observer restores plain draws: the seam stays tests-only.
     rng.setObserver(null);
     expect(() => rng.next()).not.toThrow();
