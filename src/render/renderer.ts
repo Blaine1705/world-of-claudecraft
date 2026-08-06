@@ -6900,21 +6900,21 @@ export class Renderer {
               : e.templateId === 'rift_infernal_orb' || e.templateId === 'rift_infernal_orb_active'
                 ? 2.2
                 : 2.4;
-      objectMesh = body!;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
       const built = buildMailboxPillar(e.id);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId === 'noticeboard_eastbrook') {
       // The civic board is itself the readable interaction landmark. Keep the
       // complete GLB on every tier and avoid the generic loot sparkle.
       const built = buildEastbrookNoticeboard();
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
       // build a dedicated procedural mesh that matches the crypt aesthetic.
@@ -6957,7 +6957,7 @@ export class Renderer {
       const built = buildBattlegroundObject(e.templateId, e.color, this.lowGfx);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = body;
       // Hoist the per-frame handles onto the VIEW group. battleground_fx.ts
       // reads `view.group.userData.bg`, and view.group is this method's own
       // wrapper, the built body goes in as a CHILD of it further down, so the
@@ -9424,7 +9424,8 @@ export class Renderer {
         const heurSeed = this.sim.cfg.seed;
         let effGround = groundHeight(ax, az, heurSeed);
         if (inRift) {
-          const rf = this.sim.riftFloor!;
+          const rf = this.sim.riftFloor;
+          if (!rf) return;
           const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
           effGround += riftLiftAt(floor, ax - rf.origin.x, az - rf.origin.z);
         }

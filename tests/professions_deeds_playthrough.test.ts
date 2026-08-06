@@ -33,7 +33,12 @@ const KOI = 'glimmerfin_koi';
 const sim = new Sim({ seed: PLAYTHROUGH_SEED, playerClass: 'warrior', autoEquip: true });
 const pid = sim.playerId;
 const meta = sim.players.get(pid) as PlayerMeta;
-const player = sim.entities.get(pid)!;
+function requirePlayer() {
+  const entity = sim.entities.get(pid);
+  if (!entity) throw new Error('playthrough player entity missing');
+  return entity;
+}
+const player = requirePlayer();
 
 function deedEvents(evs: SimEvent[]): Extract<SimEvent, { type: 'deedUnlocked' }>[] {
   return evs.filter((ev): ev is Extract<SimEvent, { type: 'deedUnlocked' }> => {
