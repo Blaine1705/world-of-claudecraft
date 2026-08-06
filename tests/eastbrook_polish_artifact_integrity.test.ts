@@ -608,12 +608,6 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
 }
 
-// FROZEN, and no longer equal to the live town fingerprint: this is the identity of
-// the tree the v2 polish captures were taken against, not a mirror of the current
-// one. It first diverged when a lockfile-only dependency bump re-minted the town
-// fingerprint to aa0df220..., which moved the live value without retaking a single
-// screenshot. Do NOT sweep this to the live value along with the neighbouring
-// literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
@@ -638,10 +632,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // bounded ground-object reuse pool (storePooledObject/takePooledObject cap), the
 // rendererIntegration leaf, so the composite (and the metadata file's second-order
 // digest that embeds it) re-mint once more.
+// Re-pinned after merging release/v0.35.0: both parents reminted the same rendererIntegration leaf (release pnpm/mobile-disconnect stack vs this branch weapon-skin VFX queue), so remint_polish_provenance.mjs mints a third composite matching neither parent.
+// Re-pinned once more for the weapon-skin VFX connection-freeze fix: the
+// budgeted apply queue and the vfx.weapon-skins prewarm entry move
+// src/render/renderer.ts, the rendererIntegration leaf, so the composite and the
+// metadata seal that embeds it both re-mint (remint_polish_provenance.mjs).
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '515dade30aaad522cbda78d46b01b6c533a8eb4d9d05f11c65b761ced62cbb3b';
+  '709ac592c352b47dfecf327b41f07df5f57e31f93031b091a9d7a10b99dcc55e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '9ed193cbbdadd0b3923427002f07252968b3969b273d24f2a7a200c214d1ef72';
+  'd8dd9c46b4667c35decb97486350e4a7a8cfb3b1ecc9057412a1892027cf1ddb';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1511,8 +1510,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // matched the merged tree, and no capture was retaken here.
     // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
     // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
+    // Re-pinned once more for the weapon-skin VFX connection-freeze fix's
+    // src/render/renderer.ts change (budgeted apply queue plus the
+    // vfx.weapon-skins prewarm entry), same script, no capture retaken.
     expect(fingerprint.digest('hex')).toBe(
-      '46522bd82e547f81b7a97c52333ce561223f18e09f715cc42a10f5c5a0d593d1',
+      '6bbe4a7391e8d5e0ed8484b51e0b5c225ad1db728feade17ff8ed48d6e89d87b',
     );
   });
 
