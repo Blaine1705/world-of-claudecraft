@@ -7447,7 +7447,11 @@
   .trade-money input.coininput {
     width: 52px;
   }
-  .trade-money input {
+  /* The $WOC price field joins this declaration rather than restating it: the
+     two are the same control in the same window, and a second copy of the
+     colours would drift the moment either is retuned. */
+  .trade-money input,
+  .trade-woc-price {
     width: 80px;
     background: #0d0d14;
     color: #ffd100;
@@ -7530,9 +7534,6 @@
   .trade-woc-price-label {
     font-size: 11px;
     color: #887c5c;
-  }
-  .trade-woc-price {
-    width: 120px;
   }
   .trade-woc-equiv,
   .trade-woc-fee,

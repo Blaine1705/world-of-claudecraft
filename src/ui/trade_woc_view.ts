@@ -56,6 +56,11 @@ export interface WocPendingOffer {
   phase: WocOfferPhase;
   /** The directed listing to pay for, once one exists. */
   listingId: number | null;
+  /** Each side's agreement. The trade window's Accept button reads THESE rather
+   *  than the sim's own accepted flags, because a $WOC deal never confirms the
+   *  sim trade and those flags therefore never move. */
+  buyerAccepted: boolean;
+  sellerAccepted: boolean;
 }
 
 /** Why the $WOC arm is unavailable, or null when it is offerable. */

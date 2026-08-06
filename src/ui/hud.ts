@@ -18833,9 +18833,13 @@ export class Hud {
     this.wocTradeOfferPolledAtMs = nowMs;
     void hooks.client.offers().then(async (res) => {
       if (!res.ok || this.sim.tradeInfo?.otherName !== otherName) return;
+      // 'accepted' as well as 'pending': the deal is not over when it is agreed,
+      // and dropping it at that moment is what made the payment phase
+      // unreachable and left both windows with a stale id to press.
       const mine = res.offers.find(
         (o) =>
-          o.status === 'pending' && (o.role === 'buyer' ? o.sellerName : o.buyerName) === otherName,
+          (o.status === 'pending' || o.status === 'accepted') &&
+          (o.role === 'buyer' ? o.sellerName : o.buyerName) === otherName,
       );
       if (!mine) {
         if (this.wocTradeOffer !== null) {
@@ -18860,6 +18864,8 @@ export class Hud {
         role: mine.role,
         phase: wocOfferPhase(mine),
         listingId: mine.listingId,
+        buyerAccepted: mine.buyerAccepted,
+        sellerAccepted: mine.sellerAccepted,
       };
       this.lastTradeSig = '';
     });
@@ -18899,9 +18905,16 @@ export class Hud {
       this.lastTradeSig = '';
       return;
     }
+    // The window STAYS OPEN and the offer stays in it: escrow is done, and the
+    // buyer's payment is the next thing that happens here. Closing at this
+    // point is what previously left the deal with nowhere to finish.
     this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
-    this.wocTradeOffer = null;
-    this.sim.tradeCancel();
+    this.wocTradeOffer = {
+      ...offer,
+      phase: 'awaiting_payment',
+      listingId: res.listing.id,
+    };
+    this.lastTradeSig = '';
   }
 
   /**
@@ -19027,6 +19040,8 @@ export class Hud {
         role: 'buyer',
         phase: 'review',
         listingId: null,
+        buyerAccepted: false,
+        sellerAccepted: false,
       };
       this.lastTradeSig = '';
     } else {
@@ -19171,8 +19186,23 @@ export class Hud {
         ${wocTradeArmHtml(wocModel, this.wocTradeUsdCents)}`;
       const acceptBtn = document.createElement('button');
       acceptBtn.className = 'btn';
-      acceptBtn.textContent = info.myAccepted ? t('hud.trade.waiting') : t('hud.trade.accept');
-      acceptBtn.disabled = info.myAccepted;
+      // With a $WOC offer standing, agreement lives on the OFFER, not on the sim
+      // trade (which this deal never confirms). Reading myAccepted here left the
+      // button saying "Accept" after the player had already accepted, and
+      // pressing it again sent a second acceptance for a deal already agreed.
+      const wocAccepted =
+        wocModel.pendingOffer === null
+          ? null
+          : wocModel.pendingOffer.role === 'buyer'
+            ? wocModel.pendingOffer.buyerAccepted
+            : wocModel.pendingOffer.sellerAccepted;
+      const accepted = wocAccepted ?? info.myAccepted;
+      // Once the goods are escrowed there is nothing left to accept: the buyer
+      // pays and the seller waits, both inside the arm.
+      const acceptSpent = wocModel.pendingOffer !== null && wocModel.pendingOffer.phase !== 'review';
+      acceptBtn.textContent = accepted ? t('hud.trade.waiting') : t('hud.trade.accept');
+      acceptBtn.disabled = accepted || acceptSpent;
+      acceptBtn.hidden = acceptSpent;
       acceptBtn.addEventListener('click', () => {
         // With a $WOC offer standing, the sim's confirm must NEVER run: it swaps
         // atomically the moment both sides accept, and this deal carries no gold

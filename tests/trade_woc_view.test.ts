@@ -273,6 +273,8 @@ describe('a standing offer changes what each side may do', () => {
     role: 'buyer' as const,
     phase: 'review' as const,
     listingId: null,
+    buyerAccepted: false,
+    sellerAccepted: false,
   };
 
   it('forbids a SECOND offer while one is standing', () => {

@@ -98,6 +98,8 @@ export interface WocOfferView {
   /** The directed listing's own state once one exists; drives the payment phase. */
   listingStatus: string | null;
   listingResolution: string | null;
+  buyerAccepted: boolean;
+  sellerAccepted: boolean;
 }
 
 export interface WocQuoteView {

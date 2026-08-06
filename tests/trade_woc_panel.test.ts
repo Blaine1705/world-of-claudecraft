@@ -244,6 +244,8 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
     role: 'buyer' as const,
     phase: 'review' as const,
     listingId: null,
+    buyerAccepted: false,
+    sellerAccepted: false,
   };
 
   it('renders the agreed price for the Money row, in the asked-for shape', () => {
@@ -309,6 +311,8 @@ describe('the payment phase, in the window rather than elsewhere', () => {
     role: 'buyer' as const,
     phase: 'awaiting_payment' as const,
     listingId: 41,
+    buyerAccepted: true,
+    sellerAccepted: true,
   };
 
   it('derives the phase from the LISTING, not the offer status', () => {
@@ -369,9 +373,39 @@ describe('the payment phase, in the window rather than elsewhere', () => {
     // The case the listingId check alone does NOT catch: a settled offer still
     // carries its listing id, so without the phase test it would stay payable
     // and a second click would buy the same item twice.
-    expect(
-      wocTradeModelFrom(deps({ pendingOffer: { ...paying, phase: 'settled' } })).canPay,
-    ).toBe(false);
+    expect(wocTradeModelFrom(deps({ pendingOffer: { ...paying, phase: 'settled' } })).canPay).toBe(
+      false,
+    );
     expect(wocTradeModelFrom(deps({ pendingOffer: paying })).canPay).toBe(true);
+  });
+});
+
+describe('the window follows a $WOC deal THROUGH acceptance', () => {
+  // The two defects this pins, which compounded into a dead end in real play:
+  // the client dropped any offer that was no longer 'pending', and a successful
+  // acceptance closed the window. Between them the payment phase was
+  // unreachable and both sides were left holding a stale offer id to press.
+  const HUD = readFileSync('src/ui/hud.ts', 'utf8');
+
+  it('polls accepted offers, not only pending ones', () => {
+    expect(HUD).toContain("o.status === 'pending' || o.status === 'accepted'");
+  });
+
+  it('does not cancel the trade when an acceptance succeeds', () => {
+    // The acceptance handler must leave the window open; only the buyer's own
+    // withdraw and the sim's own cancel may close it.
+    const accept = HUD.slice(
+      HUD.indexOf('private async acceptWocTradeOffer'),
+      HUD.indexOf('private async cancelWocTradeOffer'),
+    );
+    expect(accept).not.toContain('tradeCancel');
+    expect(accept, 'it should advance the phase instead').toContain("phase: 'awaiting_payment'");
+  });
+
+  it('drives the Accept button from the OFFER, not the sim trade', () => {
+    // A $WOC deal never confirms the sim trade, so info.myAccepted never moves:
+    // reading it left the button saying "Accept" after the player had accepted.
+    expect(HUD).toContain('wocModel.pendingOffer.buyerAccepted');
+    expect(HUD).toContain('wocModel.pendingOffer.sellerAccepted');
   });
 });
