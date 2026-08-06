@@ -267,3 +267,35 @@ describe('Codex skills', () => {
     );
   });
 });
+
+describe('retired CI reviewer stays retired', () => {
+  // The Codex CI review workflow was removed 2026-08 (maintainer decision;
+  // docs/codex.md, "Pull request automation"). Reintroducing a CI reviewer
+  // needs a fresh security design, so the absence is pinned the decisive way:
+  // a scan of the whole workflow directory, not a hardcoded filename that a
+  // renamed workflow would evade.
+  it('keeps every workflow free of the codex-action and its credential', () => {
+    const dir = path.join(root, '.github/workflows');
+    const files = fs.readdirSync(dir).filter((f) => /\.ya?ml$/.test(f));
+    expect(files.length).toBeGreaterThan(0);
+    for (const f of files) {
+      const text = read(path.join('.github/workflows', f));
+      expect(text, f).not.toContain('openai/codex-action');
+      expect(text, f).not.toContain('OPENAI_API_KEY');
+    }
+  });
+
+  it('keeps the retired reviewer files deleted', () => {
+    for (const p of [
+      '.github/codex',
+      'scripts/prepare_ai_review.mjs',
+      'scripts/post_ai_review.mjs',
+      'scripts/redact_secrets.mjs',
+      'scripts/gh_sticky_comment.mjs',
+      'scripts/ai_review.mjs',
+      'scripts/ai_review_diff.mjs',
+    ]) {
+      expect(fs.existsSync(path.join(root, p)), p).toBe(false);
+    }
+  });
+});
