@@ -255,7 +255,9 @@ describe('detectCode (fail closed end to end)', () => {
   }) as unknown as typeof fetch;
 
   it('returns code=true for non-PR events without touching the API', async () => {
-    for (const eventName of ['push', 'workflow_dispatch', 'schedule', '']) {
+    // merge_group is the queue's event: a queue run must always take the full
+    // PR tier (there is no PR files listing to classify on a merge group).
+    for (const eventName of ['push', 'workflow_dispatch', 'schedule', 'merge_group', '']) {
       expect(await detectCode({ ...BASE, eventName, fetchImpl: neverFetch })).toEqual({
         code: true,
         reason: 'non-PR event: full PR tier (code=true)',
@@ -466,6 +468,22 @@ describe('detect_code_changes.mjs entry (subprocess)', () => {
     expect(run.exitCode).toBe(0);
     // Exact whole-output pin: these four lines are the entire contract the
     // dependent jobs read, and selection must never activate off a PR event.
+    expect(run.output).toBe(
+      'code=true\n' +
+        'test_mode=full\n' +
+        'test_mode_reason=selection applies to pull requests only: full suite\n' +
+        'changed_files=[]\n',
+    );
+    expect(run.log).toContain('non-PR event');
+  });
+
+  it('writes code=true and test_mode=full to GITHUB_OUTPUT for a merge queue run', async () => {
+    // The merge_group event is the queue's own run over the candidate merge
+    // result; the queue is the last pre-merge bar, so the handover the shard
+    // jobs read must be the full-suite contract, end to end through the real
+    // entry, exactly as for push.
+    const run = await runEntry('merge-group', { GITHUB_EVENT_NAME: 'merge_group' });
+    expect(run.exitCode).toBe(0);
     expect(run.output).toBe(
       'code=true\n' +
         'test_mode=full\n' +

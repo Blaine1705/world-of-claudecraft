@@ -14,6 +14,7 @@ Codex have different entry points and share the same deterministic scripts and c
 | **Selective gate** | `node scripts/gate_select.mjs` | **Before implementation is called ready / pre-merge** | **Yes (the merge bar)** |
 | Full local gate | `npm run gate` through `scripts/gate.mjs` | When you want the whole suite locally, or the planner falls back | Yes (deeper check) |
 | Selective PR-tier CI | ci.yml `pr-gate` shards through `scripts/ci_shard_test.mjs` (same selection semantics, sharded; full suite on any unprovable diff) | Every pull request | Yes (PR checks) |
+| Merge queue | ci.yml on the `merge_group` event: the full PR tier over the exact merge result about to become the branch tip (see `docs/merge-queue.md`, including rollout status: `release/**` first, `main` at the next release-to-main merge) | Every queued merge into a queue-protected branch | Yes (required checks on the merge group) |
 | Nightly full gate | `.github/workflows/nightly.yml`: full suite + checks + browser over the tips of main and the active `release/**` branch | Scheduled nightly (04:47 UTC) | No (alerting: files and closes one tracking issue) |
 | Judgment review | Claude `/qa` or Codex `$woc-qa`, plus scoped reviewers | End of a contribution | Advisory locally |
 
@@ -190,8 +191,10 @@ and everything under `tests/parity/`), PLUS every test file the PR changed. CI a
 on triggers the local gate does not need: any `.github/` path, the selection pipeline's own
 scripts (a PR runs its own copy of them), any removed or renamed source/test path (a
 deleted module's importers are invisible to `related`), and any listing it cannot relay or
-read safely. Selection never applies off `pull_request` events: `release-gate` keeps the
-unconditional full 8-shard run line, and the nightly gate re-proves the tips daily.
+read safely. Selection never applies off `pull_request` events: a merge-queue run
+(`merge_group`) always takes `test_mode=full` (the queue is the last pre-merge bar),
+`release-gate` keeps the unconditional full 8-shard run line, and the nightly gate
+re-proves the tips daily.
 
 Every decision prints in the job log (`[detect_code_changes]` in the changes job,
 `[ci-shard]` in each shard: mode, reason, floor size, related sources, and the
@@ -207,10 +210,12 @@ What the selective PR tier still cannot prove: the merge-result INTERACTION betw
 the PR's diff and base commits that landed after the PR's merge base. The shards check
 out the merge ref (the PR merged onto the current base tip), but selection derives
 from the PR's own changed files, so a test that only fails in the combination of a PR
-change and a newer base change is outside both the floor and the related set. The
-full-suite run on every `release/**` push re-proves each merged result at merge time,
-and the nightly re-proves the tip daily; a PR wanting the combination proven pre-merge
-can re-merge its base (the moving-base workflow this repo already uses).
+change and a newer base change is outside both the floor and the related set. On the
+queue-protected branches (`main` and `release/**`, see `docs/merge-queue.md`) the merge
+queue closes this pre-merge: every queued PR is retested with the FULL suite on the
+exact merge result against the current tip before it may land. The full-suite run on
+every `release/**` push still re-proves the landed tip, and the nightly re-proves it
+daily.
 
 **Evidence it works.** Fault injection, 5/5 caught: a `Math.random()` in `src/sim`, a combat
 constant, a content record, a sim-emitted player string, and a deleted weapon `.glb`. In two
