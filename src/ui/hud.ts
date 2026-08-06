@@ -747,6 +747,7 @@ import {
   wocTradeMoneyText,
 } from './trade_woc_panel';
 import {
+  inventoryIndexOfStaged,
   type WocPendingOffer,
   type WocTradePartner,
   type WocTradeSplit,
@@ -18848,10 +18849,17 @@ export class Hud {
         }
         return;
       }
-      // Compare the PHASE too: the same offer moving from review to
-      // awaiting_payment is the transition both windows are waiting on,
-      // and an id-only check would never notice it.
-      if (this.wocTradeOffer?.id === mine.id && this.wocTradeOffer.phase === wocOfferPhase(mine)) {
+      // Compare the phase AND the acceptance flags, not just the id. One side
+      // accepting moves neither the id nor the phase, so an id-and-phase check
+      // left the button reading "Accept" after the player had already accepted,
+      // and the other side never learned they were waited on.
+      const cur = this.wocTradeOffer;
+      if (
+        cur?.id === mine.id &&
+        cur.phase === wocOfferPhase(mine) &&
+        cur.buyerAccepted === mine.buyerAccepted &&
+        cur.sellerAccepted === mine.sellerAccepted
+      ) {
         return;
       }
       // Quote the agreed price once, so both sides show the same token figure.
@@ -18885,15 +18893,26 @@ export class Hud {
       this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');
       return;
     }
+    // The extraction keys on an INVENTORY index. Sending the staged position
+    // instead reads as 0 for a single staged item and extracts whatever sits
+    // first in the bags, which refused the sale at the very last step.
+    let itemFields: Record<string, unknown> = {};
+    if (first !== undefined) {
+      const index = inventoryIndexOfStaged(this.sim.inventory, first);
+      if (index < 0) {
+        // Not found is not index 0: refusing here beats escrowing the wrong item.
+        this.log(t('hudChrome.trade.woc.hintAcceptNeedsItem'), '#ff6b6b');
+        return;
+      }
+      itemFields = {
+        itemIndex: index,
+        itemId: first.itemId,
+        ...(first.instance === undefined ? {} : { expectInstance: first.instance }),
+      };
+    }
     const res = await hooks.client.acceptOffer(offer.id, {
       characterId: hooks.characterId() ?? 0,
-      ...(first === undefined
-        ? {}
-        : {
-            itemIndex: Math.max(0, this.stagedTrade.items.indexOf(first)),
-            itemId: first.itemId,
-            ...(first.instance === undefined ? {} : { expectInstance: first.instance }),
-          }),
+      ...itemFields,
     });
     if (!res.ok) {
       this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
@@ -19190,16 +19209,27 @@ export class Hud {
       // trade (which this deal never confirms). Reading myAccepted here left the
       // button saying "Accept" after the player had already accepted, and
       // pressing it again sent a second acceptance for a deal already agreed.
+      const bothAgreed =
+        wocModel.pendingOffer !== null &&
+        wocModel.pendingOffer.buyerAccepted &&
+        wocModel.pendingOffer.sellerAccepted;
+      // Both agreed but no listing means the ESCROW failed and the server
+      // reopened the offer. Leaving the button on "Waiting" there is a dead end
+      // neither side can leave, so it becomes pressable again to retry.
+      const escrowFailed = bothAgreed && wocModel.pendingOffer?.listingId === null;
       const wocAccepted =
         wocModel.pendingOffer === null
           ? null
-          : wocModel.pendingOffer.role === 'buyer'
-            ? wocModel.pendingOffer.buyerAccepted
-            : wocModel.pendingOffer.sellerAccepted;
+          : escrowFailed
+            ? false
+            : wocModel.pendingOffer.role === 'buyer'
+              ? wocModel.pendingOffer.buyerAccepted
+              : wocModel.pendingOffer.sellerAccepted;
       const accepted = wocAccepted ?? info.myAccepted;
       // Once the goods are escrowed there is nothing left to accept: the buyer
       // pays and the seller waits, both inside the arm.
-      const acceptSpent = wocModel.pendingOffer !== null && wocModel.pendingOffer.phase !== 'review';
+      const acceptSpent =
+        wocModel.pendingOffer !== null && wocModel.pendingOffer.phase !== 'review';
       acceptBtn.textContent = accepted ? t('hud.trade.waiting') : t('hud.trade.accept');
       acceptBtn.disabled = accepted || acceptSpent;
       acceptBtn.hidden = acceptSpent;

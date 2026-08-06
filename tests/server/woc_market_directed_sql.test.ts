@@ -86,3 +86,36 @@ describe('the schema carries the directed column additively', () => {
     expect(WOC_MARKET_SCHEMA).toContain('woc_market_listings_directed_buyer');
   });
 });
+
+describe('the listing-id stamp is reachable on an already-accepted offer', () => {
+  // The bug this pins cost a full test cycle to find, and every existing test
+  // passed through it, because FakeWocMarketDb modelled the arm that the real
+  // SQL was missing. The service claims the offer ('pending' -> 'accepted'),
+  // creates the listing, then calls back to stamp the id. By then the row is
+  // 'accepted', so a WHERE narrowed to 'pending' matched zero rows: the offer
+  // never learned its listing, both windows sat at "review" forever, and the
+  // buyer was never offered the chance to pay.
+  //
+  // Asserted on the STATEMENT, because that is the half the fake cannot vouch
+  // for and the half that actually ships.
+  it('accepts a stamp when the row is accepted with no listing yet', async () => {
+    const { pool, sql } = recordingPool();
+    await new PgWocMarketDb(pool).resolveDirectedOffer(REALM, 3, 'accepted', { listingId: 41 });
+    const [text] = sql();
+    expect(text).toContain("status = 'pending'");
+    expect(text, 'the stamp arm must exist at all').toContain("status = 'accepted'");
+    expect(text, 'and only while no listing is set').toContain('listing_id IS NULL');
+  });
+
+  it('still compare-and-sets on pending, so two accepts cannot both escrow', () => {
+    // The stamp arm must not weaken the claim: it changes no status and refuses
+    // once a listing is present, so it can never resurrect a resolved offer.
+    const { pool, sql } = recordingPool();
+    return new PgWocMarketDb(pool)
+      .resolveDirectedOffer(REALM, 3, 'declined')
+      .then(() => {
+        const [text] = sql();
+        expect(text).toContain("status = 'pending'");
+      });
+  });
+});

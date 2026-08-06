@@ -13,7 +13,11 @@
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot, ItemDef } from '../src/sim/types';
-import { buildWocTradeModel, wocTradableSlot } from '../src/ui/trade_woc_view';
+import {
+  buildWocTradeModel,
+  inventoryIndexOfStaged,
+  wocTradableSlot,
+} from '../src/ui/trade_woc_view';
 
 const PARTNER = { name: 'Aldan', walletVerified: true };
 
@@ -298,5 +302,39 @@ describe('a standing offer changes what each side may do', () => {
 
   it('passes the offer through untouched for both sides to read', () => {
     expect(buildWocTradeModel(input({ pendingOffer: offer })).pendingOffer).toEqual(offer);
+  });
+});
+
+describe('a staged slot resolves to its INVENTORY index', () => {
+  // The bug this pins: escrow extraction keys on an inventory index, while the
+  // trade window works in its own staged array. Passing the staged position
+  // straight through reads as 0 for a single staged item, which extracts
+  // whatever sits first in the bags and refuses the sale on the mismatch. It
+  // made the whole p2p flow fail at the last step, silently.
+  const inv: InvSlot[] = [
+    { itemId: 'cloth', count: 5 },
+    { itemId: 'potion', count: 2 },
+    { itemId: EPIC.id, count: 1 },
+  ];
+
+  it('finds the real index, not the staged one', () => {
+    expect(inventoryIndexOfStaged(inv, slot(EPIC.id))).toBe(2);
+  });
+
+  it('reports -1 for something not held, never 0', () => {
+    // 0 is a VALID index, so a not-found that returned it would extract the
+    // wrong item rather than refusing.
+    expect(inventoryIndexOfStaged(inv, slot('not_held'))).toBe(-1);
+  });
+
+  it('does not confuse an instanced copy with a plain one in the same bags', () => {
+    const enchanted: InvSlot = {
+      itemId: EPIC.id,
+      count: 1,
+      instance: { rolled: { quality: 'epic' } } as InvSlot['instance'],
+    };
+    const both: InvSlot[] = [{ itemId: EPIC.id, count: 1 }, enchanted];
+    expect(inventoryIndexOfStaged(both, enchanted)).toBe(1);
+    expect(inventoryIndexOfStaged(both, slot(EPIC.id))).toBe(0);
   });
 });

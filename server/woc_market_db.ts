@@ -733,12 +733,27 @@ export class PgWocMarketDb implements WocMarketDb {
     to: Exclude<WocDirectedOfferStatus, 'pending'>,
     opts: { listingId?: number } = {},
   ): Promise<WocDirectedOfferRow | null> {
-    // The status predicate is the compare-and-set. Two concurrent accepts both
-    // read 'pending', but only one UPDATE matches, so only one reaches escrow.
+    // Two arms, and the second one is easy to lose.
+    //
+    // The 'pending' predicate is the compare-and-set: two concurrent accepts
+    // both read 'pending', only one UPDATE matches, so only one reaches escrow.
+    //
+    // The service then calls back a SECOND time to stamp the listing id onto the
+    // offer it just created, and by then the row is 'accepted', not 'pending'.
+    // Narrowed to the first arm alone that write matched zero rows and the offer
+    // never learned its listing, so both windows saw a deal stuck at "review"
+    // forever and the buyer was never offered the chance to pay. The stamp is
+    // therefore allowed on an accepted row that has no listing yet, which cannot
+    // resurrect anything: it changes no status and refuses once one is set.
     const res = await this.pool.query(
       `UPDATE woc_market_directed_offers
           SET status = $3, listing_id = COALESCE($4, listing_id), updated_at = now()
-        WHERE realm = $1 AND id = $2 AND status = 'pending'
+        WHERE realm = $1 AND id = $2
+          AND (
+            status = 'pending'
+            OR ($3 = 'accepted' AND status = 'accepted'
+                AND listing_id IS NULL AND $4::bigint IS NOT NULL)
+          )
         RETURNING ${OFFER_COLS}`,
       [realm, id, to, opts.listingId ?? null],
     );

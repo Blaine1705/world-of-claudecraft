@@ -187,6 +187,26 @@ export function wocTradableSlot(slot: InvSlot, items: Readonly<Record<string, It
   return exchangeItemCategory(def) !== 'other';
 }
 
+/**
+ * Where a staged slot lives in the player's INVENTORY.
+ *
+ * The escrow extraction keys on an inventory index (ExtractRef.index), while the
+ * trade window works in its own staged array. Passing the staged position
+ * straight through is the bug this exists to prevent: with one item staged it
+ * reads as index 0, which extracts whatever happens to sit first in the bags,
+ * and the mismatch refuses the whole sale.
+ *
+ * Matched on id AND per-instance payload, canonically, so an enchanted or
+ * signed copy is never confused with a plain one sitting in the same bags.
+ * Returns -1 when the slot cannot be found, which the caller must treat as
+ * "do not send", never as index 0.
+ */
+export function inventoryIndexOfStaged(inventory: readonly InvSlot[], staged: InvSlot): number {
+  const key = (s: InvSlot): string => JSON.stringify(s.instance ?? null);
+  const want = key(staged);
+  return inventory.findIndex((s) => s.itemId === staged.itemId && key(s) === want);
+}
+
 /** The trade window's $WOC arm, as a function of its inputs. */
 export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
   // Eligibility is about what you are BUYING, so it reads the other side.
