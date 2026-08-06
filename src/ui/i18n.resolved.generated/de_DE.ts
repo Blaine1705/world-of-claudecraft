@@ -482,6 +482,31 @@ export const de_DE: EnTranslations = {
         "bannedUntil": "Du bist noch für {remaining} von den täglichen Belohnungen ausgeschlossen. Der Zugang wird am {until} wiederhergestellt. Grund: {reason}"
       }
     },
+    "trade": {
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "priceLabel": "Price in USD",
+        "pricePlaceholder": "0.00",
+        "equivalent": "About {tokens} $WOC at the current rate",
+        "variableWarning": "The $WOC amount is a preview, not a fixed price. The exact number is set by a fresh quote when the buyer pays.",
+        "feeLine": "Exchange fee {fee}",
+        "netLine": "You receive {net}",
+        "sendOffer": "Send $WOC offer",
+        "offerSent": "Offer sent. It expires in 10 minutes unless {name} accepts.",
+        "notInstant": "A $WOC sale is not instant. Your item moves into escrow when they accept, and reaches them once payment is verified.",
+        "blockDisabled": "The $WOC Exchange is not available on this realm.",
+        "blockNoWallet": "Link and verify a wallet to sell items for $WOC.",
+        "blockRecipientNoWallet": "That player must connect a wallet to accept $WOC payments.",
+        "blockNoEligibleItems": "None of the staged items can be sold for $WOC.",
+        "ineligibleNote": "{count} staged item(s) cannot be sold for $WOC.",
+        "incomingTitle": "$WOC offer from {name}",
+        "incomingBody": "{name} offers to sell you {item} for {price}.",
+        "accept": "Accept and pay",
+        "decline": "Decline",
+        "withdraw": "Withdraw offer"
+      }
+    },
     "wocStore": {
       "title": "WOC-Shop",
       "close": "WOC-Shop schließen",

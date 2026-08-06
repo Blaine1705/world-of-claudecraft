@@ -482,6 +482,31 @@ export const zh_TW: EnTranslations = {
         "bannedUntil": "您還將被禁止參加每日獎勵 {remaining}。恢復時間：{until}。原因：{reason}"
       }
     },
+    "trade": {
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "priceLabel": "價格（美元）",
+        "pricePlaceholder": "0.00",
+        "equivalent": "按目前匯率約為 {tokens} $WOC",
+        "variableWarning": "$WOC 金額僅為預覽，並非固定價格。買家付款時將以最新報價確定確切數量。",
+        "feeLine": "交易所手續費 {fee}",
+        "netLine": "你將收到 {net}",
+        "sendOffer": "傳送 $WOC 報價",
+        "offerSent": "報價已傳送。若 {name} 未接受，將在 10 分鐘後過期。",
+        "notInstant": "$WOC 交易並非即時完成。對方接受後你的物品將進入託管，付款驗證通過後送達對方。",
+        "blockDisabled": "本伺服器未提供 $WOC 交易所。",
+        "blockNoWallet": "請先綁定並驗證錢包，才能出售物品換取 $WOC。",
+        "blockRecipientNoWallet": "該玩家必須先連結錢包，才能接受 $WOC 付款。",
+        "blockNoEligibleItems": "暫存的物品均無法出售換取 $WOC。",
+        "ineligibleNote": "有 {count} 件暫存物品無法出售換取 $WOC。",
+        "incomingTitle": "來自 {name} 的 $WOC 報價",
+        "incomingBody": "{name} 提出以 {price} 將 {item} 出售給你。",
+        "accept": "接受並付款",
+        "decline": "拒絕",
+        "withdraw": "撤回報價"
+      }
+    },
     "wocStore": {
       "title": "WOC 商店",
       "close": "關閉 WOC 商店",

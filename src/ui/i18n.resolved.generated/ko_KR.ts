@@ -482,6 +482,31 @@ export const ko_KR: EnTranslations = {
         "bannedUntil": "일일 보상 참여가 앞으로 {remaining} 동안 금지됩니다. 해제 시각: {until}. 사유: {reason}"
       }
     },
+    "trade": {
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "priceLabel": "가격 (USD)",
+        "pricePlaceholder": "0.00",
+        "equivalent": "현재 환율 기준 약 {tokens} $WOC",
+        "variableWarning": "$WOC 금액은 미리 보기이며 고정 가격이 아닙니다. 정확한 수량은 구매자가 결제할 때 새 견적으로 정해집니다.",
+        "feeLine": "거래소 수수료 {fee}",
+        "netLine": "받는 금액 {net}",
+        "sendOffer": "$WOC 제안 보내기",
+        "offerSent": "제안을 보냈습니다. {name} 님이 수락하지 않으면 10분 후 만료됩니다.",
+        "notInstant": "$WOC 거래는 즉시 완료되지 않습니다. 상대가 수락하면 아이템이 에스크로로 이동하며, 결제가 확인되면 전달됩니다.",
+        "blockDisabled": "이 서버에서는 $WOC 거래소를 사용할 수 없습니다.",
+        "blockNoWallet": "$WOC로 아이템을 판매하려면 지갑을 연결하고 인증하세요.",
+        "blockRecipientNoWallet": "해당 플레이어가 $WOC 결제를 받으려면 지갑을 연결해야 합니다.",
+        "blockNoEligibleItems": "올려둔 아이템 중 $WOC로 판매할 수 있는 것이 없습니다.",
+        "ineligibleNote": "올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.",
+        "incomingTitle": "{name} 님의 $WOC 제안",
+        "incomingBody": "{name} 님이 {item}을(를) {price}에 판매하겠다고 제안했습니다.",
+        "accept": "수락하고 결제",
+        "decline": "거절",
+        "withdraw": "제안 철회"
+      }
+    },
     "wocStore": {
       "title": "WOC 상점",
       "close": "WOC 상점 닫기",

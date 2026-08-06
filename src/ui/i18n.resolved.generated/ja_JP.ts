@@ -482,6 +482,31 @@ export const ja_JP: EnTranslations = {
         "bannedUntil": "デイリー報酬への参加はあと{remaining}禁止されています。解除日時: {until}。理由: {reason}"
       }
     },
+    "trade": {
+      "woc": {
+        "tabGold": "Gold",
+        "tabWoc": "$WOC",
+        "priceLabel": "価格（USD）",
+        "pricePlaceholder": "0.00",
+        "equivalent": "現在のレートで約 {tokens} $WOC",
+        "variableWarning": "$WOC の金額はプレビューであり、固定価格ではありません。正確な数量は購入者の支払い時に最新の見積もりで決まります。",
+        "feeLine": "取引所手数料 {fee}",
+        "netLine": "受取額 {net}",
+        "sendOffer": "$WOC オファーを送る",
+        "offerSent": "オファーを送信しました。{name} が承諾しない場合、10 分で期限切れになります。",
+        "notInstant": "$WOC の取引は即時ではありません。相手が承諾するとアイテムはエスクローに移り、支払いが確認され次第、相手に届きます。",
+        "blockDisabled": "このレルムでは $WOC 取引所を利用できません。",
+        "blockNoWallet": "$WOC でアイテムを売却するには、ウォレットを連携して認証してください。",
+        "blockRecipientNoWallet": "そのプレイヤーが $WOC の支払いを受け取るには、ウォレットを接続する必要があります。",
+        "blockNoEligibleItems": "セットしたアイテムはいずれも $WOC で売却できません。",
+        "ineligibleNote": "セットしたアイテムのうち {count} 個は $WOC で売却できません。",
+        "incomingTitle": "{name} からの $WOC オファー",
+        "incomingBody": "{name} が {item} を {price} であなたに売却すると提案しています。",
+        "accept": "承諾して支払う",
+        "decline": "辞退する",
+        "withdraw": "オファーを取り下げる"
+      }
+    },
     "wocStore": {
       "title": "WOCストア",
       "close": "WOCストアを閉じる",

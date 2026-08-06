@@ -73,6 +73,29 @@ export interface WocEstimateView {
   usdCents: number;
   amount: WocQuoteLegView | null;
   asOfMs: number | null;
+  /** The server's USD fee split for this amount. Null when unavailable, or on
+   *  an economy service too old to send it: the client NEVER derives it. */
+  split: { sellerCents: number; burnCents: number; treasuryCents: number } | null;
+}
+
+/** Whether a character can be paid in $WOC, for the trade window's arm. */
+export interface WocTradePartnerView {
+  characterId: number;
+  name: string;
+  walletVerified: boolean;
+}
+
+/** A directed p2p offer, from either side. */
+export interface WocOfferView {
+  id: number;
+  sellerName: string;
+  buyerName: string;
+  itemId: string;
+  usdCents: number;
+  status: 'pending' | 'accepted' | 'declined' | 'withdrawn' | 'expired';
+  listingId: number | null;
+  expiresAtMs: number;
+  role: 'buyer' | 'seller';
 }
 
 export interface WocQuoteView {
@@ -260,6 +283,56 @@ export class WocMarketClient {
       `/api/woc-market/estimate?cents=${Math.floor(cents)}`,
     );
     return out.ok ? out.data : null;
+  }
+
+  /** Can this character be paid in $WOC? Null when there is no such character
+   *  on the realm, which the window treats the same as "cannot be paid". */
+  async tradePartner(characterId: number): Promise<WocTradePartnerView | null> {
+    const out = await this.request<{ partner: WocTradePartnerView }>(
+      'GET',
+      `/api/woc-market/trade-partner/${Math.floor(characterId)}`,
+    );
+    return out.ok ? out.data.partner : null;
+  }
+
+  async offers(): Promise<{ ok: true; offers: WocOfferView[] } | WocMarketFail> {
+    const out = await this.request<{ offers: WocOfferView[] }>('GET', '/api/woc-market/offers');
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
+  async createOffer(req: {
+    characterId: number;
+    itemIndex: number;
+    itemId: string;
+    expectInstance?: unknown;
+    buyerCharacterId: number;
+    usdCents: number;
+  }): Promise<{ ok: true; offer: WocOfferView } | WocMarketFail> {
+    const out = await this.request<{ offer: WocOfferView }>('POST', '/api/woc-market/offers', req);
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
+  async acceptOffer(id: number): Promise<{ ok: true; listing: WocListingView } | WocMarketFail> {
+    const out = await this.request<{ listing: WocListingView }>(
+      'POST',
+      `/api/woc-market/offers/${Math.floor(id)}/accept`,
+      {},
+    );
+    return out.ok ? { ok: true, ...out.data } : out;
+  }
+
+  /** decline is the buyer's verb, withdraw the seller's; the server enforces
+   *  which one the caller is entitled to. */
+  async resolveOffer(
+    id: number,
+    action: 'decline' | 'withdraw',
+  ): Promise<{ ok: true } | WocMarketFail> {
+    const out = await this.request<Record<string, never>>(
+      'POST',
+      `/api/woc-market/offers/${Math.floor(id)}/${action}`,
+      {},
+    );
+    return out.ok ? { ok: true } : out;
   }
 
   async me(): Promise<{ ok: true; activity: WocActivityView } | WocMarketFail> {
