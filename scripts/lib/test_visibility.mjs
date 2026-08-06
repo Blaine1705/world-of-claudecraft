@@ -74,6 +74,16 @@ export const OUT_OF_GRAPH_PATTERNS = Object.freeze([
   // these import signals joined the list (Phase 2 adversarial audit).
   ['gltf-transform', /from\s*['"]@gltf-transform\//],
   ['sharp', /from\s*['"]sharp['"]|require\(\s*['"]sharp['"]\s*\)/],
+  // Generated i18n artifacts (the resolved locale slices and the
+  // TranslationKey union) are deliberately OUTSIDE the graph selection models:
+  // the selective planner classifies them inert (lib/gate_select_plan.mjs,
+  // isGeneratedI18nArtifactPath) because pr-checks' regenerate-and-diff owns
+  // their integrity. A suite that imports or path-references them therefore
+  // depends on content that selection will never hand to `related`, so it
+  // rides the floor. Matches the artifact NAMES, not the exact paths: an import
+  // specifier is relative ('./i18n.resolved.generated/en') and a moved
+  // artifact tree should keep flooring its consumers.
+  ['generated-i18n', /i18n\.resolved\.generated|translation_keys\.generated/],
 ]);
 
 /**

@@ -40,7 +40,7 @@
 // planner understands. Any doubt resolves to 'full'.
 
 import { isRelatedSourcePath, isTestPath, normalizeRepoPath } from './gate_fast_plan.mjs';
-import { classifySelectPaths } from './gate_select_plan.mjs';
+import { classifySelectPaths, isGeneratedI18nArtifactPath } from './gate_select_plan.mjs';
 
 /**
  * The selection pipeline's own source files: the modules whose code computes
@@ -178,6 +178,14 @@ export function decideTestMode({ eventName, code, files }) {
       if (isRelatedSourcePath(gone) || isTestPath(gone)) {
         return full(`removed or renamed code path (${JSON.stringify(gone)}): full suite`);
       }
+      // A deleted artifact is the one artifact shape the freshness diff cannot
+      // flag (regeneration recreates it UNTRACKED, and `git diff` never shows
+      // untracked files), so it is unprovable and widens.
+      if (isGeneratedI18nArtifactPath(gone)) {
+        return full(
+          `removed or renamed generated i18n artifact (${JSON.stringify(gone)}): full suite`,
+        );
+      }
     }
     changedPaths.push(name);
   }
@@ -188,8 +196,14 @@ export function decideTestMode({ eventName, code, files }) {
 
   // Shared planner buckets: lockfile, package.json, vite/vitest/tsconfig,
   // turbo/biome/npmrc, tests/helpers + fixtures, vitest setup files, and every
-  // unrecognized path land in broadConfigs and widen to the full suite.
-  const { testFiles, relatedSources, broadConfigs } = classifySelectPaths(changedPaths);
+  // unrecognized path land in broadConfigs and widen to the full suite. The
+  // generatedI18n bucket (freshness-guarded artifacts) is inert here: the
+  // deletion guard above already ran over the statuses, presence in the merge
+  // tree is re-proven shard-side (lib/ci_shard_plan.mjs has the checkout this
+  // job lacks), and pr-checks' i18n regenerate-and-diff runs on every code PR
+  // in every mode.
+  const { testFiles, relatedSources, broadConfigs, generatedI18n } =
+    classifySelectPaths(changedPaths);
   if (broadConfigs.length > 0) {
     const shown = broadConfigs.slice(0, 3).map((p) => JSON.stringify(p));
     return full(
@@ -197,12 +211,18 @@ export function decideTestMode({ eventName, code, files }) {
     );
   }
 
+  const inertCount =
+    changedPaths.length - relatedSources.length - testFiles.length - generatedI18n.length;
+  const artifactNote =
+    generatedI18n.length > 0
+      ? `, ${generatedI18n.length} generated i18n artifact(s) (freshness-guarded)`
+      : '';
   return {
     mode: 'selective',
     reason:
       `selective: ${relatedSources.length} changed source file(s), ` +
       `${testFiles.length} changed test file(s), ` +
-      `${changedPaths.length - relatedSources.length - testFiles.length} inert path(s)`,
+      `${inertCount} inert path(s)${artifactNote}`,
     changedPaths,
   };
 }

@@ -218,6 +218,15 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
       'guard suite missing from the tree',
       { testFiles: COLLECTED.filter((f) => f !== 'tests/world_api_parity.test.ts') },
     ],
+    [
+      // The one artifact shape the freshness diff cannot flag: deleted in the
+      // PR, recreated untracked by the shard's own regeneration.
+      'generated i18n artifact missing from the tree',
+      {
+        changedPaths: ['src/ui/i18n.resolved.generated/da_DK.ts'],
+        exists: (p: string) => p !== 'src/ui/i18n.resolved.generated/da_DK.ts',
+      },
+    ],
   ])('%s falls back to the full leg', (_label, overrides) => {
     const plan = buildShardPlan({ ...BASE, ...overrides });
     expect(plan.mode).toBe('full');
@@ -228,6 +237,18 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
         args: ['test', '--', '--shard=3/8', '--maxWorkers=2'],
       },
     ]);
+  });
+
+  it('keeps a PRESENT generated i18n artifact selective and out of the related leg', () => {
+    const plan = buildShardPlan({
+      ...BASE,
+      changedPaths: ['src/ui/unit_portrait.ts', 'src/ui/i18n.resolved.generated/da_DK.ts'],
+    });
+    expect(plan.mode).toBe('selective');
+    const related = plan.legs.find((l) => l.args.includes('related'));
+    expect(related).toBeDefined();
+    expect(related?.args).toContain('src/ui/unit_portrait.ts');
+    expect(related?.args).not.toContain('src/ui/i18n.resolved.generated/da_DK.ts');
   });
 });
 
@@ -369,6 +390,10 @@ describe('the long-sims lane (Phase 4)', () => {
       { changedPaths: ['package.json'] },
       { alwaysRun: ['tests/architecture.test.ts'] },
       { testFiles: LANE_BASE.testFiles.filter((f) => f !== 'tests/world_api_parity.test.ts') },
+      {
+        changedPaths: ['src/ui/i18n.resolved.generated/da_DK.ts'],
+        exists: (p: string) => p !== 'src/ui/i18n.resolved.generated/da_DK.ts',
+      },
     ]) {
       const shardPlan = buildShardPlan({ ...LANE_BASE, ...overrides });
       const lanePlan = buildLanePlan({ ...LANE_BASE, ...overrides });

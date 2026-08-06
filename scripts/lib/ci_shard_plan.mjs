@@ -203,6 +203,17 @@ function resolveSelectiveInputs({ changedPaths, alwaysRun, testFiles, exists }) 
     };
   }
 
+  // Generated i18n artifacts are inert only while PRESENT in the merge tree:
+  // the freshness diff cannot flag a deleted-then-regenerated file (it comes
+  // back untracked), and this job has the checkout the mode decision lacked,
+  // so presence is re-proven here whatever the relayed statuses said.
+  const missingArtifacts = buckets.generatedI18n.filter((p) => !exists(p));
+  if (missingArtifacts.length > 0) {
+    return {
+      fallback: `generated i18n artifact(s) missing from the tree (${missingArtifacts.slice(0, 3).join(', ')}): failing closed to the full suite`,
+    };
+  }
+
   const { floor, missingGuards } = buildFloor({
     alwaysRun,
     testFiles,
