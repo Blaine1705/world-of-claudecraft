@@ -263,7 +263,7 @@ export class ReliquaryWindow {
                 total: this.fmt(s.total),
               });
         return (
-          `<button type="button" class="reliquary-nav${on ? ' active' : ''}" data-nav="${s.id}" data-focus-key="nav:${s.id}" aria-pressed="${on}" aria-label="${esc(aria)}">` +
+          `<button type="button" class="reliquary-nav${on ? ' active' : ''}" data-nav="${esc(s.id)}" data-focus-key="${esc(`nav:${s.id}`)}" aria-pressed="${on}" aria-label="${esc(aria)}">` +
           `<span class="reliquary-nav-name">${esc(label)}</span>${count}</button>`
         );
       })
@@ -319,7 +319,7 @@ export class ReliquaryWindow {
         // from the model's raw catalog English.
         const name = reliquaryPageName(n.pageId);
         return (
-          `<button type="button" class="reliquary-nearly-row" data-page="${esc(n.pageId)}" data-focus-key="nearly:${n.pageId}" aria-label="${esc(
+          `<button type="button" class="reliquary-nearly-row" data-page="${esc(n.pageId)}" data-focus-key="${esc(`nearly:${n.pageId}`)}" aria-label="${esc(
             t('hudChrome.reliquary.nearlyJumpAria', {
               name,
               owned: this.fmt(n.owned),
@@ -357,7 +357,7 @@ export class ReliquaryWindow {
           ? `<span class="reliquary-complete-badge">${esc(t('hudChrome.reliquary.pageComplete'))}</span>`
           : '';
         return (
-          `<button type="button" class="reliquary-page-row" data-page="${esc(page.pageId)}" data-focus-key="page:${page.pageId}">` +
+          `<button type="button" class="reliquary-page-row" data-page="${esc(page.pageId)}" data-focus-key="${esc(`page:${page.pageId}`)}">` +
           `<span class="reliquary-page-name">${esc(reliquaryPageName(page.pageId))}</span>` +
           `<span class="reliquary-page-meta">` +
           `<span class="reliquary-progress-text">${esc(progress)}</span>${clears}${done}` +
@@ -423,7 +423,7 @@ export class ReliquaryWindow {
     return (
       `<div class="reliquary-cell reliquary-cell--${stateClass} q-${esc(quality)}" role="listitem" tabindex="0" ` +
       `data-cell-id="${esc(cell.id)}" data-cell-kind="${esc(cell.kind)}" data-cell-owned="${cell.owned ? '1' : '0'}" ` +
-      `data-focus-key="cell:${cell.kind}:${cell.id}" aria-label="${esc(aria)}">` +
+      `data-focus-key="${esc(`cell:${cell.kind}:${cell.id}`)}" aria-label="${esc(aria)}">` +
       `<span class="reliquary-cell-art" aria-hidden="true">${icon}</span>` +
       `</div>`
     );

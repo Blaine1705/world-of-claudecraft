@@ -31,6 +31,11 @@ describe('deed_i18n English resolution', () => {
     expect(deedName('removed_deed')).toBe('removed_deed');
     expect(deedDesc('removed_deed')).toBe('');
     expect(deedTitleText('removed_deed')).toBe('');
+    // Prototype keys index truthy on a plain object; the hasOwn guard keeps
+    // the raw-id contract for a hostile or drifted id.
+    expect(deedName('__proto__')).toBe('__proto__');
+    expect(deedDesc('constructor')).toBe('');
+    expect(deedTitleText('__proto__')).toBe('');
   });
 
   it("returns title text only for title-reward deeds, '' otherwise (the hide gate)", () => {

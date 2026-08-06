@@ -135,10 +135,13 @@ describe('painter hygiene', () => {
     // candidate untranslated render. Page names must go through
     // reliquaryPageName(pageId); the single sanctioned `.name` read is the
     // weapon-skin label from the shared armory helper, which localizes itself.
-    // Comments (line and jsdoc) are stripped so prose cannot pad the count.
+    // Comments (line and jsdoc) are stripped so prose cannot pad the count;
+    // trailing line comments are cut too so an unrelated `// ... .name` note
+    // on a code line cannot red the pin.
     const code = painter
       .split('\n')
       .filter((line) => !/^\s*(\/\/|\/\*|\*)/.test(line))
+      .map((line) => line.replace(/\s\/\/.*$/, ''))
       .join('\n');
     expect(code.match(/\.name\b/g)?.length).toBe(1);
     expect(code).toContain('localizeWeaponSkin(def).name');
