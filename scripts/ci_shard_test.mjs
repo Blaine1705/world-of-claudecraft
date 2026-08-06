@@ -48,15 +48,15 @@ if ((laneArgs.length > 0 && !lane) || (lane && hasShardToken) || (!lane && !shar
 // so it can never quietly turn the real shard step into a no-op.
 const planOnly = argv.includes('--plan-only');
 
-// Shards keep the half-cores bound of the run line this replaces: eight of
-// them share the runner pool and the bound is the documented contention
-// policy. The lane is the sole tenant of its runner and carries at most four
-// single-threaded sim files, so it uses every core: the whole point of the
-// lane is the tail, and half-cores would idle half the machine while the
-// slowest file sets the wall clock.
-const workers = lane
-  ? Math.max(1, os.availableParallelism())
-  : Math.max(1, Math.floor(os.availableParallelism() / 2));
+// Half the runner's cores for the lane AND the shards, and for the lane
+// this is a MEASURED decision, not an oversight: a full-core trial (4
+// workers on the 4-vCPU runner, run 31107474546) inflated the four sims'
+// aggregate CPU time from 644 s to 1027 s through memory-bandwidth
+// contention and pushed the eastbrook integration sweep past its own 180 s
+// budget, while the half-cores run finished green with a 432 s wall. Every
+// per-test budget in the suite is calibrated against this bound; raise it
+// only with a green measured run at the new value.
+const workers = Math.max(1, Math.floor(os.availableParallelism() / 2));
 
 const mode = process.env.TEST_MODE ?? '';
 // Echoed into the log only. The producer already strips CR/LF; re-stripping

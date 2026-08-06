@@ -171,8 +171,9 @@ The backstops are the runs that stay unconditionally full: `.github/workflows/ci
 the FULL suite on every push to `main` / `release/**` (release pushes as the plain 8-shard
 matrix; main/dev pushes through the PR tier's shards-plus-long-sims-lane layout, full
 mode, since selection applies to pull requests only, next section), and the scheduled
-nightly full gate re-proves the tips daily with same-day alerting. A selection miss therefore surfaces at merge-to-release time or the same
-night, never later, and the release branch is the safety net the packet designed it to be.
+nightly full gate re-proves the tips daily with same-day alerting. A selection miss
+therefore surfaces at merge-to-release time or the same night, never later, and the
+release branch is the safety net the packet designed it to be.
 
 ### Selective PR-tier CI (`ci_shard_test.mjs`)
 
@@ -200,7 +201,8 @@ mode, the nine PR-tier test jobs together therefore run exactly what the pre-lan
 selective mode still skips the outside-floor remainder by design, exactly as before the
 lane). The latency win is concentrated in FULL mode: three of the four lane files are
 graph-visible, so on a sim-heavy selective PR the `related` legs pull them back into a
-shard exactly as they did before the lane, and only the blind member rides the lane.
+shard exactly as they did before the lane, and only the blind member (plus any lane
+test the PR itself changed) rides the lane.
 The lane reproduces locally with
 `node scripts/ci_shard_test.mjs --lane=long-sims --plan-only`, printing the same
 `[ci-shard]` audit lines as the shards. `release-gate` is deliberately not lane-split:

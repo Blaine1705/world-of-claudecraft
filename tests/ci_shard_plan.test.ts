@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { readdirSync, readFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -244,8 +245,8 @@ describe('the long-sims lane (Phase 4)', () => {
 
   it('pins the lane membership list as a literal', () => {
     // Literal list: a rename or removal must be a conscious decision here AND
-    // in the measured record (docs/prd/ci-cd-performance/ phase notes), never
-    // a refactor side effect.
+    // in the measured record (docs/qa-gate.md, "The long-sims lane"), never a
+    // refactor side effect.
     expect([...CI_LONG_SUITES]).toEqual([
       'tests/audit_conservation_property.test.ts',
       'tests/battleground.test.ts',
@@ -532,6 +533,14 @@ describe('ci_shard_test.mjs entry (subprocess, --plan-only)', () => {
     for (const f of CI_LONG_SUITES) expect(run.log).toContain(f);
     expect(run.log).toContain('npm test -- tests/audit_conservation_property.test.ts');
     expect(run.log).not.toContain('--shard=');
+    // The lane keeps the half-cores bound, a MEASURED decision (see the
+    // entry's comment: the full-core trial in run 31107474546 inflated the
+    // sims' aggregate CPU time ~1.6x through contention and timed out the
+    // eastbrook sweep). Pinned so neither direction changes silently: the
+    // budgets are calibrated against this bound.
+    expect(run.log).toContain(
+      `long-sims lane, workers=${Math.max(1, Math.floor(os.availableParallelism() / 2))}`,
+    );
   });
 
   it('lane selective mode runs only the floor lane member for a leaf UI diff', async () => {

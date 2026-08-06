@@ -7,7 +7,7 @@
 //   full        today's step minus the long-sims lane: `npm test -- --shard=i/N`
 //               (pretest and all) with the CI_LONG_SUITES files excluded; the
 //               dedicated lane job runs exactly those files in the same run,
-//               so the union of the nine PR-tier test jobs is the whole old
+//               so in FULL mode the shards plus the lane run the whole old
 //               suite and a fail-closed decision can never cost coverage.
 //   selective   two sharded legs. Leg 1 runs the always-run FLOOR through
 //               `npm test` (its pretest regenerates the i18n artifacts the
