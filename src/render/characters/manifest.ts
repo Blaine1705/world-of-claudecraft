@@ -1328,7 +1328,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // Attack_Kick, not 'Attack': the rig ships no clip by that name, so every
     // second swing in the rotation resolved to nothing and played no animation
     // at all (the repainted siblings below always had it right).
-    clips: animal(['Attack_Headbutt', 'Attack_Kick']),
+    // Own bespoke charge attack (scripts/build_stag_anims.mjs, issue #2889):
+    // spread the animal() factory result and override only attack, so the
+    // repainted siblings (veiled_stag/gleamstag/veiled_doe/aurelhorn, separate
+    // GLB files on the same rig) keep the standing Headbutt/Kick pair.
+    clips: { ...animal(['Attack_Headbutt', 'Attack_Kick']), attack: ['Stag_Attack_Charge'] },
+    animUrls: [`${CREATURES}/stag_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.35,
   },
@@ -1842,7 +1847,14 @@ export const VISUALS: Record<string, VisualDef> = {
   skel_boss: {
     url: `${ENEMIES}/skeleton_mage.glb`,
     height: 2.5,
-    clips: skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),
+    // Morthen the Gravecaller's visual (a dungeon final boss, dungeons.ts): its
+    // own attack instead of the plain 2H chop skel_mage and delve_skel_varric
+    // still share off the same skeletonClips() vocabulary (scripts/
+    // build_skelboss_anims.mjs, issue #2889). Spread the factory result and
+    // override only attack, so skel_mage/delve_skel_varric/rift_ritualist stay
+    // on the shared swing.
+    clips: { ...skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'), attack: ['SkelBoss_Attack'] },
+    animUrls: [`${ENEMIES}/skelboss_ability_anims.glb`],
     attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
     tint: 'entity',
     tintStrength: 0.25,
