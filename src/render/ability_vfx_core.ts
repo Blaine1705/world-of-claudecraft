@@ -374,7 +374,11 @@ export const STUN_STAR_LIFT = 0.55;
 export const STUN_STAR_RATE = 2.4;
 export const STUN_STAR_SIZE = 0.2;
 export const STUN_STAR_BRIGHTNESS = 2.2;
-export const STUN_STAR_COLOR = 0xffd75e;
+// One classic dizzy-stars yellow for EVERY stun source, deliberately not the
+// ability's accent: a tell reads fastest when it looks identical no matter
+// what applied it (low blue channel so the overbright additive draw clamps
+// toward pure yellow, never washes to white).
+export const STUN_STAR_COLOR = 0xffd700;
 export const STUN_STAR_ALPHA_FLOOR = 0.35;
 // The overlay point cloud is one shared hard-capped batch (128 sprites for
 // EVERY windup orb, orbit band, bolt head, and sequencer transient in the
@@ -404,14 +408,6 @@ export function wornStunIndex(auras: readonly { kind?: string; remaining?: numbe
     }
   }
   return index;
-}
-
-// The held band's color for a spec-resolved stun: the same accent the
-// sequencer gives its cast-moment stars (lighten 0.4 of the ability color),
-// so the handoff from impact stars to held band never steps hue. Unspec'd
-// stuns (mob stomps) fall back to STUN_STAR_COLOR classic gold.
-export function stunStarAccentColor(colorHex: number): number {
-  return lighten(colorHex, 0.4);
 }
 
 // Fixed-size ring buffers of timestamps: zero allocation in steady state (one

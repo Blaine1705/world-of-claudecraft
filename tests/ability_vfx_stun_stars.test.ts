@@ -18,12 +18,10 @@ import { OVERLAY_CELL } from '../src/render/ability_vfx/fx_textures';
 import type { AbilityVfxDeps, AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 import { AbilityVfx } from '../src/render/ability_vfx/painter';
 import {
-  abilityVfxColor,
   MAX_STUN_STAR_BANDS,
   STUN_STAR_ALPHA_FLOOR,
   STUN_STAR_COLOR,
   STUN_STAR_COUNT,
-  stunStarAccentColor,
   wornStunIndex,
 } from '../src/render/ability_vfx_core';
 import { ABILITY_VFX_SPECS } from '../src/render/ability_vfx_specs';
@@ -66,7 +64,7 @@ afterEach(() => {
 });
 
 interface FxProbe {
-  stunStars: Map<number, { remaining: number; color: number; stamp: number }>;
+  stunStars: Map<number, { remaining: number; stamp: number }>;
   overlay: { count: number; alpha: Float32Array; cell: Float32Array };
   sequencer: {
     slots: { active: boolean; targetId: number; ccStars: number; impactDone: boolean }[];
@@ -171,34 +169,32 @@ describe('wornStunIndex (pure core)', () => {
     expect(wornStunIndex([{ kind: 'stun' }])).toBe(0);
     expect(wornStunIndex([{ kind: 'stun', remaining: 0 }])).toBe(-1);
   });
+
+  it('pins the one uniform dizzy-stars yellow for every stun source', () => {
+    expect(STUN_STAR_COLOR).toBe(0xffd700);
+  });
 });
 
 describe('painter feeds the stun tell from the aura KIND, not the spec table', () => {
-  it('holds gold stars for a stun aura whose id has no vfx spec (a mob stomp)', () => {
+  it('holds stars for a stun aura whose id has no vfx spec (a mob stomp)', () => {
     const { painter, fx } = makePainter();
     const auraId = 'war_stomp_stun';
     expect(ABILITY_VFX_SPECS[auraId]).toBeUndefined();
 
     painter.syncEntity(ent([{ id: auraId, kind: 'stun', remaining: 2.5 }]));
 
-    expect(fx.holdStunStars).toHaveBeenCalledWith(7, 2.5, STUN_STAR_COLOR);
+    expect(fx.holdStunStars).toHaveBeenCalledWith(7, 2.5);
   });
 
-  it('holds the sequencer-matched accent for a spec-suffixed player stun, every frame', () => {
+  it('holds stars for a spec-suffixed player stun too, every frame it is worn', () => {
     const { painter, fx } = makePainter();
-    const spec = ABILITY_VFX_SPECS.storm_bolt;
-    expect(spec).toBeDefined();
     const e = ent([{ id: 'storm_bolt_stun', kind: 'stun', remaining: 3 }]);
 
     painter.syncEntity(e);
     painter.syncEntity(e);
 
     expect(fx.holdStunStars).toHaveBeenCalledTimes(2);
-    expect(fx.holdStunStars).toHaveBeenLastCalledWith(
-      7,
-      3,
-      stunStarAccentColor(abilityVfxColor(spec)),
-    );
+    expect(fx.holdStunStars).toHaveBeenLastCalledWith(7, 3);
   });
 
   it('holds nothing for non-stun debuffs, buffs, or an expired stun', () => {

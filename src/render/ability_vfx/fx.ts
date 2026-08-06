@@ -307,7 +307,7 @@ export class AbilityVfxFx implements SequencerHost {
   // entity, frame-stamp swept exactly like windups/orbits. Drawn for at most
   // the MAX_STUN_STAR_BANDS entities nearest the camera per frame (the two
   // fixed pick arrays are the selection scratch, reused every frame).
-  private stunStars = new Map<number, { remaining: number; color: number; stamp: number }>();
+  private stunStars = new Map<number, { remaining: number; stamp: number }>();
   private stunPickIds: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
   private stunPickDist: number[] = new Array(MAX_STUN_STAR_BANDS).fill(0);
   private time = 0;
@@ -1363,17 +1363,15 @@ export class AbilityVfxFx implements SequencerHost {
   // its aura scan, and the update sweep drops it the frame the feed stops
   // (aura faded, entity left interest), so there is no teardown bookkeeping.
   // remaining drives the fade toward the alpha floor over the stun's final
-  // second; color is the painter-resolved accent (the ability's own for a
-  // spec'd stun, classic gold otherwise).
-  holdStunStars(entityId: number, remaining: number, colorHex = STUN_STAR_COLOR): void {
+  // second; the color is always STUN_STAR_COLOR (one uniform tell).
+  holdStunStars(entityId: number, remaining: number): void {
     let s = this.stunStars.get(entityId);
     if (!s) {
-      s = { remaining, color: colorHex, stamp: this.frame };
+      s = { remaining, stamp: this.frame };
       this.stunStars.set(entityId, s);
       return;
     }
     s.remaining = remaining;
-    s.color = colorHex;
     s.stamp = this.frame;
   }
 
@@ -1382,7 +1380,7 @@ export class AbilityVfxFx implements SequencerHost {
   // stun's remaining time but never falls below the floor while the aura
   // lives: the fade above the floor is the duration read, the floor is the
   // fairness rule (an active stun tell must stay readable to the last tick).
-  private drawStunStars(entityId: number, s: { remaining: number; color: number }): void {
+  private drawStunStars(entityId: number, s: { remaining: number }): void {
     const head = this.anchorOf(entityId, 1.0);
     if (!head) return;
     const alpha = Math.max(STUN_STAR_ALPHA_FLOOR, Math.min(1, s.remaining));
@@ -1392,7 +1390,7 @@ export class AbilityVfxFx implements SequencerHost {
         head.x + Math.cos(a) * STUN_STAR_RADIUS,
         head.y + STUN_STAR_LIFT,
         head.z + Math.sin(a) * STUN_STAR_RADIUS,
-        s.color,
+        STUN_STAR_COLOR,
         STUN_STAR_SIZE,
         OVERLAY_CELL.star,
         alpha,
