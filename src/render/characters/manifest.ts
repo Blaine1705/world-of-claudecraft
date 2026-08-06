@@ -404,19 +404,6 @@ const NIGHTKIN_FLOATING: ClipMap = {
   attack: ['Nightkin_Attack'],
 };
 
-// The choir thrall family's own attack (scripts/build_choir_thrall_anims.mjs,
-// issue #2889): FLOATING's Headbutt/Punch is shared by reference across
-// several unrelated families, mob_choir_thrall among them. This clip is
-// baked off ghost.glb's own donor poses (the same rig file mob_ghost uses,
-// but a distinct, choir-thrall-specific bake: a reaching claw grasp with a
-// chant sway and a snap, not mob_ghost's own attack), so only
-// mob_choir_thrall gets it; every other FLOATING family, including
-// mob_ghost, is untouched.
-const CHOIR_THRALL_FLOATING: ClipMap = {
-  ...FLOATING,
-  attack: ['ChoirThrall_Attack'],
-};
-
 // 2023 enemy rig variant with a bite attack and no run clip (yeti)
 const ENEMY_BITE: ClipMap = {
   idle: 'Idle',
@@ -952,38 +939,12 @@ export const VISUALS: Record<string, VisualDef> = {
     height: HUMANOID_H,
     clips: {
       ...kaykit(['2H_Melee_Attack_Chop']),
-      // Ability-specific spellcasts (scripts/build_priest_ability_anims.mjs,
-      // issue #2889): the priest's 10-ability kit had exactly one override
-      // (renew, below); the rest played the same melee chop. Mapped by
-      // school (src/sim/content/classes.ts): the holy heal/buff side reads
-      // as a slow, benevolent offering (Cast_Heal, Cast_FlashHeal, Cast_Ward)
-      // that never snaps into a strike, Smite sits between the two (an aimed
-      // holy point, more decisive than a heal but not a strike), and the
-      // shadow side reads sharper and more clinical (Cast_ShadowWord,
-      // Cast_MindBlast, Cast_MindFlay). Covers every remaining ability in the
-      // kit; this rig also backs player_mage and player_warlock, but this
-      // GLB is a priest-only bake with its own clip names, not a reuse of
-      // either sibling's clips.
       attackByAbility: {
         // Lingering Grace is a blessing, not a staff swing: the one-hand
         // raise (a stock mage.glb clip) reads as the priest offering the HoT.
         renew: 'Spellcast_Raise',
-        lesser_heal: 'Cast_Heal',
-        heal: 'Cast_Heal',
-        flash_heal: 'Cast_FlashHeal',
-        power_word_fortitude: 'Cast_Ward',
-        power_word_shield: 'Cast_Ward',
-        smite: 'Cast_Smite',
-        shadow_word_pain: 'Cast_ShadowWord',
-        mind_blast: 'Cast_MindBlast',
-        mind_flay: 'Cast_MindFlay',
       },
     },
-    // Ability-specific spellcast clips (scripts/build_priest_ability_anims.mjs):
-    // a mesh-free clip donor GLB baked off this rig's own donor poses,
-    // independent of mage_ability_anims.glb (player_mage's own bake off the
-    // same source file).
-    animUrls: [`${PLAYERS}/priest_ability_anims.glb`],
     // The priest's Light: a warm golden halo ring above the crown. The mage
     // model's pointed hat is canon here, and at the default lift the ring
     // plane crosses the hat cone where it is wide, clipping through it; +0.15
@@ -1725,11 +1686,7 @@ export const VISUALS: Record<string, VisualDef> = {
     url: `${CREATURES}/ghost.glb`,
     height: 1.6,
     hover: 0.3,
-    clips: CHOIR_THRALL_FLOATING,
-    // Bespoke reaching-claw-chant attack (scripts/build_choir_thrall_anims.mjs,
-    // issue #2889), baked off this rig's own donor poses: a mesh-free clip
-    // donor GLB, same wiring shape as mage_ability_anims.glb.
-    animUrls: [`${CREATURES}/choir_thrall_ability_anims.glb`],
+    clips: FLOATING,
     // Strong pull toward the template's pale sage: the ghost's own materials
     // are charcoal-grey and vanish against the black Litany pools; undead in
     // this delve read bone-pale per the marsh palette brief in the asset plan.
