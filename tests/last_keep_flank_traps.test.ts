@@ -451,8 +451,8 @@ describe('the Last Keep flanks hold no wedge pockets', () => {
       // rectangle it is drawn as), so due west is honest stone, not a freeze:
       // the escape there rounds the hall through the alley between its east
       // face and the terrace, which the walkable-alley sweep below keeps open.
-      const escape = z === 2015 ? { x: 384, z: 2004 } : { x: 384, z };
-      pushToward(sim, p, meta, escape, 20 * 3);
+      const escapeTo = z === 2015 ? { x: 384, z: 2004 } : { x: 384, z };
+      pushToward(sim, p, meta, escapeTo, 20 * 3);
       expect(
         Math.hypot(pinnedX - p.pos.x, pinnedZ - p.pos.z),
         `walks back off the west edge instead of freezing at z=${z}`,
