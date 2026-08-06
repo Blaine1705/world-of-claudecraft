@@ -667,12 +667,14 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 251 deeds - 3 feats - 9 hidden = 239 visible to a fresh character
-    // (release base brood/battleground/Rift/profession rares plus four
-    // Reliquary Curator rank bridges; none a feat or hidden).
-    expect(view.summary.visibleTotal).toBe(239);
+    // 263 deeds - 3 feats - 9 hidden = 251 visible to a fresh character (the
+    // Drakelands brood pair, the four battleground deeds, the Rift coverage
+    // pair, the seven per-craft rare-tier profession deeds, the twelve
+    // remaining starter-zone chronicle pairs, and the four Reliquary Curator
+    // rank bridges, none a feat or hidden).
+    expect(view.summary.visibleTotal).toBe(251);
     // The bucket sum adds the Feats shelf's own 3 rows back on top.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(242);
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(254);
   });
 
   it('maps every live catalog category onto a display bucket', () => {

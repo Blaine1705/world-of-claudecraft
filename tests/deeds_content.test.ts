@@ -62,12 +62,12 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 251 deeds worth 3000 total Renown', () => {
-    // Release base (247 / 3000: brood, Thornhollow Fields, Rift pair, seven
-    // per-craft rare-tier profession deeds) plus four Reliquary Curator rank
-    // bridges (all renown 0).
-    expect(DEED_ORDER.length).toBe(251);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3000);
+  it('ships exactly 263 deeds worth 3060 total Renown', () => {
+    // Release base (259 / 3060: brood, Thornhollow Fields, Rift pair, seven
+    // per-craft rare-tier profession deeds, twelve starter-zone chronicle
+    // pairs) plus four Reliquary Curator rank bridges (all renown 0).
+    expect(DEED_ORDER.length).toBe(263);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3060);
   });
 
   it('ships the audited per-category counts', () => {
@@ -79,7 +79,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank).
       dungeon: 31,
       delve: 13,
-      chronicle: 37,
+      chronicle: 49,
       // +4 Reliquary Curator rank bridges on top of the release collection set.
       collection: 32,
       // +4 Thornhollow Fields battleground deeds from release.
@@ -177,9 +177,25 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       'prog_tailoring_rare',
       'prog_weaponcrafting_rare',
       'prog_armorcrafting_rare',
+      // The remaining starter-tier zones pick up the same chronicle pair
+      // (drakelands already covered above by the brood rework), appended
+      // after the profession-rare block above (the release base merge put
+      // that block first).
+      'chr_frostveil_gatherer',
+      'chr_frostveil_first_cast',
+      'chr_amberfall_gatherer',
+      'chr_amberfall_first_cast',
+      'chr_nightbloom_gatherer',
+      'chr_nightbloom_first_cast',
+      'chr_wraithwood_gatherer',
+      'chr_wraithwood_first_cast',
+      'chr_palmreach_gatherer',
+      'chr_palmreach_first_cast',
+      'chr_evergarden_gatherer',
+      'chr_evergarden_first_cast',
       // Reliquary Curator rank bridges (zero Renown; catalog prestige never
       // scores the board). Manual grant via syncCuratorRankDeeds. Appended
-      // after the profession rare-tier block across the release merge.
+      // after the starter-zone chronicle block across the release merge.
       'col_reliquary_rank_2',
       'col_reliquary_rank_3',
       'col_reliquary_rank_4',
@@ -506,11 +522,15 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // Re-baselined for Rift coverage (dgn_rift, dgn_rift_s_rank) plus issue #2055
   // (basic universal profession deeds: prog_engineering_rare through
   // prog_armorcrafting_rare), which both append after the Drakelands brood
-  // rework block above, plus Reliquary Phase 6 zero-Renown Curator rank
-  // bridges (col_reliquary_rank_2..5) after the profession rare-tier block.
-  // No shipped trigger or renown changed on prior deeds. Hash recomputed
-  // after the union.
-  const FROZEN_CATALOG_SHA256 = 'e06fd8f6a5a4d35c91be540044b5a0ea2be609e9c65f4535422a448fe7979885';
+  // rework block above. Re-baselined again immediately after for the
+  // remaining bottom-map chronicle pairs: twelve more appended deeds after the
+  // profession-rare block, the gatherer and first-cast pair for frostveil,
+  // amberfall, nightbloom, wraithwood, palmreach, and evergarden (drakelands
+  // already covered by the brood rework above). Re-baselined at the v0.35.0
+  // sync merge that unions those pairs with the Reliquary Phase 6 zero-Renown
+  // Curator rank bridges (col_reliquary_rank_2..5), appended after the
+  // chronicle block. No shipped trigger or renown changed on any side.
+  const FROZEN_CATALOG_SHA256 = 'b93199d60b53c33514db75acb6c34c17fd34b2505625a14880f03f92a054bb3a';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -699,12 +719,12 @@ describe('table shape', () => {
   it('DEED_ORDER holds the append-only authored order (first and last pinned)', () => {
     // DEED_ORDER derives from the table keys, so covering DEEDS is inherent;
     // what CAN drift is the authored order itself. Pin the endpoints as
-    // literals: prog_first_steps opens the catalog and the farshore
+    // literals: prog_first_steps opens the catalog and the evergarden
     // first-cast closes the tail, and either moving would signal a reorder
     // (forbidden: the order is an append-only determinism contract; new
     // deeds append). hid_codfather's index is pinned in the refresh test.
     expect(DEED_ORDER[0]).toBe('prog_first_steps');
-    // Reliquary Curator ranks append after the profession rare-tier block.
+    // Reliquary Curator ranks append after the starter-zone chronicle block.
     expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('col_reliquary_rank_5');
   });
 
@@ -909,13 +929,20 @@ describe('trigger references resolve against the real content tables', () => {
     // The witness for the fallback-aware guard above: the mark writer fires
     // for a Vale fish caught under a starter zone's own id (which is what
     // the resolver actually draws there), and the deed grants through the
-    // real visit path, for ALL THREE zones (the review round: one positive
-    // arm of a three-zone claim proves one zone). A fish the zone never
-    // draws must NOT fire it.
+    // real visit path, for every bottom-map zone (the six added when the
+    // pair extended past the original three prove the mechanism generalizes,
+    // not just that it works once). A fish the zone never draws must NOT
+    // fire it.
     const CASES = [
       ['willowfen', 'chr_willowfen_first_cast'],
       ['galecrest', 'chr_galecrest_first_cast'],
       ['farshore_isle', 'chr_farshore_first_cast'],
+      ['frostveil', 'chr_frostveil_first_cast'],
+      ['amberfall', 'chr_amberfall_first_cast'],
+      ['nightbloom', 'chr_nightbloom_first_cast'],
+      ['wraithwood', 'chr_wraithwood_first_cast'],
+      ['palmreach', 'chr_palmreach_first_cast'],
+      ['evergarden', 'chr_evergarden_first_cast'],
     ] as const;
     for (const [zoneId, deedId] of CASES) {
       const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });
@@ -945,6 +972,12 @@ describe('trigger references resolve against the real content tables', () => {
       ['willowfen', 'chr_willowfen_gatherer'],
       ['galecrest', 'chr_galecrest_gatherer'],
       ['farshore_isle', 'chr_farshore_gatherer'],
+      ['frostveil', 'chr_frostveil_gatherer'],
+      ['amberfall', 'chr_amberfall_gatherer'],
+      ['nightbloom', 'chr_nightbloom_gatherer'],
+      ['wraithwood', 'chr_wraithwood_gatherer'],
+      ['palmreach', 'chr_palmreach_gatherer'],
+      ['evergarden', 'chr_evergarden_gatherer'],
     ] as const;
     for (const [zoneId, deedId] of CASES) {
       const sim = new Sim({ seed: 11, playerClass: 'warrior', autoEquip: false });
