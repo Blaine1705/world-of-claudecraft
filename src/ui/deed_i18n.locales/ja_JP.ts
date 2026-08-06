@@ -15,54 +15,6 @@ export const table: DeedLocaleTable = {
     name: '空の静寂',
     desc: 'ドレイクモウを見下ろす火口のねぐらで、シンドラレス、火口の母竜を討ち取れ。',
   },
-  chr_frostveil_gatherer: {
-    name: '段丘の収穫',
-    desc: 'Frostveilで鉱脈、木立、薬草畑を収穫する。',
-  },
-  chr_frostveil_first_cast: {
-    name: '湖沼の初氷',
-    desc: 'Frostveilの水辺で魚を釣る。',
-  },
-  chr_amberfall_gatherer: {
-    name: 'Amberfallの収穫',
-    desc: 'Amberfallで鉱脈、木立、薬草畑を収穫する。',
-  },
-  chr_amberfall_first_cast: {
-    name: '大湿原の一匹',
-    desc: 'Amberfallの水辺で魚を釣る。',
-  },
-  chr_nightbloom_gatherer: {
-    name: '夢見る収穫',
-    desc: 'Nightbloomで鉱脈、木立、薬草畑を収穫する。',
-  },
-  chr_nightbloom_first_cast: {
-    name: '月の井戸の波紋',
-    desc: 'Nightbloomの水辺で魚を釣る。',
-  },
-  chr_wraithwood_gatherer: {
-    name: '樹冠の下の収穫',
-    desc: 'Wraithwoodで鉱脈、木立、薬草畑を収穫する。',
-  },
-  chr_wraithwood_first_cast: {
-    name: '鏡の入り江への一投',
-    desc: 'Wraithwoodの水辺で魚を釣る。',
-  },
-  chr_palmreach_gatherer: {
-    name: '椰子浜の収穫',
-    desc: 'Palmreachで鉱脈、木立、薬草畑を収穫する。',
-  },
-  chr_palmreach_first_cast: {
-    name: 'サファイア潟への一投',
-    desc: 'Palmreachの水辺で魚を釣る。',
-  },
-  chr_evergarden_gatherer: {
-    name: '花壇の恵み',
-    desc: 'Evergardenで鉱脈、木立、薬草畑を収穫する。',
-  },
-  chr_evergarden_first_cast: {
-    name: '花びら池への一投',
-    desc: 'Evergardenの水辺で魚を釣る。',
-  },
   pvp_card_duel_first_win: {
     name: '我が流儀',
     desc: 'カードマスターのもとでカードデュエルに勝利する。',
@@ -784,33 +736,5 @@ export const table: DeedLocaleTable = {
   chr_farshore_first_cast: {
     name: 'カモメは知っている',
     desc: '遠つ岸の水辺で魚を釣り上げる。',
-  },
-  prog_engineering_rare: {
-    name: '精密工作',
-    desc: '工作で初めてのレア級アイテムを作る。',
-  },
-  prog_alchemy_rare: {
-    name: '稀少な逸品',
-    desc: '錬金術で初めてのレア級アイテムを作る。',
-  },
-  prog_cooking_rare: {
-    name: '忘れられぬ一皿',
-    desc: '料理で初めてのレア級アイテムを作る。',
-  },
-  prog_leatherworking_rare: {
-    name: '上質ななめし',
-    desc: '皮革加工で初めてのレア級アイテムを作る。',
-  },
-  prog_tailoring_rare: {
-    name: '名匠の一針',
-    desc: '裁縫で初めてのレア級アイテムを作る。',
-  },
-  prog_weaponcrafting_rare: {
-    name: '磨き上げた輝き',
-    desc: '武器鍛冶で初めてのレア級アイテムを作る。',
-  },
-  prog_armorcrafting_rare: {
-    name: '完璧な装甲',
-    desc: '防具鍛冶で初めてのレア級アイテムを作る。',
   },
 };

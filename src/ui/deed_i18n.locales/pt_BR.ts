@@ -15,54 +15,6 @@ export const table: DeedLocaleTable = {
     name: 'O Céu Se Cala',
     desc: 'Derrote Cindraleth, a Matriarca das Fauces, em seu poleiro na cratera acima do Drakemaw.',
   },
-  chr_frostveil_gatherer: {
-    name: 'Colheita nos terracos',
-    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Frostveil.',
-  },
-  chr_frostveil_first_cast: {
-    name: 'Primeiro gelo no lago',
-    desc: 'Pesque um peixe nas aguas de Frostveil.',
-  },
-  chr_amberfall_gatherer: {
-    name: 'A colheita de Amberfall',
-    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Amberfall.',
-  },
-  chr_amberfall_first_cast: {
-    name: 'Uma pesca do grande charco',
-    desc: 'Pesque um peixe nas aguas de Amberfall.',
-  },
-  chr_nightbloom_gatherer: {
-    name: 'A colheita sonhadora',
-    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Nightbloom.',
-  },
-  chr_nightbloom_first_cast: {
-    name: 'Uma ondulacao no poco lunar',
-    desc: 'Pesque um peixe nas aguas de Nightbloom.',
-  },
-  chr_wraithwood_gatherer: {
-    name: 'Colheita sob a copa',
-    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Wraithwood.',
-  },
-  chr_wraithwood_first_cast: {
-    name: 'Um arremesso na baia espelhada',
-    desc: 'Pesque um peixe nas aguas de Wraithwood.',
-  },
-  chr_palmreach_gatherer: {
-    name: 'Colheita na praia das palmeiras',
-    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Palmreach.',
-  },
-  chr_palmreach_first_cast: {
-    name: 'Arremesso na lagoa safira',
-    desc: 'Pesque um peixe nas aguas de Palmreach.',
-  },
-  chr_evergarden_gatherer: {
-    name: 'A fartura do parterre',
-    desc: 'Colha um veio de minerio, um bosque de madeira e um canteiro de ervas em Evergarden.',
-  },
-  chr_evergarden_first_cast: {
-    name: 'Um arremesso no lago de petalas',
-    desc: 'Pesque um peixe nas aguas de Evergarden.',
-  },
   pvp_card_duel_first_win: {
     name: 'Regras da Casa',
     desc: 'Vença um Duelo de Cartas no Mestre das Cartas.',
@@ -921,33 +873,5 @@ export const table: DeedLocaleTable = {
   chr_farshore_first_cast: {
     name: 'O Que as Gaivotas Sabem',
     desc: 'Pesque um peixe nas águas da Farshore.',
-  },
-  prog_engineering_rare: {
-    name: 'Engenharia de Precisão',
-    desc: 'Crie seu primeiro item de qualidade rara em Engenharia.',
-  },
-  prog_alchemy_rare: {
-    name: 'Uma Safra Rara',
-    desc: 'Crie seu primeiro item de qualidade rara em Alquimia.',
-  },
-  prog_cooking_rare: {
-    name: 'Um Prato Memorável',
-    desc: 'Crie seu primeiro item de qualidade rara em Culinária.',
-  },
-  prog_leatherworking_rare: {
-    name: 'Curtimento Fino',
-    desc: 'Crie seu primeiro item de qualidade rara em Couraria.',
-  },
-  prog_tailoring_rare: {
-    name: 'Um Ponto de Mestre',
-    desc: 'Crie seu primeiro item de qualidade rara em Alfaiataria.',
-  },
-  prog_weaponcrafting_rare: {
-    name: 'Temperado até Brilhar',
-    desc: 'Crie seu primeiro item de qualidade rara em Fabricação de Armas.',
-  },
-  prog_armorcrafting_rare: {
-    name: 'Blindado à Perfeição',
-    desc: 'Crie seu primeiro item de qualidade rara em Fabricação de Armaduras.',
   },
 };

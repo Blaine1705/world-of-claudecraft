@@ -220,7 +220,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.summon_water_elemental.description':
     'Invoca a un elemental de agua que combate junto a ti, dispara Descargas de Agua contra tu objetivo y canaliza Chorro de Agua. (Escarcha)',
   'entities.items.conjured_water4.name': 'Agua de Manantial Invocada',
-  'entities.items.direfang_quiver.name': 'Carcaj de Direfang',
   'entities.items.conjured_bread4.name': 'Hogaza de Festín Invocada',
   'entities.delves.collapsed_reliquary.leaveText':
     'Trepas de vuelta hasta el Hermano Halven, en la ruina del relicario.',
@@ -366,5 +365,14 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Se ha anulado una invitación de hermandad pendiente porque la hermandad ha cambiado de nombre.',
   'hud.prompts.guildRenamed':
     'Tu hermandad ha sido renombrada a {name} por el equipo de moderación.',
-  'hudChrome.options.hideUnusedActionSlots': 'Ocultar casillas de acción sin usar',
+  'hudChrome.unitFrame.petLabel': 'Tu mascota',
+  'hudChrome.pvp.launcherTitle': 'PvP',
+  'hudChrome.pvp.mobileLabel': 'PvP',
+  'entities.items.moggers_hide_quiver.name': 'Carcaj de cuero de Mogger',
+  'entities.items.cragmaw_huntquiver.name': 'Carcaj de caza de Cragmaw',
+  'entities.items.gravewyrm_bone_quiver.name': 'Carcaj de hueso del Gravewyrm',
+  'entities.items.direfang_quiver.name': 'Carcaj de Direfang',
+  'entities.items.sharp_claw.name': 'Garra afilada',
+  'entities.items.curved_tusk.name': 'Colmillo curvo',
+  'entities.items.pristine_claw.name': 'Garra prístina',
 };

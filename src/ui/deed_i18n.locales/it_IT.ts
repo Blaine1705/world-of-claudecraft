@@ -15,54 +15,6 @@ export const table: DeedLocaleTable = {
     name: 'Il Cielo Tace',
     desc: 'Uccidi Cindraleth, la Matriarca delle Fauci, nel suo nido nel cratere sopra il Drakemaw.',
   },
-  chr_frostveil_gatherer: {
-    name: 'Raccolto sui terrazzamenti',
-    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Frostveil.',
-  },
-  chr_frostveil_first_cast: {
-    name: 'Primo ghiaccio sul lago',
-    desc: 'Pesca un pesce nelle acque del Frostveil.',
-  },
-  chr_amberfall_gatherer: {
-    name: 'Il raccolto di Amberfall',
-    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe ad Amberfall.',
-  },
-  chr_amberfall_first_cast: {
-    name: 'Una preda dalla grande palude',
-    desc: 'Pesca un pesce nelle acque di Amberfall.',
-  },
-  chr_nightbloom_gatherer: {
-    name: 'Il raccolto sognante',
-    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Nightbloom.',
-  },
-  chr_nightbloom_first_cast: {
-    name: 'Un increspatura sul pozzo lunare',
-    desc: 'Pesca un pesce nelle acque di Nightbloom.',
-  },
-  chr_wraithwood_gatherer: {
-    name: 'Raccolto sotto la volta',
-    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe nel Wraithwood.',
-  },
-  chr_wraithwood_first_cast: {
-    name: 'Un lancio nella baia dello specchio',
-    desc: 'Pesca un pesce nelle acque del Wraithwood.',
-  },
-  chr_palmreach_gatherer: {
-    name: 'Raccolto sulla spiaggia di palme',
-    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Palmreach.',
-  },
-  chr_palmreach_first_cast: {
-    name: 'Lancio nella laguna di zaffiro',
-    desc: 'Pesca un pesce nelle acque di Palmreach.',
-  },
-  chr_evergarden_gatherer: {
-    name: 'Il dono del parterre',
-    desc: 'Raccogli una vena di minerale, un gruppo di legna e un appezzamento d erbe a Evergarden.',
-  },
-  chr_evergarden_first_cast: {
-    name: 'Un lancio sullo stagno dei petali',
-    desc: 'Pesca un pesce nelle acque di Evergarden.',
-  },
   pvp_card_duel_first_win: {
     name: 'Regole di Casa',
     desc: 'Vinci un Duello di Carte dal Maestro delle Carte.',
@@ -951,33 +903,5 @@ export const table: DeedLocaleTable = {
   chr_farshore_first_cast: {
     name: 'Ciò che Sanno i Gabbiani',
     desc: 'Pesca un pesce nelle acque del Farshore.',
-  },
-  prog_engineering_rare: {
-    name: 'Ingegneria di precisione',
-    desc: 'Forgia il tuo primo oggetto di qualità rara in Ingegneria.',
-  },
-  prog_alchemy_rare: {
-    name: "Un'annata rara",
-    desc: 'Forgia il tuo primo oggetto di qualità rara in Alchimia.',
-  },
-  prog_cooking_rare: {
-    name: 'Un piatto da ricordare',
-    desc: 'Forgia il tuo primo oggetto di qualità rara in Cucina.',
-  },
-  prog_leatherworking_rare: {
-    name: 'Concia raffinata',
-    desc: 'Forgia il tuo primo oggetto di qualità rara in Lavorazione del Cuoio.',
-  },
-  prog_tailoring_rare: {
-    name: 'Un punto da maestro',
-    desc: 'Forgia il tuo primo oggetto di qualità rara in Sartoria.',
-  },
-  prog_weaponcrafting_rare: {
-    name: 'Temprato fino a brillare',
-    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armi.',
-  },
-  prog_armorcrafting_rare: {
-    name: 'Placcato alla perfezione',
-    desc: 'Forgia il tuo primo oggetto di qualità rara in Forgiatura di Armature.',
   },
 };

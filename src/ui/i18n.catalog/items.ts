@@ -256,10 +256,6 @@ const itemStringsEn = {
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
-      // The itemized ledger under the proceeds line. saleOlder covers the rows the
-      // ledger cap dropped, whose gold IS still in the total above.
-      saleBuyer: 'Sold to {buyer}',
-      saleOlder: 'Plus {count} earlier sales, included in the total.',
       collectAll: 'Collect All',
     },
     logs: {
@@ -2518,8 +2514,7 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
   restless_skull: 'Restless Skull',
   vanguard_bone: 'Vanguard Bone',
-  // Hunter quivers, the class's first held-offhand ladder; same English-appended
-  // treatment until the release fill folds them into the per-locale arrays.
+  // Hunter quivers and new harvest components, filled in locale overlays for the release.
   moggers_hide_quiver: "Mogger's Hide Quiver",
   cragmaw_huntquiver: 'Cragmaw Huntquiver',
   gravewyrm_bone_quiver: 'Gravewyrm Bone Quiver',
