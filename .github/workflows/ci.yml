@@ -384,9 +384,9 @@ jobs:
       # source, the config file contents, NODE_ENV, and the fsModuleCache
       # format version, so a changed input can only miss (a vitest upgrade
       # rotates via the lockfile, in this key and in vitest's own integrity
-      # discard, which hashes the derived node_modules/.pnpm/lock.yaml,
-      # byte-identical to pnpm-lock.yaml under the hoisted layout and present
-      # only after install, one reason this step sits after the install step).
+      # discard, which hashes the derived node_modules/.pnpm/lock.yaml, the
+      # byte-identical copy pnpm writes during install and therefore present
+      # only after it, one reason this step sits after the install step).
       # TAMPER safety is GitHub's per-ref cache scoping, not vitest: entries
       # are keyed by content, never verified against it, and the store is
       # executed as module code, so this step must never gain restore-keys or
@@ -404,7 +404,14 @@ jobs:
       # toolchain state per scope (measured 2026-08-06), written once when
       # the key is new and never refreshed within that state, so the hit rate
       # decays as sources drift until the next rotation (start there if the
-      # speedup fades). Per-shard keys: in full mode each shard transforms
+      # speedup fades). The binding budget is GitHub's 10 GB per-repo cache
+      # quota with LRU eviction: both matrices together hold roughly 1 GB per
+      # toolchain state per scope beside the pnpm store, Playwright, and tsc
+      # caches, so if hot-entry eviction is ever observed, the lever is
+      # restricting this step's save to push events, never restore-keys.
+      # Producers beyond release-gate: pr-gate's own main and dev-* push runs
+      # seed those branches' scopes the same way.
+      # Per-shard keys: in full mode each shard transforms
       # its own pack's import closure; in selective mode the collected set is
       # smaller and only partially resembles the full-mode store it restores,
       # which still hits on the shared source closure that dominates the

@@ -792,26 +792,31 @@ describe('CI workflow parity', () => {
     // it, and neither can a step neutered by an appended `if:` or any other
     // trailing key (the mutation that beat the pin's first draft).
     const cacheStepRe =
-      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@[^\n]+\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-shard\$\{\{ matrix\.shard \}\}-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n/;
+      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-shard\$\{\{ matrix\.shard \}\}-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n/;
     for (const name of ['pr-gate', 'release-gate'] as const) {
       const job = jobSource(name);
       expect(job).toMatch(cacheStepRe);
       // Restore strictly between the install and the test run: earlier and
       // pnpm install may prune or re-layout what was just restored, later and
       // the run never sees the store. Step-name literals, not bare phrases,
-      // so a comment mentioning the name cannot shift the comparison.
-      expect(job.indexOf('- name: Install dependencies')).toBeLessThan(
-        job.indexOf('- name: Cache vitest transform cache'),
-      );
-      expect(job.indexOf('- name: Cache vitest transform cache')).toBeLessThan(
-        job.indexOf('- name: Run tests'),
-      );
+      // so a comment mentioning the name cannot shift the comparison; and
+      // every anchor must EXIST first, because indexOf returns -1 for a
+      // missing step and -1 compares less-than everything, making the
+      // ordering vacuously green if a step were deleted.
+      const install = job.indexOf('- name: Install dependencies');
+      const cache = job.indexOf('- name: Cache vitest transform cache');
+      const runTests = job.indexOf('- name: Run tests');
+      expect(install).toBeGreaterThanOrEqual(0);
+      expect(cache).toBeGreaterThanOrEqual(0);
+      expect(runTests).toBeGreaterThanOrEqual(0);
+      expect(install).toBeLessThan(cache);
+      expect(cache).toBeLessThan(runTests);
       // No restore-keys: a cross-lockfile restore is discarded by vitest's own
       // integrity check and a cross-config restore misses every entry, so a
       // prefix fallback can only ever download dead weight. Anchored to the
-      // YAML key shape (quoted or bare) because the step's own comment says
-      // the word.
-      expect(job).not.toMatch(/\n\s+"?restore-keys"?:/);
+      // YAML key shape (bare, double- or single-quoted) because the step's
+      // own comment says the word.
+      expect(job).not.toMatch(/\n\s+["']?restore-keys["']?:/);
     }
     // The store is enabled in the config this cache serves, at the DEFAULT
     // path the workflow hardcodes. Comment-stripped first (a `//` prefix

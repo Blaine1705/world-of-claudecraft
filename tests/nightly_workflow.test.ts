@@ -135,6 +135,11 @@ describe('nightly gate workflow', () => {
     // The expected-red release-i18n locale tier stays out of the whole file
     // (issue #2820), not just out of the tests job.
     expect(workflow).not.toContain('I18N_RELEASE_TIER');
+    // Uncached by design, and pinned because docs/qa-gate.md says so out
+    // loud: the nightly is the one full replay that never restores the
+    // vitest transform cache the PR-tier shard jobs persist (Phase 4), so a
+    // cache-layer bug can never hide from it.
+    expect(workflow).not.toContain('.experimental-vitest-cache');
   });
 
   it('mirrors the serialized release checks from ci.yml and the browser lane', () => {
