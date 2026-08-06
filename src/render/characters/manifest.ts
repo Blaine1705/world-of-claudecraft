@@ -174,7 +174,7 @@ const kaykit = (attack: string[], idle = 'Idle'): ClipMap => ({
   run: 'Running_A',
   walkBack: 'Walking_Backwards',
   attack,
-  hit: ['Hit_A'],
+  hit: ['Hit_A', 'Hit_B_Stagger'],
   death: 'Death_A',
   cast: 'Spellcasting',
   sitDown: 'Sit_Floor_Down',
@@ -888,7 +888,10 @@ export const VISUALS: Record<string, VisualDef> = {
     // the warrior's real kit in src/sim/content/classes.ts, not assumed) is
     // authored by pose-sample-and-blend (scripts/build_warrior_ability_anims.mjs)
     // instead of pointed at an unused clip.
-    animUrls: [`${PLAYERS}/warrior_ability_anims.glb`],
+    animUrls: [
+      `${PLAYERS}/knight_hit_variety_anims.glb`,
+      `${PLAYERS}/warrior_ability_anims.glb`,
+    ],
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: {
@@ -969,6 +972,7 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_paladin: swims({
     url: `${PLAYERS}/paladin.glb`,
+    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
@@ -1051,11 +1055,12 @@ export const VISUALS: Record<string, VisualDef> = {
     // shoulder-aim (visual.ts weaponSkinAttackClips). The cast-time hold pose
     // (bow_hold_anim.glb) and the ability-specific attack clips
     // (scripts/build_hunter_ability_anims.mjs) ride the same mesh-free donor
-    // GLB mechanism, appended alongside: all three GLBs' clips load together.
+    // GLB mechanism, appended alongside: all GLBs' clips load together.
     animUrls: [
       `${PLAYERS}/bow_anims.glb`,
       `${PLAYERS}/bow_hold_anim.glb`,
       `${PLAYERS}/hunter_ability_anims.glb`,
+      `${PLAYERS}/ranger_hit_variety_anims.glb`,
     ],
     // dedicated ranger model — the quiver is a built-in mesh, so it's no longer
     // a separate chest attachment
@@ -1063,6 +1068,7 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_rogue: swims({
     url: `${PLAYERS}/rogue.glb`,
+    animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['Dualwield_Melee_Attack_Chop']),
@@ -1127,6 +1133,7 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_priest: swims({
     url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['2H_Melee_Attack_Chop']),
@@ -1166,6 +1173,7 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_shaman: swims({
     url: `${PLAYERS}/barbarian.glb`,
+    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
@@ -1233,7 +1241,7 @@ export const VISUALS: Record<string, VisualDef> = {
     },
     // Ability-specific spellcast clips (scripts/build_mage_ability_anims.mjs):
     // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
-    animUrls: [`${PLAYERS}/mage_ability_anims.glb`],
+    animUrls: [`${PLAYERS}/mage_ability_anims.glb`, `${PLAYERS}/mage_hit_variety_anims.glb`],
     // The hat and cape render regardless of this list: the current mage.glb
     // rigs every accessory as a SkinnedMesh, and the show allowlist
     // (assets.ts) only hides non-skinned nodes. The hatted silhouette is the
@@ -1244,6 +1252,7 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_warlock: swims({
     url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: {
       ...kaykit(['Spellcast_Shoot']), // wand zap reads better than a staff bonk
@@ -1299,6 +1308,7 @@ export const VISUALS: Record<string, VisualDef> = {
   }),
   player_druid: swims({
     url: `${PLAYERS}/druid.glb`,
+    animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     // dedicated druid model (own texture, ships a Backpack mesh)
@@ -1310,6 +1320,7 @@ export const VISUALS: Record<string, VisualDef> = {
   //    player whose skinCatalog === 'mech', see visualKeyFor) ----------------
   player_mech: swims({
     url: `${PLAYERS}/Mech/characters/CombatMech.glb`,
+    animUrls: [`${PLAYERS}/Mech/characters/CombatMech_hit_variety_anims.glb`],
     height: HUMANOID_H,
     // The mech is rigged to the same KayKit Rig_Medium skeleton as every other
     // player class; its GLB shipped with no clips, so the full KayKit set is
@@ -2055,6 +2066,7 @@ export const VISUALS: Record<string, VisualDef> = {
   delve_skel_wraith: {
     // Ledger Wraith: pale skeleton, no weapon, stronger wash reads as near-transparent
     url: `${ENEMIES}/skeleton_minion.glb`,
+    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     tint: 'entity',
@@ -2063,6 +2075,7 @@ export const VISUALS: Record<string, VisualDef> = {
   delve_skel_ringer: {
     // Funeral Ringer: skeleton rogue rig, cloth-brown tint at mid strength
     url: `${ENEMIES}/skeleton_rogue.glb`,
+    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     attach: [{ url: `${WEAPONS}/skeleton_axe.glb`, bone: 'handslot.r' }],
@@ -2072,6 +2085,7 @@ export const VISUALS: Record<string, VisualDef> = {
   delve_mob_acolyte: {
     // Gravecall Acolyte: hooded mage with hat + staff, deep dark-brown saturation
     url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: ['Mage_Hat'],
@@ -2082,6 +2096,7 @@ export const VISUALS: Record<string, VisualDef> = {
   delve_skel_effigy: {
     // Saintless Effigy: armoured skeleton, high stone-pale wash, reads as carved stone
     url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     attach: [
@@ -2094,6 +2109,7 @@ export const VISUALS: Record<string, VisualDef> = {
   delve_skel_varric: {
     // Deacon Varric: boss mage rig with Taunt flourish on pull
     url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['2H_Melee_Attack_Chop'], 'Taunt'),
     attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
@@ -2104,6 +2120,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // -- undead (KayKit skeletons, shared 41-joint rig) ------------------------
   skel_minion: {
     url: `${ENEMIES}/skeleton_minion.glb`,
+    animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     tint: 'entity',
@@ -2111,6 +2128,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   skel_warrior: {
     url: `${ENEMIES}/skeleton_warrior.glb`,
+    animUrls: [`${ENEMIES}/skeleton_warrior_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     tint: 'entity',
@@ -2118,6 +2136,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   skel_rogue: {
     url: `${ENEMIES}/skeleton_rogue.glb`,
+    animUrls: [`${ENEMIES}/skeleton_rogue_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
     tint: 'entity',
@@ -2125,6 +2144,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   skel_mage: {
     url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/skeleton_staff.glb`, bone: 'handslot.r' }],
@@ -2133,6 +2153,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   skel_boss: {
     url: `${ENEMIES}/skeleton_mage.glb`,
+    animUrls: [`${ENEMIES}/skeleton_mage_hit_variety_anims.glb`],
     height: 2.5,
     // Morthen the Gravecaller's visual (a dungeon final boss, dungeons.ts): its
     // own attack instead of the plain 2H chop skel_mage and delve_skel_varric
@@ -2148,6 +2169,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   skel_necromancer: {
     url: `${ENEMIES}/necromancer.glb`,
+    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['2H_Melee_Attack_Chop']),
     tint: 'entity',
@@ -2158,6 +2180,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // bone-white, which reads as a snowdrift under the citadel's blood-red grade).
   rift_ritualist: {
     url: `${ENEMIES}/necromancer.glb`,
+    animUrls: [`${ENEMIES}/necromancer_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['2H_Melee_Attack_Chop']),
     tint: 'entity',
@@ -2189,6 +2212,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // -- humanoid mobs (KayKit adventurers) ------------------------------------
   mob_bandit: {
     url: `${PLAYERS}/rogue_hooded.glb`,
+    animUrls: [`${PLAYERS}/rogue_hooded_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop', 'Dualwield_Melee_Attack_Chop']),
     // v2 rogue_hooded ships the hood/mask/cape as its default look (no show
@@ -2204,6 +2228,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_dark_caster: {
     url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: ['Mage_Hat'],
@@ -2213,6 +2238,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_bruiser: {
     url: `${PLAYERS}/barbarian.glb`,
+    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: ['Barbarian_BearHat'], // v2 barbarian: Hat→BearHat, no Cape, weapon now attached
@@ -2224,6 +2250,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // -- NPCs ------------------------------------------------------------------
   npc_knight: {
     url: `${PLAYERS}/knight.glb`,
+    animUrls: [`${PLAYERS}/knight_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: ['Knight_Helmet', 'Knight_Cape'],
@@ -2231,6 +2258,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   npc_mage: {
     url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: [],
@@ -2243,6 +2271,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // other npc_mage uses the new KayKit full-pack model from #396.
   npc_aldric: {
     url: `${PLAYERS}/mage_classic.glb`,
+    animUrls: [`${PLAYERS}/mage_classic_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: ['2H_Staff'],
@@ -2251,6 +2280,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   npc_smith: {
     url: `${PLAYERS}/barbarian.glb`,
+    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: [],
@@ -2258,6 +2288,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   npc_scout: {
     url: `${PLAYERS}/rogue.glb`,
+    animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Ranged_Shoot']),
     show: ['Rogue_Cape'],
@@ -2265,6 +2296,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   npc_villager: {
     url: `${PLAYERS}/rogue.glb`,
+    animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: [],
@@ -2273,6 +2305,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   npc_villager_robed: {
     url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: [],
@@ -2284,6 +2317,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // the gold NpcDef color would wash the repaint back toward the villager look.
   npc_fernando: {
     url: `${PLAYERS}/rogue.glb`,
+    animUrls: [`${PLAYERS}/rogue_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
     show: [],
@@ -2294,6 +2328,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // rogue. Ships its accessories (helm/cape/shield) by default (no show filter).
   npc_reliquary_keeper: {
     url: `${PLAYERS}/paladin.glb`,
+    animUrls: [`${PLAYERS}/paladin_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['1H_Melee_Attack_Chop']),
   },
@@ -2304,6 +2339,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // Spellcasting channel. Fixed staff (no weaponSlots: NPC gear never changes).
   npc_edda_reedhand: {
     url: `${PLAYERS}/druid.glb`,
+    animUrls: [`${PLAYERS}/druid_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/staff.glb`, bone: 'handslot.r' }],
@@ -2315,6 +2351,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // one def per chronicler with its own url.
   npc_chronicler: {
     url: `${PLAYERS}/mage.glb`,
+    animUrls: [`${PLAYERS}/mage_hit_variety_anims.glb`],
     height: HUMANOID_H,
     clips: kaykit(['2H_Melee_Attack_Chop']),
     show: ['Mage_Hat'],
