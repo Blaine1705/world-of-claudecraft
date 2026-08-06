@@ -10850,11 +10850,6 @@ function addedEffectDescription(
       return `${name}: +${formatPercent(effect.value, lang)} ${text.statLabels.damage} (${seconds(effect.duration, lang)}).`;
     case 'breakRoots':
       return `${name}: ${t('hudChrome.auraEffect.root')} -> 0.`;
-    case 'selfBuff': {
-      const multiplierShaped = effect.kind === 'buff_speed' || effect.kind === 'buff_haste';
-      const value = multiplierShaped ? effect.value - 1 : effect.value;
-      return `${name}: +${formatPercent(value, lang)} (${seconds(effect.duration, lang)}).`;
-    }
   }
 }
 

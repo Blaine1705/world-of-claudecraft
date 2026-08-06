@@ -1,19 +1,19 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  type CharacterWeaponAura,
   characterAvengingWrathActive,
   characterPaladinWingsActive,
-  type CharacterWeaponAura,
   characterRecklessnessActive,
   characterSoulRendActive,
   characterVeilboundState,
+  characterWeaponAuraColor,
+  characterWeaponAuraInto,
   characterWeaponAuraMode,
   hunterPetFerocityStage,
   hunterPetFrenzyActive,
   hunterPetVisualScale,
   tithefiendEmpoweredActive,
-  characterWeaponAuraColor,
-  characterWeaponAuraInto,
 } from '../src/render/character_effects';
 import {
   CHARACTER_EFFECT_RECKLESSNESS,

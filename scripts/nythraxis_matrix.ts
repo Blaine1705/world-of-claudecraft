@@ -1912,7 +1912,6 @@ function runGroup(groupSpecs: Spec[], key: string, seed = 42): Result {
   return {
     seed,
     key,
-    seed,
     killed: boss.dead,
     seconds,
     bossHp: boss.hp,

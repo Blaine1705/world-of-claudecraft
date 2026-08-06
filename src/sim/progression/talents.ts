@@ -34,18 +34,18 @@
 
 import { clearAfflictionState } from '../combat/affliction';
 import { stripTemporalEchoes } from '../combat/chronomancy';
+import { clearDestructionState } from '../combat/destruction';
 import { cleanDruidEngineState } from '../combat/druid_engines';
 import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
 import { clearPacklordState } from '../combat/hunter_packlord';
 import { clearHunterTalentState } from '../combat/hunter_shared';
+import { clearDeathEchoes, clearOssuaryMarks } from '../combat/necromancy';
 import { cleanupPriestState } from '../combat/priest/lifecycle';
 import { cleanRogueEngineState } from '../combat/rogue_engines';
 import { clearSpiritmendState } from '../combat/shaman_spiritmend';
 import { clearShamanTalentState } from '../combat/shaman_talents';
 import { clearThundercallState } from '../combat/shaman_thundercall';
 import { clearWarspiritState } from '../combat/shaman_warspirit';
-import { clearDestructionState } from '../combat/destruction';
-import { clearDeathEchoes, clearOssuaryMarks } from '../combat/necromancy';
 import { reconcileWarlockTalentState } from '../combat/warlock_talents';
 import { abilitiesKnownAt } from '../content/classes';
 import {

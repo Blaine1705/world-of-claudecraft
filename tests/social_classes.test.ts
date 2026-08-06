@@ -53,7 +53,11 @@ describe('nine classes', () => {
         // The overhauled Warlock completes its shared kit at level 10; its
         // 10-20 progression now belongs to each specialization instead.
         for (const spec of ['affliction', 'demonology', 'destruction'] as const) {
-          const at10 = abilitiesKnownAt(cls, 10, computeTalentModifiers(cls, { spec, rows: {} }, 10));
+          const at10 = abilitiesKnownAt(
+            cls,
+            10,
+            computeTalentModifiers(cls, { spec, rows: {} }, 10),
+          );
           const atMax = abilitiesKnownAt(
             cls,
             MAX_LEVEL,

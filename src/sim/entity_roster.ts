@@ -21,10 +21,10 @@
 // (enforced by tests/architecture.test.ts).
 
 import { tickHunterTrap } from './combat/hunter_trap';
+import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { cleanupPaladinAegis } from './combat/paladin_aegis';
 import { stripSunGodVerdicts } from './combat/paladin_sun_verdict';
 import { stripPaladinDevotionsFromSource } from './combat/paladin_support';
-import { isTemporaryNecromancyUndead } from './combat/necromancy';
 import { tickRingOfFrost } from './combat/ring_of_frost';
 import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';

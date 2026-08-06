@@ -11107,7 +11107,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '繁茂：第{stacks}/{max}層。每種下一個全新的野性綻放或再度綻放累積1層。達到{max}層時，迅癒變為盛放',
   'hudChrome.auraEffect.galeheartWeapon':
     '完成戰魂的{steps}連擊節奏後，該次打擊迴響{count}次，每次造成其傷害{pct}%的自然傷害',
-  'hudChrome.auraEffect.elementalTrance': '受到的傷害降低{pct}%。你造成的所有傷害的{mana}%轉化為法力值',
+  'hudChrome.auraEffect.elementalTrance':
+    '受到的傷害降低{pct}%。你造成的所有傷害的{mana}%轉化為法力值',
   'entities.abilities.moonseed.name': '月種',
   'entities.abilities.moonseed.description':
     '僅限月翼形態。造成{damage}點秘法傷害，累積1層月潮（最多3層），並將你的月光風暴延長6秒；每次施加最多延長6秒。月潮達3層時，此按鈕變為月湧：立即造成240至285點秘法傷害，並耗盡全部3層。',
