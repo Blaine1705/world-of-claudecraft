@@ -392,7 +392,7 @@ export const it_IT: EnTranslations = {
     "emoteEditor": {
       "title": "Emote",
       "done": "Fine",
-      "close": "Close emotes"
+      "close": "Chiudi emote"
     },
     "dailyRewards": {
       "title": "Ricompense giornaliere",
@@ -961,7 +961,7 @@ export const it_IT: EnTranslations = {
       "petTaunt": "Famiglio: provoca",
       "petDefensive": "Famiglio: difensivo",
       "petAggressive": "Famiglio: aggressivo",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Famiglio: bersaglia",
       "mount": "Monta / Smonta",
       "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo."
     },
@@ -1327,10 +1327,10 @@ export const it_IT: EnTranslations = {
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
       "showThirdActionBar": "Mostra la terza barra delle azioni",
-      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "hideUnusedActionSlots": "Nascondi gli slot azione inutilizzati",
       "lockActionBars": "Blocca le barre azione",
       "showTargetOfTarget": "Mostra il bersaglio del bersaglio",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Mostra il tuo famiglio",
       "showAttackButton": "Mostra Pulsante Attacco",
       "showDailyRewardsChest": "Mostra forziere delle ricompense giornaliere",
       "mobileCameraJoystick": "Joystick della fotocamera",
@@ -2076,7 +2076,7 @@ export const it_IT: EnTranslations = {
       "familyDemon": "Demone",
       "hostile": "Ostile",
       "friendly": "Amichevole",
-      "elite": "Elite",
+      "elite": "Élite",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2533,10 +2533,6 @@ export const it_IT: EnTranslations = {
         "moongateCommunion": {
           "title": "Comunione del Cancello Lunare",
           "note": "I pellegrini si radunano al cancello lunare del tempio sotto la luna di metà mese."
-        },
-        "fiestaNight": {
-          "note": "Stanotte il ring della Fiesta 2v2 richiama il suo pubblico più fragoroso.",
-          "title": "Notte della Fiesta"
         }
       }
     },
@@ -2689,7 +2685,7 @@ export const it_IT: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Incanta Arma - Potenza",
       "enchant_weapon_intellect": "Incanta Arma - Potere Magico",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Incanta Mano Secondaria - Robustezza",
       "enchant_helmet_fortitude": "Incanta Elmo - Fortezza",
       "enchant_neck_spirit": "Incanta Collana - Spirito",
       "enchant_shoulder_agility": "Incanta Spalle - Agilita",
@@ -2919,9 +2915,7 @@ export const it_IT: EnTranslations = {
       "commissionToggle": "Pezzo su commissione",
       "commissionToggleHint": "Si lega al primo personaggio che lo riceve in uno scambio.",
       "commissionUnbound": "Pezzo su commissione: si lega al primo destinatario",
-      "commissionBound": "Pezzo su commissione: legato al suo destinatario",
-      "craft": "Mestiere",
-      "throttled": "Stai fabbricando troppo in fretta. Aspetta un momento e riprova."
+      "commissionBound": "Pezzo su commissione: legato al suo destinatario"
     },
     "itemMenu": {
       "use": "Usa",
@@ -2986,10 +2980,7 @@ export const it_IT: EnTranslations = {
       "replaceConfirmKeepsBond": "Vincolo di commissione",
       "replaceConfirmCost": "Costo: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Sostituisci",
-      "disenchantThrottled": "Stai disincantando troppo velocemente. Attendi un momento e riprova.",
-      "enchantThrottled": "Stai incantando troppo velocemente. Attendi un momento e riprova.",
-      "salvageThrottled": "Stai smantellando troppo velocemente. Attendi un momento e riprova."
+      "replaceConfirmAccept": "Sostituisci"
     },
     "training": {
       "title": "Formazione: {name}",
@@ -3184,7 +3175,7 @@ export const it_IT: EnTranslations = {
         "soul_rend": "Squarcio dell'Anima (i giocatori segnati devono disperdersi ed essere curati)",
         "deathless_rage": "Furia Immortale (interrotta alle pietre di guardia)",
         "wardstones": "Canalizzazione delle pietre di guardia (transizione di fase)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Maledizione del Terrore (solo eroica, penalità cumulativa per cambio tank)"
       }
     },
     "deeds": {
@@ -3422,6 +3413,7 @@ export const it_IT: EnTranslations = {
       "talents": "Talenti",
       "arena": "Arena e PvP",
       "valeCup": "Coppa della Valle",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Libro delle Imprese",
       "glossary": "Glossario",
       "wishIKnew": "Cose che avrei voluto sapere",
@@ -3591,16 +3583,21 @@ export const it_IT: EnTranslations = {
       "groupInterface": "Interfaccia",
       "groupCamera": "Telecamera",
       "talents": "Talenti",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Classifica",
       "deeds": "Libro delle Imprese",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Creazione",
       "valeCup": "Coppa della Valle",
+      "mount": "Mount / Dismount",
       "calendar": "Calendario degli eventi",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usa le abilità della barra delle azioni (la fila dei numeri; una seconda barra è sul tastierino numerico)",
       "targetFriendly": "Bersaglia l'amico più vicino",
       "cycleFriendly": "Scorri i bersagli amici",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Apri il menu di gioco e le opzioni",
       "bothMouse": "Entrambi i pulsanti del mouse",
       "runForward": "Corri in avanti",
@@ -4127,7 +4124,7 @@ export const it_IT: EnTranslations = {
       "bastionBody": "Una fortezza allagata perduta nella palude, difesa dagli annegati e dalla marea crescente in persona.",
       "templeBody": "Un santuario sommerso lungo la strada della palude, una deviazione per i curiosi e i ben preparati.",
       "sanctumBody": "Il cuore oscuro di Thornpeak, dove la lunga opera del culto raggiunge il suo apice terribile.",
-      "wildheartBody": "Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per affrontare Zulgar.",
+      "wildheartBody": "Una caldera di giungla battuta dalla pioggia, dove due sentieri di caccia rialzati circondano un cenote di giada. Attraversa tane di bestie e rovine ataviche, poi sali la piramide rituale per scoprire chi ti aspetta in cima.",
       "raidName": "L'incursione di fine gioco",
       "raidBody": "Oltre una porta reale sigillata attende una prova per dieci giocatori: uno scontro a più fasi e un potere immortale che l'intera incursione deve neutralizzare insieme. Guadagnati l'ingresso, poi porta nove amici.",
       "heroicTitle": "Modalità eroica",
@@ -4192,23 +4189,25 @@ export const it_IT: EnTranslations = {
       "duelsBody": "Sfida a duello amichevole qualsiasi giocatore che incontri. In palio non c'è altro che l'orgoglio, quindi è il modo più semplice per imparare uno scontro o risolvere una disputa amichevole.",
       "coliseumHeading": "Il Colosseo di Cenere",
       "coliseumBody": "Il Colosseo è l'arena del reame, dove affronti altri giocatori in partite classificate, uno contro uno o due contro due. Ogni categoria mantiene la propria classifica, perciò una vittoria ti fa salire in quella graduatoria sotto gli occhi di tutto il reame. Apri la finestra dell'Arena per iscriverti a una categoria, da solo o con il tuo compagno.",
-      "fiestaHeading": "Fiesta due contro due",
-      "fiestaBody": "Fiesta è una rissa rapida due contro due giocata come un unico incontro continuo, con ogni combattente portato su un piano di parità. Man mano che lo scontro procede arruoli potenziamenti, boost veloci che rimodellano il tuo arsenale al volo, così non ci sono due partite uguali.",
-      "augmentsNote": "Potenziamenti e bonus durano solo per la partita. Sono pensati per costruzioni giocose e improvvisate, non per un potere duraturo, così nessuno si compra la vittoria.",
-      "wavesTitle": "I potenziamenti arrivano a ondate",
-      "wavesBody": "Un incontro di Fiesta ti offre nuove scelte man mano che procede, e le scelte si fanno più audaci quanto più a lungo dura lo scontro. Costruisci da un'ondata alla successiva, scegliendo ogni volta una tra poche opzioni e tenendola per il resto dell'incontro.",
-      "waveSilverTitle": "Argento",
-      "waveSilverBody": "L'ondata d'apertura: potenziamenti netti a singola statistica che affinano le basi della tua classe.",
-      "waveGoldTitle": "Oro",
-      "waveGoldBody": "L'ondata intermedia: combo a doppio taglio in cui la tua build inizia a prendere forma e a cantare.",
-      "wavePrismaticTitle": "Prismatico",
-      "wavePrismaticBody": "L'ondata finale: picchi che definiscono la build e fanno sciogliere lo schermo, pensati per sembrare assurdi nel migliore dei modi.",
-      "yumiHeading": "Proteggi Yumi",
-      "yumiBody": "Proteggi Yumi è una modalità a obiettivi di squadra che si gioca in un labirinto: ogni fazione protegge il proprio famiglio felino mentre dà la caccia a quello avversario. Di tanto in tanto entrambi i gatti si teletrasportano in nuovi angoli del labirinto, così lo scontro oscilla tra difesa, caccia e corsa per ritrovarli. Mettiti in coda in tre contro tre o cinque contro cinque; cadere in battaglia ti tiene in panchina solo per un momento.",
-      "powerupsTitle": "Potenziamenti nell'arena",
-      "powerupsBody": "Durante lo scontro nell'arena cadono anche sfere luminose, libere per chiunque le raggiunga per primo. Sono volutamente sopra le righe e durano solo un istante: Demone della Velocità per un lampo di ritmo accecante, Colosso per gonfiarti in un gigante ingombrante, Stivali Lunari per un balzo rimbalzante a bassa gravità, e Berserker per un'improvvisa ondata di furia.",
       "ladderHeading": "Scalare la classifica",
       "ladderBody": "Il gioco classificato traccia la tua posizione nel tempo. Controlla la classifica per vedere dove ti trovi e chi domina la vetta del reame."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "La Coppa della Valle",
@@ -4350,6 +4349,8 @@ export const it_IT: EnTranslations = {
       "sourcesBody": "Gran parte dei tuoi primi miglioramenti sono ricompense delle missioni, perciò conviene portarle a termine invece di macinare nemici. I nemici lasciano cadere equipaggiamento quando li sconfiggi, i venditori in città vendono solide basi, gli artigiani trasformano i materiali raccolti in pezzi indossabili, e il mercato dei giocatori ti permette di comprare da altri avventurieri. In cima alla scalata, due valute in marchi comprano equipaggiamento introvabile altrove: i Sigilli d'Incursione presso il custode delle incursioni, e i Marchi Eroici presso il Quartiermastro Eroico.",
       "soulboundTitle": "Vincolato all'anima: tuo e tuo soltanto",
       "soulboundBody": "Alcune ricompense speciali sono vincolate all'anima, legate al tuo personaggio dal momento in cui le ottieni. Un oggetto vincolato all'anima non può essere scambiato, spedito, venduto a un venditore o messo in vendita sul mercato; è tuo e tuo soltanto. Oggi questa protezione custodisce i gettoni premio come i Marchi Eroici, mentre l'equipaggiamento che vinci è tuo da scambiare, vendere o condividere liberamente.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Le tenute e i loro bonus",
       "setsBody": "Alcune armature arrivano in famiglie coordinate, più pezzi tagliati per apparire e combattere come una cosa sola. Indossa abbastanza pezzi di una famiglia insieme e la tenuta si risveglia, concedendo bonus che si aggiungono alle statistiche di ciascun pezzo, e più pezzi indossi più diventa forte. Alcune di queste famiglie compaiono come bottino ambito mentre sali di livello; le più grandi arrivano dai contenuti di gruppo più ardui vicino al limite di livello, perciò inseguire una tenuta completa è un classico obiettivo di fine gioco.",
       "consumablesTitle": "Consumabili",
@@ -4606,6 +4607,7 @@ export const it_IT: EnTranslations = {
         "startBody": "Una Canna da pesca semplice costa 20 monete di rame dal Pescatore Brandt a Eastbrook (cerca il Vecchio Sale al margine orientale della città, sulla strada per il Lago Specchio); anche l'Armeggiatore Gizzel, il Provveditore Hale a Fenbridge e il Quartiermastro Bree a Highwatch tengono canne in magazzino. Usa la canna rivolto verso acqua abbastanza profonda da contenere pesci, fino a circa 24 yard davanti a te, e il tuo galleggiante volerà fuori.\n\nNon puoi lanciare in combattimento, mentre nuoti o da morto: lanciare dalla riva è la postura prevista. L'acqua però si fa dura come si fa dura la terra: la palude vuole almeno la Canna con mulinello di ferro di livello 2 e le vette la Canna del ruscello d'argento di livello 3, e una lenza lanciata senza la canna che quell'acqua pretende non lascia mai la tua mano. Due canne stanno sopra queste, la Canna della Tempesta e la Canna Forgiamarea: gli ingegneri le fabbricano all'officina con ciò che la lenza tira su, e il banco dell'incursione della Litania Annegata le vende per Sigilli d'Incursione dietro ai suoi requisiti di completamento, ma mai per monete. Nessuna acqua le richiede, quindi comprano un'attesa più breve e una finestra di recupero più ampia invece dell'accesso, il che al gradino più alto significa un'abboccata in tre secondi netti.",
         "biteHeading": "Abboccata e salpata",
         "biteBody": "Dopo il lancio, l'abboccata arriva in un momento nascosto tra {min} e {max} secondi; il ritardo viene deciso quando la lenza tocca l'acqua, quindi non ci sono due lanci davvero uguali. Quando il galleggiante abbocca hai una finestra di {reel} secondi per premere di nuovo la canna e recuperare: recupera entro quel tempo e la cattura è tua, esita oltre e il pesce se ne va senza lasciarti nulla. Un'intera sessione si ferma a {cap} secondi, quindi anche un lancio tranquillo si risolve in fretta.\n\nLe canne migliori affinano entrambe le estremità del minigioco: ogni livello di canna sopra il primo taglia {rod} secondi dall'attesa più lunga possibile, mai sotto il minimo di tre secondi che la canna di punta già sfiora, e aggiunge {reelRod} secondi alla finestra di recupero, così la Canna con mulinello di ferro porta l'attesa peggiore a 6,5 secondi con una finestra di 3,25 secondi, e la Canna del ruscello d'argento a 5 con una finestra oltre i 4, dato che la sua rarità allarga il recupero un po' più di quanto paghi il livello da solo. Le abboccate più rapide non cambiano mai, qualunque cosa tu impugni, e a una canna basta stare nelle tue borse per contare.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Guadagno di competenza",
         "scheduleNote": "Il guadagno della Pesca segue un calendario fisso senza dadi: un punto intero per cattura sotto 50 di competenza, mezzo punto sotto 100, un decimo sotto 150 e un lento gocciolio di 0,02 da 150 a 200. Quell'ultimo tratto è deliberatamente un viaggio da migliaia di catture: 200 è una dichiarazione, non una tappa verso qualcos'altro.\n\nL'immondizia smette del tutto di insegnare a {cutoff}: da lì in poi, alghe e stivali sono soltanto alghe e stivali. Anche l'acqua stessa pone un tetto alla lezione: le acque di livello 1 della Valle (e ogni riva giovane oltre le terre centrali) non insegnano nulla oltre 100, quelle della palude si fermano a 150, e solo quelle di Thornpeak istruiscono un pescatore per l'intero tragitto fino a 200. Per il resto ogni cattura portata a riva guadagna al ritmo previsto, quindi quando il contatore si blocca, è il calendario che ti sta dicendo di cercare acque più profonde.",
         "colProficiency": "Competenza",
@@ -4654,8 +4656,16 @@ export const it_IT: EnTranslations = {
         "provenanceBody": "Alcuni oggetti portano un nome. Passaci sopra il puntatore e la descrizione dice Raccolto da tal dei tali su un materiale grezzo, oppure Realizzato da tal dei tali su un pezzo finito: lo stesso marchio, formulato secondo il modo in cui l’oggetto è venuto al mondo. Una firma è parte dell’oggetto stesso, viaggia con lui attraverso gli scambi, la banca, la posta, il Mercato Mondiale e persino il riacquisto da un venditore, e non svanisce mai.\n\nLa raccolta firma il suo lavoro migliore in automatico: ogni raccolto che tira raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intera manna quintuplicata. Il tiro fortunato di un raccolto da carcassa firma la sua resa quando la famiglia non ha alcun esemplare da offrire; quando invece ce l’ha, lascia la resa semplice e conia accanto l’esemplare puro firmato. La fabbricazione firma seguendo la stessa linea: ogni copia di un risultato raro o superiore viene coniata firmata, e un capolavoro firma sempre, qualunque sia la sua qualità, così la versione più pregiata di qualsiasi pezzo nomina sempre il suo creatore. L’unica cosa che può costarti una firma è una borsa piena: un’unità firmata ha bisogno di uno spazio tutto suo, o di una pila firmata corrispondente, in cui posarsi.\n\nUna pila di oggetti condivide una sola identità, quindi due copie si uniscono solo quando ogni marchio combacia esattamente: stesso oggetto, stesso firmatario, stesse statistiche da capolavoro, stesso incanto, stesso vincolo. Un tronco firmato non si aggiunge mai a un mucchio semplice, in nessuna delle due direzioni (unirli cancellerebbe il nome di qualcuno), ma carichi identici si uniscono volentieri, così venti minerali firmati dallo stesso raccoglitore stanno in un’unica pila e una manna non ti fa a pezzi le borse.\n\nLe firme ripagano gli artigiani: tenere al banco una qualsiasi copia firmata di un reagente richiesto, chiunque l’abbia firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro, e tenere un reagente firmato dalla tua stessa mano riduce di uno la quantità richiesta di quel reagente (mai sotto uno). Il tuo lavoro firmato di qualità rara o superiore continua persino a insegnarti qualcosa, oggi soltanto attraverso la boccetta: bevi una pozione che hai firmato e un piccolo rivolo di competenza torna al mestiere che l’ha preparata, purché quel mestiere sia uno dei tuoi principali attivi.",
         "collectorsHeading": "Collezionisti, trofei, e il prezzo di una storia",
         "collectorsBody": "I venditori sono ciechi alla provenienza: un oggetto firmato si vende a un PNG esattamente al suo prezzo normale. Il sovrapprezzo di una firma esiste solo tra i giocatori, il che e precisamente cio che lo rende interessante: una pila di minerale fortunato firmata da un celebre raccoglitore, un Taglio Pregiato da un raccolto fortunato, una lama da capolavoro che porta il nome di un artigiano ormai ritirato, valgono tutti cio che la memoria di qualcuno dice che valgano.\n\nIl Libro delle Imprese segue lo stesso istinto: Filone Intatto, Cuore di Legno Antico, Fiore di Luna, Un Esemplare Perfetto, e Barlume di Speranza sono segni da collezionista a zero Fama che esistono solo per provare che un momento e accaduto a te. Conserva l'oggetto che ha guadagnato l'impresa e tieni la ricevuta. Nulla di tutto questo e potere; la provenienza non compra statistiche e non vince battaglie, e il registro cartaceo del gioco dei giorni felici.",
-        "throttleHeading": "Il limite delle azioni",
-        "throttleBody": "La produzione ha un tetto: fabbricazione, disincanto, incantamento, smantellamento e ricariche degli effetti degli strumenti condividono un unico budget di {actions} azioni riuscite in ogni finestra di {seconds} secondi. Un tentativo respinto non costa nulla e non consuma budget. Non lo sentirai mai in una sessione normale; esiste perché uno specialista al massimo con la banca piena non possa inondare il Mercato, qualunque sia la sua abilità o la sua scorta.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "I giocatori commerciano con i giocatori",
         "doctrineBody": "L'economia artigianale e costruita su un'idea: i giocatori riforniscono i giocatori. I raccoglitori alimentano gli artigiani, gli artigiani alimentano chi fa missioni e chi fa raid, e chi smantella alimenta gli incantatori, con venditori e maestri di stazione ai margini per assorbire robaccia e monete piuttosto che competere con te. Se vuoi guadagnare denaro da una professione, il tuo cliente e una persona: scopri cosa consumano gli altri giocatori, fissa i prezzi in base al Mercato Mondiale, e tratta i sistemi PNG come un pavimento sotto i tuoi prezzi, non come il mercato stesso.\n\nL'equipaggiamento artigianale e calibrato per stare sotto il livello del raid: persino un capolavoro e sempre solo un livello di qualita sopra alla sua ricetta, mai oltre il leggendario, e il suo budget di statistiche rimane sotto la fascia del bottino del raid. La fucina ti prepara per i contenuti piu difficili; non li sostituisce. Questo mantiene artigiani, raider e il mercato in un triangolo stabile: i drop del raid rimangono ambiziosi, e i pezzi artigianali rimangono il miglior equipaggiamento che il denaro possa effettivamente comprare."
       },
@@ -5113,6 +5123,7 @@ export const it_IT: EnTranslations = {
       "terrainCapReached": "Limite di modifiche al terreno raggiunto ({max}). Le impronte di scultura in eccesso non sono state aggiunte.",
       "placementCapReached": "Limite di posizionamenti raggiunto ({max}). Gli asset in eccesso non sono stati aggiunti.",
       "blockerCapReached": "Limite di muri invisibili raggiunto ({max}). Il nuovo muro non è stato aggiunto.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Salvataggio automatico disattivato: {reason} Salva manualmente, poi riattivalo."
     },
     "confirm": {
@@ -6096,7 +6107,6 @@ export const it_IT: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3c3",
     "bracket5": "Yumi 5c5",
-    "enterQueue": "Unisciti a Proteggi Yumi!",
     "queue": {
       "join": "Ti unisci alla coda di Proteggi Yumi. Proteggi il tuo famiglio…",
       "leave": "Lasci la coda di Proteggi Yumi.",
@@ -6134,9 +6144,6 @@ export const it_IT: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Unisciti alla Fiesta!",
-    "practice": "🎉 Pratica contro i bot",
-    "practiceNote": "Pratica offline: genera 3 bot IA e ti mette in coda per una Fiesta 2v2. Clicca di nuovo per interrompere.",
     "banner": {
       "wave": "ONDATA {wave}/{total} — SCEGLI UN POTENZIAMENTO!",
       "augmentGained": "Potenziamento ottenuto: {name}!",
@@ -6618,7 +6625,6 @@ export const it_IT: EnTranslations = {
       "mobileMore": "Altro",
       "mobileMoreAria": "Mostra altri menu",
       "mobileSocial": "Sociale",
-      "mobileArena": "Arena",
       "mobileMenu": "Menu",
       "mobileSettings": "Impostazioni",
       "mobileUse": "Usa",
@@ -6735,7 +6741,7 @@ export const it_IT: EnTranslations = {
         "nameplates": "Mostra nomi",
         "meters": "Misuratori danni",
         "social": "Amici e gilda",
-        "arena": "Arena (Colosseo Cinereo)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Apri chat",
         "attack": "Attacca",
         "actionBarSlot": "Barra azioni {slot}"
@@ -6840,6 +6846,7 @@ export const it_IT: EnTranslations = {
       "floatingParry": "Parata",
       "floatingResist": "Resistito",
       "floatingEvade": "Evitato",
+      "floatingBlock": "{amount} Block",
       "floatingHealFull": "Pieno",
       "floatingHealAbsorbed": "Assorbito",
       "cannotMove": "Non puoi muoverti!",
@@ -6853,6 +6860,8 @@ export const it_IT: EnTranslations = {
       "parried": "Il tuo {ability} viene parato da {target}.",
       "resisted": "{target} resiste al tuo {ability}.",
       "evaded": "Il tuo {ability} viene evitato da {target}.",
+      "blockedDone": "Your {ability} is blocked by {target}, dealing {amount}.",
+      "blockedTaken": "You block {source}'s attack, taking {amount}.",
       "healSelf": "Il tuo {ability} ti cura di {amount}.",
       "healSelfCrit": "Il tuo {ability} ti cura criticamente di {amount}.",
       "healOther": "Il tuo {ability} cura {target} di {amount}.",
@@ -7229,6 +7238,11 @@ export const it_IT: EnTranslations = {
     "cast": {
       "fishing": "Pesca",
       "gathering": "Raccolta",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Cura demoniaca",
       "thunzharrStormcall": "Richiamo della tempesta",
       "rift_frost_execution": "Tomba Glaciale",
@@ -7551,6 +7565,8 @@ export const it_IT: EnTranslations = {
       "collectEmpty": "Non c'è nulla in attesa. Ricavi e inserzioni scadute si ritirano qui.",
       "collectNote": "Ricavi e merci restituite che il Mercante conserva per te.",
       "saleProceeds": "Ricavi di vendita",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Ritira tutto"
     },
     "logs": {
@@ -10331,13 +10347,13 @@ export const it_IT: EnTranslations = {
         "name": "Faretra Direfang"
       },
       "sharp_claw": {
-        "name": "Artiglio affilato"
+        "name": "Sharp Claw"
       },
       "curved_tusk": {
-        "name": "Zanna ricurva"
+        "name": "Curved Tusk"
       },
       "pristine_claw": {
-        "name": "Artiglio intatto"
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Acqua sorgiva evocata"

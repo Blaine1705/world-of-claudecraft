@@ -392,7 +392,7 @@ export const nl_NL: EnTranslations = {
     "emoteEditor": {
       "title": "Emotes",
       "done": "Klaar",
-      "close": "Close emotes"
+      "close": "Emotes sluiten"
     },
     "dailyRewards": {
       "title": "Dagelijkse beloningen",
@@ -787,7 +787,7 @@ export const nl_NL: EnTranslations = {
       "targetAnnounce": "Markeer {name}",
       "targetOfTargetLabel": "Doelwit van het doelwit",
       "partyLabel": "Je Bende",
-      "petLabel": "Je huisdier",
+      "petLabel": "Je Huisdier",
       "partyChip": "Groep",
       "partyGroup": "Groep {n}",
       "durationUnitSeconds": "s",
@@ -961,7 +961,7 @@ export const nl_NL: EnTranslations = {
       "petTaunt": "Huisdier: Uitdagen",
       "petDefensive": "Huisdier: Verdedigend",
       "petAggressive": "Huisdier: Agressief",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Huisdier: Aanwijzen",
       "mount": "Opstijgen / Afstijgen",
       "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld."
     },
@@ -1327,10 +1327,10 @@ export const nl_NL: EnTranslations = {
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
       "showThirdActionBar": "Derde actiebalk tonen",
-      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "hideUnusedActionSlots": "Ongebruikte actievakjes verbergen",
       "lockActionBars": "Actiebalken vergrendelen",
       "showTargetOfTarget": "Doelwit van doelwit tonen",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Je huisdier tonen",
       "showAttackButton": "Aanvalsknop Tonen",
       "showDailyRewardsChest": "Kist met dagelijkse beloningen tonen",
       "mobileCameraJoystick": "Camerajoystick",
@@ -2077,7 +2077,7 @@ export const nl_NL: EnTranslations = {
       "hostile": "Vijandig",
       "friendly": "Vriendelijk",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Baas"
     },
     "targetFrame": {
       "unlock": "Doelwitframe verplaatsen",
@@ -2533,10 +2533,6 @@ export const nl_NL: EnTranslations = {
         "moongateCommunion": {
           "title": "Maanpoort-Communie",
           "note": "Pelgrims verzamelen zich bij de maanpoort van de tempel onder de maan van halverwege de maand."
-        },
-        "fiestaNight": {
-          "note": "De 2v2 Fiesta-ring trekt vanavond zijn luidruchtigste publiek.",
-          "title": "Fiesta-avond"
         }
       }
     },
@@ -2689,7 +2685,7 @@ export const nl_NL: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Wapen betoveren - Kracht",
       "enchant_weapon_intellect": "Wapen betoveren - Spreukkracht",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Bijhand betoveren - Uithoudingsvermogen",
       "enchant_helmet_fortitude": "Helm betoveren - Fortitude",
       "enchant_neck_spirit": "Ketting betoveren - Geest",
       "enchant_shoulder_agility": "Schouders betoveren - Behendigheid",
@@ -2919,9 +2915,7 @@ export const nl_NL: EnTranslations = {
       "commissionToggle": "Opdrachtsstuk",
       "commissionToggleHint": "Bindt aan het eerste personage dat het via een ruil ontvangt.",
       "commissionUnbound": "Opdrachtsstuk: bindt aan de eerste ontvanger",
-      "commissionBound": "Opdrachtstuk: gebonden aan de ontvanger",
-      "craft": "Ambacht",
-      "throttled": "Je maakt te snel. Wacht even en probeer het opnieuw."
+      "commissionBound": "Opdrachtstuk: gebonden aan de ontvanger"
     },
     "itemMenu": {
       "use": "Gebruiken",
@@ -2986,10 +2980,7 @@ export const nl_NL: EnTranslations = {
       "replaceConfirmKeepsBond": "Opdrachtbinding",
       "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Vervangen",
-      "disenchantThrottled": "Je onbetoverd te snel. Wacht even en probeer het opnieuw.",
-      "enchantThrottled": "Je betoverd te snel. Wacht even en probeer het opnieuw.",
-      "salvageThrottled": "Je salvaged te snel. Wacht even en probeer het opnieuw."
+      "replaceConfirmAccept": "Vervangen"
     },
     "training": {
       "title": "Opleiding: {name}",
@@ -3184,7 +3175,7 @@ export const nl_NL: EnTranslations = {
         "soul_rend": "Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)",
         "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
         "wardstones": "Wardstone-kanalen (faseovergang)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)"
       }
     },
     "deeds": {
@@ -3422,6 +3413,7 @@ export const nl_NL: EnTranslations = {
       "talents": "Talenten",
       "arena": "Arena & PvP",
       "valeCup": "Dalbeker",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Boek der Daden",
       "glossary": "Begrippenlijst",
       "wishIKnew": "Dingen die ik graag eerder had geweten",
@@ -3591,16 +3583,21 @@ export const nl_NL: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Camera",
       "talents": "Talenten",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Ranglijst",
       "deeds": "Boek der Daden",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Vervaardigen",
       "valeCup": "De Dalbeker",
+      "mount": "Mount / Dismount",
       "calendar": "Evenementenkalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Actiebalkvaardigheden gebruiken (de cijferrij; een tweede balk staat op het numerieke toetsenblok)",
       "targetFriendly": "Dichtstbijzijnde bondgenoot aanwijzen",
       "cycleFriendly": "Door bondgenoten bladeren",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Spelmenu en opties openen",
       "bothMouse": "Beide muisknoppen",
       "runForward": "Vooruit rennen",
@@ -4127,7 +4124,7 @@ export const nl_NL: EnTranslations = {
       "bastionBody": "Een ondergelopen vesting verloren aan het moeras, in handen van verdronken verdedigers en het rijzende tij zelf.",
       "templeBody": "Een door de maan verlicht heiligdom verzonken onder een gloeiend bergmeer hoog in de pieken, te bereiken door een poort van koud licht. Een verdronken sekte zingt daar nog steeds in haar verrotte gewaden, en de waarschuwingen in de oever gekerfd zeggen dat iets beneden slechts slaapt. Een op zichzelf staand mysterie, afgezonderd van het hoofdverhaal, voor de nieuwsgierigen en de goed voorbereiden.",
       "sanctumBody": "Het duistere hart van Doorntop, waar het lange werk van de sekte zijn vreselijke hoogtepunt bereikt.",
-      "wildheartBody": "Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om Zulgar te trotseren.",
+      "wildheartBody": "Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om te zien wie er op de top wacht.",
       "raidName": "De eindspel-raid",
       "raidBody": "Achter een verzegelde koninklijke deur wacht een beproeving voor tien spelers: een gevecht in meerdere fasen en een dodeloze macht die de hele raid samen moet uitschakelen. Verdien je toegang en breng dan negen vrienden mee.",
       "heroicTitle": "Heroïsche modus",
@@ -4192,23 +4189,25 @@ export const nl_NL: EnTranslations = {
       "duelsBody": "Daag elke speler die je tegenkomt uit voor een vriendschappelijk duel. Er staat niets op het spel behalve trots, dus het is de makkelijkste manier om een matchup te leren of een vriendschappelijk meningsverschil te beslechten.",
       "coliseumHeading": "Het Asgrauwe Colosseum",
       "coliseumBody": "Het Coliseum is de arena van het rijk, waar je andere spelers tegemoet treedt in ranglijstwedstrijden, één tegen één of twee tegen twee. Elke categorie heeft zijn eigen ranglijst, dus een overwinning tilt je hoger op die ladder, zichtbaar voor het hele rijk. Open het Arenavenster om je in te schrijven voor een categorie, alleen of met je partner.",
-      "fiestaHeading": "Twee tegen twee Fiesta",
-      "fiestaBody": "Fiesta is een snel, twee-tegen-twee gevecht dat als één doorlopende partij wordt uitgevochten, waarbij elke strijder op gelijke voet wordt gebracht. Terwijl het gevecht loopt, draft je augments, snelle boosts die je kit gaandeweg hervormen, zodat geen twee wedstrijden helemaal hetzelfde spelen.",
-      "augmentsNote": "Augments en power-ups gelden alleen voor de wedstrijd. Ze draaien om speelse, ter plekke bedachte builds, niet om blijvende macht, zodat niemand zich een weg naar de winst koopt.",
-      "wavesTitle": "Augments komen in golven",
-      "wavesBody": "Een Fiesta-partij reikt je gaandeweg verse keuzes aan, en de keuzes worden gewaagder naarmate het gevecht langer duurt. Je bouwt van de ene golf naar de volgende, kiest elke keer een van een paar opties en houdt het voor de rest van de partij.",
-      "waveSilverTitle": "Zilver",
-      "waveSilverBody": "De openingsgolf: schone, enkelvoudige statboosts die de basis van je klasse aanscherpen.",
-      "waveGoldTitle": "Goud",
-      "waveGoldBody": "De middelste golf: tweesnijdende combo's waar je build vorm begint te krijgen en gaat zingen.",
-      "wavePrismaticTitle": "Prismatisch",
-      "wavePrismaticBody": "De laatste golf: build-bepalende, schermversmeltende pieken bedoeld om belachelijk aan te voelen op de beste manier.",
-      "yumiHeading": "Bescherm Yumi",
-      "yumiBody": "Bescherm Yumi is een teamdoelspel dat in een doolhof wordt gespeeld: elke kant bewaakt zijn eigen kattenmetgezel terwijl hij die van de ander bejaagt. Zo nu en dan flitsen beide katten naar nieuwe hoeken van het doolhof, zodat het gevecht heen en weer gaat tussen verdedigen, jagen en de race om ze opnieuw te vinden. Sluit aan als drie tegen drie of vijf tegen vijf; sneuvelen in de strijd zet je maar even op de bank.",
-      "powerupsTitle": "Power-ups in de ring",
-      "powerupsBody": "Gloeiende bollen vallen ook middenin het gevecht in de arena, gratis voor wie ze als eerste bereikt. Ze zijn opzettelijk over de top en duren maar even: Speed Demon voor een flits van verblindend tempo, Colossus om uit te dijen tot een logge reus, Moon Boots voor een stuiterende sprong met lage zwaartekracht, en Berserker voor een plotselinge golf van razernij.",
       "ladderHeading": "De ladder beklimmen",
       "ladderBody": "Ranglijstspel volgt je positie over de tijd. Bekijk het scorebord om te zien waar je staat en wie de top van het rijk bezit."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "De Dalbeker",
@@ -4350,6 +4349,8 @@ export const nl_NL: EnTranslations = {
       "sourcesBody": "De meeste van je vroege verbeteringen zijn questbeloningen, dus het loont om quests af te ronden in plaats van te grinden. Vijanden laten uitrusting vallen wanneer je ze verslaat, verkopers in de stad verkopen degelijke basisspullen, ambachtslieden maken van verzamelde materialen draagbare stukken, en op de spelersmarkt kun je van andere avonturiers kopen. Bovenaan de heuvel kopen twee merkvaluta uitrusting die nergens anders te vinden is: Delve-Merken bij de delvebewaarder, en Heroïsche Merken bij de heroïsche kwartiermeester.",
       "soulboundTitle": "Zielgebonden: van jou en jou alleen",
       "soulboundBody": "Een paar bijzondere beloningen zijn zielgebonden, verbonden aan je personage vanaf het moment dat je ze verdient. Een zielgebonden voorwerp kun je niet verhandelen, versturen, aan een verkoper verkopen of op de markt zetten; het is van jou en jou alleen. Vandaag beschermt dat prijzentokens zoals Heroïsche Merken, terwijl de uitrusting die je wint van jou is om vrijelijk te verhandelen, verkopen of delen.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sets en setbonussen",
       "setsBody": "Sommige pantsers komen in bij elkaar passende families, meerdere stukken die zo gesneden zijn dat ze er als één uitzien en als één vechten. Draag er genoeg van een familie tegelijk en de set ontwaakt, en geeft bonussen bovenop de eigen statistieken van elk stuk, en hoe meer stukken je draagt, hoe sterker hij wordt. Een paar van zulke families duiken op als gewilde drops terwijl je levelt; de grootste ervan komen uit de zwaarste groepscontent vlak bij de levelcap, dus jagen op een volledige set is een klassiek eindspeldoel.",
       "consumablesTitle": "Verbruiksartikelen",
@@ -4606,6 +4607,7 @@ export const nl_NL: EnTranslations = {
         "startBody": "Een Eenvoudige Hengel kost 20 koper bij Visser Brandt in Oostbeek (zoek de Oude Zout aan de oostrand van de stad, bij de weg naar het Spiegelmeer); ook Knutselaar Gizzel, Proviandmeester Hale in Fenbridge en Kwartiermeester Bree in Highwatch hebben hengels op voorraad. Gebruik de hengel terwijl je naar water kijkt dat diep genoeg is om vis te herbergen, tot ongeveer 24 meter voor je, en je dobber vliegt uit.\n\nJe kunt niet werpen tijdens een gevecht, tijdens het zwemmen of terwijl je dood bent: werpen vanaf de oever is de bedoelde houding. Het water wordt wel zwaarder naarmate het land dat doet: het moeras wil minstens de rang 2 Hengel met ijzeren molen en de toppen de rang 3 Zilverbeek-hengel, en een lijn die wordt geworpen zonder de hengel die dat water vraagt, verlaat je hand nooit. Daarboven staan nog twee hengels, de Stormmolen-hengel en de Getijsmeed-hengel: knutselaars maken ze bij de gereedschapsmakerij uit wat een lijn ophaalt, en de delve-balie van De Verdronken Litanie verkoopt ze voor Delve-Tekens achter haar voltooiingsdrempels, zij het nooit voor munt. Geen enkel water vraagt erom, dus ze kopen een kortere wachttijd en een breder inhaalvenster in plaats van toegang, wat op de hoogste trede een beet in een strakke drie seconden betekent.",
         "biteHeading": "Aanslaan en inhalen",
         "biteBody": "Na de worp komt de beet op een verborgen moment tussen {min} en {max} seconden; de vertraging wordt bepaald op het ogenblik dat de lijn landt, dus geen twee worpen voelen helemaal hetzelfde. Wanneer de dobber aanslaat heb je een venster van {reel} seconde om de hengel opnieuw in te drukken en binnen te halen: haal je binnen dat venster in, dan landt de vangst; aarzel je te lang, dan ontsnapt de vis en houd je niets over. Een hele sessie wordt begrensd op {cap} seconden, dus zelfs een stille worp is snel afgehandeld.\n\nBetere hengels scherpen beide kanten van het minispel aan: elke hengelrang boven de eerste knipt {rod} seconde van de langst mogelijke wachttijd, nooit onder de ondergrens van drie seconden die de tophengel al schampt, en voegt {reelRod} seconde toe aan het inhaalvenster, zodat de Hengel met ijzeren molen de ergste wachttijd terugbrengt tot 6,5 seconde met een venster van 3,25 seconde, en de Zilverbeek-hengel tot 5 met een venster voorbij 4, waarbij zijn zeldzaamheid het inhalen nog iets verder verbreedt dan de rang alleen betaalt. De snelste beten veranderen nooit, wat je ook vasthoudt, en een hengel hoeft alleen in je tassen te zitten om mee te tellen.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Vaardigheidswinst",
         "scheduleNote": "Visvaardigheidswinst volgt een vast schema zonder dobbelsteen: een vol punt per vangst onder vaardigheid 50, een half punt onder 100, een tiende onder 150, en een traag straaltje van 0,02 van 150 tot 200. Dat laatste stuk is met opzet een reis van duizenden vangsten: 200 is een statement, geen halte op weg naar iets anders.\n\nRommel stopt volledig met leren bij {cutoff}: vanaf dat punt zijn wier en laarzen gewoon wier en laarzen. Ook het water zelf begrenst de les: de rang 1-wateren van het Dal (en elke jonge kust voorbij het kernland) leren je niets meer voorbij 100, die van het moeras stoppen bij 150, en alleen die van Doorntop scholen een hengelaar de hele weg tot 200. Elke gelande vangst levert verder winst op volgens het schema, dus wanneer de teller vastloopt, zegt het schema je dat je dieper water moet zoeken.",
         "colProficiency": "Vaardigheid",
@@ -4654,8 +4656,16 @@ export const nl_NL: EnTranslations = {
         "provenanceBody": "Sommige voorwerpen dragen een naam. Zweef eroverheen en de tooltip zegt Verzameld door die-en-die op een grondstof, of Gemaakt door die-en-die op een afgewerkt stuk: hetzelfde merk, geformuleerd naar hoe het voorwerp is ontstaan. Een handtekening is onderdeel van het voorwerp zelf, reist ermee mee door ruilen, de bank, de post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervaagt nooit.\n\nVerzamelen signeert zijn beste werk vanzelf: elke oogst die zeldzaam of beter rolt komt gesigneerd binnen, en zeldzame vondsten signeren hun hele vijfvoudige buitenkans. De gelukkige rol van een lijkoogst signeert de opbrengst waar de familie geen exemplaar te geven heeft, en waar dat wel zo is, houdt hij de opbrengst gewoon en slaat er het gesigneerde ongeschonden exemplaar naast. Vervaardigen signeert langs dezelfde lijn: elke kopie van een zeldzame of betere uitkomst wordt gesigneerd geslagen, en een meesterwerk signeert altijd, welke kwaliteit het ook heeft, zodat de fijnste versie van elk stuk altijd zijn maker noemt. Het enige dat je een handtekening kan kosten is een volle tas: een gesigneerde eenheid heeft eigen ruimte nodig, of een bijpassende gesigneerde stapel om in te landen.\n\nEen stapel voorwerpen deelt één identiteit, dus twee kopieën smelten alleen samen wanneer elk merk exact overeenkomt: hetzelfde voorwerp, dezelfde ondertekenaar, dezelfde meesterwerkstatistieken, dezelfde betovering, dezelfde band. Een gesigneerd blok voegt zich nooit bij een gewone hoop, in geen van beide richtingen (samenvoegen zou iemands naam wissen), maar identieke inhoud smelt vrolijk samen, dus twintig erts gesigneerd door dezelfde verzamelaar zitten in één stapel en een buitenkans versnippert je tassen niet.\n\nHandtekeningen betalen makers terug: een gesigneerde kopie van een benodigd reagens aan de werkbank hebben, door wie dan ook gesigneerd, voegt 2 procentpunt meesterwerkkans toe, en een reagens in handen hebben dat je met eigen hand hebt gesigneerd verlaagt de vereiste hoeveelheid van dat reagens met één (nooit tot onder één). Je eigen gesigneerde werk van zeldzaam of beter blijft je zelfs leren, vandaag alleen nog via het flesje: drink een drank die je zelf hebt gesigneerd en er sijpelt een beetje vaardigheid terug naar het ambacht dat hem brouwde, zolang dat ambacht een van je actieve hoofdambachten is.",
         "collectorsHeading": "Verzamelaars, trofees en de prijs van een verhaal",
         "collectorsBody": "Handelaren zijn blind voor herkomst: een gesigneerd voorwerp verkoopt aan een NPC voor precies zijn gewone prijs. De premie op een handtekening bestaat alleen tussen spelers, en dat is precies wat het interessant maakt: een stapel windfall-erts gesigneerd door een beroemde verzamelaar, een Prime Cut van een gelukkige oogst, een meesterwerkling met de naam van een ambachtsman die inmiddels gestopt is, ze kosten wat iemands geheugen zegt dat ze waard zijn.\n\nHet Boek der Daden speelt op hetzelfde instinct in: Ongerept Ader, Oud Hardhout, Maanbloesem, Een Perfect Exemplaar en Glinstering van Hoop zijn nul-Roem verzamelaarsdaden die puur bestaan om te bewijzen dat een moment jou is overkomen. Bewaar het voorwerp dat de daad verdiende en je hebt het bewijs. Niets hiervan is macht; herkomst koopt geen statistieken en wint geen gevechten, het is het papieren spoor van het spel van goede dagen.",
-        "throttleHeading": "De actiebegrenzing",
-        "throttleBody": "Productie heeft een plafond: vervaardigen, onbetoveren, betoveren, salvagen en het opladen van gereedschapseffecten delen één budget van {actions} geslaagde acties per venster van {seconds} seconden. Een geweigerde poging kost niets en verbruikt geen budget. In normaal spel zul je het nooit merken; het bestaat zodat een afgetopte specialist met een volle bank de Markt niet kan overspoelen, wat zijn vaardigheid of voorraad ook is.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Spelers handelen met spelers",
         "doctrineBody": "De ambachteconomie is gebouwd op één idee: spelers beleveren spelers. Verzamelaars voeden ambachtslieden, ambachtslieden voeden questers en raiders, en brekers voeden betoveraars, met handelaren en stationneesters aan de randen om rommel en munt op te nemen in plaats van met je te concurreren. Als je geld wilt verdienen aan een ambacht, is jouw klant een persoon: leer wat andere spelers doorheen branden, prijs je waar ten opzichte van de Wereldmarkt, en behandel de NPC-systemen als een vloer onder je prijzen, niet als de markt zelf.\n\nGevaardigde uitrusting is afgestemd om net onder de raidgrens te zitten: zelfs een meesterwerk is altijd slechts één kwaliteitstrede boven zijn recept, nooit voorbij legendarisch, en zijn statistiekenbudget blijft onder het raidlootband. De smidse maakt je klaar voor de zwaarste inhoud; hij vervangt die niet. Dat houdt ambachtslieden, raiders en de markt in een stabiele driehoek: raid-drops blijven iets om naar te streven, en ambachtswerk blijft de beste uitrusting die geld daadwerkelijk kan kopen."
       },
@@ -5113,6 +5123,7 @@ export const nl_NL: EnTranslations = {
       "terrainCapReached": "Limiet voor terreinbewerkingen bereikt ({max}). Extra beeldhouwstempels zijn niet toegevoegd.",
       "placementCapReached": "Plaatsingslimiet bereikt ({max}). Extra assets zijn niet toegevoegd.",
       "blockerCapReached": "Limiet voor blokkademuren bereikt ({max}). De nieuwe muur is niet toegevoegd.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Automatisch opslaan uitgeschakeld: {reason} Sla handmatig op en zet het daarna weer aan."
     },
     "confirm": {
@@ -6096,7 +6107,6 @@ export const nl_NL: EnTranslations = {
   "yumi": {
     "bracket3": "Bescherm Yumi 3v3",
     "bracket5": "Bescherm Yumi 5v5",
-    "enterQueue": "Doe mee met Bescherm Yumi!",
     "queue": {
       "join": "Je sluit je aan bij de Bescherm Yumi-wachtrij. Bewaak je metgezel…",
       "leave": "Je verlaat de Bescherm Yumi-wachtrij.",
@@ -6134,9 +6144,6 @@ export const nl_NL: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Doe mee aan de Fiesta!",
-    "practice": "🎉 Oefenen tegen Bots",
-    "practiceNote": "Offline oefenen: brengt 3 AI-bots voort en zet je in de wachtrij voor een 2v2-Fiesta. Klik nogmaals om te stoppen.",
     "banner": {
       "wave": "GOLF {wave}/{total}, KIES EEN VERSTERKING!",
       "augmentGained": "Versterking verkregen: {name}!",
@@ -6618,7 +6625,6 @@ export const nl_NL: EnTranslations = {
       "mobileMore": "Meer",
       "mobileMoreAria": "Meer menu's tonen",
       "mobileSocial": "Sociaal",
-      "mobileArena": "Arena",
       "mobileMenu": "Menu",
       "mobileSettings": "Instellingen",
       "mobileUse": "Gebruiken",
@@ -6735,7 +6741,7 @@ export const nl_NL: EnTranslations = {
         "nameplates": "Naamplaatjes aan/uit",
         "meters": "Schademeters",
         "social": "Vrienden & Gilde",
-        "arena": "Arena (Ashen Coliseum)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Chat openen",
         "attack": "Aanvallen",
         "actionBarSlot": "Actiebalk {slot}"
@@ -6840,6 +6846,7 @@ export const nl_NL: EnTranslations = {
       "floatingParry": "Parering",
       "floatingResist": "Weerstaan",
       "floatingEvade": "Ontlopen",
+      "floatingBlock": "{amount} Block",
       "floatingHealFull": "Vol",
       "floatingHealAbsorbed": "Geabsorbeerd",
       "cannotMove": "Kan niet bewegen!",
@@ -6853,6 +6860,8 @@ export const nl_NL: EnTranslations = {
       "parried": "Je {ability} wordt gepareerd door {target}.",
       "resisted": "{target} weerstaat je {ability}.",
       "evaded": "{target} ontloopt je {ability}.",
+      "blockedDone": "Your {ability} is blocked by {target}, dealing {amount}.",
+      "blockedTaken": "You block {source}'s attack, taking {amount}.",
       "healSelf": "Je {ability} geneest je voor {amount}.",
       "healSelfCrit": "Je {ability} geneest je kritiek voor {amount}.",
       "healOther": "Je {ability} geneest {target} voor {amount}.",
@@ -7229,6 +7238,11 @@ export const nl_NL: EnTranslations = {
     "cast": {
       "fishing": "Vissen",
       "gathering": "Verzamelen",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Demonengenezing",
       "thunzharrStormcall": "Stormroep",
       "rift_frost_execution": "IJzig Graf",
@@ -7551,6 +7565,8 @@ export const nl_NL: EnTranslations = {
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",
       "collectNote": "Verdiensten en teruggekeerde waren die de Koopman voor je bewaart.",
       "saleProceeds": "Verkoopopbrengst",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Alles ophalen"
     },
     "logs": {
@@ -10319,25 +10335,25 @@ export const nl_NL: EnTranslations = {
         "name": "Teugels van de Drakenmuil-Raptor"
       },
       "moggers_hide_quiver": {
-        "name": "Moggers leren pijlkoker"
+        "name": "Moggers Leren Pijlkoker"
       },
       "cragmaw_huntquiver": {
-        "name": "Cragmaws jachtpijlkoker"
+        "name": "Cragmaws Jachtpijlkoker"
       },
       "gravewyrm_bone_quiver": {
-        "name": "Grafwurm-beenpijlkoker"
+        "name": "Grafwurm-Beenpijlkoker"
       },
       "direfang_quiver": {
-        "name": "Direfang-pijlkoker"
+        "name": "Direfang-Pijlkoker"
       },
       "sharp_claw": {
-        "name": "Scherpe klauw"
+        "name": "Sharp Claw"
       },
       "curved_tusk": {
-        "name": "Gebogen slagtand"
+        "name": "Curved Tusk"
       },
       "pristine_claw": {
-        "name": "Onbeschadigde klauw"
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Getoverd bronwater"

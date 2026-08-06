@@ -392,7 +392,7 @@ export const cs_CZ: EnTranslations = {
     "emoteEditor": {
       "title": "Emoty",
       "done": "Hotovo",
-      "close": "Close emotes"
+      "close": "Zavřít emoty"
     },
     "dailyRewards": {
       "title": "Denní odměny",
@@ -961,7 +961,7 @@ export const cs_CZ: EnTranslations = {
       "petTaunt": "Mazlíček: Provokace",
       "petDefensive": "Mazlíček: Obranný",
       "petAggressive": "Mazlíček: Agresivní",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Mazlíček: Zacílit",
       "mount": "Nasednout / Sesednout",
       "mouseHint": "Fungují i tlačítka myši: při přiřazování stiskni prostřední tlačítko (M3) nebo boční tlačítko (M4, M5). Levá a pravá tlačítka zůstávají vyhrazena pro kameru, kliknutí k pohybu a klikání na věci ve světě."
     },
@@ -1327,10 +1327,10 @@ export const cs_CZ: EnTranslations = {
       "itemScoreLine": "Skóre {score}",
       "showSecondaryActionBar": "Zobrazit sekundární akční lištu",
       "showThirdActionBar": "Zobrazit třetí panel akcí",
-      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "hideUnusedActionSlots": "Skrýt nepoužitá políčka akcí",
       "lockActionBars": "Uzamknout akční lišty",
       "showTargetOfTarget": "Zobrazit cíl cíle",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Zobrazit tvého mazlíčka",
       "showAttackButton": "Zobrazit tlačítko útoku",
       "showDailyRewardsChest": "Zobrazit truhlu denních odměn",
       "mobileCameraJoystick": "Joystick kamery",
@@ -2076,7 +2076,7 @@ export const cs_CZ: EnTranslations = {
       "familyDemon": "Démon",
       "hostile": "Nepřátelský",
       "friendly": "Přátelský",
-      "elite": "Elite",
+      "elite": "Elita",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2533,10 +2533,6 @@ export const cs_CZ: EnTranslations = {
         "moongateCommunion": {
           "title": "Společenství měsíční brány",
           "note": "Poutníci se scházejí u chrámové měsíční brány pod měsícem uprostřed měsíce."
-        },
-        "fiestaNight": {
-          "note": "Kruh 2v2 Fiesty dnes večer přitahuje nejhlasitější davy.",
-          "title": "Fiesta noc"
         }
       }
     },
@@ -2689,7 +2685,7 @@ export const cs_CZ: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Okouzlení zbraně - Moc",
       "enchant_weapon_intellect": "Okouzlení zbraně - Síla kouzel",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Okouzlení vedlejší ruky - Výdrž",
       "enchant_helmet_fortitude": "Okouzlení helmy - Pevnost",
       "enchant_neck_spirit": "Okouzlení náhrdelníku - Duch",
       "enchant_shoulder_agility": "Okouzlení nárameníků - Obratnost",
@@ -2919,9 +2915,7 @@ export const cs_CZ: EnTranslations = {
       "commissionToggle": "Zakázkový předmět",
       "commissionToggleHint": "Váže se na první postavu, která ho přijme v obchodu.",
       "commissionUnbound": "Zakázkový předmět: váže se na prvního příjemce",
-      "commissionBound": "Zakázkový předmět: vázán na příjemce",
-      "craft": "Vyrobit",
-      "throttled": "Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu."
+      "commissionBound": "Zakázkový předmět: vázán na příjemce"
     },
     "itemMenu": {
       "use": "Použít",
@@ -2986,10 +2980,7 @@ export const cs_CZ: EnTranslations = {
       "replaceConfirmKeepsBond": "Vazba zakázky",
       "replaceConfirmCost": "Cena: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Nahradit",
-      "disenchantThrottled": "Rozzačaruješ příliš rychle. Chvíli počkej a zkus to znovu.",
-      "enchantThrottled": "Okouzluješ příliš rychle. Chvíli počkej a zkus to znovu.",
-      "salvageThrottled": "Rozebíráš příliš rychle. Chvíli počkej a zkus to znovu."
+      "replaceConfirmAccept": "Nahradit"
     },
     "training": {
       "title": "Školení: {name}",
@@ -3184,7 +3175,7 @@ export const cs_CZ: EnTranslations = {
         "soul_rend": "Trhání duše (označení hráči se musí rozejít a být vyléčeni)",
         "deathless_rage": "Nesmrtelný hněv (přerušen u ochranných kamenů)",
         "wardstones": "Kanály ochranných kamenů (přechod fáze)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)"
       }
     },
     "deeds": {
@@ -3422,6 +3413,7 @@ export const cs_CZ: EnTranslations = {
       "talents": "Talenty",
       "arena": "Aréna a PvP",
       "valeCup": "Pohár údolí",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Kniha skutků",
       "glossary": "Glosář",
       "wishIKnew": "Co bych rád věděl dřív",
@@ -3591,16 +3583,21 @@ export const cs_CZ: EnTranslations = {
       "groupInterface": "Rozhraní",
       "groupCamera": "Kamera",
       "talents": "Talenty",
+      "professions": "Professions",
       "arena": "Aréna",
       "leaderboard": "Žebříček",
       "deeds": "Kniha skutků",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Výroba",
       "valeCup": "Pohár údolí",
+      "mount": "Mount / Dismount",
       "calendar": "Kalendář událostí",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Použít schopnosti na akční liště, číselná řada; druhá lišta je na numpadu",
       "targetFriendly": "Zacílit nejbližšího spojence",
       "cycleFriendly": "Přepínat spojenecký cíl",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Otevřít herní menu a nastavení",
       "bothMouse": "Obě tlačítka myši",
       "runForward": "Běh vpřed",
@@ -4127,7 +4124,7 @@ export const cs_CZ: EnTranslations = {
       "bastionBody": "Zaplavená pevnost ztracená v močálu, držená utopenými obránci a samotným stoupajícím přílivem.",
       "templeBody": "Měsíční svatyně potopená pod zářícím plesem vysoko ve štítech, dosažitelná branou studeného světla. Utopený kult tam dole stále zpívá ve shnilých rouchách a varování vyrytá na břehu říkají, že něco níže jen spí. Samostatná záhada mimo hlavní příběh, pro zvědavé a dobře připravené.",
       "sanctumBody": "Temné srdce Thornpeaku, kde dlouhá práce kultu dosáhne strašného vrcholu.",
-      "wildheartBody": "Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys čelil Zulgarovi.",
+      "wildheartBody": "Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys zjistil, kdo čeká na vrcholu.",
       "raidName": "Endgame raid",
       "raidBody": "Za zapečetěnými královskými dveřmi čeká desetičlenná zkouška: vícefázový boj a nesmrtelná síla, kterou musí celý raid společně vyřadit. Získej si vstup a přiveď devět přátel.",
       "heroicTitle": "Hrdinský režim",
@@ -4192,23 +4189,25 @@ export const cs_CZ: EnTranslations = {
       "duelsBody": "Vyzvi libovolného hráče, kterého potkáš, na přátelský duel. V sázce je jen hrdost, takže je to nejsnazší cesta, jak se naučit matchup nebo vyřešit přátelskou hádku.",
       "coliseumHeading": "Popelavé koloseum",
       "coliseumBody": "Koloseum je aréna světa, kde čelíš ostatním hráčům v hodnocených zápasech jeden na jednoho nebo dva na dva. Každý bracket má vlastní pořadí, takže výhra tě v jeho žebříku posune pro celý svět. Otevři okno Arény a přihlas se do bracketu, sám nebo se svým partnerem.",
-      "fiestaHeading": "Fiesta dva na dva",
-      "fiestaBody": "Fiesta je rychlá řež dva na dva hraná jako jeden souvislý souboj, kde jsou všichni bojovníci postaveni na stejnou startovní čáru. Jak boj běží, draftuješ augmenty, rychlá posílení, která za běhu přetvarují tvůj kit, takže žádné dva zápasy nehrají stejně.",
-      "augmentsNote": "Augmenty a power-upy trvají jen pro zápas. Jsou o hravých, okamžitých buildech, ne o trvalé síle, takže si nikdo nekoupí cestu k výhře.",
-      "wavesTitle": "Augmenty přicházejí ve vlnách",
-      "wavesBody": "Souboj Fiesty ti podává čerstvé volby, jak běží, a volby jsou s délkou boje odvážnější. Stavíš od jedné vlny k další, pokaždé vybíráš jednu z několika možností a necháváš si ji do konce souboje.",
-      "waveSilverTitle": "Stříbrná",
-      "waveSilverBody": "Úvodní vlna: čistá posílení jedné statistiky, která zostří základy třídy.",
-      "waveGoldTitle": "Zlatá",
-      "waveGoldBody": "Prostřední vlna: dvousečné kombinace, kde se build začíná tvarovat a zpívat.",
-      "wavePrismaticTitle": "Prizmatická",
-      "wavePrismaticBody": "Závěrečná vlna: build určující, obrazovku tavící špičky, které mají působit směšně tím nejlepším způsobem.",
-      "yumiHeading": "Ochraňte Yumi",
-      "yumiBody": "Ochraňte Yumi je týmový objektivní režim, který se hraje v bludišti: každá strana hlídá svého vlastního kočičího společníka a zároveň loví toho druhého. Čas od času se obě kočky přenesou do nových koutů bludiště, takže se boj přelévá mezi obranou, lovem a závodem o to, kdo je najde dřív. Zařaď se do fronty jako tři na tři nebo pět na pět; pád v boji tě odstaví jen na okamžik.",
-      "powerupsTitle": "Power-upy v ringu",
-      "powerupsBody": "Do arény během boje padají také zářící orby, volné pro toho, kdo k nim doběhne první. Záměrně přehánějí a trvají jen krátce: Rychlostní démon pro záblesk oslepujícího tempa, Kolos pro nabobtnání v těžkopádného obra, Měsíční boty pro skákavý skok s nízkou gravitací a Berserker pro náhlý příval zuřivosti.",
       "ladderHeading": "Stoupání po žebříku",
       "ladderBody": "Hodnocené hraní sleduje tvoje postavení v čase. Podívej se na žebříček, kde sedíš a kdo drží vrchol světa."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "Pohár údolí",
@@ -4350,6 +4349,8 @@ export const cs_CZ: EnTranslations = {
       "sourcesBody": "Většina raných vylepšení jsou odměny z úkolů, takže se vyplatí úkoly dokončovat, ne grindit. Nepřátelé pouštějí výbavu po porážce, prodejci ve městě prodávají solidní základy, řemeslníci mění nasbírané suroviny v nositelné kusy a hráčský trh ti dovolí nakupovat od ostatních dobrodruhů. Na vrcholu kopce kupují výbavu, kterou nikde jinde nenajdeš, dvě známkové měny: Známky výprav u správce výprav a Hrdinské značky u hrdinského zásobovače.",
       "soulboundTitle": "Vázané k duši: tvé a jen tvé",
       "soulboundBody": "Několik zvláštních odměn je vázaných k duši, spjatých s tvou postavou od chvíle, kdy si je vysloužíš. Předmět vázaný k duši nelze směnit, poslat poštou, prodat obchodníkovi ani vystavit na trhu; je tvůj a jen tvůj. Dnes tato ochrana střeží cenné tokeny jako Hrdinské známky, zatímco výbavu, kterou získáš, můžeš volně směňovat, prodávat i sdílet.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sady a bonusy sad",
       "setsBody": "Některá zbroj přichází ve sladěných rodinách, několika kusech střižených tak, aby vypadaly a bojovaly jako jeden celek. Oblékni dost kusů jedné rodiny najednou a sada se probudí, přidá bonusy nad vlastní statistiky každého kusu, a čím víc kusů nosíš, tím silnější je. Pár takových rodin se objevuje jako ceněné dropy během levelování; ty největší pocházejí z nejtěžšího skupinového obsahu blízko maximální úrovně, takže honba za celou sadou je klasický endgame cíl.",
       "consumablesTitle": "Spotřební předměty",
@@ -4606,6 +4607,7 @@ export const cs_CZ: EnTranslations = {
         "startBody": "Jednoduchý rybářský prut stojí 20 měďáků u Rybáře Brandta v Eastbrooku (hledej Starého mořského vlka na východním okraji města, u cesty k Zrcadlovému jezeru); pruty vedou i Kutil Gizzel, Zásobovač Hale ve Fenbridge a Intendantka Bree v Highwatchi. Použij prut čelem k vodě dost hluboké, aby v ní byly ryby, až asi 24 yardů před sebou, a splávek vyletí ven.\n\nNahazovat nemůžeš v boji, při plavání ani po smrti: zamýšlený postoj je nahazování z břehu. Voda ale tvrdne stejně jako země: močál chce alespoň Prut se železným navijákem 2. úrovně a výšiny Prut stříbrného potoka 3. úrovně a vlasec nahozený bez prutu, který si daná voda žádá, ti nikdy neopustí ruku. Nad nimi sedí dva pruty, Prut s bouřným navijákem a Prut kovaný přílivem: strojíři je vyrábějí v nástrojárně z toho, co vlasec vytáhne, a přepážka výpravy u Utopené litanie je prodává za Známky výprav za branami svých vyčištění, nikdy však za mince. Nechce je žádná voda, takže místo přístupu kupují kratší čekání a širší okno navíjení, což na nejvyšším příčli znamená záběr v rovných třech sekundách.",
         "biteHeading": "Záběr a vytažení",
         "biteBody": "Po nahození přijde záběr ve skryté chvíli mezi {min} a {max} sekundami; prodleva se rozhodne v okamžiku, kdy vlasec dopadne, takže žádná dvě nahození nejsou tak úplně stejná. Když splávek zabere, máš okno {reel} sekundy na to znovu zmáčknout prut a navinout: navineš uvnitř něj a úlovek přistane, zaváháš déle a ryba ti unikne, aniž bys měl co ukázat. Celé sezení se zastropuje na {cap} sekundách, takže i tiché nahození se vyřeší rychle.\n\nLepší pruty zostřují oba konce minihry: každá úroveň prutu nad první ukrojí {rod} sekundy z nejdelšího možného čekání, nikdy ne pod třísekundovou dolní hranici, kterou nejvyšší prut už škrábe, a přidá {reelRod} sekundy do okna navíjení, takže Prut se železným navijákem stáhne nejhorší čekání na 6,5 sekundy s oknem 3,25 sekundy a Prut stříbrného potoka na 5 s oknem přes 4, přičemž jeho vzácnost rozšíří navíjení o kus víc, než platí samotná úroveň. Nejrychlejší záběry se nemění, ať držíš cokoli, a prutu stačí k započtení ležet v brašnách.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Zisk dovednosti",
         "scheduleNote": "Zisk v Rybaření se řídí pevným plánem bez kostek: celý bod za úlovek pod 50 zdatnosti, půl bodu pod 100, desetina pod 150 a pomalá kapka 0,02 od 150 do 200. Ten poslední úsek je záměrně cesta na tisíce úlovků: 200 je prohlášení, ne zastávka na cestě k něčemu jinému.\n\nOdpad přestane učit úplně na {cutoff}: od té chvíle jsou plevele a boty jen plevele a boty. Strop lekci klade i sama voda: vody 1. úrovně v Údolí (a každé mladé pobřeží za hranicemi vnitrozemí) neučí nic nad 100, ty močálové končí na 150 a jen thornpeakské vychovají rybáře celou cestu k 200. Každý vytažený úlovek jinak přidává podle plánu, takže když se počitadlo zastaví, plán ti říká, ať vyhledáš hlubší vodu.",
         "colProficiency": "Zdatnost",
@@ -4654,8 +4656,16 @@ export const cs_CZ: EnTranslations = {
         "provenanceBody": "Některé předměty nesou jméno. Najeď na takový kurzorem a popisek u suroviny řekne Sesbíráno a čí jméno, u hotového kusu Vytvořil a čí jméno: tatáž značka, jen formulovaná podle toho, jak předmět vznikl. Podpis je součástí samotného předmětu, putuje s ním přes výměny, banku, poštu, Světový trh i zpětný odkup u prodejce, a nikdy nevybledne.\n\nSběr podepisuje svou nejlepší práci automaticky: každá sklizeň, která padne vzácná nebo lepší, přichází podepsaná a vzácné nálezy podepíšou celý svůj pětinásobný výnos. Šťastný hod při sklizni z těla podepíše výnos tam, kde rodina nemá co dát jako exemplář, a tam, kde má, nechá výnos prostý a vedle něj vyrazí podepsaný nepoškozený exemplář. Výroba podepisuje po téže linii: každá kopie vzácného nebo lepšího výrobku se razí podepsaná a mistrovské dílo podepisuje vždy, ať má jakoukoli kvalitu, takže nejjemnější verze každého kusu vždy jmenuje svého tvůrce. Jediné, co tě může připravit o podpis, je plná brašna: podepsaný kus potřebuje vlastní místo nebo odpovídající podepsaný stack, kam dopadne.\n\nStack předmětů sdílí jednu identitu, takže dvě kopie se sloučí jen tehdy, když se každá značka přesně shoduje: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné okouzlení, stejné pouto. Podepsaná kláda se nikdy nepřidá k prosté hromadě ani v jednom směru (sloučení by smazalo něčí jméno), ale shodné náklady se slučují s radostí, takže dvacet rud podepsaných týmž sběračem sedí v jednom stacku a nečekaný nález ti nerozseká brašny.\n\nPodpisy se řemeslníkům vracejí: držet u pracovního stolu jakoukoli podepsanou kopii potřebného reagentu, ať ji podepsal kdokoli, přidá 2 procentní body k šanci na mistrovské dílo, a držet reagent podepsaný vlastní rukou sníží požadované množství toho reagentu o jeden kus (nikdy ne pod jeden). Tvá vlastní podepsaná vzácná nebo lepší práce tě dokonce dál učí, dnes jedině skrze lahvičku: vypij lektvar, který jsi podepsal, a malá kapka dovednosti odteče zpět do řemesla, které ho uvařilo, pokud je to řemeslo jedním z tvých aktivních hlavních oborů.",
         "collectorsHeading": "Sběratelé, trofeje a cena příběhu",
         "collectorsBody": "Prodejci jsou slepí k původu: podepsaný předmět prodáš NPC přesně za jeho základní cenu. Příplatek za podpis existuje pouze mezi hráči, a právě to je zajímavé: hromada rudy z nečekaného nálezu podepsaná slavným sběračem, Prvotřídní výřez ze šťastné sklizně, mistrovská čepel nesoucí jméno kováře, který od té doby odešel do ústraní, všechno stojí tolik, co si paměť lidí řekne, že jsou hodné.\n\nKniha skutků vychází vstříc témuž instinktu: Nedotčená rudná žíla, Prastaré jádrové dřevo, Měsíční květ, Dokonalý exemplář a Záblesk naděje jsou sběratelské záznamy bez Věhlasu, které existují výhradně jako důkaz, že se ti něco přihodilo. Uchovej předmět, který získání skutku vynesl, a máš v rukou potvrzení. Nic z toho není výkon; původ nekupuje statistiky ani nevyhrává souboje, je to papírová stopa hry o povedených dnech.",
-        "throttleHeading": "Omezení akcí",
-        "throttleBody": "Výstup má svůj strop: výroba, rozzačarování, okouzlování, rozebírání a dobíjení účinků nástrojů sdílejí jeden rozpočet {actions} úspěšných akcí v každém okně o délce {seconds} sekund. Odmítnutý pokus nic nestojí a z rozpočtu neubere nic. Při běžném hraní ho nikdy nepocítíš; existuje proto, aby vymaxovaný specialista s plnou bankou nemohl zaplavit Trh, ať už má jakoukoli dovednost nebo zásoby.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Hráči obchodují s hráči",
         "doctrineBody": "Řemeslná ekonomika stojí na jediné myšlence: hráči zásobují hráče. Sběrači živí řemeslníky, řemeslníci živí hráče plnící úkoly a nájezdníky a rozebíratelé živí okouzlovatele, přičemž prodejci a správci stanic stojí na okraji, aby pohlcovali smetí a mince, nikoli aby s tebou soutěžili. Chceš-li vydělávat mince z profese, tvůj zákazník je osoba: zjisti, co ostatní hráči rychle spotřebují, porovnej ceny se Světovým trhem a chovej se k NPC systémům jako k podlaze pod svými cenami, ne jako k trhu samotnému.\n\nVybavení z řemesel je laděno tak, aby zůstávalo pod úrovní nájezdové hranice: i mistrovské dílo je vždy jen o jeden stupeň kvality nad svým receptem, nikdy ne přes legendární, a jeho rozpočet statistik zůstává pod pásmem nájezdové kořisti. Kovárna tě připraví na nejtěžší obsah; nenahrazuje ho. To udržuje řemeslníky, nájezdníky a trh ve stabilním trojúhelníku: nájezdové kusy zůstávají aspiračním cílem a řemeslné kusy nejlepším vybavením, které lze skutečně koupit za mince."
       },
@@ -5113,6 +5123,7 @@ export const cs_CZ: EnTranslations = {
       "terrainCapReached": "Dosažen limit úprav terénu ({max}). Nadbytečné otisky tvarování nebyly přidány.",
       "placementCapReached": "Dosažen limit umístění ({max}). Nadbytečné prvky nebyly přidány.",
       "blockerCapReached": "Dosažen limit blokujících zdí ({max}). Nová zeď nebyla přidána.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Automatické ukládání vypnuto: {reason} Ulož ručně a potom ho znovu zapni."
     },
     "confirm": {
@@ -6096,7 +6107,6 @@ export const cs_CZ: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3 na 3",
     "bracket5": "Yumi 5 na 5",
-    "enterQueue": "Zapoj se do Ochraňte Yumi!",
     "queue": {
       "join": "Vstupuješ do fronty Ochraňte Yumi. Hlídej svého společníka…",
       "leave": "Opouštíš frontu Ochraňte Yumi.",
@@ -6134,9 +6144,6 @@ export const cs_CZ: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Připojit se k Fiestě!",
-    "practice": "Trénink proti botům",
-    "practiceNote": "Offline trénink: vytvoří 3 AI boty a zařadí tě do 2v2 Fiesty. Klikni znovu pro zastavení.",
     "banner": {
       "wave": "VLNA {wave}/{total} - VYBER VYLEPŠENÍ!",
       "augmentGained": "Získáno vylepšení: {name}!",
@@ -6618,7 +6625,6 @@ export const cs_CZ: EnTranslations = {
       "mobileMore": "Více",
       "mobileMoreAria": "Zobrazit další menu",
       "mobileSocial": "Sociální",
-      "mobileArena": "Aréna",
       "mobileMenu": "Menu",
       "mobileSettings": "Nastavení",
       "mobileUse": "Použít",
@@ -6735,7 +6741,7 @@ export const cs_CZ: EnTranslations = {
         "nameplates": "Přepnout jmenovky",
         "meters": "Měřiče poškození",
         "social": "Přátelé a cech",
-        "arena": "Aréna (Popelavé koloseum)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Otevřít chat",
         "attack": "Útok",
         "actionBarSlot": "Akční lišta {slot}"
@@ -6840,6 +6846,7 @@ export const cs_CZ: EnTranslations = {
       "floatingParry": "Odraženo",
       "floatingResist": "Odoláno",
       "floatingEvade": "Uniknutí",
+      "floatingBlock": "{amount} Block",
       "floatingHealFull": "Plné",
       "floatingHealAbsorbed": "Pohlceno",
       "cannotMove": "Nemůžeš se hýbat!",
@@ -6853,6 +6860,8 @@ export const cs_CZ: EnTranslations = {
       "parried": "{target} odráží tvoji schopnost {ability}.",
       "resisted": "{target} odolává tvé schopnosti {ability}.",
       "evaded": "{target} uniká tvé schopnosti {ability}.",
+      "blockedDone": "Your {ability} is blocked by {target}, dealing {amount}.",
+      "blockedTaken": "You block {source}'s attack, taking {amount}.",
       "healSelf": "Tvoje {ability} tě léčí za {amount}.",
       "healSelfCrit": "Tvoje {ability} tě kriticky léčí za {amount}.",
       "healOther": "Tvoje {ability} léčí {target} za {amount}.",
@@ -7229,6 +7238,11 @@ export const cs_CZ: EnTranslations = {
     "cast": {
       "fishing": "Rybaření",
       "gathering": "Sběr",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Léčení démona",
       "thunzharrStormcall": "Volání bouře",
       "rift_frost_execution": "Ledovcový hrob",
@@ -7551,6 +7565,8 @@ export const cs_CZ: EnTranslations = {
       "collectEmpty": "Nic nečeká. Tady si vyzvedneš výnosy z prodeje a vypršelé nabídky.",
       "collectNote": "Výdělky a vrácené zboží, které pro tebe drží Obchodník.",
       "saleProceeds": "Výnosy z prodeje",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Vyzvednout vše"
     },
     "logs": {
@@ -10331,13 +10347,13 @@ export const cs_CZ: EnTranslations = {
         "name": "Toulec děsivého tesáku"
       },
       "sharp_claw": {
-        "name": "Ostrý dráp"
+        "name": "Sharp Claw"
       },
       "curved_tusk": {
-        "name": "Zakřivený kel"
+        "name": "Curved Tusk"
       },
       "pristine_claw": {
-        "name": "Neporušený dráp"
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Vyčarovaná pramenitá voda"

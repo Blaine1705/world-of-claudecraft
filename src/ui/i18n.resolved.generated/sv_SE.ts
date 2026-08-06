@@ -392,7 +392,7 @@ export const sv_SE: EnTranslations = {
     "emoteEditor": {
       "title": "Gester",
       "done": "Klar",
-      "close": "Close emotes"
+      "close": "Stäng gester"
     },
     "dailyRewards": {
       "title": "Dagliga belöningar",
@@ -961,7 +961,7 @@ export const sv_SE: EnTranslations = {
       "petTaunt": "Djur: Provocera",
       "petDefensive": "Djur: Defensivt",
       "petAggressive": "Djur: Aggressivt",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Djur: Måltavla",
       "mount": "Sitt upp / Stig av",
       "mouseHint": "Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen."
     },
@@ -1327,10 +1327,10 @@ export const sv_SE: EnTranslations = {
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
       "showThirdActionBar": "Visa tredje åtgärdsfältet",
-      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "hideUnusedActionSlots": "Dölj oanvända åtgärdsrutor",
       "lockActionBars": "Lås åtgärdsfälten",
       "showTargetOfTarget": "Visa målets mål",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Visa ditt djur",
       "showAttackButton": "Visa attackknapp",
       "showDailyRewardsChest": "Visa kistan för dagliga belöningar",
       "mobileCameraJoystick": "Kamera joystick",
@@ -2076,7 +2076,7 @@ export const sv_SE: EnTranslations = {
       "familyDemon": "Demon",
       "hostile": "Fientlig",
       "friendly": "Vänlig",
-      "elite": "Elite",
+      "elite": "Elit",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2533,10 +2533,6 @@ export const sv_SE: EnTranslations = {
         "moongateCommunion": {
           "title": "Månportskommunion",
           "note": "Pilgrimer samlas vid templets månport under midmånadens måne."
-        },
-        "fiestaNight": {
-          "note": "2v2-fiestans ring drar sin högljuddaste publik i kväll.",
-          "title": "Fiestanatt"
         }
       }
     },
@@ -2689,7 +2685,7 @@ export const sv_SE: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Förtrollning Vapen - Kraft",
       "enchant_weapon_intellect": "Förtrollning Vapen - Besvärjelsestyrka",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Förtrollning Bi-hand - Uthållighet",
       "enchant_helmet_fortitude": "Förtrollning Hjälm - Uthållighet",
       "enchant_neck_spirit": "Förtrollning Halsband - Ande",
       "enchant_shoulder_agility": "Förtrollning Axelplåtar - Rörlighet",
@@ -2919,9 +2915,7 @@ export const sv_SE: EnTranslations = {
       "commissionToggle": "Beställningsstycke",
       "commissionToggleHint": "Binds till den första karaktären som tar emot det i en handel.",
       "commissionUnbound": "Beställningsstycke: binds till den första mottagaren",
-      "commissionBound": "Beställningsstycke: bundet till sin mottagare",
-      "craft": "Hantverk",
-      "throttled": "Du tillverkar för snabbt. Vänta ett ögonblick och försök igen."
+      "commissionBound": "Beställningsstycke: bundet till sin mottagare"
     },
     "itemMenu": {
       "use": "Använd",
@@ -2986,10 +2980,7 @@ export const sv_SE: EnTranslations = {
       "replaceConfirmKeepsBond": "Uppdragsbindning",
       "replaceConfirmCost": "Kostnad: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Ersätt",
-      "disenchantThrottled": "Du avförtrollar för snabbt. Vänta en stund och försök igen.",
-      "enchantThrottled": "Du förtrollar för snabbt. Vänta en stund och försök igen.",
-      "salvageThrottled": "Du bärgar för snabbt. Vänta en stund och försök igen."
+      "replaceConfirmAccept": "Ersätt"
     },
     "training": {
       "title": "Utbildning: {name}",
@@ -3184,7 +3175,7 @@ export const sv_SE: EnTranslations = {
         "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
         "wardstones": "Väktarstenarnas kanaler (fasövergång)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)"
       }
     },
     "deeds": {
@@ -3422,6 +3413,7 @@ export const sv_SE: EnTranslations = {
       "talents": "Talanger",
       "arena": "Arena och PvP",
       "valeCup": "Dalcupen",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Bedrifternas bok",
       "glossary": "Ordlista",
       "wishIKnew": "Saker jag önskar att jag visste",
@@ -3591,16 +3583,21 @@ export const sv_SE: EnTranslations = {
       "groupInterface": "Gränssnitt",
       "groupCamera": "Kamera",
       "talents": "Talanger",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Topplista",
       "deeds": "Bedrifternas bok",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Hantverk",
       "valeCup": "Dalcupen",
+      "mount": "Mount / Dismount",
       "calendar": "Händelsekalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Använd förmågor i handlingsfältet (sifferraden; ett andra fält ligger på det numeriska tangentbordet)",
       "targetFriendly": "Måla in närmaste vänliga",
       "cycleFriendly": "Växla mellan vänliga mål",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Öppna spelmeny och alternativ",
       "bothMouse": "Båda musknapparna",
       "runForward": "Spring framåt",
@@ -4127,7 +4124,7 @@ export const sv_SE: EnTranslations = {
       "bastionBody": "En översvämmad fästning förlorad till träsket, hållen av dränkta försvarare och den stigande tidvattnet självt.",
       "templeBody": "En månbelyst helgedom sjunken under en glödande tjärn högt uppe bland topparna, nådd genom en port av kallt ljus. En dränkt kult sjunger fortfarande där nere i sina ruttna skrudar, och varningarna ristade på stranden säger att något därunder bara sover. Ett fristående mysterium, åtskilt från huvudberättelsen, för de nyfikna och de välförberedda.",
       "sanctumBody": "Törntoppens mörka hjärta, där kultens långa arbete når sin fasansfulla höjdpunkt.",
-      "wildheartBody": "En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att möta Zulgar.",
+      "wildheartBody": "En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att se vem som väntar på toppen.",
       "raidName": "Slutspelsraiden",
       "raidBody": "Bortom en förseglad kunglig dörr väntar en prövning för tio spelare: en strid i flera faser och en odödlig kraft som hela raiden måste stänga ner tillsammans. Förtjäna din väg in, ta sedan med dig nio vänner.",
       "heroicTitle": "Heroiskt läge",
@@ -4192,23 +4189,25 @@ export const sv_SE: EnTranslations = {
       "duelsBody": "Utmana vilken spelare du än möter till en vänskaplig duell. Inget står på spel utom stoltheten, så det är det enklaste sättet att lära sig en matchning eller göra upp en vänskaplig tvist.",
       "coliseumHeading": "Det askgråa colosseumet",
       "coliseumBody": "Coliseum är rikets arena, där du möter andra spelare i rankade matcher, en mot en eller två mot två. Varje division håller sin egen ställning, så en seger lyfter dig uppför den stegen för hela riket att se. Öppna Arena-fönstret för att anmäla dig till en division, ensam eller med din partner.",
-      "fiestaHeading": "Två-mot-två-fiesta",
-      "fiestaBody": "Fiesta är ett snabbt slagsmål två mot två som utkämpas som en enda sammanhängande drabbning, med varje kämpe ställd på jämn fot. Medan striden pågår draftar du förstärkningar, snabba boostar som omformar din uppsättning i farten, så att inga två matcher spelas riktigt likadant.",
-      "augmentsNote": "Förstärkningar och kraftuppladdningar håller bara under matchen. De handlar om lekfulla, improviserade byggen, inte varaktig makt, så ingen köper sig till en seger.",
-      "wavesTitle": "Förstärkningar kommer i vågor",
-      "wavesBody": "En Fiesta-drabbning ger dig färska val efter hand, och valen blir djärvare ju längre striden pågår. Du bygger från en våg till nästa, väljer ett av några få alternativ varje gång och behåller det resten av drabbningen.",
-      "waveSilverTitle": "Silver",
-      "waveSilverBody": "Den inledande vågen: rena boostar för en enda egenskap som skärper grunderna i din klass.",
-      "waveGoldTitle": "Guld",
-      "waveGoldBody": "Den mellersta vågen: tveeggade kombinationer där ditt bygge börjar ta form och sjunga.",
-      "wavePrismaticTitle": "Prismatisk",
-      "wavePrismaticBody": "Den sista vågen: byggesdefinierande, skärmsmältande toppar avsedda att kännas löjliga på bästa sätt.",
-      "yumiHeading": "Skydda Yumi",
-      "yumiBody": "Skydda Yumi är ett lagbaserat målläge som spelas i en labyrint: varje sida vaktar sin egen kattföljeslagare samtidigt som den jagar den andra. Med jämna mellanrum blinkar båda katterna till nya hörn av labyrinten, så striden pendlar mellan att försvara, jaga och kappas om att hitta dem igen. Köa som tre mot tre eller fem mot fem; att falla i strid sätter dig bara på bänken en kort stund.",
-      "powerupsTitle": "Kraftuppladdningar i ringen",
-      "powerupsBody": "Glödande klot faller också ner i arenan mitt i striden, fria för den som når dem först. De är medvetet överdrivna och håller bara en kort stund: Fartdemon för en blinkning av bländande fart, Koloss för att svälla upp till en lufsande jätte, Månstövlar för ett studsande hopp med låg gravitation, och Bärsärk för en plötslig våg av ursinne.",
       "ladderHeading": "Klättra på rankingstegen",
       "ladderBody": "Rankat spel följer din ställning över tid. Kolla topplistan för att se var du befinner dig och vem som håller rikets topp."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "Dalcupen",
@@ -4350,6 +4349,8 @@ export const sv_SE: EnTranslations = {
       "sourcesBody": "Det mesta av dina tidiga uppgraderingar är uppdragsbelöningar, så det lönar sig att slutföra uppdrag snarare än att grinda. Fiender släpper utrustning när du besegrar dem, handlare i staden säljer solida basvaror, hantverkare förvandlar insamlade material till bärbara pjäser, och spelarmarknaden låter dig köpa från andra äventyrare. Högst upp på kullen köper två märkesvalutor utrustning som inte finns någon annanstans: Delve-märken hos delvevaktaren, och heroiska märken hos den heroiska kvartersmästaren.",
       "soulboundTitle": "Själsbunden: din och endast din",
       "soulboundBody": "Ett fåtal särskilda belöningar är själsbundna, bundna till din karaktär från det ögonblick du förtjänar dem. Ett själsbundet föremål kan inte bytas, skickas med post, säljas till en handlare eller läggas upp på marknaden; det är ditt och endast ditt. I dag skyddar det värnet prispolletter som Heroiska märken, medan utrustningen du vinner är din att byta, sälja eller dela fritt.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Set och setbonusar",
       "setsBody": "En del rustning kommer i matchande familjer, flera pjäser skurna för att se ut och slåss som en. Bär nog av en familj samtidigt så vaknar settet, vilket ger bonusar utöver varje pjäs egna egenskaper, och ju fler pjäser du bär desto starkare blir det. Några sådana familjer dyker upp som eftertraktade byten medan du klättrar i nivå; de främsta av dem kommer från det tuffaste gruppinnehållet nära nivåtaket, så att jaga ett komplett set är ett klassiskt slutspelsmål.",
       "consumablesTitle": "Förbrukningsvaror",
@@ -4606,6 +4607,7 @@ export const sv_SE: EnTranslations = {
         "startBody": "Ett Enkelt metspö kostar 20 koppar hos Fiskare Brandt i Östbäck (leta efter den gamla sjöbjörnen vid stadens östra kant, vid vägen mot Spegelsjön); Fixare Gizzel, Proviantmästare Hale i Fenbron och Kvartersmästare Bree i Högvakt har också spön i lager. Använd spöet vänd mot vatten som är djupt nog att hysa fisk, upp till ungefär 24 yard framför dig, så seglar flötet ut.\n\nDu kan inte kasta i strid, medan du simmar eller när du är död: att kasta från stranden är den avsedda hållningen. Vattnet blir dock svårare i takt med landet: träsket vill ha minst nivå 2-spöet Järnrullespöet och höjderna nivå 3-spöet Silverbäcksspöet, och en lina som kastas utan det spö vattnet kräver lämnar aldrig din hand. Två spön sitter ovanför dessa, Stormrullespöet och Tidvattensspöet: ingenjörer tillverkar dem vid verktygsverkstaden av det en lina drar upp, och delvedisken vid Den dränkta litanian säljer dem för Delve-märken bakom sina rensningsgrindar, men aldrig för mynt. Inget vatten kräver dem, så de köper kortare väntan och ett bredare indragningsfönster i stället för tillträde, vilket på det översta steget betyder ett napp på jämna tre sekunder.",
         "biteHeading": "Napp och indragning",
         "biteBody": "Efter kastet kommer ett napp i ett dolt ögonblick mellan {min} och {max} sekunder; fördröjningen avgörs när linan landar, så inga två kast känns riktigt lika. När flötet dyker har du ett fönster på {reel} sekunder att trycka på spöet igen och dra in: dra in inom det så landar fångsten, tveka förbi det och fisken kommer undan utan att lämna något efter sig. En hel session har ett tak på {cap} sekunder, så även ett stillsamt kast avgörs snabbt.\n\nBättre spön skärper båda ändarna av minispelet: varje spönivå över den första skalar bort {rod} sekunder från den längsta möjliga väntan, aldrig under golvet på tre sekunder som toppspöet redan tangerar, och lägger till {reelRod} sekunder på indragningsfönstret, så Järnrullespöet drar ner den värsta väntan till 6,5 sekunder med ett fönster på 3,25 sekunder, och Silverbäcksspöet till 5 med ett fönster förbi 4, där dess sällsynthet vidgar indragningen lite utöver vad nivån ensam betalar. De snabbaste nappen ändras aldrig oavsett vad du håller i, och ett spö behöver bara ligga i väskorna för att räknas.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Skicklighetsvinst",
         "scheduleNote": "Fiskevinsten följer ett fast schema utan tärningar: en hel poäng per fångst under 50 skicklighet, en halv poäng under 100, en tiondel under 150 och ett långsamt sipprande på 0,02 från 150 till 200. Den sista sträckan är med flit en resa på tusentals fångster: 200 är ett ställningstagande, inte en anhalt på vägen mot något annat.\n\nSkräp slutar lära ut helt vid {cutoff}: därifrån och framåt är sjögräs och stövlar bara sjögräs och stövlar. Vattnet självt sätter också tak för lärdomen: Dalens nivå 1-vatten (och varje ung strand bortom kärnlandet) lär inte ut något förbi 100, träskets slutar vid 150, och bara Törntopps vatten skolar en fiskare hela vägen till 200. Varje landad fångst ger annars vinst i schemats takt, så när räknaren stannar säger schemat åt dig att söka djupare vatten.",
         "colProficiency": "Skicklighet",
@@ -4654,8 +4656,16 @@ export const sv_SE: EnTranslations = {
         "provenanceBody": "Vissa föremål bär ett namn. För muspekaren över ett så säger verktygstipset Samlat av den och den på ett råmaterial, eller Skapad av den och den på en färdig pjäs: samma märke, formulerat efter hur föremålet blev till. En signatur är en del av föremålet självt, följer med det genom handel, banken, posten, Världsmarknaden och till och med ett återköp hos en handlare, och bleknar aldrig.\n\nInsamling signerar sitt bästa arbete automatiskt: varje skörd som rullar sällsynt eller bättre anländer signerad, och sällsynta fynd signerar hela sitt femfaldiga vindfall. En lycklig rullning vid en kroppsskörd signerar sitt utbyte där familjen inte har något exemplar att ge, och där den har det hålls utbytet enkelt och det signerade orörda exemplaret präglas bredvid. Hantverk signerar längs samma linje: varje kopia av ett resultat på sällsynt eller bättre präglas signerad, och ett mästerverk signerar alltid, oavsett kvalitet, så den finaste versionen av vilken pjäs som helst namnger alltid sin tillverkare. Det enda som kan kosta dig en signatur är en full väska: en signerad enhet behöver en egen plats att landa på, eller en signerad stapel som matchar.\n\nEn stapel föremål delar en enda identitet, så två kopior slås samman bara när varje märke matchar exakt: samma föremål, samma signerare, samma mästerverksegenskaper, samma förtrollning, samma band. En signerad stock går aldrig in i en enkel hög åt något håll (en sammanslagning skulle sudda ut någons namn), men identiska laster slås samman med glädje, så tjugo malm signerade av samma samlare sitter i en enda stapel och ett vindfall trasar inte sönder dina väskor.\n\nSignaturer betalar tillbaka till hantverkare: att hålla vilken signerad kopia som helst av ett reagens som krävs vid bänken, oavsett vem som signerat den, lägger till 2 procentenheters mästerverkschans, och att hålla ett reagens signerat av din egen hand skär ner det reagensets krävda antal med ett (aldrig under ett). Ditt eget signerade arbete på sällsynt eller bättre fortsätter till och med lära dig, i dag enbart genom flaskan: drick en dryck du signerat och ett litet sipprande av färdighet flyter tillbaka till hantverket som bryggde den, så länge det hantverket är ett av dina aktiva huvudyrken.",
         "collectorsHeading": "Samlare, trofeer, och priset pa en historia",
         "collectorsBody": "Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.",
-        "throttleHeading": "Atgärdsbegränsningen",
-        "throttleBody": "Produktionen har ett tak: hantverkande, avförtrollning, förtrollning, bärgning och uppladdningar av verktygseffekter delar på en enda budget om {actions} lyckade åtgärder i varje {seconds} sekunder långt fönster. Ett nekat försök kostar ingenting och drar ingen budget. Du kommer aldrig att känna av den i normalt spel; den finns för att en maxad specialist med full bank inte ska kunna översvämma Marknaden, oavsett skicklighet eller lager.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Spelare handlar med spelare",
         "doctrineBody": "Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa."
       },
@@ -5113,6 +5123,7 @@ export const sv_SE: EnTranslations = {
       "terrainCapReached": "Gränsen för terrängändringar nådd ({max}). Extra skulpteringsstämplar lades inte till.",
       "placementCapReached": "Placeringsgränsen nådd ({max}). Extra resurser lades inte till.",
       "blockerCapReached": "Gränsen för spärrväggar nådd ({max}). Den nya väggen lades inte till.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Autospar avstängt: {reason} Spara manuellt och slå sedan på det igen."
     },
     "confirm": {
@@ -6096,7 +6107,6 @@ export const sv_SE: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3 mot 3",
     "bracket5": "Yumi 5 mot 5",
-    "enterQueue": "Gå med i Skydda Yumi!",
     "queue": {
       "join": "Du går med i kön till Skydda Yumi. Vakta din följeslagare…",
       "leave": "Du lämnar kön till Skydda Yumi.",
@@ -6134,9 +6144,6 @@ export const sv_SE: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Gå med i Fiestan!",
-    "practice": "🎉 Öva mot bottar",
-    "practiceNote": "Offlineträning: skapar 3 AI-bottar och ställer dig i kö för en 2v2-Fiesta. Klicka igen för att sluta.",
     "banner": {
       "wave": "VÅG {wave}/{total} - VÄLJ EN FÖRSTÄRKNING!",
       "augmentGained": "Förstärkning erhållen: {name}!",
@@ -6618,7 +6625,6 @@ export const sv_SE: EnTranslations = {
       "mobileMore": "Mer",
       "mobileMoreAria": "Visa fler menyer",
       "mobileSocial": "Socialt",
-      "mobileArena": "Arena",
       "mobileMenu": "Meny",
       "mobileSettings": "Inställningar",
       "mobileUse": "Använd",
@@ -6735,7 +6741,7 @@ export const sv_SE: EnTranslations = {
         "nameplates": "Växla namnskyltar",
         "meters": "Skademätare",
         "social": "Vänner och gille",
-        "arena": "Arena (Askgrå kolosseum)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Öppna chatt",
         "attack": "Anfall",
         "actionBarSlot": "Handlingsfält {slot}"
@@ -6840,6 +6846,7 @@ export const sv_SE: EnTranslations = {
       "floatingParry": "Parerade",
       "floatingResist": "Motstod",
       "floatingEvade": "Undkom",
+      "floatingBlock": "{amount} Block",
       "floatingHealFull": "Fullt",
       "floatingHealAbsorbed": "Absorberad",
       "cannotMove": "Kan inte röra dig!",
@@ -6853,6 +6860,8 @@ export const sv_SE: EnTranslations = {
       "parried": "Din {ability} pareras av {target}.",
       "resisted": "{target} motstår din {ability}.",
       "evaded": "{target} undkommer din {ability}.",
+      "blockedDone": "Your {ability} is blocked by {target}, dealing {amount}.",
+      "blockedTaken": "You block {source}'s attack, taking {amount}.",
       "healSelf": "Din {ability} läker dig för {amount}.",
       "healSelfCrit": "Din {ability} läker dig kritiskt för {amount}.",
       "healOther": "Din {ability} läker {target} för {amount}.",
@@ -7229,6 +7238,11 @@ export const sv_SE: EnTranslations = {
     "cast": {
       "fishing": "Fiske",
       "gathering": "Insamling",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Demonläkning",
       "thunzharrStormcall": "Stormrop",
       "rift_frost_execution": "Glaciärgraven",
@@ -7551,6 +7565,8 @@ export const sv_SE: EnTranslations = {
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",
       "collectNote": "Intäkter och returnerade varor som Handlaren håller åt dig.",
       "saleProceeds": "Försäljningsintäkter",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Hämta allt"
     },
     "logs": {
@@ -10331,13 +10347,13 @@ export const sv_SE: EnTranslations = {
         "name": "Direfang-koger"
       },
       "sharp_claw": {
-        "name": "Vass klo"
+        "name": "Sharp Claw"
       },
       "curved_tusk": {
-        "name": "Böjd bete"
+        "name": "Curved Tusk"
       },
       "pristine_claw": {
-        "name": "Orörd klo"
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Frambesvärjt källvatten"

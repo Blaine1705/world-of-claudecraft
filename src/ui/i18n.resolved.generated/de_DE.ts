@@ -392,7 +392,7 @@ export const de_DE: EnTranslations = {
     "emoteEditor": {
       "title": "Emotes",
       "done": "Fertig",
-      "close": "Close emotes"
+      "close": "Emotes schließen"
     },
     "dailyRewards": {
       "title": "Tägliche Belohnungen",
@@ -961,7 +961,7 @@ export const de_DE: EnTranslations = {
       "petTaunt": "Begleiter: Verspotten",
       "petDefensive": "Begleiter: Defensiv",
       "petAggressive": "Begleiter: Aggressiv",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Begleiter: Anvisieren",
       "mount": "Aufsitzen / Absitzen",
       "mouseHint": "Maustasten funktionieren ebenfalls: Drücke beim Belegen die mittlere Maustaste (M3) oder eine Daumentaste (M4, M5). Links und rechts bleiben der Kamera, dem Klicken zum Bewegen und dem Anklicken von Objekten in der Welt vorbehalten."
     },
@@ -1327,10 +1327,10 @@ export const de_DE: EnTranslations = {
       "itemScoreLine": "Wertung {score}",
       "showSecondaryActionBar": "Zweite Aktionsleiste anzeigen",
       "showThirdActionBar": "Dritte Aktionsleiste anzeigen",
-      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "hideUnusedActionSlots": "Ungenutzte Aktionsfelder ausblenden",
       "lockActionBars": "Aktionsleisten sperren",
       "showTargetOfTarget": "Ziel des Ziels anzeigen",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Euren Begleiter anzeigen",
       "showAttackButton": "Angriffs-Schaltflache anzeigen",
       "showDailyRewardsChest": "Truhe der täglichen Belohnungen anzeigen",
       "mobileCameraJoystick": "Kamera-Joystick",
@@ -2533,10 +2533,6 @@ export const de_DE: EnTranslations = {
         "moongateCommunion": {
           "title": "Mondtor-Kommunion",
           "note": "Pilger versammeln sich unter dem Mond zur Monatsmitte am Mondtor des Tempels."
-        },
-        "fiestaNight": {
-          "note": "Der 2v2-Fiesta-Ring zieht heute Nacht sein lautestes Publikum an.",
-          "title": "Fiesta-Nacht"
         }
       }
     },
@@ -2689,7 +2685,7 @@ export const de_DE: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Waffe verzaubern - Macht",
       "enchant_weapon_intellect": "Waffe verzaubern - Zaubermacht",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Nebenhand verzaubern - Ausdauer",
       "enchant_helmet_fortitude": "Helm verzaubern - Ausdauerkraft",
       "enchant_neck_spirit": "Amulett verzaubern - Geist",
       "enchant_shoulder_agility": "Schultern verzaubern - Beweglichkeit",
@@ -2919,9 +2915,7 @@ export const de_DE: EnTranslations = {
       "commissionToggle": "Auftragsarbeit",
       "commissionToggleHint": "Bindet sich an den ersten Charakter, der es im Handel erhält.",
       "commissionUnbound": "Auftragsarbeit: bindet sich an den ersten Empfänger",
-      "commissionBound": "Auftragsarbeit: gebunden an den Empfänger",
-      "craft": "Handwerk",
-      "throttled": "Ihr stellt zu schnell her. Wartet einen Moment und versucht es erneut."
+      "commissionBound": "Auftragsarbeit: gebunden an den Empfänger"
     },
     "itemMenu": {
       "use": "Verwenden",
@@ -2986,10 +2980,7 @@ export const de_DE: EnTranslations = {
       "replaceConfirmKeepsBond": "Auftragsbindung",
       "replaceConfirmCost": "Kosten: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Ersetzen",
-      "disenchantThrottled": "Du entzauberst zu schnell. Warte einen Moment und versuche es erneut.",
-      "enchantThrottled": "Du verzauberst zu schnell. Warte einen Moment und versuche es erneut.",
-      "salvageThrottled": "Du zerlegst zu schnell. Warte einen Moment und versuche es erneut."
+      "replaceConfirmAccept": "Ersetzen"
     },
     "training": {
       "title": "Ausbildung: {name}",
@@ -3184,7 +3175,7 @@ export const de_DE: EnTranslations = {
         "soul_rend": "Seelenzerfetzung (markierte Spieler mussen sich verteilen und geheilt werden)",
         "deathless_rage": "Unsterbliche Raserei (an den Schutzsteinen unterbrochen)",
         "wardstones": "Schutzstein-Kanale (Phasenubergang)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Schreckensfluch (nur heroisch, stapelnder Schwachungseffekt fur Tankwechsel)"
       }
     },
     "deeds": {
@@ -3422,6 +3413,7 @@ export const de_DE: EnTranslations = {
       "talents": "Talente",
       "arena": "Arena und PvP",
       "valeCup": "Talpokal",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Buch der Taten",
       "glossary": "Glossar",
       "wishIKnew": "Was ich gern früher gewusst hätte",
@@ -3591,16 +3583,21 @@ export const de_DE: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Kamera",
       "talents": "Talente",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Bestenliste",
       "deeds": "Buch der Taten",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Handwerk",
       "valeCup": "Talpokal",
+      "mount": "Mount / Dismount",
       "calendar": "Ereigniskalender",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Aktionsleisten-Fähigkeiten einsetzen (die Zahlenreihe; eine zweite Leiste liegt auf dem Nummernblock)",
       "targetFriendly": "Nächstes freundliches Ziel anvisieren",
       "cycleFriendly": "Freundliches Ziel durchschalten",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Spielmenü und Optionen öffnen",
       "bothMouse": "Beide Maustasten",
       "runForward": "Vorwärtslaufen",
@@ -4127,7 +4124,7 @@ export const de_DE: EnTranslations = {
       "bastionBody": "Eine überflutete Festung, ans Moor verloren, gehalten von ertrunkenen Verteidigern und der steigenden Flut selbst.",
       "templeBody": "Ein versunkener Schrein abseits der Moorstraße, ein Nebenweg für die Neugierigen und gut Vorbereiteten.",
       "sanctumBody": "Das dunkle Herz von Thornpeak, wo das lange Wirken des Kults seinen schrecklichen Höhepunkt erreicht.",
-      "wildheartBody": "Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um Zulgar entgegenzutreten.",
+      "wildheartBody": "Eine regendurchtränkte Dschungelcaldera, in der zwei erhöhte Jagdpfade einen jadegrünen Cenote umkreisen. Durchquere Tierhöhlen und Ahnenruinen, dann erklimme die Ritualpyramide, um zu sehen, wer oben wartet.",
       "raidName": "Der Endgame-Schlachtzug",
       "raidBody": "Hinter einer versiegelten königlichen Tür wartet eine Prüfung für zehn Spieler: ein Kampf über mehrere Phasen und eine todlose Macht, die der ganze Schlachtzug gemeinsam ausschalten muss. Verdiene dir den Zutritt und bring dann neun Freunde mit.",
       "heroicTitle": "Heroischer Modus",
@@ -4192,23 +4189,25 @@ export const de_DE: EnTranslations = {
       "duelsBody": "Fordere jeden Spieler, dem du begegnest, zu einem freundschaftlichen Duell heraus. Es steht nichts auf dem Spiel außer dem Stolz, also ist es der einfachste Weg, eine Paarung zu lernen oder eine freundschaftliche Wette zu klären.",
       "coliseumHeading": "Das Aschene Kolosseum",
       "coliseumBody": "Das Kolosseum ist die Arena des Reichs, wo du in gewerteten Matches gegen andere Spieler antrittst, eins gegen eins oder zwei gegen zwei. Jede Wertungsklasse hat ihre eigene Rangliste, ein Sieg hebt dich also auf dieser Leiter empor, für das ganze Reich sichtbar. Öffne das Arenafenster, um dich für eine Wertungsklasse anzumelden, allein oder mit deinem Partner.",
-      "fiestaHeading": "Zwei gegen Zwei Fiesta",
-      "fiestaBody": "Fiesta ist ein schneller Zwei-gegen-Zwei-Kampf, als ein durchgehendes Gefecht ausgetragen, bei dem jeder Kämpfer auf gleiche Ausgangslage gebracht wird. Während der Kampf läuft, draftest du Augmentierungen, schnelle Boosts, die dein Repertoire spontan umformen, sodass kein Match dem anderen gleicht.",
-      "augmentsNote": "Augmentierungen und Verstärkungen halten nur für das Match. Es geht um verspielte Builds aus dem Moment heraus, nicht um anhaltende Macht, sodass sich niemand den Sieg erkaufen kann.",
-      "wavesTitle": "Augmentierungen kommen in Wellen",
-      "wavesBody": "Ein Fiesta-Gefecht reicht dir im Verlauf frische Auswahlmöglichkeiten, und sie werden mutiger, je länger der Kampf dauert. Du baust von einer Welle zur nächsten auf, wählst jedes Mal eine von wenigen Optionen und behältst sie für den Rest des Gefechts.",
-      "waveSilverTitle": "Silber",
-      "waveSilverBody": "Die Eröffnungswelle: klare Boosts auf einen einzelnen Wert, die die Grundlagen deiner Klasse schärfen.",
-      "waveGoldTitle": "Gold",
-      "waveGoldBody": "Die mittlere Welle: zweischneidige Kombinationen, in denen dein Build allmählich Gestalt annimmt und zu glänzen beginnt.",
-      "wavePrismaticTitle": "Prismatisch",
-      "wavePrismaticBody": "Die letzte Welle: build-prägende, bildschirmschmelzende Ausschläge, die sich auf die beste Art lächerlich anfühlen sollen.",
-      "yumiHeading": "Yumi beschützen",
-      "yumiBody": "Yumi beschützen ist ein Team-Zielmodus, der in einem Labyrinth ausgetragen wird: Jede Seite bewacht ihren eigenen Katzenbegleiter und jagt zugleich den der Gegner. Immer wieder blinzeln beide Katzen in neue Ecken des Labyrinths, sodass der Kampf zwischen Verteidigen, Jagen und dem Wettlauf, sie erneut aufzuspüren, hin und her schwingt. Melde dich als drei gegen drei oder fünf gegen fünf an; wer im Kampf fällt, muss nur einen Moment pausieren.",
-      "powerupsTitle": "Powerups im Ring",
-      "powerupsBody": "Mitten im Kampf fallen außerdem leuchtende Kugeln in die Arena, frei für den, der sie zuerst erreicht. Sie sind absichtlich völlig übertrieben und halten nur kurz an: Geschwindigkeitsdämon für einen Wimpernschlag blendenden Tempos, Koloss, um dich zu einem schwerfälligen Riesen anschwellen zu lassen, Mondstiefel für einen federnden Sprung bei niedriger Schwerkraft und Berserker für einen plötzlichen Schub an Raserei.",
       "ladderHeading": "Die Rangleiter erklimmen",
       "ladderBody": "Das gewertete Spiel verfolgt dein Ansehen über die Zeit. Wirf einen Blick auf die Bestenliste, um zu sehen, wo du stehst und wer die Spitze des Reichs hält."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "Der Talpokal",
@@ -4350,6 +4349,8 @@ export const de_DE: EnTranslations = {
       "sourcesBody": "Die meisten deiner frühen Verbesserungen sind Questbelohnungen, es zahlt sich also aus, Quests abzuschließen, statt zu grinden. Feinde lassen Ausrüstung fallen, wenn du sie bezwingst, Händler in der Stadt verkaufen solide Grundausstattung, Handwerker verwandeln gesammelte Materialien in tragbare Stücke, und der Spielermarkt lässt dich von anderen Abenteurern kaufen. Ganz oben auf dem Berg kaufen zwei Marken-Währungen Ausrüstung, die es sonst nirgends gibt: Tiefgang-Marken beim Tiefgang-Hüter und Heroische Marken beim heroischen Quartiermeister.",
       "soulboundTitle": "Seelengebunden: dein und nur dein",
       "soulboundBody": "Einige besondere Belohnungen sind seelengebunden, von dem Moment an, in dem du sie erringst, an deinen Charakter gebunden. Ein seelengebundener Gegenstand lässt sich nicht handeln, verschicken, an einen Händler verkaufen oder auf dem Markt einstellen; er gehört dir und dir allein. Heute schützt das Preis-Tokens wie Heroische Marken, während die Ausrüstung, die du gewinnst, dir gehört und frei gehandelt, verkauft oder geteilt werden kann.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Sets und Set-Boni",
       "setsBody": "Manche Rüstung kommt in zusammengehörigen Familien, mehreren Teilen, die darauf zugeschnitten sind, als Einheit auszusehen und zu kämpfen. Trage genug Teile einer Familie gleichzeitig, und das Set erwacht und gewährt Boni zusätzlich zu den eigenen Werten jedes Teils, und je mehr Teile du trägst, desto stärker wird es. Einige wenige solcher Familien tauchen als begehrte Beute auf, während du aufsteigst; die größten von ihnen stammen aus dem härtesten Gruppeninhalt nahe der Höchststufe, weshalb die Jagd nach einem vollständigen Set ein klassisches Endgame-Ziel ist.",
       "consumablesTitle": "Verbrauchsgüter",
@@ -4606,6 +4607,7 @@ export const de_DE: EnTranslations = {
         "startBody": "Eine Einfache Angel kostet 20 Kupfer bei Fischer Brandt in Eastbrook (halte am Ostrand der Stadt nach dem Alten Seebären Ausschau, an der Straße zum Spiegelsee); auch Tüftler Gizzel, Proviantmeister Hale in Fenbridge und Quartiermeisterin Bree in Highwatch führen Angeln. Benutze die Angel mit Blick auf Wasser, das tief genug für Fische ist, bis etwa 24 Meter vor dir, und deine Pose fliegt hinaus.\n\nDu kannst nicht auswerfen, während du im Kampf bist, schwimmst oder tot bist: Der Wurf vom Ufer aus ist die vorgesehene Haltung. Das Wasser wird allerdings genauso anspruchsvoll wie das Land: Das Moor verlangt mindestens die Eisenrolle der Stufe 2 und die Höhen den Silberbach der Stufe 3, und eine Schnur, die ohne die vom Wasser geforderte Rute ausgeworfen wird, verlässt deine Hand nie. Zwei Ruten stehen darüber, die Sturmrolle und die Flutgeschmiedete: Ingenieure fertigen sie an der Werkzeugmacherei aus dem, was eine Schnur heraufholt, und der Tiefgang-Tresen der Ertrunkenen Litanei verkauft sie hinter ihren Abschluss-Schranken für Tiefgang-Marken, doch nie für Münzen. Kein Gewässer verlangt sie, sie kaufen also eine kürzere Wartezeit und ein breiteres Einholfenster statt Zugang, was auf der obersten Sprosse einen Biss nach glatten drei Sekunden bedeutet.",
         "biteHeading": "Biss und Einholen",
         "biteBody": "Nach dem Auswerfen kommt der Biss in einem verborgenen Moment zwischen {min} und {max} Sekunden; die Verzögerung wird festgelegt, sobald die Schnur aufs Wasser trifft, keine zwei Würfe fühlen sich also ganz gleich an. Wenn die Pose anbeißt, hast du ein Fenster von {reel} Sekunden, um die Angel erneut zu drücken und einzuholen: Holst du darin ein, landet der Fang, zögerst du darüber hinaus, entkommt der Fisch, und du hast nichts vorzuweisen. Ein ganzer Durchgang ist bei {cap} Sekunden gedeckelt, selbst ein ruhiger Wurf ist also schnell entschieden.\n\nBessere Ruten schärfen beide Enden des Minispiels: Jede Rutenstufe über der ersten kürzt die längstmögliche Wartezeit um {rod} Sekunden, nie unter das Minimum von drei Sekunden, das die oberste Rute ohnehin schon streift, und legt {reelRod} Sekunden auf das Einholfenster, sodass die Eisenrolle die schlimmste Wartezeit auf 6,5 Sekunden mit einem Fenster von 3,25 Sekunden drückt und der Silberbach auf 5 mit einem Fenster jenseits von 4, wobei seine Seltenheit das Einholen noch etwas weiter öffnet, als die Stufe allein zahlt. Die schnellsten Bisse ändern sich nie, was du auch hältst, und eine Rute muss nur in deinen Taschen liegen, um zu zählen.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Fertigkeitszuwachs",
         "scheduleNote": "Der Angelzuwachs folgt einem festen Plan ohne Würfel: ein voller Punkt pro Fang unter Fertigkeit 50, ein halber Punkt unter 100, ein Zehntel unter 150 und ein langsames Rinnsal von 0,02 von 150 bis 200. Diese letzte Strecke ist mit Absicht eine Reise über Tausende von Fängen: 200 ist eine Aussage, keine Zwischenstation auf dem Weg zu etwas anderem.\n\nPlunder hört bei {cutoff} vollständig auf zu lehren: Von da an sind Kraut und Stiefel eben nur Kraut und Stiefel. Auch das Gewässer selbst deckelt die Lektion: Die Gewässer der Stufe 1 im Tal (und jede junge Küste jenseits des Kernlands) lehren über 100 hinaus nichts mehr, die des Moores hören bei 150 auf, und nur die von Thornpeak schulen einen Angler den ganzen Weg bis 200. Jeder gelandete Fang bringt ansonsten den planmäßigen Zuwachs, wenn der Zähler also stockt, sagt dir der Plan, dass du tieferes Wasser suchen sollst.",
         "colProficiency": "Fertigkeit",
@@ -4654,8 +4656,16 @@ export const de_DE: EnTranslations = {
         "provenanceBody": "Manche Gegenstände tragen einen Namen. Fahre mit dem Zeiger darüber, und der Tooltip sagt bei einem Rohstoff Gesammelt von Soundso oder bei einem fertigen Stück Hergestellt von Soundso: dieselbe Marke, nur danach formuliert, wie der Gegenstand entstanden ist. Eine Signatur ist Teil des Gegenstands selbst, reist mit ihm durch Handel, Bank, Post, den Weltmarkt und sogar einen Händler-Rückkauf und verblasst nie.\n\nSammeln signiert seine beste Arbeit von selbst: Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Segen. Der Glückswurf einer Leichenernte signiert den Ertrag dort, wo die Familie kein Exemplar zu geben hat, und wo sie eines hat, bleibt der Ertrag schlicht und daneben entsteht das signierte makellose Exemplar. Handwerk signiert nach derselben Regel: Jede Kopie einer seltenen oder besseren Ausgabe entsteht signiert, und ein Meisterwerk signiert immer, welche Qualität es auch hat, sodass die feinste Fassung jedes Stücks stets seinen Hersteller nennt. Das Einzige, was dich eine Signatur kosten kann, ist eine volle Tasche: Eine signierte Einheit braucht einen eigenen Platz oder einen passenden signierten Stapel, in dem sie landen kann.\n\nEin Stapel Gegenstände teilt sich eine Identität, also verschmelzen zwei Kopien nur dann, wenn jede Marke exakt übereinstimmt: gleicher Gegenstand, gleicher Unterzeichner, gleiche Meisterwerk-Attribute, gleiche Verzauberung, gleiche Bindung. Ein signiertes Scheit gesellt sich in keine Richtung zu einem schlichten Haufen (das Verschmelzen würde jemandes Namen auslöschen), doch identische Ladungen verschmelzen bereitwillig, sodass zwanzig vom selben Sammler signierte Erze in einem Stapel sitzen und ein Segensfund deine Taschen nicht zerfetzt.\n\nSignaturen zahlen sich für Handwerker aus: Hältst du an der Werkbank irgendeine signierte Kopie eines benötigten Reagenzes, gleich wer sie signiert hat, steigt die Meisterwerk-Chance um 2 Prozentpunkte, und hältst du ein von eigener Hand signiertes Reagenz, sinkt die benötigte Menge dieses Reagenzes um eins (nie unter eins). Deine eigene signierte seltene oder bessere Arbeit lehrt dich sogar weiter, heute allein über die Flasche: Trink einen Trank, den du signiert hast, und ein kleines Rinnsal Fertigkeit fließt zurück in das Handwerk, das ihn gebraut hat, solange dieses Handwerk einer deiner aktiven Hauptberufe ist.",
         "collectorsHeading": "Sammler, Trophäen und der Preis einer Geschichte",
         "collectorsBody": "Händler sind blind für Provenienz: Ein signierter Gegenstand verkauft sich an einen NSC für genau seinen schlichten Preis. Der Aufpreis für eine Signatur besteht nur zwischen Spielern, und genau das macht ihn interessant: ein Stapel Glückserz, signiert von einem berühmten Sammler, ein Erstklassiges Stück aus einer glücklichen Ernte, eine Meisterwerksklinge mit dem Namen eines längst zurückgezogenen Schmieds, all das kostet, was jemandes Erinnerung sagt, dass es wert ist.\n\nDas Buch der Taten spielt mit demselben Instinkt: Makellose Ader, Altes Herzholz, Mondlichtblüte, Ein Makelloses Exemplar und Schimmer der Hoffnung sind Sammlertaten mit null Ansehen, die einzig dazu da sind, zu beweisen, dass dir ein Moment passiert ist. Behalte den Gegenstand, der die Tat verdient hat, und du hältst den Beleg. Das ist keine Macht; Provenienz kauft keine Attributpunkte und gewinnt keine Kämpfe, sie ist die Papierspur der Welt an guten Tagen.",
-        "throttleHeading": "Die Aktionsdrosselung",
-        "throttleBody": "Der Ausstoß hat eine Obergrenze: Herstellen, Entzaubern, Verzaubern, Zerlegen und das Aufladen von Werkzeugeffekten teilen sich ein Budget von {actions} erfolgreichen Aktionen in jedem Fenster von {seconds} Sekunden. Ein abgewiesener Versuch kostet nichts und verbraucht kein Budget. Im normalen Spiel wirst du sie nie spüren; es gibt sie nur, damit ein Spezialist am Maximum mit vollem Lager den Markt nicht überschwemmen kann, wie hoch seine Fertigkeit oder sein Vorrat auch sein mag.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Spieler handeln mit Spielern",
         "doctrineBody": "Die Handwerkswirtschaft beruht auf einem Gedanken: Spieler versorgen Spieler. Sammler beliefern Handwerker, Handwerker versorgen Quester und Schlachtzügler, und Zerbrecher beliefern Verzauberer, während Händler und Stationsmeister an den Rändern stehen, um Plunder und Münzen aufzunehmen, anstatt mit dir zu konkurrieren. Wenn du mit einem Beruf Geld verdienen willst, ist dein Kunde ein Mensch: Lerne, was andere Spieler verbrauchen, richte deine Preise am Weltmarkt aus und behandle die NSC-Systeme als Boden unter deinen Preisen, nicht als den Markt selbst.\n\nGefertigte Ausrüstung ist so ausgewogen, dass sie unterhalb des Schlachtzugbodens liegt: Selbst ein Meisterwerk ist immer nur eine Qualitätsstufe über seinem Rezept, nie jenseits von Legendär, und sein Attributbudget bleibt unter dem Schlachtzugsbeute-Band. Die Schmiede macht dich bereit für den härtesten Inhalt; sie ersetzt ihn nicht. Das hält Handwerker, Schlachtzügler und den Markt in einem stabilen Dreieck: Schlachtzugsbeute bleibt erstrebenswert, und gefertigte Stücke bleiben die beste Ausrüstung, die man für Geld kaufen kann."
       },
@@ -5113,6 +5123,7 @@ export const de_DE: EnTranslations = {
       "terrainCapReached": "Limit für Geländebearbeitungen erreicht ({max}). Überzählige Formstempel wurden nicht hinzugefügt.",
       "placementCapReached": "Platzierungslimit erreicht ({max}). Überzählige Assets wurden nicht hinzugefügt.",
       "blockerCapReached": "Sperrwand-Limit erreicht ({max}). Die neue Wand wurde nicht hinzugefügt.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Automatisches Speichern ausgeschaltet: {reason} Speichere manuell und schalte es dann wieder ein."
     },
     "confirm": {
@@ -6096,7 +6107,6 @@ export const de_DE: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3 gegen 3",
     "bracket5": "Yumi 5 gegen 5",
-    "enterQueue": "Yumi beschützen beitreten!",
     "queue": {
       "join": "Ihr tretet der Warteschlange für Yumi beschützen bei. Bewacht Euren Begleiter…",
       "leave": "Ihr verlasst die Warteschlange für Yumi beschützen.",
@@ -6134,9 +6144,6 @@ export const de_DE: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Tretet der Fiesta bei!",
-    "practice": "🎉 Übung gegen Bots",
-    "practiceNote": "Offline-Übung: erzeugt 3 KI-Bots und meldet Euch für eine 2-gegen-2-Fiesta an. Klickt erneut zum Beenden.",
     "banner": {
       "wave": "WELLE {wave}/{total} — WÄHLT EINE AUGMENTIERUNG!",
       "augmentGained": "Augmentierung erhalten: {name}!",
@@ -6618,7 +6625,6 @@ export const de_DE: EnTranslations = {
       "mobileMore": "Mehr",
       "mobileMoreAria": "Weitere Menüs anzeigen",
       "mobileSocial": "Soziales",
-      "mobileArena": "Arena",
       "mobileMenu": "Menü",
       "mobileSettings": "Einstellungen",
       "mobileUse": "Benutzen",
@@ -6735,7 +6741,7 @@ export const de_DE: EnTranslations = {
         "nameplates": "Namensplaketten umschalten",
         "meters": "Schadensanzeigen",
         "social": "Freunde & Gilde",
-        "arena": "Arena (Aschenes Kolosseum)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Chat öffnen",
         "attack": "Angreifen",
         "actionBarSlot": "Aktionsleiste {slot}"
@@ -6840,6 +6846,7 @@ export const de_DE: EnTranslations = {
       "floatingParry": "Pariert",
       "floatingResist": "Widerstand",
       "floatingEvade": "Entgangen",
+      "floatingBlock": "{amount} Block",
       "floatingHealFull": "Voll",
       "floatingHealAbsorbed": "Absorbiert",
       "cannotMove": "Bewegungsunfähig!",
@@ -6853,6 +6860,8 @@ export const de_DE: EnTranslations = {
       "parried": "Deine {ability} wird von {target} pariert.",
       "resisted": "{target} widersteht Eurem {ability}.",
       "evaded": "{target} entgeht deiner {ability}.",
+      "blockedDone": "Your {ability} is blocked by {target}, dealing {amount}.",
+      "blockedTaken": "You block {source}'s attack, taking {amount}.",
       "healSelf": "Euer {ability} heilt Euch um {amount}.",
       "healSelfCrit": "Euer {ability} heilt Euch kritisch um {amount}.",
       "healOther": "Euer {ability} heilt {target} um {amount}.",
@@ -7229,6 +7238,11 @@ export const de_DE: EnTranslations = {
     "cast": {
       "fishing": "Angeln",
       "gathering": "Sammeln",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Dämonenheilung",
       "thunzharrStormcall": "Sturmruf",
       "rift_frost_execution": "Gletschergrab",
@@ -7551,6 +7565,8 @@ export const de_DE: EnTranslations = {
       "collectEmpty": "Nichts wartet. Verkaufserlöse und abgelaufene Angebote werden hier abgeholt.",
       "collectNote": "Erlöse und zurückgegebene Waren, die der Händler für Euch hält.",
       "saleProceeds": "Verkaufserlöse",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Alles abholen"
     },
     "logs": {
@@ -10331,13 +10347,13 @@ export const de_DE: EnTranslations = {
         "name": "Direfang-Köcher"
       },
       "sharp_claw": {
-        "name": "Scharfe Klaue"
+        "name": "Sharp Claw"
       },
       "curved_tusk": {
-        "name": "Gebogener Hauer"
+        "name": "Curved Tusk"
       },
       "pristine_claw": {
-        "name": "Makellose Klaue"
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"

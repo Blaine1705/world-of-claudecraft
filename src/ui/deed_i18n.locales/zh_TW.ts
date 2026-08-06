@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: '長空歸寂',
     desc: '在龍喉上方的火山口棲地中，擊殺辛卓蕾絲，龍喉之母。',
   },
+  chr_frostveil_gatherer: {
+    name: '梯田收穫',
+    desc: '在Frostveil採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_frostveil_first_cast: {
+    name: '山湖初冰',
+    desc: '在Frostveil水域釣上一條魚。',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Amberfall的收穫',
+    desc: '在Amberfall採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_amberfall_first_cast: {
+    name: '大沼澤之獲',
+    desc: '在Amberfall水域釣上一條魚。',
+  },
+  chr_nightbloom_gatherer: {
+    name: '夢中收穫',
+    desc: '在Nightbloom採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_nightbloom_first_cast: {
+    name: '月井漣漪',
+    desc: '在Nightbloom水域釣上一條魚。',
+  },
+  chr_wraithwood_gatherer: {
+    name: '樹冠下的收穫',
+    desc: '在Wraithwood採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_wraithwood_first_cast: {
+    name: '鏡灣一投',
+    desc: '在Wraithwood水域釣上一條魚。',
+  },
+  chr_palmreach_gatherer: {
+    name: '棕櫚灘收穫',
+    desc: '在Palmreach採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_palmreach_first_cast: {
+    name: '藍寶石潟湖垂釣',
+    desc: '在Palmreach水域釣上一條魚。',
+  },
+  chr_evergarden_gatherer: {
+    name: '花壇饋贈',
+    desc: '在Evergarden採集一處礦脈、一片木料和一塊草藥地。',
+  },
+  chr_evergarden_first_cast: {
+    name: '花瓣池一投',
+    desc: '在Evergarden水域釣上一條魚。',
+  },
   pvp_card_duel_first_win: {
     name: '我的地盤我的規矩',
     desc: '在牌局大師處贏得一場紙牌對決。',
@@ -559,5 +607,33 @@ export const table: DeedLocaleTable = {
   chr_farshore_first_cast: {
     name: '鷗鳥所知',
     desc: '在遠岸的水域釣起一條魚。',
+  },
+  prog_engineering_rare: {
+    name: '精密工程',
+    desc: '在工程學中製作你的第一件稀有品質物品。',
+  },
+  prog_alchemy_rare: {
+    name: '稀世佳釀',
+    desc: '在鍊金術中製作你的第一件稀有品質物品。',
+  },
+  prog_cooking_rare: {
+    name: '令人難忘的佳餚',
+    desc: '在烹飪中製作你的第一件稀有品質物品。',
+  },
+  prog_leatherworking_rare: {
+    name: '精細鞣製',
+    desc: '在製皮中製作你的第一件稀有品質物品。',
+  },
+  prog_tailoring_rare: {
+    name: '大師的針腳',
+    desc: '在裁縫中製作你的第一件稀有品質物品。',
+  },
+  prog_weaponcrafting_rare: {
+    name: '淬鍊至光亮',
+    desc: '在武器鍛造中製作你的第一件稀有品質物品。',
+  },
+  prog_armorcrafting_rare: {
+    name: '鍛造至完美',
+    desc: '在護甲鍛造中製作你的第一件稀有品質物品。',
   },
 };

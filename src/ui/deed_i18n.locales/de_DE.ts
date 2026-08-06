@@ -15,6 +15,54 @@ export const table: DeedLocaleTable = {
     name: 'Der Himmel verstummt',
     desc: 'Cindraleth, die Rachen-Matriarchin, in ihrem Kraterhorst über dem Drakenrachen erlegen.',
   },
+  chr_frostveil_gatherer: {
+    name: 'Ernte auf den Terrassen',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet im Frostveil.',
+  },
+  chr_frostveil_first_cast: {
+    name: 'Erstes Eis auf dem Bergsee',
+    desc: 'Fange einen Fisch in den Gewassern des Frostveil.',
+  },
+  chr_amberfall_gatherer: {
+    name: 'Die Ernte von Amberfall',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Amberfall.',
+  },
+  chr_amberfall_first_cast: {
+    name: 'Ein Fang aus dem Grossen Moor',
+    desc: 'Fange einen Fisch in den Gewassern von Amberfall.',
+  },
+  chr_nightbloom_gatherer: {
+    name: 'Die traumende Ernte',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Nightbloom.',
+  },
+  chr_nightbloom_first_cast: {
+    name: 'Ein Ring auf dem Mondbrunnen',
+    desc: 'Fange einen Fisch in den Gewassern von Nightbloom.',
+  },
+  chr_wraithwood_gatherer: {
+    name: 'Ernte unter dem Blatterdach',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet im Wraithwood.',
+  },
+  chr_wraithwood_first_cast: {
+    name: 'Ein Wurf in der Spiegelbucht',
+    desc: 'Fange einen Fisch in den Gewassern des Wraithwood.',
+  },
+  chr_palmreach_gatherer: {
+    name: 'Ernte am Palmenstrand',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Palmreach.',
+  },
+  chr_palmreach_first_cast: {
+    name: 'Wurf in die Saphirlagune',
+    desc: 'Fange einen Fisch in den Gewassern von Palmreach.',
+  },
+  chr_evergarden_gatherer: {
+    name: 'Die Gabe des Parterres',
+    desc: 'Ernte eine Erzader, einen Holzbestand und ein Krauterbeet in Evergarden.',
+  },
+  chr_evergarden_first_cast: {
+    name: 'Ein Wurf auf dem Blutenteich',
+    desc: 'Fange einen Fisch in den Gewassern von Evergarden.',
+  },
   pvp_card_duel_first_win: {
     name: 'Nach eigenen Regeln',
     desc: 'Gewinne einen Kartenkampf beim Kartenmeister.',
@@ -868,5 +916,33 @@ export const table: DeedLocaleTable = {
   chr_farshore_first_cast: {
     name: 'Was die Möwen wissen',
     desc: 'Fange einen Fisch aus den Gewässern der Fernküste.',
+  },
+  prog_engineering_rare: {
+    name: 'Präzisionsingenieurwesen',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück im Ingenieurswesen.',
+  },
+  prog_alchemy_rare: {
+    name: 'Ein seltener Jahrgang',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Alchemie.',
+  },
+  prog_cooking_rare: {
+    name: 'Ein unvergessliches Gericht',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück im Kochen.',
+  },
+  prog_leatherworking_rare: {
+    name: 'Feine Gerberei',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Lederverarbeitung.',
+  },
+  prog_tailoring_rare: {
+    name: 'Ein meisterhafter Stich',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Schneiderei.',
+  },
+  prog_weaponcrafting_rare: {
+    name: 'Zu Glanz gehärtet',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Waffenherstellung.',
+  },
+  prog_armorcrafting_rare: {
+    name: 'Zur Perfektion gepanzert',
+    desc: 'Fertige dein erstes seltenes Ausrüstungsstück in der Rüstungsherstellung.',
   },
 };

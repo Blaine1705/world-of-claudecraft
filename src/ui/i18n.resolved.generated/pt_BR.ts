@@ -392,7 +392,7 @@ export const pt_BR: EnTranslations = {
     "emoteEditor": {
       "title": "Emotes",
       "done": "Concluído",
-      "close": "Close emotes"
+      "close": "Fechar emotes"
     },
     "dailyRewards": {
       "title": "Recompensas Diárias",
@@ -961,7 +961,7 @@ export const pt_BR: EnTranslations = {
       "petTaunt": "Mascote: provocar",
       "petDefensive": "Mascote: defensivo",
       "petAggressive": "Mascote: agressivo",
-      "targetPet": "Pet: Mark",
+      "targetPet": "Mascote: selecionar",
       "mount": "Montar / Desmontar",
       "mouseHint": "Os botões do mouse também funcionam: pressione o botão do meio (M3) ou um botão lateral (M4, M5) ao atribuir a tecla. Os botões esquerdo e direito continuam reservados para a câmera, o clique para mover e cliques em objetos no mundo."
     },
@@ -1033,8 +1033,8 @@ export const pt_BR: EnTranslations = {
       "timeLeft": "{seconds}s"
     },
     "pvp": {
-      "launcherTitle": "JxJ",
-      "mobileLabel": "JxJ",
+      "launcherTitle": "PvP",
+      "mobileLabel": "PvP",
       "bracket1v1": "1v1",
       "bracket2v2": "2v2"
     },
@@ -1327,10 +1327,10 @@ export const pt_BR: EnTranslations = {
       "itemScoreLine": "Pontuação {score}",
       "showSecondaryActionBar": "Mostrar Barra de Ação Secundária",
       "showThirdActionBar": "Mostrar terceira barra de ação",
-      "hideUnusedActionSlots": "Hide Unused Action Slots",
+      "hideUnusedActionSlots": "Ocultar Espaços de Ação Não Utilizados",
       "lockActionBars": "Travar barras de ação",
       "showTargetOfTarget": "Mostrar Alvo do Alvo",
-      "showPetFrame": "Show Your Pet",
+      "showPetFrame": "Mostrar seu mascote",
       "showAttackButton": "Exibir Botão de Ataque",
       "showDailyRewardsChest": "Mostrar Baú de Recompensas Diárias",
       "mobileCameraJoystick": "Joystick da câmera",
@@ -2077,7 +2077,7 @@ export const pt_BR: EnTranslations = {
       "hostile": "Hostil",
       "friendly": "Amistoso",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Chefe"
     },
     "targetFrame": {
       "unlock": "Mover quadro do alvo",
@@ -2533,10 +2533,6 @@ export const pt_BR: EnTranslations = {
         "moongateCommunion": {
           "title": "Comunhão do Portão Lunar",
           "note": "Peregrinos se reúnem no portão lunar do templo sob a lua do meio do mês."
-        },
-        "fiestaNight": {
-          "note": "O ringue da Fiesta 2v2 atrai suas plateias mais barulhentas esta noite.",
-          "title": "Noite de Fiesta"
         }
       }
     },
@@ -2689,7 +2685,7 @@ export const pt_BR: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Encantar Arma - Força",
       "enchant_weapon_intellect": "Encantar Arma - Poder Mágico",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Encantar Mão Secundária - Vigor",
       "enchant_helmet_fortitude": "Encantar Elmo - Fortitude",
       "enchant_neck_spirit": "Encantar Colar - Espírito",
       "enchant_shoulder_agility": "Encantar Ombros - Agilidade",
@@ -2919,9 +2915,7 @@ export const pt_BR: EnTranslations = {
       "commissionToggle": "Peça por encomenda",
       "commissionToggleHint": "Vincula ao primeiro personagem que a receber em uma negociação.",
       "commissionUnbound": "Peça por encomenda: vincula ao primeiro destinatário",
-      "commissionBound": "Peça por encomenda: vinculada ao seu destinatário",
-      "craft": "Arte",
-      "throttled": "Você está criando rápido demais. Espere um momento e tente de novo."
+      "commissionBound": "Peça por encomenda: vinculada ao seu destinatário"
     },
     "itemMenu": {
       "use": "Usar",
@@ -2986,10 +2980,7 @@ export const pt_BR: EnTranslations = {
       "replaceConfirmKeepsBond": "Vínculo da encomenda",
       "replaceConfirmCost": "Custo: {cost}",
       "replaceConfirmCostItem": "{name} x{count}",
-      "replaceConfirmAccept": "Substituir",
-      "disenchantThrottled": "Você está desencantando rápido demais. Espere um momento e tente de novo.",
-      "enchantThrottled": "Você está encantando rápido demais. Espere um momento e tente de novo.",
-      "salvageThrottled": "Você está recuperando rápido demais. Espere um momento e tente de novo."
+      "replaceConfirmAccept": "Substituir"
     },
     "training": {
       "title": "Treinamento: {name}",
@@ -3184,7 +3175,7 @@ export const pt_BR: EnTranslations = {
         "soul_rend": "Rasgão de Alma (jogadores marcados devem se dispersar e ser curados)",
         "deathless_rage": "Fúria Imortal (interrompida nas pedras de guarda)",
         "wardstones": "Canalizações das pedras de guarda (transição de fase)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Maldição do Pavor (somente heroico, penalidade cumulativa para troca de tanque)"
       }
     },
     "deeds": {
@@ -3422,6 +3413,7 @@ export const pt_BR: EnTranslations = {
       "talents": "Talentos",
       "arena": "Arena e JcJ",
       "valeCup": "Copa do Vale",
+      "thornhollow": "Thornhollow Fields",
       "deeds": "Livro dos Feitos",
       "glossary": "Glossário",
       "wishIKnew": "O que eu gostaria de saber",
@@ -3591,16 +3583,21 @@ export const pt_BR: EnTranslations = {
       "groupInterface": "Interface",
       "groupCamera": "Câmera",
       "talents": "Talentos",
+      "professions": "Professions",
       "arena": "Arena",
       "leaderboard": "Placar de líderes",
       "deeds": "Livro dos Feitos",
+      "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Criação",
       "valeCup": "Copa do Vale",
+      "mount": "Mount / Dismount",
       "calendar": "Calendário de eventos",
+      "dungeonFinder": "Dungeon Finder",
       "discord": "Discord",
       "abilities": "Usar habilidades da barra de ação (a fileira de números; uma segunda barra fica no teclado numérico)",
       "targetFriendly": "Mirar o aliado mais próximo",
       "cycleFriendly": "Alternar alvo aliado",
+      "targetAuras": "Target buffs and debuffs",
       "gameMenu": "Abrir o menu do jogo e as opções",
       "bothMouse": "Ambos os botões do mouse",
       "runForward": "Correr para frente",
@@ -4127,7 +4124,7 @@ export const pt_BR: EnTranslations = {
       "bastionBody": "Uma fortaleza inundada perdida para o pântano, mantida por defensores afogados e pela própria maré crescente.",
       "templeBody": "Um santuário submerso fora da estrada do pântano, um caminho alternativo para os curiosos e os bem preparados.",
       "sanctumBody": "O coração sombrio de Thornpeak, onde a longa obra do culto atinge seu terrível auge.",
-      "wildheartBody": "Uma caldeira de selva encharcada de chuva, onde duas trilhas de caça elevadas circundam um cenote de jade. Atravesse covis de feras e ruínas ancestrais, depois suba a pirâmide ritual para enfrentar Zulgar.",
+      "wildheartBody": "Uma caldeira de selva encharcada de chuva, onde duas trilhas de caça elevadas circundam um cenote de jade. Atravesse covis de feras e ruínas ancestrais, depois suba a pirâmide ritual para ver quem espera no topo.",
       "raidName": "O raide de fim de jogo",
       "raidBody": "Além de uma porta real selada aguarda um desafio de dez jogadores: uma luta de várias fases e um poder imortal que o raide inteiro precisa neutralizar em conjunto. Conquiste sua entrada e depois traga nove amigos.",
       "heroicTitle": "Modo heroico",
@@ -4192,23 +4189,25 @@ export const pt_BR: EnTranslations = {
       "duelsBody": "Desafie qualquer jogador que encontrar para um duelo amistoso. Nada está em jogo além do orgulho, então é a forma mais fácil de aprender um confronto ou resolver uma discussão amigável.",
       "coliseumHeading": "O Coliseu das Cinzas",
       "coliseumBody": "O Coliseu é a arena do reino, onde você enfrenta outros jogadores em partidas ranqueadas, um contra um ou dois contra dois. Cada categoria mantém sua própria classificação, então uma vitória o eleva naquele placar para o reino inteiro ver. Abra a janela da Arena para se inscrever em uma categoria, sozinho ou com seu parceiro.",
-      "fiestaHeading": "Fiesta dois contra dois",
-      "fiestaBody": "Fiesta é uma briga rápida de dois contra dois travada como uma única disputa contínua, com cada lutador colocado em pé de igualdade. Conforme a luta corre, você escolhe aprimoramentos, reforços rápidos que remodelam seu arsenal na hora, então nenhuma partida é igual à outra.",
-      "augmentsNote": "Aprimoramentos e melhorias duram apenas a partida. Eles servem para builds divertidas e improvisadas, não para poder permanente, então ninguém compra a vitória.",
-      "wavesTitle": "Os aprimoramentos chegam em ondas",
-      "wavesBody": "Uma disputa de Fiesta lhe entrega novas escolhas conforme avança, e as escolhas ficam mais ousadas quanto mais a luta se estende. Você constrói de uma onda para a próxima, escolhendo uma de poucas opções a cada vez e mantendo-a pelo resto da disputa.",
-      "waveSilverTitle": "Prata",
-      "waveSilverBody": "A onda de abertura: reforços limpos de um único atributo que afiam o básico da sua classe.",
-      "waveGoldTitle": "Ouro",
-      "waveGoldBody": "A onda do meio: combos de dois gumes onde sua build começa a tomar forma e a brilhar.",
-      "wavePrismaticTitle": "Prismático",
-      "wavePrismaticBody": "A onda final: picos que definem a build e derretem a tela, feitos para parecer ridículos no melhor sentido.",
-      "yumiHeading": "Proteja a Yumi",
-      "yumiBody": "Proteja a Yumi é um modo de objetivo em equipe disputado em um labirinto: cada lado protege a própria gata familiar enquanto caça a do inimigo. De tempos em tempos, as duas gatas saltam para novos cantos do labirinto, então a luta alterna entre defender, caçar e correr para reencontrá-las. Entre na fila em três contra três ou cinco contra cinco; cair em combate só o afasta por um instante.",
-      "powerupsTitle": "Power-ups na arena",
-      "powerupsBody": "Orbes brilhantes também caem na arena no meio da luta, livres para quem alcançá-los primeiro. Eles são deliberadamente exagerados e duram só um instante: Demônio da Velocidade para um lampejo de ritmo alucinante, Colosso para inchar até virar um gigante pesado, Botas Lunares para um salto saltitante de baixa gravidade, e Berserker para uma súbita explosão de fúria.",
       "ladderHeading": "Subindo no ranking",
       "ladderBody": "O jogo ranqueado acompanha sua classificação ao longo do tempo. Confira o placar para ver onde você está e quem domina o topo do reino."
+    },
+    "thornhollowPage": {
+      "heading": "Thornhollow Fields",
+      "intro": "A ranked 5v5 capture-the-flag battleground fought in a walled hollow in the old growth below Thornpeak, where two ruined keeps face each other down the length of a ravine and an older courtyard sits between them that neither has ever held. Two teams of five, two keeps, one goal: steal the enemy banner and run it home before they run yours.",
+      "queueHeading": "Queueing up",
+      "queueBody": "Open the Thornhollow Fields panel and enter the queue solo, or bring a party of up to five and queue together: parties are always kept on one team, and the remaining seats fill with solo champions. When ten stand ready, the match seats both teams at their keeps for a short form-up before the flags go live.",
+      "fieldHeading": "The field",
+      "fieldBody": "A walled, open-air field carved into three chambers: each team has its own field before its keep, and the walled Ruin Courtyard sits between them. Two curtain walls span the full width, and every move between chambers passes a contested crossing: the wide main gate, or the gatehouse, a small room straddling the wall whose offset doors force a jog past an ambush corner. Each keep is sealed except its mouth, so every flag run starts and ends through the same opening, and a low barricade breaks the straight charge into it. The courtyard holds the hollow heart ruin and the two flank Sprint Runes; the other two wait on the flag approaches. A Battle or Ward Rune (more damage dealt, or less damage taken, for a few seconds) waits at each main gate's courtyard mouth: both pads open the match on the same face and flip with every claim.",
+      "flagsHeading": "Flags",
+      "flagsBody": "Each keep holds its team flag. Take the enemy flag and carry it to your own stand to score; the first team to three captures wins, and a timed-out battle resolves on score. A slain carrier drops the flag where they fell: an enemy can take it up again, while its own team returns it home instantly just by reaching it. The flag also refuses to hide: picking it up breaks stealth, and a carrier who turns invisible by any means drops it on the spot.",
+      "pickupNote": "Picking a flag up is always a deliberate press of the battleground action key: nobody ever becomes the carrier by strafing through the wrong spot.",
+      "respawnHeading": "Falling in battle",
+      "respawnBody": "Death keeps the classic rite: your corpse lies where it fell until YOU release, and the spirit rises in the fenced graveyard beside your keep, warded there until your team's next respawn wave. The wave raises every waiting spirit together, and the two team waves are deliberately staggered, so the fight never fully resets at once. There is no corpse run and no Spirit Healer bargain: release, wait out the wave, fight.",
+      "carrierHeading": "Carrying the flag",
+      "carrierBody": "A carrier who holds the enemy flag too long grows more and more vulnerable, taking ever-increasing damage until the flag is captured, dropped, or returned. Hiding with the flag is a losing plan; running it home is the winning one.",
+      "ladderHeading": "The ladder",
+      "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions. Wins and hard-fought losses also pay Honor through the Warfare system."
     },
     "valeCupPage": {
       "heading": "A Copa do Vale",
@@ -4350,6 +4349,8 @@ export const pt_BR: EnTranslations = {
       "sourcesBody": "A maioria das suas melhorias iniciais são recompensas de missões, então vale a pena terminar missões em vez de farmar. Inimigos largam equipamento quando você os derrota, vendedores na cidade vendem o básico de confiança, artesãos transformam materiais coletados em peças vestíveis, e o mercado de jogadores permite comprar de outros aventureiros. Lá no topo, duas moedas de selos compram equipamentos que não se encontram em nenhum outro lugar: os Selos de Incursão com o guardião de incursões, e as Marcas Heroicas com o Intendente Heroico.",
       "soulboundTitle": "Vinculado à alma: seu e só seu",
       "soulboundBody": "Algumas recompensas especiais são vinculadas à alma, presas ao seu personagem desde o instante em que você as ganha. Um item vinculado à alma não pode ser negociado, enviado pelo correio, vendido a um vendedor nem anunciado no mercado; ele é seu e só seu. Hoje essa proteção guarda fichas de prêmio como as Marcas Heroicas, enquanto o equipamento que você conquista é seu para negociar, vender ou compartilhar livremente.",
+      "uniqueTitle": "Unique-Equipped: one legendary of a kind",
+      "uniqueBody": "Legendary items are unique-equipped: your character can wear only one copy of a given legendary at a time, and its heroic version counts as the same item. A second copy can ride in your bags, in the bank, or on the market, but trying to wear both at once is refused, and the tooltip carries a gold Unique-Equipped tag so you can see the rule before you plan a build around two of them.",
       "setsTitle": "Conjuntos e bônus de conjunto",
       "setsBody": "Algumas armaduras vêm em famílias combinando, várias peças talhadas para parecer e lutar como uma só. Vista o bastante de uma família ao mesmo tempo e o conjunto desperta, concedendo bônus por cima dos atributos de cada peça, e quanto mais peças você usa mais forte ele fica. Algumas dessas famílias surgem como saques valiosos enquanto você sobe de nível; as maiores delas vêm do conteúdo em grupo mais difícil perto do limite de nível, então perseguir um conjunto completo é um objetivo clássico de fim de jogo.",
       "consumablesTitle": "Consumíveis",
@@ -4606,6 +4607,7 @@ export const pt_BR: EnTranslations = {
         "startBody": "Uma Vara de Pesca Simples custa 20 cobre com o Pescador Brandt em Eastbrook (procure o Sal Velho na borda leste da cidade, junto à estrada para o Lago Espelho); o Engenhoqueiro Gizzel, o Fornecedor Hale em Fenbridge e a Intendente Bree em Highwatch também mantêm varas em estoque. Use a vara de frente para uma água funda o bastante para abrigar peixes, até cerca de 24 jardas à sua frente, e a sua boia voa para longe.\n\nVocê não pode lançar em combate, nadando ou morto: lançar da margem é a postura pretendida. A água, porém, fica mais dura conforme a terra fica: o pântano quer pelo menos a Vara com Molinete de Ferro de nível 2 e os picos a Vara do Riacho Prateado de nível 3, e uma linha lançada sem a vara que aquela água exige nunca sai da sua mão. Duas varas ficam acima dessas, a Vara com Molinete de Tempestade e a Vara Forjada pela Maré: engenheiros as criam na oficina de ferramentas com aquilo que a linha traz da água, e o balcão de incursão da Ladainha Afogada as vende por Selos de Incursão atrás de seus requisitos de conclusão, embora nunca por moedas. Nenhuma água as pede, então elas compram uma espera mais curta e uma janela de recolha mais larga em vez de acesso, o que no degrau mais alto significa uma fisgada em exatos três segundos.",
         "biteHeading": "Mordida e recolha",
         "biteBody": "Depois do lançamento, a fisgada vem em um instante oculto entre {min} e {max} segundos; o atraso é decidido quando a linha toca a água, então dois lançamentos nunca são exatamente iguais. Quando a boia afunda, você tem uma janela de {reel} segundos para apertar a vara de novo e recolher: recolha dentro dela e a captura é sua, hesite além dela e o peixe escapa sem deixar nada. Uma sessão inteira termina em no máximo {cap} segundos, então até um lançamento tranquilo se resolve rápido.\n\nVaras melhores afiam as duas pontas do minijogo: cada nível de vara acima do primeiro corta {rod} segundos da espera máxima possível, nunca abaixo do piso de três segundos que a vara do topo já roça, e acrescenta {reelRod} segundos à janela de recolha, então a Vara com Molinete de Ferro puxa a pior espera para 6,5 segundos com uma janela de 3,25 segundos, e a Vara do Riacho Prateado para 5 com uma janela acima de 4, sua raridade alargando a recolha um pouco além do que o nível sozinho paga. As fisgadas mais rápidas nunca mudam, seja qual for a vara que você segure, e basta a vara estar nas suas bolsas para contar.",
+        "earlyReelNote": "One caution for eager thumbs: press the pole again before anything bites and you reel in an empty line, ending the cast (a moment of grace right after casting forgives an accidental double-press). Patience is the whole game: wait for the bite, then strike.",
         "scheduleHeading": "Ganho de proficiência",
         "scheduleNote": "O ganho de Pesca segue uma tabela fixa, sem dados: um ponto inteiro por captura abaixo de 50 de proficiência, meio ponto abaixo de 100, um décimo abaixo de 150, e um fio lento de 0,02 de 150 a 200. Esse último trecho é uma jornada de milhares de capturas de propósito: 200 é uma declaração, não uma parada no caminho para outra coisa.\n\nA tralha para de ensinar por completo em {cutoff}: dali em diante, ervas daninhas e botas são apenas ervas daninhas e botas. A própria água também limita a lição: as águas de nível 1 do Vale (e toda margem jovem além das terras centrais) não ensinam nada acima de 100, as do pântano param em 150, e só as de Thornpeak instruem um pescador por todo o caminho até 200. Fora isso, toda captura fisgada rende no ritmo previsto, então quando o contador empaca, é a tabela dizendo a você para procurar águas mais profundas.",
         "colProficiency": "Perícia",
@@ -4654,8 +4656,16 @@ export const pt_BR: EnTranslations = {
         "provenanceBody": "Alguns itens carregam um nome. Passe o cursor sobre um e a dica de item diz Coletado por fulano num material bruto, ou Feito por fulano numa peça acabada: a mesma marca, redigida conforme o item veio a existir. Uma assinatura é parte do próprio item, viaja com ele por negociações, pelo banco, pelo correio, pelo Mercado Mundial e até por uma recompra de vendedor, e nunca desaparece.\n\nA coleta assina seu melhor trabalho automaticamente: toda extração que rola raro ou melhor chega assinada, e os achados raros assinam todo o seu rendimento quíntuplo. A rolagem de sorte de uma colheita de cadáver assina o rendimento quando a família não tem espécime a oferecer, e quando tem, mantém o rendimento simples e cunha o espécime perfeito assinado ao lado dele. A criação assina pela mesma linha: toda cópia de um resultado raro ou melhor é cunhada assinada, e uma obra-prima sempre assina, qualquer que seja sua qualidade, então a versão mais fina de qualquer peça sempre nomeia seu criador. A única coisa que pode lhe custar uma assinatura é uma bolsa cheia: uma unidade assinada precisa de espaço próprio, ou de uma pilha assinada compatível, para pousar.\n\nUma pilha de itens compartilha uma identidade, então duas cópias só se fundem quando cada marca coincide exatamente: mesmo item, mesmo signatário, mesmos atributos de obra-prima, mesmo encantamento, mesmo vínculo. Uma tora assinada nunca se junta a um monte simples em nenhuma das direções (fundi-los apagaria o nome de alguém), mas cargas idênticas se fundem sem problema, então vinte minérios assinados pelo mesmo coletor ficam em uma pilha só e um achado farto não estraçalha suas bolsas.\n\nAs assinaturas recompensam os artesãos: ter na bancada qualquer cópia assinada de um reagente necessário, seja quem for que a assinou, acrescenta 2 pontos percentuais de chance de obra-prima, e ter um reagente assinado pela sua própria mão corta em um a quantidade exigida daquele reagente (nunca abaixo de um). Seu próprio trabalho assinado de qualidade rara ou melhor ainda continua lhe ensinando, hoje só através do frasco: beba uma poção que você assinou e um pequeno fio de habilidade volta para o ofício que a preparou, contanto que esse ofício seja um dos seus principais ativos.",
         "collectorsHeading": "Colecionadores, troféus e o preço de uma história",
         "collectorsBody": "Os vendedores são cegos à proveniência: um item assinado é vendido a um PNJ exatamente pelo seu preço comum. O prêmio de uma assinatura existe apenas entre jogadores, o que é precisamente o que o torna interessante: uma pilha de minério inesperado assinada por um coletor famoso, um Corte Principal de uma colheita sortuda, uma lâmina obra-prima com o nome de um artesão aposentado, todos custam o que a memória de alguém diz que valem.\n\nO Livro dos Feitos apoia o mesmo instinto: Veia Imaculada, Cerne Ancião, Flor ao Luar, Um Espécime Perfeito e Lampejo de Esperança são marcas de colecionador com zero de Renome que existem apenas para provar que um momento aconteceu com você. Guarde o item que conquistou o feito e você tem o recibo. Nada disso é poder; a proveniência não compra atributos nem vence batalhas, é o rastro de papel do jogo para dias felizes.",
-        "throttleHeading": "O limitador de ações",
-        "throttleBody": "A produção tem um teto: criação, desencantamento, encantamento, salvamento e recargas de efeito de ferramenta dividem um único orçamento de {actions} ações bem-sucedidas a cada janela de {seconds} segundos. Uma tentativa recusada não custa nada e não gasta orçamento. Você nunca vai sentir isso em uma sessão normal; a regra existe para que um especialista no limite com o banco cheio não consiga inundar o Mercado, por maior que seja sua habilidade ou seu estoque.",
+        "castPaceHeading": "Cast time and the gold sink",
+        "castPaceBody": "Profession actions take real cast time: recipes scale from just under two seconds for simple field work up to a few seconds at the top of the ladder, and disenchant, enchant, salvage, and tool-effect recharge each take a fixed short cast. Cancel mid-cast and you lose nothing. Every successful craft also pays a copper fee proportional to the item budget. Together with materials, stations, and skill ceilings, that pace keeps the Market honest without a separate action quota. The exact durations by skill band are listed below.",
+        "castPaceField": "Field recipes (no skill requirement): {seconds}s cast",
+        "castPaceSkill25": "Recipes up to skill 25: {seconds}s cast",
+        "castPaceSkill50": "Recipes up to skill 50: {seconds}s cast",
+        "castPaceSkill75": "Recipes up to skill 75: {seconds}s cast",
+        "castPaceCombo": "Top-of-ladder and combo recipes: {seconds}s cast",
+        "castPaceEnchantFamily": "Disenchant, enchant, and salvage: {seconds}s cast",
+        "castPaceRecharge": "Tool-effect recharge: {seconds}s cast",
+        "castPaceBatch": "Batch crafting: up to {count} in one order, one cast each",
         "doctrineHeading": "Jogadores negociam com jogadores",
         "doctrineBody": "A economia de criação é construída sobre uma ideia: jogadores abastecem jogadores. Coletores alimentam artesãos, artesãos alimentam aventureiros e raideiros, e demolidores alimentam encantadores, com vendedores e mestres de posto nas bordas para absorver itens indesejados e moedas em vez de competir com você. Se quiser ganhar dinheiro com uma profissão, seu cliente é uma pessoa: aprenda o que outros jogadores consomem, precifique em relação ao Mercado Mundial e trate os sistemas de PNJ como um piso para seus preços, não como o mercado em si.\n\nO equipamento criado é ajustado para ficar abaixo do patamar de raide: mesmo uma obra-prima está apenas um nível de qualidade acima da receita, nunca além de lendário, e seu orçamento de atributos fica abaixo da faixa do saque de raide. A forja te prepara para o conteúdo mais difícil; ela não o substitui. Isso mantém artesãos, raideiros e o mercado em um triângulo estável: os drops de raide permanecem aspiracionais, e as peças criadas permanecem o melhor equipamento que o dinheiro pode de fato comprar."
       },
@@ -5113,6 +5123,7 @@ export const pt_BR: EnTranslations = {
       "terrainCapReached": "Limite de edições de terreno atingido ({max}). Os carimbos de escultura excedentes não foram adicionados.",
       "placementCapReached": "Limite de colocações atingido ({max}). Os recursos excedentes não foram adicionados.",
       "blockerCapReached": "Limite de paredes de bloqueio atingido ({max}). A nova parede não foi adicionada.",
+      "campCapReached": "Camp limit reached ({max}). The new camp was not added.",
       "autosaveOff": "Salvamento automático desativado: {reason} Salve manualmente e depois reative-o."
     },
     "confirm": {
@@ -6096,7 +6107,6 @@ export const pt_BR: EnTranslations = {
   "yumi": {
     "bracket3": "Yumi 3x3",
     "bracket5": "Yumi 5x5",
-    "enterQueue": "Entre no Proteja a Yumi!",
     "queue": {
       "join": "Você entra na fila do Proteja a Yumi. Proteja a sua gata…",
       "leave": "Você sai da fila do Proteja a Yumi.",
@@ -6134,9 +6144,6 @@ export const pt_BR: EnTranslations = {
   },
   "fiesta": {
     "bracket": "Fiesta",
-    "enterQueue": "Entre na Fiesta!",
-    "practice": "🎉 Treino contra Bots",
-    "practiceNote": "Treino offline: invoca 3 bots de IA e inscreve você em uma Fiesta 2v2. Clique de novo para parar.",
     "banner": {
       "wave": "ONDA {wave}/{total} — ESCOLHA UM APRIMORAMENTO!",
       "augmentGained": "Aprimoramento obtido: {name}!",
@@ -6618,7 +6625,6 @@ export const pt_BR: EnTranslations = {
       "mobileMore": "Mais",
       "mobileMoreAria": "Mostrar mais menus",
       "mobileSocial": "Comunidade",
-      "mobileArena": "Arena",
       "mobileMenu": "Menu",
       "mobileSettings": "Configurações",
       "mobileUse": "Usar",
@@ -6735,7 +6741,7 @@ export const pt_BR: EnTranslations = {
         "nameplates": "Alternar placas de nome",
         "meters": "Medidores de dano",
         "social": "Amigos e guilda",
-        "arena": "Arena (Coliseu Cinzento)",
+        "arena": "PvP (Thornhollow Fields and Arenas)",
         "chat": "Abrir chat",
         "attack": "Atacar",
         "actionBarSlot": "Barra de ação {slot}"
@@ -6840,6 +6846,7 @@ export const pt_BR: EnTranslations = {
       "floatingParry": "Aparou",
       "floatingResist": "Resistiu",
       "floatingEvade": "Evadiu",
+      "floatingBlock": "{amount} Block",
       "floatingHealFull": "Cheio",
       "floatingHealAbsorbed": "Absorvido",
       "cannotMove": "Não pode se mover!",
@@ -6853,6 +6860,8 @@ export const pt_BR: EnTranslations = {
       "parried": "Seu {ability} foi aparado por {target}.",
       "resisted": "{target} resiste a seu {ability}.",
       "evaded": "Seu {ability} foi evadido por {target}.",
+      "blockedDone": "Your {ability} is blocked by {target}, dealing {amount}.",
+      "blockedTaken": "You block {source}'s attack, taking {amount}.",
       "healSelf": "Seu {ability} cura você em {amount}.",
       "healSelfCrit": "Seu {ability} cura você criticamente em {amount}.",
       "healOther": "Seu {ability} cura {target} em {amount}.",
@@ -7229,6 +7238,11 @@ export const pt_BR: EnTranslations = {
     "cast": {
       "fishing": "Pesca",
       "gathering": "Coletando",
+      "crafting": "Crafting",
+      "disenchanting": "Disenchanting",
+      "enchanting_apply": "Enchanting",
+      "salvaging": "Salvaging",
+      "tool_recharge": "Recharging",
       "demonHeal": "Cura demoníaca",
       "thunzharrStormcall": "Chamado da Tempestade",
       "rift_frost_execution": "Sepultura Glacial",
@@ -7551,6 +7565,8 @@ export const pt_BR: EnTranslations = {
       "collectEmpty": "Nada esperando. Receitas de venda e listagens expiradas ficam aqui.",
       "collectNote": "Receitas e bens devolvidos que o Mercador guarda para você.",
       "saleProceeds": "Receitas da venda",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Coletar tudo"
     },
     "logs": {
@@ -10331,13 +10347,13 @@ export const pt_BR: EnTranslations = {
         "name": "Aljava Direfang"
       },
       "sharp_claw": {
-        "name": "Garra afiada"
+        "name": "Sharp Claw"
       },
       "curved_tusk": {
-        "name": "Presa curva"
+        "name": "Curved Tusk"
       },
       "pristine_claw": {
-        "name": "Garra imaculada"
+        "name": "Pristine Claw"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"

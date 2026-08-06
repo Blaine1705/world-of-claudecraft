@@ -300,14 +300,4 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hud.prompts.guildInviteCancelled':
     'Une invitation de guilde en attente a été annulée parce que la guilde a été renommée.',
   'hud.prompts.guildRenamed': "Votre guilde a été renommée en {name} par l'équipe de modération.",
-  'hudChrome.unitFrame.petLabel': 'Votre familier',
-  'hudChrome.pvp.launcherTitle': 'JcJ',
-  'hudChrome.pvp.mobileLabel': 'JcJ',
-  'entities.items.moggers_hide_quiver.name': 'Carquois en cuir de Mogger',
-  'entities.items.cragmaw_huntquiver.name': 'Carquois de chasse de Cragmaw',
-  'entities.items.gravewyrm_bone_quiver.name': 'Carquois en os du Gravewyrm',
-  'entities.items.direfang_quiver.name': 'Carquois de Direfang',
-  'entities.items.sharp_claw.name': 'Griffe tranchante',
-  'entities.items.curved_tusk.name': 'Défense courbée',
-  'entities.items.pristine_claw.name': 'Griffe intacte',
 };
