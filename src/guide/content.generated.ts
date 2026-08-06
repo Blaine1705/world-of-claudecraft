@@ -267,7 +267,16 @@ export interface GuideProfWorkOrder {
 
 export interface GuideProfEconomy {
   craftFeeCopperPerBudgetPoint: number;
-  actionThrottle: { windowSeconds: number; maxActions: number };
+  castPace: {
+    fieldSec: number;
+    skill25Sec: number;
+    skill50Sec: number;
+    skill75Sec: number;
+    comboSec: number;
+    enchantFamilySec: number;
+    rechargeSec: number;
+    batchMax: number;
+  };
   marketCutPct: number;
   listingDepositCopper: number;
   trainingFeeCopperByTier: number[];
@@ -1171,8 +1180,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_priest",
     "tint": "#f0e9d6",
-    "tintStrength": 0.15,
-    "still": "/guide-stills/player_priest__f0e9d6__s15.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_priest__f0e9d6__s12.webp"
   },
   {
     "id": "shaman",
@@ -1316,8 +1325,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_shaman",
     "tint": "#6f8fc9",
-    "tintStrength": 0.15,
-    "still": "/guide-stills/player_shaman__6f8fc9__s15.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_shaman__6f8fc9__s12.webp"
   },
   {
     "id": "mage",
@@ -1803,8 +1812,8 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
     ],
     "model": "player_warlock",
     "tint": "#8d5fd3",
-    "tintStrength": 0.15,
-    "still": "/guide-stills/player_warlock__8d5fd3__s15.webp"
+    "tintStrength": 0.12,
+    "still": "/guide-stills/player_warlock__8d5fd3__s12.webp"
   },
   {
     "id": "druid",
@@ -2326,7 +2335,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
     "families": [
       "beast",
       "burrower",
-      "undead"
+      "undead",
+      "elemental"
     ]
   },
   {
@@ -2605,6 +2615,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#d8d0c0",
         "tintStrength": 0.3,
         "still": "/guide-stills/mob_alpaca__d8d0c0__s30.webp"
+      },
+      {
+        "name": "Shoal Scuttler",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "shoal_scuttler",
+        "model": "mob_crab",
+        "tint": "#8898a8",
+        "tintStrength": 0.35,
+        "still": "/guide-stills/mob_crab__8898a8__s35.webp"
       },
       {
         "name": "Thicket Boar",
@@ -3220,6 +3241,17 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "tint": "#d0f2c8",
         "tintStrength": 0.55,
         "still": "/guide-stills/mob_ghost__d0f2c8__s55.webp"
+      },
+      {
+        "name": "Gale Wisp",
+        "min": 20,
+        "max": 20,
+        "rare": false,
+        "templateId": "gale_wisp",
+        "model": "mob_elemental",
+        "tint": "#bfe0e8",
+        "tintStrength": 0.4,
+        "still": "/guide-stills/mob_elemental__bfe0e8.webp"
       },
       {
         "name": "Nightkin Stargazer",
@@ -5141,6 +5173,35 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "crest": "/ui/deeds/chr_hollow_rares.webp"
   },
   {
+    "id": "pvp_bg_first_capture",
+    "name": "Banner in Hand",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "pvp_bg_first_win",
+    "name": "The Hollow Holds",
+    "category": "pvp",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "pvp_bg_wins_25",
+    "name": "Warden of the Hollow",
+    "category": "pvp",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Flagbearer"
+  },
+  {
+    "id": "pvp_bg_captures_100",
+    "name": "A Hundred Banners",
+    "category": "pvp",
+    "renown": 50,
+    "feat": false
+  },
+  {
     "id": "chr_willowfen_gatherer",
     "name": "Fenland Bounty",
     "category": "chronicle",
@@ -5200,6 +5261,153 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Sky Goes Quiet",
     "category": "chronicle",
     "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "dgn_rift",
+    "name": "Riftwalker",
+    "category": "dungeon",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "dgn_rift_s_rank",
+    "name": "Rift Sovereign",
+    "category": "dungeon",
+    "renown": 25,
+    "feat": false
+  },
+  {
+    "id": "prog_engineering_rare",
+    "name": "Precision Engineering",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_alchemy_rare",
+    "name": "A Rare Vintage",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_cooking_rare",
+    "name": "A Dish to Remember",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_leatherworking_rare",
+    "name": "Fine Tanning",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_tailoring_rare",
+    "name": "A Master's Stitch",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_weaponcrafting_rare",
+    "name": "Tempered to a Shine",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "prog_armorcrafting_rare",
+    "name": "Plated to Perfection",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "chr_frostveil_gatherer",
+    "name": "Terraced Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_frostveil_first_cast",
+    "name": "First Ice on the Tarn",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_amberfall_gatherer",
+    "name": "The Amberfall Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_amberfall_first_cast",
+    "name": "A Catch from the Great Mere",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_nightbloom_gatherer",
+    "name": "The Dreaming Harvest",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_nightbloom_first_cast",
+    "name": "A Ripple on the Moonwell",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_wraithwood_gatherer",
+    "name": "Harvest Under the Canopy",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_wraithwood_first_cast",
+    "name": "A Cast in the Looking-Glass",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_palmreach_gatherer",
+    "name": "Harvest on the Palmstrand",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_palmreach_first_cast",
+    "name": "Casting the Sapphire Lagoon",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_gatherer",
+    "name": "The Parterre's Bounty",
+    "category": "chronicle",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "chr_evergarden_first_cast",
+    "name": "A Cast on the Petal Pond",
+    "category": "chronicle",
+    "renown": 5,
     "feat": false
   }
 ];
@@ -9392,6 +9600,24 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       ]
     },
     {
+      "id": "enchant_offhand_stamina",
+      "name": "Enchant Offhand - Stamina",
+      "slot": "offhand",
+      "tier": "base",
+      "reagents": [
+        {
+          "name": "Chime Dust",
+          "count": 5
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "sta",
+          "value": 3
+        }
+      ]
+    },
+    {
       "id": "enchant_helmet_fortitude",
       "name": "Enchant Helmet - Fortitude",
       "slot": "helmet",
@@ -10200,9 +10426,15 @@ export const GUIDE_PROF_MASTERWORK: GuideProfMasterwork = {
 
 export const GUIDE_PROF_ECONOMY: GuideProfEconomy = {
   "craftFeeCopperPerBudgetPoint": 2,
-  "actionThrottle": {
-    "windowSeconds": 60,
-    "maxActions": 10
+  "castPace": {
+    "fieldSec": 1.75,
+    "skill25Sec": 2.5,
+    "skill50Sec": 3,
+    "skill75Sec": 3.5,
+    "comboSec": 4,
+    "enchantFamilySec": 1.5,
+    "rechargeSec": 1.5,
+    "batchMax": 50
   },
   "marketCutPct": 5,
   "listingDepositCopper": 0,
@@ -10438,7 +10670,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.r"
       }
     ],
-    "tintStrength": 0.15
+    "tintStrength": 0.12
   },
   "player_shaman": {
     "url": "models/chars/players/barbarian.glb",
@@ -10457,7 +10689,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.15
+    "tintStrength": 0.12
   },
   "player_mage": {
     "url": "models/chars/players/mage.glb",
@@ -10489,7 +10721,7 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
         "gripRef": "Spellbook_open"
       }
     ],
-    "tintStrength": 0.15
+    "tintStrength": 0.12
   },
   "player_druid": {
     "url": "models/chars/players/druid.glb",

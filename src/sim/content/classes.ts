@@ -1,3 +1,4 @@
+import { resolveTalentHitMult } from '../talent_hit_mult';
 import {
   type AbilityDef,
   type AbilityEffect,
@@ -8264,6 +8265,12 @@ function scaleEffect(
         min: Math.round(eff.min * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
         max: Math.round(eff.max * (eff.type === 'aoeHeal' ? healMult : dmgMult) + flat),
       };
+    case 'chainDamage':
+      return {
+        ...eff,
+        min: Math.round(eff.min * dmgMult + flat),
+        max: Math.round(eff.max * dmgMult + flat),
+      };
     case 'aoeRoot':
       return {
         ...eff,
@@ -8317,6 +8324,17 @@ function scaleEffect(
         tickMax: Math.round(eff.tickMax * healMult + flat),
         finalMin: Math.round(eff.finalMin * healMult),
         finalMax: Math.round(eff.finalMax * healMult),
+      };
+    case 'massTemporalEcho':
+      // Like heal/chainHeal, the initial-heal base is talent scaled here so it
+      // matches the SP rider talentHealMult now applies at the effect_dispatch.ts
+      // call site (Chronoweave's "all healing" bonus was previously a no-op here).
+      return {
+        ...eff,
+        heal: {
+          min: Math.round(eff.heal.min * healMult + flat),
+          max: Math.round(eff.heal.max * healMult + flat),
+        },
       };
     case 'hot':
       return {
@@ -8406,10 +8424,15 @@ function scaleEffect(
 // mods stack on top and also tune cost / cast time / cooldown.
 export function applyTalentMods(entry: KnownAbility, mods: TalentModifiers): void {
   const am = mods.abilities[entry.def.id];
-  const physical = entry.def.school === 'physical';
-  const globalDmg = physical ? mods.global.meleeDmgPct : mods.global.spellDmgPct;
-  const dmgMult = 1 + globalDmg + (am?.dmgPct ?? 0);
-  const healMult = 1 + mods.global.healPct + (am?.dmgPct ?? 0);
+  // dmgMult/healMult come from the shared talent_hit_mult resolver: the SAME
+  // function combat sites (effect_dispatch.ts/casting_lifecycle.ts/auto_attack.ts)
+  // call to scale a resolved ability's runtime SP/AP/weapon rider, so the
+  // authored-base bake here and the rider scaling at combat time can never drift
+  // apart. (The melee bucket also covers hunter's ranged-AP shots regardless of
+  // magic school: `scalesWith: 'ranged'` is exclusively set on hunter abilities
+  // (arcane_shot, serpent_sting, wyvern_sting are non-physical), so Marksmanship's
+  // Iron Aim ("ranged ability damage") reaches Arcane Shot, the spec's arcane nuke.)
+  const { dmgMult, healMult } = resolveTalentHitMult(entry.def, mods);
   const dotMult = 1 + mods.global.dotDmgPct;
   const hotMult = 1 + mods.global.hotHealPct;
   const absorbMult = 1 + mods.global.absorbPct;
