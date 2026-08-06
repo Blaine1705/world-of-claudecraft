@@ -231,7 +231,7 @@ export interface CastleWallLedge {
 }
 export const CASTLE_WALL_LEDGES: readonly CastleWallLedge[] = [
   { x: 439.8, z: 2040, hw: 1.5, hd: 1.8, top: 7.3 },
-  { x: 439.7, z: 2036, hw: 1.4, hd: 1.8, top: 9.3 },
+  { x: 439.7, z: 2036, hw: 1.4, hd: 1.8, top: 9.35 },
   { x: 439.7, z: 2032, hw: 1.4, hd: 1.8, top: 11.4 },
 ] as const;
 /** the step ramps run from the ward edge z1 down to bailey over this run */

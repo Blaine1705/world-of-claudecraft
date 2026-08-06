@@ -571,12 +571,12 @@ export const LASTKEEP_DECOR: readonly AuthoredDecor[] = [
 export const LASTKEEP_LEDGES: readonly AuthoredLedge[] = [
   // the great hall: up the east flank toward the throne end
   { x: 12.2, z: 14, hw: 1.6, hd: 2.8, top: 1.3 },
-  { x: 12.2, z: 22, hw: 1.6, hd: 2.8, top: 3.3 },
-  { x: 12.2, z: 30, hw: 1.6, hd: 2.8, top: 3.3 },
+  { x: 12.2, z: 22, hw: 1.6, hd: 2.8, top: 3.35 },
+  { x: 12.2, z: 30, hw: 1.6, hd: 2.8, top: 3.35 },
   // the ballroom: a musicians' shelf up the north wall
   { x: -35.2, z: 21.4, hw: 2.6, hd: 1.4, top: 1.2 },
-  { x: -29, z: 21.4, hw: 2.6, hd: 1.4, top: 3.2 },
-  { x: -22, z: 21.4, hw: 2.6, hd: 1.4, top: 3.2 },
+  { x: -29, z: 21.4, hw: 2.6, hd: 1.4, top: 3.25 },
+  { x: -22, z: 21.4, hw: 2.6, hd: 1.4, top: 3.25 },
 ] as const;
 
 export const LASTKEEP_LAYOUT: DungeonLayout = {
@@ -745,19 +745,19 @@ export const DAWNHOLD_DECOR: readonly AuthoredDecor[] = [
  * Dawnhold's parkour shelves. Two chains, each a VAULT onto a low shelf and
  * then a ledge CLIMB from that shelf to a high one, so the room is climbed
  * in two beats rather than one impossible hop. Heights are above the room
- * floor: the vault ceiling is 1.68 and the climb band is 1.8 to 2.2, and a
- * climb also measures 1.8 of overhead from the surface underfoot, which is
- * why every high shelf sits 2.0 over the low one rather than over the floor.
+ * floor: the vault ceiling is 1.88 and the climb band is 2.025 to 2.2 (the
+ * v0.35 climb tuning), which is why every high shelf sits 2.05 over the low
+ * one rather than over the floor.
  */
 export const DAWNHOLD_LEDGES: readonly AuthoredLedge[] = [
   // the great parlor: up the west flank, along, and out over the hearth
   { x: -11.4, z: 6, hw: 1.4, hd: 2.6, top: 1.3 },
-  { x: -11.4, z: 13, hw: 1.4, hd: 2.6, top: 3.3 },
-  { x: -11.4, z: 20, hw: 1.4, hd: 2.6, top: 3.3 },
+  { x: -11.4, z: 13, hw: 1.4, hd: 2.6, top: 3.35 },
+  { x: -11.4, z: 20, hw: 1.4, hd: 2.6, top: 3.35 },
   // the garden room: a planter shelf climbing toward the conservatory glass
   { x: 31.2, z: 0, hw: 1.4, hd: 2.4, top: 1.2 },
-  { x: 31.2, z: 6.5, hw: 1.4, hd: 2.4, top: 3.2 },
-  { x: 31.2, z: 13, hw: 1.4, hd: 2.4, top: 3.2 },
+  { x: 31.2, z: 6.5, hw: 1.4, hd: 2.4, top: 3.25 },
+  { x: 31.2, z: 13, hw: 1.4, hd: 2.4, top: 3.25 },
 ] as const;
 
 export const DAWNHOLD_LAYOUT: DungeonLayout = {

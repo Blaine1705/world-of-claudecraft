@@ -219,8 +219,8 @@ export const DAWNHOLD_WALL_LEDGES: readonly DawnholdWallLedge[] = [
   // off the wall leaves a strip of ground behind it too narrow to turn around
   // in, and a corbel grows out of the wall it is cut into anyway
   { x: 255, z: 861.1, hw: 1.5, hd: 1.4, top: 4.5 },
-  { x: 259, z: 861.1, hw: 1.4, hd: 1.4, top: 6.5 },
-  { x: 263, z: 861.1, hw: 1.4, hd: 1.4, top: 8.5 },
+  { x: 259, z: 861.1, hw: 1.4, hd: 1.4, top: 6.55 },
+  { x: 263, z: 861.1, hw: 1.4, hd: 1.4, top: 8.6 },
 ] as const;
 
 export interface DawnholdField {
