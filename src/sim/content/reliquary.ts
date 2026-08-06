@@ -1,7 +1,9 @@
-// The Reliquary catalog: data-as-code shelves, pages, and relic slots.
-// No engine logic lives here; runtime marks and pure completion math live in
-// src/sim/reliquary.ts. Player-facing names are English content re-localized
-// at the client boundary (the sim never emits Reliquary English text).
+// The Reliquary catalog: data-as-code shelves, pages, and relic slots, plus
+// pure read-only projections of the table (isCataloguedRelic*, the source
+// resolver). No engine logic lives here; runtime marks and pure completion
+// math live in src/sim/reliquary.ts. Player-facing names are English content
+// re-localized at the client boundary (the sim never emits Reliquary English
+// text).
 //
 // Page table is append-only once product pages ship: append new pages at the
 // END and never reorder or remove an id (ids may be referenced by firstFind
@@ -42,8 +44,8 @@ export type ReliquarySourceKind = 'boss' | 'zone' | 'profession' | 'deed' | 'ven
  * visible maintainer decision rather than an invented answer.
  */
 export interface ReliquarySourceHint {
-  sourceKind: ReliquarySourceKind;
-  sourceId: string;
+  readonly sourceKind: ReliquarySourceKind;
+  readonly sourceId: string;
 }
 
 /** One unique slot on a page. Item relics own via itemsDiscovered; other kinds
@@ -551,12 +553,18 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     // FIVE live sources drop this page's relics (sanctum_boneguard and
     // sanctum_drakonid trash plus the three bosses), of which FOUR are authored
     // as hints here. sanctum_boneguard is absent on purpose: the only two ids
-    // it drops, boundstone_helm and boundstone_girdle, are among the six rows
+    // it drops, boundstone_helm and boundstone_girdle, are among the seven rows
     // left un-hinted below, so it never wins a slot outright.
     //
-    // Those six each sit on TWO live loot tables at comparable rates with no
-    // primary (a trash family and a boss, or two mid-bosses), so no single id
-    // is the true answer. They are pinned in SOURCE_PENDING_RULING in
+    // Six of those seven sit on TWO OR MORE comparable live routes with no
+    // primary: a trash family and a boss or two mid-bosses for all six, plus a
+    // crafting recipe for boundstone_helm (recipe_ironbound_warplate_helm) and
+    // gravewyrm_gauntlets (recipe_forgeguard_bulwark_gauntlets), and a
+    // guaranteed quest reward (q_velkhar) for staff_of_velkhar and
+    // shadowmeld_tunic. The seventh, wyrmcult_grand_robe, has two routes that
+    // name two DIFFERENT mobs: the guaranteed mage reward of q_gravewyrm
+    // (objective: korzul_the_gravewyrm) and a korgath_bonus loot row at 0.1.
+    // All seven are pinned in SOURCE_PENDING_RULING in
     // tests/reliquary_content.test.ts awaiting a maintainer ruling rather than
     // being assigned by guess.
     relics: items(
@@ -569,7 +577,7 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
       ['korgaths_chainwraps', fromBoss('korgath_the_bound')],
       'staff_of_velkhar',
       'shadowmeld_tunic',
-      ['wyrmcult_grand_robe', fromBoss('korgath_the_bound')],
+      'wyrmcult_grand_robe',
       ['gravewyrm_sabatons', fromBoss('korgath_the_bound')],
       ['wyrmcult_soulsteps', fromBoss('korgath_the_bound')],
       ['wyrmshadow_treads', fromBoss('korgath_the_bound')],
@@ -926,8 +934,10 @@ export function isCataloguedRelicMark(markId: string): boolean {
  * page default, else null. Null is a real answer ("content does not name one
  * source"), not a missing value the caller should paper over with prose.
  *
- * THE one implementation of that precedence: every caller, the client view
- * included, goes through here rather than re-spelling `?? sourceDefault`.
+ * THE one implementation of that precedence: every production caller, the
+ * client view included, goes through here rather than re-spelling
+ * `?? sourceDefault` (tests may re-spell it deliberately as an independent
+ * oracle).
  *
  * Takes the page DEF, not a page id. The same relic sits on two pages (a set
  * member on both its boss page and its set page), so the page has to come from
