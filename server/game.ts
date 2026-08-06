@@ -9096,6 +9096,10 @@ export class GameServer {
     // Resolved once per batch, applied per session below against that session's
     // ANCHOR pid (so a spectator watching a fighter refreshes with them).
     const bgRespawnRefresh = this.bgRespawnRefreshPids(events);
+    // A pet acts for its owner, so combat-event delivery resolves each side to
+    // its controller before comparing against the viewer or viewer party.
+    const ownerOf = (entityId: number): number | null =>
+      this.sim.entities.get(entityId)?.ownerId ?? null;
     // Guard each session: a throw while routing events to one player must not
     // drop this tick's events for every other session (server/CLAUDE.md).
     forEachGuarded(
@@ -9120,7 +9124,7 @@ export class GameServer {
         for (let i = 0; i < events.length; i++) {
           const ev = events[i];
           if (suppressedInvites?.has(ev)) continue;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty)) continue;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) continue;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
