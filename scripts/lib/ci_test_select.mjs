@@ -197,11 +197,13 @@ export function decideTestMode({ eventName, code, files }) {
   // Shared planner buckets: lockfile, package.json, vite/vitest/tsconfig,
   // turbo/biome/npmrc, tests/helpers + fixtures, vitest setup files, and every
   // unrecognized path land in broadConfigs and widen to the full suite. The
-  // generatedI18n bucket (freshness-guarded artifacts) is inert here: the
+  // generatedI18n bucket (freshness-guarded artifacts) never widens: the
   // deletion guard above already ran over the statuses, presence in the merge
   // tree is re-proven shard-side (lib/ci_shard_plan.mjs has the checkout this
-  // job lacks), and pr-checks' i18n regenerate-and-diff runs on every code PR
-  // in every mode.
+  // job lacks), pr-checks' i18n regenerate-and-diff runs on every code PR in
+  // every mode, and the shard plan feeds the artifact paths to `vitest
+  // related` as graph nodes so their consumer suites stay selected (the
+  // rationale lives in lib/gate_select_plan.mjs).
   const { testFiles, relatedSources, broadConfigs, generatedI18n } =
     classifySelectPaths(changedPaths);
   if (broadConfigs.length > 0) {
@@ -215,7 +217,7 @@ export function decideTestMode({ eventName, code, files }) {
     changedPaths.length - relatedSources.length - testFiles.length - generatedI18n.length;
   const artifactNote =
     generatedI18n.length > 0
-      ? `, ${generatedI18n.length} generated i18n artifact(s) (freshness-guarded)`
+      ? `, ${generatedI18n.length} generated i18n artifact(s) fed to related (freshness-guarded)`
       : '';
   return {
     mode: 'selective',

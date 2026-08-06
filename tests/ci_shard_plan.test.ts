@@ -239,7 +239,11 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
     ]);
   });
 
-  it('keeps a PRESENT generated i18n artifact selective and out of the related leg', () => {
+  it('keeps a PRESENT generated i18n artifact selective and IN the related leg', () => {
+    // The artifact is a graph node: its consumers (including suites that pin
+    // resolved-table content through the src/ui/i18n.ts re-export seam) are
+    // reachable only from the artifact side, so dropping it from the argv is
+    // the silent-unselect failure mode this pin exists to catch.
     const plan = buildShardPlan({
       ...BASE,
       changedPaths: ['src/ui/unit_portrait.ts', 'src/ui/i18n.resolved.generated/da_DK.ts'],
@@ -248,7 +252,22 @@ describe('buildShardPlan: fail-closed fallbacks', () => {
     const related = plan.legs.find((l) => l.args.includes('related'));
     expect(related).toBeDefined();
     expect(related?.args).toContain('src/ui/unit_portrait.ts');
-    expect(related?.args).not.toContain('src/ui/i18n.resolved.generated/da_DK.ts');
+    expect(related?.args).toContain('src/ui/i18n.resolved.generated/da_DK.ts');
+    expect(plan.relatedCount).toBe(2);
+  });
+
+  it('truncates the missing-artifact fallback reason past three entries', () => {
+    const missing = [
+      'src/ui/i18n.resolved.generated/aa.ts',
+      'src/ui/i18n.resolved.generated/bb.ts',
+      'src/ui/i18n.resolved.generated/cc.ts',
+      'src/ui/i18n.resolved.generated/dd.ts',
+    ];
+    const plan = buildShardPlan({ ...BASE, changedPaths: missing, exists: () => false });
+    expect(plan.mode).toBe('full');
+    expect(plan.reason).toContain('generated i18n artifact(s) missing');
+    expect(plan.reason).toContain('src/ui/i18n.resolved.generated/cc.ts, ...');
+    expect(plan.reason).not.toContain('dd.ts');
   });
 });
 

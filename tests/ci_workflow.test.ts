@@ -7,7 +7,7 @@ import {
   GENERATED_I18N_ARTIFACT_PREFIXES,
   isGeneratedI18nArtifactPath,
 } from '../scripts/lib/gate_select_plan.mjs';
-import { buildFullGateSteps } from '../scripts/lib/gate_steps.mjs';
+import { buildFullGateSteps, I18N_ARTIFACTS } from '../scripts/lib/gate_steps.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
 const detectEntry = readFileSync(
@@ -318,16 +318,26 @@ describe('CI workflow parity', () => {
       ...GENERATED_I18N_ARTIFACT_PREFIXES.map((p) => p.replace(/\/$/, '')),
       ...GENERATED_I18N_ARTIFACT_FILES,
     ].sort();
+    // The LOCAL gate's freshness list must agree too: gate_select treats the
+    // classifier's paths as never-widening on the strength of the local i18n
+    // freshness step covering them, and that step builds its argv from
+    // I18N_ARTIFACTS. Without this coupling, narrowing I18N_ARTIFACTS would
+    // silently orphan the local half of the safety argument (the step's own
+    // test compares the argv to the same constant, which pins nothing).
+    expect([...I18N_ARTIFACTS].sort()).toEqual(classifierPaths);
     for (const jobName of ['pr-checks', 'release-checks']) {
       const job = jobSource(jobName);
-      const m = job.match(/run: git diff --exit-code -- ([^\n]+)/);
+      // Anchored to the src/ prefix so a future unrelated `git diff
+      // --exit-code` step added above this one cannot re-point the pin.
+      const m = job.match(/run: git diff --exit-code -- (src\/[^\n]+)/);
       expect(m, `${jobName} must carry the freshness diff step`).not.toBeNull();
       const freshnessPaths = (m as RegExpMatchArray)[1].trim().split(/\s+/).sort();
       expect(classifierPaths).toEqual(freshnessPaths);
       // Regenerate BEFORE diff, inside the same job, so the diff proves the
-      // committed artifacts against the PR's own sources.
-      expect(job.indexOf('run: npm run i18n:gen')).toBeGreaterThan(0);
-      expect(job.indexOf('run: npm run i18n:gen')).toBeLessThan(
+      // committed artifacts against the PR's own sources. Trailing newline so
+      // a renamed `i18n:gen:something` cannot satisfy the pin.
+      expect(job.indexOf('run: npm run i18n:gen\n')).toBeGreaterThan(0);
+      expect(job.indexOf('run: npm run i18n:gen\n')).toBeLessThan(
         job.indexOf('run: git diff --exit-code --'),
       );
     }

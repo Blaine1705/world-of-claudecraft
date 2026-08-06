@@ -74,22 +74,37 @@ export function isFullSuiteTrigger(p) {
 }
 
 /**
- * The regenerated i18n artifacts the selective planner treats as INERT rather
- * than unclassifiable. These are the ONLY generated trees with that standing,
- * and the standing rests on one structural invariant: ci.yml's pr-checks job
- * (and its release-checks mirror, and the full local gate's i18n step) reruns
- * `npm run i18n:gen` and fails on `git diff --exit-code` over EXACTLY these
- * paths, on every code PR, in every test mode. So a hand-edited or stale
- * artifact is a red check regardless of test selection, and a faithful
- * regeneration is a pure function of catalog/overlay/generator sources that
- * are themselves classified normally (related sources reaching every consumer
- * the import graph models). Suites that consume the artifacts from OUTSIDE
- * the modeled graph ride the always-run floor via the generated-i18n entry in
- * lib/test_visibility.mjs OUT_OF_GRAPH_PATTERNS.
+ * The regenerated i18n artifacts the selective planner classifies into their
+ * own bucket instead of the unrecognized-widen-to-full catch-all. These are
+ * the ONLY generated trees with that standing, and it rests on two facts:
  *
- * tests/ci_workflow.test.ts pins this list against the freshness-diff paths in
- * ci.yml itself: a path may only be listed here while the freshness step
- * proves it, so the two cannot drift apart silently.
+ * INTEGRITY is owned by freshness, which selection never touches: ci.yml's
+ * pr-checks job (and its release-checks mirror, and the full local gate's
+ * i18n step) reruns `npm run i18n:gen` and fails on `git diff --exit-code`
+ * over EXACTLY these paths, on every code PR, in every test mode. A
+ * hand-edited or stale artifact is a red check regardless of selection.
+ *
+ * COVERAGE is owned by the import graph, WITH the artifacts as the entry
+ * nodes: the artifacts are the most-connected runtime modules in the i18n
+ * graph (src/ui/i18n.ts statically imports and re-exports the resolved
+ * barrel), while their DRIVING sources (catalog, overlays) are build inputs
+ * the runtime reaches only through type-erased edges, so `related` over a
+ * driving source selects almost nothing. The planner therefore feeds the
+ * changed artifact paths THEMSELVES to `vitest related`, which walks the real
+ * import graph to every consumer (measured: a single resolved slice reaches
+ * about 240 of 2296 suites). They are inert only for the widen decision,
+ * never dropped from selection.
+ *
+ * Membership is TOP-LEVEL ONLY under the two resolved dirs: the generator's
+ * orphan sweep deletes an unexpected top-level .ts on regeneration (making a
+ * hand-added file freshness-red), but the sweep does not recurse, so a
+ * SUBDIRECTORY path under an artifact dir is not freshness-provable and must
+ * keep the unrecognized-widen behavior.
+ *
+ * tests/ci_workflow.test.ts pins this list against the freshness-diff paths
+ * in ci.yml itself AND against the local gate's I18N_ARTIFACTS list
+ * (lib/gate_steps.mjs): a path may only be listed here while both freshness
+ * steps prove it, so the copies cannot drift apart silently.
  *
  * Any OTHER `.generated` path keeps today's behavior (unrecognized: widen to
  * the full suite); do not add one here without its own freshness-equivalent
@@ -105,7 +120,9 @@ export const GENERATED_I18N_ARTIFACT_FILES = Object.freeze([
 ]);
 
 /**
- * True only for the freshness-guarded generated i18n artifact paths above.
+ * True only for the freshness-guarded generated i18n artifact paths above:
+ * the exact catalog key-union file, or a TOP-LEVEL .ts directly under one of
+ * the two resolved dirs (the freshness sweep cannot see deeper).
  *
  * @param {string} p
  * @returns {boolean}
@@ -114,7 +131,11 @@ export function isGeneratedI18nArtifactPath(p) {
   const n = normalizeRepoPath(p);
   if (!n) return false;
   if (GENERATED_I18N_ARTIFACT_FILES.includes(n)) return true;
-  return GENERATED_I18N_ARTIFACT_PREFIXES.some((prefix) => n.startsWith(prefix));
+  return GENERATED_I18N_ARTIFACT_PREFIXES.some((prefix) => {
+    if (!n.startsWith(prefix)) return false;
+    const rest = n.slice(prefix.length);
+    return rest.endsWith('.ts') && !rest.includes('/');
+  });
 }
 
 /**
@@ -244,16 +265,22 @@ export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists }) {
   }
 
   // Present in the reason so an audited log never reads "no changes" while
-  // artifacts moved; the freshness step is the integrity bar for these.
+  // artifacts moved; freshness owns their integrity, `related` their coverage.
   const artifactNote =
     generatedI18n.length > 0
-      ? `; ${generatedI18n.length} generated i18n artifact(s) inert (freshness-guarded)`
+      ? `; ${generatedI18n.length} generated i18n artifact(s) fed to related (freshness-guarded)`
       : '';
 
   // A changed test file always runs, whether or not the graph would pick it.
   const alwaysWithChangedTests = [...new Set([...always, ...testFiles])].sort();
 
-  if (relatedSources.length === 0 && testFiles.length === 0) {
+  // The artifacts join the related leg as GRAPH NODES (see the header above):
+  // their consumers are reachable only from the artifact side of the graph,
+  // so dropping them here is what would silently unselect every suite that
+  // pins resolved-table content through the src/ui/i18n.ts re-export seam.
+  const relatedWithArtifacts = [...relatedSources, ...generatedI18n];
+
+  if (relatedWithArtifacts.length === 0 && testFiles.length === 0) {
     return {
       mode: 'selective',
       reason: `no code or test changes: always-run set only${artifactNote}`,
@@ -267,7 +294,7 @@ export function buildSelectPlan({ changedPaths, alwaysRunFiles, exists }) {
     mode: 'selective',
     reason: `${relatedSources.length} changed source file(s), ${testFiles.length} changed test file(s)${artifactNote}`,
     alwaysRunFiles: alwaysWithChangedTests,
-    relatedSources,
+    relatedSources: relatedWithArtifacts,
     changedTestFiles: testFiles,
   };
 }

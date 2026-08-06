@@ -240,7 +240,7 @@ describe('decideTestMode: generated i18n artifacts', () => {
     expect(d.changedPaths).toEqual(['src/ui/i18n.catalog/tooltips.ts', p]);
     expect(d.reason).toBe(
       'selective: 1 changed source file(s), 0 changed test file(s), ' +
-        '0 inert path(s), 1 generated i18n artifact(s) (freshness-guarded)',
+        '0 inert path(s), 1 generated i18n artifact(s) fed to related (freshness-guarded)',
     );
   });
 
@@ -253,7 +253,7 @@ describe('decideTestMode: generated i18n artifacts', () => {
       ],
     });
     expect(d.mode).toBe('selective');
-    expect(d.reason).toContain('2 generated i18n artifact(s) (freshness-guarded)');
+    expect(d.reason).toContain('2 generated i18n artifact(s) fed to related (freshness-guarded)');
   });
 
   it('widens on a removed or renamed-away artifact (the freshness diff cannot see it)', () => {
@@ -292,12 +292,17 @@ describe('decideTestMode: generated i18n artifacts', () => {
   });
 
   it('refuses lookalike paths outside the pinned artifact classes', () => {
-    // Prefix matching is anchored at the repo root and requires the directory
-    // separator, so nested or renamed trees never inherit the inert standing.
+    // Prefix matching is anchored at the repo root, requires the directory
+    // separator, and stops at ONE level (the freshness sweep cannot see
+    // deeper); the file arm is an exact-path match, never a basename match
+    // (a same-named file elsewhere is not freshness-proven).
     for (const p of [
       'nested/src/ui/i18n.resolved.generated/en.ts',
       'src/ui/i18n.resolved.generated.bak.ts',
       'src/guide/i18n.resolved.generated/en.ts',
+      'src/ui/i18n.resolved.generated/sub/en.ts',
+      'src/admin/i18n.catalog/translation_keys.generated.ts',
+      'nested/src/ui/i18n.catalog/translation_keys.generated.ts',
     ]) {
       const d = decideTestMode({ ...PR, files: [mod(p)] });
       expect(d.mode).toBe('full');
