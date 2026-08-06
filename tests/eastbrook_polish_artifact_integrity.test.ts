@@ -608,6 +608,12 @@ function readJsonFile<T>(filePath: string): T {
   return JSON.parse(readFileSync(filePath, 'utf8')) as T;
 }
 
+// FROZEN, and no longer equal to the live town fingerprint: this is the identity of
+// the tree the v2 polish captures were taken against, not a mirror of the current
+// one. It first diverged when a lockfile-only dependency bump re-minted the town
+// fingerprint to aa0df220..., which moved the live value without retaking a single
+// screenshot. Do NOT sweep this to the live value along with the neighbouring
+// literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
 const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
@@ -628,14 +634,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
 // at the same captured view, and only its swept provenance bytes follow the
 // merged rendererIntegration and layout inputs.
 // Re-minted with scripts/assets/eastbrook_grand_armoury/remint_polish_provenance.mjs.
-// Re-pinned again for the mobile-disconnect fix: src/render/renderer.ts gains the
-// bounded ground-object reuse pool (storePooledObject/takePooledObject cap), the
-// rendererIntegration leaf, so the composite (and the metadata file's second-order
-// digest that embeds it) re-mint once more.
+// Re-pinned for the integrated v0.35 renderer on AAA-enhancements. The accepted
+// captures are unchanged; only the rendererIntegration leaf, composite, and the
+// metadata file's second-order digest are re-minted on this branch.
+// Re-pinned again for the merge of release/v0.35.0 into AAA-enhancements: both
+// sides moved the rendererIntegration leaf (this branch's integrated v0.35
+// renderer; the release's bounded ground-object reuse pool), so the merged tree
+// mints literals matching neither parent. Captures adopted verbatim from the
+// release tip; swept by remint_polish_provenance.mjs on the merged tree.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '90d5ab49680e3e2bf8be49f35acdc0d964275a51a337715fc57497acfeaf95a6';
+  'dcf57f6d70ee1c8b472f8d1114d129005c2f0d051db925b8cfe506ad1f0b8c03';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '628f66e2ba22fb456ca64603dfee7311bf766ee5d9ebe71d5e2b2109b01f1d3b';
+  'f748c054b28d4e30f80dbb41b52a47e590d24f6bd262cf800b4febe0535c83d9';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1503,10 +1513,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // every measured value (frame timings, draw stats, triangle and scenario
     // numbers) is adopted verbatim from the base tip; no parent's literal
     // matched the merged tree, and no capture was retaken here.
-    // Re-pinned again for the mobile-disconnect fix's src/render/renderer.ts change
-    // (bounded ground-object reuse pool), recomputed by remint_polish_provenance.mjs.
+    // Re-pinned for the integrated v0.35 renderer on AAA-enhancements and
+    // recomputed by remint_polish_provenance.mjs.
     expect(fingerprint.digest('hex')).toBe(
-      'd26892a5c5ea31b30370b477a5eb610a21b1267e7556b1efcdb6a6b96beb9d62',
+      '4fd9c844d07805ba75c6749ae76ee139838d5f3f389fe2b20266671f7afb4cd0',
     );
   });
 

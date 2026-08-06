@@ -1,7 +1,7 @@
 // Chronomancy Phase 3 mechanics (docs/prd/mage-chronomancy.md 13.4 / 14): Aether
 // Surge (Oleada de éter), the single-target Arcane spender with per-caster Arcane
 // Charges. Each cast READS the charges held (scaling damage +30%/charge and cost
-// x1.9/charge), THEN banks one more (cap 4); the charge aura expires 10s after
+// x2/charge), THEN banks one more (cap 4); the charge aura expires 10s after
 // the last cast. Aether Darts (arcane_missiles) consumes every charge on its
 // first landed missile, splitting a flat Arcane bonus across the missiles.
 import { describe, expect, it } from 'vitest';
@@ -95,8 +95,9 @@ describe('Aether Surge charge multipliers (pure)', () => {
 });
 
 describe('Aether Surge cost at each charge level (resolvedAbility choke point)', () => {
-  it('the affordability/spend cost is base x1.9^charges, rounded', () => {
+  it('pins the tuned base and resolves affordability/spend at base x2^charges', () => {
     const base = ABILITIES.arcane_surge.cost; // provisional base, derived via harness
+    expect(base).toBe(14);
     const { sim, p } = chronoMage();
     for (let k = 0; k <= 4; k++) {
       p.auras = p.auras.filter((a) => a.id !== 'arcane_surge');
@@ -125,6 +126,21 @@ describe('Aether Surge charge sequence (use previous, then +1)', () => {
   it('a higher-charge cast hits harder (the damage multiplier is real)', () => {
     const { sim, p } = chronoMage();
     const mob = addHostile(sim);
+    // Pin crit OFF for both casts. A spell crit is a flat 1.5x, big enough to
+    // swamp the +30%-per-charge scaling this test is measuring: a crit on the
+    // zero-charge cast alone made the comparison read backwards. Carried on an
+    // aura rather than a raw stat so the recalc-on-cast cannot wipe it, and
+    // rng.chance still draws its number, so the stream shape is unchanged.
+    p.auras.push({
+      id: 'test_no_crit',
+      name: 'test-pinned-no-crit',
+      kind: 'buff_spellcrit',
+      value: -1,
+      remaining: 600,
+      duration: 600,
+      sourceId: p.id,
+      school: 'arcane',
+    } as Aura);
     const dmgOf = (evs: SimEvent[]) =>
       evs
         .filter(
@@ -138,7 +154,7 @@ describe('Aether Surge charge sequence (use previous, then +1)', () => {
     p.auras.push(chargeAura(3));
     const d3 = dmgOf(castResolve(sim, p, 'arcane_surge', mob.id)); // 3 charges (x1.9)
     expect(d0).toBeGreaterThan(0);
-    expect(d3).toBeGreaterThan(d0 * 1.5); // clearly harder; ~1.9x before roll noise
+    expect(d3).toBeGreaterThan(d0 * 1.5); // clearly harder; ~1.9x with crit pinned off
   });
 });
 
