@@ -32,6 +32,7 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     staged: [],
     theirStaged: [slot(EPIC.id)],
     goldCopper: 0,
+    pendingOffer: null,
     items: TABLE,
     marketEnabled: true,
     selfWalletVerified: true,
@@ -44,6 +45,8 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     onModeChange: vi.fn(),
     onPriceInput: vi.fn(),
     onSendOffer: vi.fn(),
+    onAcceptOffer: vi.fn(),
+    onCancelOffer: vi.fn(),
     ...over,
   };
 }
@@ -227,5 +230,62 @@ describe('the trade window actually applies the gold lock', () => {
         `id="trade-${coin}"\${goldAttr}`,
       );
     }
+  });
+});
+
+describe('a standing offer becomes a REVIEW surface for both sides', () => {
+  const offer = { id: 7, usdCents: 100, tokens: 7812.5, role: 'buyer' as const };
+
+  it('shows the agreed price, and the token figure the server quoted', () => {
+    // Both sides read the same numbers: the USD they agreed, and the tokens as
+    // quoted once, so neither player sees a different figure from the other.
+    const root = paint(deps({ pendingOffer: offer }));
+    const text = root.querySelector('.trade-woc-offer')?.textContent ?? '';
+    expect(text).toContain('1.00');
+    expect(text).toContain('7,812.5');
+  });
+
+  it('replaces the price form: you cannot stack a second offer on the first', () => {
+    const root = paint(deps({ pendingOffer: offer }));
+    expect(root.querySelector('#trade-woc-usd')).toBeNull();
+    expect(root.querySelector('[data-woc-send]')).toBeNull();
+  });
+
+  it('gives the BUYER withdraw and no accept', () => {
+    const root = paint(deps({ pendingOffer: offer }));
+    expect(root.querySelector('[data-woc-cancel]')).toBeTruthy();
+    expect(root.querySelector('[data-woc-accept]'), 'a buyer must not accept their own offer').toBeNull();
+  });
+
+  it('gives the SELLER accept and no withdraw', () => {
+    const root = paint(
+      deps({ pendingOffer: { ...offer, role: 'seller' }, staged: [slot(EPIC.id)] }),
+    );
+    expect(root.querySelector<HTMLButtonElement>('[data-woc-accept]')?.disabled).toBe(false);
+    expect(root.querySelector('[data-woc-cancel]')).toBeNull();
+  });
+
+  it("disables the seller's accept until they stage something eligible, and says why", () => {
+    // Acceptance is what escrows the goods, so there must be goods.
+    const root = paint(deps({ pendingOffer: { ...offer, role: 'seller' }, staged: [] }));
+    expect(root.querySelector<HTMLButtonElement>('[data-woc-accept]')?.disabled).toBe(true);
+    expect(root.querySelector('[data-woc-hint]')?.textContent ?? '').not.toBe('');
+  });
+
+  it('reports accept and withdraw presses', () => {
+    const seller = deps({ pendingOffer: { ...offer, role: 'seller' }, staged: [slot(EPIC.id)] });
+    paint(seller).querySelector<HTMLElement>('[data-woc-accept]')?.click();
+    expect(seller.onAcceptOffer).toHaveBeenCalled();
+
+    const buyer = deps({ pendingOffer: offer });
+    paint(buyer).querySelector<HTMLElement>('[data-woc-cancel]')?.click();
+    expect(buyer.onCancelOffer).toHaveBeenCalled();
+  });
+
+  it('omits the token figure rather than guessing when the quote is unavailable', () => {
+    const root = paint(deps({ pendingOffer: { ...offer, tokens: null } }));
+    const text = root.querySelector('.trade-woc-offer')?.textContent ?? '';
+    expect(text).toContain('1.00');
+    expect(text).not.toContain('(');
   });
 });

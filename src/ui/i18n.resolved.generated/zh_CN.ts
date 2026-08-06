@@ -503,11 +503,13 @@ export const zh_CN: EnTranslations = {
         "hintClearYourItems": "请先移出你自己的物品：$WOC 报价用于购买对方出售的物品。",
         "hintAwaitTheirItems": "正在等待对方拿出可用 $WOC 出售的物品。",
         "hintEnterPrice": "请输入美元价格。",
+        "hintAcceptNeedsItem": "接受前请先放入你要出售的物品。",
         "hintGoldOffered": "请先移除你的金币报价：一笔交易只能用金币或 $WOC，不能兼有。",
         "ineligibleNote": "有 {count} 件暂存物品无法出售换取 $WOC。",
         "incomingTitle": "来自 {name} 的 $WOC 报价",
         "incomingBody": "{name} 提出以 {price} 将 {item} 出售给你。",
-        "accept": "接受并付款",
+        "accept": "接受报价",
+        "accepted": "报价已接受。你的物品将被托管，直至付款完成验证。",
         "decline": "拒绝",
         "withdraw": "撤回报价"
       }

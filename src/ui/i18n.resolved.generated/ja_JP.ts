@@ -503,11 +503,13 @@ export const ja_JP: EnTranslations = {
         "hintClearYourItems": "自分のアイテムを外してください。$WOC の提示は相手の出品を買うためのものです。",
         "hintAwaitTheirItems": "$WOC で売却できるものを相手が出すのを待っています。",
         "hintEnterPrice": "USD で価格を入力してください。",
+        "hintAcceptNeedsItem": "承諾する前に、売却するアイテムを入れてください。",
         "hintGoldOffered": "先にゴールドの提示を取り消してください。取引はゴールドか $WOC のどちらか一方です。",
         "ineligibleNote": "セットしたアイテムのうち {count} 個は $WOC で売却できません。",
         "incomingTitle": "{name} からの $WOC オファー",
         "incomingBody": "{name} が {item} を {price} であなたに売却すると提案しています。",
-        "accept": "承諾して支払う",
+        "accept": "オファーを承諾",
+        "accepted": "オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。",
         "decline": "辞退する",
         "withdraw": "オファーを取り下げる"
       }

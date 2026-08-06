@@ -503,11 +503,13 @@ export const cs_CZ: EnTranslations = {
         "hintClearYourItems": "Remove your own items: a $WOC offer buys what they are selling.",
         "hintAwaitTheirItems": "Waiting for them to offer something that can be sold for $WOC.",
         "hintEnterPrice": "Enter a price in USD.",
+        "hintAcceptNeedsItem": "Add the item you are selling before accepting.",
         "hintGoldOffered": "Remove your gold offer first: a trade is gold or $WOC, not both.",
         "ineligibleNote": "{count} staged item(s) cannot be sold for $WOC.",
         "incomingTitle": "$WOC offer from {name}",
         "incomingBody": "{name} offers to sell you {item} for {price}.",
-        "accept": "Accept and pay",
+        "accept": "Accept offer",
+        "accepted": "Offer accepted. Your item is held until payment is verified.",
         "decline": "Decline",
         "withdraw": "Withdraw offer"
       }

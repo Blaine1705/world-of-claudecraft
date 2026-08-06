@@ -503,11 +503,13 @@ export const ko_KR: EnTranslations = {
         "hintClearYourItems": "내 아이템을 내려주세요. $WOC 제안은 상대가 파는 물건을 사는 것입니다.",
         "hintAwaitTheirItems": "상대가 $WOC로 판매 가능한 물건을 올리기를 기다리는 중입니다.",
         "hintEnterPrice": "USD 가격을 입력하세요.",
+        "hintAcceptNeedsItem": "수락하기 전에 판매할 아이템을 올려주세요.",
         "hintGoldOffered": "먼저 골드 제안을 취소하세요. 거래는 골드 또는 $WOC 중 하나만 가능합니다.",
         "ineligibleNote": "올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.",
         "incomingTitle": "{name} 님의 $WOC 제안",
         "incomingBody": "{name} 님이 {item}을(를) {price}에 판매하겠다고 제안했습니다.",
-        "accept": "수락하고 결제",
+        "accept": "제안 수락",
+        "accepted": "제안을 수락했습니다. 결제가 확인될 때까지 아이템이 보관됩니다.",
         "decline": "거절",
         "withdraw": "제안 철회"
       }

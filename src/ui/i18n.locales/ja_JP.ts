@@ -13100,6 +13100,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.hintAwaitTheirItems': '$WOC で売却できるものを相手が出すのを待っています。',
   'hudChrome.trade.woc.sendOffer': '$WOC を提示',
   'hudChrome.trade.woc.incomingAccept': '{name} があなたのアイテムに {price} を提示しています。',
+  'hudChrome.trade.woc.hintAcceptNeedsItem': '承諾する前に、売却するアイテムを入れてください。',
   'hudChrome.trade.woc.hintEnterPrice': 'USD で価格を入力してください。',
   'hudChrome.trade.woc.hintGoldOffered': '先にゴールドの提示を取り消してください。取引はゴールドか $WOC のどちらか一方です。',
   'hudChrome.trade.woc.ineligibleNote':
@@ -13107,7 +13108,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.incomingTitle': '{name} からの $WOC オファー',
   'hudChrome.trade.woc.incomingBody':
     '{name} が {item} を {price} であなたに売却すると提案しています。',
-  'hudChrome.trade.woc.accept': '承諾して支払う',
+  'hudChrome.trade.woc.accept': 'オファーを承諾',
+  'hudChrome.trade.woc.accepted': 'オファーを承諾しました。支払いが確認されるまでアイテムは預かられます。',
   'hudChrome.trade.woc.decline': '辞退する',
   'hudChrome.trade.woc.withdraw': 'オファーを取り下げる',
 };

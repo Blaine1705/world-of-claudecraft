@@ -57,6 +57,7 @@ function input(over: Partial<Parameters<typeof buildWocTradeModel>[0]> = {}) {
     tokens: 1234.5,
     split: { sellerCents: 4500, burnCents: 150, treasuryCents: 350 },
     goldOffered: false,
+    pendingOffer: null,
     ...over,
   };
 }
@@ -257,5 +258,36 @@ describe('sending is gated on a real, positive price', () => {
     expect(m.eligible.map((s) => s.itemId)).toEqual([EPIC.id]);
     expect(m.ineligible.map((s) => s.itemId)).toEqual([QUEST.id]);
     expect(m.canSend, 'a partly-eligible stage can still send the eligible part').toBe(true);
+  });
+});
+
+describe('a standing offer changes what each side may do', () => {
+  // These are asserted on the MODEL, not through the rendered panel. The panel
+  // branches on role and pendingOffer before it ever consults these flags, so
+  // driving it would pass even with the rules deleted: the two layers encode
+  // the same guard on purpose, and only this level tests the inner one.
+  const offer = { id: 7, usdCents: 100, tokens: 7812.5, role: 'buyer' as const };
+
+  it('forbids a SECOND offer while one is standing', () => {
+    const m = buildWocTradeModel(input({ pendingOffer: offer }));
+    expect(m.canSend, 'a standing offer must not be stackable').toBe(false);
+  });
+
+  it('lets only the SELLER accept, and only with eligible goods staged', () => {
+    const asSeller = (staged: InvSlot[]) =>
+      buildWocTradeModel(input({ pendingOffer: { ...offer, role: 'seller' }, staged }));
+    expect(asSeller([slot(EPIC.id)]).canAccept).toBe(true);
+    // Acceptance escrows the goods, so there must be goods, and eligible ones.
+    expect(asSeller([]).canAccept).toBe(false);
+    expect(asSeller([slot(QUEST.id)]).canAccept).toBe(false);
+  });
+
+  it('never lets the BUYER accept their own offer', () => {
+    const m = buildWocTradeModel(input({ pendingOffer: offer, staged: [slot(EPIC.id)] }));
+    expect(m.canAccept).toBe(false);
+  });
+
+  it('passes the offer through untouched for both sides to read', () => {
+    expect(buildWocTradeModel(input({ pendingOffer: offer })).pendingOffer).toEqual(offer);
   });
 });

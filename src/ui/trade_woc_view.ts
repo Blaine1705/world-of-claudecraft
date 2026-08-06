@@ -34,6 +34,16 @@ export interface WocTradeSplit {
 
 export type WocTradeMode = 'gold' | 'woc';
 
+/** A sent-but-unresolved $WOC offer, as both sides see it. */
+export interface WocPendingOffer {
+  id: number;
+  usdCents: number;
+  /** Server-quoted tokens for that price, or null while unavailable. */
+  tokens: number | null;
+  /** Which side the VIEWER is on: only the seller may accept. */
+  role: 'buyer' | 'seller';
+}
+
 /** Why the $WOC arm is unavailable, or null when it is offerable. */
 export type WocArmBlock =
   | 'market_disabled' // the realm has no exchange
@@ -72,6 +82,15 @@ export interface WocTradeInput {
   /** Server passthroughs for `usdCents`; null while unquoted or unavailable. */
   tokens: number | null;
   split: WocTradeSplit | null;
+  /**
+   * The live offer standing between these two players, if one has been sent.
+   *
+   * While it exists the arm stops being a form and becomes a REVIEW surface:
+   * both sides see the same price, and each gets the action that is theirs. The
+   * trade window deliberately stays open across this, because reviewing and
+   * agreeing IS the trade, and closing it would leave both players guessing.
+   */
+  pendingOffer: WocPendingOffer | null;
   /** True once the seller's gold offer is non-zero. */
   goldOffered: boolean;
   /**
@@ -104,6 +123,10 @@ export interface WocTradeModel {
   wocDisabled: boolean;
   tokens: number | null;
   split: WocTradeSplit | null;
+  /** The live offer to review, or null while none is standing. */
+  pendingOffer: WocPendingOffer | null;
+  /** Whether the SELLER may accept the standing offer (they hold the goods). */
+  canAccept: boolean;
   /** Whether "Send offer" may be pressed. */
   canSend: boolean;
   /** The i18n key explaining why it may not, or null when it may. */
@@ -203,7 +226,14 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     wocDisabled: !offerable || input.goldOffered || input.staged.length > 0,
     tokens: wocMode ? input.tokens : null,
     split: wocMode ? input.split : null,
-    canSend: wocMode && hint === null,
+    pendingOffer: input.pendingOffer,
+    // Only the seller accepts, and only with something eligible on the table:
+    // acceptance is what escrows the goods, so there must be goods.
+    canAccept:
+      input.pendingOffer?.role === 'seller' &&
+      input.staged.filter((s) => wocTradableSlot(s, input.items)).length > 0,
+    // A standing offer replaces the form: you cannot send a second one over it.
+    canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,
   };
 }

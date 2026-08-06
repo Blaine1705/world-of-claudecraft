@@ -744,7 +744,12 @@ import {
   wocTradeArmHtml,
   wocTradeModelFrom,
 } from './trade_woc_panel';
-import type { WocTradePartner, WocTradeSplit } from './trade_woc_view';
+import {
+  type WocPendingOffer,
+  type WocTradePartner,
+  type WocTradeSplit,
+  wocTradableSlot,
+} from './trade_woc_view';
 import { TutorialOverlay } from './tutorial';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -1285,6 +1290,11 @@ const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 function curatorRankDisplayName(rank: number): string {
   return t(curatorRankNameKey(rank), { rank: formatNumber(rank) });
 }
+
+/** How often the trade window re-reads the standing $WOC offer. Slow on
+ *  purpose: it is a REST read on a short-lived surface, and two seconds of lag
+ *  is invisible while two players are talking. */
+const WOC_TRADE_OFFER_POLL_MS = 2000;
 
 export class Hud {
   // Ability slots across three rows: 1..11 primary, 12..22 secondary, and
@@ -5200,6 +5210,10 @@ export class Hud {
   private wocTradeEstimateTimer: number | null = null;
   /** Guards a late estimate from overwriting a newer one (last write wins). */
   private wocTradeEstimateSeq = 0;
+  /** The offer standing between these two players, polled while the window is
+   *  open so BOTH sides see the same one without a push channel. */
+  private wocTradeOffer: WocPendingOffer | null = null;
+  private wocTradeOfferPolledAtMs = 0;
   private readonly wocMarketWindow = new WocMarketWindow({
     root: () => $('#woc-market-window'),
     attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -18793,7 +18807,86 @@ export class Hud {
       },
       onPriceInput: (cents) => this.onWocTradePrice(cents),
       onSendOffer: () => void this.sendWocTradeOffer(otherName),
+      onAcceptOffer: () => void this.acceptWocTradeOffer(),
+      onCancelOffer: () => void this.cancelWocTradeOffer('withdraw'),
+      pendingOffer: this.wocTradeOffer,
     };
+  }
+
+  /**
+   * The standing offer between these two, refreshed on a slow poll.
+   *
+   * A poll rather than a push because the offer lives on the REST rail, not the
+   * world socket, and the trade window is a short-lived surface where a two
+   * second lag is invisible. Throttled by wall clock rather than by frame, so
+   * the cost does not scale with framerate.
+   */
+  private pollWocTradeOffer(otherName: string, nowMs: number): void {
+    const hooks = this.wocMarketHooks;
+    if (!hooks || nowMs - this.wocTradeOfferPolledAtMs < WOC_TRADE_OFFER_POLL_MS) return;
+    this.wocTradeOfferPolledAtMs = nowMs;
+    void hooks.client.offers().then(async (res) => {
+      if (!res.ok || this.sim.tradeInfo?.otherName !== otherName) return;
+      const mine = res.offers.find(
+        (o) =>
+          o.status === 'pending' &&
+          (o.role === 'buyer' ? o.sellerName : o.buyerName) === otherName,
+      );
+      if (!mine) {
+        if (this.wocTradeOffer !== null) {
+          this.wocTradeOffer = null;
+          this.lastTradeSig = '';
+        }
+        return;
+      }
+      if (this.wocTradeOffer?.id === mine.id) return;
+      // Quote the agreed price once, so both sides show the same token figure.
+      const est = await hooks.client.estimate(mine.usdCents);
+      if (this.sim.tradeInfo?.otherName !== otherName) return;
+      this.wocTradeOffer = {
+        id: mine.id,
+        usdCents: mine.usdCents,
+        tokens: est?.amount?.tokens ?? null,
+        role: mine.role,
+      };
+      this.lastTradeSig = '';
+    });
+  }
+
+  private async acceptWocTradeOffer(): Promise<void> {
+    const hooks = this.wocMarketHooks;
+    const offer = this.wocTradeOffer;
+    if (!hooks || !offer) return;
+    // The seller's own staged copy is what escrows: acceptance is the moment the
+    // goods leave the bags, so the item is named here rather than at offer time.
+    const first = this.stagedTrade.items.find((sl) => wocTradableSlot(sl, ITEMS));
+    if (!first) return;
+    const res = await hooks.client.acceptOffer(offer.id, {
+      characterId: hooks.characterId() ?? 0,
+      itemIndex: Math.max(0, this.stagedTrade.items.indexOf(first)),
+      itemId: first.itemId,
+      ...(first.instance === undefined ? {} : { expectInstance: first.instance }),
+    });
+    if (res.ok) {
+      this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
+      this.wocTradeOffer = null;
+      this.sim.tradeCancel();
+    } else {
+      this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+    }
+  }
+
+  private async cancelWocTradeOffer(action: 'decline' | 'withdraw'): Promise<void> {
+    const hooks = this.wocMarketHooks;
+    const offer = this.wocTradeOffer;
+    if (!hooks || !offer) return;
+    const res = await hooks.client.resolveOffer(offer.id, action);
+    if (res.ok) {
+      this.wocTradeOffer = null;
+      this.lastTradeSig = '';
+    } else {
+      this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
+    }
   }
 
   /** Debounced: one estimate per pause in typing, not one per keystroke. */
@@ -18837,8 +18930,17 @@ export class Hud {
       usdCents: this.wocTradeUsdCents,
     });
     if (res.ok) {
+      // The window STAYS OPEN. The offer now sits in it for both players to
+      // read, and the seller accepts from there; closing it here left both
+      // sides staring at nothing, with no way to agree.
       this.log(t('hudChrome.trade.woc.offerSent', { name: otherName }), '#7fdc4f');
-      this.sim.tradeCancel();
+      this.wocTradeOffer = {
+        id: res.offer.id,
+        usdCents: res.offer.usdCents,
+        tokens: this.wocTradeTokens,
+        role: 'buyer',
+      };
+      this.lastTradeSig = '';
     } else {
       this.log(userFacingApiError({ code: res.code }), '#ff6b6b');
     }
@@ -18855,6 +18957,8 @@ export class Hud {
         this.wocTradePartner = null;
         this.wocTradePartnerResolved = false;
         this.wocTradePartnerFor = '';
+        this.wocTradeOffer = null;
+        this.wocTradeOfferPolledAtMs = 0;
         this.lastTradeSig = '';
         if ($('#bags').style.display !== 'none') this.renderBags();
       }
@@ -18873,6 +18977,9 @@ export class Hud {
     // Once per counterparty: whether they can be paid in $WOC is server data the
     // sim cannot know (src/sim/social/trade.ts is inside the token firewall), so
     // it rides beside TradeInfo rather than on it.
+    // The standing offer is polled every pass (self-throttled by wall clock),
+    // because either side may create or resolve one at any moment.
+    this.pollWocTradeOffer(info.otherName, Date.now());
     if (this.wocMarketHooks !== null && this.wocTradePartnerFor !== info.otherName) {
       this.wocTradePartnerFor = info.otherName;
       const name = info.otherName;
@@ -18894,6 +19001,7 @@ export class Hud {
       // under the caret. Price edits refresh the derived lines in place.
       this.wocTradeMode,
       this.wocTradePartner,
+      this.wocTradeOffer,
     ]);
     if (sig === this.lastTradeSig) return;
     // The rebuild below replaces the whole subtree, so a seller typing a $WOC

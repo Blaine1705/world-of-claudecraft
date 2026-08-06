@@ -21,6 +21,7 @@ import { restoreFirstEnabled } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import {
   buildWocTradeModel,
+  type WocPendingOffer,
   type WocTradeModel,
   type WocTradePartner,
   type WocTradeSplit,
@@ -39,9 +40,12 @@ export interface WocTradePanelDeps {
   usdCents: number | null;
   tokens: number | null;
   split: WocTradeSplit | null;
+  pendingOffer: WocPendingOffer | null;
   onModeChange(mode: 'gold' | 'woc'): void;
   onPriceInput(usdCents: number | null): void;
   onSendOffer(): void;
+  onAcceptOffer(): void;
+  onCancelOffer(): void;
 }
 
 /** USD cents as a localized money string. Cents in: the caller parses the
@@ -63,6 +67,7 @@ export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
     usdCents: deps.usdCents,
     tokens: deps.tokens,
     split: deps.split,
+    pendingOffer: deps.pendingOffer,
     goldOffered: deps.goldCopper > 0,
   });
 }
@@ -81,6 +86,30 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   if (model.blockKey !== null) {
     // The arm stays present while blocked so the reason has somewhere to live.
     return `<div class="trade-woc-arm">${modeTabs}<p class="trade-woc-block">${esc(t(model.blockKey))}</p></div>`;
+  }
+  if (model.pendingOffer !== null) {
+    const o = model.pendingOffer;
+    // Both sides read the SAME price, in the currency they agreed it in, with
+    // the token figure as the server quoted it. The seller gets Accept; the
+    // buyer gets Withdraw. Neither is offered an action that is not theirs.
+    const tokens =
+      o.tokens === null
+        ? ''
+        : ` <span class="trade-woc-tokens">(${esc(
+            t('hudChrome.trade.woc.equivalent', {
+              tokens: formatNumber(o.tokens, { maximumFractionDigits: 4 }),
+            }),
+          )})</span>`;
+    const action =
+      o.role === 'seller'
+        ? `<button type="button" class="btn trade-woc-accept" data-woc-accept${model.canAccept ? '' : ' disabled'}>${esc(t('hudChrome.trade.woc.accept'))}</button>`
+        : `<button type="button" class="btn trade-woc-cancel" data-woc-cancel>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`;
+    return `<div class="trade-woc-arm">${modeTabs}
+      <p class="trade-woc-offer"><strong>${esc(usd(o.usdCents))}</strong>${tokens}</p>
+      <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
+      ${action}
+      <p class="trade-woc-hint" data-woc-hint></p>
+    </div>`;
   }
   if (model.mode !== 'woc') return `<div class="trade-woc-arm">${modeTabs}</div>`;
 
@@ -146,7 +175,16 @@ export function refreshWocTradeArm(root: ParentNode, model: WocTradeModel): void
   );
   // A disabled button always says why: the hint rides beside it and clears the
   // moment the offer becomes sendable.
-  setText('[data-woc-hint]', model.sendHint === null ? '' : t(model.sendHint));
+  setText(
+    '[data-woc-hint]',
+    model.pendingOffer !== null
+      ? model.pendingOffer.role === 'seller' && !model.canAccept
+        ? t('hudChrome.trade.woc.hintAcceptNeedsItem')
+        : ''
+      : model.sendHint === null
+        ? ''
+        : t(model.sendHint),
+  );
   const send = root.querySelector<HTMLButtonElement>('[data-woc-send]');
   if (send && send.disabled !== !model.canSend) send.disabled = !model.canSend;
 }
@@ -186,4 +224,10 @@ export function wireWocTradeArm(root: ParentNode, deps: WocTradePanelDeps): void
   root
     .querySelector<HTMLElement>('[data-woc-send]')
     ?.addEventListener('click', () => deps.onSendOffer());
+  root
+    .querySelector<HTMLElement>('[data-woc-accept]')
+    ?.addEventListener('click', () => deps.onAcceptOffer());
+  root
+    .querySelector<HTMLElement>('[data-woc-cancel]')
+    ?.addEventListener('click', () => deps.onCancelOffer());
 }

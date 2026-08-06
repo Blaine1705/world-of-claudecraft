@@ -13100,13 +13100,15 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.trade.woc.hintAwaitTheirItems': '상대가 $WOC로 판매 가능한 물건을 올리기를 기다리는 중입니다.',
   'hudChrome.trade.woc.sendOffer': '$WOC 제안',
   'hudChrome.trade.woc.incomingAccept': '{name} 님이 당신의 아이템에 {price}을(를) 제안했습니다.',
+  'hudChrome.trade.woc.hintAcceptNeedsItem': '수락하기 전에 판매할 아이템을 올려주세요.',
   'hudChrome.trade.woc.hintEnterPrice': 'USD 가격을 입력하세요.',
   'hudChrome.trade.woc.hintGoldOffered': '먼저 골드 제안을 취소하세요. 거래는 골드 또는 $WOC 중 하나만 가능합니다.',
   'hudChrome.trade.woc.ineligibleNote': '올려둔 아이템 중 {count}개는 $WOC로 판매할 수 없습니다.',
   'hudChrome.trade.woc.incomingTitle': '{name} 님의 $WOC 제안',
   'hudChrome.trade.woc.incomingBody':
     '{name} 님이 {item}을(를) {price}에 판매하겠다고 제안했습니다.',
-  'hudChrome.trade.woc.accept': '수락하고 결제',
+  'hudChrome.trade.woc.accept': '제안 수락',
+  'hudChrome.trade.woc.accepted': '제안을 수락했습니다. 결제가 확인될 때까지 아이템이 보관됩니다.',
   'hudChrome.trade.woc.decline': '거절',
   'hudChrome.trade.woc.withdraw': '제안 철회',
 };
