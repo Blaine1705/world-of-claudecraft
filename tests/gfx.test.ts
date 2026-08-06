@@ -925,27 +925,29 @@ describe('graphics tier resolution', () => {
       );
     });
 
-    it('caps a REPORTED tight-memory mobile device at LOW regardless of GPU class (memory safety is a separate axis from GPU capability)', () => {
-      // A flagship-class mobile GPU paired with a genuine 3-4 GB total RAM budget is a
-      // common real Android configuration; without this cap it would default to HIGH (the
-      // branch just above), and the world's baseline texture/geometry residency alone is
-      // large enough on that tier to cross the OS's per-tab memory ceiling during ordinary
-      // play, reported upstream as "randomly disconnects no matter the network."
+    it('floors a REPORTED tight-memory mobile device at LOW, and every other phone with it', () => {
+      // #2955 added this as a memory-gated floor: a flagship-class mobile GPU paired with a
+      // genuine 3-4 GB total RAM budget is a common real Android configuration, and the world's
+      // baseline texture/geometry residency alone on HIGH is large enough to cross the OS's
+      // per-tab memory ceiling during ordinary play, reported upstream as "randomly disconnects
+      // no matter the network." Those cases still floor; the blanket mobile floor now subsumes
+      // them, which is why the cases that used to sit just OUTSIDE the memory gate floor too.
       expect(
         resolveDefaultGraphicsPreset({
           ...phone,
-          gpuRenderer: 'Adreno (TM) 740', // flagship: HIGH without the memory floor
+          gpuRenderer: 'Adreno (TM) 740', // flagship: HIGH before either floor
           deviceMemory: 3,
         }),
       ).toBe(1);
       expect(
         resolveDefaultGraphicsPreset({
           ...phone,
-          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)', // strongDesktop-on-touch: HIGH otherwise
+          gpuRenderer: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 4080)', // strongDesktop-on-touch
           deviceMemory: 4,
         }),
       ).toBe(1);
-      // exactly at the TIGHT_MEMORY_MAX_GB threshold still floors; one above does not.
+      // At the old TIGHT_MEMORY_MAX_GB threshold and one above it: both floor now. The threshold
+      // is no longer load-bearing for the preset, since ample RAM does not buy a phone a tier.
       expect(
         resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Adreno (TM) 740', deviceMemory: 4 }),
       ).toBe(1);
@@ -957,8 +959,8 @@ describe('graphics tier resolution', () => {
       // Never fires on desktop (not mobile) even at the same low deviceMemory: PITFALL 1's
       // "thin RAM never pulls a tier down" rule still holds for the GPU-capability ladder.
       expect(resolveDefaultGraphicsPreset({ ...desktop, deviceMemory: 3 })).toBe(2);
-      // Unreported memory (Safari/Firefox) must not fabricate a tight-memory
-      // reason, but the broader mobile first-run floor still starts low.
+      // Unreported memory (Safari/Firefox) must not fabricate a tight-memory reason, but the
+      // broader mobile first-run floor still covers iOS/WebKit, whose process kill is most brutal.
       expect(resolveDefaultGraphicsPreset({ ...phone, gpuRenderer: 'Apple A17 Pro GPU' })).toBe(1);
     });
 

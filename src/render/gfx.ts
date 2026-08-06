@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
-import { TIGHT_MEMORY_MAX_GB, tightMemoryDeviceHint } from '../device_memory_hint';
+import { tightMemoryDeviceHint } from '../device_memory_hint';
 import {
   type GraphicsSettingsSnapshot,
   normalizeGraphicsSettingsSnapshot,
@@ -1380,31 +1380,30 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
  *
  * Grounded in the standard adaptive-quality practice (detect-gpu name tiering + web.dev adaptive
  * loading), first-match-wins. CRITICAL: deviceMemory + hardwareConcurrency may only RAISE a tier
- * or break a tie, NEVER pull one down. Safari caps hardwareConcurrency (2 on iOS, 8 on macOS) and
- * Safari + Firefox omit deviceMemory entirely (Chromium-only, clamped, max ~8), so a thin count is
- * routinely a REPORTING artifact rather than a weak machine: a Safari desktop must not be
- * down-ranked for it. The recognized GPU class sets the floor; a masked/unknown desktop name lands
- * on MEDIUM. Ultra is gated behind a recognized strong-desktop GPU (a masked name cannot reach it)
- * and is desktop-only, since every touch device now takes the LOW branch first.
+ * or break a tie, NEVER pull one down FOR THIS CAPABILITY LADDER. Safari caps hardwareConcurrency
+ * (2 on iOS, 8 on macOS) and Safari + Firefox omit deviceMemory entirely (Chromium-only, clamped,
+ * max ~8), so a thin count is routinely a REPORTING artifact rather than a weak machine: a Safari
+ * DESKTOP must not be down-ranked for it. The recognized GPU class sets the floor; a masked/unknown
+ * desktop name lands on MEDIUM. Ultra is gated behind a recognized strong-desktop GPU (a masked
+ * name cannot reach it) and is desktop-only, since every touch device takes the LOW branch first.
  *
- * A confirmed low deviceMemory is a SEPARATE axis from GPU capability, though: a mobile GPU
- * capable of pushing HIGH-tier pixels can still sit behind a genuinely small total RAM budget (a
- * common mid-range Android configuration pairs a decent GPU with 3-4 GB total system RAM), and
- * the world's baseline texture/geometry residency alone is large enough that a HIGH-tier session
- * on one of these phones can cross the OS's per-tab memory ceiling during ordinary play, reported
- * upstream as "randomly disconnects / dumped back to login no matter the network." This floor
- * fires ONLY on a REPORTED (never inferred) deviceMemory, so it can never false-positive an
- * iPhone the way a thin core-count check would (Safari never reports deviceMemory, so mem stays
- * undefined there and this never fires): it reuses the exact TIGHT_MEMORY_MAX_GB threshold
- * entry_crash_guard's reactive tight profile already applies to this device class, just proactively
- * instead of only after a confirmed crash.
+ * That blanket mobile floor SUBSUMES the reported-deviceMemory floor #2955 added here (mobile with
+ * a reported mem <= TIGHT_MEMORY_MAX_GB), which is why no separate memory check remains: its cases
+ * are a strict subset and resolve to the same PRESET_LOW. Its evidence is the corroborating
+ * argument for going blanket rather than a reason to keep two ladders. GPU capability and total RAM
+ * really are separate axes (a common mid-range Android pairs a decent GPU with 3-4 GB of system
+ * RAM), the world's baseline texture/geometry residency alone can cross the OS per-tab ceiling
+ * during ordinary play at HIGH, and players reported exactly that as "randomly disconnects / dumped
+ * back to login no matter the network." The narrow floor could only ever fire where deviceMemory is
+ * REPORTED, so it never covered iOS at all (Safari omits deviceMemory, leaving mem undefined) even
+ * though phone-class WebKit is where the process kill is most brutal. Touch alone is the signal
+ * that covers both.
  */
 export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   const gpu = classifyGpuRenderer(hints.gpuRenderer);
   const mem = hints.deviceMemory; // GiB, Chromium-only (clamped, max ~8); undefined elsewhere
   const cores = hints.hardwareConcurrency; // logical cores, or undefined
   const isMobile = hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
-  if (isMobile && mem !== undefined && mem <= TIGHT_MEMORY_MAX_GB) return PRESET_LOW;
   // Corroborating RAM/core signal (or deviceMemory simply unreported, as on Firefox): only ever
   // used to RAISE the strong-desktop tier to ultra, never to demote.
   const ampleOrUnknownMem =
