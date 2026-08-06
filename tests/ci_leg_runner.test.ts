@@ -1,8 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { PassThrough } from 'node:stream';
 import { describe, expect, it } from 'vitest';
-import { formatLegHeader, runLeg, runLegsWithFlakeRetry } from '../scripts/lib/ci_leg_runner.mjs';
-import { TEARDOWN_RPC_MESSAGE } from '../scripts/lib/teardown_rpc_flake.mjs';
+import {
+  createTailKeeper,
+  DEFAULT_DRAIN_DEADLINE_MS,
+  formatLegHeader,
+  runLeg,
+  runLegsWithFlakeRetry,
+} from '../scripts/lib/ci_leg_runner.mjs';
+import {
+  TEARDOWN_RPC_MESSAGE,
+  TEARDOWN_RPC_TAIL_BYTES,
+} from '../scripts/lib/teardown_rpc_flake.mjs';
 
 // The retry policy is the load-bearing part: CI may rerun a leg ONLY on the
 // exact teardown-rpc signature, at most once per process, and everything
@@ -27,14 +36,16 @@ type StubResult = { status: number | null; tail: string };
 
 function makeStub(script: Record<string, StubResult[]>) {
   const calls: string[] = [];
-  const runLegImpl = async ({ cmd, args }: { cmd: string; args: string[] }) => {
+  const receivedLogs: unknown[] = [];
+  const runLegImpl = async ({ cmd, args, log }: { cmd: string; args: string[]; log?: unknown }) => {
     const key = `${cmd} ${args.join(' ')}`;
     calls.push(key);
+    receivedLogs.push(log);
     const queue = script[key];
     if (!queue || queue.length === 0) throw new Error(`unexpected leg spawn: ${key}`);
     return queue.shift() as StubResult;
   };
-  return { calls, runLegImpl };
+  return { calls, receivedLogs, runLegImpl };
 }
 
 function collect() {
@@ -80,6 +91,50 @@ describe('runLegsWithFlakeRetry', () => {
     expect(calls).toEqual(['npm test -- a', 'npm test -- b']);
     expect(log.lines).toEqual([formatLegHeader(legs[0]), formatLegHeader(legs[1])]);
     expect(annotations.lines).toEqual([]);
+  });
+
+  it('forwards the injected log sink into every leg spawn', async () => {
+    // Unpinned in the audit: dropping the forwarding sends the drain-deadline
+    // note straight to console.log, bypassing any injected sink.
+    const { receivedLogs, runLegImpl } = makeStub({
+      'npm test -- a': [{ status: 1, tail: FLAKE_TAIL }, GREEN],
+    });
+    const { opts, log } = runnerOpts(
+      [{ name: 'floor', cmd: 'npm', args: ['test', '--', 'a'] }],
+      runLegImpl,
+    );
+    await runLegsWithFlakeRetry(opts);
+    expect(receivedLogs).toEqual([log.sink, log.sink]);
+  });
+
+  it('gates the default annotation on GITHUB_ACTIONS, printing via console.log only in CI', async () => {
+    const { vi } = await import('vitest');
+    for (const [envValue, expectedWarnings] of [
+      ['true', 1],
+      ['', 0],
+    ] as const) {
+      vi.stubEnv('GITHUB_ACTIONS', envValue);
+      const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      try {
+        const { runLegImpl } = makeStub({
+          'npm test -- a': [{ status: 1, tail: FLAKE_TAIL }, GREEN],
+        });
+        const log = collect();
+        // No annotate injected: the default must decide from the env.
+        await runLegsWithFlakeRetry({
+          legs: [{ name: 'floor', cmd: 'npm', args: ['test', '--', 'a'] }],
+          cwd: '/nowhere',
+          log: log.sink,
+          error: log.sink,
+          runLegImpl,
+        });
+        const warnings = spy.mock.calls.filter((c) => String(c[0]).startsWith('::warning'));
+        expect(warnings).toHaveLength(expectedWarnings);
+      } finally {
+        spy.mockRestore();
+        vi.unstubAllEnvs();
+      }
+    }
   });
 
   it('retries exactly the flaked leg once, loudly, and greens when the rerun passes', async () => {
@@ -214,6 +269,38 @@ describe('runLegsWithFlakeRetry', () => {
   });
 });
 
+describe('createTailKeeper', () => {
+  it('bounds RETAINED memory, not just the returned tail', () => {
+    // The audit proved the trim deletable: the final subarray bounds what
+    // callers see while the retained list grows without limit. The keeper
+    // must hold at most tailBytes plus one chunk at any moment.
+    const tailBytes = 16 * 1024;
+    const chunk = 8 * 1024;
+    const keeper = createTailKeeper(tailBytes);
+    for (let i = 0; i < 100; i++) {
+      keeper.push(Buffer.alloc(chunk, i % 256));
+      expect(keeper.retainedBytes()).toBeLessThanOrEqual(tailBytes + chunk);
+    }
+    const tail = keeper.tail();
+    expect(tail.length).toBe(tailBytes);
+  });
+});
+
+describe('exported constants and header shape', () => {
+  it('pins the deadline value and the header literal', () => {
+    // 10 seconds: long enough for any healthy post-exit drain, short enough
+    // that a leaked grandchild costs seconds, not a workflow timeout.
+    // Resizing is a conscious edit here.
+    expect(DEFAULT_DRAIN_DEADLINE_MS).toBe(10_000);
+    // The header is shared with the entry's plan-only printer; the prefix
+    // half has no other backstop (the command half is pinned by the
+    // subprocess tests in ci_shard_plan.test.ts).
+    expect(formatLegHeader({ name: 'floor', cmd: 'npm', args: ['test', '--', 'a'] })).toBe(
+      '\n[ci-shard] floor: npm test -- a',
+    );
+  });
+});
+
 describe('runLeg (real subprocess)', () => {
   it('streams output through, captures a bounded tail, and reports the exit code', async () => {
     const out = new PassThrough();
@@ -316,6 +403,11 @@ describe('runLeg (real subprocess)', () => {
     expect(received).toBe(256 * 1024);
     // With the pause in place the parent-side buffer never approaches the
     // full burst; without it, it climbs past this bound regardless of load.
+    // The ceiling is structural, not timing-dependent: exactly two 64 KB
+    // pipe chunks (131072 bytes), byte-identical across 36 verifier runs in
+    // three load conditions, because the mirror never allows more than one
+    // un-drained write plus one in flight. The bound sits 17 percent above
+    // that fixed ceiling and only a Node pipe-read-size change could move it.
     expect(maxBuffered).toBeLessThan(150 * 1024);
   });
 
@@ -326,7 +418,7 @@ describe('runLeg (real subprocess)', () => {
     // check in CI) hangs with it.
     const script =
       "const { spawn } = require('node:child_process');" +
-      "spawn(process.execPath, ['-e', 'setTimeout(() => {}, 8000)'], " +
+      "spawn(process.execPath, ['-e', 'setTimeout(() => {}, 3000)'], " +
       "{ stdio: ['ignore', 'inherit', 'inherit'], detached: true }).unref();" +
       "process.stdout.write('leg done\\n');" +
       'process.exit(0);';
@@ -353,7 +445,7 @@ describe('runLeg (real subprocess)', () => {
     // the pipes reports green".
     const script =
       "const { spawn } = require('node:child_process');" +
-      "spawn(process.execPath, ['-e', 'setTimeout(() => {}, 8000)'], " +
+      "spawn(process.execPath, ['-e', 'setTimeout(() => {}, 3000)'], " +
       "{ stdio: ['ignore', 'inherit', 'inherit'], detached: true }).unref();" +
       'process.exitCode = 7;';
     const result = await runLeg({
@@ -374,29 +466,36 @@ describe('runLeg (real subprocess)', () => {
     // real driver process proves the property end to end: it must exit on
     // its own, promptly, with the leg's code relayed.
     const { execFile } = await import('node:child_process');
-    const { mkdtemp, writeFile: writeTmp } = await import('node:fs/promises');
+    const { mkdtemp, writeFile: writeTmp, rm } = await import('node:fs/promises');
     const { tmpdir } = await import('node:os');
     const { join } = await import('node:path');
     const dir = await mkdtemp(join(tmpdir(), 'ci-leg-runner-'));
-    const runnerUrl = new URL('../scripts/lib/ci_leg_runner.mjs', import.meta.url).href;
-    const driver =
-      `import { runLeg } from ${JSON.stringify(runnerUrl)};\n` +
-      "const leak = \"const {spawn}=require('node:child_process');" +
-      "spawn(process.execPath,['-e','setTimeout(()=>{},8000)']," +
-      "{stdio:['ignore','inherit','inherit'],detached:true}).unref();process.exitCode=0;\";\n" +
-      'const r = await runLeg({ cmd: process.execPath, args: ["-e", leak], cwd: process.cwd(), ' +
-      'out: { write: () => true }, err: { write: () => true }, log: () => {}, drainDeadlineMs: 400 });\n' +
-      'process.exitCode = r.status === 0 ? 42 : 43;\n';
-    const driverPath = join(dir, 'driver.mjs');
-    await writeTmp(driverPath, driver);
-    const code = await new Promise<number | null>((resolve) => {
-      execFile(process.execPath, [driverPath], { timeout: 6_000, killSignal: 'SIGKILL' }, (error) =>
-        resolve(error ? ((error as { code?: number }).code ?? null) : 0),
-      );
-    });
-    // 42 relayed through a clean self-exit; a hang would be SIGKILLed by the
-    // 6 second harness timeout and land here as null.
-    expect(code).toBe(42);
+    try {
+      const runnerUrl = new URL('../scripts/lib/ci_leg_runner.mjs', import.meta.url).href;
+      const driver =
+        `import { runLeg } from ${JSON.stringify(runnerUrl)};\n` +
+        "const leak = \"const {spawn}=require('node:child_process');" +
+        "spawn(process.execPath,['-e','setTimeout(()=>{},3000)']," +
+        "{stdio:['ignore','inherit','inherit'],detached:true}).unref();process.exitCode=0;\";\n" +
+        'const r = await runLeg({ cmd: process.execPath, args: ["-e", leak], cwd: process.cwd(), ' +
+        'out: { write: () => true }, err: { write: () => true }, log: () => {}, drainDeadlineMs: 400 });\n' +
+        'process.exitCode = r.status === 0 ? 42 : 43;\n';
+      const driverPath = join(dir, 'driver.mjs');
+      await writeTmp(driverPath, driver);
+      const code = await new Promise<number | null>((resolve) => {
+        execFile(
+          process.execPath,
+          [driverPath],
+          { timeout: 6_000, killSignal: 'SIGKILL' },
+          (error) => resolve(error ? ((error as { code?: number }).code ?? null) : 0),
+        );
+      });
+      // 42 relayed through a clean self-exit; a hang would be SIGKILLed by
+      // the 6 second harness timeout and land here as null.
+      expect(code).toBe(42);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
   });
 });
 
@@ -423,5 +522,21 @@ describe('entry wiring', () => {
     expect(code).toMatch(
       /if \(!result\.ok\) \{\s*process\.exitCode = result\.status;\s*\} else \{[\s\S]{0,600}?\[ci-shard\] PASS/,
     );
+    // The PASS suffix naming retried legs is a docs/qa-gate.md claim.
+    expect(code).toContain('known-flake retry used on:');
+    // Exactly ONE call site: a second one (say, inside the plan-only branch)
+    // would spawn real legs where the contract says nothing runs.
+    expect(code.match(/runLegsWithFlakeRetry\(/g)).toHaveLength(1);
+    // The runner's tail default must stay bound to the shared budget: a
+    // shrunken default would blind the classifier in CI while every test,
+    // which passes tailBytes explicitly, stayed green.
+    const runnerSource = readFileSync(
+      new URL('../scripts/lib/ci_leg_runner.mjs', import.meta.url),
+      'utf8',
+    );
+    const runnerCode = runnerSource
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(runnerCode).toContain('tailBytes = TEARDOWN_RPC_TAIL_BYTES');
   });
 });

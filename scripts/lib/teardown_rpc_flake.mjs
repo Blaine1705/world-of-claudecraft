@@ -107,7 +107,19 @@ function countOccurrences(text, needle) {
 export function isTeardownRpcFlake({ status, tail }) {
   if (status !== 1) return false;
   if (typeof tail !== 'string' || tail === '') return false;
-  const text = tail.replace(ANSI_RE, '').replace(/\r/g, '');
+  // Workflow-command lines are dropped before counting: with
+  // GITHUB_ACTIONS=true vitest auto-enables its github-actions reporter,
+  // which can RE-EMIT the unhandled error as a `::error ...` annotation
+  // line, and that duplicate would make the occurrence count exceed the
+  // summary's error count and silently veto the retry in CI (the audit
+  // reproduced both arms against real vitest 4.1.10: annotation emitted
+  // for project-frame stacks, skipped for vitest-internal ones).
+  const text = tail
+    .replace(ANSI_RE, '')
+    .replace(/\r/g, '')
+    .split('\n')
+    .filter((line) => !/^::[a-z-]+/.test(line))
+    .join('\n');
   if (!text.includes('EnvironmentTeardownError')) return false;
   const occurrences = countOccurrences(text, TEARDOWN_RPC_MESSAGE);
   if (occurrences < 1) return false;

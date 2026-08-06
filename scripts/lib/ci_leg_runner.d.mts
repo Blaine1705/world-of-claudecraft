@@ -14,6 +14,12 @@ export const DEFAULT_DRAIN_DEADLINE_MS: number;
 
 export function formatLegHeader(leg: CiLeg): string;
 
+export function createTailKeeper(tailBytes: number): {
+  push: (chunk: Buffer) => void;
+  retainedBytes: () => number;
+  tail: () => string;
+};
+
 export function runLeg(opts: {
   cmd: string;
   args: string[];

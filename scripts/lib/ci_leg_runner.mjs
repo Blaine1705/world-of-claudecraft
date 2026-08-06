@@ -48,6 +48,37 @@ export function formatLegHeader({ name, cmd, args }) {
 }
 
 /**
+ * Rolling tail keeper, extracted pure so the MEMORY bound is testable: the
+ * final subarray alone would bound the RETURNED tail while the retained
+ * chunk list quietly grew without limit against a multi-megabyte log (the
+ * mutation audit proved the trim deletable behind that subarray).
+ *
+ * @param {number} tailBytes
+ * @returns {{
+ *   push: (chunk: Buffer) => void,
+ *   retainedBytes: () => number,
+ *   tail: () => string,
+ * }}
+ */
+export function createTailKeeper(tailBytes) {
+  /** @type {Buffer[]} */
+  const chunks = [];
+  let kept = 0;
+  return {
+    push(chunk) {
+      chunks.push(chunk);
+      kept += chunk.length;
+      while (chunks.length > 1 && kept - chunks[0].length >= tailBytes) {
+        kept -= chunks[0].length;
+        chunks.shift();
+      }
+    },
+    retainedBytes: () => kept,
+    tail: () => Buffer.concat(chunks).subarray(-tailBytes).toString('utf8'),
+  };
+}
+
+/**
  * Spawn one leg, mirroring its stdout/stderr through with backpressure while
  * keeping a rolling tail of the combined output for classification. No
  * shell, deliberately: argv elements (which embed PR-controlled filenames)
@@ -79,17 +110,8 @@ export function runLeg({
 }) {
   return new Promise((resolve) => {
     const child = spawn(cmd, args, { cwd, stdio: ['inherit', 'pipe', 'pipe'] });
-    /** @type {Buffer[]} */
-    const chunks = [];
-    let kept = 0;
-    const keep = (chunk) => {
-      chunks.push(chunk);
-      kept += chunk.length;
-      while (chunks.length > 1 && kept - chunks[0].length >= tailBytes) {
-        kept -= chunks[0].length;
-        chunks.shift();
-      }
-    };
+    const keeper = createTailKeeper(tailBytes);
+    const keep = keeper.push;
     // Mirror with backpressure: when the parent's pipe reports saturation,
     // pause the child stream until drain, exactly the pressure the child
     // felt under the old stdio-inherit wiring.
@@ -111,7 +133,7 @@ export function runLeg({
       if (settled) return;
       settled = true;
       if (drainTimer) clearTimeout(drainTimer);
-      const tail = Buffer.concat(chunks).subarray(-tailBytes).toString('utf8');
+      const tail = keeper.tail();
       resolve(spawnError ? { status, tail, spawnError } : { status, tail });
     };
     child.on('error', (spawnError) => finish(null, spawnError));
