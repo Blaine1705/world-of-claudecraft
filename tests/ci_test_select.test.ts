@@ -31,7 +31,9 @@ describe('decideTestMode: when selection is allowed at all', () => {
   });
 
   it('never selects off a non-PR event', () => {
-    for (const eventName of ['push', 'workflow_dispatch', 'schedule', '']) {
+    // merge_group included: the merge queue is the last pre-merge bar, so a
+    // queue run must never narrow the suite.
+    for (const eventName of ['push', 'workflow_dispatch', 'schedule', 'merge_group', '']) {
       const d = decideTestMode({ eventName, code: true, files: [mod('src/ui/hud.ts')] });
       expect(d.mode).toBe('full');
       expect(d.changedPaths).toEqual([]);

@@ -255,7 +255,9 @@ describe('detectCode (fail closed end to end)', () => {
   }) as unknown as typeof fetch;
 
   it('returns code=true for non-PR events without touching the API', async () => {
-    for (const eventName of ['push', 'workflow_dispatch', 'schedule', '']) {
+    // merge_group is the queue's event: a queue run must always take the full
+    // PR tier (there is no PR files listing to classify on a merge group).
+    for (const eventName of ['push', 'workflow_dispatch', 'schedule', 'merge_group', '']) {
       expect(await detectCode({ ...BASE, eventName, fetchImpl: neverFetch })).toEqual({
         code: true,
         reason: 'non-PR event: full PR tier (code=true)',

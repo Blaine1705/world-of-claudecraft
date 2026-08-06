@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { isCodePath } from '../scripts/lib/ci_change_classify.mjs';
+import { decideTestMode } from '../scripts/lib/ci_test_select.mjs';
 import { buildFullGateSteps } from '../scripts/lib/gate_steps.mjs';
 
 const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
@@ -71,10 +72,13 @@ const CHECK_RUN_STEPS = [
 const RELEASE_IF_LINE =
   "    if: (github.event_name == 'pull_request' && github.base_ref == 'main' && startsWith(github.head_ref, 'release/')) || (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release/'))";
 
-// PR-tier event routing (release-to-main exclusion + non-release push + dispatch).
+// PR-tier event routing (release-to-main exclusion + non-release push + dispatch
+// + merge queue). merge_group is unconditional: the queue bar is the full PR
+// tier, including a queued release-to-main merge (the release exclusion lives on
+// the pull_request arm and cannot match a merge_group event).
 // Path-filter arm is AND-composed separately so either arm can be pinned alone.
 const PR_TIER_EVENT_FRAGMENT =
-  "(github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch'";
+  "(github.event_name == 'pull_request' && (github.base_ref != 'main' || !startsWith(github.head_ref, 'release/'))) || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group'";
 
 // Exact composed if for pr-gate and pr-checks after Phase 5 path filters (D10).
 // Extra parens around the event fragment keep || from binding past the && code arm.
@@ -506,6 +510,52 @@ describe('CI workflow parity', () => {
       expect(job).not.toContain('paths-ignore');
       expect(job).not.toContain('needs.changes');
       expect(job).not.toMatch(/^\s{4}needs:/m);
+    }
+  });
+
+  it('routes merge queue runs through the full PR tier and keeps release lanes off them', () => {
+    // The merge queue on main and release/** tests each candidate merge result
+    // on a merge_group event. The trigger is load-bearing: required checks that
+    // never report stall every queued PR until the queue's status-check timeout
+    // rejects it. Anchored to the on: block shape (comments allowed between
+    // keys) so a commented-out trigger cannot satisfy the pin.
+    expect(workflow).toMatch(/\non:\n {2}pull_request:\n(?: {2}#[^\n]*\n)* {2}merge_group:\n/);
+
+    // The queue always runs the FULL suite on the merge result: the changes job
+    // has no job-level if (pinned elsewhere), and the selector treats every
+    // non-PR event as mode=full. Behavioral pin through the real module so a
+    // future merge_group special case in the selector fails here, next to the
+    // workflow trigger it would undermine.
+    expect(decideTestMode({ eventName: 'merge_group', code: true, files: [] }).mode).toBe('full');
+
+    // pr-gate and pr-checks carry the merge_group arm (the exact composed if:
+    // line is pinned in the release-to-main test via PR_TIER_IF_LINE; this is
+    // the readable statement of intent).
+    expect(PR_TIER_EVENT_FRAGMENT).toContain("github.event_name == 'merge_group'");
+
+    // lint diffs a queue run against the target-branch tip the merge group was
+    // built on (event.merge_group.base_sha, passed via env, never interpolated
+    // into the run line). Without this arm the step falls through to the
+    // default-branch fallback and diffs a release/** group against main,
+    // dragging the whole release delta (intentionally-red whole-repo debt)
+    // into biome and rejecting every queued release PR.
+    const lint = jobSource('lint');
+    expect(lint).toContain('MERGE_GROUP_BASE_SHA: ${{ github.event.merge_group.base_sha }}');
+    expect(lint).toMatch(
+      /elif \[ "\$EVENT_NAME" = "merge_group" \] && \[ -n "\$MERGE_GROUP_BASE_SHA" \]; then\n(?: {12}#[^\n]*\n)* {12}git fetch --no-tags --depth=1 origin "\$MERGE_GROUP_BASE_SHA"\n {12}echo "ref=\$MERGE_GROUP_BASE_SHA" >> "\$GITHUB_OUTPUT"\n/,
+    );
+
+    // Release lanes stay off queue runs: their if arms match pull_request and
+    // push only, and the RELEASE_IF_LINE equality pins hold the exact lines.
+    // This negative keeps a future widen from quietly running a release lane
+    // (release-i18n is legitimately red mid-cycle) on every queued PR.
+    for (const name of [
+      'release-gate',
+      'release-i18n',
+      'release-checks',
+      'release-version-gate',
+    ] as const) {
+      expect(jobSource(name)).not.toContain('merge_group');
     }
   });
 
