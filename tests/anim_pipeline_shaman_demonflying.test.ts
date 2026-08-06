@@ -28,6 +28,15 @@ function meshCountOf(glbPath: string): number {
   return (doc.meshes ?? []).length;
 }
 
+function channelCountOf(glbPath: string, clipName: string): number {
+  const glb = readFileSync(join(ROOT, glbPath));
+  const jsonLen = glb.readUInt32LE(12);
+  const doc = JSON.parse(glb.subarray(20, 20 + jsonLen).toString('utf8'));
+  const anim = (doc.animations ?? []).find((a: { name?: string }) => a.name === clipName);
+  expect(anim, `clip '${clipName}' not found in ${glbPath}`).toBeTruthy();
+  return anim.channels.length;
+}
+
 const MANIFEST_SRC = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
 
 function manifestBlock(startAnchor: string, endAnchor: string): string {
@@ -105,6 +114,17 @@ describe('mob_demon_flying bespoke attack (issue #2889)', () => {
     const glbPath = 'public/models/creatures/demon_flying_anims.glb';
     expect(clipNamesOf(glbPath)).toEqual(['DemonFlying_Attack']);
     expect(meshCountOf(glbPath)).toBe(0);
+  });
+
+  it('covers every donor channel, not just the No/Yes gesture subset (review #2961)', () => {
+    // The initial timeline row must fall back to the merged P_all pose, not a
+    // single donor pose: a channel only Punch (23 channels) contributes gets
+    // dropped by bakeClip before the later ramps if the seed row's fallback
+    // is missing it, even though those ramps do supply P_all. Regression for
+    // that exact bug: the clip shipped with only 14 channels (No/Yes
+    // coverage) instead of the full 24-channel donor union.
+    const glbPath = 'public/models/creatures/demon_flying_anims.glb';
+    expect(channelCountOf(glbPath, 'DemonFlying_Attack')).toBe(24);
   });
 
   it('gives mob_demon_flying its own ClipMap instead of mutating the shared FLOATING constant', () => {

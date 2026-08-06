@@ -2,9 +2,9 @@
 // mob_demon_flying shares the literal FLOATING ClipMap object, by reference,
 // with 8 other unrelated families in src/render/characters/manifest.ts, so a
 // flying demon "attacks" with the same Headbutt/Punch as a fire elemental, a
-// ghost, and a dragon. Three earlier batches have each already migrated ONE
-// other FLOATING member off the shared set (elemental, dragonkin, ghost);
-// this migrates mob_demon_flying, following the exact playbook
+// ghost, and a dragon. One earlier batch already migrated a FLOATING member
+// off the shared set (elemental); this migrates mob_demon_flying, following
+// the exact playbook
 // scripts/build_elemental_anims.mjs used. Authors one distinct clip by
 // pose-sample-and-blend (scripts/anim/pose_blend.mjs) off donor poses already
 // baked into the shipped demon.glb itself: Flying_Idle (the hover bookend),
@@ -76,7 +76,7 @@ const P_nod = samplePose(yesIdx, 0.4); // snap-nod as the strike lands
 // this same rig family.
 const P_all = mergePoses(P_idle, P_rear, P_windup, P_dive, P_nod);
 
-const timeline = [[0, (k) => poseValue(P_idle, k, P_rear)]];
+const timeline = [[0, (k) => poseValue(P_idle, k, P_all)]];
 pushPoseRamp(timeline, {
   fromTime: 0,
   toTime: 0.22,
