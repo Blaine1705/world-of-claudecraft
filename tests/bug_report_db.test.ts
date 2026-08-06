@@ -13,6 +13,7 @@ import {
   getBugReportScreenshot,
   isStorableScreenshot,
   listBugReports,
+  resolveBugReport,
 } from '../server/bug_report_db';
 import { pool } from '../server/db';
 
@@ -178,5 +179,39 @@ describe('getBugReportScreenshot', () => {
   it('returns null for a non-finite id without querying', async () => {
     expect(await getBugReportScreenshot(NaN)).toBeNull();
     expect(query).not.toHaveBeenCalled();
+  });
+});
+
+describe('resolveBugReport', () => {
+  it('resolves an open report, stamping the reviewer, timestamp, and a trimmed note', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    const ok = await resolveBugReport(5, 7, 'resolved', '  fixed in 0.34.1  ');
+    expect(ok).toBe(true);
+    const [sql, params] = query.mock.calls[0];
+    expect(sql).toContain('UPDATE bug_reports');
+    expect(sql).toContain("status = 'open'");
+    expect(sql).toContain('reviewed_at = now()');
+    expect(params).toEqual([5, 'resolved', 7, 'fixed in 0.34.1']);
+  });
+
+  it('dismisses an open report with no note (empty string, never null)', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    await resolveBugReport(6, 7, 'dismissed', undefined);
+    const params = query.mock.calls[0][1]!;
+    expect(params[1]).toBe('dismissed');
+    expect(params[3]).toBe('');
+  });
+
+  it('returns false and is a no-op WHERE-clause-wise for a report that is not open', async () => {
+    query.mockResolvedValueOnce({ rowCount: 0 } as any);
+    const ok = await resolveBugReport(9, 7, 'resolved', 'dup');
+    expect(ok).toBe(false);
+  });
+
+  it('truncates an over-long note to the review-note cap', async () => {
+    query.mockResolvedValueOnce({ rowCount: 1 } as any);
+    await resolveBugReport(5, 7, 'resolved', 'x'.repeat(5000));
+    const note = query.mock.calls[0][1]![3] as string;
+    expect(note.length).toBe(500);
   });
 });
