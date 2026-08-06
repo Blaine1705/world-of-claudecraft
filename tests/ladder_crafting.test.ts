@@ -7,7 +7,7 @@
 // authored capacity. The static ladder SHAPE pins live in
 // tests/recipe_economy.test.ts; this file is the execution arm.
 import { describe, expect, it } from 'vitest';
-import { bagCapacity } from '../src/sim/bags';
+import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import { HARVEST_COMPONENT_SPECIMENS } from '../src/sim/content/professions';
 import { LADDER_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS, STATIONS } from '../src/sim/data';
@@ -171,6 +171,83 @@ describe('crafted elixir defs and the live use path', () => {
       expect(aura.name).toBe(expected.aura);
       expect(sim.countItem(id, pid)).toBe(0);
     }
+  });
+});
+
+// Potions are stackable, and crafted copies actually merge: the sweep above
+// proves one craft's output arrives, these pin the follow-up a player asked
+// about ("Potions should be stackable, right?"), which one craft alone cannot
+// show. Kind 'potion'/'elixir' rides the 20-per-slot consumable default
+// (bags.ts stackSizeOf), a second craft of the same recipe tops up the FIRST
+// craft's slot instead of opening a new one (common outputs are plain
+// fungible adds with no craftedRecipeId marker, rare outputs carry the same
+// byte-equal {signer} payload every time), and a plain-granted copy from any
+// other source shares the crafted common stack.
+describe('crafted potions and elixirs stack', () => {
+  const consumableOutputs = LADDER_RECIPES.map((r) => ITEMS[r.resultItemId]).filter(
+    (def) => def.kind === 'potion' || def.kind === 'elixir',
+  );
+
+  function craftTwice(recipeId: string) {
+    const sim = makeSim(11);
+    const pid = primaryOf(sim);
+    const meta = metaOf(sim, pid);
+    meta.copper = 10_000_000;
+    const recipe = LADDER_RECIPES.find((r) => r.id === recipeId);
+    if (!recipe) throw new Error(`expected ${recipeId} on the ladder`);
+    meta.craftSkills[recipe.professionId] = recipe.skillReq;
+    meta.knownRecipes.add(recipe.id);
+    placeAt(sim, pid, stationsOfType(STATIONS, recipe.stationType!)[0].pos);
+    for (let craft = 0; craft < 2; craft++) {
+      meta.craftThrottle.count = 0;
+      for (const reagent of recipe.reagents) sim.addItem(reagent.itemId, reagent.count, pid);
+      runCraft(sim, recipe.id, false, pid);
+      expect(
+        meta.lastCraftResult?.ok,
+        `${recipeId} craft ${craft + 1}: ${meta.lastCraftResult?.reason}`,
+      ).toBe(true);
+    }
+    return { sim, pid, meta, recipe };
+  }
+
+  it('every ladder potion and elixir stacks 20 per slot', () => {
+    // 6 draughts + 3 elixirs (the alchemy ladder block in
+    // content/profession_items.ts).
+    expect(consumableOutputs.length).toBe(9);
+    for (const def of consumableOutputs) {
+      expect(stackSizeOf(def), `${def.id} must stack to the consumable default`).toBe(20);
+    }
+  });
+
+  it('crafting the same common potion twice merges into ONE plain stack', () => {
+    const { sim, pid, meta, recipe } = craftTwice('recipe_silverleaf_healing_draught');
+    expect(sim.countItem(recipe.resultItemId, pid)).toBe(2 * recipe.resultCount);
+    const slots = meta.inventory.filter((s: any) => s.itemId === recipe.resultItemId);
+    // ONE slot is the decisive pin: a regression that marks common potion
+    // outputs (an instance payload, a craftedRecipeId stamp) fragments the
+    // second craft into its own slot and fails here.
+    expect(slots.length).toBe(1);
+    expect(slots[0].count).toBe(2 * recipe.resultCount);
+    expect(slots[0].instance).toBeUndefined();
+    expect(slots[0].craftedRecipeId).toBeUndefined();
+    // A copy from any OTHER source (loot, trade, mail) is the same plain add
+    // and must share the crafted stack.
+    sim.addItem(recipe.resultItemId, 1, pid);
+    const after = meta.inventory.filter((s: any) => s.itemId === recipe.resultItemId);
+    expect(after.length).toBe(1);
+    expect(after[0].count).toBe(2 * recipe.resultCount + 1);
+  });
+
+  it('crafting the same rare draught twice merges into ONE signed stack', () => {
+    const { sim, pid, meta, recipe } = craftTwice('recipe_sunpetal_healing_draught');
+    expect(ITEMS[recipe.resultItemId].quality).toBe('rare');
+    expect(sim.countItem(recipe.resultItemId, pid)).toBe(2 * recipe.resultCount);
+    const slots = meta.inventory.filter((s: any) => s.itemId === recipe.resultItemId);
+    // Both crafts mint the same {signer} payload, so the second one must top
+    // up the first craft's instanced slot, never sit beside it.
+    expect(slots.length).toBe(1);
+    expect(slots[0].count).toBe(2 * recipe.resultCount);
+    expect(slots[0].instance?.signer).toBe(meta.name);
   });
 });
 
