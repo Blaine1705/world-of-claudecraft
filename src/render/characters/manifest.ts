@@ -326,6 +326,17 @@ const BIPED14: ClipMap = {
   death: 'Death',
 };
 
+// The yeti family's own attack (scripts/build_yeti_anims.mjs, issue #2889
+// round 2): BIPED14's Punch/Weapon attack is shared by reference across 6
+// unrelated families (mob_bear, mob_yeti, mob_murloc, mob_troll, mob_demon,
+// mob_demonalt). This "icy roar-and-swipe" clip is baked off yetialt.glb's
+// own donor poses (Weapon's overhead swing blended through the currently
+// unused No clip's head-shake), so only mob_yeti gets it.
+const YETI_BIPED14: ClipMap = {
+  ...BIPED14,
+  attack: ['Yeti_Attack'],
+};
+
 // Tripo biped rig. These creatures come through the current biped
 // pipeline, which retargets and bakes the complete game vocabulary directly.
 const TRIPO_BIPED_FULL_RIG: ClipMap = {
@@ -1284,7 +1295,10 @@ export const VISUALS: Record<string, VisualDef> = {
   mob_yeti: {
     url: `${CREATURES}/yetialt.glb`,
     height: 2.5,
-    clips: BIPED14,
+    clips: YETI_BIPED14,
+    // Yeti_Attack clip donor (scripts/build_yeti_anims.mjs): mesh-free,
+    // baked off this same rig's own poses.
+    animUrls: [`${CREATURES}/yeti_ability_anims.glb`],
     tint: 'entity',
     tintStrength: 0.55,
   },
