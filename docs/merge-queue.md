@@ -11,6 +11,12 @@ the ci.yml merge_group trigger lands there; `main` joins at the next
 release-to-main merge, which is what carries that trigger onto main (enabling
 the queue on a branch whose ci.yml lacks the trigger stalls every queued PR).
 Until a branch is covered by the ruleset, its merge button is unchanged.
+The same sequencing applies to every NEW required name after that: add a
+check's context to the ruleset only AFTER the PR introducing the job has
+merged into the target branch (`PR gate (long sims)` is the first case), and
+expect open PRs whose heads predate the job to need a base re-merge before
+they can queue, since a required context that never reports blocks the merge
+forever.
 
 Why: on 2026-08-05 two merges landed on an already-red release tip, every open
 PR inherited 67 broken tests, and repair took a day of close/reopen churn. The
@@ -26,8 +32,9 @@ automatically instead of by hand.
   builds the candidate merge result (your PR merged onto the current tip, plus
   any PRs queued ahead of you) and runs CI on it as a `merge_group` event.
   ci.yml routes that run through the full PR tier: `changes` reports
-  `test_mode=full`, so the queue always runs the complete 8-shard suite plus
-  checks, browser, and lint on the tree it is about to make the branch tip.
+  `test_mode=full`, so the queue always runs the complete suite (the 8-shard
+  matrix plus the long-sims lane) plus checks, browser, and lint on the tree
+  it is about to make the branch tip.
 - If the queue run is green, GitHub merges automatically. No close/reopen, no
   re-merge of the base: base movement is the queue's job now.
 - The queue merges with one repo-wide method (merge commit). The per-PR
@@ -67,6 +74,12 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   themselves fail-closed triggers (always `code=true`, always full mode); a
   hostile edit is a review problem, not something protection can solve.
 - `PR gate (English-only legal) (1)` through `(8)`: the sharded test suite.
+- `PR gate (long sims)`: the dedicated lane for the long rotation sims
+  (`CI_LONG_SUITES` in `scripts/lib/ci_shard_plan.mjs`). The shard matrix
+  deliberately excludes those files, so this job carries coverage nothing else
+  in the run has: it is required for the same reason the shards are. It runs
+  (or docs-only-skips) on every `pull_request` and `merge_group` run, exactly
+  like the shards.
 - `PR checks (freshness, typecheck, builds)`.
 - `Format + lint (Biome, changed files)`: deterministic, diff-scoped, minutes
   long, and a red here is always a real defect in the changed files. On queue
