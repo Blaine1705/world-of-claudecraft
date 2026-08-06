@@ -80,7 +80,13 @@ is dirty (same reason `gate:fast` skips those paths for related expansion). Pref
 `test:related` with explicit sources, or `gate:fast`, for day-to-day work. Vitest
 `experimental.fsModuleCache` is on in `vite.config.ts` so warm re-runs reuse module
 transforms under `node_modules/.experimental-vitest-cache` (clear with
-`npx vitest --clearCache` if a warm run looks wrong). Most DOM-environment unit
+`npx vitest --clearCache` if a warm run looks wrong). The same store is persisted
+across CI runs since Phase 4 of the CI/CD performance packet: the pr-gate and
+release-gate shard jobs carry an `actions/cache` step for it, keyed per shard on the
+node_modules-layout inputs (lockfile, vite config, `.npmrc`, `package.json`), with the
+design constraints written on the step in `.github/workflows/ci.yml` and pinned by
+`tests/ci_workflow.test.ts`. The nightly gate deliberately stays cold: it is the
+uncached full replay. Most DOM-environment unit
 tests use `// @vitest-environment happy-dom`; a short exception list still pins
 `jsdom` where happy-dom API gaps bite (see `docs/local-gate-perf/baselines.md`
 Phase 5). Default environment remains `node`.

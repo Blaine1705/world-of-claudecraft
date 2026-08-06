@@ -783,33 +783,63 @@ describe('CI workflow parity', () => {
   });
 
   it('persists the vitest transform cache on both shard matrices with a bounded key', () => {
-    // Phase 4 of the CI/CD performance packet: the fsModuleCache store
-    // (enabled in vite.config.ts) is content-addressed inside vitest, so the
-    // actions/cache key only manages rotation and size, never correctness.
-    // Name-to-uses adjacency plus the path line so a YAML-commented-out step
-    // cannot satisfy the pin, mirroring the Playwright cache pin above.
+    // Phase 4 of the CI/CD performance packet: vitest's fsModuleCache store
+    // (enabled in vite.config.ts) keys entries by content, so the
+    // actions/cache key manages rotation and size; the tamper boundary is
+    // GitHub's per-ref cache scoping (see the step comment in ci.yml).
+    // Name-to-uses adjacency plus the path and key lines, TERMINATED BY THE
+    // BLANK LINE THAT ENDS THE STEP: a YAML-commented-out copy cannot satisfy
+    // it, and neither can a step neutered by an appended `if:` or any other
+    // trailing key (the mutation that beat the pin's first draft).
     const cacheStepRe =
-      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@[^\n]+\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-shard\$\{\{ matrix\.shard \}\}-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts'\) \}\}\n/;
+      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@[^\n]+\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-shard\$\{\{ matrix\.shard \}\}-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n/;
     for (const name of ['pr-gate', 'release-gate'] as const) {
       const job = jobSource(name);
       expect(job).toMatch(cacheStepRe);
-      // Restore before the test step, or the run never sees the store.
-      expect(job.indexOf('Cache vitest transform cache')).toBeLessThan(
+      // Restore strictly between the install and the test run: earlier and
+      // pnpm install may prune or re-layout what was just restored, later and
+      // the run never sees the store. Step-name literals, not bare phrases,
+      // so a comment mentioning the name cannot shift the comparison.
+      expect(job.indexOf('- name: Install dependencies')).toBeLessThan(
+        job.indexOf('- name: Cache vitest transform cache'),
+      );
+      expect(job.indexOf('- name: Cache vitest transform cache')).toBeLessThan(
         job.indexOf('- name: Run tests'),
       );
       // No restore-keys: a cross-lockfile restore is discarded by vitest's own
       // integrity check and a cross-config restore misses every entry, so a
       // prefix fallback can only ever download dead weight. Anchored to the
-      // YAML key shape because the step's own comment says the word.
-      expect(job).not.toMatch(/\n\s+restore-keys:/);
+      // YAML key shape (quoted or bare) because the step's own comment says
+      // the word.
+      expect(job).not.toMatch(/\n\s+"?restore-keys"?:/);
     }
-    // The store is enabled in the config this cache serves; if fsModuleCache is
-    // ever turned off there, this step becomes dead weight and must go too.
-    expect(viteConfig).toContain('fsModuleCache: true');
-    // Only the two shard matrices carry the step: the check jobs never run
-    // vitest, and release-i18n's five-file run is seconds long.
-    for (const name of ['pr-checks', 'release-checks', 'release-i18n', 'changes'] as const) {
-      expect(jobSource(name)).not.toContain('.experimental-vitest-cache');
+    // The store is enabled in the config this cache serves, at the DEFAULT
+    // path the workflow hardcodes. Comment-stripped first (a `//` prefix
+    // must fail the pin, not satisfy it), then anchored to the real config
+    // line shape; and fsModuleCachePath must stay unset or the two would
+    // silently point at different directories.
+    const viteConfigCode = viteConfig.replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: true,/);
+    expect(viteConfigCode).not.toContain('fsModuleCachePath');
+    // Exactly the two shard matrices carry the step, counted workflow-wide so
+    // a copy added to ANY other job fails (browser-gate has no matrix, so
+    // ${{ matrix.shard }} would render empty there and every run would
+    // collide on one key). The path line is counted rather than the bare
+    // string because the pr-gate rationale comment mentions the directory.
+    expect(workflow.match(/- name: Cache vitest transform cache\n/g)).toHaveLength(2);
+    expect(workflow.match(/ {10}path: node_modules\/\.experimental-vitest-cache\n/g)).toHaveLength(
+      2,
+    );
+    for (const name of [
+      'pr-checks',
+      'release-checks',
+      'release-i18n',
+      'changes',
+      'browser-gate',
+      'lint',
+      'release-version-gate',
+    ] as const) {
+      expect(jobSource(name)).not.toContain('path: node_modules/.experimental-vitest-cache');
     }
   });
 

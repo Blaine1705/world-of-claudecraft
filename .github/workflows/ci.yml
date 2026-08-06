@@ -379,27 +379,46 @@ jobs:
 
       # Persist the vitest transform cache across runs (vite.config.ts enables
       # experimental.fsModuleCache; the store is
-      # node_modules/.experimental-vitest-cache). Correctness lives inside
-      # vitest, not in this key: every entry is content-addressed (sha1 over the
-      # module source, the config file contents, NODE_ENV, and the vitest
-      # version), and vitest discards the whole store when pnpm-lock.yaml
-      # changes, so a stale restore can only miss, never serve a wrong
-      # transform. The key still pins lockfile + vite config so a rotated
-      # toolchain starts clean instead of restoring a store vitest would
-      # immediately discard; no restore-keys for the same reason. actions/cache
-      # saves only when the primary key missed, so entries stay bounded (one per
-      # shard per toolchain state) instead of accumulating per commit. Per-shard
-      # keys because each shard transforms its own pack's import closure.
-      # release-gate carries the same step with the same key: its release/**
-      # push runs are what save the cache into the base-branch scope PR runs can
-      # restore from (pr-gate never runs on release pushes, and a PR-scoped save
-      # is invisible to every other PR). Both selective legs and the full replay
-      # read the same store: every leg is vitest under the same config.
+      # node_modules/.experimental-vitest-cache). STALENESS safety lives inside
+      # vitest, not in this key: every entry is keyed by sha1 over the module
+      # source, the config file contents, NODE_ENV, and the fsModuleCache
+      # format version, so a changed input can only miss (a vitest upgrade
+      # rotates via the lockfile, in this key and in vitest's own integrity
+      # discard, which hashes the derived node_modules/.pnpm/lock.yaml,
+      # byte-identical to pnpm-lock.yaml under the hoisted layout and present
+      # only after install, one reason this step sits after the install step).
+      # TAMPER safety is GitHub's per-ref cache scoping, not vitest: entries
+      # are keyed by content, never verified against it, and the store is
+      # executed as module code, so this step must never gain restore-keys or
+      # a shared scope without redoing that analysis. Accepted residual: a
+      # fork PR's first run (which already executes the PR's own code by
+      # design) can seed its own refs/pull/N/merge scope for later runs of
+      # the SAME PR; that scope cannot reach other PRs, merge_group runs,
+      # release-gate, or the nightly, and the PR tier holds no secrets and a
+      # read-only token. The key pins every node_modules-layout input
+      # (lockfile, vite config, .npmrc for node-linker, package.json for the
+      # packageManager pin) so a re-layout starts clean instead of restoring
+      # a store vitest would discard or mis-resolve; no restore-keys for the
+      # same reason. actions/cache saves only when the primary key missed, so
+      # entries stay bounded: one 57-73 MB compressed entry per shard per
+      # toolchain state per scope (measured 2026-08-06), written once when
+      # the key is new and never refreshed within that state, so the hit rate
+      # decays as sources drift until the next rotation (start there if the
+      # speedup fades). Per-shard keys: in full mode each shard transforms
+      # its own pack's import closure; in selective mode the collected set is
+      # smaller and only partially resembles the full-mode store it restores,
+      # which still hits on the shared source closure that dominates the
+      # store. release-gate carries the same step with the same key: its
+      # release/** push runs are what save the store into the base-branch
+      # scope PR runs can restore from (pr-gate never runs on release pushes,
+      # and a PR-scoped save is invisible to every other PR). Both selective
+      # legs and the full replay read the same store: every leg is vitest
+      # under the same config.
       - name: Cache vitest transform cache
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts') }}
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # The shard runner spawns `npm test` itself, so pretest still regenerates
       # the i18n artifacts in EVERY shard BY DESIGN (the S3 guard, guide
@@ -557,16 +576,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Same vitest transform cache as pr-gate, same key on purpose: these push
-      # runs are the producer that saves the store into the base-branch cache
-      # scope, which is the only scope PR runs can restore from. The full
-      # rationale (content-addressed entries, lockfile integrity discard, no
-      # restore-keys, save-on-miss-only) sits on the pr-gate copy of this step.
+      # Same vitest transform cache as pr-gate, same key on purpose: this
+      # job's release/** PUSH runs are the producer that saves the store into
+      # the base-branch cache scope, the only scope PR runs can restore from
+      # (this job's other arm, the release-to-main pull_request, saves into
+      # that PR's own scope like any PR run). The full rationale (staleness
+      # vs tamper safety, layout-pinned key, no restore-keys,
+      # save-on-miss-only, measured sizes) sits on the pr-gate copy of this
+      # step.
       - name: Cache vitest transform cache
         uses: actions/cache@v4
         with:
           path: node_modules/.experimental-vitest-cache
-          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts') }}
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
 
       # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
       # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
