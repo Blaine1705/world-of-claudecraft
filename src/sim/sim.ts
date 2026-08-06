@@ -9025,6 +9025,11 @@ export class Sim {
     if (cost.durationMs <= 0) {
       this.chargeTownFocusRespec(meta, cost);
       meta.townFocus = resolvedAllocation;
+      // An instant commit supersedes any earlier queued re-spec: without this,
+      // an older `time`/`timeAndPartial` request would still resolve later via
+      // updateTownFocusRespec, double-charging and overwriting this allocation
+      // with the stale one (see the CHANGES_REQUESTED finding on PR #2909).
+      meta.pendingTownFocus = undefined;
       deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
       return;
     }

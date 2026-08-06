@@ -589,6 +589,34 @@ describe('setTownFocus charges the #1144 re-spec cost model', () => {
     );
   });
 
+  // PR #2909 CHANGES_REQUESTED finding: an instant commit left an earlier
+  // queued timed re-spec in `meta.pendingTownFocus`, so once the old timer
+  // elapsed `updateTownFocusRespec` charged AND applied it again, silently
+  // reverting the instant allocation the player already paid for.
+  it('an instant re-spec supersedes and clears an earlier queued timed re-spec, with no stale double-charge', () => {
+    const { sim, internals, a } = setup();
+    const meta = internals.players.get(a)!;
+    meta.copper = 10_000;
+    sim.addItem('arcane_dust', 50, a);
+    sim.setTownFocus({ hide: 3 }, 'timeAndPartial', a); // queues, does not commit
+    const pending = meta.pendingTownFocus!;
+    expect(pending.readyAtTime).toBeGreaterThan(sim.time);
+
+    sim.setTownFocus({ hide: 1 }, 'instant', a); // commits immediately
+    expect(meta.townFocus).toEqual({ hide: 1 });
+    expect(meta.pendingTownFocus).toBeUndefined(); // the stale queue is cleared
+
+    // Advance past the old timer and let the tick loop try to resolve it: it
+    // must be a no-op now, not a second charge/overwrite of the allocation.
+    const copperAfterInstant = meta.copper;
+    const dustAfterInstant = sim.countItem('arcane_dust', a);
+    sim.time = pending.readyAtTime;
+    sim.tick();
+    expect(meta.townFocus).toEqual({ hide: 1 });
+    expect(meta.copper).toBe(copperAfterInstant);
+    expect(sim.countItem('arcane_dust', a)).toBe(dustAfterInstant);
+  });
+
   it('a materials-costing tier consumes arcane_dust from the bag', () => {
     const { sim, internals, a } = setup();
     const meta = internals.players.get(a)!;
