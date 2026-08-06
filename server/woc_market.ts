@@ -118,6 +118,10 @@ export interface WocDirectedOfferRow {
    *  SECOND acceptance is what escrows. */
   buyerAccepted: boolean;
   sellerAccepted: boolean;
+  /** The directed listing's own state, once one exists. Lets the seller tell
+   *  "waiting for payment" from "paid" without a second round trip. */
+  listingStatus: string | null;
+  listingResolution: string | null;
 }
 
 export type WocBondState =

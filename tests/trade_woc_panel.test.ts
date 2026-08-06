@@ -14,6 +14,7 @@ import {
   refreshWocTradeArm,
   type WocTradePanelDeps,
   wireWocTradeArm,
+  wocOfferPhase,
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
@@ -48,6 +49,7 @@ function deps(over: Partial<WocTradePanelDeps> = {}): WocTradePanelDeps {
     onSendOffer: vi.fn(),
     onAcceptOffer: vi.fn(),
     onCancelOffer: vi.fn(),
+    onPayOffer: vi.fn(),
     ...over,
   };
 }
@@ -235,7 +237,14 @@ describe('the trade window actually applies the gold lock', () => {
 });
 
 describe('a standing offer becomes a REVIEW surface for both sides', () => {
-  const offer = { id: 7, usdCents: 100, tokens: 7812.5, role: 'buyer' as const };
+  const offer = {
+    id: 7,
+    usdCents: 100,
+    tokens: 7812.5,
+    role: 'buyer' as const,
+    phase: 'review' as const,
+    listingId: null,
+  };
 
   it('renders the agreed price for the Money row, in the asked-for shape', () => {
     // "$1.00 USD (~ 7,812.5 $WOC)". The tilde is load-bearing: the token figure
@@ -289,5 +298,80 @@ describe('a standing offer becomes a REVIEW surface for both sides', () => {
     const buyer = deps({ pendingOffer: offer });
     paint(buyer).querySelector<HTMLElement>('[data-woc-cancel]')?.click();
     expect(buyer.onCancelOffer).toHaveBeenCalled();
+  });
+});
+
+describe('the payment phase, in the window rather than elsewhere', () => {
+  const paying = {
+    id: 7,
+    usdCents: 100,
+    tokens: 7812.5,
+    role: 'buyer' as const,
+    phase: 'awaiting_payment' as const,
+    listingId: 41,
+  };
+
+  it('derives the phase from the LISTING, not the offer status', () => {
+    // The offer says only "agreed"; what decides whether money is still owed is
+    // the listing, which exists from acceptance and closes when the sale settles.
+    expect(wocOfferPhase({ listingId: null, listingStatus: null, listingResolution: null })).toBe(
+      'review',
+    );
+    expect(wocOfferPhase({ listingId: 41, listingStatus: 'active', listingResolution: null })).toBe(
+      'awaiting_payment',
+    );
+    expect(
+      wocOfferPhase({ listingId: 41, listingStatus: 'closed', listingResolution: 'sold' }),
+    ).toBe('settled');
+  });
+
+  it('gives the BUYER a pay button naming the agreed price', () => {
+    const root = paint(deps({ pendingOffer: paying }));
+    const btn = root.querySelector('[data-woc-pay]');
+    expect(btn?.textContent).toContain('1.00');
+  });
+
+  it('gives the SELLER a waiting state and NO control', () => {
+    // They can do nothing at this point, so offering a button would be a lie.
+    const root = paint(deps({ pendingOffer: { ...paying, role: 'seller' } }));
+    expect(root.querySelector('.trade-woc-waiting')?.textContent ?? '').not.toBe('');
+    expect(root.querySelector('[data-woc-pay]')).toBeNull();
+    expect(
+      root.querySelector('[data-woc-cancel]'),
+      'escrow is done; no withdrawing now',
+    ).toBeNull();
+  });
+
+  it('shows both sides the settled state once paid', () => {
+    for (const role of ['buyer', 'seller'] as const) {
+      const root = paint(deps({ pendingOffer: { ...paying, role, phase: 'settled' } }));
+      expect(root.querySelector('.trade-woc-done')?.textContent ?? '', role).not.toBe('');
+      expect(root.querySelector('[data-woc-pay]'), role).toBeNull();
+    }
+  });
+
+  it('reports a pay press', () => {
+    const d = deps({ pendingOffer: paying });
+    paint(d).querySelector<HTMLElement>('[data-woc-pay]')?.click();
+    expect(d.onPayOffer).toHaveBeenCalled();
+  });
+
+  it('never offers pay to the seller, nor before escrow', () => {
+    // Paying before the goods are escrowed would take money for an item still
+    // sitting in someone's bags.
+    expect(wocTradeModelFrom(deps({ pendingOffer: { ...paying, role: 'seller' } })).canPay).toBe(
+      false,
+    );
+    expect(
+      wocTradeModelFrom(deps({ pendingOffer: { ...paying, phase: 'review', listingId: null } }))
+        .canPay,
+    ).toBe(false);
+    // The case the listingId check alone does NOT catch: a settled offer still
+    // carries its listing id, so without the phase test it would stay payable
+    // and a second click would buy the same item twice.
+    expect(
+      wocTradeModelFrom(deps({ pendingOffer: { ...paying, phase: 'settled' } })).canPay,
+    ).toBe(false);
+    expect(wocTradeModelFrom(deps({ pendingOffer: paying })).canPay).toBe(true);
   });
 });

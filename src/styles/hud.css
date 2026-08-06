@@ -7486,6 +7486,39 @@
     color: var(--accent);
     font-variant-numeric: tabular-nums;
   }
+  .trade-woc-waiting {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    font-size: 11.5px;
+    color: #887c5c;
+  }
+  .trade-woc-done {
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--accent);
+  }
+  /* A plain rotating ring. prefers-reduced-motion drops the spin rather than
+     the element, so the waiting state still reads as waiting. */
+  .trade-woc-spinner {
+    width: 11px;
+    height: 11px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: trade-woc-spin 0.9s linear infinite;
+  }
+  @keyframes trade-woc-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .trade-woc-spinner {
+      animation: none;
+    }
+  }
   .trade-woc-modes {
     display: flex;
     gap: 6px;

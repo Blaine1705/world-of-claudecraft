@@ -21,6 +21,7 @@ import { restoreFirstEnabled } from './focus_restore';
 import { formatNumber, t } from './i18n';
 import {
   buildWocTradeModel,
+  type WocOfferPhase,
   type WocPendingOffer,
   type WocTradeModel,
   type WocTradePartner,
@@ -46,6 +47,7 @@ export interface WocTradePanelDeps {
   onSendOffer(): void;
   onAcceptOffer(): void;
   onCancelOffer(): void;
+  onPayOffer(): void;
 }
 
 /** USD cents as a localized money string. Cents in: the caller parses the
@@ -70,6 +72,23 @@ export function wocTradeMoneyText(offer: WocPendingOffer | null): string {
   return `${price} ${t('hudChrome.trade.woc.moneyTokens', {
     tokens: formatNumber(offer.tokens, { maximumFractionDigits: 4 }),
   })}`;
+}
+
+/**
+ * Which face of the deal a server-side offer row is showing.
+ *
+ * Derived from the listing rather than the offer's own status, because the
+ * offer says only "agreed": what decides whether money is still owed is the
+ * LISTING, which exists from acceptance and closes when the sale settles.
+ */
+export function wocOfferPhase(row: {
+  listingId: number | null;
+  listingStatus: string | null;
+  listingResolution: string | null;
+}): WocOfferPhase {
+  if (row.listingId === null) return 'review';
+  if (row.listingResolution === 'sold' || row.listingStatus === 'closed') return 'settled';
+  return 'awaiting_payment';
 }
 
 export function wocTradeModelFrom(deps: WocTradePanelDeps): WocTradeModel {
@@ -110,6 +129,28 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     // Both sides read the SAME price, in the currency they agreed it in, with
     // the token figure as the server quoted it. The seller gets Accept; the
     // buyer gets Withdraw. Neither is offered an action that is not theirs.
+    if (o.phase === 'settled') {
+      return `<div class="trade-woc-arm">${modeTabs}
+        <p class="trade-woc-done">${esc(t('hudChrome.trade.woc.settled'))}</p>
+      </div>`;
+    }
+    if (o.phase === 'awaiting_payment') {
+      // The goods are already in escrow. The buyer signs; the seller can do
+      // nothing at all, so their face says exactly that rather than offering a
+      // control that would not work.
+      const body =
+        o.role === 'buyer'
+          ? `<button type="button" class="btn trade-woc-pay" data-woc-pay>${esc(
+              t('hudChrome.trade.woc.payNow', { usd: usd(o.usdCents) }),
+            )}</button>`
+          : `<p class="trade-woc-waiting"><span class="trade-woc-spinner" aria-hidden="true"></span>${esc(
+              t('hudChrome.trade.woc.awaitingPayment'),
+            )}</p>`;
+      return `<div class="trade-woc-arm">${modeTabs}
+        ${body}
+        <p class="trade-woc-hint" data-woc-hint></p>
+      </div>`;
+    }
     // No Accept button of its own: agreement rides the trade window's existing
     // Accept, on both sides, exactly as a gold trade does. The only action here
     // is the buyer's withdraw, which has no equivalent in the window's chrome.
@@ -242,4 +283,7 @@ export function wireWocTradeArm(root: ParentNode, deps: WocTradePanelDeps): void
   root
     .querySelector<HTMLElement>('[data-woc-cancel]')
     ?.addEventListener('click', () => deps.onCancelOffer());
+  root
+    .querySelector<HTMLElement>('[data-woc-pay]')
+    ?.addEventListener('click', () => deps.onPayOffer());
 }

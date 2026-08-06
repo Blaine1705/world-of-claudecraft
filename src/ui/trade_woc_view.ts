@@ -34,14 +34,28 @@ export interface WocTradeSplit {
 
 export type WocTradeMode = 'gold' | 'woc';
 
+/**
+ * Where a $WOC deal has got to. The window shows one of three faces.
+ *
+ *  - review: agreed price on the table, each side yet to accept.
+ *  - awaiting_payment: both accepted, the goods are in escrow, and the BUYER
+ *    still has to sign. The seller can do nothing but wait, which is exactly
+ *    what their face should say.
+ *  - settled: paid; the item is on its way by mail.
+ */
+export type WocOfferPhase = 'review' | 'awaiting_payment' | 'settled';
+
 /** A sent-but-unresolved $WOC offer, as both sides see it. */
 export interface WocPendingOffer {
   id: number;
   usdCents: number;
   /** Server-quoted tokens for that price, or null while unavailable. */
   tokens: number | null;
-  /** Which side the VIEWER is on: only the seller may accept. */
+  /** Which side the VIEWER is on: only the seller may accept, only the buyer pays. */
   role: 'buyer' | 'seller';
+  phase: WocOfferPhase;
+  /** The directed listing to pay for, once one exists. */
+  listingId: number | null;
 }
 
 /** Why the $WOC arm is unavailable, or null when it is offerable. */
@@ -127,6 +141,8 @@ export interface WocTradeModel {
   pendingOffer: WocPendingOffer | null;
   /** Whether the SELLER may accept the standing offer (they hold the goods). */
   canAccept: boolean;
+  /** Whether the BUYER may start paying: escrow is done and it is their turn. */
+  canPay: boolean;
   /** Whether "Send offer" may be pressed. */
   canSend: boolean;
   /** The i18n key explaining why it may not, or null when it may. */
@@ -230,8 +246,15 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
     // Only the seller accepts, and only with something eligible on the table:
     // acceptance is what escrows the goods, so there must be goods.
     canAccept:
-      input.pendingOffer?.role === 'seller' &&
+      input.pendingOffer?.phase === 'review' &&
+      input.pendingOffer.role === 'seller' &&
       input.staged.filter((s) => wocTradableSlot(s, input.items)).length > 0,
+    // Only the buyer pays, and only once the goods are actually in escrow: a pay
+    // button before that would take money for an item still in someone's bags.
+    canPay:
+      input.pendingOffer?.phase === 'awaiting_payment' &&
+      input.pendingOffer.role === 'buyer' &&
+      input.pendingOffer.listingId !== null,
     // A standing offer replaces the form: you cannot send a second one over it.
     canSend: wocMode && hint === null && input.pendingOffer === null,
     sendHint: wocMode && hint !== null ? SEND_HINT_KEYS[hint] : null,

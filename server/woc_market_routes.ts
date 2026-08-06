@@ -665,6 +665,8 @@ function offerView(offer: WocDirectedOfferRow, viewer: number | null) {
     status: offer.status,
     listingId: offer.listingId,
     expiresAtMs: offer.expiresAtMs,
+    listingStatus: offer.listingStatus,
+    listingResolution: offer.listingResolution,
     // Which side the caller is on, so the client picks accept/decline versus
     // withdraw without having to compare account ids it should not be sent.
     role: viewer === offer.buyerAccount ? 'buyer' : 'seller',

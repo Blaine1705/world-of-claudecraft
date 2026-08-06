@@ -741,6 +741,7 @@ import {
   restoreWocTradeFocus,
   type WocTradePanelDeps,
   wireWocTradeArm,
+  wocOfferPhase,
   wocTradeArmHtml,
   wocTradeModelFrom,
   wocTradeMoneyText,
@@ -5215,6 +5216,9 @@ export class Hud {
    *  open so BOTH sides see the same one without a push channel. */
   private wocTradeOffer: WocPendingOffer | null = null;
   private wocTradeOfferPolledAtMs = 0;
+  /** Re-entry guard: a second click mid-signature would take two lock+quote
+   *  round trips for one purchase. */
+  private wocTradePaying = false;
   private readonly wocMarketWindow = new WocMarketWindow({
     root: () => $('#woc-market-window'),
     attachTooltip: (element, html) => this.attachTooltip(element, html),
@@ -18810,6 +18814,7 @@ export class Hud {
       onSendOffer: () => void this.sendWocTradeOffer(otherName),
       onAcceptOffer: () => void this.acceptWocTradeOffer(),
       onCancelOffer: () => void this.cancelWocTradeOffer('withdraw'),
+      onPayOffer: () => void this.payWocTradeOffer(),
       pendingOffer: this.wocTradeOffer,
     };
   }
@@ -18839,7 +18844,12 @@ export class Hud {
         }
         return;
       }
-      if (this.wocTradeOffer?.id === mine.id) return;
+      // Compare the PHASE too: the same offer moving from review to
+      // awaiting_payment is the transition both windows are waiting on,
+      // and an id-only check would never notice it.
+      if (this.wocTradeOffer?.id === mine.id && this.wocTradeOffer.phase === wocOfferPhase(mine)) {
+        return;
+      }
       // Quote the agreed price once, so both sides show the same token figure.
       const est = await hooks.client.estimate(mine.usdCents);
       if (this.sim.tradeInfo?.otherName !== otherName) return;
@@ -18848,6 +18858,8 @@ export class Hud {
         usdCents: mine.usdCents,
         tokens: est?.amount?.tokens ?? null,
         role: mine.role,
+        phase: wocOfferPhase(mine),
+        listingId: mine.listingId,
       };
       this.lastTradeSig = '';
     });
@@ -18890,6 +18902,64 @@ export class Hud {
     this.log(t('hudChrome.trade.woc.accepted'), '#7fdc4f');
     this.wocTradeOffer = null;
     this.sim.tradeCancel();
+  }
+
+  /**
+   * The buyer pays, from the trade window.
+   *
+   * Exactly the Exchange's own sequence, reused rather than reimplemented: take
+   * the buy-now lock, ask for a settlement quote, hand the SERVER-BUILT
+   * transaction to the wallet bridge, then confirm with the signature. The
+   * client never assembles a transaction, and nothing here computes an amount.
+   */
+  private async payWocTradeOffer(): Promise<void> {
+    const hooks = this.wocMarketHooks;
+    const offer = this.wocTradeOffer;
+    if (!hooks || !offer || offer.listingId === null || this.wocTradePaying) return;
+    this.wocTradePaying = true;
+    this.lastTradeSig = '';
+    try {
+      const bought = await hooks.client.buyNow({
+        listingId: offer.listingId,
+        characterId: hooks.characterId() ?? 0,
+        // Terms were accepted when the offer was made; the server records them
+        // once per account and this flag is only the per-call assertion.
+        acceptTerms: true,
+      });
+      if (!bought.ok) {
+        this.log(userFacingApiError({ code: bought.code }), '#ff6b6b');
+        return;
+      }
+      const quoted = await hooks.client.settlementQuote(bought.settlement.id);
+      if (!quoted.ok || !quoted.quote.transactionBase64) {
+        this.log(
+          userFacingApiError({ code: quoted.ok ? 'woc_market.quote_unavailable' : quoted.code }),
+          '#ff6b6b',
+        );
+        return;
+      }
+      this.log(t('hudChrome.trade.woc.paying'), '#ffd100');
+      let signature: string;
+      try {
+        signature = await hooks.signAndSendTransactionBase64(quoted.quote.transactionBase64);
+      } catch (err) {
+        // The wallet bridge throws player-facing text already.
+        this.log(
+          err instanceof Error && err.message ? err.message : t('hudChrome.wocMarket.loadFailed'),
+          '#ff6b6b',
+        );
+        return;
+      }
+      const done = await hooks.client.confirmSettlement(bought.settlement.id, signature);
+      if (!done.ok) {
+        this.log(userFacingApiError({ code: done.code }), '#ff6b6b');
+        return;
+      }
+      this.log(t('hudChrome.trade.woc.settled'), '#7fdc4f');
+    } finally {
+      this.wocTradePaying = false;
+      this.lastTradeSig = '';
+    }
   }
 
   private async cancelWocTradeOffer(action: 'decline' | 'withdraw'): Promise<void> {
@@ -18955,6 +19025,8 @@ export class Hud {
         usdCents: res.offer.usdCents,
         tokens: this.wocTradeTokens,
         role: 'buyer',
+        phase: 'review',
+        listingId: null,
       };
       this.lastTradeSig = '';
     } else {

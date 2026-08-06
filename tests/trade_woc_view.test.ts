@@ -266,7 +266,14 @@ describe('a standing offer changes what each side may do', () => {
   // branches on role and pendingOffer before it ever consults these flags, so
   // driving it would pass even with the rules deleted: the two layers encode
   // the same guard on purpose, and only this level tests the inner one.
-  const offer = { id: 7, usdCents: 100, tokens: 7812.5, role: 'buyer' as const };
+  const offer = {
+    id: 7,
+    usdCents: 100,
+    tokens: 7812.5,
+    role: 'buyer' as const,
+    phase: 'review' as const,
+    listingId: null,
+  };
 
   it('forbids a SECOND offer while one is standing', () => {
     const m = buildWocTradeModel(input({ pendingOffer: offer }));

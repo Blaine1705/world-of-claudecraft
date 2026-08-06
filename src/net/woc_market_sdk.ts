@@ -95,6 +95,9 @@ export interface WocOfferView {
   listingId: number | null;
   expiresAtMs: number;
   role: 'buyer' | 'seller';
+  /** The directed listing's own state once one exists; drives the payment phase. */
+  listingStatus: string | null;
+  listingResolution: string | null;
 }
 
 export interface WocQuoteView {

@@ -399,6 +399,8 @@ function toOffer(row: Row): WocDirectedOfferRow {
     expiresAtMs: ms(row.expires_at),
     buyerAccepted: row.buyer_accepted === true,
     sellerAccepted: row.seller_accepted === true,
+    listingStatus: (row.listing_status ?? null) as string | null,
+    listingResolution: (row.listing_resolution ?? null) as string | null,
   };
 }
 
@@ -705,15 +707,21 @@ export class PgWocMarketDb implements WocMarketDb {
   }
 
   async directedOffersForAccount(realm: string, account: number): Promise<WocDirectedOfferRow[]> {
-    // Both partial indexes cover one arm each; the UNION keeps them usable
-    // rather than OR-ing them into a seq scan (the DAILY_REWARD view precedent).
+    // 'accepted' rides along with 'pending' because the deal is not over when it
+    // is agreed: the buyer still has to pay, and BOTH windows need to show that
+    // phase. The listing's own status comes with it so the seller can tell
+    // "waiting for payment" from "paid", without a second round trip.
+    const cols = OFFER_COLS.split(', ')
+      .map((c) => `o.${c}`)
+      .join(', ');
     const res = await this.pool.query(
-      `SELECT ${OFFER_COLS} FROM woc_market_directed_offers
-        WHERE realm = $1 AND buyer_account = $2 AND status = 'pending'
-       UNION ALL
-       SELECT ${OFFER_COLS} FROM woc_market_directed_offers
-        WHERE realm = $1 AND seller_account = $2 AND status = 'pending'
-       ORDER BY created_at DESC LIMIT 50`,
+      `SELECT ${cols}, l.status AS listing_status, l.resolution AS listing_resolution
+         FROM woc_market_directed_offers o
+         LEFT JOIN woc_market_listings l ON l.id = o.listing_id
+        WHERE o.realm = $1
+          AND o.status IN ('pending', 'accepted')
+          AND (o.buyer_account = $2 OR o.seller_account = $2)
+        ORDER BY o.created_at DESC LIMIT 50`,
       [realm, account],
     );
     return res.rows.map(toOffer);
