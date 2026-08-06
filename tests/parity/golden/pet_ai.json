@@ -5,13 +5,13 @@
   "ticks": 180,
   "coverage": [
     "class:hunter (pet owner)",
-    "petRangedAttack imp-bolt arm (petRanged crit roll + AP-scaled fire damage)",
+    "petRangedAttack imp-bolt arm (petRanged resist roll + crit roll + AP-scaled fire damage)",
     "petPickTarget aggressive auto-pull",
     "updatePet melee arm: close + auto-taunt + mobSwing (PET_COMBAT_LINGER owner inCombat)",
     "petFollow heel transition (pets return to a moved owner)"
   ],
-  "draws": 1473,
-  "drawDigest": "2d3680cc",
+  "draws": 1478,
+  "drawDigest": "07b46717",
   "frames": [
     {
       "tick": 0,
@@ -140,77 +140,77 @@
       "tick": 20,
       "time": 1,
       "nextId": 968,
-      "state": "9fa2888e",
-      "events": "ac871453",
+      "state": "5a315312",
+      "events": "a105bdfe",
       "rng": {
-        "draws": 13,
-        "digest": "adfaaed4"
+        "draws": 14,
+        "digest": "b39138db"
       }
     },
     {
       "tick": 40,
       "time": 2,
       "nextId": 968,
-      "state": "4f774756",
-      "events": "810f0494",
+      "state": "658d342a",
+      "events": "3c87884c",
       "rng": {
-        "draws": 16,
-        "digest": "412e66ba"
+        "draws": 15,
+        "digest": "a3598267"
       }
     },
     {
       "tick": 60,
       "time": 3,
       "nextId": 968,
-      "state": "ea258f35",
+      "state": "fc65b0af",
       "events": "015cb65d",
       "rng": {
-        "draws": 185,
-        "digest": "a3871e14"
+        "draws": 184,
+        "digest": "b06e71bd"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 968,
-      "state": "1e42d898",
-      "events": "3c87884c",
+      "state": "8ff51984",
+      "events": "810f0494",
       "rng": {
-        "draws": 363,
-        "digest": "930bdd81"
+        "draws": 361,
+        "digest": "2a060b02"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 968,
-      "state": "35ce860d",
-      "events": "1cf34a49",
+      "state": "41a2b0aa",
+      "events": "8cf65895",
       "rng": {
-        "draws": 560,
-        "digest": "4a29d461"
+        "draws": 566,
+        "digest": "ccfbdc96"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 968,
-      "state": "b026cce1",
-      "events": "12e9e8f8",
+      "state": "846e13e5",
+      "events": "810f0494",
       "rng": {
-        "draws": 771,
-        "digest": "952aeeb6"
+        "draws": 774,
+        "digest": "6057a5b9"
       }
     },
     {
       "tick": 120,
       "time": 6,
       "nextId": 968,
-      "state": "2bf5f271",
+      "state": "8d222a3d",
       "events": "741638a5",
       "rng": {
-        "draws": 771,
-        "digest": "952aeeb6"
+        "draws": 774,
+        "digest": "6057a5b9"
       },
       "label": "heel",
       "players": [
@@ -356,7 +356,7 @@
           "facing": 1.646071,
           "fallStartY": 7.280921,
           "fiveSecondRule": 99,
-          "hp": 136,
+          "hp": 140,
           "id": 964,
           "inCombat": true,
           "kind": "mob",
@@ -402,7 +402,7 @@
           "fallStartY": -9.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49931,
+          "hp": 49949,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
@@ -438,7 +438,7 @@
           "threat": [
             [
               964,
-              70
+              52
             ]
           ],
           "wanderTarget": {
@@ -463,7 +463,7 @@
           "facing": -1.570796,
           "fallStartY": 7.280921,
           "fiveSecondRule": 99,
-          "hp": 334,
+          "hp": 344,
           "id": 966,
           "inCombat": true,
           "kind": "mob",
@@ -502,7 +502,7 @@
         {
           "aggroTargetId": 966,
           "aiState": "attack",
-          "combatTimer": 1.6,
+          "combatTimer": 1.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -568,44 +568,44 @@
       "tick": 140,
       "time": 7,
       "nextId": 968,
-      "state": "20795865",
+      "state": "c792e073",
       "events": "741638a5",
       "rng": {
-        "draws": 976,
-        "digest": "aa2afb80"
+        "draws": 983,
+        "digest": "d47ba5f6"
       }
     },
     {
       "tick": 160,
       "time": 8,
       "nextId": 968,
-      "state": "19c0878a",
+      "state": "147a5560",
       "events": "741638a5",
       "rng": {
-        "draws": 1219,
-        "digest": "0744ed95"
+        "draws": 1213,
+        "digest": "f9238783"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 968,
-      "state": "74b6e975",
+      "state": "247c5d5b",
       "events": "741638a5",
       "rng": {
-        "draws": 1473,
-        "digest": "2d3680cc"
+        "draws": 1478,
+        "digest": "07b46717"
       }
     },
     {
       "tick": 180,
       "time": 9,
       "nextId": 968,
-      "state": "74b6e975",
+      "state": "247c5d5b",
       "events": "741638a5",
       "rng": {
-        "draws": 1473,
-        "digest": "2d3680cc"
+        "draws": 1478,
+        "digest": "07b46717"
       },
       "label": "final",
       "players": [
@@ -750,7 +750,7 @@
           "facing": 1.570796,
           "fallStartY": 7.280921,
           "fiveSecondRule": 99,
-          "hp": 139,
+          "hp": 143,
           "id": 964,
           "kind": "mob",
           "level": 12,
@@ -794,7 +794,7 @@
           "fallStartY": -9.5,
           "fiveSecondRule": 99,
           "hostile": true,
-          "hp": 49931,
+          "hp": 49949,
           "id": 965,
           "inCombat": true,
           "kind": "mob",
@@ -844,7 +844,7 @@
           "facing": 1.570796,
           "fallStartY": 7.280921,
           "fiveSecondRule": 99,
-          "hp": 342,
+          "hp": 352,
           "id": 966,
           "kind": "mob",
           "level": 12,
@@ -886,7 +886,7 @@
         },
         {
           "aiState": "evade",
-          "combatTimer": 4.6,
+          "combatTimer": 4.65,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
