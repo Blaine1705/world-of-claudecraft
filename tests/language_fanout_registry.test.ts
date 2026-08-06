@@ -245,9 +245,9 @@ const ANSWERED: readonly AnsweredSurface[] = [
   },
   {
     file: 'reliquary_window.ts',
-    memos: ['lastSig'],
+    memos: ['lastAnnounced', 'lastSig'],
     answer: 'this.reliquaryWindow.render',
-    why: 'catalog progress, Curator rank labels, shelf page lists, and grid chrome',
+    why: 'catalog progress, Curator rank labels, shelf page lists, and grid chrome; lastAnnounced holds the LOCALIZED live-region line, but the fan-out render is argument-less (the player-driven arm), which recomputes and rewrites the region unconditionally, so the memo cannot pin stale-language text past a switch',
   },
   {
     file: 'dungeon_finder_proposal_popup.ts',
