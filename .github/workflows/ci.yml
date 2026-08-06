@@ -405,9 +405,12 @@ jobs:
       # the key is new and never refreshed within that state, so the hit rate
       # decays as sources drift until the next rotation (start there if the
       # speedup fades). The binding budget is GitHub's 10 GB per-repo cache
-      # quota with LRU eviction: both matrices together hold roughly 1 GB per
-      # toolchain state per scope beside the pnpm store, Playwright, and tsc
-      # caches, so if hot-entry eviction is ever observed, the lever is
+      # quota with LRU eviction: about 0.5 GB per toolchain state per scope
+      # (8 entries at 57-73 MB; no single scope holds both matrices, since
+      # their if arms are exact complements on the events that could share a
+      # ref), roughly 1 GB across the two long-lived producer scopes (main
+      # plus the release branch) beside the pnpm store, Playwright, and tsc
+      # caches. If hot-entry eviction is ever observed, the lever is
       # restricting this step's save to push events, never restore-keys.
       # Producers beyond release-gate: pr-gate's own main and dev-* push runs
       # seed those branches' scopes the same way.
@@ -585,10 +588,11 @@ jobs:
 
       # Same vitest transform cache as pr-gate, same key on purpose: this
       # job's release/** PUSH runs are the producer that saves the store into
-      # the base-branch cache scope, the only scope PR runs can restore from
-      # (this job's other arm, the release-to-main pull_request, saves into
-      # that PR's own scope like any PR run). The full rationale (staleness
-      # vs tamper safety, layout-pinned key, no restore-keys,
+      # the release branch's scope, the base-branch scope PR runs restore
+      # from (this job's other arm, the release-to-main pull_request, saves
+      # into that PR's own scope like any PR run; pr-gate's main and dev-*
+      # push runs seed those branches' scopes likewise). The full rationale
+      # (staleness vs tamper safety, layout-pinned key, no restore-keys,
       # save-on-miss-only, measured sizes) sits on the pr-gate copy of this
       # step.
       - name: Cache vitest transform cache
