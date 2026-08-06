@@ -2665,7 +2665,7 @@ async function startGame(
     activateProfile: (target) =>
       activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
     resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
-    buildRenderer: (_target, recycled) => {
+    buildRenderer: (target, recycled) => {
       const next = new Renderer(world, recycled.canvas, nameplates, {
         context: recycled.context,
         initializeGfx: false,
