@@ -5070,9 +5070,9 @@ export const TARGETS = [
           try {
             sim.setPlayerLevel?.(20);
           } catch {}
-          // Part of ONE family owned, and worn: the owned marks, the live
-          // 2-piece bonus and the "N more" progress line all need a viewer who
-          // is part way through a set, never an empty or a finished one.
+          // Part of ONE family owned, and worn: the per-tile Owned marker needs
+          // a viewer who is part way through a set, never an empty or a
+          // finished one, so one section carries both treatments at once.
           for (const id of [
             'furyforged_warhelm',
             'furyforged_warspaulders',
@@ -5111,21 +5111,27 @@ export const TARGETS = [
             sections: document.querySelectorAll('#warfare-window .vendor-section-title').length,
             progress: document.querySelectorAll('#warfare-window .warfare-set-progress').length,
             bonuses: document.querySelectorAll('#warfare-window .warfare-set-bonus').length,
+            tiles: document.querySelectorAll('#warfare-window .vendor-goods-grid .vendor-item')
+              .length,
             owned: document.querySelectorAll('#warfare-window .vendor-item.warfare-owned').length,
             balance: Boolean(document.querySelector('#warfare-window .warfare-balance')),
           }));
           if (shape.sections < 4) {
             throw new Error(`expected the four armor sections at least, saw ${shape.sections}`);
           }
-          // The owned-count sentence was CUT from the window (the lit and dim
-          // tier rows plus the per-tile Owned marker already carry it), so the
-          // frame is only honest when nothing renders it. Asserted as an
-          // absence rather than dropped, or a re-added line would slip back
+          // A section is now a name header straight onto its item tiles, so the
+          // tiles are what the header has to be verified against: a headers-only
+          // window would otherwise pass on the section count alone.
+          if (shape.tiles === 0) throw new Error('no section renders any item tile');
+          // Both set-text lines were CUT from the window (the item tooltip's set
+          // block carries the tiers, and the per-tile Owned marker carries the
+          // count), so the frame is only honest when neither renders. Asserted
+          // as absences rather than dropped, or a re-added line would slip back
           // into the shot unnoticed.
           if (shape.progress > 0) {
             throw new Error('the owned-count progress line is still rendered');
           }
-          if (shape.bonuses === 0) throw new Error('no set carries a bonus tier line');
+          if (shape.bonuses > 0) throw new Error('the set bonus tier lines are still rendered');
           if (shape.owned === 0) throw new Error('no tile is marked owned');
           if (!shape.balance) throw new Error('the shop shows no honor balance');
         }
