@@ -3634,6 +3634,7 @@ export const tr_TR: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Lider Tablosu",
       "deeds": "Yiğitlikler Kitabı",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Üretim",
       "valeCup": "Vadi Kupası",

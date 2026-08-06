@@ -3634,6 +3634,7 @@ export const id_ID: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Papan Peringkat",
       "deeds": "Kitab Jasa",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Kriya",
       "valeCup": "Piala Lembah",

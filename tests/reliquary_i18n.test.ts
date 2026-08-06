@@ -12,6 +12,7 @@ import {
   type ReliquaryPageDef,
 } from '../src/sim/content/reliquary';
 import { setLanguage } from '../src/ui/i18n';
+import { ja_JP, ko_KR, ru_RU, zh_CN, zh_TW } from '../src/ui/i18n.resolved.generated';
 import {
   ensureReliquaryLocalesLoaded,
   RELIQUARY_LOCALE_LOADERS,
@@ -35,6 +36,11 @@ describe('reliquary_i18n English resolution', () => {
   it('falls back for catalog-unknown ids (content drift)', () => {
     expect(reliquaryPageName('removed_page')).toBe('removed_page');
     expect(reliquaryPageDesc('removed_page')).toBe('');
+    // Prototype keys index truthy on a plain object; the hasOwn guard keeps
+    // the raw-id contract for a hostile or drifted wire id.
+    expect(reliquaryPageName('__proto__')).toBe('__proto__');
+    expect(reliquaryPageName('constructor')).toBe('constructor');
+    expect(reliquaryPageDesc('__proto__')).toBe('');
   });
 
   it('manifests one row per page name and one per authored desc', () => {
@@ -65,6 +71,9 @@ describe('reliquary_i18n English resolution', () => {
 describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
   type BaseLocale = keyof typeof RELIQUARY_LOCALE_LOADERS;
   const tables = {} as Record<BaseLocale, ReliquaryLocaleTable>;
+  // The resolved main-catalog bundles, for the entity-anchor sweep: the page
+  // that collects a dungeon must carry that dungeon's own translated name.
+  const BUNDLES = { ja_JP, ko_KR, ru_RU, zh_CN, zh_TW } as const;
 
   beforeAll(async () => {
     const keys = Object.keys(RELIQUARY_LOCALE_LOADERS) as BaseLocale[];
@@ -173,17 +182,13 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
 
   // Page NAMES ship for the five non-Latin locales now, because a Latin-script
   // reader can still parse an English proper noun while a CJK or Cyrillic reader
-  // cannot. That makes NAME coverage a PR-tier contract, not a release-tier one:
-  // this arm runs at both tiers so a page added without its five fills reds
-  // immediately. Page DESCS (and the Latin locale tables) are release fill, so
-  // desc rows are deliberately excluded here; the release fill widens this to the
-  // full manifest. Nothing in this file reads I18N_RELEASE_TIER any more (that
-  // spelling is deliberate: the tier-list scan claims any file containing the
-  // full env accessor form, so do not add the prefix here), so it is
-  // off the release-tier suite list; a release-tier desc arm landing here has to be
-  // re-added to all three places that list holds (scripts/lib/gate_steps.mjs, the
-  // release-i18n job in ci.yml, and the literal pin in
-  // tests/release_i18n_tier_coverage.test.ts).
+  // cannot. That makes NAME coverage a PR-tier contract: this arm runs at both
+  // tiers so a page added without its five fills reds immediately. Page DESCS
+  // and the Latin locale tables are release fill (Phase 22), held to the
+  // release tier by the runIf arm below (the deed-channel shape), which is why
+  // this suite sits on the release-tier suite list in all three places that
+  // list holds (scripts/lib/gate_steps.mjs, the release-i18n job in ci.yml,
+  // and the literal pin in tests/release_i18n_tier_coverage.test.ts).
   it('covers every manifest NAME row in all five shipped locale tables', () => {
     const nameRows = reliquaryTranslationManifest().filter((row) => row.field === 'name');
     for (const lang of tableLocales()) {
@@ -194,6 +199,105 @@ describe('reliquary locale chunks (the shipped non-Latin fill)', () => {
       }
     }
   });
+
+  it('anchors every dungeon, delve, and set page name to its entity translation', () => {
+    // Derived from the page defs (clearSource.dungeonId / delveId, the
+    // conquerors_set_<setId> id shape), so a NEW dungeon, delve, or set page
+    // is swept automatically; the literal spot checks above stay as
+    // tripwires. A drift here means the museum page and the content it
+    // collects disagree inside the same client. The two Nythraxis raid pages
+    // deliberately trim the arena noun off the entity name (state.md Phase 11
+    // anchors) and are pinned literally in the spot-check test instead.
+    const NYTHRAXIS_DEVIATION = new Set(['conquerors_nythraxis', 'conquerors_nythraxis_heroic']);
+    const HEROIC_PREFIX: Record<string, string> = {
+      ja_JP: '英雄: ',
+      ko_KR: '영웅: ',
+      ru_RU: 'Героизм: ',
+      zh_CN: '英雄：',
+      zh_TW: '英雄：',
+    };
+    const swept: string[] = [];
+    for (const lang of tableLocales()) {
+      const bundle = BUNDLES[lang as keyof typeof BUNDLES] as unknown as {
+        entities?: Record<string, Record<string, { name?: string }>>;
+      };
+      expect(bundle, `${lang} has no resolved bundle in the sweep map`).toBeDefined();
+      const entityName = (ns: string, id: string): string | undefined =>
+        bundle.entities?.[ns]?.[id]?.name;
+      for (const page of RELIQUARY_PAGES) {
+        if (NYTHRAXIS_DEVIATION.has(page.id)) continue;
+        const cs = page.clearSource;
+        const setMatch = page.id.match(/^conquerors_set_(\w+)$/);
+        let anchor: string | undefined;
+        if (cs?.kind === 'dungeon') {
+          const base = entityName('dungeons', cs.dungeonId);
+          expect(base, `${lang} entities.dungeons.${cs.dungeonId}.name`).toBeDefined();
+          anchor = cs.difficulty === 'heroic' ? HEROIC_PREFIX[lang] + base : base;
+        } else if (cs?.kind === 'delve') {
+          anchor = entityName('delves', cs.delveId);
+          expect(anchor, `${lang} entities.delves.${cs.delveId}.name`).toBeDefined();
+        } else if (setMatch) {
+          anchor = entityName('itemSets', setMatch[1]);
+          expect(anchor, `${lang} entities.itemSets.${setMatch[1]}.name`).toBeDefined();
+        }
+        if (anchor === undefined) continue;
+        expect(tables[lang][page.id]?.name, `${lang}.${page.id}`).toBe(anchor);
+        swept.push(`${lang}.${page.id}`);
+      }
+    }
+    // Vacuity floor, snug to the real corpus: 19 anchorable pages x 5 locales
+    // today (5 normal + 5 heroic dungeons, 2 delves, 7 sets; the world-boss
+    // page is mark-anchored and the rest carry no derivable anchor).
+    expect(swept.length).toBeGreaterThanOrEqual(95);
+  });
+
+  // RELEASE-TIER ONLY: channel English lives in RELIQUARY_PAGES, outside the
+  // registry, so no row here can ever turn `pending` and the pending-set gate
+  // cannot see this surface (the invisible-passthrough shape). This arm is the
+  // bar that forces the Phase 22 release fill: every base locale must ship a
+  // chunk, and every chunk must cover the full manifest (names and authored
+  // descs). Deliberately red at release tier until that fill lands, exactly
+  // like the deed sibling's 18-locale arm.
+  it.runIf(process.env.I18N_RELEASE_TIER === '1')(
+    'ships a chunk for all 18 base locales covering the full manifest',
+    async () => {
+      const BASE_LOCALES = [
+        'cs_CZ',
+        'da_DK',
+        'de_DE',
+        'es',
+        'fr_FR',
+        'id_ID',
+        'it_IT',
+        'ja_JP',
+        'ko_KR',
+        'nl_NL',
+        'pl_PL',
+        'pt_BR',
+        'ru_RU',
+        'sv_SE',
+        'tr_TR',
+        'vi_VN',
+        'zh_CN',
+        'zh_TW',
+      ];
+      const manifest = reliquaryTranslationManifest();
+      for (const lang of BASE_LOCALES) {
+        const loader = RELIQUARY_LOCALE_LOADERS[lang as keyof typeof RELIQUARY_LOCALE_LOADERS];
+        expect(loader, `${lang} has no locale chunk`).toBeDefined();
+        if (!loader) continue;
+        const mod = await loader();
+        const table = (mod as { default?: ReliquaryLocaleTable }).default ?? mod;
+        for (const row of manifest) {
+          const value = (table as ReliquaryLocaleTable)[row.id]?.[row.field];
+          expect(
+            value !== undefined && value.trim().length > 0,
+            `${lang}.${row.id}.${row.field}`,
+          ).toBe(true);
+        }
+      }
+    },
+  );
 });
 
 describe('the window paints the RESOLVED page name, never the model English', () => {

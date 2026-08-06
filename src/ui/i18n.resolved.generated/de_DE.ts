@@ -3634,6 +3634,7 @@ export const de_DE: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Bestenliste",
       "deeds": "Buch der Taten",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Handwerk",
       "valeCup": "Talpokal",

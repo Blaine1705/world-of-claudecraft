@@ -3634,6 +3634,7 @@ export const ru_RU: EnTranslations = {
       "arena": "Арена",
       "leaderboard": "Таблица лидеров",
       "deeds": "Книга деяний",
+      "reliquary": "Реликварий",
       "sheathe": "Убрать/обнажить оружие",
       "crafting": "Крафт",
       "valeCup": "Кубок Долины",

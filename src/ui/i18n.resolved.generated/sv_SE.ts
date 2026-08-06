@@ -3634,6 +3634,7 @@ export const sv_SE: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Topplista",
       "deeds": "Bedrifternas bok",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Hantverk",
       "valeCup": "Dalcupen",

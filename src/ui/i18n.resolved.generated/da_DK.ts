@@ -3634,6 +3634,7 @@ export const da_DK: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Resultattavle",
       "deeds": "Bedrifternes Bog",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Håndværk",
       "valeCup": "Dalpokalen",

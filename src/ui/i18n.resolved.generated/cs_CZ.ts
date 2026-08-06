@@ -3634,6 +3634,7 @@ export const cs_CZ: EnTranslations = {
       "arena": "Aréna",
       "leaderboard": "Žebříček",
       "deeds": "Kniha skutků",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Výroba",
       "valeCup": "Pohár údolí",

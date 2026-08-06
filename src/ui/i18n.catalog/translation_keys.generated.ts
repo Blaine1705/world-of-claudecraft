@@ -4394,6 +4394,7 @@ export type TranslationKeyFlat =
   | 'guide.controls.mount'
   | 'guide.controls.petBar'
   | 'guide.controls.professions'
+  | 'guide.controls.reliquary'
   | 'guide.controls.runForward'
   | 'guide.controls.sheathe'
   | 'guide.controls.talents'

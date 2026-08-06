@@ -3634,6 +3634,7 @@ export const nl_NL: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Ranglijst",
       "deeds": "Boek der Daden",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Vervaardigen",
       "valeCup": "De Dalbeker",

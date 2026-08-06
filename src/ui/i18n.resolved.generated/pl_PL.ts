@@ -3634,6 +3634,7 @@ export const pl_PL: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Tabela wyników",
       "deeds": "Księga Czynów",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Wytwarzanie",
       "valeCup": "Puchar Doliny",

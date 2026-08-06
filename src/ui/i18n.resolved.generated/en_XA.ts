@@ -3634,6 +3634,7 @@ export const en_XA: EnTranslations = {
       "arena": "[Áŕéñá]",
       "leaderboard": "[Ļéáðéŕƀóáŕð]",
       "deeds": "[Ɓóóķ óƒ Ðééðš]",
+      "reliquary": "[Ţĥé Ŕéļíɋúáŕý]",
       "sheathe": "[Šĥéáţĥé/Úñšĥéáţĥé Ŵéáþóñ]",
       "crafting": "[Çŕáƒţíñĝ]",
       "valeCup": "[Ʋáļé Çúþ]",

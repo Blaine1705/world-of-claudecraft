@@ -3634,6 +3634,7 @@ export const vi_VN: EnTranslations = {
       "arena": "Đấu Trường",
       "leaderboard": "Bảng xếp hạng",
       "deeds": "Sách Kỳ Công",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Chế Tác",
       "valeCup": "Cúp Thung Lũng",

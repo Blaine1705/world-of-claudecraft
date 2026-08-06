@@ -3634,6 +3634,7 @@ export const zh_TW: EnTranslations = {
       "arena": "競技場",
       "leaderboard": "排行榜",
       "deeds": "功績之書",
+      "reliquary": "聖物庫",
       "sheathe": "收起/拔出武器",
       "crafting": "製作",
       "valeCup": "溪谷盃",

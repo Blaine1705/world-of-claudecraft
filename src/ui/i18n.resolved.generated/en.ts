@@ -3634,6 +3634,7 @@ export const en: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Leaderboard",
       "deeds": "Book of Deeds",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Crafting",
       "valeCup": "Vale Cup",

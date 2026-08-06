@@ -1,4 +1,7 @@
+import { readFileSync } from 'node:fs';
 import { beforeAll, describe, expect, it } from 'vitest';
+// @ts-expect-error - shared zero-dep JS tool (no .d.ts); same pattern as tests/i18n_fill_worklist.test.ts.
+import { expandGlossaryTerms, patternToRegExp } from '../scripts/i18n_fill_worklist.mjs';
 import {
   cs_CZ,
   da_DK,
@@ -265,17 +268,101 @@ describe('i18n whole-catalog completeness', () => {
     }
   });
 
+  it('names The Reliquary with one term per non-Latin locale on every surface', () => {
+    // English legitimately varies the article by surface ('The Reliquary'
+    // window title vs the compact 'Reliquary' sheet label), but the five
+    // non-Latin locales have no article distinction: one term is the contract
+    // (glossary reliquaryName). ko shipped split between the compact CJK
+    // cognate and a descriptive long form until the v0.35.0 cycle unified it,
+    // which is the drift class this guard now reds on. The two sentence
+    // surfaces (the loading tip, the wiki body) must embed the same term.
+    const exactKeys = [
+      'hudChrome.reliquary.title',
+      'hudChrome.mobile.reliquary',
+      'hudChrome.reliquary.charCompletionLabel',
+      'hudChrome.reliquary.charOpen',
+      'guide.nav.reliquary',
+      'guide.controls.reliquary',
+    ];
+    const drift: string[] = [];
+    for (const lang of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW'] as SupportedLanguage[]) {
+      const flat = flatten(TABLES[lang]);
+      const term = flat['hudChrome.reliquary.title'];
+      // Anchor must be a real fill, or every equality below is vacuous.
+      expect(typeof term, `${lang} title fill`).toBe('string');
+      expect(term, `${lang} title fill is not English`).not.toBe(
+        enFlat['hudChrome.reliquary.title'],
+      );
+      for (const key of exactKeys) {
+        if (typeof flat[key] !== 'string') drift.push(`${lang} missing ${key}`);
+        else if (flat[key] !== term) drift.push(`${lang} ${key}: "${flat[key]}" vs "${term}"`);
+      }
+      for (const key of ['loading.tips.reliquary', 'guide.reliquaryPage.intro']) {
+        if (typeof flat[key] !== 'string') drift.push(`${lang} missing ${key}`);
+        else if (!flat[key].includes(term)) drift.push(`${lang} ${key} does not embed "${term}"`);
+      }
+    }
+    expect(drift, drift.join('\n')).toEqual([]);
+  });
+
+  it('every shipped glossary keyPattern resolves to at least one live English key', () => {
+    // The glossary is the one mechanism that carries locked terminology into
+    // the release-fill worklist batches; a typoed keyPatterns row would
+    // silently drop its term from every batch. The worklist suite exercises
+    // expandGlossaryTerms against a synthetic object only, so this is the pin
+    // over the SHIPPED file.
+    const glossary = JSON.parse(
+      readFileSync(new URL('../scripts/i18n_glossary.json', import.meta.url), 'utf8'),
+    );
+    const enKeys = Object.keys(enFlat).sort();
+    const categories = Object.keys(glossary.categories ?? {});
+    expect(categories.length, 'the glossary category set is empty').toBeGreaterThan(5);
+    for (const category of categories) {
+      const patterns: string[] = glossary.categories[category].keyPatterns ?? [];
+      expect(patterns.length, `${category} has no keyPatterns`).toBeGreaterThan(0);
+      for (const pat of patterns) {
+        const re = patternToRegExp(pat);
+        expect(
+          enKeys.some((k) => re.test(k)),
+          `glossary ${category} pattern "${pat}" matches no live key`,
+        ).toBe(true);
+      }
+    }
+    // The expander end-to-end over the shipped file: every category expands.
+    const terms = expandGlossaryTerms(glossary, enKeys);
+    for (const category of categories) {
+      expect(
+        terms.some((t: { category: string }) => t.category === category),
+        `glossary ${category} expands to zero terms`,
+      ).toBe(true);
+    }
+  });
+
   // The loading-tips rotation renders through a bare t(key) with NO values, so a
   // tip that spells out a chord goes stale the moment a player rebinds it (and
   // there is no seam to interpolate the live bind). Sweep the whole en tip set,
   // not just the one tip that used to name Shift+X.
-  it('names no keybind chord in any loading tip', () => {
-    const tips = Object.entries(enFlat).filter(([key]) => key.startsWith('loading.tips.'));
-    expect(tips.length, 'the loading tips rotation is empty').toBeGreaterThan(5);
-    const chord = /(Shift|Ctrl|Alt|Cmd|Meta)\s*\+/;
-    const named = tips.filter(([, value]) => chord.test(value)).map(([key]) => key);
+  it('names no keybind chord in any loading tip, in any locale', () => {
+    // The rationale is locale-independent: the rotation renders a bare t(key)
+    // with no interpolation seam, so a chord spelled out in ANY locale's fill
+    // (including a future release fill) goes stale the moment a player
+    // rebinds. Sweep every locale table, not just English, and match localized
+    // modifier spellings plus the full-width plus sign alongside the Latin set.
+    const enTips = Object.entries(enFlat).filter(([key]) => key.startsWith('loading.tips.'));
+    expect(enTips.length, 'the loading tips rotation is empty').toBeGreaterThan(5);
+    const chord =
+      /(Shift|Ctrl|Strg|Alt|Cmd|Meta|Umschalt|シフト|コントロール|시프트|컨트롤|Шифт)\s*[+＋]/;
     expect(chord.test('press Shift+X'), 'the chord guard itself must trip').toBe(true);
     expect(chord.test('press Cmd + B'), 'the spaced macOS form must trip too').toBe(true);
+    expect(chord.test('シフト＋X を押す'), 'the CJK full-width form must trip too').toBe(true);
+    const named: string[] = [];
+    for (const lang of supportedLanguages) {
+      const flat = flatten(TABLES[lang]);
+      for (const [key, value] of Object.entries(flat)) {
+        if (!key.startsWith('loading.tips.')) continue;
+        if (chord.test(value)) named.push(`${lang} ${key}`);
+      }
+    }
     expect(
       named,
       `loading tips must not name a live keybind (no interpolation seam): ${named.join(', ')}`,

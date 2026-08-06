@@ -5846,6 +5846,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.controls.arena': '竞技场',
   'guide.controls.leaderboard': '排行榜',
   'guide.controls.deeds': '功绩之书',
+  'guide.controls.reliquary': '圣物库',
   'guide.controls.sheathe': '收起/拔出武器',
   'guide.controls.crafting': '制作',
   'guide.controls.valeCup': '溪谷杯',

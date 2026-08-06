@@ -3634,6 +3634,7 @@ export const pt_BR: EnTranslations = {
       "arena": "Arena",
       "leaderboard": "Placar de líderes",
       "deeds": "Livro dos Feitos",
+      "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "crafting": "Criação",
       "valeCup": "Copa do Vale",

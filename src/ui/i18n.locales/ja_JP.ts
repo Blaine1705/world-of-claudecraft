@@ -6077,6 +6077,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.arena': 'アリーナ',
   'guide.controls.leaderboard': 'リーダーボード',
   'guide.controls.deeds': '功績の書',
+  'guide.controls.reliquary': '聖遺物庫',
   'guide.controls.sheathe': '武器を納刀/抜刀',
   'guide.controls.crafting': '製作',
   'guide.controls.valeCup': 'ヴェイルカップ',

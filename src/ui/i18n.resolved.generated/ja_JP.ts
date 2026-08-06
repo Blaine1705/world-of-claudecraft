@@ -3634,6 +3634,7 @@ export const ja_JP: EnTranslations = {
       "arena": "アリーナ",
       "leaderboard": "リーダーボード",
       "deeds": "功績の書",
+      "reliquary": "聖遺物庫",
       "sheathe": "武器を納刀/抜刀",
       "crafting": "製作",
       "valeCup": "ヴェイルカップ",

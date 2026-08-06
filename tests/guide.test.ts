@@ -1087,6 +1087,19 @@ describe('Guide deeds cross-page surfaces', () => {
     expect(html).toContain('<kbd>Shift+Z</kbd></td><td>Book of Deeds</td>');
   });
 
+  it('lists The Reliquary bind on the controls page, matching the in-game default', () => {
+    setLanguage('en');
+    const reliquaryBind = BIND_ACTIONS.find((a) => a.id === 'reliquary');
+    expect(reliquaryBind?.defaults).toEqual(['Shift+KeyX']);
+    expect(t('guide.controls.reliquary')).toBe('The Reliquary');
+    const html = controlsPage.render({
+      params: [],
+      sub: 'reference/controls',
+      titleKey: 'guide.nav.controls',
+    });
+    expect(html).toContain('<kbd>Shift+X</kbd></td><td>The Reliquary</td>');
+  });
+
   it('cross-links the deeds catalog from the dungeons page', () => {
     setLanguage('en');
     const html = dungeonsPage.render({
