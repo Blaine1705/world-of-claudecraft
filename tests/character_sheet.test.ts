@@ -348,7 +348,8 @@ describe('characterSheet: reliquary completion pair + rank', () => {
     expect(sheetCuratorRankText(4)).toBe('Grand Curator');
     expect(sheetCuratorRankText(5)).toBe('Eternal Curator');
     // Literal 6 = today's out-of-range boundary; the derived pins below own
-    // growth, so on a sixth rank the literal (not the derived pair) updates.
+    // growth, so on a sixth rank this literal moves to 7 and a rank-6 name
+    // literal joins the list above (the derived pair stays untouched).
     expect(sheetCuratorRankText(6)).toBeNull();
     expect(sheetCuratorRankText(99)).toBeNull();
     // Growth cross-pin against the live rank table: if a sixth rank ships in

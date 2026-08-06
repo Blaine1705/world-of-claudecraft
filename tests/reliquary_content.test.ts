@@ -595,9 +595,10 @@ describe('Reliquary Thunzharr and delve unique coverage', () => {
     expect(boss).toBeDefined();
     expect(boss.worldBoss).toBe(true);
     // Both epic roll groups are DRAWN every kill (draw-order parity), but
-    // rollWorldBossLoot's gearWon cap discards a second gear win, so a kill
-    // awards AT MOST ONE Tier-2 piece (src/sim/world_boss.ts); the
-    // guaranteed storm trophy is groupless filler and always drops.
+    // rollWorldBossLoot's per-contributor gearWon cap discards a second gear
+    // win, so a kill awards AT MOST ONE Tier-2 piece per contributor
+    // (src/sim/world_boss.ts); the guaranteed storm trophy is groupless
+    // filler and always drops.
     const groups = [
       ...new Set(boss.loot.map((e) => e.rollGroup).filter((g): g is string => g !== undefined)),
     ].sort();
@@ -754,9 +755,10 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
   it('page descs that cite a full live boss name stay pinned to it', () => {
     // Same staleness class the Drowned Temple reword fixed (a blurb crediting
     // yesterday's boss list), swept over every page whose desc carries a FULL
-    // live mob name. Pages using a short form (Olen, Morthen, Ysolei alone,
-    // Zulgar alone, "Nythraxis" on the heroic page) are not pinnable against
-    // MOBS and stay curated prose.
+    // live mob name (the Drowned Temple pair has its own dedicated test
+    // above). Pages using a short form (Olen, Morthen, Ysolei alone, Zulgar
+    // alone, "Nythraxis" on the heroic page) are not pinnable against MOBS
+    // and stay curated prose.
     const DESC_BOSSES: Record<string, string[]> = {
       conquerors_sunken_bastion: ['vael_the_mistcaller'],
       conquerors_sunken_bastion_heroic: ['vael_the_mistcaller'],
@@ -773,6 +775,25 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
         expect(page.desc, `${pageId} desc names ${mobId}`).toContain(MOBS[mobId].name);
       }
     }
+    // Completeness guard: the hand table IS the live set of (page, full-name)
+    // pairs, derived here from every page desc against every live MOBS name,
+    // so a future desc that starts naming a full boss must land in the table
+    // (or the dedicated Drowned Temple test) instead of escaping the sweep.
+    const derivedPairs: Record<string, string[]> = {};
+    for (const page of RELIQUARY_PAGES) {
+      if (!page.desc) continue;
+      const named = Object.keys(MOBS)
+        .filter((mobId) => page.desc!.includes(MOBS[mobId].name))
+        .sort();
+      if (named.length > 0) derivedPairs[page.id] = named;
+    }
+    const expected: Record<string, string[]> = {
+      conquerors_drowned_temple: ['choirmother_selthe', 'ysolei'],
+      ...Object.fromEntries(
+        Object.entries(DESC_BOSSES).map(([pageId, mobIds]) => [pageId, [...mobIds].sort()]),
+      ),
+    };
+    expect(derivedPairs).toEqual(expected);
   });
 
   it('Hollow Crypt: rare+ equality plus four curated uncommon brand pieces', () => {
