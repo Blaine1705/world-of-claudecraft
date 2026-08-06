@@ -509,6 +509,26 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Same vitest transform cache as the shard matrices (the Phase 4 rider:
+      # whichever of the cache step and the lane landed second gains the
+      # other). The full rationale (staleness vs tamper safety, layout-pinned
+      # key, no restore-keys, save-on-miss-only, measured sizes) sits on the
+      # pr-gate copy of this step. This job has no shard matrix, so the key
+      # carries a lane segment where the matrices carry shard${{ matrix.shard }}:
+      # a bare matrix.shard would render empty here, and the lane's store (the
+      # four CI_LONG_SUITES import closures) only partially resembles any one
+      # shard's, so it earns its own entry instead of borrowing shard keys.
+      # Producer reality for this key: release-gate is deliberately not
+      # lane-split, so release/** push runs never save a lane entry into the
+      # base-branch scope; warm hits come from this job's own main and dev-*
+      # push runs and from later runs of the same PR restoring the first run's
+      # save into the PR's own scope.
+      - name: Cache vitest transform cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.experimental-vitest-cache
+          key: vitest-fsmodule-${{ runner.os }}-lane-long-sims-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts', '.npmrc', 'package.json') }}
+
       # Same selection relay as the shard step (env, never run-line
       # interpolation); the lane entry spawns `npm test` itself, so pretest
       # regenerates the i18n artifacts here exactly as in every shard.

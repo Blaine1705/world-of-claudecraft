@@ -741,8 +741,9 @@ describe('CI workflow parity', () => {
     expect(prLongSims).not.toContain('strategy:');
     expect(prLongSims).not.toContain('matrix:');
     expect(prLongSims).not.toContain('--shard=');
-    // Checkout, setup-pnpm, setup-node, pnpm install, and the lane run.
-    expect(prLongSims.match(/\n {6}- name: /g)).toHaveLength(5);
+    // Checkout, setup-pnpm, setup-node, pnpm install, the vitest transform
+    // cache (the Phase 4 rider), and the lane run.
+    expect(prLongSims.match(/\n {6}- name: /g)).toHaveLength(6);
     for (const job of [releaseGate, releaseChecks, jobSource('release-i18n')]) {
       expect(job).not.toContain('ci_shard_test.mjs');
       expect(job).not.toContain('TEST_MODE');
@@ -821,7 +822,7 @@ describe('CI workflow parity', () => {
     expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(6);
   });
 
-  it('persists the vitest transform cache on both shard matrices with a bounded key', () => {
+  it('persists the vitest transform cache on the shard matrices and the long-sims lane', () => {
     // Phase 4 of the CI/CD performance packet: vitest's fsModuleCache store
     // (enabled in vite.config.ts) keys entries by content, so the
     // actions/cache key manages rotation and size; the tamper boundary is
@@ -832,9 +833,19 @@ describe('CI workflow parity', () => {
     // trailing key (the mutation that beat the pin's first draft).
     const cacheStepRe =
       /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-shard\$\{\{ matrix\.shard \}\}-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n/;
-    for (const name of ['pr-gate', 'release-gate'] as const) {
+    // The lane job (Phase 4 rider) carries the same step with a lane key
+    // segment where the matrices carry shard${{ matrix.shard }}: the lane has
+    // no matrix, so the shard expression would render empty there, and the
+    // lane's store earns its own entry rather than borrowing a shard's.
+    const laneCacheStepRe =
+      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-lane-long-sims-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n/;
+    for (const [name, stepRe] of [
+      ['pr-gate', cacheStepRe],
+      ['release-gate', cacheStepRe],
+      ['pr-long-sims', laneCacheStepRe],
+    ] as const) {
       const job = jobSource(name);
-      expect(job).toMatch(cacheStepRe);
+      expect(job).toMatch(stepRe);
       // Restore strictly between the install and the test run: earlier and
       // pnpm install may prune or re-layout what was just restored, later and
       // the run never sees the store. Step-name literals, not bare phrases,
@@ -865,14 +876,16 @@ describe('CI workflow parity', () => {
     const viteConfigCode = viteConfig.replace(/(^|[^:])\/\/.*$/gm, '$1');
     expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: true,/);
     expect(viteConfigCode).not.toContain('fsModuleCachePath');
-    // Exactly the two shard matrices carry the step, counted workflow-wide so
-    // a copy added to ANY other job fails (browser-gate has no matrix, so
-    // ${{ matrix.shard }} would render empty there and every run would
-    // collide on one key). The path line is counted rather than the bare
-    // string because the pr-gate rationale comment mentions the directory.
-    expect(workflow.match(/- name: Cache vitest transform cache\n/g)).toHaveLength(2);
+    // Exactly the two shard matrices plus the long-sims lane carry the step,
+    // counted workflow-wide so a copy added to ANY other job fails
+    // (browser-gate has no matrix, so ${{ matrix.shard }} would render empty
+    // there and every run would collide on one key; the lane carries its own
+    // lane-long-sims key segment for the same reason). The path line is
+    // counted rather than the bare string because the pr-gate rationale
+    // comment mentions the directory.
+    expect(workflow.match(/- name: Cache vitest transform cache\n/g)).toHaveLength(3);
     expect(workflow.match(/ {10}path: node_modules\/\.experimental-vitest-cache\n/g)).toHaveLength(
-      2,
+      3,
     );
     for (const name of [
       'pr-checks',
