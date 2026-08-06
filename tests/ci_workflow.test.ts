@@ -775,10 +775,42 @@ describe('CI workflow parity', () => {
     expect(releaseI18n).not.toContain('--shard=');
     expect(releaseI18n.match(/\n {6}- name: /g)).toHaveLength(5);
     // Structural step counts: each test job is exactly checkout, setup-pnpm,
-    // setup-node, pnpm install, and the sharded test run. An unconditioned
-    // addition would run N times per push; a dropped step shrinks the job silently.
-    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(5);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(5);
+    // setup-node, pnpm install, the vitest transform cache, and the sharded
+    // test run. An unconditioned addition would run N times per push; a
+    // dropped step shrinks the job silently.
+    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(6);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(6);
+  });
+
+  it('persists the vitest transform cache on both shard matrices with a bounded key', () => {
+    // Phase 4 of the CI/CD performance packet: the fsModuleCache store
+    // (enabled in vite.config.ts) is content-addressed inside vitest, so the
+    // actions/cache key only manages rotation and size, never correctness.
+    // Name-to-uses adjacency plus the path line so a YAML-commented-out step
+    // cannot satisfy the pin, mirroring the Playwright cache pin above.
+    const cacheStepRe =
+      /- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@[^\n]+\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-shard\$\{\{ matrix\.shard \}\}-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts'\) \}\}\n/;
+    for (const name of ['pr-gate', 'release-gate'] as const) {
+      const job = jobSource(name);
+      expect(job).toMatch(cacheStepRe);
+      // Restore before the test step, or the run never sees the store.
+      expect(job.indexOf('Cache vitest transform cache')).toBeLessThan(
+        job.indexOf('- name: Run tests'),
+      );
+      // No restore-keys: a cross-lockfile restore is discarded by vitest's own
+      // integrity check and a cross-config restore misses every entry, so a
+      // prefix fallback can only ever download dead weight. Anchored to the
+      // YAML key shape because the step's own comment says the word.
+      expect(job).not.toMatch(/\n\s+restore-keys:/);
+    }
+    // The store is enabled in the config this cache serves; if fsModuleCache is
+    // ever turned off there, this step becomes dead weight and must go too.
+    expect(viteConfig).toContain('fsModuleCache: true');
+    // Only the two shard matrices carry the step: the check jobs never run
+    // vitest, and release-i18n's five-file run is seconds long.
+    for (const name of ['pr-checks', 'release-checks', 'release-i18n', 'changes'] as const) {
+      expect(jobSource(name)).not.toContain('.experimental-vitest-cache');
+    }
   });
 
   it('builds every bundle in the local gate too, including the Discord bot', () => {

@@ -377,6 +377,30 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Persist the vitest transform cache across runs (vite.config.ts enables
+      # experimental.fsModuleCache; the store is
+      # node_modules/.experimental-vitest-cache). Correctness lives inside
+      # vitest, not in this key: every entry is content-addressed (sha1 over the
+      # module source, the config file contents, NODE_ENV, and the vitest
+      # version), and vitest discards the whole store when pnpm-lock.yaml
+      # changes, so a stale restore can only miss, never serve a wrong
+      # transform. The key still pins lockfile + vite config so a rotated
+      # toolchain starts clean instead of restoring a store vitest would
+      # immediately discard; no restore-keys for the same reason. actions/cache
+      # saves only when the primary key missed, so entries stay bounded (one per
+      # shard per toolchain state) instead of accumulating per commit. Per-shard
+      # keys because each shard transforms its own pack's import closure.
+      # release-gate carries the same step with the same key: its release/**
+      # push runs are what save the cache into the base-branch scope PR runs can
+      # restore from (pr-gate never runs on release pushes, and a PR-scoped save
+      # is invisible to every other PR). Both selective legs and the full replay
+      # read the same store: every leg is vitest under the same config.
+      - name: Cache vitest transform cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.experimental-vitest-cache
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts') }}
+
       # The shard runner spawns `npm test` itself, so pretest still regenerates
       # the i18n artifacts in EVERY shard BY DESIGN (the S3 guard, guide
       # freshness, and the git-subprocess suites need the generated artifacts no
@@ -532,6 +556,17 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Same vitest transform cache as pr-gate, same key on purpose: these push
+      # runs are the producer that saves the store into the base-branch cache
+      # scope, which is the only scope PR runs can restore from. The full
+      # rationale (content-addressed entries, lockfile integrity discard, no
+      # restore-keys, save-on-miss-only) sits on the pr-gate copy of this step.
+      - name: Cache vitest transform cache
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.experimental-vitest-cache
+          key: vitest-fsmodule-${{ runner.os }}-shard${{ matrix.shard }}-${{ hashFiles('pnpm-lock.yaml', 'vite.config.ts') }}
 
       # `npm test` regenerates the i18n artifacts itself (pretest) in EVERY
       # shard BY DESIGN (the S3 guard, guide freshness, and the git-subprocess
