@@ -23,6 +23,7 @@ import { withBody } from './http/middleware/body';
 import { type Infer, object, optional, str } from './http/schema';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { json } from './http_util';
+import { NATIVE_BUILD_BRIDGE, type NativeBuildBridge } from './ota_native_build';
 import { publicReadRateLimited } from './ratelimit';
 
 /** The stable machine code this domain emits on invalid input (see error_codes.ts). */
@@ -141,6 +142,9 @@ export function resetOtaUpdatesRuntimeForTests(): void {
   manifestCacheUrl = null;
 }
 
+/** Older than every published bundle: an unrecognised, pre-bridge store build. */
+const OLDEST_VERSION: [number, number, number] = [0, 0, 0];
+
 /** Parse a strict MAJOR.MINOR.PATCH version; null on anything else. */
 export function parseSemver(value: unknown): [number, number, number] | null {
   if (typeof value !== 'string') return null;
@@ -192,6 +196,30 @@ export function normalizeOtaManifest(value: unknown, expectedOrigin?: string): O
 }
 
 /**
+ * The device's current asset version, as a comparable semver.
+ *
+ * `version_build` is a native BUILD NUMBER (iOS CFBundleVersion, Android
+ * versionCode), not a version string, so it is resolved through
+ * NATIVE_BUILD_BRIDGE: at or above this release's build number the device runs
+ * this release's assets, and anything below it is an older store build and so
+ * older than any bundle we publish. A marketing-style value is still accepted
+ * verbatim, which keeps older shells and the simulator working. Anything else
+ * (a non-numeric build such as 'dev') stays null and the caller fails safe.
+ */
+export function resolveNativeVersion(
+  platform: 'ios' | 'android',
+  versionBuild: string | undefined,
+  bridge: NativeBuildBridge = NATIVE_BUILD_BRIDGE,
+): [number, number, number] | null {
+  const asSemver = parseSemver(versionBuild);
+  if (asSemver !== null) return asSemver;
+  const raw = typeof versionBuild === 'string' ? versionBuild.trim() : '';
+  if (!/^\d+$/.test(raw)) return null;
+  const bridgeBuild = platform === 'ios' ? bridge.ios : bridge.android;
+  return Number(raw) >= bridgeBuild ? parseSemver(bridge.version) : OLDEST_VERSION;
+}
+
+/**
  * The pure update decision: given the published manifest and one device's
  * check-in, return the offer or null for "no update". Every unparseable or
  * unexpected input decides null (fail-safe: a device we cannot reason about
@@ -200,19 +228,23 @@ export function normalizeOtaManifest(value: unknown, expectedOrigin?: string): O
 export function planOtaUpdate(
   manifest: OtaManifest,
   req: { platform: string; versionName?: string; versionBuild?: string },
+  bridge: NativeBuildBridge = NATIVE_BUILD_BRIDGE,
 ): OtaUpdateOffer | null {
   if (req.platform !== 'ios' && req.platform !== 'android') return null;
   // version_name is the currently applied OTA bundle, or 'builtin' when the
-  // device still runs the store-shipped assets; the store bundle's version IS
-  // the native version (scripts/version_sync.mjs keeps them in lockstep).
-  const currentRaw =
-    req.versionName && req.versionName !== 'builtin' ? req.versionName : req.versionBuild;
-  const current = parseSemver(currentRaw);
+  // device still runs the store-shipped assets. A builtin device reports only a
+  // native BUILD NUMBER, so it resolves through the build bridge rather than
+  // parseSemver, which used to reject it and silently offer nothing forever.
+  const applied = req.versionName && req.versionName !== 'builtin' ? req.versionName : null;
+  const current =
+    applied !== null
+      ? parseSemver(applied)
+      : resolveNativeVersion(req.platform, req.versionBuild, bridge);
   const published = parseSemver(manifest.version);
   if (current === null || published === null) return null;
   if (manifest.minNativeVersion !== undefined) {
     const min = parseSemver(manifest.minNativeVersion);
-    const native = parseSemver(req.versionBuild);
+    const native = resolveNativeVersion(req.platform, req.versionBuild, bridge);
     if (min === null || native === null || compareSemver(native, min) < 0) return null;
   }
   if (compareSemver(published, current) <= 0) return null;

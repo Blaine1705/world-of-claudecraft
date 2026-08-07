@@ -42,6 +42,12 @@ const PLAY_HTML = `<a href="https://updates.worldofclaudecraft.com/desktop/world
 <a href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.20.0-win-x64.exe">Download</a>
 <div id="game-version">v0.10</div>`;
 
+const OTA_NATIVE_BUILD_TS = `export const NATIVE_BUILD_BRIDGE: NativeBuildBridge = {
+  version: '0.20.0',
+  ios: 4,
+  android: 4,
+};`;
+
 const DESKTOP_TS = `export const DESKTOP_VERSION = '0.20.0';
 const DESKTOP_HOST = 'https://updates.worldofclaudecraft.com/desktop';`;
 
@@ -174,6 +180,7 @@ describe('planReleaseVersion', () => {
       gradle: GRADLE,
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,
+      otaNativeBuild: OTA_NATIVE_BUILD_TS,
       htmlFiles: {
         'index.html': INDEX_HTML,
         'play.html': PLAY_HTML,
@@ -195,6 +202,12 @@ describe('planReleaseVersion', () => {
     expect(plan.htmlFiles['play.html']).toContain('<div id="game-version">v0.21.0</div>');
     expect(plan.desktopModule).toContain("export const DESKTOP_VERSION = '0.21.0';");
     expect(plan.readmeFiles['README.md']).toContain('version-0.21.0-blue');
+    // The OTA build bridge must carry the BUMPED build numbers (4 -> 5), not the
+    // pre-bump ones: a bridge one release behind silently stops offering updates
+    // to every store-fresh device.
+    expect(plan.otaNativeBuild).toContain("version: '0.21.0'");
+    expect(plan.otaNativeBuild).toContain('ios: 5');
+    expect(plan.otaNativeBuild).toContain('android: 5');
   });
 });
 
@@ -206,6 +219,7 @@ describe('collectReleaseVersionFailures', () => {
       gradle: GRADLE,
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,
+      otaNativeBuild: OTA_NATIVE_BUILD_TS,
       htmlFiles: {
         'index.html': INDEX_HTML,
         'play.html': '<div class="coming-soon-badge">Coming Soon...</div>',
@@ -238,6 +252,7 @@ describe('collectReleaseVersionFailures', () => {
       gradle: GRADLE,
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,
+      otaNativeBuild: OTA_NATIVE_BUILD_TS,
       htmlFiles: {
         'play.html': PLAY_HTML,
       },
@@ -256,6 +271,7 @@ describe('collectReleaseVersionFailures', () => {
       gradle: GRADLE,
       pbxproj: PBXPROJ,
       desktopModule: DESKTOP_TS,
+      otaNativeBuild: OTA_NATIVE_BUILD_TS,
       htmlFiles: {
         'index.html': setGameVersionText(LEGACY_WINDOWS_HTML, '0.21.0', 'index.html').replace(
           'world-of-claudecraft-0.20.0-mac-universal.dmg',
