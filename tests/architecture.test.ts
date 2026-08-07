@@ -309,6 +309,7 @@ const UI_PURE_CORES = [
   'src/ui/professions_view.ts',
   'src/ui/market_view.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/woc_affordable_core.ts',
   'src/ui/woc_market_view.ts',
   'src/ui/mailbox_view.ts',
   'src/ui/calendar_view.ts',

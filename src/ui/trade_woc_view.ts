@@ -17,6 +17,7 @@
 import { exchangeHardLock, exchangeItemCategory } from '../sim/exchange_eligibility';
 import type { InvSlot, ItemDef } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
+import { overWalletBalance } from './woc_affordable_core';
 
 /** What the window knows about the other side, fed by the server (never by the
  *  sim, which sits inside the token firewall and knows nothing about wallets). */
@@ -296,16 +297,9 @@ export function buildWocTradeModel(input: WocTradeInput): WocTradeModel {
   const offerable = block === null;
   const wocMode = offerable && input.mode === 'woc';
 
-  // The quoted tokens are what the buyer actually has to hand over, so that is
-  // the figure compared: the fee legs come OUT of this amount rather than being
-  // added on top, and comparing the USD price to a token balance would be
-  // comparing two different units.
-  //
-  // Both operands must be known. An unquoted price or an unknown balance is not
-  // evidence of a shortfall, and treating either as one refuses a player who can
-  // pay (see walletTokens).
-  const shortfall =
-    input.tokens !== null && input.walletTokens !== null && input.tokens > input.walletTokens;
+  // Shared with the Exchange's bid and buy-now gates: the fail-open semantics
+  // are the subtle part, and one definition is what stops them drifting.
+  const shortfall = overWalletBalance(input.tokens, input.walletTokens);
 
   // Ordered the way a seller does the work: pick the item, then price it. Gold
   // comes first because it makes the whole arm unusable rather than incomplete.

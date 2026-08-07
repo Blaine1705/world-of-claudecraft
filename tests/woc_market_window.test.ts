@@ -999,3 +999,37 @@ describe('woc_market_window: the bid $WOC preview', () => {
     expect(painter).toContain('this.bidEquivalentTokens === null');
   });
 });
+
+describe('woc_market_window: a price the wallet cannot cover', () => {
+  // Mirrors the trade window's rule on the Exchange's two paying paths. Source
+  // scans rather than a rendered check: the figures arrive from async estimates
+  // held as window state, and what matters is that each gate reaches the shared
+  // predicate and takes the button with it.
+  it('gates the BID on the shared predicate, not a hand-rolled comparison', () => {
+    const form = between('private bidFormHtml(', 'private confirmFieldsHtml');
+    expect(form).toContain('overWalletBalance(this.bidEquivalentTokens, this.walletTokens())');
+    expect(form, 'and the button actually goes dead').toContain('|| overBid ?');
+    expect(form, 'with the figure carrying it too').toContain("' over-balance'");
+    expect(form, 'and never colour alone').toContain(
+      "t('hudChrome.trade.woc.hintInsufficientBalance')",
+    );
+  });
+
+  it('gates BUY NOW on its own quote, since the detail estimate prices the bid', () => {
+    // listingDetail estimates currentBidCents ?? startCents, which is not the
+    // buy-now price: reusing it would compare the wrong number.
+    expect(painter).toContain('overWalletBalance(this.buyNowTokens, this.walletTokens())');
+    expect(painter).toContain('|| overBuyNow ?');
+  });
+
+  it('reads the VERIFIED balance, not a merely-connected wallet', () => {
+    const reader = between('private walletTokens()', 'private busy =');
+    expect(reader).toContain('verifiedWocBalance()');
+  });
+
+  it('clears the buy-now quote when the selected listing changes', () => {
+    // A stale figure from the previous listing would gate this one.
+    const select = between('this.selectedId = id;', 'private usd(');
+    expect(select).toContain('this.buyNowTokens = null');
+  });
+});

@@ -16363,6 +16363,17 @@
     color: var(--color-text-muted);
     font-size: 12px;
   }
+  /* A price the connected wallet cannot cover: the figure itself carries it,
+     because that is the number being typed at. The sentence below and the
+     disabled button carry the same state, so it never rests on colour alone. */
+  #woc-market-window .wm-bid-equiv.over-balance,
+  #woc-market-window .wm-over-balance {
+    color: var(--color-text-error);
+  }
+  #woc-market-window .wm-over-balance {
+    margin: 0;
+    font-size: 12px;
+  }
   /* The two states a bidder must not miss: an expired quote and a live
      suspension both read as errors, never as ordinary muted notes. */
   #woc-market-window .wm-quote-expired,

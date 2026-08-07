@@ -37,6 +37,8 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
+import { verifiedWocBalance } from './wallet_balance';
+import { overWalletBalance } from './woc_affordable_core';
 import {
   buildWocMarketView,
   type WocMarketTab,
@@ -181,6 +183,15 @@ export class WocMarketWindow {
   /** The server-quoted tokens for the price currently typed, or null when there
    *  is no figure to show. Rendered, never written into the DOM directly. */
   private bidEquivalentTokens: number | null = null;
+  /** The server-quoted tokens for THIS listing's buy-now price. Its own quote
+   *  because the detail's estimate covers the current bid, not the buy-now. */
+  private buyNowTokens: number | null = null;
+
+  /** The VERIFIED wallet's balance: the account-linked wallet is the one that
+   *  will actually pay, so a merely-connected figure would gate the wrong one. */
+  private walletTokens(): number | null {
+    return verifiedWocBalance();
+  }
   private busy = false;
   private busyLabel: TranslationKey | null = null;
   private notice: { text: string; error: boolean } | null = null;
@@ -273,6 +284,7 @@ export class WocMarketWindow {
     // token figure across would put a stale rate under an empty price field.
     this.bidEquivalentTokens = null;
     this.bidEstimateWanted = null;
+    this.buyNowTokens = null;
     this.render();
     const seq = this.renderSeq;
     const detail = await hooks.client.detail(id);
@@ -280,6 +292,14 @@ export class WocMarketWindow {
     if (detail.ok) {
       this.detail = detail.listing;
       this.estimate = detail.estimate;
+      // The detail's own estimate prices the CURRENT BID, so buy-now needs its
+      // own quote before it can be checked against a balance.
+      const buyNowCents = detail.listing.buyNowCents;
+      if (buyNowCents !== null && buyNowCents > 0) {
+        const quoted = await hooks.client.estimate(buyNowCents);
+        if (seq !== this.renderSeq) return;
+        this.buyNowTokens = quoted?.amount?.tokens ?? null;
+      }
       const history = await hooks.client.history(detail.listing.itemId);
       if (seq !== this.renderSeq) return;
       this.sales = history.ok ? history.sales : [];
@@ -673,12 +693,20 @@ export class WocMarketWindow {
             )
             .join('')}</ul>`;
     const bidForm = this.bidFormHtml(model, d.row.id, name);
+    // EXACT here, unlike the bid: buy-now carries no bond, so the server compares
+    // this same price and nothing else.
+    const overBuyNow = overWalletBalance(this.buyNowTokens, this.walletTokens());
     const buyNow =
       d.row.buyNowCents !== null && !d.row.mine
         ? `<button type="button" class="wm-primary" data-action="buy-now" data-listing="${d.row.id}" ` +
-          `${model.paused || !model.walletLinked || d.row.buyNowLocked ? 'disabled' : ''} ` +
+          `${model.paused || !model.walletLinked || d.row.buyNowLocked || overBuyNow ? 'disabled' : ''} ` +
           `aria-label="${esc(t('hudChrome.wocMarket.buyNowAria', { item: name, usd: this.usd(d.row.buyNowCents) }))}" data-focus-key="wm-buy-now">` +
-          `${esc(t('hudChrome.wocMarket.buyNowButton', { usd: this.usd(d.row.buyNowCents) }))}</button>`
+          `${esc(t('hudChrome.wocMarket.buyNowButton', { usd: this.usd(d.row.buyNowCents) }))}</button>` +
+          (overBuyNow
+            ? `<p class="wm-over-balance">${esc(
+                t('hudChrome.trade.woc.hintInsufficientBalance'),
+              )}</p>`
+            : '')
         : '';
     const cancel =
       d.row.mine && d.row.currentCents === null
@@ -717,7 +745,13 @@ export class WocMarketWindow {
   ): string {
     const d = model.browse.detail;
     if (!d || d.row.mine || d.row.format === 'buy_now' || d.row.remainingMs <= 0) return '';
-    const disabled = model.paused || !model.walletLinked || this.busy ? 'disabled' : '';
+    // A LOWER BOUND on the server's rule, which checks the bid PLUS its bond.
+    // The bond for an arbitrary bid is server-computed and the client may not
+    // derive money, so this catches the clear case (bidding well past what you
+    // hold) and leaves the narrow band between bid and bid+bond to the server's
+    // own refusal. Erring this way only ever permits, never wrongly blocks.
+    const overBid = overWalletBalance(this.bidEquivalentTokens, this.walletTokens());
+    const disabled = model.paused || !model.walletLinked || this.busy || overBid ? 'disabled' : '';
     return (
       `<div class="wm-bid-form">` +
       `<p class="wm-min-next">${esc(t('hudChrome.wocMarket.detailMinNext', { usd: this.usd(d.row.minNextBidCents) }))}</p>` +
@@ -729,11 +763,16 @@ export class WocMarketWindow {
       // rate it does not have.
       (this.bidEquivalentTokens === null
         ? ''
-        : `<p class="wm-bid-equiv">${esc(
+        : `<p class="wm-bid-equiv${overBid ? ' over-balance' : ''}">${esc(
             t('hudChrome.trade.woc.equivalent', {
               tokens: formatNumber(this.bidEquivalentTokens, { maximumFractionDigits: 2 }),
             }),
           )}</p>`) +
+      // Never colour alone: the refusal is also stated in words, beside a button
+      // that is actually disabled.
+      (overBid
+        ? `<p class="wm-over-balance">${esc(t('hudChrome.trade.woc.hintInsufficientBalance'))}</p>`
+        : '') +
       this.confirmFieldsHtml(model) +
       `<p class="wm-note">${esc(
         // The bond figure is SERVER-computed and shipped on the listing view:
