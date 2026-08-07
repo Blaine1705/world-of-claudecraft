@@ -29,7 +29,6 @@
 
 import * as THREE from 'three';
 import { WORLD_MIN_X, WORLD_MIN_Z } from '../sim/data';
-import { terrainHeight } from '../sim/world';
 import { attachBiomeHaze } from './biome_haze_field';
 import {
   createFarShortfallSampler,

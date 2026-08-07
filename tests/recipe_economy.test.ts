@@ -51,6 +51,12 @@ function outputValue(recipe: ProfessionRecipeRecord): number {
   return def.sellValue * recipe.resultCount;
 }
 
+function requireRecipe(id: string): ProfessionRecipeRecord {
+  const recipe = recipeById(id);
+  if (!recipe) throw new Error(`recipe ${id} missing`);
+  return recipe;
+}
+
 // The legacy gold-positive exception list is EMPTY as of the economy rework
 // (maintainer-approved 2026-07-22): 10 of the original 14
 // members were reworked gold-negative through INPUT-only reagent reworks, and
@@ -168,7 +174,7 @@ describe('THE ECONOMY INVARIANT', () => {
     // requiredReagentCountFor. Self-sign alone would give 6*60 + 4*20 = 440,
     // so without this pin a discount regression would silently widen the
     // bound and let a 300-to-440 re-price slip through green.
-    expect(minAchievableInputValue(recipeById('recipe_sootscale_mantle')!)).toBe(300);
+    expect(minAchievableInputValue(requireRecipe('recipe_sootscale_mantle'))).toBe(300);
   });
 
   it('no recipe is fully vendor-fed in live stock, and the bound above does not rest on that', () => {

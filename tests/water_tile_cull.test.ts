@@ -6,6 +6,7 @@ import {
   WATER_TILE_KEEP_ABOVE,
   waterSheetTilePlan,
 } from '../src/render/water_core';
+import { expectDefined } from './helpers/defined';
 
 // Dry-tile culling for the water sheets (water.ts): quads whose corners all
 // sit above the waterline are buried under terrain and drop from the index;
@@ -21,7 +22,7 @@ describe('buildWaterSurfaceIndex', () => {
     const segments = 3;
     const columns = segments + 1;
     const plane = new THREE.PlaneGeometry(1, 1, segments, segments);
-    const reference = Array.from(plane.getIndex()!.array);
+    const reference = Array.from(expectDefined(plane.getIndex()).array);
     // one dropped quad forces a rebuilt index; make the corner quad dry but
     // compare only the SHARED quads' encoding
     const depth = new Float32Array(columns * columns).fill(WET);
@@ -33,7 +34,7 @@ describe('buildWaterSurfaceIndex', () => {
     expect(culled).not.toBeNull();
     // the dropped quad is the first: the culled index must equal the
     // reference minus its first 6 entries
-    expect(Array.from(culled!)).toEqual(reference.slice(6));
+    expect(Array.from(expectDefined(culled))).toEqual(reference.slice(6));
   });
 
   it('keeps any quad with at least one submerged corner (contour straddlers stay)', () => {
@@ -42,7 +43,7 @@ describe('buildWaterSurfaceIndex', () => {
     depth[columns + 1] = WET; // vertex (1,1) touches exactly four quads
     const culled = buildWaterSurfaceIndex(depth, columns, columns);
     expect(culled).not.toBeNull();
-    expect(culled!.length).toBe(4 * 6); // its four quads kept, the other five drop
+    expect(expectDefined(culled).length).toBe(4 * 6); // its four quads kept, the other five drop
   });
 
   it('drops only fully-dry quads', () => {
@@ -51,7 +52,7 @@ describe('buildWaterSurfaceIndex', () => {
     depth[0] = WET; // only the first quad touches water
     const culled = buildWaterSurfaceIndex(depth, columns, columns);
     expect(culled).not.toBeNull();
-    expect(culled!.length).toBe(6);
+    expect(expectDefined(culled).length).toBe(6);
   });
 
   it('returns null when nothing drops, so callers keep the geometry index', () => {
@@ -133,7 +134,7 @@ describe('buildWaterSurfaceTileIndex', () => {
       Array.from({ length: xs.length / 3 }, (_, i) => xs.slice(i * 3, i * 3 + 3).join(','))
         .slice()
         .sort();
-    expect(triples(tiled)).toEqual(triples(Array.from(whole!)));
+    expect(triples(tiled)).toEqual(triples(Array.from(expectDefined(whole))));
   });
 
   it('returns an empty index for a block with no wet quad, so it draws nothing', () => {

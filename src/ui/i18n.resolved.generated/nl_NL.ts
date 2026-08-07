@@ -392,7 +392,7 @@ export const nl_NL: EnTranslations = {
     "emoteEditor": {
       "title": "Emotes",
       "done": "Klaar",
-      "close": "Close emotes"
+      "close": "Emotes sluiten"
     },
     "dailyRewards": {
       "title": "Dagelijkse beloningen",
@@ -1823,7 +1823,13 @@ export const nl_NL: EnTranslations = {
       "saveButton": "Focus opslaan",
       "notInTownHint": "Je moet in de stad zijn om je focus in te stellen.",
       "increaseAria": "Vergroot de focus op {component}",
-      "decreaseAria": "Verminder de focus op {component}"
+      "decreaseAria": "Verminder de focus op {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Bevorderen tot leider",
@@ -2071,7 +2077,7 @@ export const nl_NL: EnTranslations = {
       "hostile": "Vijandig",
       "friendly": "Vriendelijk",
       "elite": "Elite",
-      "boss": "Boss"
+      "boss": "Baas"
     },
     "targetFrame": {
       "unlock": "Doelwitframe verplaatsen",
@@ -2679,7 +2685,7 @@ export const nl_NL: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Wapen betoveren - Kracht",
       "enchant_weapon_intellect": "Wapen betoveren - Spreukkracht",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Bijhand betoveren - Uithoudingsvermogen",
       "enchant_helmet_fortitude": "Helm betoveren - Fortitude",
       "enchant_neck_spirit": "Ketting betoveren - Geest",
       "enchant_shoulder_agility": "Schouders betoveren - Behendigheid",
@@ -3169,7 +3175,7 @@ export const nl_NL: EnTranslations = {
         "soul_rend": "Zielenscheur (gemarkeerde spelers moeten spreiden en worden genezen)",
         "deathless_rage": "Doodloze Razernij (onderbroken bij de wardstones)",
         "wardstones": "Wardstone-kanalen (faseovergang)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Schrikvloek (alleen heroisch, stapelende verzwakking voor tankwissel)"
       }
     },
     "deeds": {
@@ -4118,7 +4124,7 @@ export const nl_NL: EnTranslations = {
       "bastionBody": "Een ondergelopen vesting verloren aan het moeras, in handen van verdronken verdedigers en het rijzende tij zelf.",
       "templeBody": "Een door de maan verlicht heiligdom verzonken onder een gloeiend bergmeer hoog in de pieken, te bereiken door een poort van koud licht. Een verdronken sekte zingt daar nog steeds in haar verrotte gewaden, en de waarschuwingen in de oever gekerfd zeggen dat iets beneden slechts slaapt. Een op zichzelf staand mysterie, afgezonderd van het hoofdverhaal, voor de nieuwsgierigen en de goed voorbereiden.",
       "sanctumBody": "Het duistere hart van Doorntop, waar het lange werk van de sekte zijn vreselijke hoogtepunt bereikt.",
-      "wildheartBody": "Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om Zulgar te trotseren.",
+      "wildheartBody": "Een regennatte junglecaldera waar twee verhoogde jachtpaden om een jaden cenote cirkelen. Doorkruis beestenholen en voorouderruines, en beklim dan de rituele piramide om te zien wie er op de top wacht.",
       "raidName": "De eindspel-raid",
       "raidBody": "Achter een verzegelde koninklijke deur wacht een beproeving voor tien spelers: een gevecht in meerdere fasen en een dodeloze macht die de hele raid samen moet uitschakelen. Verdien je toegang en breng dan negen vrienden mee.",
       "heroicTitle": "Heroïsche modus",
@@ -7561,6 +7567,8 @@ export const nl_NL: EnTranslations = {
       "collectEmpty": "Niets in afwachting. Verkoopopbrengsten en verlopen aanbiedingen komen hier binnen.",
       "collectNote": "Verdiensten en teruggekeerde waren die de Koopman voor je bewaart.",
       "saleProceeds": "Verkoopopbrengst",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Alles ophalen"
     },
     "logs": {

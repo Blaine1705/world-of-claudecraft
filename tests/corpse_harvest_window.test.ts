@@ -19,6 +19,7 @@ import {
   corpseHarvestView,
 } from '../src/ui/hud/loot/corpse_harvest_view';
 import { renderCorpseHarvestPicker } from '../src/ui/hud/loot/corpse_harvest_window';
+import { expectDefined } from './helpers/defined';
 
 function view(overrides: Partial<CorpseHarvestViewModel> = {}): CorpseHarvestViewModel {
   return {
@@ -141,13 +142,13 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
       onHarvest,
       attachTooltip,
       boxes,
-      btn: container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')!,
-      warning: container.querySelector<HTMLElement>('.corpse-harvest-warning')!,
+      btn: expectDefined(container.querySelector<HTMLButtonElement>('.corpse-harvest-btn')),
+      warning: expectDefined(container.querySelector<HTMLElement>('.corpse-harvest-warning')),
       // The real user gesture. Setting `.checked` fires no `change`, so a test
       // that mutated the property directly would assert a stale button and
       // pass whatever the handler did.
       toggle(tag: string) {
-        const box = boxes.find((b) => b.value === tag)!;
+        const box = expectDefined(boxes.find((b) => b.value === tag));
         box.checked = !box.checked;
         box.dispatchEvent(new Event('change', { bubbles: true }));
       },
@@ -336,7 +337,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // Still a live control: the sim ignores it either way, so the picker must
     // not pretend it cannot be pressed, and the pick still goes over the wire
     // verbatim (the sim boundary is what interprets it, never the client).
-    const horn = t.boxes.find((b) => b.value === 'horn')!;
+    const horn = expectDefined(t.boxes.find((b) => b.value === 'horn'));
     expect(horn.disabled).toBe(false);
     t.toggle('hide');
     t.toggle('horn');
@@ -359,7 +360,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     const label = (tag: string) => t.boxes.find((b) => b.value === tag)?.getAttribute('aria-label');
     expect(label('hide')).toBe('Harvest Hide');
     expect(label('horn')).toBe('Harvest Horn: nothing yet');
-    const note = t.container.querySelector<HTMLElement>('.corpse-harvest-note')!;
+    const note = expectDefined(t.container.querySelector<HTMLElement>('.corpse-harvest-note'));
     expect(note.getAttribute('aria-hidden')).toBe('true');
     // WCAG 2.2 SC 2.5.3, Label in Name: the accessible name must CONTAIN the
     // text the row presents visually, or a speech-input user reading the row
@@ -397,7 +398,7 @@ describe('renderCorpseHarvestPicker: a selection that forfeits every yield (#250
     // not a box count: on this corpse the widest pick already carries a bonus,
     // so naming both mapped families is not a concentrate and naming one is.
     const t = render(PALECOIL, []);
-    const section = t.container.querySelector<HTMLElement>('.corpse-harvest')!;
+    const section = expectDefined(t.container.querySelector<HTMLElement>('.corpse-harvest'));
     expect(section.classList.contains('is-concentrated')).toBe(false);
     t.toggle('hide');
     expect(section.classList.contains('is-concentrated')).toBe(true);
