@@ -220,7 +220,7 @@ describe('combat-rating tier ladder', () => {
     // The replacement POSITIVE pin: the carve-out must stay a known, bounded set
     // rather than growing quietly, and both arms must be non-vacuous.
     const warfareAtIlvl31 = ilvl31.filter((item) => warfareIds.has(item.id));
-    expect(warfareAtIlvl31, 'the whole WARFARE catalog sits at ilvl 31').toHaveLength(40);
+    expect(warfareAtIlvl31, 'the whole WARFARE catalog sits at ilvl 31').toHaveLength(47);
     expect(
       ilvl31.length - warfareAtIlvl31.length,
       'ilvl-31 PvE epics still carry their ratings',

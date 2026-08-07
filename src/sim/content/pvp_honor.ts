@@ -43,6 +43,7 @@ import {
   SET_WARFARE_CINDERWEAVE,
   SET_WARFARE_FURYFORGED,
   SET_WARFARE_STORMBOUND,
+  SET_WARFARE_THORNHIDE,
 } from './item_sets';
 
 export const FURY_NPC_ID = 'fury';
@@ -536,6 +537,132 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
   // Necklaces: one Strength, one Agility, and one caster profile. Jewelry carries
   // no set tag (it is shared across role profiles) and rides the lower
   // WARFARE_JEWELRY_STAT_FRACTION.
+  // Thornhide Garb, the leather caster family. Added after review: a druid's
+  // maximum armor weight is LEATHER (equipment_rules.ts LEATHER_CLASSES), and the
+  // only int/spi families were Stormbound (mail, unwearable) and Cinderweave
+  // (cloth, a full rank below what the class can wear), so a caster druid was
+  // giving up an armor rank to a content gap rather than to a decision. The
+  // 7-piece capstone made that worse rather than better: before the sets existed
+  // a druid could mix cloth and leather freely, and the capstone turned that
+  // hedge into a forfeit.
+  //
+  // Stat identity is Cinderweave's, slot for slot, because the caster budget is
+  // the caster budget. Armor is Ashstalker's, slot for slot, because armor is a
+  // function of weight and item level, not of stat identity. No requiredClass:
+  // these gate on armorType like every other WARFARE piece, so a rogue may equip
+  // them and get nothing useful, exactly as with Cinderweave today.
+  thornhide_headdress: {
+    id: 'thornhide_headdress',
+    set: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Headdress',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'helmet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 168, int: 8, sta: 5, spi: 3 },
+    pvpOffenseRating: 18,
+    pvpDefenseRating: 18,
+    priceHonor: 900,
+    sellValue: 0,
+    soulbound: true,
+  },
+  thornhide_mantle: {
+    id: 'thornhide_mantle',
+    set: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Mantle',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'shoulder',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 148, int: 6, sta: 5, spi: 3 },
+    pvpOffenseRating: 16,
+    pvpDefenseRating: 16,
+    priceHonor: 700,
+    sellValue: 0,
+    soulbound: true,
+  },
+  thornhide_vestment: {
+    id: 'thornhide_vestment',
+    set: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Vestment',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'chest',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 172, int: 10, sta: 7, spi: 3 },
+    pvpOffenseRating: 22,
+    pvpDefenseRating: 22,
+    priceHonor: 1_200,
+    sellValue: 0,
+    soulbound: true,
+  },
+  thornhide_cinch: {
+    id: 'thornhide_cinch',
+    set: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Cinch',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'waist',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 100, int: 5, sta: 5, spi: 4 },
+    pvpOffenseRating: 15,
+    pvpDefenseRating: 15,
+    priceHonor: 450,
+    sellValue: 0,
+    soulbound: true,
+  },
+  thornhide_leggings: {
+    id: 'thornhide_leggings',
+    set: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Leggings',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'legs',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 132, int: 8, sta: 7, spi: 3 },
+    pvpOffenseRating: 20,
+    pvpDefenseRating: 20,
+    priceHonor: 1_050,
+    sellValue: 0,
+    soulbound: true,
+  },
+  thornhide_gloves: {
+    id: 'thornhide_gloves',
+    set: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Gloves',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'gloves',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 104, int: 5, sta: 5, spi: 4 },
+    pvpOffenseRating: 15,
+    pvpDefenseRating: 15,
+    priceHonor: 550,
+    sellValue: 0,
+    soulbound: true,
+  },
+  thornhide_boots: {
+    id: 'thornhide_boots',
+    set: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Boots',
+    kind: 'armor',
+    armorType: 'leather',
+    slot: 'feet',
+    quality: 'epic',
+    requiredLevel: 20,
+    stats: { armor: 96, int: 7, sta: 3, spi: 3 },
+    pvpOffenseRating: 14,
+    pvpDefenseRating: 14,
+    priceHonor: 550,
+    sellValue: 0,
+    soulbound: true,
+  },
   final_oath_medallion: {
     id: 'final_oath_medallion',
     name: 'Medallion of the Final Oath',

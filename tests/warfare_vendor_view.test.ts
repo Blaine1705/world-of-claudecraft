@@ -157,6 +157,7 @@ describe('buildWarfareVendorView: sectioning', () => {
       'warfare_stormbound',
       'warfare_ashstalker',
       'warfare_cinderweave',
+      'warfare_thornhide',
     ]);
     // Stock deliberately lists the UNNAMED family first and the two named ones
     // out of authored order, so first-seen order and authored order disagree:

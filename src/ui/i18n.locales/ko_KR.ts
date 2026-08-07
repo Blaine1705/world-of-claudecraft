@@ -7517,6 +7517,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
   'entities.itemSets.warfare_stormbound.bonus7':
     '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 "잿불 수호"가 발동하여 8초 동안 120의 피해를 흡수합니다.',
+  'entities.itemSets.warfare_thornhide.name': '가시가죽 의복',
+  'entities.itemSets.warfare_thornhide.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 "가시 방호"가 발동하여 6초 동안 회피 확률이 15% 증가합니다.',
   'entities.itemSets.wyrmshadow.name': '밤송곳니 의복',
   'entities.itemSets.wyrmshadow.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
@@ -9055,6 +9061,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '불씨매듭 다리싸개',
   'entities.items.cinderweave_handwraps.name': '불씨매듭 손싸개',
   'entities.items.cinderweave_slippers.name': '불씨매듭 덧신',
+  'entities.items.thornhide_headdress.name': '가시가죽 두건',
+  'entities.items.thornhide_mantle.name': '가시가죽 어깨망토',
+  'entities.items.thornhide_vestment.name': '가시가죽 예복',
+  'entities.items.thornhide_cinch.name': '가시가죽 허리띠',
+  'entities.items.thornhide_leggings.name': '가시가죽 다리보호대',
+  'entities.items.thornhide_gloves.name': '가시가죽 장갑',
+  'entities.items.thornhide_boots.name': '가시가죽 발덮개',
   'entities.items.final_oath_medallion.name': '최후의 맹세 메달',
   'entities.items.razorwind_torque.name': '칼바람 목가리개',
   'entities.items.cinder_sigil_pendant.name': '불씨 인장 목걸이',

@@ -9593,6 +9593,27 @@ export const zh_CN: EnTranslations = {
       "cinderweave_slippers": {
         "name": "织烬便鞋"
       },
+      "thornhide_headdress": {
+        "name": "荆棘兜帽"
+      },
+      "thornhide_mantle": {
+        "name": "荆棘披肩"
+      },
+      "thornhide_vestment": {
+        "name": "荆棘法衣"
+      },
+      "thornhide_cinch": {
+        "name": "荆棘腰带"
+      },
+      "thornhide_leggings": {
+        "name": "荆棘护腿"
+      },
+      "thornhide_gloves": {
+        "name": "荆棘护手"
+      },
+      "thornhide_boots": {
+        "name": "荆棘软靴"
+      },
       "final_oath_medallion": {
         "name": "最终誓约勋章"
       },
@@ -15100,6 +15121,12 @@ export const zh_CN: EnTranslations = {
         "bonus2": "战争防御等级提高 40 点。",
         "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
         "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。"
+      },
+      "warfare_thornhide": {
+        "name": "荆棘皮甲",
+        "bonus2": "战争防御等级提高 40 点。",
+        "bonus4": "战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。",
+        "bonus7": "战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“棘刺护身”，躲闪几率提高 15%，持续 6 秒。"
       },
       "wyrmshadow": {
         "name": "夜牙法衣",

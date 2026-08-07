@@ -157,9 +157,9 @@ function equipmentForProfile(profile: Profile): Partial<Record<EquipSlot, string
 }
 
 describe('FURY WARFARE stock', () => {
-  it('merges forty unique offers and places FURY in Eastbrook with that exact stock', () => {
-    expect(FURY_STOCK).toHaveLength(40);
-    expect(new Set(FURY_STOCK).size).toBe(40);
+  it('merges forty seven unique offers and places FURY in Eastbrook with that exact stock', () => {
+    expect(FURY_STOCK).toHaveLength(47);
+    expect(new Set(FURY_STOCK).size).toBe(47);
     expect(Object.keys(WARFARE_ITEMS)).toEqual(FURY_STOCK);
     for (const id of FURY_STOCK) expect(ITEMS[id], id).toBe(WARFARE_ITEMS[id]);
 

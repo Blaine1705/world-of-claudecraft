@@ -215,10 +215,10 @@ describe('the WARFARE tier is authored from named fractions', () => {
   });
 });
 
-describe('the four WARFARE sets', () => {
+describe('the five WARFARE sets', () => {
   it('tags exactly the seven armor pieces of each family and nothing else', () => {
     const tagged = FURY_STOCK.filter((id) => ITEMS[id].set);
-    expect(tagged).toHaveLength(28);
+    expect(tagged).toHaveLength(35);
     for (const setId of WARFARE_SET_IDS) {
       const members = FURY_STOCK.filter((id) => ITEMS[id].set === setId);
       expect(members, setId).toHaveLength(7);

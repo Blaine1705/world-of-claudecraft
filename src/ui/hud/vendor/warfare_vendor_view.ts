@@ -23,6 +23,7 @@ export const WARFARE_SHOP_SET_ORDER: readonly string[] = [
   'warfare_stormbound',
   'warfare_ashstalker',
   'warfare_cinderweave',
+  'warfare_thornhide',
 ];
 
 /** Section keys for the two non-set sections. Set sections key on their set id,

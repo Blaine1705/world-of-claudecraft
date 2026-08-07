@@ -7524,6 +7524,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。',
   'entities.itemSets.warfare_stormbound.bonus7':
     'ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。',
+  'entities.itemSets.warfare_thornhide.name': 'ソーンハイドの装束',
+  'entities.itemSets.warfare_thornhide.bonus2': 'ウォーフェア防御レーティングが40上昇します。',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    'ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    'ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「ソーンガード」が発動し、6秒間、回避率が15%上昇します。',
   'entities.itemSets.wyrmshadow.name': 'ナイトファングの装束',
   'entities.itemSets.wyrmshadow.bonus2': '攻撃力が40上昇します。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷性が15、クリティカル率が2%上昇します。',
@@ -9067,6 +9073,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '熾火織りの脚巻き',
   'entities.items.cinderweave_handwraps.name': '熾火織りの手巻き',
   'entities.items.cinderweave_slippers.name': '熾火織りの上履き',
+  'entities.items.thornhide_headdress.name': 'ソーンハイドの頭巾',
+  'entities.items.thornhide_mantle.name': 'ソーンハイドの肩衣',
+  'entities.items.thornhide_vestment.name': 'ソーンハイドの法衣',
+  'entities.items.thornhide_cinch.name': 'ソーンハイドの腰帯',
+  'entities.items.thornhide_leggings.name': 'ソーンハイドの脚当て',
+  'entities.items.thornhide_gloves.name': 'ソーンハイドの手甲',
+  'entities.items.thornhide_boots.name': 'ソーンハイドの足袋',
   'entities.items.final_oath_medallion.name': '最後の誓いのメダリオン',
   'entities.items.razorwind_torque.name': '刃風の首輪',
   'entities.items.cinder_sigil_pendant.name': '熾火印のペンダント',

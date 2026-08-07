@@ -9593,6 +9593,27 @@ export const ko_KR: EnTranslations = {
       "cinderweave_slippers": {
         "name": "불씨매듭 덧신"
       },
+      "thornhide_headdress": {
+        "name": "가시가죽 두건"
+      },
+      "thornhide_mantle": {
+        "name": "가시가죽 어깨망토"
+      },
+      "thornhide_vestment": {
+        "name": "가시가죽 예복"
+      },
+      "thornhide_cinch": {
+        "name": "가시가죽 허리띠"
+      },
+      "thornhide_leggings": {
+        "name": "가시가죽 다리보호대"
+      },
+      "thornhide_gloves": {
+        "name": "가시가죽 장갑"
+      },
+      "thornhide_boots": {
+        "name": "가시가죽 발덮개"
+      },
       "final_oath_medallion": {
         "name": "최후의 맹세 메달"
       },
@@ -15100,6 +15121,12 @@ export const ko_KR: EnTranslations = {
         "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
         "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
         "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"잿불 수호\"가 발동하여 8초 동안 120의 피해를 흡수합니다."
+      },
+      "warfare_thornhide": {
+        "name": "가시가죽 의복",
+        "bonus2": "워페어 방어 등급이 40만큼 증가합니다.",
+        "bonus4": "워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.",
+        "bonus7": "워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 \"가시 방호\"가 발동하여 6초 동안 회피 확률이 15% 증가합니다."
       },
       "wyrmshadow": {
         "name": "밤송곳니 의복",

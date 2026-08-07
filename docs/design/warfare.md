@@ -131,9 +131,9 @@ which is where the PvE tier spends its extra budget and all of its ratings. A
 player who takes the honor kit into PvE is trading damage for durability, not
 taking a uniformly worse kit.
 
-## The four Warfare sets
+## The five Warfare sets
 
-The four armor families are also four item sets (`src/sim/content/item_sets.ts`).
+The five armor families are also five item sets (`src/sim/content/item_sets.ts`).
 Neck, rings and weapons carry no set tag: they are shared across role profiles,
 so the seven armor pieces are the only coherent grouping.
 
@@ -143,6 +143,26 @@ so the seven armor pieces are the only coherent grouping.
 | `warfare_stormbound` | Stormbound Vestments | mail | caster |
 | `warfare_ashstalker` | Ashstalker Kit | leather | Agility |
 | `warfare_cinderweave` | Cinderweave Regalia | cloth | caster |
+| `warfare_thornhide` | Thornhide Garb | leather | caster |
+
+Thornhide was added after review, and the gap it fills is worth recording. A
+druid's maximum armor weight is LEATHER (`LEATHER_CLASSES` in
+`src/sim/equipment_rules.ts`), and before it the only int/spi families were
+Stormbound, which is mail and unwearable, and Cinderweave, which is cloth and a
+full rank below what the class can wear. A caster druid was therefore giving up
+an entire armor rank to a content gap rather than to a decision.
+
+The 7-piece capstone made that worse rather than better. While WARFARE items
+carried no set at all, a druid could mix cloth and leather freely and lose
+nothing; the capstone turned that hedge into a forfeit, since six Cinderweave
+plus a leather chest gains armor but gives up the 80/80 and drops Warfare from 30
+to 20 percent. Adding the family removes the trap rather than tuning around it.
+
+Its stat identity is Cinderweave's, slot for slot, because the caster budget is
+the caster budget. Its armor is Ashstalker's, slot for slot, because armor is a
+function of weight and item level rather than of stat identity. It carries no
+`requiredClass`: like every WARFARE piece it gates on armor type, so a rogue may
+wear it and gain nothing, exactly as with Cinderweave today.
 
 Breakpoints are 2, 4 and 7 of the seven armor pieces, the same in every family:
 
@@ -166,9 +186,23 @@ no rng outside hostile player-versus-player combat):
 | Furyforged | Unbroken Oath | kill | Killing a hostile player grants a 200-damage absorb for 10 sec |
 | Ashstalker | Ashen Step | kill | Killing a hostile player grants +40 percent movement speed for 6 sec |
 | Stormbound, Cinderweave | Emberward | spell cast | 15 percent chance on cast to grant a 120-damage absorb for 8 sec, 20 sec internal cooldown |
+| Thornhide | Thornguard | spell cast | 15 percent chance on cast to grant +15 percent dodge for 6 sec, 20 sec internal cooldown |
 
 Movement speed on the Agility set is tuned for Thornhollow Fields, which is a
 capture-the-flag mode.
+
+Thornguard is dodge rather than a third absorb on purpose. Thornhide carries
+Cinderweave's stats on Ashstalker's armor, so it is the furthest ahead of the
+five families and the last one that should be handed more effective health.
+Dodge is AVOIDANCE, so it does not compound the stamina weighting the caster
+families already gain against their PvE counterparts, and it answers melee
+pressure, which is the caster druid's actual weakness. For scale, a real
+defensive cooldown is much larger: Evasion is 25 percent and Deterrence 30.
+
+Note also that Stormbound and Cinderweave share Emberward, so five families carry
+four distinct signatures. That is deliberate rather than an oversight (armor is
+ranked, so the two caster families never compete for the same wearer) but it is
+worth stating so it is not read as a gap.
 
 ### Why the capstone is 7 of 7
 
@@ -298,6 +332,12 @@ while losing never protects a rating. Ranked, Fiesta, and Thornhollow Fields res
 accounting is exactly once, including a disconnect during the post-match return
 delay.
 
+Honor itself is per CHARACTER, not per account (`PlayerMeta.honor`, and
+`lifetimeHonor` beside it), so an alt starts the tier from zero and the rank
+titles in the Book of Deeds are earned per character too. That is consistent with
+how every other currency in the game is held, but it is worth stating plainly
+next to a 7,550 honor kit: rolling a second character means earning it again.
+
 Thornhollow Fields rating is its own per-character ladder (base 1500, floor 100), moved
 zero-sum by the arena's Elo over team-average ratings; a draw applies the 0.5
 draw score. The queue is rated but NOT rating-matched: matchmaking fills
@@ -335,8 +375,16 @@ slots so a new PvP player gets a real upgrade on the first day.
 
 Item ids are frozen and this is a retune in place, so a player already holding an
 old-tier piece receives the item-level-31 stats for free at merge, without paying
-the rise. That is an accepted consequence of retuning existing ids rather than
-minting new ones.
+the rise. That is INTENDED, not merely tolerated: someone who bought into the tier
+when it was bad should not be punished for having done so early, and the
+alternative (minting parallel ids) would strand their purchase entirely and blank
+the slot on load, which is the exact failure the frozen-id rule exists to prevent.
+
+The population it affects is expected to be near zero in any case. The vendor is
+unadvertised, the prices were already high relative to the tier's value, and the
+gear was measurably worse than what the same player could farm, which is the
+problem this whole change exists to fix. Grandfathering is therefore both the
+right call and a cheap one.
 
 The planning figures this schedule was set against were about 900 honor for a
 committed day of Thornhollow Fields and 450 for a lighter session, which put the

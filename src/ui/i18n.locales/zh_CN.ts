@@ -7210,6 +7210,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。',
   'entities.itemSets.warfare_stormbound.bonus7':
     '战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“余烬护壁”，吸收 120 点伤害，持续 8 秒。',
+  'entities.itemSets.warfare_thornhide.name': '荆棘皮甲',
+  'entities.itemSets.warfare_thornhide.bonus2': '战争防御等级提高 40 点。',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    '战争攻击等级提高 40 点，敌对玩家对你施放的控制效果持续时间缩短 15%。',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    '战争攻击等级和防御等级提高 80 点。你的法术有 15% 的几率触发“棘刺护身”，躲闪几率提高 15%，持续 6 秒。',
   'entities.itemSets.wyrmshadow.name': '夜牙法衣',
   'entities.itemSets.wyrmshadow.bonus2': '攻击强度提高 40 点。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷提高 15 点，致命一击几率提高 2%。',
@@ -8653,6 +8659,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '织烬裹腿',
   'entities.items.cinderweave_handwraps.name': '织烬裹手',
   'entities.items.cinderweave_slippers.name': '织烬便鞋',
+  'entities.items.thornhide_headdress.name': '荆棘兜帽',
+  'entities.items.thornhide_mantle.name': '荆棘披肩',
+  'entities.items.thornhide_vestment.name': '荆棘法衣',
+  'entities.items.thornhide_cinch.name': '荆棘腰带',
+  'entities.items.thornhide_leggings.name': '荆棘护腿',
+  'entities.items.thornhide_gloves.name': '荆棘护手',
+  'entities.items.thornhide_boots.name': '荆棘软靴',
   'entities.items.final_oath_medallion.name': '最终誓约勋章',
   'entities.items.razorwind_torque.name': '剃风颈环',
   'entities.items.cinder_sigil_pendant.name': '烬印坠饰',

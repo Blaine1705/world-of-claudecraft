@@ -7634,6 +7634,12 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.',
   'entities.itemSets.warfare_stormbound.bonus7':
     'Рейтинг атаки и защиты Боевой мощи повышается на 80. Ваши заклинания с вероятностью 15% даруют «Тлеющий оберег», поглощающий 120 ед. урона в течение 8 сек.',
+  'entities.itemSets.warfare_thornhide.name': 'Одеяние Терновой шкуры',
+  'entities.itemSets.warfare_thornhide.bonus2': 'Рейтинг защиты Боевой мощи повышается на 40.',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    'Рейтинг атаки Боевой мощи повышается на 40, а контроль, применённый к вам враждебными игроками, длится на 15% меньше.',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    'Рейтинг атаки и защиты Боевой мощи повышается на 80. Ваши заклинания с вероятностью 15% даруют «Терновый покров», повышающий шанс уклонения на 15% на 6 сек.',
   'entities.itemSets.wyrmshadow.name': 'Облачение Ночного Клыка',
   'entities.itemSets.wyrmshadow.bonus2': 'Сила атаки повышается на 40.',
   'entities.itemSets.wyrmshadow.bonus3':
@@ -9209,6 +9215,13 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': 'Обмотки жароткача',
   'entities.items.cinderweave_handwraps.name': 'Повязки жароткача',
   'entities.items.cinderweave_slippers.name': 'Туфли жароткача',
+  'entities.items.thornhide_headdress.name': 'Капюшон Терновой шкуры',
+  'entities.items.thornhide_mantle.name': 'Оплечье Терновой шкуры',
+  'entities.items.thornhide_vestment.name': 'Облачение Терновой шкуры',
+  'entities.items.thornhide_cinch.name': 'Кушак Терновой шкуры',
+  'entities.items.thornhide_leggings.name': 'Набедренники Терновой шкуры',
+  'entities.items.thornhide_gloves.name': 'Перчатки Терновой шкуры',
+  'entities.items.thornhide_boots.name': 'Башмаки Терновой шкуры',
   'entities.items.final_oath_medallion.name': 'Медальон последней клятвы',
   'entities.items.razorwind_torque.name': 'Шейная гривна режущего ветра',
   'entities.items.cinder_sigil_pendant.name': 'Подвеска с печатью углей',

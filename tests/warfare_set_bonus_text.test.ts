@@ -34,8 +34,8 @@ afterAll(() => {
 });
 
 describe('the 7-piece set bonus text', () => {
-  it('covers all four WARFARE families, so this file is not vacuous', () => {
-    expect(WARFARE_SETS).toHaveLength(4);
+  it('covers all five WARFARE families, so this file is not vacuous', () => {
+    expect(WARFARE_SETS).toHaveLength(5);
     for (const set of WARFARE_SETS) {
       expect(
         set.bonuses.map((b) => b.pieces),

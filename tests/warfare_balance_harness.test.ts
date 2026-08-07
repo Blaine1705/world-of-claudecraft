@@ -104,6 +104,69 @@ const WARFARE_KIT: Kit = {
 // piece, which is also the one with the best PvE replacement.
 const WARFARE_MINUS_CHEST: Kit = { ...WARFARE_KIT, chest: 'heroic_deathlord_warplate' };
 
+const ARMOR_SLOTS = ['helmet', 'shoulder', 'chest', 'waist', 'legs', 'gloves', 'feet'] as const;
+/** Seven ids in ARMOR_SLOTS order into a slot-keyed kit. */
+function ARMOR_SLOT_KIT(ids: readonly string[]): Kit {
+  const kit: Kit = {};
+  ARMOR_SLOTS.forEach((slot, i) => {
+    kit[slot] = ids[i];
+  });
+  return kit;
+}
+
+/** Every WARFARE armor family, so a per-family regression cannot hide behind the
+ *  Strength mail profile. The TTK rows above stay warrior-only on purpose: the
+ *  model is auto-attack, so it cannot honestly compare a caster kit against a
+ *  melee one. What IS comparable across families is the tier's own arithmetic,
+ *  which is what the sweep below asserts. */
+const WARFARE_FAMILY_ARMOR: Record<string, Kit> = {
+  warfare_furyforged: ARMOR_SLOT_KIT([
+    'furyforged_warhelm',
+    'furyforged_warspaulders',
+    'furyforged_warplate',
+    'furyforged_girdle',
+    'furyforged_legguards',
+    'furyforged_gauntlets',
+    'furyforged_sabatons',
+  ]),
+  warfare_stormbound: ARMOR_SLOT_KIT([
+    'stormbound_crown',
+    'stormbound_spaulders',
+    'stormbound_hauberk',
+    'stormbound_waistguard',
+    'stormbound_legmail',
+    'stormbound_handguards',
+    'stormbound_greaves',
+  ]),
+  warfare_ashstalker: ARMOR_SLOT_KIT([
+    'ashstalker_cowl',
+    'ashstalker_shoulderguards',
+    'ashstalker_harness',
+    'ashstalker_waistband',
+    'ashstalker_legguards',
+    'ashstalker_grips',
+    'ashstalker_treads',
+  ]),
+  warfare_cinderweave: ARMOR_SLOT_KIT([
+    'cinderweave_cowl',
+    'cinderweave_mantle',
+    'cinderweave_raiment',
+    'cinderweave_cord',
+    'cinderweave_legwraps',
+    'cinderweave_handwraps',
+    'cinderweave_slippers',
+  ]),
+  warfare_thornhide: ARMOR_SLOT_KIT([
+    'thornhide_headdress',
+    'thornhide_mantle',
+    'thornhide_vestment',
+    'thornhide_cinch',
+    'thornhide_leggings',
+    'thornhide_gloves',
+    'thornhide_boots',
+  ]),
+};
+
 function geared(kit: Kit): Entity {
   // A missing id would silently measure a naked slot and quietly move every
   // ratio, so fail loudly instead.
@@ -258,6 +321,34 @@ describe('WARFARE balance re-check (merge blocker)', () => {
       dropped,
       `dropping the chest measured ${dropped.toFixed(3)}x against the full kit's ${full.toFixed(3)}x`,
     ).toBeGreaterThan(full + 0.15);
+  });
+
+  it('gives every family the same WARFARE rating, so no family is quietly behind', () => {
+    // The review's "the families are not equally tuned" finding is about STATS,
+    // which the auto-attack model cannot compare across archetypes. What it CAN
+    // assert, and what a per-family regression would break first, is that the
+    // rating schedule is identical family to family: same slot, same rating, so
+    // completing any family reaches the same 30 percent cap.
+    const perFamily = Object.entries(WARFARE_FAMILY_ARMOR).map(([setId, kit]) => {
+      const rating = Object.values(kit).reduce(
+        (sum, id) => sum + (ITEMS[id]?.pvpOffenseRating ?? 0),
+        0,
+      );
+      return { setId, rating };
+    });
+    expect(perFamily, 'all five families must be present').toHaveLength(5);
+    for (const { setId, rating } of perFamily) {
+      // The seven armor slots carry 120 of the kit's 182; the other 62 is on the
+      // weapon and jewelry, which every family shares.
+      expect(rating, `${setId} armor rating`).toBe(120);
+    }
+    // And every piece really exists, so a typo in an id reads as 0 rather than
+    // silently shrinking the sum.
+    for (const [setId, kit] of Object.entries(WARFARE_FAMILY_ARMOR)) {
+      for (const [slot, id] of Object.entries(kit)) {
+        expect(ITEMS[id], `${setId} ${slot}: ${id} must exist`).toBeDefined();
+      }
+    }
   });
 
   it('raises the base kit above what ships today rather than regressing it', () => {

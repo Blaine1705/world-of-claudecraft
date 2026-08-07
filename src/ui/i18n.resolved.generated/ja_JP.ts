@@ -9593,6 +9593,27 @@ export const ja_JP: EnTranslations = {
       "cinderweave_slippers": {
         "name": "熾火織りの上履き"
       },
+      "thornhide_headdress": {
+        "name": "ソーンハイドの頭巾"
+      },
+      "thornhide_mantle": {
+        "name": "ソーンハイドの肩衣"
+      },
+      "thornhide_vestment": {
+        "name": "ソーンハイドの法衣"
+      },
+      "thornhide_cinch": {
+        "name": "ソーンハイドの腰帯"
+      },
+      "thornhide_leggings": {
+        "name": "ソーンハイドの脚当て"
+      },
+      "thornhide_gloves": {
+        "name": "ソーンハイドの手甲"
+      },
+      "thornhide_boots": {
+        "name": "ソーンハイドの足袋"
+      },
       "final_oath_medallion": {
         "name": "最後の誓いのメダリオン"
       },
@@ -15100,6 +15121,12 @@ export const ja_JP: EnTranslations = {
         "bonus2": "ウォーフェア防御レーティングが40上昇します。",
         "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
         "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。"
+      },
+      "warfare_thornhide": {
+        "name": "ソーンハイドの装束",
+        "bonus2": "ウォーフェア防御レーティングが40上昇します。",
+        "bonus4": "ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。",
+        "bonus7": "ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「ソーンガード」が発動し、6秒間、回避率が15%上昇します。"
       },
       "wyrmshadow": {
         "name": "ナイトファングの装束",

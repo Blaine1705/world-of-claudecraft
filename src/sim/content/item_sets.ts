@@ -76,6 +76,17 @@ export const WARFARE_CAST_ABSORB = 120;
 export const WARFARE_CAST_ABSORB_DURATION = 8;
 export const WARFARE_CAST_ABSORB_CHANCE = 0.15;
 export const WARFARE_CAST_ABSORB_ICD = 20;
+// Thornguard, the Thornhide capstone. DODGE rather than another absorb, on
+// purpose: this family carries Cinderweave's stats on Ashstalker's armor, so it
+// is the furthest ahead of the five and the last one that should be handed more
+// effective health. Dodge is avoidance, so it does not compound the stamina
+// weighting the caster families already gain against their PvE counterparts, and
+// it answers melee pressure, which is the druid's actual weakness. Well under a
+// real defensive cooldown for comparison: Evasion is 0.25 and Deterrence 0.30.
+export const WARFARE_CAST_DODGE = 0.15;
+export const WARFARE_CAST_DODGE_DURATION = 6;
+export const WARFARE_CAST_DODGE_CHANCE = 0.15;
+export const WARFARE_CAST_DODGE_ICD = 20;
 
 // Set ids. Tier-1 families drop from the Gravewyrm Sanctum; tier-2 from the
 // Nythraxis raid. The string is also the `set` tag on each member item.
@@ -97,7 +108,8 @@ export const SET_GREYJAW_STALKER = 'greyjaw_stalker'; // leather, marksman
 export const SET_WARFARE_FURYFORGED = 'warfare_furyforged'; // mail, Strength
 export const SET_WARFARE_STORMBOUND = 'warfare_stormbound'; // mail, caster
 export const SET_WARFARE_ASHSTALKER = 'warfare_ashstalker'; // leather, Agility
-export const SET_WARFARE_CINDERWEAVE = 'warfare_cinderweave'; // cloth, caster
+export const SET_WARFARE_CINDERWEAVE = 'warfare_cinderweave';
+export const SET_WARFARE_THORNHIDE = 'warfare_thornhide'; // cloth, caster
 
 // Archetype bonus tiers. Tiers stack (a 3-piece set grants both the 2- and
 // 3-piece bonuses); cast pushback reduction and knockback resistance
@@ -304,6 +316,17 @@ const WARFARE_ASHEN_STEP: SetProc = {
   duration: WARFARE_KILL_SPEED_DURATION,
   pvpOnly: true,
 };
+const WARFARE_THORNGUARD: SetProc = {
+  id: 'set_warfare_thornguard',
+  name: 'Thornguard',
+  trigger: 'spellCast',
+  chance: WARFARE_CAST_DODGE_CHANCE,
+  aura: 'buff_dodge',
+  value: WARFARE_CAST_DODGE,
+  duration: WARFARE_CAST_DODGE_DURATION,
+  icd: WARFARE_CAST_DODGE_ICD,
+  pvpOnly: true,
+};
 const WARFARE_EMBERWARD: SetProc = {
   id: 'set_warfare_emberward',
   name: 'Emberward',
@@ -422,6 +445,14 @@ export const ITEM_SETS: Record<string, ItemSet> = {
     bonuses: warfareBonuses(
       WARFARE_EMBERWARD,
       'Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec.',
+    ),
+  },
+  [SET_WARFARE_THORNHIDE]: {
+    id: SET_WARFARE_THORNHIDE,
+    name: 'Thornhide Garb',
+    bonuses: warfareBonuses(
+      WARFARE_THORNGUARD,
+      'Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec.',
     ),
   },
 };
