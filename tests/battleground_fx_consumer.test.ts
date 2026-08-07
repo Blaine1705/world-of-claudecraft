@@ -8,7 +8,12 @@
 // facet type), so a single fixture covers both worlds.
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { BattlegroundFx, BG_RING_ALLY, BG_RING_ENEMY } from '../src/render/battleground_fx';
+import {
+  BattlegroundFx,
+  BG_RING_ALLY,
+  BG_RING_DASH_SPEC,
+  BG_RING_ENEMY,
+} from '../src/render/battleground_fx';
 import { BG_RUNE_BOB_AMP } from '../src/render/battleground_fx_core';
 import { type BgObjectRefs, buildBattlegroundObject } from '../src/render/battleground_props';
 import type { Vfx } from '../src/render/vfx';
@@ -221,6 +226,32 @@ describe('BattlegroundFx.update', () => {
     );
     expect(ring70.children).toHaveLength(2); // dark underlay + color ring
     expect(ring70.visible).toBe(true);
+    // The identity ring is DASHED, never the solid annulus the target reticle
+    // owns, and it stays flat (rotation.x = -PI/2) with the underlay beneath.
+    for (const mesh of [colorMesh(ring70), ring70.children[0] as THREE.Mesh]) {
+      expect(mesh.rotation.x).toBeCloseTo(-Math.PI / 2, 6);
+      const index = mesh.geometry.getIndex();
+      expect(index?.count).toBe(BG_RING_DASH_SPEC.dashes * BG_RING_DASH_SPEC.segments * 6);
+    }
+    // Both layers share the pooled geometry across every player's ring.
+    expect(colorMesh(ring71).geometry).toBe(colorMesh(ring70).geometry);
+    expect((ring71.children[0] as THREE.Mesh).geometry).toBe(
+      (ring70.children[0] as THREE.Mesh).geometry,
+    );
+    // The dark underlay is dashed on the same cadence, NOT a solid ring behind
+    // the dashes: it overhangs each dash end (a full rim) yet still leaves a
+    // gap, or the solid silhouette the dashes exist to break comes right back.
+    const firstDashArc = (mesh: THREE.Mesh): number => {
+      const pos = mesh.geometry.getAttribute('position');
+      const angle = (i: number) => Math.atan2(pos.getY(i), pos.getX(i));
+      return angle(BG_RING_DASH_SPEC.segments * 2) - angle(0);
+    };
+    const cell = (Math.PI * 2) / BG_RING_DASH_SPEC.dashes;
+    const colorArc = firstDashArc(colorMesh(ring70));
+    const underArc = firstDashArc(ring70.children[0] as THREE.Mesh);
+    expect(colorArc).toBeCloseTo(cell * BG_RING_DASH_SPEC.duty, 6);
+    expect(underArc).toBeGreaterThan(colorArc);
+    expect(underArc).toBeLessThan(cell);
     expect(ring71.visible).toBe(false); // a corpse shows no ring
     // match over: every ring leaves the scene graph
     h.sim.bgInfo = null;
