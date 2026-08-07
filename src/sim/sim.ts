@@ -321,6 +321,7 @@ import {
 import * as petAi from './pet/pet_ai';
 import * as petCommands from './pet/pet_commands';
 import type { MatchPetSnapshot } from './pet/pet_match_return';
+import type { PetReturnSnapshot } from './pet/pet_return';
 import {
   isSwimming as isSwimmingImpl,
   moveSpeedMult as moveSpeedMultImpl,
@@ -1161,6 +1162,14 @@ export interface PlayerMeta {
   // Firebottle throw cooldown (q_deepfen_purge): sim time the player's next hut
   // torch is ready. Session-only, never serialized.
   firebottleReadyAt?: number;
+  // The LIVING pet this player's own death took from them (absent when they had
+  // none), so every resurrection path can stand it back up beside them instead of
+  // leaving them owing a Revive Pet cast, or a fresh summon, for a death that was
+  // just undone. Written on every death and consumed by the shared revive;
+  // src/sim/pet/pet_owner_revive.ts owns the rules. Session-only and never
+  // serialized, exactly like the match-side snapshot it shares its shape with: a
+  // relog is a fresh session, and a warlock re-summons their demon on login.
+  deathPet?: PetReturnSnapshot;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
