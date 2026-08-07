@@ -14,8 +14,8 @@
 | 13 QA | complete | 2026-08-06 | 2026-08-06 |
 | 13b Complete source coverage | complete | 2026-08-07 | 2026-08-07 |
 | 13b QA | complete | 2026-08-07 | 2026-08-07 |
-| 14 Overview flagship + celebration | not started | | |
-| 14 QA | not started | | |
+| 14 Overview flagship + celebration | complete | 2026-08-07 | 2026-08-07 |
+| 14 QA | complete | 2026-08-07 | 2026-08-07 |
 | 15 Deep links, chat, tracker, guide search | not started | | |
 | 15 QA | not started | | |
 | 16 Art: launcher + owned cells | not started | | |
@@ -773,7 +773,8 @@ state.md delivery decision trued up in this record's commit).
   reliquary-cell-flash (1s fill pulse), standing is-illuminated gold
   frame + filled badge replacing the letter-spacing-only rule; sticky
   one-shot celebrateIllumination(pageId) gated on the model reporting
-  the page complete, flashRelics(ids) cleared by the consuming render,
+  the page complete, flashRelics(keys, kind:id since the Phase 14 QA
+  round) cleared by the consuming render,
   animationend removal with a bubbling-target guard, close() drops
   unspent moments, reduced motion = static frames (declaration-level
   content-bound pins). Elide: ownership Sets out of buildInput (an
@@ -832,3 +833,101 @@ state.md delivery decision trued up in this record's commit).
   (deed fills) -> ef48d80446 (feature) -> 2558a0da94 (screenshots) ->
   the docs commit. Commits stay LOCAL; the Phase 14 QA session owns the
   push.
+
+## Phase 14 QA (2026-08-07)
+
+Verdict: PASS-WITH-FOLLOWUPS. Zero BLOCKING findings across six audit
+sources (release-merge audit x3, frontend-seam-reviewer, qa-checklist,
+contract/mutation audit, i18n+a11y audit, visual pixel QA); every
+should-fix and nit applied in two reviewed fix rounds. The QA session
+owns the push.
+
+- Sync: second v0.36.0 sync this phase, merge e8570107ce
+  (origin/release/v0.36.0 at ffde6dc349; 35 commits: arena PvP fix set
+  PR 2885, four bespoke animation PRs, retention sweeps PR 2911).
+  Conflicts were generated files only, resolved by REGENERATION:
+  pending.ts via i18n:gen (union), the two arena goldens re-minted on
+  the merged tree via UPDATE_PARITY=1 (only those two goldens moved;
+  the merged traces carry BOTH the release level gate and the branch
+  reliquary meta, verified independently). Auto-merged both-sides
+  unions (icons.ts, scenarios.ts, arena_pet_return.test.ts, hud_chrome
+  catalog, five non-Latin overlays) all verified: no side's intent
+  lost. Release-merge audit: no new endpoints/SimEvents, no stale
+  injected bindings (the retention pruneBatch two-shape near-miss
+  checked and clean), no db-mock trap; deed overlay counts exact
+  (curator fills intact 5x4); premise re-check trued up the parity
+  anchor, retired the resolved inherited-red trio, and flagged
+  hudChrome.arenaGate.minLevelNote's 15 Latin pending rows as
+  RELEASE-owned (the Phase 22 worklist must not absorb them).
+- Inherited red at the tip (recorded, not fixed): tests/
+  anim_pipeline_hunter_ghost.test.ts, 2 tests; its manifestBlock
+  anchors ("player_hunter: {") reference a manifest shape that no
+  longer exists; every input byte-identical to the release tip.
+  Flake adjudications: drowned_litany coverage red in the mint run
+  only, green isolated (the per-merge seed class, 13b precedent);
+  corpse_harvest_sim 20s timeout and one i18n_resolved_equivalence
+  batch timeout are the known contention shapes, judge by CI.
+- ARM 3 perf tour (HUD_PERF_BUDGET_TOUR=1, PERF_GPU=1, both
+  viewports): tourMinFrames, hudHotDomWrites desktop (603), FCT pool
+  all within anchors; hudSkip 100 percent. TWO anchor overages
+  reproduce IDENTICALLY at the release tip in a clean worktree, so
+  they are base-owned, not this branch: mobile hudHotDomWrites 696-698
+  vs anchor 640 (frame-count-independent across 1232 and 3007-frame
+  runs; the branch adds zero writes, 603/603 and 696/696 vs tip), and
+  desktop frameLong50 14-17 vs anchor 12 under load. Baseline NOT
+  re-pinned (release-owned; surface upstream).
+- Real-run VERIFY items: npm run test:browser 16 files / 110 green
+  (axe over every window incl. the new Overview, keyboard nav, target
+  size). Visual pixel QA on the live Overview: desktop chips measure
+  exactly 28px (20px icon + 3px pad + 1px border), mobile chips and
+  cards hold the 48px floor, all three truth-rule arms render
+  truthfully, bars ride --reliquary-fill including a 0-width fill,
+  committed-screenshot diffs show surface-identical rendering (all
+  red = world bleed through the translucent window + count deltas from
+  seeding), reduced-motion celebration renders the static ring
+  (animation none, classes clear on the next rebuild) and the normal
+  path runs the 1.6s celebrate + shimmer.
+- Fix round 1 (all findings applied): per-strip search hint (new key
+  hudChrome.reliquary.stripNoMatch + five non-Latin fills; adds its 15
+  Latin pending rows to the Phase 22 fill); focus fallback for jump
+  controls destroyed by their own jump (card:X to nav:X, page jumps to
+  back; pure reliquaryFocusFallbackKey + tests); flash keys
+  kind-namespaced end to end (bare ids could collide across kinds);
+  is-illuminated frame recolors a transparent base border so the grid
+  no longer jumps at the celebration moment; jump-family hover/focus
+  blocks unified; three redundant animation-iteration-count lines
+  folded into the shorthand; stale comments fixed; pr_shot_targets
+  seeding now records firstFind so chips exercise the hinted path;
+  reliquaryFillPct extracted to the pure core. New pins: the hud
+  arming order (one-shots armed BEFORE refreshIfChanged, inside
+  isOpen), the illuminated-gate short-circuit order (armed across a
+  repaint of its own incomplete page), close() dropping an
+  elided-armed flash, full key-and-value catalog literals, the
+  identical-totals ring-digest fixture.
+- Fix round 2 (fresh-reviewer findings, two round-1 choices REVERSED
+  with rationale): the sharedUniquesNote owned-gate was WRONG (the
+  shelf denominators disagree with the catalog total at owned 0
+  already: 245 slots over 219 relics), so the note is unconditional
+  again and the committed fresh screenshots stay truthful; the
+  reduced-motion rings went back to var(--gold) (the deed precedent's
+  --gold-dim has no salience against the standing --gold-dim
+  is-illuminated frame; rationale comment at the rule); stripNoMatch
+  now keys on per-strip model flags (recentEmptiedBySearch /
+  nearlyEmptiedBySearch), so a STRUCTURALLY empty strip keeps its own
+  hint while a needle is live instead of claiming a false no-match;
+  summary bar routed through the shared percent; reliquaryFlashKey
+  single-sources the kind:id shape (hud arming + cell match).
+- Follow-up candidates recorded, NOT built: derive the Horizons card
+  latest line from firstFind; the Horizons single-signature-dimension
+  observation; setTimeout is absent from the perf gate's FRAME_DRIVERS
+  (a timer added to a cold painter would pass; repo-wide gate, not
+  this packet's); forced-colors drops the celebration's visual arrival
+  cue (the news survives as text; observation only); the release-side
+  arena unqueue double-message (hud arenaUnqueued line + sim log line
+  disagree for team queues; pre-existing release pattern, surface
+  upstream); mobile page-detail width cost of the celebration frame
+  fix (18px, graceful auto-fill reflow, unverified visually at
+  boundary widths).
+- OPEN rulings surfaced again at this QA, no call received, nothing
+  implemented against them: mounts-place + heroic difficulty (decide
+  together), quest class-gate, native-shell sourceStore.

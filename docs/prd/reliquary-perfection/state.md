@@ -78,7 +78,8 @@ line as phases complete.
   deed_chat_line.ts (clickable chat), deed tracker painter + #deed-tracker, deed_i18n.ts
   (content-name localization pattern), DEED_IMAGE_IDS (crest art).
 - Guards: tests/architecture.test.ts (UI_PURE_CORES x3 lists), tests/
-  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (306/79/227, facet 33),
+  hud_perf_budget.test.ts, tests/world_api_parity.test.ts (307/79/228 since the
+  Phase 14 v0.36.0 sync re-union, facet 33),
   tests/guide.test.ts hidden-deed needles (the three hiddenDeedProse guards).
 
 ## Surfaces added by this packet (append per phase as they land)
@@ -222,9 +223,14 @@ line as phases complete.
   resolver path); guide.reliquaryPage.howBody keeps 'default Shift+X' (a wiki
   reference stating the default, outside the tips rationale); commit 6647fc383f's
   claw/tusk phrasing quotes the release PR title (claw is the only specimen family).
-  INHERITED reds, not this branch: 3 full-suite failures (loot_window_controller x2,
-  material_profession_affinity sharp_claw) reproduce exactly at the release tip
-  303be34548 (PR 2905 landed without updating those suites); release-owned.
+  INHERITED reds, not this branch: RESOLVED upstream as of the Phase 14 QA sync
+  (e8570107ce): the 3 full-suite failures once recorded here
+  (loot_window_controller x2, material_profession_affinity sharp_claw) went green
+  on the merged tree after PR 3015 shipped the claw/tusk craft consumers; do not
+  budget them as expected reds. The CURRENT inherited red at the v0.36.0 tip is
+  tests/anim_pipeline_hunter_ghost.test.ts (2 tests: its manifestBlock anchors
+  scan for "player_hunter: {", a manifest shape that no longer exists); inputs
+  byte-identical to the release tip, release-owned.
   Release-fill native-pass notes (join the ru retro note): ja colon conventions
   split (deed dungeon-heroics ASCII vs delve-heroics full-width; deedsRetroSummary
   ASCII vs reliquaryRetroSummary full-width); cs/pl plural few leaves carry the
@@ -371,11 +377,14 @@ line as phases complete.
   (data-nav, aria-describedby carries the latest line), sharedUniquesNote,
   overviewEmpty DELETED end to end. New keys: hudChrome.reliquary.
   {recentJumpAria, recentEmpty, nearlyEmpty, shelfRecent, shelfNoFinds,
-  shelfOpenAria, sharedUniquesNote} + the plural base; five non-Latin fills
-  in-change, Latin pending (Phase 22). Celebration classes:
+  shelfOpenAria, sharedUniquesNote} + the plural base, and stripNoMatch added
+  by the Phase 14 QA fix round (per-strip no-match hint, gated on the model's
+  recentEmptiedBySearch / nearlyEmptiedBySearch, never on needle presence);
+  five non-Latin fills in-change for every key, Latin pending (Phase 22). Celebration classes:
   reliquary-page-celebrate, reliquary-cell-flash, upgraded standing
   is-illuminated; celebrateIllumination(pageId) sticky one-shot gated on
-  model completeness, flashRelics(ids), animationend removal with a
+  model completeness, flashRelics(keys, kind:id via reliquaryFlashKey
+  since the Phase 14 QA round), animationend removal with a
   bubbling-target guard, close() clears, reduced motion = static frames
   (content-bound declaration pins). Elide: ownership Sets built only on a
   real repaint (elided polls read neither ownership seam, call-count
