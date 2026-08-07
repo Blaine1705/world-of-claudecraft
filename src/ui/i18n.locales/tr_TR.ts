@@ -313,8 +313,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Her tarif basamağı için tek bir sabit ücret, bir usta onu öğrettiğinde bir kez alınır; aşağıdaki tablonun her basamağı bugün fiilen kullanımdadır, ücretsiz başlangıç tariflerinden en tepedeki alet yapımcısının olta derslerine kadar.',
   'guide.profPages.econ.provenanceBody':
     "Bazı eşyalar bir ad taşır. Üzerine gelin; ipucu kutusu bir hammaddede filanca tarafından toplandı, bitmiş bir parçada ise filanca tarafından hazırlanmıştır der: aynı işaret, eşyanın nasıl var olduğuna göre sözcüklenmiştir. İmza eşyanın kendisinin bir parçasıdır; ticaretlerde, bankada, postada, Dünya Pazarı'nda ve hatta bir satıcıdan geri alımda bile onunla birlikte yol alır ve asla solmaz.\n\nToplama en iyi işini kendiliğinden imzalar: nadir ya da daha iyi atan her hasat imzalı gelir ve nadir bulgular beş katlık beklenmedik kazancının tamamını imzalar. Bir ceset hasadının şanslı atışı, ailenin verecek bir örneği olmadığı yerde verimi imzalar; örneği olduğu yerde ise verimi düz bırakır ve yanına imzalı bozulmamış örneği basar. Üretim de aynı çizgide imzalar: nadir ya da daha iyi bir çıktının her kopyası imzalı basılır ve bir şaheser, kalitesi ne olursa olsun her zaman imzalanır; böylece herhangi bir parçanın en iyi sürümü her zaman ustasının adını taşır. Size bir imzaya mal olabilecek tek şey dolu bir çantadır: imzalı bir birimin ineceği kendi yerine ya da eşleşen imzalı bir yığına ihtiyacı vardır.\n\nBir eşya yığını tek bir kimliği paylaşır; bu yüzden iki kopya ancak her işaret tam olarak eşleştiğinde birleşir: aynı eşya, aynı imzalayan, aynı şaheser istatistikleri, aynı büyü, aynı bağ. İmzalı bir kütük hiçbir yönde düz bir yığına katılmaz (birleşme birinin adını silerdi), ama birebir aynı içerikler seve seve birleşir; böylece aynı toplayıcının imzaladığı yirmi cevher tek bir yığında durur ve beklenmedik bir kazanç çantalarınızı param parça etmez.\n\nİmzalar ustalara geri öder: tezgahta gereken bir bileşenin imzalı herhangi bir kopyasını elde tutmak, kim imzalamış olursa olsun, şaheser şansına 2 yüzde puanı ekler; kendi elinizle imzaladığınız bir bileşeni tutmak ise o bileşenin gereken miktarını bir azaltır (asla birin altına inmez). Kendi imzalı nadir ya da daha iyi işiniz size ders vermeyi bile sürdürür, bugün yalnızca şişe üzerinden: imzaladığınız bir iksiri içtiğinizde, o iksiri karıştıran zanaat etkin ana dallarınızdan biri olduğu sürece küçük bir beceri sızıntısı o zanaata geri akar.",
-  'guide.profPages.econ.throttleBody':
-    "Üretimin bir tavanı vardır: zanaat, büyü bozumu, büyüleme, hurda toplama ve alet etkisi yeniden dolumları, her {seconds} saniyelik pencerede {actions} başarılı eylemlik tek bir bütçeyi paylaşır. Reddedilen bir deneme hiçbir şeye mal olmaz ve bütçeden harcamaz. Normal oyunda bunu asla hissetmezsiniz; bu sınır, kasası dolu ve becerisi tavan yapmış bir uzmanın, becerisi ya da stoku ne olursa olsun Pazar'ı boğamaması için vardır.",
   'guide.profPages.faq.a4':
     "Talihinize denk geldi. Kabaca 90 hasattan 1'i nadir bir toplama olayını tetikler (ağaçta antik kalp odunu, cevherde bozulmamış bir damar, otlarda mehtaplı bir çiçek): verimi beş katına çıkarır, her birimi adınızla imzalar ve bulguyu tüm bölgeye duyurur. Sıradan bir hasatta çıkan nadir veya üzeri bir kalite çekimi de verimi imzalar.\n\nİmzalı malzemeler saklamaya ya da pahalıya satmaya değer: tezgahta, gereken bir bileşenin imzalı herhangi bir kopyasını elde tutmak şaheser şansına 2 yüzde puanı ekler. Yalnızca şunu unutmayın, bunlar sadece aynı şekilde imzalanmış kopyalarla yığın oluşturur, yani kendi çanta yuvalarını işgal ederler.",
   'guide.profPages.faq.a6':
@@ -691,7 +689,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Koleksiyoncular, kupalar ve bir hikayenin bedeli',
   'guide.profPages.econ.collectorsBody':
     "Satıcılar kaynağa kördür: imzalı bir eşya NPC'ye tam fiyatına satılır. İmzanın getirdiği prim yalnızca oyuncular arasında mevcuttur; bu da onu ilginç kılan şeydir: ünlü bir toplayıcı tarafından imzalanmış bir yığın beklenmedik cevher, şanslı bir hasattan gelen Prime Cut, o zamandan beri emekli olmuş bir ustanın adını taşıyan şaheser bir bıçak, bunların hepsi birinin belleğinin değer biçtiği kadar değerlidir.\n\nDeeds Kitabı da aynı içgüdüye yaslanır: Bozulmamış Damar, Kadim Kalp Ağacı, Ay Işığı Çiçeği, Mükemmel Numune ve Umut Işıltısı, tamamen bir anın sizinle gerçekleştiğini kanıtlamak için var olan sıfır Şöhretli koleksiyoncu işaretleridir. Görevi kazandıran eşyayı elinizde tutun, elinizde makbuzu tutarsınız. Bunların hiçbiri güç değildir; köken istatistik satın almaz ve savaş kazanmaz, sadece iyi günlerin oyunun kağıt izi olur.",
-  'guide.profPages.econ.throttleHeading': 'Eylem kısıtlaması',
   'guide.profPages.econ.doctrineHeading': 'Oyuncular oyuncularla alışveriş yapar',
   'guide.profPages.econ.doctrineBody':
     "Zanaat ekonomisi tek bir fikir üzerine inşa edilmiştir: oyuncular oyunculara tedarik eder. Toplayıcılar ustaları besler, ustalar görev yapan ve baskın düzenleyenleri besler, bozucular büyücüleri besler; satıcılar ve tezgah ustaları ise kenar bölgede çöp ve madeni para emmek için durur, sizinle rekabet etmek için değil. Bir meslekten para kazanmak istiyorsanız, müşteriniz bir insandır: diğer oyuncuların ne tükettiğini öğrenin, Dünya Pazarı'na göre fiyat belirleyin ve NPC sistemlerini fiyatlarınızın tabanı olarak değerlendirin, pazar olarak değil.\n\nZanaatla yapılan teçhizat baskın tabanının altına oturacak şekilde ayarlanmıştır: bir şaheser bile tarifinin yalnızca bir kalite katı üzerindedir, asla efsanevi ötesine geçemez ve istatistik bütçesi baskın ganimet bandının altında kalır. Demirhanesi sizi en zorlu içeriklere hazırlar; onun yerini almaz. Bu, ustalar, baskın düzenleyenler ve pazar arasındaki istikrarlı üçgeni korur: baskın düşen ganimet hep çekici kalır ve zanaatla yapılan parçalar gerçekten parayla satın alınabilecek en iyi teçhizat olur.",
@@ -1084,6 +1081,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroik bonusu, bunlardan biri her zaman düşer:',
   'hudChrome.finder.lootMaybe': 'En fazla bunlardan biri düşebilir:',
   'hudChrome.finder.mech.deathless_rage': 'Ölümsüz Öfke (koruma taşlarında kesilir)',
+  'hudChrome.finder.mech.dread_curse':
+    'Dehşet Laneti (yalnızca kahramanlık, tank değişimi için biriken zayıflatma)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Ölüm Avcısının Biçişi (öne doğru yay saldırısı)',
   'hudChrome.finder.mech.enrage': 'Düşük canda çılgına döner',
   'hudChrome.finder.mech.grave_cleaver': 'Mezar Biçici (öne doğru yay saldırısı)',
@@ -2482,6 +2481,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Dost',
   'hudChrome.mobTooltip.hostile': 'Düşman',
   'hudChrome.mobTooltip.levelFamily': 'Seviye {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Seçkin',
+  'hudChrome.mobTooltip.boss': 'Patron',
   'hudChrome.options.aurasOnPlayerFrame': 'Oyuncu Çerçevesinde Güçlendirmeler',
   'hudChrome.options.playerFrameScale': 'Oyuncu Çerçevesi Ölçeği',
   'hudChrome.options.showDailyRewardsChest': 'Günlük Ödül Sandığını Göster',
@@ -7334,6 +7335,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Tuş Düzenini Sıfırla',
   'hudChrome.controller.title': 'Oyun Kolu',
   'hudChrome.controller.vibration': 'Titreşim',
+  'hudChrome.emoteEditor.close': 'İfadeleri kapat',
   'hudChrome.emoteEditor.done': 'Tamam',
   'hudChrome.emoteEditor.title': 'İfadeler',
   'hudChrome.emoteWheel.edit': 'Düzenle',
@@ -8846,7 +8848,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Bu sayfadaki her şey oyunun içindedir: seçenekleri açmak için Esc tuşuna basın. Menü, sabitlenmiş temel ayarların bir Genel Bakış ekranıyla açılır ve kategoriler onun yanındaki bir rayda yer alır: aşağıdaki ayarlar Ekran grubundaki Grafikler, Arayüz ve Erişilebilirlik başlıkları altında, Performans Arayüzü ise Sistem altında bulunur. Daha da hızlısı, üstteki arama kutusuna bir ad yazıp doğrudan ona atlayın.',
   'guide.settingsPage.whyLabel': 'Neden işe yarıyor:',
   'hudChrome.crafting.close': 'İşçiliği kapat',
-  'hudChrome.crafting.craft': 'Zanaat',
   'hudChrome.crafting.craftedToast': 'Hazırlanma Tarihi: {name}',
   'hudChrome.crafting.empty': 'Henüz bilinen bir tarif yok.',
   'hudChrome.crafting.insufficientMaterials': 'Bunun için malzemeleriniz yok.',
@@ -8940,7 +8941,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zekayı %{pct} artırır',
   'hudChrome.auraEffect.increasePct.sta': 'Dayanıklılığı %{pct} artırır',
   'hudChrome.crafting.recipeNotLearned': 'Bu tarifi henüz öğrenmedin.',
-  'hudChrome.crafting.throttled': 'Çok hızlı üretiyorsun. Bir an bekle ve tekrar dene.',
   'hudChrome.mobile.chatPlaceholder': 'Bir şey söyle...',
   'hudChrome.mobile.hideKeyboard': 'Klavyeyi gizle',
   'hudChrome.unitFrame.partyChip': 'Grup',
@@ -10030,7 +10030,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Grubun sahiplenilmiş koşuları tutarken zorluğu değiştirirsen eski haklar kendiliğinden silinmeden önce bir süre kalır. Grup lideri kendi portre menüsünden Tüm Örnekleri Sıfırla seçeneğini seçerek veya /dungeon reset yazarak bunları hemen bırakabilir. Zorluk gerçekten değiştirilmiş olmalı, içeride canlı ya da düşmüş hiç kimse kalmamalı ve sıfırlamalar arasında kısa bir bekleme süresi vardır. Kapıya yanlış zorlukta gelirsen oyun başlamadan önce uyarır. Baskın bu şekilde asla sıfırlanmaz; kendi kilit kuralları geçerlidir.',
   'guide.dungeonsPage.wildheartBody':
-    'İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından Zulgar ile yüzleşmek için ritüel piramidine tırman.',
+    'İki yükseltilmiş av patikasının yeşim rengi bir cenoteyi çevrelediği, yağmurla ıslanmış bir orman kalderası. Canavar inlerini ve ata kalıntılarını geç, ardından zirvede kimin seni beklediğini görmek için ritüel piramidine tırman.',
   'guide.gear.itemLevelBody':
     'İki parçayı hızlıca karşılaştırmak için seçeneklerden Eşya Seviyesini Göster’i aç. Düşmanlardan, görevlerden ve üretim mesleklerinden gelen, kaynağı bilinen teçhizat bir eşya seviyesi gösterir: kaynağına göre gücünü yaklaşık belirten tek bir sayı, farklı yuvalar arasında bile hangi yükseltmenin daha etkili olduğunu gösterir. Basit satıcı eşyaları ve başlangıç teçhizatı gibi böyle bir kaynağı olmayan parçalarda seviye görünmez; sayının olmaması normaldir.',
   'guide.professions.craftHowTitle': 'Üretim penceresi',
@@ -10793,6 +10793,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Kolye Büyüsü - Çeviklik',
   'hudChrome.enchantName.enchant_neck_intellect': 'Kolye Büyüsü - Zeka',
   'hudChrome.enchantName.enchant_neck_spirit': 'Kolye Büyüsü - Ruh',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'İkincil El Büyüsü - Dayanıklılık',
   'hudChrome.enchantName.enchant_ring_agility': 'Yüzük Büyüsü - Çeviklik',
   'hudChrome.enchantName.enchant_ring_intellect': 'Yüzük Büyüsü - Zeka',
   'hudChrome.enchantName.enchant_ring_spirit': 'Yüzük Büyüsü - Ruh',
@@ -10814,13 +10815,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve arkanik malzeme verir. Bu geri alınamaz.",
   'hudChrome.enchanting.disenchantConfirmTitle': '{item} büyüsü bozulsun mu?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Çok hızlı büyü bozuyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.disenchantedLine': '{item} büyüsünü bozdunuz.',
   'hudChrome.enchanting.enchantAppliedLine': '{item} üzerine {enchant} büyüsü uyguladınız.',
   'hudChrome.enchanting.enchantInsufficient': 'O büyü için malzemeniz yok.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Çok hızlı büyü yapıyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.enchantUnknown': 'O büyü mevcut değil.',
   'hudChrome.enchanting.enchantWrongSlot': 'Bu büyü o eşyaya uygulanamaz.',
   'hudChrome.enchanting.noEnchants': 'Hiçbir büyü bu malzemeyi kullanmıyor.',
@@ -10834,8 +10831,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     "{item}'nin özel bir kopyası (imzalı, şaheser veya büyülü) yok edilir ve zanaat malzemesi verir. Bu geri alınamaz.",
   'hudChrome.enchanting.salvageConfirmTitle': '{item} parçalansın mı?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Çok hızlı parçalıyorsunuz. Bir an bekleyin ve tekrar deneyin.',
   'hudChrome.enchanting.salvagedLine': '{item} parçaladınız.',
   'hudChrome.enchanting.targetTitle': 'Büyülenecek eşya seçin',
   'hudChrome.unbind.cannotAfford': 'Çözüm ücretini karşılayamazsınız.',

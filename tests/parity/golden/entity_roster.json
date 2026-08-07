@@ -10,13 +10,13 @@
     "releaseSpirit ghost release + Spirit Healer resurrect (Resurrection Sickness)"
   ],
   "draws": 4,
-  "drawDigest": "343e2396",
+  "drawDigest": "0d8664bb",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "79743a94",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -149,33 +148,33 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 966,
-      "state": "081687cd",
+      "state": "9b608d3f",
       "events": "a5e3fe0a",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       }
     },
     {
       "tick": 4,
       "time": 0.2,
       "nextId": 966,
-      "state": "1a407794",
+      "state": "58b9082c",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       }
     },
     {
       "tick": 5,
       "time": 0.25,
       "nextId": 966,
-      "state": "a484a438",
+      "state": "54b69a88",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "post-churn",
       "players": [
@@ -197,7 +196,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -320,11 +318,11 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 966,
-      "state": "32b965bc",
+      "state": "e6dc5414",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "ghost-release",
       "players": [
@@ -346,7 +344,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -465,11 +462,11 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 966,
-      "state": "dade7ff0",
-      "events": "0e7100e6",
+      "state": "d41a3000",
+      "events": "c453183d",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "healer-resurrect",
       "players": [
@@ -491,7 +488,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -616,22 +612,22 @@
       "tick": 6,
       "time": 0.3,
       "nextId": 966,
-      "state": "1adac9c8",
-      "events": "a0873ad4",
+      "state": "702398d8",
+      "events": "5f5b7b5b",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       }
     },
     {
       "tick": 7,
       "time": 0.35,
       "nextId": 966,
-      "state": "18ba3ead",
+      "state": "bdd69a5f",
       "events": "741638a5",
       "rng": {
         "draws": 4,
-        "digest": "343e2396"
+        "digest": "0d8664bb"
       },
       "label": "final",
       "players": [
@@ -653,7 +649,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},

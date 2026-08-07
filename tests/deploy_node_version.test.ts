@@ -14,8 +14,9 @@ const TARGET_TAG = 'node:26-slim';
 
 const dockerfile = readFileSync('Dockerfile', 'utf8');
 const ciWorkflow = readFileSync('.github/workflows/ci.yml', 'utf8');
-const prAiWorkflow = readFileSync('.github/workflows/pr-ai.yml', 'utf8');
+const auditWorkflow = readFileSync('.github/workflows/audit.yml', 'utf8');
 const desktopWorkflow = readFileSync('.github/workflows/desktop-publish.yml', 'utf8');
+const nightlyWorkflow = readFileSync('.github/workflows/nightly.yml', 'utf8');
 const deployDoc = readFileSync('DEPLOY.md', 'utf8');
 const compose = readFileSync('docker-compose.yml', 'utf8');
 
@@ -92,12 +93,25 @@ describe('deploy and CI Node version pin', () => {
     expect(ciWorkflow).toContain(`node-version: ${TARGET_MAJOR}`);
   });
 
-  // pr-ai.yml runs only the codex-action review jobs and deliberately sets up no Node
-  // toolchain of its own, so there is no version for the cross-carrier pin to hold. Do
-  // not delete this arm if a Node step returns: swap it back to the pinned form above
-  // (every value equals TARGET_MAJOR, non-empty) so the new carrier joins the bump.
-  it('keeps pr-ai.yml free of a Node toolchain the cross-carrier pin would miss', () => {
-    expect(nodeVersionValues(prAiWorkflow)).toEqual([]);
+  // audit.yml carries its own setup-node step and lives outside ci.yml on purpose (its
+  // `schedule` trigger would otherwise fire ci.yml's changes/lint/browser-gate jobs), so
+  // the cross-carrier pin has to read it separately or a Node bump would leave the audit
+  // job behind on a version nothing else builds against.
+  it('pins every audit.yml node-version to the target Node major', () => {
+    const values = nodeVersionValues(auditWorkflow);
+    expect(values.length).toBeGreaterThan(0);
+    for (const value of values) expect(value).toBe(TARGET_MAJOR);
+    expect(auditWorkflow).toContain(`node-version: ${TARGET_MAJOR}`);
+  });
+
+  // nightly.yml re-proves the tips on a schedule with its own setup-node steps, so it
+  // is a bump carrier like audit.yml: fold it into the coordinated move or the nightly
+  // would silently prove the tree against a Node nothing else ships on.
+  it('pins every nightly.yml node-version to the target Node major', () => {
+    const values = nodeVersionValues(nightlyWorkflow);
+    expect(values.length).toBeGreaterThan(0);
+    for (const value of values) expect(value).toBe(TARGET_MAJOR);
+    expect(nightlyWorkflow).toContain(`node-version: ${TARGET_MAJOR}`);
   });
 
   // DEPLOY.md's containerized tsc-gate builds the type check inside

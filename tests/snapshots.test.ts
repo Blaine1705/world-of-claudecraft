@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { completeCraftCast } from './helpers/enchant_family_cast';
 
 // Mock the db layer so no Postgres is needed; snapshot logic is under test.
 vi.mock('../server/db', () => ({
@@ -32,6 +33,7 @@ import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mou
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
 import { BUILTIN_WORLD, DELVES, GATHER_NODES, ITEMS, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { emptySaleLog } from '../src/sim/market_sale_log';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { Sim } from '../src/sim/sim';
 import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
@@ -3505,7 +3507,11 @@ function dirtyEveryDeltaField(): {
   if (merchant) merchant.pos = { ...p.pos };
   // `mktU`: credit a pending collection so the collect-indicator bit is 1 (the
   // name key merges into the canonical seller key on first read).
-  (sim.market as any).marketCollections.set(meta.name, { copper: 95, items: [] });
+  (sim.market as any).marketCollections.set(meta.name, {
+    copper: 95,
+    items: [],
+    sales: emptySaleLog(),
+  });
   // `mail`: mailInfoFor is null unless near a mailbox, so relocate one onto the
   // player. `mailU` is already non-zero: every fresh character got the one-time
   // Ravenpost welcome letter (delay 0) at join.
@@ -3772,6 +3778,7 @@ describe('full self-state snapshot delta fixture', () => {
       session,
       JSON.stringify({ t: 'cmd', cmd: 'craft_item', recipe: recipe.id }),
     );
+    completeCraftCast(server.sim as never, session.pid);
     expect(server.sim.countItem(recipe.resultItemId, session.pid)).toBe(1);
   });
 

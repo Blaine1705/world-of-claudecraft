@@ -112,6 +112,7 @@ export const hudChromeStrings = {
   emoteEditor: {
     title: 'Emotes',
     done: 'Done',
+    close: 'Close emotes',
   },
   dailyRewards: {
     title: 'Daily Rewards',
@@ -1206,6 +1207,29 @@ export const hudChromeStrings = {
     graphicsFatal: 'Graphics recovery failed. Reload the game to continue.',
     graphicsReload: 'Reload Game',
     graphicsDraftChanged: 'Graphics changes are ready to apply.',
+    // Graphics panel card titles (the wide two-column card form), the
+    // per-system dial labels the hud.options block does not already carry,
+    // and the notes under the dials.
+    gfxSectionQuality: 'Quality',
+    gfxSectionWorld: 'World Detail',
+    gfxSectionLighting: 'Lighting & Effects',
+    gfxSectionCamera: 'Camera',
+    gfxSectionDisplay: 'Display',
+    gfxSectionSystem: 'System',
+    gfxSectionTouch: 'Touch Controls',
+    gfxViewDistance: 'View Distance',
+    gfxWaterQuality: 'Water Quality',
+    gfxCharacterDetail: 'Character Detail',
+    gfxAmbientOcclusion: 'Ambient Occlusion',
+    gfxBloom: 'Bloom',
+    gfxAntiAliasing: 'Anti-Aliasing',
+    gfxDynamicLights: 'Dynamic Lights',
+    gfxParticleEffects: 'Particle Effects',
+    gfxHalf: 'Half',
+    gfxCustomNote:
+      'Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.',
+    gfxEffectsNote:
+      'Ambient Occlusion, Bloom and Anti-Aliasing ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect.',
     // Interface Mode control (Graphics panel): desktop keyboard/mouse vs the
     // on-screen touch controls. Auto detects the device; the rest force one.
     interfaceMode: 'Interface Mode',
@@ -1359,6 +1383,8 @@ export const hudChromeStrings = {
     buttons: 'Button Layout',
     resetButtons: 'Reset Button Layout',
     menuAction: 'Game Menu',
+    zoomIn: 'Zoom In',
+    zoomOut: 'Zoom Out',
     help: 'Left stick moves, right stick looks. Open a window to use the on-screen pointer.',
   },
   // Performance overlay (the customizable in-game stats panel + its Options
@@ -1644,6 +1670,9 @@ export const hudChromeStrings = {
   // Tooltip marker for a soulbound item (bound to its owner: cannot be traded, mailed,
   // listed, sold, or destroyed). Currency-like reward tokens (Heroic Marks) carry this.
   itemSoulbound: 'Soulbound',
+  // Tooltip marker for a unique-equipped item (every legendary): a character can wear
+  // at most one copy of it at a time (src/sim/equipment_rules.ts isUniqueEquipped).
+  itemUniqueEquipped: 'Unique-Equipped',
   itemSet: {
     header: '{name} ({have}/{total})',
     bonusLine: '({pieces}) {bonus}',
@@ -1949,6 +1978,16 @@ export const hudChromeStrings = {
     notInTownHint: 'You must be in town to set your focus.',
     increaseAria: 'Increase focus on {component}',
     decreaseAria: 'Decrease focus on {component}',
+    // #1144 re-spec cost model: the payment-tier picker and its cost preview,
+    // shown above Save. {coin}/{materials} are pre-formatted (formatMoney /
+    // formatNumber + the material item's localized name), matching the
+    // pre-formatted-placeholder idiom budgetLabel/tierHint already use above.
+    respecTierLabel: 'Re-spec speed',
+    respecTierTimeOption: 'Free (take your time)',
+    respecTierPartialOption: 'Faster (small cost)',
+    respecTierInstantOption: 'Instant (full cost)',
+    respecCostFree: 'Free',
+    respecCostLine: 'Costs {coin} and {materials}',
   },
   // Party leadership: the right-click "Promote to Leader" handoff action shown on a
   // party member's context menu to the current leader. Lives in the English-only
@@ -2315,7 +2354,7 @@ export const hudChromeStrings = {
   // Friendly/Hostile reaction line (green/red, from Entity.hostile). All the
   // wordy ones (M16) are filled in the five non-Latin locales in this same
   // change; "Boss" is not wordy (no four-plus consecutive-lowercase run) so
-  // it stays pending like the rest of a plain-word English addition.
+  // it is also filled in the locale overlays by the release repair.
   mobTooltip: {
     levelFamily: 'Level {level} {family}',
     // The one MobFamily with no guide.family.* bestiary entry (demons are
@@ -3017,6 +3056,11 @@ export const hudChromeStrings = {
     // accessibility); gotAwayLine is the no-cost miss.
     biteLine: 'Something takes the bait!',
     gotAwayLine: 'It got away.',
+    // The early reel (the spam-click fix): a pole re-press before the bite
+    // now ends the session empty, and this line says why, so the player
+    // learns to wait for the bite instead of reading a silent cancel as a
+    // bug. Same grey no-cue register as gotAwayLine.
+    earlyReelLine: 'You reel in too soon. Nothing had taken the bait.',
     // Base tool tier gating (Professions 2.0). The sim's gatherDenied
     // SimEvent and the node hover tooltip are both text-free at the source:
     // every line here is composed client-side off structured fields, keyed per
@@ -3376,7 +3420,30 @@ export const hudChromeStrings = {
     // aria is the localized craft name (craftName above).
     dialogOption: 'Crafting',
     dialogOptionAria: 'Open the crafting window for {craft}',
-    craft: 'Craft',
+    // Craft Cast System Phase 2: button label while this recipe's cast runs.
+    crafting: 'Crafting',
+    // Phase 3 batch craft: primary action with the row qty, and mats-limited max.
+    create: 'Create',
+    createAll: 'Create All',
+    createAllAria: 'Create the maximum number of this recipe from materials held',
+    // Qty stepper group for one recipe row.
+    qtyRowAria: 'Craft quantity',
+    qtyDecreaseAria: 'Decrease craft quantity, currently {count}',
+    qtyIncreaseAria: 'Increase craft quantity, currently {count}',
+    qtyValueAria: 'Craft quantity, {count}',
+    // Batch progress on the in-window strip ({remaining} / {total} localized).
+    batchRemaining: '{remaining} of {total} remaining',
+    batchRemainingAria: '{remaining} of {total} crafts remaining',
+    // Compact row chip for expected cast time ({seconds} is a localized number).
+    durationChip: '{seconds}s',
+    // Accessible duration line (aria + tooltip); {seconds} is a localized number.
+    durationAria: 'Cast time: {seconds} seconds',
+    // In-window progress strip accessible name.
+    progressAria: 'Craft progress',
+    // Polite live-region lines for cast start / complete / cancel.
+    announceStart: 'Crafting {name}',
+    announceComplete: 'Finished crafting {name}',
+    announceCancel: 'Crafting cancelled',
     reagentsNeeded: 'Requires:',
     reagentLine: '{name} x{have}/{required}',
     // The fine-substitution suffix (the UX pass): appended to a reagent line
@@ -3479,8 +3546,10 @@ export const hudChromeStrings = {
       loom: 'Loom',
       toolworks: 'Toolworks',
     },
-    // #1301: denied because the rolling craft-output window is full.
-    throttled: 'You are crafting too quickly. Wait a moment and try again.',
+    // Craft Cast System: already casting or consuming when craft_item arrives.
+    // Cast duration paces craft-family actions (busy is the concurrent-cast
+    // deny; the retired 'throttled' wire reason renders this same copy).
+    busy: 'You are busy.',
     // #1299: the recipe exists but this player has not learned it yet.
     recipeNotLearned: 'You have not learned that recipe yet.',
     // #2350: denied because the output cannot fit the bags, even after the
@@ -3582,9 +3651,8 @@ export const hudChromeStrings = {
   // disenchant / apply-enchant / salvage commands (enchanting_view.ts maps each
   // text-free SimEvent to one of these), the destroy-confirm copy (a stronger
   // body when the copy consumed is special), and the Apply Enchant picker chrome.
-  // Each throttled key names ITS OWN action: the 10-per-60s throttle is shared
-  // with crafting and gathering, so a generic "crafting is busy" line would
-  // mis-attribute the deny.
+  // Craft Cast System Phase 5: concurrent-cast denies use per-action busy keys
+  // (cast duration paces; the shared "too quickly" quota is retired).
   enchanting: {
     // The SOLE player-visible lines for these actions (#2430). The grant hub's
     // "You receive:" lines no longer print for a disenchant or a salvage yield
@@ -3611,9 +3679,11 @@ export const hudChromeStrings = {
     notHeld: 'You do not have that item.',
     notDisenchantable: 'You cannot disenchant that.',
     notSalvageable: 'You cannot salvage that.',
-    disenchantThrottled: 'You are disenchanting too quickly. Wait a moment and try again.',
-    salvageThrottled: 'You are salvaging too quickly. Wait a moment and try again.',
-    enchantThrottled: 'You are enchanting too quickly. Wait a moment and try again.',
+    // Craft Cast System Phase 4/5: cast busy gate when another cast is already
+    // running (the retired 'throttled' wire reason renders the same copy).
+    disenchantBusy: 'You are busy.',
+    salvageBusy: 'You are busy.',
+    enchantBusy: 'You are busy.',
     enchantWrongSlot: 'That enchant cannot be applied to that item.',
     enchantUnknown: 'That enchant does not exist.',
     enchantInsufficient: 'You do not have the materials for that enchant.',
@@ -3954,6 +4024,7 @@ export const hudChromeStrings = {
       soul_rend: 'Soul Rend (marked players must spread and be healed)',
       deathless_rage: 'Deathless Rage (interrupted at the wardstones)',
       wardstones: 'Wardstone channels (phase transition)',
+      dread_curse: 'Dread Curse (heroic only, stacking tank-swap debuff)',
     },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,

@@ -314,8 +314,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En fast avgift per receptsteg, uttagen en gång när en mästare lär ut det; varje steg i tabellen nedan är i bruk idag, från de gratis startrecepten till verktygsmakarens spölektioner högst upp.',
   'guide.profPages.econ.provenanceBody':
     'Vissa föremål bär ett namn. För muspekaren över ett så säger verktygstipset Samlat av den och den på ett råmaterial, eller Skapad av den och den på en färdig pjäs: samma märke, formulerat efter hur föremålet blev till. En signatur är en del av föremålet självt, följer med det genom handel, banken, posten, Världsmarknaden och till och med ett återköp hos en handlare, och bleknar aldrig.\n\nInsamling signerar sitt bästa arbete automatiskt: varje skörd som rullar sällsynt eller bättre anländer signerad, och sällsynta fynd signerar hela sitt femfaldiga vindfall. En lycklig rullning vid en kroppsskörd signerar sitt utbyte där familjen inte har något exemplar att ge, och där den har det hålls utbytet enkelt och det signerade orörda exemplaret präglas bredvid. Hantverk signerar längs samma linje: varje kopia av ett resultat på sällsynt eller bättre präglas signerad, och ett mästerverk signerar alltid, oavsett kvalitet, så den finaste versionen av vilken pjäs som helst namnger alltid sin tillverkare. Det enda som kan kosta dig en signatur är en full väska: en signerad enhet behöver en egen plats att landa på, eller en signerad stapel som matchar.\n\nEn stapel föremål delar en enda identitet, så två kopior slås samman bara när varje märke matchar exakt: samma föremål, samma signerare, samma mästerverksegenskaper, samma förtrollning, samma band. En signerad stock går aldrig in i en enkel hög åt något håll (en sammanslagning skulle sudda ut någons namn), men identiska laster slås samman med glädje, så tjugo malm signerade av samma samlare sitter i en enda stapel och ett vindfall trasar inte sönder dina väskor.\n\nSignaturer betalar tillbaka till hantverkare: att hålla vilken signerad kopia som helst av ett reagens som krävs vid bänken, oavsett vem som signerat den, lägger till 2 procentenheters mästerverkschans, och att hålla ett reagens signerat av din egen hand skär ner det reagensets krävda antal med ett (aldrig under ett). Ditt eget signerade arbete på sällsynt eller bättre fortsätter till och med lära dig, i dag enbart genom flaskan: drick en dryck du signerat och ett litet sipprande av färdighet flyter tillbaka till hantverket som bryggde den, så länge det hantverket är ett av dina aktiva huvudyrken.',
-  'guide.profPages.econ.throttleBody':
-    'Produktionen har ett tak: hantverkande, avförtrollning, förtrollning, bärgning och uppladdningar av verktygseffekter delar på en enda budget om {actions} lyckade åtgärder i varje {seconds} sekunder långt fönster. Ett nekat försök kostar ingenting och drar ingen budget. Du kommer aldrig att känna av den i normalt spel; den finns för att en maxad specialist med full bank inte ska kunna översvämma Marknaden, oavsett skicklighet eller lager.',
   'guide.profPages.faq.a4':
     'Du fick ett vindfall. Ungefär 1 skörd av 90 utlöser en sällsynt insamlingshändelse (urgammalt hjärtved på ett träd, en oskadd åder i malm, en månlyst blomma bland örter): den femdubblar utbytet, signerar varje enhet med ditt namn och kungör fyndet för hela zonen. Ett sällsynt eller bättre kvalitetsslag på en vanlig skörd signerar också utbytet.\n\nSignerade material är värda att spara eller sälja dyrt: att hålla vilken signerad kopia som helst av ett nödvändigt reagens vid bänken lägger till 2 procentenheter på mästerverkschansen. Kom bara ihåg att de bara staplas med identiskt signerade kopior, så de tar en egen väskplats.',
   'guide.profPages.faq.a6':
@@ -692,7 +690,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Samlare, trofeer, och priset pa en historia',
   'guide.profPages.econ.collectorsBody':
     'Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.',
-  'guide.profPages.econ.throttleHeading': 'Atgärdsbegränsningen',
   'guide.profPages.econ.doctrineHeading': 'Spelare handlar med spelare',
   'guide.profPages.econ.doctrineBody':
     'Hantverksekonomin är byggd på en idé: spelare försörjer spelare. Samlare matar hantverkare, hantverkare matar korsfarare och raidare, och avbrytare matar förtrollare, med handlare och stationsmästare på kanterna för att ta in skräp och mynt snarare än att konkurrera med dig. Om du vill tjäna pengar på ett yrke är din kund en person: lär dig vad andra spelare bränner igenom, prissätt mot Världsmarknaden, och behandla NPC-systemen som ett golv under dina priser, inte som marknaden själv.\n\nTillverkad utrustning är inställd för att ligga under raidgolvet: även ett mästerverk är alltid bara en kvalitetsnivå över sitt recept, aldrig förbi legendarisk, och dess statbudget stannar under raidlootbandet. Smedjan gör dig redo för det svåraste innehållet; den ersätter det inte. Det håller hantverkare, raidare och marknaden i en stabil triangel: raidfynd förblir aspirationsbaserade, och tillverkade pjäser förblir den bästa utrustning pengar faktiskt kan köpa.',
@@ -1130,6 +1127,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Heroisk bonus, ett av dessa faller alltid:',
   'hudChrome.finder.lootMaybe': 'Högst ett av dessa kan falla:',
   'hudChrome.finder.mech.deathless_rage': 'Dödsfri vrede (avbryts vid väktarstenarna)',
+  'hudChrome.finder.mech.dread_curse':
+    'Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Dödsstalkarens huggsving (frontalt huggsving)',
   'hudChrome.finder.mech.enrage': 'Rasar vid låga livspunkter',
   'hudChrome.finder.mech.grave_cleaver': 'Grav-klyvare (frontalt huggsving)',
@@ -2364,6 +2363,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Vänlig',
   'hudChrome.mobTooltip.hostile': 'Fientlig',
   'hudChrome.mobTooltip.levelFamily': 'Nivå {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elit',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Förstärkningar på spelarramen',
   'hudChrome.options.playerFrameScale': 'Spelarramens skala',
   'hudChrome.options.showDailyRewardsChest': 'Visa kistan för dagliga belöningar',
@@ -6609,6 +6610,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.resetButtons': 'Återställ knapplayout',
   'hudChrome.controller.title': 'Handkontroll',
   'hudChrome.controller.vibration': 'Vibration',
+  'hudChrome.emoteEditor.close': 'Stäng gester',
   'hudChrome.emoteEditor.done': 'Klar',
   'hudChrome.emoteEditor.title': 'Gester',
   'hudChrome.emoteWheel.edit': 'Redigera',
@@ -8131,7 +8133,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Allt på den här sidan lever i spelet: tryck på Esc för att öppna alternativen. Menyn öppnas på en Översikt av fästa väsentligheter, med kategorierna på en rad bredvid: inställningarna nedan finns under Grafik, Gränssnitt och Tillgänglighet i Skärm-gruppen, och Prestandaöverlägget under System. Ännu snabbare: skriv in ett namn i sökrutan högst upp och hoppa direkt dit.',
   'guide.settingsPage.whyLabel': 'Varför det fungerar:',
   'hudChrome.crafting.close': 'Nära hantverk',
-  'hudChrome.crafting.craft': 'Hantverk',
   'hudChrome.crafting.craftedToast': 'Tillverkad: {name}',
   'hudChrome.crafting.empty': 'Inga recept kända än.',
   'hudChrome.crafting.insufficientMaterials': 'Du har inte materialet för det.',
@@ -8225,7 +8226,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Ökar Intellekt med {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Ökar Uthållighet med {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Du har inte lärt dig det receptet än.',
-  'hudChrome.crafting.throttled': 'Du tillverkar för snabbt. Vänta ett ögonblick och försök igen.',
   'hudChrome.mobile.chatPlaceholder': 'Säg något...',
   'hudChrome.mobile.hideKeyboard': 'Dölj tangentbordet',
   'hudChrome.unitFrame.partyChip': 'Grupp',
@@ -10050,7 +10050,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Om du byter svårighetsgrad medan gruppen fortfarande har hävdade rundor ligger de gamla anspråken kvar en stund. Gruppledaren kan släppa dem direkt genom att välja Återställ alla instanser i menyn på sitt eget porträtt eller skriva /dungeon reset. Svårighetsgraden måste faktiskt ha ändrats, ingen levande eller fallen får vara kvar inuti och en kort väntetid skiljer återställningarna åt. Vid dörren på fel svårighetsgrad varnar spelet innan starten. Raiden återställs aldrig så här; dess egna låsningsregler gäller.',
   'guide.dungeonsPage.wildheartBody':
-    'En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att möta Zulgar.',
+    'En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att se vem som väntar på toppen.',
   'guide.gear.itemLevelBody':
     'Slå på Visa föremålsnivå i alternativen för att snabbt jämföra två delar. Utrustning med känd källa, från fiender, uppdrag och hantverksyrken, visar då en föremålsnivå: ett enda tal som ungefär anger styrkan utifrån ursprunget och gör förbättringar jämförbara även mellan olika platser. Delar utan sådan källa, som enkla handelsvaror och startutrustning, visar ingen nivå; ett saknat tal är normalt.',
   'hudChrome.auraEffect.battleStance': 'Stridsställning: 10% mer raserigenerering',
@@ -10743,6 +10743,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Förtrollning Halsband - Rörlighet',
   'hudChrome.enchantName.enchant_neck_intellect': 'Förtrollning Halsband - Intelligens',
   'hudChrome.enchantName.enchant_neck_spirit': 'Förtrollning Halsband - Ande',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Förtrollning Bi-hand - Uthållighet',
   'hudChrome.enchantName.enchant_ring_agility': 'Förtrollning Ring - Rörlighet',
   'hudChrome.enchantName.enchant_ring_intellect': 'Förtrollning Ring - Intelligens',
   'hudChrome.enchantName.enchant_ring_spirit': 'Förtrollning Ring - Ande',
@@ -10765,13 +10766,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger arkanmaterial. Det kan inte ångras.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Avförtrylla {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Du avförtrollar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.disenchantedLine': 'Du avförtrollar {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Du förtrollar {item} med {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Du har inte materialet för den förtrollningen.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Du förtrollar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.enchantUnknown': 'Den förtrollningen finns inte.',
   'hudChrome.enchanting.enchantWrongSlot':
     'Den förtrollningen kan inte appliceras på det föremålet.',
@@ -10786,7 +10783,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Detta förstör en särskild kopia av {item} (signerad, mästerverk eller förtrollad) och ger hantverksmaterial. Det kan inte ångras.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Bärga {item}?',
-  'hudChrome.enchanting.salvageThrottled': 'Du bärgar för snabbt. Vänta en stund och försök igen.',
   'hudChrome.enchanting.salvagedLine': 'Du bärgar {item}.',
   'hudChrome.enchanting.targetTitle': 'Välj ett föremål att förtrylla',
   'hudChrome.gathering.biteLine': 'Något nappar på betet!',

@@ -15,7 +15,10 @@ import { WEAPON_SKINS, type WeaponSkinDef } from '../../sim/content/weapon_skins
 
 export interface SkinAttackClips {
   clips: readonly string[];
-  timeScale: number;
+  /** Omitted to keep the visual's own `attackTimeScale`. A substitution that
+   *  names the clip a rig ALREADY authors (the ranged shot on the hunter) must
+   *  not also re-time it, or applying a skin would change the shot's speed. */
+  timeScale?: number;
 }
 
 /** Typed renderer-event correlation for player ranged attacks. The launch cue
@@ -40,11 +43,32 @@ const BOW_ATTACK: SkinAttackClips = {
   timeScale: 1.0,
 };
 
-// Every clip a displayed weapon skin can substitute for the authored attack.
-// CharacterVisual binds these alongside the def's own clip names; a rig that
-// does not ship them (no animUrls entry) simply skips the absent names, so
-// only the hunter pays the extra action.
-export const SKIN_ATTACK_CLIP_NAMES: readonly string[] = ['Bow_Draw_Shot'];
+// Crossbow handling (real crossbows and the bow-slot guns that aim like them)
+// asks for the KayKit shoulder-aim by NAME rather than leaning on the rig's
+// authored attack. On the hunter that IS the authored attack, so this resolves
+// to the same clip at the same speed (timeScale omitted above). It matters on
+// every OTHER body that can display a ranged skin: the Combat Mech authors a
+// melee chop, and both rigs ship 2H_Ranged_Shoot in their GLB, so naming it
+// here is what makes the mech shoulder the weapon instead of clubbing with it.
+const RANGED_ATTACK: SkinAttackClips = {
+  clips: ['2H_Ranged_Shoot'],
+};
+
+// Every clip a displayed weapon skin can substitute for the authored attack or
+// cast pose.
+// CharacterVisual binds these alongside the def's own clip names, which reaches
+// clips the rig's ClipMap never names (Bow_Draw_Hold on the hunter,
+// 2H_Ranged_Shoot on the mech). A rig that ships none simply binds no action,
+// and the pick/base fallbacks keep its authored animation.
+/** The static full-draw pose the cast state holds (bow_hold_anim.glb, built by
+ *  scripts/build_bow_hold_anim.mjs by resampling the draw's own hold window). */
+const BOW_CAST_CLIP = 'Bow_Draw_Hold';
+
+export const SKIN_ATTACK_CLIP_NAMES: readonly string[] = [
+  'Bow_Draw_Shot',
+  BOW_CAST_CLIP,
+  '2H_Ranged_Shoot',
+];
 
 /** How a ranged skin is held and fired: its weapon type, unless the def
  *  carries a `handling` override (a bow-slot gun aims like a crossbow). */
@@ -54,10 +78,60 @@ export function weaponSkinHandling(skin: WeaponSkinDef): string {
 
 /** The attack-clip override for a displayed weapon skin, or null to keep the
  *  visual's authored attack. Keyed off the skin's HANDLING, not its store
- *  slot: a bow-slot skin with crossbow handling keeps the shoulder-aim. */
+ *  slot: a bow-slot skin with crossbow handling keeps the shoulder-aim. Melee
+ *  skins never substitute, so a sword skin swings whatever the rig authors. */
 export function weaponSkinAttackClips(weaponSkinId: string | null): SkinAttackClips | null {
   const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
-  return skin && weaponSkinHandling(skin) === 'bow' ? BOW_ATTACK : null;
+  if (!skin) return null;
+  const handling = weaponSkinHandling(skin);
+  if (handling === 'bow') return BOW_ATTACK;
+  return handling === 'crossbow' ? RANGED_ATTACK : null;
+}
+
+/** The substitution above, resolved against the clips a RIG actually bound.
+ *  `has` answers whether a clip name resolved to a live action on this visual.
+ *
+ *  Only the hunter ships bow_anims.glb (the one animUrls entry in the
+ *  manifest), so on any other rig displaying a bow skin, Bow_Draw_Shot is
+ *  never bound. Substituting it there is worse than not substituting at all:
+ *  the clip list REPLACES the authored attack, and playOneShot no-ops on a
+ *  missing action, so the body plays nothing at all when it swings. The
+ *  Combat Mech is the live case, being the one body that shows a hunter's
+ *  equipped weapon. Returning null hands the caller back its authored attack.
+ *
+ *  All-or-nothing per skin: a partially-bound list would play a subset of an
+ *  authored sequence, which is a different animation, not a degraded one. */
+export function pickSkinAttackClips(
+  weaponSkinId: string | null,
+  has: (clip: string) => boolean,
+): SkinAttackClips | null {
+  const spec = weaponSkinAttackClips(weaponSkinId);
+  if (!spec) return null;
+  return spec.clips.every(has) ? spec : null;
+}
+
+/** The clip the CAST base state should hold while this skin is displayed, or
+ *  null to keep the visual's authored cast.
+ *
+ *  Casting is a HELD state, not a one-shot, and every class takes `Spellcasting`
+ *  from the shared kaykit() ClipMap. That is a caster's arm-circling gesture, so
+ *  a hunter part-way through a cast-time shot (Long Draw, castTime 3.0) looked
+ *  like a mage waving at a bow. A drawn bow holds the draw instead.
+ *
+ *  Keyed off HANDLING like the attack substitution: a crossbow (and a bow-slot
+ *  gun, which aims like one) is shouldered rather than drawn, so it keeps the
+ *  authored cast until a pose exists for it. */
+export function weaponSkinCastClip(
+  weaponSkinId: string | null,
+  castingAbility: string | null,
+): string | null {
+  // Gated on the same drawn-shot allowlist the aim pin uses. Handling alone is
+  // not enough: a bow skin is a bow during tame_beast too, and holding a full
+  // draw through a six-second beast taming is the POSE half of the bug
+  // isDrawnShotCast prevents. Reported by review on PR 2941.
+  if (!isDrawnShotCast(castingAbility)) return null;
+  const skin = weaponSkinId ? WEAPON_SKINS[weaponSkinId] : null;
+  return skin && weaponSkinHandling(skin) === 'bow' ? BOW_CAST_CLIP : null;
 }
 
 /** Cast-time abilities that are a DRAWN SHOT, so a bow should be held aimed

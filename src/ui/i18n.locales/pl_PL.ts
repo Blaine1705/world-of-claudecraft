@@ -317,8 +317,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Jedna stała opłata za szczebel przepisów, pobierana raz, gdy mistrz go naucza; każdy szczebel z poniższej tabeli jest dziś w żywym użyciu, od darmowych przepisów startowych po lekcje wędek u wytwórcy narzędzi na samej górze.',
   'guide.profPages.econ.provenanceBody':
     'Niektóre przedmioty noszą imię. Najedź na taki, a dymek powie Zebrane przez kogoś tam na surowym materiale albo Stworzone przez kogoś tam na gotowym wyrobie: ten sam znak, ubrany w słowa zależnie od tego, jak przedmiot powstał. Podpis jest częścią samego przedmiotu, jedzie z nim przez wymiany, bank, pocztę, Rynek Świata, a nawet odkup u sprzedawcy, i nigdy nie blednie.\n\nZbieractwo podpisuje swoją najlepszą pracę automatycznie: każdy zbiór, który wylosuje rzadki lub lepszy, przychodzi podpisany, a rzadkie znaleziska podpisują cały swój pięciokrotny urobek. Szczęśliwy rzut przy zbiorze ze zwłok podpisuje plon tam, gdzie dana rodzina nie ma okazu do oddania, a tam, gdzie ma, zostawia plon zwykły i wybija obok niego podpisany nieskazitelny okaz. Wytwarzanie podpisuje wedle tej samej linii: każda kopia wyniku rzadkiego lub lepszego wybija się podpisana, a arcydzieło podpisuje się zawsze, niezależnie od swojej jakości, więc najlepsza wersja każdego elementu zawsze wymienia swojego twórcę. Jedyne, co może kosztować cię podpis, to pełna torba: podpisana sztuka potrzebuje własnego miejsca albo pasującego podpisanego stosu, w którym może wylądować.\n\nStos przedmiotów dzieli jedną tożsamość, więc dwie kopie łączą się tylko wtedy, gdy każdy znak zgadza się dokładnie: ten sam przedmiot, ten sam podpisujący, te same statystyki arcydzieła, to samo zaklęcie, ta sama więź. Podpisana kłoda nigdy nie dołącza do zwykłej sterty w żadną stronę (łączenie wymazałoby czyjeś imię), ale identyczne ładunki łączą się chętnie, więc dwadzieścia rud podpisanych przez tego samego zbieracza siedzi w jednym stosie, a urobek nie szatkuje ci toreb.\n\nPodpisy oddają rzemieślnikom z nawiązką: trzymanie przy stole dowolnej podpisanej kopii potrzebnego reagentu, obojętne kto ją podpisał, dodaje 2 punkty procentowe szansy na arcydzieło, a trzymanie reagentu podpisanego twoją własną ręką obniża wymaganą ilość tego reagentu o jeden (nigdy poniżej jednego). Twoja własna podpisana praca rzadka lub lepsza nawet dalej cię uczy, dziś wyłącznie przez butelkę: wypij miksturę, którą podpisałeś, a mały strumyczek umiejętności popłynie z powrotem do rzemiosła, które ją uwarzyło, o ile to rzemiosło jest jedną z twoich aktywnych głównych specjalizacji.',
-  'guide.profPages.econ.throttleBody':
-    'Produkcja ma sufit: wytwarzanie, rozkładanie zaklęć, zaklinanie, odzyskiwanie i ładowanie efektów narzędzi dzielą jeden budżet {actions} udanych akcji w każdym oknie o długości {seconds} sekund. Odrzucona próba nic nie kosztuje i nie zużywa budżetu. W normalnej grze nigdy tego nie poczujesz; istnieje po to, by wyspecjalizowany rzemieślnik z pełnym bankiem nie zalał Rynku, niezależnie od swojej umiejętności i zapasów.',
   'guide.profPages.faq.a4':
     'Trafiła ci się gratka. Mniej więcej 1 zbiór na 90 wyzwala rzadkie zdarzenie zbierackie (starożytne twarde drewno na drzewie, pierwotna żyła w rudzie, rozkwitły w blasku księżyca kwiat wśród ziół): mnoży plon pięć razy, podpisuje każdą jednostkę twoim imieniem i ogłasza znalezisko całej strefie. Rzut na rzadką lub lepszą jakość przy zwykłym zbiorze również podpisuje plon.\n\nPodpisane materiały warto zachować albo sprzedać drogo: trzymanie przy warsztacie dowolnej podpisanej kopii potrzebnego reagentu dodaje 2 punkty procentowe do szansy na arcydzieło. Pamiętaj tylko, że łączą się w stos wyłącznie z identycznie podpisanymi kopiami, więc zajmują własny slot w torbie.',
   'guide.profPages.faq.a6':
@@ -692,7 +690,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Kolekcjonerzy, trofea i cena historii',
   'guide.profPages.econ.collectorsBody':
     'Sprzedawcy są ślepi na pochodzenie: podpisany przedmiot sprzedaje się NPC za dokładnie jego zwykłą cenę. Premia za podpis istnieje wyłącznie między graczami, co sprawia, że jest właśnie interesująca: stos przypadkowo znalezionej rudy podpisany przez sławnego zbieracza, Najlepszy Kawałek ze szczęśliwego zbioru, mistrzowskie ostrze z imieniem kowala, który już dawno skończył grę, wszystko kosztuje tyle, ile czyjś sentyment mówi, że jest warte.\n\nKsięga Czynów opiera się na tym samym instynkcie: Nieskażona Żyła, Pradawne Drzewo Serca, Księżycowy Kwiat, Doskonały Okaz i Przebłysk Nadziei to znaki kolekcjonerskie bez Renomy, które istnieją wyłącznie po to, by udowodnić, że pewien moment ci się przydarzył. Zachowaj przedmiot, który przyniósł czyn, a będziesz mieć pokwitowanie. Żadna z tych rzeczy nie daje mocy; proweniencja nie kupuje statystyk i nie wygrywa walk, to papierowy ślad gry po dobrych dniach.',
-  'guide.profPages.econ.throttleHeading': 'Ogranicznik akcji',
   'guide.profPages.econ.doctrineHeading': 'Gracze handlują z graczami',
   'guide.profPages.econ.doctrineBody':
     'Gospodarka wytwarzania opiera się na jednej idei: gracze zaopatrują graczy. Zbieracze karmią rzemieślników, rzemieślnicy karmią poszukiwaczy zadań i rajdowców, a rozkładacze karmią zaklinaczy, a sprzedawcy i mistrzowie stacji stoją na krawędziach, by pochłaniać rupiecie i monety, a nie konkurować z tobą. Jeśli chcesz zarabiać na profesji, twoim klientem jest człowiek: dowiedz się, co inni gracze zużywają, wyceniaj względem Rynku Świata i traktuj systemy NPC jako dolną granicę twoich cen, a nie jako sam rynek.\n\nWytwarzany ekwipunek jest dostrojony, by pozostawać poniżej progu rajdowego: nawet arcydzieło jest zawsze tylko o jeden poziom jakości powyżej swojego przepisu, nigdy nie osiągając legendarnego, a jego budżet statystyk pozostaje poniżej pasma łupów rajdowych. Kuźnia przygotowuje cię na najtrudniejszą zawartość; nie zastępuje jej. To utrzymuje rzemieślników, rajdowców i rynek w stabilnym trójkącie: łupy rajdowe pozostają aspiracyjne, a wyroby rzemieślnicze pozostają najlepszym ekwipunkiem, jaki można realnie kupić za pieniądze.',
@@ -1201,6 +1198,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': 'Co najwyżej jeden z tych może wypaść:',
   'hudChrome.finder.mech.deathless_rage':
     'Nieśmiertelna Furia (przerywana przy kamieniach wardowych)',
+  'hudChrome.finder.mech.dread_curse':
+    'Klątwa Grozy (tylko heroiczna, kumulowany efekt do zmiany tanka)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Kosiące Cięcie Łowcy Śmierci (frontalne cięcie)',
   'hudChrome.finder.mech.enrage': 'Wpada w szał przy niskim zdrowiu',
   'hudChrome.finder.mech.grave_cleaver': 'Grobowe Cięcie (frontalne cięcie)',
@@ -2526,6 +2525,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Przyjazny',
   'hudChrome.mobTooltip.hostile': 'Wrogi',
   'hudChrome.mobTooltip.levelFamily': 'Poziom {level}: {family}',
+  'hudChrome.mobTooltip.elite': 'Elita',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.options.aurasOnPlayerFrame': 'Wzmocnienia na ramce gracza',
   'hudChrome.options.playerFrameScale': 'Skala ramki gracza',
   'hudChrome.options.showDailyRewardsChest': 'Pokaż skrzynię codziennych nagród',
@@ -6762,6 +6763,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.harvestTooltip':
     'Zbiera zaznaczone komponenty. Każde zwloki można zebrać raz, pierwszemu podejdzie. Nie zabiera łupów.',
   'hudChrome.corpseHarvest.title': 'Zbieranie',
+  'hudChrome.emoteEditor.close': 'Zamknij emotki',
   'hudChrome.emoteEditor.done': 'Gotowe',
   'hudChrome.emoteEditor.title': 'Emotki',
   'hudChrome.emoteWheel.edit': 'Edytuj',
@@ -6803,6 +6805,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Zaklinanie naszyjnika - Zwinność',
   'hudChrome.enchantName.enchant_neck_intellect': 'Zaklinanie naszyjnika - Intelekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Zaklinanie naszyjnika - Duch',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Zaklinanie ręki dodatkowej - Wytrzymałość',
   'hudChrome.enchantName.enchant_ring_agility': 'Zaklinanie pierścienia - Zwinność',
   'hudChrome.enchantName.enchant_ring_intellect': 'Zaklinanie pierścienia - Intelekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Zaklinanie pierścienia - Duch',
@@ -6824,13 +6827,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały arkaniczne. Nie można tego cofnąć.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Rozbroić {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Rozbrajasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.disenchantedLine': 'Rozbrajasz {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Zaklinasz {item} za pomocą {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Nie masz materiałów na to zaklinanie.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Zaklinasz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.enchantUnknown': 'To zaklinanie nie istnieje.',
   'hudChrome.enchanting.enchantWrongSlot':
     'To zaklinanie nie może być zastosowane do tego przedmiotu.',
@@ -6845,8 +6844,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'To niszczy specjalną kopię {item} (podpisaną, mistrzowską lub zaklinowaną) i daje materiały rzemieślnicze. Nie można tego cofnąć.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Odzyskać {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Odzyskujesz zbyt szybko. Poczekaj chwilę i spróbuj ponownie.',
   'hudChrome.enchanting.salvagedLine': 'Odzyskujesz {item}.',
   'hudChrome.enchanting.targetTitle': 'Wybierz przedmiot do zaklinania',
   'hudChrome.keybinds.emoteWheel': 'Koło emotek',
@@ -8355,7 +8352,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wszystko na tej stronie jest obecne w grze: naciśnij Esc, aby otworzyć opcje. Menu otwiera się na Przeglądzie przypiętych najważniejszych ustawień, z kategoriami na listwie obok: opisane niżej ustawienia znajdziesz w grupie Ekran, pod Grafiką, Interfejsem i Dostępnością, a Nakładkę wydajności pod Systemem. Jeszcze szybciej: wpisz nazwę w pole wyszukiwania na górze i przejdź prosto do niej.',
   'guide.settingsPage.whyLabel': 'Dlaczego to działa:',
   'hudChrome.crafting.close': 'Zamknij rzemiosło',
-  'hudChrome.crafting.craft': 'Rzemiosło',
   'hudChrome.crafting.craftedToast': 'Wykonane: {name}',
   'hudChrome.crafting.empty': 'Nie są jeszcze znane żadne przepisy.',
   'hudChrome.crafting.insufficientMaterials': 'Nie masz na to materiałów.',
@@ -8449,7 +8445,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zwiększa Intelekt o {pct}%',
   'hudChrome.auraEffect.increasePct.sta': 'Zwiększa Wytrzymałość o {pct}%',
   'hudChrome.crafting.recipeNotLearned': 'Nie nauczyłeś się jeszcze tego przepisu.',
-  'hudChrome.crafting.throttled': 'Wytwarzasz zbyt szybko. Zaczekaj chwilę i spróbuj ponownie.',
   'hudChrome.mobile.chatPlaceholder': 'Powiedz coś...',
   'hudChrome.mobile.hideKeyboard': 'Ukryj klawiaturę',
   'hudChrome.unitFrame.partyChip': 'Drużyna',
@@ -10248,7 +10243,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Jeśli zmienisz trudność, gdy grupa wciąż ma zajęte podejścia, stare przypisania pozostaną przez pewien czas. Przywódca może porzucić je natychmiast, wybierając Resetuj wszystkie instancje w menu własnego portretu albo wpisując /dungeon reset. Trudność musi faktycznie zostać zmieniona, wewnątrz nie może pozostać nikt żywy ani poległy, a kolejne resety dzieli krótki czas odnowienia. Przy wejściu na złej trudności gra ostrzeże przed rozpoczęciem. Rajdu nie resetuje się w ten sposób; obowiązują jego własne zasady blokady.',
   'guide.dungeonsPage.wildheartBody':
-    'Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by stawić czoła Zulgarowi.',
+    'Przesiąknięta deszczem dżunglowa kaldera, gdzie dwa wzniesione szlaki łowieckie okrążają jadeitowy cenote. Przemierz nory bestii i ruiny przodków, po czym wspnij się na rytualną piramidę, by zobaczyć, kto czeka na szczycie.',
   'guide.gear.itemLevelBody':
     'Aby szybko porównać dwa przedmioty, włącz w opcjach Pokaż poziom przedmiotu. Wyposażenie o znanym źródle, zdobyte z wrogów, zadań i profesji rzemieślniczych, pokazuje wtedy poziom przedmiotu: jedną liczbę przybliżającą jego moc na podstawie pochodzenia, co ułatwia ocenę ulepszeń nawet między różnymi miejscami. Przedmioty bez takiego źródła, jak podstawowe towary kupców i sprzęt startowy, nie pokazują poziomu; brak liczby jest normalny.',
   'hudChrome.auraEffect.battleStance': 'Postawa bojowa: generowanie wściekłości zwiększone o 10%',

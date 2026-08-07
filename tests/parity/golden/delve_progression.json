@@ -10,13 +10,13 @@
     "companionUpgrade rank bump + refreshDelveDaily day rollover"
   ],
   "draws": 3,
-  "drawDigest": "aec42e04",
+  "drawDigest": "392af441",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "79743a94",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -42,7 +42,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -148,23 +147,23 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 981,
-      "state": "d53374b1",
+      "nextId": 985,
+      "state": "31528b59",
       "events": "638383f9",
       "rng": {
         "draws": 1,
-        "digest": "a7714531"
+        "digest": "38457ea8"
       }
     },
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 981,
-      "state": "caf0776a",
+      "nextId": 985,
+      "state": "075b8498",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "aec42e04"
+        "digest": "392af441"
       },
       "label": "advanced-to-finale",
       "players": [
@@ -186,7 +185,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -302,12 +300,12 @@
     {
       "tick": 7,
       "time": 0.35,
-      "nextId": 981,
-      "state": "6d66e5aa",
+      "nextId": 985,
+      "state": "03e06c62",
       "events": "d1fea3d9",
       "rng": {
         "draws": 3,
-        "digest": "aec42e04"
+        "digest": "392af441"
       },
       "label": "shop-daily",
       "players": [
@@ -332,7 +330,6 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -453,12 +450,12 @@
     {
       "tick": 9,
       "time": 0.45,
-      "nextId": 981,
-      "state": "3bf3d997",
+      "nextId": 985,
+      "state": "3a6ea32d",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "aec42e04"
+        "digest": "392af441"
       },
       "label": "final",
       "players": [
@@ -483,7 +480,6 @@
           "copper": 100000,
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},

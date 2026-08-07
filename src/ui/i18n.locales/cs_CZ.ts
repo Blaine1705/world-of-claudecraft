@@ -308,8 +308,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Jeden pevný poplatek za každý příčel receptů, účtovaný jednou v okamžiku, kdy tě ho mistr naučí; každý příčel tabulky níže je dnes v živém provozu, od bezplatných začátečnických receptů až po lekce prutů u výrobce nástrojů na jejím vrcholu.',
   'guide.profPages.econ.provenanceBody':
     'Některé předměty nesou jméno. Najeď na takový kurzorem a popisek u suroviny řekne Sesbíráno a čí jméno, u hotového kusu Vytvořil a čí jméno: tatáž značka, jen formulovaná podle toho, jak předmět vznikl. Podpis je součástí samotného předmětu, putuje s ním přes výměny, banku, poštu, Světový trh i zpětný odkup u prodejce, a nikdy nevybledne.\n\nSběr podepisuje svou nejlepší práci automaticky: každá sklizeň, která padne vzácná nebo lepší, přichází podepsaná a vzácné nálezy podepíšou celý svůj pětinásobný výnos. Šťastný hod při sklizni z těla podepíše výnos tam, kde rodina nemá co dát jako exemplář, a tam, kde má, nechá výnos prostý a vedle něj vyrazí podepsaný nepoškozený exemplář. Výroba podepisuje po téže linii: každá kopie vzácného nebo lepšího výrobku se razí podepsaná a mistrovské dílo podepisuje vždy, ať má jakoukoli kvalitu, takže nejjemnější verze každého kusu vždy jmenuje svého tvůrce. Jediné, co tě může připravit o podpis, je plná brašna: podepsaný kus potřebuje vlastní místo nebo odpovídající podepsaný stack, kam dopadne.\n\nStack předmětů sdílí jednu identitu, takže dvě kopie se sloučí jen tehdy, když se každá značka přesně shoduje: stejný předmět, stejný podepisující, stejné statistiky mistrovského díla, stejné okouzlení, stejné pouto. Podepsaná kláda se nikdy nepřidá k prosté hromadě ani v jednom směru (sloučení by smazalo něčí jméno), ale shodné náklady se slučují s radostí, takže dvacet rud podepsaných týmž sběračem sedí v jednom stacku a nečekaný nález ti nerozseká brašny.\n\nPodpisy se řemeslníkům vracejí: držet u pracovního stolu jakoukoli podepsanou kopii potřebného reagentu, ať ji podepsal kdokoli, přidá 2 procentní body k šanci na mistrovské dílo, a držet reagent podepsaný vlastní rukou sníží požadované množství toho reagentu o jeden kus (nikdy ne pod jeden). Tvá vlastní podepsaná vzácná nebo lepší práce tě dokonce dál učí, dnes jedině skrze lahvičku: vypij lektvar, který jsi podepsal, a malá kapka dovednosti odteče zpět do řemesla, které ho uvařilo, pokud je to řemeslo jedním z tvých aktivních hlavních oborů.',
-  'guide.profPages.econ.throttleBody':
-    'Výstup má svůj strop: výroba, rozzačarování, okouzlování, rozebírání a dobíjení účinků nástrojů sdílejí jeden rozpočet {actions} úspěšných akcí v každém okně o délce {seconds} sekund. Odmítnutý pokus nic nestojí a z rozpočtu neubere nic. Při běžném hraní ho nikdy nepocítíš; existuje proto, aby vymaxovaný specialista s plnou bankou nemohl zaplavit Trh, ať už má jakoukoli dovednost nebo zásoby.',
   'guide.profPages.faq.a4':
     'Narazil jsi na nečekaný nález. Zhruba 1 sklizeň z 90 spustí vzácný sběratelský nález (prastaré jádrové dřevo na stromě, nedotčená žíla v rudě, měsíční květ mezi bylinami): pětinásobí výnos, podepíše každou jednotku tvým jménem a ohlásí nález celé zóně. Podpis přinese i vzácný nebo lepší hod na kvalitu při obyčejné sklizni.\n\nPodepsané materiály stojí za to si nechat nebo draze prodat: držení jakékoli podepsané kopie potřebné suroviny u pracovního stolu přidá 2 procentní body k šanci na mistrovské dílo. Jen pamatuj, že se skládají pouze se shodně podepsanými kopiemi, takže si drží vlastní místo v brašně.',
   'guide.profPages.faq.a6':
@@ -687,7 +685,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.collectorsHeading': 'Sběratelé, trofeje a cena příběhu',
   'guide.profPages.econ.collectorsBody':
     'Prodejci jsou slepí k původu: podepsaný předmět prodáš NPC přesně za jeho základní cenu. Příplatek za podpis existuje pouze mezi hráči, a právě to je zajímavé: hromada rudy z nečekaného nálezu podepsaná slavným sběračem, Prvotřídní výřez ze šťastné sklizně, mistrovská čepel nesoucí jméno kováře, který od té doby odešel do ústraní, všechno stojí tolik, co si paměť lidí řekne, že jsou hodné.\n\nKniha skutků vychází vstříc témuž instinktu: Nedotčená rudná žíla, Prastaré jádrové dřevo, Měsíční květ, Dokonalý exemplář a Záblesk naděje jsou sběratelské záznamy bez Věhlasu, které existují výhradně jako důkaz, že se ti něco přihodilo. Uchovej předmět, který získání skutku vynesl, a máš v rukou potvrzení. Nic z toho není výkon; původ nekupuje statistiky ani nevyhrává souboje, je to papírová stopa hry o povedených dnech.',
-  'guide.profPages.econ.throttleHeading': 'Omezení akcí',
   'guide.profPages.econ.doctrineHeading': 'Hráči obchodují s hráči',
   'guide.profPages.econ.doctrineBody':
     'Řemeslná ekonomika stojí na jediné myšlence: hráči zásobují hráče. Sběrači živí řemeslníky, řemeslníci živí hráče plnící úkoly a nájezdníky a rozebíratelé živí okouzlovatele, přičemž prodejci a správci stanic stojí na okraji, aby pohlcovali smetí a mince, nikoli aby s tebou soutěžili. Chceš-li vydělávat mince z profese, tvůj zákazník je osoba: zjisti, co ostatní hráči rychle spotřebují, porovnej ceny se Světovým trhem a chovej se k NPC systémům jako k podlaze pod svými cenami, ne jako k trhu samotnému.\n\nVybavení z řemesel je laděno tak, aby zůstávalo pod úrovní nájezdové hranice: i mistrovské dílo je vždy jen o jeden stupeň kvality nad svým receptem, nikdy ne přes legendární, a jeho rozpočet statistik zůstává pod pásmem nájezdové kořisti. Kovárna tě připraví na nejtěžší obsah; nenahrazuje ho. To udržuje řemeslníky, nájezdníky a trh ve stabilním trojúhelníku: nájezdové kusy zůstávají aspiračním cílem a řemeslné kusy nejlepším vybavením, které lze skutečně koupit za mince.',
@@ -1088,6 +1085,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootHeroic': 'Hrdinský bonus, vždy vypadne jedno z těchto:',
   'hudChrome.finder.lootMaybe': 'Může vypadnout nejvýše jeden z těchto předmětů:',
   'hudChrome.finder.mech.deathless_rage': 'Nesmrtelný hněv (přerušen u ochranných kamenů)',
+  'hudChrome.finder.mech.dread_curse':
+    'Děsivá kletba (pouze heroická, sčítající se oslabení pro střídání tanků)',
   'hudChrome.finder.mech.deathstalker_cleave': 'Sek smrtilovcovy zbraně (čelní sek)',
   'hudChrome.finder.mech.enrage': 'Zuří při nízkém zdraví',
   'hudChrome.finder.mech.grave_cleaver': 'Hrobní sekáč (čelní sek)',
@@ -4564,7 +4563,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.commissionToggleHint': 'Váže se na první postavu, která ho přijme v obchodu.',
   'hudChrome.crafting.commissionUnbound': 'Zakázkový předmět: váže se na prvního příjemce',
   'hudChrome.crafting.close': 'Zavřít výrobu',
-  'hudChrome.crafting.craft': 'Vyrobit',
   'hudChrome.crafting.craftedToast': 'Vyrobeno: {name}',
   'hudChrome.crafting.difficultyMinimal': 'Minimální zisk dovednosti',
   'hudChrome.crafting.empty': 'Zatím nejsou známy žádné recepty.',
@@ -4714,6 +4712,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.friendly': 'Přátelský',
   'hudChrome.mobTooltip.hostile': 'Nepřátelský',
   'hudChrome.mobTooltip.levelFamily': 'Úroveň {level} {family}',
+  'hudChrome.mobTooltip.elite': 'Elita',
+  'hudChrome.mobTooltip.boss': 'Boss',
   'hudChrome.raidConvert.leaderOnly': 'Na skupinu může převést jen vůdce raidu.',
   'hudChrome.raidConvert.notRaid': 'Tvoje skupina není raid.',
   'hudChrome.raidConvert.toPartyDone': 'Tvůj raid byl převeden zpět na skupinu.',
@@ -4734,6 +4734,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.questTracker.expandHint': 'Rozbalit tracker úkolů',
   'hudChrome.castBar.playerAria': 'Tvoje lišta sesílání',
   'hudChrome.castBar.targetAria': 'Lišta sesílání jednotky',
+  'hudChrome.emoteEditor.close': 'Zavřít emoty',
   'hudChrome.emoteEditor.done': 'Hotovo',
   'hudChrome.emoteEditor.title': 'Emoty',
   'hudChrome.emoteWheel.edit': 'Upravit',
@@ -8192,7 +8193,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.increasePct.int': 'Zvyšuje Intelekt o {pct} %',
   'hudChrome.auraEffect.increasePct.sta': 'Zvyšuje Výdrž o {pct} %',
   'hudChrome.crafting.recipeNotLearned': 'Tento recept ses ještě nenaučil.',
-  'hudChrome.crafting.throttled': 'Vyrábíš příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.mobile.chatPlaceholder': 'Něco napiš...',
   'hudChrome.mobile.hideKeyboard': 'Skrýt klávesnici',
   'hudChrome.unitFrame.partyChip': 'Skupina',
@@ -10025,7 +10025,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.resetBody':
     'Když změníte obtížnost, zatímco skupina stále drží přidělené průchody, staré nároky chvíli zůstanou a pak samy zmizí. Vůdce skupiny je může opustit okamžitě volbou Resetovat všechny instance v nabídce vlastního portrétu nebo příkazem /dungeon reset. Obtížnost musí být skutečně změněna, uvnitř nesmí zůstat nikdo živý ani padlý a mezi resety je krátká prodleva. U dveří na špatné obtížnosti vás hra varuje před začátkem. Raid se takto nikdy neresetuje; platí pro něj vlastní pravidla uzamčení.',
   'guide.dungeonsPage.wildheartBody':
-    'Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys čelil Zulgarovi.',
+    'Deštěm promáčená džunglová kaldera, kde dvě vyvýšené lovecké stezky obtáčejí nefritovou cenotu. Projdi doupaty šelem a troskami předků, poté vystoupej na rituální pyramidu, abys zjistil, kdo čeká na vrcholu.',
   'guide.gear.itemLevelBody':
     'Pro rychlé porovnání dvou kusů zapněte v možnostech Zobrazit úroveň předmětu. Výbava se známým původem, od nepřátel, z úkolů a řemesel, pak ukazuje úroveň předmětu: jediné číslo, které přibližně vyjadřuje sílu podle zdroje a umožňuje poznat lepší vylepšení i mezi různými sloty. Kusy bez takového původu, například základní zboží obchodníků a počáteční výbava, úroveň neukazují; chybějící číslo je normální.',
   'hudChrome.auraEffect.battleStance': 'Bojový postoj: o 10 % vyšší generování vzteku',
@@ -10700,6 +10700,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_neck_agility': 'Okouzlení náhrdelníku - Obratnost',
   'hudChrome.enchantName.enchant_neck_intellect': 'Okouzlení náhrdelníku - Intelekt',
   'hudChrome.enchantName.enchant_neck_spirit': 'Okouzlení náhrdelníku - Duch',
+  'hudChrome.enchantName.enchant_offhand_stamina': 'Okouzlení vedlejší ruky - Výdrž',
   'hudChrome.enchantName.enchant_ring_agility': 'Okouzlení prstenu - Obratnost',
   'hudChrome.enchantName.enchant_ring_intellect': 'Okouzlení prstenu - Intelekt',
   'hudChrome.enchantName.enchant_ring_spirit': 'Okouzlení prstenu - Duch',
@@ -10722,13 +10723,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.disenchantConfirmBodySpecial':
     'Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš arcanové materiály. Tuto akci nelze vrátit.',
   'hudChrome.enchanting.disenchantConfirmTitle': 'Rozzačarovat {item}?',
-  'hudChrome.enchanting.disenchantThrottled':
-    'Rozzačaruješ příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.disenchantedLine': 'Rozzačaruješ {item}.',
   'hudChrome.enchanting.enchantAppliedLine': 'Okouzlíš {item} pomocí {enchant}.',
   'hudChrome.enchanting.enchantInsufficient': 'Na toto okouzlení nemáš materiály.',
-  'hudChrome.enchanting.enchantThrottled':
-    'Okouzluješ příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.enchantUnknown': 'Toto okouzlení neexistuje.',
   'hudChrome.enchanting.enchantWrongSlot': 'Toto okouzlení nelze aplikovat na tento předmět.',
   'hudChrome.enchanting.noEnchants': 'Žádné okouzlení nepoužívá tuto reagencii.',
@@ -10742,8 +10739,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.salvageConfirmBodySpecial':
     'Tímto se zvláštní kopie {item} (podepsaná, mistrovská nebo okouzlená) zničí a získáš řemeslné materiály. Tuto akci nelze vrátit.',
   'hudChrome.enchanting.salvageConfirmTitle': 'Rozebrat {item}?',
-  'hudChrome.enchanting.salvageThrottled':
-    'Rozebíráš příliš rychle. Chvíli počkej a zkus to znovu.',
   'hudChrome.enchanting.salvagedLine': 'Rozebereš {item}.',
   'hudChrome.enchanting.targetTitle': 'Vybrat předmět',
   'hudChrome.unbind.cannotAfford': 'Na odpoutání nemáš dostatek prostředků.',

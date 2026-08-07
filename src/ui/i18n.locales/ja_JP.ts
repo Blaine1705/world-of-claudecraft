@@ -597,6 +597,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mobTooltip.hostile': '敵対',
   'hudChrome.mobTooltip.friendly': '味方',
   'hudChrome.mobTooltip.elite': 'エリート',
+  'hudChrome.mobTooltip.boss': 'ボス',
   'hudChrome.targetFrame.unlock': 'ターゲットフレームを移動',
   'hudChrome.targetFrame.lock': 'ターゲットフレームを固定',
   'hudChrome.playerFrame.unlock': 'プレイヤーフレームを移動',
@@ -817,6 +818,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'フォーカスを設定するには町にいる必要があります。',
   'hudChrome.townFocus.increaseAria': '{component}へのフォーカスを増やす',
   'hudChrome.townFocus.decreaseAria': '{component}へのフォーカスを減らす',
+  'hudChrome.townFocus.respecTierLabel': '再割り振りの速さ',
+  'hudChrome.townFocus.respecTierTimeOption': '無料（時間をかける）',
+  'hudChrome.townFocus.respecTierPartialOption': '速い（少額の費用）',
+  'hudChrome.townFocus.respecTierInstantOption': '即時（全額費用）',
+  'hudChrome.townFocus.respecCostFree': '無料',
+  'hudChrome.townFocus.respecCostLine': '{coin}と{materials}がかかります',
   'hudChrome.theme.preset': 'UIテーマ',
   'hudChrome.theme.customColors': 'カスタムカラー',
   'hudChrome.theme.reset': 'リセット',
@@ -1130,6 +1137,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'グラフィックの復旧に失敗しました。続行するにはゲームを再読み込みしてください。',
   'hudChrome.options.graphicsReload': 'ゲームを再読み込み',
   'hudChrome.options.graphicsDraftChanged': 'グラフィックの変更を適用できます。',
+  'hudChrome.options.gfxSectionQuality': '画質',
+  'hudChrome.options.gfxSectionWorld': 'ワールド詳細',
+  'hudChrome.options.gfxSectionLighting': 'ライティングとエフェクト',
+  'hudChrome.options.gfxViewDistance': '描画距離',
+  'hudChrome.options.gfxWaterQuality': '水面品質',
+  'hudChrome.options.gfxCharacterDetail': 'キャラクター詳細',
+  'hudChrome.options.gfxAmbientOcclusion': 'アンビエントオクルージョン',
+  'hudChrome.options.gfxBloom': 'ブルーム',
+  'hudChrome.options.gfxAntiAliasing': 'アンチエイリアス',
+  'hudChrome.options.gfxDynamicLights': '動的ライト',
+  'hudChrome.options.gfxParticleEffects': 'パーティクル効果',
+  'hudChrome.options.gfxHalf': '半分',
+  'hudChrome.options.gfxEffectsNote':
+    'アンビエントオクルージョン、ブルーム、アンチエイリアスはポストプロセスチェーンに依存します。「エフェクトとライティング」が低の場合、チェーンが無効になりこれらの設定は効果がありません。',
+  'hudChrome.options.gfxSectionCamera': 'カメラ',
+  'hudChrome.options.gfxSectionDisplay': '表示',
+  'hudChrome.options.gfxSectionSystem': 'システム',
+  'hudChrome.options.gfxSectionTouch': 'タッチ操作',
+  'hudChrome.options.gfxCustomNote':
+    'ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。',
   'hudChrome.options.footstepSounds': '足音',
   'hudChrome.options.interfaceSounds': 'インターフェースとフィードバック音',
   'hudChrome.options.clickFeedback': 'クリックマーカー',
@@ -2534,6 +2561,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '使用: 即座に体力を{amount}回復します。戦闘中に使用可能。クールダウン1分。',
   'itemUi.tooltip.useManaPotion':
     '使用: 即座にマナを{amount}回復します。戦闘中に使用可能。クールダウン1分。',
+  'itemUi.tooltip.useElixir':
+    '使用: {stat}が{value}上昇し、{minutes}分間持続します。戦闘中に使用可能。',
+  'itemUi.tooltip.useElixirAura':
+    '使用: {aura}の効果を得て、{minutes}分間持続します。戦闘中に使用可能。',
   'itemUi.tooltip.clickUseInstant': 'クリックして戦闘中に即使用',
   'itemUi.tooltip.clickUse': 'クリックして使用',
   'itemUi.tooltip.clickBuyback': 'クリックして買い戻す',
@@ -2662,6 +2693,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '待機中のものはありません。売上と期限切れの出品はここで受け取ります。',
   'itemUi.market.collectNote': '商人が預かっている売上と返却品です。',
   'itemUi.market.saleProceeds': '売上',
+  'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
   'itemUi.market.collectAll': 'すべて受け取る',
   'itemUi.logs.listedItem': '{item}を{money}でワールドマーケットに出品しました。',
   'itemUi.logs.sellerSold':
@@ -3315,6 +3347,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.arcane_shard.name': '鈴音のかけら',
   'entities.items.gatherers_cache.name': '採集者の貯蔵袋',
   'entities.items.artisans_eye.name': '職人の眼',
+  'entities.items.sharp_claw.name': '鋭い鉤爪',
+  'entities.items.curved_tusk.name': '曲がった牙',
+  'entities.items.pristine_claw.name': '無傷の鉤爪',
   'entities.items.linen_scrap.name': 'リネンの切れ端',
   'entities.items.fen_muster_order.name': 'フェンブリッジ召集令',
   'entities.items.mire_prowler_pelt.name': '沼の徘徊者の毛皮',
@@ -5521,6 +5556,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.compass.SE': '南東',
   'hudChrome.compass.SW': '南西',
   'hudChrome.compass.W': '西',
+  'hudChrome.emoteEditor.close': 'エモートを閉じる',
   'hudChrome.emoteEditor.done': '完了',
   'hudChrome.emoteEditor.title': 'エモート',
   'hudChrome.emotes.bow': 'お辞儀',
@@ -6044,18 +6080,23 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.groupCombat': 'ターゲットと戦闘',
   'guide.controls.groupInterface': 'インターフェース',
   'guide.controls.controllerBody':
-    'ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。',
+    'ゲームパッドにも対応しており、コントローラーのサポートは初期設定で有効になっています。左スティックで移動し、右スティックでカメラを操作し、フェイスボタンとショルダーボタンでアビリティ、ジャンプ、対話を行います。バッグのようなウィンドウを開くと画面上のポインターが表示され、ゲームメニューは十字キーとフェイスボタンで直接操作できます。ボタンの割り当て変更や、スティックのデッドゾーン、カメラ速度、振動、視点反転の調整は、オプションのコントローラー設定から行えます。ボタンをカメラのズームイン・ズームアウトに割り当てることもできます（初期状態では未割り当て）。',
   'guide.controls.controllerHeading': 'コントローラーでは',
   'guide.controls.cycleFriendly': '友好的なターゲットを順に切り替え',
+  'guide.controls.targetAuras': 'ターゲットのバフとデバフ',
   'guide.controls.gameMenu': 'ゲームメニューとオプションを開く',
   'guide.controls.groupCamera': 'カメラ',
   'guide.controls.talents': 'タレント',
+  'guide.controls.professions': '生産職',
   'guide.controls.arena': 'アリーナ',
   'guide.controls.leaderboard': 'リーダーボード',
   'guide.controls.deeds': '功績の書',
+  'guide.controls.sheathe': '武器を納刀/抜刀',
   'guide.controls.crafting': '製作',
   'guide.controls.valeCup': 'ヴェイルカップ',
+  'guide.controls.mount': '騎乗 / 降車',
   'guide.controls.calendar': 'イベントカレンダー',
+  'guide.controls.dungeonFinder': 'ダンジョンファインダー',
   'guide.controls.discord': 'Discord',
   'guide.controls.abilities':
     'アクションバーのアビリティを使用（数字キーの列。二つ目のバーはテンキーにあります）',
@@ -6347,7 +6388,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.dungeonsPage.sanctumBody':
     'ソーンピークの暗き中心。カルトの長きにわたる企てが、おぞましい頂点に達する場所です。',
   'guide.dungeonsPage.wildheartBody':
-    '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドでズルガーに挑め。',
+    '温かな雨に濡れた密林のカルデラ。翡翠色の泉を囲む二本の高い狩猟路を進み、獣の巣と祖霊の遺跡を越えて、儀式のピラミッドの頂で誰が待っているか確かめよ。',
   'guide.dungeonsPage.raidName': 'エンドコンテンツのレイド',
   'guide.dungeonsPage.raidBody':
     '封じられた王家の扉の奥で、10人用の試練が待ち受けます。複数段階の戦いと、レイド全員で力を合わせて封じねばならない不死の力です。挑む資格を勝ち取り、9人の仲間を連れて挑みましょう。',
@@ -6737,6 +6778,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.gear.slotsTitle': '装備できるもの',
   'guide.gear.soulboundBody':
     '価値ある品の多くは魂縛、つまり入手した瞬間からあなたのキャラクターに縛られています。魂縛のアイテムは取引にも郵送にも出せず、商人に売ることも、マーケットに出品することもできません。それはもうあなたの物語の一部であり、ほかの誰かが代わりに持ち運ぶことはできないのです。',
+  'guide.gear.uniqueTitle': '装備ユニーク：同じレジェンダリーは1つだけ',
+  'guide.gear.uniqueBody':
+    'レジェンダリーアイテムは装備ユニークです。キャラクターは同じレジェンダリーを同時に1つしか装備できず、そのヒロイック版も同じアイテムとして扱われます。2つ目はバッグや銀行、マーケットに置けますが、両方を同時に装備しようとすると拒否されます。ツールチップには金色の「装備ユニーク」タグが表示されるので、2つ持ちのビルドを計画する前にこのルールを確認できます。',
   'guide.gear.soulboundTitle': '魂縛：あなただけのもの',
   'guide.gear.sourcesBody':
     '序盤のアップグレードのほとんどはクエスト報酬なので、稼ぎ作業よりクエストを終わらせるほうが得です。敵は倒されると装備を落とし、町の商人は手堅い基本装備を売り、職人は採集した素材を身につけられる品へと変え、プレイヤーマーケットでは他の冒険者から買えます。そして頂の上では、二つの刻印通貨が、ほかでは見つからない装備を買わせてくれます。デルヴの番人のもとではデルヴの刻印、英雄補給係のもとでは英雄の証です。',
@@ -7454,6 +7498,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.wyrmshadow.bonus4':
     '武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。',
   'hudChrome.itemSoulbound': '魂縛',
+  'hudChrome.itemUniqueEquipped': '装備ユニーク',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
@@ -7593,7 +7638,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.dialogOption': '製作',
   'hudChrome.crafting.dialogOptionAria': '{craft}の製作ウィンドウを開く',
   'hudChrome.crafting.close': '製作を閉じる',
-  'hudChrome.crafting.craft': '製作',
   'hudChrome.crafting.reagentsNeeded': '必要素材:',
   'hudChrome.crafting.empty': '既知のレシピはありません。',
   'hudChrome.crafting.resultAria': '{name}を製作',
@@ -8568,6 +8612,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.catchLine': '{name}を釣り上げた',
   'hudChrome.gathering.biteLine': '何かが食いついた！',
   'hudChrome.gathering.gotAwayLine': '逃げられてしまった。',
+  'hudChrome.gathering.earlyReelLine': '巻き上げるのが早すぎた。まだ何も食いついていなかった。',
   'hudChrome.gathering.nodeName.ore': '鉱脈',
   'hudChrome.gathering.nodeName.wood': '立木',
   'hudChrome.gathering.nodeName.herb': '薬草の群生地',
@@ -8682,7 +8727,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'yumi.end.loss': '敗北！Yumiが倒れてしまった。',
   'hudChrome.crafting.comboRequirementUnmet':
     'その組み合わせレシピに必要な両方の生産スキルの熟練度に達していません。',
-  'hudChrome.crafting.throttled': '製作が速すぎます。少し待ってからもう一度お試しください。',
   'hudChrome.crafting.recipeNotLearned': 'そのレシピはまだ習得していません。',
   'hudChrome.crafting.noBagSpace': 'バッグに製作したアイテムを入れる空きがありません。',
   // Professions 2.0 (M16 non-Latin fills).
@@ -9258,6 +9302,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.soul_rend': 'ソウルレンド（対象は散開して回復を受ける）',
   'hudChrome.finder.mech.deathless_rage': '不死の憤怒（ウォードストーンで妨害）',
   'hudChrome.finder.mech.wardstones': 'ウォードストーンの詠唱（フェーズ移行）',
+  'hudChrome.finder.mech.dread_curse': 'ドレッドカース（ヒロイック限定、タンク交代用の累積デバフ）',
   'hudChrome.steam.link': 'Steamと連携',
   'hudChrome.steam.unlink': 'Steam連携を解除',
   'hudChrome.steam.linked': 'Steamアカウント {id} と連携済み',
@@ -10415,12 +10460,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.notHeld': 'そのアイテムを所持していません。',
   'hudChrome.enchanting.notDisenchantable': 'それは魔力分解できません。',
   'hudChrome.enchanting.notSalvageable': 'それは解体できません。',
-  'hudChrome.enchanting.disenchantThrottled':
-    '魔力分解が速すぎます。少し待ってからもう一度お試しください。',
-  'hudChrome.enchanting.salvageThrottled':
-    '解体が速すぎます。少し待ってからもう一度お試しください。',
-  'hudChrome.enchanting.enchantThrottled':
-    'エンチャントが速すぎます。少し待ってからもう一度お試しください。',
   'hudChrome.enchanting.enchantWrongSlot': 'そのエンチャントはそのアイテムには付与できません。',
   'hudChrome.enchanting.enchantUnknown': 'そのエンチャントは存在しません。',
   'hudChrome.enchanting.enchantInsufficient': 'そのエンチャントに必要な素材がありません。',
@@ -10839,6 +10878,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.fish.biteHeading': 'アタリとリール',
   'guide.profPages.fish.biteBody':
     'キャストから{min}から{max}秒でアタリが来ます（良い竿は待ちを最大{rod}秒縮めます）。リールの猶予は{reel}秒に竿がティア1つ上がるごとに{reelRod}秒加わり、1回のセッションは最長{cap}秒です。',
+  'guide.profPages.fish.earlyReelNote':
+    'せっかちな指への注意：アタリが来る前にもう一度竿を使うと空の糸を巻き上げ、そのキャストは終わります（キャスト直後のわずかな猶予がうっかりの二度押しを許してくれます）。釣りは我慢がすべて。アタリを待って、それから合わせましょう。',
   'guide.profPages.fish.scheduleHeading': '熟練度成長',
   'guide.profPages.fish.scheduleNote':
     '釣りの成長は熟練度ごとの固定スケジュールに従い、{cutoff}からはガラクタを釣っても何も学べません。',
@@ -10883,9 +10924,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceHeading': '署名入りの品',
   'guide.profPages.econ.provenanceBody':
     'レア以上の製作品と発見には作り手の署名が入り、署名が完全に一致する品は今でもスタックできます。',
-  'guide.profPages.econ.throttleHeading': '行動の制限',
-  'guide.profPages.econ.throttleBody':
-    '製作・分解・エンチャント・サルベージはひとつの制限を共有します。{seconds}秒あたり最大{actions}回です。',
   'guide.profPages.econ.doctrineHeading': 'プレイヤー同士の取引',
   'guide.profPages.econ.doctrineBody':
     '製作装備の強さは常にレイドの下限を下回り、上記の費用は品物を商店の循環ではなくプレイヤー間の取引へと押し出します。',
@@ -11170,4 +11208,40 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraOverlay.procs.aetherRush': 'エーテルラッシュ',
   'itemUi.vendor.buyStack': '{count}個購入',
   'itemUi.vendor.buyStackAria': '{item}を{count}個、{price}で購入',
+  // Craft Cast System Phase 6 M16 non-Latin fills
+  'abilityUi.cast.crafting': '製作',
+  'abilityUi.cast.disenchanting': '分解',
+  'abilityUi.cast.enchanting_apply': '付魔',
+  'abilityUi.cast.salvaging': '解体',
+  'abilityUi.cast.tool_recharge': '充填',
+  'hudChrome.crafting.crafting': '製作中',
+  'hudChrome.crafting.create': '作成',
+  'hudChrome.crafting.createAll': 'すべて作成',
+  'hudChrome.crafting.createAllAria': '所持材料で作れる最大数までこのレシピを作成する',
+  'hudChrome.crafting.qtyRowAria': '作成数',
+  'hudChrome.crafting.qtyDecreaseAria': '作成数を減らす（現在 {count}）',
+  'hudChrome.crafting.qtyIncreaseAria': '作成数を増やす（現在 {count}）',
+  'hudChrome.crafting.qtyValueAria': '作成数、{count}',
+  'hudChrome.crafting.batchRemaining': '残り {remaining}/{total}',
+  'hudChrome.crafting.batchRemainingAria': '残り {remaining} 個、合計 {total} 個',
+  'hudChrome.crafting.durationAria': '詠唱時間: {seconds} 秒',
+  'hudChrome.crafting.progressAria': '製作の進行',
+  'hudChrome.crafting.announceStart': '{name} を製作中',
+  'hudChrome.crafting.announceComplete': '{name} の製作が完了',
+  'hudChrome.crafting.announceCancel': '製作をキャンセルした',
+  'hudChrome.crafting.busy': '手が離せません。',
+  'hudChrome.enchanting.disenchantBusy': '手が離せません。',
+  'hudChrome.enchanting.salvageBusy': '手が離せません。',
+  'hudChrome.enchanting.enchantBusy': '手が離せません。',
+  'guide.profPages.econ.castPaceHeading': '詠唱時間とゴールドの消費',
+  'guide.profPages.econ.castPaceBody':
+    '専門職の行動には実際の詠唱時間がかかります。簡単な野外レシピは2秒弱、梯子の上位レシピは数秒、分解・付魔・解体・道具効果の充填はそれぞれ固定の短い詠唱です。詠唱中にキャンセルしても損失はありません。成功した製作にはアイテム予算に応じた銅貨の手数料もかかります。材料・作業台・技能上限と合わせて、別枠の行動上限がなくても市場を健全に保てます。スキル帯ごとの正確な詠唱時間は下記のとおりです。',
+  'guide.profPages.econ.castPaceField': 'フィールドレシピ（スキル要件なし）: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill25': 'スキル25までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill50': 'スキル50までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceSkill75': 'スキル75までのレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceCombo': '最上位およびコンボレシピ: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceEnchantFamily': '分解・付魔・解体: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceRecharge': '道具効果の充填: 詠唱 {seconds} 秒',
+  'guide.profPages.econ.castPaceBatch': 'まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱',
 };

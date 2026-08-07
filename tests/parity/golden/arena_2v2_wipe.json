@@ -8,8 +8,8 @@
     "first kill does not end the match; team wipe (isArenaTeamWiped) does",
     "endArenaMatch ranked Elo on both teams (arena2v2 standings) + returnFromArena"
   ],
-  "draws": 2039,
-  "drawDigest": "e0a0f6e2",
+  "draws": 2000,
+  "drawDigest": "4a632170",
   "frames": [
     {
       "tick": 0,
@@ -29,8 +29,8 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "514c9f9b",
-      "events": "dea47eb5",
+      "state": "4e073419",
+      "events": "3a7da939",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,44 +40,44 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "8812dcf0",
+      "state": "6c3d1d5e",
       "events": "224cbfd9",
       "rng": {
         "draws": 94,
-        "digest": "205c5b7b"
+        "digest": "f94836fc"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "c288d9a6",
+      "state": "f545dbd4",
       "events": "969ec561",
       "rng": {
-        "draws": 297,
-        "digest": "e6cd4596"
+        "draws": 290,
+        "digest": "d5038b1d"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "c91db225",
+      "state": "2cdc0c8b",
       "events": "507341c9",
       "rng": {
-        "draws": 531,
-        "digest": "dfd3b0ae"
+        "draws": 513,
+        "digest": "fbd3b6a8"
       }
     },
     {
       "tick": 101,
       "time": 5.05,
       "nextId": 967,
-      "state": "437351e8",
+      "state": "08920976",
       "events": "74c0894d",
       "rng": {
-        "draws": 544,
-        "digest": "27121304"
+        "draws": 525,
+        "digest": "3a6dc8d7"
       },
       "label": "bout-active",
       "players": [
@@ -98,7 +98,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -151,7 +150,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -207,7 +205,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -259,7 +256,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -522,11 +518,11 @@
       "tick": 102,
       "time": 5.1,
       "nextId": 967,
-      "state": "6b156899",
+      "state": "b0193b0b",
       "events": "96c714ad",
       "rng": {
-        "draws": 549,
-        "digest": "1e73e3f3"
+        "draws": 531,
+        "digest": "bc30bbc0"
       },
       "label": "first-down",
       "players": [
@@ -547,7 +543,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 62
@@ -602,7 +597,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -660,7 +654,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "deaths": 1
@@ -721,7 +714,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -984,11 +976,11 @@
       "tick": 103,
       "time": 5.15,
       "nextId": 967,
-      "state": "661924fa",
-      "events": "fb5eb31d",
+      "state": "5cd6777c",
+      "events": "b97f8b79",
       "rng": {
-        "draws": 556,
-        "digest": "5bcd5f86"
+        "draws": 538,
+        "digest": "989640f4"
       },
       "label": "team-wiped",
       "players": [
@@ -1010,7 +1002,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 113
@@ -1086,7 +1077,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1165,7 +1155,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "deaths": 1
@@ -1233,7 +1222,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "deaths": 1
@@ -1509,66 +1497,66 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "806f047e",
+      "state": "962b8e70",
       "events": "741638a5",
       "rng": {
-        "draws": 778,
-        "digest": "991d4c41"
+        "draws": 754,
+        "digest": "92c82180"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "dfdd5e8a",
+      "state": "3a8353cc",
       "events": "741638a5",
       "rng": {
-        "draws": 1060,
-        "digest": "b7c75251"
+        "draws": 1029,
+        "digest": "8b312fda"
       }
     },
     {
       "tick": 175,
       "time": 8.75,
       "nextId": 967,
-      "state": "94b327f3",
+      "state": "9caef151",
       "events": "741638a5",
       "rng": {
-        "draws": 1361,
-        "digest": "c004cc28"
+        "draws": 1349,
+        "digest": "df929fbc"
       }
     },
     {
       "tick": 200,
       "time": 10,
       "nextId": 967,
-      "state": "d2fe21e7",
+      "state": "8bb88235",
       "events": "741638a5",
       "rng": {
-        "draws": 1713,
-        "digest": "bc91af64"
+        "draws": 1668,
+        "digest": "5aacb8cf"
       }
     },
     {
       "tick": 225,
       "time": 11.25,
       "nextId": 967,
-      "state": "1bbba89e",
-      "events": "bb835735",
+      "state": "991d3da0",
+      "events": "de7d14f9",
       "rng": {
-        "draws": 1894,
-        "digest": "5692d0ce"
+        "draws": 1860,
+        "digest": "f802c41d"
       }
     },
     {
       "tick": 243,
       "time": 12.15,
       "nextId": 967,
-      "state": "6331656b",
+      "state": "4b249205",
       "events": "741638a5",
       "rng": {
-        "draws": 2039,
-        "digest": "e0a0f6e2"
+        "draws": 2000,
+        "digest": "4a632170"
       },
       "label": "returned",
       "players": [
@@ -1590,7 +1578,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 113
@@ -1669,7 +1656,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -1751,7 +1737,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "deaths": 1
@@ -1822,7 +1807,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "deaths": 1
@@ -1900,7 +1884,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 3.238738,
+          "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
           "hp": 100,
           "id": 963,
@@ -1915,7 +1899,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 3.238738,
+            "y": 4.00947,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -1949,7 +1933,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 3.09695,
+          "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
           "hp": 54,
           "id": 964,
@@ -1964,7 +1948,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 3,
-            "y": 3.09695,
+            "y": 5.258106,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -2000,7 +1984,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 2.656939,
+          "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
           "hp": 62,
           "id": 965,
@@ -2022,7 +2006,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 6,
-            "y": 2.656939,
+            "y": 5.810025,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -2058,7 +2042,7 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": 1.893785,
+          "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
           "hp": 51,
           "id": 966,
@@ -2073,7 +2057,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 9,
-            "y": 1.893785,
+            "y": 3.716074,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -2106,11 +2090,11 @@
       "tick": 243,
       "time": 12.15,
       "nextId": 967,
-      "state": "6331656b",
+      "state": "4b249205",
       "events": "741638a5",
       "rng": {
-        "draws": 2039,
-        "digest": "e0a0f6e2"
+        "draws": 2000,
+        "digest": "4a632170"
       },
       "label": "final",
       "players": [
@@ -2132,7 +2116,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 113
@@ -2211,7 +2194,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -2293,7 +2275,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "deaths": 1
@@ -2364,7 +2345,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "deaths": 1
@@ -2442,7 +2422,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 3.238738,
+          "fallStartY": 4.00947,
           "fiveSecondRule": 111.15,
           "hp": 100,
           "id": 963,
@@ -2457,7 +2437,7 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "y": 3.238738,
+            "y": 4.00947,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -2491,7 +2471,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 3.09695,
+          "fallStartY": 5.258106,
           "fiveSecondRule": 111.15,
           "hp": 54,
           "id": 964,
@@ -2506,7 +2486,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 3,
-            "y": 3.09695,
+            "y": 5.258106,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -2542,7 +2522,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 2.656939,
+          "fallStartY": 5.810025,
           "fiveSecondRule": 111.15,
           "hp": 62,
           "id": 965,
@@ -2564,7 +2544,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 6,
-            "y": 2.656939,
+            "y": 5.810025,
             "z": -40
           },
           "potionCooldownUntil": -1,
@@ -2600,7 +2580,7 @@
           "critChance": 0.0555,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0555,
-          "fallStartY": 1.893785,
+          "fallStartY": 3.716074,
           "fiveSecondRule": 111.15,
           "hp": 51,
           "id": 966,
@@ -2615,7 +2595,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 9,
-            "y": 1.893785,
+            "y": 3.716074,
             "z": -40
           },
           "potionCooldownUntil": -1,

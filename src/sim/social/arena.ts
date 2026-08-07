@@ -24,7 +24,12 @@ import { ARENA_SLOT_COUNT, arenaOrigin, DUNGEON_X_THRESHOLD } from '../data';
 import * as deedsMod from '../deeds';
 import { arenaMapForSlot } from '../dungeon_layout';
 import { recalcPlayerStats } from '../entity';
-import { type MatchPetSnapshot, restoreMatchPet, snapshotMatchPet } from '../pet/pet_match_return';
+import {
+  type MatchPetSnapshot,
+  refreshMatchPetSnapshot,
+  restoreMatchPet,
+  snapshotMatchPet,
+} from '../pet/pet_match_return';
 import { awardFiestaCompletionHonor, awardRankedArenaWinHonor, honorTeamIdentity } from '../pvp';
 import { SICKNESS_AURA_IDS, UNSTUCK_SICKNESS_ID } from '../resurrection';
 import type { ArenaMatch, ArenaQueueUnit, ArenaReturnPools, PlayerMeta } from '../sim';
@@ -631,6 +636,8 @@ export function updateArena(ctx: SimContext): void {
         match.state = 'active';
         match.timer = 0;
         const matchPids = arenaAllPids(match);
+        for (const pid of matchPids)
+          refreshMatchPetSnapshot(ctx, pid, match.preMatchPets?.get(pid));
         for (const e of fighters)
           readyArenaFighter(ctx, e, { clearPrep: false, keepValidTargetPids: matchPids });
         for (const mPid of arenaAllPids(match)) {
@@ -1033,6 +1040,17 @@ export function readyArenaFighter(
   e.gatherCastNodeId = '';
   e.gatherCastToolRarity = '';
   e.gatherCastEffectConfirmed = false;
+  e.craftCastRecipeId = '';
+  e.craftCastCommission = false;
+  e.craftCastBatchRemaining = 0;
+  e.craftCastBatchTotal = 0;
+  e.enchantCastItemId = '';
+  e.enchantCastBagSlot = 0;
+  e.enchantCastEnchantId = '';
+  e.enchantCastEquipSlot = '';
+  e.enchantCastConfirmReplace = false;
+  e.enchantCastTargetPin = '';
+  e.toolRechargeCastProfessionId = '';
   e.fishBiteAtTick = 0;
   e.fishReelDeadlineTick = 0;
   e.fishCastZoneId = '';

@@ -108,6 +108,17 @@ function baseEntity(id: number, pos: Vec3): Entity {
     gatherCastNodeId: '',
     gatherCastToolRarity: '',
     gatherCastEffectConfirmed: false,
+    craftCastRecipeId: '',
+    craftCastCommission: false,
+    craftCastBatchRemaining: 0,
+    craftCastBatchTotal: 0,
+    enchantCastItemId: '',
+    enchantCastBagSlot: 0,
+    enchantCastEnchantId: '',
+    enchantCastEquipSlot: '',
+    enchantCastConfirmReplace: false,
+    enchantCastTargetPin: '',
+    toolRechargeCastProfessionId: '',
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
     fishCastZoneId: '',
@@ -545,7 +556,12 @@ export function recalcPlayerStats(
   // Resolve the active weapon-skin cosmetic against the (possibly changed)
   // mainhand: swapping to a different weapon type drops a non-matching skin and
   // re-shows the matching one automatically. Cosmetic only; never feeds stats.
-  e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
+  e.weaponSkinId = resolveActiveWeaponSkin(
+    cls,
+    e.mainhandItemId,
+    e.weaponSkinLoadout,
+    e.skinCatalog,
+  );
   // Render-only mirror of the full worn set, copied so a later mutation of the
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.

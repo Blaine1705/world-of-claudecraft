@@ -222,7 +222,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
-import { canEquipItem, resolveEquipSlot } from './equipment_rules';
+import { canEquipItem, resolveEquipSlot, uniqueEquipConflictSlot } from './equipment_rules';
 import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
@@ -365,18 +365,21 @@ import {
   type AcquireRecipeResult,
   acquireRecipe as acquireRecipeImpl,
   type CraftResult,
+  completeCraftCast as completeCraftCastImpl,
   craftItem as craftItemImpl,
 } from './professions/crafting';
 import {
   type ApplyEnchantResult,
   applyEnchant as applyEnchantImpl,
+  completeApplyEnchantCast as completeApplyEnchantCastImpl,
+  completeDisenchantCast as completeDisenchantCastImpl,
   type DisenchantResult,
   disenchantItem as disenchantItemImpl,
   isEnchantedInstance,
 } from './professions/enchanting';
 import * as fishing from './professions/fishing';
+import type { RespecPaymentTier } from './professions/focus';
 import * as professionsFocus from './professions/focus';
-import { announceMasterworkZone } from './professions/gather_events';
 import {
   completeGatherCast as completeGatherCastImpl,
   drainGatheringGrants,
@@ -407,7 +410,11 @@ import {
 } from './professions/node_persist';
 import { updateProfNudges } from './professions/prof_nudges';
 import { healDisplayRoundedProficiency } from './professions/proficiency_display_heal';
-import { type SalvageResult, salvageItem as salvageItemImpl } from './professions/salvage';
+import {
+  completeSalvageCast as completeSalvageCastImpl,
+  type SalvageResult,
+  salvageItem as salvageItemImpl,
+} from './professions/salvage';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   applyPairTransitionTierMail,
@@ -415,7 +422,11 @@ import {
   pruneTierMailToActiveMajors,
   updateTierMail,
 } from './professions/tier_mail';
-import { rechargeToolEffectAction, slotToolEffectAction } from './professions/tool_effect_actions';
+import {
+  completeRechargeCast as completeRechargeCastImpl,
+  rechargeToolEffectAction,
+  slotToolEffectAction,
+} from './professions/tool_effect_actions';
 import {
   EMPTY_TOOL_EFFECT_SLOT_VIEWS,
   normalizeToolEffectSlots,
@@ -1407,14 +1418,13 @@ export interface PlayerMeta {
   // knownRecipes exactly once (professions/training.ts
   // grandfatherKnownRecipes), then persists true. Persisted in CharacterState.
   recipesGrandfathered: boolean;
-  // Craft output throttle (#1301): a FIXED tumbling window of successful
-  // actions (five consumer families; see professions/action_throttle.ts,
-  // which states the tumbling semantics and their accepted straddle).
-  // Session-only (like lastActiveTick above), never persisted,
-  // and deliberately so: a fresh login gets a fresh 60-second window rather
-  // than carrying a logout-time throttle across sessions. (This used to cite
-  // nodeHarvestReadyAt as its session-only exemplar; that field persists as
-  // remaining deltas now, while this one stays session-only on purpose.)
+  // INERT after Craft Cast System Phase 5: the shared 10-per-60s action
+  // throttle is retired; cast duration paces craft-family actions. This
+  // field was SESSION-ONLY from birth (never persisted, never wired), so no
+  // save shape depends on it; it survives only as the inert shape the
+  // retirement suite pins (tests/professions_action_throttle.test.ts stamps
+  // it and proves gameplay ignores it). The parity sampler excludes it
+  // (tests/parity/trace.ts META_EXCLUDE). Never read or written by gameplay.
   craftThrottle: { windowStart: number; count: number };
   // One-time mastery reset notice pending (Professions 2.0): set by
   // the load-time masteryResetApplied branch, consumed by the tick mail phase
@@ -1480,6 +1490,17 @@ export interface PlayerMeta {
   // Set only while standing in a town hub; adds a bonus to that component's
   // #1142 harvest yield, on top of the universal baseline, never below it.
   townFocus: Record<string, number>;
+  // #1144: a re-spec queued on the 'time' or 'timeAndPartial' payment tier,
+  // pending the tier's duration before it commits onto `townFocus` above.
+  // TRANSIENT (never serialized): a logout before it resolves simply drops the
+  // request (nothing was charged for it yet, see setTownFocus), the same way
+  // an unstarted timer costs nothing to abandon.
+  pendingTownFocus?: {
+    allocation: Record<string, number>;
+    readyAtTime: number;
+    coin: number;
+    materials: number;
+  };
   // Heroic reset-window circuit progress for the Book of Deeds. Reward eligibility
   // is gated only by raidLockouts; this persisted field records which distinct
   // heroic clears contributed to one authoritative reset window without gating rewards.
@@ -2973,6 +2994,15 @@ export class Sim {
           meta.bags[i] = id && ITEMS[id]?.kind === 'bag' ? id : null;
         }
       }
+      // Legendary items are unique-equipped; a save from before that rule (or
+      // a tampered one) can still wear duplicates. Bench every later copy into
+      // the bags before stats derive from the worn set below, and say so: a
+      // silently changed worn set reads as lost gear (the respec bench and the
+      // bag migration both notice too).
+      for (const benchedId of items.benchDuplicateUniqueEquipped(meta)) {
+        const benchedDef = ITEMS[benchedId];
+        if (benchedDef) this.notice(player.id, `Unequipped ${benchedDef.name}.`);
+      }
       // Buyback rows deliberately skip the full instancedCountCap: byte-equal
       // merges past the stack cap are legitimate here (recordVendorBuyback
       // merges an entire multi-unit sale into one row, and buyBackItem
@@ -3995,6 +4025,16 @@ export class Sim {
     meta.skinCatalog = catalog;
     e.skin = idx;
     e.skinCatalog = catalog;
+    // The BODY decides which skin types apply (the mech shows the equipped
+    // mainhand, the hunter rig its fixed ranged attach), so a catalog change
+    // re-resolves. Without this the new body's skin stays dark, and the old
+    // body's stays resolved, until an unrelated gear change recomputes it.
+    e.weaponSkinId = resolveActiveWeaponSkin(
+      e.templateId,
+      e.mainhandItemId,
+      e.weaponSkinLoadout,
+      catalog,
+    );
     deedsMod.markDeedsDirty(this.ctx, meta.entityId); // col_true_colors reads the skin state
     return true;
   }
@@ -4104,7 +4144,7 @@ export class Sim {
     }
     e.weaponSkinLoadout = next;
     // For player entities templateId is the class id (createPlayer).
-    e.weaponSkinId = resolveActiveWeaponSkin(e.templateId, e.mainhandItemId, next);
+    e.weaponSkinId = resolveActiveWeaponSkin(e.templateId, e.mainhandItemId, next, e.skinCatalog);
     this.mirrorWeaponSkinLoadout(pid, e);
   }
 
@@ -4131,7 +4171,8 @@ export class Sim {
     if (skinId !== null) {
       const def = WEAPON_SKINS[skinId];
       if (!def) return false;
-      if (!weaponSkinTypeMatches(cls, e.mainhandItemId, def.weaponType)) return false;
+      if (!weaponSkinTypeMatches(cls, e.mainhandItemId, def.weaponType, e.skinCatalog))
+        return false;
       e.weaponSkinLoadout = withWeaponSkinApplied(e.weaponSkinLoadout, skinId) ?? {};
     } else {
       const t = weaponType;
@@ -4140,7 +4181,12 @@ export class Sim {
       delete next[t];
       e.weaponSkinLoadout = next;
     }
-    e.weaponSkinId = resolveActiveWeaponSkin(cls, e.mainhandItemId, e.weaponSkinLoadout);
+    e.weaponSkinId = resolveActiveWeaponSkin(
+      cls,
+      e.mainhandItemId,
+      e.weaponSkinLoadout,
+      e.skinCatalog,
+    );
     this.mirrorWeaponSkinLoadout(pid, e);
     return true;
   }
@@ -5266,6 +5312,11 @@ export class Sim {
       // Gather cast completion: module-bound with the live ctx,
       // exactly like completeFishing above; no Sim method exists for it.
       completeGatherCast: (p, meta) => completeGatherCastImpl(sim.ctx, p, meta),
+      completeCraftCast: (p, meta) => completeCraftCastImpl(sim.ctx, p, meta),
+      completeDisenchantCast: (p, meta) => completeDisenchantCastImpl(sim.ctx, p, meta),
+      completeApplyEnchantCast: (p, meta) => completeApplyEnchantCastImpl(sim.ctx, p, meta),
+      completeSalvageCast: (p, meta) => completeSalvageCastImpl(sim.ctx, p, meta),
+      completeRechargeCast: (p, meta) => completeRechargeCastImpl(sim.ctx, p, meta),
       applyDemonHealTick: sim.applyDemonHealTick.bind(sim),
       // C4b effect-dispatch surface: the per-effect switch the cast lifecycle hands
       // off to. awardCombo, the stat/LoS helpers, and meleeSwing STAY on Sim
@@ -5640,6 +5691,10 @@ export class Sim {
           // Proficiency just became visible; the gathering predicates re-check.
           deedsMod.markDeedsDirty(this.ctx, p.id);
         }
+        // #1144: resolves a queued time-tier town-focus re-spec once its
+        // duration elapses. Draws no rng, so the tick-phase draw order is
+        // unchanged.
+        if (meta.pendingTownFocus) this.updateTownFocusRespec(meta);
         // Mount summon/dismount transition: decrement the timer, cancel a summon
         // on combat/swim, complete a mount/dismount, and force-dismount a mounted
         // swimmer. Live players only (a dead player is already force-dismounted by
@@ -6092,8 +6147,8 @@ export class Sim {
     // step-out, matching the movement kernel and the clamp findChargePath
     // already plans with, so a wading-depth ford never ends a charge.
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return done(false);
-    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return done(false);
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
     const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
     const r1 = Math.max(h1, wls);
     if (
@@ -6163,11 +6218,11 @@ export class Sim {
     const nx = p.pos.x + Math.sin(p.facing) * step;
     const nz = p.pos.z + Math.cos(p.facing) * step;
     const h1 = groundHeight(nx, nz, this.cfg.seed);
-    if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) return true; // don't trail into deep water
+    if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) return true; // don't trail into deep water
     // ridden-surface slopes plus the shore step-out (ride_height.ts), matching
     // the movement kernel: a follower crosses the same fords and climbs the
     // same low banks its leader just walked.
-    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz);
+    const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, this.cfg.seed);
     const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, this.cfg.seed), wls);
     const r1 = Math.max(h1, wls);
     if (
@@ -6584,21 +6639,51 @@ export class Sim {
       replacementConflicts.some((index) => isUnbreakableControlAura(target.auras[index]))
     )
       return;
+    // A same-id same-name re-application is a REFRESH: the old aura is
+    // displaced silently (no fade, exactly as before) and the gained event
+    // below carries refresh: true so parses read it as SPELL_AURA_REFRESH
+    // rather than a fresh application (parse fidelity 7.2). PLACEMENT IS
+    // DELIBERATELY UNCHANGED: splice then append, so the refreshed aura moves
+    // to the end exactly as it always has. Entity.auras array order is an rng
+    // draw-order input (the DoT tick walk draws per dot, breakable-fear
+    // chances draw per aura) and a gameplay-selection input (dispel targets,
+    // absorb consumption order), so refresh-vs-apply must never produce a
+    // different order than it did before this field existed.
+    let refreshed = false;
     for (const existing of replacementConflicts) {
       const displaced = target.auras[existing];
       this.applyNonPlayerStatAura(target, displaced, -1);
       target.auras.splice(existing, 1);
-      // A same-id replacement that swaps in a DIFFERENT display name (a
-      // same-stat elixir overwriting another brand) would otherwise vanish
-      // from the buff bar with no combat-log trace: emit the fade the client
-      // cannot infer. Same-name refreshes stay silent, exactly as before.
-      if (displaced.name !== aura.name)
-        this.emit({ type: 'aura', targetId: target.id, name: displaced.name, gained: false });
+      if (displaced.name !== aura.name) {
+        // A same-id replacement that swaps in a DIFFERENT display name (a
+        // same-stat elixir overwriting another brand) would otherwise vanish
+        // from the buff bar with no combat-log trace: emit the fade the client
+        // cannot infer. Same-name refreshes stay silent, exactly as before.
+        this.emit({
+          type: 'aura',
+          targetId: target.id,
+          name: displaced.name,
+          gained: false,
+          sourceId: displaced.sourceId,
+          abilityId: displaced.id,
+        });
+      } else {
+        refreshed = true;
+      }
     }
     target.auras.push(aura);
     if (aura.kind === 'stealth') target.stealthed = true; // keep the cache live without waiting for updateAuras
     this.applyNonPlayerStatAura(target, aura, 1);
-    this.emit({ type: 'aura', targetId: target.id, name: aura.name, gained: true });
+    this.emit({
+      type: 'aura',
+      targetId: target.id,
+      name: aura.name,
+      gained: true,
+      sourceId: aura.sourceId,
+      abilityId: aura.id,
+      ...(aura.stacks !== undefined ? { stacks: aura.stacks } : {}),
+      ...(refreshed ? { refresh: true } : {}),
+    });
     if (aura.kind === 'hot') {
       // A HoT's periodic ticks (combat/auras.ts) no longer carry the sound: the
       // client plays a single heal_impact right here, at the moment it lands,
@@ -6692,11 +6777,11 @@ export class Sim {
       const nx = cx + ux * adv,
         nz = cz + uz * adv;
       const h1 = groundHeight(nx, nz, this.cfg.seed);
-      if (h1 < waterLevelAt(nx, nz) - SWIM_DEPTH) break; // would land in deep water
+      if (h1 < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH) break; // would land in deep water
       // ridden-surface slopes (ride_height.ts): a submerged bed bump does not
       // stop a shove crossing shallow water. No shore step-out here: a forced
       // displacement conservatively stops at a bank face.
-      const wls = stepWaterLevel(cx, cz, nx, nz);
+      const wls = stepWaterLevel(cx, cz, nx, nz, this.cfg.seed);
       const r0 = Math.max(groundHeight(cx, cz, this.cfg.seed), wls);
       const r1 = Math.max(h1, wls);
       if (
@@ -7510,7 +7595,7 @@ export class Sim {
       e.pos.x = nx;
       e.pos.z = nz;
       const g = groundHeight(nx, nz, this.cfg.seed);
-      e.pos.y = Math.max(g, swimSurfaceY(nx, nz)); // ride the surface while phasing, don't sink under terrain/water
+      e.pos.y = Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed)); // ride the surface while phasing, don't sink under terrain/water
       return d - step < 0.3;
     }
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
@@ -7526,7 +7611,7 @@ export class Sim {
     // footprint there is no waterline at all, so a dry sunken feature never
     // reads as a shore.
     const ride = (x: number, z: number, h: number): number => {
-      const wl = waterLevelAt(x, z);
+      const wl = waterLevelAt(x, z, this.cfg.seed);
       return canSwim && h < wl ? wl : h;
     };
     let h0 = Number.NaN; // lazily sampled: only steep cells pay for heights
@@ -7535,7 +7620,10 @@ export class Sim {
       const nx = e.pos.x + Math.sin(a) * step;
       const nz = e.pos.z + Math.cos(a) * step;
       // landlocked creatures stop at the waterline instead of walking under it
-      if (!canSwim && groundHeight(nx, nz, this.cfg.seed) < waterLevelAt(nx, nz) - SWIM_DEPTH) {
+      if (
+        !canSwim &&
+        groundHeight(nx, nz, this.cfg.seed) < waterLevelAt(nx, nz, this.cfg.seed) - SWIM_DEPTH
+      ) {
         continue;
       }
       // Mobs, pets, and feared players obey the wall rule too: no uphill step
@@ -7567,7 +7655,9 @@ export class Sim {
     e.pos.z = bestZ;
     const g = groundHeight(bestX, bestZ, this.cfg.seed);
     e.pos.y =
-      canSwim && g < waterLevelAt(bestX, bestZ) - SWIM_DEPTH ? swimSurfaceY(bestX, bestZ) : g;
+      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
+        ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
+        : g;
     return dist2d(e.pos, dest) < 0.3;
   }
 
@@ -8489,7 +8579,22 @@ export class Sim {
   // boolean opt-in off the craft command; the resolve honors it
   // only for eligible equipment outputs and mints the bindOnTrade arm
   // server-side (professions/commission.ts), never off client data.
-  craftItem(recipeId: string, commission?: boolean, pid?: number): void {
+  // IWorld: craftItem(recipeId, commission?, count?), the third argument is
+  // ALWAYS the batch count. Crafting for another player (server dispatch,
+  // multi-player tests) REQUIRES the explicit four-arg form
+  // craftItem(recipeId, commission, pid, count): a bare third-arg pid is not
+  // supported, because batch counts and player entity ids share one integer
+  // space and a membership guess (the retired players.has() heuristic) made
+  // "craft N" and "craft as player N" collide silently.
+  craftItem(recipeId: string, commission?: boolean, countOrPid?: number, count?: number): void {
+    let pid: number | undefined;
+    let batchCount = 1;
+    if (count !== undefined) {
+      pid = countOrPid;
+      batchCount = count;
+    } else if (countOrPid !== undefined) {
+      batchCount = countOrPid;
+    }
     // Dead gate for the profession-action family (this wrapper plus
     // trainRecipe/unbindItem/salvageItem/disenchantItem/applyEnchant below):
     // refuse BEFORE the resolver, so no result event is emitted and the
@@ -8498,7 +8603,12 @@ export class Sim {
     // result unconditionally; mobile-station placement and the rift forge
     // emit no wrapper-side event, so their gates live in their own modules.
     if (refusedWhileDead(this.ctx, pid)) return;
-    const result = craftItemImpl(this.ctx, recipeId, commission === true, pid);
+    // Craft Cast System: craftItemImpl starts a cast or returns a start-gate
+    // denial. On casting:true the castStart event is the surface; craftResult
+    // / masterwork / lastCraftResult land only from completeCraftCast.
+    // Phase 3: optional count (default 1) is clamped to batch max + mats-fit.
+    const result = craftItemImpl(this.ctx, recipeId, commission === true, pid, batchCount);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastCraftResult = result;
     this.emit({
@@ -8512,22 +8622,6 @@ export class Sim {
       reason: result.reason,
       pid: meta?.entityId,
     });
-    // Masterwork proc surface (Professions 2.0): stash the per-player
-    // view (session-only, like lastCraftResult above) and emit the personal
-    // masterwork event, in addition to the craftResult emit.
-    if (result.masterwork && result.itemId && meta) {
-      const proc: MasterworkProc = {
-        recipeId: result.recipeId,
-        itemId: result.itemId,
-        crafter: meta.entityId,
-      };
-      meta.lastMasterwork = proc;
-      this.emit({ type: 'masterwork', ...proc, pid: meta.entityId });
-      // Zone-wide celebration copy: the professions module owns the
-      // fanout and the instance-space exclusion; draws no rng, runs after the
-      // personal emit.
-      announceMasterworkZone(this.ctx, meta.entityId, meta.name, proc);
-    }
   }
 
   // IWorld read surface (IWorldProfessions, #1127): the local viewer's most
@@ -8753,7 +8847,11 @@ export class Sim {
   // on the resolved player's PlayerMeta so lastSalvageResult reflects it.
   salvageItem(itemId: string, pid?: number): void {
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: salvageItemImpl starts a cast or returns a start-gate denial.
+    // On casting:true castStart is the surface; salvageResult lands only from
+    // completeSalvageCast.
     const result = salvageItemImpl(this.ctx, itemId, pid);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastSalvageResult = result;
     // Emit the pid-scoped, text-free outcome, same immediacy arm as
@@ -8805,7 +8903,9 @@ export class Sim {
     const pid = typeof pidOrTarget === 'number' ? pidOrTarget : undefined;
     const targetSlotIndex = typeof pidOrTarget === 'object' ? pidOrTarget.slotIndex : slotIndex;
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = disenchantItemImpl(this.ctx, itemId, pid, targetSlotIndex);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastDisenchantResult = result;
     this.emit({
@@ -8843,7 +8943,9 @@ export class Sim {
     pid?: number,
   ): void {
     if (refusedWhileDead(this.ctx, pid)) return;
+    // Phase 4: start cast or deny; result event only on complete or start deny.
     const result = applyEnchantImpl(this.ctx, itemId, enchantId, pid, slot, confirmReplace);
+    if (result.casting) return;
     const meta = this.players.get(pid ?? this.primaryId);
     if (meta) meta.lastEnchantResult = result;
     this.emit({
@@ -8873,6 +8975,10 @@ export class Sim {
     // "must be level N" message belongs.
     const e = this.entities.get(meta.entityId);
     if (e && !meetsLevelRequirement(e.level, def)) return;
+    // Skip silently when a copy of a unique-equipped (legendary) family is
+    // already worn anywhere: equipping the duplicate would be refused, and the
+    // explicit equip path is where that refusal toast belongs.
+    if (uniqueEquipConflictSlot(def, meta.equipment, (id) => ITEMS[id], [])) return;
     if (def.kind === 'weapon') {
       const cur = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand]?.weapon : null;
       const next = def.weapon;
@@ -8931,7 +9037,29 @@ export class Sim {
   // player standing in their current zone's town hub (professions/focus.ts
   // isInTownZone); rejected requests (out of town, malformed, over budget)
   // leave the previous allocation untouched and surface a toast.
-  setTownFocus(allocation: Record<string, number>, pid?: number): void {
+  //
+  // #1144: `tier` picks which of the three RESPEC_TIER_CONFIG rows prices the
+  // reallocation (computeRespecCost). The validity/afford checks happen HERE,
+  // between validating the request and either committing it (instant tier) or
+  // queuing it (time/timeAndPartial): the pure validator runs first and never
+  // mutates state, so an invalid/over-budget/out-of-town request is rejected
+  // before any cost is even computed, and an unaffordable one is rejected
+  // before anything is charged or queued. Priced off `result.allocation` (the
+  // request AFTER the pure validator drops zero-point entries), not the raw
+  // `allocation` argument, so a caller cannot inflate the bill with junk the
+  // commit itself would discard. A no-op reallocation costs nothing at any
+  // tier and can never fail the affordability check.
+  //
+  // A tier with durationMs > 0 (`time`/`timeAndPartial`) does NOT commit or
+  // charge here: it queues `meta.pendingTownFocus`, which the per-player tick
+  // loop resolves via `updateTownFocusRespec` once the duration elapses. That
+  // is what makes the 'free, slow' tier actually slow instead of a same-tick
+  // no-cost commit; only the `instant` tier (durationMs 0) ever runs the
+  // charge-then-commit path below directly. Charging only at resolution, not
+  // at the request, means an abandoned queue (a later request that replaces
+  // it, or a logout, since pendingTownFocus is transient) never spends
+  // anything.
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier, pid?: number): void {
     const r = this.resolve(pid);
     if (!r) return;
     const { meta, e: p } = r;
@@ -8949,8 +9077,72 @@ export class Sim {
       );
       return;
     }
-    meta.townFocus = result.allocation as Record<string, number>;
+    const resolvedAllocation = result.allocation as Record<string, number>;
+    const cost = professionsFocus.computeRespecCost(meta.townFocus, resolvedAllocation, tier);
+    const canAfford =
+      meta.copper >= cost.coin &&
+      this.countItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, meta.entityId) >= cost.materials;
+    if (!canAfford) {
+      this.error(meta.entityId, 'You cannot afford that focus re-spec.');
+      return;
+    }
+    if (cost.durationMs <= 0) {
+      this.chargeTownFocusRespec(meta, cost);
+      meta.townFocus = resolvedAllocation;
+      // An instant commit supersedes any earlier queued re-spec: without this,
+      // an older `time`/`timeAndPartial` request would still resolve later via
+      // updateTownFocusRespec, double-charging and overwriting this allocation
+      // with the stale one (see the CHANGES_REQUESTED finding on PR #2909).
+      meta.pendingTownFocus = undefined;
+      deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
+      return;
+    }
+    meta.pendingTownFocus = {
+      allocation: resolvedAllocation,
+      readyAtTime: this.time + cost.durationMs / 1000,
+      coin: cost.coin,
+      materials: cost.materials,
+    };
+    this.notice(
+      meta.entityId,
+      `Your focus re-spec will complete in ${Math.ceil(cost.durationMs / 1000)}s.`,
+    );
+  }
+
+  private chargeTownFocusRespec(meta: PlayerMeta, cost: professionsFocus.RespecCost): void {
+    if (cost.coin > 0) meta.copper -= cost.coin;
+    if (cost.materials > 0) {
+      this.removeItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, cost.materials, meta.entityId);
+    }
+  }
+
+  // #1144: resolves a queued 're-spec' once its duration has elapsed. Called
+  // from the per-player tick loop for a live player. Re-checks affordability
+  // at resolution time (the charge happens here, never at the request), so a
+  // purse spent in the meantime cancels the queued re-spec instead of going
+  // negative or silently discarding materials the player no longer has.
+  private updateTownFocusRespec(meta: PlayerMeta): void {
+    const pending = meta.pendingTownFocus;
+    if (!pending || this.time < pending.readyAtTime) return;
+    meta.pendingTownFocus = undefined;
+    const canAfford =
+      meta.copper >= pending.coin &&
+      this.countItem(professionsFocus.RESPEC_MATERIAL_ITEM_ID, meta.entityId) >= pending.materials;
+    if (!canAfford) {
+      this.error(
+        meta.entityId,
+        'You could not afford your pending focus re-spec, so it was cancelled.',
+      );
+      return;
+    }
+    this.chargeTownFocusRespec(meta, {
+      durationMs: 0,
+      coin: pending.coin,
+      materials: pending.materials,
+    });
+    meta.townFocus = pending.allocation;
     deedsMod.markDeedsDirty(this.ctx, meta.entityId); // soc_civic_duty reads the allocation
+    this.notice(meta.entityId, 'Your focus re-spec is complete.');
   }
 
   interact(pid?: number): void {
@@ -10372,6 +10564,13 @@ export class Sim {
 
   marketInfoFor(pid: number): import('../world_api').MarketInfo | null {
     return this.market.marketInfoFor(pid);
+  }
+
+  // Server-only broadcast helper (never IWorld, the guildBankInfoForGuild
+  // precedent): the cheap change signal server/game.ts polls before paying for
+  // a marketInfoFor rebuild. Null while the player is not at a Merchant.
+  marketBrowseRevFor(pid: number): number | null {
+    return this.market.browseRevFor(pid);
   }
 
   // The always-streamed collect-indicator bit (the mailUnreadFor pattern):

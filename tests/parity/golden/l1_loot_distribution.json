@@ -10,7 +10,7 @@
     "looter-takes-all common item + personal-loot visibility"
   ],
   "draws": 3,
-  "drawDigest": "22bdb0e2",
+  "drawDigest": "9cfa0ceb",
   "frames": [
     {
       "tick": 0,
@@ -30,11 +30,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 967,
-      "state": "9cadacb7",
-      "events": "b1db937b",
+      "state": "96ab5205",
+      "events": "a7f88743",
       "rng": {
         "draws": 1,
-        "digest": "5afc057e"
+        "digest": "fc1f956a"
       },
       "label": "after-loot-a",
       "players": [
@@ -53,15 +53,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -121,7 +120,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -178,15 +176,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -244,7 +241,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.596036,
+          "fallStartY": 1.600558,
           "fiveSecondRule": 99,
           "hp": 100,
           "id": 963,
@@ -260,7 +257,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.596036,
+            "y": 1.600558,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -294,7 +291,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.485736,
+          "fallStartY": 1.492886,
           "fiveSecondRule": 99,
           "hp": 54,
           "id": 964,
@@ -309,7 +306,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 1.485736,
+            "y": 1.492886,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -345,7 +342,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.335688,
+          "fallStartY": 1.345952,
           "fiveSecondRule": 99,
           "hp": 62,
           "id": 965,
@@ -367,7 +364,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 22,
-            "y": 1.335688,
+            "y": 1.345952,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -404,7 +401,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.65162,
+          "fallStartY": 1.655608,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
@@ -436,13 +433,13 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "spawnPos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "stats": {
@@ -462,11 +459,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "927976ad",
-      "events": "22d50c10",
+      "state": "4e1d4fa7",
+      "events": "f836561c",
       "rng": {
         "draws": 3,
-        "digest": "22bdb0e2"
+        "digest": "9cfa0ceb"
       },
       "label": "after-rolls",
       "players": [
@@ -485,15 +482,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -565,7 +561,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -629,15 +624,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -702,7 +696,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.596036,
+          "fallStartY": 1.600558,
           "fiveSecondRule": 99.05,
           "hp": 100,
           "id": 963,
@@ -718,7 +712,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.596036,
+            "y": 1.600558,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -752,7 +746,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.485736,
+          "fallStartY": 1.492886,
           "fiveSecondRule": 99.05,
           "hp": 54,
           "id": 964,
@@ -767,7 +761,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 1.485736,
+            "y": 1.492886,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -803,7 +797,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.335688,
+          "fallStartY": 1.345952,
           "fiveSecondRule": 99.05,
           "hp": 62,
           "id": 965,
@@ -825,7 +819,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 22,
-            "y": 1.335688,
+            "y": 1.345952,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -862,7 +856,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.65162,
+          "fallStartY": 1.655608,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
@@ -899,14 +893,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "stats": {
@@ -926,11 +920,11 @@
       "tick": 1,
       "time": 0.05,
       "nextId": 967,
-      "state": "dd19e57b",
+      "state": "73646e0d",
       "events": "024a26d2",
       "rng": {
         "draws": 3,
-        "digest": "22bdb0e2"
+        "digest": "9cfa0ceb"
       },
       "label": "after-loot-b",
       "players": [
@@ -949,15 +943,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1029,7 +1022,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1102,15 +1094,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1175,7 +1166,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.596036,
+          "fallStartY": 1.600558,
           "fiveSecondRule": 99.05,
           "hp": 100,
           "id": 963,
@@ -1191,7 +1182,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.596036,
+            "y": 1.600558,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1225,7 +1216,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.485736,
+          "fallStartY": 1.492886,
           "fiveSecondRule": 99.05,
           "hp": 54,
           "id": 964,
@@ -1240,7 +1231,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 1.485736,
+            "y": 1.492886,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1276,7 +1267,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.335688,
+          "fallStartY": 1.345952,
           "fiveSecondRule": 99.05,
           "hp": 62,
           "id": 965,
@@ -1298,7 +1289,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 22,
-            "y": 1.335688,
+            "y": 1.345952,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1335,7 +1326,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.65162,
+          "fallStartY": 1.655608,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
@@ -1356,14 +1347,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.05,
           "spawnPos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "stats": {
@@ -1383,11 +1374,11 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 967,
-      "state": "250d56d2",
+      "state": "53f3e720",
       "events": "741638a5",
       "rng": {
         "draws": 3,
-        "digest": "22bdb0e2"
+        "digest": "9cfa0ceb"
       },
       "label": "final",
       "players": [
@@ -1406,15 +1397,14 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 34,
+          "copper": 33,
           "counters": {
-            "lootCopper": 34
+            "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 34,
+              "lootCopper": 33,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1486,7 +1476,6 @@
             "lootCopper": 33
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "lootCopper": 33,
@@ -1559,15 +1548,14 @@
           "bgRating": 1500,
           "cls": "rogue",
           "companionUpgrades": {},
-          "copper": 33,
+          "copper": 34,
           "counters": {
-            "lootCopper": 33
+            "lootCopper": 34
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
-              "lootCopper": 33,
+              "lootCopper": 34,
               "partiesJoined": 1
             },
             "dungeonClears": {},
@@ -1632,7 +1620,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.596036,
+          "fallStartY": 1.600558,
           "fiveSecondRule": 99.15,
           "hp": 100,
           "id": 963,
@@ -1648,7 +1636,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.596036,
+            "y": 1.600558,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1682,7 +1670,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 1.485736,
+          "fallStartY": 1.492886,
           "fiveSecondRule": 99.15,
           "hp": 54,
           "id": 964,
@@ -1697,7 +1685,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 1.485736,
+            "y": 1.492886,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1733,7 +1721,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.335688,
+          "fallStartY": 1.345952,
           "fiveSecondRule": 99.15,
           "hp": 62,
           "id": 965,
@@ -1755,7 +1743,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 22,
-            "y": 1.335688,
+            "y": 1.345952,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -1792,7 +1780,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.65162,
+          "fallStartY": 1.655608,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
@@ -1813,14 +1801,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.15,
           "spawnPos": {
             "x": 20,
-            "y": 1.65162,
+            "y": 1.655608,
             "z": 22
           },
           "stats": {

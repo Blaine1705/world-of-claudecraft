@@ -9,8 +9,8 @@
     "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
     "multi-player meta"
   ],
-  "draws": 1227,
-  "drawDigest": "30fc618f",
+  "draws": 1176,
+  "drawDigest": "1ab1c3cb",
   "frames": [
     {
       "tick": 0,
@@ -30,8 +30,8 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "db1f8a2d",
-      "events": "c702eb13",
+      "state": "18feeb15",
+      "events": "6a2f178b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -41,66 +41,66 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "1f3b9e40",
+      "state": "62cb6bec",
       "events": "224cbfd9",
       "rng": {
-        "draws": 68,
-        "digest": "33e99c8d"
+        "draws": 66,
+        "digest": "383a5306"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "f5be9296",
+      "state": "def24ac2",
       "events": "969ec561",
       "rng": {
-        "draws": 267,
-        "digest": "03b0582c"
+        "draws": 247,
+        "digest": "6b3f31b5"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "ca3b25e5",
+      "state": "186085ad",
       "events": "507341c9",
       "rng": {
-        "draws": 502,
-        "digest": "c0fe368d"
+        "draws": 485,
+        "digest": "b0986e30"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "1b6f7a36",
+      "state": "1de455b2",
       "events": "ada54ef3",
       "rng": {
-        "draws": 789,
-        "digest": "6d5cd93a"
+        "draws": 755,
+        "digest": "c2a9f447"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "545f32b1",
+      "state": "2b5b2011",
       "events": "741638a5",
       "rng": {
-        "draws": 1076,
-        "digest": "188634c1"
+        "draws": 1038,
+        "digest": "bee5a5dc"
       }
     },
     {
       "tick": 163,
       "time": 8.15,
       "nextId": 967,
-      "state": "af0a768e",
+      "state": "c533fd2a",
       "events": "8945b220",
       "rng": {
-        "draws": 1227,
-        "digest": "30fc618f"
+        "draws": 1176,
+        "digest": "1ab1c3cb"
       },
       "label": "final",
       "players": [
@@ -123,7 +123,6 @@
             "kills": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {
               "damageDealt": 510
@@ -194,7 +193,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -266,7 +264,6 @@
             "deaths": 1
           },
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},
@@ -335,7 +332,6 @@
           "companionUpgrades": {},
           "counters": {},
           "craftSkills": {},
-          "craftThrottle": {},
           "deedStats": {
             "counters": {},
             "dungeonClears": {},

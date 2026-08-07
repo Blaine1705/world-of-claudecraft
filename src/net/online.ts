@@ -43,6 +43,7 @@ import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
 import { normalizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import { getArchetypeTitle, getHobbyCraft } from '../sim/professions/archetype';
+import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import type { ResolvedAbility } from '../sim/sim';
@@ -1294,6 +1295,17 @@ function blankEntity(id: number): Entity {
     gatherCastNodeId: '',
     gatherCastToolRarity: '',
     gatherCastEffectConfirmed: false,
+    craftCastRecipeId: '',
+    craftCastCommission: false,
+    craftCastBatchRemaining: 0,
+    craftCastBatchTotal: 0,
+    enchantCastItemId: '',
+    enchantCastBagSlot: 0,
+    enchantCastEnchantId: '',
+    enchantCastEquipSlot: '',
+    enchantCastConfirmReplace: false,
+    enchantCastTargetPin: '',
+    toolRechargeCastProfessionId: '',
     fishBiteAtTick: 0,
     fishReelDeadlineTick: 0,
     fishCastZoneId: '',
@@ -3215,6 +3227,13 @@ export class ClientWorld implements IWorld {
             ticksElapsed: 0,
           }
         : null;
+      // Craft-cast session mirror (self-only `ccast`, the eat/drk shape): the
+      // crafting window reads the SAME entity fields offline and online, so
+      // the recipe highlight and batch counter survive a mid-cast window
+      // close/reopen and always show the server's clamped batch numbers.
+      e.craftCastRecipeId = s.ccast?.r ?? '';
+      e.craftCastBatchRemaining = s.ccast?.rem ?? 0;
+      e.craftCastBatchTotal = s.ccast?.tot ?? 0;
       // IWorldProgressionXp facet (W7) self-decode: xp/lxp/rxp/prk ride every
       // self-frame (?? 0); milestones is delta-guarded (omitted keeps the prior
       // mirror). Terse keys (lxp->lifetimeXp, rxp->restedXp, prk->prestigeRank,
@@ -3789,8 +3808,8 @@ export class ClientWorld implements IWorld {
   harvestCorpse(id: number, components?: string[]): void {
     this.cmd({ cmd: 'harvestCorpse', id, components });
   }
-  setTownFocus(allocation: Record<string, number>): void {
-    this.cmd({ cmd: 'set_town_focus', allocation });
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier): void {
+    this.cmd({ cmd: 'set_town_focus', allocation, tier });
   }
   // --- IWorldLoot: need-greed roll submit + HUD reconcile read ---
   submitLootRoll(rollId: number, choice: LootRollChoice): void {
@@ -3909,9 +3928,19 @@ export class ClientWorld implements IWorld {
   // opt-in, sent ONLY when true so a non-commission craft's wire message
   // stays byte-identical to the pre-phase form. The server mints the
   // bindOnTrade arm itself; no payload ever rides the command.
-  craftItem(recipeId: string, commission?: boolean): void {
-    if (commission === true) {
+  craftItem(recipeId: string, commission?: boolean, count?: number): void {
+    // Optional count (Phase 3): omit when default/1 so a single craft stays
+    // byte-identical to the pre-batch wire form. Server re-clamps.
+    const batchCount =
+      typeof count === 'number' && Number.isFinite(count) && Math.floor(count) !== 1
+        ? Math.floor(count)
+        : undefined;
+    if (commission === true && batchCount !== undefined) {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId, commission: true, count: batchCount });
+    } else if (commission === true) {
       this.cmd({ cmd: 'craft_item', recipe: recipeId, commission: true });
+    } else if (batchCount !== undefined) {
+      this.cmd({ cmd: 'craft_item', recipe: recipeId, count: batchCount });
     } else {
       this.cmd({ cmd: 'craft_item', recipe: recipeId });
     }
@@ -4047,6 +4076,15 @@ export class ClientWorld implements IWorld {
     if (p) {
       p.skin = idx;
       p.skinCatalog = catalog;
+      // Same re-resolve the offline Sim does (setPlayerSkin): the body decides
+      // which skin types apply, so the optimistic local view must swap the
+      // displayed skin with the body rather than wait for the next snapshot.
+      p.weaponSkinId = resolveActiveWeaponSkin(
+        p.templateId,
+        p.mainhandItemId,
+        p.weaponSkinLoadout,
+        catalog,
+      );
     }
     this.cmd({ cmd: 'change_skin', skin: idx, catalog });
   }
@@ -4182,6 +4220,16 @@ export class ClientWorld implements IWorld {
       if (current?.skinCatalog === 'mech' && current.skin === skin) {
         current.skin = 0;
         current.skinCatalog = 'class';
+        // Dropping the chroma drops the wearer OFF the mech body, so this is a
+        // body change and re-resolves like changeSkin and Sim.setPlayerSkin do.
+        // Without it a mech hunter's sword skin stayed displayed on a class rig
+        // that cannot render one, until the next authoritative snapshot.
+        current.weaponSkinId = resolveActiveWeaponSkin(
+          current.templateId,
+          current.mainhandItemId,
+          current.weaponSkinLoadout,
+          current.skinCatalog,
+        );
       }
       const existing = this.inventory.find((slot) => slot.itemId === itemId);
       this.inventory = existing
@@ -4210,7 +4258,12 @@ export class ClientWorld implements IWorld {
       } else delete next[type];
       if (!def) p.weaponSkinLoadout = next;
       const appliedLoadout = p.weaponSkinLoadout;
-      p.weaponSkinId = resolveActiveWeaponSkin(p.templateId, p.mainhandItemId, appliedLoadout);
+      p.weaponSkinId = resolveActiveWeaponSkin(
+        p.templateId,
+        p.mainhandItemId,
+        appliedLoadout,
+        p.skinCatalog ?? 'class',
+      );
       const loadout: Record<string, string> = {};
       for (const [t, id] of Object.entries(appliedLoadout)) if (id) loadout[t] = id;
       this.accountCosmetics = { ...this.accountCosmetics, weaponSkinLoadout: loadout };

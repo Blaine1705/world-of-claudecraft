@@ -14,7 +14,7 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { InvSlot, ItemDef } from '../src/sim/types';
 import { buildCraftingView, type RecipeDefLike } from '../src/ui/crafting_view';
 import { type CraftingWindowDeps, renderCraftingWindow } from '../src/ui/crafting_window';
@@ -53,6 +53,10 @@ function craftingDeps(): CraftingWindowDeps {
     hideTooltip: () => {},
     onCraft: () => {},
     onClose: () => {},
+    onOpenOrders: () => {},
+    craftQty: () => 1,
+    onCraftQty: () => {},
+    announce: () => {},
     itemIcon: () => '',
     moneyHtml: () => '',
     itemTooltip: () => '',
@@ -61,7 +65,6 @@ function craftingDeps(): CraftingWindowDeps {
     onToggleCommission: () => {},
     selectedCraft: () => null,
     onSelectCraft: () => {},
-    onOpenOrders: () => {},
   };
 }
 
@@ -123,35 +126,99 @@ describe('crafting window: Tab focus trap and restore-on-close', () => {
     const capturedOpener = bridge.captureFocus();
     expect(capturedOpener).toBe(opener);
 
-    // Document order: the commission-board button then Close (both panel-title),
-    // the craft's tab-strip button (.crafting-tabs), then the Craft row button
-    // (.crafting-body).
+    // Document order: Orders then Close (panel-title), the cast strip
+    // (tabindex -1, EXCLUDED from the Tab cycle), the craft's tab-strip
+    // button (.crafting-tabs), then the recipe row's controls in
+    // .crafting-body: the Craft row button, the qty stepper (dec is disabled
+    // at the qty-1 floor, so Tab skips it), and Create All.
     const ordersBtn = el.querySelector<HTMLButtonElement>('[data-open-orders]');
     const closeBtn = el.querySelector<HTMLButtonElement>('[data-close]');
     const tabBtn = el.querySelector<HTMLButtonElement>('.crafting-tab');
     const craftBtn = el.querySelector<HTMLButtonElement>('.crafting-recipe-btn');
+    const decBtn = el.querySelector<HTMLButtonElement>('[data-focus-key^="qty-dec:"]');
+    const incBtn = el.querySelector<HTMLButtonElement>('[data-focus-key^="qty-inc:"]');
+    const createAllBtn = el.querySelector<HTMLButtonElement>('.crafting-create-all-btn');
+    const strip = el.querySelector<HTMLElement>('.crafting-cast-progress');
     expect(ordersBtn).not.toBeNull();
     expect(closeBtn).not.toBeNull();
     expect(tabBtn).not.toBeNull();
     expect(craftBtn).not.toBeNull();
     expect(craftBtn?.disabled).toBe(false); // the craftable fixture precondition
+    expect(decBtn?.disabled).toBe(true); // qty floor: dec starts disabled
+    // 3 bone_fragments against a 2-cost recipe: mats-fit is 1, so inc is
+    // ALSO at its ceiling and disabled; Tab must skip the whole stepper.
+    expect(incBtn?.disabled).toBe(true);
+    expect(createAllBtn?.disabled).toBe(false);
+    expect(strip?.tabIndex).toBe(-1); // programmatic focus only, never tabbed
 
-    // Walk the full four-control cycle: every Tab is intercepted (the trap
-    // is really installed, not a no-op that happens to leave focus alone),
-    // and it wraps back to the first control rather than ever reaching the
-    // opener or body.
-    ordersBtn?.focus();
-    expect(document.activeElement).toBe(ordersBtn);
-    expect(pressTab()).toBe(true);
+    // Walk the FULL enumerated cycle: every Tab is intercepted (the trap is
+    // really installed, not a no-op that happens to leave focus alone), the
+    // disabled stepper buttons and the tabindex -1 strip are skipped, and it
+    // wraps to Orders rather than ever reaching the opener or body.
+    closeBtn?.focus();
     expect(document.activeElement).toBe(closeBtn);
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(tabBtn);
     expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(craftBtn);
     expect(pressTab()).toBe(true);
+    expect(document.activeElement).toBe(createAllBtn);
+    expect(pressTab()).toBe(true);
     expect(document.activeElement).toBe(ordersBtn); // wraps
+    expect(pressTab()).toBe(true);
+    expect(document.activeElement).toBe(closeBtn);
     expect(document.activeElement).not.toBe(opener);
     expect(document.activeElement).not.toBe(document.body);
+  });
+
+  it('moves focus into the dialog on the ordinary open path before Tab is pressed', async () => {
+    const opener = document.createElement('button');
+    document.body.appendChild(opener);
+    opener.focus();
+
+    const el = document.createElement('div');
+    el.id = 'crafting-window';
+    document.body.appendChild(el);
+
+    const fm = new FocusManager();
+    const bridge = makeWindowFocus(fm, () => el);
+
+    renderCraftingWindow(el, craftableView(), craftingDeps());
+    const capturedOpener = bridge.captureFocus();
+    fm.focusFirst(el);
+
+    const tabBtn = el.querySelector<HTMLButtonElement>('.crafting-tab');
+    await vi.waitFor(() => expect(document.activeElement).toBe(tabBtn));
+
+    expect(pressTab()).toBe(true);
+    expect(el.contains(document.activeElement)).toBe(true);
+
+    bridge.restoreFocus(capturedOpener);
+    await vi.waitFor(() => expect(document.activeElement).toBe(opener));
+  });
+
+  it('moves focus to the selected tab for the craftId handoff path', () => {
+    const opener = document.createElement('button');
+    document.body.appendChild(opener);
+    opener.focus();
+
+    const el = document.createElement('div');
+    el.id = 'crafting-window';
+    document.body.appendChild(el);
+
+    const fm = new FocusManager();
+    const bridge = makeWindowFocus(fm, () => el);
+
+    renderCraftingWindow(el, craftableView(), craftingDeps());
+    bridge.captureFocus();
+    const selected = el.querySelector<HTMLButtonElement>('.crafting-tab.sel');
+    selected?.focus();
+
+    expect(document.activeElement).toBe(selected);
+    expect(pressTab()).toBe(true);
+    expect(el.contains(document.activeElement)).toBe(true);
+
+    bridge.restoreFocus(null);
   });
 
   it('hands focus back to the opener on close, tearing the trap down', async () => {
@@ -198,7 +265,7 @@ describe('hud.ts crafting window wiring (source pins; Hud is a monolith no test 
 
   it('openCrafting captures the opener AFTER the paint, mirroring openTrain/openUnbind', () => {
     const start = hudSource.indexOf('openCrafting(craftId?: string): void {');
-    const end = hudSource.indexOf('private renderCrafting(): void {');
+    const end = hudSource.indexOf('private renderCrafting(focusReturnRecipeId = ');
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     const body = hudSource.slice(start, end);
@@ -208,6 +275,23 @@ describe('hud.ts crafting window wiring (source pins; Hud is a monolith no test 
     expect(body.indexOf('this.renderCrafting();')).toBeLessThan(
       body.indexOf('this.craftingOpenerFocus = this.craftingWindowFocus.captureFocus();'),
     );
+  });
+
+  it('openCrafting moves focus inside for both ordinary opens and craftId handoffs', () => {
+    const start = hudSource.indexOf('openCrafting(craftId?: string): void {');
+    const end = hudSource.indexOf('private craftCastSessionForPlayer(): CraftCastSessionView {');
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const body = hudSource.slice(start, end);
+    const selectedTabFocus =
+      "($('#crafting-window').querySelector('.crafting-tab.sel') as HTMLElement | null)?.focus();";
+    const ordinaryFocus = "this.focusManager.focusFirst($('#crafting-window'));";
+    expect(body).toContain(selectedTabFocus);
+    expect(body).toContain(ordinaryFocus);
+    expect(body.indexOf('if (craftId !== undefined) {')).toBeLessThan(
+      body.indexOf(selectedTabFocus),
+    );
+    expect(body.indexOf(selectedTabFocus)).toBeLessThan(body.indexOf(ordinaryFocus));
   });
 
   it('closeCrafting restores focus to the opener and clears the field', () => {
