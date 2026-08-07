@@ -2046,9 +2046,11 @@ function applyChannelTick(
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
         if (doom > 0) gainDoom(ctx, src, doom);
         if (!src.dead) {
-          const healed = Math.min(Math.round(dmg * eff.healFrac), src.maxHp - src.hp);
+          const intended = Math.round(dmg * eff.healFrac);
+          const healed = Math.min(intended, src.maxHp - src.hp);
           if (healed > 0) {
             src.hp += healed;
+            const overheal = intended - healed;
             ctx.emit({
               type: 'heal2',
               sourceId: src.id,
@@ -2056,6 +2058,7 @@ function applyChannelTick(
               amount: healed,
               crit: false,
               ability: res.def.name,
+              ...(overheal > 0 ? { overheal } : {}),
             });
             ctx.healingThreat(src, src, healed);
           }

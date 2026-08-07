@@ -9,8 +9,8 @@
     "augment wave: fiestaPickOffers + arenaAugmentPick (fiestaAugments on meta + augmentOffer/Chosen events)",
     "multi-player meta"
   ],
-  "draws": 1227,
-  "drawDigest": "30fc618f",
+  "draws": 1176,
+  "drawDigest": "1ab1c3cb",
   "frames": [
     {
       "tick": 0,
@@ -30,8 +30,8 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 967,
-      "state": "433ac95d",
-      "events": "c702eb13",
+      "state": "18feeb15",
+      "events": "6a2f178b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -41,66 +41,66 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 967,
-      "state": "61c2d906",
+      "state": "62cb6bec",
       "events": "224cbfd9",
       "rng": {
-        "draws": 68,
-        "digest": "33e99c8d"
+        "draws": 66,
+        "digest": "383a5306"
       }
     },
     {
       "tick": 75,
       "time": 3.75,
       "nextId": 967,
-      "state": "b14a9d94",
+      "state": "def24ac2",
       "events": "969ec561",
       "rng": {
-        "draws": 267,
-        "digest": "03b0582c"
+        "draws": 247,
+        "digest": "6b3f31b5"
       }
     },
     {
       "tick": 100,
       "time": 5,
       "nextId": 967,
-      "state": "5cb16fa5",
+      "state": "186085ad",
       "events": "507341c9",
       "rng": {
-        "draws": 502,
-        "digest": "c0fe368d"
+        "draws": 485,
+        "digest": "b0986e30"
       }
     },
     {
       "tick": 125,
       "time": 6.25,
       "nextId": 967,
-      "state": "79952e66",
+      "state": "1de455b2",
       "events": "ada54ef3",
       "rng": {
-        "draws": 789,
-        "digest": "6d5cd93a"
+        "draws": 755,
+        "digest": "c2a9f447"
       }
     },
     {
       "tick": 150,
       "time": 7.5,
       "nextId": 967,
-      "state": "9f9962bf",
+      "state": "2b5b2011",
       "events": "741638a5",
       "rng": {
-        "draws": 1076,
-        "digest": "188634c1"
+        "draws": 1038,
+        "digest": "bee5a5dc"
       }
     },
     {
       "tick": 163,
       "time": 8.15,
       "nextId": 967,
-      "state": "f8bfe67c",
+      "state": "c533fd2a",
       "events": "8945b220",
       "rng": {
-        "draws": 1227,
-        "digest": "30fc618f"
+        "draws": 1176,
+        "digest": "1ab1c3cb"
       },
       "label": "final",
       "players": [
@@ -304,12 +304,12 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {
-              "5": "rog_r5_shadeslip",
-              "8": "rog_r8_borrowed_breath",
-              "11": "rog_r11_marked_prey",
-              "14": "rog_r14_dusk_economy",
-              "17": "rog_r17_flurry_of_knives",
-              "20": "rog_r20_second_shadow"
+              "5": "rog_r5_relentless_strikes",
+              "8": "rog_r8_smoke_screen",
+              "11": "rog_r11_preparation",
+              "14": "rog_r14_seal_fate",
+              "17": "rog_r17_cloak_of_shadows",
+              "20": "rog_r20_shadowstep"
             },
             "spec": "assassination"
           },
@@ -338,7 +338,8 @@
             "itemsDiscovered": [
               "baked_bread",
               "footpad_jerkin",
-              "rusty_hatchet"
+              "rusty_hatchet",
+              "spring_water"
             ]
           },
           "delveClears": {},
@@ -361,6 +362,10 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             }
           ],
           "mailWelcomed": true,
@@ -368,12 +373,12 @@
           "recipesGrandfathered": true,
           "talents": {
             "rows": {
-              "5": "hun_r5_tactical_retreat",
-              "8": "hun_r8_receding_shell",
-              "11": "hun_r11_double_hush",
-              "14": "hun_r14_efficient_rhythm",
-              "17": "hun_r17_apex_instinct",
-              "20": "hun_r20_overdraw"
+              "5": "hun_r5_improved_serpent_sting",
+              "8": "hun_r8_startle_shot",
+              "11": "hun_r11_mend_pet",
+              "14": "hun_r14_multi_shot",
+              "17": "hun_r17_deterrence",
+              "20": "hun_r20_improved_volley"
             },
             "spec": "beast_mastery"
           },
@@ -492,10 +497,10 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 177,
+          "attackPower": 118,
           "combatTimer": 99.05,
           "comboUntil": -1,
-          "critChance": 0.211,
+          "critChance": 0.121,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.091,
           "dualWielding": true,
@@ -564,7 +569,7 @@
           "level": 20,
           "lootFfaTimer": "Infinity",
           "maxHp": 783,
-          "maxResource": 100,
+          "maxResource": 622,
           "moveSpeed": 7,
           "onGround": true,
           "overpowerUntil": -1,
@@ -575,8 +580,8 @@
           },
           "potionCooldownUntil": -1,
           "rangedPower": 188,
-          "resource": 100,
-          "resourceType": "focus",
+          "resource": 622,
+          "resourceType": "mana",
           "spawnPos": {
             "x": 2,
             "y": 1.5,

@@ -14,13 +14,22 @@ const guardianHit: SimEvent = {
   kind: 'hit',
 };
 
+// Ownership now resolves through the delivery-time lookup (the live entity
+// map on the server), not the event's sourceOwnerId field: the guardian
+// entity 90 belongs to player 10.
+const ownerOf = (entityId: number): number | null => (entityId === 90 ? 10 : null);
+
 describe('combat event delivery', () => {
   it('delivers guardian damage to its owner and the owner party', () => {
-    expect(shouldDeliverCombatEventToViewer(guardianHit, 10, null)).toBe(true);
-    expect(shouldDeliverCombatEventToViewer(guardianHit, 11, { members: [10, 11] })).toBe(true);
+    expect(shouldDeliverCombatEventToViewer(guardianHit, 10, null, ownerOf)).toBe(true);
+    expect(shouldDeliverCombatEventToViewer(guardianHit, 11, { members: [10, 11] }, ownerOf)).toBe(
+      true,
+    );
   });
 
   it('does not expose guardian damage to unrelated viewers', () => {
-    expect(shouldDeliverCombatEventToViewer(guardianHit, 12, { members: [12] })).toBe(false);
+    expect(shouldDeliverCombatEventToViewer(guardianHit, 12, { members: [12] }, ownerOf)).toBe(
+      false,
+    );
   });
 });
