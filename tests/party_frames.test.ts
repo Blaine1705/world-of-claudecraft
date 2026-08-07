@@ -387,8 +387,9 @@ describe('party pets in the selector and the signature', () => {
     master: { enabled: false, looter: 0, threshold: 'uncommon' },
     members: [member(1, 1), member(2, 1, 10, 0), member(3, 1, 20, 0)],
   });
-  const pets = (over: Partial<{ hp: number; maxHp: number; dead: boolean; id: number }> = {}) =>
-    new Map([[2, { id: 90, name: 'Fang', hp: 30, maxHp: 40, dead: false, ...over }]]);
+  const pets = (
+    over: Partial<{ hp: number; maxHp: number; dead: boolean; id: number; name: string }> = {},
+  ) => new Map([[2, { id: 90, name: 'Fang', hp: 30, maxHp: 40, dead: false, ...over }]]);
 
   it('attaches a member pet from the roster map', () => {
     const rows = selectPartyFrameMembers(
@@ -455,6 +456,32 @@ describe('party pets in the selector and the signature', () => {
       pets({ hp: 12 }),
     );
     expect(after).not.toBe(before);
+  });
+
+  // renamePet changes ONLY the name; every other pet and member field stays put. The
+  // sliver's accessible label is built from that name, so if the signature ignored it
+  // updatePartyFrames would short-circuit and a screen-reader user would keep hearing
+  // the old name. Everything paintPet reads has to be folded, not just the numbers.
+  it('MOVES the signature when a pet is RENAMED and nothing else changes', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    const before = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets(),
+    );
+    const renamed = partyFrameSignature(
+      party,
+      1,
+      pos,
+      undefined,
+      DEFAULT_PARTY_FRAME_DISPLAY,
+      pets({ name: 'Shadowfang' }),
+    );
+    expect(renamed).not.toBe(before);
   });
 
   it('MOVES the signature when a pet dies, is dismissed, or is swapped', () => {

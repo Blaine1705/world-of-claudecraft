@@ -149,9 +149,16 @@ export function partyFrameSignature(
     // could move while every wire field stayed put, the signature would not budge,
     // and updatePartyFrames would short-circuit before repainting: the sliver would
     // simply freeze at whatever value it first painted.
+    //
+    // The NAME is folded for the same reason and is not decorative: it is the only
+    // thing the sliver's accessible label says besides the percent, and renamePet
+    // can change it with every other field identical. Everything paintPet reads
+    // (name, hp, maxHp, dead) has to be in here, or that read goes stale silently.
+    // Pet names are validated to letters, spaces, apostrophes and hyphens, so they
+    // cannot inject the delimiters this fold uses.
     const pet = config.showPets ? pets?.get(m.pid) : undefined;
     sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}`;
-    sig += pet ? `:P${pet.id},${pet.hp}/${pet.maxHp},${pet.dead ? 1 : 0}|` : '|';
+    sig += pet ? `:P${pet.id},${pet.name},${pet.hp}/${pet.maxHp},${pet.dead ? 1 : 0}|` : '|';
   }
   return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.showPets ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
 }
