@@ -8600,6 +8600,11 @@ type BgExtraKey =
   | 'leaveQueue'
   | 'battleBegins'
   | 'fightFor'
+  // The backfill pair (a queued solo seated into a match already under way):
+  // the joiner's own line, which must say the match is off the ladder, and the
+  // one their new teammates see.
+  | 'backfillJoin'
+  | 'backfillArrived'
   | 'seizeRune'
   | 'seizeBattleRune'
   | 'seizeWardRune'
@@ -8631,6 +8636,9 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   seizeRune: 'You seize a Sprint Rune!',
   seizeBattleRune: 'You seize a Battle Rune!',
   seizeWardRune: 'You seize a Ward Rune!',
+  backfillJoin:
+    'Thornhollow Fields: you join a battle already under way for the {team}. This match will not change your rating.',
+  backfillArrived: 'A fresh fighter joins the {team}.',
   teamCrimson: 'Crimson',
   teamAzure: 'Azure',
   errInBattleground: 'You are already in a battleground.',
@@ -8657,6 +8665,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     battleBegins: '荆谷原野之战开始了:夺取他们的旗帜!',
     fightFor: '荆谷原野:你为{team}而战。先夺得{caps}次旗帜者获胜。',
     seizeRune: '你夺得了疾行符文!',
+    backfillJoin: '荆谷原野:你加入了{team}正在进行的战斗。本场比赛不会改变你的评分。',
+    backfillArrived: '一名新的战士加入了{team}。',
     teamCrimson: '赤红队',
     teamAzure: '蔚蓝队',
     errInBattleground: '你已经在战场中了。',
@@ -8682,6 +8692,8 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     battleBegins: '荊谷原野之戰開始了:奪取他們的旗幟!',
     fightFor: '荊谷原野:你為{team}而戰。先奪得{caps}次旗幟者獲勝。',
     seizeRune: '你奪得了疾行符文!',
+    backfillJoin: '荊谷原野:你加入了{team}正在進行的戰鬥。本場比賽不會改變你的評分。',
+    backfillArrived: '一名新的戰士加入了{team}。',
     teamCrimson: '赤紅隊',
     teamAzure: '蔚藍隊',
     errInBattleground: '你已經在戰場中了。',
@@ -8708,6 +8720,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     fightFor:
       'ソーンホロウ平原:あなたは{team}として戦います。先に{caps}回旗を奪取したチームの勝利です。',
     seizeRune: 'スプリントルーンを手に入れた!',
+    backfillJoin:
+      'ソーンホロウ平原:進行中の戦いに{team}として参加します。この試合でレーティングは変動しません。',
+    backfillArrived: '新たな戦士が{team}に加わりました。',
     teamCrimson: 'クリムゾン',
     teamAzure: 'アズール',
     errInBattleground: 'すでに戦場にいます。',
@@ -8738,6 +8753,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     fightFor:
       '쏜할로우 평원: 당신은 {team} 소속으로 싸웁니다. 먼저 {caps}회 깃발을 탈취한 팀이 승리합니다.',
     seizeRune: '질주 룬을 차지했습니다!',
+    backfillJoin:
+      '쏜할로우 평원: 진행 중인 전투에 {team}으로 참가합니다. 이 경기는 평점에 반영되지 않습니다.',
+    backfillArrived: '새로운 전사가 {team}에 합류했습니다.',
     teamCrimson: '진홍팀',
     teamAzure: '청람팀',
     errInBattleground: '이미 전장에 있습니다.',
@@ -8766,6 +8784,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     fightFor:
       'Терновая Лощина: вы сражаетесь за {team}. Побеждает команда, первой захватившая флаг {caps} раз.',
     seizeRune: 'Вы подобрали руну спринта!',
+    backfillJoin:
+      'Терновая Лощина: вы вступаете в уже идущий бой за {team}. Этот матч не изменит ваш рейтинг.',
+    backfillArrived: 'Новый боец присоединяется к отряду {team}.',
     teamCrimson: 'Багровых',
     teamAzure: 'Лазурных',
     errInBattleground: 'Вы уже находитесь на поле боя.',
@@ -8795,6 +8816,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'You seize a Sprint Rune!',
     seizeBattleRune: 'You seize a Battle Rune!',
     seizeWardRune: 'You seize a Ward Rune!',
+    backfillJoin:
+      'Thornhollow Fields: you join a battle already under way for the {team}. This match will not change your rating.',
+    backfillArrived: 'A fresh fighter joins the {team}.',
     teamCrimson: 'Crimson',
     teamAzure: 'Azure',
     errInBattleground: 'You are already in a battleground.',
@@ -8824,6 +8848,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: '¡Te apoderas de una Runa de Velocidad!',
     seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
     seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    backfillJoin:
+      'Te unes a una batalla ya en curso con {team} en los Campos de Thornhollow. Este combate no cambiará tu clasificación.',
+    backfillArrived: 'Un nuevo combatiente entra en combate con {team}.',
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
@@ -8855,6 +8882,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: '¡Te apoderas de una Runa de Velocidad!',
     seizeBattleRune: '¡Te apoderas de una Runa de Batalla!',
     seizeWardRune: '¡Te apoderas de una Runa de Protección!',
+    backfillJoin:
+      'Te unes a una batalla ya en curso con {team} en los Campos de Thornhollow. Este combate no cambiará tu clasificación.',
+    backfillArrived: 'Un nuevo combatiente entra en combate con {team}.',
     teamCrimson: 'Carmesí',
     teamAzure: 'Azur',
     errInBattleground: 'Ya estás en un campo de batalla.',
@@ -8886,6 +8916,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Vous vous emparez d’une Rune de course !',
     seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
     seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    backfillJoin:
+      'Vous rejoignez une bataille déjà engagée avec {team} dans les Champs de Thornhollow. Ce match ne modifiera pas votre classement.',
+    backfillArrived: 'Un nouveau combattant rejoint {team}.',
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
@@ -8917,6 +8950,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Vous vous emparez d’une Rune de course !',
     seizeBattleRune: 'Vous vous emparez d’une Rune de bataille !',
     seizeWardRune: 'Vous vous emparez d’une Rune de protection !',
+    backfillJoin:
+      'Vous rejoignez une bataille déjà engagée avec {team} dans les Champs de Thornhollow. Ce match ne modifiera pas votre classement.',
+    backfillArrived: 'Un nouveau combattant rejoint {team}.',
     teamCrimson: 'les Cramoisis',
     teamAzure: 'les Azurs',
     errInBattleground: 'Vous êtes déjà sur un champ de bataille.',
@@ -8948,6 +8984,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Ti impossessi di una Runa di Scatto!',
     seizeBattleRune: 'Ti impossessi di una Runa di Battaglia!',
     seizeWardRune: 'Ti impossessi di una Runa di Protezione!',
+    backfillJoin:
+      'Ti unisci a una battaglia già in corso con {team} nei Campi di Thornhollow. Questa partita non modificherà il tuo punteggio.',
+    backfillArrived: 'Un nuovo combattente entra in campo con {team}.',
     teamCrimson: 'i Cremisi',
     teamAzure: 'gli Azzurri',
     errInBattleground: 'Sei già in un campo di battaglia.',
@@ -8980,6 +9019,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Du schnappst dir eine Sprintrune!',
     seizeBattleRune: 'Du schnappst dir eine Kampfrune!',
     seizeWardRune: 'Du schnappst dir eine Schutzrune!',
+    backfillJoin:
+      'Du steigst auf den Thornhollow-Feldern in eine bereits laufende Schlacht ein und kämpfst für {team}. Dieses Match ändert deine Wertung nicht.',
+    backfillArrived: 'Ein neuer Kämpfer kämpft nun für {team}.',
     teamCrimson: 'die Karmesinroten',
     teamAzure: 'die Azurblauen',
     errInBattleground: 'Du bist bereits auf einem Schlachtfeld.',
@@ -9011,6 +9053,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Você toma uma Runa de Corrida!',
     seizeBattleRune: 'Você toma uma Runa de Batalha!',
     seizeWardRune: 'Você toma uma Runa de Proteção!',
+    backfillJoin:
+      'Você entra em uma batalha em andamento pelos {team} nos Campos de Thornhollow. Esta partida não alterará sua classificação.',
+    backfillArrived: 'Um novo combatente entra em campo pelos {team}.',
     teamCrimson: 'Carmesins',
     teamAzure: 'Azuis',
     errInBattleground: 'Você já está em um campo de batalha.',
@@ -9042,6 +9087,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Zmocnil(a) ses Runy sprintu!',
     seizeBattleRune: 'Zmocnil(a) ses Runy boje!',
     seizeWardRune: 'Zmocnil(a) ses Runy ochrany!',
+    backfillJoin:
+      'Připojuješ se k již probíhající bitvě za {team} na Thornhollowských polích. Tento zápas neovlivní tvůj rating.',
+    backfillArrived: 'Do boje za {team} se zapojuje nový bojovník.',
     teamCrimson: 'Rudé',
     teamAzure: 'Azurové',
     errInBattleground: 'Už jsi na bojišti.',
@@ -9071,6 +9119,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Je bemachtigt een Sprintrune!',
     seizeBattleRune: 'Je bemachtigt een Strijdrune!',
     seizeWardRune: 'Je bemachtigt een Wachtrune!',
+    backfillJoin:
+      'Je sluit je aan bij een al begonnen strijd voor {team} op de Doornholte-Velden. Deze wedstrijd verandert je rating niet.',
+    backfillArrived: 'Een nieuwe strijder vecht nu voor {team}.',
     teamCrimson: 'de Karmozijnen',
     teamAzure: 'de Azuren',
     errInBattleground: 'Je bent al op een slagveld.',
@@ -9102,6 +9153,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Zdobywasz Runę Sprintu!',
     seizeBattleRune: 'Zdobywasz Runę Bitwy!',
     seizeWardRune: 'Zdobywasz Runę Ochrony!',
+    backfillJoin:
+      'Dołączasz do trwającej już bitwy po stronie {team} na Polach Ciernistej Kotliny. Ten mecz nie zmieni twojego rankingu.',
+    backfillArrived: 'Nowy wojownik dołącza do {team}.',
     teamCrimson: 'Szkarłatnych',
     teamAzure: 'Lazurowych',
     errInBattleground: 'Jesteś już na polu bitwy.',
@@ -9132,6 +9186,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Kamu merebut Rune Lari Cepat!',
     seizeBattleRune: 'Kamu merebut Rune Pertempuran!',
     seizeWardRune: 'Kamu merebut Rune Pelindung!',
+    backfillJoin:
+      'Kamu bergabung dengan pertempuran yang sedang berlangsung untuk {team} di Padang Thornhollow. Pertandingan ini tidak akan mengubah peringkatmu.',
+    backfillArrived: 'Seorang petarung baru bergabung dengan {team}.',
     teamCrimson: 'Merah Tua',
     teamAzure: 'Biru Langit',
     errInBattleground: 'Kamu sudah berada di medan perang.',
@@ -9162,6 +9219,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Bir Koşu Rünü ele geçirdin!',
     seizeBattleRune: 'Bir Savaş Rünü ele geçirdin!',
     seizeWardRune: 'Bir Koruma Rünü ele geçirdin!',
+    backfillJoin:
+      'Dikenvadi Ovalarında süregelen bir savaşa {team} safında katılıyorsun. Bu maç puanını değiştirmeyecek.',
+    backfillArrived: 'Yeni bir savaşçı {team} safına katıldı.',
     teamCrimson: 'Kızıllar',
     teamAzure: 'Gökmaviler',
     errInBattleground: 'Zaten bir savaş alanındasın.',
@@ -9190,6 +9250,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Du lägger beslag på en Spurtruna!',
     seizeBattleRune: 'Du lägger beslag på en Stridsruna!',
     seizeWardRune: 'Du lägger beslag på en Skyddsruna!',
+    backfillJoin:
+      'Du ansluter till en redan pågående strid för {team} på Törnhålefälten. Den här matchen påverkar inte din rankning.',
+    backfillArrived: 'En ny kämpe strider nu för {team}.',
     teamCrimson: 'de Karmosinröda',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du är redan på ett slagfält.',
@@ -9217,6 +9280,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Bạn giành được Rune Nước Rút!',
     seizeBattleRune: 'Bạn giành được Rune Chiến Trận!',
     seizeWardRune: 'Bạn giành được Rune Hộ Vệ!',
+    backfillJoin:
+      'Bạn tham gia một trận đấu đang diễn ra cho {team} tại Cánh Đồng Thung Gai. Trận này sẽ không thay đổi thứ hạng của bạn.',
+    backfillArrived: 'Một chiến binh mới gia nhập {team}.',
     teamCrimson: 'phe Đỏ Thẫm',
     teamAzure: 'phe Xanh Biếc',
     errInBattleground: 'Bạn đã ở trong một chiến trường rồi.',
@@ -9246,6 +9312,9 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     seizeRune: 'Du snupper en Spurtrune!',
     seizeBattleRune: 'Du snupper en Kamprune!',
     seizeWardRune: 'Du snupper en Værnerune!',
+    backfillJoin:
+      'Du slutter dig til en kamp der allerede er i gang for {team} på Tornehule Sletter. Denne kamp ændrer ikke din rating.',
+    backfillArrived: 'En ny kriger kæmper nu for {team}.',
     teamCrimson: 'de Karmosinrøde',
     teamAzure: 'de Azurblå',
     errInBattleground: 'Du er allerede på en slagmark.',
@@ -9269,6 +9338,15 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
 function tBg(key: BgExtraKey, params?: InterpolationValues): string {
   const table = BG_EXTRA[getLanguage()] ?? BG_EXTRA.en;
   return interpolate(table[key] ?? BG_EXTRA_EN[key], params);
+}
+
+/** The localized team word for a captured English BG_TEAM_NAMES value. Shared by
+ *  the three rules that interpolate a side into their line; an unrecognized
+ *  capture passes through verbatim rather than resolving to an empty string. */
+function bgTeamWord(captured: string): string {
+  if (captured === 'Crimson') return tBg('teamCrimson');
+  if (captured === 'Azure') return tBg('teamAzure');
+  return captured;
 }
 
 type QuestExtraKey =
@@ -10495,11 +10573,15 @@ const RULES: Rule[] = [
   },
   {
     re: /^Thornhollow Fields: you fight for the (.+?)\. First to (.+?) captures wins\.$/,
-    build: (m) =>
-      tBg('fightFor', {
-        team: m[1] === 'Crimson' ? tBg('teamCrimson') : m[1] === 'Azure' ? tBg('teamAzure') : m[1],
-        caps: m[2],
-      }),
+    build: (m) => tBg('fightFor', { team: bgTeamWord(m[1]), caps: m[2] }),
+  },
+  {
+    re: /^Thornhollow Fields: you join a battle already under way for the (.+?)\. This match will not change your rating\.$/,
+    build: (m) => tBg('backfillJoin', { team: bgTeamWord(m[1]) }),
+  },
+  {
+    re: /^A fresh fighter joins the (.+?)\.$/,
+    build: (m) => tBg('backfillArrived', { team: bgTeamWord(m[1]) }),
   },
   { re: /^You seize a Sprint Rune!$/, build: () => tBg('seizeRune') },
   { re: /^You seize a Battle Rune!$/, build: () => tBg('seizeBattleRune') },

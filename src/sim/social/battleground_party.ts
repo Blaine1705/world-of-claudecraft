@@ -52,6 +52,61 @@ export function formBgTeamParty(ctx: SimContext, teamPids: number[]): number[] {
   return units.filter((u) => u !== base).flatMap((u) => u.members);
 }
 
+/**
+ * Add ONE backfilled fighter to a team's existing match party. Returns true when
+ * the link was made, so the caller can record it as auto-added and unwind it
+ * exactly like a start-of-match one.
+ *
+ * The joiner is always the added unit, never the base: the team's party (and so
+ * its id, leader, and loot settings) is the one that must survive, which is the
+ * mirror of the rule formBgTeamParty applies at start. Returns false when the
+ * team holds no party to join (an all-solo side whose formation refused, or a
+ * dev match), leaving the fighter partyless rather than inventing a group.
+ */
+export function joinBgTeamParty(
+  ctx: SimContext,
+  teamPids: number[],
+  joinerPid: number,
+  opts: { simFormed: boolean },
+): boolean {
+  let existing = teamPids
+    .filter((pid) => pid !== joinerPid)
+    .map((pid) => ctx.partyOf(pid))
+    .find((party) => party !== null);
+  if (!existing) return false;
+  if (existing.members.includes(joinerPid)) return false; // already linked
+  // A deserter who was the party's BASE unit is not an auto-added link, so
+  // unwindBgAutoPartyFor leaves them in it: the party stays five wide and the
+  // merge below would be refused for capacity while the team fights four.
+  // Drop anyone who has left the match, but ONLY from a party this system built
+  // (simFormed). A team that queued as one whole premade owns its group, and
+  // the deliberate rule there is that deserting the match never breaks up the
+  // friends: such a team simply gets no party seat for its backfill.
+  if (opts.simFormed) {
+    const stale = existing.members.filter((m) => !teamPids.includes(m));
+    for (const m of stale) ctx.removeFromParty(m, LEAVE_VERB);
+    if (stale.length > 0) {
+      const refreshed = teamPids
+        .filter((pid) => pid !== joinerPid)
+        .map((pid) => ctx.partyOf(pid))
+        .find((party) => party !== null);
+      if (!refreshed) return false;
+      existing = refreshed;
+    }
+  }
+  // Partied with someone outside this match: pull them out solo first, so the
+  // old party gets the normal leave notice before the merge.
+  if (ctx.partyOf(joinerPid)) ctx.removeFromParty(joinerPid, LEAVE_VERB);
+  const formed = ctx.formDungeonFinderGroup(
+    [
+      { partyId: existing.id, leaderPid: existing.leader, members: [...existing.members] },
+      { partyId: null, leaderPid: joinerPid, members: [joinerPid] },
+    ],
+    { raid: false },
+  );
+  return formed !== null;
+}
+
 /** Unwind every auto-added team-party link (match end). */
 export function unwindBgTeamParties(ctx: SimContext, auto: [number[], number[]]): void {
   for (const team of [0, 1] as const) {

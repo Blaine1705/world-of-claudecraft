@@ -35,6 +35,7 @@ import {
   type BgMatch,
   bgAllPids,
   bgCarryingFlag,
+  bgQueueSize,
   bgResolveDesertion,
   CARRIED_FLAG_AURA_ID,
   devEndBg,
@@ -115,6 +116,9 @@ function logPidsFor(events: SimEvent[], text: string): number[] {
 
 const bgPartyJoinLine = (count: number): string =>
   `Your party of ${count} joins the Thornhollow Fields queue.`;
+
+const joinInProgressLine = (team: string): string =>
+  `Thornhollow Fields: you join a battle already under way for the ${team}. This match will not change your rating.`;
 
 function kill(sim: Sim, pid: number, killerPid: number | null = null) {
   const e = sim.entities.get(pid)!;
@@ -2893,5 +2897,128 @@ describe('the outcome log stays observability-only', () => {
       'src/sim/sim_context.ts', // the live view
       'src/sim/social/battleground.ts', // the one write site
     ]);
+  });
+});
+
+describe('Thornhollow Fields: a queued solo backfills a deserted seat', () => {
+  // The leaver already pays (bgResolveDesertion charges rating and an L). This
+  // is the other half: the four who stayed get their fifth back rather than
+  // playing out a rated 4v5, which at BG_TEAM_SIZE 5 is most of a match.
+  const staged = (): { sim: Sim; match: BgMatch; pids: number[] } => {
+    const { sim, pids } = tenInQueue();
+    const match = sim.ctx.bgMatches.get(pids[0])!;
+    toActive(sim, match);
+    return { sim, match, pids };
+  };
+
+  // One more level-20 solo waiting in the queue, ready to be seated.
+  const queueSpare = (sim: Sim, name = 'Spare'): number => {
+    const pid = sim.addPlayer('warrior', name);
+    tp(sim, pid, 6, -40);
+    sim.entities.get(pid)!.level = 20;
+    sim.bgQueueJoin(pid);
+    return pid;
+  };
+
+  it('seats the spare into the empty seat and tells both sides', () => {
+    const { sim, match, pids } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    bgResolveDesertion(sim.ctx, deserter);
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+
+    const events = sim.tick();
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE);
+    expect(match.teams[0]).toContain(spare);
+    expect(sim.ctx.bgMatches.get(spare)).toBe(match);
+    expect(sim.ctx.bgQueue).toHaveLength(0);
+    // The seat carries the same per-fighter bookkeeping a start-of-match one
+    // does, or the release path would strand them on the field.
+    expect(match.returns.has(spare)).toBe(true);
+    expect(match.preMatchPools.has(spare)).toBe(true);
+    expect(match.stats.get(spare)).toEqual({ kills: 0, deaths: 0, captures: 0, assists: 0 });
+
+    // Welded into the team's match party like everyone else, and recorded as an
+    // auto-added link so the release path unwinds it (a silent false from
+    // joinBgTeamParty would leave them fighting outside party chat and frames).
+    const teamParty = sim.ctx.partyOf(match.teams[0][0]);
+    expect(teamParty?.members).toContain(spare);
+    expect(match.autoPartyPids[0]).toContain(spare);
+
+    expect(logPidsFor(events, joinInProgressLine('Crimson'))).toEqual([spare]);
+    // Everyone still in the match hears it except the joiner, who got their own line.
+    expect(logPidsFor(events, 'A fresh fighter joins the Crimson.')).toEqual(
+      bgAllPids(match)
+        .filter((p) => p !== spare)
+        .sort((a, b) => a - b),
+    );
+    expect(pids).toContain(deserter);
+  });
+
+  it('leaves the backfilled fighter off the ladder while the rest are scored', () => {
+    const { sim, match } = staged();
+    const deserter = match.teams[0][0];
+    const spare = queueSpare(sim);
+    bgResolveDesertion(sim.ctx, deserter);
+    sim.tick();
+    expect(match.backfilled.has(spare)).toBe(true);
+
+    const stayer = match.teams[0].find((p) => p !== spare)!;
+    const spareBefore = sim.ctx.players.get(spare)!.bgRating;
+    const stayerBefore = sim.ctx.players.get(stayer)!.bgRating;
+    endBgMatch(sim.ctx, match, 1, 'caps'); // the backfilled side LOSES
+
+    const spareMeta = sim.ctx.players.get(spare)!;
+    const stayerMeta = sim.ctx.players.get(stayer)!;
+    expect(spareMeta.bgRating).toBe(spareBefore);
+    expect(spareMeta.bgLosses).toBe(0);
+    // Decisive only against a teammate who really did move: same match, same result.
+    expect(stayerMeta.bgRating).toBeLessThan(stayerBefore);
+    expect(stayerMeta.bgLosses).toBe(1);
+  });
+
+  it('charges a backfilled fighter nothing if they leave too', () => {
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    sim.tick();
+    expect(match.backfilled.has(spare)).toBe(true);
+
+    const before = sim.ctx.players.get(spare)!.bgRating;
+    bgResolveDesertion(sim.ctx, spare);
+    expect(sim.ctx.players.get(spare)!.bgRating).toBe(before);
+    expect(sim.ctx.players.get(spare)!.bgLosses).toBe(0);
+  });
+
+  it('refuses the seat once the short side is one capture from losing', () => {
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const spare = queueSpare(sim);
+    match.scores[1] = BG_CAPS_TO_WIN - 1;
+
+    sim.tick();
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+    expect(sim.ctx.bgMatches.has(spare)).toBe(false);
+    // Still queued, not silently dropped: the match refused them, nothing else.
+    expect(bgQueueSize(sim.ctx)).toBe(1);
+  });
+
+  it('never breaks up a queued pair to fill one seat', () => {
+    const { sim, match } = staged();
+    bgResolveDesertion(sim.ctx, match.teams[0][0]);
+    const a = sim.addPlayer('warrior', 'PairA');
+    const b = sim.addPlayer('priest', 'PairB');
+    for (const pid of [a, b]) {
+      tp(sim, pid, 8, -40);
+      sim.entities.get(pid)!.level = 20;
+    }
+    sim.partyInvite(b, a);
+    sim.partyAccept(b);
+    sim.bgQueueJoin(a);
+
+    sim.tick();
+    expect(match.teams[0]).toHaveLength(BG_TEAM_SIZE - 1);
+    expect(sim.ctx.bgMatches.has(a)).toBe(false);
+    expect(sim.ctx.bgMatches.has(b)).toBe(false);
   });
 });
