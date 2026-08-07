@@ -8613,7 +8613,6 @@ type BgExtraKey =
   | 'errPartyTooLarge'
   | 'errPartyLeaderOnly'
   | 'errDelveDuringBg'
-  | 'errTalentsDuringBg'
   | 'errLevelTooLow'
   | 'errMemberLevelTooLow'
   | 'heldAtGate'
@@ -8641,7 +8640,6 @@ const BG_EXTRA_EN: Record<BgExtraKey, string> = {
   errPartyTooLarge: 'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
   errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
   errDelveDuringBg: 'You cannot enter a delve during a battleground.',
-  errTalentsDuringBg: 'You cannot change talents during a battleground.',
   errLevelTooLow: 'Thornhollow Fields requires level {level}.',
   errMemberLevelTooLow: 'Every party member must be level {level} to queue for Thornhollow Fields.',
   heldAtGate: 'The gates open when the battle begins.',
@@ -8667,7 +8665,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyTooLarge: '你的队伍人数超出荆谷原野上限。最多5人小队可排队。',
     errPartyLeaderOnly: '只有队长才能让小队排入荆谷原野队列。',
     errDelveDuringBg: '战场进行中无法进入探秘。',
-    errTalentsDuringBg: '战场进行中无法更改天赋。',
     errLevelTooLow: '荆谷原野需要等级{level}。',
     errMemberLevelTooLow: '所有小队成员必须达到等级{level}才能加入荆谷原野队列。',
     seizeBattleRune: '你夺得了战斗符文!',
@@ -8692,7 +8689,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyTooLarge: '你的隊伍人數超出荊谷原野上限。最多5人隊伍可排隊。',
     errPartyLeaderOnly: '只有隊長才能讓隊伍排入荊谷原野佇列。',
     errDelveDuringBg: '戰場進行中無法進入探祕。',
-    errTalentsDuringBg: '戰場進行中無法更改天賦。',
     errLevelTooLow: '荊谷原野需要等級{level}。',
     errMemberLevelTooLow: '所有隊伍成員必須達到等級{level}才能加入荊谷原野佇列。',
     seizeBattleRune: '你奪得了戰鬥符文!',
@@ -8720,7 +8716,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'ソーンホロウ平原のキューにパーティを登録できるのはパーティリーダーだけです。',
     errDelveDuringBg: '戦場の最中はディレルヴに入れません。',
-    errTalentsDuringBg: '戦場の最中はタレントを変更できません。',
     errLevelTooLow: 'ソーンホロウ平原にはレベル{level}が必要です。',
     errMemberLevelTooLow:
       'ソーンホロウ平原のキューに参加するには、パーティ全員がレベル{level}である必要があります。',
@@ -8749,7 +8744,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       '파티 인원이 쏜할로우 평원 제한을 초과합니다. 최대 5인 파티만 참가할 수 있습니다.',
     errPartyLeaderOnly: '쏜할로우 평원 대기열에는 파티장만 파티를 등록할 수 있습니다.',
     errDelveDuringBg: '전장 중에는 탐사에 들어갈 수 없습니다.',
-    errTalentsDuringBg: '전장 중에는 특성을 변경할 수 없습니다.',
     errLevelTooLow: '쏜할로우 평원은 레벨 {level}부터 참가할 수 있습니다.',
     errMemberLevelTooLow:
       '쏜할로우 평원 대기열에 참가하려면 모든 파티원이 레벨 {level} 이상이어야 합니다.',
@@ -8777,7 +8771,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Ваша группа слишком велика для Терновой Лощины. В очередь встают группы до 5 бойцов.',
     errPartyLeaderOnly: 'Записать группу в очередь Терновой Лощины может только лидер группы.',
     errDelveDuringBg: 'Нельзя войти в вылазку во время боя на поле боя.',
-    errTalentsDuringBg: 'Нельзя менять таланты во время боя на поле боя.',
     errLevelTooLow: 'Для Терновой Лощины требуется уровень {level}.',
     errMemberLevelTooLow:
       'Чтобы встать в очередь Терновой Лощины, каждый в группе должен иметь уровень {level}.',
@@ -8806,7 +8799,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Your party is too large for Thornhollow Fields. It queues parties of up to 5.',
     errPartyLeaderOnly: 'Only the party leader may queue your team for Thornhollow Fields.',
     errDelveDuringBg: 'You cannot enter a delve during a battleground.',
-    errTalentsDuringBg: 'You cannot change talents during a battleground.',
     errLevelTooLow: 'Thornhollow Fields requires level {level}.',
     errMemberLevelTooLow:
       'Every party member must be level {level} to queue for Thornhollow Fields.',
@@ -8837,7 +8829,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
     errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
-    errTalentsDuringBg: 'No puedes cambiar de talentos durante un campo de batalla.',
     errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
     errMemberLevelTooLow:
       'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
@@ -8868,7 +8859,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Solo el líder del grupo puede meter al grupo en la cola de los Campos de Thornhollow.',
     errDelveDuringBg: 'No puedes entrar en una expedición durante un campo de batalla.',
-    errTalentsDuringBg: 'No puedes cambiar de talentos durante un campo de batalla.',
     errLevelTooLow: 'Los Campos de Thornhollow requieren el nivel {level}.',
     errMemberLevelTooLow:
       'Todos los miembros del grupo deben ser de nivel {level} para entrar en la cola de los Campos de Thornhollow.',
@@ -8899,7 +8889,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
     errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
-    errTalentsDuringBg: 'Vous ne pouvez pas changer de talents pendant un champ de bataille.',
     errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
     errMemberLevelTooLow:
       'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
@@ -8930,7 +8919,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Seul le chef de groupe peut inscrire le groupe dans la file des Champs de Thornhollow.',
     errDelveDuringBg: 'Vous ne pouvez pas entrer dans une plongée pendant un champ de bataille.',
-    errTalentsDuringBg: 'Vous ne pouvez pas changer de talents pendant un champ de bataille.',
     errLevelTooLow: 'Les Champs de Thornhollow requièrent le niveau {level}.',
     errMemberLevelTooLow:
       'Chaque membre du groupe doit être de niveau {level} pour rejoindre la file des Champs de Thornhollow.',
@@ -8961,7 +8949,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Solo il capogruppo può mettere il gruppo in coda per i Campi di Thornhollow.',
     errDelveDuringBg: 'Non puoi entrare in un’incursione durante un campo di battaglia.',
-    errTalentsDuringBg: 'Non puoi cambiare talenti durante un campo di battaglia.',
     errLevelTooLow: 'I Campi di Thornhollow richiedono il livello {level}.',
     errMemberLevelTooLow:
       'Ogni membro del gruppo deve essere di livello {level} per entrare in coda per i Campi di Thornhollow.',
@@ -8993,7 +8980,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Nur der Gruppenleiter darf die Gruppe für die Thornhollow-Felder anmelden.',
     errDelveDuringBg: 'Du kannst während eines Schlachtfelds keinen Tiefgang betreten.',
-    errTalentsDuringBg: 'Du kannst während eines Schlachtfelds keine Talente ändern.',
     errLevelTooLow: 'Die Thornhollow-Felder erfordern Stufe {level}.',
     errMemberLevelTooLow:
       'Jedes Gruppenmitglied muss Stufe {level} sein, um sich für die Thornhollow-Felder anzumelden.',
@@ -9024,7 +9010,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Apenas o líder do grupo pode inscrever o grupo na fila dos Campos de Thornhollow.',
     errDelveDuringBg: 'Você não pode entrar em uma incursão durante um campo de batalha.',
-    errTalentsDuringBg: 'Você não pode mudar talentos durante um campo de batalha.',
     errLevelTooLow: 'Os Campos de Thornhollow exigem nível {level}.',
     errMemberLevelTooLow:
       'Todos os membros do grupo precisam ser nível {level} para entrar na fila dos Campos de Thornhollow.',
@@ -9053,7 +9038,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Tvá skupina je na Thornhollowská pole příliš velká. Do fronty se řadí skupiny až po 5 hráčích.',
     errPartyLeaderOnly: 'Do fronty na Thornhollowská pole může skupinu zařadit jen vůdce skupiny.',
     errDelveDuringBg: 'Během bojiště nemůžeš vstoupit do výpravy.',
-    errTalentsDuringBg: 'Během bojiště nemůžeš měnit talenty.',
     errLevelTooLow: 'Thornhollowská pole vyžadují úroveň {level}.',
     errMemberLevelTooLow:
       'Každý ve skupině musí mít úroveň {level}, aby se mohl zařadit do fronty na Thornhollowská pole.',
@@ -9084,7 +9068,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Alleen de groepsleider mag de groep in de wachtrij zetten voor de Doornholte-Velden.',
     errDelveDuringBg: 'Je kunt tijdens een slagveld geen delve betreden.',
-    errTalentsDuringBg: 'Je kunt tijdens een slagveld geen talenten wijzigen.',
     errLevelTooLow: 'De Doornholte-Velden vereisen niveau {level}.',
     errMemberLevelTooLow:
       'Elk groepslid moet niveau {level} zijn om zich aan te melden voor de Doornholte-Velden.',
@@ -9114,7 +9097,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Twoja drużyna jest za duża na Pola Ciernistej Kotliny. Do kolejki wchodzą drużyny do 5 osób.',
     errPartyLeaderOnly: 'Tylko przywódca drużyny może zapisać drużynę na Pola Ciernistej Kotliny.',
     errDelveDuringBg: 'Nie możesz wejść do wyprawy w trakcie pola bitwy.',
-    errTalentsDuringBg: 'Nie możesz zmieniać talentów w trakcie pola bitwy.',
     errLevelTooLow: 'Pola Ciernistej Kotliny wymagają poziomu {level}.',
     errMemberLevelTooLow:
       'Każdy członek drużyny musi mieć poziom {level}, aby dołączyć do kolejki na Pola Ciernistej Kotliny.',
@@ -9145,7 +9127,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyLeaderOnly:
       'Hanya pemimpin kelompok yang boleh mendaftarkan kelompok ke antrean Padang Thornhollow.',
     errDelveDuringBg: 'Kamu tidak bisa memasuki delve selama medan perang berlangsung.',
-    errTalentsDuringBg: 'Kamu tidak bisa mengubah talenta selama medan perang berlangsung.',
     errLevelTooLow: 'Padang Thornhollow membutuhkan level {level}.',
     errMemberLevelTooLow:
       'Setiap anggota kelompok harus level {level} untuk mengantre Padang Thornhollow.',
@@ -9173,7 +9154,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Grubun Dikenvadi Ovaları için fazla kalabalık. Sıraya en fazla 5 kişilik gruplar girebilir.',
     errPartyLeaderOnly: 'Grubu Dikenvadi Ovaları sırasına yalnızca grup lideri sokabilir.',
     errDelveDuringBg: 'Savaş alanı sürerken Mağara Seferine giremezsin.',
-    errTalentsDuringBg: 'Savaş alanı sürerken yetenek değiştiremezsin.',
     errLevelTooLow: 'Dikenvadi Ovaları için {level}. seviye gerekir.',
     errMemberLevelTooLow:
       'Dikenvadi Ovaları sırasına girmek için grubun her üyesi {level}. seviye olmalı.',
@@ -9200,7 +9180,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
     errPartyTooLarge: 'Din grupp är för stor för Törnhålefälten. Kön tar grupper på upp till 5.',
     errPartyLeaderOnly: 'Endast gruppledaren får ställa gruppen i kö till Törnhålefälten.',
     errDelveDuringBg: 'Du kan inte gå in i en delve under ett slagfält.',
-    errTalentsDuringBg: 'Du kan inte byta talanger under ett slagfält.',
     errLevelTooLow: 'Törnhålefälten kräver nivå {level}.',
     errMemberLevelTooLow:
       'Varje gruppmedlem måste vara nivå {level} för att köa till Törnhålefälten.',
@@ -9228,7 +9207,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Tổ đội của bạn quá đông cho Cánh Đồng Thung Gai. Hàng chờ chỉ nhận tổ đội tối đa 5 người.',
     errPartyLeaderOnly: 'Chỉ nhóm trưởng mới có thể đưa tổ đội vào hàng chờ Cánh Đồng Thung Gai.',
     errDelveDuringBg: 'Bạn không thể vào Hang Sâu trong lúc đang ở chiến trường.',
-    errTalentsDuringBg: 'Bạn không thể đổi thiên phú trong lúc đang ở chiến trường.',
     errLevelTooLow: 'Cánh Đồng Thung Gai yêu cầu cấp {level}.',
     errMemberLevelTooLow:
       'Mọi thành viên tổ đội phải đạt cấp {level} để vào hàng chờ Cánh Đồng Thung Gai.',
@@ -9257,7 +9235,6 @@ export const BG_EXTRA: Record<SupportedLanguage, Record<BgExtraKey, string>> = {
       'Din gruppe er for stor til Tornehule Sletter. Køen tager grupper på op til 5.',
     errPartyLeaderOnly: 'Kun gruppelederen kan stille gruppen i kø til Tornehule Sletter.',
     errDelveDuringBg: 'Du kan ikke gå ind i en delve under en slagmark.',
-    errTalentsDuringBg: 'Du kan ikke skifte talenter under en slagmark.',
     errLevelTooLow: 'Tornehule Sletter kræver niveau {level}.',
     errMemberLevelTooLow:
       'Hvert gruppemedlem skal være niveau {level} for at stille sig i kø til Tornehule Sletter.',
@@ -10532,10 +10509,6 @@ const RULES: Rule[] = [
   {
     re: /^You cannot enter a delve during a battleground\.$/,
     build: () => tBg('errDelveDuringBg'),
-  },
-  {
-    re: /^You cannot change talents during a battleground\.$/,
-    build: () => tBg('errTalentsDuringBg'),
   },
   {
     re: /^Thornhollow Fields requires level (\d+)\.$/,
