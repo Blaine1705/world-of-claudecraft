@@ -7417,6 +7417,7 @@ export const nl_NL: EnTranslations = {
       "questRules": "Kan niet worden verkocht, in de bank gezet of geruild.",
       "questOrphaned": "Niet nodig voor een actieve quest.",
       "classes": "Klassen: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Verkoopprijs: {money}",
       "clickBuy": "Klik om te kopen",
       "clickSell": "Klik om te verkopen",

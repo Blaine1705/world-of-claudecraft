@@ -7417,6 +7417,7 @@ export const fr_CA: EnTranslations = {
       "questRules": "Ne peut être vendu, mis en banque, ni échangé.",
       "questOrphaned": "N'est nécessaire pour aucune quête active.",
       "classes": "Classes : {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Prix de vente : {money}",
       "clickBuy": "Cliquer pour acheter",
       "clickSell": "Cliquer pour vendre",

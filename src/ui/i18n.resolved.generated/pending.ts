@@ -259,6 +259,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -512,6 +513,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -765,6 +767,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1018,6 +1021,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1272,6 +1276,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1525,6 +1530,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -1822,6 +1828,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -2086,6 +2093,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -2339,6 +2347,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -2592,6 +2601,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -2845,6 +2855,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3098,6 +3109,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3351,6 +3363,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3604,6 +3617,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ],
@@ -3857,6 +3871,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
     "itemUi.market.saleOlder",
+    "itemUi.tooltip.maxStack",
     "itemUi.tooltip.useElixir",
     "itemUi.tooltip.useElixirAura"
   ]

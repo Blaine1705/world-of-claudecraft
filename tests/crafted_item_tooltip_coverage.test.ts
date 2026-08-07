@@ -90,7 +90,7 @@ describe('crafted item tooltip coverage', () => {
 
   it('Hud.itemTooltip composes every pure builder the sweep trusts (source pin)', () => {
     // The def-field predicates above mirror branches that live INSIDE
-    // itemTooltip itself, but the six pure builders could be unwired from
+    // itemTooltip itself, but the pure builders below could be unwired from
     // the coordinator without changing any def, and the sweep would still
     // pass. Pin each composition call inside the method body, whole-line //
     // comments stripped first (the comment-gameable trap; block comments are
@@ -111,6 +111,7 @@ describe('crafted item tooltip coverage', () => {
       'cookingCatchHintKey(item.id)',
       'materialProfessionHintText(item.id)',
       'elixirTooltipLines(item)',
+      'stackSizeTooltipLine(item, instance)',
     ]) {
       expect(body, `itemTooltip must compose ${call}`).toContain(call);
     }
