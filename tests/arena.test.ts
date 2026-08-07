@@ -384,12 +384,16 @@ describe('arena: a full bout', () => {
     const events = sim.drainEvents();
 
     expect(target.dead).toBe(true);
-    expect(events).toContainEqual({
-      type: 'aura',
-      targetId: a,
-      name: 'Condemnation',
-      gained: true,
-    });
+    // objectContaining: the aura gain event also carries the parse-fidelity
+    // attribution fields (sourceId/abilityId/stacks) since v0.35.0.
+    expect(events).toContainEqual(
+      expect.objectContaining({
+        type: 'aura',
+        targetId: a,
+        name: 'Condemnation',
+        gained: true,
+      }),
+    );
     expect(AFFLICTION_EYE_DEATH_GAIN).toBe(10);
     expect(doomValue(warlock)).toBe(0);
   });

@@ -180,9 +180,11 @@ function applyBeaconTransfer(
 
   let healed = Math.round(effectiveHeal * BEACON_HEAL_FRACTION * healingTakenMult(ctx, beacon));
   healed = consumeHealAbsorb(ctx, beacon, healed);
+  const intended = healed;
   healed = Math.min(healed, beacon.maxHp - beacon.hp);
   if (healed <= 0) return;
   beacon.hp += healed;
+  const overheal = intended - healed;
   ctx.emit({
     type: 'heal2',
     sourceId: source.id,
@@ -190,6 +192,7 @@ function applyBeaconTransfer(
     amount: healed,
     crit: false,
     ability: BEACON_OF_LIGHT_NAME,
+    ...(overheal > 0 ? { overheal } : {}),
   });
   healingThreat(ctx, source, beacon, healed);
 }
