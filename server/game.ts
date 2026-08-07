@@ -620,6 +620,24 @@ const CORDER_WIRE_PROMPT_CMDS = new Set<string>([
 // the plain 5x cadence win. If that rate ever materializes, the next lever is
 // the bg readout's sharedMatchView memo shape: build the viewer-identical
 // open-scope subset once per board revision and splice the per-viewer rows.
+// Ravenpost mailbox readout cadence, the market gate applied to `mail`: the
+// view is a full projection of the viewer's delivered letters (bodies
+// included) that used to re-serialize at 20 Hz for anyone standing at a raven
+// pillar, and nothing in it carries a sub-second clock. On top of the cadence,
+// a rebuild-only-on-change gate (sim.mailRevFor) skips the rebuild while
+// nothing changed; MAIL_REFRESH_TICKS is its staleness backstop, and the
+// viewer's OWN mail commands re-arm the gate so their take/delete/read
+// feedback still lands on the next snapshot. The always-streamed O(1) `mailU`
+// envelope count is deliberately NOT gated.
+const MAIL_WIRE_HZ = 4;
+const MAIL_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MAIL_WIRE_HZ)));
+const MAIL_REFRESH_TICKS = 40;
+const MAIL_WIRE_PROMPT_CMDS = new Set<string>([
+  'mail_send',
+  'mail_take',
+  'mail_delete',
+  'mail_read',
+]);
 
 type ClientMessage = Record<string, unknown> & {
   ability?: string;
@@ -1000,6 +1018,12 @@ export interface ClientSession {
   lastCorderWireTick: number;
   lastCorderBoardRev: number | null;
   lastCorderRebuildTick: number;
+  // Ravenpost mailbox readout, the market shape at its own cadence
+  // (MAIL_WIRE_HZ): the sim mail revision last built for and the tick of the
+  // last rebuild (the MAIL_REFRESH_TICKS staleness backstop's tracker).
+  lastMailWireTick: number;
+  lastMailRev: number | null;
+  lastMailRebuildTick: number;
   // set when a command or sim event that can change a heavy self field (bags,
   // gear, quests, talents, stats, ...) lands for this session, so the next
   // snapshot re-diffs those fields. Otherwise they're skipped (see
@@ -2181,6 +2205,9 @@ export class GameServer {
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
     moderator.lastCorderRebuildTick = 0;
+    moderator.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
+    moderator.lastMailRev = null;
+    moderator.lastMailRebuildTick = 0;
     moderator.sentEnts.clear();
     // force the heavy self block (tal/inv/equip/bags/...) to re-run next
     // snapshot: it is gated on meta.wireRev vs session.lastWireRev, and that
@@ -2218,6 +2245,9 @@ export class GameServer {
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
     moderator.lastCorderRebuildTick = 0;
+    moderator.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
+    moderator.lastMailRev = null;
+    moderator.lastMailRebuildTick = 0;
     moderator.sentEnts.clear();
     // same as enterSpectate: force the heavy self block to re-run so the
     // moderator's OWN talents/inventory/equip/etc. resend immediately
@@ -3634,6 +3664,9 @@ export class GameServer {
       lastCorderWireTick: -CORDER_WIRE_INTERVAL_TICKS,
       lastCorderBoardRev: null,
       lastCorderRebuildTick: 0,
+      lastMailWireTick: -MAIL_WIRE_INTERVAL_TICKS,
+      lastMailRev: null,
+      lastMailRebuildTick: 0,
       selfHeavyDirty: true,
       lastWireRev: -1,
       sentEnts: new Map(),
@@ -6238,6 +6271,12 @@ export class GameServer {
     if (typeof msg.cmd === 'string' && CORDER_WIRE_PROMPT_CMDS.has(msg.cmd)) {
       session.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     }
+    // Same re-arm for the viewer's own mail commands (send/take/delete/read):
+    // their mailbox feedback lands on the next snapshot instead of waiting out
+    // the MAIL_WIRE_HZ cadence.
+    if (typeof msg.cmd === 'string' && MAIL_WIRE_PROMPT_CMDS.has(msg.cmd)) {
+      session.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
+    }
     switch (command) {
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
@@ -8579,11 +8618,32 @@ export class GameServer {
     // so the minimap badge lights anywhere while proceeds/items wait
     maybe('mktU', this.sim.marketCollectPendingFor(anchorSession.pid) ? 1 : 0);
     selfLap?.('self.market');
-    // Mailbox view: null unless the player stands near a raven pillar.
-    // Rebuilding it re-filters the whole realm mail book per tick per
-    // near-pillar viewer; the change gate + recipient index for this key
-    // lands in PR #3052 (perf(mail)), deliberately not duplicated here.
-    maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
+    // The Ravenpost mailbox view rides the market gate's exact shape: on the
+    // MAIL_WIRE_HZ cadence (re-armed by the viewer's own mail commands), only
+    // when the sim's mail revision moved since the last build, with
+    // MAIL_REFRESH_TICKS as the staleness backstop. The full projection
+    // (letter bodies included) used to re-serialize at 20 Hz for every player
+    // at a raven pillar; nothing in it carries a sub-second clock. Null (not
+    // at a pillar) still ships promptly on the cadence so the window closes.
+    const mailDue =
+      this.sim.tickCount - session.lastMailWireTick >= MAIL_WIRE_INTERVAL_TICKS ||
+      sent.mail === undefined;
+    if (mailDue) {
+      session.lastMailWireTick = this.sim.tickCount;
+      const mailRev = this.sim.mailRevFor(anchorSession.pid);
+      if (mailRev === null) {
+        maybe('mail', null);
+        session.lastMailRev = null;
+      } else if (
+        sent.mail === undefined ||
+        mailRev !== session.lastMailRev ||
+        this.sim.tickCount - session.lastMailRebuildTick >= MAIL_REFRESH_TICKS
+      ) {
+        session.lastMailRebuildTick = this.sim.tickCount;
+        maybe('mail', this.sim.mailInfoFor(anchorSession.pid));
+        session.lastMailRev = mailRev;
+      }
+    }
     maybe('mailU', this.sim.mailUnreadFor(anchorSession.pid));
     selfLap?.('self.mail');
     // bank info is null unless the player is standing at a banker, so it only
