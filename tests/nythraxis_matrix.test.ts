@@ -138,7 +138,8 @@ describe('Nythraxis matrix DPS rotations', () => {
 
   it('moves long caster buffs to prepull instead of recurring combat priority', () => {
     expect(source).toContain("prepull: ['arcane_intellect']");
-    expect(source).toContain("{ ability: 'demon_skin', target: 'self' }");
+    // v0.36 composition re-pin: destruction's prepull list, not a targeted cast.
+    expect(source).toContain("prepull: ['demon_skin']");
     expect(source).toContain("prepull: ['lightning_shield']");
     expect(source).toContain("rotation: ['flame_shock', 'earth_shock', 'lightning_bolt']");
     expect(source).toContain("'raise_bone_mage'");
@@ -159,9 +160,11 @@ describe('Nythraxis matrix DPS rotations', () => {
     expect(source).toContain("rotation: ['frostbolt']");
     expect(source).toContain("rotation: ['arcane_missiles']");
     expect(source).toContain("'shadowburn'");
-    expect(source).toContain("{ ability: 'summon_infernal', target: 'boss', aim: 'target' }");
-    expect(source).toContain("{ ability: 'vicarious_suffering', target: 'activeTank' }");
-    expect(source).toContain("{ ability: 'cursed_accomplice', target: 'accomplice' }");
+    // v0.36 composition re-pin: these rotation entries are plain strings now,
+    // not position/target-aimed cast objects.
+    expect(source).toContain("'summon_infernal',");
+    expect(source).toContain("'vicarious_suffering',");
+    expect(source).toContain("'cursed_accomplice',");
     expect(source).toContain("'drain_life'");
     expect(source).toContain("'life_tap'");
     expect(source).toContain("rotation: ['moonfire', 'insect_swarm', 'wrath']");
@@ -171,7 +174,8 @@ describe('Nythraxis matrix DPS rotations', () => {
 
   it('runs multiple deterministic seeds and reports owner, pet, and combined damage', () => {
     expect(source).toContain('process.env.MATRIX_SEEDS ??');
-    expect(source).toContain("'42,1337,9001,777");
+    // v0.36 composition re-pin: default seed list dropped to three seeds.
+    expect(source).toContain("'42,1337,9001'");
     expect(source).toContain('playerDamageDone');
     expect(source).toContain('petDamageDone');
     expect(source).toContain('bossDamageDone');
@@ -223,7 +227,8 @@ describe('Nythraxis matrix DPS rotations', () => {
   });
 
   it('builds complete paired raids and separates setup time from combat time', () => {
-    expect(source).toContain('const healerCombos = combos(healers, 2)');
+    // v0.36 composition re-pin: finalized kits pair healers three at a time.
+    expect(source).toContain('const healerCombos = combos(healers, 3)');
     expect(source).toMatch(/filter\(\(spec\) => spec\.cls !== 'warlock'\),\s*5,/);
     expect(source).toContain('if (index === 5) sim.convertPartyToRaid(pids[0])');
     expect(source).toContain('failed to place all ten players in one raid');

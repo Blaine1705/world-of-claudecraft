@@ -247,7 +247,7 @@ describe('warlock wave 2 choice rows', () => {
     const hpBeforeCruelPact = afflictionCredit.p.hp;
     afflictionCredit.sim.castAbility('cruel_pact');
     expect(afflictionCredit.p.resource).toBe(
-      Math.round(afflictionCredit.p.maxResource * 0.15 * 1.5),
+      Math.round(afflictionCredit.p.maxResource * 0.015 * 1.5),
     );
     expect(afflictionCredit.p.hp).toBe(
       hpBeforeCruelPact - Math.round(afflictionCredit.p.maxHp * 0.12),

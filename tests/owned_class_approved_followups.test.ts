@@ -239,11 +239,13 @@ describe('approved Thundercall Chain Lightning follow-up', () => {
       computeTalentModifiers('shaman', { ...emptyAllocation(), spec: 'elemental' }),
     ).find((ability) => ability.def.id === 'chain_lightning');
     if (!chain) throw new Error('missing Skybranch');
+    // v0.36 composition re-pin: Earthen Fury mastery now applies whole-hit per
+    // the composed talent scaling, raising the zero-power band.
     expect(abilityEffectText(chain, { spellPower: 0, rangedPower: 0, attackPower: 0 })).toBe(
-      '52 to 60',
+      '60 to 69',
     );
     expect(abilityEffectText(chain, { spellPower: 100, rangedPower: 0, attackPower: 0 })).not.toBe(
-      '52 to 60',
+      '60 to 69',
     );
 
     const sim = new Sim({ seed: 2920, playerClass: 'shaman' });
