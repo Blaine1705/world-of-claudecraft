@@ -2583,6 +2583,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Использование: мгновенно восстанавливает {amount} здоровья. Можно использовать в бою. Восстановление 1 мин.',
   'itemUi.tooltip.useManaPotion':
     'Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.',
+  'itemUi.tooltip.useElixir':
+    'Использование: повышает {stat} на {value} в течение {minutes} мин. Можно использовать в бою.',
+  'itemUi.tooltip.useElixirAura':
+    'Использование: дает эффект "{aura}" на {minutes} мин. Можно использовать в бою.',
   'itemUi.tooltip.clickUseInstant': 'Нажмите, чтобы мгновенно использовать в бою',
   'itemUi.tooltip.clickUse': 'Нажмите, чтобы использовать',
   'itemUi.tooltip.clickBuyback': 'Нажмите, чтобы выкупить',

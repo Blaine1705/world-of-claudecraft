@@ -7410,6 +7410,8 @@ export const en_CA: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.",
       "useDrink": "Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Quest Item",
       "questRelated": "Quest: {quest}",
       "questRules": "Cannot be sold, banked, or traded.",

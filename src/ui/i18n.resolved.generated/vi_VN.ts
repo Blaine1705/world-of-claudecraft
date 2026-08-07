@@ -7410,6 +7410,8 @@ export const vi_VN: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Dùng: Hồi {amount} sinh lực trong {seconds} giây. Phải ngồi yên khi ăn.",
       "useDrink": "Dùng: Hồi {amount} mana trong {seconds} giây. Phải ngồi yên khi uống.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Vật Phẩm Nhiệm Vụ",
       "questRelated": "Nhiệm vụ: {quest}",
       "questRules": "Không thể bán, gửi ngân hàng, hoặc trao đổi.",

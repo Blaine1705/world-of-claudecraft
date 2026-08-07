@@ -79,6 +79,11 @@ const itemStringsEn = {
       useFood: 'Use: Restores {amount} health over {seconds} sec. Must remain seated while eating.',
       useDrink:
         'Use: Restores {amount} mana over {seconds} sec. Must remain seated while drinking.',
+      // Battle elixirs (elixir_tooltip_view.ts): the stat line for a mapped
+      // buff kind, and the aura-name fallback so an unmapped kind still says
+      // what quaffing grants instead of saying nothing.
+      useElixir: 'Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.',
+      useElixirAura: 'Use: Grants {aura} for {minutes} min. Usable in combat.',
       questItem: 'Quest Item',
       // Story tooltip lines (quest_item_tooltip_view.ts): related quest title,
       // keep-rules footer, and orphaned copy when the item is no longer needed

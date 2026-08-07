@@ -258,7 +258,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "es_ES": [
     "abilityUi.cast.crafting",
@@ -509,7 +511,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "fr_FR": [
     "abilityUi.cast.crafting",
@@ -760,7 +764,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "fr_CA": [
     "abilityUi.cast.crafting",
@@ -1011,7 +1017,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "en_CA": [],
   "it_IT": [
@@ -1263,7 +1271,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "de_DE": [
     "abilityUi.cast.crafting",
@@ -1514,7 +1524,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "zh_CN": [
     "hudChrome.bg.clock",
@@ -1809,7 +1821,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "ru_RU": [
     "hudChrome.bg.clock",
@@ -2071,7 +2085,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "nl_NL": [
     "abilityUi.cast.crafting",
@@ -2322,7 +2338,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "pl_PL": [
     "abilityUi.cast.crafting",
@@ -2573,7 +2591,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "id_ID": [
     "abilityUi.cast.crafting",
@@ -2824,7 +2844,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "tr_TR": [
     "abilityUi.cast.crafting",
@@ -3075,7 +3097,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "sv_SE": [
     "abilityUi.cast.crafting",
@@ -3326,7 +3350,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "vi_VN": [
     "abilityUi.cast.crafting",
@@ -3577,7 +3603,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ],
   "da_DK": [
     "abilityUi.cast.crafting",
@@ -3828,6 +3856,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.warfare.reasons.battlegroundKill",
     "hudChrome.warfare.reasons.battlegroundWin",
     "itemUi.market.saleBuyer",
-    "itemUi.market.saleOlder"
+    "itemUi.market.saleOlder",
+    "itemUi.tooltip.useElixir",
+    "itemUi.tooltip.useElixirAura"
   ]
 };

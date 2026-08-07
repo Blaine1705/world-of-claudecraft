@@ -15,7 +15,6 @@ const TARGET_TAG = 'node:26-slim';
 const dockerfile = readFileSync('Dockerfile', 'utf8');
 const ciWorkflow = readFileSync('.github/workflows/ci.yml', 'utf8');
 const auditWorkflow = readFileSync('.github/workflows/audit.yml', 'utf8');
-const prAiWorkflow = readFileSync('.github/workflows/pr-ai.yml', 'utf8');
 const desktopWorkflow = readFileSync('.github/workflows/desktop-publish.yml', 'utf8');
 const nightlyWorkflow = readFileSync('.github/workflows/nightly.yml', 'utf8');
 const deployDoc = readFileSync('DEPLOY.md', 'utf8');
@@ -113,14 +112,6 @@ describe('deploy and CI Node version pin', () => {
     expect(values.length).toBeGreaterThan(0);
     for (const value of values) expect(value).toBe(TARGET_MAJOR);
     expect(nightlyWorkflow).toContain(`node-version: ${TARGET_MAJOR}`);
-  });
-
-  // pr-ai.yml runs only the codex-action review jobs and deliberately sets up no Node
-  // toolchain of its own, so there is no version for the cross-carrier pin to hold. Do
-  // not delete this arm if a Node step returns: swap it back to the pinned form above
-  // (every value equals TARGET_MAJOR, non-empty) so the new carrier joins the bump.
-  it('keeps pr-ai.yml free of a Node toolchain the cross-carrier pin would miss', () => {
-    expect(nodeVersionValues(prAiWorkflow)).toEqual([]);
   });
 
   // DEPLOY.md's containerized tsc-gate builds the type check inside

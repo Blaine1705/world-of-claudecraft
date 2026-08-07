@@ -6,6 +6,9 @@ import { describe, expect, it } from 'vitest';
 const captureContract =
   // @ts-expect-error The executable capture contract intentionally ships as plain Node ESM.
   await import('../scripts/assets/eastbrook_grand_armoury/capture_contract.mjs');
+const { POLISH_SEAL_PATH, REMINT_COMMAND } = await import(
+  '../scripts/assets/eastbrook_grand_armoury/provenance_diagnostics.mjs'
+);
 const {
   assertTownArmouryIdentity,
   assertTownAttributionTargetState,
@@ -616,10 +619,10 @@ function readJsonFile<T>(filePath: string): T {
 // literals; it only moves if the captures themselves are retaken.
 const ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT =
   'e15d65fda69efd04395e93dd28af8a56f2fb9bc1ff1125e3b605b07720891367';
-const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(
-  POLISH_ROOT,
-  'metadata/after-desktop-ultra.json',
-);
+// Derived from the diagnostics module's one seal-path constant, so this
+// pin, the failure diagnostics, and the remint tool's printed metadata
+// authority sha can never silently point at three different files.
+const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-pinned for the merge of release/v0.34.0 into this branch. Every
 // rendererIntegration move on both sides now stacks on src/render/renderer.ts:
 // from the release, PR #2720's Eastbrook fence-removal layout evidence, the live
@@ -942,8 +945,16 @@ describe('Eastbrook polish committed capture artifacts', () => {
   });
 
   it('pins the historical metadata authority independently', () => {
-    expect(sha256File(ACCEPTED_POLISH_V2_METADATA_PATH)).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
-    expect(ACCEPTED_POLISH_V2_PROVENANCE.fingerprint).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
+    // On a legitimate re-mint both literals move together with the capture
+    // contract's composite pin; the remint tool prints all three.
+    expect(
+      sha256File(ACCEPTED_POLISH_V2_METADATA_PATH),
+      `the accepted metadata authority moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND}`,
+    ).toBe(ACCEPTED_POLISH_V2_METADATA_SHA256);
+    expect(
+      ACCEPTED_POLISH_V2_PROVENANCE.fingerprint,
+      `the sealed composite fingerprint moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND}`,
+    ).toBe(ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE);
   });
 
   // The frozen polish-v2 evidence intentionally predates the bank rebuild: it
@@ -1527,9 +1538,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // swept evidence bytes. No capture was retaken.
     // Re-pinned for the PR #2983 revert: the swept evidence follows the
     // reverted renderer while preserving PR #2982's prewarm-policy leaf.
-    expect(fingerprint.digest('hex')).toBe(
-      'ff74141643633a491a4a4d33d6acdcba6f670c0bc09ffaea4507a5b315d2964b',
-    );
+    expect(
+      fingerprint.digest('hex'),
+      `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
+    ).toBe('ff74141643633a491a4a4d33d6acdcba6f670c0bc09ffaea4507a5b315d2964b');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -7410,6 +7410,8 @@ export const zh_TW: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "使用：在 {seconds} 秒內恢復 {amount} 點生命值。進食時必須保持坐下。",
       "useDrink": "使用：在 {seconds} 秒內恢復 {amount} 點法力值。飲水時必須保持坐下。",
+      "useElixir": "使用：使你的{stat}提高 {value} 點，持續 {minutes} 分鐘。戰鬥中可用。",
+      "useElixirAura": "使用：獲得{aura}效果，持續 {minutes} 分鐘。戰鬥中可用。",
       "questItem": "任務物品",
       "questRelated": "任務：{quest}",
       "questRules": "無法出售、存入銀行或交易。",

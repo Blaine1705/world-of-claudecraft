@@ -8732,6 +8732,8 @@ export type TranslationKeyFlat =
   | 'itemUi.tooltip.sellPrice'
   | 'itemUi.tooltip.stat'
   | 'itemUi.tooltip.useDrink'
+  | 'itemUi.tooltip.useElixir'
+  | 'itemUi.tooltip.useElixirAura'
   | 'itemUi.tooltip.useFishing'
   | 'itemUi.tooltip.useFood'
   | 'itemUi.tooltip.useHealingPotion'

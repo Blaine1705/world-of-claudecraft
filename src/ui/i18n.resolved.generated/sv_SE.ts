@@ -7410,6 +7410,8 @@ export const sv_SE: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Använd: Återställer {amount} hälsa under {seconds} sek. Du måste förbli sittande medan du äter.",
       "useDrink": "Använd: Återställer {amount} mana under {seconds} sek. Du måste förbli sittande medan du dricker.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Uppdragsföremål",
       "questRelated": "Uppdrag: {quest}",
       "questRules": "Kan inte säljas, bankas eller bytas bort.",

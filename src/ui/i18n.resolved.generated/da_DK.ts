@@ -7410,6 +7410,8 @@ export const da_DK: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "Brug: Genopretter {amount} helbred over {seconds} sek. Skal forblive siddende mens du spiser.",
       "useDrink": "Brug: Genopretter {amount} mana over {seconds} sek. Skal forblive siddende mens du drikker.",
+      "useElixir": "Use: Increases your {stat} by {value} for {minutes} min. Usable in combat.",
+      "useElixirAura": "Use: Grants {aura} for {minutes} min. Usable in combat.",
       "questItem": "Questgenstand",
       "questRelated": "Opgave: {quest}",
       "questRules": "Kan ikke sælges, lægges i banken eller byttes.",

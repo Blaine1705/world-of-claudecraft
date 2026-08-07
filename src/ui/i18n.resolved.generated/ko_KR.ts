@@ -7410,6 +7410,8 @@ export const ko_KR: EnTranslations = {
       "stat": "+{value} {stat}",
       "useFood": "사용 효과: {seconds}초에 걸쳐 생명력 {amount} 회복. 먹는 동안 앉아 있어야 합니다.",
       "useDrink": "사용 효과: {seconds}초에 걸쳐 마나 {amount} 회복. 마시는 동안 앉아 있어야 합니다.",
+      "useElixir": "사용: {stat}이(가) {value} 증가하며 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.",
+      "useElixirAura": "사용: {aura} 효과를 얻어 {minutes}분 동안 지속됩니다. 전투 중 사용 가능.",
       "questItem": "퀘스트 아이템",
       "questRelated": "퀘스트: {quest}",
       "questRules": "판매, 은행에 보관, 거래할 수 없습니다.",

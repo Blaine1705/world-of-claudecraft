@@ -303,10 +303,11 @@ describe('CI workflow parity', () => {
 
   it('runs the release tier against a release-to-main pull request merge result', () => {
     const prGate = jobSource('pr-gate');
+    const prLongSims = jobSource('pr-long-sims');
     const prChecks = jobSource('pr-checks');
     const releaseGate = jobSource('release-gate');
     const releaseChecks = jobSource('release-checks');
-    for (const job of [prGate, prChecks]) {
+    for (const job of [prGate, prLongSims, prChecks]) {
       // Exact composed if: event routing AND code path filter (D10). Dropping
       // either arm breaks release-to-main exclusion or docs-only skip.
       const ifLines = job.match(/^\s{4}if: .+$/gm) ?? [];
@@ -343,13 +344,18 @@ describe('CI workflow parity', () => {
 
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {
     const prGate = jobSource('pr-gate');
+    const prLongSims = jobSource('pr-long-sims');
     const prChecks = jobSource('pr-checks');
-    // Parallel means no needs edge between the pair. Both may need `changes`
-    // for the path filter; neither may wait on the other (would re-serialize).
+    // Parallel means no needs edge between the trio. Each may need `changes`
+    // for the path filter; none may wait on another (would re-serialize).
     expect(prGate).toMatch(/^\s{4}needs: changes\s*$/m);
+    expect(prLongSims).toMatch(/^\s{4}needs: changes\s*$/m);
     expect(prChecks).toMatch(/^\s{4}needs: changes\s*$/m);
     expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-checks/);
     expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-gate/);
+    expect(prLongSims).not.toMatch(/needs:\s*\[?[^\n]*pr-(gate|checks)/);
+    expect(prGate).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
+    expect(prChecks).not.toMatch(/needs:\s*\[?[^\n]*pr-long-sims/);
     // Phase 2: pr-gate's test step runs through the selection-aware shard
     // runner; the runner itself spawns `npm test` (pretest preserved), which
     // tests/ci_shard_plan.test.ts pins behaviorally.
@@ -362,7 +368,13 @@ describe('CI workflow parity', () => {
       // survives the comment, the anchored form does not.
       expect(prChecks).toMatch(new RegExp(`\\n {8}${step.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
       expect(prGate).not.toContain(step);
+      expect(prLongSims).not.toContain(step);
     }
+    // The lane job is tests-only through the shard runner, like pr-gate: a
+    // raw `npm test` or a check step substituted into it would run the whole
+    // suite (or a check) on every PR under the lane's name.
+    expect(prLongSims).not.toContain('run: npm test');
+    expect(prLongSims).not.toContain('Cache tsc incremental buildinfo');
     // ...and a structural count, the same backstop release-gate has: an added
     // or removed pr-checks step must consciously update this test rather than
     // slipping in beside the by-name pins above.
@@ -631,6 +643,7 @@ describe('CI workflow parity', () => {
     const requiredCheckNames = [
       'Detect code path changes',
       'PR gate (English-only legal)',
+      'PR gate (long sims)',
       'PR checks (freshness, typecheck, builds)',
       'Format + lint (Biome, changed files)',
       'Browser regressions (Chromium)',
@@ -657,6 +670,7 @@ describe('CI workflow parity', () => {
     const docRequiredNameForms = [
       '`Detect code path changes`',
       `\`PR gate (English-only legal) (1)\` through \`(${SHARD_N})\``,
+      '`PR gate (long sims)`',
       '`PR checks (freshness, typecheck, builds)`',
       '`Format + lint (Biome, changed files)`',
       '`Browser regressions (Chromium)`',
@@ -667,6 +681,100 @@ describe('CI workflow parity', () => {
     for (const name of requiredCheckNames) {
       expect(neverSection).not.toContain(`\`${name}\``);
     }
+  });
+
+  it('bounds the test and browser jobs against the runner-side checkout-stall class', () => {
+    // Phase 6 of the CI/CD performance packet: on 2026-08-06 thirteen shard,
+    // lane, and browser jobs across seven runs sat 9.6 to 24.4 minutes inside
+    // actions/checkout before completing (runner-pool-side; healthy checkout
+    // is under 3 minutes; the worst stalled job wall was 32.8 minutes), and
+    // the stall, not any test, set those runs' tails. Each bound is sized
+    // from that job's measured healthy worst case plus margin (the sizing
+    // rationale sits on each ci.yml bound; the evidence table lives in the
+    // packet's detect-wedge postmortem note), so a stalled job dies and gets
+    // rerun on a fresh runner instead of holding a required check. Exact
+    // values, not a floor: resizing a bound is a conscious, measured decision
+    // (the full-core lane revert is the packet's precedent for what happens
+    // to unmeasured resizes). Exactly one job-level line per job, so a
+    // duplicate cannot shadow the pinned one; and job-level, never
+    // step-level, because a step bound leaves the rest of the job free to
+    // hang toward GitHub's 6 hour default.
+    const bounds = [
+      ['pr-gate', 20],
+      ['release-gate', 20],
+      ['pr-long-sims', 20],
+      ['browser-gate', 10],
+      // 8 is a measured decision like the rest (healthy worst 4.42 min, all
+      // observed stalls over 8), so it is pinned exactly here beside the
+      // single-digit shape check the classifier test keeps.
+      ['changes', 8],
+    ] as const;
+    // Both the positive and the negatives run over the full index-based job
+    // span (this job key to the next), never the comment-terminated
+    // jobSource slice, so a stray top-level comment inside a job body can
+    // hide neither a duplicate job-level bound nor a step bound (the fix
+    // round's verifier proved the jobSource form evadable both ways).
+    // Deliberate consequence: a span INCLUDES the 2-space comment block that
+    // documents the NEXT job, so only indentation-anchored patterns belong
+    // on spans; a bare not.toContain would trip on a neighbour's comment.
+    const jobSpan = (name: string) => {
+      const start = workflow.indexOf(`\n  ${name}:`);
+      expect(start).toBeGreaterThanOrEqual(0);
+      const rest = workflow.slice(start + 1);
+      const next = rest.search(/\n {2}[A-Za-z][A-Za-z0-9_-]*:[ \t]*(?:#[^\n]*)?\n/);
+      return next === -1 ? rest : rest.slice(0, next);
+    };
+    for (const [name, minutes] of bounds) {
+      const span = jobSpan(name);
+      const jobLevel = span.match(/^ {4}timeout-minutes: \d+$/gm) ?? [];
+      expect(jobLevel).toEqual([`    timeout-minutes: ${minutes}`]);
+      expect(span).not.toMatch(/\n {8}timeout-minutes:/);
+      // A step bound can also legally sit as the FIRST key of a step item.
+      expect(span).not.toMatch(/\n {6}- timeout-minutes:/);
+    }
+    // Completeness: every ci.yml job is either in the bounds table above or
+    // the named unbounded-by-design list: the checks and release lanes sit outside
+    // Phase 6's measured pass, and bounding them is a recorded follow-up in
+    // the packet's postmortem note, not an accident. A new job therefore
+    // cannot arrive silently unbounded, and moving a job between the lists
+    // is a conscious edit here. The key regex tolerates a trailing comment
+    // or space after the colon, both valid YAML that would otherwise make an
+    // eleventh job invisible. The nightly workflow's deliberately generous
+    // bounds have their own presence pins in tests/nightly_workflow.test.ts
+    // and stay untouched.
+    const UNBOUNDED_BY_DESIGN = [
+      'release-version-gate',
+      'lint',
+      'pr-checks',
+      'release-i18n',
+      'release-checks',
+    ] as const;
+    const jobsSection = workflow.slice(workflow.indexOf('\njobs:'));
+    const jobKeys = [
+      ...jobsSection.matchAll(/\n {2}([A-Za-z][A-Za-z0-9_-]*):[ \t]*(?:#[^\n]*)?\n/g),
+    ].map((m) => m[1]);
+    expect([...jobKeys].sort()).toEqual(
+      [...bounds.map(([name]) => name), ...UNBOUNDED_BY_DESIGN].sort(),
+    );
+    // Two-way: a job on the unbounded list must actually BE unbounded, so
+    // the list is an assertion, not documentation that can rot.
+    for (const name of UNBOUNDED_BY_DESIGN) {
+      expect(jobSpan(name).match(/^ {4}timeout-minutes: \d+$/gm) ?? []).toEqual([]);
+    }
+    // The operator triage for a timeout kill is part of the contract: the
+    // doc must keep the rejection signature, route it to a rerun, and tell
+    // the operator to check for a failing test step first (a genuinely red
+    // shard on a runner with a setup spike can die AS a timeout).
+    const mergeQueueTriage = readFileSync(
+      new URL('../docs/merge-queue.md', import.meta.url),
+      'utf8',
+    );
+    expect(mergeQueueTriage).toContain('exceeded the maximum execution time');
+    expect(mergeQueueTriage).toContain('checkout-stall bound');
+    expect(mergeQueueTriage).toContain('failing or still running');
+    // The routing is the entry's operational point: a timeout kill goes to
+    // a rerun, never straight to a code investigation.
+    expect(mergeQueueTriage).toContain('re-run the failed jobs and re-queue');
   });
 
   it(`shards the PR and release test steps ${SHARD_N} ways and keeps the checks single-shard`, () => {
@@ -714,10 +822,36 @@ describe('CI workflow parity', () => {
           String.raw` {8}run: node scripts/ci_shard_test\.mjs --shard=\$\{\{ matrix\.shard \}\}/${SHARD_N}\n`,
       ),
     );
-    expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(1);
+    // Exactly two entry invocations: the shard matrix and the long-sims lane.
+    expect(workflow.match(/run: node scripts\/ci_shard_test\.mjs/g)).toHaveLength(2);
+    // The lane job mirrors the shard step's hardened relay (env block, never
+    // run-line interpolation) and runs the entry in lane mode: unsharded, no
+    // matrix, one job that owns the CI_LONG_SUITES files every shard leg
+    // excludes. Same anchored name-to-env-to-run shape as the shard pin.
+    const prLongSims = jobSource('pr-long-sims');
+    expect(prLongSims).toMatch(
+      new RegExp(
+        String.raw`- name: Run tests \(PR tier, long-sims lane\)\n` +
+          String.raw` {8}env:\n` +
+          String.raw` {10}TEST_MODE: \$\{\{ needs\.changes\.outputs\.test_mode \}\}\n` +
+          String.raw` {10}TEST_MODE_REASON: \$\{\{ needs\.changes\.outputs\.test_mode_reason \}\}\n` +
+          String.raw` {10}CHANGED_FILES: \$\{\{ needs\.changes\.outputs\.changed_files \}\}\n` +
+          String.raw` {8}run: node scripts/ci_shard_test\.mjs --lane=long-sims\n`,
+      ),
+    );
+    expect(prLongSims).not.toContain('strategy:');
+    expect(prLongSims).not.toContain('matrix:');
+    expect(prLongSims).not.toContain('--shard=');
+    // Checkout, setup-pnpm, setup-node, pnpm install, the vitest transform
+    // cache (the Phase 4 rider), and the lane run.
+    expect(prLongSims.match(/\n {6}- name: /g)).toHaveLength(6);
     for (const job of [releaseGate, releaseChecks, jobSource('release-i18n')]) {
       expect(job).not.toContain('ci_shard_test.mjs');
       expect(job).not.toContain('TEST_MODE');
+      // The lane split is PR-tier only: a release job must never exclude the
+      // long sims (release pushes keep the whole suite in their 8 shards).
+      expect(job).not.toContain('long-sims');
+      expect(job).not.toContain('--exclude');
     }
     // The half-cores worker bound moved from pr-gate's run line into the shard
     // runner. Derive the expected expression FROM halfCoreCap (the release-gate
@@ -782,10 +916,94 @@ describe('CI workflow parity', () => {
     expect(releaseI18n).not.toContain('--shard=');
     expect(releaseI18n.match(/\n {6}- name: /g)).toHaveLength(5);
     // Structural step counts: each test job is exactly checkout, setup-pnpm,
-    // setup-node, pnpm install, and the sharded test run. An unconditioned
-    // addition would run N times per push; a dropped step shrinks the job silently.
-    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(5);
-    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(5);
+    // setup-node, pnpm install, the vitest transform cache, and the sharded
+    // test run. An unconditioned addition would run N times per push; a
+    // dropped step shrinks the job silently.
+    expect(prGate.match(/\n {6}- name: /g)).toHaveLength(6);
+    expect(releaseGate.match(/\n {6}- name: /g)).toHaveLength(6);
+  });
+
+  it('persists the vitest transform cache on the shard matrices and the long-sims lane', () => {
+    // Phase 4 of the CI/CD performance packet: vitest's fsModuleCache store
+    // (enabled in vite.config.ts) keys entries by content, so the
+    // actions/cache key manages rotation and size; the tamper boundary is
+    // GitHub's per-ref cache scoping (see the step comment in ci.yml).
+    // Name-to-uses adjacency plus the path and key lines, TERMINATED BY THE
+    // BLANK LINE THAT ENDS THE STEP: a YAML-commented-out copy cannot satisfy
+    // it, and neither can a step neutered by an appended `if:` or any other
+    // trailing key (the mutation that beat the pin's first draft).
+    // One shared prefix and hashFiles tail for every copy of the step, so
+    // the shard and lane regexes cannot drift apart: an edit to the key's
+    // input list either moves all three ci.yml key lines or goes red here.
+    const cacheStepPrefix = String.raw`- name: Cache vitest transform cache\n(?: {8}#[^\n]*\n)* {8}uses: actions\/cache@v(?:[4-9]|\d{2,})[^\n]*\n {8}with:\n {10}path: node_modules\/\.experimental-vitest-cache\n {10}key: vitest-fsmodule-\$\{\{ runner\.os \}\}-`;
+    const cacheKeyTail = String.raw`-\$\{\{ hashFiles\('pnpm-lock\.yaml', 'vite\.config\.ts', '\.npmrc', 'package\.json'\) \}\}\n\n`;
+    const cacheStepRe = new RegExp(
+      `${cacheStepPrefix}${String.raw`shard\$\{\{ matrix\.shard \}\}`}${cacheKeyTail}`,
+    );
+    // The lane job (Phase 4 rider) carries the same step with a lane key
+    // segment where the matrices carry shard${{ matrix.shard }}: the lane has
+    // no matrix, so the shard expression would render empty there, and the
+    // lane's store earns its own entry rather than borrowing a shard's.
+    const laneCacheStepRe = new RegExp(`${cacheStepPrefix}lane-long-sims${cacheKeyTail}`);
+    for (const [name, stepRe] of [
+      ['pr-gate', cacheStepRe],
+      ['release-gate', cacheStepRe],
+      ['pr-long-sims', laneCacheStepRe],
+    ] as const) {
+      const job = jobSource(name);
+      expect(job).toMatch(stepRe);
+      // Restore strictly between the install and the test run: earlier and
+      // pnpm install may prune or re-layout what was just restored, later and
+      // the run never sees the store. Step-name literals, not bare phrases,
+      // so a comment mentioning the name cannot shift the comparison; and
+      // every anchor must EXIST first, because indexOf returns -1 for a
+      // missing step and -1 compares less-than everything, making the
+      // ordering vacuously green if a step were deleted.
+      const install = job.indexOf('- name: Install dependencies');
+      const cache = job.indexOf('- name: Cache vitest transform cache');
+      const runTests = job.indexOf('- name: Run tests');
+      expect(install).toBeGreaterThanOrEqual(0);
+      expect(cache).toBeGreaterThanOrEqual(0);
+      expect(runTests).toBeGreaterThanOrEqual(0);
+      expect(install).toBeLessThan(cache);
+      expect(cache).toBeLessThan(runTests);
+      // No restore-keys: a cross-lockfile restore is discarded by vitest's own
+      // integrity check and a cross-config restore misses every entry, so a
+      // prefix fallback can only ever download dead weight. Anchored to the
+      // YAML key shape (bare, double- or single-quoted) because the step's
+      // own comment says the word.
+      expect(job).not.toMatch(/\n\s+["']?restore-keys["']?:/);
+    }
+    // The store is enabled in the config this cache serves, at the DEFAULT
+    // path the workflow hardcodes. Comment-stripped first (a `//` prefix
+    // must fail the pin, not satisfy it), then anchored to the real config
+    // line shape; and fsModuleCachePath must stay unset or the two would
+    // silently point at different directories.
+    const viteConfigCode = viteConfig.replace(/(^|[^:])\/\/.*$/gm, '$1');
+    expect(viteConfigCode).toMatch(/\n\s+fsModuleCache: true,/);
+    expect(viteConfigCode).not.toContain('fsModuleCachePath');
+    // Exactly the two shard matrices plus the long-sims lane carry the step,
+    // counted workflow-wide so a copy added to ANY other job fails
+    // (browser-gate has no matrix, so ${{ matrix.shard }} would render empty
+    // there and every run would collide on one key; the lane carries its own
+    // lane-long-sims key segment for the same reason). The path line is
+    // counted rather than the bare string because the pr-gate rationale
+    // comment mentions the directory.
+    expect(workflow.match(/- name: Cache vitest transform cache\n/g)).toHaveLength(3);
+    expect(workflow.match(/ {10}path: node_modules\/\.experimental-vitest-cache\n/g)).toHaveLength(
+      3,
+    );
+    for (const name of [
+      'pr-checks',
+      'release-checks',
+      'release-i18n',
+      'changes',
+      'browser-gate',
+      'lint',
+      'release-version-gate',
+    ] as const) {
+      expect(jobSource(name)).not.toContain('path: node_modules/.experimental-vitest-cache');
+    }
   });
 
   it('builds every bundle in the local gate too, including the Discord bot', () => {
