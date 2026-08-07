@@ -78,8 +78,12 @@ interface AttributionTargetFixture {
 // the rendererIntegration leaf (the release's PR #2983 re-land, this branch's
 // creator review pass), so the merged tree mints a value matching neither
 // parent. Captures adopted verbatim; no measured value moved on either side.
+// Re-minted again for the retarget onto release/v0.36.0 (v0.35.0 shipped to
+// main without this PR merging): the release moved the rendererIntegration
+// leaf further, plus this branch's own rift ambience wiring. No Eastbrook
+// input, geometry value, or capture moved.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '532c7b4b907fc86b1847b415bb8d915428c2e3abac19ac1d1128d51e117b01a6';
+  'affd44ca899db4418744df258939f57bf09060ab9b06afd19ba1b3e42dee0291';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
