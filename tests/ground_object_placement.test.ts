@@ -17,6 +17,7 @@ import { GROUND_OBJECTS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { groundHeight, terrainHeight } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // A pickup deliberately authored onto a walkable structure would go here, as
 // `'<itemId>@<x>,<z>'`, with the reason. Empty on purpose: every shipped
@@ -35,7 +36,11 @@ const LIFT_EPSILON = 0.01;
 // masonry it rests against, not masonry it rests on.
 const CRATE_PERCH_TOLERANCE = 1.5;
 
-const makeSim = (): Sim => new Sim({ seed: 1337, playerClass: 'warrior', noPlayer: true });
+// THE shipped world seed, never a private literal: two of the checks below read
+// seeded state (isBlocked walks the scatter/prop collider grid, and the perch
+// ring reads natural terrain), so a guard run on any other seed would be
+// policing a world nobody plays. src/sim/CLAUDE.md, world_seed.ts.
+const makeSim = (): Sim => new Sim({ seed: WORLD_SEED, playerClass: 'warrior', noPlayer: true });
 
 const RING: readonly (readonly [number, number])[] = [
   [2, 0],
@@ -94,7 +99,7 @@ describe('authored ground pickups stand on reachable natural ground', () => {
   // the player was SEEING it. The geometry guards above are what fail on a
   // regression; this proves the objective can be finished from the four spots.
   it('credits all four crates and readies Scorched Stores for turn-in', () => {
-    const sim = new Sim({ seed: 1337, playerClass: 'warrior' });
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
     const player = sim.player;
     const meta = sim.ctx.resolve(undefined)?.meta;
     expect(meta, 'the primary player resolves').toBeTruthy();
