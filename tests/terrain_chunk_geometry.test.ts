@@ -122,8 +122,16 @@ describe('generated chunk geometry is stable', () => {
     // Re-minted for the natural-relief heightfield plus the shared height
     // lattice in terrain_chunk_build.ts (vertex normals now difference the
     // lattice at the chunk's own spacing instead of a fixed 1.5yd stencil).
-    // Both were intended, reviewed visual changes.
-    expect(digestOf(inRect)).toBe('7fdd682e1b2668c0da7124b284939b7b');
+    // Both were intended, reviewed visual changes. Re-minted again for the
+    // gather-node placement fix (herb_eastbrook_4 moved off the boarball
+    // pitch to (6,-69) is the move these chunks see): an authored node pos
+    // is a calm-anchor world fixture, so the pads around the old and new
+    // spots reshape nearby vertices. Localization checked against the dense
+    // height atlas (tests/terrain_height_parity.test.ts fixture, re-minted
+    // in the same commit): the whole ten-node placement fix moves 146 of
+    // its 140639 points, 0.1 percent, all inside the moved nodes' pad
+    // footprints.
+    expect(digestOf(inRect)).toBe('5a5e1a89378552ec5e52321c657d923b');
     // The gap super-chunks take the same re-mint.
     expect(digestOf(gapFill)).toBe('0a6da9382c9bc0a9d6c7adcc752fb27b');
 

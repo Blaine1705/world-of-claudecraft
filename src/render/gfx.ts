@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { NATIVE_APP } from '../client_origin';
-import { TIGHT_MEMORY_MAX_GB, tightMemoryDeviceHint } from '../device_memory_hint';
+import { tightMemoryDeviceHint } from '../device_memory_hint';
 import {
   type GraphicsSettingsSnapshot,
   normalizeGraphicsSettingsSnapshot,
@@ -26,8 +26,9 @@ import { isSoftwareRendererName } from './software_renderer';
 //      (headless screenshot verification: stills render slowly but correctly)
 //   3. an explicit persisted graphics preset -> that tier
 //   4. no persisted preset (first boot / inconclusive detection) -> DEVICE-AWARE default via
-//      resolveDefaultGraphicsPreset (recognized weak/software -> low, strong desktop -> high/ultra,
-//      anything unrecognized -> medium), so the 3D tier matches the medium data-fx-level fallback
+//      resolveDefaultGraphicsPreset (any touch device -> low, recognized weak/software -> low,
+//      strong desktop -> high/ultra, anything unrecognized -> medium), so the 3D tier matches the
+//      medium data-fx-level fallback on the desktop path that still lands there
 
 export type GfxTier = 'low' | 'medium' | 'high' | 'ultra' | 'insane';
 
@@ -1480,9 +1481,11 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
 
 /**
  * The device-appropriate graphics preset (1 low .. 4 ultra) for a player who has NOT chosen one,
- * so a weak phone is not stuck on a tier it cannot run and a strong desktop is not capped below
- * what it can drive. MEDIUM (2) is the deliberate fallback whenever the signals are inconclusive
- * (the product call: a safe middle the runtime auto-governor can climb from). Pure function of
+ * so a phone is not stuck on a tier it cannot enter the world at and a strong desktop is not
+ * capped below what it can drive. EVERY touch device resolves to LOW (see the isMobile branch:
+ * the entry-time memory ceiling, not the frame rate, is what mobile is protected from). MEDIUM
+ * (2) is the deliberate DESKTOP fallback whenever the signals are inconclusive (the product
+ * call: a safe middle the runtime auto-governor can climb from). Pure function of
  * static device hints only (GPU name, deviceMemory, hardwareConcurrency, touch/coarse/narrow);
  * reads NO FPS governor and runs ONCE on first boot, so it never fights the runtime governor (the
  * two-controller rule). main.ts persists the result over the medium default so the 3D
@@ -1495,28 +1498,28 @@ export function classifyGpuRenderer(name: string | undefined): GpuClass {
  * loading), first-match-wins. CRITICAL: deviceMemory + hardwareConcurrency may only RAISE a tier
  * or break a tie, NEVER pull one down FOR THIS CAPABILITY LADDER. Safari caps hardwareConcurrency
  * (2 on iOS, 8 on macOS) and Safari + Firefox omit deviceMemory entirely (Chromium-only, clamped,
- * max ~8), so a flagship iPhone reports cores=2 / mem=undefined: a low-count down-rank would
- * wrongly bucket it low. The recognized GPU class sets the floor; a masked/unknown name lands on
- * MEDIUM. Ultra is gated behind a recognized strong-desktop GPU (a masked name cannot reach it).
+ * max ~8), so a thin count is routinely a REPORTING artifact rather than a weak machine: a Safari
+ * DESKTOP must not be down-ranked for it. The recognized GPU class sets the floor; a masked/unknown
+ * desktop name lands on MEDIUM. Ultra is gated behind a recognized strong-desktop GPU (a masked
+ * name cannot reach it) and is desktop-only, since every touch device takes the LOW branch first.
  *
- * A confirmed low deviceMemory is a SEPARATE axis from GPU capability, though: a mobile GPU
- * capable of pushing HIGH-tier pixels can still sit behind a genuinely small total RAM budget (a
- * common mid-range Android configuration pairs a decent GPU with 3-4 GB total system RAM), and
- * the world's baseline texture/geometry residency alone is large enough that a HIGH-tier session
- * on one of these phones can cross the OS's per-tab memory ceiling during ordinary play, reported
- * upstream as "randomly disconnects / dumped back to login no matter the network." This floor
- * fires ONLY on a REPORTED (never inferred) deviceMemory, so it can never false-positive an
- * iPhone the way a thin core-count check would (Safari never reports deviceMemory, so mem stays
- * undefined there and this never fires): it reuses the exact TIGHT_MEMORY_MAX_GB threshold
- * entry_crash_guard's reactive tight profile already applies to this device class, just proactively
- * instead of only after a confirmed crash.
+ * That blanket mobile floor SUBSUMES the reported-deviceMemory floor #2955 added here (mobile with
+ * a reported mem <= TIGHT_MEMORY_MAX_GB), which is why no separate memory check remains: its cases
+ * are a strict subset and resolve to the same PRESET_LOW. Its evidence is the corroborating
+ * argument for going blanket rather than a reason to keep two ladders. GPU capability and total RAM
+ * really are separate axes (a common mid-range Android pairs a decent GPU with 3-4 GB of system
+ * RAM), the world's baseline texture/geometry residency alone can cross the OS per-tab ceiling
+ * during ordinary play at HIGH, and players reported exactly that as "randomly disconnects / dumped
+ * back to login no matter the network." The narrow floor could only ever fire where deviceMemory is
+ * REPORTED, so it never covered iOS at all (Safari omits deviceMemory, leaving mem undefined) even
+ * though phone-class WebKit is where the process kill is most brutal. Touch alone is the signal
+ * that covers both.
  */
 export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
   const gpu = classifyGpuRenderer(hints.gpuRenderer);
   const mem = hints.deviceMemory; // GiB, Chromium-only (clamped, max ~8); undefined elsewhere
   const cores = hints.hardwareConcurrency; // logical cores, or undefined
   const isMobile = hints.maxTouchPoints > 0 && (hints.coarsePointer || hints.narrowViewport);
-  if (isMobile && mem !== undefined && mem <= TIGHT_MEMORY_MAX_GB) return PRESET_LOW;
   // Corroborating RAM/core signal (or deviceMemory simply unreported, as on Firefox): only ever
   // used to RAISE the strong-desktop tier to ultra, never to demote.
   const ampleOrUnknownMem =
@@ -1525,19 +1528,29 @@ export function resolveDefaultGraphicsPreset(hints: GfxRuntimeHints): number {
     (cores !== undefined && cores >= AMPLE_LOGICAL_CORES);
 
   if (gpu === 'software' || gpu === 'weak') return PRESET_LOW;
-  if (gpu === 'strongDesktop' && !isMobile) return ampleOrUnknownMem ? PRESET_ULTRA : PRESET_HIGH;
-  // A strong/flagship GPU on a touch device: capped at HIGH (ultra is desktop-only) for thermals.
-  if (gpu === 'flagshipMobile' || (gpu === 'strongDesktop' && isMobile)) return PRESET_HIGH;
-  // Apple Silicon: an M-series iPad (touch) keeps the mobile HIGH cap above; an M-series Mac
-  // (non-touch) defaults to the safe middle. These SoCs can render high, but the thermally
-  // constrained MacBook form factor overheats and drains battery on a sustained ultra load, so
-  // medium is the right auto-default (the runtime governor can still climb; ultra stays a manual
-  // opt-in). Issue 1676.
-  if (gpu === 'appleSilicon') return isMobile ? PRESET_HIGH : PRESET_MEDIUM;
+  // EVERY touch device starts at LOW, whatever its GPU class reports. The tier the synchronous
+  // world-entry scene build runs at is what decides its peak memory footprint, and on phone-class
+  // WebKit crossing the per-process ceiling gets the tab's WebContent process killed with no
+  // error event (src/game/entry_crash_guard.ts). The previous mobile ladder (flagship or
+  // Apple-silicon touch to HIGH, masked/unknown phone to MEDIUM) entered above that ceiling often
+  // enough that the crash-recovery banner became a routine part of joining on a phone. Mobile now
+  // starts at the floor and CLIMBS only by an explicit player choice in Options; the runtime
+  // governor still moves render scale within the tier, and safeStartupGraphicsPreset still caps a
+  // stored ultra/insane choice on iOS. Detection can no longer pick a mobile tier that has to be
+  // walked back down one crash at a time.
+  if (isMobile) return PRESET_LOW;
+  if (gpu === 'strongDesktop') return ampleOrUnknownMem ? PRESET_ULTRA : PRESET_HIGH;
+  // A flagship MOBILE GPU on a device reporting no touch at all (an Android TV box, desktop
+  // device emulation): not a phone by the check above, so it keeps its historical HIGH.
+  if (gpu === 'flagshipMobile') return PRESET_HIGH;
+  // Apple Silicon Macs (touch devices took the LOW branch above): these SoCs can render high, but
+  // the thermally constrained MacBook form factor overheats and drains battery on a sustained
+  // ultra load, so medium is the right auto-default (the runtime governor can still climb; ultra
+  // stays a manual opt-in). Issue 1676.
+  if (gpu === 'appleSilicon') return PRESET_MEDIUM;
   if (gpu === 'midIntegrated' || gpu === 'midMobile') return PRESET_MEDIUM;
   if (
     gpu === 'unknown' &&
-    !isMobile &&
     mem !== undefined &&
     mem >= AMPLE_DEVICE_MEMORY_GIB &&
     cores !== undefined &&
@@ -1884,6 +1897,14 @@ export function addRimGlow(mat: THREE.Material): void {
   };
   mat.customProgramCacheKey = () =>
     `pbr-rim-reuse|${previousCompileSource}|${previousProgramKey()}`;
+}
+
+/** True when addRimGlow already patched this exact material instance. A
+ *  Material.clone() is NOT the same instance and never carries the hook (clone
+ *  copies userData but drops onBeforeCompile), which is what
+ *  material_clone_hooks.ts re-attaches. */
+export function hasRimGlow(mat: THREE.Material): boolean {
+  return rimGlowMaterials.has(mat);
 }
 
 // Material factory: dedupes by (color|maps|flags) so hundreds of small box

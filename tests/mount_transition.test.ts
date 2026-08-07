@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { expectDefined } from './helpers/defined';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
 // mirroring tests/mounts.test.ts / tests/snapshots.test.ts.
@@ -41,7 +42,7 @@ function joinRider(sim: Sim, opts: { level?: number; x?: number; z?: number } = 
   const pid = sim.addPlayer('warrior', 'Rider');
   sim.tick();
   sim.setPlayerLevel(opts.level ?? 60, pid);
-  const p = sim.entities.get(pid)!;
+  const p = expectDefined(sim.entities.get(pid));
   const x = opts.x ?? 0;
   const z = opts.z ?? -40;
   p.pos.x = x;
@@ -155,7 +156,7 @@ describe('mount summon/dismount transition', () => {
   it('completes a mount summon after MOUNT_SUMMON_SECONDS of ticks, then rides', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
 
     expect(summonMountItem(sim.ctx, pid, 'grag_bear')).toBe(true);
     // The channel starts; the live mount is NOT flipped yet.
@@ -180,8 +181,8 @@ describe('mount summon/dismount transition', () => {
   it('cancels the summon channel when the player moves (move-to-cancel)', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
-    const meta = sim.meta(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
+    const meta = expectDefined(sim.meta(pid));
 
     summonMountItem(sim.ctx, pid, 'grag_bear');
     expect(e.mountCastRemaining).toBeGreaterThan(0); // channel started
@@ -198,7 +199,7 @@ describe('mount summon/dismount transition', () => {
   it('ignores a second toggle while a summon is already channelling', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
 
     expect(summonMountItem(sim.ctx, pid, 'grag_bear')).toBe(true);
     const rem = e.mountCastRemaining;
@@ -211,7 +212,7 @@ describe('mount summon/dismount transition', () => {
   it('cancels an in-flight summon on entering combat and never mounts', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
 
     summonMountItem(sim.ctx, pid, 'grag_bear');
     sim.tick(); // one tick of channel progress
@@ -232,7 +233,7 @@ describe('mount summon/dismount transition', () => {
   it('clears the summon channel when the player dies mid-transition', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
 
     summonMountItem(sim.ctx, pid, 'grag_bear');
     sim.tick();
@@ -247,8 +248,8 @@ describe('mount summon/dismount transition', () => {
   it('dismounts INSTANTLY with no channel, and never roots the player', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
-    const meta = sim.meta(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
+    const meta = expectDefined(sim.meta(pid));
     e.mountKey = 'grag_bear'; // start already mounted (skip the summon)
 
     expect(toggleMount(sim.ctx, pid)).toBe(true);
@@ -271,7 +272,7 @@ describe('mount summon/dismount transition', () => {
   it('force-dismounts a mounted player teleported into deep water', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
     e.mountKey = 'grag_bear';
 
     const lake = findDeepLake(SEED);
@@ -293,7 +294,7 @@ describe('mounted deep-water wall (kernel)', () => {
     const pid = sim.addPlayer('warrior', 'Rider');
     sim.tick();
     sim.setPlayerLevel(60, pid);
-    const template = sim.entities.get(pid)!;
+    const template = expectDefined(sim.entities.get(pid));
     const shore = findMountShore(SEED);
     const groundY = groundHeight(shore.x, shore.z, SEED);
     const clone = (mountKey: string): Entity => ({
@@ -339,7 +340,7 @@ describe('mount transition on the entity wire', () => {
   it('keeps the active mount on the identity mnt field', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
     e.mountKey = 'grag_bear';
 
     expect(wireEntity(e).mnt).toBe('grag_bear');
@@ -348,7 +349,7 @@ describe('mount transition on the entity wire', () => {
   it('carries mcr/mck during a summon and omits them when idle', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
 
     // idle: neither field rides the wire
     const idle = wireEntity(e);
@@ -367,7 +368,7 @@ describe('mount transition on the entity wire', () => {
   it('a dismount puts NO channel on the wire (it is instant)', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
     e.mountKey = 'grag_bear';
 
     toggleMount(sim.ctx, pid);
@@ -384,7 +385,7 @@ describe('attack auto-dismount', () => {
   it('casting any ability while mounted instantly dismounts the player', () => {
     const sim = makeSim();
     const pid = joinRider(sim);
-    const e = sim.entities.get(pid)!;
+    const e = expectDefined(sim.entities.get(pid));
 
     // Arrange: player is fully mounted (skip the summon channel)
     e.mountKey = 'grag_bear';

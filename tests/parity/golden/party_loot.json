@@ -8,7 +8,7 @@
     "multi-player party"
   ],
   "draws": 2,
-  "drawDigest": "abc5fd1d",
+  "drawDigest": "6f587c5e",
   "frames": [
     {
       "tick": 0,
@@ -28,11 +28,11 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 966,
-      "state": "187d7a8e",
-      "events": "3773324c",
+      "state": "ebf29f7d",
+      "events": "1bad28d0",
       "rng": {
         "draws": 2,
-        "digest": "abc5fd1d"
+        "digest": "6f587c5e"
       },
       "label": "final",
       "players": [
@@ -91,9 +91,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 5,
           "talents": {
             "rows": {}
@@ -163,16 +160,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {
-              "greyjaw_hide_boots": {
-                "pageId": "conquerors_hollow_crypt"
-              }
-            },
-            "recent": [
-              "greyjaw_hide_boots"
-            ]
-          },
           "renown": 5,
           "talents": {
             "rows": {}

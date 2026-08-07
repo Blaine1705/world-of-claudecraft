@@ -5,6 +5,7 @@
 // the last cast. Aether Darts (arcane_missiles) consumes every charge on its
 // first landed missile, splitting a flat Arcane bonus across the missiles.
 import { describe, expect, it } from 'vitest';
+
 import {
   AETHER_SURGE_COST_PER_CHARGE,
   AETHER_SURGE_DMG_PER_CHARGE,
@@ -18,6 +19,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 
 function chronoMage(level = 20) {
   const sim = new Sim({ seed: 1, playerClass: 'mage', autoEquip: true });
@@ -163,7 +165,7 @@ describe('Aether Surge feeds Temporal Echo (no hidden heal bonus)', () => {
     const { sim, p } = chronoMage();
     const mob = addHostile(sim);
     const allyId = sim.addPlayer('warrior', 'Marcado');
-    const ally = sim.entities.get(allyId)!;
+    const ally = expectDefined(sim.entities.get(allyId));
     ally.pos.x = p.pos.x + 4;
     ally.pos.z = p.pos.z;
     ally.maxHp = 1_000_000;
@@ -291,7 +293,7 @@ describe('Aether Surge free-cast proc', () => {
   it('the free proc only covers Aether Surge, not other casts', () => {
     const { sim, p } = chronoMage();
     const allyId = sim.addPlayer('warrior', 'Aliado');
-    const ally = sim.entities.get(allyId)!;
+    const ally = expectDefined(sim.entities.get(allyId));
     ally.pos.x = p.pos.x + 4;
     ally.pos.z = p.pos.z;
     ally.hp = Math.floor(ally.maxHp * 0.4);

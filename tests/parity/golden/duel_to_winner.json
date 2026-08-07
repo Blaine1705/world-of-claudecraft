@@ -8,8 +8,8 @@
     "updateDuels countdown -> active + duelStart",
     "endDuel on a PvP finishing blow (winner/loser + this.duels cleared)"
   ],
-  "draws": 530,
-  "drawDigest": "dfb03466",
+  "draws": 526,
+  "drawDigest": "8f824e62",
   "frames": [
     {
       "tick": 0,
@@ -54,8 +54,8 @@
       "state": "c35bd8b5",
       "events": "cea7d96e",
       "rng": {
-        "draws": 140,
-        "digest": "aad057f3"
+        "draws": 137,
+        "digest": "bec97bd6"
       }
     },
     {
@@ -65,8 +65,8 @@
       "state": "1ca5452c",
       "events": "9d9e6365",
       "rng": {
-        "draws": 157,
-        "digest": "76cce856"
+        "draws": 152,
+        "digest": "1202574a"
       },
       "label": "duel-active",
       "players": [
@@ -314,8 +314,8 @@
       "state": "10b758df",
       "events": "fe298cb7",
       "rng": {
-        "draws": 157,
-        "digest": "76cce856"
+        "draws": 152,
+        "digest": "1202574a"
       },
       "label": "duel-ended",
       "players": [
@@ -568,8 +568,8 @@
       "state": "a15827fa",
       "events": "251b6de1",
       "rng": {
-        "draws": 313,
-        "digest": "30689d20"
+        "draws": 305,
+        "digest": "22034388"
       }
     },
     {
@@ -579,8 +579,8 @@
       "state": "eabf85e5",
       "events": "741638a5",
       "rng": {
-        "draws": 523,
-        "digest": "0c48dd81"
+        "draws": 519,
+        "digest": "e86da331"
       }
     },
     {
@@ -590,8 +590,8 @@
       "state": "2ea272b2",
       "events": "741638a5",
       "rng": {
-        "draws": 530,
-        "digest": "dfb03466"
+        "draws": 526,
+        "digest": "8f824e62"
       },
       "label": "final",
       "players": [

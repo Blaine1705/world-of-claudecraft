@@ -17,13 +17,13 @@
     "R40 confirmed prompt use: two draws, bonus applied, charge spent (the consented digest)"
   ],
   "draws": 6,
-  "drawDigest": "2c41400b",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "60db104b",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -79,9 +79,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -158,7 +155,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "9181a16f",
+      "state": "f7b3a426",
       "events": "df133d2d",
       "rng": {
         "draws": 0,
@@ -225,9 +222,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -313,11 +307,11 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "0d3d56b7",
-      "events": "fe777845",
+      "state": "79171eeb",
+      "events": "a10631da",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "harvest-with-effect-applied",
       "players": [
@@ -395,7 +389,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -405,9 +399,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -496,11 +487,11 @@
       "tick": 53,
       "time": 2.65,
       "nextId": 964,
-      "state": "c4fe2dfa",
+      "state": "db92da10",
       "events": "414479fe",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "same-vein-denied-by-own-timer",
       "players": [
@@ -578,7 +569,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -588,9 +579,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -679,11 +667,11 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 964,
-      "state": "20e964e4",
+      "state": "2ab38680",
       "events": "1796b529",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "prompt-mode-reslotted",
       "players": [
@@ -761,7 +749,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -771,9 +759,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -862,11 +847,11 @@
       "tick": 106,
       "time": 5.3,
       "nextId": 964,
-      "state": "acb4693f",
+      "state": "824e44a9",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
-        "digest": "b247a679"
+        "digest": "49d036fe"
       },
       "label": "prompt-unconfirmed-skips-whole",
       "players": [
@@ -945,7 +930,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 2,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -963,9 +948,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -1054,11 +1036,11 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "a812020e",
-      "events": "bc352f64",
+      "state": "947a4856",
+      "events": "7f087928",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "prompt-confirmed-fires-and-spends",
       "players": [
@@ -1137,7 +1119,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 4,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1146,6 +1128,13 @@
                 "signer": "Adventurer"
               },
               "itemId": "iron_ore"
+            },
+            {
+              "count": 4,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
             }
           ],
           "lifetimeXp": 108,
@@ -1156,9 +1145,6 @@
             "ore_mirefen_t2b": 247.4
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -1247,11 +1233,11 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "3ebf1721",
+      "state": "0b65a053",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [
@@ -1330,7 +1316,7 @@
               "itemId": "mithril_mining_pick"
             },
             {
-              "count": 4,
+              "count": 3,
               "itemId": "fine_iron_ore"
             },
             {
@@ -1339,6 +1325,13 @@
                 "signer": "Adventurer"
               },
               "itemId": "iron_ore"
+            },
+            {
+              "count": 4,
+              "instance": {
+                "signer": "Adventurer"
+              },
+              "itemId": "fine_iron_ore"
             }
           ],
           "lifetimeXp": 108,
@@ -1349,9 +1342,6 @@
             "ore_mirefen_t2b": 247.4
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}

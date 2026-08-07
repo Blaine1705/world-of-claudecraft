@@ -11,7 +11,7 @@
     "corpse-tick gate: a dungeon mob (spawnPos.x > DUNGEON_X_THRESHOLD) stays dead, no respawn"
   ],
   "draws": 20,
-  "drawDigest": "42be3e24",
+  "drawDigest": "eacecc62",
   "frames": [
     {
       "tick": 0,
@@ -31,11 +31,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 968,
-      "state": "62668466",
+      "state": "0237849c",
       "events": "3b7fb98a",
       "rng": {
         "draws": 5,
-        "digest": "c07e256b"
+        "digest": "6fda2ce9"
       },
       "label": "pack-frenzy",
       "players": [
@@ -94,9 +94,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -189,7 +186,17 @@
           },
           "level": 5,
           "loot": {
-            "copper": 11
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -403,11 +410,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "5f2d235d",
+      "state": "4d977f1a",
       "events": "640dd8c6",
       "rng": {
         "draws": 8,
-        "digest": "e5303267"
+        "digest": "db719754"
       },
       "label": "throes-arm",
       "players": [
@@ -472,9 +479,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -568,7 +572,17 @@
           },
           "level": 5,
           "loot": {
-            "copper": 11
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -796,7 +810,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 38
+            "copper": 44
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -835,11 +849,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 969,
-      "state": "b3e0288a",
-      "events": "2bb52194",
+      "state": "d5bce1b2",
+      "events": "62c2b0f9",
       "rng": {
         "draws": 9,
-        "digest": "b7b24a2e"
+        "digest": "d32543fd"
       },
       "label": "throes-detonate",
       "players": [
@@ -860,7 +874,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 2293,
-            "damageTaken": 20,
+            "damageTaken": 16,
             "kills": 2,
             "xpGained": 198
           },
@@ -905,9 +919,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -939,7 +950,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999980,
+          "hp": 999984,
           "id": 963,
           "inCombat": true,
           "kind": "player",
@@ -958,7 +969,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2.2,
+          "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1002,7 +1013,17 @@
           },
           "level": 5,
           "loot": {
-            "copper": 11
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -1230,7 +1251,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 38
+            "copper": 44
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -1269,11 +1290,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 971,
-      "state": "e687ccca",
+      "state": "1a11d9bf",
       "events": "eb7d7808",
       "rng": {
         "draws": 15,
-        "digest": "980a6e0a"
+        "digest": "7fb5c277"
       },
       "label": "respawn",
       "players": [
@@ -1294,7 +1315,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 3389,
-            "damageTaken": 20,
+            "damageTaken": 16,
             "kills": 3,
             "xpGained": 282
           },
@@ -1339,9 +1360,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -1373,7 +1391,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999980,
+          "hp": 999984,
           "id": 963,
           "inCombat": true,
           "kind": "player",
@@ -1392,7 +1410,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2.2,
+          "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1436,7 +1454,17 @@
           },
           "level": 5,
           "loot": {
-            "copper": 11
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -1664,7 +1692,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 38
+            "copper": 44
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -1733,7 +1761,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 2.426058,
+          "wanderTimer": 2.750794,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -1746,11 +1774,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "c4e39018",
+      "state": "e5149800",
       "events": "db94afe1",
       "rng": {
         "draws": 20,
-        "digest": "42be3e24"
+        "digest": "eacecc62"
       },
       "label": "dungeon-stays-dead",
       "players": [
@@ -1771,7 +1799,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 4485,
-            "damageTaken": 20,
+            "damageTaken": 16,
             "kills": 4,
             "xpGained": 366
           },
@@ -1820,9 +1848,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -1854,7 +1879,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999980,
+          "hp": 999984,
           "id": 963,
           "inCombat": true,
           "kind": "player",
@@ -1873,7 +1898,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2.2,
+          "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -1917,7 +1942,17 @@
           },
           "level": 5,
           "loot": {
-            "copper": 11
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -2145,7 +2180,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 38
+            "copper": 44
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -2214,7 +2249,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 2.426058,
+          "wanderTimer": 2.750794,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2242,7 +2277,7 @@
           },
           "level": 5,
           "loot": {
-            "copper": 8
+            "copper": 12
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [
@@ -2282,11 +2317,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 972,
-      "state": "c4e39018",
+      "state": "e5149800",
       "events": "741638a5",
       "rng": {
         "draws": 20,
-        "digest": "42be3e24"
+        "digest": "eacecc62"
       },
       "label": "final",
       "players": [
@@ -2307,7 +2342,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 4485,
-            "damageTaken": 20,
+            "damageTaken": 16,
             "kills": 4,
             "xpGained": 366
           },
@@ -2356,9 +2391,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -2390,7 +2422,7 @@
           "dodgeChance": 0.06,
           "fallStartY": 1.5,
           "fiveSecondRule": 99,
-          "hp": 999980,
+          "hp": 999984,
           "id": 963,
           "inCombat": true,
           "kind": "player",
@@ -2409,7 +2441,7 @@
             "z": -2
           },
           "potionCooldownUntil": -1,
-          "resource": 2.2,
+          "resource": 1.76,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
@@ -2453,7 +2485,17 @@
           },
           "level": 5,
           "loot": {
-            "copper": 11
+            "copper": 10,
+            "items": [
+              {
+                "count": 1,
+                "itemId": "wolf_fang"
+              },
+              {
+                "count": 1,
+                "itemId": "milepost_boots"
+              }
+            ]
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
@@ -2681,7 +2723,7 @@
           },
           "level": 10,
           "loot": {
-            "copper": 38
+            "copper": 44
           },
           "lootFfaTimer": 58.45,
           "lootRecipientIds": [
@@ -2750,7 +2792,7 @@
             "armor": 40
           },
           "templateId": "forest_wolf",
-          "wanderTimer": 2.426058,
+          "wanderTimer": 2.750794,
           "weapon": {
             "max": 12,
             "min": 8,
@@ -2778,7 +2820,7 @@
           },
           "level": 5,
           "loot": {
-            "copper": 8
+            "copper": 12
           },
           "lootFfaTimer": 59.95,
           "lootRecipientIds": [

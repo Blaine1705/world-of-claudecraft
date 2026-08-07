@@ -8,8 +8,8 @@
     "first kill does not end the match; team wipe (isArenaTeamWiped) does",
     "endArenaMatch ranked Elo on both teams (arena2v2 standings) + returnFromArena"
   ],
-  "draws": 2083,
-  "drawDigest": "1d370767",
+  "draws": 2000,
+  "drawDigest": "4a632170",
   "frames": [
     {
       "tick": 0,
@@ -44,7 +44,7 @@
       "events": "224cbfd9",
       "rng": {
         "draws": 94,
-        "digest": "205c5b7b"
+        "digest": "f94836fc"
       }
     },
     {
@@ -54,8 +54,8 @@
       "state": "3205f606",
       "events": "969ec561",
       "rng": {
-        "draws": 297,
-        "digest": "e6cd4596"
+        "draws": 290,
+        "digest": "d5038b1d"
       }
     },
     {
@@ -65,8 +65,8 @@
       "state": "5c59ea49",
       "events": "507341c9",
       "rng": {
-        "draws": 529,
-        "digest": "c477779c"
+        "draws": 513,
+        "digest": "fbd3b6a8"
       }
     },
     {
@@ -76,8 +76,8 @@
       "state": "0b0d9068",
       "events": "74c0894d",
       "rng": {
-        "draws": 541,
-        "digest": "2b0e2adf"
+        "draws": 525,
+        "digest": "3a6dc8d7"
       },
       "label": "bout-active",
       "players": [
@@ -533,8 +533,8 @@
       "state": "8f2f918b",
       "events": "96c714ad",
       "rng": {
-        "draws": 546,
-        "digest": "ed388070"
+        "draws": 531,
+        "digest": "bc30bbc0"
       },
       "label": "first-down",
       "players": [
@@ -1003,8 +1003,8 @@
       "state": "6a9fa47c",
       "events": "b97f8b79",
       "rng": {
-        "draws": 554,
-        "digest": "2120a869"
+        "draws": 538,
+        "digest": "989640f4"
       },
       "label": "team-wiped",
       "players": [
@@ -1536,8 +1536,8 @@
       "state": "5b886800",
       "events": "741638a5",
       "rng": {
-        "draws": 772,
-        "digest": "09127066"
+        "draws": 754,
+        "digest": "92c82180"
       }
     },
     {
@@ -1547,8 +1547,8 @@
       "state": "c6514f8c",
       "events": "741638a5",
       "rng": {
-        "draws": 1063,
-        "digest": "ffaecc0b"
+        "draws": 1029,
+        "digest": "8b312fda"
       }
     },
     {
@@ -1558,8 +1558,8 @@
       "state": "e481c1d5",
       "events": "741638a5",
       "rng": {
-        "draws": 1368,
-        "digest": "37af0571"
+        "draws": 1349,
+        "digest": "df929fbc"
       }
     },
     {
@@ -1569,8 +1569,8 @@
       "state": "8b147889",
       "events": "741638a5",
       "rng": {
-        "draws": 1727,
-        "digest": "4c688667"
+        "draws": 1668,
+        "digest": "5aacb8cf"
       }
     },
     {
@@ -1580,8 +1580,8 @@
       "state": "dc335628",
       "events": "de7d14f9",
       "rng": {
-        "draws": 1917,
-        "digest": "c9c4e0c0"
+        "draws": 1860,
+        "digest": "f802c41d"
       }
     },
     {
@@ -1591,8 +1591,8 @@
       "state": "4e527839",
       "events": "741638a5",
       "rng": {
-        "draws": 2083,
-        "digest": "1d370767"
+        "draws": 2000,
+        "digest": "4a632170"
       },
       "label": "returned",
       "players": [
@@ -2141,8 +2141,8 @@
       "state": "4e527839",
       "events": "741638a5",
       "rng": {
-        "draws": 2083,
-        "digest": "1d370767"
+        "draws": 2000,
+        "digest": "4a632170"
       },
       "label": "final",
       "players": [

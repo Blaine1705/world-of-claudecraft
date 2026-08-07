@@ -2,7 +2,7 @@
   "scenario": "professions_fishing_session",
   "seed": 1,
   "sampleEvery": 100,
-  "ticks": 94,
+  "ticks": 99,
   "coverage": [
     "class:warrior (angler)",
     "startFishing cast start: water probe + bite-delay rng draw",
@@ -12,13 +12,13 @@
     "post-completion re-press: a fresh cast begins (no stale session state)"
   ],
   "draws": 3,
-  "drawDigest": "5f12ed66",
+  "drawDigest": "1e79975d",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "60db104b",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,9 +74,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -153,11 +150,11 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "36805d53",
+      "state": "03d52ddc",
       "events": "9988cb27",
       "rng": {
         "draws": 1,
-        "digest": "635aa48c"
+        "digest": "acd1c827"
       },
       "label": "cast-start",
       "players": [
@@ -214,9 +211,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -249,7 +243,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
-          "fishBiteAtTick": 86,
+          "fishBiteAtTick": 91,
           "fishCastZoneId": "eastbrook_vale",
           "fiveSecondRule": 99,
           "hp": 100,
@@ -295,14 +289,14 @@
       ]
     },
     {
-      "tick": 86,
-      "time": 4.3,
+      "tick": 91,
+      "time": 4.55,
       "nextId": 964,
-      "state": "83723818",
+      "state": "d9acf061",
       "events": "affa4108",
       "rng": {
         "draws": 1,
-        "digest": "635aa48c"
+        "digest": "acd1c827"
       },
       "label": "bite-armed",
       "players": [
@@ -359,9 +353,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -378,25 +369,25 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.7,
+              "remaining": 3595.45,
               "school": "physical",
               "sourceId": 959
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "castRemaining": 10.7,
+          "castRemaining": 10.45,
           "castTotal": 15,
           "castingAbility": "fishing",
-          "combatTimer": 103.3,
+          "combatTimer": 103.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
           "fishCastZoneId": "eastbrook_vale",
-          "fishReelDeadlineTick": 136,
-          "fiveSecondRule": 103.3,
+          "fishReelDeadlineTick": 141,
+          "fiveSecondRule": 103.55,
           "hp": 100,
           "id": 959,
           "kind": "player",
@@ -440,14 +431,14 @@
       ]
     },
     {
-      "tick": 86,
-      "time": 4.3,
+      "tick": 91,
+      "time": 4.55,
       "nextId": 964,
-      "state": "bbca2d02",
-      "events": "e279fb5a",
+      "state": "adf6b297",
+      "events": "cffa3816",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "reel-landed",
       "players": [
@@ -475,7 +466,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
-              "raw_mirror_trout",
+              "raw_river_perch",
               "recruit_tunic",
               "simple_fishing_pole",
               "worn_sword"
@@ -506,7 +497,7 @@
             },
             {
               "count": 1,
-              "itemId": "raw_mirror_trout"
+              "itemId": "raw_river_perch"
             }
           ],
           "mailWelcomed": true,
@@ -518,9 +509,6 @@
             }
           ],
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -537,7 +525,7 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.7,
+              "remaining": 3595.45,
               "school": "physical",
               "sourceId": 959
             }
@@ -545,13 +533,13 @@
           "blockChance": 0.05,
           "blockValue": 6,
           "castTotal": 15,
-          "combatTimer": 103.3,
+          "combatTimer": 103.55,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
-          "fiveSecondRule": 103.3,
+          "fiveSecondRule": 103.55,
           "hp": 100,
           "id": 959,
           "kind": "player",
@@ -595,14 +583,14 @@
       ]
     },
     {
-      "tick": 94,
-      "time": 4.7,
+      "tick": 99,
+      "time": 4.95,
       "nextId": 964,
-      "state": "0590cb72",
+      "state": "a8a124c8",
       "events": "943b953c",
       "rng": {
         "draws": 3,
-        "digest": "5f12ed66"
+        "digest": "1e79975d"
       },
       "label": "final",
       "players": [
@@ -630,7 +618,7 @@
             "itemsDiscovered": [
               "baked_bread",
               "eastbrook_buckler",
-              "raw_mirror_trout",
+              "raw_river_perch",
               "recruit_tunic",
               "simple_fishing_pole",
               "worn_sword"
@@ -673,15 +661,12 @@
             },
             {
               "count": 1,
-              "itemId": "raw_mirror_trout"
+              "itemId": "raw_river_perch"
             }
           ],
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 10,
           "talents": {
             "rows": {}
@@ -699,7 +684,7 @@
               "id": "battle_stance",
               "kind": "battle_stance",
               "name": "Battle Stance",
-              "remaining": 3595.3,
+              "remaining": 3595.05,
               "school": "physical",
               "sourceId": 959
             }
@@ -709,15 +694,15 @@
           "castRemaining": 14.6,
           "castTotal": 15,
           "castingAbility": "fishing",
-          "combatTimer": 103.7,
+          "combatTimer": 103.95,
           "comboUntil": -1,
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
           "fallStartY": -2.902683,
-          "fishBiteAtTick": 219,
+          "fishBiteAtTick": 234,
           "fishCastZoneId": "eastbrook_vale",
-          "fiveSecondRule": 103.7,
+          "fiveSecondRule": 103.95,
           "hp": 100,
           "id": 959,
           "kind": "player",

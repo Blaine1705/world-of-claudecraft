@@ -16,14 +16,14 @@
     "petTaunt -> applyTaunt manual arm + PET_GROWL_INTERVAL cooldown",
     "stowPetForDelve/restorePetFromDelveStash (serializePet/restorePet round-trip)"
   ],
-  "draws": 299,
-  "drawDigest": "5a37b492",
+  "draws": 286,
+  "drawDigest": "a616493f",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "2ead8d33",
+      "state": "4c85ae94",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -82,9 +82,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -149,7 +146,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "f08e4e3f",
+      "state": "80dd0140",
       "events": "c91d20d7",
       "rng": {
         "draws": 0,
@@ -209,9 +206,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -319,7 +313,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 966,
-      "state": "db6818c4",
+      "state": "0a3ba965",
       "events": "5753e728",
       "rng": {
         "draws": 0,
@@ -379,9 +373,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -503,7 +494,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 966,
-      "state": "aa528bba",
+      "state": "5b31b441",
       "events": "8bc075c6",
       "rng": {
         "draws": 0,
@@ -514,7 +505,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 966,
-      "state": "d7ba99b0",
+      "state": "9632f3ff",
       "events": "85f2511e",
       "rng": {
         "draws": 0,
@@ -525,7 +516,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "fcf7f48b",
+      "state": "2ab92d2a",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -602,9 +593,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -789,7 +777,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 967,
-      "state": "2601f3da",
+      "state": "8f8f79a1",
       "events": "012e8727",
       "rng": {
         "draws": 0,
@@ -866,9 +854,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -990,7 +975,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "d861b556",
+      "state": "72e5a59d",
       "events": "75c391a9",
       "rng": {
         "draws": 0,
@@ -1067,9 +1052,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1234,7 +1216,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "784f8469",
+      "state": "582e62b8",
       "events": "d4e9a759",
       "rng": {
         "draws": 0,
@@ -1311,9 +1293,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1478,7 +1457,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 969,
-      "state": "2601f3da",
+      "state": "8f8f79a1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1555,9 +1534,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1679,7 +1655,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 970,
-      "state": "2601f3da",
+      "state": "8f8f79a1",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1756,9 +1732,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -1880,7 +1853,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 972,
-      "state": "20ba5bcb",
+      "state": "980d9193",
       "events": "eb920bc7",
       "rng": {
         "draws": 0,
@@ -1957,9 +1930,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2017,9 +1987,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -2237,33 +2204,33 @@
       "tick": 60,
       "time": 3,
       "nextId": 972,
-      "state": "d3cea6a4",
-      "events": "6d8e730a",
+      "state": "c98b318a",
+      "events": "c8d5ae52",
       "rng": {
-        "draws": 157,
-        "digest": "a9a077c8"
+        "draws": 151,
+        "digest": "1e93d795"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 972,
-      "state": "0ed283fa",
+      "state": "b963f4aa",
       "events": "76fbfd1a",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       }
     },
     {
       "tick": 80,
       "time": 4,
       "nextId": 972,
-      "state": "0ed283fa",
+      "state": "b963f4aa",
       "events": "741638a5",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "demon-heal-tick",
       "players": [
@@ -2283,9 +2250,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2338,9 +2303,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2412,9 +2374,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2426,14 +2385,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -2478,7 +2437,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -2637,11 +2596,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 974,
-      "state": "459f4e46",
+      "state": "e55049b6",
       "events": "869c6ace",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "demon-resummoned",
       "players": [
@@ -2661,9 +2620,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -2716,9 +2673,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2790,9 +2744,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -2804,14 +2755,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -2856,7 +2807,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3016,11 +2967,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 976,
-      "state": "79684439",
+      "state": "f221b289",
       "events": "67fda175",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "demon-despawned",
       "players": [
@@ -3040,9 +2991,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -3095,9 +3044,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -3169,9 +3115,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -3183,14 +3126,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -3235,7 +3178,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -3403,11 +3346,11 @@
       "tick": 80,
       "time": 4,
       "nextId": 976,
-      "state": "79684439",
+      "state": "f221b289",
       "events": "741638a5",
       "rng": {
-        "draws": 299,
-        "digest": "5a37b492"
+        "draws": 286,
+        "digest": "a616493f"
       },
       "label": "final",
       "players": [
@@ -3427,9 +3370,7 @@
           "bgRating": 1500,
           "cls": "hunter",
           "companionUpgrades": {},
-          "counters": {
-            "damageTaken": 11
-          },
+          "counters": {},
           "craftSkills": {},
           "deedStats": {
             "counters": {},
@@ -3482,9 +3423,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -3556,9 +3494,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 20,
           "talents": {
             "rows": {}
@@ -3570,14 +3505,14 @@
         {
           "aiState": "idle",
           "attackPower": 83,
-          "combatTimer": 1.95,
+          "combatTimer": 103,
           "comboUntil": -1,
           "critChance": 0.079,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.079,
           "fallStartY": 1.5,
           "fiveSecondRule": 103,
-          "hp": 49989,
+          "hp": 50000,
           "id": 959,
           "inCombat": true,
           "kind": "player",
@@ -3622,7 +3557,7 @@
         {
           "aggroTargetId": 959,
           "aiState": "attack",
-          "combatTimer": 1.95,
+          "combatTimer": 2,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",

@@ -93,6 +93,9 @@ const itemStringsEn = {
       questRules: 'Cannot be sold, banked, or traded.',
       questOrphaned: 'Not needed for any active quest.',
       classes: 'Classes: {classes}',
+      // Stackable per-slot cap (stack_size_tooltip_view.ts); unstackable
+      // kinds render no line at all rather than "Max stack: 1".
+      maxStack: 'Max stack: {count}',
       sellPrice: 'Sell price: {money}',
       clickBuy: 'Click to buy',
       clickSell: 'Click to sell',
@@ -261,6 +264,10 @@ const itemStringsEn = {
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
+      // The itemized ledger under the proceeds line. saleOlder covers the rows the
+      // ledger cap dropped, whose gold IS still in the total above.
+      saleBuyer: 'Sold to {buyer}',
+      saleOlder: 'Plus {count} earlier sales, included in the total.',
       collectAll: 'Collect All',
     },
     logs: {

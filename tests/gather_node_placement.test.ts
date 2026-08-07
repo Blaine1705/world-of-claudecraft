@@ -44,6 +44,13 @@ import { NODE_HARVEST_TABLE } from '../src/sim/professions/gathering';
 import { GATHER_NODE_BODIES } from '../src/sim/prop_layout';
 import { INTERACT_RANGE } from '../src/sim/types';
 import {
+  GOAL_LINE_EAST_X,
+  GOAL_LINE_WEST_X,
+  isOnPitch,
+  PITCH_CENTER,
+  SOWFIELD_EXCLUDE,
+} from '../src/sim/vale_cup_layout';
+import {
   DECORATION_MAX_SLOPE,
   groundHeight,
   isInWaterBody,
@@ -81,8 +88,8 @@ it('the shipped world seed is pinned to its literal', () => {
 // expansion nodes sat below the global line (down to 3.6yd under it on the
 // Wickharbor cove floor, whose two nodes moved ashore at the v0.34.0 merge)
 // while passing this declared-water screen, which is
-// why the world-plane check is now its own arm below (the sea-plane arm and
-// its exemption pin) rather than a claim in this comment. Measured headroom on
+// why the world-plane check is now its own arm below (the sea-plane arm and its
+// in-reach companion) rather than a claim in this comment. Measured headroom on
 // the shipped content when this margin landed: the tightest passing node
 // cleared by 0.57yd (ore_mirefen_t2, a genuine bank inside a lake's blend
 // ring), and the tightest FAILING one missed by 0.54yd (the old
@@ -406,24 +413,20 @@ describe('gather node placement: every node sits on ground a player can work', (
   const seaFreeboardAt = (x: number, z: number): number =>
     groundHeight(x, z, WORLD_SEED) - waterLevel();
 
-  // The shipped violators, pinned with the road-band exemption's logic: the
-  // set records a decision (these ship near-submerged today; relocating
-  // expansion starter nodes is zone-4-pass content work, not a side effect
-  // of a guard landing), and a NEW violation must be a human adding to this
-  // list rather than a silent drift. Measured freeboards at the pin (after the
-  // waterline rose 0.2 to -4.3): ore_frostveil_2 -0.69, ore_willowfen_1 +0.45,
-  // wood_evergarden_2 +0.30.
-  // Four former members retired at the release/v0.34.0 merge: open-sea swim
-  // made the world sea real water, which turned herb_galecrest_1 (-3.60),
-  // ore_galecrest_2 (-3.40), herb_farshore_isle_2 (-1.37) and
-  // wood_farshore_isle_1 (-0.97) from render-only violations into nodes a
-  // player cannot stand at (or whose harvest disc dips to swim depth), so
-  // all four moved ashore instead of staying exempt.
-  const SEA_PLANE_EXEMPT = ['ore_frostveil_2', 'ore_willowfen_1', 'wood_evergarden_2'];
-
+  // No exemptions. There WAS an exemption list here, holding the three nodes
+  // that shipped at or under the waterline (ore_frostveil_2 under it outright,
+  // wood_evergarden_2 and ore_willowfen_1 at half a yard) on the reading that
+  // relocating expansion starter nodes was zone-4-pass content work rather
+  // than a side effect of a guard landing. Four earlier members had already
+  // retired that way at the release/v0.34.0 merge, when open-sea swim turned
+  // herb_galecrest_1, ore_galecrest_2, herb_farshore_isle_2 and
+  // wood_farshore_isle_1 from render-only violations into nodes a player
+  // cannot stand at. The last three retired the same way here: a vein
+  // rendering on a pond floor is the defect a player reports, not a decision
+  // to record, so all three moved ashore and the list went with them. A node
+  // under the sea plane now simply reds.
   it('sea plane: every node clears the WORLD water surface by the prop freeboard', () => {
     for (const node of GATHER_NODES) {
-      if (SEA_PLANE_EXEMPT.includes(node.id)) continue;
       const freeboard = seaFreeboardAt(node.pos.x, node.pos.z);
       expect(
         freeboard,
@@ -432,34 +435,184 @@ describe('gather node placement: every node sits on ground a player can work', (
     }
   });
 
-  it('the sea-plane exemption set holds exactly the shipped violators', () => {
-    // Both directions at once: a new sub-margin node reds (it is not in the
-    // list), and a relocated exemption reds too (the list would then name a
-    // node that no longer violates, and the exemption must be retired with
-    // the fix rather than mask the next violator). Edge note: when the
-    // waterline rose 0.2 to -4.3, the four tightest passers (the three
-    // Mirefen shore herbs and ore_palmreach_1) arrived here at once and all
-    // four moved a few yards up their own shores instead of joining the
-    // list; the next arrival after a terrain or waterline touch means
-    // terrain moved under a node, not that this pin broke.
-    const below = GATHER_NODES.filter((n) => seaFreeboardAt(n.pos.x, n.pos.z) < WATER_MARGIN)
-      .map((n) => n.id)
-      .sort();
-    expect(below).toEqual(SEA_PLANE_EXEMPT);
-    // Severity floor, per exemption (the review round: membership alone lets
-    // an exempt node sink further without a red). The deepest surviving
-    // violator sits at -0.49; a node dropping past -0.8 (PLAYER_SWIM_DEPTH)
-    // stops being wadeable at all, the failure that forced the four
-    // retirements above, so the floor now sits exactly there.
-    for (const id of SEA_PLANE_EXEMPT) {
-      const node = GATHER_NODES.find((n) => n.id === id);
-      expect(node, `${id} names a live node`).toBeDefined();
-      if (!node) continue;
-      expect(
-        seaFreeboardAt(node.pos.x, node.pos.z),
-        `${id} sank past every recorded freeboard`,
-      ).toBeGreaterThan(-PLAYER_SWIM_DEPTH);
+  it('the sea-plane floor is exercised by real content, not passing by slack', () => {
+    // What the retired exemption list used to do, without the license: name
+    // the tightest shipped node, so the floor is provably load-bearing rather
+    // than clearing by twenty yards everywhere. The tightest passer sits
+    // inside a yard of the bound, which is where a floor has to sit to mean
+    // anything; if this reds, terrain or the waterline moved under a node.
+    let tightest = Number.POSITIVE_INFINITY;
+    let who = '';
+    for (const node of GATHER_NODES) {
+      const freeboard = seaFreeboardAt(node.pos.x, node.pos.z);
+      if (freeboard < tightest) {
+        tightest = freeboard;
+        who = node.id;
+      }
     }
+    expect(tightest, `tightest freeboard is ${who}`).toBeGreaterThanOrEqual(WATER_MARGIN);
+    expect(tightest, `tightest freeboard is ${who}`).toBeLessThan(WATER_MARGIN + 1);
+  });
+
+  // The water sweep samples MORE densely than the slope sweeps above, and the
+  // reason is the shape of what it hunts rather than a taste for precision. A
+  // cliff is a broad feature, so the fan's widening arc gap (about 1.3yd at
+  // the edge of reach) cannot hide one. A waterline is a CONTOUR, and a tongue
+  // of sea reaching into a disc can be narrower than that gap the whole way
+  // in, so on a coarse fan the ANSWER depends on the spoke count you happened
+  // to pick: the old herb_farshore_isle_4 spot on the Gull Mere neck reads
+  // +0.07 on 24 spokes and -0.13 on 36, because a 36-spoke ray lands in a
+  // sliver the 24-spoke rays straddle. So this sweep uses two grids whose
+  // resolution is stated rather than incidental. Rings at SWEEP_STEP with the
+  // spoke count derived from WATER_ARC cover every radius including the RIM,
+  // which is where a shoreline usually crosses a disc and where a square
+  // lattice has no samples at all; the lattice covers the interior, where
+  // rings spread out. Together no point of the disc is further than about
+  // WATER_ARC from a sample. Still a screen and not a proof (a channel
+  // thinner than that can cross between samples), but a screen whose blind
+  // spot is a number.
+  const WATER_ARC = 0.35;
+  /**
+   * How far the LOWEST ground anywhere in a node's harvest reach sits above the
+   * world water surface. Negative means open water inside the disc.
+   */
+  const seaClearanceInReach = (x: number, z: number): number => {
+    let worst = seaFreeboardAt(x, z);
+    for (let r = SWEEP_STEP; r <= REACH; r += SWEEP_STEP) {
+      const spokes = Math.max(SWEEP_SPOKES, Math.ceil((2 * Math.PI * r) / WATER_ARC));
+      for (let k = 0; k < spokes; k++) {
+        const a = (k / spokes) * Math.PI * 2;
+        worst = Math.min(worst, seaFreeboardAt(x + Math.cos(a) * r, z + Math.sin(a) * r));
+      }
+    }
+    for (let dx = -REACH; dx <= REACH; dx += SWEEP_STEP) {
+      for (let dz = -REACH; dz <= REACH; dz += SWEEP_STEP) {
+        if (dx * dx + dz * dz > REACH * REACH) continue;
+        worst = Math.min(worst, seaFreeboardAt(x + dx, z + dz));
+      }
+    }
+    return worst;
+  };
+
+  it('no water in reach: a gatherer never has to stand in the sea to work a node', () => {
+    // Freeboard at the node's own point is not the whole question, and the
+    // shipped content proved it: five nodes cleared the sea plane where they
+    // stood while the waterline cut THROUGH their harvest disc, so part of the
+    // ground a player may legally gather from was open water and the prop read
+    // as standing in the surf (wood_farshore_isle_6 was the worst, with the sea
+    // 2 yards out, 1.32yd deep inside the reach and a fifth of the disc under
+    // water; the player report that opened this was "some of the gathering
+    // nodes are in the water"). Three more failed the point arm above as well.
+    // The reach is the same INTERACT_RANGE disc harvestNode enforces, so this
+    // arm is about exactly the ground the gate lets a player use, and the
+    // bound is the waterline itself: ground under it is water, and a node
+    // whose working area contains water is not placed on land.
+    for (const node of GATHER_NODES) {
+      const clearance = seaClearanceInReach(node.pos.x, node.pos.z);
+      expect(
+        clearance,
+        `${node.id} at (${node.pos.x},${node.pos.z}) has open water ${(-clearance).toFixed(2)}yd deep inside its ${REACH}yd harvest reach`,
+      ).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('the in-reach arm rejects the pre-fix shore spots, and is not passing by slack', () => {
+    // Non-vacuity in both directions. Every one of these is a spot this change
+    // moved a node off, so the arm has to fail at all of them or it is not the
+    // rule that forced the relocations. They are also the proof that the arm
+    // sees something the point-freeboard arm above cannot: each one PASSES
+    // that arm (dry where the node stood) and fails only here.
+    //
+    // A sixth node moved in the same pass and is deliberately NOT listed:
+    // herb_farshore_isle_4's old spot on the Gull Mere neck sits tangent to
+    // the waterline rather than over it, and it moved on the placement
+    // judgement the player report named (open water on four of its eight
+    // compass bearings at 14 yards, and the waterline on a fifth) rather than
+    // because this arm failed it. Listing it would be claiming a red this arm
+    // does not produce.
+    const MOVED_OFF: [string, number, number][] = [
+      ['wood_farshore_isle_6', 210, -24],
+      ['herb_galecrest_2', 406, 412],
+      ['wood_willowfen_6', -417, 580],
+      ['herb_amberfall_1', -342, 2110],
+      ['wood_willowfen_2', -392, 322],
+    ];
+    for (const [id, x, z] of MOVED_OFF) {
+      expect(seaFreeboardAt(x, z), `${id}'s old spot was dry AT the node`).toBeGreaterThanOrEqual(
+        WATER_MARGIN,
+      );
+      expect(seaClearanceInReach(x, z), `${id}'s old spot had water in reach`).toBeLessThan(0);
+    }
+    // And the bound bites on the shipped table rather than clearing it by
+    // yards. It bites HARD, on purpose: the tightest passers are the authored
+    // lakeside patches (a herb on the Mirror Lake bank is the flavour, not a
+    // defect) and they sit within a tenth of a yard of the waterline at the
+    // far edge of their reach. So this arm is a knife edge for them by
+    // design, and the honest reading of a future red here is that a shoreline
+    // moved under a node: the fix is a yard of nudge, not a looser bound.
+    let tightest = Number.POSITIVE_INFINITY;
+    let who = '';
+    for (const node of GATHER_NODES) {
+      const clearance = seaClearanceInReach(node.pos.x, node.pos.z);
+      if (clearance < tightest) {
+        tightest = clearance;
+        who = node.id;
+      }
+    }
+    expect(tightest, `tightest in-reach clearance is ${who}`).toBeGreaterThanOrEqual(0);
+    expect(tightest, `tightest in-reach clearance is ${who}`).toBeLessThan(0.5);
+  });
+
+  it('no node grows inside the Sowfield boarball ground', () => {
+    // A gather node is a world prop, and SOWFIELD_EXCLUDE is the footprint
+    // world.ts generateDecorations already refuses to seat one in: the pitch,
+    // its goal pockets, both stands, the gate approach and the terrain
+    // flatten's falloff apron. Nothing applied that screen to authored nodes,
+    // and herb_eastbrook_4 shipped at (23,-99), INSIDE the pitch rectangle in
+    // the east goal's corner (the second half of the player report that opened
+    // this change: "one of the fine sheenleaf herb is inside the football game
+    // in eastbrook"). Every other arm passed it: the flattened pitch is dry,
+    // level, unblocked and reachable. The ground is a match venue, so a node
+    // on it is worked at the pitch police's pleasure (social/vale_cup.ts
+    // ejects any non-fighter standing there, cancelling the gather cast) and
+    // the patch grows on the playing surface. Reusing the shipped exclusion
+    // rather than a fresh rectangle keeps ONE definition of the venue's
+    // footprint for the terrain, the decorations and the nodes.
+    for (const node of GATHER_NODES) {
+      const { x, z } = node.pos;
+      const inside =
+        x >= SOWFIELD_EXCLUDE.xMin &&
+        x <= SOWFIELD_EXCLUDE.xMax &&
+        z >= SOWFIELD_EXCLUDE.zMin &&
+        z <= SOWFIELD_EXCLUDE.zMax;
+      expect(inside, `${node.id} at (${x},${z}) sits inside the Sowfield boarball ground`).toBe(
+        false,
+      );
+    }
+  });
+
+  it('the Sowfield arm rejects the old herb spot and the pitch it stood on', () => {
+    const inSowfield = (x: number, z: number) =>
+      x >= SOWFIELD_EXCLUDE.xMin &&
+      x <= SOWFIELD_EXCLUDE.xMax &&
+      z >= SOWFIELD_EXCLUDE.zMin &&
+      z <= SOWFIELD_EXCLUDE.zMax;
+    // The shipped-then-moved spot, and the property that made it a defect:
+    // it was not merely inside the exclusion apron, it was on the pitch.
+    expect(inSowfield(23, -99)).toBe(true);
+    expect(isOnPitch(23, -99)).toBe(true);
+    // The exclusion really does contain the whole playing surface, so the
+    // screen above cannot pass a node standing in a goal mouth either.
+    expect(inSowfield(PITCH_CENTER.x, PITCH_CENTER.z)).toBe(true);
+    expect(inSowfield(GOAL_LINE_WEST_X, PITCH_CENTER.z)).toBe(true);
+    expect(inSowfield(GOAL_LINE_EAST_X, PITCH_CENTER.z)).toBe(true);
+    // And it is a screen, not a blanket: the relocated patch is outside it,
+    // with real clearance rather than sitting on the boundary.
+    const moved = GATHER_NODES.find((n) => n.id === 'herb_eastbrook_4');
+    expect(moved, 'herb_eastbrook_4 names a live node').toBeDefined();
+    if (!moved) return;
+    expect(inSowfield(moved.pos.x, moved.pos.z)).toBe(false);
+    expect(moved.pos.z - SOWFIELD_EXCLUDE.zMax).toBeGreaterThanOrEqual(2);
   });
 
   it('the sea-plane arm rejects the Wickharbor cove floor, so it can fail', () => {

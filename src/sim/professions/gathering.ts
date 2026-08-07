@@ -44,7 +44,6 @@ import { fineGradeReachable, harvestGradeItemId } from './material_grades';
 import { gatherActionXp } from './profession_xp';
 import { proficiencyBandFor } from './proficiency_bands';
 import {
-  applyEffectBonus,
   applyToolEffectUse,
   bestOwnedGatherToolFor,
   canGatherTier,

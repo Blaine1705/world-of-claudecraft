@@ -12,13 +12,13 @@
     "gatherResult itemId carries the resolved grade"
   ],
   "draws": 6,
-  "drawDigest": "2c41400b",
+  "drawDigest": "1272a77a",
   "frames": [
     {
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "60db104b",
+      "state": "e836976c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,9 +74,6 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "talents": {
             "rows": {}
           },
@@ -153,11 +150,11 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "24483509",
-      "events": "0e7303b4",
+      "state": "5a9ca1a5",
+      "events": "2953a226",
       "rng": {
         "draws": 2,
-        "digest": "d9dab85a"
+        "digest": "00a2a78c"
       },
       "label": "fine-grade-at-full-tier-vein",
       "players": [
@@ -239,7 +236,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             }
           ],
@@ -249,9 +246,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -331,11 +325,11 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 964,
-      "state": "3d103502",
+      "state": "fc147768",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
-        "digest": "b247a679"
+        "digest": "49d036fe"
       },
       "label": "plain-grade-at-lower-tier-vein",
       "players": [
@@ -418,7 +412,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             },
             {
@@ -436,9 +430,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -518,11 +509,11 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "ca080eab",
-      "events": "459b8e0e",
+      "state": "dd2ecfb7",
+      "events": "6c52f970",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "wrong-profession-tool-does-not-upgrade",
       "players": [
@@ -607,7 +598,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             },
             {
@@ -618,7 +609,10 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 1,
+              "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "goldleaf_herb"
             }
           ],
@@ -630,9 +624,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -712,11 +703,11 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "c9596a74",
+      "state": "1d8dff08",
       "events": "741638a5",
       "rng": {
         "draws": 6,
-        "digest": "2c41400b"
+        "digest": "1272a77a"
       },
       "label": "final",
       "players": [
@@ -801,7 +792,7 @@
               "itemId": "bronze_sickle"
             },
             {
-              "count": 1,
+              "count": 2,
               "itemId": "fine_iron_ore"
             },
             {
@@ -812,7 +803,10 @@
               "itemId": "iron_ore"
             },
             {
-              "count": 1,
+              "count": 2,
+              "instance": {
+                "signer": "Adventurer"
+              },
               "itemId": "goldleaf_herb"
             }
           ],
@@ -824,9 +818,6 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
-          "reliquary": {
-            "firstFind": {}
-          },
           "renown": 15,
           "talents": {
             "rows": {}

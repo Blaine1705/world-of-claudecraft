@@ -392,7 +392,7 @@ export const sv_SE: EnTranslations = {
     "emoteEditor": {
       "title": "Gester",
       "done": "Klar",
-      "close": "Close emotes"
+      "close": "Stäng gester"
     },
     "dailyRewards": {
       "title": "Dagliga belöningar",
@@ -1842,7 +1842,13 @@ export const sv_SE: EnTranslations = {
       "saveButton": "Spara fokus",
       "notInTownHint": "Du måste vara i staden för att ställa in ditt fokus.",
       "increaseAria": "Öka fokus på {component}",
-      "decreaseAria": "Minska fokus på {component}"
+      "decreaseAria": "Minska fokus på {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Befordra till ledare",
@@ -2089,7 +2095,7 @@ export const sv_SE: EnTranslations = {
       "familyDemon": "Demon",
       "hostile": "Fientlig",
       "friendly": "Vänlig",
-      "elite": "Elite",
+      "elite": "Elit",
       "boss": "Boss"
     },
     "targetFrame": {
@@ -2698,7 +2704,7 @@ export const sv_SE: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Förtrollning Vapen - Kraft",
       "enchant_weapon_intellect": "Förtrollning Vapen - Besvärjelsestyrka",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Förtrollning Bi-hand - Uthållighet",
       "enchant_helmet_fortitude": "Förtrollning Hjälm - Uthållighet",
       "enchant_neck_spirit": "Förtrollning Halsband - Ande",
       "enchant_shoulder_agility": "Förtrollning Axelplåtar - Rörlighet",
@@ -3188,7 +3194,7 @@ export const sv_SE: EnTranslations = {
         "soul_rend": "Själsrift (märkta spelare måste sprida sig och bli helade)",
         "deathless_rage": "Dödsfri vrede (avbryts vid väktarstenarna)",
         "wardstones": "Väktarstenarnas kanaler (fasövergång)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Skräckförbannelse (endast heroisk, staplande försvagning för tankbyte)"
       }
     },
     "reliquary": {
@@ -4221,7 +4227,7 @@ export const sv_SE: EnTranslations = {
       "bastionBody": "En översvämmad fästning förlorad till träsket, hållen av dränkta försvarare och den stigande tidvattnet självt.",
       "templeBody": "En månbelyst helgedom sjunken under en glödande tjärn högt uppe bland topparna, nådd genom en port av kallt ljus. En dränkt kult sjunger fortfarande där nere i sina ruttna skrudar, och varningarna ristade på stranden säger att något därunder bara sover. Ett fristående mysterium, åtskilt från huvudberättelsen, för de nyfikna och de välförberedda.",
       "sanctumBody": "Törntoppens mörka hjärta, där kultens långa arbete når sin fasansfulla höjdpunkt.",
-      "wildheartBody": "En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att möta Zulgar.",
+      "wildheartBody": "En regnvåt djungelkaldera där två upphöjda jaktstigar cirklar en jadegrön cenot. Korsa bestars lyor och förfädersruiner, klättra sedan upp för ritualpyramiden för att se vem som väntar på toppen.",
       "raidName": "Slutspelsraiden",
       "raidBody": "Bortom en förseglad kunglig dörr väntar en prövning för tio spelare: en strid i flera faser och en odödlig kraft som hela raiden måste stänga ner tillsammans. Förtjäna din väg in, ta sedan med dig nio vänner.",
       "heroicTitle": "Heroiskt läge",
@@ -7531,6 +7537,7 @@ export const sv_SE: EnTranslations = {
       "questRules": "Kan inte säljas, bankas eller bytas bort.",
       "questOrphaned": "Behövs inte för något aktivt uppdrag.",
       "classes": "Klasser: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Försäljningspris: {money}",
       "clickBuy": "Klicka för att köpa",
       "clickSell": "Klicka för att sälja",
@@ -7681,6 +7688,8 @@ export const sv_SE: EnTranslations = {
       "collectEmpty": "Inget väntar. Försäljningsintäkter och utgångna annonser hämtas här.",
       "collectNote": "Intäkter och returnerade varor som Handlaren håller åt dig.",
       "saleProceeds": "Försäljningsintäkter",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Hämta allt"
     },
     "logs": {

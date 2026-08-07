@@ -392,7 +392,7 @@ export const da_DK: EnTranslations = {
     "emoteEditor": {
       "title": "Følelsesudtryk",
       "done": "Færdig",
-      "close": "Close emotes"
+      "close": "Luk følelsesudtryk"
     },
     "dailyRewards": {
       "title": "Daglige belønninger",
@@ -1842,7 +1842,13 @@ export const da_DK: EnTranslations = {
       "saveButton": "Gem fokus",
       "notInTownHint": "Du skal være i byen for at sætte dit fokus.",
       "increaseAria": "Øg fokus på {component}",
-      "decreaseAria": "Sænk fokus på {component}"
+      "decreaseAria": "Sænk fokus på {component}",
+      "respecTierLabel": "Re-spec speed",
+      "respecTierTimeOption": "Free (take your time)",
+      "respecTierPartialOption": "Faster (small cost)",
+      "respecTierInstantOption": "Instant (full cost)",
+      "respecCostFree": "Free",
+      "respecCostLine": "Costs {coin} and {materials}"
     },
     "party": {
       "promoteLeader": "Forfrem til leder",
@@ -2698,7 +2704,7 @@ export const da_DK: EnTranslations = {
     "enchantName": {
       "enchant_weapon_might": "Fortryl våben - Magt",
       "enchant_weapon_intellect": "Fortryl våben - Besværgelsesstyrke",
-      "enchant_offhand_stamina": "Enchant Offhand - Stamina",
+      "enchant_offhand_stamina": "Fortryl sekundær hånd - Udholdenhed",
       "enchant_helmet_fortitude": "Fortryl hjelm - Udholdenhed",
       "enchant_neck_spirit": "Fortryl halskæde - Ånd",
       "enchant_shoulder_agility": "Fortryl skuldre - Smidighed",
@@ -3188,7 +3194,7 @@ export const da_DK: EnTranslations = {
         "soul_rend": "Sjælerivning (markerede spillere skal sprede sig og heles)",
         "deathless_rage": "Udødelig Raseri (afbrydes ved vardstene)",
         "wardstones": "Vardstenskanaler (faseovergang)",
-        "dread_curse": "Dread Curse (heroic only, stacking tank-swap debuff)"
+        "dread_curse": "Rædselsforbandelse (kun heroisk, stablende svækkelse til tankskifte)"
       }
     },
     "reliquary": {
@@ -4221,7 +4227,7 @@ export const da_DK: EnTranslations = {
       "bastionBody": "En oversvømmet fæstning fortabt til sumpen, holdt af druknede forsvarere og den stigende tidevand selv.",
       "templeBody": "En måneoplyst helligdom sunket under en glødende tjern højt oppe i bjergene, nået gennem en port af koldt lys. En druknet kult synger stadig dernede i sine rådne klædninger, og advarslerne ristet på bredden siger, at noget dybt nede kun sover. Et selvstændigt mysterium, sat til side fra hovedhistorien, for de nysgerrige og de velforberedte.",
       "sanctumBody": "Tornetops mørke hjerte, hvor kultens lange arbejde når sit frygtelige højdepunkt.",
-      "wildheartBody": "En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at møde Zulgar.",
+      "wildheartBody": "En regnvåd jungle-caldera hvor to hævede jagtstier omkranser en jade-cenote. Kryds bæstenes huler og forfædrenes ruiner, og bestig derefter ritualpyramiden for at se, hvem der venter på toppen.",
       "raidName": "Slutspilsraidet",
       "raidBody": "Bag en forseglet kongelig dør venter en prøvelse for ti spillere: en kamp i flere faser og en dødløs magt, som hele raidet må lukke ned sammen. Tjen din adgang, og medbring så ni venner.",
       "heroicTitle": "Heroisk tilstand",
@@ -7531,6 +7537,7 @@ export const da_DK: EnTranslations = {
       "questRules": "Kan ikke sælges, lægges i banken eller byttes.",
       "questOrphaned": "Ikke nødvendig for nogen aktiv quest.",
       "classes": "Klasser: {classes}",
+      "maxStack": "Max stack: {count}",
       "sellPrice": "Salgspris: {money}",
       "clickBuy": "Klik for at købe",
       "clickSell": "Klik for at sælge",
@@ -7681,6 +7688,8 @@ export const da_DK: EnTranslations = {
       "collectEmpty": "Intet venter. Salgsindtægter og udløbne varer hentes her.",
       "collectNote": "Indtjening og returnerede varer, som Købmanden holder for dig.",
       "saleProceeds": "Salgsindtægt",
+      "saleBuyer": "Sold to {buyer}",
+      "saleOlder": "Plus {count} earlier sales, included in the total.",
       "collectAll": "Hent alt"
     },
     "logs": {

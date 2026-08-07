@@ -176,7 +176,7 @@ export function classifyTestSource(source, { helperImportPattern = null } = {}) 
   for (const [label, re] of OUT_OF_GRAPH_PATTERNS) {
     if (re.test(text)) reasons.push(label);
   }
-  if (helperImportPattern && helperImportPattern.test(text)) reasons.push('fs-helper-import');
+  if (helperImportPattern?.test(text)) reasons.push('fs-helper-import');
   const srcImports = SRC_IMPORT_RE.test(text);
   if (reasons.length === 0) return { klass: 'graph', reasons, srcImports };
   return { klass: srcImports ? 'partial' : 'blind', reasons, srcImports };

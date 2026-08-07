@@ -43,7 +43,12 @@ import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
 import type { IWorld } from '../world_api';
-import { AbilityVfx, AbilityVfxFx } from './ability_vfx';
+import {
+  AbilityVfx,
+  AbilityVfxFx,
+  abilityVfxTexturePrewarmSteps,
+  collectAbilityVfxCompileTargets,
+} from './ability_vfx';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';
 import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
@@ -335,6 +340,7 @@ import {
   type PrewarmPolicy,
   partitionMandatoryLandmarkCandidates,
   prewarmBuildDeadline,
+  prewarmEntryResumesAfterSkip,
   prewarmEntryRuns,
   prewarmEntryShouldDefer,
   remainingPrewarmViewBudget,
@@ -1635,6 +1641,10 @@ export class Renderer {
   // One shared lane for background work that touches WebGL. Idle callbacks from
   // independent zone/sky/archetype tasks can otherwise all start in one frame.
   private backgroundGpuWork = createBackgroundGpuQueue();
+  // Serial tail for spirit-puppet construction: several models resolve at once
+  // when a class is first sighted, so the builds queue behind one another and
+  // each spends its own idle slot instead of stacking into one combat frame.
+  private spiritBuildLane: Promise<unknown> = Promise.resolve();
   // Static terrain/water/features just beyond the current zone are built in a
   // single background lane when their rectangles enter the relaxed fog
   // horizon, so a walked boundary crossing lands on already-resident ground.
@@ -2708,6 +2718,7 @@ export class Renderer {
       this.webgl.domElement.clientHeight * this.webgl.getPixelRatio(),
       60,
     );
+    this.abilityVfxFx.setSpiritBuildScheduler((build) => this.queueSpiritPuppetBuild(build));
     this.abilityVfx = new AbilityVfx({
       vfx: this.vfx,
       fx: this.abilityVfxFx,
@@ -4846,15 +4857,16 @@ export class Renderer {
       }
     }
     // One EXTRA rig per class wearing the ability-VFX aura glow: setAuraGlow's
-    // on-edge swaps the rig materials for private clones, and on the tinted
-    // player rigs that clone links a NEW program. Without this seed the FIRST
-    // spec'd cast of a session compiles it synchronously mid-frame - the
+    // on-edge swaps the rig materials for private clones, and the FIRST spec'd
+    // cast of a session used to compile them synchronously mid-frame (the
     // measured 'mage' program link landing inside the player's own cast
-    // moment (e.g. mid Solemn Prayer cast bar). Seeding glow-lit copies here
-    // puts the clone materials in front of programs.compile while the base
-    // rigs above still carry the un-glowed originals; the group is removed in
-    // the prewarm finally, but the linked programs stay cached for the
-    // session.
+    // moment, e.g. mid Solemn Prayer cast bar). The clones now keep the
+    // source's shader hooks and therefore its program cache key
+    // (material_clone_hooks.ts), which is what closes that hole for mob rigs
+    // and non-default skins too; this seed stays as the boot-side belt for the
+    // player classes, and for any rig material with no hook to preserve. The
+    // group is removed in the prewarm finally, but linked programs stay cached
+    // for the session.
     for (const cls of ALL_CLASSES) {
       if (performance.now() >= deadline) return { group, visualCount: idx };
       const color = CLASSES[cls]?.color ?? 0xffffff;
@@ -4910,6 +4922,19 @@ export class Renderer {
     if (!texture) return;
     this.webgl.initTexture(texture);
     this.gpuReadyTextures.add(texture);
+  }
+
+  /** One spirit-puppet build per idle slot, arbitrated with every other lane
+   *  that reaches WebGL. A rejected unit (renderer shut down mid-build) is a
+   *  dev-channel warning: an unbuilt puppet only means its next cast skips its
+   *  spirit, exactly like a model still in flight. */
+  private queueSpiritPuppetBuild(build: () => void): void {
+    this.spiritBuildLane = this.spiritBuildLane
+      .then(() => idleSlot(IDLE_PREWARM_TIMEOUT_MS))
+      .then(() => this.backgroundGpuWork.run(build, GPU_WORK_PRIORITY.BACKGROUND))
+      .catch((err: unknown) => {
+        console.warn('[spirits] deferred puppet build failed', err);
+      });
   }
 
   private readonly gpuReadyTextures = new WeakSet<THREE.Texture>();
@@ -5862,16 +5887,38 @@ export class Renderer {
       {
         // Spawn one of every pooled ability-VFX primitive (rings, decals,
         // pillar, shell, slash ribbon, overlay sprite). The pools build their
-        // meshes visible=false, so neither the render passes nor
-        // programs.compile ever see their ShaderMaterials, the first spec'd
-        // cast in the open world used to link them synchronously. The spawns
-        // also bind the per-style decal textures, so the texture re-walk below
-        // uploads the whole canvas set now. abilityVfxFx.clear() in the
-        // finally block hides everything again.
+        // meshes visible=false, so no render pass ever draws them: their
+        // textures and geometry stay un-uploaded, and the first spec'd cast in
+        // the open world used to pay for both synchronously. The spawns bind
+        // the per-style decal textures and the six impact sheets, so the
+        // texture re-walk below uploads the whole canvas set now.
+        // abilityVfxFx.clear() in the finally block hides everything again.
+        //
+        // resumeUnits deliberately does NOT replay the spawn: run live it
+        // would pop a white ring/decal/flipbook burst at the player's feet
+        // (the same reason vfx.atlas retains nothing). It carries the
+        // invisible half instead, one impact sheet per unit plus one program
+        // link per distinct pooled material. That is also the MINIMAL variant
+        // constrained devices get in place of this entry
+        // (CONSTRAINED_PREWARM_RESUME): there the whole entry is skipped, so
+        // each 512px sheet is otherwise drawn on the first impact of its
+        // school, i.e. mid-combat.
         id: 'vfx.ability-primitives',
         category: 'vfx',
         priority: 62,
         required: false,
+        resumeUnits: () => [
+          ...abilityVfxTexturePrewarmSteps().map((step) => ({
+            id: `texture:${step.id}`,
+            run: () => {
+              for (const texture of step.build()) this.prewarmTexture(texture);
+            },
+          })),
+          ...collectAbilityVfxCompileTargets(this.scene).map((target) => ({
+            id: `program:${target.id}`,
+            run: () => this.compilePrewarmColorPrograms(target.object, false),
+          })),
+        ],
         run: () => {
           this.abilityVfxFx.prewarmSpawn(p.pos.x, p.pos.y, p.pos.z - 5, p.id);
           this.scene.traverse((child) => {
@@ -6013,9 +6060,16 @@ export class Renderer {
       for (const entry of orderedManifest) {
         // Skip everything outside the minimal keep-list (prewarm_policy.ts),
         // recording the skip so the prewarm summary stays honest about what was
-        // deliberately not warmed. The skipped warms happen lazily in-world.
+        // deliberately not warmed. The skipped warms happen lazily in-world,
+        // except for the few entries that opt into the background resume lane
+        // (CONSTRAINED_PREWARM_RESUME): those hand over their explicit small
+        // units, which run after entry instead of never.
         if (!prewarmEntryRuns(entry.id, policy)) {
           const counts = this.prewarmCounts();
+          const skipUnits = prewarmEntryResumesAfterSkip(entry.id, policy)
+            ? (entry.resumeUnits?.() ?? [])
+            : [];
+          if (skipUnits.length > 0) droppedEntries.push({ id: entry.id, units: skipUnits });
           manifestEntries.push({
             id: entry.id,
             category: entry.category,
@@ -6031,7 +6085,10 @@ export class Renderer {
             texturesBefore: counts.textures,
             texturesAfter: counts.textures,
             textureDelta: 0,
-            detail: 'constrained-minimal',
+            detail:
+              skipUnits.length > 0
+                ? `constrained-minimal;resume=${skipUnits.length}`
+                : 'constrained-minimal',
           });
           continue;
         }
@@ -6900,21 +6957,21 @@ export class Renderer {
               : e.templateId === 'rift_infernal_orb' || e.templateId === 'rift_infernal_orb_active'
                 ? 2.2
                 : 2.4;
-      objectMesh = body!;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
       const built = buildMailboxPillar(e.id);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId === 'noticeboard_eastbrook') {
       // The civic board is itself the readable interaction landmark. Keep the
       // complete GLB on every tier and avoid the generic loot sparkle.
       const built = buildEastbrookNoticeboard();
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = body;
     } else if (e.kind === 'object' && e.templateId?.startsWith('delve_')) {
       // Delve interactables: skip the object pool (each is unique/stateful) and
       // build a dedicated procedural mesh that matches the crypt aesthetic.
@@ -6957,7 +7014,7 @@ export class Renderer {
       const built = buildBattlegroundObject(e.templateId, e.color, this.lowGfx);
       body = built.group;
       height = built.height;
-      objectMesh = body!;
+      objectMesh = body;
       // Hoist the per-frame handles onto the VIEW group. battleground_fx.ts
       // reads `view.group.userData.bg`, and view.group is this method's own
       // wrapper, the built body goes in as a CHILD of it further down, so the
@@ -9424,7 +9481,8 @@ export class Renderer {
         const heurSeed = this.sim.cfg.seed;
         let effGround = groundHeight(ax, az, heurSeed);
         if (inRift) {
-          const rf = this.sim.riftFloor!;
+          const rf = this.sim.riftFloor;
+          if (!rf) return;
           const floor = generateRiftFloor(rf.seed, rf.baseLevel, rf.floorIndex, rf.upgrade);
           effGround += riftLiftAt(floor, ax - rf.origin.x, az - rf.origin.z);
         }
