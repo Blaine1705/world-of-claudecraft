@@ -627,14 +627,15 @@ describe('Reliquary profession marks (Phase 7)', () => {
   });
 
   it('a live masterwork proc writes masterwork:first and the per-craft mark (real craft path)', () => {
-    // Seed 151: the recorded signed-reagent hunt window shared with
+    // Seed 21: the recorded signed-reagent hunt window shared with
     // tests/professions_masterwork.test.ts (bounded scan from seed 1; the
     // single output-side proc draw lands in [0.03, 0.05), so one self-signed
     // reagent's 2 percent term lifts the vestments roll to 0.05 and the
     // craft procs deterministically). Re-hunt there and re-record here
     // together whenever a content commit shifts the construction-time draw
-    // sequence; spares on record: 186, 241, 259, and 287.
-    const SEED = 151;
+    // sequence; the release/v0.35.0 private-scatter sync moved the window
+    // from the old seed 151 (whose spares went stale with it).
+    const SEED = 21;
     // Premise anchors from live content: the derived per-craft id this
     // recipe produces, and its catalog membership (an uncatalogued id can
     // never land in marks, so the derived-arm assertions below would be
