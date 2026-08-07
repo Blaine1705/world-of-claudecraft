@@ -101,10 +101,12 @@ describe('G5: damage-scaled fear break', () => {
     // is not resisted: the fear must actually land for the aura assertions.
     // Re-hunted (1 -> 3) after the Eastbrook camp respacing thinned the zone-1
     // camp counts, then (3 -> 1) after the Galecrest quest camps (#2887)
-    // added four world-gen draws (inherited from the release base; the
-    // Reliquary branch itself adds no world-gen draws). Spares on record
-    // for this stream, from the release-side hunt of the same shift: 4, 6, 8.
-    const sim = new Sim({ seed: 1, playerClass: 'warlock', autoEquip: true });
+    // added four world-gen draws, then (1 -> 4) when the release
+    // private-scatter sync moved those late camps onto their own stream and
+    // the branch hunt went stale; 4 is the release side's own recorded hunt
+    // and holds on the merged stream (the Reliquary branch itself adds no
+    // world-gen draws). Release spares on record: 6, 8.
+    const sim = new Sim({ seed: 4, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(14);
     const mob = addTarget(sim, 3);
     sim.player.resource = sim.player.maxResource;
