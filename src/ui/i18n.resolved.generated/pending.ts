@@ -3455,8 +3455,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "zh_CN": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -3467,8 +3465,6 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "zh_TW": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -3479,8 +3475,6 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "ko_KR": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -3491,8 +3485,6 @@ export const pending: Record<string, readonly string[]> = {
     "guide.riftsPage.rankFmt"
   ],
   "ja_JP": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
@@ -4077,8 +4069,6 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wiki.confirmTitle"
   ],
   "ru_RU": [
-    "entities.abilities.intervene.description",
-    "entities.abilities.intervene.name",
     "guide.classPage.formName.form_cat",
     "guide.gear.slotOffhand",
     "guide.glossary.claudiumTerm",
