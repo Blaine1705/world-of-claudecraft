@@ -2654,8 +2654,10 @@ describe('guildBankInfoForGuild (the ungated operator read)', () => {
   it('reads the book by guild id with no proximity, rank, or alive gate', () => {
     const sim = makeOfficerSim({ treasury: 4_242 });
     book(sim).inventory.push({ itemId: 'wolf_fang', count: 2 });
-    // Degrade every gate the PLAYER read applies: away from the banker, demoted
-    // to member, and dead. The player read goes null; the operator read does not.
+    // Degrade the PLAYER read: DEAD is what nulls it (since the v0.35 member
+    // read-only view a demotion alone keeps the stream and only drops canEdit;
+    // the demotion here proves rank is irrelevant to the operator read too).
+    // The player read goes null; the operator read does not.
     sim.setPlayerGuildMembership(sim.playerId, { guildId: GUILD_ID, rank: 'member' });
     const p = sim.entities.get(sim.playerId);
     if (!p) throw new Error('missing player');

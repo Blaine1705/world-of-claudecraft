@@ -127,10 +127,20 @@ export class GuildBankTab {
     return this.view;
   }
 
+  // Whether the LAST paint of this pane was read-only, or null before any
+  // paint (and again after close). The one edge detector behind the read-only
+  // note's announcement: a demotion mid-view must be VOICED (the surface
+  // changed under the viewer), while a steady read-only pane repainting on
+  // another member's op echo must not re-announce the same sentence, and every
+  // repaint re-inserts the node, so a permanently-live region would.
+  private prevReadOnly: boolean | null = null;
+
   /** Reset to the bank contents. BankWindow calls this on close so a reopened
-   *  bank never starts on the log (and never refetches it unasked). */
+   *  bank never starts on the log (and never refetches it unasked); the
+   *  read-only edge detector resets with it so a reopening never announces. */
   resetView(): void {
     this.view = 'contents';
+    this.prevReadOnly = null;
   }
 
   /**
@@ -172,6 +182,10 @@ export class GuildBankTab {
    *  per paint, never two). */
   renderInto(root: HTMLElement, model: GuildBankViewModel): void {
     if (model.kind === 'hidden') return; // raced null: BankWindow falls back next paint
+    // The DEMOTION edge (editable on the last paint, read-only on this one):
+    // the only paint whose read-only note carries live-region semantics.
+    const announceReadOnly = model.readOnly && this.prevReadOnly === false;
+    this.prevReadOnly = model.readOnly;
     // A REAL role=tabpanel, unlike the personal pane, which mounts flat. This
     // pane holds a nested tab list, and an inner tablist with no owning panel
     // reads to a screen reader as a second unrelated top-level strip that came
@@ -202,7 +216,9 @@ export class GuildBankTab {
       // before they are met, and a second line names the unopened state the
       // missing open row would otherwise have carried (without it the member
       // pane reads as empty or broken rather than not-yet-opened).
-      if (model.readOnly) el.appendChild(this.buildNote('hudChrome.bank.guildReadOnlyNote'));
+      if (model.readOnly) {
+        el.appendChild(this.buildNote('hudChrome.bank.guildReadOnlyNote', announceReadOnly));
+      }
       el.appendChild(this.buildTreasuryRow(model.treasury));
       if (model.readOnly) el.appendChild(this.buildNote('hudChrome.bank.guildUnopenedNote'));
       if (model.open) el.appendChild(this.buildOpenRow(model.open));
@@ -217,7 +233,9 @@ export class GuildBankTab {
     el.appendChild(capacity);
     // The read-only note lands BEFORE the treasury row (assistive tech should
     // meet the explanation before the disabled controls it explains).
-    if (model.readOnly) el.appendChild(this.buildNote('hudChrome.bank.guildReadOnlyNote'));
+    if (model.readOnly) {
+      el.appendChild(this.buildNote('hudChrome.bank.guildReadOnlyNote', announceReadOnly));
+    }
     el.appendChild(this.buildTreasuryRow(model.treasury));
     if (model.hasDormant) {
       // The dormant legend is always-visible TEXT (never tooltip-only, the
@@ -244,9 +262,20 @@ export class GuildBankTab {
   // why every mutating affordance is missing instead of discovering dead
   // buttons. Its OWN class (not a second `gbank-dormant-note`), so the
   // dormant-legend selector stays unambiguous in tests and styling.
-  private buildNote(key: 'hudChrome.bank.guildReadOnlyNote' | 'hudChrome.bank.guildUnopenedNote') {
+  // `live` is true ONLY on the demotion-edge paint (see prevReadOnly): that
+  // one insert carries role=status + polite aria-live so the mid-view rank
+  // change is voiced (the gold prompt errorLine precedent), while steady
+  // read-only repaints stay silent divs and never re-announce.
+  private buildNote(
+    key: 'hudChrome.bank.guildReadOnlyNote' | 'hudChrome.bank.guildUnopenedNote',
+    live = false,
+  ) {
     const note = document.createElement('div');
     note.className = 'gbank-readonly-note';
+    if (live) {
+      note.setAttribute('role', 'status');
+      note.setAttribute('aria-live', 'polite');
+    }
     note.textContent = t(key);
     return note;
   }

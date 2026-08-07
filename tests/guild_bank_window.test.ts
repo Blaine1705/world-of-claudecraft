@@ -1157,6 +1157,32 @@ describe('the READ-ONLY member pane (canEdit false)', () => {
     expect(h.window.guildTabActive).toBe(false);
   });
 
+  it('the read-only note announces ONLY on the demotion edge, never on steady repaints', () => {
+    // First paint as a member: informational, not an event; no live region.
+    const h = harness(memberInfo({ treasury: 60_000 }));
+    h.window.open();
+    clickGuildTab(h);
+    const first = h.root.querySelector('.gbank-readonly-note');
+    expect(first?.getAttribute('role')).toBeNull();
+    expect(first?.getAttribute('aria-live')).toBeNull();
+    // Promotion, then demotion mid-view: the surface changed under the viewer,
+    // so THIS paint's note is a polite status (the gold-prompt errorLine
+    // precedent) and screen readers hear the rank change.
+    h.world.guildBankInfo = guildInfo({ treasury: 60_000 });
+    h.window.refreshIfChanged();
+    h.world.guildBankInfo = memberInfo({ treasury: 60_000 });
+    h.window.refreshIfChanged();
+    const onEdge = h.root.querySelector('.gbank-readonly-note');
+    expect(onEdge?.getAttribute('role')).toBe('status');
+    expect(onEdge?.getAttribute('aria-live')).toBe('polite');
+    // A steady read-only repaint (another member's op echoed): silent again.
+    h.world.guildBankInfo = memberInfo({ treasury: 70_000 });
+    h.window.refreshIfChanged();
+    const steady = h.root.querySelector('.gbank-readonly-note');
+    expect(steady?.textContent).toBe('Only guild officers can make changes to the guild bank.');
+    expect(steady?.getAttribute('role')).toBeNull();
+  });
+
   it('a canEdit flip mid-open repaints: promotion enables, demotion disables', () => {
     const h = harness(memberInfo({ treasury: 60_000 }));
     h.window.open();
