@@ -655,10 +655,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // forward again (apply queue + vfx.weapon-skins prewarm entry) over the
 // bow-aim renderer edit the release landed after the revert. No capture was
 // retaken.
+// Re-minted again for the second release/v0.35.0 merge: the release-side
+// swimming strokes PR and pr-batch move the renderer leaf again. Captures
+// still adopted verbatim; neither parent retook one.
+// Re-minted for the merge of release/v0.35.0 into this branch: both sides moved
+// the rendererIntegration leaf, so all three literals mint to values matching
+// neither parent. No capture was retaken on either side (the two parents'
+// evidence differs only in its provenance bytes).
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '7fec10ffd6a4151174fa52b2b8d5d063b8783813ba00d8cd036d3a355d2cfde7';
+  '9763ba4a465106ad4a2e537c460ab623229d452340d5b891282263345bc7b35b';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'c1382022e845ac58940cb1bed2b0c2d52cd316b3fcc3c1efcfeac3336a582d4a';
+  'c3a9f27f2f67ed08e8351e7031d46cd71aae9a23068490ba17be1ef4f083984c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -1547,7 +1554,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('576a6138fa1c4469b5b549d6fcc48333f18e21a44d29ec70d35bc182dd5fd6f2');
+    ).toBe('9de9dff25dc4e1459bd7e33b7f6ff0b999392479cf5a44db5dd67699190bfc01');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

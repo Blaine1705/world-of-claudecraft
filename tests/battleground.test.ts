@@ -11,7 +11,6 @@ import {
   awardBattlegroundHonor,
   BATTLEGROUND_ASSIST_HONOR,
   BATTLEGROUND_FIRST_WIN_BONUS_HONOR,
-  BATTLEGROUND_FIRST_WIN_BONUS_MULT,
   BATTLEGROUND_KILL_HONOR,
   BATTLEGROUND_LOSS_HONOR,
   BATTLEGROUND_WIN_HONOR,
@@ -2333,13 +2332,18 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     return seen;
   }
 
-  it('the bonus is N times the ordinary win award, paid on top of it', () => {
-    // The one tunable, pinned to the exported multiple rather than a literal so
-    // retuning N moves the const and this assertion together.
-    expect(BATTLEGROUND_FIRST_WIN_BONUS_MULT).toBe(2);
-    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(
-      BATTLEGROUND_WIN_HONOR * BATTLEGROUND_FIRST_WIN_BONUS_MULT,
-    );
+  it('the bonus is a flat authored award, not a multiple of the win', () => {
+    // Pinned to the literal on purpose. The bonus used to be derived (win x 2 =
+    // 120, so the day's first win paid 180, three times a routine one), which
+    // paid "log in, win once, log off" better than it paid playing a session.
+    // A flat 20 is a judgment about what a daily hook is worth, so asserting it
+    // against BATTLEGROUND_WIN_HONOR would restate the shape that was removed.
+    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(20);
+    // The property that actually matters: first win to repeat win is 1.33x, in
+    // line with the delve daily's ~1.6x rather than the old 3x.
+    const firstWin = BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR;
+    expect(firstWin).toBe(80);
+    expect(firstWin / BATTLEGROUND_WIN_HONOR).toBeLessThan(1.5);
   });
 
   it('pays exactly once per UTC day, under its own honor reason', () => {

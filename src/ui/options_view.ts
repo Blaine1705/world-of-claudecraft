@@ -450,6 +450,12 @@ export function buildGraphicsSections(
     slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1),
     toggle(s, 'fullscreen', 'hud.options.fullscreen'),
     toggle(s, 'weather', 'game.settings.weather'),
+    // Opt-in wake/ripple simulation on water (default off): the one water effect
+    // that runs extra GPU passes; bubbles and splashes are unaffected. It sits
+    // beside Weather in GRAPHICS rather than in Interface (Troy, 2026-08-07):
+    // it costs frames, so it belongs with the things you turn down for
+    // performance, not with the HUD comfort toggles.
+    boolToggle(s, 'waterRipples', 'hudChrome.options.waterRipples'),
     toggle(s, 'showOverflowXp', 'game.settings.showOverflowXp'),
   ];
 
@@ -649,6 +655,7 @@ export function buildInterfaceControls(s: OptionsSettingsSource): OptionsControl
       boolToggle(s, 'partyFrameShowResource', 'hudChrome.partyFrames.showResource'),
       boolToggle(s, 'partyFrameShowAbsorbs', 'hudChrome.partyFrames.showAbsorbs'),
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
+      boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
       boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),

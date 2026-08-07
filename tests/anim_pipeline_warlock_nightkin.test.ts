@@ -50,14 +50,14 @@ describe('warlock ability-specific spellcasts (issue #2889)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_warlock: {', 'player_druid: {');
+    const block = manifestBlock('player_warlock: swims({', 'player_druid: swims({');
     expect(block).toContain('warlock_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of WARLOCK_CAST_CLIPS) expect(block).toContain(`'${clip}'`);
   });
 
   it('every mapped ability id is a real warlock ability, and every referenced clip is shipped', () => {
-    const warlockBlock = manifestBlock('player_warlock: {', 'player_druid: {');
+    const warlockBlock = manifestBlock('player_warlock: swims({', 'player_druid: swims({');
     const abilityStart = warlockBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = warlockBlock.indexOf('\n      },', abilityStart);
