@@ -14810,6 +14810,7 @@ export class Hud {
       'Trade window opened.': 'hud.logs.tradeOpened',
       'Trade complete.': 'hud.logs.tradeComplete',
       'Trade cancelled.': 'hud.logs.tradeCancelled',
+      'Trade window closed.': 'hudChrome.trade.windowClosed',
       'Loot method set to Group Loot.': 'hudChrome.masterLoot.methodGroup',
       'Loot Settings: Group Loot.': 'hudChrome.masterLoot.summaryGroup',
     };
@@ -18940,8 +18941,33 @@ export class Hud {
     this.wocTradeOffer = null;
     this.lastTradeSig = '';
     // Closing the trade itself is the sim's call, not a display change: the
-    // other player's client must learn the trade is over too.
-    this.sim.tradeCancel();
+    // other player's client must learn the trade is over too. CLOSE, not
+    // cancel: the sale succeeded, and telling both players it was cancelled
+    // contradicts the payment line printed a moment earlier.
+    this.sim.tradeClose();
+  }
+
+  /**
+   * Resolve a deal whose window closed before this side saw it finish.
+   *
+   * Only one player's client has to reach `settled` to end the session, and
+   * ending it stops the other's polling mid-flight, because the poll runs only
+   * while a trade is open. That raced: whichever side noticed second got no
+   * payment line and no balance refresh, which is exactly how a seller ended up
+   * with a stale bag. The outcome is therefore resolved once more here, off the
+   * window entirely. The server keeps the row readable for a grace window
+   * precisely so this lookup can still find it.
+   */
+  private resolveClosedWocTrade(): void {
+    const hooks = this.wocMarketHooks;
+    const offer = this.wocTradeOffer;
+    this.wocTradeOffer = null;
+    if (!hooks || !offer || this.wocTradeFinished.has(offer.id)) return;
+    void hooks.client.offers().then((res) => {
+      if (!res.ok) return;
+      const row = res.offers.find((o) => o.id === offer.id);
+      if (row && wocOfferPhase(row) === 'settled') this.finishWocTrade(row);
+    });
   }
 
   private async acceptWocTradeOffer(): Promise<void> {
@@ -19165,7 +19191,10 @@ export class Hud {
         this.wocTradePartner = null;
         this.wocTradePartnerResolved = false;
         this.wocTradePartnerFor = '';
-        this.wocTradeOffer = null;
+        // Before clearing it: a deal that was still live when the window shut
+        // may have settled, and this side may not have seen it yet. Clears
+        // wocTradeOffer itself, so the assignment it replaces is not repeated.
+        this.resolveClosedWocTrade();
         this.wocTradeOfferPolledAtMs = 0;
         this.lastTradeSig = '';
         if ($('#bags').style.display !== 'none') this.renderBags();

@@ -483,6 +483,7 @@ export const da_DK: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "Trade window closed.",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

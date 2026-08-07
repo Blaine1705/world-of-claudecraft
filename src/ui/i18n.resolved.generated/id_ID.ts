@@ -483,6 +483,7 @@ export const id_ID: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "Trade window closed.",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

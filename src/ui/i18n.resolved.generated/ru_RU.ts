@@ -483,6 +483,7 @@ export const ru_RU: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "Окно обмена закрыто.",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

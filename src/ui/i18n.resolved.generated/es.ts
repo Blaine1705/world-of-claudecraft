@@ -483,6 +483,7 @@ export const es: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "Trade window closed.",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

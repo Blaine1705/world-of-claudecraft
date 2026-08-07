@@ -483,6 +483,7 @@ export const ko_KR: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "거래 창이 닫혔습니다.",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

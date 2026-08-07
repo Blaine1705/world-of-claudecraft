@@ -7460,6 +7460,9 @@ export class GameServer {
       case 'trade_cancel':
         sim.tradeCancel(pid);
         break;
+      case 'trade_close':
+        sim.tradeClose(pid);
+        break;
       // duels
       case 'duel_req':
         if (typeof msg.id === 'number') sim.duelRequest(msg.id, pid);

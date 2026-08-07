@@ -217,6 +217,12 @@ export const hudChromeStrings = {
   // The trade window's $WOC arm (docs/prd/woc/p2p-woc-trade.md): selling a
   // staged item to the player you are trading with, for $WOC.
   trade: {
+    // The neutral end of a trade session, for when the business the window
+    // existed for concluded elsewhere. Its sibling (hud.logs.tradeCancelled)
+    // lives in the hud catalog; this one is here because hud_chrome is the
+    // en-only domain, and a completed sale should not wait on twenty locale
+    // blocks to stop calling itself cancelled.
+    windowClosed: 'Trade window closed.',
     woc: {
       tabGold: 'Gold',
       tabWoc: '$WOC',

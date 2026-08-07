@@ -483,6 +483,7 @@ export const en_XA: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "[Ţŕáðé ŵíñðóŵ çļóšéð.]",
       "woc": {
         "tabGold": "[Ĝóļð]",
         "tabWoc": "[$ŴÓÇ]",

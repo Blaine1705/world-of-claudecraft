@@ -523,7 +523,9 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
     // The tokens moved on-chain, so the footer figure is stale for both of them.
     expect(finish, 'the bag balance must be re-read').toContain('refreshWocBalance');
     // And the window goes away, since it has nothing left to offer.
-    expect(finish).toContain('tradeCancel');
+    expect(finish, 'ends the session (as a close, pinned separately below)').toContain(
+      'this.sim.tradeClose()',
+    );
   });
 
   it('reports a finished sale exactly once, and never re-opens it', () => {
@@ -539,6 +541,40 @@ describe('the window follows a $WOC deal THROUGH acceptance', () => {
       'if (this.wocTradeFinished.has(row.id)) return;',
     );
     expect(HUD, 'and the poll must skip retired ids').toContain('!this.wocTradeFinished.has(o.id)');
+  });
+
+  it('resolves the outcome even when the OTHER side closed the window first', () => {
+    // The race that shipped: finishWocTrade ends the trade for both players, and
+    // the offer poll runs only while a trade is open. Whichever side noticed
+    // 'settled' second had its window closed out from under it and never ran
+    // finishWocTrade at all: no payment line, no balance refresh, a stale bag.
+    // The recovery must therefore hang off the CLOSE path, not the poll.
+    const close = HUD.slice(
+      HUD.indexOf('private resolveClosedWocTrade'),
+      HUD.indexOf('private async sendWocTradeOffer'),
+    );
+    expect(close, 'it re-reads the offer off the window entirely').toContain('client.offers()');
+    expect(close).toContain("wocOfferPhase(row) === 'settled'");
+    expect(close).toContain('this.finishWocTrade(row)');
+    // And the cleanup branch must actually call it, or it is dead code.
+    const update = HUD.slice(
+      HUD.indexOf('private updateTradeWindow'),
+      HUD.indexOf('attachOptions(hooks: OptionsHooks)'),
+    );
+    expect(update, 'the window-closed branch must invoke it').toContain(
+      'this.resolveClosedWocTrade()',
+    );
+  });
+
+  it('ends a COMPLETED trade with a close, never a cancellation', () => {
+    // "Trade cancelled." contradicts the payment line printed a moment earlier,
+    // and both players saw it.
+    const finish = HUD.slice(
+      HUD.indexOf('private finishWocTrade'),
+      HUD.indexOf('private resolveClosedWocTrade'),
+    );
+    expect(finish).toContain('this.sim.tradeClose()');
+    expect(finish).not.toContain('tradeCancel');
   });
 
   it('does not announce DELIVERY while the chain is still confirming', () => {

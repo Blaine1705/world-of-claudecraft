@@ -483,6 +483,7 @@ export const ja_JP: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "取引ウィンドウを閉じました。",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

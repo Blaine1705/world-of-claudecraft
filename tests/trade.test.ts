@@ -160,6 +160,32 @@ describe('trade module (direct, no Sim)', () => {
     );
   });
 
+  it('tradeClose ends the session without calling it a cancellation', () => {
+    // Same teardown, different sentence, and the sentence is the entire reason
+    // it exists: a $WOC sale ends the window by SUCCEEDING, and telling both
+    // players it was cancelled contradicts the payment they were just shown.
+    const h = makeTradeCtx();
+    h.addPlayer(1, 'Ayla', 0, 0);
+    h.addPlayer(2, 'Borin', 1, 0);
+    tradeMod.tradeRequest(h.ctx, 2, 1);
+    tradeMod.tradeAccept(h.ctx, 2);
+    tradeMod.tradeClose(h.ctx, 1);
+    expect(tradeMod.tradeFor(h.ctx, 1), 'the session must actually end').toBe(null);
+    const logs = h.events.filter((e) => e.type === 'log');
+    expect(logs.filter((e) => e.text === 'Trade window closed.').length, 'both sides').toBe(2);
+    expect(
+      logs.some((e) => e.text === 'Trade cancelled.'),
+      'never the cancel wording',
+    ).toBe(false);
+  });
+
+  it('tradeClose on no session is a no-op, not a stray message', () => {
+    const h = makeTradeCtx();
+    h.addPlayer(1, 'Ayla', 0, 0);
+    tradeMod.tradeClose(h.ctx, 1);
+    expect(h.events.filter((e) => e.type === 'log').length).toBe(0);
+  });
+
   // A dedicated fake ctx factory, not the shared makeTradeCtx bag store: this one
   // models real per-slot inventory arrays with instanced payloads explicitly,
   // mirroring how removePreferFungible/addItemInstance behave on the real Sim

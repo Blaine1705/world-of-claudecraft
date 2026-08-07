@@ -483,6 +483,7 @@ export const zh_CN: EnTranslations = {
       }
     },
     "trade": {
+      "windowClosed": "交易窗口已关闭。",
       "woc": {
         "tabGold": "Gold",
         "tabWoc": "$WOC",

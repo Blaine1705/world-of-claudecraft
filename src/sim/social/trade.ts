@@ -451,6 +451,26 @@ export function tradeCancel(ctx: SimContext, pid?: number): void {
   closeTrade(ctx, session);
 }
 
+/**
+ * End a trade session that nobody cancelled.
+ *
+ * Same teardown as tradeCancel, different sentence, and the difference is the
+ * whole point: a session can end because the business it existed for is DONE,
+ * and telling both players it was "cancelled" contradicts the sale that just
+ * completed. This stays deliberately generic, with no notion of what concluded
+ * outside the session, so nothing about settlement leaks into the sim.
+ */
+export function tradeClose(ctx: SimContext, pid?: number): void {
+  const r = ctx.resolve(pid);
+  if (!r) return;
+  const session = ctx.trades.get(r.meta.entityId);
+  if (!session) return;
+  for (const tPid of [session.a, session.b]) {
+    ctx.emit({ type: 'log', text: 'Trade window closed.', color: '#8df', pid: tPid });
+  }
+  closeTrade(ctx, session);
+}
+
 // true when the player's bags cover the offered totals per item, summing
 // duplicate slots: a per-slot check would let duplicates each pass alone.
 // Counts against the UNBOUND copies only (unboundCount), the same

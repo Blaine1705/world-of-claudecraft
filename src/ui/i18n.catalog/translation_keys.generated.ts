@@ -9699,6 +9699,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.townFocus.tierHint'
   | 'hudChrome.townFocus.title'
   | 'hudChrome.townFocus.townOnlyHint'
+  | 'hudChrome.trade.windowClosed'
   | 'hudChrome.trade.woc.accept'
   | 'hudChrome.trade.woc.accepted'
   | 'hudChrome.trade.woc.awaitingPayment'
