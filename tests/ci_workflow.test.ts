@@ -401,12 +401,16 @@ describe('CI workflow parity', () => {
     // PR_GATE_JOB_IF_LINE). Exactly one job-level if, equal to the event-only
     // literal; the step gate on EVERY step, count pinned to the parsed step
     // list so a new step cannot land ungated and silently run (or leak work)
-    // on a docs-only or release-to-main leg.
+    // on a docs-only or release-to-main leg. Space classes are literal spaces,
+    // not \s, so a blank line cannot be absorbed into an indent match; and the
+    // step count matches EVERY list item start, named or not, because a
+    // nameless `- uses:` step is legal YAML and a `- name: `-only sweep would
+    // let it land ungated (fix-round mutation M7).
     {
-      const jobIfLines = prGate.match(/^\s{4}if: .+$/gm) ?? [];
+      const jobIfLines = prGate.match(/^ {4}if: .+$/gm) ?? [];
       expect(jobIfLines).toEqual([PR_GATE_JOB_IF_LINE]);
-      const stepIfLines = prGate.match(/^\s{8}if: .+$/gm) ?? [];
-      const stepStarts = prGate.match(/^\s{6}- name: /gm) ?? [];
+      const stepIfLines = prGate.match(/^ {8}if: .+$/gm) ?? [];
+      const stepStarts = prGate.match(/^ {6}- /gm) ?? [];
       // Vacuity floor near the real step count (checkout, pnpm, node,
       // install, cache, run): an empty parse must never pass the sweep.
       expect(stepStarts.length).toBeGreaterThanOrEqual(6);
@@ -463,7 +467,7 @@ describe('CI workflow parity', () => {
       // Anchored to the start of a step line, so a YAML-commented-out step
       // (`#        run: npm run build:server`) cannot satisfy it: the substring
       // survives the comment, the anchored form does not.
-      expect(prChecks).toMatch(new RegExp(`\\n {8}${step.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+      expect(prChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(prGate).not.toContain(step);
       expect(prLongSims).not.toContain(step);
     }
@@ -500,9 +504,7 @@ describe('CI workflow parity', () => {
     for (const step of CHECK_RUN_STEPS) {
       // Same anchored form as the PR-tier loop: a YAML-commented-out step must
       // not satisfy the pin.
-      expect(releaseChecks).toMatch(
-        new RegExp(`\\n {8}${step.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`),
-      );
+      expect(releaseChecks).toMatch(new RegExp(`\\n {8}${escapeRe(step)}`));
       expect(releaseGate).not.toContain(step);
     }
     // Named-step count: checkout, setup-pnpm, setup-node, pnpm install, plus ten

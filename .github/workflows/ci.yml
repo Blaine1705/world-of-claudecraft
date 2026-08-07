@@ -88,8 +88,11 @@ concurrency:
 #
 # Path filters (D10): a cheap `changes` job classifies pull_request diffs as
 # code vs docs-only. Docs/markdown/screenshot-only PRs keep lint (and any
-# other always-on cheap jobs) but skip pr-gate, pr-long-sims, pr-checks, and
-# browser-gate. Any touch of the code path set forces the full PR tier. push
+# other always-on cheap jobs) and skip the PR-tier work: pr-long-sims,
+# pr-checks, and browser-gate skip at JOB level, while pr-gate's matrix legs
+# start and skip at STEP level so all eight suffixed required check runs
+# still report (see the pr-gate job comment for why that difference is
+# load-bearing). Any touch of the code path set forces the full PR tier. push
 # to main/dev-*, workflow_dispatch, and merge_group queue runs always report
 # code=true (full PR tier when unsure).
 # Release/** pushes and release-to-main PRs never consult the filter:
@@ -382,7 +385,9 @@ jobs:
     # gate arm: release-to-main must still select release-*, and docs-only PRs
     # must still skip the suite work. needs.changes only; no needs edge to
     # pr-checks. merge_group always runs the work (the queue bar is the full
-    # PR tier; neither gate arm can match a merge_group event).
+    # PR tier): the release arm cannot match the event, and the classifier
+    # always reports code=true off a pull_request event, so neither gate arm
+    # can gate off a queue run.
     needs: changes
     if: github.event_name == 'pull_request' || (github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/release/')) || github.event_name == 'workflow_dispatch' || github.event_name == 'merge_group'
     # Fail fast on the runner-side checkout-stall class instead of burning
@@ -472,9 +477,12 @@ jobs:
       # decays as sources drift until the next rotation (start there if the
       # speedup fades). The binding budget is GitHub's 10 GB per-repo cache
       # quota with LRU eviction: about 0.5 GB per toolchain state per scope
-      # (8 entries at 57-73 MB; no single scope holds both matrices, since
-      # their if arms are exact complements on the events that could share a
-      # ref), roughly 1 GB across the two long-lived producer scopes (main
+      # (8 entries at 57-73 MB; no single scope holds both matrices: on the
+      # one event both jobs now see, a release-to-main PR, pr-gate's copy of
+      # this step is gated off by the step gate above, so release-gate's
+      # matrix is the only producer on that ref; the separation lives in the
+      # STEP gate, not in the job routing), roughly 1 GB across the two
+      # long-lived producer scopes (main
       # plus the release branch) beside the pnpm store, Playwright, and tsc
       # caches. If hot-entry eviction is ever observed, the lever is
       # restricting this step's save to push events, never restore-keys

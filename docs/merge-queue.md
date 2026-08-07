@@ -79,7 +79,8 @@ Required on both `main` and `release/**`, all sourced from GitHub Actions:
   its non-matrix dependents report skipped under their exact names, and branch
   protection treats skipped as satisfied (the shard matrix instead collapses to
   an unsuffixed check run, which blocks by accident rather than by decision).
-  Requiring the job that decides closes that hole for a classifier FAILURE. The residual is inherent to CI-config-in-repo: a queue run executes
+  Requiring the job that decides closes that hole for a classifier FAILURE.
+  The residual is inherent to CI-config-in-repo: a queue run executes
   the queued tree's own copy of ci.yml and the classifier, so an honest
   mistake there is caught only because the workflow files
   (`.github/workflows/`) and the selection pipeline's own scripts are
