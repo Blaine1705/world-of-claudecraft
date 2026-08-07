@@ -128,8 +128,8 @@ export const ru_RU: EnTranslations = {
         "description": "Надеть комплект уровня 20 (до Sanctum) для выбранной специализации, сначала сумки. Только снаряжение."
       },
       "biskit": {
-        "label": "Equip BIS-20 kit",
-        "description": "Wear the best-in-slot epic set for a spec across every slot. Gear only."
+        "label": "Экипировать комплект BIS 20 уровня",
+        "description": "Надеть лучший эпический комплект для выбранной специализации во все ячейки. Только снаряжение."
       },
       "gold": {
         "label": "Добавить золото",
@@ -245,7 +245,7 @@ export const ru_RU: EnTranslations = {
     "hud": {
       "lowMana": "Мало маны",
       "lowEnergy": "Мало энергии",
-      "lowFocus": "Low Focus"
+      "lowFocus": "Мало концентрации"
     },
     "talents": {
       "title": "Таланты",
@@ -322,20 +322,20 @@ export const ru_RU: EnTranslations = {
   },
   "hudChrome": {
     "warlock": {
-      "doomLabel": "Condemnation",
-      "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
-      "doomEmptyStatus": "{value} of {max} Condemnation.",
-      "doomStatus": "{value} of {max} Condemnation; {remaining}.",
-      "fateThreadsStatus": "{value} of {max} Fate Threads.",
-      "fateThreadsConsumeReady": "Three Fate Threads: Consume can weave them into additional Condemnation.",
-      "fateThreadsSentenceReady": "Three Fate Threads: Sentence can consume them for 18% increased damage."
+      "doomLabel": "Осуждение",
+      "fateThreadsLabel": "Нити судьбы",
+      "doomMeterUnlock": "Переместить шкалу ресурсов Колдовства",
+      "doomMeterLock": "Закрепить шкалу ресурсов Колдовства",
+      "doomEmptyStatus": "Осуждение: {value} из {max}.",
+      "doomStatus": "Осуждение: {value} из {max}; осталось {remaining}.",
+      "fateThreadsStatus": "Нити судьбы: {value} из {max}.",
+      "fateThreadsConsumeReady": "Три Нити судьбы: «Поглощение» может сплести их в дополнительное Осуждение.",
+      "fateThreadsSentenceReady": "Три Нити судьбы: «Приговор» может израсходовать их ради 18% дополнительного урона."
     },
     "procOverlay": {
-      "soulFragmentsMeter": "Soul Fragments",
+      "soulFragmentsMeter": "Осколки душ",
       "ruinMeter": "Ruin",
-      "ruinStatus": "{value} of {max} Ruin"
+      "ruinStatus": "Гибель: {value} из {max}"
     },
     "spectate": {
       "banner": "Наблюдение за {name}"
@@ -804,12 +804,12 @@ export const ru_RU: EnTranslations = {
       "resting": "Отдых"
     },
     "paladin": {
-      "devotion": "Devotion",
-      "devotionValue": "Devotion {value} of {max}",
-      "devotionAscensionCharges": "Devotion {value} of {max}. Ascension {charges} charges.",
-      "devotionAscensionLast": "Devotion {value} of {max}. Ascension final charge.",
-      "ascensionLastAnnouncement": "Ascension final charge",
-      "ascensionSpenderAria": "Action slot {slot}: {ability}. Consumes one Ascension charge."
+      "devotion": "Преданность",
+      "devotionValue": "Преданность: {value} из {max}",
+      "devotionAscensionCharges": "Преданность: {value} из {max}. Заряды Вознесения: {charges}.",
+      "devotionAscensionLast": "Преданность: {value} из {max}. Последний заряд Вознесения.",
+      "ascensionLastAnnouncement": "Последний заряд Вознесения",
+      "ascensionSpenderAria": "Ячейка действия {slot}: {ability}. Расходует один заряд Вознесения."
     },
     "abilityScaling": {
       "bonus": "(+{value})"
@@ -1616,7 +1616,7 @@ export const ru_RU: EnTranslations = {
         "spellCritPct": "+{value}% к шансу критического удара заклинанием",
         "healthRegen": "Около {value} ед. здоровья каждые 5 сек. во время отдыха",
         "manaRegen": "Около {value} ед. маны каждые 5 сек. во время отдыха",
-        "manaRegenCombat": "About {value} mana every 5 sec in combat",
+        "manaRegenCombat": "Около {value} ед. маны каждые 5 сек. в бою",
         "damageReduction": "Снижение урона от атакующего {level} уровня: {value}%",
         "dpsFromAp": "Добавляет {value} ед. урона в секунду к вашим атакам"
       },
@@ -1975,36 +1975,36 @@ export const ru_RU: EnTranslations = {
     "auraEffect": {
       "dot": "Наносит {value} единиц урона ({school}) каждые {interval} сек",
       "hot": "Восстанавливает {value} здоровья каждые {interval} сек",
-      "mendingCurrent": "Stores {value} healing, released over time or consumed by Cascading Mend",
-      "mendingCurrentPercent": "Stores healing equal to {pct}% of maximum health for Cascading Mend",
+      "mendingCurrent": "Накапливает {value} исцеления, которое высвобождается со временем или расходуется Каскадным исцелением",
+      "mendingCurrentPercent": "Накапливает исцеление в размере {pct}% от максимума здоровья для Каскадного исцеления",
       "absorb": "Поглощает {value} единиц урона",
       "healAbsorb": "Поглощает {value} единиц входящего исцеления",
       "thorns": "Наносит {value} единиц урона ({school}) атакующим",
-      "stasis": "Immune and unable to act",
+      "stasis": "Даёт неуязвимость, но не позволяет действовать",
       "slow": "Снижает скорость передвижения на {pct}%",
       "speed": "Повышает скорость передвижения на {pct}%",
       "attackSpeedSlow": "Замедляет скорость атаки на {pct}%",
       "attackSpeedFast": "Повышает скорость атаки на {pct}%",
       "haste": "Повышает скорость атаки и произнесения заклинаний на {pct}%",
       "imbueRange": "Оружие наделено: от {min} до {max} дополнительного урона при Приговоре",
-      "petDamage": "Increases pet damage by {pct}%",
-      "petHaste": "Increases pet action speed by {pct}%",
-      "spellDamage": "Increases spell damage by {pct}%",
-      "spellHaste": "Increases spell casting speed by {pct}%",
-      "sated": "Cannot benefit from another group haste effect",
-      "cauterizeFatigue": "Cauterize cannot prevent another lethal hit",
-      "castShield": "Casting cannot be interrupted or delayed by damage",
+      "petDamage": "Повышает урон питомца на {pct}%",
+      "petHaste": "Повышает скорость действий питомца на {pct}%",
+      "spellDamage": "Повышает урон заклинаний на {pct}%",
+      "spellHaste": "Повышает скорость произнесения заклинаний на {pct}%",
+      "sated": "Не позволяет получить другой групповой эффект ускорения",
+      "cauterizeFatigue": "Прижигание не может снова предотвратить смертельный удар",
+      "castShield": "Урон не прерывает и не задерживает произнесение заклинаний",
       "dmgDone": "Повышает наносимый урон на {pct}%",
       "dmgDoneReduce": "Снижает наносимый урон на {pct}%",
       "heatingUp": "Следующий критический удар огненного заклинания в серии дает «Полосу везения»; некритический удар снимает «Разогрев»",
       "elementalConvergencePrimed": "Следующее заклинание другой стихийной школы активирует Стихийное слияние",
-      "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
-      "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
-      "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
-      "leadenHexLock": "Leaden Hex cannot root this target again yet",
-      "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
-      "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
-      "internalCooldown": "This effect cannot trigger again until the timer expires",
+      "hunterFerocity": "Стайная свирепость, {stacks} зар.: урон вашего питомца повышен на {pct}%",
+      "cooldownCap": "В этом окне использовано {used} из {cap} сек. сокращения восстановления",
+      "funeralHarvestLock": "Погребальная жатва пока не может создать ещё один осколок души",
+      "leadenHexLock": "Свинцовый сглаз пока не может снова обездвижить эту цель",
+      "forbiddenReflectionReady": "Следующее подходящее умение чернокнижника можно применить повторно",
+      "forbiddenReflectionLock": "Запретное отражение пока нельзя подготовить снова",
+      "internalCooldown": "Эффект не сработает снова до окончания таймера",
       "carriedFlag": "Вы несете вражеский флаг. Отмените этот эффект, чтобы бросить его.",
       "battleStance": "Боевая стойка: на 10% больше создания ярости",
       "berserkerStance": "Стойка берсерка: крит. удары на 3% чаще и на 3% сильнее",
@@ -2019,13 +2019,13 @@ export const ru_RU: EnTranslations = {
       "revengeFree": "Ваша следующая Месть не потребует ярости",
       "victoryRush": "«Порыв победы» готов",
       "maxHpPct": "Повышает максимальное здоровье на {pct}%",
-      "enrage": "Damage dealt increased by {damagePct}%, attack speed by {hastePct}%, and movement speed by {movePct}%",
-      "suddenDeath": "Your next Execute costs no Rage and ignores its health requirement",
-      "aoeEcho": "{charges} echoes remain: single-target abilities deal {pct}% damage to up to {targets} nearby enemies",
-      "sureCrit": "{charges} damaging ability casts are guaranteed critical strikes",
-      "temporalEcho": "The caster's Arcane damage heals you for {singlePct}% of single-target or {areaPct}% of area damage",
-      "arcaneCharge": "{stacks} Arcane Charges: Aether Surge deals {damagePct}% more damage, casts {castPct}% faster, and costs {costMult}x mana",
-      "physicalReduction": "Reduces Physical damage taken by {pct}%",
+      "enrage": "Наносимый урон повышен на {damagePct}%, скорость атак — на {hastePct}%, скорость передвижения — на {movePct}%",
+      "suddenDeath": "Следующая Казнь не требует ярости и игнорирует требование к здоровью",
+      "aoeEcho": "Осталось отражений: {charges}. Одиночные умения наносят {pct}% урона ещё до {targets} ближайшим врагам",
+      "sureCrit": "Следующие атакующие умения ({charges}) гарантированно наносят критический удар",
+      "temporalEcho": "Тайный урон заклинателя исцеляет вас на {singlePct}% одиночного или {areaPct}% массового урона",
+      "arcaneCharge": "Заряды тайной магии: {stacks}. Урон Эфирного всплеска выше на {damagePct}%, применение быстрее на {castPct}%, расход маны — в {costMult} раз",
+      "physicalReduction": "Снижает получаемый физический урон на {pct}%",
       "temporalHourglass": "Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.",
       "tongues": "Увеличивает время произнесения заклинаний на {pct}%",
       "combustionCrit": "Ваши заклинания огня всегда наносят критический удар",
@@ -2035,22 +2035,22 @@ export const ru_RU: EnTranslations = {
       "freeCast": "Следующее заклинание ничего не стоит",
       "instantCast": "Следующее заклинание с временем чтения станет мгновенным",
       "cheapCast": "Следующее заклинание стоит на {pct}% меньше",
-      "radiantResonance": "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
-      "solarReprisal": "Your next Sunward Disc costs no mana, ignores its cooldown, and deals {pct}% more damage; Hammer of Grace ignores its cooldown and heals for 100% of damage dealt; or Mending Light is instant",
-      "dawnsWrath": "HoW: all HP · +1 use · CD 0 · +{pct}% DMG",
-      "venomRitual": "Venom Ritual {stacks}/{max}. Craven Thrust, Wicked Slash, and Venom Dart each add 1. At {max}, Dirt Nap becomes Venomrend",
-      "gloam": "Gloam {stacks}/{max}. Openers used from Duskveil each add 1. At {max}, your openers work without stealth, and the next one is free, spends all 3, and starts the Shadow Veil",
-      "redline": "Redline {stacks}/{max}. Each Haymaker adds 1. Lights Out hits {pct}% harder for each one and ends Redline. If the timer runs out first, the knockout is lost",
-      "veilstrikeWindow": "Shadow Veil: your Duskveil openers are usable in the open from any angle, and damage dealt is increased by {pct}%",
-      "veiledEdge": "Your next Lurker's Strike strikes for double",
-      "duskEconomy": "Abilities cost {pct}% less energy",
-      "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
-      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
-      "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
-      "freeExecute": "Your next eligible execute ability costs nothing",
-      "resourceSap": "Restores {value} of your current resource every {interval} sec",
-      "nextAttackCrit": "Your next attack is guaranteed to critically strike",
-      "healEcho": "Falling below {threshold}% health restores {value} health",
+      "radiantResonance": "Следующий «Целительный свет» применяется мгновенно, либо следующие «Объятия рассвета» требуют на {pct}% меньше маны и применяются за {castTime} сек.",
+      "solarReprisal": "Следующий «Солнечный диск» не требует маны, игнорирует время восстановления и наносит на {pct}% больше урона; «Молот благодати» игнорирует время восстановления и исцеляет на 100% нанесенного урона; либо «Целительный свет» применяется мгновенно",
+      "dawnsWrath": "МГ: любое здоровье · +1 применение · КД 0 · +{pct}% урона",
+      "venomRitual": "Ядовитый ритуал: этап {stacks} из {max}. «Трусливый выпад», «Злодейский разрез» и «Ядовитый дротик» добавляют по 1 этапу; на этапе {max} «Вечный сон» превращается в «Ядовитый разрыв»",
+      "gloam": "Сумрак: этап {stacks} из {max}. Приемы открытия из «Сумеречной завесы» добавляют по 1 этапу; на этапе {max} приемы открытия работают без незаметности, а следующий из них ничего не стоит, тратит все 3 этапа и окутывает вас тенью",
+      "redline": "Redline: деление {stacks} из {max}. Каждый «Удар с размаху» добавляет 1 деление; «Отключка» бьет на {pct}% сильнее за каждое деление и завершает Redline. Если время выйдет раньше, нокаут пропадет",
+      "veilstrikeWindow": "Окутан тенью: скрытные приемы можно использовать в открытую с любого угла, наносимый урон увеличен на {pct}%",
+      "veiledEdge": "Следующий «Удар скрытня» нанесет двойной урон",
+      "duskEconomy": "Способности стоят на {pct}% меньше энергии",
+      "moontide": "Лунный прилив: стадия {stacks} из {max}. Применения Дикой стрелы, Падения небес и Лунного семени в облике Лунного крыла добавляют по 1 стадии. На {max}: Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца; любое из них тратит все 3 стадии",
+      "oldBlood": "Старая кровь: стадия {stacks} из {max}. Попавшие удары Рвущего когтя, Свежевания, Кровавого разлома, Кровавого укуса, Разящих когтей и Костолома добавляют по 1 стадии. На {max}: Кровавый укус становится Кровавой жатвой в облике волка, а Костолом — Дроблением костей в облике бурого",
+      "verdance": "Зелень: стадия {stacks} из {max}. Каждый НОВЫЙ посаженный Дикий расцвет или Второй расцвет добавляет 1 стадию; на {max} Быстрое восстановление становится Сверхцветением",
+      "freeExecute": "Следующее подходящее добивающее умение не требует ресурсов",
+      "resourceSap": "Восстанавливает {value} текущего ресурса раз в {interval} сек.",
+      "nextAttackCrit": "Следующая атака гарантированно станет критической",
+      "healEcho": "При падении здоровья ниже {threshold}% восстанавливает {value} здоровья",
       "increase": {
         "ap": "Повышает силу атаки на {value}",
         "sp": "Повышает силу заклинаний на {value}",
@@ -2089,8 +2089,8 @@ export const ru_RU: EnTranslations = {
       "mortalWound": "Снижает получаемое исцеление на {pct}%",
       "vulnerability": "Увеличивает получаемый урон на {pct}%",
       "physVuln": "Увеличивает получаемый физический урон на {pct}%",
-      "bleedVuln": "Increases bleed damage taken by {pct}%",
-      "sourceVuln": "Takes {pct}% more damage from the caster who applied this effect",
+      "bleedVuln": "Повышает получаемый урон от кровотечений на {pct}%",
+      "sourceVuln": "Повышает на {pct}% урон от наложившего эффект заклинателя",
       "spellVuln": "Увеличивает получаемый магический урон на {pct}%",
       "critVuln": "Увеличивает шанс получить критический удар на {pct}%",
       "costTax": "Увеличивает стоимость способностей на {pct}%",
@@ -2104,46 +2104,46 @@ export const ru_RU: EnTranslations = {
       "disarm": "Обезоруживание: невозможно использовать атаки оружием",
       "lockout": "Школа заклинаний заблокирована",
       "imbue": "Оружие наделено дополнительными эффектами",
-      "galeheartWeapon": "Completing the {steps}-hit Warspirit cadence echoes the strike {count} times for {pct}% of its damage as Nature damage",
-      "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
+      "galeheartWeapon": "Завершение ритма Духа войны из {steps} ударов вызывает {count} эха удара, каждое наносит {pct}% его урона силами природы",
+      "elementalTrance": "Получаемый урон снижен на {pct}%. {mana}% всего нанесенного вами урона преобразуется в ману",
       "stealth": "Скрытность; скорость передвижения снижена на {pct}%",
       "formBear": "Облик бурого: повышенное здоровье и броня",
       "formCat": "Облик кошки: урон в ближнем бою и энергия",
       "formTravel": "Форма скорохода: скорость передвижения повышена на {pct}%",
       "formFireball": "Облик огненного шара: скорость повышена на {pct}%; атаки и заклинания недоступны",
-      "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
-      "formShadow": "Gloamveil Form: Shadow damage increased by {pct}%",
+      "formMoonkin": "Облик лунного крыла: урон заклинаний повышен на {pct}%, а броня на {armorPct}%",
+      "formShadow": "Сумрачный облик: урон от темной магии повышен на {pct}%",
       "resourceCount": "{value} of {max}",
-      "formLich": "Soul Lance also strikes up to {targets} nearby enemies for {pct}% damage",
-      "afflictionEye": "Maledict Gaze attacks every {interval} sec; effects at this Eye generate {pct}% Condemnation",
-      "afflictionEyeSecondary": "Effects at this Eye generate {doomPct}% Condemnation; Sentence echoes here for {echoPct}% damage",
-      "afflictionAccomplice": "Qualifying damage grants {value} Condemnation, at most once every {interval} sec",
-      "afflictionViolence": "{charges} reprisals remain; an enemy attack grants {doom} Condemnation and deals {damage} Shadow damage back",
-      "afflictionVicarious": "Redirects or reduces {pct}% of incoming damage and can generate up to {max} Condemnation",
-      "afflictionPossession": "Empowers Needle of Fate, Drain Life, Maledict Gaze, and Sentence",
-      "afflictionJudgment": "Primary Eye generates {eyePct}% more Condemnation; Sentence deals {sentencePct}% more damage and the first refunds {refund} Condemnation",
-      "afflictionLitany": "Condemnation gains deal {damage} Shadow damage to up to {targets} enemies within {radius} yd, once per sec",
-      "afflictionFateThreads": "{stacks} Fate Threads: Sentence deals {sentencePct}% more damage, or Drain Life gains {doom} extra Condemnation per tick",
-      "afflictionConsumeThreads": "Drain Life is consuming {stacks} Fate Threads for {doom} extra Condemnation per tick",
-      "necromancyHarvestMark": "Death can create 1 Soul Fragment",
-      "necromancyOssuaryMark": "Stores {storedPct}% of your and your undead damage, plus {lancePct}% of Soul Lance damage; recast to detonate. Death explodes within {radius} yd and creates 1 Soul Fragment",
-      "necromancyDeathEcho": "Legacy Death Echo; no current ability consumes it",
-      "warlockAnchor": "Recast within {range} yd to return here and consume the anchor",
-      "formMetamorph": "Demon form: body size increased by {pct}%; other bonuses ride separate buffs",
-      "energyRegen": "Increases Energy regeneration by {pct}%",
+      "formLich": "Копьё души поражает до {targets} ближайших врагов, нанося {pct}% урона",
+      "afflictionEye": "Проклятый взгляд атакует раз в {interval} сек.; эффекты на этом оке создают {pct}% Осуждения",
+      "afflictionEyeSecondary": "Эффекты на этом оке создают {doomPct}% Осуждения; Приговор отражается сюда с {echoPct}% урона",
+      "afflictionAccomplice": "Подходящий урон создаёт {value} Осуждения не чаще раза в {interval} сек.",
+      "afflictionViolence": "Осталось возмездий: {charges}. Атака врага создаёт {doom} Осуждения и наносит ему {damage} ед. урона от темной магии",
+      "afflictionVicarious": "Перенаправляет или снижает {pct}% входящего урона и может создать до {max} Осуждения",
+      "afflictionPossession": "Усиливает Иглу судьбы, Похищение жизни, Проклятый взгляд и Приговор",
+      "afflictionJudgment": "Главное око создаёт на {eyePct}% больше Осуждения; Приговор наносит на {sentencePct}% больше урона, а первый возвращает {refund} Осуждения",
+      "afflictionLitany": "Получение Осуждения наносит {damage} ед. урона от темной магии до {targets} врагам в радиусе {radius} м, не чаще раза в секунду",
+      "afflictionFateThreads": "Нити судьбы: {stacks}. Приговор наносит на {sentencePct}% больше урона, либо каждый тик Похищения жизни создаёт ещё {doom} Осуждения",
+      "afflictionConsumeThreads": "Похищение жизни поглощает {stacks} Нити судьбы и создаёт ещё {doom} Осуждения за тик",
+      "necromancyHarvestMark": "Смерть может создать 1 осколок души",
+      "necromancyOssuaryMark": "Накапливает {storedPct}% урона от вас и нежити и ещё {lancePct}% урона Копья души. Повторное применение взрывает метку. Смерть вызывает взрыв в радиусе {radius} м и создаёт 1 осколок души",
+      "necromancyDeathEcho": "Устаревшее Эхо смерти; ни одна текущая способность его не поглощает",
+      "warlockAnchor": "Повторное применение в пределах {range} м возвращает сюда и поглощает якорь",
+      "formMetamorph": "Облик демона: размер тела увеличен на {pct}%; прочие бонусы показаны отдельными эффектами",
+      "energyRegen": "Повышает восстановление энергии на {pct}%",
       "defensiveStance": "Стойка стража: сниженный получаемый урон, больше угрозы",
       "righteousFury": "Пылающая клятва: значительно повышенная угроза от урона Святой школы",
-      "overpowerCharge": "{stacks} charges: your next Maiming Strike deals {pct}% more damage",
-      "sweepingStrikes": "Single-target strikes also hit {targets} nearby enemy for {pct}% damage",
-      "fingersOfFrost": "{charges} charges: Ice Lance treats its target as frozen and deals {pct}% frozen damage",
-      "brainFreeze": "Your next Flurry is instant and ignores its cooldown",
-      "wintersChill": "{charges} charges: compatible spells treat this target as frozen",
-      "icicles": "{value} of {max} Icicles; at {max}, Glacial Spike can be cast",
-      "desolation": "{charges} charges: your next Chaos Bolt casts {castPct}% faster or your next Rain of Fire lands immediately",
-      "ruinousBrand": "{charges} copies remain: direct spells copy {otherPct}% damage here, or {selfPct}% when this is their target",
-      "duskfireClaim": "Death grants {value} Ruin",
-      "pyreGuardian": "Generates {ruin} Ruin every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec",
-      "perfectMoment": "Aether Darts does not consume Arcane Charges",
+      "overpowerCharge": "Заряды: {stacks}. Следующий Калечащий удар наносит на {pct}% больше урона",
+      "sweepingStrikes": "Одиночные удары наносят {pct}% урона ещё {targets} ближайшему врагу",
+      "fingersOfFrost": "Заряды: {charges}. Ледяное копьё считает цель замороженной и наносит {pct}% урона по замороженной цели",
+      "brainFreeze": "Следующий Шквал применяется мгновенно и игнорирует время восстановления",
+      "wintersChill": "Заряды: {charges}. Подходящие заклинания считают эту цель замороженной",
+      "icicles": "Ледяные осколки: {value}/{max}. При {max} можно применить Ледяной шип",
+      "desolation": "Заряды: {charges}. Следующая Стрела хаоса применяется на {castPct}% быстрее, либо Огненный дождь падает мгновенно",
+      "ruinousBrand": "Осталось копий: {charges}. Прямые заклинания копируют сюда {otherPct}% урона или {selfPct}%, если это их основная цель",
+      "duskfireClaim": "Смерть цели даёт {value} Разрушения",
+      "pyreGuardian": "Создаёт {ruin} Разрушения раз в {ruinInterval} сек. и наносит {damage} ед. урона от огня в радиусе {radius} м раз в {damageInterval} сек.",
+      "perfectMoment": "Эфирные стрелы не поглощают заряды тайной магии",
       "scale": "Размер увеличен на {pct}%",
       "jump": "Высота прыжка увеличена на {pct}%",
       "school": {
@@ -3979,7 +3979,7 @@ export const ru_RU: EnTranslations = {
       "none": "Ни один класс не подходит под все фильтры. Снимите один, чтобы увидеть больше."
     },
     "abilityHook": {
-      "evil_eye": "Names the enemy whose actions and suffering will feed your Condemnation.",
+      "evil_eye": "Отмечает врага, чьи действия и страдания будут накапливать ваше Осуждение.",
       "heroic_strike": "Готовит более тяжелый замах, который потратит ярость на следующем ударе.",
       "revenge": "Поражает противников перед вами и может не требовать затрат после уклонения или парирования.",
       "hamstring": "Ограничивает передвижение противника, не позволяя ему сбежать.",
@@ -3990,21 +3990,21 @@ export const ru_RU: EnTranslations = {
       "holy_light": "Ровное, ощутимое лечение, чтобы долечить союзника или себя.",
       "devotion_aura": "Длительное усиление на себя, которое повышает броню, так что удары проходят мягче.",
       "judgement": "Тратит вашу активную печать, чтобы ударить врага с короткой дистанции.",
-      "hammer_of_wrath": "Executes a wounded enemy from range, or any enemy while your wings are active.",
-      "avenging_wrath": "Grants 10 Devotion, then doubles Devotion generated by abilities for fifteen seconds.",
-      "bastion_sweep": "Sweeps your shield through a group to seize threat and build Devotion.",
-      "oath_chain": "Drags a distant enemy into your pack and slows its escape.",
-      "veilbound_march": "Pass through a pack to mark it, blunt its damage against you, and lock in threat.",
-      "holy_shield": "Spends Devotion on an active block window, absorption, and a threat pulse.",
-      "consecration": "Claims the ground around you with sustained Holy damage and threat.",
-      "hammer_of_justice": "Stops one enemy with a short, reliable stun.",
-      "lay_on_hands": "Restores a large amount of health when an ally is close to falling.",
+      "hammer_of_wrath": "Добивает раненого врага на расстоянии или любого врага, пока действуют ваши крылья.",
+      "avenging_wrath": "Дает 10 ед. Преданности, а затем на 15 сек. удваивает Преданность, создаваемую способностями.",
+      "bastion_sweep": "Проводит щитом по группе врагов, захватывая угрозу и накапливая Преданность.",
+      "oath_chain": "Притягивает далекого врага к вашей группе и замедляет его отступление.",
+      "veilbound_march": "Проходит сквозь группу врагов, помечая их, ослабляя наносимый вам урон и надежно удерживая угрозу.",
+      "holy_shield": "Расходует Преданность, чтобы на время усилить блокирование, поглощение и создать волну угрозы.",
+      "consecration": "Освящает землю вокруг вас, постоянно нанося урон от Света и создавая угрозу.",
+      "hammer_of_justice": "Останавливает одного врага коротким и надежным оглушением.",
+      "lay_on_hands": "Восстанавливает большое количество здоровья союзнику, который близок к гибели.",
       "blessing_of_might": "Повышает силу атаки дружественной цели, удобно наложить перед началом боя.",
       "divine_protection": "Быстрый защитный оберег, поглощающий урон, когда становится туго.",
       "raptor_strike": "Тяжелый удар в ближнем бою на случай, когда кто-то сократил с вами дистанцию.",
-      "pack_command": "Orders your companion to strike and build Pack Ferocity. Each stack makes your pet deal 10% more damage, up to 30%, before Unleash Beast spends the stacks.",
-      "stampede": "Calls three beasts to attack for 12 seconds. Use it at full Pack Ferocity so they keep the maximum damage bonus for the whole summon.",
-      "measured_shot": "A deliberate ranged shot that restores Focus for your heavier attacks.",
+      "pack_command": "Приказывает вашему спутнику атаковать и накапливает Свирепость стаи для Высвобождения зверя.",
+      "stampede": "Призывает трех зверей атаковать в течение 12 сек. Используйте при максимальной Свирепости стаи, чтобы звери сохраняли наибольшую прибавку к урону все время призыва.",
+      "measured_shot": "Выверенный дальний выстрел, восстанавливающий концентрацию для более мощных атак.",
       "aspect_of_the_hawk": "Стойка, которую вы держите постоянно, чтобы повысить силу дальних атак.",
       "serpent_sting": "Поражает цель ядом, наносящим урон силами природы со временем.",
       "arcane_shot": "Мгновенный выстрел с дистанции для быстрого дополнительного урона.",
@@ -4023,21 +4023,21 @@ export const ru_RU: EnTranslations = {
       "power_word_shield": "Окутывает союзника щитом, который поглощает удары до того, как они проходят.",
       "renew": "Лечение, которое идет со временем, удобно наложить и продолжать движение.",
       "lightning_bolt": "Накладываемый удар силами природы с дистанции, ваш основной способ бить издалека.",
-      "chain_lightning": "Strikes one target and jumps to two nearby enemies, building one Thunder for the whole cast.",
-      "thunder_reservoir": "Banks lightning until Earthen Jolt or Faultwake can release a full-power payoff.",
+      "chain_lightning": "Поражает одну цель и перескакивает на двух ближайших врагов, давая один заряд Грома за все применение.",
+      "thunder_reservoir": "Копит молнии до полной разрядки через Земной толчок или Разлом земли.",
       "rockbiter_weapon": "Накладывает чары на оружие, так что каждый замах в ближнем бою бьет сильнее.",
       "healing_wave": "Ваше основное лечение: прямое исцеление себя или союзника.",
       "earth_shock": "Мгновенный шок для быстрого урона силами природы, когда он нужен сейчас.",
       "lightning_shield": "Заряжает вас так, что атакующие получают урон силами природы, когда бьют вас.",
       "flame_shock": "Мгновенный поджог, который бьет сразу и продолжает жечь со временем.",
-      "galeheart_weapon": "Imbues both weapons with storm winds that reward a steady dual-wield rhythm.",
-      "warspirit_cadence": "Turns a steady weapon rhythm into Galeheart Echoes and an instant spell opportunity.",
-      "stormsurge": "Sometimes brings Ancestral Strike back early after you spend a Stormcast opportunity.",
-      "lifespring_weapon": "Imbues your weapon with restorative water that strengthens your healing flow.",
-      "tidecall": "Immediately heals an ally and deposits a full Mending Current pool.",
-      "ancestor_return": "Returns every fallen group or raid member to life after a long out-of-combat cast.",
-      "stoneward": "Raises a charged stone shield that turns incoming damage into recovery.",
-      "primal_exaltation": "Unleashes a short specialization-specific surge of elemental power.",
+      "galeheart_weapon": "Наполняет оба оружия штормовым ветром и вознаграждает ровный ритм атак.",
+      "warspirit_cadence": "Превращает ровный ритм оружия в Эхо бурного сердца и мгновенное заклинание.",
+      "stormsurge": "Иногда досрочно возвращает Удар предков после расхода Бурезаклятия.",
+      "lifespring_weapon": "Наполняет оружие целебной водой и усиливает непрерывный поток исцеления.",
+      "tidecall": "Мгновенно исцеляет союзника и наполняет его Поток исцеления.",
+      "ancestor_return": "После долгого применения вне боя возвращает к жизни всех погибших участников группы или рейда.",
+      "stoneward": "Поднимает заряженный каменный щит, превращающий полученный урон в исцеление.",
+      "primal_exaltation": "Ненадолго высвобождает стихийную силу, соответствующую специализации.",
       "fireball": "Ваш основной огненный удар: бьет по цели и оставляет ее гореть.",
       "fireball_form": "Превращает вас в живой огненный шар для быстрого движения по открытой местности.",
       "frost_armor": "Длительное усиление на себя, которое укрепляет броню перед боем.",
@@ -4063,7 +4063,7 @@ export const ru_RU: EnTranslations = {
       "healing_touch": "Большое лечение одной цели с долгим временем накладывания, чтобы кого-то долечить.",
       "mark_of_the_wild": "Длительное благословение, которое вы накладываете на себя или союзника перед боем.",
       "moonfire": "Бьет мгновенно и оставляет цель гореть, удобно использовать в движении.",
-      "moonseed": "Adds a Moontide stage and extends Lunar Tempest while you are in Moonwing Form.",
+      "moonseed": "В облике Лунного крыла добавляет стадию Лунного прилива и продлевает Лунную бурю.",
       "rejuvenation": "Накладывается мгновенно и лечит союзника со временем, так что вы можете продолжать действовать.",
       "thorns": "Защищает союзника так, что атакующие в ближнем бою ранят себя при ударе."
     },
@@ -6850,7 +6850,7 @@ export const ru_RU: EnTranslations = {
       "mana": "Мана",
       "energy": "Энергия",
       "rage": "Ярость",
-      "focus": "Focus"
+      "focus": "Концентрация"
     },
     "roles": {
       "warrior": "Танк / ближний DPS",
@@ -7256,7 +7256,7 @@ export const ru_RU: EnTranslations = {
       "notEnoughRage": "Недостаточно ярости!",
       "notEnoughEnergy": "Недостаточно энергии!",
       "notEnoughMana": "Недостаточно маны!",
-      "notEnoughDevotion": "Not enough Devotion!",
+      "notEnoughDevotion": "Недостаточно Преданности!",
       "notEnoughResource": "Недостаточно {resource}!",
       "notEnoughHealth": "Недостаточно здоровья.",
       "targetMustDodge": "Ваша цель должна сначала уклониться.",
@@ -7384,10 +7384,10 @@ export const ru_RU: EnTranslations = {
     "pet": {
       "attack": "Атаковать",
       "waterJet": "Струя воды",
-      "felbolt": "Felbolt",
-      "abyssalChain": "Abyssal Chain",
-      "autocastOn": "Autocast on. Right-click, touch-hold, or press Shift+Enter to turn it off.",
-      "autocastOff": "Autocast off. Right-click, touch-hold, or press Shift+Enter to turn it on.",
+      "felbolt": "Стрела Скверны",
+      "abyssalChain": "Цепь бездны",
+      "autocastOn": "Автоприменение включено. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы выключить его.",
+      "autocastOff": "Автоприменение выключено. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы включить его.",
       "taunt": "Провокация",
       "healDemon": "Исцелить демона",
       "healPet": "Исцелить питомца",
@@ -7398,10 +7398,10 @@ export const ru_RU: EnTranslations = {
       "petAttackDesc": "Прикажите питомцу атаковать вашу текущую враждебную цель.",
       "waterJetTitle": "Струя воды",
       "waterJetDesc": "Приказывает элементалю воды в течение 3 сек. поддерживать замедляющий поток. Восстановление: 8 сек. Щёлкните правой кнопкой, чтобы он применял способность автоматически, когда она готова.",
-      "felboltTitle": "Felbolt",
-      "felboltDesc": "Command Emberkin to launch an extra fel projectile at your target. 8 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
-      "abyssalChainTitle": "Abyssal Chain",
-      "abyssalChainDesc": "Command Gloomshade to drag a normal enemy more than 8 and up to 20 yards back to itself. Bosses cannot be pulled. 15 second cooldown. Right-click, touch-hold, or press Shift+Enter to toggle autocast.",
+      "felboltTitle": "Стрела Скверны",
+      "felboltDesc": "Приказывает Угольку выпустить по вашей цели дополнительный снаряд Скверны. Восстановление: 8 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.",
+      "abyssalChainTitle": "Цепь бездны",
+      "abyssalChainDesc": "Приказывает Мрачной тени притянуть к себе обычного противника, находящегося дальше 8 и не далее 20 м. Боссов притянуть нельзя. Восстановление: 15 сек. Щёлкните правой кнопкой, удерживайте касание или нажмите Shift+Enter, чтобы переключить автоприменение.",
       "petTauntTitle": "Провокация питомца",
       "petTauntDesc": "Прикажите питомцу вступить в бой и применить Рык в радиусе действия. Восстановление 10 секунд.",
       "healDemonDesc": "Потратьте ману, чтобы направлять исцеление в демона 5 секунд.",
@@ -7569,7 +7569,7 @@ export const ru_RU: EnTranslations = {
       "requiresLevel": "Требуется уровень {level}",
       "requiresForm": "Требуется облик {form}",
       "requiresStealth": "Требуется незаметность",
-      "requiresStealthSkulduggery": "Requires stealth (not needed at 3 Gloam or during the Shadow Veil)",
+      "requiresStealthSkulduggery": "Требуется незаметность (не нужна при 3 этапах Сумрака и пока вы окутаны тенью)",
       "requiresCombo": "Расходует приемы серии",
       "requiresTargetHealthBelow": "Требуется цель ниже {percent}% здоровья",
       "requiresDodge": "Можно использовать только после уклонения цели",
@@ -7586,8 +7586,8 @@ export const ru_RU: EnTranslations = {
       "mana": "маны",
       "rage": "ярости",
       "energy": "энергии",
-      "focus": "Focus",
-      "devotion": "Devotion"
+      "focus": "концентрации",
+      "devotion": "Преданность"
     },
     "forms": {
       "bear": "медведя",
@@ -7788,7 +7788,7 @@ export const ru_RU: EnTranslations = {
       "clickDestroy": "Нажмите, чтобы уничтожить",
       "useFishing": "Использование: ловите рыбу в ближайшей воде.",
       "useHealingPotion": "Использование: мгновенно восстанавливает {amount} здоровья. Можно использовать в бою. Восстановление 1 мин.",
-      "useHealingPotionPct": "Use: Instantly restores {percent}% of maximum health. Usable in combat. 2 min cooldown.",
+      "useHealingPotionPct": "Использование: мгновенно восстанавливает {percent}% максимального здоровья. Можно использовать в бою. Восстановление 2 мин.",
       "useManaPotion": "Использование: мгновенно восстанавливает {amount} маны. Можно использовать в бою. Восстановление 1 мин.",
       "clickUseInstant": "Нажмите, чтобы мгновенно использовать в бою",
       "clickUse": "Нажмите, чтобы использовать",
@@ -8027,56 +8027,56 @@ export const ru_RU: EnTranslations = {
         "description": "Осыпает указанную область стрелами в течение 3 сек., нанося {damage} ед. урона каждые 0.5 сек. врагам в ней."
       },
       "pack_command": {
-        "name": "Pack Command",
-        "description": "Command your living pet to strike for 36 to 48 Physical damage. Damage increases with the pet's Attack Power. A hit restores 20 Focus and grants 1 Pack Ferocity for 30 sec, up to 3. Each stack increases all damage dealt by your pet by 10%. This strike uses the stacks you had before the hit."
+        "name": "Команда стае",
+        "description": "Приказывает вашему живому питомцу атаковать. Успешное попадание дает 20 ед. концентрации и один уровень Свирепости стаи."
       },
       "stampede": {
-        "name": "Stampede",
-        "description": "Summon 3 beasts for 12 sec. Each attacks every 2 sec for {damage} Physical damage. The shown damage includes 8% of your Ranged Attack Power before pet damage bonuses. The beasts snapshot Pack Ferocity when summoned, gaining 10% damage per stack. While Stampede is on cooldown, successful Pack Commands have a 20% chance to reset it, guaranteed after 5 failed chances. It cannot reset while the beasts are active. (Packlord)"
+        "name": "Звериный натиск",
+        "description": "Призывает 3 зверей на 12 сек. Каждый зверь атакует раз в 2 сек. и наносит {damage} ед. физического урона. Показанный урон включает 8% от силы атаки дальнего боя до прибавок к урону питомцев. Звери запоминают Свирепость стаи при призыве и наносят на 10% больше урона за каждый заряд. Пока Звериный натиск восстанавливается, успешная Команда стае с вероятностью 20% сбрасывает его время восстановления; после 5 неудачных попыток сброс срабатывает наверняка. Пока звери активны, сброс невозможен. (Повелитель стаи)"
       },
       "unleash_beast": {
-        "name": "Unleash Beast",
-        "description": "Consume 3 Pack Ferocity after your pet strikes for 42 to 53 Physical damage and claps every enemy within 6 yards for 57 to 75. The clap deals 50% more damage to enemies other than the main target. The strike and clap use Pack Ferocity's full 30% pet damage bonus and increase with the pet's Attack Power. For 8 sec afterward, the pet deals 25% more damage, attacks 35% faster, and makes Fell Shot cleave up to 2 enemies within 5 yards of the target."
+        "name": "Высвободить зверя",
+        "description": "Высвобождает полную Свирепость стаи в мощном ударе по основной цели и по области, а затем ненадолго приводит питомца в неистовство с рассекающими атаками."
       },
       "measured_shot": {
-        "name": "Measured Shot",
-        "description": "Shoot the target for {damage} Physical damage. A hit restores 20 Focus. Damage increases with Ranged Attack Power."
+        "name": "Выверенный выстрел",
+        "description": "Выверенный выстрел наносит {damage} ед. физического урона и при попадании дает 20 ед. концентрации."
       },
       "cold_focus": {
-        "name": "Cold Focus",
-        "description": "For 12 sec, Measured Shot restores 50% more Focus, and Long Draw costs 25% less and casts 30% faster. (Coldsight signature)"
+        "name": "Холодная сосредоточенность",
+        "description": "На 12 сек. Выверенный выстрел дает больше концентрации, а Дальний натяг становится быстрее и дешевле. (Фирменная способность Холодного взора)"
       },
       "bloodhook": {
-        "name": "Bloodhook",
-        "description": "Charge to an enemy and apply Bloodhook Wound, dealing 34 base Physical damage plus 26% of your Ranged Attack Power over 12 sec in 4 ticks. (Fieldcraft signature)"
+        "name": "Кровавый крюк",
+        "description": "Рывок к врагу на расстоянии от 8 до 25 м, открывающий основную рану с кровотечением на 24 ед. урона за 12 сек. (Фирменная способность Полевой выучки)"
       },
       "shrapnel_charge": {
-        "name": "Shrapnel Charge",
-        "description": "Hit the target for 24 to 30 Physical damage and up to 4 other enemies within 6 yards for 13 to 17. Other targets also bleed for 12 damage over 6 sec. If the main target has your Bloodhook Wound, deal 1 wound tick immediately. Direct damage increases with Ranged Attack Power."
+        "name": "Шрапнельный заряд",
+        "description": "Поражает цель и ближайших врагов шрапнелью, затем распространяет с основной цели короткое кровотечение."
       },
       "bloodtrail_assault": {
-        "name": "Bloodtrail Assault",
-        "description": "For 12 sec, Bloodhook spreads a 60%-strength wound to up to 2 enemies within 5 yards, Woundrend commands an 18-damage pet attack, and Shrapnel Charge gains 2 yards of radius, deals 25% more base damage to its main target, and triggers 50% more wound damage."
+        "name": "Натиск по кровавому следу",
+        "description": "На 12 сек. усиливает Кровавый крюк, Разрыв раны, Шрапнельный заряд и последующие атаки питомца."
       },
       "trailbreak": {
-        "name": "Trailbreak",
-        "description": "Leap 12 yards backward. If you have Hunting Momentum, refresh it and arm Re-entry for 12 sec."
+        "name": "Разрыв следа",
+        "description": "Отпрыгивает назад, не теряя состояние специализации. Полевая выучка также подготавливает следующее возвращение в бой."
       },
       "wildheart": {
-        "name": "Wildheart",
-        "description": "Immediately restore 30% of your maximum health."
+        "name": "Дикое сердце",
+        "description": "Мгновенно восстанавливает 30% от максимального запаса здоровья."
       },
       "shellskin": {
-        "name": "Shellskin",
-        "description": "Reduce damage taken by 60% for 8 sec, but prevent attacks while active."
+        "name": "Панцирная кожа",
+        "description": "Снижает получаемый урон на 60% на 8 сек., но во время действия запрещает атаковать."
       },
       "frostjaw_trap": {
-        "name": "Frostjaw Trap",
-        "description": "Place a trap at the selected enemy or at your feet. It arms after 0.75 sec and lasts 30 sec. The first enemy to trigger it is rooted for 3 sec, and enemies within 4 yards are slowed by 50% for 4 sec."
+        "name": "Капкан ледяной пасти",
+        "description": "Устанавливает взведенную ловушку у выбранного врага или у ваших ног. Она обездвиживает первого сработавшего на ней врага и замедляет врагов рядом."
       },
       "pack_rally": {
-        "name": "Pack Rally",
-        "description": "Adopt Courser's Guise. You, your companion, and group or raid allies within 30 yards gain 30% movement speed and 10% attack, casting, and channeling speed for 10 sec."
+        "name": "Сбор стаи",
+        "description": "Принимает Облик скакуна и воодушевляет ближайших союзников, повышая на 10 сек. скорость передвижения на 30%, а скорость атак и применения способностей на 10%."
       },
       "hurricane": {
         "name": "Ураган",
@@ -8293,19 +8293,19 @@ export const ru_RU: EnTranslations = {
       "sinister_strike": {
         "name": "Злодейский разрез",
         "description": "Мгновенный удар, наносящий урон оружием плюс {damage}. Дает 1 прием серии.",
-        "specNote_assassination": "Adds 1 Venom Ritual (max 6).",
-        "specNote_combat": "While Redline is active, this button becomes Haymaker: 130% weapon damage plus 10, awards 2 combo points, and adds 1 Redline (max 4)."
+        "specNote_assassination": "Добавляет 1 этап Ядовитого ритуала (максимум 6).",
+        "specNote_combat": "Пока действует Redline, эта кнопка становится «Ударом с размаху»: 130% урона от оружия плюс 10, дает 2 очка серии приемов и добавляет 1 деление Redline (максимум 4)."
       },
       "eviscerate": {
         "name": "Вечный сон",
         "description": "Завершающий прием, наносящий {damage}.",
-        "specNote_assassination": "At 6 Venom Ritual, this button becomes Venomrend: a strike that instantly deals all the damage your bleeds would still have dealt, plants a fresh venom wound, and restores 20 energy.",
-        "specNote_combat": "Landing this with 4 or more combo points starts Redline for 8 sec: Wicked Slash becomes Haymaker and this button becomes Lights Out (45 plus 35 per combo point, hitting 25% harder for each Redline built, restores 25 energy). Spend it before Redline ends."
+        "specNote_assassination": "При 6 этапах Ядовитого ритуала эта кнопка становится «Ядовитым разрывом»: удар, который мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, наносит новую ядовитую рану и восстанавливает 20 ед. энергии.",
+        "specNote_combat": "Попадание этим приемом при 4 и более очках серии приемов запускает Redline на 8 сек.: «Злодейский разрез» становится «Ударом с размаху», а эта кнопка — «Отключкой» (45 плюс 35 за каждое очко серии приемов, на 25% сильнее за каждое накопленное деление Redline, восстанавливает 25 ед. энергии). Потратьте ее до окончания Redline."
       },
       "backstab": {
         "name": "Трусливый выпад",
         "description": "Бьет цель в спину, нанося 150% урона оружием плюс {damage}. Нужно находиться позади цели. Требуется кинжал. Дает 1 прием серии.",
-        "specNote_assassination": "Each strike adds 1 Venom Ritual (max 6) and refunds 15 energy. At 6 Venom Ritual, Dirt Nap becomes Venomrend (it deals all your remaining bleed damage at once)."
+        "specNote_assassination": "Каждый удар добавляет 1 этап Ядовитого ритуала (максимум 6) и возвращает 15 ед. энергии. При 6 этапах «Вечный сон» становится «Ядовитым разрывом» (он мгновенно наносит весь оставшийся урон ваших кровотечений)."
       },
       "gouge": {
         "name": "Тычок в глаз",
@@ -8330,12 +8330,12 @@ export const ru_RU: EnTranslations = {
       "ambush": {
         "name": "Удар скрытня",
         "description": "Нападает из засады, нанося 250% урона оружием плюс {damage}. Нужно быть в незаметности и позади цели. Требуется кинжал. Дает 1 прием серии.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth and from any angle: that use costs nothing, spends all 3 Gloam, starts the 6 sec Shadow Veil, and hits for double."
+        "specNote_subtlety": "Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности и с любого угла: такое применение ничего не стоит, тратит все 3 этапа, на 6 сек. окутывает вас тенью и наносит двойной урон."
       },
       "stealth": {
         "name": "Сумеречная завеса",
         "description": "Скрывает вас в тенях: враги почти не замечают вас, но вы двигаетесь на 50% медленнее. Атака или получение урона прерывает Сумеречную завесу. Примените снова, чтобы выйти.",
-        "specNote_subtlety": "Each opener you use from Duskveil adds 1 Gloam (max 3)."
+        "specNote_subtlety": "Каждый прием открытия, использованный из Сумеречной завесы, добавляет 1 этап Сумрака (максимум 3)."
       },
       "adrenaline_rush": {
         "name": "Ускоренная кровь",
@@ -8344,12 +8344,12 @@ export const ru_RU: EnTranslations = {
       "garrote": {
         "name": "Удавка",
         "description": "Душит врага гарротой, нанося {damage} ед. урона сразу и {overTime} от кровотечения в течение 18 сек. Требуется незаметность. Дает 1 очко серии.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "specNote_subtlety": "Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности: такое применение ничего не стоит, тратит все 3 этапа и на 6 сек. окутывает вас тенью."
       },
       "cheap_shot": {
         "name": "Удар под дых",
         "description": "Бьет цель, нанося {damage} ед. урона и оглушая ее на 4 сек. Требуется незаметность. Дает 2 очка серии.",
-        "specNote_subtlety": "Used from Duskveil this adds 1 Gloam (max 3). At 3 Gloam you can use it WITHOUT stealth: that use costs nothing, spends all 3 Gloam, and starts the 6 sec Shadow Veil."
+        "specNote_subtlety": "Применение из «Сумеречной завесы» добавляет 1 этап Сумрака (максимум 3). При 3 этапах Сумрака способность можно использовать БЕЗ незаметности: такое применение ничего не стоит, тратит все 3 этапа и на 6 сек. окутывает вас тенью."
       },
       "sap": {
         "name": "Ошеломление",
@@ -8396,116 +8396,116 @@ export const ru_RU: EnTranslations = {
         "description": "Исцеляет дружественную цель на {damage}."
       },
       "divine_ascension": {
-        "name": "Divine Ascension",
-        "description": "Consume 20 Devotion to gain 5 Ascension charges for up to 45 sec. Marked abilities consume one charge and gain an additional effect."
+        "name": "Божественное вознесение",
+        "description": "Расходует 20 ед. Преданности и дает 5 зарядов Вознесения на срок до 45 сек. Отмеченные способности расходуют один заряд и получают дополнительный эффект."
       },
       "aura_mastery": {
-        "name": "Sacred Concord",
-        "description": "For 8 sec, empower every active Devotion and Requital Aura in your group. Bastion Devotion reduces damage by 15%; Requital deals 15 Holy damage. Multiple uses refresh instead of stacking."
+        "name": "Священное согласие",
+        "description": "На 8 сек. усиливает все активные ауры Преданности и ауру Воздаяния в вашей группе. «Преданность бастиона» снижает урон на 15%, а «Воздаяние» наносит 15 ед. урона от Света. Повторное применение обновляет время действия, а не складывает эффекты."
       },
       "devotion_ward": {
-        "name": "Bastion Devotion",
-        "description": "Reduce damage taken by you and party members by 5% until death or replacement. Replaces your own Requital Aura. Another Paladin casting Bastion Devotion refreshes it instead of stacking; Radiant, Dawn, and Grace Devotion coexist."
+        "name": "Преданность бастиона",
+        "description": "До смерти или замены снижает получаемый вами и участниками группы урон на 5%. Только эта аура и «Аура воздаяния» заменяют друг друга; «Сияющая преданность», «Преданность рассвета» и «Преданность благодати» действуют одновременно."
       },
       "hammer_of_grace": {
-        "name": "Hammer of Grace",
-        "description": "Instantly hurl a holy hammer at an enemy within 20 m for {damage}, restoring 70 mana, healing yourself for 50% of damage dealt, and generating 1 Devotion when it deals damage. Solar Reprisal lets Hammer of Grace ignore its cooldown and heal you for 100% of damage dealt."
+        "name": "Молот благодати",
+        "description": "Мгновенно бросает священный молот во врага в пределах 20 м, нанося {damage} ед. урона, восстанавливая 70 маны, исцеляя вас на 50% нанесенного урона и создавая 1 ед. Преданности при нанесении урона. «Солнечное возмездие» позволяет «Молоту благодати» игнорировать время восстановления и исцелять вас на 100% нанесенного урона."
       },
       "hushbrand": {
-        "name": "Hushbrand",
-        "description": "Interrupts spellcasting and prevents spells from that school for 4 sec."
+        "name": "Печать молчания",
+        "description": "Прерывает применение заклинания и на 4 сек. запрещает заклинания той же школы."
       },
       "guardian_covenant": {
-        "name": "Guardian Covenant",
-        "description": "Protects a friendly target and yourself, reducing damage taken by 20% for 8 sec. Defaults to you when no friendly target is selected."
+        "name": "Завет защитника",
+        "description": "Защищает выбранного союзника и паладина, снижая получаемый ими урон на 20% на 8 сек. Если союзная цель не выбрана, применяется к паладину."
       },
       "solar_step": {
-        "name": "Solar Step",
-        "description": "Increase your movement speed by 150% for 2 sec."
+        "name": "Солнечный шаг",
+        "description": "Увеличивает вашу скорость передвижения на 150% на 2 сек."
       },
       "solar_invocation": {
-        "name": "Solar Invocation",
-        "description": "Instantly heal an ally for {damage} or deal moderate Holy damage to an enemy. Either use generates 1 Devotion. During Ascension, a healing cast also heals allied players within 10 m of the target for half as much."
+        "name": "Солнечное воззвание",
+        "description": "Мгновенно исцеляет союзника на {damage} ед. или наносит врагу умеренный урон от Света. Любое применение создает 1 ед. Преданности. Во время Вознесения исцеляющее применение также исцеляет союзных игроков в пределах 10 м от цели на половину этого значения."
       },
       "radiant_devotion": {
-        "name": "Radiant Devotion",
-        "description": "Increase the spell power of you and party members by 20 for 30 min. Replaces your own Dawn or Grace Devotion. Another Paladin casting Radiant Devotion refreshes it instead of stacking; a different Devotion coexists."
+        "name": "Сияющая преданность",
+        "description": "На 30 мин. увеличивает силу заклинаний у вас и участников группы на 20. Заменяет вашу «Преданность рассвета» или «Преданность благодати», но действует одновременно с Преданностями других паладинов."
       },
       "dawn_devotion": {
-        "name": "Dawn Devotion",
-        "description": "Increase the attack power of you and party members by 40 for 30 min. Replaces your own Radiant or Grace Devotion. Another Paladin casting Dawn Devotion refreshes it instead of stacking; a different Devotion, and Warrior shouts, coexist."
+        "name": "Преданность рассвета",
+        "description": "На 30 мин. увеличивает силу атаки у вас и участников группы на 40. Заменяет вашу «Сияющую преданность» или «Преданность благодати», но действует одновременно с Преданностями других паладинов и боевыми кличами воинов."
       },
       "grace_devotion": {
-        "name": "Grace Devotion",
-        "description": "You and party members restore 15 mana every 5 sec and pay 3% less mana for 30 min. Replaces your own Radiant or Dawn Devotion. Another Paladin casting Grace Devotion refreshes it instead of stacking; a different Devotion coexists."
+        "name": "Преданность благодати",
+        "description": "В течение 30 мин. вы и участники группы восстанавливаете 15 маны каждые 5 сек. и расходуете на 3% меньше маны. Заменяет вашу «Сияющую преданность» или «Преданность рассвета», но действует одновременно с Преданностями других паладинов."
       },
       "recall_the_fallen": {
-        "name": "Recall the Fallen",
-        "description": "Returns a dead group member to life with 35% health and mana. A Sunmender of level 16 or higher instead calls back every fallen member of the group."
+        "name": "Возвращение павших",
+        "description": "Возвращает погибшего участника группы к жизни с 35% здоровья и маны."
       },
       "beacon_of_light": {
-        "name": "Beacon of Light",
-        "description": "Mark one group member as your Beacon of Light. 50% of your effective direct healing on another group member within 60 m also heals the Beacon. Area and periodic healing do not transfer. Lasts until either of you dies."
+        "name": "Маяк Света",
+        "description": "Отмечает одного участника группы как ваш «Маяк Света». 50% вашего эффективного прямого исцеления другого участника группы в пределах 60 м также исцеляет Маяк. Исцеление по области и периодическое исцеление не переносятся. Действует, пока один из вас не погибнет."
       },
       "final_edict": {
-        "name": "Final Edict",
-        "description": "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you."
+        "name": "Последний эдикт",
+        "description": "Наносит сокрушительный удар оружием и при попадании создает 1 ед. Преданности. Успешное попадание сокращает оставшееся время восстановления «Падения рассвета» на 2 сек. Успешные автоматические атаки и попадания «Последнего эдикта» с вероятностью 15% дают «Гнев рассвета» на 8 сек. Вознесение также создает вокруг вас взрыв Света."
       },
       "dawnfall": {
-        "name": "Dawnfall",
-        "description": "Deal {damage} Holy damage to nearby enemies and generate 1 Devotion. Hitting at least one enemy reduces Final Edict's remaining cooldown by 2 sec. Ascension increases its damage and radius."
+        "name": "Падение рассвета",
+        "description": "Наносит ближайшим врагам {damage} ед. урона от Света и создает 1 ед. Преданности. Попадание хотя бы по одному врагу сокращает оставшееся время восстановления «Последнего эдикта» на 2 сек. Вознесение увеличивает урон и радиус действия."
       },
       "sun_gods_verdict": {
-        "name": "Verdict of the Sun God",
-        "description": "Judge an enemy beneath the Verdict of the Sun God for 30 sec. Final Edict and Dawnfall inscribe one charge on a successful hit. The ability that lands the third charge dictates the sentence: Final Edict unleashes devastating damage on the condemned; Dawnfall detonates the verdict, damaging and stunning nearby enemies for 1.5 sec."
+        "name": "Приговор бога солнца",
+        "description": "На 30 сек. подвергает врага «Приговору бога солнца». Успешные попадания «Последнего эдикта» и «Падения рассвета» накладывают по одному заряду. Способность, наложившая третий заряд, определяет приговор: «Последний эдикт» наносит осужденному сокрушительный урон, а «Падение рассвета» взрывает приговор, нанося урон ближайшим врагам и оглушая их на 1,5 сек."
       },
       "valkyrs_calling": {
-        "name": "Valkyr's Calling",
-        "description": "Ascend into the air, becoming immune to damage as you fly toward the enemy. After 2 sec, descend upon the target area for {damage} Holy damage and generate 1 Devotion. Ascension increases the impact damage by 50% and consumes 1 charge."
+        "name": "Зов валькирии",
+        "description": "Поднимает вас в воздух и делает невосприимчивым к урону во время полета к врагу. Через 2 сек. вы обрушиваетесь на выбранную область, наносите {damage} ед. урона от Света и создаете 1 ед. Преданности. Вознесение увеличивает урон при приземлении на 50% и расходует 1 заряд."
       },
       "faithforged_guard": {
-        "name": "Debt of Light",
-        "description": "For 8 sec, the next enemy hit against you is answered: up to {buff} damage is denied and returned to the attacker as Holy damage, and you gain 1 Devotion. Only one blow is answered. Ascension raises the amount it can answer by 50%."
+        "name": "Долг Света",
+        "description": "В течение 8 сек. следующий удар врага получает ответ: до {buff} ед. урона поглощается и возвращается атакующему как урон Светом, а вы получаете 1 ед. преданности. Ответ дается только на один удар. Вознесение увеличивает отражаемое количество на 50%."
       },
       "mercy_lance": {
-        "name": "Mercy Lance",
-        "description": "Deal {damage} Holy damage to an enemy and generate 1 Devotion when it deals damage. During Ascension, it consumes 1 charge to guarantee a critical hit."
+        "name": "Копье милосердия",
+        "description": "Наносит врагу {damage} ед. урона от Света и при нанесении урона создает 1 ед. Преданности. Во время Вознесения расходует 1 заряд и гарантированно наносит критический удар."
       },
       "sacred_form": {
-        "name": "Sacred Form",
-        "description": "Enter a sacred state until death, increasing healing by 10%, spell critical chance by 5%, and reducing threat generated by 50%. Sunmender only."
+        "name": "Священный облик",
+        "description": "До смерти вводит вас в священное состояние, увеличивая исцеление на 10%, вероятность критического эффекта заклинаний на 5% и снижая создаваемую угрозу на 50%. Только для Солнцелечителя."
       },
       "dawns_embrace": {
-        "name": "Dawn's Embrace",
-        "description": "Deliver a powerful heal and generate 1 Devotion. Radiant Resonance reduces its mana cost by 50% and cast time to 1.5 sec. Ascension makes it instant and increases its healing by 35%."
+        "name": "Объятия рассвета",
+        "description": "Мощно исцеляет и создает 1 ед. Преданности. «Сияющий резонанс» снижает расход маны на 50% и время применения до 1,5 сек. Вознесение делает способность мгновенной и увеличивает исцеление на 35%."
       },
       "radiant_chorus": {
-        "name": "Radiant Chorus",
-        "description": "Heal nearby allies for {damage} and generate 1 Devotion. Effectively healing at least 2 allies grants Radiant Resonance: your next Mending Light is instant, or your next Dawn's Embrace costs 50% less mana and casts in 1.5 sec. Ascension increases Radiant Chorus healing and radius."
+        "name": "Сияющий хор",
+        "description": "Исцеляет ближайших союзников на {damage} ед. и создает 1 ед. Преданности. Эффективное исцеление хотя бы 2 союзников дает «Сияющий резонанс»: следующий «Целительный свет» применяется мгновенно, либо следующие «Объятия рассвета» требуют на 50% меньше маны и применяются за 1,5 сек. Вознесение увеличивает исцеление и радиус «Сияющего хора»."
       },
       "life_covenant": {
-        "name": "Life Covenant",
-        "description": "Reduce an ally's damage taken by 40% for 6 sec. During Ascension it also grants a 120-point shield without consuming a charge."
+        "name": "Завет жизни",
+        "description": "На 6 сек. снижает получаемый союзником урон на 40%. Во время Вознесения также дает щит прочностью 120 ед., не расходуя заряд."
       },
       "aegis_first_dawn": {
-        "name": "Aegis of the First Dawn",
-        "description": "Channel for 5 sec, creating a 10 meter holy dome. Allies inside are healed every second and take 50% less damage. Completing the channel releases a final heal and grants 30% movement speed for 4 sec."
+        "name": "Эгида первого рассвета",
+        "description": "Поддерживается в течение 5 сек. и создает священный купол радиусом 10 м. Союзники внутри исцеляются каждую секунду и получают на 50% меньше урона. Завершение поддержания высвобождает последнее исцеление и увеличивает скорость передвижения на 30% на 4 сек."
       },
       "vowkeeper_strike": {
-        "name": "Vowkeeper Strike",
-        "description": "Strike with high threat and generate 1 Devotion. A successful strike has a 20% chance to grant Solar Reprisal for 8 sec; each successful block has a 25% chance. Solar Reprisal empowers your next Sunward Disc, Hammer of Grace, or Mending Light. Ascension also grants a small absorption shield."
+        "name": "Удар хранителя обета",
+        "description": "Наносит удар с высокой угрозой и создает 1 ед. Преданности. Успешный удар с вероятностью 20% дает «Солнечное возмездие» на 8 сек., а каждый успешный блок с вероятностью 25%. «Солнечное возмездие» усиливает следующий «Солнечный диск», «Молот благодати» или «Целительный свет». Вознесение также дает небольшой поглощающий щит."
       },
       "bastion_rite": {
-        "name": "Bastion Rite",
-        "description": "Reduce physical damage taken by 20% and increase block chance by 20% for 6 sec. Ascension extends the duration to 10 sec."
+        "name": "Обряд бастиона",
+        "description": "На 6 сек. снижает получаемый физический урон на 20% и увеличивает вероятность блокирования на 20%. Вознесение продлевает действие до 10 сек."
       },
       "sunward_disc": {
-        "name": "Sunward Disc",
-        "description": "Requires a shield. Hurl a radiant disc that strikes and then bounces between nearby enemies. Each damaging impact generates 1 Devotion. Solar Reprisal makes Sunward Disc cost no mana, ignore its cooldown, and deal 20% more damage. Ascension empowers 5 bounces."
+        "name": "Солнечный диск",
+        "description": "Требуется щит. Бросает сияющий диск, который поражает цель, а затем отскакивает между ближайшими врагами. Каждое попадание с уроном создает 1 ед. Преданности. «Солнечное возмездие» позволяет «Солнечному диску» не расходовать ману, игнорировать время восстановления и наносить на 20% больше урона. Вознесение усиливает 5 отскоков."
       },
       "sacred_challenge": {
-        "name": "Sacred Goad",
-        "description": "Compel an enemy to attack you. During Ascension it also reduces all damage received by 15% for 4 sec without consuming a charge."
+        "name": "Священный вызов",
+        "description": "Заставляет врага атаковать вас. Во время Вознесения также на 4 сек. снижает весь получаемый урон на 15%, не расходуя заряд."
       },
       "devotion_aura": {
         "name": "Аура стойкости",
@@ -8544,20 +8544,20 @@ export const ru_RU: EnTranslations = {
         "description": "Освящает землю под вами, обжигая ближайших врагов на {damage} ед. урона от светлой магии каждые 2 сек. в течение 10 сек."
       },
       "bastion_sweep": {
-        "name": "Bastion Sweep",
-        "description": "Sweep your equipped shield through enemies in a 180 degree frontal arc for {damage} Holy damage with high threat and generate 1 Devotion. Ascension increases damage by 30% and radius to 8 m."
+        "name": "Размах бастиона",
+        "description": "Проводит экипированным щитом по врагам в лобовом секторе 180 градусов, наносит {damage} ед. урона от Света с высокой угрозой и создает 1 ед. Преданности. Вознесение увеличивает урон на 30%, а радиус до 8 м."
       },
       "oath_chain": {
-        "name": "Oath Chain",
-        "description": "Instantly bind a distant enemy with a sacred chain. The enemy travels toward you at 18 m per second until it reaches 3 m, then is slowed by 50% for 4 sec. During Ascension it binds a second nearby enemy."
+        "name": "Цепь клятвы",
+        "description": "Мгновенно связывает далекого врага священной цепью. Враг движется к вам со скоростью 18 м в секунду, пока не приблизится на 3 м, после чего его скорость снижается на 50% на 4 сек. Во время Вознесения связывает второго ближайшего врага."
       },
       "veilbound_march": {
-        "name": "Veilbound March",
-        "description": "Become ethereal for 4 sec, gaining 40% movement speed and 30% armor and becoming immune to roots, slows, and displacement. Enemies you pass through are Veil Marked for 6 sec, taking Holy damage each second, dealing 20% less damage to you, and generating extra threat. The first mark grants 1 Devotion. When the march ends, nearby marked enemies take a final burst. Ascension increases the burst by 50% and lightly pulls them toward you."
+        "name": "Шествие сквозь завесу",
+        "description": "На 4 сек. делает вас бесплотным, увеличивает скорость передвижения на 40% и броню на 30%, а также дает невосприимчивость к обездвиживанию, замедлению и перемещению. Враги, сквозь которых вы проходите, получают «Метку завесы» на 6 сек., каждую секунду получают урон от Света, наносят вам на 20% меньше урона и создают дополнительную угрозу. Первая метка дает 1 ед. Преданности. В конце шествия ближайшие отмеченные враги получают заключительный взрывной урон. Вознесение увеличивает этот урон на 50% и слегка притягивает их к вам."
       },
       "veilbound_mark": {
-        "name": "Veil Mark",
-        "description": "Takes Holy damage each second, deals 20% less damage to the Paladin who applied the mark, and generates additional threat toward that Paladin."
+        "name": "Метка Завесы",
+        "description": "Каждую секунду получает урон от Света, наносит на 20% меньше урона наложившему метку паладину и создает дополнительную угрозу по отношению к нему."
       },
       "righteous_fury": {
         "name": "Пылающая клятва",
@@ -8600,12 +8600,12 @@ export const ru_RU: EnTranslations = {
         "description": "Контратака после уклонения цели, наносящая урон оружием плюс {damage}. От нее нельзя уклониться."
       },
       "hunting_momentum": {
-        "name": "Hunting Momentum",
-        "description": "Passive: Gutting Strike grants 1 Hunting Momentum for 8 sec, up to 3. At 3 stacks, Woundrend deals 45% more strike damage and consumes the stacks. (Fieldcraft)"
+        "name": "Охотничий натиск",
+        "description": "Пассивно: Потрошащий удар дает 1 заряд Охотничьего натиска на 8 сек., вплоть до 3 зарядов. При 3 зарядах Ответный клык наносит на 45% больше урона от удара и поглощает все заряды. (Полевая выучка)"
       },
       "fieldcraft_reentry": {
-        "name": "Armed Re-entry",
-        "description": "Passive: Trailbreak refreshes Hunting Momentum and arms your next Gutting Strike or Bloodhook for 12 sec. Gutting Strike deals 15% more damage per stack. Bloodhook deals 18 to 24 extra Physical damage, increased by 15% per stack and by Ranged Attack Power. At 3 stacks, either attack consumes Hunting Momentum. (Fieldcraft)"
+        "name": "Подготовленное возвращение",
+        "description": "Пассивно: Разрыв следа обновляет Охотничий натиск и на 12 сек. усиливает следующий Потрошащий удар или Кровавый крюк. Потрошащий удар наносит на 15% больше урона за каждый заряд. Кровавый крюк наносит еще от 18 до 24 ед. физического урона, увеличенного на 15% за каждый заряд и зависящего от силы атаки дальнего боя. При 3 зарядах любая атака поглощает Охотничий натиск. (Полевая выучка)"
       },
       "wing_clip": {
         "name": "Сковывающий разрез",
@@ -8672,8 +8672,8 @@ export const ru_RU: EnTranslations = {
         "description": "Метает разряд молнии, нанося {damage} ед. урона от сил природы."
       },
       "thunder_reservoir": {
-        "name": "Thunder Reservoir",
-        "description": "Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)"
+        "name": "Грозовой запас",
+        "description": "Пассивно: Дуга молнии и Небесная ветвь накапливают Гром, максимум 5. При 5 зарядах Земной толчок наносит на 125% больше урона, а Разлом земли на 100%, затем расходуется весь Гром. (Громовержец)"
       },
       "rockbiter_weapon": {
         "name": "Оружие каменных уз",
@@ -8733,27 +8733,27 @@ export const ru_RU: EnTranslations = {
       },
       "evil_eye": {
         "name": "Evil Eye",
-        "description": "Marks one enemy as the focus of your curses. Moving the Eye preserves Condemnation but does not refresh its 20 sec expiry."
+        "description": "Отмечает одного врага как средоточие ваших проклятий. Перенос дурного глаза сохраняет Осуждение, но не обновляет его время действия в 20 сек."
       },
       "maledict_gaze": {
-        "name": "Maledict Gaze",
-        "description": "Your Maledict Eye attacks your selected primary Evil Eye every 2.5 sec for Shadow damage. Possess the Evil Eye doubles its attack speed."
+        "name": "Проклятый взор",
+        "description": "Ваше проклятое око раз в 2,5 сек. атакует выбранную основную цель дурного глаза и наносит урон от Тьмы. Одержимость дурным глазом удваивает скорость атак."
       },
       "needle_of_fate": {
-        "name": "Needle of Fate",
-        "description": "Pierces the enemy for {damage} Shadow damage and generates 5 Condemnation if it bears your Evil Eye. Each hit on your primary Evil Eye adds a Fate Thread for 12 sec, up to 3. If no Evil Eye exists, the Needle first marks its target."
+        "name": "Игла судьбы",
+        "description": "Пронзает врага и наносит {damage} ед. урона от Тьмы. Если на цели есть ваш дурной глаз, создаёт 5 ед. Осуждения; если его нет, сначала отмечает цель."
       },
       "sentence": {
-        "name": "Sentence",
-        "description": "Consumes all Condemnation and Fate Threads to pass sentence on the enemy. Each Thread increases damage by 6%. Added effects escalate at 20, 50, 80, and 100 Condemnation. Its damage scaling flattens after level 16."
+        "name": "Приговор",
+        "description": "Расходует всё Осуждение и Нити судьбы, вынося врагу приговор. Каждая Нить увеличивает урон на 6%, а дополнительные эффекты усиливаются при 20, 50, 80 и 100 ед. Осуждения. После 16-го уровня рост урона замедляется."
       },
       "life_tap": {
         "name": "Тяжёлая сделка",
         "description": "Преобразует {damage} здоровья в {damage} маны."
       },
       "cursed_accomplice": {
-        "name": "Cursed Accomplice",
-        "description": "Links your Maledict Eye when no ally is selected, making its Gaze generate 2 Condemnation. Linking one selected group member makes only their damage to your Evil Eye generate 3 instead. A new link replaces the previous one and may trigger once every 2 sec."
+        "name": "Проклятый сообщник",
+        "description": "Если союзник не выбран, связывает вас с проклятым оком, и его взор создаёт 2 ед. Осуждения. При связи с союзником его урон по цели дурного глаза создаёт 3 ед. Эффект срабатывает не чаще раза в 2 сек."
       },
       "curse_of_agony": {
         "name": "Порча муки",
@@ -8764,44 +8764,44 @@ export const ru_RU: EnTranslations = {
         "description": "Похищает жизнь цели, передавая вам {damage} здоровья каждую секунду в течение 5 сек."
       },
       "litany_of_guilt": {
-        "name": "Litany of Guilt",
-        "description": "Curses your primary Evil Eye for 6 sec. Condemnation gains release a wave that damages up to 2 other enemies within 8 yards, at most once per second. Rank 2 extends it to 8 sec and 4 enemies."
+        "name": "Литания вины",
+        "description": "Проклинает основную цель дурного глаза на 8 сек. Получение Осуждения выпускает волну, которая наносит урон максимум 4 другим противникам в радиусе 8 м. Эффект срабатывает не чаще раза в секунду."
       },
       "cinderhide": {
-        "name": "Cinderhide",
-        "description": "Hardens your skin to cooling slag for 10 sec, reducing all damage taken by 25%."
+        "name": "Шлаковая кожа",
+        "description": "На 10 сек. делает кожу твёрдой, как остывший шлак, и снижает весь получаемый урон на 25%."
       },
       "umbral_anchor": {
-        "name": "Umbral Anchor",
-        "description": "First cast: anchors your shadow at your feet for 5 min. Recast within 40 m to return there, consuming the anchor and starting a 45 sec cooldown."
+        "name": "Сумрачный якорь",
+        "description": "Первое применение устанавливает у ваших ног теневой якорь на 5 мин. Повторное применение в пределах 40 м возвращает к нему, расходует якорь и запускает восстановление на 45 сек."
       },
       "soulwell": {
-        "name": "Soulwell",
-        "description": "Summons a Soulwell for 3 min. While outside combat, group members can refill their Soul Stones up to 3. A Soul Stone restores 25% of maximum health and shares the potion cooldown."
+        "name": "Колодец душ",
+        "description": "Призывает Колодец душ на 3 мин. Вне боя участники группы могут пополнить свои Камни души до 3 штук. Камень души восстанавливает 25% максимального здоровья и имеет общее восстановление с зельями."
       },
       "hex_of_violence": {
-        "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 16 Shadow damage."
+        "name": "Проклятие насилия",
+        "description": "Проклинает врага на 8 сек. Следующие 3 наносящих урон действия цели создают по 7 ед. Осуждения и наносят ей 22 ед. урона от Тьмы."
       },
       "cruel_pact": {
-        "name": "Cruel Pact",
-        "description": "Sacrifices 12% of your maximum health to restore 1.5% of your maximum mana and generate 20 Condemnation. Cannot be used at or below 20% health."
+        "name": "Жестокий договор",
+        "description": "Жертвует 12% максимального здоровья и создаёт 20 ед. Осуждения. Нельзя применить при 15% здоровья или меньше."
       },
       "vicarious_suffering": {
-        "name": "Vicarious Suffering",
-        "description": "Links your suffering for 8 sec and generates up to 15 Condemnation from hostile hits. On yourself, reduces damage taken by 20%. On an ally, redirects up to 20% to you without taking you below 15% health."
+        "name": "Перенесённое страдание",
+        "description": "Связывает страдания на 8 сек. и создаёт до 15 ед. Осуждения от вражеских ударов. На себе снижает получаемый урон на 20%. На союзнике перенаправляет вам до 20% урона, но не опускает ваше здоровье ниже 15%."
       },
       "possess_evil_eye": {
-        "name": "Possess the Evil Eye",
-        "description": "The Maledictor possesses your primary Evil Eye for 15 sec and generates 35 Condemnation. Needle of Fate casts in 1 sec and generates 2 extra Condemnation, Consume can be channeled while moving, and Sentence deals 25% more damage and releases a delayed echo for 60% damage, tapering to 30% across levels 17-20."
+        "name": "Одержимость дурным глазом",
+        "description": "Проклинатель овладевает вашим основным дурным глазом на 15 сек. и создаёт 35 ед. Осуждения. «Игла судьбы» применяется за 1 сек. и создаёт ещё 2 ед. Осуждения, «Поглощение» поддерживается в движении, а «Приговор» наносит на 25% больше урона. Отложенное эхо повторяет 60% урона, снижаясь до 30% с 17-го по 20-й уровень."
       },
       "hour_of_judgment": {
-        "name": "Hour of Judgment",
-        "description": "Calls judgment upon your primary Evil Eye for 15 sec, granting 40 Condemnation and 3 Fate Threads, activating Possession, doubling Condemnation generated through the primary Eye, and increasing Sentence damage by 20%. The first Sentence refunds 50 Condemnation."
+        "name": "Час суда",
+        "description": "Обрушивает суд на ваш основной дурной глаз на 15 сек., создаёт 40 ед. Осуждения и 3 Нити судьбы, активирует Одержимость, удваивает Осуждение от основного дурного глаза и повышает урон «Приговора» на 20%. Первый «Приговор» возвращает 50 ед. Осуждения."
       },
       "coven": {
-        "name": "Coven",
-        "description": "Creates secondary Evil Eyes on up to 4 nearby enemies for 15 sec. They feed the shared Condemnation pool at 50%, and Sentence echoes to them for 35% damage."
+        "name": "Ковен",
+        "description": "Создаёт вторичные дурные глаза на срок 15 сек. не более чем на 4 ближайших врагах. Они пополняют общий запас Осуждения с эффективностью 50% и получают 35% урона «Приговора»."
       },
       "fear": {
         "name": "Терзание",
@@ -8816,13 +8816,13 @@ export const ru_RU: EnTranslations = {
         "description": "Мгновенно поражает цель жгучей тьмой, нанося {damage} ед. урона от тёмной магии."
       },
       "ruinous_brand": {
-        "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "name": "Губительное клеймо",
+        "description": "Ставит клеймо на противника на 15 сек. Ваши следующие 3 прямых заклинания повторяются по заклеймённому противнику с 25% урона, а при применении по другой цели переносят на него 50% урона."
       },
       "wrath": {
         "name": "Дикая стрела",
         "description": "Метает сгусток природной энергии, нанося {damage} ед. урона от сил природы.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, Moonseed becomes Moonsurge and Skyfall becomes Sunwake."
+        "specNote_balance": "В облике Лунного крыла каждое завершенное применение добавляет 1 стадию Лунного прилива (максимум 3). При 3 стадиях Лунного прилива Лунное семя становится Лунным всплеском, а Падение небес — Пробуждением солнца."
       },
       "healing_touch": {
         "name": "Дикое заживление",
@@ -8835,16 +8835,16 @@ export const ru_RU: EnTranslations = {
       "moonfire": {
         "name": "Лунная буря",
         "description": "Сжигает врага лунным огнем, нанося {damage} ед. урона от тайной магии и периодический урон.",
-        "specNote_balance": "Keep it burning: Moonseed extends it by 6 sec."
+        "specNote_balance": "Поддерживайте горение Лунной бури: Лунное семя продлевает её на 6 сек."
       },
       "moonseed": {
-        "name": "Moonseed",
-        "description": "Moonwing Form only. Strikes for {damage} Arcane damage, adds 1 Moontide (max 3), and extends your Lunar Tempest by 6 sec, up to 6 sec per application. At 3 Moontide, this button becomes Moonsurge: an instant strike for 136 to 162 Arcane damage (plus spell power) that spends all 3."
+        "name": "Лунное семя",
+        "description": "Только в облике Лунного крыла. Наносит {damage} ед. урона от тайной магии, добавляет 1 стадию Лунного прилива (максимум 3) и продлевает вашу Лунную бурю на 6 сек. Не более 6 сек за одно наложение. При 3 стадиях Лунного прилива эта кнопка становится Лунным всплеском: мгновенный удар, наносящий от 240 до 285 ед. урона от тайной магии и расходующий все 3 стадии."
       },
       "rejuvenation": {
         "name": "Дикий расцвет",
         "description": "Исцеляет цель на {damage} за 12 сек.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5). At 5 Verdance, Swiftmend becomes Overbloom."
+        "specNote_restoration": "Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5). При 5 стадиях Зелени Быстрое восстановление становится Сверхцветением."
       },
       "thorns": {
         "name": "Терновая защита",
@@ -8861,7 +8861,7 @@ export const ru_RU: EnTranslations = {
       "maul": {
         "name": "Костолом",
         "description": "Свирепая атака, увеличивающая урон в ближнем бою на {damage} и создающая много угрозы. Срабатывает при следующем взмахе. Только в облике бурого.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Marrowbreak: a strike for 78 to 96 damage at high threat; below half health it instead shields you for 18% of your maximum health and refunds 15 rage."
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Дроблением костей: удар, наносящий от 78 до 96 ед. урона с высокой угрозой; ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья и возвращает 15 ед. ярости."
       },
       "growl": {
         "name": "Устрашение",
@@ -8874,22 +8874,22 @@ export const ru_RU: EnTranslations = {
       "claw": {
         "name": "Цапнуть",
         "description": "Царапает врага, нанося урон оружием плюс {damage}. Дает 1 прием серии. Только в облике волка.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "ferocious_bite": {
         "name": "Кровавый укус",
         "description": "Завершающий прием, наносящий {damage}. Только в облике волка.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest: a bite for 70 plus 43 per combo point that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores 30 energy."
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови; при 3 стадиях эта кнопка становится Кровавой жатвой: укус на 91 плюс 55 за каждый прием серии, который также мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, и восстанавливает 30 ед. энергии."
       },
       "swipe": {
         "name": "Разящие когти",
         "description": "Размахивает по ближайшим врагам, нанося {damage} ед. урона. Создает дополнительную угрозу. Только в облике бурого.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "regrowth": {
         "name": "Второй расцвет",
         "description": "Исцеляет дружественную цель на {damage} и дополнительно в течение 21 сек.",
-        "specNote_restoration": "Planting a NEW bloom adds 1 Verdance (max 5)."
+        "specNote_restoration": "Посадка НОВОГО расцвета добавляет 1 стадию Зелени (максимум 5)."
       },
       "barkskin": {
         "name": "Дубовая шкура",
@@ -8906,7 +8906,7 @@ export const ru_RU: EnTranslations = {
       "starfire": {
         "name": "Падение небес",
         "description": "Обрушивает вспышку звездного огня, нанося {damage} ед. урона от тайной магии.",
-        "specNote_balance": "In Moonwing Form, each completed cast adds 1 Moontide (max 3). At 3 Moontide, this button becomes Sunwake: an instant strike for 80 to 100 Nature damage plus a 45 burn over 9 sec, restoring 35 mana and spending all 3."
+        "specNote_balance": "В облике Лунного крыла каждое завершенное применение добавляет 1 стадию Лунного прилива (максимум 3). При 3 стадиях Лунного прилива эта кнопка становится Пробуждением солнца: мгновенный удар, наносящий от 160 до 190 ед. урона от сил природы плюс 75 ед. ожога за 9 сек., восстанавливающий 35 ед. маны и расходующий все 3 стадии."
       },
       "travel_form": {
         "name": "Форма скорохода",
@@ -8947,7 +8947,7 @@ export const ru_RU: EnTranslations = {
       "rip": {
         "name": "Разрывание",
         "description": "Завершающий прием, наносящий {damage} ед. урона от кровотечения в течение 12 сек. Расходует приемы серии. Только в облике волка.",
-        "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
+        "specNote_feral": "Попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "mortal_strike": {
         "name": "Калечащий удар",
@@ -8978,96 +8978,96 @@ export const ru_RU: EnTranslations = {
         "description": "Исцеляет дружественную цель на большую величину, затем перескакивает на 2 ближайших союзников, исцеляя на 50% меньше с каждым прыжком. (Специализация Исцеление)"
       },
       "galeheart_weapon": {
-        "name": "Galeheart Weapon",
-        "description": "Imbue both weapons for 30 min, enabling Warspirit Cadence."
+        "name": "Оружие сердца бури",
+        "description": "Наполняет оружие шквалом. Каждая третья попавшая атака оружием дважды отзывается эхом и актирует Буревое колдовство."
       },
       "warspirit_cadence": {
-        "name": "Warspirit Cadence",
-        "description": "Passive: Dual-wield attacks have no extra miss chance. Every 3rd landed weapon attack triggers 2 Galeheart Echoes for 50% Nature damage and grants Stormcast for 12 sec. Stormcast makes your next Arc Bolt, Jolt, or Mending Waters instant and cost 50% less Mana. Ancestral Strike counts as 2 attacks. (Warspirit)"
+        "name": "Ритм духа войны",
+        "description": "Пассивно: каждая 3-я попавшая атака оружием вызывает 2 Эха бурного сердца по 50% урона от сил природы и дает Бурезаклятие на 12 сек. Бурезаклятие делает следующую Дугу молнии, Толчок или Целебные воды мгновенными и снижает расход маны на 50%. Удар предков считается за 2 атаки. (Дух войны)"
       },
       "stormsurge": {
-        "name": "Stormsurge",
-        "description": "Passive: While Ancestral Strike is on cooldown, consuming Stormcast has a 25% chance to reset it. If the first 3 chances fail, the 4th always resets it. (Warspirit)"
+        "name": "Штормовой натиск",
+        "description": "Пассивно: пока Удар предков восстанавливается, расход Бурезаклятия с вероятностью 25% сбрасывает его время восстановления. После 4 неудач сброс гарантирован. (Дух войны)"
       },
       "lifespring_weapon": {
-        "name": "Lifespring Weapon",
-        "description": "Imbue your weapon for 30 min. Mending Waters and Tidecall add 20% more healing to Mending Current."
+        "name": "Оружие живого источника",
+        "description": "Наполняет оружие живой водой, увеличивая накопление Потока исцеления на 20%."
       },
       "unleash_weapon": {
-        "name": "Unleash Weapon",
-        "description": "Trigger your active weapon enchant. Pyrebrand: deal 54 to 64 Fire damage plus 30% of your Spell Power and gain 2 Thunder. Galeheart: strike with your weapon, advance Warspirit Cadence, and gain 20% attack speed for 6 sec. Stonebound: strike for 75% weapon damage, force the target to attack you for 3 sec, and take 20% less damage for 4 sec. Lifespring: consume Mending Current, heal for 125% of its remaining healing, and reduce the next hit within 8 sec by 50% of the health restored."
+        "name": "Высвобождение оружия",
+        "description": "Высвобождает активное зачарование оружия. Пламенное клеймо наносит 54-64 ед. урона от огня с прибавкой 30% силы заклинаний и дает 2 заряда Грома. Сердце бури наносит удар оружием, продвигает Ритм духа войны и повышает скорость атаки на 20% на 6 сек. Каменные узы наносят 75% урона оружия, заставляют цель атаковать вас и снижают получаемый урон на 20% на 4 сек. Живой источник расходует Поток исцеления, мгновенно восстанавливает 125% оставшегося объема и в течение 8 сек. уменьшает урон от следующего удара на 50% фактически восстановленного здоровья."
       },
       "elemental_trance": {
-        "name": "Elemental Trance",
-        "description": "Enter an elemental trance for 15 sec, reducing damage taken by 30% and converting 20% of all damage you deal into mana. (Warspirit signature)"
+        "name": "Стихийный транс",
+        "description": "Вы входите в стихийный транс на 15 сек: получаемый урон снижается на 30%, а 20% всего нанесенного вами урона преобразуется в ману. (Особая способность Духа войны)"
       },
       "primal_exaltation": {
-        "name": "Primal Exaltation",
-        "description": "For 12 sec, Thundercall Arc Bolt and Skybranch cast 50% faster, while Arc Bolt grants 2 Thunder; Warspirit triggers its cadence every 2 weapon hits; Spiritmend adds 50% more healing to Mending Current. (Shaman talent)"
+        "name": "Первозданное возвышение",
+        "description": "На 12 сек. высвобождает силу вашей специализации, усиливая ее обычную ротацию. (Талант шамана)"
       },
       "stoneward": {
-        "name": "Stoneward",
-        "description": "Protects one ally for 60 sec with 6 charges. Damage consumes a charge to heal 5% maximum health, once every 3 sec. (Shaman talent)"
+        "name": "Каменный оберег",
+        "description": "Защищает одного союзника на 60 сек. и имеет 6 зарядов. Урон расходует заряд, исцеляя 5% от максимума здоровья не чаще раза в 3 сек. (Талант шамана)"
       },
       "tidecall": {
-        "name": "Tidecall",
-        "description": "Heal a friendly target for {damage}. Healing increases with Spell Power. Add the full heal before overhealing to Mending Current, up to 30% of the target's maximum health."
+        "name": "Зов прилива",
+        "description": "Исцеляет дружественную цель на {damage}. Исцеление усиливается силой заклинаний. Добавляет полный объем до избыточного исцеления в Поток исцеления, вплоть до 30% максимального здоровья цели."
       },
       "soul_harvest": {
-        "name": "Essence Reap",
-        "description": "Tears at the enemy soul for {damage} Shadow damage and creates 1 Soul Fragment, up to 5."
+        "name": "Жатва сущности",
+        "description": "Терзает душу противника, нанося {damage} ед. урона от темной магии, и создает 1 осколок души, максимум 5."
       },
       "soul_lance": {
-        "name": "Soul Lance",
-        "description": "Hurls a spectral lance for {damage} Shadow damage. Against your Ossuary Mark, 50% of its damage is added to the mark."
+        "name": "Копьё душ",
+        "description": "Метает призрачное копьё, нанося {damage} ед. урона от темной магии. По цели с вашей Меткой оссуария 50% этого урона добавляется к метке."
       },
       "raise_graveguard": {
-        "name": "Raise Graveguard",
-        "description": "Raises a permanent defensive companion. Graveguard automatically taunts, intercepts 20% of your damage through Grave Dominion, and Reaping Command makes it taunt and take 30% less damage for 4 sec."
+        "name": "Поднять могильного стража",
+        "description": "Поднимает постоянного защитного спутника. Могильный страж автоматически провоцирует врагов и принимает 20% вашего урона благодаря Власти могил. Команда жатвы заставляет его провоцировать и на 4 сек. снижает получаемый им урон на 30%."
       },
       "raise_skeletal_warrior": {
-        "name": "Raise Skeletal Warrior",
-        "description": "Spends 1 Soul Fragment to add a persistent Skeletal Warrior to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 45% damage every 6 sec, and Reaping Command pins its target with a 40% slow for 4 sec."
+        "name": "Поднять воина-скелета",
+        "description": "Расходует 1 осколок души и добавляет постоянного воина-скелета в вашу Власть с 2 ячейками. Служить может только один. Раз в 6 сек. он рассекает ближайших врагов с 45% урона, а Команда жатвы замедляет его цель на 40% на 4 сек."
       },
       "raise_bone_mage": {
-        "name": "Raise Bone Mage",
-        "description": "Spends 2 Soul Fragments to add a persistent ranged Bone Mage to your 2-slot Dominion. Only one may serve you. Its attacks expose the target to 5% more magic damage for 6 sec, and Reaping Command raises that weakness to 8%."
+        "name": "Поднять костяного мага",
+        "description": "Расходует 2 осколка души и добавляет постоянного костяного мага дальнего боя в вашу Власть с 2 ячейками. Служить может только один. Его атаки на 6 сек. повышают получаемый целью магический урон на 5%, а Команда жатвы усиливает слабость до 8%."
       },
       "bone_armor": {
-        "name": "Bone Armor",
-        "description": "Wraps you in bone, absorbing damage equal to 20% of your maximum health."
+        "name": "Костяной доспех",
+        "description": "Окутывает вас костями, поглощая урон в размере 20% от максимального запаса здоровья."
       },
       "corpse_explosion": {
-        "name": "Corpse Explosion",
-        "description": "Sacrifices a Bone Mage first, then a Skeletal Warrior, and a Gravewing only as a last resort. Among duplicates it chooses the one with the least remaining duration, then the weakest, to deal {damage} Shadow damage at the chosen location."
+        "name": "Взрыв останков",
+        "description": "Сначала жертвует Костяным магом, затем Скелетом-воином и лишь в крайнем случае Могильным крылом. Среди одинаковых прислужников выбирает того, кому осталось меньше времени, затем самого слабого, и наносит противникам в выбранной точке {damage} ед. урона от темной магии."
       },
       "funeral_harvest": {
-        "name": "Funeral Harvest",
-        "description": "When an enemy recently damaged by you or your undead dies, you gain 1 Soul Fragment. This can occur once every 3 sec."
+        "name": "Погребальная жатва",
+        "description": "Когда погибает противник, которому недавно нанесли урон вы или ваши мертвецы, вы получаете 1 осколок души. Эффект срабатывает не чаще раза в 3 сек."
       },
       "ossuary_mark": {
-        "name": "Ossuary Mark",
-        "description": "Marks an enemy for 12 sec, storing 20% of damage dealt by you and your undead. Recast to detonate it. If the marked enemy dies, it explodes within 6 yards and creates 1 Soul Fragment."
+        "name": "Метка оссуария",
+        "description": "Отмечает противника на 12 сек., накапливая 20% урона, нанесённого вами и вашими мертвецами. Повторное применение подрывает метку. Если отмеченный противник погибает, она взрывается в радиусе 6 м и создаёт 1 осколок души."
       },
       "unholy_command": {
-        "name": "Unholy Command",
-        "description": "Spends 3 Soul Fragments to command all of your undead to deal 25% more damage and act 20% faster for 12 sec."
+        "name": "Нечестивый приказ",
+        "description": "Расходует 3 осколка души и приказывает всем вашим мертвецам наносить на 25% больше урона и действовать на 20% быстрее в течение 12 сек."
       },
       "reaping_command": {
-        "name": "Reaping Command",
-        "description": "Spends 2 Soul Fragments to command every undead servant to strike in unison. Graveguards taunt and brace, Warriors pin, Bone Mages expose magic defenses, and Gravewing rends all enemies hit."
+        "name": "Приказ жатвы",
+        "description": "Расходует 2 осколка души и приказывает всем мёртвым слугам атаковать одновременно. Могильные стражи провоцируют и защищаются, воины приковывают цель, костяные маги раскрывают магическую защиту, а могильные крылья терзают всех поражённых врагов."
       },
       "sacrifice_undead": {
-        "name": "Sacrifice Undead",
-        "description": "Destroys one Dominion servant to restore 25% of your maximum health."
+        "name": "Жертва мертвеца",
+        "description": "Уничтожает одного слугу Доминиона и восстанавливает 25% от максимального запаса здоровья."
       },
       "raise_gravewing": {
-        "name": "Raise Gravewing",
-        "description": "Spends 2 Soul Fragments to add a persistent Gravewing to your 2-slot Dominion. Only one may serve you. It cleaves nearby enemies for 65% damage every 5 sec, and Reaping Command makes every enemy struck take 8% more damage for 5 sec."
+        "name": "Поднять могильное крыло",
+        "description": "Расходует 2 осколка души и добавляет постоянное могильное крыло в вашу Власть с 2 ячейками. Служить может только одно. Раз в 5 сек. оно рассекает ближайших врагов с 65% урона, а Команда жатвы на 5 сек. повышает на 8% урон по всем поражённым врагам."
       },
       "army_of_the_dead": {
-        "name": "Army of the Dead",
-        "description": "Tears open a grave portal to raise a temporary Skeletal Warrior, Bone Mage, and Gravewing for 20 sec, filling the ranks your standing Dominion servants leave empty."
+        "name": "Армия мертвых",
+        "description": "Открывает могильный портал и на 20 сек. поднимает временных Скелета-воина, Костяного мага и Могильное крыло в дополнение к выбранным прислужникам Господства."
       },
       "metamorphosis": {
         "name": "Метаморфоза",
@@ -9154,24 +9154,24 @@ export const ru_RU: EnTranslations = {
         "description": "Поглощает эффект периодического исцеления на дружественной цели и исцеляет ее на {damage}. (знаковое умение Исцеления)"
       },
       "moonlash": {
-        "name": "Moonsurge",
-        "description": "Spends your 3 Moontide for a heavy strike of {damage} Arcane damage: the damage choice. Sunwake spends the same 3 Moontide, so pick one."
+        "name": "Лунный всплеск",
+        "description": "Расходует ваши 3 стадии Лунного прилива на мощный удар, наносящий {damage} ед. урона от тайной магии: выбор в пользу урона. Пробуждение солнца тратит те же 3 стадии, так что выбирайте одно."
       },
       "sunlance": {
-        "name": "Sunwake",
-        "description": "Spends your 3 Moontide for a strike of {damage} Nature damage plus a {overTime} burn over 9 sec, and restores 35 mana: the mana choice. Moonsurge spends the same 3 Moontide, so pick one."
+        "name": "Пробуждение солнца",
+        "description": "Расходует ваши 3 стадии Лунного прилива на удар, наносящий {damage} ед. урона от сил природы плюс {overTime} ед. ожога за 9 сек., и восстанавливает 35 ед. маны: выбор в пользу экономии. Лунный всплеск тратит те же 3 стадии, так что выбирайте одно."
       },
       "redharvest": {
-        "name": "Redharvest",
-        "description": "Spends your 3 Old Blood: strike for {damage}, instantly deal all the damage your Flense and Bloodrift would still have dealt, remove both bleeds, and restore 30 energy. Works with zero combo points."
+        "name": "Кровавая жатва",
+        "description": "Расходует ваши 3 стадии Старой крови: удар на {damage} ед. урона, который мгновенно наносит весь урон, что еще нанесли бы ваши Свежевание и Кровавый разлом, снимает оба кровотечения и восстанавливает 30 ед. энергии. Работает даже без очков серии приемов."
       },
       "marrowbreak": {
-        "name": "Marrowbreak",
-        "description": "Spends your 3 Old Blood for a heavy, high-threat strike of {damage} damage. Below half health it instead shields you for 18% of your maximum health for 8 sec and refunds 15 rage."
+        "name": "Дробление костей",
+        "description": "Расходует ваши 3 стадии Старой крови на мощный удар с высокой угрозой, наносящий {damage} ед. урона. Ниже половины здоровья вместо удара он поглощает урон в размере 18% максимального здоровья на 8 сек. и возвращает 15 ед. ярости."
       },
       "overbloom": {
-        "name": "Overbloom",
-        "description": "Spends your 5 Verdance: every ally carrying your heal-over-time effects is instantly healed for 60% of the healing those effects had left, the effects are removed, and the target gets a fresh Wildbloom."
+        "name": "Сверхцветение",
+        "description": "Расходует ваши 5 стадий Зелени: каждый союзник с вашими эффектами периодического исцеления мгновенно исцеляется на 60% оставшегося в них исцеления, сами эффекты снимаются, а цель получает новый Дикий расцвет."
       },
       "summon_imp": {
         "name": "Призыв Уголька",
@@ -9350,16 +9350,16 @@ export const ru_RU: EnTranslations = {
         "description": "Обрушивает молнию на выбранную область, нанося ближайшим противникам {damage} ед. урона. (талант шамана)"
       },
       "abyssal_rift": {
-        "name": "Abyssal Rift",
-        "description": "Tears open a rift at the selected location, pulling enemies within 8 yards to its center, dealing {damage} Shadow damage, and stunning them for 2 sec. Bosses take damage but resist the pull and stun."
+        "name": "Бездонный разлом",
+        "description": "Разрывает пространство в выбранной точке, притягивая противников в радиусе 8 м к её центру, нанося {damage} ед. урона от Тьмы и оглушая их на 2 сек. Боссы получают урон, но сопротивляются притяжению и оглушению."
       },
       "chaos_bolt": {
         "name": "Стрела погибели",
         "description": "Выпускает сгусток хаотического огня, наносящий {damage} ед. урона от Огня. (талант чернокнижника)"
       },
       "dark_pact": {
-        "name": "Sanguine Covenant",
-        "description": "Sacrifices 10% of your current health to absorb damage equal to 30% of your maximum health for 8 sec."
+        "name": "Кровавый завет",
+        "description": "Жертвует 10% текущего здоровья и на 8 сек. поглощает урон в размере 30% максимального здоровья."
       },
       "cloak_of_shadows": {
         "name": "Плащ теней",
@@ -9402,8 +9402,8 @@ export const ru_RU: EnTranslations = {
         "description": "Быстро восполняет ману. (Талант мага)"
       },
       "flurry_of_knives": {
-        "name": "Flurry of Knives",
-        "description": "Lash every enemy within 6 yd with thrown knives for {damage} Physical damage and gain 2 combo points. (Rogue talent)"
+        "name": "Вихрь ножей",
+        "description": "Осыпает метательными ножами всех врагов в радиусе 6 м, нанося {damage} ед. физического урона и давая 2 очка серии приемов. (талант разбойника)"
       },
       "frenzied_regeneration": {
         "name": "Дикое исцеление",
@@ -9482,8 +9482,8 @@ export const ru_RU: EnTranslations = {
         "description": "Отматывает линию времени каждого погибшего участника группы или рейда и возвращает его к жизни у тела с 30% здоровья и маны. Нельзя применять в бою. (Хрономантия)"
       },
       "ancestor_return": {
-        "name": "Ancestors' Return",
-        "description": "Call every fallen member of your group or raid back to life at their body with 30% health and mana. Cannot be cast in combat. (Spiritmend)"
+        "name": "Возвращение предков",
+        "description": "Возвращает к жизни всех погибших участников группы или рейда у их тел с 30% здоровья и маны. Нельзя применять в бою. (Целитель духов)"
       },
       "temporal_rewind": {
         "name": "Перемотка времени",
@@ -9550,8 +9550,8 @@ export const ru_RU: EnTranslations = {
         "description": "Вы скрываетесь в облаке дыма, повышая шанс уклонения на 30% на 8 сек."
       },
       "sacrilegious_march": {
-        "name": "Sacrilegious March",
-        "description": "Increases movement speed by 35%, but sacrifices 2% of your maximum health each second. Cast again to cancel. It switches off at 20% health."
+        "name": "Кощунственный марш",
+        "description": "Повышает скорость передвижения на 35%, но каждую секунду отнимает 2% максимального здоровья. Повторное применение отменяет эффект. При 20% здоровья он отключается."
       },
       "spellsteal": {
         "name": "Похищение чар",
@@ -9570,33 +9570,33 @@ export const ru_RU: EnTranslations = {
         "description": "Заставляет цель умолкнуть при чтении заклинания и запрещает заклинания этой школы на 5 сек."
       },
       "thieves_chorus": {
-        "name": "Thieves' Chorus",
-        "description": "A whistled signal spurs your group on, increasing attack, casting, and channeling speed by 10% for 10 sec. Allies recently affected by a group haste burst are too exhausted to benefit. (Rogue talent)"
+        "name": "Хор воров",
+        "description": "Условный свист подстегивает вашу группу, увеличивая скорость атаки, произнесения заклинаний и поддержания на 10% на 10 сек. Союзники, недавно получившие групповое ускорение, слишком истощены, чтобы получить эффект. (талант разбойника)"
       },
       "tranquility": {
         "name": "Песнь рощи",
         "description": "Поддерживает поток целительной энергии в течение 4 сек., восстанавливая союзникам в радиусе 30 м от 42 до 52 ед. здоровья каждую секунду. (талант друида)"
       },
       "venom_dart": {
-        "name": "Venom Dart",
-        "description": "Flick a poisoned dart for {damage} Nature damage. Awards 1 combo point.",
-        "specNote_assassination": "Adds 1 Venom Ritual and extends your venom wound by 6 sec (the wound never goes above 20 sec)."
+        "name": "Ядовитый дротик",
+        "description": "Метает отравленный дротик, нанося {damage} ед. урона от сил природы. Дает 1 очко серии приемов.",
+        "specNote_assassination": "Добавляет 1 этап Ядовитого ритуала и продлевает вашу ядовитую рану на 6 сек. (но не дольше 20 сек.)."
       },
       "body_blow": {
-        "name": "Haymaker",
-        "description": "A heavy blow for 130% weapon damage plus 10. Awards 2 combo points and adds 1 Redline (max 4). (Thuggery)"
+        "name": "Удар с размаху",
+        "description": "Тяжелый удар, наносящий 130% урона от оружия плюс 10. Дает 2 очка серии приемов и добавляет 1 деление Redline (максимум 4). (механика Боя)"
       },
       "knockout_blow": {
-        "name": "Lights Out",
-        "description": "Ends Redline with a knockout: strike for 45 plus 35 per combo point, hitting 25% harder for each Redline you built, and recover 25 energy. Use it before Redline runs out or the knockout is lost. (Thuggery)"
+        "name": "Отключка",
+        "description": "Завершает Redline нокаутом: наносит 45 плюс 35 за каждое очко серии приемов, на 25% сильнее за каждое накопленное деление Redline, и восстанавливает 25 ед. энергии. Используйте ее до окончания Redline, иначе нокаут пропадет. (механика Боя)"
       },
       "veilstrike": {
-        "name": "Shadow Veil",
-        "description": "For 6 sec: your Duskveil openers work without stealth and from any angle, you deal 10% more damage, and your first Lurker's Strike inside it hits for double. (Skulduggery)"
+        "name": "Удар завесы",
+        "description": "На 6 сек.: ваши приемы открытия из «Сумеречной завесы» работают без незаметности и с любого угла, вы наносите на 10% больше урона, а первый «Удар скрытня» за это время наносит двойной урон. (механика Скрытности)"
       },
       "venomrend": {
-        "name": "Venomrend",
-        "description": "Spends your 6 Venom Ritual: strike for 100 plus 55 per combo point, instantly deal all the damage your bleeds would still have dealt, then apply a fresh venom wound (120 damage over 20 sec). Restores 20 energy. (Knifework)"
+        "name": "Ядовитый разрыв",
+        "description": "Расходует ваши 6 этапов Ядовитого ритуала: наносит 100 плюс 55 за каждое очко серии приемов, мгновенно наносит весь урон, что еще нанесли бы ваши кровотечения, а затем наносит новую ядовитую рану (120 ед. урона за 20 сек.). Восстанавливает 20 ед. энергии. (механика Ликвидации)"
       },
       "typhoon": {
         "name": "Тайфун",
@@ -9607,28 +9607,28 @@ export const ru_RU: EnTranslations = {
         "description": "Поглощает один магический эффект (положительный с врага или отрицательный с союзника) и восстанавливает 6% от максимального запаса здоровья."
       },
       "veilstep": {
-        "name": "Veilstep",
-        "description": "Step 10 yards forward through the veil."
+        "name": "Шаг сквозь завесу",
+        "description": "Перемещает сквозь завесу в направлении взгляда."
       },
       "scouring_mercy": {
-        "name": "Scouring Mercy",
-        "description": "Deal 72 to 84 Holy damage to an enemy or heal a friendly target for 130 to 155. Both amounts increase with Spell Power. Damage also heals each Doctrine-linked ally for 30%, or the lowest-health party member for 15% if no ally is linked. (Doctrine signature)"
+        "name": "Карающее милосердие",
+        "description": "Поражает противника силой Света или мгновенно исцеляет союзника. Особая способность Доктрины."
       },
       "seraphic_vigil": {
-        "name": "Seraphic Vigil",
-        "description": "Protect one ally for 30 sec. The first hit that leaves them below 35% health consumes the Vigil and heals them for 180. (Benison signature)"
+        "name": "Серафическое бдение",
+        "description": "Накладывает на союзника оберегающее благословение, исцеляющее его при опасном падении здоровья. Особая способность Благословения."
       },
       "summon_tithefiend": {
-        "name": "Call Tithefiend",
-        "description": "Consume all Gloomtithe to summon a Tithefiend. It lasts 6, 8, 10, 12, or 15 sec at 1 to 5 stacks and attacks every 2 sec. Each attack deals 20 to 24 Shadow damage plus 8 per extra stack and increases with your Spell Power. At 5 stacks, the fiend grows larger and deals 25% more damage. It prefers your Effigy. Each hit restores 1% maximum Mana and echoes 15% of its damage to up to 3 other enemies with your Dirge of Decay. (Vespers signature)"
+        "name": "Призыв демона десятины",
+        "description": "Поглощает Мрачную десятину и призывает временного демона, преследующего ваше Изваяние. Особая способность Вечерни."
       },
       "martyrs_aegis": {
-        "name": "Martyr's Aegis",
-        "description": "Reduce one ally's incoming damage by 40% for 8 sec."
+        "name": "Эгида мученика",
+        "description": "Уменьшает получаемый союзником урон на 40% на 8 сек."
       },
       "choir_of_deliverance": {
-        "name": "Choir of Deliverance",
-        "description": "Channel for 6 sec, healing party members within 30 yards for {damage} every 2 sec. Healing increases with Spell Power."
+        "name": "Хор избавления",
+        "description": "Поддерживается 6 сек., исцеляя участников группы в радиусе 30 ярдов на {damage} раз в 2 сек. Исцеление усиливается силой заклинаний."
       },
       "bear_charge": {
         "name": "Натиск бурого",
@@ -9645,7 +9645,7 @@ export const ru_RU: EnTranslations = {
       "rake": {
         "name": "Свежевание",
         "description": "Скрытная атака из засады, наносящая врагу урон оружием плюс {damage} и вызывающая кровотечение в течение 9 сек. Даёт 1 очко серии приёмов. Только в облике волка.",
-        "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
+        "specNote_feral": "Каждый попавший удар добавляет 1 стадию Старой крови (максимум 3)."
       },
       "revive_pet": {
         "name": "Подлатать",
@@ -11202,7 +11202,7 @@ export const ru_RU: EnTranslations = {
         "name": "Сотворённый хлеб для пира"
       },
       "soul_stone": {
-        "name": "Soul Stone"
+        "name": "Камень души"
       },
       "bristleback_maul": {
         "name": "Молот Гэллоугласа"
@@ -12665,16 +12665,16 @@ export const ru_RU: EnTranslations = {
         "name": "Элементаль воды"
       },
       "graveguard": {
-        "name": "Graveguard"
+        "name": "Могильный страж"
       },
       "necromancy_skeletal_warrior": {
-        "name": "Skeletal Warrior"
+        "name": "Воин-скелет"
       },
       "necromancy_bone_mage": {
-        "name": "Bone Mage"
+        "name": "Костяной маг"
       },
       "necromancy_gravewing": {
-        "name": "Gravewing"
+        "name": "Могильное крыло"
       }
     },
     "npcs": {
@@ -13302,12 +13302,12 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_divine_tome": {
-        "title": "The Dawnbound Tome",
-        "text": "The Light does not rest in you quietly, {playerName}. I have watched you lay the dead to peace, and I believe you are ready for what few paladins are ever taught: the Rite of Recall, by which a fallen soul is called back to the living. Its words are kept in the Dawnbound Tome, here in my keeping, but a book is no blessing while the restless dead still walk this ground. Return 6 more Restless Bones to the earth, and I will begin to teach you.",
-        "completion": "The chapel yard grows quiet. You are ready for the words, {playerName}, but the Rite of Recall cannot be spoken in a warm chapel. It must be sung where the veil between life and death wears thin. I mean to carry the Tome north into the Mirefen Marsh. Follow me there, and we will finish this.",
+        "title": "Том рассветного обета",
+        "text": "Свет не дремлет в тебе спокойно, {playerName}. Я видел, как ты даруешь мертвым покой, и верю, что ты готов постичь тайну, известную лишь немногим паладинам: Обряд возвращения, который призывает павшую душу обратно к живым. Его слова записаны в Томе рассветного обета, который я храню, но книга не станет благословением, пока по этой земле бродят беспокойные мертвецы. Упокой еще 6 беспокойных костяков, и я начну твое обучение.",
+        "completion": "Во дворе часовни становится тихо. Ты готов произнести слова, {playerName}, но Обряд возвращения нельзя совершить в теплой часовне. Его следует пропеть там, где завеса между жизнью и смертью истончилась. Я отнесу Том на север, в Топи Майрфена. Следуй за мной, и мы завершим начатое.",
         "objectives": {
           "0": {
-            "label": "Restless Bones laid to rest"
+            "label": "Упокоено беспокойных костяков"
           }
         }
       },
@@ -13468,12 +13468,12 @@ export const ru_RU: EnTranslations = {
         }
       },
       "q_rite_of_redemption": {
-        "title": "The Rite of Recall",
-        "text": "So you followed me into the mire, {playerName}. Good. I have the Dawnbound Tome here, and this drowned ground is where its words belong: nowhere is the veil between life and death thinner than a place where the dead will not stay buried. But the drowned would drag your voice down mid-verse. Clear a space fit for the rite: put 8 of the Drowned Dead to rest, and we will consecrate it together.",
-        "completion": "Kneel, {playerName}, and read the words aloud. There. Do you feel it? The Light no longer only mends the living in your hands, it can summon back those who have crossed over. Use it wisely. A soul called back to a hopeless fight is a cruelty, not a mercy. Rise, Redeemer.",
+        "title": "Обряд возвращения",
+        "text": "Значит, ты последовал за мной в топь, {playerName}. Хорошо. Том рассветного обета со мной, и эти затопленные земли подходят для его слов: нигде завеса между жизнью и смертью не бывает тоньше, чем там, где мертвецы отказываются лежать в могилах. Но утопленники заглушат твой голос посреди песнопения. Подготовь место для обряда: упокой 8 утопших мертвецов, и мы вместе освятим его.",
+        "completion": "Преклони колено, {playerName}, и прочти слова вслух. Вот так. Чувствуешь? Теперь Свет в твоих руках не только исцеляет живых, но и возвращает тех, кто пересек черту. Пользуйся этим даром мудро. Вернуть душу в безнадежный бой значит проявить жестокость, а не милосердие. Восстань, Искупитель.",
         "objectives": {
           "0": {
-            "label": "Drowned Dead laid to rest"
+            "label": "Упокоено утопших мертвецов"
           }
         }
       },
