@@ -235,13 +235,13 @@ describe('destruction progression', () => {
       castTime: 2.5,
       cooldown: 0,
       ruinCost: 3,
-      effects: [{ type: 'directDamage', min: 290, max: 355 }],
+      effects: [{ type: 'directDamage', min: 200, max: 245 }],
     });
     expect(ABILITIES.shadow_bolt.effects).toEqual([{ type: 'directDamage', min: 36, max: 50 }]);
     expect(ABILITIES.shadow_bolt.ranks?.map((rank) => rank.effects)).toEqual([
       [{ type: 'directDamage', min: 67, max: 87 }],
       [{ type: 'directDamage', min: 118, max: 148 }],
-      [{ type: 'directDamage', min: 190, max: 235 }],
+      [{ type: 'directDamage', min: 130, max: 162 }],
     ]);
     expect(ABILITIES.immolate.effects).toEqual([
       { type: 'directDamage', min: 31, max: 31 },
@@ -253,8 +253,8 @@ describe('destruction progression', () => {
         { type: 'dot', total: 98, duration: 15, interval: 3 },
       ],
       [
-        { type: 'directDamage', min: 106, max: 106 },
-        { type: 'dot', total: 136, duration: 15, interval: 3 },
+        { type: 'directDamage', min: 73, max: 73 },
+        { type: 'dot', total: 100, duration: 15, interval: 3 },
       ],
     ]);
     expect(ABILITIES.conflagrate.effects).toEqual([
