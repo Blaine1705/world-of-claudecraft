@@ -630,8 +630,8 @@ const CORDER_WIRE_PROMPT_CMDS = new Set<string>([
 // feedback still lands on the next snapshot. The always-streamed O(1) `mailU`
 // envelope count is deliberately NOT gated.
 const MAIL_WIRE_HZ = 4;
-const MAIL_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MAIL_WIRE_HZ)));
-const MAIL_REFRESH_TICKS = 40;
+export const MAIL_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MAIL_WIRE_HZ)));
+export const MAIL_REFRESH_TICKS = 40;
 const MAIL_WIRE_PROMPT_CMDS = new Set<string>([
   'mail_send',
   'mail_take',

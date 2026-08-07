@@ -32,13 +32,14 @@ vi.mock('../server/db', () => ({
   setCharacterHotbarLayout: vi.fn(async () => {}),
 }));
 
-import { type ClientSession, GameServer } from '../server/game';
+import {
+  type ClientSession,
+  GameServer,
+  MAIL_REFRESH_TICKS,
+  MAIL_WIRE_INTERVAL_TICKS,
+} from '../server/game';
 import { groundHeight } from '../src/sim/world';
 import { broadcast, type FakeClient, fakeWs, joinServer, lastSnap } from './helpers/bare_client';
-
-// Mirrors MAIL_WIRE_HZ = 4 / MAIL_REFRESH_TICKS in server/game.ts.
-const MAIL_WIRE_INTERVAL_TICKS = 5;
-const MAIL_REFRESH_TICKS = 40;
 
 function placeAtMailbox(server: GameServer, pid: number): void {
   const box = server.sim.entities.get(server.sim.postOffice.mailboxIds[0]);
