@@ -120,7 +120,14 @@ try {
   process.exit(1);
 }
 
-const plan = buildSelectPlan({ changedPaths, alwaysRunFiles: alwaysRun });
+const plan = buildSelectPlan({
+  changedPaths,
+  alwaysRunFiles: alwaysRun,
+  // Generated i18n artifacts are inert only while present (a deleted one is
+  // unprovable: regeneration recreates it untracked, invisible to the
+  // freshness diff), so the planner needs a live existence probe.
+  exists: (f) => existsSync(path.join(repoRoot, f)),
+});
 
 console.log('[gate:select] full gate step list, selective vitest step');
 console.log(
@@ -171,7 +178,10 @@ if (plan.mode === 'full') {
   const relatedArgs = buildRelatedArgs({ sources: plan.relatedSources, workers });
   if (relatedArgs) {
     vitestSteps.push({
-      name: `vitest (related to ${plan.relatedSources.length} changed source file(s))`,
+      // "path(s)", not "changed source file(s)": the list is the union of
+      // changed sources AND fed-through generated i18n artifacts, and the
+      // plan.reason line above counts those separately.
+      name: `vitest (related over ${plan.relatedSources.length} path(s))`,
       cmd: 'npx',
       args: ['--no-install', 'vitest', ...relatedArgs],
     });
