@@ -70,7 +70,14 @@ describe('BIPED14 hit-reaction stagger (issue #2889 round 2)', () => {
       expect(idx, key).toBeGreaterThanOrEqual(0);
       const end = MANIFEST_SRC.indexOf('\n  },', idx);
       const block = MANIFEST_SRC.slice(idx, end);
-      expect(block, key).toContain('clips: BIPED14');
+      // mob_troll wires TROLL_BIPED14 (`{ ...BIPED14, attack: ['Troll_Smash'] }`,
+      // issue #2889): it inherits BIPED14's hit array unchanged, so it still
+      // qualifies as a BIPED14 consumer for HitReact_Heavy.
+      const clipsOk =
+        key === 'mob_troll'
+          ? block.includes('clips: TROLL_BIPED14')
+          : block.includes('clips: BIPED14');
+      expect(clipsOk, key).toBe(true);
       expect(block, `${key} animUrls`).toContain(file);
     }
     // Exactly 6 consumers touched: a stray extra or missing wiring changes this count.

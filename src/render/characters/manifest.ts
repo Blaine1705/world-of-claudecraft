@@ -1522,13 +1522,14 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   mob_troll: {
     url: `${CREATURES}/orc.glb`,
-    animUrls: [`${CREATURES}/orc_hit_variety_anims.glb`],
     height: 2.4,
     // faint wash only — 0.35 flooded every material with the template green
     clips: TROLL_BIPED14,
     // Troll_Smash clip donor (scripts/build_troll_anims.mjs): mesh-free,
-    // baked off this same rig's own poses.
-    animUrls: [`${CREATURES}/troll_ability_anims.glb`],
+    // baked off this same rig's own poses. The second donor GLB
+    // (scripts/build_biped14_hit_variety_anims.mjs) donates the second
+    // BIPED14 hit-reaction clip, HitReact_Heavy.
+    animUrls: [`${CREATURES}/troll_ability_anims.glb`, `${CREATURES}/orc_hit_variety_anims.glb`],
     tint: 'entity',
     tintStrength: 0.12,
   },
