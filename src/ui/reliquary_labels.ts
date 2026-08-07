@@ -201,10 +201,14 @@ export function reliquarySourceLineText(plan: ReliquarySourceLinePlan | undefine
     case 'bossDungeon': {
       const boss = bossName(plan.bossId);
       const dungeon = dungeonName(plan.dungeonId);
-      // Both halves or nothing: a half-resolved sentence would splice one raw
-      // id into otherwise-real prose, which reads as content and is worse than
-      // no line at all.
-      if (boss === null || dungeon === null) return '';
+      // A stale half degrades to the surviving AUTHORED half instead of
+      // deleting the line (never a spliced raw id): the boss is the relic's
+      // own hint, so it falls back to the plain boss sentence when the page's
+      // dungeon id goes stale. The reverse does not hold: the dungeon comes
+      // from the page clear meter, not from this relic's hints, so a stale
+      // boss drops the line rather than inventing a dungeon-only door.
+      if (boss === null) return '';
+      if (dungeon === null) return t('hudChrome.reliquary.sourceBoss', { boss });
       return t('hudChrome.reliquary.sourceBossDungeon', { boss, dungeon });
     }
     case 'boss': {
@@ -230,10 +234,17 @@ export function reliquarySourceLineText(plan: ReliquarySourceLinePlan | undefine
     case 'bossZone': {
       const boss = bossName(plan.bossId);
       const zone = zoneName(plan.zoneId);
-      // Both halves or nothing, the bossDungeon rule: an open-world rare paired
-      // with a raw zone id would read as content just the same.
-      if (boss === null || zone === null) return '';
-      return t('hudChrome.reliquary.sourceBossZone', { boss, zone });
+      // This composition consumed TWO authored hints, so a stale half
+      // degrades to the other half's own sentence rather than deleting a
+      // live, renderable door with it: the zone hint would have rendered
+      // "Found in {zone}" on its own, the boss hint "Drops from {boss}".
+      // Only both-stale drops the line, and no arm splices a raw id.
+      if (boss !== null && zone !== null) {
+        return t('hudChrome.reliquary.sourceBossZone', { boss, zone });
+      }
+      if (boss !== null) return t('hudChrome.reliquary.sourceBoss', { boss });
+      if (zone !== null) return t('hudChrome.reliquary.sourceZone', { zone });
+      return '';
     }
     case 'delve': {
       const delve = delveSourceName(plan.delveId);

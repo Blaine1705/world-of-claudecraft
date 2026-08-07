@@ -60,6 +60,7 @@ import {
 import type { LootTier } from '../src/sim/lockpick';
 import { gatherRareEventFlavor } from '../src/sim/professions/gather_events';
 import { NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
+import { masterworkBonusStats } from '../src/sim/professions/masterwork';
 import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { catalogCharacterCompletion, catalogRelicCompletion } from '../src/sim/reliquary';
 import { riftHeroicClearPool, riftNormalClearPool } from '../src/sim/rift/loot_pools';
@@ -951,6 +952,43 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
     }
   });
 
+  it('a masterwork craft is hinted iff it is gear-capable (derived, not ring membership)', () => {
+    // Ring membership alone let masterwork:engineering ship an unearnable
+    // hint: every engineering recipe produces a slotless, statless tool, so
+    // masterworkBonusStats (the SAME gate the proc path consults in
+    // crafting.ts) returns null for all of them and the mark can never be
+    // written. Deriving gear-capability through that gate reds both drifts: a
+    // tool-only craft gaining a hint, and a craft becoming gear-capable while
+    // its slot still sits pended (QA ruling 2026-08-07).
+    const page = RELIQUARY_PAGES_BY_ID.professions_masterwork;
+    const pendedMarks = new Set(SOURCE_PENDING_RULING.professions_masterwork);
+    let gearCapableCount = 0;
+    for (const markId of RELIQUARY_PROFESSION_MARKS.masterworkByCraft) {
+      const craftId = markId.slice('masterwork:'.length);
+      const gearCapable = ALL_RECIPES.some((recipe) => {
+        if (recipe.professionId !== craftId) return false;
+        const def = ITEMS[recipe.resultItemId];
+        if (!def) return false;
+        return (
+          masterworkBonusStats({
+            level: recipe.level,
+            quality: def.quality,
+            slot: def.slot,
+            stats: def.stats,
+          }) !== null
+        );
+      });
+      if (gearCapable) gearCapableCount += 1;
+      const relic = page.relics.find((r) => r.kind === 'mark' && r.markId === markId);
+      expect(relic, markId).toBeDefined();
+      const hinted = relic !== undefined && reliquaryRelicSource(page, relic).length > 0;
+      expect(hinted, `${markId} hinted iff gear-capable`).toBe(gearCapable);
+      expect(pendedMarks.has(markId), `${markId} pended iff NOT gear-capable`).toBe(!gearCapable);
+    }
+    // Liveness: the derivation is worthless if it calls everything ineligible.
+    expect(gearCapableCount).toBe(4);
+  });
+
   it('field notes reuse visited gather_event:* namespaces', () => {
     const page = RELIQUARY_PAGES_BY_ID.professions_field_notes;
     // Literal pin matches deed visit marks (col_pristine_vein etc.).
@@ -1222,7 +1260,10 @@ function awardIdForSlot(relic: ReliquaryRelicDef, slotId: string): string {
 
 /** Rift rank -> the reins table that rank's clear rolls
  *  (src/sim/rift/progression.ts). Keys typed against the live rank id space, so
- *  a new awarding rank fails tsc here until its table is wired. */
+ *  a new awarding rank fails tsc here until its table is wired. The mapping
+ *  hand-mirrors an inline ternary in addRiftClearGearLoot; the behavioral pin
+ *  that drives that production path per rank lives in
+ *  tests/rift_rank_tuning.test.ts, which is what keeps this mirror honest. */
 const RIFT_REINS_BY_RANK: Record<
   (typeof RELIQUARY_RIFT_RANK_SOURCE_IDS)[number],
   readonly string[]
@@ -1482,11 +1523,11 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The two remaining gaps are CONTENT gaps, not vocabulary gaps: no live table
-  // awards either mount, so there is no door to name. Every other slot the
-  // catalog used to leave pending turned out to be a several-doors slot rather
-  // than a no-answer slot, and Phase 13b authored all of them (a relic lists
-  // every comparable route it really has).
+  // The three gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // any of them, so there is no door to name. Every other slot the catalog
+  // used to leave pending turned out to be a several-doors slot rather than a
+  // no-answer slot, and Phase 13b authored all of them (a relic lists every
+  // comparable route it really has).
   //
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
@@ -1494,6 +1535,15 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
   horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
+  // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
+  // engineering recipe produces a slotless, statless tool, masterworkBonusStats
+  // returns null for all of them, so the masterwork proc can never fire and
+  // the mark can never be written (write site crafting.ts, gate masterwork.ts).
+  // The slot stays catalogued and un-hinted until the owner either ships a
+  // stats-bearing engineering craftable or retires the slot. The
+  // gear-capability pin below derives the eligible set from the live recipes
+  // and reds if either side moves.
+  professions_masterwork: ['masterwork:engineering'],
 };
 
 /**
@@ -1511,6 +1561,14 @@ function bossRouteSatisfies(
   if (difficulty === 'heroic') return fromHeroic;
   if (difficulty === 'normal') return fromLoot;
   return fromLoot || fromHeroic;
+}
+
+/** The zone sweep's shape gate, named so its trip-wire is provable: a zone
+ *  hint is checkable only beside EXACTLY one boss hint, mirroring both halves
+ *  of the view's compose guard (bosses === 1 && zones === 1). Live data never
+ *  trips it, so the synthetic cases below are what keep it honest. */
+function zoneHintShapeOk(bossCount: number, zoneCount: number): boolean {
+  return bossCount === 1 && zoneCount === 1;
 }
 
 /** `pageId:slotId` keys, the shape the sweeps below test membership against. */
@@ -1551,7 +1609,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_set_nighttalon: 2,
   conquerors_set_soulflame: 2,
   conquerors_set_stormcallers: 2,
-  professions_masterwork: 6,
+  // 5 = activity (masterworkFirst) + the four gear-capable craft professions;
+  // masterwork:engineering is pended un-hinted (QA ruling 2026-08-07).
+  professions_masterwork: 5,
   professions_field_notes: 4,
   professions_specimens: 4,
   horizons_mounts: 10,
@@ -1872,9 +1932,10 @@ describe('Reliquary source hints resolve against live content', () => {
         .map((h) => h.sourceId)
         .filter((id) => !(id in GATHERING_PROFESSIONS)),
     );
-    // Vacuity floor: the five gear crafts on the masterwork page (the two
-    // crafted Sanctum relics name two of those same five).
-    expect(crafts.size).toBeGreaterThanOrEqual(5);
+    // Vacuity floor: the four gear-capable crafts on the masterwork page (the
+    // two crafted Sanctum relics name two of those same four; engineering is
+    // pended, see the gear-capability pin).
+    expect(crafts.size).toBeGreaterThanOrEqual(4);
     for (const craftId of crafts) {
       expect(() => craftById(craftId), craftId).not.toThrow();
       expect(craftById(craftId).id, craftId).toBe(craftId);
@@ -2074,7 +2135,7 @@ describe('Reliquary source hints resolve against live content', () => {
       // view's compose guard (bosses === 1 && zones === 1): any other shape
       // leaves a zone rendering as a lonely "Found in {zone}" line the
       // composition never intended, and zero bosses says nothing checkable.
-      if (bossHints.length !== 1 || zoneHints.length !== 1) {
+      if (!zoneHintShapeOk(bossHints.length, zoneHints.length)) {
         offenders.push(
           `${page.id}:${slotId} pairs ${zoneHints.length} zone hints with ${bossHints.length} boss hints (need exactly 1 of each)`,
         );
@@ -2105,6 +2166,47 @@ describe('Reliquary source hints resolve against live content', () => {
     // Vacuity floor: the two open-world set drops.
     expect(checked).toBeGreaterThanOrEqual(2);
   });
+
+  it('the zone sweep shape gate can actually trip (synthetic shapes)', () => {
+    // Live data is always exactly 1+1, so without these the gate could rot
+    // (invert, or widen to >= 1) with the sweep still green, which is the one
+    // predicate in the truth-pin set that would fail silently.
+    expect(zoneHintShapeOk(1, 1)).toBe(true);
+    expect(zoneHintShapeOk(2, 1)).toBe(false);
+    expect(zoneHintShapeOk(1, 2)).toBe(false);
+    expect(zoneHintShapeOk(0, 1)).toBe(false);
+  });
+
+  it('every title relic hints its OWN deed (the derived hint cannot shift)', () => {
+    // titles() derives the hint from the slot id, which makes drift
+    // structurally impossible today; this pin is what makes a future
+    // hand-authored title row that names a NEIGHBOURING deed red instead of
+    // shipping a systematically shifted mapping the distinct-count and
+    // resolvability sweeps cannot see.
+    let checked = 0;
+    for (const { page, relic, slotId } of RELIC_SLOTS) {
+      if (relic.kind !== 'title') continue;
+      const hints = reliquaryRelicSource(page, relic);
+      expect(hints, slotId).toHaveLength(1);
+      expect(hints[0], slotId).toEqual({ sourceKind: 'deed', sourceId: relic.deedId });
+      checked += 1;
+    }
+    expect(checked).toBeGreaterThanOrEqual(33);
+  });
+
+  it('every dungeon-page clearSource names a live dungeon (the composed place half)', () => {
+    // The bossDungeon line's place half comes from the page clear meter, not
+    // from any relic hint, so the per-hint resolvability sweeps never see it;
+    // a renamed dungeon id would silently degrade every boss line on the page
+    // to the plain boss sentence. Pin it at authoring.
+    let checked = 0;
+    for (const page of RELIQUARY_PAGES) {
+      if (page.clearSource?.kind !== 'dungeon') continue;
+      checked += 1;
+      expect(page.clearSource.dungeonId in DUNGEONS, `${page.id} names a live dungeon`).toBe(true);
+    }
+    expect(checked).toBeGreaterThanOrEqual(6);
+  });
 });
 
 describe('Reliquary source hint coverage', () => {
@@ -2130,9 +2232,10 @@ describe('Reliquary source hint coverage', () => {
     }
     expect([...actuallyUnhinted].sort()).toEqual([...PENDING_KEYS].sort());
     // Vacuity floor: this suite is worth nothing if almost everything is
-    // excluded. Literal: tighten as rulings land.
+    // excluded. Literal: tighten as rulings land. 239 = 242 slots minus the
+    // two gap mounts minus the pended masterwork:engineering.
     const hinted = RELIC_SLOTS.length - actuallyUnhinted.size;
-    expect(hinted).toBeGreaterThanOrEqual(240);
+    expect(hinted).toBeGreaterThanOrEqual(239);
   });
 
   it('no relic authors an EMPTY hint list (a sourceless slot stays keyless)', () => {
@@ -2189,22 +2292,30 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending row is the two mounts content awards no route at all', () => {
+  it('the surviving pending rows are the three slots content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
     // RELIQUARY_HORIZON_WEAPON_SKINS are gone with them. What is left is a
-    // hand-listed pair of CONTENT gaps, and hand-listing is the point: a new
+    // hand-listed set of CONTENT gaps, and hand-listing is the point: a new
     // mount must now be authored or deliberately added here, never auto-enrol.
-    expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
+    expect(Object.keys(SOURCE_PENDING_RULING)).toEqual([
+      'horizons_mounts',
+      'professions_masterwork',
+    ]);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
       'terrorspark_groundshaker',
     ]);
-    // Both are still live catalog slots, so the exclusion cannot outlive them.
+    // masterwork:engineering pended by the QA ruling 2026-08-07: no
+    // engineering recipe can proc a masterwork (see the gear-capability pin),
+    // so its former profession hint named a door that awards nothing.
+    expect(SOURCE_PENDING_RULING.professions_masterwork).toEqual(['masterwork:engineering']);
+    // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
       expect(RELIQUARY_HORIZON_MOUNTS, mountId).toContain(mountId);
     }
+    expect(RELIQUARY_PROFESSION_MARKS.masterworkByCraft).toContain('masterwork:engineering');
     // And the skins page really is fully answered now, which is the half of the
     // executed ruling this row can no longer show.
     expect(RELIQUARY_HORIZON_WEAPON_SKINS.length).toBe(29);
@@ -2509,6 +2620,25 @@ describe('Reliquary source hint coverage', () => {
       const reinsId = reinsItemIdForMount(mountId);
       const { counts } = judgeSlotRoutes('mount', mountId, reinsId, []);
       expect(counts, `${mountId} (${reinsId}) has no live award route`).toEqual({
+        mob: 0,
+        heroic: 0,
+        vendor: 0,
+        quest: 0,
+        recipe: 0,
+        delveChest: 0,
+        riftReins: 0,
+        store: 0,
+        activity: 0,
+      });
+    }
+    // The pended masterwork:engineering mark makes the same claim through a
+    // different door: no family may count a live route for it (the activity
+    // family maps masterwork_craft to masterwork:first only, and the
+    // gear-capability pin above owns the "could the write site ever fire"
+    // half, which these nine families cannot see).
+    for (const markId of SOURCE_PENDING_RULING.professions_masterwork) {
+      const { counts } = judgeSlotRoutes('mark', markId, markId, []);
+      expect(counts, `${markId} has no live award route`).toEqual({
         mob: 0,
         heroic: 0,
         vendor: 0,

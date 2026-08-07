@@ -3259,7 +3259,7 @@ export const ru_RU: EnTranslations = {
       "sourceVendor": "Продаёт {vendor}",
       "sourceBossZone": "Падает с {boss} в регионе {zone}",
       "sourceDelve": "Находится в вылазке {delve}",
-      "sourceRift": "Награда за прохождение разломов ранга {rank}",
+      "sourceRift": "Падает при прохождении разломов ранга {rank}",
       "sourceQuest": "Награда за задание {quest}",
       "sourceStore": "Покупается в магазине WOC",
       "sourceActivityCorpseHarvest": "Находится при сборе с трупов существ",

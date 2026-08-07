@@ -10662,7 +10662,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceVendor': 'Продаёт {vendor}',
   'hudChrome.reliquary.sourceBossZone': 'Падает с {boss} в регионе {zone}',
   'hudChrome.reliquary.sourceDelve': 'Находится в вылазке {delve}',
-  'hudChrome.reliquary.sourceRift': 'Награда за прохождение разломов ранга {rank}',
+  'hudChrome.reliquary.sourceRift': 'Падает при прохождении разломов ранга {rank}',
   'hudChrome.reliquary.sourceQuest': 'Награда за задание {quest}',
   'hudChrome.reliquary.sourceStore': 'Покупается в магазине WOC',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': 'Находится при сборе с трупов существ',

@@ -3453,9 +3453,10 @@ export const TARGETS = [
         // locales, where the old aria-text match ('Drops from') silently
         // degraded to the fallback.
         //
-        // Highest count wins, so the shot lands on a genuinely multi-source
-        // relic (gravewyrm_gauntlets at three lines on this page) instead of a
-        // one-line cell that shows nothing the previous release did not. A cell
+        // Highest count wins, so the shot lands on whichever cell resolves the
+        // most doors on the target page (content re-authoring moves the pick
+        // automatically; no relic is named here) instead of a one-line cell
+        // that shows nothing the previous release did not. A cell
         // with the attribute but no parseable number still beats one without,
         // and the first missing cell remains the last resort.
         const missing = [

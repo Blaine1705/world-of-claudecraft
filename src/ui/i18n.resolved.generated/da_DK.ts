@@ -3259,7 +3259,7 @@ export const da_DK: EnTranslations = {
       "sourceVendor": "Sold by {vendor}",
       "sourceBossZone": "Drops from {boss} in {zone}",
       "sourceDelve": "Found in the delve {delve}",
-      "sourceRift": "Awarded for clearing {rank}-rank Rifts",
+      "sourceRift": "Drops from {rank}-rank Rift clears",
       "sourceQuest": "Reward from the quest {quest}",
       "sourceStore": "Purchased from the WOC Store",
       "sourceActivityCorpseHarvest": "Recovered while harvesting creature corpses",

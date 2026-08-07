@@ -156,41 +156,32 @@ function withSource(def: ReliquaryRelicDef, entry: RelicEntry): ReliquaryRelicDe
   return { ...def, source: 'sourceKind' in source ? source : Object.freeze(source) };
 }
 
-const fromBoss = (mobId: string): ReliquarySourceHint => ({ sourceKind: 'boss', sourceId: mobId });
-const fromVendor = (npcId: string): ReliquarySourceHint => ({
-  sourceKind: 'vendor',
-  sourceId: npcId,
-});
-const fromProfession = (professionId: string): ReliquarySourceHint => ({
-  sourceKind: 'profession',
-  sourceId: professionId,
-});
-const fromDelve = (delveId: string): ReliquarySourceHint => ({
-  sourceKind: 'delve',
-  sourceId: delveId,
-});
+/** Every authored hint is frozen at its constructor: the resolver hands
+ *  catalog hint objects back by reference (inside frozen lists), so a mutable
+ *  hint would let one caller's field write rename a door process-wide, server
+ *  included. Freezing here covers every authoring channel at once (bare hints,
+ *  list members, page defaults, and the titles() deed hints). */
+const hint = (h: ReliquarySourceHint): ReliquarySourceHint => Object.freeze(h);
+const fromBoss = (mobId: string): ReliquarySourceHint =>
+  hint({ sourceKind: 'boss', sourceId: mobId });
+const fromVendor = (npcId: string): ReliquarySourceHint =>
+  hint({ sourceKind: 'vendor', sourceId: npcId });
+const fromProfession = (professionId: string): ReliquarySourceHint =>
+  hint({ sourceKind: 'profession', sourceId: professionId });
+const fromDelve = (delveId: string): ReliquarySourceHint =>
+  hint({ sourceKind: 'delve', sourceId: delveId });
 /** Rank typed against the live ladder, so a rift hint cannot name a rank that
  *  awards no reins (C) without failing tsc. */
-const fromRift = (rank: ReliquaryRiftRank): ReliquarySourceHint => ({
-  sourceKind: 'rift',
-  sourceId: rank,
-});
-const fromQuest = (questId: string): ReliquarySourceHint => ({
-  sourceKind: 'quest',
-  sourceId: questId,
-});
-const fromStore = (): ReliquarySourceHint => ({
-  sourceKind: 'store',
-  sourceId: RELIQUARY_STORE_SOURCE_ID,
-});
-const fromActivity = (activityId: ReliquaryActivitySourceId): ReliquarySourceHint => ({
-  sourceKind: 'activity',
-  sourceId: activityId,
-});
-const fromZone = (zoneId: string): ReliquarySourceHint => ({
-  sourceKind: 'zone',
-  sourceId: zoneId,
-});
+const fromRift = (rank: ReliquaryRiftRank): ReliquarySourceHint =>
+  hint({ sourceKind: 'rift', sourceId: rank });
+const fromQuest = (questId: string): ReliquarySourceHint =>
+  hint({ sourceKind: 'quest', sourceId: questId });
+const fromStore = (): ReliquarySourceHint =>
+  hint({ sourceKind: 'store', sourceId: RELIQUARY_STORE_SOURCE_ID });
+const fromActivity = (activityId: ReliquaryActivitySourceId): ReliquarySourceHint =>
+  hint({ sourceKind: 'activity', sourceId: activityId });
+const fromZone = (zoneId: string): ReliquarySourceHint =>
+  hint({ sourceKind: 'zone', sourceId: zoneId });
 
 function items(...entries: readonly RelicEntry[]): ReliquaryRelicDef[] {
   return entries.map((e) => withSource({ kind: 'item', itemId: entryId(e) }, e));
@@ -215,7 +206,7 @@ function titles(...ids: readonly string[]): ReliquaryRelicDef[] {
   return ids.map((deedId) => ({
     kind: 'title' as const,
     deedId,
-    source: { sourceKind: 'deed' as const, sourceId: deedId },
+    source: hint({ sourceKind: 'deed', sourceId: deedId }),
   }));
 }
 
@@ -249,9 +240,16 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 //
 // drakemaw_raptor and terrorspark_groundshaker are absent, and that absence IS
 // the answer: no live table awards either (drakemaw_raptor has no acquisition
-// path, terrorspark_groundshaker is dev-grant only). They are the catalog's two
-// remaining SOURCE_PENDING_RULING slots.
-const MOUNT_SOURCES: Readonly<Record<string, ReliquarySourceHints>> = {
+// path, terrorspark_groundshaker is dev-grant only). They are the catalog's
+// two SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions
+// shelf is the third pending slot (QA ruling 2026-08-07).
+//
+// Keys are typed against the live mount ladder so a misspelled or renamed key
+// fails tsc at the authoring site instead of falling through to the pending
+// pin one layer later.
+const MOUNT_SOURCES: Readonly<
+  Partial<Record<(typeof RELIQUARY_HORIZON_MOUNTS)[number], ReliquarySourceHints>>
+> = {
   // One-door mounts are authored as bare hints per the ReliquarySourceHints
   // convention (a one-element list would mean the same thing; the catalog
   // never encodes meaning in the shape).
@@ -285,7 +283,7 @@ const MOUNT_SOURCES: Readonly<Record<string, ReliquarySourceHints>> = {
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
  *  left the single authority on membership and order. A mount with no row falls
  *  through bare rather than inventing a route. */
-function mountEntries(ids: readonly string[]): RelicEntry[] {
+function mountEntries(ids: readonly (typeof RELIQUARY_HORIZON_MOUNTS)[number][]): RelicEntry[] {
   return ids.map((id) => {
     // Own-property read, same reasoning as setMembers below.
     const source = Object.hasOwn(MOUNT_SOURCES, id) ? MOUNT_SOURCES[id] : undefined;
@@ -383,7 +381,13 @@ export const RELIQUARY_HORIZON_TITLES = [
 export const RELIQUARY_PROFESSION_MARKS = {
   /** First lifetime masterwork proc (any craft). */
   masterworkFirst: 'masterwork:first',
-  /** First masterwork per gear-capable craft on the ring. */
+  /** First masterwork per craft on the ring that the gallery catalogs. Only
+   *  the first four are gear-capable today: every engineering recipe produces
+   *  a slotless, statless tool, so masterworkBonusStats returns null and the
+   *  engineering mark can never be written (QA ruling 2026-08-07: the slot
+   *  stays catalogued but un-hinted in SOURCE_PENDING_RULING beside the two
+   *  gap mounts, an owner call; a stats-bearing engineering craftable would
+   *  un-pend it). */
   masterworkByCraft: [
     'masterwork:weaponcrafting',
     'masterwork:armorcrafting',
@@ -440,19 +444,19 @@ const SPECIMEN_PROFESSIONS: Readonly<Record<string, string>> = {
 
 /** Ids carrying a profession hint where the map has one, and the `fallback`
  *  hint (the activity that really awards them) everywhere it deliberately does
- *  not. Keeps the curated id lists above the single authority on membership and
- *  order; without a fallback the unmapped ids stay bare and the resolver
- *  answers the empty list. */
+ *  not. Keeps the curated id lists above the single authority on membership
+ *  and order. The fallback is required: both live pages have one, and a page
+ *  that wants un-hinted fall-through authors bare entries directly. */
 function withProfessions(
   ids: readonly string[],
   professionById: Readonly<Record<string, string>>,
-  fallback?: ReliquarySourceHint,
+  fallback: ReliquarySourceHint,
 ): RelicEntry[] {
   return ids.map((id) => {
     // Own-property read, same reasoning as setMembers below.
     const professionId = Object.hasOwn(professionById, id) ? professionById[id] : undefined;
     if (professionId) return [id, fromProfession(professionId)] as const;
-    return fallback ? ([id, fallback] as const) : id;
+    return [id, fallback] as const;
   });
 }
 
@@ -519,7 +523,17 @@ export const RELIQUARY_SET_MEMBERS = {
 // flip between two routes. Each pairs its rare with the ZONE that rare camps
 // in, because "which rare" is only half the answer for an open-world drop: the
 // other half is where to go looking for it.
-const SET_MEMBER_SOURCES: Readonly<Record<string, ReliquarySourceHints>> = {
+//
+// Keys typed against the live set-member ladder, same rationale as
+// MOUNT_SOURCES above.
+const SET_MEMBER_SOURCES: Readonly<
+  Partial<
+    Record<
+      (typeof RELIQUARY_SET_MEMBERS)[keyof typeof RELIQUARY_SET_MEMBERS][number],
+      ReliquarySourceHints
+    >
+  >
+> = {
   deathlord_warplate: fromBoss('korzul_the_gravewyrm'),
   deathlord_legguards: fromBoss('grand_necromancer_velkhar'),
   deathlord_sabatons: [fromBoss('ironvein_foreman'), fromZone('thornpeak_heights')],
@@ -553,7 +567,9 @@ const SET_MEMBER_SOURCES: Readonly<Record<string, ReliquarySourceHints>> = {
 /** Set-page members carrying their SET_MEMBER_SOURCES hint. A member with no
  *  row falls through un-hinted rather than inventing one; the coverage test
  *  reds on it. */
-function setMembers(ids: readonly string[]): RelicEntry[] {
+function setMembers(
+  ids: readonly (typeof RELIQUARY_SET_MEMBERS)[keyof typeof RELIQUARY_SET_MEMBERS][number][],
+): RelicEntry[] {
   return ids.map((id) => {
     // Own-property read: an id like 'constructor' or 'toString' would otherwise
     // walk the prototype and hand back a function as if it were a hint.
@@ -726,7 +742,12 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     // - staff_of_velkhar and shadowmeld_tunic: korgath_bonus 0.1 and
     //   velkhar_bonus 0.1. q_velkhar's guaranteed mage / rogue reward needs no
     //   hint of its own: its kill objective IS grand_necromancer_velkhar, so
-    //   the quest is the same door the velkhar hint already names.
+    //   the quest is the same door the velkhar hint already names. That
+    //   same-door elision is the RULE for every Sanctum quest reward whose
+    //   kill objective is the hinted boss: it also covers q_velkhar's warrior
+    //   arm (boneguard_breastplate) and q_korgath's korgaths_chainwraps for
+    //   all three classes. Only q_gravewyrm points at a DIFFERENT boss, so it
+    //   alone is named directly (next bullet).
     // - wyrmcult_grand_robe: korgath_bonus 0.1 plus the guaranteed mage reward
     //   of q_gravewyrm, whose kill objective is korzul instead. Those are two
     //   DIFFERENT doors, so the quest is named directly rather than folded into
@@ -984,8 +1005,16 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = [
     // does to earn it.
     relics: marks(
       [RELIQUARY_PROFESSION_MARKS.masterworkFirst, fromActivity('masterwork_craft')],
-      ...RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map(
-        (markId) => [markId, fromProfession(markId.slice('masterwork:'.length))] as const,
+      // masterwork:engineering stays a BARE entry (no hint): no engineering
+      // recipe can proc a masterwork (see the masterworkByCraft comment), so
+      // a profession hint here would name a door that awards nothing. The
+      // slot rides SOURCE_PENDING_RULING with the two gap mounts; the
+      // gear-capability pin in tests/reliquary_content.test.ts derives the
+      // eligible set from masterworkBonusStats and reds if either side moves.
+      ...RELIQUARY_PROFESSION_MARKS.masterworkByCraft.map((markId) =>
+        markId === 'masterwork:engineering'
+          ? markId
+          : ([markId, fromProfession(markId.slice('masterwork:'.length))] as const),
       ),
     ),
   },
@@ -1129,8 +1158,10 @@ export function isCataloguedRelicMark(markId: string): boolean {
   return RELIQUARY_MARK_IDS.has(markId);
 }
 
-/** Shared frozen empty answer, so "no source" never allocates and never gets
- *  mutated by a caller that mistook it for its own array. */
+/** Shared frozen empty answer, so the no-source arm never allocates and never
+ *  gets mutated by a caller that mistook it for its own array. The
+ *  hint-bearing arms DO allocate a fresh frozen wrapper per call, which is
+ *  immaterial on this cold rebuild path. */
 const NO_SOURCE_HINTS: readonly ReliquarySourceHint[] = Object.freeze([]);
 
 /**
@@ -1163,12 +1194,13 @@ export function reliquaryRelicSource(
   // `in` rather than Array.isArray: it narrows the readonly-array arm without
   // the any[] widening Array.isArray brings to a readonly union.
   //
-  // Every arm answers a FROZEN list: the list arm is the catalog's own array
-  // (frozen at construction in withSource), and the two wrapper arms freeze
-  // their fresh one-element list so a caller cannot learn to mutate the answer
-  // on the cheap arms and then corrupt the shared one. The freeze is shallow
-  // by design: the hint OBJECTS inside stay runtime-mutable, and the readonly
-  // fields on ReliquarySourceHint are what guard them for typed callers.
+  // For CATALOG-BUILT relics every arm answers a FROZEN list of FROZEN hints:
+  // the list arm is the catalog's own array (frozen at construction in
+  // withSource), the two wrapper arms freeze their fresh one-element list so a
+  // caller cannot learn to mutate the answer on the cheap arms and then
+  // corrupt the shared one, and the hint objects themselves are frozen by the
+  // hint() constructor. A synthetic def handed an inline array answers that
+  // exact array as-is; callers own the mutability of their own synthetics.
   if (own !== undefined) return 'sourceKind' in own ? Object.freeze([own]) : own;
   const fallback = page?.sourceDefault;
   return fallback ? Object.freeze([fallback]) : NO_SOURCE_HINTS;

@@ -4138,7 +4138,7 @@ export const hudChromeStrings = {
     sourceDelve: 'Found in the delve {delve}',
     // "{rank}-rank" matches the established Rift wording (itemTooltip.riftTier,
     // sim.rift.raceWorldWin), and the reins come off the CLEAR, not one boss.
-    sourceRift: 'Awarded for clearing {rank}-rank Rifts',
+    sourceRift: 'Drops from {rank}-rank Rift clears',
     sourceQuest: 'Reward from the quest {quest}',
     sourceStore: 'Purchased from the WOC Store',
     // Award activities: the player action itself is the source, with no mob,

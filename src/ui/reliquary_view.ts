@@ -198,8 +198,15 @@ export function reliquarySourceLinePlan(
       soleZone = hint;
     }
   }
+  // Both sole-hint guards are symmetric even though the counts already imply
+  // them: if either count check ever loosened, the compose would degrade to
+  // separate lines rather than silently losing a half.
   const composeBossZone =
-    clearSource?.kind !== 'dungeon' && bosses === 1 && zones === 1 && soleZone !== null;
+    clearSource?.kind !== 'dungeon' &&
+    bosses === 1 &&
+    zones === 1 &&
+    soleBoss !== null &&
+    soleZone !== null;
   const lines: ReliquarySourceLinePlan[] = [];
   for (const hint of hints) {
     if (composeBossZone && soleZone !== null) {

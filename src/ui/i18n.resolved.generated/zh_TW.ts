@@ -3259,7 +3259,7 @@ export const zh_TW: EnTranslations = {
       "sourceVendor": "由{vendor}販售",
       "sourceBossZone": "由{zone}的{boss}掉落",
       "sourceDelve": "在秘探「{delve}」中獲得",
-      "sourceRift": "通關 {rank} 級裂隙的獎勵",
+      "sourceRift": "通關{rank}級裂隙時掉落",
       "sourceQuest": "任務「{quest}」獎勵",
       "sourceStore": "在 WOC 商店購買",
       "sourceActivityCorpseHarvest": "採集生物屍體時獲得",

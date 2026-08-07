@@ -3259,7 +3259,7 @@ export const en_XA: EnTranslations = {
       "sourceVendor": "[Šóļð ƀý {vendor}]",
       "sourceBossZone": "[Ðŕóþš ƒŕóɱ {boss} íñ {zone}]",
       "sourceDelve": "[Ƒóúñð íñ ţĥé ðéļʋé {delve}]",
-      "sourceRift": "[Áŵáŕðéð ƒóŕ çļéáŕíñĝ {rank}-ŕáñķ Ŕíƒţš]",
+      "sourceRift": "[Ðŕóþš ƒŕóɱ {rank}-ŕáñķ Ŕíƒţ çļéáŕš]",
       "sourceQuest": "[Ŕéŵáŕð ƒŕóɱ ţĥé ɋúéšţ {quest}]",
       "sourceStore": "[Þúŕçĥášéð ƒŕóɱ ţĥé ŴÓÇ Šţóŕé]",
       "sourceActivityCorpseHarvest": "[Ŕéçóʋéŕéð ŵĥíļé ĥáŕʋéšţíñĝ çŕéáţúŕé çóŕþšéš]",

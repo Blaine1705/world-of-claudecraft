@@ -1406,18 +1406,25 @@ describe('ReliquaryWindow: search filtering', () => {
     expect(liveRegion(rig.el)?.textContent).toBe(announced);
   });
 
-  it('stamps data-cell-source with the plan COUNT on exactly the hinted cells', () => {
+  it('stamps data-cell-source with the RESOLVED line count on exactly the missing hinted cells', () => {
     // The PR shot picker selects on this attribute and now prefers the highest
-    // count (scripts/pr_shot_targets), so three things matter: present wherever
-    // a plan resolves, absent wherever the relic is a content gap, and carrying
-    // the real number in between. The mounts page ships both arms.
+    // count (scripts/pr_shot_targets), so four things matter: present wherever
+    // a plan resolves on a MISSING cell, absent wherever the relic is a
+    // content gap, absent on OWNED cells (whose tooltip paints no hunting
+    // directions, so a stamped count would promise lines that never render),
+    // and carrying the real number in between. The mounts page ships every
+    // arm once one hinted mount is owned.
     const page = RELIQUARY_PAGES_BY_ID[UNHINTED_PAGE_ID];
     expect(page, 'content premise: the mounts page exists').toBeTruthy();
-    const rig = openPage(baseState(), UNHINTED_PAGE_ID, 'horizons');
+    const ownedState = baseState();
+    const OWNED_HINTED_MOUNT = 'grag_bear';
+    ownedState.mounts = [OWNED_HINTED_MOUNT];
+    const rig = openPage(ownedState, UNHINTED_PAGE_ID, 'horizons');
     const grid = cells(rig.el);
     expect(grid.length).toBeGreaterThan(0);
     let withSource = 0;
     let withoutSource = 0;
+    let ownedSeen = 0;
     for (const node of grid) {
       const slot = node.dataset.cellId ?? '';
       const relic = page?.relics.find((r) => r.kind === 'mount' && r.mountId === slot);
@@ -1429,6 +1436,15 @@ describe('ReliquaryWindow: search filtering', () => {
       const lines = reliquarySourceLinePlan(hints, page?.clearSource)
         .map((plan) => reliquarySourceLineText(plan))
         .filter((line) => line !== '');
+      if (slot === OWNED_HINTED_MOUNT) {
+        // The owned arm: hints resolve (premise below), yet the cell carries
+        // no attribute, matching the tooltip that paints no source lines.
+        ownedSeen += 1;
+        expect(lines.length, 'premise: the owned mount is genuinely hinted').toBeGreaterThan(0);
+        expect(node.dataset.cellOwned, slot).toBe('1');
+        expect(node.hasAttribute('data-cell-source'), slot).toBe(false);
+        continue;
+      }
       if (lines.length > 0) withSource += 1;
       else withoutSource += 1;
       expect(node.hasAttribute('data-cell-source'), slot).toBe(lines.length > 0);
@@ -1438,8 +1454,9 @@ describe('ReliquaryWindow: search filtering', () => {
         lines.length > 0 ? String(lines.length) : undefined,
       );
     }
-    // Premise: the page really exercises both arms, and at least one cell is
+    // Premise: the page really exercises every arm, and at least one cell is
     // genuinely multi-source, so the count pin above is not all ones.
+    expect(ownedSeen).toBe(1);
     expect(withSource).toBeGreaterThan(0);
     expect(withoutSource).toBeGreaterThan(0);
     const counts = grid.map((node) => Number(node.dataset.cellSource ?? 0));

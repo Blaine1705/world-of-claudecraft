@@ -1131,6 +1131,39 @@ describe('Guide deeds cross-page surfaces', () => {
     }
   });
 
+  it('never leaks a boss personal name into the reliquary page beyond the catalog names', () => {
+    // The same withhold-the-name standard, extended to the newest public
+    // guide surface. The reliquary guide renders GENERATED catalog fields
+    // (page names and relic names), and some catalog names legitimately carry
+    // a boss name (the raid page IS 'Nythraxis Raid'), so those are derived
+    // as the allowed set rather than hand-listed; any boss personal name
+    // outside them (guide-authored prose, headings, future intro copy) is a
+    // leak, exactly like the dungeons page below.
+    setLanguage('en');
+    const html = reliquaryPage.render({
+      params: [],
+      sub: 'reliquary',
+      titleKey: 'guide.nav.reliquary',
+    });
+    const catalogText = GUIDE_RELIQUARY.map(
+      (page) => `${page.name} ${page.relics.map((r) => r.name).join(' ')}`,
+    ).join(' ');
+    let scanned = 0;
+    for (const boss of Object.values(MOBS).filter((m) => m.boss)) {
+      const personalName = boss.name.split(',')[0];
+      if (catalogText.includes(personalName)) continue;
+      scanned += 1;
+      expect(
+        html.includes(personalName),
+        `boss personal name "${personalName}" leaked into the reliquary page`,
+      ).toBe(false);
+    }
+    // Premise: the carve-out stays narrow; the scan still covers most bosses
+    // (19 today; only ones a catalog page or relic NAME carries are excused,
+    // e.g. the Nythraxis raid pages and the Staff of Velkhar).
+    expect(scanned).toBeGreaterThanOrEqual(15);
+  });
+
   it('never leaks a boss personal name into the dungeons page card copy', () => {
     // Regression pin: wildheartBody once named the Wildheart Basin boss outright
     // ("...to face Zulgar"), breaking with every sibling body's withhold-the-name

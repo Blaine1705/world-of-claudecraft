@@ -10007,7 +10007,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceVendor': '由{vendor}販售',
   'hudChrome.reliquary.sourceBossZone': '由{zone}的{boss}掉落',
   'hudChrome.reliquary.sourceDelve': '在秘探「{delve}」中獲得',
-  'hudChrome.reliquary.sourceRift': '通關 {rank} 級裂隙的獎勵',
+  'hudChrome.reliquary.sourceRift': '通關{rank}級裂隙時掉落',
   'hudChrome.reliquary.sourceQuest': '任務「{quest}」獎勵',
   'hudChrome.reliquary.sourceStore': '在 WOC 商店購買',
   'hudChrome.reliquary.sourceActivityCorpseHarvest': '採集生物屍體時獲得',

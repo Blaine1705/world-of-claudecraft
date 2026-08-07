@@ -7,6 +7,7 @@ import { DEEDS } from '../src/sim/content/deeds';
 import { MOUNTS } from '../src/sim/content/mounts';
 import type { ReliquaryPageDef, ReliquaryRelicDef } from '../src/sim/content/reliquary';
 import {
+  RELIQUARY_ACTIVITY_SOURCE_IDS,
   RELIQUARY_HORIZON_MOUNTS,
   RELIQUARY_MARK_IDS,
   RELIQUARY_PAGES,
@@ -1341,7 +1342,13 @@ describe('reliquarySourceLinePlan', () => {
   });
 
   it('answers the empty list with no hints (an un-authored source renders no line)', () => {
-    expect(reliquarySourceLinePlan([], { kind: 'dungeon', dungeonId: 'crypt' })).toEqual([]);
+    const empty = reliquarySourceLinePlan([], { kind: 'dungeon', dungeonId: 'crypt' });
+    expect(empty).toEqual([]);
+    // The shared frozen constant, same contract as the content resolver's
+    // NO_SOURCE_HINTS twin: the no-hints answer never allocates and a caller
+    // that mistook it for its own array cannot mutate it.
+    expect(Object.isFrozen(empty)).toBe(true);
+    expect(reliquarySourceLinePlan([], undefined)).toBe(empty);
   });
 
   it('renders one line per hint, in authored order, with no cap', () => {
@@ -1858,19 +1865,28 @@ describe('reliquarySourceLineText', () => {
     // The delve board and the quest log already own these names; the source
     // line reuses those channels rather than minting a third naming ladder.
     const delveId = Object.keys(DELVES)[0];
+    const delveName = tEntity({ kind: 'delve', id: delveId, field: 'name' });
+    // Premise per half: the channel resolved a REAL name (non-empty and not a
+    // raw-id echo), so the sentence pins below cannot vacuously agree with a
+    // production arm that degraded to echoing ids.
+    expect(delveName).not.toBe('');
+    expect(delveName).not.toBe(delveId);
     expect(reliquarySourceLineText({ kind: 'delve', delveId })).toBe(
-      `Found in the delve ${tEntity({ kind: 'delve', id: delveId, field: 'name' })}`,
+      `Found in the delve ${delveName}`,
     );
     const questId = 'q_gravewyrm';
     expect(QUESTS[questId], 'content premise: the quest is live').toBeDefined();
+    const questTitle = tEntity({ kind: 'quest', id: questId, field: 'title' });
+    expect(questTitle).not.toBe('');
+    expect(questTitle).not.toBe(questId);
     expect(reliquarySourceLineText({ kind: 'quest', questId })).toBe(
-      `Reward from the quest ${tEntity({ kind: 'quest', id: questId, field: 'title' })}`,
+      `Reward from the quest ${questTitle}`,
     );
   });
 
   it('names the Rift rank, the storefront, and each award activity', () => {
     expect(reliquarySourceLineText({ kind: 'rift', rank: 'S' })).toBe(
-      'Awarded for clearing S-rank Rifts',
+      'Drops from S-rank Rift clears',
     );
     expect(reliquarySourceLineText({ kind: 'store', storeId: RELIQUARY_STORE_SOURCE_ID })).toBe(
       'Purchased from the WOC Store',
@@ -1883,24 +1899,44 @@ describe('reliquarySourceLineText', () => {
     );
   });
 
-  it('pairs the rare with the zone it camps in, both halves or nothing', () => {
+  it('renders a line for EVERY pinned activity id (the key table cannot drift)', () => {
+    // ACTIVITY_SOURCE_KEYS in reliquary_labels.ts hand-maps each pinned
+    // activity id to its sentence key. A third id added to
+    // RELIQUARY_ACTIVITY_SOURCE_IDS without a key row would pass the
+    // membership guard and then render a silent no-line; this loop makes that
+    // drift loud at the moment the id list grows.
+    for (const activityId of RELIQUARY_ACTIVITY_SOURCE_IDS) {
+      expect(reliquarySourceLineText({ kind: 'activity', activityId }), activityId).not.toBe('');
+    }
+  });
+
+  it('pairs the rare with the zone it camps in, degrading to the surviving half', () => {
     const boss = tEntity({ kind: 'mob', id: 'korzul_the_gravewyrm', field: 'name' });
     const zoneId = ZONES[0].id;
     expect(
       reliquarySourceLineText({ kind: 'bossZone', bossId: 'korzul_the_gravewyrm', zoneId }),
     ).toBe(`Drops from ${boss} in ${zoneDisplayName(zoneId)}`);
-    // Either half missing drops the whole line, the bossDungeon rule: half a
-    // real sentence with one raw id in it reads as content.
+    // The composition consumed TWO authored hints, so ONE stale half degrades
+    // to the other half's own sentence (never a spliced raw id) rather than
+    // deleting a live, renderable door along with the dead one.
     expect(
       reliquarySourceLineText({
         kind: 'bossZone',
         bossId: 'korzul_the_gravewyrm',
         zoneId: 'no_such_zone',
       }),
-    ).toBe('');
+    ).toBe(`Drops from ${boss}`);
     expect(reliquarySourceLineText({ kind: 'bossZone', bossId: 'gorne_the_dread', zoneId })).toBe(
-      '',
+      `Found in ${zoneDisplayName(zoneId)}`,
     );
+    // Only both-stale drops the line entirely.
+    expect(
+      reliquarySourceLineText({
+        kind: 'bossZone',
+        bossId: 'gorne_the_dread',
+        zoneId: 'no_such_zone',
+      }),
+    ).toBe('');
   });
 
   it('drops the line for a fabricated id on every NEW arm too', () => {
@@ -1937,9 +1973,13 @@ describe('reliquarySourceLineText', () => {
     expect(reliquarySourceLineText({ kind: 'zone', zoneId: 'blackrock_hollow' })).toBe('');
     expect(reliquarySourceLineText({ kind: 'deed', deedId: 'col_no_such_deed' })).toBe('');
     expect(reliquarySourceLineText({ kind: 'vendor', npcId: 'merchant_nobody' })).toBe('');
-    // The two-name arm: EITHER half missing drops the line, so a real boss
-    // cannot smuggle a raw dungeon id in beside it (or the reverse).
+    // The two-name arm never splices a raw id, and it degrades asymmetrically
+    // on purpose: the boss is the relic's AUTHORED door, so a stale page
+    // dungeon falls back to the plain boss sentence; a stale boss drops the
+    // line outright rather than inventing a dungeon-only door the relic never
+    // authored.
     const realBoss = 'korzul_the_gravewyrm';
+    const realBossName = tEntity({ kind: 'mob', id: realBoss, field: 'name' });
     const realDungeon = Object.keys(DUNGEONS)[0];
     expect(
       reliquarySourceLineText({
@@ -1947,7 +1987,7 @@ describe('reliquarySourceLineText', () => {
         bossId: realBoss,
         dungeonId: 'blackrock_hollow',
       }),
-    ).toBe('');
+    ).toBe(`Drops from ${realBossName}`);
     expect(
       reliquarySourceLineText({
         kind: 'bossDungeon',
@@ -1985,8 +2025,9 @@ describe('reliquarySourceLineText', () => {
     }
     // Premise: the sweep really visited authored content, so a catalog that
     // stopped hinting anything could not pass this vacuously. Exact regime:
-    // 261 resolved lines measured today; update deliberately with authoring.
-    expect(checked).toBeGreaterThanOrEqual(261);
+    // 260 resolved lines measured today (down one when masterwork:engineering
+    // was pended, QA ruling 2026-08-07); update deliberately with authoring.
+    expect(checked).toBeGreaterThanOrEqual(260);
   });
 
   it('reliquarySourceLines drops the stale plan and keeps the live ones around it', () => {

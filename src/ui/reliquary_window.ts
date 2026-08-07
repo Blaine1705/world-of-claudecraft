@@ -821,6 +821,11 @@ export class ReliquaryWindow {
     // returns the full item tooltip below, and a player who already has it does
     // not need the hunting directions. Nothing extra renders when the lines all
     // resolve empty, exactly like the un-hinted arm.
+    //
+    // Agreement contract with cellHtml/cellAria: both sides derive from the
+    // same reliquarySourceLines(cell.sourcePlans) on the same cell object, so
+    // the aria fold and this loop cannot disagree on content or count. Any
+    // cap, filter, or dedup added here must land on the aria side too.
     if (!cell.owned) {
       for (const source of reliquarySourceLines(cell.sourcePlans)) {
         body += `<div class="tt-line">${esc(source)}</div>`;

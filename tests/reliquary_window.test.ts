@@ -535,9 +535,12 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
     expect(code).toContain('ownEntry(DUNGEONS, dungeonId)');
     expect(code).toContain('ownEntry(DEEDS, deedId)');
     expect(code).toContain('ZONE_IDS.has(zoneId)');
-    // The two-name arm needs BOTH halves or nothing: one raw id inside real
-    // prose is worse than no line.
-    expect(code).toMatch(/if \(boss === null \|\| dungeon === null\) return ''/);
+    // The two-name arm degrades to the surviving AUTHORED half rather than
+    // splicing a raw id: a stale page dungeon falls back to the plain boss
+    // sentence, and a stale boss drops the line outright (the dungeon is page
+    // context, not an authored door of the relic).
+    expect(code).toMatch(/if \(boss === null\) return ''/);
+    expect(code).toMatch(/if \(dungeon === null\) return t\('hudChrome\.reliquary\.sourceBoss'/);
   });
 
   it('composes each source-line arm through a t() key with named entity lookups', () => {
@@ -575,8 +578,11 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
     expect(code).toContain('RELIQUARY_RIFT_RANK_SOURCE_IDS');
     expect(code).toContain('RELIQUARY_ACTIVITY_SOURCE_IDS');
     expect(code).toContain('RELIQUARY_STORE_SOURCE_ID');
-    // The bossZone pair needs BOTH halves, the bossDungeon rule.
-    expect(code).toMatch(/if \(boss === null \|\| zone === null\) return ''/);
+    // The bossZone pair composes when both halves resolve, degrades to the
+    // surviving half's own sentence when one is stale (each half is an
+    // authored hint the composition consumed), and drops only on both-stale.
+    expect(code).toMatch(/if \(boss !== null\) return t\('hudChrome\.reliquary\.sourceBoss'/);
+    expect(code).toMatch(/if \(zone !== null\) return t\('hudChrome\.reliquary\.sourceZone'/);
     // The aria fold goes through the locale list formatter (Intl.ListFormat
     // via formatList), never a hardcoded separator or a bespoke join key.
     expect(code).toContain('formatList(lines)');
@@ -621,8 +627,11 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
       'filterEmpty',
       'gridKeyboardHint',
     ];
+    // Comment-stripped like every scrape in this file: a commented-out key or
+    // example fill line must never satisfy a presence or value pin.
+    const chromeCode = stripComments(chrome);
     for (const key of NEW_KEYS) {
-      expect(chrome, key).toContain(`${key}:`);
+      expect(chromeCode, key).toContain(`${key}:`);
     }
     // M16: a wordy new English value needs its non-Latin fills in the SAME
     // change. i18n_completeness only sees a leak once en and the locale are
@@ -634,7 +643,7 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
     // Count-neutral noun: this one line serves the grid (relics), the shelf
     // (pages), and Overview (mixed entries), so naming any noun is wrong twice.
     for (const leaf of PLURAL_LEAVES) {
-      expect(chrome, leaf).toMatch(new RegExp(`${leaf}: '\\{count\\} results?\\.'`));
+      expect(chromeCode, leaf).toMatch(new RegExp(`${leaf}: '\\{count\\} results?\\.'`));
     }
     // Reads a fill's VALUE, tolerating the line break biome inserts when a long
     // value wraps onto its own line. Key presence alone would pass on an empty
@@ -642,7 +651,7 @@ describe('shared relic display-name ladder (reliquary_labels.ts)', () => {
     const fillValue = (table: string, key: string): string | undefined =>
       table.match(new RegExp(`'${key.replace(/\./g, '\\.')}':\\s*\\n?\\s*'([^']*)'`))?.[1];
     for (const locale of ['ja_JP', 'ko_KR', 'ru_RU', 'zh_CN', 'zh_TW']) {
-      const table = read(`../src/ui/i18n.locales/${locale}.ts`);
+      const table = stripComments(read(`../src/ui/i18n.locales/${locale}.ts`));
       for (const key of NEW_KEYS) {
         const value = fillValue(table, `hudChrome.reliquary.${key}`);
         expect(typeof value, `${locale} ${key} missing`).toBe('string');
