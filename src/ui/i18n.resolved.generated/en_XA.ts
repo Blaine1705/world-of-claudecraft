@@ -2112,6 +2112,8 @@ export const en_XA: EnTranslations = {
       "showResource": "[Šĥóŵ Ɱáñá, Ŕáĝé, áñð Éñéŕĝý]",
       "showAbsorbs": "[Šĥóŵ Áƀšóŕƀ Šĥíéļðš]",
       "showAuras": "[Šĥóŵ Ɓúƒƒš áñð Ðéƀúƒƒš]",
+      "showPets": "[Šĥóŵ Þéţš]",
+      "petHealth": "[Þéţ {name}, {pct} ĥéáļţĥ]",
       "showSelf": "[Šĥóŵ Ýóúŕ Ƒŕáɱé]"
     },
     "frameReset": {

@@ -2112,6 +2112,8 @@ export const nl_NL: EnTranslations = {
       "showResource": "Mana, woede en energie tonen",
       "showAbsorbs": "Absorptieschilden tonen",
       "showAuras": "Versterkingen en verzwakkingen tonen",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Je eigen frame tonen"
     },
     "frameReset": {

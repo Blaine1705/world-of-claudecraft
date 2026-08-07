@@ -2112,6 +2112,8 @@ export const da_DK: EnTranslations = {
       "showResource": "Vis mana, raseri og energi",
       "showAbsorbs": "Vis absorberingsskjolde",
       "showAuras": "Vis styrkelser og svækkelser",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Vis din ramme"
     },
     "frameReset": {

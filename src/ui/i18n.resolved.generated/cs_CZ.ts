@@ -2112,6 +2112,8 @@ export const cs_CZ: EnTranslations = {
       "showResource": "Zobrazit manu, vztek a energii",
       "showAbsorbs": "Zobrazit absorpční štíty",
       "showAuras": "Zobrazit posílení a oslabení",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Zobrazit vlastní rámeček"
     },
     "frameReset": {

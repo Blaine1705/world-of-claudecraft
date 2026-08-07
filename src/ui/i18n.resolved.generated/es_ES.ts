@@ -2112,6 +2112,8 @@ export const es_ES: EnTranslations = {
       "showResource": "Mostrar maná, ira y energía",
       "showAbsorbs": "Mostrar escudos de absorción",
       "showAuras": "Mostrar beneficios y perjuicios",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Mostrar tu marco"
     },
     "frameReset": {

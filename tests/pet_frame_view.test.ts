@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   DELVE_COMPANION_TEMPLATE_IDS,
   findOwnPet,
+  findPetsByOwner,
   type PetFrameUnit,
   petFrameDescriptorInto,
 } from '../src/ui/pet_frame_view';
@@ -163,5 +164,48 @@ describe('petFrameDescriptorInto', () => {
     const a = { ...petFrameDescriptorInto(blankDescriptor(), pet, 'Dead') };
     const b = { ...petFrameDescriptorInto(blankDescriptor(), pet, 'Dead') };
     expect(a).toEqual(b);
+  });
+});
+
+describe('findPetsByOwner', () => {
+  it('keys each pet by its OWNER entity id, which is the party member pid', () => {
+    const map = findPetsByOwner([unit({ id: 50, ownerId: 7 }), unit({ id: 51, ownerId: 9 })]);
+    expect(map.get(7)?.id).toBe(50);
+    expect(map.get(9)?.id).toBe(51);
+  });
+
+  it('carries the health the sliver paints and the id its click targets', () => {
+    const map = findPetsByOwner([unit({ id: 50, ownerId: 7, hp: 12, maxHp: 40, name: 'Fang' })]);
+    expect(map.get(7)).toEqual({ id: 50, name: 'Fang', hp: 12, maxHp: 40, dead: false });
+  });
+
+  it('skips wild mobs, which have no owner at all', () => {
+    expect(findPetsByOwner([unit({ ownerId: null })]).size).toBe(0);
+  });
+
+  it('skips non-mob entities even when they carry an ownerId', () => {
+    expect(findPetsByOwner([unit({ kind: 'player', ownerId: 7 })]).size).toBe(0);
+  });
+
+  it('excludes delve companions, matching findOwnPet', () => {
+    const map = findPetsByOwner([unit({ ownerId: 7, templateId: COMPANION_TEMPLATE })]);
+    expect(map.size).toBe(0);
+  });
+
+  it('keeps the real pet when a companion shares the owner', () => {
+    const map = findPetsByOwner([
+      unit({ id: 4, ownerId: 7, templateId: COMPANION_TEMPLATE }),
+      unit({ id: 5, ownerId: 7, templateId: 'wolf' }),
+    ]);
+    expect(map.get(7)?.id).toBe(5);
+  });
+
+  it('keeps a DEAD pet, so a party row can still show and select the corpse', () => {
+    const map = findPetsByOwner([unit({ ownerId: 7, dead: true, hp: 0 })]);
+    expect(map.get(7)?.dead).toBe(true);
+  });
+
+  it('returns an empty map for an empty roster', () => {
+    expect(findPetsByOwner([]).size).toBe(0);
   });
 });

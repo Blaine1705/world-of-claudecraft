@@ -2112,6 +2112,8 @@ export const tr_TR: EnTranslations = {
       "showResource": "Mana, Öfke ve Enerjiyi Göster",
       "showAbsorbs": "Soğurma Kalkanlarını Göster",
       "showAuras": "Güçlendirmeleri ve Zayıflatmaları Göster",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Kendi Çerçeveni Göster"
     },
     "frameReset": {

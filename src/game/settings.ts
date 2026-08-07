@@ -246,6 +246,11 @@ export const BOOL_SETTINGS = {
   partyFrameShowResource: { def: true },
   partyFrameShowAbsorbs: { def: true },
   partyFrameShowAuras: { def: true },
+  // on by default: a thin pet health sliver on the row of any party member who has a
+  // pet out (hunter / warlock / mage). The pet is read from the client's own entity
+  // roster, so it appears only for pets in interest range, which is far wider than
+  // any ability's reach. Clicking the sliver selects that pet.
+  partyFrameShowPets: { def: true },
   partyFrameShowSelf: { def: false },
 
   // --- Interface & Comfort pack (booleans). ---

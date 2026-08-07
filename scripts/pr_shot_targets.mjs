@@ -3484,6 +3484,108 @@ export const TARGETS = [
     },
   },
   {
+    key: 'party-pets',
+    label: 'Party frames: pet health slivers on the rows of members with pets',
+    when: ['party_frame_row', 'party_frames.ts'],
+    variants: [
+      { key: 'desktop', charClass: 'priest', charName: 'Lumina' },
+      { key: 'mobile', charClass: 'priest', charName: 'Lumina', mobile: true },
+    ],
+    // A mixed party staged on the PartyMachine (same recipe as the class-color
+    // target below), deliberately mixing pet classes with a petless one so the shot
+    // shows both a row that grows a sliver and a row that does not. The local player
+    // is the PETLESS priest, so every sliver in frame belongs to somebody else,
+    // which is the case this change is actually about.
+    async capture(page, variant) {
+      // Party rows are ~170px wide, so a native-resolution clip of them is a
+      // postage stamp and the sliver (5px tall) is unreadable in review. Render the
+      // desktop shot at 2x device pixels: same layout and same CSS pixel geometry,
+      // just a crisper PNG. Mobile already runs at deviceScaleFactor 2.
+      if (!variant?.mobile) {
+        const vp = page.viewport() ?? { width: 1600, height: 900 };
+        await page.setViewport({ ...vp, deviceScaleFactor: 2 });
+      }
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const me = sim.primaryId;
+        const p = sim.player;
+        const pm = sim.party;
+        const roster = [
+          ['Rhoswen', 'hunter', 'forest_wolf'],
+          ['Nyxaris', 'warlock', 'emberkin'],
+          ['Thorgar', 'warrior', null],
+        ];
+        const pids = roster.map(([name, cls, pet], i) => {
+          const pid = sim.addPlayer(cls, name);
+          const e = sim.entities.get(pid);
+          if (e) {
+            e.pos = { x: p.pos.x + (i % 4) * 2 - 3, y: p.pos.y, z: p.pos.z + 2 };
+            e.prevPos = { ...e.pos };
+            if (pet) {
+              try {
+                sim.summonPet(e, pet);
+              } catch {}
+            }
+          }
+          return pid;
+        });
+        const party = {
+          id: pm.nextPartyId++,
+          leader: me,
+          members: [me, ...pids],
+          raid: false,
+          raidGroups: new Map(),
+          lootStrategies: {},
+        };
+        pm.parties.set(party.id, party);
+        pm.partyByPid.set(me, party.id);
+        for (const q of pids) pm.partyByPid.set(q, party.id);
+      });
+      await wait(1500);
+      // Damage each staged pet to a different fraction: a row of bars all pinned at
+      // full cannot show that the sliver tracks anything.
+      await page.evaluate(() => {
+        const sim = window.__game.sim;
+        const fracs = [0.42, 0.71];
+        let i = 0;
+        for (const e of sim.entities.values()) {
+          if (e.kind === 'mob' && e.ownerId !== null && e.ownerId !== sim.primaryId) {
+            e.hp = Math.max(1, Math.round(e.maxHp * (fracs[i % fracs.length] ?? 0.5)));
+            i++;
+          }
+        }
+        const banner = document.querySelector('#banner');
+        if (banner) banner.style.opacity = '0';
+        // Becoming party leader auto-opens Loot Settings, which sits over the party
+        // frames. The id here is the REAL one: an earlier '#party-loot-settings'
+        // matched nothing in the repo, so the hide was a silent no-op and the panel
+        // covered the very rows this target exists to show.
+        const loot = document.querySelector('#loot-settings-window');
+        if (loot) loot.style.display = 'none';
+      });
+      // Mobile party frames default to COLLAPSED (party_collapse.ts: anything but a
+      // stored '0' collapses), so without expanding them the mobile shot has no rows
+      // in it at all and cannot show the sliver. Expand via the real chip control.
+      if (variant?.mobile) {
+        await page.evaluate(() => {
+          const rowsVisible = () => {
+            const w = document.querySelector('.party-rows');
+            return !!w && getComputedStyle(w).display !== 'none' && w.childNodes.length > 0;
+          };
+          if (rowsVisible()) return;
+          document
+            .querySelector('#party-chip')
+            ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        });
+        await wait(600);
+      }
+      await wait(800);
+      return variant?.mobile ? {} : { clip: '#party-frames' };
+    },
+  },
+  {
     key: 'char-window',
     label: 'Character window',
     when: ['ui/char_window', 'ui/char_view', 'ui/stat_tooltip_view'],
