@@ -81,7 +81,7 @@ export const WARLOCK_PET_MOBS: Record<string, MobTemplate> = {
     hpBase: 130,
     hpPerLevel: 42,
     dmgBase: 10,
-    dmgPerLevel: 2.6,
+    dmgPerLevel: 2.2,
     attackSpeed: 2.8,
     armorPerLevel: 55,
     moveSpeed: 4.8,

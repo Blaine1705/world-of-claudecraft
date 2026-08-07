@@ -268,7 +268,7 @@ describe('Necromancy Warlock', () => {
           rank: 3,
           level: 20,
           cost: 65,
-          effects: [{ type: 'directDamage', min: 85, max: 101 }],
+          effects: [{ type: 'directDamage', min: 80, max: 95 }],
         },
       ],
     });
@@ -297,7 +297,7 @@ describe('Necromancy Warlock', () => {
       level: 20,
       cost: 55,
       effects: [
-        { type: 'directDamage', min: 58, max: 72 },
+        { type: 'directDamage', min: 44, max: 55 },
         { type: 'gainSoulFragments', amount: 1 },
       ],
     });
@@ -1013,7 +1013,7 @@ describe('Necromancy Warlock', () => {
       duration: 6,
     });
     expect(MOBS.necromancy_gravewing.dmgBase).toBe(2);
-    expect(MOBS.necromancy_gravewing.dmgPerLevel).toBe(1.405);
+    expect(MOBS.necromancy_gravewing.dmgPerLevel).toBe(1.25);
     expect(MOBS.necromancy_gravewing.petCleave).toEqual({
       radius: 5,
       mult: 0.65,

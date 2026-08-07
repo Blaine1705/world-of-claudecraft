@@ -235,13 +235,13 @@ describe('destruction progression', () => {
       castTime: 2.5,
       cooldown: 0,
       ruinCost: 3,
-      effects: [{ type: 'directDamage', min: 200, max: 245 }],
+      effects: [{ type: 'directDamage', min: 192, max: 235 }],
     });
     expect(ABILITIES.shadow_bolt.effects).toEqual([{ type: 'directDamage', min: 36, max: 50 }]);
     expect(ABILITIES.shadow_bolt.ranks?.map((rank) => rank.effects)).toEqual([
       [{ type: 'directDamage', min: 67, max: 87 }],
       [{ type: 'directDamage', min: 118, max: 148 }],
-      [{ type: 'directDamage', min: 130, max: 162 }],
+      [{ type: 'directDamage', min: 126, max: 156 }],
     ]);
     expect(ABILITIES.immolate.effects).toEqual([
       { type: 'directDamage', min: 31, max: 31 },
@@ -253,13 +253,13 @@ describe('destruction progression', () => {
         { type: 'dot', total: 98, duration: 15, interval: 3 },
       ],
       [
-        { type: 'directDamage', min: 73, max: 73 },
+        { type: 'directDamage', min: 70, max: 70 },
         { type: 'dot', total: 100, duration: 15, interval: 3 },
       ],
     ]);
     expect(ABILITIES.conflagrate.effects).toEqual([
       { type: 'destructionConflagrate' },
-      { type: 'directDamage', min: 140, max: 165 },
+      { type: 'directDamage', min: 118, max: 140 },
     ]);
     expect(ABILITIES.summon_infernal).toMatchObject({
       castTime: 0,
@@ -1016,7 +1016,7 @@ describe('Pyre Colossus', () => {
     expect(
       pulses.filter((event) => event.type === 'damage' && event.targetId === friendly.id),
     ).toHaveLength(0);
-    expect(pulses.every((event) => event.type === 'damage' && event.amount === 84)).toBe(true);
+    expect(pulses.every((event) => event.type === 'damage' && event.amount === 60)).toBe(true);
     expect(ruinAmount(p)).toBe(4);
   });
 

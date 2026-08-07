@@ -4678,7 +4678,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 80,
         castTime: 3.0,
-        effects: [{ type: 'directDamage', min: 130, max: 162 }],
+        effects: [{ type: 'directDamage', min: 126, max: 156 }],
       },
     ],
     description: 'Sends a shadowy bolt at the enemy for $d Shadow damage.',
@@ -4742,7 +4742,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 16,
         cost: 60,
         effects: [
-          { type: 'directDamage', min: 73, max: 73 },
+          { type: 'directDamage', min: 70, max: 70 },
           { type: 'dot', total: 100, duration: 15, interval: 3 },
         ],
       },
@@ -4892,7 +4892,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         rank: 3,
         level: 20,
         cost: 65,
-        effects: [{ type: 'directDamage', min: 85, max: 101 }],
+        effects: [{ type: 'directDamage', min: 80, max: 95 }],
       },
     ],
     description:
@@ -5188,7 +5188,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
         level: 20,
         cost: 55,
         effects: [
-          { type: 'directDamage', min: 58, max: 72 },
+          { type: 'directDamage', min: 44, max: 55 },
           { type: 'gainSoulFragments', amount: 1 },
         ],
       },
@@ -6844,7 +6844,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'fire',
     requiresTarget: true,
-    effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 140, max: 165 }],
+    effects: [{ type: 'destructionConflagrate' }, { type: 'directDamage', min: 118, max: 140 }],
     description:
       'Advances one future tick of your Burning Pact, then ignites the target for $d Fire damage. Generates 1 Ruin and 1 Desolation. Holds 2 charges. (Destruction signature)',
   },
