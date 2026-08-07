@@ -531,24 +531,65 @@ export const TARGETS = [
     },
   },
   {
-    key: 'stun-stars',
-    label: 'Persistent stunned-star band over a stunned mob, past the cast moment',
-    // One token, and it covers the whole shipping surface: the band lives in
+    key: 'cc-bands',
+    label: 'Held crowd-control bands (stun, root, fear) worn past the cast moment',
+    // One token, and it covers the whole shipping surface: the bands live in
     // 'render/ability_vfx_core.ts' plus 'render/ability_vfx/{fx,painter,
     // sequencer}.ts', all of which this prefix matches. (An earlier
     // 'stun_stars' token named no shipping module at all, so it only ever
     // matched the test file.)
     when: ['render/ability_vfx'],
     variants: [
-      // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
-      // capture pipeline spends ~0.7s between the aura poll and the shutter,
-      // and the star alpha fades over the stun's final second, so the longer
-      // stun is what keeps the shot inside the full-alpha read.
+      // One variant per band type, each staged on a class that actually owns
+      // the ability. `level` is the ability's own learn level (the rank the
+      // duration below refers to), `auraKind`/`auraId` are exactly what the
+      // band rule keys off, and `settleMs` is how long past the aura landing
+      // the shutter waits.
+      //
+      // settleMs is set per variant against ONE constraint: land inside the
+      // band's full-alpha read (the alpha fades over the aura's final second)
+      // while clearing the sequencer's cast-moment burst (~1.8s). The capture
+      // pipeline spends another ~0.7s between the aura poll and the shutter.
       {
+        // Sundering Gavel rank 2 (4s stun) rather than Storm Bolt (3s): the
+        // longer stun is what keeps the shot inside the full-alpha read.
         key: 'sundering-gavel-desktop',
         charClass: 'paladin',
         charName: 'Aurelius',
         abilityId: 'hammer_of_justice',
+        level: 16,
+        auraKind: 'stun',
+        settleMs: 1900,
+      },
+      {
+        // Gripping Roots: 12s, the longest of the three, so the ankle band
+        // sits at full alpha with room to spare.
+        key: 'gripping-roots-desktop',
+        charClass: 'druid',
+        charName: 'Brambleward',
+        abilityId: 'entangling_roots',
+        level: 8,
+        auraKind: 'root',
+        settleMs: 1900,
+      },
+      {
+        // Harrow: 8s. A feared mob RUNS, which is the one framing problem in
+        // this family, so the shutter comes down sooner than the other two
+        // rather than chasing it out of frame. That is safe here precisely
+        // because of the handoff this change adds: the held band stands the
+        // cast-moment stars down as soon as it wins a slot, so what is on
+        // screen at 1.1s is already the violet band and not the yellow burst.
+        // (On the BEFORE side of the pair the same moment shows the yellow
+        // stun stars this archetype flashed for every control ability, which
+        // is the misread the band replaces.)
+        key: 'harrow-desktop',
+        charClass: 'warlock',
+        charName: 'Vexmoor',
+        abilityId: 'fear',
+        level: 14,
+        auraKind: 'incapacitate',
+        auraId: 'fear_incap',
+        settleMs: 1100,
       },
     ],
     async capture(page, variant) {
@@ -569,11 +610,11 @@ export const TARGETS = [
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
-      // Stage: level to the Gavel rank 2 learn level, stand a durable mob in
+      // Stage: level to the ability's learn level, stand a durable mob in
       // front of the player (pumped hp so stray aggro damage cannot kill it:
-      // the shot needs the mob ALIVE and stunned), and arm the ability on
-      // slot 1. The stun itself is applied by the real cast click below,
-      // never injected.
+      // the shot needs the mob ALIVE and controlled), and arm the ability on
+      // slot 1. The control aura itself is applied by the real cast click
+      // below, never injected.
       const staged = await page.evaluate((shot) => {
         // The entry overlays can race the shared dismissal on a cold profile;
         // clear them here too (the bags-target idiom) so they cannot sit over
@@ -584,7 +625,7 @@ export const TARGETS = [
         const sim = game?.sim;
         const player = sim?.player;
         if (!game || !sim || !player) return { ok: false, reason: 'offline world is unavailable' };
-        sim.setPlayerLevel?.(16, player.id);
+        sim.setPlayerLevel?.(shot.level, player.id);
         player.resource = player.maxResource;
         let mob = null;
         let best = Infinity;
@@ -623,9 +664,10 @@ export const TARGETS = [
       await wait(5200);
 
       // Exercise the same click a player uses; poll the MOB's auras for the
-      // worn stun (kind, not id: exactly what the star band keys off).
-      let stunApplied = false;
-      for (let attempt = 0; attempt < 2 && !stunApplied; attempt++) {
+      // worn control aura (the kind, plus the shared fear id where the kind
+      // alone does not say fear: exactly what the band rule keys off).
+      let ccApplied = false;
+      for (let attempt = 0; attempt < 2 && !ccApplied; attempt++) {
         const clicked = await page.evaluate(
           (shot) => {
             document.querySelector('.camera-prompt-confirm')?.click();
@@ -639,7 +681,9 @@ export const TARGETS = [
             // The banner wait gave the mob seconds to drift: re-place it just
             // before the click, at melee-cast range and nudged off the facing
             // axis so the player's own rig cannot occlude it, and pull the
-            // chase camera in so the star band reads at PR-screenshot size.
+            // chase camera in so the band reads at PR-screenshot size. Melee
+            // range suits the ranged casts here too (Gripping Roots is 30 yd,
+            // Harrow 20 yd), and it is what keeps the ankle band legible.
             game.input.camDist = 6;
             mob.pos.x = player.pos.x + Math.sin(player.facing + 0.5) * 4.5;
             mob.pos.z = player.pos.z + Math.cos(player.facing + 0.5) * 4.5;
@@ -660,22 +704,25 @@ export const TARGETS = [
           { ...variant, mobId: staged.mobId },
         );
         if (!clicked) throw new Error('primary action slot 1 is unavailable');
-        for (let poll = 0; poll < 24 && !stunApplied; poll++) {
+        for (let poll = 0; poll < 24 && !ccApplied; poll++) {
           await wait(200);
-          stunApplied = await page.evaluate(
-            (mobId) =>
-              !!window.__game?.sim?.entities?.get(mobId)?.auras.some((a) => a.kind === 'stun'),
-            staged.mobId,
+          ccApplied = await page.evaluate(
+            (shot) =>
+              !!window.__game?.sim?.entities
+                ?.get(shot.mobId)
+                ?.auras.some(
+                  (a) => a.kind === shot.auraKind && (!shot.auraId || a.id === shot.auraId),
+                ),
+            { ...variant, mobId: staged.mobId },
           );
         }
       }
-      if (!stunApplied) throw new Error('stun aura never applied to the mob');
+      if (!ccApplied) throw new Error(`${variant.auraKind} aura never applied to the mob`);
 
-      // Shoot PAST the sequencer's cast-moment stars (~1.8s): with the
-      // runner's own shot overhead (~0.7s) the shutter lands around 2.5s in,
-      // where what remains on screen is exactly the held, aura-driven band
-      // this change adds, and the before side of the pair shows nothing.
-      await wait(1900);
+      // Settle past the sequencer's cast-moment burst (see settleMs on each
+      // variant): what remains on screen is the held, aura-driven band this
+      // change adds.
+      await wait(variant.settleMs);
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
