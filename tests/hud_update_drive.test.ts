@@ -1020,6 +1020,14 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'closes the heroic vendor window out of range',
   },
   {
+    call: 'this.closeWarfareVendor',
+    band: 'medium',
+    gate: 'this.openWarfareVendorNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
+    surface: 'window',
+    guard: { kind: 'callsite' },
+    why: 'closes the WARFARE quartermaster shop out of range',
+  },
+  {
     call: 'this.closeTrain',
     band: 'medium',
     gate: 'this.openTrainNpcId !== null && (!npc || dist2d(p.pos, npc.pos) > NPC_WINDOW_CLOSE_RANGE)',
@@ -1472,7 +1480,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(
       bySurface,
       "the surface split moved. A new call needs its surface decided; a CHANGED one means a repaint was reclassified, which is the one edit that can quietly drop a window row's invalidation guard.",
-    ).toEqual({ window: 43, chrome: 75, none: 16 });
+    ).toEqual({ window: 44, chrome: 75, none: 16 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1486,7 +1494,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
     expect(byKind, 'a guard kind changed: say why in the PR, not only in the table').toEqual({
       module: 22,
       hud: 6,
-      callsite: 11,
+      callsite: 12,
       none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never

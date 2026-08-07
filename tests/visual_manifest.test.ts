@@ -25,6 +25,7 @@ function expectedClipNames(clips: ClipMap): string[] {
     clips.sitDown,
     clips.sitIdle,
     clips.swim,
+    clips.swimSurface,
     clips.jump,
     clips.walkBack,
     clips.flourish,
@@ -32,6 +33,20 @@ function expectedClipNames(clips: ClipMap): string[] {
     ...(clips.hit ?? []),
     ...Object.values(clips.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((name): name is string => !!name);
+}
+
+/** Every clip a def can actually resolve: its own GLB PLUS any animUrls layered
+ *  onto it (assets.ts prepareVisual merges both into one clip map, which is how
+ *  the hunter gets its bow draw and every player body gets the swim strokes). */
+async function loadableClipNames(visual: {
+  url: string;
+  animUrls?: readonly string[];
+}): Promise<Set<string>> {
+  const names = new Set<string>();
+  for (const url of [visual.url, ...(visual.animUrls ?? [])]) {
+    for (const name of await glbAnimationNames(`public/${url}`)) names.add(name);
+  }
+  return names;
 }
 
 async function glbAnimationNames(path: string): Promise<Set<string>> {
@@ -134,7 +149,7 @@ describe('character visual manifest', () => {
     expect(visual.clips.cast).toBe('Channel');
     expect(visual.clips.attack).toEqual(['Cast']);
 
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
     expect(animationNames.size).toBeGreaterThan(0);
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
@@ -143,7 +158,7 @@ describe('character visual manifest', () => {
 
   it('points the Combat Mech manifest at animation clips baked into the GLB', async () => {
     const visual = VISUALS.player_mech;
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
 
     expect(animationNames.size).toBeGreaterThan(0);
     expect(
@@ -160,10 +175,14 @@ describe('character visual manifest', () => {
     // (scripts/_add_dirt_throw_anim.mjs); neither is a dagger swing.
     expect(visual.clips.attackByAbility?.kick).toBe('Kick_A');
     expect(visual.clips.attackByAbility?.blind).toBe('Dirt_Throw');
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
-    expect(animationNames.has('Garrote_Choke')).toBe(true);
-    expect(animationNames.has('Kick_A')).toBe(true);
-    expect(animationNames.has('Dirt_Throw')).toBe(true);
+    // The bespoke one-shots live in the rogue GLB itself...
+    const rogueGlbNames = await glbAnimationNames(`public/${visual.url}`);
+    expect(rogueGlbNames.has('Garrote_Choke')).toBe(true);
+    expect(rogueGlbNames.has('Kick_A')).toBe(true);
+    expect(rogueGlbNames.has('Dirt_Throw')).toBe(true);
+    // ...but full clip coverage must include the layered animUrls (the shared
+    // swim strokes ride in swim_anims.glb, not in any class body).
+    const animationNames = await loadableClipNames(visual);
     expect(
       [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
     ).toEqual([]);
@@ -171,7 +190,7 @@ describe('character visual manifest', () => {
 
   it('points the Stone Cantor manifest at clips present in the GLB (including the synthesized Hit)', async () => {
     const visual = VISUALS.mob_reedbound_acolyte;
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
 
     expect(animationNames.size).toBeGreaterThan(0);
     expect(
@@ -181,7 +200,7 @@ describe('character visual manifest', () => {
 
   it('points the training dummy manifest at clips present in the GLB, with cast/jump deliberately absent', async () => {
     const visual = VISUALS.mob_training_dummy;
-    const animationNames = await glbAnimationNames(`public/${visual.url}`);
+    const animationNames = await loadableClipNames(visual);
 
     expect(animationNames.size).toBeGreaterThan(0);
     expect(

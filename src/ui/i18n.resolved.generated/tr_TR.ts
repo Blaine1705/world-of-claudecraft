@@ -775,6 +775,10 @@ export const tr_TR: EnTranslations = {
       "ready": "Vuruş",
       "seconds": "{seconds}sn"
     },
+    "breath": {
+      "label": "Nefes",
+      "drowning": "Boğuluyorsun!"
+    },
     "rest": {
       "resting": "Dinleniyor"
     },
@@ -955,6 +959,7 @@ export const tr_TR: EnTranslations = {
       "valecup": "Vadi Kupası",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Silahı Kın'a Tak / Çıkar",
+      "dive": "Swim Down",
       "categoryPet": "Yoldaş",
       "petAttack": "Yoldaş: Saldır",
       "petStop": "Yoldaş: Dur",
@@ -1331,6 +1336,7 @@ export const tr_TR: EnTranslations = {
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
       "showPetFrame": "Yoldaşını Göster",
+      "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
@@ -1526,6 +1532,16 @@ export const tr_TR: EnTranslations = {
         "assist": "Assist",
         "firstWin": "First Win"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
+      "jewelry": "Jewelry",
+      "weapons": "Weapons",
+      "owned": "Owned",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "Buy {item} for {honor}, already owned",
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Saldırı",
@@ -2112,6 +2128,8 @@ export const tr_TR: EnTranslations = {
       "showResource": "Mana, Öfke ve Enerjiyi Göster",
       "showAbsorbs": "Soğurma Kalkanlarını Göster",
       "showAuras": "Güçlendirmeleri ve Zayıflatmaları Göster",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Kendi Çerçeveni Göster"
     },
     "frameReset": {
@@ -2457,6 +2475,8 @@ export const tr_TR: EnTranslations = {
       "guildOpenAccept": "Aç",
       "guildOpenNote": "Lonca hazinesinden değil, kendi paranından ödenir",
       "guildPurseShort": "Yeterli para yok",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Kilitli eşyalar çekilemez ve loncanın dağıtılmasını engeller.",
       "guildDormantHint": "Bu eşya lonca bankasında kilitli ve çekilemez.",
       "guildDormantAria": "{item}, adet {count}, çekilemez",
@@ -2471,7 +2491,7 @@ export const tr_TR: EnTranslations = {
       "logNote": "En son {count} lonca bankası işlemi.",
       "logLoading": "Lonca bankası günlüğü yükleniyor...",
       "logEmpty": "Lonca bankasına henüz bir şey girmedi ya da çıkmadı.",
-      "logRefused": "Lonca bankası günlüğünü yalnızca subaylar okuyabilir.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Eski bir lonca üyesi",
       "logDepositItem": "{actor}, {count} {item} yatırdı",
       "logWithdrawItem": "{actor}, {count} {item} çekti",
@@ -9585,6 +9605,27 @@ export const tr_TR: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Cinderweave Terlik"
       },
+      "thornhide_headdress": {
+        "name": "Thornhide Headdress"
+      },
+      "thornhide_mantle": {
+        "name": "Thornhide Mantle"
+      },
+      "thornhide_vestment": {
+        "name": "Thornhide Vestment"
+      },
+      "thornhide_cinch": {
+        "name": "Thornhide Cinch"
+      },
+      "thornhide_leggings": {
+        "name": "Thornhide Leggings"
+      },
+      "thornhide_gloves": {
+        "name": "Thornhide Gloves"
+      },
+      "thornhide_boots": {
+        "name": "Thornhide Boots"
+      },
       "final_oath_medallion": {
         "name": "Son Yemin Madalyonu"
       },
@@ -11931,6 +11972,11 @@ export const tr_TR: EnTranslations = {
         "name": "ÖFKE",
         "title": "Onur Malzeme Sorumlusu",
         "greeting": "Kumlar her zaferi hatırlar. Onurunu iyi harca."
+      },
+      "warmarshal_draven_kole": {
+        "name": "Warmarshal Draven Kole",
+        "title": "Master of the Warfare Stores",
+        "greeting": "Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one."
       },
       "loremaster_caddis": {
         "name": "İrfan Ustası Caddis",
@@ -15063,6 +15109,36 @@ export const tr_TR: EnTranslations = {
       "vale_arcanist": {
         "name": "Vadi Arkanisti giysileri",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
+      },
+      "warfare_ashstalker": {
+        "name": "Ashstalker Kit",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+      },
+      "warfare_cinderweave": {
+        "name": "Cinderweave Regalia",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_furyforged": {
+        "name": "Furyforged Battlegear",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+      },
+      "warfare_stormbound": {
+        "name": "Stormbound Vestments",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_thornhide": {
+        "name": "Thornhide Garb",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Nightfang Cübbeleri",

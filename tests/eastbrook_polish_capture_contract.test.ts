@@ -73,7 +73,7 @@ interface AttributionTargetFixture {
 // on top of the bow-aim renderer edit the release landed after the revert.
 // No Eastbrook input, geometry value, or capture moved.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c1382022e845ac58940cb1bed2b0c2d52cd316b3fcc3c1efcfeac3336a582d4a';
+  '74725f312d51e75c0dc19989cd1b1df6bb73ceea4a1474dd61079dd9971b2b70';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

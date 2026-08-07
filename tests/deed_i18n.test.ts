@@ -50,8 +50,8 @@ describe('deed_i18n English resolution', () => {
     // (dgn_rift, dgn_rift_s_rank), the seven per-craft rare-tier profession
     // deeds, and the twelve remaining starter-zone chronicle pairs, none of
     // which carry a title reward.
-    expect(manifest.length).toBe(259 * 2 + 31);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(31);
+    expect(manifest.length).toBe(262 * 2 + 34);
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(34);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',

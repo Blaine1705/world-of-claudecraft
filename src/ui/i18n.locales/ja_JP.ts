@@ -623,6 +623,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': 'マナ・怒り・エネルギーを表示',
   'hudChrome.partyFrames.showAbsorbs': '吸収シールドを表示',
   'hudChrome.partyFrames.showAuras': 'バフとデバフを表示',
+  'hudChrome.partyFrames.petHealth': 'ペット{name}、体力{pct}',
   'hudChrome.partyFrames.showSelf': '自分のフレームを表示',
   'hudChrome.frameReset.label': 'フレーム位置をリセット',
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',
@@ -867,6 +868,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '撃破',
   'hudChrome.warfare.floatReasons.assist': 'アシスト',
   'hudChrome.warfare.floatReasons.firstWin': '初勝利',
+  'hudChrome.warfareShop.gossipOption': 'ウォーフェアセットを見る',
+  'hudChrome.warfareShop.gossipOptionAria': '{name}のウォーフェアセット商店を見る',
+  'hudChrome.warfareShop.jewelry': 'アクセサリー',
+  'hudChrome.warfareShop.weapons': '武器',
+  'hudChrome.warfareShop.owned': '所有済み',
+  'hudChrome.warfareShop.buyOwnedAria': '{item}を{honor}で購入、所有済み',
+  'hudChrome.warfareShop.buyConfirmBody':
+    '{item}を{honor}で購入しますか？名誉での購入は返金できません。',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': 'ソーンホロウ平原',
@@ -7494,6 +7503,36 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。',
   'entities.itemSets.vale_arcanist.name': '谷の秘術師の装束',
   'entities.itemSets.vale_arcanist.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
+  'entities.itemSets.warfare_ashstalker.name': 'アッシュストーカーの装備',
+  'entities.itemSets.warfare_ashstalker.bonus2': 'ウォーフェア防御レーティングが40上昇します。',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    'ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    'ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アッシェンステップ」が発動し、6秒間、移動速度が40%上昇します。',
+  'entities.itemSets.warfare_cinderweave.name': 'シンダーウィーヴの法衣',
+  'entities.itemSets.warfare_cinderweave.bonus2': 'ウォーフェア防御レーティングが40上昇します。',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    'ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    'ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。',
+  'entities.itemSets.warfare_furyforged.name': 'フューリーフォージの戦装束',
+  'entities.itemSets.warfare_furyforged.bonus2': 'ウォーフェア防御レーティングが40上昇します。',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    'ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    'ウォーフェアの攻撃および防御レーティングが80上昇します。敵対プレイヤーを撃破すると「アンブロークンオース」が発動し、10秒間200ダメージを吸収します。',
+  'entities.itemSets.warfare_stormbound.name': 'ストームバウンドの法衣',
+  'entities.itemSets.warfare_stormbound.bonus2': 'ウォーフェア防御レーティングが40上昇します。',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    'ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    'ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「エンバーワード」が発動し、8秒間120ダメージを吸収します。',
+  'entities.itemSets.warfare_thornhide.name': 'ソーンハイドの装束',
+  'entities.itemSets.warfare_thornhide.bonus2': 'ウォーフェア防御レーティングが40上昇します。',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    'ウォーフェア攻撃レーティングが40上昇し、敵対プレイヤーから受けるクラウドコントロールの持続時間が15%短縮されます。',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    'ウォーフェアの攻撃および防御レーティングが80上昇します。呪文に15%の確率で「ソーンガード」が発動し、6秒間、回避率が15%上昇します。',
   'entities.itemSets.wyrmshadow.name': 'ナイトファングの装束',
   'entities.itemSets.wyrmshadow.bonus2': '攻撃力が40上昇します。',
   'entities.itemSets.wyrmshadow.bonus3': '敏捷性が15、クリティカル率が2%上昇します。',
@@ -9037,6 +9076,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '熾火織りの脚巻き',
   'entities.items.cinderweave_handwraps.name': '熾火織りの手巻き',
   'entities.items.cinderweave_slippers.name': '熾火織りの上履き',
+  'entities.items.thornhide_headdress.name': 'ソーンハイドの頭巾',
+  'entities.items.thornhide_mantle.name': 'ソーンハイドの肩衣',
+  'entities.items.thornhide_vestment.name': 'ソーンハイドの法衣',
+  'entities.items.thornhide_cinch.name': 'ソーンハイドの腰帯',
+  'entities.items.thornhide_leggings.name': 'ソーンハイドの脚当て',
+  'entities.items.thornhide_gloves.name': 'ソーンハイドの手甲',
+  'entities.items.thornhide_boots.name': 'ソーンハイドの足袋',
   'entities.items.final_oath_medallion.name': '最後の誓いのメダリオン',
   'entities.items.razorwind_torque.name': '刃風の首輪',
   'entities.items.cinder_sigil_pendant.name': '熾火印のペンダント',
@@ -9052,6 +9098,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.name': 'フューリー',
   'entities.npcs.fury.title': '名誉補給官',
   'entities.npcs.fury.greeting': '戦場の砂は、すべての勝利を記憶している。名誉は賢く使うことだ。',
+  'entities.npcs.warmarshal_draven_kole.name': '戦元帥ドレイヴン・コール',
+  'entities.npcs.warmarshal_draven_kole.title': 'ウォーフェア軍需庫の管理者',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    '私が受け取る通貨は名誉だけだ。ウォーフェア軍需庫は私が守っている。戦場で階級を勝ち取れ。次の戦いに備えて武具を整えてやろう。',
   'guide.economy.bankBody':
     '各拠点の町には、この地の銀行商会である金張りの金庫の支店があります。そこの出納官に話しかけると自分の金庫が開きます。バッグとは別の私的な収納で、キャラクターが生涯持ち続けるものです。預けた品は、次にどの支店を訪れてもそのまま安全に待っています。',
   'guide.economy.bankHow':
@@ -9126,6 +9176,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.guildOpenAccept': '開設',
   'hudChrome.bank.guildOpenNote': 'ギルド金庫ではなく、あなた自身の所持金から支払われます',
   'hudChrome.bank.guildPurseShort': '所持金不足',
+  'hudChrome.bank.guildReadOnlyNote': 'ギルド銀行を変更できるのはギルド役員のみです。',
+  'hudChrome.bank.guildUnopenedNote': 'ギルド銀行はまだ開設されていません。',
   'hudChrome.bank.guildDormantNote':
     'ロックされたアイテムは引き出せず、ギルドの解散もできなくなります。',
   'hudChrome.bank.guildDormantHint': 'このアイテムはギルド銀行にロックされており、引き出せません。',
@@ -9141,7 +9193,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logNote': '直近{count}件のギルド銀行の操作です。',
   'hudChrome.bank.logLoading': 'ギルド銀行のログを読み込んでいます...',
   'hudChrome.bank.logEmpty': 'ギルド銀行にはまだ何も出し入れされていません。',
-  'hudChrome.bank.logRefused': 'ギルド銀行のログを閲覧できるのはギルド役員のみです。',
+  'hudChrome.bank.logUnavailable': '現在、ギルド銀行のログを閲覧できません。',
   'hudChrome.bank.logFormerMember': '元ギルドメンバー',
   'hudChrome.bank.logDepositItem': '{actor} が {item} を {count} 個預けました',
   'hudChrome.bank.logWithdrawItem': '{actor} が {item} を {count} 個引き出しました',
@@ -11246,4 +11298,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '分解・付魔・解体: 詠唱 {seconds} 秒',
   'guide.profPages.econ.castPaceRecharge': '道具効果の充填: 詠唱 {seconds} 秒',
   'guide.profPages.econ.castPaceBatch': 'まとめて作成: 一度の注文で最大 {count} 個、1個ずつ詠唱',
+  'hudChrome.options.waterRipples': '水面の波紋（航跡）',
+  'hudChrome.breath.label': '息',
+  'hudChrome.breath.drowning': '溺れています！',
 };

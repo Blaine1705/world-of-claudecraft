@@ -33,6 +33,9 @@ const PORTRAIT_ANIM_STATE = {
   dead: false,
   casting: false,
   swimming: false,
+  submerged: false,
+  swimPitch: 0,
+  wading: false,
   sitting: false,
 };
 

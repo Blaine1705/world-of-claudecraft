@@ -66,8 +66,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Carregando o registro do banco da guilda...',
   'hudChrome.bank.logNote': 'As {count} ações mais recentes do banco da guilda.',
   'hudChrome.bank.logOpenBank': '{actor} abriu o banco da guilda por {amount}',
-  'hudChrome.bank.logRefused':
-    'Somente oficiais da guilda podem ler o registro do banco da guilda.',
   'hudChrome.bank.logWithdrawItem': '{actor} retirou {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} retirou {amount}',
   'hudChrome.bank.personalTab': 'Pessoal',
@@ -11238,4 +11236,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Reordenar a aba {channel}: arraste-a, ou use Alt+Esquerda e Alt+Direita',
   'itemUi.vendor.buyStack': 'Comprar {count}',
   'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
+  'hudChrome.options.waterRipples': 'Ondulações na água (esteiras)',
+  'hudChrome.breath.label': 'Fôlego',
+  'hudChrome.breath.drowning': 'Afogando!',
 };

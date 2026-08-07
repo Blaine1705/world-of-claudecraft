@@ -242,6 +242,7 @@ import {
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
 import { ARRIVAL_NEIGHBOR_STREAM_RADIUS } from './render/zone_streaming';
 import { desktopBridge } from './runtime';
+import { breathFraction, stepBreathUsedSeconds } from './sim/breath';
 import { pathCrossesFence } from './sim/colliders';
 import { isStunned } from './sim/combat/cc';
 import { ABILITIES, CLASSES } from './sim/content/classes';
@@ -262,6 +263,7 @@ import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
 import { findPlayerPath, resolvePlayerDestination } from './sim/pathfind';
+import { isSubmerged } from './sim/player_motion';
 import { Sim } from './sim/sim';
 import { TAB_NEAR_RADIUS, TAB_QUERY_RADIUS, tabConeHalfAt } from './sim/tab_target';
 import {
@@ -291,6 +293,7 @@ import {
   validateCharacterName,
   validateForm,
 } from './ui/auth_utils';
+import { BreathBar } from './ui/breath_bar';
 import { assembleBugReportMeta } from './ui/bug_report';
 import {
   cameraPromptOpen,
@@ -1335,6 +1338,7 @@ async function startGame(
     renderer.showDevBadges = settings.get('showDevBadges');
     renderer.showOwnNameplate = settings.get('showOwnNameplate');
     renderer.showPlayerNameplates = settings.get('showPlayerNameplates');
+    renderer.setWaterRipples(settings.get('waterRipples'));
     // Dev-only: ?targetcone=1 draws the Tab-target front cone on the ground in
     // front of the player, for tuning the targeting angle/radius (tab_target.ts).
     if (import.meta.env.DEV && new URLSearchParams(location.search).get('targetcone') === '1') {
@@ -2280,10 +2284,17 @@ async function startGame(
       if (!v) hud.cancelGroundAim();
       return;
     }
+    if (key === 'waterRipples') {
+      // The wake height field lives renderer-side (render modules never read
+      // the settings store), so the flip is pushed rather than read live.
+      renderer.setWaterRipples(settings.set('waterRipples', !!value));
+      return;
+    }
     if (
       key === 'partyFrameShowResource' ||
       key === 'partyFrameShowAbsorbs' ||
       key === 'partyFrameShowAuras' ||
+      key === 'partyFrameShowPets' ||
       key === 'partyFrameShowSelf'
     ) {
       // Read live by Hud.updatePartyFrames (its config is rebuilt from settings each
@@ -3902,6 +3913,24 @@ async function startGame(
     }
   }
 
+  // WoW-style breath mirror bar. Display-only: the HUD steps its own copy of
+  // the sim's breath clock (sim/breath.ts constants) from the DISPLAYED self
+  // state, so it works identically offline and online with no wire traffic;
+  // the sim deals the authoritative drowning damage on its own copy.
+  const breathBar = new BreathBar(document.getElementById('ui') ?? document.body);
+  let breathUsedSeconds = 0;
+  function updateBreathBar(dt: number): void {
+    const self = world.entities.get(world.playerId);
+    if (!self || self.dead) {
+      breathUsedSeconds = 0;
+      breathBar.update(1, false, dt);
+      return;
+    }
+    const submerged = isSubmerged(self, world.cfg.seed);
+    breathUsedSeconds = stepBreathUsedSeconds(breathUsedSeconds, submerged, dt);
+    breathBar.update(breathFraction(breathUsedSeconds), submerged, dt);
+  }
+
   // Desktop-only gather-node hover tooltip (Professions 2.0): the
   // module owns the listener/throttle/paint; this is thin wiring only.
   attachGatherNodeHoverTooltip(
@@ -4064,6 +4093,7 @@ async function startGame(
     } finally {
       perf.finishTrace('input.hoverCursor', traceStart, 'active', hoverActive);
     }
+    updateBreathBar(frameDt);
     perf.markInputFrame(performance.now());
 
     const mouselook = intro === null && input.isMouselookActive() && !movementFrozen();

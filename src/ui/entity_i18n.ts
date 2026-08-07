@@ -47,6 +47,27 @@ export type EntityTranslationKind =
   | 'delve'
   | 'itemSet'
   | 'letter';
+/** An item set's per-tier bonus field, keyed by the tier's PIECE COUNT rather
+ *  than a fixed 2/3/4 triple. Every shipped set used 2, 3 and 4 pieces, and that
+ *  assumption was hard coded here, in the i18n catalog builder, and in the
+ *  tooltip's field selection, so a set authored with any other breakpoint (the
+ *  WARFARE families' 2/4/7) rendered the WRONG tier's text instead of failing.
+ *  Generalizing keeps every existing entities.itemSets.*.bonus2/bonus3/bonus4
+ *  key byte-stable in the locale overlays and mints only the new counts. */
+export type ItemSetBonusField = `bonus${number}`;
+
+/** The piece count a bonus field names, or null when the field is not a bonus
+ *  field at all. The ONE place the field-to-count mapping lives. */
+export function itemSetBonusPieces(field: string): number | null {
+  const matched = /^bonus([1-9][0-9]*)$/.exec(field);
+  return matched ? Number(matched[1]) : null;
+}
+
+/** The bonus field naming a tier of `pieces` pieces. */
+export function itemSetBonusField(pieces: number): ItemSetBonusField {
+  return `bonus${pieces}`;
+}
+
 export type EntityTranslationField =
   | 'name'
   | 'description'
@@ -58,9 +79,7 @@ export type EntityTranslationField =
   | 'welcome'
   | 'enterText'
   | 'leaveText'
-  | 'bonus2'
-  | 'bonus3'
-  | 'bonus4'
+  | ItemSetBonusField
   | 'sender'
   | 'subject'
   | 'body';
@@ -72,7 +91,7 @@ export type EntityTranslationRequest =
   | {
       kind: 'itemSet';
       id: string;
-      field: 'name' | 'bonus2' | 'bonus3' | 'bonus4';
+      field: 'name' | ItemSetBonusField;
       values?: InterpolationValues;
     }
   | { kind: 'mob'; id: string; field: 'name'; values?: InterpolationValues }
@@ -254,7 +273,11 @@ function canonicalEntityText(request: EntityTranslationRequest): string {
       const set = ownEntry(ITEM_SETS, request.id);
       if (!set) return request.id;
       if (request.field === 'name') return set.name;
-      const pieces = request.field === 'bonus2' ? 2 : request.field === 'bonus3' ? 3 : 4;
+      // Piece-count agnostic (see ItemSetBonusField): the field NAMES its tier,
+      // so a 7-piece breakpoint resolves without a fifth ternary arm, and an
+      // unknown field falls back to the raw id like every other R34 miss.
+      const pieces = itemSetBonusPieces(request.field);
+      if (pieces === null) return request.id;
       return set.bonuses.find((b) => b.pieces === pieces)?.text ?? request.id;
     }
     case 'mob':
@@ -489,12 +512,14 @@ export function entityTranslationManifest(): EntityTranslationManifestEntry[] {
     );
   }
   for (const set of Object.values(ITEM_SETS).sort(compareById)) {
-    // Only tiers the set actually has: the leveling haste kits carry a single
-    // 3-piece tier, so registering a bonus2 row would emit an id-fallback string.
-    const fields: ('name' | 'bonus2' | 'bonus3' | 'bonus4')[] = ['name'];
-    if (set.bonuses.some((b) => b.pieces === 2)) fields.push('bonus2');
-    if (set.bonuses.some((b) => b.pieces === 3)) fields.push('bonus3');
-    if (set.bonuses.some((b) => b.pieces === 4)) fields.push('bonus4');
+    // Only tiers the set actually has, at WHATEVER piece counts it authored:
+    // the leveling haste kits carry a single 3-piece tier (so registering a
+    // bonus2 row would emit an id-fallback string) and the WARFARE families
+    // carry 2/4/7. Ascending and de-duplicated so the manifest order is stable.
+    const fields: ('name' | ItemSetBonusField)[] = ['name'];
+    for (const pieces of [...new Set(set.bonuses.map((b) => b.pieces))].sort((a, b) => a - b)) {
+      fields.push(itemSetBonusField(pieces));
+    }
     for (const field of fields) {
       entries.push(
         entry(

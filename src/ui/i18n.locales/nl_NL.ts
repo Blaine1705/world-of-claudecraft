@@ -55,7 +55,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Het logboek van de gildebank wordt geladen...',
   'hudChrome.bank.logNote': 'De {count} meest recente gildebankacties.',
   'hudChrome.bank.logOpenBank': '{actor} opende de gildebank voor {amount}',
-  'hudChrome.bank.logRefused': 'Alleen gildeofficieren kunnen het logboek van de gildebank lezen.',
   'hudChrome.bank.logWithdrawItem': '{actor} nam {count} {item} op',
   'hudChrome.bank.logWithdrawMoney': '{actor} nam {amount} op',
   'hudChrome.bank.personalTab': 'Persoonlijk',
@@ -11225,4 +11224,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Tabblad {channel} herschikken: sleep het, of gebruik Alt+Links en Alt+Rechts',
   'itemUi.vendor.buyStack': 'Koop {count}',
   'itemUi.vendor.buyStackAria': 'Koop {count} {item} voor {price}',
+  'hudChrome.options.waterRipples': 'Waterrimpels (kielzog)',
+  'hudChrome.breath.label': 'Adem',
+  'hudChrome.breath.drowning': 'Verdrinken!',
 };

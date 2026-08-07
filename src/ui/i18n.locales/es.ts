@@ -68,8 +68,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logLoading': 'Cargando el registro del banco de la hermandad...',
   'hudChrome.bank.logNote': 'Las {count} acciones más recientes del banco de la hermandad.',
   'hudChrome.bank.logOpenBank': '{actor} abrió el banco de la hermandad por {amount}',
-  'hudChrome.bank.logRefused':
-    'Solo los oficiales de la hermandad pueden leer el registro del banco de la hermandad.',
   'hudChrome.bank.logWithdrawItem': '{actor} retiró {count} {item}',
   'hudChrome.bank.logWithdrawMoney': '{actor} retiró {amount}',
   'hudChrome.bank.personalTab': 'Privado',
@@ -11303,4 +11301,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Reordenar la pestaña {channel}: arrástrala, o usa Alt+Izquierda y Alt+Derecha',
   'itemUi.vendor.buyStack': 'Comprar {count}',
   'itemUi.vendor.buyStackAria': 'Comprar {count} {item} por {price}',
+  'hudChrome.options.waterRipples': 'Ondas en el agua (estelas)',
+  'hudChrome.breath.label': 'Aliento',
+  'hudChrome.breath.drowning': '¡Ahogándose!',
 };

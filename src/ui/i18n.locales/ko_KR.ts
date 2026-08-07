@@ -624,6 +624,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.showResource': '마나, 분노, 에너지 표시',
   'hudChrome.partyFrames.showAbsorbs': '흡수 보호막 표시',
   'hudChrome.partyFrames.showAuras': '버프 및 디버프 표시',
+  'hudChrome.partyFrames.petHealth': '펫 {name}, 체력 {pct}',
   'hudChrome.partyFrames.showSelf': '내 프레임 표시',
   'hudChrome.frameReset.label': '프레임 위치 초기화',
   'hudChrome.options.playerFrameScale': '플레이어 프레임 크기',
@@ -865,6 +866,14 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.floatReasons.kill': '처치',
   'hudChrome.warfare.floatReasons.assist': '도움',
   'hudChrome.warfare.floatReasons.firstWin': '첫 승리',
+  'hudChrome.warfareShop.gossipOption': '워페어 세트 둘러보기',
+  'hudChrome.warfareShop.gossipOptionAria': '{name}이(가) 운영하는 워페어 세트 상점 둘러보기',
+  'hudChrome.warfareShop.jewelry': '장신구',
+  'hudChrome.warfareShop.weapons': '무기',
+  'hudChrome.warfareShop.owned': '보유 중',
+  'hudChrome.warfareShop.buyOwnedAria': '{honor}에 {item} 구매, 이미 보유 중',
+  'hudChrome.warfareShop.buyConfirmBody':
+    '{honor}에 {item}을(를) 구매하시겠습니까? 명예 구매는 환불되지 않습니다.',
   'hudChrome.keybinds.bgFlag': '전장 깃발 행동',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': '쏜할로우 평원',
@@ -7487,6 +7496,36 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '주문 사용 시 10% 확률로 "영혼의 불길"이 발동하여 주문력이 40만큼 증가합니다. 10초 동안 지속됩니다.',
   'entities.itemSets.vale_arcanist.name': '계곡 비전술사의 예복',
   'entities.itemSets.vale_arcanist.bonus3': '공격 속도와 시전 속도가 15% 증가합니다.',
+  'entities.itemSets.warfare_ashstalker.name': '잿빛추적자의 장비',
+  'entities.itemSets.warfare_ashstalker.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_ashstalker.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_ashstalker.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 "잿빛 질주"가 발동하여 6초 동안 이동 속도가 40% 증가합니다.',
+  'entities.itemSets.warfare_cinderweave.name': '잿불직물 의복',
+  'entities.itemSets.warfare_cinderweave.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_cinderweave.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_cinderweave.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 "잿불 수호"가 발동하여 8초 동안 120의 피해를 흡수합니다.',
+  'entities.itemSets.warfare_furyforged.name': '분노벼림 전투장비',
+  'entities.itemSets.warfare_furyforged.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_furyforged.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_furyforged.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 적대 플레이어를 처치하면 "꺾이지 않는 맹세"가 발동하여 10초 동안 200의 피해를 흡수합니다.',
+  'entities.itemSets.warfare_stormbound.name': '폭풍결속 의복',
+  'entities.itemSets.warfare_stormbound.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_stormbound.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_stormbound.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 "잿불 수호"가 발동하여 8초 동안 120의 피해를 흡수합니다.',
+  'entities.itemSets.warfare_thornhide.name': '가시가죽 의복',
+  'entities.itemSets.warfare_thornhide.bonus2': '워페어 방어 등급이 40만큼 증가합니다.',
+  'entities.itemSets.warfare_thornhide.bonus4':
+    '워페어 공격 등급이 40만큼 증가하고, 적대 플레이어가 당신에게 사용한 군중 제어 효과의 지속 시간이 15% 감소합니다.',
+  'entities.itemSets.warfare_thornhide.bonus7':
+    '워페어 공격 등급과 방어 등급이 80만큼 증가합니다. 주문 사용 시 15% 확률로 "가시 방호"가 발동하여 6초 동안 회피 확률이 15% 증가합니다.',
   'entities.itemSets.wyrmshadow.name': '밤송곳니 의복',
   'entities.itemSets.wyrmshadow.bonus2': '전투력이 40만큼 증가합니다.',
   'entities.itemSets.wyrmshadow.bonus3': '민첩이 15, 치명타 확률이 2% 증가합니다.',
@@ -9025,6 +9064,13 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.cinderweave_legwraps.name': '불씨매듭 다리싸개',
   'entities.items.cinderweave_handwraps.name': '불씨매듭 손싸개',
   'entities.items.cinderweave_slippers.name': '불씨매듭 덧신',
+  'entities.items.thornhide_headdress.name': '가시가죽 두건',
+  'entities.items.thornhide_mantle.name': '가시가죽 어깨망토',
+  'entities.items.thornhide_vestment.name': '가시가죽 예복',
+  'entities.items.thornhide_cinch.name': '가시가죽 허리띠',
+  'entities.items.thornhide_leggings.name': '가시가죽 다리보호대',
+  'entities.items.thornhide_gloves.name': '가시가죽 장갑',
+  'entities.items.thornhide_boots.name': '가시가죽 발덮개',
   'entities.items.final_oath_medallion.name': '최후의 맹세 메달',
   'entities.items.razorwind_torque.name': '칼바람 목가리개',
   'entities.items.cinder_sigil_pendant.name': '불씨 인장 목걸이',
@@ -9040,6 +9086,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.fury.name': '퓨리',
   'entities.npcs.fury.title': '명예 병참장교',
   'entities.npcs.fury.greeting': '전장의 모래는 모든 승리를 기억한다. 명예를 현명하게 사용하라.',
+  'entities.npcs.warmarshal_draven_kole.name': '전쟁원수 드레이븐 콜',
+  'entities.npcs.warmarshal_draven_kole.title': '워페어 보급창 관리관',
+  'entities.npcs.warmarshal_draven_kole.greeting':
+    '내가 받는 화폐는 명예뿐이며, 워페어 보급창은 내가 지킨다. 전장에서 계급을 얻어라. 다음 전투를 위해 갑주를 갖춰 주겠다.',
   'guide.economy.bankBody':
     '모든 거점 마을에는 이 땅의 은행 상회인 도금 금고의 지점이 있습니다. 그곳의 출납관에게 말을 걸면 자신의 금고가 열립니다. 가방과는 별개인 개인 보관 공간으로, 캐릭터가 평생 유지합니다. 맡겨 둔 물건은 다음에 어느 지점을 찾아가도 안전하게 기다리고 있습니다.',
   'guide.economy.bankHow':
@@ -9114,6 +9164,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.guildOpenAccept': '개설',
   'hudChrome.bank.guildOpenNote': '길드 금고가 아닌 본인의 소지금에서 지불됩니다',
   'hudChrome.bank.guildPurseShort': '소지금 부족',
+  'hudChrome.bank.guildReadOnlyNote': '길드 장교만 길드 은행을 변경할 수 있습니다.',
+  'hudChrome.bank.guildUnopenedNote': '길드 은행이 아직 개설되지 않았습니다.',
   'hudChrome.bank.guildDormantNote': '잠긴 아이템은 꺼낼 수 없으며 길드 해산을 막습니다.',
   'hudChrome.bank.guildDormantHint': '이 아이템은 길드 은행에 잠겨 있어 꺼낼 수 없습니다.',
   'hudChrome.bank.guildDormantAria': '{item}, 수량 {count}, 꺼낼 수 없음',
@@ -9128,7 +9180,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.logNote': '최근 길드 은행 활동 {count}건입니다.',
   'hudChrome.bank.logLoading': '길드 은행 기록을 불러오는 중...',
   'hudChrome.bank.logEmpty': '아직 길드 은행에 넣거나 뺀 것이 없습니다.',
-  'hudChrome.bank.logRefused': '길드 장교만 길드 은행 기록을 볼 수 있습니다.',
+  'hudChrome.bank.logUnavailable': '지금은 길드 은행 기록을 볼 수 없습니다.',
   'hudChrome.bank.logFormerMember': '탈퇴한 길드원',
   'hudChrome.bank.logDepositItem': '{actor}님이 {item} {count}개를 넣었습니다',
   'hudChrome.bank.logWithdrawItem': '{actor}님이 {item} {count}개를 꺼냈습니다',
@@ -11235,4 +11287,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.castPaceEnchantFamily': '마력 추출·마법부여·분해: {seconds}초 시전',
   'guide.profPages.econ.castPaceRecharge': '도구 효과 충전: {seconds}초 시전',
   'guide.profPages.econ.castPaceBatch': '일괄 제작: 한 번에 최대 {count}개, 각각 시전',
+  'hudChrome.options.waterRipples': '수면 물결 (물살)',
+  'hudChrome.breath.label': '숨',
+  'hudChrome.breath.drowning': '익사 중!',
 };

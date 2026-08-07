@@ -775,6 +775,10 @@ export const vi_VN: EnTranslations = {
       "ready": "Vung Đòn",
       "seconds": "{seconds}s"
     },
+    "breath": {
+      "label": "Hơi thở",
+      "drowning": "Đang chết đuối!"
+    },
     "rest": {
       "resting": "Đang Nghỉ Ngơi"
     },
@@ -955,6 +959,7 @@ export const vi_VN: EnTranslations = {
       "valecup": "Cúp Thung Lũng",
       "bgFlag": "Battleground Flag Action",
       "sheathe": "Tra/Rút Vũ Khí",
+      "dive": "Swim Down",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
       "petStop": "Thú Cưng: Dừng",
@@ -1331,6 +1336,7 @@ export const vi_VN: EnTranslations = {
       "lockActionBars": "Khóa Thanh Hành Động",
       "showTargetOfTarget": "Hiện Mục Tiêu Của Mục Tiêu",
       "showPetFrame": "Hiện Thú Cưng Của Bạn",
+      "waterRipples": "Gợn nước (sóng rẽ nước)",
       "showAttackButton": "Hiển Thị Nút Tấn Công",
       "showDailyRewardsChest": "Hiện Rương Phần Thưởng Hằng Ngày",
       "mobileCameraJoystick": "Cần điều khiển máy ảnh",
@@ -1526,6 +1532,16 @@ export const vi_VN: EnTranslations = {
         "assist": "Assist",
         "firstWin": "First Win"
       }
+    },
+    "warfareShop": {
+      "gossipOption": "Browse Warfare Sets",
+      "gossipOptionAria": "Browse the Warfare set shop offered by {name}",
+      "jewelry": "Jewelry",
+      "weapons": "Weapons",
+      "owned": "Owned",
+      "buyAria": "Buy {item} for {honor}",
+      "buyOwnedAria": "Buy {item} for {honor}, already owned",
+      "buyConfirmBody": "Buy {item} for {honor}? Honor purchases cannot be refunded."
     },
     "charSheet": {
       "offense": "Tấn Công",
@@ -2112,6 +2128,8 @@ export const vi_VN: EnTranslations = {
       "showResource": "Hiện Mana, Nộ Khí và Năng Lượng",
       "showAbsorbs": "Hiện Khiên Hấp Thụ",
       "showAuras": "Hiện Buff và Debuff",
+      "showPets": "Show Pets",
+      "petHealth": "Pet {name}, {pct} health",
       "showSelf": "Hiện Khung Của Bạn"
     },
     "frameReset": {
@@ -2457,6 +2475,8 @@ export const vi_VN: EnTranslations = {
       "guildOpenAccept": "Mở",
       "guildOpenNote": "Thanh toán từ tiền của chính bạn, không phải từ ngân khố bang hội",
       "guildPurseShort": "Không đủ tiền",
+      "guildReadOnlyNote": "Only guild officers can make changes to the guild bank.",
+      "guildUnopenedNote": "The guild bank has not been opened yet.",
       "guildDormantNote": "Vật phẩm bị khóa không thể rút ra và ngăn cản việc giải tán bang hội.",
       "guildDormantHint": "Vật phẩm này đang bị khóa trong ngân hàng bang hội và không thể rút ra.",
       "guildDormantAria": "{item}, số lượng {count}, không thể rút ra",
@@ -2471,7 +2491,7 @@ export const vi_VN: EnTranslations = {
       "logNote": "{count} hoạt động ngân hàng bang hội gần đây nhất.",
       "logLoading": "Đang tải nhật ký ngân hàng bang hội...",
       "logEmpty": "Chưa có gì được chuyển vào hoặc ra khỏi ngân hàng bang hội.",
-      "logRefused": "Chỉ sĩ quan bang hội mới có thể xem nhật ký ngân hàng bang hội.",
+      "logUnavailable": "The guild bank log cannot be read right now.",
       "logFormerMember": "Một cựu thành viên bang hội",
       "logDepositItem": "{actor} đã gửi {count} {item}",
       "logWithdrawItem": "{actor} đã rút {count} {item}",
@@ -9585,6 +9605,27 @@ export const vi_VN: EnTranslations = {
       "cinderweave_slippers": {
         "name": "Hài Cinderweave"
       },
+      "thornhide_headdress": {
+        "name": "Thornhide Headdress"
+      },
+      "thornhide_mantle": {
+        "name": "Thornhide Mantle"
+      },
+      "thornhide_vestment": {
+        "name": "Thornhide Vestment"
+      },
+      "thornhide_cinch": {
+        "name": "Thornhide Cinch"
+      },
+      "thornhide_leggings": {
+        "name": "Thornhide Leggings"
+      },
+      "thornhide_gloves": {
+        "name": "Thornhide Gloves"
+      },
+      "thornhide_boots": {
+        "name": "Thornhide Boots"
+      },
       "final_oath_medallion": {
         "name": "Huy Chương Lời Thề Cuối"
       },
@@ -11931,6 +11972,11 @@ export const vi_VN: EnTranslations = {
         "name": "NỘ KHÍ",
         "title": "Thủ Lĩnh Danh Dự",
         "greeting": "Cát nhớ từng chiến thắng. Hãy dành danh dự của bạn thật tốt."
+      },
+      "warmarshal_draven_kole": {
+        "name": "Warmarshal Draven Kole",
+        "title": "Master of the Warfare Stores",
+        "greeting": "Honor is the only coin I take, and the Warfare stores are mine to guard. Earn your rank on the field and I will armor you for the next one."
       },
       "loremaster_caddis": {
         "name": "Sử Gia Caddis",
@@ -15063,6 +15109,36 @@ export const vi_VN: EnTranslations = {
       "vale_arcanist": {
         "name": "Bộ Arcanist Thung Khê",
         "bonus3": "Tăng tốc độ tấn công cùng thi triển thêm 15%."
+      },
+      "warfare_ashstalker": {
+        "name": "Ashstalker Kit",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Ashen Step, increasing movement speed by 40% for 6 sec."
+      },
+      "warfare_cinderweave": {
+        "name": "Cinderweave Regalia",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_furyforged": {
+        "name": "Furyforged Battlegear",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Killing a hostile player grants Unbroken Oath, absorbing 200 damage for 10 sec."
+      },
+      "warfare_stormbound": {
+        "name": "Stormbound Vestments",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Emberward, absorbing 120 damage for 8 sec."
+      },
+      "warfare_thornhide": {
+        "name": "Thornhide Garb",
+        "bonus2": "Increases WARFARE Defense Rating by 40.",
+        "bonus4": "Increases WARFARE Offense Rating by 40, and crowd control cast on you by hostile players lasts 15% less.",
+        "bonus7": "Increases WARFARE Offense and Defense Rating by 80. Your spells have a 15% chance to grant Thornguard, increasing dodge by 15% for 6 sec."
       },
       "wyrmshadow": {
         "name": "Áo Lễ Nightfang",
