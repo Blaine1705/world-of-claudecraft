@@ -148,6 +148,13 @@ function joinSourceLines(lines: readonly string[]): string {
 // ---------------------------------------------------------------------------
 
 interface WorldState {
+  /**
+   * The character the pin store keys off (woc_reliquary_pins_<class>_<name>).
+   * Mutable, because the key-change reload can only be observed by walking ONE
+   * live window across a switch: a second window instance reloads anyway, from a
+   * cold key, so it would pass whether or not the reload exists.
+   */
+  identity: { playerClass: string; name: string };
   itemsDiscovered: Set<string>;
   marks: Set<string>;
   recent: string[];
@@ -177,6 +184,7 @@ interface WorldState {
 
 function baseState(): WorldState {
   return {
+    identity: { playerClass: 'warrior', name: 'Testwright' },
     itemsDiscovered: new Set(),
     marks: new Set(),
     recent: [],
@@ -230,8 +238,10 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
       ({
         // The pin store keys off the character (woc_reliquary_pins_<class>_<name>),
         // so every ReliquaryWindow world needs the identity pair a real IWorld has.
-        cfg: { playerClass: 'warrior' },
-        player: { name: 'Testwright' },
+        // Read through state on every call, exactly as a real world answers after
+        // a character switch, rather than frozen into the deps at construction.
+        cfg: { playerClass: state.identity.playerClass },
+        player: { name: state.identity.name },
         deedStats: { itemsDiscovered: state.itemsDiscovered },
         reliquaryMarks: state.marks,
         reliquaryRecent: state.recent,
@@ -2518,6 +2528,17 @@ describe('pinning a page to the HUD tracker', () => {
   const pinButton = (el: HTMLElement, pageId: string): HTMLElement =>
     must(el, `.reliquary-pin[data-pin="${pageId}"]`);
 
+  /** The exact production key this rig's stub world produces, spelled out rather
+   *  than rebuilt from the module's prefix: the untrusted-storage arms below seed
+   *  the store BEFORE the window reads it, which only tests anything if the key
+   *  they write is the one the window will look under. */
+  const PIN_KEY = 'woc_reliquary_pins_warrior_Testwright';
+
+  /** Live Conquerors page ids in catalog order. Real ids, so a seeded pin is one
+   *  the catalog can resolve; a fabricated id would be indistinguishable from a
+   *  pin the loader correctly refused. */
+  const shelfPageIds = RELIQUARY_PAGES.filter((p) => p.shelf === 'conquerors').map((p) => p.id);
+
   it('renders the pin control as a SIBLING of the row, never nested inside it', () => {
     // A button inside a button is invalid markup and unreachable to a keyboard:
     // the row IS a button, so the pin has to be its sibling in the listitem.
@@ -2658,5 +2679,110 @@ describe('pinning a page to the HUD tracker', () => {
     // One page, one pin control per paint: the shelf list and a page detail are
     // mutually exclusive surfaces, so the focus key stays unique.
     expect(rig.el.querySelectorAll(`[data-focus-key="pin:${PAGE_ID}"]`).length).toBe(1);
+  });
+
+  it('retires the pin control from an illuminated page DETAIL too', () => {
+    // A separate arm from the shelf retirement above, not a restatement of it:
+    // the row passes page.complete and the detail header passes page.illuminated,
+    // two fields off two different models, so one call site can lose the flag
+    // while the other keeps it. The detail is also the surface a player reaches
+    // by finishing the page they were reading, so a pin left here would hand back
+    // the one control the prune assumes has already gone.
+    const state = baseState();
+    // Fill the page through the same ownership seams the game fills them
+    // through, so the facet and the painted detail agree it is illuminated.
+    for (const relic of pageDef(PAGE_ID).relics) {
+      switch (relic.kind) {
+        case 'item':
+          state.itemsDiscovered.add(relic.itemId);
+          break;
+        case 'mark':
+          state.marks.add(relic.markId);
+          break;
+        case 'mount':
+          state.mounts.push(relic.mountId);
+          break;
+        case 'weapon_skin':
+          state.weaponSkinIds.push(relic.skinId);
+          break;
+        case 'title':
+          state.deedsEarned.set(relic.deedId, '2026-01-01');
+          break;
+      }
+    }
+    const rig = openPage(state);
+    // Premise: this really is the illuminated page's detail surface, so the
+    // missing button below cannot be a missing PAGE.
+    const detail = must(rig.el, '.reliquary-page-detail');
+    expect(detail.classList.contains('is-illuminated')).toBe(true);
+    expect(must(rig.el, '.reliquary-page-header').querySelector('.reliquary-pin')).toBeNull();
+    expect(rig.el.querySelector(`.reliquary-pin[data-pin="${PAGE_ID}"]`)).toBeNull();
+  });
+
+  // Stored pins are UNTRUSTED input. Nothing between another tab, an older build
+  // with a different cap, or a hand-edited value and the strip but the loader:
+  // the pin BUTTON enforces the cap and the id on the way in, and a stored set
+  // never passes through it. Each arm below seeds the real key BEFORE the window
+  // reads it and opens with `open: false`, so no paint (and no catalog-unknown
+  // prune) can stand in for a load the loader should have refused itself.
+
+  it('truncates an oversized stored pin list to the cap', () => {
+    const oversized = shelfPageIds.slice(0, RELIQUARY_TRACK_CAP + 3);
+    expect(
+      oversized.length,
+      'content premise: the Conquerors shelf holds more pages than the cap, so this is oversized',
+    ).toBe(RELIQUARY_TRACK_CAP + 3);
+    localStorage.setItem(PIN_KEY, JSON.stringify(oversized));
+    const rig = makeWindow(baseState(), { open: false });
+    // The FIRST cap ids, in the stored order: pin order is display order, so a
+    // truncation that kept the tail would silently reshuffle the strip.
+    expect([...rig.w.pinned]).toEqual(oversized.slice(0, RELIQUARY_TRACK_CAP));
+  });
+
+  it('resets to empty for a stored value that is not an array', () => {
+    // Two corrupt shapes, because they fail at different points: a value that
+    // PARSES to a non-array (an older shape, or another key's value) has to be
+    // refused by the shape check, and one that does not parse at all has to be
+    // caught rather than thrown at whichever paint asked for the pins.
+    localStorage.setItem(PIN_KEY, '{"nope":1}');
+    expect([...makeWindow(baseState(), { open: false }).w.pinned]).toEqual([]);
+    document.body.innerHTML = '';
+    localStorage.setItem(PIN_KEY, 'not json at all');
+    expect([...makeWindow(baseState(), { open: false }).w.pinned]).toEqual([]);
+  });
+
+  it('skips a non-string element and still loads the ids around it', () => {
+    // Per element, not per list: a partially corrupt array must not cost the
+    // player the pins that are fine. The 42 is fabricated on purpose, because
+    // what is under test is the element's TYPE and no page id could carry that;
+    // the ids around it are live, so what survives is a real load.
+    const [first, second] = shelfPageIds;
+    localStorage.setItem(PIN_KEY, JSON.stringify([first, 42, second]));
+    const rig = makeWindow(baseState(), { open: false });
+    expect([...rig.w.pinned]).toEqual([first, second]);
+  });
+
+  it('re-reads the store when the character changes under one window instance', () => {
+    // The HUD keeps ONE ReliquaryWindow for the session, so a character switch
+    // has to move the pin set with it. A loader that latched on the first key
+    // would leave the new character wearing the old one's strip, and then
+    // persist that strip onto whichever key it last read.
+    const state = baseState();
+    const other = { playerClass: 'mage', name: 'Otherwright' };
+    // Disjoint seeds under both keys: neither answer below can be produced by
+    // reading the wrong store, and an empty set is not an answer either.
+    localStorage.setItem(PIN_KEY, JSON.stringify([PAGE_ID]));
+    localStorage.setItem(
+      `woc_reliquary_pins_${other.playerClass}_${other.name}`,
+      JSON.stringify([UNHINTED_PAGE_ID]),
+    );
+    const rig = makeWindow(state, { open: false });
+    expect([...rig.w.pinned]).toEqual([PAGE_ID]);
+    state.identity = other;
+    expect([...rig.w.pinned]).toEqual([UNHINTED_PAGE_ID]);
+    // And back, because a loader that re-read exactly once and then latched
+    // passes the switch above on its own.
+    state.identity = { playerClass: 'warrior', name: 'Testwright' };
+    expect([...rig.w.pinned]).toEqual([PAGE_ID]);
   });
 });

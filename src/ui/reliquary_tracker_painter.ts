@@ -21,6 +21,14 @@
 // stylesheet turns into a short pulse (and skips entirely under reduced motion).
 // Everything rendered here is player-chosen cosmetic information and none of it
 // varies with the graphics tier.
+//
+// Rule of three, deliberately not taken yet: this is copy number TWO of the
+// deed-tracker painter shape (deed_tracker_painter.ts is copy one), and two
+// similar blocks are left alone by house rule. It collapses into a single
+// descriptor-parameterized TrackerStripPainter the day a THIRD tracker wants
+// the shape (the delve tracker is the natural third), at which point the
+// hardcoded list id above moves into the descriptor alongside the label and
+// progress keys.
 
 import { formatNumber, t } from './i18n';
 import type { PainterHostWriters } from './painter_host';

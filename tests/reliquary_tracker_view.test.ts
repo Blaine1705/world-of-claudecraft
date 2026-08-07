@@ -11,6 +11,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { DEED_WATCH_CAP } from '../src/ui/deeds_view';
 import {
   buildReliquaryTrackerViewInto,
   makeReliquaryTrackerView,
@@ -58,6 +59,19 @@ function build(
 
 const shown = (view: ReliquaryTrackerView): string[] =>
   view.lines.slice(0, view.count).map((line) => line.pageId);
+
+describe('tracker constants', () => {
+  it('caps the strip at five, the deed watchlist number, and holds a flash two builds', () => {
+    // The cap mirrors DEED_WATCH_CAP on purpose: the two trackers stack in one
+    // right-hand column, so the shared five is what keeps a fully pinned player
+    // inside the small-viewport HUD. Pinned to the LITERAL as well as to the
+    // deed constant, or a change to both at once would slip through unnoticed.
+    expect(RELIQUARY_TRACK_CAP).toBe(5);
+    expect(RELIQUARY_TRACK_CAP).toBe(DEED_WATCH_CAP);
+    // Two slow-band builds is about a second, the room the CSS pulse needs.
+    expect(RELIQUARY_FLASH_BUILDS).toBe(2);
+  });
+});
 
 describe('buildReliquaryTrackerViewInto: selection', () => {
   it('shows pinned pages in pin order, not catalog order', () => {
@@ -197,6 +211,55 @@ describe('buildReliquaryTrackerViewInto: the fill flash', () => {
     expect(shown(view)).toEqual(['b', 'a']);
     expect(view.lines[0].flash).toBe(false);
     expect(view.lines[1].flash).toBe(false);
+  });
+
+  it('burns the flash hold while collapsed, so a later expand shows no pulse', () => {
+    // This pins the documented READ of current behavior, not a bug. The core is
+    // told whether the strip is collapsed but deliberately does not model it in
+    // the flash: a fill that lands under a folded header still starts its hold
+    // and still spends it, build by build, unseen. Expanding after the hold has
+    // run out is therefore quiet. Saving the pulse for the next expand would
+    // mean the core tracking visibility, which is a different contract than the
+    // one shipped; changing that intentionally means changing this test.
+    const view = makeReliquaryTrackerView();
+    build(view, progress(4), { pinned: ['page'], collapsed: true });
+    expect(view.lines[0].flash).toBe(false);
+    // The fill lands with the rows folded away, and the flag is set anyway.
+    build(view, progress(5), { pinned: ['page'], collapsed: true });
+    expect(view.lines[0].flash).toBe(true);
+    for (let i = 1; i < RELIQUARY_FLASH_BUILDS; i++) {
+      build(view, progress(5), { pinned: ['page'], collapsed: true });
+      expect(view.lines[0].flash).toBe(true);
+    }
+    // Expanded again, and the pulse is already spent: the player sees the new
+    // number, never the animation that announced it.
+    build(view, progress(5), { pinned: ['page'], collapsed: false });
+    expect(view.lines[0].flash).toBe(false);
+  });
+
+  it('does not flash a page that left the strip and came back richer', () => {
+    // The first-sighting rule covers RETURNS too: the previous table is bounded
+    // by the last build's live line count, so a page that dropped off has no
+    // entry left to have risen from, however much it gained while away. The
+    // filler pin is what makes this decisive rather than incidental: it keeps
+    // the departed page's stale slot alive PAST prevCount, so a diff that
+    // scanned the whole prev array would find the old 4, read 7 against it, and
+    // pulse a row for relics the player collected on some other screen.
+    const away: Progress = { filler: { owned: 2, total: 10 }, page: { owned: 4, total: 10 } };
+    const view = makeReliquaryTrackerView();
+    build(view, away, { pinned: ['filler', 'page'] });
+    expect(shown(view)).toEqual(['filler', 'page']);
+    build(view, away, { pinned: ['filler'] });
+    expect(shown(view)).toEqual(['filler']);
+    const back: Progress = { filler: { owned: 2, total: 10 }, page: { owned: 7, total: 10 } };
+    build(view, back, { pinned: ['filler', 'page'] });
+    expect(shown(view)).toEqual(['filler', 'page']);
+    expect(view.lines[1].flash).toBe(false);
+    // And it is a real first sighting, not a hidden hold: the NEXT gain, now
+    // that the page has a previous count again, does flash.
+    const gained: Progress = { filler: { owned: 2, total: 10 }, page: { owned: 8, total: 10 } };
+    build(view, gained, { pinned: ['filler', 'page'] });
+    expect(view.lines[1].flash).toBe(true);
   });
 
   it('lights the page that actually gained, wherever the reorder put it', () => {
@@ -468,6 +531,49 @@ describe('tracker chrome', () => {
   const hudMobile = read('../src/styles/hud.mobile.css');
   const settingsSrc = read('../src/game/settings.ts');
   const painter = read('../src/ui/reliquary_tracker_painter.ts');
+
+  // The updateReliquaryTracker body alone, comment-stripped. Scoped to the
+  // method rather than the whole file so a matching line living in the deed
+  // tracker's twin (or in the prose that names these very fields) can never
+  // satisfy one of the ownership pins below.
+  const sliceBetween = (src: string, from: string, to: string): string => {
+    const start = src.indexOf(from);
+    if (start < 0) throw new Error(`source premise: hud.ts no longer contains ${from}`);
+    const end = src.indexOf(to, start);
+    if (end < 0) throw new Error(`source premise: hud.ts no longer contains ${to} after ${from}`);
+    return src.slice(start, end);
+  };
+  const trackerBody = stripComments(
+    sliceBetween(
+      hud,
+      'private updateReliquaryTracker(): void {',
+      'private toggleReliquaryTrackerCollapsed(',
+    ),
+  );
+
+  it('feeds every ownership surface into the memo signature', () => {
+    // Five surfaces fold into a page's owned count, and the default scan re-runs
+    // only when this signature moves. Drop any ONE of them and the strip holds a
+    // stale ranking straight through the fill that should have re-ranked it,
+    // which is invisible in the pure core (it takes the number, not the reads).
+    // Pinned as five separate lines so the failure names the missing surface.
+    expect(trackerBody, 'itemsDiscovered').toContain(
+      'itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,',
+    );
+    expect(trackerBody, 'reliquaryMarks').toContain('marks: this.sim.reliquaryMarks.size,');
+    expect(trackerBody, 'deedsEarned').toContain('deedsEarned: this.sim.deedsEarned.size,');
+    expect(trackerBody, 'ownedMounts').toContain('mounts: this.sim.ownedMounts().length,');
+    expect(trackerBody, 'weaponSkinIds').toContain(
+      'weaponSkins: this.sim.accountCosmetics.weaponSkinIds.length,',
+    );
+  });
+
+  it('repaints the strip the moment a pin toggles, not on the next slow band', () => {
+    // The deeds precedent (onWatchChanged): without this hook a pin lands and
+    // the strip keeps showing the old set for up to a whole 500ms band, which
+    // reads as the button having done nothing.
+    expect(stripComments(hud)).toContain('onPinChanged: () => this.updateReliquaryTracker(),');
+  });
 
   it('wires the tracker container in BOTH game entries, under the deed tracker', () => {
     for (const html of [indexHtml, playHtml]) {

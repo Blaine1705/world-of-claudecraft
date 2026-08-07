@@ -15665,6 +15665,16 @@ export class Hud {
       pinned: this.reliquaryWindow.pinned,
       pageIds: RELIQUARY_PAGE_ORDER,
       completion: (pageId) => this.sim.reliquaryPageCompletion(pageId),
+      // The deliberate asymmetry, recorded here because the two halves read as
+      // an inconsistency otherwise: pinned pages (at most RELIQUARY_TRACK_CAP,
+      // five) are read LIVE on every slow build, while the 28-page default scan
+      // memoizes on this signature. The signature is cheap but has a documented
+      // same-band blind spot (an add and a remove on ONE surface inside a single
+      // 500ms band cancel out), and five live reads sit comfortably inside the
+      // slow-band budget, so the pages the player explicitly chose get the exact
+      // answer and the whole-catalog scan gets the cheap one. Accepted with it:
+      // Sim.ownedMounts() allocates a fresh array per read, which is fine at
+      // this cadence and at this count (ClientWorld returns a stored field).
       ownershipSig: reliquaryTrackerOwnershipSig({
         itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
         marks: this.sim.reliquaryMarks.size,

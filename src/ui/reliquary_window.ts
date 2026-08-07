@@ -194,6 +194,16 @@ export class ReliquaryWindow {
    */
   private focusPageId: string | null = null;
   /**
+   * Shelf deep-link one-shot: the rail button the next paint parks the reading
+   * position on (a nav-bearing open, today the Curator rank-up chat link). A
+   * shelf jump is a navigation and owes the same focus move a page jump makes;
+   * without it, a keyboard or screen-reader player who activates the link while
+   * the window is ALREADY open perceives nothing at all, because that branch
+   * only repaints. Consumed by the paint, and re-placed once the root is
+   * visible on a cold open, exactly as focusPageId is.
+   */
+  private focusNavId: ReliquaryNavId | null = null;
+  /**
    * Pinned pages for the HUD tracker, in pin order (a Set preserves insertion
    * order, and that order IS the strip's display order). Loaded lazily per
    * character key, capped at RELIQUARY_TRACK_CAP, and pruned of illuminated
@@ -224,11 +234,17 @@ export class ReliquaryWindow {
       // landed). A no-arg open() still keeps where-I-was exactly.
       this.pageId = null;
       this.gridIndex = 0;
+      // A shelf deep link is a navigation, so arm the rail button for it (see
+      // focusNavId). This is what makes the ALREADY-OPEN branch below do
+      // something a non-sighted player can perceive.
+      this.focusNavId = nav;
     }
-    // Captured before render() consumes the one-shot: a cold deep link parks
-    // focus on the target page header instead of Close, and has to re-place it
-    // once the root is actually visible (the deeds cold-jump pattern).
+    // Captured before render() consumes the one-shots: a cold deep link parks
+    // focus on the target page header (or the target rail button) instead of
+    // Close, and has to re-place it once the root is actually visible (the
+    // deeds cold-jump pattern).
     const jumpPageId = this.focusPageId;
+    const jumpNav = this.focusNavId;
     if (this.opened) {
       this.render();
       return;
@@ -240,7 +256,12 @@ export class ReliquaryWindow {
     this.suppressAnnounceOnce = true;
     this.render();
     this.deps.root().style.display = 'flex';
-    const landed = jumpPageId !== null && this.spotlightPage(this.deps.root(), jumpPageId);
+    // The page jump outranks the shelf jump: only a page target can be armed
+    // alongside a nav one (openWithPage into a closed window), and the page is
+    // the more specific promise of the two.
+    const landed =
+      (jumpPageId !== null && this.spotlightPage(this.deps.root(), jumpPageId)) ||
+      (jumpNav !== null && this.spotlightNav(this.deps.root(), jumpNav));
     if (!landed) {
       (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
     }
@@ -307,6 +328,32 @@ export class ReliquaryWindow {
     // Guarded: jsdom (the focus/behavior test env) ships no scrollIntoView.
     if (typeof header.scrollIntoView === 'function') {
       header.scrollIntoView({ block: 'center' });
+    }
+    return true;
+  }
+
+  /**
+   * Park the reading position on a rail button after paint: the spotlightPage
+   * shape for a SHELF. No programmatic tab stop is needed (the rail button is
+   * already a real control in the tab order), but the scroll is: the rail
+   * scrolls on BOTH tiers (a 148px column on desktop, a horizontal strip under
+   * mobile-touch), so a shelf past the fold would otherwise be focused while
+   * off screen. 'nearest' on both axes leaves an already-visible button exactly
+   * where it is. The button is found by its shared data-focus-key rather than a
+   * built selector, so a nav id never has to be CSS-escaped. False when this
+   * paint holds no such button, so a cold open falls back to its Close park
+   * instead of leaving focus nowhere.
+   */
+  private spotlightNav(el: HTMLElement, nav: ReliquaryNavId): boolean {
+    const key = `nav:${nav}`;
+    const btn = [...el.querySelectorAll<HTMLElement>('.reliquary-nav')].find(
+      (node) => node.dataset.focusKey === key,
+    );
+    if (!btn) return false;
+    btn.focus({ preventScroll: true });
+    // Guarded: jsdom (the focus/behavior test env) ships no scrollIntoView.
+    if (typeof btn.scrollIntoView === 'function') {
+      btn.scrollIntoView({ block: 'nearest', inline: 'nearest' });
     }
     return true;
   }
@@ -485,12 +532,18 @@ export class ReliquaryWindow {
       // follows the player's last cell instead of snapping back to the first.
       this.syncGridRoving(el, focusKey);
     }
-    // The deep-link one-shot, taken LAST so the jump outranks the key-based
+    // The deep-link one-shots, taken LAST so the jump outranks the key-based
     // restore above, and released whatever this paint managed to show. A cold
-    // open re-places it once the root is visible (see open()).
+    // open re-places them once the root is visible (see open()).
     const jumpPageId = this.focusPageId;
     this.focusPageId = null;
-    if (jumpPageId !== null) this.spotlightPage(el, jumpPageId);
+    const jumpNav = this.focusNavId;
+    this.focusNavId = null;
+    if (jumpPageId !== null) {
+      this.spotlightPage(el, jumpPageId);
+    } else if (jumpNav !== null) {
+      this.spotlightNav(el, jumpNav);
+    }
   }
 
   /** The persistent polite region (see liveEl), minted once from the root's own

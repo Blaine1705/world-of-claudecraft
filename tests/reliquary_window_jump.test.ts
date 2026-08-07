@@ -111,6 +111,10 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
 const activeNav = (el: HTMLElement): string | null =>
   el.querySelector<HTMLElement>('.reliquary-nav.active')?.dataset.nav ?? null;
 
+/** One rail button by shelf, the landing spot a nav-bearing open promises. */
+const navButton = (el: HTMLElement, nav: string): HTMLElement | null =>
+  el.querySelector<HTMLElement>(`.reliquary-nav[data-nav="${nav}"]`);
+
 /** The painted page detail's title, or null when no page detail is painted. */
 const paintedPage = (el: HTMLElement): string | null =>
   el.querySelector<HTMLElement>('.reliquary-page-detail .reliquary-page-title')?.textContent ??
@@ -299,11 +303,74 @@ describe('open(nav): the shelf deep link', () => {
     expect(paintedPage(el)).toBe(reliquaryPageName(NOTES_PAGE));
   });
 
-  it('does not park focus on a page header when no jump armed it', () => {
-    // A plain shelf open is not a jump: the reading position stays on Close.
+  it('parks the reading position on the rail button the link named (cold)', () => {
+    // A shelf deep link is a navigation, so it owes the same focus move a page
+    // jump makes: land on the shelf just asked for, not on the Close park a
+    // plain open() falls back to, and not on a page header (no page jump armed
+    // one, and a nav-bearing open drops the persisted page anyway).
     const { w, el } = makeWindow(baseState(), { open: false });
     w.open('conquerors');
+    const target = navButton(el, 'conquerors');
+    expect(document.activeElement).toBe(target);
+    // The production spotlight finds that button by the SHARED focus key, so a
+    // renamed key would silently stop landing anywhere.
+    expect(target?.dataset.focusKey).toBe('nav:conquerors');
+    expect(document.activeElement).not.toBe(el.querySelector('[data-close]'));
+    expect(document.activeElement).not.toBe(header(el));
+  });
+
+  it('scrolls that rail button into view through the guarded call', () => {
+    // The rail scrolls on BOTH tiers (a 148px column on desktop, a horizontal
+    // strip under mobile-touch), so a shelf past the fold would otherwise be
+    // focused while off screen. jsdom ships no scrollIntoView, which is exactly
+    // why the production call is typeof-guarded.
+    const spy = vi.fn();
+    (Element.prototype as unknown as { scrollIntoView: unknown }).scrollIntoView = spy;
+    try {
+      const { w } = makeWindow(baseState(), { open: false });
+      w.open('conquerors');
+      // Once under display:none during render, once after open() sets flex so
+      // the scroll is reliable against a visible root (the cold-jump shape).
+      expect(spy).toHaveBeenCalledTimes(2);
+      // 'nearest' on both axes: an already-visible button must not jump.
+      expect(spy).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
+    } finally {
+      Reflect.deleteProperty(Element.prototype, 'scrollIntoView');
+    }
+  });
+
+  it('moves focus on an ALREADY-OPEN window (the rank-up link is not a no-op)', () => {
+    // The warm branch only re-renders, so before Phase 15 a keyboard or
+    // screen-reader player who activated the Curator rank-up chat line while
+    // the window was open perceived NOTHING. The shelf changes under them and
+    // the reading position has to follow it.
+    const { w, el } = makeWindow(baseState(), { nav: 'conquerors' });
+    el.querySelector<HTMLElement>('[data-close]')?.focus();
     expect(document.activeElement).toBe(el.querySelector('[data-close]'));
+    w.open('overview');
+    expect(activeNav(el)).toBe('overview');
+    // Outranks the data-focus-key restore, which would otherwise put the player
+    // back on Close (the key it captured before the rebuild).
+    expect(document.activeElement).toBe(navButton(el, 'overview'));
+  });
+
+  it('is a ONE-SHOT: a later repaint does not yank the reading position back', () => {
+    const { w, el } = makeWindow(baseState(), { nav: 'conquerors' });
+    w.open('overview');
+    expect(document.activeElement).toBe(navButton(el, 'overview'));
+    el.querySelector<HTMLElement>('[data-close]')?.focus();
+    w.render();
+    expect(document.activeElement).toBe(el.querySelector('[data-close]'));
+    expect(document.activeElement).not.toBe(navButton(el, 'overview'));
+  });
+
+  it('a NO-ARG open arms nothing and still parks on Close', () => {
+    // The nav arm is what makes the jump; a plain open() is "where I was", and
+    // arming it unconditionally would move focus on every keybind press.
+    const { w, el } = makeWindow(baseState(), { open: false });
+    w.open();
+    expect(document.activeElement).toBe(el.querySelector('[data-close]'));
+    expect(document.activeElement).not.toBe(navButton(el, 'overview'));
   });
 });
 

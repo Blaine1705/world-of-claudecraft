@@ -28,6 +28,11 @@
 // clock, no Math.random, no Date.now (this core is scanned for determinism):
 // the flash rides RELIQUARY_FLASH_BUILDS slow-band builds, which is what gives
 // the CSS pulse room to finish instead of being cut off mid-animation.
+//
+// Confirming the intended read of one consequence: the relic that COMPLETES a
+// page never flashes, because that page leaves the strip on the very build that
+// fills it (the skip predicate above), and the Illumination banner plus the chat
+// line own that moment instead.
 
 import type { ReliquaryPageCompletion } from '../world_api/reliquary';
 import { isReliquaryNearlyComplete, rankNearlyComplete } from './reliquary_view';

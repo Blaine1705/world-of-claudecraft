@@ -20,6 +20,7 @@ import { formatNumber, t, tPlural } from '../src/ui/i18n';
 import { reliquaryPageName } from '../src/ui/reliquary_i18n';
 import { reliquaryRelicDisplayName } from '../src/ui/reliquary_labels';
 import { curatorRankNameKey, type ReliquaryUnlockEventModel } from '../src/ui/reliquary_view';
+import { isReliquaryNavId } from '../src/ui/reliquary_window';
 
 // A tier set piece really lives on TWO pages: the raid page that drops it
 // (first in authored order) and its set page. That is what makes the first-find
@@ -250,6 +251,10 @@ describe('the Illumination line (both emitters)', () => {
     expect(illuminate.textContent).toBe(
       t('hudChrome.reliquary.illuminateToast', { name: `[${pageLabel}]` }),
     );
+    // The gold announcement color rides this emitter too: the durable line is
+    // the one that fires on the rarest drain, and it must not read as ordinary
+    // chat just because rank-up took the banner slot.
+    expect(illuminate.style.color).toBe(cssColor(GOLD));
     (illuminate.querySelector('span.chat-deed-link') as HTMLElement).click();
     expect(hud.reliquaryWindow.openWithPage).toHaveBeenCalledWith(ILLUMINATED_PAGE);
     // Three lines, three links: relic, Illumination, rank-up.
@@ -274,6 +279,13 @@ describe('the Curator rank-up line', () => {
     // that nav-bearing open is what drops a persisted off-shelf page.
     expect(hud.reliquaryWindow.open).toHaveBeenCalledWith('overview');
     expect(hud.reliquaryWindow.openWithPage).not.toHaveBeenCalled();
+    // Composition with the REAL window (whose own focus placement is driven in
+    // reliquary_window_jump.test.ts): the argument has to be a nav id the
+    // window's validator accepts, or the shelf jump, and the reading-position
+    // move it arms, would quietly land nowhere.
+    const navArg: unknown = hud.reliquaryWindow.open.mock.calls[0]?.[0];
+    expect(typeof navArg).toBe('string');
+    expect(isReliquaryNavId(navArg as string)).toBe(true);
   });
 });
 

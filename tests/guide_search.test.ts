@@ -106,14 +106,26 @@ describe('guide search index contents', () => {
     // once per page so each hit deep-links to the catalog the reader lands on.
     expect(relicHits.length).toBe(relicTotal);
     const catalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
-    for (const p of GUIDE_RELIQUARY.slice(0, 5)) {
+    // EVERY page and every slot, not a first-five sample: the count parities above
+    // only say how MANY entries exist, so a page whose relics all carry a neighbour's
+    // anchor (or a generator that emits no section id for one page) passes them
+    // untouched, and a sample that stops at five never reaches the page it broke.
+    // The relic hits are bucketed by label first so the per-slot lookup stays linear
+    // over the whole catalog instead of rescanning every hit for every relic.
+    const relicsByName = new Map<string, SearchEntry[]>();
+    for (const hit of relicHits) {
+      const bucket = relicsByName.get(hit.label);
+      if (bucket) bucket.push(hit);
+      else relicsByName.set(hit.label, [hit]);
+    }
+    for (const p of GUIDE_RELIQUARY) {
       const anchor = `reliquary#reliquary-${p.id}`;
       // The deep link resolves: the wiki page really emits this anchor.
       expect(catalogHtml, `page "${p.id}" anchor`).toContain(`id="reliquary-${p.id}"`);
       const pageHit = pageHits.find((e) => e.label === p.name);
       expect(pageHit?.href.endsWith(anchor), `reliquary page "${p.name}" anchor`).toBe(true);
       for (const r of p.relics) {
-        const hit = relicHits.find((e) => e.label === r.name && e.href.endsWith(anchor));
+        const hit = relicsByName.get(r.name)?.find((e) => e.href.endsWith(anchor));
         expect(hit, `relic "${r.name}" missing from "${p.name}"`).toBeDefined();
         // The page name rides along as extra, so a page query also surfaces its relics.
         expect(hit?.haystack.includes(p.name.toLowerCase()), `relic "${r.name}" extra`).toBe(true);

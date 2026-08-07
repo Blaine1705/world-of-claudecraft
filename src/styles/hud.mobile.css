@@ -4163,6 +4163,7 @@
   body.mobile-touch.hud-mobile-compact #deed-tracker .dt-chevron {
     display: none;
   }
+  /* ---------- mobile Reliquary tracker ---------- */
   /* The Reliquary tracker folds on exactly the same tiers, for the same reason:
      glanceable decoration on a phone, with the window itself carrying the full
      pin list. hud.ts routes the compact-tier tap to The Reliquary instead of the
