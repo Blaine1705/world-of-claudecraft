@@ -46,14 +46,14 @@ describe('mage ability-specific spellcasts (issue #2889 batch 1)', () => {
   });
 
   it('wires the donor GLB and an attackByAbility override for every mapped ability', () => {
-    const block = manifestBlock('player_mage: {', 'player_warlock: {');
+    const block = manifestBlock('player_mage: swims({', 'player_warlock: swims({');
     expect(block).toContain('mage_ability_anims.glb');
     expect(block).toContain('attackByAbility');
     for (const clip of MAGE_CAST_CLIPS) expect(block).toContain(`'${clip}'`);
   });
 
   it('every mapped ability id is a real mage ability, and every referenced clip is shipped', () => {
-    const mageBlock = manifestBlock('player_mage: {', 'player_warlock: {');
+    const mageBlock = manifestBlock('player_mage: swims({', 'player_warlock: swims({');
     const abilityStart = mageBlock.indexOf('attackByAbility: {');
     expect(abilityStart).toBeGreaterThanOrEqual(0);
     const abilityEnd = mageBlock.indexOf('\n      },', abilityStart);

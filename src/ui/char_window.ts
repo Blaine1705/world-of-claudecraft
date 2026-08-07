@@ -19,7 +19,7 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot } from '../sim/types';
+import { type EquipSlot, isMechWearer } from '../sim/types';
 import type { IWorld } from '../world_api';
 import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
@@ -35,7 +35,7 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import { wornTooltipInstance } from './item_instance_tooltip';
 import type { PainterHostPresentation } from './painter_host';
-import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { hydratePortraits, modularLookFor, portraitChipHtml } from './portrait_chip';
 import { archetypeImageUrl, professionImageUrl } from './profession_art';
 import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
@@ -133,6 +133,11 @@ export interface CharWindowDeps extends PainterHostPresentation {
   renderBags(): void;
   /** Refusal toast for a drop the socket will not take. */
   showError(text: string): void;
+  /** The paperdoll eye toggle's current state: is the composed kit helm hidden? */
+  helmHidden(): boolean;
+  /** Flip the helmet-visibility preference. HUD-owned side effects (wire
+   *  command, stored choice, portrait re-snapshot, sheet repaint). */
+  toggleHelm(): void;
 }
 
 const SHARE_GLYPH =
@@ -189,7 +194,7 @@ export class CharWindow {
       world.hobbyCraft !== null
         ? `<span class="panel-subtitle char-hobby-craft">${esc(t('hudChrome.archetypeTitle.hobbyLabel'))}: ${esc(hobbyCraft)}</span>`
         : '';
-    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md' })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
+    let html = `<div class="panel-title char-title-portrait">${portraitChipHtml({ cls: world.cfg.playerClass, skin: p.skin ?? 0, name: p.name, variant: 'md', catalog: p.skinCatalog, look: isMechWearer(world.player) ? null : modularLookFor(world.player) })}<span class="char-title-text" id="char-title">${esc(p.name)} <span class="panel-subtitle">${esc(t('itemUi.equipment.levelClass', { level, className }))}</span><span class="panel-subtitle char-archetype-title">${archetypeCrest}${esc(t('hudChrome.archetypeTitle.label'))}: ${esc(archetypeTitle)}</span>${hobbyRow}<span class="panel-subtitle char-honor-balance">${esc(t('hudChrome.warfare.balance', { amount: formatNumber(world.honor, { maximumFractionDigits: 0 }) }))}</span></span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>`;
     html += `<div class="paperdoll">
       <div class="equip-col" id="equip-col-left"></div>
       <div class="char-model-panel">
@@ -291,6 +296,29 @@ export class CharWindow {
       : `<img class="item-icon" style="border-color:${SLOT_EMPTY_BORDER_COLOR}" src="${iconDataUrl('item', 'slot_empty')}" alt="" draggable="false">`;
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
+    // The helmet-visibility eye (head socket only): a standing wardrobe control,
+    // so unlike the corner x it is always visible, and it rides the socket
+    // because that is where the player looks for "my helmet". State + side
+    // effects are HUD-owned through deps (the wire command, the stored choice,
+    // the portrait re-snapshot).
+    if (slot === 'helmet') {
+      const hidden = this.deps.helmHidden();
+      const labelKey = hidden
+        ? 'hudChrome.paperdoll.showHelmAria'
+        : 'hudChrome.paperdoll.hideHelmAria';
+      const eye = document.createElement('button');
+      eye.type = 'button';
+      eye.className = 'equip-helm-eye';
+      eye.innerHTML = svgIcon(hidden ? 'eye-off' : 'eye');
+      eye.setAttribute('aria-label', t(labelKey));
+      eye.setAttribute('aria-pressed', hidden ? 'true' : 'false');
+      this.deps.attachTooltip(eye, () => esc(t(labelKey)));
+      eye.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        this.deps.toggleHelm();
+      });
+      row.appendChild(eye);
+    }
     if (item) {
       // Soft glow in the item's quality color (derived, no getComputedStyle).
       const iconEl = row.querySelector<HTMLImageElement>('.item-icon');

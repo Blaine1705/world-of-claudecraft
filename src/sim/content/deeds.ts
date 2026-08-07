@@ -2659,6 +2659,49 @@ export const DEEDS: Record<string, DeedDef> = {
     renown: 5,
     trigger: { kind: 'visit', markId: 'fish:evergarden' },
   },
+
+  // The WARFARE lifetime-honor ladder: what honor is FOR once the set is
+  // bought. The meter reads PlayerMeta.lifetimeHonor, which is monotonic
+  // (grantHonor only ever adds), so spending at the quartermaster can never
+  // take a rank back, and a veteran who earned the honor before these deeds
+  // shipped is credited by the join-time retro pass. Rank names follow the
+  // classic-era PvP ladder and lead up to Warmarshal Draven Kole, so the
+  // quartermaster reads as the top of the chain of command being climbed.
+  // Thresholds derive from a modelled ~900 honor per committed day of
+  // Thornhollow Fields (result honor plus the uncapped per-kill drip, after the
+  // per-opponent daily decay in src/sim/pvp/honor.ts), so roughly 11, 44 and 167
+  // committed days. Sergeant deliberately lands a little AFTER the 7,550-honor
+  // complete kit, so the first title rewards finishing the gear grind rather than
+  // being a step along it. The thresholds are the tunable here; the income
+  // assumption they rest on is written down so they can be moved with evidence
+  // rather than by feel.
+  pvp_honor_sergeant: {
+    id: 'pvp_honor_sergeant',
+    name: 'Sergeant',
+    desc: 'Earn 10,000 honor in your lifetime. Spending it never costs you the rank.',
+    category: 'pvp',
+    renown: 10,
+    trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 10_000 },
+    reward: { kind: 'title', text: 'Sergeant' },
+  },
+  pvp_honor_knight_lieutenant: {
+    id: 'pvp_honor_knight_lieutenant',
+    name: 'Knight-Lieutenant',
+    desc: 'Earn 40,000 honor in your lifetime, a season of real war behind you.',
+    category: 'pvp',
+    renown: 25,
+    trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 40_000 },
+    reward: { kind: 'title', text: 'Knight-Lieutenant' },
+  },
+  pvp_honor_field_marshal: {
+    id: 'pvp_honor_field_marshal',
+    name: 'Field Marshal',
+    desc: 'Earn 150,000 honor in your lifetime. Rare on any realm, and it should be.',
+    category: 'pvp',
+    renown: 50,
+    trigger: { kind: 'meter', meter: 'lifetimeHonor', amount: 150_000 },
+    reward: { kind: 'title', text: 'Field Marshal' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

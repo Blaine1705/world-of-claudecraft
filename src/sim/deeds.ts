@@ -637,6 +637,21 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   arenaRankedWins: [],
   bgWins: [],
   bgCaptures: [],
+  // The meter reads PlayerMeta.lifetimeHonor directly, never a deedStats ledger,
+  // so no narrow dirty key could name anything it consumes: [] is the only
+  // honest value, which is the condition the guard test instruments for.
+  //
+  // Note what this DOES cost, precisely, because an earlier draft of this comment
+  // overstated it. The three RESULT sites mark a full pass (battleground result,
+  // ranked arena end, fiesta return), but the mid-match drip does not:
+  // awardBattlegroundKillHonor, awardBattlegroundAssistHonor and
+  // awardFiestaKillHonor all grant honor without marking. So a rank threshold
+  // crossed by a killing blow grants at the end of that match rather than on the
+  // tick it was crossed. That is a few minutes of latency on a cosmetic title,
+  // it is identical on every host, and retro-grant-on-load backstops it, so it is
+  // accepted rather than fixed: adding a mark to the per-kill path would put deed
+  // work on a combat hot path to make a title appear slightly sooner.
+  lifetimeHonor: [],
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
@@ -744,6 +759,9 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   arenaRankedWins: (m) => m.arenaWins + m.arena2v2Wins,
   bgWins: (m) => m.bgWins,
   bgCaptures: (m) => m.bgCaptures,
+  // LIFETIME honor, never the spendable balance: a rank once earned survives
+  // every purchase at the WARFARE quartermaster.
+  lifetimeHonor: (m) => m.lifetimeHonor,
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,

@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Banner in der Hand',
+    desc: 'Erobere eine Flagge in den Thornhollow-Feldern.',
+  },
+  pvp_bg_first_win: {
+    name: 'Die Senke hält',
+    desc: 'Gewinne ein Schlachtfeld in den Thornhollow-Feldern.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Wärter der Senke',
+    desc: 'Gewinne 25 Schlachtfelder in den Thornhollow-Feldern.',
+    title: 'Fahnenträger',
+  },
+  pvp_bg_captures_100: {
+    name: 'Hundert Banner',
+    desc: 'Erobere im Laufe deiner Karriere 100 Flaggen in den Thornhollow-Feldern.',
+  },
+  dgn_rift: {
+    name: 'Risswandler',
+    desc: 'Bereinige einen Riss, indem du seinen Boss besiegst.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Rissherrscher',
+    desc: 'Bereinige einen Riss vom Rang S, der schwersten Stufe, die ein Rissportal erzeugen kann.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sergeant',
+    desc: 'Verdiene im Laufe deines Lebens 10.000 Ehre. Sie auszugeben kostet dich nie den Rang.',
+    title: 'Sergeant',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Ritter-Leutnant',
+    desc: 'Verdiene im Laufe deines Lebens 40.000 Ehre, eine Saison echten Krieges hinter dir.',
+    title: 'Ritter-Leutnant',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Feldmarschall',
+    desc: 'Verdiene im Laufe deines Lebens 150.000 Ehre. Selten auf jedem Reich, und das sollte es auch sein.',
+    title: 'Feldmarschall',
+  },
   chr_drakemaw_broodlord: {
     name: 'Gelegebrecher',
     desc: 'Einen Drakenrachen-Brutfürsten inmitten seiner Eier erlegen, durch Schrei, Hieb und Feuer hindurch.',

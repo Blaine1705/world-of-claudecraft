@@ -88,6 +88,8 @@ const mi = (over: Partial<MoveInput> = {}): MoveInput => ({
   strafeLeft: false,
   strafeRight: false,
   jump: false,
+  dive: false,
+  surface: false,
   ...over,
 });
 
@@ -262,6 +264,26 @@ describe('player motion kernel parity with the live Sim', () => {
     runParity(sim, mi(), 5, 'settle to surface');
     runParity(sim, mi({ forward: true }), 20 * 3, 'swim forward');
     runParity(sim, mi({ forward: true, jump: true }), 20 * 2, 'shore hop');
+  });
+
+  // The VERTICAL half of swimming has to hold the same bit-for-bit contract as
+  // the horizontal half: swimVerticalPass owns Y outright (dive rate, buoyancy,
+  // the swimDiving latch, the graded camera steer), all of it off MoveInput
+  // fields the client predictor forwards, so a fork here would rubber-band a
+  // dive on every online client while every case above stayed green.
+  it('dives, holds depth, and surfaces identically', () => {
+    const sim = makeSim();
+    const spot = findDeepWater(SEED);
+    teleport(sim, spot.x, spot.z);
+    runParity(sim, mi(), 5, 'settle to surface');
+    // full-rate key dive, then the latch holding depth hands-free
+    runParity(sim, mi({ forward: true, dive: true }), 20 * 2, 'dive');
+    runParity(sim, mi(), 20, 'swimDiving holds depth');
+    // a feathered camera steer, the one graded movement field
+    runParity(sim, mi({ forward: true, dive: true, swimSteer: 0.5 }), 20, 'graded dive');
+    runParity(sim, mi({ surface: true, swimSteer: 0.5 }), 20 * 2, 'graded ascend');
+    // and jump outranking dive on the way back out
+    runParity(sim, mi({ forward: true, dive: true, jump: true }), 20, 'jump outranks dive');
   });
 
   it('runs at ghost speed identically (snare-immune multiplier)', () => {

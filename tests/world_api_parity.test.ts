@@ -164,6 +164,7 @@ export const IWORLD_MEMBERS = [
   { name: 'unequipMechChroma', kind: 'method' },
   { name: 'changeWeaponSkin', kind: 'method' },
   { name: 'toggleWeaponStow', kind: 'method' },
+  { name: 'setHelmHidden', kind: 'method' },
   { name: 'unstuck', kind: 'method' },
   { name: 'releaseSpirit', kind: 'method' },
   { name: 'resurrectAtCorpse', kind: 'method' },
@@ -551,9 +552,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // branch's commission order board (issue #1298) adds commissionOrders
     // (data) plus openCommissionOrder/cancelCommissionOrder/
     // acceptCommissionOrder/deliverCommissionOrder (methods), leaving 299.
-    expect(IWORLD_MEMBERS.length).toBe(299);
+    // This branch's paperdoll helmet-visibility eye adds setHelmHidden
+    // (IWorldCosmetics, a method), leaving 300.
+    expect(IWORLD_MEMBERS.length).toBe(300);
     expect(DATA_MEMBERS.length).toBe(76);
-    expect(METHOD_MEMBERS.length).toBe(223);
+    expect(METHOD_MEMBERS.length).toBe(224);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -810,6 +813,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellItem',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
@@ -1130,6 +1134,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'sellItem',
       'setActiveTitle',
       'setDungeonDifficulty',
+      'setHelmHidden',
       'setMarker',
       'setPartyLootMaster',
       'setPetAutoTaunt',
@@ -1330,6 +1335,7 @@ const FACET_COSMETICS = [
   'unequipMechChroma',
   'changeWeaponSkin',
   'toggleWeaponStow',
+  'setHelmHidden',
 ] as const satisfies readonly (keyof IWorldCosmetics)[];
 type _ExhaustCosmetics = AssertNever<
   Exclude<keyof IWorldCosmetics, (typeof FACET_COSMETICS)[number]>
@@ -1749,8 +1755,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(299);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(299);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(300);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(300);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

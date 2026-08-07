@@ -486,8 +486,8 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // The hunter loads it.
     const manifestSrc = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const hunterBlock = manifestSrc.slice(
-      manifestSrc.indexOf('player_hunter: {'),
-      manifestSrc.indexOf('player_rogue: {'),
+      manifestSrc.indexOf('player_hunter: swims({'),
+      manifestSrc.indexOf('player_rogue: swims({'),
     );
     expect(hunterBlock).toContain('bow_hold_anim.glb');
   });
@@ -496,10 +496,17 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // Source scan, not an import: pulling the manifest into Node would kick
     // the module-import GLB preloads (assets.ts loading contract).
     const manifestSrc = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
+    // Anchor inside VISUALS on the KEY alone: the same keys appear earlier in
+    // the SKINS table, and player defs are wrapped (`player_hunter: swims({`)
+    // to layer the shared swim strokes on — so neither a bare key search nor a
+    // brace anchor lands on the def. Both would slice the wrong text and pass.
+    const visualsAt = manifestSrc.indexOf('export const VISUALS');
+    expect(visualsAt).toBeGreaterThan(-1);
     const hunterBlock = manifestSrc.slice(
-      manifestSrc.indexOf('player_hunter: {'),
-      manifestSrc.indexOf('player_rogue: {'),
+      manifestSrc.indexOf('player_hunter:', visualsAt),
+      manifestSrc.indexOf('player_rogue:', visualsAt),
     );
+    expect(hunterBlock, 'anchored on the hunter VISUAL, not its skin row').toContain('ranger.glb');
     expect(hunterBlock).toContain('bow_anims.glb');
     // Parse the shipped GLB's JSON chunk and assert the clips are inside
     // (scripts/build_bow_anims.mjs output; regenerate from the CC0 pack).
@@ -559,7 +566,7 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
   it('the mech ships both ranged clips: the bow donor by animUrls, the shot in its GLB', () => {
     const manifestSrc = readFileSync(join(ROOT, 'src/render/characters/manifest.ts'), 'utf8');
     const mechBlock = manifestSrc.slice(
-      manifestSrc.indexOf('player_mech: {'),
+      manifestSrc.indexOf('player_mech: swims({'),
       manifestSrc.indexOf('npc_fernando: {'),
     );
     expect(mechBlock).toContain('bow_anims.glb');

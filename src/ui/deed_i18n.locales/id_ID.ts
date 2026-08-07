@@ -7,6 +7,46 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  pvp_bg_first_capture: {
+    name: 'Bendera di Tangan',
+    desc: 'Rebut bendera di Medan Thornhollow.',
+  },
+  pvp_bg_first_win: {
+    name: 'Thornhollow Bertahan',
+    desc: 'Menangkan pertempuran di Medan Thornhollow.',
+  },
+  pvp_bg_wins_25: {
+    name: 'Penjaga Thornhollow',
+    desc: 'Menangkan 25 pertempuran di Medan Thornhollow.',
+    title: 'Pembawa Panji',
+  },
+  pvp_bg_captures_100: {
+    name: 'Seratus Bendera',
+    desc: 'Rebut 100 bendera di Medan Thornhollow sepanjang kariermu.',
+  },
+  dgn_rift: {
+    name: 'Penjelajah Rift',
+    desc: 'Bersihkan Rift dengan mengalahkan bos lantainya.',
+  },
+  dgn_rift_s_rank: {
+    name: 'Penguasa Rift',
+    desc: 'Bersihkan Rift peringkat S, tingkat tersulit yang bisa dimunculkan portal Rift.',
+  },
+  pvp_honor_sergeant: {
+    name: 'Sersan',
+    desc: 'Raih 10.000 kehormatan seumur hidupmu. Membelanjakannya tidak akan pernah menghilangkan pangkat ini.',
+    title: 'Sersan',
+  },
+  pvp_honor_knight_lieutenant: {
+    name: 'Letnan Ksatria',
+    desc: 'Raih 40.000 kehormatan seumur hidupmu, satu musim perang sungguhan di belakangmu.',
+    title: 'Letnan Ksatria',
+  },
+  pvp_honor_field_marshal: {
+    name: 'Marsekal Lapangan',
+    desc: 'Raih 150.000 kehormatan seumur hidupmu. Langka di realm mana pun, dan memang seharusnya begitu.',
+    title: 'Marsekal Lapangan',
+  },
   chr_drakemaw_broodlord: {
     name: 'Pemusnah Tetasan',
     desc: 'Tumpaskan seekor Penguasa Sarang Drakemaw di tengah telur-telurnya, menembus raungan, tebasan, dan apinya.',
