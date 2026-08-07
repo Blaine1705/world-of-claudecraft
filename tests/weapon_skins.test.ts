@@ -367,6 +367,7 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
             '2H_Ranged_Shoot',
             'Hunter_Shot_LongDraw',
             'Hunter_Melee_Gut',
+            'Spellcast_Raise',
             'Bow_Draw_Shot',
             'Idle',
             'Walk',
@@ -415,6 +416,15 @@ describe('bow skin attack animation (hunter draw instead of crossbow aim)', () =
     // thrown (second review round on PR #2958).
     visual.playAttack('raptor_strike');
     expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Hunter_Melee_Gut');
+
+    // A self-buff aspect toggle (range-agnostic, no swing) also keeps its
+    // authored Spellcast_Raise raise/buff ceremony with the same bow skin
+    // displayed: casting Harrier's Guise or Fevered Draw must never play the
+    // draw-shot attack (Rubsey's OSSBrain review on PR #2958).
+    visual.playAttack('aspect_of_the_hawk');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
+    visual.playAttack('rapid_fire');
+    expect((visual as unknown as ActionPeek).current?.getClip().name).toBe('Spellcast_Raise');
   });
 });
 
