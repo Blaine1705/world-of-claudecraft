@@ -18,7 +18,11 @@ describe('warlock sub-200 BiS anchor at 120 seconds', () => {
         rows.reduce((sum, row) => sum + row[key], 0) / rows.length;
 
       expect(mean('dps')).toBeLessThanOrEqual(200);
-      expect(mean('dps')).toBeGreaterThanOrEqual(150);
+      // Floor 150 to 140 with the 2026-08-07 top-end trim round: the isolated
+      // head benches below the composed tree, and the sanctioned cuts land
+      // Ruination and Pactbound near 148-149 here. The floor still catches a
+      // collapse; the anchor above is the load-bearing half.
+      expect(mean('dps')).toBeGreaterThanOrEqual(140);
       expect(mean('starvedPct')).toBeLessThan(0.1);
     },
     180_000,
@@ -48,7 +52,9 @@ describe('Demonology full-BiS five-minute inert-boss balance', () => {
   it('keeps a modest sustain floor without approaching Affliction', () => {
     const result = runWarlockBalanceProbe('demonology', 42, 300);
 
-    expect(result.dps).toBeGreaterThanOrEqual(110);
+    // Floor 110 to 100 with the 2026-08-07 top-end trim round (same reasoning
+    // as the two-minute anchor floor above).
+    expect(result.dps).toBeGreaterThanOrEqual(100);
     expect(result.dps).toBeLessThanOrEqual(165);
     expect(result.manaEndPct).toBeLessThan(0.05);
     expect(result.starvedPct).toBeLessThan(0.45);
