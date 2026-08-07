@@ -1815,6 +1815,10 @@ export const hudChromeStrings = {
   paperdoll: {
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
+    // The helmet-visibility eye on the head socket: each string is the action
+    // the press performs (so the shown-state button says "Hide helmet").
+    hideHelmAria: 'Hide helmet',
+    showHelmAria: 'Show helmet',
   },
   // Home-page account portal (the logged-in "Account" nav tab). Lives here in the
   // English-only hud_chrome domain so an English-only PR compiles; translations

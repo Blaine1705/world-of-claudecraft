@@ -566,6 +566,9 @@ export const COMMAND_NAMES = [
   // 20 Hz snapshot, because the payload is cold, identical for every member of
   // the guild, and 50 rows wide. Sent only while the log view is open.
   'guild_bank_log',
+  // Paperdoll eye toggle: helmet-visibility preference on the composed body.
+  // Appended because wire tokens are never reordered.
+  'set_helm',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -701,6 +704,7 @@ export const COMMAND_FACETS = {
   unequip_mech_chroma: 'IWorldCosmetics',
   change_weapon_skin: 'IWorldCosmetics',
   stow_weapon: 'IWorldCosmetics',
+  set_helm: 'IWorldCosmetics',
   // IWorldPet: hunter-pet commands (snake_case wire strings, by design; pet state
   // mirrors on the owned-mob entity wire, not a self-snapshot field).
   pet_abandon: 'IWorldPet',

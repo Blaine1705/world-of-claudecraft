@@ -13227,6 +13227,53 @@
   body.mobile-touch .equip-slot .equip-unequip-btn {
     opacity: 1;
   }
+  /* The head socket's helmet-visibility eye: the unequip x's circle chrome, but
+     ALWAYS visible (a standing wardrobe control, not a destructive reveal) and
+     seated at the bottom corner so the two never overlap. */
+  .equip-slot .equip-helm-eye {
+    position: absolute;
+    bottom: -7px;
+    z-index: 2;
+    flex: none;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid rgba(202, 164, 114, 0.5);
+    background: rgba(40, 26, 20, 0.85);
+    color: var(--color-text-secondary, #d6c1a0);
+    cursor: var(--cursor-point);
+    transition:
+      border-color 0.12s,
+      box-shadow 0.12s,
+      color 0.12s;
+  }
+  .equip-slot .equip-helm-eye .ui-icon {
+    width: 13px;
+    height: 13px;
+  }
+  .equip-col:not(.equip-col-right) .equip-slot .equip-helm-eye {
+    left: calc(50% - 88px);
+  }
+  .equip-col-right .equip-slot .equip-helm-eye {
+    right: calc(50% - 88px);
+  }
+  .equip-slot .equip-helm-eye[aria-pressed="true"] {
+    color: rgba(214, 193, 160, 0.55);
+  }
+  .equip-slot .equip-helm-eye:hover,
+  .equip-slot .equip-helm-eye:focus-visible {
+    border-color: rgba(255, 218, 160, 0.8);
+    color: #fff;
+    box-shadow: 0 0 7px rgba(202, 164, 114, 0.4);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .equip-slot .equip-helm-eye {
+      transition: none;
+    }
+  }
   .equip-slot .equip-unequip-btn:hover,
   .equip-slot .equip-unequip-btn:focus-visible {
     border-color: rgba(255, 218, 160, 0.8);

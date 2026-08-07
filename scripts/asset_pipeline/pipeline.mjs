@@ -26,6 +26,8 @@
 //   node scripts/asset_pipeline/pipeline.mjs validate --file x.glb --kind weapon|prop|creature [--family sword]
 //   node scripts/asset_pipeline/pipeline.mjs preview --file x.glb [--out dir]
 //   node scripts/asset_pipeline/pipeline.mjs library [--serve [--port 5180]] [--category weapons,skins] [--open]
+//   node scripts/asset_pipeline/pipeline.mjs fit [--port 5184]   (Fit Studio: gizmo-place modular
+//     hair/piercings; Save writes tmp/modular/anchors.json for the Blender rebuild)
 //   node scripts/asset_pipeline/pipeline.mjs status [--job id]
 //
 // Keys: TRIPO_API_KEY (required), OPENAI_API_KEY (optional gpt-image-2 concepts).
@@ -1371,6 +1373,26 @@ async function cmdLibrary() {
   }
 }
 
+async function cmdFit() {
+  const { serveFitStudio, fitState } = await import('./lib/fit_studio.mjs');
+  const st = fitState();
+  if (!st.characterGlb) {
+    throw new Error(
+      'fit: no modular character GLB found (run the modular rebuild, or ship ' +
+        'public/models/chars/modular/warrior_modular.glb)',
+    );
+  }
+  const port = Number(opt('port', 5184));
+  const { url } = await serveFitStudio({ port });
+  console.log(`\nFit Studio serving at ${url}`);
+  console.log(`  character: ${st.characterGlb}`);
+  console.log(`  hair sculpts: ${st.hair.length} (tmp/modular/hair_src)`);
+  console.log('  place each hair/piercing with the gizmo, Save writes tmp/modular/anchors.json,');
+  console.log('  and the next modular rebuild seats it exactly there. Ctrl-C to stop.');
+  if (!flag('no-open')) await openInBrowser(url);
+  // the http server keeps the process alive
+}
+
 // Open a URL/file in the OS browser without ever crashing the caller: the opener
 // binary is platform-specific and may be absent (headless Linux), so a missing
 // command must be swallowed (async 'error' event), not thrown.
@@ -1456,6 +1478,7 @@ const COMMANDS = {
   preview: cmdPreview,
   'preview-held': cmdPreviewHeld,
   library: cmdLibrary,
+  fit: cmdFit,
   qa: cmdQa,
   status: cmdStatus,
   balance: cmdBalance,

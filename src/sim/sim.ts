@@ -594,6 +594,7 @@ import * as yumiMod from './social/yumi';
 export { eloDelta } from './social/arena';
 
 import { FINDER_ACTIVITIES, type FinderListingTag } from './content/dungeon_finder';
+import { setHelmHidden as setHelmHiddenMod } from './helm_visibility';
 import {
   partyFrameAbsorb,
   partyFrameAggroTargets,
@@ -1680,6 +1681,9 @@ export interface CharacterState {
   // Z-key sheathed-weapon toggle (JSONB; written only while sheathed, so pre-feature
   // saves and unsheathed characters stay byte-equal and load with the weapon drawn).
   weaponStowed?: boolean;
+  // Paperdoll helmet-visibility preference (JSONB; written only while hidden, same
+  // pre-feature byte-equality contract as weaponStowed).
+  helmHidden?: boolean;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
@@ -3267,6 +3271,7 @@ export class Sim {
       );
       // Resume with the weapon sheathed exactly as saved (absent = drawn).
       if (s.weaponStowed) player.weaponStowed = true;
+      if (s.helmHidden) player.helmHidden = true;
     }
 
     // Host-stamped bank bonus slots (see the opt doc above). Applied on BOTH the
@@ -3910,6 +3915,7 @@ export class Sim {
         : {}),
       // Absent until sheathed (back-compat + parity-stable saves).
       ...(e.weaponStowed ? { weaponStowed: true } : {}),
+      ...(e.helmHidden ? { helmHidden: true } : {}),
       // Absent until the first cup result (back-compat + parity-stable saves).
       ...(meta.vcupWins || meta.vcupLosses || meta.vcupDraws
         ? { vcupWins: meta.vcupWins, vcupLosses: meta.vcupLosses, vcupDraws: meta.vcupDraws }
@@ -4234,6 +4240,15 @@ export class Sim {
     const r = this.resolve(pid);
     if (!r) return;
     weaponStowMod.toggleWeaponStow(r.e);
+  }
+
+  /** Paperdoll eye toggle (IWorld.setHelmHidden; server `set_helm` command).
+   *  Cosmetic only: sets Entity.helmHidden, which rides the entity wire and the
+   *  renderer maps to a composed body with its kit head piece left off. */
+  setHelmHidden(hidden: boolean, pid?: number): void {
+    const r = this.resolve(pid);
+    if (!r) return;
+    setHelmHiddenMod(r.e, hidden);
   }
 
   /** Set a player's guild name (online only) so it rides the entity wire and
