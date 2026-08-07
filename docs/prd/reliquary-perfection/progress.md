@@ -12,8 +12,8 @@
 | 12 QA | complete | 2026-08-06 | 2026-08-06 |
 | 13 Window structure + information UX | complete | 2026-08-06 | 2026-08-06 |
 | 13 QA | complete | 2026-08-06 | 2026-08-06 |
-| 13b Complete source coverage | not started | | |
-| 13b QA | not started | | |
+| 13b Complete source coverage | complete | 2026-08-07 | 2026-08-07 |
+| 13b QA | complete | 2026-08-07 | 2026-08-07 |
 | 14 Overview flagship + celebration | not started | | |
 | 14 QA | not started | | |
 | 15 Deep links, chat, tracker, guide search | not started | | |
@@ -713,3 +713,14 @@ the pending set grew to three by ruling, every other claim verified.
   BSD grep has no -P). SOURCE_PENDING_RULING key order is load-bearing in
   the exact-equality pin (deliberate). The pended mark caps catalog
   completion at 215/216 until the owner acts (recorded in state.md).
+- Gate: node scripts/gate_select.mjs (planner fell back to the full
+  suite) surfaced ONE real red the audits had missed: the Harrow fear
+  case in tests/fear_break_chance.test.ts, an assertion failure (not a
+  timeout), isolated-reproducible, GREEN at both merge parents and red
+  only at their combination: the branch's seed-1 hunt went stale when the
+  private-scatter sync moved the late Galecrest camps off the shared
+  stream. Followed to the release side's own recorded seed 4 in
+  6391de2fef (the same fallout class as the masterwork window). The
+  re-run gate is PASS, all 8 steps green: full suite 32088 tests across
+  2315 files (2 expected fail, 108 skipped), browser suite 110 green,
+  builds, i18n freshness, biome, and the malware scan all clean.
