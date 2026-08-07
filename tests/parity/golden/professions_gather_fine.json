@@ -18,7 +18,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "e836976c",
+      "state": "60db104b",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -74,6 +74,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -150,7 +153,7 @@
       "tick": 51,
       "time": 2.55,
       "nextId": 964,
-      "state": "5a9ca1a5",
+      "state": "249d4ef4",
       "events": "2953a226",
       "rng": {
         "draws": 2,
@@ -246,6 +249,9 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -325,7 +331,7 @@
       "tick": 104,
       "time": 5.2,
       "nextId": 964,
-      "state": "fc147768",
+      "state": "2f211a93",
       "events": "4be0fb68",
       "rng": {
         "draws": 4,
@@ -430,6 +436,9 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -509,7 +518,7 @@
       "tick": 157,
       "time": 7.85,
       "nextId": 964,
-      "state": "dd2ecfb7",
+      "state": "d3133ad4",
       "events": "6c52f970",
       "rng": {
         "draws": 6,
@@ -624,6 +633,9 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}
@@ -703,7 +715,7 @@
       "tick": 159,
       "time": 7.95,
       "nextId": 964,
-      "state": "1d8dff08",
+      "state": "9a709601",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -818,6 +830,9 @@
             "ore_mirefen_t2": 242.1
           },
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 15,
           "talents": {
             "rows": {}

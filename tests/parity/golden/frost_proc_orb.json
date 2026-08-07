@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 964,
-      "state": "7e4e40e7",
+      "state": "f1e7623e",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -75,6 +75,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "talents": {
             "rows": {}
           },
@@ -138,7 +141,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 965,
-      "state": "97b063cd",
+      "state": "fbc9b9e8",
       "events": "1483a910",
       "rng": {
         "draws": 1,
@@ -149,7 +152,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 965,
-      "state": "139b2c97",
+      "state": "826ebbf2",
       "events": "02c127b6",
       "rng": {
         "draws": 2,
@@ -160,7 +163,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 965,
-      "state": "9bebb3c8",
+      "state": "cfbb28cf",
       "events": "0323ce72",
       "rng": {
         "draws": 150,
@@ -171,7 +174,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 965,
-      "state": "676ce292",
+      "state": "e50d0351",
       "events": "c2f7f197",
       "rng": {
         "draws": 316,
@@ -182,7 +185,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "73afcc07",
+      "state": "6b419642",
       "events": "7b765a8e",
       "rng": {
         "draws": 356,
@@ -279,6 +282,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 65,
           "talents": {
             "rows": {},
@@ -436,7 +442,7 @@
       "tick": 84,
       "time": 4.2,
       "nextId": 965,
-      "state": "73afcc07",
+      "state": "6b419642",
       "events": "741638a5",
       "rng": {
         "draws": 356,
@@ -533,6 +539,9 @@
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
+          "reliquary": {
+            "firstFind": {}
+          },
           "renown": 65,
           "talents": {
             "rows": {},
