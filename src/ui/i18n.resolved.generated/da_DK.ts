@@ -3609,7 +3609,9 @@ export const da_DK: EnTranslations = {
       "typeDelve": "Delve",
       "typeTerm": "Begreb",
       "typeAbility": "Evne",
-      "typeDeed": "Bedrift"
+      "typeDeed": "Bedrift",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "Klassisk browser-MMO",

@@ -9627,6 +9627,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.professions.craftHowTitle': '製作ウィンドウ',
   'guide.search.typeAbility': 'アビリティ',
   'guide.search.typeDeed': '功績',
+  'guide.search.typeRelic': '聖遺物',
+  'guide.search.typeReliquaryPage': '聖遺物庫ページ',
   'guide.settingsPage.autolootBody':
     '一つ一つの亡骸をクリックするのが面倒ですか。初期設定ではオフのインターフェース設定を使えば、自分が倒した相手の戦利品を、そばを通り過ぎるだけで自動で拾えます。',
   'guide.settingsPage.factSearchBody':

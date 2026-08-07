@@ -3609,7 +3609,9 @@ export const vi_VN: EnTranslations = {
       "typeDelve": "Hang Sâu",
       "typeTerm": "Thuật Ngữ",
       "typeAbility": "Kỹ Năng",
-      "typeDeed": "Kỳ Công"
+      "typeDeed": "Kỳ Công",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "MMO cổ điển trên trình duyệt",

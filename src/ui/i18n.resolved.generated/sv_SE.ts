@@ -3609,7 +3609,9 @@ export const sv_SE: EnTranslations = {
       "typeDelve": "Delve",
       "typeTerm": "Term",
       "typeAbility": "Förmåga",
-      "typeDeed": "Bedrift"
+      "typeDeed": "Bedrift",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "Klassiskt MMO i webbläsaren",

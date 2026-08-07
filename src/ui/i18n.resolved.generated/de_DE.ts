@@ -3609,7 +3609,9 @@ export const de_DE: EnTranslations = {
       "typeDelve": "Tiefgang",
       "typeTerm": "Begriff",
       "typeAbility": "Fähigkeit",
-      "typeDeed": "Tat"
+      "typeDeed": "Tat",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "Browser-MMO im klassischen Stil",

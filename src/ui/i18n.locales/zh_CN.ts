@@ -9190,6 +9190,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.professions.craftHowTitle': '制作窗口',
   'guide.search.typeAbility': '技能',
   'guide.search.typeDeed': '功绩',
+  'guide.search.typeRelic': '圣物',
+  'guide.search.typeReliquaryPage': '圣物库页面',
   'guide.settingsPage.autolootBody':
     '不想逐个点击尸体？有一个默认关闭的界面选项，会在你路过自己击杀的目标时自动拾取它们身上的战利品。',
   'guide.settingsPage.factSearchBody':

@@ -9613,6 +9613,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.professions.craftHowTitle': '제작 창',
   'guide.search.typeAbility': '능력',
   'guide.search.typeDeed': '업적',
+  'guide.search.typeRelic': '성물',
+  'guide.search.typeReliquaryPage': '성물고 페이지',
   'guide.settingsPage.autolootBody':
     '시체마다 일일이 클릭하기 번거로우신가요? 기본값으로 꺼져 있는 인터페이스 옵션을 켜면, 여러분이 처치한 적을 지나칠 때 그 전리품을 자동으로 주워 담습니다.',
   'guide.settingsPage.factSearchBody':

@@ -3609,7 +3609,9 @@ export const tr_TR: EnTranslations = {
       "typeDelve": "Mağara Seferi",
       "typeTerm": "Terim",
       "typeAbility": "Yetenek",
-      "typeDeed": "Yiğitlik"
+      "typeDeed": "Yiğitlik",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "Klasik tarz tarayıcı MMO'su",

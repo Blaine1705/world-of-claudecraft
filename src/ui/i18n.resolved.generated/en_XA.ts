@@ -3609,7 +3609,9 @@ export const en_XA: EnTranslations = {
       "typeDelve": "[Ðéļʋé]",
       "typeTerm": "[Ţéŕɱ]",
       "typeAbility": "[Áƀíļíţý]",
-      "typeDeed": "[Ðééð]"
+      "typeDeed": "[Ðééð]",
+      "typeReliquaryPage": "[Ŕéļíɋúáŕý Þáĝé]",
+      "typeRelic": "[Ŕéļíç]"
     },
     "home": {
       "eyebrow": "[Çļáššíç-šţýļé ƀŕóŵšéŕ ⱮⱮÓ]",

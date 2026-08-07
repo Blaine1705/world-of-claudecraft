@@ -3609,7 +3609,9 @@ export const cs_CZ: EnTranslations = {
       "typeDelve": "Výprava",
       "typeTerm": "Termín",
       "typeAbility": "Schopnost",
-      "typeDeed": "Skutek"
+      "typeDeed": "Skutek",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "Prohlížečové MMO v klasickém stylu",

@@ -3609,7 +3609,9 @@ export const zh_TW: EnTranslations = {
       "typeDelve": "秘探",
       "typeTerm": "詞彙",
       "typeAbility": "技能",
-      "typeDeed": "功績"
+      "typeDeed": "功績",
+      "typeReliquaryPage": "聖物庫頁面",
+      "typeRelic": "聖物"
     },
     "home": {
       "eyebrow": "經典風格的瀏覽器MMO",

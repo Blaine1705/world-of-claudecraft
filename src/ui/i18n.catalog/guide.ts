@@ -119,6 +119,10 @@ export const guideStrings = {
     typeTerm: 'Term',
     typeAbility: 'Ability',
     typeDeed: 'Deed',
+    // A Reliquary collection page (a shelf entry), not a wiki page: keep the
+    // Reliquary term of the glossary reliquaryName row in every locale.
+    typeReliquaryPage: 'Reliquary Page',
+    typeRelic: 'Relic',
   },
 
   // Home / overview landing.

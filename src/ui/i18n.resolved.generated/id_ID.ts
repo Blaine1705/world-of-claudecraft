@@ -3609,7 +3609,9 @@ export const id_ID: EnTranslations = {
       "typeDelve": "Delve",
       "typeTerm": "Istilah",
       "typeAbility": "Kemampuan",
-      "typeDeed": "Jasa"
+      "typeDeed": "Jasa",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "MMO browser bergaya klasik",

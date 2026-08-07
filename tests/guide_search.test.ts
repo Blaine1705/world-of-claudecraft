@@ -4,8 +4,11 @@
 // pins target the pure functions the panel renders from.
 
 import { beforeAll, describe, expect, it } from 'vitest';
-import { GUIDE_CLASSES, GUIDE_DEEDS } from '../src/guide/content.generated';
+import { GUIDE_CLASSES, GUIDE_DEEDS, GUIDE_RELIQUARY } from '../src/guide/content.generated';
+import { reliquaryCatalogSections } from '../src/guide/pages/reliquary';
 import { buildIndex, groupByType, rank, type SearchEntry } from '../src/guide/search';
+import { DEEDS } from '../src/sim/content/deeds';
+import type { DeedDef } from '../src/sim/types';
 import { setLanguage, t } from '../src/ui/i18n';
 
 const entry = (label: string, type = 'T', href = '#'): SearchEntry => ({
@@ -83,6 +86,100 @@ describe('guide search index contents', () => {
       expect(hit?.href.endsWith(`deeds#deed-cat-${d.category}`), `deed "${d.name}" anchor`).toBe(
         true,
       );
+    }
+  });
+
+  it('indexes every Reliquary page and relic onto that page section of the catalog', () => {
+    const index = buildIndex();
+    const pageType = t('guide.search.typeReliquaryPage');
+    const relicType = t('guide.search.typeRelic');
+    // Exact English labels: the two group headings the panel prints.
+    expect([pageType, relicType]).toEqual(['Reliquary Page', 'Relic']);
+    const relicTotal = GUIDE_RELIQUARY.reduce((n, p) => n + p.relics.length, 0);
+    // Floors so the count parity below can never pass on an empty catalog.
+    expect(GUIDE_RELIQUARY.length).toBeGreaterThanOrEqual(28);
+    expect(relicTotal).toBeGreaterThanOrEqual(200);
+    const pageHits = index.filter((e) => e.type === pageType);
+    const relicHits = index.filter((e) => e.type === relicType);
+    expect(pageHits.length).toBe(GUIDE_RELIQUARY.length);
+    // Every slot, not every distinct name: a relic shown on two pages is indexed
+    // once per page so each hit deep-links to the catalog the reader lands on.
+    expect(relicHits.length).toBe(relicTotal);
+    const catalogHtml = reliquaryCatalogSections(GUIDE_RELIQUARY);
+    for (const p of GUIDE_RELIQUARY.slice(0, 5)) {
+      const anchor = `reliquary#reliquary-${p.id}`;
+      // The deep link resolves: the wiki page really emits this anchor.
+      expect(catalogHtml, `page "${p.id}" anchor`).toContain(`id="reliquary-${p.id}"`);
+      const pageHit = pageHits.find((e) => e.label === p.name);
+      expect(pageHit?.href.endsWith(anchor), `reliquary page "${p.name}" anchor`).toBe(true);
+      for (const r of p.relics) {
+        const hit = relicHits.find((e) => e.label === r.name && e.href.endsWith(anchor));
+        expect(hit, `relic "${r.name}" missing from "${p.name}"`).toBeDefined();
+        // The page name rides along as extra, so a page query also surfaces its relics.
+        expect(hit?.haystack.includes(p.name.toLowerCase()), `relic "${r.name}" extra`).toBe(true);
+      }
+    }
+  });
+
+  it('finds a Reliquary page and one of its relics by name', () => {
+    const index = buildIndex();
+    const page = GUIDE_RELIQUARY.find((p) => p.name === 'Gravewyrm Sanctum');
+    expect(page, 'the Gravewyrm Sanctum reliquary page').toBeDefined();
+    expect(
+      page?.relics.some((r) => r.name === 'Gravewyrm Mantle'),
+      'the Gravewyrm Mantle relic',
+    ).toBe(true);
+    const anchor = `reliquary#reliquary-${page?.id}`;
+    expect(
+      rank(index, 'gravewyrm sanctum').some(
+        (e) =>
+          e.label === 'Gravewyrm Sanctum' &&
+          e.type === t('guide.search.typeReliquaryPage') &&
+          e.href.endsWith(anchor),
+      ),
+      'page name does not resolve in search',
+    ).toBe(true);
+    expect(
+      rank(index, 'gravewyrm mantle').some(
+        (e) =>
+          e.label === 'Gravewyrm Mantle' &&
+          e.type === t('guide.search.typeRelic') &&
+          e.href.endsWith(anchor),
+      ),
+      'relic name does not resolve in search',
+    ).toBe(true);
+  });
+
+  // Indexing the Reliquary adds relic names to a public corpus, and a hidden deed's
+  // reward title once leaked through a title relic (tests/guide.test.ts, the
+  // hiddenDeedProse guard). Sweep the built corpus itself, not just the generated data.
+  it('keeps every hidden deed out of the search corpus', () => {
+    const index = buildIndex();
+    const secretsOf = (d: DeedDef): string[] => [
+      d.name,
+      d.desc,
+      ...(d.reward?.kind === 'title' ? [d.reward.text] : []),
+    ];
+    const hidden = Object.values(DEEDS).filter((d) => d.hidden);
+    expect(hidden.length, 'the catalog has hidden deeds; this guard is meaningful').toBeGreaterThan(
+      0,
+    );
+    expect(
+      hidden.some((d) => d.reward?.kind === 'title'),
+      'the reward-text arm needs a live hidden title deed',
+    ).toBe(true);
+    const labels = new Set(index.map((e) => e.label));
+    for (const d of hidden) {
+      for (const secret of secretsOf(d)) {
+        expect(
+          labels.has(secret),
+          `hidden deed "${d.id}" leaked "${secret}" as a search label`,
+        ).toBe(false);
+        expect(
+          index.some((e) => e.haystack.includes(secret.toLowerCase())),
+          `hidden deed "${d.id}" leaked "${secret}" into a search haystack`,
+        ).toBe(false);
+      }
     }
   });
 });

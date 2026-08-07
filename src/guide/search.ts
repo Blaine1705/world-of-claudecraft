@@ -14,6 +14,7 @@ import {
   GUIDE_FAMILIES,
   GUIDE_PROF_CRAFTS,
   GUIDE_PROF_GATHERING,
+  GUIDE_RELIQUARY,
   GUIDE_ZONES,
 } from './content.generated';
 import { GLOSSARY_TERMS } from './pages/glossary';
@@ -100,6 +101,19 @@ export function buildIndex(): SearchEntry[] {
   // category's section of the full roll.
   for (const d of GUIDE_DEEDS) {
     add(d.name, t('guide.search.typeDeed'), `${hrefFor('deeds')}#deed-cat-${d.category}`);
+  }
+  // Reliquary pages and the relics they collect (GUIDE_RELIQUARY is already
+  // spoiler-filtered), both deep-linked to the page's section of the catalog since
+  // relics have no anchor of their own. Relic names are English proper nouns from the
+  // sim, like ability and creature names; the page name rides along as extra, the way a
+  // signature ability carries its class, so a page query also surfaces its relics. A
+  // relic listed on two pages is indexed once per page, one entry per destination.
+  for (const p of GUIDE_RELIQUARY) {
+    const href = `${hrefFor('reliquary')}#reliquary-${p.id}`;
+    add(p.name, t('guide.search.typeReliquaryPage'), href);
+    for (const r of p.relics) {
+      add(r.name, t('guide.search.typeRelic'), href, p.name);
+    }
   }
   return entries;
 }

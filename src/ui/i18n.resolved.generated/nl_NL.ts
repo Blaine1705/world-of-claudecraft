@@ -3609,7 +3609,9 @@ export const nl_NL: EnTranslations = {
       "typeDelve": "Delve",
       "typeTerm": "Term",
       "typeAbility": "Vaardigheid",
-      "typeDeed": "Daad"
+      "typeDeed": "Daad",
+      "typeReliquaryPage": "Reliquary Page",
+      "typeRelic": "Relic"
     },
     "home": {
       "eyebrow": "Klassieke MMO in je browser",

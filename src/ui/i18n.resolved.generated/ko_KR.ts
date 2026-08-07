@@ -3609,7 +3609,9 @@ export const ko_KR: EnTranslations = {
       "typeDelve": "탐굴",
       "typeTerm": "용어",
       "typeAbility": "능력",
-      "typeDeed": "업적"
+      "typeDeed": "업적",
+      "typeReliquaryPage": "성물고 페이지",
+      "typeRelic": "성물"
     },
     "home": {
       "eyebrow": "클래식 스타일 브라우저 MMO",

@@ -9189,6 +9189,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.professions.craftHowTitle': '製作視窗',
   'guide.search.typeAbility': '技能',
   'guide.search.typeDeed': '功績',
+  'guide.search.typeRelic': '聖物',
+  'guide.search.typeReliquaryPage': '聖物庫頁面',
   'guide.settingsPage.autolootBody':
     '不想逐一點擊每具屍體嗎？有一個介面選項（預設關閉），能在你走過自己擊殺的敵人時，自動拾取牠們身上的戰利品。',
   'guide.settingsPage.factSearchBody':

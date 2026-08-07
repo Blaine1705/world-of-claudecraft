@@ -3609,7 +3609,9 @@ export const ru_RU: EnTranslations = {
       "typeDelve": "Вылазка",
       "typeTerm": "Термин",
       "typeAbility": "Способность",
-      "typeDeed": "Деяние"
+      "typeDeed": "Деяние",
+      "typeReliquaryPage": "Страница реликвария",
+      "typeRelic": "Реликвия"
     },
     "home": {
       "eyebrow": "Классическая браузерная MMO",

@@ -5436,6 +5436,8 @@ export type TranslationKeyFlat =
   | 'guide.search.typeDelve'
   | 'guide.search.typeDungeon'
   | 'guide.search.typePage'
+  | 'guide.search.typeRelic'
+  | 'guide.search.typeReliquaryPage'
   | 'guide.search.typeTerm'
   | 'guide.search.typeZone'
   | 'guide.seq.label'

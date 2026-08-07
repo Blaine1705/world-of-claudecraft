@@ -3609,7 +3609,9 @@ export const ja_JP: EnTranslations = {
       "typeDelve": "デルヴ",
       "typeTerm": "用語",
       "typeAbility": "アビリティ",
-      "typeDeed": "功績"
+      "typeDeed": "功績",
+      "typeReliquaryPage": "聖遺物庫ページ",
+      "typeRelic": "聖遺物"
     },
     "home": {
       "eyebrow": "クラシックスタイルのブラウザMMO",

@@ -9782,6 +9782,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.professions.craftHowTitle': 'Окно ремесла',
   'guide.search.typeAbility': 'Способность',
   'guide.search.typeDeed': 'Деяние',
+  'guide.search.typeRelic': 'Реликвия',
+  'guide.search.typeReliquaryPage': 'Страница реликвария',
   'guide.settingsPage.autolootBody':
     'Не хотите щёлкать по каждому телу? Параметр интерфейса, по умолчанию выключенный, сам подбирает добычу с ваших убийств, когда вы проходите мимо.',
   'guide.settingsPage.factSearchBody':

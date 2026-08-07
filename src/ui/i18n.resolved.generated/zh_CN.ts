@@ -3609,7 +3609,9 @@ export const zh_CN: EnTranslations = {
       "typeDelve": "探秘",
       "typeTerm": "术语",
       "typeAbility": "技能",
-      "typeDeed": "功绩"
+      "typeDeed": "功绩",
+      "typeReliquaryPage": "圣物库页面",
+      "typeRelic": "圣物"
     },
     "home": {
       "eyebrow": "经典风格浏览器 MMO",
