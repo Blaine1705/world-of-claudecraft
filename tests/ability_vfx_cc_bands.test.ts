@@ -160,11 +160,16 @@ function ent(
 // pins care about the band around the victim). The test anchor puts entity id
 // at x = id.
 function bandSpriteIndices(probe: FxProbe, entityId: number, type: CcBandType): number[] {
-  const cell = OVERLAY_CELL[CC_BAND_SPECS[type].cell];
+  const spec = CC_BAND_SPECS[type];
+  const cell = OVERLAY_CELL[spec.cell];
+  // Tolerance comes from the band's own radius, since the sprites ring the
+  // anchor: a fixed window narrower than the widest band silently drops half
+  // its sprites and reads as a partial draw.
+  const reach = spec.radius + 0.1;
   const pos = probe.overlay.pos;
   const out: number[] = [];
   for (let i = 0; i < probe.overlay.count; i++) {
-    if (probe.overlay.cell[i] === cell && Math.abs(pos[i * 3] - entityId) <= 0.6) out.push(i);
+    if (probe.overlay.cell[i] === cell && Math.abs(pos[i * 3] - entityId) <= reach) out.push(i);
   }
   return out;
 }

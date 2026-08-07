@@ -87,12 +87,14 @@ describe('classifyDiff', () => {
         settleMs: 1900,
       },
       {
-        key: 'gripping-roots-desktop',
-        charClass: 'druid',
-        charName: 'Brambleward',
-        abilityId: 'entangling_roots',
-        level: 8,
+        key: 'icebind-desktop',
+        charClass: 'mage',
+        charName: 'Frosthollow',
+        abilityId: 'frost_nova',
+        level: 5,
         auraKind: 'root',
+        offsetAngle: 1,
+        distance: 5.5,
         settleMs: 1900,
       },
       {
@@ -103,7 +105,8 @@ describe('classifyDiff', () => {
         level: 14,
         auraKind: 'incapacitate',
         auraId: 'fear_incap',
-        settleMs: 1100,
+        pollMs: 150,
+        settleMs: 0,
       },
     ]);
     // The control must come from the real action-bar click, never an injected

@@ -465,13 +465,22 @@ export const CC_BAND_SPECS: Readonly<Record<CcBandType, CcBandSpec>> = {
   // At the ANKLES, not overhead: a root says "my feet are stuck", which is a
   // different sentence from the head-space tells, and putting it at the base
   // keeps the two legible on the same screen without competing.
+  //
+  // The ring is WIDER than the head-space bands even though it reads smaller
+  // on screen, and that is the whole difficulty of drawing at the base: an
+  // overhead band orbits empty air, while a ground band orbits the widest
+  // part of the victim. A first pass at radius 0.38 was fed, ranked, and
+  // drawn every frame, and was still invisible in a capture, because the
+  // sprites sat INSIDE a boar's body and the depth test buried them. The
+  // ring has to clear the footprint of a broad quadruped, not just a
+  // humanoid's ankles, and the extra lift keeps it off a sloping surface.
   root: {
     type: 'root',
     severity: 2,
-    count: 3,
-    radius: 0.38,
+    count: 4,
+    radius: 0.85,
     anchorFrac: 0,
-    lift: 0.06,
+    lift: 0.12,
     rate: 1.1,
     size: 0.22,
     brightness: 2,

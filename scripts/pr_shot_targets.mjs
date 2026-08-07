@@ -533,6 +533,13 @@ export const TARGETS = [
   {
     key: 'cc-bands',
     label: 'Held crowd-control bands (stun, root, fear) worn past the cast moment',
+    // How long to wait for the cast to land its aura. Generous on purpose:
+    // the offline sim advances on the client's own frame loop, which under
+    // headless SwiftShader runs in stalled bursts, so a 1.5s cast has taken
+    // anywhere from 3s to past 12s of wall clock on a loaded host. Expiring
+    // early reports "aura never applied", which reads as bad target data
+    // rather than a slow machine.
+    ccAuraPollBudgetMs: 25000,
     // One token, and it covers the whole shipping surface: the bands live in
     // 'render/ability_vfx_core.ts' plus 'render/ability_vfx/{fx,painter,
     // sequencer}.ts', all of which this prefix matches. (An earlier
@@ -562,26 +569,41 @@ export const TARGETS = [
         settleMs: 1900,
       },
       {
-        // Gripping Roots: 12s, the longest of the three, so the ankle band
-        // sits at full alpha with room to spare.
-        key: 'gripping-roots-desktop',
-        charClass: 'druid',
-        charName: 'Brambleward',
-        abilityId: 'entangling_roots',
-        level: 8,
+        // Icebind (frost_nova): 8s, instant, and self-centred, so the nearby
+        // victim is rooted with no cast to stall on. Chosen over Gripping
+        // Roots deliberately. Every player root ability has an authored vfx
+        // spec, so all of them ALREADY wear a spec-coloured worn-debuff
+        // ground band, and shot against the nature-green Gripping Roots the
+        // new band is green on green and proves nothing. Icebind's spec is
+        // frost BLUE, so the green ankle shards this change adds are
+        // unmistakably the new read. (The genuinely uncovered root sources
+        // are the unspec'd ones, above all the mob ensnare affix, but those
+        // land on an rng chance during a mob swing and cannot be staged
+        // deterministically in a screenshot.)
+        // Staged wider off-axis and a yard further out than the head-space
+        // variants: a first capture put the victim's feet behind the
+        // player's own rig.
+        key: 'icebind-desktop',
+        charClass: 'mage',
+        charName: 'Frosthollow',
+        abilityId: 'frost_nova',
+        level: 5,
         auraKind: 'root',
+        offsetAngle: 1,
+        distance: 5.5,
         settleMs: 1900,
       },
       {
-        // Harrow: 8s. A feared mob RUNS, which is the one framing problem in
-        // this family, so the shutter comes down sooner than the other two
-        // rather than chasing it out of frame. That is safe here precisely
-        // because of the handoff this change adds: the held band stands the
-        // cast-moment stars down as soon as it wins a slot, so what is on
-        // screen at 1.1s is already the violet band and not the yellow burst.
-        // (On the BEFORE side of the pair the same moment shows the yellow
-        // stun stars this archetype flashed for every control ability, which
-        // is the misread the band replaces.)
+        // Harrow: 8s. A feared mob RUNS, and that is the one framing problem
+        // in this family: a first capture at 1.1s found the victim already
+        // across the square and illegible. So this variant shoots as soon as
+        // the aura lands rather than settling past the cast-moment burst,
+        // which is safe precisely because of the handoff this change adds:
+        // the held band stands the cast stars down the frame it wins a slot,
+        // so what is on screen is already the violet band, not yellow stars.
+        // (On the BEFORE side of the pair that same moment shows the yellow
+        // stun stars this archetype flashed for every control ability alike,
+        // which is exactly the misread the band replaces.)
         key: 'harrow-desktop',
         charClass: 'warlock',
         charName: 'Vexmoor',
@@ -589,7 +611,13 @@ export const TARGETS = [
         level: 14,
         auraKind: 'incapacitate',
         auraId: 'fear_incap',
-        settleMs: 1100,
+        // Left on the default off-axis placement. Swinging it to the player's
+        // other side to clear the town NPCs from the flee path stopped the
+        // cast landing at all (two runs, "aura never applied"), so the
+        // occasional frame where the victim ends up behind a guard is the
+        // better trade against a variant that does not capture.
+        pollMs: 150,
+        settleMs: 0,
       },
     ],
     async capture(page, variant) {
@@ -683,10 +711,14 @@ export const TARGETS = [
             // axis so the player's own rig cannot occlude it, and pull the
             // chase camera in so the band reads at PR-screenshot size. Melee
             // range suits the ranged casts here too (Gripping Roots is 30 yd,
-            // Harrow 20 yd), and it is what keeps the ankle band legible.
+            // Harrow 20 yd). The ROOT variant swings further off-axis than the
+            // others because its band rides the ANKLES, the one screen region
+            // the player's own body reliably covers at this camera distance.
             game.input.camDist = 6;
-            mob.pos.x = player.pos.x + Math.sin(player.facing + 0.5) * 4.5;
-            mob.pos.z = player.pos.z + Math.cos(player.facing + 0.5) * 4.5;
+            const offAxis = shot.offsetAngle ?? 0.5;
+            const range = shot.distance ?? 4.5;
+            mob.pos.x = player.pos.x + Math.sin(player.facing + offAxis) * range;
+            mob.pos.z = player.pos.z + Math.cos(player.facing + offAxis) * range;
             mob.pos.y = player.pos.y;
             if (mob.prevPos) {
               mob.prevPos.x = mob.pos.x;
@@ -704,15 +736,24 @@ export const TARGETS = [
           { ...variant, mobId: staged.mobId },
         );
         if (!clicked) throw new Error('primary action slot 1 is unavailable');
-        // 12s of polling, not the 4.8s an instant stun needed. Two of these
-        // three abilities have a 1.5s cast, and the offline sim advances on
-        // the client's own frame loop, which under headless SwiftShader runs
-        // in stalled bursts: a measured Gripping Roots cast took over 4s of
-        // wall clock to spend its first 1.1s of cast time. The old window
-        // expired mid-cast and reported "aura never applied", which reads as
-        // a target-data bug rather than a slow host.
-        for (let poll = 0; poll < 60 && !ccApplied; poll++) {
-          await wait(200);
+        // ~12s of polling, not the 4.8s an instant stun needed. Harrow has a
+        // 1.5s cast, and the offline sim advances on the client's own frame
+        // loop, which under headless SwiftShader runs in stalled bursts: a
+        // measured 1.5s cast took over 4s of wall clock to spend its first
+        // 1.1s of cast time. The old window expired mid-cast and reported
+        // "aura never applied", which reads as a target-data bug rather than
+        // a slow host.
+        //
+        // The poll INTERVAL is the shutter latency for a victim that moves,
+        // so the fear variant tightens it: a feared mob starts running the
+        // moment the aura lands, and at a 200ms interval how far it got by
+        // the shot was pure luck (one capture framed it, the next lost it
+        // across the square). Everything else holds still and keeps the
+        // cheaper interval.
+        const pollMs = variant.pollMs ?? 200;
+        const budgetMs = this.ccAuraPollBudgetMs;
+        for (let poll = 0; poll < Math.ceil(budgetMs / pollMs) && !ccApplied; poll++) {
+          await wait(pollMs);
           ccApplied = await page.evaluate(
             (shot) =>
               !!window.__game?.sim?.entities
