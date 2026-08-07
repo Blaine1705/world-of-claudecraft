@@ -68,8 +68,12 @@ interface AttributionTargetFixture {
 // value, or capture moved.
 // Re-pinned for the PR #2983 revert: the rendererIntegration leaf moved
 // back while PR #2982's prewarm policy remains in the release.
+// Re-pinned for the PR #2983 re-land: the weapon-skin apply queue and the
+// vfx.weapon-skins prewarm entry move src/render/renderer.ts forward again,
+// on top of the bow-aim renderer edit the release landed after the revert.
+// No Eastbrook input, geometry value, or capture moved.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '14b30d0447316ea7d4d776f1563d408f01440979a2123726cca18f51e1ed7438';
+  '74725f312d51e75c0dc19989cd1b1df6bb73ceea4a1474dd61079dd9971b2b70';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
